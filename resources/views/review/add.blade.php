@@ -312,6 +312,23 @@
 
                 <div class="tab-pane" id="tab_3">
                     <div class="form-body col-md-8">
+						<?php if(Auth::user()->admin){ ?>
+						<div class="form-group">
+                            <label>Assign to</label>
+                            <div class="input-group ">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-user"></i>
+                                </span>
+                                <select class="form-control" name="user_id" id="user_id">
+
+                                    @foreach ($users as $user_id=>$user_name)
+                                        <option value="{{$user_id}}" <?php if($user_id==$review['user_id']) echo 'selected';?>>{{$user_name}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+						<?php } ?>
+						
                         <div class="form-group">
                             <label>Follow Status</label>
                             <div class="input-group col-md-6">

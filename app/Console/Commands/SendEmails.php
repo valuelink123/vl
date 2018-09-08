@@ -122,7 +122,7 @@ class SendEmails extends Command
 				
 			} catch (\Exception $e) {
 				//\Log::error('Send Mail '.$task->id.' Error' . $e->getMessage());
-				$task->error = $e->getMessage();
+				$task->error = $this->filterEmoji($e->getMessage());
 				$task->error_count = $task->error_count + 1;
 			}
 			sleep(1);
@@ -173,4 +173,18 @@ class SendEmails extends Command
         
         return $result;
     }
+	
+	
+	
+	function filterEmoji($str)
+	{
+	 $str = preg_replace_callback(
+	   '/./u',
+	   function (array $match) {
+		return strlen($match[0]) >= 4 ? '' : $match[0];
+	   },
+	   $str);
+	  $str = str_replace(PHP_EOL, '', $str);
+	  return $str;
+	 }
 }

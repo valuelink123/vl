@@ -73,7 +73,7 @@ th,td {
                             <th>Date</th>
 							<th>Reviewer Name</th>
 							<th>Review Content</th>
-							<th>Important Value</th>
+							<th>Importance</th>
 							<th>Seller</th>
 							<th>Link</th>
                         </tr>
@@ -109,7 +109,7 @@ th,td {
                                 </td>
 								<td>
                                     <a href="review/{{array_get($data,'id')}}/edit" target="_blank">
-                                        <button type="submit" class="btn btn-success btn-xs">View</button>
+                                        <button type="submit" class="btn btn-success btn-xs">Resolve</button>
                                     </a>
                                 </td>
                             </tr>
@@ -348,7 +348,7 @@ th,td {
                             <th>Review Count</th>
 							<th>Total Stock Day</th>
 							<th>Total Stock Value</th>
-							<th>Important Value</th>
+							<th>Importance</th>
 							<th>Seller</th>
 							<th>Link</th>
                         </tr>
