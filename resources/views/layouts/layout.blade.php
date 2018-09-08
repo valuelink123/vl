@@ -359,7 +359,7 @@
 					<li class="nav-item <?php if($action=='seller') echo 'active';?>">
                         <a href="{{ url('seller') }}" class="nav-link nav-toggle">
                             <i class="fa fa-tasks"></i>
-                            <span class="title">Seller Tab</span>
+                            <span class="title">Sales Management</span>
                             <?php if($action=='seller') echo '<span class="selected"></span>';?>
                         </a>
                     </li>

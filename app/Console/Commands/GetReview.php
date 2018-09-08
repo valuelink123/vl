@@ -65,6 +65,7 @@ and tbl_review_hunter_order_product.market_place_id=tbl_seller_info.marketplace_
 			$exists = DB::table('review')->where('review', $review->review)->where('site', $review->domain)->first();
 			if(!$exists) {
 				try{
+					$user_id = 0;
 					$insert_data = array();
 					$insert_data['site'] = $review->domain;
 					$insert_data['review'] = $review->review;
@@ -82,6 +83,13 @@ and tbl_review_hunter_order_product.market_place_id=tbl_seller_info.marketplace_
 					foreach($words as $word){
 						if(stripos($review->content,$word) !== false) $insert_data['warn'] = 1;
 					}
+					
+					$user_arr = DB::table('asin')->where('asin', $review->asin)->where('site', $review->domain)->where('sellersku', $review->sellersku)->first();
+					if($user_arr){
+						$user_id = $user_arr->review_user_id;
+					}
+					$insert_data['user_id'] = $user_id;
+					
 					$result = DB::table('review')->insert($insert_data);
 				}catch (\Exception $e){
 					Log::Info(' '.$review->review.' Insert Error...'.$e->getMessage());
