@@ -82,6 +82,7 @@
             return 0 >= a.currentIndex() ? null : c.find('li:has([data-toggle="tab"]):eq(' + parseInt(a.currentIndex() - 1) + ")")
         };
         this.show = function (a) {
+			alert(a);
             return d.find('li:has([data-toggle="tab"]):eq(' + a + ") a").tab("show")
         };
         this.disable = function (a) {

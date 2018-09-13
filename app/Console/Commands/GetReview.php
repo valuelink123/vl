@@ -71,20 +71,17 @@ and tbl_review_hunter_order_product.market_place_id=tbl_seller_info.marketplace_
 					$insert_data['review'] = $review->review;
 					$insert_data['seller_id'] = $review->seller_id;
 					$insert_data['date'] = $review->date;
-					$insert_data['amazon_account'] = $review->amazon_account;
-					$insert_data['sellersku'] = $review->sellersku;
 					$insert_data['asin'] = $review->asin;
 					$insert_data['reviewer_name'] = $review->reviewer_name;
 					$insert_data['review_content'] = $review->content;
 					$insert_data['buyer_email'] = $review->customer_email;
 					$insert_data['rating'] = $review->rating;
-					$insert_data['asin_url'] = $review->domain.'/dp/'.$review->asin;
 					$insert_data['status'] = 1;
 					foreach($words as $word){
 						if(stripos($review->content,$word) !== false) $insert_data['warn'] = 1;
 					}
 					
-					$user_arr = DB::table('asin')->where('asin', $review->asin)->where('site', $review->domain)->where('sellersku', $review->sellersku)->first();
+					$user_arr = DB::table('asin')->where('asin', $review->asin)->where('site', $review->domain)->first();
 					if($user_arr){
 						$user_id = $user_arr->review_user_id;
 					}

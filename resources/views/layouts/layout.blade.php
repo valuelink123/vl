@@ -71,10 +71,13 @@
     <script src="/assets/global/plugins/bootstrap-toastr/toastr.min.js" type="text/javascript"></script>
 	<script src="/assets/global/plugins/bootbox/bootbox.min.js" type="text/javascript"></script>
 	<script src="/assets/pages/scripts/ui-modals.min.js" type="text/javascript"></script>
+	
     <!-- END PAGE LEVEL SCRIPTS -->
     <script src="/assets/global/plugins/jquery-validation/js/jquery.validate.min.js" type="text/javascript"></script>
     <script src="/assets/global/plugins/jquery-validation/js/additional-methods.min.js" type="text/javascript"></script>
     <script src="/assets/global/plugins/select2/js/select2.full.min.js" type="text/javascript"></script>
+	<script src="/assets/global/plugins/bootstrap-wizard/jquery.bootstrap.wizard.js" type="text/javascript"></script>
+
     <!-- BEGIN THEME GLOBAL SCRIPTS -->
     <script src="/assets/global/scripts/app.min.js" type="text/javascript"></script>
     <script src="/assets/global/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js" type="text/javascript"></script>
@@ -348,6 +351,15 @@
                             <i class="fa fa-wrench"></i>
                             <span class="title">Seller Tab Config</span>
                             <?php if($action=='sellertab') echo '<span class="selected"></span>';?>
+
+                        </a>
+
+                    </li>
+					<li class="nav-item <?php if($action=='rs') echo 'active';?>">
+                        <a href="{{ url('rs') }}" class="nav-link nav-toggle">
+                            <i class="fa fa-wrench"></i>
+                            <span class="title">Review Step Config</span>
+                            <?php if($action=='rs') echo '<span class="selected"></span>';?>
 
                         </a>
 

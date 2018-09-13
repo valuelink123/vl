@@ -321,6 +321,11 @@ class GetAsininfo extends Command
 	when DATEDIFF(CURRENT_DATE(),date)<=720 and DATEDIFF(CURRENT_DATE(),date)>360 then 3
 	when DATEDIFF(CURRENT_DATE(),date)<=1000 and DATEDIFF(CURRENT_DATE(),date)>720 then 2
 	when DATEDIFF(CURRENT_DATE(),date)>1000 then 1
+	End)+(case 
+	when rating=1 then 10
+	when rating=2 then 8
+	when rating=3 then 6
+	else 0
 	End),0) where date>'2015-01-01' and `status` =1");
 
 		

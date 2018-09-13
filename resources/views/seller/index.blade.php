@@ -6,12 +6,15 @@
 table.dataTable thead>tr>th.sorting_asc, table.dataTable thead>tr>th.sorting_desc, table.dataTable thead>tr>th.sorting, table.dataTable thead>tr>td.sorting_asc, table.dataTable thead>tr>td.sorting_desc, table.dataTable thead>tr>td.sorting {
     padding-right: 15px !important;
 }
+
 table.dataTable thead th, table.dataTable thead td {
     padding: 10px 2px !important;}
+table.dataTable tbody th, table.dataTable tbody td {
+    padding: 10px 2px !important;;
+}
 th,td {
-    font-size:14px !important;}
-
-
+    font-size:12px !important;
+	font-family:Arial, Helvetica, sans-serif;}
 </style>
     <h1 class="page-title font-red-intense"> Seller Tab
         <small>Seller Tab</small>
@@ -105,7 +108,7 @@ th,td {
                                     {{array_get($data,'negative_value')}} 
                                 </td>
 								<td>
-                                    {{array_get($data,'seller')}}
+                                    {{array_get($users,array_get($data,'user_id'))}}
                                 </td>
 								<td>
                                     <a href="review/{{array_get($data,'id')}}/edit" target="_blank">

@@ -53,6 +53,7 @@ Route::get('/laravel-u-editor-server/server', 'UploadController@server')->name('
 Route::resource('question', 'QaController');
 Route::resource('group', 'GroupController');
 Route::resource('sellertab', 'SellertabController');
+Route::resource('rs', 'RsController');
 Route::resource('seller', 'SellerController');
 Route::get('/seller/{asin}/{marketplaceid}', 'SellerController@show')->name('viewAsin');
 Route::Post('/ratingdetails', 'SellerController@getrating')->name('getRating');

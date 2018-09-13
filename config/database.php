@@ -82,6 +82,22 @@ return [
             'strict' => false,
             'engine' => null,
         ],
+		
+		
+		'review_new' => [
+            'driver' => 'mysql',
+            'host' => env('DB_REVIEW_NEW_HOST', '127.0.0.1'),
+            'port' => env('DB_REVIEW_NEW_PORT', '3306'),
+            'database' => env('DB_REVIEW_NEW_DATABASE', 'forge'),
+            'username' => env('DB_REVIEW_NEW_USERNAME', 'forge'),
+            'password' => env('DB_REVIEW_NEW_PASSWORD', ''),
+            'unix_socket' => env('DB_REVIEW_NEW_SOCKET', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'strict' => false,
+            'engine' => null,
+        ],
 
         'pgsql' => [
             'driver' => 'pgsql',
