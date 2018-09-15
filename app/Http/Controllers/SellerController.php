@@ -38,8 +38,12 @@ class SellerController extends Controller
 		$seller_tabs= array();
 		
 		$config_fields = getFieldtoField();
-		$addwhere = '';
-		if(!Auth::user()->admin) $addwhere = " and seller in ('".implode("','", $this->getUser())."')";
+		$addwhere = $addwhereid= '';
+		$users = $this->getUser();
+		if(!Auth::user()->admin){
+			$addwhere = " and seller in ('".implode("','", $this->getUser())."')";
+			$addwhereid = " and user_id in ('".implode("','", $this->getUser(true))."')";
+		}
 		foreach($tabs as $tab){
 			$seller_tabs[$tab->id]['tab']=$tab->tab;
 			$rule = unserialize($tab->tab_rules);
@@ -121,19 +125,24 @@ class SellerController extends Controller
 		//print_r($seller_tabs);
 		//die();
 		$positives=DB::select("select a.seller,b.* from seller_asins as b left join (select site,seller,asin from asin group by site,seller,asin) as a on a.asin=b.asin and a.site=b.site where positive_value>0 $addwhere order by positive_value desc");
-		$negatives=DB::select("select a.seller,b.* from review as b left join (select site,seller,asin from asin group by site,seller,asin) as a on a.asin=b.asin and a.site=b.site where negative_value>0 and status=1 $addwhere order by negative_value desc");
+		$negatives=DB::select("select * from review where negative_value>0 and status=1 and date>='".date('Y-m-d',strtotime('-90days'))."' $addwhereid order by negative_value desc");
 		
-        return view('seller/index',['tabs'=>$seller_tabs,'positives'=>json_decode(json_encode($positives),TRUE),'negatives'=>json_decode(json_encode($negatives),TRUE)]);
+        return view('seller/index',['tabs'=>$seller_tabs,'users'=>$users,'positives'=>json_decode(json_encode($positives),TRUE),'negatives'=>json_decode(json_encode($negatives),TRUE)]);
 
     }
 
-    public function getUser(){
+    public function getUser($getid=false){
 		$users_arr = array();
 		if(Auth::user()->admin){
             $users = User::all();
 			
 			foreach($users as $user){
-				$users_arr[] = $user->name;
+				if($getid){
+					$users_arr[] = $user->id;
+				}else{
+					$users_arr[$user->id] = $user->name;
+				}
+				
 			}
 			return $users_arr;
         }else{
@@ -149,9 +158,10 @@ class SellerController extends Controller
 			foreach($user_ids as $user){
 				$user_ids_arr[] = $user->user_id;
 			}
+			if($getid) return $user_ids_arr;
 			$users = User::whereIn('id',$user_ids_arr)->get();
 			foreach($users as $user){
-				$users_arr[] = $user->name;
+				$users_arr[$user->id] = $user->name;
 			}
 			return $users_arr;
         }

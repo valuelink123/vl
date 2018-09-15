@@ -176,7 +176,7 @@ class ReviewController extends Controller
 			});
 		
 		if(!Auth::user()->admin){
-            $customers = $customers->where('asin.review_user_id',$this->getUserId());
+            $customers = $customers->where('review.user_id',$this->getUserId());
         }
 		
 
@@ -326,6 +326,10 @@ class ReviewController extends Controller
 		
 		$asin_status_array = getAsinStatus();
 		$follow_status_array = getReviewStatus();
+		$steps = DB::table('review_step')->get();
+		foreach($steps as $step){
+			$follow_status_array[$step->id]=$step->title;
+		}
 		$teams= DB::select('select bg,bu from asin group by bg,bu ORDER BY BG ASC,BU ASC');
         return view('review/index',['date_from'=>$date_from ,'date_to'=>$date_to, 'asin_status'=>$asin_status_array,'follow_status'=>$follow_status_array, 'users'=>$this->getUsers(),'teams'=>$teams]);
 
@@ -337,7 +341,7 @@ class ReviewController extends Controller
 		$date_to=date('Y-m-d');	
 		if (isset($_REQUEST["customActionType"]) && $_REQUEST["customActionType"] == "group_action") {
             $updateDate=array();
-
+			
 			if(array_get($_REQUEST,"giveReviewUser")){
                 $updateDate['user_id'] = array_get($_REQUEST,"giveReviewUser");
             }
@@ -364,7 +368,7 @@ class ReviewController extends Controller
 			});
 		
 		if(!Auth::user()->admin){
-            $customers = $customers->where('asin.review_user_id',$this->getUserId());
+            $customers = $customers->where('review.user_id',$this->getUserId());
         }
 		
 		if(array_get($_REQUEST,'bgbu')){
@@ -391,7 +395,7 @@ class ReviewController extends Controller
 		$customers = $customers->where('date','>=',$date_from);
 		$customers = $customers->where('date','<=',$date_to);
 		
-
+		
 		if(array_get($_REQUEST,'follow_status')){
             $customers = $customers->whereIn('review.status',array_get($_REQUEST,'follow_status'));
         }
@@ -426,17 +430,15 @@ class ReviewController extends Controller
         $sort = 'desc';
         if(isset($_REQUEST['order'][0])){
 			 if($_REQUEST['order'][0]['column']==1) $orderby = 'negative_value';
-            if($_REQUEST['order'][0]['column']==2) $orderby = 'item_no';
-			if($_REQUEST['order'][0]['column']==3) $orderby = 'asin';
-            if($_REQUEST['order'][0]['column']==4) $orderby = 'date';
-            if($_REQUEST['order'][0]['column']==5) $orderby = 'rating';
+            if($_REQUEST['order'][0]['column']==2) $orderby = 'asin';
+			if($_REQUEST['order'][0]['column']==3) $orderby = 'date';
+            if($_REQUEST['order'][0]['column']==4) $orderby = 'rating';
+            if($_REQUEST['order'][0]['column']==5) $orderby = 'reviewer_name';
             if($_REQUEST['order'][0]['column']==6) $orderby = 'status';
-            if($_REQUEST['order'][0]['column']==7) $orderby = 'amazon_account';
-            if($_REQUEST['order'][0]['column']==8) $orderby = 'amazon_order_id';
-			if($_REQUEST['order'][0]['column']==9) $orderby = 'buyer_email';
-			if($_REQUEST['order'][0]['column']==11) $orderby = 'reviewer_name';
-			if($_REQUEST['order'][0]['column']==12) $orderby = 'edate';
-			if($_REQUEST['order'][0]['column']==13) $orderby = 'user_id';
+            if($_REQUEST['order'][0]['column']==7) $orderby = 'buyer_email';
+            if($_REQUEST['order'][0]['column']==8) $orderby = 'edate';
+			if($_REQUEST['order'][0]['column']==9) $orderby = 'user_id';
+
             $sort = $_REQUEST['order'][0]['dir'];
 			
 			
@@ -466,25 +468,25 @@ class ReviewController extends Controller
 		$users_array = $this->getUsers();
 		$asin_status_array =  getAsinStatus();
 		$follow_status_array = getReviewStatus();
+		$steps = DB::table('review_step')->get();
+		foreach($steps as $step){
+			$follow_status_array[$step->id]=$step->title;
+		}
+		
         for($i = $iDisplayStart; $i < $end; $i++) {
 
 			$records["data"][] = array(
 				 '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input name="id[]" type="checkbox" class="checkboxes" value="'.$ordersList[$i]['id'].'"/><span></span></label>',
 				$ordersList[$i]['negative_value'],
-				$ordersList[$i]['asin'],
-				$ordersList[$i]['item_no'],
+				'<a href="https://'.$ordersList[$i]['site'].'/dp/'.$ordersList[$i]['asin'].'" target="_blank">'.$ordersList[$i]['asin'].'</a> <span class="label label-sm label-default">'.strtoupper(substr(strrchr($ordersList[$i]['site'], '.'), 1)).'</span>',
 				$ordersList[$i]['date'],
 				$ordersList[$i]['rating'],
-				array_get($follow_status_array,$ordersList[$i]['status'],''),
-				$ordersList[$i]['amazon_account'],
-				$ordersList[$i]['amazon_order_id'],
-				$ordersList[$i]['buyer_email'],
-				strip_tags($ordersList[$i]['content']),
-
 				$ordersList[$i]['reviewer_name'],
+				array_get($follow_status_array,$ordersList[$i]['status'],''),
+				$ordersList[$i]['buyer_email'],
 				$ordersList[$i]['edate'],
 				array_get($users_array,intval(array_get($ordersList[$i],'user_id')),''),				
-				(($ordersList[$i]['warn']>0)?'<i class="fa fa-warning" title="Contains dangerous words"></i>&nbsp;&nbsp;&nbsp;':'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;').'<a href="https://'.$ordersList[$i]['site'].'/gp/customer-reviews/'.$ordersList[$i]['review'].'" target="_blank" class="btn btn-success btn-xs"> View </a>'.'<a href="/review/'.$ordersList[$i]['id'].'/edit" target="_blank" class="btn btn-danger btn-xs"><i class="fa fa-search"></i> Edit </a>'
+				(($ordersList[$i]['warn']>0)?'<i class="fa fa-warning" title="Contains dangerous words"></i>&nbsp;&nbsp;&nbsp;':'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;').'<a href="https://'.$ordersList[$i]['site'].'/gp/customer-reviews/'.$ordersList[$i]['review'].'" target="_blank" class="btn btn-success btn-xs"> View </a>'.'<a href="/review/'.$ordersList[$i]['id'].'/edit" target="_blank" class="btn btn-danger btn-xs"><i class="fa fa-search"></i> Resolve </a>'
 			);
         }
 
@@ -520,136 +522,55 @@ class ReviewController extends Controller
             if($order) $order->item = DB::table('amazon_orders_item')->where('SellerId', array_get($review,'seller_id'))->where('AmazonOrderId', array_get($review,'amazon_order_id'))->get();
         }
 		$return['users'] = $this->getUsers();
+		$return['steps'] = DB::table('review_step')->get();
 		$return['review'] = $review;
 		$return['sellerids'] = $this->getSellerIds();
 		$return['accounts'] = $this->getAccounts();
+		$return['emails'] = DB::table('sendbox')->where('to_address', array_get($review,'buyer_email'))->orderBy('date','desc')->get();
+		$return['emails'] =json_decode(json_encode($return['emails']), true);
 		if($order) $return['order'] = $order;
         return view('review/edit',$return);
 
     }
 
-	
-	public function create()
-    {
-        //if(!Auth::user()->admin) die();
-        return view('review/add',['users'=>$this->getUsers()]);
-    }
-	
-	
-	public function store(Request $request)
-    {
-        //if(!Auth::user()->admin) die();
-		
-        $this->validate($request, [
-			'review' => 'required|string',
-            'asin' => 'required|string',
-            'site' => 'required|string',
-			'sellersku' => 'required|string',
-			'date' => 'required|string',
-			'rating' => 'required|int',
-            'amazon_account' => 'required|string',
-			'reviewer_name' => 'required|string',
-            'review_content' => 'required|string',
-            'status' => 'required|int',
-        ]);
-		if($request->get('status')==6 && !($request->get('creson'))){
-            $request->session()->flash('error_message','Set Review Failed, Set Review Closed Must Fill Closed Reson !.');
-            return redirect()->back()->withInput();
-            die();
-        }
-		
-        if($this->checkAccount($request)){
-            $request->session()->flash('error_message','Set Review Failed, this Review has Already exists.');
-            return redirect()->back()->withInput();
-            die();
-        }
-		
-        $seller_account = new Review;
-		$seller_account->review = $request->get('review');
-        $seller_account->asin = $request->get('asin');
-        $seller_account->site = $request->get('site');
-		$seller_account->review_content = $request->get('review_content');
-        $seller_account->sellersku = $request->get('sellersku');
-		$seller_account->seller_id = $request->get('seller_id');
-        $seller_account->date = $request->get('date');
-        $seller_account->rating = $request->get('rating');
-        $seller_account->amazon_account = $request->get('amazon_account');
-		$seller_account->reviewer_name = $request->get('reviewer_name');
-		$seller_account->status = $request->get('status');
-		if($request->get('status')==6) $seller_account->creson = $request->get('creson');
-		if($request->get('status')>1) $seller_account->edate = date('Y-m-d');
-		$seller_account->amazon_order_id = $request->get('amazon_order_id');
-		$seller_account->buyer_email = $request->get('buyer_email');
-		$seller_account->content = $request->get('content');
-		$seller_account->etype = $request->get('etype');
-		$seller_account->epoint = $request->get('epoint');
-		$seller_account->edescription = $request->get('edescription');
-		if(Auth::user()->admin && $request->get('user_id')){
-			$seller_account->user_id = $request->get('user_id');
-		}
-        if($request->get('id')>0){
-            $seller_account->id = $request->get('id');
-        }
-        if ($seller_account->save()) {
-            $request->session()->flash('success_message','Set Review Success');
-            return redirect('review');
-        } else {
-            $request->session()->flash('error_message','Set Review Failed');
-            return redirect()->back()->withInput();
-        }
-    }
-
-
-
     public function update(Request $request,$id)
     {
         //if(!Auth::user()->admin) die();
-
-        $this->validate($request, [
-			'review' => 'required|string',
-            'asin' => 'required|string',
-            'site' => 'required|string',
-			'sellersku' => 'required|string',
-			'date' => 'required|string',
-			'rating' => 'required|int',
-            'amazon_account' => 'required|string',
-			'reviewer_name' => 'required|string',
-            'review_content' => 'required|string',
-            'status' => 'required|int',
-        ]);
 		
 		if($request->get('status')==6 && !($request->get('creson'))){
             $request->session()->flash('error_message','Set Review Failed, Set Review Closed Must Fill Closed Reson !.');
-            return redirect()->back()->withInput();
-            die();
-        }
-		
-        if($this->checkAccount($request)){
-            $request->session()->flash('error_message','Set Review Failed, this Review has Already exists.');
             return redirect()->back()->withInput();
             die();
         }
 		
         $seller_account = Review::findOrFail($id);;
-		$seller_account->review = $request->get('review');
-        $seller_account->asin = $request->get('asin');
-        $seller_account->site = $request->get('site');
-		$seller_account->review_content = $request->get('review_content');
-        $seller_account->sellersku = $request->get('sellersku');
-		$seller_account->seller_id = $request->get('seller_id');
-        $seller_account->date = $request->get('date');
-        $seller_account->rating = $request->get('rating');
-        $seller_account->amazon_account = $request->get('amazon_account');
-		$seller_account->reviewer_name = $request->get('reviewer_name');
-		$seller_account->status = $request->get('status');
-		if($request->get('status')==6) $seller_account->creson = $request->get('creson');
-		if($request->get('status')>1) $seller_account->edate = date('Y-m-d');
-		$seller_account->amazon_order_id = $request->get('amazon_order_id');
-		$seller_account->buyer_email = $request->get('buyer_email');
-		$seller_account->content = $request->get('content');
-		$seller_account->etype = $request->get('etype');
-		$seller_account->epoint = $request->get('epoint');
-		$seller_account->edescription = $request->get('edescription');
+		
+		if($request->get('rebindordersellerid')) $seller_account->seller_id = $request->get('rebindordersellerid');
+		if($request->get('rebindorderid')) $seller_account->amazon_order_id = $request->get('rebindorderid');
+		if($request->get('buyer_email')) $seller_account->buyer_email = $request->get('buyer_email');
+		if($request->get('buyer_phone')) $seller_account->buyer_phone = $request->get('buyer_phone');
+		if($request->get('etype')) $seller_account->etype = $request->get('etype');
+		$seller_account->edate = date('Y-m-d');
+		$do_ids = $request->get('do_id');
+		
+		if($do_ids){
+			asort($do_ids);
+			$do_log = [];
+			foreach($do_ids as $k=>$do_id){
+				if($do_id=='X'){
+					$seller_account->status = $request->get('status');
+					if($request->get('status')==6) $seller_account->creson = $request->get('creson');
+					$do_log[$do_id]['do_date']=$request->get('do_date_'.$do_id);
+					$do_log[$do_id]['do_content']=$request->get('status');
+				}else{
+					$do_log[$do_id]['do_date']=$request->get('do_date_'.$do_id);
+					$do_log[$do_id]['do_content']=$request->get('valuelink_follow_content_'.$do_id);
+					$seller_account->status = $do_id;
+				}
+			}
+			$seller_account->follow_content = serialize($do_log);
+		}
+				
 		if(Auth::user()->admin && $request->get('user_id')){
 			if($seller_account->user_id!=$request->get('user_id')){
 				DB::table('review_change_log')->insert(array(
@@ -668,15 +589,6 @@ class ReviewController extends Controller
             $request->session()->flash('error_message','Set Review Failed');
             return redirect()->back()->withInput();
         }
-    }
-	
-    public function checkAccount($request){
-        $id = ($request->get('id'))?($request->get('id')):0;
-
-        $seller_account = Review::where('review',$request->get('review'))->where('site',$request->get('site'))->where('id','<>',$id)
-            ->first();
-        if($seller_account) return true;
-        return false;
     }
 	
 	function getExtension($inputFileName)

@@ -10,6 +10,14 @@
   margin: 0px !important;
 }
 
+table.dataTable thead th, table.dataTable thead td {
+    padding: 10px 2px !important;}
+table.dataTable tbody th, table.dataTable tbody td {
+    padding: 10px 2px;
+}
+th,td,td>span {
+    font-size:12px !important;
+	font-family:Arial, Helvetica, sans-serif;}
 
 </style>
     <h1 class="page-title font-red-intense"> Review List
@@ -71,6 +79,8 @@
 						</div>
 						
 						</div>	
+						
+						
 						 <div class="row" style="margin-top:20px;">
 						<div class="col-md-2">
 						<select class="form-control form-filter input-sm" name="rating">
@@ -111,14 +121,12 @@
 					</div>
 
                     </form>
+					
+					
+					
 					<div class="row" style="margin-top:30px">
                         <div class="col-md-4">
-                            <div class="btn-group">
-                                <a href="{{ url('review/create')}}"><button id="sample_editable_1_2_new" class="btn sbold blue"> Add New
-                                    <i class="fa fa-plus"></i>
-                                </button>
-                                </a>
-                            </div>
+                            
                         </div>
 						<div class="col-md-2">
 						</div>
@@ -140,8 +148,11 @@
 						</form>
 						
 					</div>
+					
+					
+					
                 </div>
-
+				
                 <div class="portlet-title">
                     <div class="caption font-dark">
                         <i class="icon-settings font-dark"></i>
@@ -150,16 +161,16 @@
 					
 					<div class="btn-group " style="float:right;">
 								<div class="table-actions-wrapper" id="table-actions-wrapper">
-							
-							<select id="giveReviewUser" class="table-group-action-input form-control input-inline input-small input-sm">
-                                <option value="">Change Review User</option>
+							<?php if(Auth::user()->admin){ ?>
+							<select class="mt-multiselect btn btn-default" multiple="multiple" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" id="giveReviewUser" >
+                                
                                 @foreach ($users as $user_id=>$user_name)
                                     <option value="{{$user_id}}">{{$user_name}}</option>
                                 @endforeach
                             </select>
                             <button class="btn  green table-group-action-submit">
                                 <i class="fa fa-check"></i> Change</button>
-                        	
+                        	<?php } ?>
                                 <button id="vl_list_export" class="btn sbold blue"> Export
                                     <i class="fa fa-download"></i>
                                 </button>
@@ -174,26 +185,22 @@
                         <table class="table table-striped table-bordered table-hover table-checkable" id="datatable_ajax_asin">
                         <thead>
                             <tr role="row" class="heading">
-								<th width="2%">
+								<th style="max-width:20px;">
                                     <label class="mt-checkbox mt-checkbox-single mt-checkbox-outline">
                                         <input type="checkbox" class="group-checkable" data-set="#datatable_ajax_asin .checkboxes" />
                                         <span></span>
                                     </label>
                                 </th>
-								<th style="min-width:50px;">Importance</th>
-								<th style="min-width:100px;">Asin</th>
-                                <th style="min-width:60px;">Item No.</th>
-								<th style="min-width:80px;">Date</th>
+								<th style="min-width:30px;">Imp.</th>
+								<th style="min-width:70px;">Asin</th>
+								<th style="min-width:70px;">Date</th>
 								<th style="min-width:50px;">Rating</th>
-								<th style="min-width:50px;">Status</th>
-								<th style="min-width:150px;">Account</th>
-								<th style="min-width:120px;">OrderId</th>
-								<th style="min-width:150px;">BuyerEmail</th>
-								<th style="max-width:400px;">FollowUpProgress</th>
-								<th style="min-width:100px;">ReviewerName</th>
-								 <th style="min-width:100px;">FollowUpDate</th>
-                                <th style="min-width:100px;">User</th>
-                                <th style="min-width:100px;">Action</th>
+								<th style="min-width:80px;">Name</th>
+								<th style="min-width:80px;">Status</th>
+								<th style="min-width:200px;">Email</th>
+								<th style="min-width:70px;">LastUpdate</th>
+                                <th style="min-width:70px;">User</th>
+                                <th style="min-width:90px;">Action</th>
                             </tr>
 							
                             
@@ -251,15 +258,15 @@
                     // So when dropdowns used the scrollable div should be removed.
                    "autoWidth":true,
                     "lengthMenu": [
-                        [20, 50, 100, -1],
-                        [20, 50, 100, 'All'] // change per page values here
+                        [10, 50, 100, -1],
+                        [10, 50, 100, 'All'] // change per page values here
                     ],
-                    "pageLength": 20, // default record count per page
+                    "pageLength": 10, // default record count per page
 
 
-					"aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0,9,14] }],	
+					"aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0,10] }],	
 					 "order": [
-                        [4, "desc"]
+                        [3, "desc"]
                     ],
                     // scroller extension: http://datatables.net/extensions/scroller/
 
@@ -274,10 +281,9 @@
                     },
 
                     "createdRow": function( row, data, dataIndex ) {
-						$(row).children('td').eq(10).attr('style', 'max-width: 200px;overflow:hidden;white-space:nowrap;text-align: left; ');
-						$(row).children('td').eq(10).attr('title', $(row).children('td').eq(10).text());
-                        $(row).children('td').eq(9).attr('style', 'max-width: 100px;overflow:hidden;white-space:nowrap;text-align: left; ');
-						$(row).children('td').eq(9).attr('title', $(row).children('td').eq(9).text());
+						$(row).children('td').eq(0).attr('style', 'width: 30px;');
+                        $(row).children('td').eq(7).attr('style', 'max-width: 200px;overflow:hidden;white-space:nowrap;text-align: left; ');
+						$(row).children('td').eq(7).attr('title', $(row).children('td').eq(7).text());
                     },
 					"dom": "<'row' <'col-md-12'>><'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'>r><'table-scrollable't><'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>",
                 }
