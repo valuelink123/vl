@@ -10,9 +10,10 @@ namespace App\Http\Controllers\Frank;
 
 class KmsController extends Controller {
 
-    public function test() {
+    public function brandLine() {
+        // print_r(($GLOBALS['request'])); // 竟然报内存不足
         // print_r(request()->route()->getAction());
-        return view('kms/test', ['abc' => 'Product Guide']);
+        return view('frank/kmsBrandLine', ['abc' => 'Product Guide']);
     }
 
 }

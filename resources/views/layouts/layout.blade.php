@@ -198,7 +198,7 @@
                         </div>
                     </li>
                     <?php
-                    $action_method = explode('.',request()->route()->getAction()['as']);
+                    $action_method = explode('.', request()->route()->getAction()['as'] ?? '');
                     
                     $action = $action_method[0];
                     $method = isset($action_method[1])?$action_method[1]:'';
