@@ -78,18 +78,21 @@ th,td,td>span {
                                     </select>
 						</div>
 						
+						 <div class="col-md-2">
+						<select class="mt-multiselect btn btn-default" multiple="multiple" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" name="site[]" id="site[]">
+
+                                        @foreach (getAsinSites() as $v)
+                                            <option value="{{$v}}">{{$v}}</option>
+                                        @endforeach
+                                    </select>
+						</div>
+						
+						
+						
 						</div>	
 						
 						
 						 <div class="row" style="margin-top:20px;">
-						<div class="col-md-2">
-						<select class="form-control form-filter input-sm" name="rating">
-                                        <option value="">Rating</option>
-                                        <option value="1" <?php if(1==array_get($_REQUEST,'rating')) echo 'selected';?>>1</option>
-										<option value="2" <?php if(2==array_get($_REQUEST,'rating')) echo 'selected';?>>2</option>
-										<option value="3" <?php if(3==array_get($_REQUEST,'rating')) echo 'selected';?>>3</option>
-                                    </select>
-						</div>
 						
 						
 						<div class="col-md-2">
@@ -105,18 +108,53 @@ th,td,td>span {
                                     </select>
 						</div>	
 						
-						<div class="col-md-3">
+						
+						<div class="col-md-1">
+						
+						
+						
+						
+						<select class="form-control form-filter input-sm" name="rating">
+                                        <option value="">Rating</option>
+                                        <option value="1" <?php if(1==array_get($_REQUEST,'rating')) echo 'selected';?>>1</option>
+										<option value="2" <?php if(2==array_get($_REQUEST,'rating')) echo 'selected';?>>2</option>
+										<option value="3" <?php if(3==array_get($_REQUEST,'rating')) echo 'selected';?>>3</option>
+                                    </select>
+						</div>
+						
+						
+						<div class="col-md-1">
+						<select class="form-control form-filter input-sm" name="vp">
+							<option value="">VP</option>
+							<option value="1">No</option>
+							<option value="2">Yes</option>
+						</select>
+						</div>
+						<div class="col-md-1">
+						<select class="form-control form-filter input-sm" name="del">
+							<option value="">Del</option>
+							<option value="1">No</option>
+							<option value="2">Yes</option>
+						</select>
+						</div>
+						
+						
+						<div class="col-md-2">
+						<select class="form-control form-filter input-sm" name="rc">
+							<option value="">Rating Change</option>
+							<option value="1">No</option>
+							<option value="2">Yes</option>
+						</select>
+						</div>
+						
+						<div class="col-md-2">
 						<input type="text" class="form-control form-filter input-sm" name="keywords" placeholder="Keywords" value ="{{array_get($_REQUEST,'keywords')}}">
                                        
 						</div>	
 						<div class="col-md-1">
-							<div class="form-actions">
-								<div class="row">
-									<div class="col-md-offset-4 col-md-8">
+							
 										<button type="button" class="btn blue" id="data_search">Search</button>
-									</div>
-								</div>
-							</div>
+									
                         </div>
 					</div>
 
@@ -133,7 +171,7 @@ th,td,td>span {
 						<form action="{{url('review/upload')}}" method="post" enctype="multipart/form-data">
 						<div class="col-md-2" style="text-align:right;" >
 
-							<a href="{{ url('/uploads/reviewUpload/reviews.csv')}}" >Import Template
+							<a href="{{ url('/uploads/reviewUpload/customers.csv')}}" >Import Template
                                 </a>	
 						</div>
 						<div class="col-md-2">
@@ -141,7 +179,7 @@ th,td,td>span {
 								 <input type="file" name="importFile"  />
 						</div>
 						<div class="col-md-2">
-							<button type="submit" class="btn blue" id="data_search">Batch upload</button>
+							<button type="submit" class="btn blue" id="data_search">Upload Email</button>
 
 						</div>
 						
@@ -162,7 +200,7 @@ th,td,td>span {
 					<div class="btn-group " style="float:right;">
 								<div class="table-actions-wrapper" id="table-actions-wrapper">
 							<?php if(Auth::user()->admin){ ?>
-							<select class="mt-multiselect btn btn-default" multiple="multiple" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" id="giveReviewUser" >
+							<select  class="table-group-action-input form-control input-inline input-small input-sm" id="giveReviewUser">
                                 
                                 @foreach ($users as $user_id=>$user_name)
                                     <option value="{{$user_id}}">{{$user_name}}</option>
@@ -196,8 +234,9 @@ th,td,td>span {
 								<th style="min-width:70px;">Date</th>
 								<th style="min-width:50px;">Rating</th>
 								<th style="min-width:80px;">Name</th>
+								<th style="min-width:30px;">VP</th>
 								<th style="min-width:80px;">Status</th>
-								<th style="min-width:200px;">Email</th>
+								<th style="min-width:170px;">Email</th>
 								<th style="min-width:70px;">LastUpdate</th>
                                 <th style="min-width:70px;">User</th>
                                 <th style="min-width:90px;">Action</th>
@@ -264,9 +303,9 @@ th,td,td>span {
                     "pageLength": 10, // default record count per page
 
 
-					"aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0,10] }],	
+					"aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0,11] }],	
 					 "order": [
-                        [3, "desc"]
+                        [1, "desc"]
                     ],
                     // scroller extension: http://datatables.net/extensions/scroller/
 
@@ -282,8 +321,8 @@ th,td,td>span {
 
                     "createdRow": function( row, data, dataIndex ) {
 						$(row).children('td').eq(0).attr('style', 'width: 30px;');
-                        $(row).children('td').eq(7).attr('style', 'max-width: 200px;overflow:hidden;white-space:nowrap;text-align: left; ');
-						$(row).children('td').eq(7).attr('title', $(row).children('td').eq(7).text());
+                        $(row).children('td').eq(8).attr('style', 'max-width: 170px;overflow:hidden;white-space:nowrap;text-align: left; ');
+						$(row).children('td').eq(8).attr('title', $(row).children('td').eq(8).text());
                     },
 					"dom": "<'row' <'col-md-12'>><'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'>r><'table-scrollable't><'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>",
                 }
@@ -324,12 +363,16 @@ th,td,td>span {
 
             grid.setAjaxParam("date_from", $("input[name='date_from']").val());
             grid.setAjaxParam("date_to", $("input[name='date_to']").val());
+			grid.setAjaxParam("vp", $("select[name='vp']").val());
+			grid.setAjaxParam("del", $("select[name='del']").val());
             grid.setAjaxParam("user_id", $("select[name='user_id[]']").val());
 			grid.setAjaxParam("rating", $("select[name='rating']").val());
 			grid.setAjaxParam("asin_status", $("select[name='asin_status[]']").val());
 			grid.setAjaxParam("follow_status", $("select[name='follow_status[]']").val());
+			grid.setAjaxParam("site", $("select[name='site[]']").val());
 			grid.setAjaxParam("keywords", $("input[name='keywords']").val());
 			grid.setAjaxParam("bgbu", $("select[name='bgbu']").val());
+			grid.setAjaxParam("rc", $("select[name='rc']").val());
             grid.getDataTable().ajax.reload(null,false);
             //grid.clearAjaxParams();
         }
@@ -357,7 +400,7 @@ $(function() {
 		TableDatatablesAjax.init();
 	});
 	$("#vl_list_export").click(function(){
-		location.href='/reviewexport?asin_status='+(($("select[name='asin_status[]']").val())?$("select[name='asin_status[]']").val():'')+'&keywords='+$("input[name='keywords']").val()+'&date_from='+$("input[name='date_from']").val()+'&date_to='+$("input[name='date_to']").val()+'&follow_status='+(($("select[name='follow_status[]']").val())?$("select[name='follow_status[]']").val():'')+'&user_id='+(($("select[name='user_id[]']").val())?$("select[name='user_id[]']").val():'')+'&rating='+$("select[name='rating']").val()+'&bgbu='+$("select[name='bgbu']").val();
+		location.href='/reviewexport?asin_status='+(($("select[name='asin_status[]']").val())?$("select[name='asin_status[]']").val():'')+'&keywords='+$("input[name='keywords']").val()+'&date_from='+$("input[name='date_from']").val()+'&date_to='+$("input[name='date_to']").val()+'&follow_status='+(($("select[name='follow_status[]']").val())?$("select[name='follow_status[]']").val():'')+'&user_id='+(($("select[name='user_id[]']").val())?$("select[name='user_id[]']").val():'')+'&site='+(($("select[name='site[]']").val())?$("select[name='site[]']").val():'')+'&rating='+$("select[name='rating']").val()+'&bgbu='+$("select[name='bgbu']").val()+'&vp='+$('select[name="vp"]').val()+'&rc='+$('select[name="rc"]').val()+'&del='+$('select[name="del"]').val();
 	});
 });
 

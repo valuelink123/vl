@@ -53,95 +53,39 @@ class ReviewController extends Controller
   				$bool = $file->move(public_path().$newpath,$newname);
 
 				if($bool){
-					//echo $inputFileName;
-					//echo substr(strrchr($inputFileName, '.'), 1);
-					//$inputFileType = $this->getExtension($inputFileName);
-
-					//$reader = \PhpOffice\PhpSpreadsheet\IOFactory::createReader($inputFileType);
-					//$reader->setInputEncoding('utf-8');
-					//$spreadsheet = $reader->load($inputFileName);
 					$spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($inputFileName);
-					//$spreadsheet  
-					$importData = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
-					
+					$importData = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);		
 					$successCount = $addCount = $errorCount = 0;
-					$status_array = array_flip(getReviewStatus());
 					foreach($importData as $key => $data){
-						
-						if($key>1 && array_get($data,'F') && array_get($data,'E')){
-							if(array_get($data,'A')){
-								if(date('Ymd',strtotime(array_get($data,'A')))<19990101){
-									$errorCount++;
-									continue;
-								}
+						if($key==1){
+							if(array_get($data,'A')!='site' || array_get($data,'B')!='customer id'){
+								die('Customer profile import template error');
 							}
-							if(array_get($data,'L')){
-								if(!array_get($status_array,array_get($data,'L'))){
-									$errorCount++;
-									continue;
-								}
-							}
-							$exists = Review::where('review',$data['F'])->where('site',$data['E'])->first();
+						} 
+						if($key>1 && array_get($data,'A') && array_get($data,'B')){
+							$exists = DB::table('customers')->where('customer_id',trim($data['B']))->where('site',trim($data['A']))->first();
 							if($exists){
-								//$seller_account = Review::where('review',$data['F'])->where('site',$data['E'])->first();
-								$exists->review = $data['F'];
-								$exists->asin = array_get($data,'C');
-								$exists->site = array_get($data,'E');
-								if(array_get($data,'I')) $exists->review_content = array_get($data,'I');
-								$exists->sellersku = array_get($data,'D');
-								if(array_get($data,'A')) $exists->date = date('Y-m-d',strtotime(array_get($data,'A')));
-								if(array_get($data,'H')) $exists->rating = intval(array_get($data,'H'));
-								if(array_get($data,'B')) $exists->amazon_account = array_get($data,'B');
-								if(array_get($data,'G')) $exists->reviewer_name = array_get($data,'G');
-								if(array_get($data,'K')) $exists->amazon_order_id = array_get($data,'K');
-								if(array_get($data,'J')) $exists->buyer_email = array_get($data,'J');
-								
-								if(array_get($data,'L')){
-									$exists->status = array_get($status_array,array_get($data,'L'))?array_get($status_array,array_get($data,'L')):1;
-									if($exists->status>1) $exists->edate = date('Y-m-d');
-					
-								}
-								if(array_get($data,'M'))  $exists->content = array_get($data,'M');
-								if(array_get($data,'N'))  $exists->etype = array_get($data,'N');
-								if(array_get($data,'O'))  $exists->epoint = array_get($data,'O');
-								if(array_get($data,'P'))  $exists->edescription = array_get($data,'P');
-								if(array_get($data,'Q'))  $exists->seller_id = array_get($data,'Q');
-								if ($exists->save()) {
+								$update_result = DB::table('customers')->where('customer_id',trim($data['B']))->where('site',trim($data['A']))->update(array(
+										'email'=>trim($data['C']),
+										'phone'=>trim($data['D']),
+										'other'=>trim($data['E']),
+										'last_update_date'=>date('Y-m-d')
+									));
+								if ($update_result) {
 									$successCount++;
-								} else {
-									$errorCount++;
 								}
 							}else{
-								$seller_account = new Review;
-								$seller_account->review = $data['F'];
-								$seller_account->asin = array_get($data,'C');
-								$seller_account->site = array_get($data,'E');
-								if(array_get($data,'I')) $seller_account->review_content = array_get($data,'I');
-								$seller_account->sellersku = array_get($data,'D');
-								if(array_get($data,'A')) $seller_account->date = date('Y-m-d',strtotime(array_get($data,'A')));
-								if(array_get($data,'H')) $seller_account->rating = intval(array_get($data,'H'));
-								if(array_get($data,'B')) $seller_account->amazon_account = array_get($data,'B');
-								if(array_get($data,'G')) $seller_account->reviewer_name = array_get($data,'G');
-								$seller_account->status = 1;
-								if(array_get($data,'K')) $seller_account->amazon_order_id = array_get($data,'K');
-								if(array_get($data,'J')) $seller_account->buyer_email = array_get($data,'J');
-								if(array_get($data,'L')){
-									$seller_account->status = array_get($status_array,array_get($data,'L'))?array_get($status_array,array_get($data,'L')):1;
-									if($seller_account->status>1) $seller_account->edate = date('Y-m-d');
-					
-								}
-								if(array_get($data,'M'))  $seller_account->content = array_get($data,'M');
-								if(array_get($data,'N'))  $seller_account->etype = array_get($data,'N');
-								if(array_get($data,'O'))  $seller_account->epoint = array_get($data,'O');
-								if(array_get($data,'P'))  $seller_account->edescription = array_get($data,'P');
-								if(array_get($data,'Q'))  $seller_account->seller_id = array_get($data,'Q');
-								$user_id = 0;
-								$user_arr = DB::table('asin')->where('asin', array_get($data,'C'))->where('site', array_get($data,'E'))->where('sellersku', array_get($data,'D'))->first();
-								if($user_arr){
-									$user_id = $user_arr->review_user_id;
-								}
-								$seller_account->user_id = $user_id;
-								if ($seller_account->save()) {
+								$insert_result = DB::table('customers')->insert(
+									array(
+										'site'=>trim($data['A']),
+										'customer_id'=>trim($data['B']),
+										'email'=>trim($data['C']),
+										'phone'=>trim($data['D']),
+										'other'=>trim($data['E']),
+										'last_update_date'=>date('Y-m-d')
+									)
+								);
+								if ($insert_result) {
 									$addCount++;
 								} else {
 									$errorCount++;
@@ -149,9 +93,9 @@ class ReviewController extends Controller
 							}
 						}
 					}
-					$request->session()->flash('success_message','Import Review Data Success! '.$successCount.' covered  '.$addCount.' added  '.$errorCount.'  Errors');
+					$request->session()->flash('success_message','Import Customer Data Success! '.$successCount.' covered  '.$addCount.' added  '.$errorCount.'  Errors');
 				}else{
-					$request->session()->flash('error_message','Upload Review Failed');
+					$request->session()->flash('error_message','Upload Customer Failed');
 				}          
             } 
 			}else{
@@ -164,41 +108,65 @@ class ReviewController extends Controller
 	
 	
 	public function export(Request $request){
-		$date_from=date('Y-m-d',strtotime('-30 days'));		
+		$date_from=date('Y-m-d',strtotime('-90 days'));		
 		$date_to=date('Y-m-d');	
 		
 		$customers = DB::table('review')
-			->select('review.*','asin.brand','asin.brand_line','asin.seller','asin.review_user_id','asin.item_no','asin.status as asin_status')
-			->leftJoin('asin',function($q){
+			->select('review.*','asin.status as asin_status','customers.email as email','customers.phone as phone','customers.other as other')
+			->leftJoin(DB::raw('(select max(status) as status,asin,site,max(bg) as bg,max(bu) as bu from asin group by asin,site) as asin'),function($q){
 				$q->on('review.asin', '=', 'asin.asin')
-					->on('review.site', '=', 'asin.site')
-					->on('review.sellersku', '=', 'asin.sellersku');
+					->on('review.site', '=', 'asin.site');
+			})->leftJoin('customers',function($q){
+				$q->on('review.customer_id', '=', 'customers.customer_id')
+					->on('review.site', '=', 'customers.site');
 			});
 		
 		if(!Auth::user()->admin){
             $customers = $customers->where('review.user_id',$this->getUserId());
         }
 		
+		if(array_get($_REQUEST,'bgbu')){
+			   $bgbu = array_get($_REQUEST,'bgbu');
+			   $bgbu_arr = explode('_',$bgbu);
+			   if(array_get($bgbu_arr,0)) $customers = $customers->where('asin.bg',array_get($bgbu_arr,0));
+			   if(array_get($bgbu_arr,1)) $customers = $customers->where('asin.bu',array_get($bgbu_arr,1));
+		}
 
-        
+        if(array_get($_REQUEST,'vp')){
+			   $customers = $customers->where('review.vp',array_get($_REQUEST,'vp')-1);
+		}
+		
+		if(array_get($_REQUEST,'del')){
+			   $customers = $customers->where('review.is_delete',array_get($_REQUEST,'del')-1);
+		}
+		 
+		if(array_get($_REQUEST,'rc')){
+			   if(array_get($_REQUEST,'rc')==1) $customers = $customers->whereRaw('review.rating=review.updated_rating');
+			    if(array_get($_REQUEST,'rc')==2) $customers = $customers->whereRaw('review.rating<>review.updated_rating');
+		}
 		
 		if(array_get($_REQUEST,'asin_status')){
             $customers = $customers->whereIn('asin.status',explode(',',array_get($_REQUEST,'asin_status')));
         }
 		if(Auth::user()->admin){
 			if(array_get($_REQUEST,'user_id')){
-				$customers = $customers->whereIn('asin.review_user_id',explode(',',array_get($_REQUEST,'user_id')));
+				$customers = $customers->whereIn('review.user_id',explode(',',array_get($_REQUEST,'user_id')));
 			}
 		}
 		
 		
 		if(array_get($_REQUEST,'date_from')) $date_from= array_get($_REQUEST,'date_from');
 		if(array_get($_REQUEST,'date_to')) $date_to= array_get($_REQUEST,'date_to');
-		$customers = $customers->where('date','>=',$date_from);
+		$customers = $customers->where('date','>=',$date_from)->where('rating','<',4);;
 		$customers = $customers->where('date','<=',$date_to);
-
+		
+		
 		if(array_get($_REQUEST,'follow_status')){
             $customers = $customers->whereIn('review.status',explode(',',array_get($_REQUEST,'follow_status')));
+        }
+		
+		if(array_get($_REQUEST,'site')){
+            $customers = $customers->whereIn('review.site',explode(',',array_get($_REQUEST,'site')));
         }
 		
 		if(array_get($_REQUEST,'rating')){
@@ -210,16 +178,12 @@ class ReviewController extends Controller
             $keywords = array_get($_REQUEST,'keywords');
             $customers = $customers->where(function ($query) use ($keywords) {
 
-                $query->where('brand_line'  , 'like', '%'.$keywords.'%')
-                        ->orwhere('item_no', 'like', '%'.$keywords.'%')
-                        ->orwhere('seller', 'like', '%'.$keywords.'%')
-                        ->orwhere('amazon_account', 'like', '%'.$keywords.'%')
-						->orwhere('reviewer_name', 'like', '%'.$keywords.'%')
+                $query->where('reviewer_name', 'like', '%'.$keywords.'%')
 						 ->orwhere('review.asin', 'like', '%'.$keywords.'%')
-						  ->orwhere('review.sellersku', 'like', '%'.$keywords.'%')
 						  ->orwhere('review', 'like', '%'.$keywords.'%')
 						  ->orwhere('amazon_order_id', 'like', '%'.$keywords.'%')
 						   ->orwhere('buyer_email', 'like', '%'.$keywords.'%')
+						   ->orwhere('review.customer_id', 'like', '%'.$keywords.'%')
 						  ->orwhere('etype', 'like', '%'.$keywords.'%');
 
             });
@@ -239,9 +203,8 @@ class ReviewController extends Controller
 		$arrayData = array();
 
 		$headArray[] = 'Review Date';
-		$headArray[] = 'Account';
 		$headArray[] = 'Asin';
-		$headArray[] = 'SellerSku';
+		$headArray[] = 'Customer ID';
 		$headArray[] = 'Site';
 		$headArray[] = 'ReviewID';
 		$headArray[] = 'Reviewer Name';
@@ -250,28 +213,28 @@ class ReviewController extends Controller
 		$headArray[] = 'Buyer Email';
 		$headArray[] = 'Amazon OrderId';
 		$headArray[] = 'Review Status';
-		$headArray[] = 'Follow up progress';
 		$headArray[] = 'Question Type';
-		$headArray[] = 'Problem Point';
-		$headArray[] = 'Remark';
 		$headArray[] = 'Follow up Date';
 		$headArray[] = 'Asin Status';
-		$headArray[] = 'Brand Line';
-		$headArray[] = 'Item NO.';
-		$headArray[] = 'Seller';
 		$headArray[] = 'User';
 		$headArray[] = 'SellerID';
+		$headArray[] = 'Customer Email';
+		$headArray[] = 'Customer Phone';
+		$headArray[] = 'Customer Other';
 
 		$arrayData[] = $headArray;
 		$users_array = $this->getUsers();
 		$asin_status_array =  getAsinStatus();
 		$follow_status_array = getReviewStatus();
+		$steps = DB::table('review_step')->get();
+		foreach($steps as $step){
+			$follow_status_array[$step->id]=$step->title;
+		}
 		foreach ( $reviewsLists as $review){
             $arrayData[] = array(
                	$review['date'],
-				$review['amazon_account'],
 				$review['asin'],
-				$review['sellersku'],
+				$review['customer_id'],
 				$review['site'],
 				$review['review'],
 				$review['reviewer_name'],
@@ -280,18 +243,14 @@ class ReviewController extends Controller
 				$review['buyer_email'],
 				$review['amazon_order_id'],
 				array_get($follow_status_array,empty(array_get($review,'status'))?0:array_get($review,'status'),''),
-				strip_tags($review['content']),
 				$review['etype'],
-				$review['epoint'],
-				strip_tags($review['edescription']),
 				$review['edate'],
-				array_get($asin_status_array,empty(array_get($review,'asin_status'))?0:array_get($review,'asin_status')),
-				$review['brand_line'],
-				$review['item_no'],
-				$review['seller'],
-				
-				array_get($users_array,intval(array_get($review,'review_user_id')),''),
-				$review['seller_id']
+				array_get($asin_status_array,empty(array_get($review,'asin_status'))?0:array_get($review,'asin_status')),				
+				array_get($users_array,intval(array_get($review,'user_id')),''),
+				$review['seller_id'],
+				$review['email'],
+				$review['phone'],
+				$review['other']
 				
             );
 		}
@@ -337,7 +296,7 @@ class ReviewController extends Controller
 
     public function get()
     {
-		$date_from=date('Y-m-d',strtotime('-30 days'));		
+		$date_from=date('Y-m-d',strtotime('-90 days'));		
 		$date_to=date('Y-m-d');	
 		if (isset($_REQUEST["customActionType"]) && $_REQUEST["customActionType"] == "group_action") {
             $updateDate=array();
@@ -360,11 +319,13 @@ class ReviewController extends Controller
         }
 		
 		$customers = DB::table('review')
-			->select('review.*','asin.brand','asin.brand_line','asin.seller','asin.review_user_id','asin.item_no','asin.status as asin_status')
-			->leftJoin('asin',function($q){
+			->select('review.*','asin.status as asin_status','customers.email as email')
+			->leftJoin(DB::raw('(select max(status) as status,asin,site,max(bg) as bg,max(bu) as bu from asin group by asin,site) as asin'),function($q){
 				$q->on('review.asin', '=', 'asin.asin')
-					->on('review.site', '=', 'asin.site')
-					->on('review.sellersku', '=', 'asin.sellersku');
+					->on('review.site', '=', 'asin.site');
+			})->leftJoin('customers',function($q){
+				$q->on('review.customer_id', '=', 'customers.customer_id')
+					->on('review.site', '=', 'customers.site');
 			});
 		
 		if(!Auth::user()->admin){
@@ -378,7 +339,18 @@ class ReviewController extends Controller
 			   if(array_get($bgbu_arr,1)) $customers = $customers->where('asin.bu',array_get($bgbu_arr,1));
 		}
 
-        
+        if(array_get($_REQUEST,'vp')){
+			   $customers = $customers->where('review.vp',array_get($_REQUEST,'vp')-1);
+		}
+		
+		if(array_get($_REQUEST,'del')){
+			   $customers = $customers->where('review.is_delete',array_get($_REQUEST,'del')-1);
+		}
+		
+		if(array_get($_REQUEST,'rc')){
+			   if(array_get($_REQUEST,'rc')==1) $customers = $customers->whereRaw('review.rating=review.updated_rating');
+			    if(array_get($_REQUEST,'rc')==2) $customers = $customers->whereRaw('review.rating<>review.updated_rating');
+		}
 		
 		if(array_get($_REQUEST,'asin_status')){
             $customers = $customers->whereIn('asin.status',array_get($_REQUEST,'asin_status'));
@@ -392,12 +364,16 @@ class ReviewController extends Controller
 		
 		if(array_get($_REQUEST,'date_from')) $date_from= array_get($_REQUEST,'date_from');
 		if(array_get($_REQUEST,'date_to')) $date_to= array_get($_REQUEST,'date_to');
-		$customers = $customers->where('date','>=',$date_from);
+		$customers = $customers->where('date','>=',$date_from)->where('rating','<',4);
 		$customers = $customers->where('date','<=',$date_to);
 		
 		
 		if(array_get($_REQUEST,'follow_status')){
             $customers = $customers->whereIn('review.status',array_get($_REQUEST,'follow_status'));
+        }
+		
+		if(array_get($_REQUEST,'site')){
+            $customers = $customers->whereIn('review.site',array_get($_REQUEST,'site'));
         }
 		
 		if(array_get($_REQUEST,'rating')){
@@ -409,16 +385,12 @@ class ReviewController extends Controller
             $keywords = array_get($_REQUEST,'keywords');
             $customers = $customers->where(function ($query) use ($keywords) {
 
-                $query->where('brand_line'  , 'like', '%'.$keywords.'%')
-                        ->orwhere('item_no', 'like', '%'.$keywords.'%')
-                        ->orwhere('seller', 'like', '%'.$keywords.'%')
-                        ->orwhere('amazon_account', 'like', '%'.$keywords.'%')
-						->orwhere('reviewer_name', 'like', '%'.$keywords.'%')
+                $query->where('reviewer_name', 'like', '%'.$keywords.'%')
 						 ->orwhere('review.asin', 'like', '%'.$keywords.'%')
-						  ->orwhere('review.sellersku', 'like', '%'.$keywords.'%')
 						  ->orwhere('review', 'like', '%'.$keywords.'%')
 						  ->orwhere('amazon_order_id', 'like', '%'.$keywords.'%')
 						   ->orwhere('buyer_email', 'like', '%'.$keywords.'%')
+						   ->orwhere('review.customer_id', 'like', '%'.$keywords.'%')
 						  ->orwhere('etype', 'like', '%'.$keywords.'%');
 
             });
@@ -434,10 +406,11 @@ class ReviewController extends Controller
 			if($_REQUEST['order'][0]['column']==3) $orderby = 'date';
             if($_REQUEST['order'][0]['column']==4) $orderby = 'rating';
             if($_REQUEST['order'][0]['column']==5) $orderby = 'reviewer_name';
-            if($_REQUEST['order'][0]['column']==6) $orderby = 'status';
-            if($_REQUEST['order'][0]['column']==7) $orderby = 'buyer_email';
-            if($_REQUEST['order'][0]['column']==8) $orderby = 'edate';
-			if($_REQUEST['order'][0]['column']==9) $orderby = 'user_id';
+			if($_REQUEST['order'][0]['column']==6) $orderby = 'vp';
+            if($_REQUEST['order'][0]['column']==7) $orderby = 'status';
+            if($_REQUEST['order'][0]['column']==8) $orderby = 'buyer_email';
+            if($_REQUEST['order'][0]['column']==9) $orderby = 'edate';
+			if($_REQUEST['order'][0]['column']==10) $orderby = 'user_id';
 
             $sort = $_REQUEST['order'][0]['dir'];
 			
@@ -474,16 +447,26 @@ class ReviewController extends Controller
 		}
 		
         for($i = $iDisplayStart; $i < $end; $i++) {
-
+			$rating_chstr = '';
+			if($ordersList[$i]['updated_rating']>0 && $ordersList[$i]['updated_rating']!=$ordersList[$i]['rating']){
+				if($ordersList[$i]['updated_rating']>$ordersList[$i]['rating']){
+					$rating_chstr = '<span class="badge badge-danger"><i class="fa fa-angle-double-up"></i> '.$ordersList[$i]['updated_rating'].'</span>';
+				}else{
+					$rating_chstr = '<span class="badge badge-success"><i class="fa fa-angle-double-down"></i>'.$ordersList[$i]['updated_rating'].'</span>';
+				}
+				
+				
+			}
 			$records["data"][] = array(
 				 '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input name="id[]" type="checkbox" class="checkboxes" value="'.$ordersList[$i]['id'].'"/><span></span></label>',
 				$ordersList[$i]['negative_value'],
 				'<a href="https://'.$ordersList[$i]['site'].'/dp/'.$ordersList[$i]['asin'].'" target="_blank">'.$ordersList[$i]['asin'].'</a> <span class="label label-sm label-default">'.strtoupper(substr(strrchr($ordersList[$i]['site'], '.'), 1)).'</span>',
 				$ordersList[$i]['date'],
-				$ordersList[$i]['rating'],
+				$ordersList[$i]['rating'].' '.$rating_chstr,
 				$ordersList[$i]['reviewer_name'],
-				array_get($follow_status_array,$ordersList[$i]['status'],''),
-				$ordersList[$i]['buyer_email'],
+				($ordersList[$i]['vp'])?'<span class="badge badge-danger">VP</span>':'',
+				array_get($follow_status_array,$ordersList[$i]['status'],'').' '.(($ordersList[$i]['is_delete'])?'<span class="badge badge-danger">Del</span>':''),
+				($ordersList[$i]['buyer_email']==$ordersList[$i]['email'])?$ordersList[$i]['buyer_email']:$ordersList[$i]['buyer_email'].' '.$ordersList[$i]['email'],
 				$ordersList[$i]['edate'],
 				array_get($users_array,intval(array_get($ordersList[$i],'user_id')),''),				
 				(($ordersList[$i]['warn']>0)?'<i class="fa fa-warning" title="Contains dangerous words"></i>&nbsp;&nbsp;&nbsp;':'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;').'<a href="https://'.$ordersList[$i]['site'].'/gp/customer-reviews/'.$ordersList[$i]['review'].'" target="_blank" class="btn btn-success btn-xs"> View </a>'.'<a href="/review/'.$ordersList[$i]['id'].'/edit" target="_blank" class="btn btn-danger btn-xs"><i class="fa fa-search"></i> Resolve </a>'
@@ -521,6 +504,13 @@ class ReviewController extends Controller
             $order = DB::table('amazon_orders')->where('SellerId', array_get($review,'seller_id'))->where('AmazonOrderId', array_get($review,'amazon_order_id'))->first();
             if($order) $order->item = DB::table('amazon_orders_item')->where('SellerId', array_get($review,'seller_id'))->where('AmazonOrderId', array_get($review,'amazon_order_id'))->get();
         }
+		
+		$customer=[];
+		if(array_get($review,'customer_id') && array_get($review,'site')){
+            $customer_obj = DB::table('customers')->where('site', array_get($review,'site'))->where('customer_id', array_get($review,'customer_id'))->first();
+			$customer = json_decode(json_encode($customer_obj), true);
+        }
+		$return['customer'] = $customer;
 		$return['users'] = $this->getUsers();
 		$return['steps'] = DB::table('review_step')->get();
 		$return['review'] = $review;
