@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50722
 File Encoding         : 65001
 
-Date: 2018-09-05 17:18:57
+Date: 2018-09-17 14:26:00
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -33,26 +33,6 @@ CREATE TABLE `accounts` (
 `smtp_ssl`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
 `smtp_port`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
 `type`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
-PRIMARY KEY (`id`)
-)
-ENGINE=MyISAM
-DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
-
-;
-
--- ----------------------------
--- Table structure for `accounts_copy`
--- ----------------------------
-DROP TABLE IF EXISTS `accounts_copy`;
-CREATE TABLE `accounts_copy` (
-`id`  int(10) UNSIGNED NOT NULL ,
-`account_email`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
-`account_sellerid`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
-`email`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
-`password`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
-`imap_host`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
-`imap_ssl`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
-`imap_port`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
 PRIMARY KEY (`id`)
 )
 ENGINE=MyISAM
@@ -344,6 +324,25 @@ DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
 ;
 
 -- ----------------------------
+-- Table structure for `customers`
+-- ----------------------------
+DROP TABLE IF EXISTS `customers`;
+CREATE TABLE `customers` (
+`id`  int(10) UNSIGNED NOT NULL ,
+`site`  varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
+`customer_id`  varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
+`email`  varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
+`phone`  varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
+`other`  varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
+`last_update_date`  varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
+PRIMARY KEY (`id`)
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
+
+;
+
+-- ----------------------------
 -- Table structure for `exception`
 -- ----------------------------
 DROP TABLE IF EXISTS `exception`;
@@ -558,17 +557,57 @@ CREATE TABLE `review` (
 `site`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
 `review`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
 `date`  varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
+`asin`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
+`rating`  tinyint(1) UNSIGNED ZEROFILL NULL DEFAULT 0 ,
+`updated_rating`  tinyint(1) UNSIGNED ZEROFILL NULL DEFAULT 0 ,
+`reviewer_name`  varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
+`review_content`  text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL ,
+`buyer_email`  varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
+`edate`  varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
+`created_at`  timestamp NULL DEFAULT NULL ,
+`status`  int(5) NULL DEFAULT 1 ,
+`etype`  varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
+`updated_at`  timestamp NULL DEFAULT NULL ,
+`amazon_order_id`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
+`warn`  tinyint(1) UNSIGNED ZEROFILL NULL DEFAULT 0 ,
+`creson`  varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
+`negative_value`  int(10) UNSIGNED ZEROFILL NOT NULL DEFAULT 0000000000 ,
+`user_id`  int(10) UNSIGNED ZEROFILL NOT NULL DEFAULT 0000000000 ,
+`buyer_phone`  varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
+`follow_content`  text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL ,
+`follow_status`  int(5) UNSIGNED ZEROFILL NULL DEFAULT 00000 ,
+`customer_id`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
+`vp`  tinyint(1) UNSIGNED ZEROFILL NULL DEFAULT 0 ,
+`title`  varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
+`is_delete`  tinyint(1) UNSIGNED ZEROFILL NULL DEFAULT NULL ,
+PRIMARY KEY (`id`)
+)
+ENGINE=MyISAM
+DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
+
+;
+
+-- ----------------------------
+-- Table structure for `review_bak`
+-- ----------------------------
+DROP TABLE IF EXISTS `review_bak`;
+CREATE TABLE `review_bak` (
+`id`  int(10) NOT NULL ,
+`seller_id`  varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
+`site`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
+`review`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
+`date`  varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
 `amazon_account`  varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
 `sellersku`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
 `asin`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
 `rating`  tinyint(1) NULL DEFAULT NULL ,
 `reviewer_name`  varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
 `review_content`  text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL ,
-`buyer_email`  varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
+`buyer_email`  varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
 `edate`  varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
 `created_at`  timestamp NULL DEFAULT NULL ,
 `content`  text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL ,
-`status`  tinyint(1) NULL DEFAULT 1 ,
+`status`  int(5) NULL DEFAULT 1 ,
 `etype`  varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
 `epoint`  varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
 `edescription`  text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL ,
@@ -578,9 +617,45 @@ CREATE TABLE `review` (
 `warn`  tinyint(1) UNSIGNED ZEROFILL NULL DEFAULT 0 ,
 `creson`  varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
 `negative_value`  int(10) UNSIGNED ZEROFILL NOT NULL DEFAULT 0000000000 ,
+`user_id`  int(10) UNSIGNED ZEROFILL NOT NULL DEFAULT 0000000000 ,
+`buyer_phone`  varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
+`follow_content`  text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL ,
+`follow_status`  int(5) UNSIGNED ZEROFILL NULL DEFAULT 00000 ,
 PRIMARY KEY (`id`)
 )
 ENGINE=MyISAM
+DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
+
+;
+
+-- ----------------------------
+-- Table structure for `review_change_log`
+-- ----------------------------
+DROP TABLE IF EXISTS `review_change_log`;
+CREATE TABLE `review_change_log` (
+`id`  int(10) UNSIGNED NOT NULL ,
+`user_id`  int(10) NULL DEFAULT NULL ,
+`date`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
+`to_user_id`  int(10) NULL DEFAULT NULL ,
+`review_id`  int(10) NULL DEFAULT NULL ,
+PRIMARY KEY (`id`)
+)
+ENGINE=MyISAM
+DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
+
+;
+
+-- ----------------------------
+-- Table structure for `review_step`
+-- ----------------------------
+DROP TABLE IF EXISTS `review_step`;
+CREATE TABLE `review_step` (
+`id`  int(10) UNSIGNED NOT NULL ,
+`title`  varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
+`content`  text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL ,
+PRIMARY KEY (`id`)
+)
+ENGINE=InnoDB
 DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
 
 ;
@@ -807,6 +882,11 @@ CREATE UNIQUE INDEX `d` ON `asin_profits`(`item_code`, `date`, `seller_code`) US
 CREATE UNIQUE INDEX `site,asin` ON `asin_seller_count`(`site`, `asin`) USING BTREE ;
 
 -- ----------------------------
+-- Indexes structure for table customers
+-- ----------------------------
+CREATE UNIQUE INDEX `site` ON `customers`(`site`, `customer_id`) USING BTREE ;
+
+-- ----------------------------
 -- Indexes structure for table inbox
 -- ----------------------------
 CREATE UNIQUE INDEX `mail_id,mail_address` ON `inbox`(`mail_address`, `mail_id`) USING BTREE ;
@@ -826,17 +906,13 @@ CREATE INDEX `password_resets_email_index` ON `password_resets`(`email`) USING B
 -- Indexes structure for table review
 -- ----------------------------
 CREATE UNIQUE INDEX `site,review` ON `review`(`site`, `review`) USING BTREE ;
-CREATE INDEX `asin,sellersku,site` ON `review`(`site`, `sellersku`, `asin`) USING BTREE ;
+
+-- ----------------------------
+-- Indexes structure for table review_bak
+-- ----------------------------
+CREATE UNIQUE INDEX `site,review` ON `review_bak`(`site`, `review`) USING BTREE ;
 
 -- ----------------------------
 -- Indexes structure for table users
 -- ----------------------------
 CREATE UNIQUE INDEX `users_email_unique` ON `users`(`email`) USING BTREE ;
-
-
--- ----------------------------
--- Records of users
--- ----------------------------
-BEGIN;
-INSERT INTO `users` VALUES ('1', 'System', 'wangjianeng@valuelinkcorp.com', '$2y$10$FqeenZdI.wvA8M1rvswvqesA6eSRHGsZcFHEL//0toyPyvRBtvLY2', 'dfRuJRHsK7yKfKPmQeF5KNAgJvQb7e3kdx6xhUX98E0GoprPuPB6z0fHfHOv', '2017-10-12 08:54:04', '2018-01-24 08:00:04', '1');
-COMMIT;

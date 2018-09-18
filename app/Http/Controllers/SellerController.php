@@ -125,7 +125,7 @@ class SellerController extends Controller
 		//print_r($seller_tabs);
 		//die();
 		$positives=DB::select("select a.seller,b.* from seller_asins as b left join (select site,seller,asin from asin group by site,seller,asin) as a on a.asin=b.asin and a.site=b.site where positive_value>0 $addwhere order by positive_value desc");
-		$negatives=DB::select("select * from review where negative_value>0 and status=1 and date>='".date('Y-m-d',strtotime('-90days'))."' $addwhereid order by negative_value desc");
+		$negatives=DB::select("select * from review where negative_value>0 and status=1 and rating<4 and date>='".date('Y-m-d',strtotime('-90days'))."' $addwhereid order by negative_value desc");
 		
         return view('seller/index',['tabs'=>$seller_tabs,'users'=>$users,'positives'=>json_decode(json_encode($positives),TRUE),'negatives'=>json_decode(json_encode($negatives),TRUE)]);
 

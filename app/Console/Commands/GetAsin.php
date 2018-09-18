@@ -73,7 +73,7 @@ class GetAsin extends Command
 		$asinList = array_get($result,'data');
 
 		foreach($asinList as $asin){
-			//if(array_get($asin,'ASIN') == 'B074NXJWN2') print_r($asin);
+			if(array_get($asin,'ASIN') == 'B0772MJHDS') print_r($asin);
 			unset($exists);
 			if(array_get($asin,'ZDELETE')=='X'){
 				Asin::where('asin', trim(array_get($asin,'ASIN')))->where('site', 'www.'.trim(array_get($asin,'SITE')))->where('sellersku', trim(array_get($asin,'SELLER_SKU')))->delete();

@@ -50,15 +50,15 @@ class GetStar extends Command
 		$date_from=date('Y-m-d',strtotime('-'.$time));		
 
 		
-		$reviewList = DB::connection('review')->select('select tbl_star_system_star_info.*,tbl_star_system_product.seller_sku from tbl_star_system_star_info left join tbl_star_system_product on tbl_star_system_star_info.product_id=tbl_star_system_product.product_id  
-where tbl_star_system_star_info.create_at>:date_from',['date_from' => $date_from]);
+		$reviewList = DB::connection('review_new')->select('select * from tbl_star_system_star_info
+where create_at>:date_from',['date_from' => $date_from]);
 		
 		foreach($reviewList as $review){
 
 			try{
 				$data = array(
 					'asin' => $review->asin,
-					'sellersku' => $review->seller_sku,
+					'sellersku' => '',
 					'domain' => $review->domain,
 					'one_star_number' => $review->one_star_number,
 					'two_star_number' => $review->two_star_number,

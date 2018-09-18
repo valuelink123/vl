@@ -55,16 +55,18 @@
                 <div class="tab-pane active" id="tab_1">
                     {{ csrf_field() }}
                     {{ method_field('PUT') }}
-					<div class="col-md-8">
+					<div class="col-md-7">
 					<h2 style="margin:20px 0;"><a href="https://{{ $review['site']}}/dp/{{ $review['asin']}}" target="_blank">{{ $review['asin']}}</a></h2>
 					<div style="clear:both;"></div>
 					 <ul class="chats">
 						<li class="in"><img class="avatar" alt="" src="/assets/layouts/layout/img/avatar.png"><div class="message"><span class="arrow"> </span> {{ $review['reviewer_name']}}  &lt; 
-						<?php for($i=1;$i<=$review['rating'];$i++){
+						<?php for($i=1;$i<=$review['updated_rating'];$i++){
 							echo '<i class="fa fa-star"></i>';
 
 						 }?>
-						 &gt;  <span class="datetime"> at {{ $review['date']}} </span> <span class="body" style="font-size:14px;"><a href="https://{{$review['site']}}/gp/customer-reviews/{{$review['review']}}" target="_blank"> {!!$review['review_content']!!} </a></span></div></li>
+						 &gt;  <span class="datetime"> at {{ $review['date']}} </span> <br/><br/>
+						 {!!$review['title']!!} {!!($review['vp'])?'<span class="btn btn-danger btn-xs">VP</span>':''!!} {!!($review['is_delete'])?'<span class="btn btn-danger btn-xs">Deleted</span>':''!!}<p>
+						 <span class="body" style="font-size:14px;"><a href="https://{{$review['site']}}/gp/customer-reviews/{{$review['review']}}" target="_blank"> {!!$review['review_content']!!} </a></span></div></li>
 					</ul>
 					
 					<?php if(Auth::user()->admin){ ?>
@@ -126,7 +128,7 @@
 						<div class="input-group ">
 							<span class="input-group-addon">
 								<i class="fa fa-envelope"></i>
-							</span><input id="buyer_email" class="form-control" type="text" name="buyer_email" placeholder="Buyer Email" value="{{ $review['buyer_email']}}">
+							</span><input id="buyer_email" class="form-control" type="text" name="buyer_email" placeholder="Buyer Email" value="{{$review['buyer_email']?$review['buyer_email']:array_get($customer,'email')}}">
 						 </div>
 						
 					</div>
@@ -137,7 +139,7 @@
 						<div class="input-group ">
 							<span class="input-group-addon">
 								<i class="fa fa-envelope"></i>
-							</span><input id="buyer_phone" class="form-control" type="text" name="buyer_phone" placeholder="Buyer Phone" value="{{ $review['buyer_phone']}}">
+							</span><input id="buyer_phone" class="form-control" type="text" name="buyer_phone" placeholder="Buyer Phone" value="{{ $review['buyer_phone']?$review['phone']:array_get($customer,'phone')}}">
 						 </div>
 						
 					</div>
@@ -165,6 +167,24 @@
                     </div>
 					
 					<div style="clear:both;"></div>
+					</div>
+					
+					<div class="col-md-5">
+						<h2 style="margin:20px 0;">Customer information</h2>
+						<?php
+						if($customer){
+						?>
+						<p style="margin:20px 0;">
+						Email :  {{array_get($customer,'email')}}</p>
+						<p style="margin:20px 0;">
+						Phone :  {{array_get($customer,'phone')}}</p>
+						<p style="margin:20px 0;">
+						Other :  {!!array_get($customer,'other')!!}</p>
+						<?php }else{ ?>
+						<p style="margin:20px 0;">The database does not have contact information for the customer. If you need to buy, please save it in the Step ( buy email ).</p>
+						<?php } ?>
+						
+						
 					</div>
 					 <div style="clear:both;"></div>
                 </div>
@@ -580,14 +600,18 @@ $(function() {
                 onTabClick: function (tab, navigation, index, clickedIndex) {
                     success.hide();
                     error.hide();
-					var checkifisback = false;
- 					$("input[name='do_id[]']").each(function(){
-						if($(this).val()==navigation.find('li').eq(clickedIndex).data('stepid')) checkifisback = true;
-				    });
-					if(checkifisback){
-                    	handleTitle(tab, navigation, clickedIndex);
+					if(index+1==clickedIndex){
+						handleTitle(tab, navigation, index+1);
 					}else{
-						return false;
+						var checkifisback = false;
+						$("input[name='do_id[]']").each(function(){
+							if($(this).val()==navigation.find('li').eq(clickedIndex).data('stepid')) checkifisback = true;
+						});
+						if(checkifisback){
+							handleTitle(tab, navigation, clickedIndex);
+						}else{
+							return false;
+						}
 					}
                 },
                 onNext: function (tab, navigation, index) {

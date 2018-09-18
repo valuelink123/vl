@@ -49,7 +49,7 @@ class StarController extends Controller
 		if(array_get($_REQUEST,'date_from')) $date_from= array_get($_REQUEST,'date_from');
 		if(array_get($_REQUEST,'date_to')) $date_to= array_get($_REQUEST,'date_to');
 		$customers = DB::table( DB::raw("(select * from star_history where create_at = '".$date_from."') as star") )
-			->select(DB::raw('star.* ,
+			->select(DB::raw('asin.sellersku as seller_sku,star.* ,
 			pre_star.one_star_number as pre_one_star_number,
 			pre_star.two_star_number as pre_two_star_number,
 			pre_star.three_star_number as pre_three_star_number,
@@ -61,12 +61,10 @@ class StarController extends Controller
 			asin.brand_line,asin.seller,asin.review_user_id as user_id,asin.item_no,asin.star'))
 			->leftJoin( DB::raw("(select * from star_history where create_at = '".$date_to."') as pre_star") ,function($q){
 				$q->on('star.asin', '=', 'pre_star.asin')
-					->on('star.sellersku', '=', 'pre_star.sellersku')
 					->on('star.domain', '=', 'pre_star.domain');
 			})
-			->leftJoin( 'asin' ,function($q){
+			->leftJoin( DB::raw('(select max(brand_line) as brand_line,max(sellersku) as sellersku,max(star) as star,max(item_no) as item_no,max(seller) as seller,max(review_user_id) as review_user_id,asin,site from asin group by asin,site) as asin') ,function($q){
 				$q->on('star.asin', '=', 'asin.asin')
-				->on('star.sellersku', '=', 'asin.sellersku')
 					->on('star.domain', '=', 'asin.site');
 			});
 		
@@ -114,7 +112,7 @@ class StarController extends Controller
 				
         if(isset($_REQUEST['order'][0])){
             if($_REQUEST['order'][0]['column']==1) $orderby = 'star.asin';
-            if($_REQUEST['order'][0]['column']==2) $orderby = 'asin.sellersku';
+            if($_REQUEST['order'][0]['column']==2) $orderby = 'asin.seller_sku';
             if($_REQUEST['order'][0]['column']==3) $orderby = 'asin.item_no';
             if($_REQUEST['order'][0]['column']==4) $orderby = 'asin.seller';
             if($_REQUEST['order'][0]['column']==5) $orderby = 'asin.review_user_id';
@@ -213,7 +211,7 @@ class StarController extends Controller
 			$records["data"][] = array(
 				$ordersList[$i]['brand_line'],
 				'<a href="https://'.$ordersList[$i]['domain'].'/dp/'.$ordersList[$i]['asin'].'" target="_blank">'.$ordersList[$i]['asin'].'</a>',
-				$ordersList[$i]['sellersku'],
+				$ordersList[$i]['seller_sku'],
 				$ordersList[$i]['item_no'],
 				
 				$ordersList[$i]['seller'],
