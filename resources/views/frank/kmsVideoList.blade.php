@@ -1,7 +1,7 @@
 @extends('layouts.layout')
 @section('label', 'Knowledge Manage')
 @section('content')
-    <h1 class="page-title font-red-intense"> Product Guide
+    <h1 class="page-title font-red-intense"> Video List
         <small></small>
     </h1>
 
@@ -66,7 +66,7 @@
                     searchable: false,
                     // defaultContent: '<button type="button" class="btn btn-success btn-xs">View</button>',
                     render(data, type, row, meta) {
-                        let search = {type: 'usermanual', xx: row.item_group}
+                        let search = {type: 'UserManual', xx: row.item_group}
                         return `<button type='button' class='btn btn-success btn-xs' data-search='${JSON.stringify(search)}'>View</button>`
                     }
                 },
@@ -74,7 +74,7 @@
                     orderable: false,
                     searchable: false,
                     render(data, type, row, meta) {
-                        let search = {type: 'videolist', xx: row.item_group}
+                        let search = {type: 'VideoList', xx: row.item_group}
                         return `<button type='button' class='btn btn-success btn-xs' data-search='${JSON.stringify(search)}'>View</button>`
                     }
                 },
@@ -95,14 +95,14 @@
             ],
             ajax: {
                 type: 'POST',
-                url: '/kms/brandline/get',
+                url: '/kms/videolist/get',
                 // dataSrc(json) { return json.data }
             }
         })
 
         $theTable.on('click', '.btn', (e) => {
             let search = $(e.target).data('search')
-            window.open(`/kms/${search.type}?xx=${search.xx}`)
+            console.log(search.xx)
         })
     </script>
 
