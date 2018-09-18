@@ -535,11 +535,11 @@ class ReviewController extends Controller
 		
         $seller_account = Review::findOrFail($id);;
 		
-		if($request->get('rebindordersellerid')) $seller_account->seller_id = $request->get('rebindordersellerid');
-		if($request->get('rebindorderid')) $seller_account->amazon_order_id = $request->get('rebindorderid');
-		if($request->get('buyer_email')) $seller_account->buyer_email = $request->get('buyer_email');
-		if($request->get('buyer_phone')) $seller_account->buyer_phone = $request->get('buyer_phone');
-		if($request->get('etype')) $seller_account->etype = $request->get('etype');
+		$seller_account->seller_id = $request->get('rebindordersellerid');
+		$seller_account->amazon_order_id = $request->get('rebindorderid');
+		$seller_account->buyer_email = $request->get('buyer_email');
+		$seller_account->buyer_phone = $request->get('buyer_phone');
+		$seller_account->etype = $request->get('etype');
 		$seller_account->edate = date('Y-m-d');
 		$do_ids = $request->get('do_id');
 		
