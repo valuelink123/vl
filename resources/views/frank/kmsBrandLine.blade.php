@@ -102,6 +102,7 @@
 
         $theTable.on('click', '.btn', (e) => {
             let search = $(e.target).data('search')
+            if (!search) return;
             window.open(`/kms/${search.type}?xx=${search.xx}`)
         })
     </script>

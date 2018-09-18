@@ -40,10 +40,10 @@
                         <th>Item Group</th>
                         <th>Brand</th>
                         <th>Model</th>
-                        <th>User Manual</th>
-                        <th>Video List</th>
-                        <th>Q&A</th>
-                        <th>Parts list</th>
+                        <th>Type</th>
+                        <th>Video Description</th>
+                        <th>Video Link</th>
+                        <th>Note</th>
                     </tr>
                     </thead>
                     <tbody></tbody>
@@ -62,35 +62,30 @@
                 {data: 'brand', name: 'brand'},
                 {data: 'item_model', name: 'item_model'},
                 {
+                    data: 'type',
+                    name: 'type',
+                    searchable: false,
+                },
+                {
+                    data: 'descr',
+                    name: 'descr',
                     orderable: false,
                     searchable: false,
-                    // defaultContent: '<button type="button" class="btn btn-success btn-xs">View</button>',
-                    render(data, type, row, meta) {
-                        let search = {type: 'UserManual', xx: row.item_group}
-                        return `<button type='button' class='btn btn-success btn-xs' data-search='${JSON.stringify(search)}'>View</button>`
+                },
+                {
+                    data: 'link',
+                    name: 'link',
+                    orderable: false,
+                    searchable: false,
+                    render(data) {
+                        return `<span class="video-link">${data}</span>`
                     }
                 },
                 {
+                    data: 'note',
+                    name: 'note',
                     orderable: false,
                     searchable: false,
-                    render(data, type, row, meta) {
-                        let search = {type: 'VideoList', xx: row.item_group}
-                        return `<button type='button' class='btn btn-success btn-xs' data-search='${JSON.stringify(search)}'>View</button>`
-                    }
-                },
-                {
-                    orderable: false,
-                    searchable: false,
-                    render() {
-                        return 'sdf'
-                    }
-                },
-                {
-                    orderable: false,
-                    searchable: false,
-                    render() {
-                        return 'sdf'
-                    }
                 }
             ],
             ajax: {
@@ -100,10 +95,25 @@
             }
         })
 
-        $theTable.on('click', '.btn', (e) => {
-            let search = $(e.target).data('search')
-            console.log(search.xx)
+        $theTable.on('click', '.video-link', (e) => {
+            selectText(e.target)
         })
+
+        /**
+         * 选中文本
+         */
+        function selectText(ele) {
+            if (document.selection) {
+                var range = document.body.createTextRange();
+                range.moveToElementText(ele);
+                range.select();
+            } else if (window.getSelection) {
+                window.getSelection().empty();
+                var range = document.createRange();
+                range.selectNodeContents(ele);
+                window.getSelection().addRange(range);
+            }
+        }
     </script>
 
 @endsection

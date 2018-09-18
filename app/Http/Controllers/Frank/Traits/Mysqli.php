@@ -1,8 +1,6 @@
 <?php
 /**
- * Created by PhpStorm.
- * Date: 18.9.17
- * Time: 10:11
+ * SQL 查询
  */
 
 namespace App\Http\Controllers\Frank\Traits;
