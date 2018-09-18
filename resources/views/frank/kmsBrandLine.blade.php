@@ -53,16 +53,56 @@
     </div>
 
     <script>
-        var arr = []
-        for (var i = 0; i < 50; i++) {
-            var line = []
-            for (var j = 0; j < 7; j++) {
-                line.push(Math.ceil(99999 * Math.random()))
+        let $theTable = $(thetable).dataTable({
+            serverSide: true,
+            pagingType: 'bootstrap_extended',
+            processing: true,
+            columns: [
+                {data: 'item_group', name: 'item_group'},
+                {data: 'brand', name: 'brand'},
+                {data: 'item_model', name: 'item_model'},
+                {
+                    orderable: false,
+                    searchable: false,
+                    // defaultContent: '<button type="button" class="btn btn-success btn-xs">View</button>',
+                    render(data, type, row, meta) {
+                        let search = {type: 'UserManual', xx: row.item_group}
+                        return `<button type='button' class='btn btn-success btn-xs' data-search='${JSON.stringify(search)}'>View</button>`
+                    }
+                },
+                {
+                    orderable: false,
+                    searchable: false,
+                    render(data, type, row, meta) {
+                        let search = {type: 'VideoList', xx: row.item_group}
+                        return `<button type='button' class='btn btn-success btn-xs' data-search='${JSON.stringify(search)}'>View</button>`
+                    }
+                },
+                {
+                    orderable: false,
+                    searchable: false,
+                    render() {
+                        return 'sdf'
+                    }
+                },
+                {
+                    orderable: false,
+                    searchable: false,
+                    render() {
+                        return 'sdf'
+                    }
+                }
+            ],
+            ajax: {
+                type: 'POST',
+                url: '/kms/brandline/get',
+                // dataSrc(json) { return json.data }
             }
-            arr.push(line)
-        }
-        $(thetable).dataTable({
-            aaData: arr
+        })
+
+        $theTable.on('click', '.btn', (e) => {
+            let search = $(e.target).data('search')
+            console.log(search.xx)
         })
     </script>
 

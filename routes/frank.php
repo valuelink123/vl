@@ -3,5 +3,5 @@
  * Created by PhpStorm.
  */
 
-Route::get('/kms', 'KmsController@brandLine');
-Route::get('/kms/brandline', 'KmsController@brandLine');
+Route::get('/kms/brandline', 'BrandLineController@index');
+Route::post('/kms/brandline/get', 'BrandLineController@get');
