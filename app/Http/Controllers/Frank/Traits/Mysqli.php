@@ -32,6 +32,15 @@ trait Mysqli {
         return $rows;
     }
 
+    protected function queryFields($sql) {
+        $fields = [];
+        $rows = $this->queryRows($sql);
+        foreach ($rows as $row) {
+            $fields[] = current($row);
+        }
+        return $fields;
+    }
+
     protected function queryRow($sql, $resulttype = MYSQLI_ASSOC) {
         $rows = $this->queryRows($sql, $resulttype);
         return empty($rows) ? [] : current($rows);
@@ -40,5 +49,15 @@ trait Mysqli {
     protected function queryOne($sql, $resulttype = MYSQLI_ASSOC) {
         $row = $this->queryRow($sql, $resulttype);
         return empty($row) ? null : current($row);
+    }
+
+    protected function enumOptions($table, $field) {
+        $info = $this->queryRow("SHOW COLUMNS FROM $table WHERE Field='$field'");
+        $strs = explode("'", $info['Type']);
+        $options = [];
+        for ($i = 1; $i < count($strs); $i += 2) {
+            $options[] = $strs[$i];
+        }
+        return $options;
     }
 }

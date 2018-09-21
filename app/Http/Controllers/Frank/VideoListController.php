@@ -18,8 +18,16 @@ class VideoListController extends Controller {
         return view('frank/kmsVideoList');
     }
 
-    public function create() {
-        return view('frank/kmsVideoCreate');
+    public function import() {
+        $vars['itemGroups'] = $this->queryFields('SELECT item_group FROM asin GROUP BY item_group');
+        // 一对多关系，很实用的 SQL 语句
+        $vars['itemGroupModels'] = $this->queryRows('SELECT item_group,GROUP_CONCAT(DISTINCT item_model) item_models FROM asin GROUP BY item_group');
+        $vars['types'] = $this->enumOptions('kms_video', 'type');
+        return view('frank/kmsVideoCreate', $vars);
+    }
+
+    public function create(Request $req) {
+        Models\KmsVideo::create($req->all());
     }
 
     public function get(Request $req) {
