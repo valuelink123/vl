@@ -16,7 +16,7 @@
                     <div class="col-md-4">
                         <div class="btn-group " style="float:right;">
 
-                            <a id="excel-import" class="btn sbold green" href="/kms/videolist/new"> Import
+                            <a id="excel-import" class="btn sbold green" href="/kms/videolist/import"> Import
                                 <i class="fa fa-plus-circle"></i>
                             </a>
 
