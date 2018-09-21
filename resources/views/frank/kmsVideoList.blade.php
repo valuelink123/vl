@@ -1,6 +1,9 @@
 @extends('layouts.layout')
 @section('label', 'Knowledge Manage')
 @section('content')
+
+    @include('frank.common')
+
     <h1 class="page-title font-red-intense"> Video List
         <small></small>
     </h1>
@@ -9,22 +12,15 @@
         <div class="portlet-body">
             <div class="table-toolbar">
                 <div class="row">
-
-                    <div class="col-md-8">
-                        <div class="table-actions-wrapper" id="table-actions-wrapper">
-                            <span> </span>
-
-                            <input id="giveBrandLine" placeholder="Set Brand Line" class="table-group-action-input form-control input-inline input-small input-sm">
-                            <button class="btn btn-sm green table-group-action-submit">
-                                <i class="fa fa-search"></i> Search
-                            </button>
-                        </div>
-
-
-                    </div>
+                    <div class="col-md-8"></div>
                     <div class="col-md-4">
                         <div class="btn-group " style="float:right;">
-                            <button id="vl_list_export" class="btn sbold blue"> Export
+
+                            <a id="excel-import" class="btn sbold green" href="/kms/videolist/import"> Import
+                                <i class="fa fa-plus-circle"></i>
+                            </a>
+
+                            <button id="excel-export" class="btn sbold blue"> Export
                                 <i class="fa fa-download"></i>
                             </button>
 
@@ -53,7 +49,36 @@
     </div>
 
     <script>
-        let $theTable = $(thetable).dataTable({
+
+        let $theTable = $(thetable)
+
+        $theTable.one('preXhr.dt', (e, settings, data) => {
+            let obj = getQuerys()
+            if (obj.search) {
+                data.search.value = obj.search
+            } else if (obj.item_group) {
+                data.search.item_group = obj.item_group
+                data.search.item_model = obj.item_model
+            }
+            $theTable.on('preXhr.dt', (e, settings, data) => {
+                history.replaceState(null, null, '?search=' + encodeURIComponent($.trim(data.search.value)))
+            })
+        })
+
+        function getQuerys() {
+            let obj = {}
+            if (location.search) {
+                let strs = location.search.substr(1).split('&')
+                for (let str of strs) {
+                    let par = str.split('=')
+                    obj[par[0]] = par[1] ? decodeURIComponent(par[1]) : ''
+                }
+            }
+            return obj
+        }
+
+        $theTable.dataTable({
+            // search: {search: location.search},
             serverSide: true,
             pagingType: 'bootstrap_extended',
             processing: true,
@@ -91,6 +116,15 @@
             ajax: {
                 type: 'POST',
                 url: '/kms/videolist/get',
+                // data(args) {
+                //     // 过滤 Request 表单
+                //     let columns = args.columns
+                //     for (let i = 0; i < columns.length; i++) {
+                //         let column = columns[i]
+                //         if (!column.searchable && !column.orderable) delete columns[i]
+                //     }
+                // }
+                // // 过滤 Response 数据
                 // dataSrc(json) { return json.data }
             }
         })
