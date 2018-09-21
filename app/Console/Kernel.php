@@ -29,6 +29,7 @@ class Kernel extends ConsoleKernel
 		'App\Console\Commands\GetAsininfo',
 		'App\Console\Commands\GetAds',
 		'App\Console\Commands\GetProfits',
+        'App\Console\Commands\GetSettlementReport'
     ];
 
     /**
