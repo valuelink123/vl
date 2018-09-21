@@ -1,6 +1,9 @@
 @extends('layouts.layout')
 @section('label', 'Knowledge Manage')
 @section('content')
+
+    @include('frank.common')
+
     <h1 class="page-title font-red-intense"> Product Guide
         <small></small>
     </h1>
@@ -11,16 +14,13 @@
                 <div class="row">
 
                     <div class="col-md-8">
-                        <div class="table-actions-wrapper" id="table-actions-wrapper">
-                            <span> </span>
-
-                            <input id="giveBrandLine" placeholder="Set Brand Line" class="table-group-action-input form-control input-inline input-small input-sm">
-                            <button class="btn btn-sm green table-group-action-submit">
-                                <i class="fa fa-search"></i> Search
-                            </button>
-                        </div>
-
-
+                        {{--<div class="table-actions-wrapper" id="table-actions-wrapper">--}}
+                        {{--<span> </span>--}}
+                        {{--<input id="giveBrandLine" placeholder="Set Brand Line" class="table-group-action-input form-control input-inline input-small input-sm">--}}
+                        {{--<button class="btn btn-sm green table-group-action-submit">--}}
+                        {{--<i class="fa fa-search"></i> Search--}}
+                        {{--</button>--}}
+                        {{--</div>--}}
                     </div>
                     <div class="col-md-4">
                         <div class="btn-group " style="float:right;">
@@ -66,30 +66,29 @@
                     searchable: false,
                     // defaultContent: '<button type="button" class="btn btn-success btn-xs">View</button>',
                     render(data, type, row, meta) {
-                        let search = {type: 'usermanual', xx: row.item_group}
-                        return `<button type='button' class='btn btn-success btn-xs' data-search='${JSON.stringify(search)}'>View</button>`
+                        return `<button type='button' class='btn btn-success btn-xs'>View</button>`
                     }
                 },
                 {
                     orderable: false,
                     searchable: false,
                     render(data, type, row, meta) {
-                        let search = {type: 'videolist', xx: row.item_group}
-                        return `<button type='button' class='btn btn-success btn-xs' data-search='${JSON.stringify(search)}'>View</button>`
+                        let args = {'item_group': row.item_group, 'item_model': row.item_model}
+                        return `<a href="/kms/videolist?${jQuery.param(args)}" target="_blank" class='btn btn-success btn-xs'>View</a>`
                     }
                 },
                 {
                     orderable: false,
                     searchable: false,
                     render() {
-                        return 'sdf'
+                        return `<button class='btn btn-success btn-xs'>View</button>`
                     }
                 },
                 {
                     orderable: false,
                     searchable: false,
                     render() {
-                        return 'sdf'
+                        return `<button class='btn btn-success btn-xs'>View</button>`
                     }
                 }
             ],
@@ -100,11 +99,12 @@
             }
         })
 
-        $theTable.on('click', '.btn', (e) => {
-            let search = $(e.target).data('search')
-            if (!search) return;
-            window.open(`/kms/${search.type}?xx=${search.xx}`)
-        })
+        // `<button type='button' class='btn btn-success btn-xs' data-search='${JSON.stringify(search)}'>View</button>`
+        // $theTable.on('click', '.btn', (e) => {
+        //     let search = $(e.target).data('search')
+        //     if (!search) return;
+        //     window.open(`/kms/${search.type}?${jQuery.param(search.args)}`)
+        // })
     </script>
 
 @endsection
