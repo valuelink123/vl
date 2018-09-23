@@ -50,17 +50,6 @@
                         </label>
                     </div>
 
-                    <div class="form-group">
-                        <label>
-                            Video Type
-                            <select required autocomplete="off" class="form-control" name="type">
-                                @foreach($types as $type)
-                                    <option value="{!! $type !!}">{!! $type !!}</option>
-                                @endforeach
-                            </select>
-                        </label>
-                    </div>
-
                     <br/>
 
                     <button type="submit" class="btn btn-primary">Submit</button>
@@ -71,14 +60,7 @@
 
                     <div class="form-group">
                         <label>
-                            Video Description
-                            <input required autocomplete="off" class="form-control" placeholder="Description" name="descr"/>
-                        </label>
-                    </div>
-
-                    <div class="form-group">
-                        <label>
-                            Video Link
+                            Manual Link
                             <input required autocomplete="off" class="form-control" placeholder="Link" name="link"/>
                         </label>
                     </div>

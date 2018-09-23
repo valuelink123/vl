@@ -4,7 +4,7 @@
 
     @include('frank.common')
 
-    <h1 class="page-title font-red-intense"> Video List
+    <h1 class="page-title font-red-intense"> User Manual
         <small></small>
     </h1>
 
@@ -16,7 +16,7 @@
                     <div class="col-md-4">
                         <div class="btn-group " style="float:right;">
 
-                            <a id="excel-import" class="btn sbold green" href="/kms/videolist/import"> Import
+                            <a id="excel-import" class="btn sbold green" href="/kms/usermanual/import"> Import
                                 <i class="fa fa-plus-circle"></i>
                             </a>
 
@@ -36,10 +36,9 @@
                         <th>Item Group</th>
                         <th>Brand</th>
                         <th>Model</th>
-                        <th>Type</th>
-                        <th>Video Description</th>
-                        <th>Video Link</th>
-                        <th>Note</th>
+                        <th>Item Name</th>
+                        <th>Manual</th>
+                        <th>Date</th>
                     </tr>
                     </thead>
                     <tbody></tbody>
@@ -76,67 +75,27 @@
                 {data: 'brand', name: 'brand'},
                 {data: 'item_model', name: 'item_model'},
                 {
-                    data: 'type',
-                    name: 'type',
-                    searchable: false,
-                },
-                {
-                    data: 'descr',
-                    name: 'descr',
-                    orderable: false,
-                    searchable: false,
+                    data: 'item_name',
+                    name: 'item_name',
                 },
                 {
                     data: 'link',
                     name: 'link',
                     orderable: false,
-                    searchable: false,
                     render(data) {
-                        return `<span class="video-link">${data}</span>`
+                        return `<a href="${data}" target="_blank" class='btn btn-success btn-xs'>View</a>`
                     }
                 },
                 {
-                    data: 'note',
-                    name: 'note',
-                    orderable: false,
-                    searchable: false,
+                    data: 'updated_at',
+                    name: 'updated_at',
                 }
             ],
             ajax: {
                 type: 'POST',
-                url: '/kms/videolist/get',
-                // data(args) {
-                //     // 过滤 Request 表单
-                //     let columns = args.columns
-                //     for (let i = 0; i < columns.length; i++) {
-                //         let column = columns[i]
-                //         if (!column.searchable && !column.orderable) delete columns[i]
-                //     }
-                // }
-                // // 过滤 Response 数据
-                // dataSrc(json) { return json.data }
+                url: '/kms/usermanual/get',
             }
         })
-
-        $theTable.on('click', '.video-link', (e) => {
-            selectText(e.target)
-        })
-
-        /**
-         * 选中文本
-         */
-        function selectText(ele) {
-            if (document.selection) {
-                var range = document.body.createTextRange();
-                range.moveToElementText(ele);
-                range.select();
-            } else if (window.getSelection) {
-                window.getSelection().empty();
-                var range = document.createRange();
-                range.selectNodeContents(ele);
-                window.getSelection().addRange(range);
-            }
-        }
     </script>
 
 @endsection
