@@ -9,27 +9,52 @@ use Illuminate\Http\Request;
 
 trait DataTables {
 
-    protected function dtWhere(Request $req) {
+    // protected function dtWhere(Request $req) {
+    //
+    //     $where = [];
+    //     $search = $req->input('search');
+    //
+    //     if (!empty($search['value'])) {
+    //         if ('?' === $search['value'][0]) {
+    //             parse_str(substr($search['value'], 1), $args);
+    //             foreach ($args as $arg => $val) {
+    //                 $arg = addslashes($arg);
+    //                 $val = addslashes($val);
+    //                 $where[] = "$arg='$val'";
+    //             }
+    //         } else {
+    //             // todo 全文索引
+    //         }
+    //     }
+    //
+    //     if (empty($where)) $where[] = 1;
+    //
+    //     return implode(' AND ', $where);
+    // }
 
-        $where = [];
-        $search = $req->input('search');
+    protected function dtWhere(Request $req, $orLikeFields, $andsMap) {
 
-        if (!empty($search['value'])) {
-            if ('?' === $search['value'][0]) {
-                parse_str(substr($search['value'], 1), $args);
-                foreach ($args as $arg => $val) {
-                    $arg = addslashes($arg);
-                    $val = addslashes($val);
-                    $where[] = "$arg='$val'";
-                }
-            } else {
-                // todo 全文索引
+        if (!empty($req->input('search.ands'))) {
+            $ands = $req->input('search.ands');
+            $where = [];
+            foreach ($ands as $field => $value) {
+                if (empty($andsMap[$field])) continue;
+                $value = addslashes($value);
+                $where[] = "{$andsMap[$field]}='{$value}'";
             }
+            $where = implode(' AND ', $where);
+        } else if (!empty($req->input('search.value'))) {
+            $word = addslashes($req->input('search.value'));
+            $where = [];
+            foreach ($orLikeFields as $field) {
+                $where[] = "{$field} LIKE '%{$word}%'";
+            }
+            $where = implode(' OR ', $where);
+        } else {
+            $where = 1;
         }
 
-        if (empty($where)) $where[] = 1;
-
-        return implode(' AND ', $where);
+        return $where;
     }
 
     protected function dtLimit(Request $req) {

@@ -1,5 +1,7 @@
 <?php
 
+umask(env('UMASK', 0002));
+
 return [
 
     /*
