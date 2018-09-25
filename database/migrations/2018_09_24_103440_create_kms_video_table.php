@@ -2,10 +2,9 @@
 
 use Illuminate\Database\Migrations\Migration;
 
-use Illuminate\Support\Facades\DB;
-
-
 class CreateKmsVideoTable extends Migration {
+    use App\Traits\Migration;
+
     /**
      * Run the migrations.
      *
@@ -30,7 +29,7 @@ CREATE TABLE IF NOT EXISTS `kms_video` (
   KEY `item_model` (`item_model`(10)) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 SQL;
-        DB::statement($sql);
+        self::statement($sql);
     }
 
     /**
@@ -39,6 +38,6 @@ SQL;
      * @return void
      */
     public function down() {
-        DB::statement('DROP TABLE IF EXISTS kms_video');
+        self::dropIfEmpty('kms_video');
     }
 }
