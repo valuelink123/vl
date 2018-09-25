@@ -10,15 +10,41 @@
         headers: {'X-CSRF-TOKEN': '{!! csrf_token() !!}'}
     })
 
-    function getQuerys() {
+    function queryStringToObject(queryString = location.search.substr(1)) {
         let obj = {}
-        if (location.search) {
-            let strs = location.search.substr(1).split('&')
-            for (let str of strs) {
-                let par = str.split('=')
-                obj[par[0]] = par[1] ? decodeURIComponent(par[1]) : ''
-            }
+        let strs = queryString.split('&')
+
+        for (let str of strs) {
+            let par = str.split('=')
+            if (!par[0]) continue
+            obj[par[0]] = par[1] ? decodeURIComponent(par[1]) : ''
         }
+
         return obj
+    }
+
+    function objectToQueryString(obj) {
+        let strs = []
+        for (let key in obj) {
+            let val = encodeURIComponent(obj[key])
+            strs.push(`${key}=${val}`)
+        }
+        return strs.join('&')
+    }
+
+    /**
+     * 选中文本
+     */
+    function selectText(ele) {
+        if (document.selection) {
+            var range = document.body.createTextRange();
+            range.moveToElementText(ele);
+            range.select();
+        } else if (window.getSelection) {
+            window.getSelection().empty();
+            var range = document.createRange();
+            range.selectNodeContents(ele);
+            window.getSelection().addRange(range);
+        }
     }
 </script>
