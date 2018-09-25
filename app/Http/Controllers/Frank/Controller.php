@@ -11,7 +11,7 @@ namespace App\Http\Controllers\Frank;
 class Controller extends \App\Http\Controllers\Controller {
 
     public function __construct() {
-        // app('debugbar')->disable();
+        app('debugbar')->disable();
         $this->middleware('auth');
     }
 }
