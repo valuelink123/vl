@@ -54,7 +54,7 @@
 
         $theTable.on('preXhr.dt', (e, settings, data) => {
             if (!data.search.value) {
-                let obj = getQuerys()
+                let obj = queryStringToObject()
                 if (obj.item_group) {
                     let ands = data.search.ands = {}
                     ands.item_group = obj.item_group
@@ -67,7 +67,7 @@
         })
 
         $theTable.dataTable({
-            search: {search: getQuerys().search},
+            search: {search: queryStringToObject().search},
             serverSide: true,
             pagingType: 'bootstrap_extended',
             processing: true,
@@ -122,21 +122,6 @@
             selectText(e.target)
         })
 
-        /**
-         * 选中文本
-         */
-        function selectText(ele) {
-            if (document.selection) {
-                var range = document.body.createTextRange();
-                range.moveToElementText(ele);
-                range.select();
-            } else if (window.getSelection) {
-                window.getSelection().empty();
-                var range = document.createRange();
-                range.selectNodeContents(ele);
-                window.getSelection().addRange(range);
-            }
-        }
     </script>
 
 @endsection

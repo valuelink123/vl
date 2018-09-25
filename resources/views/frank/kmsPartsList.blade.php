@@ -47,7 +47,7 @@
 
         $theTable.on('preXhr.dt', (e, settings, data) => {
             if (!data.search.value) {
-                let obj = getQuerys()
+                let obj = queryStringToObject()
                 if (obj.item_group) {
                     let ands = data.search.ands = {}
                     ands.item_group = obj.item_group
@@ -60,7 +60,7 @@
         })
 
         $theTable.dataTable({
-            search: {search: getQuerys().search},
+            search: {search: queryStringToObject().search},
             serverSide: true,
             pagingType: 'bootstrap_extended',
             processing: true,
