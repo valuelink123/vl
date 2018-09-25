@@ -1,17 +1,16 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateKmsUserManualTable extends Migration
-{
+class CreateKmsUserManualTable extends Migration {
+    use App\Traits\Migration;
+
     /**
      * Run the migrations.
      *
      * @return void
      */
-    public function up()
-    {
+    public function up() {
         $sql = <<<'SQL'
 CREATE TABLE IF NOT EXISTS `kms_user_manual` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -26,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `kms_user_manual` (
   KEY `item_model` (`item_model`(10)) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 SQL;
-        DB::statement($sql);
+        self::statement($sql);
     }
 
     /**
@@ -34,8 +33,7 @@ SQL;
      *
      * @return void
      */
-    public function down()
-    {
-        Schema::dropIfExists('kms_user_manual');
+    public function down() {
+        self::dropIfEmpty('kms_user_manual');
     }
 }
