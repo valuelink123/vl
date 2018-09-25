@@ -40,7 +40,7 @@ class UserManualController extends Controller {
 SELECT SQL_CALC_FOUND_ROWS
 t1.item_group,t1.item_model,t1.link,t1.updated_at,t2.brand,t2.brand_line AS item_name
 FROM kms_user_manual t1
-LEFT JOIN asin t2 ON t2.item_group=t1.item_group AND t2.item_model=t1.item_model AND t2.brand is not null
+LEFT JOIN asin t2 ON t2.item_group=t1.item_group AND t2.item_model=t1.item_model
 WHERE $where
 GROUP BY t1.id
 ORDER BY $orderby

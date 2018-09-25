@@ -61,7 +61,7 @@
         })
 
         $theTable.dataTable({
-            search: {search: getQuerys().search},
+            search: {search: queryStringToObject().search},
             serverSide: true,
             pagingType: 'bootstrap_extended',
             processing: true,
@@ -75,7 +75,8 @@
                     // defaultContent: '<button class="btn btn-success btn-xs">View</button>',
                     render(data, type, row, meta) {
                         let args = {'item_group': row.item_group, 'item_model': row.item_model}
-                        return `<a href="/kms/usermanual?${jQuery.param(args)}" target="_blank" class='btn btn-success btn-xs'>View</a>`
+                        // jQuery.param( ) 坑爹啊 jQuery uses + instead of %20 to URL-encode spaces
+                        return `<a href="/kms/usermanual?${objectToQueryString(args)}" target="_blank" class='btn btn-success btn-xs'>View</a>`
                     }
                 },
                 {
@@ -83,7 +84,7 @@
                     searchable: false,
                     render(data, type, row, meta) {
                         let args = {'item_group': row.item_group, 'item_model': row.item_model}
-                        return `<a href="/kms/videolist?${jQuery.param(args)}" target="_blank" class='btn btn-success btn-xs'>View</a>`
+                        return `<a href="/kms/videolist?${objectToQueryString(args)}" target="_blank" class='btn btn-success btn-xs'>View</a>`
                     }
                 },
                 {
@@ -98,7 +99,7 @@
                     searchable: false,
                     render(data, type, row, meta) {
                         let args = {'item_group': row.item_group, 'item_model': row.item_model}
-                        return `<a href="/kms/partslist?${jQuery.param(args)}" target="_blank" class='btn btn-success btn-xs'>View</a>`
+                        return `<a href="/kms/partslist?${objectToQueryString(args)}" target="_blank" class='btn btn-success btn-xs'>View</a>`
                     }
                 }
             ],
@@ -113,7 +114,7 @@
         // $theTable.on('click', '.btn', (e) => {
         //     let search = $(e.target).data('search')
         //     if (!search) return;
-        //     window.open(`/kms/${search.type}?${jQuery.param(search.args)}`)
+        //     window.open(`/kms/${search.type}?${objectToQueryString(search.args)}`)
         // })
     </script>
 
