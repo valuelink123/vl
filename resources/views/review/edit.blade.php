@@ -158,6 +158,40 @@
 						</select>
 						</div>
 					</div>
+					
+					
+					<div class="form-group">
+						<label>Next follow up Date</label>
+						<div class="input-group date date-picker col-md-2" data-date-format="yyyy-mm-dd">
+                                <input type="text" class="form-control form-filter input-sm " name="nextdate" placeholder="Next follow up Date" value="{{$review['nextdate']?$review['nextdate']:date('Y-m-d',strtotime('+1 days'))}}">
+                                <span class="input-group-btn">
+                                                                        <button class="btn btn-sm default" type="button">
+                                                                            <i class="fa fa-calendar"></i>
+                                                                        </button>
+                                                                    </span>
+                            </div>
+							
+							
+						
+					</div>
+					
+					
+					<div class="form-group">
+						<label>Customer FeedBack</label>
+						<div class="input-group ">
+							<span class="input-group-addon">
+								<i class="fa fa-envelope"></i>
+							</span>
+						   <select class="form-control" name="customer_feedback" id="customer_feedback">
+							@foreach (getCustomerFb() as $k=>$customer_feedback)
+								<option value="{{$k}}" <?php if($k== $review['customer_feedback']) echo 'selected';?>>{{$customer_feedback}}</option>
+							@endforeach
+						</select>
+						</div>
+					</div>
+					
+					
+					
 					<div class="form-actions">
                         <div class="row">
                             <div class="col-md-offset-4 col-md-8">
@@ -354,7 +388,7 @@
                                 </div>
                             </div>
                         </div>
-                            <BR><BR>
+                        <BR><BR>
                         <div class="row invoice-cust-add">
                             <div class="col-xs-3">
                                 <h4 class="invoice-title ">Seller ID</h4>
@@ -377,8 +411,6 @@
                                 <h4 class="invoice-title ">Status</h4>
                                 <p class="invoice-desc">{{$order->OrderStatus}}</p>
                             </div>
-
-
                         </div>
                         <BR><BR>
                         <div class="row invoice-body">

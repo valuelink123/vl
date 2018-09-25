@@ -107,6 +107,8 @@
     <script src="/assets/global/plugins/jquery-file-upload/js/jquery.fileupload-ui.js" type="text/javascript"></script>
 
     <script src="/assets/pages/scripts/form-fileupload.js" type="text/javascript"></script>
+	<script src="/assets/layouts/global/scripts/echarts.min.js" type="text/javascript"></script>
+
     <!-- END PAGE LEVEL SCRIPTS -->
     <link rel="shortcut icon" href="/favicon.ico" /> </head>
 <!-- END HEAD -->
