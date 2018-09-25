@@ -18,7 +18,7 @@ Route::get('/', function () {
 
 Auth::routes();
 
-Route::get('/home', 'SendController@create')->name('home');
+Route::get('/home', 'HomeController@index')->name('home');
 Route::resource('account', 'AccountController');
 Route::resource('template', 'TemplateController');
 Route::resource('asin', 'AsinController');

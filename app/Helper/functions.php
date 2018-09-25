@@ -70,6 +70,15 @@ function getReviewStatus(){
     );
 }
 
+function getCustomerFb(){
+    return array(
+        '0'=>'None',
+		'1'=>'Wait Reply',
+		'2'=>'No Reply',
+		'3'=>'Unwilling',
+    );
+}
+
 function getSiteCode(){
      return array(
          'United States' =>'ATVPDKIKX0DER',
