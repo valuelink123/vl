@@ -139,7 +139,7 @@
 						<div class="input-group ">
 							<span class="input-group-addon">
 								<i class="fa fa-envelope"></i>
-							</span><input id="buyer_phone" class="form-control" type="text" name="buyer_phone" placeholder="Buyer Phone" value="{{ $review['buyer_phone']?$review['phone']:array_get($customer,'phone')}}">
+							</span><input id="buyer_phone" class="form-control" type="text" name="buyer_phone" placeholder="Buyer Phone" value="{{$review['buyer_phone']?$review['buyer_phone']:array_get($customer,'phone')}}">
 						 </div>
 						
 					</div>
@@ -163,7 +163,7 @@
 					<div class="form-group">
 						<label>Next follow up Date</label>
 						<div class="input-group date date-picker col-md-2" data-date-format="yyyy-mm-dd">
-                                <input type="text" class="form-control form-filter input-sm " name="nextdate" placeholder="Next follow up Date" value="{{$review['nextdate']?$review['nextdate']:date('Y-m-d',strtotime('+1 days'))}}">
+                                <input type="text" class="form-control form-filter input-sm " name="nextdate" placeholder="Next follow up Date" value="{{$review['nextdate']}}">
                                 <span class="input-group-btn">
                                                                         <button class="btn btn-sm default" type="button">
                                                                             <i class="fa fa-calendar"></i>
