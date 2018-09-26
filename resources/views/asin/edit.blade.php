@@ -149,7 +149,7 @@
                                 <span class="input-group-addon">
                                     <i class="fa fa-user"></i>
                                 </span>
-                                <input type="text" class="form-control" name="brand" id="brand" value="{{$asin['brand']}}" >
+                                <input type="text" class="form-control" name="brand" id="brand" value="{{$asin['brand']}}" disabled>
                             </div>
                         </div>
 						
@@ -159,7 +159,7 @@
                                 <span class="input-group-addon">
                                     <i class="fa fa-user"></i>
                                 </span>
-                                <input type="text" class="form-control" name="brand_line" id="brand_line" value="{{$asin['brand_line']}}" required>
+                                <input type="text" class="form-control" name="brand_line" id="brand_line" value="{{$asin['brand_line']}}" disabled>
                             </div>
                         </div>
 						
