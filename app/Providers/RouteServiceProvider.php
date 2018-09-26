@@ -60,7 +60,8 @@ class RouteServiceProvider extends ServiceProvider
 
     protected function mapFrankRoutes()
     {
-        Route::middleware('web')
+        Route::prefix('kms')
+            ->middleware('kms')
             ->namespace($this->namespace . '\Frank')
             ->group(base_path('routes/frank.php'));
     }

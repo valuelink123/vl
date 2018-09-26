@@ -84,7 +84,7 @@
                     <div class="form-group">
                         <label>
                             Video Link
-                            <input required autocomplete="off" class="form-control" placeholder="Link" name="link"/>
+                            <input required pattern=".*\S+.*" autocomplete="off" class="form-control" placeholder="Link" name="link" title="This field is required."/>
                         </label>
                     </div>
 
@@ -98,7 +98,7 @@
                     <div class="form-group">
                         <label>
                             Video Description
-                            <textarea placeholder="Description" name="descr" class="form-control" style="min-height:7em"></textarea>
+                            <textarea autocomplete="off" placeholder="Description" name="descr" class="form-control" style="min-height:7em"></textarea>
                         </label>
                     </div>
 
