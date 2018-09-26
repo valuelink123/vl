@@ -231,9 +231,6 @@ class AsinController extends Controller
 			if(array_get($_REQUEST,"giveReviewUser")){
                 $updateDate['review_user_id'] = array_get($_REQUEST,"giveReviewUser");
             }
-			if(array_get($_REQUEST,"giveBrandLine")){
-                $updateDate['brand_line'] = array_get($_REQUEST,"giveBrandLine");
-            }
 			if(array_get($_REQUEST,"giveStar")){
                 $updateDate['star'] = round(array_get($_REQUEST,"giveStar"),1);
             }
@@ -425,8 +422,6 @@ class AsinController extends Controller
         
         $seller_account = Asin::findOrFail($id);
 		$seller_account->star = round($request->get('star'),1);
-        $seller_account->brand = $request->get('brand');
-        $seller_account->brand_line = $request->get('brand_line');
         $seller_account->group_id = $request->get('group_id');
 		$seller_account->review_user_id = $request->get('review_user_id');
         if ($seller_account->save()) {

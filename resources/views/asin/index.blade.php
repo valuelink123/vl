@@ -1,6 +1,21 @@
 @extends('layouts.layout')
 @section('label', 'Asins List')
 @section('content')
+<style type="text/css">
+.dataTables_extended_wrapper .table.dataTable {
+  margin: 0px !important;
+}
+
+table.dataTable thead th, table.dataTable thead td {
+    padding: 10px 2px !important;}
+table.dataTable tbody th, table.dataTable tbody td {
+    padding: 10px 0px;
+}
+th,td,td>span {
+    font-size:12px !important;
+	font-family:Arial, Helvetica, sans-serif;}
+
+</style>
     <h1 class="page-title font-red-intense"> Asins List
         <small>Configure your Asin.</small>
     </h1>
@@ -33,8 +48,6 @@
 
 							
 							<input id='giveStar' placeholder='Limit Star' class="table-group-action-input form-control input-inline input-small input-sm">
-							
-							<input id='giveBrandLine' placeholder='Set Brand Line' class="table-group-action-input form-control input-inline input-small input-sm">
                             <button class="btn btn-sm green table-group-action-submit">
                                 <i class="fa fa-check"></i> Change</button>
                         </div>
@@ -243,20 +256,18 @@
                 e.preventDefault();
                 var giveUser = $("#giveUser", $("#table-actions-wrapper"));
 				var giveReviewUser = $("#giveReviewUser", $("#table-actions-wrapper"));
-				var giveBrandLine = $("#giveBrandLine", $("#table-actions-wrapper"));
 				var giveStar = $("#giveStar", $("#table-actions-wrapper"));
 				
-                if ((giveUser.val() != "" || giveReviewUser.val() != "" || giveBrandLine.val() != "" || giveStar.val() != "") && grid.getSelectedRowsCount() > 0) {
+                if ((giveUser.val() != "" || giveReviewUser.val() != "" || giveStar.val() != "") && grid.getSelectedRowsCount() > 0) {
                     grid.setAjaxParam("customActionType", "group_action");
 
                     grid.setAjaxParam("giveUser", giveUser.val());
 					grid.setAjaxParam("giveReviewUser", giveReviewUser.val());
-					grid.setAjaxParam("giveBrandLine", giveBrandLine.val());
 					grid.setAjaxParam("giveStar", giveStar.val());
                     grid.setAjaxParam("id", grid.getSelectedRows());
                     grid.getDataTable().draw(false);
                     //grid.clearAjaxParams();
-                } else if (giveUser.val() == "" && giveReviewUser.val() == "" && giveBrandLine.val() == "" && giveStar.val() == "") {
+                } else if (giveUser.val() == "" && giveReviewUser.val() == "" && giveStar.val() == "") {
                     App.alert({
                         type: 'danger',
                         icon: 'warning',

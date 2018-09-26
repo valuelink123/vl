@@ -176,6 +176,7 @@ class GetAsininfo extends Command
 					$fbm_stock_total+=array_get($sku_fbm_stock,$i_c.'.fbm_stock',0);
 					$item_name_arr[] = array_get($sku_fbm_stock,$i_c.'.item_name');
 				}
+				$in_true = $in;
 				if($in<0) $in=1;
 				if($in){
 					$get_profits= round(($pf-$ad)/$in*100,2);
@@ -300,6 +301,8 @@ class GetAsininfo extends Command
 						'total_star'=>array_get($val,'total_star',0),
 						'avg_star'=>array_get($val,'avg_star',0),
 						'profits'=>$get_profits,
+						'profits_value'=>round(($pf-$ad),2),
+						'income_value'=>round($in_true,2),
 						'fba_stock_keep'=>$fba_stock_keep,
 						'stock_keep'=>$stock_keep,
 						'stock_amount'=>$stock_amount,
