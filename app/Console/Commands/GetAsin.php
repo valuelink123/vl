@@ -97,6 +97,8 @@ class GetAsin extends Command
 				$asinadd->bg = array_get($asin,'ZBGROUP');
 				$asinadd->bu = array_get($asin,'ZBUNIT');
 				$asinadd->store = array_get($asin,'STORE');
+				$asinadd->brand = array_get($asin,'BRAND');
+				$asinadd->brand_line = array_get($asin,'WGBEZ');
 				$result = $asinadd->save();
 				//if(array_get($asin,'ASIN') == 'B074NXJWN2') print_r($asinadd);
 				unset($asinadd);
@@ -114,6 +116,8 @@ class GetAsin extends Command
 				$exists->bg = array_get($asin,'ZBGROUP');
 				$exists->bu = array_get($asin,'ZBUNIT');
 				$exists->store = array_get($asin,'STORE');
+				$exists->brand = array_get($asin,'BRAND');
+				$exists->brand_line = array_get($asin,'WGBEZ');
 				$exists->save();
 			
 			}
