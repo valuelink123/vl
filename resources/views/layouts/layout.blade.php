@@ -378,6 +378,16 @@
                         </a>
                     </li>
 					
+					
+					
+					<li class="nav-item <?php if($action=='tran') echo 'active';?>">
+                        <a href="{{ url('tran') }}" class="nav-link nav-toggle">
+                            <i class="fa fa-truck"></i>
+                            <span class="title">Distribution analysis</span>
+                            <?php if($action=='tran') echo '<span class="selected"></span>';?>
+                        </a>
+                    </li>
+					
 					<li class="nav-item <?php if($action=='asin') echo 'active';?>">
                         <a href="{{ url('asin') }}" class="nav-link nav-toggle">
                             <i class="fa fa-table"></i>
