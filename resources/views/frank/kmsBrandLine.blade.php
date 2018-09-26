@@ -74,32 +74,30 @@
                     searchable: false,
                     // defaultContent: '<button class="btn btn-success btn-xs">View</button>',
                     render(data, type, row, meta) {
-                        let args = {'item_group': row.item_group, 'item_model': row.item_model}
+                        // let args = {'item_group': row.item_group, 'item_model': row.item_model}
                         // jQuery.param( ) 坑爹啊 jQuery uses + instead of %20 to URL-encode spaces
-                        return `<a href="/kms/usermanual?${objectToQueryString(args)}" target="_blank" class='btn btn-success btn-xs'>View</a>`
+                        return `<a href="/kms/usermanual?${objectToQueryString(row)}" target="_blank" class='btn btn-success btn-xs'>View</a>`
                     }
                 },
                 {
                     orderable: false,
                     searchable: false,
                     render(data, type, row, meta) {
-                        let args = {'item_group': row.item_group, 'item_model': row.item_model}
-                        return `<a href="/kms/videolist?${objectToQueryString(args)}" target="_blank" class='btn btn-success btn-xs'>View</a>`
+                        return `<a href="/kms/videolist?${objectToQueryString(row)}" target="_blank" class='btn btn-success btn-xs'>View</a>`
                     }
                 },
                 {
                     orderable: false,
                     searchable: false,
                     render() {
-                        return `<button class='btn btn-success btn-xs'>View</button>`
+                        return `<a href="/qa" target="_blank" class='btn btn-success btn-xs'>View</a>`
                     }
                 },
                 {
                     orderable: false,
                     searchable: false,
                     render(data, type, row, meta) {
-                        let args = {'item_group': row.item_group, 'item_model': row.item_model}
-                        return `<a href="/kms/partslist?${objectToQueryString(args)}" target="_blank" class='btn btn-success btn-xs'>View</a>`
+                        return `<a href="/kms/partslist?${objectToQueryString(row)}" target="_blank" class='btn btn-success btn-xs'>View</a>`
                     }
                 }
             ],

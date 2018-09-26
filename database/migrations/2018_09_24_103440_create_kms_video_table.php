@@ -38,6 +38,6 @@ SQL;
      * @return void
      */
     public function down() {
-        self::dropIfEmpty('kms_video');
+        self::dropTableIfEmpty('kms_video');
     }
 }

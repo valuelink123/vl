@@ -28,6 +28,6 @@ class CreatePasswordResetsTable extends Migration {
      * @return void
      */
     public function down() {
-        self::dropIfEmpty('password_resets');
+        self::dropTableIfEmpty('password_resets');
     }
 }

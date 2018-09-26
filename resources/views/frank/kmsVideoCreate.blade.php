@@ -38,6 +38,18 @@
 
                     <div class="form-group">
                         <label>
+                            Brand
+                            <input required autocomplete="off" class="form-control" placeholder="Brand" name="brand" list="list-brand" id="brand"/>
+                            <datalist id="list-brand">
+                                @foreach($brands as $brand)
+                                    <option value="{!! $brand !!}"/>
+                                @endforeach
+                            </datalist>
+                        </label>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
                             Item Model
                             <input required autocomplete="off" class="form-control" placeholder="Item Model" name="item_model" list="" id="item_model"/>
                             @foreach($itemGroupModels as $itemGroupModel)
@@ -71,15 +83,22 @@
 
                     <div class="form-group">
                         <label>
-                            Video Description
-                            <input required autocomplete="off" class="form-control" placeholder="Description" name="descr"/>
+                            Video Link
+                            <input required autocomplete="off" class="form-control" placeholder="Link" name="link"/>
                         </label>
                     </div>
 
                     <div class="form-group">
                         <label>
-                            Video Link
-                            <input required autocomplete="off" class="form-control" placeholder="Link" name="link"/>
+                            Note
+                            <input autocomplete="off" class="form-control" placeholder="Note" name="note"/>
+                        </label>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            Video Description
+                            <textarea placeholder="Description" name="descr" class="form-control" style="min-height:7em"></textarea>
                         </label>
                     </div>
 
@@ -96,11 +115,11 @@
 
     <div class="portlet light bordered">
         <div class="portlet-body">
-            <form>
+            <form method="post" enctype="multipart/form-data">
                 <div class="form-group">
                     <label>
                         Upload File
-                        <input required autocomplete="off" type="file" style="margin-top: 5px;"/>
+                        <input required autocomplete="off" type="file" style="margin-top: 5px;" accept=".xls, .xlsx" name="excelfile"/>
                     </label>
                     <p class="help-block">Only support CSV format, can not exceed 5M. <a href="#">template.xls</a></p>
                 </div>
@@ -121,6 +140,11 @@
             } else {
                 item_group.value = ''
             }
+        })
+
+        $(brand).change(() => {
+            if ($(`#list-brand option[value="${brand.value}"]`).length) return
+            brand.value = ''
         })
 
         $(item_model).change(() => {

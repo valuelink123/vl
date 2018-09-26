@@ -29,7 +29,7 @@ class BrandLineController extends Controller {
         $limit = $this->dtLimit($req);
 
         // $rows = DB::connection('frank')->table('asin')->select('item_group', 'item_model', 'brand')->groupBy('item_group', 'item_model')->get()->toArray();
-        $rows = $this->queryRows("SELECT SQL_CALC_FOUND_ROWS item_group,brand,item_model FROM asin WHERE $where GROUP BY item_group,item_model ORDER BY $orderby LIMIT $limit");
+        $rows = $this->queryRows("SELECT SQL_CALC_FOUND_ROWS item_group,item_model,brand FROM asin WHERE $where GROUP BY item_group,brand,item_model ORDER BY $orderby LIMIT $limit");
         $total = $this->queryOne('SELECT FOUND_ROWS()');
 
         return ['data' => $rows, 'recordsTotal' => $total, 'recordsFiltered' => $total];

@@ -34,6 +34,6 @@ SQL;
      * @return void
      */
     public function down() {
-        self::dropIfEmpty('kms_user_manual');
+        self::dropTableIfEmpty('kms_user_manual');
     }
 }
