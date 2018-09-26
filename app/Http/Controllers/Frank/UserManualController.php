@@ -32,15 +32,20 @@ class UserManualController extends Controller {
 
     public function get(Request $req) {
 
-        $where = $this->dtWhere($req, ['t2.sellersku', 't2.brand', 't2.asin', 't2.item_no', 't1.item_group', 't1.item_model'], ['item_group' => 't1.item_group', 'item_model' => 't1.item_model']);
+        $where = $this->dtWhere($req, ['t2.sellersku', 't1.brand', 't2.asin', 't2.item_no', 't1.item_group', 't1.item_model'], ['item_group' => 't1.item_group', 'brand' => 't1.brand', 'item_model' => 't1.item_model']);
         $orderby = $this->dtOrderBy($req);
         $limit = $this->dtLimit($req);
         // todo item_name
         $sql = "
 SELECT SQL_CALC_FOUND_ROWS
-t1.item_group,t1.item_model,t1.link,t1.updated_at,t2.brand,t2.brand_line AS item_name
+ANY_VALUE(t1.item_group) AS item_group,
+ANY_VALUE(t1.item_model) AS item_model,
+ANY_VALUE(t1.link) AS link,
+ANY_VALUE(t1.updated_at) AS updated_at,
+ANY_VALUE(t1.brand) AS brand,
+MAX(t2.brand_line) AS item_name
 FROM kms_user_manual t1
-LEFT JOIN asin t2 ON t2.item_group=t1.item_group AND t2.item_model=t1.item_model
+LEFT JOIN asin t2 ON t2.item_group=t1.item_group AND t2.brand=t1.brand AND t2.item_model=t1.item_model
 WHERE $where
 GROUP BY t1.id
 ORDER BY $orderby

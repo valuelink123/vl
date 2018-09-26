@@ -58,6 +58,7 @@
                 if (obj.item_group) {
                     let ands = data.search.ands = {}
                     ands.item_group = obj.item_group
+                    ands.brand = obj.brand
                     ands.item_model = obj.item_model
                     return
                 }

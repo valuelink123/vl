@@ -22,6 +22,7 @@ class CreateUsersTable extends Migration {
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();
+            $table->tinyinteger('admin')->default(0);
         });
     }
 
@@ -31,6 +32,6 @@ class CreateUsersTable extends Migration {
      * @return void
      */
     public function down() {
-        self::dropIfEmpty('users');
+        self::dropTableIfEmpty('users');
     }
 }
