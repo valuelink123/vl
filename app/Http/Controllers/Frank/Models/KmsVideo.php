@@ -65,6 +65,11 @@ class KmsVideo extends Model {
 
         if ($req->has('link')) {
 
+            // 默认值仅对不存在的 key 生效
+            // Laravel 自动对表单进行 trim 操作
+            // 空格及空字符串会被转成 null，导致数据库报错
+            // 可以通过配置中间件改变此行为
+            // https://laravel.com/docs/5.4/requests#input-trimming-and-normalization
             $rows[] = $req->all();
 
         } elseif (empty($_FILES['excelfile']['size'])) {
