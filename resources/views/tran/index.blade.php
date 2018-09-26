@@ -137,7 +137,7 @@ th,td,td>span {
 							
 							if( array_get($data,'fbm_stock')>($fba_sales - array_get($data,'fba_stock')) ){
 								$fbm_add = $fba_sales - array_get($data,'fba_stock');
-								$ship_add ='Warning';
+								$ship_add = 'Warning';
 							}else{
 								$fbm_add = array_get($data,'fbm_stock');
 								$ship_add =  $fba_sales - array_get($data,'fba_stock') - array_get($data,'fbm_stock');
@@ -219,7 +219,7 @@ th,td,td>span {
 								{{round($fbm_add,2)}}
 								</td>
 								<td>
-								{{round($ship_add,2)}}
+								{{$ship_add}}
 								</td>
 								<td>
 								{{round($fba_sales,2)}}
