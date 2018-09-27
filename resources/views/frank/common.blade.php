@@ -32,6 +32,28 @@
         return strs.join('&')
     }
 
+    function objectFilte(obj, keys = [], except = true) {
+
+        let map = {}
+
+        for (let key of keys) {
+            map[key] = true
+        }
+
+        let result = {}
+
+        for (let k in obj) {
+            if (except) {
+                if (map[k]) continue
+            } else {
+                if (!map[k]) continue
+            }
+            result[k] = obj[k]
+        }
+
+        return result
+    }
+
     /**
      * 选中文本
      */
