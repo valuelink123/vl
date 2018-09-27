@@ -34,9 +34,9 @@
                     <thead>
                     <tr>
                         <th>Item Group</th>
+                        <th>Item Group Description</th>
                         <th>Brand</th>
                         <th>Model</th>
-                        <th>Item Name</th>
                         <th>Manual</th>
                         <th>Date</th>
                     </tr>
@@ -73,12 +73,9 @@
             processing: true,
             columns: [
                 {data: 'item_group', name: 'item_group'},
+                {data: 'item_group_descr', name: 'item_group_descr'},
                 {data: 'brand', name: 'brand'},
                 {data: 'item_model', name: 'item_model'},
-                {
-                    data: 'item_name',
-                    name: 'item_name',
-                },
                 {
                     data: 'link',
                     name: 'link',

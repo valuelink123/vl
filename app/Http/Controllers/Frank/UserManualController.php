@@ -46,7 +46,7 @@ ANY_VALUE(t1.item_model) AS item_model,
 ANY_VALUE(t1.link) AS link,
 ANY_VALUE(t1.updated_at) AS updated_at,
 ANY_VALUE(t1.brand) AS brand,
-MAX(t2.brand_line) AS item_name
+MAX(t2.brand_line) AS item_group_descr
 FROM kms_user_manual t1
 LEFT JOIN asin t2 ON t2.item_group=t1.item_group AND t2.brand=t1.brand AND t2.item_model=t1.item_model
 WHERE $where

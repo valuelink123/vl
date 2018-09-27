@@ -90,7 +90,7 @@
                     orderable: false,
                     searchable: false,
                     render() {
-                        return `<a href="/qa" target="_blank" class='btn btn-success btn-xs'>View</a>`
+                        return `<a href="/question" target="_blank" class='btn btn-success btn-xs'>View</a>`
                     }
                 },
                 {
