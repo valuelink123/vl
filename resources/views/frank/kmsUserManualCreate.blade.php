@@ -38,6 +38,18 @@
 
                     <div class="form-group">
                         <label>
+                            Brand
+                            <input required autocomplete="off" class="form-control" placeholder="Brand" name="brand" list="list-brand" id="brand"/>
+                            <datalist id="list-brand">
+                                @foreach($brands as $brand)
+                                    <option value="{!! $brand !!}"/>
+                                @endforeach
+                            </datalist>
+                        </label>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
                             Item Model
                             <input required autocomplete="off" class="form-control" placeholder="Item Model" name="item_model" list="" id="item_model"/>
                             @foreach($itemGroupModels as $itemGroupModel)
@@ -61,7 +73,14 @@
                     <div class="form-group">
                         <label>
                             Manual Link
-                            <input required autocomplete="off" class="form-control" placeholder="Link" name="link"/>
+                            <input required pattern=".*\S+.*" autocomplete="off" class="form-control" placeholder="Link" name="link" title="This field is required."/>
+                        </label>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            Note
+                            <input autocomplete="off" class="form-control" placeholder="Note" name="note"/>
                         </label>
                     </div>
 
@@ -78,13 +97,13 @@
 
     <div class="portlet light bordered">
         <div class="portlet-body">
-            <form>
+            <form method="post" enctype="multipart/form-data">
                 <div class="form-group">
                     <label>
-                        Upload File
-                        <input required autocomplete="off" type="file" style="margin-top: 5px;"/>
+                        Import by Excel Format
+                        <input required autocomplete="off" type="file" style="margin-top: 5px;" accept=".xls, .xlsx" name="excelfile"/>
                     </label>
-                    <p class="help-block">Only support CSV format, can not exceed 5M. <a href="#">template.xls</a></p>
+                    <p class="help-block">Fill in the Excel <a href="/kms/user_manual_import.xlsx">template.xlsx</a> and upload it here.</p>
                 </div>
                 <br/>
                 <button type="submit" class="btn btn-primary">Submit</button>
@@ -103,6 +122,11 @@
             } else {
                 item_group.value = ''
             }
+        })
+
+        $(brand).change(() => {
+            if ($(`#list-brand option[value="${brand.value}"]`).length) return
+            brand.value = ''
         })
 
         $(item_model).change(() => {

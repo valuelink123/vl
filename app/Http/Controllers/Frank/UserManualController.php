@@ -20,12 +20,15 @@ class UserManualController extends Controller {
 
     public function import() {
         $vars['itemGroups'] = $this->queryFields('SELECT item_group FROM asin GROUP BY item_group');
+        $vars['brands'] = $this->queryFields('SELECT brand FROM asin GROUP BY brand');
         $vars['itemGroupModels'] = $this->queryRows('SELECT item_group,GROUP_CONCAT(DISTINCT item_model) item_models FROM asin GROUP BY item_group');
         return view('frank/kmsUserManualCreate', $vars);
     }
 
     public function create(Request $req) {
-        Models\KmsUserManual::create($req->all());
+
+        Models\KmsUserManual::import($req);
+
         // todo 提示成功
         return redirect('/kms/usermanual/import');
     }
