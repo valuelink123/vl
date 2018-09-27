@@ -107,6 +107,8 @@
     <script src="/assets/global/plugins/jquery-file-upload/js/jquery.fileupload-ui.js" type="text/javascript"></script>
 
     <script src="/assets/pages/scripts/form-fileupload.js" type="text/javascript"></script>
+	<script src="/assets/layouts/global/scripts/echarts.min.js" type="text/javascript"></script>
+
     <!-- END PAGE LEVEL SCRIPTS -->
     <link rel="shortcut icon" href="/favicon.ico" /> </head>
 <!-- END HEAD -->
@@ -373,6 +375,16 @@
                             <i class="fa fa-tasks"></i>
                             <span class="title">Sales Management</span>
                             <?php if($action=='seller') echo '<span class="selected"></span>';?>
+                        </a>
+                    </li>
+					
+					
+					
+					<li class="nav-item <?php if($action=='tran') echo 'active';?>">
+                        <a href="{{ url('tran') }}" class="nav-link nav-toggle">
+                            <i class="fa fa-truck"></i>
+                            <span class="title">Distribution analysis</span>
+                            <?php if($action=='tran') echo '<span class="selected"></span>';?>
                         </a>
                     </li>
 					

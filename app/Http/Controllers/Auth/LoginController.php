@@ -25,7 +25,7 @@ class LoginController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/inbox';
+    protected $redirectTo = '/home';
 
     /**
      * Create a new controller instance.
@@ -41,7 +41,7 @@ class LoginController extends Controller
 		if(array_get($_REQUEST,'redirect_url')){
 			return array_get($_REQUEST,'redirect_url');
 		}else{
-			return '/inbox';
+			return '/home';
 		}
 		
 	}

@@ -18,13 +18,14 @@ Route::get('/', function () {
 
 Auth::routes();
 
-Route::get('/home', 'SendController@create')->name('home');
+Route::get('/home', 'HomeController@index')->name('home');
 Route::resource('account', 'AccountController');
 Route::resource('template', 'TemplateController');
 Route::resource('asin', 'AsinController');
 Route::resource('user', 'UserController');
 Route::get('/total', 'UserController@total')->name('total');
-Route::get('/etotal', 'UserController@etotal')->name('etotal');;
+Route::get('/etotal', 'UserController@etotal')->name('etotal');
+Route::get('/tran', 'TranController@index')->name('tran');
 Route::resource('rule', 'RuleController');
 Route::resource('auto', 'AutoController');
 Route::get('/profile', 'UserController@profile')->name('profile');

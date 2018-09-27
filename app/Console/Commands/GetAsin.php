@@ -89,14 +89,16 @@ class GetAsin extends Command
 				$asinadd->asin = trim(array_get($asin,'ASIN'));
 				$asinadd->site = 'www.'.trim(array_get($asin,'SITE'));
 				$asinadd->sellersku = trim(array_get($asin,'SELLER_SKU'));
-				$asinadd->item_no = array_get($asin,'MATNR');
-				$asinadd->seller = array_get($asin,'SELLER');
-				$asinadd->item_group = array_get($asin,'MATKL');
-				$asinadd->status = array_get($asin,'ZSTATUS');
-				$asinadd->item_model = array_get($asin,'MODEL');
-				$asinadd->bg = array_get($asin,'ZBGROUP');
-				$asinadd->bu = array_get($asin,'ZBUNIT');
-				$asinadd->store = array_get($asin,'STORE');
+				$asinadd->item_no = trim(array_get($asin,'MATNR'));
+				$asinadd->seller = trim(array_get($asin,'SELLER'));
+				$asinadd->item_group = trim(array_get($asin,'MATKL'));
+				$asinadd->status = trim(array_get($asin,'ZSTATUS'));
+				$asinadd->item_model = trim(array_get($asin,'MODEL'));
+				$asinadd->bg = trim(array_get($asin,'ZBGROUP'));
+				$asinadd->bu = trim(array_get($asin,'ZBUNIT'));
+				$asinadd->store = trim(array_get($asin,'STORE'));
+				$asinadd->brand = trim(array_get($asin,'BRAND'));
+				$asinadd->brand_line = trim(array_get($asin,'WGBEZ'));
 				$result = $asinadd->save();
 				//if(array_get($asin,'ASIN') == 'B074NXJWN2') print_r($asinadd);
 				unset($asinadd);
@@ -106,14 +108,16 @@ class GetAsin extends Command
 			}else{
 				
 				//if(array_get($asin,'ASIN') == 'B074NXJWN2') echo '2';
-				$exists->item_no = array_get($asin,'MATNR');
-				$exists->seller = array_get($asin,'SELLER');
-				$exists->item_group = array_get($asin,'MATKL');
-				$exists->status = array_get($asin,'ZSTATUS');
-				$exists->item_model = array_get($asin,'MODEL');
-				$exists->bg = array_get($asin,'ZBGROUP');
-				$exists->bu = array_get($asin,'ZBUNIT');
-				$exists->store = array_get($asin,'STORE');
+				$exists->item_no = trim(array_get($asin,'MATNR'));
+				$exists->seller = trim(array_get($asin,'SELLER'));
+				$exists->item_group = trim(array_get($asin,'MATKL'));
+				$exists->status = trim(array_get($asin,'ZSTATUS'));
+				$exists->item_model = trim(array_get($asin,'MODEL'));
+				$exists->bg = trim(array_get($asin,'ZBGROUP'));
+				$exists->bu = trim(array_get($asin,'ZBUNIT'));
+				$exists->store = trim(array_get($asin,'STORE'));
+				$exists->brand = trim(array_get($asin,'BRAND'));
+				$exists->brand_line = trim(array_get($asin,'WGBEZ'));
 				$exists->save();
 			
 			}

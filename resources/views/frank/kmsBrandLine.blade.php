@@ -53,7 +53,15 @@
     </div>
 
     <script>
-        let $theTable = $(thetable).dataTable({
+
+        let $theTable = $(thetable)
+
+        $theTable.on('preXhr.dt', (e, settings, data) => {
+            history.replaceState(null, null, '?search=' + encodeURIComponent($.trim(data.search.value)))
+        })
+
+        $theTable.dataTable({
+            search: {search: queryStringToObject().search},
             serverSide: true,
             pagingType: 'bootstrap_extended',
             processing: true,
@@ -64,31 +72,32 @@
                 {
                     orderable: false,
                     searchable: false,
-                    // defaultContent: '<button type="button" class="btn btn-success btn-xs">View</button>',
+                    // defaultContent: '<button class="btn btn-success btn-xs">View</button>',
                     render(data, type, row, meta) {
-                        return `<button type='button' class='btn btn-success btn-xs'>View</button>`
+                        // let args = {'item_group': row.item_group, 'item_model': row.item_model}
+                        // jQuery.param( ) 坑爹啊 jQuery uses + instead of %20 to URL-encode spaces
+                        return `<a href="/kms/usermanual?${objectToQueryString(row)}" target="_blank" class='btn btn-success btn-xs'>View</a>`
                     }
                 },
                 {
                     orderable: false,
                     searchable: false,
                     render(data, type, row, meta) {
-                        let args = {'item_group': row.item_group, 'item_model': row.item_model}
-                        return `<a href="/kms/videolist?${jQuery.param(args)}" target="_blank" class='btn btn-success btn-xs'>View</a>`
+                        return `<a href="/kms/videolist?${objectToQueryString(row)}" target="_blank" class='btn btn-success btn-xs'>View</a>`
                     }
                 },
                 {
                     orderable: false,
                     searchable: false,
                     render() {
-                        return `<button class='btn btn-success btn-xs'>View</button>`
+                        return `<a href="/qa" target="_blank" class='btn btn-success btn-xs'>View</a>`
                     }
                 },
                 {
                     orderable: false,
                     searchable: false,
-                    render() {
-                        return `<button class='btn btn-success btn-xs'>View</button>`
+                    render(data, type, row, meta) {
+                        return `<a href="/kms/partslist?${objectToQueryString(row)}" target="_blank" class='btn btn-success btn-xs'>View</a>`
                     }
                 }
             ],
@@ -103,7 +112,7 @@
         // $theTable.on('click', '.btn', (e) => {
         //     let search = $(e.target).data('search')
         //     if (!search) return;
-        //     window.open(`/kms/${search.type}?${jQuery.param(search.args)}`)
+        //     window.open(`/kms/${search.type}?${objectToQueryString(search.args)}`)
         // })
     </script>
 

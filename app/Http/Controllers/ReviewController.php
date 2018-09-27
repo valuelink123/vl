@@ -108,19 +108,22 @@ class ReviewController extends Controller
 	
 	
 	public function export(Request $request){
+		set_time_limit(0);
 		$date_from=date('Y-m-d',strtotime('-90 days'));		
 		$date_to=date('Y-m-d');	
 		
 		$customers = DB::table('review')
-			->select('review.*','asin.status as asin_status','customers.email as email','customers.phone as phone','customers.other as other')
+			->select('review.*','asin.status as asin_status','customers.email as email','customers.phone as phone','customers.other as other','star.average_score as average_score','star.total_star_number as total_star_number')
 			->leftJoin(DB::raw('(select max(status) as status,asin,site,max(bg) as bg,max(bu) as bu from asin group by asin,site) as asin'),function($q){
 				$q->on('review.asin', '=', 'asin.asin')
 					->on('review.site', '=', 'asin.site');
+			})->leftJoin('star',function($q){
+				$q->on('review.asin', '=', 'star.asin')
+					->on('review.site', '=', 'star.domain');
 			})->leftJoin('customers',function($q){
 				$q->on('review.customer_id', '=', 'customers.customer_id')
 					->on('review.site', '=', 'customers.site');
 			});
-		
 		if(!Auth::user()->admin){
             $customers = $customers->where('review.user_id',$this->getUserId());
         }
@@ -201,9 +204,10 @@ class ReviewController extends Controller
 		
 		$reviewsLists =json_decode(json_encode($reviews), true);
 		$arrayData = array();
-
 		$headArray[] = 'Review Date';
 		$headArray[] = 'Asin';
+		$headArray[] = 'Review';
+		$headArray[] = 'ReviewCount';
 		$headArray[] = 'Customer ID';
 		$headArray[] = 'Site';
 		$headArray[] = 'ReviewID';
@@ -215,6 +219,7 @@ class ReviewController extends Controller
 		$headArray[] = 'Review Status';
 		$headArray[] = 'Question Type';
 		$headArray[] = 'Follow up Date';
+		$headArray[] = 'Customer Feedback';
 		$headArray[] = 'Asin Status';
 		$headArray[] = 'User';
 		$headArray[] = 'SellerID';
@@ -231,9 +236,12 @@ class ReviewController extends Controller
 			$follow_status_array[$step->id]=$step->title;
 		}
 		foreach ( $reviewsLists as $review){
+
             $arrayData[] = array(
                	$review['date'],
 				$review['asin'],
+				round($review['average_score'],1),
+				$review['total_star_number'],
 				$review['customer_id'],
 				$review['site'],
 				$review['review'],
@@ -245,6 +253,7 @@ class ReviewController extends Controller
 				array_get($follow_status_array,empty(array_get($review,'status'))?0:array_get($review,'status'),''),
 				$review['etype'],
 				$review['edate'],
+				array_get(getCustomerFb(),$review['customer_feedback']),
 				array_get($asin_status_array,empty(array_get($review,'asin_status'))?0:array_get($review,'asin_status')),				
 				array_get($users_array,intval(array_get($review,'user_id')),''),
 				$review['seller_id'],
@@ -319,10 +328,13 @@ class ReviewController extends Controller
         }
 		
 		$customers = DB::table('review')
-			->select('review.*','asin.status as asin_status','customers.email as email')
-			->leftJoin(DB::raw('(select max(status) as status,asin,site,max(bg) as bg,max(bu) as bu from asin group by asin,site) as asin'),function($q){
+			->select('review.*','asin.status as asin_status','asin.item_no as item_no','customers.email as email','star.average_score as average_score','star.total_star_number as total_star_number')
+			->leftJoin(DB::raw('(select max(status) as status,asin,site,max(bg) as bg,max(bu) as bu,max(item_no) as item_no from asin group by asin,site) as asin'),function($q){
 				$q->on('review.asin', '=', 'asin.asin')
 					->on('review.site', '=', 'asin.site');
+			})->leftJoin('star',function($q){
+				$q->on('review.asin', '=', 'star.asin')
+					->on('review.site', '=', 'star.domain');
 			})->leftJoin('customers',function($q){
 				$q->on('review.customer_id', '=', 'customers.customer_id')
 					->on('review.site', '=', 'customers.site');
@@ -367,6 +379,7 @@ class ReviewController extends Controller
 		$customers = $customers->where('date','>=',$date_from)->where('rating','<',4);
 		$customers = $customers->where('date','<=',$date_to);
 		
+		if(array_get($_REQUEST,'nextdate')) $customers = $customers->where('nextdate',array_get($_REQUEST,'nextdate'));
 		
 		if(array_get($_REQUEST,'follow_status')){
             $customers = $customers->whereIn('review.status',array_get($_REQUEST,'follow_status'));
@@ -405,12 +418,15 @@ class ReviewController extends Controller
             if($_REQUEST['order'][0]['column']==2) $orderby = 'asin';
 			if($_REQUEST['order'][0]['column']==3) $orderby = 'date';
             if($_REQUEST['order'][0]['column']==4) $orderby = 'rating';
-            if($_REQUEST['order'][0]['column']==5) $orderby = 'reviewer_name';
-			if($_REQUEST['order'][0]['column']==6) $orderby = 'vp';
-            if($_REQUEST['order'][0]['column']==7) $orderby = 'status';
-            if($_REQUEST['order'][0]['column']==8) $orderby = 'buyer_email';
-            if($_REQUEST['order'][0]['column']==9) $orderby = 'edate';
-			if($_REQUEST['order'][0]['column']==10) $orderby = 'user_id';
+			if($_REQUEST['order'][0]['column']==5) $orderby = 'average_score';
+			if($_REQUEST['order'][0]['column']==6) $orderby = 'total_star_number';
+            if($_REQUEST['order'][0]['column']==7) $orderby = 'reviewer_name';
+			if($_REQUEST['order'][0]['column']==8) $orderby = 'vp';
+            if($_REQUEST['order'][0]['column']==9) $orderby = 'status';
+            if($_REQUEST['order'][0]['column']==10) $orderby = 'buyer_email';
+			if($_REQUEST['order'][0]['column']==11) $orderby = 'customer_feedback';
+            if($_REQUEST['order'][0]['column']==12) $orderby = 'nextdate';
+			if($_REQUEST['order'][0]['column']==15) $orderby = 'user_id';
 
             $sort = $_REQUEST['order'][0]['dir'];
 			
@@ -457,17 +473,23 @@ class ReviewController extends Controller
 				
 				
 			}
+			$fol_arr= unserialize($ordersList[$i]['follow_content'])?unserialize($ordersList[$i]['follow_content']):array();
 			$records["data"][] = array(
 				 '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input name="id[]" type="checkbox" class="checkboxes" value="'.$ordersList[$i]['id'].'"/><span></span></label>',
 				$ordersList[$i]['negative_value'],
 				'<a href="https://'.$ordersList[$i]['site'].'/dp/'.$ordersList[$i]['asin'].'" target="_blank">'.$ordersList[$i]['asin'].'</a> <span class="label label-sm label-default">'.strtoupper(substr(strrchr($ordersList[$i]['site'], '.'), 1)).'</span>',
 				$ordersList[$i]['date'],
 				$ordersList[$i]['rating'].' '.$rating_chstr,
+				$ordersList[$i]['average_score'],
+				$ordersList[$i]['total_star_number'],
 				$ordersList[$i]['reviewer_name'],
 				($ordersList[$i]['vp'])?'<span class="badge badge-danger">VP</span>':'',
 				array_get($follow_status_array,$ordersList[$i]['status'],'').' '.(($ordersList[$i]['is_delete'])?'<span class="badge badge-danger">Del</span>':''),
 				($ordersList[$i]['buyer_email']==$ordersList[$i]['email'])?$ordersList[$i]['buyer_email']:$ordersList[$i]['buyer_email'].' '.$ordersList[$i]['email'],
-				$ordersList[$i]['edate'],
+				array_get(getCustomerFb(),$ordersList[$i]['customer_feedback']),
+				$ordersList[$i]['nextdate'],
+				$ordersList[$i]['item_no'],
+				strip_tags(array_get($fol_arr,$ordersList[$i]['status'].'.do_content')),
 				array_get($users_array,intval(array_get($ordersList[$i],'user_id')),''),				
 				(($ordersList[$i]['warn']>0)?'<i class="fa fa-warning" title="Contains dangerous words"></i>&nbsp;&nbsp;&nbsp;':'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;').'<a href="https://'.$ordersList[$i]['site'].'/gp/customer-reviews/'.$ordersList[$i]['review'].'" target="_blank" class="btn btn-success btn-xs"> View </a>'.'<a href="/review/'.$ordersList[$i]['id'].'/edit" target="_blank" class="btn btn-danger btn-xs"><i class="fa fa-search"></i> Resolve </a>'
 			);
@@ -541,6 +563,8 @@ class ReviewController extends Controller
 		$seller_account->buyer_phone = $request->get('buyer_phone');
 		$seller_account->etype = $request->get('etype');
 		$seller_account->edate = date('Y-m-d');
+		$seller_account->nextdate = $request->get('nextdate');
+		$seller_account->customer_feedback = $request->get('customer_feedback');
 		$do_ids = $request->get('do_id');
 		
 		if($do_ids){

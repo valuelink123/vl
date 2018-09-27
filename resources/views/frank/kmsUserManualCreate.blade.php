@@ -62,17 +62,6 @@
                         </label>
                     </div>
 
-                    <div class="form-group">
-                        <label>
-                            Video Type
-                            <select required autocomplete="off" class="form-control" name="type">
-                                @foreach($types as $type)
-                                    <option value="{!! $type !!}">{!! $type !!}</option>
-                                @endforeach
-                            </select>
-                        </label>
-                    </div>
-
                     <br/>
 
                     <button type="submit" class="btn btn-primary">Submit</button>
@@ -83,7 +72,7 @@
 
                     <div class="form-group">
                         <label>
-                            Video Link
+                            Manual Link
                             <input required pattern=".*\S+.*" autocomplete="off" class="form-control" placeholder="Link" name="link" title="This field is required."/>
                         </label>
                     </div>
@@ -92,13 +81,6 @@
                         <label>
                             Note
                             <input autocomplete="off" class="form-control" placeholder="Note" name="note"/>
-                        </label>
-                    </div>
-
-                    <div class="form-group">
-                        <label>
-                            Video Description
-                            <textarea autocomplete="off" placeholder="Description" name="descr" class="form-control" style="min-height:7em"></textarea>
                         </label>
                     </div>
 
@@ -121,7 +103,7 @@
                         Import by Excel Format
                         <input required autocomplete="off" type="file" style="margin-top: 5px;" accept=".xls, .xlsx" name="excelfile"/>
                     </label>
-                    <p class="help-block">Fill in the Excel <a href="/kms/product_video_import.xlsx">template.xlsx</a> and upload it here.</p>
+                    <p class="help-block">Fill in the Excel <a href="/kms/user_manual_import.xlsx">template.xlsx</a> and upload it here.</p>
                 </div>
                 <br/>
                 <button type="submit" class="btn btn-primary">Submit</button>

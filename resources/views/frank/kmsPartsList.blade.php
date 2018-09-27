@@ -4,7 +4,7 @@
 
     @include('frank.common')
 
-    <h1 class="page-title font-red-intense"> Video List
+    <h1 class="page-title font-red-intense"> Parts List
         <small></small>
     </h1>
 
@@ -15,10 +15,6 @@
                     <div class="col-md-8"></div>
                     <div class="col-md-4">
                         <div class="btn-group " style="float:right;">
-
-                            <a id="excel-import" class="btn sbold green" href="/kms/videolist/import"> Import
-                                <i class="fa fa-plus-circle"></i>
-                            </a>
 
                             <button id="excel-export" class="btn sbold blue"> Export
                                 <i class="fa fa-download"></i>
@@ -33,13 +29,10 @@
                 <table class="table table-striped table-bordered" id="thetable">
                     <thead>
                     <tr>
-                        <th>Item Group</th>
-                        <th>Brand</th>
-                        <th>Model</th>
-                        <th>Type</th>
-                        <th>Video Description</th>
-                        <th>Video Link</th>
-                        <th>Note</th>
+                        <th>Item No</th>
+                        <th>Item Name</th>
+                        <th>Stock</th>
+                        <th>Average Per Day</th>
                     </tr>
                     </thead>
                     <tbody></tbody>
@@ -73,54 +66,18 @@
             pagingType: 'bootstrap_extended',
             processing: true,
             columns: [
-                {data: 'item_group', name: 'item_group'},
-                {data: 'brand', name: 'brand'},
-                {data: 'item_model', name: 'item_model'},
+                {data: 'item_no', name: 'item_no'},
+                {data: 'item_name', name: 'item_name'},
+                {data: 'stock', name: 'stock'},
                 {
-                    data: 'type',
-                    name: 'type',
-                    searchable: false,
+                    data: 'apd',
+                    name: 'apd',
                 },
-                {
-                    data: 'descr',
-                    name: 'descr',
-                    orderable: false,
-                    searchable: false,
-                },
-                {
-                    data: 'link',
-                    name: 'link',
-                    orderable: false,
-                    searchable: false,
-                    render(data) {
-                        return `<span class="video-link">${data}</span>`
-                    }
-                },
-                {
-                    data: 'note',
-                    name: 'note',
-                    orderable: false,
-                    searchable: false,
-                }
             ],
             ajax: {
                 type: 'POST',
-                url: '/kms/videolist/get',
-                // data(args) {
-                //     // 过滤 Request 表单
-                //     let columns = args.columns
-                //     for (let i = 0; i < columns.length; i++) {
-                //         let column = columns[i]
-                //         if (!column.searchable && !column.orderable) delete columns[i]
-                //     }
-                // }
-                // // 过滤 Response 数据
-                // dataSrc(json) { return json.data }
+                url: '/kms/partslist/get',
             }
-        })
-
-        $theTable.on('click', '.video-link', (e) => {
-            selectText(e.target)
         })
 
     </script>

@@ -148,6 +148,17 @@ th,td,td>span {
 						</div>
 						
 						<div class="col-md-2">
+                            <div class="input-group date date-picker margin-bottom-5" data-date-format="yyyy-mm-dd">
+                                <input type="text" class="form-control form-filter input-sm" name="nextdate" placeholder="Next FollowUp Date" value="{{array_get($_REQUEST,'nextdate')}}">
+                                <span class="input-group-btn">
+                                                                        <button class="btn btn-sm default" type="button">
+                                                                            <i class="fa fa-calendar"></i>
+                                                                        </button>
+                                                                    </span>
+                            </div>
+                        </div>
+						
+						<div class="col-md-1">
 						<input type="text" class="form-control form-filter input-sm" name="keywords" placeholder="Keywords" value ="{{array_get($_REQUEST,'keywords')}}">
                                        
 						</div>	
@@ -229,17 +240,22 @@ th,td,td>span {
                                         <span></span>
                                     </label>
                                 </th>
-								<th style="min-width:30px;">Imp.</th>
-								<th style="min-width:70px;">Asin</th>
-								<th style="min-width:70px;">Date</th>
-								<th style="min-width:50px;">Rating</th>
-								<th style="min-width:80px;">Name</th>
-								<th style="min-width:30px;">VP</th>
-								<th style="min-width:80px;">Status</th>
-								<th style="min-width:170px;">Email</th>
-								<th style="min-width:70px;">LastUpdate</th>
-                                <th style="min-width:70px;">User</th>
-                                <th style="min-width:90px;">Action</th>
+								<th style="max-width: 30px;">Imp.</th>
+								<th style="max-width:70px;">Asin</th>
+								<th style="max-width:55px;">Date</th>
+								<th style="max-width:40px;">Rating</th>
+								<th style="max-width:30px;">Rev</th>
+								<th style="max-width:40px;">RevC</th>
+								<th style="max-width:40px;">Name</th>
+								<th style="max-width:30px;">VP</th>
+								<th style="max-width:40px;">Status</th>
+								<th style="max-width:80px;">Email</th>
+								<th style="max-width:40px;">CusFB</th>
+								<th style="max-width:55px;">NextDate</th>
+								<th style="max-width:40px;">SKU</th>
+								<th style="max-width:80px;">Follow</th>
+                                <th style="max-width:50px;">User</th>
+                                <th style="max-width:90px;">Action</th>
                             </tr>
 							
                             
@@ -303,7 +319,7 @@ th,td,td>span {
                     "pageLength": 10, // default record count per page
 
 
-					"aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0,11] }],	
+					"aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0,13,14,16] }],	
 					 "order": [
                         [1, "desc"]
                     ],
@@ -320,9 +336,11 @@ th,td,td>span {
                     },
 
                     "createdRow": function( row, data, dataIndex ) {
-						$(row).children('td').eq(0).attr('style', 'width: 30px;');
-                        $(row).children('td').eq(8).attr('style', 'max-width: 170px;overflow:hidden;white-space:nowrap;text-align: left; ');
-						$(row).children('td').eq(8).attr('title', $(row).children('td').eq(8).text());
+						$(row).children('td').eq(0).attr('style', 'wdith: 30px;');
+                        $(row).children('td').eq(10).attr('style', 'max-width: 80px;overflow:hidden;white-space:nowrap;text-align: left; ');
+						$(row).children('td').eq(10).attr('title', $(row).children('td').eq(10).text());
+						$(row).children('td').eq(14).attr('style', 'max-width: 80px;overflow:hidden;white-space:nowrap;text-align: left; ');
+						$(row).children('td').eq(14).attr('title', $(row).children('td').eq(14).text());
                     },
 					"dom": "<'row' <'col-md-12'>><'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'>r><'table-scrollable't><'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>",
                 }
@@ -363,6 +381,7 @@ th,td,td>span {
 
             grid.setAjaxParam("date_from", $("input[name='date_from']").val());
             grid.setAjaxParam("date_to", $("input[name='date_to']").val());
+			grid.setAjaxParam("nextdate", $("input[name='nextdate']").val());
 			grid.setAjaxParam("vp", $("select[name='vp']").val());
 			grid.setAjaxParam("del", $("select[name='del']").val());
             grid.setAjaxParam("user_id", $("select[name='user_id[]']").val());
@@ -400,7 +419,7 @@ $(function() {
 		TableDatatablesAjax.init();
 	});
 	$("#vl_list_export").click(function(){
-		location.href='/reviewexport?asin_status='+(($("select[name='asin_status[]']").val())?$("select[name='asin_status[]']").val():'')+'&keywords='+$("input[name='keywords']").val()+'&date_from='+$("input[name='date_from']").val()+'&date_to='+$("input[name='date_to']").val()+'&follow_status='+(($("select[name='follow_status[]']").val())?$("select[name='follow_status[]']").val():'')+'&user_id='+(($("select[name='user_id[]']").val())?$("select[name='user_id[]']").val():'')+'&site='+(($("select[name='site[]']").val())?$("select[name='site[]']").val():'')+'&rating='+$("select[name='rating']").val()+'&bgbu='+$("select[name='bgbu']").val()+'&vp='+$('select[name="vp"]').val()+'&rc='+$('select[name="rc"]').val()+'&del='+$('select[name="del"]').val();
+		location.href='/reviewexport?asin_status='+(($("select[name='asin_status[]']").val())?$("select[name='asin_status[]']").val():'')+'&keywords='+$("input[name='keywords']").val()+'&date_from='+$("input[name='date_from']").val()+'&date_to='+$("input[name='date_to']").val()+'&nextdate='+$("input[name='nextdate']").val()+'&follow_status='+(($("select[name='follow_status[]']").val())?$("select[name='follow_status[]']").val():'')+'&user_id='+(($("select[name='user_id[]']").val())?$("select[name='user_id[]']").val():'')+'&site='+(($("select[name='site[]']").val())?$("select[name='site[]']").val():'')+'&rating='+$("select[name='rating']").val()+'&bgbu='+$("select[name='bgbu']").val()+'&vp='+$('select[name="vp"]').val()+'&rc='+$('select[name="rc"]').val()+'&del='+$('select[name="del"]').val();
 	});
 });
 

@@ -8,7 +8,7 @@ namespace App\Http\Controllers\Frank\Traits;
 trait Mysqli {
 
     private $_mysqli;
-    private $_mysqli_charset = 'UTF8';
+    protected $_mysqli_charset = 'UTF8';
 
     private function initMysqli() {
         if (!$this->_mysqli) {
@@ -59,5 +59,10 @@ trait Mysqli {
             $options[] = $strs[$i];
         }
         return $options;
+    }
+
+    public function __destruct() {
+        if ($this->_mysqli) $this->_mysqli->close();
+        parent::__destruct();
     }
 }
