@@ -139,48 +139,49 @@
 
                     <li class="dropdown dropdown-user">
                         <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
-                            <i class="fa fa-weixin"></i>
+                            <i class="fa fa-weixin" style="font-size:20px"></i>
                             <span class="username"> KMS </span>
+                            <i class="fa fa-angle-down"></i>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-default">
                             <li>
                                 <a href="/kms/brandline">
-                                    <i class="icon-user"></i> Product Guide
+                                    <i class="fa fa-file"></i> Product Guide
                                 </a>
                             </li>
                             <li>
                                 <a href="/asin">
-                                    <i class="icon-key"></i> Asin Table
+                                    <i class="fa fa-table"></i> Asin Table
                                 </a>
                             </li>
                             <li>
                                 <a href="/qa">
-                                    <i class="icon-key"></i> Q&A Manage
+                                    <i class="fa fa-files-o"></i> Q&A Manage
                                 </a>
                             </li>
                             <li>
                                 <a href="/question">
-                                    <i class="icon-key"></i> Q&A Center
+                                    <i class="fa fa-question"></i> Q&A Center
                                 </a>
                             </li>
                             <li>
                                 <a href="/template">
-                                    <i class="icon-key"></i> Templates
+                                    <i class="fa fa-inbox"></i> Templates
                                 </a>
                             </li>
                             <li>
                                 <a href="/kms/usermanual">
-                                    <i class="icon-key"></i> User Manuals
+                                    <i class="fa fa-book"></i> User Manuals
                                 </a>
                             </li>
                             <li>
                                 <a href="/kms/videolist">
-                                    <i class="icon-key"></i> Video List
+                                    <i class="fa fa-play-circle-o"></i> Video List
                                 </a>
                             </li>
                             <li>
                                 <a href="/kms/partslist">
-                                    <i class="icon-key"></i> Parts List
+                                    <i class="icon-list"></i> Parts List
                                 </a>
                             </li>
                         </ul>
