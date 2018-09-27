@@ -51,7 +51,8 @@ ANY_VALUE(t1.type) AS type,
 ANY_VALUE(t1.descr) AS descr,
 ANY_VALUE(t1.link) AS link,
 ANY_VALUE(t1.note) AS note,
-ANY_VALUE(t1.brand) AS brand
+ANY_VALUE(t1.brand) AS brand,
+MAX(t2.brand_line) AS item_group_descr
 FROM kms_video t1
 LEFT JOIN asin t2 ON t2.item_group=t1.item_group AND t2.brand=t1.brand AND t2.item_model=t1.item_model
 WHERE $where

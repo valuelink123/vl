@@ -20,6 +20,8 @@ class Kernel extends HttpKernel
         \App\Http\Middleware\TrustProxies::class,
     ];
 
+    // protected $middlewarePriority = []; // Middleware Call Order
+
     /**
      * The application's route middleware groups.
      *
@@ -38,7 +40,6 @@ class Kernel extends HttpKernel
         ],
 
         'kms' => [
-            // todo Middleware Order
             \App\Http\Middleware\EncryptCookies::class,
             \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
             \Illuminate\Session\Middleware\StartSession::class,

@@ -136,6 +136,56 @@
             <!-- BEGIN TOP NAVIGATION MENU -->
             <div class="top-menu">
                 <ul class="nav navbar-nav pull-right">
+
+                    <li class="dropdown dropdown-user">
+                        <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
+                            <i class="fa fa-weixin"></i>
+                            <span class="username"> KMS </span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-default">
+                            <li>
+                                <a href="/kms/brandline">
+                                    <i class="icon-user"></i> Product Guide
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/asin">
+                                    <i class="icon-key"></i> Asin Table
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/qa">
+                                    <i class="icon-key"></i> Q&A Manage
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/question">
+                                    <i class="icon-key"></i> Q&A Center
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/template">
+                                    <i class="icon-key"></i> Templates
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/kms/usermanual">
+                                    <i class="icon-key"></i> User Manuals
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/kms/videolist">
+                                    <i class="icon-key"></i> Video List
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/kms/partslist">
+                                    <i class="icon-key"></i> Parts List
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+
                     <li class="dropdown dropdown-user">
                         <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
                             <img alt="" class="img-circle" src="/assets/layouts/layout/img/avatar.png" />
@@ -265,6 +315,26 @@
                         </a>
 
                     </li>
+
+                    <li class="nav-item <?php if($action=='review') echo 'active';?>">
+                        <a href="{{ url('review') }}" class="nav-link nav-toggle">
+                            <i class="fa fa-table"></i>
+                            <span class="title">Reviews Table</span>
+                            <?php if($action=='review') echo '<span class="selected"></span>';?>
+
+                        </a>
+
+                    </li>
+
+                    <li class="nav-item <?php if($action=='star') echo 'active';?>">
+                        <a href="{{ url('star') }}" class="nav-link nav-toggle">
+                            <i class="fa fa-star"></i>
+                            <span class="title">Asin Rating Table</span>
+                            <?php if($action=='star') echo '<span class="selected"></span>';?>
+
+                        </a>
+
+                    </li>
 					
 					<li class="nav-item <?php if($action=='exception') echo 'active';?>">
                         <a href="{{ url('exception') }}" class="nav-link nav-toggle">
@@ -284,8 +354,6 @@
                             <?php if($action=='auto') echo '<span class="selected"></span>';?>
                         </a>
                     </li>
-
-
 
 
                     <li class="nav-item <?php if($action=='rule') echo 'active';?>">
@@ -367,8 +435,7 @@
 
                     </li>
 					<?php } ?>
-                    
-					
+
 					
 					<li class="nav-item <?php if($action=='seller') echo 'active';?>">
                         <a href="{{ url('seller') }}" class="nav-link nav-toggle">
@@ -377,8 +444,7 @@
                             <?php if($action=='seller') echo '<span class="selected"></span>';?>
                         </a>
                     </li>
-					
-					
+
 					
 					<li class="nav-item <?php if($action=='tran') echo 'active';?>">
                         <a href="{{ url('tran') }}" class="nav-link nav-toggle">
@@ -388,72 +454,7 @@
                         </a>
                     </li>
 					
-					<li class="nav-item <?php if($action=='asin') echo 'active';?>">
-                        <a href="{{ url('asin') }}" class="nav-link nav-toggle">
-                            <i class="fa fa-table"></i>
-                            <span class="title">Asin Table</span>
-                            <?php if($action=='asin') echo '<span class="selected"></span>';?>
 
-                        </a>
-
-                    </li>
-					
-					
-					<li class="nav-item <?php if($action=='review') echo 'active';?>">
-                        <a href="{{ url('review') }}" class="nav-link nav-toggle">
-                            <i class="fa fa-table"></i>
-                            <span class="title">Reviews Table</span>
-                            <?php if($action=='review') echo '<span class="selected"></span>';?>
-
-                        </a>
-
-                    </li>
-					
-					<li class="nav-item <?php if($action=='star') echo 'active';?>">
-                        <a href="{{ url('star') }}" class="nav-link nav-toggle">
-                            <i class="fa fa-star"></i>
-                            <span class="title">Asin Rating Table</span>
-                            <?php if($action=='star') echo '<span class="selected"></span>';?>
-
-                        </a>
-
-                    </li>
-					
-					
-					<li class="nav-item <?php if($action=='template') echo 'active';?>">
-                        <a href="{{ url('template') }}" class="nav-link nav-toggle">
-                            <i class="fa fa-book"></i>
-                            <span class="title">Templates</span>
-                            <?php if($action=='template') echo '<span class="selected"></span>';?>
-
-                        </a>
-
-                    </li>
-					
-					
-					
-					
-					<li class="nav-item <?php if($action=='qa') echo 'active';?>">
-                        <a href="{{ url('qa') }}" class="nav-link nav-toggle">
-                            <i class="fa fa-support"></i>
-                            <span class="title">Question Manage</span>
-                            <?php if($action=='template') echo '<span class="selected"></span>';?>
-
-                        </a>
-
-                    </li>
-					
-					
-					<li class="nav-item <?php if($action=='question') echo 'active';?>">
-                        <a href="{{ url('question') }}" class="nav-link nav-toggle">
-                            <i class="fa fa-question"></i>
-                            <span class="title">Question Center</span>
-                            <?php if($action=='template') echo '<span class="selected"></span>';?>
-
-                        </a>
-
-                    </li>
-                    
                 </ul>
                 <!-- END SIDEBAR MENU -->
                 <!-- END SIDEBAR MENU -->
