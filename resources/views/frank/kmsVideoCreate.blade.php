@@ -118,10 +118,10 @@
             <form method="post" enctype="multipart/form-data">
                 <div class="form-group">
                     <label>
-                        Upload File
+                        Import by Excel Format
                         <input required autocomplete="off" type="file" style="margin-top: 5px;" accept=".xls, .xlsx" name="excelfile"/>
                     </label>
-                    <p class="help-block">Only support CSV format, can not exceed 5M. <a href="#">template.xls</a></p>
+                    <p class="help-block">Fill in the Excel <a href="/kms/product_video_import.xlsx">template.xlsx</a> and upload it here.</p>
                 </div>
                 <br/>
                 <button type="submit" class="btn btn-primary">Submit</button>
