@@ -8,11 +8,11 @@
 namespace App\Classes;
 
 /**
- * Use Age:
+ * Useage:
  *
  * $sap = new SapRfcRequest($appid, $appsecret, $host);
  *
- * $data = $sap->getOrder(['orderId' => 'TM0426']);
+ * $data = $sap->getOrder(['orderId' => '000-000-01']);
  *
  * $data = $sap->getAccessories(['sku' => 'TM0426']);
  *

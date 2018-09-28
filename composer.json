@@ -6,6 +6,8 @@
     "type": "project",
     "require": {
         "php": ">=7.0.0",
+        "ext-curl": "*",
+        "ext-mysqli": "*",
         "barryvdh/laravel-debugbar": "^3.1",
         "enkay/mws": "^0.4.0",
         "exeu/apai-io": "^2.1",

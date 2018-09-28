@@ -73,7 +73,7 @@
                         </label>
                     </div>
 
-                    <br/>
+                    <br/>{!! csrf_field() !!}
 
                     <button type="submit" class="btn btn-primary">Submit</button>
 
@@ -123,7 +123,7 @@
                     </label>
                     <p class="help-block">Fill in the Excel <a href="/kms/product_video_import.xlsx">template.xlsx</a> and upload it here.</p>
                 </div>
-                <br/>
+                <br/>{!! csrf_field() !!}
                 <button type="submit" class="btn btn-primary">Submit</button>
             </form>
         </div>

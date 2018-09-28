@@ -33,7 +33,7 @@ class UserManualController extends Controller {
         // Parts List 物料主从关系
         // 主题，菜单看不清楚
         // 可编辑 table
-        // search 加强 多关键字 or and
+        // search 加强 多关键字 and
         // 根据 link 去重
         // 仅显示有匹配的 view
         // todo 提示成功
@@ -45,7 +45,8 @@ class UserManualController extends Controller {
         $where = $this->dtWhere($req, ['t2.sellersku', 't1.brand', 't2.asin', 't2.item_no', 't1.item_group', 't1.item_model'], ['item_group' => 't1.item_group', 'brand' => 't1.brand', 'item_model' => 't1.item_model']);
         $orderby = $this->dtOrderBy($req);
         $limit = $this->dtLimit($req);
-        // todo item_name
+        // todo item_group_descr
+        // todo UPDATE asin SET xxx=TRIM(IFNULL(xxx, ''))
         $sql = "
 SELECT SQL_CALC_FOUND_ROWS
 ANY_VALUE(t1.item_group) AS item_group,
