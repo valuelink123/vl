@@ -139,7 +139,7 @@
 
                     <li class="dropdown dropdown-user">
                         <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
-                            <i class="fa fa-weixin" style="font-size:20px"></i>
+                            <i class="fa fa-book" style="font-size:20px"></i>
                             <span class="username"> KMS </span>
                             <i class="fa fa-angle-down"></i>
                         </a>
@@ -181,7 +181,7 @@
                             </li>
                             <li>
                                 <a href="/kms/partslist">
-                                    <i class="icon-list"></i> Parts List
+                                    <i class="fa fa-list"></i> Parts List
                                 </a>
                             </li>
                         </ul>

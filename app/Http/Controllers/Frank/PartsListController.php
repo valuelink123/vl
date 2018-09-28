@@ -7,6 +7,7 @@
 
 namespace App\Http\Controllers\Frank;
 
+use App\Classes\SapRfcRequest;
 use Illuminate\Http\Request;
 
 class PartsListController extends Controller {
@@ -23,10 +24,16 @@ class PartsListController extends Controller {
         $where = $this->dtWhere($req, ['sellersku', 'brand', 'brand_line', 'asin', 'item_no', 'item_group', 'item_model'], ['item_group' => 'item_group', 'brand' => 'brand', 'item_model' => 'item_model']);
         $orderby = $this->dtOrderBy($req);
         $limit = $this->dtLimit($req);
-// todo data from sap
+
+        // $sap = new SapRfcRequest();
+        // $sap->getAccessories(['sku' => 'TM0426']);
+
         $sql = "
 SELECT SQL_CALC_FOUND_ROWS
-item_no,MAX(brand) AS item_name,ANY_VALUE(group_id) AS stock,ANY_VALUE(review_user_id) AS apd
+item_no,
+MAX(brand) AS item_name,
+ANY_VALUE(group_id) AS stock,
+ANY_VALUE(review_user_id) AS apd
 FROM asin
 WHERE $where
 GROUP BY item_no

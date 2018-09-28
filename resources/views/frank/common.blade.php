@@ -9,7 +9,8 @@
     $.ajaxSetup({
         headers: {'X-CSRF-TOKEN': '{!! csrf_token() !!}'}
     })
-
+</script>
+<script>
     function queryStringToObject(queryString = location.search.substr(1)) {
         let obj = {}
         let strs = queryString.split('&')

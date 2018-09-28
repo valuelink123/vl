@@ -95,7 +95,7 @@
                     orderable: false,
                     searchable: false,
                     render(data) {
-                        return `<span class="video-link">${data}</span>`
+                        return `<a href="${data}" target="_blank" class='btn btn-success btn-xs'>View</a>`
                     }
                 },
                 {
@@ -121,9 +121,9 @@
             }
         })
 
-        $theTable.on('click', '.video-link', (e) => {
-            selectText(e.target)
-        })
+        // $theTable.on('click', '.video-link', (e) => {
+        //     selectText(e.target)
+        // })
 
     </script>
 
