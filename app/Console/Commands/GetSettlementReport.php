@@ -115,6 +115,7 @@ class GetSettlementReport extends Command
         if(isset($accountList) && !empty($accountList)){
             foreach ($accountList as $account)
             {
+                sleep(20);
                 $regionData = self::getRegionData();
                 $domain = $account->domain;
                 $serviceUrl = $regionData[$domain]['serviceUrl'];
@@ -129,8 +130,8 @@ class GetSettlementReport extends Command
                 try{
                         $request->setMerchant($account->seller_id);
                         $request->setMWSAuthToken($account->token);
-                        $request->setAvailableFromDate('2018-08-01T00:00:00+00:00 ');
-                        $request->setAvailableToDate('2018-08-02T23:59:59+00:00 ');
+                        $request->setAvailableFromDate('2018-07-01T00:00:00+00:00 ');
+                        $request->setAvailableToDate('2018-09-25T23:59:59+00:00 ');
                         $type->setType('_GET_V2_SETTLEMENT_REPORT_DATA_FLAT_FILE_');
                         $request->setReportTypeList($type);
                         $response = $service->getReportList($request);
