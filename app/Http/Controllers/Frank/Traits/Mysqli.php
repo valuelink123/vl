@@ -7,6 +7,9 @@ namespace App\Http\Controllers\Frank\Traits;
 
 trait Mysqli {
 
+    /**
+     * @var \mysqli PhpStorm 需要对应类型信息，否则无语法提示
+     */
     private $_mysqli;
     protected $_mysqli_charset = 'UTF8';
 

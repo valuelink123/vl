@@ -1,7 +1,13 @@
 <?php
 /**
- * Created by PhpStorm.
+ * KMS routes
+ *
+ * URI Prefix: /kms
+ * Controller Namespace: App\Http\Controllers\Frank
+ *
  */
+
+use Illuminate\Support\Facades\Route;
 
 Route::get('/brandline', 'BrandLineController@index');
 Route::post('/brandline/get', 'BrandLineController@get');
@@ -18,3 +24,15 @@ Route::post('/usermanual/import', 'UserManualController@create');
 
 Route::get('/partslist', 'PartsListController@index');
 Route::post('/partslist/get', 'PartsListController@get');
+
+
+
+
+
+
+
+
+
+
+
+
