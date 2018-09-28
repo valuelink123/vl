@@ -78,6 +78,7 @@
                     render(data, type, row, meta) {
                         // let args = {'item_group': row.item_group, 'item_model': row.item_model}
                         // jQuery.param( ) 坑爹啊 jQuery uses + instead of %20 to URL-encode spaces
+                        // enc_type http://php.net/manual/en/function.http-build-query.php
                         return `<a href="/kms/usermanual?${objectToQueryString(objectFilte(row, ['item_group_descr']))}" target="_blank" class='btn btn-success btn-xs'>View</a>`
                     }
                 },
