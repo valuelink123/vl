@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use App;
@@ -40,6 +41,10 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
+        // 由于 php artisan 命令会触发 schedule 执行；
+        if (!Schema::hasTable('accounts')) return;
+        // 防止第一次执行 php artisan migrate 时，报找不到表的错误；
+
         $accountList = DB::table('accounts')->get(array('id'));
         $i=0;
         foreach($accountList as $account){
@@ -47,7 +52,7 @@ class Kernel extends ConsoleKernel
             $schedule->command('get:email '.$account->id.' 6hour')->cron($i.' * * * *')->name($account->id.'_get_emails')->withoutOverlapping();
             $i++;
         }
-		
+
         $schedule->command('scan:send')->cron('*/5 * * * *')->name('sendmails')->withoutOverlapping();
 		$schedule->command('get:order')->cron('*/30 * * * *')->name('getOrder')->withoutOverlapping();
 		$schedule->command('get:review 7days')->cron('0 */4 * * *')->name('getreviews')->withoutOverlapping();
