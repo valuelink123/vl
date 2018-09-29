@@ -42,7 +42,9 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         // 由于 php artisan 命令会触发 schedule 执行；
-        if (!Schema::hasTable('accounts')) return;
+
+        // if (!Schema::hasTable('accounts')) return;
+
         // 防止第一次执行 php artisan migrate 时，报找不到表的错误；
 
         $accountList = DB::table('accounts')->get(array('id'));
