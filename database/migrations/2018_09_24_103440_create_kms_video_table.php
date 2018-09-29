@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS `kms_video` (
   KEY `item_model` (`item_model`(10)) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 SQL;
-        self::statement($sql);
+        $this->statement($sql);
     }
 
     /**
@@ -38,6 +38,6 @@ SQL;
      * @return void
      */
     public function down() {
-        self::dropTableIfEmpty('kms_video');
+        $this->dropTableIfEmpty('kms_video');
     }
 }

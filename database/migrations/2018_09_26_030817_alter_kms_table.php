@@ -11,15 +11,15 @@ class AlterKmsTable extends Migration {
      * @return void
      */
     public function up() {
-        self::dropColumnIfEmpty('kms_video', 'brand');
-        self::statement('ALTER TABLE `kms_video` ADD COLUMN `brand` varchar(50) NOT NULL AFTER `id`');
-        self::statement('ALTER TABLE `kms_video` ADD INDEX `brand` (`brand`(10)) USING BTREE');
+        $this->dropColumnIfEmpty('kms_video', 'brand');
+        $this->statement('ALTER TABLE `kms_video` ADD COLUMN `brand` varchar(50) NOT NULL AFTER `id`');
+        $this->statement('ALTER TABLE `kms_video` ADD INDEX `brand` (`brand`(10)) USING BTREE');
 
-        self::dropColumnIfEmpty('kms_user_manual', 'brand');
-        self::dropColumnIfEmpty('kms_user_manual', 'note');
-        self::statement('ALTER TABLE `kms_user_manual` ADD COLUMN `brand` varchar(50) NOT NULL AFTER `id`');
-        self::statement('ALTER TABLE `kms_user_manual` ADD INDEX `brand` (`brand`(10)) USING BTREE');
-        self::statement('ALTER TABLE `kms_user_manual` ADD COLUMN `note` varchar(512) NOT NULL DEFAULT "" AFTER `status`');
+        $this->dropColumnIfEmpty('kms_user_manual', 'brand');
+        $this->dropColumnIfEmpty('kms_user_manual', 'note');
+        $this->statement('ALTER TABLE `kms_user_manual` ADD COLUMN `brand` varchar(50) NOT NULL AFTER `id`');
+        $this->statement('ALTER TABLE `kms_user_manual` ADD INDEX `brand` (`brand`(10)) USING BTREE');
+        $this->statement('ALTER TABLE `kms_user_manual` ADD COLUMN `note` varchar(512) NOT NULL DEFAULT "" AFTER `status`');
     }
 
     /**
@@ -28,8 +28,8 @@ class AlterKmsTable extends Migration {
      * @return void
      */
     public function down() {
-        self::dropColumnIfEmpty('kms_video', 'brand');
-        self::dropColumnIfEmpty('kms_user_manual', 'brand');
-        self::dropColumnIfEmpty('kms_user_manual', 'note');
+        $this->dropColumnIfEmpty('kms_video', 'brand');
+        $this->dropColumnIfEmpty('kms_user_manual', 'brand');
+        $this->dropColumnIfEmpty('kms_user_manual', 'note');
     }
 }
