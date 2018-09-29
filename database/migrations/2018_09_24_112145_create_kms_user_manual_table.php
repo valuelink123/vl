@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `kms_user_manual` (
   KEY `item_model` (`item_model`(10)) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 SQL;
-        self::statement($sql);
+        $this->statement($sql);
     }
 
     /**
@@ -34,6 +34,6 @@ SQL;
      * @return void
      */
     public function down() {
-        self::dropTableIfEmpty('kms_user_manual');
+        $this->dropTableIfEmpty('kms_user_manual');
     }
 }
