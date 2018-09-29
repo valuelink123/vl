@@ -45,15 +45,12 @@ class Kernel extends ConsoleKernel
         foreach($accountList as $account){
             if($i>59) $i=0;
             $schedule->command('get:email '.$account->id.' 6hour')->cron($i.' * * * *')->name($account->id.'_get_emails')->withoutOverlapping();
-	//$schedule->command('get:email '.$account->id.' 6hour')->cron((30+$i).' * * * *')->name($account->id.'_get_emails')->withoutOverlapping();
             $i++;
         }
-        //$schedule->command('scan:email')->hourly()->name('scanmails')->withoutOverlapping();
+		
         $schedule->command('scan:send')->cron('*/5 * * * *')->name('sendmails')->withoutOverlapping();
 		$schedule->command('get:order')->cron('*/30 * * * *')->name('getOrder')->withoutOverlapping();
-		
 		$schedule->command('get:review 7days')->cron('0 */4 * * *')->name('getreviews')->withoutOverlapping();
-		
 		$schedule->command('get:star 7days')->twiceDaily(20, 22)->name('getstars')->withoutOverlapping();
 		$schedule->command('get:asin 3 0')->hourly()->name('getasins')->withoutOverlapping();
 		$schedule->command('get:sellers')->cron('*/1 * * * *')->name('sendmails')->withoutOverlapping();

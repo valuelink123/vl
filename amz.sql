@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50722
 File Encoding         : 65001
 
-Date: 2018-09-17 14:26:00
+Date: 2018-09-29 12:16:51
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -144,7 +144,7 @@ CREATE TABLE `asin` (
 `seller`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
 `review_user_id`  int(10) NULL DEFAULT 0 ,
 `group_id`  int(10) NULL DEFAULT 0 ,
-`brand_line`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
+`brand_line`  varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
 `id`  int(10) UNSIGNED NOT NULL ,
 `status`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '1' ,
 `sellersku`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
@@ -153,7 +153,7 @@ CREATE TABLE `asin` (
 `bg`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
 `bu`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
 `store`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
-`item_group`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
+`item_group`  varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
 PRIMARY KEY (`id`)
 )
 ENGINE=MyISAM
@@ -482,6 +482,51 @@ DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
 ;
 
 -- ----------------------------
+-- Table structure for `kms_user_manual`
+-- ----------------------------
+DROP TABLE IF EXISTS `kms_user_manual`;
+CREATE TABLE `kms_user_manual` (
+`id`  int(10) UNSIGNED NOT NULL ,
+`brand`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL ,
+`item_group`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL ,
+`item_model`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL ,
+`link`  varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL ,
+`status`  tinyint(4) NOT NULL DEFAULT 1 ,
+`note`  varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' ,
+`created_at`  datetime NOT NULL ,
+`updated_at`  datetime NOT NULL ,
+PRIMARY KEY (`id`)
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
+
+;
+
+-- ----------------------------
+-- Table structure for `kms_video`
+-- ----------------------------
+DROP TABLE IF EXISTS `kms_video`;
+CREATE TABLE `kms_video` (
+`id`  int(10) UNSIGNED NOT NULL ,
+`brand`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL ,
+`item_group`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL ,
+`item_model`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL ,
+`type`  enum('Others','Marketing Video','Buyers Video','Operation Instruction') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'Others' ,
+`descr`  varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL ,
+`link`  varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL ,
+`note`  varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' ,
+`status`  tinyint(4) NOT NULL DEFAULT 1 ,
+`created_by`  varchar(25) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' ,
+`created_at`  datetime NOT NULL ,
+`updated_at`  datetime NOT NULL ,
+PRIMARY KEY (`id`)
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
+
+;
+
+-- ----------------------------
 -- Table structure for `password_resets`
 -- ----------------------------
 DROP TABLE IF EXISTS `password_resets`;
@@ -580,47 +625,8 @@ CREATE TABLE `review` (
 `vp`  tinyint(1) UNSIGNED ZEROFILL NULL DEFAULT 0 ,
 `title`  varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
 `is_delete`  tinyint(1) UNSIGNED ZEROFILL NULL DEFAULT NULL ,
-PRIMARY KEY (`id`)
-)
-ENGINE=MyISAM
-DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci
-
-;
-
--- ----------------------------
--- Table structure for `review_bak`
--- ----------------------------
-DROP TABLE IF EXISTS `review_bak`;
-CREATE TABLE `review_bak` (
-`id`  int(10) NOT NULL ,
-`seller_id`  varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
-`site`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
-`review`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
-`date`  varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
-`amazon_account`  varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
-`sellersku`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
-`asin`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
-`rating`  tinyint(1) NULL DEFAULT NULL ,
-`reviewer_name`  varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
-`review_content`  text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL ,
-`buyer_email`  varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
-`edate`  varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
-`created_at`  timestamp NULL DEFAULT NULL ,
-`content`  text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL ,
-`status`  int(5) NULL DEFAULT 1 ,
-`etype`  varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
-`epoint`  varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
-`edescription`  text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL ,
-`updated_at`  timestamp NULL DEFAULT NULL ,
-`asin_url`  varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
-`amazon_order_id`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
-`warn`  tinyint(1) UNSIGNED ZEROFILL NULL DEFAULT 0 ,
-`creson`  varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
-`negative_value`  int(10) UNSIGNED ZEROFILL NOT NULL DEFAULT 0000000000 ,
-`user_id`  int(10) UNSIGNED ZEROFILL NOT NULL DEFAULT 0000000000 ,
-`buyer_phone`  varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
-`follow_content`  text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL ,
-`follow_status`  int(5) UNSIGNED ZEROFILL NULL DEFAULT 00000 ,
+`nextdate`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
+`customer_feedback`  tinyint(1) UNSIGNED ZEROFILL NULL DEFAULT 0 ,
 PRIMARY KEY (`id`)
 )
 ENGINE=MyISAM
@@ -710,6 +716,8 @@ CREATE TABLE `seller_asins` (
 `positive_value`  int(10) UNSIGNED ZEROFILL NOT NULL ,
 `negative_value`  int(10) UNSIGNED ZEROFILL NOT NULL ,
 `site`  varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL ,
+`profits_value`  decimal(10,2) NOT NULL DEFAULT 0.00 ,
+`income_value`  decimal(10,2) NOT NULL DEFAULT 0.00 ,
 PRIMARY KEY (`asin`, `marketplaceid`)
 )
 ENGINE=InnoDB
@@ -865,6 +873,7 @@ CREATE INDEX `orderid_sellerid` ON `amazon_orders_item`(`SellerId`, `AmazonOrder
 -- Indexes structure for table asin
 -- ----------------------------
 CREATE UNIQUE INDEX `asin,site,sellersku` ON `asin`(`asin`, `site`, `sellersku`) USING BTREE ;
+CREATE INDEX `model` ON `asin`(`brand`, `brand_line`, `item_model`, `item_group`) USING BTREE ;
 
 -- ----------------------------
 -- Indexes structure for table asin_ads
@@ -898,6 +907,20 @@ CREATE INDEX `mark` ON `inbox`(`mark`) USING BTREE ;
 CREATE FULLTEXT INDEX `text_html` ON `inbox`(`text_html`) ;
 
 -- ----------------------------
+-- Indexes structure for table kms_user_manual
+-- ----------------------------
+CREATE INDEX `item_group` ON `kms_user_manual`(`item_group`(10)) USING BTREE ;
+CREATE INDEX `item_model` ON `kms_user_manual`(`item_model`(10)) USING BTREE ;
+CREATE INDEX `brand` ON `kms_user_manual`(`brand`(10)) USING BTREE ;
+
+-- ----------------------------
+-- Indexes structure for table kms_video
+-- ----------------------------
+CREATE INDEX `item_group` ON `kms_video`(`item_group`(10)) USING BTREE ;
+CREATE INDEX `item_model` ON `kms_video`(`item_model`(10)) USING BTREE ;
+CREATE INDEX `brand` ON `kms_video`(`brand`(10)) USING BTREE ;
+
+-- ----------------------------
 -- Indexes structure for table password_resets
 -- ----------------------------
 CREATE INDEX `password_resets_email_index` ON `password_resets`(`email`) USING BTREE ;
@@ -906,11 +929,6 @@ CREATE INDEX `password_resets_email_index` ON `password_resets`(`email`) USING B
 -- Indexes structure for table review
 -- ----------------------------
 CREATE UNIQUE INDEX `site,review` ON `review`(`site`, `review`) USING BTREE ;
-
--- ----------------------------
--- Indexes structure for table review_bak
--- ----------------------------
-CREATE UNIQUE INDEX `site,review` ON `review_bak`(`site`, `review`) USING BTREE ;
 
 -- ----------------------------
 -- Indexes structure for table users

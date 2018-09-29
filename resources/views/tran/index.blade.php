@@ -284,7 +284,7 @@ th,td,td>span {
 						"pageLength": 50,
 						"createdRow": function( row, data, dataIndex ) {
 							$(row).children('td').eq(0).attr('style', 'width: 90px;');
-							$(row).children('td').eq(1).attr('style', 'max-width: 60px;overflow:hidden;white-space:nowrap;text-align: left; ');
+							$(row).children('td').eq(1).attr('style', 'max-width: 50px;overflow:hidden;white-space:nowrap;text-align: left; ');
 							$(row).children('td').eq(1).attr('title', $(row).children('td').eq(1).text());
 							
 						},
