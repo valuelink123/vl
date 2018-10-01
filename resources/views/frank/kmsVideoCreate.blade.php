@@ -30,7 +30,7 @@
                             <input required autocomplete="off" class="form-control" placeholder="Item Group" name="item_group" list="list-item-group" id="item_group"/>
                             <datalist id="list-item-group">
                                 @foreach($itemGroups as $itemGroup)
-                                    <option value="{!! $itemGroup !!}"/>
+                                    <option value="{!! $itemGroup !!}">
                                 @endforeach
                             </datalist>
                         </label>
@@ -42,7 +42,7 @@
                             <input required autocomplete="off" class="form-control" placeholder="Brand" name="brand" list="list-brand" id="brand"/>
                             <datalist id="list-brand">
                                 @foreach($brands as $brand)
-                                    <option value="{!! $brand !!}"/>
+                                    <option value="{!! $brand !!}">
                                 @endforeach
                             </datalist>
                         </label>
@@ -55,7 +55,7 @@
                             @foreach($itemGroupModels as $itemGroupModel)
                                 <datalist id="list-{!! $itemGroupModel['item_group'] !!}">
                                     @foreach(explode(',', $itemGroupModel['item_models']) as $item_model)
-                                        <option value="{!! $item_model !!}"/>
+                                        <option value="{!! $item_model !!}">
                                     @endforeach
                                 </datalist>
                             @endforeach
