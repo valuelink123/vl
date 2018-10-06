@@ -8,11 +8,12 @@
 namespace App\Http\Controllers\Frank;
 
 use Illuminate\Http\Request;
+use App\Models\KmsUserManual;
 
 class UserManualController extends Controller {
 
-    use Traits\Mysqli;
-    use Traits\DataTables;
+    use \App\Traits\Mysqli;
+    use \App\Traits\DataTables;
 
     public function index() {
         return view('frank/kmsUserManual');
@@ -27,7 +28,7 @@ class UserManualController extends Controller {
 
     public function create(Request $req) {
 
-        Models\KmsUserManual::import($req);
+        KmsUserManual::import($req);
         // qa 加 type dot 连个字段，可选择、可编辑
         // 下载过渡页
         // Parts List 物料主从关系

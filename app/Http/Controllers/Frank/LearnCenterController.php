@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 
 // use Illuminate\Support\Facades\DB;
 
-class BrandLineController extends Controller {
+class LearnCenterController extends Controller {
 
     use \App\Traits\Mysqli;
     use \App\Traits\DataTables;

@@ -1,9 +1,9 @@
 <?php
 /**
- * SQL 查询
+ * 对于复杂的统计查询，建议写 SQL 语句，用 Eloquent 反而易出问题
  */
 
-namespace App\Http\Controllers\Frank\Traits;
+namespace App\Traits;
 
 trait Mysqli {
 

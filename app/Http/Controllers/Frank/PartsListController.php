@@ -12,8 +12,8 @@ use Illuminate\Http\Request;
 
 class PartsListController extends Controller {
 
-    use Traits\Mysqli;
-    use Traits\DataTables;
+    use \App\Traits\Mysqli;
+    use \App\Traits\DataTables;
 
     public function index() {
         return view('frank/kmsPartsList');

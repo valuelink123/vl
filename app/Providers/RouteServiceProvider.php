@@ -63,7 +63,7 @@ class RouteServiceProvider extends ServiceProvider
         Route::prefix('kms')
             ->middleware('kms')
             ->namespace($this->namespace . '\Frank')
-            ->group(base_path('routes/frank.php'));
+            ->group(base_path('routes/kms.php'));
     }
 
     /**

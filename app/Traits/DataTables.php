@@ -3,7 +3,7 @@
  * DataTables 辅助
  */
 
-namespace App\Http\Controllers\Frank\Traits;
+namespace App\Traits;
 
 use Illuminate\Http\Request;
 
@@ -32,6 +32,13 @@ trait DataTables {
     //     return implode(' AND ', $where);
     // }
 
+    /**
+     * WHERE
+     * @param Request $req
+     * @param $orLikeFields
+     * @param $andsMap
+     * @return string
+     */
     protected function dtWhere(Request $req, $orLikeFields, $andsMap) {
 
         if (!empty($req->input('search.ands'))) {
@@ -57,6 +64,11 @@ trait DataTables {
         return $where;
     }
 
+    /**
+     * LIMIT
+     * @param Request $req
+     * @return string
+     */
     protected function dtLimit(Request $req) {
 
         $start = (int)$req->input('start');
@@ -65,6 +77,12 @@ trait DataTables {
         return "{$start},{$length}";
     }
 
+    /**
+     * ORDER BY
+     * @param Request $req
+     * @return string
+     * @throws \Exception
+     */
     protected function dtOrderBy(Request $req) {
 
         $order = $req->input('order');

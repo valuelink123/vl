@@ -5,7 +5,7 @@
  * Time: 16:31
  */
 
-namespace App\Http\Controllers\Frank\Models;
+namespace App\Models;
 
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Model;
@@ -52,11 +52,16 @@ class KmsUserManual extends Model {
         return $rows;
     }
 
+    /**
+     * 从 Excel 导入到 MySQL
+     * @param Request $req
+     * @throws \Exception
+     */
     public static function import(Request $req) {
 
         if ($req->has('link')) {
 
-            $rows[] = $req->all();
+            $rows[] = $req->all(); // 单个添加的情况，也一并处理
 
         } elseif (empty($_FILES['excelfile']['size'])) {
 

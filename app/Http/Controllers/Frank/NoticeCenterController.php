@@ -9,16 +9,14 @@ namespace App\Http\Controllers\Frank;
 
 use Illuminate\Http\Request;
 
-// use Illuminate\Support\Facades\DB;
 
-class BrandLineController extends Controller {
+class NoticeCenterController extends Controller {
 
     use \App\Traits\Mysqli;
     use \App\Traits\DataTables;
 
     public function index() {
-        // print_r(array_keys($GLOBALS));
-        return view('frank/kmsBrandLine');
+        return view('frank/kmsNotice');
     }
 
     public function get(Request $req) {
