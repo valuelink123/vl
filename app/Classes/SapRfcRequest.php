@@ -8,7 +8,7 @@
 namespace App\Classes;
 
 /**
- * Useage:
+ * Usage:
  *
  * $sap = new SapRfcRequest($appid, $appsecret, $host);
  *

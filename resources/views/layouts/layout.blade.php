@@ -165,6 +165,16 @@
                                 </a>
                             </li>
                             <li>
+                                <a href="/kms/learn">
+                                    <i class="fa fa-book"></i> Learning Center
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/kms/notice">
+                                    <i class="fa fa-inbox"></i> Notice Center
+                                </a>
+                            </li>
+                            <li>
                                 <a href="/template">
                                     <i class="fa fa-inbox"></i> Templates
                                 </a>

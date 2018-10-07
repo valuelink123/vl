@@ -13,8 +13,8 @@ use Illuminate\Http\Request;
 
 class BrandLineController extends Controller {
 
-    use Traits\Mysqli;
-    use Traits\DataTables;
+    use \App\Traits\Mysqli;
+    use \App\Traits\DataTables;
 
     public function index() {
         // print_r(array_keys($GLOBALS));

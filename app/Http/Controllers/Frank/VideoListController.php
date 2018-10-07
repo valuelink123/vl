@@ -8,11 +8,12 @@
 namespace App\Http\Controllers\Frank;
 
 use Illuminate\Http\Request;
+use App\Models\KmsVideo;
 
 class VideoListController extends Controller {
 
-    use Traits\Mysqli;
-    use Traits\DataTables;
+    use \App\Traits\Mysqli;
+    use \App\Traits\DataTables;
 
     public function index() {
         return view('frank/kmsVideoList');
@@ -30,7 +31,7 @@ class VideoListController extends Controller {
     public function create(Request $req) {
 
         $videoTypes = $this->enumOptions('kms_video', 'type');
-        Models\KmsVideo::import($req, $videoTypes);
+        KmsVideo::import($req, $videoTypes);
 
         // todo 提示成功
         return redirect('/kms/videolist/import');
