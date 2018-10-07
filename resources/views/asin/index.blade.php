@@ -83,7 +83,7 @@ th,td,td>span {
 								<th width="5%"> Model </th>
 								<th width="5%"> Status </th>
                                 <th width="5%"> Item Group </th>
-                                <th width="5%"> Brand Line </th>
+                                <th width="5%"> Item Group Description </th>
 								<th width="5%"> Seller </th>
 								<th width="2%"> BG </th>
 								<th width="2%"> BU </th>

@@ -71,8 +71,8 @@ trait DataTables {
      */
     protected function dtLimit(Request $req) {
 
-        $start = (int)$req->input('start');
-        $length = (int)$req->input('length');
+        $start = (int)$req->input('start', 0);
+        $length = (int)$req->input('length', 10);
 
         return "{$start},{$length}";
     }

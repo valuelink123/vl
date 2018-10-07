@@ -9,41 +9,38 @@ namespace App\Http\Controllers\Frank;
 
 use Illuminate\Http\Request;
 
-// use Illuminate\Support\Facades\DB;
 
 class LearnCenterController extends Controller {
 
     use \App\Traits\Mysqli;
     use \App\Traits\DataTables;
 
-    public function index() {
-        // print_r(array_keys($GLOBALS));
-        return view('frank/kmsBrandLine');
-    }
+    public function index(Request $req) {
 
-    public function get(Request $req) {
+        $where = $this->dtWhere($req, ['item_group', 'item_model', 'title', 'content'], []);
 
-        $where = $this->dtWhere($req, ['item_group', 'item_model', 'item_no', 'asin', 'sellersku', 'brand', 'brand_line'], []);
-
-        $orderby = $this->dtOrderBy($req);
+        // $orderby = $this->dtOrderBy($req);
+        $orderby = 'updated_at DESC';
         $limit = $this->dtLimit($req);
 
         $sql = <<<SQL
 SELECT SQL_CALC_FOUND_ROWS
-item_group,item_model,brand,
-MAX(brand_line) AS item_group_descr
-FROM asin
+title,
+SUBSTRING(content, 1, 350) AS content
+FROM kms_notice
 WHERE $where
-GROUP BY item_group,brand,item_model
 ORDER BY $orderby
 LIMIT $limit
 SQL;
-        // $rows = DB::connection('frank')->table('asin')->select('item_group', 'item_model', 'brand')->groupBy('item_group', 'item_model')->get()->toArray();
-        $rows = $this->queryRows($sql);
+        $vars['rows'] = $this->queryRows($sql);
 
-        $total = $this->queryOne('SELECT FOUND_ROWS()');
+        $vars['total'] = $this->queryOne('SELECT FOUND_ROWS()');
 
-        return ['data' => $rows, 'recordsTotal' => $total, 'recordsFiltered' => $total];
+        return view('frank/kmsNotice', $vars);
+    }
+
+    public function get(Request $req) {
+
     }
 
 }
