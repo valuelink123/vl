@@ -137,7 +137,7 @@ class GetAsininfo extends Command
 		
 		
 		DB::table('fba_stock')->truncate();
-		$fs = DB::connection('order')->select('select stock,(Total-InStock) as transfer ,asin,sellerid,sellersku,updated_at from amazon_inventory_supply where Total>0');
+		$fs = DB::connection('order')->select('select InStock as stock,(Total-InStock) as transfer ,asin,sellerid,sellersku,updated_at from amazon_inventory_supply where Total>0');
 		foreach($fs as $fsd){
 			$exists_item_code = DB::table('asin')->where('asin',$fsd->asin)->where('sellersku',$fsd->sellersku)->first();
 			DB::table('fba_stock')->insert(
