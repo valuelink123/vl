@@ -35,17 +35,18 @@ trait DataTables {
     /**
      * WHERE
      * @param Request $req
-     * @param $orLikeFields
+     * @param array $fuzzyFields 模糊匹配字段
      * @param $andsMap
      * @return string
      */
-    protected function dtWhere(Request $req, $orLikeFields, $andsMap) {
+    protected function dtWhere(Request $req, $fuzzyFields, $andsMap) {
 
         if (!empty($req->input('search.ands'))) {
             $ands = $req->input('search.ands');
             $where = [];
             foreach ($ands as $field => $value) {
                 if (empty($andsMap[$field])) continue;
+                if (empty($value)) continue;
                 $value = addslashes($value);
                 $where[] = "{$andsMap[$field]}='{$value}'";
             }
@@ -53,15 +54,17 @@ trait DataTables {
         } else if (!empty($req->input('search.value'))) {
             $word = addslashes($req->input('search.value'));
             $where = [];
-            foreach ($orLikeFields as $field) {
-                $where[] = "{$field} LIKE '%{$word}%'";
+            foreach ($fuzzyFields as $field) {
+                if (0 === strpos($field, 'f:')) {
+                    $where[] = "MATCH({$field}) AGAINST '{$word}'";
+                } else {
+                    $where[] = "{$field} LIKE '%{$word}%'";
+                }
             }
             $where = implode(' OR ', $where);
-        } else {
-            $where = 1;
         }
 
-        return $where;
+        return empty($where) ? 1 : $where;
     }
 
     /**
