@@ -43,9 +43,9 @@ th,td,td>span {
 								<th style="max-width:30px;">FbmDistD</th>
 								<th style="max-width:30px;">FbaStock</th>
 								<th style="max-width:30px;">FbmStock</th>
-								<th style="max-width:30px;">FbmAdd</th>
-								<th style="max-width:30px;">ShipAdd</th>
-                                <th style="max-width:30px;">FbaSales</th>
+								<th style="max-width:30px;">TranType</th>
+								<th style="max-width:30px;">TranQty</th>
+                                <th style="max-width:30px;">FbaExpected</th>
                                 <th style="max-width:30px;">FbmLoc</th>
 								<th style="max-width:30px;">FbmLocScore</th>
 								<th style="max-width:30px;">FbaDay</th>
@@ -135,12 +135,17 @@ th,td,td>span {
 							}
 							$fba_sales = round(array_get($data,'sales'),2)*$avg_star_score*$profits_score*$total_star_score*28;
 							
-							if( array_get($data,'fbm_stock')>($fba_sales - array_get($data,'fba_stock')) ){
-								$fbm_add = $fba_sales - array_get($data,'fba_stock');
-								$ship_add = 'Warning';
+							if( array_get($data,'fba_stock')>=$fba_sales){
+								$fbm_add = '无需配货';
+								$ship_add = 0;
 							}else{
-								$fbm_add = array_get($data,'fbm_stock');
-								$ship_add =  $fba_sales - array_get($data,'fba_stock') - array_get($data,'fbm_stock');
+								if(array_get($data,'fbm_stock')>=$fba_sales-array_get($data,'fba_stock')){
+									$fbm_add = 'FBM库存调拨';
+									$ship_add = $fba_sales-array_get($data,'fba_stock');
+								}else{
+									$fbm_add = '头程配货';
+									$ship_add = $fba_sales-array_get($data,'fba_stock')-array_get($data,'fbm_stock');
+								}
 							}
 							
 							
@@ -216,13 +221,13 @@ th,td,td>span {
 								{{round(array_get($data,'fbm_stock'),2)}}
 								</td>
 								<td>
-								{{round($fbm_add,2)}}
+								{{$fbm_add}}
 								</td>
 								<td>
-								{{$ship_add}}
+								{{ceil($ship_add)}}
 								</td>
 								<td>
-								{{round($fba_sales,2)}}
+								{{ceil($fba_sales)}}
 								</td>
 								
 								<td>A</td><td>1</td>
