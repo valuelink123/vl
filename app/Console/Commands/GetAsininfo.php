@@ -109,8 +109,8 @@ class GetAsininfo extends Command
 			$sales_t[$sale->asin][array_get($marketplaceid_area,$sale->marketplaceid)]['total_sales']+=round(intval($sale->sale)/14,2);
 		}
 
-		$sellerid_area=[];
-		$sellerids = DB::connection('order')->select("select sellerid,(case MarketPlaceId
+		$sellerid_area=$sellerid_name=[];
+		$sellerids = DB::connection('order')->select("select sellerid,sellername,(case MarketPlaceId
 		when 'ATVPDKIKX0DER' then 'US'
 		when 'A2EUQ1WTGCTBG2' then 'US'
 		when 'A1AM78C64UM0Y8' then 'US'
@@ -120,9 +120,10 @@ class GetAsininfo extends Command
 		when 'A1RKKUPIHCS9HS' then 'EU'
 		when 'A13V1IB3VIYZZH' then 'EU'
 		when 'A1VC38T7YXB528' then 'JP'
-		else 'US' End) as area from accounts GROUP BY sellerid,area");
+		else 'US' End) as area from accounts GROUP BY sellerid,sellername,area");
 		foreach($sellerids as $sellerid){
 			$sellerid_area[$sellerid->sellerid] = $sellerid->area;
+			$sellerid_name[$sellerid->sellerid] = $sellerid->sellername;
 		}
 		
 		$stocks = DB::connection('order')->select('select sum(InStock) as stock,sum(Total-InStock) as transfer ,asin,sellerid from amazon_inventory_supply where InStock>0 or Total>0 group by asin,sellerid');
@@ -133,6 +134,25 @@ class GetAsininfo extends Command
 			$stock_t[$stock->asin][array_get($sellerid_area,$stock->sellerid)]['transfer']+= intval($stock->transfer);
 		}
 		
+		
+		
+		DB::table('fba_stock')->truncate();
+		$fs = DB::connection('order')->select('select InStock as stock,(Total-InStock) as transfer ,asin,sellerid,sellersku,updated_at from amazon_inventory_supply where Total>0');
+		foreach($fs as $fsd){
+			$exists_item_code = DB::table('asin')->where('asin',$fsd->asin)->where('sellersku',$fsd->sellersku)->first();
+			DB::table('fba_stock')->insert(
+				array(
+					'seller_id'=>$fsd->sellerid,
+					'seller_name'=>array_get($sellerid_name,$fsd->sellerid),
+					'item_code'=>isset($exists_item_code->item_no)?$exists_item_code->item_no:NULL,
+					'asin'=>$fsd->asin,
+					'seller_sku'=>$fsd->sellersku,
+					'fba_stock'=>$fsd->stock,
+					'fba_transfer'=>$fsd->transfer,
+					'updated_at'=>$fsd->updated_at,
+				)
+			);
+		}
 		
 		
 		$stars = DB::select("select asin ,domain, average_score as avg_star,total_star_number as total_star  from star where create_at>='".date('Y-m-d',strtotime('-1 day'))."' or updated_at>='".date('Y-m-d',strtotime('-1 day'))."'");
