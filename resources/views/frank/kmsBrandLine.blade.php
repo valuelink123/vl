@@ -73,9 +73,9 @@
         {
             let ands = queryStringToObject().ands || {}
 
-            item_group.value = ands.item_group
-            brand.value = ands.brand
-            item_model.value = ands.item_model
+            item_group.value = ands.item_group || ''
+            brand.value = ands.brand || ''
+            item_model.value = ands.item_model || ''
 
             new LinkageInput([item_group, brand, item_model], @json($itemGroupBrandModels))
 
