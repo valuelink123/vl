@@ -16,8 +16,12 @@ class NoticeCenterController extends Controller {
     use \App\Traits\DataTables;
 
     public function index(Request $req) {
+        return view('frank/kmsNotice');
+    }
 
-        $where = $this->dtWhere($req, ['item_group', 'item_model', 'title', 'content'], []);
+    public function get(Request $req) {
+
+        $where = $this->dtWhere($req, ['item_group', 'item_model', 'title', 'f:content'], ['item_group' => 'item_group', 'item_model' => 'item_model']);
 
         // $orderby = $this->dtOrderBy($req);
         $orderby = 'updated_at DESC';
@@ -32,15 +36,12 @@ WHERE $where
 ORDER BY $orderby
 LIMIT $limit
 SQL;
+
         $vars['rows'] = $this->queryRows($sql);
 
         $vars['total'] = $this->queryOne('SELECT FOUND_ROWS()');
 
-        return view('frank/kmsNotice', $vars);
-    }
-
-    public function get(Request $req) {
-
+        return $vars;
     }
 
 }

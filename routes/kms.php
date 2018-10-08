@@ -26,6 +26,7 @@ Route::get('/partslist', 'PartsListController@index');
 Route::post('/partslist/get', 'PartsListController@get');
 
 Route::get('/notice', 'NoticeCenterController@index');
+Route::post('/notice/get', 'NoticeCenterController@get');
 
 Route::get('/learn', 'LearnCenterController@index');
 
