@@ -16,15 +16,23 @@ class NoticeCenterController extends Controller {
     use \App\Traits\DataTables;
 
     public function index(Request $req) {
-        return view('frank/kmsNotice');
+
+        $itemGroupModels = [];
+
+        $rows = $this->queryRows('SELECT item_group, GROUP_CONCAT(DISTINCT item_model) AS item_models FROM kms_notice GROUP BY item_group');
+
+        foreach ($rows as $row) {
+            $itemGroupModels[$row['item_group']] = explode(',', $row['item_models']);
+        }
+
+        return view('frank/kmsNotice', compact('itemGroupModels'));
     }
 
     public function get(Request $req) {
 
         $where = $this->dtWhere($req, ['item_group', 'item_model', 'title', 'f:content'], ['item_group' => 'item_group', 'item_model' => 'item_model']);
 
-        // $orderby = $this->dtOrderBy($req);
-        $orderby = 'updated_at DESC';
+        $orderby = $this->dtOrderBy($req);
         $limit = $this->dtLimit($req);
 
         $sql = <<<SQL
@@ -36,6 +44,8 @@ WHERE $where
 ORDER BY $orderby
 LIMIT $limit
 SQL;
+
+        // throw new \Exception($sql);
 
         $vars['rows'] = $this->queryRows($sql);
 

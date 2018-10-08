@@ -10,26 +10,71 @@
         headers: {'X-CSRF-TOKEN': '{!! csrf_token() !!}'}
     })
 </script>
+<script src="/js/frank/linkageInput.js?v=2"></script>
 <script>
     function queryStringToObject(queryString = location.search.substr(1)) {
+
         let obj = {}
         let strs = queryString.split('&')
 
         for (let str of strs) {
-            let par = str.split('=')
-            if (!par[0]) continue
-            obj[par[0]] = par[1] ? decodeURIComponent(par[1]) : ''
+
+            let pair = str.split('=')
+
+            if (!pair[0]) continue
+
+            let objRef = obj
+
+            let paths = decodeURIComponent(pair[0]).split(/[\[\]]+/)
+
+            let key = paths[0]
+
+            if (paths.length > 1) {
+
+                paths.pop()
+
+                key = paths.pop()
+
+                for (let path of paths) {
+                    if (!objRef[path]) {
+                        objRef[path] = {}
+                    }
+                    objRef = objRef[path]
+                }
+
+            }
+
+            objRef[key] = pair[1] ? decodeURIComponent(pair[1]) : ''
+
         }
 
         return obj
     }
 
     function objectToQueryString(obj) {
+
         let strs = []
-        for (let key in obj) {
-            let val = encodeURIComponent(obj[key])
-            strs.push(`${key}=${val}`)
+
+        function cook(obj, prefix = '') {
+
+            for (let key in obj) {
+
+                let val = obj[key]
+                key = prefix ? `${prefix}[${key}]` : key
+
+                if (val instanceof Object) {
+                    cook(val, key)
+                } else {
+                    key = encodeURIComponent(key)
+                    val = encodeURIComponent(val)
+                    strs.push(`${key}=${val}`)
+                }
+            }
+
         }
+
+        cook(obj)
+
         return strs.join('&')
     }
 

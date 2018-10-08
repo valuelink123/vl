@@ -4,6 +4,11 @@ namespace App\Http;
 
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
+// 不可以在 bootstrap/app.php 中 require functions.php 文件，否则会导致 PHPUnit 出错！
+// 最好的方式是加在 composer.json ( autoload.files ) 中
+// 由于我不便执行 composer，临时从 bootstrap/app.php 移到这里
+require __DIR__.'/../Helper/functions.php';
+
 class Kernel extends HttpKernel
 {
     /**

@@ -41,6 +41,8 @@ trait DataTables {
      */
     protected function dtWhere(Request $req, $fuzzyFields, $andsMap) {
 
+        $where = [];
+
         if (!empty($req->input('search.ands'))) {
             $ands = $req->input('search.ands');
             $where = [];
@@ -50,21 +52,23 @@ trait DataTables {
                 $value = addslashes($value);
                 $where[] = "{$andsMap[$field]}='{$value}'";
             }
-            $where = implode(' AND ', $where);
-        } else if (!empty($req->input('search.value'))) {
-            $word = addslashes($req->input('search.value'));
-            $where = [];
-            foreach ($fuzzyFields as $field) {
-                if (0 === strpos($field, 'f:')) {
-                    $where[] = "MATCH({$field}) AGAINST '{$word}'";
-                } else {
-                    $where[] = "{$field} LIKE '%{$word}%'";
-                }
-            }
-            $where = implode(' OR ', $where);
         }
 
-        return empty($where) ? 1 : $where;
+        if (!empty($req->input('search.value'))) {
+            $word = addslashes($req->input('search.value'));
+            $ors = [];
+            foreach ($fuzzyFields as $field) {
+                if (0 === strpos($field, 'f:')) {
+                    $field = substr($field, 2);
+                    $ors[] = "MATCH({$field}) AGAINST('{$word}')";
+                } else {
+                    $ors[] = "{$field} LIKE '%{$word}%'";
+                }
+            }
+            $where[] = '(' . implode(' OR ', $ors) . ')';
+        }
+
+        return empty($where) ? 1 : implode(' AND ', $where);
     }
 
     /**
@@ -94,8 +98,8 @@ trait DataTables {
         $orderby = [];
 
         foreach ($order as $obj) {
-            $index = $obj['column'];
-            $field = $columns[$index]['name'];
+
+            $field = empty($obj['field']) ? $columns[$obj['column']]['name'] : $obj['field'];
 
             if (!preg_match('#^\w+$#', $field) || !preg_match('#^asc|desc$#i', $obj['dir'])) {
                 throw new \Exception("INPUT ERROR: ORDER BY {$field} {$obj['dir']}", 101);

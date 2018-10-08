@@ -14,7 +14,7 @@
 $app = new Illuminate\Foundation\Application(
     realpath(__DIR__.'/../')
 );
-require __DIR__.'/../app/Helper/functions.php';
+
 /*
 |--------------------------------------------------------------------------
 | Bind Important Interfaces

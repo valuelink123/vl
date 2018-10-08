@@ -30,7 +30,7 @@
                     <div class="input-group">
                         <input type="text" class="form-control" placeholder="Fuzzy search..." id="fuzzysearch" autocomplete="off"/>
                         <span class="input-group-btn">
-                            <button class="btn btn-default" type="button">Search!</button>
+                            <button class="btn btn-default" type="button" id="dosearch">Search!</button>
                         </span>
                     </div>
                 </div>
@@ -81,9 +81,11 @@
 
     <script>
 
+        new LinkageInput([item_group, item_model], @json($itemGroupModels))
+
         async function loadData(page = 1) {
 
-            if (page < 1) page = 1
+            if (isNaN(page) || page < 1) page = 1
 
             let length = 10
             let start = (page - 1) * length
@@ -100,7 +102,7 @@
 
             let {rows, total} = await new Promise((resolve, reject) => {
                 $.ajax({
-                    data: {start, length, search},
+                    data: {start, length, search, order: [{field: 'updated_at', dir: 'desc'}]},
                     method: 'POST',
                     url: '/kms/notice/get',
                     success(data) {
@@ -156,9 +158,9 @@
 
             let query = queryStringToObject()
 
-            item_group.value = query.item_group
-            item_model.value = query.item_model
-            fuzzysearch.value = query.search
+            item_group.value = query.item_group || ''
+            item_model.value = query.item_model || ''
+            fuzzysearch.value = query.search || ''
 
 
             $(thepagination).on('click', '.prev', function (e) {
@@ -175,14 +177,15 @@
                 loadData(e.target.value)
             })
 
-            $('#item_group,#item_model,#fuzzysearch').change(function () {
-                loadData(1)
-            })
+            $([item_group, item_model]).change(loadData)
+            LinkageInput.bindDelayEvents(fuzzysearch, 'change keyup paste', loadData)
 
-            loadData(query.page || 1)
+            $(dosearch).click(loadData)
+
+            loadData(query.page)
         }
 
-        init()
+        $(init)
 
     </script>
 

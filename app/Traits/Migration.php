@@ -15,6 +15,7 @@ trait Migration {
     public function statement($sql) {
         // https://laravel.com/docs/5.5/database#running-queries
         DB::statement($sql);
+        // DB::unprepared($sql);
     }
 
     public function isTableExists($table) {

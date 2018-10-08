@@ -18,12 +18,21 @@ class BrandLineController extends Controller {
 
     public function index() {
         // print_r(array_keys($GLOBALS));
-        return view('frank/kmsBrandLine');
+
+        $itemGroupBrandModels = [];
+
+        $rows = $this->queryRows('SELECT item_group,brand,GROUP_CONCAT(DISTINCT item_model) AS item_models FROM asin GROUP BY item_group,brand');
+
+        foreach ($rows as $row) {
+            $itemGroupBrandModels[$row['item_group']][$row['brand']] = explode(',', $row['item_models']);
+        }
+
+        return view('frank/kmsBrandLine', compact('itemGroupBrandModels'));
     }
 
     public function get(Request $req) {
 
-        $where = $this->dtWhere($req, ['item_group', 'item_model', 'item_no', 'asin', 'sellersku', 'brand', 'brand_line'], []);
+        $where = $this->dtWhere($req, ['item_group', 'item_model', 'item_no', 'asin', 'sellersku', 'brand', 'brand_line'], ['item_group' => 'item_group', 'brand' => 'brand', 'item_model' => 'item_model']);
 
         $orderby = $this->dtOrderBy($req);
         $limit = $this->dtLimit($req);

@@ -71,7 +71,7 @@
     <script src="/assets/global/plugins/bootstrap-toastr/toastr.min.js" type="text/javascript"></script>
 	<script src="/assets/global/plugins/bootbox/bootbox.min.js" type="text/javascript"></script>
 	<script src="/assets/pages/scripts/ui-modals.min.js" type="text/javascript"></script>
-	
+
     <!-- END PAGE LEVEL SCRIPTS -->
     <script src="/assets/global/plugins/jquery-validation/js/jquery.validate.min.js" type="text/javascript"></script>
     <script src="/assets/global/plugins/jquery-validation/js/additional-methods.min.js" type="text/javascript"></script>
@@ -110,7 +110,21 @@
 	<script src="/assets/layouts/global/scripts/echarts.min.js" type="text/javascript"></script>
 
     <!-- END PAGE LEVEL SCRIPTS -->
-    <link rel="shortcut icon" href="/favicon.ico" /> </head>
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <style>
+        .page-sidebar .page-sidebar-menu>li>a,
+        .page-sidebar .page-sidebar-menu>li>a>i,
+        .page-header.navbar .top-menu .navbar-nav>li.dropdown .dropdown-toggle>i,
+        .page-header.navbar .top-menu .navbar-nav>li.dropdown-user>.dropdown-toggle>.username {
+            color: #fff;
+        }
+        .page-header.navbar .menu-toggler>span,
+        .page-header.navbar .menu-toggler>span:before,
+        .page-header.navbar .menu-toggler>span:after{
+            background: #fff;
+        }
+    </style>
+</head>
 <!-- END HEAD -->
 
 <body class="page-header-fixed page-sidebar-closed-hide-logo page-container-bg-solid page-content-white page-sidebar-closed">
@@ -265,10 +279,10 @@
                     </li>
                     <?php
                     $action_method = explode('.', request()->route()->getAction()['as'] ?? '');
-                    
+
                     $action = $action_method[0];
                     $method = isset($action_method[1])?$action_method[1]:'';
-					
+
 
                     ?>
                     <!-- END SIDEBAR TOGGLER BUTTON -->
@@ -282,7 +296,7 @@
 
                         </a>
                     </li>
-					
+
                     <li class="nav-item <?php if($action=='inbox') echo 'active';?>">
                         <a href="{{url('inbox')}}" class="nav-link nav-toggle">
                             <i class="fa fa-envelope-o"></i>
@@ -294,7 +308,7 @@
                     </li>
 					<?php $filtertype=isset($type)?$type:''; ?>
 					@foreach (getAccountTypes() as $type)
-					
+
 					<li class="nav-item <?php if($action=='filterInbox' && $filtertype==$type) echo 'active';?>">
                         <a href="{{url('inbox/filter/'.$type)}}" class="nav-link nav-toggle">
                             <i class="fa fa-envelope-o"></i>
@@ -303,8 +317,8 @@
                         </a>
                     </li>
 					@endforeach
-					
-					
+
+
 					<li class="nav-item <?php if($action=='phone') echo 'active';?>">
                         <a href="{{url('phone')}}" class="nav-link nav-toggle">
                             <i class="fa fa-phone"></i>
@@ -314,7 +328,7 @@
                         </a>
 
                     </li>
-					
+
 
 
                     <li class="nav-item <?php if($action=='send' && $method!='create') echo 'active';?>">
@@ -346,7 +360,7 @@
                         </a>
 
                     </li>
-					
+
 					<li class="nav-item <?php if($action=='exception') echo 'active';?>">
                         <a href="{{ url('exception') }}" class="nav-link nav-toggle">
                             <i class="fa fa-ticket"></i>
@@ -356,7 +370,7 @@
                         </a>
 
                     </li>
-					
+
                     <?php if(Auth::user()->admin){?>
                     <li class="nav-item <?php if($action=='auto') echo 'active';?>">
                         <a href="{{url('auto')}}" class="nav-link nav-toggle">
@@ -376,8 +390,8 @@
                         </a>
 
                     </li>
-					
-					
+
+
 					 <li class="nav-item <?php if($action=='group') echo 'active';?>">
                         <a href="{{ url('group') }}" class="nav-link nav-toggle">
                             <i class="fa fa-group"></i>
@@ -387,7 +401,7 @@
                         </a>
 
                     </li>
-					
+
 
                     <li class="nav-item <?php if($action=='user') echo 'active';?>">
                         <a href="{{ url('user') }}" class="nav-link nav-toggle">
@@ -417,7 +431,7 @@
                         </a>
 
                     </li>
-					
+
 					<li class="nav-item <?php if($action=='etotal') echo 'active';?>">
                         <a href="{{ url('etotal') }}" class="nav-link nav-toggle">
                             <i class="fa fa-question-circle"></i>
@@ -447,7 +461,7 @@
                     </li>
 					<?php } ?>
 
-					
+
 					<li class="nav-item <?php if($action=='seller') echo 'active';?>">
                         <a href="{{ url('seller') }}" class="nav-link nav-toggle">
                             <i class="fa fa-tasks"></i>
@@ -456,7 +470,7 @@
                         </a>
                     </li>
 
-					
+
 					<li class="nav-item <?php if($action=='tran') echo 'active';?>">
                         <a href="{{ url('tran') }}" class="nav-link nav-toggle">
                             <i class="fa fa-truck"></i>
@@ -464,7 +478,7 @@
                             <?php if($action=='tran') echo '<span class="selected"></span>';?>
                         </a>
                     </li>
-					
+
 
                 </ul>
                 <!-- END SIDEBAR MENU -->
@@ -477,7 +491,7 @@
         <div class="page-content-wrapper">
             <!-- BEGIN CONTENT BODY -->
             <div class="page-content">
-                
+
 
                 <div class="page-bar">
                     <ul class="page-breadcrumb">
