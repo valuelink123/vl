@@ -13,16 +13,28 @@
             <div class="table-toolbar">
                 <div class="row">
 
-                    <div class="col-md-8">
-                        {{--<div class="table-actions-wrapper" id="table-actions-wrapper">--}}
-                        {{--<span> </span>--}}
-                        {{--<input id="giveBrandLine" placeholder="Set Brand Line" class="table-group-action-input form-control input-inline input-small input-sm">--}}
-                        {{--<button class="btn btn-sm green table-group-action-submit">--}}
-                        {{--<i class="fa fa-search"></i> Search--}}
-                        {{--</button>--}}
-                        {{--</div>--}}
+                    <div class="col-md-3">
+                        <div class="input-group">
+                            <span class="input-group-addon">Item Group</span>
+                            <input type="text" class="form-control" placeholder="Item Group..." id="item_group" autocomplete="off"/>
+                        </div>
                     </div>
-                    <div class="col-md-4">
+
+                    <div class="col-md-3">
+                        <div class="input-group">
+                            <span class="input-group-addon">Brand</span>
+                            <input type="text" class="form-control" placeholder="Brand..." id="brand" autocomplete="off"/>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="input-group">
+                            <span class="input-group-addon">Model</span>
+                            <input type="text" class="form-control" placeholder="Item Model..." id="item_model" autocomplete="off"/>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
                         <div class="btn-group " style="float:right;">
                             <button id="vl_list_export" class="btn sbold blue"> Export
                                 <i class="fa fa-download"></i>
@@ -55,14 +67,33 @@
 
     <script>
 
-        let $theTable = $(thetable)
+        let $theTable = $(thetable);
+
+        // init
+        {
+            let ands = queryStringToObject().ands || {}
+
+            item_group.value = ands.item_group
+            brand.value = ands.brand
+            item_model.value = ands.item_model
+
+            new LinkageInput([item_group, brand, item_model], @json($itemGroupBrandModels))
+
+            $([item_group, brand, item_model]).change(() => $theTable.api().ajax.reload())
+        }
+        // end init
+
 
         $theTable.on('preXhr.dt', (e, settings, data) => {
-            history.replaceState(null, null, '?search=' + encodeURIComponent($.trim(data.search.value)))
+            let ands = data.search.ands = {}
+            ands.item_group = item_group.value
+            ands.brand = brand.value
+            ands.item_model = item_model.value
+            history.replaceState(null, null, '?' + objectToQueryString(data.search))
         })
 
         $theTable.dataTable({
-            search: {search: queryStringToObject().search},
+            search: {search: queryStringToObject().value},
             serverSide: true,
             pagingType: 'bootstrap_extended',
             processing: true,
