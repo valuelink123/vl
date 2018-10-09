@@ -30,9 +30,13 @@
                     <thead>
                     <tr>
                         <th>Item No</th>
+                        <th>Seller Name</th>
+                        <th>Asin</th>
+                        <th>Seller SKU</th>
                         <th>Item Name</th>
-                        <th>Stock</th>
-                        <th>Average Per Day</th>
+                        <th>Fbm Stock</th>
+                        <th>Fba Stock</th>
+                        <th>Fba Transfer</th>
                     </tr>
                     </thead>
                     <tbody></tbody>
@@ -66,13 +70,14 @@
             pagingType: 'bootstrap_extended',
             processing: true,
             columns: [
-                {data: 'item_no', name: 'item_no'},
+                {data: 'item_code', name: 'item_code'},
+                {data: 'seller_name', name: 'seller_name'},
+                {data: 'asin', name: 'asin'},
+                {data: 'seller_sku', name: 'seller_sku'},
                 {data: 'item_name', name: 'item_name'},
-                {data: 'stock', name: 'stock'},
-                {
-                    data: 'apd',
-                    name: 'apd',
-                },
+                {data: 'fbm_stock', name: 'fbm_stock'},
+                {data: 'fba_stock', name: 'fba_stock'},
+                {data: 'fba_transfer', name: 'fba_transfer'}
             ],
             ajax: {
                 type: 'POST',
