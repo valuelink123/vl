@@ -11,6 +11,9 @@ class CreateKmsVideoTable extends Migration {
      * @return void
      */
     public function up() {
+
+        $this->dropTableIfEmpty('kms_video');
+
         $sql = <<<'SQL'
 CREATE TABLE IF NOT EXISTS `kms_video` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,

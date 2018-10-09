@@ -11,6 +11,9 @@ class CreateKmsUserManualTable extends Migration {
      * @return void
      */
     public function up() {
+
+        $this->dropTableIfEmpty('kms_user_manual');
+
         $sql = <<<'SQL'
 CREATE TABLE IF NOT EXISTS `kms_user_manual` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
