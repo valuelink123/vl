@@ -47,7 +47,16 @@ License: You must have a valid license purchased only from themeforest(the above
         <link href="/assets/layouts/layout/css/themes/darkblue.min.css" rel="stylesheet" type="text/css" id="style_color" />
         <link href="/assets/layouts/layout/css/custom.min.css" rel="stylesheet" type="text/css" />
         <!-- END THEME LAYOUT STYLES -->
-        <link rel="shortcut icon" href="favicon.ico" /> </head>
+        <link rel="shortcut icon" href="favicon.ico" />
+		<style>
+		.search-page .search-bar input,.search-page .search-bar select{
+    border: 1px !important;
+    background-color: #f3f6f9;
+    color: #a0a9b4;
+    height: 55px;
+}
+		</style>
+		 </head>
     <!-- END HEAD -->
 
     <body class="page-header-fixed page-sidebar-closed-hide-logo page-content-white" style="background:#eef1f5;">
@@ -55,12 +64,21 @@ License: You must have a valid license purchased only from themeforest(the above
 	<div class="blog-page">
 
 	<div class="search-page">
-	<div class="search-bar" style="  position: fixed; z-index:999;">
+	<div class="search-bar" style="  position: fixed; z-index:999;background: #eee;">
                                 <div class="row">
 								<form method="get" action="/question">
+									
                                     <div class="col-lg-7">
-                                        <div class="input-group">
-                                            <input type="text" class="form-control" name="keywords" placeholder="Search for..." value='<?php echo isset($keywords)?$keywords:'';?>'>
+						<div class="col-md-3">
+                            <select class="form-control" name="etype" id="etype">
+                                <option value="">Question Type</option>
+                                @foreach (getEType() as $etype)
+                                    <option value="{{$etype}}">{{$etype}}</option>
+                                @endforeach
+                            </select>
+                        </div>	
+                                        <div class="col-md-9 input-group">
+                                            <input type="text" class="form-control" name="keywords" placeholder="Search for..." >
                                             <span class="input-group-btn">
                                                 <button class="btn blue uppercase bold" type="submit">Search</button>
                                             </span>
@@ -68,7 +86,7 @@ License: You must have a valid license purchased only from themeforest(the above
                                     </div>
 									</form>
                                     <div class="col-lg-5">
-                                        <p class="search-desc clearfix" style="color: #666;
+                                        <p class="search-desc clearfix" style="color: #333;
   font-size: 35px;
   text-align: center;">Questions And Solutions</p>
                                     </div>
@@ -93,7 +111,9 @@ License: You must have a valid license purchased only from themeforest(the above
 											Product Line: {!!$qa->product_line!!} <br>
 											Product : {!!$qa->product!!} <br>
 											Model :  {!!$qa->model!!} <br>
-											  Item No. : {!!$qa->item_no!!}</h4>
+											Item No. : {!!$qa->item_no!!}<br>
+											Question Type : {!!$qa->etype!!}<br>
+											Problem Point. : {!!$qa->epoint!!}</h4>
 											 
                                             {!!$qa->description!!}
                                         </div>

@@ -110,6 +110,12 @@ class QaiController extends Controller
 		if(array_get($_REQUEST,'item_no')){
             $customers = $customers->where('item_no', 'like', '%'.$_REQUEST['item_no'].'%');
         }
+		if(array_get($_REQUEST,'etype')){
+            $customers = $customers->where('etype', $_REQUEST['etype']);
+        }
+		if(array_get($_REQUEST,'epoint')){
+            $customers = $customers->where('epoint', 'like', '%'.$_REQUEST['epoint'].'%');
+        }
 		
 		if(array_get($_REQUEST,'title')){
             $customers = $customers->where('title', 'like', '%'.$_REQUEST['title'].'%');
@@ -163,6 +169,8 @@ class QaiController extends Controller
 				
                 $customersList[$i]['model'],
 				$customersList[$i]['item_no'],
+				$customersList[$i]['etype'],
+				$customersList[$i]['epoint'],
 				$customersList[$i]['title'],
                 
                 $users[$customersList[$i]['user_id']],
@@ -201,6 +209,8 @@ class QaiController extends Controller
 		$seller_account->model = $request->get('model');
 		$seller_account->product_line = $request->get('product_line');
 		$seller_account->item_no = $request->get('item_no');
+		$seller_account->etype = $request->get('etype');
+		$seller_account->epoint = $request->get('epoint');
         $seller_account->title = $request->get('title');
 		$seller_account->description = $request->get('description');
         $seller_account->service_content = $request->get('service_content');
@@ -257,6 +267,8 @@ class QaiController extends Controller
 		$seller_account->model = $request->get('model');
 		$seller_account->product_line = $request->get('product_line');
 		$seller_account->item_no = $request->get('item_no');
+		$seller_account->etype = $request->get('etype');
+		$seller_account->epoint = $request->get('epoint');
         $seller_account->title = $request->get('title');
 		$seller_account->description = $request->get('description');
         $seller_account->service_content = $request->get('service_content');
