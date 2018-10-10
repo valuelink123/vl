@@ -62,6 +62,9 @@ trait DataTables {
                     $field = substr($field, 2);
                     $ors[] = "MATCH({$field}) AGAINST('{$word}')";
                 } else {
+                    // 表中数据多到一定程度以后，% LIKE 会很慢
+                    // todo 使用全文索引，XunSearch、ElasticSearch
+                    // 或者就用 MySQL 自带的全文索引，把所有需要搜索的字段，拼成一个用于搜索的 FullText 字段
                     $ors[] = "{$field} LIKE '%{$word}%'";
                 }
             }

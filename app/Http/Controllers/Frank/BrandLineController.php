@@ -39,9 +39,14 @@ class BrandLineController extends Controller {
 
         $sql = <<<SQL
 SELECT SQL_CALC_FOUND_ROWS
-item_group,item_model,brand,
-MAX(brand_line) AS item_group_descr
-FROM asin
+t1.brand,
+t1.item_group,
+t1.item_model,
+ANY_VALUE(t1.brand_line) AS brand_line,
+t2.manualink
+FROM asin t1
+LEFT JOIN (SELECT item_group,brand,item_model,any_value(link) manualink FROM kms_user_manual group by item_group,brand,item_model) t2
+ON t2.item_group=t1.item_group AND t2.item_model=t1.item_model AND t2.brand=t1.brand
 WHERE $where
 GROUP BY item_group,brand,item_model
 ORDER BY $orderby

@@ -156,7 +156,7 @@
             let rows = await new Promise((resolve, reject) => {
                 $.post('/kms/partslist/subitems', {item_code})
                     .success(rows => resolve(rows))
-                    .error((xhr, status, errmsg) => reject(errmsg))
+                    .error((xhr, status, errmsg) => reject(new Error(errmsg)))
             })
 
             if (!rows.length) return ''
@@ -197,6 +197,8 @@
                     } else {
                         $(`#${id}`).html('Nothing to Show.')
                     }
+                }).catch(err => {
+                    $(`#${id}`).html(`<span style="color:red">Error: ${err.message}</span>`)
                 })
 
                 $td.addClass('closed');
