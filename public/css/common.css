@@ -1,0 +1,25 @@
+.page-sidebar .page-sidebar-menu > li > a,
+.page-sidebar .page-sidebar-menu > li > a > i,
+.page-header.navbar .top-menu .navbar-nav > li.dropdown .dropdown-toggle > i,
+.page-header.navbar .top-menu .navbar-nav > li.dropdown-user > .dropdown-toggle > .username {
+    color: #fff;
+}
+
+.page-header.navbar .menu-toggler > span,
+.page-header.navbar .menu-toggler > span:before,
+.page-header.navbar .menu-toggler > span:after {
+    background: #fff;
+}
+
+td.details-control {
+    background: url('./common/details_open.png') no-repeat center center;
+    cursor: pointer;
+}
+
+td.details-control.closed {
+    background: url('./common/details_close.png') no-repeat center center;
+}
+
+td.details-control.disabled {
+    background: url('./common/details_disabled.png') no-repeat center center;
+}

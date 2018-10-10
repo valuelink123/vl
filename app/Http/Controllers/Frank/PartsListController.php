@@ -9,6 +9,7 @@ namespace App\Http\Controllers\Frank;
 
 use App\Classes\SapRfcRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class PartsListController extends Controller {
 
@@ -41,12 +42,30 @@ class PartsListController extends Controller {
         return $subCodes;
     }
 
+    public function getSubItemList(Request $req) {
+
+        $subCodes = $this->subItemCodes($req->input('item_code'));
+
+        if (empty($subCodes)) return [];
+
+        return DB::table('fba_stock AS t1')
+            ->select(DB::raw('t1.item_code,t1.asin,t1.fba_stock,t1.fba_transfer,t2.fbm_stock,t2.item_name'))
+            ->join('fbm_stock AS t2', 't1.item_code', '=', 't2.item_code')
+            ->whereIn('t1.item_code', $subCodes)
+            ->get();
+        // ->toSql();
+
+        // DB::enableQueryLog();
+        // $user = User::get();
+        // $query = DB::getQueryLog();
+        // print_r($query);
+    }
+
     public function get(Request $req) {
 
         $where = $this->dtWhere($req, ['item_code', 'item_name', 'asin', 'seller_id', 'seller_name', 'seller_sku'], []);
         $orderby = $this->dtOrderBy($req);
         $limit = $this->dtLimit($req);
-
 
         $sql = "
 SELECT SQL_CALC_FOUND_ROWS
@@ -62,7 +81,6 @@ FROM fba_stock t1
 INNER JOIN fbm_stock t2
 USING(item_code)
 WHERE $where
-GROUP BY item_no
 ORDER BY $orderby
 LIMIT $limit
 ";
