@@ -111,19 +111,7 @@
 
     <!-- END PAGE LEVEL SCRIPTS -->
     <link rel="shortcut icon" href="/favicon.ico" />
-    <style>
-        .page-sidebar .page-sidebar-menu>li>a,
-        .page-sidebar .page-sidebar-menu>li>a>i,
-        .page-header.navbar .top-menu .navbar-nav>li.dropdown .dropdown-toggle>i,
-        .page-header.navbar .top-menu .navbar-nav>li.dropdown-user>.dropdown-toggle>.username {
-            color: #fff;
-        }
-        .page-header.navbar .menu-toggler>span,
-        .page-header.navbar .menu-toggler>span:before,
-        .page-header.navbar .menu-toggler>span:after{
-            background: #fff;
-        }
-    </style>
+    <link href="/css/common.css?v=2" rel="stylesheet" type="text/css"/>
 </head>
 <!-- END HEAD -->
 

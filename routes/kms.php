@@ -24,6 +24,7 @@ Route::post('/usermanual/import', 'UserManualController@create');
 
 Route::get('/partslist', 'PartsListController@index');
 Route::post('/partslist/get', 'PartsListController@get');
+Route::post('/partslist/subitems', 'PartsListController@getSubItemList');
 
 Route::get('/notice', 'NoticeCenterController@index');
 Route::post('/notice/get', 'NoticeCenterController@get');
