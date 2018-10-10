@@ -32,16 +32,27 @@ class BrandLineController extends Controller {
 
     public function get(Request $req) {
 
-        $where = $this->dtWhere($req, ['item_group', 'item_model', 'item_no', 'asin', 'sellersku', 'brand', 'brand_line'], ['item_group' => 'item_group', 'brand' => 'brand', 'item_model' => 'item_model']);
+        $where = $this->dtWhere($req, ['item_group', 'item_model', 'item_no', 'asin', 'sellersku', 'brand', 'brand_line'], ['item_group' => 't1.item_group', 'brand' => 't1.brand', 'item_model' => 't1.item_model']);
 
         $orderby = $this->dtOrderBy($req);
         $limit = $this->dtLimit($req);
 
         $sql = <<<SQL
 SELECT SQL_CALC_FOUND_ROWS
-item_group,item_model,brand,
-MAX(brand_line) AS item_group_descr
-FROM asin
+t1.brand,
+t1.item_group,
+t1.item_model,
+ANY_VALUE(t1.brand_line) AS brand_line,
+t2.manualink,
+IF(ISNULL(t3.item_group), 0, 1) AS has_video,
+COUNT(t4.item_code) AS has_stock_info
+FROM asin t1
+LEFT JOIN (SELECT item_group,brand,item_model,any_value(link) manualink FROM kms_user_manual GROUP BY item_group,brand,item_model) t2
+ON t2.item_group=t1.item_group AND t2.item_model=t1.item_model AND t2.brand=t1.brand
+LEFT JOIN (SELECT DISTINCT item_group,brand,item_model FROM kms_video) t3
+ON t3.item_group=t1.item_group AND t3.item_model=t1.item_model AND t3.brand=t1.brand
+LEFT JOIN fbm_stock t4
+ON t4.item_code=t1.item_no
 WHERE $where
 GROUP BY item_group,brand,item_model
 ORDER BY $orderby

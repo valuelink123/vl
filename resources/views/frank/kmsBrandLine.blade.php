@@ -4,6 +4,20 @@
 
     @include('frank.common')
 
+    <style>
+        .user-manual-has {
+            text-align: right;
+        }
+
+        .user-manual-has a:first-child {
+            text-overflow: ellipsis;
+            max-width: 176px;
+            white-space: nowrap;
+            overflow: hidden;
+            display: inline-block;
+        }
+    </style>
+
     <h1 class="page-title font-red-intense"> Product Guide
         <small></small>
     </h1>
@@ -99,25 +113,32 @@
             processing: true,
             columns: [
                 {data: 'item_group', name: 'item_group'},
-                {data: 'item_group_descr', name: 'item_group_descr'},
+                {data: 'brand_line', name: 'brand_line'},
                 {data: 'brand', name: 'brand'},
                 {data: 'item_model', name: 'item_model'},
                 {
-                    orderable: false,
-                    searchable: false,
+                    data: 'manualink', name: 'manualink',
                     // defaultContent: '<button class="btn btn-success btn-xs">View</button>',
                     render(data, type, row, meta) {
                         // let args = {'item_group': row.item_group, 'item_model': row.item_model}
                         // jQuery.param( ) 坑爹啊 jQuery uses + instead of %20 to URL-encode spaces
                         // enc_type http://php.net/manual/en/function.http-build-query.php
-                        return `<a href="/kms/usermanual?${objectToQueryString(objectFilte(row, ['item_group_descr']))}" target="_blank" class='btn btn-success btn-xs'>View</a>`
+
+                        let href = `/kms/usermanual?${objectToQueryString(objectFilte(row, ['item_group', 'brand', 'item_model'], false))}`
+
+                        if (data) {
+                            let ms = data.match(/([^/]+\.\w+)$/)
+                            let file = ms ? ms[1] : data
+                            return `<div class="user-manual-has"><a href="${data}" target="_blank">${file}</a> <a href="${href}" target="_blank" class='btn btn-success btn-xs'>More</a></div>`
+                        } else {
+                            return `<a href="${href}" target="_blank" class='btn btn-default btn-xs'>No Data Available</a>`
+                        }
                     }
                 },
                 {
-                    orderable: false,
-                    searchable: false,
+                    data: 'has_video', name: 'has_video',
                     render(data, type, row, meta) {
-                        return `<a href="/kms/videolist?${objectToQueryString(objectFilte(row, ['item_group_descr']))}" target="_blank" class='btn btn-success btn-xs'>View</a>`
+                        return `<a href="/kms/videolist?${objectToQueryString(objectFilte(row, ['item_group', 'brand', 'item_model'], false))}" target="_blank" class='btn btn-${data > 0 ? 'success' : 'default'} btn-xs'>View</a>`
                     }
                 },
                 {
@@ -128,10 +149,9 @@
                     }
                 },
                 {
-                    orderable: false,
-                    searchable: false,
+                    data: 'has_stock_info', name: 'has_stock_info',
                     render(data, type, row, meta) {
-                        return `<a href="/kms/partslist?${objectToQueryString(objectFilte(row, ['item_group_descr']))}" target="_blank" class='btn btn-success btn-xs'>View</a>`
+                        return `<a href="/kms/partslist?${objectToQueryString(objectFilte(row, ['item_group', 'brand', 'item_model'], false))}" target="_blank" class='btn btn-${data > 0 ? 'success' : 'default'} btn-xs'>View</a>`
                     }
                 }
             ],
