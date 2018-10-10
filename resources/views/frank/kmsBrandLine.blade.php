@@ -131,15 +131,14 @@
                             let file = ms ? ms[1] : data
                             return `<div class="user-manual-has"><a href="${data}" target="_blank">${file}</a> <a href="${href}" target="_blank" class='btn btn-success btn-xs'>More</a></div>`
                         } else {
-                            return `<a href="${href}" target="_blank" class='btn btn-default btn-xs'>Empty</a>`
+                            return `<a href="${href}" target="_blank" class='btn btn-default btn-xs'>No Data Available</a>`
                         }
                     }
                 },
                 {
-                    orderable: false,
-                    searchable: false,
+                    data: 'has_video', name: 'has_video',
                     render(data, type, row, meta) {
-                        return `<a href="/kms/videolist?${objectToQueryString(objectFilte(row, ['item_group', 'brand', 'item_model'], false))}" target="_blank" class='btn btn-success btn-xs'>View</a>`
+                        return `<a href="/kms/videolist?${objectToQueryString(objectFilte(row, ['item_group', 'brand', 'item_model'], false))}" target="_blank" class='btn btn-${data > 0 ? 'success' : 'default'} btn-xs'>View</a>`
                     }
                 },
                 {
@@ -150,10 +149,9 @@
                     }
                 },
                 {
-                    orderable: false,
-                    searchable: false,
+                    data: 'has_stock_info', name: 'has_stock_info',
                     render(data, type, row, meta) {
-                        return `<a href="/kms/partslist?${objectToQueryString(objectFilte(row, ['item_group', 'brand', 'item_model'], false))}" target="_blank" class='btn btn-success btn-xs'>View</a>`
+                        return `<a href="/kms/partslist?${objectToQueryString(objectFilte(row, ['item_group', 'brand', 'item_model'], false))}" target="_blank" class='btn btn-${data > 0 ? 'success' : 'default'} btn-xs'>View</a>`
                     }
                 }
             ],
