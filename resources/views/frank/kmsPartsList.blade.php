@@ -140,8 +140,10 @@
                     let rows = json.data
                     for (let row of rows) {
                         let item_code = row.item_code
+                        // 根据每一行 item_code 进行预查询，如果有配件数据，则将加号按钮变绿
                         $.post('/kms/partslist/subitems', {item_code}).success(rows => {
                             if (rows.length > 0) {
+                                if (false === rows[0]) return
                                 $(`.ctrl-${item_code}`).parent().removeClass('disabled')
                             }
                         })
@@ -160,6 +162,8 @@
             })
 
             if (!rows.length) return ''
+
+            if (false === rows[0]) return Promise.reject(new Error(rows[1]))
 
             let trs = []
 
@@ -198,7 +202,7 @@
                         $(`#${id}`).html('Nothing to Show.')
                     }
                 }).catch(err => {
-                    $(`#${id}`).html(`<span style="color:red">Error: ${err.message}</span>`)
+                    $(`#${id}`).html(`<span style="color:red">Server Error: ${err.message}</span>`)
                 })
 
                 $td.addClass('closed');

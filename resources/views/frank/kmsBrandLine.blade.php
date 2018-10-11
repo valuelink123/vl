@@ -5,11 +5,7 @@
     @include('frank.common')
 
     <style>
-        .user-manual-has {
-            text-align: right;
-        }
-
-        .user-manual-has a:first-child {
+        .user-manual-file {
             text-overflow: ellipsis;
             max-width: 176px;
             white-space: nowrap;
@@ -117,6 +113,7 @@
                 {data: 'brand', name: 'brand'},
                 {data: 'item_model', name: 'item_model'},
                 {
+                    className: 'dt-body-right',
                     data: 'manualink', name: 'manualink',
                     // defaultContent: '<button class="btn btn-success btn-xs">View</button>',
                     render(data, type, row, meta) {
@@ -129,7 +126,7 @@
                         if (data) {
                             let ms = data.match(/([^/]+\.\w+)$/)
                             let file = ms ? ms[1] : data
-                            return `<div class="user-manual-has"><a href="${data}" target="_blank">${file}</a> <a href="${href}" target="_blank" class='btn btn-success btn-xs'>More</a></div>`
+                            return `<a href="${data}" target="_blank" class="user-manual-file">${file}</a> <a href="${href}" target="_blank" class='btn btn-success btn-xs'>More</a>`
                         } else {
                             return `<a href="${href}" target="_blank" class='btn btn-default btn-xs'>No Data Available</a>`
                         }
