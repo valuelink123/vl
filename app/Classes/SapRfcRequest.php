@@ -18,6 +18,12 @@ namespace App\Classes;
  *
  */
 
+/**
+ * Class SapRfcRequest
+ * @package App\Classes
+ * @method array getOrder(array $arguments)
+ * @method array getAccessories(array $arguments)
+ */
 class SapRfcRequest {
 
     private $host;
@@ -75,6 +81,9 @@ class SapRfcRequest {
             throw new \Exception('System Data Decode Failed.');
         } else if (1 == $json['result']) {
             return $json['data'];
+        } else if ('No matching data!' === $json['message']) {
+            // 垃圾设计，把 无结果 和 错误 混在一起了！
+            return [];
         } else {
             throw new \Exception($json['message']);
         }

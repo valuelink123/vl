@@ -29,14 +29,10 @@ class PartsListController extends Controller {
 
         $subCodes = [];
 
-        try {
-            $sap = new SapRfcRequest();
-            $rows = $sap->getAccessories(['sku' => $item_code]);
-            foreach ($rows as $row) {
-                $subCodes[] = $row['IDNRK'];
-            }
-        } catch (\Exception $e) {
-
+        $sap = new SapRfcRequest();
+        $rows = $sap->getAccessories(['sku' => $item_code]);
+        foreach ($rows as $row) {
+            $subCodes[] = $row['IDNRK'];
         }
 
         return $subCodes;
@@ -44,7 +40,11 @@ class PartsListController extends Controller {
 
     public function getSubItemList(Request $req) {
 
-        $subCodes = $this->subItemCodes($req->input('item_code'));
+        try {
+            $subCodes = $this->subItemCodes($req->input('item_code'));
+        } catch (\Exception $e) {
+            return [false, $e->getMessage()];
+        }
 
         if (empty($subCodes)) return [];
 
@@ -63,10 +63,12 @@ class PartsListController extends Controller {
 
     public function get(Request $req) {
 
-        $where = $this->dtWhere($req, ['item_code', 'item_name', 'asin', 'seller_id', 'seller_name', 'seller_sku'], []);
+        $where = $this->dtWhere($req, ['item_code', 'item_name', 'asin', 'seller_id', 'seller_name', 'seller_sku'], ['item_group' => 't3.item_group', 'brand' => 't3.brand', 'item_model' => 't3.item_model']);
+
+
         $orderby = $this->dtOrderBy($req);
         $limit = $this->dtLimit($req);
-
+        // todo outer join
         $sql = "
 SELECT SQL_CALC_FOUND_ROWS
 t1.item_code,
@@ -79,6 +81,8 @@ t2.fbm_stock,
 t2.item_name
 FROM fba_stock t1
 INNER JOIN fbm_stock t2
+USING(item_code)
+LEFT JOIN (SELECT ANY_VALUE(item_group) AS item_group,ANY_VALUE(brand) AS brand,ANY_VALUE(item_model) AS item_model,item_no AS item_code FROM asin GROUP BY item_no) t3
 USING(item_code)
 WHERE $where
 ORDER BY $orderby
