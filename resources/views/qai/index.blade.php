@@ -1,6 +1,21 @@
 @extends('layouts.layout')
 @section('label', 'Asins List')
 @section('content')
+<style type="text/css">
+.dataTables_extended_wrapper .table.dataTable {
+  margin: 0px !important;
+}
+
+table.dataTable thead th, table.dataTable thead td {
+    padding: 10px 2px !important;}
+table.dataTable tbody th, table.dataTable tbody td {
+    padding: 10px 0px;
+}
+th,td,td>span {
+    font-size:12px !important;
+	font-family:Arial, Helvetica, sans-serif;}
+
+</style>
     <h1 class="page-title font-red-intense"> Qa List
         <small>Configure your Qa.</small>
     </h1>
@@ -50,15 +65,17 @@
                                         <span></span>
                                     </label>
                                 </th>
-								<th width="10%">Product Line</th>
-                                <th width="10%">Product</th>
-                                <th width="10%"> Model </th>
-								<th width="10%"> Item No. </th>
-								<th width="20%"> Title </th>
-                                <th width="10%"> User </th>
-								<th width="10%"> Status </th>
-                                <th width="15%"> Update Date </th>
-                                <th width="5%"> Action </th>
+								<th width="5%">Product Line</th>
+                                <th width="5%">Product</th>
+                                <th width="5%">Model</th>
+								<th width="5%">Item No.</th>
+								<th width="10%">Question Type</th>
+								<th width="10%">Problem Point</th>
+								<th width="23%">Title</th>
+                                <th width="10%">User</th>
+								<th width="10%">Status</th>
+                                <th width="10%">Update Date</th>
+                                <th width="5%">Action</th>
                             </tr>
                             <tr role="row" class="filter">
                                 <td> </td>
@@ -73,6 +90,17 @@
                                 </td>
 								<td>
                                     <input type="text" class="form-control form-filter input-sm" name="item_no">
+                                </td>
+								<td>
+                                    <select class="form-control form-filter input-sm" name="etype" id="etype">
+                                <option value="">Select</option>
+                                @foreach (getEType() as $etype)
+                                    <option value="{{$etype}}">{{$etype}}</option>
+                                @endforeach
+                            </select>
+                                </td>
+								<td>
+                                    <input type="text" class="form-control form-filter input-sm" name="epoint">
                                 </td>
 								<td>
                                     <input type="text" class="form-control form-filter input-sm" name="title">
@@ -182,7 +210,7 @@
                     "dom": "<'row'<'col-md-6 col-sm-12'pli><'col-md-6 col-sm-12'<'table-group-actions pull-right'>>r>t<'row'<'col-md-6 col-sm-12'pli><'col-md-6 col-sm-12'>>",
 
                     "bStateSave": true, // save datatable state(pagination, sort, etc) in cookie.
-                    "aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0 , 9 ] }],
+                    "aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0 , 11 ] }],
                     "lengthMenu": [
                         [10, 20, 50, -1],
                         [10, 20, 50, 'All'] // change per page values here
@@ -242,7 +270,8 @@
             grid.setAjaxParam("item_no", $("input[name='item_no']").val());
 			grid.setAjaxParam("title", $("input[name='title']").val());
             grid.setAjaxParam("confirm", $("select[name='confirm']").val());
-   
+   			grid.setAjaxParam("etype", $("select[name='etype']").val());
+			grid.setAjaxParam("epoint", $("input[name='epoint']").val());
             grid.setAjaxParam("update_date_from", $("input[name='update_date_from']").val());
             grid.setAjaxParam("update_date_to", $("input[name='update_date_to']").val());
             grid.setAjaxParam("user_id", $("select[name='user_id']").val());

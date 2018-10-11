@@ -40,12 +40,21 @@ class QaController extends Controller
     public function index(Request $request)
     {	
 		$keywords = $request->get('keywords');
-		if($keywords){
-			$qas = Qa::where('product','like','%'.$keywords.'%')->orWhere('product_line','like','%'.$keywords.'%')->orWhere('item_no','like','%'.$keywords.'%')->orWhere('model','like','%'.$keywords.'%')->orWhere('title','like','%'.$keywords.'%')->orWhere('description','like','%'.$keywords.'%')->orderBy('created_at','desc')->paginate(8);
-		}else{
-			$qas = Qa::orderBy('created_at','desc')->paginate(8);
-		}
+		$etype = $request->get('etype');
 
+		$qas = new Qa;
+		if($etype) $qas = $qas->where('etype',$etype);
+		if($keywords){
+			$qas = $qas->where(function ($query) use ($keywords){
+				$query->where('product', 'like','%'.$keywords.'%')
+				->orWhere('product_line', 'like','%'.$keywords.'%')
+				->orWhere('item_no', 'like','%'.$keywords.'%')
+				->orWhere('model', 'like','%'.$keywords.'%')
+				->orWhere('title', 'like','%'.$keywords.'%')
+				->orWhere('description', 'like','%'.$keywords.'%');
+			});
+		}
+		$qas = $qas->orderBy('created_at','desc')->paginate(8);
         return view('qa/index',['qas'=>$qas,'keywords'=>$keywords,'users'=>$this->getUsers()]);
 
     }

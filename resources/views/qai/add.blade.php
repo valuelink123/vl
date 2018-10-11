@@ -65,7 +65,34 @@
                                 <input type="text" class="form-control" placeholder="Item No." name="item_no" id="item_no" value="{{old('item_no')}}" required />
                             </div>
                         </div>
-	
+						
+						
+						<div class="form-group">
+                        <label>Question Type</label>
+                        <div class="input-group ">
+                        <span class="input-group-addon">
+                            <i class="fa fa-bookmark"></i>
+                        </span>
+                            <select class="form-control" name="etype" id="etype">
+                                <option value="">None</option>
+                                @foreach (getEType() as $etype)
+                                    <option value="{{$etype}}" <?php if($etype==old('etype')) echo 'selected';?>>{{$etype}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+					
+					<div class="form-group">
+                        <label>Problem Point</label>
+                        <div class="input-group ">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-bookmark"></i>
+                                </span>
+                            <input type="text" class="form-control" name="epoint" id="epoint" value="{{old('epoint')}}" >
+                        </div>
+                    </div>
+					
+					
                         <div class="form-group">
                             <label>Title</label>
                             <div class="input-group">
