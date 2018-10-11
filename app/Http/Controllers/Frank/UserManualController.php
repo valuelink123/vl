@@ -43,23 +43,31 @@ class UserManualController extends Controller {
 
     public function get(Request $req) {
 
-        $where = $this->dtWhere($req, ['t2.sellersku', 't1.brand', 't2.asin', 't2.item_no', 't1.item_group', 't1.item_model'], ['item_group' => 't1.item_group', 'brand' => 't1.brand', 'item_model' => 't1.item_model']);
+        $where = $this->dtWhere($req, ['t2.sellersku', 't1.brand', 't2.brand_line', 't2.asin', 't2.item_no', 't1.item_group', 't1.item_model'], ['item_group' => 't1.item_group', 'brand' => 't1.brand', 'item_model' => 't1.item_model']);
         $orderby = $this->dtOrderBy($req);
         $limit = $this->dtLimit($req);
         // todo item_group_descr
         // todo UPDATE asin SET xxx=TRIM(IFNULL(xxx, ''))
         $sql = "
 SELECT SQL_CALC_FOUND_ROWS
-ANY_VALUE(t1.item_group) AS item_group,
-ANY_VALUE(t1.item_model) AS item_model,
-ANY_VALUE(t1.link) AS link,
-ANY_VALUE(t1.updated_at) AS updated_at,
-ANY_VALUE(t1.brand) AS brand,
-MAX(t2.brand_line) AS item_group_descr
+item_group,
+item_model,
+link,
+updated_at,
+brand,
+t2.brand_line
 FROM kms_user_manual t1
-LEFT JOIN asin t2 ON t2.item_group=t1.item_group AND t2.brand=t1.brand AND t2.item_model=t1.item_model
+LEFT JOIN (
+  SELECT item_group,brand,item_model,
+  GROUP_CONCAT(DISTINCT sellersku) AS sellersku,
+  GROUP_CONCAT(DISTINCT brand_line) AS brand_line,
+  GROUP_CONCAT(DISTINCT asin) AS asin,
+  GROUP_CONCAT(DISTINCT item_no) AS item_no
+  FROM asin
+  GROUP BY item_group,brand,item_model
+) t2
+USING(item_group,brand,item_model)
 WHERE $where
-GROUP BY t1.id
 ORDER BY $orderby
 LIMIT $limit
 ";
