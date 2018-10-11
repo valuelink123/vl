@@ -46,18 +46,26 @@ class VideoListController extends Controller {
         // 非唯一索引关联的情况下，Left Join 是会出现重复数据的；这里使用 Group By 左表 id 来去重；
         $sql = "
 SELECT SQL_CALC_FOUND_ROWS
-ANY_VALUE(t1.item_group) AS item_group,
-ANY_VALUE(t1.item_model) AS item_model,
-ANY_VALUE(t1.type) AS type,
-ANY_VALUE(t1.descr) AS descr,
-ANY_VALUE(t1.link) AS link,
-ANY_VALUE(t1.note) AS note,
-ANY_VALUE(t1.brand) AS brand,
-MAX(t2.brand_line) AS item_group_descr
+item_group,
+brand,
+item_model,
+type,
+descr,
+link,
+note,
+t2.brand_line
 FROM kms_video t1
-LEFT JOIN asin t2 ON t2.item_group=t1.item_group AND t2.brand=t1.brand AND t2.item_model=t1.item_model
+LEFT JOIN (
+  SELECT item_group,brand,item_model,
+  GROUP_CONCAT(DISTINCT sellersku) AS sellersku,
+  GROUP_CONCAT(DISTINCT brand_line) AS brand_line,
+  GROUP_CONCAT(DISTINCT asin) AS asin,
+  GROUP_CONCAT(DISTINCT item_no) AS item_no
+  FROM asin
+  GROUP BY item_group,brand,item_model
+) t2
+USING(item_group,brand,item_model)
 WHERE $where
-GROUP BY t1.id
 ORDER BY $orderby
 LIMIT $limit
 ";
