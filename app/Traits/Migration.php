@@ -12,6 +12,15 @@ use Illuminate\Support\Facades\DB;
 
 trait Migration {
 
+    public function upOrDown(callable $func) {
+        try {
+            $func();
+        } catch (\Exception $e) {
+            $this->down();
+            throw $e;
+        }
+    }
+
     public function statement($sql) {
         // https://laravel.com/docs/5.5/database#running-queries
         DB::statement($sql);
@@ -53,6 +62,12 @@ trait Migration {
         }
 
         $this->statement("DROP TABLE IF EXISTS $table");
+    }
+
+    public function dropColumnIfExists($table, $column) {
+        if (!$this->isTableExists($table)) return;
+        if (empty($this->getColumnInfo($table, $column))) return;
+        $this->statement("ALTER TABLE `$table` DROP COLUMN `$column`");
     }
 
     public function dropColumnIfEmpty($table, $column) {

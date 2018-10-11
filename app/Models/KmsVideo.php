@@ -13,7 +13,18 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class KmsVideo extends Model {
     protected $table = 'kms_video';
-    protected $fillable = ['brand', 'item_group', 'item_model', 'type', 'descr', 'link', 'note'];
+    protected $fillable = ['brand', 'item_group', 'item_model', 'type', 'descr', 'link', 'link_hash', 'note'];
+
+    public static function create($row) {
+        $find['link_hash'] = md5($row['link']);
+        // 它的底层可能执行了不止一句 SQL
+        // 既然有表的字段信息，其实可以在写入前判断
+        // 如果 $find 包含唯一索引、主键，则使用如下语句
+        // ISERT INTO ON DUPLICATE KEY UPDATE
+        // 或者 REPLACE INTO
+        // Laravel 最终会把 $find 和 $row 都写到数据里
+        return parent::updateOrCreate($find, $row);
+    }
 
     public static function parseExcel($filepath) {
 

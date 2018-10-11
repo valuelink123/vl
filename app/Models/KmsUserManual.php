@@ -13,7 +13,13 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class KmsUserManual extends Model {
     protected $table = 'kms_user_manual';
-    protected $fillable = ['brand', 'item_group', 'item_model', 'link', 'note'];
+    protected $fillable = ['brand', 'item_group', 'item_model', 'link', 'link_hash', 'note'];
+
+    public static function create($row) {
+        $find['link_hash'] = md5($row['link']);
+        // Laravel 的代码提示是个问题
+        return parent::updateOrCreate($find, $row);
+    }
 
     public static function parseExcel($filepath) {
 
