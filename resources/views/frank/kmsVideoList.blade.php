@@ -75,7 +75,7 @@
             processing: true,
             columns: [
                 {data: 'item_group', name: 'item_group'},
-                {data: 'item_group_descr', name: 'item_group_descr'},
+                {data: 'brand_line', name: 'brand_line'},
                 {data: 'brand', name: 'brand'},
                 {data: 'item_model', name: 'item_model'},
                 {
