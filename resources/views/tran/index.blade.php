@@ -133,7 +133,36 @@ th,td,td>span {
 							}else{
 								$profits_score=0;
 							}
-							$fba_sales = round(array_get($data,'sales'),2)*$avg_star_score*$profits_score*$total_star_score*28;
+							
+							$month = date('m');
+							if($month>=12){
+								$month_v=2.5;
+							}elseif($month>=11){
+								$month_v=2;
+							}elseif($month>=10){
+								$month_v=1.5;
+							}elseif($month>=9){
+								$month_v=0.95;
+							}elseif($month>=8){
+								$month_v=1.05;
+							}elseif($month>=7){
+								$month_v=1;
+							}elseif($month>=6){
+								$month_v=0.9;
+							}elseif($month>=5){
+								$month_v=0.9;
+							}elseif($month>=4){
+								$month_v=0.9;
+							}elseif($month>=3){
+								$month_v=0.8;
+							}elseif($month>=2){
+								$month_v=0.8;
+							}else{
+								$month_v=0.9;
+							}
+							
+							
+							$fba_sales = round(array_get($data,'sales'),2)*$avg_star_score*$profits_score*$total_star_score*28*$month_v;
 							
 							if( array_get($data,'fba_stock')>=$fba_sales){
 								$fbm_add = '无需配货';
