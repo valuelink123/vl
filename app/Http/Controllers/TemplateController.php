@@ -34,11 +34,11 @@ class TemplateController extends Controller
      */
     public function index()
     {	
-		if(Auth::user()->admin){
+		//if(Auth::user()->admin){
 			$templates = new Templates;
-		}else{
-			$templates = Templates::where('user_id',$this->getUserId());
-		}
+		//}else{
+		//	$templates = Templates::where('user_id',$this->getUserId());
+		//}
         $templates = $templates->get()->toArray();
         return view('template/index',['templates'=>$templates,'users'=>$this->getUsers()]);
 
@@ -112,11 +112,11 @@ class TemplateController extends Controller
 
     public function destroy(Request $request,$id)
     {
-		if(Auth::user()->admin){
+		//if(Auth::user()->admin){
 			$templates = new Templates;
-		}else{
-			$templates = Templates::where('user_id',$this->getUserId());
-		}
+		//}else{
+			//$templates = Templates::where('user_id',$this->getUserId());
+		//}
 		
         $result =  $templates->where('id',$id)->delete();
 		if($result){
@@ -130,11 +130,11 @@ class TemplateController extends Controller
 
     public function edit(Request $request,$id)
     {
-		if(Auth::user()->admin){
+		//if(Auth::user()->admin){
 			$templates = new Templates;
-		}else{
-			$templates = Templates::where('user_id',$this->getUserId());
-		}
+		//}else{
+		//	$templates = Templates::where('user_id',$this->getUserId());
+		//}
         $template = $templates->where('id',$id)->first()->toArray();
         if(!$template){
             $request->session()->flash('error_message','Template not Exists');
@@ -150,11 +150,11 @@ class TemplateController extends Controller
 			'title' => 'required|string',
             'content' => 'required|string',
         ]);
-        if(Auth::user()->admin){
+        //if(Auth::user()->admin){
 			$templates = new Templates;
-		}else{
-			$templates = Templates::where('user_id',$this->getUserId());
-		}
+		//}else{
+			//$templates = Templates::where('user_id',$this->getUserId());
+		//}
         $seller_account = $templates->findOrFail($id);
         $seller_account->tag = $request->get('tag');
         $seller_account->title = $request->get('title');

@@ -60,14 +60,14 @@
                                     </div>
                                 </td>
 								<td>
-                                    <?php if(Auth::user()->admin){ ?>
+                                    <?php //if(Auth::user()->admin){ ?>
                                     <select class="form-control form-filter input-sm" name="user_id">
                                         <option value="">Select...</option>
                                         @foreach ($users as $user_id=>$user_name)
                                             <option value="{{$user_id}}">{{$user_name}}</option>
                                         @endforeach
                                     </select>
-                                    <?php } ?>
+                                    <?php //} ?>
                                 </td>
                                 <td>
                                     <select name="status" class="form-control form-filter input-sm">

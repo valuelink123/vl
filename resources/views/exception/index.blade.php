@@ -127,18 +127,18 @@
                                     
                                     <select class="form-control form-filter input-sm" name="group_id">
                                         <option value="">Group</option>
-										@foreach (array_get($mygroups,'groups',array()) as $group_id=>$group)
+										@foreach ($groups as $group_id=>$group)
 										
-											<option value="{{$group_id}}">{{array_get($groups,$group_id.'.group_name')}}</option>
+											<option value="{{$group_id}}">{{array_get($group,'group_name')}}</option>
 											
 										@endforeach
                                     </select>
 									
 									<select class="form-control form-filter input-sm" name="user_id">
                                         <option value="">User</option>
-										@foreach (array_get($mygroups,'users',array()) as $user_id=>$user)
+										@foreach ($users as $user_id=>$user)
 										
-											<option value="{{$user_id}}">{{array_get($users,$user_id)}}</option>
+											<option value="{{$user_id}}">{{$user}}</option>
 											
 										@endforeach
                                     </select>

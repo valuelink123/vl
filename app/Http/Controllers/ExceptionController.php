@@ -49,17 +49,17 @@ class ExceptionController extends Controller
     }
 	
 	public function export(Request $request){
-		if(Auth::user()->admin){
+		//if(Auth::user()->admin){
             $customers = new Exception;
-        }else{
-			$mgroup_ids  = array_get($this->getUserGroup(),'manage_groups',array());
-			$user_id  = Auth::user()->id;
-			$customers = Exception::where(function ($query) use ($mgroup_ids,$user_id) {
-                $query->whereIn('group_id'  , $mgroup_ids)
-						  ->orwhere('user_id', $user_id);
-
-            });
-        }
+        //}else{
+		//	$mgroup_ids  = array_get($this->getUserGroup(),'manage_groups',array());
+		//	$user_id  = Auth::user()->id;
+		//	$customers = Exception::where(function ($query) use ($mgroup_ids,$user_id) {
+        //        $query->whereIn('group_id'  , $mgroup_ids)
+		//				  ->orwhere('user_id', $user_id);
+//
+        //    });
+        //}
 		if(array_get($_REQUEST,'type')){
             $customers = $customers->where('type', array_get($_REQUEST,'type'));
         }
@@ -203,18 +203,18 @@ class ExceptionController extends Controller
 
      public function edit(Request $request,$id)
     {
-        if(Auth::user()->admin){
+        //if(Auth::user()->admin){
 			$rule= Exception::where('id',$id)->first();
-		}else{
-			$mgroup_ids  = array_get($this->getUserGroup(),'manage_groups',array());
-			$user_id  = Auth::user()->id;
-			$rule = Exception::where(function ($query) use ($mgroup_ids,$user_id) {
-
-                $query->whereIn('group_id'  , $mgroup_ids)
-						  ->orwhere('user_id', $user_id);
-
-            })->where('id',$id)->first();
-		}
+		//}else{
+//			$mgroup_ids  = array_get($this->getUserGroup(),'manage_groups',array());
+//			$user_id  = Auth::user()->id;
+//			$rule = Exception::where(function ($query) use ($mgroup_ids,$user_id) {
+//
+//                $query->whereIn('group_id'  , $mgroup_ids)
+//						  ->orwhere('user_id', $user_id);
+//
+//            })->where('id',$id)->first();
+//		}
         
         if(!$rule){
             $request->session()->flash('error_message','Exception not Exists');
@@ -350,18 +350,18 @@ class ExceptionController extends Controller
            // $records["customActionMessage"] = "Group action successfully has been completed. Well done!"; // pass custom message(useful for getting status of group actions)
             unset($updateDate);
         }
-        if(Auth::user()->admin){
+        //if(Auth::user()->admin){
             $customers = new Exception;
-        }else{
-			$mgroup_ids  = array_get($this->getUserGroup(),'manage_groups',array());
-			$user_id  = Auth::user()->id;
-			$customers = Exception::where(function ($query) use ($mgroup_ids,$user_id) {
-
-                $query->whereIn('group_id'  , $mgroup_ids)
-						  ->orwhere('user_id', $user_id);
-
-            });
-        }
+        //}else{
+//			$mgroup_ids  = array_get($this->getUserGroup(),'manage_groups',array());
+//			$user_id  = Auth::user()->id;
+//			$customers = Exception::where(function ($query) use ($mgroup_ids,$user_id) {
+//
+//                $query->whereIn('group_id'  , $mgroup_ids)
+//						  ->orwhere('user_id', $user_id);
+//
+//            });
+//        }
 		if(array_get($_REQUEST,'type')){
             $customers = $customers->where('type', array_get($_REQUEST,'type'));
         }
