@@ -1,6 +1,6 @@
 class Xformhelper {
     static autoTrim(selector) {
-        $(selector).keyup(e => {
+        $(selector).change(e => {
             let $this = $(e.target)
             $this.val($this.val().trim())
         })

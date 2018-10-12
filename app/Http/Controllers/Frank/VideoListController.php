@@ -20,11 +20,16 @@ class VideoListController extends Controller {
     }
 
     public function import() {
-        $vars['itemGroups'] = $this->queryFields('SELECT item_group FROM asin GROUP BY item_group');
-        $vars['brands'] = $this->queryFields('SELECT brand FROM asin GROUP BY brand');
+
         // 一对多关系，很实用的 SQL 语句
-        $vars['itemGroupModels'] = $this->queryRows('SELECT item_group,GROUP_CONCAT(DISTINCT item_model) item_models FROM asin GROUP BY item_group');
+        $rows = $this->queryRows('SELECT item_group,brand,GROUP_CONCAT(DISTINCT item_model) AS item_models FROM asin GROUP BY item_group,brand');
+
+        foreach ($rows as $row) {
+            $vars['itemGroupBrandModels'][$row['item_group']][$row['brand']] = explode(',', $row['item_models']);
+        }
+
         $vars['types'] = $this->enumOptions('kms_video', 'type');
+
         return view('frank/kmsVideoCreate', $vars);
     }
 

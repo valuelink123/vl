@@ -27,38 +27,21 @@
                     <div class="form-group">
                         <label>
                             Item Group
-                            <input required autocomplete="off" class="xform-autotrim form-control" placeholder="Item Group" name="item_group" list="list-item-group" id="item_group"/>
-                            <datalist id="list-item-group">
-                                @foreach($itemGroups as $itemGroup)
-                                    <option value="{!! $itemGroup !!}">
-                                @endforeach
-                            </datalist>
+                            <input required autocomplete="off" class="xform-autotrim form-control" placeholder="Item Group" name="item_group" id="item_group"/>
                         </label>
                     </div>
 
                     <div class="form-group">
                         <label>
                             Brand
-                            <input required autocomplete="off" class="xform-autotrim form-control" placeholder="Brand" name="brand" list="list-brand" id="brand"/>
-                            <datalist id="list-brand">
-                                @foreach($brands as $brand)
-                                    <option value="{!! $brand !!}">
-                                @endforeach
-                            </datalist>
+                            <input required autocomplete="off" class="xform-autotrim form-control" placeholder="Brand" name="brand" id="brand"/>
                         </label>
                     </div>
 
                     <div class="form-group">
                         <label>
                             Item Model
-                            <input required autocomplete="off" class="xform-autotrim form-control" placeholder="Item Model" name="item_model" list="" id="item_model"/>
-                            @foreach($itemGroupModels as $itemGroupModel)
-                                <datalist id="list-{!! $itemGroupModel['item_group'] !!}">
-                                    @foreach(explode(',', $itemGroupModel['item_models']) as $item_model)
-                                        <option value="{!! $item_model !!}">
-                                    @endforeach
-                                </datalist>
-                            @endforeach
+                            <input required autocomplete="off" class="xform-autotrim form-control" placeholder="Item Model" name="item_model" id="item_model"/>
                         </label>
                     </div>
 
@@ -91,7 +74,7 @@
                     <div class="form-group">
                         <label>
                             Note
-                            <input autocomplete="off" class="form-control" placeholder="Note" name="note"/>
+                            <input autocomplete="off" class="xform-autotrim form-control" placeholder="Note" name="note"/>
                         </label>
                     </div>
 
@@ -130,27 +113,9 @@
     </div>
 
     <script>
-        $(item_group).change(() => {
 
-            item_model.value = ''
-            item_model.setAttribute('list', '')
+        new LinkageInput([item_group, brand, item_model], @json($itemGroupBrandModels))
 
-            if ($(`#list-item-group option[value="${item_group.value}"]`).length > 0) {
-                item_model.setAttribute('list', `list-${item_group.value}`)
-            } else {
-                item_group.value = ''
-            }
-        })
-
-        $(brand).change(() => {
-            if ($(`#list-brand option[value="${brand.value}"]`).length) return
-            brand.value = ''
-        })
-
-        $(item_model).change(() => {
-            if (item_group.value && $(`#list-${item_group.value} option[value="${item_model.value}"]`).length) return
-            item_model.value = ''
-        })
     </script>
 
 @endsection

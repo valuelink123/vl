@@ -86,6 +86,28 @@ function objectFilte(obj, keys = [], except = true) {
     return result
 }
 
+function bindDelayEvents(eles, eTypes, callback, ...moreargs) {
+
+    let stid = 0
+
+    function func(...args) {
+        clearTimeout(stid)
+        stid = setTimeout(callback.bind(this, ...args), 16)
+    }
+
+    // 既可以是数组，也可以是空格分隔的字符串
+    (eTypes instanceof Array) || (eTypes = eTypes.split(/\s+/));
+    (eles instanceof Element) && (eles = [eles]);
+    (eles instanceof Array) || (eles = eles.split(','));
+
+    for (let eType of eTypes) {
+        for (let ele of eles) {
+            (ele instanceof Element) || (ele = document.querySelector(ele));
+            ele && ele.addEventListener(eType, func, ...moreargs);
+        }
+    }
+}
+
 /**
  * 选中文本
  */

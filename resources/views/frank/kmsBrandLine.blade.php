@@ -89,7 +89,7 @@
 
             new LinkageInput([item_group, brand, item_model], @json($itemGroupBrandModels))
 
-            LinkageInput.bindDelayEvents([item_group, brand, item_model], 'change', () => $theTable.api().ajax.reload())
+            bindDelayEvents([item_group, brand, item_model], 'change', () => $theTable.api().ajax.reload())
         }
         // end init
 
