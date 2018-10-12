@@ -40,28 +40,43 @@ class LinkageInput {
 
     static initLinkage(eleInputs, data) {
 
-        function getListByLayer(layer) {
 
-            let obj = data
+        function getListByLayer(targetLayer) {
 
-            for (let i = 0; i < layer; i++) {
-                obj = obj[eleInputs[i].value]
-                if (!obj) return []
+            let layerValueSet = new Set() // 使用集合来去重
+
+            function walk(obj, layer = 0) {
+
+                if (0 === layer - targetLayer) {
+
+                    let values = (obj instanceof Array) ? obj : Object.keys(obj)
+
+                    for (let value of values) layerValueSet.add(value)
+
+                } else if (layer < targetLayer && !(obj instanceof Array)) {
+
+                    let inputValue = eleInputs[layer].value
+
+                    let objs = inputValue.trim() ? [obj[inputValue]] : Object.values(obj)
+
+                    for (let obj of objs) obj && walk(obj, layer + 1)
+
+                }
+
             }
 
-            return (obj instanceof Array) ? obj : Object.keys(obj)
-        }
+            walk(data)
 
+            return layerValueSet
+        }
 
         for (let i = 0; i < eleInputs.length - 1; i++) {
 
-            this.bindDelayEvents(eleInputs[i], 'change', () => {
+            eleInputs[i].addEventListener('change', () => {
                 let nextInput = eleInputs[i + 1]
                 let values = getListByLayer(i + 1)
-                if (values.indexOf(nextInput.value) < 0) nextInput.value = ''
-                this.setDataList(nextInput, values)
-                // 通过代码修改 input.value，不会触发 change 事件？
-                // 那就手动触发
+                if (!values.has(nextInput.value)) nextInput.value = ''
+                // 通过代码修改 input.value，不会触发 change 事件，需要手动触发
                 nextInput.dispatchEvent(new Event('change'))
             })
         }
@@ -69,35 +84,14 @@ class LinkageInput {
         for (let i = 0; i < eleInputs.length; i++) {
             let eleInput = eleInputs[i]
             eleInput.addEventListener('focus', () => {
-                let dataListId = 'list-' + eleInput.id
-                let values = getListByLayer(i)
-                if (!document.getElementById(dataListId)) this.setDataList(eleInput, values)
+                let lastfilter = eleInputs.slice(0, i).map(ele => ele.value.trim()).join('')
+                if (eleInput.lastfilter !== lastfilter) {
+                    eleInput.lastfilter = lastfilter
+                    this.setDataList(eleInput, getListByLayer(i))
+                }
             })
         }
 
-        this.setDataList(eleInputs[0], getListByLayer(0))
-
     }
 
-    static bindDelayEvents(eles, eTypes, callback, ...moreargs) {
-
-        let stid = 0
-
-        function func(...args) {
-            clearTimeout(stid)
-            stid = setTimeout(callback.bind(this, ...args), 16)
-        }
-
-        // 既可以是数组，也可以是空格分隔的字符串
-        (eTypes instanceof Array) || (eTypes = eTypes.split(/\s+/));
-        (eles instanceof Element) && (eles = [eles]);
-        (eles instanceof Array) || (eles = eles.split(','));
-
-        for (let eType of eTypes) {
-            for (let ele of eles) {
-                (ele instanceof Element) || (ele = document.querySelector(ele));
-                ele && ele.addEventListener(eType, func, ...moreargs);
-            }
-        }
-    }
 }

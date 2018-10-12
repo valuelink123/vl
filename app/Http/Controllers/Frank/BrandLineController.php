@@ -19,8 +19,6 @@ class BrandLineController extends Controller {
     public function index() {
         // print_r(array_keys($GLOBALS));
 
-        $itemGroupBrandModels = [];
-
         $rows = $this->queryRows('SELECT item_group,brand,GROUP_CONCAT(DISTINCT item_model) AS item_models FROM asin GROUP BY item_group,brand');
 
         foreach ($rows as $row) {

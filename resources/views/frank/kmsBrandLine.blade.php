@@ -26,21 +26,21 @@
                     <div class="col-md-3">
                         <div class="input-group">
                             <span class="input-group-addon">Item Group</span>
-                            <input type="text" class="form-control" placeholder="Item Group..." id="item_group" autocomplete="off"/>
+                            <input type="text" class="xform-autotrim form-control" placeholder="Item Group..." id="item_group" autocomplete="off"/>
                         </div>
                     </div>
 
                     <div class="col-md-3">
                         <div class="input-group">
                             <span class="input-group-addon">Brand</span>
-                            <input type="text" class="form-control" placeholder="Brand..." id="brand" autocomplete="off"/>
+                            <input type="text" class="xform-autotrim form-control" placeholder="Brand..." id="brand" autocomplete="off"/>
                         </div>
                     </div>
 
                     <div class="col-md-3">
                         <div class="input-group">
                             <span class="input-group-addon">Model</span>
-                            <input type="text" class="form-control" placeholder="Item Model..." id="item_model" autocomplete="off"/>
+                            <input type="text" class="xform-autotrim form-control" placeholder="Item Model..." id="item_model" autocomplete="off"/>
                         </div>
                     </div>
 
@@ -89,7 +89,7 @@
 
             new LinkageInput([item_group, brand, item_model], @json($itemGroupBrandModels))
 
-            $([item_group, brand, item_model]).change(() => $theTable.api().ajax.reload())
+            bindDelayEvents([item_group, brand, item_model], 'change', () => $theTable.api().ajax.reload())
         }
         // end init
 
