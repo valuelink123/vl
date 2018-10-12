@@ -40,16 +40,45 @@ class LinkageInput {
 
     static initLinkage(eleInputs, data) {
 
+
+        function getLayerMergeSet(targetLayer) {
+
+            let layerValueSet = new Set() // 使用集合来去重
+
+            function walk(obj, layer = 0) {
+
+                if (0 === layer - targetLayer) {
+
+                    let values = (obj instanceof Array) ? obj : Object.keys(obj)
+
+                    for (let value of values) layerValueSet.add(value)
+
+                } else if (layer < targetLayer && !(obj instanceof Array)) {
+
+                    for (let child of Object.values(obj)) walk(child, layer + 1)
+
+                }
+
+            }
+
+            walk(data)
+
+            return layerValueSet
+        }
+
         function getListByLayer(layer) {
 
             let obj = data
 
             for (let i = 0; i < layer; i++) {
                 obj = obj[eleInputs[i].value]
-                if (!obj) return []
+                if (!obj) {
+                    let filtered = eleInputs.slice(0, layer).map(ele => ele.value).join('').trim()
+                    return filtered ? new Set() : getLayerMergeSet(layer)
+                }
             }
 
-            return (obj instanceof Array) ? obj : Object.keys(obj)
+            return (obj instanceof Array) ? new Set(obj) : new Set(Object.keys(obj))
         }
 
 
@@ -58,10 +87,9 @@ class LinkageInput {
             this.bindDelayEvents(eleInputs[i], 'change', () => {
                 let nextInput = eleInputs[i + 1]
                 let values = getListByLayer(i + 1)
-                if (values.indexOf(nextInput.value) < 0) nextInput.value = ''
+                if (!values.has(nextInput.value)) nextInput.value = ''
                 this.setDataList(nextInput, values)
-                // 通过代码修改 input.value，不会触发 change 事件？
-                // 那就手动触发
+                // 通过代码修改 input.value，不会触发 change 事件，需要手动触发
                 nextInput.dispatchEvent(new Event('change'))
             })
         }
@@ -70,8 +98,7 @@ class LinkageInput {
             let eleInput = eleInputs[i]
             eleInput.addEventListener('focus', () => {
                 let dataListId = 'list-' + eleInput.id
-                let values = getListByLayer(i)
-                if (!document.getElementById(dataListId)) this.setDataList(eleInput, values)
+                if (!document.getElementById(dataListId)) this.setDataList(eleInput, getListByLayer(i))
             })
         }
 

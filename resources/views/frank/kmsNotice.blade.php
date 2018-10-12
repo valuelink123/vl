@@ -17,18 +17,18 @@
                 <div class="col-lg-3">
                     <div class="input-group">
                         <span class="input-group-addon">Item Group</span>
-                        <input type="text" class="form-control" placeholder="Item Group..." id="item_group" autocomplete="off"/>
+                        <input type="text" class="xform-autotrim form-control" placeholder="Item Group..." id="item_group" autocomplete="off"/>
                     </div>
                 </div>
                 <div class="col-lg-3">
                     <div class="input-group">
                         <span class="input-group-addon">Item Model</span>
-                        <input type="text" class="form-control" placeholder="Item Model..." id="item_model" autocomplete="off"/>
+                        <input type="text" class="xform-autotrim form-control" placeholder="Item Model..." id="item_model" autocomplete="off"/>
                     </div>
                 </div>
                 <div class="col-lg-3">
                     <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Fuzzy search..." id="fuzzysearch" autocomplete="off"/>
+                        <input type="text" class="xform-autotrim form-control" placeholder="Fuzzy search..." id="fuzzysearch" autocomplete="off"/>
                         <span class="input-group-btn">
                             <button class="btn btn-default" type="button" id="dosearch">Search!</button>
                         </span>
