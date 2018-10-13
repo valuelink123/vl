@@ -26,27 +26,27 @@
                     <div class="col-md-2">
                         <div class="input-group">
                             <span class="input-group-addon">Item Group</span>
-                            <input type="text" class="xform-autotrim form-control" placeholder="Item Group..." id="item_group" autocomplete="off"/>
+                            <input type="text" class="xform-autotrim form-control" data-init-by-query="ands.item_group" placeholder="Item Group..." id="item_group" autocomplete="off"/>
                         </div>
                     </div>
 
                     <div class="col-md-2">
                         <div class="input-group">
                             <span class="input-group-addon">Brand</span>
-                            <input type="text" class="xform-autotrim form-control" placeholder="Brand..." id="brand" autocomplete="off"/>
+                            <input type="text" class="xform-autotrim form-control" data-init-by-query="ands.brand" placeholder="Brand..." id="brand" autocomplete="off"/>
                         </div>
                     </div>
 
                     <div class="col-md-2">
                         <div class="input-group">
                             <span class="input-group-addon">Model</span>
-                            <input type="text" class="xform-autotrim form-control" placeholder="Item Model..." id="item_model" autocomplete="off"/>
+                            <input type="text" class="xform-autotrim form-control" data-init-by-query="ands.item_model" placeholder="Item Model..." id="item_model" autocomplete="off"/>
                         </div>
                     </div>
 
                     <div class="col-md-2">
                         <div class="input-group">
-                            <input type="text" class="xform-autotrim form-control" placeholder="Fuzzy search..." id="fuzzysearch" autocomplete="off"/>
+                            <input type="text" class="xform-autotrim form-control" data-init-by-query="value" placeholder="Fuzzy search..." id="fuzzysearch" autocomplete="off"/>
                             <span class="input-group-btn">
                                 <button class="btn btn-default" type="button" id="dosearch">Search!</button>
                             </span>
@@ -89,15 +89,8 @@
 
         // init
         {
-            let query = queryStringToObject() || {ands: {}}
-
-            item_group.value = query.ands.item_group || ''
-            brand.value = query.ands.brand || ''
-            item_model.value = query.ands.item_model || ''
-            fuzzysearch.value = query.value || ''
-
+            XFormHelper.initByQuery('[data-init-by-query]')
             new LinkageInput([item_group, brand, item_model], @json($itemGroupBrandModels))
-
             bindDelayEvents([item_group, brand, item_model], 'change', () => $theTable.api().ajax.reload())
             bindDelayEvents(fuzzysearch, 'change keyup paste', () => $theTable.api().ajax.reload())
             $(dosearch).click(() => $theTable.api().ajax.reload())
@@ -106,11 +99,16 @@
 
 
         $theTable.on('preXhr.dt', (e, settings, data) => {
-            let ands = data.search.ands = {}
-            ands.item_group = item_group.value
-            ands.brand = brand.value
-            ands.item_model = item_model.value
-            data.search.value = fuzzysearch.value
+
+            Object.assign(data.search, {
+                value: fuzzysearch.value,
+                ands: {
+                    item_group: item_group.value,
+                    brand: brand.value,
+                    item_model: item_model.value
+                }
+            })
+
             history.replaceState(null, null, '?' + objectToQueryString(data.search))
         })
 
