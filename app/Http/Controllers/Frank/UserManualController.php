@@ -19,6 +19,9 @@ class UserManualController extends Controller {
         return view('frank/kmsUserManual');
     }
 
+    /**
+     * @throws \App\Traits\MysqliException
+     */
     public function import() {
 
         $rows = $this->queryRows('SELECT item_group,brand,GROUP_CONCAT(DISTINCT item_model) AS item_models FROM asin GROUP BY item_group,brand');
@@ -30,6 +33,10 @@ class UserManualController extends Controller {
         return view('frank/kmsUserManualCreate', $vars);
     }
 
+    /**
+     * @throws \App\Exceptions\DataImportException
+     * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
+     */
     public function create(Request $req) {
 
         KmsUserManual::import($req);
@@ -45,12 +52,15 @@ class UserManualController extends Controller {
         return redirect('/kms/usermanual/import');
     }
 
+    /**
+     * @throws \App\Traits\MysqliException
+     * @throws \App\Traits\DataTablesException
+     */
     public function get(Request $req) {
 
         $where = $this->dtWhere($req, ['t2.sellersku', 't1.brand', 't2.brand_line', 't2.asin', 't2.item_no', 't1.item_group', 't1.item_model'], ['item_group' => 't1.item_group', 'brand' => 't1.brand', 'item_model' => 't1.item_model']);
         $orderby = $this->dtOrderBy($req);
         $limit = $this->dtLimit($req);
-        // todo item_group_descr
         // todo UPDATE asin SET xxx=TRIM(IFNULL(xxx, ''))
         $sql = "
 SELECT SQL_CALC_FOUND_ROWS

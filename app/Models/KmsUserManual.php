@@ -7,6 +7,7 @@
 
 namespace App\Models;
 
+use App\Exceptions\DataImportException;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Model;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -21,6 +22,11 @@ class KmsUserManual extends Model {
         return parent::updateOrCreate($find, $row);
     }
 
+    /**
+     * @param $filepath
+     * @return array
+     * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
+     */
     public static function parseExcel($filepath) {
 
         $spreadsheet = IOFactory::load($filepath);
@@ -61,7 +67,8 @@ class KmsUserManual extends Model {
     /**
      * 从 Excel 导入到 MySQL
      * @param Request $req
-     * @throws \Exception
+     * @throws DataImportException
+     * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
      */
     public static function import(Request $req) {
 
@@ -71,15 +78,15 @@ class KmsUserManual extends Model {
 
         } elseif (empty($_FILES['excelfile']['size'])) {
 
-            throw new \Exception('Please check the validity of the Excel file!');
+            throw new DataImportException('Please check the validity of the Excel file!', 100);
 
         } elseif ($_FILES['excelfile']['error']) {
 
-            throw new \Exception("Upload error: {$_FILES['excelfile']['error']}");
+            throw new DataImportException("Upload error: {$_FILES['excelfile']['error']}", 101);
 
         } elseif ($_FILES['excelfile']['size'] > 5 * 1204 * 1204) {
 
-            throw new \Exception('File exceeds 5M limit!');
+            throw new DataImportException('File exceeds 5M limit!', 102);
 
         } else {
 
@@ -89,7 +96,7 @@ class KmsUserManual extends Model {
 
         if (empty($rows)) {
 
-            throw new \Exception('Import failed: Excel is empty or format error!');
+            throw new DataImportException('Import failed: Excel is empty or format error!', 103);
 
         }
 

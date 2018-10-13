@@ -23,33 +23,41 @@
             <div class="table-toolbar">
                 <div class="row">
 
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <div class="input-group">
                             <span class="input-group-addon">Item Group</span>
                             <input type="text" class="xform-autotrim form-control" placeholder="Item Group..." id="item_group" autocomplete="off"/>
                         </div>
                     </div>
 
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <div class="input-group">
                             <span class="input-group-addon">Brand</span>
                             <input type="text" class="xform-autotrim form-control" placeholder="Brand..." id="brand" autocomplete="off"/>
                         </div>
                     </div>
 
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <div class="input-group">
                             <span class="input-group-addon">Model</span>
                             <input type="text" class="xform-autotrim form-control" placeholder="Item Model..." id="item_model" autocomplete="off"/>
                         </div>
                     </div>
 
-                    <div class="col-md-3">
+                    <div class="col-md-2">
+                        <div class="input-group">
+                            <input type="text" class="xform-autotrim form-control" placeholder="Fuzzy search..." id="fuzzysearch" autocomplete="off"/>
+                            <span class="input-group-btn">
+                                <button class="btn btn-default" type="button" id="dosearch">Search!</button>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
                         <div class="btn-group " style="float:right;">
                             <button id="vl_list_export" class="btn sbold blue"> Export
                                 <i class="fa fa-download"></i>
                             </button>
-
                         </div>
                     </div>
                 </div>
@@ -81,15 +89,18 @@
 
         // init
         {
-            let ands = queryStringToObject().ands || {}
+            let query = queryStringToObject() || {ands: {}}
 
-            item_group.value = ands.item_group || ''
-            brand.value = ands.brand || ''
-            item_model.value = ands.item_model || ''
+            item_group.value = query.ands.item_group || ''
+            brand.value = query.ands.brand || ''
+            item_model.value = query.ands.item_model || ''
+            fuzzysearch.value = query.value || ''
 
             new LinkageInput([item_group, brand, item_model], @json($itemGroupBrandModels))
 
             bindDelayEvents([item_group, brand, item_model], 'change', () => $theTable.api().ajax.reload())
+            bindDelayEvents(fuzzysearch, 'change keyup paste', () => $theTable.api().ajax.reload())
+            $(dosearch).click(() => $theTable.api().ajax.reload())
         }
         // end init
 
@@ -99,11 +110,13 @@
             ands.item_group = item_group.value
             ands.brand = brand.value
             ands.item_model = item_model.value
+            data.search.value = fuzzysearch.value
             history.replaceState(null, null, '?' + objectToQueryString(data.search))
         })
 
         $theTable.dataTable({
-            search: {search: queryStringToObject().value},
+            searching: false, // 不使用自带的搜索框
+            // search: {search: queryStringToObject().value},
             serverSide: true,
             pagingType: 'bootstrap_extended',
             processing: true,
