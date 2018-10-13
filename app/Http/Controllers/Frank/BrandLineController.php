@@ -43,14 +43,14 @@ t1.item_model,
 ANY_VALUE(t1.brand_line) AS brand_line,
 t2.manualink,
 IF(ISNULL(t3.item_group), 0, 1) AS has_video,
-COUNT(t4.item_no) AS has_stock_info
+COUNT(t4.item_code) AS has_stock_info
 FROM asin t1
 LEFT JOIN (SELECT item_group,brand,item_model,any_value(link) manualink FROM kms_user_manual GROUP BY item_group,brand,item_model) t2
 USING(item_group,brand,item_model)
 LEFT JOIN (SELECT DISTINCT item_group,brand,item_model FROM kms_video) t3
 USING(item_group,brand,item_model)
-LEFT JOIN (SELECT item_code AS item_no FROM fba_stock INNER JOIN fbm_stock USING(item_code)) t4
-USING(item_no)
+LEFT JOIN kms_stock t4
+ON t4.item_code=t1.item_no
 WHERE $where
 GROUP BY item_group,brand,item_model
 ORDER BY $orderby
