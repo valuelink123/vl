@@ -10,10 +10,10 @@
         headers: {'X-CSRF-TOKEN': '{!! csrf_token() !!}'}
     })
 </script>
-<script src="/js/frank/prototypes.js?v=121"></script>
-<script src="/js/frank/functions.js?v=121"></script>
-<script src="/js/frank/linkageInput.js?v=124"></script>
-<script src="/js/frank/xformhelper.js?v=113"></script>
+<script src="/js/frank/prototypes.js?v={!! $jsversion = time() !!}"></script>
+<script src="/js/frank/functions.js?v={!! $jsversion !!}"></script>
+<script src="/js/frank/linkageInput.js?v={!! $jsversion !!}"></script>
+<script src="/js/frank/xformhelper.js?v={!! $jsversion !!}"></script>
 <script>
 
 </script>

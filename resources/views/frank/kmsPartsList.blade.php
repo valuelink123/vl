@@ -144,7 +144,7 @@
                         $.post('/kms/partslist/subitems', {item_code}).success(rows => {
                             if (rows.length > 0) {
                                 if (false === rows[0]) return
-                                $(`.ctrl-${item_code}`).parent().removeClass('disabled')
+                                $(`#thetable .ctrl-${item_code}`).parent().removeClass('disabled')
                             }
                         })
                     }
