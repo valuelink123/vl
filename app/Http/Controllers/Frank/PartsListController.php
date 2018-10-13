@@ -48,11 +48,17 @@ class PartsListController extends Controller {
 
         if (empty($subCodes)) return [];
 
-        return DB::table('fba_stock AS t1')
-            ->select(DB::raw('t1.item_code,t1.asin,t1.fba_stock,t1.fba_transfer,t2.fbm_stock,t2.item_name'))
-            ->join('fbm_stock AS t2', 't1.item_code', '=', 't2.item_code')
-            ->whereIn('t1.item_code', $subCodes)
+        return DB::table('kms_stock')
+            ->select('item_code', 'asin', 'fba_stock', 'fba_transfer', 'fbm_stock', 'item_name')
+            ->whereIn('item_code', $subCodes)
             ->get();
+
+        // 改用视图
+        // return DB::table('fba_stock AS t1')
+        //     ->select(DB::raw('t1.item_code,t1.asin,t1.fba_stock,t1.fba_transfer,t2.fbm_stock,t2.item_name'))
+        //     ->join('fbm_stock AS t2', 't1.item_code', '=', 't2.item_code')
+        //     ->whereIn('t1.item_code', $subCodes)
+        //     ->get();
         // ->toSql();
 
         // DB::enableQueryLog();
@@ -65,10 +71,14 @@ class PartsListController extends Controller {
 
         $where = $this->dtWhere($req, ['item_code', 'item_name', 'asin', 'seller_id', 'seller_name', 'seller_sku'], ['item_group' => 't3.item_group', 'brand' => 't3.brand', 'item_model' => 't3.item_model']);
 
-
         $orderby = $this->dtOrderBy($req);
         $limit = $this->dtLimit($req);
-        // todo outer join
+
+        // FROM fba_stock t1
+        // INNER JOIN fbm_stock t2
+        // USING(item_code)
+        // 由于 INNER JOIN 导致数据不全，弃用
+
         $sql = "
 SELECT SQL_CALC_FOUND_ROWS
 t1.item_code,
@@ -77,11 +87,9 @@ t1.asin,
 t1.seller_sku,
 t1.fba_stock,
 t1.fba_transfer,
-t2.fbm_stock,
-t2.item_name
-FROM fba_stock t1
-INNER JOIN fbm_stock t2
-USING(item_code)
+t1.fbm_stock,
+t1.item_name
+FROM kms_stock t1
 LEFT JOIN (SELECT ANY_VALUE(item_group) AS item_group,ANY_VALUE(brand) AS brand,ANY_VALUE(item_model) AS item_model,item_no AS item_code FROM asin GROUP BY item_no) t3
 USING(item_code)
 WHERE $where
