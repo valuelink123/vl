@@ -91,7 +91,7 @@ trait DataTables {
      * ORDER BY
      * @param Request $req
      * @return string
-     * @throws \Exception
+     * @throws DataTablesException
      */
     protected function dtOrderBy(Request $req) {
 
@@ -105,7 +105,7 @@ trait DataTables {
             $field = empty($obj['field']) ? $columns[$obj['column']]['name'] : $obj['field'];
 
             if (!preg_match('#^\w+$#', $field) || !preg_match('#^asc|desc$#i', $obj['dir'])) {
-                throw new \Exception("INPUT ERROR: ORDER BY {$field} {$obj['dir']}", 101);
+                throw new DataTablesException("INPUT ERROR: ORDER BY {$field} {$obj['dir']}", 101);
             }
 
             $orderby[] = "{$field} {$obj['dir']}";
@@ -113,4 +113,8 @@ trait DataTables {
 
         return implode(',', $orderby);
     }
+}
+
+class DataTablesException extends \Exception {
+
 }

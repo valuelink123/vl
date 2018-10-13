@@ -178,7 +178,7 @@
             })
 
             $([item_group, item_model]).change(loadData)
-            LinkageInput.bindDelayEvents(fuzzysearch, 'change keyup paste', loadData)
+            bindDelayEvents(fuzzysearch, 'change keyup paste', loadData)
 
             $(dosearch).click(loadData)
 

@@ -36,6 +36,9 @@ class SapRfcRequest {
         $this->appsecret = $appsecret;
     }
 
+    /**
+     * @throws SapRfcRequestException
+     */
     public function __call($method, $arguments) {
 
         $appid = $this->appid;
@@ -68,7 +71,7 @@ class SapRfcRequest {
 
         } catch (\Exception $e) {
 
-            throw new \Exception('System Network Error: ' . $e->getMessage());
+            throw new SapRfcRequestException('System Network Error.', 100, $e);
         }
 
         $json = json_decode($json, true);
@@ -78,14 +81,18 @@ class SapRfcRequest {
         // 失败 {"method":"getOrder","orderId":"028-8067324-23275401","result":0,"message":"Data Auth Failed!"}
 
         if (!isset($json['result'])) {
-            throw new \Exception('System Data Decode Failed.');
+            throw new SapRfcRequestException('System Data Decode Failed.', 101);
         } else if (1 == $json['result']) {
             return $json['data'];
         } else if ('No matching data!' === $json['message']) {
             // 垃圾设计，把 无结果 和 错误 混在一起了！
             return [];
         } else {
-            throw new \Exception($json['message']);
+            throw new SapRfcRequestException($json['message'], 102);
         }
     }
+}
+
+class SapRfcRequestException extends \Exception {
+
 }

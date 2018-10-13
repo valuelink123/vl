@@ -24,17 +24,29 @@ trait Mysqli {
         // }
     }
 
+    /**
+     * 执行SQL，并返回所有行
+     * @param $sql
+     * @return array
+     * @throws MysqliException
+     */
     protected function queryRows($sql, $resulttype = MYSQLI_ASSOC) {
         $this->initMysqli();
         $res = $this->_mysqli->query($sql);
         if (!$res) {
-            throw new \Exception('SQL ERROR: ' . $this->_mysqli->error, 100);
+            throw new MysqliException($this->_mysqli->error, 100);
         }
         $rows = $res->fetch_all($resulttype);
         $res->free();
         return $rows;
     }
 
+    /**
+     * 执行SQL，以一维数组形式返回结果中所有行的第一个字段的值
+     * @param $sql
+     * @return array
+     * @throws MysqliException
+     */
     protected function queryFields($sql) {
         $fields = [];
         $rows = $this->queryRows($sql);
@@ -44,16 +56,36 @@ trait Mysqli {
         return $fields;
     }
 
+    /**
+     * 执行SQL，返回结果的第一行
+     * 若无结果，返回空数组
+     * @param $sql
+     * @return array
+     * @throws MysqliException
+     */
     protected function queryRow($sql, $resulttype = MYSQLI_ASSOC) {
         $rows = $this->queryRows($sql, $resulttype);
         return empty($rows) ? [] : current($rows);
     }
 
+    /**
+     * 执行SQL，返回结果的第一行中的第一个字段的值
+     * @param $sql
+     * @return string|null
+     * @throws MysqliException
+     */
     protected function queryOne($sql, $resulttype = MYSQLI_ASSOC) {
         $row = $this->queryRow($sql, $resulttype);
         return empty($row) ? null : current($row);
     }
 
+    /**
+     * 获取 Enum 枚举字段所有可能值
+     * @param $table
+     * @param $field
+     * @return array
+     * @throws MysqliException
+     */
     protected function enumOptions($table, $field) {
         $info = $this->queryRow("SHOW COLUMNS FROM $table WHERE Field='$field'");
         $strs = explode("'", $info['Type']);
@@ -68,4 +100,8 @@ trait Mysqli {
         if ($this->_mysqli) $this->_mysqli->close();
         parent::__destruct();
     }
+}
+
+class MysqliException extends \Exception {
+
 }
