@@ -25,6 +25,7 @@ WHERE id < maxid
      * Run the migrations.
      *
      * @return void
+     * @throws Exception
      */
     public function up() {
         // 此处事务不起作用？

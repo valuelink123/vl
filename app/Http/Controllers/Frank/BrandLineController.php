@@ -7,6 +7,9 @@
 
 namespace App\Http\Controllers\Frank;
 
+use App\Asin;
+use App\Models\KmsUserManual;
+use App\Models\KmsVideo;
 use Illuminate\Http\Request;
 
 // use Illuminate\Support\Facades\DB;
@@ -62,6 +65,70 @@ SQL;
         $total = $this->queryOne('SELECT FOUND_ROWS()');
 
         return ['data' => $rows, 'recordsTotal' => $total, 'recordsFiltered' => $total];
+    }
+
+    /**
+     * @throws \App\Traits\MysqliException
+     */
+    public function getEmailDetailRightBar(Request $req) {
+
+        $asinRows = $req->input('asinRows', []);
+
+        if (empty($asinRows)) return [];
+
+        // $where = [];
+        //
+        // foreach ($asinRows as $row) {
+        //
+        //     // if (!preg_match('#^[\w.]+$#', $row['site'])) throw new DataInputException("Site - {$row['site']} format error.", 100);
+        //     // if (!preg_match('#^\w+$#', $row['asin'])) throw new DataInputException("Asin - {$row['asin']} format error.", 100);
+        //     // if (!preg_match('#^[\w-]+$#', $row['sellersku'])) throw new DataInputException("SellerSKU - {$row['sellersku']} format error.", 100);
+        //
+        //     foreach ($row as &$field) $field = addslashes($field);
+        //
+        //     $where[] = "(site='{$row['site']}' AND asin='{$row['asin']}' AND sellersku='{$row['sellersku']}')";
+        // }
+        //
+        // $where = implode(' OR ', $where);
+        //
+        // $xxx = Asin::select('item_group', 'brand', 'item_model')->whereRaw($where)->orWhereRaw($where)->toSql();
+
+        $modelRows = Asin::select('item_group', 'brand', 'item_model')->where(function ($where) use ($asinRows) {
+            foreach ($asinRows as $row) {
+                $where->orWhere(function ($where) use ($row) {
+                    $where->where('site', $row['site']);
+                    $where->where('asin', $row['asin']);
+                    $where->where('sellersku', $row['sellersku']);
+                });
+            }
+        })->get();
+
+        if (empty($modelRows)) return [];
+
+        // 能不用 JOIN 就尽量不用
+        // 有唯一索引，不用那么绕
+        // 不过 Eloquent 也真够绕的
+        $manuals = KmsUserManual::select('link')->where(function ($where) use ($modelRows) {
+            foreach ($modelRows as $row) {
+                $where->orWhere(function ($where) use ($row) {
+                    $where->where('brand', $row->brand);
+                    $where->where('item_group', $row->item_group);
+                    $where->where('item_model', $row->item_model);
+                });
+            }
+        })->get();
+
+        $videos = KmsVideo::select('link')->where(function ($where) use ($modelRows) {
+            foreach ($modelRows as $row) {
+                $where->orWhere(function ($where) use ($row) {
+                    $where->where('brand', $row->brand);
+                    $where->where('item_group', $row->item_group);
+                    $where->where('item_model', $row->item_model);
+                });
+            }
+        })->get();
+
+        return compact('manuals', 'videos');
     }
 
 }

@@ -90,7 +90,7 @@
 
         // init
         {
-            XFormHelper.initByQuery('[data-init-by-query]')
+            XFormHelper.initByQuery('.form-control[data-init-by-query]')
             new LinkageInput([item_group, brand, item_model], @json($itemGroupBrandModels))
             bindDelayEvents([item_group, brand, item_model], 'change', () => $theTable.api().ajax.reload())
             bindDelayEvents(fuzzysearch, 'change keyup paste', () => $theTable.api().ajax.reload())

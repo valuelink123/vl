@@ -30,5 +30,5 @@ class XFormHelper {
 
 $(() => {
     XFormHelper.autoTrim('.xform-autotrim')
-    XFormHelper.initByQuery('[data-init-by-query]')
+    // XFormHelper.initByQuery('[data-init-by-query]')
 })
