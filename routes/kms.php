@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/brandline', 'BrandLineController@index');
 Route::post('/brandline/get', 'BrandLineController@get');
+Route::post('/email-detail-right-bar-data', 'BrandLineController@getEmailDetailRightBar');
 
 Route::get('/videolist', 'VideoListController@index');
 Route::post('/videolist/get', 'VideoListController@get');

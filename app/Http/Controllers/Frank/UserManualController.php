@@ -42,12 +42,8 @@ class UserManualController extends Controller {
         KmsUserManual::import($req);
         // qa 加 type dot 连个字段，可选择、可编辑
         // 下载过渡页
-        // Parts List 物料主从关系
-        // 主题，菜单看不清楚
         // 可编辑 table
         // search 加强 多关键字 and
-        // 根据 link 去重
-        // 仅显示有匹配的 view
         // todo 提示成功
         return redirect('/kms/usermanual/import');
     }

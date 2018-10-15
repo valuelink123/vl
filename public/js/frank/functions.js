@@ -123,3 +123,9 @@ function selectText(ele) {
         window.getSelection().addRange(range);
     }
 }
+
+function getUrlFileName(url) {
+    let ms = url.match(/([^/]+\.\w+)$/)
+    let file = ms ? ms[1] : url
+    return file
+}
