@@ -74,7 +74,7 @@ SQL;
 
         $asinRows = $req->input('asinRows', []);
 
-        if (empty($asinRows)) return [];
+        if (empty($asinRows)) return ['manuals' => [], 'videos' => []];
 
         // $where = [];
         //
@@ -103,7 +103,7 @@ SQL;
             }
         })->get();
 
-        if (empty($modelRows)) return [];
+        if (empty($modelRows)) return ['manuals' => [], 'videos' => []];
 
         // 能不用 JOIN 就尽量不用
         // 有唯一索引，不用那么绕

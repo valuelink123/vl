@@ -4,7 +4,7 @@
 
     @include('frank.common')
 
-    <h1 class="page-title font-red-intense"> Notice Center
+    <h1 class="page-title font-red-intense"> Learn Center
         <small></small>
     </h1>
 
@@ -13,6 +13,7 @@
 
             <br/>
 
+            {{--搜索栏--}}
             <div class="row">
                 <div class="col-lg-3">
                     <div class="input-group">
@@ -38,6 +39,7 @@
 
             <br/><br/>
 
+            {{--文章列表--}}
             <div class="row">
                 <div class="col-lg-9">
                     <div class="list-group" id="thelist"></div>
@@ -59,6 +61,7 @@
 
             <br/>
 
+            {{--分页信息--}}
             <div class="row">
                 <div class="col-lg-4">
                     <span id="paginfo" data-tpl="`Showing ${start + 1} to ${Math.min(start + length, total)} of ${total} entries`"></span>
@@ -105,7 +108,7 @@
                 $.ajax({
                     data: {start, length, search, order: [{field: 'updated_at', dir: 'desc'}]},
                     method: 'POST',
-                    url: '/kms/notice/get',
+                    url: '/kms/learn/get',
                     success(data) {
                         resolve(data)
                     },
