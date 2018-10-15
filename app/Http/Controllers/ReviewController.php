@@ -221,7 +221,7 @@ class ReviewController extends Controller
 
                 $query->where('reviewer_name', 'like', '%'.$keywords.'%')
 						 ->orwhere('review.asin', 'like', '%'.$keywords.'%')
-						  ->orwhere('review', 'like', '%'.$keywords.'%')
+						  ->orwhere('review.review', 'like', '%'.$keywords.'%')
 						  ->orwhere('amazon_order_id', 'like', '%'.$keywords.'%')
 						   ->orwhere('buyer_email', 'like', '%'.$keywords.'%')
 						   ->orwhere('review.customer_id', 'like', '%'.$keywords.'%')
@@ -447,7 +447,7 @@ class ReviewController extends Controller
 
                 $query->where('reviewer_name', 'like', '%'.$keywords.'%')
 						 ->orwhere('review.asin', 'like', '%'.$keywords.'%')
-						  ->orwhere('review', 'like', '%'.$keywords.'%')
+						  ->orwhere('review.review', 'like', '%'.$keywords.'%')
 						  ->orwhere('amazon_order_id', 'like', '%'.$keywords.'%')
 						   ->orwhere('buyer_email', 'like', '%'.$keywords.'%')
 						   ->orwhere('review.customer_id', 'like', '%'.$keywords.'%')
