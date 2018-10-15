@@ -182,7 +182,7 @@ th,td,td>span {
 						<form action="{{url('review/upload')}}" method="post" enctype="multipart/form-data">
 						<div class="col-md-2" style="text-align:right;" >
 
-							<a href="{{ url('/uploads/reviewUpload/customers.csv')}}" >Import Template
+							<a href="{{ url('/uploads/reviewUpload/review_customers.csv')}}" >Import Template
                                 </a>	
 						</div>
 						<div class="col-md-2">

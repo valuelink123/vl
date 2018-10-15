@@ -484,7 +484,7 @@
                 <div class="page-bar">
                     <ul class="page-breadcrumb">
                         <li>
-                            <a href="javascript:;">Home</a>
+                            <a href="{{url('home')}}">Home</a>
                             <i class="fa fa-circle"></i>
                         </li>
                         <li>
