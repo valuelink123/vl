@@ -31,6 +31,7 @@ Route::get('/notice', 'NoticeCenterController@index');
 Route::post('/notice/get', 'NoticeCenterController@get');
 
 Route::get('/learn', 'LearnCenterController@index');
+Route::post('/learn/get', 'LearnCenterController@get');
 
 
 
