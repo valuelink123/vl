@@ -204,18 +204,35 @@
 					</div>
 					
 					<div class="col-md-5">
-						<h2 style="margin:20px 0;">Customer information</h2>
 						<?php
 						if($customer){
 						?>
+						<h2 style="margin:20px 0;">CustomerID information</h2>
+						
 						<p style="margin:20px 0;">
 						Email :  {{array_get($customer,'email')}}</p>
 						<p style="margin:20px 0;">
 						Phone :  {{array_get($customer,'phone')}}</p>
 						<p style="margin:20px 0;">
 						Other :  {!!array_get($customer,'other')!!}</p>
-						<?php }else{ ?>
-						<p style="margin:20px 0;">The database does not have contact information for the customer. If you need to buy, please save it in the Step ( buy email ).</p>
+						<?php } ?>
+						
+						
+						<?php
+						if($review_info){
+						?>
+						<h2 style="margin:20px 0;">ReviewID information</h2>
+						
+						<p style="margin:20px 0;">
+						Email :  {{array_get($review_info,'email')}}</p>
+						<p style="margin:20px 0;">
+						Phone :  {{array_get($review_info,'phone')}}</p>
+						<p style="margin:20px 0;">
+						Other :  {!!array_get($review_info,'other')!!}</p>
+						<?php } ?>
+						
+						<?php if(!$customer && !$review_info){ ?>
+						<p style="margin:20px 0;">The database does not have contact information for the review. If you need to buy, please save it in the Step ( GetCustomerInfo ).</p>
 						<?php } ?>
 						
 						

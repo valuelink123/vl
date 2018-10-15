@@ -58,39 +58,74 @@ class ReviewController extends Controller
 					$successCount = $addCount = $errorCount = 0;
 					foreach($importData as $key => $data){
 						if($key==1){
-							if(array_get($data,'A')!='site' || array_get($data,'B')!='customer id'){
+							if(array_get($data,'A')!='site' || array_get($data,'B')!='customer id' || array_get($data,'C')!='review id'){
 								die('Customer profile import template error');
 							}
 						} 
-						if($key>1 && array_get($data,'A') && array_get($data,'B')){
-							$exists = DB::table('customers')->where('customer_id',trim($data['B']))->where('site',trim($data['A']))->first();
-							if($exists){
-								$update_result = DB::table('customers')->where('customer_id',trim($data['B']))->where('site',trim($data['A']))->update(array(
-										'email'=>trim($data['C']),
-										'phone'=>trim($data['D']),
-										'other'=>trim($data['E']),
+						if($key>1 && array_get($data,'A') && array_get($data,'B') && array_get($data,'C')){
+							
+							if(array_get($data,'B')!='not_match'){
+								$exists = DB::table('customers')->where('customer_id',trim($data['B']))->where('site',trim($data['A']))->first();
+								if($exists){
+									$update_result = DB::table('customers')->where('site',trim($data['A']))->where('customer_id',trim($data['B']))->update(array(
+										'email'=>trim($data['D']),
+										'phone'=>trim($data['E']),
+										'other'=>trim($data['F']),
 										'last_update_date'=>date('Y-m-d')
 									));
-								if ($update_result) {
-									$successCount++;
+									if ($update_result) {
+										$successCount++;
+									}
+								}else{
+									$insert_result = DB::table('customers')->insert(
+										array(
+											'site'=>trim($data['A']),
+											'customer_id'=>trim($data['B']),
+											'email'=>trim($data['D']),
+											'phone'=>trim($data['E']),
+											'other'=>trim($data['F']),
+											'last_update_date'=>date('Y-m-d')
+										)
+									);
+									if ($insert_result) {
+										$addCount++;
+									} else {
+										$errorCount++;
+									}
 								}
+							
 							}else{
-								$insert_result = DB::table('customers')->insert(
-									array(
-										'site'=>trim($data['A']),
-										'customer_id'=>trim($data['B']),
-										'email'=>trim($data['C']),
-										'phone'=>trim($data['D']),
-										'other'=>trim($data['E']),
+								$exists = DB::table('review_customers')->where('review',trim($data['C']))->where('site',trim($data['A']))->first();
+								if($exists){
+									$update_result = DB::table('review_customers')->where('site',trim($data['A']))->where('review',trim($data['C']))->update(array(
+										'email'=>trim($data['D']),
+										'phone'=>trim($data['E']),
+										'other'=>trim($data['F']),
 										'last_update_date'=>date('Y-m-d')
-									)
-								);
-								if ($insert_result) {
-									$addCount++;
-								} else {
-									$errorCount++;
+									));
+									if ($update_result) {
+										$successCount++;
+									}
+								}else{
+									$insert_result = DB::table('review_customers')->insert(
+										array(
+											'site'=>trim($data['A']),
+											'review'=>trim($data['C']),
+											'email'=>trim($data['D']),
+											'phone'=>trim($data['E']),
+											'other'=>trim($data['F']),
+											'last_update_date'=>date('Y-m-d')
+										)
+									);
+									if ($insert_result) {
+										$addCount++;
+									} else {
+										$errorCount++;
+									}
 								}
+							
 							}
+							
 						}
 					}
 					$request->session()->flash('success_message','Import Customer Data Success! '.$successCount.' covered  '.$addCount.' added  '.$errorCount.'  Errors');
@@ -113,7 +148,7 @@ class ReviewController extends Controller
 		$date_to=date('Y-m-d');	
 		
 		$customers = DB::table('review')
-			->select('review.*','asin.status as asin_status','customers.email as email','customers.phone as phone','customers.other as other','star.average_score as average_score','star.total_star_number as total_star_number')
+			->select('review.*','asin.status as asin_status','customers.email as email','customers.phone as phone','customers.other as other','review_customers.email as email_add','review_customers.phone as phone_add','review_customers.other as other_add','star.average_score as average_score','star.total_star_number as total_star_number')
 			->leftJoin(DB::raw('(select max(status) as status,asin,site,max(bg) as bg,max(bu) as bu from asin group by asin,site) as asin'),function($q){
 				$q->on('review.asin', '=', 'asin.asin')
 					->on('review.site', '=', 'asin.site');
@@ -123,6 +158,9 @@ class ReviewController extends Controller
 			})->leftJoin('customers',function($q){
 				$q->on('review.customer_id', '=', 'customers.customer_id')
 					->on('review.site', '=', 'customers.site');
+			})->leftJoin('review_customers',function($q){
+				$q->on('review.review', '=', 'review_customers.review')
+					->on('review.site', '=', 'review_customers.site');
 			});
 		if(!Auth::user()->admin){
             $customers = $customers->where('review.user_id',$this->getUserId());
@@ -226,6 +264,9 @@ class ReviewController extends Controller
 		$headArray[] = 'Customer Email';
 		$headArray[] = 'Customer Phone';
 		$headArray[] = 'Customer Other';
+		$headArray[] = 'Review Email';
+		$headArray[] = 'Review Phone';
+		$headArray[] = 'Review Other';
 
 		$arrayData[] = $headArray;
 		$users_array = $this->getUsers();
@@ -259,7 +300,10 @@ class ReviewController extends Controller
 				$review['seller_id'],
 				$review['email'],
 				$review['phone'],
-				$review['other']
+				$review['other'],
+				$review['email_add'],
+				$review['phone_add'],
+				$review['other_add']
 				
             );
 		}
@@ -328,7 +372,7 @@ class ReviewController extends Controller
         }
 		
 		$customers = DB::table('review')
-			->select('review.*','asin.status as asin_status','asin.item_no as item_no','customers.email as email','star.average_score as average_score','star.total_star_number as total_star_number')
+			->select('review.*','asin.status as asin_status','asin.item_no as item_no','customers.email as email','review_customers.email as email_add','star.average_score as average_score','star.total_star_number as total_star_number')
 			->leftJoin(DB::raw('(select max(status) as status,asin,site,max(bg) as bg,max(bu) as bu,max(item_no) as item_no from asin group by asin,site) as asin'),function($q){
 				$q->on('review.asin', '=', 'asin.asin')
 					->on('review.site', '=', 'asin.site');
@@ -338,6 +382,9 @@ class ReviewController extends Controller
 			})->leftJoin('customers',function($q){
 				$q->on('review.customer_id', '=', 'customers.customer_id')
 					->on('review.site', '=', 'customers.site');
+			})->leftJoin('review_customers',function($q){
+				$q->on('review.review', '=', 'review_customers.review')
+					->on('review.site', '=', 'review_customers.site');
 			});
 		
 		if(!Auth::user()->admin){
@@ -485,7 +532,7 @@ class ReviewController extends Controller
 				$ordersList[$i]['reviewer_name'],
 				($ordersList[$i]['vp'])?'<span class="badge badge-danger">VP</span>':'',
 				array_get($follow_status_array,$ordersList[$i]['status'],'').' '.(($ordersList[$i]['is_delete'])?'<span class="badge badge-danger">Del</span>':''),
-				($ordersList[$i]['buyer_email']==$ordersList[$i]['email'])?$ordersList[$i]['buyer_email']:$ordersList[$i]['buyer_email'].' '.$ordersList[$i]['email'],
+				(($ordersList[$i]['email'])?'<span class="badge badge-danger">C</span>':' ').(($ordersList[$i]['email_add'])?'<span class="badge badge-danger">R</span>':' ').$ordersList[$i]['buyer_email'],
 				array_get(getCustomerFb(),$ordersList[$i]['customer_feedback']),
 				$ordersList[$i]['nextdate'],
 				$ordersList[$i]['item_no'],
@@ -532,7 +579,13 @@ class ReviewController extends Controller
             $customer_obj = DB::table('customers')->where('site', array_get($review,'site'))->where('customer_id', array_get($review,'customer_id'))->first();
 			$customer = json_decode(json_encode($customer_obj), true);
         }
+		$review_info=[];
+		if(array_get($review,'review') && array_get($review,'site')){
+            $review_info_obj = DB::table('review_customers')->where('site', array_get($review,'site'))->where('review', array_get($review,'review'))->first();
+			$review_info = json_decode(json_encode($review_info_obj), true);
+        }
 		$return['customer'] = $customer;
+		$return['review_info'] = $review_info;
 		$return['users'] = $this->getUsers();
 		$return['steps'] = DB::table('review_step')->get();
 		$return['review'] = $review;
