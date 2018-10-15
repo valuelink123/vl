@@ -23,10 +23,11 @@ class LinkageInput {
             eleDataList = document.createElement('datalist')
             eleInput.after(eleDataList) // 在DOM元素后面插入新元素
             eleDataList.id = dataListId
+            eleInput.setAttribute('list', dataListId)
         }
 
-        while (eleDataList.firstChild) {
-            eleDataList.removeChild(eleDataList.firstChild)
+        while (eleDataList.lastChild) {
+            eleDataList.removeChild(eleDataList.lastChild)
         }
 
         for (let value of values) {
@@ -34,8 +35,6 @@ class LinkageInput {
             option.value = value
             eleDataList.appendChild(option)
         }
-
-        eleInput.setAttribute('list', dataListId)
     }
 
     static initLinkage(eleInputs, treeData) {
