@@ -23,10 +23,11 @@ class LinkageInput {
             eleDataList = document.createElement('datalist')
             eleInput.after(eleDataList) // 在DOM元素后面插入新元素
             eleDataList.id = dataListId
+            eleInput.setAttribute('list', dataListId)
         }
 
-        while (eleDataList.firstChild) {
-            eleDataList.removeChild(eleDataList.firstChild)
+        while (eleDataList.lastChild) {
+            eleDataList.removeChild(eleDataList.lastChild)
         }
 
         for (let value of values) {
@@ -34,38 +35,36 @@ class LinkageInput {
             option.value = value
             eleDataList.appendChild(option)
         }
-
-        eleInput.setAttribute('list', dataListId)
     }
 
-    static initLinkage(eleInputs, data) {
+    static initLinkage(eleInputs, treeData) {
 
 
         function getListByLayer(targetLayer) {
 
             let layerValueSet = new Set() // 使用集合来去重
 
-            function walk(obj, layer = 0) {
+            function walk(ref, layer = 0) {
 
                 if (0 === layer - targetLayer) {
 
-                    let values = (obj instanceof Array) ? obj : Object.keys(obj)
+                    let values = (ref instanceof Array) ? ref : Object.keys(ref)
 
                     for (let value of values) layerValueSet.add(value)
 
-                } else if (layer < targetLayer && !(obj instanceof Array)) {
+                } else if (layer < targetLayer && !(ref instanceof Array)) {
 
                     let inputValue = eleInputs[layer].value
 
-                    let objs = inputValue.trim() ? [obj[inputValue]] : Object.values(obj)
+                    let refs = inputValue.trim() ? [ref[inputValue]] : Object.values(ref)
 
-                    for (let obj of objs) obj && walk(obj, layer + 1)
+                    for (let ref of refs) ref && walk(ref, layer + 1)
 
                 }
 
             }
 
-            walk(data)
+            walk(treeData)
 
             return layerValueSet
         }

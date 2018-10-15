@@ -11,6 +11,7 @@
             white-space: nowrap;
             overflow: hidden;
             display: inline-block;
+            vertical-align: bottom;
         }
     </style>
 
