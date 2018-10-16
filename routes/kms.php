@@ -29,9 +29,13 @@ Route::post('/partslist/subitems', 'PartsListController@getSubItemList');
 
 Route::get('/notice', 'NoticeCenterController@index');
 Route::post('/notice/get', 'NoticeCenterController@get');
+Route::get('/notice/create', 'NoticeCenterController@edit');
+Route::post('/notice/create', 'NoticeCenterController@create');
 
 Route::get('/learn', 'LearnCenterController@index');
 Route::post('/learn/get', 'LearnCenterController@get');
+Route::get('/learn/create', 'LearnCenterController@edit');
+Route::post('/learn/create', 'LearnCenterController@create');
 
 
 

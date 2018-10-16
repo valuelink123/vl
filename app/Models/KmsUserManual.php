@@ -39,9 +39,7 @@ class KmsUserManual extends Model {
 
             $row = $sheet->rangeToArray("A{$i}:E{$i}")[0];
 
-            foreach ($row as &$cell) {
-                $cell = trim($cell);
-            }
+            $row = array_map('trim', $row);
 
             if (empty($row[3])) {
 

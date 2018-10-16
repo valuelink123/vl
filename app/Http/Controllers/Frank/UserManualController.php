@@ -45,6 +45,7 @@ class UserManualController extends Controller {
         // 可编辑 table
         // search 加强 多关键字 and
         // todo 提示成功
+
         return redirect('/kms/usermanual/import');
     }
 

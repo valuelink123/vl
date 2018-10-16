@@ -54,4 +54,12 @@ SQL;
         return $vars;
     }
 
+    public function edit(Request $req) {
+        return view('frank.kmsNoticeCreatee');
+    }
+
+    public function create(Request $req) {
+
+    }
+
 }

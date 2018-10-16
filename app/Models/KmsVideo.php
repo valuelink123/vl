@@ -43,9 +43,8 @@ class KmsVideo extends Model {
             // 从指定行开始，一行一行读取；
             $row = $sheet->rangeToArray("A{$i}:G{$i}")[0];
 
-            foreach ($row as &$cell) {
-                $cell = trim($cell);
-            }
+            // foreach ($row as &$cell) $cell = trim($cell);
+            $row = array_map('trim', $row);
 
             // 第F列是视频地址，不允许空；
             // 出现连续多个空行结束读取；
