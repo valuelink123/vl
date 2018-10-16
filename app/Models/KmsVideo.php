@@ -7,6 +7,7 @@
 
 namespace App\Models;
 
+use App\Exceptions\DataImportException;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Model;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -26,6 +27,10 @@ class KmsVideo extends Model {
         return parent::updateOrCreate($find, $row);
     }
 
+    /**
+     * @throws DataImportException
+     * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
+     */
     public static function parseExcel($filepath) {
 
         $spreadsheet = IOFactory::load($filepath);
@@ -38,6 +43,8 @@ class KmsVideo extends Model {
 
         // 根据指定名称读取，避免存在隐藏工作表，内容不对应的问题；
         $sheet = $spreadsheet->getSheetByName('Video List');
+
+        if (empty($sheet)) throw new DataImportException('Unable to find the Sheet named "Video List".', 100);
 
         for ($nul = 0, $i = 3; true; ++$i) {
             // 从指定行开始，一行一行读取；
@@ -75,7 +82,8 @@ class KmsVideo extends Model {
      * 从 Excel 导入到 MySQL
      * @param Request $req
      * @param array $types 视频类型枚举
-     * @throws \Exception
+     * @throws DataImportException
+     * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
      */
     public static function import(Request $req, $types) {
 
@@ -91,15 +99,15 @@ class KmsVideo extends Model {
 
         } elseif (empty($_FILES['excelfile']['size'])) {
 
-            throw new \Exception('Please check the validity of the Excel file!');
+            throw new DataImportException('Please check the validity of the Excel file!', 100);
 
         } elseif ($_FILES['excelfile']['error']) {
 
-            throw new \Exception("Upload error: {$_FILES['excelfile']['error']}");
+            throw new DataImportException("Upload error: {$_FILES['excelfile']['error']}", 101);
 
         } elseif ($_FILES['excelfile']['size'] > 5 * 1204 * 1204) {
 
-            throw new \Exception('File exceeds 5M limit!');
+            throw new DataImportException('File exceeds 5M limit!', 102);
 
         } else {
 
@@ -109,7 +117,7 @@ class KmsVideo extends Model {
 
         if (empty($rows)) {
 
-            throw new \Exception('Import failed: Excel is empty or format error!');
+            throw new DataImportException('Import failed: Excel is empty or format error!', 103);
 
         }
 
@@ -121,6 +129,8 @@ class KmsVideo extends Model {
             }
             self::create($row);
         }
+
+        return count($rows);
 
     }
 }

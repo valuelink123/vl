@@ -31,6 +31,10 @@ class BrandLineController extends Controller {
         return view('frank/kmsBrandLine', compact('itemGroupBrandModels'));
     }
 
+    /**
+     * @throws \App\Traits\DataTablesException
+     * @throws \App\Traits\MysqliException
+     */
     public function get(Request $req) {
 
         $where = $this->dtWhere($req, ['item_group', 'item_model', 'item_no', 't1.asin', 'sellersku', 'brand', 'brand_line'], ['item_group' => 'item_group', 'brand' => 'brand', 'item_model' => 'item_model']);

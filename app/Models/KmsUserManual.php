@@ -26,6 +26,7 @@ class KmsUserManual extends Model {
      * @param $filepath
      * @return array
      * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
+     * @throws DataImportException
      */
     public static function parseExcel($filepath) {
 
@@ -34,6 +35,12 @@ class KmsUserManual extends Model {
         $rows = [];
 
         $sheet = $spreadsheet->getSheetByName('Manual List');
+
+        if (empty($sheet)) {
+
+            throw new DataImportException('Unable to find the Sheet named "Manual List".', 100);
+
+        }
 
         for ($nul = 0, $i = 3; true; ++$i) {
 
@@ -101,6 +108,8 @@ class KmsUserManual extends Model {
         foreach ($rows as $row) {
             self::create($row);
         }
+
+        return count($rows);
 
     }
 }
