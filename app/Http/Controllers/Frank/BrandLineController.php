@@ -33,7 +33,7 @@ class BrandLineController extends Controller {
 
     public function get(Request $req) {
 
-        $where = $this->dtWhere($req, ['item_group', 'item_model', 'item_no', 'asin', 'sellersku', 'brand', 'brand_line'], ['item_group' => 'item_group', 'brand' => 'brand', 'item_model' => 'item_model']);
+        $where = $this->dtWhere($req, ['item_group', 'item_model', 'item_no', 't1.asin', 'sellersku', 'brand', 'brand_line'], ['item_group' => 'item_group', 'brand' => 'brand', 'item_model' => 'item_model']);
 
         $orderby = $this->dtOrderBy($req);
         $limit = $this->dtLimit($req);

@@ -52,4 +52,12 @@ SQL;
         return $vars;
     }
 
+    public function edit(Request $req) {
+        return view('frank.kmsLearnCreatee');
+    }
+
+    public function create(Request $req) {
+
+    }
+
 }

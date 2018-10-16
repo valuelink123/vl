@@ -55,6 +55,8 @@
 @php
     $asinRows = (function()use($order){
 
+        if(empty($order)) return [];
+
         $items = empty($order->item) ? [] : $order->item->toArray();
 
         $site = strtolower("www.{$order->SalesChannel}");
