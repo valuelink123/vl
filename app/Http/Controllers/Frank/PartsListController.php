@@ -50,7 +50,7 @@ class PartsListController extends Controller {
 
         // kms_stock 为 fba_stockk + fbm_stock 的视图
         return DB::table('kms_stock')
-            ->select('item_code', 'asin', 'fba_stock', 'fba_transfer', 'fbm_stock', 'item_name')
+            ->select('item_code', 'asin', 'fba_stock', 'fba_transfer', 'fbm_stock', 'item_name', 'seller_name', 'seller_sku')
             ->whereIn('item_code', $subCodes)
             ->get();
 

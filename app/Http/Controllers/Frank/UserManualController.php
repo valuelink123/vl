@@ -39,14 +39,25 @@ class UserManualController extends Controller {
      */
     public function create(Request $req) {
 
-        KmsUserManual::import($req);
+        try {
+            $count = KmsUserManual::import($req);
+            $errors = ['success' => "Written $count Records."];
+        } catch (\Exception $e) {
+            $errors = ['error' => $e->getMessage()];
+        }
+
         // qa 加 type dot 连个字段，可选择、可编辑
         // 下载过渡页
         // 可编辑 table
         // search 加强 多关键字 and
-        // todo 提示成功
 
-        return redirect('/kms/usermanual/import');
+        // Blade 中的使用方式:
+        // $errors->dataImport->first('field')
+        // $errors->dataImport->all('替换 :message 并返回数组')
+        // $errors->dataImport->all('<div>:message</div>')
+        // 不指定 key 就用默认公共的
+        // $errors->all()
+        return redirect()->back()->withErrors($errors, 'dataImport');
     }
 
     /**

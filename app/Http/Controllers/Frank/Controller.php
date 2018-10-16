@@ -14,4 +14,5 @@ class Controller extends \App\Http\Controllers\Controller {
         app('debugbar')->disable();
         $this->middleware('auth');
     }
+
 }

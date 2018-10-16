@@ -21,6 +21,17 @@
 
     <div class="portlet light bordered">
         <div class="portlet-body">
+
+            <div class="row">
+                <div class="col-xs-12">
+                    @if($msg = $errors->dataImport->first('success'))
+                        <div class="alert alert-success"><strong>Success !</strong> {!! $msg !!}</div>
+                    @elseif($msg = $errors->dataImport->first('error'))
+                        <div class="alert alert-danger"><strong>Error !</strong> {!! $msg !!}</div>
+                    @endif
+                </div>
+            </div>
+
             <form method="post" class="row">
                 <div class="col-lg-4">
 

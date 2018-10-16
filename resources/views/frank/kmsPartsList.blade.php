@@ -77,7 +77,9 @@
             <thead>
             <tr>
                 <th>Item No</th>
+                <th>Seller Name</th>
                 <th>Asin</th>
+                <th>Seller SKU</th>
                 <th>Item Name</th>
                 <th>Fbm Stock</th>
                 <th>Fba Stock</th>
@@ -168,7 +170,7 @@
             let trs = []
 
             for (let row of rows) {
-                trs.push(`<tr><td>${row.item_code}</td><td>${row.asin}</td><td>${row.item_name}</td><td>${row.fbm_stock}</td><td>${row.fba_stock}</td><td>${row.fba_transfer}</td></tr>`)
+                trs.push(`<tr><td>${row.item_code}</td><td>${row.seller_name}</td><td>${row.asin}</td><td>${row.seller_sku}</td><td>${row.item_name}</td><td>${row.fbm_stock}</td><td>${row.fba_stock}</td><td>${row.fba_transfer}</td></tr>`)
             }
 
             let tpl = $('#sub-table-tpl').html()

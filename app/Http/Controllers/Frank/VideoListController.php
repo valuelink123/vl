@@ -35,11 +35,15 @@ class VideoListController extends Controller {
 
     public function create(Request $req) {
 
-        $videoTypes = $this->enumOptions('kms_video', 'type');
-        KmsVideo::import($req, $videoTypes);
+        try {
+            $videoTypes = $this->enumOptions('kms_video', 'type');
+            $count = KmsVideo::import($req, $videoTypes);
+            $errors = ['success' => "Written $count Records."];
+        } catch (\Exception $e) {
+            $errors = ['error' => $e->getMessage()];
+        }
 
-        // todo 提示成功
-        return redirect('/kms/videolist/import');
+        return redirect()->back()->withErrors($errors, 'dataImport');
     }
 
     public function get(Request $req) {
