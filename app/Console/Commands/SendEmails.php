@@ -71,7 +71,7 @@ class SendEmails extends Command
 				$from=trim($task->from_address);
 				$to = trim($task->to_address);
 				$subject=$task->subject;
-				$content=$task->text_html;
+				$content=preg_replace('/(?<=[\'="])\/uploads\/ueditor\/php\/upload/', url('/uploads/ueditor/php/upload'), $task->text_html);
 				$smtp_array= array_get($smtp_arrays,strtolower(trim($task->from_address)))?array_get($smtp_arrays,strtolower(trim($task->from_address))):array();
 
 				if($this->run_email!=$from){
