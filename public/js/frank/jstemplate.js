@@ -1,24 +1,16 @@
 {
-    let map = (ref, func) => {
-        let arr = []
-        for (let n in ref) {
-            arr.push(func(ref[n], n))
-        }
-        return arr.join('')
-    }
-
     function tplCompile(tpl) {
 
-        // for-loop support
-        tpl = tpl.replace(
-            /\${for ([$,\w\s]+?) of ([$\w\s]+?)}/ig,
-            '${map($2,($1)=>`'
-        ).replace(
-            /\${endfor}/ig,
-            '`)}'
-        )
+        tpl = tpl.replace(/<%([^]+?)%>/g, "`);$1;_push(`")
 
-        return `\`${tpl}\``
+        return new Function(
+            'vars',
+            `let _output = []
+             let _push = _output.push.bind(_output)
+             eval(\`var {\${Object.keys(vars).join(",")}} = vars\`)
+             _push(\`${tpl}\`)
+             return _output.join("")`
+        )
     }
 
     function tplRender(selector, vars) {
@@ -28,14 +20,10 @@
             if (!selector) return ''
         }
 
-        // tpl cache
-        let tpl = selector._tpl || (selector._tpl = tplCompile(selector.innerHTML))
-
-        // extract vars
-        for (let n in vars) {
-            eval(`var ${n}=vars.${n}`)
+        if (!selector._compile) {
+            selector._compile = tplCompile(selector.innerHTML)
         }
 
-        return eval(tpl)
+        return selector._compile(vars)
     }
 }

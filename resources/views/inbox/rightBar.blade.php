@@ -15,7 +15,7 @@
         }
     }
 </style>
-<script src="/js/frank/functions.js?v={!! time() !!}"></script>
+@include('frank.common')
 <div class="panel-group" id="email-detail-right-bar">
     <div class="panel panel-default">
         <a class="panel-heading">
@@ -25,6 +25,15 @@
             <ul class="list-group" id="ulManual">
                 <li class="list-group-item blink" style="padding:2em;">Data is Loading ...</li>
             </ul>
+            <script type="text/template">
+                <% if(manuals.length){ %>
+                    <% for (let {link} of manuals){ %>
+                        <li class="list-group-item"><a href="${link}" target="_blank">${getUrlFileName(link)}</a></li>
+                    <% } %>
+                <% }else{ %>
+                    <li class="list-group-item" style="padding:2em;">Nothing to Show.</li>
+                <% } %>
+            </script>
         </div>
     </div>
 
@@ -36,6 +45,15 @@
             <ul class="list-group" id="ulVideo">
                 <li class="list-group-item blink" style="padding:2em;">Data is Loading ...</li>
             </ul>
+            <script type="text/template">
+                <% if(videos.length){ %>
+                    <% for (let {link} of videos){ %>
+                        <li class="list-group-item"><a href="${link}" target="_blank">${getUrlFileName(link)}</a></li>
+                    <% } %>
+                <% }else{ %>
+                    <li class="list-group-item" style="padding:2em;">Nothing to Show.</li>
+                <% } %>
+            </script>
         </div>
     </div>
 
@@ -46,7 +64,7 @@
         <div class="panel-collapse collapse in">
             <ul class="list-group">
                 <li class="list-group-item" style="padding:2em;">
-                    <a href="/kms/brandline" target="_blank">Search More <i class="blink">...</i></a>
+                    <a href="/kms/productguide" target="_blank">Search More <i class="blink">...</i></a>
                 </li>
             </ul>
         </div>
@@ -78,26 +96,9 @@
             headers: {'X-CSRF-TOKEN': '{!! csrf_token() !!}'},
             success({manuals, videos}) {
 
-                if (manuals.length) {
-                    let lis = []
-                    for (let {link} of manuals) {
-                        lis.push(`<li class="list-group-item"><a href="${link}" target="_blank">${getUrlFileName(link)}</a></li>`)
-                    }
-                    $(ulManual).html(lis.join(''))
-                } else {
-                    $(ulManual).children().removeClass('blink').html('Nothing to Show.')
-                }
+                $(ulManual).html(tplRender(ulManual.nextElementSibling, {manuals}))
 
-
-                if (videos.length) {
-                    let lis = []
-                    for (let {link} of videos) {
-                        lis.push(`<li class="list-group-item"><a href="${link}" target="_blank">${getUrlFileName(link)}</a></li>`)
-                    }
-                    $(ulVideo).html(lis.join(''))
-                } else {
-                    $(ulVideo).children().removeClass('blink').html('Nothing to Show.')
-                }
+                $(ulVideo).html(tplRender(ulVideo.nextElementSibling, {videos}))
 
             }
         })
