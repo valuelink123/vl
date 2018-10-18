@@ -72,7 +72,6 @@
     </div>
 
     <script type="text/template" id="sub-table-tpl">
-        `
         <table class="table">
             <thead>
             <tr>
@@ -87,10 +86,20 @@
             </tr>
             </thead>
             <tbody>
-            ${trs}
+            ${for row of rows}
+            <tr>
+                <td>${row.item_code}</td>
+                <td>${row.seller_name}</td>
+                <td>${row.asin}</td>
+                <td>${row.seller_sku}</td>
+                <td>${row.item_name}</td>
+                <td>${row.fbm_stock}</td>
+                <td>${row.fba_stock}</td>
+                <td>${row.fba_transfer}</td>
+            </tr>
+            ${endfor}
             </tbody>
         </table>
-        `
     </script>
 
     <script>
@@ -167,17 +176,7 @@
 
             if (false === rows[0]) return Promise.reject(new Error(rows[1]))
 
-            let trs = []
-
-            for (let row of rows) {
-                trs.push(`<tr><td>${row.item_code}</td><td>${row.seller_name}</td><td>${row.asin}</td><td>${row.seller_sku}</td><td>${row.item_name}</td><td>${row.fbm_stock}</td><td>${row.fba_stock}</td><td>${row.fba_transfer}</td></tr>`)
-            }
-
-            let tpl = $('#sub-table-tpl').html()
-
-            trs = trs.join('')
-
-            return eval(tpl)
+            return tplRender('#sub-table-tpl', {rows})
         }
 
         // Add event listener for opening and closing details

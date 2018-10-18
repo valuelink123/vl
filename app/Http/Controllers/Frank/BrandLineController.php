@@ -19,6 +19,9 @@ class BrandLineController extends Controller {
     use \App\Traits\Mysqli;
     use \App\Traits\DataTables;
 
+    /**
+     * @throws \App\Traits\MysqliException
+     */
     public function index() {
         // print_r(array_keys($GLOBALS));
 

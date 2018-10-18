@@ -171,7 +171,7 @@
             ],
             ajax: {
                 type: 'POST',
-                url: '/kms/brandline/get',
+                url: '/kms/productguide/get',
                 // dataSrc(json) { return json.data }
             }
         })
