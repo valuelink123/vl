@@ -86,7 +86,7 @@
             </tr>
             </thead>
             <tbody>
-            ${for row of rows}
+            <% for(let row of rows){ %>
             <tr>
                 <td>${row.item_code}</td>
                 <td>${row.seller_name}</td>
@@ -97,7 +97,7 @@
                 <td>${row.fba_stock}</td>
                 <td>${row.fba_transfer}</td>
             </tr>
-            ${endfor}
+            <% } %>
             </tbody>
         </table>
     </script>
