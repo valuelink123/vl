@@ -147,7 +147,7 @@
                         </a>
                         <ul class="dropdown-menu dropdown-menu-default">
                             <li>
-                                <a href="/kms/brandline">
+                                <a href="/kms/productguide">
                                     <i class="fa fa-file"></i> Product Guide
                                 </a>
                             </li>

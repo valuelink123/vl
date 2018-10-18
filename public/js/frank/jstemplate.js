@@ -7,27 +7,35 @@
         return arr.join('')
     }
 
-    function tplCompile(tpl, vars) {
+    function tplCompile(tpl) {
 
-        // for looping support
-        do {
-            var tpl_ = tpl.replace(
-                /\${for ([$,\w\s]+?) of ([$\w\s]+?)}([^]+)\${endfor}/ig,
-                '${map($2,($1)=>`$3`)}'
-            )
-            // nesting support
-        } while (tpl !== tpl_ && (tpl = tpl_))
+        // for-loop support
+        tpl = tpl.replace(
+            /\${for ([$,\w\s]+?) of ([$\w\s]+?)}/ig,
+            '${map($2,($1)=>`'
+        ).replace(
+            /\${endfor}/ig,
+            '`)}'
+        )
+
+        return `\`${tpl}\``
+    }
+
+    function tplRender(selector, vars) {
+
+        if (!(selector instanceof Element)) {
+            selector = document.querySelector(selector)
+            if (!selector) return ''
+        }
+
+        // tpl cache
+        let tpl = selector._tpl || (selector._tpl = tplCompile(selector.innerHTML))
 
         // extract vars
         for (let n in vars) {
             eval(`var ${n}=vars.${n}`)
         }
 
-        return eval(`\`${tpl}\``)
-    }
-
-    function tplRender(selector, vars) {
-        (selector instanceof Element) || (selector = document.querySelector(selector));
-        return tplCompile(selector ? selector.innerHTML : '', vars)
+        return eval(tpl)
     }
 }
