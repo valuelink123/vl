@@ -111,7 +111,7 @@
 
     <!-- END PAGE LEVEL SCRIPTS -->
     <link rel="shortcut icon" href="/favicon.ico" />
-    <link href="/css/common.css?v=2" rel="stylesheet" type="text/css"/>
+    <link href="/css/common.css?v=6" rel="stylesheet" type="text/css"/>
 </head>
 <!-- END HEAD -->
 
@@ -490,6 +490,7 @@
                         <li>
                             <span>@yield('label')</span>
                         </li>
+                        @yield('crumb')
                     </ul>
                 </div>
 

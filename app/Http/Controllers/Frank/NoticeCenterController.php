@@ -28,6 +28,10 @@ class NoticeCenterController extends Controller {
         return view('frank/kmsNotice', compact('itemGroupModels'));
     }
 
+    /**
+     * @throws \App\Traits\DataTablesException
+     * @throws \App\Traits\MysqliException
+     */
     public function get(Request $req) {
 
         $where = $this->dtWhere($req, ['item_group', 'item_model', 'title', 'f:content'], ['item_group' => 'item_group', 'item_model' => 'item_model']);

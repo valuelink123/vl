@@ -1,3 +1,4 @@
+/*菜单文字颜色*/
 .page-sidebar .page-sidebar-menu > li > a,
 .page-sidebar .page-sidebar-menu > li > a > i,
 .page-header.navbar .top-menu .navbar-nav > li.dropdown .dropdown-toggle > i,
@@ -11,15 +12,28 @@
     background: #fff;
 }
 
+/*面包屑导航*/
+.page-breadcrumb .fa-circle {
+    top: 0 !important;
+}
+
+.page-breadcrumb a {
+    color: #337ab7 !important;
+}
+
+
+/*DataTables [展开/收缩] 按钮*/
 td.details-control {
-    background: url('./common/details_open.png') no-repeat center center;
+    background: url('./common/details.png') no-repeat center center;
     cursor: pointer;
 }
 
 td.details-control.closed {
-    background: url('./common/details_close.png') no-repeat center center;
+    background: url('./common/details.png') no-repeat center center;
+    background-position-y: -73px;
 }
 
 td.details-control.disabled {
-    background: url('./common/details_disabled.png') no-repeat center center;
+    background: url('./common/details.png') no-repeat center center;
+    background-position-y: 9px;
 }
