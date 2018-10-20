@@ -138,6 +138,7 @@
                 {data: 'fba_stock', name: 'fba_stock'},
                 {data: 'fba_transfer', name: 'fba_transfer'},
                 {
+                    width: "2px",
                     "className": 'details-control disabled',
                     "orderable": false,
                     "data": 'item_code',

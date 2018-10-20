@@ -39,15 +39,15 @@ class NoticeCenterController extends Controller {
         $orderby = $this->dtOrderBy($req);
         $limit = $this->dtLimit($req);
 
-        $sql = <<<SQL
-SELECT SQL_CALC_FOUND_ROWS
-title,
-SUBSTRING(content, 1, 350) AS content
-FROM kms_notice
-WHERE $where
-ORDER BY $orderby
-LIMIT $limit
-SQL;
+        $sql = "
+        SELECT SQL_CALC_FOUND_ROWS
+        title,
+        SUBSTRING(content, 1, 350) AS content
+        FROM kms_notice
+        WHERE $where
+        ORDER BY $orderby
+        LIMIT $limit
+        ";
 
         // throw new \Exception($sql);
 
