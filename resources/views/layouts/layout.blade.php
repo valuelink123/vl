@@ -470,7 +470,7 @@
 					<li class="nav-item <?php if($action=='fees') echo 'active';?>">
                         <a href="{{ url('fees') }}" class="nav-link nav-toggle">
                             <i class="fa fa-dollar"></i>
-                            <span class="title">Distribution analysis</span>
+                            <span class="title">Fees Split</span>
                             <?php if($action=='fees') echo '<span class="selected"></span>';?>
                         </a>
                     </li>
