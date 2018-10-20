@@ -15,6 +15,9 @@ class LearnCenterController extends Controller {
     use \App\Traits\Mysqli;
     use \App\Traits\DataTables;
 
+    /**
+     * @throws \App\Traits\MysqliException
+     */
     public function index(Request $req) {
 
         $itemGroupModels = [];
@@ -28,6 +31,10 @@ class LearnCenterController extends Controller {
         return view('frank/kmsLearn', compact('itemGroupModels'));
     }
 
+    /**
+     * @throws \App\Traits\DataTablesException
+     * @throws \App\Traits\MysqliException
+     */
     public function get(Request $req) {
 
         $where = $this->dtWhere($req, ['item_group', 'item_model', 'title', 'f:content'], ['item_group' => 'item_group', 'item_model' => 'item_model']);
@@ -35,15 +42,15 @@ class LearnCenterController extends Controller {
         $orderby = $this->dtOrderBy($req);
         $limit = $this->dtLimit($req);
 
-        $sql = <<<SQL
-SELECT SQL_CALC_FOUND_ROWS
-title,
-SUBSTRING(content, 1, 350) AS content
-FROM kms_learn
-WHERE $where
-ORDER BY $orderby
-LIMIT $limit
-SQL;
+        $sql = "
+        SELECT SQL_CALC_FOUND_ROWS
+        title,
+        SUBSTRING(content, 1, 350) AS content
+        FROM kms_learn
+        WHERE $where
+        ORDER BY $orderby
+        LIMIT $limit
+        ";
 
         $vars['rows'] = $this->queryRows($sql);
 
