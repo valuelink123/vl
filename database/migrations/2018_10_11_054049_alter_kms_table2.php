@@ -2,7 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 
-class AlterKmsTable extends Migration {
+class AlterKmsTable2 extends Migration {
     use \App\Traits\Migration;
 
     private function deleteDuplicatedRows($table, $field) {
