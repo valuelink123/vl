@@ -64,3 +64,8 @@ Route::Post('/exception/getorder', 'ExceptionController@getrfcorder')->name('get
 Route::get('/exceptionexport', 'ExceptionController@export')->name('exportException');
 Route::get('/reviewexport', 'ReviewController@export')->name('exportReview');
 Route::get('/asinexport', 'AsinController@export')->name('exportAsin');
+Route::get('/fees', 'FeesController@index')->name('fees');
+Route::Post('/fees/getads', 'FeesController@getads')->name('getads');
+Route::Post('/fees/getdeal', 'FeesController@getdeal')->name('getdeal');
+Route::Post('/fees/getcoupon', 'FeesController@getcoupon')->name('getcoupon');
+Route::Post('/fees/getservice', 'FeesController@getservice')->name('getservice');

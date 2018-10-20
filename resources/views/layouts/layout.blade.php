@@ -466,6 +466,14 @@
                             <?php if($action=='tran') echo '<span class="selected"></span>';?>
                         </a>
                     </li>
+					
+					<li class="nav-item <?php if($action=='fees') echo 'active';?>">
+                        <a href="{{ url('fees') }}" class="nav-link nav-toggle">
+                            <i class="fa fa-dollar"></i>
+                            <span class="title">Distribution analysis</span>
+                            <?php if($action=='fees') echo '<span class="selected"></span>';?>
+                        </a>
+                    </li>
 
 
                 </ul>
