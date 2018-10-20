@@ -68,6 +68,10 @@ class PartsListController extends Controller {
         // print_r($query);
     }
 
+    /**
+     * @throws \App\Traits\DataTablesException
+     * @throws \App\Traits\MysqliException
+     */
     public function get(Request $req) {
 
         $where = $this->dtWhere($req, ['item_code', 'item_name', 'asin', 'seller_id', 'seller_name', 'seller_sku'], ['item_group' => 't3.item_group', 'brand' => 't3.brand', 'item_model' => 't3.item_model']);
@@ -81,22 +85,30 @@ class PartsListController extends Controller {
         // 由于 INNER JOIN 导致数据不全，弃用
 
         $sql = "
-SELECT SQL_CALC_FOUND_ROWS
-t1.item_code,
-t1.seller_name,
-t1.asin,
-t1.seller_sku,
-t1.fba_stock,
-t1.fba_transfer,
-t1.fbm_stock,
-t1.item_name
-FROM kms_stock t1
-LEFT JOIN (SELECT ANY_VALUE(item_group) AS item_group,ANY_VALUE(brand) AS brand,ANY_VALUE(item_model) AS item_model,item_no AS item_code FROM asin GROUP BY item_no) t3
-USING(item_code)
-WHERE $where
-ORDER BY $orderby
-LIMIT $limit
-";
+        SELECT SQL_CALC_FOUND_ROWS
+        t1.item_code,
+        t1.seller_name,
+        t1.asin,
+        t1.seller_sku,
+        t1.fba_stock,
+        t1.fba_transfer,
+        t1.fbm_stock,
+        t1.item_name
+        FROM kms_stock t1
+        LEFT JOIN (
+            SELECT
+            ANY_VALUE(item_group) AS item_group,
+            ANY_VALUE(brand) AS brand,
+            ANY_VALUE(item_model) AS item_model,
+            item_no AS item_code
+            FROM asin
+            GROUP BY item_no
+        ) t3
+        USING(item_code)
+        WHERE $where
+        ORDER BY $orderby
+        LIMIT $limit
+        ";
 
         $rows = $this->queryRows($sql);
 

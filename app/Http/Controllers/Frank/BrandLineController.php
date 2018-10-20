@@ -45,27 +45,36 @@ class BrandLineController extends Controller {
         $orderby = $this->dtOrderBy($req);
         $limit = $this->dtLimit($req);
 
-        $sql = <<<SQL
-SELECT SQL_CALC_FOUND_ROWS
-t1.brand,
-t1.item_group,
-t1.item_model,
-ANY_VALUE(t1.brand_line) AS brand_line,
-t2.manualink,
-IF(ISNULL(t3.item_group), 0, 1) AS has_video,
-COUNT(t4.item_code) AS has_stock_info
-FROM asin t1
-LEFT JOIN (SELECT item_group,brand,item_model,any_value(link) manualink FROM kms_user_manual GROUP BY item_group,brand,item_model) t2
-USING(item_group,brand,item_model)
-LEFT JOIN (SELECT DISTINCT item_group,brand,item_model FROM kms_video) t3
-USING(item_group,brand,item_model)
-LEFT JOIN kms_stock t4
-ON t4.item_code=t1.item_no
-WHERE $where
-GROUP BY item_group,brand,item_model
-ORDER BY $orderby
-LIMIT $limit
-SQL;
+        $sql = "
+        SELECT SQL_CALC_FOUND_ROWS
+            t1.brand,
+            t1.item_group,
+            t1.item_model,
+            ANY_VALUE(t1.brand_line) AS brand_line,
+            t2.manualink,
+            IF(ISNULL(t3.item_group), 0, 1) AS has_video,
+            COUNT(t4.item_code) AS has_stock_info
+        FROM asin t1
+        LEFT JOIN (
+            SELECT item_group,
+            brand,
+            item_model,
+            any_value(link) manualink
+            FROM kms_user_manual
+            GROUP BY item_group,brand,item_model
+        ) t2
+        USING(item_group,brand,item_model)
+        LEFT JOIN (
+            SELECT DISTINCT item_group,brand,item_model FROM kms_video
+        ) t3
+        USING(item_group,brand,item_model)
+        LEFT JOIN kms_stock t4
+        ON t4.item_code=t1.item_no
+        WHERE $where
+        GROUP BY item_group,brand,item_model
+        ORDER BY $orderby
+        LIMIT $limit
+        ";
         // $rows = DB::connection('frank')->table('asin')->select('item_group', 'item_model', 'brand')->groupBy('item_group', 'item_model')->get()->toArray();
         $rows = $this->queryRows($sql);
 

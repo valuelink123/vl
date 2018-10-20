@@ -24,16 +24,14 @@
 
 /*DataTables [展开/收缩] 按钮*/
 td.details-control {
-    background: url('./common/details.png') no-repeat center center;
+    background: url('./common/doclose.png') no-repeat center center;
     cursor: pointer;
 }
 
 td.details-control.closed {
-    background: url('./common/details.png') no-repeat center center;
-    background-position-y: -73px;
+    background-position-x: -71px;
 }
 
 td.details-control.disabled {
-    background: url('./common/details.png') no-repeat center center;
-    background-position-y: 9px;
+    background-position-x: 9px;
 }

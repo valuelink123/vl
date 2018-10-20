@@ -71,28 +71,28 @@ class UserManualController extends Controller {
         $limit = $this->dtLimit($req);
         // todo UPDATE asin SET xxx=TRIM(IFNULL(xxx, ''))
         $sql = "
-SELECT SQL_CALC_FOUND_ROWS
-item_group,
-item_model,
-link,
-updated_at,
-brand,
-t2.brand_line
-FROM kms_user_manual t1
-LEFT JOIN (
-  SELECT item_group,brand,item_model,
-  GROUP_CONCAT(DISTINCT sellersku) AS sellersku,
-  GROUP_CONCAT(DISTINCT brand_line) AS brand_line,
-  GROUP_CONCAT(DISTINCT asin) AS asin,
-  GROUP_CONCAT(DISTINCT item_no) AS item_no
-  FROM asin
-  GROUP BY item_group,brand,item_model
-) t2
-USING(item_group,brand,item_model)
-WHERE $where
-ORDER BY $orderby
-LIMIT $limit
-";
+        SELECT SQL_CALC_FOUND_ROWS
+        item_group,
+        item_model,
+        link,
+        updated_at,
+        brand,
+        t2.brand_line
+        FROM kms_user_manual t1
+        LEFT JOIN (
+          SELECT item_group,brand,item_model,
+          GROUP_CONCAT(DISTINCT sellersku) AS sellersku,
+          GROUP_CONCAT(DISTINCT brand_line) AS brand_line,
+          GROUP_CONCAT(DISTINCT asin) AS asin,
+          GROUP_CONCAT(DISTINCT item_no) AS item_no
+          FROM asin
+          GROUP BY item_group,brand,item_model
+        ) t2
+        USING(item_group,brand,item_model)
+        WHERE $where
+        ORDER BY $orderby
+        LIMIT $limit
+        ";
 
         $rows = $this->queryRows($sql);
 
