@@ -15,17 +15,18 @@ class NoticeCenterController extends Controller {
     use \App\Traits\Mysqli;
     use \App\Traits\DataTables;
 
+    /**
+     * @throws \App\Traits\MysqliException
+     */
     public function index(Request $req) {
 
-        $itemGroupModels = [];
-
-        $rows = $this->queryRows('SELECT item_group, GROUP_CONCAT(DISTINCT item_model) AS item_models FROM kms_notice GROUP BY item_group');
+        $rows = $this->queryRows('SELECT item_group,brand,GROUP_CONCAT(DISTINCT item_model) AS item_models FROM kms_notice GROUP BY item_group,brand');
 
         foreach ($rows as $row) {
-            $itemGroupModels[$row['item_group']] = explode(',', $row['item_models']);
+            $itemGroupBrandModels[$row['item_group']][$row['brand']] = explode(',', $row['item_models']);
         }
 
-        return view('frank/kmsNotice', compact('itemGroupModels'));
+        return view('frank/kmsNotice', compact('itemGroupBrandModels'));
     }
 
     /**
@@ -34,7 +35,7 @@ class NoticeCenterController extends Controller {
      */
     public function get(Request $req) {
 
-        $where = $this->dtWhere($req, ['item_group', 'item_model', 'title', 'f:content'], ['item_group' => 'item_group', 'item_model' => 'item_model']);
+        $where = $this->dtWhere($req, ['item_group', 'item_model', 'brand', 'title', 'f:content'], ['item_group' => 'item_group', 'brand' => 'brand', 'item_model' => 'item_model']);
 
         $orderby = $this->dtOrderBy($req);
         $limit = $this->dtLimit($req);
@@ -59,7 +60,14 @@ class NoticeCenterController extends Controller {
     }
 
     public function edit(Request $req) {
-        return view('frank.kmsNoticeCreatee');
+
+        $rows = $this->queryRows('SELECT item_group,brand,GROUP_CONCAT(DISTINCT item_model) AS item_models FROM asin GROUP BY item_group,brand');
+
+        foreach ($rows as $row) {
+            $itemGroupBrandModels[$row['item_group']][$row['brand']] = explode(',', $row['item_models']);
+        }
+
+        return view('frank.kmsNoticeCreate', compact('itemGroupBrandModels'));
     }
 
     public function create(Request $req) {
