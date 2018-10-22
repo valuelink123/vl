@@ -1,0 +1,56 @@
+﻿{
+	"AP": {
+		"Jump starter": ["can not start the car","can not charge","can not hold a charge","screen damage","jump clamp damage","smoking or swelling","button or port damage","can not turn on","undetailed manual","poor total capacity","can not supply current continuously","receive a second hand product","length of jump cable is not enough","flashlight damage","incompatible laptop charging converter","does not receive the product","wall or car charger damage","consult","Others"],
+		"Tire Inflator": ["pump does not work","hose itself or its connections damage","smoking","can not turn on","tire gauge damage","Insufficient inflation ability","pump doesn't work and loud noise","valve damage or not compatible","appearance or function is not liked","automatic shutdown from time to time","accessories lost","car charger cable is too long","button or port damage","consult","Others"]
+	},
+	"DB": {
+		"Action Camera": ["can not turn on","button is broken","can not charge","can not read SD card","can not connect wifi or use wifi","can not record","can not post pictures","waterproofcase damage","camera damaged","battery damage","eye fish pictures","video cannot be played","interface damage","the touch screen is broken","consult","Others"]
+	},
+	"PF": {
+		"Photo Frame": ["can not read the disk","stuck when playing","remote control broken or damaged","LCD protective film has bubbles","vertical stripes or horizontal stripes on screen","Video  cannot be played","Music cannot be played","can not turn on","consult","Others"]
+	},
+	"MP": {
+		"DVD": ["only works when it is plugged","battery last shorter time than expected","swollen battery","loading on the screen","no disc on the screen","open on the screen","could not read disc","skipping when reading the disc","freezing  when reading the disc","screen broken inside","black/white screen","have sound no picture","low sound","noise sound","lid broken(spring out, door is broken)","port stuck in","could not stand up","remote dose not work","wall/car charger broken","could not recognize usb/sd card","does not support files in usb/sd card","Others"]
+	},
+	"MAC": {
+		"Baby monitor": ["screen problem","no view captured","cannot power on","cannot charge properly","cannot hold a charge","poor battery life","PT problem","picutre quality","power save mode issue","cannot pair","defective power cord","motion detected function","no sound transmmit","infrared lights","split screen mode","used item","need additional camera","Others"]
+	},
+	"TM": {
+		"Drone": ["Fly away","Battery lasts too short","Not stable; Could not hover","No image on App","The remote controller 'Beep'","One motor does not rotate","USB charger burnt out","Burnt spot on the receiving board","Could not pair","Could not charge","All motors rotate but will not take off; drone flip up","Joystick could not spring back","Others"]
+	},
+	"HPC": {
+		"Tens unit": ["charge cord broken","insufficient endurance","can not power on","can not charge","the screen/icon is not fully displayed","black spot on the screen","screen flashback","screen is broken","can not increase the intensity","pads can not stick well","lead wire broken","snap broken","only one channel works","can not work as expected","a sense of shock","Others"]
+	},
+
+	"CS": {
+		"Hair Straightener Brush": ["Not Heat Up","Shut Off Itself","Can not turn on","Bristle melted","Frizzy","Bad using experience","Smoke/Burnt Smell","Screen Low display","Buzzing","Does not work once got the device","Does not work after being used for some times","Others"],
+		"Nail Lamp": ["Can not dry gel polish","Part of the LED twickle/dead","Does not turn on","Others"],
+		"Curling Iron": ["Can not turn on","Do not heat up","Do not work","Cannot catch the hair","Splint coating peeling off","Too hot","Not easy to change the tempreture with the button","Others"],
+		"Facial brush": ["Do not spin, just vibrate","Do not work","How to remove the brush head","Not suitable for the skin of some customers ","beeping","Can not turn on","Can not be charged","Replacement Brush Heads","Do not know how to charge the device","Others"]
+	},
+
+	"PJ": {
+		"Projector": ["Not bright enough","Not clear enough","Yellow circle / black circle","Turn off automatically","cannot power on","No sound/Dolby sound","Connetion problem","Focusing problem","Misssing accessories","Noise","doesn't work as expected","Others"]
+	},
+
+	"AG": {
+		"Adult product": ["can't charge","can't turn on","loud noise","Others"]
+	},
+
+	"VT": {
+		"Essential Oils": ["oils leaked","Some oil was missed in the box","smell bad","Others"]
+	},
+
+
+	"ST": {
+		"Fitness Tracker": ["can't charge","can't turn on","can't connect to the smartphone","steps counting not accurate","sleep monitor doesn't work","Others"]
+	},
+
+
+
+	"HA/SHA": {
+		"blender": ["food Processor broken","beaker broken","lid fall off","'I' button do not work","'TURBO' button do not work","blender burn out","blender do not work","The blade came off ","Attachment will not lock","Others"],
+		"Robot Vacuum Cleaner": ["Do not work","circle around","can not charge","can not clean","VACUUM GETS STUCK","Others"],
+		"kettle": ["do not work","Leaking water","Get Rusty","Temperature difference","loud noise","Others"]
+	}
+}

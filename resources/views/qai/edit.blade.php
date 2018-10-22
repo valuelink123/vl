@@ -30,23 +30,87 @@
 					
 						<div class="form-group">
                             <label>Product Line</label>
-                            <div class="input-group ">
-                                <span class="input-group-addon">
-                                    <i class="fa fa-envelope"></i>
-                                </span>
-                                <input type="text" class="form-control" placeholder="product Line" name="product_line" id="product_line" value="{{$qa['product_line']}}" required />
-                            </div>
+                            <div class="epoint_selectList form-inline">
+							<select class="epoint_group form-control" name="product_line" required>
+							<option value="{{$qa['product_line']}}">{{$qa['product_line']}}</option>
+							</select>
+							<select class="epoint_product form-control" name="product" required>
+							<option value="{{$qa['product']}}">{{$qa['product']}}</option>
+							
+							</select>
+							<select class="epoint form-control" name="epoint">
+							<option value="{{$qa['epoint']}}">{{$qa['epoint']}}</option>
+							</select>
+							</div>
+						<script type="text/javascript">
+						$(function(){
+							$(".epoint_selectList").each(function(){
+								var url = "/epoint.json";
+								var epointJson;
+								var temp_html;
+								var oepoint_group = $(this).find(".epoint_group");
+								var oepoint_product = $(this).find(".epoint_product");
+								var oepoint = $(this).find(".epoint");
+
+								var epoint_group = function(){
+									temp_html = '<option value="">Group</option>';
+									$.each(epointJson,function(i,epoint_group){
+										temp_html+='<option value="'+i+'" '+((oepoint_group.val() == i) ?"selected":"")+'>'+i+'</option>';
+									});
+									oepoint_group.html(temp_html);
+									epoint_product();
+								};
+			
+								var epoint_product = function(){
+									temp_html = '<option value="">Product</option>';
+									
+										var n = oepoint_group.val();
+										if(typeof(epointJson[n]) == "undefined"){
+											oepoint_product.css("display","none");
+											oepoint.css("display","none");
+										}else{
+											oepoint_product.css("display","inline");
+											$.each(epointJson[n],function(i,epoint_product){
+												temp_html+='<option value="'+i+'" '+((oepoint_product.val() == i) ?"selected":"")+'>'+i+'</option>';
+											});
+											oepoint_product.html(temp_html);
+											epoint();
+										}
+									
+								};
+						
+								var epoint = function(){
+									temp_html = '<option value="">Problem</option>'; 
+									var m = oepoint_group.val();
+									var n = oepoint_product.val();
+							
+										if(typeof(epointJson[m][n]) == "undefined"){
+											oepoint.css("display","none");
+										}else{
+											oepoint.css("display","inline");
+											$.each(epointJson[m][n],function(i,epoint){
+												temp_html+='<option value="'+epoint+'" '+((oepoint.val() == epoint) ?"selected":"")+'>'+epoint+'</option>';
+											});
+											oepoint.html(temp_html);
+										};
+									
+								};
+								oepoint_group.change(function(){
+									epoint_product();
+								});
+								oepoint_product.change(function(){
+									epoint();
+								});
+								$.getJSON(url,function(data){
+									epointJson = data;
+									epoint_group();
+								});
+							});
+						});
+						</script>
                         </div>
 						
-                        <div class="form-group">
-                            <label>Product </label>
-                            <div class="input-group ">
-                                <span class="input-group-addon">
-                                    <i class="fa fa-envelope"></i>
-                                </span>
-                                <input type="text" class="form-control" placeholder="product" name="product" id="product" value="{{$qa['product']}}" required />
-                            </div>
-                        </div>
+                       
 						
 						<div class="form-group">
                             <label>Model</label>
@@ -84,16 +148,7 @@
                             </select>
                         </div>
                     </div>
-					
-					<div class="form-group">
-                        <label>Problem Point</label>
-                        <div class="input-group ">
-                                <span class="input-group-addon">
-                                    <i class="fa fa-bookmark"></i>
-                                </span>
-                            <input type="text" class="form-control" name="epoint" id="epoint" value="{{$qa['epoint']}}" >
-                        </div>
-                    </div>
+
 					
 	
                         <div class="form-group">

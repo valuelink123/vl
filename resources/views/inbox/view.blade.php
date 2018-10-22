@@ -705,7 +705,7 @@
 
 
                 <div class="tab-pane" id="tab_4">
-                    <div class="col-xs-6">
+                    <div class="col-xs-7">
                         <form role="form" action="{{ url('inbox/change') }}" method="POST">
                             {{ csrf_field() }}
                             <input type="hidden" name="inbox_id" id="inbox_id" value ="{{$email['id']}}">
@@ -772,12 +772,84 @@
 					
 					<div class="form-group">
                         <label>Problem Point</label>
-                        <div class="input-group ">
-                                <span class="input-group-addon">
-                                    <i class="fa fa-bookmark"></i>
-                                </span>
-                            <input type="text" class="form-control" name="epoint" id="epoint" value="{{$email['epoint']}}" >
-                        </div>
+                        <div class="epoint_selectList form-inline">
+							<select class="epoint_group form-control" name="epoint_group">
+							<option value="{{$email['epoint_group']}}">{{$email['epoint_group']}}</option>
+							</select>
+							<select class="epoint_product form-control" name="epoint_product">
+							<option value="{{$email['epoint_product']}}">{{$email['epoint_product']}}</option>
+							
+							</select>
+							<select class="epoint form-control" name="epoint">
+							<option value="{{$email['epoint']}}">{{$email['epoint']}}</option>
+							</select>
+							</div>
+						<script type="text/javascript">
+						$(function(){
+							$(".epoint_selectList").each(function(){
+								var url = "/epoint.json";
+								var epointJson;
+								var temp_html;
+								var oepoint_group = $(this).find(".epoint_group");
+								var oepoint_product = $(this).find(".epoint_product");
+								var oepoint = $(this).find(".epoint");
+
+								var epoint_group = function(){
+									temp_html = '<option value="">Group</option>';
+									$.each(epointJson,function(i,epoint_group){
+										temp_html+='<option value="'+i+'" '+((oepoint_group.val() == i) ?"selected":"")+'>'+i+'</option>';
+									});
+									oepoint_group.html(temp_html);
+									epoint_product();
+								};
+			
+								var epoint_product = function(){
+									temp_html = '<option value="">Product</option>';
+									
+										var n = oepoint_group.val();
+										if(typeof(epointJson[n]) == "undefined"){
+											oepoint_product.css("display","none");
+											oepoint.css("display","none");
+										}else{
+											oepoint_product.css("display","inline");
+											$.each(epointJson[n],function(i,epoint_product){
+												temp_html+='<option value="'+i+'" '+((oepoint_product.val() == i) ?"selected":"")+'>'+i+'</option>';
+											});
+											oepoint_product.html(temp_html);
+											epoint();
+										}
+									
+								};
+						
+								var epoint = function(){
+									temp_html = '<option value="">Problem</option>'; 
+									var m = oepoint_group.val();
+									var n = oepoint_product.val();
+							
+										if(typeof(epointJson[m][n]) == "undefined"){
+											oepoint.css("display","none");
+										}else{
+											oepoint.css("display","inline");
+											$.each(epointJson[m][n],function(i,epoint){
+												temp_html+='<option value="'+epoint+'" '+((oepoint.val() == epoint) ?"selected":"")+'>'+epoint+'</option>';
+											});
+											oepoint.html(temp_html);
+										};
+									
+								};
+								oepoint_group.change(function(){
+									epoint_product();
+								});
+								oepoint_product.change(function(){
+									epoint();
+								});
+								$.getJSON(url,function(data){
+									epointJson = data;
+									epoint_group();
+								});
+							});
+						});
+						</script>
                     </div>
 					
                     <div class="form-group">
