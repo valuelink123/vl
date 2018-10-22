@@ -30,7 +30,8 @@ class Kernel extends ConsoleKernel
 		'App\Console\Commands\GetAsininfo',
 		'App\Console\Commands\GetAds',
 		'App\Console\Commands\GetProfits',
-        'App\Console\Commands\GetSettlementReport'
+        'App\Console\Commands\GetSettlementReport',
+        'App\Console\Commands\GetAwsInfo'
     ];
 
     /**
@@ -66,6 +67,7 @@ class Kernel extends ConsoleKernel
 		$schedule->command('get:profits 10 1 ')->cron('10 0 * * *')->name('getprotit')->withoutOverlapping();
         //$schedule->command('scan:warn')->hourly()->name('warningcheck')->withoutOverlapping();
         //$schedule->command('scan:auto')->hourly()->name('autocheck')->withoutOverlapping();
+        $schedule->command('get:awsinfo')->dailyAt('23:50')->name('getawsinfo')->withoutOverlapping();
     }
 
     /**
