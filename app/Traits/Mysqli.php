@@ -74,8 +74,8 @@ trait Mysqli {
      * @return string|null
      * @throws MysqliException
      */
-    protected function queryOne($sql, $resulttype = MYSQLI_ASSOC) {
-        $row = $this->queryRow($sql, $resulttype);
+    protected function queryOne($sql) {
+        $row = $this->queryRow($sql);
         return empty($row) ? null : current($row);
     }
 

@@ -29,7 +29,7 @@
 
 	}
   }
-  
+
   function loadorder(){
   	$.post("/exception/getorder",
 	  {
@@ -67,7 +67,7 @@
 				$("#order_sku", $("#exception_form")).val(order_sku);
 			}else{
 				toastr.error(redata.message);
-			}	
+			}
 		}
 
 	  });
@@ -103,8 +103,8 @@
                 @endforeach
             </div>
         @endif
-		
-		
+
+
     <div class="portlet-title">
         <div class="caption">
             <i class="icon-microphone font-green"></i>
@@ -115,8 +115,8 @@
     </div>
     <div class="portlet-body">
 		<div class="col-xs-12">
-		
-		 
+
+
 		<div class="form-group">
 			<label>Group</label>
 			<div class="input-group ">
@@ -126,47 +126,47 @@
 				<select class="form-control" name="group_id" id="group_id">
 
 				@foreach (array_get($mygroups,'groups',array()) as $group_id=>$group)
-				
+
 					<option value="{{$group_id}}">{{array_get($groups,$group_id.'.group_name')}}</option>
-					
+
 				@endforeach
 		</select>
 			</div>
-		</div>							
-       
-		
+		</div>
 
-		
+
+
+
 		<div class="form-group">
 			<label>Seller Account and Order ID</label>
 		<div class="row" >
-	
+
 						<div class="col-md-5">
-						
+
 													<select id="rebindordersellerid" class="form-control" name="rebindordersellerid" required>
 													@foreach ($sellerids as $id=>$name)
 														<option value="{{$id}}">{{$name}}</option>
 													@endforeach
-													</select> 		
-													
+													</select>
+
 						</div>
 
                         <div class="col-md-7">
 						<div class="input-group">
-                                                 
-													
-															
-                                                                <input id="rebindorderid" class="form-control" type="text" name="rebindorderid" placeholder="Amazon Order ID"> 
+
+
+
+                                                                <input id="rebindorderid" class="form-control" type="text" name="rebindorderid" placeholder="Amazon Order ID">
                                                             <span class="input-group-btn">
                                                                 <button id="rebindorder" class="btn btn-success" type="button">
                                                                     Get Order Info</button>
                                                             </span>
                                                         </div>
-                            
+
                         </div>
-                        
-                        
-                    </div>	
+
+
+                    </div>
 					</div>
 					 <div class="form-group">
 			<label>Customer Name</label>
@@ -184,11 +184,16 @@
 			<span class="input-group-addon">
 				<i class="fa fa-bookmark"></i>
 			</span>
-				<input type="text" class="form-control" name="request_content" id="request_content" value="{{old('request_content')}}" >
+				<input type="text" class="form-control" name="request_content" id="request_content" value="{{old('request_content')}}" list="list-request_content" autocomplete="off" />
+				<datalist id="list-request_content">
+					@foreach($requestContentHistoryValues as $rcValue)
+					<option value="{!! $rcValue !!}" >
+                    @endforeach
+				</datalist>
 			</div>
 		</div>
-		
-		
+
+
 		<div class="form-group">
 			<label>Type</label>
 			<div class="input-group ">
@@ -201,7 +206,7 @@
 				<option value="1">Refund 
 				</select>
 			</div>
-		</div>				
+		</div>
 		</div>
 		<div style="clear:both"></div>
         <div class="tabbable-line">
@@ -214,10 +219,10 @@
                 </li>
             </ul>
             <div class="tab-content">
-			
+
                 <div class="tab-pane active" id="tab_1">
-				
-				
+
+
 					<div class="col-xs-12">
                         <div class="form-group">
 							<label>Refund Amount</label>
@@ -230,7 +235,7 @@
 						</div>
                         <div style="clear:both;"></div>
                     </div>
- 
+
                      <div style="clear:both;"></div>
                 </div>
 
@@ -273,7 +278,7 @@
 								<input type="text" class="form-control" name="address3" id="address3" value="{{old('address3')}}" >
 							</div>
 						</div>
-						
+
 
 
 
@@ -340,12 +345,12 @@
 								<input type="text" class="form-control" name="phone" id="phone" value="{{old('phone')}}" >
 							</div>
 						</div>
-						
-						
-						
-						
-						
-						
+
+
+
+
+
+
 
 
 
@@ -357,17 +362,17 @@
 										<div class="col-md-3">
 											<label class="control-label">Replaced SKU</label>
 											 <input type="text" class="form-control"  name="sku" placeholder="SKU" >
-								
+
 										</div>
 										<div class="col-md-5">
 											<label class="control-label">Replaced Product/Accessories Name</label>
 											 <input type="text" class="form-control"  name="title" placeholder="title" >
-								
+
 										</div>
 										<div class="col-md-2">
 											<label class="control-label">Quantity</label>
 											 <input type="text" class="form-control"  name="qty" placeholder="Quantity" >
-								
+
 										</div>
 										<div class="col-md-1">
 											<a href="javascript:;" data-repeater-delete class="btn btn-danger mt-repeater-delete">
@@ -382,13 +387,13 @@
 						</div>
                         <div style="clear:both;"></div>
                     </div>
-                        
+
                      <div style="clear:both;"></div>
                 </div>
 
 
 
-                
+
 
             </div>
 

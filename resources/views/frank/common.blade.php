@@ -1,3 +1,21 @@
+<style>
+    .container-top-msg {
+        margin-top: 25px;
+    }
+
+    .container-top-msg .alert {
+        margin-bottom: 0;
+    }
+
+    .form-group label:only-child {
+        width: 100%;
+        margin-bottom: 0;
+    }
+
+    .form-group label .form-control {
+        margin-top: 5px;
+    }
+</style>
 <script>
     try {
         eval('()=>{}')

@@ -197,8 +197,32 @@ class ExceptionController extends Controller
 
     public function create()
     {
-		
-        return view('exception/add',['groups'=>$this->getGroups(),'mygroups'=>$this->getUserGroup(),'sellerids'=>$this->getSellerIds()]);
+        $vars = ['groups'=>$this->getGroups(),'mygroups'=>$this->getUserGroup(),'sellerids'=>$this->getSellerIds()];
+
+        $vars['requestContentHistoryValues'] = array_map(function ($row) {
+            return $row['rc'];
+        }, Exception::selectRaw('DISTINCT request_content AS rc')->get()->toArray());
+
+        array_push(
+            $vars['requestContentHistoryValues'],
+            'Original Info Error',
+            'Listing Error',
+            'Unsatisfied Customer Service',
+            'Change Request Of Order Info',
+            'Return Request',
+            'Exchange Request',
+            'Ship wrong item',
+            'Lost in transit',
+            'Damage in transit',
+            'Shipping delay',
+            'out of stock',
+            'Qulity issue',
+            'Free order',
+            'Other shipping issue',
+            'Gift'
+        );
+
+        return view('exception/add', $vars);
     }
 
      public function edit(Request $request,$id)

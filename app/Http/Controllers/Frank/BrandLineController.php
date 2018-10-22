@@ -135,6 +135,7 @@ class BrandLineController extends Controller {
         })->get();
 
         $videos = KmsVideo::select('link')->where(function ($where) use ($modelRows) {
+            // 注意 $modelRows 为空时，相当于不设条件！
             foreach ($modelRows as $row) {
                 $where->orWhere(function ($where) use ($row) {
                     $where->where('brand', $row->brand);
