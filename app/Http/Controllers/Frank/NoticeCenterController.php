@@ -7,6 +7,7 @@
 
 namespace App\Http\Controllers\Frank;
 
+use App\Models\KmsNotice;
 use Illuminate\Http\Request;
 
 
@@ -59,6 +60,9 @@ class NoticeCenterController extends Controller {
         return $vars;
     }
 
+    /**
+     * @throws \App\Traits\MysqliException
+     */
     public function edit(Request $req) {
 
         $rows = $this->queryRows('SELECT item_group,brand,GROUP_CONCAT(DISTINCT item_model) AS item_models FROM asin GROUP BY item_group,brand');
@@ -71,7 +75,12 @@ class NoticeCenterController extends Controller {
     }
 
     public function create(Request $req) {
-
+        try {
+            $row = KmsNotice::add($req->all());
+            return [$row->id, 'Data Written.'];
+        } catch (\Exception $e) {
+            return [false, $e->getMessage()];
+        }
     }
 
 }

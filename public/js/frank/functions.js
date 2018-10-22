@@ -86,6 +86,17 @@ function objectFilte(obj, keys = [], except = true) {
     return result
 }
 
+function pairs2object(pairs, key, value) {
+
+    let dataObject = {}
+
+    for (let pair of pairs) {
+        dataObject[pair[key]] = pair[value]
+    }
+
+    return dataObject
+}
+
 function bindDelayEvents(eles, eTypes, callback, ...moreargs) {
 
     let stid = 0
