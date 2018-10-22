@@ -8,6 +8,7 @@
 namespace App\Http\Controllers\Frank;
 
 use App\Models\KmsNotice;
+use App\Models\KmsTag;
 use Illuminate\Http\Request;
 
 
@@ -27,7 +28,9 @@ class NoticeCenterController extends Controller {
             $itemGroupBrandModels[$row['item_group']][$row['brand']] = explode(',', $row['item_models']);
         }
 
-        return view('frank/kmsNotice', compact('itemGroupBrandModels'));
+        $tags = KmsTag::getTagList('notice');
+
+        return view('frank/kmsNotice', compact('itemGroupBrandModels', 'tags'));
     }
 
     /**
@@ -36,7 +39,7 @@ class NoticeCenterController extends Controller {
      */
     public function get(Request $req) {
 
-        $where = $this->dtWhere($req, ['item_group', 'item_model', 'brand', 'title', 'f:content'], ['item_group' => 'item_group', 'brand' => 'brand', 'item_model' => 'item_model']);
+        $where = $this->dtWhere($req, ['item_group', 'item_model', 'brand', 'title', 'f:content', 'f:tags'], ['item_group' => 'item_group', 'brand' => 'brand', 'item_model' => 'item_model']);
 
         $orderby = $this->dtOrderBy($req);
         $limit = $this->dtLimit($req);
@@ -71,12 +74,15 @@ class NoticeCenterController extends Controller {
             $itemGroupBrandModels[$row['item_group']][$row['brand']] = explode(',', $row['item_models']);
         }
 
-        return view('frank.kmsNoticeCreate', compact('itemGroupBrandModels'));
+        $tags = KmsTag::getTagList('notice');
+
+        return view('frank.kmsNoticeCreate', compact('itemGroupBrandModels', 'tags'));
     }
 
     public function create(Request $req) {
         try {
             $row = KmsNotice::add($req->all());
+            KmsTag::puts('notice', $req->input('tags'));
             return [$row->id, 'Data Written.'];
         } catch (\Exception $e) {
             return [false, $e->getMessage()];

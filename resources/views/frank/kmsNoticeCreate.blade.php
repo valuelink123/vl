@@ -105,8 +105,8 @@
         $('#tags').tagEditor({
             autocomplete: {
                 delay: 0,
+                source: @json($tags),
                 position: {collision: 'flip'},
-                source: ['ActionScript', 'AppleScript', 'Asp', ... 'Python', 'Ruby']
             },
             forceLowercase: false,
             placeholder: 'Enter tags ...'
