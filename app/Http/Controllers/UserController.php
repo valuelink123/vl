@@ -427,6 +427,144 @@ where a.date>=:sdate_from and a.date<=:sdate_to
 			}
 			
 			
+			
+			if(array_get($_REQUEST,'ExportType')=='Fees'){
+				$seller=[];
+				$accounts= DB::connection('order')->table('accounts')->where('status',1)->groupBy(['sellername','sellerid'])->get(['sellername','sellerid']);
+				$accounts=json_decode(json_encode($accounts), true);
+				foreach($accounts as $account){
+					$seller[$account['sellerid']]=$account['sellername'];
+				}
+				$users=$this->getUsers();
+				
+				$spreadsheet = new Spreadsheet();
+				$myWorkSheet = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($spreadsheet, 'Ads Fee');
+				$spreadsheet->addSheet($myWorkSheet, 0);
+				$myWorkSheet = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($spreadsheet, 'Deal Fee');
+				$spreadsheet->addSheet($myWorkSheet, 1);
+				$myWorkSheet = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($spreadsheet, 'Coupon Fee');
+				$spreadsheet->addSheet($myWorkSheet, 2);
+				$myWorkSheet = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($spreadsheet, 'Service Fee');
+				$spreadsheet->addSheet($myWorkSheet, 3);
+
+				
+				$datas= DB::connection('order')->table('finances_product_ads_payment_event')->where('PostedDate','>=',$date_from.'T00:00:00Z')->where('PostedDate','<=',$date_to.'T23:59:59Z')->orderBy('PostedDate','asc')->get()->toArray();
+				$arrayData[] = ['PostedDate','SellerId','SellerName','InvoiceId','Amount','Currency','BG','BU','User'];
+				$datas=json_decode(json_encode($datas), true);
+				foreach($datas as $key=>$val){
+					$arrayData[] = [
+						array_get($val,'PostedDate'),
+						array_get($val,'SellerId'),
+						array_get($seller,array_get($val,'SellerId'),array_get($val,'SellerId')),
+						array_get($val,'InvoiceId'),
+						array_get($val,'TransactionValue'),
+						array_get($val,'Currency'),
+						array_get($val,'bg'),
+						array_get($val,'bu'),
+						array_get($users,array_get($val,'user_id'),array_get($val,'user_id'))
+					];
+				}
+				
+				
+	
+				$spreadsheet->getSheet(0)
+					->fromArray(
+						$arrayData,  // The data to set
+						NULL,        // Array values with this value will not be set
+						'A1'         // Top left coordinate of the worksheet range where
+									 //    we want to set these values (default is A1)
+					);
+				$arrayData=[];
+				$datas= DB::connection('order')->table('finances_deal_event')->where('PostedDate','>=',$date_from.'T00:00:00Z')->where('PostedDate','<=',$date_to.'T23:59:59Z')->orderBy('PostedDate','asc')->get()->toArray();
+				$arrayData[] = ['PostedDate','SellerId','SellerName','DealId','DealDescription','Amount','Currency','BG','BU','User'];
+				$datas=json_decode(json_encode($datas), true);
+				foreach($datas as $key=>$val){
+					$arrayData[] = [
+						array_get($val,'PostedDate'),
+						array_get($val,'SellerId'),
+						array_get($seller,array_get($val,'SellerId'),array_get($val,'SellerId')),
+						array_get($val,'DealId'),
+						array_get($val,'DealDescription'),
+						array_get($val,'TotalAmount'),
+						array_get($val,'Currency'),
+						array_get($val,'bg'),
+						array_get($val,'bu'),
+						array_get($users,array_get($val,'user_id'),array_get($val,'user_id'))
+					];
+				}
+				$spreadsheet->getSheet(1)
+					->fromArray(
+						$arrayData,  // The data to set
+						NULL,        // Array values with this value will not be set
+						'A1'         // Top left coordinate of the worksheet range where
+									 //    we want to set these values (default is A1)
+					);
+					
+				$arrayData=[];
+				$datas= DB::connection('order')->table('finances_coupon_event')->where('PostedDate','>=',$date_from.'T00:00:00Z')->where('PostedDate','<=',$date_to.'T23:59:59Z')->orderBy('PostedDate','asc')->get()->toArray();
+				$arrayData[] = ['PostedDate','SellerId','SellerName','CouponId','SellerCouponDescription','Amount','Currency','BG','BU','User'];
+				$datas=json_decode(json_encode($datas), true);
+				foreach($datas as $key=>$val){
+					$arrayData[] = [
+						array_get($val,'PostedDate'),
+						array_get($val,'SellerId'),
+						array_get($seller,array_get($val,'SellerId'),array_get($val,'SellerId')),
+						array_get($val,'CouponId'),
+						array_get($val,'SellerCouponDescription'),
+						array_get($val,'TotalAmount'),
+						array_get($val,'Currency'),
+						array_get($val,'bg'),
+						array_get($val,'bu'),
+						array_get($users,array_get($val,'user_id'),array_get($val,'user_id'))
+					];
+				}
+				$spreadsheet->getSheet(2)
+					->fromArray(
+						$arrayData,  // The data to set
+						NULL,        // Array values with this value will not be set
+						'A1'         // Top left coordinate of the worksheet range where
+									 //    we want to set these values (default is A1)
+					);
+					
+					
+				$arrayData=[];
+				$datas= DB::connection('order')->table('finances_servicefee_event')->where('PostedDate','>=',$date_from.'T00:00:00Z')->where('PostedDate','<=',$date_to.'T23:59:59Z')->orderBy('PostedDate','asc')->get()->toArray();
+				$arrayData[] = ['PostedDate','SellerId','SellerName','FeeDescription','Amount','Currency','BG','BU','User'];
+				$datas=json_decode(json_encode($datas), true);
+				foreach($datas as $key=>$val){
+					$arrayData[] = [
+						array_get($val,'PostedDate'),
+						array_get($val,'SellerId'),
+						array_get($seller,array_get($val,'SellerId'),array_get($val,'SellerId')),
+						array_get($val,'Type'),
+						array_get($val,'Amount'),
+						array_get($val,'Currency'),
+						array_get($val,'bg'),
+						array_get($val,'bu'),
+						array_get($users,array_get($val,'user_id'),array_get($val,'user_id'))
+					];
+				}
+				$spreadsheet->getSheet(3)
+					->fromArray(
+						$arrayData,  // The data to set
+						NULL,        // Array values with this value will not be set
+						'A1'         // Top left coordinate of the worksheet range where
+									 //    we want to set these values (default is A1)
+					);
+					
+					
+					
+				$spreadsheet->setActiveSheetIndex(0);
+				header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');//¸æËßä¯ÀÀÆ÷Êä³ö07ExcelÎÄ¼þ
+				header('Content-Disposition: attachment;filename="Export_'.array_get($_REQUEST,'ExportType').'.xlsx"');//¸æËßä¯ÀÀÆ÷Êä³öä¯ÀÀÆ÷Ãû³Æ
+				header('Cache-Control: max-age=0');//½ûÖ¹»º´æ
+				$writer = new Xlsx($spreadsheet);
+				$writer->save('php://output');
+				
+				$arrayData=[];
+			}
+			
+			
 		
         }
 		

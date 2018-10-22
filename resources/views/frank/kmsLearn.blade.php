@@ -1,5 +1,7 @@
 @extends('layouts.layout')
-@section('label', 'Knowledge Manage')
+@section('crumb')
+    @include('layouts.crumb', ['crumbs'=>[['KMS', '/kms/productguide'], 'Learn Center']])
+@endsection
 @section('content')
 
     @include('frank.common')

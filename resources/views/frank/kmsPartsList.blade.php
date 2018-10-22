@@ -1,5 +1,7 @@
 @extends('layouts.layout')
-@section('label', 'Knowledge Manage')
+@section('crumb')
+    @include('layouts.crumb', ['crumbs'=>[['KMS', '/kms/productguide'], 'Parts List']])
+@endsection
 @section('content')
 
     @include('frank.common')
@@ -136,6 +138,7 @@
                 {data: 'fba_stock', name: 'fba_stock'},
                 {data: 'fba_transfer', name: 'fba_transfer'},
                 {
+                    width: "2px",
                     "className": 'details-control disabled',
                     "orderable": false,
                     "data": 'item_code',

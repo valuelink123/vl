@@ -22,9 +22,12 @@ trait Migration {
     }
 
     public function statement($sql) {
-        // https://laravel.com/docs/5.5/database#running-queries
         DB::statement($sql);
-        // DB::unprepared($sql);
+    }
+
+    public function statements($sql) {
+        // https://laravel.com/docs/5.5/database#running-queries
+        DB::unprepared($sql);
     }
 
     public function isTableExists($table) {
@@ -75,5 +78,15 @@ trait Migration {
         if (empty($this->getColumnInfo($table, $column))) return;
         if (!$this->isColumnEmpty($table, $column)) throw new \Exception("You may Backup and Empty Column $table.$column before dropping.");
         $this->statement("ALTER TABLE `$table` DROP COLUMN `$column`");
+    }
+
+    public function isIndexExists($table, $index) {
+        $arr = DB::select("SHOW INDEX FROM `$table` WHERE Key_name = '$index' ");
+        return !empty($arr);
+    }
+
+    public function dropIndex($table, $index) {
+        if (!$this->isIndexExists($table, $index)) return;
+        $this->statement("ALTER TABLE `${table}` DROP INDEX `${index}`");
     }
 }

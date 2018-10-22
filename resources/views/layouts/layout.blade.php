@@ -111,7 +111,7 @@
 
     <!-- END PAGE LEVEL SCRIPTS -->
     <link rel="shortcut icon" href="/favicon.ico" />
-    <link href="/css/common.css?v=2" rel="stylesheet" type="text/css"/>
+    <link href="/css/common.css?v=9" rel="stylesheet" type="text/css"/>
 </head>
 <!-- END HEAD -->
 
@@ -466,6 +466,14 @@
                             <?php if($action=='tran') echo '<span class="selected"></span>';?>
                         </a>
                     </li>
+					
+					<li class="nav-item <?php if($action=='fees') echo 'active';?>">
+                        <a href="{{ url('fees') }}" class="nav-link nav-toggle">
+                            <i class="fa fa-dollar"></i>
+                            <span class="title">Fees Split</span>
+                            <?php if($action=='fees') echo '<span class="selected"></span>';?>
+                        </a>
+                    </li>
 
 
                 </ul>
@@ -490,6 +498,7 @@
                         <li>
                             <span>@yield('label')</span>
                         </li>
+                        @yield('crumb')
                     </ul>
                 </div>
 

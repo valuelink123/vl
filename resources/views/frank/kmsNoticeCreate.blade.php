@@ -1,5 +1,7 @@
 @extends('layouts.layout')
-@section('label', 'Knowledge Manage')
+@section('crumb')
+    @include('layouts.crumb', ['crumbs'=>[['KMS', '/kms/productguide'], ['Notice Center', '/kms/notice'], 'Add New']])
+@endsection
 @section('content')
 
     <style>
@@ -11,110 +13,121 @@
         .form-group label .form-control {
             margin-top: 5px;
         }
+
+        .tag-editor {
+            line-height: 26px !important;
+            border: none !important;
+        }
     </style>
 
+    @include('UEditor::head')
     @include('frank.common')
+    @include('frank.tagEditor')
 
-    <h1 class="page-title font-red-intense"> Single Import
+    <h1 class="page-title font-red-intense"> New Notice
         <small></small>
     </h1>
 
     <div class="portlet light bordered">
         <div class="portlet-body">
-            <form method="post" class="row">
-                <div class="col-lg-4">
+            <form method="post" class="row" id="theform">
 
+                <div class="col-md-2">
                     <div class="form-group">
                         <label>
                             Item Group
                             <input required autocomplete="off" class="xform-autotrim form-control" placeholder="Item Group" name="item_group" id="item_group"/>
                         </label>
                     </div>
+                </div>
 
+                <div class="col-md-2">
                     <div class="form-group">
                         <label>
                             Brand
                             <input required autocomplete="off" class="xform-autotrim form-control" placeholder="Brand" name="brand" id="brand"/>
                         </label>
                     </div>
+                </div>
 
+                <div class="col-md-2">
                     <div class="form-group">
                         <label>
                             Item Model
                             <input required autocomplete="off" class="xform-autotrim form-control" placeholder="Item Model" name="item_model" id="item_model"/>
                         </label>
                     </div>
-
-                    <div class="form-group">
-                        <label>
-                            Video Type
-                            <select required autocomplete="off" class="form-control" name="type">
-                                @foreach($types as $type)
-                                    <option value="{!! $type !!}">{!! $type !!}</option>
-                                @endforeach
-                            </select>
-                        </label>
-                    </div>
-
-                    <br/>{!! csrf_field() !!}
-
-                    <button type="submit" class="btn btn-primary">Submit</button>
-
-                </div>
-
-                <div class="col-lg-4">
-
-                    <div class="form-group">
-                        <label>
-                            Video Link
-                            <input required pattern=".*\S+.*" autocomplete="off" class="xform-autotrim form-control" placeholder="Link" name="link" title="This field is required."/>
-                        </label>
-                    </div>
-
-                    <div class="form-group">
-                        <label>
-                            Note
-                            <input autocomplete="off" class="xform-autotrim form-control" placeholder="Note" name="note"/>
-                        </label>
-                    </div>
-
-                    <div class="form-group">
-                        <label>
-                            Video Description
-                            <textarea autocomplete="off" placeholder="Description" name="descr" class="form-control" style="min-height:7em"></textarea>
-                        </label>
-                    </div>
-
                 </div>
 
             </form>
-        </div>
-    </div>
 
-
-    <h1 class="page-title font-red-intense"> Batch Import
-        <small></small>
-    </h1>
-
-    <div class="portlet light bordered">
-        <div class="portlet-body">
-            <form method="post" enctype="multipart/form-data">
-                <div class="form-group">
-                    <label>
-                        Import by Excel Format
-                        <input required autocomplete="off" type="file" style="margin-top: 5px;" accept=".xls, .xlsx" name="excelfile"/>
-                    </label>
-                    <p class="help-block">Fill in the Excel <a href="/kms/product_video_import.xlsx">template.xlsx</a> and upload it here.</p>
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="form-group">
+                        <label>
+                            <b>Title</b>
+                            <textarea form="theform" autocomplete="off" placeholder="Notice Title ..." name="title" class="form-control" style="height:34px"></textarea>
+                        </label>
+                    </div>
                 </div>
-                <br/>{!! csrf_field() !!}
-                <button type="submit" class="btn btn-primary">Submit</button>
-            </form>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-8">
+                    <div class="form-group">
+                        <label><b>Content</b></label>
+                        <script id="content" name="content" type="text/plain">init content ,...</script>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-8">
+                    <div class="form-group">
+                        <label>
+                            Tags
+                            <div class="form-control" style="padding:0; height:auto;">
+                                <textarea form="theform" name="tags" id="tags"></textarea>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-12">
+                    <br/><br/>
+                    <input form="theform" type="hidden" name="_token" value="{!! $csrf_token = csrf_token() !!}"/>
+                    <button form="theform" type="submit" class="btn btn-primary" style="padding:.5em 3em;">Submit</button>
+                </div>
+            </div>
+
         </div>
     </div>
 
     <script>
 
         new LinkageInput([item_group, brand, item_model], @json($itemGroupBrandModels))
+
+        $('#tags').tagEditor({
+            autocomplete: {
+                delay: 0,
+                position: {collision: 'flip'},
+                source: ['ActionScript', 'AppleScript', 'Asp', ... 'Python', 'Ruby']
+            },
+            forceLowercase: false,
+            placeholder: 'Enter tags ...'
+        });
+
+
+        let ue = UE.getEditor('content', {
+            topOffset: 60,
+            initialFrameWidth: 1171
+        })
+
+        ue.ready(function () {
+            ue.execCommand('serverparam', '_token', '{!! $csrf_token !!}');
+        })
 
     </script>
 

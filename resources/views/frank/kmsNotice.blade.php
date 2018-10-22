@@ -1,5 +1,8 @@
 @extends('layouts.layout')
-@section('label', 'Knowledge Manage')
+@section('title', 'KMS Notice Center')
+@section('crumb')
+    @include('layouts.crumb', ['crumbs'=>[['KMS', '/kms/productguide'], 'Notice Center']])
+@endsection
 @section('content')
 
     @include('frank.common')
@@ -14,24 +17,37 @@
             <br/>
 
             <div class="row">
-                <div class="col-lg-3">
+                <div class="col-md-2">
                     <div class="input-group">
                         <span class="input-group-addon">Item Group</span>
                         <input type="text" class="xform-autotrim form-control" data-init-by-query="ands.item_group" placeholder="Item Group..." id="item_group" autocomplete="off"/>
                     </div>
                 </div>
-                <div class="col-lg-3">
+                <div class="col-md-2">
+                    <div class="input-group">
+                        <span class="input-group-addon">Brand</span>
+                        <input type="text" class="xform-autotrim form-control" data-init-by-query="ands.brand" placeholder="Brand ..." id="brand" autocomplete="off"/>
+                    </div>
+                </div>
+                <div class="col-md-2">
                     <div class="input-group">
                         <span class="input-group-addon">Item Model</span>
                         <input type="text" class="xform-autotrim form-control" data-init-by-query="ands.item_model" placeholder="Item Model..." id="item_model" autocomplete="off"/>
                     </div>
                 </div>
-                <div class="col-lg-3">
+                <div class="col-md-2">
                     <div class="input-group">
                         <input type="text" class="xform-autotrim form-control" data-init-by-query="value" placeholder="Fuzzy search..." id="fuzzysearch" autocomplete="off"/>
                         <span class="input-group-btn">
                             <button class="btn btn-default" type="button" id="dosearch">Search!</button>
                         </span>
+                    </div>
+                </div>
+                <div class="col-md-1">
+                    <div class="btn-group pull-right">
+                        <a id="add-new" class="btn sbold green" href="/kms/notice/create"> Add New
+                            <i class="fa fa-plus-circle"></i>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -81,7 +97,7 @@
 
     <script>
 
-        new LinkageInput([item_group, item_model], @json($itemGroupModels))
+        new LinkageInput([item_group, brand, item_model], @json($itemGroupBrandModels))
 
         async function loadData(page = 1) {
 
@@ -95,6 +111,7 @@
             let search = {
                 page,
                 ands: {
+                    brand: brand.value,
                     item_group: item_group.value,
                     item_model: item_model.value
                 },

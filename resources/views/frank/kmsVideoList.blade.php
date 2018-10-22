@@ -1,5 +1,7 @@
 @extends('layouts.layout')
-@section('label', 'Knowledge Manage')
+@section('crumb')
+    @include('layouts.crumb', ['crumbs'=>[['KMS', '/kms/productguide'], 'Product Videos']])
+@endsection
 @section('content')
 
     @include('frank.common')
@@ -14,7 +16,7 @@
                 <div class="row">
                     <div class="col-md-8"></div>
                     <div class="col-md-4">
-                        <div class="btn-group " style="float:right;">
+                        <div class="btn-group pull-right">
 
                             <a id="excel-import" class="btn sbold green" href="/kms/videolist/import"> Import
                                 <i class="fa fa-plus-circle"></i>
