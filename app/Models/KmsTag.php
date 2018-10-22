@@ -24,6 +24,12 @@ class KmsTag extends Model {
         }
     }
 
+    /**
+     * 根据 $type 返回使用过的标签；
+     * 如果 $type 为空则返回所有；
+     * @param string $type
+     * @return array
+     */
     static function getTagList($type = '') {
 
         $rows = static::select('tag')->where(function ($model) use ($type) {
