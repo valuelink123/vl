@@ -28,21 +28,80 @@
 					
 						<div class="form-group">
                             <label>Product Line</label>
-                            <div class="input-group ">
-                                <span class="input-group-addon">
-                                    <i class="fa fa-envelope"></i>
-                                </span>
-                                <input type="text" class="form-control" placeholder="product Line" name="product_line" id="product_line" value="{{old('product_line')}}" required />
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label>Product </label>
-                            <div class="input-group ">
-                                <span class="input-group-addon">
-                                    <i class="fa fa-envelope"></i>
-                                </span>
-                                <input type="text" class="form-control" placeholder="product" name="product" id="product" value="{{old('product')}}" required />
-                            </div>
+                            <div class="epoint_selectList form-inline">
+							<select class="epoint_group form-control" name="product_line" required>
+							</select>
+							<select class="epoint_product form-control" name="product" required>							
+							</select>
+							<select class="epoint form-control" name="epoint">
+							</select>
+						</div>
+						<script type="text/javascript">
+						$(function(){
+							$(".epoint_selectList").each(function(){
+								var url = "/epoint.json";
+								var epointJson;
+								var temp_html;
+								var oepoint_group = $(this).find(".epoint_group");
+								var oepoint_product = $(this).find(".epoint_product");
+								var oepoint = $(this).find(".epoint");
+
+								var epoint_group = function(){
+									temp_html = '<option value="">Group</option>';
+									$.each(epointJson,function(i,epoint_group){
+										temp_html+='<option value="'+i+'" '+((oepoint_group.val() == i) ?"selected":"")+'>'+i+'</option>';
+									});
+									oepoint_group.html(temp_html);
+									epoint_product();
+								};
+			
+								var epoint_product = function(){
+									temp_html = '<option value="">Product</option>';
+									
+										var n = oepoint_group.val();
+										if(typeof(epointJson[n]) == "undefined"){
+											oepoint_product.css("display","none");
+											oepoint.css("display","none");
+										}else{
+											oepoint_product.css("display","inline");
+											$.each(epointJson[n],function(i,epoint_product){
+												temp_html+='<option value="'+i+'" '+((oepoint_product.val() == i) ?"selected":"")+'>'+i+'</option>';
+											});
+											oepoint_product.html(temp_html);
+											epoint();
+										}
+									
+								};
+						
+								var epoint = function(){
+									temp_html = '<option value="">Problem</option>'; 
+									var m = oepoint_group.val();
+									var n = oepoint_product.val();
+							
+										if(typeof(epointJson[m][n]) == "undefined"){
+											oepoint.css("display","none");
+										}else{
+											oepoint.css("display","inline");
+											$.each(epointJson[m][n],function(i,epoint){
+												temp_html+='<option value="'+epoint+'" '+((oepoint.val() == epoint) ?"selected":"")+'>'+epoint+'</option>';
+											});
+											oepoint.html(temp_html);
+										};
+									
+								};
+								oepoint_group.change(function(){
+									epoint_product();
+								});
+								oepoint_product.change(function(){
+									epoint();
+								});
+								$.getJSON(url,function(data){
+									epointJson = data;
+									epoint_group();
+								});
+							});
+						});
+						</script>
                         </div>
 						
 						<div class="form-group">
@@ -54,7 +113,7 @@
                                 <input type="text" class="form-control" placeholder="Model" name="model" id="model" value="{{old('model')}}" required />
                             </div>
                         </div>
-						
+		
 						
 						<div class="form-group">
                             <label>Item No.</label>
@@ -82,16 +141,6 @@
                         </div>
                     </div>
 					
-					<div class="form-group">
-                        <label>Problem Point</label>
-                        <div class="input-group ">
-                                <span class="input-group-addon">
-                                    <i class="fa fa-bookmark"></i>
-                                </span>
-                            <input type="text" class="form-control" name="epoint" id="epoint" value="{{old('epoint')}}" >
-                        </div>
-                    </div>
-					
 					
                         <div class="form-group">
                             <label>Title</label>
@@ -108,11 +157,11 @@
                             <div class="input-group">
                                 @include('UEditor::head')
 
-                                    <!-- ¼ÓÔØ±à¼­Æ÷µÄÈİÆ÷ -->
+                                    <!-- åŠ è½½ç¼–è¾‘å™¨çš„å®¹å™¨ -->
                                     <script id="qa_content" name="description" type="text/plain">
 									<?php echo old('description'); ?>
 									</script>
-                                    <!-- ÊµÀı»¯±à¼­Æ÷ -->
+                                    <!-- å®ä¾‹åŒ–ç¼–è¾‘å™¨ -->
                                     <script type="text/javascript">
                                         var ue = UE.getEditor('qa_content',{toolbars: [[
             'fullscreen', 'source', '|', 'undo', 'redo', '|',
@@ -128,7 +177,7 @@
             'print', 'preview', 'searchreplace', 'drafts', 'help'
         ]]});
                                         ue.ready(function() {
-                                            ue.execCommand('serverparam', '_token', '{{ csrf_token() }}');//´Ë´¦ÎªÖ§³Ölaravel5 csrf ,¸ù¾İÊµ¼ÊÇé¿öĞŞ¸Ä,Ä¿µÄ¾ÍÊÇÉèÖÃ _token Öµ.
+                                            ue.execCommand('serverparam', '_token', '{{ csrf_token() }}');//æ­¤å¤„ä¸ºæ”¯æŒlaravel5 csrf ,æ ¹æ®å®é™…æƒ…å†µä¿®æ”¹,ç›®çš„å°±æ˜¯è®¾ç½® _token å€¼.
                                         });
                                		 </script>
                             </div>
@@ -139,11 +188,11 @@
 						<div class="form-group">
                             <label>Trouble Shooting</label>
                             <div class="input-group">
-                                    <!-- ¼ÓÔØ±à¼­Æ÷µÄÈİÆ÷ -->
+                                    <!-- åŠ è½½ç¼–è¾‘å™¨çš„å®¹å™¨ -->
                                     <script id="dqe_content" name="dqe_content" type="text/plain">
 									<?php echo old('dqe_content'); ?>
 									</script>
-                                    <!-- ÊµÀı»¯±à¼­Æ÷ -->
+                                    <!-- å®ä¾‹åŒ–ç¼–è¾‘å™¨ -->
                                     <script type="text/javascript">
                                         var ue = UE.getEditor('dqe_content',{toolbars: [[
             'fullscreen', 'source', '|', 'undo', 'redo', '|',
@@ -159,7 +208,7 @@
             'print', 'preview', 'searchreplace', 'drafts', 'help'
         ]]});
                                         ue.ready(function() {
-                                            ue.execCommand('serverparam', '_token', '{{ csrf_token() }}');//´Ë´¦ÎªÖ§³Ölaravel5 csrf ,¸ù¾İÊµ¼ÊÇé¿öĞŞ¸Ä,Ä¿µÄ¾ÍÊÇÉèÖÃ _token Öµ.
+                                            ue.execCommand('serverparam', '_token', '{{ csrf_token() }}');//æ­¤å¤„ä¸ºæ”¯æŒlaravel5 csrf ,æ ¹æ®å®é™…æƒ…å†µä¿®æ”¹,ç›®çš„å°±æ˜¯è®¾ç½® _token å€¼.
                                         });
                                		 </script>
                             </div>
@@ -170,11 +219,11 @@
                             <div class="input-group">
                   
 
-                                    <!-- ¼ÓÔØ±à¼­Æ÷µÄÈİÆ÷ -->
+                                    <!-- åŠ è½½ç¼–è¾‘å™¨çš„å®¹å™¨ -->
                                     <script id="service_content" name="service_content" type="text/plain">
 									<?php echo old('service_content'); ?>
 									</script>
-                                    <!-- ÊµÀı»¯±à¼­Æ÷ -->
+                                    <!-- å®ä¾‹åŒ–ç¼–è¾‘å™¨ -->
                                     <script type="text/javascript">
                                         var ue = UE.getEditor('service_content',{toolbars: [[
             'fullscreen', 'source', '|', 'undo', 'redo', '|',
@@ -190,7 +239,7 @@
             'print', 'preview', 'searchreplace', 'drafts', 'help'
         ]]});
                                         ue.ready(function() {
-                                            ue.execCommand('serverparam', '_token', '{{ csrf_token() }}');//´Ë´¦ÎªÖ§³Ölaravel5 csrf ,¸ù¾İÊµ¼ÊÇé¿öĞŞ¸Ä,Ä¿µÄ¾ÍÊÇÉèÖÃ _token Öµ.
+                                            ue.execCommand('serverparam', '_token', '{{ csrf_token() }}');//æ­¤å¤„ä¸ºæ”¯æŒlaravel5 csrf ,æ ¹æ®å®é™…æƒ…å†µä¿®æ”¹,ç›®çš„å°±æ˜¯è®¾ç½® _token å€¼.
                                         });
                                		 </script>
                             </div>
