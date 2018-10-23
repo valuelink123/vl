@@ -212,15 +212,15 @@ class ExceptionController extends Controller
             'Change Request Of Order Info',
             'Return Request',
             'Exchange Request',
-            'Ship wrong item',
-            'Lost in transit',
-            'Damage in transit',
-            'Shipping delay',
-            'out of stock',
-            'Qulity issue',
-            'Free order',
-            'Other shipping issue',
-            'Gift'
+            'Ship Wrong Item',
+            'Lost In Transit',
+            'Damage In Transit',
+            'Shipping Delay',
+            'Out Of Stock',
+            'Qulity Issue',
+            'Free Order',
+            'Gift',
+            'Other Shipping Issue'
         );
 
         return view('exception/add', $vars);
