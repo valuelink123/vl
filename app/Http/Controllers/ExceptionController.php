@@ -199,9 +199,10 @@ class ExceptionController extends Controller
     {
         $vars = ['groups'=>$this->getGroups(),'mygroups'=>$this->getUserGroup(),'sellerids'=>$this->getSellerIds()];
 
-        $vars['requestContentHistoryValues'] = array_map(function ($row) {
-            return $row['rc'];
-        }, Exception::selectRaw('DISTINCT request_content AS rc')->get()->toArray());
+        $vars['requestContentHistoryValues'] = [];
+        // array_map(function ($row) {
+        //     return $row['rc'];
+        // }, Exception::selectRaw('DISTINCT request_content AS rc')->get()->toArray());
 
         array_push(
             $vars['requestContentHistoryValues'],
