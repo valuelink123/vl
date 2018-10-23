@@ -206,20 +206,20 @@ class ExceptionController extends Controller
 
         array_push(
             $vars['requestContentHistoryValues'],
-            'Original Info Error',
-            'Listing Error',
-            'Unsatisfied Customer Service',
             'Change Request Of Order Info',
-            'Return Request',
-            'Exchange Request',
-            'Ship Wrong Item',
-            'Lost In Transit',
             'Damage In Transit',
-            'Shipping Delay',
-            'Out Of Stock',
-            'Qulity Issue',
+            'Exchange Request',
             'Free Order',
             'Gift',
+            'Listing Error',
+            'Lost In Transit',
+            'Original Info Error',
+            'Out Of Stock',
+            'Qulity Issue',
+            'Return Request',
+            'Ship Wrong Item',
+            'Shipping Delay',
+            'Unsatisfied Customer Service',
             'Other Shipping Issue'
         );
 
@@ -548,6 +548,12 @@ class ExceptionController extends Controller
 		}else{
 			$exception->refund = 0;
 		}
+
+        if( $exception->type == 4){
+            $exception->gift_card_amount = $request->get('gift_card_amount');
+        }else{
+            $exception->gift_card_amount = 0;
+        }
 
 		if( $exception->type == 2 || $exception->type == 3){
 			$exception->replacement = serialize(

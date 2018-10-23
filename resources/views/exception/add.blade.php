@@ -32,7 +32,7 @@
 		}
 
 	}
-    if($("#type").val()==='gift-card'){
+    if($("#type").val()==4){
 		$("a[href='#tab_1'],a[href='#tab_2']").parent().removeClass('active').hide();
         $("#tab_1,#tab_2").removeClass('active');
         $("a[href='#tab_3']").parent().addClass('active').show();
@@ -197,7 +197,7 @@
 				<input type="text" class="form-control" name="request_content" id="request_content" value="{{old('request_content')}}" list="list-request_content" autocomplete="off" />
 				<datalist id="list-request_content">
 					@foreach($requestContentHistoryValues as $rcValue)
-						<option value="{!! $rcValue !!}" >
+						<option value="{{$rcValue}}" >
 					@endforeach
 				</datalist>
 			</div>
@@ -214,7 +214,7 @@
 				<option value="3">Refund & Replacement
 				<option value="2">Replacement
 				<option value="1">Refund
-				<option value="gift-card">Gift Card
+				<option value="4">Gift Card
 				</select>
 			</div>
 		</div>
