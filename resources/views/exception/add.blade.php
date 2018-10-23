@@ -186,9 +186,9 @@
 			</span>
 				<input type="text" class="form-control" name="request_content" id="request_content" value="{{old('request_content')}}" list="list-request_content" autocomplete="off" />
 				<datalist id="list-request_content">
-                    @foreach($requestContentHistoryValues as $rcValue)
-                    <option value="{!! $rcValue !!}" >
-                    @endforeach
+					@foreach($requestContentHistoryValues as $rcValue)
+						<option value="{!! $rcValue !!}" >
+					@endforeach
 				</datalist>
 			</div>
 		</div>
