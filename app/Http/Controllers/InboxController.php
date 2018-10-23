@@ -62,7 +62,9 @@ class InboxController extends Controller
 		   if($request->get('mark')) $inbox->mark = $request->get('mark');
            if($request->get('sku')) $inbox->sku = strtoupper($request->get('sku'));
 		   if($request->get('asin')) $inbox->asin = strtoupper($request->get('asin'));
-		   if($request->get('epoint')) $inbox->epoint = strtoupper($request->get('epoint'));
+		   if($request->get('epoint')) $inbox->epoint = $request->get('epoint');
+		   if($request->get('epoint_product')) $inbox->epoint_product = $request->get('epoint_product');
+		   if($request->get('epoint_group')) $inbox->epoint_group = $request->get('epoint_group');
 		   if($request->get('item_no')) $inbox->item_no = strtoupper($request->get('item_no'));
 		   $change_user=false;
            if($request->get('user_id')){
