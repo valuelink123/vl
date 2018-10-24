@@ -147,6 +147,7 @@ class ExceptionController extends Controller
 				}
 				}
 			}
+            if($customersList['type']==4) $operate.= 'Gift Card : '.$customersList['gift_card_amount'].PHP_EOL;
 
             $arrayData[] = array(
                
@@ -460,6 +461,7 @@ class ExceptionController extends Controller
 					}
 				}
 			}
+            if($customersList['type']==4) $operate.= 'Gift Card : '.$customersList['gift_card_amount'].PHP_EOL;
 
             $records["data"][] = array(
                 ((Auth::user()->admin || in_array($customersList['group_id'],array_get($this->getUserGroup(),'manage_groups',array()))) && $customersList['process_status']=='submit')?'<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input name="id[]" type="checkbox" class="checkboxes" value="'.$customersList['id'].'"/><span></span></label>':'',
