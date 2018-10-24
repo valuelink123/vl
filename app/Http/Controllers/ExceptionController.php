@@ -550,7 +550,7 @@ class ExceptionController extends Controller
 		}
 
         if( $exception->type == 4){
-            $exception->gift_card_amount = $request->get('gift_card_amount');
+            $exception->gift_card_amount = $request->get('gift_card_amount')??0;
         }else{
             $exception->gift_card_amount = 0;
         }
