@@ -41,6 +41,11 @@
   }
 
   function loadorder(){
+
+	if(!rebindordersellerid.value || !rebindorderid.value){
+	    return $(exception_form_submit).click()
+	}
+
   	$.post("/exception/getorder",
 	  {
 	  	"_token":"{{csrf_token()}}",
@@ -153,11 +158,12 @@
 
 						<div class="col-md-5">
 
-													<select id="rebindordersellerid" class="form-control" name="rebindordersellerid" required>
-													@foreach ($sellerids as $id=>$name)
-														<option value="{{$id}}">{{$name}}</option>
-													@endforeach
-													</select>
+													<input id="rebindordersellerid" class="form-control xform-autotrim" name="rebindordersellerid" list="list-rebindordersellerid" placeholder="Seller Account" autocomplete="off" required />
+													<datalist id="list-rebindordersellerid">
+														@foreach ($sellerids as $id=>$name)
+															<option value="{{$id}}" label="{{$name}}" >
+														@endforeach
+													</datalist>
 
 						</div>
 
@@ -166,7 +172,7 @@
 
 
 
-                                                                <input id="rebindorderid" class="form-control" type="text" name="rebindorderid" placeholder="Amazon Order ID">
+                                                                <input id="rebindorderid" class="form-control xform-autotrim" type="text" name="rebindorderid" placeholder="Amazon Order ID" autocomplete="off" required />
                                                             <span class="input-group-btn">
                                                                 <button id="rebindorder" class="btn btn-success" type="button">
                                                                     Get Order Info</button>
@@ -194,7 +200,7 @@
 			<span class="input-group-addon">
 				<i class="fa fa-bookmark"></i>
 			</span>
-				<input type="text" class="form-control" name="request_content" id="request_content" value="{{old('request_content')}}" list="list-request_content" autocomplete="off" />
+				<input type="text" class="form-control xform-autotrim" name="request_content" id="request_content" value="{{old('request_content')}}" list="list-request_content" autocomplete="off" />
 				<datalist id="list-request_content">
 					@foreach($requestContentHistoryValues as $rcValue)
 						<option value="{{$rcValue}}" >
@@ -370,7 +376,7 @@
 
 
                        <div class="form-group mt-repeater">
-							<div data-repeater-list="group-products">
+							<div data-repeater-list="group-products" id="replacement-product-list">
 								<div data-repeater-item class="mt-repeater-item">
 									<div class="row mt-repeater-row">
 										<div class="col-md-3">
@@ -437,7 +443,7 @@
 <div class="form-actions">
                         <div class="row">
                             <div class="col-md-offset-4 col-md-8">
-                                <button type="submit" class="btn blue">Submit</button>
+                                <button type="submit" class="btn blue" id="exception_form_submit">Submit</button>
                                 <button type="reset" class="btn grey-salsa btn-outline">Cancel</button>
                             </div>
                         </div>
@@ -445,5 +451,12 @@
         </div>
 		 </div>
 </form>
+@include('frank.common')
+<script>
+jQuery($=>{
+    $('#replacement-product-list').on('change', '[name$="[sku]"]', e=>{
+	})
+})
+</script>
 <div style="clear:both;"></div>
 @endsection
