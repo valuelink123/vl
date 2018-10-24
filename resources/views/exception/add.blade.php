@@ -43,7 +43,7 @@
   function loadorder(){
 
 	if(!rebindordersellerid.value || !rebindorderid.value){
-	    return $(exception_form_submit).click()
+	    return $(exception_form_submit).click() // 触发表单验证
 	}
 
   	$.post("/exception/getorder",
@@ -200,7 +200,7 @@
 			<span class="input-group-addon">
 				<i class="fa fa-bookmark"></i>
 			</span>
-				<input type="text" class="form-control xform-autotrim" name="request_content" id="request_content" value="{{old('request_content')}}" list="list-request_content" autocomplete="off" />
+				<input type="text" class="form-control xform-autotrim" name="request_content" id="request_content" value="{{old('request_content')}}" list="list-request_content" autocomplete="off" required />
 				<datalist id="list-request_content">
 					@foreach($requestContentHistoryValues as $rcValue)
 						<option value="{{$rcValue}}" >
