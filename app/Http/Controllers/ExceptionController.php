@@ -197,8 +197,33 @@ class ExceptionController extends Controller
 
     public function create()
     {
-		
-        return view('exception/add',['groups'=>$this->getGroups(),'mygroups'=>$this->getUserGroup(),'sellerids'=>$this->getSellerIds()]);
+        $vars = ['groups'=>$this->getGroups(),'mygroups'=>$this->getUserGroup(),'sellerids'=>$this->getSellerIds()];
+
+        $vars['requestContentHistoryValues'] = [];
+        // array_map(function ($row) {
+        //     return $row['rc'];
+        // }, Exception::selectRaw('DISTINCT request_content AS rc')->get()->toArray());
+
+        array_push(
+            $vars['requestContentHistoryValues'],
+            'Change Request Of Order Info',
+            'Damage In Transit',
+            'Exchange Request',
+            'Free Order',
+            'Gift',
+            'Listing Error',
+            'Lost In Transit',
+            'Original Info Error',
+            'Out Of Stock',
+            'Qulity Issue',
+            'Return Request',
+            'Ship Wrong Item',
+            'Shipping Delay',
+            'Unsatisfied Customer Service',
+            'Other Shipping Issue'
+        );
+
+        return view('exception/add', $vars);
     }
 
      public function edit(Request $request,$id)
@@ -523,6 +548,12 @@ class ExceptionController extends Controller
 		}else{
 			$exception->refund = 0;
 		}
+
+        if( $exception->type == 4){
+            $exception->gift_card_amount = $request->get('gift_card_amount')??0;
+        }else{
+            $exception->gift_card_amount = 0;
+        }
 
 		if( $exception->type == 2 || $exception->type == 3){
 			$exception->replacement = serialize(

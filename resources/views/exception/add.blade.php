@@ -4,6 +4,10 @@
 
 <script>
   function changeType(){
+
+    $("a[href='#tab_3']").parent().removeClass('active').hide();
+    $("#tab_3").removeClass('active');
+
   	if($("#type").val()==1){
 		$("a[href='#tab_1']").parent().addClass('active').show();
 		$("#tab_1").addClass('active');
@@ -28,9 +32,20 @@
 		}
 
 	}
+    if($("#type").val()==4){
+		$("a[href='#tab_1'],a[href='#tab_2']").parent().removeClass('active').hide();
+        $("#tab_1,#tab_2").removeClass('active');
+        $("a[href='#tab_3']").parent().addClass('active').show();
+        $("#tab_3").addClass('active');
+    }
   }
-  
+
   function loadorder(){
+
+	if(!rebindordersellerid.value || !rebindorderid.value){
+	    return $(exception_form_submit).click() // 触发表单验证
+	}
+
   	$.post("/exception/getorder",
 	  {
 	  	"_token":"{{csrf_token()}}",
@@ -67,7 +82,7 @@
 				$("#order_sku", $("#exception_form")).val(order_sku);
 			}else{
 				toastr.error(redata.message);
-			}	
+			}
 		}
 
 	  });
@@ -103,8 +118,8 @@
                 @endforeach
             </div>
         @endif
-		
-		
+
+
     <div class="portlet-title">
         <div class="caption">
             <i class="icon-microphone font-green"></i>
@@ -115,8 +130,8 @@
     </div>
     <div class="portlet-body">
 		<div class="col-xs-12">
-		
-		 
+
+
 		<div class="form-group">
 			<label>Group</label>
 			<div class="input-group ">
@@ -126,47 +141,48 @@
 				<select class="form-control" name="group_id" id="group_id">
 
 				@foreach (array_get($mygroups,'groups',array()) as $group_id=>$group)
-				
+
 					<option value="{{$group_id}}">{{array_get($groups,$group_id.'.group_name')}}</option>
-					
+
 				@endforeach
 		</select>
 			</div>
-		</div>							
-       
-		
+		</div>
 
-		
+
+
+
 		<div class="form-group">
 			<label>Seller Account and Order ID</label>
 		<div class="row" >
-	
+
 						<div class="col-md-5">
-						
-													<select id="rebindordersellerid" class="form-control" name="rebindordersellerid" required>
-													@foreach ($sellerids as $id=>$name)
-														<option value="{{$id}}">{{$name}}</option>
-													@endforeach
-													</select> 		
-													
+
+													<input id="rebindordersellerid" class="form-control xform-autotrim" name="rebindordersellerid" list="list-rebindordersellerid" placeholder="Seller Account" autocomplete="off" required />
+													<datalist id="list-rebindordersellerid">
+														@foreach ($sellerids as $id=>$name)
+															<option value="{{$id}}" label="{{$name}}" >
+														@endforeach
+													</datalist>
+
 						</div>
 
                         <div class="col-md-7">
 						<div class="input-group">
-                                                 
-													
-															
-                                                                <input id="rebindorderid" class="form-control" type="text" name="rebindorderid" placeholder="Amazon Order ID"> 
+
+
+
+                                                                <input id="rebindorderid" class="form-control xform-autotrim" type="text" name="rebindorderid" placeholder="Amazon Order ID" autocomplete="off" required />
                                                             <span class="input-group-btn">
                                                                 <button id="rebindorder" class="btn btn-success" type="button">
                                                                     Get Order Info</button>
                                                             </span>
                                                         </div>
-                            
+
                         </div>
-                        
-                        
-                    </div>	
+
+
+                    </div>
 					</div>
 					 <div class="form-group">
 			<label>Customer Name</label>
@@ -184,11 +200,16 @@
 			<span class="input-group-addon">
 				<i class="fa fa-bookmark"></i>
 			</span>
-				<input type="text" class="form-control" name="request_content" id="request_content" value="{{old('request_content')}}" >
+				<input type="text" class="form-control xform-autotrim" name="request_content" id="request_content" value="{{old('request_content')}}" list="list-request_content" autocomplete="off" required />
+				<datalist id="list-request_content">
+					@foreach($requestContentHistoryValues as $rcValue)
+						<option value="{{$rcValue}}" >
+					@endforeach
+				</datalist>
 			</div>
 		</div>
-		
-		
+
+
 		<div class="form-group">
 			<label>Type</label>
 			<div class="input-group ">
@@ -198,10 +219,11 @@
 				<select name="type" id="type" class="form-control" >
 				<option value="3">Refund & Replacement
 				<option value="2">Replacement
-				<option value="1">Refund 
+				<option value="1">Refund
+				<option value="4">Gift Card
 				</select>
 			</div>
-		</div>				
+		</div>
 		</div>
 		<div style="clear:both"></div>
         <div class="tabbable-line">
@@ -212,12 +234,15 @@
                 <li class="">
                     <a href="#tab_2" data-toggle="tab" aria-expanded="false"> Replacement </a>
                 </li>
+				<li class="">
+					<a href="#tab_3" data-toggle="tab" aria-expanded="false"> Gift Card </a>
+				</li>
             </ul>
             <div class="tab-content">
-			
+
                 <div class="tab-pane active" id="tab_1">
-				
-				
+
+
 					<div class="col-xs-12">
                         <div class="form-group">
 							<label>Refund Amount</label>
@@ -230,7 +255,7 @@
 						</div>
                         <div style="clear:both;"></div>
                     </div>
- 
+
                      <div style="clear:both;"></div>
                 </div>
 
@@ -273,7 +298,7 @@
 								<input type="text" class="form-control" name="address3" id="address3" value="{{old('address3')}}" >
 							</div>
 						</div>
-						
+
 
 
 
@@ -340,34 +365,34 @@
 								<input type="text" class="form-control" name="phone" id="phone" value="{{old('phone')}}" >
 							</div>
 						</div>
-						
-						
-						
-						
-						
-						
+
+
+
+
+
+
 
 
 
 
                        <div class="form-group mt-repeater">
-							<div data-repeater-list="group-products">
+							<div data-repeater-list="group-products" id="replacement-product-list">
 								<div data-repeater-item class="mt-repeater-item">
 									<div class="row mt-repeater-row">
 										<div class="col-md-3">
 											<label class="control-label">Replaced SKU</label>
 											 <input type="text" class="form-control"  name="sku" placeholder="SKU" >
-								
+
 										</div>
 										<div class="col-md-5">
 											<label class="control-label">Replaced Product/Accessories Name</label>
 											 <input type="text" class="form-control"  name="title" placeholder="title" >
-								
+
 										</div>
 										<div class="col-md-2">
 											<label class="control-label">Quantity</label>
 											 <input type="text" class="form-control"  name="qty" placeholder="Quantity" >
-								
+
 										</div>
 										<div class="col-md-1">
 											<a href="javascript:;" data-repeater-delete class="btn btn-danger mt-repeater-delete">
@@ -382,13 +407,30 @@
 						</div>
                         <div style="clear:both;"></div>
                     </div>
-                        
+
                      <div style="clear:both;"></div>
                 </div>
 
 
+				<div class="tab-pane" id="tab_3">
 
-                
+
+					<div class="col-xs-12">
+						<div class="form-group">
+							<label>Gift Amount</label>
+							<div class="input-group ">
+							<span class="input-group-addon">
+								<i class="fa fa-bookmark"></i>
+							</span>
+								<input type="text" class="form-control" name="gift_card_amount" id="gift_card_amount" value="{{old('gift_card_amount')}}" />
+							</div>
+						</div>
+						<div style="clear:both;"></div>
+					</div>
+
+					<div style="clear:both;"></div>
+				</div>
+
 
             </div>
 
@@ -401,7 +443,7 @@
 <div class="form-actions">
                         <div class="row">
                             <div class="col-md-offset-4 col-md-8">
-                                <button type="submit" class="btn blue">Submit</button>
+                                <button type="submit" class="btn blue" id="exception_form_submit">Submit</button>
                                 <button type="reset" class="btn grey-salsa btn-outline">Cancel</button>
                             </div>
                         </div>
@@ -409,5 +451,12 @@
         </div>
 		 </div>
 </form>
+@include('frank.common')
+<script>
+jQuery($=>{
+    $('#replacement-product-list').on('change', '[name$="[sku]"]', e=>{
+	})
+})
+</script>
 <div style="clear:both;"></div>
 @endsection

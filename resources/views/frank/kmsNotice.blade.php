@@ -37,7 +37,7 @@
                 </div>
                 <div class="col-md-2">
                     <div class="input-group">
-                        <input type="text" class="xform-autotrim form-control" data-init-by-query="value" placeholder="Fuzzy search..." id="fuzzysearch" autocomplete="off"/>
+                        <input type="text" class="xform-autotrim form-control" data-init-by-query="value" placeholder="Tags and so on ..." id="fuzzysearch" autocomplete="off"/>
                         <span class="input-group-btn">
                             <button class="btn btn-default" type="button" id="dosearch">Search!</button>
                         </span>
@@ -98,6 +98,8 @@
     <script>
 
         new LinkageInput([item_group, brand, item_model], @json($itemGroupBrandModels))
+
+        new LinkageInput([fuzzysearch], @json($tags))
 
         async function loadData(page = 1) {
 

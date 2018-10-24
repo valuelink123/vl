@@ -4,6 +4,10 @@
 
 <script>
   function changeType(){
+
+      $("a[href='#tab_3']").parent().removeClass('active').hide();
+      $("#tab_3").removeClass('active');
+
   	if($("#type").val()==1){
 		$("a[href='#tab_1']").parent().addClass('active').show();
 		$("#tab_1").addClass('active');
@@ -28,6 +32,12 @@
 		}
 
 	}
+      if($("#type").val()==4){
+          $("a[href='#tab_1'],a[href='#tab_2']").parent().removeClass('active').hide();
+          $("#tab_1,#tab_2").removeClass('active');
+          $("a[href='#tab_3']").parent().addClass('active').show();
+          $("#tab_3").addClass('active');
+      }
   }
   $(function() {
   	changeType();
@@ -195,7 +205,8 @@ if($exception['user_id'] == Auth::user()->id  && $exception['process_status'] ==
 				<select name="type" id="type" class="form-control" required {{$disable}}>
 				<option value="3" <?php if(3 ==$exception['type']) echo 'selected' ?>>Refund & Replacement
 				<option value="2" <?php if(2 ==$exception['type']) echo 'selected' ?>>Replacement
-				<option value="1" <?php if(1 ==$exception['type']) echo 'selected' ?>>Refund 
+				<option value="1" <?php if(1 ==$exception['type']) echo 'selected' ?>>Refund
+				<option value="4" <?php if(4 ==$exception['type']) echo 'selected' ?>>Gift Card
 				</select>
 			</div>
 		</div>				
@@ -209,6 +220,9 @@ if($exception['user_id'] == Auth::user()->id  && $exception['process_status'] ==
                 <li class="">
                     <a href="#tab_2" data-toggle="tab" aria-expanded="false"> Replacement </a>
                 </li>
+				<li class="">
+					<a href="#tab_3" data-toggle="tab" aria-expanded="false"> Gift Card </a>
+				</li>
             </ul>
             <div class="tab-content">
 			
@@ -391,7 +405,24 @@ if($exception['user_id'] == Auth::user()->id  && $exception['process_status'] ==
                 </div>
 
 
+				<div class="tab-pane" id="tab_3">
 
+
+					<div class="col-xs-12">
+						<div class="form-group">
+							<label>Gift Amount</label>
+							<div class="input-group ">
+							<span class="input-group-addon">
+								<i class="fa fa-bookmark"></i>
+							</span>
+								<input type="text" class="form-control" name="gift_card_amount" id="gift_card_amount" value="{{array_get($exception,'gift_card_amount',0)}}" {{$disable}} />
+							</div>
+						</div>
+						<div style="clear:both;"></div>
+					</div>
+
+					<div style="clear:both;"></div>
+				</div>
                 
 
             </div>
