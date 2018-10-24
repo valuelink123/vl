@@ -172,7 +172,7 @@
 
 
 
-                                                                <input id="rebindorderid" class="form-control xform-autotrim" type="text" name="rebindorderid" placeholder="Amazon Order ID" autocomplete="off" required />
+                                                                <input id="rebindorderid" class="form-control xform-autotrim" type="text" name="rebindorderid" placeholder="Amazon Order ID" autocomplete="off" required pattern="\d{3}-\d{7}-\d{7}" />
                                                             <span class="input-group-btn">
                                                                 <button id="rebindorder" class="btn btn-success" type="button">
                                                                     Get Order Info</button>
@@ -380,14 +380,12 @@
 								<div data-repeater-item class="mt-repeater-item">
 									<div class="row mt-repeater-row">
 										<div class="col-md-3">
-											<label class="control-label">Replaced SKU</label>
-											 <input type="text" class="form-control"  name="sku" placeholder="SKU" >
-
+											<label class="control-label">Item Code</label>
+											 <input type="text" class="form-control xform-autotrim" name="item_code" placeholder="item code" />
 										</div>
 										<div class="col-md-5">
-											<label class="control-label">Replaced Product/Accessories Name</label>
-											 <input type="text" class="form-control"  name="title" placeholder="title" >
-
+											<label class="control-label">Which Account to Deliver From?</label>
+											 <input type="text" class="form-control xform-autotrim"  name="seller_name" placeholder="please select ..." >
 										</div>
 										<div class="col-md-2">
 											<label class="control-label">Quantity</label>
@@ -405,6 +403,13 @@
 							<a href="javascript:;" data-repeater-create class="btn btn-info mt-repeater-add">
 								<i class="fa fa-plus"></i> Add Product</a>
 						</div>
+                        <script id="tplStockDatalist" type="text/template">
+                            <datalist id="list-${item_code}-stocks">
+                                <% for(let {seller_name,seller_id,stock} of stocks){ %>
+                                <option value="${seller_name}" label="Stock: ${stock}">
+                                <% } %>
+                            </datalist>
+                        </script>
                         <div style="clear:both;"></div>
                     </div>
 
@@ -453,10 +458,52 @@
 </form>
 @include('frank.common')
 <script>
-jQuery($=>{
-    $('#replacement-product-list').on('change', '[name$="[sku]"]', e=>{
-	})
-})
+    jQuery($ => {
+        $('#replacement-product-list').on('change keyup paste', '[name$="[item_code]"]', e => {
+
+            let item_code = e.currentTarget.value
+
+            let $sellerName = $(e.currentTarget).closest('.mt-repeater-row').find('[name$="[seller_name]"]')
+
+            $sellerName.attr('placeholder', 'item code is empty ...').val('').next('datalist').remove()
+
+            if (!item_code) return
+
+            $.ajax({
+                method: 'POST',
+                url: '/kms/stocklist',
+                data: {item_code},
+                dataType: 'json',
+                success(stocks) {
+
+                    if (!stocks.length) {
+                        $sellerName.attr('placeholder', 'not match')
+                        return
+                    }
+
+                    if (false === stocks[0]) {
+                        let errmsg = stocks[1]
+                        $sellerName.attr('placeholder', errmsg)
+                        return
+                    }
+
+                    // console.log(stocks)
+
+                    stocks.sort((a, b) => {
+                        let aStock = parseInt(a.stock)
+                        let bStock = parseInt(b.stock)
+                        return aStock < bStock ? 1 : (aStock > bStock ? -1 : 0)
+                    })
+
+                    $sellerName
+                        .after(tplRender(tplStockDatalist, {stocks, item_code}))
+                        .attr('list', `list-${item_code}-stocks`)
+                        .attr('placeholder', 'please select ...')
+
+                }
+            })
+        })
+    })
 </script>
 <div style="clear:both;"></div>
 @endsection

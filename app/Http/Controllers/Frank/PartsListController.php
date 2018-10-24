@@ -8,6 +8,7 @@
 namespace App\Http\Controllers\Frank;
 
 use App\Classes\SapRfcRequest;
+use App\Exceptions\DataInputException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -115,6 +116,46 @@ class PartsListController extends Controller {
         $total = $this->queryOne('SELECT FOUND_ROWS()');
 
         return ['data' => $rows, 'recordsTotal' => $total, 'recordsFiltered' => $total];
+    }
+
+    /**
+     * @throws DataInputException
+     * @throws \App\Traits\MysqliException
+     */
+    public function getStockList(Request $req) {
+
+        $item_code = $req->input('item_code');
+
+        if (empty($item_code) || !preg_match('#^[A-z0-9]+$#', $item_code)) {
+            throw new DataInputException("Wrong Item Code: {$item_code}");
+        }
+
+        $rows = $this->queryRows(
+            "SELECT
+                seller_name,
+                seller_id,
+                item_name,
+                fba_stock AS stock
+            FROM
+                fba_stock
+            LEFT JOIN fbm_stock USING (item_code)
+            WHERE
+                item_code = '{$item_code}'
+
+            UNION
+
+            SELECT
+                'FBM' AS seller_name,
+                'fbm' AS seller_id,
+                item_name,
+                fbm_stock AS stock
+            FROM
+                fbm_stock
+            WHERE
+                item_code = '{$item_code}'"
+        );
+
+        return $rows;
     }
 
 }
