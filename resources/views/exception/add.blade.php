@@ -42,8 +42,8 @@
 
   function loadorder(){
 
-	if(!rebindordersellerid.value || !rebindorderid.value){
-	    return $(exception_form_submit).click() // 触发表单验证
+	if(!rebindordersellerid.reportValidity() || !rebindorderid.reportValidity()){
+	    return
 	}
 
   	$.post("/exception/getorder",
@@ -443,7 +443,7 @@
 <div class="form-actions">
                         <div class="row">
                             <div class="col-md-offset-4 col-md-8">
-                                <button type="submit" class="btn blue" id="exception_form_submit">Submit</button>
+                                <button type="submit" class="btn blue">Submit</button>
                                 <button type="reset" class="btn grey-salsa btn-outline">Cancel</button>
                             </div>
                         </div>
