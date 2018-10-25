@@ -66,6 +66,7 @@ Route::get('/reviewexport', 'ReviewController@export')->name('exportReview');
 Route::get('/asinexport', 'AsinController@export')->name('exportAsin');
 Route::get('/fees', 'FeesController@index')->name('fees');
 Route::Post('/fees/getads', 'FeesController@getads')->name('getads');
+Route::Post('/fees/getcpc', 'FeesController@getcpc')->name('getcpc');
 Route::Post('/fees/getdeal', 'FeesController@getdeal')->name('getdeal');
 Route::Post('/fees/getcoupon', 'FeesController@getcoupon')->name('getcoupon');
 Route::Post('/fees/getservice', 'FeesController@getservice')->name('getservice');
