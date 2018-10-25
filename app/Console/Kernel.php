@@ -67,7 +67,7 @@ class Kernel extends ConsoleKernel
 		$schedule->command('get:profits 10 1 ')->cron('10 0 * * *')->name('getprotit')->withoutOverlapping();
         //$schedule->command('scan:warn')->hourly()->name('warningcheck')->withoutOverlapping();
         //$schedule->command('scan:auto')->hourly()->name('autocheck')->withoutOverlapping();
-        $schedule->command('get:awsinfo')->dailyAt('23:50')->name('getawsinfo')->withoutOverlapping();
+        $schedule->command('get:awsinfo')->dailyAt('23:00')->name('getawsinfo')->withoutOverlapping();
     }
 
     /**

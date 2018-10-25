@@ -365,4 +365,77 @@ class FeesController extends Controller
         echo json_encode($records);
     }
 	
+	
+	public function getcpc(Request $request)
+    {
+        if ($request->input("custombgbu") && $request->input("customActionType") == "group_action") {
+			   $updateDate = [];
+               $bgbu = $request->input('custombgbu');
+			   $bgbu_arr = explode('_',$bgbu);
+			   if(array_get($bgbu_arr,0)) $updateDate['bg'] = array_get($bgbu_arr,0);
+			   if(array_get($bgbu_arr,1)) $updateDate['bu'] = array_get($bgbu_arr,1);
+			   $updateDate['user_id'] = Auth::user()->id;
+			    DB::table('aws_report')->whereIn('id',$request->input("id"))->update($updateDate);
+        }
+		$date_from=$request->input('date_from')?$request->input('date_from'):date('Y-m-d',strtotime('- 90 days'));
+        $date_to=$request->input('date_to')?$request->input('date_to'):date('Y-m-d');
+		
+		$datas= DB::table('aws_report')->where('date','>=',$date_from)->where('date','<=',$date_to);
+               
+        if($request->input('sellerid')){
+            $datas = $datas->where('seller_id', $request->input('sellerid'));
+        }
+		
+		if($request->input('bgbu')){
+			   $bgbu = $request->input('bgbu');
+			   $bgbu_arr = explode('_',$bgbu);
+			   if(count($bgbu_arr)>1){
+			   	if(array_get($bgbu_arr,0)) $datas = $datas->where('bg',array_get($bgbu_arr,0));
+			   	if(array_get($bgbu_arr,1)) $datas = $datas->where('bu',array_get($bgbu_arr,1));
+			   }else{
+			   		$datas = $datas->where('bg','');
+			   }
+		}
+		if($request->input('user_id')){
+            $datas = $datas->where('user_id', $request->input('user_id'));
+        }
+		
+		if($request->input('feedes')){
+            $datas = $datas->where('campaign_name','like','%'.$request->input('feedes').'%');
+        }
+		$iTotalRecords = $datas->count();
+        $iDisplayLength = intval($_REQUEST['length']);
+        $iDisplayLength = $iDisplayLength < 0 ? $iTotalRecords : $iDisplayLength;
+        $iDisplayStart = intval($_REQUEST['start']);
+        $sEcho = intval($_REQUEST['draw']);
+		$lists =  $datas->orderBy('date','desc')->offset($iDisplayStart)->limit($iDisplayLength)->get()->toArray();
+        $records = array();
+        $records["data"] = array();
+
+        $end = $iDisplayStart + $iDisplayLength;
+        $end = $end > $iTotalRecords ? $iTotalRecords : $end;
+		$accounts = $this->getSellerId();
+		$users= $this->getUsers();
+		$lists=json_decode(json_encode($lists), true);
+		foreach ( $lists as $list){
+            $records["data"][] = array(
+                '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input name="id[]" type="checkbox" class="checkboxes" value="'.$list['id'].'"/><span></span></label>',
+                $list['date'],
+				array_get($accounts,$list['seller_id']),
+				$list['campaign_name'],
+				$list['ad_group'],
+				$list['sales'],
+				$list['profit'],
+				$list['orders'],
+				$list['bg'].' - '.$list['bu'],
+				array_get($users,$list['user_id'],''),
+				$list['cost']
+            );
+		}
+        $records["draw"] = $sEcho;
+        $records["recordsTotal"] = $iTotalRecords;
+        $records["recordsFiltered"] = $iTotalRecords;
+        echo json_encode($records);
+    }
+	
 }
