@@ -66,19 +66,15 @@ function objectToQueryString(obj) {
 
 function objectFilte(obj, keys = [], except = true) {
 
-    let map = {}
-
-    for (let key of keys) {
-        map[key] = true
-    }
+    keys = new Set(keys)
 
     let result = {}
 
     for (let k in obj) {
         if (except) {
-            if (map[k]) continue
+            if (keys.has(k)) continue
         } else {
-            if (!map[k]) continue
+            if (!keys.has(k)) continue
         }
         result[k] = obj[k]
     }
@@ -86,36 +82,81 @@ function objectFilte(obj, keys = [], except = true) {
     return result
 }
 
-function pairs2object(pairs, key, value) {
+function rows2object(rows, keyFields, valueField = null) {
 
     let dataObject = {}
 
-    for (let pair of pairs) {
-        dataObject[pair[key]] = pair[value]
+    for (let row of rows) {
+        let key = (keyFields instanceof Array) ? keyFields.map(k => row[k]).join(':') : row[keyFields]
+        dataObject[key] = valueField ? row[valueField] : row
     }
 
     return dataObject
 }
 
-function bindDelayEvents(eles, eTypes, callback, ...moreargs) {
+/**
+ * @param params todo 自动提示
+ */
+function bindDelayEvents(...params) {
+
+    if (params[3] instanceof Function) {
+        var [capturEles, eTypes, eles, callback, delay = 76] = params
+    } else if (params[2] instanceof Function) {
+        var [eles, eTypes, callback, delay = 76] = params
+    } else {
+        throw new Error('Invalid callback')
+    }
 
     let stid = 0
 
     function func(...args) {
         clearTimeout(stid)
-        stid = setTimeout(callback.bind(this, ...args), 16)
+        stid = setTimeout(callback.bind(this, ...args), delay)
     }
 
     // 既可以是数组，也可以是空格分隔的字符串
     (eTypes instanceof Array) || (eTypes = eTypes.split(/\s+/));
-    (eles instanceof Element) && (eles = [eles]);
-    (eles instanceof Array) || (eles = eles.split(','));
 
-    for (let eType of eTypes) {
-        for (let ele of eles) {
-            (ele instanceof Element) || (ele = document.querySelector(ele));
-            ele && ele.addEventListener(eType, func, ...moreargs);
+    if (capturEles) {
+
+        if (capturEles instanceof Element) {
+            capturEles = [capturEles]
+        } else {
+            capturEles = document.querySelectorAll(capturEles)
         }
+
+        for (let capturEle of capturEles) {
+
+            for (let eType of eTypes) {
+                capturEle.addEventListener(eType, (e, ...args) => {
+                    // e.target.matches(eles)
+                    if (new Set(capturEle.querySelectorAll(eles)).has(e.target)) {
+                        // 修改属性的私有、只读等限制
+                        Object.defineProperty(e, 'currentTarget', {writable: true})
+                        // Object.getOwnPropertyDescriptor(e, 'currentTarget')
+                        e.currentTarget = e.target
+                        // e.delegateTarget = capturEle
+                        func.call(e.target, e, ...args)
+                        // event.stopPropagation();
+                        // event.cancelBubble = bool;
+                    }
+                }, {capture: true});
+            }
+
+        }
+
+    } else {
+
+        (eles instanceof Element) && (eles = [eles]);
+        (eles instanceof Array) || (eles = eles.split(','));
+
+        for (let eType of eTypes) {
+            for (let ele of eles) {
+                (ele instanceof Element) || (ele = document.querySelector(ele));
+                ele && ele.addEventListener(eType, func);
+            }
+        }
+
     }
 }
 

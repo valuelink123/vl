@@ -126,7 +126,7 @@
 
         $(theform).submit(e => {
 
-            let formData = pairs2object($(theform).serializeArray(), 'name', 'value')
+            let formData = rows2object($(theform).serializeArray(), 'name', 'value')
 
             formData.content = ue.getContent()
             formData.id = theid

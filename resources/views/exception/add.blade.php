@@ -71,15 +71,16 @@
 				$("#postalcode", $("#exception_form")).val(data.PostalCode);
 				$("#countrycode", $("#exception_form")).val(data.CountryCode);
 				$("#phone", $("#exception_form")).val(data.Phone);
-				$("div[data-repeater-list='group-products']").html('');
 				var items = data.orderItemData;
 				var order_sku='';
 				for( var child_i in items )
 			　　{
-			　　		$("div[data-repeater-list='group-products']").append('<div data-repeater-item class="mt-repeater-item"><div class="row mt-repeater-row"><div class="col-md-3"><label class="control-label">Replaced SKU</label><input type="text"class="form-control"name="group-products['+child_i+'][sku]"placeholder="SKU"value="'+ items[child_i].SellerSKU +'"></div><div class="col-md-5"><label class="control-label">Replaced Product/Accessories Name</label><input type="text"class="form-control"name="group-products['+child_i+'][title]"placeholder="title"value="'+ items[child_i].Title +'"></div><div class="col-md-2"><label class="control-label">Quantity</label><input type="text"class="form-control"name="group-products['+child_i+'][qty]"placeholder="Quantity"value="'+ items[child_i].QuantityOrdered +'"></div><div class="col-md-1"><a href="javascript:;"data-repeater-delete class="btn btn-danger mt-repeater-delete"><i class="fa fa-close"></i></a></div></div></div>');　
 					order_sku+=items[child_i].SellerSKU+'*'+items[child_i].QuantityOrdered+'; ';
 			　　}
 				$("#order_sku", $("#exception_form")).val(order_sku);
+
+                setReplacementItemList(items)
+
 			}else{
 				toastr.error(redata.message);
 			}
@@ -172,7 +173,7 @@
 
 
 
-                                                                <input id="rebindorderid" class="form-control xform-autotrim" type="text" name="rebindorderid" placeholder="Amazon Order ID" autocomplete="off" required />
+                                                                <input id="rebindorderid" class="form-control xform-autotrim" type="text" name="rebindorderid" placeholder="Amazon Order ID" autocomplete="off" required pattern="\d{3}-\d{7}-\d{7}" />
                                                             <span class="input-group-btn">
                                                                 <button id="rebindorder" class="btn btn-success" type="button">
                                                                     Get Order Info</button>
@@ -375,23 +376,24 @@
 
 
 
-                       <div class="form-group mt-repeater">
+                       <div class="form-group mt-repeater frank">
 							<div data-repeater-list="group-products" id="replacement-product-list">
 								<div data-repeater-item class="mt-repeater-item">
 									<div class="row mt-repeater-row">
-										<div class="col-md-3">
-											<label class="control-label">Replaced SKU</label>
-											 <input type="text" class="form-control"  name="sku" placeholder="SKU" >
-
+										<div class="col-md-2">
+											<label class="control-label">Item Code</label>
+											 <input type="text" class="form-control item_code" name="item_code" placeholder="item code" />
+                                            <input type="hidden" name="seller_id" />
+                                            <input type="hidden" name="seller_sku" />
 										</div>
-										<div class="col-md-5">
-											<label class="control-label">Replaced Product/Accessories Name</label>
-											 <input type="text" class="form-control"  name="title" placeholder="title" >
-
+										<div class="col-md-7">
+											<label class="control-label">Seller ID & Seller SKU</label>
+											<input type="hidden" name="title" />
+											<input type="text" class="form-control"  name="sku" placeholder="seller id & seller sku" />
 										</div>
 										<div class="col-md-2">
 											<label class="control-label">Quantity</label>
-											 <input type="text" class="form-control"  name="qty" placeholder="Quantity" >
+											 <input type="text" class="form-control"  name="qty" value="1" placeholder="Quantity" />
 
 										</div>
 										<div class="col-md-1">
@@ -405,6 +407,13 @@
 							<a href="javascript:;" data-repeater-create class="btn btn-info mt-repeater-add">
 								<i class="fa fa-plus"></i> Add Product</a>
 						</div>
+                        <script id="tplStockDatalist" type="text/template">
+                            <datalist id="list-${item_code}-stocks">
+                                <% for(let {seller_id,seller_sku,stock} of stocks){ %>
+                                <option value="${seller_id} & ${seller_sku}" label="Stock: ${stock}">
+                                <% } %>
+                            </datalist>
+                        </script>
                         <div style="clear:both;"></div>
                     </div>
 
@@ -453,10 +462,136 @@
 </form>
 @include('frank.common')
 <script>
-jQuery($=>{
-    $('#replacement-product-list').on('change', '[name$="[sku]"]', e=>{
-	})
-})
+
+    let $replacementProductList = $('#replacement-product-list')
+
+    let replacementItemRepeater = $replacementProductList.parent().repeater({defaultValues:{qty:1}})
+
+    let theSellerId = null // 用于判断优先选择相同账号库存；
+
+    function setReplacementItemList(items){
+        replacementItemRepeater.setList(items.map(i => {
+            theSellerId = i.SellerId; // 假设同一订单的所有商品中只有一个 SellerID……
+            return {
+                seller_id: i.SellerId,
+                seller_sku: i.SellerSKU,
+                sku: `${i.SellerId} & ${i.SellerSKU}`,
+                title: i.Title,
+                qty: i.QuantityOrdered
+            }
+        }));
+
+        $replacementProductList.find('.item_code').each((i, ele) => {
+            handleItemCodeSearch.call(ele, {currentTarget: ele})
+        })
+    }
+
+    function handleItemCodeSearch(e) {
+
+        let item_code = e.currentTarget.value.trim()
+
+        let $sellerSku = $(e.currentTarget).closest('.mt-repeater-row').find('[name$="[sku]"]')
+
+        if ($sellerSku.attr('list') === `list-${item_code}-stocks`) return
+
+        $sellerSku.val('').change().removeAttr('list').data('skusInfo', null).next('datalist').remove()
+
+        if (!item_code) {
+
+            var seller_id = $(this).next().val()
+            var seller_sku = $(this).next().next().val()
+
+            if (seller_id && seller_sku) {
+                var postData = {seller_id, seller_sku}
+            } else {
+                return $sellerSku.attr('placeholder', 'seller id & seller sku')
+            }
+
+        } else {
+            var postData = {item_code}
+        }
+
+        $.ajax({
+            method: 'POST',
+            url: '/kms/stocklist',
+            data: postData,
+            dataType: 'json',
+            success(stocks) {
+
+                if (!stocks.length) {
+                    if(seller_id && seller_sku){
+                        e.currentTarget.value = 'no match'
+                        $sellerSku.val(`${seller_id} & ${seller_sku}`)
+                    } else {
+                        $sellerSku.attr('placeholder', 'no match')
+                    }
+                    return
+                }
+
+                if (false === stocks[0]) {
+                    let errmsg = stocks[1]
+                    $sellerSku.attr('placeholder', errmsg)
+                    return
+                }
+
+                // console.log(stocks)
+                if(!item_code){
+                    item_code = stocks[0].item_code
+                    e.currentTarget.value = item_code
+                }
+
+                stocks.sort((a, b) => {
+                    let aStock = parseInt(a.stock)
+                    let bStock = parseInt(b.stock)
+                    return aStock < bStock ? 1 : (aStock > bStock ? -1 : 0)
+                })
+
+                $sellerSku
+                    .after(tplRender(tplStockDatalist, {stocks, item_code}))
+                    .attr('list', `list-${item_code}-stocks`)
+                    .attr('placeholder', 'please select ...')
+
+
+                let skusInfo = rows2object(stocks, ['seller_id', 'seller_sku'])
+
+                $sellerSku.data('skusInfo', skusInfo)
+
+                var stock = null
+
+                if (1 === stocks.length && stocks[0].stock > 0) {
+                    stock = stocks[0]
+                } else if(seller_id && seller_sku){
+                    let info = skusInfo[`${seller_id}:${seller_sku}`]
+                    if(info && info.stock-0 ) stock = info
+                } else {
+                    for(let s of stocks){
+                        if((s.seller_id === theSellerId) && (s.stock-0)) {
+                            stock = s
+                            break
+                        }
+                    }
+                }
+
+                if(stock) $sellerSku.val(`${stock.seller_id} & ${stock.seller_sku}`).change()
+
+            }
+        })
+    }
+
+    jQuery($ => {
+
+        XFormHelper.autoTrim('#replacement-product-list', 'input')
+
+        $replacementProductList.on('change', '[name$="[sku]"]', function (e) {
+            // console.log(e, this)
+            let skusInfo = $(this).data('skusInfo') || ''
+            let info = skusInfo[this.value.replace(' & ', ':')]
+            let label = info ? `${info.item_name} <b>[${info.seller_name}]</b>` : 'Seller ID & Seller SKU'
+            $(this).prev().val(info ? info.item_name : '').prev().html(label)
+        })
+
+        bindDelayEvents('#replacement-product-list', 'change keyup paste', '[name$="[item_code]"]', handleItemCodeSearch);
+    })
 </script>
 <div style="clear:both;"></div>
 @endsection
