@@ -3,7 +3,7 @@ var FormRepeater = function () {
     return {
         //main function to initiate the module
         init: function () {
-        	$('.mt-repeater').each(function(){
+        	$('.mt-repeater:not(.frank)').each(function(){
         		$(this).repeater({
         			show: function () {
 	                	$(this).slideDown();

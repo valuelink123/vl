@@ -8,6 +8,7 @@
 namespace App\Http\Controllers\Frank;
 
 use App\Classes\SapRfcRequest;
+use App\Exceptions\DataInputException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -115,6 +116,68 @@ class PartsListController extends Controller {
         $total = $this->queryOne('SELECT FOUND_ROWS()');
 
         return ['data' => $rows, 'recordsTotal' => $total, 'recordsFiltered' => $total];
+    }
+
+    /**
+     * @throws DataInputException
+     * @throws \App\Traits\MysqliException
+     */
+    public function getStockList(Request $req) {
+
+        if (empty($req->input('item_code'))) {
+
+            $result = DB::table('fba_stock')
+                ->select('item_code')
+                ->where('seller_id', $req->input('seller_id'))
+                ->where('seller_sku', $req->input('seller_sku'))
+                ->whereNotNull('item_code')
+                ->get();
+
+            if ($result->isEmpty()) {
+                // throw new DataInputException('item code not found', 1025);
+                return [];
+            }
+
+            $item_code = $result[0]->item_code;
+        } else {
+            $item_code = $req->input('item_code');
+        }
+
+
+        if (empty($item_code) || !preg_match('#^[A-z0-9]+$#', $item_code)) {
+            throw new DataInputException("Wrong Item Code: {$item_code}");
+        }
+
+        $rows = $this->queryRows(
+            "SELECT
+                item_code,
+                seller_id,
+                seller_name,
+                seller_sku,
+                item_name,
+                fba_stock AS stock
+            FROM
+                fba_stock
+            LEFT JOIN fbm_stock USING (item_code)
+            WHERE
+                item_code = '{$item_code}'
+
+            UNION
+
+            SELECT
+                item_code,
+                'FBM' AS seller_id,
+                'FBM' AS seller_name,
+                CONCAT('ITEM CODE - ', item_code) AS seller_sku,
+                item_name,
+                fbm_stock AS stock
+            FROM
+                fbm_stock
+            WHERE
+                item_code = '{$item_code}'"
+        );
+
+        return $rows;
     }
 
 }
