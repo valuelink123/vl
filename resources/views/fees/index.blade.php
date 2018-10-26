@@ -39,6 +39,7 @@
 										if($team->bg && $team->bu) echo '<option value="'.$team->bg.'_'.$team->bu.'">'.$team->bg.' - '.$team->bu.'</option>';
 									}?>
 								</select>
+								<input type="text" placeholder="SAPSKU" id="sku" class="table-group-action-input form-control input-inline input-small input-sm" />
 								
 																	
 								<button class="btn btn-sm green table-group-action-submit">
@@ -58,6 +59,7 @@
 									<th width="15%"> Invoice Id </th>
 									<th width="15%"> BGBU </th>
 									<th width="15%"> User </th>
+									<th width="15%"> SKU </th>
 									<th width="15%"> Amount</th>
 								</tr>
 								<tr role="row" class="filter">
@@ -122,6 +124,7 @@
 									</select>
 									
 									</td>
+									<td><input type="text" class="form-control form-filter input-sm" name="sku"></td>
 	
 									<td>
 										<div class="margin-bottom-5">
@@ -196,14 +199,15 @@
 									grid.getTableWrapper().on('click', '.table-group-action-submit', function (e) {
 										e.preventDefault();
 										var bgbu = $("#bgbu", grid.getTableWrapper());
-										
-										if ((bgbu.val() != "") && grid.getSelectedRowsCount() > 0) {
+										var sku = $("#sku", grid.getTableWrapper());
+										if ((bgbu.val() != "" && sku.val() != "") && grid.getSelectedRowsCount() > 0) {
 											grid.setAjaxParam("customActionType", "group_action");
 											grid.setAjaxParam("custombgbu", bgbu.val());
+											grid.setAjaxParam("customsku", sku.val());
 											grid.setAjaxParam("id", grid.getSelectedRows());
 											grid.getDataTable().draw(false);
 											//grid.clearAjaxParams();
-										} else if (bgbu.val() == "") {
+										} else if (bgbu.val() == "" || sku.val() == "") {
 											App.alert({
 												type: 'danger',
 												icon: 'warning',
@@ -229,6 +233,7 @@
 									grid.setAjaxParam("sellerid", $("select[name='sellerid']").val());
 									grid.setAjaxParam("bgbu", $("select[name='bgbu']").val());
 									grid.setAjaxParam("user_id", $("select[name='user_id']").val());
+									grid.setAjaxParam("sku", $("input[name='sku']").val());
 									grid.getDataTable().ajax.reload(null,false);
 									//grid.clearAjaxParams();
 								}
@@ -266,7 +271,7 @@
 										if($team->bg && $team->bu) echo '<option value="'.$team->bg.'_'.$team->bu.'">'.$team->bg.' - '.$team->bu.'</option>';
 									}?>
 								</select>
-								
+								<input type="text" placeholder="SAPSKU" id="sku" class="table-group-action-input form-control input-inline input-small input-sm" />
 																	
 								<button class="btn btn-sm green table-group-action-submit">
 									<i class="fa fa-check"></i> Change</button>
@@ -285,6 +290,7 @@
 									<th width="30%"> Fee Description </th>
 									<th width="10%"> BGBU </th>
 									<th width="10%"> User </th>
+									<th width="10%"> SKU </th>
 									<th width="10%"> Amount</th>
 								</tr>
 								<tr role="row" class="filter">
@@ -349,7 +355,7 @@
 									</select>
 									
 									</td>
-	
+									<td><input type="text" class="form-control form-filter input-sm" name="sku"></td>
 									<td>
 										<div class="margin-bottom-5">
 											<button class="btn btn-sm green btn-outline filter-submit margin-bottom">
@@ -423,14 +429,15 @@
 									grid.getTableWrapper().on('click', '.table-group-action-submit', function (e) {
 										e.preventDefault();
 										var bgbu = $("#bgbu", grid.getTableWrapper());
-										
-										if ((bgbu.val() != "") && grid.getSelectedRowsCount() > 0) {
+										var sku = $("#sku", grid.getTableWrapper());
+										if ((bgbu.val() != "" && sku.val() != "") && grid.getSelectedRowsCount() > 0) {
 											grid.setAjaxParam("customActionType", "group_action");
 											grid.setAjaxParam("custombgbu", bgbu.val());
+											grid.setAjaxParam("customsku", sku.val());
 											grid.setAjaxParam("id", grid.getSelectedRows());
 											grid.getDataTable().draw(false);
 											//grid.clearAjaxParams();
-										} else if (bgbu.val() == "") {
+										} else if (bgbu.val() == "" || sku.val() == "") {
 											App.alert({
 												type: 'danger',
 												icon: 'warning',
@@ -456,6 +463,7 @@
 									grid.setAjaxParam("sellerid", $("select[name='sellerid']").val());
 									grid.setAjaxParam("bgbu", $("select[name='bgbu']").val());
 									grid.setAjaxParam("user_id", $("select[name='user_id']").val());
+									grid.setAjaxParam("sku", $("input[name='sku']").val());
 									grid.getDataTable().ajax.reload(null,false);
 									//grid.clearAjaxParams();
 								}
@@ -494,6 +502,7 @@
 										if($team->bg && $team->bu) echo '<option value="'.$team->bg.'_'.$team->bu.'">'.$team->bg.' - '.$team->bu.'</option>';
 									}?>
 								</select>
+								<input type="text" placeholder="SAPSKU" id="sku" class="table-group-action-input form-control input-inline input-small input-sm" />
 								
 																	
 								<button class="btn btn-sm green table-group-action-submit">
@@ -513,6 +522,7 @@
 									<th width="30%"> Fee Description </th>
 									<th width="10%"> BGBU </th>
 									<th width="10%"> User </th>
+									<th width="15%"> SKU </th>
 									<th width="10%"> Amount</th>
 								</tr>
 								<tr role="row" class="filter">
@@ -577,7 +587,7 @@
 									</select>
 									
 									</td>
-	
+									<td><input type="text" class="form-control form-filter input-sm" name="sku"></td>
 									<td>
 										<div class="margin-bottom-5">
 											<button class="btn btn-sm green btn-outline filter-submit margin-bottom">
@@ -652,14 +662,15 @@
 									grid.getTableWrapper().on('click', '.table-group-action-submit', function (e) {
 										e.preventDefault();
 										var bgbu = $("#bgbu", grid.getTableWrapper());
-										
-										if ((bgbu.val() != "") && grid.getSelectedRowsCount() > 0) {
+										var sku = $("#sku", grid.getTableWrapper());
+										if ((bgbu.val() != "" && sku.val() != "") && grid.getSelectedRowsCount() > 0) {
 											grid.setAjaxParam("customActionType", "group_action");
 											grid.setAjaxParam("custombgbu", bgbu.val());
+											grid.setAjaxParam("customsku", sku.val());
 											grid.setAjaxParam("id", grid.getSelectedRows());
 											grid.getDataTable().draw(false);
 											//grid.clearAjaxParams();
-										} else if (bgbu.val() == "") {
+										} else if (bgbu.val() == "" || sku.val() == "") {
 											App.alert({
 												type: 'danger',
 												icon: 'warning',
@@ -685,6 +696,7 @@
 									grid.setAjaxParam("sellerid", $("select[name='sellerid']").val());
 									grid.setAjaxParam("bgbu", $("select[name='bgbu']").val());
 									grid.setAjaxParam("user_id", $("select[name='user_id']").val());
+									grid.setAjaxParam("sku", $("input[name='sku']").val());
 									grid.getDataTable().ajax.reload(null,false);
 									//grid.clearAjaxParams();
 								}
@@ -723,6 +735,7 @@
 										if($team->bg && $team->bu) echo '<option value="'.$team->bg.'_'.$team->bu.'">'.$team->bg.' - '.$team->bu.'</option>';
 									}?>
 								</select>
+								<input type="text" placeholder="SAPSKU" id="sku" class="table-group-action-input form-control input-inline input-small input-sm" />
 								
 																	
 								<button class="btn btn-sm green table-group-action-submit">
@@ -742,6 +755,7 @@
 									<th width="30%"> Fee Description </th>
 									<th width="10%"> BGBU </th>
 									<th width="10%"> User </th>
+									<th width="15%"> SKU </th>
 									<th width="10%"> Amount</th>
 								</tr>
 								<tr role="row" class="filter">
@@ -806,7 +820,7 @@
 									</select>
 									
 									</td>
-	
+									<td><input type="text" class="form-control form-filter input-sm" name="sku"></td>
 									<td>
 										<div class="margin-bottom-5">
 											<button class="btn btn-sm green btn-outline filter-submit margin-bottom">
@@ -881,14 +895,15 @@
 									grid.getTableWrapper().on('click', '.table-group-action-submit', function (e) {
 										e.preventDefault();
 										var bgbu = $("#bgbu", grid.getTableWrapper());
-										
-										if ((bgbu.val() != "") && grid.getSelectedRowsCount() > 0) {
+										var sku = $("#sku", grid.getTableWrapper());
+										if ((bgbu.val() != "" && sku.val() != "") && grid.getSelectedRowsCount() > 0) {
 											grid.setAjaxParam("customActionType", "group_action");
 											grid.setAjaxParam("custombgbu", bgbu.val());
+											grid.setAjaxParam("customsku", sku.val());
 											grid.setAjaxParam("id", grid.getSelectedRows());
 											grid.getDataTable().draw(false);
 											//grid.clearAjaxParams();
-										} else if (bgbu.val() == "") {
+										} else if (bgbu.val() == "" || sku.val() == "") {
 											App.alert({
 												type: 'danger',
 												icon: 'warning',
@@ -914,6 +929,7 @@
 									grid.setAjaxParam("sellerid", $("select[name='sellerid']").val());
 									grid.setAjaxParam("bgbu", $("select[name='bgbu']").val());
 									grid.setAjaxParam("user_id", $("select[name='user_id']").val());
+									grid.setAjaxParam("sku", $("input[name='sku']").val());
 									grid.getDataTable().ajax.reload(null,false);
 									//grid.clearAjaxParams();
 								}
@@ -952,6 +968,7 @@
 										if($team->bg && $team->bu) echo '<option value="'.$team->bg.'_'.$team->bu.'">'.$team->bg.' - '.$team->bu.'</option>';
 									}?>
 								</select>
+								<input type="text" placeholder="SAPSKU" id="sku" class="table-group-action-input form-control input-inline input-small input-sm" />
 								
 																	
 								<button class="btn btn-sm green table-group-action-submit">
@@ -970,11 +987,12 @@
 									<th width="10%"> Account </th>
 									<th width="10%"> Campaign </th>
 									<th width="10%"> Ad Group </th>
-									<th width="7%"> Sales </th>
-									<th width="7%"> Profit </th>
-									<th width="7%"> Orders </th>
-									<th width="8%"> BGBU </th>
-									<th width="8%"> User </th>
+									<th width="5%"> Sales </th>
+									<th width="8%"> Profit </th>
+									<th width="5%"> Orders </th>
+									<th width="7%"> BGBU </th>
+									<th width="7%"> User </th>
+									<th width="7%"> SKU </th>
 									<th width="7%"> Cost </th>
 								</tr>
 								<tr role="row" class="filter">
@@ -1040,7 +1058,7 @@
 									</select>
 									
 									</td>
-	
+									<td><input type="text" class="form-control form-filter input-sm" name="sku"></td>
 									<td>
 										<div class="margin-bottom-5">
 											<button class="btn btn-sm green btn-outline filter-submit margin-bottom">
@@ -1115,14 +1133,15 @@
 									grid.getTableWrapper().on('click', '.table-group-action-submit', function (e) {
 										e.preventDefault();
 										var bgbu = $("#bgbu", grid.getTableWrapper());
-										
-										if ((bgbu.val() != "") && grid.getSelectedRowsCount() > 0) {
+										var sku = $("#sku", grid.getTableWrapper());
+										if ((bgbu.val() != "" && sku.val() != "") && grid.getSelectedRowsCount() > 0) {
 											grid.setAjaxParam("customActionType", "group_action");
 											grid.setAjaxParam("custombgbu", bgbu.val());
+											grid.setAjaxParam("customsku", sku.val());
 											grid.setAjaxParam("id", grid.getSelectedRows());
 											grid.getDataTable().draw(false);
 											//grid.clearAjaxParams();
-										} else if (bgbu.val() == "") {
+										} else if (bgbu.val() == "" || sku.val() == "") {
 											App.alert({
 												type: 'danger',
 												icon: 'warning',
@@ -1148,6 +1167,7 @@
 									grid.setAjaxParam("sellerid", $("select[name='sellerid']").val());
 									grid.setAjaxParam("bgbu", $("select[name='bgbu']").val());
 									grid.setAjaxParam("user_id", $("select[name='user_id']").val());
+									grid.setAjaxParam("sku", $("input[name='sku']").val());
 									grid.getDataTable().ajax.reload(null,false);
 									//grid.clearAjaxParams();
 								}
