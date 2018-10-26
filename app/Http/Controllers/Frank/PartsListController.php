@@ -177,6 +177,11 @@ class PartsListController extends Controller {
                 item_code = '{$item_code}'"
         );
 
+        foreach ($rows as &$row) {
+            // 全部转成 INT，避免 JS 数字字符串的陷阱
+            $row['stock'] = (int)$row['stock'];
+        }
+
         return $rows;
     }
 

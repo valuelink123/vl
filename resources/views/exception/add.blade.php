@@ -382,14 +382,14 @@
 									<div class="row mt-repeater-row">
 										<div class="col-md-2">
 											<label class="control-label">Item Code</label>
-											 <input type="text" class="form-control item_code" name="item_code" placeholder="item code" />
+											 <input type="text" class="form-control item_code" name="item_code" placeholder="item code" autocomplete="off" />
                                             <input type="hidden" name="seller_id" />
                                             <input type="hidden" name="seller_sku" />
 										</div>
 										<div class="col-md-7">
 											<label class="control-label">Seller ID & Seller SKU</label>
 											<input type="hidden" name="title" />
-											<input type="text" class="form-control"  name="sku" placeholder="seller id & seller sku" />
+											<input type="text" class="form-control"  name="sku" placeholder="seller id & seller sku" autocomplete="off" />
 										</div>
 										<div class="col-md-2">
 											<label class="control-label">Quantity</label>
@@ -467,7 +467,7 @@
 
     let replacementItemRepeater = $replacementProductList.parent().repeater({defaultValues:{qty:1}})
 
-    let theSellerId = null // 用于判断优先选择相同账号库存；
+    let theSellerId = null // 全局变量，用于判断优先选择相同账号库存；
 
     function setReplacementItemList(items){
         replacementItemRepeater.setList(items.map(i => {
@@ -541,9 +541,7 @@
                 }
 
                 stocks.sort((a, b) => {
-                    let aStock = parseInt(a.stock)
-                    let bStock = parseInt(b.stock)
-                    return aStock < bStock ? 1 : (aStock > bStock ? -1 : 0)
+                    return a.stock < b.stock ? 1 : (a.stock > b.stock ? -1 : 0)
                 })
 
                 $sellerSku
@@ -560,12 +558,9 @@
 
                 if (1 === stocks.length && stocks[0].stock > 0) {
                     stock = stocks[0]
-                } else if(seller_id && seller_sku){
-                    let info = skusInfo[`${seller_id}:${seller_sku}`]
-                    if(info && info.stock-0 ) stock = info
                 } else {
                     for(let s of stocks){
-                        if((s.seller_id === theSellerId) && (s.stock-0)) {
+                        if(s.seller_id === theSellerId && s.stock) {
                             stock = s
                             break
                         }
@@ -586,7 +581,13 @@
             // console.log(e, this)
             let skusInfo = $(this).data('skusInfo') || ''
             let info = skusInfo[this.value.replace(' & ', ':')]
+
+            if(info && info.stock <= 0){
+                toastr.error('The stock of this item is Zero.');
+            }
+
             let label = info ? `${info.item_name} <b>[${info.seller_name}]</b>` : 'Seller ID & Seller SKU'
+
             $(this).prev().val(info ? info.item_name : '').prev().html(label)
         })
 
