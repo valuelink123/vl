@@ -57,6 +57,7 @@ class GetAwsInfo extends Command
         );
         //获取数据开始日期
         $date_from = date('Y-m-d',strtotime('-2days'));
+        $date_to = date('Y-m-d',strtotime('-1day'));
         if(isset($accounts) && !empty($accounts))
         {
             foreach($accounts as $account)
@@ -67,9 +68,10 @@ class GetAwsInfo extends Command
                 if(isset($date) && !empty($date))
                 {
                     $date_from = $date[0]->date;
+                    $date_to = date('Y-m-d',strtotime($date_from) + 3600*24);
                 }
                 $seller_id=$account->SellerId;
-                $date_to = date('Y-m-d',strtotime('-1day'));
+
                 //从CCP获取数据
                 $reports = DB::connection("ccp")->select(
                     "select ppc_campaigns.name as campaign_name,ppc_ad_groups.name as ad_group,ppc_reports.date,sum(ppc_reports.cost) as cost,
