@@ -564,8 +564,8 @@ where a.date>=:sdate_from and a.date<=:sdate_to
 				foreach($datas as $key=>$val){
 					$arrayData[] = [
 						array_get($val,'date'),
-						array_get($val,'SellerId'),
-						array_get($seller,array_get($val,'SellerId'),array_get($val,'SellerId')),
+						array_get($val,'seller_id'),
+						array_get($seller,array_get($val,'seller_id'),array_get($val,'seller_id')),
 						array_get($val,'marketplace_id'),
 						array_get($val,'campaign_name'),
 						array_get($val,'ad_group'),
