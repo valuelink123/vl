@@ -251,7 +251,7 @@
 							<span class="input-group-addon">
 								<i class="fa fa-bookmark"></i>
 							</span>
-								<input type="text" class="form-control" name="refund" id="refund" value="{{old('refund')}}" >
+								<input type="text" class="form-control" name="refund" id="refund" value="{{old('refund')}}" autocomplete="off" />
 							</div>
 						</div>
                         <div style="clear:both;"></div>
@@ -431,7 +431,7 @@
 							<span class="input-group-addon">
 								<i class="fa fa-bookmark"></i>
 							</span>
-								<input type="text" class="form-control" name="gift_card_amount" id="gift_card_amount" value="{{old('gift_card_amount')}}" />
+								<input type="text" class="form-control" name="gift_card_amount" id="gift_card_amount" value="{{old('gift_card_amount')}}" autocomplete="off" />
 							</div>
 						</div>
 						<div style="clear:both;"></div>
