@@ -84,10 +84,12 @@ function objectFilte(obj, keys = [], except = true) {
 
 function rows2object(rows, keyFields, valueField = null) {
 
+    let separator = (keyFields instanceof Array) ? keyFields.pop() : null
+
     let dataObject = {}
 
     for (let row of rows) {
-        let key = (keyFields instanceof Array) ? keyFields.map(k => row[k]).join(':') : row[keyFields]
+        let key = (null === separator) ? row[keyFields] : keyFields.map(k => row[k]).join(separator)
         dataObject[key] = valueField ? row[valueField] : row
     }
 
