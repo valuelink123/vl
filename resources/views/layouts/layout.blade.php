@@ -410,15 +410,7 @@
                         </a>
 
                     </li>
-					<li class="nav-item <?php if($action=='total') echo 'active';?>">
-                        <a href="{{ url('total') }}" class="nav-link nav-toggle">
-                            <i class="fa fa-download"></i>
-                            <span class="title">Data Statistics</span>
-                            <?php if($action=='total') echo '<span class="selected"></span>';?>
-
-                        </a>
-
-                    </li>
+					
 
 					<li class="nav-item <?php if($action=='etotal') echo 'active';?>">
                         <a href="{{ url('etotal') }}" class="nav-link nav-toggle">
@@ -448,7 +440,14 @@
 
                     </li>
 					<?php } ?>
+					<li class="nav-item <?php if($action=='total') echo 'active';?>">
+                        <a href="{{ url('total') }}" class="nav-link nav-toggle">
+                            <i class="fa fa-download"></i>
+                            <span class="title">Data Statistics</span>
+                            <?php if($action=='total') echo '<span class="selected"></span>';?>
 
+                        </a>
+                    </li>
 
 					<li class="nav-item <?php if($action=='seller') echo 'active';?>">
                         <a href="{{ url('seller') }}" class="nav-link nav-toggle">
