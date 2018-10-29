@@ -49,7 +49,7 @@ function getReviewWarnWords(){
 
 function getEType(){
     return array(
-        'Listing description issues','Order issues','Customer experience issues',' Manual issues','Transportation issues','Quality issues','Accessories','Invoice','Gift','Other issues'
+        'Listing description issues','Order issues','Customer experience issues','Manual issues','Transportation issues','Quality issues','Accessories','Invoice','Gift','Other issues'
     );
 }
 
