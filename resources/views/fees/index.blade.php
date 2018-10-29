@@ -182,8 +182,8 @@
 											"bStateSave": true, // save datatable state(pagination, sort, etc) in cookie.
 											"aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0 ,2,3,4,5 ] }],
 											"lengthMenu": [
-												[10, 20, 50],
-												[10, 20, 50] // change per page values here
+												[-1,10, 20, 50],
+												['All',10, 20, 50] // change per page values here
 											],
 											"pageLength": 10, // default record count per page
 											"ajax": {
@@ -412,8 +412,8 @@
 											"bStateSave": true, // save datatable state(pagination, sort, etc) in cookie.
 											"aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0 ,2,3,4,5 ] }],
 											"lengthMenu": [
-												[10, 20, 50],
-												[10, 20, 50] // change per page values here
+												[-1,10, 20, 50],
+												['All',10, 20, 50] // change per page values here
 											],
 											"pageLength": 10, // default record count per page
 											"ajax": {
@@ -645,8 +645,8 @@
 											"bStateSave": true, // save datatable state(pagination, sort, etc) in cookie.
 											"aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0 ,2,3,4,5 ] }],
 											"lengthMenu": [
-												[10, 20, 50],
-												[10, 20, 50] // change per page values here
+												[-1,10, 20, 50],
+												['All',10, 20, 50] // change per page values here
 											],
 											"pageLength": 10, // default record count per page
 											"ajax": {
@@ -878,8 +878,8 @@
 											"bStateSave": true, // save datatable state(pagination, sort, etc) in cookie.
 											"aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0 ,2,3,4,5 ] }],
 											"lengthMenu": [
-												[10, 20, 50],
-												[10, 20, 50] // change per page values here
+												[-1,10, 20, 50],
+												['All',10, 20, 50] // change per page values here
 											],
 											"pageLength": 10, // default record count per page
 											"ajax": {
@@ -1116,8 +1116,8 @@
 											"bStateSave": true, // save datatable state(pagination, sort, etc) in cookie.
 											"aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0 ,2,3,4,5,6,7,8 ] }],
 											"lengthMenu": [
-												[10, 20, 50],
-												[10, 20, 50] // change per page values here
+												[-1,10, 20, 50],
+												['All',10, 20, 50] // change per page values here
 											],
 											"pageLength": 10, // default record count per page
 											"ajax": {

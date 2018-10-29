@@ -446,10 +446,12 @@ where a.date>=:sdate_from and a.date<=:sdate_to
 				$spreadsheet->addSheet($myWorkSheet, 2);
 				$myWorkSheet = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($spreadsheet, 'Service Fee');
 				$spreadsheet->addSheet($myWorkSheet, 3);
+				$myWorkSheet = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($spreadsheet, 'Cpc Details Fee');
+				$spreadsheet->addSheet($myWorkSheet, 4);
 
 				
 				$datas= DB::connection('order')->table('finances_product_ads_payment_event')->where('PostedDate','>=',$date_from.'T00:00:00Z')->where('PostedDate','<=',$date_to.'T23:59:59Z')->orderBy('PostedDate','asc')->get()->toArray();
-				$arrayData[] = ['PostedDate','SellerId','SellerName','InvoiceId','Amount','Currency','BG','BU','User'];
+				$arrayData[] = ['PostedDate','SellerId','SellerName','InvoiceId','Amount','Currency','BG','BU','Sku','User'];
 				$datas=json_decode(json_encode($datas), true);
 				foreach($datas as $key=>$val){
 					$arrayData[] = [
@@ -461,6 +463,7 @@ where a.date>=:sdate_from and a.date<=:sdate_to
 						array_get($val,'Currency'),
 						array_get($val,'bg'),
 						array_get($val,'bu'),
+						array_get($val,'sku'),
 						array_get($users,array_get($val,'user_id'),array_get($val,'user_id'))
 					];
 				}
@@ -476,7 +479,7 @@ where a.date>=:sdate_from and a.date<=:sdate_to
 					);
 				$arrayData=[];
 				$datas= DB::connection('order')->table('finances_deal_event')->where('PostedDate','>=',$date_from.'T00:00:00Z')->where('PostedDate','<=',$date_to.'T23:59:59Z')->orderBy('PostedDate','asc')->get()->toArray();
-				$arrayData[] = ['PostedDate','SellerId','SellerName','DealId','DealDescription','Amount','Currency','BG','BU','User'];
+				$arrayData[] = ['PostedDate','SellerId','SellerName','DealId','DealDescription','Amount','Currency','BG','BU','Sku','User'];
 				$datas=json_decode(json_encode($datas), true);
 				foreach($datas as $key=>$val){
 					$arrayData[] = [
@@ -489,6 +492,7 @@ where a.date>=:sdate_from and a.date<=:sdate_to
 						array_get($val,'Currency'),
 						array_get($val,'bg'),
 						array_get($val,'bu'),
+						array_get($val,'sku'),
 						array_get($users,array_get($val,'user_id'),array_get($val,'user_id'))
 					];
 				}
@@ -502,7 +506,7 @@ where a.date>=:sdate_from and a.date<=:sdate_to
 					
 				$arrayData=[];
 				$datas= DB::connection('order')->table('finances_coupon_event')->where('PostedDate','>=',$date_from.'T00:00:00Z')->where('PostedDate','<=',$date_to.'T23:59:59Z')->orderBy('PostedDate','asc')->get()->toArray();
-				$arrayData[] = ['PostedDate','SellerId','SellerName','CouponId','SellerCouponDescription','Amount','Currency','BG','BU','User'];
+				$arrayData[] = ['PostedDate','SellerId','SellerName','CouponId','SellerCouponDescription','Amount','Currency','BG','BU','Sku','User'];
 				$datas=json_decode(json_encode($datas), true);
 				foreach($datas as $key=>$val){
 					$arrayData[] = [
@@ -515,6 +519,7 @@ where a.date>=:sdate_from and a.date<=:sdate_to
 						array_get($val,'Currency'),
 						array_get($val,'bg'),
 						array_get($val,'bu'),
+						array_get($val,'sku'),
 						array_get($users,array_get($val,'user_id'),array_get($val,'user_id'))
 					];
 				}
@@ -529,7 +534,7 @@ where a.date>=:sdate_from and a.date<=:sdate_to
 					
 				$arrayData=[];
 				$datas= DB::connection('order')->table('finances_servicefee_event')->where('PostedDate','>=',$date_from.'T00:00:00Z')->where('PostedDate','<=',$date_to.'T23:59:59Z')->orderBy('PostedDate','asc')->get()->toArray();
-				$arrayData[] = ['PostedDate','SellerId','SellerName','FeeDescription','Amount','Currency','BG','BU','User'];
+				$arrayData[] = ['PostedDate','SellerId','SellerName','FeeDescription','Amount','Currency','BG','BU','Sku','User'];
 				$datas=json_decode(json_encode($datas), true);
 				foreach($datas as $key=>$val){
 					$arrayData[] = [
@@ -541,6 +546,7 @@ where a.date>=:sdate_from and a.date<=:sdate_to
 						array_get($val,'Currency'),
 						array_get($val,'bg'),
 						array_get($val,'bu'),
+						array_get($val,'sku'),
 						array_get($users,array_get($val,'user_id'),array_get($val,'user_id'))
 					];
 				}
@@ -551,9 +557,43 @@ where a.date>=:sdate_from and a.date<=:sdate_to
 						'A1'         // Top left coordinate of the worksheet range where
 									 //    we want to set these values (default is A1)
 					);
-					
-					
-					
+				$arrayData=[];
+				$datas= DB::table('aws_report')->where('date','>=',$date_from)->where('date','<=',$date_to)->orderBy('date','asc')->get()->toArray();
+				$arrayData[] = ['Date','SellerId','SellerName','marketplace id','campaign name','ad group','cost','sales','profit','orders','acos','impressions','clicks','ctr','cpc','ad conversion rate','default bid','BG','BU','Sku','User'];
+				$datas=json_decode(json_encode($datas), true);
+				foreach($datas as $key=>$val){
+					$arrayData[] = [
+						array_get($val,'date'),
+						array_get($val,'SellerId'),
+						array_get($seller,array_get($val,'SellerId'),array_get($val,'SellerId')),
+						array_get($val,'marketplace_id'),
+						array_get($val,'campaign_name'),
+						array_get($val,'ad_group'),
+						array_get($val,'cost'),
+						array_get($val,'sales'),
+						array_get($val,'profit'),
+						array_get($val,'orders'),
+						array_get($val,'acos'),
+						array_get($val,'impressions'),
+						array_get($val,'clicks'),
+						array_get($val,'ctr'),
+						array_get($val,'cpc'),
+						array_get($val,'ad_conversion_rate'),
+						array_get($val,'default_bid'),
+						array_get($val,'bg'),
+						array_get($val,'bu'),
+						array_get($val,'sku'),
+						array_get($users,array_get($val,'user_id'),array_get($val,'user_id'))
+					];
+				}
+				$spreadsheet->getSheet(4)
+					->fromArray(
+						$arrayData,  // The data to set
+						NULL,        // Array values with this value will not be set
+						'A1'         // Top left coordinate of the worksheet range where
+									 //    we want to set these values (default is A1)
+					);
+
 				$spreadsheet->setActiveSheetIndex(0);
 				header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');//¸æËßä¯ÀÀÆ÷Êä³ö07ExcelÎÄ¼ş
 				header('Content-Disposition: attachment;filename="Export_'.array_get($_REQUEST,'ExportType').'.xlsx"');//¸æËßä¯ÀÀÆ÷Êä³öä¯ÀÀÆ÷Ãû³Æ
