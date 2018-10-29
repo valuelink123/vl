@@ -143,7 +143,7 @@ class ExceptionController extends Controller
 				$products = array_get($replacements,'products',array());
 				if(is_array($products)){
 				foreach( $products as $product){
-					$operate.= array_get($product,'sku').' ( '.array_get($product,'title').' ) * '.array_get($product,'qty').'; ';
+					$operate.= ($product['seller_sku']??$product['sku']??'').' ( '.array_get($product,'title').' ) * '.array_get($product,'qty').'; ';
 				}
 				}
 			}
@@ -457,7 +457,7 @@ class ExceptionController extends Controller
 				if(is_array($products)){
 					$operate.= 'Replace : ';
 					foreach( $products as $product){
-						$operate.= (array_get($product,'sku')?array_get($product,'sku'):array_get($product,'title')).'*'.array_get($product,'qty').'; ';
+						$operate.= (($product['seller_sku']??$product['sku']??null)??array_get($product,'title')).'*'.array_get($product,'qty').'; ';
 					}
 				}
 			}
