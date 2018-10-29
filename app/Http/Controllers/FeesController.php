@@ -65,19 +65,20 @@ class FeesController extends Controller
     public function getads(Request $request)
     {
 		$orderby = $request->input('order.0.column',1);
-		if($orderby==6){
+		if($orderby==7){
 			$orderby = 'TransactionValue';
 		}else{
 			$orderby = 'PostedDate';
 		}
         $sort = $request->input('order.0.dir','desc');
-        if ($request->input("custombgbu") && $request->input("customActionType") == "group_action") {
+        if ($request->input("custombgbu") && $request->input("customsku") && $request->input("customActionType") == "group_action") {
 			   $updateDate = [];
                $bgbu = $request->input('custombgbu');
 			   $bgbu_arr = explode('_',$bgbu);
 			   if(array_get($bgbu_arr,0)) $updateDate['bg'] = array_get($bgbu_arr,0);
 			   if(array_get($bgbu_arr,1)) $updateDate['bu'] = array_get($bgbu_arr,1);
 			   $updateDate['user_id'] = Auth::user()->id;
+			   $updateDate['sku'] = $request->input("customsku");
 			    DB::connection('order')->table('finances_product_ads_payment_event')->whereIn('id',$request->input("id"))->update($updateDate);
         }
 		$date_from=$request->input('date_from')?$request->input('date_from'):date('Y-m-d',strtotime('- 90 days'));
@@ -89,7 +90,7 @@ class FeesController extends Controller
             $datas = $datas->where('SellerId', $request->input('sellerid'));
         }
 		
-		if($request->input('bgbu')){
+		if($request->input('bgbu') ){
 			   $bgbu = $request->input('bgbu');
 			   $bgbu_arr = explode('_',$bgbu);
 			   if(count($bgbu_arr)>1){
@@ -101,6 +102,9 @@ class FeesController extends Controller
 		}
 		if($request->input('user_id')){
             $datas = $datas->where('user_id', $request->input('user_id'));
+        }
+		if($request->input('sku')){
+            $datas = $datas->where('sku', $request->input('sku'));
         }
 		
 		if($request->input('invoiceid')){
@@ -128,6 +132,7 @@ class FeesController extends Controller
 				$list['InvoiceId'],
 				$list['bg'].' - '.$list['bu'],
 				array_get($users,$list['user_id'],''),
+				$list['sku'],
 				$list['TransactionValue'].' '.$list['Currency'],
             );
 		}
@@ -142,19 +147,20 @@ class FeesController extends Controller
 	public function getdeal(Request $request)
     {
 		$orderby = $request->input('order.0.column',1);
-		if($orderby==6){
+		if($orderby==7){
 			$orderby = 'TotalAmount';
 		}else{
 			$orderby = 'PostedDate';
 		}
         $sort = $request->input('order.0.dir','desc');
-        if ($request->input("custombgbu") && $request->input("customActionType") == "group_action") {
+        if ($request->input("custombgbu") && $request->input("customsku") && $request->input("customActionType") == "group_action") {
 			   $updateDate = [];
                $bgbu = $request->input('custombgbu');
 			   $bgbu_arr = explode('_',$bgbu);
 			   if(array_get($bgbu_arr,0)) $updateDate['bg'] = array_get($bgbu_arr,0);
 			   if(array_get($bgbu_arr,1)) $updateDate['bu'] = array_get($bgbu_arr,1);
 			   $updateDate['user_id'] = Auth::user()->id;
+			   $updateDate['sku'] = $request->input("customsku");
 			    DB::connection('order')->table('finances_deal_event')->whereIn('id',$request->input("id"))->update($updateDate);
         }
 		$date_from=$request->input('date_from')?$request->input('date_from'):date('Y-m-d',strtotime('- 90 days'));
@@ -178,6 +184,9 @@ class FeesController extends Controller
 		}
 		if($request->input('user_id')){
             $datas = $datas->where('user_id', $request->input('user_id'));
+        }
+		if($request->input('sku')){
+            $datas = $datas->where('sku', $request->input('sku'));
         }
 		
 		if($request->input('feedes')){
@@ -205,6 +214,7 @@ class FeesController extends Controller
 				$list['DealDescription'],
 				$list['bg'].' - '.$list['bu'],
 				array_get($users,$list['user_id'],''),
+				$list['sku'],
 				$list['TotalAmount'].' '.$list['Currency'],
             );
 		}
@@ -218,19 +228,20 @@ class FeesController extends Controller
 	public function getcoupon(Request $request)
     {
 		$orderby = $request->input('order.0.column',1);
-		if($orderby==6){
+		if($orderby==7){
 			$orderby = 'TotalAmount';
 		}else{
 			$orderby = 'PostedDate';
 		}
         $sort = $request->input('order.0.dir','desc');
-        if ($request->input("custombgbu") && $request->input("customActionType") == "group_action") {
+        if ($request->input("custombgbu") && $request->input("customsku") && $request->input("customActionType") == "group_action") {
 			   $updateDate = [];
                $bgbu = $request->input('custombgbu');
 			   $bgbu_arr = explode('_',$bgbu);
 			   if(array_get($bgbu_arr,0)) $updateDate['bg'] = array_get($bgbu_arr,0);
 			   if(array_get($bgbu_arr,1)) $updateDate['bu'] = array_get($bgbu_arr,1);
 			   $updateDate['user_id'] = Auth::user()->id;
+			   $updateDate['sku'] = $request->input("customsku");
 			    DB::connection('order')->table('finances_coupon_event')->whereIn('id',$request->input("id"))->update($updateDate);
         }
 		$date_from=$request->input('date_from')?$request->input('date_from'):date('Y-m-d',strtotime('- 90 days'));
@@ -254,6 +265,9 @@ class FeesController extends Controller
 		}
 		if($request->input('user_id')){
             $datas = $datas->where('user_id', $request->input('user_id'));
+        }
+		if($request->input('sku')){
+            $datas = $datas->where('sku', $request->input('sku'));
         }
 		
 		if($request->input('feedes')){
@@ -281,6 +295,7 @@ class FeesController extends Controller
 				$list['SellerCouponDescription'],
 				$list['bg'].' - '.$list['bu'],
 				array_get($users,$list['user_id'],''),
+				$list['sku'],
 				$list['TotalAmount'].' '.$list['Currency'],
             );
 		}
@@ -293,19 +308,20 @@ class FeesController extends Controller
 	public function getservice(Request $request)
     {
 		$orderby = $request->input('order.0.column',1);
-		if($orderby==6){
+		if($orderby==7){
 			$orderby = 'Amount';
 		}else{
 			$orderby = 'PostedDate';
 		}
         $sort = $request->input('order.0.dir','desc');
-        if ($request->input("custombgbu") && $request->input("customActionType") == "group_action") {
+        if ($request->input("custombgbu") && $request->input("customsku") && $request->input("customActionType") == "group_action") {
 			   $updateDate = [];
                $bgbu = $request->input('custombgbu');
 			   $bgbu_arr = explode('_',$bgbu);
 			   if(array_get($bgbu_arr,0)) $updateDate['bg'] = array_get($bgbu_arr,0);
 			   if(array_get($bgbu_arr,1)) $updateDate['bu'] = array_get($bgbu_arr,1);
 			   $updateDate['user_id'] = Auth::user()->id;
+			   $updateDate['sku'] = $request->input("customsku");
 			    DB::connection('order')->table('finances_servicefee_event')->whereIn('id',$request->input("id"))->update($updateDate);
         }
 		$date_from=$request->input('date_from')?$request->input('date_from'):date('Y-m-d',strtotime('- 90 days'));
@@ -329,6 +345,9 @@ class FeesController extends Controller
 		}
 		if($request->input('user_id')){
             $datas = $datas->where('user_id', $request->input('user_id'));
+        }
+		if($request->input('sku')){
+            $datas = $datas->where('sku', $request->input('sku'));
         }
 		
 		if($request->input('feedes')){
@@ -356,6 +375,7 @@ class FeesController extends Controller
 				$list['Type'],
 				$list['bg'].' - '.$list['bu'],
 				array_get($users,$list['user_id'],''),
+				$list['sku'],
 				$list['Amount'].' '.$list['Currency'],
             );
 		}
@@ -368,13 +388,14 @@ class FeesController extends Controller
 	
 	public function getcpc(Request $request)
     {
-        if ($request->input("custombgbu") && $request->input("customActionType") == "group_action") {
+        if ($request->input("custombgbu") && $request->input("customsku") && $request->input("customActionType") == "group_action") {
 			   $updateDate = [];
                $bgbu = $request->input('custombgbu');
 			   $bgbu_arr = explode('_',$bgbu);
 			   if(array_get($bgbu_arr,0)) $updateDate['bg'] = array_get($bgbu_arr,0);
 			   if(array_get($bgbu_arr,1)) $updateDate['bu'] = array_get($bgbu_arr,1);
 			   $updateDate['user_id'] = Auth::user()->id;
+			   $updateDate['sku'] = $request->input("customsku");
 			    DB::table('aws_report')->whereIn('id',$request->input("id"))->update($updateDate);
         }
 		$date_from=$request->input('date_from')?$request->input('date_from'):date('Y-m-d',strtotime('- 90 days'));
@@ -398,6 +419,10 @@ class FeesController extends Controller
 		}
 		if($request->input('user_id')){
             $datas = $datas->where('user_id', $request->input('user_id'));
+        }
+		
+		if($request->input('sku')){
+            $datas = $datas->where('sku', $request->input('sku'));
         }
 		
 		if($request->input('feedes')){
@@ -429,6 +454,7 @@ class FeesController extends Controller
 				$list['orders'],
 				$list['bg'].' - '.$list['bu'],
 				array_get($users,$list['user_id'],''),
+				$list['sku'],
 				$list['cost']
             );
 		}
