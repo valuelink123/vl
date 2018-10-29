@@ -178,7 +178,7 @@ class PartsListController extends Controller {
         );
 
         foreach ($rows as &$row) {
-            // 全部转成 INT，避免 JS 数字字符串的陷阱
+            // 全部转成 INT，避免 JS 数字字符串的陷阱(比较、加法会出麻烦)
             $row['stock'] = (int)$row['stock'];
         }
 

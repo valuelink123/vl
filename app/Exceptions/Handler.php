@@ -46,9 +46,9 @@ class Handler extends ExceptionHandler {
      */
     public function render($request, Exception $exception) {
 
-        if ($exception instanceof FrankException) {
+        if ($exception instanceof HypocriteException) {
             // header('HTTP/1.1 200 OK');
-            return response(json_encode([false, $exception->getMessage(), $exception->getCode()]));
+            return response(json_encode([false, $exception->getMsg(), $exception->getCode()]));
         }
 
         return parent::render($request, $exception);

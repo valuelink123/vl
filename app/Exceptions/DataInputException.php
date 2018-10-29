@@ -8,6 +8,6 @@
 namespace App\Exceptions;
 
 
-class DataInputException extends FrankException {
+class DataInputException extends HypocriteException {
 
 }
