@@ -42,7 +42,7 @@
 
   function loadorder(){
 
-	if(!rebindordersellerid.reportValidity() || !rebindorderid.reportValidity()){
+	if(!rebindorderid.reportValidity()){
 	    return
 	}
 
@@ -79,6 +79,7 @@
 			　　}
 				$("#order_sku", $("#exception_form")).val(order_sku);
 
+                window.theSellerId = rebindordersellerid.value = data.SellerId // 全局变量，用于判断优先选择相同账号库存；
                 setReplacementItemList(items)
 
 			}else{
@@ -467,11 +468,8 @@
 
     let replacementItemRepeater = $replacementProductList.parent().repeater({defaultValues:{qty:1}})
 
-    let theSellerId = null // 全局变量，用于判断优先选择相同账号库存；
-
     function setReplacementItemList(items){
         replacementItemRepeater.setList(items.map(i => {
-            theSellerId = i.SellerId; // 假设同一订单的所有商品中只有一个 SellerID……
             return {
                 seller_id: i.SellerId,
                 seller_sku: i.SellerSKU,
