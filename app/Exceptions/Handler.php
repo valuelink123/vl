@@ -47,8 +47,8 @@ class Handler extends ExceptionHandler {
     public function render($request, Exception $exception) {
 
         if ($exception instanceof HypocriteException) {
-            // header('HTTP/1.1 200 OK');
-            return response(json_encode([false, $exception->getMsg(), $exception->getCode()]));
+            $exception->setAdmin();
+            if ($request->expectsJson()) return response(json_encode([false, $exception->getMessage(), $exception->getCode()]));
         }
 
         return parent::render($request, $exception);

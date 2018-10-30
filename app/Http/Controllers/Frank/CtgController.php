@@ -8,6 +8,7 @@
 namespace App\Http\Controllers\Frank;
 
 
+use App\Models\Ctg;
 use Illuminate\Http\Request;
 
 class CtgController extends Controller {
@@ -25,6 +26,11 @@ class CtgController extends Controller {
         if ($req->isMethod('GET')) {
             return view('frank.ctgProcess');
         }
+    }
+
+    public function import(Request $req) {
+        Ctg::create($req->all());
+        return [true];
     }
 
 }

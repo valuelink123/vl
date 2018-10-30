@@ -9,6 +9,11 @@ namespace App\Exceptions;
 
 use Throwable;
 
+/**
+ * 仅维护者可见、仅用于调试、或安全敏感的信息
+ * 普通用户可见、可理解、非安全敏感的信息
+ * 将以上两种错误信息分开处理
+ */
 class HypocriteException extends \Exception {
 
     private $adminOnlyMessage;
@@ -22,18 +27,16 @@ class HypocriteException extends \Exception {
         parent::__construct($message[0], $code, $previous);
     }
 
-    /**
-     * 仅维护者可见、仅用于调试、或安全敏感的信息
-     * 普通用户可见、可理解、非安全敏感的信息
-     * 将以上两种错误信息分开处理
-     */
-    public function getMsg(bool $isAdmin = null) {
+    public function setAdmin(bool $isAdmin = null) {
 
         if (null === $isAdmin) {
             $isAdmin = env('APP_DEBUG');
         }
 
-        return $isAdmin ? $this->adminOnlyMessage : $this->message;
+        if ($isAdmin) {
+            $this->message = $this->adminOnlyMessage;
+        }
+
     }
 
 }
