@@ -353,11 +353,13 @@
                         <a href="{{ url('exception') }}" class="nav-link nav-toggle">
                             <i class="fa fa-ticket"></i>
                             <span class="title">Refund & Replacement</span>
-                            <?php if($action=='asin') echo '<span class="selected"></span>';?>
+                            <?php if($action=='exception') echo '<span class="selected"></span>';?>
 
                         </a>
 
                     </li>
+
+                    @include('layouts.menu', ['text'=>'C T G', 'uri'=>'/ctg/list'])
 
                     <?php if(Auth::user()->admin){?>
                     <li class="nav-item <?php if($action=='auto') echo 'active';?>">

@@ -12,8 +12,19 @@ use Illuminate\Http\Request;
 
 class CtgController extends Controller {
 
-    public function index(Request $req){
+    public function list(Request $req) {
 
+        if ($req->isMethod('GET')) {
+            return view('frank.ctgList');
+        }
+
+    }
+
+    public function process(Request $req) {
+
+        if ($req->isMethod('GET')) {
+            return view('frank.ctgProcess');
+        }
     }
 
 }

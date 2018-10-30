@@ -148,6 +148,7 @@
                 $('#submit-result-msg').css('min-height', '71px').empty()
 
             }).then(msg => {
+                // toastr.success('todo 所谓通知')
                 $('#submit-result-msg').html(`<div class="alert alert-success"><strong>Success !</strong> ${msg}</div>`)
             }).catch(msg => {
                 $('#submit-result-msg').html(`<div class="alert alert-danger"><strong>Error !</strong> ${msg}</div>`)
