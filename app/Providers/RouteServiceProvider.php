@@ -39,6 +39,8 @@ class RouteServiceProvider extends ServiceProvider
 
         $this->mapFrankRoutes();
 
+        $this->mapKmsRoutes();
+
         $this->mapWebRoutes();
 
         //
@@ -59,6 +61,13 @@ class RouteServiceProvider extends ServiceProvider
     }
 
     protected function mapFrankRoutes()
+    {
+        Route::middleware('kms')
+            ->namespace($this->namespace . '\Frank')
+            ->group(base_path('routes/frank.php'));
+    }
+
+    protected function mapKmsRoutes()
     {
         Route::prefix('kms')
             ->middleware('kms')

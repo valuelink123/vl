@@ -79,7 +79,7 @@
 			　　}
 				$("#order_sku", $("#exception_form")).val(order_sku);
 
-                window.theSellerId = rebindordersellerid.value = data.SellerId // 全局变量，用于判断优先选择相同账号库存；
+                rebindordersellerid.value = data.SellerId
                 setReplacementItemList(items)
 
 			}else{
@@ -556,6 +556,7 @@
                 if (1 === stocks.length && stocks[0].stock > 0) {
                     stock = stocks[0]
                 } else {
+                    let theSellerId = rebindordersellerid.value.trim()
                     for(let s of stocks){
                         if(s.seller_id === theSellerId && s.stock) {
                             stock = s
