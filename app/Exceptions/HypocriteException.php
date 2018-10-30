@@ -20,23 +20,34 @@ class HypocriteException extends \Exception {
 
     public function __construct(string $message = "", int $code = 0, Throwable $previous = null) {
 
-        if (!is_array($message)) $message = [$message];
+        if (is_array($message)) {
+            $this->adminOnlyMessage = $message[1] ?? null;
+            $message = $message[0];
+        }
 
-        $this->adminOnlyMessage = $message[1] ?? $message[0];
-
-        parent::__construct($message[0], $code, $previous);
+        parent::__construct($message, $code, $previous);
     }
 
     public function setAdmin(bool $isAdmin = null) {
+
+        if (!$this->adminOnlyMessage) return;
 
         if (null === $isAdmin) {
             $isAdmin = env('APP_DEBUG');
         }
 
         if ($isAdmin) {
-            $this->message = $this->adminOnlyMessage;
+            $this->message = "{$this->message} {$this->adminOnlyMessage}";
         }
 
+    }
+
+    /**
+     * @throws HypocriteException
+     */
+    public static function wrap(\Exception $e, $message = null) {
+        $message = $message ? [$message, $e->getMessage()] : $e->getMessage();
+        throw new static($message, $e->getCode(), $e);
     }
 
 }

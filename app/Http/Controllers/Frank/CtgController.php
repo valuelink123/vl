@@ -8,6 +8,7 @@
 namespace App\Http\Controllers\Frank;
 
 
+use App\Exceptions\HypocriteException;
 use App\Models\Ctg;
 use Illuminate\Http\Request;
 
@@ -28,8 +29,17 @@ class CtgController extends Controller {
         }
     }
 
+    /**
+     * @throws HypocriteException
+     */
     public function import(Request $req) {
-        Ctg::create($req->all());
+
+        try {
+            Ctg::create($req->all());
+        } catch (\Exception $e) {
+            HypocriteException::wrap($e);
+        }
+
         return [true];
     }
 
