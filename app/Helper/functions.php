@@ -314,3 +314,9 @@ function siteToMarketplaceid(){
 			 'amazon.jp' =>'A1VC38T7YXB528'
 		 );
 }
+
+function getMcfOrderStatus(){
+	return array(
+		'RECEIVED','INVALID','PLANNING','PROCESSING','CANCELLED','COMPLETE','COMPLETE_PARTIALLED','UNFULFILLABLE'
+	);
+}

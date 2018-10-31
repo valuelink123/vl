@@ -53,7 +53,7 @@
 										</select>
                                 </td>
                                 <td>
-                                    <input type="text" class="form-control form-filter input-sm" name="order_Id">
+                                    <input type="text" class="form-control form-filter input-sm" name="order_id">
                                 </td>
                                 <td>
                                     <input type="text" class="form-control form-filter input-sm" name="name">
@@ -63,7 +63,13 @@
     
                                 </td>
                                 <td>
-         
+         							<select name="status" class="form-control form-filter input-sm">
+											<option value="">Select Status</option>
+										   <?php 
+											foreach(getMcfOrderStatus() as $k){ 	
+												echo '<option value="'.$k.'">'.$k.'</option>';
+											}?>
+										</select>	
                                 </td>
 								<td></td>
                                 <td>
@@ -154,6 +160,7 @@
             grid.setAjaxParam("date_from", $("input[name='date_from']").val());
             grid.setAjaxParam("date_to", $("input[name='date_to']").val());
             grid.setAjaxParam("sellerid", $("select[name='sellerid']").val());
+			grid.setAjaxParam("status", $("select[name='status']").val());
             grid.getDataTable().ajax.reload(null,false);
             //grid.clearAjaxParams();
         }
