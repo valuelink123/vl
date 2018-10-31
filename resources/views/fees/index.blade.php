@@ -984,12 +984,13 @@
 										</label>
 									</th>
 									<th width="10%"> Date </th>
-									<th width="10%"> Account </th>
+									<th width="7%"> Account </th>
 									<th width="10%"> Campaign </th>
 									<th width="10%"> Ad Group </th>
 									<th width="5%"> Sales </th>
-									<th width="8%"> Profit </th>
+									<th width="5%"> Profit </th>
 									<th width="5%"> Orders </th>
+									<th width="5%"> Status </th>
 									<th width="7%"> BGBU </th>
 									<th width="7%"> User </th>
 									<th width="7%"> SKU </th>
@@ -1034,6 +1035,13 @@
 										
 									</td>
 									<td colspan="3"></td>
+									<td >
+									<select name="status" class="form-control form-filter input-sm">
+										<option value="">Status</option>
+										<option value="enabled">Enabled</option>
+										<option value="paused">Paused</option>
+									</select>
+									</td>
 									<td>
 									
 										<select name="bgbu" class="form-control form-filter input-sm">
@@ -1167,6 +1175,7 @@
 									grid.setAjaxParam("sellerid", $("select[name='sellerid']").val());
 									grid.setAjaxParam("bgbu", $("select[name='bgbu']").val());
 									grid.setAjaxParam("user_id", $("select[name='user_id']").val());
+									grid.setAjaxParam("status", $("select[name='status']").val());
 									grid.setAjaxParam("sku", $("input[name='sku']").val());
 									grid.getDataTable().ajax.reload(null,false);
 									//grid.clearAjaxParams();

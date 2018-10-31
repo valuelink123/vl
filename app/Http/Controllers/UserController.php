@@ -559,7 +559,7 @@ where a.date>=:sdate_from and a.date<=:sdate_to
 					);
 				$arrayData=[];
 				$datas= DB::table('aws_report')->where('date','>=',$date_from)->where('date','<=',$date_to)->orderBy('date','asc')->get()->toArray();
-				$arrayData[] = ['Date','SellerId','SellerName','marketplace id','campaign name','ad group','cost','sales','profit','orders','acos','impressions','clicks','ctr','cpc','ad conversion rate','default bid','BG','BU','Sku','User'];
+				$arrayData[] = ['Date','SellerId','SellerName','marketplace id','campaign name','ad group','cost','sales','profit','orders','acos','impressions','clicks','ctr','cpc','ad conversion rate','default bid','status','BG','BU','Sku','User'];
 				$datas=json_decode(json_encode($datas), true);
 				foreach($datas as $key=>$val){
 					$arrayData[] = [
@@ -580,6 +580,7 @@ where a.date>=:sdate_from and a.date<=:sdate_to
 						array_get($val,'cpc'),
 						array_get($val,'ad_conversion_rate'),
 						array_get($val,'default_bid'),
+						array_get($val,'state'),
 						array_get($val,'bg'),
 						array_get($val,'bu'),
 						array_get($val,'sku'),
