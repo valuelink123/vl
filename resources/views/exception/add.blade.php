@@ -580,9 +580,9 @@
             let skusInfo = $(this).data('skusInfo') || {}
             let info = skusInfo[this.value]
 
-            if(info){
+            let $repeatRow = $(this).closest('.mt-repeater-row')
 
-                let $repeatRow = $(this).closest('.mt-repeater-row')
+            if(info){
 
                 $repeatRow.find('.seller_id').val(info.seller_id)
                 $repeatRow.find('.seller_sku').val(info.seller_sku)
@@ -590,7 +590,10 @@
                 if(info.stock <= 0){
                     alert('The stock of this item is Zero.');
                 }
-            }
+            } else {
+                $repeatRow.find('.seller_id').val('')
+                $repeatRow.find('.seller_sku').val('')
+			}
 
             let label = info ? info.item_name : 'Seller Account and SKU'
 
