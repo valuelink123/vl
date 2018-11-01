@@ -372,13 +372,13 @@ if($exception['user_id'] == Auth::user()->id  && $exception['process_status'] ==
 								<div data-repeater-item class="mt-repeater-item">
 									<div class="row mt-repeater-row">
 										<div class="col-md-3">
-											<label class="control-label">Replaced SKU</label>
-											 <input type="text" {{$disable}} class="form-control"  name="sku" placeholder="SKU"  value="{{array_get($detail,'sku')}}">
+											<label class="control-label">Item Code</label>
+											 <input type="text" {{$disable}} class="form-control"  name="sku" placeholder=""  value="{{array_get($detail,'item_code')}}">
 								
 										</div>
 										<div class="col-md-5">
-											<label class="control-label">Replaced Product/Accessories Name</label>
-											 <input type="text" {{$disable}} class="form-control"  name="title" placeholder="title" value="{{array_get($detail,'title')}}" >
+											<label class="control-label">{{array_get($detail,'title')}}</label>
+											 <input type="text" {{$disable}} class="form-control"  name="title" placeholder="title" value="{{array_get($detail,'note')}}" >
 								
 										</div>
 										<div class="col-md-2">
