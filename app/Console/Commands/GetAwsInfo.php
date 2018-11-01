@@ -56,7 +56,7 @@ class GetAwsInfo extends Command
             'ATVPDKIKX0DER'=>1
         );
         //获取数据开始日期
-        $date_from = date('Y-m-d',strtotime('-31days'));
+        $date_from = date('Y-m-d',strtotime('-35days'));
         $date_to = date('Y-m-d',strtotime('-1day'));
         if(isset($accounts) && !empty($accounts))
         {
@@ -76,7 +76,7 @@ class GetAwsInfo extends Command
                 $reports = DB::connection("ccp")->select(
                     "select ppc_campaigns.name as campaign_name,ppc_ad_groups.name as ad_group,ppc_reports.date,sum(ppc_reports.cost) as cost,
                   sum(attributed_sales1d) as sales,sum(attributed_conversions1d_same_sku) as orders,sum(impressions) as impressions,sum(clicks) as  clicks,
-                  ppc_ad_groups.default_bid,ppc_campaigns.state 
+                  ppc_ad_groups.default_bid,ppc_ad_groups.state 
                   from ppc_reports
                   left join ppc_campaigns on ppc_campaigns.campaign_id=ppc_reports.record_type_id
                   LEFT JOIN ppc_profiles on ppc_profiles.profile_id = ppc_reports.profile_id
