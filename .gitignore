@@ -5,8 +5,8 @@
 /vendor
 /.idea
 /.vagrant
-Homestead.json
-Homestead.yaml
-npm-debug.log
-yarn-error.log
-.env
+/Homestead.json
+/Homestead.yaml
+/npm-debug.log
+/yarn-error.log
+/.env
