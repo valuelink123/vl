@@ -48,4 +48,32 @@
         </div>
     </div>
 
+    <script>
+
+        let $theTable = $(thetable)
+
+        $theTable.dataTable({
+            search: {search: queryStringToObject().search},
+            serverSide: true,
+            pagingType: 'bootstrap_extended',
+            processing: true,
+            columns: [
+                {data: 'created_at', name: 'created_at'},
+                {data: 'name', name: 'name'},
+                {data: 'email', name: 'email'},
+                {data: 'phone', name: 'phone'},
+                {data: 'rating', name: 'rating'},
+                {data: 'rating', name: 'rating'},
+                {data: 'rating', name: 'rating'},
+                {data: 'rating', name: 'rating'},
+                {data: 'rating', name: 'rating'}
+            ],
+            ajax: {
+                type: 'POST',
+                url: location.href
+            }
+        })
+
+    </script>
+
 @endsection

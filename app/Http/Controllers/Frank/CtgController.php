@@ -13,14 +13,42 @@ use Illuminate\Http\Request;
 
 class CtgController extends Controller {
 
+    use \App\Traits\Mysqli;
+    use \App\Traits\DataTables;
+
     // 不需要登录验证
     protected static $authExcept = ['import'];
 
+    /**
+     * @throws \App\Traits\MysqliException
+     * @throws \App\Traits\DataTablesException
+     */
     public function list(Request $req) {
 
         if ($req->isMethod('GET')) {
             return view('frank.ctgList');
         }
+
+        $orderby = $this->dtOrderBy($req);
+        $limit = $this->dtLimit($req);
+
+        $sql = "
+        SELECT
+        DATE(created_at) AS created_at,
+        name,
+        email,
+        phone,
+        rating
+        FROM ctg
+        ORDER BY $orderby
+        LIMIT $limit
+        ";
+
+        $data = $this->queryRows($sql);
+
+        $recordsTotal = $recordsFiltered = $this->queryOne('SELECT FOUND_ROWS()');
+
+        return compact('data', 'recordsTotal', 'recordsFiltered');
 
     }
 

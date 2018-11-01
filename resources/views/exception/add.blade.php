@@ -390,7 +390,7 @@
 										<div class="col-md-7">
 											<label class="control-label">Seller Account and SKU</label>
 											<input type="hidden" name="title" />
-											<input type="text" class="form-control seller-sku-selector" placeholder="Seller Account and SKU" autocomplete="off" />
+											<input type="text" class="form-control seller-sku-selector" name="note" placeholder="Seller Account and SKU" autocomplete="off" />
 										</div>
 										<div class="col-md-2">
 											<label class="control-label">Quantity</label>
