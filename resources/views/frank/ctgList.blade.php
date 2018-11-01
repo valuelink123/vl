@@ -35,7 +35,7 @@
                         <th>Customer Name</th>
                         <th>Customer Email</th>
                         <th>Phone Number</th>
-                        <th>Rate</th>
+                        <th>Rating</th>
                         <th>Commented</th>
                         <th>Status</th>
                         <th>Processor</th>

@@ -359,7 +359,7 @@
 
                     </li>
 
-                    @include('layouts.menu', ['text'=>'C T G', 'uri'=>'/ctg/list'])
+                    @include('layouts.menu', ['text'=>'C T G', 'uri'=>'/ctg/list', 'fa'=>'google'])
 
                     <?php if(Auth::user()->admin){?>
                     <li class="nav-item <?php if($action=='auto') echo 'active';?>">
