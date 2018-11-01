@@ -372,18 +372,18 @@ if($exception['user_id'] == Auth::user()->id  && $exception['process_status'] ==
 								<div data-repeater-item class="mt-repeater-item">
 									<div class="row mt-repeater-row">
 										<div class="col-md-3">
-											<label class="control-label">Replaced SKU</label>
-											 <input type="text" {{$disable}} class="form-control"  name="sku" placeholder="SKU"  value="{{array_get($detail,'sku')}}">
+											<label class="control-label">Item Code</label>
+											 <input type="text" {{$disable}} class="form-control"  name="sku"  value="{{array_get($detail,'item_code')}}">
 								
 										</div>
 										<div class="col-md-5">
-											<label class="control-label">Replaced Product/Accessories Name</label>
-											 <input type="text" {{$disable}} class="form-control"  name="title" placeholder="title" value="{{array_get($detail,'title')}}" >
+											<label class="control-label">{{array_get($detail,'title')}}</label>
+											 <input type="text" {{$disable}} class="form-control"  name="title" value="{{array_get($detail,'note')??array_get($detail,'seller_sku')??array_get($detail,'sku')}}" >
 								
 										</div>
 										<div class="col-md-2">
 											<label class="control-label">Quantity</label>
-											 <input type="text" {{$disable}} class="form-control"  name="qty" placeholder="Quantity" value="{{array_get($detail,'qty')}}">
+											 <input type="text" {{$disable}} class="form-control"  name="qty" value="{{array_get($detail,'qty')}}">
 								
 										</div>
 										<div class="col-md-1">
