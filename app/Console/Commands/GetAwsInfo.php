@@ -56,7 +56,7 @@ class GetAwsInfo extends Command
             'ATVPDKIKX0DER'=>1
         );
         //获取数据开始日期
-        $date_from = date('Y-m-d',strtotime('-35days'));
+        $date_from = date('Y-m-d',strtotime('-2days'));
         $date_to = date('Y-m-d',strtotime('-1day'));
         if(isset($accounts) && !empty($accounts))
         {
