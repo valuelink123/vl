@@ -42,7 +42,7 @@
 
   function loadorder(){
 
-	if(!rebindordersellerid.reportValidity() || !rebindorderid.reportValidity()){
+	if(!rebindorderid.reportValidity()){
 	    return
 	}
 
@@ -79,6 +79,7 @@
 			　　}
 				$("#order_sku", $("#exception_form")).val(order_sku);
 
+                rebindordersellerid.value = data.SellerId
                 setReplacementItemList(items)
 
 			}else{
@@ -159,7 +160,7 @@
 
 						<div class="col-md-5">
 
-													<input id="rebindordersellerid" class="form-control xform-autotrim" name="rebindordersellerid" list="list-rebindordersellerid" placeholder="Seller Account" autocomplete="off" required />
+													<input id="rebindordersellerid" class="form-control xform-autotrim" name="rebindordersellerid" list="list-rebindordersellerid" placeholder="Seller Account" autocomplete="off" />
 													<datalist id="list-rebindordersellerid">
 														@foreach ($sellerids as $id=>$name)
 															<option value="{{$id}}" label="{{$name}}" >
@@ -383,13 +384,13 @@
 										<div class="col-md-2">
 											<label class="control-label">Item Code</label>
 											 <input type="text" class="form-control item_code" name="item_code" placeholder="item code" autocomplete="off" />
-                                            <input type="hidden" name="seller_id" />
-                                            <input type="hidden" name="seller_sku" />
+                                            <input type="hidden" class="seller_id" name="seller_id" />
+                                            <input type="hidden" class="seller_sku" name="seller_sku" />
 										</div>
 										<div class="col-md-7">
-											<label class="control-label">Seller ID & Seller SKU</label>
+											<label class="control-label">Seller Account and SKU</label>
 											<input type="hidden" name="title" />
-											<input type="text" class="form-control"  name="sku" placeholder="seller id & seller sku" autocomplete="off" />
+											<input type="text" class="form-control seller-sku-selector" placeholder="Seller Account and SKU" autocomplete="off" />
 										</div>
 										<div class="col-md-2">
 											<label class="control-label">Quantity</label>
@@ -409,8 +410,8 @@
 						</div>
                         <script id="tplStockDatalist" type="text/template">
                             <datalist id="list-${item_code}-stocks">
-                                <% for(let {seller_id,seller_sku,stock} of stocks){ %>
-                                <option value="${seller_id} & ${seller_sku}" label="Stock: ${stock}">
+                                <% for(let {seller_name,seller_id,seller_sku,stock} of stocks){ %>
+                                <option value="${seller_name} | ${seller_sku}" label="Stock: ${stock}">
                                 <% } %>
                             </datalist>
                         </script>
@@ -467,15 +468,11 @@
 
     let replacementItemRepeater = $replacementProductList.parent().repeater({defaultValues:{qty:1}})
 
-    let theSellerId = null // 全局变量，用于判断优先选择相同账号库存；
-
     function setReplacementItemList(items){
         replacementItemRepeater.setList(items.map(i => {
-            theSellerId = i.SellerId; // 假设同一订单的所有商品中只有一个 SellerID……
             return {
                 seller_id: i.SellerId,
                 seller_sku: i.SellerSKU,
-                sku: `${i.SellerId} & ${i.SellerSKU}`,
                 title: i.Title,
                 qty: i.QuantityOrdered
             }
@@ -490,7 +487,7 @@
 
         let item_code = e.currentTarget.value.trim()
 
-        let $sellerSku = $(e.currentTarget).closest('.mt-repeater-row').find('[name$="[sku]"]')
+        let $sellerSku = $(e.currentTarget).closest('.mt-repeater-row').find('.seller-sku-selector')
 
         if ($sellerSku.attr('list') === `list-${item_code}-stocks`) return
 
@@ -504,7 +501,7 @@
             if (seller_id && seller_sku) {
                 var postData = {seller_id, seller_sku}
             } else {
-                return $sellerSku.attr('placeholder', 'seller id & seller sku')
+                return $sellerSku.attr('placeholder', 'Seller Account and SKU')
             }
 
         } else {
@@ -521,7 +518,7 @@
                 if (!stocks.length) {
                     if(seller_id && seller_sku){
                         e.currentTarget.value = 'no match'
-                        $sellerSku.val(`${seller_id} & ${seller_sku}`)
+                        $sellerSku.val(`${seller_id} | ${seller_sku}`)
                     } else {
                         $sellerSku.attr('placeholder', 'no match')
                     }
@@ -550,7 +547,7 @@
                     .attr('placeholder', 'please select ...')
 
 
-                let skusInfo = rows2object(stocks, ['seller_id', 'seller_sku'])
+                let skusInfo = rows2object(stocks, ['seller_name', 'seller_sku', ' | '])
 
                 $sellerSku.data('skusInfo', skusInfo)
 
@@ -559,6 +556,7 @@
                 if (1 === stocks.length && stocks[0].stock > 0) {
                     stock = stocks[0]
                 } else {
+                    let theSellerId = rebindordersellerid.value.trim()
                     for(let s of stocks){
                         if(s.seller_id === theSellerId && s.stock) {
                             stock = s
@@ -567,7 +565,7 @@
                     }
                 }
 
-                if(stock) $sellerSku.val(`${stock.seller_id} & ${stock.seller_sku}`).change()
+                if(stock) $sellerSku.val(`${stock.seller_name} | ${stock.seller_sku}`).change()
 
             }
         })
@@ -577,21 +575,29 @@
 
         XFormHelper.autoTrim('#replacement-product-list', 'input')
 
-        $replacementProductList.on('change', '[name$="[sku]"]', function (e) {
-            // console.log(e, this)
-            let skusInfo = $(this).data('skusInfo') || ''
-            let info = skusInfo[this.value.replace(' & ', ':')]
+        $replacementProductList.on('change', '.seller-sku-selector', function (e) {
 
-            if(info && info.stock <= 0){
-                toastr.error('The stock of this item is Zero.');
+            let skusInfo = $(this).data('skusInfo') || {}
+            let info = skusInfo[this.value]
+
+            if(info){
+
+                let $repeatRow = $(this).closest('.mt-repeater-row')
+
+                $repeatRow.find('.seller_id').val(info.seller_id)
+                $repeatRow.find('.seller_sku').val(info.seller_sku)
+
+                if(info.stock <= 0){
+                    alert('The stock of this item is Zero.');
+                }
             }
 
-            let label = info ? `${info.item_name} <b>[${info.seller_name}]</b>` : 'Seller ID & Seller SKU'
+            let label = info ? info.item_name : 'Seller Account and SKU'
 
             $(this).prev().val(info ? info.item_name : '').prev().html(label)
         })
 
-        bindDelayEvents('#replacement-product-list', 'change keyup paste', '[name$="[item_code]"]', handleItemCodeSearch);
+        bindDelayEvents('#replacement-product-list', 'change keyup paste', '.item_code', handleItemCodeSearch);
     })
 </script>
 <div style="clear:both;"></div>

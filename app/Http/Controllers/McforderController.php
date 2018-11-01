@@ -85,6 +85,9 @@ class McforderController extends Controller
 		if($request->input('order_id')){
             $datas = $datas->where('SellerFulfillmentOrderId', $request->input('order_id'));
         }
+		if($request->input('status')){
+            $datas = $datas->where('FulfillmentOrderStatus', $request->input('status'));
+        }
 		if($request->input('name')){
             $datas = $datas->where('Name', $request->input('name'));
         }

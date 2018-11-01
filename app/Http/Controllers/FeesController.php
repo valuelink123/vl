@@ -420,6 +420,9 @@ class FeesController extends Controller
 		if($request->input('user_id')){
             $datas = $datas->where('user_id', $request->input('user_id'));
         }
+		if($request->input('status')){
+            $datas = $datas->where('state', $request->input('status'));
+        }
 		
 		if($request->input('sku')){
             $datas = $datas->where('sku', $request->input('sku'));
@@ -452,6 +455,7 @@ class FeesController extends Controller
 				$list['sales'],
 				$list['profit'],
 				$list['orders'],
+				$list['state'],
 				$list['bg'].' - '.$list['bu'],
 				array_get($users,$list['user_id'],''),
 				$list['sku'],
