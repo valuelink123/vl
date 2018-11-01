@@ -10,9 +10,11 @@ namespace App\Http\Controllers\Frank;
 
 class Controller extends \App\Http\Controllers\Controller {
 
+    protected static $authExcept = [];
+
     public function __construct() {
         app('debugbar')->disable();
-        $this->middleware('auth');
+        $this->middleware('auth', ['except' => static::$authExcept]);
     }
 
 }

@@ -8,11 +8,13 @@
 namespace App\Http\Controllers\Frank;
 
 
-use App\Exceptions\HypocriteException;
 use App\Models\Ctg;
 use Illuminate\Http\Request;
 
 class CtgController extends Controller {
+
+    // 不需要登录验证
+    protected static $authExcept = ['import'];
 
     public function list(Request $req) {
 
@@ -30,15 +32,12 @@ class CtgController extends Controller {
     }
 
     /**
-     * @throws HypocriteException
+     * 提交 CTG 数据，由 claimthegift.com 调用
+     * @throws \App\Exceptions\HypocriteException
      */
     public function import(Request $req) {
 
-        try {
-            Ctg::create($req->all());
-        } catch (\Exception $e) {
-            HypocriteException::wrap($e);
-        }
+        Ctg::add($req->all());
 
         return [true];
     }
