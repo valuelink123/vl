@@ -479,7 +479,12 @@
         }));
 
         $replacementProductList.find('.item_code').each((i, ele) => {
-            handleItemCodeSearch.call(ele, {currentTarget: ele})
+
+            handleItemCodeSearch.call(ele, {
+                currentTarget: ele,
+                seller_id: $(ele).siblings('.seller_id').val(),
+                seller_sku: $(ele).siblings('.seller_sku').val()
+            })
         })
     }
 
@@ -495,8 +500,7 @@
 
         if (!item_code) {
 
-            var seller_id = $(this).next().val()
-            var seller_sku = $(this).next().next().val()
+            var {seller_id, seller_sku} = e
 
             if (seller_id && seller_sku) {
                 var postData = {seller_id, seller_sku}
@@ -590,7 +594,7 @@
                 if(info.stock <= 0){
                     alert('The stock of this item is Zero.');
                 }
-            } else if(this.value){
+            } else {
                 $repeatRow.find('.seller_id').val('')
                 $repeatRow.find('.seller_sku').val('')
 			}
