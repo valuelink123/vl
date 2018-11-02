@@ -92,6 +92,7 @@
   </script>
 <form  action="{{ url('exception/'.$exception['id']) }}" id="exception_form" method="POST" enctype="multipart/form-data">
 <?php 
+$mcf_order_str='';
 if($exception['user_id'] == Auth::user()->id  && $exception['process_status'] =='cancel'){
 	$disable='';
 }else{
@@ -368,7 +369,10 @@ if($exception['user_id'] == Auth::user()->id  && $exception['process_status'] ==
 								<?php 
 								$products_details = array_get($replace,'products',array());
 								if(is_array($products_details)){
-								foreach($products_details as $detail) { ?>
+								
+								foreach($products_details as $detail) { 
+								$mcf_order_str.=array_get($detail,'replacement_order_id')?array_get($detail,'replacement_order_id').'</BR>':'';
+								?>
 								<div data-repeater-item class="mt-repeater-item">
 									<div class="row mt-repeater-row">
 										<div class="col-md-3">
@@ -507,12 +511,16 @@ if((Auth::user()->admin || in_array($exception['group_id'],array_get($mygroups,'
 				<?php } ?>
 			</div>
 		</div>
-		<?php if($last_inboxid){ ?>
+		<?php if($mcf_order_str){ ?>
+		<div class="form-group">
+			<label>Replacement Order Id:</label>
+			<div class="input-group ">{!!$mcf_order_str!!}</div>
+		</div>
+		<?php }
+		if($last_inboxid){ ?>
 		<div class="form-group">
 		<div class="btn-group">
-			<a href="{{ url('/inbox/'.$last_inboxid)}}" target="_blank" > See Email History
-				
-			</a>
+			<a href="{{ url('/inbox/'.$last_inboxid)}}" target="_blank" > See Email History</a>
 		</div>
 		</div>
 		<?php 

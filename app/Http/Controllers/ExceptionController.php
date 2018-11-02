@@ -7,7 +7,7 @@ use App\Inbox;
 use App\Sendbox;
 use App\Accounts;
 use Illuminate\Support\Facades\Session;
-
+use App\Asin;
 use App\User;
 use App\Exception;
 use App\Group;
@@ -147,10 +147,12 @@ class ExceptionController extends Controller
 				$replacements = unserialize($customersList['replacement']);
 				$products = array_get($replacements,'products',array());
 				if(is_array($products)){
+					$sap_line_num=0;
 					foreach( $products as $product){
+						$sap_line_num+=10;
 						$operate.= ($product['seller_sku']??$product['note']??$product['sku']??'').' ( '.(array_get($product,'item_code')??array_get($product,'title')??'').' ) * '.array_get($product,'qty').'; ';
+						if($customersList['process_status']=='submit'){
 						if(array_get($product,'seller_id') && array_get($accounts,array_get($product,'seller_id'))){
-	
 							$arrayAmazon[] =[
 								array_get($accounts,array_get($product,'seller_id')),
 								array_get($product,'replacement_order_id'),
@@ -179,11 +181,17 @@ class ExceptionController extends Controller
 							];
 						}
 						
+						if($sap_sku_info = Asin::where('sellersku',array_get($product,'seller_sku'))->first()){
+							$sap_sku_info = $sap_sku_info->toArray();
+						}else{
+							$sap_sku_info=[];
+						}
+						
 						$arraySap[] =[
 							'11',
-							'1007',
+							array_get($sap_sku_info,'sap_site_id'),
 							$customersList['amazon_order_id'],
-							'AMNOV007',
+							array_get($sap_sku_info,'sap_store_id'),
 							'ZRR1',
 							'',
 							'',
@@ -204,21 +212,22 @@ class ExceptionController extends Controller
 							'',
 							'',
 							'',
-							'L008',
+							array_get($sap_sku_info,'sap_shipment_id'),
 							$customersList['amazon_order_id'],
-							'1007',
-							'10',
+							array_get($sap_sku_info,'sap_site_id'),
+							$sap_line_num,
 							array_get($product,'item_code'),
 							array_get($product,'qty'),
-							'US01',
-							'AA1',
+							array_get($sap_sku_info,'sap_warehouse_id'),
+							array_get($sap_sku_info,'sap_factory_id'),
 							'',
 							'',
 							'',
-							'',
+							array_get($sap_sku_info,'sap_seller_id'),
 							'',
 							''
 						];
+						}
 					}
 				}
 			}
@@ -403,6 +412,13 @@ class ExceptionController extends Controller
 			}
 	
 			if( $exception->type == 2 || $exception->type == 3){
+				$products=[];
+				$products_arr = $request->get('group-products');
+	
+				foreach($products_arr as $product_arr){
+					$product_arr['replacement_order_id']=array_get($product_arr,'seller_id').'-'.uniqid(rand(10,99));
+					$products[]=$product_arr;
+				}
 				$exception->replacement = serialize(
 				array(
 					'shipname'=>$request->get('shipname'),
@@ -416,7 +432,7 @@ class ExceptionController extends Controller
 					'postalcode'=>$request->get('postalcode'),
 					'countrycode'=>$request->get('countrycode'),
 					'phone'=>$request->get('phone'),
-					'products'=>$request->get('group-products'),
+					'products'=>$products,
 				));
 			}else{
 				$exception->replacement = '';
@@ -648,6 +664,13 @@ class ExceptionController extends Controller
         }
 
 		if( $exception->type == 2 || $exception->type == 3){
+			$products=[];
+			$products_arr = $request->get('group-products');
+
+			foreach($products_arr as $product_arr){
+				$product_arr['replacement_order_id']=array_get($product_arr,'seller_id').'-'.uniqid(rand(10,99));
+				$products[]=$product_arr;
+			}
 			$exception->replacement = serialize(
 			array(
 				'shipname'=>$request->get('shipname'),
@@ -661,7 +684,7 @@ class ExceptionController extends Controller
 				'postalcode'=>$request->get('postalcode'),
 				'countrycode'=>$request->get('countrycode'),
 				'phone'=>$request->get('phone'),
-				'products'=>$request->get('group-products'),
+				'products'=>$products,
 			));
 		}else{
 			$exception->replacement = '';

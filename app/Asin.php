@@ -8,5 +8,6 @@ class Asin extends Model
 {
     //
     protected $table = 'asin';
+	protected $guarded = [];
     public $timestamps = false;
 }
