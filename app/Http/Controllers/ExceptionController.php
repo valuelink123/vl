@@ -151,8 +151,8 @@ class ExceptionController extends Controller
 					foreach( $products as $product){
 						$sap_line_num+=10;
 						$operate.= ($product['seller_sku']??$product['note']??$product['sku']??'').' ( '.(array_get($product,'item_code')??array_get($product,'title')??'').' ) * '.array_get($product,'qty').'; ';
+						if($customersList['process_status']=='submit'){
 						if(array_get($product,'seller_id') && array_get($accounts,array_get($product,'seller_id'))){
-	
 							$arrayAmazon[] =[
 								array_get($accounts,array_get($product,'seller_id')),
 								array_get($product,'replacement_order_id'),
@@ -227,6 +227,7 @@ class ExceptionController extends Controller
 							'',
 							''
 						];
+						}
 					}
 				}
 			}
