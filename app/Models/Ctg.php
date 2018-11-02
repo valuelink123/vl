@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Ctg extends Model {
     protected $table = 'ctg';
+    // protected $guarded = ['id']; // 黑名单模式
     protected $fillable = ['order_id', 'product_asin', 'product_sku', 'gift_sku', 'name', 'email', 'phone', 'address', 'rating', 'note'];
 
     /**
