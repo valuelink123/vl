@@ -65,7 +65,6 @@ class GetAsin extends Command
 		}
 		$authstr=$authstr.$appsecret;
 		$sign = strtoupper(sha1($authstr));
-		
 		$res = file_get_contents('http://116.6.105.153:18003/rfc_site.php?appid='.$appkey.'&method=getAsin&date_start='.$date_start.'&date_end='.$date_end.'&sign='.$sign);
 		$result = json_decode($res,true);
 		
@@ -73,54 +72,33 @@ class GetAsin extends Command
 		$asinList = array_get($result,'data');
 
 		foreach($asinList as $asin){
-			if(array_get($asin,'ASIN') == 'B0772MJHDS') print_r($asin);
-			unset($exists);
+
 			if(array_get($asin,'ZDELETE')=='X'){
 				Asin::where('asin', trim(array_get($asin,'ASIN')))->where('site', 'www.'.trim(array_get($asin,'SITE')))->where('sellersku', trim(array_get($asin,'SELLER_SKU')))->delete();
 				DB::table('asin_seller_count')->where('asin', trim(array_get($asin,'ASIN')))->where('site', 'www.'.trim(array_get($asin,'SITE')))->update(array('updated_at'=>date('Y-m-d H:i:s'),'status'=>'X'));
 				continue;
 			} 
-			
-			$exists = Asin::where('asin', trim(array_get($asin,'ASIN')))->where('site', 'www.'.trim(array_get($asin,'SITE')))->where('sellersku', trim(array_get($asin,'SELLER_SKU')))->first();
-			if(!$exists) {
-				
-				//if(array_get($asin,'ASIN') == 'B074NXJWN2') echo '1';
-				$asinadd = new Asin;
-				$asinadd->asin = trim(array_get($asin,'ASIN'));
-				$asinadd->site = 'www.'.trim(array_get($asin,'SITE'));
-				$asinadd->sellersku = trim(array_get($asin,'SELLER_SKU'));
-				$asinadd->item_no = trim(array_get($asin,'MATNR'));
-				$asinadd->seller = trim(array_get($asin,'SELLER'));
-				$asinadd->item_group = trim(array_get($asin,'MATKL'));
-				$asinadd->status = trim(array_get($asin,'ZSTATUS'));
-				$asinadd->item_model = trim(array_get($asin,'MODEL'));
-				$asinadd->bg = trim(array_get($asin,'ZBGROUP'));
-				$asinadd->bu = trim(array_get($asin,'ZBUNIT'));
-				$asinadd->store = trim(array_get($asin,'STORE'));
-				$asinadd->brand = trim(array_get($asin,'BRAND'));
-				$asinadd->brand_line = trim(array_get($asin,'WGBEZ'));
-				$result = $asinadd->save();
-				//if(array_get($asin,'ASIN') == 'B074NXJWN2') print_r($asinadd);
-				unset($asinadd);
-				//if(array_get($asin,'ASIN') == 'B074NXJWN2') print_r($result);
-				
-				
-			}else{
-				
-				//if(array_get($asin,'ASIN') == 'B074NXJWN2') echo '2';
-				$exists->item_no = trim(array_get($asin,'MATNR'));
-				$exists->seller = trim(array_get($asin,'SELLER'));
-				$exists->item_group = trim(array_get($asin,'MATKL'));
-				$exists->status = trim(array_get($asin,'ZSTATUS'));
-				$exists->item_model = trim(array_get($asin,'MODEL'));
-				$exists->bg = trim(array_get($asin,'ZBGROUP'));
-				$exists->bu = trim(array_get($asin,'ZBUNIT'));
-				$exists->store = trim(array_get($asin,'STORE'));
-				$exists->brand = trim(array_get($asin,'BRAND'));
-				$exists->brand_line = trim(array_get($asin,'WGBEZ'));
-				$exists->save();
-			
-			}
+			Asin::updateOrCreate([
+				'asin' => array_get($asin,'ASIN',''),
+				'site' => array_get($asin,'SITE',''),
+				'sellersku'=> array_get($asin,'SELLER_SKU','')],[
+				'item_no' => array_get($asin,'MATNR',''),
+				'seller' => array_get($asin,'SELLER',''),
+				'item_group' => array_get($asin,'MATKL',''),
+				'status' => array_get($asin,'ZSTATUS',''),
+				'item_model' => array_get($asin,'MODEL',''),
+				'bg' => array_get($asin,'ZBGROUP',''),
+				'bu' => array_get($asin,'ZBUNIT',''),
+				'store' => array_get($asin,'STORE',''),
+				'brand' => array_get($asin,'BRAND',''),
+				'brand_line' => array_get($asin,'WGBEZ',''),
+				'sap_seller_id' => array_get($asin,'VKGRP',''),
+				'sap_site_id' => array_get($asin,'VKBUR',''),
+				'sap_store_id' => array_get($asin,'KUNNR',''),
+				'sap_warehouse_id' => array_get($asin,'LGORT',''),
+				'sap_factory_id' => array_get($asin,'WERKS',''),
+				'sap_shipment_id' => array_get($asin,'SDABW',''),
+			]);
 			
 			if( array_get($asin,'ZSTATUS')=='A' || array_get($asin,'ZSTATUS')=='B'){
 				$exists = DB::table('asin_seller_count')->where('asin', trim(array_get($asin,'ASIN')))->where('site', 'www.'.trim(array_get($asin,'SITE')))->first();
