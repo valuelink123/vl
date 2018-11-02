@@ -221,7 +221,7 @@
 				<select name="type" id="type" class="form-control" >
 				<option value="2">Replacement
 				<option value="1">Refund
-				<option value="3">Refund & Replacement				
+				<option value="3">Refund & Replacement
 				<option value="4">Gift Card
 				</select>
 			</div>
@@ -389,7 +389,7 @@
 										</div>
 										<div class="col-md-7">
 											<label class="control-label">Seller Account and SKU</label>
-											<input type="hidden" name="title" />
+											<input type="hidden" class="item_name" name="title" />
 											<input type="text" class="form-control seller-sku-selector" name="note" placeholder="Seller Account and SKU" autocomplete="off" />
 										</div>
 										<div class="col-md-2">
@@ -590,14 +590,15 @@
                 if(info.stock <= 0){
                     alert('The stock of this item is Zero.');
                 }
-            } else {
+            } else if(this.value){
                 $repeatRow.find('.seller_id').val('')
                 $repeatRow.find('.seller_sku').val('')
 			}
 
-            let label = info ? info.item_name : 'Seller Account and SKU'
+            let item_name = info ? info.item_name : ''
 
-            $(this).prev().val(info ? info.item_name : '').prev().html(label)
+            $repeatRow.find('.item_name').val(item_name).prev().html(item_name||'Seller Account and SKU')
+
         })
 
         bindDelayEvents('#replacement-product-list', 'change keyup paste', '.item_code', handleItemCodeSearch);
