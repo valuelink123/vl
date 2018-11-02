@@ -219,9 +219,9 @@
 				<i class="fa fa-bookmark"></i>
 			</span>
 				<select name="type" id="type" class="form-control" >
-				<option value="3">Refund & Replacement
 				<option value="2">Replacement
 				<option value="1">Refund
+				<option value="3">Refund & Replacement				
 				<option value="4">Gift Card
 				</select>
 			</div>
@@ -230,11 +230,11 @@
 		<div style="clear:both"></div>
         <div class="tabbable-line">
             <ul class="nav nav-tabs ">
-                <li class="active">
-                    <a href="#tab_1" data-toggle="tab" aria-expanded="true"> Refund </a>
-                </li>
                 <li class="">
-                    <a href="#tab_2" data-toggle="tab" aria-expanded="false"> Replacement </a>
+                    <a href="#tab_1" data-toggle="tab" aria-expanded="false"> Refund </a>
+                </li>
+                <li class="active">
+                    <a href="#tab_2" data-toggle="tab" aria-expanded="true"> Replacement </a>
                 </li>
 				<li class="">
 					<a href="#tab_3" data-toggle="tab" aria-expanded="false"> Gift Card </a>
@@ -242,7 +242,7 @@
             </ul>
             <div class="tab-content">
 
-                <div class="tab-pane active" id="tab_1">
+                <div class="tab-pane " id="tab_1">
 
 
 					<div class="col-xs-12">
@@ -262,7 +262,7 @@
                 </div>
 
 
-                <div class="tab-pane" id="tab_2">
+                <div class="tab-pane active" id="tab_2">
 					<div class="col-xs-12">
 						<div class="form-group">
 							<label>Name</label>
