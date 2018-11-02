@@ -7,7 +7,7 @@ use App\Inbox;
 use App\Sendbox;
 use App\Accounts;
 use Illuminate\Support\Facades\Session;
-
+use App\Asin;
 use App\User;
 use App\Exception;
 use App\Group;
