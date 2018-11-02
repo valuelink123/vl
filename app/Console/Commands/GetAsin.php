@@ -78,26 +78,27 @@ class GetAsin extends Command
 				DB::table('asin_seller_count')->where('asin', trim(array_get($asin,'ASIN')))->where('site', 'www.'.trim(array_get($asin,'SITE')))->update(array('updated_at'=>date('Y-m-d H:i:s'),'status'=>'X'));
 				continue;
 			} 
-			Asin::updateOrCreate([
-				'asin' => array_get($asin,'ASIN',''),
-				'site' => array_get($asin,'SITE',''),
-				'sellersku'=> array_get($asin,'SELLER_SKU','')],[
-				'item_no' => array_get($asin,'MATNR',''),
-				'seller' => array_get($asin,'SELLER',''),
-				'item_group' => array_get($asin,'MATKL',''),
-				'status' => array_get($asin,'ZSTATUS',''),
-				'item_model' => array_get($asin,'MODEL',''),
-				'bg' => array_get($asin,'ZBGROUP',''),
-				'bu' => array_get($asin,'ZBUNIT',''),
-				'store' => array_get($asin,'STORE',''),
-				'brand' => array_get($asin,'BRAND',''),
-				'brand_line' => array_get($asin,'WGBEZ',''),
-				'sap_seller_id' => array_get($asin,'VKGRP',''),
-				'sap_site_id' => array_get($asin,'VKBUR',''),
-				'sap_store_id' => array_get($asin,'KUNNR',''),
-				'sap_warehouse_id' => array_get($asin,'LGORT',''),
-				'sap_factory_id' => array_get($asin,'WERKS',''),
-				'sap_shipment_id' => array_get($asin,'SDABW',''),
+			Asin::updateOrCreate(
+			[
+				'asin' => trim(array_get($asin,'ASIN','')),
+				'site' => 'www.'.trim(array_get($asin,'SITE','')),
+				'sellersku'=> trim(array_get($asin,'SELLER_SKU',''))],[
+				'item_no' => trim(array_get($asin,'MATNR','')),
+				'seller' => trim(array_get($asin,'SELLER','')),
+				'item_group' => trim(array_get($asin,'MATKL','')),
+				'status' => trim(array_get($asin,'ZSTATUS','')),
+				'item_model' => trim(array_get($asin,'MODEL','')),
+				'bg' => trim(array_get($asin,'ZBGROUP','')),
+				'bu' => trim(array_get($asin,'ZBUNIT','')),
+				'store' => trim(array_get($asin,'STORE','')),
+				'brand' => trim(array_get($asin,'BRAND','')),
+				'brand_line' => trim(array_get($asin,'WGBEZ','')),
+				'sap_seller_id' => trim(array_get($asin,'VKGRP','')),
+				'sap_site_id' => trim(array_get($asin,'VKBUR','')),
+				'sap_store_id' => trim(array_get($asin,'KUNNR','')),
+				'sap_warehouse_id' => trim(array_get($asin,'LGORT','')),
+				'sap_factory_id' => trim(array_get($asin,'WERKS','')),
+				'sap_shipment_id' => trim(array_get($asin,'SDABW',''))
 			]);
 			
 			if( array_get($asin,'ZSTATUS')=='A' || array_get($asin,'ZSTATUS')=='B'){
