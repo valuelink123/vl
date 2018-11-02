@@ -60,12 +60,25 @@ class CtgController extends Controller {
     }
 
     /**
-     * 提交 CTG 数据，由 claimthegift.com 调用
+     * 提交 CTG 数据
+     * 由 claimthegift.com 调用
+     * 加密方式及密码都是写好的
+     *
      * @throws \App\Exceptions\HypocriteException
      */
     public function import(Request $req) {
 
-        Ctg::add($req->all());
+        // todo remove
+        if ($req->input('order_id')) {
+            Ctg::add($req->all());
+            return [true];
+        }
+
+        $binStr = $req->getContent();
+
+        $json = openssl_decrypt($binStr, 'AES-256-CFB', 'frank-is-ok', OPENSSL_RAW_DATA, 'mnoefpaghijbcdkl');
+
+        Ctg::add(json_decode($json, true));
 
         return [true];
     }

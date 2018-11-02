@@ -18,10 +18,14 @@ class Ctg extends Model {
      * @throws HypocriteException
      */
     public static function add($row) {
+
+        if (empty($row['order_id'])) throw new HypocriteException('ORDER ID IS UNSET');
+
         try {
             return self::create($row);
         } catch (\Exception $e) {
-            return HypocriteException::wrap($e, 'Your ORDER ID has been used. For help, please mail to support@claimthegift.com');
+            throw new HypocriteException('ORDER ID is Duplicate, You may had submitted it successfully. For help, please mail to support@claimthegift.com');
+            // return HypocriteException::wrap($e, 'ORDER ID is Duplicate, You may had submitted it successfully. For help, please mail to support@claimthegift.com');
         }
     }
 }
