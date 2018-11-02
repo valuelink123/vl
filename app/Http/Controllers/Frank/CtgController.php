@@ -38,7 +38,8 @@ class CtgController extends Controller {
         name,
         email,
         phone,
-        rating
+        rating,
+        order_id
         FROM ctg
         ORDER BY $orderby
         LIMIT $limit

@@ -66,7 +66,14 @@
                 {data: 'rating', name: 'rating'},
                 {data: 'rating', name: 'rating'},
                 {data: 'rating', name: 'rating'},
-                {data: 'rating', name: 'rating'}
+                {
+                    data: 'order_id',
+                    name: 'order_id',
+                    orderable: false,
+                    render(data) {
+                        return `<a class="btn btn-danger btn-xs" href="/ctg/list/process?order_id=${data}" target="_blank">Process</a>`
+                    }
+                }
             ],
             ajax: {
                 type: 'POST',
