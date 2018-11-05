@@ -62,10 +62,22 @@
                 {data: 'name', name: 'name'},
                 {data: 'email', name: 'email'},
                 {data: 'phone', name: 'phone'},
-                {data: 'rating', name: 'rating'},
-                {data: 'rating', name: 'rating'},
-                {data: 'rating', name: 'rating'},
-                {data: 'rating', name: 'rating'},
+                {
+                    data: 'rating',
+                    name: 'rating',
+                    render(data) {
+                        return parseInt(data) > 0 ? data : ''
+                    }
+                },
+                {
+                    data: 'commented',
+                    name: 'commented',
+                    render(data) {
+                        return parseInt(data) > 0 ? 'Yes' : 'No'
+                    }
+                },
+                {data: 'status', name: 'status'},
+                {data: 'processor', name: 'processor'},
                 {
                     data: 'order_id',
                     name: 'order_id',
