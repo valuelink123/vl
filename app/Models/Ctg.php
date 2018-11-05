@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 class Ctg extends Model {
     protected $table = 'ctg';
     // protected $guarded = ['id']; // 黑名单模式
-    protected $fillable = ['order_id', 'product_asin', 'product_sku', 'gift_sku', 'name', 'email', 'phone', 'address', 'rating', 'note'];
+    protected $fillable = ['order_id', 'gift_sku', 'name', 'email', 'phone', 'address', 'note'];
 
     /**
      * @throws HypocriteException
@@ -21,6 +21,8 @@ class Ctg extends Model {
     public static function add($row) {
 
         if (empty($row['order_id'])) throw new HypocriteException('ORDER ID IS UNSET');
+
+        $row = array_map('trim', $row);
 
         try {
             return self::create($row);

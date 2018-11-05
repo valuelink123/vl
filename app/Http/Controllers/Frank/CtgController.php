@@ -8,8 +8,10 @@
 namespace App\Http\Controllers\Frank;
 
 
+use App\Exceptions\DataInputException;
 use App\Models\Ctg;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CtgController extends Controller {
 
@@ -29,18 +31,26 @@ class CtgController extends Controller {
             return view('frank.ctgList');
         }
 
+
+        // query data list
+
         $orderby = $this->dtOrderBy($req);
         $limit = $this->dtLimit($req);
 
         $sql = "
-        SELECT
-        DATE(created_at) AS created_at,
-        name,
-        email,
-        phone,
-        rating,
-        order_id
-        FROM ctg
+        SELECT SQL_CALC_FOUND_ROWS
+            DATE(t1.created_at) AS created_at,
+            t1.name,
+            t1.email,
+            phone,
+            rating,
+            commented,
+            status,
+            t2.name AS processor,
+            order_id
+        FROM ctg t1
+        LEFT JOIN users t2
+          ON t2.id = t1.processor
         ORDER BY $orderby
         LIMIT $limit
         ";
@@ -53,11 +63,43 @@ class CtgController extends Controller {
 
     }
 
+    /**
+     * @throws DataInputException
+     */
     public function process(Request $req) {
 
+        $ctgRow = Ctg::selectRaw('*')->where('order_id', $req->input('order_id'))->first();
+
+        if (empty($ctgRow)) throw new DataInputException('ctg not found');
+
         if ($req->isMethod('GET')) {
-            return view('frank.ctgProcess');
+
+            $rows = DB::table('users')->select('id', 'name')->get();
+
+            foreach ($rows as $row) {
+                $users[$row->id] = $row->name;
+            }
+
+            return view('frank.ctgProcess', compact('ctgRow', 'users'));
+
         }
+
+
+        // Update
+
+        if ($req->has('processor')) {
+            $ctgRow->processor = (int)$req->input('processor');
+        }
+
+        if ($req->has('steps')) {
+            $ctgRow->status = $req->input('status');
+            $ctgRow->commented = $req->input('commented');
+            $ctgRow->steps = json_encode($req->input('steps'));
+        }
+
+        $ctgRow->save();
+
+        return [true];
     }
 
     /**
@@ -68,12 +110,6 @@ class CtgController extends Controller {
      * @throws \App\Exceptions\HypocriteException
      */
     public function import(Request $req) {
-
-        // todo remove
-        if ($req->input('order_id')) {
-            Ctg::add($req->all());
-            return [true];
-        }
 
         $binStr = $req->getContent();
 

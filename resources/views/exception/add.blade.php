@@ -490,13 +490,15 @@
 
     function handleItemCodeSearch(e) {
 
-        let item_code = e.currentTarget.value.trim()
+        let $item_code = $(e.currentTarget)
 
-        let $sellerSku = $(e.currentTarget).closest('.mt-repeater-row').find('.seller-sku-selector')
+        let item_code = $item_code.val().trim()
 
-        if ($sellerSku.attr('list') === `list-${item_code}-stocks`) return
+        let $sellerSkuSelector = $item_code.closest('.mt-repeater-row').find('.seller-sku-selector')
 
-        $sellerSku.val('').change().removeAttr('list').data('skusInfo', null).next('datalist').remove()
+        if ($sellerSkuSelector.attr('list') === `list-${item_code}-stocks`) return
+
+        $sellerSkuSelector.val('').change().removeAttr('list').data('skusInfo', null).next('datalist').remove()
 
         if (!item_code) {
 
@@ -505,7 +507,7 @@
             if (seller_id && seller_sku) {
                 var postData = {seller_id, seller_sku}
             } else {
-                return $sellerSku.attr('placeholder', 'Seller Account and SKU')
+                return $sellerSkuSelector.attr('placeholder', 'Seller Account and SKU')
             }
 
         } else {
@@ -521,31 +523,31 @@
 
                 if (!stocks.length) {
                     if(seller_id && seller_sku){
-                        e.currentTarget.value = 'no match'
-                        $sellerSku.val(`${seller_id} | ${seller_sku}`)
+                        $item_code.val('no match')
+                        $sellerSkuSelector.val(`${seller_id} | ${seller_sku}`)
                     } else {
-                        $sellerSku.attr('placeholder', 'no match')
+                        $sellerSkuSelector.attr('placeholder', 'no match')
                     }
                     return
                 }
 
                 if (false === stocks[0]) {
                     let errmsg = stocks[1]
-                    $sellerSku.attr('placeholder', errmsg)
+                    $sellerSkuSelector.attr('placeholder', errmsg)
                     return
                 }
 
                 // console.log(stocks)
                 if(!item_code){
                     item_code = stocks[0].item_code
-                    e.currentTarget.value = item_code
+                    $item_code.val(item_code)
                 }
 
                 stocks.sort((a, b) => {
                     return a.stock < b.stock ? 1 : (a.stock > b.stock ? -1 : 0)
                 })
 
-                $sellerSku
+                $sellerSkuSelector
                     .after(tplRender(tplStockDatalist, {stocks, item_code}))
                     .attr('list', `list-${item_code}-stocks`)
                     .attr('placeholder', 'please select ...')
@@ -553,23 +555,23 @@
 
                 let skusInfo = rows2object(stocks, ['seller_name', 'seller_sku', ' | '])
 
-                $sellerSku.data('skusInfo', skusInfo)
+                $sellerSkuSelector.data('skusInfo', skusInfo)
 
-                var stock = null
+                let selected = null
 
                 if (1 === stocks.length && stocks[0].stock > 0) {
-                    stock = stocks[0]
+                    selected = stocks[0]
                 } else {
                     let theSellerId = rebindordersellerid.value.trim()
-                    for(let s of stocks){
-                        if(s.seller_id === theSellerId && s.stock) {
-                            stock = s
+                    for(let stock of stocks){
+                        if(stock.seller_id === theSellerId && stock.stock) {
+                            selected = stock
                             break
                         }
                     }
                 }
 
-                if(stock) $sellerSku.val(`${stock.seller_name} | ${stock.seller_sku}`).change()
+                if(selected) $sellerSkuSelector.val(`${selected.seller_name} | ${selected.seller_sku}`).change()
 
             }
         })
