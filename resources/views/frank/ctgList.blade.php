@@ -76,7 +76,13 @@
                         return parseInt(data) > 0 ? 'Yes' : 'No'
                     }
                 },
-                {data: 'status', name: 'status'},
+                {
+                    data: 'status',
+                    name: 'status',
+                    render(data) {
+                        return data.toUpperCase()
+                    }
+                },
                 {data: 'processor', name: 'processor'},
                 {
                     data: 'order_id',
