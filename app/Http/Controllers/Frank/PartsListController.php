@@ -179,6 +179,9 @@ class PartsListController extends Controller {
 
         foreach ($rows as &$row) {
             // 全部转成 INT，避免 JS 数字字符串的陷阱(比较、加法会出麻烦)
+            // 通过配置 PDO、MYSQLI 可以默认返回数字
+            // PDO::ATTR_STRINGIFY_FETCHES
+            // MYSQLI_OPT_INT_AND_FLOAT_NATIVE
             $row['stock'] = (int)$row['stock'];
         }
 
