@@ -99,7 +99,6 @@ class ExceptionController extends Controller
         }
 		$customersLists =  $customers->orderBy('date','desc')->get()->toArray();
 		$arrayData = $arrayAmazon = $arraySap = array();
-		$headArray[] = 'Returned/Urgent';
 		$headArray[] = 'Account';
 		$headArray[] = 'Amazon OrderID';
 		$headArray[] = 'Type';
@@ -237,7 +236,6 @@ class ExceptionController extends Controller
             if($customersList['type']==4) $operate.= 'Gift Card : '.$customersList['gift_card_amount'].PHP_EOL;
 
             $arrayData[] = array(
-           		implode(', ',array_get($product,'addattr',[])),
 				array_get($accounts,$customersList['sellerid']),
                 $customersList['amazon_order_id'],
                 array_get($type_list,$customersList['type']),
