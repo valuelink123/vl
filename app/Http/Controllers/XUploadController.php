@@ -7,7 +7,7 @@ use Stevenyangecho\UEditor\Uploader\UploadScrawl;
 use Stevenyangecho\UEditor\Uploader\UploadFile;
 use Stevenyangecho\UEditor\Uploader\UploadCatch;
 
-class UploadController extends BaseController
+class XUploadController extends BaseController
 {
 
 
