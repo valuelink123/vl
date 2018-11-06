@@ -126,21 +126,38 @@
                                 <div id="step-3">
                                     <div class="row">
                                         <div class="col-md-3">
-                                            <div class="form-group">
-
-                                            </div>
+                                            <pre>确认是否收货	是/否   是直接进入第5步</pre>
                                         </div>
                                     </div>
                                 </div>
                                 <div id="step-4">
-                                    <ul>
-                                        <li>跟进客户留评</li>
-                                    </ul>
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label>
+                                                    Review ID
+                                                    <input required pattern="^\w+$" autocomplete="off" class="xform-autotrim form-control" placeholder="Review ID" name="review_id"/>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div id="step-5">
-                                    <ul>
-                                        <li>再营销</li>
-                                    </ul>
+                                    <pre>
+再营销/re-SG
+	再营销为多次循环过程
+	以下应该按照第一次、第二次分别记录并存档
+
+确认推荐产品	选择推荐产品
+确认意向	意向度低--表示无意向做
+	意向度中--表示可以做，在咨询条件
+	意向度高--明确表示可以做
+	未明确意向--无回复
+跟进记录	已下单
+	已留评
+	已退款
+	完成
+                                    </pre>
                                 </div>
                             </div>
                         </form>
