@@ -468,6 +468,7 @@
 
     let replacementItemRepeater = $replacementProductList.parent().repeater({defaultValues:{qty:1}})
 
+    // 将原订单SKU填充到重发列表，并带出库存信息
     function setReplacementItemList(items){
         replacementItemRepeater.setList(items.map(i => {
             return {
@@ -488,6 +489,10 @@
         })
     }
 
+    /**
+     * 通过 item_code 或者 seller_id + seller_sku
+     * 把物料的库存列表带出来(包括fba、fbm)以供选择重发
+     */
     function handleItemCodeSearch(e) {
 
         let $item_code = $(e.currentTarget)
@@ -581,6 +586,7 @@
 
         XFormHelper.autoTrim('#replacement-product-list', 'input')
 
+        // 更新隐藏表单
         $replacementProductList.on('change', '.seller-sku-selector', function (e) {
 
             let skusInfo = $(this).data('skusInfo') || {}

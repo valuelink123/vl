@@ -239,7 +239,7 @@
                 }
             })
 
-
+            // 不使用数字作为status，以备流程有增删改动
             let statusDict = {
                 0: 'check review',
                 1: 'do delivery',
