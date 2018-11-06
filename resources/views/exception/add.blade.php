@@ -383,12 +383,12 @@
 									<div class="row mt-repeater-row">
 										<div class="col-md-2">
 											<label class="control-label">Item No.</label>
-											 <input type="text" class="form-control item_code" name="item_code" placeholder="item code" autocomplete="off" />
+											 <input type="text" class="form-control item_code" name="item_code" placeholder="Item No" autocomplete="off" />
                                             <input type="hidden" class="seller_id" name="seller_id" />
                                             <input type="hidden" class="seller_sku" name="seller_sku" />
 										</div>
-										<div class="col-md-5">
-											<label class="control-label">Seller Account and SKU</label>
+										<div class="col-md-7">
+											<label class="control-label">Search by Item No and Select an Item</label>
 											<input type="hidden" class="item_name" name="title" />
 											<input type="text" class="form-control seller-sku-selector" name="note" placeholder="Seller Account and SKU" autocomplete="off" />
 										</div>
@@ -473,6 +473,7 @@
 
     let replacementItemRepeater = $replacementProductList.parent().repeater({defaultValues:{qty:1}})
 
+    // 将原订单SKU填充到重发列表，并带出库存信息
     function setReplacementItemList(items){
         replacementItemRepeater.setList(items.map(i => {
             return {
@@ -493,6 +494,10 @@
         })
     }
 
+    /**
+     * 通过 item_code 或者 seller_id + seller_sku
+     * 把物料的库存列表带出来(包括fba、fbm)以供选择重发
+     */
     function handleItemCodeSearch(e) {
 
         let $item_code = $(e.currentTarget)
@@ -586,6 +591,7 @@
 
         XFormHelper.autoTrim('#replacement-product-list', 'input')
 
+        // 更新隐藏表单
         $replacementProductList.on('change', '.seller-sku-selector', function (e) {
 
             let skusInfo = $(this).data('skusInfo') || {}
@@ -608,7 +614,7 @@
 
             let item_name = info ? info.item_name : ''
 
-            $repeatRow.find('.item_name').val(item_name).prev().html(item_name||'Seller Account and SKU')
+            $repeatRow.find('.item_name').val(item_name).prev().html(item_name||'Search by Item No and Select an Item')
 
         })
 

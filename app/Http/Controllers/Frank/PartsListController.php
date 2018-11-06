@@ -124,6 +124,7 @@ class PartsListController extends Controller {
      */
     public function getStockList(Request $req) {
 
+        // 通过 seller_id + seller_sku 找到 item_code
         if (empty($req->input('item_code'))) {
 
             $result = DB::table('fba_stock')
@@ -133,19 +134,26 @@ class PartsListController extends Controller {
                 ->whereNotNull('item_code')
                 ->get();
 
+            // fba 查不到，说明是 fbm
             if ($result->isEmpty()) {
                 // throw new DataInputException('item code not found', 1025);
-                return [];
+                // return [];
+
+                // 到 asin 表中找 item_code？（由于asin表没有 seller_id 字段，放弃）
+
+                $item_code = $req->input('seller_sku');
+            } else {
+                $item_code = $result[0]->item_code;
             }
 
-            $item_code = $result[0]->item_code;
+
         } else {
             $item_code = $req->input('item_code');
         }
 
 
         if (empty($item_code) || !preg_match('#^[A-z0-9]+$#', $item_code)) {
-            throw new DataInputException("Wrong Item Code: {$item_code}");
+            throw new DataInputException("Wrong Item No: {$item_code}");
         }
 
         $rows = $this->queryRows(
