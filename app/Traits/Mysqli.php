@@ -18,6 +18,7 @@ trait Mysqli {
             $this->_mysqli = new \mysqli(env('DB_HOST'), env('DB_USERNAME'), env('DB_PASSWORD'), env('DB_DATABASE'), env('DB_PORT'));
             // $this->_mysqli->query('SET NAMES UTF8');
             $this->_mysqli->set_charset($this->_mysqli_charset);
+            $this->_mysqli->options(MYSQLI_OPT_INT_AND_FLOAT_NATIVE, TRUE); // 不要以字符串的形式返回数字(依赖ext-mysqlnd)
         }
         // else {
         //     $this->_mysqli->ping();
