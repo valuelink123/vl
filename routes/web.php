@@ -50,7 +50,7 @@ Route::Post('/saporder/get', 'InboxController@getrfcorder')->name('getRfcOrder')
 Route::get('/invoice/get/{id}', 'InboxController@getpdfinvoice')->name('getPdfInvoice');
 Route::resource('qa', 'QaiController');
 Route::Post('/qa/get', 'QaiController@get')->name('getQa');
-Route::get('/laravel-u-editor-server/server', 'UploadController@server')->name('upload');
+Route::get('/laravel-u-editor-server/server', 'CustomuploadController@server')->name('upload');
 Route::resource('question', 'QaController');
 Route::resource('group', 'GroupController');
 Route::resource('sellertab', 'SellertabController');
