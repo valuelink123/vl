@@ -71,7 +71,7 @@ class XUploadController extends BaseController
 
                 break;
 
-            /* 列出图片 */
+            /* 鍒楀嚭鍥剧墖 */
             case 'listimage':
 
 
@@ -91,7 +91,7 @@ class XUploadController extends BaseController
 
 
                 break;
-            /* 列出文件 */
+            /* 鍒楀嚭鏂囦欢 */
             case 'listfile':
                 if (config('UEditorUpload.core.mode') == 'local') {
                     $result = with(new Lists(
@@ -109,7 +109,7 @@ class XUploadController extends BaseController
 
                 break;
 
-            /* 抓取远程文件 */
+            /* 鎶撳彇杩滅▼鏂囦欢 */
             case 'catchimage':
 
                 $upConfig = array(
