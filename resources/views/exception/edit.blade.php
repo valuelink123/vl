@@ -371,12 +371,11 @@ if($exception['user_id'] == Auth::user()->id  && $exception['process_status'] ==
 								if(is_array($products_details)){
 								
 								foreach($products_details as $detail) { 
-								$mcf_order_str.=array_get($detail,'replacement_order_id')?array_get($detail,'replacement_order_id').'</BR>':'';
 								?>
 								<div data-repeater-item class="mt-repeater-item">
 									<div class="row mt-repeater-row">
 										<div class="col-md-3">
-											<label class="control-label">Item Code</label>
+											<label class="control-label">Item No.</label>
 											 <input type="text" {{$disable}} class="form-control"  name="sku"  value="{{array_get($detail,'item_code')}}">
 								
 										</div>
@@ -389,6 +388,10 @@ if($exception['user_id'] == Auth::user()->id  && $exception['process_status'] ==
 											<label class="control-label">Quantity</label>
 											 <input type="text" {{$disable}} class="form-control"  name="qty" value="{{array_get($detail,'qty')}}">
 								
+										</div>
+										<div class="col-md-2">
+											<label class="control-label"><input type="checkbox" name="addattr" {{$disable}} value="Returned">Returned</label>
+											<label class="control-label"><input type="checkbox" name="addattr" {{$disable}} value="Urgent">Urgent</label>
 										</div>
 										<div class="col-md-1">
 											<a href="javascript:;" data-repeater-delete class="btn btn-danger mt-repeater-delete"  {{$disable}}>
@@ -511,12 +514,11 @@ if((Auth::user()->admin || in_array($exception['group_id'],array_get($mygroups,'
 				<?php } ?>
 			</div>
 		</div>
-		<?php if($mcf_order_str){ ?>
+
 		<div class="form-group">
 			<label>Replacement Order Id:</label>
-			<div class="input-group ">{!!$mcf_order_str!!}</div>
+			<div class="input-group "><input type="text" class="form-control" name="replacement_order_id" id="replacement_order_id" value="{{$exception['replacement_order_id']}}"  {{$disable}}></div>
 		</div>
-		<?php }
 		if($last_inboxid){ ?>
 		<div class="form-group">
 		<div class="btn-group">

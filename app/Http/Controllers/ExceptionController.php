@@ -99,6 +99,7 @@ class ExceptionController extends Controller
         }
 		$customersLists =  $customers->orderBy('date','desc')->get()->toArray();
 		$arrayData = $arrayAmazon = $arraySap = array();
+		$headArray[] = 'Returned/Urgent';
 		$headArray[] = 'Account';
 		$headArray[] = 'Amazon OrderID';
 		$headArray[] = 'Type';
@@ -123,9 +124,9 @@ class ExceptionController extends Controller
 		$headArray[] = 'Group';
 		$headArray[] = 'Creator';
 		
-		$arrayAmazon[] =['Account','MerchantFulfillmentOrderID','DisplayableOrderID','DisplayableOrderDate','MerchantSKU','Quantity','MerchantFulfillmentOrderItemID','GiftMessage','DisplayableComment','PerUnitDeclaredValue','DisplayableOrderComment','DeliverySLA','AddressName','AddressFieldOne','AddressFieldTwo','AddressFieldThree','AddressCity','AddressCountryCode','AddressStateOrRegion','AddressPostalCode','AddressPhoneNumber','NotificationEmail','FulfillmentAction','MarketplaceID'];
+		$arrayAmazon[] =['Account','Returned/Urgent','MerchantFulfillmentOrderID','DisplayableOrderID','DisplayableOrderDate','MerchantSKU','Quantity','MerchantFulfillmentOrderItemID','GiftMessage','DisplayableComment','PerUnitDeclaredValue','DisplayableOrderComment','DeliverySLA','AddressName','AddressFieldOne','AddressFieldTwo','AddressFieldThree','AddressCity','AddressCountryCode','AddressStateOrRegion','AddressPostalCode','AddressPhoneNumber','NotificationEmail','FulfillmentAction','MarketplaceID'];
 		
-		$arraySap[] =['平台编号','站点','平台订单号','售达方','订单类型','订单交易号','付款日期','付款交易ID(不能重复)','买家ID','买家姓名','国家代码','城市名','州/省','街道1','街道2','邮编','邮箱','电话1','成交费','货币','佣金','货币','订单总价','货币','实际运输方式','平台订单号','站点','行号','SAP物料号','数量','工厂','仓库','行项目ID','帖子ID','帖子标题','销售员编号','行交易ID','标记完成'];
+		$arraySap[] =['Returned/Urgent','平台编号','站点','平台订单号','售达方','订单类型','订单交易号','付款日期','付款交易ID(不能重复)','买家ID','买家姓名','国家代码','城市名','州/省','街道1','街道2','邮编','邮箱','电话1','成交费','货币','佣金','货币','订单总价','货币','实际运输方式','平台订单号','站点','行号','SAP物料号','数量','工厂','仓库','行项目ID','帖子ID','帖子标题','销售员编号','行交易ID','标记完成'];
 
 		$arrayData[] = $headArray;
 		$users=$this->getUsers();
@@ -155,8 +156,9 @@ class ExceptionController extends Controller
 						if(array_get($product,'seller_id') && array_get($accounts,array_get($product,'seller_id'))){
 							$arrayAmazon[] =[
 								array_get($accounts,array_get($product,'seller_id')),
-								array_get($product,'replacement_order_id'),
-								array_get($product,'replacement_order_id'),
+								implode(', ',array_get($product,'addattr',[])),
+								array_get($customersList,'replacement_order_id'),
+								array_get($customersList,'replacement_order_id'),
 								array_get($customersList,'date'),
 								array_get($product,'seller_sku'),
 								array_get($product,'qty'),
@@ -188,6 +190,7 @@ class ExceptionController extends Controller
 						}
 						
 						$arraySap[] =[
+							implode(', ',array_get($product,'addattr',[])),
 							'11',
 							array_get($sap_sku_info,'sap_site_id'),
 							$customersList['amazon_order_id'],
@@ -234,7 +237,7 @@ class ExceptionController extends Controller
             if($customersList['type']==4) $operate.= 'Gift Card : '.$customersList['gift_card_amount'].PHP_EOL;
 
             $arrayData[] = array(
-           
+           		implode(', ',array_get($product,'addattr',[])),
 				array_get($accounts,$customersList['sellerid']),
                 $customersList['amazon_order_id'],
                 array_get($type_list,$customersList['type']),
@@ -366,6 +369,7 @@ class ExceptionController extends Controller
 			$exception->process_status = $request->get('process_status');
 			$exception->process_date = date('Y-m-d H:i:s');
 			$exception->process_user_id = intval(Auth::user()->id);
+			$exception->replacement_order_id = $request->get('replacement_order_id');
 			$file = $request->file('importFile');  
   			if($file){
 				if($file->isValid()){  
@@ -412,13 +416,8 @@ class ExceptionController extends Controller
 			}
 	
 			if( $exception->type == 2 || $exception->type == 3){
-				$products=[];
-				$products_arr = $request->get('group-products');
-	
-				foreach($products_arr as $product_arr){
-					$product_arr['replacement_order_id']=array_get($product_arr,'seller_id').'-'.uniqid(rand(10,99));
-					$products[]=$product_arr;
-				}
+				
+				$exception->replacement_order_id = $request->get('rebindorderid').'-re-01';
 				$exception->replacement = serialize(
 				array(
 					'shipname'=>$request->get('shipname'),
@@ -432,7 +431,7 @@ class ExceptionController extends Controller
 					'postalcode'=>$request->get('postalcode'),
 					'countrycode'=>$request->get('countrycode'),
 					'phone'=>$request->get('phone'),
-					'products'=>$products,
+					'products'=>$request->get('group-products'),
 				));
 			}else{
 				$exception->replacement = '';
@@ -631,7 +630,6 @@ class ExceptionController extends Controller
 
 	public function store(Request $request)
     {
-
         $this->validate($request, [
 			'group_id' => 'required|string',
             'name' => 'required|string',
@@ -664,13 +662,7 @@ class ExceptionController extends Controller
         }
 
 		if( $exception->type == 2 || $exception->type == 3){
-			$products=[];
-			$products_arr = $request->get('group-products');
-
-			foreach($products_arr as $product_arr){
-				$product_arr['replacement_order_id']=array_get($product_arr,'seller_id').'-'.uniqid(rand(10,99));
-				$products[]=$product_arr;
-			}
+			$exception->replacement_order_id = $request->get('rebindorderid').'-re-01';
 			$exception->replacement = serialize(
 			array(
 				'shipname'=>$request->get('shipname'),
@@ -684,7 +676,7 @@ class ExceptionController extends Controller
 				'postalcode'=>$request->get('postalcode'),
 				'countrycode'=>$request->get('countrycode'),
 				'phone'=>$request->get('phone'),
-				'products'=>$products,
+				'products'=>$request->get('group-products'),
 			));
 		}else{
 			$exception->replacement = '';

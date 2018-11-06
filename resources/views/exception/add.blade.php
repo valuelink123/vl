@@ -382,12 +382,12 @@
 								<div data-repeater-item class="mt-repeater-item">
 									<div class="row mt-repeater-row">
 										<div class="col-md-2">
-											<label class="control-label">Item Code</label>
+											<label class="control-label">Item No.</label>
 											 <input type="text" class="form-control item_code" name="item_code" placeholder="item code" autocomplete="off" />
                                             <input type="hidden" class="seller_id" name="seller_id" />
                                             <input type="hidden" class="seller_sku" name="seller_sku" />
 										</div>
-										<div class="col-md-7">
+										<div class="col-md-5">
 											<label class="control-label">Seller Account and SKU</label>
 											<input type="hidden" class="item_name" name="title" />
 											<input type="text" class="form-control seller-sku-selector" name="note" placeholder="Seller Account and SKU" autocomplete="off" />
@@ -397,7 +397,12 @@
 											 <input type="text" class="form-control"  name="qty" value="1" placeholder="Quantity" />
 
 										</div>
+										<div class="col-md-2">
+											<label class="control-label"><input type="checkbox" name="addattr" value="Returned">Returned</label>
+											<label class="control-label"><input type="checkbox" name="addattr" value="Urgent">Urgent</label>
+										</div>
 										<div class="col-md-1">
+										
 											<a href="javascript:;" data-repeater-delete class="btn btn-danger mt-repeater-delete">
 												<i class="fa fa-close"></i>
 											</a>
