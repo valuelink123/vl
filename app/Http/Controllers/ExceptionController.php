@@ -355,7 +355,11 @@ class ExceptionController extends Controller
 		$last_inbox = Inbox::where('amazon_seller_id',array_get($rule,'sellerid'))->where('amazon_order_id',array_get($rule,'amazon_order_id'))->orderBy('date','desc')->first();
 		if($last_inbox) $last_inboxid= $last_inbox->id;
 		
-        return view('exception/edit',['exception'=>$rule,'groups'=>$this->getGroups(),'mygroups'=>$this->getUserGroup(),'sellerids'=>$this->getSellerIds(),'last_inboxid'=>$last_inboxid]);
+		$mcf_orders = DB::connection('order')->table('amazon_mcf_shipment_package')->where('SellerFulfillmentOrderId',array_get($rule,'replacement_order_id'))->get();
+		
+		if($last_inbox) $last_inboxid= $last_inbox->id;
+		
+        return view('exception/edit',['exception'=>$rule,'groups'=>$this->getGroups(),'mygroups'=>$this->getUserGroup(),'sellerids'=>$this->getSellerIds(),'last_inboxid'=>$last_inboxid,'mcf_orders'=>$mcf_orders]);
     }
 
     public function update(Request $request,$id)

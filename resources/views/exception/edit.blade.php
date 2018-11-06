@@ -518,8 +518,11 @@ if((Auth::user()->admin || in_array($exception['group_id'],array_get($mygroups,'
 		<div class="form-group">
 			<label>Replacement Order Id:</label>
 			<div class="input-group "><input type="text" class="form-control" name="replacement_order_id" id="replacement_order_id" value="{{$exception['replacement_order_id']}}"  {{$disable}}></div>
+			@foreach ($mcf_orders as $mcf_order)
+				{{$mcf_order->SellerFulfillmentOrderId}} : {{$mcf_order->TrackingNumber}} {{$mcf_order->CarrierCode}}
+			@endforeach
 		</div>
-		if($last_inboxid){ ?>
+		<?php if($last_inboxid){ ?>
 		<div class="form-group">
 		<div class="btn-group">
 			<a href="{{ url('/inbox/'.$last_inboxid)}}" target="_blank" > See Email History</a>
