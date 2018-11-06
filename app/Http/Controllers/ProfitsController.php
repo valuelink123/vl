@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Services\MultipleQueue;
-class ProductsController extends Controller
+class ProfitsController extends Controller
 {
     /**
      * Create a new controller instance.
