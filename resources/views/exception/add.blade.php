@@ -382,13 +382,13 @@
 								<div data-repeater-item class="mt-repeater-item">
 									<div class="row mt-repeater-row">
 										<div class="col-md-2">
-											<label class="control-label">Item Code</label>
-											 <input type="text" class="form-control item_code" name="item_code" placeholder="item code" autocomplete="off" />
+											<label class="control-label">Item No.</label>
+											 <input type="text" class="form-control item_code" name="item_code" placeholder="Item No" autocomplete="off" />
                                             <input type="hidden" class="seller_id" name="seller_id" />
                                             <input type="hidden" class="seller_sku" name="seller_sku" />
 										</div>
 										<div class="col-md-7">
-											<label class="control-label">Seller Account and SKU</label>
+											<label class="control-label">Search by Item No and Select an Item</label>
 											<input type="hidden" class="item_name" name="title" />
 											<input type="text" class="form-control seller-sku-selector" name="note" placeholder="Seller Account and SKU" autocomplete="off" />
 										</div>
@@ -609,7 +609,7 @@
 
             let item_name = info ? info.item_name : ''
 
-            $repeatRow.find('.item_name').val(item_name).prev().html(item_name||'Seller Account and SKU')
+            $repeatRow.find('.item_name').val(item_name).prev().html(item_name||'Search by Item No and Select an Item')
 
         })
 
