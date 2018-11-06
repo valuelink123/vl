@@ -397,7 +397,12 @@
 											 <input type="text" class="form-control"  name="qty" value="1" placeholder="Quantity" />
 
 										</div>
+										<div class="col-md-2">
+											<label class="control-label"><input type="checkbox" name="addattr" value="Returned">Returned</label>
+											<label class="control-label"><input type="checkbox" name="addattr" value="Urgent">Urgent</label>
+										</div>
 										<div class="col-md-1">
+										
 											<a href="javascript:;" data-repeater-delete class="btn btn-danger mt-repeater-delete">
 												<i class="fa fa-close"></i>
 											</a>
