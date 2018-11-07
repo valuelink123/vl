@@ -608,6 +608,7 @@
                     alert('The stock of this item is Zero.');
                 }
             } else {
+                this.value = ''
                 $repeatRow.find('.seller_id').val('')
                 $repeatRow.find('.seller_sku').val('')
 			}
