@@ -5,39 +5,14 @@
 <script>
   function changeType(){
 
-    $("a[href='#tab_3']").parent().removeClass('active').hide();
-    $("#tab_3").removeClass('active');
+      $(thetabs).find('[href^="#tab_"]').hide()
 
-  	if($("#type").val()==1){
-		$("a[href='#tab_1']").parent().addClass('active').show();
-		$("#tab_1").addClass('active');
-		$("a[href='#tab_2']").parent().removeClass('active').hide();
-		$("#tab_2").removeClass('active');
-	}
-	if($("#type").val()==2){
-		$("a[href='#tab_1']").parent().removeClass('active').hide();
-		$("#tab_1").removeClass('active');
-		$("a[href='#tab_2']").parent().addClass('active').show();
-		$("#tab_2").addClass('active');
-	}
-	if($("#type").val()==3){
-		$("a[href='#tab_1']").parent().show();
-		$("a[href='#tab_2']").parent().show();
-		if($("a[href='#tab_1']").parent().hasClass('active')){
-			$("#tab_1").addClass('active');
-			$("#tab_2").removeClass('active');
-		}else{
-			$("#tab_1").removeClass('active');
-			$("#tab_2").addClass('active');
-		}
+      let type = $("#type").val()
 
-	}
-    if($("#type").val()==4){
-		$("a[href='#tab_1'],a[href='#tab_2']").parent().removeClass('active').hide();
-        $("#tab_1,#tab_2").removeClass('active');
-        $("a[href='#tab_3']").parent().addClass('active').show();
-        $("#tab_3").addClass('active');
-    }
+      // 1 2 4 8 16 ...
+      for(let bit of [1, 2, 4]){
+          if(bit & type) $(thetabs).find(`[href="#tab_${bit}"]`).show().tab('show')
+      }
   }
 
   function loadorder(){
@@ -230,7 +205,7 @@
 		</div>
 		<div style="clear:both"></div>
         <div class="tabbable-line">
-            <ul class="nav nav-tabs ">
+            <ul class="nav nav-tabs" id="thetabs">
                 <li class="">
                     <a href="#tab_1" data-toggle="tab" aria-expanded="false"> Refund </a>
                 </li>
@@ -238,12 +213,12 @@
                     <a href="#tab_2" data-toggle="tab" aria-expanded="true"> Replacement </a>
                 </li>
 				<li class="">
-					<a href="#tab_3" data-toggle="tab" aria-expanded="false"> Gift Card </a>
+					<a href="#tab_4" data-toggle="tab" aria-expanded="false"> Gift Card </a>
 				</li>
             </ul>
             <div class="tab-content">
 
-                <div data-types="[1,3]" class="tab-pane" id="tab_1">
+                <div class="tab-pane" id="tab_1">
 
 
 					<div class="col-xs-12">
@@ -263,7 +238,7 @@
                 </div>
 
 
-                <div data-types="[2,3]" class="tab-pane active" id="tab_2">
+                <div class="tab-pane active" id="tab_2">
 					<div class="col-lg-8">
 						<div class="form-group">
 							<label>Name</label>
@@ -385,7 +360,7 @@
                                             <input type="hidden" class="find_item_by" name="find_item_by" />
                                         </div>
                                         <div class="col-lg-6 col-md-5">
-                                            <label class="control-label">Search by Item No and Select an Item</label>
+                                            <label class="control-label">Search by Item No and select</label>
                                             <input type="hidden" class="item_name" name="title" />
                                             <input type="text" class="form-control seller-sku-selector" name="note" placeholder="Seller Account and SKU" autocomplete="off" required />
                                         </div>
@@ -421,7 +396,7 @@
                 </div>
 
 
-				<div data-types="[4]" class="tab-pane" id="tab_3">
+				<div class="tab-pane" id="tab_4">
 
 
 					<div class="col-xs-12">
@@ -615,20 +590,20 @@
 
             let item_name = info ? info.item_name : ''
 
-            $repeatRow.find('.item_name').val(item_name).prev().html(item_name||'Search by Item No and Select an Item')
+            $repeatRow.find('.item_name').val(item_name).prev().html(item_name||'Search by Item No and select')
 
         })
 
         $(exception_form).submit(function (e) {
 
-            let type = $('#type').val() - 0
+            let type = $('#type').val()
 
             for(let input of $(this).find('[name]')){
 
-                let $tabPane = $(input).closest('.tab-pane')
+                let tabID = $(input).closest('.tab-pane').attr('id')
 
-                if($tabPane.length && $tabPane.data('types').indexOf(type) < 0 ){
-                    continue
+                if(tabID){
+                    if(!(type & tabID.substr(-1))) continue
                 }
 
                 // if($.contains($replacementProductList[0], input)){ }
