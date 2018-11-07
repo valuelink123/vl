@@ -110,7 +110,7 @@
   </script>
 <form  action="{{ url('exception') }}" id="exception_form" method="POST">
  {{ csrf_field() }}
-    <div class="col-md-7">
+    <div class="col-lg-9">
         <div class="col-md-12">
 <div class="portlet light portlet-fit bordered ">
 	@if($errors->any())
@@ -131,7 +131,7 @@
 
     </div>
     <div class="portlet-body">
-		<div class="col-xs-12">
+		<div class="col-lg-8">
 
 
 		<div class="form-group">
@@ -263,7 +263,7 @@
 
 
                 <div class="tab-pane active" id="tab_2">
-					<div class="col-xs-12">
+					<div class="col-lg-8">
 						<div class="form-group">
 							<label>Name</label>
 							<div class="input-group ">
@@ -367,52 +367,46 @@
 								<input type="text" class="form-control" name="phone" id="phone" value="{{old('phone')}}" >
 							</div>
 						</div>
+                        <div style="clear:both;"></div>
 
+                    </div>
 
-
-
-
-
-
-
-
-
-                       <div class="form-group mt-repeater frank">
-							<div data-repeater-list="group-products" id="replacement-product-list">
-								<div data-repeater-item class="mt-repeater-item">
-									<div class="row mt-repeater-row">
-										<div class="col-md-2">
-											<label class="control-label">Item No.</label>
-											 <input type="text" class="form-control item_code" name="item_code" placeholder="Item No" autocomplete="off" />
+                    <div class="col-sm-12">
+                        <div class="form-group mt-repeater frank">
+                            <div data-repeater-list="group-products" id="replacement-product-list">
+                                <div data-repeater-item class="mt-repeater-item">
+                                    <div class="row mt-repeater-row">
+                                        <div class="col-lg-2 col-md-2">
+                                            <label class="control-label">Item No.</label>
+                                            <input type="text" class="form-control item_code" name="item_code" placeholder="Item No" autocomplete="off" />
                                             <input type="hidden" class="seller_id" name="seller_id" />
                                             <input type="hidden" class="seller_sku" name="seller_sku" />
-										</div>
-										<div class="col-md-7">
-											<label class="control-label">Search by Item No and Select an Item</label>
-											<input type="hidden" class="item_name" name="title" />
-											<input type="text" class="form-control seller-sku-selector" name="note" placeholder="Seller Account and SKU" autocomplete="off" />
-										</div>
-										<div class="col-md-2">
-											<label class="control-label">Quantity</label>
-											 <input type="text" class="form-control"  name="qty" value="1" placeholder="Quantity" />
+                                        </div>
+                                        <div class="col-lg-6 col-md-5">
+                                            <label class="control-label">Search by Item No and Select an Item</label>
+                                            <input type="hidden" class="item_name" name="title" />
+                                            <input type="text" class="form-control seller-sku-selector" name="note" placeholder="Seller Account and SKU" autocomplete="off" />
+                                        </div>
+                                        <div class="col-lg-2 col-md-2">
+                                            <label class="control-label">Quantity</label>
+                                            <input type="text" class="form-control"  name="qty" value="1" placeholder="Quantity" />
 
-										</div>
-										<div class="col-md-2">
-											<label class="control-label"><input type="checkbox" name="addattr" value="Returned">Returned</label>
-											<label class="control-label"><input type="checkbox" name="addattr" value="Urgent">Urgent</label>
-										</div>
-										<div class="col-md-1">
-										
-											<a href="javascript:;" data-repeater-delete class="btn btn-danger mt-repeater-delete">
-												<i class="fa fa-close"></i>
-											</a>
-										</div>
-									</div>
-								</div>
-							</div>
-							<a href="javascript:;" data-repeater-create class="btn btn-info mt-repeater-add">
-								<i class="fa fa-plus"></i> Add Product</a>
-						</div>
+                                        </div>
+                                        <div class="col-lg-1 col-md-2">
+                                            <label class="control-label"><input type="checkbox" name="addattr" value="Returned">Returned</label>
+                                            <label class="control-label"><input type="checkbox" name="addattr" value="Urgent">Urgent</label>
+                                        </div>
+                                        <div class="col-lg-1 col-md-1">
+                                            <a href="javascript:;" data-repeater-delete class="btn btn-danger mt-repeater-delete">
+                                                <i class="fa fa-close"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <a href="javascript:;" data-repeater-create class="btn btn-info mt-repeater-add">
+                                <i class="fa fa-plus"></i> Add Product</a>
+                        </div>
                         <script id="tplStockDatalist" type="text/template">
                             <datalist id="list-${item_code}-stocks">
                                 <% for(let {seller_name,seller_id,seller_sku,stock} of stocks){ %>
@@ -420,10 +414,9 @@
                                 <% } %>
                             </datalist>
                         </script>
-                        <div style="clear:both;"></div>
                     </div>
+                    <div style="clear:both;"></div>
 
-                     <div style="clear:both;"></div>
                 </div>
 
 

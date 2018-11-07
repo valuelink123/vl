@@ -97,6 +97,42 @@ function rows2object(rows, keyFields, valueField = null) {
 }
 
 /**
+ * Ajax post data by json format
+ *
+ * @param url
+ * @param data data object or form element
+ */
+function postByJson(url, data) {
+
+    let $form = null
+
+    if (data.jquery) {
+        $form = data
+    } else if (data instanceof HTMLFormElement) {
+        $form = $(data)
+    }
+
+    if ($form) data = rows2object($form.serializeArray(), 'name', 'value')
+
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            url,
+            method: 'POST',
+            dataType: 'json',
+            data: JSON.stringify(data),
+            headers: {'Content-Type': 'application/json'},
+            success(arr) {
+                if (false === arr[0]) return reject(new Error(arr[1]))
+                resolve(arr)
+            },
+            error(xhr, status, errmsg) {
+                reject(new Error(errmsg))
+            }
+        })
+    })
+}
+
+/**
  * @param params todo 自动提示
  */
 function bindDelayEvents(...params) {

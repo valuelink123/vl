@@ -177,23 +177,19 @@
         </div>
     </div>
 
-    <script>
+    <script type="text/javascript">
+
         $('#ctg-info > form').submit(function () {
-            $.ajax({
-                method: 'POST',
-                url: location.href,
-                data: $(this).serialize(),
-                dataType: 'json',
-                success(arr) {
-                    if (false === arr[0]) return toastr.error(arr[1])
-                    toastr.success('Saved !')
-                }
+
+            postByJson(location.href, this).then(arr => {
+                toastr.success('Saved !')
+            }).catch(err => {
+                toastr.error(err.message)
             })
+
             return false
         })
-    </script>
 
-    <script type="text/javascript">
         $(function ($) {
 
             let steps = <?php echo empty($ctgRow['steps']) ? '{}' : $ctgRow['steps']; ?>;
@@ -222,13 +218,10 @@
 
             $thewizard.on('showStep', (e, anchorObject, stepNumber, stepDirection) => {
                 ue.loadTrackNote()
-                // console.log(wizardInstance.current_index, stepNumber)
             })
 
 
             $thewizard.on('leaveStep', (e, anchorObject, stepNumber, stepDirection) => {
-                // localStorage
-                // console.log(e, anchorObject, stepNumber, stepDirection)
                 if ('backward' === stepDirection) return true
                 $pages = $thewizard.children('.pages').children('div')
                 $inputs = $($pages[wizardInstance.current_index]).find('[name]')
@@ -251,7 +244,6 @@
             $thewizard.submit(function () {
 
                 // todo 退出自动保存、提示
-                // todo 禁用 UE 自动缓存
 
                 let steps = rows2object($thewizard.serializeArray(), 'name', 'value')
                 steps.current_index = wizardInstance.current_index
@@ -261,16 +253,10 @@
 
                 // jQuery 的 urlencode 中 + 号，似乎不太靠谱
                 // 使用 JSON 提交可以避免数字变字符串的问题
-                $.ajax({
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    url: location.href,
-                    data: JSON.stringify({steps, status, commented}),
-                    dataType: 'json',
-                    success(arr) {
-                        if (false === arr[0]) return toastr.error(arr[1])
-                        toastr.success('Saved !')
-                    }
+                postByJson(location.href, {steps, status, commented}).then(arr => {
+                    toastr.success('Saved !')
+                }).catch(err => {
+                    toastr.error(err.message)
                 })
 
                 return false
@@ -279,6 +265,8 @@
 
             let ue = UE.getEditor('bdeditor', {
                 topOffset: 60,
+                autoSyncData: false,
+                enableAutoSave: false,
                 initialFrameWidth: "100%",
             })
 
