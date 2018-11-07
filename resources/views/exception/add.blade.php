@@ -9,8 +9,9 @@
 
       let type = $("#type").val()
 
-      // 1 2 4 8 16 ...
-      for(let bit of [1, 2, 4]){
+      // 位运算，3 等于 1 OR 2
+      // 即用 3 来表示 Refund & Replacement 组合
+      for(let bit of [2, 1, 4]){
           if(bit & type) $(thetabs).find(`[href="#tab_${bit}"]`).show().tab('show')
       }
   }
@@ -221,7 +222,7 @@
                 <div class="tab-pane" id="tab_1">
 
 
-					<div class="col-xs-12">
+					<div class="col-lg-8">
                         <div class="form-group">
 							<label>Refund Amount</label>
 							<div class="input-group ">
@@ -399,7 +400,7 @@
 				<div class="tab-pane" id="tab_4">
 
 
-					<div class="col-xs-12">
+					<div class="col-lg-8">
 						<div class="form-group">
 							<label>Gift Amount</label>
 							<div class="input-group ">
