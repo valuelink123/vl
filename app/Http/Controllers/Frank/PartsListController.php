@@ -125,8 +125,9 @@ class PartsListController extends Controller {
      */
     public function getStockList(Request $req) {
 
-        // query item_code
-        if (empty($req->input('item_code'))) {
+        $item_code = $req->input('item_code');
+
+        if (empty($item_code)) {
 
             // 查 fba
             $result = DB::table('fba_stock')
@@ -136,7 +137,7 @@ class PartsListController extends Controller {
                 ->whereNotNull('item_code')
                 ->get();
 
-            // fba 查不到，说明是 fbm
+            // fba 查不到，再查 fbm
             if ($result->isEmpty()) {
 
                 $asinRow = Asin::select('item_no')
@@ -155,8 +156,6 @@ class PartsListController extends Controller {
             }
 
 
-        } else {
-            $item_code = $req->input('item_code');
         }
 
 
