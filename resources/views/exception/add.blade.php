@@ -109,7 +109,7 @@
 	});
   });
   </script>
-<form  action="{{ url('exception') }}" id="exception_form" method="POST">
+<form  action="{{ url('exception') }}" id="exception_form" novalidate method="POST">
  {{ csrf_field() }}
     <div class="col-lg-9">
         <div class="col-md-12">
@@ -243,7 +243,7 @@
             </ul>
             <div class="tab-content">
 
-                <div class="tab-pane " id="tab_1">
+                <div data-types="[1,3]" class="tab-pane" id="tab_1">
 
 
 					<div class="col-xs-12">
@@ -253,7 +253,7 @@
 							<span class="input-group-addon">
 								<i class="fa fa-bookmark"></i>
 							</span>
-								<input type="text" class="form-control" name="refund" id="refund" value="{{old('refund')}}" autocomplete="off" />
+								<input type="text" class="form-control" name="refund" id="refund" value="{{old('refund')}}" autocomplete="off" required />
 							</div>
 						</div>
                         <div style="clear:both;"></div>
@@ -263,7 +263,7 @@
                 </div>
 
 
-                <div class="tab-pane active" id="tab_2">
+                <div data-types="[2,3]" class="tab-pane active" id="tab_2">
 					<div class="col-lg-8">
 						<div class="form-group">
 							<label>Name</label>
@@ -379,7 +379,7 @@
                                     <div class="row mt-repeater-row">
                                         <div class="col-lg-2 col-md-2">
                                             <label class="control-label">Item No.</label>
-                                            <input type="text" class="form-control item_code" name="item_code" placeholder="Item No" autocomplete="off" />
+                                            <input type="text" class="form-control item_code" name="item_code" placeholder="Item No" autocomplete="off" required />
                                             <input type="hidden" class="seller_id" name="seller_id" />
                                             <input type="hidden" class="seller_sku" name="seller_sku" />
                                             <input type="hidden" class="find_item_by" name="find_item_by" />
@@ -387,12 +387,11 @@
                                         <div class="col-lg-6 col-md-5">
                                             <label class="control-label">Search by Item No and Select an Item</label>
                                             <input type="hidden" class="item_name" name="title" />
-                                            <input type="text" class="form-control seller-sku-selector" name="note" placeholder="Seller Account and SKU" autocomplete="off" />
+                                            <input type="text" class="form-control seller-sku-selector" name="note" placeholder="Seller Account and SKU" autocomplete="off" required />
                                         </div>
                                         <div class="col-lg-2 col-md-2">
                                             <label class="control-label">Quantity</label>
-                                            <input type="text" class="form-control"  name="qty" value="1" placeholder="Quantity" />
-
+                                            <input type="text" class="form-control"  name="qty" value="1" placeholder="Quantity" required />
                                         </div>
                                         <div class="col-lg-1 col-md-2">
                                             <label class="control-label"><input type="checkbox" name="addattr" value="Returned">Returned</label>
@@ -422,7 +421,7 @@
                 </div>
 
 
-				<div class="tab-pane" id="tab_3">
+				<div data-types="[4]" class="tab-pane" id="tab_3">
 
 
 					<div class="col-xs-12">
@@ -432,7 +431,7 @@
 							<span class="input-group-addon">
 								<i class="fa fa-bookmark"></i>
 							</span>
-								<input type="text" class="form-control" name="gift_card_amount" id="gift_card_amount" value="{{old('gift_card_amount')}}" autocomplete="off" />
+								<input type="text" class="form-control" name="gift_card_amount" id="gift_card_amount" value="{{old('gift_card_amount')}}" autocomplete="off" required />
 							</div>
 						</div>
 						<div style="clear:both;"></div>
@@ -484,7 +483,9 @@
 
         $replacementProductList.find('.item_code').each((i, ele) => {
 
-            let eventData = JSON.parse($(ele).siblings('.find_item_by').val())
+            let $findBy = $(ele).siblings('.find_item_by')
+            let eventData = JSON.parse($findBy.val())
+            $findBy.remove()
             eventData.currentTarget = ele
 
             handleItemCodeSearch.call(ele, eventData)
@@ -614,6 +615,28 @@
             let item_name = info ? info.item_name : ''
 
             $repeatRow.find('.item_name').val(item_name).prev().html(item_name||'Search by Item No and Select an Item')
+
+        })
+
+        $(exception_form).submit(function (e) {
+
+            let type = $('#type').val() - 0
+
+            for(let input of $(this).find('[name]')){
+
+                let $tabPane = $(input).closest('.tab-pane')
+
+                if($tabPane.length && $tabPane.data('types').indexOf(type) < 0 ){
+                    continue
+                }
+
+                // if($.contains($replacementProductList[0], input)){ }
+
+                if(!input.reportValidity()) {
+                    toastr.error('The form is not complete yet.')
+                    return false
+                }
+            }
 
         })
 
