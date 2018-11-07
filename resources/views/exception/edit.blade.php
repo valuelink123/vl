@@ -93,7 +93,7 @@
 <form  action="{{ url('exception/'.$exception['id']) }}" id="exception_form" method="POST" enctype="multipart/form-data">
 <?php 
 $mcf_order_str='';
-if($exception['user_id'] == Auth::user()->id  && $exception['process_status'] =='cancel'){
+if(($exception['user_id'] == Auth::user()->id || Auth::user()->admin || in_array($exception['group_id'],array_get($mygroups,'manage_groups',array()))) && $exception['process_status'] =='cancel'){
 	$disable='';
 }else{
 	$disable='disabled';
@@ -441,7 +441,7 @@ if($exception['user_id'] == Auth::user()->id  && $exception['process_status'] ==
 
 </div>
 <?php 
-if($exception['user_id'] == Auth::user()->id  && $exception['process_status'] =='cancel'){ ?>
+if(($exception['user_id'] == Auth::user()->id || Auth::user()->admin || in_array($exception['group_id'],array_get($mygroups,'manage_groups',array()))) && $exception['process_status'] =='cancel'){ ?>
 <div class="form-actions">
 	<div class="row">
 		<div class="col-md-offset-4 col-md-8">
