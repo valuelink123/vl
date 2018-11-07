@@ -80,7 +80,8 @@
 				$("#order_sku", $("#exception_form")).val(order_sku);
 
                 rebindordersellerid.value = data.SellerId
-                setReplacementItemList(items)
+                let site = `www.${data.SalesChannel}`.toLowerCase()
+                setReplacementItemList(items, site)
 
 			}else{
 				toastr.error(redata.message);
@@ -381,6 +382,7 @@
                                             <input type="text" class="form-control item_code" name="item_code" placeholder="Item No" autocomplete="off" />
                                             <input type="hidden" class="seller_id" name="seller_id" />
                                             <input type="hidden" class="seller_sku" name="seller_sku" />
+                                            <input type="hidden" class="find_item_by" name="find_item_by" />
                                         </div>
                                         <div class="col-lg-6 col-md-5">
                                             <label class="control-label">Search by Item No and Select an Item</label>
@@ -467,28 +469,32 @@
     let replacementItemRepeater = $replacementProductList.parent().repeater({defaultValues:{qty:1}})
 
     // 将原订单SKU填充到重发列表，并带出库存信息
-    function setReplacementItemList(items){
+    function setReplacementItemList(items, site){
         replacementItemRepeater.setList(items.map(i => {
             return {
-                seller_id: i.SellerId,
-                seller_sku: i.SellerSKU,
-                title: i.Title,
+                find_item_by: JSON.stringify({
+                    site,
+                    asin: i.ASIN,
+                    seller_id: i.SellerId,
+                    seller_sku: i.SellerSKU,
+                }),
                 qty: i.QuantityOrdered
             }
         }));
 
         $replacementProductList.find('.item_code').each((i, ele) => {
 
-            handleItemCodeSearch.call(ele, {
-                currentTarget: ele,
-                seller_id: $(ele).siblings('.seller_id').val(),
-                seller_sku: $(ele).siblings('.seller_sku').val()
-            })
+            let eventData = JSON.parse($(ele).siblings('.find_item_by').val())
+            eventData.currentTarget = ele
+
+            handleItemCodeSearch.call(ele, eventData)
         })
     }
 
     /**
-     * 通过 item_code 或者 seller_id + seller_sku
+     * 通过 item_code (手动输入)
+     * 或者 seller_id + seller_sku (FBA发货)
+     * 或者 site + seller_sku + asin (FBM发货)
      * 把物料的库存列表带出来(包括fba、fbm)以供选择重发
      */
     function handleItemCodeSearch(e) {
@@ -505,10 +511,10 @@
 
         if (!item_code) {
 
-            var {seller_id, seller_sku} = e
+            var {seller_id, seller_sku, site, asin} = e
 
-            if (seller_id && seller_sku) {
-                var postData = {seller_id, seller_sku}
+            if (asin) {
+                var postData = {seller_id, seller_sku, site, asin}
             } else {
                 return $sellerSkuSelector.attr('placeholder', 'Seller Account and SKU')
             }

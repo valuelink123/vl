@@ -7,6 +7,7 @@
 
 namespace App\Http\Controllers\Frank;
 
+use App\Asin;
 use App\Classes\SapRfcRequest;
 use App\Exceptions\DataInputException;
 use Illuminate\Http\Request;
@@ -124,9 +125,10 @@ class PartsListController extends Controller {
      */
     public function getStockList(Request $req) {
 
-        // 通过 seller_id + seller_sku 找到 item_code
+        // query item_code
         if (empty($req->input('item_code'))) {
 
+            // 查 fba
             $result = DB::table('fba_stock')
                 ->select('item_code')
                 ->where('seller_id', $req->input('seller_id'))
@@ -136,12 +138,18 @@ class PartsListController extends Controller {
 
             // fba 查不到，说明是 fbm
             if ($result->isEmpty()) {
-                // throw new DataInputException('item code not found', 1025);
-                // return [];
 
-                // 到 asin 表中找 item_code？（由于asin表没有 seller_id 字段，放弃）
+                $asinRow = Asin::select('item_no')
+                    ->where('site', $req->input('site'))
+                    ->where('asin', $req->input('asin'))
+                    ->where('sellersku', $req->input('seller_sku'))->first();
 
-                $item_code = $req->input('seller_sku');
+                if (empty($asinRow)) {
+                    return [];
+                } else {
+                    $item_code = $asinRow->item_no;
+                }
+
             } else {
                 $item_code = $result[0]->item_code;
             }
