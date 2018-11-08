@@ -703,6 +703,7 @@ where a.date>=:sdate_from and a.date<=:sdate_to
             $result = Hash::check($request->get('current_password'), $user->password);//Auth::validate(['password'=>$request->get('current_password')]);
             if($result){
                 $user->name = $request->get('name');
+				$user->sap_seller_id = intval($request->get('sap_seller_id'));
                 if($request->get('password')) $user->password = Hash::make(($request->get('password')));
                 $user->save();
                 $request->session()->flash('success_message', 'Set Profile Success');
