@@ -31,11 +31,14 @@
                 <table class="table table-striped table-bordered" id="thetable">
                     <thead>
                     <tr>
+                        <th onclick="this===arguments[0].target && this.firstElementChild.click()">
+                            <input type="checkbox" onchange="this.checked?dtApi.rows().select():dtApi.rows().deselect()"/>
+                        </th>
                         <th>Date</th>
                         <th>Customer Name</th>
                         <th>Customer Email</th>
                         <th>Phone Number</th>
-                        <th>Rating</th>
+                        <th>Expect Rating</th>
                         <th>Commented</th>
                         <th>Status</th>
                         <th>Processor</th>
@@ -53,23 +56,44 @@
         let $theTable = $(thetable)
 
         $theTable.dataTable({
+            searching: false, // 不使用自带的搜索框
             search: {search: queryStringToObject().search},
             serverSide: true,
             pagingType: 'bootstrap_extended',
             processing: true,
+            order: [[1, 'desc']],
+            select: {
+                style: 'os',
+                info: true, // info N rows selected
+                blurable: true, // unselect on blur
+                selector: 'td:first-child', // 指定第一列可以点击选中
+            },
             columns: [
-                {data: 'created_at', name: 'created_at'},
-                {data: 'name', name: 'name'},
+                {
+                    width: "1px",
+                    orderable: false,
+                    defaultContent: '',
+                    className: 'select-checkbox', // 该类根据 tr:selected 改变自己的背景
+                },
+                {
+                    width: "55px",
+                    data: 'created_at',
+                    name: 'created_at'
+                },
+                {
+                    width: "20px",
+                    data: 'name',
+                    name: 'name'
+                },
                 {data: 'email', name: 'email'},
                 {data: 'phone', name: 'phone'},
                 {
+                    width: "20px",
                     data: 'rating',
-                    name: 'rating',
-                    render(data) {
-                        return parseInt(data) > 0 ? data : ''
-                    }
+                    name: 'rating'
                 },
                 {
+                    width: "20px",
                     data: 'commented',
                     name: 'commented',
                     render(data) {
@@ -77,14 +101,20 @@
                     }
                 },
                 {
+                    width: "80px",
                     data: 'status',
                     name: 'status',
                     render(data) {
                         return data.toUpperCase()
                     }
                 },
-                {data: 'processor', name: 'processor'},
                 {
+                    width: "120px",
+                    data: 'processor',
+                    name: 'processor'
+                },
+                {
+                    width: "20px",
                     data: 'order_id',
                     name: 'order_id',
                     orderable: false,
@@ -98,6 +128,8 @@
                 url: location.href
             }
         })
+
+        let dtApi = $theTable.api()
 
     </script>
 
