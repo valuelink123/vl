@@ -50,7 +50,7 @@
                                 <span class="input-group-addon">
                                     <i class="fa fa-user"></i>
                                 </span>
-                                <input type="text" class="form-control" name="sap_seller_id" id="sap_seller_id" value="{{$profile->name}}">
+                                <input type="text" class="form-control" name="sap_seller_id" id="sap_seller_id" value="{{$profile->sap_seller_id}}">
                             </div>
                         </div>
                         <div class="form-group">
