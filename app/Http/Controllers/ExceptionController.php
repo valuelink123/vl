@@ -388,7 +388,7 @@ class ExceptionController extends Controller
 				if(is_array($products_arr)){
 					$id_add=0;
 					foreach( $products_arr as $product_arr){
-						$product_arr['replacement_order_id']=$request->get('replacement_order_id.'.$id_add);	
+						$product_arr['replacement_order_id']=$request->input('replacement_order_id.'.$id_add);	
 						$products[]=$product_arr;
 						$id_add++;
 					}
