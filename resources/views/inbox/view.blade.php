@@ -232,7 +232,7 @@
 							<label class="control-label">Specify time to send ( UTC Time )</label>
 							<div class="input-group">
 								<div class="input-group date form_datetime">
-									<input type="text" size="16" readonly class="form-control">
+									<input type="text" size="16" name="plan_date" readonly class="form-control">
 									<span class="input-group-btn">
 										<button class="btn default date-reset" type="button">
 											<i class="fa fa-times"></i>
