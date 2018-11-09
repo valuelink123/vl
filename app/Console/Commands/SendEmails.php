@@ -51,7 +51,7 @@ class SendEmails extends Command
     public function handle()
     {
 		set_time_limit(0);
-        $count = $smtp_array = array();
+        $count = $smtp_array = $signature_arrays = array();
         $command = $this;
         $smtp_config =  Accounts::whereNotNull('smtp_host')->whereNotNull('smtp_port')->whereNotNull('smtp_ssl')->get();
 		
