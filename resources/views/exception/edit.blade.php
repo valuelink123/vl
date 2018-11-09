@@ -373,6 +373,7 @@ if(($exception['user_id'] == Auth::user()->id || Auth::user()->admin || in_array
 								
 								foreach($products_details as $detail) { 
 									$replacement_order_ids[]=array_get($detail,'replacement_order_id');
+									$addattr=array_get($detail,'addattr',[]);
 								?>
 								<div data-repeater-item class="mt-repeater-item">
 									<div class="row mt-repeater-row">
@@ -392,8 +393,8 @@ if(($exception['user_id'] == Auth::user()->id || Auth::user()->admin || in_array
 								
 										</div>
 										<div class="col-md-2">
-											<label class="control-label"><input type="checkbox" name="addattr" {{$disable}} value="Returned">Returned</label>
-											<label class="control-label"><input type="checkbox" name="addattr" {{$disable}} value="Urgent">Urgent</label>
+											<label class="control-label"><input type="checkbox" name="addattr" {{$disable}} value="Returned" <?php if(in_array('Returned',$addattr)) echo "checked";?> >Returned</label>
+											<label class="control-label"><input type="checkbox" name="addattr" {{$disable}} value="Urgent" <?php if(in_array('Urgent',$addattr)) echo "checked";?>>Urgent</label>
 										</div>
 										<div class="col-md-1">
 											<a href="javascript:;" data-repeater-delete class="btn btn-danger mt-repeater-delete"  {{$disable}}>
