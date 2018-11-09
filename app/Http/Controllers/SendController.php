@@ -178,6 +178,7 @@ class SendController extends Controller
 				$sendbox->subject = $request->get('subject');
 				$sendbox->text_html = $request->get('content');
 				$sendbox->date = date('Y-m-d H:i:s');
+				if($request->get('plan_date')) $sendbox->plan_date = strtotime($request->get('plan_date'));
 				$sendbox->status = $request->get('asDraft')?'Draft':'Waiting';
 				$sendbox->inbox_id = $request->get('inbox_id')?intval($request->get('inbox_id')):0;
 				$sendbox->warn = $request->get('warn')?intval($request->get('warn')):0;

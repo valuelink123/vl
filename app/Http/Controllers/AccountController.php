@@ -80,6 +80,7 @@ class AccountController extends Controller
         $seller_account->smtp_ssl = $request->get('smtp_ssl');
         $seller_account->smtp_port = $request->get('smtp_port');
 		$seller_account->type = $request->get('type');
+		$seller_account->signature = $request->get('signature');
 
         if($request->get('id')>0){
             $seller_account->id = $request->get('id');
@@ -146,7 +147,7 @@ class AccountController extends Controller
         $seller_account->smtp_ssl = $request->get('smtp_ssl');
         $seller_account->smtp_port = $request->get('smtp_port');
 		$seller_account->type = $request->get('type');
-		
+		$seller_account->signature = $request->get('signature');
         if ($seller_account->save()) {
             $request->session()->flash('success_message','Set Seller Account Success');
             return redirect('account');
