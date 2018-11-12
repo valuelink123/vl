@@ -368,9 +368,12 @@ if(($exception['user_id'] == Auth::user()->id || Auth::user()->admin || in_array
 							<div data-repeater-list="group-products">
 								<?php 
 								$products_details = array_get($replace,'products',array());
+								$replacement_order_ids=[];
 								if(is_array($products_details)){
 								
 								foreach($products_details as $detail) { 
+									$replacement_order_ids[]=array_get($detail,'replacement_order_id');
+									$addattr=array_get($detail,'addattr',[]);
 								?>
 								<div data-repeater-item class="mt-repeater-item">
 									<div class="row mt-repeater-row">
@@ -390,8 +393,8 @@ if(($exception['user_id'] == Auth::user()->id || Auth::user()->admin || in_array
 								
 										</div>
 										<div class="col-md-2">
-											<label class="control-label"><input type="checkbox" name="addattr" {{$disable}} value="Returned">Returned</label>
-											<label class="control-label"><input type="checkbox" name="addattr" {{$disable}} value="Urgent">Urgent</label>
+											<label class="control-label"><input type="checkbox" name="addattr" {{$disable}} value="Returned" <?php if(in_array('Returned',$addattr)) echo "checked";?> >Returned</label>
+											<label class="control-label"><input type="checkbox" name="addattr" {{$disable}} value="Urgent" <?php if(in_array('Urgent',$addattr)) echo "checked";?>>Urgent</label>
 										</div>
 										<div class="col-md-1">
 											<a href="javascript:;" data-repeater-delete class="btn btn-danger mt-repeater-delete"  {{$disable}}>
@@ -517,7 +520,10 @@ if((Auth::user()->admin || in_array($exception['group_id'],array_get($mygroups,'
 
 		<div class="form-group">
 			<label>Replacement Order Id:</label>
-			<div class="input-group "><input type="text" class="form-control" name="replacement_order_id" id="replacement_order_id" value="{{$exception['replacement_order_id']}}"  {{$disable}}></div>
+			@foreach ($replacement_order_ids as $replacement_order_id)
+			<div class="input-group "><input type="text" class="form-control form-filter" name="replacement_order_id[]"  value="{{$replacement_order_id}}"  {{$disable}}></div>
+			@endforeach
+			<BR />
 			@foreach ($mcf_orders as $mcf_order)
 				{{$mcf_order->SellerFulfillmentOrderId}} : {{$mcf_order->TrackingNumber}} {{$mcf_order->CarrierCode}}
 			@endforeach

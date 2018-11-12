@@ -156,8 +156,8 @@ class ExceptionController extends Controller
 							$arrayAmazon[] =[
 								array_get($accounts,array_get($product,'seller_id')),
 								implode(', ',array_get($product,'addattr',[])),
-								array_get($customersList,'replacement_order_id'),
-								array_get($customersList,'replacement_order_id'),
+								array_get($product,'replacement_order_id'),
+								array_get($product,'replacement_order_id'),
 								array_get($customersList,'date'),
 								array_get($product,'seller_sku'),
 								array_get($product,'qty'),
@@ -352,8 +352,18 @@ class ExceptionController extends Controller
 	
 		$last_inbox = Inbox::where('amazon_seller_id',array_get($rule,'sellerid'))->where('amazon_order_id',array_get($rule,'amazon_order_id'))->orderBy('date','desc')->first();
 		if($last_inbox) $last_inboxid= $last_inbox->id;
-		
-		$mcf_orders = DB::connection('order')->table('amazon_mcf_shipment_package')->where('SellerFulfillmentOrderId',array_get($rule,'replacement_order_id'))->get();
+		$replacement_order_ids=[];
+		if($rule['type']==2 || $rule['type']==3){
+			$replacements = unserialize($rule['replacement']);
+			$products = array_get($replacements,'products',array());
+			if(is_array($products)){
+				foreach( $products as $product){
+					$replacement_order_ids[]=array_get($product,'replacement_order_id');
+				}
+			}
+		}	
+					
+		$mcf_orders = DB::connection('order')->table('amazon_mcf_shipment_package')->whereIn('SellerFulfillmentOrderId',$replacement_order_ids)->get();
 		
 		if($last_inbox) $last_inboxid= $last_inbox->id;
 		
@@ -371,7 +381,21 @@ class ExceptionController extends Controller
 			$exception->process_status = $request->get('process_status');
 			$exception->process_date = date('Y-m-d H:i:s');
 			$exception->process_user_id = intval(Auth::user()->id);
-			$exception->replacement_order_id = $request->get('replacement_order_id');
+			if($exception->type==2 || $exception->type==3){
+				$replacements = unserialize($exception->replacement);
+				$products=[];
+				$products_arr = array_get($replacements,'products',array());
+				if(is_array($products_arr)){
+					$id_add=0;
+					foreach( $products_arr as $product_arr){
+						$product_arr['replacement_order_id']=$request->input('replacement_order_id.'.$id_add);	
+						$products[]=$product_arr;
+						$id_add++;
+					}
+				}
+				$replacements['products']=$products;
+				$exception->replacement =  serialize($replacements);
+			}
 			$file = $request->file('importFile');  
   			if($file){
 				if($file->isValid()){  
@@ -419,7 +443,19 @@ class ExceptionController extends Controller
 	
 			if( $exception->type == 2 || $exception->type == 3){
 				
-				$exception->replacement_order_id = $request->get('rebindorderid').'-re-01';
+				$products=[];
+				$products_arr = $request->get('group-products');
+	
+				$id_add=0;
+				foreach($products_arr as $product_arr){
+					$id_add++;
+					if(array_get($product_arr,'seller_id')==$request->get('rebindordersellerid')){
+						$product_arr['replacement_order_id']=$request->get('rebindorderid').'-0'.$id_add;
+					}else{
+						$product_arr['replacement_order_id']=substr($request->get('rebindorderid'),4).'-0'.$id_add;	
+					}		
+					$products[]=$product_arr;
+				}
 				$exception->replacement = serialize(
 				array(
 					'shipname'=>$request->get('shipname'),
@@ -433,7 +469,7 @@ class ExceptionController extends Controller
 					'postalcode'=>$request->get('postalcode'),
 					'countrycode'=>$request->get('countrycode'),
 					'phone'=>$request->get('phone'),
-					'products'=>$request->get('group-products'),
+					'products'=>$products,
 				));
 			}else{
 				$exception->replacement = '';
@@ -664,7 +700,19 @@ class ExceptionController extends Controller
         }
 
 		if( $exception->type == 2 || $exception->type == 3){
-			$exception->replacement_order_id = $request->get('rebindorderid').'-re-01';
+			$products=[];
+			$products_arr = $request->get('group-products');
+			$id_add=0;
+			foreach($products_arr as $product_arr){
+				$id_add++;
+				if(array_get($product_arr,'seller_id')==$request->get('rebindordersellerid')){
+					$product_arr['replacement_order_id']=$request->get('rebindorderid').'-0'.$id_add;
+				}else{
+					$product_arr['replacement_order_id']=substr($request->get('rebindorderid'),4).'-0'.$id_add;	
+				}		
+				$products[]=$product_arr;
+			}
+			
 			$exception->replacement = serialize(
 			array(
 				'shipname'=>$request->get('shipname'),
@@ -678,7 +726,7 @@ class ExceptionController extends Controller
 				'postalcode'=>$request->get('postalcode'),
 				'countrycode'=>$request->get('countrycode'),
 				'phone'=>$request->get('phone'),
-				'products'=>$request->get('group-products'),
+				'products'=>$products,
 			));
 		}else{
 			$exception->replacement = '';

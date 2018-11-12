@@ -42,6 +42,7 @@
 									<button type="submit" class="btn blue" name ="ExportType" value ="Reply">Export Reply Report</button>
 									<button type="submit" class="btn blue" name ="ExportType" value ="Review">Export Review Report</button> 
 									<button type="submit" class="btn blue" name ="ExportType" value ="Fees">Export Fees Report</button>
+									<button type="submit" class="btn blue" name ="ExportType" value ="Removal">Export Removal Report</button>
                                 
                             </div>
                         </div>
