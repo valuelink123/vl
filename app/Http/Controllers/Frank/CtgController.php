@@ -34,6 +34,7 @@ class CtgController extends Controller {
 
         // query data list
 
+        $where = $this->dtWhere($req, [], []);
         $orderby = $this->dtOrderBy($req);
         $limit = $this->dtLimit($req);
 
@@ -51,6 +52,7 @@ class CtgController extends Controller {
         FROM ctg t1
         LEFT JOIN users t2
           ON t2.id = t1.processor
+        WHERE $where
         ORDER BY $orderby
         LIMIT $limit
         ";

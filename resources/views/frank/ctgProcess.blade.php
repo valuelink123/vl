@@ -35,6 +35,8 @@
                 <ul class="nav nav-tabs" role="tablist" id="tabs">
                     <li role="presentation"><a href="#ctg-info" aria-controls="ctg-info" role="tab" data-toggle="tab">CTG Info</a></li>
                     <li role="presentation"><a href="#process-steps" aria-controls="process-steps" role="tab" data-toggle="tab">Process Steps</a></li>
+                    <li role="presentation"><a href="#order-info" aria-controls="order-info" role="tab" data-toggle="tab">Amazon Order Info</a></li>
+                    <li role="presentation"><a href="#email-history" aria-controls="email-history" role="tab" data-toggle="tab">Email History</a></li>
                 </ul>
 
                 <div class="tab-content">
@@ -170,6 +172,14 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+
+                    <div role="tabpanel" class="tab-pane" id="order-info">
+                        or
+                    </div>
+
+                    <div role="tabpanel" class="tab-pane" id="email-history">
+                        eh
                     </div>
                 </div>
 

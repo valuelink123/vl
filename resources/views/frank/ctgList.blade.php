@@ -4,6 +4,9 @@
 @endsection
 @section('content')
 
+    <link rel="stylesheet" href="/js/chosen/chosen.min.css"/>
+    <script src="/js/chosen/chosen.jquery.min.js"></script>
+
     @include('frank.common')
 
     <h1 class="page-title font-red-intense"> CTG List
@@ -12,10 +15,64 @@
 
     <div class="portlet light bordered">
         <div class="portlet-body">
-            <div class="table-toolbar">
+            <div class="table-toolbar" id="thetabletoolbar">
                 <div class="row">
-                    <div class="col-md-8"></div>
-                    <div class="col-md-4">
+                    <div class="col-md-2">
+                        <div class="input-group">
+                            <span class="input-group-addon">From</span>
+                            <input class="form-control" value="{!! date('Y-m-d', strtotime('-90 day')) !!}" data-init-by-query="ands.date_from" id="date_from" autocomplete="off"/>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="input-group">
+                            <span class="input-group-addon">To</span>
+                            <input class="form-control" value="{!! date('Y-m-d') !!}" data-init-by-query="ands.date_to" id="date_to" autocomplete="off"/>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="input-group">
+                            <span class="input-group-addon">Site</span>
+                            <select multiple style="width:100%;" name="site">
+                                <option value="A">Important</option>
+                                <option value="B">Normal</option>
+                                <option value="C">Abandon</option>
+                                <option value="D">Unlisted</option>
+                            </select>
+                        </div>
+                        <br/>
+                        <div class="input-group">
+                            <span class="input-group-addon">Expect Rating</span>
+                            <select multiple style="width:100%;" name="rating">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4" selected>4</option>
+                                <option value="5" selected>5</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="input-group">
+                            <span class="input-group-addon">Processor</span>
+                            <select multiple style="width:100%;" name="processor">
+                                <option value="A">Important</option>
+                                <option value="B">Normal</option>
+                                <option value="C">Abandon</option>
+                                <option value="D">Unlisted</option>
+                            </select>
+                        </div>
+                        <br/>
+                        <div class="input-group">
+                            <span class="input-group-addon">Status</span>
+                            <select multiple style="width:100%;" name="status">
+                                <option value="A">Important</option>
+                                <option value="B">Normal</option>
+                                <option value="C">Abandon</option>
+                                <option value="D">Unlisted</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
                         <div class="btn-group " style="float:right;">
 
                             <button id="excel-export" class="btn sbold blue"> Export
@@ -53,10 +110,33 @@
 
     <script>
 
+        $("#thetabletoolbar [id^='date_']").datepicker({
+            format: "yyyy-mm-dd",
+            autoclose: true
+        })
+
+        $("#thetabletoolbar select[multiple]").chosen()
+
         let $theTable = $(thetable)
 
+        $theTable.on('preXhr.dt', (e, settings, data) => {
+
+            Object.assign(data.search, {
+                // value: fuzzysearch.value,
+                ands: {
+                    date_from: date_from.value,
+                    date_to: date_to.value,
+                    // item_group: item_group.value,
+                    // brand: brand.value,
+                    // item_model: item_model.value
+                }
+            })
+
+            history.replaceState(null, null, '?' + objectToQueryString(data.search))
+        })
+
         $theTable.dataTable({
-            searching: false, // 不使用自带的搜索框
+            // searching: false,
             search: {search: queryStringToObject().search},
             serverSide: true,
             pagingType: 'bootstrap_extended',
