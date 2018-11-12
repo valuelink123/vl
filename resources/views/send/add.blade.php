@@ -153,7 +153,7 @@
                         </div>
 
                         <div class="form-group">
-                            <label>Send To</label>
+                            <label>Send To ( Multiple please use " <font color="#FF0000">;</font> " to separate ) </label>
                             <div class="input-group ">
                                 <span class="input-group-addon">
                                     <i class="fa fa-bookmark"></i>
