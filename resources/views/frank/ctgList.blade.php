@@ -7,6 +7,12 @@
     <link rel="stylesheet" href="/js/chosen/chosen.min.css"/>
     <script src="/js/chosen/chosen.jquery.min.js"></script>
 
+    <style>
+        .form-control {
+            height: 29px;
+        }
+    </style>
+
     @include('frank.common')
 
     <h1 class="page-title font-red-intense"> CTG List
@@ -20,34 +26,25 @@
                     <div class="col-md-2">
                         <div class="input-group">
                             <span class="input-group-addon">From</span>
-                            <input class="form-control" value="{!! date('Y-m-d', strtotime('-90 day')) !!}" data-init-by-query="ands.date_from" id="date_from" autocomplete="off"/>
+                            <input class="form-control" data-options="format:'yyyy-mm-dd 00:00:00'" value="{!! date('Y-m-d 00:00:00', strtotime('-90 day')) !!}" data-init-by-query="ands.date_from" id="date_from"
+                                   autocomplete="off"/>
                         </div>
                     </div>
                     <div class="col-md-2">
                         <div class="input-group">
                             <span class="input-group-addon">To</span>
-                            <input class="form-control" value="{!! date('Y-m-d') !!}" data-init-by-query="ands.date_to" id="date_to" autocomplete="off"/>
+                            <input class="form-control" data-options="format:'yyyy-mm-dd 23:59:59'" value="{!! date('Y-m-d 23:59:59') !!}" data-init-by-query="ands.date_to" id="date_to" autocomplete="off"/>
                         </div>
                     </div>
                     <div class="col-md-3">
-                        <div class="input-group">
-                            <span class="input-group-addon">Site</span>
-                            <select multiple style="width:100%;" name="site">
-                                <option value="A">Important</option>
-                                <option value="B">Normal</option>
-                                <option value="C">Abandon</option>
-                                <option value="D">Unlisted</option>
-                            </select>
-                        </div>
-                        <br/>
                         <div class="input-group">
                             <span class="input-group-addon">Expect Rating</span>
                             <select multiple style="width:100%;" name="rating">
                                 <option value="1">1</option>
                                 <option value="2">2</option>
                                 <option value="3">3</option>
-                                <option value="4" selected>4</option>
-                                <option value="5" selected>5</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
                             </select>
                         </div>
                     </div>
@@ -104,15 +101,36 @@
                     </thead>
                     <tbody></tbody>
                 </table>
+                <script type="text/template" id="bottomtoolbar">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <div class="input-group">
+                                <span class="input-group-addon">Task Assign to</span>
+                                <input class="xform-autotrim form-control" list="list-assignto" />
+                                <datalist id="list-assignto">
+                                    <% for(let user_id in users) { %>
+                                    <option value="${user_id} | ${users[user_id]}">
+                                    <% } %>
+                                </datalist>
+                            </div>
+                        </div>
+                    </div>
+                </script>
             </div>
         </div>
     </div>
 
     <script>
 
-        $("#thetabletoolbar [id^='date_']").datepicker({
-            format: "yyyy-mm-dd",
-            autoclose: true
+        $("#thetabletoolbar [id^='date_']").each(function () {
+
+            let defaults = {
+                autoclose: true
+            }
+
+            let options = eval(`({${$(this).data('options')}})`)
+
+            $(this).datepicker(Object.assign(defaults, options))
         })
 
         $("#thetabletoolbar select[multiple]").chosen()
@@ -208,6 +226,8 @@
                 url: location.href
             }
         })
+
+        $theTable.closest('.table-scrollable').after(tplRender(bottomtoolbar, {users: @json($users)}))
 
         let dtApi = $theTable.api()
 

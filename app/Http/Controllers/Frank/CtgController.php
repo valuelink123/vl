@@ -28,7 +28,14 @@ class CtgController extends Controller {
     public function list(Request $req) {
 
         if ($req->isMethod('GET')) {
-            return view('frank.ctgList');
+
+            $rows = DB::table('users')->select('id', 'name')->get();
+
+            foreach ($rows as $row) {
+                $users[$row->id] = $row->name;
+            }
+
+            return view('frank.ctgList', compact('users'));
         }
 
 
