@@ -427,6 +427,42 @@ where a.date>=:sdate_from and a.date<=:sdate_to
 			}
 			
 			
+			if(array_get($_REQUEST,'ExportType')=='Removal'){
+				$seller=[];
+				$accounts= DB::connection('order')->table('accounts')->where('status',1)->groupBy(['sellername','sellerid'])->get(['sellername','sellerid']);
+				$accounts=json_decode(json_encode($accounts), true);
+				foreach($accounts as $account){
+					$seller[$account['sellerid']]=$account['sellername'];
+				}
+				$datas= DB::connection('order')->table('removal_orders')->where('RequestDate','>=',$date_from.' 00:00:00')->where('RequestDate','<=',$date_to.' 23:59:59')->orderBy('RequestDate','asc')->get()->toArray();
+				$arrayData[] = ['RequestDate','SellerId','SellerName','OrderId','ServiceSpeed','OrderType','OrderStatus','LastUpdatedDate','Sku','FnSku','Disposition','RequestedQuantity','CancelledQuantity','DisposedQuantity','ShippedQuantity','InProcessQuantity','RemovalFee','Currency'];
+				$datas=json_decode(json_encode($datas), true);
+				foreach($datas as $key=>$val){
+					$arrayData[] = [
+						array_get($val,'RequestDate'),
+						array_get($val,'SellerId'),
+						array_get($seller,array_get($val,'SellerId'),array_get($val,'SellerId')),
+						array_get($val,'OrderId'),
+						array_get($val,'ServiceSpeed'),
+						array_get($val,'OrderType'),
+						array_get($val,'OrderStatus'),
+						array_get($val,'LastUpdatedDate'),
+						array_get($val,'Sku'),
+						array_get($val,'FnSku'),
+						array_get($val,'Disposition'),
+						array_get($val,'RequestedQuantity'),
+						array_get($val,'CancelledQuantity'),
+						array_get($val,'DisposedQuantity'),
+						array_get($val,'ShippedQuantity'),
+						array_get($val,'InProcessQuantity'),
+						array_get($val,'RemovalFee'),
+						array_get($val,'Currency')
+					];
+				}
+				
+			}
+			
+			
 			
 			if(array_get($_REQUEST,'ExportType')=='Fees'){
 				$seller=[];
@@ -703,6 +739,7 @@ where a.date>=:sdate_from and a.date<=:sdate_to
             $result = Hash::check($request->get('current_password'), $user->password);//Auth::validate(['password'=>$request->get('current_password')]);
             if($result){
                 $user->name = $request->get('name');
+				$user->sap_seller_id = intval($request->get('sap_seller_id'));
                 if($request->get('password')) $user->password = Hash::make(($request->get('password')));
                 $user->save();
                 $request->session()->flash('success_message', 'Set Profile Success');

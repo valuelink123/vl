@@ -150,23 +150,7 @@ class SendController extends Controller
             'content' => 'required|string',
             'user_id' => 'required|int',
         ]);
-		if($request->get('sendbox_id')){
-			$sendbox = Sendbox::findOrFail($request->get('sendbox_id'));
-		}else{
-			$sendbox = new Sendbox;
-		}
-		
-        
-        $sendbox->user_id = intval(Auth::user()->id);
-        $sendbox->from_address = $request->get('from_address');
-        $sendbox->to_address = $request->get('to_address');
-        $sendbox->subject = $request->get('subject');
-        $sendbox->text_html = $request->get('content');
-        $sendbox->date = date('Y-m-d H:i:s');
-		$sendbox->status = $request->get('asDraft')?'Draft':'Waiting';
-        $sendbox->inbox_id = $request->get('inbox_id')?intval($request->get('inbox_id')):0;
-		$sendbox->warn = $request->get('warn')?intval($request->get('warn')):0;
-        if($request->get('fileid')){
+		if($request->get('fileid')){
 			$up_attachs = $request->get('fileid');
 			foreach( $up_attachs as $up_attach){
 				if (!file_exists(public_path().$up_attach)){
@@ -174,9 +158,37 @@ class SendController extends Controller
             		return redirect()->back()->withInput();
 				}
 			}
-			$sendbox->attachs = serialize($request->get('fileid'));
+			$attachs = serialize($request->get('fileid'));
 		}
-        if ($sendbox->save()) {
+		
+		
+		
+		$to_address_array = explode(';',$request->get('to_address'));
+		
+		foreach($to_address_array as $to_address){
+			if(trim($to_address)){
+				if($request->get('sendbox_id')){
+					$sendbox = Sendbox::findOrFail($request->get('sendbox_id'));
+				}else{
+					$sendbox = new Sendbox;
+				}
+				$sendbox->user_id = intval(Auth::user()->id);
+				$sendbox->from_address = trim($request->get('from_address'));
+				$sendbox->to_address = trim($to_address);
+				$sendbox->subject = $request->get('subject');
+				$sendbox->text_html = $request->get('content');
+				$sendbox->date = date('Y-m-d H:i:s');
+				if($request->get('plan_date')) $sendbox->plan_date = strtotime($request->get('plan_date'));
+				$sendbox->status = $request->get('asDraft')?'Draft':'Waiting';
+				$sendbox->inbox_id = $request->get('inbox_id')?intval($request->get('inbox_id')):0;
+				$sendbox->warn = $request->get('warn')?intval($request->get('warn')):0;
+				if($request->get('fileid')) $sendbox->attachs = $attachs;
+				$sendbox->save();
+			}
+		}
+        
+        
+        if ($sendbox->id) {
             $request->session()->flash('success_message','Save Email Success');
             if($request->get('inbox_id')){
 				if(!$request->get('asDraft')){
@@ -186,8 +198,6 @@ class SendController extends Controller
             }else{
                 return redirect('send/'.$sendbox->id);
             }
-
-
             //return redirect('inbox/'.$request->get('inbox_id'));
         } else {
             $request->session()->flash('error_message','Set Email Failed');

@@ -4,6 +4,15 @@
 @endsection
 @section('content')
 
+    <link rel="stylesheet" href="/js/chosen/chosen.min.css"/>
+    <script src="/js/chosen/chosen.jquery.min.js"></script>
+
+    <style>
+        .form-control {
+            height: 29px;
+        }
+    </style>
+
     @include('frank.common')
 
     <h1 class="page-title font-red-intense"> CTG List
@@ -12,10 +21,55 @@
 
     <div class="portlet light bordered">
         <div class="portlet-body">
-            <div class="table-toolbar">
+            <div class="table-toolbar" id="thetabletoolbar">
                 <div class="row">
-                    <div class="col-md-8"></div>
-                    <div class="col-md-4">
+                    <div class="col-md-2">
+                        <div class="input-group">
+                            <span class="input-group-addon">From</span>
+                            <input class="form-control" data-options="format:'yyyy-mm-dd 00:00:00'" value="{!! date('Y-m-d 00:00:00', strtotime('-90 day')) !!}" data-init-by-query="ands.date_from" id="date_from"
+                                   autocomplete="off"/>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="input-group">
+                            <span class="input-group-addon">To</span>
+                            <input class="form-control" data-options="format:'yyyy-mm-dd 23:59:59'" value="{!! date('Y-m-d 23:59:59') !!}" data-init-by-query="ands.date_to" id="date_to" autocomplete="off"/>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="input-group">
+                            <span class="input-group-addon">Expect Rating</span>
+                            <select multiple style="width:100%;" name="rating">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="input-group">
+                            <span class="input-group-addon">Processor</span>
+                            <select multiple style="width:100%;" name="processor">
+                                <option value="A">Important</option>
+                                <option value="B">Normal</option>
+                                <option value="C">Abandon</option>
+                                <option value="D">Unlisted</option>
+                            </select>
+                        </div>
+                        <br/>
+                        <div class="input-group">
+                            <span class="input-group-addon">Status</span>
+                            <select multiple style="width:100%;" name="status">
+                                <option value="A">Important</option>
+                                <option value="B">Normal</option>
+                                <option value="C">Abandon</option>
+                                <option value="D">Unlisted</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
                         <div class="btn-group " style="float:right;">
 
                             <button id="excel-export" class="btn sbold blue"> Export
@@ -31,11 +85,14 @@
                 <table class="table table-striped table-bordered" id="thetable">
                     <thead>
                     <tr>
+                        <th onclick="this===arguments[0].target && this.firstElementChild.click()">
+                            <input type="checkbox" onchange="this.checked?dtApi.rows().select():dtApi.rows().deselect()"/>
+                        </th>
                         <th>Date</th>
                         <th>Customer Name</th>
                         <th>Customer Email</th>
                         <th>Phone Number</th>
-                        <th>Rating</th>
+                        <th>Expect Rating</th>
                         <th>Commented</th>
                         <th>Status</th>
                         <th>Processor</th>
@@ -44,8 +101,136 @@
                     </thead>
                     <tbody></tbody>
                 </table>
+                <script type="text/template" id="bottomtoolbar">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <div class="input-group">
+                                <span class="input-group-addon">Task Assign to</span>
+                                <input class="xform-autotrim form-control" list="list-assignto" />
+                                <datalist id="list-assignto">
+                                    <% for(let user_id in users) { %>
+                                    <option value="${user_id} | ${users[user_id]}">
+                                    <% } %>
+                                </datalist>
+                            </div>
+                        </div>
+                    </div>
+                </script>
             </div>
         </div>
     </div>
+
+    <script>
+
+        $("#thetabletoolbar [id^='date_']").each(function () {
+
+            let defaults = {
+                autoclose: true
+            }
+
+            let options = eval(`({${$(this).data('options')}})`)
+
+            $(this).datepicker(Object.assign(defaults, options))
+        })
+
+        $("#thetabletoolbar select[multiple]").chosen()
+
+        let $theTable = $(thetable)
+
+        $theTable.on('preXhr.dt', (e, settings, data) => {
+
+            Object.assign(data.search, {
+                // value: fuzzysearch.value,
+                ands: {
+                    date_from: date_from.value,
+                    date_to: date_to.value,
+                    // item_group: item_group.value,
+                    // brand: brand.value,
+                    // item_model: item_model.value
+                }
+            })
+
+            history.replaceState(null, null, '?' + objectToQueryString(data.search))
+        })
+
+        $theTable.dataTable({
+            // searching: false,
+            search: {search: queryStringToObject().search},
+            serverSide: true,
+            pagingType: 'bootstrap_extended',
+            processing: true,
+            order: [[1, 'desc']],
+            select: {
+                style: 'os',
+                info: true, // info N rows selected
+                blurable: true, // unselect on blur
+                selector: 'td:first-child', // 指定第一列可以点击选中
+            },
+            columns: [
+                {
+                    width: "1px",
+                    orderable: false,
+                    defaultContent: '',
+                    className: 'select-checkbox', // 该类根据 tr:selected 改变自己的背景
+                },
+                {
+                    width: "55px",
+                    data: 'created_at',
+                    name: 'created_at'
+                },
+                {
+                    width: "20px",
+                    data: 'name',
+                    name: 'name'
+                },
+                {data: 'email', name: 'email'},
+                {data: 'phone', name: 'phone'},
+                {
+                    width: "20px",
+                    data: 'rating',
+                    name: 'rating'
+                },
+                {
+                    width: "20px",
+                    data: 'commented',
+                    name: 'commented',
+                    render(data) {
+                        return parseInt(data) > 0 ? 'Yes' : 'No'
+                    }
+                },
+                {
+                    width: "80px",
+                    data: 'status',
+                    name: 'status',
+                    render(data) {
+                        return data.toUpperCase()
+                    }
+                },
+                {
+                    width: "120px",
+                    data: 'processor',
+                    name: 'processor'
+                },
+                {
+                    width: "20px",
+                    data: 'order_id',
+                    name: 'order_id',
+                    orderable: false,
+                    render(data) {
+                        return `<a class="btn btn-danger btn-xs" href="/ctg/list/process?order_id=${data}" target="_blank">Process</a>`
+                    }
+                }
+            ],
+            ajax: {
+                type: 'POST',
+                url: location.href
+            }
+        })
+
+        $theTable.closest('.table-scrollable').after(tplRender(bottomtoolbar, {users: @json($users)}))
+
+        let dtApi = $theTable.api()
+
+    </script>
 
 @endsection

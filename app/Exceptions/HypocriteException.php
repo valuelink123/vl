@@ -18,7 +18,7 @@ class HypocriteException extends \Exception {
 
     private $adminOnlyMessage;
 
-    public function __construct(string $message = "", int $code = 0, Throwable $previous = null) {
+    public function __construct($message = "", int $code = 0, Throwable $previous = null) {
 
         if (is_array($message)) {
             $this->adminOnlyMessage = $message[1] ?? null;
@@ -45,9 +45,10 @@ class HypocriteException extends \Exception {
     /**
      * @throws HypocriteException
      */
-    public static function wrap(\Exception $e, $message = null) {
+    public static function wrap(\Exception $e, $message = null, $code = null) {
         $message = $message ? [$message, $e->getMessage()] : $e->getMessage();
-        throw new static($message, $e->getCode(), $e);
+        $code = $code ?? (int)$e->getCode();
+        throw new static($message, $code, $e);
     }
 
 }

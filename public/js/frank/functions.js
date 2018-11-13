@@ -97,6 +97,42 @@ function rows2object(rows, keyFields, valueField = null) {
 }
 
 /**
+ * Ajax post data by json format
+ *
+ * @param url
+ * @param data data object or form element
+ */
+function postByJson(url, data) {
+
+    let $form = null
+
+    if (data.jquery) {
+        $form = data
+    } else if (data instanceof HTMLFormElement) {
+        $form = $(data)
+    }
+
+    if ($form) data = rows2object($form.serializeArray(), 'name', 'value')
+
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            url,
+            method: 'POST',
+            dataType: 'json',
+            data: JSON.stringify(data),
+            headers: {'Content-Type': 'application/json'},
+            success(arr) {
+                if (false === arr[0]) return reject(new Error(arr[1]))
+                resolve(arr)
+            },
+            error(xhr, status, errmsg) {
+                reject(new Error(errmsg))
+            }
+        })
+    })
+}
+
+/**
  * @param params todo 自动提示
  */
 function bindDelayEvents(...params) {
@@ -112,7 +148,7 @@ function bindDelayEvents(...params) {
     let stid = 0
 
     function func(...args) {
-        clearTimeout(stid)
+        clearTimeout(stid) // 为了防止频繁执行设计的
         stid = setTimeout(callback.bind(this, ...args), delay)
     }
 
@@ -130,19 +166,29 @@ function bindDelayEvents(...params) {
         for (let capturEle of capturEles) {
 
             for (let eType of eTypes) {
-                capturEle.addEventListener(eType, (e, ...args) => {
-                    // e.target.matches(eles)
-                    if (new Set(capturEle.querySelectorAll(eles)).has(e.target)) {
-                        // 修改属性的私有、只读等限制
-                        Object.defineProperty(e, 'currentTarget', {writable: true})
-                        // Object.getOwnPropertyDescriptor(e, 'currentTarget')
-                        e.currentTarget = e.target
-                        // e.delegateTarget = capturEle
-                        func.call(e.target, e, ...args)
-                        // event.stopPropagation();
-                        // event.cancelBubble = bool;
+                capturEle.addEventListener(eType, (e) => {
+
+                    let pathSet = new Set(e.path)
+                    let elesSet = new Set(capturEle.querySelectorAll(eles))
+
+                    // 修改属性的私有、只读等限制
+                    Object.defineProperty(e, 'currentTarget', {writable: true})
+                    // Object.getOwnPropertyDescriptor(e, 'currentTarget')
+                    // jQuery 自己定义了一个事件类，而且没有继承 Event 类
+                    // 好处是和自带事件系统分离，两种方式互不影响
+
+                    for (let ele of elesSet) {
+                        // e.target.matches(eles)
+                        if (pathSet.has(ele)) {
+                            e.currentTarget = ele
+                            // e.delegateTarget = capturEle
+                            func.call(ele, e)
+                            // event.stopPropagation();
+                            // event.cancelBubble = bool;
+                        }
                     }
-                }, {capture: true});
+
+                }, {capture: true}); // todo 不知道这个配置有啥用，能不能自动设置 currentTarget
             }
 
         }

@@ -5,39 +5,15 @@
 <script>
   function changeType(){
 
-    $("a[href='#tab_3']").parent().removeClass('active').hide();
-    $("#tab_3").removeClass('active');
+      $(thetabs).find('[href^="#tab_"]').hide()
 
-  	if($("#type").val()==1){
-		$("a[href='#tab_1']").parent().addClass('active').show();
-		$("#tab_1").addClass('active');
-		$("a[href='#tab_2']").parent().removeClass('active').hide();
-		$("#tab_2").removeClass('active');
-	}
-	if($("#type").val()==2){
-		$("a[href='#tab_1']").parent().removeClass('active').hide();
-		$("#tab_1").removeClass('active');
-		$("a[href='#tab_2']").parent().addClass('active').show();
-		$("#tab_2").addClass('active');
-	}
-	if($("#type").val()==3){
-		$("a[href='#tab_1']").parent().show();
-		$("a[href='#tab_2']").parent().show();
-		if($("a[href='#tab_1']").parent().hasClass('active')){
-			$("#tab_1").addClass('active');
-			$("#tab_2").removeClass('active');
-		}else{
-			$("#tab_1").removeClass('active');
-			$("#tab_2").addClass('active');
-		}
+      let type = $("#type").val()
 
-	}
-    if($("#type").val()==4){
-		$("a[href='#tab_1'],a[href='#tab_2']").parent().removeClass('active').hide();
-        $("#tab_1,#tab_2").removeClass('active');
-        $("a[href='#tab_3']").parent().addClass('active').show();
-        $("#tab_3").addClass('active');
-    }
+      // 位运算，3 等于 1 OR 2
+      // 即用 3 来表示 Refund & Replacement 组合
+      for(let bit of [2, 1, 4]){
+          if(bit & type) $(thetabs).find(`[href="#tab_${bit}"]`).show().tab('show')
+      }
   }
 
   function loadorder(){
@@ -80,7 +56,8 @@
 				$("#order_sku", $("#exception_form")).val(order_sku);
 
                 rebindordersellerid.value = data.SellerId
-                setReplacementItemList(items)
+                let site = `www.${data.SalesChannel}`.toLowerCase()
+                setReplacementItemList(items, site)
 
 			}else{
 				toastr.error(redata.message);
@@ -108,9 +85,9 @@
 	});
   });
   </script>
-<form  action="{{ url('exception') }}" id="exception_form" method="POST">
+<form  action="{{ url('exception') }}" id="exception_form" novalidate method="POST">
  {{ csrf_field() }}
-    <div class="col-md-7">
+    <div class="col-lg-9">
         <div class="col-md-12">
 <div class="portlet light portlet-fit bordered ">
 	@if($errors->any())
@@ -131,7 +108,7 @@
 
     </div>
     <div class="portlet-body">
-		<div class="col-xs-12">
+		<div class="col-lg-8">
 
 
 		<div class="form-group">
@@ -219,9 +196,9 @@
 				<i class="fa fa-bookmark"></i>
 			</span>
 				<select name="type" id="type" class="form-control" >
-				<option value="3">Refund & Replacement
 				<option value="2">Replacement
 				<option value="1">Refund
+				<option value="3">Refund & Replacement
 				<option value="4">Gift Card
 				</select>
 			</div>
@@ -229,30 +206,30 @@
 		</div>
 		<div style="clear:both"></div>
         <div class="tabbable-line">
-            <ul class="nav nav-tabs ">
-                <li class="active">
-                    <a href="#tab_1" data-toggle="tab" aria-expanded="true"> Refund </a>
-                </li>
+            <ul class="nav nav-tabs" id="thetabs">
                 <li class="">
-                    <a href="#tab_2" data-toggle="tab" aria-expanded="false"> Replacement </a>
+                    <a href="#tab_1" data-toggle="tab" aria-expanded="false"> Refund </a>
+                </li>
+                <li class="active">
+                    <a href="#tab_2" data-toggle="tab" aria-expanded="true"> Replacement </a>
                 </li>
 				<li class="">
-					<a href="#tab_3" data-toggle="tab" aria-expanded="false"> Gift Card </a>
+					<a href="#tab_4" data-toggle="tab" aria-expanded="false"> Gift Card </a>
 				</li>
             </ul>
             <div class="tab-content">
 
-                <div class="tab-pane active" id="tab_1">
+                <div class="tab-pane" id="tab_1">
 
 
-					<div class="col-xs-12">
+					<div class="col-lg-8">
                         <div class="form-group">
 							<label>Refund Amount</label>
 							<div class="input-group ">
 							<span class="input-group-addon">
 								<i class="fa fa-bookmark"></i>
 							</span>
-								<input type="text" class="form-control" name="refund" id="refund" value="{{old('refund')}}" autocomplete="off" />
+								<input type="text" class="form-control" name="refund" id="refund" value="{{old('refund')}}" autocomplete="off" required />
 							</div>
 						</div>
                         <div style="clear:both;"></div>
@@ -262,8 +239,8 @@
                 </div>
 
 
-                <div class="tab-pane" id="tab_2">
-					<div class="col-xs-12">
+                <div class="tab-pane active" id="tab_2">
+					<div class="col-lg-8">
 						<div class="form-group">
 							<label>Name</label>
 							<div class="input-group ">
@@ -367,47 +344,46 @@
 								<input type="text" class="form-control" name="phone" id="phone" value="{{old('phone')}}" >
 							</div>
 						</div>
+                        <div style="clear:both;"></div>
 
+                    </div>
 
-
-
-
-
-
-
-
-
-                       <div class="form-group mt-repeater frank">
-							<div data-repeater-list="group-products" id="replacement-product-list">
-								<div data-repeater-item class="mt-repeater-item">
-									<div class="row mt-repeater-row">
-										<div class="col-md-2">
-											<label class="control-label">Item Code</label>
-											 <input type="text" class="form-control item_code" name="item_code" placeholder="item code" autocomplete="off" />
+                    <div class="col-sm-12">
+                        <div class="form-group mt-repeater frank">
+                            <div data-repeater-list="group-products" id="replacement-product-list">
+                                <div data-repeater-item class="mt-repeater-item">
+                                    <div class="row mt-repeater-row">
+                                        <div class="col-lg-2 col-md-2">
+                                            <label class="control-label">Item No.</label>
+                                            <input type="text" class="form-control item_code" name="item_code" placeholder="Item No" autocomplete="off" required />
                                             <input type="hidden" class="seller_id" name="seller_id" />
                                             <input type="hidden" class="seller_sku" name="seller_sku" />
-										</div>
-										<div class="col-md-7">
-											<label class="control-label">Seller Account and SKU</label>
-											<input type="hidden" name="title" />
-											<input type="text" class="form-control seller-sku-selector" placeholder="Seller Account and SKU" autocomplete="off" />
-										</div>
-										<div class="col-md-2">
-											<label class="control-label">Quantity</label>
-											 <input type="text" class="form-control"  name="qty" value="1" placeholder="Quantity" />
-
-										</div>
-										<div class="col-md-1">
-											<a href="javascript:;" data-repeater-delete class="btn btn-danger mt-repeater-delete">
-												<i class="fa fa-close"></i>
-											</a>
-										</div>
-									</div>
-								</div>
-							</div>
-							<a href="javascript:;" data-repeater-create class="btn btn-info mt-repeater-add">
-								<i class="fa fa-plus"></i> Add Product</a>
-						</div>
+                                            <input type="hidden" class="find_item_by" name="find_item_by" />
+                                        </div>
+                                        <div class="col-lg-6 col-md-5">
+                                            <label class="control-label">Search by Item No and select</label>
+                                            <input type="hidden" class="item_name" name="title" />
+                                            <input type="text" class="form-control seller-sku-selector" name="note" placeholder="Seller Account and SKU" autocomplete="off" required />
+                                        </div>
+                                        <div class="col-lg-2 col-md-2">
+                                            <label class="control-label">Quantity</label>
+                                            <input type="text" class="form-control"  name="qty" value="1" placeholder="Quantity" required />
+                                        </div>
+                                        <div class="col-lg-1 col-md-2">
+                                            <label class="control-label"><input type="checkbox" name="addattr" value="Returned">Returned</label>
+                                            <label class="control-label"><input type="checkbox" name="addattr" value="Urgent">Urgent</label>
+                                        </div>
+                                        <div class="col-lg-1 col-md-1">
+                                            <a href="javascript:;" data-repeater-delete class="btn btn-danger mt-repeater-delete">
+                                                <i class="fa fa-close"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <a href="javascript:;" data-repeater-create class="btn btn-info mt-repeater-add">
+                                <i class="fa fa-plus"></i> Add Product</a>
+                        </div>
                         <script id="tplStockDatalist" type="text/template">
                             <datalist id="list-${item_code}-stocks">
                                 <% for(let {seller_name,seller_id,seller_sku,stock} of stocks){ %>
@@ -415,24 +391,23 @@
                                 <% } %>
                             </datalist>
                         </script>
-                        <div style="clear:both;"></div>
                     </div>
+                    <div style="clear:both;"></div>
 
-                     <div style="clear:both;"></div>
                 </div>
 
 
-				<div class="tab-pane" id="tab_3">
+				<div class="tab-pane" id="tab_4">
 
 
-					<div class="col-xs-12">
+					<div class="col-lg-8">
 						<div class="form-group">
 							<label>Gift Amount</label>
 							<div class="input-group ">
 							<span class="input-group-addon">
 								<i class="fa fa-bookmark"></i>
 							</span>
-								<input type="text" class="form-control" name="gift_card_amount" id="gift_card_amount" value="{{old('gift_card_amount')}}" autocomplete="off" />
+								<input type="text" class="form-control" name="gift_card_amount" id="gift_card_amount" value="{{old('gift_card_amount')}}" autocomplete="off" required />
 							</div>
 						</div>
 						<div style="clear:both;"></div>
@@ -468,40 +443,57 @@
 
     let replacementItemRepeater = $replacementProductList.parent().repeater({defaultValues:{qty:1}})
 
-    function setReplacementItemList(items){
+    // 将原订单SKU填充到重发列表，并带出库存信息
+    function setReplacementItemList(items, site){
         replacementItemRepeater.setList(items.map(i => {
             return {
-                seller_id: i.SellerId,
-                seller_sku: i.SellerSKU,
-                title: i.Title,
+                find_item_by: JSON.stringify({
+                    site,
+                    asin: i.ASIN,
+                    seller_id: i.SellerId,
+                    seller_sku: i.SellerSKU,
+                }),
                 qty: i.QuantityOrdered
             }
         }));
 
         $replacementProductList.find('.item_code').each((i, ele) => {
-            handleItemCodeSearch.call(ele, {currentTarget: ele})
+
+            let $findBy = $(ele).siblings('.find_item_by')
+            let eventData = JSON.parse($findBy.val())
+            $findBy.remove()
+            eventData.currentTarget = ele
+
+            handleItemCodeSearch.call(ele, eventData)
         })
     }
 
+    /**
+     * 通过 item_code (手动输入)
+     * 或者 seller_id + seller_sku (FBA发货)
+     * 或者 site + seller_sku + asin (FBM发货)
+     * 把物料的库存列表带出来(包括fba、fbm)以供选择重发
+     */
     function handleItemCodeSearch(e) {
 
-        let item_code = e.currentTarget.value.trim()
+        let $item_code = $(e.currentTarget)
 
-        let $sellerSku = $(e.currentTarget).closest('.mt-repeater-row').find('.seller-sku-selector')
+        let item_code = $item_code.val().trim()
 
-        if ($sellerSku.attr('list') === `list-${item_code}-stocks`) return
+        let $sellerSkuSelector = $item_code.closest('.mt-repeater-row').find('.seller-sku-selector')
 
-        $sellerSku.val('').change().removeAttr('list').data('skusInfo', null).next('datalist').remove()
+        if ($sellerSkuSelector.attr('list') === `list-${item_code}-stocks`) return
+
+        $sellerSkuSelector.val('').change().removeAttr('list').data('skusInfo', null).next('datalist').remove()
 
         if (!item_code) {
 
-            var seller_id = $(this).next().val()
-            var seller_sku = $(this).next().next().val()
+            var {seller_id, seller_sku, site, asin} = e
 
-            if (seller_id && seller_sku) {
-                var postData = {seller_id, seller_sku}
+            if (asin) {
+                var postData = {seller_id, seller_sku, site, asin}
             } else {
-                return $sellerSku.attr('placeholder', 'Seller Account and SKU')
+                return $sellerSkuSelector.attr('placeholder', 'Seller Account and SKU')
             }
 
         } else {
@@ -517,31 +509,31 @@
 
                 if (!stocks.length) {
                     if(seller_id && seller_sku){
-                        e.currentTarget.value = 'no match'
-                        $sellerSku.val(`${seller_id} | ${seller_sku}`)
+                        $item_code.val('no match')
+                        $sellerSkuSelector.val(`${seller_id} | ${seller_sku}`)
                     } else {
-                        $sellerSku.attr('placeholder', 'no match')
+                        $sellerSkuSelector.attr('placeholder', 'no match')
                     }
                     return
                 }
 
                 if (false === stocks[0]) {
                     let errmsg = stocks[1]
-                    $sellerSku.attr('placeholder', errmsg)
+                    $sellerSkuSelector.attr('placeholder', errmsg)
                     return
                 }
 
                 // console.log(stocks)
                 if(!item_code){
                     item_code = stocks[0].item_code
-                    e.currentTarget.value = item_code
+                    $item_code.val(item_code)
                 }
 
                 stocks.sort((a, b) => {
                     return a.stock < b.stock ? 1 : (a.stock > b.stock ? -1 : 0)
                 })
 
-                $sellerSku
+                $sellerSkuSelector
                     .after(tplRender(tplStockDatalist, {stocks, item_code}))
                     .attr('list', `list-${item_code}-stocks`)
                     .attr('placeholder', 'please select ...')
@@ -549,23 +541,23 @@
 
                 let skusInfo = rows2object(stocks, ['seller_name', 'seller_sku', ' | '])
 
-                $sellerSku.data('skusInfo', skusInfo)
+                $sellerSkuSelector.data('skusInfo', skusInfo)
 
-                var stock = null
+                let selected = null
 
                 if (1 === stocks.length && stocks[0].stock > 0) {
-                    stock = stocks[0]
+                    selected = stocks[0]
                 } else {
                     let theSellerId = rebindordersellerid.value.trim()
-                    for(let s of stocks){
-                        if(s.seller_id === theSellerId && s.stock) {
-                            stock = s
+                    for(let stock of stocks){
+                        if(stock.seller_id === theSellerId && stock.stock) {
+                            selected = stock
                             break
                         }
                     }
                 }
 
-                if(stock) $sellerSku.val(`${stock.seller_name} | ${stock.seller_sku}`).change()
+                if(selected) $sellerSkuSelector.val(`${selected.seller_name} | ${selected.seller_sku}`).change()
 
             }
         })
@@ -575,14 +567,15 @@
 
         XFormHelper.autoTrim('#replacement-product-list', 'input')
 
+        // 更新隐藏表单
         $replacementProductList.on('change', '.seller-sku-selector', function (e) {
 
             let skusInfo = $(this).data('skusInfo') || {}
             let info = skusInfo[this.value]
 
-            if(info){
+            let $repeatRow = $(this).closest('.mt-repeater-row')
 
-                let $repeatRow = $(this).closest('.mt-repeater-row')
+            if(info){
 
                 $repeatRow.find('.seller_id').val(info.seller_id)
                 $repeatRow.find('.seller_sku').val(info.seller_sku)
@@ -590,11 +583,38 @@
                 if(info.stock <= 0){
                     alert('The stock of this item is Zero.');
                 }
+            } else {
+                this.value = ''
+                $repeatRow.find('.seller_id').val('')
+                $repeatRow.find('.seller_sku').val('')
+			}
+
+            let item_name = info ? info.item_name : ''
+
+            $repeatRow.find('.item_name').val(item_name).prev().html(item_name||'Search by Item No and select')
+
+        })
+
+        $(exception_form).submit(function (e) {
+
+            let type = $('#type').val()
+
+            for(let input of $(this).find('[name]')){
+
+                let tabID = $(input).closest('.tab-pane').attr('id')
+
+                if(tabID){
+                    if(!(type & tabID.substr(-1))) continue
+                }
+
+                // if($.contains($replacementProductList[0], input)){ }
+
+                if(!input.reportValidity()) {
+                    toastr.error('The form is not complete yet.')
+                    return false
+                }
             }
 
-            let label = info ? info.item_name : 'Seller Account and SKU'
-
-            $(this).prev().val(info ? info.item_name : '').prev().html(label)
         })
 
         bindDelayEvents('#replacement-product-list', 'change keyup paste', '.item_code', handleItemCodeSearch);

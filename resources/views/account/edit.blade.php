@@ -69,6 +69,34 @@
                                 <input type="text" class="form-control" name="account_sellerid" id="account_sellerid" value="{{$seller_account['account_sellerid']}}" required>
                             </div>
                         </div>
+						
+						<div class="form-group">
+                            <label>Account Signature</label>
+                            <div class="input-group">
+                                @include('UEditor::head')
+
+                                    <!-- 加载编辑器的容器 -->
+                                    <script id="signature_content" name="signature" type="text/plain">
+									<?php echo $seller_account['signature']; ?>
+									</script>
+                                    <!-- 实例化编辑器 -->
+                                    <script type="text/javascript">
+                                        var ue = UE.getEditor('signature_content',{toolbars: [[
+            'undo', 'redo', '|',
+            'bold', 'italic', 'underline', 'fontborder', 'strikethrough', 'removeformat', 'formatmatch', 'autotypeset', 'blockquote', 'pasteplain', '|', 'forecolor', 'backcolor', 'insertorderedlist', 'insertunorderedlist', 'selectall', 'cleardoc', '|',     
+            'fontfamily', 'fontsize', '|',
+             'touppercase', 'tolowercase', '|',
+            'link', 'unlink', 'anchor', '|', 'imagenone', 'imageleft', 'imageright', 'imagecenter', '|',
+            'horizontal', 'date', 'time', 'spechars', 'snapscreen', 'wordimage', '|',
+            'inserttable', 'deletetable', 'insertparagraphbeforetable', 'insertrow', 'deleterow', 'insertcol', 'deletecol', 'mergecells', 'mergeright', 'mergedown', 'splittocells', 'splittorows', 'splittocols', 'charts', '|',
+        ]]});
+                                        ue.ready(function() {
+                                            ue.execCommand('serverparam', '_token', '{{ csrf_token() }}');//此处为支持laravel5 csrf ,根据实际情况修改,目的就是设置 _token 值.
+                                        });
+                               		 </script>
+                            </div>
+                        </div>
+						
                         <div class="form-group">
                             <label>Receive Email</label>
                             <div class="input-group col-md-6">

@@ -1016,5 +1016,14 @@ var App = function() {
 <!-- END THEME LAYOUT SCRIPTS -->
 
 jQuery(document).ready(function() {    
-   App.init(); // init metronic core componets
+	App.init(); // init metronic core componets
+	$(".form_advance_datetime").datetimepicker({
+		isRTL: App.isRTL(),
+		format: "yyyy-mm-dd hh:ii",
+		autoclose: true,
+		todayBtn: true,
+		startDate: "",
+		pickerPosition: (App.isRTL() ? "bottom-right" : "bottom-left"),
+		minuteStep: 10
+	});
 });

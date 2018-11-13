@@ -51,14 +51,22 @@ class SendEmails extends Command
     public function handle()
     {
 		set_time_limit(0);
-        $count = $smtp_array = array();
+        $count = $smtp_array = $signature_arrays = array();
         $command = $this;
         $smtp_config =  Accounts::whereNotNull('smtp_host')->whereNotNull('smtp_port')->whereNotNull('smtp_ssl')->get();
 		
         foreach($smtp_config as $smtp_value){
             $smtp_arrays[strtolower(trim($smtp_value->account_email))] = array('password'=>$smtp_value->password,'smtp_host'=>$smtp_value->smtp_host,'smtp_port'=>$smtp_value->smtp_port,'smtp_ssl'=>$smtp_value->smtp_ssl);
         }
-        $tasks = Sendbox::where('status','Waiting')->where('error_count','<',1)->orderBy('from_address','asc')->take(100)->get();
+		
+		$signature_config =  Accounts::whereNotNull('signature')->get();
+		foreach($signature_config as $signature_value){
+			$signature_arrays[strtolower(trim($signature_value->account_email))] = $signature_value->signature;  
+		}
+		
+		
+		
+        $tasks = Sendbox::where('status','Waiting')->where('plan_date','<',strtotime(date('Y-m-d H:i:s')))->where('error_count','<',1)->orderBy('from_address','asc')->take(100)->get();
 		$this->run_email = '';
 		foreach ($tasks as $task) {
 
@@ -71,7 +79,7 @@ class SendEmails extends Command
 				$from=trim($task->from_address);
 				$to = trim($task->to_address);
 				$subject=$task->subject;
-				$content=preg_replace('/(?<=[\'="])\/uploads\/ueditor\/php\/upload/', url('/uploads/ueditor/php/upload'), $task->text_html);
+				$content=preg_replace('/(?<=[\'="])\/uploads\/ueditor\/php\/upload/', url('/uploads/ueditor/php/upload'), $task->text_html).array_get($signature_arrays,strtolower(trim($task->from_address)));
 				$smtp_array= array_get($smtp_arrays,strtolower(trim($task->from_address)))?array_get($smtp_arrays,strtolower(trim($task->from_address))):array();
 
 				if($this->run_email!=$from){

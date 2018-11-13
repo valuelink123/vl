@@ -92,7 +92,8 @@
   </script>
 <form  action="{{ url('exception/'.$exception['id']) }}" id="exception_form" method="POST" enctype="multipart/form-data">
 <?php 
-if($exception['user_id'] == Auth::user()->id  && $exception['process_status'] =='cancel'){
+$mcf_order_str='';
+if(($exception['user_id'] == Auth::user()->id || Auth::user()->admin || in_array($exception['group_id'],array_get($mygroups,'manage_groups',array()))) && $exception['process_status'] =='cancel'){
 	$disable='';
 }else{
 	$disable='disabled';
@@ -367,24 +368,33 @@ if($exception['user_id'] == Auth::user()->id  && $exception['process_status'] ==
 							<div data-repeater-list="group-products">
 								<?php 
 								$products_details = array_get($replace,'products',array());
+								$replacement_order_ids=[];
 								if(is_array($products_details)){
-								foreach($products_details as $detail) { ?>
+								
+								foreach($products_details as $detail) { 
+									$replacement_order_ids[]=array_get($detail,'replacement_order_id');
+									$addattr=array_get($detail,'addattr',[]);
+								?>
 								<div data-repeater-item class="mt-repeater-item">
 									<div class="row mt-repeater-row">
 										<div class="col-md-3">
-											<label class="control-label">Replaced SKU</label>
-											 <input type="text" {{$disable}} class="form-control"  name="sku" placeholder="SKU"  value="{{array_get($detail,'sku')}}">
+											<label class="control-label">Item No.</label>
+											 <input type="text" {{$disable}} class="form-control"  name="sku"  value="{{array_get($detail,'item_code')}}">
 								
 										</div>
 										<div class="col-md-5">
-											<label class="control-label">Replaced Product/Accessories Name</label>
-											 <input type="text" {{$disable}} class="form-control"  name="title" placeholder="title" value="{{array_get($detail,'title')}}" >
+											<label class="control-label">{{array_get($detail,'title')}}</label>
+											 <input type="text" {{$disable}} class="form-control"  name="title" value="{{array_get($detail,'note')??array_get($detail,'seller_sku')??array_get($detail,'sku')}}" >
 								
 										</div>
 										<div class="col-md-2">
 											<label class="control-label">Quantity</label>
-											 <input type="text" {{$disable}} class="form-control"  name="qty" placeholder="Quantity" value="{{array_get($detail,'qty')}}">
+											 <input type="text" {{$disable}} class="form-control"  name="qty" value="{{array_get($detail,'qty')}}">
 								
+										</div>
+										<div class="col-md-2">
+											<label class="control-label"><input type="checkbox" name="addattr" {{$disable}} value="Returned" <?php if(in_array('Returned',$addattr)) echo "checked";?> >Returned</label>
+											<label class="control-label"><input type="checkbox" name="addattr" {{$disable}} value="Urgent" <?php if(in_array('Urgent',$addattr)) echo "checked";?>>Urgent</label>
 										</div>
 										<div class="col-md-1">
 											<a href="javascript:;" data-repeater-delete class="btn btn-danger mt-repeater-delete"  {{$disable}}>
@@ -434,7 +444,7 @@ if($exception['user_id'] == Auth::user()->id  && $exception['process_status'] ==
 
 </div>
 <?php 
-if($exception['user_id'] == Auth::user()->id  && $exception['process_status'] =='cancel'){ ?>
+if(($exception['user_id'] == Auth::user()->id || Auth::user()->admin || in_array($exception['group_id'],array_get($mygroups,'manage_groups',array()))) && $exception['process_status'] =='cancel'){ ?>
 <div class="form-actions">
 	<div class="row">
 		<div class="col-md-offset-4 col-md-8">
@@ -507,12 +517,21 @@ if((Auth::user()->admin || in_array($exception['group_id'],array_get($mygroups,'
 				<?php } ?>
 			</div>
 		</div>
+
+		<div class="form-group">
+			<label>Replacement Order Id:</label>
+			@foreach ($replacement_order_ids as $replacement_order_id)
+			<div class="input-group "><input type="text" class="form-control form-filter" name="replacement_order_id[]"  value="{{$replacement_order_id}}"  {{$disable}}></div>
+			@endforeach
+			<BR />
+			@foreach ($mcf_orders as $mcf_order)
+				{{$mcf_order->SellerFulfillmentOrderId}} : {{$mcf_order->TrackingNumber}} {{$mcf_order->CarrierCode}}
+			@endforeach
+		</div>
 		<?php if($last_inboxid){ ?>
 		<div class="form-group">
 		<div class="btn-group">
-			<a href="{{ url('/inbox/'.$last_inboxid)}}" target="_blank" > See Email History
-				
-			</a>
+			<a href="{{ url('/inbox/'.$last_inboxid)}}" target="_blank" > See Email History</a>
 		</div>
 		</div>
 		<?php 

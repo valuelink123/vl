@@ -67,6 +67,9 @@ return [
             'prefix' => '',
             'strict' => false,
             'engine' => null,
+            'options' => array(
+                // PDO::ATTR_STRINGIFY_FETCHES => TRUE
+            )
         ],
 
         'order' => [
@@ -83,8 +86,8 @@ return [
             'strict' => true,
             'engine' => null,
         ],
-		
-		 'review' => [
+
+        'review' => [
             'driver' => 'mysql',
             'host' => env('DB_REVIEW_HOST', '127.0.0.1'),
             'port' => env('DB_REVIEW_PORT', '3306'),
@@ -98,9 +101,9 @@ return [
             'strict' => false,
             'engine' => null,
         ],
-		
-		
-		'review_new' => [
+
+
+        'review_new' => [
             'driver' => 'mysql',
             'host' => env('DB_REVIEW_NEW_HOST', '127.0.0.1'),
             'port' => env('DB_REVIEW_NEW_PORT', '3306'),

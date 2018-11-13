@@ -46,6 +46,10 @@ trait DataTables {
         if (!empty($req->input('search.ands'))) {
             $ands = $req->input('search.ands');
             $where = [];
+
+            if (!empty($ands['date_from'])) $where[] = 't1.created_at >= "' . addslashes($ands['date_from']) . '"';
+            if (!empty($ands['date_to'])) $where[] = 't1.created_at <= "' . addslashes($ands['date_to']) . '"';
+
             foreach ($ands as $field => $value) {
                 if (empty($andsMap[$field])) continue;
                 if (empty($value)) continue;

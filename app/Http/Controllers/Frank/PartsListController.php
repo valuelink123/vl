@@ -7,6 +7,7 @@
 
 namespace App\Http\Controllers\Frank;
 
+use App\Asin;
 use App\Classes\SapRfcRequest;
 use App\Exceptions\DataInputException;
 use Illuminate\Http\Request;
@@ -124,8 +125,11 @@ class PartsListController extends Controller {
      */
     public function getStockList(Request $req) {
 
-        if (empty($req->input('item_code'))) {
+        $item_code = $req->input('item_code');
 
+        if (empty($item_code)) {
+
+            // 查 fba
             $result = DB::table('fba_stock')
                 ->select('item_code')
                 ->where('seller_id', $req->input('seller_id'))
@@ -133,19 +137,30 @@ class PartsListController extends Controller {
                 ->whereNotNull('item_code')
                 ->get();
 
+            // fba 查不到，再查 fbm
             if ($result->isEmpty()) {
-                // throw new DataInputException('item code not found', 1025);
-                return [];
+
+                $asinRow = Asin::select('item_no')
+                    ->where('site', $req->input('site'))
+                    ->where('asin', $req->input('asin'))
+                    ->where('sellersku', $req->input('seller_sku'))->first();
+
+                if (empty($asinRow)) {
+                    return [];
+                } else {
+                    $item_code = $asinRow->item_no;
+                }
+
+            } else {
+                $item_code = $result[0]->item_code;
             }
 
-            $item_code = $result[0]->item_code;
-        } else {
-            $item_code = $req->input('item_code');
+
         }
 
 
         if (empty($item_code) || !preg_match('#^[A-z0-9]+$#', $item_code)) {
-            throw new DataInputException("Wrong Item Code: {$item_code}");
+            throw new DataInputException("Wrong Item No: {$item_code}");
         }
 
         $rows = $this->queryRows(
@@ -179,6 +194,9 @@ class PartsListController extends Controller {
 
         foreach ($rows as &$row) {
             // 全部转成 INT，避免 JS 数字字符串的陷阱(比较、加法会出麻烦)
+            // 通过配置 PDO、MYSQLI 可以默认返回数字
+            // PDO::ATTR_STRINGIFY_FETCHES
+            // MYSQLI_OPT_INT_AND_FLOAT_NATIVE
             $row['stock'] = (int)$row['stock'];
         }
 

@@ -76,6 +76,7 @@ trait Migration {
     public function dropColumnIfEmpty($table, $column) {
         if (!$this->isTableExists($table)) return;
         if (empty($this->getColumnInfo($table, $column))) return;
+        // todo force mode -arg
         if (!$this->isColumnEmpty($table, $column)) throw new \Exception("You may Backup and Empty Column $table.$column before dropping.");
         $this->statement("ALTER TABLE `$table` DROP COLUMN `$column`");
     }

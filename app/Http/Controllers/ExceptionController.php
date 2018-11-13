@@ -7,7 +7,7 @@ use App\Inbox;
 use App\Sendbox;
 use App\Accounts;
 use Illuminate\Support\Facades\Session;
-
+use App\Asin;
 use App\User;
 use App\Exception;
 use App\Group;
@@ -98,7 +98,7 @@ class ExceptionController extends Controller
             $customers = $customers->where('date','<=',$_REQUEST['date_to'].' 23:59:59');
         }
 		$customersLists =  $customers->orderBy('date','desc')->get()->toArray();
-		$arrayData = array();
+		$arrayData = $arrayAmazon = $arraySap = array();
 		$headArray[] = 'Account';
 		$headArray[] = 'Amazon OrderID';
 		$headArray[] = 'Type';
@@ -118,9 +118,14 @@ class ExceptionController extends Controller
 		$headArray[] = 'PostalCode';
 		$headArray[] = 'Country';
 		$headArray[] = 'Phone';
+		$headArray[] = 'Reson';
 		$headArray[] = 'Operator';
 		$headArray[] = 'Group';
 		$headArray[] = 'Creator';
+		
+		$arrayAmazon[] =['Account','Returned/Urgent','MerchantFulfillmentOrderID','DisplayableOrderID','DisplayableOrderDate','MerchantSKU','Quantity','MerchantFulfillmentOrderItemID','GiftMessage','DisplayableComment','PerUnitDeclaredValue','DisplayableOrderComment','DeliverySLA','AddressName','AddressFieldOne','AddressFieldTwo','AddressFieldThree','AddressCity','AddressCountryCode','AddressStateOrRegion','AddressPostalCode','AddressPhoneNumber','NotificationEmail','FulfillmentAction','MarketplaceID'];
+		
+		$arraySap[] =['Returned/Urgent','平台编号','站点','平台订单号','售达方','订单类型','订单交易号','付款日期','付款交易ID(不能重复)','买家ID','买家姓名','国家代码','城市名','州/省','街道1','街道2','邮编','邮箱','电话1','成交费','货币','佣金','货币','订单总价','货币','实际运输方式','平台订单号','站点','行号','SAP物料号','数量','工厂','仓库','行项目ID','帖子ID','帖子标题','销售员编号','行交易ID','标记完成'];
 
 		$arrayData[] = $headArray;
 		$users=$this->getUsers();
@@ -142,15 +147,95 @@ class ExceptionController extends Controller
 				$replacements = unserialize($customersList['replacement']);
 				$products = array_get($replacements,'products',array());
 				if(is_array($products)){
-				foreach( $products as $product){
-					$operate.= ($product['seller_sku']??$product['sku']??'').' ( '.array_get($product,'title').' ) * '.array_get($product,'qty').'; ';
-				}
+					$sap_line_num=0;
+					foreach( $products as $product){
+						$sap_line_num+=10;
+						$operate.= ($product['seller_sku']??$product['note']??$product['sku']??'').' ( '.(array_get($product,'item_code')??array_get($product,'title')??'').' ) * '.array_get($product,'qty').'; ';
+						if($customersList['process_status']=='submit'){
+						if(array_get($product,'seller_id') && array_get($accounts,array_get($product,'seller_id'))){
+							$arrayAmazon[] =[
+								array_get($accounts,array_get($product,'seller_id')),
+								implode(', ',array_get($product,'addattr',[])),
+								array_get($product,'replacement_order_id'),
+								array_get($product,'replacement_order_id'),
+								array_get($customersList,'date'),
+								array_get($product,'seller_sku'),
+								array_get($product,'qty'),
+								array_get($product,'item_code'),
+								'',
+								'',
+								'',
+								'Thank you for the order.',
+								'Standard',
+								array_get($replacements,'shipname'),
+								array_get($replacements,'address1'),
+								array_get($replacements,'address2'),
+								array_get($replacements,'address3'),
+								array_get($replacements,'city'),
+								array_get($replacements,'countrycode'),
+								array_get($replacements,'state'),
+								array_get($replacements,'postalcode'),
+								'',
+								'',
+								'',
+								''
+							];
+						}
+						
+						if($sap_sku_info = Asin::where('sellersku',array_get($product,'seller_sku'))->first()){
+							$sap_sku_info = $sap_sku_info->toArray();
+						}else{
+							$sap_sku_info=[];
+						}
+						
+						$arraySap[] =[
+							implode(', ',array_get($product,'addattr',[])),
+							'11',
+							array_get($sap_sku_info,'sap_site_id'),
+							$customersList['amazon_order_id'],
+							array_get($sap_sku_info,'sap_store_id'),
+							'ZRR1',
+							'',
+							'',
+							'',
+							'',
+							array_get($replacements,'shipname'),
+							array_get($replacements,'countrycode'),
+							array_get($replacements,'city'),
+							array_get($replacements,'state'),
+							array_get($replacements,'address1'),
+							array_get($replacements,'address2'),
+							array_get($replacements,'postalcode'),
+							'',
+							'',
+							'',
+							'',
+							'',
+							'',
+							'',
+							'',
+							array_get($sap_sku_info,'sap_shipment_id'),
+							$customersList['amazon_order_id'],
+							array_get($sap_sku_info,'sap_site_id'),
+							$sap_line_num,
+							array_get($product,'item_code'),
+							array_get($product,'qty'),
+							array_get($sap_sku_info,'sap_warehouse_id'),
+							array_get($sap_sku_info,'sap_factory_id'),
+							'',
+							'',
+							'',
+							array_get($sap_sku_info,'sap_seller_id'),
+							'',
+							''
+						];
+						}
+					}
 				}
 			}
             if($customersList['type']==4) $operate.= 'Gift Card : '.$customersList['gift_card_amount'].PHP_EOL;
 
             $arrayData[] = array(
-               
 				array_get($accounts,$customersList['sellerid']),
                 $customersList['amazon_order_id'],
                 array_get($type_list,$customersList['type']),
@@ -170,7 +255,7 @@ class ExceptionController extends Controller
 				array_get($replacements,'postalcode'),
 				array_get($replacements,'countrycode'),
 				array_get($replacements,'phone'),
-
+				$customersList['request_content'],
 				array_get($users,$customersList['process_user_id'])?array_get($users,$customersList['process_user_id']):array_get($groupleaders,$customersList['group_id']),
                 array_get($groups,$customersList['group_id'].'.group_name'),
 				array_get($users,$customersList['user_id'])
@@ -178,8 +263,9 @@ class ExceptionController extends Controller
 		}
 
 		if($arrayData){
-			$spreadsheet = new Spreadsheet();
 
+			$spreadsheet = new Spreadsheet();
+			
 			$spreadsheet->getActiveSheet()
 				->fromArray(
 					$arrayData,  // The data to set
@@ -187,6 +273,20 @@ class ExceptionController extends Controller
 					'A1'         // Top left coordinate of the worksheet range where
 								 //    we want to set these values (default is A1)
 				);
+			$myWorkSheet = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($spreadsheet, 'Replacement For Amazon');
+			$spreadsheet->addSheet($myWorkSheet, 1)->fromArray(
+						$arrayAmazon,  // The data to set
+						NULL,        // Array values with this value will not be set
+						'A1'         // Top left coordinate of the worksheet range where
+									 //    we want to set these values (default is A1)
+					);
+			$myWorkSheet = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($spreadsheet, 'Replacement For SAP');
+			$spreadsheet->addSheet($myWorkSheet, 2)->fromArray(
+						$arraySap,  // The data to set
+						NULL,        // Array values with this value will not be set
+						'A1'         // Top left coordinate of the worksheet range where
+									 //    we want to set these values (default is A1)
+					);
 			header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');//告诉浏览器输出07Excel文件
 			header('Content-Disposition: attachment;filename="Export_'.array_get($_REQUEST,'ExportType').'.xlsx"');//告诉浏览器输出浏览器名称
 			header('Cache-Control: max-age=0');//禁止缓存
@@ -252,8 +352,22 @@ class ExceptionController extends Controller
 	
 		$last_inbox = Inbox::where('amazon_seller_id',array_get($rule,'sellerid'))->where('amazon_order_id',array_get($rule,'amazon_order_id'))->orderBy('date','desc')->first();
 		if($last_inbox) $last_inboxid= $last_inbox->id;
+		$replacement_order_ids=[];
+		if($rule['type']==2 || $rule['type']==3){
+			$replacements = unserialize($rule['replacement']);
+			$products = array_get($replacements,'products',array());
+			if(is_array($products)){
+				foreach( $products as $product){
+					$replacement_order_ids[]=array_get($product,'replacement_order_id');
+				}
+			}
+		}	
+					
+		$mcf_orders = DB::connection('order')->table('amazon_mcf_shipment_package')->whereIn('SellerFulfillmentOrderId',$replacement_order_ids)->get();
 		
-        return view('exception/edit',['exception'=>$rule,'groups'=>$this->getGroups(),'mygroups'=>$this->getUserGroup(),'sellerids'=>$this->getSellerIds(),'last_inboxid'=>$last_inboxid]);
+		if($last_inbox) $last_inboxid= $last_inbox->id;
+		
+        return view('exception/edit',['exception'=>$rule,'groups'=>$this->getGroups(),'mygroups'=>$this->getUserGroup(),'sellerids'=>$this->getSellerIds(),'last_inboxid'=>$last_inboxid,'mcf_orders'=>$mcf_orders]);
     }
 
     public function update(Request $request,$id)
@@ -267,6 +381,21 @@ class ExceptionController extends Controller
 			$exception->process_status = $request->get('process_status');
 			$exception->process_date = date('Y-m-d H:i:s');
 			$exception->process_user_id = intval(Auth::user()->id);
+			if($exception->type==2 || $exception->type==3){
+				$replacements = unserialize($exception->replacement);
+				$products=[];
+				$products_arr = array_get($replacements,'products',array());
+				if(is_array($products_arr)){
+					$id_add=0;
+					foreach( $products_arr as $product_arr){
+						$product_arr['replacement_order_id']=$request->input('replacement_order_id.'.$id_add);	
+						$products[]=$product_arr;
+						$id_add++;
+					}
+				}
+				$replacements['products']=$products;
+				$exception->replacement =  serialize($replacements);
+			}
 			$file = $request->file('importFile');  
   			if($file){
 				if($file->isValid()){  
@@ -313,6 +442,20 @@ class ExceptionController extends Controller
 			}
 	
 			if( $exception->type == 2 || $exception->type == 3){
+				
+				$products=[];
+				$products_arr = $request->get('group-products');
+	
+				$id_add=0;
+				foreach($products_arr as $product_arr){
+					$id_add++;
+					if(array_get($product_arr,'seller_id')==$request->get('rebindordersellerid')){
+						$product_arr['replacement_order_id']=$request->get('rebindorderid').'-0'.$id_add;
+					}else{
+						$product_arr['replacement_order_id']=substr($request->get('rebindorderid'),4).'-0'.$id_add;	
+					}		
+					$products[]=$product_arr;
+				}
 				$exception->replacement = serialize(
 				array(
 					'shipname'=>$request->get('shipname'),
@@ -326,7 +469,7 @@ class ExceptionController extends Controller
 					'postalcode'=>$request->get('postalcode'),
 					'countrycode'=>$request->get('countrycode'),
 					'phone'=>$request->get('phone'),
-					'products'=>$request->get('group-products'),
+					'products'=>$products,
 				));
 			}else{
 				$exception->replacement = '';
@@ -525,7 +668,6 @@ class ExceptionController extends Controller
 
 	public function store(Request $request)
     {
-
         $this->validate($request, [
 			'group_id' => 'required|string',
             'name' => 'required|string',
@@ -558,6 +700,19 @@ class ExceptionController extends Controller
         }
 
 		if( $exception->type == 2 || $exception->type == 3){
+			$products=[];
+			$products_arr = $request->get('group-products');
+			$id_add=0;
+			foreach($products_arr as $product_arr){
+				$id_add++;
+				if(array_get($product_arr,'seller_id')==$request->get('rebindordersellerid')){
+					$product_arr['replacement_order_id']=$request->get('rebindorderid').'-0'.$id_add;
+				}else{
+					$product_arr['replacement_order_id']=substr($request->get('rebindorderid'),4).'-0'.$id_add;	
+				}		
+				$products[]=$product_arr;
+			}
+			
 			$exception->replacement = serialize(
 			array(
 				'shipname'=>$request->get('shipname'),
@@ -571,7 +726,7 @@ class ExceptionController extends Controller
 				'postalcode'=>$request->get('postalcode'),
 				'countrycode'=>$request->get('countrycode'),
 				'phone'=>$request->get('phone'),
-				'products'=>$request->get('group-products'),
+				'products'=>$products,
 			));
 		}else{
 			$exception->replacement = '';
