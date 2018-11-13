@@ -55,9 +55,6 @@ class GetAwsInfo extends Command
             'A1AM78C64UM0Y8'=>3,
             'ATVPDKIKX0DER'=>1
         );
-        //获取数据开始日期
-        $date_from = date('Y-m-d',strtotime('-2days'));
-        $date_to = date('Y-m-d',strtotime('-1day'));
         if(isset($accounts) && !empty($accounts))
         {
             foreach($accounts as $account)
@@ -67,11 +64,15 @@ class GetAwsInfo extends Command
                 $date = DB::select('select * from aws_report_time where seller_id=:seller_id and marketplace_id=:marketplace_id limit 1',['seller_id'=>$account->SellerId,'marketplace_id'=>$account->MarketPlaceId]);
                 if(isset($date) && !empty($date))
                 {
+                    //获取数据开始日期
                     $date_from = $date[0]->date;
                     $date_to = date('Y-m-d',strtotime($date_from) + 3600*24);
+                }else{
+                    //获取数据开始日期
+                    $date_from = date('Y-m-d',strtotime('-2days'));
+                    $date_to = date('Y-m-d',strtotime('-1day'));
                 }
                 $seller_id=$account->SellerId;
-
                 //从CCP获取数据
                 $reports = DB::connection("ccp")->select(
                     "select ppc_campaigns.name as campaign_name,ppc_ad_groups.name as ad_group,ppc_reports.date,sum(ppc_reports.cost) as cost,
