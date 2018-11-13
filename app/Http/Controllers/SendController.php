@@ -173,8 +173,8 @@ class SendController extends Controller
 					$sendbox = new Sendbox;
 				}
 				$sendbox->user_id = intval(Auth::user()->id);
-				$sendbox->from_address = $request->get('from_address');
-				$sendbox->to_address = $to_address;
+				$sendbox->from_address = trim($request->get('from_address'));
+				$sendbox->to_address = trim($to_address);
 				$sendbox->subject = $request->get('subject');
 				$sendbox->text_html = $request->get('content');
 				$sendbox->date = date('Y-m-d H:i:s');
