@@ -136,6 +136,10 @@
 
         $("#thetabletoolbar select[multiple]").chosen()
 
+        $(thetabletoolbar).change(e => {
+            dtApi.ajax.reload()
+        })
+
         let $theTable = $(thetable)
 
         $theTable.on('preXhr.dt', (e, settings, data) => {
