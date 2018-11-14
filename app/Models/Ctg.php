@@ -14,6 +14,7 @@ use App\User;
 use Illuminate\Database\Eloquent\Model;
 
 class Ctg extends Model {
+    protected $primaryKey = 'order_id';
     protected $table = 'ctg';
     // protected $guarded = ['id']; // 黑名单模式
     protected $fillable = ['order_id', 'gift_sku', 'name', 'email', 'phone', 'address', 'note', 'rating'];

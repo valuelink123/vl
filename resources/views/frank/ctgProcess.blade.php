@@ -74,28 +74,28 @@
                         <form id="thewizard" novalidate>
                             <ul>
                                 <li>
-                                    <a href="#step-1">留评确认<br/>
-                                        <small>确认客户是否留评</small>
+                                    <a href="#step-1">Confirm Review<br/>
+                                        <small>if the customer has left a review</small>
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#step-2">发货<br/>
-                                        <small>确认是否已发货</small>
+                                    <a href="#step-2">Arrange shipment<br/>
+                                        <small>if the product has been shipped out</small>
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#step-3">收货确认<br/>
-                                        <small>确认客户是否已收货</small>
+                                    <a href="#step-3">Delivery confirmation<br/>
+                                        <small>if the customer has received the item</small>
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#step-4">引导留评<br/>
-                                        <small>跟进客户留评</small>
+                                    <a href="#step-4">Lead to leave review<br/>
+                                        <small>if the customer hasn't</small>
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#step-5">再营销<br/>
-                                        <small>再营销为多次循环过程</small>
+                                    <a href="#step-5">Re-SG<br/>
+                                        <small>it is a cyclic process</small>
                                     </a>
                                 </li>
                             </ul>
@@ -354,6 +354,15 @@
 
     <script type="text/javascript">
 
+        // 不使用数字作为status，以备流程有增删改动
+        let statusDict = {
+            0: 'Confirm Review',
+            1: 'Arrange Shipment',
+            2: 'Delivery Confirmation',
+            3: 'Lead To Leave Review',
+            4: 'Re-SG'
+        }
+
         $('#ctg-info > form').submit(function () {
 
             postByJson(location.href, this).then(arr => {
@@ -371,8 +380,10 @@
 
             let $thewizard = $('#thewizard')
 
+            let current_index = rows2object(Object.keys(statusDict).map(i => [i, statusDict[i]]), 1, 0)["{!! $ctgRow['status'] !!}"]
+
             $thewizard.smartWizard({
-                selected: parseInt(steps.current_index) || 0, // bug 传数字字符串就麻烦了
+                selected: parseInt(current_index) || 0, // bug 传数字字符串就麻烦了
                 theme: 'arrows',
                 useURLhash: false,
                 keyNavigation: false,
@@ -407,21 +418,13 @@
                 }
             })
 
-            // 不使用数字作为status，以备流程有增删改动
-            let statusDict = {
-                0: 'check review',
-                1: 'do delivery',
-                2: 'check delivery',
-                3: 'ask for review',
-                4: 're sg'
-            }
 
             $thewizard.submit(function () {
 
                 // todo 退出自动保存、提示
 
                 let steps = rows2object($thewizard.serializeArray(), 'name', 'value')
-                steps.current_index = wizardInstance.current_index
+                // steps.current_index = wizardInstance.current_index
                 steps.track_notes = track_notes
                 let status = statusDict[wizardInstance.current_index]
                 let commented = steps.review_id ? 1 : 0
