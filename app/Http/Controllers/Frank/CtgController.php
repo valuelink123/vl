@@ -8,6 +8,8 @@
 namespace App\Http\Controllers\Frank;
 
 
+use App\Accounts;
+use App\Classes\SapRfcRequest;
 use App\Exceptions\DataInputException;
 use App\Models\Ctg;
 use App\User;
@@ -104,13 +106,25 @@ class CtgController extends Controller {
 
         if ($req->isMethod('GET')) {
 
-            $rows = DB::table('users')->select('id', 'name')->get();
+            $sap = new SapRfcRequest();
 
-            foreach ($rows as $row) {
+            $order = SapRfcRequest::sapOrderDataTranslate($sap->getOrder(['orderId' => $req->input('order_id')]));
+
+            $order['SellerName'] = Accounts::where('account_sellerid', $order['SellerId'])->first()->account_name;
+
+
+            $emails = DB::table('sendbox')->where('to_address', $order['BuyerEmail'])->orderBy('date', 'desc')->get();
+            $emails = json_decode(json_encode($emails), true); // todo
+
+
+            $userRows = DB::table('users')->select('id', 'name')->get();
+
+            foreach ($userRows as $row) {
                 $users[$row->id] = $row->name;
             }
 
-            return view('frank.ctgProcess', compact('ctgRow', 'users'));
+
+            return view('frank.ctgProcess', compact('ctgRow', 'users', 'order', 'emails'));
 
         }
 
