@@ -93,7 +93,8 @@
                         <th>Customer Email</th>
                         <th>Phone Number</th>
                         <th>Expect Rating</th>
-                        <th>Commented</th>
+                        <th>Reviewed</th>
+                        <th>Tracking Note</th>
                         <th>Status</th>
                         <th>Processor</th>
                         <th>Action</th>
@@ -106,11 +107,11 @@
                         <div class="col-xs-3">
                             <div class="input-group">
                                 <span class="input-group-addon">Task Assign to</span>
-                                <input class="xform-autotrim form-control" list="list-assignto" />
+                                <input class="xform-autotrim form-control" list="list-assignto" id="assignto"/>
                                 <datalist id="list-assignto">
                                     <% for(let user_id in users) { %>
                                     <option value="${user_id} | ${users[user_id]}">
-                                    <% } %>
+                                        <% } %>
                                 </datalist>
                             </div>
                         </div>
@@ -163,7 +164,7 @@
             select: {
                 style: 'os',
                 info: true, // info N rows selected
-                blurable: true, // unselect on blur
+                // blurable: true, // unselect on blur
                 selector: 'td:first-child', // 指定第一列可以点击选中
             },
             columns: [
@@ -199,6 +200,16 @@
                     }
                 },
                 {
+                    width: "20px",
+                    data: 'steps',
+                    name: 'steps',
+                    render(data, type, row) {
+                        if (!data) return ''
+                        let steps = JSON.parse(data)
+                        return steps.track_notes[row.status] || ''
+                    }
+                },
+                {
                     width: "80px",
                     data: 'status',
                     name: 'status',
@@ -228,6 +239,32 @@
         })
 
         $theTable.closest('.table-scrollable').after(tplRender(bottomtoolbar, {users: @json($users)}))
+        $(assignto).change(e => {
+
+            $this = $(e.currentTarget)
+
+            let processor = parseInt($this.val())
+            if (isNaN(processor)) return
+
+            let selectedRows = dtApi.rows({selected: true})
+            let order_ids = []
+
+            for (let {order_id} of selectedRows.data().toArray()) {
+                order_ids.push(order_id)
+            }
+
+            if (!order_ids.length) return toastr.error('Please select some rows first !')
+
+            postByJson('/ctg/batchassigntask', {processor, order_ids}).then(arr => {
+                for (let rowIndex of selectedRows[0]) {
+                    // console.log(dtApi.cell(rowIndex, 9).data())
+                    dtApi.cell(rowIndex, 9).data(arr[1]).draw()
+                }
+                toastr.success('Saved !')
+            }).catch(err => {
+                toastr.error(err.message)
+            })
+        })
 
         let dtApi = $theTable.api()
 

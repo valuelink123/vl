@@ -10,6 +10,7 @@ namespace App\Http\Controllers\Frank;
 
 use App\Exceptions\DataInputException;
 use App\Models\Ctg;
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -53,6 +54,7 @@ class CtgController extends Controller {
             phone,
             rating,
             commented,
+            steps,
             status,
             t2.name AS processor,
             order_id
@@ -70,6 +72,25 @@ class CtgController extends Controller {
 
         return compact('data', 'recordsTotal', 'recordsFiltered');
 
+    }
+
+    public function batchAssignTask(Request $req) {
+
+        $processor = (int)$req->input('processor');
+
+        $user = User::findOrFail($processor);
+
+        Ctg::whereIn('order_id', $req->input('order_ids'))->update(compact('processor'));
+
+        // foreach ($req->input('order_ids') as $order_id) {
+        //     // todo 干掉 id 字段，使用表分区
+        //     // 要求 select 中包含主键，否则无法保存
+        //     $row = Ctg::select('id')->where('order_id', $order_id)->first();
+        //     $row->processor = $processor;
+        //     $row->save();
+        // }
+
+        return [true, $user->name];
     }
 
     /**
