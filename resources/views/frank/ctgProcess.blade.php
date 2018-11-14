@@ -138,7 +138,7 @@
                                             <div class="form-group">
                                                 <label>
                                                     Review ID
-                                                    <input required pattern="^\w+$" autocomplete="off" class="xform-autotrim form-control" placeholder="Review ID" name="review_id"/>
+                                                    <input required pattern="^\w+$" autocomplete="off" class="xform-autotrim form-control" placeholder="Review ID" name="xxx"/>
                                                 </label>
                                             </div>
                                         </div>
@@ -285,7 +285,14 @@
                 ue.loadTrackNote()
             })
 
-            let track_notes = steps.track_notes || {}
+            let track_notes = steps.track_notes
+            // arr = []
+            // arr.a = 333
+            // JSON.stringify(arr)
+            // 结果是 []
+            if (!track_notes || (track_notes instanceof Array)) {
+                track_notes = {}
+            }
 
             ue.saveTrackNote = function () {
                 track_notes[statusDict[wizardInstance.current_index]] = ue.getContent()
