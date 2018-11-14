@@ -140,19 +140,24 @@ class GetEmails extends Command
         }else{
 			$mailbox->setServerEncoding('UTF-8');
             foreach($mailsIds as $mailsId){
-                $exists = DB::table('inbox')->where('mail_address', $this->runAccount['email'])->where('mail_id', $mailsId)->first();
+                $mail = $mailbox->getMail($mailsId);
+                //切换可能重复简单去除
+                if(date('Y-m-d H:i:s')<'2018-11-14 06:00:00'){
+                    $exists = DB::table('inbox')->where('mail_address', $this->runAccount['email'])->where('date', $mail->date)->where('subject', $mail->subject)->first();
+                    if($exists) continue;
+                }
+                //
+                $exists = DB::table('inbox')->where('mail_address', $this->runAccount['email'])->where('mail_id', $mail->messageId)->first();
                 if(!$exists) {
                     try{
                         $insert_data = array();
                         $attach_data = array();
-                        $mail = $mailbox->getMail($mailsId);
                         if(!$mail->to) continue;
                         if(!array_key_exists(strtolower($this->runAccount['account_email']),array_change_key_case($mail->to,CASE_LOWER))) continue;
-
                         if($mail){
 							$reply_to = current(array_keys($mail->replyTo));
                             $insert_data['mail_address'] = $this->runAccount['email'];
-                            $insert_data['mail_id'] = $mail->id;
+                            $insert_data['mail_id'] = $mail->messageId;
                             $insert_data['from_name'] = $mail->fromName;
                             $insert_data['from_address'] = ($reply_to)?$reply_to:$mail->fromAddress;
                             if($insert_data['from_address']=='invalid_address@.syntax-error.'){
