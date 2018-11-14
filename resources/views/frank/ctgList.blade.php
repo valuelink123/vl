@@ -247,13 +247,14 @@
             if (isNaN(processor)) return
 
             let selectedRows = dtApi.rows({selected: true})
-            let order_ids = []
 
-            for (let {order_id} of selectedRows.data().toArray()) {
-                order_ids.push(order_id)
+            let order_ids = selectedRows.data().toArray().map(obj => obj.order_id)
+
+            if (!order_ids.length) {
+                $this.val('')
+                toastr.error('Please select some rows first !')
+                return
             }
-
-            if (!order_ids.length) return toastr.error('Please select some rows first !')
 
             postByJson('/ctg/batchassigntask', {processor, order_ids}).then(arr => {
                 for (let rowIndex of selectedRows[0]) {

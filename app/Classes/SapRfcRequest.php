@@ -36,6 +36,90 @@ class SapRfcRequest {
         $this->appsecret = $appsecret;
     }
 
+
+    public static function sapOrderDataTranslate($data) {
+
+        if (empty($data['O_ITEMS'])) return ['orderItems' => []];
+
+        $order = array(
+            'SellerId' => $data['SELLERID'],
+            'MarketPlaceId' => $data['ZMPLACEID'],
+            'AmazonOrderId' => $data['ZAOID'],
+            'SellerOrderId' => $data['ZSOID'],
+            'ApiDownloadDate' => date('Y-m-d H:i:s', strtotime($data['ALOADDATE'] . $data['ALOADTIME'])),
+            'PurchaseDate' => date('Y-m-d H:i:s', strtotime($data['PCHASEDATE'] . $data['PCHASETIME'])),
+            'LastUpdateDate' => date('Y-m-d H:i:s', strtotime($data['LUPDATEDATE'] . $data['LUPDATETIME'])),
+            'OrderStatus' => $data['ORSTATUS'],
+            'FulfillmentChannel' => $data['FCHANNEL'],
+            'SalesChannel' => $data['SCHANNEL'],
+            'OrderChannel' => $data['OCHANNEL'],
+            'ShipServiceLevel' => $data['SHIPLEVEL'],
+            'Name' => $data['ZNAME'],
+            'AddressLine1' => $data['ADDR1'],
+            'AddressLine2' => $data['ADDR2'],
+            'AddressLine3' => $data['ADDR3'],
+            'City' => $data['ZCITY'],
+            'County' => $data['ZCOUNTRY'],
+            'District' => $data['ZDISTRICT'],
+            'StateOrRegion' => $data['ZSOREGION'],
+            'PostalCode' => $data['ZPOSCODE'],
+            'CountryCode' => $data['ZCOUNTRYCODE'],
+            'Phone' => $data['ZPHONE'],
+            'Amount' => $data['ZAMOUNT'],
+            'CurrencyCode' => $data['ZCURRCODE'],
+            'NumberOfItemsShipped' => $data['NISHIPPED'],
+            'NumberOfItemsUnshipped' => $data['NIUNSHIPPED'],
+            'PaymentMethod' => $data['PMETHOD'],
+            'BuyerName' => $data['BUYNAME'],
+            'BuyerEmail' => $data['BUYEMAIL'],
+            'ShipServiceLevelCategory' => $data['SSCATEGORY'],
+            'EarliestShipDate' => ($data['ESDATE'] > 0) ? date('Y-m-d H:i:s', strtotime($data['ESDATE'] . $data['ESTIME'])) : '',
+            'LatestShipDate' => ($data['LSDATE'] > 0) ? date('Y-m-d H:i:s', strtotime($data['LSDATE'] . $data['LSTIME'])) : '',
+            'EarliestDeliveryDate' => ($data['EDDATE'] > 0) ? date('Y-m-d H:i:s', strtotime($data['EDDATE'] . $data['EDTIME'])) : '',
+            'LatestDeliveryDate' => ($data['LDDATE'] > 0) ? date('Y-m-d H:i:s', strtotime($data['LDDATE'] . $data['LDTIME'])) : '',
+        );
+        foreach ($data['O_ITEMS'] as $sdata) {
+            $orderItemData[] = array(
+                'SellerId' => $sdata['SELLERID'],
+                'MarketPlaceId' => $sdata['ZMPLACEID'],
+                'AmazonOrderId' => $sdata['ZAOID'],
+                'OrderItemId' => $sdata['ZORIID'],
+                'Title' => $sdata['TITLE'],
+                'QuantityOrdered' => intval($sdata['QORDERED']),
+                'QuantityShipped' => intval($sdata['QSHIPPED']),
+                'GiftWrapLevel' => $sdata['GWLEVEL'],
+                'GiftMessageText' => $sdata['GMTEXT'],
+                'ItemPriceAmount' => round($sdata['IPAMOUNT'], 2),
+                'ItemPriceCurrencyCode' => $sdata['IPCCODE'],
+                'ShippingPriceAmount' => round($sdata['SPAMOUNT'], 2),
+                'ShippingPriceCurrencyCode' => $sdata['SPCCODE'],
+                'GiftWrapPriceAmount' => round($sdata['GWPAMOUNT'], 2),
+                'GiftWrapPriceCurrencyCode' => $sdata['GWPCCODE'],
+                'ItemTaxAmount' => round($sdata['ITAMOUNT'], 2),
+                'ItemTaxCurrencyCode' => $sdata['ITCCODE'],
+                'ShippingTaxAmount' => round($sdata['STAMOUNT'], 2),
+                'ShippingTaxCurrencyCode' => $sdata['STCCODE'],
+                'GiftWrapTaxAmount' => round($sdata['GWTAMOUNT'], 2),
+                'GiftWrapTaxCurrencyCode' => $sdata['GWTCCODE'],
+                'ShippingDiscountAmount' => round($sdata['SDAMOUNT'], 2),
+                'ShippingDiscountCurrencyCode' => $sdata['SDCCODE'],
+                'PromotionDiscountAmount' => round($sdata['PDAMOUNT'], 2),
+                'PromotionDiscountCurrencyCode' => $sdata['PDCCODE'],
+                'PromotionIds' => $sdata['PROMOID'],
+                'CODFeeAmount' => round($sdata['CFAMOUNT'], 2),
+                'CODFeeCurrencyCode' => $sdata['CFCCODE'],
+                'CODFeeDiscountAmount' => round($sdata['CFDAMOUNT'], 2),
+                'CODFeeDiscountCurrencyCode' => $sdata['CFDCCODE'],
+                'ASIN' => $sdata['ZASIN'],
+                'SellerSKU' => $sdata['ZSSKU'],
+            );
+        }
+
+        $order ['orderItems'] = $orderItemData;
+
+        return $order;
+    }
+
     /**
      * @throws SapRfcRequestException
      */
