@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Ctg extends Model {
     protected $primaryKey = 'order_id';
+    public $incrementing = false; // 主键不是数字，需要有此声明，否则 order_id 被截断
     protected $table = 'ctg';
     // protected $guarded = ['id']; // 黑名单模式
     protected $fillable = ['order_id', 'gift_sku', 'name', 'email', 'phone', 'address', 'note', 'rating'];

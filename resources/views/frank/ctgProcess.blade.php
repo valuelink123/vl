@@ -102,12 +102,38 @@
 
                             <div style="min-height:250px;" class="pages">
                                 <div id="step-1">
+                                    <br/>
                                     <div class="row">
-                                        <div class="col-md-3">
+                                        <div class="col-xs-12">
+                                            <span>Check ASIN links of the order.</span>
+                                            <ul>
+                                                @foreach($order['orderItems'] as $item)
+                                                    <li>
+                                                        <a target="_blank" rel="noreferrer" href="https://www.{!! $order['SalesChannel'] !!}/product-reviews/{!! $item['ASIN'] !!}?sortBy=recent"
+                                                           title="{!! $item['SellerSKU'] !!}">{!! $item['Title'] !!}</a>
+                                                    </li>
+                                                @endforeach
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <br/>
+                                    <div class="row">
+                                        <div class="col-xs-3">
+                                            <div class="form-group">
+                                                <span>Had the customer left a review ?</span><br/>
+                                                <label style="margin-right:5em;">
+                                                    <input type="radio" name="reviewed" value="1"/>
+                                                    Yes
+                                                </label>
+                                                <label>
+                                                    <input type="radio" name="reviewed" value="0"/>
+                                                    No
+                                                </label>
+                                            </div>
                                             <div class="form-group">
                                                 <label>
-                                                    Review ID
-                                                    <input required pattern="^\w+$" autocomplete="off" class="xform-autotrim form-control" placeholder="Review ID" name="review_id"/>
+                                                    <span>And the review ID ?</span>
+                                                    <input required pattern="^\w+( +\w+)*$" autocomplete="off" class="xform-autotrim form-control" placeholder="Review ID" name="review_id"/>
                                                 </label>
                                             </div>
                                         </div>
