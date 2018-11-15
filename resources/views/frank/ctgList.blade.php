@@ -38,7 +38,7 @@
                     <div class="col-md-2">
                         <div class="input-group">
                             <span class="input-group-addon">Expect Rating</span>
-                            <select multiple style="width:100%;" name="rating">
+                            <select multiple style="width:100%;" id="rating">
                                 <option value="1">1</option>
                                 <option value="2">2</option>
                                 <option value="3">3</option>
@@ -50,7 +50,7 @@
                     <div class="col-md-3">
                         <div class="input-group">
                             <span class="input-group-addon">Processor</span>
-                            <select multiple style="width:100%;" name="processor">
+                            <select multiple style="width:100%;" id="processor">
                                 @foreach($users as $id=>$name)
                                     <option value="{!! $id !!}">{!! $name !!}</option>
                                 @endforeach
@@ -60,12 +60,12 @@
                     <div class="col-md-3">
                         <div class="input-group">
                             <span class="input-group-addon">Status</span>
-                            <select multiple style="width:100%;" name="status">
-                                <option value="0">Confirm Review</option>
-                                <option value="1">Arrange Shipment</option>
-                                <option value="2">Delivery Confirmation</option>
-                                <option value="3">Lead To Leave Review</option>
-                                <option value="4">Re-SG</option>
+                            <select multiple style="width:100%;" id="status">
+                                <option value="Confirm Review">Confirm Review</option>
+                                <option value="Arrange Shipment">Arrange Shipment</option>
+                                <option value="Delivery Confirmation">Delivery Confirmation</option>
+                                <option value="Lead To Leave Review">Lead To Leave Review</option>
+                                <option value="Re-SG">Re-SG</option>
                             </select>
                         </div>
                     </div>
@@ -152,6 +152,11 @@
                     // item_group: item_group.value,
                     // brand: brand.value,
                     // item_model: item_model.value
+                },
+                ins: {
+                    rating: $('#rating').val(),
+                    processor: $('#processor').val(),
+                    status: $('#status').val(),
                 }
             })
 
