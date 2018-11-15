@@ -1,6 +1,21 @@
 @extends('layouts.layout')
 @section('label', 'Exception List')
 @section('content')
+<style type="text/css">
+.dataTables_extended_wrapper .table.dataTable {
+  margin: 0px !important;
+}
+
+table.dataTable thead th, table.dataTable thead td {
+    padding: 10px 2px !important;}
+table.dataTable tbody th, table.dataTable tbody td {
+    padding: 10px 0px;
+}
+th,td,td>span {
+    font-size:12px !important;
+	font-family:Arial, Helvetica, sans-serif;}
+
+</style>
     <h1 class="page-title font-red-intense"> Exception List
         <small>Exception.</small>
     </h1>
@@ -118,7 +133,14 @@
                                     </select>
                                 </td>
 								 <td>
-                                   
+                                <select id="resellerid" class="form-control form-filter input-sm" name="resellerid">
+								<option value ="">Replace Account
+									<option value ="FBM">FBM	
+								@foreach ($sellerids as $id=>$name)
+									<option value="{{$id}}">{{$name}}</option>
+								@endforeach
+								</select>
+								<input type="text" class="form-control form-filter input-sm" name="resku" placeholder="Replace SKU">
                                 </td>
 								 <td>
                                    
