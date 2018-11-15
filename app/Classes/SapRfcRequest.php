@@ -51,7 +51,7 @@ class SapRfcRequest {
             'LastUpdateDate' => date('Y-m-d H:i:s', strtotime($data['LUPDATEDATE'] . $data['LUPDATETIME'])),
             'OrderStatus' => $data['ORSTATUS'],
             'FulfillmentChannel' => $data['FCHANNEL'],
-            'SalesChannel' => $data['SCHANNEL'],
+            'SalesChannel' => strtolower($data['SCHANNEL']),
             'OrderChannel' => $data['OCHANNEL'],
             'ShipServiceLevel' => $data['SHIPLEVEL'],
             'Name' => $data['ZNAME'],

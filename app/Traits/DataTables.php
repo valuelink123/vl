@@ -55,6 +55,7 @@ trait DataTables {
         foreach ($ins as $field => $arr) {
             if (empty($insMap[$field])) continue;
             if (empty($arr)) continue;
+            $values = [];
             foreach ($arr as $value) {
                 $values[] = '"' . addslashes($value) . '"';
             }
