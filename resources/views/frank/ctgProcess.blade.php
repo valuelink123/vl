@@ -163,8 +163,8 @@
                                         <div class="col-md-3">
                                             <div class="form-group">
                                                 <label>
-                                                    If the customer has already left a review, just skip this step.
-                                                    <input required pattern="^\w+$" autocomplete="off" class="xform-autotrim form-control" placeholder="Review ID" name="xxx"/>
+                                                    Review ID Separated by spaces
+                                                    <input required pattern="^\w+( +\w+)*$" autocomplete="off" class="xform-autotrim form-control" placeholder="Review ID Separated by spaces" name="review_id3"/>
                                                 </label>
                                             </div>
                                         </div>
@@ -402,7 +402,7 @@
 
         $(function ($) {
 
-            let steps = <?php echo empty($ctgRow['steps']) ? '{}' : $ctgRow['steps']; ?>;
+            let _steps = <?php echo empty($ctgRow['steps']) ? '{}' : $ctgRow['steps']; ?>;
 
             let $thewizard = $('#thewizard')
 
@@ -415,6 +415,7 @@
                 keyNavigation: false,
                 showStepURLhash: false,
                 autoAdjustHeight: false,
+                hiddenSteps: (_steps.commented || 0) - 1 < 0 ? [] : [3],
                 lang: {
                     next: 'Continue >',
                     previous: '< Back'
@@ -434,6 +435,11 @@
 
 
             $thewizard.on('leaveStep', (e, anchorObject, stepNumber, stepDirection) => {
+                switch (stepNumber) {
+                    case 0:
+                        wizardInstance.stepState(3, parseInt(thewizard.commented.value) < 1 ? 'show' : 'hide')
+                        break
+                }
                 if ('backward' === stepDirection) return true
                 $pages = $thewizard.children('.pages').children('div')
                 $inputs = $($pages[wizardInstance.current_index]).find('[name]')
@@ -450,6 +456,7 @@
                 // todo 退出自动保存、提示
 
                 let steps = rows2object($thewizard.serializeArray(), 'name', 'value')
+                steps = Object.assign(_steps, steps)
                 // steps.current_index = wizardInstance.current_index
                 steps.track_notes = track_notes
                 let status = statusDict[wizardInstance.current_index]
@@ -479,7 +486,7 @@
                 ue.loadTrackNote()
             })
 
-            let track_notes = steps.track_notes
+            let track_notes = _steps.track_notes
             // arr = []
             // arr.a = 333
             // JSON.stringify(arr)
@@ -500,7 +507,7 @@
 
             for (let input of $thewizard.find('[name]')) {
                 // formElement.filedName.value // 此种写法兼容 radio、checkbox 等等
-                thewizard[input.name].value = steps[input.name] || ''
+                thewizard[input.name].value = _steps[input.name] || ''
             }
 
             XFormHelper.inputEnableByRadio(thewizard)
