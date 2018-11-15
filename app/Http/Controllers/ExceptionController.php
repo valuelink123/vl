@@ -615,7 +615,7 @@ class ExceptionController extends Controller
 							$seller_id = $customersList['sellerid'];
 						}
 						
-						$operate.= '<span class="label label-sm label-primary">'.array_get($accounts,$seller_id,$seller_id).'</span></BR>'.(((array_get($accounts,$seller_id)?$product['seller_sku']:$product['item_code'])??$product['sku']??null)??array_get($product,'title')).'*'.array_get($product,'qty').'</BR>';
+						$operate.= '<span class="label label-sm label-primary">'.array_get($accounts,$seller_id,$seller_id).'</span></BR>'.(((array_get($accounts,$seller_id)?array_get($product,'seller_sku'):array_get($product,'item_code'))??array_get($product,'sku')??null)??array_get($product,'title')).'*'.array_get($product,'qty').'</BR>';
 						
 						
 					}
