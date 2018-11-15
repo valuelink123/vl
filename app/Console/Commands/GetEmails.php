@@ -142,7 +142,7 @@ class GetEmails extends Command
             foreach($mailsIds as $mailsId){
                 $mail = $mailbox->getMail($mailsId);
                 //切换可能重复简单去除
-                if(date('Y-m-d H:i:s')<'2018-11-14 06:00:00'){
+                if(date('Y-m-d H:i:s')<'2018-11-15 01:00:00'){
                     $exists = DB::table('inbox')->where('mail_address', $this->runAccount['email'])->where('date', $mail->date)->where('subject', $mail->subject)->first();
                     if($exists) continue;
                 }
