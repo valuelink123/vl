@@ -44,7 +44,7 @@ class CtgController extends Controller {
 
         // query data list
 
-        $where = $this->dtWhere($req, [], []);
+        $where = $this->dtWhere($req, [], [], ['rating' => 't1.rating', 'processor' => 't1.processor', 'status' => 't1.status']);
         $orderby = $this->dtOrderBy($req);
         $limit = $this->dtLimit($req);
 
