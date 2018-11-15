@@ -160,11 +160,8 @@ class SendController extends Controller
 			}
 			$attachs = serialize($request->get('fileid'));
 		}
-		
-		
-		
-		$to_address_array = explode(';',$request->get('to_address'));
-		
+		$to_address_array = explode(';',str_replace("；",";",$request->get('to_address')));
+
 		foreach($to_address_array as $to_address){
 			if(trim($to_address)){
 				if($request->get('sendbox_id')){
@@ -174,7 +171,7 @@ class SendController extends Controller
 				}
 				$sendbox->user_id = intval(Auth::user()->id);
 				$sendbox->from_address = trim($request->get('from_address'));
-				$sendbox->to_address = trim($to_address);
+				$sendbox->to_address = substr(trim($to_address),0,99);
 				$sendbox->subject = $request->get('subject');
 				$sendbox->text_html = $request->get('content');
 				$sendbox->date = date('Y-m-d H:i:s');
