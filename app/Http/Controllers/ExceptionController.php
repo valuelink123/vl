@@ -42,9 +42,7 @@ class ExceptionController extends Controller
      */
     public function index($type = '')
     {
-		
         return view('exception/index',['users'=>$this->getUsers(),'groups'=>$this->getGroups(),'mygroups'=>$this->getUserGroup(),'sellerids'=>$this->getSellerIds()]);
-		
 
     }
 	
