@@ -1017,7 +1017,7 @@ var App = function() {
 
 jQuery(document).ready(function() {    
 	App.init(); // init metronic core componets
-	$(".form_advance_datetime").datetimepicker({
+	$(".form_datetime").datetimepicker({
 		isRTL: App.isRTL(),
 		format: "yyyy-mm-dd hh:ii",
 		autoclose: true,
@@ -1025,5 +1025,8 @@ jQuery(document).ready(function() {
 		startDate: "",
 		pickerPosition: (App.isRTL() ? "bottom-right" : "bottom-left"),
 		minuteStep: 10
+	});
+	$(".form_datetime button.date-clear").on('click',function(){
+		 $(".form_datetime input[type='text']").val('');
 	});
 });
