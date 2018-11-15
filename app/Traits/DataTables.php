@@ -40,17 +40,20 @@ trait DataTables {
      * @param $insMap array WHERE IN
      * @return string
      */
-    protected function dtWhere(Request $req, array $fuzzyFields, array $andsMap, array $insMap) {
+    protected function dtWhere(Request $req, array $fuzzyFields, array $andsMap, array $insMap = []) {
 
         $where = [];
 
         $ands = $req->input('search.ands', []);
         $ins = $req->input('search.ins', []);
+        $timerange = $req->input('search.timerange');
 
         $where = [];
 
-        if (!empty($ands['date_from'])) $where[] = 't1.created_at >= "' . addslashes($ands['date_from']) . '"';
-        if (!empty($ands['date_to'])) $where[] = 't1.created_at <= "' . addslashes($ands['date_to']) . '"';
+        if (!empty($timerange)) {
+            if (!empty($timerange['from'])) $where[] = 't1.created_at >= "' . addslashes($timerange['from']) . '"';
+            if (!empty($timerange['to'])) $where[] = 't1.created_at <= "' . addslashes($timerange['to']) . '"';
+        }
 
         foreach ($ins as $field => $arr) {
             if (empty($insMap[$field])) continue;

@@ -146,9 +146,11 @@
 
             Object.assign(data.search, {
                 // value: fuzzysearch.value,
+                timerange: {
+                    from: date_from.value,
+                    to: date_to.value
+                },
                 ands: {
-                    date_from: date_from.value,
-                    date_to: date_to.value,
                     // item_group: item_group.value,
                     // brand: brand.value,
                     // item_model: item_model.value
