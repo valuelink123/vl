@@ -121,11 +121,11 @@
                                             <div class="form-group">
                                                 <span>Had the customer left a review ?</span><br/>
                                                 <label style="margin-right:5em;">
-                                                    <input type="radio" name="reviewed" value="1" checked/>
+                                                    <input type="radio" name="commented" value="1" checked/>
                                                     Yes
                                                 </label>
                                                 <label>
-                                                    <input type="radio" name="reviewed" value="0"/>
+                                                    <input type="radio" name="commented" value="0"/>
                                                     No
                                                 </label>
                                             </div>
@@ -162,7 +162,7 @@
                                         <div class="col-md-3">
                                             <div class="form-group">
                                                 <label>
-                                                    Review ID
+                                                    If the customer has already left a review, just skip this step.
                                                     <input required pattern="^\w+$" autocomplete="off" class="xform-autotrim form-control" placeholder="Review ID" name="xxx"/>
                                                 </label>
                                             </div>
@@ -452,7 +452,7 @@
                 // steps.current_index = wizardInstance.current_index
                 steps.track_notes = track_notes
                 let status = statusDict[wizardInstance.current_index]
-                let commented = steps.review_id ? 1 : 0
+                let commented = steps.commented
 
                 // jQuery 的 urlencode 中 + 号，似乎不太靠谱
                 // 使用 JSON 提交可以避免数字变字符串的问题
@@ -498,8 +498,8 @@
             ue.addListener('blur', ue.saveTrackNote)
 
             for (let input of $thewizard.find('[name]')) {
-                if ('radio' === input.type) continue
-                input.value = steps[input.name] || ''
+                // formElement.filedName.value // 此种写法兼容 radio、checkbox 等等
+                thewizard[input.name].value = steps[input.name] || ''
             }
 
             let activeTab = @json($ctgRow['processor']>0)? 'process-steps' : 'ctg-info'

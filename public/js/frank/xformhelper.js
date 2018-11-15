@@ -33,6 +33,21 @@ class XFormHelper {
         })
 
     }
+
+    static inputDisableByRadio(selector) {
+        $(selector).each((i, input) => {
+            let $input = $(input)
+            let $form = $input.closest('form')
+            if (!$form.length) return
+            let radioName = $input.data('assoc-radio')
+            $input[0].disabled = parseInt($form[0][radioName].value) < 1
+            $form.change(e => {
+                if (radioName === e.target.name) {
+                    $input[0].disabled = parseInt(e.target.value) < 1
+                }
+            })
+        })
+    }
 }
 
 $(() => {
