@@ -74,40 +74,66 @@
                         <form id="thewizard" novalidate>
                             <ul>
                                 <li>
-                                    <a href="#step-1">留评确认<br/>
-                                        <small>确认客户是否留评</small>
+                                    <a href="#step-1">Confirm Review<br/>
+                                        <small>if the customer has left a review</small>
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#step-2">发货<br/>
-                                        <small>确认是否已发货</small>
+                                    <a href="#step-2">Arrange shipment<br/>
+                                        <small>if the product has been shipped out</small>
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#step-3">收货确认<br/>
-                                        <small>确认客户是否已收货</small>
+                                    <a href="#step-3">Delivery confirmation<br/>
+                                        <small>if the customer has received the item</small>
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#step-4">引导留评<br/>
-                                        <small>跟进客户留评</small>
+                                    <a href="#step-4">Lead to leave review<br/>
+                                        <small>if the customer hasn't</small>
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#step-5">再营销<br/>
-                                        <small>再营销为多次循环过程</small>
+                                    <a href="#step-5">Re-SG<br/>
+                                        <small>it is a cyclic process</small>
                                     </a>
                                 </li>
                             </ul>
 
                             <div style="min-height:250px;" class="pages">
                                 <div id="step-1">
+                                    <br/>
                                     <div class="row">
-                                        <div class="col-md-3">
+                                        <div class="col-xs-12">
+                                            <span>Check ASIN links of the order.</span>
+                                            <ul>
+                                                @foreach($order['orderItems'] as $item)
+                                                    <li>
+                                                        <a target="_blank" rel="noreferrer" href="https://www.{!! $order['SalesChannel'] !!}/product-reviews/{!! $item['ASIN'] !!}?sortBy=recent"
+                                                           title="{!! $item['SellerSKU'] !!}">{!! $item['Title'] !!}</a>
+                                                    </li>
+                                                @endforeach
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <br/>
+                                    <div class="row">
+                                        <div class="col-xs-3">
+                                            <div class="form-group">
+                                                <span>Had the customer left a review ?</span><br/>
+                                                <label style="margin-right:5em;">
+                                                    <input type="radio" name="reviewed" value="1"/>
+                                                    Yes
+                                                </label>
+                                                <label>
+                                                    <input type="radio" name="reviewed" value="0"/>
+                                                    No
+                                                </label>
+                                            </div>
                                             <div class="form-group">
                                                 <label>
-                                                    Review ID
-                                                    <input required pattern="^\w+$" autocomplete="off" class="xform-autotrim form-control" placeholder="Review ID" name="review_id"/>
+                                                    <span>And the review ID ?</span>
+                                                    <input required pattern="^\w+( +\w+)*$" autocomplete="off" class="xform-autotrim form-control" placeholder="Review ID" name="review_id"/>
                                                 </label>
                                             </div>
                                         </div>
@@ -175,11 +201,176 @@
                     </div>
 
                     <div role="tabpanel" class="tab-pane" id="order-info">
-                        or
+                        @if(!empty($order['orderItems']))
+                            <div class="invoice-content-2 bordered">
+                                <div class="row invoice-head">
+                                    <div class="col-md-7 col-xs-6">
+                                        <div class="invoice-logo">
+                                            <h1 class="uppercase">{!! $order['AmazonOrderId'] !!} ( {!! $order['SellerName'] !!} )</h1>
+                                            Buyer Email : {!! $order['BuyerEmail'] !!}<BR>
+                                            Buyer Name : {!! $order['BuyerName'] !!}<BR>
+                                            PurchaseDate : {!! $order['PurchaseDate'] !!}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-5 col-xs-6">
+                                        <div class="company-address">
+                                            <span class="bold ">{!! $order['Name'] !!}</span>
+                                            <br> {!! $order['AddressLine1'] !!}
+                                            <br> {!! $order['AddressLine2'] !!}
+                                            <br> {!! $order['AddressLine3'] !!}
+                                            <br> {!! $order['City'] !!} {!! $order['StateOrRegion'] !!} {!! $order['CountryCode'] !!}
+                                            <br> {!! $order['PostalCode'] !!}
+                                        </div>
+                                    </div>
+                                </div>
+                                <BR><BR>
+                                <div class="row invoice-cust-add">
+                                    <div class="col-xs-3">
+                                        <h4 class="invoice-title ">Seller ID</h4>
+                                        <p class="invoice-desc">{!! $order['SellerId'] !!}   </p>
+                                    </div>
+                                    <div class="col-xs-3">
+                                        <h4 class="invoice-title ">Site</h4>
+                                        <p class="invoice-desc">{!! $order['SalesChannel'] !!}</p>
+                                    </div>
+                                    <div class="col-xs-2">
+                                        <h4 class="invoice-title ">Fulfillment Channel</h4>
+                                        <p class="invoice-desc">{!! $order['FulfillmentChannel'] !!}</p>
+                                    </div>
+                                    <div class="col-xs-2">
+                                        <h4 class="invoice-title ">Ship Service Level</h4>
+                                        <p class="invoice-desc">{!! $order['ShipServiceLevel'] !!}</p>
+                                    </div>
+
+                                    <div class="col-xs-2">
+                                        <h4 class="invoice-title ">Status</h4>
+                                        <p class="invoice-desc">{!! $order['OrderStatus'] !!}</p>
+                                    </div>
+                                </div>
+                                <BR><BR>
+                                <div class="row invoice-body">
+                                    <div class="col-xs-12 table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                            <tr>
+                                                <th class="invoice-title uppercase">Description</th>
+                                                <th class="invoice-title uppercase text-center">Qty</th>
+                                                <th class="invoice-title uppercase text-center">Price</th>
+                                                <th class="invoice-title uppercase text-center">Shipping</th>
+                                                <th class="invoice-title uppercase text-center">Promotion</th>
+                                                <th class="invoice-title uppercase text-center">Tax</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            @foreach($order['orderItems'] as $item)
+                                                <tr>
+                                                    <td>
+                                                        <h4>{!! $item['ASIN'] !!} ( {!! $item['SellerSKU'] !!} )</h4>
+                                                        <p> {!! $item['Title'] !!} </p>
+                                                    </td>
+                                                    <td class="text-center sbold">{!! $item['QuantityOrdered'] !!}</td>
+                                                    <td class="text-center sbold">{{round($item['ItemPriceAmount']/$item['QuantityOrdered'],2)}}</td>
+                                                    <td class="text-center sbold">{{round($item['ShippingPriceAmount'],2)}} {{($item['ShippingDiscountAmount'])?'( -'.round($item['ShippingDiscountAmount'],2).' )':''}}</td>
+                                                    <td class="text-center sbold">{{($item['PromotionDiscountAmount'])?'( -'.round($item['PromotionDiscountAmount'],2).' )':''}}</td>
+                                                    <td class="text-center sbold">{{round($item['ItemTaxAmount'],2)}}</td>
+                                                </tr>
+                                            @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="row invoice-subtotal">
+                                    <div class="col-xs-6">
+                                        <h4 class="invoice-title uppercase">Total</h4>
+                                        <p class="invoice-desc grand-total">{{round($order['Amount'],2)}} {{$order['CurrencyCode']}}</p>
+                                    </div>
+                                </div>
+
+                            </div>
+                        @else
+                            <b>Can not match or find order</b>
+                        @endif
                     </div>
 
                     <div role="tabpanel" class="tab-pane" id="email-history">
-                        eh
+                        <div class="table-container">
+                            <table class="table table-striped table-bordered table-hover order-column" id="email_table">
+                                <thead>
+                                <tr>
+                                    <th>From Address</th>
+                                    <th>To Address</th>
+                                    <th>Subject</th>
+                                    <th>Date</th>
+                                    <th>User</th>
+                                    <th>Status</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                @foreach ($emails as $data)
+                                    <tr class="odd gradeX">
+                                        <td>
+                                            {{array_get($data,'from_address')}}
+                                        </td>
+                                        <td>
+                                            {{array_get($data,'to_address')}}
+                                        </td>
+                                        <td>
+                                            <a href="/send/{{array_get($data,'id')}}" target="_blank"> {{array_get($data,'subject')}}</a>
+                                        </td>
+                                        <td>
+                                            {{array_get($data,'date')}}
+                                        </td>
+                                        <td>
+                                            {{array_get($users,array_get($data,'user_id'))}}
+                                        </td>
+                                        <td>
+                                            {!!array_get($data,'send_date')?'<span class="label label-sm label-success">'.array_get($data,'send_date').'</span> ':'<span class="label label-sm label-danger">'.array_get($data,'status').'</span>'!!}
+                                        </td>
+
+                                    </tr>
+                                @endforeach
+
+
+                                </tbody>
+                            </table>
+                            <script>
+                                $(function () {
+                                    $('#email_table').dataTable({
+                                        "language": {
+                                            "aria": {
+                                                "sortAscending": ": activate to sort column ascending",
+                                                "sortDescending": ": activate to sort column descending"
+                                            },
+                                            "emptyTable": "No data available in table",
+                                            "info": "Showing _START_ to _END_ of _TOTAL_ records",
+                                            "infoEmpty": "No records found",
+                                            "infoFiltered": "(filtered1 from _MAX_ total records)",
+                                            "lengthMenu": "Show _MENU_",
+                                            "search": "Search:",
+                                            "zeroRecords": "No matching records found",
+                                            "paginate": {
+                                                "previous": "Prev",
+                                                "next": "Next",
+                                                "last": "Last",
+                                                "first": "First"
+                                            }
+                                        },
+
+                                        "bStateSave": false, // save datatable state(pagination, sort, etc) in cookie.
+                                        "autoWidth": false,
+                                        "lengthMenu": [
+                                            [10, 50, 100, -1],
+                                            [10, 50, 100, "All"] // change per page values here
+                                        ],
+                                        // set the initial value
+                                        "pageLength": 10,
+                                        "order": [
+                                            [3, "desc"]
+                                        ] // set first column as a default sort by asc
+                                    });
+                                });
+                            </script>
+                        </div>
                     </div>
                 </div>
 
@@ -188,6 +379,15 @@
     </div>
 
     <script type="text/javascript">
+
+        // 不使用数字作为status，以备流程有增删改动
+        let statusDict = {
+            0: 'Confirm Review',
+            1: 'Arrange Shipment',
+            2: 'Delivery Confirmation',
+            3: 'Lead To Leave Review',
+            4: 'Re-SG'
+        }
 
         $('#ctg-info > form').submit(function () {
 
@@ -206,8 +406,10 @@
 
             let $thewizard = $('#thewizard')
 
+            let current_index = rows2object(Object.keys(statusDict).map(i => [i, statusDict[i]]), 1, 0)["{!! $ctgRow['status'] !!}"]
+
             $thewizard.smartWizard({
-                selected: parseInt(steps.current_index) || 0, // bug 传数字字符串就麻烦了
+                selected: parseInt(current_index) || 0, // bug 传数字字符串就麻烦了
                 theme: 'arrows',
                 useURLhash: false,
                 keyNavigation: false,
@@ -242,21 +444,13 @@
                 }
             })
 
-            // 不使用数字作为status，以备流程有增删改动
-            let statusDict = {
-                0: 'check review',
-                1: 'do delivery',
-                2: 'check delivery',
-                3: 'ask for review',
-                4: 're sg'
-            }
 
             $thewizard.submit(function () {
 
                 // todo 退出自动保存、提示
 
                 let steps = rows2object($thewizard.serializeArray(), 'name', 'value')
-                steps.current_index = wizardInstance.current_index
+                // steps.current_index = wizardInstance.current_index
                 steps.track_notes = track_notes
                 let status = statusDict[wizardInstance.current_index]
                 let commented = steps.review_id ? 1 : 0

@@ -29,17 +29,16 @@
                             <input class="form-control" data-options="format:'yyyy-mm-dd 00:00:00'" value="{!! date('Y-m-d 00:00:00', strtotime('-90 day')) !!}" data-init-by-query="ands.date_from" id="date_from"
                                    autocomplete="off"/>
                         </div>
-                    </div>
-                    <div class="col-md-2">
+                        <br/>
                         <div class="input-group">
                             <span class="input-group-addon">To</span>
                             <input class="form-control" data-options="format:'yyyy-mm-dd 23:59:59'" value="{!! date('Y-m-d 23:59:59') !!}" data-init-by-query="ands.date_to" id="date_to" autocomplete="off"/>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <div class="input-group">
                             <span class="input-group-addon">Expect Rating</span>
-                            <select multiple style="width:100%;" name="rating">
+                            <select multiple style="width:100%;" id="rating">
                                 <option value="1">1</option>
                                 <option value="2">2</option>
                                 <option value="3">3</option>
@@ -51,21 +50,22 @@
                     <div class="col-md-3">
                         <div class="input-group">
                             <span class="input-group-addon">Processor</span>
-                            <select multiple style="width:100%;" name="processor">
-                                <option value="A">Important</option>
-                                <option value="B">Normal</option>
-                                <option value="C">Abandon</option>
-                                <option value="D">Unlisted</option>
+                            <select multiple style="width:100%;" id="processor">
+                                @foreach($users as $id=>$name)
+                                    <option value="{!! $id !!}">{!! $name !!}</option>
+                                @endforeach
                             </select>
                         </div>
-                        <br/>
+                    </div>
+                    <div class="col-md-3">
                         <div class="input-group">
                             <span class="input-group-addon">Status</span>
-                            <select multiple style="width:100%;" name="status">
-                                <option value="A">Important</option>
-                                <option value="B">Normal</option>
-                                <option value="C">Abandon</option>
-                                <option value="D">Unlisted</option>
+                            <select multiple style="width:100%;" id="status">
+                                <option value="Confirm Review">Confirm Review</option>
+                                <option value="Arrange Shipment">Arrange Shipment</option>
+                                <option value="Delivery Confirmation">Delivery Confirmation</option>
+                                <option value="Lead To Leave Review">Lead To Leave Review</option>
+                                <option value="Re-SG">Re-SG</option>
                             </select>
                         </div>
                     </div>
@@ -136,6 +136,10 @@
 
         $("#thetabletoolbar select[multiple]").chosen()
 
+        $(thetabletoolbar).change(e => {
+            dtApi.ajax.reload()
+        })
+
         let $theTable = $(thetable)
 
         $theTable.on('preXhr.dt', (e, settings, data) => {
@@ -148,6 +152,11 @@
                     // item_group: item_group.value,
                     // brand: brand.value,
                     // item_model: item_model.value
+                },
+                ins: {
+                    rating: $('#rating').val(),
+                    processor: $('#processor').val(),
+                    status: $('#status').val(),
                 }
             })
 
@@ -200,7 +209,7 @@
                     }
                 },
                 {
-                    width: "20px",
+                    width: "200px",
                     data: 'steps',
                     name: 'steps',
                     render(data, type, row) {
@@ -210,12 +219,9 @@
                     }
                 },
                 {
-                    width: "80px",
+                    width: "190px",
                     data: 'status',
-                    name: 'status',
-                    render(data) {
-                        return data.toUpperCase()
-                    }
+                    name: 'status'
                 },
                 {
                     width: "120px",
@@ -238,7 +244,8 @@
             }
         })
 
-        $theTable.closest('.table-scrollable').after(tplRender(bottomtoolbar, {users: @json($users)}))
+        let users = @json($users) ;
+        $theTable.closest('.table-scrollable').after(tplRender(bottomtoolbar, {users}))
         $(assignto).change(e => {
 
             $this = $(e.currentTarget)
@@ -247,13 +254,14 @@
             if (isNaN(processor)) return
 
             let selectedRows = dtApi.rows({selected: true})
-            let order_ids = []
 
-            for (let {order_id} of selectedRows.data().toArray()) {
-                order_ids.push(order_id)
+            let order_ids = selectedRows.data().toArray().map(obj => obj.order_id)
+
+            if (!order_ids.length) {
+                $this.val('')
+                toastr.error('Please select some rows first !')
+                return
             }
-
-            if (!order_ids.length) return toastr.error('Please select some rows first !')
 
             postByJson('/ctg/batchassigntask', {processor, order_ids}).then(arr => {
                 for (let rowIndex of selectedRows[0]) {
