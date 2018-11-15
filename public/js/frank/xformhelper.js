@@ -34,18 +34,25 @@ class XFormHelper {
 
     }
 
-    static inputDisableByRadio(selector) {
-        $(selector).each((i, input) => {
-            let $input = $(input)
-            let $form = $input.closest('form')
-            if (!$form.length) return
-            let radioName = $input.data('assoc-radio')
-            $input[0].disabled = parseInt($form[0][radioName].value) < 1
+    static inputEnableByRadio(formSelector) {
+        $(formSelector).each((i, form) => {
+
+            let $form = $(form);
+
+            let map = new Map($form.find('[data-enable-radio]').toArray().map(input => [$(input).data('enable-radio'), input]))
+
+            if (!map.size) return
+
             $form.change(e => {
-                if (radioName === e.target.name) {
-                    $input[0].disabled = parseInt(e.target.value) < 1
+                let $radio = $(e.target)
+                if (!$radio.is(':radio')) return
+                if (map.has(e.target.name)) {
+                    let input = map.get(e.target.name)
+                    input.disabled = parseInt(e.target.value) < 1
                 }
             })
+
+            $form.find(':radio:checked').change()
         })
     }
 }

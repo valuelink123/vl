@@ -132,7 +132,8 @@
                                             <div class="form-group">
                                                 <label>
                                                     <span>And the review ID ?</span>
-                                                    <input required pattern="^\w+( +\w+)*$" autocomplete="off" class="xform-autotrim form-control" placeholder="Review ID Separated by spaces" name="review_id"/>
+                                                    <input required pattern="^\w+( +\w+)*$" autocomplete="off" class="xform-autotrim form-control" placeholder="Review ID Separated by spaces" name="review_id"
+                                                           data-enable-radio="commented"/>
                                                 </label>
                                             </div>
                                         </div>
@@ -501,6 +502,8 @@
                 // formElement.filedName.value // 此种写法兼容 radio、checkbox 等等
                 thewizard[input.name].value = steps[input.name] || ''
             }
+
+            XFormHelper.inputEnableByRadio(thewizard)
 
             let activeTab = @json($ctgRow['processor']>0)? 'process-steps' : 'ctg-info'
             $(`#tabs a[href="#${activeTab}"]`).tab('show')
