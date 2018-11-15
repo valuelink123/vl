@@ -105,7 +105,6 @@
                                     <br/>
                                     <div class="row">
                                         <div class="col-xs-12">
-                                            <span>Check ASIN links of the order.</span>
                                             <ul>
                                                 @foreach($order['orderItems'] as $item)
                                                     <li>
@@ -118,11 +117,11 @@
                                     </div>
                                     <br/>
                                     <div class="row">
-                                        <div class="col-xs-3">
+                                        <div class="col-xs-3" style="padding-left:3em;">
                                             <div class="form-group">
                                                 <span>Had the customer left a review ?</span><br/>
                                                 <label style="margin-right:5em;">
-                                                    <input type="radio" name="reviewed" value="1"/>
+                                                    <input type="radio" name="reviewed" value="1" checked/>
                                                     Yes
                                                 </label>
                                                 <label>
@@ -133,7 +132,7 @@
                                             <div class="form-group">
                                                 <label>
                                                     <span>And the review ID ?</span>
-                                                    <input required pattern="^\w+( +\w+)*$" autocomplete="off" class="xform-autotrim form-control" placeholder="Review ID" name="review_id"/>
+                                                    <input required pattern="^\w+( +\w+)*$" autocomplete="off" class="xform-autotrim form-control" placeholder="Review ID Separated by spaces" name="review_id"/>
                                                 </label>
                                             </div>
                                         </div>
@@ -499,6 +498,7 @@
             ue.addListener('blur', ue.saveTrackNote)
 
             for (let input of $thewizard.find('[name]')) {
+                if ('radio' === input.type) continue
                 input.value = steps[input.name] || ''
             }
 
