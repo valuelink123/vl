@@ -415,7 +415,7 @@
                 keyNavigation: false,
                 showStepURLhash: false,
                 autoAdjustHeight: false,
-                hiddenSteps: _steps.commented - 1 < 0 ? [] : [3],
+                hiddenSteps: (_steps.commented || 0) - 1 < 0 ? [] : [3],
                 lang: {
                     next: 'Continue >',
                     previous: '< Back'
