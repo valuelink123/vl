@@ -164,7 +164,7 @@
                                             <div class="form-group">
                                                 <label>
                                                     Review ID Separated by spaces
-                                                    <input required pattern="^\w+( +\w+)*$" autocomplete="off" class="xform-autotrim form-control" placeholder="Review ID Separated by spaces" name="review_id3"/>
+                                                    <input required pattern="^\w+( +\w+)*$" autocomplete="off" class="xform-autotrim form-control" placeholder="Review ID Separated by spaces" data-assoc-name="review_id"/>
                                                 </label>
                                             </div>
                                         </div>
@@ -442,7 +442,7 @@
                 }
                 if ('backward' === stepDirection) return true
                 $pages = $thewizard.children('.pages').children('div')
-                $inputs = $($pages[wizardInstance.current_index]).find('[name]')
+                $inputs = $($pages[wizardInstance.current_index]).find('[name],[data-assoc-name]')
                 for (let input of $inputs) {
                     if (!input.reportValidity()) {
                         return false
@@ -506,11 +506,15 @@
             ue.addListener('blur', ue.saveTrackNote)
 
             for (let input of $thewizard.find('[name]')) {
+                // formElement.elements 属性包含所有输入框、选择框等等
+                // 可使用 for of 循环遍历，另外有 name 属性的可通过 name 访问
+                // 具有相同 name 的 input[radio] 自带分组处理功能
                 // formElement.filedName.value // 此种写法兼容 radio、checkbox 等等
                 thewizard[input.name].value = _steps[input.name] || ''
             }
 
             XFormHelper.inputEnableByRadio(thewizard)
+            XFormHelper.assocFormControls(thewizard)
 
             let activeTab = @json($ctgRow['processor']>0)? 'process-steps' : 'ctg-info'
             $(`#tabs a[href="#${activeTab}"]`).tab('show')
