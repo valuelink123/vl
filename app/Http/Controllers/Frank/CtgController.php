@@ -110,7 +110,7 @@ class CtgController extends Controller {
 
             $order = SapRfcRequest::sapOrderDataTranslate($sap->getOrder(['orderId' => $req->input('order_id')]));
 
-            $order['SellerName'] = Accounts::where('account_sellerid', $order['SellerId'])->first()->account_name;
+            $order['SellerName'] = Accounts::where('account_sellerid', $order['SellerId'])->first()->account_name ?? 'No Match';
 
 
             $emails = DB::table('sendbox')->where('to_address', $order['BuyerEmail'])->orderBy('date', 'desc')->get();
