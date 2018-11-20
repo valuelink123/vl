@@ -121,18 +121,19 @@
                                             <div class="form-group">
                                                 <span>Had the customer left a review ?</span><br/>
                                                 <label style="margin-right:5em;">
-                                                    <input type="radio" name="reviewed" value="1" checked/>
+                                                    <input type="radio" name="commented" value="1" checked/>
                                                     Yes
                                                 </label>
                                                 <label>
-                                                    <input type="radio" name="reviewed" value="0"/>
+                                                    <input type="radio" name="commented" value="0"/>
                                                     No
                                                 </label>
                                             </div>
                                             <div class="form-group">
                                                 <label>
                                                     <span>And the review ID ?</span>
-                                                    <input required pattern="^\w+( +\w+)*$" autocomplete="off" class="xform-autotrim form-control" placeholder="Review ID Separated by spaces" name="review_id"/>
+                                                    <input required pattern="^\w+( +\w+)*$" autocomplete="off" class="xform-autotrim form-control" placeholder="Review ID Separated by spaces" name="review_id"
+                                                           data-enable-radio="commented"/>
                                                 </label>
                                             </div>
                                         </div>
@@ -162,8 +163,8 @@
                                         <div class="col-md-3">
                                             <div class="form-group">
                                                 <label>
-                                                    Review ID
-                                                    <input required pattern="^\w+$" autocomplete="off" class="xform-autotrim form-control" placeholder="Review ID" name="xxx"/>
+                                                    Review ID Separated by spaces
+                                                    <input required pattern="^\w+( +\w+)*$" autocomplete="off" class="xform-autotrim form-control" placeholder="Review ID Separated by spaces" data-assoc-name="review_id"/>
                                                 </label>
                                             </div>
                                         </div>
@@ -401,7 +402,7 @@
 
         $(function ($) {
 
-            let steps = <?php echo empty($ctgRow['steps']) ? '{}' : $ctgRow['steps']; ?>;
+            let _steps = <?php echo empty($ctgRow['steps']) ? '{}' : $ctgRow['steps']; ?>;
 
             let $thewizard = $('#thewizard')
 
@@ -414,6 +415,7 @@
                 keyNavigation: false,
                 showStepURLhash: false,
                 autoAdjustHeight: false,
+                hiddenSteps: (_steps.commented || 0) - 1 < 0 ? [] : [3],
                 lang: {
                     next: 'Continue >',
                     previous: '< Back'
@@ -433,9 +435,14 @@
 
 
             $thewizard.on('leaveStep', (e, anchorObject, stepNumber, stepDirection) => {
+                switch (stepNumber) {
+                    case 0:
+                        wizardInstance.stepState(3, parseInt(thewizard.commented.value) < 1 ? 'show' : 'hide')
+                        break
+                }
                 if ('backward' === stepDirection) return true
                 $pages = $thewizard.children('.pages').children('div')
-                $inputs = $($pages[wizardInstance.current_index]).find('[name]')
+                $inputs = $($pages[wizardInstance.current_index]).find('[name],[data-assoc-name]')
                 for (let input of $inputs) {
                     if (!input.reportValidity()) {
                         return false
@@ -449,10 +456,11 @@
                 // todo 退出自动保存、提示
 
                 let steps = rows2object($thewizard.serializeArray(), 'name', 'value')
+                steps = Object.assign(_steps, steps)
                 // steps.current_index = wizardInstance.current_index
                 steps.track_notes = track_notes
                 let status = statusDict[wizardInstance.current_index]
-                let commented = steps.review_id ? 1 : 0
+                let commented = steps.commented
 
                 // jQuery 的 urlencode 中 + 号，似乎不太靠谱
                 // 使用 JSON 提交可以避免数字变字符串的问题
@@ -478,7 +486,7 @@
                 ue.loadTrackNote()
             })
 
-            let track_notes = steps.track_notes
+            let track_notes = _steps.track_notes
             // arr = []
             // arr.a = 333
             // JSON.stringify(arr)
@@ -498,9 +506,15 @@
             ue.addListener('blur', ue.saveTrackNote)
 
             for (let input of $thewizard.find('[name]')) {
-                if ('radio' === input.type) continue
-                input.value = steps[input.name] || ''
+                // formElement.elements 属性包含所有输入框、选择框等等
+                // 可使用 for of 循环遍历，另外有 name 属性的可通过 name 访问
+                // 具有相同 name 的 input[radio] 自带分组处理功能
+                // formElement.filedName.value // 此种写法兼容 radio、checkbox 等等
+                thewizard[input.name].value = _steps[input.name] || ''
             }
+
+            XFormHelper.inputEnableByRadio(thewizard)
+            XFormHelper.assocFormControls(thewizard)
 
             let activeTab = @json($ctgRow['processor']>0)? 'process-steps' : 'ctg-info'
             $(`#tabs a[href="#${activeTab}"]`).tab('show')

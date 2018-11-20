@@ -44,7 +44,7 @@ class CtgController extends Controller {
 
         // query data list
 
-        $where = $this->dtWhere($req, [], [], ['rating' => 't1.rating', 'processor' => 't1.processor', 'status' => 't1.status']);
+        $where = $this->dtWhere($req, ['processor' => 't2.name', 'phone' => 't1.phone'], ['phone' => 't1.phone'], ['rating' => 't1.rating', 'processor' => 't1.processor', 'status' => 't1.status']);
         $orderby = $this->dtOrderBy($req);
         $limit = $this->dtLimit($req);
 
@@ -110,7 +110,7 @@ class CtgController extends Controller {
 
             $order = SapRfcRequest::sapOrderDataTranslate($sap->getOrder(['orderId' => $req->input('order_id')]));
 
-            $order['SellerName'] = Accounts::where('account_sellerid', $order['SellerId'])->first()->account_name;
+            $order['SellerName'] = Accounts::where('account_sellerid', $order['SellerId'])->first()->account_name ?? 'No Match';
 
 
             $emails = DB::table('sendbox')->where('to_address', $order['BuyerEmail'])->orderBy('date', 'desc')->get();
