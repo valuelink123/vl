@@ -464,6 +464,82 @@ where a.date>=:sdate_from and a.date<=:sdate_to
 			
 			
 			
+			if(array_get($_REQUEST,'ExportType')=='Return'){
+				$seller=[];
+				$accounts= DB::connection('order')->table('accounts')->where('status',1)->groupBy(['sellername','sellerid'])->get(['sellername','sellerid']);
+				$accounts=json_decode(json_encode($accounts), true);
+				foreach($accounts as $account){
+					$seller[$account['sellerid']]=$account['sellername'];
+				}
+				$datas= DB::connection('order')->table('amazon_returns')->where('ReturnDate','>=',$date_from.' 00:00:00')->where('ReturnDate','<=',$date_to.' 23:59:59')->orderBy('ReturnDate','asc')->get()->toArray();
+				$arrayData[] = ['ReturnDate','SellerId','SellerName','AmazonOrderId','LineNum','SellerSKU','ASIN','FNSKU','Title','Quantity','FulfillmentCenterId','DetailedDisposition','Reason','Status','LicensePlateNumber','CustomerComments'];
+
+				$datas=json_decode(json_encode($datas), true);
+				foreach($datas as $key=>$val){
+					$arrayData[] = [
+						array_get($val,'ReturnDate'),
+						array_get($val,'SellerId'),
+						array_get($seller,array_get($val,'SellerId'),array_get($val,'SellerId')),
+						array_get($val,'AmazonOrderId'),
+						array_get($val,'LineNum'),
+						array_get($val,'SellerSKU'),
+						array_get($val,'ASIN'),
+						array_get($val,'FNSKU'),
+						array_get($val,'Title'),
+						array_get($val,'Quantity'),
+						array_get($val,'FulfillmentCenterId'),
+						array_get($val,'DetailedDisposition'),
+						array_get($val,'Reason'),
+						array_get($val,'Status'),
+						array_get($val,'LicensePlateNumber'),
+						array_get($val,'CustomerComments')
+					];
+				}
+				
+			}
+			
+			
+			if(array_get($_REQUEST,'ExportType')=='Reimbursements'){
+				$seller=[];
+				$accounts= DB::connection('order')->table('accounts')->where('status',1)->groupBy(['sellername','sellerid'])->get(['sellername','sellerid']);
+				$accounts=json_decode(json_encode($accounts), true);
+				foreach($accounts as $account){
+					$seller[$account['sellerid']]=$account['sellername'];
+				}
+				$datas= DB::connection('order')->table('amazon_reimbursements')->where('approvalDate','>=',$date_from.'T00:00:00')->where('approvalDate','<=',$date_to.'T23:59:59')->orderBy('approvalDate','asc')->get()->toArray();
+				$arrayData[] = ['approvalDate','SellerId','SellerName','reimbursementId','lineNum','caseId','amazonOrderId','reason','Sku','FnSku','asin','productName','currencyUnit','quantityReimbursedCash','quantityReimbursedInventory','quantityReimbursedTotal','originalReimbursementId','originalReimbursementType','condition','amountPerUnit','amountTotal'];
+				$datas=json_decode(json_encode($datas), true);
+				foreach($datas as $key=>$val){
+					$arrayData[] = [
+						array_get($val,'approvalDate'),
+						array_get($val,'sellerId'),
+						array_get($seller,array_get($val,'sellerId'),array_get($val,'sellerId')),
+						array_get($val,'reimbursementId'),
+						array_get($val,'lineNum'),
+						array_get($val,'caseId'),
+						array_get($val,'amazonOrderId'),
+						array_get($val,'reason'),
+						array_get($val,'sku'),
+						array_get($val,'fnsku'),
+						array_get($val,'asin'),
+						array_get($val,'productName'),
+						array_get($val,'currencyUnit'),
+						array_get($val,'quantityReimbursedCash'),
+						array_get($val,'quantityReimbursedInventory'),
+						array_get($val,'quantityReimbursedTotal'),
+						array_get($val,'originalReimbursementId'),
+						array_get($val,'originalReimbursementType'),
+						array_get($val,'condition'),
+						array_get($val,'amountPerUnit'),
+						array_get($val,'amountTotal')
+						
+					];
+				}
+				
+			}
+			
+			
+			
 			if(array_get($_REQUEST,'ExportType')=='Fees'){
 				$seller=[];
 				$accounts= DB::connection('order')->table('accounts')->where('status',1)->groupBy(['sellername','sellerid'])->get(['sellername','sellerid']);
