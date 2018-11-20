@@ -471,7 +471,7 @@ where a.date>=:sdate_from and a.date<=:sdate_to
 				foreach($accounts as $account){
 					$seller[$account['sellerid']]=$account['sellername'];
 				}
-				$datas= DB::connection('order')->table('amazon_returns')->where('ReturnDate','>=',$date_from.' 00:00:00')->where('ReturnDate','<=',$date_to.' 23:59:59')->orderBy('ReturnDate','asc')->get()->toArray();
+				$datas= DB::connection('order')->table('amazon_returns')->where('ReturnDate','>=',$date_from.'T00:00:00')->where('ReturnDate','<=',$date_to.'T23:59:59')->orderBy('ReturnDate','asc')->get()->toArray();
 				$arrayData[] = ['ReturnDate','SellerId','SellerName','AmazonOrderId','LineNum','SellerSKU','ASIN','FNSKU','Title','Quantity','FulfillmentCenterId','DetailedDisposition','Reason','Status','LicensePlateNumber','CustomerComments'];
 
 				$datas=json_decode(json_encode($datas), true);
