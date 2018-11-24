@@ -69,19 +69,19 @@
 				 <label class="control-label">价格类型</label>
 			 </div>
 			 <div class="col-md-1">
-				 <label class="control-label">页面竞品定价</label>
+				 <label class="control-label">页面竞品定价(站点币种)</label>
 			 </div>
 			 <div class="col-md-1">
 				 <label class="control-label">该价格下销量</label>
 			 </div>
 			 <div class="col-md-1">
-				 <label class="control-label">你的定价</label>
+				 <label class="control-label">你的定价(站点币种)</label>
 			 </div>
 			 <div class="col-md-1">
 				 <label class="control-label">预计日销量</label>
 			 </div>
 			 <div class="col-md-1">
-				 <label class="control-label">促销价</label>
+				 <label class="control-label">促销价(站点币种)</label>
 			 </div>
 			 <div class="col-md-1">
 				 <label class="control-label">月促销量</label>
