@@ -28,6 +28,7 @@ Route::get('/etotal', 'UserController@etotal')->name('etotal');
 Route::get('/tran', 'TranController@index')->name('tran');
 Route::get('/price', 'PriceController@index')->name('price');
 Route::Post('/price/get', 'PriceController@get')->name('getPrice');
+Route::Post('/price/getStockAge', 'PriceController@getStockAge')->name('getStockAge');
 Route::resource('rule', 'RuleController');
 Route::resource('auto', 'AutoController');
 Route::get('/profile', 'UserController@profile')->name('profile');

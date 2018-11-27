@@ -72,5 +72,12 @@ class PriceController extends Controller
 		$res = curl_request('http://116.6.105.153:18003/rfc_site.php',$array);
 		die($res);
 	}
-
+	
+	
+	
+	public function getStockAge(Request $request){
+		$saprfc = new \App\Classes\SapRfcRequest();
+		$res = $saprfc->getStockAge(['sku' => strtoupper($request->get('sku'))]);
+		die(round(intval(array_get($res,'1.SAGE',0))/30));
+	}
 }

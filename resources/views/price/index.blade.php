@@ -485,7 +485,13 @@
 					月
 				 </div>
 				 <div class="col-md-4">
-					 <input class="form-control" name="I_ZPJCL" type="text" value="2">
+				 	<div class="input-group">
+					 <input class="form-control" name="I_ZPJCL" type="text" value="0">
+					 <span class="input-group-btn">
+						<button id="genStockAge" class="btn btn-success" type="button">
+						自动获取</button>
+					 </span>
+					 </div>
 				 </div>
 		
 				</div>
@@ -566,7 +572,22 @@ $('.mt-repeater-c').repeater({
 	},
 	isFirstItemUndeletable: true
 });
+$('#genStockAge').on('click',function(){
 
+	var sku=$('input[name="I_MATNR"]').val();
+	if(!sku){
+		alert('请输入SAP物料号');
+		$('input[name="I_MATNR"]').focus();
+	}
+	$.ajax({
+		url:'/price/getStockAge',
+		data:{sku:sku},
+		type:'post',
+		success:function(txt){
+			$('input[name="I_ZPJCL"]').val(txt);
+		},
+	});
+});
 $('#cus_price_submit').on('click',function(){
 
 	$(this).addClass('disabled');
