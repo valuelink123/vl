@@ -234,7 +234,7 @@
 								<div class="input-group date form_datetime">
 									<input type="text" size="16" name="plan_date" readonly class="form-control">
 									<span class="input-group-btn">
-										<button class="btn default date-reset" type="button">
+										<button class="btn default date-clear" type="button">
 											<i class="fa fa-times"></i>
 										</button>
 										<button class="btn default date-set" type="button">

@@ -36,26 +36,41 @@ trait DataTables {
      * WHERE
      * @param Request $req
      * @param array $fuzzyFields 模糊匹配字段
-     * @param $andsMap
+     * @param $andsMap array WHERE AND
+     * @param $insMap array WHERE IN
      * @return string
      */
-    protected function dtWhere(Request $req, $fuzzyFields, $andsMap) {
+    protected function dtWhere(Request $req, array $fuzzyFields, array $andsMap, array $insMap = []) {
 
         $where = [];
 
-        if (!empty($req->input('search.ands'))) {
-            $ands = $req->input('search.ands');
-            $where = [];
+        $ands = $req->input('search.ands', []);
+        $ins = $req->input('search.ins', []);
+        $timerange = $req->input('search.timerange');
 
-            if (!empty($ands['date_from'])) $where[] = 't1.created_at >= "' . addslashes($ands['date_from']) . '"';
-            if (!empty($ands['date_to'])) $where[] = 't1.created_at <= "' . addslashes($ands['date_to']) . '"';
+        $where = [];
 
-            foreach ($ands as $field => $value) {
-                if (empty($andsMap[$field])) continue;
-                if (empty($value)) continue;
-                $value = addslashes($value);
-                $where[] = "{$andsMap[$field]}='{$value}'";
+        if (!empty($timerange)) {
+            if (!empty($timerange['from'])) $where[] = 't1.created_at >= "' . addslashes($timerange['from']) . '"';
+            if (!empty($timerange['to'])) $where[] = 't1.created_at <= "' . addslashes($timerange['to']) . '"';
+        }
+
+        foreach ($ins as $field => $arr) {
+            if (empty($insMap[$field])) continue;
+            if (empty($arr)) continue;
+            $values = [];
+            foreach ($arr as $value) {
+                $values[] = '"' . addslashes($value) . '"';
             }
+            $values = implode(',', $values);
+            $where[] = "{$insMap[$field]} IN ({$values})";
+        }
+
+        foreach ($ands as $field => $value) {
+            if (empty($andsMap[$field])) continue;
+            if (empty($value)) continue;
+            $value = addslashes($value);
+            $where[] = "{$andsMap[$field]}='{$value}'";
         }
 
         if (!empty($req->input('search.value'))) {

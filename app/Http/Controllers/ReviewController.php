@@ -93,6 +93,7 @@ class ReviewController extends Controller
 										$errorCount++;
 									}
 								}
+								DB::table('review')->where('site',trim($data['A']))->where('customer_id',trim($data['B']))->where('status',102)->update(['status'=>103]);
 							
 							}else{
 								$exists = DB::table('review_customers')->where('review',trim($data['C']))->where('site',trim($data['A']))->first();
@@ -123,6 +124,7 @@ class ReviewController extends Controller
 										$errorCount++;
 									}
 								}
+								DB::table('review')->where('site',trim($data['A']))->where('review',trim($data['C']))->where('status',102)->update(['status'=>103]);
 							
 							}
 							

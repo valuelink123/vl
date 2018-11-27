@@ -159,7 +159,7 @@ class PartsListController extends Controller {
         }
 
 
-        if (empty($item_code) || !preg_match('#^[A-z0-9]+$#', $item_code)) {
+        if (empty($item_code) || !preg_match('#^[A-z0-9_-]+$#', $item_code)) {
             throw new DataInputException("Wrong Item No: {$item_code}");
         }
 

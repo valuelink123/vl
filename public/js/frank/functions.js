@@ -90,7 +90,7 @@ function rows2object(rows, keyFields, valueField = null) {
 
     for (let row of rows) {
         let key = (null === separator) ? row[keyFields] : keyFields.map(k => row[k]).join(separator)
-        dataObject[key] = valueField ? row[valueField] : row
+        dataObject[key] = (null !== valueField) ? row[valueField] : row
     }
 
     return dataObject

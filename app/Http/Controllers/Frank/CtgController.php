@@ -8,8 +8,11 @@
 namespace App\Http\Controllers\Frank;
 
 
+use App\Accounts;
+use App\Classes\SapRfcRequest;
 use App\Exceptions\DataInputException;
 use App\Models\Ctg;
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -41,7 +44,7 @@ class CtgController extends Controller {
 
         // query data list
 
-        $where = $this->dtWhere($req, [], []);
+        $where = $this->dtWhere($req, ['processor' => 't2.name', 'phone' => 't1.phone'], ['phone' => 't1.phone'], ['rating' => 't1.rating', 'processor' => 't1.processor', 'status' => 't1.status']);
         $orderby = $this->dtOrderBy($req);
         $limit = $this->dtLimit($req);
 
@@ -53,6 +56,7 @@ class CtgController extends Controller {
             phone,
             rating,
             commented,
+            steps,
             status,
             t2.name AS processor,
             order_id
@@ -72,6 +76,25 @@ class CtgController extends Controller {
 
     }
 
+    public function batchAssignTask(Request $req) {
+
+        $processor = (int)$req->input('processor');
+
+        $user = User::findOrFail($processor);
+
+        Ctg::whereIn('order_id', $req->input('order_ids'))->update(compact('processor'));
+
+        // foreach ($req->input('order_ids') as $order_id) {
+        //     // todo 干掉 id 字段，使用表分区
+        //     // 要求 select 中包含主键，否则无法保存
+        //     $row = Ctg::select('id')->where('order_id', $order_id)->first();
+        //     $row->processor = $processor;
+        //     $row->save();
+        // }
+
+        return [true, $user->name];
+    }
+
     /**
      * @throws DataInputException
      */
@@ -83,13 +106,25 @@ class CtgController extends Controller {
 
         if ($req->isMethod('GET')) {
 
-            $rows = DB::table('users')->select('id', 'name')->get();
+            $sap = new SapRfcRequest();
 
-            foreach ($rows as $row) {
+            $order = SapRfcRequest::sapOrderDataTranslate($sap->getOrder(['orderId' => $req->input('order_id')]));
+
+            $order['SellerName'] = Accounts::where('account_sellerid', $order['SellerId'])->first()->account_name ?? 'No Match';
+
+
+            $emails = DB::table('sendbox')->where('to_address', $order['BuyerEmail'])->orderBy('date', 'desc')->get();
+            $emails = json_decode(json_encode($emails), true); // todo
+
+
+            $userRows = DB::table('users')->select('id', 'name')->get();
+
+            foreach ($userRows as $row) {
                 $users[$row->id] = $row->name;
             }
 
-            return view('frank.ctgProcess', compact('ctgRow', 'users'));
+
+            return view('frank.ctgProcess', compact('ctgRow', 'users', 'order', 'emails'));
 
         }
 

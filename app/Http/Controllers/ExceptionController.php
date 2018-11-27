@@ -42,9 +42,7 @@ class ExceptionController extends Controller
      */
     public function index($type = '')
     {
-		
         return view('exception/index',['users'=>$this->getUsers(),'groups'=>$this->getGroups(),'mygroups'=>$this->getUserGroup(),'sellerids'=>$this->getSellerIds()]);
-		
 
     }
 	
@@ -123,9 +121,9 @@ class ExceptionController extends Controller
 		$headArray[] = 'Group';
 		$headArray[] = 'Creator';
 		
-		$arrayAmazon[] =['Account','Returned/Urgent','MerchantFulfillmentOrderID','DisplayableOrderID','DisplayableOrderDate','MerchantSKU','Quantity','MerchantFulfillmentOrderItemID','GiftMessage','DisplayableComment','PerUnitDeclaredValue','DisplayableOrderComment','DeliverySLA','AddressName','AddressFieldOne','AddressFieldTwo','AddressFieldThree','AddressCity','AddressCountryCode','AddressStateOrRegion','AddressPostalCode','AddressPhoneNumber','NotificationEmail','FulfillmentAction','MarketplaceID'];
+		$arrayAmazon[] =['Status','Account','Returned/Urgent','MerchantFulfillmentOrderID','DisplayableOrderID','DisplayableOrderDate','MerchantSKU','Quantity','MerchantFulfillmentOrderItemID','GiftMessage','DisplayableComment','PerUnitDeclaredValue','DisplayableOrderComment','DeliverySLA','AddressName','AddressFieldOne','AddressFieldTwo','AddressFieldThree','AddressCity','AddressCountryCode','AddressStateOrRegion','AddressPostalCode','AddressPhoneNumber','NotificationEmail','FulfillmentAction','MarketplaceID'];
 		
-		$arraySap[] =['Returned/Urgent','平台编号','站点','平台订单号','售达方','订单类型','订单交易号','付款日期','付款交易ID(不能重复)','买家ID','买家姓名','国家代码','城市名','州/省','街道1','街道2','邮编','邮箱','电话1','成交费','货币','佣金','货币','订单总价','货币','实际运输方式','平台订单号','站点','行号','SAP物料号','数量','工厂','仓库','行项目ID','帖子ID','帖子标题','销售员编号','行交易ID','标记完成'];
+		$arraySap[] =['Status','Returned/Urgent','平台编号','站点','平台订单号','售达方','订单类型','订单交易号','付款日期','付款交易ID(不能重复)','买家ID','买家姓名','国家代码','城市名','州/省','街道1','街道2','邮编','邮箱','电话1','成交费','货币','佣金','货币','订单总价','货币','实际运输方式','平台订单号','站点','行号','SAP物料号','数量','工厂','仓库','行项目ID','帖子ID','帖子标题','销售员编号','行交易ID','标记完成'];
 
 		$arrayData[] = $headArray;
 		$users=$this->getUsers();
@@ -151,9 +149,10 @@ class ExceptionController extends Controller
 					foreach( $products as $product){
 						$sap_line_num+=10;
 						$operate.= ($product['seller_sku']??$product['note']??$product['sku']??'').' ( '.(array_get($product,'item_code')??array_get($product,'title')??'').' ) * '.array_get($product,'qty').'; ';
-						if($customersList['process_status']=='submit'){
+						if($customersList['process_status']!='cancel'){
 						if(array_get($product,'seller_id') && array_get($accounts,array_get($product,'seller_id'))){
 							$arrayAmazon[] =[
+								$customersList['process_status'],
 								array_get($accounts,array_get($product,'seller_id')),
 								implode(', ',array_get($product,'addattr',[])),
 								array_get($product,'replacement_order_id'),
@@ -189,6 +188,7 @@ class ExceptionController extends Controller
 						}
 						
 						$arraySap[] =[
+							$customersList['process_status'],
 							implode(', ',array_get($product,'addattr',[])),
 							'11',
 							array_get($sap_sku_info,'sap_site_id'),
@@ -562,6 +562,13 @@ class ExceptionController extends Controller
             $customers = $customers->where('order_sku', 'like', '%'.$_REQUEST['order_sku'].'%');
            
         }
+		if(array_get($_REQUEST,'resellerid')){
+            $customers = $customers->where('replacement', 'like', '%:"'.$_REQUEST['resellerid'].'"%');
+        }
+		if(array_get($_REQUEST,'resku')){
+            $customers = $customers->where('replacement', 'like', '%:"'.$_REQUEST['resku'].'"%');
+        }
+		
         if(array_get($_REQUEST,'date_from')){
             $customers = $customers->where('date','>=',$_REQUEST['date_from'].' 00:00:00');
         }
@@ -592,15 +599,23 @@ class ExceptionController extends Controller
         $type_list['3'] = "Refund & Replacement";
 		foreach ( $customersLists as $customersList){
 			$operate = '';
-			if($customersList['type']==1 || $customersList['type']==3) $operate.= 'Refund : '.$customersList['refund'].'<BR>';
+			if($customersList['type']==1 || $customersList['type']==3) $operate.= 'Refund : '.$customersList['refund'].'</BR>';
 			if($customersList['type']==2 || $customersList['type']==3){
 				
 				$replacements = unserialize($customersList['replacement']);
 				$products = array_get($replacements,'products',array());
 				if(is_array($products)){
-					$operate.= 'Replace : ';
+					$operate.= 'Replace : </BR>';
 					foreach( $products as $product){
-						$operate.= (($product['seller_sku']??$product['sku']??null)??array_get($product,'title')).'*'.array_get($product,'qty').'; ';
+						if(array_get($product,'seller_id')){
+							$seller_id=array_get($product,'seller_id');
+						}else{
+							$seller_id = $customersList['sellerid'];
+						}
+						
+						$operate.= '<span class="label label-sm label-primary">'.array_get($accounts,$seller_id,$seller_id).'</span></BR>'.(((array_get($accounts,$seller_id)?array_get($product,'seller_sku'):array_get($product,'item_code'))??array_get($product,'sku')??null)??array_get($product,'title')).'*'.array_get($product,'qty').'</BR>';
+						
+						
 					}
 				}
 			}
@@ -649,12 +664,15 @@ class ExceptionController extends Controller
     }
 
     public function getAccounts(){
-        $accounts = Accounts::get()->toArray();
-        $accounts_array = array();
-        foreach($accounts as $account){
-            $accounts_array[strtolower($account['account_email'])] = $account['account_name'];
-        }
-        return $accounts_array;
+		
+		$seller=[];
+		$accounts= DB::connection('order')->table('accounts')->where('status',1)->groupBy(['sellername','sellerid'])->get(['sellername','sellerid']);
+		$accounts=json_decode(json_encode($accounts), true);
+		foreach($accounts as $account){
+			$seller[$account['sellerid']]=$account['sellername'];
+		}
+		return $seller;
+		
     }
 	
 	public function getSellerIds(){
