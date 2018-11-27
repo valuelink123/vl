@@ -66,7 +66,8 @@ class GetAwsInfo extends Command
                 {
                     //获取数据开始日期
                     $date_from = $date[0]->date;
-                    $date_to = date('Y-m-d',strtotime($date_from) + 3600*24);
+                    //$date_to = date('Y-m-d',strtotime($date_from) + 3600*24);
+                    $date_to = date('Y-m-d',strtotime('-1day'));
                 }else{
                     //获取数据开始日期
                     $date_from = date('Y-m-d',strtotime('-2days'));
@@ -92,7 +93,7 @@ class GetAwsInfo extends Command
                     try{
                         foreach ($reports as $k=> $report)
                         {
-                            if(!is_null($report->campaign_name)){
+                            if(!is_null($report->campaign_name) && isset($report->campaign_name)){
                                 $info = array(
                                     "seller_id"=>$account->SellerId,
                                     "marketplace_id"=>$account->MarketPlaceId,
@@ -120,7 +121,9 @@ class GetAwsInfo extends Command
                         }
                         $time_arr = [$account->SellerId,$account->MarketPlaceId,$updated_date,date("Y-m-d H:i:s"),date("Y-m-d H:i:s")];
                         $time_info = "'".implode("','",$time_arr)."'";
-                        DB::insert("INSERT INTO aws_report_time (seller_id,marketplace_id,date,created_at,updated_at) VALUES ($time_info) ON DUPLICATE KEY UPDATE `date`=VALUES (`date`),`updated_at`=VALUES (`updated_at`)");
+                        if($updated_date!=0){
+                            DB::insert("INSERT INTO aws_report_time (seller_id,marketplace_id,date,created_at,updated_at) VALUES ($time_info) ON DUPLICATE KEY UPDATE `date`=VALUES (`date`),`updated_at`=VALUES (`updated_at`)");
+                        }
                        DB::commit();
                     }catch (\Exception $e){
                         var_dump($e->getMessage());
