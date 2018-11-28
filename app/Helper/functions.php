@@ -320,3 +320,47 @@ function getMcfOrderStatus(){
 		'RECEIVED','INVALID','PLANNING','PROCESSING','CANCELLED','COMPLETE','COMPLETE_PARTIALLED','UNFULFILLABLE'
 	);
 }
+
+function curl_request($url,$post='',$cookie='', $returnCookie=0){
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, $url);
+        curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
+        curl_setopt($curl, CURLOPT_AUTOREFERER, 1);
+        if($post) {
+            curl_setopt($curl, CURLOPT_POST, 1);
+            curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($post));
+        }
+        if($cookie) {
+            curl_setopt($curl, CURLOPT_COOKIE, $cookie);
+        }
+        curl_setopt($curl, CURLOPT_HEADER, $returnCookie);
+        curl_setopt($curl, CURLOPT_TIMEOUT, 10);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        $data = curl_exec($curl);
+        if (curl_errno($curl)) {
+            return curl_error($curl);
+        }
+        curl_close($curl);
+        if($returnCookie){
+            list($header, $body) = explode("\r\n\r\n", $data, 2);
+            preg_match_all("/Set\-Cookie:([^;]*);/", $header, $matches);
+            $info['cookie']  = substr($matches[1][0], 1);
+            $info['content'] = $body;
+            return $info;
+        }else{
+            return $data;
+        }
+}
+
+function getSapSiteCode(){
+	return array(
+		'1007'  => 'amazon.com',
+		'1008'  => 'amazon.ca',
+		'1009'  => 'amazon.de',
+		'1010'  => 'amazon.fr',
+		'1011'  => 'amazon.it',
+		'1012'  => 'amazon.es',
+		'1013'  => 'amazon.co.uk',
+		'1014'  => 'amazon.co.jp'
+	);
+}

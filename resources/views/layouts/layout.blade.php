@@ -480,9 +480,18 @@
 					
 					<li class="nav-item <?php if($action=='mcforder') echo 'active';?>">
                         <a href="{{ url('mcforder') }}" class="nav-link nav-toggle">
-                            <i class="fa fa-line-chart"></i>
+                            <i class="fa fa-sticky-note-o"></i>
                             <span class="title">Mcf Order</span>
                             <?php if($action=='mcforder') echo '<span class="selected"></span>';?>
+                        </a>
+                    </li>
+					
+					
+					<li class="nav-item <?php if($action=='price') echo 'active';?>">
+                        <a href="{{ url('price') }}" class="nav-link nav-toggle">
+                            <i class="fa fa-line-chart"></i>
+                            <span class="title">Price Model</span>
+                            <?php if($action=='price') echo '<span class="selected"></span>';?>
                         </a>
                     </li>
 
