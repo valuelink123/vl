@@ -123,7 +123,7 @@ class BrandLineController extends Controller {
 
         // 能不用 JOIN 就尽量不用
         // 有唯一索引，不用那么绕
-        // 不过 Eloquent 也真够绕的
+        // WHERE 分组，传二维数组就可以
         $manuals = KmsUserManual::select('link')->where(function ($where) use ($modelRows) {
             foreach ($modelRows as $row) {
                 $where->orWhere(function ($where) use ($row) {
