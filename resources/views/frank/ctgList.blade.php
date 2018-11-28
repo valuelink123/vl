@@ -188,7 +188,10 @@
                 {
                     width: "55px",
                     data: 'created_at',
-                    name: 'created_at'
+                    name: 'created_at',
+                    render(data) {
+                        return data.substr(0, 10)
+                    }
                 },
                 {
                     width: "20px",
@@ -235,8 +238,8 @@
                     data: 'order_id',
                     name: 'order_id',
                     orderable: false,
-                    render(data) {
-                        return `<a class="btn btn-danger btn-xs" href="/ctg/list/process?order_id=${data}" target="_blank">Process</a>`
+                    render(data, type, row) {
+                        return `<a class="btn btn-danger btn-xs" href="/ctg/list/process?order_id=${data}&created_at=${encodeURIComponent(row.created_at)}" target="_blank">Process</a>`
                     }
                 }
             ],
@@ -257,20 +260,22 @@
 
             let selectedRows = dtApi.rows({selected: true})
 
-            let order_ids = selectedRows.data().toArray().map(obj => obj.order_id)
+            let ctgRows = selectedRows.data().toArray().map(obj => [obj.created_at, obj.order_id])
 
-            if (!order_ids.length) {
+            if (!ctgRows.length) {
                 $this.val('')
                 toastr.error('Please select some rows first !')
                 return
             }
 
-            postByJson('/ctg/batchassigntask', {processor, order_ids}).then(arr => {
+            postByJson('/ctg/batchassigntask', {processor, ctgRows}).then(arr => {
                 for (let rowIndex of selectedRows[0]) {
                     // console.log(dtApi.cell(rowIndex, 9).data())
                     dtApi.cell(rowIndex, 9).data(arr[1]).draw()
+                    // draw 之后，dt 自作主张，向服务器请求数据然后又更新一遍
                 }
                 toastr.success('Saved !')
+                $this.val('')
             }).catch(err => {
                 toastr.error(err.message)
             })

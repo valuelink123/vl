@@ -78,6 +78,9 @@ class SapRfcRequest {
             'EarliestDeliveryDate' => ($data['EDDATE'] > 0) ? date('Y-m-d H:i:s', strtotime($data['EDDATE'] . $data['EDTIME'])) : '',
             'LatestDeliveryDate' => ($data['LDDATE'] > 0) ? date('Y-m-d H:i:s', strtotime($data['LDDATE'] . $data['LDTIME'])) : '',
         );
+
+        $orderItemData = [];
+
         foreach ($data['O_ITEMS'] as $sdata) {
             $orderItemData[] = array(
                 'SellerId' => $sdata['SELLERID'],

@@ -50,7 +50,7 @@ class CtgController extends Controller {
 
         $sql = "
         SELECT SQL_CALC_FOUND_ROWS
-            DATE(t1.created_at) AS created_at,
+            t1.created_at,
             t1.name,
             t1.email,
             phone,
@@ -78,14 +78,24 @@ class CtgController extends Controller {
 
     public function batchAssignTask(Request $req) {
 
+        if (empty($req->input('ctgRows'))) return [true, ''];
+
         $processor = (int)$req->input('processor');
 
         $user = User::findOrFail($processor);
 
-        Ctg::whereIn('order_id', $req->input('order_ids'))->update(compact('processor'));
+        Ctg::where(function ($where) use ($req) {
+            foreach ($req->input('ctgRows') as $row) {
+                // WHERE GROUP，传二维数组就可以
+                $where->orWhere([
+                    ['created_at', $row[0]],
+                    ['order_id', $row[1]],
+                ]);
+            }
+        })->update(compact('processor'));
 
         // foreach ($req->input('order_ids') as $order_id) {
-        //     // todo 干掉 id 字段，使用表分区
+        //     // 干掉 id 字段，使用表分区
         //     // 要求 select 中包含主键，否则无法保存
         //     $row = Ctg::select('id')->where('order_id', $order_id)->first();
         //     $row->processor = $processor;
@@ -100,7 +110,12 @@ class CtgController extends Controller {
      */
     public function process(Request $req) {
 
-        $ctgRow = Ctg::selectRaw('*')->where('order_id', $req->input('order_id'))->first();
+        $wheres = [
+            ['created_at', $req->input('created_at')],
+            ['order_id', $req->input('order_id')]
+        ];
+
+        $ctgRow = Ctg::selectRaw('*')->where($wheres)->limit(1)->first();
 
         if (empty($ctgRow)) throw new DataInputException('ctg not found');
 
@@ -131,17 +146,19 @@ class CtgController extends Controller {
 
         // Update
 
+        $updates = [];
+
         if ($req->has('processor')) {
-            $ctgRow->processor = (int)$req->input('processor');
+            $updates['processor'] = (int)$req->input('processor');
         }
 
         if ($req->has('steps')) {
-            $ctgRow->status = $req->input('status');
-            $ctgRow->commented = $req->input('commented');
-            $ctgRow->steps = json_encode($req->input('steps'));
+            $updates['status'] = $req->input('status');
+            $updates['commented'] = $req->input('commented');
+            $updates['steps'] = json_encode($req->input('steps'));
         }
 
-        $ctgRow->save();
+        $ctgRow->where($wheres)->update($updates);
 
         return [true];
     }
