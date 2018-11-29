@@ -11,14 +11,15 @@ use App\Asin;
 use App\Classes\SapRfcRequest;
 use App\Exceptions\HypocriteException;
 use App\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 
 class Ctg extends Model {
-    protected $primaryKey = 'order_id';
+    protected $primaryKey = null;
     public $incrementing = false; // 主键不是数字，需要有此声明，否则 order_id 被截断
     protected $table = 'ctg';
     // protected $guarded = ['id']; // 黑名单模式
-    protected $fillable = ['order_id', 'gift_sku', 'name', 'email', 'phone', 'address', 'note', 'rating'];
+    protected $fillable = ['order_id', 'gift_sku', 'name', 'email', 'phone', 'address', 'note', 'rating', 'processor'];
 
     /**
      * @throws HypocriteException
@@ -35,15 +36,17 @@ class Ctg extends Model {
 
             $order = $sap->getOrder(['orderId' => $row['order_id']]);
 
-            if (empty($order['O_ITEMS'])) {
+            $order = SapRfcRequest::sapOrderDataTranslate($order);
+
+            if (empty($order['orderItems'])) {
                 throw new \Exception('Order Info Error.');
             }
 
-            $item = array_pop($order['O_ITEMS']);
+            $item = array_pop($order['orderItems']);
 
-            $site = strtolower("www.{$order['SCHANNEL']}");
+            $site = "www.{$order['SalesChannel']}";
 
-            $asinRow = Asin::select('sap_seller_id')->where('site', $site)->where('asin', $item['ZASIN'])->where('sellersku', $item['ZSSKU'])->first();
+            $asinRow = Asin::select('sap_seller_id')->where('site', $site)->where('asin', $item['ASIN'])->where('sellersku', $item['SellerSKU'])->first();
 
         } catch (\Exception $e) {
             throw new HypocriteException($e->getMessage() . ' For help, please mail to support@claimthegift.com');
@@ -52,22 +55,35 @@ class Ctg extends Model {
 
         try {
 
-            $obj = self::create($row);
+            DB::beginTransaction();
+
+            $ctgRow = self::select('created_at')->where('created_at', '>', $order['PurchaseDate'])->where('order_id', $row['order_id'])->limit(1)->lockForUpdate()->first();
+
+            if (!empty($ctgRow)) {
+                DB::rollback();
+                throw new \Exception("Order ID is duplicate, submitted in {$ctgRow['created_at']}.");
+            }
+
+
+            $row['processor'] = 0;
 
             if (!empty($asinRow->sap_seller_id)) {
 
                 $user = User::select('id')->where('sap_seller_id', $asinRow->sap_seller_id)->limit(1)->first();
 
                 if (!empty($user->id)) {
-                    $obj->processor = $user->id;
-                    $obj->save();
+                    $row['processor'] = $user->id;
                 }
             }
+
+            $obj = self::create($row);
+
+            DB::commit();
 
             return $obj;
 
         } catch (\Exception $e) {
-            throw new HypocriteException('ORDER ID is Duplicate, You may had submitted it successfully. For help, please mail to support@claimthegift.com');
+            throw new HypocriteException($e->getMessage() . ' For help, please mail to support@claimthegift.com');
             // return HypocriteException::wrap($e, 'ORDER ID is Duplicate, You may had submitted it successfully. For help, please mail to support@claimthegift.com');
         }
     }
