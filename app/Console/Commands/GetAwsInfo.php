@@ -12,7 +12,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use DB;
 use Log;
-
+use App\AwsInfo;
 class GetAwsInfo extends Command
 {
     /**
@@ -70,7 +70,7 @@ class GetAwsInfo extends Command
                     $date_to = date('Y-m-d',strtotime('-1day'));
                 }else{
                     //获取数据开始日期
-                    $date_from = date('Y-m-d',strtotime('-2days'));
+                    $date_from = date('Y-m-d',strtotime('-32 days'));
                     $date_to = date('Y-m-d',strtotime('-1day'));
                 }
                 $seller_id=$account->SellerId;
@@ -84,7 +84,7 @@ class GetAwsInfo extends Command
                   LEFT JOIN ppc_profiles on ppc_profiles.profile_id = ppc_reports.profile_id
                   left join accounts on accounts.id=ppc_profiles.account_id
                   left join ppc_ad_groups on ppc_ad_groups.campaign_id = ppc_campaigns.campaign_id
-                  where ppc_reports.date>'$date_from' and ppc_reports.date<='$date_to' and accounts.seller_id='$seller_id' and  accounts.marketplace_id=$marketplaceid  group by ppc_campaigns.name,ppc_ad_groups.ad_group_id,ppc_reports.date "
+                  where ppc_reports.date>'$date_from' and ppc_reports.date<='$date_to' and accounts.seller_id='$seller_id' and  accounts.marketplace_id=$marketplaceid   group by ppc_campaigns.name,ppc_ad_groups.ad_group_id,ppc_reports.date order by ppc_reports.date"
                     );
                 if(isset($reports) && !empty($reports))
                 {
@@ -94,7 +94,7 @@ class GetAwsInfo extends Command
                         foreach ($reports as $k=> $report)
                         {
                             if(!is_null($report->campaign_name) && isset($report->campaign_name)){
-                                $info = array(
+                                $info_arr = array(
                                     "seller_id"=>$account->SellerId,
                                     "marketplace_id"=>$account->MarketPlaceId,
                                     "campaign_name"=>$report->campaign_name,
@@ -116,7 +116,12 @@ class GetAwsInfo extends Command
                                     "updated_at"=>date("Y-m-d H:i:s"),
                                 );
                                 $updated_date =$report->date;
-                              DB::table('aws_report')->insert($info);
+                                AwsInfo::updateOrCreate(array("seller_id"=>$account->SellerId,
+                                    "marketplace_id"=>$account->MarketPlaceId,
+                                    "campaign_name"=>$report->campaign_name,
+                                    "ad_group"=>$report->ad_group,
+                                    "date"=>$report->date
+                                    ),$info_arr);
                             }
                         }
                         $time_arr = [$account->SellerId,$account->MarketPlaceId,$updated_date,date("Y-m-d H:i:s"),date("Y-m-d H:i:s")];
