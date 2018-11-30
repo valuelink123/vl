@@ -90,14 +90,14 @@
                         </th>
                         <th>Date</th>
                         <th>Processor</th>
-                        <th>Customer Email</th>
-                        <th>Customer Name</th>
+                        <th>Email</th>
+                        <th>Customer</th>
                         <th>Item No</th>
                         <th>Item Name</th>
                         <th>Seller SKU</th>
                         <th>Brand</th>
                         <th>Item Group</th>
-                        <th>Phone Number</th>
+                        <th>Phone</th>
                         <th>Expect Rating</th>
                         <th>Reviewed</th>
                         <th>Tracking Note</th>
@@ -176,6 +176,7 @@
             // searching: false,
             search: {search: queryStringToObject().search},
             serverSide: true,
+            scrollX: 2000,
             pagingType: 'bootstrap_extended',
             processing: true,
             order: [[1, 'desc']],
@@ -200,25 +201,17 @@
                         return data.substr(0, 10)
                     }
                 },
-                {
-                    width: "120px",
-                    data: 'processor',
-                    name: 'processor'
-                },
+                {data: 'processor', name: 'processor', width: "120px"},
                 {data: 'email', name: 'email'},
-                {
-                    width: "20px",
-                    data: 'name',
-                    name: 'name'
-                },
+                {data: 'name', name: 'name'},
                 {data: 'itemCodes', name: 'itemCodes'},
-                {data: 'itemNames', name: 'itemNames'},
+                {data: 'itemNames', name: 'itemNames', width: "520px"},
                 {data: 'sellerskus', name: 'sellerskus'},
                 {data: 'brands', name: 'brands'},
-                {data: 'itemGroups', name: 'itemGroups'},
+                {data: 'itemGroups', name: 'itemGroups', width: "80px"},
                 {data: 'phone', name: 'phone'},
                 {
-                    width: "20px",
+                    width: "100px",
                     data: 'rating',
                     name: 'rating'
                 },
