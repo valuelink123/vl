@@ -26,13 +26,13 @@
                     <div class="col-md-2">
                         <div class="input-group">
                             <span class="input-group-addon">From</span>
-                            <input class="form-control" data-options="format:'yyyy-mm-dd 00:00:00'" value="{!! date('Y-m-d 00:00:00', strtotime('-90 day')) !!}" data-init-by-query="ands.date_from" id="date_from"
+                            <input class="form-control" data-options="format:'yyyy-mm-dd'" value="{!! date('Y-m-d', strtotime('-90 day')) !!}" data-init-by-query="ands.date_from" id="date_from"
                                    autocomplete="off"/>
                         </div>
                         <br/>
                         <div class="input-group">
                             <span class="input-group-addon">To</span>
-                            <input class="form-control" data-options="format:'yyyy-mm-dd 23:59:59'" value="{!! date('Y-m-d 23:59:59') !!}" data-init-by-query="ands.date_to" id="date_to" autocomplete="off"/>
+                            <input class="form-control" data-options="format:'yyyy-mm-dd'" value="{!! date('Y-m-d') !!}" data-init-by-query="ands.date_to" id="date_to" autocomplete="off"/>
                         </div>
                     </div>
                     <div class="col-md-2">
@@ -46,6 +46,15 @@
                                 <option value="5">5</option>
                             </select>
                         </div>
+                        <br/>
+                        <div class="input-group">
+                            <span class="input-group-addon">BG</span>
+                            <select multiple style="width:100%;" id="bg">
+                                @foreach($bgs as $bg)
+                                    <option value="{!! $bg !!}">{!! $bg !!}</option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
                     <div class="col-md-3">
                         <div class="input-group">
@@ -53,6 +62,15 @@
                             <select multiple style="width:100%;" id="processor">
                                 @foreach($users as $id=>$name)
                                     <option value="{!! $id !!}">{!! $name !!}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <br/>
+                        <div class="input-group">
+                            <span class="input-group-addon">BU</span>
+                            <select multiple style="width:100%;" id="bu">
+                                @foreach($bus as $bu)
+                                    <option value="{!! $bu !!}">{!! $bu !!}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -66,6 +84,15 @@
                                 <option value="Delivery Confirmation">Delivery Confirmation</option>
                                 <option value="Lead To Leave Review">Lead To Leave Review</option>
                                 <option value="Re-SG">Re-SG</option>
+                            </select>
+                        </div>
+                        <br/>
+                        <div class="input-group">
+                            <span class="input-group-addon">Brand</span>
+                            <select multiple style="width:100%;" id="brand">
+                                @foreach($brands as $brand)
+                                    <option value="{!! $brand !!}">{!! $brand !!}</option>
+                                @endforeach
                             </select>
                         </div>
                     </div>
@@ -86,16 +113,23 @@
                     <thead>
                     <tr>
                         <th onclick="this===arguments[0].target && this.firstElementChild.click()">
-                            <input type="checkbox" onchange="this.checked?dtApi.rows().select():dtApi.rows().deselect()"/>
+                            <input type="checkbox" onchange="this.checked?dtApi.rows().select():dtApi.rows().deselect()" id="selectAll"/>
                         </th>
                         <th>Date</th>
-                        <th>Customer Name</th>
-                        <th>Customer Email</th>
-                        <th>Phone Number</th>
+                        <th>Email</th>
+                        <th>Customer</th>
+                        <th>Item No</th>
+                        <th>Item Name</th>
+                        <th>Seller SKU</th>
+                        <th>Brand</th>
+                        <th>Item Group</th>
+                        <th>Phone</th>
                         <th>Expect Rating</th>
                         <th>Reviewed</th>
                         <th>Tracking Note</th>
                         <th>Status</th>
+                        <th>BG</th>
+                        <th>BU</th>
                         <th>Processor</th>
                         <th>Action</th>
                     </tr>
@@ -159,6 +193,9 @@
                     rating: $('#rating').val(),
                     processor: $('#processor').val(),
                     status: $('#status').val(),
+                    bg: $('#bg').val(),
+                    bu: $('#bu').val(),
+                    brand: $('#brand').val(),
                 }
             })
 
@@ -169,6 +206,8 @@
             // searching: false,
             search: {search: queryStringToObject().search},
             serverSide: true,
+            scrollX: 2000,
+            fixedColumns: {leftColumns: 1},
             pagingType: 'bootstrap_extended',
             processing: true,
             order: [[1, 'desc']],
@@ -193,15 +232,16 @@
                         return data.substr(0, 10)
                     }
                 },
-                {
-                    width: "20px",
-                    data: 'name',
-                    name: 'name'
-                },
                 {data: 'email', name: 'email'},
+                {data: 'name', name: 'name'},
+                {data: 'itemCodes', name: 'itemCodes'},
+                {data: 'itemNames', name: 'itemNames', width: "520px"},
+                {data: 'sellerskus', name: 'sellerskus'},
+                {data: 'brands', name: 'brands'},
+                {data: 'itemGroups', name: 'itemGroups', width: "80px"},
                 {data: 'phone', name: 'phone'},
                 {
-                    width: "20px",
+                    width: "100px",
                     data: 'rating',
                     name: 'rating'
                 },
@@ -228,11 +268,9 @@
                     data: 'status',
                     name: 'status'
                 },
-                {
-                    width: "120px",
-                    data: 'processor',
-                    name: 'processor'
-                },
+                {data: 'bgs', name: 'bgs'},
+                {data: 'bus', name: 'bus'},
+                {data: 'processor', name: 'processor', width: "120px"},
                 {
                     width: "20px",
                     data: 'order_id',
@@ -274,8 +312,11 @@
                     dtApi.cell(rowIndex, 9).data(arr[1]).draw()
                     // draw 之后，dt 自作主张，向服务器请求数据然后又更新一遍
                 }
+
                 toastr.success('Saved !')
                 $this.val('')
+                selectAll.checked = false
+
             }).catch(err => {
                 toastr.error(err.message)
             })

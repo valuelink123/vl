@@ -79,6 +79,8 @@ class SapRfcRequest {
             'LatestDeliveryDate' => ($data['LDDATE'] > 0) ? date('Y-m-d H:i:s', strtotime($data['LDDATE'] . $data['LDTIME'])) : '',
         );
 
+        $MarketPlaceSite = 'www.' . $order['SalesChannel'];
+
         $orderItemData = [];
 
         foreach ($data['O_ITEMS'] as $sdata) {
@@ -115,6 +117,7 @@ class SapRfcRequest {
                 'CODFeeDiscountCurrencyCode' => $sdata['CFDCCODE'],
                 'ASIN' => $sdata['ZASIN'],
                 'SellerSKU' => $sdata['ZSSKU'],
+                'MarketPlaceSite' => $MarketPlaceSite
             );
         }
 

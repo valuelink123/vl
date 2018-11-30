@@ -42,11 +42,9 @@ class Ctg extends Model {
                 throw new \Exception('Order Info Error.');
             }
 
-            $item = array_pop($order['orderItems']);
+            $item = current($order['orderItems']);
 
-            $site = "www.{$order['SalesChannel']}";
-
-            $asinRow = Asin::select('sap_seller_id')->where('site', $site)->where('asin', $item['ASIN'])->where('sellersku', $item['SellerSKU'])->first();
+            $asinRow = Asin::select('sap_seller_id')->where('site', $item['MarketPlaceSite'])->where('asin', $item['ASIN'])->where('sellersku', $item['SellerSKU'])->first();
 
         } catch (\Exception $e) {
             throw new HypocriteException($e->getMessage() . ' For help, please mail to support@claimthegift.com');
@@ -57,6 +55,7 @@ class Ctg extends Model {
 
             DB::beginTransaction();
 
+            // 时区不明确 todo
             $ctgRow = self::select('created_at')->where('created_at', '>', $order['PurchaseDate'])->where('order_id', $row['order_id'])->limit(1)->lockForUpdate()->first();
 
             if (!empty($ctgRow)) {
@@ -76,9 +75,32 @@ class Ctg extends Model {
                 }
             }
 
+
             $obj = self::create($row);
 
+            // $find = [
+            //     // 'created_at' => $order['created_at'],
+            //     'MarketPlaceId' => $order['MarketPlaceId'],
+            //     'SellerId' => $order['SellerId'],
+            //     'AmazonOrderId' => $order['AmazonOrderId'],
+            // ];
+
+
+            foreach ($order['orderItems'] as $item) {
+                $item['created_at'] = $obj['created_at'];
+                // CtgOrderItem::updateOrCreate($find, $item);
+                CtgOrderItem::create($item);
+            }
+
+            unset($order['orderItems']);
+
+            $order['created_at'] = $obj['created_at'];
+            // CtgOrder::updateOrCreate($find, $order);
+            CtgOrder::create($order);
+
+
             DB::commit();
+
 
             return $obj;
 
