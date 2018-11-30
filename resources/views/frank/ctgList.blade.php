@@ -46,6 +46,15 @@
                                 <option value="5">5</option>
                             </select>
                         </div>
+                        <br/>
+                        <div class="input-group">
+                            <span class="input-group-addon">BG</span>
+                            <select multiple style="width:100%;" id="bg">
+                                @foreach($bgs as $bg)
+                                    <option value="{!! $bg !!}">{!! $bg !!}</option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
                     <div class="col-md-3">
                         <div class="input-group">
@@ -53,6 +62,15 @@
                             <select multiple style="width:100%;" id="processor">
                                 @foreach($users as $id=>$name)
                                     <option value="{!! $id !!}">{!! $name !!}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <br/>
+                        <div class="input-group">
+                            <span class="input-group-addon">BU</span>
+                            <select multiple style="width:100%;" id="bu">
+                                @foreach($bus as $bu)
+                                    <option value="{!! $bu !!}">{!! $bu !!}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -66,6 +84,15 @@
                                 <option value="Delivery Confirmation">Delivery Confirmation</option>
                                 <option value="Lead To Leave Review">Lead To Leave Review</option>
                                 <option value="Re-SG">Re-SG</option>
+                            </select>
+                        </div>
+                        <br/>
+                        <div class="input-group">
+                            <span class="input-group-addon">Brand</span>
+                            <select multiple style="width:100%;" id="brand">
+                                @foreach($brands as $brand)
+                                    <option value="{!! $brand !!}">{!! $brand !!}</option>
+                                @endforeach
                             </select>
                         </div>
                     </div>
@@ -89,7 +116,6 @@
                             <input type="checkbox" onchange="this.checked?dtApi.rows().select():dtApi.rows().deselect()" id="selectAll"/>
                         </th>
                         <th>Date</th>
-                        <th>Processor</th>
                         <th>Email</th>
                         <th>Customer</th>
                         <th>Item No</th>
@@ -104,6 +130,7 @@
                         <th>Status</th>
                         <th>BG</th>
                         <th>BU</th>
+                        <th>Processor</th>
                         <th>Action</th>
                     </tr>
                     </thead>
@@ -166,6 +193,9 @@
                     rating: $('#rating').val(),
                     processor: $('#processor').val(),
                     status: $('#status').val(),
+                    bg: $('#bg').val(),
+                    bu: $('#bu').val(),
+                    brand: $('#brand').val(),
                 }
             })
 
@@ -177,6 +207,7 @@
             search: {search: queryStringToObject().search},
             serverSide: true,
             scrollX: 2000,
+            fixedColumns: {leftColumns: 1},
             pagingType: 'bootstrap_extended',
             processing: true,
             order: [[1, 'desc']],
@@ -201,7 +232,6 @@
                         return data.substr(0, 10)
                     }
                 },
-                {data: 'processor', name: 'processor', width: "120px"},
                 {data: 'email', name: 'email'},
                 {data: 'name', name: 'name'},
                 {data: 'itemCodes', name: 'itemCodes'},
@@ -240,6 +270,7 @@
                 },
                 {data: 'bgs', name: 'bgs'},
                 {data: 'bus', name: 'bus'},
+                {data: 'processor', name: 'processor', width: "120px"},
                 {
                     width: "20px",
                     data: 'order_id',

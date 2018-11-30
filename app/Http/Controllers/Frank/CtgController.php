@@ -32,20 +32,53 @@ class CtgController extends Controller {
 
         if ($req->isMethod('GET')) {
 
-            $rows = DB::table('users')->select('id', 'name')->get();
+            $userRows = DB::table('users')->select('id', 'name')->get();
 
-            foreach ($rows as $row) {
+            foreach ($userRows as $row) {
                 $users[$row->id] = $row->name;
             }
 
-            return view('frank.ctgList', compact('users'));
+            $bgs = $this->queryFields('SELECT DISTINCT bg FROM asin');
+            $bus = $this->queryFields('SELECT DISTINCT bu FROM asin');
+            $brands = $this->queryFields('SELECT DISTINCT brand FROM asin');
+
+            return view('frank.ctgList', compact('users', 'bgs', 'bus', 'brands'));
         }
 
 
         // query data list
 
         $dateRange = $this->dtDateRange($req);
-        $where = $this->dtWhere($req, ['processor' => 't2.name', 'phone' => 't1.phone'], ['phone' => 't1.phone'], ['rating' => 't1.rating', 'processor' => 't1.processor', 'status' => 't1.status']);
+        $where = $this->dtWhere(
+            $req,
+            [
+                'processor' => 't2.name',
+                'email' => 't1.email',
+                'name' => 't1.name',
+                'order_id' => 't1.order_id',
+                'asins' => 't4.asins',
+                'itemCodes' => 't4.itemCodes',
+                'itemNames' => 't4.itemNames',
+                'sellerskus' => 't4.sellerskus',
+                'itemGroups' => 't4.itemGroups',
+                'brands' => 't4.brands',
+                'bgs' => 't4.bgs',
+                'bus' => 't4.bus',
+                'phone' => 't1.phone'
+            ],
+            [
+                'phone' => 't1.phone'
+            ],
+            [
+                'rating' => 't1.rating',
+                'processor' => 't1.processor',
+                'status' => 't1.status',
+                // todo 已知的搜索问题
+                'bg' => 't4.bgs',
+                'bu' => 't4.bus',
+                'brand' => 't4.brands',
+            ]
+        );
         $orderby = $this->dtOrderBy($req);
         $limit = $this->dtLimit($req);
 
