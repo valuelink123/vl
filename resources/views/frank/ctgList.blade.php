@@ -26,13 +26,13 @@
                     <div class="col-md-2">
                         <div class="input-group">
                             <span class="input-group-addon">From</span>
-                            <input class="form-control" data-options="format:'yyyy-mm-dd 00:00:00'" value="{!! date('Y-m-d 00:00:00', strtotime('-90 day')) !!}" data-init-by-query="ands.date_from" id="date_from"
+                            <input class="form-control" data-options="format:'yyyy-mm-dd'" value="{!! date('Y-m-d', strtotime('-90 day')) !!}" data-init-by-query="ands.date_from" id="date_from"
                                    autocomplete="off"/>
                         </div>
                         <br/>
                         <div class="input-group">
                             <span class="input-group-addon">To</span>
-                            <input class="form-control" data-options="format:'yyyy-mm-dd 23:59:59'" value="{!! date('Y-m-d 23:59:59') !!}" data-init-by-query="ands.date_to" id="date_to" autocomplete="off"/>
+                            <input class="form-control" data-options="format:'yyyy-mm-dd'" value="{!! date('Y-m-d') !!}" data-init-by-query="ands.date_to" id="date_to" autocomplete="off"/>
                         </div>
                     </div>
                     <div class="col-md-2">
@@ -86,17 +86,24 @@
                     <thead>
                     <tr>
                         <th onclick="this===arguments[0].target && this.firstElementChild.click()">
-                            <input type="checkbox" onchange="this.checked?dtApi.rows().select():dtApi.rows().deselect()"/>
+                            <input type="checkbox" onchange="this.checked?dtApi.rows().select():dtApi.rows().deselect()" id="selectAll"/>
                         </th>
                         <th>Date</th>
-                        <th>Customer Name</th>
+                        <th>Processor</th>
                         <th>Customer Email</th>
+                        <th>Customer Name</th>
+                        <th>Item No</th>
+                        <th>Item Name</th>
+                        <th>Seller SKU</th>
+                        <th>Brand</th>
+                        <th>Item Group</th>
                         <th>Phone Number</th>
                         <th>Expect Rating</th>
                         <th>Reviewed</th>
                         <th>Tracking Note</th>
                         <th>Status</th>
-                        <th>Processor</th>
+                        <th>BG</th>
+                        <th>BU</th>
                         <th>Action</th>
                     </tr>
                     </thead>
@@ -194,11 +201,21 @@
                     }
                 },
                 {
+                    width: "120px",
+                    data: 'processor',
+                    name: 'processor'
+                },
+                {data: 'email', name: 'email'},
+                {
                     width: "20px",
                     data: 'name',
                     name: 'name'
                 },
-                {data: 'email', name: 'email'},
+                {data: 'itemCodes', name: 'itemCodes'},
+                {data: 'itemNames', name: 'itemNames'},
+                {data: 'sellerskus', name: 'sellerskus'},
+                {data: 'brands', name: 'brands'},
+                {data: 'itemGroups', name: 'itemGroups'},
                 {data: 'phone', name: 'phone'},
                 {
                     width: "20px",
@@ -228,11 +245,8 @@
                     data: 'status',
                     name: 'status'
                 },
-                {
-                    width: "120px",
-                    data: 'processor',
-                    name: 'processor'
-                },
+                {data: 'bgs', name: 'bgs'},
+                {data: 'bus', name: 'bus'},
                 {
                     width: "20px",
                     data: 'order_id',
@@ -274,8 +288,11 @@
                     dtApi.cell(rowIndex, 9).data(arr[1]).draw()
                     // draw 之后，dt 自作主张，向服务器请求数据然后又更新一遍
                 }
+
                 toastr.success('Saved !')
                 $this.val('')
+                selectAll.checked = false
+
             }).catch(err => {
                 toastr.error(err.message)
             })

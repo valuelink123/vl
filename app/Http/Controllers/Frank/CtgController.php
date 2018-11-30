@@ -44,6 +44,7 @@ class CtgController extends Controller {
 
         // query data list
 
+        $dateRange = $this->dtDateRange($req);
         $where = $this->dtWhere($req, ['processor' => 't2.name', 'phone' => 't1.phone'], ['phone' => 't1.phone'], ['rating' => 't1.rating', 'processor' => 't1.processor', 'status' => 't1.status']);
         $orderby = $this->dtOrderBy($req);
         $limit = $this->dtLimit($req);
@@ -53,16 +54,55 @@ class CtgController extends Controller {
             t1.created_at,
             t1.name,
             t1.email,
-            phone,
+            t1.phone,
             rating,
             commented,
             steps,
             status,
             t2.name AS processor,
-            order_id
+            t1.order_id,
+            t4.asins,
+            t4.itemCodes,
+            t4.itemNames,
+            t4.sellerskus,
+            t4.itemGroups,
+            t4.bgs,
+            t4.bus,
+            t4.brands
         FROM ctg t1
         LEFT JOIN users t2
           ON t2.id = t1.processor
+        LEFT JOIN (
+          SELECT
+            MarketPlaceId,
+            SellerId,
+            AmazonOrderId
+          FROM ctg_order
+            WHERE $dateRange
+          ) t3
+          ON t3.AmazonOrderId = t1.order_id
+        LEFT JOIN (
+            SELECT
+              ANY_VALUE(SellerId) AS SellerId,
+              ANY_VALUE(MarketPlaceId) AS MarketPlaceId,
+              ANY_VALUE(AmazonOrderId) AS AmazonOrderId,
+              GROUP_CONCAT(DISTINCT t4_1.ASIN) AS asins,
+              GROUP_CONCAT(DISTINCT asin.item_no) AS itemCodes,
+              GROUP_CONCAT(DISTINCT fbm_stock.item_name) AS itemNames,
+              GROUP_CONCAT(DISTINCT asin.sellersku) AS sellerskus,
+              GROUP_CONCAT(DISTINCT asin.item_group) AS itemGroups,
+              GROUP_CONCAT(DISTINCT asin.bg) AS bgs,
+              GROUP_CONCAT(DISTINCT asin.bu) AS bus,
+              GROUP_CONCAT(DISTINCT asin.brand) AS brands
+            FROM ctg_order_item t4_1
+            LEFT JOIN asin
+              ON asin.site = t4_1.MarketPlaceSite AND asin.asin = t4_1.ASIN AND asin.sellersku = t4_1.SellerSKU
+            LEFT JOIN fbm_stock
+              ON fbm_stock.item_code = asin.item_no
+            WHERE $dateRange
+            GROUP BY AmazonOrderId
+          ) t4
+          ON t4.AmazonOrderId = t1.order_id AND t4.MarketPlaceId = t3.MarketPlaceId AND t4.SellerId = t3.SellerId
         WHERE $where
         ORDER BY $orderby
         LIMIT $limit

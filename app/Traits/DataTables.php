@@ -32,6 +32,25 @@ trait DataTables {
     //     return implode(' AND ', $where);
     // }
 
+
+    protected function dtDateRange(Request $req, $prefix = '') {
+
+        $where = [];
+
+        $timerange = $req->input('search.timerange');
+
+        if (!empty($timerange)) {
+
+            $from = addslashes($timerange['from']);
+            $to = addslashes($timerange['to']);
+
+            if (!empty($from)) $where[] = "$prefix created_at >= '$from 00:00:00'";
+            if (!empty($to)) $where[] = "$prefix created_at <= '$to 23:59:59'";
+        }
+
+        return implode(' AND ', $where);
+    }
+
     /**
      * WHERE
      * @param Request $req
@@ -42,18 +61,11 @@ trait DataTables {
      */
     protected function dtWhere(Request $req, array $fuzzyFields, array $andsMap, array $insMap = []) {
 
-        $where = [];
-
         $ands = $req->input('search.ands', []);
         $ins = $req->input('search.ins', []);
-        $timerange = $req->input('search.timerange');
 
-        $where = [];
-
-        if (!empty($timerange)) {
-            if (!empty($timerange['from'])) $where[] = 't1.created_at >= "' . addslashes($timerange['from']) . '"';
-            if (!empty($timerange['to'])) $where[] = 't1.created_at <= "' . addslashes($timerange['to']) . '"';
-        }
+        $dateRange = $this->dtDateRange($req, 't1.');
+        $where = empty($dateRange) ? [] : [$dateRange];
 
         foreach ($ins as $field => $arr) {
             if (empty($insMap[$field])) continue;
