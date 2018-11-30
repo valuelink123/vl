@@ -31,7 +31,7 @@ height: 20px;
         <div class="caption">
             <i class="icon-microphone font-green"></i>
             <span class="caption-subject bold font-green">Price Model</span>
-            <span class="caption-helper"><br />本模型用于计算同一本模型用于计算同一SKU, SKU不同销售定价下不同销量所带来的经济效益差别, 不同销售定价下不同销量所带来的经济效益差别, 作为销售定价的参考作为销售定价的参考<br />建议每周测算一次建议每周测算一次	,	最少每月重新测算一次并定价最少每月重新测算一次并定价, 当定价与销量发生明显变化时亦须重新测算当定价与销量发生明显变化时亦须重新测算</span>
+            <span class="caption-helper"><br />本模型用于计算同一SKU不同销售定价下不同销量所带来的经济效益差别, 作为销售定价的参考作为销售定价的参考<br />建议每周测算一次建议每周测算一次,	最少每月重新测算一次并定价, 当定价与销量发生明显变化时亦须重新测算</span>
         </div>
 
     </div>
