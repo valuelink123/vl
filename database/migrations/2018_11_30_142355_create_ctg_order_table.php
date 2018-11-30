@@ -8,7 +8,7 @@ class CreateCtgOrderTable extends Migration {
     public function up() {
         $this->statement(
             "
-            CREATE TABLE `ctg_order` (
+            CREATE TABLE IF NOT EXISTS `ctg_order` (
               `SellerId` varchar(50) NOT NULL,
               `MarketPlaceId` varchar(50) NOT NULL,
               `AmazonOrderId` varchar(50) NOT NULL,
@@ -57,7 +57,7 @@ class CreateCtgOrderTable extends Migration {
         );
         $this->statement(
             "
-            CREATE TABLE `ctg_order_item` (
+            CREATE TABLE IF NOT EXISTS `ctg_order_item` (
               `SellerId` varchar(50) NOT NULL,
               `MarketPlaceId` varchar(50) NOT NULL,
               `MarketPlaceSite` varchar(50) NOT NULL,
