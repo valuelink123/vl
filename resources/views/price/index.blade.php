@@ -20,6 +20,8 @@ height: 20px;
     padding: 1px;
     font-size: 12px;
 	}
+.price_model_list .col-md-1{
+width:11%;}
 </style>
     <div class="col-lg-12 price_model" style="font-size:12px;">
         <div class="col-md-12">
@@ -38,19 +40,25 @@ height: 20px;
 	<form id="price_form">
     <div class="portlet-body" id="cus_price_form">
 <p id="dynamic_pager_content1" class="well" style="margin:0px; padding: 10px"> 	一、销售定价-经济效益测算：</p>
-		<div class="col-md-12">
+		
+		
+		<div style="clear:both;height:30px;"></div>
+		<div class="col-md-3" style="border-right: 1px solid #ccc;">
 			
-			 <div class="col-md-2">
+			 <div class="col-md-10" style="line-height: 20px;
+    margin-bottom: 22px;">
 				<label class="control-label">SAP 物料号</label>
 				<input type="text" class="form-control"  name="I_MATNR" >
 			
 			 </div>
-			 <div class="col-md-2">
+			 <div class="col-md-10" style="line-height: 20px;
+    margin-bottom: 22px;">
 				 <label class="control-label">当前月份</label>
 				 <BR/>{{date('Y-m')}}
 			 </div>
 			 
-			 <div class="col-md-2">
+			 <div class="col-md-10" style="line-height: 20px;
+    margin-bottom: 22px;">
 				 <label class="control-label">销售站点</label>
 				 <select class="form-control" name="I_VKBUR">
 							@foreach (getSapSiteCode() as $k=>$v)
@@ -59,18 +67,16 @@ height: 20px;
 				 </select>	
 			 </div>
 			 
-			 <div class="col-md-2">
+			 <div class="col-md-10" style="line-height: 20px;
+    margin-bottom: 22px;">
 				 <label class="control-label">产品尺寸</label>
 				 <select class="form-control" name="I_ZCC">
 					<option value="1">标准尺寸</option>
 					<option value="2">超大尺寸</option>
 				 </select>		
 			 </div>
-		</div>
-		
-		<div style="clear:both;height:30px;"></div>
-										
-		<div class="form-group mt-repeater-c col-md-12">
+		</div>								
+		<div class="form-group mt-repeater-c col-md-9 price_model_list">
 			 <div class="col-md-1">
 				 <label class="control-label">价格类型</label>
 			 </div>
