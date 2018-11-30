@@ -805,7 +805,15 @@ class ExceptionController extends Controller
 		
 		
 	}
-	
+	public function getRepeatOrder(Request $request){
+		$orderid = $request->get('orderid');
+		$id = intval($request->get('id'));
+		$exists = Exception::where('exception.amazon_order_id',$orderid)->where('exception.id','<>',$id)->where('exception.process_status','<>','cancel')
+		->leftJoin('users',function($q){
+				$q->on('exception.user_id', '=', 'users.id');
+			})->get(['users.name','exception.date','exception.process_status'])->toArray();
+		die(json_encode($exists));
+	}
 
 	
 	public function getrfcorder(Request $request){

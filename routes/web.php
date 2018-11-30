@@ -64,6 +64,7 @@ Route::Post('/ratingdetails', 'SellerController@getrating')->name('getRating');
 Route::resource('exception', 'ExceptionController');
 Route::Post('/exception/get', 'ExceptionController@get')->name('getException');
 Route::Post('/exception/getorder', 'ExceptionController@getrfcorder')->name('getExceptionOrder');
+Route::Post('/exception/getrepeatorder', 'ExceptionController@getRepeatOrder')->name('getRepeatOrder');
 Route::get('/exceptionexport', 'ExceptionController@export')->name('exportException');
 Route::get('/reviewexport', 'ReviewController@export')->name('exportReview');
 Route::get('/asinexport', 'AsinController@export')->name('exportAsin');
