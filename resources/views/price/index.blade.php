@@ -493,7 +493,9 @@ width:11%;}
 		</div><div style="clear:both"></div>
 	
 
-<p id="dynamic_pager_content1" class="well" style="margin:0px; padding: 10px"> 三、参数表</p>
+<p id="dynamic_pager_content1" class="well" style="margin:0px; padding: 10px"> 三、参数表 <button id="genStockAge" class="btn btn-success" type="button" style="padding: 0px 5px;
+    font-size: 12px;">
+						自动获取</button></p>
 		<div style="clear:both"></div>
 		<div class="col-md-6" >
 			<div class="mt-repeater-c">
@@ -525,7 +527,7 @@ width:11%;}
 					CNY
 				 </div>
 				 <div class="col-md-4">
-					 <input class="form-control" name="I_ZDWCB" type="text" value="100">
+					 <input class="form-control" name="I_ZDWCB" type="text" value="0">
 				 </div>
 		
 				</div>
@@ -538,7 +540,7 @@ width:11%;}
 					CNY
 				 </div>
 				 <div class="col-md-4">
-					 <input class="form-control" name="I_ZDWJPF" type="text" value="45">
+					 <input class="form-control" name="I_ZDWJPF" type="text" value="0">
 				 </div>
 		
 				</div>
@@ -551,7 +553,7 @@ width:11%;}
 					CNY
 				 </div>
 				 <div class="col-md-4">
-					 <input class="form-control" name="I_ZDWCCF19" type="text" value="100">
+					 <input class="form-control" name="I_ZDWCCF19" type="text" value="0">
 				 </div>
 		
 				</div>
@@ -564,7 +566,7 @@ width:11%;}
 					CNY
 				 </div>
 				 <div class="col-md-4">
-					 <input class="form-control" name="I_ZDWCCF1012" type="text" value="100">
+					 <input class="form-control" name="I_ZDWCCF1012" type="text" value="0">
 				 </div>
 		
 				</div>
@@ -579,7 +581,7 @@ width:11%;}
 					/
 				 </div>
 				 <div class="col-md-4">
-					 <input class="form-control" name="I_ZHL" type="text" value="6.8">
+					 <input class="form-control" name="I_ZHL" type="text" value="0">
 				 </div>
 		
 				</div>
@@ -595,7 +597,7 @@ width:11%;}
 					%
 				 </div>
 				 <div class="col-md-4">
-					 <input class="form-control" name="I_ZPTYJBL" type="text" value="15">
+					 <input class="form-control" name="I_ZPTYJBL" type="text" value="0">
 				 </div>
 		
 				</div>
@@ -608,7 +610,7 @@ width:11%;}
 					%
 				 </div>
 				 <div class="col-md-4">
-					 <input class="form-control" name="I_ZYXFYL" type="text" value="6">
+					 <input class="form-control" name="I_ZYXFYL" type="text" value="0">
 				 </div>
 		
 				</div>
@@ -621,7 +623,7 @@ width:11%;}
 					%
 				 </div>
 				 <div class="col-md-4">
-					 <input class="form-control" name="I_ZYCL" type="text" value="10">
+					 <input class="form-control" name="I_ZYCL" type="text" value="0">
 				 </div>
 		
 				</div>
@@ -651,14 +653,9 @@ width:11%;}
 					月
 				 </div>
 				 <div class="col-md-4">
-				 	<div class="input-group">
+
 					 <input class="form-control" name="I_ZPJCL" type="text" value="0">
-					 <span class="input-group-btn">
-						<button id="genStockAge" class="btn btn-success" type="button" style="padding: 0px 5px;
-    font-size: 12px;">
-						自动获取</button>
-					 </span>
-					 </div>
+	
 				 </div>
 		
 				</div>
@@ -671,7 +668,7 @@ width:11%;}
 					PCS
 				 </div>
 				 <div class="col-md-4">
-					 <input class="form-control" name="I_ZKC" type="text" value="1000">
+					 <input class="form-control" name="I_ZKC" type="text" value="0">
 				 </div>
 		
 				</div>
@@ -742,16 +739,35 @@ $('.mt-repeater-c').repeater({
 $('#genStockAge').on('click',function(){
 
 	var sku=$('input[name="I_MATNR"]').val();
+	var site=$('select[name="I_VKBUR"]').val();
 	if(!sku){
 		alert('请输入SAP物料号');
 		$('input[name="I_MATNR"]').focus();
 	}
+	if(!site){
+		alert('请选择销售站点');
+		$('select[name="I_VKBUR"]').focus();
+	}
 	$.ajax({
 		url:'/price/getStockAge',
-		data:{sku:sku},
+		data:{sku:sku,site:site},
 		type:'post',
-		success:function(txt){
-			$('input[name="I_ZPJCL"]').val(txt);
+		dataType: "json",
+		success:function(data){
+			
+			if(data){
+				$('input[name="I_ZPJCL"]').val(Math.round(data.SAGE/30));
+				$('input[name="I_ZDWCB"]').val(data.VERPR);
+				$('input[name="I_ZPTYJBL"]').val(data.ZCRATIO);
+				$('input[name="I_ZDWJPF"]').val(data.FBAPRICE);
+				var YCL = data.YCL;
+				if((YCL.substr(YCL.length-1,1))=='-'){
+					YCL = Number(YCL.substr(0,YCL.length-1));
+				}
+				$('input[name="I_ZYCL"]').val(YCL);
+				$('input[name="I_ZHL"]').val(data.RATE);
+			}
+			
 		},
 	});
 });
