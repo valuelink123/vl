@@ -39,7 +39,12 @@ class NoticeCenterController extends Controller {
      */
     public function get(Request $req) {
 
-        $where = $this->dtWhere($req, ['item_group', 'item_model', 'brand', 'title', 'f:content', 'f:tags'], ['item_group' => 'item_group', 'brand' => 'brand', 'item_model' => 'item_model']);
+        $where = $this->dtWhere(
+            $req,
+            // f: 表示 fulltext，全文索引字段
+            ['item_group', 'item_model', 'brand', 'title', 'f:content', 'f:tags'],
+            ['item_group' => 'item_group', 'brand' => 'brand', 'item_model' => 'item_model']
+        );
 
         $orderby = $this->dtOrderBy($req);
         $limit = $this->dtLimit($req);
