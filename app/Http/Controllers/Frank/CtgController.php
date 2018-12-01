@@ -70,13 +70,14 @@ class CtgController extends Controller {
                 'phone' => 't1.phone'
             ],
             [
+                // WHERE IN
                 'rating' => 't1.rating',
                 'processor' => 't1.processor',
                 'status' => 't1.status',
-                // todo 已知的搜索问题
-                'bg' => 't4.bgs',
-                'bu' => 't4.bus',
-                'brand' => 't4.brands',
+                // WHERE FIND_IN_SET
+                'bg' => 's:t4.bgs',
+                'bu' => 's:t4.bus',
+                'brand' => 's:t4.brands',
             ]
         );
         $orderby = $this->dtOrderBy($req);

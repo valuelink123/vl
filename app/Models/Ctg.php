@@ -84,6 +84,7 @@ class Ctg extends Model {
             //     'SellerId' => $order['SellerId'],
             //     'AmazonOrderId' => $order['AmazonOrderId'],
             // ];
+            // 去重效率成本太高，放弃；
 
 
             foreach ($order['orderItems'] as $item) {

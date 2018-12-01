@@ -68,14 +68,31 @@ trait DataTables {
         $where = empty($dateRange) ? [] : [$dateRange];
 
         foreach ($ins as $field => $arr) {
+
             if (empty($insMap[$field])) continue;
             if (empty($arr)) continue;
-            $values = [];
-            foreach ($arr as $value) {
-                $values[] = '"' . addslashes($value) . '"';
+
+            if (0 === strpos($insMap[$field], 's:')) {
+
+                $ors = [];
+                $field = substr($insMap[$field], 2);
+                foreach ($arr as $value) {
+                    $value = addslashes($value);
+                    $ors[] = "FIND_IN_SET('$value', $field)";
+                }
+
+                $where[] = '(' . implode(' OR ', $ors) . ')';
+
+            } else {
+
+                $values = [];
+                foreach ($arr as $value) {
+                    $values[] = '"' . addslashes($value) . '"';
+                }
+                $values = implode(',', $values);
+                $where[] = "{$insMap[$field]} IN ({$values})";
+
             }
-            $values = implode(',', $values);
-            $where[] = "{$insMap[$field]} IN ({$values})";
         }
 
         foreach ($ands as $field => $value) {
