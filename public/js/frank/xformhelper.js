@@ -26,7 +26,18 @@ class XFormHelper {
             if (!initByQuery) return
 
             try {
-                $element.val(eval(`obj.${initByQuery}`))
+
+                let value = eval(`obj.${initByQuery}`)
+                if (!value) return
+
+                // jQuery Chosen Plugin Support
+                if ((ele instanceof HTMLSelectElement) && $element.is('[multiple]')) {
+                    for (let v of Object.values(value)) {
+                        $element.children(`[value="${v}"]`).attr('selected', 'selected')
+                    }
+                } else {
+                    $element.val(value)
+                }
             } catch (e) {
 
             }

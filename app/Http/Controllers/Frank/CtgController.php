@@ -48,7 +48,7 @@ class CtgController extends Controller {
 
         // query data list
 
-        $dateRange = $this->dtDateRange($req);
+        $timeRange = $this->dtTimeRange($req);
         $where = $this->dtWhere(
             $req,
             [
@@ -112,7 +112,7 @@ class CtgController extends Controller {
             SellerId,
             AmazonOrderId
           FROM ctg_order
-            WHERE $dateRange
+            WHERE $timeRange
           ) t3
           ON t3.AmazonOrderId = t1.order_id
         LEFT JOIN (
@@ -133,8 +133,8 @@ class CtgController extends Controller {
               ON asin.site = t4_1.MarketPlaceSite AND asin.asin = t4_1.ASIN AND asin.sellersku = t4_1.SellerSKU
             LEFT JOIN fbm_stock
               ON fbm_stock.item_code = asin.item_no
-            WHERE $dateRange
-            GROUP BY AmazonOrderId
+            WHERE $timeRange
+            GROUP BY MarketPlaceId,AmazonOrderId,SellerId
           ) t4
           ON t4.AmazonOrderId = t1.order_id AND t4.MarketPlaceId = t3.MarketPlaceId AND t4.SellerId = t3.SellerId
         WHERE $where
