@@ -22,7 +22,7 @@
 	    return
 	}
 
-  	$.post("/exception/getorder",
+	$.post("/exception/getorder",
 	  {
 	  	"_token":"{{csrf_token()}}",
 		"sellerid":$("#rebindordersellerid").val(),
@@ -83,10 +83,12 @@
 	$("#rebindorder").click(function(){
 	  loadorder();
 	});
+	
+	
   });
   </script>
 <form  action="{{ url('exception') }}" id="exception_form" novalidate method="POST">
- {{ csrf_field() }}
+ {{ csrf_field() }}<input type="hidden" name="warn" id="warn" value="0">
     <div class="col-lg-9">
         <div class="col-md-12">
 <div class="portlet light portlet-fit bordered ">
@@ -614,7 +616,57 @@
                     return false
                 }
             }
+			
+			var havewarnwords='';
+			if($('#warn').val()!=1){
 
+			  $.ajax({ 
+				type: "post", 
+				url: "/exception/getrepeatorder", 
+				 cache:false, 
+			   data:{
+				"_token":"{{csrf_token()}}",
+				"id":0,
+				"orderid":$("#rebindorderid").val()
+			  },
+			   async:false, 
+			
+			   success: function(data){ 
+					var redata = JSON.parse(data);
+					
+					for( var child_i in redata )
+					{
+						havewarnwords+='Post at '+redata[child_i].date+' by '+redata[child_i].name+'<BR>';
+					}
+
+					
+				} 
+			
+			});
+			
+		}
+		if(havewarnwords){   
+		   bootbox.dialog({
+				message: "Similar orders already exists, please confirm before submit!<BR><BR>"+havewarnwords,
+				title: "Warning",
+				buttons: {
+					danger: {
+						label: "Continue Submit",
+						className: "red",
+						callback: function() {
+							$('#warn').val(1);
+							$(exception_form).submit();
+						}
+					},
+					main: {
+						label: "Return To Edit",
+						className: "blue"
+					}
+				}
+			});
+			return false;
+		}
+			
         })
 
         bindDelayEvents('#replacement-product-list', 'change keyup paste', '.item_code', handleItemCodeSearch);
