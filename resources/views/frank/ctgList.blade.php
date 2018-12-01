@@ -26,19 +26,19 @@
                     <div class="col-md-2">
                         <div class="input-group">
                             <span class="input-group-addon">From</span>
-                            <input class="form-control" data-options="format:'yyyy-mm-dd'" value="{!! date('Y-m-d', strtotime('-90 day')) !!}" data-init-by-query="ands.date_from" id="date_from"
+                            <input class="form-control" data-options="format:'yyyy-mm-dd'" value="{!! date('Y-m-d', strtotime('-90 day')) !!}" data-init-by-query="daterange.from" id="date_from"
                                    autocomplete="off"/>
                         </div>
                         <br/>
                         <div class="input-group">
                             <span class="input-group-addon">To</span>
-                            <input class="form-control" data-options="format:'yyyy-mm-dd'" value="{!! date('Y-m-d') !!}" data-init-by-query="ands.date_to" id="date_to" autocomplete="off"/>
+                            <input class="form-control" data-options="format:'yyyy-mm-dd'" value="{!! date('Y-m-d', strtotime('+1 day')) !!}" data-init-by-query="daterange.to" id="date_to" autocomplete="off"/>
                         </div>
                     </div>
                     <div class="col-md-2">
                         <div class="input-group">
                             <span class="input-group-addon">Expect Rating</span>
-                            <select multiple style="width:100%;" id="rating">
+                            <select multiple style="width:100%;" id="rating" data-init-by-query="ins.rating">
                                 <option value="1">1</option>
                                 <option value="2">2</option>
                                 <option value="3">3</option>
@@ -49,7 +49,7 @@
                         <br/>
                         <div class="input-group">
                             <span class="input-group-addon">BG</span>
-                            <select multiple style="width:100%;" id="bg">
+                            <select multiple style="width:100%;" id="bg" data-init-by-query="ins.bg">
                                 @foreach($bgs as $bg)
                                     <option value="{!! $bg !!}">{!! $bg !!}</option>
                                 @endforeach
@@ -59,7 +59,7 @@
                     <div class="col-md-3">
                         <div class="input-group">
                             <span class="input-group-addon">Processor</span>
-                            <select multiple style="width:100%;" id="processor">
+                            <select multiple style="width:100%;" id="processor" data-init-by-query="ins.processor">
                                 @foreach($users as $id=>$name)
                                     <option value="{!! $id !!}">{!! $name !!}</option>
                                 @endforeach
@@ -68,7 +68,7 @@
                         <br/>
                         <div class="input-group">
                             <span class="input-group-addon">BU</span>
-                            <select multiple style="width:100%;" id="bu">
+                            <select multiple style="width:100%;" id="bu" data-init-by-query="ins.bu">
                                 @foreach($bus as $bu)
                                     <option value="{!! $bu !!}">{!! $bu !!}</option>
                                 @endforeach
@@ -78,7 +78,7 @@
                     <div class="col-md-3">
                         <div class="input-group">
                             <span class="input-group-addon">Status</span>
-                            <select multiple style="width:100%;" id="status">
+                            <select multiple style="width:100%;" id="status" data-init-by-query="ins.status">
                                 <option value="Confirm Review">Confirm Review</option>
                                 <option value="Arrange Shipment">Arrange Shipment</option>
                                 <option value="Delivery Confirmation">Delivery Confirmation</option>
@@ -89,7 +89,7 @@
                         <br/>
                         <div class="input-group">
                             <span class="input-group-addon">Brand</span>
-                            <select multiple style="width:100%;" id="brand">
+                            <select multiple style="width:100%;" id="brand" data-init-by-query="ins.brand">
                                 @foreach($brands as $brand)
                                     <option value="{!! $brand !!}">{!! $brand !!}</option>
                                 @endforeach
@@ -157,6 +157,8 @@
 
     <script>
 
+        XFormHelper.initByQuery('[data-init-by-query]')
+
         $("#thetabletoolbar [id^='date_']").each(function () {
 
             let defaults = {
@@ -180,7 +182,7 @@
 
             Object.assign(data.search, {
                 // value: fuzzysearch.value,
-                timerange: {
+                daterange: {
                     from: date_from.value,
                     to: date_to.value
                 },
@@ -204,7 +206,7 @@
 
         $theTable.dataTable({
             // searching: false,
-            search: {search: queryStringToObject().search},
+            search: {search: queryStringToObject().value},
             serverSide: true,
             scrollX: 2000,
             fixedColumns: {leftColumns: 1},

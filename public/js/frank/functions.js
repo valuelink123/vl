@@ -30,7 +30,19 @@ function queryStringToObject(queryString = location.search.substr(1)) {
 
         }
 
-        objRef[key] = pair[1] ? decodeURIComponent(pair[1]) : ''
+        objRef[key] = decodeURIComponent(pair[1])
+
+        switch (objRef[key]) {
+            case 'null':
+                objRef[key] = null
+                break
+            case 'false':
+                objRef[key] = false
+                break
+            case 'undefined':
+                objRef[key] = undefined
+                break
+        }
 
     }
 

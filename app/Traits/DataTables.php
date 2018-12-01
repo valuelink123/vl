@@ -33,16 +33,16 @@ trait DataTables {
     // }
 
 
-    protected function dtDateRange(Request $req, $prefix = '') {
+    protected function dtTimeRange(Request $req, $prefix = '') {
 
         $where = [];
 
-        $timerange = $req->input('search.timerange');
+        $daterange = $req->input('search.daterange');
 
-        if (!empty($timerange)) {
+        if (!empty($daterange)) {
 
-            $from = addslashes($timerange['from']);
-            $to = addslashes($timerange['to']);
+            $from = addslashes($daterange['from'] ?? '');
+            $to = addslashes($daterange['to'] ?? '');
 
             if (!empty($from)) $where[] = "$prefix created_at >= '$from 00:00:00'";
             if (!empty($to)) $where[] = "$prefix created_at <= '$to 23:59:59'";
@@ -64,8 +64,8 @@ trait DataTables {
         $ands = $req->input('search.ands', []);
         $ins = $req->input('search.ins', []);
 
-        $dateRange = $this->dtDateRange($req, 't1.');
-        $where = empty($dateRange) ? [] : [$dateRange];
+        $timeRange = $this->dtTimeRange($req, 't1.');
+        $where = empty($timeRange) ? [] : [$timeRange];
 
         foreach ($ins as $field => $arr) {
 
