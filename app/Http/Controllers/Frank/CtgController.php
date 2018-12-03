@@ -95,6 +95,7 @@ class CtgController extends Controller {
             status,
             t2.name AS processor,
             t1.order_id,
+            t3.SalesChannel,
             t4.asins,
             t4.itemCodes,
             t4.itemNames,
@@ -108,6 +109,7 @@ class CtgController extends Controller {
           ON t2.id = t1.processor
         LEFT JOIN (
           SELECT
+            SalesChannel,
             MarketPlaceId,
             SellerId,
             AmazonOrderId

@@ -120,6 +120,7 @@
                         <th>Customer</th>
                         <th>Item No</th>
                         <th>Item Name</th>
+                        <th>Asin</th>
                         <th>Seller SKU</th>
                         <th>Brand</th>
                         <th>Item Group</th>
@@ -238,6 +239,16 @@
                 {data: 'name', name: 'name'},
                 {data: 'itemCodes', name: 'itemCodes'},
                 {data: 'itemNames', name: 'itemNames', width: "520px"},
+                {
+                    data: 'asins',
+                    name: 'asins',
+                    render(data, type, row) {
+                        let asins = data.split(',')
+                        return asins.map(asin => {
+                            return `<a href="https://www.${row.SalesChannel}/dp/${asin}" target="_blank" rel="noreferrer">${asin}</a>`
+                        }).join('<br/>')
+                    }
+                },
                 {data: 'sellerskus', name: 'sellerskus'},
                 {data: 'brands', name: 'brands'},
                 {data: 'itemGroups', name: 'itemGroups', width: "80px"},
