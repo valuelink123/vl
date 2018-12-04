@@ -154,7 +154,7 @@
                                 <div id="step-3">
                                     <div class="row">
                                         <div class="col-md-3">
-                                            <pre>确认是否收货	是/否   是直接进入第5步</pre>
+                                            <pre>确认是否收货	是/否   是直接进入下一步</pre>
                                         </div>
                                     </div>
                                 </div>

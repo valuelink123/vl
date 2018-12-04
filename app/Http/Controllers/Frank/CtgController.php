@@ -48,7 +48,9 @@ class CtgController extends Controller {
 
         // query data list
 
+        // 分区条件
         $timeRange = $this->dtTimeRange($req);
+
         $where = $this->dtWhere(
             $req,
             [
