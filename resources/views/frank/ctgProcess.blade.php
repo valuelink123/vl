@@ -144,7 +144,7 @@
                                         <div class="col-md-3">
                                             <div class="form-group">
                                                 <label>
-                                                    Shipment ID
+                                                    Replacement ID
                                                     <input required pattern="^\w+$" autocomplete="off" class="xform-autotrim form-control" placeholder="Shipment ID" name="shipment_id"/>
                                                 </label>
                                             </div>
