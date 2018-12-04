@@ -1,8 +1,6 @@
 <?php
 /**
- * Created by PhpStorm.
- * Date: 18.9.25
- * Time: 9:57
+ * Migration Helper
  */
 
 namespace App\Traits;

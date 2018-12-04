@@ -1,6 +1,8 @@
 <?php
 /**
- * 对于复杂的统计查询，建议写 SQL 语句，用 Eloquent 反而易出问题
+ * MySQL Query Helper
+ *
+ * 对于复杂的统计查询，建议写 SQL 语句，用 Eloquent 反而易出问题；
  */
 
 namespace App\Traits;
