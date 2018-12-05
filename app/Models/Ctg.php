@@ -22,6 +22,9 @@ class Ctg extends Model {
     protected $fillable = ['order_id', 'gift_sku', 'name', 'email', 'phone', 'address', 'note', 'rating', 'processor'];
 
     /**
+     * 1.检查订单号有效性
+     * 2.根据 sap_seller_id 分配处理人
+     * 3.写入 ctg、ctg_order、ctg_order_item 三个表
      * @throws HypocriteException
      */
     public static function add($row) {
@@ -42,10 +45,6 @@ class Ctg extends Model {
                 throw new \Exception('Order Info Error.');
             }
 
-            $item = current($order['orderItems']);
-
-            $asinRow = Asin::select('sap_seller_id')->where('site', $item['MarketPlaceSite'])->where('asin', $item['ASIN'])->where('sellersku', $item['SellerSKU'])->first();
-
         } catch (\Exception $e) {
             throw new HypocriteException($e->getMessage() . ' For help, please mail to support@claimthegift.com');
         }
@@ -63,6 +62,10 @@ class Ctg extends Model {
                 throw new \Exception("Order ID is duplicate, submitted in {$ctgRow['created_at']}.");
             }
 
+
+            $item = current($order['orderItems']);
+
+            $asinRow = Asin::select('sap_seller_id')->where('site', $item['MarketPlaceSite'])->where('asin', $item['ASIN'])->where('sellersku', $item['SellerSKU'])->first();
 
             $row['processor'] = 0;
 
@@ -107,7 +110,6 @@ class Ctg extends Model {
 
         } catch (\Exception $e) {
             throw new HypocriteException($e->getMessage() . ' For help, please mail to support@claimthegift.com');
-            // return HypocriteException::wrap($e, 'ORDER ID is Duplicate, You may had submitted it successfully. For help, please mail to support@claimthegift.com');
         }
     }
 }

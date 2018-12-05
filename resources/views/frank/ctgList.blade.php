@@ -99,9 +99,9 @@
                     <div class="col-md-2">
                         <div class="btn-group " style="float:right;">
 
-                            <button id="excel-export" class="btn sbold blue"> Export
-                                <i class="fa fa-download"></i>
-                            </button>
+                            {{--<button id="excel-export" class="btn sbold blue"> Export--}}
+                                {{--<i class="fa fa-download"></i>--}}
+                            {{--</button>--}}
 
                         </div>
                     </div>
