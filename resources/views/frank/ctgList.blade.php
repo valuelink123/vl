@@ -243,6 +243,7 @@
                     data: 'asins',
                     name: 'asins',
                     render(data, type, row) {
+                        if (!data) return ''
                         let asins = data.split(',')
                         return asins.map(asin => {
                             return `<a href="https://www.${row.SalesChannel}/dp/${asin}" target="_blank" rel="noreferrer">${asin}</a>`
@@ -273,7 +274,9 @@
                     render(data, type, row) {
                         if (!data) return ''
                         let steps = JSON.parse(data)
-                        return steps.track_notes[row.status] || ''
+                        let html = steps.track_notes[row.status]
+                        if (!html) return ''
+                        return $(html).text().trim().substr(0, 67)
                     }
                 },
                 {

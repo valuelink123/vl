@@ -83,6 +83,13 @@ class XFormHelper {
                     // 或许就用相同的 name，稍微处理一下就可以
                     let assocEle = map.get(e.target)
                     assocEle.value = e.target.value
+
+                    let radioName = $(assocEle).data('enable-radio')
+                    if (radioName) {
+                        assocEle.disabled = !assocEle.value
+                        $form[0][radioName].value = assocEle.disabled ? 0 : 1
+                    }
+
                 }
             })
 

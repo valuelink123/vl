@@ -206,7 +206,7 @@ class CtgController extends Controller {
             $order['SellerName'] = Accounts::where('account_sellerid', $order['SellerId'])->first()->account_name ?? 'No Match';
 
 
-            $emails = DB::table('sendbox')->where('to_address', $order['BuyerEmail'])->orderBy('date', 'desc')->get();
+            $emails = DB::table('sendbox')->where('to_address', $ctgRow['email'])->orderBy('date', 'desc')->get();
             $emails = json_decode(json_encode($emails), true); // todo
 
 
