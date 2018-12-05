@@ -56,9 +56,11 @@ class FixCtgOrderDatas extends Migration {
                             Ctg::where([
                                 ['created_at', $row['created_at']],
                                 ['order_id', $row['order_id']]
-                            ])->update([
-                                'processor' => $user->id
-                            ])->limit(1);
+                            ])
+                                ->limit(1)
+                                ->update([
+                                    'processor' => $user->id
+                                ]);
                         }
                     }
 
