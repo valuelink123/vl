@@ -693,10 +693,12 @@ $('#genStockAge').on('click',function(){
 		type:'post',
 		dataType: "json",
 		success:function(data){
-			
 			if(data){
 				$('input[name="I_ZPJCL"]').val(Math.round(data.SAGE/30));
 				$('input[name="I_ZDWCB"]').val(data.VERPR);
+				$('select[name="I_ZCC"]').val(data.ZCC);
+				$('input[name="I_ZDWCCF19"]').val(data.ZDWCCF19);
+				$('input[name="I_ZDWCCF1012"]').val(data.ZDWCCF1012);
 				$('input[name="I_ZPTYJBL"]').val(data.ZCRATIO);
 				$('input[name="I_ZDWJPF"]').val(data.FBAPRICE);
 				var YCL = data.YCL;
