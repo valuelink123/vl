@@ -21,7 +21,7 @@ class CtgController extends Controller {
     use \App\Traits\Mysqli;
     use \App\Traits\DataTables;
 
-    // 不需要登录验证
+    // 不需要登录验证的
     protected static $authExcept = ['import'];
 
     /**

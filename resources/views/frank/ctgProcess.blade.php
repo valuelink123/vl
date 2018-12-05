@@ -145,7 +145,7 @@
                                             <div class="form-group">
                                                 <label>
                                                     Replacement ID
-                                                    <input required pattern="^\w+$" autocomplete="off" class="xform-autotrim form-control" placeholder="Shipment ID" name="shipment_id"/>
+                                                    <input required pattern=".*\S+.*" autocomplete="off" class="xform-autotrim form-control" placeholder="Shipment ID" name="shipment_id"/>
                                                 </label>
                                             </div>
                                         </div>
