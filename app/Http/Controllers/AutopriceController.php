@@ -100,7 +100,7 @@ class AutopriceController extends Controller
             $request->session()->flash('error_message','Auto Price not Exists');
             return redirect('autoprice');
         }
-		$logs = DB::connection('order')->table('auto_price_log')->where('auto_price_id',$id)->get()->orderBy('id','desc');
+		$logs = DB::connection('order')->table('auto_price_log')->where('auto_price_id',$id)->orderBy('id','desc')->get();
         return view('autoprice/edit',['rule'=>$rule,'logs'=>$logs,'users'=>$this->getUsers(),'accounts'=>$this->getAccounts()]);
     }
 
