@@ -257,6 +257,7 @@ class ReviewController extends Controller
 		$headArray[] = 'Buyer Email';
 		$headArray[] = 'Amazon OrderId';
 		$headArray[] = 'Review Status';
+		$headArray[] = 'Follow Content';
 		$headArray[] = 'Question Type';
 		$headArray[] = 'Follow up Date';
 		$headArray[] = 'Customer Feedback';
@@ -279,7 +280,7 @@ class ReviewController extends Controller
 			$follow_status_array[$step->id]=$step->title;
 		}
 		foreach ( $reviewsLists as $review){
-
+			$fol_arr= unserialize($review['follow_content'])?unserialize($review['follow_content']):array();
             $arrayData[] = array(
                	$review['date'],
 				$review['asin'],
@@ -294,6 +295,7 @@ class ReviewController extends Controller
 				$review['buyer_email'],
 				$review['amazon_order_id'],
 				array_get($follow_status_array,empty(array_get($review,'status'))?0:array_get($review,'status'),''),
+				strip_tags(array_get($fol_arr,array_get($review,'status').'.do_content')),
 				$review['etype'],
 				$review['edate'],
 				array_get(getCustomerFb(),$review['customer_feedback']),

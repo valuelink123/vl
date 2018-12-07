@@ -35,7 +35,7 @@ class AutopriceController extends Controller
     {
         $autoprice = AutoPrice::get()->toArray();
         $users_array = $this->getUsers();
-        return view('autoprice/index',['rules'=>$autoprice,'users'=>$users_array,'accounts'=>$this->getAccounts(),'actived'=>array(0=>'Disabled',1=>'Enabled')]);
+        return view('autoprice/index',['rules'=>$autoprice,'users'=>$users_array,'accounts'=>$this->getAccounts(),'actived'=>array(0=>'<span class="badge badge-default">Disabled</a>',1=>'<span class="badge badge-success">Enabled</span>')]);
 
     }
 

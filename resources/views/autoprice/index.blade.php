@@ -1,6 +1,21 @@
 @extends('layouts.layout')
 @section('label', 'Automatic Price Adjustment')
 @section('content')
+<style type="text/css">
+.dataTables_extended_wrapper .table.dataTable {
+  margin: 0px !important;
+}
+
+table.dataTable thead th, table.dataTable thead td {
+    padding: 10px 2px !important;}
+table.dataTable tbody th, table.dataTable tbody td {
+    padding: 10px 2px;
+}
+th,td,td>span {
+    font-size:12px !important;
+	font-family:Arial, Helvetica, sans-serif;}
+
+</style>
     <div class="row">
         <div class="col-md-12">
             <!-- BEGIN EXAMPLE TABLE PORTLET-->
@@ -36,8 +51,8 @@
 							<th> Sales </th>
 							<th> Price </th>
 							<th> Update Price </th>
-							<th> Processing Status </th>
-							<th> Processing Date </th>
+							<th> Process Status </th>
+							<th> Process Date </th>
 							<th> User </th>
                         </tr>
                         </thead>
@@ -54,7 +69,7 @@
                                     <a data-target="#ajax" data-toggle="modal" href="{{ url('autoprice/'.$rule['id'].'/edit') }}">{{$rule['seller_sku']}}</a>
                                 </td>
                                 <td>
-                                    {{array_get($actived,$rule['actived'])}}
+                                    {!!array_get($actived,$rule['actived'])!!}
                                 </td>
 								
 								<td>
