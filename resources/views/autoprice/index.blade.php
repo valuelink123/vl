@@ -46,13 +46,13 @@ th,td,td>span {
                             <th > Account </th>
                             <th> Site </th>
                             <th> SellerSKU </th>
-                            <th> Status </th>                       
+                            <th> Status </th> 
+							<th> Asin </th>                      
 							<th> Stock </th>
 							<th> Sales </th>
 							<th> Price </th>
 							<th> Update Price </th>
-							<th> Process Status </th>
-							<th> Process Date </th>
+							<th> Update Date </th>
 							<th> User </th>
                         </tr>
                         </thead>
@@ -71,7 +71,10 @@ th,td,td>span {
                                 <td>
                                     {!!array_get($actived,$rule['actived'])!!}
                                 </td>
-								
+								<td>
+                                    <a target="_blank" href="https://www.{{array_get(getSiteUrl(),$rule['marketplace_id'])}}/dp/{{$rule['asin']}}?m={{$rule['seller_id']}}">{{$rule['asin']}}</a>
+                                </td>
+
 								<td>
                                     {{($rule['fba_stock']+$rule['fbm_stock'])}}
                                 </td>
@@ -83,9 +86,6 @@ th,td,td>span {
                                 </td>
 								<td>
                                     {{$rule['update_price']}}
-                                </td>
-								<td>
-                                    {{$rule['feed_processing_status']}}
                                 </td>
 								<td>
                                     {{$rule['submitted_date']}}
