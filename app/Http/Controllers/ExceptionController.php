@@ -180,7 +180,7 @@ class ExceptionController extends Controller
 								''
 							];
 						}
-						$o_seller_sku = Asin::where('sellersku',array_get(explode('*',$customersList['order_sku']),0))->first()->toArray();
+						$o_sap_seller_id = Asin::where('sellersku',array_get(explode('*',$customersList['order_sku']),0))->value('sap_seller_id');
 						if($sap_sku_info = Asin::where('sellersku',array_get($product,'seller_sku'))->first()){
 							$sap_sku_info = $sap_sku_info->toArray();
 						}else{
@@ -225,7 +225,7 @@ class ExceptionController extends Controller
 							'',
 							'',
 							'',
-							array_get($o_seller_sku,'sap_seller_id'),
+							$o_sap_seller_id,
 							'',
 							''
 						];
