@@ -427,9 +427,12 @@ class ReviewController extends Controller
 		
 		if(array_get($_REQUEST,'date_from')) $date_from= array_get($_REQUEST,'date_from');
 		if(array_get($_REQUEST,'date_to')) $date_to= array_get($_REQUEST,'date_to');
-		$customers = $customers->where('date','>=',$date_from)->where('rating','<',4);
+		$customers = $customers->where('date','>=',$date_from);
 		$customers = $customers->where('date','<=',$date_to);
-		
+		$nev_rating=4;
+		$customers = $customers->where(function ($query) use ($nev_rating) {
+			$query->where('rating', '<', $nev_rating)->orWhere('updated_rating', '<', $nev_rating);
+		});
 		if(array_get($_REQUEST,'nextdate')) $customers = $customers->where('nextdate',array_get($_REQUEST,'nextdate'));
 		
 		if(array_get($_REQUEST,'follow_status')){
