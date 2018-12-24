@@ -52,7 +52,7 @@ class FeesController extends Controller
 	}
 	
 	public function getUsers(){
-        $users = User::get()->toArray();
+        $users = User::where('sap_seller_id','>',0)->get()->toArray();
         $users_array = array();
         foreach($users as $user){
             $users_array[$user['id']] = $user['name'];
@@ -79,7 +79,7 @@ class FeesController extends Controller
 			   if(array_get($bgbu_arr,1)) $updateDate['bu'] = array_get($bgbu_arr,1);
 			   $updateDate['user_id'] = Auth::user()->id;
 			   $updateDate['sku'] = $request->input("customsku");
-			    DB::connection('order')->table('finances_product_ads_payment_event')->whereIn('id',$request->input("id"))->update($updateDate);
+			    DB::connection('order')->table('finances_product_ads_payment_event')->whereIn('id',$request->input("id"))->whereIn('ImportToSap',0)->update($updateDate);
         }
 		$date_from=$request->input('date_from')?$request->input('date_from'):date('Y-m-d',strtotime('- 90 days'));
         $date_to=$request->input('date_to')?$request->input('date_to'):date('Y-m-d');
@@ -126,7 +126,7 @@ class FeesController extends Controller
 		$lists=json_decode(json_encode($lists), true);
 		foreach ( $lists as $list){
             $records["data"][] = array(
-                '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input name="id[]" type="checkbox" class="checkboxes" value="'.$list['Id'].'"/><span></span></label>',
+                '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input name="id[]" type="checkbox" class="checkboxes" value="'.$list['Id'].'" '.$list['ImportToSap']?"disabled":"".'/><span></span></label>',
                 $list['PostedDate'],
 				array_get($accounts,$list['SellerId']),
 				$list['InvoiceId'],
@@ -161,7 +161,7 @@ class FeesController extends Controller
 			   if(array_get($bgbu_arr,1)) $updateDate['bu'] = array_get($bgbu_arr,1);
 			   $updateDate['user_id'] = Auth::user()->id;
 			   $updateDate['sku'] = $request->input("customsku");
-			    DB::connection('order')->table('finances_deal_event')->whereIn('id',$request->input("id"))->update($updateDate);
+			    DB::connection('order')->table('finances_deal_event')->whereIn('id',$request->input("id"))->whereIn('ImportToSap',0)->update($updateDate);
         }
 		$date_from=$request->input('date_from')?$request->input('date_from'):date('Y-m-d',strtotime('- 90 days'));
         $date_to=$request->input('date_to')?$request->input('date_to'):date('Y-m-d');
@@ -208,7 +208,7 @@ class FeesController extends Controller
 		$lists=json_decode(json_encode($lists), true);
 		foreach ( $lists as $list){
             $records["data"][] = array(
-                '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input name="id[]" type="checkbox" class="checkboxes" value="'.$list['Id'].'"/><span></span></label>',
+                '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input name="id[]" type="checkbox" class="checkboxes" value="'.$list['Id'].'" '.$list['ImportToSap']?"disabled":"".' /><span></span></label>',
                 $list['PostedDate'],
 				array_get($accounts,$list['SellerId']),
 				$list['DealDescription'],
@@ -242,7 +242,7 @@ class FeesController extends Controller
 			   if(array_get($bgbu_arr,1)) $updateDate['bu'] = array_get($bgbu_arr,1);
 			   $updateDate['user_id'] = Auth::user()->id;
 			   $updateDate['sku'] = $request->input("customsku");
-			    DB::connection('order')->table('finances_coupon_event')->whereIn('id',$request->input("id"))->update($updateDate);
+			    DB::connection('order')->table('finances_coupon_event')->whereIn('id',$request->input("id"))->whereIn('ImportToSap',0)->update($updateDate);
         }
 		$date_from=$request->input('date_from')?$request->input('date_from'):date('Y-m-d',strtotime('- 90 days'));
         $date_to=$request->input('date_to')?$request->input('date_to'):date('Y-m-d');
@@ -289,7 +289,7 @@ class FeesController extends Controller
 		$lists=json_decode(json_encode($lists), true);
 		foreach ( $lists as $list){
             $records["data"][] = array(
-                '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input name="id[]" type="checkbox" class="checkboxes" value="'.$list['Id'].'"/><span></span></label>',
+                '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input name="id[]" type="checkbox" class="checkboxes" value="'.$list['Id'].'" '.$list['ImportToSap']?"disabled":"".' /><span></span></label>',
                 $list['PostedDate'],
 				array_get($accounts,$list['SellerId']),
 				$list['SellerCouponDescription'],
@@ -322,7 +322,7 @@ class FeesController extends Controller
 			   if(array_get($bgbu_arr,1)) $updateDate['bu'] = array_get($bgbu_arr,1);
 			   $updateDate['user_id'] = Auth::user()->id;
 			   $updateDate['sku'] = $request->input("customsku");
-			    DB::connection('order')->table('finances_servicefee_event')->whereIn('id',$request->input("id"))->update($updateDate);
+			    DB::connection('order')->table('finances_servicefee_event')->whereIn('id',$request->input("id"))->whereIn('ImportToSap',0)->update($updateDate);
         }
 		$date_from=$request->input('date_from')?$request->input('date_from'):date('Y-m-d',strtotime('- 90 days'));
         $date_to=$request->input('date_to')?$request->input('date_to'):date('Y-m-d');
@@ -369,7 +369,7 @@ class FeesController extends Controller
 		$lists=json_decode(json_encode($lists), true);
 		foreach ( $lists as $list){
             $records["data"][] = array(
-                '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input name="id[]" type="checkbox" class="checkboxes" value="'.$list['Id'].'"/><span></span></label>',
+                '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input name="id[]" type="checkbox" class="checkboxes" value="'.$list['Id'].'" '.$list['ImportToSap']?"disabled":"".' /><span></span></label>',
                 $list['PostedDate'],
 				array_get($accounts,$list['SellerId']),
 				$list['Type'],
@@ -396,7 +396,7 @@ class FeesController extends Controller
 			   if(array_get($bgbu_arr,1)) $updateDate['bu'] = array_get($bgbu_arr,1);
 			   $updateDate['user_id'] = Auth::user()->id;
 			   $updateDate['sku'] = $request->input("customsku");
-			    DB::table('aws_report')->whereIn('id',$request->input("id"))->update($updateDate);
+			    DB::table('aws_report')->whereIn('id',$request->input("id"))->whereIn('ImportToSap',0)->update($updateDate);
         }
 		$date_from=$request->input('date_from')?$request->input('date_from'):date('Y-m-d',strtotime('- 90 days'));
         $date_to=$request->input('date_to')?$request->input('date_to'):date('Y-m-d');
@@ -450,7 +450,7 @@ class FeesController extends Controller
 		$lists=json_decode(json_encode($lists), true);
 		foreach ( $lists as $list){
             $records["data"][] = array(
-                '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input name="id[]" type="checkbox" class="checkboxes" value="'.$list['id'].'"/><span></span></label>',
+                '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input name="id[]" type="checkbox" class="checkboxes" value="'.$list['id'].'" '.$list['ImportToSap']?"disabled":"".' /><span></span></label>',
                 $list['date'],
 				array_get($accounts,$list['seller_id']),
 				$list['campaign_name'],
