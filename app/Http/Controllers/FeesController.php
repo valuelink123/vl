@@ -73,7 +73,7 @@ class FeesController extends Controller
         $sort = $request->input('order.0.dir','desc');
 		$users= $this->getUsers();
         if ($request->input("custombgbu") && $request->input("customsku") && $request->input("customActionType") == "group_action") {
-			   $sap_seller_id = User::where('id',Auth::user()->id)->first()->value('sap_seller_id');
+			   $sap_seller_id =  Auth::user()->sap_seller_id;
 			   if($sap_seller_id){
 			   	   $updateDate = [];
 				   $bgbu = $request->input('custombgbu');
@@ -82,8 +82,11 @@ class FeesController extends Controller
 				   if(array_get($bgbu_arr,1)) $updateDate['bu'] = array_get($bgbu_arr,1);
 				   $updateDate['user_id'] = Auth::user()->id;
 				   $updateDate['sku'] = $request->input("customsku");
-				   DB::connection('order')->table('finances_product_ads_payment_event')->whereIn('id',$request->input("id"))->whereIn('ImportToSap',0)->update($updateDate);
-			   }  
+				   DB::connection('order')->table('finances_product_ads_payment_event')->whereIn('id',$request->input("id"))->where('ImportToSap',0)->update($updateDate);
+			   }else{
+			   	   $request->session()->flash('error_message','Please set your Sap Seller id and  relogin');
+				   return redirect('fees');
+			   } 
         }
 		$date_from=$request->input('date_from')?$request->input('date_from'):date('Y-m-d',strtotime('- 90 days'));
         $date_to=$request->input('date_to')?$request->input('date_to'):date('Y-m-d');
@@ -160,7 +163,7 @@ class FeesController extends Controller
         $sort = $request->input('order.0.dir','desc');
 		$users= $this->getUsers();
         if ($request->input("custombgbu") && $request->input("customsku") && $request->input("customActionType") == "group_action") {
-			$sap_seller_id = User::where('id',Auth::user()->id)->first()->value('sap_seller_id');
+			$sap_seller_id = Auth::user()->sap_seller_id;
 			if($sap_seller_id){
 			   $updateDate = [];
                $bgbu = $request->input('custombgbu');
@@ -169,8 +172,11 @@ class FeesController extends Controller
 			   if(array_get($bgbu_arr,1)) $updateDate['bu'] = array_get($bgbu_arr,1);
 			   $updateDate['user_id'] = Auth::user()->id;
 			   $updateDate['sku'] = $request->input("customsku");
-			    DB::connection('order')->table('finances_deal_event')->whereIn('id',$request->input("id"))->whereIn('ImportToSap',0)->update($updateDate);
-			}
+			    DB::connection('order')->table('finances_deal_event')->whereIn('id',$request->input("id"))->where('ImportToSap',0)->update($updateDate);
+			}else{
+			   	   $request->session()->flash('error_message','Please set your Sap Seller id and  relogin');
+				   return redirect('fees');
+			   } 
         }
 		$date_from=$request->input('date_from')?$request->input('date_from'):date('Y-m-d',strtotime('- 90 days'));
         $date_to=$request->input('date_to')?$request->input('date_to'):date('Y-m-d');
@@ -246,7 +252,7 @@ class FeesController extends Controller
         $sort = $request->input('order.0.dir','desc');
 		$users= $this->getUsers();
         if ($request->input("custombgbu") && $request->input("customsku") && $request->input("customActionType") == "group_action") {
-			   $sap_seller_id = User::where('id',Auth::user()->id)->first()->value('sap_seller_id');
+			   $sap_seller_id = Auth::user()->sap_seller_id;
 				if($sap_seller_id){
 				$updateDate = [];
                $bgbu = $request->input('custombgbu');
@@ -255,8 +261,11 @@ class FeesController extends Controller
 			   if(array_get($bgbu_arr,1)) $updateDate['bu'] = array_get($bgbu_arr,1);
 			   $updateDate['user_id'] = Auth::user()->id;
 			   $updateDate['sku'] = $request->input("customsku");
-			    DB::connection('order')->table('finances_coupon_event')->whereIn('id',$request->input("id"))->whereIn('ImportToSap',0)->update($updateDate);
-				}
+			    DB::connection('order')->table('finances_coupon_event')->whereIn('id',$request->input("id"))->where('ImportToSap',0)->update($updateDate);
+				}else{
+			   	   $request->session()->flash('error_message','Please set your Sap Seller id and  relogin');
+				   return redirect('fees');
+			   } 
         }
 		$date_from=$request->input('date_from')?$request->input('date_from'):date('Y-m-d',strtotime('- 90 days'));
         $date_to=$request->input('date_to')?$request->input('date_to'):date('Y-m-d');
@@ -331,7 +340,7 @@ class FeesController extends Controller
         $sort = $request->input('order.0.dir','desc');
 		$users= $this->getUsers();
         if ($request->input("custombgbu") && $request->input("customsku") && $request->input("customActionType") == "group_action") {
-			$sap_seller_id = User::where('id',Auth::user()->id)->first()->value('sap_seller_id');
+			$sap_seller_id = Auth::user()->sap_seller_id;
 			if($sap_seller_id){
 				$updateDate = [];
                $bgbu = $request->input('custombgbu');
@@ -340,8 +349,11 @@ class FeesController extends Controller
 			   if(array_get($bgbu_arr,1)) $updateDate['bu'] = array_get($bgbu_arr,1);
 			   $updateDate['user_id'] = Auth::user()->id;
 			   $updateDate['sku'] = $request->input("customsku");
-			    DB::connection('order')->table('finances_servicefee_event')->whereIn('id',$request->input("id"))->whereIn('ImportToSap',0)->update($updateDate);
-			}
+			    DB::connection('order')->table('finances_servicefee_event')->whereIn('id',$request->input("id"))->where('ImportToSap',0)->update($updateDate);
+			}else{
+			   	   $request->session()->flash('error_message','Please set your Sap Seller id and  relogin');
+				   return redirect('fees');
+			   } 
         }
 		$date_from=$request->input('date_from')?$request->input('date_from'):date('Y-m-d',strtotime('- 90 days'));
         $date_to=$request->input('date_to')?$request->input('date_to'):date('Y-m-d');
@@ -410,7 +422,7 @@ class FeesController extends Controller
     {	
 		$users= $this->getUsers();
         if ($request->input("custombgbu") && $request->input("customsku") && $request->input("customActionType") == "group_action") {
-			$sap_seller_id = User::where('id',Auth::user()->id)->first()->value('sap_seller_id');
+			$sap_seller_id = Auth::user()->sap_seller_id;
 			if($sap_seller_id){
 				$updateDate = [];
                $bgbu = $request->input('custombgbu');
@@ -419,8 +431,11 @@ class FeesController extends Controller
 			   if(array_get($bgbu_arr,1)) $updateDate['bu'] = array_get($bgbu_arr,1);
 			   $updateDate['user_id'] = Auth::user()->id;
 			   $updateDate['sku'] = $request->input("customsku");
-			    DB::table('aws_report')->whereIn('id',$request->input("id"))->whereIn('ImportToSap',0)->update($updateDate);
-			}
+			    DB::table('aws_report')->whereIn('id',$request->input("id"))->where('ImportToSap',0)->update($updateDate);
+			}else{
+			   	   $request->session()->flash('error_message','Please set your Sap Seller id and  relogin');
+				   return redirect('fees');
+			   } 
         }
 		$date_from=$request->input('date_from')?$request->input('date_from'):date('Y-m-d',strtotime('- 90 days'));
         $date_to=$request->input('date_to')?$request->input('date_to'):date('Y-m-d');
