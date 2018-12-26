@@ -76,8 +76,10 @@ class FeesController extends Controller
 		$error_message='';
         if ($request->input("custombgbu") && $request->input("customsku") && $request->input("customActionType") == "group_action") {
 			   $sap_seller_id =  Auth::user()->sap_seller_id;
-			   $exists_sku =Asin::where('item_no',trim($request->input("customsku")))->first();
-			   if($sap_seller_id && $exists_sku){
+			   $customskus = explode('/',trim($request->input("customsku")));
+			   $exists_skus = Asin::whereIn('item_no',$customskus)->groupBy('item_no')->get(['item_no'])->count();
+
+			   if( $sap_seller_id && $exists_skus == count($customskus)){
 			   	   $updateDate = [];
 				   $bgbu = $request->input('custombgbu');
 				   $bgbu_arr = explode('_',$bgbu);
@@ -168,8 +170,10 @@ class FeesController extends Controller
 		$error_message='';
         if ($request->input("custombgbu") && $request->input("customsku") && $request->input("customActionType") == "group_action") {
 			$sap_seller_id = Auth::user()->sap_seller_id;
-			$exists_sku =Asin::where('item_no',trim($request->input("customsku")))->first();
-			if($sap_seller_id && $exists_sku){
+			$customskus = explode('/',trim($request->input("customsku")));
+			   $exists_skus = Asin::whereIn('item_no',$customskus)->groupBy('item_no')->get(['item_no'])->count();
+
+			   if( $sap_seller_id && $exists_skus == count($customskus)){
 			   $updateDate = [];
                $bgbu = $request->input('custombgbu');
 			   $bgbu_arr = explode('_',$bgbu);
@@ -259,8 +263,10 @@ class FeesController extends Controller
 		$error_message='';
         if ($request->input("custombgbu") && $request->input("customsku") && $request->input("customActionType") == "group_action") {
 			   $sap_seller_id = Auth::user()->sap_seller_id;
-				$exists_sku =Asin::where('item_no',trim($request->input("customsku")))->first();
-			if($sap_seller_id && $exists_sku){
+			$customskus = explode('/',trim($request->input("customsku")));
+			   $exists_skus = Asin::whereIn('item_no',$customskus)->groupBy('item_no')->get(['item_no'])->count();
+
+			   if( $sap_seller_id && $exists_skus == count($customskus)){
 				$updateDate = [];
                $bgbu = $request->input('custombgbu');
 			   $bgbu_arr = explode('_',$bgbu);
@@ -349,8 +355,10 @@ class FeesController extends Controller
 		$error_message='';
         if ($request->input("custombgbu") && $request->input("customsku") && $request->input("customActionType") == "group_action") {
 			$sap_seller_id = Auth::user()->sap_seller_id;
-			$exists_sku =Asin::where('item_no',trim($request->input("customsku")))->first();
-			if($sap_seller_id && $exists_sku){
+			$customskus = explode('/',trim($request->input("customsku")));
+			   $exists_skus = Asin::whereIn('item_no',$customskus)->groupBy('item_no')->get(['item_no'])->count();
+
+			   if( $sap_seller_id && $exists_skus == count($customskus)){
 				$updateDate = [];
                $bgbu = $request->input('custombgbu');
 			   $bgbu_arr = explode('_',$bgbu);
@@ -433,8 +441,10 @@ class FeesController extends Controller
 		$error_message='';
         if ($request->input("custombgbu") && $request->input("customsku") && $request->input("customActionType") == "group_action") {
 			$sap_seller_id = Auth::user()->sap_seller_id;
-			$exists_sku =Asin::where('item_no',trim($request->input("customsku")))->first();
-			if($sap_seller_id && $exists_sku){
+			$customskus = explode('/',trim($request->input("customsku")));
+			   $exists_skus = Asin::whereIn('item_no',$customskus)->groupBy('item_no')->get(['item_no'])->count();
+
+			   if( $sap_seller_id && $exists_skus == count($customskus)){
 				$updateDate = [];
                $bgbu = $request->input('custombgbu');
 			   $bgbu_arr = explode('_',$bgbu);
