@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use App\User;
+use App\Asin;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Auth;
@@ -72,9 +73,11 @@ class FeesController extends Controller
 		}
         $sort = $request->input('order.0.dir','desc');
 		$users= $this->getUsers();
+		$error_message='';
         if ($request->input("custombgbu") && $request->input("customsku") && $request->input("customActionType") == "group_action") {
 			   $sap_seller_id =  Auth::user()->sap_seller_id;
-			   if($sap_seller_id){
+			   $exists_sku =Asin::where('item_no',trim($request->input("customsku")))->first();
+			   if($sap_seller_id && $exists_sku){
 			   	   $updateDate = [];
 				   $bgbu = $request->input('custombgbu');
 				   $bgbu_arr = explode('_',$bgbu);
@@ -84,8 +87,7 @@ class FeesController extends Controller
 				   $updateDate['sku'] = $request->input("customsku");
 				   DB::connection('order')->table('finances_product_ads_payment_event')->whereIn('id',$request->input("id"))->where('ImportToSap',0)->update($updateDate);
 			   }else{
-			   	   $request->session()->flash('error_message','Please set your Sap Seller id and  relogin');
-				   return redirect('fees');
+			   	   $error_message = 'Your account is not bound to the SAP Seller ID, or the entered SKU is invalid.';
 			   } 
         }
 		$date_from=$request->input('date_from')?$request->input('date_from'):date('Y-m-d',strtotime('- 90 days'));
@@ -145,6 +147,7 @@ class FeesController extends Controller
             );
 		}
         $records["draw"] = $sEcho;
+		$records["cusErrorMessage"] = $error_message;
         $records["recordsTotal"] = $iTotalRecords;
         $records["recordsFiltered"] = $iTotalRecords;
         echo json_encode($records);
@@ -162,21 +165,22 @@ class FeesController extends Controller
 		}
         $sort = $request->input('order.0.dir','desc');
 		$users= $this->getUsers();
+		$error_message='';
         if ($request->input("custombgbu") && $request->input("customsku") && $request->input("customActionType") == "group_action") {
 			$sap_seller_id = Auth::user()->sap_seller_id;
-			if($sap_seller_id){
+			$exists_sku =Asin::where('item_no',trim($request->input("customsku")))->first();
+			if($sap_seller_id && $exists_sku){
 			   $updateDate = [];
                $bgbu = $request->input('custombgbu');
 			   $bgbu_arr = explode('_',$bgbu);
 			   if(array_get($bgbu_arr,0)) $updateDate['bg'] = array_get($bgbu_arr,0);
 			   if(array_get($bgbu_arr,1)) $updateDate['bu'] = array_get($bgbu_arr,1);
 			   $updateDate['user_id'] = Auth::user()->id;
-			   $updateDate['sku'] = $request->input("customsku");
+			   $updateDate['sku'] = trim($request->input("customsku"));
 			    DB::connection('order')->table('finances_deal_event')->whereIn('id',$request->input("id"))->where('ImportToSap',0)->update($updateDate);
 			}else{
-			   	   $request->session()->flash('error_message','Please set your Sap Seller id and  relogin');
-				   return redirect('fees');
-			   } 
+			   $error_message = 'Your account is not bound to the SAP Seller ID, or the entered SKU is invalid.';
+			} 
         }
 		$date_from=$request->input('date_from')?$request->input('date_from'):date('Y-m-d',strtotime('- 90 days'));
         $date_to=$request->input('date_to')?$request->input('date_to'):date('Y-m-d');
@@ -235,6 +239,7 @@ class FeesController extends Controller
             );
 		}
         $records["draw"] = $sEcho;
+		$records["cusErrorMessage"] = $error_message;
         $records["recordsTotal"] = $iTotalRecords;
         $records["recordsFiltered"] = $iTotalRecords;
         echo json_encode($records);
@@ -251,9 +256,11 @@ class FeesController extends Controller
 		}
         $sort = $request->input('order.0.dir','desc');
 		$users= $this->getUsers();
+		$error_message='';
         if ($request->input("custombgbu") && $request->input("customsku") && $request->input("customActionType") == "group_action") {
 			   $sap_seller_id = Auth::user()->sap_seller_id;
-				if($sap_seller_id){
+				$exists_sku =Asin::where('item_no',trim($request->input("customsku")))->first();
+			if($sap_seller_id && $exists_sku){
 				$updateDate = [];
                $bgbu = $request->input('custombgbu');
 			   $bgbu_arr = explode('_',$bgbu);
@@ -263,8 +270,7 @@ class FeesController extends Controller
 			   $updateDate['sku'] = $request->input("customsku");
 			    DB::connection('order')->table('finances_coupon_event')->whereIn('id',$request->input("id"))->where('ImportToSap',0)->update($updateDate);
 				}else{
-			   	   $request->session()->flash('error_message','Please set your Sap Seller id and  relogin');
-				   return redirect('fees');
+			   	  $error_message = 'Your account is not bound to the SAP Seller ID, or the entered SKU is invalid.';
 			   } 
         }
 		$date_from=$request->input('date_from')?$request->input('date_from'):date('Y-m-d',strtotime('- 90 days'));
@@ -324,6 +330,7 @@ class FeesController extends Controller
             );
 		}
         $records["draw"] = $sEcho;
+		$records["cusErrorMessage"] = $error_message;
         $records["recordsTotal"] = $iTotalRecords;
         $records["recordsFiltered"] = $iTotalRecords;
         echo json_encode($records);
@@ -339,9 +346,11 @@ class FeesController extends Controller
 		}
         $sort = $request->input('order.0.dir','desc');
 		$users= $this->getUsers();
+		$error_message='';
         if ($request->input("custombgbu") && $request->input("customsku") && $request->input("customActionType") == "group_action") {
 			$sap_seller_id = Auth::user()->sap_seller_id;
-			if($sap_seller_id){
+			$exists_sku =Asin::where('item_no',trim($request->input("customsku")))->first();
+			if($sap_seller_id && $exists_sku){
 				$updateDate = [];
                $bgbu = $request->input('custombgbu');
 			   $bgbu_arr = explode('_',$bgbu);
@@ -351,8 +360,7 @@ class FeesController extends Controller
 			   $updateDate['sku'] = $request->input("customsku");
 			    DB::connection('order')->table('finances_servicefee_event')->whereIn('id',$request->input("id"))->where('ImportToSap',0)->update($updateDate);
 			}else{
-			   	   $request->session()->flash('error_message','Please set your Sap Seller id and  relogin');
-				   return redirect('fees');
+			   	   $error_message = 'Your account is not bound to the SAP Seller ID, or the entered SKU is invalid.';
 			   } 
         }
 		$date_from=$request->input('date_from')?$request->input('date_from'):date('Y-m-d',strtotime('- 90 days'));
@@ -412,6 +420,7 @@ class FeesController extends Controller
             );
 		}
         $records["draw"] = $sEcho;
+		$records["cusErrorMessage"] = $error_message;
         $records["recordsTotal"] = $iTotalRecords;
         $records["recordsFiltered"] = $iTotalRecords;
         echo json_encode($records);
@@ -421,9 +430,11 @@ class FeesController extends Controller
 	public function getcpc(Request $request)
     {	
 		$users= $this->getUsers();
+		$error_message='';
         if ($request->input("custombgbu") && $request->input("customsku") && $request->input("customActionType") == "group_action") {
 			$sap_seller_id = Auth::user()->sap_seller_id;
-			if($sap_seller_id){
+			$exists_sku =Asin::where('item_no',trim($request->input("customsku")))->first();
+			if($sap_seller_id && $exists_sku){
 				$updateDate = [];
                $bgbu = $request->input('custombgbu');
 			   $bgbu_arr = explode('_',$bgbu);
@@ -433,8 +444,7 @@ class FeesController extends Controller
 			   $updateDate['sku'] = $request->input("customsku");
 			    DB::table('aws_report')->whereIn('id',$request->input("id"))->where('ImportToSap',0)->update($updateDate);
 			}else{
-			   	   $request->session()->flash('error_message','Please set your Sap Seller id and  relogin');
-				   return redirect('fees');
+			   	   $error_message = 'Your account is not bound to the SAP Seller ID, or the entered SKU is invalid.';
 			   } 
         }
 		$date_from=$request->input('date_from')?$request->input('date_from'):date('Y-m-d',strtotime('- 90 days'));
@@ -506,6 +516,7 @@ class FeesController extends Controller
             );
 		}
         $records["draw"] = $sEcho;
+		$records["cusErrorMessage"] = $error_message;
         $records["recordsTotal"] = $iTotalRecords;
         $records["recordsFiltered"] = $iTotalRecords;
         echo json_encode($records);
