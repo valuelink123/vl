@@ -182,8 +182,13 @@ class RsgrequestsController extends Controller
 			);
 			$product= RsgProduct::where('id',$rule->product_id)->first()->toArray();
 			$mailchimpData = array(
-				'PROIMG'=>$product['product_img'],'PRONAME'=>$product['product_name'],'PROKEY'=>$product['keyword'],'PROPAGE'=>$product['page'],'PROPOS'=>$product['position'],'PAYPAL'=>$rule->customer_paypal_email,'FUNDED'=>$rule->transfer_amount.' '.$rule->transfer_currency,'ORDERID'=>$rule->amazon_order_id,'REVIEWURL'=>$rule->review_url
+				'PROIMG'=>$product['product_img'],'PRONAME'=>$product['product_name'],'PROKEY'=>$product['keyword'],'PROPAGE'=>$product['page'],'PROPOS'=>$product['position']
 			);
+			if($rule->customer_paypal_email) $mailchimpData['PAYPAL'] = $rule->customer_paypal_email;
+			if($rule->transfer_amount) $mailchimpData['FUNDED'] = $rule->transfer_amount.' '.$rule->transfer_currency;
+			if($rule->amazon_order_id) $mailchimpData['ORDERID'] = $rule->amazon_order_id;
+			if($rule->review_url) $mailchimpData['REVIEWURL'] = $rule->review_url;
+			
 			self::mailchimp($rule->customer_email,array_get($step_to_tags,$rule->step),$mailchimpData);
 				
             $request->session()->flash('success_message','Set Rsg Request Success');
