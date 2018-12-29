@@ -188,9 +188,10 @@ class RsgrequestsController extends Controller
 			if($rule->transfer_amount) $mailchimpData['FUNDED'] = $rule->transfer_amount.' '.$rule->transfer_currency;
 			if($rule->amazon_order_id) $mailchimpData['ORDERID'] = $rule->amazon_order_id;
 			if($rule->review_url) $mailchimpData['REVIEWURL'] = $rule->review_url;
-			
-			self::mailchimp($rule->customer_email,array_get($step_to_tags,$rule->step),$mailchimpData);
-				
+			self::mailchimp($rule->customer_email,array_get($step_to_tags,$rule->step),[
+						'email_address' => $customer_email,
+						'status'        => 'subscribed',
+						'merge_fields' => $mailchimpData]);
             $request->session()->flash('success_message','Set Rsg Request Success');
             return redirect('rsgrequests');
         } else {
