@@ -189,7 +189,7 @@ class RsgrequestsController extends Controller
 			if($rule->amazon_order_id) $mailchimpData['ORDERID'] = $rule->amazon_order_id;
 			if($rule->review_url) $mailchimpData['REVIEWURL'] = $rule->review_url;
 			self::mailchimp($rule->customer_email,array_get($step_to_tags,$rule->step),[
-						'email_address' => $customer_email,
+						'email_address' => $rule->customer_email,
 						'status'        => 'subscribed',
 						'merge_fields' => $mailchimpData]);
             $request->session()->flash('success_message','Set Rsg Request Success');
