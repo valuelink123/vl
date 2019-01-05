@@ -1,5 +1,4 @@
 
-
     <div class="row"><div class="col-md-12">
         <div class="portlet light bordered">
 
@@ -79,17 +78,6 @@
                         </div>
 						
 						
-						<div class="form-group col-md-6">
-                            <label>Funded Paypal</label>
-                                <input type="text" class="form-control" name="transfer_paypal_account" id="transfer_paypal_account" value="{{array_get($rule,'transfer_paypal_account')}}">
-                           
-                        </div>
-						
-						<div class="form-group col-md-6">
-                            <label>Paypal Transaction Id</label>
-                                <input type="text" class="form-control" name="transaction_id" id="transaction_id" value="{{array_get($rule,'transaction_id')}}">
-                           
-                        </div>
 
 						
 						
@@ -105,6 +93,33 @@
                                 <input type="text" class="form-control" name="review_url" id="review_url" value="{{array_get($rule,'review_url')}}">
                            
                         </div>
+						
+						@if ($rule['trans'])
+						<table class="table table-hover col-md-12">
+							<thead>
+								<tr>
+									<th> Date </th>
+									<th> Type </th>
+									<th> Email </th>
+									<th> TransactionID </th>
+									<th> Amount </th>
+									<th> Status </th>
+								</tr>
+							</thead>
+							<tbody>
+								@foreach ($rule['trans'] as $tran)
+								<tr>
+									<td> {{array_get($tran,'Timestamp')}} </td>
+									<td> {{array_get($tran,'Type')}}  </td>
+									<td> {{array_get($tran,'Payer')}}  </td>
+									<td> {{array_get($tran,'TransactionID')}}  </td>
+									<td> {{array_get($tran,'GrossAmount.value').' '.array_get($tran,'GrossAmount.currencyID')}}  </td>
+									<td> {{array_get($tran,'Status')}}  </td>
+								</tr>
+								 @endforeach
+							</tbody>
+						</table>
+						@endif
 						
                     </div>
                     <div class="form-actions">

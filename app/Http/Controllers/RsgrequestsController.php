@@ -13,6 +13,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Services\MultipleQueue;
 use DB;
+use PayPal\PayPalAPI\TransactionSearchReq;
+use PayPal\PayPalAPI\TransactionSearchRequestType;
+use PayPal\Service\PayPalAPIInterfaceServiceService;
 class RsgrequestsController extends Controller
 {
     /**
@@ -146,6 +149,7 @@ class RsgrequestsController extends Controller
             $request->session()->flash('error_message','Rsg Product not Exists');
             return redirect('rsgrequests');
         }
+		if(array_get($rule,'customer_paypal_email')) $rule['trans']=self::getTrans(array_get($rule,'customer_paypal_email'));
 		$product= RsgProduct::where('id',$rule['product_id'])->first()->toArray();
         return view('rsgrequests/edit',['rule'=>$rule,'product'=>$product]);
     }
@@ -219,6 +223,27 @@ class RsgrequestsController extends Controller
 		if (!$MailChimp->success()) {
 			die($MailChimp->getLastError());
 		}
+	}
+	
+	public function getTrans($customer_paypal_email){
+		$transactionSearchRequest = new TransactionSearchRequestType();
+		$transactionSearchRequest->StartDate = '2018-01-01T00:00:00Z';
+		$transactionSearchRequest->Payer = $customer_paypal_email;
+		$tranSearchReq = new TransactionSearchReq();
+		$tranSearchReq->TransactionSearchRequest = $transactionSearchRequest;
+		$config = array(
+			"acct1.UserName" => "wangxuesong_api1.valuelinkcorp.com",
+			"acct1.Password" => "SEGA6WHYNA59AHL6",
+			"acct1.Signature" => "A--8MSCLabuvN8L.-MHjxC9uypBtAM4rESWthVxFB22kZUlViNTRaI4p",
+			"mode" => "live",
+			'log.LogEnabled' => false,
+			'log.FileName' => '../PayPal.log',
+			'log.LogLevel' => 'FINE'
+		);
+		$paypalService = new PayPalAPIInterfaceServiceService($config);
+		$transactionSearchResponse = $paypalService->TransactionSearch($tranSearchReq);
+		$transactionSearchResponse = json_decode(json_encode($transactionSearchResponse), true);
+		return array_get($transactionSearchResponse,'PaymentTransactions',[]);
 	}
 
 
