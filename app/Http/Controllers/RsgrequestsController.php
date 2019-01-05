@@ -227,9 +227,9 @@ class RsgrequestsController extends Controller
 	
 	public function getTrans($customer_paypal_email){
 		$transactionSearchRequest = new TransactionSearchRequestType();
-		$transactionSearchRequest->StartDate = '2018-01-01T00:00:00Z';
-		$transactionSearchRequest->EndDate = date('Y-m-d\TH:i:s\Z');
-		$transactionSearchRequest->Payer = $customer_paypal_email;
+		$transactionSearchRequest->StartDate='2018-01-01T00:00:00Z';
+		$transactionSearchRequest->EndDate=date('Y-m-d\TH:i:s\Z');
+		$transactionSearchRequest->Payer=$customer_paypal_email;
 		$tranSearchReq = new TransactionSearchReq();
 		$tranSearchReq->TransactionSearchRequest = $transactionSearchRequest;
 		$config = array(
