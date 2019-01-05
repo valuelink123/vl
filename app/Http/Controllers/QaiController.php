@@ -173,7 +173,7 @@ class QaiController extends Controller
 				$customersList[$i]['epoint'],
 				$customersList[$i]['title'],
                 
-                $users[$customersList[$i]['user_id']],
+                array_get($users,$customersList[$i]['user_id']),
 				$customersList[$i]['confirm']?'<span class="label label-sm label-primary">Confirmed</span>':'<span class="label label-sm label-danger">Un Confirm</span>',
                 $customersList[$i]['updated_at'],
                 '<a href="/qa/'.$customersList[$i]['id'].'/edit" class="btn btn-sm btn-outline grey-salsa" target="_blank"><i class="fa fa-search"></i> Edit </a> <a href="/question/'.$customersList[$i]['id'].'" class="btn btn-sm btn-outline grey-salsa" target="_blank"><i class="fa fa-search"></i> View </a>',
