@@ -94,7 +94,7 @@
                            
                         </div>
 						
-						@if ($rule['trans'])
+						@if (array_get($rule,'trans'))
 						<table class="table table-hover col-md-12">
 							<thead>
 								<tr>
