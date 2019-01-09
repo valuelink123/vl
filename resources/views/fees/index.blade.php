@@ -499,6 +499,18 @@
 						
 						
 						<div class="tab-pane" id="tab_coupon">
+						<div class="table-toolbar">
+							<div class="row">
+								<div class="col-md-6">
+									<div class="btn-group">
+										<a href="{{ url('couponkunnr')}}"><button id="sample_editable_1_2_new" class="btn sbold blue"> Coupon Code Rules
+											<i class="fa fa-plus"></i>
+										</button>
+										</a>
+									</div>
+								</div>
+							</div>
+						</div>
 						<div class="table-container">
 							<div class="table-actions-wrapper">
 								<select id="bgbu" class="table-group-action-input form-control input-inline input-small input-sm">
