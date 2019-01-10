@@ -40,7 +40,7 @@ class CouponkunnrController extends Controller
     }
 
     public function getUsers(){
-        $users = User::Where('sap_seller_id','>',0)->get()->toArray();
+        $users = User::Where('sap_seller_id','>',0)->orderBy('sap_seller_id','asc')->get()->toArray();
         $users_array = array();
         foreach($users as $user){
             $users_array[$user['sap_seller_id']] = $user['name'];
@@ -50,7 +50,7 @@ class CouponkunnrController extends Controller
 
     public function getAccounts(){
         $seller=[];
-		$accounts= DB::table('sap_kunnr')->get(['kunnr']);
+		$accounts= DB::table('sap_kunnr')->orderBy('kunnr','asc')->get(['kunnr']);
 		$accounts=json_decode(json_encode($accounts), true);
 		foreach($accounts as $account){
 			$seller[$account['kunnr']]=$account['kunnr'];
