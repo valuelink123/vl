@@ -36,43 +36,78 @@ th,td,td>span {
                                 </a>
                             </div>
                         </div>
+						
+						<div class="col-md-6">
+						<form action="{{url('couponkunnr/upload')}}" method="post" enctype="multipart/form-data">
+						<div class="col-md-4" style="text-align:right;" >
+
+							<a href="{{ url('/uploads/coupon/coupon.csv')}}" >Import Template
+                                </a>	
+						</div>
+						<div class="col-md-4">
+							{{ csrf_field() }}
+								 <input type="file" name="importFile"  />
+						</div>
+						<div class="col-md-4">
+							<button type="submit" class="btn blue" id="data_search">Upload Email</button>
+
+						</div>
+						
+						</form>
+						</div>
+						
                     </div>
                 </div>
+				
                 <div class="portlet-body">
-
-                    <table class="table table-striped table-bordered table-hover order-column" id="manage_coupon_rules">
+<div class="table-container">
+                    <table class="table table-striped table-bordered table-hover" id="manage_coupon_rules">
                         <thead>
                         <tr>
-							 <th> Coupon Code </th>
-                            <th > Sold-to party </th>
-                           
-                            <th> Sku </th>
-                            <th> Sap Seller ID </th>                   			
+							 <th width="30%"> Coupon Code （Coupon描述）</th>
+                            <th width="15%"> Sold-to party （售达方） </th>
+                             <th width="15%"> Sku （物料号）</th>
+                            <th width="15%"> Sap Seller ID （销售组）</th> 
+							<th width="15%"> Action </th>                   			
                         </tr>
+						<tr role="row" class="filter">
+									<td><input type="text" class="form-control form-filter input-sm" name="coupon_description"> </td>
+									
+									<td>
+										<select name="kunnr" class="form-control form-filter input-sm" >
+										<option value="">Please Select
+								   <?php 
+									foreach($accounts as $k=>$v){
+										echo '<option value="'.$k.'">'.$v.'</option>';
+									}?>
+								</select>
+									</td>
+									<td><input type="text" class="form-control form-filter input-sm" name="sku"> </td>
+									
+									<td>
+										<select name="sap_seller_id" class="form-control form-filter input-sm" >
+										<option value="">Please Select
+								   <?php 
+									foreach($users as $k=>$v){ 	
+										echo '<option value="'.$k.'" >'.$k.' ( '.$v.' ) </option>';
+									}?>
+								</select>
+									</td>
+									<td>
+										
+											<button class="btn btn-sm green btn-outline filter-submit margin-bottom">
+												<i class="fa fa-search"></i> Search</button>
+										
+										<button class="btn btn-sm red btn-outline filter-cancel">
+											<i class="fa fa-times"></i> Reset</button>
+									</td>
+									
+						</tr>
                         </thead>
                         <tbody>
-                        @foreach ($rules as $rule)
-                            <tr class="odd gradeX">
-                                <td>
-                                    <a data-target="#ajax" data-toggle="modal" href="{{ url('couponkunnr/'.$rule['id'].'/edit') }}">{{$rule['coupon_description']}}</a>
-                                </td>
-                                <td>
-                                    {{$rule['kunnr']}}
-                                </td>
-                                <td>
-                                    {{$rule['sku']}}
-                                </td>
-                                <td>
-                                   {{$rule['sap_seller_id']}}
-                                </td>
-								
-                            </tr>
-                        @endforeach
-
-
-
                         </tbody>
                     </table>
+					</option>
                 </div>
             </div>
             <!-- END EXAMPLE TABLE PORTLET-->
@@ -92,83 +127,88 @@ th,td,td>span {
     </div>
 
     <script>
-        $(function() {
-        var TableDatatablesManaged = function () {
-
-            var initTable = function () {
-
-                var table = $('#manage_coupon_rules');
-
-                // begin first table
-                table.dataTable({
-
-                    // Internationalisation. For more info refer to http://datatables.net/manual/i18n
-                    "language": {
-                        "aria": {
-                            "sortAscending": ": activate to sort column ascending",
-                            "sortDescending": ": activate to sort column descending"
-                        },
-                        "emptyTable": "No data available in table",
-                        "info": "Showing _START_ to _END_ of _TOTAL_ records",
-                        "infoEmpty": "No records found",
-                        "infoFiltered": "(filtered1 from _MAX_ total records)",
-                        "lengthMenu": "Show _MENU_",
-                        "search": "Search:",
-                        "zeroRecords": "No matching records found",
-                        "paginate": {
-                            "previous":"Prev",
-                            "next": "Next",
-                            "last": "Last",
-                            "first": "First"
-                        }
-                    },
-
-                    "bStateSave": true, // save datatable state(pagination, sort, etc) in cookie.
-
-                    "lengthMenu": [
-                        [5, 15, 20, -1],
-                        [5, 15, 20, "All"] // change per page values here
-                    ],
-                    // set the initial value
-                    "pageLength": 20,
-                    "pagingType": "bootstrap_full_number",
-                    "columnDefs": [
-
-                        {
-                            "className": "dt-right",
-                            //"targets": [2]
-                        }
-                    ],
-                    "order": [
-                        [1, "asc"]
-                    ] // set first column as a default sort by asc
-                });
-
-            }
-
-
-            return {
-
-                //main function to initiate the module
-                init: function () {
-                    if (!jQuery().dataTable) {
-                        return;
-                    }
-
-                    initTable();
-                }
-
-            };
-
-        }();
-
-
-
-            TableDatatablesManaged.init();
-			$("#ajax").on("hidden.bs.modal",function(){
-				$(this).find('.modal-content').html('<div class="modal-body"><img src="../assets/global/img/loading-spinner-grey.gif" alt="" class="loading"><span>Loading... </span></div>');
-			});
-        });
+        var TableDatatablesAjax = function () {
+						
+								var initPickers = function () {
+									//init date pickers
+									$('.date-picker').datepicker({
+										rtl: App.isRTL(),
+										autoclose: true
+									});
+								}
+						
+								var initTable = function () {
+									$.ajaxSetup({
+										headers: { 'X-CSRF-TOKEN' : '{{ csrf_token() }}' }
+									});
+									var grid = new Datatable();
+						
+									grid.init({
+										src: $("#manage_coupon_rules"),
+										onSuccess: function (grid, response) {
+											// grid:        grid object
+											// response:    json object of server side ajax response
+											// execute some code after table records loaded
+										},
+										onError: function (grid) {
+											// execute some code on network or other general error
+										},
+										onDataLoad: function(grid) {
+											// execute some code on ajax data load
+											//alert('123');
+											//alert($("#subject").val());
+											//grid.setAjaxParam("subject", $("#subject").val());
+										},
+										loadingMessage: 'Loading...',
+										dataTable: { // here you can define a typical datatable settings from http://datatables.net/usage/options
+						
+											// Uncomment below line("dom" parameter) to fix the dropdown overflow issue in the datatable cells. The default datatable layout
+											// setup uses scrollable div(table-scrollable) with overflow:auto to enable vertical scroll(see: assets/global/scripts/datatable.js).
+											// So when dropdowns used the scrollable div should be removed.
+											"dom": "<'row'<'col-md-6 col-sm-12'pli><'col-md-6 col-sm-12'<'table-group-actions pull-right'>>r>t<'row'<'col-md-6 col-sm-12'pli><'col-md-6 col-sm-12'>>",
+											"bSortable": false,
+											"bStateSave": true, // save datatable state(pagination, sort, etc) in cookie.
+											"lengthMenu": [
+												[-1,10, 20, 50],
+												['All',10, 20, 50] // change per page values here
+											],
+											"pageLength": 10, // default record count per page
+											"ajax": {
+												"url": "{{ url('couponkunnr/get')}}", // ajax source
+											},
+										}
+									});
+						
+						
+									grid.setAjaxParam("coupon_description", $("input[name='coupon_description']").val());
+									grid.setAjaxParam("sku", $("input[name='sku']").val());
+									grid.setAjaxParam("kunnr", $("select[name='kunnr']").val());
+									grid.setAjaxParam("sap_seller_id", $("select[name='sap_seller_id']").val());
+									grid.getDataTable().ajax.reload(null,false);
+									//grid.clearAjaxParams();
+								}
+						
+						
+								return {
+						
+									//main function to initiate the module
+									init: function () {
+										initPickers();
+										initTable();
+									}
+						
+								};
+						
+							}();
+						
+						$(function() {
+							
+							TableDatatablesAjax.init();
+							
+							$("#ajax").on("hidden.bs.modal",function(){
+								$(this).find('.modal-content').html('<div class="modal-body"><img src="../assets/global/img/loading-spinner-grey.gif" alt="" class="loading"><span>Loading... </span></div>');
+							});
+						});
 
 
 </script>

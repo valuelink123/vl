@@ -77,6 +77,8 @@ Route::Post('/fees/getservice', 'FeesController@getservice')->name('getservice')
 Route::resource('mcforder', 'McforderController');
 Route::resource('autoprice', 'AutopriceController');
 Route::resource('couponkunnr', 'CouponkunnrController');
+Route::Post('/couponkunnr/get', 'CouponkunnrController@get')->name('getkunnrs');
+Route::Post('/couponkunnr/upload', 'CouponkunnrController@upload')->name('uploadkunnr');
 Route::Post('/mcforder/get', 'McforderController@get')->name('getMcforder');
 Route::resource('rsgproducts', 'RsgproductsController');
 Route::Post('/rsgproducts/get', 'RsgproductsController@get')->name('getrsgproducts');

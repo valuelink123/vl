@@ -35,8 +35,97 @@ class CouponkunnrController extends Controller
     {
         $autoprice = Couponkunnr::get()->toArray();
         $users_array = $this->getUsers();
-        return view('couponkunnr/index',['rules'=>$autoprice,'users'=>$users_array,'accounts'=>$this->getAccounts()]);
+        return view('couponkunnr/index',['users'=>$users_array,'accounts'=>$this->getAccounts()]);
 
+    }
+	
+	public function upload( Request $request )
+	{	
+		if($request->isMethod('POST')){  
+            $file = $request->file('importFile');  
+  			if($file){
+            if($file->isValid()){  
+  
+                $originalName = $file->getClientOriginalName();  
+                $ext = $file->getClientOriginalExtension();  
+                $type = $file->getClientMimeType();  
+                $realPath = $file->getRealPath();  
+                $newname = date('Y-m-d-H-i-S').'-'.uniqid().'.'.$ext;  
+				$newpath = '/uploads/coupon/'.date('Ymd').'/';
+				$inputFileName = public_path().$newpath.$newname;
+  				$bool = $file->move(public_path().$newpath,$newname);
+
+				if($bool){
+					$spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($inputFileName);
+					$importData = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);		
+					foreach($importData as $key => $data){
+						if($key>1 && array_get($data,'A') && array_get($data,'B') && array_get($data,'C')  && array_get($data,'D')){
+							Couponkunnr::updateOrCreate(
+							[
+								'kunnr' => trim(array_get($data,'A')),
+								'coupon_description' => trim(array_get($data,'B'))
+								],[
+								'sku'=> trim(array_get($data,'C')),
+								'sap_seller_id' => trim(array_get($data,'D'))
+							]);	
+						}
+					}
+					$request->session()->flash('success_message','Import Data Success!');
+				}else{
+					$request->session()->flash('error_message','Upload Customer Failed');
+				}          
+            } 
+			}else{
+				$request->session()->flash('error_message','Please Select Upload File');
+			} 
+        } 
+		return redirect('couponkunnr');
+	
+	}
+	
+	
+	public function get(Request $request)
+    {
+		$datas= new Couponkunnr;
+               
+        if($request->input('coupon_description')){
+            $datas = $datas->where('coupon_description','like','%'.$request->input('coupon_description').'%');
+        }
+		if($request->input('sap_seller_id')){
+            $datas = $datas->where('sap_seller_id', $request->input('sap_seller_id'));
+        }
+		if($request->input('sku')){
+            $datas = $datas->where('sku','like','%'.$request->input('sku').'%');
+        }
+		if($request->input('kunnr')){
+            $datas = $datas->where('kunnr', $request->input('kunnr'));
+        }
+		
+		$iTotalRecords = $datas->count();
+        $iDisplayLength = intval($_REQUEST['length']);
+        $iDisplayLength = $iDisplayLength < 0 ? $iTotalRecords : $iDisplayLength;
+        $iDisplayStart = intval($_REQUEST['start']);
+        $sEcho = intval($_REQUEST['draw']);
+		$lists =  $datas->offset($iDisplayStart)->limit($iDisplayLength)->get()->toArray();
+        $records = array();
+        $records["data"] = array();
+
+        $end = $iDisplayStart + $iDisplayLength;
+        $end = $end > $iTotalRecords ? $iTotalRecords : $end;
+		foreach ( $lists as $list){
+            $records["data"][] = array(
+				$list['coupon_description'],
+				$list['kunnr'],
+                $list['sku'],
+				$list['sap_seller_id'],
+				'<a data-target="#ajax" data-toggle="modal" href="'.url('couponkunnr/'.$list['id'].'/edit').'" class="badge badge-success"> View </a>'
+				
+            );
+		}
+        $records["draw"] = $sEcho;
+        $records["recordsTotal"] = $iTotalRecords;
+        $records["recordsFiltered"] = $iTotalRecords;
+        echo json_encode($records);
     }
 
     public function getUsers(){
