@@ -8,7 +8,7 @@
                     {{ csrf_field() }}
                     <div class="form-body">
                          <div class="form-group">
-                            <label>Sold-to party</label>
+                            <label>Sold-to party （售达方）</label>
                             <div class="input-group ">
                                 <span class="input-group-addon">
                                     <i class="fa fa-tag"></i>
@@ -23,7 +23,7 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label>Sap Seller ID</label>
+                            <label>Sap Seller ID （销售组）</label>
                             <div class="input-group ">
                                 <span class="input-group-addon">
                                     <i class="fa fa-sort-amount-asc"></i>
@@ -37,7 +37,7 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label>SAP SKU</label>
+                            <label>SAP SKU （物料号）</label>
                             <div class="input-group ">
                                 <span class="input-group-addon">
                                     <i class="fa fa-heart"></i>
@@ -47,7 +47,7 @@
                         </div>
 						
 						<div class="form-group">
-                            <label>Coupon Code</label>
+                            <label>Coupon Code （Coupon描述）</label>
                             <div class="input-group ">
                                 <span class="input-group-addon">
                                     <i class="fa fa-heart"></i>
