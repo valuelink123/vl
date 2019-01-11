@@ -49,7 +49,7 @@ th,td,td>span {
 								 <input type="file" name="importFile"  />
 						</div>
 						<div class="col-md-4">
-							<button type="submit" class="btn blue" id="data_search">Upload Email</button>
+							<button type="submit" class="btn blue" id="data_search">Upload</button>
 
 						</div>
 						

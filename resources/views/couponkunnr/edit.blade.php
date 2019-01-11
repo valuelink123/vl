@@ -10,7 +10,7 @@
 					<input type="hidden" name='id' value="{{$rule['id']}}" />
                     <div class="form-body">
                         <div class="form-group">
-                            <label>Sold-to party £® €¥Ô∑Ω£©</label>
+                            <label>Sold-to party ÔºàÂîÆËææÊñπÔºâ</label>
                             <div class="input-group ">
                                 <span class="input-group-addon">
                                     <i class="fa fa-tag"></i>
@@ -26,7 +26,7 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label>Sap Seller ID £®œ˙ €◊È£©</label>
+                            <label>Sap Seller ID ÔºàÈîÄÂîÆÁªÑÔºâ</label>
                             <div class="input-group ">
                                 <span class="input-group-addon">
                                     <i class="fa fa-sort-amount-asc"></i>
@@ -41,7 +41,7 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label>SAP SKU £®ŒÔ¡œ∫≈£©</label>
+                            <label>SAP SKU ÔºàÁâ©ÊñôÂè∑Ôºâ</label>
                             <div class="input-group ">
                                 <span class="input-group-addon">
                                     <i class="fa fa-heart"></i>
@@ -51,7 +51,7 @@
                         </div>
 						
 						<div class="form-group">
-                            <label>Coupon Code £®Coupon√Ë ˆ£©</label>
+                            <label>Coupon Code ÔºàCouponÊèèËø∞Ôºâ</label>
                             <div class="input-group ">
                                 <span class="input-group-addon">
                                     <i class="fa fa-heart"></i>
