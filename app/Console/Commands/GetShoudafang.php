@@ -6,6 +6,8 @@ use Illuminate\Console\Command;
 use PhpImap;
 use Illuminate\Support\Facades\Input;
 use App\Kunnr;
+use App\User;
+use App\Couponkunnr;
 use PDO;
 use DB;
 use Log;
@@ -87,6 +89,72 @@ class GetShoudafang extends Command
 			]);
 			
     	}
+		$users = User::Where('sap_seller_id','>',0)->orderBy('sap_seller_id','asc')->get()->toArray();
+        $users_array = array();
+        foreach($users as $user){
+            $users_array[$user['sap_seller_id']] = $user['id'];
+        }
+		
+		$datas= DB::connection('order')->table('finances_deal_event')->where('ImportToSap',0)->where('user_id',0)->where('PostedDate','>=','2018-12-01')->where('DealDescription','like','%-%')->get();
+		foreach($datas as $data_s){
+			$s_data_s = explode('-',$data_s->DealDescription);
+			if(count($s_data_s)!=5) continue;
+			if(!intval($s_data_s[2])) continue;
+			if(!array_get($users_array,intval($s_data_s[2]))) continue;
+			if(!array_get(matchSapSiteCode(),trim($s_data_s[3]))) continue;
+			
+			DB::connection('order')->table('finances_deal_event')->where('id',$data_s->Id)->update(
+			[
+				'user_id'=>array_get($users_array,intval($s_data_s[2])),
+				'site_code'=>array_get(matchSapSiteCode(),trim($s_data_s[3])),
+				'sku'=>trim($s_data_s[0])
+			]
+			);
+		}
+		
+		$datas= DB::table('aws_report')->where('ImportToSap',0)->where('user_id',0)->where('date','>=','2018-12-01')->where('campaign_name','like','%-%')->get();
+		foreach($datas as $data_s){
+			$s_data_s = explode('-',$data_s->campaign_name);
+			if(count($s_data_s)!=5) continue;
+			if(!intval($s_data_s[2])) continue;
+			if(!array_get($users_array,intval($s_data_s[2]))) continue;
+			DB::table('aws_report')->where('id',$data_s->id)->update(
+			[
+				'user_id'=>array_get($users_array,intval($s_data_s[2])),
+				'sku'=>trim($s_data_s[0])
+			]
+			);
+		}
+		
+		$kunnrs = Kunnr::get()->toArray();
+        $kunnr_array = array();
+        foreach($kunnrs as $kunnr){
+            $kunnr_array[$kunnr['seller_id'].$kunnr['site']] = $kunnr['kunnr'];
+        }
+		
+		
+		$datas= DB::connection('order')->table('finances_coupon_event')->where('ImportToSap',0)->where('user_id',0)->where('PostedDate','>=','2018-12-01')->where('SellerCouponDescription','like','%-%')->get();
+		foreach($datas as $data_s){
+			$s_data_s = explode('-',$data_s->SellerCouponDescription);
+			if(count($s_data_s)!=3) continue;
+			if(!intval($s_data_s[1])) continue;
+			if(!array_get($users_array,intval($s_data_s[1]))) continue;
+			if(!array_get(matchSapSiteCode(),trim($s_data_s[2]))) continue;
+			$data_s->user_id = array_get($users_array,intval($s_data_s[1]));
+			$data_s->site_code = array_get(matchSapSiteCode(),trim($s_data_s[2]));
+			$kunnr = array_get($kunnr_array,trim($data_s->SellerId.$data_s->site_code));
+			if(!$kunnr) continue;
+			$sku = Couponkunnr::where('kunnr',$kunnr)->where('coupon_description',$data_s->SellerCouponDescription)->value('sku');
+			if(!$sku) continue;
+			DB::connection('order')->table('finances_coupon_event')->where('id',$data_s->Id)->update(
+			[
+				'user_id'=>array_get($users_array,intval($s_data_s[1])),
+				'site_code'=>array_get(matchSapSiteCode(),trim($s_data_s[2])),
+				'sku'=>$sku
+			]
+			);
+		}
+		
 	}
 
 }

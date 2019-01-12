@@ -385,3 +385,15 @@ function getStepStatus(){
 		'9'  => 'Completed'
 	);
 }
+
+function matchSapSiteCode(){
+	return array(
+		'US'  => '1007',
+		'UK'  => '1013',
+		'DE'  => '1009',
+		'FR'  => '1010',
+		'IT'  => '1011',
+		'ES'  => '1012',
+		'JP'  => '1014'
+	);
+}
