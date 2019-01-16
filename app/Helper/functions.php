@@ -397,3 +397,15 @@ function matchSapSiteCode(){
 		'JP'  => '1014'
 	);
 }
+
+function matchMarketplaceSiteCode(){
+	return array(
+		'ATVPDKIKX0DER'  => '1007',
+		'A1F83G8C2ARO7P'  => '1013',
+		'A1PA6795UKMFR9'  => '1009',
+		'A13V1IB3VIYZZH'  => '1010',
+		'APJ6JRA9NG5V4'  => '1011',
+		'A1RKKUPIHCS9HS'  => '1012',
+		'A1VC38T7YXB528'  => '1014'
+	);
+}
