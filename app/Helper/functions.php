@@ -372,6 +372,19 @@ function getSapSiteCode(){
 	);
 }
 
+function getSapFactoryCode(){
+	return array(
+		'1007'  => 'US01',
+		'1008'  => 'CA01',
+		'1009'  => 'GR01',
+		'1010'  => 'FR01',
+		'1011'  => 'IT01',
+		'1012'  => 'ES01',
+		'1013'  => 'UK01',
+		'1014'  => 'JP01'
+	);
+}
+
 function getStepStatus(){
 	return array(
 		'1'  => 'Check Customer',

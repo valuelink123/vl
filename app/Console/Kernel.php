@@ -73,7 +73,7 @@ class Kernel extends ConsoleKernel
         //$schedule->command('scan:warn')->hourly()->name('warningcheck')->withoutOverlapping();
         //$schedule->command('scan:auto')->hourly()->name('autocheck')->withoutOverlapping();
         $schedule->command('get:awsinfo')->dailyAt('23:00')->name('getawsinfo')->withoutOverlapping();
-		$schedule->command('get:dailysales 1')->dailyAt('9:00')->name('getdailysales')->withoutOverlapping();
+		$schedule->command('get:dailysales 7')->dailyAt('9:00')->name('getdailysales')->withoutOverlapping();
     }
 
     /**
