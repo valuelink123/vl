@@ -117,13 +117,10 @@ License: You must have a valid license purchased only from themeforest(the above
 											 
                                             {!!$qa->description!!}
                                         </div>
-                                        <div class="blog-comments" style="margin-top:50px;">
-											<h3 class="sbold blog-comments-title">Customer Service Solutions/Templates:</h3>
-                                            {!!$qa->service_content!!}
-                                        </div>
+                                        
 										
 										<div class="blog-comments" style="margin-top:50px;">
-											<h3 class="sbold blog-comments-title">Trouble Shooting:</h3>
+											<h3 class="sbold blog-comments-title">Details （Chinese）:</h3>
                                             {!!$qa->dqe_content!!}
                                         </div>
 										<?php if($qa->confirm!=1){?>

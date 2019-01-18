@@ -33,9 +33,9 @@ th,td,td>span {
 								<th width="10%"> Factory </th>
 								<th width="10%"> Description </th>
 								<th width="10%"> Sales 22-28 </th>
-								<th width="10%"> Sales 21-15 </th>
-								<th width="10%"> Sales 14-08 </th>
-								<th width="10%"> Sales 07-01 </th>
+								<th width="10%"> Sales 15-21 </th>
+								<th width="10%"> Sales 8-14 </th>
+								<th width="10%"> Sales 1-7 </th>
 								<?php foreach($addcolspans as $k=>$v){ ?>
 									<th> {{$k}} </th>
 								<?php } ?>
@@ -134,10 +134,10 @@ th,td,td>span {
                     "bStateSave": true, // save datatable state(pagination, sort, etc) in cookie.
                     "aoColumnDefs": [ { "bSortable": false, "aTargets": [4,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30] }],
                     "lengthMenu": [
-                        [20, 50, 100, -1],
-                        [20, 50, 100, 'All'] // change per page values here
+                        [10, 50, 100, -1],
+                        [10, 50, 100, 'All'] // change per page values here
                     ],
-                    "pageLength": 20, // default record count per page
+                    "pageLength": 10, // default record count per page
                     "ajax": {
                         "url": "{{ url('salesp/get')}}", // ajax source
                     },
