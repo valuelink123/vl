@@ -131,7 +131,7 @@ th,td,td>span {
                     //"dom": "<'row'<'col-md-8 col-sm-12'pli><'col-md-4 col-sm-12'<'table-group-actions pull-right'>>r>t<'row'<'col-md-8 col-sm-12'pli><'col-md-4 col-sm-12'>>",
 					scrollX: 2000,
 					fixedColumns:   {
-						leftColumns:8,
+						leftColumns:9,
 						rightColumns: 0
 					},
 
