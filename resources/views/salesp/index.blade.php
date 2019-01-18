@@ -24,7 +24,7 @@ th,td,td>span {
 
                     <div class="table-container">
 
-                        <table class="table table-striped table-bordered" id="datatable_ajax_sp">
+                        <table class="table table-striped table-bordered table-hover" id="datatable_ajax_sp">
                             <thead>
                             <tr role="row" class="heading">
 								<th width="10%"> Group </th>
@@ -129,11 +129,7 @@ th,td,td>span {
                     // setup uses scrollable div(table-scrollable) with overflow:auto to enable vertical scroll(see: assets/global/scripts/datatable.js).
                     // So when dropdowns used the scrollable div should be removed.
                     //"dom": "<'row'<'col-md-8 col-sm-12'pli><'col-md-4 col-sm-12'<'table-group-actions pull-right'>>r>t<'row'<'col-md-8 col-sm-12'pli><'col-md-4 col-sm-12'>>",
-					scrollX: 2000,
-					fixedColumns:   {
-						leftColumns:9,
-						rightColumns: 0
-					},
+					
 
                     "bStateSave": true, // save datatable state(pagination, sort, etc) in cookie.
                     "aoColumnDefs": [ { "bSortable": false, "aTargets": [4,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30] }],
@@ -141,7 +137,7 @@ th,td,td>span {
                         [20, 50, 100, -1],
                         [20, 50, 100, 'All'] // change per page values here
                     ],
-                    "pageLength": 10, // default record count per page
+                    "pageLength": 20, // default record count per page
                     "ajax": {
                         "url": "{{ url('salesp/get')}}", // ajax source
                     },
@@ -149,14 +145,12 @@ th,td,td>span {
                         [1, "desc"]
                     ],// set first column as a default sort by asc
 					
-					buttons: [
-                        { extend: 'csv', className: 'btn purple btn-outline ',filename:'salesp' }
-                    ],
+					
 					 "createdRow": function( row, data, dataIndex ) {
                         $(row).children('td').eq(4).attr('style', 'max-width: 200px;overflow:hidden;white-space:nowrap;text-align: left; ');
 						$(row).children('td').eq(4).attr('title', $(row).children('td').eq(4).text());
                     },
-					"dom": "<'row' <'col-md-12'B>><'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'>r><'table-scrollable't><'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>",
+	
 					
                 }
             });
