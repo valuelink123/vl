@@ -21,30 +21,15 @@ th,td,td>span {
             <!-- BEGIN EXAMPLE TABLE PORTLET-->
             <div class="portlet light bordered">
                 <div class="portlet-body">
-
-                    <div class="table-container">
-
-                        <table class="table table-striped table-bordered table-hover" id="datatable_ajax_sp">
-                            <thead>
-                            <tr role="row" class="heading">
-								<th width="10%"> Group </th>
-								<th width="10%"> Seller </th>
-								<th width="10%"> SKU </th>
-								<th width="10%"> Factory </th>
-								<th width="10%"> Description </th>
-								<th width="10%"> Sales 22-28 </th>
-								<th width="10%"> Sales 15-21 </th>
-								<th width="10%"> Sales 8-14 </th>
-								<th width="10%"> Sales 1-7 </th>
-								<?php foreach($addcolspans as $k=>$v){ ?>
-									<th> {{$k}} </th>
-								<?php } ?>
-                                
-                            </tr>
-                            <tr role="row" class="filter">
-								<td>
-                                    <select name="bgbu" class="form-control form-filter input-sm">
-										<option value="">BG && BU</option>
+							
+							
+					<div class="table-toolbar">
+                    <form role="form" action="{{url('salesp')}}" method="GET">
+                        {{ csrf_field() }}
+                        <div class="row">
+						<div class="col-md-2">
+                            <select name="bgbu" class="form-control form-filter input-sm">
+										<option value="">All BG && BU</option>
 										<option value="-">[Empty]</option>
 										<?php 
 										$bg='';
@@ -53,36 +38,67 @@ th,td,td>span {
 											if($team->bg && $team->bu) echo '<option value="'.$team->bg.'_'.$team->bu.'">'.$team->bg.' - '.$team->bu.'</option>';
 										}?>
 									</select>
-                                </td>
-                                <td>
-                                    <select name="sap_seller_id" class="form-control form-filter input-sm">
-										<option value="">Sellers</option>
+                        </div>
+                        <div class="col-md-2">
+                            <select name="sap_seller_id" class="form-control form-filter input-sm">
+										<option value="">All Sellers</option>
 										@foreach ($users as $sap_seller_id=>$user_name)
 											<option value="{{$sap_seller_id}}">{{$user_name}}</option>
 										@endforeach
 									</select>
-                                </td>
-                                <td>
-                                    <input type="text" class="form-control form-filter input-sm" name="sku">
-                                </td>
-                                <td>
-                                   <select name="sap_site_id" class="form-control form-filter input-sm">
-										<option value="">All</option>
+                        </div>
+                        <div class="col-md-2">
+                            
+                                <select name="sap_site_id" class="form-control form-filter input-sm">
+										<option value="">All Site</option>
 										@foreach (matchSapSiteCode() as $k=>$v)
 											<option value="{{$v}}">{{$k}}</option>
 										@endforeach
 									</select>
-                                </td>
-                                <td>
-                                    
-                                        <button class="btn btn-sm green btn-outline filter-submit margin-bottom">
-                                            <i class="fa fa-search"></i> Search</button>
-                                   
-                                    <button class="btn btn-sm red btn-outline filter-cancel">
-                                        <i class="fa fa-times"></i> Reset</button>
-                                </td>
-								<td colspan="26"></td>
+
+                           
+                        </div>
+                        <div class="col-md-2">
+                            
+                                <input type="text" class="form-control form-filter input-sm" name="sku" placeholder='SKU'>
+
+                        </div>
+
+						
+						
+						<div class="col-md-2">
+						<button type="button" class="btn blue" id="data_search">Search</button>
+                                       
+						</div>	
+						</div>
+
+                    </form>
+					
+                </div>
+                    <div class="table-container">
+
+                        <table class="table table-striped table-bordered table-hover" id="datatable_ajax_sp">
+                            <thead>
+                            <tr role="row" class="heading">
+								<th width="10%" rowspan="2"> Group </th>
+								<th width="10%" rowspan="2"> Seller </th>
+								<th width="10%" rowspan="2"> SKU </th>
+								<th width="10%" rowspan="2"> Factory </th>
+								<th width="10%" rowspan="2"> Description </th>
+								<td colspan="4" style="background:#e2efda">Last 28 days sales</td>
+								<td colspan="22" style="background:#b4c6e7">Expected sales in the next 22 weeks</td>
+							</tr>
+							 <tr role="row" class="heading">
+								<th width="10%" style="background:#e2efda"> Sales 22-28 </th>
+								<th width="10%" style="background:#e2efda"> Sales 15-21 </th>
+								<th width="10%" style="background:#e2efda"> Sales 8-14 </th>
+								<th width="10%" style="background:#e2efda"> Sales 1-7 </th>
+								<?php foreach($addcolspans as $k=>$v){ ?>
+									<th style="background:#b4c6e7"> {{$k}} </th>
+								<?php } ?>
+                                
                             </tr>
+                            
                             </thead>
                             <tbody> </tbody>
                         </table>
@@ -152,7 +168,14 @@ th,td,td>span {
                         $(row).children('td').eq(4).attr('style', 'max-width: 200px;overflow:hidden;white-space:nowrap;text-align: left; ');
 						$(row).children('td').eq(4).attr('title', $(row).children('td').eq(4).text());
                     },
+					scrollY:        380,
+                    scrollX:        true,
 					
+
+					fixedColumns:   {
+						leftColumns:9,
+						rightColumns: 0
+					},
 					"dom": "<'row' <'col-md-12'B>><'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'>r><'table-scrollable't><'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>",
                 }
             });
@@ -178,6 +201,12 @@ th,td,td>span {
 
 $(function() {
     TableDatatablesAjax.init();
+	$('#data_search').on('click',function(){
+		var dttable = $('#datatable_ajax_sp').dataTable();
+	    dttable.fnClearTable(); //清空一下table
+	    dttable.fnDestroy(); //还原初始化了的datatable
+		TableDatatablesAjax.init();
+	});
 });
 
 
