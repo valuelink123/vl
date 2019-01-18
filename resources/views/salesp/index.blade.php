@@ -145,13 +145,15 @@ th,td,td>span {
                         [1, "desc"]
                     ],// set first column as a default sort by asc
 					
-					
+					buttons: [
+                        { extend: 'csv', className: 'btn purple btn-outline ',filename:'salesp' }
+                    ],
 					 "createdRow": function( row, data, dataIndex ) {
                         $(row).children('td').eq(4).attr('style', 'max-width: 200px;overflow:hidden;white-space:nowrap;text-align: left; ');
 						$(row).children('td').eq(4).attr('title', $(row).children('td').eq(4).text());
                     },
-	
 					
+					"dom": "<'row' <'col-md-12'B>><'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'>r><'table-scrollable't><'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>",
                 }
             });
             grid.setAjaxParam("sku", $("input[name='sku']").val());
