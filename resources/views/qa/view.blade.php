@@ -125,7 +125,7 @@ License: You must have a valid license purchased only from themeforest(the above
                                         </div>
 										<?php if($qa->confirm!=1){?>
                                         <div class="blog-comments">
-                                            <h3 class="sbold blog-comments-title">Update Trouble Shooting:</h3>
+                                            <h3 class="sbold blog-comments-title">Update Details:</h3>
 											<form role="form" action="{{ url('question/'.$qa['id']) }}" method="POST">
                     {{ csrf_field() }}
 					{{ method_field('PUT') }}

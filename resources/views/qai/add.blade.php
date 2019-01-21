@@ -31,7 +31,7 @@
                             <div class="epoint_selectList form-inline">
 							<select class="epoint_group form-control" name="product_line" required>
 							</select>
-							<select class="epoint_product form-control" name="product" required>							
+							<select class="epoint_product form-control" name="product">							
 							</select>
 							<select class="epoint form-control" name="epoint">
 							</select>
@@ -62,6 +62,9 @@
 										if(typeof(epointJson[n]) == "undefined"){
 											oepoint_product.css("display","none");
 											oepoint.css("display","none");
+										}else if($.isEmptyObject(epointJson[n])){
+											oepoint_product.css("display","none");
+											oepoint.css("display","none");
 										}else{
 											oepoint_product.css("display","inline");
 											$.each(epointJson[n],function(i,epoint_product){
@@ -79,6 +82,8 @@
 									var n = oepoint_product.val();
 							
 										if(typeof(epointJson[m][n]) == "undefined"){
+											oepoint.css("display","none");
+										}else if($.isEmptyObject(epointJson[m][n])){
 											oepoint.css("display","none");
 										}else{
 											oepoint.css("display","inline");

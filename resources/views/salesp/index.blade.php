@@ -79,20 +79,21 @@ th,td,td>span {
 
                         <table class="table table-striped table-bordered table-hover" id="datatable_ajax_sp">
                             <thead>
-                            <tr role="row" class="heading">
-								<th width="10%" rowspan="2"> Group </th>
-								<th width="10%" rowspan="2"> Seller </th>
-								<th width="10%" rowspan="2"> SKU </th>
-								<th width="10%" rowspan="2"> Factory </th>
-								<th width="10%" rowspan="2"> Description </th>
+                            <tr role="row" >
+								<td colspan="5" style="background:#c6e7ff">Sku Base Info</td>
 								<td colspan="4" style="background:#e2efda">Last 28 days sales</td>
 								<td colspan="22" style="background:#b4c6e7">Expected sales in the next 22 weeks</td>
 							</tr>
 							 <tr role="row" class="heading">
-								<th width="10%" style="background:#e2efda"> Sales 22-28 </th>
-								<th width="10%" style="background:#e2efda"> Sales 15-21 </th>
-								<th width="10%" style="background:#e2efda"> Sales 8-14 </th>
-								<th width="10%" style="background:#e2efda"> Sales 1-7 </th>
+							 	<th style="background-color:#c6e7ff"> Group </th>
+								<th style="background-color:#c6e7ff" > Seller </th>
+								<th  style="background-color:#c6e7ff"> SKU </th>
+								<th  style="background-color:#c6e7ff"> Factory </th>
+								<th  style="background-color:#c6e7ff"> Description </th>
+								<th  style="background-color:#e2efda">22-28</th>
+								<th  style="background-color:#e2efda">15-21</th>
+								<th  style="background-color:#e2efda">8-14</th>
+								<th  style="background-color:#e2efda">1-7</th>
 								<?php foreach($addcolspans as $k=>$v){ ?>
 									<th style="background:#b4c6e7"> {{$k}} </th>
 								<?php } ?>
@@ -167,6 +168,11 @@ th,td,td>span {
 					 "createdRow": function( row, data, dataIndex ) {
                         $(row).children('td').eq(4).attr('style', 'max-width: 200px;overflow:hidden;white-space:nowrap;text-align: left; ');
 						$(row).children('td').eq(4).attr('title', $(row).children('td').eq(4).text());
+						$(row).children('td').eq(5).attr('style', 'min-width:60px;white-space:nowrap;');
+						$(row).children('td').eq(6).attr('style', 'min-width:60px;white-space:nowrap;');
+						$(row).children('td').eq(7).attr('style', 'min-width:60px;white-space:nowrap;');
+						$(row).children('td').eq(8).attr('style', 'min-width:60px;white-space:nowrap;');
+						
                     },
 					scrollY:        380,
                     scrollX:        true,
