@@ -53,7 +53,7 @@
 		"Robot Vacuum Cleaner": ["Do not work","circle around","can not charge","can not clean","VACUUM GETS STUCK","Others"],
 		"kettle": ["do not work","Leaking water","Get Rusty","Temperature difference","loud noise","Others"]
 	},
-	"Learning":,	"Notice":,"Others":
+	"Learning":{},	"Notice":{},"Others":{}
 					
 		
 }
