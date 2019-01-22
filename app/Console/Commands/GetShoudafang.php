@@ -133,24 +133,21 @@ class GetShoudafang extends Command
         }
 		
 		
-		$datas= DB::connection('order')->table('finances_coupon_event')->where('ImportToSap',0)->where('user_id',0)->where('PostedDate','>=','2018-12-01')->where('SellerCouponDescription','like','%-%')->get();
+		$datas= DB::connection('order')->table('finances_coupon_event')->where('ImportToSap',0)->where('user_id',0)->where('PostedDate','>=','2018-12-01')->get();
 		foreach($datas as $data_s){
-			$s_data_s = explode('-',$data_s->SellerCouponDescription);
-			if(count($s_data_s)!=3) continue;
-			if(!intval($s_data_s[1])) continue;
-			if(!array_get($users_array,intval($s_data_s[1]))) continue;
-			if(!array_get(matchSapSiteCode(),trim($s_data_s[2]))) continue;
-			$data_s->user_id = array_get($users_array,intval($s_data_s[1]));
-			$data_s->site_code = array_get(matchSapSiteCode(),trim($s_data_s[2]));
+			$s_data_s = substr($data_s->SellerCouponDescription, -3);
+			if(!array_get(matchSapSiteCode(),ltrim($s_data_s))) continue;
+			$data_s->site_code = array_get(matchSapSiteCode(),ltrim($s_data_s));
 			$kunnr = array_get($kunnr_array,trim($data_s->SellerId.$data_s->site_code));
 			if(!$kunnr) continue;
-			$sku = Couponkunnr::where('kunnr',$kunnr)->where('coupon_description',$data_s->SellerCouponDescription)->value('sku');
-			if(!$sku) continue;
+			$exists = Couponkunnr::where('kunnr',$kunnr)->where('coupon_description',$data_s->SellerCouponDescription)->first();
+			if(!$exists) continue;
+			if(!array_get($users_array,intval($exists->sap_seller_id))) continue;
 			DB::connection('order')->table('finances_coupon_event')->where('id',$data_s->Id)->update(
 			[
-				'user_id'=>array_get($users_array,intval($s_data_s[1])),
-				'site_code'=>array_get(matchSapSiteCode(),trim($s_data_s[2])),
-				'sku'=>$sku
+				'user_id'=>array_get($users_array,intval($exists->sap_seller_id)),
+				'site_code'=>array_get(matchSapSiteCode(),ltrim($s_data_s)),
+				'sku'=>$exists->sku
 			]
 			);
 		}
