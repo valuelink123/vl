@@ -81,8 +81,8 @@ th,td,td>span {
                             <thead>
                             <tr role="row" >
 								<td colspan="5" style="background:#c6e7ff">Sku Base Info</td>
-								<td colspan="4" style="background:#e2efda">Last 28 days sales</td>
-								<td colspan="22" style="background:#b4c6e7">Expected sales in the next 22 weeks</td>
+								<td colspan="4" style="background:#e2efda">Last 4 weeks sales</td>
+								<td colspan="22" style="background:#b4c6e7;text-align:left">Expected sales in the next 22 weeks</td>
 							</tr>
 							 <tr role="row" class="heading">
 							 	<th style="background-color:#c6e7ff"> Group </th>
@@ -97,7 +97,6 @@ th,td,td>span {
 								<?php foreach($addcolspans as $k=>$v){ ?>
 									<th style="background:#b4c6e7"> {{$k}} </th>
 								<?php } ?>
-                                
                             </tr>
                             
                             </thead>

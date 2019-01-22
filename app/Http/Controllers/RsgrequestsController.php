@@ -51,6 +51,7 @@ class RsgrequestsController extends Controller
 		$orderby = 'updated_at';
         $sort = $request->input('order.0.dir','desc');
         if ($request->input("customActionType") == "group_action") {
+			   if(!Auth::user()->admin) die('Permission denied');
 			   $updateDate = [];
 			   $updateDate['step'] = $request->input("customstatus");
 			   RsgRequest::whereIn('id',$request->input("id"))->update($updateDate);
@@ -111,7 +112,7 @@ class RsgrequestsController extends Controller
 				$list['customer_paypal_email'],
                 $list['transfer_amount'].' '.$list['transfer_currency'],
 				$list['amazon_order_id'],
-				$list['review_url'],
+				$list['review_url'].'<BR><span class="text-danger">'.$list['transaction_id'].'</span>',
 				$list['updated_at'],
 				'<a data-target="#ajax" data-toggle="modal" href="'.url('rsgrequests/'.$list['id'].'/edit').'" class="badge badge-success"> View </a>'
 				
@@ -156,7 +157,7 @@ class RsgrequestsController extends Controller
 
     public function update(Request $request,$id)
     {
-
+		if(!Auth::user()->admin) die('Permission denied');
         $this->validate($request, [
 			'step' => 'required|int',
         ]);
@@ -198,7 +199,7 @@ class RsgrequestsController extends Controller
 						'merge_fields' => $mailchimpData]);
             $request->session()->flash('success_message','Set Rsg Request Success');
             return redirect('rsgrequests');
-        } else {
+        }else{
             $request->session()->flash('error_message','Set Rsg Request Failed');
             return redirect()->back()->withInput();
         }

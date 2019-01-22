@@ -249,7 +249,7 @@ th,td,td>span {
                 {data: 'email', name: 'email'},
                 {data: 'name', name: 'name'},
                 {data: 'itemCodes', name: 'itemCodes'},
-                {data: 'itemNames', name: 'itemNames', width: "520px"},
+                {data: 'itemNames', name: 'itemNames', width: "200px"},
                 {
                     data: 'asins',
                     name: 'asins',
@@ -291,7 +291,7 @@ th,td,td>span {
                     }
                 },
                 {
-                    width: "190px",
+                    width: "100px",
                     data: 'status',
                     name: 'status'
                 },
