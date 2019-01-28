@@ -24,7 +24,7 @@ class CtgController extends Controller {
     use \App\Traits\DataTables;
 
     // 不需要登录验证的
-    protected static $authExcept = ['import'];
+    protected static $authExcept = ['import','b1g1import','cashbackimport'];
 
     /**
      * @throws \App\Traits\MysqliException
@@ -273,9 +273,7 @@ class CtgController extends Controller {
     }
 	
 	public function cashbackimport(Request $req) {
-
         $binStr = $req->getContent();
-
         $json = openssl_decrypt($binStr, 'AES-256-CFB', 'frank-is-ok', OPENSSL_RAW_DATA, 'mnoefpaghijbcdkl');
 
         Cashback::add(json_decode($json, true));
