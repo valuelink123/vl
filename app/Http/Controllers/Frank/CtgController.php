@@ -12,6 +12,8 @@ use App\Accounts;
 use App\Classes\SapRfcRequest;
 use App\Exceptions\DataInputException;
 use App\Models\Ctg;
+use App\Models\B1g1;
+use App\Models\Cashback;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -255,6 +257,28 @@ class CtgController extends Controller {
         $json = openssl_decrypt($binStr, 'AES-256-CFB', 'frank-is-ok', OPENSSL_RAW_DATA, 'mnoefpaghijbcdkl');
 
         Ctg::add(json_decode($json, true));
+
+        return [true];
+    }
+	
+	public function b1g1import(Request $req) {
+
+        $binStr = $req->getContent();
+
+        $json = openssl_decrypt($binStr, 'AES-256-CFB', 'frank-is-ok', OPENSSL_RAW_DATA, 'mnoefpaghijbcdkl');
+
+        B1g1::add(json_decode($json, true));
+
+        return [true];
+    }
+	
+	public function cashbackimport(Request $req) {
+
+        $binStr = $req->getContent();
+
+        $json = openssl_decrypt($binStr, 'AES-256-CFB', 'frank-is-ok', OPENSSL_RAW_DATA, 'mnoefpaghijbcdkl');
+
+        Cashback::add(json_decode($json, true));
 
         return [true];
     }
