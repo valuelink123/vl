@@ -1,6 +1,6 @@
 @extends('layouts.layout')
 @section('crumb')
-    @include('layouts.crumb', ['crumbs'=>['CTG']])
+    @include('layouts.crumb', ['crumbs'=>['Buy one get one']])
 @endsection
 @section('content')
 
@@ -23,7 +23,7 @@ th,td,td>span {
 
     @include('frank.common')
 
-    <h1 class="page-title font-red-intense"><a href="{{url('ctg/list')}}"><button class="btn blue" style="width:9em;" type="button">CTG</button></a><a href="{{url('cb/list')}}"><button class="btn default" style="width:9em;" type="button">CashBack</button></a><a href="{{url('bg/list')}}"><button class="btn default" style="width:9em;" type="button">BuyOneGetOne</button></a>
+    <h1 class="page-title font-red-intense"><a href="{{url('ctg/list')}}"><button class="btn default" style="width:9em;" type="button">CTG</button></a><a href="{{url('cb/list')}}"><button class="btn default" style="width:9em;" type="button">CashBack</button></a><a href="{{url('bg/list')}}"><button class="btn blue" style="width:9em;" type="button">BuyOneGetOne</button></a>
     </h1>
 
     <div class="portlet light bordered">
@@ -303,7 +303,7 @@ th,td,td>span {
                     name: 'order_id',
                     orderable: false,
                     render(data, type, row) {
-                        return `<a class="btn btn-danger btn-xs" href="/ctg/list/process?order_id=${data}&created_at=${encodeURIComponent(row.created_at)}" target="_blank">Process</a>`
+                        return `<a class="btn btn-danger btn-xs" href="/bg/list/process?order_id=${data}&created_at=${encodeURIComponent(row.created_at)}" target="_blank">Process</a>`
                     }
                 }
             ],
@@ -332,7 +332,7 @@ th,td,td>span {
                 return
             }
 
-            postByJson('/ctg/batchassigntask', {processor, ctgRows}).then(arr => {
+            postByJson('/bg/batchassigntask', {processor, ctgRows}).then(arr => {
                 for (let rowIndex of selectedRows[0]) {
                     // console.log(dtApi.cell(rowIndex, 9).data())
                     dtApi.cell(rowIndex, 9).data(arr[1]).draw()
