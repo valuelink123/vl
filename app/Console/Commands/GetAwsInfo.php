@@ -65,7 +65,8 @@ class GetAwsInfo extends Command
                 if(isset($date) && !empty($date))
                 {
                     //获取数据开始日期
-                    $date_from = $date[0]->date;
+                    //$date_from = $date[0]->date;
+                    $date_from = date('Y-m-d',strtotime('-32 days'));
                     //$date_to = date('Y-m-d',strtotime($date_from) + 3600*24);
                     $date_to = date('Y-m-d',strtotime('-1day'));
                 }else{
@@ -103,12 +104,12 @@ class GetAwsInfo extends Command
                                     "sales"=>$report->sales,
                                     "profit"=>$report->sales - $report->cost,
                                     "orders"=>$report->orders,
-                                    "acos"=>$report->sales != 0 ? $report->cost/$report->sales :0,
+                                    "acos"=>$report->sales != 0 ? number_format($report->cost/$report->sales,4) :0,
                                     "impressions"=>$report->impressions,
                                     "clicks"=>$report->clicks,
-                                    "ctr"=>$report->impressions != 0 ? $report->clicks/$report->impressions :0,
+                                    "ctr"=>$report->impressions != 0 ? number_format($report->clicks/$report->impressions,4) :0,
                                     "cpc"=>$report->clicks != 0 ? $report->cost/$report->clicks :0,
-                                    "ad_conversion_rate"=>$report->clicks != 0 ? $report->orders/$report->clicks :0,
+                                    "ad_conversion_rate"=>$report->clicks != 0 ? number_format($report->orders/$report->clicks,4) :0,
                                     "default_bid"=>$report->default_bid,
                                     "date"=>$report->date,
                                     "state"=>$report->state,
