@@ -208,7 +208,7 @@ class RsgrequestsController extends Controller
 	
 	public function mailchimp($customer_email,$tag,$args){
 		$MailChimp = new MailChimp('e6a877cf5994df3331a5ea180abfc85d-us8');
-		$MailChimp->verify_ssl=false;
+		//$MailChimp->verify_ssl=false;
 		$list_id = '6aaf7d9691';
 		$subscriber_hash = $MailChimp->subscriberHash($customer_email);	
 		$MailChimp->put("lists/$list_id/members/$subscriber_hash", $args);
