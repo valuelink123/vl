@@ -157,7 +157,7 @@ class RsgrequestsController extends Controller
 
     public function update(Request $request,$id)
     {
-		if(!Auth::user()->admin) die('Permission denied');
+		//if(!Auth::user()->admin) die('Permission denied');
         $this->validate($request, [
 			'step' => 'required|int',
         ]);

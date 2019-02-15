@@ -35,9 +35,9 @@ class FeesController extends Controller
 		$date_from=date('Y-m-d',strtotime('-90 days'));		
 		$date_to=date('Y-m-d');	
 	
-		$teams= DB::select('select bg,bu from asin group by bg,bu ORDER BY BG ASC,BU ASC');
+		//$teams= DB::select('select bg,bu from asin group by bg,bu ORDER BY BG ASC,BU ASC');
 
-        return view('fees/index',['date_from'=>$date_from ,'date_to'=>$date_to,'teams'=>$teams,'accounts'=>$this->getSellerId(),'users'=>$this->getUsers()]);
+        return view('fees/index',['date_from'=>$date_from ,'date_to'=>$date_to,'accounts'=>$this->getSellerId(),'users'=>$this->getUsers()]);
 		
 
     }
@@ -53,7 +53,7 @@ class FeesController extends Controller
 	}
 	
 	public function getUsers(){
-        $users = User::get()->toArray();
+        $users = User::where('sap_seller_id','>',0)->get()->toArray();
         $users_array = array();
         foreach($users as $user){
             $users_array[$user['id']] = $user['name'];
@@ -74,19 +74,19 @@ class FeesController extends Controller
         $sort = $request->input('order.0.dir','desc');
 		$users= $this->getUsers();
 		$error_message='';
-        if ($request->input("customsku") && $request->input("customActionType") == "group_action") {
-			   $sap_seller_id =  Auth::user()->sap_seller_id;
+        if ($request->input("customsku") && $request->input("customuserid") && $request->input("customActionType") == "group_action") {
+			   //$sap_seller_id =  Auth::user()->sap_seller_id;
 			   $customskus = explode('/',trim($request->input("customsku")));
 			   $exists_skus = Asin::whereIn('item_no',$customskus)->groupBy('item_no')->get(['item_no'])->count();
 
-			   if( $sap_seller_id && $exists_skus == count($customskus)){
+			   if($exists_skus == count($customskus)){
 			   	   $updateDate = [];
 				   
-				   $updateDate['user_id'] = Auth::user()->id;
+				   $updateDate['user_id'] = $request->input("customuserid");
 				   $updateDate['sku'] = $request->input("customsku");
 				   DB::connection('order')->table('finances_product_ads_payment_event')->whereIn('id',$request->input("id"))->where('ImportToSap',0)->update($updateDate);
 			   }else{
-			   	   $error_message = 'Your account is not bound to the SAP Seller ID, or the entered SKU is invalid.';
+			   	   $error_message = 'Your entered SKU is invalid.';
 			   } 
         }
 		$date_from=$request->input('date_from')?$request->input('date_from'):date('Y-m-d',strtotime('- 90 days'));
@@ -156,19 +156,19 @@ class FeesController extends Controller
         $sort = $request->input('order.0.dir','desc');
 		$users= $this->getUsers();
 		$error_message='';
-        if ($request->input("customsku") && $request->input("customActionType") == "group_action") {
-			$sap_seller_id = Auth::user()->sap_seller_id;
+        if ($request->input("customsku") && $request->input("customuserid") &&  $request->input("customActionType") == "group_action") {
+			//$sap_seller_id = Auth::user()->sap_seller_id;
 			$customskus = explode('/',trim($request->input("customsku")));
 			   $exists_skus = Asin::whereIn('item_no',$customskus)->groupBy('item_no')->get(['item_no'])->count();
 
-			   if( $sap_seller_id && $exists_skus == count($customskus)){
+			   if( $exists_skus == count($customskus)){
 			   $updateDate = [];
               
-			   $updateDate['user_id'] = Auth::user()->id;
+			   $updateDate['user_id'] = $request->input("customuserid");
 			   $updateDate['sku'] = trim($request->input("customsku"));
 			    DB::connection('order')->table('finances_deal_event')->whereIn('id',$request->input("id"))->where('ImportToSap',0)->update($updateDate);
 			}else{
-			   $error_message = 'Your account is not bound to the SAP Seller ID, or the entered SKU is invalid.';
+			   $error_message = 'Your entered SKU is invalid.';
 			} 
         }
 		$date_from=$request->input('date_from')?$request->input('date_from'):date('Y-m-d',strtotime('- 90 days'));
@@ -236,19 +236,19 @@ class FeesController extends Controller
         $sort = $request->input('order.0.dir','desc');
 		$users= $this->getUsers();
 		$error_message='';
-        if ($request->input("customsku") && $request->input("customActionType") == "group_action") {
-			   $sap_seller_id = Auth::user()->sap_seller_id;
-			$customskus = explode('/',trim($request->input("customsku")));
+        if ($request->input("customsku") && $request->input("customuserid") && $request->input("customActionType") == "group_action") {
+			   //$sap_seller_id = Auth::user()->sap_seller_id;
+			   $customskus = explode('/',trim($request->input("customsku")));
 			   $exists_skus = Asin::whereIn('item_no',$customskus)->groupBy('item_no')->get(['item_no'])->count();
 
-			   if( $sap_seller_id && $exists_skus == count($customskus)){
+			   if($exists_skus == count($customskus)){
 				$updateDate = [];
               
-			   $updateDate['user_id'] = Auth::user()->id;
+			   $updateDate['user_id'] = $request->input("customuserid");
 			   $updateDate['sku'] = $request->input("customsku");
 			    DB::connection('order')->table('finances_coupon_event')->whereIn('id',$request->input("id"))->where('ImportToSap',0)->update($updateDate);
 				}else{
-			   	  $error_message = 'Your account is not bound to the SAP Seller ID, or the entered SKU is invalid.';
+			   	  $error_message = 'Your entered SKU is invalid.';
 			   } 
         }
 		$date_from=$request->input('date_from')?$request->input('date_from'):date('Y-m-d',strtotime('- 90 days'));
@@ -317,19 +317,19 @@ class FeesController extends Controller
         $sort = $request->input('order.0.dir','desc');
 		$users= $this->getUsers();
 		$error_message='';
-        if ($request->input("customsku") && $request->input("customActionType") == "group_action") {
-			$sap_seller_id = Auth::user()->sap_seller_id;
+        if ($request->input("customsku") && $request->input("customuserid") && $request->input("customActionType") == "group_action") {
+			//$sap_seller_id = Auth::user()->sap_seller_id;
 			$customskus = explode('/',trim($request->input("customsku")));
 			   $exists_skus = Asin::whereIn('item_no',$customskus)->groupBy('item_no')->get(['item_no'])->count();
 
-			   if( $sap_seller_id && $exists_skus == count($customskus)){
+			   if( $exists_skus == count($customskus)){
 				$updateDate = [];
                
-			   $updateDate['user_id'] = Auth::user()->id;
+			   $updateDate['user_id'] = $request->input("customuserid");
 			   $updateDate['sku'] = $request->input("customsku");
 			    DB::connection('order')->table('finances_servicefee_event')->whereIn('id',$request->input("id"))->where('ImportToSap',0)->update($updateDate);
 			}else{
-			   	   $error_message = 'Your account is not bound to the SAP Seller ID, or the entered SKU is invalid.';
+			   	   $error_message = 'Your entered SKU is invalid.';
 			} 
         }
 		$date_from=$request->input('date_from')?$request->input('date_from'):date('Y-m-d',strtotime('- 90 days'));
@@ -391,19 +391,19 @@ class FeesController extends Controller
     {	
 		$users= $this->getUsers();
 		$error_message='';
-        if ($request->input("customsku") && $request->input("customActionType") == "group_action") {
-			$sap_seller_id = Auth::user()->sap_seller_id;
+        if ($request->input("customsku") && $request->input("customuserid") && $request->input("customActionType") == "group_action") {
+			//$sap_seller_id = Auth::user()->sap_seller_id;
 			$customskus = explode('/',trim($request->input("customsku")));
 			   $exists_skus = Asin::whereIn('item_no',$customskus)->groupBy('item_no')->get(['item_no'])->count();
 
-			   if( $sap_seller_id && $exists_skus == count($customskus)){
+			   if( $exists_skus == count($customskus)){
 				$updateDate = [];
                
-			   $updateDate['user_id'] = Auth::user()->id;
+			   $updateDate['user_id'] = $request->input("customuserid");
 			   $updateDate['sku'] = $request->input("customsku");
 			    DB::table('aws_report')->whereIn('id',$request->input("id"))->where('ImportToSap',0)->update($updateDate);
 			}else{
-			   	   $error_message = 'Your account is not bound to the SAP Seller ID, or the entered SKU is invalid.';
+			   	   $error_message = 'Your entered SKU is invalid.';
 			   } 
         }
 		$date_from=$request->input('date_from')?$request->input('date_from'):date('Y-m-d',strtotime('- 90 days'));

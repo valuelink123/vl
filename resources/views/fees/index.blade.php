@@ -31,7 +31,12 @@
 						<div class="table-container">
 							<div class="table-actions-wrapper">
 								<input type="text" placeholder="SAPSKU" id="sku" class="table-group-action-input form-control input-inline input-small input-sm" />
-						
+								<select  id="sapuid" class="table-group-action-input form-control input-inline input-small input-sm">
+										<option value="">Select Seller</option>
+										@foreach ($users as $user_id=>$user_name)
+												<option value="{{$user_id}}">{{$user_name}}</option>
+											@endforeach
+									</select>
 																	
 								<button class="btn btn-sm green table-group-action-submit">
 									<i class="fa fa-check"></i> Change</button>
@@ -181,13 +186,15 @@
 									grid.getTableWrapper().on('click', '.table-group-action-submit', function (e) {
 										e.preventDefault();
 										var sku = $("#sku", grid.getTableWrapper());
-										if ((sku.val() != "") && grid.getSelectedRowsCount() > 0) {
+										var uid = $("#sapuid", grid.getTableWrapper());
+										if ((sku.val() != "") && (uid.val() != "") && grid.getSelectedRowsCount() > 0) {
 											grid.setAjaxParam("customActionType", "group_action");
+											grid.setAjaxParam("customuserid", uid.val());
 											grid.setAjaxParam("customsku", sku.val());
 											grid.setAjaxParam("id", grid.getSelectedRows());
 											grid.getDataTable().draw(false);
 											//grid.clearAjaxParams();
-										} else if (sku.val() == "") {
+										} else if (sku.val() == "" || uid.val() == "") {
 											App.alert({
 												type: 'danger',
 												icon: 'warning',
@@ -242,7 +249,12 @@
 						<div class="table-container">
 							<div class="table-actions-wrapper">
 								<input type="text" placeholder="SAPSKU" id="sku" class="table-group-action-input form-control input-inline input-small input-sm" />
-																	
+								<select  id="sapuid" class="table-group-action-input form-control input-inline input-small input-sm">
+										<option value="">Select Seller</option>
+										@foreach ($users as $user_id=>$user_name)
+												<option value="{{$user_id}}">{{$user_name}}</option>
+											@endforeach
+									</select>											
 								<button class="btn btn-sm green table-group-action-submit">
 									<i class="fa fa-check"></i> Change</button>
 							</div>
@@ -392,14 +404,15 @@
 										e.preventDefault();
 									
 										var sku = $("#sku", grid.getTableWrapper());
-										if ((sku.val() != "") && grid.getSelectedRowsCount() > 0) {
+										var uid = $("#sapuid", grid.getTableWrapper());
+										if ((sku.val() != "") && (uid.val() != "") && grid.getSelectedRowsCount() > 0) {
 											grid.setAjaxParam("customActionType", "group_action");
-											
+											grid.setAjaxParam("customuserid", uid.val());
 											grid.setAjaxParam("customsku", sku.val());
 											grid.setAjaxParam("id", grid.getSelectedRows());
 											grid.getDataTable().draw(false);
 											//grid.clearAjaxParams();
-										} else if (sku.val() == "") {
+										} else if (sku.val() == "" || uid.val() == "") {
 											App.alert({
 												type: 'danger',
 												icon: 'warning',
@@ -468,7 +481,12 @@
 							<div class="table-actions-wrapper">
 								
 								<input type="text" placeholder="SAPSKU" id="sku" class="table-group-action-input form-control input-inline input-small input-sm" />
-								
+								<select  id="sapuid" class="table-group-action-input form-control input-inline input-small input-sm">
+										<option value="">Select Seller</option>
+										@foreach ($users as $user_id=>$user_name)
+												<option value="{{$user_id}}">{{$user_name}}</option>
+											@endforeach
+									</select>
 																	
 								<button class="btn btn-sm green table-group-action-submit">
 									<i class="fa fa-check"></i> Change</button>
@@ -620,14 +638,15 @@
 										e.preventDefault();
 										
 										var sku = $("#sku", grid.getTableWrapper());
-										if ((sku.val() != "") && grid.getSelectedRowsCount() > 0) {
+										var uid = $("#sapuid", grid.getTableWrapper());
+										if ((sku.val() != "") && (uid.val() != "") && grid.getSelectedRowsCount() > 0) {
 											grid.setAjaxParam("customActionType", "group_action");
-										
+											grid.setAjaxParam("customuserid", uid.val());
 											grid.setAjaxParam("customsku", sku.val());
 											grid.setAjaxParam("id", grid.getSelectedRows());
 											grid.getDataTable().draw(false);
 											//grid.clearAjaxParams();
-										} else if (sku.val() == "") {
+										} else if (sku.val() == "" || uid.val() == "") {
 											App.alert({
 												type: 'danger',
 												icon: 'warning',
@@ -684,7 +703,12 @@
 							<div class="table-actions-wrapper">
 								
 								<input type="text" placeholder="SAPSKU" id="sku" class="table-group-action-input form-control input-inline input-small input-sm" />
-								
+								<select  id="sapuid" class="table-group-action-input form-control input-inline input-small input-sm">
+										<option value="">Select Seller</option>
+										@foreach ($users as $user_id=>$user_name)
+												<option value="{{$user_id}}">{{$user_name}}</option>
+											@endforeach
+									</select>
 																	
 								<button class="btn btn-sm green table-group-action-submit">
 									<i class="fa fa-check"></i> Change</button>
@@ -836,14 +860,15 @@
 										e.preventDefault();
 									
 										var sku = $("#sku", grid.getTableWrapper());
-										if ((sku.val() != "") && grid.getSelectedRowsCount() > 0) {
+										var uid = $("#sapuid", grid.getTableWrapper());
+										if ((sku.val() != "") && (uid.val() != "") && grid.getSelectedRowsCount() > 0) {
 											grid.setAjaxParam("customActionType", "group_action");
-									
+											grid.setAjaxParam("customuserid", uid.val());
 											grid.setAjaxParam("customsku", sku.val());
 											grid.setAjaxParam("id", grid.getSelectedRows());
 											grid.getDataTable().draw(false);
 											//grid.clearAjaxParams();
-										} else if (sku.val() == "") {
+										} else if (sku.val() == "" || uid.val() == "") {
 											App.alert({
 												type: 'danger',
 												icon: 'warning',
@@ -901,7 +926,12 @@
 							<div class="table-actions-wrapper">
 								
 								<input type="text" placeholder="SAPSKU" id="sku" class="table-group-action-input form-control input-inline input-small input-sm" />
-								
+								<select  id="sapuid" class="table-group-action-input form-control input-inline input-small input-sm">
+										<option value="">Select Seller</option>
+										@foreach ($users as $user_id=>$user_name)
+												<option value="{{$user_id}}">{{$user_name}}</option>
+											@endforeach
+									</select>
 																	
 								<button class="btn btn-sm green table-group-action-submit">
 									<i class="fa fa-check"></i> Change</button>
@@ -1074,14 +1104,15 @@
 										e.preventDefault();
 										
 										var sku = $("#sku", grid.getTableWrapper());
-										if ((sku.val() != "") && grid.getSelectedRowsCount() > 0) {
+										var uid = $("#sapuid", grid.getTableWrapper());
+										if ((sku.val() != "") && (uid.val() != "") && grid.getSelectedRowsCount() > 0) {
 											grid.setAjaxParam("customActionType", "group_action");
-											
+											grid.setAjaxParam("customuserid", uid.val());
 											grid.setAjaxParam("customsku", sku.val());
 											grid.setAjaxParam("id", grid.getSelectedRows());
 											grid.getDataTable().draw(false);
 											//grid.clearAjaxParams();
-										} else if (sku.val() == "") {
+										} else if (sku.val() == "" || uid.val() == "") {
 											App.alert({
 												type: 'danger',
 												icon: 'warning',
