@@ -27,6 +27,17 @@ th,td,td>span {
                     <form role="form" action="{{url('salesp')}}" method="GET">
                         {{ csrf_field() }}
                         <div class="row">
+						<div class="col-md-2 ">
+						<div class="input-group date date-picker margin-bottom-5" data-date-format="yyyy-mm-dd">
+                                        <input type="text" class="form-control form-filter input-sm" readonly name="date" placeholder="Date" value="{{date('Y-m-d')}}">
+                                        <span class="input-group-btn">
+                                                                    <button class="btn btn-sm default" type="button">
+                                                                        <i class="fa fa-calendar"></i>
+                                                                    </button>
+                                                                </span>
+                                    </div>
+						</div>
+						
 						<div class="col-md-2">
                             <select name="bgbu" class="form-control form-filter input-sm">
 										<option value="">All BG && BU</option>
@@ -114,7 +125,13 @@ th,td,td>span {
 
 <script>
     var TableDatatablesAjax = function () {
-
+		var initPickers = function () {
+            //init date pickers
+            $('.date-picker').datepicker({
+                rtl: App.isRTL(),
+                autoclose: true
+            });
+        }
         var initTable = function () {
             $.ajaxSetup({
                 headers: { 'X-CSRF-TOKEN' : '{{ csrf_token() }}' }
@@ -186,6 +203,7 @@ th,td,td>span {
             });
             grid.setAjaxParam("sku", $("input[name='sku']").val());
             grid.setAjaxParam("bgbu", $("select[name='bgbu']").val());
+			grid.setAjaxParam("date", $("input[name='date']").val());
 			grid.setAjaxParam("sap_seller_id", $("select[name='sap_seller_id']").val());
 			grid.setAjaxParam("sap_site_id", $("select[name='sap_site_id']").val());
             grid.getDataTable().ajax.reload(null,false);
@@ -197,6 +215,7 @@ th,td,td>span {
 
             //main function to initiate the module
             init: function () {
+				initPickers();
                 initTable();
             }
 

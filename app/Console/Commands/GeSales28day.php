@@ -66,7 +66,7 @@ and asin.sellersku=sales_28_day.seller_sku and asin.sap_site_id=sales_28_day.sit
 and asin.sellersku=sales_28_day.seller_sku and asin.sap_site_id=sales_28_day.site_id),0),sales_14_08 = IFNULL((select sum(qty) from sales_28_day where date BETWEEN '".date('Y-m-d',strtotime('-14 days'))."' and '".date('Y-m-d',strtotime('-8 days'))."'
 and asin.sellersku=sales_28_day.seller_sku and asin.sap_site_id=sales_28_day.site_id),0),sales_07_01 = IFNULL((select sum(qty) from sales_28_day where date BETWEEN '".date('Y-m-d',strtotime('-7 days'))."' and '".date('Y-m-d',strtotime('-1 days'))."'
 and asin.sellersku=sales_28_day.seller_sku and asin.sap_site_id=sales_28_day.site_id),0)");
-		DB::table('sales_prediction')->truncate();
+		//DB::table('sales_prediction')->truncate();
 		$skus = DB::select("select item_no as sku,sap_site_id,min(item_group) as item_group,min(bg) as bg ,min(bu) as bu,min(sap_seller_id) as sap_seller_id,GROUP_CONCAT(sellersku) as seller_skus
 ,sum(sales_28_22) as sales_28_22
 ,sum(sales_21_15) as sales_21_15
@@ -117,7 +117,7 @@ from asin where(sales_28_22+sales_21_15+sales_14_08+sales_07_01)>0 group by item
 		
 		foreach($skus_data as $sku_data){
 			$skus_data[$i]['week_sales'] = serialize(array_get($sku_sales_p,strtoupper($sku_data['sku']).'_'.$sku_data['sap_site_id'],[]));
-			$skus_data[$i]['date'] = date('Y-m-d H:i:s');
+			$skus_data[$i]['date'] = date('Y-m-d');
 			$skus_data[$i]['sku_des'] = array_get($skus_name,strtoupper($sku_data['sku']),'');
 			$i++;
 		}

@@ -99,6 +99,11 @@ class SalespController extends Controller
             $datas = $datas->where('sap_site_id', $request->input('sap_site_id'));
         }
 		
+		if($request->input('date')){
+            $datas = $datas->where('date', $request->input('date'));
+        }else{
+			$datas = $datas->where('date', date('Y-m-d'));
+		}
 		$iTotalRecords = $datas->count();
         $iDisplayLength = intval($_REQUEST['length']);
         $iDisplayLength = $iDisplayLength < 0 ? $iTotalRecords : $iDisplayLength;
