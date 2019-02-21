@@ -237,14 +237,14 @@ class CtgController extends Controller {
             GROUP BY MarketPlaceId,AmazonOrderId,SellerId
           ) t4
           ON t4.AmazonOrderId = t1.order_id AND t4.MarketPlaceId = t3.MarketPlaceId AND t4.SellerId = t3.SellerId
-        ORDER BY created_at DESC
+        ORDER BY created_at DESC LIMIT 50
         ";
 
         $data = $this->queryRows($sql);
         foreach ($data as $key=>$val){
             if(!empty($val['steps'])){
                 $steps = json_decode($val['steps'],true);
-                if($steps['commented'] == 1){
+                if(!empty($steps['commented']) && $steps['commented'] == 1){
                     $commented = 'Yes';
                 }else{
                     $commented = 'No';
