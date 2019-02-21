@@ -106,15 +106,17 @@ th,td,td>span {
                     <div class="col-md-2">
                         <div class="btn-group " style="float:right;">
 
-                            {{--<button id="excel-export" class="btn sbold blue"> Export--}}
-                                {{--<i class="fa fa-download"></i>--}}
-                            {{--</button>--}}
+                            <button id="ctg-export" class="btn sbold blue"> Export
+                                <i class="fa fa-download"></i>
+                            </button>
 
                         </div>
                     </div>
                 </div>
             </div>
-            <div style="clear:both;height:50px;"></div>
+            <div style="clear:both;height:50px; text-align: right;">
+
+            </div>
             <div class="table-container" style="">
                 <table class="table table-striped table-bordered" id="thetable">
                     <thead>
@@ -348,7 +350,14 @@ th,td,td>span {
             })
         })
 
-        let dtApi = $theTable.api()
+        let dtApi = $theTable.api();
+
+//        $("#ctg-export").click(function(){
+//            location.href='/ctg/export?asin_status='+(($("select[name='asin_status[]']").val())?$("select[name='asin_status[]']").val():'')+'&keywords='+$("input[name='keywords']").val()+'&date_from='+$("input[name='date_from']").val()+'&date_to='+$("input[name='date_to']").val()+'&nextdate='+$("input[name='nextdate']").val()+'&follow_status='+(($("select[name='follow_status[]']").val())?$("select[name='follow_status[]']").val():'')+'&user_id='+(($("select[name='user_id[]']").val())?$("select[name='user_id[]']").val():'')+'&site='+(($("select[name='site[]']").val())?$("select[name='site[]']").val():'')+'&rating='+$("select[name='rating']").val()+'&bgbu='+$("select[name='bgbu']").val()+'&vp='+$('select[name="vp"]').val()+'&rc='+$('select[name="rc"]').val()+'&del='+$('select[name="del"]').val();
+//        });
+        $("#ctg-export").click(function(){
+            location.href='/ctg/export';
+        });
 
     </script>
 

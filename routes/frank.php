@@ -14,6 +14,8 @@ Route::post('/ctg/list', 'CtgController@list');
 Route::post('/ctg/batchassigntask', 'CtgController@batchAssignTask');
 Route::get('/ctg/list/process', 'CtgController@process');
 Route::post('/ctg/list/process', 'CtgController@process');
+Route::get('/ctg/export', 'CtgController@export');
+Route::post('/ctg/export', 'CtgController@export');
 
 Route::get('/cb/list', 'CtgController@cblist');
 Route::post('/cb/list', 'CtgController@cblist');

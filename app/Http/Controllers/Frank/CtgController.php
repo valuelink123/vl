@@ -17,6 +17,8 @@ use App\Models\Cashback;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class CtgController extends Controller {
 
@@ -31,7 +33,6 @@ class CtgController extends Controller {
      * @throws \App\Traits\DataTablesException
      */
     public function list(Request $req) {
-
         if ($req->isMethod('GET')) {
 
             $userRows = DB::table('users')->select('id', 'name')->get();
@@ -52,6 +53,7 @@ class CtgController extends Controller {
 
         // 分区条件
         $timeRange = $this->dtTimeRange($req);
+
 
         $where = $this->dtWhere(
             $req,
@@ -154,6 +156,149 @@ class CtgController extends Controller {
 
         return compact('data', 'recordsTotal', 'recordsFiltered');
 
+    }
+
+    public function export(){
+
+        set_time_limit(0);
+
+        $arrayData = array();
+        $headArray[] = 'Date';
+        $headArray[] = 'Email';
+        $headArray[] = 'Customer';
+        $headArray[] = 'Item No';
+        $headArray[] = 'Item Name';
+        $headArray[] = 'Asin';
+        $headArray[] = 'Seller SKU';
+        $headArray[] = 'Brand';
+        $headArray[] = 'Item Group';
+        $headArray[] = 'Phone';
+        $headArray[] = 'Expect Rating';
+        $headArray[] = 'Reviewed';
+        $headArray[] = 'Tracking Note';
+        $headArray[] = 'Status';
+        $headArray[] = 'BG';
+        $headArray[] = 'BU';
+        $headArray[] = 'Processor';
+
+        $arrayData[] = $headArray;
+
+        $sql = "
+        SELECT SQL_CALC_FOUND_ROWS
+            t1.created_at,
+            t1.name,
+            t1.email,
+            t1.phone,
+            t1.rating,
+            t1.commented,
+            t1.steps,
+            t1.status,
+            t1.order_id,
+            t2.name AS processor,
+            t3.SalesChannel,
+            t4.asins,
+            t4.itemCodes,
+            t4.itemNames,
+            t4.sellerskus,
+            t4.itemGroups,
+            t4.bgs,
+            t4.bus,
+            t4.brands
+        FROM ctg t1
+        LEFT JOIN users t2
+          ON t2.id = t1.processor
+        LEFT JOIN (
+          SELECT
+            SalesChannel,
+            MarketPlaceId,
+            SellerId,
+            AmazonOrderId
+          FROM ctg_order
+          ) t3
+          ON t3.AmazonOrderId = t1.order_id
+        LEFT JOIN (
+            SELECT
+              ANY_VALUE(SellerId) AS SellerId,
+              ANY_VALUE(MarketPlaceId) AS MarketPlaceId,
+              ANY_VALUE(AmazonOrderId) AS AmazonOrderId,
+              GROUP_CONCAT(DISTINCT t4_1.ASIN) AS asins,
+              GROUP_CONCAT(DISTINCT t4_1.SellerSKU) AS sellerskus,
+              GROUP_CONCAT(DISTINCT fbm_stock.item_name) AS itemNames,
+              GROUP_CONCAT(DISTINCT asin.item_no) AS itemCodes,
+              GROUP_CONCAT(DISTINCT asin.item_group) AS itemGroups,
+              GROUP_CONCAT(DISTINCT asin.bg) AS bgs,
+              GROUP_CONCAT(DISTINCT asin.bu) AS bus,
+              GROUP_CONCAT(DISTINCT asin.brand) AS brands
+            FROM ctg_order_item t4_1
+            LEFT JOIN asin
+              ON asin.site = t4_1.MarketPlaceSite AND asin.asin = t4_1.ASIN AND asin.sellersku = t4_1.SellerSKU
+            LEFT JOIN fbm_stock
+              ON fbm_stock.item_code = asin.item_no
+            GROUP BY MarketPlaceId,AmazonOrderId,SellerId
+          ) t4
+          ON t4.AmazonOrderId = t1.order_id AND t4.MarketPlaceId = t3.MarketPlaceId AND t4.SellerId = t3.SellerId
+        ORDER BY created_at DESC
+        ";
+
+        $data = $this->queryRows($sql);
+        foreach ($data as $key=>$val){
+            if(!empty($val['steps'])){
+                $steps = json_decode($val['steps'],true);
+                if($steps['commented'] == 1){
+                    $commented = 'Yes';
+                }else{
+                    $commented = 'No';
+                }
+                if(!empty($steps['track_notes'])){
+                    foreach($steps['track_notes'] as $k=>$v){
+                        $track_notes = $v;
+                    }
+                }else{
+                    $track_notes = '';
+                }
+
+            }else{
+                $commented = 'No';
+                $track_notes = '';
+            }
+            $arrayData[] = array(
+                $val['created_at'],
+                $val['email'],
+                $val['name'],
+                $val['itemCodes'],
+                $val['itemNames'],
+                $val['asins'],
+                $val['sellerskus'],
+                $val['brands'],
+                $val['itemGroups'],
+                $val['phone'],
+                $val['rating'],
+                $commented,
+                $track_notes,
+                $val['status'],
+                $val['bgs'],
+                $val['bus'],
+                $val['processor'],
+            );
+        }
+
+        if($arrayData){
+            $spreadsheet = new Spreadsheet();
+
+            $spreadsheet->getActiveSheet()
+                ->fromArray(
+                    $arrayData,  // The data to set
+                    NULL,        // Array values with this value will not be set
+                    'A1'         // Top left coordinate of the worksheet range where
+                //    we want to set these values (default is A1)
+                );
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');//������������07Excel�ļ�
+            header('Content-Disposition: attachment;filename="Export_CTG.xlsx"');//���������������������
+            header('Cache-Control: max-age=0');//��ֹ����
+            $writer = new Xlsx($spreadsheet);
+            $writer->save('php://output');
+        }
+        die();
     }
 
     public function batchAssignTask(Request $req) {
