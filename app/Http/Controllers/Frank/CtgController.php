@@ -237,7 +237,7 @@ class CtgController extends Controller {
             GROUP BY MarketPlaceId,AmazonOrderId,SellerId
           ) t4
           ON t4.AmazonOrderId = t1.order_id AND t4.MarketPlaceId = t3.MarketPlaceId AND t4.SellerId = t3.SellerId
-        ORDER BY created_at DESC LIMIT 50
+        ORDER BY created_at DESC
         ";
 
         $data = $this->queryRows($sql);
