@@ -55,8 +55,8 @@ tbl_star_system_product.domain,tbl_review_hunter_review.review,customer_id,is_de
 tbl_review_hunter_review.new_rating as updated_rating,tbl_review_hunter_review.content,substring_index(substring_index(tbl_review_hunter_review.reviewer_name,'a-profile-name\">',-1),'<',1) as reviewer_name
 from  tbl_review_hunter_review 
 left join tbl_star_system_product using(product_id)
-where tbl_review_hunter_review.change_last_updated>=:date_from
-or tbl_review_hunter_review.created_at>=:date_from1",['date_from' => $date_from,'date_from1' => $date_from]);
+where (tbl_review_hunter_review.change_last_updated>=:date_from
+or tbl_review_hunter_review.created_at>=:date_from1) and (rating<4 or new_rating<4)",['date_from' => $date_from,'date_from1' => $date_from]);
 		
 		foreach($reviewList as $review){
 			$exists = DB::table('review')->where('review', $review->review)->where('site', $review->domain)->first();
