@@ -207,7 +207,7 @@ class RsgrequestsController extends Controller
 	
 	
 	public function mailchimp($customer_email,$tag,$args){
-		$MailChimp = new MailChimp('e6a877cf5994df3331a5ea180abfc85d-us8');
+		$MailChimp = new MailChimp(env('MAILCHIMP_KEY', ''));
 		//$MailChimp->verify_ssl=false;
 		$list_id = '6aaf7d9691';
 		$subscriber_hash = $MailChimp->subscriberHash($customer_email);	
@@ -234,9 +234,9 @@ class RsgrequestsController extends Controller
 		$tranSearchReq = new TransactionSearchReq();
 		$tranSearchReq->TransactionSearchRequest = $transactionSearchRequest;
 		$config = array(
-			"acct1.UserName" => "wangxuesong_api1.valuelinkcorp.com",
-			"acct1.Password" => "SEGA6WHYNA59AHL6",
-			"acct1.Signature" => "A--8MSCLabuvN8L.-MHjxC9uypBtAM4rESWthVxFB22kZUlViNTRaI4p",
+			"acct1.UserName" => env('PAYPAL_USERNAME', ''),
+			"acct1.Password" => env('PAYPAL_PASSWORD', ''),
+			"acct1.Signature" => env('PAYPAL_SIGNATURE', ''),
 			"mode" => "live",
 			'log.LogEnabled' => false,
 			'log.FileName' => '../PayPal.log',
