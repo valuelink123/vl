@@ -81,10 +81,10 @@ class GetAwsInfo extends Command
                   sum(attributed_sales1d) as sales,sum(attributed_conversions1d_same_sku) as orders,sum(impressions) as impressions,sum(clicks) as  clicks,
                   ppc_ad_groups.default_bid,ppc_ad_groups.state 
                   from ppc_reports
-                  left join ppc_campaigns on ppc_campaigns.campaign_id=ppc_reports.record_type_id
                   LEFT JOIN ppc_profiles on ppc_profiles.profile_id = ppc_reports.profile_id
                   left join accounts on accounts.id=ppc_profiles.account_id
-                  left join ppc_ad_groups on ppc_ad_groups.campaign_id = ppc_campaigns.campaign_id
+                  left join ppc_ad_groups on ppc_ad_groups.ad_group_id = ppc_reports.record_type_id
+                  left join ppc_campaigns on ppc_campaigns.campaign_id=ppc_ad_groups.campaign_id
                   where ppc_reports.date>='$date_from' and ppc_reports.date<='$date_to' and accounts.seller_id='$seller_id' and  accounts.marketplace_id=$marketplaceid   group by ppc_campaigns.name,ppc_ad_groups.ad_group_id,ppc_reports.date order by ppc_reports.date"
                     );
                 if(isset($reports) && !empty($reports))
