@@ -94,7 +94,7 @@ class RsgrequestsController extends Controller
         $iDisplayLength = $iDisplayLength < 0 ? $iTotalRecords : $iDisplayLength;
         $iDisplayStart = intval($_REQUEST['start']);
         $sEcho = intval($_REQUEST['draw']);
-		$lists =  $datas->orderBy($orderby,$sort)->offset($iDisplayStart)->limit($iDisplayLength)->get(['rsg_requests.*','rsg_products.asin','rsg_products.site','rsg_products.seller_id'])->toArray();
+		$lists =  $datas->orderBy($orderby,$sort)->offset($iDisplayStart)->limit($iDisplayLength)->get(['rsg_requests.*','rsg_products.asin','rsg_products.site','rsg_products.seller_id','rsg_products.user_id'])->toArray();
         $records = array();
         $records["data"] = array();
 
@@ -106,6 +106,7 @@ class RsgrequestsController extends Controller
 		foreach ( $lists as $list){
             $records["data"][] = array(
                 '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input name="id[]" type="checkbox" class="checkboxes" value="'.$list['id'].'"/><span></span></label>',
+				$list['created_at'],
 				$list['customer_email'],
 				'<a href="https://'.array_get($list,'site').'/dp/'.array_get($list,'asin').'?m='.array_get($list,'seller_id').'" target="_blank">'.$list['asin'].'</a>',
 				'<span class="badge badge-success">'.array_get(getStepStatus(),$list['step']).'</span>',
@@ -113,6 +114,11 @@ class RsgrequestsController extends Controller
                 $list['transfer_amount'].' '.$list['transfer_currency'],
 				$list['amazon_order_id'],
 				$list['review_url'].'<BR><span class="text-danger">'.$list['transaction_id'].'</span>',
+				$list['star_rating'],
+				$list['follow'],
+				$list['next_follow_date'],
+				array_get($users,$list['user_id']),
+				$list['site'],
 				$list['updated_at'],
 				'<a data-target="#ajax" data-toggle="modal" href="'.url('rsgrequests/'.$list['id'].'/edit').'" class="badge badge-success"> View </a>'
 				
@@ -171,6 +177,10 @@ class RsgrequestsController extends Controller
 		$rule->transfer_currency = $request->get('transfer_currency');
 		$rule->review_url = $request->get('review_url');
         $rule->step = intval($request->get('step'));
+
+		$rule->star_rating = $request->get('star_rating');
+		$rule->follow = $request->get('follow');
+		$rule->next_follow_date = $request->get('next_follow_date');
 
         $rule->user_id = intval(Auth::user()->id);
         if ($rule->save()) {

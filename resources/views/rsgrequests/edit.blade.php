@@ -93,11 +93,29 @@
                            
                         </div>
 						
-						<div class="form-group col-md-12">
+						<div class="form-group col-md-6">
                             <label>Remark</label>
                                 <input type="text" class="form-control" name="transaction_id" id="transaction_id" value="{{array_get($rule,'transaction_id')}}">
                            
                         </div>
+
+						<div class="form-group col-md-6">
+							<label>Star rating</label>
+							<input type="text" class="form-control" name="star_rating" id="star_rating" value="{{array_get($rule,'star_rating')}}">
+
+						</div>
+
+						<div class="form-group col-md-6">
+							<label>Follow</label>
+							<input type="text" class="form-control" name="follow" id="follow" value="{{array_get($rule,'follow')}}">
+
+						</div>
+
+						<div class="form-group col-md-6">
+							<label>Next follow date</label>
+							<input type="text" class="form-control" name="next_follow_date" id="next_follow_date" value="{{array_get($rule,'next_follow_date')}}">
+
+						</div>
 						
 						@if (array_get($rule,'trans'))
 						<table class="table table-hover col-md-12">

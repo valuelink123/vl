@@ -53,18 +53,28 @@ th,td,td>span {
 											<span></span>
 										</label>
 									</th>
-									<th width="14%"> Customer Email </th>
-									<th width="10%"> Request Product </th>
-									<th width="10%"> Current Step </th>
-									<th width="14%"> Customer Paypal </th>
-									<th width="10%"> Funded </th>
-									<th width="10%"> Amazon OrderID </th>
-									<th width="10%"> Review Url</th>
-									<th width="10%"> Update Date </th>
+									<th width="6%"> Submit Date </th>
+									<th width="8%"> Customer Email </th>
+									<th width="6%"> Request Product </th>
+									<th width="8%"> Current Step </th>
+									<th width="5%"> Customer Paypal </th>
+									<th width="5%"> Funded </th>
+									<th width="6%"> Amazon OrderID </th>
+									<th width="6%"> Review Url</th>
+									<th width="6%"> Star rating</th>
+									<th width="6%"> Follow</th>
+									<th width="6%"> Next follow date</th>
+									<th width="6%"> User</th>
+									<th width="6%"> Site</th>
+									<th width="8%"> Update Date </th>
 									<th width="10%"> Action</th>
 								</tr>
 								<tr role="row" class="filter">
 									<td> </td>
+									<td>
+
+
+									</td>
 									<td>
 										
 										<input type="text" class="form-control form-filter input-sm" placeholder='customer email' name="customer_email">
@@ -104,6 +114,12 @@ th,td,td>span {
 										
 										<input type="text" class="form-control form-filter input-sm" placeholder='review url' name="review_url">
 									</td>
+
+									<td></td>
+									<td></td>
+									<td></td>
+									<td></td>
+									<td></td>
 									
 									
 									<td>

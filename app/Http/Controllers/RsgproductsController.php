@@ -239,7 +239,7 @@ class RsgproductsController extends Controller
 		$rule->positive_daily_limit = intval($request->get('positive_daily_limit'));
         $rule->status = 0;
 		$rule->daily_stock = intval($request->get('daily_stock'));
-        $rule->user_id = intval(Auth::user()->id);
+        //$rule->user_id = intval(Auth::user()->id);
         if ($rule->save()) {
             $request->session()->flash('success_message','Set Rsg Product Success');
             return redirect('rsgproducts');
