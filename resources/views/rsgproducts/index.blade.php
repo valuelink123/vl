@@ -200,7 +200,7 @@ th,td,td>span {
 											"dom": "<'row'<'col-md-6 col-sm-12'pli><'col-md-6 col-sm-12'<'table-group-actions pull-right'>>r>t<'row'<'col-md-6 col-sm-12'pli><'col-md-6 col-sm-12'>>",
 
 											"bStateSave": true, // save datatable state(pagination, sort, etc) in cookie.
-											"aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0 ,1,6,7,8 ] }],
+											"aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0 ,1,8,9,10 ] }],
 											"lengthMenu": [
 												[-1,10, 20, 50],
 												['All',10, 20, 50] // change per page values here
@@ -213,7 +213,7 @@ th,td,td>span {
 												$(row).children('td').eq(1).attr('style', 'text-align: left; ');
 											},
 											"order": [
-												[5, "desc"]
+												[7, "desc"]
 											],// set first column as a default sort by asc
 										}
 									});
