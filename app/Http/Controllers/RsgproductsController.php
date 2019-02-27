@@ -119,6 +119,8 @@ class RsgproductsController extends Controller
 				$list['start_date'].'</BR>To</BR>'.$list['end_date'],
 				$list['daily_stock'],
                 $list['daily_remain'],
+                $list['review_rating'],
+                $list['number_of_reviews'],
 				$list['created_at'],
 				array_get($users,$list['user_id']),
 				array_get($status_arr,$list['status']),
@@ -172,7 +174,7 @@ class RsgproductsController extends Controller
 			'price' => 'required|string',
 			'currency' => 'required|string',
         ]);
-		
+
         $rule = new RsgProduct;
         $rule->seller_id = $request->get('seller_id');
         $rule->asin = $request->get('asin');
@@ -193,6 +195,10 @@ class RsgproductsController extends Controller
 		$rule->daily_stock = intval($request->get('daily_stock'));
 		$rule->daily_remain = intval($request->get('daily_stock'));
         $rule->user_id = intval(Auth::user()->id);
+
+        $rule->review_rating = intval($request->get('review_rating'));
+        $rule->number_of_reviews = intval($request->get('number_of_reviews'));
+
         if ($rule->save()) {
             $request->session()->flash('success_message','Set Rsg Product Success');
             return redirect('rsgproducts');
@@ -214,7 +220,6 @@ class RsgproductsController extends Controller
 
     public function update(Request $request,$id)
     {
-
         $this->validate($request, [
 			'start_date' => 'required|string',
 			'end_date' => 'required|string',
@@ -240,6 +245,8 @@ class RsgproductsController extends Controller
         $rule->status = 0;
 		$rule->daily_stock = intval($request->get('daily_stock'));
         //$rule->user_id = intval(Auth::user()->id);
+        $rule->review_rating = intval($request->get('review_rating'));
+        $rule->number_of_reviews = intval($request->get('number_of_reviews'));
         if ($rule->save()) {
             $request->session()->flash('success_message','Set Rsg Product Success');
             return redirect('rsgproducts');

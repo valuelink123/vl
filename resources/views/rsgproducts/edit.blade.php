@@ -145,6 +145,22 @@
                                 <input type="text" class="form-control" name="positive_daily_limit" id="positive_daily_limit" value="{{intval(array_get($rule,'positive_daily_limit'))}}">
                            
                         </div>
+
+                        <div class="form-group col-md-6">
+                            <label>Review Rating</label>
+
+
+                            <input type="text" class="form-control" name="review_rating" id="review_rating" value="{{intval(array_get($rule,'review_rating'))}}">
+
+                        </div>
+
+                        <div class="form-group col-md-6">
+                            <label>Number of reviews</label>
+
+
+                            <input type="text" class="form-control" name="number_of_reviews" id="number_of_reviews" value="{{intval(array_get($rule,'number_of_reviews'))}}">
+
+                        </div>
 						
                     </div>
                     <div class="form-actions">

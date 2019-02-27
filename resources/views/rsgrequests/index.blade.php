@@ -120,7 +120,7 @@ th,td,td>span {
 									<td></td>
 									<td></td>
 									<td></td>
-									
+
 									
 									<td>
 										<div class="input-group date date-picker" data-date-format="yyyy-mm-dd">
@@ -195,7 +195,7 @@ th,td,td>span {
 											"dom": "<'row'<'col-md-6 col-sm-12'pli><'col-md-6 col-sm-12'<'table-group-actions pull-right'>>r>t<'row'<'col-md-6 col-sm-12'pli><'col-md-6 col-sm-12'>>",
 						
 											"bStateSave": true, // save datatable state(pagination, sort, etc) in cookie.
-											"aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0 ,1,2,3,4,6,7,9 ] }],
+											"aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0 ,2,3,4,5,7,8,9,10,11,12,13,15 ] }],
 											"lengthMenu": [
 												[-1,10, 20, 50],
 												['All',10, 20, 50] // change per page values here
@@ -205,7 +205,7 @@ th,td,td>span {
 												"url": "{{ url('rsgrequests/get')}}", // ajax source
 											},
 											"order": [
-												[8, "desc"]
+												[14, "desc"]
 											],// set first column as a default sort by asc
 										}
 									});

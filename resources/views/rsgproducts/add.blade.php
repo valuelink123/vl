@@ -141,6 +141,22 @@
                                 <input type="text" class="form-control" name="positive_daily_limit" id="positive_daily_limit" value="">
                            
                         </div>
+
+                        <div class="form-group col-md-6">
+                            <label>Review Rating</label>
+
+
+                            <input type="text" class="form-control" name="review_rating" id="review_rating" value="">
+
+                        </div>
+
+                        <div class="form-group col-md-6">
+                            <label>Number of reviews</label>
+
+
+                            <input type="text" class="form-control" name="number_of_reviews" id="number_of_reviews" value="">
+
+                        </div>
 						
                     </div>
                     <div class="form-actions">

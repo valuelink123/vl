@@ -48,8 +48,8 @@ th,td,td>span {
 									<option value="1">Enabled</option>
 									<option value="-1">Reject</option>
 								</select>
-								
-												
+
+
 								<button class="btn btn-sm green table-group-action-submit">
 									<i class="fa fa-check"></i> Update</button>
 							</div>
@@ -65,10 +65,12 @@ th,td,td>span {
 									<th width="30%"> Product </th>
 									<th width="10%"> ActiveDate </th>
 									<th width="10%"> Daily Gift </th>
-									<th width="10%"> Daily Remain </th>
-									<th width="10%"> Date </th>
-									<th width="10%"> User </th>
-									<th width="10%"> Status</th>
+									<th width="8%"> Daily Remain </th>
+									<th width="8%"> Review Rating </th>
+									<th width="8%"> Number of reviews </th>
+									<th width="8%"> Date </th>
+									<th width="8%"> User </th>
+									<th width="8%"> Status</th>
 								</tr>
 								<tr role="row" class="filter">
 									<td> </td>
@@ -76,8 +78,8 @@ th,td,td>span {
 										<div class="input-group">
 										<select name="seller_id" class="form-control form-filter input-sm">
 											<option value="">Select Account</option>
-										   <?php 
-											foreach($accounts as $k=>$v){ 	
+										   <?php
+											foreach($accounts as $k=>$v){
 												echo '<option value="'.$k.'">'.$v.'</option>';
 											}?>
 										</select>
@@ -86,7 +88,7 @@ th,td,td>span {
 										<input type="text" class="form-control form-filter input-sm" placeholder='ASIN' name="asin">
 										</div>
 									</td>
-									
+
 									<td>
 										<div class="input-group date date-picker" data-date-format="yyyy-mm-dd">
 											<input type="text" class="form-control form-filter input-sm" readonly name="date_from" placeholder="From" value="">
@@ -105,18 +107,20 @@ th,td,td>span {
 											</span>
 										</div>
 									</td>
-									
+
+									<td></td>
+									<td></td>
 									<td></td>
 									<td></td>
 									<td></td>
 									<!--
-									<td>									
+									<td>
 										<select name="bgbu" class="form-control form-filter input-sm">
 										<option value="">BG && BU</option>
 										<option value="-">[Empty]</option>
-										<?php 
+										<?php
 										$bg='';
-										foreach($teams as $team){ 	
+										foreach($teams as $team){
 											$bg=$team->bg;
 											if($team->bg && $team->bu) echo '<option value="'.$team->bg.'_'.$team->bu.'">'.$team->bg.' - '.$team->bu.'</option>';
 										}?>
@@ -124,14 +128,14 @@ th,td,td>span {
 									</td>
 									-->
 									 <td>
-									
+
 										<select name="user_id" class="form-control form-filter input-sm">
 										<option value="">Users</option>
 										@foreach ($users as $user_id=>$user_name)
 												<option value="{{$user_id}}">{{$user_name}}</option>
 										@endforeach
 										</select>
-									
+
 									</td>
 									<td>
 									<select id="status"  name="status" class="form-control form-filter input-sm">
@@ -141,7 +145,7 @@ th,td,td>span {
 										<option value="-1">Reject</option>
 									</select>
 									</td>
-	
+
 									<td>
 										<div class="margin-bottom-5">
 											<button class="btn btn-sm green btn-outline filter-submit margin-bottom">
@@ -156,7 +160,7 @@ th,td,td>span {
 							</table>
 							<script>
 							var TableDatatablesAjax = function () {
-						
+
 								var initPickers = function () {
 									//init date pickers
 									$('.date-picker').datepicker({
@@ -164,13 +168,13 @@ th,td,td>span {
 										autoclose: true
 									});
 								}
-						
+
 								var initTable = function () {
 									$.ajaxSetup({
 										headers: { 'X-CSRF-TOKEN' : '{{ csrf_token() }}' }
 									});
 									var grid = new Datatable();
-						
+
 									grid.init({
 										src: $("#datatable_ajax_rsg_products"),
 										onSuccess: function (grid, response) {
@@ -189,12 +193,12 @@ th,td,td>span {
 										},
 										loadingMessage: 'Loading...',
 										dataTable: { // here you can define a typical datatable settings from http://datatables.net/usage/options
-						
+
 											// Uncomment below line("dom" parameter) to fix the dropdown overflow issue in the datatable cells. The default datatable layout
 											// setup uses scrollable div(table-scrollable) with overflow:auto to enable vertical scroll(see: assets/global/scripts/datatable.js).
 											// So when dropdowns used the scrollable div should be removed.
 											"dom": "<'row'<'col-md-6 col-sm-12'pli><'col-md-6 col-sm-12'<'table-group-actions pull-right'>>r>t<'row'<'col-md-6 col-sm-12'pli><'col-md-6 col-sm-12'>>",
-						
+
 											"bStateSave": true, // save datatable state(pagination, sort, etc) in cookie.
 											"aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0 ,1,6,7,8 ] }],
 											"lengthMenu": [
@@ -213,7 +217,7 @@ th,td,td>span {
 											],// set first column as a default sort by asc
 										}
 									});
-						
+
 									// handle group actionsubmit button click
 									grid.getTableWrapper().on('click', '.table-group-action-submit', function (e) {
 										e.preventDefault();
@@ -241,9 +245,9 @@ th,td,td>span {
 												place: 'prepend'
 											});
 										}
-						
+
 									});
-						
+
 									grid.setAjaxParam("date_from", $("input[name='date_from']").val());
 									grid.setAjaxParam("date_to", $("input[name='date_to']").val());
 									grid.setAjaxParam("asin", $("input[name='asin']").val());
@@ -254,30 +258,30 @@ th,td,td>span {
 									grid.getDataTable().ajax.reload(null,false);
 									//grid.clearAjaxParams();
 								}
-						
-						
+
+
 								return {
-						
+
 									//main function to initiate the module
 									init: function () {
 										initPickers();
 										initTable();
 									}
-						
+
 								};
-						
+
 							}();
-						
+
 						$(function() {
-							
+
 							TableDatatablesAjax.init();
-							
+
 							$("#ajax").on("hidden.bs.modal",function(){
 								$(this).find('.modal-content').html('<div class="modal-body"><img src="../assets/global/img/loading-spinner-grey.gif" alt="" class="loading"><span>Loading... </span></div>');
 							});
 						});
 						</script>
-	
+
 						</div>
                 </div>
             </div>
