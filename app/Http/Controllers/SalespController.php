@@ -125,8 +125,9 @@ class SalespController extends Controller
                 array_get($users,$list['sap_seller_id'],$list['sap_seller_id']),
 				$list['sku'],
 				
+
 				array_get(getSapFactoryCode(),$list['sap_site_id']),
-				$list['sku_des'],
+				($list['status']?'<span class="btn btn-success btn-xs">Reserved</span>':'<span class="btn btn-danger btn-xs">Eliminate</span>').$list['sku_des'],
 				$list['sales_28_22'],
 				$list['sales_21_15'],
 				$list['sales_14_08'],
