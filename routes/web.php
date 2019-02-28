@@ -82,6 +82,8 @@ Route::Post('/couponkunnr/upload', 'CouponkunnrController@upload')->name('upload
 Route::Post('/mcforder/get', 'McforderController@get')->name('getMcforder');
 Route::resource('rsgproducts', 'RsgproductsController');
 Route::Post('/rsgproducts/get', 'RsgproductsController@get')->name('getrsgproducts');
+Route::get('/rsgrequests/export', 'RsgrequestsController@export');
+Route::Post('/rsgrequests/export', 'RsgrequestsController@export');
 Route::resource('rsgrequests', 'RsgrequestsController');
 Route::Post('/rsgrequests/get', 'RsgrequestsController@get')->name('getrsgrequests');
 Route::resource('salesp', 'SalespController');

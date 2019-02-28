@@ -21,10 +21,19 @@ th,td,td>span {
             <!-- BEGIN EXAMPLE TABLE PORTLET-->
             <div class="portlet light bordered">
                 <div class="portlet-title">
-                    <div class="caption font-dark">
+                    <div class="caption font-dark col-md-6">
                         <i class="icon-settings font-dark"></i>
                         <span class="caption-subject bold uppercase">RSG Requests</span>
                     </div>
+					<div class="col-md-6" style="padding: 0px;">
+						<div class="btn-group " style="float:right;">
+
+							<button id="rsg-requests-export" class="btn sbold blue"> Export
+								<i class="fa fa-download"></i>
+							</button>
+
+						</div>
+					</div>
                 </div>
                 <div class="portlet-body">
 
@@ -274,6 +283,10 @@ th,td,td>span {
 							$("#ajax").on("hidden.bs.modal",function(){
 								$(this).find('.modal-content').html('<div class="modal-body"><img src="../assets/global/img/loading-spinner-grey.gif" alt="" class="loading"><span>Loading... </span></div>');
 							});
+						});
+
+						$("#rsg-requests-export").click(function(){
+							location.href='/rsgrequests/export';
 						});
 						</script>
 	

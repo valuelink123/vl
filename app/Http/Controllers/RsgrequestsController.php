@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use \DrewM\MailChimp\MailChimp;
 use Illuminate\Http\Request;
 use App\RsgRequest;
@@ -16,6 +17,9 @@ use DB;
 use PayPal\PayPalAPI\TransactionSearchReq;
 use PayPal\PayPalAPI\TransactionSearchRequestType;
 use PayPal\Service\PayPalAPIInterfaceServiceService;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+
 class RsgrequestsController extends Controller
 {
     /**
@@ -256,6 +260,77 @@ class RsgrequestsController extends Controller
 		$transactionSearchResponse = $paypalService->TransactionSearch($tranSearchReq);
 		$transactionSearchResponse = json_decode(json_encode($transactionSearchResponse), true);
 		return array_get($transactionSearchResponse,'PaymentTransactions',[]);
+	}
+
+	public function export(){
+
+		set_time_limit(0);
+
+		$arrayData = array();
+		$headArray[] = 'Submit Date';
+		$headArray[] = 'Customer Email';
+		$headArray[] = 'Request Product';
+		$headArray[] = 'Current Step';
+		$headArray[] = 'Customer Paypal';
+		$headArray[] = 'Funded';
+		$headArray[] = 'Amazon OrderID';
+		$headArray[] = 'Review Url';
+		$headArray[] = 'Star rating';
+		$headArray[] = 'Follow';
+		$headArray[] = 'Next follow date';
+		$headArray[] = 'User';
+		$headArray[] = 'Site';
+		$headArray[] = 'Update Date';
+
+		$arrayData[] = $headArray;
+
+		$orderby = 'updated_at';
+		$sort = 'desc';
+		$datas= RsgRequest::leftJoin('rsg_products',function($q){
+			$q->on('rsg_requests.product_id', '=', 'rsg_products.id');
+		});
+
+		//$datas->count();
+		$lists =  $datas->orderBy($orderby,$sort)->get(['rsg_requests.*','rsg_products.asin','rsg_products.site','rsg_products.seller_id','rsg_products.user_id'])->toArray();
+		$users = $this->getUsers();
+
+		foreach ($lists as $key=>$val){
+
+			$arrayData[] = array(
+				$val['created_at'],
+				$val['customer_email'],
+				$val['asin'],
+				array_get(getStepStatus(),$val['step']),
+				$val['customer_paypal_email'],
+				$val['transfer_amount'].$val['transfer_currency'],
+				$val['amazon_order_id'],
+				$val['review_url'].$val['transaction_id'],
+				$val['star_rating'],
+				$val['follow'],
+				$val['next_follow_date'],
+				array_get($users,$val['user_id']),
+				$val['site'],
+				$val['updated_at'],
+			);
+		}
+
+		if($arrayData){
+			$spreadsheet = new Spreadsheet();
+
+			$spreadsheet->getActiveSheet()
+				->fromArray(
+					$arrayData,  // The data to set
+					NULL,        // Array values with this value will not be set
+					'A1'         // Top left coordinate of the worksheet range where
+				//    we want to set these values (default is A1)
+				);
+			header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');//告诉浏览器输出07Excel文件
+			header('Content-Disposition: attachment;filename="Export_RSG_Requests.xlsx"');//告诉浏览器输出浏览器名称
+			header('Cache-Control: max-age=0');//禁止缓存
+			$writer = new Xlsx($spreadsheet);
+			$writer->save('php://output');
+		}
+		die();
 	}
 
 

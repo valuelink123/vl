@@ -292,9 +292,9 @@ class CtgController extends Controller {
                     'A1'         // Top left coordinate of the worksheet range where
                 //    we want to set these values (default is A1)
                 );
-            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');//������������07Excel�ļ�
-            header('Content-Disposition: attachment;filename="Export_CTG.xlsx"');//���������������������
-            header('Cache-Control: max-age=0');//��ֹ����
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');//告诉浏览器输出07Excel文件
+            header('Content-Disposition: attachment;filename="Export_CTG.xlsx"');//告诉浏览器输出浏览器名称
+            header('Cache-Control: max-age=0');//禁止缓存
             $writer = new Xlsx($spreadsheet);
             $writer->save('php://output');
         }
