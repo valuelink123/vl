@@ -52,8 +52,22 @@ class RsgrequestsController extends Controller
 	
 	public function get(Request $request)
     {
-		$orderby = 'updated_at';
+
+		//$orderby = 'updated_at';
+		$order_column = $request->input('order.0.column','14');
+
+		if($order_column == 14){
+			$orderby = 'updated_at';
+		}else if($order_column == 6){
+			$orderby = 'transfer_amount';
+		}else if($order_column == 1){
+			$orderby = 'created_at';
+		}else{
+			$orderby = 'updated_at';
+		}
+
         $sort = $request->input('order.0.dir','desc');
+
         if ($request->input("customActionType") == "group_action") {
 			   if(!Auth::user()->admin) die('Permission denied');
 			   $updateDate = [];
