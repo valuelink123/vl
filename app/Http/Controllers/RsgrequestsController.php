@@ -131,14 +131,14 @@ class RsgrequestsController extends Controller
 				$list['customer_paypal_email'],
                 $list['transfer_amount'].' '.$list['transfer_currency'],
 				$list['amazon_order_id'],
-				$list['review_url'].'<BR><span class="text-danger">'.$list['transaction_id'].'</span>',
+				'<div style="width: 250px;word-wrap: break-word;text-align: center;">'.$list['review_url'].'<BR><span class="text-danger">'.$list['transaction_id'].'</span></div>',
 				$list['star_rating'],
 				$list['follow'],
 				$list['next_follow_date'],
 				array_get($users,$list['user_id']),
 				$list['site'],
 				$list['updated_at'],
-				'<a data-target="#ajax" data-toggle="modal" href="'.url('rsgrequests/'.$list['id'].'/edit').'" class="badge badge-success"> View </a>'
+				'<a data-target="#ajax" data-toggle="modal" href="'.url('rsgrequests/'.$list['id'].'/edit').'" class="badge badge-success"> View </a> <a class="btn btn-danger btn-xs" href="'.url('rsgrequests/process?email='.$list['customer_email']).'" target="_blank">Process</a>'
 				
             );
 		}
@@ -156,6 +156,18 @@ class RsgrequestsController extends Controller
         }
         return $users_array;
     }
+
+	public function process(Request $req){
+
+		if ($req->isMethod('GET')) {
+
+			$emails = DB::table('sendbox')->where('to_address', $req->input('email'))->orderBy('date', 'desc')->get();
+			$emails = json_decode(json_encode($emails), true); // todo
+
+			$users= $this->getUsers();
+		}
+		return view('rsgrequests/process',['emails'=>$emails,'users'=>$users]);
+	}
 
     public function getAccounts(){
         $seller=[];

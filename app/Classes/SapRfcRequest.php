@@ -153,7 +153,8 @@ class SapRfcRequest {
 
         $queryString = http_build_query($array, '', '&', PHP_QUERY_RFC3986);
 
-        $url = "http://{$this->host}/rfc_site.php?{$queryString}";
+        //$url = "http://{$this->host}/rfc_site.php?{$queryString}";
+        $url = "http://192.168.10.10:18003/rfc_site.php?{$queryString}";
 
         try {
 
