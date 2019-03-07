@@ -44,9 +44,12 @@ class RsgrequestsController extends Controller
 
 	
 		$date_from=date('Y-m-d',strtotime('-90 days'));		
-		$date_to=date('Y-m-d');	
+		$date_to=date('Y-m-d');
 
-        return view('rsgrequests/index',['date_from'=>$date_from ,'date_to'=>$date_to]);;
+		$submit_date_from=date('Y-m-d',strtotime('-90 days'));
+		$submit_date_to=date('Y-m-d');
+
+		return view('rsgrequests/index',['date_from'=>$date_from ,'date_to'=>$date_to ,'submit_date_from'=>$submit_date_from ,'submit_date_to'=>$submit_date_to]);;
 
     }
 	
@@ -76,9 +79,13 @@ class RsgrequestsController extends Controller
         }
 		$date_from=$request->input('date_from')?$request->input('date_from'):date('Y-m-d',strtotime('- 90 days'));
         $date_to=$request->input('date_to')?$request->input('date_to'):date('Y-m-d');
+
+		$submit_date_from=$request->input('submit_date_from')?$request->input('submit_date_from'):date('Y-m-d',strtotime('- 90 days'));
+		$submit_date_to=$request->input('submit_date_to')?$request->input('submit_date_to'):date('Y-m-d');
+
 		$datas= RsgRequest::leftJoin('rsg_products',function($q){
 				$q->on('rsg_requests.product_id', '=', 'rsg_products.id');
-			})->where('rsg_requests.updated_at','>=',$date_from.' 00:00:00')->where('rsg_requests.updated_at','<=',$date_to.' 23:59:59');;
+			})->where('rsg_requests.updated_at','>=',$date_from.' 00:00:00')->where('rsg_requests.updated_at','<=',$date_to.' 23:59:59')->where('rsg_requests.created_at','>=',$submit_date_from.' 00:00:00')->where('rsg_requests.created_at','<=',$submit_date_to.' 23:59:59');
                
         if($request->input('customer_email')){
             $datas = $datas->where('customer_email', $request->input('customer_email'));
@@ -131,7 +138,7 @@ class RsgrequestsController extends Controller
 				$list['customer_paypal_email'],
                 $list['transfer_amount'].' '.$list['transfer_currency'],
 				$list['amazon_order_id'],
-				'<div style="width: 250px;word-wrap: break-word;text-align: center;">'.$list['review_url'].'<BR><span class="text-danger">'.$list['transaction_id'].'</span></div>',
+				'<div style="width: 200px;word-wrap: break-word;text-align: center;">'.$list['review_url'].'<BR><span class="text-danger">'.$list['transaction_id'].'</span></div>',
 				$list['star_rating'],
 				$list['follow'],
 				$list['next_follow_date'],

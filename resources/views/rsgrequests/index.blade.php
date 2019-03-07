@@ -62,26 +62,41 @@ th,td,td>span {
 											<span></span>
 										</label>
 									</th>
-									<th width="6%"> Submit Date </th>
-									<th width="8%"> Customer Email </th>
+									<th width="10%"> Submit Date </th>
+									<th width="6%"> Customer Email </th>
 									<th width="6%"> Request Product </th>
 									<th width="8%"> Current Step </th>
-									<th width="5%"> Customer Paypal </th>
-									<th width="5%"> Funded </th>
+									<th width="4%"> Customer Paypal </th>
+									<th width="4%"> Funded </th>
 									<th width="6%"> Amazon OrderID </th>
 									<th width="6%"> Review Url</th>
 									<th width="6%"> Star rating</th>
 									<th width="6%"> Follow</th>
 									<th width="6%"> Next follow date</th>
-									<th width="6%"> User</th>
+									<th width="4%"> User</th>
 									<th width="6%"> Site</th>
-									<th width="8%"> Update Date </th>
+									<th width="10%"> Update Date </th>
 									<th width="10%"> Action</th>
 								</tr>
 								<tr role="row" class="filter">
 									<td> </td>
 									<td>
-
+										<div class="input-group date date-picker" data-date-format="yyyy-mm-dd">
+											<input type="text" class="form-control form-filter input-sm" readonly name="submit_date_from" placeholder="From" value="{{$submit_date_from}}">
+											<span class="input-group-btn">
+												<button class="btn btn-sm default" type="button">
+													<i class="fa fa-calendar"></i>
+												</button>
+											</span>
+										</div>
+										<div class="input-group date date-picker" data-date-format="yyyy-mm-dd">
+											<input type="text" class="form-control form-filter input-sm" readonly name="submit_date_to" placeholder="To" value="{{$submit_date_to}}">
+											<span class="input-group-btn">
+												<button class="btn btn-sm default" type="button">
+													<i class="fa fa-calendar"></i>
+												</button>
+											</span>
+										</div>
 
 									</td>
 									<td>
