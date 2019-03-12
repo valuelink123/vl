@@ -44,10 +44,10 @@ class HomeController extends Controller
 				   $bgbu_arr = explode('_',$bgbu);
 				   if(array_get($bgbu_arr,0)){
 						$where_star.= "and b.bg='".array_get($bgbu_arr,0)."'";
-						$where_star.= "and b.bg='".array_get($bgbu_arr,0)."'";
+						$where_review.= "and b.bg='".array_get($bgbu_arr,0)."'";
 				   }
 				   if(array_get($bgbu_arr,1)){
-						$where_review.= "and b.bu='".array_get($bgbu_arr,1)."'";
+						$where_star.= "and b.bu='".array_get($bgbu_arr,1)."'";
 						$where_review.= "and b.bu='".array_get($bgbu_arr,1)."'";
 				   }
 			}

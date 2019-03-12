@@ -99,6 +99,7 @@ class GetAsin extends Command
 				'sap_warehouse_id' => trim(array_get($asin,'LGORT','')),
 				'sap_factory_id' => trim(array_get($asin,'WERKS','')),
 				'sap_shipment_id' => trim(array_get($asin,'SDABW','')),
+				'item_status' => intval(array_get($asin,'MATNRZT',0)),
 				'asin_last_update_date'=> date('Y-m-d H:i:s')
 			]);
 			
