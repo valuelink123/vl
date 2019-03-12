@@ -227,7 +227,7 @@ th,td {
                                                        {{$data->site}}
                                                     </td>
 													<td> {!!($data->status)?'<span class="btn btn-success btn-xs">Reserved</span>':'<span class="btn btn-danger btn-xs">Eliminate</span>'!!} </td>
-                                                    <td><a href="https://{{$data->site}}/dp/{{strip_tags(str_replace('&nbsp;','',$data->asin))}}1" target="_blank">{{strip_tags(str_replace('&nbsp;','',$data->asin))}}1</a></td>
+                                                    <td><a href="https://{{$data->site}}/dp/{{strip_tags(str_replace('&nbsp;','',$data->asin))}}" target="_blank">{{strip_tags(str_replace('&nbsp;','',$data->asin))}}</a></td>
                                                     <td> {{$data->keywords}} </td>
                                                     <td >{{array_get($ranking,0)}}</td>
                                                     <td >{{array_get($ranking,1)}}</td>
@@ -419,9 +419,7 @@ var TableDatatablesEditable = function () {
             "order": [
                 [0, "asc"]
             ],
-			buttons: [
-                        { extend: 'csv', className: 'btn purple btn-outline ',filename:'skus' }
-                    ],
+
 					 "createdRow": function( row, data, dataIndex ) {
                         $(row).children('td').eq(4).attr('style', 'max-width: 80px;overflow:hidden;white-space:nowrap;text-align: left; ');
 						$(row).children('td').eq(4).attr('title', $(row).children('td').eq(4).text());
@@ -430,7 +428,8 @@ var TableDatatablesEditable = function () {
 						$(row).children('td').eq(8).attr('style', 'max-width: 80px;overflow:hidden;white-space:nowrap;text-align: left; ');
 						$(row).children('td').eq(8).attr('title', $(row).children('td').eq(8).text());
 						
-                    }
+                    },
+					
         });
 
         var nEditing = null;
