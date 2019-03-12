@@ -49,7 +49,7 @@ class RsgrequestsController extends Controller
 		$submit_date_from=date('Y-m-d',strtotime('-90 days'));
 		$submit_date_to=date('Y-m-d');
 
-		return view('rsgrequests/index',['date_from'=>$date_from ,'date_to'=>$date_to ,'submit_date_from'=>$submit_date_from ,'submit_date_to'=>$submit_date_to]);;
+		return view('rsgrequests/index',['date_from'=>$date_from ,'date_to'=>$date_to ,'submit_date_from'=>$submit_date_from ,'submit_date_to'=>$submit_date_to,'users'=>$this->getUsers()]);
 
     }
 	
@@ -110,9 +110,30 @@ class RsgrequestsController extends Controller
 		if($request->input('amazon_order_id')){
             $datas = $datas->where('amazon_order_id', $request->input('amazon_order_id'));
         }
+
 		if($request->input('review_url')){
             $datas = $datas->where('review_url','like', '%'.$request->input('review_url').'%');
         }
+
+		if($request->input('star_rating')){
+			$datas = $datas->where('star_rating', $request->input('star_rating'));
+		}
+
+		if($request->input('follow')){
+			$datas = $datas->where('follow','like', '%'.$request->input('follow').'%');
+		}
+
+		if($request->input('next_follow_date')){
+			$datas = $datas->where('next_follow_date','like', '%'.$request->input('next_follow_date').'%');
+		}
+
+		if($request->input('user_id')){
+			$datas = $datas->where('rsg_products.user_id', $request->input('user_id'));
+		}
+
+		if($request->input('site')){
+			$datas = $datas->where('rsg_products.site','like', '%'.$request->input('site').'%');
+		}
 		
 		$iTotalRecords = $datas->count();
         $iDisplayLength = intval($_REQUEST['length']);

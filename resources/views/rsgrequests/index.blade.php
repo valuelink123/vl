@@ -139,11 +139,26 @@ th,td,td>span {
 										<input type="text" class="form-control form-filter input-sm" placeholder='review url' name="review_url">
 									</td>
 
-									<td></td>
-									<td></td>
-									<td></td>
-									<td></td>
-									<td></td>
+									<td>
+										<input type="text" class="form-control form-filter input-sm" placeholder='Star rating' name="star_rating">
+									</td>
+									<td>
+										<input type="text" class="form-control form-filter input-sm" placeholder='Follow' name="follow">
+									</td>
+									<td>
+										<input type="text" class="form-control form-filter input-sm" placeholder='Next follow date' name="next_follow_date">
+									</td>
+									<td>
+										<select name="user_id" class="form-control form-filter input-sm">
+											<option value="">Users</option>
+											@foreach ($users as $user_id=>$user_name)
+												<option value="{{$user_id}}">{{$user_name}}</option>
+											@endforeach
+										</select>
+									</td>
+									<td>
+										<input type="text" class="form-control form-filter input-sm" placeholder='Site' name="site">
+									</td>
 
 									
 									<td>
