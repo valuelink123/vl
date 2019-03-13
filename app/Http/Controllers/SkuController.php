@@ -164,7 +164,7 @@ where 1=1 ".$where);
 			$p_data['fbm_stock']=intval(trim($data[55]));
 			$p_data['total_stock']=$p_data['fba_stock']+$p_data['fba_transfer']+$p_data['fbm_stock'];
 			$p_data['strategy']=trim($data[56]);
-			$p_data['fba_keep']=($daily_sales>0)?(round(($p_data['fba_stock']+$p_data['fba_transfer'])/$daily_sales,2)):(($p_data['fba_stock']+$p_data['fba_transfer'])*100);
+			$p_data['fba_keep']=($daily_sales>0)?(round(($p_data['fba_stock'])/$daily_sales,2)):(($p_data['fba_stock'])*100);
 			$p_data['total_keep']=($daily_sales>0)?(round($p_data['total_stock']/$daily_sales,2)):($p_data['total_stock']*100);
 			
 			$exists_week = Skusweek::where('asin',$asin)->where('site',$site)->value('weeks');

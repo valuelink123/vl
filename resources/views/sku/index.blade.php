@@ -2,39 +2,34 @@
 @section('label', 'Daily Sales Report')
 @section('content')
 <style>
-.table-checkable tr>td:first-child, .table-checkable tr>th:first-child{max-width:auto !important;}
-table.dataTable thead>tr>th.sorting_asc, table.dataTable thead>tr>th.sorting_desc, table.dataTable thead>tr>th.sorting, table.dataTable thead>tr>td.sorting_asc, table.dataTable thead>tr>td.sorting_desc, table.dataTable thead>tr>td.sorting {
-    padding-right: 15px !important;
+        .form-control {
+            height: 29px;
+        }
+		.dataTables_extended_wrapper .table.dataTable {
+  margin: 0px !important;
+}
+.input-small {
+    width: 80%!important;
 }
 
-table.dataTable thead th, table.dataTable thead td {
-    padding: 10px 2px !important;}
-table.dataTable tbody th, table.dataTable tbody td {
-    padding: 10px 2px !important;;
-}
-th,td {
+th,td,td>span {
     font-size:12px !important;
 	font-family:Arial, Helvetica, sans-serif;}
-</style>
+    </style>
     <h1 class="page-title font-red-intense"> Daily Sales Report
         
     </h1>
-    <div class="row">
+	
+	
+	<div class="row">
         <div class="col-md-12">
             <!-- BEGIN EXAMPLE TABLE PORTLET-->
             <div class="portlet light bordered">
-                <div class="portlet-title">
-                    <div class="caption font-dark">
-                        <i class="icon-settings font-dark"></i>
-                        <span class="caption-subject bold uppercase">Daily Sales Report</span>
-                    </div>
-                </div>
-                <div class="table-toolbar">
-                    <div class="row">
-                        	<div class="row widget-row">
-						<div style="margin: 20px;">
+                <div class="portlet-body">
 							
-<form role="form" action="{{url('skus')}}" method="GET">
+							
+					<div class="table-toolbar">
+                    <form role="form" action="{{url('skus')}}" method="GET">
                         {{ csrf_field() }}
                         <div class="row">
 
@@ -111,19 +106,13 @@ th,td {
 					</div>
 
                     </form>
-						</div>
 					
-						
-					</div>
-                     </div>
                 </div>
-                        
-                   
-                <div class="portlet-body">
-					<form id='update_sku'>
-                    <table class="table table-striped table-hover table-bordered" id="skus_editable">
-                        <thead>
-							<tr role="row" >
+                    <div class="table-container">
+
+                        <table class="table table-striped table-bordered table-hover" id="datatable_ajax_sp">
+                            <thead>
+                            <tr role="row"  >
 								<td colspan="9" style="background:#fff2cc;text-align:left">Sku Base Info</td>
 								<td colspan="7" style="background:#ddeef7;text-align:left">Ranking</td>
 								<td colspan="7" style="background:#fff2cc;text-align:left">Rating</td>
@@ -134,7 +123,7 @@ th,td {
 								<td colspan="7" style="background:#ddeef7;text-align:left">Conversion rate</td>
 								<td colspan="7" style="background:#fff2cc;text-align:left">Stock Info</td>
 							</tr>
-                                                <tr>
+                                                <tr role="row" class="heading">
                                                     <th> BG </th>
                                                     <th> BU </th>
                                                     <th> Seller </th>
@@ -143,64 +132,64 @@ th,td {
                                                     <th> Site </th>
 													<th> Status </th>
                                                     <th> Link </th>
-                                                    <th> Keywords </th>
+                                                    <th width="50px"> Keywords </th>
                                                     
-                                                    <th> Mon </th>
-                                                    <th> Tues </th>
-													<th> Wed </th>
-                                                    <th> Thur </th>
-                                                    <th> Fri </th>
-                                                    <th> Sat </th>
-                                                     <th> Sun </th>
-                                                    <th> Mon </th>
-                                                    <th> Tues </th>
-													<th> Wed </th>
-                                                    <th> Thur </th>
-                                                    <th> Fri </th>
-                                                    <th> Sat </th>
-                                                    <th> Sun </th>
-                                                    <th> Mon </th>
-                                                    <th> Tues </th>
-													<th> Wed </th>
-                                                    <th> Thur </th>
-                                                    <th> Fri </th>
-                                                    <th> Sat </th>
-													 <th> Sun </th>
-                                                    <th> Mon </th>
-                                                    <th> Tues </th>
-													<th> Wed </th>
-                                                    <th> Thur </th>
-                                                    <th> Fri </th>
-                                                    <th> Sat </th>
-                                                     <th> Sun </th>
-                                                    <th> Mon </th>
-                                                    <th> Tues </th>
-													<th> Wed </th>
-                                                    <th> Thur </th>
-                                                    <th> Fri </th>
-                                                    <th> Sat </th>
-                                                     <th> Sun </th>
-                                                    <th> Mon </th>
-                                                    <th> Tues </th>
-													<th> Wed </th>
-                                                    <th> Thur </th>
-                                                    <th> Fri </th>
-                                                    <th> Sat </th>
-                                                     <th> Sun </th>
-                                                    <th> Mon </th>
-                                                    <th> Tues </th>
-													<th> Wed </th>
-                                                    <th> Thur </th>
-                                                    <th> Fri </th>
-                                                    <th> Sat </th>
-													<th> Sun </th>
-													<th> FBA InStock </th>
-                                                    <th> FBA Transfer </th>
-													<th> FBM InStock </th>
-													<th> Strategy </th>
-                                                    <th> Total </th>
-                                                    <th> FBA Keep </th>
-													<th> Total Keep </th>
+                                                    <th width="50px"> Mon </th>
+                                                    <th width="50px"> Tues </th>
+													<th width="50px"> Wed </th>
+                                                    <th width="50px"> Thur </th>
+                                                    <th width="50px"> Fri </th>
+                                                    <th width="50px"> Sat </th>
+                                                     <th width="50px"> Sun </th>
+                                                    <th width="50px"> Mon </th>
+                                                    <th width="50px"> Tues </th>
+													<th width="50px"> Wed </th>
+                                                    <th width="50px"> Thur </th>
+                                                    <th width="50px"> Fri </th>
+                                                    <th width="50px"> Sat </th>
+                                                    <th width="50px"> Sun </th>
+                                                    <th width="50px"> Mon </th>
+                                                    <th width="50px"> Tues </th>
+													<th width="50px"> Wed </th>
+                                                    <th width="50px"> Thur </th>
+                                                    <th width="50px"> Fri </th>
+                                                    <th width="50px"> Sat </th>
+													 <th width="50px"> Sun </th>
+                                                    <th width="50px"> Mon </th>
+                                                    <th width="50px"> Tues </th>
+													<th width="50px"> Wed </th>
+                                                    <th width="50px"> Thur </th>
+                                                    <th width="50px"> Fri </th>
+                                                    <th width="50px"> Sat </th>
+                                                     <th width="50px"> Sun </th>
+                                                    <th width="50px"> Mon </th>
+                                                    <th width="50px"> Tues </th>
+													<th width="50px"> Wed </th>
+                                                    <th width="50px"> Thur </th>
+                                                    <th width="50px"> Fri </th>
+                                                    <th width="50px"> Sat </th>
+                                                     <th width="50px"> Sun </th>
+                                                    <th width="50px"> Mon </th>
+                                                    <th width="50px"> Tues </th>
+													<th width="50px"> Wed </th>
+                                                    <th width="50px"> Thur </th>
+                                                    <th width="50px"> Fri </th>
+                                                    <th width="50px"> Sat </th>
+                                                     <th width="50px"> Sun </th>
+                                                    <th width="50px"> Mon </th>
+                                                    <th width="50px"> Tues </th>
+													<th width="50px"> Wed </th>
+                                                    <th width="50px"> Thur </th>
+                                                    <th width="50px"> Fri </th>
+                                                    <th width="50px"> Sat </th>
+													<th width="50px"> Sun </th>
+													<th width="50px"> FBA InStock </th>
+                                                    <th width="50px"> FBA Transfer </th>
+													<th width="50px"> FBM InStock </th>
+													<th width="50px"> Strategy </th>
+                                                    <th width="50px"> Total </th>
+                                                    <th width="50px"> FBA Keep </th>
+													<th width="50px"> Total Keep </th>
 													
                                                 </tr>
                                             </thead>
@@ -214,12 +203,13 @@ th,td {
 											$price = explode(";",$data->price);
 											$flow = explode(";",$data->flow);
 											$conversion = explode(";",$data->conversion);
+											$d_number = (date('w',strtotime($date_start))==0)?6:(date('w',strtotime($date_start))-1);
 											?>
                                                 <tr>
                                                     <td> {{$data->bg}} </td>
                                                     <td> {{$data->bu}} </td>
                                                     <td> {{array_get($users,$data->sap_seller_id,$data->sap_seller_id)}} </td>
-                                                    <td class="center"><a class="edit" href="javascript:;"> {{$data->item_code}} </a> </td>
+                                                    <td class="center">{{$data->item_code}} </td>
                                                     <td>
                                                         {{$data->item_name}}
                                                     </td>
@@ -228,62 +218,57 @@ th,td {
                                                     </td>
 													<td> {!!($data->status)?'<span class="btn btn-success btn-xs">Reserved</span>':'<span class="btn btn-danger btn-xs">Eliminate</span>'!!} </td>
                                                     <td><a href="https://{{$data->site}}/dp/{{strip_tags(str_replace('&nbsp;','',$data->asin))}}" target="_blank">{{strip_tags(str_replace('&nbsp;','',$data->asin))}}</a></td>
-                                                    <td> {{$data->keywords}} </td>
-                                                    <td >{{array_get($ranking,0)}}</td>
-                                                    <td >{{array_get($ranking,1)}}</td>
-                                                   <td >{{array_get($ranking,2)}}</td>
-                                                    <td >{{array_get($ranking,3)}}</td>
-                                                     <td >{{array_get($ranking,4)}}</td>
-													 <td >{{array_get($ranking,5)}}</td>
-													 <td >{{array_get($ranking,6)}}</td>  
+                                                    <td> {{$data->keywords}}</td>
+													
+													<?php 
+													for($i=0;$i<7;$i++){
+														$style=(($d_number==$i)?'style="background:#ddeef7;"':'');
+														echo '<td '.$style.'>'.array_get($ranking,$i).'</td>';
+													}
+													?>
+													
+                                                    <?php 
+													for($i=0;$i<7;$i++){
+														$style=(($d_number==$i)?'style="background:#fff2cc;"':'');
+														echo '<td '.$style.'>'.array_get($rating,$i).'</td>';
+													}
+													?>
+                                                    
 													 
-                                                    <td >{{array_get($rating,0)}}</td>
-                                                    <td >{{array_get($rating,1)}}</td>
-                                                   <td >{{array_get($rating,2)}}</td>
-                                                    <td >{{array_get($rating,3)}}</td>
-                                                     <td >{{array_get($rating,4)}}</td>
-													 <td >{{array_get($rating,5)}}</td>
-													 <td >{{array_get($rating,6)}}</td>  
+                                                   <?php 
+													for($i=0;$i<7;$i++){
+														$style=(($d_number==$i)?'style="background:#ddeef7;"':'');
+														echo '<td '.$style.'>'.array_get($review,$i).'</td>';
+													}
+													?>
+													
+                                                    <?php 
+													for($i=0;$i<7;$i++){
+														$style=(($d_number==$i)?'style="background:#fff2cc;"':'');
+														echo '<td '.$style.'>'.array_get($sales,$i).'</td>';
+													}
+													?>
 													 
-													 <td >{{array_get($review,0)}}</td>
-                                                    <td >{{array_get($review,1)}}</td>
-                                                   <td >{{array_get($review,2)}}</td>
-                                                    <td >{{array_get($review,3)}}</td>
-                                                     <td >{{array_get($review,4)}}</td>
-													 <td >{{array_get($review,5)}}</td>
-													 <td >{{array_get($review,6)}}</td>  
+													 <?php 
+													for($i=0;$i<7;$i++){
+														$style=(($d_number==$i)?'style="background:#ddeef7;"':'');
+														echo '<td '.$style.'>'.array_get($price,$i).'</td>';
+													}
+													?>
+													
+                                                    <?php 
+													for($i=0;$i<7;$i++){
+														$style=(($d_number==$i)?'style="background:#fff2cc;"':'');
+														echo '<td '.$style.'>'.array_get($flow,$i).'</td>';
+													}
+													?>
 													 
-													 <td >{{array_get($sales,0)}}</td>
-                                                    <td >{{array_get($sales,1)}}</td>
-                                                   <td >{{array_get($sales,2)}}</td>
-                                                    <td >{{array_get($sales,3)}}</td>
-                                                     <td >{{array_get($sales,4)}}</td>
-													 <td >{{array_get($sales,5)}}</td>
-													 <td >{{array_get($sales,6)}}</td>  
-													 
-													 <td >{{array_get($price,0)}}</td>
-                                                    <td >{{array_get($price,1)}}</td>
-                                                   <td >{{array_get($price,2)}}</td>
-                                                    <td >{{array_get($price,3)}}</td>
-                                                     <td >{{array_get($price,4)}}</td>
-													 <td >{{array_get($price,5)}}</td>
-													 <td >{{array_get($price,6)}}</td>  
-													 
-													 <td >{{array_get($flow,0)}}</td>
-                                                    <td >{{array_get($flow,1)}}</td>
-                                                   <td >{{array_get($flow,2)}}</td>
-                                                    <td >{{array_get($flow,3)}}</td>
-                                                     <td >{{array_get($flow,4)}}</td>
-													 <td >{{array_get($flow,5)}}</td>
-													 <td >{{array_get($flow,6)}}</td>  
-													 
-													 <td >{{array_get($conversion,0)}}</td>
-                                                    <td >{{array_get($conversion,1)}}</td>
-                                                   <td >{{array_get($conversion,2)}}</td>
-                                                    <td >{{array_get($conversion,3)}}</td>
-                                                     <td >{{array_get($conversion,4)}}</td>
-													 <td >{{array_get($conversion,5)}}</td>
-													 <td >{{array_get($conversion,6)}}</td>  
+													 <?php 
+													for($i=0;$i<7;$i++){
+														$style=(($d_number==$i)?'style="background:#ddeef7;"':'');
+														echo '<td '.$style.'>'.array_get($conversion,$i).'</td>';
+													}
+													?>  
                                                     <td>
                                                         {{$data->fba_stock}}
                                                     </td>
@@ -308,14 +293,16 @@ th,td {
                                                 </tr>
                                               @endforeach  
                                             </tbody>
-                    </table>
-					</form>
+                        </table>
+                    </div>
                 </div>
             </div>
             <!-- END EXAMPLE TABLE PORTLET-->
         </div>
     </div>
-
+	
+	
+    
 
 <script>
 var TableDatatablesEditable = function () {
@@ -340,7 +327,7 @@ var TableDatatablesEditable = function () {
                   jqTds[i].innerHTML = '<input type="text" name="sku_data[]" class="form-control input-small" value="' + aData[i] + '">';
             }
 
-            jqTds[3].innerHTML = aData[3]+'<a class="edit badge badge-info" href="">Save</a> <a class="cancel badge badge-danger" href="">Cancel</a>';
+            //jqTds[3].innerHTML = aData[3]+'<a class="edit badge badge-info" href="">Save</a> <a class="cancel badge badge-danger" href="">Cancel</a>';
         }
 
         function saveRow(oTable, nRow) {
@@ -355,7 +342,7 @@ var TableDatatablesEditable = function () {
 				numArr.push(jqInputs[i-8].value);
                 oTable.fnUpdate(jqInputs[i-8].value, nRow, i, false);
             }
-			oTable.fnUpdate(aData[3], nRow, 3, false);
+			//oTable.fnUpdate(aData[3], nRow, 3, false);
 			$.ajax({
 				url:'/skus',
 				data:{data:JSON.stringify(numArr)},
@@ -384,7 +371,7 @@ var TableDatatablesEditable = function () {
             oTable.fnDraw();
         }
 
-        var table = $('#skus_editable');
+        var table = $('#datatable_ajax_sp');
 
         var oTable = table.dataTable({
 
@@ -394,60 +381,55 @@ var TableDatatablesEditable = function () {
             //"dom": "<'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'f>r>t<'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>",
 
             "lengthMenu": [
-                [5, 15, 20, -1],
-                [5, 15, 20, "All"] // change per page values here
-            ],
-
-            // Or you can use remote translation file
-            //"language": {
-            //   url: '//cdn.datatables.net/plug-ins/3cfcc339e89/i18n/Portuguese.json'
-            //},
-
-            // set the initial value
-            "pageLength": 20,
+                        [10, 50, 100, -1],
+                        [10, 50, 100, 'All'] // change per page values here
+                    ],
+            "pageLength": 10, // default record count per page
 			bFilter: false,
             "language": {
                 "lengthMenu": " _MENU_ records"
             },
-            "columnDefs": [{ // set default column settings
-                'orderable': true,
-                'targets': [0]
-            }, {
-                "searchable": true,
-                "targets": [0]
-            }],
-            "order": [
-                [0, "asc"]
-            ],
+           
+            
 
 					 "createdRow": function( row, data, dataIndex ) {
                         $(row).children('td').eq(4).attr('style', 'max-width: 80px;overflow:hidden;white-space:nowrap;text-align: left; ');
 						$(row).children('td').eq(4).attr('title', $(row).children('td').eq(4).text());
 						$(row).children('td').eq(7).attr('style', 'max-width: 80px;overflow:hidden;white-space:nowrap;text-align: left; ');
 						$(row).children('td').eq(7).attr('title', $(row).children('td').eq(7).text());
-						$(row).children('td').eq(8).attr('style', 'max-width: 80px;overflow:hidden;white-space:nowrap;text-align: left; ');
+						$(row).children('td').eq(8).attr('style', 'max-width: 50px;overflow:hidden;white-space:nowrap;text-align: left; ');
 						$(row).children('td').eq(8).attr('title', $(row).children('td').eq(8).text());
 						
                     },
+					
+					scrollY:        380,
+                    scrollX:        true,
+					buttons: [
+                        { extend: 'csv', className: 'btn purple btn-outline ',filename:'skus' }
+                    ],
+
+					fixedColumns:   {
+						leftColumns:8,
+						rightColumns: 0
+					},
+					"dom": "<'row' <'col-md-12'B>><'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'>r><'table-scrollable't><'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>",
 					
         });
 
         var nEditing = null;
         var nNew = false;
-
-        table.on('click', '.cancel', function (e) {
-            e.preventDefault();
-            if (nNew) {
-                oTable.fnDeleteRow(nEditing);
-                nEditing = null;
-                nNew = false;
-            } else {
-                restoreRow(oTable, nEditing);
-                nEditing = null;
-            }
+		
+		table.on('keypress', 'input', function (e) {
+             var nRow = $(this).parents('tr')[0];	 
+			 if (nRow && e.keyCode == "13") {
+			 	e.preventDefault();
+				saveRow(oTable, nRow);
+				nEditing = null;
+			 }
+           
         });
-
-        table.on('click', '.edit', function (e) {
+		
+        table.on('dblclick', 'td', function (e) {
             e.preventDefault();
             nNew = false;
             

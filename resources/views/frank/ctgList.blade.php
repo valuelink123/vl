@@ -285,10 +285,12 @@ th,td,td>span {
                     name: 'steps',
                     render(data, type, row) {
                         if (!data) return ''
-                        let steps = JSON.parse(data)
+                        let steps = eval('(' + data.replace(/<[^>]+>/g,"") + ')');//JSON.parse(data.replace(/<[^>]+>/g,""))
+						
                         let html = steps.track_notes[row.status]
+						//alert(html);
                         if (!html) return ''
-                        return $(html).text().trim().substr(0, 67)
+                        return html.trim().substr(0, 67)
                     }
                 },
                 {
