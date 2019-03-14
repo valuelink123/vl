@@ -61,7 +61,7 @@ class SkuController extends Controller
 		b.item_name,c.keywords,c.fba_stock,c.fbm_stock,c.fba_transfer,c.total_stock,c.fba_keep,c.total_keep,c.strategy,
 		d.ranking,d.rating,d.review,d.sales,d.price,d.flow,d.conversion
 
-from (select asin,site,max(item_no) as item_code,max(item_status) as status, max(bg) as bg,max(bu) as bu,max(sap_seller_id) as sap_seller_id from asin where status in ('A','B') group by asin,site) as a
+from (select asin,site,max(item_no) as item_code,max(item_status) as status, max(bg) as bg,max(bu) as bu,max(sap_seller_id) as sap_seller_id from asin group by asin,site) as a
 left join fbm_stock as b on a.item_code =b.item_code
 left join skus_week as c on a.asin = c.asin and a.site=c.site
 left join skus_week_details as d on a.asin = d.asin and a.site=d.site and d.weeks = '".$week."'

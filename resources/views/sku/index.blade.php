@@ -10,6 +10,7 @@
 }
 .input-small {
     width: 80%!important;
+	height: 20px;
 }
 
 th,td,td>span {
@@ -402,7 +403,7 @@ var TableDatatablesEditable = function () {
 						
                     },
 					
-					scrollY:        380,
+					scrollY:        450,
                     scrollX:        true,
 					buttons: [
                         { extend: 'csv', className: 'btn purple btn-outline ',filename:'skus' }
