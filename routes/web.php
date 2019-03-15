@@ -55,6 +55,7 @@ Route::resource('qa', 'QaiController');
 Route::Post('/qa/get', 'QaiController@get')->name('getQa');
 Route::get('/laravel-u-editor-server/server', 'CustomuploadController@server')->name('upload');
 Route::resource('question', 'QaController');
+Route::resource('category', 'CategoryController');
 Route::resource('group', 'GroupController');
 Route::resource('sellertab', 'SellertabController');
 Route::resource('rs', 'RsController');

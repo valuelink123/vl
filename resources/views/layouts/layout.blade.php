@@ -158,6 +158,13 @@
                                     <i class="fa fa-table"></i> Asin Table
                                 </a>
                             </li>
+                            <?php if(Auth::user()->admin){ ?>
+                            <li>
+                                <a href="/category">
+                                    <i class="fa fa-files-o"></i> Q&A Category
+                                </a>
+                            </li>
+                            <?php } ?>
                             <li>
                                 <a href="/qa">
                                     <i class="fa fa-files-o"></i> Q&A Manage
