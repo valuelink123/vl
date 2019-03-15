@@ -6,7 +6,7 @@ use App\Sendbox;
 use Illuminate\Http\Request;
 use App\Accounts;
 use Illuminate\Support\Facades\Session;
-
+use App\Asin;
 use App\User;
 use App\Group;
 use App\Inbox;
@@ -548,6 +548,12 @@ where a.date>=:sdate_from and a.date<=:sdate_to
 					$seller[$account['sellerid']]=$account['sellername'];
 				}
 				$users=$this->getUsers();
+				$sellers=[];
+				$sellers_data = DB::select("select users.id,max(bg) as bg,max(bu) as bu from users left join asin on users.sap_seller_id=asin.sap_seller_id where users.sap_seller_id>0 group by users.id");
+				foreach($sellers_data as $seller){
+					$sellers[$seller->id]['bg']=$seller->bg;
+					$sellers[$seller->id]['bu']=$seller->bu;
+				}
 				
 				$spreadsheet = new Spreadsheet();
 				$myWorkSheet = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($spreadsheet, 'Ads Fee');
@@ -573,8 +579,8 @@ where a.date>=:sdate_from and a.date<=:sdate_to
 						array_get($val,'InvoiceId'),
 						array_get($val,'TransactionValue'),
 						array_get($val,'Currency'),
-						array_get($val,'bg'),
-						array_get($val,'bu'),
+						array_get($sellers,array_get($val,'user_id').'.bg'),
+						array_get($sellers,array_get($val,'user_id').'.bu'),
 						array_get($val,'sku'),
 						array_get($users,array_get($val,'user_id'),array_get($val,'user_id'))
 					];
@@ -602,8 +608,8 @@ where a.date>=:sdate_from and a.date<=:sdate_to
 						array_get($val,'DealDescription'),
 						array_get($val,'TotalAmount'),
 						array_get($val,'Currency'),
-						array_get($val,'bg'),
-						array_get($val,'bu'),
+						array_get($sellers,array_get($val,'user_id').'.bg'),
+						array_get($sellers,array_get($val,'user_id').'.bu'),
 						array_get($val,'sku'),
 						array_get($users,array_get($val,'user_id'),array_get($val,'user_id'))
 					];
@@ -629,8 +635,8 @@ where a.date>=:sdate_from and a.date<=:sdate_to
 						array_get($val,'SellerCouponDescription'),
 						array_get($val,'TotalAmount'),
 						array_get($val,'Currency'),
-						array_get($val,'bg'),
-						array_get($val,'bu'),
+						array_get($sellers,array_get($val,'user_id').'.bg'),
+						array_get($sellers,array_get($val,'user_id').'.bu'),
 						array_get($val,'sku'),
 						array_get($users,array_get($val,'user_id'),array_get($val,'user_id'))
 					];
@@ -656,8 +662,8 @@ where a.date>=:sdate_from and a.date<=:sdate_to
 						array_get($val,'Type'),
 						array_get($val,'Amount'),
 						array_get($val,'Currency'),
-						array_get($val,'bg'),
-						array_get($val,'bu'),
+						array_get($sellers,array_get($val,'user_id').'.bg'),
+						array_get($sellers,array_get($val,'user_id').'.bu'),
 						array_get($val,'sku'),
 						array_get($users,array_get($val,'user_id'),array_get($val,'user_id'))
 					];
@@ -693,8 +699,8 @@ where a.date>=:sdate_from and a.date<=:sdate_to
 						array_get($val,'ad_conversion_rate'),
 						array_get($val,'default_bid'),
 						array_get($val,'state'),
-						array_get($val,'bg'),
-						array_get($val,'bu'),
+						array_get($sellers,array_get($val,'user_id').'.bg'),
+						array_get($sellers,array_get($val,'user_id').'.bu'),
 						array_get($val,'sku'),
 						array_get($users,array_get($val,'user_id'),array_get($val,'user_id'))
 					];
