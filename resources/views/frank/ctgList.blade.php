@@ -127,6 +127,7 @@ th,td,td>span {
                         <th>Date</th>
                         <th>Email</th>
                         <th>Customer</th>
+						<th>Order No</th>
                         <th>Item No</th>
                         <th>Item Name</th>
                         <th>Asin</th>
@@ -249,6 +250,7 @@ th,td,td>span {
                 },
                 {data: 'email', name: 'email'},
                 {data: 'name', name: 'name'},
+				{data: 'order_id', name: 'order_id'},
                 {data: 'itemCodes', name: 'itemCodes'},
                 {data: 'itemNames', name: 'itemNames', width: "200px"},
                 {

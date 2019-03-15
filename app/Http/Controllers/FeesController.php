@@ -426,6 +426,9 @@ class FeesController extends Controller
 		if($request->input('sku')){
             $datas = $datas->where('sku', $request->input('sku'));
         }
+		if($request->input('marketplace_id')){
+            $datas = $datas->where('marketplace_id', $request->input('marketplace_id'));
+        }
 		
 		if($request->input('feedes1')){
             $datas = $datas->where('campaign_name','like','%'.$request->input('feedes1').'%');
@@ -462,6 +465,7 @@ class FeesController extends Controller
 				
 				array_get($users,$list['user_id'],''),
 				$list['sku'],
+				array_get(getSiteUrl(),$list['marketplace_id'],$list['marketplace_id']),
 				$list['cost']
             );
 		}

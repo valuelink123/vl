@@ -18,8 +18,15 @@
                              
                                 <select class="form-control" name="product_id" id="product_id" required>
 								<?php 
-									foreach($products as $pd){ 
+									$c_s='';$i=0;
+									$p_c=count($products);
+									foreach($products as $pd){
+										$i++;
+										if($pd['site']<>$c_s && $c_s) echo '</optgroup>';
+										if($pd['site']<>$c_s) echo '<optgroup label="'.$pd['site'].'">';
+										$c_s = $pd['site'];
 										echo '<option value="'.$pd['id'].'" >'.$pd['product_name'].' </option>';
+										if($i==$p_c) echo '</optgroup>';
 									}?>
 								</select>
                             

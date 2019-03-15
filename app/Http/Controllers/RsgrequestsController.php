@@ -284,7 +284,7 @@ class RsgrequestsController extends Controller
 	
 	public function getproducts(){
 		$date=date('Y-m-d');
-		$products = RsgProduct::where('status',1)->where('daily_remain','>',0)->where('start_date','<=',$date)->where('end_date','>=',$date)->get()->toArray();
+		$products = RsgProduct::where('status',1)->where('daily_remain','>',0)->where('start_date','<=',$date)->where('end_date','>=',$date)->orderBy('site','asc')->get()->toArray();
 		return $products;
 	}
 

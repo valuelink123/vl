@@ -166,6 +166,7 @@ class CtgController extends Controller {
         $headArray[] = 'Date';
         $headArray[] = 'Email';
         $headArray[] = 'Customer';
+		$headArray[] = 'Order No';
         $headArray[] = 'Item No';
         $headArray[] = 'Item Name';
         $headArray[] = 'Asin';
@@ -265,6 +266,7 @@ class CtgController extends Controller {
                 $val['created_at'],
                 $val['email'],
                 $val['name'],
+				$val['order_id'],
                 $val['itemCodes'],
                 $val['itemNames'],
                 $val['asins'],

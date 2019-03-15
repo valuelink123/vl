@@ -39,10 +39,17 @@
                                 <select class="form-control" name="product_id" id="product_id" required>
 									<option value="{{$rule['product_id']}}" >{{array_get($product,'product_name')}}</option>
 									<?php 
-									foreach($products as $pd){ 
-									
+									$c_s='';$i=0;
+									$p_c=count($products);
+									foreach($products as $pd){
+										$i++;
+										if($pd['site']<>$c_s && $c_s) echo '</optgroup>';
+										if($pd['site']<>$c_s) echo '<optgroup label="'.$pd['site'].'">';
+										$c_s = $pd['site'];
 										if($pd['id']!=$rule['product_id']) echo '<option value="'.$pd['id'].'" >'.$pd['product_name'].' </option>';
+										if($i==$p_c) echo '</optgroup>';
 									}?>
+									
 								</select>
                             
                         </div>

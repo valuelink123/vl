@@ -956,6 +956,7 @@
 									
 									<th width="7%"> User </th>
 									<th width="7%"> SKU </th>
+									<th width="7%"> Site </th>
 									<th width="7%"> Cost </th>
 								</tr>
 								<tr role="row" class="filter">
@@ -1025,6 +1026,16 @@
 									
 									</td>
 									<td><input type="text" class="form-control form-filter input-sm" name="sku"></td>
+									<td>
+									
+										<select name="marketplace_id" class="form-control form-filter input-sm">
+										<option value="">All</option>
+										@foreach (getSiteUrl() as $k=>$v)
+												<option value="{{$k}}">{{$v}}</option>
+											@endforeach
+									</select>
+									
+									</td>
 									<td>
 										<div class="margin-bottom-5">
 											<button class="btn btn-sm green btn-outline filter-submit margin-bottom">
