@@ -25,12 +25,19 @@ th,td,td>span {
                         <i class="icon-settings font-dark"></i>
                         <span class="caption-subject bold uppercase">RSG Requests</span>
                     </div>
+			
 					<div class="col-md-6" style="padding: 0px;">
-						<div class="btn-group " style="float:right;">
 
+						<div class="btn-group " style="float:right;">
+							
 							<button id="rsg-requests-export" class="btn sbold blue"> Export
 								<i class="fa fa-download"></i>
 							</button>
+							
+							<a data-target="#ajax" data-toggle="modal" href="{{ url('rsgrequests/create')}}"><button id="sample_editable_1_2_new" class="btn sbold red"> Add New
+                                    <i class="fa fa-plus"></i>
+                                </button>
+                                </a>
 
 						</div>
 					</div>

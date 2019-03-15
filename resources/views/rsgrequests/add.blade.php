@@ -1,146 +1,120 @@
 
-
     <div class="row"><div class="col-md-12">
         <div class="portlet light bordered">
 
             <div class="portlet-body form">
-                <form role="form" action="{{ url('rsgproducts') }}" method="POST">
+                <form role="form" action="{{ url('rsgrequests') }}" method="POST">
                     {{ csrf_field() }}
+
                     <div class="form-body">
-						<div class="form-group col-md-6">
-                            <label>Start Date</label>
-                            <div class="input-group date date-picker" data-date-format="yyyy-mm-dd">
-								<input type="text" class="form-control" readonly name="start_date" placeholder="From" value="{{date('Y-m-d')}}" required>
-								<span class="input-group-btn">
-									<button class="btn default" type="button">
-										<i class="fa fa-calendar"></i>
-									</button>
-								</span>
-							</div>
-                        </div>
-                        <div class="form-group col-md-6">
-                            <label>End Date</label>
-                            <div class="input-group date date-picker" data-date-format="yyyy-mm-dd">
-								<input type="text" class="form-control" readonly name="end_date" placeholder="To" value="{{date('Y-m-d')}}" required>
-								<span class="input-group-btn">
-									<button class="btn   default" type="button">
-										<i class="fa fa-calendar"></i>
-									</button>
-								</span>
-							</div>
-                        </div>
-                        <div class="form-group col-md-6">
-                            <label>Account</label>
+						
+				
+				
+				<div class="clearfix margin-bottom-20"></div>
+				
+						<div class="form-group col-md-12">
+                            <label>Products</label>
                             
-                                
-								<select name="seller_id" class="form-control" required>
-								   <?php 
-									foreach($accounts as $k=>$v){ 	
-										echo '<option value="'.$k.'">'.$v.' ( '.$k.' ) </option>';
+                             
+                                <select class="form-control" name="product_id" id="product_id" required>
+								<?php 
+									$c_s='';$i=0;
+									$p_c=count($products);
+									foreach($products as $pd){
+										$i++;
+										if($pd['site']<>$c_s && $c_s) echo '</optgroup>';
+										if($pd['site']<>$c_s) echo '<optgroup label="'.$pd['site'].'">';
+										$c_s = $pd['site'];
+										echo '<option value="'.$pd['id'].'" >'.$pd['product_name'].' </option>';
+										if($i==$p_c) echo '</optgroup>';
 									}?>
 								</select>
                             
                         </div>
                         <div class="form-group col-md-6">
-                            <label>Site</label>
-                           
-                                
-                                <select name="site" class="form-control " required>
-								   <?php 
-									foreach(getAsinSites() as $v){ 	
-										echo '<option value="'.$v.'">'.$v.' </option>';
-									}?>
-								</select>
-                            
-                        </div>
-                        <div class="form-group col-md-6">
-                            <label>Asin</label>
+                            <label>Customer Email</label>
                             
                              
-                                <input type="text" class="form-control" name="asin" id="asin" value="" required>
+                                <input type="text" class="form-control" name="customer_email" id="customer_email"  required>
                             
                         </div>
 						
 						<div class="form-group col-md-6">
-                            <label>Daily Gift Quantity</label>
-                            
-                      
-                                <input type="text" class="form-control" name="daily_stock" id="daily_stock" value="" required>
-                           
+                            <label>Current Step</label>
+								<select class="form-control " name="step" id="step" required>
+								<?php 
+								foreach(getStepStatus() as $k=>$v){ 	
+									echo '<option value="'.$k.'" >'.$v.'</option>';
+								}?>
+								
+								</select>                           
                         </div>
 						<div class="form-group col-md-6">
-                            <label>Product Name</label>
+                            <label>Customer Paypal</label>
                             
                              
-                                <input type="text" class="form-control" name="product_name" id="product_name" value="" required>
+                                <input type="text" class="form-control" name="customer_paypal_email" id="customer_paypal_email" >
                             
                         </div>
 						
 						<div class="form-group col-md-6">
-                            <label>Product Image</label>
-                            
-                      
-                                <input type="text" class="form-control" name="product_img" id="product_img" value="">
-                           
-                        </div>
-						
-						<div class="form-group col-md-6">
-                            <label>Price</label>
+                            <label>Fund Money</label>
                             	<div class="clearfix"></div>
                              	<div class="form-inline">
-                                <input type="text" class="form-control col-md-8" name="price" id="price" value="" required>
+                                <input type="text" class="form-control col-md-8" name="transfer_amount" id="transfer_amount" >
 								
-								<select class="form-control col-md-4" name="currency" id="currency" required>
+								<select class="form-control col-md-4" name="transfer_currency" id="transfer_currency">
 								<?php 
-									foreach(getCurrency() as $v){ 	
-										echo '<option value="'.$v.'">'.$v.' </option>';
+									foreach(getCurrency() as $v){ 
+										echo '<option value="'.$v.'" >'.$v.' </option>';
 									}?>
 								</select>
 								</div>
                             
                         </div>
 						
+						
+
+						
+						
+						
 						<div class="form-group col-md-6">
-                            <label>Purchase Search Keywords</label>
-                            
-                      
-                                <input type="text" class="form-control" name="keyword" id="keyword" value="">
+                            <label>Amazon Order Id</label>
+                                <input type="text" class="form-control" name="amazon_order_id" id="amazon_order_id" >
                            
                         </div>
 						
 						<div class="form-group col-md-6">
-                            <label>Purchase Search Page No.</label>
-                            
-                      
-                                <input type="text" class="form-control" name="page" id="page" value="" >
-                           
-                        </div>
-						
-						
-						<div class="form-group col-md-6">
-                            <label>Purchase Search Position</label>
-                            
-                      
-                                <input type="text" class="form-control" name="position" id="position" value="" >
+                            <label>Review Url</label>
+                                <input type="text" class="form-control" name="review_url" id="review_url" >
                            
                         </div>
 						
 						<div class="form-group col-md-6">
-                            <label>Positive Target</label>
-                            
-                      
-                                <input type="text" class="form-control" name="positive_target" id="positive_target" value="">
+                            <label>Remark</label>
+                                <input type="text" class="form-control" name="transaction_id" id="transaction_id" >
                            
                         </div>
-						
-						
+
 						<div class="form-group col-md-6">
-                            <label>Positive Daily Limit</label>
-                            
-                      
-                                <input type="text" class="form-control" name="positive_daily_limit" id="positive_daily_limit" value="">
-                           
-                        </div>
+							<label>Star rating</label>
+							<input type="text" class="form-control" name="star_rating" id="star_rating" >
+
+						</div>
+
+						<div class="form-group col-md-6">
+							<label>Follow</label>
+							<input type="text" class="form-control" name="follow" id="follow" >
+
+						</div>
+
+						<div class="form-group col-md-6">
+							<label>Next follow date</label>
+							<input type="text" class="form-control" name="next_follow_date" id="next_follow_date">
+
+						</div>
+						
+
 						
                     </div>
                     <div class="form-actions">
@@ -158,11 +132,4 @@
     </div>
 
     </div>
-<script>
-$(function() {
-$('.date-picker').datepicker({
-	rtl: App.isRTL(),
-	autoclose: true
-});
-});
-</script>
+

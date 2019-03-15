@@ -516,6 +516,13 @@
                             <?php if($action=='salesp') echo '<span class="selected"></span>';?>
                         </a>
                     </li>
+					<li class="nav-item <?php if($action=='skus') echo 'active';?>">
+                        <a href="{{ url('skus') }}" class="nav-link nav-toggle">
+                            <i class="fa fa-calendar"></i>
+                            <span class="title">Daily Sales Report</span>
+                            <?php if($action=='skus') echo '<span class="selected"></span>';?>
+                        </a>
+                    </li>
 					
 					<li class="nav-item <?php if($action=='rsgproducts') echo 'active';?>">
                         <a href="{{ url('rsgproducts') }}" class="nav-link nav-toggle">

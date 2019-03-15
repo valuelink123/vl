@@ -127,6 +127,7 @@ th,td,td>span {
                         <th>Date</th>
                         <th>Email</th>
                         <th>Customer</th>
+						<th>Order No</th>
                         <th>Item No</th>
                         <th>Item Name</th>
                         <th>Asin</th>
@@ -249,6 +250,7 @@ th,td,td>span {
                 },
                 {data: 'email', name: 'email'},
                 {data: 'name', name: 'name'},
+				{data: 'order_id', name: 'order_id'},
                 {data: 'itemCodes', name: 'itemCodes'},
                 {data: 'itemNames', name: 'itemNames', width: "200px"},
                 {
@@ -285,10 +287,12 @@ th,td,td>span {
                     name: 'steps',
                     render(data, type, row) {
                         if (!data) return ''
-                        let steps = JSON.parse(data)
+                        let steps = eval('(' + data.replace(/<[^>]+>/g,"") + ')');//JSON.parse(data.replace(/<[^>]+>/g,""))
+						
                         let html = steps.track_notes[row.status]
+						//alert(html);
                         if (!html) return ''
-                        return $(html).text().trim().substr(0, 67)
+                        return html.trim().substr(0, 67)
                     }
                 },
                 {

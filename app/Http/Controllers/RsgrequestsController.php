@@ -206,7 +206,70 @@ class RsgrequestsController extends Controller
 		}
 		return $seller;
     }
+	
+	public function create()
+    {
+        return view('rsgrequests/add',['products'=>self::getproducts()]);
+    }
 
+
+    public function store(Request $request)
+    {
+        //if(!Auth::user()->admin) die('Permission denied');
+        $this->validate($request, [
+			'step' => 'required|int',
+			'product_id' => 'required|int',
+			'customer_email' => 'required|email'
+        ]);
+		
+        $rule = new RsgRequest();
+		$rule->customer_email = $request->get('customer_email');
+		$rule->customer_paypal_email = $request->get('customer_paypal_email');
+		$rule->transfer_paypal_account = $request->get('transfer_paypal_account');
+		$rule->transaction_id = $request->get('transaction_id');
+		$rule->amazon_order_id = $request->get('amazon_order_id');
+		$rule->transfer_amount = round($request->get('transfer_amount'),2);
+		$rule->transfer_currency = $request->get('transfer_currency');
+		$rule->review_url = $request->get('review_url');
+        $rule->step = intval($request->get('step'));
+		if(intval($request->get('product_id'))) $rule->product_id = intval($request->get('product_id'));
+		$rule->star_rating = $request->get('star_rating');
+		$rule->follow = $request->get('follow');
+		$rule->next_follow_date = $request->get('next_follow_date');
+
+        $rule->user_id = intval(Auth::user()->id);
+        if ($rule->save()) {
+			$step_to_tags = array(
+				'1'  => 'RSG Join',
+				'2'  => 'RSG Request Reject',
+				'3'  => 'RSG Submit Paypal',
+				'4'  => 'RSG Check Paypal',
+				'5'  => 'RSG Submit Purchase',
+				'6'  => 'RSG Check Purchase',
+				'7'  => 'RSG Submit Review Url',
+				'8'  => 'RSG Check Review Url',
+				'9'  => 'RSG Completed'
+			);
+			$product= RsgProduct::where('id',$rule->product_id)->first()->toArray();
+			$mailchimpData = array(
+				'PROIMG'=>$product['product_img'],'PRONAME'=>$product['product_name'],'PROKEY'=>$product['keyword'],'PROPAGE'=>$product['page'],'PROPOS'=>$product['position']
+			);
+			if($rule->customer_paypal_email) $mailchimpData['PAYPAL'] = $rule->customer_paypal_email;
+			if($rule->transfer_amount) $mailchimpData['FUNDED'] = $rule->transfer_amount.' '.$rule->transfer_currency;
+			if($rule->amazon_order_id) $mailchimpData['ORDERID'] = $rule->amazon_order_id;
+			if($rule->review_url) $mailchimpData['REVIEWURL'] = $rule->review_url;
+			self::mailchimp($rule->customer_email,array_get($step_to_tags,$rule->step),[
+						'email_address' => $rule->customer_email,
+						'status'        => 'subscribed',
+						'merge_fields' => $mailchimpData]);
+            $request->session()->flash('success_message','Set Rsg Request Success');
+            return redirect('rsgrequests');
+        }else{
+            $request->session()->flash('error_message','Set Rsg Request Failed');
+            return redirect()->back()->withInput();
+        }
+    }
+	
     public function edit(Request $request,$id)
     {
         $rule= RsgRequest::where('id',$id)->first()->toArray();
@@ -216,8 +279,14 @@ class RsgrequestsController extends Controller
         }
 		if(array_get($rule,'customer_paypal_email')) $rule['trans']=self::getTrans(array_get($rule,'customer_paypal_email'));
 		$product= RsgProduct::where('id',$rule['product_id'])->first()->toArray();
-        return view('rsgrequests/edit',['rule'=>$rule,'product'=>$product]);
+        return view('rsgrequests/edit',['rule'=>$rule,'product'=>$product,'products'=>self::getproducts()]);
     }
+	
+	public function getproducts(){
+		$date=date('Y-m-d');
+		$products = RsgProduct::where('status',1)->where('daily_remain','>',0)->where('start_date','<=',$date)->where('end_date','>=',$date)->orderBy('site','asc')->get()->toArray();
+		return $products;
+	}
 
     public function update(Request $request,$id)
     {
@@ -235,7 +304,7 @@ class RsgrequestsController extends Controller
 		$rule->transfer_currency = $request->get('transfer_currency');
 		$rule->review_url = $request->get('review_url');
         $rule->step = intval($request->get('step'));
-
+		if(intval($request->get('product_id'))) $rule->product_id = intval($request->get('product_id'));
 		$rule->star_rating = $request->get('star_rating');
 		$rule->follow = $request->get('follow');
 		$rule->next_follow_date = $request->get('next_follow_date');
