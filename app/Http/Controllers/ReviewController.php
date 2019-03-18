@@ -517,22 +517,22 @@ class ReviewController extends Controller
 		}
 		
         for($i = $iDisplayStart; $i < $end; $i++) {
-			$rating_chstr = '';
+			$rating_chstr =$date_chstr = '';
 			if($ordersList[$i]['updated_rating']>0 && $ordersList[$i]['updated_rating']!=$ordersList[$i]['rating']){
 				if($ordersList[$i]['updated_rating']>$ordersList[$i]['rating']){
 					$rating_chstr = '<span class="badge badge-danger"><i class="fa fa-angle-double-up"></i> '.$ordersList[$i]['updated_rating'].'</span>';
+					if($ordersList[$i]['updated_date']) $date_chstr = '<span class="badge badge-danger">'.$ordersList[$i]['updated_date'].'</span>';
 				}else{
 					$rating_chstr = '<span class="badge badge-success"><i class="fa fa-angle-double-down"></i>'.$ordersList[$i]['updated_rating'].'</span>';
-				}
-				
-				
+					if($ordersList[$i]['updated_date']) $date_chstr = '<span class="badge badge-success">'.$ordersList[$i]['updated_date'].'</span>';
+				}	
 			}
 			$fol_arr= unserialize($ordersList[$i]['follow_content'])?unserialize($ordersList[$i]['follow_content']):array();
 			$records["data"][] = array(
 				 '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input name="id[]" type="checkbox" class="checkboxes" value="'.$ordersList[$i]['id'].'"/><span></span></label>',
 				$ordersList[$i]['negative_value'],
 				'<a href="https://'.$ordersList[$i]['site'].'/dp/'.$ordersList[$i]['asin'].'" target="_blank">'.$ordersList[$i]['asin'].'</a> <span class="label label-sm label-default">'.strtoupper(substr(strrchr($ordersList[$i]['site'], '.'), 1)).'</span>',
-				$ordersList[$i]['date'],
+				$ordersList[$i]['date'].' '.$date_chstr,
 				$ordersList[$i]['rating'].' '.$rating_chstr,
 				$ordersList[$i]['average_score'],
 				$ordersList[$i]['total_star_number'],
