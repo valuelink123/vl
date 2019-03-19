@@ -40,20 +40,20 @@ class SkuController extends Controller
 		if($bgbu){
 		   $bgbu_arr = explode('_',$bgbu);
 		   if(array_get($bgbu_arr,0)){
-				$where.= "and a.bg='".array_get($bgbu_arr,0)."'";
+				$where.= " and a.bg='".array_get($bgbu_arr,0)."'";
 		   }
 		   if(array_get($bgbu_arr,1)){
-				$where.= "and a.bu='".array_get($bgbu_arr,1)."'";
+				$where.= " and a.bu='".array_get($bgbu_arr,1)."'";
 		   }
 		}
 		if($site){
-			$where.= "and a.site='".$site."'";
+			$where.= " and a.site='".$site."'";
 		}
 		if($user_id){
-			$where.= "and a.sap_seller_id=".$user_id;
+			$where.= " and a.sap_seller_id=".$user_id;
 		}
 		if($sku){
-			$where.= "and (a.asin='".$sku."' or a.item_code='".$sku."')";
+			$where.= " and (a.asin='".$sku."' or a.item_code='".$sku."')";
 		}
 	    $date_start = $request->get('date_start')?$request->get('date_start'):date('Y-m-d',strtotime('+ 8hours'));
 		$week = self::getWeek($date_start);
