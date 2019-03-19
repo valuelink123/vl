@@ -31,12 +31,24 @@ class SkuController extends Controller
 	
     public function index(Request $request)
     {
-		$where='';
+		
 		$site = $request->get('site');
 		$bgbu = $request->get('bgbu');
 		$user_id = $request->get('user_id');
 		$sku = $request->get('sku');
-		if(Auth::user()->sap_seller_id) $where.= "and a.sap_seller_id=".Auth::user()->sap_seller_id;
+		if (Auth::user()->seller_rules) {
+			$rules = explode("-",Auth::user()->seller_rules);
+			$where= "where 1=1";
+			if(array_get($rules,0)!='*') $where.= " and a.bg='".array_get($rules,0)."'";
+			if(array_get($rules,1)!='*') $where.= " and a.bu='".array_get($rules,1)."'";
+		} elseif (Auth::user()->sap_seller_id) {
+			$where= "where a.sap_seller_id=".Auth::user()->sap_seller_id;
+		} else {
+			$where= "where 1=1";
+		}
+
+
+
 		if($bgbu){
 		   $bgbu_arr = explode('_',$bgbu);
 		   if(array_get($bgbu_arr,0)){
@@ -65,7 +77,7 @@ from (select asin,site,max(item_no) as item_code,max(item_status) as status, max
 left join fbm_stock as b on a.item_code =b.item_code
 left join skus_week as c on a.asin = c.asin and a.site=c.site
 left join skus_week_details as d on a.asin = d.asin and a.site=d.site and d.weeks = '".$week."'
-where 1=1 ".$where);
+ ".$where);
 
 
         $returnDate['teams']= DB::select('select bg,bu from asin group by bg,bu ORDER BY BG ASC,BU ASC');
