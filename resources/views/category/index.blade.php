@@ -53,7 +53,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="btn-group">
-                                <a data-target="#ajax" data-toggle="modal" href="{{ url('category/create')}}"><button id="sample_editable_1_2_new" class="btn sbold blue"> Add New
+                                <a data-target="#ajax" data-toggle="modal" href="{{ url('category/create?type=1')}}"><button id="sample_editable_1_2_new" class="btn sbold blue"> Add New
                                     <i class="fa fa-plus"></i>
                                 </button>
                                 </a>
@@ -74,6 +74,32 @@
 						</div>
 					</div>
                 </div>
+
+				<div class="table-toolbar" style="margin-top: 30px;">
+					<div class="row">
+						<div class="col-md-6">
+							<div class="btn-group">
+								<a data-target="#ajax" data-toggle="modal" href="{{ url('category/create?type=2')}}"><button id="sample_editable_1_2_new" class="btn sbold blue"> Add New
+										<i class="fa fa-plus"></i>
+									</button>
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="portlet-body">
+
+					<div class="table-container" style=" border: 1px solid #f3f4f6;">
+						<div style="background: #f3f4f6;height: 30px; line-height: 30px; font-weight: bold;">
+							<div style="float: left; margin-left: 30px; line-height: 30px;">Knowledge Category name</div>
+							<div style="float: right; margin-right: 40px; line-height: 30px;">Actions</div>
+						</div>
+						<div style="clear: both;"></div>
+						<div class="zTreeDemoBackground">
+							<ul id="tree" class="ztree"></ul>
+						</div>
+					</div>
+				</div>
             </div>
             <!-- END EXAMPLE TABLE PORTLET-->
         </div>
@@ -128,15 +154,40 @@
 		}
 	};
 
+	var settings = {
+		view: {
+			showLine: false,
+			showIcon: false,
+			addDiyDom: addDiyDoms,
+		},
+		data: {
+			simpleData: {
+				enable: true
+			}
+		}
+	};
+
 	var zNodes =[
 
 			<?php
-			foreach($tree as $key=>$val){
+			foreach($category_one as $key=>$val){
 			?>
 		{ id:"<?=$val['id']?>", pId:"<?=$val['category_pid']?>", name:"<?=$val['category_name']?>"},
 			<?php
 			}
 			?>
+
+	];
+
+	var zNodesList =[
+
+			<?php
+			foreach($category_two as $key=>$val){
+			?>
+		{ id:"<?=$val['id']?>", pId:"<?=$val['category_pid']?>", name:"<?=$val['category_name']?>"},
+		<?php
+		}
+		?>
 
 	];
 
@@ -146,7 +197,20 @@
 				icoObj = $("#" + treeNode.tId + "_ico");
 		switchObj.remove();
 		icoObj.before(switchObj);
-		var spaceStr = "<span style='display: inline-block;width:" + (spaceWidth * treeNode.level)+ "px'></span> <span style='position:absolute;right:0px; margin-right: 40px;'><a data-target='#ajax' data-toggle='modal' href='category/"+treeNode.id+"/edit' style='text-align: center; width: 50px;background-color: #36c6d3;color: #ffffff; margin-right: 10px;' id='diyBtn2_" +treeNode.id+ "'>Edit</a>" +
+		var spaceStr = "<span style='display: inline-block;width:" + (spaceWidth * treeNode.level)+ "px'></span> <span style='position:absolute;right:0px; margin-right: 40px;'><a data-target='#ajax' data-toggle='modal' href='category/"+treeNode.id+"/edit?type=1' style='text-align: center; width: 50px;background-color: #36c6d3;color: #ffffff; margin-right: 10px;' id='diyBtn2_" +treeNode.id+ "'>Edit</a>" +
+				"<a data-target='#Delete' data-toggle='modal' style='text-align: center;width: 50px;background-color: #ed6b75;color: #ffffff;margin-right: 10px;' id='diyBtn1_" +treeNode.id+ "' onclick='del("+treeNode.id+")'>Delete</a> </span>";
+
+		switchObj.before(spaceStr);
+
+	}
+
+	function addDiyDoms(treeId, treeNode) {
+		var spaceWidth = 5;
+		var switchObj = $("#" + treeNode.tId + "_switch"),
+				icoObj = $("#" + treeNode.tId + "_ico");
+		switchObj.remove();
+		icoObj.before(switchObj);
+		var spaceStr = "<span style='display: inline-block;width:" + (spaceWidth * treeNode.level)+ "px'></span> <span style='position:absolute;right:0px; margin-right: 40px;'><a data-target='#ajax' data-toggle='modal' href='category/"+treeNode.id+"/edit?type=2' style='text-align: center; width: 50px;background-color: #36c6d3;color: #ffffff; margin-right: 10px;' id='diyBtn2_" +treeNode.id+ "'>Edit</a>" +
 				"<a data-target='#Delete' data-toggle='modal' style='text-align: center;width: 50px;background-color: #ed6b75;color: #ffffff;margin-right: 10px;' id='diyBtn1_" +treeNode.id+ "' onclick='del("+treeNode.id+")'>Delete</a> </span>";
 
 		switchObj.before(spaceStr);
@@ -161,6 +225,22 @@
 		var treeObj = $("#treeDemo");
 		$.fn.zTree.init(treeObj, setting, zNodes);
 		zTree_Menu = $.fn.zTree.getZTreeObj("treeDemo");
+		curMenu = zTree_Menu.getNodes();
+		zTree_Menu.selectNode(curMenu);
+
+		treeObj.hover(function () {
+			if (!treeObj.hasClass("showIcon")) {
+				treeObj.addClass("showIcon");
+			}
+		}, function() {
+			treeObj.removeClass("showIcon");
+		});
+	});
+
+	$(document).ready(function(){
+		var treeObj = $("#tree");
+		$.fn.zTree.init(treeObj, settings, zNodesList);
+		zTree_Menu = $.fn.zTree.getZTreeObj("tree");
 		curMenu = zTree_Menu.getNodes();
 		zTree_Menu.selectNode(curMenu);
 

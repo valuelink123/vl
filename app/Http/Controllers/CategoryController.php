@@ -43,23 +43,31 @@ class CategoryController extends Controller
         $order_by = 'created_at';
         $sort = 'desc';
 
-        $tree =  $data->orderBy($order_by,$sort)->get()->toArray();
-        //$tree = $this->getTree($lists,0);
+        $data_one = $data->where('category_type', 1);
+        $data_two = $data->where('category_type', 2);
+        $category_one = $data_one->orderBy($order_by,$sort)->get()->toArray();
+        $category_two = $data_two->orderBy($order_by,$sort)->get()->toArray();
 
-        return view('category/index',['tree'=>$tree]);
+        return view('category/index',['category_one'=>$category_one,'category_two'=>$category_two]);
     }
 
-    public function create()
+    public function create(Request $request)
     {
 
+        $category_type = $request->get('type',1);
         $data = new Category;
         $order_by = 'created_at';
         $sort = 'desc';
 
         $lists =  $data->orderBy($order_by,$sort)->get()->toArray();
-        $tree = $this->getTree($lists,0);
+        if($category_type == 2){
+            $tree = $this->getTree($lists,29);
+        }else{
+            $tree = $this->getTree($lists,28);
+        }
 
-        return view('category/add',['tree'=>$tree]);
+
+        return view('category/add',['tree'=>$tree,'category_type'=>$category_type]);
     }
 
     public function store(Request $request)
@@ -73,6 +81,7 @@ class CategoryController extends Controller
         $category->category_pid = $request->get('superior_category');
         $category->category_name = $request->get('category_name');
         $category->category_order = 0;
+        $category->category_type = $request->get('category_type',1);
 
         if ($category->save()) {
             $request->session()->flash('success_message','Set Category Success');
@@ -108,8 +117,15 @@ class CategoryController extends Controller
         $data = new Category;
         $order_by = 'created_at';
         $sort = 'desc';
+
+        $category_type = $request->get('type',1);
+
         $lists =  $data->orderBy($order_by,$sort)->get()->toArray();
-        $tree = $this->getTree($lists,0);
+        if($category_type == 2){
+            $tree = $this->getTree($lists,29);
+        }else{
+            $tree = $this->getTree($lists,28);
+        }
 
         $category = Category::where('id',$id)->first()->toArray();
 
@@ -117,7 +133,7 @@ class CategoryController extends Controller
             $request->session()->flash('error_message','Qa Category not Exists');
             return redirect('category');
         }
-        return view('category/edit',['category'=>$category,'tree'=>$tree]);
+        return view('category/edit',['category'=>$category,'tree'=>$tree,'category_type'=>$category_type]);
     }
 
     public function update(Request $request,$id)
@@ -133,6 +149,7 @@ class CategoryController extends Controller
         $category->category_pid = $request->get('superior_category');
         $category->category_name = $request->get('category_name');
         $category->category_order = 0;
+        $category->category_type = $request->get('category_type',1);
 
         if ($category->save()) {
             $request->session()->flash('success_message','Set Category Success');

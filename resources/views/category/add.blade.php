@@ -6,10 +6,10 @@
             <div class="portlet-body form">
                 <form role="form" action="{{ url('category') }}" method="POST">
                     {{ csrf_field() }}
+                    <input type="hidden" name="category_type" value="<?php echo $category_type;?>" />
                     <div class="form-body">
                         <div class="form-group col-md-12" style="margin-top: 40px;">
                             <label>Superior category</label>
-
                             <select name="superior_category" class="form-control " required>
                                 <option value="0">Primary category</option>
                                 <?php

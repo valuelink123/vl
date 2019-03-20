@@ -6,6 +6,7 @@
                 <form role="form" action="{{ url('category/'.$category['id']) }}" method="POST">
                     {{ csrf_field() }}
                     {{ method_field('PUT') }}
+                    <input type="hidden" name="category_type" value="<?php echo $category_type;?>" />
                     <div class="form-body">
                         <div class="form-group col-md-12" style="margin-top: 40px;">
                             <label>Superior category</label>

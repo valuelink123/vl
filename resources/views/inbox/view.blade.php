@@ -721,208 +721,219 @@
 
 
                 <div class="tab-pane" id="tab_4">
-                    <div class="col-xs-7">
-                        <form role="form" action="{{ url('inbox/change') }}" method="POST">
-                            {{ csrf_field() }}
-                            <input type="hidden" name="inbox_id" id="inbox_id" value ="{{$email['id']}}">
-                    <div class="form-group">
-                        <label>Change Mail Status</label>
-                        <div class="input-group ">
-                                <span class="input-group-addon">
-                                    <i class="fa fa-bookmark"></i>
-                                </span>
-                            <select class="form-control" name="reply" id="reply">
-                                <option value="2" <?php if(2==$email['reply']) echo 'selected';?>>Replied</option>
-                                <option value="1" <?php if(1==$email['reply']) echo 'selected';?>>Do not need to reply</option>
-                                <option value="0" <?php if(0==$email['reply']) echo 'selected';?>>Need reply</option>
-                            </select>
+                    <form role="form" action="{{ url('inbox/change') }}" method="POST">
+                        {{ csrf_field() }}
+                        <input type="hidden" name="inbox_id" id="inbox_id" value ="{{$email['id']}}">
+                        <div class="col-xs-6">
+                        <div class="form-group">
+                            <label>Change Mail Status</label>
+                            <div class="input-group ">
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-bookmark"></i>
+                                    </span>
+                                <select class="form-control" name="reply" id="reply">
+                                    <option value="2" <?php if(2==$email['reply']) echo 'selected';?>>Replied</option>
+                                    <option value="1" <?php if(1==$email['reply']) echo 'selected';?>>Do not need to reply</option>
+                                    <option value="0" <?php if(0==$email['reply']) echo 'selected';?>>Need reply</option>
+                                </select>
+                            </div>
                         </div>
-                    </div>
+
+                        <div class="form-group">
+                            <label>Set Mark</label>
+                            <div class="input-group">
+                                <select class="form-control form-filter input-sm" name="mark">
+                                    <option value="">Select...</option>
+                                    @foreach (getMarks() as $mark)
+                                        <option value="{{$mark}}" <?php if($mark==$email['mark']) echo 'selected';?>>{{$mark}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Question Type</label>
+                            <div class="input-group ">
+                            <span class="input-group-addon">
+                                <i class="fa fa-bookmark"></i>
+                            </span>
+                                <select class="form-control" name="etype" id="etype">
+                                    <option value="">None</option>
+                                    @foreach (getEType() as $etype)
+                                        <option value="{{$etype}}" <?php if($etype==$email['etype']) echo 'selected';?>>{{$etype}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Add Remark</label>
+                            <div class="input-group ">
+                            <span class="input-group-addon">
+                                <i class="fa fa-bookmark"></i>
+                            </span>
+                                <input type="text" class="form-control" name="remark" id="remark" value="{{$email['remark']}}" >
+                            </div>
+                        </div>
+                            <div style="clear:both;"></div>
+                        </div>
+                        <div class="col-xs-6">
+                                <div class="form-group">
+                                    <label>Assign to</label>
+                                    <div class="input-group ">
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-user"></i>
+                                    </span>
+                                        <select class="form-control" name="user_id" id="user_id">
+                                            @foreach ($groups as $group_id=>$group)
+                                                <optgroup label="{{array_get($group,'group_name')}}">
+                                                    @foreach (array_get($group,'user_ids') as $user_id)
+                                                        <option value="{{$group_id.'_'.$user_id}}" <?php if($group_id.'_'.$user_id==$email['group_id'].'_'.$email['user_id']) echo 'selected';?>>{{array_get($users,$user_id)}}</option>
+                                                    @endforeach
+                                                </optgroup>
+                                            @endforeach
 
 
-                    <div class="form-group">
-                        <label>SKU</label>
-                        <div class="input-group ">
-                        <span class="input-group-addon">
-                            <i class="fa fa-bookmark"></i>
-                        </span>
-                            <input type="text" class="form-control" name="sku" id="sku" value="{{$email['sku']}}" >
-                        </div>
-                    </div>
-					
-					<div class="form-group">
-                        <label>ASIN</label>
-                        <div class="input-group ">
-                        <span class="input-group-addon">
-                            <i class="fa fa-bookmark"></i>
-                        </span>
-                            <input type="text" class="form-control" name="asin" id="asin" value="{{$email['asin']}}" >
-                        </div>
-                    </div>
-					
-					<div class="form-group">
-                        <label>Item NO.</label>
-                        <div class="input-group ">
-                        <span class="input-group-addon">
-                            <i class="fa fa-bookmark"></i>
-                        </span>
-                            <input type="text" class="form-control" name="item_no" id="item_no" value="{{$email['item_no']}}" >
-                        </div>
-                    </div>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>ASIN</label>
+                                    <div class="input-group ">
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-bookmark"></i>
+                                    </span>
+                                        <input type="text" class="form-control" name="asin" id="asin" value="{{$email['asin']}}" >
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>SKU</label>
+                                    <div class="input-group ">
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-bookmark"></i>
+                                    </span>
+                                        <input type="text" class="form-control" name="sku" id="sku" value="{{$email['sku']}}" >
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Item NO.</label>
+                                    <div class="input-group ">
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-bookmark"></i>
+                                    </span>
+                                        <input type="text" class="form-control" name="item_no" id="item_no" value="{{$email['item_no']}}" >
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Item Group</label>
+                                    <div class="input-group ">
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-bookmark"></i>
+                                    </span>
+                                        <input type="text" class="form-control" name="item_no" id="item_no" value="{{$email['item_no']}}" >
+                                    </div>
+                                </div>
 
 
-                    <div class="form-group">
-                        <label>Question Type</label>
-                        <div class="input-group ">
-                        <span class="input-group-addon">
-                            <i class="fa fa-bookmark"></i>
-                        </span>
-                            <select class="form-control" name="etype" id="etype">
-                                <option value="">None</option>
-                                @foreach (getEType() as $etype)
-                                    <option value="{{$etype}}" <?php if($etype==$email['etype']) echo 'selected';?>>{{$etype}}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-					
-					<div class="form-group">
-                        <label>Problem Point</label>
-                        <div class="epoint_selectList form-inline">
-							<select class="epoint_group form-control" name="epoint_group">
-							<option value="{{$email['epoint_group']}}">{{$email['epoint_group']}}</option>
-							</select>
-							<select class="epoint_product form-control" name="epoint_product">
-							<option value="{{$email['epoint_product']}}">{{$email['epoint_product']}}</option>
-							
-							</select>
-							<select class="epoint form-control" name="epoint">
-							<option value="{{$email['epoint']}}">{{$email['epoint']}}</option>
-							</select>
-							</div>
-						<script type="text/javascript">
-						$(function(){
-							$(".epoint_selectList").each(function(){
-								var url = "/epoint.json";
-								var epointJson;
-								var temp_html;
-								var oepoint_group = $(this).find(".epoint_group");
-								var oepoint_product = $(this).find(".epoint_product");
-								var oepoint = $(this).find(".epoint");
 
-								var epoint_group = function(){
-									temp_html = '<option value="">Group</option>';
-									$.each(epointJson,function(i,epoint_group){
-										temp_html+='<option value="'+i+'" '+((oepoint_group.val() == i) ?"selected":"")+'>'+i+'</option>';
-									});
-									oepoint_group.html(temp_html);
-									epoint_product();
-								};
-			
-								var epoint_product = function(){
-									temp_html = '<option value="">Product</option>';
-									
-										var n = oepoint_group.val();
-										if(typeof(epointJson[n]) == "undefined"){
-											oepoint_product.css("display","none");
-											oepoint.css("display","none");
-										}else{
-											oepoint_product.css("display","inline");
-											$.each(epointJson[n],function(i,epoint_product){
-												temp_html+='<option value="'+i+'" '+((oepoint_product.val() == i) ?"selected":"")+'>'+i+'</option>';
-											});
-											oepoint_product.html(temp_html);
-											epoint();
-										}
-									
-								};
-						
-								var epoint = function(){
-									temp_html = '<option value="">Problem</option>'; 
-									var m = oepoint_group.val();
-									var n = oepoint_product.val();
-							
-										if(typeof(epointJson[m][n]) == "undefined"){
-											oepoint.css("display","none");
-										}else{
-											oepoint.css("display","inline");
-											$.each(epointJson[m][n],function(i,epoint){
-												temp_html+='<option value="'+epoint+'" '+((oepoint.val() == epoint) ?"selected":"")+'>'+epoint+'</option>';
-											});
-											oepoint.html(temp_html);
-										};
-									
-								};
-								oepoint_group.change(function(){
-									epoint_product();
-								});
-								oepoint_product.change(function(){
-									epoint();
-								});
-								$.getJSON(url,function(data){
-									epointJson = data;
-									epoint_group();
-								});
-							});
-						});
-						</script>
-                    </div>
-					
-                    <div class="form-group">
-                        <label>Add Remark</label>
-                        <div class="input-group ">
-                                <span class="input-group-addon">
-                                    <i class="fa fa-bookmark"></i>
-                                </span>
-                            <input type="text" class="form-control" name="remark" id="remark" value="{{$email['remark']}}" >
-                        </div>
-                    </div>
-					
-					
-					 <div class="form-group">
-						<label>Set Mark</label>
-						<div class="input-group">
-							<select class="form-control form-filter input-sm" name="mark">
-                                        <option value="">Select...</option>
-                                        @foreach (getMarks() as $mark)
-                                            <option value="{{$mark}}" <?php if($mark==$email['mark']) echo 'selected';?>>{{$mark}}</option>
-                                        @endforeach
-                                    </select>
-						</div>
-					</div>
-																	
-                    <div class="form-group">
-                        <label>Change User</label>
-                        <div class="input-group ">
-                                <span class="input-group-addon">
-                                    <i class="fa fa-user"></i>
-                                </span>
-                            <select class="form-control" name="user_id" id="user_id">
-								@foreach ($groups as $group_id=>$group)
-									<optgroup label="{{array_get($group,'group_name')}}">
-										@foreach (array_get($group,'user_ids') as $user_id)
-										<option value="{{$group_id.'_'.$user_id}}" <?php if($group_id.'_'.$user_id==$email['group_id'].'_'.$email['user_id']) echo 'selected';?>>{{array_get($users,$user_id)}}</option>
-										@endforeach
-									</optgroup>
-								@endforeach
-										
-                               
-                            </select>
-                        </div>
-                    </div>
 
-                        <div class="form-actions">
+                                {{--<div class="form-group">--}}
+                                    {{--<label>Problem Point</label>--}}
+                                    {{--<div class="epoint_selectList form-inline">--}}
+                                        {{--<select class="epoint_group form-control" name="epoint_group">--}}
+                                            {{--<option value="{{$email['epoint_group']}}">{{$email['epoint_group']}}</option>--}}
+                                        {{--</select>--}}
+                                        {{--<select class="epoint_product form-control" name="epoint_product">--}}
+                                            {{--<option value="{{$email['epoint_product']}}">{{$email['epoint_product']}}</option>--}}
+
+                                        {{--</select>--}}
+                                        {{--<select class="epoint form-control" name="epoint">--}}
+                                            {{--<option value="{{$email['epoint']}}">{{$email['epoint']}}</option>--}}
+                                        {{--</select>--}}
+                                    {{--</div>--}}
+                                    {{--<script type="text/javascript">--}}
+                                        {{--$(function(){--}}
+                                            {{--$(".epoint_selectList").each(function(){--}}
+                                                {{--var url = "/epoint.json";--}}
+                                                {{--var epointJson;--}}
+                                                {{--var temp_html;--}}
+                                                {{--var oepoint_group = $(this).find(".epoint_group");--}}
+                                                {{--var oepoint_product = $(this).find(".epoint_product");--}}
+                                                {{--var oepoint = $(this).find(".epoint");--}}
+
+                                                {{--var epoint_group = function(){--}}
+                                                    {{--temp_html = '<option value="">Group</option>';--}}
+                                                    {{--$.each(epointJson,function(i,epoint_group){--}}
+                                                        {{--temp_html+='<option value="'+i+'" '+((oepoint_group.val() == i) ?"selected":"")+'>'+i+'</option>';--}}
+                                                    {{--});--}}
+                                                    {{--oepoint_group.html(temp_html);--}}
+                                                    {{--epoint_product();--}}
+                                                {{--};--}}
+
+                                                {{--var epoint_product = function(){--}}
+                                                    {{--temp_html = '<option value="">Product</option>';--}}
+
+                                                    {{--var n = oepoint_group.val();--}}
+                                                    {{--if(typeof(epointJson[n]) == "undefined"){--}}
+                                                        {{--oepoint_product.css("display","none");--}}
+                                                        {{--oepoint.css("display","none");--}}
+                                                    {{--}else{--}}
+                                                        {{--oepoint_product.css("display","inline");--}}
+                                                        {{--$.each(epointJson[n],function(i,epoint_product){--}}
+                                                            {{--temp_html+='<option value="'+i+'" '+((oepoint_product.val() == i) ?"selected":"")+'>'+i+'</option>';--}}
+                                                        {{--});--}}
+                                                        {{--oepoint_product.html(temp_html);--}}
+                                                        {{--epoint();--}}
+                                                    {{--}--}}
+
+                                                {{--};--}}
+
+                                                {{--var epoint = function(){--}}
+                                                    {{--temp_html = '<option value="">Problem</option>';--}}
+                                                    {{--var m = oepoint_group.val();--}}
+                                                    {{--var n = oepoint_product.val();--}}
+
+                                                    {{--if(typeof(epointJson[m][n]) == "undefined"){--}}
+                                                        {{--oepoint.css("display","none");--}}
+                                                    {{--}else{--}}
+                                                        {{--oepoint.css("display","inline");--}}
+                                                        {{--$.each(epointJson[m][n],function(i,epoint){--}}
+                                                            {{--temp_html+='<option value="'+epoint+'" '+((oepoint.val() == epoint) ?"selected":"")+'>'+epoint+'</option>';--}}
+                                                        {{--});--}}
+                                                        {{--oepoint.html(temp_html);--}}
+                                                    {{--};--}}
+
+                                                {{--};--}}
+                                                {{--oepoint_group.change(function(){--}}
+                                                    {{--epoint_product();--}}
+                                                {{--});--}}
+                                                {{--oepoint_product.change(function(){--}}
+                                                    {{--epoint();--}}
+                                                {{--});--}}
+                                                {{--$.getJSON(url,function(data){--}}
+                                                    {{--epointJson = data;--}}
+                                                    {{--epoint_group();--}}
+                                                {{--});--}}
+                                            {{--});--}}
+                                        {{--});--}}
+                                    {{--</script>--}}
+                                {{--</div>--}}
+                            <div style="clear:both;"></div>
+                        </div>
+
+                        <div class="form-actions col-xs-12">
                             <div class="row">
-                                <div class="col-md-offset-4 col-md-8">
+                                <div class="col-md-12" style="text-align: center;">
                                     <button type="submit" class="btn blue">Submit</button>
                                     <button type="reset" class="btn grey-salsa btn-outline">Cancel</button>
                                 </div>
                             </div>
                         </div>
-
-                        </form>
-                        <div style="clear:both;"></div>
-                    </div>
+                    </form>
                     <div style="clear:both;"></div>
                 </div>
 
