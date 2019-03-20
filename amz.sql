@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50722
 File Encoding         : 65001
 
-Date: 2019-02-20 16:18:26
+Date: 2019-03-20 14:27:53
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -159,6 +159,7 @@ CREATE TABLE `asin` (
   `sales_21_15` int(10) unsigned DEFAULT '0',
   `sales_14_08` int(10) unsigned DEFAULT '0',
   `sales_07_01` int(10) unsigned DEFAULT '0',
+  `item_status` tinyint(1) unsigned DEFAULT '1',
   PRIMARY KEY (`id`),
   UNIQUE KEY `asin,site,sellersku` (`asin`,`site`,`sellersku`) USING BTREE,
   KEY `model` (`brand`,`brand_line`,`item_model`,`item_group`) USING BTREE,
@@ -166,7 +167,7 @@ CREATE TABLE `asin` (
   KEY `item_group` (`item_group`(10)),
   KEY `item_model` (`item_model`(10)),
   KEY `item_no` (`item_no`(10))
-) ENGINE=MyISAM AUTO_INCREMENT=13792 DEFAULT CHARSET=utf8mb4;
+) ENGINE=MyISAM AUTO_INCREMENT=26261 DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
 -- Table structure for asin_ads
@@ -200,7 +201,7 @@ CREATE TABLE `asin_ads` (
   `id` int(10) NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`id`),
   UNIQUE KEY `d` (`date_start`,`date_end`,`campaign_name`,`sku`,`site`,`seller_code`,`fee_type`,`item_code`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=32488 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=41985 DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
 -- Table structure for asin_b
@@ -280,7 +281,7 @@ CREATE TABLE `asin_profits` (
   `id` int(10) NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`id`),
   UNIQUE KEY `d` (`item_code`,`date`,`seller_code`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=140384 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=153759 DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
 -- Table structure for asin_seller_count
@@ -300,7 +301,7 @@ CREATE TABLE `asin_seller_count` (
   `title` varchar(500) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `site,asin` (`site`,`asin`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=2230 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=2253 DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
 -- Table structure for asin_seller_details
@@ -313,7 +314,7 @@ CREATE TABLE `asin_seller_details` (
   `asin_seller_count_id` int(10) unsigned DEFAULT NULL,
   `date` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=223460 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=250773 DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
 -- Table structure for auto
@@ -362,13 +363,13 @@ CREATE TABLE `aws_report` (
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
   `user_id` int(10) unsigned DEFAULT '0',
-  `sku` varchar(50) NOT NULL DEFAULT '',
+  `sku` varchar(255) DEFAULT '',
   `bg` varchar(255) DEFAULT '',
   `bu` varchar(255) DEFAULT '',
   `ImportToSap` tinyint(1) unsigned zerofill DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `seller_date_index` (`seller_id`,`marketplace_id`,`campaign_name`,`ad_group`,`date`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=72255 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=82874 DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
 -- Table structure for aws_report_time
@@ -383,7 +384,7 @@ CREATE TABLE `aws_report_time` (
   `updated_at` datetime NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `seller_marketplace` (`seller_id`,`marketplace_id`) USING BTREE
-) ENGINE=MyISAM AUTO_INCREMENT=46 DEFAULT CHARSET=utf8mb4;
+) ENGINE=MyISAM AUTO_INCREMENT=49 DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
 -- Table structure for b1g1
@@ -444,17 +445,6 @@ CREATE TABLE `b1g1` (
  PARTITION future VALUES LESS THAN (MAXVALUE) ENGINE = InnoDB) */;
 
 -- ----------------------------
--- Table structure for bc
--- ----------------------------
-DROP TABLE IF EXISTS `bc`;
-CREATE TABLE `bc` (
-  `a` varchar(50) NOT NULL,
-  `b` varchar(50) NOT NULL,
-  `c` varchar(50) NOT NULL,
-  PRIMARY KEY (`a`,`b`,`c`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- ----------------------------
 -- Table structure for cashback
 -- ----------------------------
 DROP TABLE IF EXISTS `cashback`;
@@ -513,6 +503,20 @@ CREATE TABLE `cashback` (
  PARTITION future VALUES LESS THAN (MAXVALUE) ENGINE = InnoDB) */;
 
 -- ----------------------------
+-- Table structure for category
+-- ----------------------------
+DROP TABLE IF EXISTS `category`;
+CREATE TABLE `category` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `category_pid` int(11) NOT NULL,
+  `category_name` varchar(255) NOT NULL,
+  `category_order` int(11) NOT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb4;
+
+-- ----------------------------
 -- Table structure for coupon_kunnr
 -- ----------------------------
 DROP TABLE IF EXISTS `coupon_kunnr`;
@@ -524,7 +528,7 @@ CREATE TABLE `coupon_kunnr` (
   `sap_seller_id` int(10) DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `kunnr` (`kunnr`,`coupon_description`)
-) ENGINE=InnoDB AUTO_INCREMENT=64 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=130 DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
 -- Table structure for ctg
@@ -791,7 +795,7 @@ CREATE TABLE `exception` (
   `process_attach` varchar(200) DEFAULT NULL,
   `replacement_order_id` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=16057 DEFAULT CHARSET=utf8mb4;
+) ENGINE=MyISAM AUTO_INCREMENT=17772 DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
 -- Table structure for fba_stock
@@ -848,7 +852,7 @@ CREATE TABLE `group_detail` (
   `time_to` varchar(10) DEFAULT NULL,
   `leader` tinyint(1) unsigned zerofill DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=3771 DEFAULT CHARSET=utf8mb4;
+) ENGINE=MyISAM AUTO_INCREMENT=4227 DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
 -- Table structure for inbox
@@ -895,7 +899,7 @@ CREATE TABLE `inbox` (
   KEY `etype` (`etype`) USING BTREE,
   KEY `mark` (`mark`) USING BTREE,
   FULLTEXT KEY `text_html` (`text_html`)
-) ENGINE=MyISAM AUTO_INCREMENT=219519 DEFAULT CHARSET=utf8mb4;
+) ENGINE=MyISAM AUTO_INCREMENT=233702 DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
 -- Table structure for inbox_change_log
@@ -908,7 +912,7 @@ CREATE TABLE `inbox_change_log` (
   `to_user_id` int(10) DEFAULT NULL,
   `inbox_id` int(10) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=101115 DEFAULT CHARSET=utf8mb4;
+) ENGINE=MyISAM AUTO_INCREMENT=112212 DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
 -- Table structure for kms_learn
@@ -988,7 +992,7 @@ CREATE TABLE `kms_user_manual` (
   KEY `item_group` (`item_group`(10)) USING BTREE,
   KEY `item_model` (`item_model`(10)) USING BTREE,
   KEY `brand` (`brand`(10)) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=128 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=130 DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
 -- Table structure for kms_video
@@ -1014,6 +1018,20 @@ CREATE TABLE `kms_video` (
   KEY `item_model` (`item_model`(10)) USING BTREE,
   KEY `brand` (`brand`(10)) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=306 DEFAULT CHARSET=utf8mb4;
+
+-- ----------------------------
+-- Table structure for knowledge_category
+-- ----------------------------
+DROP TABLE IF EXISTS `knowledge_category`;
+CREATE TABLE `knowledge_category` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `category_pid` int(11) NOT NULL,
+  `category_name` varchar(255) NOT NULL,
+  `category_order` int(11) NOT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
 -- Table structure for migrations
@@ -1058,7 +1076,7 @@ CREATE TABLE `phone` (
   `date` varchar(50) DEFAULT NULL,
   `user_id` int(10) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3245 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=3275 DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
 -- Table structure for qa
@@ -1081,7 +1099,7 @@ CREATE TABLE `qa` (
   `etype` varchar(50) DEFAULT NULL,
   `epoint` varchar(200) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=695 DEFAULT CHARSET=utf8mb4;
+) ENGINE=MyISAM AUTO_INCREMENT=699 DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
 -- Table structure for review
@@ -1118,9 +1136,10 @@ CREATE TABLE `review` (
   `is_delete` tinyint(1) unsigned zerofill DEFAULT NULL,
   `nextdate` varchar(50) DEFAULT NULL,
   `customer_feedback` tinyint(1) unsigned zerofill DEFAULT '0',
+  `updated_date` varchar(10) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `site,review` (`site`,`review`) USING BTREE
-) ENGINE=MyISAM AUTO_INCREMENT=194870 DEFAULT CHARSET=utf8mb4;
+) ENGINE=MyISAM AUTO_INCREMENT=198557 DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
 -- Table structure for review_change_log
@@ -1133,7 +1152,7 @@ CREATE TABLE `review_change_log` (
   `to_user_id` int(10) DEFAULT NULL,
   `review_id` int(10) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=53096 DEFAULT CHARSET=utf8mb4;
+) ENGINE=MyISAM AUTO_INCREMENT=56509 DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
 -- Table structure for review_customers
@@ -1149,7 +1168,7 @@ CREATE TABLE `review_customers` (
   `last_update_date` varchar(10) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `site` (`site`,`review`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=6670 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=7106 DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
 -- Table structure for review_step
@@ -1188,8 +1207,10 @@ CREATE TABLE `rsg_products` (
   `user_id` int(10) unsigned zerofill DEFAULT '0000000000',
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
+  `review_rating` int(11) unsigned zerofill DEFAULT '00000000000',
+  `number_of_reviews` int(11) unsigned zerofill DEFAULT '00000000000',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=49 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=71 DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
 -- Table structure for rsg_requests
@@ -1206,14 +1227,17 @@ CREATE TABLE `rsg_requests` (
   `transfer_paypal_account` varchar(255) DEFAULT NULL,
   `transaction_id` text,
   `transfer_date` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-  `amazon_order_id` varchar(50) DEFAULT NULL,
-  `review_url` varchar(255) DEFAULT NULL,
+  `amazon_order_id` varchar(200) DEFAULT NULL,
+  `review_url` text,
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
   `user_id` int(10) unsigned zerofill DEFAULT '0000000000',
+  `star_rating` varchar(255) DEFAULT NULL,
+  `follow` varchar(255) DEFAULT NULL,
+  `next_follow_date` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `customer_email` (`customer_email`)
-) ENGINE=InnoDB AUTO_INCREMENT=1120 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=1260 DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
 -- Table structure for rules
@@ -1233,7 +1257,7 @@ CREATE TABLE `rules` (
   `reply_status` tinyint(1) unsigned zerofill DEFAULT '0',
   `group_id` int(10) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=141 DEFAULT CHARSET=utf8mb4;
+) ENGINE=MyISAM AUTO_INCREMENT=143 DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
 -- Table structure for sales_28_day
@@ -1247,7 +1271,7 @@ CREATE TABLE `sales_28_day` (
   `date` date DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `seller_sku` (`seller_sku`,`site_id`,`date`)
-) ENGINE=InnoDB AUTO_INCREMENT=40128 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=55350 DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
 -- Table structure for sales_prediction
@@ -1267,11 +1291,12 @@ CREATE TABLE `sales_prediction` (
   `sales_21_15` int(10) unsigned DEFAULT '0',
   `sales_14_08` int(10) unsigned DEFAULT '0',
   `sales_07_01` int(10) unsigned DEFAULT '0',
-  `date` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `date` date DEFAULT NULL,
   `week_sales` text,
+  `status` tinyint(1) unsigned DEFAULT '0',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `sku` (`sku`,`sap_site_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=940 DEFAULT CHARSET=utf8mb4;
+  UNIQUE KEY `sku` (`sku`,`sap_site_id`,`date`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=24325 DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
 -- Table structure for sap_kunnr
@@ -1352,7 +1377,48 @@ CREATE TABLE `sendbox` (
   `error_count` tinyint(1) unsigned zerofill DEFAULT '0',
   `plan_date` int(10) unsigned zerofill DEFAULT '0000000000',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=264836 DEFAULT CHARSET=utf8mb4;
+) ENGINE=MyISAM AUTO_INCREMENT=286810 DEFAULT CHARSET=utf8mb4;
+
+-- ----------------------------
+-- Table structure for skus_week
+-- ----------------------------
+DROP TABLE IF EXISTS `skus_week`;
+CREATE TABLE `skus_week` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `asin` varchar(50) DEFAULT NULL,
+  `site` varchar(50) DEFAULT NULL,
+  `keywords` varchar(255) DEFAULT NULL,
+  `fba_stock` int(10) DEFAULT NULL,
+  `fbm_stock` int(10) DEFAULT NULL,
+  `fba_transfer` int(10) DEFAULT NULL,
+  `total_stock` int(10) DEFAULT NULL,
+  `fba_keep` decimal(10,2) DEFAULT NULL,
+  `total_keep` decimal(10,2) DEFAULT NULL,
+  `weeks` varchar(10) DEFAULT NULL,
+  `strategy` text,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `sku` (`asin`,`site`)
+) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4;
+
+-- ----------------------------
+-- Table structure for skus_week_details
+-- ----------------------------
+DROP TABLE IF EXISTS `skus_week_details`;
+CREATE TABLE `skus_week_details` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `asin` varchar(255) DEFAULT NULL,
+  `site` varchar(255) DEFAULT NULL,
+  `weeks` varchar(255) DEFAULT NULL,
+  `ranking` text,
+  `rating` text,
+  `review` text,
+  `sales` text,
+  `price` text,
+  `flow` text,
+  `conversion` text,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `sku` (`asin`,`site`,`weeks`)
+) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
 -- Table structure for star
@@ -1409,7 +1475,7 @@ CREATE TABLE `templates` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=917 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=993 DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
 -- Table structure for users
@@ -1425,9 +1491,10 @@ CREATE TABLE `users` (
   `updated_at` timestamp NULL DEFAULT NULL,
   `admin` tinyint(1) unsigned zerofill NOT NULL DEFAULT '0',
   `sap_seller_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `seller_rules` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `users_email_unique` (`email`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=193 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=206 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ----------------------------
 -- View structure for kms_stock
