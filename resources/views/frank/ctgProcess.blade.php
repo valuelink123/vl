@@ -425,7 +425,8 @@
                 toolbarSettings: {
                     toolbarExtraButtons: [
                         $('<button class="btn blue" style="width:9em" type="submit">Save</button>'),
-						$('<a href="/send/create?from_address=support@claimthegift.com&to_address={!!$ctgRow['email']!!}&subject=Claim the gift" target="_blank"><button class="btn green" style="width:9em" type="button">Compose</button></a>')
+						$('<a href="/send/create?from_address=support@claimthegift.com&to_address={!!$ctgRow['email']!!}&subject=Claim the gift" target="_blank"><button class="btn green" style="width:9em" type="button">Compose</button></a>'),
+						$('<a href="/exception/create?request_orderid={!!$ctgRow['order_id']!!}" target="_blank"><button class="btn red" style="width:9em" type="button">Create Refund and Replacement</button></a>')
                     ]
                 }
             })

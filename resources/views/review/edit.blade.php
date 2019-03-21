@@ -468,7 +468,13 @@
                                 <p class="invoice-desc grand-total">{{round($order->Amount,2)}} {{$order->CurrencyCode}}</p>
                             </div>
                         </div>
+						<div class="row">
+                            <div class="col-xs-12">
+								
+								 <a class="btn btn-lg red-haze hidden-print uppercase print-btn" href="{{ url('exception/create?request_sellerid='.$order->SellerId.'&request_orderid='.$order->AmazonOrderId.'&request_groupid='.$email['group_id'])}}" target="_blank">Create Refund and Replacement</a>
 
+                            </div>
+                        </div>
                     </div>
                        <?php }else{
                             echo "Can not match or find order";
