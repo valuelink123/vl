@@ -6,12 +6,14 @@ use Illuminate\Http\Request;
 use App\Inbox;
 use App\Sendbox;
 use App\Accounts;
+use App\Asin;
 use Illuminate\Support\Facades\Session;
 
 use App\User;
 use App\Group;
 use App\Groupdetail;
 use App\Rule;
+use App\Category;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Services\MultipleQueue;
@@ -51,6 +53,23 @@ class InboxController extends Controller
         return view('account/add');
     }
 
+	public function getItemGroup(){
+
+		if(array_get($_REQUEST,'item_no')){
+			$ItemGroup = new Asin;
+			$ItemGroup = $ItemGroup->where('item_no', 'like', '%'.$_REQUEST['item_no'].'%');
+			$ItemGroupList = $ItemGroup->limit(1)->get()->toArray();
+			if(!empty($ItemGroupList)){
+				echo json_encode(['code'=>200,'data'=>$ItemGroupList]);exit(0);
+			}else{
+				echo json_encode(['code'=>204]);exit(0);
+			}
+		}else{
+			echo json_encode(['code'=>204]);exit(0);
+		}
+
+	}
+
     function change(Request $request){
 
        $id = intval($request->get('inbox_id'));
@@ -66,6 +85,7 @@ class InboxController extends Controller
 		   if($request->get('epoint_product')) $inbox->epoint_product = $request->get('epoint_product');
 		   if($request->get('epoint_group')) $inbox->epoint_group = $request->get('epoint_group');
 		   if($request->get('item_no')) $inbox->item_no = strtoupper($request->get('item_no'));
+		   if($request->get('item_group')) $inbox->item_group = strtoupper($request->get('item_group'));
 		   $change_user=false;
            if($request->get('user_id')){
 			   $user_str = $request->get('user_id');
@@ -163,7 +183,13 @@ class InboxController extends Controller
             $email_history[$key] = $mail;
         }
         krsort($email_history);
-        return view('inbox/view',['email_history'=>$email_history,'unread_history'=>$email_unread_history,'order'=>$order,'email'=>$email,'users'=>$this->getUsers(),'groups'=>$this->getGroups(),'sellerids'=>$this->getSellerIds(),'accounts'=>$this->getAccounts(),'account_type'=>$account_type]);
+
+		$order_by = 'created_at';
+		$sort = 'desc';
+		$lists =  Category::orderBy($order_by,$sort)->get()->toArray();
+		$tree = $this->getTree($lists,28);
+
+        return view('inbox/view',['email_history'=>$email_history,'unread_history'=>$email_unread_history,'order'=>$order,'email'=>$email,'users'=>$this->getUsers(),'groups'=>$this->getGroups(),'sellerids'=>$this->getSellerIds(),'accounts'=>$this->getAccounts(),'account_type'=>$account_type,'tree'=>$tree]);
     }
     public function get(Request $request)
     {
@@ -945,6 +971,22 @@ class InboxController extends Controller
 			}
 			die(json_encode($return_arr));
 		}
+	}
+
+	public function getTree($data, $pId)
+	{
+		$tree = [];
+		foreach($data as $k => $v)
+		{
+			if($v['category_pid'] == $pId)
+			{
+				//父亲找到儿子
+				$v['category_pid'] = $this->getTree($data, $v['id']);
+				$tree[] = $v;
+				//unset($data[$k]);
+			}
+		}
+		return $tree;
 	}
 
 }

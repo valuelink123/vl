@@ -36,6 +36,7 @@ Route::Post('/profile', 'UserController@profile')->name('profileUpdate');
 Route::resource('inbox', 'InboxController');
 Route::get('/inbox/filter/{type}', 'InboxController@index')->name('filterInbox');
 Route::Post('/inbox/get', 'InboxController@get')->name('getInbox');
+Route::Post('/inbox/getItemGroup', 'InboxController@getItemGroup')->name('getItemGroup');
 Route::Post('/asin/get', 'AsinController@get')->name('getAsin');
 Route::Post('/inbox/change', 'InboxController@change')->name('changeInbox');
 Route::resource('send', 'SendController');

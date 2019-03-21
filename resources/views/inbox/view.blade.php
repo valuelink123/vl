@@ -759,9 +759,9 @@
                             </span>
                                 <select class="form-control" name="etype" id="etype">
                                     <option value="">None</option>
-                                    @foreach (getEType() as $etype)
-                                        <option value="{{$etype}}" <?php if($etype==$email['etype']) echo 'selected';?>>{{$etype}}</option>
-                                    @endforeach
+                                    <?php
+                                    echo procHtml($tree);
+                                    ?>
                                 </select>
                             </div>
                         </div>
@@ -824,7 +824,7 @@
                                     <span class="input-group-addon">
                                         <i class="fa fa-bookmark"></i>
                                     </span>
-                                        <input type="text" class="form-control" name="item_no" id="item_no" value="{{$email['item_no']}}" >
+                                        <input type="text" class="form-control" onchange="rItemGroup();" name="item_no" id="item_no" value="{{$email['item_no']}}" >
                                     </div>
                                 </div>
 
@@ -834,7 +834,7 @@
                                     <span class="input-group-addon">
                                         <i class="fa fa-bookmark"></i>
                                     </span>
-                                        <input type="text" class="form-control" name="item_no" id="item_no" value="{{$email['item_no']}}" >
+                                        <input type="text" class="form-control" name="item_group" id="item_group" value="{{$email['item_no']}}" >
                                     </div>
                                 </div>
 
@@ -945,5 +945,42 @@
 </div>
         </div>
 		 <div style="clear:both;"></div></div>
+<script>
+    function rItemGroup(){
+        var item_no = $('#item_no').val();
 
+        $.ajax({
+            url: "{{ url('inbox/getItemGroup') }}",
+            method: 'POST',
+            cache: false,
+            dataType:'json',
+            data: {item_no: item_no},
+            success: function (data) {
+                if(data.code == 200){
+                    $('#item_group').val(data.data[0].item_group);
+                }else{
+                    $('#item_group').val('');
+                }
+            }
+        });
+    }
+</script>
+<?php
+function procHtml($tree,$level = 0)
+{
+    $html = '';
+    foreach($tree as $key=>$val)
+    {
+        if($val['category_pid'] == '') {
+            $html .= '<option value="'.$val['id'].'">'.$val['category_name'].' </option>';
+        }else{
+            $flg = str_repeat('|----',$level);
+            $html .= '<option value="'.$val['category_name'].'">'.$flg.$val['category_name'];
+            $html .= procHtml($val['category_pid'],$level+1);
+            $html = $html."</option>";
+        }
+    }
+    return $html;
+}
+?>
 @endsection
