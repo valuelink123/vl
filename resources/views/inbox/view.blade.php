@@ -760,7 +760,7 @@
                                 <select class="form-control" name="etype" id="etype">
                                     <option value="">None</option>
                                     <?php
-                                    echo procHtml($tree);
+                                    echo procHtml($tree,0, $email['etype']);
                                     ?>
                                 </select>
                             </div>
@@ -966,7 +966,7 @@
     }
 </script>
 <?php
-function procHtml($tree,$level = 0)
+function procHtml($tree,$level = 0,$category_pid)
 {
     $html = '';
     foreach($tree as $key=>$val)
@@ -975,8 +975,9 @@ function procHtml($tree,$level = 0)
             $html .= '<option value="'.$val['id'].'">'.$val['category_name'].' </option>';
         }else{
             $flg = str_repeat('|----',$level);
-            $html .= '<option value="'.$val['category_name'].'">'.$flg.$val['category_name'];
-            $html .= procHtml($val['category_pid'],$level+1);
+            $selected = ($val['id']==$category_pid) ? 'selected' : '';
+            $html .= '<option value="'.$val['category_name'].'" '.$selected.'>'.$flg.$val['category_name'];
+            $html .= procHtml($val['category_pid'],$level+1,$category_pid);
             $html = $html."</option>";
         }
     }
