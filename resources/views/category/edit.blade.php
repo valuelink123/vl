@@ -12,7 +12,17 @@
                             <label>Superior category</label>
 
                             <select name="superior_category" class="form-control " required>
-                                <option value="0">Primary category</option>
+                                <?php
+                                if($category_type == 1){
+                                ?>
+                                <option value="28">Primary category</option>
+                                <?php
+                                }else{
+                                ?>
+                                <option value="29">Primary category</option>
+                                <?php
+                                }
+                                ?>
                                 <?php
                                 echo procHtml($tree,0, $category['category_pid']);
 //                                foreach($lists as $key=>$val){
