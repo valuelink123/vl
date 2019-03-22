@@ -382,7 +382,17 @@
                										 </div>
 													 
 				<div class="tab-pane" id="tab_3">
+					<?php
+                    if($review['amazon_order_id']){?>
+					<div class="row">
+                            <div class="col-xs-12">
+								
+								 <a class="btn btn-lg red-haze hidden-print uppercase print-btn" href="{{ url('exception/create?request_orderid='.$review['amazon_order_id'])}}" target="_blank">Create Refund and Replacement</a>
+
+                            </div>
+                        </div>
                     <?php
+					}
                     if(isset($order->AmazonOrderId)){?>
                     <div class="invoice-content-2 bordered">
                         <div class="row invoice-head">
@@ -468,13 +478,7 @@
                                 <p class="invoice-desc grand-total">{{round($order->Amount,2)}} {{$order->CurrencyCode}}</p>
                             </div>
                         </div>
-						<div class="row">
-                            <div class="col-xs-12">
-								
-								 <a class="btn btn-lg red-haze hidden-print uppercase print-btn" href="{{ url('exception/create?request_sellerid='.$order->SellerId.'&request_orderid='.$order->AmazonOrderId)}}" target="_blank">Create Refund and Replacement</a>
-
-                            </div>
-                        </div>
+						
                     </div>
                        <?php }else{
                             echo "Can not match or find order";
