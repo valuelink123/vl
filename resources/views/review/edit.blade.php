@@ -471,7 +471,7 @@
 						<div class="row">
                             <div class="col-xs-12">
 								
-								 <a class="btn btn-lg red-haze hidden-print uppercase print-btn" href="{{ url('exception/create?request_sellerid='.$order->SellerId.'&request_orderid='.$order->AmazonOrderId.'" target="_blank">Create Refund and Replacement</a>
+								 <a class="btn btn-lg red-haze hidden-print uppercase print-btn" href="{{ url('exception/create?request_sellerid='.$order->SellerId.'&request_orderid='.$order->AmazonOrderId)}}" target="_blank">Create Refund and Replacement</a>
 
                             </div>
                         </div>
