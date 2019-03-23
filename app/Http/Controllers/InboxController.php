@@ -53,6 +53,25 @@ class InboxController extends Controller
         return view('account/add');
     }
 
+	public function getCategoryJson(Request $request){
+
+		$parent_id = $request->get('parent_id',28);
+		$order_by = 'created_at';
+		$sort = 'desc';
+		$list =  Category::where('category_pid','=',$parent_id)->orderBy($order_by,$sort)->get()->toArray();
+
+		$lists = json_encode(['status'=>'y','data'=>$list],true);
+		$d = json_decode($lists,true);
+		$ret = ['status'=>'y'];
+
+		foreach($d['data'] as $r){
+			if($r['category_pid']==$parent_id){
+				$ret['data'][]=$r;
+			}
+		}
+		echo json_encode($ret,true);exit(0);
+	}
+
 	public function getItemGroup(){
 
 		if(array_get($_REQUEST,'item_no')){
@@ -61,6 +80,23 @@ class InboxController extends Controller
 			$ItemGroupList = $ItemGroup->limit(1)->get()->toArray();
 			if(!empty($ItemGroupList)){
 				echo json_encode(['code'=>200,'data'=>$ItemGroupList]);exit(0);
+			}else{
+				echo json_encode(['code'=>204]);exit(0);
+			}
+		}else{
+			echo json_encode(['code'=>204]);exit(0);
+		}
+
+	}
+
+	public function getItem(){
+
+		if(array_get($_REQUEST,'sku')){
+			$Item = new Asin;
+			$Item = $Item->where('sellersku', 'like', '%'.$_REQUEST['sku'].'%');
+			$ItemList = $Item->limit(1)->get()->toArray();
+			if(!empty($ItemList)){
+				echo json_encode(['code'=>200,'data'=>$ItemList]);exit(0);
 			}else{
 				echo json_encode(['code'=>204]);exit(0);
 			}

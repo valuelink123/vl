@@ -147,7 +147,14 @@ th,td,td>span {
 									</td>
 
 									<td>
-										<input type="text" class="form-control form-filter input-sm" placeholder='Star rating' name="star_rating">
+										<select name="star_rating" class="form-control form-filter input-sm">
+											<option value="">Select</option>
+											<option value="1">1</option>
+											<option value="2">2</option>
+											<option value="3">3</option>
+											<option value="4">4</option>
+											<option value="5">5</option>
+										</select>
 									</td>
 									<td>
 										<input type="text" class="form-control form-filter input-sm" placeholder='Follow' name="follow">
@@ -164,7 +171,13 @@ th,td,td>span {
 										</select>
 									</td>
 									<td>
-										<input type="text" class="form-control form-filter input-sm" placeholder='Site' name="site">
+										<select name="site" class="form-control form-filter input-sm">
+											<option value="">Select</option>
+											<?php
+											foreach(getAsinSites() as $v){
+												echo '<option value="'.$v.'">'.$v.' </option>';
+											}?>
+										</select>
 									</td>
 
 									

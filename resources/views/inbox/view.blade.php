@@ -17,11 +17,11 @@
       minLength: 1,
       select: function( event, ui ) {
 	  	if(ui.item){
-		
+
 		   var title = ui.item.title;
 		   var desc = ui.item.desc;
-		   rename = new RegExp("{CUSTOMER_NAME}","g"); 
-		   remail = new RegExp("{CUSTOMER_EMAIL}","g"); 
+		   rename = new RegExp("{CUSTOMER_NAME}","g");
+		   remail = new RegExp("{CUSTOMER_EMAIL}","g");
 		   retitle = new RegExp("{EMAIL_TITLE}","g");
 		   title = title.replace(rename, "{{$email['from_name']}}");
 		   title = title.replace(remail, "{{$email['from_address']}}");
@@ -34,8 +34,8 @@
 		   ue.ready(function() {
 				ue.setContent(desc);
 		   });
-		   
-		}	
+
+		}
       }
     });
 	$("#rebindorder").click(function(){
@@ -54,15 +54,15 @@
 				setTimeout(function(){location.reload();},3000);
 			}else{
 				toastr.error(redata.message);
-			}	
+			}
 		}
 
 	  });
 	});
-	
+
 	$("#fileupload").submit(function(e){
 	  if($('#account_type').val()!='Amazon') return true;
-	  
+
 	  var ue = UE.getEditor('valuelink_amzmessage_container');
 	  var str = ue.getContent();
 	  var forbidwords = {!!getForbidWords()!!};
@@ -73,9 +73,9 @@
 			haveforbidwords = haveforbidwords + forbidwords[j] + ' ; ' ;
 		 }
 	  }
-	  
+
 	  if(haveforbidwords){
-	  	
+
 	  	 bootbox.dialog({
 			message: "Your submission contains sensitive words : ( "+haveforbidwords+" ) , Please resubmit it after revision",
 			title: "Error",
@@ -88,9 +88,9 @@
 		});
 		return false;
 	  }
-	  
+
 	  if($('#warn').val()!=1){
-	  	var havewarnwords = '';	
+	  	var havewarnwords = '';
 		  var warnwords = {!!getWarnWords()!!};
 		  for(var j = 0,len = warnwords.length; j < len; j++){
 			 var reg = eval("/"+warnwords[j]+"/ig");
@@ -121,7 +121,7 @@
 		}
 
 	  }
-	  return true;		  
+	  return true;
 	});
   });
   </script>
@@ -750,21 +750,146 @@
                                 </select>
                             </div>
                         </div>
-
                         <div class="form-group">
                             <label>Question Type</label>
-                            <div class="input-group ">
-                            <span class="input-group-addon">
-                                <i class="fa fa-bookmark"></i>
-                            </span>
-                                <select class="form-control" name="etype" id="etype">
-                                    <option value="">None</option>
-                                    <?php
-                                    echo procHtml($tree,0, $email['etype']);
-                                    ?>
-                                </select>
+                            <div class="form-inline">
+                                <select id="linkage1" name="linkage1" class="form-control city-select" data-selected="28" data-parent_id="28"></select>
+                                <select id="linkage2" name="linkage2" class="form-control city-select"></select>
+                                <select id="linkage3" name="linkage3" class="form-control city-select"></select>
+                                <select id="linkage4" name="linkage4" class="form-control city-select"></select>
+                                <select id="linkage5" name="linkage5" class="form-control city-select"></select>
                             </div>
                         </div>
+                            <script>
+                                var city=[],cityName=[];
+                                $.fn.city = function (opt) {
+                                    var $id = $(this),
+                                            options = $.extend({
+                                                url:"{{ url('inbox/getCategoryJson?parent_id=') }}",
+                                                /*当前ID，设置选中状态*/
+                                                selected: null,
+                                                /*上级栏目ID*/
+                                                parent_id: null,
+                                                /*主键ID名称*/
+                                                valueName: "id",
+                                                /*名称*/
+                                                textName: "category_name",
+                                                /*默认名称*/
+                                                defaultName: "None",
+                                                /*下级对象ID*/
+                                                nextID: null}, opt),selected,_tmp;
+                                    if(options.parent_id==null){
+                                        _tmp=$id.data('parent_id');
+                                        if(_tmp!==undefined){
+                                            options.parent_id=_tmp;
+                                        }
+                                    }
+                                    //初始化层
+                                    this.init = function () {
+                                        if($.inArray($id.attr('id'),cityName)==-1){
+                                            cityName.push($id.attr('id'));
+                                        }
+                                        if(!options.selected){
+                                            options.selected=$id.data('selected');
+                                        }
+                                        $id.append(format(get(options.parent_id)));
+                                    };
+                                    function get(id) {
+                                        if (id !== null && !city[id]) {
+                                            getData(id);
+                                            return city[id];
+                                        }else if (id !== null && city[id]) {
+                                            return city[id];
+                                        }
+                                        return [];
+                                    }
+
+                                    function getData(id) {
+                                        $.ajax({
+                                            url: options.url+ id,
+                                            type: 'GET',
+                                            async: false,
+                                            dataType:'json',
+                                            success: function (d) {
+                                                if (d.status == 'y') {
+                                                    city[id] = d.data;
+                                                }
+                                            }
+                                        });
+                                    }
+
+                                    function format(d) {
+                                        var _arr = [], r, selected = '';
+                                        if (options.defaultName !== null) _arr.push('<option value="">' + options.defaultName + '</option>');
+                                        if ($.isArray(d)) for (var v in d) {
+                                            r = null;
+                                            r = d[v];
+                                            selected = '';
+                                            if (options.selected && options.selected == (r[options.valueName])) {
+                                                selected = 'selected';
+                                            }
+                                            _arr.push('<option value="' + r[options.valueName] + '" ' + selected + '>' + r[options.textName] + '</option>');
+                                        }
+                                        return _arr.join('');
+                                    }
+
+                                    this.each(function () {
+                                        options.nextID && $id.on('change', function () {
+                                            var $this = $('#' + options.nextID),id=$(this).attr('id'),i=$.inArray(id,cityName);
+                                            $this.html(format(get($(this).val())));
+                                            if ($.isArray(cityName)) for (var v in cityName) {
+                                                if(v>(i+1)){
+                                                    $('#'+cityName[v]).html(format());
+                                                }
+                                            }
+                                        });
+                                    });
+                                    this.init();
+                                };
+                                $(function() {
+
+                                    $('#linkage1').city({nextID:'linkage2'});
+                                    $('#linkage2').city({nextID:'linkage3'});
+                                    $('#linkage3').city({nextID:'linkage4'});
+                                    $('#linkage4').city({nextID:'linkage5'});
+                                    $('#linkage5').city();
+
+                                    var sku = $('#sku').val();
+
+                                    $.ajax({
+                                        url: "{{ url('inbox/getItem') }}",
+                                        method: 'POST',
+                                        cache: false,
+                                        dataType:'json',
+                                        data: {sku: sku},
+                                        success: function (data) {
+                                            if(data.code == 200){
+                                                $('#item_no').val(data.data[0].item_no);
+                                                $('#item_group').val(data.data[0].item_group);
+                                            }
+                                        }
+                                    });
+                                });
+
+                                function rItemGroup(){
+                                    var item_no = $('#item_no').val();
+
+                                    $.ajax({
+                                        url: "{{ url('inbox/getItemGroup') }}",
+                                        method: 'POST',
+                                        cache: false,
+                                        dataType:'json',
+                                        data: {item_no: item_no},
+                                        success: function (data) {
+                                            if(data.code == 200){
+                                                $('#item_group').val(data.data[0].item_group);
+                                            }else{
+                                                $('#item_group').val('');
+                                            }
+                                        }
+                                    });
+                                }
+                            </script>
 
                         <div class="form-group">
                             <label>Add Remark</label>
@@ -945,26 +1070,6 @@
 </div>
         </div>
 		 <div style="clear:both;"></div></div>
-<script>
-    function rItemGroup(){
-        var item_no = $('#item_no').val();
-
-        $.ajax({
-            url: "{{ url('inbox/getItemGroup') }}",
-            method: 'POST',
-            cache: false,
-            dataType:'json',
-            data: {item_no: item_no},
-            success: function (data) {
-                if(data.code == 200){
-                    $('#item_group').val(data.data[0].item_group);
-                }else{
-                    $('#item_group').val('');
-                }
-            }
-        });
-    }
-</script>
 <?php
 function procHtml($tree,$level = 0,$category_name)
 {
