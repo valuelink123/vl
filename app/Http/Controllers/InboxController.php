@@ -121,7 +121,14 @@ class InboxController extends Controller
 		   if($request->get('epoint_product')) $inbox->epoint_product = $request->get('epoint_product');
 		   if($request->get('epoint_group')) $inbox->epoint_group = $request->get('epoint_group');
 		   if($request->get('item_no')) $inbox->item_no = strtoupper($request->get('item_no'));
-		   if($request->get('item_group')) $inbox->item_group = strtoupper($request->get('item_group'));
+		   if($request->get('item_group')) $inbox->item_group = $request->get('item_group');
+
+		   if($request->get('linkage1')) $inbox->linkage1 = $request->get('linkage1');
+		   if($request->get('linkage2')) $inbox->linkage2 = $request->get('linkage2');
+		   if($request->get('linkage3')) $inbox->linkage3 = $request->get('linkage3');
+		   if($request->get('linkage4')) $inbox->linkage4 = $request->get('linkage4');
+		   if($request->get('linkage5')) $inbox->linkage5 = $request->get('linkage5');
+
 		   $change_user=false;
            if($request->get('user_id')){
 			   $user_str = $request->get('user_id');
