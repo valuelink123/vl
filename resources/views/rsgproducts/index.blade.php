@@ -212,7 +212,7 @@ th,td,td>span {
 											"dom": "<'row'B<'col-md-6 col-sm-12'pli><'col-md-6 col-sm-12'<'table-group-actions pull-right'>>r>t<'row'<'col-md-6 col-sm-12'pli><'col-md-6 col-sm-12'>>",
 
 											"bStateSave": true, // save datatable state(pagination, sort, etc) in cookie.
-											"aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0 ,1,8,9,10 ] }],
+											"aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0 ,1,7,8,9,10,12,13,14 ] }],
 											"lengthMenu": [
 												[-1,10, 20, 50],
 												['All',10, 20, 50] // change per page values here
