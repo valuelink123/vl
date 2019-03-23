@@ -753,11 +753,11 @@
                         <div class="form-group">
                             <label>Question Type</label>
                             <div class="form-inline">
-                                <select id="linkage1" name="linkage1" class="form-control city-select" data-selected="28" data-parent_id="28"></select>
-                                <select id="linkage2" name="linkage2" class="form-control city-select"></select>
-                                <select id="linkage3" name="linkage3" class="form-control city-select"></select>
-                                <select id="linkage4" name="linkage4" class="form-control city-select"></select>
-                                <select id="linkage5" name="linkage5" class="form-control city-select"></select>
+                                <select id="linkage1" name="linkage1" class="form-control city-select" data-selected="{{$email['linkage1']}}" data-parent_id="28"></select>
+                                <select id="linkage2" name="linkage2" class="form-control city-select" data-selected="{{$email['linkage2']}}" data-parent_id="{{$email['linkage1']}}"></select>
+                                <select id="linkage3" name="linkage3" class="form-control city-select" data-selected="{{$email['linkage3']}}" data-parent_id="{{$email['linkage2']}}"></select>
+                                <select id="linkage4" name="linkage4" class="form-control city-select" data-selected="{{$email['linkage4']}}" data-parent_id="{{$email['linkage3']}}"></select>
+                                <select id="linkage5" name="linkage5" class="form-control city-select" data-selected="{{$email['linkage5']}}" data-parent_id="{{$email['linkage4']}}"></select>
                             </div>
                         </div>
                             <script>
@@ -820,7 +820,7 @@
 
                                     function format(d) {
                                         var _arr = [], r, selected = '';
-                                        if (options.defaultName !== null) _arr.push('<option value="">' + options.defaultName + '</option>');
+                                        if (options.defaultName !== null) _arr.push('<option value="999999999">' + options.defaultName + '</option>');
                                         if ($.isArray(d)) for (var v in d) {
                                             r = null;
                                             r = d[v];

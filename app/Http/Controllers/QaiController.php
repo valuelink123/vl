@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Qa;
 use Illuminate\Support\Facades\Session;
-
+use App\Category;
 use App\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -46,7 +46,12 @@ class QaiController extends Controller
     public function create()
     {
 
-        return view('qai/add');
+        $order_by = 'created_at';
+        $sort = 'desc';
+        $lists =  Category::orderBy($order_by,$sort)->get()->toArray();
+        $tree = $this->getTree($lists,29);
+
+        return view('qai/add',['tree'=>$tree]);
     }
 	
 	
@@ -290,6 +295,22 @@ class QaiController extends Controller
             $request->session()->flash('error_message','Set Qa Failed');
             return redirect()->back()->withInput();
         }
+    }
+
+    public function getTree($data, $pId)
+    {
+        $tree = [];
+        foreach($data as $k => $v)
+        {
+            if($v['category_pid'] == $pId)
+            {
+                //父亲找到儿子
+                $v['category_pid'] = $this->getTree($data, $v['id']);
+                $tree[] = $v;
+                //unset($data[$k]);
+            }
+        }
+        return $tree;
     }
 
 
