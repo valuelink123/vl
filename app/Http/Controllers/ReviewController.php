@@ -415,6 +415,20 @@ class ReviewController extends Controller
 			    if(array_get($_REQUEST,'rc')==2) $customers = $customers->whereRaw('review.rating<>review.updated_rating');
 		}
 		
+		if(array_get($_REQUEST,'np')){
+			$nev_rating=4;
+			if(array_get($_REQUEST,'np')==1) {
+				$customers = $customers->where(function ($query) use ($nev_rating) {
+					$query->where('rating', '<', $nev_rating)->orWhere('updated_rating', '<', $nev_rating);
+				});
+			}
+			if(array_get($_REQUEST,'np')==2) {
+				$customers = $customers->where('rating', '>=', $nev_rating)->where(function ($query) use ($nev_rating) {
+					$query->where('updated_rating', '>=', $nev_rating)->orWhere('updated_rating', 0);
+				});
+			}
+		}
+		
 		if(array_get($_REQUEST,'asin_status')){
             $customers = $customers->whereIn('asin.status',array_get($_REQUEST,'asin_status'));
         }
@@ -429,10 +443,7 @@ class ReviewController extends Controller
 		if(array_get($_REQUEST,'date_to')) $date_to= array_get($_REQUEST,'date_to');
 		$customers = $customers->where('date','>=',$date_from);
 		$customers = $customers->where('date','<=',$date_to);
-		$nev_rating=4;
-		$customers = $customers->where(function ($query) use ($nev_rating) {
-			$query->where('rating', '<', $nev_rating)->orWhere('updated_rating', '<', $nev_rating);
-		});
+		
 		if(array_get($_REQUEST,'nextdate')) $customers = $customers->where('nextdate',array_get($_REQUEST,'nextdate'));
 		
 		if(array_get($_REQUEST,'follow_status')){
