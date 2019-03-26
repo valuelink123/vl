@@ -252,7 +252,7 @@ class RsgrequestsController extends Controller
 			);
 			$product= RsgProduct::where('id',$rule->product_id)->first()->toArray();
 			$mailchimpData = array(
-				'PROIMG'=>$product['product_img'],'PRONAME'=>$product['product_name'],'PROKEY'=>$product['keyword'],'PROPAGE'=>$product['page'],'PROPOS'=>$product['position']
+				'PROIMG'=>$product['product_img'],'PRONAME'=>$product['product_name'],'PROKEY'=>$product['keyword'],'PROPAGE'=>$product['page'],'PROPOS'=>$product['position'],'MARKET'=>str_replace('www.','',$product['site'])
 			);
 			if($rule->customer_paypal_email) $mailchimpData['PAYPAL'] = $rule->customer_paypal_email;
 			if($rule->transfer_amount) $mailchimpData['FUNDED'] = $rule->transfer_amount.' '.$rule->transfer_currency;
