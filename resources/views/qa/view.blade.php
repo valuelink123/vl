@@ -109,7 +109,26 @@ License: You must have a valid license purchased only from themeforest(the above
                                         <div class="blog-single-desc">
 											<h4 style="line-height: 30px;font-weight: 400;">
                                                 Knowledge Type : {!!$qa->knowledge_type!!} <br>
-                                                For Product : {!!$qa->for_product1!!} -- {!!$qa->for_product2!!} -- {!!$qa->for_product3!!} -- {!!$qa->for_product4!!}
+                                                <?php
+                                                    if($qa->knowledge_type == '产品知识'){
+                                                ?>
+                                                For Product : {!!$qa->for_product1!!} -- {!!$qa->for_product2!!} -- {!!$qa->for_product3!!} -- {!!$qa->for_product4!!} <br>
+                                                <?php
+                                                    }
+                                                ?>
+                                                Similar Question :
+                                                <?php
+
+                                                ?>
+                                                <?php
+                                                    if($qa->confirm == 2){
+                                                        echo 'Status : Invaild';
+                                                    }else if($qa->confirm == 2){
+                                                        echo 'Status : Active';
+                                                    }else{
+                                                        echo 'Status : Pending';
+                                                    }
+                                                ?>
                                             </h4>
 											 
                                             {!!$qa->description!!}

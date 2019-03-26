@@ -193,8 +193,8 @@
                                     <div style="clear: both;"></div>
                                     <div class="input-group col-md-10 similar_question" style="float: left;">
                                         <?php
-                                            if($qa['similar_question'] != ''){
-                                                $similar_question = json_decode($qa['similar_question'], true);
+                                            $similar_question = json_decode($qa['similar_question'], true);
+                                            if(!empty($similar_question)){
                                                 foreach($similar_question as $key=>$val){
                                         ?>
                                             <div class="input-group col-md-12">

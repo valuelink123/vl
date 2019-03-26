@@ -409,6 +409,14 @@ class QaiController extends Controller
 			'title' => 'required|string',
 			'description' => 'required|string',
         ]);
+
+        $similar_question = $request->get('similar_question');
+        $similar_question_list = [];
+        foreach($similar_question as $key=>$val){
+            if($val != ''){
+                $similar_question_list[] = $val;
+            }
+        }
 		
         $seller_account = new Qa;
         $seller_account->product = $request->get('product');
@@ -429,7 +437,7 @@ class QaiController extends Controller
         $seller_account->for_product3 = $request->get('for_product3');
         $seller_account->for_product4 = $request->get('for_product4');
         $seller_account->for_question = $request->get('for_question');
-        $seller_account->similar_question = json_encode($request->get('similar_question'),true);
+        $seller_account->similar_question = json_encode($similar_question_list,true);
         $seller_account->related_knowledge = $request->get('related_knowledge')?implode(';',$request->get('related_knowledge')):null;
 
 		$seller_account->user_id = intval(Auth::user()->id);
@@ -508,6 +516,14 @@ class QaiController extends Controller
 			'description' => 'required|string',
         ]);
 
+        $similar_question = $request->get('similar_question');
+        $similar_question_list = [];
+        foreach($similar_question as $key=>$val){
+            if($val != ''){
+                $similar_question_list[] = $val;
+            }
+        }
+
         $seller_account = Qa::findOrFail($id);
         $seller_account->product = $request->get('product');
 		$seller_account->model = $request->get('model');
@@ -527,7 +543,7 @@ class QaiController extends Controller
         $seller_account->for_product3 = $request->get('for_product3');
         $seller_account->for_product4 = $request->get('for_product4');
         $seller_account->for_question = $request->get('for_question');
-        $seller_account->similar_question = json_encode($request->get('similar_question'),true);
+        $seller_account->similar_question = json_encode($similar_question_list,true);
         $seller_account->related_knowledge = $request->get('related_knowledge')?implode(';',$request->get('related_knowledge')):null;
 
 		$seller_account->user_id = intval(Auth::user()->id);
