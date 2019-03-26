@@ -181,12 +181,15 @@
 			<span class="input-group-addon">
 				<i class="fa fa-bookmark"></i>
 			</span>
-				<input type="text" class="form-control xform-autotrim" name="request_content" id="request_content" value="{{old('request_content')}}" list="list-request_content" autocomplete="off" required />
-				<datalist id="list-request_content">
+
+				<select class="form-control" name="request_content" id="request_content">
+
 					@foreach($requestContentHistoryValues as $rcValue)
-						<option value="{{$rcValue}}" >
+
+						<option value="{{$rcValue}}">{{$rcValue}}</option>
+
 					@endforeach
-				</datalist>
+				</select>
 			</div>
 		</div>
 
