@@ -592,13 +592,17 @@ class ExceptionController extends Controller
         $type_list['2'] = "Replacement";
         $type_list['3'] = "Refund & Replacement";
 
+
+        /*mcf订单状态先不要
         //得到列表记录的所有亚马逊id
         $amazon_ids = $_mcfStatus = $mcfStatus = array();
         foreach ( $customersLists as $customersList){
-            $amazon_ids[] = $customersList['amazon_order_id'];
+            $_replacement = unserialize($customersList['replacement']);
+            // $amazon_ids[] = $_replacement['products']['replacement_order_id'];
+
         }
         //根据亚马逊id得到该订单的mcf物流状态
-        //exception表的amazon_order_id是对应的order库的amazon_mcf_orders表的SellerFulfillmentOrderId字段吧,amazon_mcf_orders表里的FulfillmentOrderStatus表示订单状态
+        //exception表的 的 replacement 字段中的 replacement_order_id 是对应的order库的amazon_mcf_orders表的SellerFulfillmentOrderId字段,amazon_mcf_orders表里的FulfillmentOrderStatus表示订单状态
         if($amazon_ids){
             $_mcfStatus = DB::connection('order')->table('amazon_mcf_orders')->wherein('SellerFulfillmentOrderId',$amazon_ids)->get(['SellerFulfillmentOrderId','FulfillmentOrderStatus']);
 
@@ -608,6 +612,7 @@ class ExceptionController extends Controller
                 }
             }
         }
+        */
 
 		foreach ( $customersLists as $customersList){
 			$operate = '';
@@ -642,7 +647,7 @@ class ExceptionController extends Controller
                 $customersList['order_sku'],
 				$customersList['date'],
                 array_get($status_list,$customersList['process_status']),
-				isset($mcfStatus[$customersList['amazon_order_id']]) ? $mcfStatus[$customersList['amazon_order_id']] : 'unknown',
+				// isset($mcfStatus[$customersList['amazon_order_id']]) ? $mcfStatus[$customersList['amazon_order_id']] : 'unknown',
 				$operate,
 				array_get($users,$customersList['process_user_id'])?array_get($users,$customersList['process_user_id']):array_get($groupleaders,$customersList['group_id']),
                 array_get($groups,$customersList['group_id'].'.group_name').' > '.array_get($users,$customersList['user_id']),
