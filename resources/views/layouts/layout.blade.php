@@ -285,18 +285,28 @@
                     <!-- END SIDEBAR TOGGLER BUTTON -->
                     <!-- DOC: To remove the search box from the sidebar you just need to completely remove the below "sidebar-search-wrapper" LI element -->
                     <li class="nav-item <?php if($action=='send' && $method=='create') echo 'active';?> ">
-                        <a href="{{ url('send/create') }}" class="nav-link nav-toggle">
+                        
+	<a href="{{ url('send/create') }}" class="nav-link nav-toggle">
+						
                             <i class="fa fa-edit"></i>
+							
                             <span class="title">Compose</span>
                             <!--<span class="arrow"></span>-->
                             <?php if($action=='send') echo '<span class="selected"></span>';?>
-
+							
                         </a>
+						
                     </li>
 
                     <li class="nav-item <?php if($action=='inbox') echo 'active';?>">
                         <a href="{{url('inbox')}}" class="nav-link nav-toggle">
-                            <i class="fa fa-envelope-o"></i>
+                            <i class="fa fa-envelope-o"><span class=" badge-danger " style="
+    border-radius: 5px !important;
+    font-size: 12px;
+    position: relative;
+    top: -10px;
+    left: -10px;
+">{{intval(array_get($unreply,'Site',0)+array_get($unreply,'Amazon',0))}}</span></i>
                             <span class="title">InBox</span>
                             <?php if($action=='inbox') echo '<span class="selected"></span>';?>
 
@@ -308,7 +318,13 @@
 
 					<li class="nav-item <?php if($action=='filterInbox' && $filtertype==$type) echo 'active';?>">
                         <a href="{{url('inbox/filter/'.$type)}}" class="nav-link nav-toggle">
-                            <i class="fa fa-envelope-o"></i>
+                            <i class="fa fa-envelope-o"><span class=" badge-danger " style="
+    border-radius: 5px !important;
+    font-size: 12px;
+    position: relative;
+    top: -10px;
+    left: -10px;
+">{{intval(array_get($unreply,$type,0))}}</span></i>
                             <span class="title">{{$type}} InBox</span>
                             <?php if($action=='filterInbox' && $filtertype==$type) echo '<span class="selected"></span>';?>
                         </a>
