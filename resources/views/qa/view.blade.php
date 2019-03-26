@@ -108,12 +108,9 @@ License: You must have a valid license purchased only from themeforest(the above
                                         </div>
                                         <div class="blog-single-desc">
 											<h4 style="line-height: 30px;font-weight: 400;">
-											Product Line: {!!$qa->product_line!!} <br>
-											Product : {!!$qa->product!!} <br>
-											Model :  {!!$qa->model!!} <br>
-											Item No. : {!!$qa->item_no!!}<br>
-											Question Type : {!!$qa->etype!!}<br>
-											Problem Point. : {!!$qa->epoint!!}</h4>
+                                                Knowledge Type : {!!$qa->knowledge_type!!} <br>
+                                                For Product : {!!$qa->for_product1!!} -- {!!$qa->for_product2!!} -- {!!$qa->for_product3!!} -- {!!$qa->for_product4!!}
+                                            </h4>
 											 
                                             {!!$qa->description!!}
                                         </div>

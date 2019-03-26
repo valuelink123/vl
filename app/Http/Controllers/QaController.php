@@ -38,7 +38,8 @@ class QaController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request)
-    {	
+    {
+
 		$keywords = $request->get('keywords');
 		$etype = $request->get('etype');
 
@@ -63,10 +64,18 @@ class QaController extends Controller
     {
 
         $qa = Qa::where('id',$id)->first();
+        $this->clicks($id,$qa['clicks']);
 
         return view('qa/view',['qa'=>$qa,'users'=>$this->getUsers()]);
     }
-	
+
+    public function clicks($id,$clicks)
+    {
+
+        $seller_account = Qa::findOrFail($id);
+        $seller_account->clicks = $clicks + 1;
+        $seller_account->save();
+    }
 
     public function update(Request $request,$id)
     {

@@ -161,18 +161,18 @@
                             <?php if(Auth::user()->admin){ ?>
                             <li>
                                 <a href="/category">
-                                    <i class="fa fa-files-o"></i> Q&A Category
+                                    <i class="fa fa-files-o"></i> Knowledge Category
                                 </a>
                             </li>
                             <?php } ?>
                             <li>
                                 <a href="/qa">
-                                    <i class="fa fa-files-o"></i> Q&A Manage
+                                    <i class="fa fa-files-o"></i> Knowledge Base
                                 </a>
                             </li>
                             <li>
                                 <a href="/question">
-                                    <i class="fa fa-question"></i> Q&A Center
+                                    <i class="fa fa-question"></i> Knowledge Center
                                 </a>
                             </li>
                             <li>

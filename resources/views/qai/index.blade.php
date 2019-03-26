@@ -20,6 +20,9 @@ th,td,td>span {
         <small>Configure your Qa.</small>
     </h1>
     <div class="row">
+
+
+
         <div class="col-md-12">
             <!-- BEGIN EXAMPLE TABLE PORTLET-->
             <div class="portlet light bordered">
@@ -35,7 +38,7 @@ th,td,td>span {
                             </div>
                         </div>
                        
-                        <div class="col-md-6">
+                        <div class="col-md-6" style="text-align: right;">
                             <div class="table-actions-wrapper" id="table-actions-wrapper">
                             <span> </span>
                             <select id="QaAction" class="table-group-action-input form-control input-inline input-small input-sm">
@@ -53,7 +56,40 @@ th,td,td>span {
                         
                     </div>
                 </div>
-				
+
+                    <div class="col-md-2" style=" padding-left: 0px;">
+                        <div class="input-group">
+                            <span class="input-group-addon">Group</span>
+                            <input type="text" class="xform-autotrim form-control" data-init-by-query="ands.group" placeholder="Group..." id="group" autocomplete="off" name="group" />
+                        </div>
+                    </div>
+
+                    <div class="col-md-2">
+                        <div class="input-group">
+                            <span class="input-group-addon">Item Group</span>
+                            <input type="text" class="xform-autotrim form-control" data-init-by-query="ands.item_group" placeholder="Item Group..." id="item_group" autocomplete="off" name="item_group" />
+                        </div>
+                    </div>
+
+                    <div class="col-md-2">
+                        <div class="input-group">
+                            <span class="input-group-addon">Model</span>
+                            <input type="text" class="xform-autotrim form-control" data-init-by-query="ands.item_model" placeholder="Item Model..." id="item_model" autocomplete="off" name="item_model" />
+                        </div>
+                    </div>
+
+                    <div class="col-md-2">
+                        <input style="height: 34px;" type="text" class="form-control form-filter input-sm" name="keywords" placeholder="Keywords">
+
+                    </div>
+                    <div class="col-md-2">
+
+                        <button type="button" class="btn blue" id="data_search">Search</button>
+
+                    </div>
+
+                    <div style="height:50px;"></div>
+
                     <div class="table-container">
                         
                         <table class="table table-striped table-bordered table-hover table-checkable" id="datatable_ajax_asin">
@@ -65,95 +101,13 @@ th,td,td>span {
                                         <span></span>
                                     </label>
                                 </th>
-								<th width="5%">Product Line</th>
-                                <th width="5%">Product</th>
-                                <th width="5%">Model</th>
-								<th width="5%">Item No.</th>
-								<th width="10%">Question Type</th>
-								<th width="10%">Problem Point</th>
-								<th width="23%">Title</th>
-                                <th width="10%">User</th>
-								<th width="10%">Status</th>
-                                <th width="10%">Update Date</th>
-                                <th width="5%">Action</th>
-                            </tr>
-                            <tr role="row" class="filter">
-                                <td> </td>
-								<td>
-                                    <input type="text" class="form-control form-filter input-sm" name="product_line">
-                                </td>
-                                <td>
-                                    <input type="text" class="form-control form-filter input-sm" name="product">
-                                </td>
-                                <td>
-                                    <input type="text" class="form-control form-filter input-sm" name="model">
-                                </td>
-								<td>
-                                    <input type="text" class="form-control form-filter input-sm" name="item_no">
-                                </td>
-								<td>
-                                    <select class="form-control form-filter input-sm" name="etype" id="etype">
-                                <option value="">Select</option>
-                                @foreach (getEType() as $etype)
-                                    <option value="{{$etype}}">{{$etype}}</option>
-                                @endforeach
-                            </select>
-                                </td>
-								<td>
-                                    <input type="text" class="form-control form-filter input-sm" name="epoint">
-                                </td>
-								<td>
-                                    <input type="text" class="form-control form-filter input-sm" name="title">
-                                </td>
-                               
-     
-                                <td>
-   
-                                    <select class="form-control form-filter input-sm" name="user_id">
-                                        <option value="">Select...</option>
-                                        @foreach ($users as $user_id=>$user_name)
-                                            <option value="{{$user_id}}">{{$user_name}}</option>
-                                        @endforeach
-                                    </select>
-                                </td>
-								 <td>
-
-                                    <select class="form-control form-filter input-sm" name="confirm">
-										<option value="">Select...</option>
-										<option value="unconfirm" >UnConfirm</option>
-										<option value="confirm" >Confirmed</option>
-										
-									</select>
-		
-                                </td>
-                                <td>
-
-                                   <div class="input-group date date-picker margin-bottom-5" data-date-format="yyyy-mm-dd">
-                                        <input type="text" class="form-control form-filter input-sm" readonly name="update_date_from" placeholder="From">
-                                        <span class="input-group-btn">
-                                                                    <button class="btn btn-sm default" type="button">
-                                                                        <i class="fa fa-calendar"></i>
-                                                                    </button>
-                                                                </span>
-                                    </div>
-                                    <div class="input-group date date-picker" data-date-format="yyyy-mm-dd">
-                                        <input type="text" class="form-control form-filter input-sm" readonly name="update_date_to" placeholder="To">
-                                        <span class="input-group-btn">
-                                                                    <button class="btn btn-sm default" type="button">
-                                                                        <i class="fa fa-calendar"></i>
-                                                                    </button>
-                                                                </span>
-                                    </div>
-		
-                                </td>
-                                <td>
-                                    <div class="margin-bottom-5">
-                                        <button class="btn btn-sm green btn-outline filter-submit margin-bottom">
-                                            <i class="fa fa-search"></i> Search</button>
-                                    </div>
-                                    <button class="btn btn-sm red btn-outline filter-cancel">
-                                        <i class="fa fa-times"></i> Reset</button>
-                                </td>
+								<th width="10%">Created Date</th>
+                                <th width="10%">Created User</th>
+                                <th width="10%">Status</th>
+								<th width="38%">Title</th>
+								<th width="10%">Clicks</th>
+								<th width="10%">Update Date</th>
+                                <th width="10%">Action</th>
                             </tr>
                             </thead>
                             <tbody> </tbody>
@@ -210,7 +164,7 @@ th,td,td>span {
                     "dom": "<'row'<'col-md-6 col-sm-12'pli><'col-md-6 col-sm-12'<'table-group-actions pull-right'>>r>t<'row'<'col-md-6 col-sm-12'pli><'col-md-6 col-sm-12'>>",
 
                     "bStateSave": true, // save datatable state(pagination, sort, etc) in cookie.
-                    "aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0 , 11 ] }],
+                    "aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0 , 7 ] }],
                     "lengthMenu": [
                         [10, 20, 50, -1],
                         [10, 20, 50, 'All'] // change per page values here
@@ -226,7 +180,7 @@ th,td,td>span {
                         [1, "desc"]
                     ],// set first column as a default sort by asc
                     "createdRow": function( row, data, dataIndex ) {
-                        $(row).children('td').eq(3).attr('style', 'text-align: left;')
+                        $(row).children('td').eq(4).attr('style', 'text-align: left;padding-left: 5px;padding-right: 5px;')
                     },
                 }
             });
@@ -264,20 +218,24 @@ th,td,td>span {
             });
 
             //grid.setAjaxParam("customActionType", "group_action");
-            grid.setAjaxParam("product", $("input[name='product']").val());
-            grid.setAjaxParam("model", $("input[name='model']").val());
-			grid.setAjaxParam("product_line", $("input[name='product_line']").val());
-            grid.setAjaxParam("item_no", $("input[name='item_no']").val());
-			grid.setAjaxParam("title", $("input[name='title']").val());
-            grid.setAjaxParam("confirm", $("select[name='confirm']").val());
-   			grid.setAjaxParam("etype", $("select[name='etype']").val());
-			grid.setAjaxParam("epoint", $("input[name='epoint']").val());
-            grid.setAjaxParam("update_date_from", $("input[name='update_date_from']").val());
-            grid.setAjaxParam("update_date_to", $("input[name='update_date_to']").val());
-            grid.setAjaxParam("user_id", $("select[name='user_id']").val());
+//            grid.setAjaxParam("product", $("input[name='product']").val());
+//            grid.setAjaxParam("model", $("input[name='model']").val());
+//			grid.setAjaxParam("product_line", $("input[name='product_line']").val());
+//            grid.setAjaxParam("item_no", $("input[name='item_no']").val());
+//			grid.setAjaxParam("title", $("input[name='title']").val());
+//            grid.setAjaxParam("confirm", $("select[name='confirm']").val());
+//   			grid.setAjaxParam("etype", $("select[name='etype']").val());
+//			grid.setAjaxParam("epoint", $("input[name='epoint']").val());
+//            grid.setAjaxParam("update_date_from", $("input[name='update_date_from']").val());
+//            grid.setAjaxParam("update_date_to", $("input[name='update_date_to']").val());
+//            grid.setAjaxParam("user_id", $("select[name='user_id']").val());
+            grid.setAjaxParam("group", $("input[name='group']").val());
+            grid.setAjaxParam("item_group", $("input[name='item_group']").val());
+            grid.setAjaxParam("item_model", $("input[name='item_model']").val());
+            grid.setAjaxParam("keywords", $("input[name='keywords']").val());
             grid.getDataTable().ajax.reload(null,false);
             //grid.clearAjaxParams();
-        }
+        };
 
 
         return {
@@ -294,8 +252,14 @@ th,td,td>span {
 
 $(function() {
     TableDatatablesAjax.init();
+    $('#data_search').on('click',function(){
+        var dttable = $('#datatable_ajax_asin').dataTable();
+        dttable.fnDestroy();
+        dttable.fnClearTable();
+        dttable.fnDestroy();
+        TableDatatablesAjax.init();
+    });
 });
-
 
 </script>
 
