@@ -44,8 +44,10 @@ th,td,td>span {
 							<div class="table-actions-wrapper">
 								<select id="customstatus" class="table-group-action-input form-control input-inline input-small input-sm">
 									<option value="">Select Status</option>
-									<option value="0">Disabled</option>
-									<option value="1">Enabled</option>
+									<option value="0">Pending</option>
+									<option value="1">Active</option>
+									<option value="2">Inactive</option>
+									<option value="3">Expired</option>
 									<option value="-1">Reject</option>
 								</select>
 
@@ -62,12 +64,16 @@ th,td,td>span {
 											<span></span>
 										</label>
 									</th>
-									<th width="30%"> Product </th>
+									<th width="15%"> Product </th>
 									<th width="10%"> ActiveDate </th>
-									<th width="10%"> Daily Gift </th>
-									<th width="8%"> Daily Remain </th>
-									<th width="8%"> Review Rating </th>
-									<th width="8%"> Number of reviews </th>
+									<th width="5%"> Daily Gift </th>
+									<th width="5%"> Daily Remain </th>
+									<th width="5%"> Review Rating </th>
+									<th width="5%"> Number of reviews </th>
+									<th width="5%">Total Requests </th>
+									<th width="5%"> Submit Purchase </th>
+									<th width="5%"> Submit Review </th>
+									<th width="5%"> Completed </th>
 									<th width="8%"> Date </th>
 									<th width="8%"> User </th>
 									<th width="8%"> Status</th>
@@ -113,6 +119,10 @@ th,td,td>span {
 									<td></td>
 									<td></td>
 									<td></td>
+									<td></td>
+									<td></td>
+									<td></td>
+									<td></td>
 									<!--
 									<td>
 										<select name="bgbu" class="form-control form-filter input-sm">
@@ -140,8 +150,10 @@ th,td,td>span {
 									<td>
 									<select id="status"  name="status" class="form-control form-filter input-sm">
 										<option value="">Select Status</option>
-										<option value="0">Disabled</option>
-										<option value="1">Enabled</option>
+										<option value="0">Pending</option>
+										<option value="1">Active</option>
+										<option value="2">Inactive</option>
+										<option value="3">Expired</option>
 										<option value="-1">Reject</option>
 									</select>
 									</td>
@@ -197,10 +209,10 @@ th,td,td>span {
 											// Uncomment below line("dom" parameter) to fix the dropdown overflow issue in the datatable cells. The default datatable layout
 											// setup uses scrollable div(table-scrollable) with overflow:auto to enable vertical scroll(see: assets/global/scripts/datatable.js).
 											// So when dropdowns used the scrollable div should be removed.
-											"dom": "<'row'<'col-md-6 col-sm-12'pli><'col-md-6 col-sm-12'<'table-group-actions pull-right'>>r>t<'row'<'col-md-6 col-sm-12'pli><'col-md-6 col-sm-12'>>",
+											"dom": "<'row'B<'col-md-6 col-sm-12'pli><'col-md-6 col-sm-12'<'table-group-actions pull-right'>>r>t<'row'<'col-md-6 col-sm-12'pli><'col-md-6 col-sm-12'>>",
 
 											"bStateSave": true, // save datatable state(pagination, sort, etc) in cookie.
-											"aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0 ,1,8,9,10 ] }],
+											"aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0 ,1,7,8,9,10,12,13,14 ] }],
 											"lengthMenu": [
 												[-1,10, 20, 50],
 												['All',10, 20, 50] // change per page values here
@@ -212,6 +224,9 @@ th,td,td>span {
 											 "createdRow": function( row, data, dataIndex ) {
 												$(row).children('td').eq(1).attr('style', 'text-align: left; ');
 											},
+											buttons: [
+												{ extend: 'csv', className: 'btn purple btn-outline ',filename:'RsgProducts' }
+											],
 											"order": [
 												[7, "desc"]
 											],// set first column as a default sort by asc

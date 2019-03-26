@@ -147,6 +147,14 @@ th,td,td>span {
 						</select>
 						</div>
 						
+						<div class="col-md-1">
+						<select class="form-control form-filter input-sm" name="np">
+							<option value="">All</option>
+							<option value="1" selected="selected">Negative</option>
+							<option value="2">Positive</option>
+						</select>
+						</div>
+						
 						<div class="col-md-2">
                             <div class="input-group date date-picker margin-bottom-5" data-date-format="yyyy-mm-dd">
                                 <input type="text" class="form-control form-filter input-sm" name="nextdate" placeholder="Next FollowUp Date" value="{{array_get($_REQUEST,'nextdate')}}">
@@ -392,6 +400,7 @@ th,td,td>span {
 			grid.setAjaxParam("keywords", $("input[name='keywords']").val());
 			grid.setAjaxParam("bgbu", $("select[name='bgbu']").val());
 			grid.setAjaxParam("rc", $("select[name='rc']").val());
+			grid.setAjaxParam("np", $("select[name='np']").val());
             grid.getDataTable().ajax.reload(null,false);
             //grid.clearAjaxParams();
         }
@@ -419,7 +428,7 @@ $(function() {
 		TableDatatablesAjax.init();
 	});
 	$("#vl_list_export").click(function(){
-		location.href='/reviewexport?asin_status='+(($("select[name='asin_status[]']").val())?$("select[name='asin_status[]']").val():'')+'&keywords='+$("input[name='keywords']").val()+'&date_from='+$("input[name='date_from']").val()+'&date_to='+$("input[name='date_to']").val()+'&nextdate='+$("input[name='nextdate']").val()+'&follow_status='+(($("select[name='follow_status[]']").val())?$("select[name='follow_status[]']").val():'')+'&user_id='+(($("select[name='user_id[]']").val())?$("select[name='user_id[]']").val():'')+'&site='+(($("select[name='site[]']").val())?$("select[name='site[]']").val():'')+'&rating='+$("select[name='rating']").val()+'&bgbu='+$("select[name='bgbu']").val()+'&vp='+$('select[name="vp"]').val()+'&rc='+$('select[name="rc"]').val()+'&del='+$('select[name="del"]').val();
+		location.href='/reviewexport?asin_status='+(($("select[name='asin_status[]']").val())?$("select[name='asin_status[]']").val():'')+'&keywords='+$("input[name='keywords']").val()+'&date_from='+$("input[name='date_from']").val()+'&date_to='+$("input[name='date_to']").val()+'&nextdate='+$("input[name='nextdate']").val()+'&follow_status='+(($("select[name='follow_status[]']").val())?$("select[name='follow_status[]']").val():'')+'&user_id='+(($("select[name='user_id[]']").val())?$("select[name='user_id[]']").val():'')+'&site='+(($("select[name='site[]']").val())?$("select[name='site[]']").val():'')+'&rating='+$("select[name='rating']").val()+'&bgbu='+$("select[name='bgbu']").val()+'&vp='+$('select[name="vp"]').val()+'&rc='+$('select[name="rc"]').val()+'&np='+$('select[name="np"]').val()+'&del='+$('select[name="del"]').val();
 	});
 });
 

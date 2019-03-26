@@ -163,6 +163,45 @@
                             </div>
 							
 							<?php } ?>
+							
+							
+							
+							<?php if(count($email_change_log)>0){?>
+<div class="col-md-12">
+                                <!-- BEGIN Portlet PORTLET-->
+                                <div class="portlet light">
+                                    <div class="portlet-title">
+                                        <div class="caption font-red-sunglo">
+                                            <i class="icon-share font-red-sunglo"></i>
+                                            <span class="caption-subject bold uppercase"> Email Change Logs</span>
+                                        </div>
+                                        <div class="tools">
+                                            <a href="" class="collapse" data-original-title="" title=""> </a>
+                                            <a href="" class="remove" data-original-title="" title=""> </a>
+                                        </div>
+                                    </div>
+                                    <div class="portlet-body">
+                                        <div class="scroller" style="height:200px" data-always-visible="1" data-rail-visible="1" data-rail-color="red" data-handle-color="green">
+                                            <ul class="chats">
+												 <?php foreach($email_change_log as $email_log){ ?>
+                                                <li class="in">
+                                                    <img class="avatar" alt="" src="/assets/layouts/layout/img/avatar.png">
+                                                    <div class="message">
+                                                        <span class="arrow"> </span>
+                                                        <a href="javascript:;" class="name"> {{array_get($users,$email_log->user_id)}} Change User To {{array_get($users,$email_log->to_user_id)}}   </a>
+                                                        <span class="datetime"> at {{$email_log->date}} </span>
+                                                        <span class="body" style="font-size:14px;"> {{$email_log->text}}  </span>
+                                                    </div>
+                                                </li>
+                                               <?php } ?>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- END Portlet PORTLET-->
+                            </div>
+							
+							<?php } ?>
     <div class="row">
         <div class="col-md-12">
 <div class="portlet light portlet-fit bordered">
@@ -920,6 +959,7 @@
 
 
                                         </select>
+										<input type="text" class="form-control" name="text" id="text" value="" placeholder="Remark for Assign">
                                     </div>
                                 </div>
 

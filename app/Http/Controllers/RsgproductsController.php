@@ -111,16 +111,39 @@ class RsgproductsController extends Controller
         $end = $end > $iTotalRecords ? $iTotalRecords : $end;
 		$accounts = $this->getAccounts();
 		$users= $this->getUsers();
-		$status_arr = array('-1'=>'<span class="badge badge-default">Reject</a>',0=>'<span class="badge badge-default">Disabled</a>',1=>'<span class="badge badge-success">Enabled</span>');
+		$pro_req_arr=[];
+		$pro_requests = DB::select('select product_id,sum(a) as a,sum(b) as b,sum(c) as c,count(*) as d from 
+		(select product_id,(case 
+			when step=9 then 1
+			else 0
+			End) as a,(case 
+			when amazon_order_id is null then 0
+			else 1
+			End) as b,(case 
+			when star_rating is null then 0
+			else 1
+			End) as c from rsg_requests) as f group by product_id');
+	
+		$pro_requests = json_decode(json_encode($pro_requests), true);
+		foreach($pro_requests as $pro_req){
+			$pro_req_arr[$pro_req['product_id']]=$pro_req;
+		}
+		
+	
+		$status_arr = array('-1'=>'<span class="badge badge-default">Reject</a>',0=>'<span class="badge badge-warning">Pending</a>',1=>'<span class="badge badge-success">Active</span>',2=>'<span class="badge badge-info">Inactive</span>',3=>'<span class="badge badge-danger">Expired</span>');
 		foreach ( $lists as $list){
             $records["data"][] = array(
                 '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input name="id[]" type="checkbox" class="checkboxes" value="'.$list['id'].'"/><span></span></label>',
-				'<img src="'.array_get($list,'product_img').'" width="75px" height="75px" align="left"/>Account : '.array_get($accounts,$list['seller_id']).'</BR>ASIN :<a href="https://'.array_get($list,'site').'/dp/'.array_get($list,'asin').'?m='.array_get($list,'seller_id').'" target="_blank">'.array_get($list,'asin').'</a></BR>Price : '.round(array_get($list,'price'),2).array_get($list,'currency').'</BR>Product : '.array_get($list,'product_name') ,
+				'<img src="'.array_get($list,'product_img').'" width="50px" height="50px" align="left"/>Account : '.array_get($accounts,$list['seller_id']).'</BR>ASIN :<a href="https://'.array_get($list,'site').'/dp/'.array_get($list,'asin').'?m='.array_get($list,'seller_id').'" target="_blank">'.array_get($list,'asin').'</a></BR>Price : '.round(array_get($list,'price'),2).array_get($list,'currency'),
 				$list['start_date'].'</BR>To</BR>'.$list['end_date'],
 				$list['daily_stock'],
                 $list['daily_remain'],
                 $list['review_rating'],
                 $list['number_of_reviews'],
+				array_get($pro_req_arr,$list['id'].'.d'),
+				array_get($pro_req_arr,$list['id'].'.b'),
+				array_get($pro_req_arr,$list['id'].'.c'),
+				array_get($pro_req_arr,$list['id'].'.a'),
 				$list['created_at'],
 				array_get($users,$list['user_id']),
 				array_get($status_arr,$list['status']),

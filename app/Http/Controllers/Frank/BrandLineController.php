@@ -27,6 +27,7 @@ class BrandLineController extends Controller {
 
         $rows = $this->queryRows('SELECT item_group,brand,GROUP_CONCAT(DISTINCT item_model) AS item_models FROM asin GROUP BY item_group,brand');
 
+        $itemGroupBrandModels = array();
         foreach ($rows as $row) {
             $itemGroupBrandModels[$row['item_group']][$row['brand']] = explode(',', $row['item_models']);
         }

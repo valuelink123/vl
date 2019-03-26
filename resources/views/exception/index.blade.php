@@ -74,6 +74,7 @@ th,td,td>span {
 								<th width="18%">Order Sku </th>
 								<th width="10%">Create Date</th>
 								<th width="8%">Status</th>
+                                <th width="8%">MCF Status</th>
 								<th width="22%"> Operate </th>
                                 <th width="8%"> Operator </th>
 								<th width="8%">Creator</th>
@@ -132,6 +133,9 @@ th,td,td>span {
                                         <option value="done">Done</option>
                                     </select>
                                 </td>
+
+                                <td></td>
+
 								 <td>
                                 <select id="resellerid" class="form-control form-filter input-sm" name="resellerid">
 								<option value ="">Replace Account
@@ -289,6 +293,7 @@ th,td,td>span {
             grid.setAjaxParam("type", $("select[name='subject']").val());
             grid.setAjaxParam("order_sku", $("input[name='order_sku']").val());
 			grid.setAjaxParam("status", $("select[name='status']").val());
+            grid.setAjaxParam("status", $("select[name='mcf_status']").val());
             grid.setAjaxParam("user_id", $("select[name='user_id']").val());
 			grid.setAjaxParam("group_id", $("select[name='group_id']").val());
             grid.getDataTable().ajax.reload(null,false);

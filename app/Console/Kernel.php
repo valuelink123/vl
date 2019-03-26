@@ -52,6 +52,9 @@ class Kernel extends ConsoleKernel
 		$schedule->call(function (){
 			DB::update('update rsg_products set daily_remain = daily_stock;');
         })->dailyAt('14:00');
+		$schedule->call(function (){
+			DB::update("update rsg_products set status = 3 where status>-1 and end_date<'".date('Y-m-d')."';");
+        })->dailyAt('00:00');
         $accountList = DB::table('accounts')->get(array('id'));
         $i=0;
         foreach($accountList as $account){

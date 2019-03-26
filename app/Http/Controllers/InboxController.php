@@ -145,6 +145,7 @@ class InboxController extends Controller
 							'inbox_id'=>$id,
 							'to_user_id'=>$inbox->user_id,
 							'user_id'=>Auth::user()->id,
+							'text'=>$request->get('text'),
 							'date'=>date('Y-m-d H:i:s')
 						));
 			   }	
@@ -226,13 +227,13 @@ class InboxController extends Controller
             $email_history[$key] = $mail;
         }
         krsort($email_history);
-
+		$email_change_log = DB::table('inbox_change_log')->where('inbox_id',$id)->whereRaw('user_id <> to_user_id')->orderBy('date','asc')->get();
 		$order_by = 'created_at';
 		$sort = 'desc';
 		$lists =  Category::orderBy($order_by,$sort)->get()->toArray();
 		$tree = $this->getTree($lists,28);
 
-        return view('inbox/view',['email_history'=>$email_history,'unread_history'=>$email_unread_history,'order'=>$order,'email'=>$email,'users'=>$this->getUsers(),'groups'=>$this->getGroups(),'sellerids'=>$this->getSellerIds(),'accounts'=>$this->getAccounts(),'account_type'=>$account_type,'tree'=>$tree]);
+        return view('inbox/view',['email_history'=>$email_history,'unread_history'=>$email_unread_history,'order'=>$order,'email'=>$email,'users'=>$this->getUsers(),'groups'=>$this->getGroups(),'sellerids'=>$this->getSellerIds(),'accounts'=>$this->getAccounts(),'account_type'=>$account_type,'tree'=>$tree,'email_change_log'=>$email_change_log]);
     }
     public function get(Request $request)
     {

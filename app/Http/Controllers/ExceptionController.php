@@ -298,7 +298,7 @@ class ExceptionController extends Controller
 
     public function create()
     {
-        $vars = ['groups'=>$this->getGroups(),'mygroups'=>$this->getUserGroup(),'sellerids'=>$this->getSellerIds()];
+        $vars = ['groups'=>$this->getGroups(46),'mygroups'=>$this->getUserGroup(46),'sellerids'=>$this->getSellerIds()];
 
         $vars['requestContentHistoryValues'] = [];
         // array_map(function ($row) {
@@ -307,21 +307,15 @@ class ExceptionController extends Controller
 
         array_push(
             $vars['requestContentHistoryValues'],
-            'Change Request Of Order Info',
-            'Damage In Transit',
-            'Exchange Request',
-            'Free Order',
-            'Gift',
-            'Listing Error',
-            'Lost In Transit',
-            'Original Info Error',
-            'Out Of Stock',
-            'Qulity Issue',
-            'Return Request',
-            'Ship Wrong Item',
-            'Shipping Delay',
-            'Unsatisfied Customer Service',
-            'Other Shipping Issue'
+            'Damage in Transit/lost in Transit',
+            'cx did not receive the product',
+            'Replacement parts',
+            'SG gift',
+            'RSG-gift',
+            'CTG-gift',
+            'Remove NRW',
+            'qulity issue',
+            'others'
         );
 
         return view('exception/add', $vars);
@@ -597,6 +591,24 @@ class ExceptionController extends Controller
 		$type_list['1'] = "Refund";
         $type_list['2'] = "Replacement";
         $type_list['3'] = "Refund & Replacement";
+
+        //得到列表记录的所有亚马逊id
+        $amazon_ids = $_mcfStatus = $mcfStatus = array();
+        foreach ( $customersLists as $customersList){
+            $amazon_ids[] = $customersList['amazon_order_id'];
+        }
+        //根据亚马逊id得到该订单的mcf物流状态
+        //exception表的amazon_order_id是对应的order库的amazon_mcf_orders表的SellerFulfillmentOrderId字段吧,amazon_mcf_orders表里的FulfillmentOrderStatus表示订单状态
+        if($amazon_ids){
+            $_mcfStatus = DB::connection('order')->table('amazon_mcf_orders')->wherein('SellerFulfillmentOrderId',$amazon_ids)->get(['SellerFulfillmentOrderId','FulfillmentOrderStatus']);
+
+            if($_mcfStatus){
+                foreach($_mcfStatus as $key=>$val){
+                    $mcfStatus[$val->SellerFulfillmentOrderId] = $val->FulfillmentOrderStatus;
+                }
+            }
+        }
+
 		foreach ( $customersLists as $customersList){
 			$operate = '';
 			if($customersList['type']==1 || $customersList['type']==3) $operate.= 'Refund : '.$customersList['refund'].'</BR>';
@@ -630,6 +642,7 @@ class ExceptionController extends Controller
                 $customersList['order_sku'],
 				$customersList['date'],
                 array_get($status_list,$customersList['process_status']),
+				isset($mcfStatus[$customersList['amazon_order_id']]) ? $mcfStatus[$customersList['amazon_order_id']] : 'unknown',
 				$operate,
 				array_get($users,$customersList['process_user_id'])?array_get($users,$customersList['process_user_id']):array_get($groupleaders,$customersList['group_id']),
                 array_get($groups,$customersList['group_id'].'.group_name').' > '.array_get($users,$customersList['user_id']),
@@ -652,9 +665,15 @@ class ExceptionController extends Controller
         }
         return $users_array;
     }
-	
-	public function getGroups(){
-        $users = Group::get()->toArray();
+
+    //得到分组的下拉框,有id表示只展示这一个id的下拉框选项
+	public function getGroups($groupid=''){
+        if($groupid){
+            $users = Group::where('id',$groupid)->get()->toArray();
+        }else{
+            $users = Group::get()->toArray();
+        }
+
         $users_array = array();
         foreach($users as $user){
             $users_array[$user['id']]['group_name'] = $user['group_name'];
@@ -692,6 +711,7 @@ class ExceptionController extends Controller
 			'rebindordersellerid' => 'required|string',
 			'rebindorderid' => 'required|string',
 			'type' => 'required|string',
+            'descrip' => 'required|string',
         ]);
         $exception = new Exception;
 		
@@ -705,6 +725,7 @@ class ExceptionController extends Controller
 		$exception->user_id = intval(Auth::user()->id);
 		$exception->request_content = $request->get('request_content');
 		$exception->process_status = 'submit';
+        $exception->descrip = $request->get('descrip');
 		if( $exception->type == 1 || $exception->type == 3){
 			$exception->refund = $request->get('refund');
 		}else{
@@ -772,10 +793,15 @@ class ExceptionController extends Controller
 	
 	
 	
-	public function getUserGroup(){
+	public function getUserGroup($groupid=''){
 	
 		if(Auth::user()->admin){
-            $groups = Groupdetail::get(['group_id']);
+		    if($groupid){
+                $groups = Groupdetail::where('group_id',$groupid)->get(['group_id']);
+            }else{
+                $groups = Groupdetail::get(['group_id']);
+            }
+
 			$group_arr =array();
 			foreach($groups as $group){
 				$group_arr['groups'][$group->group_id] = $group->group_id;
@@ -787,7 +813,12 @@ class ExceptionController extends Controller
 			return $group_arr;
         }else{
 			$user_id = Auth::user()->id;
-            $groups = Groupdetail::where('user_id',$user_id)->get(['group_id','leader']);
+            if($groupid){
+                $groups = Groupdetail::where('user_id',$user_id)->where('group_id',$groupid)->get(['group_id','leader']);
+            }else{
+                $groups = Groupdetail::where('user_id',$user_id)->get(['group_id','leader']);
+            }
+
 			$group_arr =array();
 			foreach($groups as $group){
 				$group_arr['groups'][$group->group_id] = $group->group_id;
