@@ -190,6 +190,16 @@
 			</div>
 		</div>
 
+		<div class="form-group">
+			<label>Description</label>
+			<div class="input-group ">
+			<span class="input-group-addon">
+				<i class="fa fa-bookmark"></i>
+			</span>
+				<input type="text" class="form-control" name="descrip" id="descrip" value="{{old('descrip')}}" required >
+			</div>
+		</div>
+
 
 		<div class="form-group">
 			<label>Type</label>
@@ -200,7 +210,6 @@
 				<select name="type" id="type" class="form-control" >
 				<option value="2">Replacement
 				<option value="1">Refund
-				<option value="3">Refund & Replacement
 				<option value="4">Gift Card
 				</select>
 			</div>

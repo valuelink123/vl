@@ -195,6 +195,16 @@ if(($exception['user_id'] == Auth::user()->id || Auth::user()->admin || in_array
 				<input type="text" class="form-control" name="request_content" id="request_content" value="{{$exception['request_content']}}" {{$disable}}>
 			</div>
 		</div>
+
+			<div class="form-group">
+				<label>Description</label>
+				<div class="input-group ">
+			<span class="input-group-addon">
+				<i class="fa fa-bookmark"></i>
+			</span>
+					<input type="text" class="form-control" name="descrip" id="descrip" value="{{$exception['descrip']}}" required {{$disable}}>
+				</div>
+			</div>
 		
 		
 		<div class="form-group">
