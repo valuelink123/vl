@@ -126,7 +126,12 @@ class QaController extends Controller
         }
         $for_product2 = array_unique(array_filter($for_product2));
 
-        return view('qa/view',['qa'=>$qa,'users'=>$this->getUsers(),'tree'=>$tree,'for_product2'=>$for_product2,'groups'=>$this->getGroups()]);
+        $qas = new Qa;
+        $related_knowledge = explode(';',$qa['related_knowledge']);
+        $qas = $qas->whereIN('id',$related_knowledge);
+        $qas = $qas->orderBy('created_at','desc')->get()->toArray();
+
+        return view('qa/view',['qa'=>$qa,'qas'=>$qas,'users'=>$this->getUsers(),'tree'=>$tree,'for_product2'=>$for_product2,'groups'=>$this->getGroups()]);
     }
 
     public function clicks($id,$clicks)

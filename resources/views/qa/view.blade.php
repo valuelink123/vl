@@ -244,18 +244,32 @@ License: You must have a valid license purchased only from themeforest(the above
                                                         echo 'Status : Pending';
                                                     }
                                                 ?>
+
                                             </h4>
 											 
+
+                                        </div>
+                                        <div class="blog-comments" style="margin-top:50px;">
+                                            <h3 class="sbold blog-comments-title">Details :</h3>
                                             {!!$qa->description!!}
                                         </div>
                                         
-										
 										<div class="blog-comments" style="margin-top:50px;">
 											<h3 class="sbold blog-comments-title">Details （Chinese）:</h3>
                                             {!!$qa->dqe_content!!}
                                         </div>
+                                        <div class="blog-comments" style="margin-top:50px; margin-bottom: 30px;">
+                                            <h3 class="sbold blog-comments-title">Related Knowledge:</h3>
+                                            <?php
+                                            foreach($qas as $key=>$val){
+                                            ?>
+                                            <div class="col-md-6" style="line-height: 30px; border: 1px solid #717172;"><?=$val['title']?></div>
+                                            <?php
+                                            }
+                                            ?>
+                                        </div>
 										<?php if($qa->confirm!=1){?>
-                                        <div class="blog-comments">
+                                        <div class="blog-comments" style="margin-top:60px;">
                                             <h3 class="sbold blog-comments-title">Update Details:</h3>
 											<form role="form" action="{{ url('question/'.$qa['id']) }}" method="POST">
                     {{ csrf_field() }}
@@ -289,7 +303,6 @@ License: You must have a valid license purchased only from themeforest(the above
 											 </script>
 			
 									</div>
-								
                         <div style="text-align:right; margin-top:30px;">
                           
                                 <button type="submit" class="btn blue">Submit</button>
