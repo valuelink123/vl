@@ -34,20 +34,100 @@ License: You must have a valid license purchased only from themeforest(the above
         <link href="/assets/global/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
         <link href="/assets/global/plugins/bootstrap-switch/css/bootstrap-switch.min.css" rel="stylesheet" type="text/css" />
         <!-- END GLOBAL MANDATORY STYLES -->
+        <!-- BEGIN PAGE LEVEL PLUGINS -->
+        <link href="/assets/global/plugins/bootstrap-colorpicker/css/colorpicker.css" rel="stylesheet" type="text/css" />
+        <link href="/assets/global/plugins/jquery-minicolors/jquery.minicolors.css" rel="stylesheet" type="text/css" />
+        <link href="/assets/global/plugins/datatables/datatables.min.css" rel="stylesheet" type="text/css" />
+        <link href="/assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.css" rel="stylesheet" type="text/css" />
+        <link href="/assets/global/plugins/bootstrap-toastr/toastr.min.css" rel="stylesheet" type="text/css" />
+        <link href="/assets/pages/css/pricing.min.css" rel="stylesheet" type="text/css" />
+        <link href="/assets/global/plugins/bootstrap-multiselect/css/bootstrap-multiselect.css" rel="stylesheet" type="text/css" />
+        <!-- END PAGE LEVEL PLUGINS -->
         <!-- BEGIN THEME GLOBAL STYLES -->
-        <link href="/assets/global/css/components.min.css" rel="stylesheet" id="style_components" type="text/css" />
+        <link href="/assets/global/css/components.css" rel="stylesheet" id="style_components" type="text/css" />
         <link href="/assets/global/css/plugins.min.css" rel="stylesheet" type="text/css" />
         <!-- END THEME GLOBAL STYLES -->
-        <!-- BEGIN PAGE LEVEL STYLES -->
-        <link href="/assets/pages/css/blog.min.css" rel="stylesheet" type="text/css" />
-		<link href="/assets/pages/css/search.min.css" rel="stylesheet" type="text/css">
-        <!-- END PAGE LEVEL STYLES -->
         <!-- BEGIN THEME LAYOUT STYLES -->
         <link href="/assets/layouts/layout/css/layout.min.css" rel="stylesheet" type="text/css" />
         <link href="/assets/layouts/layout/css/themes/darkblue.min.css" rel="stylesheet" type="text/css" id="style_color" />
         <link href="/assets/layouts/layout/css/custom.min.css" rel="stylesheet" type="text/css" />
         <!-- END THEME LAYOUT STYLES -->
-        <link rel="shortcut icon" href="favicon.ico" />
+        <link href="/assets/global/plugins/fancybox/source/jquery.fancybox.css" rel="stylesheet" type="text/css" />
+        <link href="/assets/global/plugins/jquery-file-upload/blueimp-gallery/blueimp-gallery.min.css" rel="stylesheet" type="text/css" />
+        <link href="/assets/global/plugins/jquery-file-upload/css/jquery.fileupload.css" rel="stylesheet" type="text/css" />
+        <link href="/assets/global/plugins/jquery-file-upload/css/jquery.fileupload-ui.css" rel="stylesheet" type="text/css" />
+        <link href="/assets/global/plugins/bootstrap-timepicker/css/bootstrap-timepicker.min.css" rel="stylesheet" type="text/css" />
+        <link href="/assets/global/plugins/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css" rel="stylesheet" type="text/css" />
+        <link rel="stylesheet" href="/assets/global/plugins/jquery-ui/jquery-ui.min.css">
+        <!--[if lt IE 9]>
+        <script src="/assets/global/plugins/respond.min.js"></script>
+        <script src="/assets/global/plugins/excanvas.min.js"></script>
+        <script src="/assets/global/plugins/ie8.fix.min.js"></script>
+        <![endif]-->
+        <!-- BEGIN CORE PLUGINS -->
+        <script src="/assets/global/plugins/jquery.min.js" type="text/javascript"></script>
+        <script src="/assets/global/plugins/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+        <script src="/assets/global/plugins/js.cookie.min.js" type="text/javascript"></script>
+        <script src="/assets/global/plugins/jquery-slimscroll/jquery.slimscroll.min.js" type="text/javascript"></script>
+        <script src="/assets/global/plugins/jquery.blockui.min.js" type="text/javascript"></script>
+        <script src="/assets/global/plugins/bootstrap-switch/js/bootstrap-switch.min.js" type="text/javascript"></script>
+        <script src="/assets/global/plugins/jquery-repeater/jquery.repeater.js" type="text/javascript"></script>
+        <!-- END CORE PLUGINS -->
+
+
+        <script src="/assets/global/plugins/jquery-ui/jquery-ui.min.js"></script>
+        <script src="/assets/global/scripts/datatable.js" type="text/javascript"></script>
+        <script src="/assets/global/plugins/datatables/datatables.min.js" type="text/javascript"></script>
+        <script src="/assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.js" type="text/javascript"></script>
+        <script src="/assets/pages/scripts/form-repeater.js?v=laji" type="text/javascript"></script>
+        <script src="/assets/global/plugins/bootstrap-multiselect/js/bootstrap-multiselect.js" type="text/javascript"></script>
+        <script src="/assets/pages/scripts/components-bootstrap-multiselect.js" type="text/javascript"></script>
+        <!-- BEGIN PAGE LEVEL SCRIPTS -->
+        <script src="/assets/global/plugins/bootstrap-toastr/toastr.min.js" type="text/javascript"></script>
+        <script src="/assets/global/plugins/bootbox/bootbox.min.js" type="text/javascript"></script>
+        <script src="/assets/pages/scripts/ui-modals.min.js" type="text/javascript"></script>
+
+        <!-- END PAGE LEVEL SCRIPTS -->
+        <script src="/assets/global/plugins/jquery-validation/js/jquery.validate.min.js" type="text/javascript"></script>
+        <script src="/assets/global/plugins/jquery-validation/js/additional-methods.min.js" type="text/javascript"></script>
+        <script src="/assets/global/plugins/select2/js/select2.full.min.js" type="text/javascript"></script>
+        <script src="/assets/global/plugins/bootstrap-wizard/jquery.bootstrap.wizard.js" type="text/javascript"></script>
+
+        <!-- BEGIN THEME GLOBAL SCRIPTS -->
+        <script src="/assets/global/scripts/app.min.js" type="text/javascript"></script>
+        <script src="/assets/global/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js" type="text/javascript"></script>
+        <script src="/assets/global/plugins/bootstrap-timepicker/js/bootstrap-timepicker.min.js" type="text/javascript"></script>
+        <script src="/assets/global/plugins/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js" type="text/javascript"></script>
+        <script src="/assets/global/plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.js" type="text/javascript"></script>
+        <script src="/assets/global/plugins/jquery-minicolors/jquery.minicolors.min.js" type="text/javascript"></script>
+        <!-- END THEME GLOBAL SCRIPTS -->
+        <!-- BEGIN THEME LAYOUT SCRIPTS -->
+        <script src="/assets/layouts/layout/scripts/layout.js" type="text/javascript"></script>
+        <script src="/assets/layouts/layout/scripts/demo.min.js" type="text/javascript"></script>
+        <script src="/assets/layouts/global/scripts/quick-sidebar.min.js" type="text/javascript"></script>
+        <script src="/assets/layouts/global/scripts/quick-nav.min.js" type="text/javascript"></script>
+        <!-- BEGIN PAGE LEVEL PLUGINS -->
+        <script src="/assets/global/plugins/fancybox/source/jquery.fancybox.pack.js" type="text/javascript"></script>
+        <script src="/assets/global/plugins/jquery-file-upload/js/vendor/jquery.ui.widget.js" type="text/javascript"></script>
+        <script src="/assets/global/plugins/jquery-file-upload/js/vendor/tmpl.min.js" type="text/javascript"></script>
+        <script src="/assets/global/plugins/jquery-file-upload/js/vendor/load-image.min.js" type="text/javascript"></script>
+        <script src="/assets/global/plugins/jquery-file-upload/js/vendor/canvas-to-blob.min.js" type="text/javascript"></script>
+        <script src="/assets/global/plugins/jquery-file-upload/blueimp-gallery/jquery.blueimp-gallery.min.js" type="text/javascript"></script>
+        <script src="/assets/global/plugins/jquery-file-upload/js/jquery.iframe-transport.js" type="text/javascript"></script>
+        <script src="/assets/global/plugins/jquery-file-upload/js/jquery.fileupload.js" type="text/javascript"></script>
+        <script src="/assets/global/plugins/jquery-file-upload/js/jquery.fileupload-process.js" type="text/javascript"></script>
+        <script src="/assets/global/plugins/jquery-file-upload/js/jquery.fileupload-image.js" type="text/javascript"></script>
+        <script src="/assets/global/plugins/jquery-file-upload/js/jquery.fileupload-audio.js" type="text/javascript"></script>
+        <script src="/assets/global/plugins/jquery-file-upload/js/jquery.fileupload-video.js" type="text/javascript"></script>
+        <script src="/assets/global/plugins/jquery-file-upload/js/jquery.fileupload-validate.js" type="text/javascript"></script>
+        <script src="/assets/global/plugins/jquery-file-upload/js/jquery.fileupload-ui.js" type="text/javascript"></script>
+
+        <script src="/assets/pages/scripts/form-fileupload.js" type="text/javascript"></script>
+        <script src="/assets/layouts/global/scripts/echarts.min.js" type="text/javascript"></script>
+
+        <!-- END PAGE LEVEL SCRIPTS -->
+        <link rel="shortcut icon" href="/favicon.ico" />
+        <link href="/css/common.css?v=9" rel="stylesheet" type="text/css"/>
 		<style>
 		.search-page .search-bar input,.search-page .search-bar select{
     border: 1px !important;
@@ -65,27 +145,58 @@ License: You must have a valid license purchased only from themeforest(the above
 
 	<div class="search-page">
 	<div class="search-bar" style="  position: fixed; z-index:999;background: #eee;">
-                                <div class="row">
+                                <div>
 								<form method="get" action="/question">
 									
-                                    <div class="col-lg-7">
-						<div class="col-md-3">
-                            <select class="form-control" name="etype" id="etype">
-                                <option value="">Question Type</option>
-                                @foreach (getEType() as $etype)
-                                    <option value="{{$etype}}">{{$etype}}</option>
-                                @endforeach
-                            </select>
-                        </div>	
-                                        <div class="col-md-9 input-group">
+                                    <div class="col-lg-8" style="margin-top: 15px;">
+
+                                        <div class="col-md-4" style=" padding-left: 0px;padding-right: 0px;">
+                                            <div class="input-group">
+                                                <span class="input-group-addon">Group</span>
+                                                <select class="form-control" name="group" id="group">
+                                                    <option value="ALL">ALL</option>
+                                                    @foreach($groups as $key=>$val)
+                                                        <option value="{{$val}}">{{$val}}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <div class="input-group">
+                                                <span class="input-group-addon">Item Group</span>
+                                                <select class="form-control" name="item_group" id="item_group">
+                                                    <option value="ALL">ALL</option>
+                                                    @foreach($for_product2 as $key=>$val)
+                                                        <option value="{{$val}}">{{$val}}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-4 input-group">
                                             <input type="text" class="form-control" name="keywords" placeholder="Search for..." >
                                             <span class="input-group-btn">
-                                                <button class="btn blue uppercase bold" type="submit">Search</button>
+                                                <button class="btn blue uppercase bold" type="submit" style="height: 55px;">Search</button>
                                             </span>
                                         </div>
+						{{--<div class="col-md-3">--}}
+                            {{--<select class="form-control" name="etype" id="etype">--}}
+                                {{--<option value="">Question Type</option>--}}
+                                {{--@foreach (getEType() as $etype)--}}
+                                    {{--<option value="{{$etype}}">{{$etype}}</option>--}}
+                                {{--@endforeach--}}
+                            {{--</select>--}}
+                        {{--</div>	--}}
+                                        {{--<div class="col-md-9 input-group">--}}
+                                            {{--<input type="text" class="form-control" name="keywords" placeholder="Search for..." >--}}
+                                            {{--<span class="input-group-btn">--}}
+                                                {{--<button class="btn blue uppercase bold" type="submit">Search</button>--}}
+                                            {{--</span>--}}
+                                        {{--</div>--}}
                                     </div>
 									</form>
-                                    <div class="col-lg-5">
+                                    <div class="col-lg-3">
                                         <p class="search-desc clearfix" style="color: #333;
   font-size: 35px;
   text-align: center;">Questions And Solutions</p>
@@ -94,7 +205,7 @@ License: You must have a valid license purchased only from themeforest(the above
                             </div>
 	</div>
 
-	 <div class="row" style="  padding-top: 120px;z-index:998;">
+	 <div style="  padding-top: 120px;z-index:998;">
 	 
 	  <div class="col-lg-10 col-lg-offset-1">
                                     <div class="blog-single-content blog-container" style="padding: 30px;
@@ -116,9 +227,13 @@ License: You must have a valid license purchased only from themeforest(the above
                                                 <?php
                                                     }
                                                 ?>
-                                                Similar Question :
                                                 <?php
-
+                                                $similar_question = json_decode($qa->similar_question, true);
+                                                if(!empty($similar_question)){
+                                                    foreach($similar_question as $val){
+                                                        echo 'Similar Question : '.$val.'<br>';
+                                                    }
+                                                }
                                                 ?>
                                                 <?php
                                                     if($qa->confirm == 2){
@@ -175,7 +290,7 @@ License: You must have a valid license purchased only from themeforest(the above
 			
 									</div>
 								
-                        <div class="row" style="text-align:right; margin-top:30px;margin-right:30px;">
+                        <div style="text-align:right; margin-top:30px;">
                           
                                 <button type="submit" class="btn blue">Submit</button>
                                 <button type="reset" class="btn grey-salsa btn-outline">Cancel</button>
@@ -191,30 +306,6 @@ License: You must have a valid license purchased only from themeforest(the above
 								
 
 		</div>
-
-        <!-- END QUICK NAV -->
-        <!--[if lt IE 9]>
-<script src="/assets/global/plugins/respond.min.js"></script>
-<script src="/assets/global/plugins/excanvas.min.js"></script> 
-<script src="/assets/global/plugins/ie8.fix.min.js"></script> 
-<![endif]-->
-        <!-- BEGIN CORE PLUGINS -->
-        <script src="/assets/global/plugins/jquery.min.js" type="text/javascript"></script>
-        <script src="/assets/global/plugins/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
-        <script src="/assets/global/plugins/js.cookie.min.js" type="text/javascript"></script>
-        <script src="/assets/global/plugins/jquery-slimscroll/jquery.slimscroll.min.js" type="text/javascript"></script>
-        <script src="/assets/global/plugins/jquery.blockui.min.js" type="text/javascript"></script>
-        <script src="/assets/global/plugins/bootstrap-switch/js/bootstrap-switch.min.js" type="text/javascript"></script>
-        <!-- END CORE PLUGINS -->
-        <!-- BEGIN THEME GLOBAL SCRIPTS -->
-        <script src="/assets/global/scripts/app.min.js" type="text/javascript"></script>
-        <!-- END THEME GLOBAL SCRIPTS -->
-        <!-- BEGIN THEME LAYOUT SCRIPTS -->
-        <script src="/assets/layouts/layout/scripts/layout.min.js" type="text/javascript"></script>
-        <script src="/assets/layouts/layout/scripts/demo.min.js" type="text/javascript"></script>
-        <script src="/assets/layouts/global/scripts/quick-sidebar.min.js" type="text/javascript"></script>
-        <script src="/assets/layouts/global/scripts/quick-nav.min.js" type="text/javascript"></script>
-        <!-- END THEME LAYOUT SCRIPTS -->
     </body>
 
 </html>

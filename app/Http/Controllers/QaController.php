@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Qa;
+use App\Category;
+use App\Asin;
+use App\Group;
 use Illuminate\Support\Facades\Session;
 
 use App\User;
@@ -32,6 +35,15 @@ class QaController extends Controller
         }
         return $users_array;
     }
+    public function getGroups(){
+        $users = Group::get()->toArray();
+        $users_array = array();
+        foreach($users as $user){
+            $users_array[$user['id']] = $user['group_name'];
+        }
+        return $users_array;
+    }
+
     /**
      * Show the application dashboard.
      *
@@ -41,10 +53,22 @@ class QaController extends Controller
     {
 
 		$keywords = $request->get('keywords');
-		$etype = $request->get('etype');
+        $group = $request->get('group');
+        $item_group = $request->get('item_group');
+        $knowledge_type = $request->get('knowledge_type');
+
+		//$etype = $request->get('etype');
 
 		$qas = new Qa;
-		if($etype) $qas = $qas->where('etype',$etype);
+		//if($etype) $qas = $qas->where('etype',$etype);
+        if($group != 'ALL'){
+            $qas = $qas->where('for_product1', 'like', '%'.$group.'%');
+        }
+        if($item_group != 'ALL'){
+            $qas = $qas->where('for_product2', 'like', '%'.$item_group.'%');
+        }
+        if($knowledge_type) $qas = $qas->where('knowledge_type', 'like', '%'.$knowledge_type.'%');
+
 		if($keywords){
 			$qas = $qas->where(function ($query) use ($keywords){
 				$query->where('product', 'like','%'.$keywords.'%')
@@ -56,7 +80,26 @@ class QaController extends Controller
 			});
 		}
 		$qas = $qas->orderBy('created_at','desc')->paginate(8);
-        return view('qa/index',['qas'=>$qas,'keywords'=>$keywords,'users'=>$this->getUsers()]);
+
+        $data = new Category;
+        $order_by = 'created_at';
+        $sort = 'desc';
+
+        $data_two = $data->where('category_type', 2);
+        $category_two = $data_two->orderBy($order_by,$sort)->get()->toArray();
+
+        $asin_order_by = 'asin';
+        $asin_sort = 'asc';
+        $asin_data = new Asin;
+        $asin_list =  $asin_data->orderBy($asin_order_by,$asin_sort)->get()->toArray();
+
+        $for_product2 = [];
+        foreach($asin_list as $key=>$val){
+            $for_product2[] = $val['item_group'];
+        }
+        $for_product2 = array_unique(array_filter($for_product2));
+
+        return view('qa/index',['qas'=>$qas,'keywords'=>$keywords,'group'=>$group,'item_group'=>$item_group,'knowledge_type'=>$knowledge_type,'users'=>$this->getUsers(),'category_two'=>$category_two,'for_product2'=>$for_product2,'groups'=>$this->getGroups()]);
 
     }
 	
@@ -66,7 +109,24 @@ class QaController extends Controller
         $qa = Qa::where('id',$id)->first();
         $this->clicks($id,$qa['clicks']);
 
-        return view('qa/view',['qa'=>$qa,'users'=>$this->getUsers()]);
+        $order_by = 'created_at';
+        $sort = 'desc';
+
+        $lists =  Category::orderBy($order_by,$sort)->get()->toArray();
+        $tree = $this->getTree($lists,29);
+
+        $asin_order_by = 'asin';
+        $asin_sort = 'asc';
+        $asin_data = new Asin;
+        $asin_list =  $asin_data->orderBy($asin_order_by,$asin_sort)->get()->toArray();
+
+        $for_product2 = [];
+        foreach($asin_list as $key=>$val){
+            $for_product2[] = $val['item_group'];
+        }
+        $for_product2 = array_unique(array_filter($for_product2));
+
+        return view('qa/view',['qa'=>$qa,'users'=>$this->getUsers(),'tree'=>$tree,'for_product2'=>$for_product2,'groups'=>$this->getGroups()]);
     }
 
     public function clicks($id,$clicks)
@@ -91,6 +151,21 @@ class QaController extends Controller
         }
     }
 
+    public function getTree($data, $pId)
+    {
+        $tree = [];
+        foreach($data as $k => $v)
+        {
+            if($v['category_pid'] == $pId)
+            {
+                //父亲找到儿子
+                $v['category_pid'] = $this->getTree($data, $v['id']);
+                $tree[] = $v;
+                //unset($data[$k]);
+            }
+        }
+        return $tree;
+    }
 
 
 }
