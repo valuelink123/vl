@@ -298,7 +298,7 @@ class ExceptionController extends Controller
 
     public function create()
     {
-        $vars = ['groups'=>$this->getGroups(46),'mygroups'=>$this->getUserGroup(46),'sellerids'=>$this->getSellerIds()];
+        $vars = ['groups'=>$this->getGroups(),'mygroups'=>$this->getUserGroup(),'sellerids'=>$this->getSellerIds()];
 
         $vars['requestContentHistoryValues'] = [];
         // array_map(function ($row) {
@@ -672,12 +672,8 @@ class ExceptionController extends Controller
     }
 
     //得到分组的下拉框,有id表示只展示这一个id的下拉框选项
-	public function getGroups($groupid=''){
-        if($groupid){
-            $users = Group::where('id',$groupid)->get()->toArray();
-        }else{
-            $users = Group::get()->toArray();
-        }
+	public function getGroups(){
+        $users = Group::get()->toArray();
 
         $users_array = array();
         foreach($users as $user){
@@ -798,14 +794,11 @@ class ExceptionController extends Controller
 	
 	
 	
-	public function getUserGroup($groupid=''){
+	public function getUserGroup(){
 	
 		if(Auth::user()->admin){
-		    if($groupid){
-                $groups = Groupdetail::where('group_id',$groupid)->get(['group_id']);
-            }else{
-                $groups = Groupdetail::get(['group_id']);
-            }
+		    $groups = Groupdetail::get(['group_id']);
+
 
 			$group_arr =array();
 			foreach($groups as $group){
@@ -818,11 +811,7 @@ class ExceptionController extends Controller
 			return $group_arr;
         }else{
 			$user_id = Auth::user()->id;
-            if($groupid){
-                $groups = Groupdetail::where('user_id',$user_id)->where('group_id',$groupid)->get(['group_id','leader']);
-            }else{
-                $groups = Groupdetail::where('user_id',$user_id)->get(['group_id','leader']);
-            }
+			$groups = Groupdetail::where('user_id',$user_id)->get(['group_id','leader']);
 
 			$group_arr =array();
 			foreach($groups as $group){
