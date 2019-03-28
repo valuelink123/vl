@@ -18,7 +18,17 @@
                                 </a>
                             </div>
                         </div>
+                        <div class="col-md-6 " >
+                            <div class="btn-group " style="float:right;">
+                                <button id="vl_list_export" class="btn sbold blue"> Export
+                                    <i class="fa fa-download"></i>
+                                </button>
+
+                            </div>
+                        </div>
 					</div>
+
+                    <div style="clear:both"></div>
                     <div class="table-container">
                         <table class="table table-striped table-bordered table-hover table-checkable" id="datatable_ajax_phone">
                             <thead>
@@ -29,7 +39,8 @@
                                 <th width="15%"> Phone Nunber </th>
                                 <th width="20%"> Buyer Email </th>
                                 <th width="15%"> Amazon OrderID </th>
-								<th width="30%"> Call Notes </th>
+								<th width="20%"> Call Notes </th>
+                                <th width="10%"> Creator </th>
                                 <th width="10%"> Date </th>
                                 <th width="5%"> Action </th>
                             </tr>
@@ -46,6 +57,10 @@
                                 </td>
 								<td>
 								<input type="text" class="form-control form-filter input-sm" name="content">
+                                </td>
+                                {{--新添加的创建人搜索--}}
+                                <td>
+                                    <input type="text" class="form-control form-filter input-sm" name="user_name">
                                 </td>
                                 <td>
                                     <div class="input-group date date-picker margin-bottom-5" data-date-format="yyyy-mm-dd">
@@ -130,7 +145,7 @@
                     "dom": "<'row'<'col-md-6 col-sm-12'pli><'col-md-6 col-sm-12'<'table-group-actions pull-right'>>r>t<'row'<'col-md-6 col-sm-12'pli><'col-md-6 col-sm-12'>>",
 
                     "bStateSave": true, // save datatable state(pagination, sort, etc) in cookie.
-                    "aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0 , 4 , 6] }],
+                    "aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0 , 5 , 7] }],
                     "lengthMenu": [
                         [10, 20, 50],
                         [10, 20, 50] // change per page values here
@@ -140,7 +155,7 @@
                         "url": "{{ url('phone/get')}}", // ajax source
                     },
                     "order": [
-                        [5, "desc"]
+                        [6, "desc"]
                     ],// set first column as a default sort by asc
                     "createdRow": function( row, data, dataIndex ) {
 						$(row).children('td').eq(4).attr('style', 'text-align: left;word-break: break-all;')
@@ -156,6 +171,7 @@
             grid.setAjaxParam("date_to", $("input[name='date_to']").val());
             grid.setAjaxParam("amazon_order_id", $("input[name='amazon_order_id']").val());
 			grid.setAjaxParam("content", $("input[name='content']").val());
+            grid.setAjaxParam("user_name", $("input[name='user_name']").val());
             grid.getDataTable().ajax.reload(null,false);
             //grid.clearAjaxParams();
         }
@@ -175,6 +191,9 @@
 
 $(function() {
     TableDatatablesAjax.init();
+    $("#vl_list_export").click(function(){
+        location.href='/phoneExport?user_name='+$("input[name='user_name']").val()+'&amazon_order_id='+$("input[name='amazon_order_id']").val()+'&date_from='+$("input[name='date_from']").val()+'&date_to='+$("input[name='date_to']").val()+'&buyer_email='+$("input[name='buyer_email']").val()+'&content='+$("input[name='content']").val()+'&phone='+$("input[name='phone']").val();
+    });
 });
 
 

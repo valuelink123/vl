@@ -13,6 +13,9 @@ use Illuminate\Support\Facades\Hash;
 use App\Services\MultipleQueue;
 use PDO;
 use DB;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+
 class PhoneController extends Controller
 {
     /**
@@ -37,6 +40,8 @@ class PhoneController extends Controller
     }
 	public function get(Request $request)
     {
+        //取出所有用户的id=>name的映射数组
+        $users=$this->getUsers();
 
         $orderby = 'date';
         $sort = 'desc';
@@ -44,13 +49,24 @@ class PhoneController extends Controller
             if($_REQUEST['order'][0]['column']==1) $orderby = 'phone';
             if($_REQUEST['order'][0]['column']==2) $orderby = 'buyer_email';
             if($_REQUEST['order'][0]['column']==3) $orderby = 'amazon_order_id';
-            if($_REQUEST['order'][0]['column']==5) $orderby = 'date';
+            if($_REQUEST['order'][0]['column']==6) $orderby = 'date';
             $sort = $_REQUEST['order'][0]['dir'];
         }
 		
         $customers = new Phone;
-		if(array_get($_REQUEST,'phone')){
-            $customers = $customers->where('phone', 'like', '%'.$_REQUEST['phone'].'%');
+
+        //新添加的搜索选项（创建人姓名，buyer_email，amazon_order_id，content）
+        $searchField = array('phone','buyer_email','amazon_order_id','content');
+        foreach($searchField as $field){
+            if(array_get($_REQUEST,$field)){
+                $customers = $customers->where($field, 'like', '%'.$_REQUEST[$field].'%');
+            }
+        }
+
+        if(array_get($_REQUEST,'user_name')){
+            $username = trim($_REQUEST['user_name']);
+            $userId = in_array($username,$users) ? array_search($username,$users) : $username;
+            $customers = $customers->where('user_id', $userId);
         }
 		
         if(array_get($_REQUEST,'date_from')){
@@ -83,6 +99,7 @@ class PhoneController extends Controller
 				$customersList['buyer_email'],
 				$customersList['amazon_order_id'],
 				$customersList['content'],
+                isset($users[$customersList['user_id']]) ? $users[$customersList['user_id']] : '未知',
 				$customersList['date'],
 				
                 
@@ -103,6 +120,74 @@ class PhoneController extends Controller
         $records["recordsTotal"] = $iTotalRecords;
         $records["recordsFiltered"] = $iTotalRecords;
         echo json_encode($records);
+    }
+
+    //导出功能
+    public function export(Request $request){
+        $customers = new Phone;
+
+        //取出所有用户的id=>name的映射数组
+        $users=$this->getUsers();
+
+        $searchField = array('phone','buyer_email','amazon_order_id','content');
+        foreach($searchField as $field){
+            if(array_get($_REQUEST,$field)){
+                $customers = $customers->where($field, 'like', '%'.$_REQUEST[$field].'%');
+            }
+        }
+
+        if(array_get($_REQUEST,'user_name')){
+            $username = trim($_REQUEST['user_name']);
+            $userId = in_array($username,$users) ? array_search($username,$users) : $username;
+            $customers = $customers->where('user_id', $userId);
+        }
+
+        if(array_get($_REQUEST,'date_from')){
+            $customers = $customers->where('date','>=',$_REQUEST['date_from'].' 00:00:00');
+        }
+        if(array_get($_REQUEST,'date_to')){
+            $customers = $customers->where('date','<=',$_REQUEST['date_to'].' 23:59:59');
+        }
+        //按时间倒序排序，查出所有数据
+        $customersLists =  $customers->orderBy('date','desc')->get()->toArray();
+
+        $headArray[] = 'Phone Number';
+        $headArray[] = 'Buyer Email';
+        $headArray[] = 'Amazon OrderID';
+        $headArray[] = 'Call Notes';
+        $headArray[] = 'Creator';
+        $headArray[] = 'Date';
+
+        // 导出表格的数据为$arrayData
+        $arrayData[] = $headArray;
+        foreach ($customersLists as $key=>$val){
+            $arrayData[] = array(
+                $val['phone'],
+                $val['buyer_email'],
+                $val['amazon_order_id'],
+                $val['content'],
+                isset($users[$val['user_id']]) ? $users[$val['user_id']] : '未知',
+                $val['date'],
+            );
+        }
+
+        if($arrayData){
+            $spreadsheet = new Spreadsheet();
+
+            $spreadsheet->getActiveSheet()
+                ->fromArray(
+                    $arrayData,  // The data to set
+                    NULL,        // Array values with this value will not be set
+                    'A1'         // Top left coordinate of the worksheet range where
+                //    we want to set these values (default is A1)
+                );
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');//告诉浏览器输出07Excel文件
+            header('Content-Disposition: attachment;filename="Export_Phone.xlsx"');//告诉浏览器输出浏览器名称
+            header('Cache-Control: max-age=0');//禁止缓存
+            $writer = new Xlsx($spreadsheet);
+            $writer->save('php://output');
+        }
+        die();
     }
 	
     public function create()
