@@ -314,7 +314,7 @@ class ExceptionController extends Controller
             'RSG-gift',
             'CTG-gift',
             'Remove NRW',
-            'qulity issue',
+            'quality issue',
             'others'
         );
 
