@@ -114,17 +114,13 @@
                                     <select class="form-control" name="knowledge_type" id="knowledge_type" onchange="r_type();" required>
                                         <option>None</option>
                                         <?php
-                                        foreach($tree as $key=>$val){
-                                        ?>
-                                            <option value="<?=$val['category_name'];?>"><?=$val['category_name'];?></option>
-                                        <?php
-                                        }
+                                            echo procHtml($tree);
                                         ?>
                                     </select>
                                 </div>
                             </div>
 
-                            <div class="form-group r_type" style="display: none;">
+                            <div class="form-group r_type">
                                 <label>For Product</label>
                                 <div class="epoint_selectList form-inline">
                                     <select class="for_product1 form-control" name="for_product1">
@@ -154,7 +150,7 @@
                                 </div>
                             </div>
 
-                            <div class="form-group r_product_level" style="display: none;">
+                            <div class="form-group r_product_level">
                                 <label>For Question</label>
                                 <div class="input-group ">
                                     <span class="input-group-addon">
@@ -173,7 +169,7 @@
                                 </div>
                             </div>
 
-                            <div class="form-group r_type" style="display: none;">
+                            <div class="form-group r_type">
                                 <label>Similar Question</label>
                                 <div style="clear: both;"></div>
                                 <div class="input-group col-md-10 similar_question" style="float: left;">
@@ -237,27 +233,45 @@
 
     </div>
     <script type="text/javascript">
-        function r_type(){
-            var k_type = $("#knowledge_type").val();
-            if(k_type == '产品知识'){
-                $('.r_type').show();
-            }else{
-                $('.r_type').hide();
-            }
-        }
-        function r_product_level(){
-            var k_type = $("#for_product2").val();
-            if(k_type == 'AG-AP'){
-                $('.r_product_level').show();
-            }else{
-                $('.r_product_level').hide();
-            }
-        }
+//        function r_type(){
+//            var k_type = $("#knowledge_type").val();
+//            if(k_type == 'Product Knowledge'){
+//                $('.r_type').show();
+//            }else{
+//                $('.r_type').hide();
+//            }
+//        }
+//        function r_product_level(){
+//            var k_type = $("#for_product2").val();
+//            if(k_type == 'AG-AP'){
+//                $('.r_product_level').show();
+//            }else{
+//                $('.r_product_level').hide();
+//            }
+//        }
 
         $('.add_similar_question').on('click', function(){
             var html = '<div class="input-group col-md-12"><span class="input-group-addon"><i class="fa fa-bookmark"></i></span><input type="text" class="form-control" placeholder="Similar Question" name="similar_question[]" id="similar_question" /></div>';
             $('.similar_question').append(html);
         });
     </script>
+    <?php
+    function procHtml($tree,$level = 0)
+    {
+        $html = '';
+        foreach($tree as $key=>$val)
+        {
+            if($val['category_pid'] == '') {
+                $html .= '<option value="'.$val['category_name'].'">'.$val['category_name'].' </option>';
+            }else{
+                $flg = str_repeat('|----',$level);
+                $html .= '<option value="'.$val['category_name'].'">'.$flg.$val['category_name'];
+                $html .= procHtml($val['category_pid'],$level+1);
+                $html = $html."</option>";
+            }
+        }
+        return $html;
+    }
+    ?>
 
 @endsection

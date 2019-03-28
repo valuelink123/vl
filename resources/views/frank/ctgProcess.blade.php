@@ -3,7 +3,6 @@
     @include('layouts.crumb', ['crumbs'=>[['CTG', '/ctg/list'], 'Process']])
 @endsection
 @section('content')
-
     <style>
         .font-dark {
             color: #5888b9 !important;
@@ -475,7 +474,7 @@
                 })
 
                 return false
-            })
+            });
 
 
             let ue = UE.getEditor('bdeditor', {
@@ -483,12 +482,12 @@
                 autoSyncData: false,
                 enableAutoSave: false,
                 initialFrameWidth: "100%",
-            })
+            });
 
             ue.ready(function () {
                 ue.execCommand('serverparam', '_token', '{!! csrf_token() !!}')
                 ue.loadTrackNote()
-            })
+            });
 
             let track_notes = _steps.track_notes
             // arr = []
@@ -501,13 +500,13 @@
 
             ue.saveTrackNote = function () {
                 track_notes[statusDict[wizardInstance.current_index]] = ue.getContent()
-            }
+            };
 
             ue.loadTrackNote = function () {
                 ue.setContent(track_notes[statusDict[wizardInstance.current_index]] || '')
-            }
+            };
 
-            ue.addListener('blur', ue.saveTrackNote)
+            ue.addListener('blur', ue.saveTrackNote);
 
             for (let input of $thewizard.find('[name]')) {
                 // formElement.elements 属性包含所有输入框、选择框等等
@@ -517,10 +516,11 @@
                 thewizard[input.name].value = _steps[input.name] || ''
             }
 
-            XFormHelper.inputEnableByRadio(thewizard)
-            XFormHelper.assocFormControls(thewizard)
+            XFormHelper.inputEnableByRadio(thewizard);
+            XFormHelper.assocFormControls(thewizard);
 
-            let activeTab = @json($ctgRow['processor']>0)? 'process-steps' : 'ctg-info'
+            //let activeTab = @json($ctgRow['processor']>0)? 'process-steps' : 'ctg-info';
+            let activeTab = 'ctg-info';
             $(`#tabs a[href="#${activeTab}"]`).tab('show')
 
         })

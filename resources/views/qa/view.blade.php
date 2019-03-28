@@ -253,7 +253,7 @@ License: You must have a valid license purchased only from themeforest(the above
                                             <h3 class="sbold blog-comments-title">Details :</h3>
                                             {!!$qa->description!!}
                                         </div>
-                                        
+
 										<div class="blog-comments" style="margin-top:50px;">
 											<h3 class="sbold blog-comments-title">Details （Chinese）:</h3>
                                             {!!$qa->dqe_content!!}
