@@ -412,14 +412,14 @@ class ReviewController extends Controller
 		
 		if(array_get($_REQUEST,'rc')){
 			   if(array_get($_REQUEST,'rc')==1) $customers = $customers->whereRaw('review.rating=review.updated_rating');
-			    if(array_get($_REQUEST,'rc')==2) $customers = $customers->whereRaw('review.rating<>review.updated_rating');
+			   if(array_get($_REQUEST,'rc')==2) $customers = $customers->whereRaw('review.rating<>review.updated_rating');
 		}
 		
 		if(array_get($_REQUEST,'np')){
 			$nev_rating=4;
 			if(array_get($_REQUEST,'np')==1) {
-				$customers = $customers->where(function ($query) use ($nev_rating) {
-					$query->where('rating', '<', $nev_rating)->orWhere('updated_rating', '<', $nev_rating);
+				$customers = $customers->where('rating', '<', $nev_rating)->Where(function ($query) use ($nev_rating) {
+					$query->orWhere('updated_rating', '<', $nev_rating)->where('updated_rating', '>', 0);
 				});
 			}
 			if(array_get($_REQUEST,'np')==2) {
