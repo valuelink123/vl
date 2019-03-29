@@ -21,7 +21,7 @@ License: You must have a valid license purchased only from themeforest(the above
 
     <head>
         <meta charset="utf-8" />
-        <title>Questions And Solutions</title>
+        <title>Knowledge Center</title>
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta content="width=device-width, initial-scale=1" name="viewport" />
         <meta content="#1 selling multi-purpose bootstrap admin theme sold in themeforest marketplace packed with angularjs, material design, rtl support with over thausands of templates and ui elements and plugins to power any type of web applications including saas and admin dashboards. Preview page of Theme #1 for blog listing page"
@@ -210,7 +210,7 @@ License: You must have a valid license purchased only from themeforest(the above
                                     <div class="col-lg-4">
                                         <p class="search-desc clearfix" style="color: #333;
   font-size: 35px;
-  text-align: center;">Questions And Solutions</p>
+  text-align: center;">Knowledge Center</p>
                                     </div>
                                 </div>
                             </div>
@@ -220,7 +220,7 @@ License: You must have a valid license purchased only from themeforest(the above
 	 
 
           <div class="col-lg-3" style=" float:left;padding:30px 50px;">
-              <div class="blog-post-lg bordered blog-container" style="padding:30px; background: #fff;">
+              <div class="blog-post-lg bordered blog-container" style="padding:30px; background: #fff; position: fixed;">
                   <h3>Knowledge Type</h3>
                   <div class="zTreeDemoBackground">
                       <ul id="treeDemo" class="ztree"></ul>
@@ -301,7 +301,7 @@ License: You must have a valid license purchased only from themeforest(the above
             <?php
             foreach($category_two as $key=>$val){
             ?>
-        { "id":"<?=$val['id']?>", "pId":"<?=$val['category_pid']?>", "name":"<?=$val['category_name']?>","click":"s_url('<?=$val['category_name']?>');",open:true},
+        { "id":"<?=$val['id']?>", "pId":"<?=$val['category_pid']?>", "name":"<?=$val['category_name']?>","click":"s_url('<?=$val['id']?>');",open:true},
         <?php
         }
         ?>

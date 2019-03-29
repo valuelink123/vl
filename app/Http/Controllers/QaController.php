@@ -59,15 +59,32 @@ class QaController extends Controller
 
 		//$etype = $request->get('etype');
 
+        $data = new Category;
+        $order_by = 'created_at';
+        $sort = 'desc';
+
+        $data_two = $data->where('category_type', 2);
+        $category_two = $data_two->orderBy($order_by,$sort)->get()->toArray();
+
+        $knowledge_type_id = self::getChildren($category_two,$knowledge_type);
+        $knowledge_type_id_list = [];
+        if($knowledge_type_id != ''){
+            foreach($knowledge_type_id as $val){
+                $knowledge_type_id_list[] = $val['id'];
+            }
+        }
+        array_push($knowledge_type_id_list,$knowledge_type);
+
 		$qas = new Qa;
 		//if($etype) $qas = $qas->where('etype',$etype);
+        if($knowledge_type) $qas = $qas->whereIN('knowledge_type', $knowledge_type_id_list);
+
         if($group != 'ALL'){
             $qas = $qas->where('for_product1', 'like', '%'.$group.'%');
         }
         if($item_group != 'ALL'){
             $qas = $qas->where('for_product2', 'like', '%'.$item_group.'%');
         }
-        if($knowledge_type) $qas = $qas->where('knowledge_type', 'like', '%'.$knowledge_type.'%');
 
 		if($keywords){
 			$qas = $qas->where(function ($query) use ($keywords){
@@ -79,14 +96,8 @@ class QaController extends Controller
 				->orWhere('description', 'like','%'.$keywords.'%');
 			});
 		}
+
 		$qas = $qas->orderBy('created_at','desc')->paginate(8);
-
-        $data = new Category;
-        $order_by = 'created_at';
-        $sort = 'desc';
-
-        $data_two = $data->where('category_type', 2);
-        $category_two = $data_two->orderBy($order_by,$sort)->get()->toArray();
 
         $asin_order_by = 'asin';
         $asin_sort = 'asc';
@@ -170,6 +181,28 @@ class QaController extends Controller
             }
         }
         return $tree;
+    }
+
+    public function getParents($data,$id){
+        $arr=array();
+        foreach ($data as $v) {
+            if ($v['id']==$id) {
+                $arr[]=$v;
+                $arr=array_merge(self::getParents($data,$v['category_pid']),$arr);
+            }
+        }
+        return $arr;
+    }
+
+    public function getChildren($data,$pid){
+        $arr=array();
+        foreach ($data as $v) {
+            if ($v['category_pid']==$pid) {
+                $arr[]=$v;
+                $arr=array_merge($arr,self::getChildren($data,$v['id']));
+            }
+        }
+        return $arr;
     }
 
 

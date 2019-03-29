@@ -262,10 +262,10 @@
         foreach($tree as $key=>$val)
         {
             if($val['category_pid'] == '') {
-                $html .= '<option value="'.$val['category_name'].'">'.$val['category_name'].' </option>';
+                $html .= '<option value="'.$val['id'].'">'.$val['category_name'].' </option>';
             }else{
                 $flg = str_repeat('|----',$level);
-                $html .= '<option value="'.$val['category_name'].'">'.$flg.$val['category_name'];
+                $html .= '<option value="'.$val['id'].'">'.$flg.$val['category_name'];
                 $html .= procHtml($val['category_pid'],$level+1);
                 $html = $html."</option>";
             }

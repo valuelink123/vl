@@ -432,6 +432,20 @@ class QaiController extends Controller
 		$seller_account->confirm = $request->get('confirm');
 
         $seller_account->knowledge_type = $request->get('knowledge_type');
+
+        $order_by = 'created_at';
+        $sort = 'desc';
+
+        $lists =  Category::orderBy($order_by,$sort)->where('category_type','=',2)->get()->toArray();
+
+        $knowledge_type_id = $request->get('knowledge_type');
+        $knowledge_type_id_list = $this->getParents($lists,$knowledge_type_id);
+        $knowledge_type_id_lists = [];
+        foreach($knowledge_type_id_list as $val){
+            $knowledge_type_id_lists[] = $val['id'];
+        }
+
+        $seller_account->knowledge_type_id = json_encode($knowledge_type_id_lists,true);
         $seller_account->for_product1 = $request->get('for_product1');
         $seller_account->for_product2 = $request->get('for_product2');
         $seller_account->for_product3 = $request->get('for_product3');
@@ -538,6 +552,21 @@ class QaiController extends Controller
 		$seller_account->confirm = $request->get('confirm');
 
         $seller_account->knowledge_type = $request->get('knowledge_type');
+
+        $order_by = 'created_at';
+        $sort = 'desc';
+
+        $lists =  Category::orderBy($order_by,$sort)->where('category_type','=',2)->get()->toArray();
+
+        $knowledge_type_id = $request->get('knowledge_type');
+        $knowledge_type_id_list = $this->getParents($lists,$knowledge_type_id);
+
+        $knowledge_type_id_lists = [];
+        foreach($knowledge_type_id_list as $val){
+            $knowledge_type_id_lists[] = $val['id'];
+        }
+
+        $seller_account->knowledge_type_id = json_encode($knowledge_type_id_lists,true);
         $seller_account->for_product1 = $request->get('for_product1');
         $seller_account->for_product2 = $request->get('for_product2');
         $seller_account->for_product3 = $request->get('for_product3');
@@ -570,6 +599,17 @@ class QaiController extends Controller
             }
         }
         return $tree;
+    }
+
+    public function getParents($data,$id){
+        $arr=array();
+        foreach ($data as $v) {
+            if ($v['id']==$id) {
+                $arr[]=$v;
+                $arr=array_merge(self::getParents($data,$v['category_pid']),$arr);
+            }
+        }
+        return $arr;
     }
 
 

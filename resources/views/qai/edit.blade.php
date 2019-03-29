@@ -295,18 +295,18 @@
         });
     </script>
     <?php
-    function procHtml($tree,$level = 0,$category_name)
+    function procHtml($tree,$level = 0,$id)
     {
         $html = '';
         foreach($tree as $key=>$val)
         {
             if($val['category_pid'] == '') {
-                $html .= '<option value="'.$val['category_name'].'">'.$val['category_name'].' </option>';
+                $html .= '<option value="'.$val['id'].'">'.$val['category_name'].' </option>';
             }else{
                 $flg = str_repeat('|----',$level);
-                $selected = ($val['category_name']==$category_name) ? 'selected' : '';
-                $html .= '<option value="'.$val['category_name'].'" '.$selected.'>'.$flg.$val['category_name'];
-                $html .= procHtml($val['category_pid'],$level+1,$category_name);
+                $selected = ($val['id']==$id) ? 'selected' : '';
+                $html .= '<option value="'.$val['id'].'" '.$selected.'>'.$flg.$val['category_name'];
+                $html .= procHtml($val['category_pid'],$level+1,$id);
                 $html = $html."</option>";
             }
         }
