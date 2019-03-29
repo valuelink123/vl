@@ -227,7 +227,7 @@ License: You must have a valid license purchased only from themeforest(the above
                   </div>
                   </div>
           </div>
-         <?php if(!count($qas)) echo '<div class="col-lg-9" style="float:right;padding:30px 50px; text-align: center;"><div style="padding:30px; background: #fff;"> No matched records </div></div>';?>
+         <?php if(!count($qas)) echo '<div class="col-lg-9" style="float:right;text-align: center;"><div style="padding:30px; background: #fff;"> No matched records </div></div>';?>
 	  @foreach ($qas as $qa)
 
 
