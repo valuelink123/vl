@@ -219,7 +219,7 @@ License: You must have a valid license purchased only from themeforest(the above
 	 <div style="  padding-top: 120px;z-index:998;">
 	 
 
-          <div class="col-lg-3" style=" float:left;padding:30px 50px;">
+          <div class="col-lg-3" style=" float:left;">
               <div class="blog-post-lg bordered blog-container" style="padding:30px; background: #fff; position: fixed;">
                   <h3>Knowledge Type</h3>
                   <div class="zTreeDemoBackground">
@@ -232,7 +232,7 @@ License: You must have a valid license purchased only from themeforest(the above
 
 
         
-        <div class="col-lg-9" style="float:right;padding:30px 50px;">
+        <div class="col-lg-9" style="float:right; margin-bottom: 10px;">
                                     <div class="blog-post-lg bordered blog-container" style="padding:30px; background: #fff;">
                                         <!--<div class="blog-img-thumb" style="width:100%; height:400px; overflow:hidden;">
                                             <a href="/question/{{$qa->id}}"  target="_blank">
