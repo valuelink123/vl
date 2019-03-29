@@ -97,7 +97,7 @@ class GetShoudafang extends Command
 		$datas= DB::connection('order')->table('finances_deal_event')->where('ImportToSap',0)->where('user_id',0)->where('PostedDate','>=','2018-12-01')->where('DealDescription','like','%-%')->get();
 		foreach($datas as $data_s){
 			$s_data_s = explode('-',$data_s->DealDescription);
-			if(count($s_data_s)!=5) continue;
+			if(count($s_data_s)<5) continue;
 			if(!intval($s_data_s[2])) continue;
 			if(!array_get($users_array,intval($s_data_s[2]))) continue;
 			if(!array_get(matchSapSiteCode(),trim($s_data_s[3]))) continue;
@@ -114,7 +114,7 @@ class GetShoudafang extends Command
 		$datas= DB::table('aws_report')->where('ImportToSap',0)->where('user_id',0)->where('date','>=','2018-12-01')->where('campaign_name','like','%-%')->get();
 		foreach($datas as $data_s){
 			$s_data_s = explode('-',$data_s->campaign_name);
-			if(count($s_data_s)<5 || count($s_data_s)>6) continue;
+			if(count($s_data_s)<5 ) continue;
 			if(!intval(trim($s_data_s[2]))) continue;
 			if(!array_get($users_array,intval(trim($s_data_s[2])))) continue;
 			DB::table('aws_report')->where('id',$data_s->id)->update(
