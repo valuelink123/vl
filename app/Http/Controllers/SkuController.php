@@ -36,6 +36,12 @@ class SkuController extends Controller
 		$bgbu = $request->get('bgbu');
 		$user_id = $request->get('user_id');
 		$sku = $request->get('sku');
+		
+	    $date_start = $request->get('date_start')?$request->get('date_start'):date('Y-m-d',strtotime('+ 8hours'));
+		$week = self::getWeek($date_start);
+
+		
+		
 		if (Auth::user()->seller_rules) {
 			$rules = explode("-",Auth::user()->seller_rules);
 			$where= "where 1=1";
@@ -46,9 +52,6 @@ class SkuController extends Controller
 		} else {
 			$where= "where 1=1";
 		}
-
-
-
 		if($bgbu){
 		   $bgbu_arr = explode('_',$bgbu);
 		   if(array_get($bgbu_arr,0)){
@@ -62,22 +65,28 @@ class SkuController extends Controller
 			$where.= " and a.site='".$site."'";
 		}
 		if($user_id){
-			$where.= " and a.sap_seller_id=".$user_id;
+			$where.= " and a.sap_seller_id in (".implode(',',$user_id).")";
 		}
 		if($sku){
 			$where.= " and (a.asin='".$sku."' or a.item_code='".$sku."')";
 		}
-	    $date_start = $request->get('date_start')?$request->get('date_start'):date('Y-m-d',strtotime('+ 8hours'));
-		$week = self::getWeek($date_start);
-		$datas = DB::select("select a.asin,a.site,a.item_code,a.status,a.bg,a.bu,a.sap_seller_id,
-		b.item_name,c.keywords,c.fba_stock,c.fbm_stock,c.fba_transfer,c.total_stock,c.fba_keep,c.total_keep,c.strategy,
-		d.ranking,d.rating,d.review,d.sales,d.price,d.flow,d.conversion
+		
+		
+		$sql = "(select a.asin,a.site,a.item_code,a.status,a.pro_status,a.bg,a.bu,a.sap_seller_id,
+		b.item_name,d.keywords,d.strategy,
+		d.ranking_0,d.rating_0,d.review_0,d.sales_0,d.price_0,d.flow_0,d.conversion_0,d.fba_stock_0,d.fbm_stock_0,d.fba_transfer_0,
+		d.ranking_1,d.rating_1,d.review_1,d.sales_1,d.price_1,d.flow_1,d.conversion_1,d.fba_stock_1,d.fbm_stock_1,d.fba_transfer_1,
+		d.ranking_2,d.rating_2,d.review_2,d.sales_2,d.price_2,d.flow_2,d.conversion_2,d.fba_stock_2,d.fbm_stock_2,d.fba_transfer_2,
+		d.ranking_3,d.rating_3,d.review_3,d.sales_3,d.price_3,d.flow_3,d.conversion_3,d.fba_stock_3,d.fbm_stock_3,d.fba_transfer_3,
+		d.ranking_4,d.rating_4,d.review_4,d.sales_4,d.price_4,d.flow_4,d.conversion_4,d.fba_stock_4,d.fbm_stock_4,d.fba_transfer_4,
+		d.ranking_5,d.rating_5,d.review_5,d.sales_5,d.price_5,d.flow_5,d.conversion_5,d.fba_stock_5,d.fbm_stock_5,d.fba_transfer_5,
+		d.ranking_6,d.rating_6,d.review_6,d.sales_6,d.price_6,d.flow_6,d.conversion_6,d.fba_stock_6,d.fbm_stock_6,d.fba_transfer_6
 
-from (select asin,site,max(item_no) as item_code,max(item_status) as status, max(bg) as bg,max(bu) as bu,max(sap_seller_id) as sap_seller_id from asin group by asin,site) as a
+from (select asin,site,max(item_no) as item_code,max(item_status) as status,max(status) as pro_status, max(bg) as bg,max(bu) as bu,max(sap_seller_id) as sap_seller_id from asin group by asin,site) as a
 left join fbm_stock as b on a.item_code =b.item_code
-left join skus_week as c on a.asin = c.asin and a.site=c.site
 left join skus_week_details as d on a.asin = d.asin and a.site=d.site and d.weeks = '".$week."'
- ".$where);
+ ".$where." order by a.item_code asc ) as sku_tmp_cc";
+ 		$datas = DB::table(DB::raw($sql))->paginate(5);
 
 
         $returnDate['teams']= DB::select('select bg,bu from asin group by bg,bu ORDER BY BG ASC,BU ASC');
@@ -111,94 +120,22 @@ left join skus_week_details as d on a.asin = d.asin and a.site=d.site and d.week
     public function update(Request $request)
     {
 		
-        $data = json_decode($request->get('data'));
-		$redata['result']=0;
-		if(count($data)==57){
-			$redata['result']=1;
-			$week = self::getWeek(trim($data[2]));
-			$asin = strip_tags(trim($data[0]));
-			$site = trim($data[1]);
-			
-			$p_data=$i_data=$cus_arr=[];
-			$p_data['keywords'] = trim($data[3]);
-			for($i=4;$i<11;$i++){
-				$cus_arr[]=trim($data[$i]);
-			}
-			$i_data['ranking'] = implode(';',$cus_arr);
-			
-			$cus_arr=[];
-			for($i=11;$i<18;$i++){
-				$cus_arr[]=trim($data[$i]);
-			}
-			$i_data['rating'] = implode(';',$cus_arr);
-			
-			$cus_arr=[];
-			for($i=18;$i<25;$i++){
-				$cus_arr[]=trim($data[$i]);
-			}
-			$i_data['review'] = implode(';',$cus_arr);
-			
-			$cus_arr=[];
-			$sales_d=$sales_t=0;
-			for($i=25;$i<32;$i++){
-				if(is_numeric(trim($data[$i]))){
-					$cus_arr[]=round(trim($data[$i]),2);
-					$sales_t+=round(trim($data[$i]),2);
-					$sales_d++;
-					
-				}else{
-					$cus_arr[]='';
-					
-				}
-			}
-			$i_data['sales'] = implode(';',$cus_arr);
-			$daily_sales=($sales_d>0)?round($sales_t/$sales_d,2):0;
-			$cus_arr=[];
-			for($i=32;$i<39;$i++){
-				$cus_arr[]=trim($data[$i]);
-			}
-			$i_data['price'] = implode(';',$cus_arr);
-			
-			$cus_arr=[];
-			for($i=39;$i<46;$i++){
-				$cus_arr[]=trim($data[$i]);
-			}
-			$i_data['flow'] = implode(';',$cus_arr);
-			
-			$cus_arr=[];
-			for($i=46;$i<53;$i++){
-				$cus_arr[]=trim($data[$i]);
-			}
-			$i_data['conversion'] = implode(';',$cus_arr);
-			$p_data['weeks']=$week;
-			$p_data['fba_stock']=intval(trim($data[53]));
-			$p_data['fba_transfer']=intval(trim($data[54]));
-			$p_data['fbm_stock']=intval(trim($data[55]));
-			$p_data['total_stock']=$p_data['fba_stock']+$p_data['fba_transfer']+$p_data['fbm_stock'];
-			$p_data['strategy']=trim($data[56]);
-			$p_data['fba_keep']=($daily_sales>0)?(round(($p_data['fba_stock'])/$daily_sales,2)):(($p_data['fba_stock'])*100);
-			$p_data['total_keep']=($daily_sales>0)?(round($p_data['total_stock']/$daily_sales,2)):($p_data['total_stock']*100);
-			
-			$exists_week = Skusweek::where('asin',$asin)->where('site',$site)->value('weeks');
-			//var_dump($p_data);
-			if($week>=$exists_week){
-				Skusweek::updateOrCreate([
-					'asin' => $asin,
-					'site' => $site],$p_data);
-					
-				$redata['total_stock']=$p_data['total_stock'];
-				$redata['fba_keep']=$p_data['fba_keep'];
-				$redata['total_keep']=$p_data['total_keep'];
-			}
-			Skusweekdetails::updateOrCreate([
-					'asin' => $asin,
-					'site' => $site,
-					'weeks' => $week],$i_data);
-			
-			
+		$name = $request->get('name');
+		$data = explode("-",$name);
+		Skusweekdetails::updateOrCreate([
+				'asin' => array_get($data,1),
+				'site' => array_get($data,0),
+				'weeks' => array_get($data,2)],[array_get($data,3)=>$request->get('value')]);
+		if(in_array(strtoupper(substr(array_get($data,3),0,2)),array('SA','FB'))){
+			$pos = substr(array_get($data,3),-1);
+			$ex = Skusweekdetails::where('asin',array_get($data,1))->where('site',array_get($data,0))->where('weeks', array_get($data,2))->first()->toArray();
+			$return[str_replace('.','',array_get($data,0)).'-'.array_get($data,1).'-'.array_get($data,2).'-total_stock_'.$pos]=intval($ex['fba_stock_'.$pos]+$ex['fbm_stock_'.$pos]+$ex['fba_transfer_'.$pos]);
+			$return[str_replace('.','',array_get($data,0)).'-'.array_get($data,1).'-'.array_get($data,2).'-fba_keep_'.$pos]=($ex['sales_'.$pos])?round(intval($ex['fba_stock_'.$pos])/$ex['sales_'.$pos],2):'∞';
+			$return[str_replace('.','',array_get($data,0)).'-'.array_get($data,1).'-'.array_get($data,2).'-total_keep_'.$pos]=($ex['sales_'.$pos])?round((intval($ex['fba_stock_'.$pos])+intval($ex['fba_transfer_'.$pos])+intval($ex['fbm_stock_'.$pos]))/$ex['sales_'.$pos],2):'∞';
+			 echo json_encode($return);
 			
 		}
-		die(json_encode($redata));
+				
     }
 
 
