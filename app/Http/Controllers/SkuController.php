@@ -92,7 +92,7 @@ left join skus_week_details as d on a.asin = d.asin and a.site=d.site and d.week
         $returnDate['teams']= DB::select('select bg,bu from asin group by bg,bu ORDER BY BG ASC,BU ASC');
 		$returnDate['users']= $this->getUsers();
 		$returnDate['date_start']= $date_start;
-		$returnDate['s_user_id']= $user_id;
+		$returnDate['s_user_id']= $user_id?$user_id:[];
 		$returnDate['bgbu']= $bgbu;
 		$returnDate['week']= $week;
 		$returnDate['sku']= $sku;
