@@ -74,7 +74,7 @@ class SkuController extends Controller
 		
 		$sql = "(select a.asin,a.site,a.item_code,a.status,a.pro_status,a.bg,a.bu,a.sap_seller_id,
 		b.item_name
-from (select asin,site,item_no as item_code,max(item_status) as status,max(status) as pro_status, max(bg) as bg,max(bu) as bu,max(sap_seller_id) as sap_seller_id from asin group by asin,site,item_no) as a
+from (select asin,site,max(item_no) as item_code,max(item_status) as status,max(status) as pro_status, max(bg) as bg,max(bu) as bu,max(sap_seller_id) as sap_seller_id from asin group by asin,site) as a
 left join fbm_stock as b on a.item_code =b.item_code
  ".$where." order by a.item_code asc ) as sku_tmp_cc";
  		$datas = DB::table(DB::raw($sql))->paginate(5);
