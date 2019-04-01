@@ -728,13 +728,13 @@ class ExceptionController extends Controller
 		$exception->process_status = 'submit';
         $exception->descrip = $request->get('descrip');
 		if( $exception->type == 1 || $exception->type == 3){
-			$exception->refund = $request->get('refund');
+			$exception->refund = round($request->get('refund'),2);
 		}else{
 			$exception->refund = 0;
 		}
 
         if( $exception->type == 4){
-            $exception->gift_card_amount = $request->get('gift_card_amount')??0;
+            $exception->gift_card_amount = round($request->get('gift_card_amount'),2)??0;
         }else{
             $exception->gift_card_amount = 0;
         }
