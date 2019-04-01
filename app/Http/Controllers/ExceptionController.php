@@ -430,7 +430,7 @@ class ExceptionController extends Controller
 			$exception->request_content = $request->get('request_content');
 			$exception->process_status = 'submit';
 			if( $exception->type == 1 || $exception->type == 3){
-				$exception->refund = $request->get('refund');
+				$exception->refund = round($request->get('refund'),2);
 			}else{
 				$exception->refund = 0;
 			}
