@@ -42,7 +42,7 @@ class ExceptionController extends Controller
      */
     public function index($type = '')
     {
-        return view('exception/index',['users'=>$this->getUsers(),'groups'=>$this->getGroups(),'mygroups'=>$this->getUserGroup(),'sellerids'=>$this->getSellerIds()]);
+        return view('exception/index',['users'=>$this->getUsers(),'groups'=>$this->getGroups(),'mygroups'=>$this->getUserGroup(),'sellerids'=>$this->getAccounts()]);
 
     }
 	
@@ -129,7 +129,7 @@ class ExceptionController extends Controller
 		$users=$this->getUsers();
 		$groups = $this->getGroups();
 		$groupleaders = $this->getGroupLeader();
-		$accounts = $this->getSellerIds();
+		$accounts = $this->getAccounts();
         $status_list['done'] = "Done";
         $status_list['cancel'] = "Cancelled";
         $status_list['submit'] = "Processing";
@@ -298,7 +298,7 @@ class ExceptionController extends Controller
 
     public function create()
     {
-        $vars = ['groups'=>$this->getGroups(),'mygroups'=>$this->getUserGroup(),'sellerids'=>$this->getSellerIds()];
+        $vars = ['groups'=>$this->getGroups(),'mygroups'=>$this->getUserGroup(),'sellerids'=>$this->getAccounts()];
 
         $vars['requestContentHistoryValues'] = [];
         // array_map(function ($row) {
@@ -361,7 +361,7 @@ class ExceptionController extends Controller
 		
 		if($last_inbox) $last_inboxid= $last_inbox->id;
 		
-        return view('exception/edit',['exception'=>$rule,'groups'=>$this->getGroups(),'mygroups'=>$this->getUserGroup(),'sellerids'=>$this->getSellerIds(),'last_inboxid'=>$last_inboxid,'mcf_orders'=>$mcf_orders]);
+        return view('exception/edit',['exception'=>$rule,'groups'=>$this->getGroups(),'mygroups'=>$this->getUserGroup(),'sellerids'=>$this->getAccounts(),'last_inboxid'=>$last_inboxid,'mcf_orders'=>$mcf_orders]);
     }
 
     public function update(Request $request,$id)
@@ -584,7 +584,7 @@ class ExceptionController extends Controller
         $users = $this->getUsers();
 		$groups = $this->getGroups();
 		$groupleaders = $this->getGroupLeader();
-		$accounts = $this->getSellerIds();
+		$accounts = $this->getAccounts();
         $status_list['done'] = "<span class=\"label label-sm label-success\">Done</span>";
         $status_list['cancel'] = "<span class=\"label label-sm label-danger\">Cancelled</span>";
         $status_list['submit'] = "<span class=\"label label-sm label-warning\">Processing</span>";
