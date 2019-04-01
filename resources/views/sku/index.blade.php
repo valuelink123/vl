@@ -115,7 +115,7 @@ th,td,td>span {
 						 
 																	
 						<?php 
-
+						$curr_date = date('Ymd',strtotime($date_start));
 						$d_number = (date('w',strtotime($date_start))==0)?6:(date('w',strtotime($date_start))-1);
 						?>
 							<tr >
@@ -123,12 +123,12 @@ th,td,td>span {
 							<td width="5%"  style="font-weight: bold;">Seller</td>
 							<td width="5%" style="font-weight: bold;">BG</td>
 							<td width="5%" style="font-weight: bold;">BU</td>
-							<td colspan="2" width="14%" style="font-weight: bold;">Link</td>
-							<td width="7%" style="font-weight: bold;">Site</td>
-							<td colspan="3" width="21%" style="font-weight: bold;"> Main Keywords </td>
-							<td width="7%" style="font-weight: bold;">Status</td>
-							<td width="7%" style="font-weight: bold;">Level</td>
-							<td colspan="2"width="24%" style="font-weight: bold;">Description</td>
+							<td colspan="2" width="12%" style="font-weight: bold;">Link</td>
+							<td width="6%" style="font-weight: bold;">Site</td>
+							<td colspan="3" width="18%" style="font-weight: bold;"> Main Keywords </td>
+							<td width="6%" style="font-weight: bold;">Status</td>
+							<td width="6%" style="font-weight: bold;">Level</td>
+							<td colspan="3"width="32%" style="font-weight: bold;">Description</td>
 						  </tr>
 						  <tr>
 							<td rowspan="16">{{$data->item_code}}</td>
@@ -137,20 +137,22 @@ th,td,td>span {
 							<td rowspan="16">{{$data->bu}}</td>
 							<td colspan="2"><a href="https://{{$data->site}}/dp/{{strip_tags(str_replace('&nbsp;','',$data->asin))}}" target="_blank">{{strip_tags(str_replace('&nbsp;','',$data->asin))}}</a></td>
 							<td>{{$data->site}}</td>
-							<td colspan="3"><a class="sku_keywords" href="javascript:;" id="{{$data->site.'-'.$data->asin.'-'.$week}}-keywords" data-pk="{{$data->site.'-'.$data->asin.'-'.$week}}-keywords" data-type="text"> {{$data->keywords}} </a></td>
+							<td colspan="3"><a class="sku_keywords" href="javascript:;" id="{{$data->site.'-'.$data->asin.'-'.$curr_date}}-keywords" data-pk="{{$data->site.'-'.$data->asin.'-'.$curr_date}}-keywords" data-type="text"> {{array_get($datas_details,str_replace('.','',$data->site).'-'.$data->asin.'-'.$curr_date.'.keywords','')}} </a></td>
 							<td>{!!($data->status)?'<span class="btn btn-success btn-xs">Reserved</span>':'<span class="btn btn-danger btn-xs">Eliminate</span>'!!}</td>
 							<td>{{$data->pro_status}}</td>
-							<td colspan="2">{{$data->item_name}}</td>
+							<td colspan="3">{{$data->item_name}}</td>
 						  </tr>
 						  <tr>
 							<td colspan="2" style="font-weight: bold;">Index </td>
-							<td style="font-weight: bold;">Mon ({{date('m-d',strtotime($date_start)+(-($d_number-0)*3600*24))}})</td>
-							<td width="7%"  style="font-weight: bold;">Tues ({{date('m-d',strtotime($date_start)+(-($d_number-1)*3600*24))}})</td>
-							<td width="7%" style="font-weight: bold;" >Wed ({{date('m-d',strtotime($date_start)+(-($d_number-2)*3600*24))}})</td>
-							<td width="7%" style="font-weight: bold;" >Thur ({{date('m-d',strtotime($date_start)+(-($d_number-3)*3600*24))}})</td>
-							<td style="font-weight: bold;">Fri ({{date('m-d',strtotime($date_start)+(-($d_number-4)*3600*24))}})</td>
-							<td style="font-weight: bold;">Sat ({{date('m-d',strtotime($date_start)+(-($d_number-5)*3600*24))}})</td>
-							<td width="7%" style="font-weight: bold;">Sun ({{date('m-d',strtotime($date_start)+(-($d_number-6)*3600*24))}})</td>
+							<?php 
+							for($i=7;$i>=0;$i--){
+								$style=((0==$i)?'background:#ddeef7;':'');
+							?>
+
+							<td width="6%" style="font-weight: bold;{!!$style!!}">{{date('Y-m-d',strtotime($date_start)+(-($i)*3600*24))}}</td>
+							<?php
+							}
+							?>
 							<td rowspan="5">
 							<div class="progress-info">
 								<div class="progress">
@@ -158,17 +160,17 @@ th,td,td>span {
 										<span class="sr-only">85% change</span>
 									</span>
 								</div>
-							   
 							</div>
 							</td>
 						  </tr>
 						  <tr>
 							<td colspan="2" style="font-weight: bold;">Ranking</td>
 							<?php 
-							for($i=0;$i<7;$i++){
-								$style=(($d_number==$i)?'style="background:#ddeef7;"':'');
+							for($i=7;$i>=0;$i--){
+								$style=((0==$i)?'style="background:#ddeef7;"':'');
+								$week=date('Ymd',strtotime($date_start)+(-($i)*3600*24));
 							?>
-							<td {!!$style!!}><a class="sku_ranking" href="javascript:;" id="{{$data->site.'-'.$data->asin.'-'.$week}}-ranking_{{$i}}" data-pk="{{$data->site.'-'.$data->asin.'-'.$week}}-ranking_{{$i}}" data-type="text"> {!!$data->{'ranking_'.$i}!!} </a></td>
+							<td {!!$style!!}><a class="sku_ranking" href="javascript:;" id="{{$data->site.'-'.$data->asin.'-'.$week}}-ranking" data-pk="{{$data->site.'-'.$data->asin.'-'.$week}}-ranking" data-type="text">{{array_get($datas_details,str_replace('.','',$data->site).'-'.$data->asin.'-'.$week.'.ranking')}} </a></td>
 							<?php
 							}
 							?>
@@ -177,10 +179,11 @@ th,td,td>span {
 						  <tr>
 							<td colspan="2" style="font-weight: bold;">Rating</td>
 							<?php 
-							for($i=0;$i<7;$i++){
-								$style=(($d_number==$i)?'style="background:#ddeef7;"':'');
+							for($i=7;$i>=0;$i--){
+								$style=((0==$i)?'style="background:#ddeef7;"':'');
+								$week=date('Ymd',strtotime($date_start)+(-($i)*3600*24));
 							?>
-							<td {!!$style!!}><a class="sku_rating" href="javascript:;" id="{{$data->site.'-'.$data->asin.'-'.$week}}-rating_{{$i}}" data-pk="{{$data->site.'-'.$data->asin.'-'.$week}}-rating_{{$i}}" data-type="text"> {!!$data->{'rating_'.$i}!!} </a></td>
+							<td {!!$style!!}><a class="sku_rating" href="javascript:;" id="{{$data->site.'-'.$data->asin.'-'.$week}}-rating" data-pk="{{$data->site.'-'.$data->asin.'-'.$week}}-rating" data-type="text"> {{array_get($datas_details,str_replace('.','',$data->site).'-'.$data->asin.'-'.$week.'.rating')}} </a></td>
 							<?php
 							}
 							?>
@@ -188,10 +191,11 @@ th,td,td>span {
 						  <tr>
 							<td colspan="2" style="font-weight: bold;">Review</td>
 							<?php 
-							for($i=0;$i<7;$i++){
-								$style=(($d_number==$i)?'style="background:#ddeef7;"':'');
+							for($i=7;$i>=0;$i--){
+								$style=((0==$i)?'style="background:#ddeef7;"':'');
+								$week=date('Ymd',strtotime($date_start)+(-($i)*3600*24));
 							?>
-							<td {!!$style!!}><a class="sku_review" href="javascript:;" id="{{$data->site.'-'.$data->asin.'-'.$week}}-review_{{$i}}" data-pk="{{$data->site.'-'.$data->asin.'-'.$week}}-review_{{$i}}" data-type="text"> {!!$data->{'review_'.$i}!!} </a></td>
+							<td {!!$style!!}><a class="sku_review" href="javascript:;" id="{{$data->site.'-'.$data->asin.'-'.$week}}-review" data-pk="{{$data->site.'-'.$data->asin.'-'.$week}}-review" data-type="text"> {{array_get($datas_details,str_replace('.','',$data->site).'-'.$data->asin.'-'.$week.'.review')}}</a></td>
 							<?php
 							}
 							?>
@@ -199,10 +203,11 @@ th,td,td>span {
 						  <tr>
 							<td colspan="2" style="font-weight: bold;">Sales</td>
 							<?php 
-							for($i=0;$i<7;$i++){
-								$style=(($d_number==$i)?'style="background:#ddeef7;"':'');
+							for($i=7;$i>=0;$i--){
+								$style=((0==$i)?'style="background:#ddeef7;"':'');
+								$week=date('Ymd',strtotime($date_start)+(-($i)*3600*24));
 							?>
-							<td {!!$style!!}><a class="sku_sales" href="javascript:;" id="{{$data->site.'-'.$data->asin.'-'.$week}}-sales_{{$i}}" data-pk="{{$data->site.'-'.$data->asin.'-'.$week}}-sales_{{$i}}" data-type="text"> {!!$data->{'sales_'.$i}!!} </a></td>
+							<td {!!$style!!}><a class="sku_sales" href="javascript:;" id="{{$data->site.'-'.$data->asin.'-'.$week}}-sales" data-pk="{{$data->site.'-'.$data->asin.'-'.$week}}-sales" data-type="text"> {{array_get($datas_details,str_replace('.','',$data->site).'-'.$data->asin.'-'.$week.'.sales')}}</a></td>
 							<?php
 							}
 							?>
@@ -210,10 +215,11 @@ th,td,td>span {
 						  <tr>
 							<td colspan="2" style="font-weight: bold;">Price</td>
 							<?php 
-							for($i=0;$i<7;$i++){
-								$style=(($d_number==$i)?'style="background:#ddeef7;"':'');
+							for($i=7;$i>=0;$i--){
+								$style=((0==$i)?'style="background:#ddeef7;"':'');
+								$week=date('Ymd',strtotime($date_start)+(-($i)*3600*24));
 							?>
-							<td {!!$style!!}><a class="sku_price" href="javascript:;" id="{{$data->site.'-'.$data->asin.'-'.$week}}-price_{{$i}}" data-pk="{{$data->site.'-'.$data->asin.'-'.$week}}-price_{{$i}}" data-type="text"> {!!$data->{'price_'.$i}!!} </a></td>
+							<td {!!$style!!}><a class="sku_price" href="javascript:;" id="{{$data->site.'-'.$data->asin.'-'.$week}}-price" data-pk="{{$data->site.'-'.$data->asin.'-'.$week}}-price" data-type="text"> {{array_get($datas_details,str_replace('.','',$data->site).'-'.$data->asin.'-'.$week.'.price')}}</a></td>
 							<?php
 							}
 							?>
@@ -231,10 +237,11 @@ th,td,td>span {
 						  <tr>
 							<td colspan="2" style="font-weight: bold;">Session</td>
 							<?php 
-							for($i=0;$i<7;$i++){
-								$style=(($d_number==$i)?'style="background:#ddeef7;"':'');
+							for($i=7;$i>=0;$i--){
+								$style=((0==$i)?'style="background:#ddeef7;"':'');
+								$week=date('Ymd',strtotime($date_start)+(-($i)*3600*24));
 							?>
-							<td {!!$style!!}><a class="sku_flow" href="javascript:;" id="{{$data->site.'-'.$data->asin.'-'.$week}}-flow_{{$i}}" data-pk="{{$data->site.'-'.$data->asin.'-'.$week}}-flow_{{$i}}" data-type="text"> {!!$data->{'flow_'.$i}!!} </a></td>
+							<td {!!$style!!}><a class="sku_flow" href="javascript:;" id="{{$data->site.'-'.$data->asin.'-'.$week}}-flow" data-pk="{{$data->site.'-'.$data->asin.'-'.$week}}-flow" data-type="text"> {{array_get($datas_details,str_replace('.','',$data->site).'-'.$data->asin.'-'.$week.'.flow')}} </a></td>
 							<?php
 							}
 							?>
@@ -242,22 +249,24 @@ th,td,td>span {
 						  <tr>
 							<td colspan="2" style="font-weight: bold;">Conversion</td>
 							<?php 
-							for($i=0;$i<7;$i++){
-								$style=(($d_number==$i)?'style="background:#ddeef7;"':'');
+							for($i=7;$i>=0;$i--){
+								$style=((0==$i)?'style="background:#ddeef7;"':'');
+								$week=date('Ymd',strtotime($date_start)+(-($i)*3600*24));
 							?>
-							<td {!!$style!!}><a class="sku_conversion" href="javascript:;" id="{{$data->site.'-'.$data->asin.'-'.$week}}-conversion_{{$i}}" data-pk="{{$data->site.'-'.$data->asin.'-'.$week}}-conversion_{{$i}}" data-type="text"> {!!$data->{'conversion_'.$i}!!} </a></td>
+							<td {!!$style!!}><a class="sku_conversion" href="javascript:;" id="{{$data->site.'-'.$data->asin.'-'.$week}}-conversion" data-pk="{{$data->site.'-'.$data->asin.'-'.$week}}-conversion" data-type="text"> {{array_get($datas_details,str_replace('.','',$data->site).'-'.$data->asin.'-'.$week.'.conversion')}} </a></td>
 							<?php
 							}
 							?>
 						  </tr>
 						  <tr>
-							<td  rowspan="6" width="7%" style="font-weight: bold;">Stock</td>
+							<td  rowspan="6" width="6%" style="font-weight: bold;">Stock</td>
 							<td  style="font-weight: bold;">FBA</td>
 							<?php 
-							for($i=0;$i<7;$i++){
-								$style=(($d_number==$i)?'style="background:#ddeef7;"':'');
+							for($i=7;$i>=0;$i--){
+								$style=((0==$i)?'style="background:#ddeef7;"':'');
+								$week=date('Ymd',strtotime($date_start)+(-($i)*3600*24));
 							?>
-							<td {!!$style!!}><a class="sku_fba_stock" href="javascript:;" id="{{$data->site.'-'.$data->asin.'-'.$week}}-fba_stock_{{$i}}" data-pk="{{$data->site.'-'.$data->asin.'-'.$week}}-fba_stock_{{$i}}" data-type="text"> {!!$data->{'fba_stock_'.$i}!!} </a></td>
+							<td {!!$style!!}><a class="sku_fba_stock" href="javascript:;" id="{{$data->site.'-'.$data->asin.'-'.$week}}-fba_stock" data-pk="{{$data->site.'-'.$data->asin.'-'.$week}}-fba_stock" data-type="text"> {{array_get($datas_details,str_replace('.','',$data->site).'-'.$data->asin.'-'.$week.'.fba_stock')}} </a></td>
 							<?php
 							}
 							?>
@@ -265,10 +274,11 @@ th,td,td>span {
 						  <tr>
 							<td style="font-weight: bold;">FBA Tran </td>
 							<?php 
-							for($i=0;$i<7;$i++){
-								$style=(($d_number==$i)?'style="background:#ddeef7;"':'');
+							for($i=7;$i>=0;$i--){
+								$style=((0==$i)?'style="background:#ddeef7;"':'');
+								$week=date('Ymd',strtotime($date_start)+(-($i)*3600*24));
 							?>
-							<td {!!$style!!}><a class="sku_fba_transfer" href="javascript:;" id="{{$data->site.'-'.$data->asin.'-'.$week}}-fba_transfer_{{$i}}" data-pk="{{$data->site.'-'.$data->asin.'-'.$week}}-fba_transfer_{{$i}}" data-type="text"> {!!$data->{'fba_transfer_'.$i}!!} </a></td>
+							<td {!!$style!!}><a class="sku_fba_transfer" href="javascript:;" id="{{$data->site.'-'.$data->asin.'-'.$week}}-fba_transfer" data-pk="{{$data->site.'-'.$data->asin.'-'.$week}}-fba_transfer" data-type="text"> {{array_get($datas_details,str_replace('.','',$data->site).'-'.$data->asin.'-'.$week.'.fba_transfer')}} </a></td>
 							<?php
 							}
 							?>
@@ -276,10 +286,11 @@ th,td,td>span {
 						  <tr>
 							<td style="font-weight: bold;">FBM</td>
 							<?php 
-							for($i=0;$i<7;$i++){
-								$style=(($d_number==$i)?'style="background:#ddeef7;"':'');
+							for($i=7;$i>=0;$i--){
+								$style=((0==$i)?'style="background:#ddeef7;"':'');
+								$week=date('Ymd',strtotime($date_start)+(-($i)*3600*24));
 							?>
-							<td {!!$style!!}><a class="sku_fbm_stock" href="javascript:;" id="{{$data->site.'-'.$data->asin.'-'.$week}}-fbm_stock_{{$i}}" data-pk="{{$data->site.'-'.$data->asin.'-'.$week}}-fbm_stock_{{$i}}" data-type="text"> {!!$data->{'fbm_stock_'.$i}!!} </a></td>
+							<td {!!$style!!}><a class="sku_fbm_stock" href="javascript:;" id="{{$data->site.'-'.$data->asin.'-'.$week}}-fbm_stock" data-pk="{{$data->site.'-'.$data->asin.'-'.$week}}-fbm_stock" data-type="text"> {{array_get($datas_details,str_replace('.','',$data->site).'-'.$data->asin.'-'.$week.'.fbm_stock')}} </a></td>
 							<?php
 							}
 							?>
@@ -297,10 +308,11 @@ th,td,td>span {
 						  <tr>
 							<td style="font-weight: bold;">Total</td>
 							<?php 
-							for($i=0;$i<7;$i++){
-								$style=(($d_number==$i)?'style="background:#ddeef7;"':'');
+							for($i=7;$i>=0;$i--){
+								$style=((0==$i)?'style="background:#ddeef7;"':'');
+								$week=date('Ymd',strtotime($date_start)+(-($i)*3600*24));
 							?>
-							<td {!!$style!!}><span id="{{str_replace('.','',$data->site).'-'.$data->asin.'-'.$week}}-total_stock_{{$i}}"> {!!intval($data->{'fba_stock_'.$i}+$data->{'fbm_stock_'.$i}+$data->{'fba_transfer_'.$i})!!} </span></td>
+							<td {!!$style!!}><span id="{{str_replace('.','',$data->site).'-'.$data->asin.'-'.$week}}-total_stock"> {!!intval(array_get($datas_details,str_replace('.','',$data->site).'-'.$data->asin.'-'.$week.'.fba_stock',0)+array_get($datas_details,str_replace('.','',$data->site).'-'.$data->asin.'-'.$week.'.fbm_stock',0)+array_get($datas_details,str_replace('.','',$data->site).'-'.$data->asin.'-'.$week.'.fba_transfer',0))!!} </span></td>
 							<?php
 							}
 							?>
@@ -308,10 +320,11 @@ th,td,td>span {
 						  <tr>
 							<td style="font-weight: bold;">FBA Keep </td>
 							<?php 
-							for($i=0;$i<7;$i++){
-								$style=(($d_number==$i)?'style="background:#ddeef7;"':'');
+							for($i=7;$i>=0;$i--){
+								$style=((0==$i)?'style="background:#ddeef7;"':'');
+								$week=date('Ymd',strtotime($date_start)+(-($i)*3600*24));
 							?>
-							<td {!!$style!!}><span id="{{str_replace('.','',$data->site).'-'.$data->asin.'-'.$week}}-fba_keep_{{$i}}"> {!!($data->{'sales_'.$i})?round(intval($data->{'fba_stock_'.$i})/($data->{'sales_'.$i}),2):'∞'!!} </span></td>
+							<td {!!$style!!}><span id="{{str_replace('.','',$data->site).'-'.$data->asin.'-'.$week}}-fba_keep"> {!!(array_get($datas_details,str_replace('.','',$data->site).'-'.$data->asin.'-'.$week.'.sales',0))?round(intval(array_get($datas_details,str_replace('.','',$data->site).'-'.$data->asin.'-'.$week.'.fba_stock',0))/(array_get($datas_details,str_replace('.','',$data->site).'-'.$data->asin.'-'.$week.'.sales',0)),2):'∞'!!} </span></td>
 							<?php
 							}
 							?>
@@ -319,17 +332,18 @@ th,td,td>span {
 						  <tr>
 							<td style="font-weight: bold;">Total Keep </td>
 							<?php 
-							for($i=0;$i<7;$i++){
-								$style=(($d_number==$i)?'style="background:#ddeef7;"':'');
+							for($i=7;$i>=0;$i--){
+								$style=((0==$i)?'style="background:#ddeef7;"':'');
+								$week=date('Ymd',strtotime($date_start)+(-($i)*3600*24));
 							?>
-							<td {!!$style!!}><span id="{{str_replace('.','',$data->site).'-'.$data->asin.'-'.$week}}-total_keep_{{$i}}"> {!!($data->{'sales_'.$i})?round((intval($data->{'fba_stock_'.$i})+intval($data->{'fbm_stock_'.$i})+intval($data->{'fba_transfer_'.$i}))/($data->{'sales_'.$i}),2):'∞'!!} </span></td>
+							<td {!!$style!!}><span id="{{str_replace('.','',$data->site).'-'.$data->asin.'-'.$week}}-total_keep"> {!!(array_get($datas_details,str_replace('.','',$data->site).'-'.$data->asin.'-'.$week.'.sales',0))?round((intval(array_get($datas_details,str_replace('.','',$data->site).'-'.$data->asin.'-'.$week.'.fba_stock',0))+intval(array_get($datas_details,str_replace('.','',$data->site).'-'.$data->asin.'-'.$week.'.fbm_stock',0))+intval(array_get($datas_details,str_replace('.','',$data->site).'-'.$data->asin.'-'.$week.'.fba_transfer',0)))/(array_get($datas_details,str_replace('.','',$data->site).'-'.$data->asin.'-'.$week.'.sales',0)),2):'∞'!!} </span></td>
 							<?php
 							}
 							?>
 						  </tr>
 						  <tr>
 							<td colspan="2" style="font-weight: bold;">Strategy</td>
-							<td colspan="7"><a class="sku_strategy" href="javascript:;" id="{{$data->site.'-'.$data->asin.'-'.$week}}-strategy" data-pk="{{$data->site.'-'.$data->asin.'-'.$week}}-strategy" data-type="text"> {{$data->strategy}} </a></td>
+							<td colspan="9"><a class="sku_strategy" href="javascript:;" id="{{$data->site.'-'.$data->asin.'-'.$curr_date}}-strategy" data-pk="{{$data->site.'-'.$data->asin.'-'.$curr_date}}-strategy" data-type="text"> {{array_get($datas_details,str_replace('.','',$data->site).'-'.$data->asin.'-'.$curr_date.'.strategy','')}} </a></td>
 						  </tr>
 
 						    
