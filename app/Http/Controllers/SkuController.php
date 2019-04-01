@@ -85,12 +85,13 @@ left join fbm_stock as b on a.item_code =b.item_code
 		for($i=7;$i>=0;$i--){
 			$date_arr[]=date('Ymd',strtotime($date_start)+(-($i)*3600*24));
 		}
-		$datas_item=Skusweekdetails::whereIn('weeks',$date_arr)->whereRaw('('.implode(' or ',$asin_site_arr).')')->get()->toArray();
-		
-		foreach($datas_item as $di){
-			$datas_details[str_replace('.','',$di['site']).'-'.$di['asin'].'-'.$di['weeks']] = $di;
+		if($asin_site_arr){
+			$datas_item=Skusweekdetails::whereIn('weeks',$date_arr)->whereRaw('('.implode(' or ',$asin_site_arr).')')->get()->toArray();
+			
+			foreach($datas_item as $di){
+				$datas_details[str_replace('.','',$di['site']).'-'.$di['asin'].'-'.$di['weeks']] = $di;
+			}
 		}
-
         $returnDate['teams']= DB::select('select bg,bu from asin group by bg,bu ORDER BY BG ASC,BU ASC');
 		$returnDate['users']= $this->getUsers();
 		$returnDate['date_start']= $date_start;
