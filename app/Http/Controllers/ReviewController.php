@@ -418,8 +418,11 @@ class ReviewController extends Controller
 		if(array_get($_REQUEST,'np')){
 			$nev_rating=4;
 			if(array_get($_REQUEST,'np')==1) {
-				$customers = $customers->where('rating', '<', $nev_rating)->Where(function ($query) use ($nev_rating) {
-					$query->orWhere('updated_rating', '<', $nev_rating)->whereNotNull('updated_rating');
+				$customers = $customers->Where(function ($query) use ($nev_rating) {
+					$query->where('rating', '<', $nev_rating)
+					->orWhere(function($query) use ($nev_rating){
+						$query->where('updated_rating','<', $nev_rating)->whereNotNull('updated_rating');
+					});
 				});
 			}
 			if(array_get($_REQUEST,'np')==2) {
