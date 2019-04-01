@@ -421,13 +421,13 @@ class ReviewController extends Controller
 				$customers = $customers->Where(function ($query) use ($nev_rating) {
 					$query->where('rating', '<', $nev_rating)
 					->orWhere(function($query) use ($nev_rating){
-						$query->where('updated_rating','<', $nev_rating)->whereNotNull('updated_rating');
+						$query->where('updated_rating','<', $nev_rating)->whereNotNull('updated_rating')->where('updated_rating','>', 0);
 					});
 				});
 			}
 			if(array_get($_REQUEST,'np')==2) {
 				$customers = $customers->where('rating', '>=', $nev_rating)->where(function ($query) use ($nev_rating) {
-					$query->where('updated_rating', '>=', $nev_rating)->orWhere('updated_rating', 0);
+					$query->where('updated_rating', '>=', $nev_rating)->orWhere('updated_rating', 0)->orWhereNull('updated_rating');
 				});
 			}
 		}
