@@ -36,7 +36,7 @@ class SkuController extends Controller
 		$bgbu = $request->get('bgbu');
 		$user_id = $request->get('user_id');
 		$sku = $request->get('sku');
-		
+		$level = $request->get('level');
 	    $date_start = $request->get('date_start')?$request->get('date_start'):date('Y-m-d',strtotime('+ 8hours'));
 		$week = self::getWeek($date_start);
 
@@ -66,6 +66,10 @@ class SkuController extends Controller
 		}
 		if($user_id){
 			$where.= " and a.sap_seller_id in (".implode(',',$user_id).")";
+		}
+		
+		if($level){
+			$where.= " and a.pro_status = '".$level."'";
 		}
 		if($sku){
 			$where.= " and (a.asin='".$sku."' or a.item_code='".$sku."')";
@@ -98,6 +102,7 @@ left join fbm_stock as b on a.item_code =b.item_code
 		$returnDate['s_user_id']= $user_id?$user_id:[];
 		$returnDate['bgbu']= $bgbu;
 		$returnDate['week']= $week;
+		$returnDate['s_level']= $level;
 		$returnDate['sku']= $sku;
 		$returnDate['s_site']= $site;
 		$returnDate['datas']= $datas;

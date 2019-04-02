@@ -54,7 +54,7 @@ th,td,td>span {
 						
 						<div class="col-md-2">
 						<select class="form-control form-filter input-sm" name="bgbu">
-                                        <option value="">Select BG && BU</option>
+                                        <option value="">Select BGBU</option>
 										<?php 
 										$bg='';
 										foreach($teams as $team){ 
@@ -77,6 +77,16 @@ th,td,td>span {
                                         @foreach (getAsinSites() as $v)
                                             <option value="{{$v}}" <?php if($v==$s_site) echo 'selected'; ?>>{{$v}}</option>
                                         @endforeach
+                                    </select>
+						</div>
+						
+						 <div class="col-md-1">
+						<select class="form-control form-filter input-sm" name="level" id="level">
+									<option value="">Level</option>
+                                        <option value="A" <?php if('A'==$s_level) echo 'selected'; ?>>A</option>
+										<option value="B" <?php if('B'==$s_level) echo 'selected'; ?>>B</option>
+										<option value="C" <?php if('C'==$s_level) echo 'selected'; ?>>C</option>
+										<option value="D" <?php if('D'==$s_level) echo 'selected'; ?>>D</option>
                                     </select>
 						</div>
 						
@@ -108,7 +118,7 @@ th,td,td>span {
 					
                 </div>
                     <div class="table-container">
-					{{ $datas->appends(['date_start' => $date_start,'site' => $s_site,'user_id' => $s_user_id,'bgbu' => $bgbu,'sku' => $sku])->links() }}   
+					{{ $datas->appends(['date_start' => $date_start,'site' => $s_site,'user_id' => $s_user_id,'level' => $s_level,'bgbu' => $bgbu,'sku' => $sku])->links() }}   
 					@foreach ($datas as $data)
 						<table id="user" class="table table-striped table-bordered table-hover">
  
@@ -350,7 +360,7 @@ th,td,td>span {
 						</table>
                         @endforeach
 						
-                               {{ $datas->appends(['date_start' => $date_start,'site' => $s_site,'user_id' => $s_user_id,'bgbu' => $bgbu,'sku' => $sku])->links() }}   
+                               {{ $datas->appends(['date_start' => $date_start,'site' => $s_site,'user_id' => $s_user_id,'level' => $s_level,'bgbu' => $bgbu,'sku' => $sku])->links() }}   
 
 
 
