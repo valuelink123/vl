@@ -118,7 +118,17 @@ th,td,td>span {
 					
                 </div>
                     <div class="table-container">
-					{{ $datas->appends(['date_start' => $date_start,'site' => $s_site,'user_id' => $s_user_id,'level' => $s_level,'bgbu' => $bgbu,'sku' => $sku])->links() }}   
+					{{ $datas->appends(['date_start' => $date_start,'site' => $s_site,'user_id' => $s_user_id,'level' => $s_level,'bgbu' => $bgbu,'sku' => $sku])->links() }} 
+					
+					<?php
+						$tmp_time_s = date('Ym',strtotime($date_start));
+						$tmp_time_c = date('Ym',strtotime('+ 8hours'));
+						if($tmp_time_s > $tmp_time_c) $time_rate=0;
+						if($tmp_time_s < $tmp_time_c) $time_rate=1;
+						if($tmp_time_s == $tmp_time_c){
+							$time_rate=round(date('j',strtotime('+ 8hours'))/date('t',strtotime('+ 8hours')),2);
+						} 
+					?>
 					@foreach ($datas as $data)
 						<table id="user" class="table table-striped table-bordered table-hover">
  
@@ -164,12 +174,50 @@ th,td,td>span {
 							}
 							?>
 							<td rowspan="5">
-							<div class="progress-info">
+							<div class="display">
+								<div class="number">
+									<h3 class="font-blue-sharp">
+										<span>Sold Qty</span>
+									</h3>
+								</div>
+							</div>
+							<div class="progress-info row">
+								<div class="col-md-2"> Target </div>
+								<div class="col-md-8">
 								<div class="progress">
-									<span style="width: 85%;" class="progress-bar progress-bar-success red-haze">
-										<span class="sr-only">85% change</span>
+									<span style="width: 100%;" class="progress-bar progress-bar-success blue-sharp">
+										{{array_get($oa_data,array_get($site_code,str_replace('.','_',$data->site)).'-'.$data->item_code.'.xiaol'.date('n',strtotime($date_start)))}}
 									</span>
 								</div>
+								</div>
+								<div class="col-md-2"></div>
+								<div class="clearfix"></div>
+							</div>
+							
+							<div class="progress-info row">
+								<div class="col-md-2"> Time </div>
+								<div class="col-md-8">
+								<div class="progress">
+									<span style="width: {{$time_rate*100}}%;" class="progress-bar progress-bar-success green-sharp">
+										{{$time_rate*100}}%
+									</span>
+								</div>
+								</div>
+								<div class="col-md-2" style="padding:0"> {{$time_rate*100}}% </div>
+								<div class="clearfix"></div>
+							</div>
+							
+							<div class="progress-info row">
+								<div class="col-md-2"> Completed </div>
+								<div class="col-md-8">
+								<div class="progress">
+									<span style="width: 0%;" class="progress-bar progress-bar-success green-sharp">
+										0%
+									</span>
+								</div>
+								</div>
+								<div class="col-md-2" style="padding:0"> 0% </div>
+								<div class="clearfix"></div>
 							</div>
 							</td>
 						  </tr>
@@ -234,13 +282,50 @@ th,td,td>span {
 							}
 							?>
 							<td rowspan="5">
-							<div class="progress-info">
+							<div class="display">
+								<div class="number">
+									<h3 class="font-blue-sharp">
+										<span>Sales Amount</span>
+									</h3>
+								</div>
+							</div>
+							<div class="progress-info row">
+								<div class="col-md-2"> Target </div>
+								<div class="col-md-8">
 								<div class="progress">
-									<span style="width: 85%;" class="progress-bar progress-bar-success red-haze">
-										<span class="sr-only">85% change</span>
+									<span style="width: 100%;" class="progress-bar progress-bar-success blue-sharp">
+										{{array_get($oa_data,array_get($site_code,str_replace('.','_',$data->site)).'-'.$data->item_code.'.xiaose'.date('n',strtotime($date_start)))}}
 									</span>
 								</div>
-							   
+								</div>
+								<div class="col-md-2"></div>
+								<div class="clearfix"></div>
+							</div>
+							
+							<div class="progress-info row">
+								<div class="col-md-2"> Time </div>
+								<div class="col-md-8">
+								<div class="progress">
+									<span style="width: {{$time_rate*100}}%;" class="progress-bar progress-bar-success green-sharp">
+										{{$time_rate*100}}%
+									</span>
+								</div>
+								</div>
+								<div class="col-md-2" style="padding:0"> {{$time_rate*100}}% </div>
+								<div class="clearfix"></div>
+							</div>
+							
+							<div class="progress-info row">
+								<div class="col-md-2"> Completed </div>
+								<div class="col-md-8">
+								<div class="progress">
+									<span style="width: 0%;" class="progress-bar progress-bar-success green-sharp">
+										0%
+									</span>
+								</div>
+								</div>
+								<div class="col-md-2" style="padding:0"> 0% </div>
+								<div class="clearfix"></div>
 							</div>
 							</td>
 						  </tr>
@@ -305,13 +390,50 @@ th,td,td>span {
 							}
 							?>
 							<td rowspan="5">
-							<div class="progress-info">
+							<div class="display">
+								<div class="number">
+									<h3 class="font-blue-sharp">
+										<span>Profit Amount</span>
+									</h3>
+								</div>
+							</div>
+							<div class="progress-info row">
+								<div class="col-md-2"> Target </div>
+								<div class="col-md-8">
 								<div class="progress">
-									<span style="width: 85%;" class="progress-bar progress-bar-success red-haze">
-										<span class="sr-only">85% change</span>
+									<span style="width: 100%;" class="progress-bar progress-bar-success blue-sharp">
+										{{array_get($oa_data,array_get($site_code,str_replace('.','_',$data->site)).'-'.$data->item_code.'.yewlr'.date('n',strtotime($date_start)))}}
 									</span>
 								</div>
-							   
+								</div>
+								<div class="col-md-2"></div>
+								<div class="clearfix"></div>
+							</div>
+							
+							<div class="progress-info row">
+								<div class="col-md-2"> Time </div>
+								<div class="col-md-8">
+								<div class="progress">
+									<span style="width: {{$time_rate*100}}%;" class="progress-bar progress-bar-success green-sharp">
+										{{$time_rate*100}}%
+									</span>
+								</div>
+								</div>
+								<div class="col-md-2" style="padding:0"> {{$time_rate*100}}% </div>
+								<div class="clearfix"></div>
+							</div>
+							
+							<div class="progress-info row">
+								<div class="col-md-2"> Completed </div>
+								<div class="col-md-8">
+								<div class="progress">
+									<span style="width: 0%;" class="progress-bar progress-bar-success green-sharp">
+										0%
+									</span>
+								</div>
+								</div>
+								<div class="col-md-2" style="padding:0"> 0% </div>
+								<div class="clearfix"></div>
 							</div>
 							</td>
 						  </tr>
@@ -353,7 +475,7 @@ th,td,td>span {
 						  </tr>
 						  <tr>
 							<td colspan="2" style="font-weight: bold;">Strategy</td>
-							<td colspan="9"><a class="sku_strategy" href="javascript:;" id="{{$data->site.'-'.$data->asin.'-'.$curr_date}}-strategy" data-pk="{{$data->site.'-'.$data->asin.'-'.$curr_date}}-strategy" data-type="text"> {{array_get($datas_details,str_replace('.','',$data->site).'-'.$data->asin.'-'.$curr_date.'.strategy','')}} </a></td>
+							<td colspan="8"><a class="sku_strategy" href="javascript:;" id="{{$data->site.'-'.$data->asin.'-'.$curr_date}}-strategy" data-pk="{{$data->site.'-'.$data->asin.'-'.$curr_date}}-strategy" data-type="text"> {{array_get($datas_details,str_replace('.','',$data->site).'-'.$data->asin.'-'.$curr_date.'.strategy','')}} </a></td>
 						  </tr>
 
 						    

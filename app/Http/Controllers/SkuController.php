@@ -82,9 +82,18 @@ from (select asin,site,max(item_no) as item_code,max(item_status) as status,max(
 left join fbm_stock as b on a.item_code =b.item_code
  ".$where." order by a.item_code asc ) as sku_tmp_cc";
  		$datas = DB::table(DB::raw($sql))->paginate(5);
-		$date_arr=$asin_site_arr=$datas_details=[];
+		$date_arr=$asin_site_arr=$sku_site_arr=$datas_details=$oa_data=[];
+		$site_code['www_amazon_com']='US';
+		$site_code['www_amazon_ca']='CA';
+		$site_code['www_amazon_de']='DE';
+		$site_code['www_amazon_it']='IT';
+		$site_code['www_amazon_es']='ES';
+		$site_code['www_amazon_co_uk']='UK';
+		$site_code['www_amazon_fr']='FR';
+		$site_code['www_amazon_co_jp']='JP';
 		foreach($datas as $data){
 			$asin_site_arr[] = "(asin = '".$data->asin."' and site='".$data->site."')";
+			$sku_site_arr[] = "(SKU = '".$data->item_code."' and zhand='".array_get($site_code,str_replace('.','_',$data->site),'')."')";
  		}
 		for($i=7;$i>=0;$i--){
 			$date_arr[]=date('Ymd',strtotime($date_start)+(-($i)*3600*24));
@@ -95,7 +104,14 @@ left join fbm_stock as b on a.item_code =b.item_code
 			foreach($datas_item as $di){
 				$datas_details[str_replace('.','',$di['site']).'-'.$di['asin'].'-'.$di['weeks']] = $di;
 			}
+			
+			$oa_datas = DB::connection('oa')->table('formtable_main_193_dt1')->whereRaw('('.implode(' or ',$sku_site_arr).')')->get();
+			$oa_datas=json_decode(json_encode($oa_datas), true);
+			foreach($oa_datas as $od){
+				$oa_data[$od['zhand'].'-'.$od['SKU']] = $od;
+			}
 		}
+
         $returnDate['teams']= DB::select('select bg,bu from asin group by bg,bu ORDER BY BG ASC,BU ASC');
 		$returnDate['users']= $this->getUsers();
 		$returnDate['date_start']= $date_start;
@@ -105,8 +121,10 @@ left join fbm_stock as b on a.item_code =b.item_code
 		$returnDate['s_level']= $level;
 		$returnDate['sku']= $sku;
 		$returnDate['s_site']= $site;
+		$returnDate['site_code']= $site_code;
 		$returnDate['datas']= $datas;
 		$returnDate['datas_details']= $datas_details;
+		$returnDate['oa_data']= $oa_data;
         return view('sku/index',$returnDate);
 
     }

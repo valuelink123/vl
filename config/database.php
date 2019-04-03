@@ -141,6 +141,21 @@ return [
             'charset' => 'utf8',
             'prefix' => '',
         ],
+		
+		'oa' => [
+            'driver' => env('DB_OA_CONNECTION', ''),
+			 'host' => env('DB_OA_HOST', ''),
+			 'port' => env('DB_OA_PORT', ''),
+			 'database' => env('DB_OA_DATABASE', ''),
+			 'username' => env('DB_OA_USERNAME', ''),
+			 'password' => env('DB_OA_PASSWORD', ''),
+			 'charset' => 'utf8',
+			 'collation' => 'utf8_unicode_ci',
+			 'prefix' => '',
+			 'strict' => false,
+			 'engine' => null,
+        ],
+		
         'ccp' => [
             'driver' => 'mysql',
             'host' => env('DB_CCP_HOST', '127.0.0.1'),
