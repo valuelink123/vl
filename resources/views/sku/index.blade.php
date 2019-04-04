@@ -186,7 +186,7 @@ th,td,td>span {
 								<div class="col-md-8">
 								<div class="progress">
 									<span style="width: 100%;" class="progress-bar progress-bar-success blue-sharp">
-										{{array_get($oa_data,array_get($site_code,str_replace('.','_',$data->site)).'-'.$data->item_code.'.xiaol'.date('n',strtotime($date_start)))}}
+										{{array_get($oa_data,array_get($site_code,str_replace('.','_',$data->site)).'-'.$data->item_code.'.xiaol'.date('n',strtotime($date_start)),0)}}
 									</span>
 								</div>
 								</div>
@@ -294,7 +294,7 @@ th,td,td>span {
 								<div class="col-md-8">
 								<div class="progress">
 									<span style="width: 100%;" class="progress-bar progress-bar-success blue-sharp">
-										{{array_get($oa_data,array_get($site_code,str_replace('.','_',$data->site)).'-'.$data->item_code.'.xiaose'.date('n',strtotime($date_start)))}}
+										{{array_get($oa_data,array_get($site_code,str_replace('.','_',$data->site)).'-'.$data->item_code.'.xiaose'.date('n',strtotime($date_start)),0)}}
 									</span>
 								</div>
 								</div>
@@ -402,7 +402,7 @@ th,td,td>span {
 								<div class="col-md-8">
 								<div class="progress">
 									<span style="width: 100%;" class="progress-bar progress-bar-success blue-sharp">
-										{{array_get($oa_data,array_get($site_code,str_replace('.','_',$data->site)).'-'.$data->item_code.'.yewlr'.date('n',strtotime($date_start)))}}
+										{{array_get($oa_data,array_get($site_code,str_replace('.','_',$data->site)).'-'.$data->item_code.'.yewlr'.date('n',strtotime($date_start)),0)}}
 									</span>
 								</div>
 								</div>
