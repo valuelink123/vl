@@ -82,7 +82,7 @@ from (select asin,site,max(item_no) as item_code,max(item_status) as status,max(
 left join fbm_stock as b on a.item_code =b.item_code
  ".$where." order by a.item_code asc ) as sku_tmp_cc";
  		$datas = DB::table(DB::raw($sql))->paginate(5);
-		$date_arr=$asin_site_arr=$sku_site_arr=$datas_details=$oa_data=[];
+		$date_arr=$asin_site_arr=$sku_site_arr=$datas_details=$oa_data=$last_keywords=[];
 		$site_code['www_amazon_com']='US';
 		$site_code['www_amazon_ca']='CA';
 		$site_code['www_amazon_de']='DE';
@@ -94,12 +94,18 @@ left join fbm_stock as b on a.item_code =b.item_code
 		foreach($datas as $data){
 			$asin_site_arr[] = "(asin = '".$data->asin."' and site='".$data->site."')";
 			$sku_site_arr[] = "(SKU = '".$data->item_code."' and zhand='".array_get($site_code,str_replace('.','_',$data->site),'')."')";
+			
+			$last_keywords[str_replace('.','',$data->site).'-'.$data->asin]=Skusweekdetails::where('asin',$data->asin)->where('site',$data->site)->whereNotNull('keywords')->orderBy('weeks','desc')->take(1)->value('keywords');
  		}
+		print_r($last_keywords);
 		for($i=7;$i>=0;$i--){
 			$date_arr[]=date('Ymd',strtotime($date_start)+(-($i)*3600*24));
 		}
 		if($asin_site_arr){
 			$datas_item=Skusweekdetails::whereIn('weeks',$date_arr)->whereRaw('('.implode(' or ',$asin_site_arr).')')->get()->toArray();
+			
+			
+			
 			
 			foreach($datas_item as $di){
 				$datas_details[str_replace('.','',$di['site']).'-'.$di['asin'].'-'.$di['weeks']] = $di;
@@ -127,6 +133,7 @@ left join fbm_stock as b on a.item_code =b.item_code
 		$returnDate['datas']= $datas;
 		$returnDate['datas_details']= $datas_details;
 		$returnDate['oa_data']= $oa_data;
+		$returnDate['last_keywords']= $last_keywords;
         return view('sku/index',$returnDate);
 
     }

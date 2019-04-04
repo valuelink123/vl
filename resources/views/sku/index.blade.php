@@ -157,7 +157,7 @@ th,td,td>span {
 							<td rowspan="16">{{$data->bu}}</td>
 							<td colspan="2"><a href="https://{{$data->site}}/dp/{{strip_tags(str_replace('&nbsp;','',$data->asin))}}" target="_blank">{{strip_tags(str_replace('&nbsp;','',$data->asin))}}</a></td>
 							<td>{{$data->site}}</td>
-							<td colspan="3"><a class="sku_keywords" href="javascript:;" id="{{$data->site.'-'.$data->asin.'-'.$curr_date}}-keywords" data-pk="{{$data->site.'-'.$data->asin.'-'.$curr_date}}-keywords" data-type="text"> {{array_get($datas_details,str_replace('.','',$data->site).'-'.$data->asin.'-'.$curr_date.'.keywords','')}} </a></td>
+							<td colspan="3"><a class="sku_keywords" href="javascript:;" id="{{$data->site.'-'.$data->asin.'-'.$curr_date}}-keywords" data-pk="{{$data->site.'-'.$data->asin.'-'.$curr_date}}-keywords" data-type="text"> {{array_get($datas_details,str_replace('.','',$data->site).'-'.$data->asin.'-'.$curr_date.'.keywords')?array_get($datas_details,str_replace('.','',$data->site).'-'.$data->asin.'-'.$curr_date.'.keywords'):array_get($last_keywords,str_replace('.','',$data->site).'-'.$data->asin)}} </a></td>
 							<td>{!!($data->status)?'<span class="btn btn-success btn-xs">Reserved</span>':'<span class="btn btn-danger btn-xs">Eliminate</span>'!!}</td>
 							<td>{{$data->pro_status}}</td>
 							<td colspan="3">{{$data->item_name}}</td>
