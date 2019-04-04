@@ -33,7 +33,9 @@ class Kernel extends ConsoleKernel
         'App\Console\Commands\GetSettlementReport',
         'App\Console\Commands\GetAwsInfo',
 		'App\Console\Commands\GetSales28day',
-		'App\Console\Commands\GetShoudafang'
+		'App\Console\Commands\GetShoudafang',
+        'App\Console\Commands\Nonctg',
+        'App\Console\Commands\UpdateNonctg'
     ];
 
     /**
@@ -77,6 +79,10 @@ class Kernel extends ConsoleKernel
         //$schedule->command('scan:auto')->hourly()->name('autocheck')->withoutOverlapping();
         $schedule->command('get:awsinfo')->dailyAt('23:00')->name('getawsinfo')->withoutOverlapping();
 		$schedule->command('get:dailysales 7')->dailyAt('9:00')->name('getdailysales')->withoutOverlapping();
+
+        $filePath = 'D:\phpstudy\PHPTutorial\WWW\vl\storage\logs\noctg.log';
+        $schedule->command('add:nonctg')->monthly()->appendOutputTo($filePath)->name('add_history_nonctg')->withoutOverlapping();
+        $schedule->command('update:nonctg')->everyMinute()->appendOutputTo($filePath)->name('update_nonctg')->withoutOverlapping();
     }
 
     /**

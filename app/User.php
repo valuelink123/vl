@@ -28,4 +28,14 @@ class User extends Authenticatable
         'password', 'remember_token',
     ];
 
+    //得到所有用户的id=>name数组
+    static function getUsers(){
+        $users = User::get()->toArray();
+        $users_array = array();
+        foreach($users as $user){
+            $users_array[$user['id']] = $user['name'];
+        }
+        return $users_array;
+    }
+
 }
