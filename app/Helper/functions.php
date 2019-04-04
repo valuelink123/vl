@@ -422,3 +422,37 @@ function matchMarketplaceSiteCode(){
 		'A1VC38T7YXB528'  => '1014'
 	);
 }
+
+//批量添加數據，可避免唯一鍵冲突时报错
+function batchInsert($table,$data){
+    $fields = array_keys(current($data));
+    $sql = 'insert ignore into '.$table.' (`'.join('`,`',$fields).'`) values';//字段用反引号分隔
+    foreach($data as $key=>$val){
+        $sql .= ' ("'.join('","',$val).'"),';//数据用双引号分隔
+    }
+    $sql = rtrim($sql,',');
+    \DB::insert($sql);
+}
+
+/*
+ * 为得到官网的激活质保用户数据所需的配置
+ * dbname为数据库的库名
+ * name为此官网的名称，用于插入到non_ctg表中的from字段
+ * formid为wp_gf_form表中warranty表单的id
+ * fields表示字段的指定关系，例如name是对应meta_key的1值
+ */
+function getActiveUserConfig()
+{
+    $config = array(
+        array('dbname'=>'dbpower_co','name'=>'dbpower','formid'=>array(2,4),'fields'=>array('name'=>'1.3','email'=>2,'orderid'=>3)),
+        array('dbname'=>'nursal_co','name'=>'nursal','formid'=>array(2),'fields'=>array('name'=>'1.3','email'=>2,'orderid'=>3)),
+        array('dbname'=>'spacekey_net','name'=>'spacekey','formid'=>array(2),'fields'=>array('name'=>'1.3','email'=>2,'orderid'=>3)),
+        array('dbname'=>'mykoios_com','name'=>'mykoios','formid'=>array(2),'fields'=>array('name'=>'1.3','email'=>2,'orderid'=>4)),
+        array('dbname'=>'tenker_co','name'=>'tenker','formid'=>array(2),'fields'=>array('name'=>'1.3','email'=>2,'orderid'=>3)),
+        array('dbname'=>'miropure_co','name'=>'miropure','formid'=>array(2,4),'fields'=>array('name'=>'1.3','email'=>2,'orderid'=>3)),
+        array('dbname'=>'mooka_co','name'=>'mooka','formid'=>array(2),'fields'=>array('name'=>'1.3','email'=>2,'orderid'=>3)),
+        array('dbname'=>'irunme_net','name'=>'irunme','formid'=>array(1),'fields'=>array('name'=>'5.3','email'=>6,'orderid'=>7)),
+        array('dbname'=>'spacekeybrands_com','name'=>'spacekeybrands','formid'=>array(2),'fields'=>array('name'=>'2.3','email'=>3,'orderid'=>4)),
+    );
+    return $config;
+}

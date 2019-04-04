@@ -101,3 +101,4 @@ Route::get('/skus', 'SkuController@index');
 Route::Post('/skus', 'SkuController@update');
 
 Route::resource('nonctg', 'NonctgController');//non-ctg功能
+Route::Post('/nonctg/get', 'NonctgController@get')->name('getnonctg');//non-ctg功能，ajax请求数据
