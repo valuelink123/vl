@@ -105,13 +105,19 @@ left join fbm_stock as b on a.item_code =b.item_code
 				$datas_details[str_replace('.','',$di['site']).'-'.$di['asin'].'-'.$di['weeks']] = $di;
 			}
 			
-			$oa_datas = [];//DB::connection('oa')->table('formtable_main_193_dt1')->whereRaw('('.implode(' or ',$sku_site_arr).')')->get();
+			if(Auth::user()->id==1){
+				echo phpinfo();
+				$oa_datas = DB::connection('oa')->table('formtable_main_193_dt1')->whereRaw('('.implode(' or ',$sku_site_arr).')')->get();
+			}else{
+				$oa_datas = [];
+			}
+			
 			$oa_datas=json_decode(json_encode($oa_datas), true);
 			foreach($oa_datas as $od){
 				$oa_data[$od['zhand'].'-'.$od['SKU']] = $od;
 			}
 		}
-
+   
         $returnDate['teams']= DB::select('select bg,bu from asin group by bg,bu ORDER BY BG ASC,BU ASC');
 		$returnDate['users']= $this->getUsers();
 		$returnDate['date_start']= $date_start;
