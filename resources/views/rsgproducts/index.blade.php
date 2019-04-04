@@ -114,10 +114,16 @@ th,td,td>span {
 										</div>
 									</td>
 
-									<td></td>
-									<td></td>
-									<td></td>
-									<td></td>
+									<td colspan="4">
+									
+										<select name="site" class="form-control form-filter input-sm " >
+									   <?php 
+										foreach(getAsinSites() as $v){ 	
+											echo '<option value="'.$v.'">'.$v.' </option>';
+										}?>
+									</select>
+									</td>
+	
 									<td></td>
 									<td></td>
 									<td></td>
