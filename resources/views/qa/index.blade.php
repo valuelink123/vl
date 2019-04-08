@@ -301,7 +301,7 @@ License: You must have a valid license purchased only from themeforest(the above
             <?php
             foreach($category_two as $key=>$val){
             ?>
-        { "id":"<?=$val['id']?>", "pId":"<?=$val['category_pid']?>", "name":"<?=$val['category_name']?>","click":"s_url('<?=$val['id']?>');",open:true},
+        { "id":"<?=$val['id']?>", "pId":"<?=$val['category_pid']?>", "name":"<?=$val['category_name']?>"},
         <?php
         }
         ?>
@@ -319,7 +319,7 @@ License: You must have a valid license purchased only from themeforest(the above
                 icoObj = $("#" + treeNode.tId + "_ico");
         switchObj.remove();
         icoObj.before(switchObj);
-        var spaceStr = "<span style='display: inline-block;width:" + (spaceWidth * treeNode.level)+ "px'></span>";
+        var spaceStr = "<span onclick='s_url("+treeNode.id+")' style='width: 300px;position: absolute;z-index: 999999;left: 60px;'>&nbsp;</span>";
 
         switchObj.before(spaceStr);
 
