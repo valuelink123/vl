@@ -213,41 +213,41 @@ color:#000 !important;
 								</div>
 							</div>
 							<div class="progress-info row">
-								<div class="col-md-2"> Target </div>
-								<div class="col-md-8">
+								<div class="col-md-3"> Target </div>
+								<div class="col-md-6">
 								<div class="progress">
 									<span style="width: 100%;" class="progress-bar progress-bar-success blue-sharp">
 										{{$target_sold}}
 									</span>
 								</div>
 								</div>
-								<div class="col-md-2"></div>
+								<div class="col-md-3"></div>
 								<div class="clearfix"></div>
 							</div>
 							
 							<div class="progress-info row">
-								<div class="col-md-2"> Time </div>
-								<div class="col-md-8">
+								<div class="col-md-3"> Time </div>
+								<div class="col-md-6">
 								<div class="progress">
 									<span style="width: {{$time_rate*100}}%;" class="progress-bar progress-bar-success green-sharp">
 										{{$time_rate*100}}%
 									</span>
 								</div>
 								</div>
-								<div class="col-md-2" style="padding:0"> {{$time_rate*100}}% </div>
+								<div class="col-md-3" style="padding:0"> {{$time_rate*100}}% </div>
 								<div class="clearfix"></div>
 							</div>
 							
 							<div class="progress-info row">
-								<div class="col-md-2"> Completed </div>
-								<div class="col-md-8">
+								<div class="col-md-3"> Completed </div>
+								<div class="col-md-6">
 								<div class="progress">
 									<span style="width: {{($complete_sold>100)?100:$complete_sold}}%;" class="progress-bar progress-bar-success red-haze">
 										{{array_get($sap_data,str_replace('.','',$data->site).'-'.$data->item_code.'.VV001',0)}}
 									</span>
 								</div>
 								</div>
-								<div class="col-md-2" style="padding:0"> {{$complete_sold}}% </div>
+								<div class="col-md-3" style="padding:0"> {{$complete_sold}}% </div>
 								<div class="clearfix"></div>
 							</div>
 							</td>
@@ -321,41 +321,41 @@ color:#000 !important;
 								</div>
 							</div>
 							<div class="progress-info row">
-								<div class="col-md-2"> Target </div>
-								<div class="col-md-8">
+								<div class="col-md-3"> Target </div>
+								<div class="col-md-6">
 								<div class="progress">
 									<span style="width: 100%;" class="progress-bar progress-bar-success blue-sharp">
 										{{array_get($oa_data,array_get($site_code,str_replace('.','_',$data->site)).'-'.$data->item_code.'.xiaose'.date('n',strtotime($date_start)),0)}}
 									</span>
 								</div>
 								</div>
-								<div class="col-md-2"></div>
+								<div class="col-md-3"></div>
 								<div class="clearfix"></div>
 							</div>
 							
 							<div class="progress-info row">
-								<div class="col-md-2"> Time </div>
-								<div class="col-md-8">
+								<div class="col-md-3"> Time </div>
+								<div class="col-md-6">
 								<div class="progress">
 									<span style="width: {{$time_rate*100}}%;" class="progress-bar progress-bar-success green-sharp">
 										{{$time_rate*100}}%
 									</span>
 								</div>
 								</div>
-								<div class="col-md-2" style="padding:0"> {{$time_rate*100}}% </div>
+								<div class="col-md-3" style="padding:0"> {{$time_rate*100}}% </div>
 								<div class="clearfix"></div>
 							</div>
 							
 							<div class="progress-info row">
-								<div class="col-md-2"> Completed </div>
-								<div class="col-md-8">
+								<div class="col-md-3"> Completed </div>
+								<div class="col-md-6">
 								<div class="progress">
 									<span style="width: {{($complete_sales>100)?100:$complete_sales}}%;" class="progress-bar progress-bar-success red-haze">
 										{{array_get($sap_data,str_replace('.','',$data->site).'-'.$data->item_code.'.VSRHJ',0)}}
 									</span>
 								</div>
 								</div>
-								<div class="col-md-2" style="padding:0"> {{$complete_sales}}% </div>
+								<div class="col-md-3" style="padding:0"> {{$complete_sales}}% </div>
 								<div class="clearfix"></div>
 							</div>
 							</td>
@@ -429,41 +429,41 @@ color:#000 !important;
 								</div>
 							</div>
 							<div class="progress-info row">
-								<div class="col-md-2"> Target </div>
-								<div class="col-md-8">
+								<div class="col-md-3"> Target </div>
+								<div class="col-md-6">
 								<div class="progress">
 									<span style="width: 100%;" class="progress-bar progress-bar-success blue-sharp">
 										{{array_get($oa_data,array_get($site_code,str_replace('.','_',$data->site)).'-'.$data->item_code.'.yewlr'.date('n',strtotime($date_start)),0)}}
 									</span>
 								</div>
 								</div>
-								<div class="col-md-2"></div>
+								<div class="col-md-3"></div>
 								<div class="clearfix"></div>
 							</div>
 							
 							<div class="progress-info row">
-								<div class="col-md-2"> Time </div>
-								<div class="col-md-8">
+								<div class="col-md-3"> Time </div>
+								<div class="col-md-6">
 								<div class="progress">
 									<span style="width: {{$time_rate*100}}%;" class="progress-bar progress-bar-success green-sharp">
 										{{$time_rate*100}}%
 									</span>
 								</div>
 								</div>
-								<div class="col-md-2" style="padding:0"> {{$time_rate*100}}% </div>
+								<div class="col-md-3" style="padding:0"> {{$time_rate*100}}% </div>
 								<div class="clearfix"></div>
 							</div>
 							
 							<div class="progress-info row">
-								<div class="col-md-2"> Completed </div>
-								<div class="col-md-8">
+								<div class="col-md-3"> Completed </div>
+								<div class="col-md-6">
 								<div class="progress">
 									<span style="width: {{($complete_pro>100)?100:$complete_pro}}%;" class="progress-bar progress-bar-success red-haze">
 										{{array_get($sap_data,str_replace('.','',$data->site).'-'.$data->item_code.'.VVVVV',0)}}
 									</span>
 								</div>
 								</div>
-								<div class="col-md-2" style="padding:0"> {{$complete_pro}}% </div>
+								<div class="col-md-3" style="padding:0"> {{$complete_pro}}% </div>
 								<div class="clearfix"></div>
 							</div>
 							</td>
