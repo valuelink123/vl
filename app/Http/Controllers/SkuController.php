@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
+use App\Classes\SapRfcRequest;
 use App\User;
 use App\Skusweek;
 use App\Skusweekdetails;
@@ -71,6 +72,7 @@ class SkuController extends Controller
 		if($level){
 			$where.= " and a.pro_status = '".$level."'";
 		}
+		
 		if($sku){
 			$where.= " and (a.asin='".$sku."' or a.item_code='".$sku."')";
 		}
@@ -82,7 +84,7 @@ from (select asin,site,max(item_no) as item_code,max(item_status) as status,max(
 left join fbm_stock as b on a.item_code =b.item_code
  ".$where." order by a.item_code asc ) as sku_tmp_cc";
  		$datas = DB::table(DB::raw($sql))->paginate(5);
-		$date_arr=$asin_site_arr=$sku_site_arr=$datas_details=$oa_data=$last_keywords=[];
+		$date_arr=$asin_site_arr=$sku_site_arr=$datas_details=$oa_data=$sap_data=$last_keywords=[];
 		$site_code['www_amazon_com']='US';
 		$site_code['www_amazon_ca']='CA';
 		$site_code['www_amazon_de']='DE';
@@ -91,13 +93,39 @@ left join fbm_stock as b on a.item_code =b.item_code
 		$site_code['www_amazon_co_uk']='UK';
 		$site_code['www_amazon_fr']='FR';
 		$site_code['www_amazon_co_jp']='JP';
+		$sap = new SapRfcRequest();
 		foreach($datas as $data){
 			$asin_site_arr[] = "(asin = '".$data->asin."' and site='".$data->site."')";
 			$sku_site_arr[] = "(SKU = '".$data->item_code."' and zhand='".array_get($site_code,str_replace('.','_',$data->site),'')."')";
 			
 			$last_keywords[str_replace('.','',$data->site).'-'.$data->asin]=Skusweekdetails::where('asin',$data->asin)->where('site',$data->site)->whereNotNull('keywords')->orderBy('weeks','desc')->take(1)->value('keywords');
+			
+			$rows = $sap->getTureSales(['sku' => $data->item_code,'site' => array_get(array_flip(getSapSiteCode()),str_replace('www.','',$data->site)),'month' => date('Ym',strtotime($date_start))]);
+			$vv001 = array_get($rows,'1.VV001');
+			if(substr($vv001, -1) =='-'){
+				$vv001 = round('-'.rtrim($vv001, "-"),2);
+			}else{
+				$vv001 = round($vv001,2);
+			}
+			$vsrhj = array_get($rows,'1.VSRHJ');
+			if(substr($vsrhj, -1) =='-'){
+				$vsrhj = round('-'.rtrim($vsrhj, "-"),2);
+			}else{
+				$vsrhj = round($vsrhj,2);
+			}
+			$vvvvv = array_get($rows,'1.VVVVV');
+			if(substr($vvvvv, -1) =='-'){
+				$vvvvv = round('-'.rtrim($vvvvv, "-"),2);
+			}else{
+				$vvvvv = round($vvvvv,2);
+			}
+			$sap_data[str_replace('.','',$data->site).'-'.$data->item_code] = array(
+				'VV001'=>$vv001,
+				'VSRHJ'=>$vsrhj,
+				'VVVVV'=>$vvvvv,
+			);
+			
  		}
-		print_r($last_keywords);
 		for($i=7;$i>=0;$i--){
 			$date_arr[]=date('Ymd',strtotime($date_start)+(-($i)*3600*24));
 		}
@@ -133,6 +161,7 @@ left join fbm_stock as b on a.item_code =b.item_code
 		$returnDate['datas']= $datas;
 		$returnDate['datas_details']= $datas_details;
 		$returnDate['oa_data']= $oa_data;
+		$returnDate['sap_data']= $sap_data;
 		$returnDate['last_keywords']= $last_keywords;
         return view('sku/index',$returnDate);
 

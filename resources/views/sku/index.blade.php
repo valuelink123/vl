@@ -137,6 +137,34 @@ th,td,td>span {
 						<?php 
 						$curr_date = date('Ymd',strtotime($date_start));
 						$d_number = (date('w',strtotime($date_start))==0)?6:(date('w',strtotime($date_start))-1);
+						
+						$target_sold = round(array_get($oa_data,array_get($site_code,str_replace('.','_',$data->site)).'-'.$data->item_code.'.xiaol'.date('n',strtotime($date_start)),0),2);
+						if($target_sold>0){
+							$complete_sold = round(array_get($sap_data,str_replace('.','',$data->site).'-'.$data->item_code.'.VV001',0)/$target_sold*100,2);
+						}elseif($target_sold<0){
+							$complete_sold = round((2-array_get($sap_data,str_replace('.','',$data->site).'-'.$data->item_code.'.VV001',0)/$target_sold)*100,2);
+						}else{
+							$complete_sold =0;
+						}
+						
+						$target_sales = round(array_get($oa_data,array_get($site_code,str_replace('.','_',$data->site)).'-'.$data->item_code.'.xiaose'.date('n',strtotime($date_start)),0),2);
+						if($target_sales>0){
+							$complete_sales = round(array_get($sap_data,str_replace('.','',$data->site).'-'.$data->item_code.'.VSRHJ',0)/$target_sales*100,2);
+						}elseif($target_sales<0){
+							$complete_sales = round((2-array_get($sap_data,str_replace('.','',$data->site).'-'.$data->item_code.'.VSRHJ',0)/$target_sales)*100,2);
+						}else{
+							$complete_sales =0;
+						}
+						
+						
+						$target_pro = round(array_get($oa_data,array_get($site_code,str_replace('.','_',$data->site)).'-'.$data->item_code.'.yewlr'.date('n',strtotime($date_start)),0),2);
+						if($target_pro>0){
+							$complete_pro = round(array_get($sap_data,str_replace('.','',$data->site).'-'.$data->item_code.'.VVVVV',0)/$target_pro*100,2);
+						}elseif($target_pro<0){
+							$complete_pro = round((2-array_get($sap_data,str_replace('.','',$data->site).'-'.$data->item_code.'.VVVVV',0)/$target_pro)*100,2);
+						}else{
+							$complete_pro =0;
+						}
 						?>
 							<tr >
 							<td width="5%" style="font-weight: bold;">SKU</td>
@@ -186,7 +214,7 @@ th,td,td>span {
 								<div class="col-md-8">
 								<div class="progress">
 									<span style="width: 100%;" class="progress-bar progress-bar-success blue-sharp">
-										{{array_get($oa_data,array_get($site_code,str_replace('.','_',$data->site)).'-'.$data->item_code.'.xiaol'.date('n',strtotime($date_start)),0)}}
+										{{$target_sold}}
 									</span>
 								</div>
 								</div>
@@ -211,8 +239,8 @@ th,td,td>span {
 								<div class="col-md-2"> Completed </div>
 								<div class="col-md-8">
 								<div class="progress">
-									<span style="width: 0%;" class="progress-bar progress-bar-success green-sharp">
-										0%
+									<span style="width: {{$complete_sold}}%;" class="progress-bar progress-bar-success green-sharp">
+										{{array_get($sap_data,str_replace('.','',$data->site).'-'.$data->item_code.'.VV001',0)}}
 									</span>
 								</div>
 								</div>
@@ -319,12 +347,12 @@ th,td,td>span {
 								<div class="col-md-2"> Completed </div>
 								<div class="col-md-8">
 								<div class="progress">
-									<span style="width: 0%;" class="progress-bar progress-bar-success green-sharp">
-										0%
+									<span style="width: {{$complete_sales}}%;" class="progress-bar progress-bar-success green-sharp">
+										{{array_get($sap_data,str_replace('.','',$data->site).'-'.$data->item_code.'.VSRHJ',0)}}
 									</span>
 								</div>
 								</div>
-								<div class="col-md-2" style="padding:0"> 0% </div>
+								<div class="col-md-2" style="padding:0"> {{$complete_sales}}% </div>
 								<div class="clearfix"></div>
 							</div>
 							</td>
@@ -427,12 +455,12 @@ th,td,td>span {
 								<div class="col-md-2"> Completed </div>
 								<div class="col-md-8">
 								<div class="progress">
-									<span style="width: 0%;" class="progress-bar progress-bar-success green-sharp">
-										0%
+									<span style="width: {{$complete_pro}}%;" class="progress-bar progress-bar-success green-sharp">
+										{{array_get($sap_data,str_replace('.','',$data->site).'-'.$data->item_code.'.VVVVV',0)}}
 									</span>
 								</div>
 								</div>
-								<div class="col-md-2" style="padding:0"> 0% </div>
+								<div class="col-md-2" style="padding:0"> {{$complete_pro}}% </div>
 								<div class="clearfix"></div>
 							</div>
 							</td>
