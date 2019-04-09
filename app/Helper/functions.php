@@ -395,7 +395,9 @@ function getStepStatus(){
 		'6'  => 'Check Purchase',
 		'7'  => 'Submit Review',
 		'8'  => 'Check Review',
-		'9'  => 'Completed'
+		'9'  => 'Completed',
+        '10' => 'closed',
+        '11' => 'open dispute'
 	);
 }
 

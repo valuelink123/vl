@@ -9,6 +9,10 @@
     /* 防止水平滚动条 */
     overflow-x: hidden;
   }
+  .styleclass{
+      margin-top:-34px;
+      margin-left:100px;
+  }
 </style>
 <script>
   $(function() {
@@ -27,8 +31,17 @@
 			if(redata.result==1){
 				toastr.success(redata.message);
 				if(redata.sellerid) $("select[name='rebindordersellerid']").val(redata.sellerid);
-				if(redata.buyeremail) $("input[name='buyer_email']").val(redata.buyeremail);
+				if(redata.buyeremail) {
+                    $("input[name='buyer_email']").val(redata.buyeremail);
+                    $('.createEmail').attr('href','/send/create?to_address='+redata.buyeremail);
+                }
 				if(redata.orderhtml) $("#tab_2").html(redata.orderhtml);
+
+                if(redata.productBasicInfo){
+                    $("#tab_3 input[name='sku']").val(redata.productBasicInfo.SellerSKU);
+                    $("#tab_3 input[name='asin']").val(redata.productBasicInfo.asin);
+                    $("#tab_3 input[name='item_no']").val(redata.productBasicInfo.item_no);
+                }
 			}else{
 				toastr.error(redata.message);
 			}	
@@ -36,6 +49,7 @@
 
 	  });
 	});
+      $("#rebindorder").trigger("click");
 	
 	
   });
@@ -451,13 +465,23 @@
 				<div class="form-actions" style="margin-top:50px;">
                             <div class="row">
                                 <div class="col-md-offset-4 col-md-8">
-                                    <button type="submit" class="btn blue">Submit</button>
+                                    <button type="submit" class="btn blue btn1">Submit</button>
                                    
                                 </div>
                             </div>
                         </div>
 		</form>
 
+        <div class="row">
+            <div class="col-md-offset-4 col-md-8">
+                <div >
+                    <a class="createRR" target="_blank" href=""><button class="btn blue btn2 hide" >Create refund and replacement</button></a>
+                </div>
+                <div class="commonclass styleclass">
+                    <a class="createEmail" target="_blank" href="/send/create?to_address={{$phone['buyer_email']}}" ><button class="btn blue btnEmail" >Compose</button></a>
+                </div>
+            </div>
+        </div>
 
     </div>
 </div>
@@ -560,6 +584,28 @@
 
 $(function() {
     TableDatatablesAjax.init();
+
+    $('.nav-tabs li').click(function(){
+        var href = $(this).find('a').attr('href');
+        $('.form-actions .btn1').removeClass('hide');
+        $('.btn2').addClass('hide');
+        $('.btnEmail').addClass('hide');
+        $('.commonclass').addClass('styleclass');
+        if(href=='#tab_2'){
+            $('.form-actions .btn1').addClass('hide');
+            $('.btn2').removeClass('hide');
+            var request_orderid = $('#rebindorderid').val();
+            $('.commonclass').removeClass('styleclass');
+            $('.createRR').attr('href','/exception/create?request_orderid='+request_orderid);
+        }else{
+            if(href=='#tab_1'){
+                var buyerEmail = $('#buyer_email').val();
+                $('.btnEmail').removeClass('hide');
+                $('.createEmail').attr('href','/send/create?to_address='+buyerEmail);
+            }
+
+        }
+    })
 });
 
 

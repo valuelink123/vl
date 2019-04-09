@@ -929,12 +929,18 @@ class InboxController extends Controller
 				if($order){
 					$return_arr['buyeremail']=$order->BuyerEmail;
 					$item_str='';
-					foreach($order->item as $item){ 
-						
+                    $basicInfo = array();
+					foreach($order->item as $item){
+                        $basicInfo['asin'] = $item->ASIN;
+                        $basicInfo['SellerSKU'] = $item->SellerSKU;
                          $item_str = '<tr><td><h4>'.$item->ASIN.' ( '.$item->SellerSKU.' )</h4><p> '.$item->Title.' </p> </td><td class="text-center sbold">'.$item->QuantityOrdered.'</td><td class="text-center sbold">'.round($item->ItemPriceAmount/$item->QuantityOrdered,2).'</td><td class="text-center sbold">'.round($item->ShippingPriceAmount,2).' '.(($item->ShippingDiscountAmount)?'( -'.round($item->ShippingDiscountAmount,2).' )':'').'</td> <td class="text-center sbold">'.(($item->PromotionDiscountAmount)?'( -'.round($item->PromotionDiscountAmount,2).' )':'').'</td><td class="text-center sbold">'.round($item->ItemTaxAmount,2).'</td></tr>';
 					}
-						
-				
+					$site = 'www.'.$order->SalesChannel;
+                    $asinInfo = DB::table('asin')->where($basicInfo)->where('site',$site)->get(array('item_no'))->first();
+                    $basicInfo['item_no'] = $asinInfo->item_no;
+                    if($basicInfo){
+                        $return_arr['productBasicInfo'] = $basicInfo;//产品基本信息,ASIN,SellerSKU,item_no
+                    }
 									
 					$return_arr['orderhtml']='<div class="invoice-content-2 bordered">
                         <div class="row invoice-head">
