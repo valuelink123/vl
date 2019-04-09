@@ -15,6 +15,9 @@ table.dataTable tbody th, table.dataTable tbody td {
 th,td,td>span {
     font-size:12px !important;
 	font-family:Arial, Helvetica, sans-serif;}
+.progress-bar.green-sharp,.progress-bar.red-haze,.progress-bar.blue-sharp{
+color:#000 !important;
+}
     </style>
     <h1 class="page-title font-red-intense"> Daily Sales Report
         
@@ -239,12 +242,12 @@ th,td,td>span {
 								<div class="col-md-2"> Completed </div>
 								<div class="col-md-8">
 								<div class="progress">
-									<span style="width: {{$complete_sold}}%;" class="progress-bar progress-bar-success green-sharp">
+									<span style="width: {{($complete_sold>100)?100:$complete_sold}}%;" class="progress-bar progress-bar-success red-haze">
 										{{array_get($sap_data,str_replace('.','',$data->site).'-'.$data->item_code.'.VV001',0)}}
 									</span>
 								</div>
 								</div>
-								<div class="col-md-2" style="padding:0"> 0% </div>
+								<div class="col-md-2" style="padding:0"> {{$complete_sold}}% </div>
 								<div class="clearfix"></div>
 							</div>
 							</td>
@@ -347,7 +350,7 @@ th,td,td>span {
 								<div class="col-md-2"> Completed </div>
 								<div class="col-md-8">
 								<div class="progress">
-									<span style="width: {{$complete_sales}}%;" class="progress-bar progress-bar-success green-sharp">
+									<span style="width: {{($complete_sales>100)?100:$complete_sales}}%;" class="progress-bar progress-bar-success red-haze">
 										{{array_get($sap_data,str_replace('.','',$data->site).'-'.$data->item_code.'.VSRHJ',0)}}
 									</span>
 								</div>
@@ -455,7 +458,7 @@ th,td,td>span {
 								<div class="col-md-2"> Completed </div>
 								<div class="col-md-8">
 								<div class="progress">
-									<span style="width: {{$complete_pro}}%;" class="progress-bar progress-bar-success green-sharp">
+									<span style="width: {{($complete_pro>100)?100:$complete_pro}}%;" class="progress-bar progress-bar-success red-haze">
 										{{array_get($sap_data,str_replace('.','',$data->site).'-'.$data->item_code.'.VVVVV',0)}}
 									</span>
 								</div>
