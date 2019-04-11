@@ -235,9 +235,12 @@
                                         echo $s_email['status'];
 										if($s_email['send_date']) echo ' at '.$s_email['send_date'];
 									
-                                        if($s_email['error']) echo $s_email['error'];
+                                        if($s_email['error']) echo ' Error :'.$s_email['error'];
                                         ?>
                                     </span>
+									<?php if($s_email['status']=='Waiting'){ ?>
+									<a class="btn green-sharp btn-circle" data-toggle="confirmation" data-popout="true" href="{{url('sendcs/'.$s_email['id'])}}">Withdraw</a>
+									<?php } ?>
                                             <BR>
                                             <?php
                                             $config = array('indent' => TRUE,
@@ -608,5 +611,5 @@
 </div>
         </div>
 		 <div style="clear:both;"></div></div>
-
+<script src="/assets/global/plugins/bootstrap-confirmation/bootstrap-confirmation.min.js" type="text/javascript"></script>
 @endsection

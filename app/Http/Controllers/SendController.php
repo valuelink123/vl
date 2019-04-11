@@ -103,6 +103,23 @@ class SendController extends Controller
         return redirect()->back()->withInput();
     }
 	
+	
+	public function changeStatus(Request $request,$id)
+    {
+		$id =intval($id);
+		$email = Sendbox::where('id',$id)->where('status','Waiting');
+        if(!Auth::user()->admin){
+            $email->where('user_id',$this->getUserId());
+        }
+        $result = $email->update(['status'=>'Draft']);
+		if($result){
+        	$request->session()->flash('success_message','Withdraw Success');
+		}else{
+			$request->session()->flash('error_message','Withdraw Failed');
+		}
+        return redirect()->back()->withInput();
+    }
+	
     public function store(Request $request)
     {
         $file = $request->file('files');

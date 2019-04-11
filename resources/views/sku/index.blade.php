@@ -86,10 +86,8 @@ color:#000 !important;
 						 <div class="col-md-1">
 						<select class="form-control form-filter input-sm" name="level" id="level">
 									<option value="">Level</option>
+										<option value="S" <?php if('S'==$s_level) echo 'selected'; ?>>S</option>
                                         <option value="A" <?php if('A'==$s_level) echo 'selected'; ?>>A</option>
-										<option value="B" <?php if('B'==$s_level) echo 'selected'; ?>>B</option>
-										<option value="C" <?php if('C'==$s_level) echo 'selected'; ?>>C</option>
-										<option value="D" <?php if('D'==$s_level) echo 'selected'; ?>>D</option>
                                     </select>
 						</div>
 						
