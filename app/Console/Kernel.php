@@ -81,8 +81,8 @@ class Kernel extends ConsoleKernel
 		$schedule->command('get:dailysales 7')->dailyAt('9:00')->name('getdailysales')->withoutOverlapping();
 
         $filePath = 'D:\phpstudy\PHPTutorial\WWW\vl\storage\logs\noctg.log';
-        $schedule->command('add:nonctg')->monthly()->appendOutputTo($filePath)->name('add_history_nonctg')->withoutOverlapping();
-        $schedule->command('update:nonctg')->everyMinute()->appendOutputTo($filePath)->name('update_nonctg')->withoutOverlapping();
+        //$schedule->command('add:nonctg')->monthly()->appendOutputTo($filePath)->name('add_history_nonctg')->withoutOverlapping();
+        $schedule->command('update:nonctg')->cron('*/30 * * * *')->appendOutputTo($filePath)->name('update_nonctg')->withoutOverlapping();
     }
 
     /**

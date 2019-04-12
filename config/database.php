@@ -170,6 +170,21 @@ return [
             'strict' => false,
             'engine' => null,
         ],
+		
+		'website' => [
+			'driver' => 'mysql',
+			'host' => env('DB_WEBSITE_HOST', '127.0.0.1'),
+			'port' => env('DB_WEBSITE_PORT', '3306'),
+			'database' => env('DB_WEBSITE_DATABASE', 'forge'),
+			'username' => env('DB_WEBSITE_USERNAME', 'forge'),
+			'password' => env('DB_WEBSITE_PASSWORD', ''),
+			'unix_socket' => env('DB_WEBSITE_SOCKET', ''),
+			'charset' => 'utf8mb4',
+			'collation' => 'utf8mb4_unicode_ci',
+			'prefix' => '',
+			'strict' => false,
+			'engine' => null,
+		],
     ],
 
     /*
