@@ -517,14 +517,28 @@ if((Auth::user()->admin || in_array($exception['group_id'],array_get($mygroups,'
 			</div>
 		</div>
 		
-		<div class="form-group">
-			<label>Process Attach</label>
-			<div class="input-group ">
+		<div class="form-group mt-repeater">
+			<div class="row mt-repeater-row">
+				<div class="col-md-6">
+					<label class="control-label">Process Attach</label>
+					<div class="input-group ">
 
-				<input type="file" class="form-control" name="importFile" {{$disable}} />  
-				<?php if(array_get($exception,'process_attach')){ ?>
-				<a href="{{array_get($exception,'process_attach')}}" target="_blank">{{basename(array_get($exception,'process_attach'))}}</a>
-				<?php } ?>
+						<input type="file" class="form-control" name="importFile" {{$disable}} />
+						<?php if(array_get($exception,'process_attach')){ ?>
+						<a href="{{array_get($exception,'process_attach')}}" target="_blank">{{basename(array_get($exception,'process_attach'))}}</a>
+						<?php } ?>
+					</div>
+				</div>
+
+				<div class="col-md-6">
+					<label class="control-label">Score</label>
+					<div class="input-group ">
+					<span class="input-group-addon">
+						<i class="fa fa-bookmark"></i>
+					</span>
+						<input type="text" class="form-control" name="score" onkeyup="this.value=this.value.replace(/[^\d.]/g,'')"  id="score" value="{{$exception['score']}}"  {{$disable}}>
+					</div>
+				</div>
 			</div>
 		</div>
 

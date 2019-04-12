@@ -104,6 +104,7 @@ class ExceptionController extends Controller
 		$headArray[] = 'Order Skus';
 		$headArray[] = 'Create Date';
 		$headArray[] = 'Status';
+        $headArray[] = 'Score';
 		$headArray[] = 'Operate';
 		$headArray[] = 'Ship Name';
 		$headArray[] = 'Address1';
@@ -120,9 +121,9 @@ class ExceptionController extends Controller
 		$headArray[] = 'Operator';
 		$headArray[] = 'Group';
 		$headArray[] = 'Creator';
-		
+
 		$arrayAmazon[] =['Status','Account','Returned/Urgent','MerchantFulfillmentOrderID','DisplayableOrderID','DisplayableOrderDate','MerchantSKU','Quantity','MerchantFulfillmentOrderItemID','GiftMessage','DisplayableComment','PerUnitDeclaredValue','DisplayableOrderComment','DeliverySLA','AddressName','AddressFieldOne','AddressFieldTwo','AddressFieldThree','AddressCity','AddressCountryCode','AddressStateOrRegion','AddressPostalCode','AddressPhoneNumber','NotificationEmail','FulfillmentAction','MarketplaceID'];
-		
+    
 		$arraySap[] =['Status','Returned/Urgent','平台编号','站点','平台订单号','售达方','订单类型','订单交易号','付款日期','付款交易ID(不能重复)','买家ID','买家姓名','国家代码','城市名','州/省','街道1','街道2','邮编','邮箱','电话1','成交费','货币','佣金','货币','订单总价','货币','实际运输方式','平台订单号','站点','行号','SAP物料号','数量','工厂','仓库','行项目ID','帖子ID','帖子标题','销售员编号','行交易ID','标记完成'];
 
 		$arrayData[] = $headArray;
@@ -186,7 +187,7 @@ class ExceptionController extends Controller
 						}else{
 							$sap_sku_info=[];
 						}
-						
+
 						$arraySap[] =[
 							$customersList['process_status'],
 							implode(', ',array_get($product,'addattr',[])),
@@ -243,6 +244,7 @@ class ExceptionController extends Controller
                 $customersList['order_sku'],
 				$customersList['date'],
                 array_get($status_list,$customersList['process_status']),
+                $customersList['score'],
 				$operate,
 				array_get($replacements,'shipname'),
 				array_get($replacements,'address1'),
@@ -265,7 +267,7 @@ class ExceptionController extends Controller
 		if($arrayData){
 
 			$spreadsheet = new Spreadsheet();
-			
+
 			$spreadsheet->getActiveSheet()
 				->fromArray(
 					$arrayData,  // The data to set
@@ -335,7 +337,7 @@ class ExceptionController extends Controller
 //
 //            })->where('id',$id)->first();
 //		}
-        
+
         if(!$rule){
             $request->session()->flash('error_message','Exception not Exists');
             return redirect('exception');
@@ -343,7 +345,7 @@ class ExceptionController extends Controller
 		$rule= $rule->toArray();
 		//$account = Accounts::where('account_sellerid',array_get($rule,'sellerid'))->first();
 		$last_inboxid=0;
-	
+
 		$last_inbox = Inbox::where('amazon_seller_id',array_get($rule,'sellerid'))->where('amazon_order_id',array_get($rule,'amazon_order_id'))->orderBy('date','desc')->first();
 		if($last_inbox) $last_inboxid= $last_inbox->id;
 		$replacement_order_ids=[];
@@ -355,12 +357,12 @@ class ExceptionController extends Controller
 					$replacement_order_ids[]=array_get($product,'replacement_order_id');
 				}
 			}
-		}	
-					
+		}
+
 		$mcf_orders = DB::connection('order')->table('amazon_mcf_shipment_package')->whereIn('SellerFulfillmentOrderId',$replacement_order_ids)->get();
-		
+
 		if($last_inbox) $last_inboxid= $last_inbox->id;
-		
+
         return view('exception/edit',['exception'=>$rule,'groups'=>$this->getGroups(),'mygroups'=>$this->getUserGroup(),'sellerids'=>$this->getAccounts(),'last_inboxid'=>$last_inboxid,'mcf_orders'=>$mcf_orders]);
     }
 
@@ -373,6 +375,7 @@ class ExceptionController extends Controller
 			]);
 			$exception->process_content = $request->get('process_content');
 			$exception->process_status = $request->get('process_status');
+            $exception->score = $request->get('score');
 			$exception->process_date = date('Y-m-d H:i:s');
 			$exception->process_user_id = intval(Auth::user()->id);
 			if($exception->type==2 || $exception->type==3){
@@ -382,7 +385,7 @@ class ExceptionController extends Controller
 				if(is_array($products_arr)){
 					$id_add=0;
 					foreach( $products_arr as $product_arr){
-						$product_arr['replacement_order_id']=$request->input('replacement_order_id.'.$id_add);	
+						$product_arr['replacement_order_id']=$request->input('replacement_order_id.'.$id_add);
 						$products[]=$product_arr;
 						$id_add++;
 					}
@@ -390,14 +393,14 @@ class ExceptionController extends Controller
 				$replacements['products']=$products;
 				$exception->replacement =  serialize($replacements);
 			}
-			$file = $request->file('importFile');  
+			$file = $request->file('importFile');
   			if($file){
-				if($file->isValid()){  
-					$originalName = $file->getClientOriginalName();  
-					$ext = $file->getClientOriginalExtension();  
-					$type = $file->getClientMimeType();  
-					$realPath = $file->getRealPath();  
-					$newname = date('Y-m-d-H-i-S').'-'.uniqid().'.'.$ext;  
+				if($file->isValid()){
+					$originalName = $file->getClientOriginalName();
+					$ext = $file->getClientOriginalExtension();
+					$type = $file->getClientMimeType();
+					$realPath = $file->getRealPath();
+					$newname = date('Y-m-d-H-i-S').'-'.uniqid().'.'.$ext;
 					$newpath = '/uploads/exceptionUpload/'.date('Ymd').'/';
 					$inputFileName = public_path().$newpath.$newname;
 					$bool = $file->move(public_path().$newpath,$newname);
@@ -434,20 +437,20 @@ class ExceptionController extends Controller
 			}else{
 				$exception->refund = 0;
 			}
-	
+
 			if( $exception->type == 2 || $exception->type == 3){
-				
+
 				$products=[];
 				$products_arr = $request->get('group-products');
-	
+
 				$id_add=0;
 				foreach($products_arr as $product_arr){
 					$id_add++;
 					if(array_get($product_arr,'seller_id')==$request->get('rebindordersellerid')){
 						$product_arr['replacement_order_id']=$request->get('rebindorderid').'-0'.$id_add;
 					}else{
-						$product_arr['replacement_order_id']=substr($request->get('rebindorderid'),4).'-0'.$id_add;	
-					}		
+						$product_arr['replacement_order_id']=substr($request->get('rebindorderid'),4).'-0'.$id_add;
+					}
 					$products[]=$product_arr;
 				}
 				$exception->replacement = serialize(
@@ -468,16 +471,16 @@ class ExceptionController extends Controller
 			}else{
 				$exception->replacement = '';
 			}
-	
+
 			if ($exception->save()) {
 				return redirect('exception/'.$id.'/edit');
 			} else {
 				$request->session()->flash('error_message','Set Failed');
 				return redirect()->back()->withInput();
 			}
-		
+
 		}
-		
+
        return redirect('exception/'.$id.'/edit');
     }
     public function get(Request $request)
@@ -501,7 +504,7 @@ class ExceptionController extends Controller
                 $updateDate['process_status'] = $_REQUEST['process_status'];
 				$updateDate['process_content'] = $_REQUEST['process_content'];
             }
-            
+
             if(Auth::user()->admin){
                 $updatebox = new Exception;
             }else{
@@ -532,9 +535,9 @@ class ExceptionController extends Controller
             $customers = $customers->where('process_status', $_REQUEST['status']);
         }
         //if(Auth::user()->admin) {
-		
+
 			if (array_get($_REQUEST, 'group_id')) {
-				
+
                 $customers = $customers->where('group_id', array_get($_REQUEST, 'group_id'));
 
             }
@@ -542,19 +545,19 @@ class ExceptionController extends Controller
 				$customers = $customers->where('user_id',  array_get($_REQUEST, 'user_id'));
             }
         //}
-		
+
         if(array_get($_REQUEST,'sellerid')){
             $customers = $customers->where('sellerid',  array_get($_REQUEST, 'sellerid'));
-			
+
         }
         if(array_get($_REQUEST,'amazon_order_id')){
             $customers = $customers->where('amazon_order_id', array_get($_REQUEST, 'amazon_order_id'));
         }
-		
+
 
         if(array_get($_REQUEST,'order_sku')){
             $customers = $customers->where('order_sku', 'like', '%'.$_REQUEST['order_sku'].'%');
-           
+
         }
 		if(array_get($_REQUEST,'resellerid')){
             $customers = $customers->where('replacement', 'like', '%:"'.$_REQUEST['resellerid'].'"%');
@@ -562,14 +565,14 @@ class ExceptionController extends Controller
 		if(array_get($_REQUEST,'resku')){
             $customers = $customers->where('replacement', 'like', '%:"'.$_REQUEST['resku'].'"%');
         }
-		
+
         if(array_get($_REQUEST,'date_from')){
             $customers = $customers->where('date','>=',$_REQUEST['date_from'].' 00:00:00');
         }
         if(array_get($_REQUEST,'date_to')){
             $customers = $customers->where('date','<=',$_REQUEST['date_to'].' 23:59:59');
         }
-		
+
 		$iTotalRecords = $customers->count();
         $iDisplayLength = intval($_REQUEST['length']);
         $iDisplayLength = $iDisplayLength < 0 ? $iTotalRecords : $iDisplayLength;
@@ -618,7 +621,7 @@ class ExceptionController extends Controller
 			$operate = '';
 			if($customersList['type']==1 || $customersList['type']==3) $operate.= 'Refund : '.$customersList['refund'].'</BR>';
 			if($customersList['type']==2 || $customersList['type']==3){
-				
+
 				$replacements = unserialize($customersList['replacement']);
 				$products = array_get($replacements,'products',array());
 				if(is_array($products)){
@@ -629,24 +632,26 @@ class ExceptionController extends Controller
 						}else{
 							$seller_id = $customersList['sellerid'];
 						}
-						
+
 						$operate.= '<span class="label label-sm label-primary">'.array_get($accounts,$seller_id,$seller_id).'</span></BR>'.(((array_get($accounts,$seller_id)?array_get($product,'seller_sku'):array_get($product,'item_code'))??array_get($product,'sku')??null)??array_get($product,'title')).'*'.array_get($product,'qty').'</BR>';
-						
-						
+
+
 					}
 				}
 			}
             if($customersList['type']==4) $operate.= 'Gift Card : '.$customersList['gift_card_amount'].PHP_EOL;
+            //得到列表的状态值（在状态值下面显示score值）
+            $statusScore = array_get($status_list,$customersList['process_status']).'<br/><br/>'.$customersList['score'];
 
             $records["data"][] = array(
                 ((Auth::user()->admin || in_array($customersList['group_id'],array_get($this->getUserGroup(),'manage_groups',array()))) && $customersList['process_status']=='submit')?'<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input name="id[]" type="checkbox" class="checkboxes" value="'.$customersList['id'].'"/><span></span></label>':'',
-                
+
 				array_get($accounts,$customersList['sellerid']),
                 $customersList['amazon_order_id'],
                 array_get($type_list,$customersList['type']),
                 $customersList['order_sku'],
 				$customersList['date'],
-                array_get($status_list,$customersList['process_status']),
+                $statusScore,
 				// isset($mcfStatus[$customersList['amazon_order_id']]) ? $mcfStatus[$customersList['amazon_order_id']] : 'unknown',
 				$operate,
 				array_get($users,$customersList['process_user_id'])?array_get($users,$customersList['process_user_id']):array_get($groupleaders,$customersList['group_id']),
