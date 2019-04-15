@@ -21,7 +21,7 @@ color:#000 !important;
 table{ 
 table-layout:fixed; 
 }
-td{       
+td.strategy_s,td.keyword_s{       
 text-overflow:ellipsis; 
 -moz-text-overflow: ellipsis; 
 overflow:hidden;      
@@ -214,7 +214,7 @@ white-space: nowrap;
 							<td rowspan="16">{{$data->bu}}</td>
 							<td colspan="2"><a href="https://{{$data->site}}/dp/{{strip_tags(str_replace('&nbsp;','',$data->asin))}}" target="_blank">{{strip_tags(str_replace('&nbsp;','',$data->asin))}}</a></td>
 							<td>{{strtoupper(substr(strrchr($data->site, '.'), 1))}}</td>
-							<td colspan="3"><a class="sku_keywords" href="javascript:;" id="{{$data->site.'-'.$data->asin.'-'.$curr_date}}-keywords" data-pk="{{$data->site.'-'.$data->asin.'-'.$curr_date}}-keywords" data-type="text"> {{array_get($datas_details,str_replace('.','',$data->site).'-'.$data->asin.'-'.$curr_date.'.keywords')?array_get($datas_details,str_replace('.','',$data->site).'-'.$data->asin.'-'.$curr_date.'.keywords'):array_get($last_keywords,str_replace('.','',$data->site).'-'.$data->asin)}} </a></td>
+							<td colspan="3" class="keyword_s"><a class="sku_keywords" href="javascript:;" id="{{$data->site.'-'.$data->asin.'-'.$curr_date}}-keywords" data-pk="{{$data->site.'-'.$data->asin.'-'.$curr_date}}-keywords" data-type="text"> {{array_get($datas_details,str_replace('.','',$data->site).'-'.$data->asin.'-'.$curr_date.'.keywords')?array_get($datas_details,str_replace('.','',$data->site).'-'.$data->asin.'-'.$curr_date.'.keywords'):array_get($last_keywords,str_replace('.','',$data->site).'-'.$data->asin)}} </a></td>
 							<td>{!!($data->status)?'<span class="btn btn-success btn-xs">Reserved</span>':'<span class="btn btn-danger btn-xs">Eliminate</span>'!!}</td>
 							<td>{{$data->pro_status}}</td>
 							<td colspan="3">{{$data->item_name}}</td>
@@ -538,7 +538,7 @@ white-space: nowrap;
 								$style=((0==$i)?'style="background:#ddeef7;"':'');
 								$week=date('Ymd',strtotime($date_start)+(-($i)*3600*24));
 							?>
-							<td {!!$style!!}><a class="sku_strategy" title="{{array_get($datas_details,str_replace('.','',$data->site).'-'.$data->asin.'-'.$week.'.strategy')}}" href="javascript:;" id="{{$data->site.'-'.$data->asin.'-'.$week}}-strategy" data-pk="{{$data->site.'-'.$data->asin.'-'.$week}}-strategy" data-type="text"> {{array_get($datas_details,str_replace('.','',$data->site).'-'.$data->asin.'-'.$week.'.strategy')}} </a></td>
+							<td {!!$style!!} class="strategy_s"><a class="sku_strategy" title="{{array_get($datas_details,str_replace('.','',$data->site).'-'.$data->asin.'-'.$week.'.strategy')}}" href="javascript:;" id="{{$data->site.'-'.$data->asin.'-'.$week}}-strategy" data-pk="{{$data->site.'-'.$data->asin.'-'.$week}}-strategy" data-type="text"> {{array_get($datas_details,str_replace('.','',$data->site).'-'.$data->asin.'-'.$week.'.strategy')}} </a></td>
 							<?php
 							}
 							?>
