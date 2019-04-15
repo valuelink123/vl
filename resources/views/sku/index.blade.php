@@ -146,10 +146,10 @@ white-space: nowrap;
 						<table id="user" class="table table-striped table-bordered table-hover">
  
 						 <colgroup>
-			<col width="5%"></col>
-			<col width="5%"></col>
-			<col width="5%"></col>
-			<col width="5%"></col>
+			<col width="6%"></col>
+			<col width="6%"></col>
+			<col width="4%"></col>
+			<col width="4%"></col>
 			<col width="6%"></col>
 			<col width="6%"></col>
 			<col width="6%"></col>
