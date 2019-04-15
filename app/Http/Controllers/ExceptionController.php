@@ -123,7 +123,7 @@ class ExceptionController extends Controller
 		$headArray[] = 'Creator';
 
 		$arrayAmazon[] =['Status','Account','Returned/Urgent','MerchantFulfillmentOrderID','DisplayableOrderID','DisplayableOrderDate','MerchantSKU','Quantity','MerchantFulfillmentOrderItemID','GiftMessage','DisplayableComment','PerUnitDeclaredValue','DisplayableOrderComment','DeliverySLA','AddressName','AddressFieldOne','AddressFieldTwo','AddressFieldThree','AddressCity','AddressCountryCode','AddressStateOrRegion','AddressPostalCode','AddressPhoneNumber','NotificationEmail','FulfillmentAction','MarketplaceID'];
-    
+
 		$arraySap[] =['Status','Returned/Urgent','平台编号','站点','平台订单号','售达方','订单类型','订单交易号','付款日期','付款交易ID(不能重复)','买家ID','买家姓名','国家代码','城市名','州/省','街道1','街道2','邮编','邮箱','电话1','成交费','货币','佣金','货币','订单总价','货币','实际运输方式','平台订单号','站点','行号','SAP物料号','数量','工厂','仓库','行项目ID','帖子ID','帖子标题','销售员编号','行交易ID','标记完成'];
 
 		$arrayData[] = $headArray;
@@ -369,13 +369,13 @@ class ExceptionController extends Controller
     public function update(Request $request,$id)
     {
 		$exception = Exception::findOrFail($id);
+        $exception->score = $request->get('score');
 		if($exception->process_status=='submit' && $request->get('process_status')!='submit'){
 			$this->validate($request, [
 				'process_status' => 'required|string',
 			]);
 			$exception->process_content = $request->get('process_content');
 			$exception->process_status = $request->get('process_status');
-            $exception->score = $request->get('score');
 			$exception->process_date = date('Y-m-d H:i:s');
 			$exception->process_user_id = intval(Auth::user()->id);
 			if($exception->type==2 || $exception->type==3){
@@ -413,7 +413,15 @@ class ExceptionController extends Controller
 				$request->session()->flash('error_message','Set Failed');
 				return redirect()->back()->withInput();
 			}
-		}
+		}else{
+		    //score分数是无论什么状态都保存
+            if ($exception->save()) {
+                return redirect('exception/'.$id.'/edit');
+            } else {
+                $request->session()->flash('error_message','Set Failed');
+                return redirect()->back()->withInput();
+            }
+        }
 		if($exception->process_status=='cancel'){
 			 $this->validate($request, [
 				'group_id' => 'required|string',
