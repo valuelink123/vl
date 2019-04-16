@@ -354,7 +354,7 @@ left join fbm_stock as b on a.item_code =b.item_code ) as sku_tmp_cc'),function(
 				array_get($users_array,intval(array_get($data,'sap_seller_id')),intval(array_get($data,'sap_seller_id'))),
 				$data['bg'],
 				$data['bu'],
-				$data['status'],
+				($data['status'])?'Reserved':'Eliminate',
 				$data['pro_status'],
 				$data['item_name'],
 				$data['weeks'],
