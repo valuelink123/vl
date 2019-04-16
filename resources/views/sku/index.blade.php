@@ -128,7 +128,9 @@ white-space: nowrap;
 					</div>
 
                     </form>
-					
+					<button id="vl_list_export" class="btn sbold blue"> Export
+                                    <i class="fa fa-download"></i>
+                          </button>
                 </div>
                     <div class="table-container">
 					{{ $datas->appends(['date_start' => $date_start,'site' => $s_site,'user_id' => $s_user_id,'level' => $s_level,'bgbu' => $bgbu,'sku' => $sku])->links() }} 
@@ -634,6 +636,10 @@ var FormEditable = function() {
 
 jQuery(document).ready(function() {
     FormEditable.init();
+	
+	$("#vl_list_export").click(function(){
+		location.href='/dreportexport?sku='+$("input[name='sku']").val()+'&date_start='+$("input[name='date_start']").val()+'&user_id='+(($("select[name='user_id[]']").val())?$("select[name='user_id[]']").val():'')+'&bgbu='+$("select[name='bgbu']").val()+'&site='+$('select[name="site"]').val()+'&level='+$('select[name="level"]').val();
+	});
 });
 </script>
 

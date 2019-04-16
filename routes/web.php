@@ -73,6 +73,8 @@ Route::Post('/exception/getorder', 'ExceptionController@getrfcorder')->name('get
 Route::Post('/exception/getrepeatorder', 'ExceptionController@getRepeatOrder')->name('getRepeatOrder');
 Route::get('/exceptionexport', 'ExceptionController@export')->name('exportException');
 Route::get('/reviewexport', 'ReviewController@export')->name('exportReview');
+Route::get('/dreportexport', 'SkuController@export')->name('exportDreport');
+
 Route::get('/asinexport', 'AsinController@export')->name('exportAsin');
 Route::get('/fees', 'FeesController@index')->name('fees');
 Route::Post('/fees/getads', 'FeesController@getads')->name('getads');
