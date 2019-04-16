@@ -278,7 +278,7 @@ left join fbm_stock as b on a.item_code =b.item_code ) as sku_tmp_cc'),function(
 		$sap = new SapRfcRequest();
 		$oa_data=$sap_data=[];
 		foreach ( $datas as $data){
-			if($ex_item_code!=$data['item_code'] && $ex_site!=$data['site']){
+			if($ex_item_code!=$data['item_code'] || $ex_site!=$data['site']){
 				$ex_item_code=$data['item_code'];
 				$ex_site=$data['site'];
 				
