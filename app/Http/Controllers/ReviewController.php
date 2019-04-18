@@ -638,6 +638,7 @@ class ReviewController extends Controller
 		$seller_account->etype = $request->get('etype');
 		$seller_account->edate = date('Y-m-d');
 		$seller_account->nextdate = $request->get('nextdate');
+		$seller_account->commented = $request->get('commented');
 		$seller_account->customer_feedback = $request->get('customer_feedback');
 		$do_ids = $request->get('do_id');
 		

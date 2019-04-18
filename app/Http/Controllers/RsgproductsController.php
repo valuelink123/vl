@@ -90,7 +90,7 @@ class RsgproductsController extends Controller
         }
 		
 		if($request->input('site')){
-            $datas = $datas->where('site', $request->input('site'));
+            $datas = $datas->whereIn('site', $request->input('site'));
         }
 		if($request->input('status')!==NULL){
             $datas = $datas->where('status', $request->input('status'));

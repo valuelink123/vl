@@ -114,9 +114,9 @@ th,td,td>span {
 										</div>
 									</td>
 
-									<td colspan="4">
-									
-										<select name="site" class="form-control form-filter input-sm " >
+									<td colspan="9">
+									 
+										<select name="site" class="form-filter input-sm mt-multiselect btn btn-default " multiple="multiple" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" name="site[]" id="site[]" >
 									   <?php 
 										foreach(getAsinSites() as $v){ 	
 											echo '<option value="'.$v.'">'.$v.' </option>';
@@ -124,11 +124,7 @@ th,td,td>span {
 									</select>
 									</td>
 	
-									<td></td>
-									<td></td>
-									<td></td>
-									<td></td>
-									<td></td>
+									
 									<!--
 									<td>
 										<select name="bgbu" class="form-control form-filter input-sm">
@@ -234,7 +230,7 @@ th,td,td>span {
 												{ extend: 'csv', className: 'btn purple btn-outline ',filename:'RsgProducts' }
 											],
 											"order": [
-												[7, "desc"]
+												[2, "desc"]
 											],// set first column as a default sort by asc
 										}
 									});
@@ -273,7 +269,7 @@ th,td,td>span {
 									grid.setAjaxParam("date_to", $("input[name='date_to']").val());
 									grid.setAjaxParam("asin", $("input[name='asin']").val());
 									grid.setAjaxParam("seller_id", $("select[name='seller_id']").val());
-									//grid.setAjaxParam("bgbu", $("select[name='bgbu']").val());
+									grid.setAjaxParam("site", $("select[name='site[]']").val());
 									grid.setAjaxParam("user_id", $("select[name='user_id']").val());
 									grid.setAjaxParam("status", $("select[name='status']").val());
 									grid.getDataTable().ajax.reload(null,false);

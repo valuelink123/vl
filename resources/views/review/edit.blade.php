@@ -298,6 +298,18 @@
 															<input type="hidden" name="do_date_{{$step->id}}" id="do_date_{{$step->id}}" value="{{array_get($step_logs,$step->id.'.do_date')}}" />
                                                             <p class="block">{!!$step->content!!}</p>
 															
+															<div class="form-group">
+																<span>Have you commented on this review?</span><br/>
+																<label style="margin-right:5em;">
+																	<input type="radio" name="commented" id="commented1" value="1"/>
+																	Yes
+																</label>
+																
+																<label>
+																	<input type="radio" name="commented" id="commented0" value="0" />
+																	No
+																</label>
+															</div>
 															
                                                             <div class="form-group">
 																<label>Follow Content</label>
@@ -609,6 +621,7 @@ function closedreson(){
 
 $(function() {
 	closedreson();
+	$("#commented{{$review['commented']}}").attr("checked","checked");
     $('.date-picker').datepicker({
                 rtl: App.isRTL(),
                 autoclose: true
