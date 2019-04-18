@@ -269,7 +269,7 @@
                                                         <p> {!! $item['Title'] !!} </p>
                                                     </td>
                                                     <td class="text-center sbold">{!! $item['QuantityOrdered'] !!}</td>
-                                                    <td class="text-center sbold">{{round($item['ItemPriceAmount']/$item['QuantityOrdered'],2)}}</td>
+                                                    <td class="text-center sbold">{{round($item['ItemPriceAmount']/($item['QuantityOrdered']??1),2)}}</td>
                                                     <td class="text-center sbold">{{round($item['ShippingPriceAmount'],2)}} {{($item['ShippingDiscountAmount'])?'( -'.round($item['ShippingDiscountAmount'],2).' )':''}}</td>
                                                     <td class="text-center sbold">{{($item['PromotionDiscountAmount'])?'( -'.round($item['PromotionDiscountAmount'],2).' )':''}}</td>
                                                     <td class="text-center sbold">{{round($item['ItemTaxAmount'],2)}}</td>
