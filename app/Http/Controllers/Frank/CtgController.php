@@ -334,6 +334,7 @@ class CtgController extends Controller {
 
     /**
      * @throws DataInputException
+     * CTG点击process出现的页面操作
      */
     public function process(Request $req) {
 

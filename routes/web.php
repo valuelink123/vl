@@ -105,3 +105,5 @@ Route::Post('/skus', 'SkuController@update');
 Route::resource('nonctg', 'NonctgController');//non-ctg功能
 Route::Post('/nonctg/get', 'NonctgController@get')->name('getnonctg');//non-ctg功能，ajax请求数据
 Route::get('/sendcs/{id}', 'SendController@changeStatus')->name('changeStatus');
+
+Route::Post('/qa/getSonProductByProduct', 'QaiController@getSonProductByProduct');//add Qa页面的For Product联动，根据组别得到子组别的键值对

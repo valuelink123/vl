@@ -516,6 +516,30 @@ if((Auth::user()->admin || in_array($exception['group_id'],array_get($mygroups,'
 				<input type="text" class="form-control" name="process_content" id="process_content" value="{{$exception['process_content']}}"  {{$disable}}>
 			</div>
 		</div>
+
+		<div class="form-group mt-repeater">
+			<div class="row mt-repeater-row">
+				<div class="col-md-6">
+					<label class="control-label">Score</label>
+					<div class="input-group ">
+				<span class="input-group-addon">
+					<i class="fa fa-bookmark"></i>
+				</span>
+						<input type="text" class="form-control" name="score" onkeyup="this.value=this.value.replace(/[^\d.]/g,'')"  id="score" value="{{$exception['score']}}"  {{$disable}}>
+					</div>
+				</div>
+
+				<div class="col-md-6">
+					<label class="control-label">Comment</label>
+					<div class="input-group ">
+				<span class="input-group-addon">
+					<i class="fa fa-bookmark"></i>
+				</span>
+						<input type="text" class="form-control" name="comment"  id="comment" value="{{$exception['comment']}}"  {{$disable}}>
+					</div>
+				</div>
+			</div>
+		</div>
 		
 		<div class="form-group mt-repeater">
 			<div class="row mt-repeater-row">
@@ -531,27 +555,18 @@ if((Auth::user()->admin || in_array($exception['group_id'],array_get($mygroups,'
 				</div>
 
 				<div class="col-md-6">
-					<label class="control-label">Score</label>
-					<div class="input-group ">
-					<span class="input-group-addon">
-						<i class="fa fa-bookmark"></i>
-					</span>
-						<input type="text" class="form-control" name="score" onkeyup="this.value=this.value.replace(/[^\d.]/g,'')"  id="score" value="{{$exception['score']}}"  {{$disable}}>
-					</div>
+					<label>Replacement Order Id:</label>
+					@foreach ($replacement_order_ids as $replacement_order_id)
+						<div class="input-group "><input type="text" class="form-control form-filter" name="replacement_order_id[]"  value="{{$replacement_order_id}}"  {{$disable}}></div>
+					@endforeach
+					<BR />
+					@foreach ($mcf_orders as $mcf_order)
+						{{$mcf_order->SellerFulfillmentOrderId}} : {{$mcf_order->TrackingNumber}} {{$mcf_order->CarrierCode}}
+					@endforeach
 				</div>
 			</div>
 		</div>
 
-		<div class="form-group">
-			<label>Replacement Order Id:</label>
-			@foreach ($replacement_order_ids as $replacement_order_id)
-			<div class="input-group "><input type="text" class="form-control form-filter" name="replacement_order_id[]"  value="{{$replacement_order_id}}"  {{$disable}}></div>
-			@endforeach
-			<BR />
-			@foreach ($mcf_orders as $mcf_order)
-				{{$mcf_order->SellerFulfillmentOrderId}} : {{$mcf_order->TrackingNumber}} {{$mcf_order->CarrierCode}}
-			@endforeach
-		</div>
 		<?php if($last_inboxid){ ?>
 		<div class="form-group">
 		<div class="btn-group">

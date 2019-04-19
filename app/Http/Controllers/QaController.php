@@ -140,7 +140,11 @@ class QaController extends Controller
         $qas = new Qa;
         $related_knowledge = explode(';',$qa['related_knowledge']);
         $qas = $qas->whereIN('id',$related_knowledge);
-        $qas = $qas->orderBy('created_at','desc')->get()->toArray();
+        $_qas = $qas->orderBy('created_at','desc')->get()->toArray();
+        $qas = array();
+        foreach($_qas as $key=>$val){
+            $qas[$val['id']] = $val;
+        }
 
         return view('qa/view',['qa'=>$qa,'qas'=>$qas,'users'=>$this->getUsers(),'tree'=>$tree,'for_product2'=>$for_product2,'groups'=>$this->getGroups()]);
     }

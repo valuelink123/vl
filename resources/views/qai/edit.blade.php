@@ -289,6 +289,64 @@
 //            }
 //        }
 
+        //For Product组别下拉框改变的时候
+        $('.for_product1').bind('change',function(){
+            var for_product1 = $('select[name="for_product1"]').find('option:selected').attr('attr');
+            $.ajax({
+                method: 'POST',
+                url: '/qa/getSonProductByProduct',
+                data: {product1:for_product1},
+                dataType: 'json',
+                success(result) {
+                    var ophtml = '<option value="ALL">ALL</option>';
+                    var html = ophtml;
+                    $.each(result,function(k,v){
+                        ophtml += '<option value="'+v+'">'+v+'</option>';
+                    })
+                    $('.for_product2').html(ophtml);
+                    $('.for_product3').html(html);
+                    $('.for_product4').html(html);
+                }
+            })
+        })
+        $('.for_product2').bind('change',function(){
+            var for_product1 = $('select[name="for_product1"]').find('option:selected').attr('attr');
+            var for_product2 = $('select[name="for_product2"]').val();
+            $.ajax({
+                method: 'POST',
+                url: '/qa/getSonProductByProduct',
+                data: {product1:for_product1,product2:for_product2},
+                dataType: 'json',
+                success(result) {
+                    var ophtml = '<option value="ALL">ALL</option>';
+                    var html = ophtml;
+                    $.each(result,function(k,v){
+                        ophtml += '<option value="'+v+'">'+v+'</option>';
+                    })
+                    $('.for_product3').html(ophtml);
+                    $('.for_product4').html(html);
+                }
+            })
+        })
+        $('.for_product3').bind('change',function(){
+            var for_product1 = $('select[name="for_product1"]').find('option:selected').attr('attr');
+            var for_product2 = $('select[name="for_product2"]').val();
+            var for_product3 = $('select[name="for_product3"]').val();
+            $.ajax({
+                method: 'POST',
+                url: '/qa/getSonProductByProduct',
+                data: {product1:for_product1,product2:for_product2,product3:for_product3},
+                dataType: 'json',
+                success(result) {
+                    var ophtml = '<option value="ALL">ALL</option>';
+                    $.each(result,function(k,v){
+                        ophtml += '<option value="'+v+'">'+v+'</option>';
+                    })
+                    $('.for_product4').html(ophtml);
+                }
+            })
+        })
+
         $('.add_similar_question').on('click', function(){
             var html = '<div class="input-group col-md-12"><span class="input-group-addon"><i class="fa fa-bookmark"></i></span><input type="text" class="form-control" placeholder="Similar Question" name="similar_question[]" id="similar_question" /></div>';
             $('.similar_question').append(html);

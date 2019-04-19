@@ -263,7 +263,7 @@ License: You must have a valid license purchased only from themeforest(the above
                                             <?php
                                             foreach($qas as $key=>$val){
                                             ?>
-                                            <div class="col-md-6" style="line-height: 30px; border: 1px solid #717172;"><?=$val['title']?></div>
+                                            <a href="/question/{{$key}}" target="_blank"><div class="col-md-6" style="line-height: 30px; border: 1px solid #717172;"><?=$val['title']?></div></a>
                                             <?php
                                             }
                                             ?>

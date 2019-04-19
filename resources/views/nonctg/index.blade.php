@@ -16,7 +16,9 @@
                             <th width="8%"> Name </th>
                             <th width="18%">Order ID </th>
                             <th width="10%">Asin</th>
-                            <th width="8%">seller Name</th>
+                            <th width="10%">Item Group</th>
+                            <th width="10%">Item no</th>
+                            <th width="8%">Sales</th>
                             <th width="8%">From</th>
                             <th width="5%"> Action </th>
                         </tr>
@@ -44,9 +46,14 @@
                                 <input type="text" class="form-control form-filter input-sm" name="email">
                             </td>
                             <td>
+                                <input type="text" class="form-control form-filter input-sm" name="name">
                             </td>
                             <td>
                                 <input type="text" class="form-control form-filter input-sm" name="amazon_order_id">
+                            </td>
+                            <td>
+                            </td>
+                            <td>
                             </td>
                             <td>
                             </td>
@@ -106,7 +113,7 @@
                         "dom": "<'row'<'col-md-6 col-sm-12'pli><'col-md-6 col-sm-12'<'table-group-actions pull-right'>>r>t<'row'<'col-md-6 col-sm-12'pli><'col-md-6 col-sm-12'>>",
 
                         "bStateSave": true, // save datatable state(pagination, sort, etc) in cookie.
-                        "aoColumnDefs": [ { "bSortable": false, "aTargets": [ 1,2,3,4,5,6 ] }],
+                        "aoColumnDefs": [ { "bSortable": false, "aTargets": [ 1,2,3,4,5,6,7,8,9 ] }],
                         "lengthMenu": [
                             [10, 20, 50],
                             [10, 20, 50] // change per page values here
@@ -129,7 +136,7 @@
                 grid.setAjaxParam("name", $("input[name='name']").val());
                 grid.setAjaxParam("order_id", $("input[name='order_id']").val());
                 grid.setAjaxParam("Asin", $("select[name='Asin']").val());
-                grid.setAjaxParam("seller_name", $("input[name='seller_name']").val());
+                grid.setAjaxParam("Sales", $("input[name='Sales']").val());
                 grid.setAjaxParam("from", $("input[name='from']").val());
                 grid.setAjaxParam("action", $("input[name='from']").val());
                 grid.getDataTable().ajax.reload(null,false);

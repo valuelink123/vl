@@ -50,6 +50,8 @@
                                 <pre>{!! $ctgRow['order_id'] !!}</pre>
                                 <div class="font-dark">Customer Information</div>
                                 <pre>Name: {!! $ctgRow['name'] !!}<br/>Phone: {!! $ctgRow['phone'] !!}<br/>Email: {!! $ctgRow['email'] !!}</pre>
+                                <div class="font-dark">Remark</div>
+                                <pre>{!! $ctgRow['note'] !!}</pre>
                                 <br/>
                                 <div class="form-group">
                                     <label>

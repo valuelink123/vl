@@ -370,6 +370,7 @@ class ExceptionController extends Controller
     {
 		$exception = Exception::findOrFail($id);
         $exception->score = $request->get('score');
+        $exception->comment = $request->get('comment');
 		if($exception->process_status=='submit' && $request->get('process_status')!='submit'){
 			$this->validate($request, [
 				'process_status' => 'required|string',
@@ -415,12 +416,7 @@ class ExceptionController extends Controller
 			}
 		}else{
 		    //score分数是无论什么状态都保存
-            if ($exception->save()) {
-                return redirect('exception/'.$id.'/edit');
-            } else {
-                $request->session()->flash('error_message','Set Failed');
-                return redirect()->back()->withInput();
-            }
+            $exception->save();
         }
 		if($exception->process_status=='cancel'){
 			 $this->validate($request, [

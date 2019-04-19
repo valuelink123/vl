@@ -63,25 +63,29 @@ class QaiController extends Controller
         $tree = $this->getTree($lists,29);
         $trees = $this->getTree($lists,118);
 
+        $for_product2 = [];
+        $for_product3 = [];
+        $for_product4 = [];
+
+        /*
         $asin_order_by = 'asin';
         $asin_sort = 'asc';
         $asin_data = new Asin;
         $asin_list =  $asin_data->orderBy($asin_order_by,$asin_sort)->get()->toArray();
 
         //$epoint1 = [];
-        $for_product2 = [];
-        $for_product3 = [];
-        $for_product4 = [];
+
         foreach($asin_list as $key=>$val){
             //$epoint1[] = $val['group_id'];
-            $for_product2[] = $val['item_group'];
-            $for_product3[] = $val['item_model'];
-            $for_product4[] = $val['item_no'];
+            // $for_product2[] = $val['item_group'];
+            // $for_product3[] = $val['item_model'];
+            // $for_product4[] = $val['item_no'];
         }
         //$epoint1 = array_unique($epoint1);
         $for_product2 = array_unique(array_filter($for_product2));
         $for_product3 = array_unique(array_filter($for_product3));
         $for_product4 = array_unique(array_filter($for_product4));
+        */
 
         $qas = new Qa;
         $qas = $qas->orderBy('created_at','desc')->get()->toArray();
@@ -610,6 +614,35 @@ class QaiController extends Controller
             }
         }
         return $arr;
+    }
+
+    /*
+     * add Qa页面的For Product联动，根据组别得到子组别的键值对
+     */
+    public function getSonProductByProduct(Request $request)
+    {
+        $product1 = isset($_REQUEST["product1"]) ? $_REQUEST["product1"] : '';
+        $product2 = isset($_REQUEST["product2"]) ? $_REQUEST["product2"] : '';
+        $product3 = isset($_REQUEST["product3"]) ? $_REQUEST["product3"] : '';
+        $asin_data = new Asin;
+        $asin_order_by = 'asin';
+        $asin_sort = 'asc';
+        $query =  $asin_data->where('group_id',$product1);
+        $field = 'item_group';
+        if($product2){
+            $field = 'item_model';
+            $query = $query->where('item_group',$product2);
+        }
+        if($product3){
+            $field = 'item_no';
+            $query = $query->where('item_model',$product3);
+        }
+        $asin_list = $query->orderBy($asin_order_by,$asin_sort)->get(array($field))->toArray();
+        $return = array();
+        foreach($asin_list as $key=>$val){
+            $return[$val[$field]] = $val[$field];
+        }
+        echo json_encode($return);
     }
 
 
