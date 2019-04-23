@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Classes\SapRfcRequest;
 use App\Models\NonCtg;
 use DB;
 use App\User;
@@ -73,24 +74,43 @@ class NonctgController extends Controller
         $end = $end > $iTotalRecords ? $iTotalRecords : $end;
 
         if($customersLists) {
-            //根据订单id得到物料组asin和销售人姓名
-            $amazonOrderIds = $orderAsinSeller = array();
-            foreach ($customersLists as $val) {
-                $amazonOrderIds[] = $val['amazon_order_id'];
-            }
-            $orderAsinSeller = $this->getOrderBasicInfo($amazonOrderIds);
-
             //数据数据得到前端需要显示的内容
+            $sap = new SapRfcRequest();
             foreach ($customersLists as $customersList) {
+                $amazonOrderId = $customersList['amazon_order_id'];
+                $p = '/\d{3}\-\d{7}\-\d{7}/';
+                preg_match($p, $amazonOrderId, $match);
+                $asin = $sellersku = $SalesChannel = $item_group = $item_no = $seller = '-';
+                if($match && strlen($amazonOrderId) == 19){
+                    //根据订单id通过sap接口得到订单信息
+                    try {
+                        $sapOrderInfo = SapRfcRequest::sapOrderDataTranslate($sap->getOrder(['orderId' => $amazonOrderId]));
+                        if ($sapOrderInfo) {
+                            $asin = $sapOrderInfo['orderItems'][0]['ASIN'];
+
+                            //从asin表中获取item_group，item_no，seller的值
+                            $itemIndo = DB::table('asin')->where('asin', $asin)->where('site', 'www.' . $sapOrderInfo['SalesChannel'])->where('sellersku', $sapOrderInfo['orderItems'][0]['SellerSKU'])->get(array('item_group', 'item_no', 'seller'))->first();
+                            if ($itemIndo) {
+                                $item_group = $itemIndo->item_group;
+                                $item_no = $itemIndo->item_no;
+                                $seller = $itemIndo->seller;
+                            }
+                        }
+                    } catch (\Exception $e) {
+
+                    }
+                }
+
+
                 $records["data"][] = array(
                     $customersList['date'],
                     $customersList['email'],
                     $customersList['name'],
                     $customersList['amazon_order_id'],
-                    isset($orderAsinSeller[$customersList['amazon_order_id']]['asin']) ? $orderAsinSeller[$customersList['amazon_order_id']]['asin'] : '未知',
-                    isset($orderAsinSeller[$customersList['amazon_order_id']]['item_group']) ? $orderAsinSeller[$customersList['amazon_order_id']]['item_group'] : '未知',
-                    isset($orderAsinSeller[$customersList['amazon_order_id']]['item_no']) ? $orderAsinSeller[$customersList['amazon_order_id']]['item_no'] : '未知',
-                    isset($orderAsinSeller[$customersList['amazon_order_id']]['seller']) ? $orderAsinSeller[$customersList['amazon_order_id']]['seller'] : '未知',
+                    $asin,
+                    $item_group,
+                    $item_no,
+                    $seller,
                     $customersList['from'],
                     '<td>-</td>',
                 );

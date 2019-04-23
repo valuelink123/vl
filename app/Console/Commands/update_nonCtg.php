@@ -9,6 +9,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use DB;
 use Log;
+use App\Classes\SapRfcRequest;
 
 
 class UpdateNonctg extends Command
@@ -40,10 +41,14 @@ class UpdateNonctg extends Command
         set_time_limit(0);
         $today = date('Y-m-d');
         $yestoday = date('Y-m-d 00:00:00',strtotime("-1 day"));
-        // $yestoday = '2019-03-20 00:00:00';//测试数据
+        // $yestoday = '2019-03-20 18:00:00';//测试数据
         echo 'Execution update_nonctg.php script start time:'.$today."\n";
         DB::connection()->enableQueryLog(); // 开启查询日志
         $config = getActiveUserConfig();//得到配置信息
+        // $config = array(
+        //     array('dbname'=>'dbpower_co','name'=>'dbpower','formid'=>array(2,4),'fields'=>array('name'=>'1.3','email'=>2,'orderid'=>3)),
+        // );//测试配置
+        $sap = new SapRfcRequest();
 
         //凌晨跑前一天的数据，遍历各个官网的前一天的数据，再根据邮箱判断是否存在存在ctg表中，如果不存在就插入到nonctg数据表中
         foreach($config as $key=>$val){
@@ -64,7 +69,6 @@ class UpdateNonctg extends Command
                     $emailArr[$dv->entry_id] = $dv->meta_value;
                 }
             }
-            var_dump($data);
             //把$emailArr按个数分为n个数组，避免数据太多导致查询异常
             $emailArr = array_chunk(array_unique($emailArr),$num,true);
             foreach($emailArr as $email){
@@ -75,15 +79,30 @@ class UpdateNonctg extends Command
                     $ctgData[] = $cv->email;
                 }
                 foreach($email as $ek=>$ev){
-                    if(!in_array($ev,$ctgData)){//不在ctg中，应该插入到nonctg表中
-                        $insertData[] = array(
-                            'date' =>$data[$ek]['date_created'],
-                            'name' => isset($data[$ek][$val['fields']['name']]) ? $data[$ek][$val['fields']['name']] : '未知',
-                            'email' => isset($data[$ek][$val['fields']['email']]) ? $data[$ek][$val['fields']['email']] : '未知',
-                            'amazon_order_id' => isset($data[$ek][$val['fields']['orderid']]) ? $data[$ek][$val['fields']['orderid']] : '未知',
-                            'from' => $val['name'],
-                        );
+                    if(isset($data[$ek][$val['fields']['name']]) && isset($data[$ek][$val['fields']['email']]) && isset($data[$ek][$val['fields']['orderid']])){
+                        $amazonOrderId = $data[$ek][$val['fields']['orderid']];
+                        if(!in_array($ev,$ctgData)){//不在ctg中，应该插入到nonctg表中
+                            //判断订单号是否是存在的订单号
+                            $p = '/\d{3}\-\d{7}\-\d{7}/';
+                            preg_match($p, $amazonOrderId, $match);
+                            if($match && strlen($amazonOrderId) == 19){
+                                try {
+                                    SapRfcRequest::sapOrderDataTranslate($sap->getOrder(['orderId' => $amazonOrderId]));
+                                    $insertData[] = array(
+                                        'date' =>$data[$ek]['date_created'],
+                                        'name' => isset($data[$ek][$val['fields']['name']]) ? $data[$ek][$val['fields']['name']] : '未知',
+                                        'email' => isset($data[$ek][$val['fields']['email']]) ? $data[$ek][$val['fields']['email']] : '未知',
+                                        'amazon_order_id' => isset($data[$ek][$val['fields']['orderid']]) ? $data[$ek][$val['fields']['orderid']] : '未知',
+                                        'from' => $val['name'],
+                                    );
+                                } catch (\Exception $e) {
+                                    echo '不添加异常的订单号：'.$amazonOrderId.'     ';
+                                }
+                            }
+
+                        }
                     }
+
                 }
                 batchInsert('non_ctg',$insertData);//调用app/helper/functions.php的batchInsert方法插入数据,可以避免唯一键冲突
             }

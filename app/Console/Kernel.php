@@ -35,7 +35,8 @@ class Kernel extends ConsoleKernel
 		'App\Console\Commands\GetSales28day',
 		'App\Console\Commands\GetShoudafang',
         'App\Console\Commands\Nonctg',
-        'App\Console\Commands\UpdateNonctg'
+        'App\Console\Commands\UpdateNonctg',
+        'App\Console\Commands\DeleteNonctg'
     ];
 
     /**
@@ -82,6 +83,7 @@ class Kernel extends ConsoleKernel
 
         $filePath = 'D:\phpstudy\PHPTutorial\WWW\vl\storage\logs\noctg.log';
         //$schedule->command('add:nonctg')->monthly()->appendOutputTo($filePath)->name('add_history_nonctg')->withoutOverlapping();
+        $schedule->command('delete:nonctg')->monthly()->appendOutputTo($filePath)->name('delete_history_nonctg')->withoutOverlapping();
         $schedule->command('update:nonctg')->cron('*/30 * * * *')->appendOutputTo($filePath)->name('update_nonctg')->withoutOverlapping();
     }
 
