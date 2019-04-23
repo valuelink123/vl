@@ -128,9 +128,11 @@ th,td,td>span {
                                 <td>
                                     <select name="status" class="form-control form-filter input-sm">
                                         <option value="">Select...</option>
-                                        <option value="submit">Processing</option>
+                                        <option value="submit">Pending</option>
                                         <option value="cancel">Cancelled</option>
                                         <option value="done">Done</option>
+                                        <option value="confirmed">Confirmed</option>
+                                        <option value="manually done">Manually Done</option>
                                     </select>
                                 </td>
 

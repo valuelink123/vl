@@ -121,6 +121,7 @@ class ExceptionController extends Controller
 		$headArray[] = 'Operator';
 		$headArray[] = 'Group';
 		$headArray[] = 'Creator';
+        $headArray[] =  'Process Date';
 
 		$arrayAmazon[] =['Status','Account','Returned/Urgent','MerchantFulfillmentOrderID','DisplayableOrderID','DisplayableOrderDate','MerchantSKU','Quantity','MerchantFulfillmentOrderItemID','GiftMessage','DisplayableComment','PerUnitDeclaredValue','DisplayableOrderComment','DeliverySLA','AddressName','AddressFieldOne','AddressFieldTwo','AddressFieldThree','AddressCity','AddressCountryCode','AddressStateOrRegion','AddressPostalCode','AddressPhoneNumber','NotificationEmail','FulfillmentAction','MarketplaceID'];
 
@@ -133,7 +134,9 @@ class ExceptionController extends Controller
 		$accounts = $this->getAccounts();
         $status_list['done'] = "Done";
         $status_list['cancel'] = "Cancelled";
-        $status_list['submit'] = "Processing";
+        $status_list['submit'] = "Pending";
+        $status_list['manually done'] = "Manually Done";
+        $status_list['confirmed'] = "Confirmed";
 		$type_list['1'] = "Refund";
         $type_list['2'] = "Replacement";
         $type_list['3'] = "Refund & Replacement";
@@ -260,7 +263,8 @@ class ExceptionController extends Controller
 				$customersList['request_content'],
 				array_get($users,$customersList['process_user_id'])?array_get($users,$customersList['process_user_id']):array_get($groupleaders,$customersList['group_id']),
                 array_get($groups,$customersList['group_id'].'.group_name'),
-				array_get($users,$customersList['user_id'])
+				array_get($users,$customersList['user_id']),
+                $customersList['process_date'],
             );
 		}
 
@@ -592,9 +596,11 @@ class ExceptionController extends Controller
 		$groups = $this->getGroups();
 		$groupleaders = $this->getGroupLeader();
 		$accounts = $this->getAccounts();
+        $status_list['manually done'] = "<span class=\"label label-sm label-success\">Manually Done</span>";
+        $status_list['confirmed'] = "<span class=\"label label-sm label-success\">Confirmed</span>";
         $status_list['done'] = "<span class=\"label label-sm label-success\">Done</span>";
         $status_list['cancel'] = "<span class=\"label label-sm label-danger\">Cancelled</span>";
-        $status_list['submit'] = "<span class=\"label label-sm label-warning\">Processing</span>";
+        $status_list['submit'] = "<span class=\"label label-sm label-warning\">Pending</span>";
 		$type_list['1'] = "Refund";
         $type_list['2'] = "Replacement";
         $type_list['3'] = "Refund & Replacement";

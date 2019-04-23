@@ -501,9 +501,11 @@ if((Auth::user()->admin || in_array($exception['group_id'],array_get($mygroups,'
 			</span>
 				<select name="process_status"  id="process_status" class="form-control form-filter input-sm" {{$disable}}>
 					<option value="">Select...</option>
-					<option value="submit" <?php if($exception['process_status']=='submit') echo 'selected';?> distabled>Processing</option>
+					<option value="submit" <?php if($exception['process_status']=='submit') echo 'selected';?> distabled>Pending</option>
 					<option value="cancel" <?php if($exception['process_status']=='cancel') echo 'selected';?>>Cancelled</option>
 					<option value="done" <?php if($exception['process_status']=='done') echo 'selected';?>>Done</option>
+					<option value="confirmed" <?php if($exception['process_status']=='confirmed') echo 'selected';?>>Confirmed</option>
+					<option value="manually done" <?php if($exception['process_status']=='manually done') echo 'selected';?>>Manually Done</option>
 				</select>
 			</div>
 		</div>	
