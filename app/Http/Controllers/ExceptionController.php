@@ -72,7 +72,9 @@ class ExceptionController extends Controller
 
             }
             if (array_get($_REQUEST, 'user_id')) {
-				$customers = $customers->where('user_id',  array_get($_REQUEST, 'user_id'));
+                $_userid = array_get($_REQUEST, 'user_id');
+                $userid = explode(',',$_userid);
+				$customers = $customers->whereIn('user_id',  $userid);
             }
         //}
 		
@@ -549,8 +551,11 @@ class ExceptionController extends Controller
                 $customers = $customers->where('group_id', array_get($_REQUEST, 'group_id'));
 
             }
+
             if (array_get($_REQUEST, 'user_id')) {
-				$customers = $customers->where('user_id',  array_get($_REQUEST, 'user_id'));
+                $_userid = array_get($_REQUEST, 'user_id');
+                $userid = explode(',',$_userid);
+				$customers = $customers->whereIn('user_id',  $userid);
             }
         //}
 
