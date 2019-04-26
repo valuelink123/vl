@@ -566,6 +566,31 @@ if((Auth::user()->admin || in_array($exception['group_id'],array_get($mygroups,'
 						{{$mcf_order->SellerFulfillmentOrderId}} : {{$mcf_order->TrackingNumber}} {{$mcf_order->CarrierCode}}
 					@endforeach
 				</div>
+				
+				
+				<?php 
+				$mcf_result=array('0'=>'Waiting','1'=>'Success','-1'=>'Failed');	
+				if(array_get($exception,'auto_create_mcf')){ ?>
+				<div class="col-md-12">
+					<span class="label label-sm label-danger">{{array_get($exception,'auto_create_mcf_result')}}</span>	
+					<BR />
+					{{array_get($exception,'last_auto_create_mcf_date')}}
+					<BR />
+					{{array_get($exception,'last_auto_create_mcf_log')}}
+					
+				</div>
+				<?php } ?>
+				
+				<?php 
+				if($auto_create_mcf_logs){ ?>
+				<div class="col-md-12">
+				 	@foreach ($auto_create_mcf_logs as $auto_create_mcf_log)
+					{{array_get($users,$auto_create_mcf_log->user_id )}} {{($auto_create_mcf_log->status)?'submited':'canceled'}} at  {{$auto_create_mcf_log->date}}
+					<BR />
+					@endforeach
+				</div>
+				<?php } ?>
+				
 			</div>
 		</div>
 
@@ -577,16 +602,28 @@ if((Auth::user()->admin || in_array($exception['group_id'],array_get($mygroups,'
 		</div>
 		<?php 
 		}
-if((Auth::user()->admin || in_array($exception['group_id'],array_get($mygroups,'manage_groups',array()))) && ($exception['process_status']=='submit' || $exception['process_status']=='confirmed')){ ?>
+		?>
+		
 		<div class="form-actions">
                         <div class="row">
                             <div class="col-md-offset-4 col-md-8">
+								<?php
+if((Auth::user()->admin || in_array($exception['group_id'],array_get($mygroups,'manage_groups',array()))) && ($exception['process_status']=='submit' || $exception['process_status']=='confirmed')){ ?>
                                 <button type="submit" class="btn blue"  {{$disable}}>Submit</button>
                                 <button type="reset" class="btn grey-salsa btn-outline"  {{$disable}}>Cancel</button>
+								<?php } ?>
+								<?php 
+								if($exception['process_status']=='done'){
+									if(array_get($exception,'auto_create_mcf')){
+								?>
+								<button type="submit" class="btn blue" name="acf" value="0">Cancel Auto Create MCF</button>
+								<?php }else{ ?>
+								<button type="submit" class="btn blue" name="acf" value="1">Auto Create MCF</button>
+								<?php }} ?>
                             </div>
                         </div>
                     </div>
-		<?php } ?>
+		
 		</div>
 		</div><div style="clear:both;"></div>
 		</div></div></div>					

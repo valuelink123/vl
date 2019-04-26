@@ -353,7 +353,11 @@ class ExceptionController extends Controller
 		$last_inboxid=0;
 
 		$last_inbox = Inbox::where('amazon_seller_id',array_get($rule,'sellerid'))->where('amazon_order_id',array_get($rule,'amazon_order_id'))->orderBy('date','desc')->first();
+		
 		if($last_inbox) $last_inboxid= $last_inbox->id;
+		
+		$auto_create_mcf_logs = DB::table('mcf_auto_create_log')->where('exception_id',$id)->orderBy('id','desc')->get();
+		
 		$replacement_order_ids=[];
 		if($rule['type']==2 || $rule['type']==3){
 			$replacements = unserialize($rule['replacement']);
@@ -369,14 +373,33 @@ class ExceptionController extends Controller
 
 		if($last_inbox) $last_inboxid= $last_inbox->id;
 
-        return view('exception/edit',['exception'=>$rule,'groups'=>$this->getGroups(),'mygroups'=>$this->getUserGroup(),'sellerids'=>$this->getAccounts(),'last_inboxid'=>$last_inboxid,'mcf_orders'=>$mcf_orders]);
+        return view('exception/edit',['exception'=>$rule,'groups'=>$this->getGroups(),'mygroups'=>$this->getUserGroup(),'sellerids'=>$this->getAccounts(),'last_inboxid'=>$last_inboxid,'mcf_orders'=>$mcf_orders,'auto_create_mcf_logs'=>$auto_create_mcf_logs]);
     }
 
     public function update(Request $request,$id)
     {
 		$exception = Exception::findOrFail($id);
+		$acf = $request->get('acf');
+		if(isset($acf) && $exception->auto_create_mcf_result!=1){
+			$exception->auto_create_mcf = $acf;
+			if($acf){
+				$exception->auto_create_mcf_result = 0;
+				$exception->last_auto_create_mcf_date = date('Y-m-d H:i:s');
+			}
+			$exception->save();
+			DB::table('mcf_auto_create_log')->insert(
+			array(
+				'user_id'=>intval(Auth::user()->id),
+				'exception_id'=>$id,
+				'date'=>date('Y-m-d H:i:s'),
+				'status'=>$acf,
+			));
+			return redirect('exception/'.$id.'/edit');
+		}
+		
         $exception->score = $request->get('score');
         $exception->comment = $request->get('comment');
+		$exception->save();
 		if($exception->process_status=='submit' && $request->get('process_status')!='submit'){
 			$this->validate($request, [
 				'process_status' => 'required|string',
@@ -420,10 +443,7 @@ class ExceptionController extends Controller
 				$request->session()->flash('error_message','Set Failed');
 				return redirect()->back()->withInput();
 			}
-		}else{
-		    //score分数是无论什么状态都保存
-            $exception->save();
-        }
+		}
 		if($exception->process_status=='cancel'){
 			 $this->validate($request, [
 				'group_id' => 'required|string',
@@ -610,7 +630,8 @@ class ExceptionController extends Controller
         $type_list['2'] = "Replacement";
         $type_list['3'] = "Refund & Replacement";
 
-
+		$mcf_result=array('0'=>'Waiting','1'=>'Success','-1'=>'Failed');
+		
         /*mcf订单状态先不要
         //得到列表记录的所有亚马逊id
         $amazon_ids = $_mcfStatus = $mcfStatus = array();
@@ -649,8 +670,9 @@ class ExceptionController extends Controller
 						}
 
 						$operate.= '<span class="label label-sm label-primary">'.array_get($accounts,$seller_id,$seller_id).'</span></BR>'.(((array_get($accounts,$seller_id)?array_get($product,'seller_sku'):array_get($product,'item_code'))??array_get($product,'sku')??null)??array_get($product,'title')).'*'.array_get($product,'qty').'</BR>';
-
-
+					}
+					if($customersList['auto_create_mcf']){
+						$operate.= 'Auto Mcf : '.array_get($mcf_result,$customersList['auto_create_mcf_result']).'</BR>'.$customersList['last_auto_create_mcf_log'];
 					}
 				}
 			}
