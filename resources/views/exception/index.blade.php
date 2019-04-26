@@ -147,7 +147,7 @@ th,td,td>span {
                                         <option value="cancel">Cancelled</option>
                                         <option value="done">Done</option>
                                         <option value="confirmed">Confirmed</option>
-                                        <option value="manually done">Manually Done</option>
+                                        <option value="auto done">Auto Done</option>
                                     </select>
                                 </td>
 

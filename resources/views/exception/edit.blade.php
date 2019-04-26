@@ -473,7 +473,7 @@ if(($exception['user_id'] == Auth::user()->id || Auth::user()->admin || in_array
 <div class="portlet light portlet-fit bordered ">
 
 <?php 
-if((Auth::user()->admin || in_array($exception['group_id'],array_get($mygroups,'manage_groups',array()))) && $exception['process_status']=='submit'){
+if((Auth::user()->admin || in_array($exception['group_id'],array_get($mygroups,'manage_groups',array()))) && ($exception['process_status']=='submit' || $exception['process_status']=='confirmed')){
 	$disable='';
 }else{
 	$disable='disabled';
@@ -505,7 +505,7 @@ if((Auth::user()->admin || in_array($exception['group_id'],array_get($mygroups,'
 					<option value="cancel" <?php if($exception['process_status']=='cancel') echo 'selected';?>>Cancelled</option>
 					<option value="done" <?php if($exception['process_status']=='done') echo 'selected';?>>Done</option>
 					<option value="confirmed" <?php if($exception['process_status']=='confirmed') echo 'selected';?>>Confirmed</option>
-					<option value="manually done" <?php if($exception['process_status']=='manually done') echo 'selected';?>>Manually Done</option>
+					<option value="auto done" <?php if($exception['process_status']=='auto done') echo 'selected';?>>Auto Done</option>
 				</select>
 			</div>
 		</div>	
@@ -577,7 +577,7 @@ if((Auth::user()->admin || in_array($exception['group_id'],array_get($mygroups,'
 		</div>
 		<?php 
 		}
-if((Auth::user()->admin || in_array($exception['group_id'],array_get($mygroups,'manage_groups',array()))) && $exception['process_status']=='submit'){ ?>
+if((Auth::user()->admin || in_array($exception['group_id'],array_get($mygroups,'manage_groups',array()))) && ($exception['process_status']=='submit' || $exception['process_status']=='confirmed')){ ?>
 		<div class="form-actions">
                         <div class="row">
                             <div class="col-md-offset-4 col-md-8">
