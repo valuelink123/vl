@@ -572,7 +572,7 @@ if((Auth::user()->admin || in_array($exception['group_id'],array_get($mygroups,'
 				$mcf_result=array('0'=>'Waiting','1'=>'Success','-1'=>'Failed');	
 				if(array_get($exception,'auto_create_mcf')){ ?>
 				<div class="col-md-12">
-					<span class="label label-sm label-danger">{{array_get($exception,'auto_create_mcf_result')}}</span>	
+					<span class="label label-sm label-danger">{{array_get($mcf_result,array_get($exception,'auto_create_mcf_result'))}}</span>	
 					<BR />
 					{{array_get($exception,'last_auto_create_mcf_date')}}
 					<BR />

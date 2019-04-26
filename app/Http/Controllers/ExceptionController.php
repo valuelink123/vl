@@ -373,7 +373,7 @@ class ExceptionController extends Controller
 
 		if($last_inbox) $last_inboxid= $last_inbox->id;
 
-        return view('exception/edit',['exception'=>$rule,'groups'=>$this->getGroups(),'mygroups'=>$this->getUserGroup(),'sellerids'=>$this->getAccounts(),'last_inboxid'=>$last_inboxid,'mcf_orders'=>$mcf_orders,'auto_create_mcf_logs'=>$auto_create_mcf_logs]);
+        return view('exception/edit',['exception'=>$rule,'groups'=>$this->getGroups(),'mygroups'=>$this->getUserGroup(),'sellerids'=>$this->getAccounts(),'last_inboxid'=>$last_inboxid,'mcf_orders'=>$mcf_orders,'auto_create_mcf_logs'=>$auto_create_mcf_logs,'users'=>$this->getUsers()]);
     }
 
     public function update(Request $request,$id)
