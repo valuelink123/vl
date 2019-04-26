@@ -499,36 +499,26 @@
                                             <div class="mt-author-notes font-grey-mint" style="text-align:right">{{$s_email['date']}} <span class="label label-sm label-danger">{{array_get($users,$s_email['user_id'])}}</span></div>
                                         </div>
                                         <div class="mt-content border-grey-salt">
-                                            <?php
-											
-											 
-
-
-                                            if($s_email['text_plain']){
-												echo '<pre>'.htmlspecialchars(strip_tags($s_email['text_plain'])).'</pre>';
-												
-
-                                            }else{
+										
+											<?php
+                                            if($s_email['text_html']){
 												$s_email['text_html'] = preg_replace( "/<script[\s\S]*?<\/script>/i", "", $s_email['text_html'] );   
 												$s_email['text_html'] = preg_replace( "/<iframe[\s\S]*?<\/iframe>/i", "", $s_email['text_html'] );   
 												$s_email['text_html'] = preg_replace( "/<style[\s\S]*?<\/style>/i", "", $s_email['text_html'] ); 
+                                                $config = array('indent' => TRUE,
+                                                    'output-xhtml' => TRUE,
+                                                    'wrap' => 200);
 
-                                                $config = array( 
-											'output-xhtml'=>true,
-											'drop-empty-paras'=>FALSE,
-											'join-classes'=>TRUE,
-											'show-body-only'=>TRUE,
-											); 
+                                                $tidy = tidy_parse_string($s_email['text_html'], $config, 'UTF8');
 
+                                                $tidy->cleanRepair();
+                                                echo $tidy;
 
-											$str = tidy_repair_string($s_email['text_html'], $config, 'UTF8');
-	 
-											$str = tidy_parse_string($str,$config, 'UTF8');
-
-                                            echo $str;
-                                                
+                                            }else{
+                                                echo '<pre>'.htmlspecialchars($s_email['text_plain']).'</pre>';
                                             }
                                             ?>
+                                           
 
                                             <BR>
                                             <?php if($s_email['attachs']){
@@ -595,6 +585,8 @@
                                             echo $str;
 											
                                             ?>
+											
+											
                                             <BR>
                                             <?php if($s_email['attachs']){
                                                 $attachs = unserialize($s_email['attachs']);

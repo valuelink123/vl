@@ -185,7 +185,7 @@ class ReviewController extends Controller
 		 
 		if(array_get($_REQUEST,'rc')){
 			   if(array_get($_REQUEST,'rc')==1) $customers = $customers->whereRaw('review.rating=review.updated_rating');
-			    if(array_get($_REQUEST,'rc')==2) $customers = $customers->whereRaw('review.rating<>review.updated_rating');
+			   if(array_get($_REQUEST,'rc')==2) $customers = $customers->whereRaw('review.rating<>review.updated_rating');
 		}
 		
 		if(array_get($_REQUEST,'asin_status')){
