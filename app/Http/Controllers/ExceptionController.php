@@ -400,7 +400,7 @@ class ExceptionController extends Controller
         $exception->score = $request->get('score');
         $exception->comment = $request->get('comment');
 		$exception->save();
-		if($exception->process_status=='submit' && $request->get('process_status')!='submit'){
+		if(($exception->process_status=='submit' || $exception->process_status=='confirmed') && $request->get('process_status')!='submit'){
 			$this->validate($request, [
 				'process_status' => 'required|string',
 			]);
