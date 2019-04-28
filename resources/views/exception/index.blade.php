@@ -148,6 +148,7 @@ th,td,td>span {
                                         <option value="done">Done</option>
                                         <option value="confirmed">Confirmed</option>
                                         <option value="auto done">Auto Done</option>
+										<option value="auto_failed">Auto Failed</option>
                                     </select>
                                 </td>
 

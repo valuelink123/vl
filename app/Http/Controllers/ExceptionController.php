@@ -380,7 +380,7 @@ class ExceptionController extends Controller
     {
 		$exception = Exception::findOrFail($id);
 		$acf = $request->get('acf');
-		if(isset($acf) && $exception->auto_create_mcf_result!=1){
+		if(isset($acf) && $exception->process_status=='auto done' && $exception->auto_create_mcf_result!=1){
 			$exception->auto_create_mcf = $acf;
 			if($acf){
 				$exception->auto_create_mcf_result = 0;
@@ -562,7 +562,12 @@ class ExceptionController extends Controller
             $customers = $customers->where('type', array_get($_REQUEST,'type'));
         }
         if(isset($_REQUEST['status']) && $_REQUEST['status']!=''){
-            $customers = $customers->where('process_status', $_REQUEST['status']);
+			if($_REQUEST['status']=='auto_failed'){
+				$customers = $customers->where('auto_create_mcf', 1)->where('auto_create_mcf_result', -1);
+			}else{
+				$customers = $customers->where('process_status', $_REQUEST['status']);
+			}
+            
         }
         //if(Auth::user()->admin) {
 

@@ -613,7 +613,7 @@ if((Auth::user()->admin || in_array($exception['group_id'],array_get($mygroups,'
                                 <button type="reset" class="btn grey-salsa btn-outline"  {{$disable}}>Cancel</button>
 								<?php } ?>
 								<?php 
-								if($exception['process_status']=='done'){
+								if($exception['process_status']=='auto done'){
 									if(array_get($exception,'auto_create_mcf')){
 								?>
 								<button type="submit" class="btn blue" name="acf" value="0">Cancel Auto Create MCF</button>
