@@ -48,6 +48,7 @@ class RegisterController extends Controller
     protected function validator(array $data)
     {
 		
+		die('Not allow register!');
 		if(substr($data['email'],-18)!='@valuelinkcorp.com') die('email not allow register!');
         return Validator::make($data, [
             'name' => 'required|string|max:255',

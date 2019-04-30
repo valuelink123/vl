@@ -115,13 +115,13 @@ class UserController extends Controller
     public function destroy(Request $request,$id)
     {
         if(!Auth::user()->admin) die();
-		$existMails = Inbox::where('user_id',$id)->first();
-		if($existMails){
-			$request->session()->flash('error_message','Can not Delete User , There are many mails belong this user!');
-		}else{
-			User::where('id',$id)->delete();
+		//$existMails = Inbox::where('user_id',$id)->first();
+		//if($existMails){
+		//	$request->session()->flash('error_message','Can not Delete User , There are many mails belong this user!');
+		//}else{
+			User::where('id',$id)->update(['locked'=>$request->get('locked')]);
 			$request->session()->flash('success_message','Delete User Success');
-		}
+		//}
         return redirect('user');
     }
 

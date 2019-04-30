@@ -117,7 +117,7 @@
                                     <form action="{{ url('user/'.$user['id']) }}" method="POST" style="display: inline;">
                                         {{ method_field('DELETE') }}
                                         {{ csrf_field() }}
-                                        <button type="submit" class="btn btn-danger btn-xs">Delete</button>
+                                        <button type="submit" class="btn {{$user['locked']?'':'btn-danger'}} btn-xs" name="locked" value="{{$user['locked']?0:1}}">{{$user['locked']?'Disable':'Enable'}}</button>
                                     </form>
                                 </td>
                             </tr>

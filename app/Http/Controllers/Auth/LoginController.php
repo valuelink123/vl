@@ -37,6 +37,14 @@ class LoginController extends Controller
     {
         $this->middleware('guest')->except('logout');
     }
+	
+	
+	public function attemptLogin(Request $request)
+    {
+        return $this->guard()->attempt(
+            array_merge($this->credentials($request),['locked'=>0]), $request->filled('remember')
+        );
+    }
 	public function redirectTo(){
 		if(array_get($_REQUEST,'redirect_url')){
 			return array_get($_REQUEST,'redirect_url');

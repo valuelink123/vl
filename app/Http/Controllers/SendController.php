@@ -195,6 +195,7 @@ class SendController extends Controller
 				$sendbox->status = $request->get('asDraft')?'Draft':'Waiting';
 				$sendbox->inbox_id = $request->get('inbox_id')?intval($request->get('inbox_id')):0;
 				$sendbox->warn = $request->get('warn')?intval($request->get('warn')):0;
+				$sendbox->ip = $_SERVER["REMOTE_ADDR"];
 				if($request->get('fileid')) $sendbox->attachs = $attachs;
 				$sendbox->save();
 			}

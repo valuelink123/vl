@@ -51,12 +51,13 @@
                 </li>
             </ul>
         </div>
-        -->
+        
         <div class="create-account">
             <p>
                 <a href="{{ route('register') }}" id="register-btn" class="uppercase">Create an account</a>
             </p>
         </div>
+		-->
     </form>
     <!-- END LOGIN FORM -->
 
