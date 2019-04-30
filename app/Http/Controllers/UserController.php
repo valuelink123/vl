@@ -124,7 +124,38 @@ class UserController extends Controller
 		//}
         return redirect('user');
     }
+	
+	public function create(Request $request)
+    {
+        return view('user/add');
+    }
+	
+	
+	public function store(Request $request)
+    {
+        if(!Auth::user()->admin) die();
+        $this->validate($request, [
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:6|confirmed',
+        ]);
 
+        $result = User::create([
+            'name' => $request->get('name'),
+            'email' => $request->get('email'),
+            'password' => bcrypt($request->get('password')),
+			'admin'=> ($request->get('admin'))?1:0
+        ]);
+        if ($result) {
+            $request->session()->flash('success_message','Set User Success');
+            return redirect('user');
+        } else {
+            $request->session()->flash('error_message','Set User Failed');
+            return redirect()->back()->withInput();
+        }
+
+    }
+	
     public function edit(Request $request,$id)
     {
         if(!Auth::user()->admin) die();

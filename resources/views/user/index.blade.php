@@ -18,7 +18,12 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="btn-group">
-                                <a href="{{ url('total')}}"><button id="sample_editable_1_2_new" class="btn sbold blue"> Data Statistics
+                                <a href="{{ url('total')}}"><button  class="btn sbold blue"> Data Statistics
+                                        <i class="fa fa-plus"></i>
+                                    </button>
+                                </a>
+								
+								<a href="{{ url('user/create')}}"><button class="btn sbold blue"> Create New User
                                         <i class="fa fa-plus"></i>
                                     </button>
                                 </a>
