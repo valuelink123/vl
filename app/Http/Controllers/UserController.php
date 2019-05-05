@@ -148,7 +148,7 @@ class UserController extends Controller
         ]);
         if ($result) {
             $request->session()->flash('success_message','Set User Success');
-            return redirect('user');
+            return redirect('user/'.$result->id.'/edit');
         } else {
             $request->session()->flash('error_message','Set User Failed');
             return redirect()->back()->withInput();
