@@ -272,6 +272,7 @@ class ReviewController extends Controller
 		$headArray[] = 'ReviewID';
 		$headArray[] = 'Reviewer Name';
 		$headArray[] = 'Rating';
+		$headArray[] = 'Updated Rating';
 		$headArray[] = 'Review Content';
 		$headArray[] = 'Buyer Email';
 		$headArray[] = 'Amazon OrderId';
@@ -310,6 +311,7 @@ class ReviewController extends Controller
 				$review['review'],
 				$review['reviewer_name'],
 				$review['rating'],
+				$review['updated_rating']?$review['updated_rating']:' ',
 				strip_tags($review['review_content']),
 				$review['buyer_email'],
 				$review['amazon_order_id'],
