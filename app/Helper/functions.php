@@ -478,5 +478,5 @@ function matchOrderId($orderid)
  */
 function getNonCtgStatusKeyVal()
 {
-    return array(0=>'Not Track',1=>'Have Mind',2=>'Not Mind',3=>'Not Reply');
+    return array(0=>'Not Followed Up',1=>'Willing',2=>'Unwilling',3=>'No Reply');
 }
