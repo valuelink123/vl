@@ -54,7 +54,7 @@ function getEType(){
 }
 
 function getAsinStatus(){
-    return array('A'=>'Important','B'=>'Normal','C'=>'Abandon','D'=>'Unlisted');
+    return array('S'=>'MostImportant','A'=>'Important','B'=>'Normal','C'=>'Abandon','D'=>'Unlisted');
 }
 
 function getReviewStatus(){
