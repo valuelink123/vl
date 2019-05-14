@@ -103,7 +103,7 @@
                             <a href="/exception/create?request_orderid={!!$ctgRow['amazon_order_id']!!}" target="_blank"><button class="btn red" style="width:15em" type="button">Create Replacement</button></a>
                             </div>
                         </form>
-                        @include('nonctg.tracklog')
+                        @include('nonctg.trackLog')
                     </div>
 
                     <div role="tabpanel" class="tab-pane" id="order-info">

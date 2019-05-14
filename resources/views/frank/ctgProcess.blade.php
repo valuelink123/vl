@@ -199,7 +199,7 @@
                                 </div>
                             </div>
                         </div>
-                        @include('nonctg.tracklog')
+                        @include('nonctg.trackLog')
                     </div>
 
                     <div role="tabpanel" class="tab-pane" id="order-info">
