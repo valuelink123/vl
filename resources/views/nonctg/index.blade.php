@@ -1,164 +1,281 @@
 @extends('layouts.layout')
-@section('label', 'Non-CTG List')
+@section('crumb')
+    @include('layouts.crumb', ['crumbs'=>['NON-CTG']])
+@endsection
 @section('content')
-    <h1 class="page-title font-red-intense"> Non-CTG List
-        <small>Non-CTG.</small>
-    </h1>
-    <div class="row">
-        <div class="portlet light bordered">
-            <div class="portlet-body">
-                <div class="table-container">
-                    <table class="table table-striped table-bordered table-hover table-checkable" id="datatable_ajax">
-                        <thead>
-                        <tr role="row" class="heading">
-                            <th width="8%"> Date </th>
-                            <th width="8%"> Email </th>
-                            <th width="8%"> Name </th>
-                            <th width="18%">Order ID </th>
-                            <th width="10%">Asin</th>
-                            <th width="10%">Item Group</th>
-                            <th width="10%">Item no</th>
-                            <th width="8%">Sales</th>
-                            <th width="8%">From</th>
-                            <th width="5%"> Action </th>
-                        </tr>
 
-                        <tr role="row" class="filter">
-                            <td>
-                                <div class="input-group date date-picker margin-bottom-5" data-date-format="yyyy-mm-dd">
-                                    <input type="text" class="form-control form-filter input-sm" readonly name="date_from" placeholder="From">
-                                    <span class="input-group-btn">
-                                                                    <button class="btn btn-sm default" type="button">
-                                                                        <i class="fa fa-calendar"></i>
-                                                                    </button>
-                                                                </span>
-                                </div>
-                                <div class="input-group date date-picker" data-date-format="yyyy-mm-dd">
-                                    <input type="text" class="form-control form-filter input-sm" readonly name="date_to" placeholder="To">
-                                    <span class="input-group-btn">
-                                                                    <button class="btn btn-sm default" type="button">
-                                                                        <i class="fa fa-calendar"></i>
-                                                                    </button>
-                                                                </span>
-                                </div>
-                            </td>
-                            <td>
-                                <input type="text" class="form-control form-filter input-sm" name="email">
-                            </td>
-                            <td>
-                                <input type="text" class="form-control form-filter input-sm" name="name">
-                            </td>
-                            <td>
-                                <input type="text" class="form-control form-filter input-sm" name="amazon_order_id">
-                            </td>
-                            <td>
-                            </td>
-                            <td>
-                            </td>
-                            <td>
-                            </td>
-                            <td>
-                            </td>
-                            <td>
-                                <input type="text" class="form-control form-filter input-sm" name="from">
-                            </td>
-                            <td>
-                                <div class="margin-bottom-5">
-                                    <button class="btn btn-sm green btn-outline filter-submit margin-bottom">
-                                        <i class="fa fa-search"></i> Search</button>
-                                </div>
-                                <button class="btn btn-sm red btn-outline filter-cancel">
-                                    <i class="fa fa-times"></i> Reset</button>
-                            </td>
-                        </tr>
-                        </thead>
-                        <tbody>
+    <link rel="stylesheet" href="/js/chosen/chosen.min.css"/>
+    <script src="/js/chosen/chosen.jquery.min.js"></script>
 
-                        </tbody>
-                    </table>
+    <style>
+        .form-control {
+            height: 29px;
+        }
+        .dataTables_extended_wrapper .table.dataTable {
+            margin: 0px !important;
+        }
+
+
+        th,td,td>span {
+            font-size:12px !important;
+            font-family:Arial, Helvetica, sans-serif;}
+    </style>
+
+    @include('frank.common')
+
+    <div class="portlet light bordered">
+        <div class="portlet-body">
+            <div class="table-toolbar" id="thetabletoolbar">
+                <div class="row">
+                    <div class="col-md-2">
+                        <div class="input-group">
+                            <span class="input-group-addon">From</span>
+                            <input class="form-control" data-options="format:'yyyy-mm-dd'" value="" data-init-by-query="daterange.from" id="date_from"
+                                   autocomplete="off"/>
+                        </div>
+                        <br/>
+                        <div class="input-group">
+                            <span class="input-group-addon">To</span>
+                            <input class="form-control" data-options="format:'yyyy-mm-dd'" value="" data-init-by-query="daterange.to" id="date_to" autocomplete="off"/>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="input-group">
+                            <span class="input-group-addon">BG</span>
+                            <select multiple style="width:100%;" id="bg" data-init-by-query="ins.bg">
+                                @foreach($bgs as $bg)
+                                    <option value="{!! $bg !!}">{!! $bg !!}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <br/>
+                        <div class="input-group">
+                            <span class="input-group-addon">BU</span>
+                            <select multiple style="width:100%;" id="bu" data-init-by-query="ins.bu">
+                                @foreach($bus as $bu)
+                                    <option value="{!! $bu !!}">{!! $bu !!}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="input-group">
+                            <span class="input-group-addon">Processor</span>
+                            <select multiple style="width:100%;" id="processor" data-init-by-query="ins.processor">
+                                @foreach($users as $id=>$name)
+                                    <option value="{!! $id !!}">{!! $name !!}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <br/>
+                        <div class="input-group">
+                            <span class="input-group-addon">Status</span>
+                            <select multiple style="width:100%;" id="status" data-init-by-query="ins.status">
+                                @foreach($status as $sk=>$sv)
+                                    <option value="{!! $sk !!}">{!! $sv !!}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
                 </div>
+            </div>
+            <div style="clear:both;height:50px; text-align: right;">
+
+            </div>
+            <div class="table-container" style="">
+                <table class="table table-striped table-bordered" id="thetable">
+                    <thead>
+                    <tr>
+                        <th onclick="this===arguments[0].target && this.firstElementChild.click()">
+                            <input type="checkbox" onchange="this.checked?dtApi.rows().select():dtApi.rows().deselect()" id="selectAll"/>
+                        </th>
+                        <th> Date </th>
+                        <th> Email </th>
+                        <th> Name </th>
+                        <th>Order ID </th>
+                        <th>Asin</th>
+                        <th>Item Group</th>
+                        <th>Item no</th>
+                        <th>From</th>
+                        <th>Status</th>
+                        <th>BG</th>
+                        <th>BU</th>
+                        <th>Sales</th>
+                        <th>Processor</th>
+                        <th> Action </th>
+                    </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                <script type="text/template" id="bottomtoolbar">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <div class="input-group">
+                                <span class="input-group-addon">Task Assign to</span>
+                                <input class="xform-autotrim form-control" list="list-assignto" id="assignto"/>
+                                <datalist id="list-assignto">
+                                    <% for(let user_id in users) { %>
+                                    <option value="${user_id} | ${users[user_id]}">
+                                        <% } %>
+                                </datalist>
+                            </div>
+                        </div>
+                    </div>
+                </script>
             </div>
         </div>
     </div>
 
     <script>
-        var TableDatatablesAjax = function () {
 
-            var initPickers = function () {
-                //init date pickers
-                $('.date-picker').datepicker({
-                    rtl: App.isRTL(),
-                    autoclose: true
-                });
+        XFormHelper.initByQuery('[data-init-by-query]')
+
+        $("#thetabletoolbar [id^='date_']").each(function () {
+
+            let defaults = {
+                autoclose: true
             }
 
-            var initTable = function () {
-                $.ajaxSetup({
-                    headers: { 'X-CSRF-TOKEN' : '{{ csrf_token() }}' }
-                });
-                var grid = new Datatable();
+            let options = eval(`({${$(this).data('options')}})`)
 
-                grid.init({
-                    src: $("#datatable_ajax"),
-                    onSuccess: function (grid, response) {
-                    },
-                    onError: function (grid) {
+            $(this).datepicker(Object.assign(defaults, options))
+        })
 
-                    },
-                    onDataLoad: function(grid) {
+        $("#thetabletoolbar select[multiple]").chosen()
 
-                    },
-                    loadingMessage: 'Loading...',
-                    dataTable: {
-                        "dom": "<'row'<'col-md-6 col-sm-12'pli><'col-md-6 col-sm-12'<'table-group-actions pull-right'>>r>t<'row'<'col-md-6 col-sm-12'pli><'col-md-6 col-sm-12'>>",
+        $(thetabletoolbar).change(e => {
+            dtApi.ajax.reload()
+        })
 
-                        "bStateSave": true, // save datatable state(pagination, sort, etc) in cookie.
-                        "aoColumnDefs": [ { "bSortable": false, "aTargets": [ 1,2,3,4,5,6,7,8,9 ] }],
-                        "lengthMenu": [
-                            [10, 20, 50],
-                            [10, 20, 50] // change per page values here
-                        ],
-                        "pageLength": 10, // default record count per page
-                        "ajax": {
-                            "url": "{{ url('nonctg/get')}}", // ajax source
-                        },
-                        "order": [
-                            [0, "desc"]
-                        ],// set first column as a default sort by asc
+        let $theTable = $(thetable)
 
+        $theTable.on('preXhr.dt', (e, settings, data) => {
+
+            Object.assign(data.search, {
+                daterange: {
+                    from: date_from.value,
+                    to: date_to.value
+                },
+                ands: {
+                    // item_group: item_group.value,
+                    // brand: brand.value,
+                    // item_model: item_model.value
+                },
+                ins: {
+                    processor: $('#processor').val(),
+                    status: $('#status').val(),
+                    bg: $('#bg').val(),
+                    bu: $('#bu').val(),
+                    from: $('#from').val(),
+                }
+            })
+
+            history.replaceState(null, null, '?' + objectToQueryString(data.search))
+        })
+
+        $theTable.dataTable({
+            // searching: false,
+            search: {search: queryStringToObject().value},
+            serverSide: true,
+            pagingType: 'bootstrap_extended',
+            processing: true,
+            order: [[1, 'desc']],
+            select: {
+                style: 'os',
+                info: true, // info N rows selected
+                // blurable: true, // unselect on blur
+                selector: 'td:first-child', // 指定第一列可以点击选中
+            },
+            columns: [
+                {
+                    width: "1px",
+                    orderable: false,
+                    defaultContent: '',
+                    className: 'select-checkbox', // 该类根据 tr:selected 改变自己的背景
+                },
+                {
+                    width: "55px",
+                    data: 'date',
+                    name: 'date'
+                },
+                {data: 'email', name: 'email'},
+                {data: 'name', name: 'name'},
+                {data: 'order_id', name: 'order_id'},
+                {
+                    data: 'asin',
+                    name: 'asin',
+                    render(data, type, row) {
+                        if (!data) return ''
+                        let asin = data.split(',')
+                        return asin.map(asin => {
+                            return `<a href="https://${row.site}/dp/${asin}" target="_blank" rel="noreferrer">${asin}</a>`
+                        }).join('<br/>')
                     }
-                });
+                },
+                {data: 'item_group', name: 'item_group'},
+                {data: 'item_no', name: 'item_no'},
+                {data: 'from', name: 'from'},
+                {
+                    width: "100px",
+                    data: 'status',
+                    name: 'status'
+                },
+                {data: 'bg', name: 'bg'},
+                {data: 'bu', name: 'bu'},
+                {data: 'seller', name: 'seller'},
+                {data: 'processor', name: 'processor', width: "120px"},
+                {
+                    width: "20px",
+                    data: 'order_id',
+                    name: 'order_id',
+                    orderable: false,
+                    render(data, type, row) {
+                        return `<a class="btn btn-danger btn-xs" href="/nonctg/process?order_id=${data}&id=${row.id}" target="_blank">Process</a>`
+                    }
+                }
+            ],
+            ajax: {
+                type: 'POST',
+                url: "/nonctg/get"
+            }
+        })
 
-                grid.setAjaxParam("date_from", $("input[name='date_from']").val());
-                grid.setAjaxParam("date_to", $("input[name='date_to']").val());
-                grid.setAjaxParam("date", $("input[name='date']").val());
-                grid.setAjaxParam("email", $("input[name='email']").val());
-                grid.setAjaxParam("name", $("input[name='name']").val());
-                grid.setAjaxParam("order_id", $("input[name='order_id']").val());
-                grid.setAjaxParam("Asin", $("select[name='Asin']").val());
-                grid.setAjaxParam("Sales", $("input[name='Sales']").val());
-                grid.setAjaxParam("from", $("input[name='from']").val());
-                grid.setAjaxParam("action", $("input[name='from']").val());
-                grid.getDataTable().ajax.reload(null,false);
-                //grid.clearAjaxParams();
+        let users = @json($users) ;
+        $theTable.closest('.table-scrollable').after(tplRender(bottomtoolbar, {users}))
+        $(assignto).change(e => {
+
+            $this = $(e.currentTarget)
+
+            let processor = parseInt($this.val())
+            if (isNaN(processor)) return
+
+            let selectedRows = dtApi.rows({selected: true})
+
+            let ctgRows = selectedRows.data().toArray().map(obj => [obj.id])
+
+            if (!ctgRows.length) {
+                $this.val('')
+                toastr.error('Please select some rows first !')
+                return
             }
 
-            return {
-
-                //main function to initiate the module
-                init: function () {
-                    initTable();
-                    initPickers();
+            postByJson('/nonctg/batchAssignTask', {processor, ctgRows}).then(arr => {
+                for (let rowIndex of selectedRows[0]) {
+                    // console.log(dtApi.cell(rowIndex, 9).data())
+                    dtApi.cell(rowIndex, 9).data(arr[1]).draw()
+                    // draw 之后，dt 自作主张，向服务器请求数据然后又更新一遍
                 }
 
-            };
+                toastr.success('Saved !')
+                $this.val('')
+                selectAll.checked = false
 
-        }();
+            }).catch(err => {
+                toastr.error(err.message)
+            })
+        })
 
-        $(function() {
-            TableDatatablesAjax.init();
-        });
-
+        let dtApi = $theTable.api();
 
     </script>
 

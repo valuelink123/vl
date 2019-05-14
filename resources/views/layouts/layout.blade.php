@@ -385,6 +385,13 @@
                     </li>
 
                     @include('layouts.menu', ['text'=>'C T G', 'uri'=>'/ctg/list', 'fa'=>'google'])
+                    <li class="nav-item {{$action}} <?php if($action=='nonctg') echo 'active';?>">
+                        <a href="{{ url('nonctg') }}" class="nav-link nav-toggle">
+                            <i class="fa fa-exclamation-circle"></i>
+                            <span class="title">Non-CTG</span>
+                            <?php if($action=='nonctg') echo '<span class="selected"></span>';?>
+                        </a>
+                    </li>
 
                     <?php if(Auth::user()->admin){?>
                     <li class="nav-item <?php if($action=='auto') echo 'active';?>">
@@ -555,15 +562,6 @@
                             <?php if($action=='rsgrequests') echo '<span class="selected"></span>';?>
                         </a>
                     </li>
-
-                    <li class="nav-item {{$action}} <?php if($action=='nonctg') echo 'active';?>">
-                        <a href="{{ url('nonctg') }}" class="nav-link nav-toggle">
-                            <i class="fa fa-exclamation-circle"></i>
-                            <span class="title">Non-CTG</span>
-                            <?php if($action=='nonctg') echo '<span class="selected"></span>';?>
-                        </a>
-                    </li>
-
                 </ul>
                 <!-- END SIDEBAR MENU -->
                 <!-- END SIDEBAR MENU -->

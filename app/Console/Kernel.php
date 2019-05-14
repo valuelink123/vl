@@ -81,9 +81,8 @@ class Kernel extends ConsoleKernel
         $schedule->command('get:awsinfo')->dailyAt('23:00')->name('getawsinfo')->withoutOverlapping();
 		$schedule->command('get:dailysales 7')->dailyAt('9:00')->name('getdailysales')->withoutOverlapping();
 
-        $filePath = 'D:\phpstudy\PHPTutorial\WWW\vl\storage\logs\noctg.log';
-        //$schedule->command('add:nonctg')->monthly()->appendOutputTo($filePath)->name('add_history_nonctg')->withoutOverlapping();
-        $schedule->command('delete:nonctg')->monthly()->appendOutputTo($filePath)->name('delete_history_nonctg')->withoutOverlapping();
+        $filePath = base_path().'/storage/logs/noctg.log';
+        $schedule->command('add:nonctg')->monthly()->appendOutputTo($filePath)->name('add_history_nonctg')->withoutOverlapping();//添加nonctg数据，此脚本只执行一次
         $schedule->command('update:nonctg')->cron('*/30 * * * *')->appendOutputTo($filePath)->name('update_nonctg')->withoutOverlapping();
     }
 

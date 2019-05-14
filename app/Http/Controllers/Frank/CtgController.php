@@ -19,6 +19,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use App\Models\TrackLog;
 
 class CtgController extends Controller {
 
@@ -366,8 +367,13 @@ class CtgController extends Controller {
                 $users[$row->id] = $row->name;
             }
 
+            //得到跟进记录(toArray转换成数组)
+            $trackLogData = TrackLog::where('type',0)->where('record_id',$ctgRow['nonctg_id'])->orderBy('created_at', 'desc')->get()->toArray();
+            foreach($trackLogData as $k=>$v){
+                $trackLogData[$k]['note'] = nl2br($v['note']);
+            }
 
-            return view('frank.ctgProcess', compact('ctgRow', 'users', 'order', 'emails'));
+            return view('frank.ctgProcess', compact('ctgRow', 'users', 'trackLogData','order', 'emails'));
 
         }
 

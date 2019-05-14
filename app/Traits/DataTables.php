@@ -13,9 +13,10 @@ trait DataTables {
      * 拼接 WHERE 时间范围
      * @param Request $req
      * @param string $prefix
+     * @param $field 时间范围的字段，默认created_at
      * @return string
      */
-    protected function dtTimeRange(Request $req, $prefix = '') {
+    protected function dtTimeRange(Request $req, $prefix = '',$field='created_at') {
 
         $where = [];
 
@@ -26,8 +27,8 @@ trait DataTables {
             $from = addslashes($daterange['from'] ?? '');
             $to = addslashes($daterange['to'] ?? '');
 
-            if (!empty($from)) $where[] = "$prefix created_at >= '$from 00:00:00'";
-            if (!empty($to)) $where[] = "$prefix created_at <= '$to 23:59:59'";
+            if (!empty($from)) $where[] = "$prefix $field >= '$from 00:00:00'";
+            if (!empty($to)) $where[] = "$prefix $field <= '$to 23:59:59'";
         }
 
         return implode(' AND ', $where);
@@ -39,14 +40,15 @@ trait DataTables {
      * @param array $fuzzyFields 模糊匹配字段
      * @param $andsMap array WHERE AND
      * @param $insMap array WHERE IN
+     * @param $field 时间范围的字段，默认created_at
      * @return string
      */
-    protected function dtWhere(Request $req, array $fuzzyFields, array $andsMap, array $insMap = []) {
+    protected function dtWhere(Request $req, array $fuzzyFields, array $andsMap, array $insMap = [],$field='created_at') {
 
         $ands = $req->input('search.ands', []);
         $ins = $req->input('search.ins', []);
 
-        $timeRange = $this->dtTimeRange($req, 't1.');
+        $timeRange = $this->dtTimeRange($req, 't1.',$field);
         $where = empty($timeRange) ? [] : [$timeRange];
 
         foreach ($ins as $field => $arr) {
@@ -138,7 +140,7 @@ trait DataTables {
                 throw new DataTablesException("INPUT ERROR: ORDER BY {$field} {$obj['dir']}", 101);
             }
 
-            $orderby[] = "{$field} {$obj['dir']}";
+            $orderby[] = "`{$field}` {$obj['dir']}";
         }
 
         return implode(',', $orderby);

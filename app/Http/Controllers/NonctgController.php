@@ -7,9 +7,15 @@ use App\Classes\SapRfcRequest;
 use App\Models\NonCtg;
 use DB;
 use App\User;
+use App\Accounts;
+use App\Models\TrackLog;
+use App\Models\Ctg;
+use App\Exceptions\DataInputException;
 
 class NonctgController extends Controller
 {
+    use \App\Traits\Mysqli;
+    use \App\Traits\DataTables;
     /**
      * Create a new controller instance.
      *
@@ -28,125 +34,179 @@ class NonctgController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        return view('nonctg/index');
+
+        $users = array();
+        $userRows = DB::table('users')->select('id', 'name')->get();
+        foreach ($userRows as $row) {
+            $users[$row->id] = $row->name;
+        }
+
+        $bgs = $this->queryFields('SELECT DISTINCT bg FROM asin');
+        $bus = $this->queryFields('SELECT DISTINCT bu FROM asin');
+
+        $statusKeyVal = getNonCtgStatusKeyVal();
+        return view('nonctg/index', ['status' => $statusKeyVal, 'users' => $users, 'bgs' => $bgs, 'bus' => $bus,]);
     }
-    //列表的ajax请求数据
+    //列表的ajax请求数据,post请求
     public function get(Request $request)
     {
-        //取出所有用户的id=>name的映射数组
-        $users = User::getUsers();
+        $statusKeyVal = getNonCtgStatusKeyVal();
+        $where = $this->dtWhere(
+            $request,
+            [
+                'email' => 't1.email',
+                'name' => 't1.name',
+                'order_id' => 't1.amazon_order_id',
+                'asins' => 't1.asin',
+                'item_group'=>'t3.item_group',
+                'item_no'=>'t3.item_no',
+                'from' => 't1.from',
+                'sales' => 't3.seller',
+            ],
+            [],
+            [
+                // WHERE IN
+                'processor' => 't1.processor',
+                'status' => 't1.status',
+                // WHERE FIND_IN_SET
+                'bg' => 's:t3.bg',
+                'bu' => 's:t3.bu',
+            ],
+            'date'
+        );
 
-        $orderby = 'date';
-        $sort = 'desc';
-        if(isset($_REQUEST['order'][0])){
-            if($_REQUEST['order'][0]['column']==0) $orderby = 'date';
-            $sort = $_REQUEST['order'][0]['dir'];
+        $orderby = $this->dtOrderBy($request);
+        $limit = $this->dtLimit($request);
+
+        $sql = "SELECT SQL_CALC_FOUND_ROWS t1.id,t1.date,t1.email,t1.email,t1.name,t1.amazon_order_id as order_id,t1.asin,t3.item_group,t3.item_no,t1.from,t1.status,t2.name AS processor,t3.seller,t3.bg,t3.bu,t3.site as site 
+        FROM non_ctg t1
+        LEFT JOIN users t2 ON t2.id = t1.processor
+        LEFT JOIN asin t3 ON t1.asin = t3.asin and t3.site = CONCAT('www.',t1.saleschannel) and t1.sellersku = t3.sellersku
+        where $where
+        ORDER BY $orderby
+        LIMIT $limit";
+
+        $data = $this->queryRows($sql);
+
+        $recordsTotal = $recordsFiltered = $this->queryOne('SELECT FOUND_ROWS()');
+
+        foreach($data as $key=>$val){
+            $data[$key]['status'] = isset($statusKeyVal[$val['status']]) ? $statusKeyVal[$val['status']] : $val['status'];
         }
-        $customers = new NonCtg;
-        $searchField = array('email','name','from','amazon_order_id');
-        foreach($searchField as $field){
-            if(array_get($_REQUEST,$field)){
-                $customers = $customers->where($field, 'like', '%'.$_REQUEST[$field].'%');
+        return compact('data', 'recordsTotal', 'recordsFiltered');
+    }
+
+    /*
+     * nonctg功能的指派任务，可以把某个任务指派给其他成员
+     */
+    public function batchAssignTask(Request $req) {
+        if (empty($req->input('ctgRows'))) return [true, ''];
+
+        $processor = (int)$req->input('processor');
+
+        $user = User::findOrFail($processor);
+
+        NonCtg::where(function ($where) use ($req) {
+            foreach ($req->input('ctgRows') as $row) {
+                // WHERE GROUP，传二维数组就可以
+                $where->orWhere([
+                    ['id', $row[0]]
+                ]);
             }
-        }
+        })->update(compact('processor'));
+        return [true, $user->name];
+    }
 
-        if(array_get($_REQUEST,'date_from')){
-            $customers = $customers->where('date','>=',$_REQUEST['date_from'].' 00:00:00');
-        }
-        if(array_get($_REQUEST,'date_to')){
-            $customers = $customers->where('date','<=',$_REQUEST['date_to'].' 23:59:59');
-        }
+    /**
+     * @throws DataInputException
+     * NON-CTG点击process出现的页面操作
+     */
+    public function process(Request $req) {
+        $wheres = [
+            ['id', $req->input('id')],
+            ['amazon_order_id', $req->input('order_id')]
+        ];
 
+        $dataRow = NonCtg::selectRaw('*')->where($wheres)->limit(1)->first();
 
-        $iTotalRecords = $customers->count();
-        $iDisplayLength = intval($_REQUEST['length']);
-        $iDisplayLength = $iDisplayLength < 0 ? $iTotalRecords : $iDisplayLength;
-        $iDisplayStart = intval($_REQUEST['start']);
-        $sEcho = intval($_REQUEST['draw']);
+        if (empty($dataRow)) throw new DataInputException('nonctg not found');
+        $id = $recordId = $req->input('id');
 
-        $customersLists =  $customers->orderBy($orderby,$sort)->skip($iDisplayStart)->take($iDisplayLength)->get()->toArray();
-        $records = array();
-        $records["data"] = array();
+        if ($req->isMethod('GET')) {
 
-        $end = $iDisplayStart + $iDisplayLength;
-        $end = $end > $iTotalRecords ? $iTotalRecords : $end;
-
-        if($customersLists) {
-            //数据数据得到前端需要显示的内容
             $sap = new SapRfcRequest();
-            foreach ($customersLists as $customersList) {
-                $amazonOrderId = $customersList['amazon_order_id'];
-                $p = '/\d{3}\-\d{7}\-\d{7}/';
-                preg_match($p, $amazonOrderId, $match);
-                $asin = $sellersku = $SalesChannel = $item_group = $item_no = $seller = '-';
-                if($match && strlen($amazonOrderId) == 19){
-                    //根据订单id通过sap接口得到订单信息
-                    try {
-                        $sapOrderInfo = SapRfcRequest::sapOrderDataTranslate($sap->getOrder(['orderId' => $amazonOrderId]));
-                        if ($sapOrderInfo) {
-                            $asin = $sapOrderInfo['orderItems'][0]['ASIN'];
 
-                            //从asin表中获取item_group，item_no，seller的值
-                            $itemIndo = DB::table('asin')->where('asin', $asin)->where('site', 'www.' . $sapOrderInfo['SalesChannel'])->where('sellersku', $sapOrderInfo['orderItems'][0]['SellerSKU'])->get(array('item_group', 'item_no', 'seller'))->first();
-                            if ($itemIndo) {
-                                $item_group = $itemIndo->item_group;
-                                $item_no = $itemIndo->item_no;
-                                $seller = $itemIndo->seller;
-                            }
-                        }
-                    } catch (\Exception $e) {
+            $order = SapRfcRequest::sapOrderDataTranslate($sap->getOrder(['orderId' => $req->input('order_id')]));
 
-                    }
-                }
+            $order['SellerName'] = Accounts::where('account_sellerid', $order['SellerId'])->first()->account_name ?? 'No Match';
 
 
-                $records["data"][] = array(
-                    $customersList['date'],
-                    $customersList['email'],
-                    $customersList['name'],
-                    $customersList['amazon_order_id'],
-                    $asin,
-                    $item_group,
-                    $item_no,
-                    $seller,
-                    $customersList['from'],
-                    '<td>-</td>',
-                );
+            $emails = DB::table('sendbox')->where('to_address', $dataRow['email'])->orderBy('date', 'desc')->get();
+            $emails = json_decode(json_encode($emails), true); // todo
+
+
+            $userRows = DB::table('users')->select('id', 'name')->get();
+
+            $users = array();
+            foreach ($userRows as $row) {
+                $users[$row->id] = $row->name;
+            }
+
+            //得到跟进记录(toArray转换成数组)
+            $trackLogData = TrackLog::where('type',0)->where('record_id',$id)->orderBy('created_at', 'desc')->get()->toArray();
+            foreach($trackLogData as $k=>$v){
+                $trackLogData[$k]['note'] = nl2br($v['note']);
+            }
+
+            return view('nonctg.process', ['ctgRow' => $dataRow, 'trackLogData'=>$trackLogData,'users' => $users, 'order' => $order, 'emails' => $emails,'status'=>getNonCtgStatusKeyVal()]);
+
+        }
+
+
+        // process操作页面点击保存
+        $updates = [];
+        $status = 0;
+        if ($req->has('status')) {
+            $updates['status'] = $status = $req->input('status');
+        }
+        if ($req->has('processor')) {
+            $updates['processor'] = $dataRow['processor'] = (int)$req->input('processor');
+        }
+        if ($req->has('gift_sku')) {
+            $updates['gift_sku'] = $dataRow['gift_sku'] = $req->input('gift_sku');
+        }
+        $dataRow->where($wheres)->update($updates);//更新non-ctg表数据内容
+        $trackNote = isset($_REQUEST['track_note']) ? $_REQUEST['track_note'] : '';
+        $way = $req->has('way') ? $req->has('way') : '0';//$way=1为页面普通提交，0为ajax提交
+        //状态为有意向的时候，把此条non-ctg数据转移到ctg表中
+        $ctgres = 0;
+        if($status==1){
+            if(empty($dataRow['gift_sku'])){$dataRow['gift_sku'] = 0;}
+            $ctgData = array('processor' => $dataRow['processor'], 'order_id' => $dataRow['amazon_order_id'], 'gift_sku' => $dataRow['gift_sku'], 'name' => $dataRow['name'],'email' => $dataRow['email'], 'note'=>'','created_at' => date('Y-m-d H:i:s'),'updated_at' => date('Y-m-d H:i:s'),'nonctg_id'=>$id);
+            $ctgres = Ctg::create($ctgData);
+            if($ctgres){
+                //添加到ctg数据后，需要把non-ctg的该条数据删除
+                NonCtg::where('id',$id)->delete();
+                // TrackLog::where(array('type'=>0,'record_id'=>$id))->update(array('type'=>1,'record_id'=>$ctgid));
             }
         }
-
-        $records["draw"] = $sEcho;
-        $records["recordsTotal"] = $iTotalRecords;
-        $records["recordsFiltered"] = $iTotalRecords;
-        echo json_encode($records);
-    }
-
-    //通过亚马逊订单ID得到物料组的信息和销售人员信息
-    public function getOrderBasicInfo($orderIds)
-    {
-        $orderBasicInfo = array();
-        $sql = 'select b.ASIN as asin,b.SellerSKU as sellersku,SalesChannel,a. AmazonOrderId as amazonOrderId,c.item_group as item_group, c.item_no as item_no,seller  
-                from amazon_orders as a
-                left join amazon_orders_item  as b on a.AmazonOrderId=b.AmazonOrderId 
-                left join asin as c on c.asin = b.ASIN and c.SellerSKU = b.SellerSKU and c.site = concat("www.",a.SalesChannel) 
-                where a. AmazonOrderId in("'.join('","',$orderIds).'")';
-        $orderInfo = DB::select($sql);
-        foreach($orderInfo as $key=>$val){
-            $orderBasicInfo[$val->amazonOrderId] = array(
-                'asin' => $val->asin,
-                'sellersku' => $val->sellersku,
-                'SalesChannel' => $val->SalesChannel,
-                'amazonOrderId' => $val->amazonOrderId,
-                'item_group' => $val->item_group,
-                'item_no' => $val->item_no,
-                'seller' => $val->seller,
-            );
+        //填写了跟进内容的时候,保存到跟进记录日志表，然后列表显示该跟进记录
+        if($trackNote) {
+            $data = array('type' => 0, 'record_id' => $id, 'email' => $dataRow['email'], 'note' => $trackNote);
+            $TrackLog = new TrackLog();
+            $TrackLog->add($data);
         }
-        return $orderBasicInfo;
+        //把此条数据non-ctg移到了ctg表后，跳转到non-ctg列表
+        if($way==1){
+            if($ctgres){
+                return redirect('/nonctg');
+            }else{
+                return redirect('/nonctg/process?order_id='.$dataRow['amazon_order_id'].'&id='.$id);
+            }
+        }
+        return [true];
     }
-
-
 
 }
