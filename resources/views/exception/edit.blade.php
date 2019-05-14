@@ -473,7 +473,7 @@ if(($exception['user_id'] == Auth::user()->id || Auth::user()->admin || in_array
 <div class="portlet light portlet-fit bordered ">
 
 <?php 
-if((Auth::user()->admin || in_array($exception['group_id'],array_get($mygroups,'manage_groups',array()))) && ($exception['process_status']=='submit' || $exception['process_status']=='confirmed')){
+if((Auth::user()->admin || in_array($exception['group_id'],array_get($mygroups,'manage_groups',array()))) && ($exception['process_status']!='cancel')){
 	$disable='';
 }else{
 	$disable='disabled';
@@ -608,7 +608,7 @@ if((Auth::user()->admin || in_array($exception['group_id'],array_get($mygroups,'
                         <div class="row">
                             <div class="col-md-offset-4 col-md-8">
 								<?php
-if((Auth::user()->admin || in_array($exception['group_id'],array_get($mygroups,'manage_groups',array()))) && ($exception['process_status']=='submit' || $exception['process_status']=='confirmed')){ ?>
+if((Auth::user()->admin || in_array($exception['group_id'],array_get($mygroups,'manage_groups',array()))) && ($exception['process_status']!='cancel')){ ?>
                                 <button type="submit" class="btn blue"  {{$disable}}>Submit</button>
                                 <button type="reset" class="btn grey-salsa btn-outline"  {{$disable}}>Cancel</button>
 								<?php } ?>

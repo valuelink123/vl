@@ -399,12 +399,12 @@ class ExceptionController extends Controller
 		
         $exception->score = $request->get('score');
         $exception->comment = $request->get('comment');
+        $exception->process_content = $request->get('process_content');
 		$exception->save();
-		if(($exception->process_status=='submit' || $exception->process_status=='confirmed') && $request->get('process_status')!='submit'){
+		if(($exception->process_status!='cancel') && $request->get('process_status')!='submit'){
 			$this->validate($request, [
 				'process_status' => 'required|string',
 			]);
-			$exception->process_content = $request->get('process_content');
 			$exception->process_status = $request->get('process_status');
 			$exception->process_date = date('Y-m-d H:i:s');
 			$exception->process_user_id = intval(Auth::user()->id);
