@@ -80,7 +80,7 @@ class NonctgController extends Controller
         $orderby = $this->dtOrderBy($request);
         $limit = $this->dtLimit($request);
 
-        $sql = "SELECT SQL_CALC_FOUND_ROWS t1.id,t1.date,t1.email,t1.email,t1.name,t1.amazon_order_id as order_id,t1.asin,t3.item_group,t3.item_no,t1.from,t1.status,t2.name AS processor,t3.seller,t3.bg,t3.bu,t3.site as site 
+        $sql = "SELECT SQL_CALC_FOUND_ROWS t1.id,t1.date,t1.email,t1.email,t1.name,t1.amazon_order_id as order_id,t1.asin,t3.item_group,t3.item_no,t1.from,t1.status,t2.name AS processor,t3.seller,t3.bg,t3.bu,t1.saleschannel as saleschannel,t3.site as site 
         FROM non_ctg t1
         LEFT JOIN users t2 ON t2.id = t1.processor
         LEFT JOIN asin t3 ON t1.asin = t3.asin and t3.site = CONCAT('www.',t1.saleschannel) and t1.sellersku = t3.sellersku
@@ -94,6 +94,7 @@ class NonctgController extends Controller
 
         foreach($data as $key=>$val){
             $data[$key]['status'] = isset($statusKeyVal[$val['status']]) ? $statusKeyVal[$val['status']] : $val['status'];
+            $data[$key]['site'] = empty($val['site']) ? 'www.'.$val['saleschannel'] : $val['site'];
         }
         return compact('data', 'recordsTotal', 'recordsFiltered');
     }

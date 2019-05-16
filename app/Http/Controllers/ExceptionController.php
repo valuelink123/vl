@@ -186,7 +186,7 @@ class ExceptionController extends Controller
 								''
 							];
 						}
-						$o_sap_seller_id = Asin::where('sellersku',array_get(explode('*',$customersList['order_sku']),0))->value('sap_seller_id');
+						$o_sap_seller_id = Asin::where('sellersku',array_get(explode('*',$customersList['order_sku']),0))->where('asin',$customersList['asin'])->where('site','www.'.$customersList['saleschannel'])->value('sap_seller_id');
 						if($sap_sku_info = Asin::where('sellersku',array_get($product,'seller_sku'))->first()){
 							$sap_sku_info = $sap_sku_info->toArray();
 						}else{
@@ -400,6 +400,12 @@ class ExceptionController extends Controller
         $exception->score = $request->get('score');
         $exception->comment = $request->get('comment');
         $exception->process_content = $request->get('process_content');
+        //需要保存更改信息记录的状态，当由别的状态改为'done','auto done'时或者由'done','auto done'状态改为其他的状态的时候，才要保存更新状态记录，并且别的改为'done','auto done'，然后'done','auto done'改为其他状态，这种情况下才要显示更改状态记录信息
+        $status = $request->get('process_status');
+        $saveLogArray = array('done','auto done');
+        if(in_array($exception->process_status,$saveLogArray) || in_array($status,$saveLogArray)){
+            $exception->update_status_log = $exception->update_status_log.'Status changed to '.$status.' at  '.date('H:i:s,Y-m-d').'<br>';
+        }
 		$exception->save();
 		if(($exception->process_status!='cancel') && $request->get('process_status')!='submit'){
 			$this->validate($request, [
@@ -774,6 +780,8 @@ class ExceptionController extends Controller
 		$exception->request_content = $request->get('request_content');
 		$exception->process_status = 'submit';
         $exception->descrip = $request->get('descrip');
+        $exception->saleschannel = $request->get('saleschannel');
+        $exception->asin = $request->get('asin');
 		if( $exception->type == 1 || $exception->type == 3){
 			$exception->refund = round($request->get('refund'),2);
 		}else{
@@ -799,6 +807,15 @@ class ExceptionController extends Controller
 				}		
 				$products[]=$product_arr;
 			}
+			//当countrycode为US和CA的时候，StateOrRegion填的值必须强制为两个大写字母
+			$specialCountry = array('US','CA');
+			if(in_array($request->get('countrycode'),$specialCountry)){
+                $state = $request->get('state');
+                if(strtoupper($state)!= $state || strlen($state)!=2){
+                    $request->session()->flash('error_message','StateOrRegion has to be an abbreviation');
+                    return redirect()->back()->withInput();
+                }
+            }
 			
 			$exception->replacement = serialize(
 			array(

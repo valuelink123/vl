@@ -310,15 +310,15 @@ if(($exception['user_id'] == Auth::user()->id || Auth::user()->admin || in_array
 								<input type="text" {{$disable}} class="form-control" name="city" id="city" value="{{array_get($replace,'city')}}" >
 							</div>
 						</div>
-						<div class="form-group">
-							<label>County</label>
-							<div class="input-group ">
-							<span class="input-group-addon">
-								<i class="fa fa-bookmark"></i>
-							</span>
-								<input type="text" {{$disable}} class="form-control" name="county" id="county" value="{{array_get($replace,'county')}}" >
-							</div>
-						</div>
+						{{--<div class="form-group">--}}
+							{{--<label>County</label>--}}
+							{{--<div class="input-group ">--}}
+							{{--<span class="input-group-addon">--}}
+								{{--<i class="fa fa-bookmark"></i>--}}
+							{{--</span>--}}
+								{{--<input type="text" {{$disable}} class="form-control" name="county" id="county" value="{{array_get($replace,'county')}}" >--}}
+							{{--</div>--}}
+						{{--</div>--}}
 						<div class="form-group">
 							<label>StateOrRegion</label>
 							<div class="input-group ">
@@ -625,7 +625,14 @@ if((Auth::user()->admin || in_array($exception['group_id'],array_get($mygroups,'
                     </div>
 		
 		</div>
-		</div><div style="clear:both;"></div>
+	</div><div style="clear:both;"></div>
+
+		@if($exception['process_status']!='done' and $exception['process_status']!='auto done' and $exception['update_status_log'])
+		<div style="margin-top:20px;margin-left:35px;margin-right: 30px;">
+			<pre>{!! $exception['update_status_log'] !!}</pre>
+		</div>
+		@endif
+
 		</div></div></div>					
 </form>
 <div style="clear:both;"></div>

@@ -54,6 +54,8 @@
 					order_sku+=items[child_i].SellerSKU+'*'+items[child_i].QuantityOrdered+'; ';
 			　　}
 				$("#order_sku", $("#exception_form")).val(order_sku);
+                $("#saleschannel", $("#exception_form")).val(data.SalesChannel);
+                $("#asin", $("#exception_form")).val(data.orderItemData['0']['ASIN']);
 
                 rebindordersellerid.value = data.SellerId
                 let site = `www.${data.SalesChannel}`.toLowerCase()
@@ -173,6 +175,8 @@
 			</span>
 				<input type="text" class="form-control" name="name" id="name" value="{{old('name')}}" required >
 				<input type="hidden" class="form-control" name="order_sku" id="order_sku" value="{{old('order_sku')}}" >
+				<input type="hidden" class="form-control" name="saleschannel" id="saleschannel" value="{{old('SalesChannel')}}" >
+				<input type="hidden" class="form-control" name="asin" id="asin" value="" >
 			</div>
 		</div>
 					<div class="form-group">
@@ -304,15 +308,15 @@
 								<input type="text" class="form-control" name="city" id="city" value="{{old('city')}}" >
 							</div>
 						</div>
-						<div class="form-group">
-							<label>County</label>
-							<div class="input-group ">
-							<span class="input-group-addon">
-								<i class="fa fa-bookmark"></i>
-							</span>
-								<input type="text" class="form-control" name="county" id="county" value="{{old('county')}}" >
-							</div>
-						</div>
+						{{--<div class="form-group">--}}
+							{{--<label>County</label>--}}
+							{{--<div class="input-group ">--}}
+							{{--<span class="input-group-addon">--}}
+								{{--<i class="fa fa-bookmark"></i>--}}
+							{{--</span>--}}
+								{{--<input type="text" class="form-control" name="county" id="county" value="{{old('county')}}" >--}}
+							{{--</div>--}}
+						{{--</div>--}}
 						<div class="form-group">
 							<label>StateOrRegion</label>
 							<div class="input-group ">
