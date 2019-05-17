@@ -185,8 +185,10 @@ class NonctgController extends Controller
         $ctgres = 0;
         if($status==1){
             if(empty($dataRow['gift_sku'])){$dataRow['gift_sku'] = 0;}
-            $ctgData = array('processor' => $dataRow['processor'], 'order_id' => $dataRow['amazon_order_id'], 'gift_sku' => $dataRow['gift_sku'], 'name' => $dataRow['name'],'email' => $dataRow['email'], 'note'=>'','created_at' => date('Y-m-d H:i:s'),'updated_at' => date('Y-m-d H:i:s'),'nonctg_id'=>$id);
-            $ctgres = Ctg::create($ctgData);
+            $ctgData = array('processor' => $dataRow['processor'], 'order_id' => $dataRow['amazon_order_id'], 'gift_sku' => $dataRow['gift_sku'], 'name' => $dataRow['name'],'email' => $dataRow['email'], 'note'=>'','nonctg_id'=>$id);
+            //添加该订单的时候还要添加相对应的订单信息到ctg_order和ctg_order_item表中
+            $Ctg = new Ctg();
+            $ctgres = $Ctg->add($ctgData);
             if($ctgres){
                 //添加到ctg数据后，需要把non-ctg的该条数据删除
                 NonCtg::where('id',$id)->delete();

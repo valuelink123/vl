@@ -67,9 +67,9 @@ class Ctg extends Model {
 
             $asinRow = Asin::select('sap_seller_id')->where('site', $item['MarketPlaceSite'])->where('asin', $item['ASIN'])->where('sellersku', $item['SellerSKU'])->first();
 
-            $row['processor'] = 0;
+            $row['processor'] = isset($row['processor']) ? $row['processor'] : 0;
 
-            if (!empty($asinRow->sap_seller_id)) {
+            if (!empty($asinRow->sap_seller_id) && $row['processor']==0) {
 
                 $user = User::select('id')->where('sap_seller_id', $asinRow->sap_seller_id)->limit(1)->first();
 
