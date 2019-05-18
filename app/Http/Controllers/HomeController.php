@@ -12,7 +12,6 @@ use PDO;
 use DB;
 use log;
 
-
 class HomeController extends Controller
 {
     /**
@@ -26,7 +25,7 @@ class HomeController extends Controller
 
         $this->middleware('auth');
 
-    }
+    }	
 
     /**
      * Show the application dashboard.
