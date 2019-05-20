@@ -423,7 +423,18 @@
                         </a>
 
                     </li>
+					
+					
+					<li class="nav-item <?php if($action=='role') echo 'active';?>">
+                        <a href="{{ url('role') }}" class="nav-link nav-toggle">
+                            <i class="fa fa-user"></i>
+                            <span class="title">Role Manage</span>
+                            <?php if($action=='role') echo '<span class="selected"></span>';?>
 
+                        </a>
+
+                    </li>
+					
 
                     <li class="nav-item <?php if($action=='user') echo 'active';?>">
                         <a href="{{ url('user') }}" class="nav-link nav-toggle">

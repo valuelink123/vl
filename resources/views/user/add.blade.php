@@ -35,14 +35,7 @@
                             </div>
                         </div>
 
-                        <div class="form-group">
-                            <label>Manager</label>
-
-                            <div class="mt-checkbox-inline">
-                                <input type="checkbox" name="admin" id="admin"  value="1"/>
-                            </div>
-
-                        </div>
+                        
 
                         <div class="form-group">
                             <label>User Name</label>
@@ -53,6 +46,23 @@
                                 <input type="text" class="form-control" name="name" id="name" required>
                             </div>
                         </div>
+						
+						<div class="form-group">
+                            <label>Roles</label>
+                            <div class="input-group ">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-envelope"></i>
+                                </span>
+                                <select name="roles[]" id="roles[]" class="mt-multiselect btn btn-default" multiple="multiple" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true">
+                                    @foreach ($roles as $k => $v)
+										 
+										<option value="{{$k}}">{{$v}}</option>
+                                   				
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+						
                         <div class="form-group">
                             <label>New Password</label>
                             <div class="input-group col-md-6">
@@ -71,7 +81,7 @@
                                 <input type="password" class="form-control" name="password_confirmation" id="password_confirmation" required>
                             </div>
                         </div>
-
+						
 
                     </div>
                     <div class="form-actions">

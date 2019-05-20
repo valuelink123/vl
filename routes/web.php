@@ -30,6 +30,7 @@ Route::get('/price', 'PriceController@index')->name('price');
 Route::Post('/price/get', 'PriceController@get')->name('getPrice');
 Route::Post('/price/getStockAge', 'PriceController@getStockAge')->name('getStockAge');
 Route::resource('rule', 'RuleController');
+Route::resource('role', 'RoleController');
 Route::resource('auto', 'AutoController');
 Route::get('/profile', 'UserController@profile')->name('profile');
 Route::Post('/profile', 'UserController@profile')->name('profileUpdate');

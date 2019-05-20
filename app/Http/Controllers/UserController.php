@@ -10,6 +10,7 @@ use App\Asin;
 use App\User;
 use App\Group;
 use App\Inbox;
+use App\Role;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Services\MultipleQueue;
@@ -127,7 +128,8 @@ class UserController extends Controller
 	
 	public function create(Request $request)
     {
-        return view('user/add');
+		$roles = Role::pluck('display_name','id');
+        return view('user/add',compact('roles'));
     }
 	
 	
@@ -138,17 +140,21 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6|confirmed',
+			'roles'=> 'required|array'
         ]);
 
-        $result = User::create([
+        $user = User::create([
             'name' => $request->get('name'),
             'email' => $request->get('email'),
             'password' => bcrypt($request->get('password')),
 			'admin'=> ($request->get('admin'))?1:0
         ]);
-        if ($result) {
+        if ($user) {
+			foreach ($request->input('roles') as $key => $value) {
+				$user->attachRole($value);
+			}
             $request->session()->flash('success_message','Set User Success');
-            return redirect('user/'.$result->id.'/edit');
+            return redirect('user/'.$user->id.'/edit');
         } else {
             $request->session()->flash('error_message','Set User Failed');
             return redirect()->back()->withInput();
@@ -159,12 +165,18 @@ class UserController extends Controller
     public function edit(Request $request,$id)
     {
         if(!Auth::user()->admin) die();
-        $user = User::where('id',$id)->first()->toArray();
+        $user = User::find($id)->first()->toArray();
+		
+		
+		$roles = Role::pluck('display_name','id');
+        $userRole = User::find($id)->roles->pluck('id')->toArray();
+		
+		
         if(!$user){
             $request->session()->flash('error_message','User not Exists');
             return redirect('user');
         }
-        return view('user/edit')->with('user',$user);
+        return view('user/edit',compact('user','roles','userRole'));
     }
 
     public function total(Request $request)
@@ -818,17 +830,27 @@ where a.date>=:sdate_from and a.date<=:sdate_to
 
     public function update(Request $request,$id)
     {
-        if(!Auth::user()->admin) die();
         $this->validate($request, [
             'name' => 'required|string',
             'password' => 'required_with:password_confirmation|confirmed',
+			'roles'=> 'required|array'
         ]);
         $update=array();
         $update['admin'] = ($request->get('admin'))?1:0;
         if($request->get('name')) $update['name'] = $request->get('name');
         if($request->get('password')) $update['password'] = Hash::make(($request->get('password')));
-        $result = User::where('id',$id)->update($update);
+        $user = User::find($id);
+		$result = $user->update($update);
+		
+		
+		
         if ($result) {
+			DB::table('role_user')->where('user_id',$id)->delete();
+ 
+         
+			foreach ($request->input('roles') as $key => $value) {
+				$user->attachRole($value);
+			}
             $request->session()->flash('success_message','Set User Success');
             return redirect('user');
         } else {
