@@ -223,9 +223,7 @@ class SendController extends Controller
     {
 
         $email = Sendbox::where('id',$id)->first();
-        if(!Auth::user()->admin){
-            $email->where('user_id',$this->getUserId());
-        }
+
         $email->toArray();
 		$email_from_history = Inbox::where('date','<',$email['date'])->where('from_address',$email['to_address'])->where('to_address',$email['from_address'])
         ->take(10)->orderBy('date','desc')->get()->toArray();
@@ -299,11 +297,9 @@ class SendController extends Controller
             $records["customActionMessage"] = "Group action successfully has been completed. Well done!"; // pass custom message(useful for getting status of group actions)
         }
         */
-        if(Auth::user()->admin){
+
             $customers = new Sendbox;
-        }else{
-            $customers = Sendbox::where('user_id',$this->getUserId());
-        }
+
 
 
         if(array_get($_REQUEST,'status')){
