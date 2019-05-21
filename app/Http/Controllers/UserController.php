@@ -165,7 +165,7 @@ class UserController extends Controller
     public function edit(Request $request,$id)
     {
         if(!Auth::user()->admin) die();
-        $user = User::find($id)->first()->toArray();
+        $user = User::find($id)->toArray();
 		
 		
 		$roles = Role::pluck('display_name','id');
