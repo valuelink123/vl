@@ -7,7 +7,7 @@
 
 namespace App\Http\Controllers\Frank;
 
-
+use Illuminate\Support\Facades\Auth;
 class Controller extends \App\Http\Controllers\Controller {
 
     protected static $authExcept = [];

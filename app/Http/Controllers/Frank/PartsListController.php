@@ -6,7 +6,7 @@
  */
 
 namespace App\Http\Controllers\Frank;
-
+use Illuminate\Support\Facades\Auth;
 use App\Asin;
 use App\Classes\SapRfcRequest;
 use App\Exceptions\DataInputException;

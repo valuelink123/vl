@@ -8,7 +8,7 @@
 namespace App\Http\Controllers\Frank;
 
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Auth;
 
 class LearnCenterController extends Controller {
 

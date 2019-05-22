@@ -11,7 +11,7 @@ use App\Asin;
 use App\Models\KmsUserManual;
 use App\Models\KmsVideo;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Auth;
 // use Illuminate\Support\Facades\DB;
 
 class BrandLineController extends Controller {

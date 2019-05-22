@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use App\Models\TrackLog;
-
+use Illuminate\Support\Facades\Auth;
 class CtgController extends Controller {
 
     use \App\Traits\Mysqli;

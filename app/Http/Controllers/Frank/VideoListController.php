@@ -6,7 +6,7 @@
  */
 
 namespace App\Http\Controllers\Frank;
-
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Models\KmsVideo;
 
