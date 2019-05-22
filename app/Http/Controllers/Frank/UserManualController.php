@@ -9,7 +9,7 @@ namespace App\Http\Controllers\Frank;
 
 use Illuminate\Http\Request;
 use App\Models\KmsUserManual;
-
+use Illuminate\Support\Facades\Auth;
 class UserManualController extends Controller {
 
     use \App\Traits\Mysqli;
