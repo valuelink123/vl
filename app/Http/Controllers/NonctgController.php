@@ -11,7 +11,7 @@ use App\Accounts;
 use App\Models\TrackLog;
 use App\Models\Ctg;
 use App\Exceptions\DataInputException;
-
+use Illuminate\Support\Facades\Auth;
 class NonctgController extends Controller
 {
     use \App\Traits\Mysqli;
