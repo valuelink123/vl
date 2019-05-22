@@ -11,20 +11,24 @@
                 <div class="portlet-body">
 					<div class="row">
                         <div class="col-md-6">
+							@permission('callmessage-create')
                             <div class="btn-group">
                                 <a href="{{ url('phone/create')}}"><button id="sample_editable_1_2_new" class="btn sbold blue"> Add New
                                     <i class="fa fa-plus"></i>
                                 </button>
                                 </a>
                             </div>
+							@endpermission
                         </div>
                         <div class="col-md-6 " >
+							@permission('callmessage-export')
                             <div class="btn-group " style="float:right;">
                                 <button id="vl_list_export" class="btn sbold blue"> Export
                                     <i class="fa fa-download"></i>
                                 </button>
 
                             </div>
+							@endpermission
                         </div>
 					</div>
 

@@ -35,6 +35,7 @@ class StarController extends Controller
      */
     public function index()
     {
+		if(!Auth::user()->can(['asin-rating-show'])) die('Permission denied -- asin-rating-show');
 		$date_from=date('Y-m-d',strtotime('-1 days'));	
 		$date_to=date('Y-m-d',strtotime('-2 days'));		
 	
@@ -265,125 +266,7 @@ class StarController extends Controller
         return $users_array;
     }
 	
-	public function edit(Request $request,$id)
-    {
-        //if(!Auth::user()->admin) die();
-        $review = Review::where('id',$id)->first()->toArray();
-		if(!$review){
-            $request->session()->flash('error_message','Review not Exists');
-            return redirect('review');
-        }
-        return view('review/edit',['users'=>$this->getUsers(),'review'=>$review]);
-    }
-
 	
-	public function create()
-    {
-        //if(!Auth::user()->admin) die();
-        return view('review/add',['users'=>$this->getUsers()]);
-    }
-	
-	
-	public function store(Request $request)
-    {
-        //if(!Auth::user()->admin) die();
-		
-        $this->validate($request, [
-			'review' => 'required|string',
-            'asin' => 'required|string',
-            'site' => 'required|string',
-			'sellersku' => 'required|string',
-			'date' => 'required|string',
-			'rating' => 'required|int',
-            'amazon_account' => 'required|string',
-            'review_content' => 'required|string',
-            'status' => 'required|int',
-        ]);
-        if($this->checkAccount($request)){
-            $request->session()->flash('error_message','Set Review Failed, this Review has Already exists.');
-            return redirect()->back()->withInput();
-            die();
-        }
-		
-        $seller_account = new Review;
-		$seller_account->review = $request->get('review');
-        $seller_account->asin = $request->get('asin');
-        $seller_account->site = $request->get('site');
-		$seller_account->review_content = $request->get('review_content');
-        $seller_account->sellersku = $request->get('sellersku');
-        $seller_account->date = $request->get('date');
-        $seller_account->rating = $request->get('rating');
-        $seller_account->amazon_account = $request->get('amazon_account');
-		$seller_account->status = $request->get('status');
-		if($request->get('status')>1) $seller_account->edate = date('Y-m-d');
-		$seller_account->amazon_order_id = $request->get('amazon_order_id');
-		$seller_account->buyer_email = $request->get('buyer_email');
-		$seller_account->content = $request->get('content');
-		$seller_account->etype = $request->get('etype');
-		$seller_account->epoint = $request->get('epoint');
-		$seller_account->edescription = $request->get('edescription');
-		
-        if($request->get('id')>0){
-            $seller_account->id = $request->get('id');
-        }
-        if ($seller_account->save()) {
-            $request->session()->flash('success_message','Set Review Success');
-            return redirect('review');
-        } else {
-            $request->session()->flash('error_message','Set Review Failed');
-            return redirect()->back()->withInput();
-        }
-    }
-
-
-
-    public function update(Request $request,$id)
-    {
-        //if(!Auth::user()->admin) die();
-
-        $this->validate($request, [
-			'review' => 'required|string',
-            'asin' => 'required|string',
-            'site' => 'required|string',
-			'sellersku' => 'required|string',
-			'date' => 'required|string',
-			'rating' => 'required|int',
-            'amazon_account' => 'required|string',
-            'review_content' => 'required|string',
-            'status' => 'required|int',
-        ]);
-        if($this->checkAccount($request)){
-            $request->session()->flash('error_message','Set Review Failed, this Review has Already exists.');
-            return redirect()->back()->withInput();
-            die();
-        }
-		
-        $seller_account = Review::findOrFail($id);;
-		$seller_account->review = $request->get('review');
-        $seller_account->asin = $request->get('asin');
-        $seller_account->site = $request->get('site');
-		$seller_account->review_content = $request->get('review_content');
-        $seller_account->sellersku = $request->get('sellersku');
-        $seller_account->date = $request->get('date');
-        $seller_account->rating = $request->get('rating');
-        $seller_account->amazon_account = $request->get('amazon_account');
-		$seller_account->status = $request->get('status');
-		if($request->get('status')>1) $seller_account->edate = date('Y-m-d');
-		$seller_account->amazon_order_id = $request->get('amazon_order_id');
-		$seller_account->buyer_email = $request->get('buyer_email');
-		$seller_account->content = $request->get('content');
-		$seller_account->etype = $request->get('etype');
-		$seller_account->epoint = $request->get('epoint');
-		$seller_account->edescription = $request->get('edescription');
-		
-        if ($seller_account->save()) {
-            $request->session()->flash('success_message','Set Review Success');
-            return redirect('review/'.$id.'/edit');
-        } else {
-            $request->session()->flash('error_message','Set Review Failed');
-            return redirect()->back()->withInput();
-        }
-    }
 	
     public function checkAccount($request){
         $id = ($request->get('id'))?($request->get('id')):0;

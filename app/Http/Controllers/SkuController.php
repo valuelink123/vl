@@ -33,7 +33,7 @@ class SkuController extends Controller
 	
     public function index(Request $request)
     {
-		
+		if(!Auth::user()->can(['sales-report-show'])) die('Permission denied -- sales-report-show');
 		$site = $request->get('site');
 		$bgbu = $request->get('bgbu');
 		$user_id = $request->get('user_id');
@@ -170,6 +170,7 @@ left join fbm_stock as b on a.item_code =b.item_code
 
 
 	public function export(Request $request){
+		if(!Auth::user()->can(['sales-report-export'])) die('Permission denied -- sales-report-export');
 		set_time_limit(0);
 		$site = $request->get('site');
 		$bgbu = $request->get('bgbu');
@@ -424,7 +425,7 @@ left join fbm_stock as b on a.item_code =b.item_code ) as sku_tmp_cc'),function(
 
     public function update(Request $request)
     {
-		
+		if(!Auth::user()->can(['sales-report-update'])) die('Permission denied -- sales-report-update');
 		$name = $request->get('name');
 		$data = explode("-",$name);
 		Skusweekdetails::updateOrCreate([

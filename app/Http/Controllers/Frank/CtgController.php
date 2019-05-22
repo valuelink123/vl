@@ -34,8 +34,9 @@ class CtgController extends Controller {
      * @throws \App\Traits\DataTablesException
      */
     public function list(Request $req) {
+		if(!Auth::user()->can(['ctg-show'])) die('Permission denied -- ctg-show');
         if ($req->isMethod('GET')) {
-
+			
             $userRows = DB::table('users')->select('id', 'name')->get();
 
             foreach ($userRows as $row) {
@@ -160,7 +161,7 @@ class CtgController extends Controller {
     }
 
     public function export(){
-
+		if(!Auth::user()->can(['ctg-export'])) die('Permission denied -- ctg-export');
         set_time_limit(0);
 
         $arrayData = array();
@@ -305,7 +306,7 @@ class CtgController extends Controller {
     }
 
     public function batchAssignTask(Request $req) {
-
+		if(!Auth::user()->can(['ctg-update'])) die('Permission denied -- ctg-update');
         if (empty($req->input('ctgRows'))) return [true, ''];
 
         $processor = (int)$req->input('processor');
@@ -338,7 +339,7 @@ class CtgController extends Controller {
      * CTG点击process出现的页面操作
      */
     public function process(Request $req) {
-
+		
         $wheres = [
             ['created_at', $req->input('created_at')],
             ['order_id', $req->input('order_id')]
@@ -349,7 +350,7 @@ class CtgController extends Controller {
         if (empty($ctgRow)) throw new DataInputException('ctg not found');
 
         if ($req->isMethod('GET')) {
-
+			if(!Auth::user()->can(['ctg-show'])) die('Permission denied -- ctg-show');
             $sap = new SapRfcRequest();
 
             $order = SapRfcRequest::sapOrderDataTranslate($sap->getOrder(['orderId' => $req->input('order_id')]));
@@ -377,7 +378,7 @@ class CtgController extends Controller {
 
         }
 
-
+		if(!Auth::user()->can(['ctg-update'])) die('Permission denied -- ctg-update');
         // Update
 
         $updates = [];
@@ -409,7 +410,7 @@ class CtgController extends Controller {
 	
 	//b1g1
 	public function bglist(Request $req) {
-
+		if(!Auth::user()->can(['ctg-show'])) die('Permission denied -- ctg-show');
         if ($req->isMethod('GET')) {
 
             $userRows = DB::table('users')->select('id', 'name')->get();
@@ -535,7 +536,7 @@ class CtgController extends Controller {
     }
 
     public function bgbatchAssignTask(Request $req) {
-
+		if(!Auth::user()->can(['ctg-update'])) die('Permission denied -- ctg-update');
         if (empty($req->input('ctgRows'))) return [true, ''];
 
         $processor = (int)$req->input('processor');
@@ -567,7 +568,7 @@ class CtgController extends Controller {
      * @throws DataInputException
      */
     public function bgprocess(Request $req) {
-
+		if(!Auth::user()->can(['ctg-update'])) die('Permission denied -- ctg-update');
         $wheres = [
             ['created_at', $req->input('created_at')],
             ['order_id', $req->input('order_id')]
@@ -624,7 +625,7 @@ class CtgController extends Controller {
 	
 	//cb
 	public function cblist(Request $req) {
-
+		if(!Auth::user()->can(['ctg-show'])) die('Permission denied -- ctg-show');
         if ($req->isMethod('GET')) {
 
             $userRows = DB::table('users')->select('id', 'name')->get();
@@ -750,7 +751,7 @@ class CtgController extends Controller {
     }
 
     public function cbbatchAssignTask(Request $req) {
-
+		if(!Auth::user()->can(['ctg-update'])) die('Permission denied -- ctg-update');
         if (empty($req->input('ctgRows'))) return [true, ''];
 
         $processor = (int)$req->input('processor');
@@ -782,7 +783,7 @@ class CtgController extends Controller {
      * @throws DataInputException
      */
     public function cbprocess(Request $req) {
-
+		if(!Auth::user()->can(['ctg-update'])) die('Permission denied -- ctg-update');
         $wheres = [
             ['created_at', $req->input('created_at')],
             ['order_id', $req->input('order_id')]

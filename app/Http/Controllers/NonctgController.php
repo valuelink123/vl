@@ -36,7 +36,7 @@ class NonctgController extends Controller
      */
     public function index(Request $request)
     {
-
+		if(!Auth::user()->can(['non-ctg-show'])) die('Permission denied -- non-ctg-show');
         $users = array();
         $userRows = DB::table('users')->select('id', 'name')->get();
         foreach ($userRows as $row) {
@@ -103,6 +103,7 @@ class NonctgController extends Controller
      * nonctg功能的指派任务，可以把某个任务指派给其他成员
      */
     public function batchAssignTask(Request $req) {
+		if(!Auth::user()->can(['non-ctg-update'])) die('Permission denied -- non-ctg-update');
         if (empty($req->input('ctgRows'))) return [true, ''];
 
         $processor = (int)$req->input('processor');
@@ -125,6 +126,7 @@ class NonctgController extends Controller
      * NON-CTG点击process出现的页面操作
      */
     public function process(Request $req) {
+		
         $wheres = [
             ['id', $req->input('id')],
             ['amazon_order_id', $req->input('order_id')]
@@ -136,7 +138,7 @@ class NonctgController extends Controller
         $id = $recordId = $req->input('id');
 
         if ($req->isMethod('GET')) {
-
+			if(!Auth::user()->can(['non-ctg-show'])) die('Permission denied -- non-ctg-show');
             $sap = new SapRfcRequest();
 
             $order = SapRfcRequest::sapOrderDataTranslate($sap->getOrder(['orderId' => $req->input('order_id')]));
@@ -165,7 +167,7 @@ class NonctgController extends Controller
 
         }
 
-
+		if(!Auth::user()->can(['non-ctg-update'])) die('Permission denied -- non-ctg-update');
         // process操作页面点击保存
         $updates = [];
         $status = 0;

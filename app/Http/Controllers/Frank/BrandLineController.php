@@ -24,7 +24,7 @@ class BrandLineController extends Controller {
      */
     public function index() {
         // print_r(array_keys($GLOBALS));
-
+		if(!Auth::user()->can(['product-guide-show'])) die('Permission denied -- product-guide-show');
         $rows = $this->queryRows('SELECT item_group,brand,GROUP_CONCAT(DISTINCT item_model) AS item_models FROM asin GROUP BY item_group,brand');
 
         $itemGroupBrandModels = array();
@@ -40,7 +40,7 @@ class BrandLineController extends Controller {
      * @throws \App\Traits\MysqliException
      */
     public function get(Request $req) {
-
+		if(!Auth::user()->can(['product-guide-show'])) die('Permission denied -- product-guide-show');
         $where = $this->dtWhere($req, ['item_group', 'item_model', 'item_no', 't1.asin', 'sellersku', 'brand', 'brand_line'], ['item_group' => 'item_group', 'brand' => 'brand', 'item_model' => 'item_model']);
 
         $orderby = $this->dtOrderBy($req);

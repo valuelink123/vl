@@ -177,10 +177,11 @@ th,td,td>span {
                     "order": [
                         [1, "desc"]
                     ],// set first column as a default sort by asc
-					
+					<?php if(Auth::user()->can(['sales-prediction-export'])){ ?>
 					buttons: [
                         { extend: 'csv', className: 'btn purple btn-outline ',filename:'salesp' }
                     ],
+					<?php } ?>
 					 "createdRow": function( row, data, dataIndex ) {
                         $(row).children('td').eq(4).attr('style', 'max-width: 200px;overflow:hidden;white-space:nowrap;text-align: left; ');
 						$(row).children('td').eq(4).attr('title', $(row).children('td').eq(4).text());

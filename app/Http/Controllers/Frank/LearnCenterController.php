@@ -19,7 +19,7 @@ class LearnCenterController extends Controller {
      * @throws \App\Traits\MysqliException
      */
     public function index(Request $req) {
-
+		if(!Auth::user()->can(['learn-center'])) die('Permission denied -- learn-center');
         $itemGroupModels = [];
 
         $rows = $this->queryRows('SELECT item_group, GROUP_CONCAT(DISTINCT item_model) AS item_models FROM kms_learn GROUP BY item_group');
@@ -36,7 +36,7 @@ class LearnCenterController extends Controller {
      * @throws \App\Traits\MysqliException
      */
     public function get(Request $req) {
-
+		if(!Auth::user()->can(['learn-center'])) die('Permission denied -- learn-center');
         $where = $this->dtWhere($req, ['item_group', 'item_model', 'title', 'f:content'], ['item_group' => 'item_group', 'item_model' => 'item_model']);
 
         $orderby = $this->dtOrderBy($req);

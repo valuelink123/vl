@@ -21,7 +21,7 @@ class NoticeCenterController extends Controller {
      * @throws \App\Traits\MysqliException
      */
     public function index(Request $req) {
-
+		if(!Auth::user()->can(['notice-center'])) die('Permission denied -- notice-center');	
         $rows = $this->queryRows('SELECT item_group,brand,GROUP_CONCAT(DISTINCT item_model) AS item_models FROM kms_notice GROUP BY item_group,brand');
 
         $itemGroupBrandModels = array();
@@ -39,7 +39,7 @@ class NoticeCenterController extends Controller {
      * @throws \App\Traits\MysqliException
      */
     public function get(Request $req) {
-
+		if(!Auth::user()->can(['notice-center'])) die('Permission denied -- notice-center');
         $where = $this->dtWhere(
             $req,
             // f: 表示 fulltext，全文索引字段
@@ -86,6 +86,7 @@ class NoticeCenterController extends Controller {
     }
 
     public function create(Request $req) {
+		
         try {
             $row = KmsNotice::add($req->all());
             KmsTag::puts('notice', $req->input('tags'));

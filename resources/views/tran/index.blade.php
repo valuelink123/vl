@@ -309,9 +309,11 @@ th,td,td>span {
 						},
 						"autoWidth":false,
 						"bStateSave": false, // save datatable state(pagination, sort, etc) in cookie.
+						<?php if(Auth::user()->can(['distribution-analysis-export'])){ ?>
 						buttons: [
 							{ extend: 'csv', className: 'btn purple btn-outline ',filename:'tran' }
 						],
+						<?php } ?>
 						"lengthMenu": [
 							[10, 50, 100, -1],
 							[10, 50, 100, "All"] // change per page values here

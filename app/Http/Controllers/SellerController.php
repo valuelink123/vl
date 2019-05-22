@@ -34,7 +34,8 @@ class SellerController extends Controller
      */
     public function index()
     {
-        $tabs = Sellertab::get();
+        if(!Auth::user()->can(['sales-management'])) die('Permission denied -- sales-management');
+		$tabs = Sellertab::get();
 		$seller_tabs= array();
 		
 		$config_fields = getFieldtoField();

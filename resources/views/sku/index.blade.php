@@ -128,9 +128,11 @@ white-space: nowrap;
 					</div>
 
                     </form>
+					@permission('sales-report-export')
 					<button id="vl_list_export" class="btn sbold blue"> Export
                                     <i class="fa fa-download"></i>
                           </button>
+						  @endpermission
                 </div>
                     <div class="table-container">
 					{{ $datas->appends(['date_start' => $date_start,'site' => $s_site,'user_id' => $s_user_id,'level' => $s_level,'bgbu' => $bgbu,'sku' => $sku])->links() }} 

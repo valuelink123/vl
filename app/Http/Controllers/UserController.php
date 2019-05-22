@@ -67,7 +67,7 @@ class UserController extends Controller
 	
     public function index(Request $request)
     {
-        if(!Auth::user()->admin) die();
+        if(!Auth::user()->can(['users-show'])) die('Permission denied -- users-show');
 		$user_id_from = $request->get('user_id_from');
 		$user_id_to = $request->get('user_id_to');
 
@@ -115,7 +115,7 @@ class UserController extends Controller
 
     public function destroy(Request $request,$id)
     {
-        if(!Auth::user()->admin) die();
+        if(!Auth::user()->can(['users-update'])) die('Permission denied -- users-update');
 		//$existMails = Inbox::where('user_id',$id)->first();
 		//if($existMails){
 		//	$request->session()->flash('error_message','Can not Delete User , There are many mails belong this user!');
@@ -128,6 +128,8 @@ class UserController extends Controller
 	
 	public function create(Request $request)
     {
+		if(!Auth::user()->can(['users-create'])) die('Permission denied -- users-create');
+		
 		$roles = Role::pluck('display_name','id');
         return view('user/add',compact('roles'));
     }
@@ -135,7 +137,7 @@ class UserController extends Controller
 	
 	public function store(Request $request)
     {
-        if(!Auth::user()->admin) die();
+        if(!Auth::user()->can(['users-create'])) die('Permission denied -- users-create');
         $this->validate($request, [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
@@ -164,7 +166,7 @@ class UserController extends Controller
 	
     public function edit(Request $request,$id)
     {
-        if(!Auth::user()->admin) die();
+       if(!Auth::user()->can(['users-show'])) die('Permission denied -- users-show');
         $user = User::find($id)->toArray();
 		
 		
@@ -181,7 +183,7 @@ class UserController extends Controller
 
     public function total(Request $request)
     {
-        //if(!Auth::user()->admin) die();
+       if(!Auth::user()->can(['data-statistics'])) die('Permission denied -- data-statistics');
 		
 		$date_from = array_get($_REQUEST,'date_from')?array_get($_REQUEST,'date_from'):date('Y-m-d',strtotime('-7day'));
         $date_to = array_get($_REQUEST,'date_to')?array_get($_REQUEST,'date_to'):date('Y-m-d');
@@ -798,7 +800,7 @@ where a.date>=:sdate_from and a.date<=:sdate_to
 	
 	public function etotal(Request $request)
     {
-        //if(!Auth::user()->admin) die();
+        if(!Auth::user()->can(['product-problem-show'])) die('Permission denied -- product-problem-show');
 
         $date_from = array_get($_REQUEST,'date_from')?array_get($_REQUEST,'date_from'):date('Y-m-d',strtotime('-7day'));
         $date_to = array_get($_REQUEST,'date_to')?array_get($_REQUEST,'date_to'):date('Y-m-d');
@@ -806,11 +808,9 @@ where a.date>=:sdate_from and a.date<=:sdate_to
         $user_received_total=array();
         $user_key=array();
 		
-		if(Auth::user()->admin){
-			$user_total_r = new Inbox;
-		}else{
-			$user_total_r = Inbox::where('user_id',$this->getUserId());
-		}
+
+		$user_total_r = new Inbox;
+
 			
         
 		
@@ -830,7 +830,8 @@ where a.date>=:sdate_from and a.date<=:sdate_to
 
     public function update(Request $request,$id)
     {
-        $this->validate($request, [
+        if(!Auth::user()->can(['users-update'])) die('Permission denied -- users-update');
+		$this->validate($request, [
             'name' => 'required|string',
             'password' => 'required_with:password_confirmation|confirmed',
 			'roles'=> 'required|array'

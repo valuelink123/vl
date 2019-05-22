@@ -29,12 +29,14 @@ th,td,td>span {
                 <div class="table-toolbar">
                     <div class="row">
                         <div class="col-md-6">
+							@permission('auto-price-create')
                             <div class="btn-group">
                                 <a data-target="#ajax" data-toggle="modal" href="{{ url('autoprice/create')}}"><button id="sample_editable_1_2_new" class="btn sbold blue"> Add New
                                     <i class="fa fa-plus"></i>
                                 </button>
                                 </a>
                             </div>
+							@endpermission
                         </div>
                     </div>
                 </div>

@@ -17,12 +17,14 @@
                 <div class="table-toolbar">
                     <div class="row">
                         <div class="col-md-6">
+							@permission('review-tab-create')
                             <div class="btn-group">
                                 <a href="{{ url('rs/create')}}"><button id="sample_editable_1_2_new" class="btn sbold blue"> Add New
                                     <i class="fa fa-plus"></i>
                                 </button>
                                 </a>
                             </div>
+							@endpermission
                         </div>
                         <!--
                         <div class="col-md-6">

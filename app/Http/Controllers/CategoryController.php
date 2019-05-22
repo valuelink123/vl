@@ -39,6 +39,7 @@ class CategoryController extends Controller
 	
     public function index()
     {
+		if(!Auth::user()->can(['qa-category-show'])) die('Permission denied -- qa-category-show');
         $data = new Category;
         $order_by = 'created_at';
         $sort = 'desc';
@@ -53,7 +54,7 @@ class CategoryController extends Controller
 
     public function create(Request $request)
     {
-
+		if(!Auth::user()->can(['qa-category-create'])) die('Permission denied -- qa-category-create');
         $category_type = $request->get('type',1);
         $data = new Category;
         $order_by = 'created_at';
@@ -72,7 +73,7 @@ class CategoryController extends Controller
 
     public function store(Request $request)
     {
-
+		if(!Auth::user()->can(['qa-category-create'])) die('Permission denied -- qa-category-create');
         $this->validate($request, [
             'category_name' => 'required|string',
         ]);
@@ -95,7 +96,7 @@ class CategoryController extends Controller
 
     public function destroy(Request $request)
     {
-        //if(!Auth::user()->admin) die();
+        if(!Auth::user()->can(['qa-category-delete'])) die('Permission denied -- qa-category-delete');
 
         $id = $request->get('cate_id');
         $data = new Category;
@@ -113,7 +114,7 @@ class CategoryController extends Controller
 
     public function edit(Request $request,$id)
     {
-        //if(!Auth::user()->admin) die();
+        if(!Auth::user()->can(['qa-category-show'])) die('Permission denied -- qa-category-show');
         $data = new Category;
         $order_by = 'created_at';
         $sort = 'desc';
@@ -138,7 +139,7 @@ class CategoryController extends Controller
 
     public function update(Request $request,$id)
     {
-        //if(!Auth::user()->admin) die();
+        if(!Auth::user()->can(['qa-category-update'])) die('Permission denied -- qa-category-update');
 
         $this->validate($request, [
             'category_name' => 'required|string',

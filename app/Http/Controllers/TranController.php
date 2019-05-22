@@ -35,6 +35,7 @@ class TranController extends Controller
      */
     public function index(Request $request)
     {
+		if(!Auth::user()->can(['distribution-analysis-show'])) die('Permission denied -- distribution-analysis-show');
 		$datas=DB::select("select asin,site,sales,(transfer+stock) as fba_stock,fbm_stock,total_star,avg_star,profits,fba_stock_keep,item_code,profits_value 
 from seller_asins where site='www.amazon.com' and item_code<>'a:0:{}'");
 		$datas = json_decode(json_encode($datas),TRUE);

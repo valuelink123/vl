@@ -42,7 +42,7 @@ class RsgrequestsController extends Controller
     public function index()
     {
 
-	
+		if(!Auth::user()->can(['rsgrequests-show'])) die('Permission denied -- rsgrequests-show');
 		$date_from=date('Y-m-d',strtotime('-90 days'));		
 		$date_to=date('Y-m-d');
 
@@ -55,7 +55,7 @@ class RsgrequestsController extends Controller
 	
 	public function get(Request $request)
     {
-
+		if(!Auth::user()->can(['rsgrequests-show'])) die('Permission denied -- rsgrequests-show');
 		//$orderby = 'updated_at';
 		$order_column = $request->input('order.0.column','14');
 
@@ -72,7 +72,8 @@ class RsgrequestsController extends Controller
         $sort = $request->input('order.0.dir','desc');
 
         if ($request->input("customActionType") == "group_action") {
-			   if(!Auth::user()->admin) die('Permission denied');
+				
+			   if(!Auth::user()->can(['rsgrequests-batch-update'])) die('Permission denied -- rsgrequests-batch-update');
 			   $updateDate = [];
 			   $updateDate['step'] = $request->input("customstatus");
 			   RsgRequest::whereIn('id',$request->input("id"))->update($updateDate);
@@ -209,13 +210,14 @@ class RsgrequestsController extends Controller
 	
 	public function create()
     {
+		if(!Auth::user()->can(['rsgrequests-create'])) die('Permission denied -- rsgrequests-create');
         return view('rsgrequests/add',['products'=>self::getproducts()]);
     }
 
 
     public function store(Request $request)
     {
-        //if(!Auth::user()->admin) die('Permission denied');
+        if(!Auth::user()->can(['rsgrequests-create'])) die('Permission denied -- rsgrequests-create');
         $this->validate($request, [
 			'step' => 'required|int',
 			'product_id' => 'required|int',
@@ -272,7 +274,8 @@ class RsgrequestsController extends Controller
 	
     public function edit(Request $request,$id)
     {
-        $rule= RsgRequest::where('id',$id)->first()->toArray();
+        if(!Auth::user()->can(['rsgrequests-show'])) die('Permission denied -- rsgrequests-show');
+		$rule= RsgRequest::where('id',$id)->first()->toArray();
         if(!$rule){
             $request->session()->flash('error_message','Rsg Product not Exists');
             return redirect('rsgrequests');
@@ -290,7 +293,7 @@ class RsgrequestsController extends Controller
 
     public function update(Request $request,$id)
     {
-		//if(!Auth::user()->admin) die('Permission denied');
+		if(!Auth::user()->can(['rsgrequests-update'])) die('Permission denied -- rsgrequests-update');
         $this->validate($request, [
 			'step' => 'required|int',
         ]);
@@ -386,7 +389,7 @@ class RsgrequestsController extends Controller
 	}
 
 	public function export(){
-
+		if(!Auth::user()->can(['rsgrequests-export'])) die('Permission denied -- rsgrequests-export');
 		set_time_limit(0);
 
 		$arrayData = array();

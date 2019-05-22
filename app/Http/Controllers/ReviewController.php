@@ -38,6 +38,7 @@ class ReviewController extends Controller
 	 
 	public function upload( Request $request )
 	{	
+		if(!Auth::user()->can(['review-import'])) die('Permission denied -- review-import');
 		if($request->isMethod('POST')){  
             $file = $request->file('importFile');  
   			if($file){
@@ -145,6 +146,8 @@ class ReviewController extends Controller
 	
 	
 	public function export(Request $request){
+	
+		if(!Auth::user()->can(['review-export'])) die('Permission denied -- review-export');
 		set_time_limit(0);
 		$date_from=date('Y-m-d',strtotime('-90 days'));		
 		$date_to=date('Y-m-d');	
@@ -356,7 +359,7 @@ class ReviewController extends Controller
     public function index()
     {   
 	
-
+		if(!Auth::user()->can(['review-show'])) die('Permission denied -- review-show');
 		$date_from=date('Y-m-d',strtotime('-90 days'));		
 		$date_to=date('Y-m-d');	
 		
@@ -377,6 +380,7 @@ class ReviewController extends Controller
 		$date_from=date('Y-m-d',strtotime('-90 days'));		
 		$date_to=date('Y-m-d');	
 		if (isset($_REQUEST["customActionType"]) && $_REQUEST["customActionType"] == "group_action") {
+			if(!Auth::user()->can(['review-batch-update'])) die('Permission denied -- review-batch-update');
             $updateDate=array();
 			
 			if(array_get($_REQUEST,"giveReviewUser")){
@@ -604,7 +608,7 @@ class ReviewController extends Controller
 	
 	public function edit(Request $request,$id)
     {
-        //if(!Auth::user()->admin) die();
+        if(!Auth::user()->can(['review-show'])) die('Permission denied -- review-show');
         $review = Review::where('id',$id)->first()->toArray();
 		if(!$review){
             $request->session()->flash('error_message','Review not Exists');
@@ -642,7 +646,7 @@ class ReviewController extends Controller
 
     public function update(Request $request,$id)
     {
-        //if(!Auth::user()->admin) die();
+        if(!Auth::user()->can(['review-update'])) die('Permission denied -- review-update');
 		
 		if($request->get('status')==6 && !($request->get('creson'))){
             $request->session()->flash('error_message','Set Review Failed, Set Review Closed Must Fill Closed Reson !.');

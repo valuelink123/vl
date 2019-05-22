@@ -57,7 +57,7 @@ max-width:150px !important;
                                 <input type="text" class="form-control form-filter input-sm"  name="star_to" placeholder="Rating To" value="{{array_get($_REQUEST,'star_to')}}">
 
                         </div>
-						<?php if(Auth::user()->admin){ ?>
+						
 						<div class="col-md-2">
 						<select class="mt-multiselect btn btn-default input-sm form-control form-filter" multiple="multiple" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" name="user_id[]" id="user_id[]">
 
@@ -66,7 +66,7 @@ max-width:150px !important;
                                         @endforeach
                                     </select>
 						</div>
-						<?php } ?>
+						
 						<div class="col-md-2">
 						<select class="form-control form-filter input-sm" name="asin_status">
                                         <option value="">Asin Status</option>
@@ -203,9 +203,11 @@ max-width:150px !important;
                         [20, 50, 100, 'All'] // change per page values here
                     ],
                     "pageLength": 20, // default record count per page
+					<?php if(Auth::user()->can(['asin-rating-export'])){ ?>
 					buttons: [
                         { extend: 'csv', className: 'btn purple btn-outline ',filename:'stars' }
                     ],
+					<?php } ?>
 					"aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0 , 6,11,12,13,14 ] }],	
 					 "order": [
                         [7, "asc"]

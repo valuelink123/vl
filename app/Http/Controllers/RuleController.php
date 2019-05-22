@@ -32,7 +32,7 @@ class RuleController extends Controller
      */
     public function index()
     {
-        if(!Auth::user()->admin) die();
+        if(!Auth::user()->can(['rule-show'])) die('Permission denied -- rule-show');
         $rules = Rule::get()->toArray();
         $users_array = $this->getUsers();
         return view('rule/index',['rules'=>$rules,'users'=>$users_array,'groups'=>$this->getGroups()]);
@@ -69,14 +69,14 @@ class RuleController extends Controller
 
     public function create()
     {
-        if(!Auth::user()->admin) die();
+        if(!Auth::user()->can(['rule-create'])) die('Permission denied -- rule-create');
         return view('rule/add',['users'=>$this->getUsers(),'accounts'=>$this->getAccounts(),'groups'=>$this->getGroups()]);
     }
 
 
     public function store(Request $request)
     {
-        if(!Auth::user()->admin) die();
+        if(!Auth::user()->can(['rule-create'])) die('Permission denied -- rule-create');
         $this->validate($request, [
             'priority' => 'required|int',
             'rule_name' => 'required|string',
@@ -108,7 +108,7 @@ class RuleController extends Controller
 
     public function destroy(Request $request,$id)
     {
-        if(!Auth::user()->admin) die();
+        if(!Auth::user()->can(['rule-delete'])) die('Permission denied -- rule-delete');
         Rule::where('id',$id)->delete();
         $request->session()->flash('success_message','Delete Rule Success');
         return redirect('rule');
@@ -116,7 +116,7 @@ class RuleController extends Controller
 
     public function edit(Request $request,$id)
     {
-        if(!Auth::user()->admin) die();
+        if(!Auth::user()->can(['rule-show'])) die('Permission denied -- rule-show');
         $rule= Rule::where('id',$id)->first()->toArray();
         if(!$rule){
             $request->session()->flash('error_message','Rule not Exists');
@@ -127,6 +127,7 @@ class RuleController extends Controller
 
     public function update(Request $request,$id)
     {
+		 if(!Auth::user()->can(['rule-update'])) die('Permission denied -- rule-update');
         if(!Auth::user()->admin) die();
         $this->validate($request, [
             'priority' => 'required|int',

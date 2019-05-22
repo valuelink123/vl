@@ -33,7 +33,7 @@ class RsgproductsController extends Controller
      */
     public function index()
     {
-
+		if(!Auth::user()->can(['rsgproducts-show'])) die('Permission denied -- rsgproducts-show');
 	
 		$teams= DB::select('select bg,bu from asin group by bg,bu ORDER BY BG ASC,BU ASC');
 
@@ -43,6 +43,7 @@ class RsgproductsController extends Controller
 	
 	public function get(Request $request)
     {
+		if(!Auth::user()->can(['rsgproducts-show'])) die('Permission denied -- rsgproducts-show');
 		$orderby = $request->input('order.0.column',1);
 		if($orderby==2){
 			$orderby = 'end_date';
@@ -55,6 +56,7 @@ class RsgproductsController extends Controller
 		}
         $sort = $request->input('order.0.dir','desc');
         if ($request->input("customActionType") == "group_action") {
+				if(!Auth::user()->can(['rsgproducts-batch-update'])) die('Permission denied -- rsgproducts-batch-update');
 			   $updateDate = [];
 			   $updateDate['status'] = $request->get("customstatus")?$request->get("customstatus"):0;
 			   RsgProduct::whereIn('id',$request->input("id"))->update($updateDate);
@@ -179,12 +181,14 @@ class RsgproductsController extends Controller
 
     public function create()
     {
+		if(!Auth::user()->can(['rsgproducts-create'])) die('Permission denied -- rsgproducts-create');
         return view('rsgproducts/add',['accounts'=>$this->getAccounts()]);
     }
 
 
     public function store(Request $request)
     {
+		if(!Auth::user()->can(['rsgproducts-create'])) die('Permission denied -- rsgproducts-create');
         $this->validate($request, [
             'seller_id' => 'required|string',
             'asin' => 'required|string',
@@ -233,6 +237,7 @@ class RsgproductsController extends Controller
 
     public function edit(Request $request,$id)
     {
+		if(!Auth::user()->can(['rsgproducts-show'])) die('Permission denied -- rsgproducts-show');
         $rule= RsgProduct::where('id',$id)->first()->toArray();
         if(!$rule){
             $request->session()->flash('error_message','Rsg Product not Exists');
@@ -243,6 +248,7 @@ class RsgproductsController extends Controller
 
     public function update(Request $request,$id)
     {
+		if(!Auth::user()->can(['rsgproducts-update'])) die('Permission denied -- rsgproducts-update');
         $this->validate($request, [
 			'start_date' => 'required|string',
 			'end_date' => 'required|string',

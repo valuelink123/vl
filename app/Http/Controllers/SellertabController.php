@@ -34,7 +34,7 @@ class SellertabController extends Controller
      */
     public function index()
     {
-        if(!Auth::user()->admin) die();
+        if(!Auth::user()->can(['seller-tab-show'])) die('Permission denied -- seller-tab-show');
         $tabs = Sellertab::get()->toArray();
         return view('sellertab/index',['tabs'=>$tabs]);
 
@@ -60,14 +60,14 @@ class SellertabController extends Controller
 
     public function create()
     {
-        if(!Auth::user()->admin) die();
+        if(!Auth::user()->can(['seller-tab-create'])) die('Permission denied -- seller-tab-create');
         return view('sellertab/add');
     }
 
 
     public function store(Request $request)
     {
-        if(!Auth::user()->admin) die();
+        if(!Auth::user()->can(['seller-tab-create'])) die('Permission denied -- seller-tab-create');
 		
         $this->validate($request, [
             'tab' => 'required|string',
@@ -100,7 +100,7 @@ class SellertabController extends Controller
 
     public function destroy(Request $request,$id)
     {
-        if(!Auth::user()->admin) die();
+        if(!Auth::user()->can(['seller-tab-delete'])) die('Permission denied -- seller-tab-delete');
 		$result = Sellertab::where('id',$id)->delete();
 		if($result){
 			$request->session()->flash('success_message','Delete Tab Rules Success');
@@ -112,7 +112,7 @@ class SellertabController extends Controller
 
     public function edit(Request $request,$id)
     {
-        if(!Auth::user()->admin) die();
+        if(!Auth::user()->can(['seller-tab-show'])) die('Permission denied -- seller-tab-show');
         $rules= Sellertab::where('id',$id)->first()->toArray();
         if(!$rules){
             $request->session()->flash('error_message','Tab Rules not Exists');
@@ -123,7 +123,7 @@ class SellertabController extends Controller
 
     public function update(Request $request,$id)
     {
-        if(!Auth::user()->admin) die();
+        if(!Auth::user()->can(['seller-tab-update'])) die('Permission denied -- seller-tab-update');
 		
         $this->validate($request, [
             'tab' => 'required|string',

@@ -33,7 +33,7 @@ class RsController extends Controller
      */
     public function index()
     {
-        if(!Auth::user()->admin) die();
+        if(!Auth::user()->can(['review-tab-show'])) die('Permission denied -- review-tab-show');
         $rss = Rs::get()->toArray();
         return view('rs/index',['rss'=>$rss]);
 
@@ -41,14 +41,14 @@ class RsController extends Controller
 
     public function create()
     {
-        if(!Auth::user()->admin) die();
+        if(!Auth::user()->can(['review-tab-create'])) die('Permission denied -- review-tab-create');
         return view('rs/add');
     }
 
 
     public function store(Request $request)
     {
-        if(!Auth::user()->admin) die();
+        if(!Auth::user()->can(['review-tab-create'])) die('Permission denied -- review-tab-create');
 		
         $this->validate($request, [
 			'title' => 'required|string',
@@ -71,8 +71,7 @@ class RsController extends Controller
 
     public function destroy(Request $request,$id)
     {
-        if(!Auth::user()->admin) die();
-		//$result = Rs::where('id',$id)->delete();
+        if(!Auth::user()->can(['review-tab-delete'])) die('Permission denied -- review-tab-delete');
 		if($result){
 			$request->session()->flash('success_message','Delete Step Success');
 		}else{
@@ -83,7 +82,7 @@ class RsController extends Controller
 
     public function edit(Request $request,$id)
     {
-        if(!Auth::user()->admin) die();
+        if(!Auth::user()->can(['review-tab-show'])) die('Permission denied -- review-tab-show');
         $rules= Rs::where('id',$id)->first()->toArray();
         if(!$rules){
             $request->session()->flash('error_message','Step not Exists');
@@ -94,7 +93,7 @@ class RsController extends Controller
 
     public function update(Request $request,$id)
     {
-        if(!Auth::user()->admin) die();
+        if(!Auth::user()->can(['review-tab-update'])) die('Permission denied -- review-tab-update');
 		
         $this->validate($request, [
 			'title' => 'required|string',

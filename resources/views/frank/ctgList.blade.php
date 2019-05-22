@@ -103,6 +103,7 @@ th,td,td>span {
                             </select>
                         </div>
                     </div>
+					@permission('ctg-export')
                     <div class="col-md-2">
                         <div class="btn-group " style="float:right;">
 
@@ -112,6 +113,7 @@ th,td,td>span {
 
                         </div>
                     </div>
+					@endpermission
                 </div>
             </div>
             <div style="clear:both;height:50px; text-align: right;">

@@ -16,14 +16,15 @@ class UserManualController extends Controller {
     use \App\Traits\DataTables;
 
     public function index() {
-        return view('frank/kmsUserManual');
+        if(!Auth::user()->can(['partslist-show'])) die('Permission denied -- partslist-show');
+		return view('frank/kmsUserManual');
     }
 
     /**
      * @throws \App\Traits\MysqliException
      */
     public function import() {
-
+		if(!Auth::user()->can(['partslist-create'])) die('Permission denied -- partslist-create');
         $rows = $this->queryRows('SELECT item_group,brand,GROUP_CONCAT(DISTINCT item_model) AS item_models FROM asin GROUP BY item_group,brand');
 
         foreach ($rows as $row) {
@@ -38,7 +39,7 @@ class UserManualController extends Controller {
      * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
      */
     public function create(Request $req) {
-
+		if(!Auth::user()->can(['partslist-create'])) die('Permission denied -- partslist-create');
         try {
             $count = KmsUserManual::import($req);
             $errors = ['success' => "Written $count Records."];

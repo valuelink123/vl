@@ -134,9 +134,11 @@
                     //},
 
                     // setup buttons extension: http://datatables.net/extensions/buttons/
+					<?php if(Auth::user()->can(['product-problem-export'])){ ?>
                     buttons: [
                         { extend: 'csv', className: 'btn purple btn-outline ',filename:'users' }
                     ],
+					<?php } ?>
 
                     // scroller extension: http://datatables.net/extensions/scroller/
                     scrollY:        300,

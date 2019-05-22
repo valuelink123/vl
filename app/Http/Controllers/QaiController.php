@@ -48,14 +48,14 @@ class QaiController extends Controller
 	
     public function index()
     {
-        //if(!Auth::user()->admin) die();
+        if(!Auth::user()->can(['qa-show'])) die('Permission denied -- qa-show');
         return view('qai/index',['users'=>$this->getUsers()]);
 
     }
 
     public function create()
     {
-
+		if(!Auth::user()->can(['qa-create'])) die('Permission denied -- qa-create');
         $order_by = 'created_at';
         $sort = 'desc';
 
@@ -405,7 +405,7 @@ class QaiController extends Controller
     public function store(Request $request)
     {
         //if(!Auth::user()->admin) die();
-		
+		if(!Auth::user()->can(['qa-create'])) die('Permission denied -- qa-create');	
         $this->validate($request, [
 //            'model' => 'required|string',
 //			'product_line' => 'required|string',
@@ -474,7 +474,7 @@ class QaiController extends Controller
 
     public function destroy(Request $request,$id)
     {
-        //if(!Auth::user()->admin) die();
+        if(!Auth::user()->can(['qa-delete'])) die('Permission denied -- qa-delete');
         Qa::where('id',$id)->delete();
         $request->session()->flash('success_message','Delete Qa Success');
         return redirect('qa');
@@ -482,7 +482,7 @@ class QaiController extends Controller
 
     public function edit(Request $request,$id)
     {
-        //if(!Auth::user()->admin) die();
+        if(!Auth::user()->can(['qa-show'])) die('Permission denied -- qa-show');
 
         $order_by = 'created_at';
         $sort = 'desc';
@@ -527,7 +527,7 @@ class QaiController extends Controller
 
     public function update(Request $request,$id)
     {
-        //if(!Auth::user()->admin) die();
+        if(!Auth::user()->can(['qa-update'])) die('Permission denied -- qa-update');
 
         $this->validate($request, [
 			'title' => 'required|string',

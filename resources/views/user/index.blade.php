@@ -18,19 +18,23 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="btn-group">
+								@permission('data-statistics')
                                 <a href="{{ url('total')}}"><button  class="btn sbold blue"> Data Statistics
                                         <i class="fa fa-plus"></i>
                                     </button>
                                 </a>
-								
+								@endpermission
+								@permission('users-create')
 								<a href="{{ url('user/create')}}"><button class="btn sbold blue"> Create New User
                                         <i class="fa fa-plus"></i>
                                     </button>
                                 </a>
+								@endpermission
                             </div>
                         </div>
                         
                         <div class="col-md-6">
+							@permission('users-update')
                             <div class="btn-group ">
                                 <form role="form" action="{{url('user')}}" method="GET">
                         {{ csrf_field() }}
@@ -72,7 +76,7 @@
                         </div>
                     </div>
                     </form>
-                            </div>
+                            </div>@endpermission
                         </div>
                         
                     </div>

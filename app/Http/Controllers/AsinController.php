@@ -53,18 +53,15 @@ class AsinController extends Controller
      */
     public function index()
     {
-        //if(!Auth::user()->admin) die();
+        if(!Auth::user()->can(['asin-table-show'])) die('Permission denied -- asin-table-show');
         return view('asin/index',['users'=>$this->getUsers(),'groups'=>$this->getGroups()]);
 
     }
 
-    public function create()
-    {
-        //if(!Auth::user()->admin) die();
-        return view('asin/add',['users'=>$this->getUsers(),'groups'=>$this->getGroups()]);
-    }
+
 	
 	public function export(Request $request){
+		if(!Auth::user()->can(['asin-table-export'])) die('Permission denied -- asin-table-export');
 		$orderby = 'asin';
         $sort = 'asc';
   
@@ -203,7 +200,7 @@ class AsinController extends Controller
         /*
    * Paging
    */
-
+		if(!Auth::user()->can(['asin-table-show'])) die('Permission denied -- asin-table-show');
         $orderby = 'asin';
         $sort = 'asc';
         if(isset($_REQUEST['order'][0])){
@@ -224,6 +221,7 @@ class AsinController extends Controller
         }
 
         if (isset($_REQUEST["customActionType"]) && $_REQUEST["customActionType"] == "group_action") {
+			if(!Auth::user()->can(['asin-table-batch-update'])) die('Permission denied -- asin-table-batch-update');
             $updateDate=array();
             if(array_get($_REQUEST,"giveUser")){
                 $updateDate['group_id'] = array_get($_REQUEST,"giveUser");
@@ -348,67 +346,11 @@ class AsinController extends Controller
 	
 
 
-    public function store(Request $request)
-    {
-        //if(!Auth::user()->admin) die();
-		
-        $this->validate($request, [
-            'asin' => 'required|string',
-            'site' => 'required|string',
-			'sellersku' => 'required|string',
-			'item_no' => 'required|string',
-			'star' => 'required|string',
-			'brand' => 'required|string',
-			'status' => 'required|int',
-            'brand_line' => 'required|string',
-            'seller' => 'required|string',
-            'group_id' => 'required|int',
-			'review_user_id' => 'required|int',
-        ]);
-        if($this->checkAccount($request)){
-            $request->session()->flash('error_message','Set Asin Failed, this Asin has Already exists.');
-            return redirect()->back()->withInput();
-            die();
-        }
-		
-        $seller_account = new Asin;
-        $seller_account->asin = $request->get('asin');
-		$seller_account->sellersku = $request->get('sellersku');
-        $seller_account->site = $request->get('site');
-		$seller_account->item_no = $request->get('item_no');
-		$seller_account->item_model = $request->get('item_model');
-		$seller_account->star = round($request->get('star'),1);
-        $seller_account->brand = $request->get('brand');
-        $seller_account->brand_line = $request->get('brand_line');
-        $seller_account->seller = $request->get('seller');
-        $seller_account->group_id = $request->get('group_id');
-		$seller_account->review_user_id = $request->get('review_user_id');
-		$seller_account->status = $request->get('status');
-		
-        if($request->get('id')>0){
-            $seller_account->id = $request->get('id');
-        }
-        if ($seller_account->save()) {
-            $request->session()->flash('success_message','Set Asin Success');
-            return redirect('asin');
-        } else {
-            $request->session()->flash('error_message','Set Asin Failed');
-            return redirect()->back()->withInput();
-        }
-    }
 
-
-    public function destroy(Request $request,$id)
-    {
-        //if(!Auth::user()->admin) die();
-        Asin::where('id',$id)->delete();
-        $request->session()->flash('success_message','Delete Asin Success');
-        return redirect('asin');
-    }
 
     public function edit(Request $request,$id)
     {
-        //if(!Auth::user()->admin) die();
+        if(!Auth::user()->can(['asin-table-show'])) die('Permission denied -- asin-table-show');
         $asin = Asin::where('id',$id)->first()->toArray();
         if(!$asin){
             $request->session()->flash('error_message','Asin not Exists');
@@ -419,7 +361,7 @@ class AsinController extends Controller
 
     public function update(Request $request,$id)
     {
-        
+        if(!Auth::user()->can(['asin-table-update'])) die('Permission denied -- asin-table-update');
         $seller_account = Asin::findOrFail($id);
 		$seller_account->star = round($request->get('star'),1);
         $seller_account->group_id = $request->get('group_id');

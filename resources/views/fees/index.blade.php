@@ -29,6 +29,7 @@
             		<div class="tab-content">
 						<div class="tab-pane active" id="tab_ads">
 						<div class="table-container">
+							@permission('fee-split-update')
 							<div class="table-actions-wrapper">
 								<input type="text" placeholder="SAPSKU" id="sku" class="table-group-action-input form-control input-inline input-small input-sm" />
 								<select  id="sapuid" class="table-group-action-input form-control input-inline input-small input-sm">
@@ -41,6 +42,7 @@
 								<button class="btn btn-sm green table-group-action-submit">
 									<i class="fa fa-check"></i> Change</button>
 							</div>
+							@endpermission
 							<table class="table table-striped table-bordered table-hover table-checkable" id="datatable_ajax_ads">
 								<thead>
 								<tr role="row" class="heading">
@@ -247,6 +249,7 @@
 						
 						<div class="tab-pane" id="tab_deal">
 						<div class="table-container">
+							@permission('fee-split-update')
 							<div class="table-actions-wrapper">
 								<input type="text" placeholder="SAPSKU" id="sku" class="table-group-action-input form-control input-inline input-small input-sm" />
 								<select  id="sapuid" class="table-group-action-input form-control input-inline input-small input-sm">
@@ -258,6 +261,7 @@
 								<button class="btn btn-sm green table-group-action-submit">
 									<i class="fa fa-check"></i> Change</button>
 							</div>
+							@endpermission
 							<table class="table table-striped table-bordered table-hover table-checkable" id="datatable_ajax_deal">
 								<thead>
 								<tr role="row" class="heading">
@@ -478,6 +482,7 @@
 							</div>
 						</div>
 						<div class="table-container">
+							@permission('fee-split-update')
 							<div class="table-actions-wrapper">
 								
 								<input type="text" placeholder="SAPSKU" id="sku" class="table-group-action-input form-control input-inline input-small input-sm" />
@@ -491,6 +496,7 @@
 								<button class="btn btn-sm green table-group-action-submit">
 									<i class="fa fa-check"></i> Change</button>
 							</div>
+							@endpermission
 							<table class="table table-striped table-bordered table-hover table-checkable" id="datatable_ajax_coupon">
 								<thead>
 								<tr role="row" class="heading">
@@ -700,6 +706,7 @@
 						
 						<div class="tab-pane" id="tab_servicefee">
 						<div class="table-container">
+							@permission('fee-split-update')
 							<div class="table-actions-wrapper">
 								
 								<input type="text" placeholder="SAPSKU" id="sku" class="table-group-action-input form-control input-inline input-small input-sm" />
@@ -713,6 +720,7 @@
 								<button class="btn btn-sm green table-group-action-submit">
 									<i class="fa fa-check"></i> Change</button>
 							</div>
+							@endpermission
 							<table class="table table-striped table-bordered table-hover table-checkable" id="datatable_ajax_servicefee">
 								<thead>
 								<tr role="row" class="heading">
@@ -923,6 +931,7 @@
 						
 						<div class="tab-pane" id="tab_cpcfee">
 						<div class="table-container">
+							@permission('fee-split-update')
 							<div class="table-actions-wrapper">
 								
 								<input type="text" placeholder="SAPSKU" id="sku" class="table-group-action-input form-control input-inline input-small input-sm" />
@@ -936,6 +945,7 @@
 								<button class="btn btn-sm green table-group-action-submit">
 									<i class="fa fa-check"></i> Change</button>
 							</div>
+							@endpermission
 							<table class="table table-striped table-bordered table-hover table-checkable" id="datatable_ajax_cpcfee">
 								<thead>
 								<tr role="row" class="heading">

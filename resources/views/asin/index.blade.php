@@ -26,8 +26,9 @@ th,td,td>span {
                 <div class="portlet-body">
 					<div class="table-toolbar">
                     <div class="row">
-                       
+                       	
                         <div class="col-md-8">
+							@permission('asin-table-batch-update')
                             <div class="table-actions-wrapper" id="table-actions-wrapper">
                             <span> </span>
 
@@ -51,16 +52,18 @@ th,td,td>span {
                             <button class="btn btn-sm green table-group-action-submit">
                                 <i class="fa fa-check"></i> Change</button>
                         </div>
-						
+						@endpermission
 						
                         </div>
                         <div class="col-md-4" >
+							@permission('asin-table-export')
                             <div class="btn-group " style="float:right;">
                                 <button id="vl_list_export" class="btn sbold blue"> Export
                                     <i class="fa fa-download"></i>
                                 </button>
                                
                             </div>
+							@endpermission
                         </div>
                     </div>
                 </div>

@@ -36,7 +36,7 @@ class GroupController extends Controller
      */
     public function index()
     {
-        if(!Auth::user()->admin) die();
+        if(!Auth::user()->can(['group-show'])) die('Permission denied -- group-show');
         $groups = Group::get()->toArray();
         $users_array = $this->getUsers();
         return view('group/index',['groups'=>$groups,'users'=>$users_array]);
@@ -63,14 +63,14 @@ class GroupController extends Controller
 
     public function create()
     {
-        if(!Auth::user()->admin) die();
+        if(!Auth::user()->can(['group-create'])) die('Permission denied -- group-create');
         return view('group/add',['users'=>$this->getUsers(),'accounts'=>$this->getAccounts()]);
     }
 
 
     public function store(Request $request)
     {
-        if(!Auth::user()->admin) die();
+        if(!Auth::user()->can(['group-create'])) die('Permission denied -- group-create');
 
         $this->validate($request, [
             'group_name' => 'required|string',
@@ -115,7 +115,7 @@ class GroupController extends Controller
 
     public function destroy(Request $request,$id)
     {
-        if(!Auth::user()->admin) die();
+        if(!Auth::user()->can(['group-delete'])) die('Permission denied -- group-delete');
 		$existMails = Inbox::where('group_id',$id)->first();
 		if($existMails){
 			$request->session()->flash('error_message','Can not Delete Group , There are many mails belong this Group!');
@@ -129,7 +129,7 @@ class GroupController extends Controller
 
     public function edit(Request $request,$id)
     {
-        if(!Auth::user()->admin) die();
+       if(!Auth::user()->can(['group-show'])) die('Permission denied -- group-show');
         $group= Group::where('id',$id)->first()->toArray();
 		$group_details = Groupdetail::where('group_id',$id)->get()->toArray();
         if(!$group){
@@ -141,7 +141,7 @@ class GroupController extends Controller
 
     public function update(Request $request,$id)
     {
-        if(!Auth::user()->admin) die();
+        if(!Auth::user()->can(['group-update'])) die('Permission denied -- group-update');
 
         $this->validate($request, [
             'group_name' => 'required|string',

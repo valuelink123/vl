@@ -33,7 +33,8 @@ class AutopriceController extends Controller
      */
     public function index()
     {
-        $autoprice = AutoPrice::get()->toArray();
+        if(!Auth::user()->can(['auto-price-show'])) die('Permission denied -- auto-price-show');
+		$autoprice = AutoPrice::get()->toArray();
         $users_array = $this->getUsers();
         return view('autoprice/index',['rules'=>$autoprice,'users'=>$users_array,'accounts'=>$this->getAccounts(),'actived'=>array(0=>'<span class="badge badge-default">Disabled</a>',1=>'<span class="badge badge-success">Enabled</span>')]);
 
@@ -60,13 +61,15 @@ class AutopriceController extends Controller
 
     public function create()
     {
+		if(!Auth::user()->can(['auto-price-create'])) die('Permission denied -- auto-price-create');
         return view('autoprice/add',['accounts'=>$this->getAccounts()]);
     }
 
 
     public function store(Request $request)
     {
-        $this->validate($request, [
+        if(!Auth::user()->can(['auto-price-create'])) die('Permission denied -- auto-price-create');
+		$this->validate($request, [
             'seller_id' => 'required|string',
             'seller_sku' => 'required|string',
 			'marketplace_id' => 'required|string',
@@ -95,7 +98,8 @@ class AutopriceController extends Controller
 
     public function edit(Request $request,$id)
     {
-        $rule= AutoPrice::where('id',$id)->first()->toArray();
+        if(!Auth::user()->can(['auto-price-show'])) die('Permission denied -- auto-price-show');
+		$rule= AutoPrice::where('id',$id)->first()->toArray();
         if(!$rule){
             $request->session()->flash('error_message','Auto Price not Exists');
             return redirect('autoprice');
@@ -107,7 +111,8 @@ class AutopriceController extends Controller
     public function update(Request $request,$id)
     {
 
-        $this->validate($request, [
+        if(!Auth::user()->can(['auto-price-update'])) die('Permission denied -- auto-price-update');
+		$this->validate($request, [
             'actived' => 'required|int',
         ]);
 		

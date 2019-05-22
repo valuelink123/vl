@@ -29,23 +29,24 @@ th,td,td>span {
 					<div class="col-md-6" style="padding: 0px;">
 
 						<div class="btn-group " style="float:right;">
-							
+							@permission('rsgrequests-export')
 							<button id="rsg-requests-export" class="btn sbold blue"> Export
 								<i class="fa fa-download"></i>
 							</button>
-							
+							@endpermission
+							@permission('rsgrequests-create')
 							<a data-target="#ajax" data-toggle="modal" href="{{ url('rsgrequests/create')}}"><button id="sample_editable_1_2_new" class="btn sbold red"> Add New
                                     <i class="fa fa-plus"></i>
                                 </button>
                                 </a>
-
+							@endpermission
 						</div>
 					</div>
                 </div>
                 <div class="portlet-body">
 
                     <div class="table-container">
-							<?php if(Auth::user()->admin) { ?>
+							@permission('rsgrequests-batch-update')
 							<div class="table-actions-wrapper">
 								<select id="customstatus" class="table-group-action-input form-control input-inline input-small input-sm">
 									<option value="">Select Step</option>
@@ -59,7 +60,7 @@ th,td,td>span {
 								<button class="btn btn-sm green table-group-action-submit">
 									<i class="fa fa-check"></i> Update</button>
 							</div>
-							<?php } ?>
+							@endpermission
 							<table class="table table-striped table-bordered table-hover table-checkable" id="datatable_ajax_rsg_requests">
 								<thead>
 								<tr role="row" class="heading">

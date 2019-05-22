@@ -40,24 +40,28 @@ th,td,td>span {
             <div class="portlet light bordered">
                 <div class="portlet-body">
 						<div class="col-md-4">
+							@permission('exception-create')
                             <div class="btn-group">
                                 <a href="{{ url('exception/create')}}"><button id="sample_editable_1_2_new" class="btn sbold blue"> Add New
                                     <i class="fa fa-plus"></i>
                                 </button>
                                 </a>
                             </div>
+							@endpermission
                         </div>
 						<div class="col-md-8 " >
+							@permission('exception-export')
                             <div class="btn-group " style="float:right;">
                                 <button id="vl_list_export" class="btn sbold blue"> Export
                                     <i class="fa fa-download"></i>
                                 </button>
                                
                             </div>
+							@endpermission
                         </div>
 						<div style="clear:both"></div>
                     <div class="table-container">
-						<?php if( Auth::user()->admin || array_get($mygroups,'manage_groups')){ ?>
+						<?php if( Auth::user()->can(['exception-batch-update']) || array_get($mygroups,'manage_groups')){ ?>
 
                         <div class="table-actions-wrapper">
                             <span> </span>

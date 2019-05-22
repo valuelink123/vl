@@ -37,11 +37,13 @@ class SendController extends Controller
      */
     public function index()
     {
+		if(!Auth::user()->can(['sendbox-show'])) die('Permission denied -- sendbox-show');
         return view('send/index',['users'=>$this->getUsers()]);
     }
 
     public function create(Request $request)
     {
+		if(!Auth::user()->can(['compose'])) die('Permission denied -- compose');
 		$accounts = Accounts::get()->toArray();
         $accounts_array = $type_array =  array();
         foreach($accounts as $account){
@@ -122,6 +124,7 @@ class SendController extends Controller
 	
     public function store(Request $request)
     {
+		if(!Auth::user()->can(['compose'])) die('Permission denied -- compose');
         $file = $request->file('files');
         if($file) {
             try {
@@ -221,7 +224,7 @@ class SendController extends Controller
 
     public function show($id)
     {
-
+		if(!Auth::user()->can(['sendbox-show'])) die('Permission denied -- sendbox-show');
         $email = Sendbox::where('id',$id)->first();
 
         $email->toArray();
@@ -279,7 +282,7 @@ class SendController extends Controller
         /*
    * Paging
    */
-
+		if(!Auth::user()->can(['sendbox-show'])) die('Permission denied -- sendbox-show');
         $orderby = 'date';
         $sort = 'desc';
         if(isset($_REQUEST['order'][0])){

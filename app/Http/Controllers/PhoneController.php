@@ -36,6 +36,7 @@ class PhoneController extends Controller
      */
     public function index()
     {
+		if(!Auth::user()->can(['callmessage-show'])) die('Permission denied -- callmessage-show');
         return view('phone/index');
     }
 	public function get(Request $request)
@@ -124,6 +125,8 @@ class PhoneController extends Controller
 
     //导出功能
     public function export(Request $request){
+	
+		if(!Auth::user()->can(['callmessage-export'])) die('Permission denied -- callmessage-export');
         $customers = new Phone;
 
         //取出所有用户的id=>name的映射数组
@@ -192,12 +195,14 @@ class PhoneController extends Controller
 	
     public function create()
     {
+		if(!Auth::user()->can(['callmessage-create'])) die('Permission denied -- callmessage-create');
         return view('phone/add',['users'=>$this->getUsers(),'accounts'=>$this->getAccounts(),'groups'=>$this->getGroups(),'sellerids'=>$this->getSellerIds()]);
     }
 
 	
     public function store(Request $request)
     {
+		if(!Auth::user()->can(['callmessage-create'])) die('Permission denied -- callmessage-create');
         $this->validate($request, [
             'phone' => 'required|string',
             'content' => 'required|string',
@@ -233,7 +238,7 @@ class PhoneController extends Controller
 
     public function destroy(Request $request,$id)
     {
-        //if(!Auth::user()->admin) die();
+        if(!Auth::user()->can(['callmessage-delete'])) die('Permission denied -- callmessage-delete');
         Phone::where('id',$id)->delete();
         $request->session()->flash('success_message','Delete Phone Message Success');
         return redirect('phone');
@@ -241,6 +246,7 @@ class PhoneController extends Controller
 
     public function edit(Request $request,$id)
     {
+		if(!Auth::user()->can(['callmessage-show'])) die('Permission denied -- callmessage-show');
         $phone= Phone::where('id',$id)->first()->toArray();
         if(!$phone){
             $request->session()->flash('error_message','Phone Message not Exists');
@@ -257,6 +263,7 @@ class PhoneController extends Controller
 
     public function update(Request $request,$id)
     {
+		if(!Auth::user()->can(['callmessage-update'])) die('Permission denied -- callmessage-update');
        $this->validate($request, [
             'phone' => 'required|string',
             'content' => 'required|string',

@@ -42,11 +42,13 @@ class ExceptionController extends Controller
      */
     public function index($type = '')
     {
+		if(!Auth::user()->can(['exception-show'])) die('Permission denied -- exception-show');
         return view('exception/index',['users'=>$this->getUsers(),'groups'=>$this->getGroups(),'mygroups'=>$this->getUserGroup(),'sellerids'=>$this->getAccounts()]);
 
     }
 	
 	public function export(Request $request){
+		if(!Auth::user()->can(['exception-export'])) die('Permission denied -- exception-export');
 		//if(Auth::user()->admin){
             $customers = new Exception;
         //}else{
@@ -306,6 +308,8 @@ class ExceptionController extends Controller
 
     public function create()
     {
+	
+		if(!Auth::user()->can(['exception-create'])) die('Permission denied -- exception-create');
         $vars = ['groups'=>$this->getGroups(),'mygroups'=>$this->getUserGroup(),'sellerids'=>$this->getAccounts()];
 
         $vars['requestContentHistoryValues'] = [];
@@ -331,6 +335,7 @@ class ExceptionController extends Controller
 
      public function edit(Request $request,$id)
     {
+		if(!Auth::user()->can(['exception-show'])) die('Permission denied -- exception-show');
         //if(Auth::user()->admin){
 			$rule= Exception::where('id',$id)->first();
 		//}else{
@@ -378,9 +383,11 @@ class ExceptionController extends Controller
 
     public function update(Request $request,$id)
     {
+		if(!Auth::user()->can(['exception-update'])) die('Permission denied -- exception-update');
 		$exception = Exception::findOrFail($id);
 		$acf = $request->get('acf');
 		if(isset($acf) && $exception->process_status=='auto done' && $exception->auto_create_mcf_result!=1){
+			if(!Auth::user()->can(['exception-check'])) die('Permission denied -- exception-check');
 			$exception->auto_create_mcf = $acf;
 			if($acf){
 				$exception->auto_create_mcf_result = 0;
@@ -408,6 +415,7 @@ class ExceptionController extends Controller
         }
 		$exception->save();
 		if(($exception->process_status!='cancel') && $request->get('process_status')!='submit'){
+			if(!Auth::user()->can(['exception-check'])) die('Permission denied -- exception-check');
 			$this->validate($request, [
 				'process_status' => 'required|string',
 			]);
@@ -451,6 +459,7 @@ class ExceptionController extends Controller
 			}
 		}
 		if($exception->process_status=='cancel'){
+			 if(!Auth::user()->can(['exception-update'])) die('Permission denied -- exception-update');
 			 $this->validate($request, [
 				'group_id' => 'required|string',
 				'name' => 'required|string',
@@ -521,7 +530,7 @@ class ExceptionController extends Controller
     }
     public function get(Request $request)
     {
-
+		
         $orderby = 'date';
         $sort = 'desc';
         if(isset($_REQUEST['order'][0])){
@@ -535,6 +544,7 @@ class ExceptionController extends Controller
         }
 
         if (isset($_REQUEST["customActionType"]) && $_REQUEST["customActionType"] == "group_action") {
+			if(!Auth::user()->can(['exception-batch-update'])) die('Permission denied -- exception-batch-update');
             $updateDate=array();
             if(isset($_REQUEST['process_status']) && $_REQUEST['process_status']!='' && array_get($_REQUEST,"process_content")){
                 $updateDate['process_status'] = $_REQUEST['process_status'];
@@ -759,6 +769,7 @@ class ExceptionController extends Controller
 
 	public function store(Request $request)
     {
+		if(!Auth::user()->can(['exception-create'])) die('Permission denied -- exception-create');
         $this->validate($request, [
 			'group_id' => 'required|string',
             'name' => 'required|string',

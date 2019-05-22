@@ -32,10 +32,12 @@ class PriceController extends Controller
      */
     public function index()
     {
+		if(!Auth::user()->can(['price-model'])) die('Permission denied -- price-model');
 		return view('price/index');
     }
 	
 	public function get(Request $request){
+		if(!Auth::user()->can(['price-model'])) die('Permission denied -- price-model');
 		$data = $request->get('data');
 		$array = $priceGroup = $monthGroup = $normalGroup= [];
 		

@@ -34,7 +34,7 @@ class TemplateController extends Controller
      */
     public function index()
     {	
-		//if(Auth::user()->admin){
+		if(!Auth::user()->can(['templates-show'])) die('Permission denied -- templates-show');
 			$templates = new Templates;
 		//}else{
 		//	$templates = Templates::where('user_id',$this->getUserId());
@@ -47,6 +47,7 @@ class TemplateController extends Controller
 	
 	public function get(Request $request)
     {	
+		if(!Auth::user()->can(['templates-show'])) die('Permission denied -- templates-show');
 		$keywords = $request->get('term');
 		$keywords_array = explode(';',$keywords);
 		$where = ' where 1=1 ';
@@ -80,12 +81,14 @@ class TemplateController extends Controller
 
     public function create()
     {
+		if(!Auth::user()->can(['templates-create'])) die('Permission denied -- templates-create');
         return view('template/add');
     }
 
 
     public function store(Request $request)
     {
+		if(!Auth::user()->can(['templates-create'])) die('Permission denied -- templates-create');
         $this->validate($request, [
             'tag' => 'required|string',
 			'title' => 'required|string',
@@ -112,7 +115,7 @@ class TemplateController extends Controller
 
     public function destroy(Request $request,$id)
     {
-		//if(Auth::user()->admin){
+		if(!Auth::user()->can(['templates-delete'])) die('Permission denied -- templates-delete');
 			$templates = new Templates;
 		//}else{
 			//$templates = Templates::where('user_id',$this->getUserId());
@@ -130,7 +133,7 @@ class TemplateController extends Controller
 
     public function edit(Request $request,$id)
     {
-		//if(Auth::user()->admin){
+		if(!Auth::user()->can(['templates-show'])) die('Permission denied -- templates-show');
 			$templates = new Templates;
 		//}else{
 		//	$templates = Templates::where('user_id',$this->getUserId());
@@ -145,7 +148,8 @@ class TemplateController extends Controller
 
     public function update(Request $request,$id)
     {
-         $this->validate($request, [
+         if(!Auth::user()->can(['templates-update'])) die('Permission denied -- templates-update');
+		 $this->validate($request, [
             'tag' => 'required|string',
 			'title' => 'required|string',
             'content' => 'required|string',

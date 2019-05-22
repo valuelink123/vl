@@ -32,6 +32,7 @@ class SalespController extends Controller
      */
     public function index()
     {	
+		if(!Auth::user()->can(['sales-prediction-show'])) die('Permission denied -- sales-prediction-show');
 		$teams= DB::select('select bg,bu from asin group by bg,bu ORDER BY BG ASC,BU ASC');
 		$addcolspans = DB::table('sales_prediction')->value('week_sales');
         return view('salesp/index',['teams'=>$teams,'addcolspans'=>unserialize($addcolspans),'users'=>$this->getUsers()]);
@@ -53,6 +54,7 @@ class SalespController extends Controller
 	
     public function get(Request $request)
     {
+		if(!Auth::user()->can(['sales-prediction-show'])) die('Permission denied -- sales-prediction-show');
 		$orderby = $request->input('order.0.column',1);
 		if($orderby==0){
 			$orderby = 'bg';

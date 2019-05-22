@@ -32,7 +32,8 @@ class McforderController extends Controller
      */
     public function index()
     {
-        $date_from=date('Y-m-d',strtotime('-90 days'));		
+        if(!Auth::user()->can(['mcforders'])) die('Permission denied -- mcforders');
+		$date_from=date('Y-m-d',strtotime('-90 days'));		
 		$date_to=date('Y-m-d');	
 
         return view('mcforder/index',['date_from'=>$date_from ,'date_to'=>$date_to,'accounts'=>$this->getSellerId()]);
@@ -51,7 +52,7 @@ class McforderController extends Controller
 
     public function show($id)
     {
-
+		if(!Auth::user()->can(['mcforders'])) die('Permission denied -- mcforders');
         $mcf_order = DB::connection('order')->table('amazon_mcf_orders')->find($id);
 		if($mcf_order){
 			$mcf_order->items = DB::connection('order')->table('amazon_mcf_orders_item')->where('SellerId',$mcf_order->SellerId)->where('SellerFulfillmentOrderId',$mcf_order->SellerFulfillmentOrderId)->get();
@@ -65,7 +66,8 @@ class McforderController extends Controller
     public function get(Request $request)
     {
 
-        $orderby = $request->input('order.0.column',1);
+        if(!Auth::user()->can(['mcforders'])) die('Permission denied -- mcforders');
+		$orderby = $request->input('order.0.column',1);
 		if($orderby==6){
 			$orderby = 'StatusUpdatedDateTime';
 		}else{

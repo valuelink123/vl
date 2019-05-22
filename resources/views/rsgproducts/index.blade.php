@@ -29,18 +29,21 @@ th,td,td>span {
                 <div class="table-toolbar">
                     <div class="row">
                         <div class="col-md-6">
+							@permission('rsgproducts-create')
                             <div class="btn-group">
                                 <a data-target="#ajax" data-toggle="modal" href="{{ url('rsgproducts/create')}}"><button id="sample_editable_1_2_new" class="btn sbold blue"> Add New
                                     <i class="fa fa-plus"></i>
                                 </button>
                                 </a>
                             </div>
+							@endpermission
                         </div>
                     </div>
                 </div>
                 <div class="portlet-body">
 
                     <div class="table-container">
+							@permission('rsgproducts-batch-update')
 							<div class="table-actions-wrapper">
 								<select id="customstatus" class="table-group-action-input form-control input-inline input-small input-sm">
 									<option value="">Select Status</option>
@@ -55,6 +58,7 @@ th,td,td>span {
 								<button class="btn btn-sm green table-group-action-submit">
 									<i class="fa fa-check"></i> Update</button>
 							</div>
+							@endpermission
 							<table class="table table-striped table-bordered table-hover table-checkable" id="datatable_ajax_rsg_products">
 								<thead>
 								<tr role="row" class="heading">
@@ -226,9 +230,11 @@ th,td,td>span {
 											 "createdRow": function( row, data, dataIndex ) {
 												$(row).children('td').eq(1).attr('style', 'text-align: left; ');
 											},
+											<?php if(Auth::user()->can(['rsgproducts-export'])){ ?>
 											buttons: [
 												{ extend: 'csv', className: 'btn purple btn-outline ',filename:'RsgProducts' }
 											],
+											<?php } ?>
 											"order": [
 												[2, "desc"]
 											],// set first column as a default sort by asc

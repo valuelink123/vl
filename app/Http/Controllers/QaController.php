@@ -51,7 +51,7 @@ class QaController extends Controller
      */
     public function index(Request $request)
     {
-
+		if(!Auth::user()->can(['qa-show'])) die('Permission denied -- qa-show');
 		$keywords = $request->get('keywords');
         $group = $request->get('group');
         $item_group = $request->get('item_group');
@@ -159,7 +159,7 @@ class QaController extends Controller
 
     public function update(Request $request,$id)
     {
-
+		if(!Auth::user()->can(['qa-update'])) die('Permission denied -- qa-update');
         $seller_account = Qa::findOrFail($id);
         $seller_account->dqe_content = $request->get('dqe_content');
         if ($seller_account->save()) {

@@ -148,63 +148,83 @@
                             <i class="fa fa-angle-down"></i>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-default">
+							@permission('product-guide-show')
                             <li>
                                 <a href="/kms/productguide">
                                     <i class="fa fa-file"></i> Product Guide
                                 </a>
                             </li>
+							@endpermission
+							@permission('asin-table-show')
                             <li>
                                 <a href="/asin">
                                     <i class="fa fa-table"></i> Asin Table
                                 </a>
                             </li>
-                            <?php if(Auth::user()->admin){ ?>
+                            @endpermission
+							@permission('qa-category-show')
                             <li>
                                 <a href="/category">
                                     <i class="fa fa-files-o"></i> Knowledge Category
                                 </a>
                             </li>
-                            <?php } ?>
+                            @endpermission
+							@permission('qa-show')
                             <li>
                                 <a href="/qa">
                                     <i class="fa fa-files-o"></i> Knowledge Base
                                 </a>
                             </li>
+							@endpermission
+							@permission('qa-show')
                             <li>
                                 <a href="/question">
                                     <i class="fa fa-question"></i> Knowledge Center
                                 </a>
                             </li>
+							@endpermission
+							@permission('learn-center')
                             <li>
                                 <a href="/kms/learn">
                                     <i class="fa fa-book"></i> Learning Center
                                 </a>
                             </li>
+							@endpermission
+							@permission('notice-center')
                             <li>
                                 <a href="/kms/notice">
                                     <i class="fa fa-inbox"></i> Notice Center
                                 </a>
                             </li>
+							@endpermission
+							@permission('templates-show')
                             <li>
                                 <a href="/template">
                                     <i class="fa fa-inbox"></i> Templates
                                 </a>
                             </li>
+							@endpermission
+							@permission('user-manual-show')
                             <li>
                                 <a href="/kms/usermanual">
                                     <i class="fa fa-book"></i> User Manuals
                                 </a>
                             </li>
+							@endpermission
+							@permission('video-show')
                             <li>
                                 <a href="/kms/videolist">
                                     <i class="fa fa-play-circle-o"></i> Video List
                                 </a>
                             </li>
+							@endpermission
+							@permission('partslist-show')
                             <li>
                                 <a href="/kms/partslist">
                                     <i class="fa fa-list"></i> Parts List
                                 </a>
                             </li>
+							@endpermission
                         </ul>
                     </li>
 
@@ -284,9 +304,12 @@
                     ?>
                     <!-- END SIDEBAR TOGGLER BUTTON -->
                     <!-- DOC: To remove the search box from the sidebar you just need to completely remove the below "sidebar-search-wrapper" LI element -->
+					
+					
+					@permission('compose')		
                     <li class="nav-item <?php if($action=='send' && $method=='create') echo 'active';?> ">
                         
-	<a href="{{ url('send/create') }}" class="nav-link nav-toggle">
+							<a href="{{ url('send/create') }}" class="nav-link nav-toggle">
 						
                             <i class="fa fa-edit"></i>
 							
@@ -297,7 +320,8 @@
                         </a>
 						
                     </li>
-
+					@endpermission
+					@permission('inbox-show')
                     <li class="nav-item <?php if($action=='inbox') echo 'active';?>">
                         <a href="{{url('inbox')}}" class="nav-link nav-toggle">
                             <i class="fa fa-envelope-o"><span class=" badge-danger " style="
@@ -313,6 +337,8 @@
                         </a>
 
                     </li>
+					
+					
 					<?php $filtertype=isset($type)?$type:''; ?>
 					@foreach (getAccountTypes() as $type)
 
@@ -331,7 +357,8 @@
                     </li>
 					@endforeach
 
-
+					@endpermission
+					@permission('callmessage-show')	
 					<li class="nav-item <?php if($action=='phone') echo 'active';?>">
                         <a href="{{url('phone')}}" class="nav-link nav-toggle">
                             <i class="fa fa-phone"></i>
@@ -342,7 +369,8 @@
 
                     </li>
 
-
+					@endpermission
+					@permission('sendbox-show')
 
                     <li class="nav-item <?php if($action=='send' && $method!='create') echo 'active';?>">
                         <a href="{{url('send')}}" class="nav-link nav-toggle">
@@ -353,6 +381,10 @@
                         </a>
 
                     </li>
+					
+					@endpermission
+					@permission('review-show')
+
 
                     <li class="nav-item <?php if($action=='review') echo 'active';?>">
                         <a href="{{ url('review') }}" class="nav-link nav-toggle">
@@ -363,6 +395,9 @@
                         </a>
 
                     </li>
+					
+					@endpermission
+					@permission('asin-rating-show')
 
                     <li class="nav-item <?php if($action=='star') echo 'active';?>">
                         <a href="{{ url('star') }}" class="nav-link nav-toggle">
@@ -373,7 +408,9 @@
                         </a>
 
                     </li>
-
+					
+					@endpermission
+					@permission('exception-show')
 					<li class="nav-item <?php if($action=='exception') echo 'active';?>">
                         <a href="{{ url('exception') }}" class="nav-link nav-toggle">
                             <i class="fa fa-ticket"></i>
@@ -383,8 +420,13 @@
                         </a>
 
                     </li>
-
+					@endpermission
+					@permission('ctg-show')
                     @include('layouts.menu', ['text'=>'C T G', 'uri'=>'/ctg/list', 'fa'=>'google'])
+					
+					
+					@endpermission
+					@permission('non-ctg-show')
                     <li class="nav-item {{$action}} <?php if($action=='nonctg') echo 'active';?>">
                         <a href="{{ url('nonctg') }}" class="nav-link nav-toggle">
                             <i class="fa fa-exclamation-circle"></i>
@@ -393,7 +435,8 @@
                         </a>
                     </li>
 
-                    <?php if(Auth::user()->admin){?>
+                    @endpermission
+					@permission('auto-reply-show')
                     <li class="nav-item <?php if($action=='auto') echo 'active';?>">
                         <a href="{{url('auto')}}" class="nav-link nav-toggle">
                             <i class="fa fa-reply-all"></i>
@@ -402,7 +445,8 @@
                         </a>
                     </li>
 
-
+					@endpermission
+					@permission('rule-show')	
                     <li class="nav-item <?php if($action=='rule') echo 'active';?>">
                         <a href="{{ url('rule') }}" class="nav-link nav-toggle">
                             <i class="fa fa-filter"></i>
@@ -413,7 +457,8 @@
 
                     </li>
 
-
+					@endpermission
+					@permission('group-show')
 					 <li class="nav-item <?php if($action=='group') echo 'active';?>">
                         <a href="{{ url('group') }}" class="nav-link nav-toggle">
                             <i class="fa fa-group"></i>
@@ -423,7 +468,8 @@
                         </a>
 
                     </li>
-					
+					@endpermission
+					@permission('roles-show')		
 					
 					<li class="nav-item <?php if($action=='role') echo 'active';?>">
                         <a href="{{ url('role') }}" class="nav-link nav-toggle">
@@ -434,7 +480,8 @@
                         </a>
 
                     </li>
-					
+					@endpermission
+					@permission('users-show')
 
                     <li class="nav-item <?php if($action=='user') echo 'active';?>">
                         <a href="{{ url('user') }}" class="nav-link nav-toggle">
@@ -445,7 +492,8 @@
                         </a>
 
                     </li>
-
+					@endpermission
+					@permission('accounts-show')
                     <li class="nav-item <?php if($action=='account') echo 'active';?>">
                         <a href="{{ url('account') }}" class="nav-link nav-toggle">
                             <i class="icon-diamond"></i>
@@ -455,7 +503,8 @@
                         </a>
 
                     </li>
-					
+					@endpermission
+					@permission('product-problem-show')		
 
 					<li class="nav-item <?php if($action=='etotal') echo 'active';?>">
                         <a href="{{ url('etotal') }}" class="nav-link nav-toggle">
@@ -466,6 +515,8 @@
                         </a>
 
                     </li>
+					@endpermission
+					@permission('seller-tab-show')
 					<li class="nav-item <?php if($action=='sellertab') echo 'active';?>">
                         <a href="{{ url('sellertab') }}" class="nav-link nav-toggle">
                             <i class="fa fa-wrench"></i>
@@ -475,6 +526,8 @@
                         </a>
 
                     </li>
+					@endpermission
+					@permission('review-tab-show')
 					<li class="nav-item <?php if($action=='rs') echo 'active';?>">
                         <a href="{{ url('rs') }}" class="nav-link nav-toggle">
                             <i class="fa fa-wrench"></i>
@@ -484,7 +537,8 @@
                         </a>
 
                     </li>
-					<?php } ?>
+					@endpermission
+					@permission('data-statistics')
 					<li class="nav-item <?php if($action=='total') echo 'active';?>">
                         <a href="{{ url('total') }}" class="nav-link nav-toggle">
                             <i class="fa fa-download"></i>
@@ -493,7 +547,8 @@
 
                         </a>
                     </li>
-
+					@endpermission
+					@permission('sales-management')
 					<li class="nav-item <?php if($action=='seller') echo 'active';?>">
                         <a href="{{ url('seller') }}" class="nav-link nav-toggle">
                             <i class="fa fa-tasks"></i>
@@ -501,7 +556,8 @@
                             <?php if($action=='seller') echo '<span class="selected"></span>';?>
                         </a>
                     </li>
-
+					@endpermission
+					@permission('distribution-analysis-show')
 
 					<li class="nav-item <?php if($action=='tran') echo 'active';?>">
                         <a href="{{ url('tran') }}" class="nav-link nav-toggle">
@@ -510,7 +566,8 @@
                             <?php if($action=='tran') echo '<span class="selected"></span>';?>
                         </a>
                     </li>
-					
+					@endpermission
+					@permission('fee-split-show')		
 					<li class="nav-item <?php if($action=='fees') echo 'active';?>">
                         <a href="{{ url('fees') }}" class="nav-link nav-toggle">
                             <i class="fa fa-dollar"></i>
@@ -518,7 +575,8 @@
                             <?php if($action=='fees') echo '<span class="selected"></span>';?>
                         </a>
                     </li>
-					
+					@endpermission
+					@permission('mcforders')
 					<li class="nav-item <?php if($action=='mcforder') echo 'active';?>">
                         <a href="{{ url('mcforder') }}" class="nav-link nav-toggle">
                             <i class="fa fa-sticky-note-o"></i>
@@ -526,7 +584,8 @@
                             <?php if($action=='mcforder') echo '<span class="selected"></span>';?>
                         </a>
                     </li>
-					
+					@endpermission
+					@permission('price-model')
 					
 					<li class="nav-item <?php if($action=='price') echo 'active';?>">
                         <a href="{{ url('price') }}" class="nav-link nav-toggle">
@@ -535,7 +594,8 @@
                             <?php if($action=='price') echo '<span class="selected"></span>';?>
                         </a>
                     </li>
-					
+					@endpermission
+					@permission('auto-price-show')
 					<li class="nav-item <?php if($action=='autoprice') echo 'active';?>">
                         <a href="{{ url('autoprice') }}" class="nav-link nav-toggle">
                             <i class="fa fa-area-chart"></i>
@@ -543,6 +603,8 @@
                             <?php if($action=='autoprice') echo '<span class="selected"></span>';?>
                         </a>
                     </li>
+					@endpermission
+					@permission('sales-prediction-show')
 					<li class="nav-item <?php if($action=='salesp') echo 'active';?>">
                         <a href="{{ url('salesp') }}" class="nav-link nav-toggle">
                             <i class="fa fa-shopping-cart"></i>
@@ -550,6 +612,8 @@
                             <?php if($action=='salesp') echo '<span class="selected"></span>';?>
                         </a>
                     </li>
+					@endpermission
+					@permission('sales-report-show')
 					<li class="nav-item <?php if($action=='skus') echo 'active';?>">
                         <a href="{{ url('skus') }}" class="nav-link nav-toggle">
                             <i class="fa fa-calendar"></i>
@@ -557,7 +621,8 @@
                             <?php if($action=='skus') echo '<span class="selected"></span>';?>
                         </a>
                     </li>
-					
+					@endpermission
+					@permission('rsgproducts-show')
 					<li class="nav-item <?php if($action=='rsgproducts') echo 'active';?>">
                         <a href="{{ url('rsgproducts') }}" class="nav-link nav-toggle">
                             <i class="fa fa-gift"></i>
@@ -565,7 +630,8 @@
                             <?php if($action=='rsgproducts') echo '<span class="selected"></span>';?>
                         </a>
                     </li>
-					
+					@endpermission
+					@permission('rsgrequests-show')
 					<li class="nav-item <?php if($action=='rsgrequests') echo 'active';?>">
                         <a href="{{ url('rsgrequests') }}" class="nav-link nav-toggle">
                             <i class="fa fa-gift"></i>
@@ -573,6 +639,7 @@
                             <?php if($action=='rsgrequests') echo '<span class="selected"></span>';?>
                         </a>
                     </li>
+					@endpermission
                 </ul>
                 <!-- END SIDEBAR MENU -->
                 <!-- END SIDEBAR MENU -->

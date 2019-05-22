@@ -33,7 +33,7 @@ class AccountController extends Controller
      */
     public function index()
     {
-        if(!Auth::user()->admin) die();
+        if(!Auth::user()->can(['accounts-show'])) die('Permission denied -- accounts-show');
         $seller_accounts = Accounts::get()->toArray();
         return view('account/index',['seller_accounts'=>$seller_accounts]);
 
@@ -41,14 +41,14 @@ class AccountController extends Controller
 
     public function create()
     {
-        if(!Auth::user()->admin) die();
+        if(!Auth::user()->can(['accounts-create'])) die('Permission denied -- accounts-create');
         return view('account/add');
     }
 
 
     public function store(Request $request)
     {
-        if(!Auth::user()->admin) die();
+        if(!Auth::user()->can(['accounts-create'])) die('Permission denied -- accounts-create');
         $this->validate($request, [
             'account_email' => 'required|email',
             'account_name' => 'required|string',
@@ -97,7 +97,7 @@ class AccountController extends Controller
 
     public function destroy(Request $request,$id)
     {
-        if(!Auth::user()->admin) die();
+        if(!Auth::user()->can(['accounts-delete'])) die('Permission denied -- accounts-delete');
         Accounts::where('id',$id)->delete();
         $request->session()->flash('success_message','Delete Account Success');
         return redirect('account');
@@ -105,7 +105,7 @@ class AccountController extends Controller
 
     public function edit(Request $request,$id)
     {
-        if(!Auth::user()->admin) die();
+        if(!Auth::user()->can(['accounts-show'])) die('Permission denied -- accounts-show');
         $seller_account = Accounts::where('id',$id)->first()->toArray();
         if(!$seller_account){
             $request->session()->flash('error_message','Account not Exists');
@@ -116,7 +116,7 @@ class AccountController extends Controller
 
     public function update(Request $request,$id)
     {
-        if(!Auth::user()->admin) die();
+        if(!Auth::user()->can(['accounts-update'])) die('Permission denied -- accounts-update');
 
         $this->validate($request, [
             'account_email' => 'required|email',

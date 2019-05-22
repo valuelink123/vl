@@ -31,7 +31,7 @@ class AutoController extends Controller
      */
     public function index()
     {
-        if(!Auth::user()->admin) die();
+		if(!Auth::user()->can(['auto-reply-show'])) die('Permission denied -- auto-reply-show');
         $autos = Auto::get()->toArray();
         $users_array = $this->getUsers();
         return view('auto/index',['rules'=>$autos,'users'=>$users_array]);
@@ -58,14 +58,14 @@ class AutoController extends Controller
 
     public function create()
     {
-        if(!Auth::user()->admin) die();
+        if(!Auth::user()->can(['auto-reply-create'])) die('Permission denied -- auto-reply-create');
         return view('auto/add',['users'=>$this->getUsers(),'accounts'=>$this->getAccounts()]);
     }
 
 
     public function store(Request $request)
     {
-        if(!Auth::user()->admin) die();
+        if(!Auth::user()->can(['auto-reply-create'])) die('Permission denied -- auto-reply-create');
         $this->validate($request, [
             'priority' => 'required|int',
             'rule_name' => 'required|string',
@@ -99,7 +99,7 @@ class AutoController extends Controller
 
     public function destroy(Request $request,$id)
     {
-        if(!Auth::user()->admin) die();
+        if(!Auth::user()->can(['auto-reply-delete'])) die('Permission denied -- auto-reply-delete');
         Auto::where('id',$id)->delete();
         $request->session()->flash('success_message','Delete Auto Reply Success');
         return redirect('auto');
@@ -107,7 +107,7 @@ class AutoController extends Controller
 
     public function edit(Request $request,$id)
     {
-        if(!Auth::user()->admin) die();
+        if(!Auth::user()->can(['auto-reply-show'])) die('Permission denied -- auto-reply-show');
         $auto= Auto::where('id',$id)->first()->toArray();
         if(!$auto){
             $request->session()->flash('error_message','Auto Reply not Exists');
@@ -118,7 +118,8 @@ class AutoController extends Controller
 
     public function update(Request $request,$id)
     {
-        if(!Auth::user()->admin) die();
+		
+        if(!Auth::user()->can(['auto-reply-update'])) die('Permission denied -- auto-reply-update');
         $this->validate($request, [
             'priority' => 'required|int',
             'rule_name' => 'required|string',

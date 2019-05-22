@@ -41,17 +41,12 @@ class InboxController extends Controller
      */
     public function index($type = '')
     {
-
+		if(!Auth::user()->can(['inbox-show'])) die('Permission denied -- inbox-show');
         return view('inbox/index',['users'=>$this->getUsers(),'groups'=>$this->getGroups(),'type'=>$type,'mygroups'=>$this->getUserGroup()]);
 		
 
     }
 
-    public function create()
-    {
-		
-        return view('account/add');
-    }
 
 	public function getCategoryJson(Request $request){
 
@@ -108,6 +103,7 @@ class InboxController extends Controller
 
     function change(Request $request){
 
+	   if(!Auth::user()->can(['inbox-update'])) die('Permission denied -- inbox-update');
        $id = intval($request->get('inbox_id'));
        if($id){
            $inbox = Inbox::findOrFail($id);
@@ -165,6 +161,7 @@ class InboxController extends Controller
 
     public function show($id)
     {
+		if(!Auth::user()->can(['inbox-show'])) die('Permission denied -- inbox-show');
         $email = Inbox::where('id',$id)->first();
 
         //$email->toArray();
@@ -240,7 +237,7 @@ class InboxController extends Controller
         /*
    * Paging
    */
-
+		if(!Auth::user()->can(['inbox-show'])) die('Permission denied -- inbox-show');
         $orderby = 'date';
         $sort = 'desc';
         if(isset($_REQUEST['order'][0])){
@@ -254,6 +251,7 @@ class InboxController extends Controller
         }
 
         if (isset($_REQUEST["customActionType"]) && $_REQUEST["customActionType"] == "group_action") {
+			if(!Auth::user()->can(['inbox-batch-update'])) die('Permission denied -- inbox-batch-update');
             $updateDate=array();
             if(isset($_REQUEST['replyStatus']) && $_REQUEST['replyStatus']!=''){
                 $updateDate['reply'] = $_REQUEST['replyStatus'];

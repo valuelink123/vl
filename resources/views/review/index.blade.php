@@ -52,7 +52,7 @@ th,td,td>span {
                                                                     </span>
                             </div>
                         </div>
-						<?php if(Auth::user()->admin){ ?>
+						@permission('review-batch-update')
 						<div class="col-md-2">
 						<select class="mt-multiselect btn btn-default " multiple="multiple" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" name="user_id[]" id="user_id[]">
                                         @foreach ($users as $user_id=>$user_name)
@@ -60,7 +60,7 @@ th,td,td>span {
                                         @endforeach
                                     </select>
 						</div>
-						<?php } ?>
+						@endpermission
 						<div class="col-md-2">
 						<select class="mt-multiselect btn btn-default" multiple="multiple" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" name="asin_status[]" id="asin_status[]" >
                                         @foreach ($asin_status as $key=>$v)
@@ -180,7 +180,7 @@ th,td,td>span {
                     </form>
 					
 					
-					
+					@permission('review-import')
 					<div class="row" style="margin-top:30px">
                         <div class="col-md-4">
                             
@@ -205,11 +205,12 @@ th,td,td>span {
 						</form>
 						
 					</div>
+					@endpermission
 					
 					
 					
                 </div>
-				
+				@permission('review-batch-update')
                 <div class="portlet-title">
                     <div class="caption font-dark">
                         <i class="icon-settings font-dark"></i>
@@ -234,7 +235,7 @@ th,td,td>span {
                                </div>
                             </div>
                 </div>
-
+				@endpermission	
                 <div class="portlet-body">
 
                     <div class="table-container">

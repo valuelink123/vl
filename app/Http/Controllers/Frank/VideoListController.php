@@ -16,11 +16,12 @@ class VideoListController extends Controller {
     use \App\Traits\DataTables;
 
     public function index() {
+		if(!Auth::user()->can(['video-show'])) die('Permission denied -- video-show');
         return view('frank/kmsVideoList');
     }
 
     public function import() {
-
+		if(!Auth::user()->can(['video-create'])) die('Permission denied -- video-create');
         // 一对多关系，很实用的 SQL 语句
         $rows = $this->queryRows('SELECT item_group,brand,GROUP_CONCAT(DISTINCT item_model) AS item_models FROM asin GROUP BY item_group,brand');
 
@@ -34,7 +35,7 @@ class VideoListController extends Controller {
     }
 
     public function create(Request $req) {
-
+		if(!Auth::user()->can(['video-create'])) die('Permission denied -- video-create');
         try {
             $videoTypes = $this->enumOptions('kms_video', 'type');
             $count = KmsVideo::import($req, $videoTypes);

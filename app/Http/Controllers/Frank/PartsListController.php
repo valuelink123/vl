@@ -19,6 +19,7 @@ class PartsListController extends Controller {
     use \App\Traits\DataTables;
 
     public function index() {
+		if(!Auth::user()->can(['partslist-show'])) die('Permission denied -- partslist-show');
         return view('frank/kmsPartsList');
     }
 
@@ -75,7 +76,7 @@ class PartsListController extends Controller {
      * @throws \App\Traits\MysqliException
      */
     public function get(Request $req) {
-
+		if(!Auth::user()->can(['partslist-show'])) die('Permission denied -- partslist-show');
         $where = $this->dtWhere($req, ['item_code', 'item_name', 'asin', 'seller_id', 'seller_name', 'seller_sku'], ['item_group' => 't3.item_group', 'brand' => 't3.brand', 'item_model' => 't3.item_model']);
 
         $orderby = $this->dtOrderBy($req);

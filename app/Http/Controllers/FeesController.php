@@ -32,6 +32,7 @@ class FeesController extends Controller
      */
     public function index()
     {
+		if(!Auth::user()->can(['fee-split-show'])) die('Permission denied -- fee-split-show');
 		$date_from=date('Y-m-d',strtotime('-90 days'));		
 		$date_to=date('Y-m-d');	
 	
@@ -65,6 +66,7 @@ class FeesController extends Controller
 	
     public function getads(Request $request)
     {
+		if(!Auth::user()->can(['fee-split-show'])) die('Permission denied -- fee-split-show');
 		$orderby = $request->input('order.0.column',1);
 		if($orderby==7){
 			$orderby = 'TransactionValue';
@@ -75,7 +77,7 @@ class FeesController extends Controller
 		$users= $this->getUsers();
 		$error_message='';
         if ($request->input("customsku") && $request->input("customuserid") && $request->input("customActionType") == "group_action") {
-			   //$sap_seller_id =  Auth::user()->sap_seller_id;
+			   if(!Auth::user()->can(['fee-split-update'])) die('Permission denied -- fee-split-update');
 			   $customskus = explode('/',trim($request->input("customsku")));
 			   $exists_skus = Asin::whereIn('item_no',$customskus)->groupBy('item_no')->get(['item_no'])->count();
 
@@ -147,6 +149,7 @@ class FeesController extends Controller
 	
 	public function getdeal(Request $request)
     {
+		if(!Auth::user()->can(['fee-split-show'])) die('Permission denied -- fee-split-show');
 		$orderby = $request->input('order.0.column',1);
 		if($orderby==7){
 			$orderby = 'TotalAmount';
@@ -157,7 +160,7 @@ class FeesController extends Controller
 		$users= $this->getUsers();
 		$error_message='';
         if ($request->input("customsku") && $request->input("customuserid") &&  $request->input("customActionType") == "group_action") {
-			//$sap_seller_id = Auth::user()->sap_seller_id;
+			if(!Auth::user()->can(['fee-split-update'])) die('Permission denied -- fee-split-update');
 			$customskus = explode('/',trim($request->input("customsku")));
 			   $exists_skus = Asin::whereIn('item_no',$customskus)->groupBy('item_no')->get(['item_no'])->count();
 
@@ -227,6 +230,7 @@ class FeesController extends Controller
 	
 	public function getcoupon(Request $request)
     {
+		if(!Auth::user()->can(['fee-split-show'])) die('Permission denied -- fee-split-show');
 		$orderby = $request->input('order.0.column',1);
 		if($orderby==7){
 			$orderby = 'TotalAmount';
@@ -237,7 +241,7 @@ class FeesController extends Controller
 		$users= $this->getUsers();
 		$error_message='';
         if ($request->input("customsku") && $request->input("customuserid") && $request->input("customActionType") == "group_action") {
-			   //$sap_seller_id = Auth::user()->sap_seller_id;
+			   if(!Auth::user()->can(['fee-split-update'])) die('Permission denied -- fee-split-update');
 			   $customskus = explode('/',trim($request->input("customsku")));
 			   $exists_skus = Asin::whereIn('item_no',$customskus)->groupBy('item_no')->get(['item_no'])->count();
 
@@ -308,6 +312,7 @@ class FeesController extends Controller
 	
 	public function getservice(Request $request)
     {
+		if(!Auth::user()->can(['fee-split-show'])) die('Permission denied -- fee-split-show');
 		$orderby = $request->input('order.0.column',1);
 		if($orderby==7){
 			$orderby = 'Amount';
@@ -318,7 +323,7 @@ class FeesController extends Controller
 		$users= $this->getUsers();
 		$error_message='';
         if ($request->input("customsku") && $request->input("customuserid") && $request->input("customActionType") == "group_action") {
-			//$sap_seller_id = Auth::user()->sap_seller_id;
+			if(!Auth::user()->can(['fee-split-update'])) die('Permission denied -- fee-split-update');
 			$customskus = explode('/',trim($request->input("customsku")));
 			   $exists_skus = Asin::whereIn('item_no',$customskus)->groupBy('item_no')->get(['item_no'])->count();
 
@@ -389,10 +394,11 @@ class FeesController extends Controller
 	
 	public function getcpc(Request $request)
     {	
+		if(!Auth::user()->can(['fee-split-show'])) die('Permission denied -- fee-split-show');
 		$users= $this->getUsers();
 		$error_message='';
         if ($request->input("customsku") && $request->input("customuserid") && $request->input("customActionType") == "group_action") {
-			//$sap_seller_id = Auth::user()->sap_seller_id;
+			if(!Auth::user()->can(['fee-split-update'])) die('Permission denied -- fee-split-update');
 			$customskus = explode('/',trim($request->input("customsku")));
 			   $exists_skus = Asin::whereIn('item_no',$customskus)->groupBy('item_no')->get(['item_no'])->count();
 

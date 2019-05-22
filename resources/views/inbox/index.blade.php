@@ -11,6 +11,7 @@
                 <div class="portlet-body">
 
                     <div class="table-container">
+						@permission('inbox-batch-update')
                         <div class="table-actions-wrapper">
                             <span> </span>
 							<input type="hidden" id='mailType' value="{{$type}}" />
@@ -41,6 +42,7 @@
                             <button class="btn btn-sm green table-group-action-submit">
                                 <i class="fa fa-check"></i> Change</button>
                         </div>
+						@endpermission
                         <table class="table table-striped table-bordered table-hover table-checkable" id="datatable_ajax_{{$type}}">
                             <thead>
                             <tr role="row" class="heading">
