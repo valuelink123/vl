@@ -469,7 +469,7 @@
 
                     </li>
 					@endpermission
-					@permission('roles-show')		
+					@permission('role-show')		
 					
 					<li class="nav-item <?php if($action=='role') echo 'active';?>">
                         <a href="{{ url('role') }}" class="nav-link nav-toggle">
