@@ -207,6 +207,10 @@ max-width:150px !important;
 					buttons: [
                         { extend: 'csv', className: 'btn purple btn-outline ',filename:'stars' }
                     ],
+					<?php }else{?>
+											
+					buttons: [],
+					
 					<?php } ?>
 					"aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0 , 6,11,12,13,14 ] }],	
 					 "order": [

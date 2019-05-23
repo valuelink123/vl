@@ -181,6 +181,10 @@ th,td,td>span {
 					buttons: [
                         { extend: 'csv', className: 'btn purple btn-outline ',filename:'salesp' }
                     ],
+					<?php }else{?>
+											
+					buttons: [],
+					
 					<?php } ?>
 					 "createdRow": function( row, data, dataIndex ) {
                         $(row).children('td').eq(4).attr('style', 'max-width: 200px;overflow:hidden;white-space:nowrap;text-align: left; ');

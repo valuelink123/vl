@@ -313,6 +313,10 @@ th,td,td>span {
 						buttons: [
 							{ extend: 'csv', className: 'btn purple btn-outline ',filename:'tran' }
 						],
+						<?php }else{?>
+											
+						buttons: [],
+						
 						<?php } ?>
 						"lengthMenu": [
 							[10, 50, 100, -1],

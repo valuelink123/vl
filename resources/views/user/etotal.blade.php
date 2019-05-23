@@ -138,6 +138,10 @@
                     buttons: [
                         { extend: 'csv', className: 'btn purple btn-outline ',filename:'users' }
                     ],
+					<?php }else{?>
+											
+					buttons: [],
+					
 					<?php } ?>
 
                     // scroller extension: http://datatables.net/extensions/scroller/

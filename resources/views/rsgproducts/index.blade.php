@@ -234,6 +234,10 @@ th,td,td>span {
 											buttons: [
 												{ extend: 'csv', className: 'btn purple btn-outline ',filename:'RsgProducts' }
 											],
+											<?php }else{?>
+											
+											buttons: [],
+											
 											<?php } ?>
 											"order": [
 												[2, "desc"]

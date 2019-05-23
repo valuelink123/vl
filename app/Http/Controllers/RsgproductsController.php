@@ -56,7 +56,7 @@ class RsgproductsController extends Controller
 		}
         $sort = $request->input('order.0.dir','desc');
         if ($request->input("customActionType") == "group_action") {
-				if(!Auth::user()->can(['rsgproducts-batch-update'])) die('Permission denied -- rsgproducts-batch-update');
+			   if(!Auth::user()->can(['rsgproducts-batch-update'])) die('Permission denied -- rsgproducts-batch-update');
 			   $updateDate = [];
 			   $updateDate['status'] = $request->get("customstatus")?$request->get("customstatus"):0;
 			   RsgProduct::whereIn('id',$request->input("id"))->update($updateDate);
