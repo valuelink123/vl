@@ -8,7 +8,8 @@
 }
 
 table.dataTable thead th, table.dataTable thead td {
-    padding: 10px 2px !important;}
+    padding: 10px 2px !important;
+	}
 table.dataTable tbody th, table.dataTable tbody td {
     padding: 10px 2px;
 }
@@ -171,7 +172,7 @@ white-space: nowrap;
 						$curr_date = date('Ymd',strtotime($date_start));
 						$d_number = (date('w',strtotime($date_start))==0)?6:(date('w',strtotime($date_start))-1);
 						
-						$target_sold = round(array_get($oa_data,array_get($site_code,str_replace('.','_',$data->site)).'-'.$data->item_code.'.xiaol'.date('n',strtotime($date_start)),0),2);
+						$target_sold = round(array_get($oa_data,str_replace('.','',$data->site).'-'.$data->item_code.'.xiaol'.date('n',strtotime($date_start)),0),2);
 						if($target_sold>0){
 							$complete_sold = round(array_get($sap_data,str_replace('.','',$data->site).'-'.$data->item_code.'.VV001',0)/$target_sold*100,2);
 						}elseif($target_sold<0){
@@ -180,7 +181,7 @@ white-space: nowrap;
 							$complete_sold =0;
 						}
 						
-						$target_sales = round(array_get($oa_data,array_get($site_code,str_replace('.','_',$data->site)).'-'.$data->item_code.'.xiaose'.date('n',strtotime($date_start)),0),2);
+						$target_sales = round(array_get($oa_data,str_replace('.','',$data->site).'-'.$data->item_code.'.xiaose'.date('n',strtotime($date_start)),0),2);
 						if($target_sales>0){
 							$complete_sales = round(array_get($sap_data,str_replace('.','',$data->site).'-'.$data->item_code.'.VSRHJ',0)/$target_sales*100,2);
 						}elseif($target_sales<0){
@@ -190,7 +191,7 @@ white-space: nowrap;
 						}
 						
 						
-						$target_pro = round(array_get($oa_data,array_get($site_code,str_replace('.','_',$data->site)).'-'.$data->item_code.'.yewlr'.date('n',strtotime($date_start)),0),2);
+						$target_pro = round(array_get($oa_data,str_replace('.','',$data->site).'-'.$data->item_code.'.yewlr'.date('n',strtotime($date_start)),0),2);
 						if($target_pro>0){
 							$complete_pro = round(array_get($sap_data,str_replace('.','',$data->site).'-'.$data->item_code.'.VVVVV',0)/$target_pro*100,2);
 						}elseif($target_pro<0){
@@ -212,7 +213,7 @@ white-space: nowrap;
 							<td colspan="3"width="32%" style="font-weight: bold;">Description</td>
 						  </tr>
 						  <tr>
-							<td rowspan="16">{{$data->item_code}}</td>
+							<td rowspan="16" style="word-wrap: break-word;">{{$data->item_code}}</td>
 							<td rowspan="16"> {{array_get($users,$data->sap_seller_id,$data->sap_seller_id)}} </td>
 							<td rowspan="16">{{$data->bg}}</td>
 							<td rowspan="16">{{$data->bu}}</td>
@@ -220,7 +221,7 @@ white-space: nowrap;
 							<td>{{strtoupper(substr(strrchr($data->site, '.'), 1))}}</td>
 							<td colspan="3" class="keyword_s"><a class="sku_keywords" href="javascript:;" id="{{$data->site.'-'.$data->asin.'-'.$curr_date}}-keywords" data-pk="{{$data->site.'-'.$data->asin.'-'.$curr_date}}-keywords" data-type="text"> {{array_get($datas_details,str_replace('.','',$data->site).'-'.$data->asin.'-'.$curr_date.'.keywords')?array_get($datas_details,str_replace('.','',$data->site).'-'.$data->asin.'-'.$curr_date.'.keywords'):array_get($last_keywords,str_replace('.','',$data->site).'-'.$data->asin)}} </a></td>
 							<td>{!!($data->status)?'<span class="btn btn-success btn-xs">Reserved</span>':'<span class="btn btn-danger btn-xs">Eliminate</span>'!!}</td>
-							<td>{{$data->pro_status}}</td>
+							<td>{{(($data->pro_status==0)?'S':$data->pro_status)}}</td>
 							<td colspan="3">{{$data->item_name}}</td>
 						  </tr>
 						  <tr>
@@ -355,7 +356,7 @@ white-space: nowrap;
 								<div class="col-md-6">
 								<div class="progress">
 									<span style="width: 100%;" class="progress-bar progress-bar-success blue-sharp">
-										{{array_get($oa_data,array_get($site_code,str_replace('.','_',$data->site)).'-'.$data->item_code.'.xiaose'.date('n',strtotime($date_start)),0)}}
+										{{array_get($oa_data,str_replace('.','',$data->site).'-'.$data->item_code.'.xiaose'.date('n',strtotime($date_start)),0)}}
 									</span>
 								</div>
 								</div>
@@ -463,7 +464,7 @@ white-space: nowrap;
 								<div class="col-md-6">
 								<div class="progress">
 									<span style="width: 100%;" class="progress-bar progress-bar-success blue-sharp">
-										{{array_get($oa_data,array_get($site_code,str_replace('.','_',$data->site)).'-'.$data->item_code.'.yewlr'.date('n',strtotime($date_start)),0)}}
+										{{array_get($oa_data,str_replace('.','',$data->site).'-'.$data->item_code.'.yewlr'.date('n',strtotime($date_start)),0)}}
 									</span>
 								</div>
 								</div>

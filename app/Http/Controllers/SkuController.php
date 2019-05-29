@@ -42,17 +42,16 @@ class SkuController extends Controller
 	    $date_start = $request->get('date_start')?$request->get('date_start'):date('Y-m-d',strtotime('+ 8hours'));
 		$week = self::getWeek($date_start);
 
-		
+		$where= "where length(trim(asin))=10";
 		
 		if (Auth::user()->seller_rules) {
 			$rules = explode("-",Auth::user()->seller_rules);
-			$where= "where 1=1";
 			if(array_get($rules,0)!='*') $where.= " and a.bg='".array_get($rules,0)."'";
 			if(array_get($rules,1)!='*') $where.= " and a.bu='".array_get($rules,1)."'";
 		} elseif (Auth::user()->sap_seller_id) {
-			$where= "where a.sap_seller_id=".Auth::user()->sap_seller_id;
+			$where.= " and a.sap_seller_id=".Auth::user()->sap_seller_id;
 		} else {
-			$where= "where 1=1";
+		
 		}
 		if($bgbu){
 		   $bgbu_arr = explode('_',$bgbu);
@@ -71,21 +70,25 @@ class SkuController extends Controller
 		}
 		
 		if($level){
-			$where.= " and a.pro_status = '".$level."'";
+			$where.= " and a.pro_status = '".(($level=='S')?0:$level)."'";
 		}
 		
 		if($sku){
-			$where.= " and (a.asin='".$sku."' or a.item_code='".$sku."')";
+			$where.= " and (a.asin='".$sku."' or a.item_code like '%".$sku."%')";
 		}
 		
 		
-		$sql = "(select a.asin,a.site,a.item_code,a.status,a.pro_status,a.bg,a.bu,a.sap_seller_id,
-		b.item_name
-from (select asin,site,max(item_no) as item_code,max(item_status) as status,max(status) as pro_status, max(bg) as bg,max(bu) as bu,max(sap_seller_id) as sap_seller_id from asin group by asin,site) as a
-left join fbm_stock as b on a.item_code =b.item_code
- ".$where." order by a.item_code asc ) as sku_tmp_cc";
+		$sql = "(select asin,site,GROUP_CONCAT(a.item_no) as item_code,GROUP_CONCAT(b.item_name) as item_name,max(item_status) as status,
+min(status) as pro_status, max(bg) as bg,max(bu) as bu,max(sap_seller_id) as sap_seller_id,count(*) as count
+from 
+
+(select asin,site,item_no,max(item_status) as item_status,
+min(case when status = 'S' Then '0' else status end) as status, 
+max(bg) as bg,max(bu) as bu,max(sap_seller_id) as sap_seller_id from asin group by asin,site,item_no)
+
+ as a left join fbm_stock as b on a.item_no=b.item_code $where  group by asin,site order by pro_status asc ) as sku_tmp_cc";
  		$datas = DB::table(DB::raw($sql))->paginate(5);
-		$date_arr=$asin_site_arr=$sku_site_arr=$datas_details=$oa_data=$sap_data=$last_keywords=[];
+		$date_arr=$asin_site_arr=$datas_details=$oa_data=$sap_data=$last_keywords=[];
 		$site_code['www_amazon_com']='US';
 		$site_code['www_amazon_ca']='CA';
 		$site_code['www_amazon_de']='DE';
@@ -96,35 +99,82 @@ left join fbm_stock as b on a.item_code =b.item_code
 		$site_code['www_amazon_co_jp']='JP';
 		$sap = new SapRfcRequest();
 		foreach($datas as $data){
+			$sku_site_arr=[];
 			$asin_site_arr[] = "(asin = '".$data->asin."' and site='".$data->site."')";
-			$sku_site_arr[] = "(SKU = '".$data->item_code."' and zhand='".array_get($site_code,str_replace('.','_',$data->site),'')."')";
+			$match_sku = explode(',',$data->item_code);
+			if(count($match_sku)>1){
+				$vv001=$vsrhj=$vvvvv=0;
+				foreach($match_sku as $k=>$v){
+					$sku_site_arr[] = "(SKU = '".$v."' and zhand='".array_get($site_code,str_replace('.','_',$data->site),'')."')";
+					
+					$rows = $sap->getTureSales(['sku' => $v,'site' => array_get(array_flip(getSapSiteCode()),str_replace('www.','',$data->site)),'month' => date('Ym',strtotime($date_start))]);
+					$s_vv001 = array_get($rows,'1.VV001');
+					if(substr($s_vv001, -1) =='-'){
+						$s_vv001 = round('-'.rtrim($s_vv001, "-"),2);
+					}else{
+						$s_vv001 = round($s_vv001,2);
+					}
+					$s_vsrhj = array_get($rows,'1.VSRHJ');
+					if(substr($s_vsrhj, -1) =='-'){
+						$s_vsrhj = round('-'.rtrim($s_vsrhj, "-"),2);
+					}else{
+						$s_vsrhj = round($s_vsrhj,2);
+					}
+					$s_vvvvv = array_get($rows,'1.VVVVV');
+					if(substr($s_vvvvv, -1) =='-'){
+						$s_vvvvv = round('-'.rtrim($s_vvvvv, "-"),2);
+					}else{
+						$s_vvvvv = round($s_vvvvv,2);
+					}
+					$vv001+=$s_vv001;
+					$vsrhj+=$s_vsrhj;
+					$vvvvv+=$s_vvvvv;
+				}
+				
+				
 			
-			$last_keywords[str_replace('.','',$data->site).'-'.$data->asin]=Skusweekdetails::where('asin',$data->asin)->where('site',$data->site)->whereNotNull('keywords')->orderBy('weeks','desc')->take(1)->value('keywords');
+			}else{
+				$sku_site_arr[] = "(SKU = '".$data->item_code."' and zhand='".array_get($site_code,str_replace('.','_',$data->site),'')."')";
+				
+				$rows = $sap->getTureSales(['sku' => $data->item_code,'site' => array_get(array_flip(getSapSiteCode()),str_replace('www.','',$data->site)),'month' => date('Ym',strtotime($date_start))]);
+				$vv001 = array_get($rows,'1.VV001');
+				if(substr($vv001, -1) =='-'){
+					$vv001 = round('-'.rtrim($vv001, "-"),2);
+				}else{
+					$vv001 = round($vv001,2);
+				}
+				$vsrhj = array_get($rows,'1.VSRHJ');
+				if(substr($vsrhj, -1) =='-'){
+					$vsrhj = round('-'.rtrim($vsrhj, "-"),2);
+				}else{
+					$vsrhj = round($vsrhj,2);
+				}
+				$vvvvv = array_get($rows,'1.VVVVV');
+				if(substr($vvvvv, -1) =='-'){
+					$vvvvv = round('-'.rtrim($vvvvv, "-"),2);
+				}else{
+					$vvvvv = round($vvvvv,2);
+				}
+			}
 			
-			$rows = $sap->getTureSales(['sku' => $data->item_code,'site' => array_get(array_flip(getSapSiteCode()),str_replace('www.','',$data->site)),'month' => date('Ym',strtotime($date_start))]);
-			$vv001 = array_get($rows,'1.VV001');
-			if(substr($vv001, -1) =='-'){
-				$vv001 = round('-'.rtrim($vv001, "-"),2);
-			}else{
-				$vv001 = round($vv001,2);
-			}
-			$vsrhj = array_get($rows,'1.VSRHJ');
-			if(substr($vsrhj, -1) =='-'){
-				$vsrhj = round('-'.rtrim($vsrhj, "-"),2);
-			}else{
-				$vsrhj = round($vsrhj,2);
-			}
-			$vvvvv = array_get($rows,'1.VVVVV');
-			if(substr($vvvvv, -1) =='-'){
-				$vvvvv = round('-'.rtrim($vvvvv, "-"),2);
-			}else{
-				$vvvvv = round($vvvvv,2);
-			}
+			
+			$oa_datas = DB::connection('oa')->table('formtable_main_193_dt1')->whereRaw('('.implode(' or ',$sku_site_arr).')')->get();
+			
+				$oa_datas=json_decode(json_encode($oa_datas), true);
+				foreach($oa_datas as $od){
+					$oa_data[str_replace('.','',$data->site).'-'.$data->item_code] = $od;
+				}
+				
 			$sap_data[str_replace('.','',$data->site).'-'.$data->item_code] = array(
 				'VV001'=>$vv001,
 				'VSRHJ'=>$vsrhj,
 				'VVVVV'=>$vvvvv,
 			);
+			
+			$last_keywords[str_replace('.','',$data->site).'-'.$data->asin]=Skusweekdetails::where('asin',$data->asin)->where('site',$data->site)->whereNotNull('keywords')->orderBy('weeks','desc')->take(1)->value('keywords');
+			
+			
+			
 			
  		}
 		for($i=7;$i>=0;$i--){
@@ -141,12 +191,7 @@ left join fbm_stock as b on a.item_code =b.item_code
 			}
 			
 			
-			$oa_datas = DB::connection('oa')->table('formtable_main_193_dt1')->whereRaw('('.implode(' or ',$sku_site_arr).')')->get();
 			
-			$oa_datas=json_decode(json_encode($oa_datas), true);
-			foreach($oa_datas as $od){
-				$oa_data[$od['zhand'].'-'.$od['SKU']] = $od;
-			}
 		}
    
         $returnDate['teams']= DB::select('select bg,bu from asin group by bg,bu ORDER BY BG ASC,BU ASC');
@@ -181,16 +226,15 @@ left join fbm_stock as b on a.item_code =b.item_code
 		$week = self::getWeek($date_start);
 
 		
-		
+		$where= " length(trim(asin))=10";
 		if (Auth::user()->seller_rules) {
 			$rules = explode("-",Auth::user()->seller_rules);
-			$where= "1=1";
 			if(array_get($rules,0)!='*') $where.= " and bg='".array_get($rules,0)."'";
 			if(array_get($rules,1)!='*') $where.= " and bu='".array_get($rules,1)."'";
 		} elseif (Auth::user()->sap_seller_id) {
-			$where= "sap_seller_id=".Auth::user()->sap_seller_id;
+			$where.= "sap_seller_id=".Auth::user()->sap_seller_id;
 		} else {
-			$where= "1=1";
+			
 		}
 		if($bgbu){
 		   $bgbu_arr = explode('_',$bgbu);
@@ -213,16 +257,21 @@ left join fbm_stock as b on a.item_code =b.item_code
 		}
 		
 		if($sku){
-			$where.= " and (asin='".$sku."' or item_code='".$sku."')";
+			$where.= " and (asin='".$sku."' or item_code like '%".$sku."%')";
 		}
 		
 			
 		$month = date('Ym',strtotime($date_start));
         $datas=Skusweekdetails::whereRaw("left(weeks,6)='".$month."' ")->whereRaw($where)
-			->leftJoin(DB::raw('(select a.asin as asin_p,a.site as site_p,a.item_code,a.status,a.pro_status,a.bg,a.bu,a.sap_seller_id,
-		b.item_name
-from (select asin,site,max(item_no) as item_code,max(item_status) as status,max(status) as pro_status, max(bg) as bg,max(bu) as bu,max(sap_seller_id) as sap_seller_id from asin group by asin,site) as a
-left join fbm_stock as b on a.item_code =b.item_code ) as sku_tmp_cc'),function($q){
+			->leftJoin(DB::raw("(select asin as asin_p,site as site_p,GROUP_CONCAT(a.item_no) as item_code,GROUP_CONCAT(b.item_name) as item_name,max(item_status) as status,
+min(status) as pro_status, max(bg) as bg,max(bu) as bu,max(sap_seller_id) as sap_seller_id,count(*) as count
+from 
+
+(select asin,site,item_no,max(item_status) as item_status,
+min(case when status = 'S' Then '0' else status end) as status, 
+max(bg) as bg,max(bu) as bu,max(sap_seller_id) as sap_seller_id from asin group by asin,site,item_no)
+
+ as a left join fbm_stock as b on a.item_no=b.item_code   group by asin,site order by pro_status asc ) as sku_tmp_cc"),function($q){
 				$q->on('skus_week_details.asin', '=', 'sku_tmp_cc.asin_p')
 				  ->on('skus_week_details.site', '=', 'sku_tmp_cc.site_p');
 			})
@@ -267,7 +316,6 @@ left join fbm_stock as b on a.item_code =b.item_code ) as sku_tmp_cc'),function(
 
 		$arrayData[] = $headArray;
 		$users_array = $this->getUsers();
-		$ex_item_code = $ex_site = '';
 		$site_code['www_amazon_com']='US';
 		$site_code['www_amazon_ca']='CA';
 		$site_code['www_amazon_de']='DE';
@@ -278,20 +326,46 @@ left join fbm_stock as b on a.item_code =b.item_code ) as sku_tmp_cc'),function(
 		$site_code['www_amazon_co_jp']='JP';
 		$sap = new SapRfcRequest();
 		$oa_data=$sap_data=[];
-		foreach ( $datas as $data){
-			if($ex_item_code!=$data['item_code'] || $ex_site!=$data['site']){
-				$ex_item_code=$data['item_code'];
-				$ex_site=$data['site'];
-				
-				$oa_datas = DB::connection('oa')->table('formtable_main_193_dt1')->whereRaw("(SKU = '".$ex_item_code."' and zhand='".array_get($site_code,str_replace('.','_',$ex_site),'')."')")->take(1)->get();
-			
-				$oa_datas=json_decode(json_encode($oa_datas), true);
-				foreach($oa_datas as $od){
-					$oa_data[$od['zhand'].'-'.$od['SKU']] = $od;
+		
+		
+		foreach($datas as $data){
+			$sku_site_arr=[];
+			$match_sku = explode(',',$data['item_code']);
+			if(count($match_sku)>1){
+				$vv001=$vsrhj=$vvvvv=0;
+				foreach($match_sku as $k=>$v){
+					$sku_site_arr[] = "(SKU = '".$v."' and zhand='".array_get($site_code,str_replace('.','_',$data['site']),'')."')";
+					
+					$rows = $sap->getTureSales(['sku' => $v,'site' => array_get(array_flip(getSapSiteCode()),str_replace('www.','',$data['site'])),'month' => date('Ym',strtotime($date_start))]);
+					$s_vv001 = array_get($rows,'1.VV001');
+					if(substr($s_vv001, -1) =='-'){
+						$s_vv001 = round('-'.rtrim($s_vv001, "-"),2);
+					}else{
+						$s_vv001 = round($s_vv001,2);
+					}
+					$s_vsrhj = array_get($rows,'1.VSRHJ');
+					if(substr($s_vsrhj, -1) =='-'){
+						$s_vsrhj = round('-'.rtrim($s_vsrhj, "-"),2);
+					}else{
+						$s_vsrhj = round($s_vsrhj,2);
+					}
+					$s_vvvvv = array_get($rows,'1.VVVVV');
+					if(substr($s_vvvvv, -1) =='-'){
+						$s_vvvvv = round('-'.rtrim($s_vvvvv, "-"),2);
+					}else{
+						$s_vvvvv = round($s_vvvvv,2);
+					}
+					$vv001+=$s_vv001;
+					$vsrhj+=$s_vsrhj;
+					$vvvvv+=$s_vvvvv;
 				}
 				
 				
-				$rows = $sap->getTureSales(['sku' => $ex_item_code,'site' => array_get(array_flip(getSapSiteCode()),str_replace('www.','',$ex_site)),'month' => date('Ym',strtotime($date_start))]);
+			
+			}else{
+				$sku_site_arr[] = "(SKU = '".$data['item_code']."' and zhand='".array_get($site_code,str_replace('.','_',$data['site']),'')."')";
+				
+				$rows = $sap->getTureSales(['sku' => $data['item_code'],'site' => array_get(array_flip(getSapSiteCode()),str_replace('www.','',$data['site'])),'month' => date('Ym',strtotime($date_start))]);
 				$vv001 = array_get($rows,'1.VV001');
 				if(substr($vv001, -1) =='-'){
 					$vv001 = round('-'.rtrim($vv001, "-"),2);
@@ -310,15 +384,30 @@ left join fbm_stock as b on a.item_code =b.item_code ) as sku_tmp_cc'),function(
 				}else{
 					$vvvvv = round($vvvvv,2);
 				}
-				$sap_data[str_replace('.','',$ex_site).'-'.$ex_item_code] = array(
-					'VV001'=>$vv001,
-					'VSRHJ'=>$vsrhj,
-					'VVVVV'=>$vvvvv,
-				);
 			}
 			
 			
-			$target_sold = round(array_get($oa_data,array_get($site_code,str_replace('.','_',$data['site'])).'-'.$data['item_code'].'.xiaol'.date('n',strtotime($date_start)),0),2);
+			$oa_datas = DB::connection('oa')->table('formtable_main_193_dt1')->whereRaw('('.implode(' or ',$sku_site_arr).')')->get();
+			
+				$oa_datas=json_decode(json_encode($oa_datas), true);
+				foreach($oa_datas as $od){
+					$oa_data[str_replace('.','',$data['site']).'-'.$data['item_code']] = $od;
+				}
+				
+			$sap_data[str_replace('.','',$data['site']).'-'.$data['item_code']] = array(
+				'VV001'=>$vv001,
+				'VSRHJ'=>$vsrhj,
+				'VVVVV'=>$vvvvv,
+			);
+			
+			
+			
+ 		
+		
+	
+			
+			
+			$target_sold = round(array_get($oa_data,str_replace('.','',$data['site']).'-'.$data['item_code'].'.xiaol'.date('n',strtotime($date_start)),0),2);
 			if($target_sold>0){
 				$complete_sold = round(array_get($sap_data,str_replace('.','',$data['site']).'-'.$data['item_code'].'.VV001',0)/$target_sold*100,2);
 			}elseif($target_sold<0){
@@ -327,7 +416,7 @@ left join fbm_stock as b on a.item_code =b.item_code ) as sku_tmp_cc'),function(
 				$complete_sold =0;
 			}
 			
-			$target_sales = round(array_get($oa_data,array_get($site_code,str_replace('.','_',$data['site'])).'-'.$data['item_code'].'.xiaose'.date('n',strtotime($date_start)),0),2);
+			$target_sales = round(array_get($oa_data,str_replace('.','',$data['site']).'-'.$data['item_code'].'.xiaose'.date('n',strtotime($date_start)),0),2);
 			if($target_sales>0){
 				$complete_sales = round(array_get($sap_data,str_replace('.','',$data['site']).'-'.$data['item_code'].'.VSRHJ',0)/$target_sales*100,2);
 			}elseif($target_sales<0){
@@ -337,7 +426,7 @@ left join fbm_stock as b on a.item_code =b.item_code ) as sku_tmp_cc'),function(
 			}
 			
 			
-			$target_pro = round(array_get($oa_data,array_get($site_code,str_replace('.','_',$data['site'])).'-'.$data['item_code'].'.yewlr'.date('n',strtotime($date_start)),0),2);
+			$target_pro = round(array_get($oa_data,str_replace('.','',$data['site']).'-'.$data['item_code'].'.yewlr'.date('n',strtotime($date_start)),0),2);
 			if($target_pro>0){
 				$complete_pro = round(array_get($sap_data,str_replace('.','',$data['site']).'-'.$data['item_code'].'.VVVVV',0)/$target_pro*100,2);
 			}elseif($target_pro<0){
@@ -356,7 +445,7 @@ left join fbm_stock as b on a.item_code =b.item_code ) as sku_tmp_cc'),function(
 				$data['bg'],
 				$data['bu'],
 				($data['status'])?'Reserved':'Eliminate',
-				$data['pro_status'],
+				($data['pro_status']==0)?'S':$data['pro_status'],
 				$data['item_name'],
 				$data['weeks'],
 				$data['keywords'],
