@@ -46,31 +46,31 @@ class SkuController extends Controller
 		
 		if (Auth::user()->seller_rules) {
 			$rules = explode("-",Auth::user()->seller_rules);
-			if(array_get($rules,0)!='*') $where.= " and a.bg='".array_get($rules,0)."'";
-			if(array_get($rules,1)!='*') $where.= " and a.bu='".array_get($rules,1)."'";
+			if(array_get($rules,0)!='*') $where.= " and bg='".array_get($rules,0)."'";
+			if(array_get($rules,1)!='*') $where.= " and bu='".array_get($rules,1)."'";
 		} elseif (Auth::user()->sap_seller_id) {
-			$where.= " and a.sap_seller_id=".Auth::user()->sap_seller_id;
+			$where.= " and sap_seller_id=".Auth::user()->sap_seller_id;
 		} else {
 		
 		}
 		if($bgbu){
 		   $bgbu_arr = explode('_',$bgbu);
 		   if(array_get($bgbu_arr,0)){
-				$where.= " and a.bg='".array_get($bgbu_arr,0)."'";
+				$where.= " and bg='".array_get($bgbu_arr,0)."'";
 		   }
 		   if(array_get($bgbu_arr,1)){
-				$where.= " and a.bu='".array_get($bgbu_arr,1)."'";
+				$where.= " and bu='".array_get($bgbu_arr,1)."'";
 		   }
 		}
 		if($site){
-			$where.= " and a.site='".$site."'";
+			$where.= " and site='".$site."'";
 		}
 		if($user_id){
-			$where.= " and a.sap_seller_id in (".implode(',',$user_id).")";
+			$where.= " and sap_seller_id in (".implode(',',$user_id).")";
 		}
 		
 		if($level){
-			$where.= " and a.status = '".(($level=='S')?0:$level)."'";
+			$where.= " and pro_status = '".(($level=='S')?0:$level)."'";
 		}
 		$where_add='1=1';
 		if($sku){
@@ -78,7 +78,7 @@ class SkuController extends Controller
 		}
 		
 		
-		$sql = "(select asin,site,GROUP_CONCAT(a.item_no) as item_code,GROUP_CONCAT(b.item_name) as item_name,max(item_status) as status,
+		$sql = "(select * from (select asin,site,GROUP_CONCAT(a.item_no) as item_code,GROUP_CONCAT(b.item_name) as item_name,max(item_status) as status,
 min(status) as pro_status, max(bg) as bg,max(bu) as bu,max(sap_seller_id) as sap_seller_id
 from 
 
@@ -86,7 +86,7 @@ from
 min(case when status = 'S' Then '0' else status end) as status, 
 max(bg) as bg,max(bu) as bu,max(sap_seller_id) as sap_seller_id from asin group by asin,site,item_no)
 
- as a left join fbm_stock as b on a.item_no=b.item_code $where  group by asin,site order by pro_status asc ) as sku_tmp_cc";
+ as a left join fbm_stock as b on a.item_no=b.item_code   group by asin,site) as c $where order by pro_status asc) as sku_tmp_cc";
  		$datas = DB::table(DB::raw($sql))->whereRaw($where_add)->paginate(5);
 		$date_arr=$asin_site_arr=$datas_details=$oa_data=$sap_data=$last_keywords=[];
 		$site_code['www_amazon_com']='US';
