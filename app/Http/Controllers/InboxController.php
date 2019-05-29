@@ -291,7 +291,7 @@ class InboxController extends Controller
            // $records["customActionMessage"] = "Group action successfully has been completed. Well done!"; // pass custom message(useful for getting status of group actions)
             unset($updateDate);
         }
-        if(Auth::user()->admin){
+        if(Auth::user()->can(['inbox-show-all'])){
             $customers = new Inbox;
         }else{
             $customers = Inbox::whereIn('group_id',array_get($this->getUserGroup(),'groups',array()));
