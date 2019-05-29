@@ -167,7 +167,7 @@ class ReviewController extends Controller
 				$q->on('review.review', '=', 'review_customers.review')
 					->on('review.site', '=', 'review_customers.site');
 			});
-		if(!Auth::user()->admin){
+		if(!Auth::user()->can(['review-show-all'])){
             $customers = $customers->where('review.user_id',$this->getUserId());
         }
 		
@@ -416,7 +416,7 @@ class ReviewController extends Controller
 					->on('review.site', '=', 'review_customers.site');
 			});
 		
-		if(!Auth::user()->admin){
+		if(!Auth::user()->can(['review-show-all'])){
             $customers = $customers->where('review.user_id',$this->getUserId());
         }
 		
