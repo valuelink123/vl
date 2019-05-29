@@ -111,3 +111,14 @@ Route::post('/nonctg/process', 'NonctgController@process');//non-ctg功能的修
 Route::get('/sendcs/{id}', 'SendController@changeStatus')->name('changeStatus');
 
 Route::Post('/qa/getSonProductByProduct', 'QaiController@getSonProductByProduct');//add Qa页面的For Product联动，根据组别得到子组别的键值对
+
+//crm模块
+Route::get('/crm/export', 'CrmController@export')->name('exportCrm');//导出功能
+Route::get('/crm', 'CrmController@index');
+Route::get('/crm/show', 'CrmController@show');
+Route::get('/crm/edit', 'CrmController@edit');
+Route::match(['post','get'],'/crm/update', 'CrmController@update');
+Route::Post('/crm/get', 'CrmController@get');
+Route::match(['post','get'],'/crm/create', 'CrmController@create');
+Route::Post('/crm/import', 'CrmController@import');
+Route::get('/crm/download', 'CrmController@download');

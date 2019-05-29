@@ -434,8 +434,19 @@
                             <?php if($action=='nonctg') echo '<span class="selected"></span>';?>
                         </a>
                     </li>
-
                     @endpermission
+
+                    @permission('crm-show')
+                    {{--新添加的CRM模块--}}
+                    <li class="nav-item {{$action}} <?php if($action=='crm') echo 'active';?>">
+                        <a href="{{ url('crm') }}" class="nav-link nav-toggle">
+                            <i class="fa fa-user"></i>
+                            <span class="title">CRM</span>
+							<?php if($action=='crm') echo '<span class="selected"></span>';?>
+                        </a>
+                    </li>
+                    @endpermission
+                    
 					@permission('auto-reply-show')
                     <li class="nav-item <?php if($action=='auto') echo 'active';?>">
                         <a href="{{url('auto')}}" class="nav-link nav-toggle">
