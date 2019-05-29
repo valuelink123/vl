@@ -86,8 +86,22 @@ class RsgrequestsController extends Controller
 
 		$datas= RsgRequest::leftJoin('rsg_products',function($q){
 				$q->on('rsg_requests.product_id', '=', 'rsg_products.id');
-			})->where('rsg_requests.updated_at','>=',$date_from.' 00:00:00')->where('rsg_requests.updated_at','<=',$date_to.' 23:59:59')->where('rsg_requests.created_at','>=',$submit_date_from.' 00:00:00')->where('rsg_requests.created_at','<=',$submit_date_to.' 23:59:59');
+			})->leftJoin(DB::raw("(select asin,site,max(sap_seller_id) as sap_seller_id,max(bg) as bg,max(bu) as bu from asin group by asin,site) as asin"),function($q){
+				$q->on('rsg_products.asin', '=', 'asin.asin')
+				  ->on('rsg_products.site', '=', 'asin.site');
+			})
+			->where('rsg_requests.updated_at','>=',$date_from.' 00:00:00')->where('rsg_requests.updated_at','<=',$date_to.' 23:59:59')->where('rsg_requests.created_at','>=',$submit_date_from.' 00:00:00')->where('rsg_requests.created_at','<=',$submit_date_to.' 23:59:59');
                
+		if (Auth::user()->seller_rules) {
+			$rules = explode("-",Auth::user()->seller_rules);
+			if(array_get($rules,0)!='*') $datas = $datas->where('bg', array_get($rules,0));
+			if(array_get($rules,1)!='*') $datas = $datas->where('bu', array_get($rules,1));
+		} elseif (Auth::user()->sap_seller_id) {
+			$datas = $datas->where('sap_seller_id', Auth::user()->sap_seller_id);
+		} else {
+		
+		}
+		
         if($request->input('customer_email')){
             $datas = $datas->where('customer_email', $request->input('customer_email'));
         }
@@ -95,7 +109,7 @@ class RsgrequestsController extends Controller
             $datas = $datas->where('step', $request->input('step'));
         }
 		if($request->input('asin')){
-            $datas = $datas->where('asin', $request->input('asin'));
+            $datas = $datas->where('rsg_products.asin', $request->input('asin'));
         }
 		if($request->input('price_from')){
             $datas = $datas->where('transfer_amount','>=', round($request->input('price_from'),2));
