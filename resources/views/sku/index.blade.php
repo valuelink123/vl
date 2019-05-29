@@ -221,7 +221,7 @@ white-space: nowrap;
 							<td>{{strtoupper(substr(strrchr($data->site, '.'), 1))}}</td>
 							<td colspan="3" class="keyword_s"><a class="sku_keywords" href="javascript:;" id="{{$data->site.'-'.$data->asin.'-'.$curr_date}}-keywords" data-pk="{{$data->site.'-'.$data->asin.'-'.$curr_date}}-keywords" data-type="text"> {{array_get($datas_details,str_replace('.','',$data->site).'-'.$data->asin.'-'.$curr_date.'.keywords')?array_get($datas_details,str_replace('.','',$data->site).'-'.$data->asin.'-'.$curr_date.'.keywords'):array_get($last_keywords,str_replace('.','',$data->site).'-'.$data->asin)}} </a></td>
 							<td>{!!($data->status)?'<span class="btn btn-success btn-xs">Reserved</span>':'<span class="btn btn-danger btn-xs">Eliminate</span>'!!}</td>
-							<td>{{((($data->pro_status) == '0')?'S':$data->pro_status)}}</td>
+							<td>{{((($data->pro_status) === '0')?'S':$data->pro_status)}}</td>
 							<td colspan="3">{{$data->item_name}}</td>
 						  </tr>
 						  <tr>

@@ -445,7 +445,7 @@ max(bg) as bg,max(bu) as bu,max(sap_seller_id) as sap_seller_id from asin group 
 				$data['bg'],
 				$data['bu'],
 				($data['status'])?'Reserved':'Eliminate',
-				($data['pro_status'] == '0')?'S':$data['pro_status'],
+				($data['pro_status']==='0')?'S':$data['pro_status'],
 				$data['item_name'],
 				$data['weeks'],
 				$data['keywords'],
