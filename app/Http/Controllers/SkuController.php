@@ -158,7 +158,7 @@ max(bg) as bg,max(bu) as bu,max(sap_seller_id) as sap_seller_id from asin group 
 			}
 			
 			
-			$oa_datas = [];//DB::connection('oa')->table('formtable_main_193_dt1')->whereRaw('('.implode(' or ',$sku_site_arr).')')->get();
+			$oa_datas = DB::connection('oa')->table('formtable_main_193_dt1')->whereRaw('('.implode(' or ',$sku_site_arr).')')->get();
 			
 				$oa_datas=json_decode(json_encode($oa_datas), true);
 				foreach($oa_datas as $od){
@@ -387,7 +387,7 @@ max(bg) as bg,max(bu) as bu,max(sap_seller_id) as sap_seller_id from asin group 
 			}
 			
 			
-			$oa_datas = [];//DB::connection('oa')->table('formtable_main_193_dt1')->whereRaw('('.implode(' or ',$sku_site_arr).')')->get();
+			$oa_datas = DB::connection('oa')->table('formtable_main_193_dt1')->whereRaw('('.implode(' or ',$sku_site_arr).')')->get();
 			
 				$oa_datas=json_decode(json_encode($oa_datas), true);
 				foreach($oa_datas as $od){
