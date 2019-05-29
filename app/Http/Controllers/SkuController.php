@@ -70,16 +70,16 @@ class SkuController extends Controller
 		}
 		
 		if($level){
-			$where.= " and a.pro_status = '".(($level=='S')?0:$level)."'";
+			$where.= " and a.status = '".(($level=='S')?0:$level)."'";
 		}
-		
+		$where_add='1=1';
 		if($sku){
-			$where.= " and (a.asin='".$sku."' or a.item_code like '%".$sku."%')";
+			$where_add = " (asin='".$sku."' or item_code like '%".$sku."%')";
 		}
 		
 		
 		$sql = "(select asin,site,GROUP_CONCAT(a.item_no) as item_code,GROUP_CONCAT(b.item_name) as item_name,max(item_status) as status,
-min(status) as pro_status, max(bg) as bg,max(bu) as bu,max(sap_seller_id) as sap_seller_id,count(*) as count
+min(status) as pro_status, max(bg) as bg,max(bu) as bu,max(sap_seller_id) as sap_seller_id
 from 
 
 (select asin,site,item_no,max(item_status) as item_status,
@@ -87,7 +87,7 @@ min(case when status = 'S' Then '0' else status end) as status,
 max(bg) as bg,max(bu) as bu,max(sap_seller_id) as sap_seller_id from asin group by asin,site,item_no)
 
  as a left join fbm_stock as b on a.item_no=b.item_code $where  group by asin,site order by pro_status asc ) as sku_tmp_cc";
- 		$datas = DB::table(DB::raw($sql))->paginate(5);
+ 		$datas = DB::table(DB::raw($sql))->whereRaw($where_add)->paginate(5);
 		$date_arr=$asin_site_arr=$datas_details=$oa_data=$sap_data=$last_keywords=[];
 		$site_code['www_amazon_com']='US';
 		$site_code['www_amazon_ca']='CA';
@@ -124,7 +124,7 @@ max(bg) as bg,max(bu) as bu,max(sap_seller_id) as sap_seller_id from asin group 
 					if(substr($s_vvvvv, -1) =='-'){
 						$s_vvvvv = round('-'.rtrim($s_vvvvv, "-"),2);
 					}else{
-						$s_vvvvv = round($s_vvvvv,2);
+						$s_vvvvv = round($s_vvvvv,2); 
 					}
 					$vv001+=$s_vv001;
 					$vsrhj+=$s_vsrhj;
@@ -158,7 +158,7 @@ max(bg) as bg,max(bu) as bu,max(sap_seller_id) as sap_seller_id from asin group 
 			}
 			
 			
-			$oa_datas = DB::connection('oa')->table('formtable_main_193_dt1')->whereRaw('('.implode(' or ',$sku_site_arr).')')->get();
+			$oa_datas = [];//DB::connection('oa')->table('formtable_main_193_dt1')->whereRaw('('.implode(' or ',$sku_site_arr).')')->get();
 			
 				$oa_datas=json_decode(json_encode($oa_datas), true);
 				foreach($oa_datas as $od){
@@ -253,18 +253,18 @@ max(bg) as bg,max(bu) as bu,max(sap_seller_id) as sap_seller_id from asin group 
 		}
 		
 		if($level){
-			$where.= " and pro_status = '".$level."'";
+			$where.= " and sku_tmp_cc.pro_status = '".(($level=='S')?0:$level)."'";
 		}
 		
 		if($sku){
-			$where.= " and (asin='".$sku."' or item_code like '%".$sku."%')";
+			$where.= " and (asin='".$sku."' or sku_tmp_cc.item_code  like '%".$sku."%')";
 		}
 		
 			
 		$month = date('Ym',strtotime($date_start));
         $datas=Skusweekdetails::whereRaw("left(weeks,6)='".$month."' ")->whereRaw($where)
 			->leftJoin(DB::raw("(select asin as asin_p,site as site_p,GROUP_CONCAT(a.item_no) as item_code,GROUP_CONCAT(b.item_name) as item_name,max(item_status) as status,
-min(status) as pro_status, max(bg) as bg,max(bu) as bu,max(sap_seller_id) as sap_seller_id,count(*) as count
+min(status) as pro_status, max(bg) as bg,max(bu) as bu,max(sap_seller_id) as sap_seller_id
 from 
 
 (select asin,site,item_no,max(item_status) as item_status,
@@ -327,8 +327,8 @@ max(bg) as bg,max(bu) as bu,max(sap_seller_id) as sap_seller_id from asin group 
 		$sap = new SapRfcRequest();
 		$oa_data=$sap_data=[];
 		
-		
 		foreach($datas as $data){
+			if(!isset($sap_data[str_replace('.','',$data['site']).'-'.$data['item_code']])){
 			$sku_site_arr=[];
 			$match_sku = explode(',',$data['item_code']);
 			if(count($match_sku)>1){
@@ -387,7 +387,7 @@ max(bg) as bg,max(bu) as bu,max(sap_seller_id) as sap_seller_id from asin group 
 			}
 			
 			
-			$oa_datas = DB::connection('oa')->table('formtable_main_193_dt1')->whereRaw('('.implode(' or ',$sku_site_arr).')')->get();
+			$oa_datas = [];//DB::connection('oa')->table('formtable_main_193_dt1')->whereRaw('('.implode(' or ',$sku_site_arr).')')->get();
 			
 				$oa_datas=json_decode(json_encode($oa_datas), true);
 				foreach($oa_datas as $od){
@@ -402,7 +402,7 @@ max(bg) as bg,max(bu) as bu,max(sap_seller_id) as sap_seller_id from asin group 
 			
 			
 			
- 		
+ 			}
 		
 	
 			
