@@ -210,7 +210,7 @@ th,td,td>span {
 					
 					
                 </div>
-				@permission('review-batch-update')
+				
                 <div class="portlet-title">
                     <div class="caption font-dark">
                         <i class="icon-settings font-dark"></i>
@@ -219,7 +219,7 @@ th,td,td>span {
 					
 					<div class="btn-group " style="float:right;">
 								<div class="table-actions-wrapper" id="table-actions-wrapper">
-							<?php if(Auth::user()->admin){ ?>
+							@permission('review-batch-update')
 							<select  class="table-group-action-input form-control input-inline input-small input-sm" id="giveReviewUser">
                                 
                                 @foreach ($users as $user_id=>$user_name)
@@ -228,14 +228,16 @@ th,td,td>span {
                             </select>
                             <button class="btn  green table-group-action-submit">
                                 <i class="fa fa-check"></i> Change</button>
-                        	<?php } ?>
+                        	@endpermission	
+							@permission('review-export')
                                 <button id="vl_list_export" class="btn sbold blue"> Export
                                     <i class="fa fa-download"></i>
                                 </button>
+								@endpermission	
                                </div>
                             </div>
                 </div>
-				@endpermission	
+				
                 <div class="portlet-body">
 
                     <div class="table-container">
