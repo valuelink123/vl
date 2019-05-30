@@ -120,6 +120,7 @@ class CrmController extends Controller
 		$date_from=$request->input('date_from')?$request->input('date_from'):date('Y-m-d',strtotime('- 90 days'));
         $date_to=$request->input('date_to')?$request->input('date_to'):date('Y-m-d');
         $where .= " and date >= '$date_from' and date<= '$date_to'";//搜索时间范围内
+		$where_son = '';
         //搜索各个字段内
 		$searchField1 = array('id','times_ctg','times_rsg','times_negative_review','times_review');
 		$searchField2 = array('name','email','phone','country','from','brand');
@@ -132,16 +133,17 @@ class CrmController extends Controller
 		foreach($searchField2 as $field){
 			if($request->input($field)){
 				$value = $request->input($field);
-				$where .= " and b.$field = '$value'";
+				$where_son .= " and t1.$field = '$value'";
 			}
 		}
 		$sql = "select SQL_CALC_FOUND_ROWS a.id as id,a.date as date,c.c_name as name,c.c_email as email,c.c_phone as phone,c.c_country as country,c.`c_from` as `from`,c.c_brand as brand,
 a.times_ctg as times_ctg,a.times_rsg as times_rsg,a.times_negative_review as times_negative_review,a.times_review as times_review,if(num>0,num,0) as order_num 
 			FROM client as a
-			left join (
+			join (
 					select count(*) as num,client_id,max(t1.name) as c_name,max(t1.email) as c_email,max(t1.phone) as c_phone,max(t1.country) as c_country,max(t1.`from`) as `c_from`,max(t1.brand) as c_brand 
 					from client_info t1
-					left join client_order_info as t2 on t1.id = t2.ci_id
+					left join client_order_info as t2 on t1.id = t2.ci_id 
+					where 1=1 $where_son 
 					group by client_id
 			) as c on a.id = c.client_id
 			where 1 = 1 $where 
