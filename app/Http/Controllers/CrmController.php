@@ -135,14 +135,16 @@ class CrmController extends Controller
 				$where .= " and b.$field = '$value'";
 			}
 		}
-		$sql = "select SQL_CALC_FOUND_ROWS a.id as id,a.date as date,b.name as name,b.email as email,b.phone as phone,b.country as country,b.`from` as `from`,b.brand as brand,a.times_ctg as times_ctg,a.times_rsg as times_rsg,a.times_negative_review as times_negative_review,a.times_review as times_review,if(sum(num)>0,sum(num),0) as order_num
+		$sql = "select SQL_CALC_FOUND_ROWS a.id as id,a.date as date,c.c_name as name,c.c_email as email,c.c_phone as phone,c.c_country as country,c.`c_from` as `from`,c.c_brand as brand,
+a.times_ctg as times_ctg,a.times_rsg as times_rsg,a.times_negative_review as times_negative_review,a.times_review as times_review,if(num>0,num,0) as order_num 
 			FROM client as a
-			join client_info as b on a.id=b.client_id
-			left join(
-				select ci_id, count(*) as num from client_order_info group by ci_id
-			) as c on b.id = c.ci_id
-			where 1 = 1 $where
-			group by a.id
+			left join (
+					select count(*) as num,client_id,max(t1.name) as c_name,max(t1.email) as c_email,max(t1.phone) as c_phone,max(t1.country) as c_country,max(t1.`from`) as `c_from`,max(t1.brand) as c_brand 
+					from client_info t1
+					left join client_order_info as t2 on t1.id = t2.ci_id
+					group by client_id
+			) as c on a.id = c.client_id
+			where 1 = 1 $where 
 			order by $orderby $sort ";
 		return $sql;
 	}

@@ -183,7 +183,7 @@
                                             "aoColumnDefs": [ { "bSortable": false, "aTargets": [2,3,4,5,6,7] }],
                                             "lengthMenu": [
                                                 [10, 20, 50],
-                                                ['All',10, 20, 50] // change per page values here
+                                                [10, 20, 50], // change per page values here
                                             ],
                                             "pageLength": 10, // default record count per page
                                             "ajax": {
