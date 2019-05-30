@@ -366,6 +366,7 @@ a.times_ctg as times_ctg,a.times_rsg as times_rsg,a.times_negative_review as tim
 	public function import( Request $request )
 	{
 		if(!Auth::user()->can(['crm-import'])) die('Permission denied -- crm-import');
+		$addnum = 0;
 		if($request->isMethod('POST')){
 			$file = $request->file('importFile');
 			if($file){
@@ -391,24 +392,23 @@ a.times_ctg as times_ctg,a.times_rsg as times_rsg,a.times_negative_review as tim
 						//判断email和oderid是否已经存在，已经存在就提示
 						$_email = DB::table('client_info')->whereIn('email',$emailArr)->get(array('email'))->toArray();
 						$_order = DB::table('client_order_info')->whereIn('amazon_order_id',$orderArr)->get()->toArray();
-						if($_email){
-							$str = '';
-							foreach($_email as $val){
-								$str.=$val->email.',';
-							}
-							$str = rtrim($str,',');
-							$request->session()->flash('error_message','Add Failed,,Same Email Id By '.$str);
-							return redirect()->back()->withInput();
+						$sameEmail = $sameOrder = array();
+						//循环得到相同的邮箱和相同订单号
+						foreach($_email as $val){
+							$sameEmail[] = $val->email;
 						}
-						if($_order){
-							$str = '';
-							foreach($_order as $val){
-								$str.=$val->amazon_order_id.',';
-							}
-							$str = rtrim($str,',');
-							$request->session()->flash('error_message','Add Failed,Same Order Id By '.$str);
-							return redirect()->back()->withInput();
+						foreach($_order as $val){
+							$sameOrder[] = $val->amazon_order_id;
 						}
+						//忽略掉这些相同的邮箱和相同订单号
+						if($sameEmail || $sameOrder){
+							foreach($importData as$key=>$data){
+								if(in_array($data['B'],$sameEmail) || in_array($data['D'],$sameOrder)){
+									unset($importData[$key]);
+								}
+							}
+						}
+
 						//开始插入数据
 						DB::beginTransaction();
 						$insertOrder = array();
@@ -435,6 +435,7 @@ a.times_ctg as times_ctg,a.times_rsg as times_rsg,a.times_negative_review as tim
 										'ci_id' => $ci_id,
 									);
 								}
+								$addnum = $addnum + 1;
 							}
 						}
 						//添加crm的订单信息表
@@ -442,7 +443,7 @@ a.times_ctg as times_ctg,a.times_rsg as times_rsg,a.times_negative_review as tim
 							batchInsert('client_order_info',$insertOrder);
 						}
 						DB::commit();
-						$request->session()->flash('success_message','Import Data Success!');
+						$request->session()->flash('success_message','Import '.$addnum.' pieces of Data Success!');
 					}else{
 						$request->session()->flash('error_message','Import Data Failed');
 					}
