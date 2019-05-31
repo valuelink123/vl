@@ -573,6 +573,6 @@ function unsetEmoji($str)
 	},
 	$str);
 	$str = str_replace(PHP_EOL, '', $str);
-	$str = str_replace('\x92s', '', $str);
+	$str = str_replace('\\x92s', '', $str);
 	return $str;
 }

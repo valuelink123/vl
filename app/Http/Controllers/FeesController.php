@@ -86,7 +86,17 @@ class FeesController extends Controller
 				   
 				   $updateDate['user_id'] = $request->input("customuserid");
 				   $updateDate['sku'] = $request->input("customsku");
-				   DB::connection('order')->table('finances_product_ads_payment_event')->whereIn('id',$request->input("id"))->where('ImportToSap',0)->update($updateDate);
+				   $updateDate['ImportToSap'] = 0;
+				   $old_ups = json_decode(json_encode(DB::connection('order')->table('finances_product_ads_payment_event')->whereIn('id',$request->input("id"))->get()), true);
+				   $old_del = [];
+				   foreach($old_ups as $op){
+				   	  if($op['ImportToSap']==1){
+					  	$op['ImportToSap']=0;
+					  	$old_del[] = $op;
+					  }
+				   }
+				   if($old_del) DB::connection('order')->table('finances_product_ads_payment_event_del')->insert($old_del);
+				   DB::connection('order')->table('finances_product_ads_payment_event')->whereIn('id',$request->input("id"))->update($updateDate);
 			   }else{
 			   	   $error_message = 'Your entered SKU is invalid.';
 			   } 
@@ -126,9 +136,8 @@ class FeesController extends Controller
 		
 		$lists=json_decode(json_encode($lists), true);
 		foreach ( $lists as $list){
-			$disabled = ($list['ImportToSap'])?'disabled':'';
             $records["data"][] = array(
-                '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input name="id[]" type="checkbox" class="checkboxes" '.$disabled.' value="'.$list['Id'].'"  /><span></span></label>',
+                '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input name="id[]" type="checkbox" class="checkboxes" value="'.$list['Id'].'"  /><span></span></label>',
                 $list['PostedDate'],
 				array_get($accounts,$list['SellerId']),
 				$list['InvoiceId'],
@@ -164,12 +173,24 @@ class FeesController extends Controller
 			$customskus = explode('/',trim($request->input("customsku")));
 			   $exists_skus = Asin::whereIn('item_no',$customskus)->groupBy('item_no')->get(['item_no'])->count();
 
-			   if( $exists_skus == count($customskus)){
+			 if( $exists_skus == count($customskus)){
+			   
 			   $updateDate = [];
-              
+				   
 			   $updateDate['user_id'] = $request->input("customuserid");
-			   $updateDate['sku'] = trim($request->input("customsku"));
-			    DB::connection('order')->table('finances_deal_event')->whereIn('id',$request->input("id"))->where('ImportToSap',0)->update($updateDate);
+			   $updateDate['sku'] = $request->input("customsku");
+			   $updateDate['ImportToSap'] = 0;
+			   $old_ups = json_decode(json_encode(DB::connection('order')->table('finances_deal_event')->whereIn('id',$request->input("id"))->get()), true);
+			   $old_del = [];
+			   foreach($old_ups as $op){
+				  if($op['ImportToSap']==1){
+				  	$op['ImportToSap']=0;
+					$old_del[] = $op;
+				  }
+			   }
+			   if($old_del) DB::connection('order')->table('finances_deal_event_del')->insert($old_del);
+			   DB::connection('order')->table('finances_deal_event')->whereIn('id',$request->input("id"))->update($updateDate);
+			   
 			}else{
 			   $error_message = 'Your entered SKU is invalid.';
 			} 
@@ -208,9 +229,9 @@ class FeesController extends Controller
 		
 		$lists=json_decode(json_encode($lists), true);
 		foreach ( $lists as $list){
-			$disabled = ($list['ImportToSap'])?'disabled':'';
+			
             $records["data"][] = array(
-                '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input name="id[]" type="checkbox" class="checkboxes" value="'.$list['Id'].'" '.$disabled.' /><span></span></label>',
+                '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input name="id[]" type="checkbox" class="checkboxes" value="'.$list['Id'].'"  /><span></span></label>',
                 $list['PostedDate'],
 				array_get($accounts,$list['SellerId']),
 				$list['DealDescription'],
@@ -246,11 +267,22 @@ class FeesController extends Controller
 			   $exists_skus = Asin::whereIn('item_no',$customskus)->groupBy('item_no')->get(['item_no'])->count();
 
 			   if($exists_skus == count($customskus)){
-				$updateDate = [];
-              
-			   $updateDate['user_id'] = $request->input("customuserid");
-			   $updateDate['sku'] = $request->input("customsku");
-			    DB::connection('order')->table('finances_coupon_event')->whereIn('id',$request->input("id"))->where('ImportToSap',0)->update($updateDate);
+			   		$updateDate = [];
+				   
+				   $updateDate['user_id'] = $request->input("customuserid");
+				   $updateDate['sku'] = $request->input("customsku");
+				   $updateDate['ImportToSap'] = 0;
+				   $old_ups = json_decode(json_encode(DB::connection('order')->table('finances_coupon_event')->whereIn('id',$request->input("id"))->get()), true);
+				   $old_del = [];
+				   foreach($old_ups as $op){
+					  if($op['ImportToSap']==1){
+						$op['ImportToSap']=0;
+						$old_del[] = $op;
+					  }
+				   }
+				   if($old_del) DB::connection('order')->table('finances_coupon_event_del')->insert($old_del);
+				   DB::connection('order')->table('finances_coupon_event')->whereIn('id',$request->input("id"))->update($updateDate);
+				
 				}else{
 			   	  $error_message = 'Your entered SKU is invalid.';
 			   } 
@@ -291,9 +323,9 @@ class FeesController extends Controller
 		
 		$lists=json_decode(json_encode($lists), true);
 		foreach ( $lists as $list){
-			$disabled = ($list['ImportToSap'])?'disabled':'';
+			
             $records["data"][] = array(
-                '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input name="id[]" type="checkbox" class="checkboxes" value="'.$list['Id'].'" '.$disabled.' /><span></span></label>',
+                '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input name="id[]" type="checkbox" class="checkboxes" value="'.$list['Id'].'"  /><span></span></label>',
                 $list['PostedDate'],
 				array_get($accounts,$list['SellerId']),
 				$list['SellerCouponDescription'],
@@ -329,10 +361,21 @@ class FeesController extends Controller
 
 			   if( $exists_skus == count($customskus)){
 				$updateDate = [];
-               
-			   $updateDate['user_id'] = $request->input("customuserid");
-			   $updateDate['sku'] = $request->input("customsku");
-			    DB::connection('order')->table('finances_servicefee_event')->whereIn('id',$request->input("id"))->where('ImportToSap',0)->update($updateDate);
+				   
+				   $updateDate['user_id'] = $request->input("customuserid");
+				   $updateDate['sku'] = $request->input("customsku");
+				   $updateDate['ImportToSap'] = 0;
+				   $old_ups = json_decode(json_encode(DB::connection('order')->table('finances_servicefee_event')->whereIn('id',$request->input("id"))->get()), true);
+				   $old_del = [];
+				   foreach($old_ups as $op){
+					  if($op['ImportToSap']==1){
+						$op['ImportToSap']=0;
+						$old_del[] = $op;
+					  }
+				   }
+				   if($old_del) DB::connection('order')->table('finances_servicefee_event_del')->insert($old_del);
+				   DB::connection('order')->table('finances_servicefee_event')->whereIn('id',$request->input("id"))->update($updateDate);
+
 			}else{
 			   	   $error_message = 'Your entered SKU is invalid.';
 			} 
@@ -372,9 +415,9 @@ class FeesController extends Controller
 		
 		$lists=json_decode(json_encode($lists), true);
 		foreach ( $lists as $list){
-			$disabled = ($list['ImportToSap'])?'disabled':'';
+			
             $records["data"][] = array(
-                '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input name="id[]" type="checkbox" class="checkboxes" value="'.$list['Id'].'" '.$disabled.' /><span></span></label>',
+                '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input name="id[]" type="checkbox" class="checkboxes" value="'.$list['Id'].'"  /><span></span></label>',
                 $list['PostedDate'],
 				array_get($accounts,$list['SellerId']),
 				$list['Type'],
@@ -403,11 +446,23 @@ class FeesController extends Controller
 			   $exists_skus = Asin::whereIn('item_no',$customskus)->groupBy('item_no')->get(['item_no'])->count();
 
 			   if( $exists_skus == count($customskus)){
-				$updateDate = [];
-               
-			   $updateDate['user_id'] = $request->input("customuserid");
-			   $updateDate['sku'] = $request->input("customsku");
-			    DB::table('aws_report')->whereIn('id',$request->input("id"))->where('ImportToSap',0)->update($updateDate);
+			   
+			   
+			   	$updateDate = [];
+				   
+				   $updateDate['user_id'] = $request->input("customuserid");
+				   $updateDate['sku'] = $request->input("customsku");
+				   $updateDate['ImportToSap'] = 0;
+				   $old_ups = json_decode(json_encode(DB::table('aws_report')->whereIn('id',$request->input("id"))->get()), true);
+				   $old_del = [];
+				   foreach($old_ups as $op){
+					  if($op['ImportToSap']==1){
+						$op['ImportToSap']=0;
+						$old_del[] = $op;
+					  }
+				   }
+				   if($old_del) DB::table('aws_report_del')->insert($old_del);
+				   DB::table('aws_report')->whereIn('id',$request->input("id"))->update($updateDate);
 			}else{
 			   	   $error_message = 'Your entered SKU is invalid.';
 			   } 
@@ -457,9 +512,8 @@ class FeesController extends Controller
 		
 		$lists=json_decode(json_encode($lists), true);
 		foreach ( $lists as $list){
-			$disabled = ($list['ImportToSap'])?'disabled':'';
             $records["data"][] = array(
-                '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input name="id[]" type="checkbox" class="checkboxes" value="'.$list['id'].'" '.$disabled.' /><span></span></label>',
+                '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input name="id[]" type="checkbox" class="checkboxes" value="'.$list['id'].'" /><span></span></label>',
                 $list['date'],
 				array_get($accounts,$list['seller_id']),
 				$list['campaign_name'],
