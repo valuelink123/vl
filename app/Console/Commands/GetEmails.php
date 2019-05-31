@@ -114,8 +114,8 @@ class GetEmails extends Command
 								}
 							}
                             $insert_data['to_address'] = $this->runAccount['account_email'];
-                            $insert_data['subject'] = $mail->subject;
-                            $insert_data['text_html'] = $mail->textHtml;
+                            $insert_data['subject'] = unsetEmoji($mail->subject);
+                            $insert_data['text_html'] = unsetEmoji($mail->textHtml);
                             $insert_data['text_plain'] = $mail->textPlain;
                             $insert_data['date'] = $mail->date;
 							$insert_data['type'] = $this->runAccount['type'];
