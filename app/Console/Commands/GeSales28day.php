@@ -110,7 +110,7 @@ from asin where(sales_28_22+sales_21_15+sales_14_08+sales_07_01)>0 group by item
 		$sku_sales_p=$skus_s =[];
 		foreach($Lists as $list){
 			$sku_sales_p[$list['MATNR'].'_'.$list['VKBUR']][$list['ZWEEK']]=intval($list['MENGE']);
-			$skus_s[$list['MATNR']]=$list['MATNRZT'];
+			$skus_s[$list['MATNR'].'_'.$list['VKBUR']]=$list['MATNRZT'];
 		}
 		$i=0;
 		$skus_name = DB::table('fbm_stock')->pluck('item_name','item_code');
@@ -118,7 +118,7 @@ from asin where(sales_28_22+sales_21_15+sales_14_08+sales_07_01)>0 group by item
 		foreach($skus_data as $sku_data){
 			$skus_data[$i]['week_sales'] = serialize(array_get($sku_sales_p,strtoupper($sku_data['sku']).'_'.$sku_data['sap_site_id'],[]));
 			$skus_data[$i]['date'] = date('Y-m-d');
-			$skus_data[$i]['status'] = intval(array_get($skus_s,strtoupper($sku_data['sku'])));
+			$skus_data[$i]['status'] = intval(array_get($skus_s,strtoupper($sku_data['sku'].'_'.$sku_data['sap_site_id'])));
 			$skus_data[$i]['sku_des'] = array_get($skus_name,strtoupper($sku_data['sku']),'');
 			$i++;
 		}
