@@ -103,6 +103,8 @@ class ExceptionController extends Controller
 		$arrayData = $arrayAmazon = $arraySap = array();
 		$headArray[] = 'Account';
 		$headArray[] = 'Amazon OrderID';
+		$headArray[] = 'Replacement Order ID';
+		$headArray[] = 'S-Amazon Order ID';
 		$headArray[] = 'Type';
 		$headArray[] = 'Customer Name';
 		$headArray[] = 'Order Skus';
@@ -145,6 +147,7 @@ class ExceptionController extends Controller
         $type_list['2'] = "Replacement";
         $type_list['3'] = "Refund & Replacement";
 		foreach ( $customersLists as $customersList){
+			$customersList['Replacement Order ID'] = $customersList['S-Amazon Order ID'] = '-';
 			$operate = '';
 			$replacements = array();
 			if($customersList['type']==1 || $customersList['type']==3) $operate.= 'Refund : '.$customersList['refund'].PHP_EOL;
@@ -157,6 +160,26 @@ class ExceptionController extends Controller
 					foreach( $products as $product){
 						$sap_line_num+=10;
 						$operate.= ($product['seller_sku']??$product['note']??$product['sku']??'').' ( '.(array_get($product,'item_code')??array_get($product,'title')??'').' ) * '.array_get($product,'qty').'; ';
+
+
+						//重发订单号和S开头的订单号
+						//获取SellerId
+						if(array_get($product,'seller_id')){
+							$seller_id=array_get($product,'seller_id');
+						}else{
+							$seller_id = $customersList['sellerid'];
+						}
+						$replace= array_get($accounts,$seller_id,$seller_id);
+						//重发单
+						$customersList['Replacement Order ID'] = isset($product['replacement_order_id']) ? $product['replacement_order_id'] : '-';
+						//状态为done/auto done的时候才会有S开头的订单号,并且$replace！=FBM
+						if(($customersList['process_status']=='done' || $customersList['process_status']=='auto done') && $customersList['Replacement Order ID'] && $replace!='FBM') {
+							$SData = DB::connection('order')->table('finances_shipment_event')->where('SellerOrderId', $customersList['Replacement Order ID'])->where('SellerId',$seller_id)->limit(1)->get(array('AmazonOrderId'))->toArray();
+							if(isset($SData[0]->AmazonOrderId)){
+								$customersList['S-Amazon Order ID'] = $SData[0]->AmazonOrderId;
+							}
+						}
+
 						if($customersList['process_status']!='cancel'){
 						if(array_get($product,'seller_id') && array_get($accounts,array_get($product,'seller_id'))){
 							$arrayAmazon[] =[
@@ -246,6 +269,8 @@ class ExceptionController extends Controller
             $arrayData[] = array(
 				array_get($accounts,$customersList['sellerid']),
                 $customersList['amazon_order_id'],
+				$customersList['Replacement Order ID'],
+				$customersList['S-Amazon Order ID'],
                 array_get($type_list,$customersList['type']),
 				$customersList['name'],
                 $customersList['order_sku'],
