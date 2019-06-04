@@ -722,7 +722,7 @@ class InboxController extends Controller
 	
 	public function getUserGroup(){
 	
-		if(Auth::user()->admin){
+		if(Auth::user()->can(['inbox-show-all'])){
             $groups = Groupdetail::get(['group_id']);
 			$group_arr =array();
 			foreach($groups as $group){
