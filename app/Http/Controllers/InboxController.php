@@ -354,7 +354,7 @@ class InboxController extends Controller
         if(array_get($_REQUEST,'date_to')){
             $customers = $customers->where('date','<=',$_REQUEST['date_to'].' 23:59:59');
         }
-		if(!Auth::user()->admin) {
+		if(!Auth::user()->can(['inbox-show-all'])) {
         	 $customers = $customers->orderByRaw('case when user_id='.Auth::user()->id.' then 0 else 1 end asc');
 		}
 		$iTotalRecords = $customers->count();
