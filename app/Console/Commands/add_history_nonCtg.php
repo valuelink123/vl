@@ -13,7 +13,7 @@ use App\Classes\SapRfcRequest;
 
 class Nonctg extends Command
 {
-
+	use \App\Traits\Mysqli;
     protected $signature = 'add:nonctg';
 
     /**
@@ -33,6 +33,12 @@ class Nonctg extends Command
         parent::__construct();
 
     }
+
+	public function __destruct()
+	{
+
+	}
+
     //添加历史nonctg数据
     function handle()
     {
@@ -78,7 +84,17 @@ class Nonctg extends Command
                             $match = matchOrderId($orderid);
                             if($match){
                                 try {
-                                    $sapOrderInfo = SapRfcRequest::sapOrderDataTranslate($sap->getOrder(['orderId' => $orderid]));
+									$userid = 0;
+									$sapOrderInfo = SapRfcRequest::sapOrderDataTranslate($sap->getOrder(['orderId' => $orderid]));
+									if(isset($sapOrderInfo['orderItems'][0]['ASIN'])){
+										$sql = "select t2.id as user_id
+											from asin as t1
+											left join users as t2 on t2.sap_seller_id = t1.sap_seller_id
+											where asin = '{$sapOrderInfo['orderItems'][0]['ASIN']}' and site = 'www.{$sapOrderInfo['SalesChannel']}' and sellersku = '{$sapOrderInfo['orderItems'][0]['SellerSKU']}' limit 1";
+										$userData = $this->queryRows($sql);
+										$userid = isset($userData[0]['user_id']) ? $userData[0]['user_id'] : 0;
+									}
+
                                     $insertData[] = array(
                                         'date' =>$data[$ek]['date_created'],
                                         'name' => isset($data[$ek][$val['fields']['name']]) ? $data[$ek][$val['fields']['name']] : '未知',
@@ -88,6 +104,7 @@ class Nonctg extends Command
                                         'sellersku' => $sapOrderInfo['orderItems'][0]['SellerSKU'],
                                         'asin' => $sapOrderInfo['orderItems'][0]['ASIN'],
                                         'saleschannel' => $sapOrderInfo['SalesChannel'],
+										'processor' => $userid,
                                     );
                                 } catch (\Exception $e) {
                                     // echo '不添加异常的订单号：'.$orderid."\n";
