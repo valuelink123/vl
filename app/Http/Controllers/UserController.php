@@ -722,7 +722,7 @@ where a.date>=:sdate_from and a.date<=:sdate_to
 					);
 				$arrayData=[];
 				$datas= DB::table('aws_report')->where('date','>=',$date_from)->where('date','<=',$date_to)->orderBy('date','asc')->get()->toArray();
-				$arrayData[] = ['Date','SellerId','SellerName','marketplace id','campaign name','ad group','cost','sales','profit','orders','acos','impressions','clicks','ctr','cpc','ad conversion rate','default bid','status','BG','BU','Sku','User'];
+				$arrayData[] = ['Date','SellerId','SellerName','marketplace id','campaign name','ad group','cost','sales','profit','orders','acos','impressions','clicks','ctr','cpc','ad conversion rate','default bid','status','BG','BU','Sku','User','Site'];
 				$datas=json_decode(json_encode($datas), true);
 				foreach($datas as $key=>$val){
 					$arrayData[] = [
@@ -747,7 +747,8 @@ where a.date>=:sdate_from and a.date<=:sdate_to
 						array_get($sellers,array_get($val,'user_id').'.bg'),
 						array_get($sellers,array_get($val,'user_id').'.bu'),
 						array_get($val,'sku'),
-						array_get($users,array_get($val,'user_id'),array_get($val,'user_id'))
+						array_get($users,array_get($val,'user_id'),array_get($val,'user_id')),
+						array_get(getSiteUrl(),$val['marketplace_id'],$val['marketplace_id']),
 					];
 				}
 				$spreadsheet->getSheet(4)
@@ -759,9 +760,9 @@ where a.date>=:sdate_from and a.date<=:sdate_to
 					);
 
 				$spreadsheet->setActiveSheetIndex(0);
-				header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');//¸æËßä¯ÀÀÆ÷Êä³ö07ExcelÎÄ¼ş
-				header('Content-Disposition: attachment;filename="Export_'.array_get($_REQUEST,'ExportType').'.xlsx"');//¸æËßä¯ÀÀÆ÷Êä³öä¯ÀÀÆ÷Ãû³Æ
-				header('Cache-Control: max-age=0');//½ûÖ¹»º´æ
+				header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');//å‘Šè¯‰æµè§ˆå™¨è¾“å‡º07Excelæ–‡ä»¶
+				header('Content-Disposition: attachment;filename="Export_'.array_get($_REQUEST,'ExportType').'.xlsx"');//å‘Šè¯‰æµè§ˆå™¨è¾“å‡ºæµè§ˆå™¨åç§°
+				header('Cache-Control: max-age=0');//ç¦æ­¢ç¼“å­˜
 				$writer = new Xlsx($spreadsheet);
 				$writer->save('php://output');
 				
@@ -785,9 +786,9 @@ where a.date>=:sdate_from and a.date<=:sdate_to
 						'A1'         // Top left coordinate of the worksheet range where
 									 //    we want to set these values (default is A1)
 					);
-				header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');//¸æËßä¯ÀÀÆ÷Êä³ö07ExcelÎÄ¼ş
-				header('Content-Disposition: attachment;filename="Export_'.array_get($_REQUEST,'ExportType').'.xlsx"');//¸æËßä¯ÀÀÆ÷Êä³öä¯ÀÀÆ÷Ãû³Æ
-				header('Cache-Control: max-age=0');//½ûÖ¹»º´æ
+				header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');//å‘Šè¯‰æµè§ˆå™¨è¾“å‡º07Excelæ–‡ä»¶
+				header('Content-Disposition: attachment;filename="Export_'.array_get($_REQUEST,'ExportType').'.xlsx"');//å‘Šè¯‰æµè§ˆå™¨è¾“å‡ºæµè§ˆå™¨åç§°
+				header('Cache-Control: max-age=0');//ç¦æ­¢ç¼“å­˜
 				$writer = new Xlsx($spreadsheet);
 				$writer->save('php://output');
 			}
