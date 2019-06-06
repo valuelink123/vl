@@ -82,7 +82,7 @@ class Kernel extends ConsoleKernel
         //$schedule->command('scan:warn')->hourly()->name('warningcheck')->withoutOverlapping();
         //$schedule->command('scan:auto')->hourly()->name('autocheck')->withoutOverlapping();
         $schedule->command('get:awsinfo')->dailyAt('23:00')->name('getawsinfo')->withoutOverlapping();
-		$schedule->command('get:dailysales 7')->dailyAt('9:00')->name('getdailysales')->withoutOverlapping();
+		$schedule->command('get:dailysales 7')->dailyAt('1:00')->name('getdailysales')->withoutOverlapping();
 
         $filePath = base_path().'/storage/logs/noctg.log';
         // $schedule->command('add:nonctg')->monthly()->appendOutputTo($filePath)->name('add_history_nonctg')->withoutOverlapping();//添加nonctg数据，此脚本只执行一次

@@ -72,7 +72,7 @@ and asin.sellersku=sales_28_day.seller_sku and asin.sap_site_id=sales_28_day.sit
 ,sum(sales_21_15) as sales_21_15
 ,sum(sales_14_08) as sales_14_08
 ,sum(sales_07_01) as sales_07_01
-from asin where(sales_28_22+sales_21_15+sales_14_08+sales_07_01)>0 group by item_no,sap_site_id");
+from asin group by item_no,sap_site_id");
 		$skus_data =json_decode(json_encode($skus),true);
 		
 		$I_TAB=[];
