@@ -98,6 +98,7 @@ Route::Post('/rsgrequests/export', 'RsgrequestsController@export');
 Route::resource('rsgrequests', 'RsgrequestsController');
 Route::Post('/rsgrequests/get', 'RsgrequestsController@get')->name('getrsgrequests');
 Route::resource('salesp', 'SalespController');
+Route::resource('rr', 'RrController');
 Route::Post('/salesp/get', 'SalespController@get')->name('getSalesp');
 
 Route::get('/skus', 'SkuController@index');

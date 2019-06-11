@@ -225,6 +225,13 @@
                                 </a>
                             </li>
 							@endpermission
+							@permission('requestreport-show')
+                            <li>
+                                <a href="/rr">
+                                    <i class="fa fa-list"></i> Request Report
+                                </a>
+                            </li>
+							@endpermission
                         </ul>
                     </li>
 
