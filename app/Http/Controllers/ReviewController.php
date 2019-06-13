@@ -346,9 +346,9 @@ class ReviewController extends Controller
 					'A1'         // Top left coordinate of the worksheet range where
 								 //    we want to set these values (default is A1)
 				);
-			header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');//¸æËßä¯ÀÀÆ÷Êä³ö07ExcelÎÄ¼þ
-			header('Content-Disposition: attachment;filename="Export_review.xlsx"');//¸æËßä¯ÀÀÆ÷Êä³öä¯ÀÀÆ÷Ãû³Æ
-			header('Cache-Control: max-age=0');//½ûÖ¹»º´æ
+			header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');//å‘Šè¯‰æµè§ˆå™¨è¾“å‡º07Excelæ–‡ä»¶
+			header('Content-Disposition: attachment;filename="Export_review.xlsx"');//å‘Šè¯‰æµè§ˆå™¨è¾“å‡ºæµè§ˆå™¨åç§°
+			header('Cache-Control: max-age=0');//ç¦æ­¢ç¼“å­˜
 			$writer = new Xlsx($spreadsheet);
 			$writer->save('php://output');
 		}
@@ -361,8 +361,8 @@ class ReviewController extends Controller
 	
 		if(!Auth::user()->can(['review-show'])) die('Permission denied -- review-show');
 		$date_from=date('Y-m-d',strtotime('-90 days'));		
-		$date_to=date('Y-m-d');	
-		
+		$date_to=date('Y-m-d');
+		$_REQUEST['keywords'] = isset($_REQUEST['email']) ? $_REQUEST['email'] : '';
 		
 		$asin_status_array = getAsinStatus();
 		$follow_status_array = getReviewStatus();
@@ -502,8 +502,8 @@ class ReviewController extends Controller
             });
         }
 
-		
-		
+
+
 		$orderby = 'date';
         $sort = 'desc';
         if(isset($_REQUEST['order'][0])){
@@ -587,7 +587,6 @@ class ReviewController extends Controller
 				(($ordersList[$i]['warn']>0)?'<i class="fa fa-warning" title="Contains dangerous words"></i>&nbsp;&nbsp;&nbsp;':'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;').'<a href="https://'.$ordersList[$i]['site'].'/gp/customer-reviews/'.$ordersList[$i]['review'].'" target="_blank" class="btn btn-success btn-xs"> View </a>'.'<a href="/review/'.$ordersList[$i]['id'].'/edit" target="_blank" class="btn btn-danger btn-xs"><i class="fa fa-search"></i> Resolve </a>'
 			);
         }
-
 
 
         $records["draw"] = $sEcho;

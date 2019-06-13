@@ -100,7 +100,10 @@ trait DataTables {
                     $ors[] = "{$field} LIKE '%{$word}%'";
                 }
             }
-            $where[] = '(' . implode(' OR ', $ors) . ')';
+            if($ors){
+				$where[] = '(' . implode(' OR ', $ors) . ')';
+			}
+
         }
 
         return empty($where) ? 1 : implode(' AND ', $where);
@@ -132,18 +135,21 @@ trait DataTables {
 
         $orderby = [];
 
-        foreach ($order as $obj) {
+        if($order){
+			foreach ($order as $obj) {
 
-            $field = empty($obj['field']) ? $columns[$obj['column']]['name'] : $obj['field'];
+				$field = empty($obj['field']) ? $columns[$obj['column']]['name'] : $obj['field'];
 
-            if (!preg_match('#^\w+$#', $field) || !preg_match('#^asc|desc$#i', $obj['dir'])) {
-                throw new DataTablesException("INPUT ERROR: ORDER BY {$field} {$obj['dir']}", 101);
-            }
+				if (!preg_match('#^\w+$#', $field) || !preg_match('#^asc|desc$#i', $obj['dir'])) {
+					throw new DataTablesException("INPUT ERROR: ORDER BY {$field} {$obj['dir']}", 101);
+				}
 
-            $orderby[] = "`{$field}` {$obj['dir']}";
-        }
+				$orderby[] = "`{$field}` {$obj['dir']}";
+			}
+			return implode(',', $orderby);
+		}
 
-        return implode(',', $orderby);
+        return '';
     }
 }
 

@@ -62,7 +62,11 @@
                                             <span class="input-group-addon">
                                                 <i class="fa fa-bookmark"></i>
                                             </span>
-                                            <input type="text" class="form-control" name="country" id="country" value="{{$contactBasic['country']}}" required>
+                                            <select class="form-control" name="country" id="country">
+                                                @foreach (getCrmCountry() as $value)
+                                                    <option value="{{$value}}" @if($value==$contactBasic['country']) selected @endif>{{$value}}</option>
+                                                @endforeach
+                                            </select>
                                         </div>
                                     </div>
                                     <div class="form-group">
@@ -71,7 +75,11 @@
                                             <span class="input-group-addon">
                                                 <i class="fa fa-bookmark"></i>
                                             </span>
-                                            <input type="text" class="form-control" name="brand" id="brand" value="{{$contactBasic['brand']}}" required>
+                                            <select class="form-control" name="brand" id="brand">
+                                                @foreach (getCrmBrand() as $value)
+                                                    <option value="{{$value}}" @if($value==$contactBasic['brand']) selected @endif>{{$value}}</option>
+                                                @endforeach
+                                            </select>
                                         </div>
                                     </div>
                                     <div class="form-group">
@@ -80,7 +88,11 @@
                                             <span class="input-group-addon">
                                                 <i class="fa fa-bookmark"></i>
                                             </span>
-                                            <input type="text" class="form-control" name="from" id="from" value="{{$contactBasic['from']}}" required>
+                                            <select class="form-control" name="from" id="from">
+                                                @foreach (getCrmFrom() as $value)
+                                                    <option value="{{$value}}" @if($value==$contactBasic['from']) selected @endif>{{$value}}</option>
+                                                @endforeach
+                                            </select>
                                         </div>
                                     </div>
                                     <div style="clear:both;"></div>
@@ -109,13 +121,27 @@
                                                         <div style="clear:both;"></div>
                                                         <div class = "inner-repeater">
                                                         <div data-repeater-list = "order-list">
-                                                        @foreach ($data['amazon_order_id'] as $key=> $val)
+                                                        @foreach ($data['cid'] as $key=> $val)
                                                             <div data-repeater-item>
-                                                                <div class="col-lg-2 col-md-2">
-                                                                    <label class="control-label">Amazon_Order_Id</label>
-                                                                    <input type="hidden" class="form-control"  name="cid" value="{{$key}}"/>
-                                                                    <input type="text" class="form-control"  name="amazon_order_id" value="{{$val}}" placeholder="Amazon_Order_Id"/>
+                                                                <div class="form-group">
+                                                                    <div class="col-lg-3">
+                                                                        <label class="control-label">Amazon_Order_Id</label>
+                                                                        <input type="text" class="form-control"  name="amazon_order_id" pattern="\d{3}-\d{7}-\d{7}" value="{{$data[$val]['amazon_order_id']}}" placeholder="Amazon_Order_Id"/>
+                                                                    </div>
+                                                                    <div class="col-lg-2">
+                                                                        <label class="control-label">Order Type</label>
+                                                                        <select class="form-control"  name="order_type" id="order_type">
+                                                                            @foreach (getCrmOrderType() as $key=>$value)
+                                                                                <option value="{{$key}}" @if($key==$data[$val]['order_type']) selected @endif>{{$value}}</option>
+                                                                            @endforeach
+                                                                        </select>
+                                                                    </div>
                                                                 </div>
+                                                                {{--<div class="col-lg-2 col-md-2">--}}
+                                                                    {{--<label class="control-label">Amazon_Order_Id</label>--}}
+                                                                    {{--<input type="hidden" class="form-control"  name="cid" value="{{$key}}"/>--}}
+                                                                    {{--<input type="text" class="form-control"  name="amazon_order_id" value="{{$val}}" placeholder="Amazon_Order_Id"/>--}}
+                                                                {{--</div>--}}
                                                                 <a href="javascript:;" data-repeater-delete class="btn btn-danger mt-repeater-delete-son">
                                                                     <i class="fa fa-close"></i>
                                                                 </a>

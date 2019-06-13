@@ -123,3 +123,4 @@ Route::match(['post','get'],'/crm/get', 'CrmController@get')->name('getCrm');
 Route::match(['post','get'],'/crm/create', 'CrmController@create');
 Route::Post('/crm/import', 'CrmController@import');
 Route::get('/crm/download', 'CrmController@download');
+Route::match(['post','get'],'/crm/batchAssignTask', 'CrmController@batchAssignTask');

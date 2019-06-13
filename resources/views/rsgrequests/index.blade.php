@@ -108,8 +108,7 @@ th,td,td>span {
 
 									</td>
 									<td>
-										
-										<input type="text" class="form-control form-filter input-sm" placeholder='customer email' name="customer_email">
+										<input type="text" class="form-control form-filter input-sm" placeholder='customer email' value="{!! $email !!}" name="customer_email">
 									</td>
 									<td>
 										

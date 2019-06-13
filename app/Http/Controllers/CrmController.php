@@ -8,6 +8,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Illuminate\Support\Facades\Auth;
 use App\Accounts;
+use App\User;
 
 
 class CrmController extends Controller
@@ -35,119 +36,141 @@ class CrmController extends Controller
 	public function index()
 	{
 		if(!Auth::user()->can(['crm-show'])) die('Permission denied -- crm-show');
+		$users = User::getUsers();
+		$bgs = $this->queryFields('SELECT DISTINCT bg FROM asin');
+		$bus = $this->queryFields('SELECT DISTINCT bu FROM asin');
+		//获取country,from,brand
+		$countrys = $this->queryFields('SELECT DISTINCT country FROM client_info');
+		$froms = $this->queryFields('SELECT DISTINCT `from` FROM client_info');
+		$brands = $this->queryFields('SELECT DISTINCT brand FROM client_info');
 		$date_from=date('Y-m-d',strtotime('-90 days'));
 		$date_to=date('Y-m-d');
-		return view('crm/index',['date_from'=>$date_from,'date_to'=>$date_to]);
+		return view('crm/index',['date_from'=>$date_from,'date_to'=>$date_to,'bgs'=>$bgs,'bus'=>$bus,'users'=>$users,'countrys'=>$countrys,'froms'=>$froms,'brands'=>$brands]);
 	}
 
 	//ajax获取列表数据
 	public function get(Request $request)
 	{
 		$sql = $this->getCrmSql($request);
-		$start = (int)$request->input('start', 0);
-        $length = (int)$request->input('length', 10);
-        $limit =  "{$start},{$length}";
-        $sql .= " limit $limit";
+		$limit = $this->dtLimit($request);
+		$sql .= ' LIMIT '.$limit;
+		$data = $this->queryRows($sql);
 
-		$lists = array();
-		$_lists = $this->queryRows($sql);
-		if($_lists){
-			foreach($_lists as $key=>$val){
-				if(!Auth::user()->can(['crm-update'])){
-					$action = '<a class="btn btn-danger btn-xs" href="'.url('crm/show?id='.$val['id']).'" target="_blank">Show</a>';
-				}else{
-					$action = '<a href="'.url('crm/edit?id='.$val['id']).'" target="_blank" class="badge badge-success"> Edit </a> <a class="btn btn-danger btn-xs" href="'.url('crm/show?id='.$val['id']).'" target="_blank">Show</a>';
-				}
-				$lists[] = array(
-					$val['id'],
-					$val['date'],
-					$val['name'],
-					$val['email'],
-					$val['phone'],
-					$val['country'],
-					$val['from'],
-					$val['brand'],
-					$val['times_ctg'],
-					$val['times_rsg'],
-					$val['times_negative_review'],
-					$val['times_review'],
-					$val['order_num'],
-					$action
+		$recordsTotal = $recordsFiltered = $this->queryOne('SELECT FOUND_ROWS()');
 
-				);
+		foreach($data as $key=>$val){
+			if(!Auth::user()->can(['crm-update'])){
+				$action = '<a class="btn btn-danger btn-xs" href="'.url('crm/show?id='.$val['id']).'" target="_blank">Show</a>';
+			}else{
+				$action = '<a href="'.url('crm/edit?id='.$val['id']).'" target="_blank" class="badge badge-success"> Edit </a> <a class="btn btn-danger btn-xs" href="'.url('crm/show?id='.$val['id']).'" target="_blank">Show</a>';
+			}
+			$data[$key]['action'] = $action;
+			//当点击ctg,rsg,Negative Review所属的数字时，可以链接到相对应的客户列表页面，times_ctg，times_rsg，times_negative_review
+			$email = $val['email'];
+			if($val['times_ctg']>0){
+				$data[$key]['times_ctg'] = '<a href="/ctg/list?email='.$email.'" target="_blank">'.$val['times_ctg'].'</a>';
+			}
+			if($val['times_rsg']>0){
+				$data[$key]['times_rsg'] = '<a href="/rsgrequests?email='.$email.'" target="_blank">'.$val['times_rsg'].'</a>';
+			}
+			if($val['times_negative_review']>0){
+				$data[$key]['times_negative_review'] = '<a href="/review?email='.$email.'" target="_blank">'.$val['times_negative_review'].'</a>';
 			}
 		}
-
-        $recordsTotal = $recordsFiltered = $this->queryOne('SELECT FOUND_ROWS()');
-
-        $records["data"] = $lists;
-        $records["draw"] = intval($_REQUEST['draw']);
-        $records["recordsTotal"] = $recordsTotal;
-        $records["recordsFiltered"] = $recordsFiltered;
-
-        echo json_encode($records);
+		return compact('data', 'recordsTotal', 'recordsFiltered');
 	}
 	/*
 	得到列表搜索的sql语句，导出和列表共用一个sql语句,列表就是再加上限制的条数
 	 */
 	public function getCrmSql($request)
 	{
-		$order_column = $request->input('order.0.column');
-		$orderArray = array(0=>'id',1=>'date',8=>'times_ctg',9=>'times_rsg',10=>'times_negative_review',11=>'times_review',12=>'order_num');
+		$where = $this->dtWhere(
+			$request,
+			[
+				// 'email' => 'c.email',
+				// 'name' => 'c.name',
+				// 'phone' => 'c.phone',
+				// 'order_id' => 't1.amazon_order_id',
+			],
+			[],
+			[
+				// WHERE IN
+				'processor' => 't1.processor',
+				// 'from' => 'c.from',
+				// 'brand' => 'c.brand',
+				// 'country' => 'c.country',
+				// WHERE FIND_IN_SET
+				'bg' => 's:b.bg',
+				'bu' => 's:b.bu',
+			],
+			'date'
+		);
 
-		$orderby = 'id';
-		if(isset($orderArray[$order_column])){
-			$orderby = $orderArray[$order_column];
+		$orderby = $this->dtOrderBy($request);
+		if($orderby){
+			$orderby = ' order by '.$orderby;
+		}else{
+			$orderby = ' order by id desc';
 		}
-        $sort = $request->input('order.0.dir','desc');
 
-        $where = '';
-		if($request->input('order_id') && $request->input('order_id')){
-			$orderid = $request->input('order_id');
-			//求出这个order_id所在的客户id是多少
-			$sql = "select b.client_id as id
+		$ins = $request->input('search.ins', []);
+		$infoFields = array('brand','from','country');
+		$whereInfo = ' where 1 = 1 ';
+		foreach ($ins as $field => $arr) {
+			if(in_array($field,$infoFields)){
+				if($arr){
+					$values = [];
+					foreach ($arr as $value) {
+						$values[] = '"' . $value . '"';
+					}
+					$values = implode(',', $values);
+					$whereInfo .= " and `{$field}` IN ({$values})";
+				}
+			}
+		}
+		//搜索框输入的内容可以搜索email,name,phone
+		$ands = $request->input('search.ands', []);
+		foreach ($ands as $field => $value) {
+			if (empty($value)) continue;
+			$value = addslashes($value);
+			if($field=='amazon_order_id'){
+				//当为order_id搜索的时候，不能纯粹的限制client_order_info表的订单号(会导致查出来的客户信息order数量只有一条)，而应该先查出该订单号所属的客户id，然后根据client表的id来限制客户id
+				//求出这个order_id所在的客户id是多少
+				$sql = "select b.client_id as id
 					from client_info as b
 					join client_order_info as c on c.ci_id = b.id
-					where amazon_order_id ='$orderid' limit 1";
-			$idData = $this->queryRows($sql);
-			if($idData){
-				$where .= " and a.id = ".$idData[0]['id'];
+					where amazon_order_id ='$value' limit 1";
+				$idData = $this->queryRows($sql);
+				if($idData){
+					$where .= " and t1.id = ".$idData[0]['id'];
+				}else{
+					$where .= ' and 1 !=1 ';
+				}
 			}else{
-				$where .= ' and 1 !=1 ';
+				$whereInfo .= " and {$field}='{$value}'";
 			}
 
 		}
-		$date_from=$request->input('date_from')?$request->input('date_from'):date('Y-m-d',strtotime('- 90 days'));
-        $date_to=$request->input('date_to')?$request->input('date_to'):date('Y-m-d');
-        $where .= " and date >= '$date_from' and date<= '$date_to'";//搜索时间范围内
-		$where_son = '';
-        //搜索各个字段内
-		$searchField1 = array('id','times_ctg','times_rsg','times_negative_review','times_review');
-		$searchField2 = array('name','email','phone','country','from','brand');
-		foreach($searchField1 as $field){
-			if($request->input($field)){
-				$value = $request->input($field);
-				$where .= " and a.$field = '$value'";
-			}
-		}
-		foreach($searchField2 as $field){
-			if($request->input($field)){
-				$value = $request->input($field);
-				$where_son .= " and t1.$field = '$value'";
-			}
-		}
-		$sql = "select SQL_CALC_FOUND_ROWS a.id as id,a.date as date,c.c_name as name,c.c_email as email,c.c_phone as phone,c.c_country as country,c.`c_from` as `from`,c.c_brand as brand,
-a.times_ctg as times_ctg,a.times_rsg as times_rsg,a.times_negative_review as times_negative_review,a.times_review as times_review,if(num>0,num,0) as order_num 
-			FROM client as a
+
+		$sql = "select SQL_CALC_FOUND_ROWS t1.id as id,t1.date as date,c.name as name,c.email as email,c.phone as phone,c.country as country,c.`from` as `from`,c.brand as brand,
+t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as times_negative_review,t1.times_positive_review as times_positive_review,if(num>0,num,0) as order_num,b.name as processor,b.bg as bg,b.bu as bu 
+			FROM client as t1 
+		  	left join(
+				select users.id as processor,min(name) as name,min(bg) as bg,min(bu) as bu 
+				from users 
+				left join asin on users.sap_seller_id = asin.sap_seller_id 
+				group by users.id 
+				order by users.id desc
+			) as b on b.processor = t1.processor 
 			join (
-					select count(*) as num,client_id,max(t1.name) as c_name,max(t1.email) as c_email,max(t1.phone) as c_phone,max(t1.country) as c_country,max(t1.`from`) as `c_from`,max(t1.brand) as c_brand 
+					select count(*) as num,client_id,max(t1.name) as name,max(t1.email) as email,max(t1.phone) as phone,max(t1.country) as country,max(t1.`from`) as `from`,max(t1.brand) as brand 
 					from client_info t1
 					left join client_order_info as t2 on t1.id = t2.ci_id 
-					where 1=1 $where_son 
-					group by client_id
-			) as c on a.id = c.client_id
-			where 1 = 1 $where 
-			order by $orderby $sort ";
+			  		{$whereInfo} 
+			  		group by client_id 
+			) as c on t1.id = c.client_id
+			where $where 
+			{$orderby} ";
 		return $sql;
 	}
 
@@ -160,15 +183,15 @@ a.times_ctg as times_ctg,a.times_rsg as times_rsg,a.times_negative_review as tim
 
 		$data = $this->queryRows($sql);
 		$arrayData = array();
-		$headArray = array('ID','Date','Name','Email','Phone','Country','From','Brand','CTG','RSG','Negative Review','Review','Order Number');
+		$headArray = array('ID','Date','Email','Name','Phone','Country','From','Brand','CTG','RSG','Negative Review','Positive Review','Order Number','BG','BU','Processor');
         $arrayData[] = $headArray;
 
 		foreach ($data as $key=>$val){
             $arrayData[] = array(
                 $val['id'],
                 $val['date'],
-                $val['name'],
-				$val['email'],
+                $val['email'],
+				$val['name'],
                 $val['phone'],
                 $val['country'],
                 $val['from'],
@@ -176,8 +199,11 @@ a.times_ctg as times_ctg,a.times_rsg as times_rsg,a.times_negative_review as tim
 				strval($val['times_ctg']),//数字转化为字符串，不然整数0导出到excel会显示空白
 				strval($val['times_rsg']),
 				strval($val['times_negative_review']),
-				strval($val['times_review']),
+				strval($val['times_positive_review']),
 				strval($val['order_num']),
+				$val['bg'],
+				$val['bu'],
+				$val['processor'],
             );
         }
         if($arrayData){
@@ -207,7 +233,7 @@ a.times_ctg as times_ctg,a.times_rsg as times_rsg,a.times_negative_review as tim
 		$contactInfo = array();
 		$contactBasic['id'] = $id;
 		if($id){
-			$sql = "select b.client_id as id,b.id as info_id,c.id as cid,b.name as name,b.email as email,b.phone as phone,b.country as country,b.`from` as `from`,b.brand as brand,c.amazon_order_id as amazon_order_id
+			$sql = "select b.client_id as id,b.id as info_id,c.id as cid,b.name as name,b.email as email,b.phone as phone,b.country as country,b.`from` as `from`,b.brand as brand,c.amazon_order_id as amazon_order_id,c.order_type as order_type 
 			FROM client_info as b
 			left join client_order_info as c on b.id = c.ci_id
 			where b.client_id = $id
@@ -218,7 +244,10 @@ a.times_ctg as times_ctg,a.times_rsg as times_rsg,a.times_negative_review as tim
 				$contactInfo[$val['email']]['info_id'] = $val['info_id'];
 				$contactInfo[$val['email']]['email'] = $val['email'];
 				$contactInfo[$val['email']]['phone'] = $val['phone'];
-				$contactInfo[$val['email']]['amazon_order_id'][$val['cid']] = $val['amazon_order_id'];
+
+				$contactInfo[$val['email']]['cid'][] = $val['cid'];
+				$contactInfo[$val['email']][$val['cid']]['amazon_order_id'] = $val['amazon_order_id'];
+				$contactInfo[$val['email']][$val['cid']]['order_type'] = $val['order_type'];
 				$contactBasic['country'] = $val['country'];
 				$contactBasic['name'] = $val['name'];
 				$contactBasic['brand'] = $val['brand'];
@@ -250,11 +279,24 @@ a.times_ctg as times_ctg,a.times_rsg as times_rsg,a.times_negative_review as tim
 		$old_id = isset($data['old_id']) ? $data['old_id'] : 0;
 		//查填写的客户id是否存在，如果不存在就要新添加记录
 		$clientData = DB::table('client')->select('id')->where('id',$data['id'])->get()->toArray();
+		DB::beginTransaction();
 		if(empty($clientData)){
-			if(!DB::table('client')->insert(array('id'=>$data['id'],'date'=>date('Y-m-d')))){
+			//添加client表的数据
+			if(!DB::table('client')->insert(
+				array(
+					'id'=>$data['id'],
+					'date'=>date('Y-m-d H:i:s'),
+					'created_at'=>date('Y-m-d H:i:s'),
+					'updated_at'=> date('Y-m-d H:i:s'),
+					)
+				)
+			){
 				$request->session()->flash('error_message','Add Failed');
 				return redirect()->back()->withInput();
 			}
+		}else{
+			//修改client表的更新时间
+			DB::table('client')->where('id', $data['id'])->update(['updated_at'=>date('Y-m-d H:i:s')]);
 		}
 		$insertInfo = array('client_id'=>$data['id'],'name'=>$data['name'],'country'=>$data['country'],'from'=>$data['from'],'brand'=>$data['brand']);
 		//查出client_info表的id,把之前的该客户的client_info数据删掉
@@ -263,7 +305,6 @@ a.times_ctg as times_ctg,a.times_rsg as times_rsg,a.times_negative_review as tim
 		foreach($_ciids as $key=>$val){
 			$ciids[] = $val->id;
 		}
-		DB::beginTransaction();
 		DB::table('client_info')->whereIn('id',$ciids)->delete();//删除掉client_info表里的该条数据
 		DB::table('client_order_info')->whereIn('ci_id',$ciids)->delete();//订单信息，删除之前的
 
@@ -295,6 +336,7 @@ a.times_ctg as times_ctg,a.times_rsg as times_rsg,a.times_negative_review as tim
 					}
 					//添加现在获取到的
 					$insert['amazon_order_id'] = $v['amazon_order_id'];
+					$insert['order_type'] = $v['order_type'];
 					$res = DB::table('client_order_info')->insert($insert);
 					if(empty($res)){
 						DB::rollBack();
@@ -316,7 +358,7 @@ a.times_ctg as times_ctg,a.times_rsg as times_rsg,a.times_negative_review as tim
 		return redirect('crm/edit?id='.$data['id']);
 	}
 
-	//从列表点击edit，进入编辑页面
+	//从列表点击show,进入客户详情页
 	public function show(Request $request)
 	{
 		if(!Auth::user()->can(['crm-show'])) die('Permission denied -- crm-show');
@@ -367,53 +409,85 @@ a.times_ctg as times_ctg,a.times_rsg as times_rsg,a.times_negative_review as tim
 	{
 		if(!Auth::user()->can(['crm-import'])) die('Permission denied -- crm-import');
 		$addnum = 0;
+		set_time_limit(0);
 		if($request->isMethod('POST')){
 			$file = $request->file('importFile');
 			if($file){
 				if($file->isValid()){
-					$originalName = $file->getClientOriginalName();
 					$ext = $file->getClientOriginalExtension();
-					$type = $file->getClientMimeType();
-					$realPath = $file->getRealPath();
 					$newname = date('Y-m-d-H-i-s').'-'.uniqid().'.'.$ext;
 					$newpath = '/uploads/crm/'.date('Ymd').'/';
 					$inputFileName = public_path().$newpath.$newname;
 					$bool = $file->move(public_path().$newpath,$newname);
 
 					if($bool){
+
 						$spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($inputFileName);
 						$importData = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
 						//得到的数据中,A=>name,B=>E-email,C=>phone,D=>Amazon_Order_Id,E=>country,F=>brand,G=>from
+						$countrys = getCrmCountry();
+						$froms = getCrmFrom();
+						$brands = getCrmBrand();
+
 						$emailArr = $orderArr = array();
 						foreach($importData as $key => $data){
+							if($key==1 || empty($data['B']) || empty($data['D'])){
+								unset($importData[$key]);
+								continue;
+							}
+							$data['E'] = strtoupper($data['E']);//把国家全部转换成大写
+							if($data['E'] && !in_array($data['E'],$countrys)){
+								DB::rollBack();
+								$request->session()->flash('error_message','Import Data Failed,'.$data['E'].' is not a valid country');
+								return redirect()->back()->withInput();
+							}
+							if($data['F'] && !in_array($data['F'],$brands)){
+								DB::rollBack();
+								$request->session()->flash('error_message','Import Data Failed,'.$data['F'].' is not a valid brand');
+								return redirect()->back()->withInput();
+							}
+							if($data['G'] && !in_array($data['G'],$froms)){
+								DB::rollBack();
+								$request->session()->flash('error_message','Import Data Failed,'.$data['G'].' is not a valid from');
+								return redirect()->back()->withInput();
+							}
 							$emailArr[] = $data['B'];
 							$orderArr[] = $data['D'];
 						}
+						$fileNum = count($importData);
+
+						if($fileNum > 600){
+							$request->session()->flash('error_message','Import Data Failed,You can only add 600 pieces of data');
+							return redirect()->back()->withInput();
+						}
 						//判断email和oderid是否已经存在，已经存在就提示
-						$_email = DB::table('client_info')->whereIn('email',$emailArr)->get(array('email'))->toArray();
-						$_order = DB::table('client_order_info')->whereIn('amazon_order_id',$orderArr)->get()->toArray();
+						$sql = 'select b.id as id,b.email as email,c.amazon_order_id as amazon_order_id
+								FROM client_info as b
+								left join client_order_info as c on b.id = c.ci_id 
+								where email in("'.join('","',$emailArr).'") and amazon_order_id in ("'.join('","',$orderArr).'")';
+						$_data = $this->queryRows($sql);
+
+						//循环得到已存在的邮箱和已存在的订单号
 						$sameEmail = $sameOrder = array();
-						//循环得到相同的邮箱和相同订单号
-						foreach($_email as $val){
-							$sameEmail[] = $val->email;
-						}
-						foreach($_order as $val){
-							$sameOrder[] = $val->amazon_order_id;
-						}
-						//忽略掉这些相同的邮箱和相同订单号
-						if($sameEmail || $sameOrder){
-							foreach($importData as$key=>$data){
-								if(in_array($data['B'],$sameEmail) || in_array($data['D'],$sameOrder)){
-									unset($importData[$key]);
-								}
-							}
+						foreach($_data as $key=>$val){
+							$sameEmail[$val['email']] = $val['id'];
+							$sameOrder[$val['amazon_order_id']] = $val['amazon_order_id'];
 						}
 
-						//开始插入数据
-						DB::beginTransaction();
 						$insertOrder = array();
+
+						//开始插入数据
+						DB::beginTransaction();//开启事务处理
+						//循环处理插入数据
 						foreach($importData as $key => $data){
-							if($key>1 && array_get($data,'A') && array_get($data,'B')){
+							if(isset($sameOrder[$data['D']])){//存在相同的订单的数据就忽略掉
+								unset($importData[$key]);
+								continue;
+							}
+
+							//检查是否有相同的邮箱,email要保持唯一性,得到相同邮箱的client_info的id
+							$ci_id = isset($sameEmail[$data['B']]) ? $sameEmail[$data['B']] : 0;
+							if(empty($ci_id)){
 								$insertInfo = array(
 									'name'=>$data['A'],
 									'email'=>$data['B'],
@@ -422,34 +496,52 @@ a.times_ctg as times_ctg,a.times_rsg as times_rsg,a.times_negative_review as tim
 									'brand'=>$data['F'],
 									'from'=>empty($data['G']) ? 'Chat' : $data['G'],
 								);
-								$insertInfo['client_id'] = $res = DB::table('client')->insertGetId(array('date'=>date('Y-m-d')));
-								$ci_id = DB::table('client_info')->insertGetId($insertInfo);
-								if(empty($res) || empty($ci_id)){
-									DB::rollBack();
-									$request->session()->flash('error_message','Import Data Failed');
-									return redirect()->back()->withInput();
+
+								$insertInfo['client_id'] = $res = DB::table('client')->insertGetId(array('date'=>date('Y-m-d H:i:s'),'created_at'=>date('Y-m-d H:i:s'),'updated_at'=>date('Y-m-d H:i:s')));
+								if($res){
+									$ci_id = DB::table('client_info')->insertGetId($insertInfo);
+									$sameEmail[$data['B']] = $ci_id;//此邮箱添加的数据的client_info的id保存
 								}
-								if(isset($data['D']) && $data['D']){
-									$insertOrder[] = array(
-										'amazon_order_id' => $data['D'],
-										'ci_id' => $ci_id,
-									);
-								}
-								$addnum = $addnum + 1;
+
 							}
+
+							if(empty($ci_id)){
+								DB::rollBack();
+								$request->session()->flash('error_message','Import Data Failed');
+								return redirect()->back()->withInput();
+							}
+
+							$insertOrder[] = array(
+								'amazon_order_id' => $data['D'],
+								'ci_id' => $ci_id,
+							);
+
+							$addnum = $addnum + 1;
+
+							unset($importData[$key]);
 						}
 						//添加crm的订单信息表
 						if($insertOrder){
 							batchInsert('client_order_info',$insertOrder);
 						}
+						//销毁变量，释放内存
+						unset($sameEmail);
+						unset($importData);
+						unset($file);
 						DB::commit();
 						$request->session()->flash('success_message','Import '.$addnum.' pieces of Data Success!');
+						// return redirect()->back()->withInput();
 					}else{
 						$request->session()->flash('error_message','Import Data Failed');
+						// return redirect()->back()->withInput();
 					}
+				}else{
+					$request->session()->flash('error_message','Import Data Failed,The file is too large');
+					// return redirect()->back()->withInput();
 				}
 			}else{
 				$request->session()->flash('error_message','Please Select Upload File');
+				// return redirect()->back()->withInput();
 			}
 		}
 		return redirect('crm');
@@ -472,6 +564,24 @@ a.times_ctg as times_ctg,a.times_rsg as times_rsg,a.times_negative_review as tim
 		fclose($file);
 	}
 
+
+	/*
+     * crm功能的指派任务，可以把某个任务指派给其他成员
+     */
+	public function batchAssignTask(Request $req) {
+		if(!Auth::user()->can(['crm-update'])) die('Permission denied -- crm-update');
+		if (empty($rows = $req->input('ctgRows'))) return [true, ''];
+
+		$processor = (int)$req->input('processor');
+
+		$user = User::findOrFail($processor);
+		$ids = array();
+		foreach ($req->input('ctgRows') as $row) {
+			$ids[] =  $row[0];
+		}
+		DB::table('client')->whereIn('id', $ids)->update(['processor' => $processor,'updated_at'=>date('Y-m-d H:i:s')]);
+		return [true, $user->name];
+	}
 
 
 

@@ -428,12 +428,15 @@ function matchMarketplaceSiteCode(){
 //批量添加數據，可避免唯一鍵冲突时报错
 function batchInsert($table,$data){
     $fields = array_keys(current($data));
-    $sql = 'insert ignore into '.$table.' (`'.join('`,`',$fields).'`) values';//字段用反引号分隔
-    foreach($data as $key=>$val){
-        $sql .= ' ("'.join('","',$val).'"),';//数据用双引号分隔
-    }
-    $sql = rtrim($sql,',');
-    \DB::insert($sql);
+	$insertArr = array_chunk($data,200,true);
+	foreach($insertArr as $data) {
+		$sql = 'insert ignore into ' . $table . ' (`' . join('`,`', $fields) . '`) values';//字段用反引号分隔
+		foreach ($data as $key => $val) {
+			$sql .= ' ("' . join('","', $val) . '"),';//数据用双引号分隔
+		}
+		$sql = rtrim($sql, ',');
+		\DB::insert($sql);
+	}
 }
 
 /*
@@ -575,4 +578,28 @@ function unsetEmoji($str)
 	$str = str_replace(PHP_EOL, '', $str);
 	$str = str_replace('\\x92s', '', $str);
 	return $str;
+}
+
+//CRM模块可供下拉选择的country
+function getCrmCountry()
+{
+	return array('US','CA','DE','ES','GB','FR','IT','JP','MA');
+}
+
+//CRM模块可供下拉选择的Source
+function getCrmFrom()
+{
+	return array('BOGO','Call','Cashback','Chat','CTG','Email','Facebook','Non-CTG','Purchased','Reveiw','RSG','Others');
+}
+
+//CRM模块可供下拉选择的brand
+function getCrmBrand()
+{
+	return array('DBPOWER','TENKER','KOIOS','SPACEKEY','Mooka','Natrogix','Miropure','NURSAL','DROCON','Runme','OXA','Lyps','SPACEKEYBRANDS','TECBEAN','Babysteps','VIPSUPPORT');
+}
+
+//CRM模块可供下拉选择的订单类型
+function getCrmOrderType()
+{
+	return array(0=>'Default Type',1=>'RSG Type');
 }

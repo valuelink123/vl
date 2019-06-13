@@ -1,246 +1,338 @@
 @extends('layouts.layout')
-@section('label', 'CRM')
+@section('crumb')
+    @include('layouts.crumb', ['crumbs'=>['CRM']])
+@endsection
 @section('content')
-    <div class="row">
-        <div class="col-md-12">
-            <!-- BEGIN EXAMPLE TABLE PORTLET-->
-            <div class="portlet light bordered">
-                <div class="portlet-title">
-                    <div class="caption font-dark col-md-6">
-                        <i class="icon-settings font-dark"></i>
-                        <span class="caption-subject bold uppercase">CRM</span>
+
+    <link rel="stylesheet" href="/js/chosen/chosen.min.css"/>
+    <script src="/js/chosen/chosen.jquery.min.js"></script>
+
+    <style>
+        .form-control {
+            height: 29px;
+        }
+        .dataTables_extended_wrapper .table.dataTable {
+            margin: 0px !important;
+        }
+
+
+        th,td,td>span {
+            font-size:12px !important;
+            font-family:Arial, Helvetica, sans-serif;}
+    </style>
+
+    @include('frank.common')
+
+    <div class="portlet light bordered">
+        <div class="col-md-12" style="padding: 0px;margin-bottom: 30px;">
+
+            @permission('crm-add')
+            <a  data-toggle="modal" href="{{ url('crm/create')}}" target="_blank"><button id="sample_editable_1_2_new" class="btn sbold red"> Add New
+                    <i class="fa fa-plus"></i>
+                </button>
+            </a>
+            @endpermission
+            @permission('crm-export')
+            <button id="export" class="btn sbold blue"> Export
+                <i class="fa fa-download"></i>
+            </button>
+            @endpermission
+
+            <div class="btn-group " style="float:right;">
+                <form action="{{url('/crm/import')}}" method="post" enctype="multipart/form-data">
+                    <div class="col-md-12">
+                        @permission('crm-import')
+                        <div class="col-md-4"  >
+                            <a href="{{ url('/crm/download')}}" >Import Template
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            {{ csrf_field() }}
+                            <input type="file" name="importFile"  style="width: 90%;"/>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn blue" id="data_search">Import</button>
+
+                        </div>
+                        @endpermission
+                    </div>
+                </form>
+            </div>
+
+        </div>
+        <div class="portlet-body">
+            <div class="table-toolbar" id="thetabletoolbar">
+                <div class="row">
+                    <div class="col-md-2">
+                        <div class="input-group">
+                            <span class="input-group-addon">From</span>
+                            <input class="form-control" data-options="format:'yyyy-mm-dd'" value="{!! $date_from !!}" data-init-by-query="daterange.from" id="date_from"
+                                   autocomplete="off"/>
+                        </div>
+                        <br/>
+                        <div class="input-group">
+                            <span class="input-group-addon">To</span>
+                            <input class="form-control" data-options="format:'yyyy-mm-dd'" value="{!! $date_to !!}" data-init-by-query="daterange.to" id="date_to" autocomplete="off"/>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="input-group">
+                            <span class="input-group-addon">BG</span>
+                            <select multiple style="width:100%;" id="bg" data-init-by-query="ins.bg">
+                                @foreach($bgs as $bg)
+                                    <option value="{!! $bg !!}">{!! $bg !!}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <br/>
+                        <div class="input-group">
+                            <span class="input-group-addon">BU</span>
+                            <select multiple style="width:100%;" id="bu" data-init-by-query="ins.bu">
+                                @foreach($bus as $bu)
+                                    <option value="{!! $bu !!}">{!! $bu !!}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="input-group">
+                            <span class="input-group-addon">Processor</span>
+                            <select multiple style="width:100%;" id="processor" data-init-by-query="ins.processor">
+                                @foreach($users as $id=>$name)
+                                    <option value="{!! $id !!}">{!! $name !!}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <br/>
+                        <div class="input-group">
+                            <span class="input-group-addon">Country</span>
+                            <select multiple style="width:100%;" id="country" data-init-by-query="ins.country">
+                                @foreach($countrys as $name)
+                                    <option value="{!! $name !!}">{!! $name !!}</option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
 
-                    <div class="col-md-12" style="padding: 0px;">
+                    <div class="col-md-2">
+                        <div class="input-group">
+                            <span class="input-group-addon">From</span>
+                            <select multiple style="width:100%;" id="from" data-init-by-query="ins.from">
+                                @foreach($froms as $name)
+                                    <option value="{!! $name !!}">{!! $name !!}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <br/>
+                        <div class="input-group">
+                            <span class="input-group-addon">Brand</span>
+                            <select multiple style="width:100%" id="brand" data-init-by-query="ins.brand">
+                                @foreach($brands as $name)
+                                    <option value="{!! $name !!}">{!! $name !!}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
 
-                        @permission('crm-add')
-                        <a  data-toggle="modal" href="{{ url('crm/create')}}" target="_blank"><button id="sample_editable_1_2_new" class="btn sbold red"> Add New
-                                <i class="fa fa-plus"></i>
-                            </button>
-                        </a>
-                        @endpermission
-                        @permission('crm-export')
-                        <button id="crm-export" class="btn sbold blue"> Export
-                            <i class="fa fa-download"></i>
-                        </button>
-                        @endpermission
+                    <div class="col-md-3">
+                        <div class="input-group">
+                            <span class="input-group-addon">Email</span>
+                            <input type="text" id="email" style="width:100%;height: 28px" name="email" value="">
+                        </div>
+                        <br/>
+                        <div class="input-group">
+                            <span class="input-group-addon">Amazon Order Id</span>
+                            <input type="text" id="amazon_order_id" style="width:100%;height: 28px" name="amazon_order_id" value="">
+                        </div>
+                    </div>
 
-                        <div class="btn-group " style="float:right;">
-                            <form action="{{url('/crm/import')}}" method="post" enctype="multipart/form-data">
-                            <div class="col-md-12">
-                                @permission('crm-import')
-                                    <div class="col-md-4"  >
-                                        <a href="{{ url('/crm/download')}}" >Import Template
-                                        </a>
-                                    </div>
-                                    <div class="col-md-6">
-                                        {{ csrf_field() }}
-                                        <input type="file" name="importFile"  style="width: 90%;"/>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <button type="submit" class="btn blue" id="data_search">Import</button>
+                </div>
+            </div>
+            <div style="clear:both;height:50px; text-align: right;">
 
-                                    </div>
-                                @endpermission
+            </div>
+            <div class="table-container" style="">
+                <table class="table table-striped table-bordered" id="thetable">
+                    <thead>
+                    <tr>
+                        <th onclick="this===arguments[0].target && this.firstElementChild.click()">
+                            <input type="checkbox" onchange="this.checked?dtApi.rows().select():dtApi.rows().deselect()" id="selectAll"/>
+                        </th>
+                        <th title="The customer ID is unique. If there is a connection between customer mailbox and order number, the default is the same customer">ID</th>
+                        <th >Date</th>
+                        <th title="Customer contact email, customer can have more than one email/phone, here the default display of the first">Email</th>
+                        <th >Name</th>
+                        <th title="Customer contact number, customer can have more than one email/phone, here the default display of the first">Phone</th>
+                        <th >Country</th>
+                        <th title="From is a source for customers to contact for the first time. Customers may contact through a variety of ways and means">From</th>
+                        <th title="Brand is the source of customers' first purchase of products or consultation questions. They may purchase products of several brands. Please check the order information for details">Brand</th>
+                        <th title="The number of times the client participates in CTG does not represent the success of the review">CTG</th>
+                        <th title="The number of times the customer participates in RSG and the status is Complete">RSG</th>
+                        <th title="The number of times to leave comments on the bad comment list as determined by the customer's email">Negative</th>
+                        <th title="Data default to CTG retention status showing the sum of Yes and RSG retention, without excluding CTG retention">Positive</th>
+                        <th >Order</th>
+                        <th >BG</th>
+                        <th >BU</th>
+                        <th >Processor</th>
+                        <th >Action</th>
+                    </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                @permission('review-batch-update')
+                <script type="text/template" id="bottomtoolbar">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <div class="input-group">
+                                <span class="input-group-addon">Task Assign to</span>
+                                <input class="xform-autotrim form-control" list="list-assignto" id="assignto"/>
+                                <datalist id="list-assignto">
+                                    <% for(let user_id in users) { %>
+                                    <option value="${user_id} | ${users[user_id]}">
+                                        <% } %>
+                                </datalist>
                             </div>
-                            </form>
                         </div>
-
                     </div>
-                </div>
-                <div class="portlet-body">
-                    <div class="table-container">
-                            <table class="table table-striped table-bordered table-hover table-checkable" id="datatable_ajax_rsg_requests">
-                                <thead>
-                                <tr role="row" class="heading">
-                                    <th width="5%">ID</th>
-                                    <th width="15%">Date</th>
-                                    <th width="10%">Name</th>
-                                    <th width="10%">Email</th>
-                                    <th width="10%">Phone</th>
-                                    <th width="10%">Country</th>
-                                    <th width="10%">From</th>
-                                    <th width="10%">Brand</th>
-                                    <th width="10%">CTG</th>
-                                    <th width="10%">RSG</th>
-                                    <th width="10%">negative_review</th>
-                                    <th width="10%">Review</th>
-                                    <th width="10%">Order Number</th>
-                                    <th width="5%">Action</th>
-                                </tr>
-                                <tr role="row" class="filter">
-                                    <td>
-                                        <input type="text" class="form-control form-filter input-sm" placeholder='id' name="id">
-                                    </td>
-                                    <td>
-                                        <div class="input-group date date-picker" data-date-format="yyyy-mm-dd">
-                                            <input type="text" class="form-control form-filter input-sm" readonly name="date_from" placeholder="From" value="{{$date_from}}">
-                                            <span class="input-group-btn">
-                                                <button class="btn btn-sm default" type="button">
-                                                    <i class="fa fa-calendar"></i>
-                                                </button>
-                                            </span>
-                                        </div>
-                                        <div class="input-group date date-picker" data-date-format="yyyy-mm-dd">
-                                            <input type="text" class="form-control form-filter input-sm" readonly name="date_to" placeholder="To" value="{{$date_to}}">
-                                            <span class="input-group-btn">
-                                                <button class="btn btn-sm default" type="button">
-                                                    <i class="fa fa-calendar"></i>
-                                                </button>
-                                            </span>
-                                        </div>
-
-                                    </td>
-                                    <td>
-                                        <input type="text" class="form-control form-filter input-sm" placeholder='name' name="name">
-                                    </td>
-                                    <td>
-                                        <input type="text" class="form-control form-filter input-sm" placeholder='email' name="email">
-                                    </td>
-                                    <td>
-                                        <input type="text" class="form-control form-filter input-sm" placeholder='phone' name="phone">
-                                    </td>
-                                    <td>
-                                        <input type="text" class="form-control form-filter input-sm" placeholder='country' name="country">
-                                    </td>
-
-                                    <td>
-                                        <input type="text" class="form-control form-filter input-sm"  name="from">
-                                    </td>
-                                    <td>
-                                        <input type="text" class="form-control form-filter input-sm" name="brand">
-                                    </td>
-
-                                    <td>
-                                        <input type="text" class="form-control form-filter input-sm"  name="times_ctg">
-                                    </td>
-                                    <td>
-                                        <input type="text" class="form-control form-filter input-sm"  name="times_rsg">
-                                    </td>
-
-
-                                    <td>
-                                        <input type="text" class="form-control form-filter input-sm"  name="times_negative_review">
-                                    </td>
-                                    <td colspan="2">
-                                       <input type="text" class="form-control form-filter input-sm" placeholder='order_id'  name="order_id">
-
-                                    </td>
-                                    <td>
-                                        <div class="margin-bottom-5">
-                                            <button class="btn btn-sm green btn-outline filter-submit margin-bottom">
-                                                <i class="fa fa-search"></i> Search</button>
-                                        </div>
-                                        <button class="btn btn-sm red btn-outline filter-cancel">
-                                            <i class="fa fa-times"></i> Reset</button>
-                                    </td>
-                                </tr>
-                                </thead>
-                                <tbody> </tbody>
-                            </table>
-                            <script>
-                            var TableDatatablesAjax = function () {
-
-                                var initPickers = function () {
-                                    //init date pickers
-                                    $('.date-picker').datepicker({
-                                        rtl: App.isRTL(),
-                                        autoclose: true
-                                    });
-                                }
-
-                                var initTable = function () {
-                                    $.ajaxSetup({
-                                        headers: { 'X-CSRF-TOKEN' : '{{ csrf_token() }}' }
-                                    });
-                                    var grid = new Datatable();
-
-                                    grid.init({
-                                        src: $("#datatable_ajax_rsg_requests"),
-                                        onSuccess: function (grid, response) {
-                                            // grid:        grid object
-                                            // response:    json object of server side ajax response
-                                            // execute some code after table records loaded
-                                        },
-                                        onError: function (grid) {
-                                            // execute some code on network or other general error
-                                        },
-                                        onDataLoad: function(grid) {
-                                            // execute some code on ajax data load
-                                            //alert('123');
-                                            //alert($("#subject").val());
-                                            //grid.setAjaxParam("subject", $("#subject").val());
-                                        },
-                                        loadingMessage: 'Loading...',
-                                        dataTable: { // here you can define a typical datatable settings from http://datatables.net/usage/options
-
-                                            // Uncomment below line("dom" parameter) to fix the dropdown overflow issue in the datatable cells. The default datatable layout
-                                            // setup uses scrollable div(table-scrollable) with overflow:auto to enable vertical scroll(see: assets/global/scripts/datatable.js).
-                                            // So when dropdowns used the scrollable div should be removed.
-                                            "dom": "<'row'<'col-md-6 col-sm-12'pli><'col-md-6 col-sm-12'<'table-group-actions pull-right'>>r>t<'row'<'col-md-6 col-sm-12'pli><'col-md-6 col-sm-12'>>",
-
-                                            "bStateSave": true, // save datatable state(pagination, sort, etc) in cookie.
-                                            "aoColumnDefs": [ { "bSortable": false, "aTargets": [2,3,4,5,6,7] }],
-                                            "lengthMenu": [
-                                                [10, 20, 50],
-                                                [10, 20, 50], // change per page values here
-                                            ],
-                                            "pageLength": 10, // default record count per page
-                                            "ajax": {
-                                                "url": "{{ url('crm/get')}}", // ajax source
-                                            },
-                                            "order": [
-                                                [0, "desc"]
-                                            ],// set first column as a default sort by asc
-                                        }
-                                    });
-                                    grid.setAjaxParam("id", $("input[name='id']").val());
-                                    grid.setAjaxParam("date_from", $("input[name='date_from']").val());
-                                    grid.setAjaxParam("date_to", $("input[name='date_to']").val());
-                                    grid.setAjaxParam("name", $("input[name='name']").val());
-                                    grid.setAjaxParam("email", $("input[name='email']").val());
-                                    grid.setAjaxParam("phone", $("input[name='phone']").val());
-                                    grid.setAjaxParam("country", $("input[name='country']").val());
-                                    grid.setAjaxParam("from", $("input[name='from']").val());
-                                    grid.setAjaxParam("brand", $("input[name='brand']").val());
-                                    grid.setAjaxParam("times_ctg", $("input[name='times_ctg']").val());
-                                    grid.setAjaxParam("times_rsg", $("input[name='times_rsg']").val());
-                                    grid.setAjaxParam("times_negative_review", $("input[name='times_negative_review']").val());
-                                    grid.setAjaxParam("order_id", $("input[name='order_id']").val());
-                                    grid.getDataTable().ajax.reload(null,false);
-                                    //grid.clearAjaxParams();
-                                }
-                                return {
-                                    init: function () {
-                                        initPickers();
-                                        initTable();
-                                    }
-                                };
-                            }();
-
-                        $(function() {
-                            TableDatatablesAjax.init();
-                            $("#crm-export").click(function(){
-                                location.href='/crm/export?id='+$("input[name='id']").val()+'&date_from='+$("input[name='date_from']").val()+'&date_to='+$("input[name='date_to']").val()+'&name='+$("input[name='name']").val()+'&email='+$("input[name='email']").val()+'&phone='+$("input[name='phone']").val()+'&country='+$("input[name='country']").val()+'&from='+$("input[name='from']").val()+'&brand='+$("input[name='brand']").val()+'&times_ctg='+$("input[name='times_ctg']").val()+'&times_rsg='+$("input[name='times_rsg']").val()+'&times_negative_review='+$("input[name='times_negative_review']").val()+'&order_id='+$("input[name='order_id']").val();
-                            });
-                        });
-                        </script>
-                        </div>
-                </div>
-            </div>
-            <!-- END EXAMPLE TABLE PORTLET-->
-        </div>
-    </div>
-
-
-<div class="modal fade bs-modal-lg" id="ajax" role="basic" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content" >
-            <div class="modal-body" >
-                <img src="../assets/global/img/loading-spinner-grey.gif" alt="" class="loading">
-                <span>Loading... </span>
+                </script>
+                @endpermission
+                <input id="search_str" type="hidden" name="search_str" value="">
             </div>
         </div>
     </div>
-</div>
+
+    <script>
+
+        XFormHelper.initByQuery('[data-init-by-query]')
+
+        $("#thetabletoolbar [id^='date_']").each(function () {
+
+            let defaults = {
+                autoclose: true
+            }
+
+            let options = eval(`({${$(this).data('options')}})`)
+
+            $(this).datepicker(Object.assign(defaults, options))
+        })
+
+        $("#thetabletoolbar select[multiple]").chosen()
+
+        $(thetabletoolbar).change(e => {
+            dtApi.ajax.reload()
+        })
+
+        let $theTable = $(thetable)
+
+        $theTable.on('preXhr.dt', (e, settings, data) => {
+
+            Object.assign(data.search, {
+                daterange: {
+                    from: date_from.value,
+                    to: date_to.value
+                },
+                ands: {
+                    email: email.value,
+                    amazon_order_id: amazon_order_id.value,
+                    // item_model: item_model.value
+                },
+                ins: {
+                    processor: $('#processor').val(),
+                    bg: $('#bg').val(),
+                    bu: $('#bu').val(),
+                    from: $('#from').val(),
+                    country: $('#country').val(),
+                    brand: $('#brand').val(),
+                }
+            })
+
+            history.replaceState(null, null, '?' + objectToQueryString(data.search))
+
+            $('#search_str').val(objectToQueryString(data.search));
+        })
+
+        $theTable.dataTable({
+            searching: false,
+            search: {search: queryStringToObject().value},
+            serverSide: true,
+            pagingType: 'bootstrap_extended',
+            processing: true,
+            order: [[1, 'desc']],
+            select: {
+                style: 'os',
+                info: true, // info N rows selected
+                // blurable: true, // unselect on blur
+                selector: 'td:first-child', // 指定第一列可以点击选中
+            },
+            "aoColumnDefs": [ { "bSortable": false, "aTargets": [17] }],
+            columns: [
+                {
+                    width: "1px",
+                    orderable: false,
+                    defaultContent: '',
+                    className: 'select-checkbox', // 该类根据 tr:selected 改变自己的背景
+                },
+                {data: 'id', name: 'id'},
+                {data: 'date', name: 'date'},
+                {data: 'email', name: 'email'},
+                {data: 'name', name: 'name'},
+                {data: 'phone', name: 'phone'},
+                {data: 'country', name: 'country'},
+                {data: 'from', name: 'from'},
+                {data: 'brand', name: 'brand'},
+                {data: 'times_ctg', name: 'times_ctg'},
+                {data: 'times_rsg', name: 'times_rsg'},
+                {data: 'times_negative_review', name: 'times_negative_review'},
+                {data: 'times_positive_review', name: 'times_positive_review'},
+                {data: 'order_num', name: 'order_num'},
+                {data: 'bg', name: 'bg'},
+                {data: 'bu', name: 'bu'},
+                {data: 'processor', name: 'processor'},
+                {data: 'action', name: 'action'},
+            ],
+            ajax: {
+                type: 'POST',
+                url: "/crm/get"
+            }
+        })
+
+        let users = @json($users) ;
+        $theTable.closest('.table-scrollable').after(tplRender(bottomtoolbar, {users}))
+        $(assignto).change(e => {
+
+            $this = $(e.currentTarget)
+
+            let processor = parseInt($this.val())
+            if (isNaN(processor)) return
+
+            let selectedRows = dtApi.rows({selected: true})
+
+            let ctgRows = selectedRows.data().toArray().map(obj => [obj.id])
+
+            if (!ctgRows.length) {
+                $this.val('')
+                toastr.error('Please select some rows first !')
+                return
+            }
+
+            postByJson('/crm/batchAssignTask', {processor, ctgRows}).then(arr => {
+                // 向服务器请求数据然后刷新数据
+                dtApi.cell(0, 9).data(arr[1]).draw()
+
+                toastr.success('Saved !')
+                $this.val('')
+                selectAll.checked = false
+
+            }).catch(err => {
+                toastr.error(err.message)
+            })
+        })
+
+        let dtApi = $theTable.api();
+        $("#export").click(function(){
+            location.href='/crm/export';
+        });
+
+    </script>
+
 @endsection
