@@ -78,6 +78,21 @@ class RsgrequestsController extends Controller
 			   $updateDate = [];
 			   $updateDate['step'] = $request->input("customstatus");
 			   RsgRequest::whereIn('id',$request->input("id"))->update($updateDate);
+			   foreach($request->input("id") as $r_id){
+				   $rule = RsgRequest::findOrFail($r_id);
+				   $step_to_tags = array(
+						'1'  => 'RSG Join',
+						'2'  => 'RSG Request Reject',
+						'3'  => 'RSG Submit Paypal',
+						'4'  => 'RSG Check Paypal',
+						'5'  => 'RSG Submit Purchase',
+						'6'  => 'RSG Check Purchase',
+						'7'  => 'RSG Submit Review Url',
+						'8'  => 'RSG Check Review Url',
+						'9'  => 'RSG Completed'
+					);
+					self::mailchimp($rule->customer_email,array_get($step_to_tags,$request->input("customstatus")),[]);
+				}
         }
 		$date_from=$request->input('date_from')?$request->input('date_from'):date('Y-m-d',strtotime('- 90 days'));
         $date_to=$request->input('date_to')?$request->input('date_to'):date('Y-m-d');
