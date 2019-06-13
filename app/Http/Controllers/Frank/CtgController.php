@@ -42,12 +42,13 @@ class CtgController extends Controller {
             foreach ($userRows as $row) {
                 $users[$row->id] = $row->name;
             }
+            $email = isset($_REQUEST['email']) ? $_REQUEST['email'] : '';
 
             $bgs = $this->queryFields('SELECT DISTINCT bg FROM asin');
             $bus = $this->queryFields('SELECT DISTINCT bu FROM asin');
             $brands = $this->queryFields('SELECT DISTINCT brand FROM asin');
 
-            return view('frank.ctgList', compact('users', 'bgs', 'bus', 'brands'));
+            return view('frank.ctgList', compact('users', 'bgs', 'bus', 'brands','email'));
         }
 
 
@@ -55,7 +56,6 @@ class CtgController extends Controller {
 
         // 分区条件
         $timeRange = $this->dtTimeRange($req);
-
 
         $where = $this->dtWhere(
             $req,
@@ -75,7 +75,8 @@ class CtgController extends Controller {
                 'phone' => 't1.phone'
             ],
             [
-                'phone' => 't1.phone'
+                'phone' => 't1.phone',
+				'email' => 't1.email'
             ],
             [
                 // WHERE IN

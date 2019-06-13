@@ -90,7 +90,7 @@ class Kernel extends ConsoleKernel
         //crm模块的相关批处理
 		// $schedule->command('add:historyClient')->everyMinute()->name('add_history_client')->withoutOverlapping();//添加客户数据，此脚本只执行一次
 		$schedule->command('sta:client')->dailyAt('1:00')->name('sta_client')->withoutOverlapping();//统计历史客户数据，每天跑一次
-		$schedule->command('add:client')->dailyAt('2:00')->name('add_client')->withoutOverlapping();//添加客户数据，每天跑一次
+		// $schedule->command('add:client')->dailyAt('2:00')->name('add_client')->withoutOverlapping();//添加客户数据，每天跑一次
 		$schedule->command('insert:asininfo')->dailyAt('3:00')->name('insertasin')->withoutOverlapping();
     }
 

@@ -167,6 +167,7 @@ th,td,td>span {
             </div>
         </div>
     </div>
+    <input type="hidden" id="email" value="{!! $email !!}">
 
     <script>
 
@@ -200,7 +201,7 @@ th,td,td>span {
                     to: date_to.value
                 },
                 ands: {
-                    // item_group: item_group.value,
+                    email: $('#email').val(),
                     // brand: brand.value,
                     // item_model: item_model.value
                 },
