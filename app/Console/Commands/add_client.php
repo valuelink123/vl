@@ -210,7 +210,7 @@ class AddClient extends Command
 		Log::Info($sql);
 		$data = $this->queryRows($sql);
 		if($data){
-			$this->addData($data,'Review',true,false);
+			$this->addData($data,'Review',true,true);
 		}
 
 		// $queries = DB::getQueryLog(); // 获取查询日志
@@ -218,7 +218,7 @@ class AddClient extends Command
 	}
 
 	//插入数据到client,client_info,client_order_info这三个表中
-	function addData($_data,$from,$sap=false,$processor=false)
+	function addData($_data,$from,$sap=false,$info=false)
 	{
 		DB::beginTransaction();
 		$insertOrder = array();
@@ -226,7 +226,7 @@ class AddClient extends Command
 		//处理数据，一个email下可能有好几个订单
 		foreach($_data as $key=>$val){
 			if($sap){
-				$val = $this->OrderInfoByData($val,$processor);
+				$val = $this->OrderInfoByData($val,$info);
 			}
 			$order_id = $val['amazon_order_id'];
 			unset($val['amazon_order_id']);
@@ -294,7 +294,7 @@ class AddClient extends Command
 	/*
 	 * 从sap的获取订单信息接口得到表里面没有的数据，例如country，phone
 	 */
-	function OrderInfoByData($data,$processor)
+	function OrderInfoByData($data,$info)
 	{
 		$sap = $this->sap;
 
@@ -308,13 +308,18 @@ class AddClient extends Command
 					$data['phone'] = isset($data['phone']) && $data['phone'] ? $data['phone'] : $sapOrderInfo['Phone'];
 					$data['name'] = isset($data['name']) && $data['name'] ? $data['name'] : $sapOrderInfo['Name'];
 					$data['processor'] = isset($data['processor']) && $data['processor'] ? $data['processor'] : 0;
-					if($processor && isset($sapOrderInfo['orderItems'][0]['ASIN'])){
-						$sql = "select t2.id as user_id
+					if($info && isset($sapOrderInfo['orderItems'][0]['ASIN'])){
+						$sql = "select t2.id as user_id,t1.brand as brand 
 										from asin as t1
 										left join users as t2 on t2.sap_seller_id = t1.sap_seller_id
 										where asin = '{$sapOrderInfo['orderItems'][0]['ASIN']}' and site = 'www.{$sapOrderInfo['SalesChannel']}' and sellersku = '{$sapOrderInfo['orderItems'][0]['SellerSKU']}' limit 1";
 						$userData = $this->queryRows($sql);
-						$data['processor'] = isset($userData[0]['user_id']) ? $userData[0]['user_id'] : 0;
+						if($data['processor']==0){
+							$data['processor'] = isset($userData[0]['user_id']) ? $userData[0]['user_id'] : 0;
+						}
+						if(empty($data['brand'])){
+							$data['brand'] = isset($userData[0]['brand']) ? $userData[0]['brand'] : '';
+						}
 					}
 				} catch (\Exception $e) {
 					$data['amazon_order_id'] = '';
