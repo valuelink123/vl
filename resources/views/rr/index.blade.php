@@ -18,7 +18,7 @@
                         <div class="col-md-6">
 							@permission('requestreport-create')
                             <div class="btn-group">
-                                <a href="{{ url('rr/create')}}"><button id="sample_editable_1_2_new" class="btn sbold blue"> Add Report
+                                <a href="{{ url('rr/create')}}" target="_blank"><button id="sample_editable_1_2_new" class="btn sbold blue"> Add Report
                                     <i class="fa fa-plus"></i>
                                 </button>
                                 </a>
@@ -44,7 +44,7 @@
                 </div>
                 <div class="portlet-body">
 
-                    <table class="table table-striped table-bordered table-hover table-checkable order-column" id="manage_report">
+                    <table class="table table-striped table-bordered table-hover order-column" id="manage_report">
                         <thead>
                         <tr>
                             <th> Account </th>
@@ -59,7 +59,7 @@
                         @foreach ($datas as $data)
                             <tr class="odd gradeX">
                                 <td>
-                                    {{array_get($accounts,$data->SellerId)}}
+                                    {{array_get($accounts,$data->SellerId.'.name').' -- '.array_get($accounts,$data->SellerId.'.area')}}
                                 </td>
                                 <td>
                                     {{$data->Type}}

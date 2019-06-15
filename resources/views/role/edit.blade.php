@@ -69,7 +69,7 @@
 									}
 								}
 								?>
-                                <select name="permission[]" id="permission[]" class="mt-multiselect btn btn-default" multiple="multiple" data-clickable-groups="true" data-collapse-groups="true" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true">
+                                <select name="permission[]" id="permission[]" class="mt-multiselect btn btn-default" multiple="multiple" data-clickable-groups="true" data-collapse-groups="true" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" data-select-all="true">
 									
 									
                                     @foreach ($permissions_group as $key => $permission_group)

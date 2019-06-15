@@ -32,13 +32,28 @@
                                     <i class="fa fa-tag"></i>
                                 </span>
 								
-                               <select  name="sellerid[]" id="sellerid[]" class="mt-multiselect btn btn-default" multiple="multiple" data-clickable-groups="true" data-collapse-groups="true" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" required>
-
+                               <select  name="sellerid[]" id="sellerid[]" class="mt-multiselect btn btn-default" multiple="multiple" data-select-all="true"  data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" required>
+									<optgroup label="US" >
 									@foreach($accounts as $k=>$v)
-				
-										<option value="{{$k}}">{{$v}}</option>
-				
+										@if ($v['area']=='US')
+										<option value="{{$k}}">{{$v['name']}} -- {{$v['area']}}</option>
+										@endif
 									@endforeach
+									</optgroup>
+									<optgroup label="EU" >
+									@foreach($accounts as $k=>$v)
+										@if ($v['area']=='EU')
+										<option value="{{$k}}">{{$v['name']}} -- {{$v['area']}}</option>
+										@endif
+									@endforeach
+									</optgroup>
+									<optgroup label="JP" >
+									@foreach($accounts as $k=>$v)
+										@if ($v['area']=='JP')
+										<option value="{{$k}}">{{$v['name']}} -- {{$v['area']}}</option>
+										@endif
+									@endforeach
+									</optgroup>
 								</select>
                             </div>
                         </div>

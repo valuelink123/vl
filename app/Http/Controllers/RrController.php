@@ -50,10 +50,20 @@ class RrController extends Controller
      public function getAccounts(){
 		
 		$seller=[];
-		$accounts= DB::connection('order')->table('accounts')->where('status',1)->groupBy(['sellername','sellerid'])->get(['sellername','sellerid']);
-		$accounts=json_decode(json_encode($accounts), true);
-		foreach($accounts as $account){
-			$seller[$account['sellerid']]=$account['sellername'];
+		$sellerids = DB::connection('order')->select("select sellerid,(case MarketPlaceId
+		when 'ATVPDKIKX0DER' then 'US'
+		when 'A2EUQ1WTGCTBG2' then 'US'
+		when 'A1AM78C64UM0Y8' then 'US'
+		when 'A1F83G8C2ARO7P' then 'EU'
+		when 'A1PA6795UKMFR9' then 'EU'
+		when 'APJ6JRA9NG5V4' then 'EU'
+		when 'A1RKKUPIHCS9HS' then 'EU'
+		when 'A13V1IB3VIYZZH' then 'EU'
+		when 'A1VC38T7YXB528' then 'JP'
+		else 'US' End) as area,sellername from accounts where status=1 GROUP BY sellerid,area,sellername");
+		foreach($sellerids as $sellerid){
+			$seller[$sellerid->sellerid]['name']=$sellerid->sellername;
+			$seller[$sellerid->sellerid]['area']=$sellerid->area;
 		}
 		return $seller;
 		
