@@ -107,7 +107,7 @@ class RsgrequestsController extends Controller
 				  ->on('rsg_products.site', '=', 'asin.site');
 			})
 			->where('rsg_requests.updated_at','>=',$date_from.' 00:00:00')->where('rsg_requests.updated_at','<=',$date_to.' 23:59:59')->where('rsg_requests.created_at','>=',$submit_date_from.' 00:00:00')->where('rsg_requests.created_at','<=',$submit_date_to.' 23:59:59');
-               
+
 		if (Auth::user()->seller_rules) {
 			$rules = explode("-",Auth::user()->seller_rules);
 			if(array_get($rules,0)!='*') $datas = $datas->where('bg', array_get($rules,0));
@@ -431,6 +431,7 @@ class RsgrequestsController extends Controller
 		$headArray[] = 'Funded';
 		$headArray[] = 'Amazon OrderID';
 		$headArray[] = 'Review Url';
+		$headArray[] = 'Remark';
 		$headArray[] = 'Star rating';
 		$headArray[] = 'Follow';
 		$headArray[] = 'Next follow date';
@@ -460,7 +461,8 @@ class RsgrequestsController extends Controller
 				$val['customer_paypal_email'],
 				$val['transfer_amount'].$val['transfer_currency'],
 				$val['amazon_order_id'],
-				$val['review_url'].$val['transaction_id'],
+				$val['review_url'],
+				$val['transaction_id'],
 				$val['star_rating'],
 				$val['follow'],
 				$val['next_follow_date'],

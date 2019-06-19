@@ -12,6 +12,9 @@ use App\Models\TrackLog;
 use App\Models\Ctg;
 use App\Exceptions\DataInputException;
 use Illuminate\Support\Facades\Auth;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+
 class NonctgController extends Controller
 {
     use \App\Traits\Mysqli;
@@ -77,13 +80,15 @@ class NonctgController extends Controller
             'date'
         );
 
+		$where .= $this->getAsinWhere('t3.bg','t3.bu','t3.sap_seller_id');
+
         $orderby = $this->dtOrderBy($request);
         $limit = $this->dtLimit($request);
 
-        $sql = "SELECT SQL_CALC_FOUND_ROWS t1.id,t1.date,t1.email,t1.email,t1.name,t1.amazon_order_id as order_id,t1.asin,t3.item_group,t3.item_no,t1.from,t1.status,t2.name AS processor,t3.seller,t3.bg,t3.bu,t1.saleschannel as saleschannel,t3.site as site 
+        $sql = "SELECT SQL_CALC_FOUND_ROWS t1.id,t1.date,t1.email,t1.email,t1.name,t1.amazon_order_id as order_id,t1.asin,t3.item_group,t3.item_no,t1.from,t1.status,t2.name AS processor,t3.seller,t3.bg,t3.bu,t1.saleschannel as saleschannel,t3.site as site,t1.sellersku as sellersku   
         FROM non_ctg t1
         LEFT JOIN users t2 ON t2.id = t1.processor
-        LEFT JOIN asin t3 ON t1.asin = t3.asin and t3.site = CONCAT('www.',t1.saleschannel) and t1.sellersku = t3.sellersku
+        LEFT JOIN asin t3 ON t1.asin = t3.asin and t3.site = CONCAT('www.',t1.saleschannel) and t1.sellersku = t3.sellersku  
         where $where
         ORDER BY $orderby
         LIMIT $limit";
@@ -213,5 +218,80 @@ class NonctgController extends Controller
         }
         return [true];
     }
+
+	/*
+	 * nonctg模块的下载功能
+	 */
+	public function export(Request $request)
+	{
+		$statusKeyVal = getNonCtgStatusKeyVal();
+
+		$arrayData = array();
+		$headArray[] = 'Date';
+		$headArray[] = 'Email';
+		$headArray[] = 'Name';
+		$headArray[] = 'Order Id';
+		$headArray[] = 'Asin';
+		$headArray[] = 'SalesChannel';
+		$headArray[] = 'Sellersku';
+		$headArray[] = 'Item Group';
+		$headArray[] = 'Item No';
+		$headArray[] = 'From';
+		$headArray[] = 'Status';
+		$headArray[] = 'BG';
+		$headArray[] = 'BU';
+		$headArray[] = 'Sales';
+		$headArray[] = 'Processor';
+
+		$arrayData[] = $headArray;
+
+		$where = ' where 1 = 1 '.$this->getAsinWhere('t3.bg','t3.bu','t3.sap_seller_id');
+
+		$sql = "SELECT SQL_CALC_FOUND_ROWS t1.id,t1.date,t1.email,t1.email,t1.name,t1.amazon_order_id as order_id,t1.asin,t3.item_group,t3.item_no,t1.from,t1.status,t2.name AS processor,t3.seller,t3.bg,t3.bu,t1.saleschannel as saleschannel,t3.site as site,t1.sellersku as sellersku 
+        FROM non_ctg t1
+        LEFT JOIN users t2 ON t2.id = t1.processor
+        LEFT JOIN asin t3 ON t1.asin = t3.asin and t3.site = CONCAT('www.',t1.saleschannel) and t1.sellersku = t3.sellersku  
+        {$where} ";
+
+		$data = $this->queryRows($sql);
+		foreach ($data as $key=>$val){
+			$arrayData[] = array(
+				$val['date'],
+				$val['email'],
+				$val['name'],
+				$val['order_id'],
+				$val['asin'],
+				$val['saleschannel'],
+				$val['sellersku'],
+				$val['item_group'],
+				$val['item_no'],
+				$val['from'],
+				isset($statusKeyVal[$val['status']]) ? $statusKeyVal[$val['status']] : $val['status'],
+				$val['bg'],
+				$val['bu'],
+				$val['seller'],
+				$val['processor'],
+			);
+		}
+
+		if($arrayData){
+			$spreadsheet = new Spreadsheet();
+
+			$spreadsheet->getActiveSheet()
+				->fromArray(
+					$arrayData,  // The data to set
+					NULL,        // Array values with this value will not be set
+					'A1'         // Top left coordinate of the worksheet range where
+				//    we want to set these values (default is A1)
+				);
+			header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');//告诉浏览器输出07Excel文件
+			header('Content-Disposition: attachment;filename="Export_Non-CTG.xlsx"');//告诉浏览器输出浏览器名称
+			header('Cache-Control: max-age=0');//禁止缓存
+			$writer = new Xlsx($spreadsheet);
+			$writer->save('php://output');
+		}
+		die();
+		return compact('data', 'recordsTotal', 'recordsFiltered');
+	}
 
 }

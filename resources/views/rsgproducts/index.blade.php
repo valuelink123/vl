@@ -79,6 +79,7 @@ th,td,td>span {
 									<th width="5%"> Submit Review </th>
 									<th width="5%"> Completed </th>
 									<th width="8%"> Date </th>
+									<th width="8%"> Positive target </th>
 									<th width="8%"> User </th>
 									<th width="8%"> Status</th>
 								</tr>
@@ -118,7 +119,7 @@ th,td,td>span {
 										</div>
 									</td>
 
-									<td colspan="9">
+									<td colspan="10">
 									 
 										<select name="site" class="form-filter input-sm mt-multiselect btn btn-default " multiple="multiple" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" name="site[]" id="site[]" >
 									   <?php 
@@ -218,7 +219,7 @@ th,td,td>span {
 											"dom": "<'row'B<'col-md-6 col-sm-12'pli><'col-md-6 col-sm-12'<'table-group-actions pull-right'>>r>t<'row'<'col-md-6 col-sm-12'pli><'col-md-6 col-sm-12'>>",
 
 											"bStateSave": true, // save datatable state(pagination, sort, etc) in cookie.
-											"aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0 ,1,7,8,9,10,12,13,14 ] }],
+											"aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0 ,1,7,8,9,10,13,14,15 ] }],
 											"lengthMenu": [
 												[-1,10, 20, 50],
 												['All',10, 20, 50] // change per page values here

@@ -30,13 +30,13 @@
                     <div class="col-md-2">
                         <div class="input-group">
                             <span class="input-group-addon">From</span>
-                            <input class="form-control" data-options="format:'yyyy-mm-dd'" value="" data-init-by-query="daterange.from" id="date_from"
+                            <input class="form-control" data-options="format:'yyyy-mm-dd'" value="{!! date('Y-m-d', strtotime('-90 day')) !!}" data-init-by-query="daterange.from" id="date_from"
                                    autocomplete="off"/>
                         </div>
                         <br/>
                         <div class="input-group">
                             <span class="input-group-addon">To</span>
-                            <input class="form-control" data-options="format:'yyyy-mm-dd'" value="" data-init-by-query="daterange.to" id="date_to" autocomplete="off"/>
+                            <input class="form-control" data-options="format:'yyyy-mm-dd'" value="{!! date('Y-m-d', strtotime('+1 day')) !!}" data-init-by-query="daterange.to" id="date_to" autocomplete="off"/>
                         </div>
                     </div>
                     <div class="col-md-2">
@@ -77,6 +77,17 @@
                             </select>
                         </div>
                     </div>
+                    @permission('non-ctg-export')
+                    <div class="col-md-2">
+                        <div class="btn-group">
+
+                            <button id="export" class="btn sbold blue"> Export
+                                <i class="fa fa-download"></i>
+                            </button>
+
+                        </div>
+                    </div>
+                    @endpermission
                 </div>
             </div>
             <div style="clear:both;height:50px; text-align: right;">
@@ -94,6 +105,8 @@
                         <th> Name </th>
                         <th>Order ID </th>
                         <th>Asin</th>
+                        <th>Saleschannel</th>
+                        <th>Sellersku</th>
                         <th>Item Group</th>
                         <th>Item no</th>
                         <th>From</th>
@@ -212,6 +225,8 @@
                         }).join('<br/>')
                     }
                 },
+                {data: 'saleschannel', name: 'saleschannel'},
+                {data: 'sellersku', name: 'sellersku'},
                 {data: 'item_group', name: 'item_group'},
                 {data: 'item_no', name: 'item_no'},
                 {data: 'from', name: 'from'},
@@ -276,6 +291,10 @@
         })
 
         let dtApi = $theTable.api();
+
+        $("#export").click(function(){
+            location.href='/nonctg/export';
+        });
 
     </script>
 

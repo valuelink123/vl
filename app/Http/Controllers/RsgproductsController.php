@@ -40,19 +40,15 @@ class RsgproductsController extends Controller
         return view('rsgproducts/index',['teams'=>$teams,'accounts'=>$this->getAccounts(),'users'=>$this->getUsers()]);
 
     }
-	
+
 	public function get(Request $request)
     {
 		if(!Auth::user()->can(['rsgproducts-show'])) die('Permission denied -- rsgproducts-show');
-		$orderby = $request->input('order.0.column',1);
-		if($orderby==2){
-			$orderby = 'end_date';
-		}elseif($orderby==3){
-			$orderby = 'daily_stock';
-		}elseif($orderby==4){
-			$orderby = 'daily_remain';
-		}else{
-			$orderby = 'created_at';
+		$order = $request->input('order.0.column',1);
+		$orderby = 'created_at';
+		$orderConfig = array(2=>'end_date',3=>'daily_stock',4=>'daily_remain',5=>'review_rating',6=>'number_of_reviews',11=>'created_at',12=>'positive_target');
+		if(isset($orderConfig[$order])){
+			$orderby = $orderConfig[$order];
 		}
         $sort = $request->input('order.0.dir','desc');
         if ($request->input("customActionType") == "group_action") {
@@ -147,6 +143,7 @@ class RsgproductsController extends Controller
 				array_get($pro_req_arr,$list['id'].'.c'),
 				array_get($pro_req_arr,$list['id'].'.a'),
 				$list['created_at'],
+				$list['positive_target'],
 				array_get($users,$list['user_id']),
 				array_get($status_arr,$list['status']),
 				

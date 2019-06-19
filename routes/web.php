@@ -109,6 +109,8 @@ Route::Post('/nonctg/get', 'NonctgController@get')->name('getnonctg');//non-ctg�
 Route::Post('/nonctg/batchAssignTask', 'NonctgController@batchAssignTask')->name('batchAssignTaskNonctg');//non-ctg功能的分配功能
 Route::get('/nonctg/process', 'NonctgController@process');//non-ctg功能的修改页面
 Route::post('/nonctg/process', 'NonctgController@process');//non-ctg功能的修改页面
+Route::get('/nonctg/export', 'NonctgController@export');//non-ctg功能的下载功能
+
 Route::get('/sendcs/{id}', 'SendController@changeStatus')->name('changeStatus');
 
 Route::Post('/qa/getSonProductByProduct', 'QaiController@getSonProductByProduct');//add Qa页面的For Product联动，根据组别得到子组别的键值对

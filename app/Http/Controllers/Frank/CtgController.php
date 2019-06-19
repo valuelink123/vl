@@ -92,6 +92,8 @@ class CtgController extends Controller {
         $orderby = $this->dtOrderBy($req);
         $limit = $this->dtLimit($req);
 
+        $where .= $this->getAsinWhere('t4.bgs','t4.bus','t4.sap_seller_id');
+
         $sql = "
         SELECT SQL_CALC_FOUND_ROWS
             t1.created_at,
@@ -129,6 +131,7 @@ class CtgController extends Controller {
         LEFT JOIN (
             SELECT
               ANY_VALUE(SellerId) AS SellerId,
+		   	  ANY_VALUE(sap_seller_id) as  sap_seller_id,	 
               ANY_VALUE(MarketPlaceId) AS MarketPlaceId,
               ANY_VALUE(AmazonOrderId) AS AmazonOrderId,
               GROUP_CONCAT(DISTINCT t4_1.ASIN) AS asins,
@@ -141,7 +144,7 @@ class CtgController extends Controller {
               GROUP_CONCAT(DISTINCT asin.brand) AS brands
             FROM ctg_order_item t4_1
             LEFT JOIN asin
-              ON asin.site = t4_1.MarketPlaceSite AND asin.asin = t4_1.ASIN AND asin.sellersku = t4_1.SellerSKU
+              ON asin.site = t4_1.MarketPlaceSite AND asin.asin = t4_1.ASIN AND asin.sellersku = t4_1.SellerSKU 
             LEFT JOIN fbm_stock
               ON fbm_stock.item_code = asin.item_no
             WHERE $timeRange
@@ -152,7 +155,6 @@ class CtgController extends Controller {
         ORDER BY $orderby
         LIMIT $limit
         ";
-
         $data = $this->queryRows($sql);
 
         $recordsTotal = $recordsFiltered = $this->queryOne('SELECT FOUND_ROWS()');
@@ -187,6 +189,8 @@ class CtgController extends Controller {
 
         $arrayData[] = $headArray;
 
+		$where = ' where 1 = 1' .$this->getAsinWhere('t4.bgs','t4.bus','t4.sap_seller_id');
+
         $sql = "
         SELECT SQL_CALC_FOUND_ROWS
             t1.created_at,
@@ -223,6 +227,7 @@ class CtgController extends Controller {
         LEFT JOIN (
             SELECT
               ANY_VALUE(SellerId) AS SellerId,
+		   	  ANY_VALUE(sap_seller_id) as  sap_seller_id,
               ANY_VALUE(MarketPlaceId) AS MarketPlaceId,
               ANY_VALUE(AmazonOrderId) AS AmazonOrderId,
               GROUP_CONCAT(DISTINCT t4_1.ASIN) AS asins,
@@ -240,8 +245,9 @@ class CtgController extends Controller {
               ON fbm_stock.item_code = asin.item_no
             GROUP BY MarketPlaceId,AmazonOrderId,SellerId
           ) t4
-          ON t4.AmazonOrderId = t1.order_id AND t4.MarketPlaceId = t3.MarketPlaceId AND t4.SellerId = t3.SellerId
-        ORDER BY created_at DESC
+          ON t4.AmazonOrderId = t1.order_id AND t4.MarketPlaceId = t3.MarketPlaceId AND t4.SellerId = t3.SellerId 
+        {$where} 
+        ORDER BY created_at DESC 
         ";
 
         $data = $this->queryRows($sql);
@@ -467,6 +473,8 @@ class CtgController extends Controller {
         $orderby = $this->dtOrderBy($req);
         $limit = $this->dtLimit($req);
 
+		$where .= $this->getAsinWhere('t4.bgs','t4.bus','t4.sap_seller_id');
+
         $sql = "
         SELECT SQL_CALC_FOUND_ROWS
             t1.created_at,
@@ -504,6 +512,7 @@ class CtgController extends Controller {
         LEFT JOIN (
             SELECT
               ANY_VALUE(SellerId) AS SellerId,
+		   	  ANY_VALUE(sap_seller_id) as  sap_seller_id,
               ANY_VALUE(MarketPlaceId) AS MarketPlaceId,
               ANY_VALUE(AmazonOrderId) AS AmazonOrderId,
               GROUP_CONCAT(DISTINCT t4_1.ASIN) AS asins,
@@ -682,6 +691,8 @@ class CtgController extends Controller {
         $orderby = $this->dtOrderBy($req);
         $limit = $this->dtLimit($req);
 
+		$where .= $this->getAsinWhere('t4.bgs','t4.bus','t4.sap_seller_id');
+
         $sql = "
         SELECT SQL_CALC_FOUND_ROWS
             t1.created_at,
@@ -719,6 +730,7 @@ class CtgController extends Controller {
         LEFT JOIN (
             SELECT
               ANY_VALUE(SellerId) AS SellerId,
+              ANY_VALUE(sap_seller_id) as  sap_seller_id,
               ANY_VALUE(MarketPlaceId) AS MarketPlaceId,
               ANY_VALUE(AmazonOrderId) AS AmazonOrderId,
               GROUP_CONCAT(DISTINCT t4_1.ASIN) AS asins,
