@@ -3,7 +3,12 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use PhpImap;
+use Ddeboer\Imap\Server;
+use Ddeboer\Imap\SearchExpression;
+use Ddeboer\Imap\Search\Email\To;
+use Ddeboer\Imap\Search\Date\Since;
+use DateTimeImmutable;
+use DateInterval;
 use Illuminate\Support\Facades\Input;
 use PDO;
 use DB;
@@ -16,7 +21,7 @@ class GetEmails extends Command
      *
      * @var string
      */
-    protected $signature = 'get:email {Id} {time}';
+    protected $signature = 'get:email {Id} {--time=}';
 
     /**
      * The console command description.
@@ -44,9 +49,8 @@ class GetEmails extends Command
     public function handle()
     {
         $Id =  $this->argument('Id');
-        $time =  $this->argument('time');
+        $time =  $this->option('time');
         if(!$Id) die;
-        if(!$time) $time = '1day';
         $accounts = DB::table('accounts')->where('id',$Id);
         $accountList = $accounts->get();
 		Log::useFiles(storage_path().'/logs/'.$Id.'/'.date('Y-m-d').'_email.log','debug');
@@ -63,128 +67,140 @@ class GetEmails extends Command
                 'imap_port' => $account->imap_port,
 				'type' => $account->type,
             );
-			$this->saveEmails($time);
+			if($time){
+				$lastMailTime = strtotime('-'.$time);
+			}elseif($account->last_mail_date){
+				$lastMailTime = strtotime($account->last_mail_date);
+			}else{
+				$lastMailTime = strtotime('- 1day');
+			}
+			$lastMailDate=date('Y-m-d H:i:s',$lastMailTime);
+			self::saveEmails($lastMailDate);
         }
     }
 
 
-    public function saveEmails($time){
-        $date = date('j F Y',strtotime('- '.$time));
-        $attDir = public_path('attachs').'/'.date('Ymd');
-        if (!is_dir($attDir)) mkdir($attDir, 0777,true);
-		Log::Info(' '.$this->runAccount['account_email'].' Since '.$date.' Emails Scan Start...');
-        $domain = array_get(explode('@',$this->runAccount['email']),1,'');
-		$imap_charset = 'UTF-8';
-		if($domain=='outlook.com' || $domain=='hotmail.com') $imap_charset = 'US-ASCII';
-		
-		$junkmailbox = new PhpImap\Mailbox('{'.$this->runAccount['imap_host'].':'.$this->runAccount['imap_port'].'/imap/'.$this->runAccount['imap_ssl'].'}Junk', $this->runAccount['email'], $this->runAccount['password'], $attDir,$imap_charset);
-		$junkmailsIds = $junkmailbox->searchMailbox('ALL');
-		foreach($junkmailsIds as $junkmailsId){
-			$junkmailbox->moveMail($junkmailsId,'INBOX');
-		}
-		unset($junkmailbox);
-		
-		
-	$mailbox = new PhpImap\Mailbox('{'.$this->runAccount['imap_host'].':'.$this->runAccount['imap_port'].'/imap/'.$this->runAccount['imap_ssl'].'}INBOX', $this->runAccount['email'], $this->runAccount['password'], $attDir,$imap_charset);
-		
-        $mailsIds = $mailbox->searchMailbox('SINCE "'.$date.'"'); 
-        if(!$mailsIds) {
-            Log::Info(' '.$this->runAccount['account_email'].' Since '.$date.' Mailbox is empty...');
-        }else{
-			$mailbox->setServerEncoding('UTF-8');
-            foreach($mailsIds as $mailsId){
-                $mail = $mailbox->getMail($mailsId);
-                //
-                $exists = DB::table('inbox')->where('mail_address', $this->runAccount['email'])->where('mail_id', $mail->messageId)->first();
-                if(!$exists) {
-                    try{
-                        $insert_data = array();
-                        $attach_data = array();
-                        if(!$mail->to) continue;
-                        if(!array_key_exists(strtolower($this->runAccount['account_email']),array_change_key_case($mail->to,CASE_LOWER))) continue;
-                        if($mail){
-							$reply_to = current(array_keys($mail->replyTo));
-                            $insert_data['mail_address'] = $this->runAccount['email'];
-                            $insert_data['mail_id'] = ($mail->messageId)?$mail->messageId:$mail->id;
-                            $insert_data['from_name'] = $mail->fromName;
-                            $insert_data['from_address'] = ($reply_to)?$reply_to:$mail->fromAddress;
-                            if($insert_data['from_address']=='invalid_address@.syntax-error.'){
-								if(preg_match('/From:([\s\S]*?)[\n\r]/i', $mail->headersRaw, $fromstr)){
-									$insert_data['from_address'] = str_replace(array(' ','<','>'),'',$fromstr[1]);
-								}
+    public function saveEmails($lastMailDate){
+		$last_date = $lastMailDate;
+		$date = new DateTimeImmutable($lastMailDate);
+		$sinceTime = $date->sub(new DateInterval('PT5M'));
+		$server = new Server($this->runAccount['imap_host']);
+		$connection = $server->authenticate($this->runAccount['email'], $this->runAccount['password']);
+		$mailboxes = $connection->getMailboxes();
+		$search = new SearchExpression();
+		$search->addCondition(new To($this->runAccount['email']));
+		$search->addCondition(new Since($sinceTime));	
+
+		foreach ($mailboxes as $mailbox) {
+			
+			if ($mailbox->getAttributes() & \LATT_NOSELECT) {
+				continue;
+			}
+			$messages = $mailbox->getMessages($search);
+			foreach($messages as $message){
+				try{
+				$mail_id = ($message->getId())?$message->getId():$message->getNumber();
+				$exists = DB::table('inbox')->where('mail_address', $this->runAccount['email'])->where('mail_id', $mail_id)->first();
+				if(!$exists) {
+					$insert_data=[];
+					$attach_data = array();
+					$insert_data['mail_id'] = $mail_id;
+					$insert_data['mail_address'] = $this->runAccount['email'];
+					$insert_data['from_address']=$message->getFrom()->getAddress();
+					$insert_data['from_name']=$message->getFrom()->getName();
+
+					$insert_data['to_address'] = $this->runAccount['account_email'];
+					$insert_data['subject'] = $message->getSubject();
+					$insert_data['text_html'] = $message->getBodyHtml();
+					$insert_data['text_plain'] = $message->getBodyText();
+					$insert_data['date'] = $message->getDate()->format('Y-m-d H:i:s');
+					$insert_data['type'] = $this->runAccount['type'];
+					
+					$insert_data['message_id']=$message->getId();
+					$insert_data['mail_id']=$message->getNumber();
+
+					if($last_date<$insert_data['date']) $last_date = $insert_data['date'];
+					
+					$attachments = $message->getAttachments();
+					foreach ($attachments as $attachment) {
+						if ($attachment->isEmbeddedMessage()) {
+							$embeddedMessage = $attachment->getEmbeddedMessage()->getContent();
+							$insert_data['content'].=$embeddedMessage;
+						}else{
+							$ifid = $attachment->getStructure()->ifid;
+							if($ifid){
+								$attName = $attachment->getStructure()->id;
+							}else{
+								$attName = $attachment->getFilename();
 							}
-                            $insert_data['to_address'] = $this->runAccount['account_email'];
-                            $insert_data['subject'] = $mail->subject;
-                            $insert_data['text_html'] = $mail->textHtml;
-                            $insert_data['text_plain'] = $mail->textPlain;
-                            $insert_data['date'] = $mail->date;
-							$insert_data['type'] = $this->runAccount['type'];
-                            if($mail->getAttachments()){
-                                foreach($mail->getAttachments() as $k=>$v){
-                                    $attach_data[]=str_ireplace(public_path(),'',$v->filePath);
-                                }
-                                $insert_data['attachs'] = serialize($attach_data);
-                            }
-                            $orderInfo = $this->matchOrder($mail);
-                            //if($orderInfo){
-                            $insert_data['amazon_order_id'] = array_get($orderInfo,'amazon_order_id','');
-							$insert_data['amazon_seller_id'] = array_get($orderInfo,'order.SellerId',NULL);
-                            $insert_data['sku'] = array_get($orderInfo,'order.Sku', NULL);
-							$insert_data['asin'] = array_get($orderInfo,'order.ASIN', NULL);
-                            $match_rule = $this->matchUser($insert_data,array_get($orderInfo,'order',array()));
+							$attPath=public_path('attachs').'/'.date('Ymd').'/'.$this->runAccount['id'].'/'.md5($message->getId());
+							if (!is_dir($attPath)) mkdir($attPath, 0777,true);
+							file_put_contents($attPath.'/'.$attName,$attachment->getDecodedContent());
+							$attach_data[] = str_ireplace(public_path(),'',$attPath).'/'.$attName;
+							if($ifid) $insert_data['content'] = str_ireplace('cid:'.$attName,str_ireplace(public_path(),'',$attPath).'/'.$attName,$insert_data['content']);
+						}
+					}
+					$insert_data['attachs']=serialize($attach_data);
 
-                            if($match_rule['reply_status']==99){
-                                if(env('AFTER_GET_MAIL_DELETE',0)){
-                                    $mailbox->deleteMail($mailsId);
-                                }
-                                Log::Info(' Mail From '.$mail->fromAddress.' To '.$this->runAccount['account_email'].' have been trashed...');
-                                continue;
-                            }
-                            if(array_get($match_rule,'etype')) $insert_data['etype'] = $match_rule['etype'];
-                            if(array_get($match_rule,'remark')) $insert_data['remark'] = $match_rule['remark'];
-							if(array_get($match_rule,'sku')) $insert_data['sku'] = $match_rule['sku'];
-							if(array_get($match_rule,'asin')) $insert_data['asin'] = $match_rule['asin'];
-							if(array_get($match_rule,'mark')) $insert_data['mark'] = $match_rule['mark'];
-							if(array_get($match_rule,'item_no')) $insert_data['item_no'] = $match_rule['item_no'];
-							if(array_get($match_rule,'epoint')) $insert_data['epoint'] = $match_rule['epoint'];
-                            $insert_data['user_id'] = $match_rule['user_id'];
-							$insert_data['group_id'] = $match_rule['group_id'];
-                            $insert_data['rule_id'] = $match_rule['rule_id'];
-                            $insert_data['reply'] = $match_rule['reply_status'];
-							
-                            //}
 
-                            $result = DB::table('inbox')->insert($insert_data);
-                            if(env('AFTER_GET_MAIL_DELETE',0) && $result){
-                                $mailbox->deleteMail($mailsId);
-                            }
-                            Log::Info(' '.$this->runAccount['account_email'].' MailID '.$mailsId.' Insert Success...');
-                        }
-                    }catch (\Exception $e){
-                        Log::Info(' '.$this->runAccount['account_email'].' MailID '.$mailsId.' Insert Error...'.$e->getMessage());
-                    }
-                }else{
-                    Log::Info(' '.$this->runAccount['account_email'].' MailID '.$mailsId.' AlReady Exists...');
-                }
-            }
-        }
-        Log::Info(' '.$this->runAccount['account_email'].' Since '.$date.' Emails Scan Complete...');
+					$orderInfo = self::matchOrder($insert_data);
+					$insert_data['amazon_order_id'] = array_get($orderInfo,'amazon_order_id','');
+					$insert_data['amazon_seller_id'] = array_get($orderInfo,'order.SellerId',NULL);
+					$insert_data['sku'] = array_get($orderInfo,'order.Sku', NULL);
+					$insert_data['asin'] = array_get($orderInfo,'order.ASIN', NULL);
+					$match_rule = selft::matchUser($insert_data,array_get($orderInfo,'order',array()));
+
+					if($match_rule['reply_status']==99){
+						if(env('AFTER_GET_MAIL_DELETE',0)){
+							//$mailbox->getMessage($insert_data['mail_id'])->delete();
+						}
+						Log::Info(' Mail From '.$mail->fromAddress.' To '.$this->runAccount['account_email'].' have been trashed...');
+						continue;
+					}
+					if(array_get($match_rule,'etype')) $insert_data['etype'] = $match_rule['etype'];
+					if(array_get($match_rule,'remark')) $insert_data['remark'] = $match_rule['remark'];
+					if(array_get($match_rule,'sku')) $insert_data['sku'] = $match_rule['sku'];
+					if(array_get($match_rule,'asin')) $insert_data['asin'] = $match_rule['asin'];
+					if(array_get($match_rule,'mark')) $insert_data['mark'] = $match_rule['mark'];
+					if(array_get($match_rule,'item_no')) $insert_data['item_no'] = $match_rule['item_no'];
+					if(array_get($match_rule,'epoint')) $insert_data['epoint'] = $match_rule['epoint'];
+					$insert_data['user_id'] = $match_rule['user_id'];
+					$insert_data['group_id'] = $match_rule['group_id'];
+					$insert_data['rule_id'] = $match_rule['rule_id'];
+					$insert_data['reply'] = $match_rule['reply_status'];
+					print_r($insert_data);
+					$result = DB::table('inbox')->insert($insert_data);
+					if(env('AFTER_GET_MAIL_DELETE',0) && $result){
+						//$mailbox->getMessage($insert_data['mail_id'])->delete();
+					}
+					Log::Info(' '.$this->runAccount['account_email'].' MailID '.$mail_id.' Insert Success...');
+				}else{
+					Log::Info(' '.$this->runAccount['account_email'].' MailID '.$mail_id.' AlReady Exists...');
+				}		
+				}catch (\Exception $e){
+					Log::Info(' '.$this->runAccount['account_email'].' MailID '.$mail_id.' Insert Error...'.$e->getMessage());
+				}	
+			}
+		}
+		
+		DB::table('accounts')->where('id',$this->runAccount['id'])->update(['last_mail_date'=>$last_date]);
+		Log::Info(' '.$this->runAccount['account_email'].' Since '.$lastMailDate.' Emails Scan Complete...');
     }
 
     public function matchOrder($mail){
         //先匹配中间件1个月内订单，同步到导入到本地，再匹配本地订单
         //标题中含有订单号
         $data = array();
-        preg_match('/\d{3}-\d{7}-\d{7}/i', $mail->subject, $order_str);
+        preg_match('/\d{3}-\d{7}-\d{7}/i', $mail['subject'], $order_str);
         if(isset($order_str[0])){
             $data['amazon_order_id'] = $order_str[0];
-        }elseif(stripos($mail->fromAddress,'marketplace.amazon') !== false){
-            $data['amazon_order_id'] = $this->getOrderByEmail($mail->fromAddress);
+        }elseif(stripos($mail['from_address'],'marketplace.amazon') !== false){
+            $data['amazon_order_id'] = selft::getOrderByEmail($mail['from_address']);
         }else{
             $data['amazon_order_id']='';
         }
-        if($data['amazon_order_id'] && stripos($mail->fromAddress,'marketplace.amazon') !== false){
-            $data['order'] = $this->SaveOrderToLocal($data['amazon_order_id']);
+        if($data['amazon_order_id'] && stripos($mail['from_address'],'marketplace.amazon') !== false){
+            $data['order'] = self::SaveOrderToLocal($data['amazon_order_id']);
         }
         return $data;
 
@@ -233,8 +249,7 @@ class GetEmails extends Command
 		$return_data= array();
         $orderId = array_get($mailData,'amazon_order_id','');
         $lastUser = DB::table('inbox')->where('from_address',array_get($mailData,'from_address',''))
-            ->where('to_address',$this->runAccount['account_email'])
-            ->where('amazon_order_id',$orderId)->orderBy('date','desc')->first();
+            ->where('to_address',$this->runAccount['account_email'])->orderBy('date','desc')->first();
         if($lastUser){
             $return_data = array('etype'=>$lastUser->etype,'remark'=>$lastUser->remark,'sku'=>$lastUser->sku,'asin'=>$lastUser->asin,'item_no'=>$lastUser->item_no,'mark'=>$lastUser->mark,'epoint'=>$lastUser->epoint);
 			 
@@ -286,7 +301,7 @@ class GetEmails extends Command
 		}
 		
 		
-        $rules = $this->rules;//DB::table('rules')->orderBy('priority','asc')->get()->toArray();
+        $rules = $this->rules;
         $orderItems = array_get($orderData,'OrderItems',array());
         $orderSkus = ''; $orderAsins = array();
         foreach($orderItems as $item){

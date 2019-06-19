@@ -13,7 +13,7 @@
         "ext-openssl": "*",
         "ext-pdo": "*",
         "barryvdh/laravel-debugbar": "^3.1",
-        "ddeboer/imap": "^1.6",
+        "ddeboer/imap": "^1.8",
         "drewm/mailchimp-api": "^2.5",
         "enkay/mws": "^0.4.0",
         "exeu/apai-io": "^2.1",

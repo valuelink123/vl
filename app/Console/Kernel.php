@@ -65,7 +65,7 @@ class Kernel extends ConsoleKernel
         $i=0;
         foreach($accountList as $account){
             if($i>59) $i=0;
-            $schedule->command('get:email '.$account->id.' 1hours')->cron('*/30 * * * *')->name($account->id.'_get_emails')->withoutOverlapping();
+            $schedule->command('get:email '.$account->id)->cron('*/30 * * * *')->name($account->id.'_get_emails')->withoutOverlapping();
             $i++;
         }
 
