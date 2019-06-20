@@ -148,7 +148,7 @@ class GetEmails extends Command
 					$insert_data['amazon_seller_id'] = array_get($orderInfo,'order.SellerId',NULL);
 					$insert_data['sku'] = array_get($orderInfo,'order.Sku', NULL);
 					$insert_data['asin'] = array_get($orderInfo,'order.ASIN', NULL);
-					$match_rule = selft::matchUser($insert_data,array_get($orderInfo,'order',array()));
+					$match_rule = self::matchUser($insert_data,array_get($orderInfo,'order',array()));
 
 					if($match_rule['reply_status']==99){
 						if(env('AFTER_GET_MAIL_DELETE',0)){
@@ -195,7 +195,7 @@ class GetEmails extends Command
         if(isset($order_str[0])){
             $data['amazon_order_id'] = $order_str[0];
         }elseif(stripos($mail['from_address'],'marketplace.amazon') !== false){
-            $data['amazon_order_id'] = selft::getOrderByEmail($mail['from_address']);
+            $data['amazon_order_id'] = self::getOrderByEmail($mail['from_address']);
         }else{
             $data['amazon_order_id']='';
         }
