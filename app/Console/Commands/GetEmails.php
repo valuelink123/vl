@@ -133,6 +133,7 @@ class GetEmails extends Command
 						}else{
 							$ifid = $attachment->getStructure()->ifid;
 							if($ifid){
+								$attId = $attachment->getStructure()->id;
 								$attName = $attachment->getStructure()->id.'.'.$attachment->getStructure()->subtype;
 							}else{
 								$attName = $attachment->getFilename();
@@ -141,7 +142,7 @@ class GetEmails extends Command
 							if (!is_dir($attPath)) mkdir($attPath, 0777,true);
 							file_put_contents($attPath.'/'.$attName,$attachment->getDecodedContent());
 							$attach_data[] = str_ireplace(public_path(),'',$attPath).'/'.$attName;
-							if($ifid) $insert_data['text_html'] = str_ireplace('cid:'.$attName,str_ireplace(public_path(),'',$attPath).'/'.$attName,$insert_data['text_html']);
+							if($ifid) $insert_data['text_html'] = str_ireplace('cid:'.$attId,str_ireplace(public_path(),'',$attPath).'/'.$attName,$insert_data['text_html']);
 						}
 					}
 					$insert_data['attachs']=serialize($attach_data);
