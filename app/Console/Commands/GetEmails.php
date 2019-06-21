@@ -106,7 +106,8 @@ class GetEmails extends Command
 					$attach_data = array();
 					$insert_data['mail_id'] = $mail_id;
 					$insert_data['mail_address'] = $this->runAccount['email'];
-					$insert_data['from_address']=$message->getFrom()->getAddress();
+					$reply_to = current($message->getReplyTo());
+					$insert_data['from_address']= ($reply_to)?$reply_to->getAddress():$message->getFrom()->getAddress();
 					$insert_data['from_name']=$message->getFrom()->getName();
 
 					$insert_data['to_address'] = $this->runAccount['account_email'];
