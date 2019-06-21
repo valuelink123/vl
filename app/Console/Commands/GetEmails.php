@@ -154,7 +154,7 @@ class GetEmails extends Command
 						if(env('AFTER_GET_MAIL_DELETE',0)){
 							//$mailbox->getMessage($insert_data['mail_id'])->delete();
 						}
-						Log::Info(' Mail From '.$mail->fromAddress.' To '.$this->runAccount['account_email'].' have been trashed...');
+						Log::Info(' Mail From '.$insert_data['from_address'].' To '.$this->runAccount['account_email'].' have been trashed...');
 						continue;
 					}
 					if(array_get($match_rule,'etype')) $insert_data['etype'] = $match_rule['etype'];
