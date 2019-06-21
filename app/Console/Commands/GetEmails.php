@@ -129,11 +129,11 @@ class GetEmails extends Command
 					foreach ($attachments as $attachment) {
 						if ($attachment->isEmbeddedMessage()) {
 							$embeddedMessage = $attachment->getEmbeddedMessage()->getContent();
-							$insert_data['content'].=$embeddedMessage;
+							$insert_data['text_html'].=$embeddedMessage;
 						}else{
 							$ifid = $attachment->getStructure()->ifid;
 							if($ifid){
-								$attName = $attachment->getStructure()->id;
+								$attName = $attachment->getStructure()->id.'.'.$attachment->getStructure()->subtype;
 							}else{
 								$attName = $attachment->getFilename();
 							}
@@ -141,7 +141,7 @@ class GetEmails extends Command
 							if (!is_dir($attPath)) mkdir($attPath, 0777,true);
 							file_put_contents($attPath.'/'.$attName,$attachment->getDecodedContent());
 							$attach_data[] = str_ireplace(public_path(),'',$attPath).'/'.$attName;
-							if($ifid) $insert_data['content'] = str_ireplace('cid:'.$attName,str_ireplace(public_path(),'',$attPath).'/'.$attName,$insert_data['content']);
+							if($ifid) $insert_data['text_html'] = str_ireplace('cid:'.$attName,str_ireplace(public_path(),'',$attPath).'/'.$attName,$insert_data['text_html']);
 						}
 					}
 					$insert_data['attachs']=serialize($attach_data);
@@ -182,7 +182,7 @@ class GetEmails extends Command
 					Log::Info(' '.$this->runAccount['account_email'].' MailID '.$mail_id.' AlReady Exists...');
 				}		
 				}catch (\Exception $e){
-					Log::Info(' '.$this->runAccount['account_email'].' MailID '.$mail_id.' from '.$insert_data['from_address'].' Insert Error...'.$e->getMessage());
+					Log::Info(' '.$this->runAccount['account_email'].' MailID '.$mail_id.' from '.$message->getFrom()->getAddress().' Insert Error...'.$e->getMessage());
 				}	
 			}
 		}
