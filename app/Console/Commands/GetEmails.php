@@ -182,7 +182,7 @@ class GetEmails extends Command
 					Log::Info(' '.$this->runAccount['account_email'].' MailID '.$mail_id.' AlReady Exists...');
 				}		
 				}catch (\Exception $e){
-					Log::Info(' '.$this->runAccount['account_email'].' MailID '.$mail_id.' Insert Error...'.$e->getMessage());
+					Log::Info(' '.$this->runAccount['account_email'].' MailID '.$mail_id.' from '.$insert_data['from_address'].' Insert Error...'.$e->getMessage());
 				}	
 			}
 		}
