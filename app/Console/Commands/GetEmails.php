@@ -96,6 +96,9 @@ class GetEmails extends Command
 			if ($mailbox->getAttributes() & \LATT_NOSELECT) {
 				continue;
 			}
+			if($mailbox->getName()=='Sent Messages' || $mailbox->getName()=='Deleted Messages' || $mailbox->getName()=='Drafts'){
+				continue;
+			}
 			$messages = $mailbox->getMessages($search);
 			foreach($messages as $message){
 				try{
@@ -169,7 +172,7 @@ class GetEmails extends Command
 					$insert_data['group_id'] = $match_rule['group_id'];
 					$insert_data['rule_id'] = $match_rule['rule_id'];
 					$insert_data['reply'] = $match_rule['reply_status'];
-					print_r($insert_data);
+					//print_r($insert_data);
 					$result = DB::table('inbox')->insert($insert_data);
 					if(env('AFTER_GET_MAIL_DELETE',0) && $result){
 						//$mailbox->getMessage($insert_data['mail_id'])->delete();
