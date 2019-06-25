@@ -119,7 +119,7 @@ class GetEmails extends Command
 					$insert_data['text_plain'] = $message->getBodyText();
 					$insert_data['date'] = $message->getDate()->format('Y-m-d H:i:s');
 					$insert_data['type'] = $this->runAccount['type'];
-					
+					$insert_data['get_date'] = date('Y-m-d H:i:s');
 					//$insert_data['message_id']=$message->getId();
 					//$insert_data['mail_id']=$message->getNumber();
 
