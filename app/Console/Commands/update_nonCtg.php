@@ -127,8 +127,7 @@ class UpdateNonctg extends Command
         //取出ctg中昨天新插入的数据，根据orderid判断是否存在于ctg表中，如果存在ctg表中，则把nonctg表中的该条数据删除
         $sql = 'select b.id as id 
                 from ctg as a 
-                join non_ctg as b on a.order_id = b.amazon_order_id 
-                where  created_at >= "'.$yestoday.'"';
+                join non_ctg as b on a.order_id = b.amazon_order_id ';
         $ctgData = DB::select($sql);
         //根据id删除nonctg用户数据
         $delIds = array();

@@ -79,7 +79,7 @@ th,td,td>span {
 									<th width="5%"> Submit Review </th>
 									<th width="5%"> Completed </th>
 									<th width="8%"> Date </th>
-									<th width="8%"> Positive target </th>
+									<th width="8%"> Reviews Needed </th>
 									<th width="8%"> User </th>
 									<th width="8%"> Status</th>
 								</tr>

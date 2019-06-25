@@ -344,6 +344,7 @@ class ExceptionController extends Controller
 
         array_push(
             $vars['requestContentHistoryValues'],
+			'quality issue',
             'Damage in Transit/lost in Transit',
             'cx did not receive the product',
             'Replacement parts',
@@ -351,7 +352,6 @@ class ExceptionController extends Controller
             'RSG-gift',
             'CTG-gift',
             'Remove NRW',
-            'quality issue',
             'others'
         );
 
@@ -383,11 +383,11 @@ class ExceptionController extends Controller
 		$last_inboxid=0;
 
 		$last_inbox = Inbox::where('amazon_seller_id',array_get($rule,'sellerid'))->where('amazon_order_id',array_get($rule,'amazon_order_id'))->orderBy('date','desc')->first();
-		
+
 		if($last_inbox) $last_inboxid= $last_inbox->id;
-		
+
 		$auto_create_mcf_logs = DB::table('mcf_auto_create_log')->where('exception_id',$id)->orderBy('id','desc')->get();
-		
+
 		$replacement_order_ids=[];
 		if($rule['type']==2 || $rule['type']==3){
 			$replacements = unserialize($rule['replacement']);
@@ -428,7 +428,7 @@ class ExceptionController extends Controller
 			));
 			return redirect('exception/'.$id.'/edit');
 		}
-		
+
         $exception->score = $request->get('score');
         $exception->comment = $request->get('comment');
         $exception->process_content = $request->get('process_content');
@@ -610,6 +610,7 @@ class ExceptionController extends Controller
 			}
             
         }
+
         //if(Auth::user()->admin) {
 
 			if (array_get($_REQUEST, 'group_id')) {

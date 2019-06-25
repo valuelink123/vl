@@ -130,7 +130,7 @@
                         </div>
 						
 						<div class="form-group col-md-6">
-                            <label>Positive Target</label>
+                            <label>Reviews Needed</label>
                             
                       
                                 <input type="text" class="form-control" name="positive_target" id="positive_target" value="{{intval(array_get($rule,'positive_target'))}}">

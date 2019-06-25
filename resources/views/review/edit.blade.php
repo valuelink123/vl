@@ -383,6 +383,7 @@
 																									<i class="fa fa-angle-right"></i>
 																								</a>
 																								<button type="submit" class="btn blue">Save</button>
+                                                                                                <a href="/send/create?from_address=support@claimthegift.com&to_address={{$review['buyer_email']?$review['buyer_email']:array_get($customer,'email')}}&subject=Claim the gift" target="_blank"><button class="btn green" style="width:9em" type="button">Compose</button></a>
 																							</div>
 																						</div>
 																					</div>

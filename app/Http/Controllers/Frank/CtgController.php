@@ -94,6 +94,13 @@ class CtgController extends Controller {
 
         $where .= $this->getAsinWhere('t4.bgs','t4.bus','t4.sap_seller_id');
 
+        //搜索Review Id的搜索条件   '%"review_id":"12"%'
+		$ins = $req->input('search.ins', []);
+		if(isset($ins['review_id']) && $ins['review_id']){
+			$str = '%"review_id":"'.$ins['review_id'].'"%';
+			$where .= " AND t1.steps like '".$str."'";
+		}
+
         $sql = "
         SELECT SQL_CALC_FOUND_ROWS
             t1.created_at,
@@ -131,7 +138,7 @@ class CtgController extends Controller {
         LEFT JOIN (
             SELECT
               ANY_VALUE(SellerId) AS SellerId,
-		   	  ANY_VALUE(sap_seller_id) as  sap_seller_id,	 
+		   	  ANY_VALUE(sap_seller_id) as  sap_seller_id,	
               ANY_VALUE(MarketPlaceId) AS MarketPlaceId,
               ANY_VALUE(AmazonOrderId) AS AmazonOrderId,
               GROUP_CONCAT(DISTINCT t4_1.ASIN) AS asins,

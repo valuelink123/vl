@@ -82,7 +82,7 @@ th,td,td>span {
                             </select>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <div class="input-group">
                             <span class="input-group-addon">Status</span>
                             <select multiple style="width:100%;" id="status" data-init-by-query="ins.status">
@@ -103,8 +103,14 @@ th,td,td>span {
                             </select>
                         </div>
                     </div>
-					@permission('ctg-export')
                     <div class="col-md-2">
+                        <div class="input-group">
+                            <span class="input-group-addon">Review ID</span>
+                            <input  style="width:100%;height:29px;" id="review_id" data-init-by-query="ins.review_id" value="">
+                        </div>
+                    </div>
+					@permission('ctg-export')
+                    <div class="col-md-1">
                         <div class="btn-group " style="float:right;">
 
                             <button id="ctg-export" class="btn sbold blue"> Export
@@ -212,6 +218,7 @@ th,td,td>span {
                     bg: $('#bg').val(),
                     bu: $('#bu').val(),
                     brand: $('#brand').val(),
+                    review_id:$('#review_id').val(),
                 }
             })
 

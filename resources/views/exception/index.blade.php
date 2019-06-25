@@ -184,19 +184,11 @@ th,td,td>span {
 
                                     <div class="usergrouptot">
                                         <input type="hidden" class="form-filter"  id="from-userid" name="user_id" value="">
-                                        <div class="usergroupone">
-                                            <div class="userselect">
-                                                <select class="form-control userclass form-filter input-sm left input-small" name="userid[]" >
-                                                    <option value="">User</option>
-                                                    @foreach ($users as $user_id=>$user)
-
-                                                        <option value="{{$user_id}}">{{$user}}</option>
-
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                            <a href="javascript:void(0);" class="left addbtn">添加</a>
-                                        </div>
+                                        <select class="mt-multiselect btn btn-default select-user-id" multiple="multiple" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" name="user_id[]" id="user_id[]" value="">
+                                            @foreach ($users as $user_id=>$user)
+                                                <option value="{{$user_id}}">{{$user}}</option>
+                                            @endforeach
+                                        </select>
                                     </div>
                                 </td>
                                 <td>
@@ -343,69 +335,18 @@ th,td,td>span {
     }();
 
 $(function() {
-    //用户的搜索框点击添加按钮
-    $('.addbtn').click(function(){
-        var flag = 1;
-        $.each($('select[name="userid[]"]'),function(){
-            var value = $(this).val();
-            if(!value){
-                flag = 0;
-            }
-        })
-        if(!flag){
-            alert('请选择完用户下拉框再添加！');
-            return false;
-        }
-        var html ='<div class="usergroupone">';
-        html += $('.userselect').html();
-        html += '<a href="javascript:void(0);" class="left delbtn">删除</a></div>';
-        $('.usergrouptot').append(html);
-    });
-    //选择作者选择框改变的时候
-    $(".usergrouptot").delegate(".userclass","change",function(){
-        var curr = $(this).val();
-        var flag = 0;
-        $.each($('select[name="userid[]"]'),function(){
-            var value = $(this).val();
-            if(value==curr){
-                flag ++;
-            }
-        })
-        if(flag>1){
-            alert('请选择不同的用户！');
-            $(this).val('');
-            getuser();
-            return false;
-        }
-        getuser();
-    })
-    //改变from-userid的值
-    function getuser(){
-        var valstr = '';
-        $.each($('select[name="userid[]"]'),function(){
-            var value = $(this).val();
-            if(value){
-                valstr = value+','+valstr;
-            }
-        })
-        if (valstr.substr(0,1)==',') valstr=valstr.substr(1);
-        var reg=/,$/gi;
-        valstr = valstr.replace(reg,"");
-        $('#from-userid').val(valstr);
-    }
     //点击搜索框的重置的时候
     $('.filter-cancel').click(function(){
         $('#from-userid').val('');
     })
-    //点击删除移除此元素
-    $(".usergrouptot").delegate(".delbtn","click",function(){
-        $(this).parent().remove();
-        getuser();
-    })
 
-
+    $("table").delegate(".select-user-id","change",function(){
+        var user_id = $("select[name='user_id[]']").val();
+        $('#from-userid').val(user_id);
+    });
 
     TableDatatablesAjax.init();
+
 	$("#vl_list_export").click(function(){
 		location.href='/exceptionexport?sellerid='+$("select[name='sellerid']").val()+'&amazon_order_id='+$("input[name='amazon_order_id']").val()+'&date_from='+$("input[name='date_from']").val()+'&date_to='+$("input[name='date_to']").val()+'&type='+$("select[name='type']").val()+'&order_sku='+$("input[name='order_sku']").val()+'&status='+$("select[name='status']").val()+'&user_id='+$("input[name='user_id']").val()+'&group_id='+$("select[name='group_id']").val();
 	});
