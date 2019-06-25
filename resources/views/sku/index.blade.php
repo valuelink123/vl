@@ -518,7 +518,7 @@ white-space: nowrap;
 								$style=((0==$i)?'style="background:#ddeef7;"':'');
 								$week=date('Ymd',strtotime($date_start)+(-($i)*3600*24));
 							?>
-							<td {!!$style!!}><span id="{{str_replace('.','',$data->site).'-'.$data->asin.'-'.$week}}-fba_keep"> {!!(array_get($datas_details,str_replace('.','',$data->site).'-'.$data->asin.'-'.$week.'.sales',0))?round(intval(array_get($datas_details,str_replace('.','',$data->site).'-'.$data->asin.'-'.$week.'.fba_stock',0))/(array_get($datas_details,str_replace('.','',$data->site).'-'.$data->asin.'-'.$week.'.sales',0)),2):'∞'!!} </span></td>
+							<td {!!$style!!}><span id="{{str_replace('.','',$data->site).'-'.$data->asin.'-'.$week}}-fba_keep"> {!!(array_get($datas_details,str_replace('.','',$data->site).'-'.$data->asin.'-'.$week.'.sales',0)!=0)?round(intval(array_get($datas_details,str_replace('.','',$data->site).'-'.$data->asin.'-'.$week.'.fba_stock',0))/(array_get($datas_details,str_replace('.','',$data->site).'-'.$data->asin.'-'.$week.'.sales',0)),2):'∞'!!} </span></td>
 							<?php
 							}
 							?>
@@ -530,7 +530,7 @@ white-space: nowrap;
 								$style=((0==$i)?'style="background:#ddeef7;"':'');
 								$week=date('Ymd',strtotime($date_start)+(-($i)*3600*24));
 							?>
-							<td {!!$style!!}><span id="{{str_replace('.','',$data->site).'-'.$data->asin.'-'.$week}}-total_keep"> {!!(array_get($datas_details,str_replace('.','',$data->site).'-'.$data->asin.'-'.$week.'.sales',0))?round((intval(array_get($datas_details,str_replace('.','',$data->site).'-'.$data->asin.'-'.$week.'.fba_stock',0))+intval(array_get($datas_details,str_replace('.','',$data->site).'-'.$data->asin.'-'.$week.'.fbm_stock',0))+intval(array_get($datas_details,str_replace('.','',$data->site).'-'.$data->asin.'-'.$week.'.fba_transfer',0)))/(array_get($datas_details,str_replace('.','',$data->site).'-'.$data->asin.'-'.$week.'.sales',0)),2):'∞'!!} </span></td>
+							<td {!!$style!!}><span id="{{str_replace('.','',$data->site).'-'.$data->asin.'-'.$week}}-total_keep"> {!!(array_get($datas_details,str_replace('.','',$data->site).'-'.$data->asin.'-'.$week.'.sales',0)!=0)?round((intval(array_get($datas_details,str_replace('.','',$data->site).'-'.$data->asin.'-'.$week.'.fba_stock',0))+intval(array_get($datas_details,str_replace('.','',$data->site).'-'.$data->asin.'-'.$week.'.fbm_stock',0))+intval(array_get($datas_details,str_replace('.','',$data->site).'-'.$data->asin.'-'.$week.'.fba_transfer',0)))/(array_get($datas_details,str_replace('.','',$data->site).'-'.$data->asin.'-'.$week.'.sales',0)),2):'∞'!!} </span></td>
 							<?php
 							}
 							?>
