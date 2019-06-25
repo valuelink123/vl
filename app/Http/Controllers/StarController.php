@@ -69,7 +69,7 @@ class StarController extends Controller
 					->on('star.domain', '=', 'asin.site');
 			});
 		
-		if(!Auth::user()->admin){
+		if(!Auth::user()->can(['asin-rating-show-all'])){ 
             $customers = $customers->where('asin.review_user_id',$this->getUserId());
         }
 		
