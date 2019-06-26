@@ -92,7 +92,7 @@ class CtgController extends Controller {
         $orderby = $this->dtOrderBy($req);
         $limit = $this->dtLimit($req);
 
-        $where .= $this->getAsinWhere('t4.bgs','t4.bus','t4.sap_seller_id');
+        $where .= $this->getAsinWhere('t4.bgs','t4.bus','t1.processor');
 
         //搜索Review Id的搜索条件   '%"review_id":"12"%'
 		$ins = $req->input('search.ins', []);
@@ -196,7 +196,7 @@ class CtgController extends Controller {
 
         $arrayData[] = $headArray;
 
-		$where = ' where 1 = 1' .$this->getAsinWhere('t4.bgs','t4.bus','t4.sap_seller_id');
+		$where = ' where 1 = 1' .$this->getAsinWhere('t4.bgs','t4.bus','t1.processor');
 
         $sql = "
         SELECT SQL_CALC_FOUND_ROWS
@@ -480,7 +480,7 @@ class CtgController extends Controller {
         $orderby = $this->dtOrderBy($req);
         $limit = $this->dtLimit($req);
 
-		$where .= $this->getAsinWhere('t4.bgs','t4.bus','t4.sap_seller_id');
+		$where .= $this->getAsinWhere('t4.bgs','t4.bus','t1.processor');
 
         $sql = "
         SELECT SQL_CALC_FOUND_ROWS
@@ -698,7 +698,7 @@ class CtgController extends Controller {
         $orderby = $this->dtOrderBy($req);
         $limit = $this->dtLimit($req);
 
-		$where .= $this->getAsinWhere('t4.bgs','t4.bus','t4.sap_seller_id');
+		$where .= $this->getAsinWhere('t4.bgs','t4.bus','t1.processor');
 
         $sql = "
         SELECT SQL_CALC_FOUND_ROWS

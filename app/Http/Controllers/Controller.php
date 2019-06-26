@@ -23,15 +23,15 @@ class Controller extends BaseController
 	* BU领导只能看该BU下的所有asin的相关数据信息
 	* 只是销售员的话，只能看自己所属的asin相关数据信息
 	*/
-	public function getAsinWhere($bg = 'asin.bg',$bu = 'asin.bu',$sap_seller_id = 'asin.sap_seller_id')
+	public function getAsinWhere($bg = 'asin.bg',$bu = 'asin.bu',$userid = 'processor')
 	{
 		$asinWhere = '';
 		if (Auth::user()->seller_rules) {
 			$rules = explode("-",Auth::user()->seller_rules);
 			if(array_get($rules,0)!='*') $asinWhere .= ' AND '.$bg.' = "'.array_get($rules,0).'"';
 			if(array_get($rules,1)!='*') $asinWhere .=  ' AND '.$bu.' = "'.array_get($rules,1).'"';
-		} elseif (Auth::user()->sap_seller_id) {
-			$asinWhere = ' AND '.$sap_seller_id.' = '.Auth::user()->sap_seller_id;
+		} elseif (empty(Auth::user()->admin)) {
+			$asinWhere = ' AND '.$userid.' = '.Auth::user()->id;
 		}
 		return $asinWhere;
 	}
