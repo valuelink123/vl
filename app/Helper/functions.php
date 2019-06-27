@@ -446,6 +446,7 @@ function batchInsert($table,$data){
  * name为此官网的名称，用于插入到non_ctg表中的from字段
  * formid为wp_gf_form表中warranty表单的id
  * fields表示字段的指定关系，例如name是对应meta_key的1值
+ * tecbean.com,funavopro.com,volt-cube.com,vacassoart.com这几个品牌官网都归到spacekeybrands.com了；并且funavopro.com,volt-cube.com,vacassoart.com这三个品牌官网都不能再访问了
  */
 function getActiveUserConfig()
 {
@@ -460,7 +461,12 @@ function getActiveUserConfig()
         array('db'=>'website','dbname'=>'irunme_net','name'=>'irunme','formid'=>array(1),'fields'=>array('name'=>'5.3','email'=>6,'orderid'=>7)),
         array('db'=>'website','dbname'=>'spacekeybrands_com','name'=>'spacekeybrands','formid'=>array(2),'fields'=>array('name'=>'2.3','email'=>3,'orderid'=>4)),
 		array('db'=>'natrogix','dbname'=>'natrogix_com','name'=>'natrogix','formid'=>array(17),'fields'=>array('name'=>'4','email'=>1,'orderid'=>3)),
+
+		array('db'=>'drocon','dbname'=>'drocon_co','name'=>'drocon','formid'=>array(2),'fields'=>array('name'=>'1.3','email'=>2,'orderid'=>3)),
+		array('db'=>'natrogix','dbname'=>'lypsonline_com','name'=>'lypsonline','formid'=>array(2),'fields'=>array('name'=>'1.3','email'=>2,'orderid'=>3)),
+		array('db'=>'website','dbname'=>'vipsupport_jp','name'=>'vipsupport','formid'=>array(1),'fields'=>array('name'=>'2.3','email'=>3,'orderid'=>4)),
     );
+
     return $config;
 }
 /*
