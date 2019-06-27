@@ -383,7 +383,9 @@ class RsgrequestsController extends Controller
 		$subscriber_hash = $MailChimp->subscriberHash($customer_email);	
 		$MailChimp->put("lists/$list_id/members/$subscriber_hash", $args);
 		if (!$MailChimp->success()) {
-			die($MailChimp->getLastError());
+			echo $MailChimp->getLastError();
+			echo $MailChimp->getLastResponse();
+			die();
 		}
 		$MailChimp->post("lists/$list_id/members/$subscriber_hash/tags", [
 			'tags'=>[
@@ -392,7 +394,9 @@ class RsgrequestsController extends Controller
 			]
 		]);
 		if (!$MailChimp->success()) {
-			die($MailChimp->getLastError());
+			echo $MailChimp->getLastError();
+			echo $MailChimp->getLastResponse();
+			die();
 		}
 	}
 	
