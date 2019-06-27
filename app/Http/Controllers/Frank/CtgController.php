@@ -92,7 +92,7 @@ class CtgController extends Controller {
         $orderby = $this->dtOrderBy($req);
         $limit = $this->dtLimit($req);
 
-        $where .= $this->getAsinWhere('t4.bgs','t4.bus','t1.processor');
+        $where .= $this->getAsinWhere('t4.bgs','t4.bus','t1.processor','ctg-show-all');
 
         //搜索Review Id的搜索条件   '%"review_id":"12"%'
 		$ins = $req->input('search.ins', []);
@@ -196,7 +196,7 @@ class CtgController extends Controller {
 
         $arrayData[] = $headArray;
 
-		$where = ' where 1 = 1' .$this->getAsinWhere('t4.bgs','t4.bus','t1.processor');
+		$where = ' where 1 = 1' .$this->getAsinWhere('t4.bgs','t4.bus','t1.processor','ctg-show-all');
 
         $sql = "
         SELECT SQL_CALC_FOUND_ROWS
@@ -412,16 +412,6 @@ class CtgController extends Controller {
         return [true];
     }
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	//b1g1
 	public function bglist(Request $req) {
 		if(!Auth::user()->can(['ctg-show'])) die('Permission denied -- ctg-show');
@@ -480,7 +470,7 @@ class CtgController extends Controller {
         $orderby = $this->dtOrderBy($req);
         $limit = $this->dtLimit($req);
 
-		$where .= $this->getAsinWhere('t4.bgs','t4.bus','t1.processor');
+		$where .= $this->getAsinWhere('t4.bgs','t4.bus','t1.processor','ctg-show-all');
 
         $sql = "
         SELECT SQL_CALC_FOUND_ROWS
@@ -698,7 +688,7 @@ class CtgController extends Controller {
         $orderby = $this->dtOrderBy($req);
         $limit = $this->dtLimit($req);
 
-		$where .= $this->getAsinWhere('t4.bgs','t4.bus','t1.processor');
+		$where .= $this->getAsinWhere('t4.bgs','t4.bus','t1.processor','ctg-show-all');
 
         $sql = "
         SELECT SQL_CALC_FOUND_ROWS
