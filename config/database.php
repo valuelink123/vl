@@ -185,6 +185,36 @@ return [
 			'strict' => false,
 			'engine' => null,
 		],
+
+		'natrogix' => [
+			'driver' => 'mysql',
+			'host' => env('DB_NATROGIX_HOST', '127.0.0.1'),
+			'port' => env('DB_NATROGIX_PORT', '3306'),
+			'database' => env('DB_NATROGIX_DATABASE', 'forge'),
+			'username' => env('DB_NATROGIX_USERNAME', 'forge'),
+			'password' => env('DB_NATROGIX_PASSWORD', ''),
+			'unix_socket' => env('DB_NATROGIX_SOCKET', ''),
+			'charset' => 'utf8mb4',
+			'collation' => 'utf8mb4_unicode_ci',
+			'prefix' => '',
+			'strict' => false,
+			'engine' => null,
+		],
+
+		'drocon' => [
+			'driver' => 'mysql',
+			'host' => env('DB_DROCON_HOST', '127.0.0.1'),
+			'port' => env('DB_DROCON_PORT', '3306'),
+			'database' => env('DB_DROCON_DATABASE', 'forge'),
+			'username' => env('DB_DROCON_USERNAME', 'forge'),
+			'password' => env('DB_DROCON_PASSWORD', ''),
+			'unix_socket' => env('DB_DROCON_SOCKET', ''),
+			'charset' => 'utf8mb4',
+			'collation' => 'utf8mb4_unicode_ci',
+			'prefix' => '',
+			'strict' => false,
+			'engine' => null,
+		],
     ],
 
     /*
