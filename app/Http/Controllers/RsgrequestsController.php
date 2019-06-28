@@ -80,17 +80,7 @@ class RsgrequestsController extends Controller
 			   RsgRequest::whereIn('id',$request->input("id"))->update($updateDate);
 			   foreach($request->input("id") as $r_id){
 				   $rule = RsgRequest::findOrFail($r_id);
-				   $step_to_tags = array(
-						'1'  => 'RSG Join',
-						'2'  => 'RSG Request Reject',
-						'3'  => 'RSG Submit Paypal',
-						'4'  => 'RSG Check Paypal',
-						'5'  => 'RSG Submit Purchase',
-						'6'  => 'RSG Check Purchase',
-						'7'  => 'RSG Submit Review Url',
-						'8'  => 'RSG Check Review Url',
-						'9'  => 'RSG Completed'
-					);
+				   $step_to_tags = getStepIdToTags();
 					self::mailchimp($rule->customer_email,array_get($step_to_tags,$request->input("customstatus")),[]);
 				}
         }
@@ -271,17 +261,7 @@ class RsgrequestsController extends Controller
 
         $rule->user_id = intval(Auth::user()->id);
         if ($rule->save()) {
-			$step_to_tags = array(
-				'1'  => 'RSG Join',
-				'2'  => 'RSG Request Reject',
-				'3'  => 'RSG Submit Paypal',
-				'4'  => 'RSG Check Paypal',
-				'5'  => 'RSG Submit Purchase',
-				'6'  => 'RSG Check Purchase',
-				'7'  => 'RSG Submit Review Url',
-				'8'  => 'RSG Check Review Url',
-				'9'  => 'RSG Completed'
-			);
+			$step_to_tags = getStepIdToTags();
 			$product= RsgProduct::where('id',$rule->product_id)->first()->toArray();
 			$mailchimpData = array(
 				'PROIMG'=>$product['product_img'],'PRONAME'=>$product['product_name'],'PROKEY'=>$product['keyword'],'PROPAGE'=>$product['page'],'PROPOS'=>$product['position'],'MARKET'=>str_replace('www.','',$product['site'])
@@ -344,17 +324,7 @@ class RsgrequestsController extends Controller
 
         $rule->user_id = intval(Auth::user()->id);
         if ($rule->save()) {
-			$step_to_tags = array(
-				'1'  => 'RSG Join',
-				'2'  => 'RSG Request Reject',
-				'3'  => 'RSG Submit Paypal',
-				'4'  => 'RSG Check Paypal',
-				'5'  => 'RSG Submit Purchase',
-				'6'  => 'RSG Check Purchase',
-				'7'  => 'RSG Submit Review Url',
-				'8'  => 'RSG Check Review Url',
-				'9'  => 'RSG Completed'
-			);
+			$step_to_tags = getStepIdToTags();
 			$product= RsgProduct::where('id',$rule->product_id)->first()->toArray();
 			$mailchimpData = array(
 				'PROIMG'=>$product['product_img'],'PRONAME'=>$product['product_name'],'PROKEY'=>$product['keyword'],'PROPAGE'=>$product['page'],'PROPOS'=>$product['position']

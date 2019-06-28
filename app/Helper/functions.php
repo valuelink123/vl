@@ -609,3 +609,19 @@ function getCrmOrderType()
 {
 	return array(0=>'Default Type',1=>'RSG Type');
 }
+
+function getStepIdToTags(){
+	return array(
+				'1'  => 'RSG Join',
+				'2'  => 'RSG Request Reject',
+				'3'  => 'RSG Submit Paypal',
+				'4'  => 'RSG Check Paypal',
+				'5'  => 'RSG Submit Purchase',
+				'6'  => 'RSG Check Purchase',
+				'7'  => 'RSG Submit Review Url',
+				'8'  => 'RSG Check Review Url',
+				'9'  => 'RSG Completed',
+				'10'  => 'Closed',
+				'11'  => 'Open Dispute'
+			);
+}
