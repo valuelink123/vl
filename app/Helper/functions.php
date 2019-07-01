@@ -625,3 +625,49 @@ function getStepIdToTags(){
 				'11'  => 'Open Dispute'
 			);
 }
+
+/*
+ * 得到收件箱后缀名跟负责人的一一对应关系
+ * 主要用于跑CRM模块来自 site inbox模块的数据
+ * 此模块数据的跑到CRM后的负责人根据收件箱的品牌官网对应到某个负责人
+ */
+function getBrandProcessor()
+{
+	$data = array(
+		'azeus.net' => 166,
+		'dbpower.co' => 96,
+		'tenker.co' => 96,
+		'mykoios.com' => 166,
+		'spacekey.net' => 83,
+		'mooka.co' => 86,
+		'natrogix.com' => 208,
+		'miropure.co' => 52,
+		'miropure.co.uk' => 52,
+		'nursal.co' => 67,
+		'drocon.co' => 51,
+		'irunme.net' => 51,
+		'oxalife.com' => 51,
+		'hoverstorm.com' => 51,
+		'lypsonline.com' => 68,
+		'spacekeybrands.com' => 31,
+		'tecbean.com' => 92,
+		'hotmail.com' => 31,
+		'outlook.com' => 31,
+		'contactbabysteps.com' => 52,
+		'dbpower' => 96,
+		'dbpowerpro.com' => 96,
+		'doctorhetzner.net' => 166,
+		'funavo.co.jp' => 109,
+		'funavopro.com' => 83,
+		'tenker-vl.com' => 96,
+		'tenkersupport.com' => 96,
+		'unicdrone.com' => 51,
+		'vipsupport.jp' => 109,
+		'volt-cube.com' => 123,
+		'claimthegift.com' => 31,
+		'koiostec.com' => 166,
+		'mookapro.com' => 86,
+	);
+
+	return $data;
+}

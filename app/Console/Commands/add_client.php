@@ -55,7 +55,7 @@ class AddClient extends Command
 		Log::Info('Add History Client Start...');
 		$this->getCtgCrm();
 		$this->getNonCtg();
-		// $this->getEmailCrm();//注意：未做完(需求待确认)
+		$this->getEmailCrm();
 		$this->getCallCrm();
 		$this->getRsgCrm();
 		$this->getReviewCrm();
@@ -126,27 +126,63 @@ class AddClient extends Command
 	 * 得到crm模块来自email客户
 	 * 只获取site站点邮箱的客户
 	 * 来自email的数据的processor为最后一个发件人
+	 * 如果发件邮箱的后缀存在收件箱后缀中，则忽略掉这些邮箱发来的数据
 	 *
 	 */
-	// function getEmailCrm()
-	// {
-	// 	$where = '1 = 1';
-	// 	$sql = "SELECT  t1.from_name as name,t1.from_address as email,t1.amazon_order_id as amazon_order_id,t1.date as date,t3.brand as brand,'' as phone,'' as country
-	// 			FROM inbox as t1
-	// 			LEFT JOIN asin t3 ON t1.asin = t3.asin and t1.sku = t3.sellersku
-	// 			left join client_info as t5 on t5.email = t1.from_address
-	// 			left join client_order_info as t6 on t6.amazon_order_id=t1.amazon_order_id
-	// 			WHERE {$where} and t1.from_address is not null and type = 'Site' and t6.id is null limit 0,10";
-	// 	Log::Info($sql);
-	// 	$data = $this->queryRows($sql);
-	// 	if($data){
-	// 		$this->addData($data, 'Email',true,false);
-	// 	}
-	//
-	// 	// $queries = DB::getQueryLog(); // 获取查询日志
-	// 	// Log::Info($queries);
-	//
-	// }
+	function getEmailCrm()
+	{
+		//先找出所有收件邮箱的后缀，如果发件邮箱的后缀存在这些后缀中，则忽略掉这些邮箱发来的数据
+		$sql = 'SELECT distinct(to_address) as to_address 
+				FROM inbox
+				WHERE type = "Site"';
+		$ignoreData = $this->queryRows($sql);
+
+		$where = " t1.date >= '".$this->date."'";
+		$str = '';
+		//NOT REGEXP '北京|上海|深圳|天津|香港|沈阳';
+		foreach($ignoreData as $key=>$val){
+			$v = explode('@',$val['to_address']);
+			if(isset($v[1]) && $v[1]){
+				$str .= $v[1].'|';
+			}
+		}
+		if($str){
+			$where = $where . ' AND t1.from_address NOT REGEXP "'.rtrim($str,'|').'"';
+		}
+
+		$sql = "SELECT  t1.from_name as name,t1.from_address as email,t1.to_address as to_email,t1.amazon_order_id as amazon_order_id,t1.date as date,t3.brand as brand,'' as phone,'' as country
+				FROM inbox as t1
+				LEFT JOIN asin t3 ON t1.asin = t3.asin and t1.sku = t3.sellersku
+				left join client_info as t5 on t5.email = t1.from_address
+				left join client_order_info as t6 on t6.amazon_order_id=t1.amazon_order_id
+				WHERE {$where} and t1.from_address is not null 
+				and type = 'Site' and t6.id is null 
+				order by date asc";
+
+		Log::Info($sql);
+		$_data = $this->queryRows($sql);
+		$data = array();
+		if($_data){
+			$brandProcessor = getBrandProcessor();
+			foreach($_data as $key=>$val){
+				$to_email = explode('@',$val['to_email']);
+				//得到邮箱对应的负责人，以最后一封邮件为准
+				if(isset($to_email[1]) && $to_email[1]){
+					$emailProcess[$val['email']] = $val['processor'] = isset($brandProcessor[$to_email[1]]) ? $brandProcessor[$to_email[1]] : 31;//如果没有配置对应品牌的负责人的话默认是靖晓菲(31)
+				}
+				$emailProcess[$val['email']] = $val['processor'];
+				$data[$val['email'].'_'.$val['amazon_order_id']] = $val;//需要插入的数据，只有当邮箱和订单号同时存在的时候才不需要插入到client表中
+			}
+			foreach($data as $key=>$val){
+				$data[$key]['processor'] = isset($emailProcess[$val['email']]) ? $emailProcess[$val['email']] : '';
+			}
+			$this->addData($data, 'Email',true,true);
+		}
+
+		// $queries = DB::getQueryLog(); // 获取查询日志
+		// Log::Info($queries);
+
+	}
 
 	/*
 	 * 得到crm模块来自Call客户
@@ -217,7 +253,11 @@ class AddClient extends Command
 		// Log::Info($queries);
 	}
 
-	//插入数据到client,client_info,client_order_info这三个表中
+	/*
+	 * 插入数据到client,client_info,client_order_info这三个表中
+	 * $sap表示是否要获取sap接口,
+	 * $info表示是否要获取asin table里的数据来更新processor和brand
+	 */
 	function addData($_data,$from,$sap=false,$info=false)
 	{
 		DB::beginTransaction();
@@ -293,6 +333,7 @@ class AddClient extends Command
 
 	/*
 	 * 从sap的获取订单信息接口得到表里面没有的数据，例如country，phone
+	 * 从sap获取的订单信息中没有brand,brand要从asin表中去获取
 	 */
 	function OrderInfoByData($data,$info)
 	{
