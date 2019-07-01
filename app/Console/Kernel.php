@@ -8,7 +8,7 @@ use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use App;
 use PDO;
 use DB;
-require __DIR__.'/../Helper/functions.php';
+//require __DIR__.'/../Helper/functions.php';
 class Kernel extends ConsoleKernel
 {
     /**
