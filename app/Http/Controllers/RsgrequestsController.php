@@ -182,7 +182,7 @@ class RsgrequestsController extends Controller
 				$list['amazon_order_id'],
 				'<div style="width: 200px;word-wrap: break-word;text-align: center;">'.$list['review_url'].'<BR><span class="text-danger">'.$list['transaction_id'].'</span></div>',
 				$list['star_rating'],
-				$list['follow'],
+				'<div style="width: 200px;word-wrap: break-word;text-align: center;">'.$list['follow'].'</div>',
 				$list['next_follow_date'],
 				array_get($users,$list['user_id']),
 				$list['site'],
@@ -297,7 +297,7 @@ class RsgrequestsController extends Controller
 	
 	public function getproducts(){
 		$date=date('Y-m-d');
-		$products = RsgProduct::where('status',1)->where('daily_remain','>',0)->where('start_date','<=',$date)->where('end_date','>=',$date)->orderBy('site','asc')->get()->toArray();
+		$products = RsgProduct::whereIn('status',array(1,2))->where('daily_remain','>',0)->where('start_date','<=',$date)->where('end_date','>=',$date)->orderBy('site','asc')->get()->toArray();
 		return $products;
 	}
 
