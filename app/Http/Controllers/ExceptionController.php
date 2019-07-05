@@ -352,9 +352,10 @@ class ExceptionController extends Controller
             'RSG-gift',
             'CTG-gift',
             'Remove NRW',
-            'others'
+            'others',
+			'FBM sales order',
+			'B2B'
         );
-
         return view('exception/add', $vars);
     }
 

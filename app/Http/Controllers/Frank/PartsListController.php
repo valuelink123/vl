@@ -20,7 +20,20 @@ class PartsListController extends Controller {
 
     public function index() {
 		if(!Auth::user()->can(['partslist-show'])) die('Permission denied -- partslist-show');
-        return view('frank/kmsPartsList');
+		$sql = "
+        SELECT seller_name,any_value(account_status) as account_status FROM kms_stock group by seller_name";
+		$_sellerName = $this->queryRows($sql);
+		$sellerName = array();
+		foreach($_sellerName as $key=>$val){
+			if($val['seller_name']){
+				$sellerName[$val['seller_name']]['seller_name'] = $val['seller_name'];
+				$sellerName[$val['seller_name']]['class'] = '';
+				if($val['account_status']==1){
+					$sellerName[$val['seller_name']]['class'] = 'invalid-account';
+				}
+			}
+		}
+        return view('frank/kmsPartsList',['sellerName'=>$sellerName]);
     }
 
     /**
@@ -52,10 +65,18 @@ class PartsListController extends Controller {
         if (empty($subCodes)) return [];
 
         // kms_stock 为 fba_stockk + fbm_stock 的视图
-        return DB::table('kms_stock')
-            ->select('item_code', 'asin', 'fba_stock', 'fba_transfer', 'fbm_stock', 'item_name', 'seller_name', 'seller_sku')
+		$rows = DB::table('kms_stock')
+            ->select('item_code', 'asin', 'fba_stock', 'fba_transfer', 'fbm_stock', 'item_name', 'seller_name', 'seller_sku','account_status')
             ->whereIn('item_code', $subCodes)
             ->get();
+		//账号机的状态为1的时候，表示为无效账号机，此时标红显示
+		foreach($rows as $key=>$val){
+			// $rows[$key]->fbm_valid_stock = ' ';
+			if($val->account_status==1){
+				$rows[$key]->seller_name = '<div class="invalid-account">'.$val->seller_name.'</div>';
+			}
+		}
+		return $rows;
 
         // 改用视图
         // return DB::table('fba_stock AS t1')
@@ -96,7 +117,9 @@ class PartsListController extends Controller {
         t1.fba_stock,
         t1.fba_transfer,
         t1.fbm_stock,
-        t1.item_name
+        t1.item_name,
+	    t1.account_status
+
         FROM kms_stock t1
         LEFT JOIN (
             SELECT
@@ -114,6 +137,12 @@ class PartsListController extends Controller {
         ";
 
         $rows = $this->queryRows($sql);
+        foreach($rows as $key=>$val){
+        	//账号机的状态为1的时候，表示为无效账号机，此时标红显示
+        	if($val['account_status']==1){
+				$rows[$key]['seller_name'] = '<div class="invalid-account">'.$val['seller_name'].'</div>';
+			}
+		}
 
         $total = $this->queryOne('SELECT FOUND_ROWS()');
 
@@ -135,6 +164,7 @@ class PartsListController extends Controller {
                 ->select('item_code')
                 ->where('seller_id', $req->input('seller_id'))
                 ->where('seller_sku', $req->input('seller_sku'))
+				->where('account_status',0)
                 ->whereNotNull('item_code')
                 ->get();
 
@@ -176,7 +206,7 @@ class PartsListController extends Controller {
                 fba_stock
             LEFT JOIN fbm_stock USING (item_code)
             WHERE
-                item_code = '{$item_code}'
+                item_code = '{$item_code}' and account_status = 0 
 
             UNION
 
@@ -203,5 +233,16 @@ class PartsListController extends Controller {
 
         return $rows;
     }
+
+    /*
+     * 设置账号机有效或者是无效
+     */
+    public function updateStatus(Request $req)
+	{
+		$seller_name = isset($_POST['seller_name']) ? $_POST['seller_name'] : '';
+		$status = isset($_POST['status']) ? $_POST['status'] : '';
+		DB::table('fba_stock')->whereIn('seller_name',$seller_name)->update(array('account_status'=>$status));
+		return [true];
+	}
 
 }

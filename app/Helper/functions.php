@@ -671,3 +671,47 @@ function getBrandProcessor()
 
 	return $data;
 }
+
+/*
+ * 得到所有的countryCode
+ */
+function getCountryCode()
+{
+	$arr = array(
+		'AE','AT','AU','BE','BM','BR','CA','CL','CO','CR','CY',
+		'CZ','DE','DK','ES','FR','GB','GR','GU','HK','HU','ID',
+		'IE','IL','IN','IS','IT','JM','JP','KR','KW','LU','MT',
+		'MX','MY','NG','NL','NO','NZ','PE','PH','PL','PR','PT',
+		'PW','QA','RO','SA','SE','SG','SK','TR','TT','TW','UK',
+		'US','ZA'
+	);
+	return $arr;
+}
+/*
+ * 得到countrycode为US的StateOrRegion种类
+ * 当countrycode选择US的时候，StateOrRegion为固定的下拉选项
+ */
+function getStateOrRegionByUS()
+{
+	$arr = array(
+		'AA'=>'AA-APO/FPO:Americas','AE'=>'AE-APO/FPO：Europe,Africa,Cannda,Mideast','AK'=>'AK-Alaska',
+		'AL'=>'AL-Alabama','AP'=>'AP-APO/FPO：Asia,Pacific','AR'=>'AR-Arkansas',
+		'AZ'=>'AZ-Arizona','CA'=>'CA-California','CO'=>'CO-Colorado',
+		'CT'=>'CT-Connecticut','DC'=>'DC-District of Columbia','DE'=>'DE-Delaware',
+		'FL'=>'FL-Florida','GA'=>'GA-Georgia','HI'=>'HI-Hawaii',
+		'IA'=>'IA-Iowa','ID'=>'ID-Idaho','IL'=>'IL-Illinois',
+		'IN'=>'IN-Indiana','KS'=>'KS-Kansas','KY'=>'KY-Kentucky',
+		'LA'=>'LA-Louisiana','MA'=>'MA-Massachusetts','MD'=>'MD-Maryland',
+		'ME'=>'ME-Maine','MI'=>'MI-Michigan','MN'=>'MN-Minnesota',
+		'MO'=>'MO-Missouri','MS'=>'MS-Mississippi','MT'=>'MT-Montana',
+		'NC'=>'NC-North Carolina','ND'=>'ND-North Dakota','NE'=>'NE-Nebraska',
+		'NH'=>'NH-New Hampshire','NJ'=>'NJ-New Jersey','NM'=>'NM-New Mexico',
+		'NV'=>'NV-Nevada','NY'=>'NY-New York','OH'=>'OH-Ohio',
+		'OK'=>'OK-Oklahomaa','OR'=>'OR-Oregon','PA'=>'PA-Pennsylvania',
+		'RI'=>'RI-Rhode Island','SC'=>'SC-South Carolina','SD'=>'SD-South Dakota',
+		'TN'=>'TN-Tennessee','TX'=>'TX-Texas','UT'=>'UT-Utah',
+		'VA'=>'VA-Virginia','VT'=>'VT-Vermont','WA'=>'WA-Washington',
+		'WI'=>'WI-Wisconsin','WV'=>'WV-West Virginia','WY'=>'WY-Wyoming',
+	);
+	return $arr;
+}

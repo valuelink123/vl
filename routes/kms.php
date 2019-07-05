@@ -26,6 +26,7 @@ Route::post('/usermanual/import', 'UserManualController@create');
 Route::get('/partslist', 'PartsListController@index');
 Route::post('/partslist/get', 'PartsListController@get');
 Route::post('/partslist/subitems', 'PartsListController@getSubItemList');
+Route::post('/partslist/updateStatus', 'PartsListController@updateStatus');//partslist列表页面设置账号机是否有效
 Route::post('/stocklist', 'PartsListController@getStockList');
 
 Route::get('/notice', 'NoticeCenterController@index');

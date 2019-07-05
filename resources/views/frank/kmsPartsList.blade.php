@@ -1,6 +1,6 @@
 @extends('layouts.layout')
 @section('crumb')
-    @include('layouts.crumb', ['crumbs'=>[['KMS', '/kms/productguide'], 'Parts List']])
+    @include('layouts.crumb', ['crumbs'=>[['KMS', '/kms/productguide'], 'Inventory Inquiry']])
 @endsection
 @section('content')
 
@@ -28,10 +28,11 @@
         .sub-item-row th, .sub-item-row td {
             text-align: center;
         }
+        .invalid-account,.invalid-account a{color:red !important;}
 
     </style>
 
-    <h1 class="page-title font-red-intense"> Parts List
+    <h1 class="page-title font-red-intense"> Inventory Inquiry
         <small></small>
     </h1>
 
@@ -39,6 +40,7 @@
         <div class="portlet-body">
             <div class="table-toolbar">
                 <div class="row">
+
                     <div class="col-md-8"></div>
                     <div class="col-md-4">
                         <div class="btn-group " style="float:right;">
@@ -51,6 +53,27 @@
                     </div>
                 </div>
             </div>
+            @permission('partslist-update')
+            <div class="col-md-4" style="float:right;margin-right:-70px;">
+                <div class="col-md-6">
+                    <select class="mt-multiselect btn btn-default select-user-id" multiple="multiple" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" name="seller_name[]" id="seller_name[]" value="">
+                        @foreach ($sellerName as $key=>$value)
+                            <option value="{{$key}}" class="{{$value['class']}}">{{$value['seller_name']}}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="table-actions-wrapper">
+                    <select id="status" class="table-group-action-input form-control input-inline input-small input-sm" name="status" value="">
+                        <option value="-1">Select Status</option>
+                        <option value="0">Valid</option>
+                        <option value="1">Invalid</option>
+                    </select>
+                    <button class="btn btn-sm green table-group-action-submit update-status">
+                        <i class="fa fa-check"></i> Update</button>
+                </div>
+            </div>
+            @endpermission
             <div style="clear:both;height:50px;"></div>
             <div class="table-container" style="">
                 <table class="table table-striped table-bordered" id="thetable">
@@ -62,6 +85,7 @@
                         <th>Seller SKU</th>
                         <th>Item Name</th>
                         <th>Fbm Stock</th>
+                        {{--<th>Fbm Valid Stock</th>--}}
                         <th>Fba Stock</th>
                         <th>Fba Transfer</th>
                         <th></th>
@@ -83,6 +107,7 @@
                 <th>Seller SKU</th>
                 <th>Item Name</th>
                 <th>Fbm Stock</th>
+                {{--<th>Fbm Valid Stock</th>--}}
                 <th>Fba Stock</th>
                 <th>Fba Transfer</th>
             </tr>
@@ -96,6 +121,7 @@
                 <td>${row.seller_sku}</td>
                 <td>${row.item_name}</td>
                 <td>${row.fbm_stock}</td>
+                {{--<td>${row.fbm_valid_stock}</td>--}}
                 <td>${row.fba_stock}</td>
                 <td>${row.fba_transfer}</td>
             </tr>
@@ -135,6 +161,7 @@
                 {data: 'seller_sku', name: 'seller_sku'},
                 {data: 'item_name', name: 'item_name'},
                 {data: 'fbm_stock', name: 'fbm_stock'},
+                // {data: 'fbm_valid_stock', name: 'fbm_valid_stock'},
                 {data: 'fba_stock', name: 'fba_stock'},
                 {data: 'fba_transfer', name: 'fba_transfer'},
                 {
@@ -212,6 +239,47 @@
                 $td.addClass('closed');
             }
         });
+
+        let dtApi = $theTable.api();
+        //点击update的时候，批量设置对应的账号机是否有效
+        $('.update-status').click(function(){
+            var seller_name = $("select[name='seller_name[]']").val();
+            var status = $("select[name='status']").val();
+            //账号机跟状态为必选的下拉框
+            if(!seller_name){
+                alert('Please select account machine!');
+                return false;
+            }
+            if(status=='-1'){
+                alert('Please select state');
+                return false;
+            }
+            //ajax设置账号机的状态
+            $.post("/kms/partslist/updateStatus",
+                {
+                    "_token":"{{csrf_token()}}",
+                    "seller_name":seller_name,
+                    "status":status
+                },
+                function(res){
+                    if(res){
+                        toastr.success('Saved !');
+                        //更新下拉选择框内的颜色
+                        var obj = $('.multiselect-container .active');
+                        $.each(obj,function(i,item){
+                            if(status==1){//无效的时候，添加类名，标红显示
+                                $(this).addClass('invalid-account');
+                            }else{
+                                $(this).removeClass('invalid-account');
+                            }
+                        })
+                        //更新表格内的数据
+                        dtApi.ajax.reload();
+                    }
+                }
+            );
+
+        })
 
     </script>
 

@@ -45,7 +45,17 @@
 				$("#district", $("#exception_form")).val(data.District);
 				$("#state", $("#exception_form")).val(data.StateOrRegion);
 				$("#postalcode", $("#exception_form")).val(data.PostalCode);
-				$("#countrycode", $("#exception_form")).val(data.CountryCode);
+                $('#state-div').attr('statevalue',data.StateOrRegion)
+				// $("#countrycode", $("#exception_form")).val(data.CountryCode);
+                $("select[name='countrycode']>option").each(function(){
+					if($(this).text() == data.CountryCode){
+						$(this).prop('selected', true)
+					}else{
+                        $(this).prop('selected',false);
+					}
+				});
+                $("#countrycode").trigger("change");//触发countrycode改变事件
+
 				$("#phone", $("#exception_form")).val(data.Phone);
 				var items = data.orderItemData;
 				var order_sku='';
@@ -186,8 +196,8 @@
 				<i class="fa fa-bookmark"></i>
 			</span>
 
-				<select class="form-control" name="request_content" id="request_content">
-
+				<select class="form-control" name="request_content" id="request_content" required>
+					<option value="">Select</option>
 					@foreach($requestContentHistoryValues as $rcValue)
 
 						<option value="{{$rcValue}}">{{$rcValue}}</option>
@@ -323,7 +333,18 @@
 							<span class="input-group-addon">
 								<i class="fa fa-bookmark"></i>
 							</span>
-								<input type="text" class="form-control" name="state" id="state" value="{{old('state')}}" >
+								<div id="state-div" statevalue="{{old('state')}}">
+									<input type="text" class="form-control" name="state" id="state" value="{{old('state')}}" >
+								</div>
+								<div id="state-select" style="display:none;">
+									<option value="">Select</option>
+									@foreach(getStateOrRegionByUS() as $key=>$value)
+
+										<option value="{{$key}}">{{$value}}</option>
+
+									@endforeach
+								</div>
+
 							</div>
 						</div>
 						<div class="form-group">
@@ -350,7 +371,14 @@
 							<span class="input-group-addon">
 								<i class="fa fa-bookmark"></i>
 							</span>
-								<input type="text" class="form-control" name="countrycode" id="countrycode" value="{{old('countrycode')}}" >
+								<select class="form-control" name="countrycode" id="countrycode" required>
+									<option value="">Select</option>
+								@foreach(getCountryCode() as $value)
+
+									<option value="{{$value}}">{{$value}}</option>
+
+								@endforeach
+								</select>
 							</div>
 						</div>
 						<div class="form-group">
@@ -632,7 +660,35 @@
                     return false
                 }
             }
-			
+
+            //当quantity的数量大于1的时候，弹出提示框， You will send out MORE THAN ONE replacement. Please confirm before you submit!
+            var obj = $('.quantity-input');
+            var sub = 0;
+            $.each(obj,function(i,item){
+                var value = $(this).val();
+                if(value>1){
+                    var flag = confirm('You will send out MORE THAN ONE replacement. Please confirm before you submit!');
+                    if(flag!=true && sub==0){
+                        sub = 1;
+                    }
+                }
+            })
+
+            if(sub==1){
+                return false;
+            }
+            //当countrycode为US和CA的时候，StateOrRegion填的值必须强制为两个大写字母,且当countrycode为US的时候，StateOrRegion为固定下拉选项
+			var countryCode = $('#countrycode').val();
+
+            if(countryCode=='US' || countryCode=='CA'){
+                var state = $('#state').val();
+                if (!(state.length==2 && /^[A-Z]+$/.test(state))){
+                    alert('StateOrRegion has to be an abbreviation');
+                    return false;
+				}
+			}
+
+
 			var havewarnwords='';
 			if($('#warn').val()!=1){
 
@@ -686,6 +742,30 @@
         })
 
         bindDelayEvents('#replacement-product-list', 'change keyup paste', '.item_code', handleItemCodeSearch);
+
+        //当countrycode为US的时候，StateOrRegion为固定下拉选项
+        $("#countrycode").change(function(){
+            var country = $('#countrycode').val();
+            //当countrycode选择US的时候，StateOrRegion为固定的下拉选项
+			var html = '';
+			var statevalue = $('#state-div').attr('statevalue');
+            if(country=='US'){
+                html += '<select class="form-control" name="state" id="state" required>';
+                html += $('#state-select').html();
+                html += '</select>';
+                $('#state-div').html(html);
+                $("select[name='state']>option").each(function(){
+                    if($(this).val() == statevalue){
+                        $(this).prop('selected', true)
+                    }else{
+                        $(this).prop('selected',false);
+                    }
+                });
+			}else{
+                html = '<input type="text" class="form-control" name="state" id="state" value="'+statevalue+'" >';
+                $('#state-div').html(html);
+			}
+        });
     })
 </script>
 <div style="clear:both;"></div>

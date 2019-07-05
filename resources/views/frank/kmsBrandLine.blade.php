@@ -77,7 +77,7 @@
                         <th>User Manual</th>
                         <th>Video List</th>
                         <th>Q&A</th>
-                        <th>Parts list</th>
+                        <th>Inventory Inquiry</th>
                     </tr>
                     </thead>
                     <tbody></tbody>
