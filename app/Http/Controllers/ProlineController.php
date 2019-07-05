@@ -153,7 +153,7 @@ class ProlineController extends Controller
 				round($list['sku_price']-($list['FBAPRICE']+round($list['sku_price']*$list['ZCRATIO'],2)+(($list['RATE'])?round($list['VERPR_FBA']/$list['RATE']):$list['VERPR_FBA'])),2),
 				round(($list['sku_price'])?(($list['sku_price']-($list['FBAPRICE']+round($list['sku_price']*$list['ZCRATIO'],2)+(($list['RATE'])?round($list['VERPR_FBA']/$list['RATE']):$list['VERPR_FBA'])))/$list['sku_price']):0,2),
 				$list['YCL'],
-				round((($list['sku_price'])?(($list['sku_price']-($list['FBAPRICE']+round($list['sku_price']*$list['ZCRATIO'],2)+(($list['RATE'])?round($list['VERPR_FBA']/$list['RATE']):$list['VERPR_FBA'])))/$list['sku_price']):0)-$list['YCL'],2),
+				round((($list['sku_price'])?(($list['sku_price']-($list['FBAPRICE']+round($list['sku_price']*$list['ZCRATIO'],2)+(($list['RATE'])?round($list['VERPR_FBA']/$list['RATE']):$list['VERPR_FBA'])))/$list['sku_price']):0)-round($list['YCL'],4),2),
 				
 				$list['fba_stock'],
 				$list['LBKUM_FBM'],
