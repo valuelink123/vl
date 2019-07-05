@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use PhpImap;
 use Illuminate\Support\Facades\Input;
 use App\Asin;
+use App\Skusweekdetails;
 use PDO;
 use DB;
 use Log;
@@ -78,6 +79,29 @@ class GetAsin extends Command
 				DB::table('asin_seller_count')->where('asin', trim(array_get($asin,'ASIN')))->where('site', 'www.'.trim(array_get($asin,'SITE')))->update(array('updated_at'=>date('Y-m-d H:i:s'),'status'=>'X'));
 				continue;
 			} 
+			
+			
+			$last_keywords=Skusweekdetails::where('asin',trim(array_get($asin,'ASIN','')))->where('site','www.'.trim(array_get($asin,'SITE','')))->whereNotNull('keywords')->orderBy('weeks','desc')->take(1)->value('keywords');
+			
+			$sku_reports = Skusweekdetails::where('asin',trim(array_get($asin,'ASIN','')))->where('site','www.'.trim(array_get($asin,'SITE','')))->orderBy('weeks','asc')->take(7)->get()->toArray();
+			$sku_price=$sku_price_num=$sku_sales=$sku_sales_num=0;
+			$sku_ranking=$sku_rating=$sku_review=$sku_strategy=NULL;
+			foreach($sku_reports as $sku_report){
+				$sku_ranking=$sku_report['ranking'];
+				$sku_rating=$sku_report['rating'];
+				$sku_review=$sku_report['review'];
+				$sku_strategy=$sku_report['strategy'];
+				if(is_numeric($sku_report['price'])){
+					$sku_price_num++;
+					$sku_price+=$sku_report['price'];
+				}
+				if(is_numeric($sku_report['sales'])){
+					$sku_sales_num++;
+					$sku_sales+=$sku_report['sales'];
+				}
+			}
+			$sku_price= ($sku_price_num)?round($sku_price/$sku_price_num,2):0;
+			$sku_sales= ($sku_sales_num)?round($sku_sales/$sku_sales_num,2):0;
 			Asin::updateOrCreate(
 			[
 				'asin' => trim(array_get($asin,'ASIN','')),
@@ -100,6 +124,13 @@ class GetAsin extends Command
 				'sap_factory_id' => trim(array_get($asin,'WERKS','')),
 				'sap_shipment_id' => trim(array_get($asin,'SDABW','')),
 				'item_status' => intval(array_get($asin,'MATNRZT',0)),
+				'sku_ranking'=>$sku_ranking,
+				'sku_rating'=>$sku_rating,
+				'sku_review'=>$sku_review,
+				'sku_price'=>$sku_price,
+				'sku_sales'=>$sku_sales,
+				'last_keywords'=>$last_keywords,
+				'sku_strategy'=>$sku_strategy,
 				'asin_last_update_date'=> date('Y-m-d H:i:s')
 			]);
 			

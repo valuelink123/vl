@@ -640,6 +640,18 @@
                         </a>
                     </li>
 					@endpermission
+					
+					@permission('proline-show')
+					<li class="nav-item <?php if($action=='proline') echo 'active';?>">
+                        <a href="{{ url('proline') }}" class="nav-link nav-toggle">
+                            <i class="fa fa-calendar"></i>
+                            <span class="title">Proline Report</span>
+                            <?php if($action=='proline') echo '<span class="selected"></span>';?>
+                        </a>
+                    </li>
+					@endpermission
+					
+					
 					@permission('rsgproducts-show')
 					<li class="nav-item <?php if($action=='rsgproducts') echo 'active';?>">
                         <a href="{{ url('rsgproducts') }}" class="nav-link nav-toggle">

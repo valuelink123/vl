@@ -100,7 +100,8 @@ Route::Post('/rsgrequests/get', 'RsgrequestsController@get')->name('getrsgreques
 Route::resource('salesp', 'SalespController');
 Route::resource('rr', 'RrController');
 Route::Post('/salesp/get', 'SalespController@get')->name('getSalesp');
-
+Route::resource('proline', 'ProlineController');
+Route::Post('/proline/get', 'ProlineController@get')->name('getproline');
 Route::get('/skus', 'SkuController@index');
 Route::Post('/skus', 'SkuController@update');
 
