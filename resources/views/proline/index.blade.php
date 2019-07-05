@@ -99,85 +99,85 @@ th,td,td>span {
 								<td  style="background:#e2efda">Strategy</td>
 							</tr>
 							 <tr role="row" class="heading">
-							 	<th  style="background-color:#c6e7ff" > SKU </th>
-								<th  style="background-color:#e2efda"> 产品经理 </th>
-								<th  style="background-color:#e2efda"> 产品负责人 </th>
-								<th  style="background-color:#b4c6e7" > 一级分类 </th>
-								<th  style="background-color:#b4c6e7"> 大类 </th>
-								<th  style="background-color:#b4c6e7"> 品线 </th>
-								<th  style="background-color:#b4c6e7"> 物料组描述 </th>
-								<th  style="background-color:#b4c6e7">物料组</th>
-								<th  style="background-color:#b4c6e7"> 品线等级 </th>
-								<th  style="background-color:#e2efda">在使用品牌 </th>
-								<th  style="background-color:#e2efda">待使用品牌</th>
-								<th  style="background-color:#b4c6e7">型号</th>
-								<th  style="background-color:#b4c6e7">规格</th>
-								<th  style="background-color:#b4c6e7">是否配件</th>
-								<th  style="background-color:#b4c6e7">长</th>
-								<th  style="background-color:#b4c6e7">宽</th>
-								<th  style="background-color:#b4c6e7">高</th>
-								<th  style="background-color:#b4c6e7">尺寸类型</th>
-								<th  style="background-color:#e2efda">名称</th>
-								<th  style="background-color:#e2efda">代码</th>
-								<th  style="background-color:#e2efda">是否合作</th>
-								<th  style="background-color:#b4c6e7">状态</th>
-								<th  style="background-color:#b4c6e7">等级</th>
-								<th  style="background-color:#b4c6e7">备注</th>
-								<th  style="background-color:#b4c6e7">Asin</th>
-								<th  style="background-color:#b4c6e7">站点</th>
-								<th  style="background-color:#b4c6e7">物料描述</th>
-								<th  style="background-color:#b4c6e7">核心关键字</th>
-								<th  style="background-color:#e2efda">页面</th>
-								<th  style="background-color:#e2efda">排名</th>
-								<th  style="background-color:#b4c6e7">数量</th>
-								<th  style="background-color:#b4c6e7">星级</th>
-								<th  style="background-color:#e2efda">日均</th>
-								<th  style="background-color:#e2efda">汇率</th>					
-								<th  style="background-color:#e2efda">现售价</th>
-								<th  style="background-color:#e2efda">佣金比例</th>
-								<th  style="background-color:#e2efda">平台佣金</th>
-								<th  style="background-color:#e2efda">不含税成本</th>
-								<th  style="background-color:#e2efda">税率</th>
-								<th  style="background-color:#e2efda">含税成本</th>
-								<th  style="background-color:#e2efda">淡季仓储</th>
-								<th  style="background-color:#e2efda">旺季仓储</th>
-								<th  style="background-color:#e2efda">捡配费 </th>
-								<th  style="background-color:#e2efda">实际外仓成本</th>
-								<th  style="background-color:#e2efda">总成本</th>
-								<th  style="background-color:#e2efda"> SAP业务利润</th>
-								<th  style="background-color:#e2efda">SAP业务利润率</th>
-								<th  style="background-color:#e2efda">异常率</th>
-								<th  style="background-color:#e2efda">实际SAP利润率</th>
-								<th  style="background-color:#b4c6e7">FBA </th>
-								<th  style="background-color:#b4c6e7">FBM</th>
-								<th  style="background-color:#b4c6e7">在途</th>
-								<th  style="background-color:#b4c6e7">深仓</th>
-								<th  style="background-color:#b4c6e7">未交</th>
-								<th  style="background-color:#b4c6e7">总库存</th>
-								<th  style="background-color:#b4c6e7">库存维持天数</th>
-								<th  style="background-color:#b4c6e7">库存总金额</th>
-								<th  style="background-color:#e2efda">BG</th>
-								<th  style="background-color:#e2efda">BU</th>
-								<th  style="background-color:#e2efda">销售员</th>
-								<th  style="background-color:#b4c6e7">售价</th>
-								<th  style="background-color:#b4c6e7">业务利润率</th>
-								<th  style="background-color:#b4c6e7">营销费用率
-								<th  style="background-color:#b4c6e7">业务净利润率</th>
-								<th  style="background-color:#b4c6e7">销量</th>
-								<th  style="background-color:#b4c6e7">销售额</th>
-								<th  style="background-color:#e2efda">售价</th>
-								<th  style="background-color:#e2efda">业务利润率</th>
-								<th  style="background-color:#e2efda">营销费用率</th>
-								<th  style="background-color:#e2efda">业务净利润率</th>
-								<th  style="background-color:#e2efda">销量</th>
-								<th  style="background-color:#e2efda">销售额</th>
-								<th  style="background-color:#b4c6e7">售价</th>
-								<th  style="background-color:#b4c6e7">业务利润率</th>
-								<th  style="background-color:#b4c6e7">营销费用率</th>
-								<th  style="background-color:#b4c6e7">业务净利润率 </th>
-								<th  style="background-color:#b4c6e7">销量</th>
-								<th  style="background-color:#b4c6e7">销售额</th>
-								<th  style="background-color:#e2efda">营销策略</th>
+							 	<th  style="background-color:#c6e7ff;width:50px;" >SKU</th>
+								<th  style="background-color:#e2efda;width:60px;">产品经理</th>
+								<th  style="background-color:#e2efda;width:60px;">产品负责人</th>
+								<th  style="background-color:#b4c6e7;width:60px;" >一级分类</th>
+								<th  style="background-color:#b4c6e7;width:40px;">大类</th>
+								<th  style="background-color:#b4c6e7;width:40px;">品线</th>
+								<th  style="background-color:#b4c6e7;width:60px;">物料组描述</th>
+								<th  style="background-color:#b4c6e7;width:50px;">物料组</th>
+								<th  style="background-color:#b4c6e7;width:50px;">品线等级</th>
+								<th  style="background-color:#e2efda;width:60px;">在使用品牌</th>
+								<th  style="background-color:#e2efda;width:60px;">待使用品牌</th>
+								<th  style="background-color:#b4c6e7;width:40px;">型号</th>
+								<th  style="background-color:#b4c6e7;width:40px;">规格</th>
+								<th  style="background-color:#b4c6e7;width:50px;">是否配件</th>
+								<th  style="background-color:#b4c6e7;width:40px;">长</th>
+								<th  style="background-color:#b4c6e7;width:40px;">宽</th>
+								<th  style="background-color:#b4c6e7;width:40px;">高</th>
+								<th  style="background-color:#b4c6e7;width:50px;">尺寸类型</th>
+								<th  style="background-color:#e2efda;width:100px;">名称</th>
+								<th  style="background-color:#e2efda;width:60px;">代码</th>
+								<th  style="background-color:#e2efda;width:50px;">是否合作</th>
+								<th  style="background-color:#b4c6e7;width:40px;">状态</th>
+								<th  style="background-color:#b4c6e7;width:40px;">等级</th>
+								<th  style="background-color:#b4c6e7;width:80px;">备注</th>
+								<th  style="background-color:#b4c6e7;width:60px;">Asin</th>
+								<th  style="background-color:#b4c6e7;width:60px;">站点</th>
+								<th  style="background-color:#b4c6e7;width:100px;">物料描述</th>
+								<th  style="background-color:#b4c6e7;width:100px;">核心关键字</th>
+								<th  style="background-color:#e2efda;width:40px;">页面</th>
+								<th  style="background-color:#e2efda;width:40px;">排名</th>
+								<th  style="background-color:#b4c6e7;width:40px;">数量</th>
+								<th  style="background-color:#b4c6e7;width:40px;">星级</th>
+								<th  style="background-color:#e2efda;width:40px;">日均</th>
+								<th  style="background-color:#e2efda;width:40px;">汇率</th>					
+								<th  style="background-color:#e2efda;width:50px;">现售价</th>
+								<th  style="background-color:#e2efda;width:50px;">佣金比例</th>
+								<th  style="background-color:#e2efda;width:50px;">平台佣金</th>
+								<th  style="background-color:#e2efda;width:50px;">不含税成本</th>
+								<th  style="background-color:#e2efda;width:50px;">税率</th>
+								<th  style="background-color:#e2efda;width:50px;">含税成本</th>
+								<th  style="background-color:#e2efda;width:50px;">淡季仓储</th>
+								<th  style="background-color:#e2efda;width:50px;">旺季仓储</th>
+								<th  style="background-color:#e2efda;width:50px;">捡配费 </th>
+								<th  style="background-color:#e2efda;width:60px;">实际外仓成本</th>
+								<th  style="background-color:#e2efda;width:60px;">总成本</th>
+								<th  style="background-color:#e2efda;width:60px;">SAP业务利润</th>
+								<th  style="background-color:#e2efda;width:60px;">SAP业务利润率</th>
+								<th  style="background-color:#e2efda;width:50px;">异常率</th>
+								<th  style="background-color:#e2efda;width:60px;">实际SAP利润率</th>
+								<th  style="background-color:#b4c6e7;width:50px;">FBA</th>
+								<th  style="background-color:#b4c6e7;width:50px;">FBM</th>
+								<th  style="background-color:#b4c6e7;width:50px;">在途</th>
+								<th  style="background-color:#b4c6e7;width:50px;">深仓</th>
+								<th  style="background-color:#b4c6e7;width:50px;">未交</th>
+								<th  style="background-color:#b4c6e7;width:50px;">总库存</th>
+								<th  style="background-color:#b4c6e7;width:60px;">库存维持天数</th>
+								<th  style="background-color:#b4c6e7;width:60px;">库存总金额</th>
+								<th  style="background-color:#e2efda;width:40px;">BG</th>
+								<th  style="background-color:#e2efda;width:40px;">BU</th>
+								<th  style="background-color:#e2efda;width:50px;">销售员</th>
+								<th  style="background-color:#b4c6e7;width:50px;">售价</th>
+								<th  style="background-color:#b4c6e7;width:50px;">业务利润率</th>
+								<th  style="background-color:#b4c6e7;width:50px;">营销费用率
+								<th  style="background-color:#b4c6e7;width:60px;">业务净利润率</th>
+								<th  style="background-color:#b4c6e7;width:50px;">销量</th>
+								<th  style="background-color:#b4c6e7;width:50px;">销售额</th>
+								<th  style="background-color:#e2efda;width:50px;">售价</th>
+								<th  style="background-color:#e2efda;width:50px;">业务利润率</th>
+								<th  style="background-color:#e2efda;width:50px;">营销费用率</th>
+								<th  style="background-color:#e2efda;width:60px;">业务净利润率</th>
+								<th  style="background-color:#e2efda;width:50px;">销量</th>
+								<th  style="background-color:#e2efda;width:50px;">销售额</th>
+								<th  style="background-color:#b4c6e7;width:50px;">售价</th>
+								<th  style="background-color:#b4c6e7;width:50px;">业务利润率</th>
+								<th  style="background-color:#b4c6e7;width:50px;">营销费用率</th>
+								<th  style="background-color:#b4c6e7;width:60px;">业务净利润率 </th>
+								<th  style="background-color:#b4c6e7;width:50px;">销量</th>
+								<th  style="background-color:#b4c6e7;width:50px;">销售额</th>
+								<th  style="background-color:#e2efda;width:100px;">营销策略</th>
 								
                             </tr>
                             
@@ -233,7 +233,7 @@ th,td,td>span {
                     // setup uses scrollable div(table-scrollable) with overflow:auto to enable vertical scroll(see: assets/global/scripts/datatable.js).
                     // So when dropdowns used the scrollable div should be removed.
                     //"dom": "<'row'<'col-md-8 col-sm-12'pli><'col-md-4 col-sm-12'<'table-group-actions pull-right'>>r>t<'row'<'col-md-8 col-sm-12'pli><'col-md-4 col-sm-12'>>",
-					
+					"autoWidth":true,
 					"ordering": false,
                     "bStateSave": true, // save datatable state(pagination, sort, etc) in cookie.
                    // "aoColumnDefs": [ { "bSortable": false, "aTargets": [4,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30] }],
@@ -257,15 +257,7 @@ th,td,td>span {
 					buttons: [],
 					
 					<?php } ?>
-					 "createdRow": function( row, data, dataIndex ) {
-                        $(row).children('td').eq(4).attr('style', 'max-width: 200px;overflow:hidden;white-space:nowrap;text-align: left; ');
-						$(row).children('td').eq(4).attr('title', $(row).children('td').eq(4).text());
-						$(row).children('td').eq(5).attr('style', 'min-width:60px;white-space:nowrap;');
-						$(row).children('td').eq(6).attr('style', 'min-width:60px;white-space:nowrap;');
-						$(row).children('td').eq(7).attr('style', 'min-width:60px;white-space:nowrap;');
-						$(row).children('td').eq(8).attr('style', 'min-width:60px;white-space:nowrap;');
-						
-                    },
+					
 					scrollY:        450,
                     scrollX:        true,
 					
