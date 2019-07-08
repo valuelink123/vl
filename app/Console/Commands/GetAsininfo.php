@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Input;
 use PDO;
 use DB;
 use Log;
-
+use App\Classes\SapRfcRequest;
 class GetAsininfo extends Command
 {
     /**
@@ -97,6 +97,13 @@ class GetAsininfo extends Command
 				);
 			}
 			
+		}
+		$sap = new SapRfcRequest();
+		$result = $sap->getAccStock(['sku' => '']);
+		DB::table('fbm_accs_stock')->truncate();
+		foreach(array_get($result,'O_TAB',[]) as $acc){
+			$acc['LABST']=intval($acc['LABST']);
+			DB::table('fbm_accs_stock')->insert($acc);
 		}
 		
 		$date_from = date('Y-m-d',strtotime('-15 day')).' 00:00:00';
