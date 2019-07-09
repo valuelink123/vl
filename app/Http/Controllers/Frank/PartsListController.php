@@ -69,11 +69,20 @@ class PartsListController extends Controller {
             ->select('item_code', 'asin', 'fba_stock', 'fba_transfer', 'fbm_stock', 'item_name', 'seller_name', 'seller_sku','account_status')
             ->whereIn('item_code', $subCodes)
             ->get();
+		$validStock = $this->getFbmAccsStock();
 		//账号机的状态为1的时候，表示为无效账号机，此时标红显示
 		foreach($rows as $key=>$val){
-			// $rows[$key]->fbm_valid_stock = ' ';
 			if($val->account_status==1){
 				$rows[$key]->seller_name = '<div class="invalid-account">'.$val->seller_name.'</div>';
+			}
+			if(isset($validStock[$val->item_code]) && is_array($validStock[$val->item_code])){
+				$valid = '';
+				foreach($validStock[$val->item_code] as $k=>$v){
+					$valid = $valid.$k.':'.$v.'<br>';
+				}
+				$rows[$key]->fbm_valid_stock = $valid;
+			}else{
+				$rows[$key]->fbm_valid_stock = 0;
 			}
 		}
 		return $rows;
@@ -137,10 +146,22 @@ class PartsListController extends Controller {
         ";
 
         $rows = $this->queryRows($sql);
+        $validStock = $this->getFbmAccsStock();
+
         foreach($rows as $key=>$val){
         	//账号机的状态为1的时候，表示为无效账号机，此时标红显示
         	if($val['account_status']==1){
 				$rows[$key]['seller_name'] = '<div class="invalid-account">'.$val['seller_name'].'</div>';
+			}
+        	//AG0090
+			$rows[$key]['fbm_valid_stock'] = 0;
+        	if(isset($validStock[$val['item_code']]) && is_array($validStock[$val['item_code']])){
+        		$valid = '';
+				foreach($validStock[$val['item_code']] as $k=>$v){
+					$valid = $valid.$k.':'.$v.'<br>';
+				}
+
+				$rows[$key]['fbm_valid_stock'] = $valid;
 			}
 		}
 
@@ -223,12 +244,23 @@ class PartsListController extends Controller {
                 item_code = '{$item_code}'"
         );
 
+		$validStock = $this->getFbmAccsStock();
         foreach ($rows as &$row) {
             // 全部转成 INT，避免 JS 数字字符串的陷阱(比较、加法会出麻烦)
             // 通过配置 PDO、MYSQLI 可以默认返回数字
             // PDO::ATTR_STRINGIFY_FETCHES
             // MYSQLI_OPT_INT_AND_FLOAT_NATIVE
             $row['stock'] = (int)$row['stock'];
+            if($row['seller_id']=='FBM'){
+				if(isset($validStock[$row['item_code']]) && is_array($validStock[$row['item_code']])){
+					$valid = '';
+					foreach($validStock[$row['item_code']] as $k=>$v){
+						$valid = $valid.$k.':'.$v.',';
+					}
+
+					$row['stock'] = $valid;
+				}
+			}
         }
 
         return $rows;
@@ -243,6 +275,20 @@ class PartsListController extends Controller {
 		$status = isset($_POST['status']) ? $_POST['status'] : '';
 		DB::table('fba_stock')->whereIn('seller_name',$seller_name)->update(array('account_status'=>$status));
 		return [true];
+	}
+	/*
+	 * 得到有效的fbm库存数量
+	 */
+	public function getFbmAccsStock()
+	{
+		$sql = "SELECT MATNR,concat(WERKS,'-',LGORT) as WerksLgort,sum(LABST) as stock from fbm_accs_stock where LABST>0 group by MATNR,WerksLgort";
+		$_data = $this->queryRows($sql);
+		$data = array();
+		foreach($_data as $key=>$val){
+			$data[$val['MATNR']][$val['WerksLgort']] = $val['stock'];
+		}
+		return $data;
+
 	}
 
 }

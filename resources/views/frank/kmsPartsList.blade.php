@@ -85,7 +85,7 @@
                         <th>Seller SKU</th>
                         <th>Item Name</th>
                         <th>Fbm Stock</th>
-                        {{--<th>Fbm Valid Stock</th>--}}
+                        <th>Fbm Valid Stock</th>
                         <th>Fba Stock</th>
                         <th>Fba Transfer</th>
                         <th></th>
@@ -107,7 +107,7 @@
                 <th>Seller SKU</th>
                 <th>Item Name</th>
                 <th>Fbm Stock</th>
-                {{--<th>Fbm Valid Stock</th>--}}
+                <th>Fbm Valid Stock</th>
                 <th>Fba Stock</th>
                 <th>Fba Transfer</th>
             </tr>
@@ -121,7 +121,7 @@
                 <td>${row.seller_sku}</td>
                 <td>${row.item_name}</td>
                 <td>${row.fbm_stock}</td>
-                {{--<td>${row.fbm_valid_stock}</td>--}}
+                <td>${row.fbm_valid_stock}</td>
                 <td>${row.fba_stock}</td>
                 <td>${row.fba_transfer}</td>
             </tr>
@@ -154,6 +154,7 @@
             serverSide: true,
             pagingType: 'bootstrap_extended',
             processing: true,
+            aoColumnDefs: [ { "bSortable": false, "aTargets": [ 6 ] }],
             columns: [
                 {data: 'item_code', name: 'item_code'},
                 {data: 'seller_name', name: 'seller_name'},
@@ -161,7 +162,7 @@
                 {data: 'seller_sku', name: 'seller_sku'},
                 {data: 'item_name', name: 'item_name'},
                 {data: 'fbm_stock', name: 'fbm_stock'},
-                // {data: 'fbm_valid_stock', name: 'fbm_valid_stock'},
+                {data: 'fbm_valid_stock', name: 'fbm_valid_stock'},
                 {data: 'fba_stock', name: 'fba_stock'},
                 {data: 'fba_transfer', name: 'fba_transfer'},
                 {
