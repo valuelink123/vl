@@ -126,7 +126,9 @@ class GetEmails extends Command
 					if($last_date<$insert_data['date']) $last_date = $insert_data['date'];
 					
 					$attachments = $message->getAttachments();
+					$i=0;
 					foreach ($attachments as $attachment) {
+						$i++;
 						if ($attachment->isEmbeddedMessage()) {
 							$embeddedMessage = $attachment->getEmbeddedMessage()->getContent();
 							$insert_data['text_html'].=$embeddedMessage;
@@ -137,7 +139,10 @@ class GetEmails extends Command
 								$attName = $attachment->getStructure()->id.'.'.$attachment->getStructure()->subtype;
 							}else{
 								$attName = $attachment->getFilename();
+								if(!$attName) $attName = $i.'.'.$attachment->getStructure()->subtype;
 							}
+
+							
 							$attPath=public_path('attachs').'/'.date('Ymd').'/'.$this->runAccount['id'].'/'.md5($message->getId());
 							if (!is_dir($attPath)) mkdir($attPath, 0777,true);
 							file_put_contents($attPath.'/'.$attName,$attachment->getDecodedContent());
