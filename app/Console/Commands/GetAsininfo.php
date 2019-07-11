@@ -142,11 +142,20 @@ class GetAsininfo extends Command
 		}
 		
 		
-		
+		//查出原有的状态值,后续重置表数据，重新添加表数据的时候，需要把原始的状态值也带过去
+		$sql = "SELECT seller_name,any_value(account_status) as account_status FROM kms_stock group by seller_name";
+		$_sellerName = DB::select($sql);
+		$sellerName = array();
+		foreach($_sellerName as $key=>$val){
+			if($val->seller_name){
+				$sellerName[$val->seller_name] = $val->account_status;
+			}
+		}
 		DB::table('fba_stock')->truncate();
 		$fs = DB::connection('order')->select('select InStock as stock,(Total-InStock) as transfer ,asin,sellerid,sellersku,updated_at from amazon_inventory_supply where Total>0');
 		foreach($fs as $fsd){
 			$exists_item_code = DB::table('asin')->where('asin',$fsd->asin)->where('sellersku',$fsd->sellersku)->first();
+			$name = array_get($sellerid_name,$fsd->sellerid);
 			DB::table('fba_stock')->insert(
 				array(
 					'seller_id'=>$fsd->sellerid,
@@ -157,6 +166,7 @@ class GetAsininfo extends Command
 					'fba_stock'=>$fsd->stock,
 					'fba_transfer'=>$fsd->transfer,
 					'updated_at'=>$fsd->updated_at,
+					'account_status' => isset($sellerName[$name]) ? $sellerName[$name] : 0,
 				)
 			);
 		}
@@ -172,7 +182,7 @@ class GetAsininfo extends Command
 		foreach($asin_items as $item){
 			$data[$item->asin][array_get($site_marketplaceid,$item->site)]['item_code'][]=$item->item_no;
 		}
-		//������
+		//利润率
 		$dates = date('Ymd',strtotime('-30 day'));
 		$profits = DB::select('select sum(sales_profits) as profit,sum(income) as income,item_code from asin_profits where date>=:dates group by item_code',['dates' => $dates]);
 		foreach($profits as $profit){
