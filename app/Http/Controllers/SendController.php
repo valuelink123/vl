@@ -203,11 +203,7 @@ class SendController extends Controller
 				if($request->get('fileid')) $sendbox->attachs = $attachs;
 				$sendbox->save();
 
-				$dataRow = NonCtg::selectRaw('*')->where('email',$to_address)->where('processor',intval(Auth::user()->id))->where('status',0)->limit(1)->first();
-				if($dataRow){
-					NonCtg::where('email',$to_address)->where('processor',intval(Auth::user()->id))->update(array('status'=>4));
-				}
-
+				NonCtg::where('email',$to_address)->where('processor',intval(Auth::user()->id))->where('status',0)->update(array('status'=>4));
 			}
 		}
         
