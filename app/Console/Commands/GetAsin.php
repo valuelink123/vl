@@ -154,6 +154,7 @@ class GetAsin extends Command
 			
 			
     	}
+		Asin::where('updated_at','<',date('Y-m-d H:i:s'))->delete();
 	}
 
 }

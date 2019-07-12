@@ -40,6 +40,7 @@ class Kernel extends ConsoleKernel
 		'App\Console\Commands\HistoryClient',
 		'App\Console\Commands\StaClient',
 		'App\Console\Commands\AddClient',
+		'App\Console\Commands\GetSkuBaseInfo',
     ];
 
     /**
@@ -75,7 +76,7 @@ class Kernel extends ConsoleKernel
 		$schedule->command('get:order')->cron('*/30 * * * *')->name('getOrder')->withoutOverlapping();
 		$schedule->command('get:review 7days')->cron('0 */4 * * *')->name('getreviews')->withoutOverlapping();
 		$schedule->command('get:star 7days')->twiceDaily(20, 22)->name('getstars')->withoutOverlapping();
-		$schedule->command('get:asin 3 0')->hourly()->name('getasins')->withoutOverlapping();
+		$schedule->command('get:asin 999 0')->hourly()->name('getasins')->withoutOverlapping();
 		$schedule->command('get:kunnr 3 0')->hourly()->name('getkunnrs')->withoutOverlapping();
 		$schedule->command('get:sellers')->cron('*/1 * * * *')->name('sendmails')->withoutOverlapping();
 		$schedule->command('get:asininfo')->cron('30 0 * * *')->name('getasininfo')->withoutOverlapping();
@@ -94,6 +95,7 @@ class Kernel extends ConsoleKernel
 		$schedule->command('sta:client')->dailyAt('1:00')->name('sta_client')->withoutOverlapping();//统计历史客户数据，每天跑一次
 		$schedule->command('add:client')->dailyAt('2:00')->name('add_client')->withoutOverlapping();//添加客户数据，每天跑一次
 		$schedule->command('insert:asininfo')->dailyAt('3:00')->name('insertasin')->withoutOverlapping();
+		$schedule->command('get:skubaseinfo')->dailyAt('16:00')->name('skubaseinfo')->withoutOverlapping();
     }
 
     /**

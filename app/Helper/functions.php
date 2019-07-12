@@ -260,12 +260,22 @@ function textimage($content){
 	return $temp;
 }
 
-function getSapNumber($str,$decimal){
-	if( substr ($str, -1) == '-' ){
-		return '-'.round($str,$decimal);
+function getSapNumber($str,$decimal=2){
+	$decimal=intval($decimal);
+	if(is_array($str)){
+		$new_str = [];
+	    foreach($str as $k=>$v){
+			$new_str[$k]=getSapNumber($v,$decimal);
+		}
+		return $new_str;
 	}else{
-		return round($str,$decimal);
+		if( substr ($str, -1) == '-' ){
+			return '-'.round($str,$decimal);
+		}else{
+			return round($str,$decimal);
+		}
 	}
+	
 }
 
 function getComparisonSymbol(){

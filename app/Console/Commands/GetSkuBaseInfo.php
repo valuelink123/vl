@@ -45,7 +45,6 @@ class GetSkuBaseInfo extends Command
      */
     public function handle()
     {	
-		//die('123');
 		$skus_data=Asin::groupBy('item_no')->get(['item_no'])->toArray();
 
 		$sap = new SapRfcRequest();
