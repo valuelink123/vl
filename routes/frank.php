@@ -17,17 +17,10 @@ Route::post('/ctg/list/process', 'CtgController@process');
 Route::get('/ctg/export', 'CtgController@export');
 Route::post('/ctg/export', 'CtgController@export');
 
-Route::get('/cb/list', 'CtgController@cblist');
-Route::post('/cb/list', 'CtgController@cblist');
-Route::post('/cb/batchassigntask', 'CtgController@cbbatchAssignTask');
-Route::get('/cb/list/process', 'CtgController@cbprocess');
-Route::post('/cb/list/process', 'CtgController@cbprocess');
+Route::get('/ctg/create', 'CtgController@create');//添加ctg数据
+Route::post('/ctg/store', 'CtgController@store');//添加ctg数据
 
-Route::get('/bg/list', 'CtgController@bglist');
-Route::post('/bg/list', 'CtgController@bglist');
-Route::post('/bg/batchassigntask', 'CtgController@bgbatchAssignTask');
-Route::get('/bg/list/process', 'CtgController@bgprocess');
-Route::post('/bg/list/process', 'CtgController@bgprocess');
+
 
 
 

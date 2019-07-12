@@ -23,8 +23,8 @@ th,td,td>span {
 
     @include('frank.common')
 
-    <h1 class="page-title font-red-intense"><a href="{{url('ctg/list')}}"><button class="btn blue" style="width:9em;" type="button">CTG</button></a><a href="{{url('cb/list')}}"><button class="btn default" style="width:9em;" type="button">CashBack</button></a><a href="{{url('bg/list')}}"><button class="btn default" style="width:9em;" type="button">BuyOneGetOne</button></a>
-    </h1>
+    {{--<h1 class="page-title font-red-intense"><a href="{{url('ctg/list')}}"><button class="btn blue" style="width:9em;" type="button">CTG</button></a><a href="{{url('cb/list')}}"><button class="btn default" style="width:9em;" type="button">CashBack</button></a><a href="{{url('bg/list')}}"><button class="btn default" style="width:9em;" type="button">BuyOneGetOne</button></a>--}}
+    {{--</h1>--}}
 
     <div class="portlet light bordered">
         <div class="portlet-body">
@@ -108,6 +108,15 @@ th,td,td>span {
                             <span class="input-group-addon">Review ID</span>
                             <input  style="width:100%;height:29px;" id="review_id" data-init-by-query="ins.review_id" value="">
                         </div>
+                        <br>
+                        <div class="input-group">
+                            <span class="input-group-addon">Channel</span>
+                            <select style="width:100%;height:29px;" id="channel" data-init-by-query="ins.channel">
+                                @foreach($channel as $k=>$v)
+                                    <option value="{!! $k !!}" @if($selchannel==$k) selected @endif>{!! $v !!}</option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
 					@permission('ctg-export')
                     <div class="col-md-1">
@@ -120,6 +129,14 @@ th,td,td>span {
                         </div>
                     </div>
 					@endpermission
+                    @permission('ctg-add')
+                    <div class="btn-group" style="float:right;margin-top:10px;">
+                        <a href="{{ url('ctg/create')}}"><button id="ctg-add" class="btn sbold blue"> Add New
+                                <i class="fa fa-plus"></i>
+                            </button>
+                        </a>
+                    </div>
+                    @endpermission
                 </div>
             </div>
             <div style="clear:both;height:50px; text-align: right;">
@@ -149,6 +166,7 @@ th,td,td>span {
                         <th>Status</th>
                         <th>BG</th>
                         <th>BU</th>
+                        <th>Channel</th>
                         <th>Processor</th>
                         <th>Action</th>
                     </tr>
@@ -219,6 +237,7 @@ th,td,td>span {
                     bu: $('#bu').val(),
                     brand: $('#brand').val(),
                     review_id:$('#review_id').val(),
+                    channel:$('#channel').val(),
                 }
             })
 
@@ -312,6 +331,7 @@ th,td,td>span {
                 },
                 {data: 'bgs', name: 'bgs'},
                 {data: 'bus', name: 'bus'},
+                {data:'channel',name:'channel'},
                 {data: 'processor', name: 'processor', width: "120px"},
                 {
                     width: "20px",
@@ -319,7 +339,7 @@ th,td,td>span {
                     name: 'order_id',
                     orderable: false,
                     render(data, type, row) {
-                        return `<a class="btn btn-danger btn-xs" href="/ctg/list/process?order_id=${data}&created_at=${encodeURIComponent(row.created_at)}" target="_blank">Process</a>`
+                        return `<a class="btn btn-danger btn-xs" href="/ctg/list/process?order_id=${data}&created_at=${encodeURIComponent(row.created_at)}&channel=${$('#channel').val()}" target="_blank">Process</a>`
                     }
                 }
             ],
@@ -348,10 +368,11 @@ th,td,td>span {
                 return
             }
 
-            postByJson('/ctg/batchassigntask', {processor, ctgRows}).then(arr => {
+            var channel = $('#channel').val();
+            postByJson('/ctg/batchassigntask?channel='+channel, {processor, ctgRows}).then(arr => {
                 for (let rowIndex of selectedRows[0]) {
                     // console.log(dtApi.cell(rowIndex, 9).data())
-                    dtApi.cell(rowIndex, 9).data(arr[1]).draw()
+                    dtApi.cell(rowIndex, 19).data(arr[1]).draw()
                     // draw 之后，dt 自作主张，向服务器请求数据然后又更新一遍
                 }
 
@@ -369,8 +390,10 @@ th,td,td>span {
 //        $("#ctg-export").click(function(){
 //            location.href='/ctg/export?asin_status='+(($("select[name='asin_status[]']").val())?$("select[name='asin_status[]']").val():'')+'&keywords='+$("input[name='keywords']").val()+'&date_from='+$("input[name='date_from']").val()+'&date_to='+$("input[name='date_to']").val()+'&nextdate='+$("input[name='nextdate']").val()+'&follow_status='+(($("select[name='follow_status[]']").val())?$("select[name='follow_status[]']").val():'')+'&user_id='+(($("select[name='user_id[]']").val())?$("select[name='user_id[]']").val():'')+'&site='+(($("select[name='site[]']").val())?$("select[name='site[]']").val():'')+'&rating='+$("select[name='rating']").val()+'&bgbu='+$("select[name='bgbu']").val()+'&vp='+$('select[name="vp"]').val()+'&rc='+$('select[name="rc"]').val()+'&del='+$('select[name="del"]').val();
 //        });
+
         $("#ctg-export").click(function(){
-            location.href='/ctg/export';
+            var channel = $('#channel').val();
+            location.href='/ctg/export?channel='+channel;
         });
 
     </script>

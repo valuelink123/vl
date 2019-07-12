@@ -192,7 +192,7 @@ class NonctgController extends Controller
         $ctgres = 0;
         if($status==1){
             if(empty($dataRow['gift_sku'])){$dataRow['gift_sku'] = 0;}
-            $ctgData = array('processor' => $dataRow['processor'], 'order_id' => $dataRow['amazon_order_id'], 'gift_sku' => $dataRow['gift_sku'], 'name' => $dataRow['name'],'email' => $dataRow['email'], 'note'=>'','nonctg_id'=>$id);
+            $ctgData = array('processor' => $dataRow['processor'], 'order_id' => $dataRow['amazon_order_id'], 'gift_sku' => $dataRow['gift_sku'], 'name' => $dataRow['name'],'email' => $dataRow['email'], 'note'=>'','nonctg_id'=>$id,'channel'=>3);
             //添加该订单的时候还要添加相对应的订单信息到ctg_order和ctg_order_item表中
             $Ctg = new Ctg();
             $ctgres = $Ctg->add($ctgData);

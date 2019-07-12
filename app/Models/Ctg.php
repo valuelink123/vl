@@ -19,7 +19,7 @@ class Ctg extends Model {
     public $incrementing = false; // 主键不是数字，需要有此声明，否则 order_id 被截断
     protected $table = 'ctg';
     // protected $guarded = ['id']; // 黑名单模式
-    protected $fillable = ['order_id', 'gift_sku', 'name', 'email', 'phone', 'address', 'note', 'rating', 'processor','nonctg_id'];
+    protected $fillable = ['order_id', 'gift_sku', 'name', 'email', 'phone', 'address', 'note', 'rating', 'processor','nonctg_id','channel'];
 
     /**
      * 1.检查订单号有效性

@@ -725,3 +725,11 @@ function getStateOrRegionByUS()
 	);
 	return $arr;
 }
+
+/*
+ * CTG的channel枚举
+ */
+function getCtgChannel()
+{
+	return array(0=>'CTG',1=>'Cashback',2=>'BOGO',3=>'Non-CTG',4=>'CS-Email',5=>'CS-Chat',6=>'CS-Call');
+}
