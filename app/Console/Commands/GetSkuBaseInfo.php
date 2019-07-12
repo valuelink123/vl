@@ -76,10 +76,10 @@ class GetSkuBaseInfo extends Command
 				
 				$res = $sap->getTureSales(['sku' => $MATNR,'site' => $VKBUR,'month' => date('Ym',strtotime('-1 month'))]);
 					
-				$otab2['PRICE1'] = array_get($res,'1.T',0);
-				$otab2['YWLRL1'] = array_get($res,'1.T',0);
-				$otab2['YXFYL1'] = array_get($res,'1.T',0);
-				$otab2['YWJLL1'] = array_get($res,'1.T',0);
+				$otab2['PRICE1'] = getSapNumber(array_get($res,'1.VV001',0))?round(getSapNumber(array_get($res,'1.VSRHJ',0))/getSapNumber(array_get($res,'1.VV001',0)),4):0;
+				$otab2['YWLRL1'] = getSapNumber(array_get($res,'1.VSRHJ',0))?round(getSapNumber(array_get($res,'1.VVVVV',0))/getSapNumber(array_get($res,'1.VSRHJ',0)),4):0;
+				$otab2['YXFYL1'] = getSapNumber(array_get($res,'1.VSRHJ',0))?round(getSapNumber(array_get($res,'1.VV024',0))/getSapNumber(array_get($res,'1.VSRHJ',0)),4):0;
+				$otab2['YWJLL1'] = getSapNumber(array_get($res,'1.VSRHJ',0))?round((getSapNumber(array_get($res,'1.VVVVV',0))+getSapNumber(array_get($res,'1.VV024',0))+getSapNumber(array_get($res,'1.VV015',0)))/getSapNumber(array_get($res,'1.VSRHJ',0)),4):0;
 				$otab2['XL1'] = getSapNumber(array_get($res,'1.VV001',0));
 				$otab2['XSE1'] = getSapNumber(array_get($res,'1.VSRHJ',0));
 
@@ -87,20 +87,20 @@ class GetSkuBaseInfo extends Command
 
 				$res = $sap->getTureSales(['sku' => $MATNR,'site' => $VKBUR,'month' => date('Ym',strtotime('-2 month'))]);
 				
-				$otab2['PRICE2'] = array_get($res,'1.T',0);
-				$otab2['YWLRL2'] = array_get($res,'1.T',0);
-				$otab2['YXFYL2'] = array_get($res,'1.T',0);
-				$otab2['YWJLL2'] = array_get($res,'1.T',0);
+				$otab2['PRICE2'] = getSapNumber(array_get($res,'1.VV001',0))?round(getSapNumber(array_get($res,'1.VSRHJ',0))/getSapNumber(array_get($res,'1.VV001',0)),4):0;
+				$otab2['YWLRL2'] = getSapNumber(array_get($res,'1.VSRHJ',0))?round(getSapNumber(array_get($res,'1.VVVVV',0))/getSapNumber(array_get($res,'1.VSRHJ',0)),4):0;
+				$otab2['YXFYL2'] = getSapNumber(array_get($res,'1.VSRHJ',0))?round(getSapNumber(array_get($res,'1.VV024',0))/getSapNumber(array_get($res,'1.VSRHJ',0)),4):0;
+				$otab2['YWJLL2'] = getSapNumber(array_get($res,'1.VSRHJ',0))?round((getSapNumber(array_get($res,'1.VVVVV',0))+getSapNumber(array_get($res,'1.VV024',0))+getSapNumber(array_get($res,'1.VV015',0)))/getSapNumber(array_get($res,'1.VSRHJ',0)),4):0;
 				$otab2['XL2'] = getSapNumber(array_get($res,'1.VV001',0));
 				$otab2['XSE2'] = getSapNumber(array_get($res,'1.VSRHJ',0));
 				
 				$res = $sap->getTureSales(['sku' => $MATNR,'site' => $VKBUR,'month' => date('Ym',strtotime('-3 month'))]);
 				
 				
-				$otab2['PRICE3'] = array_get($res,'1.T',0);
-				$otab2['YWLRL3'] = array_get($res,'1.T',0);
-				$otab2['YXFYL3'] = array_get($res,'1.T',0);
-				$otab2['YWJLL3'] = array_get($res,'1.T',0);
+				$otab2['PRICE3'] = getSapNumber(array_get($res,'1.VV001',0))?round(getSapNumber(array_get($res,'1.VSRHJ',0))/getSapNumber(array_get($res,'1.VV001',0)),4):0;
+				$otab2['YWLRL3'] = getSapNumber(array_get($res,'1.VSRHJ',0))?round(getSapNumber(array_get($res,'1.VVVVV',0))/getSapNumber(array_get($res,'1.VSRHJ',0)),4):0;
+				$otab2['YXFYL3'] = getSapNumber(array_get($res,'1.VSRHJ',0))?round(getSapNumber(array_get($res,'1.VV024',0))/getSapNumber(array_get($res,'1.VSRHJ',0)),4):0;
+				$otab2['YWJLL3'] = getSapNumber(array_get($res,'1.VSRHJ',0))?round((getSapNumber(array_get($res,'1.VVVVV',0))+getSapNumber(array_get($res,'1.VV024',0))+getSapNumber(array_get($res,'1.VV015',0)))/getSapNumber(array_get($res,'1.VSRHJ',0)),4):0;
 				$otab2['XL3'] = getSapNumber(array_get($res,'1.VV001',0));
 				$otab2['XSE3'] = getSapNumber(array_get($res,'1.VSRHJ',0));
 				
