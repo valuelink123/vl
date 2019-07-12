@@ -49,6 +49,8 @@ class GetSkuBaseInfo extends Command
 
 		$sap = new SapRfcRequest();
 		foreach($skus_data as $sku_data){
+			print_r($sku_data['item_no']);
+			sleep(2);
         	$result = $sap->getSkuBaseInfo(['sku' => $sku_data['item_no']]);
 			$O_TAB1 = array_get($result,'O_TAB1',[]);
 			$O_TAB2 = array_get($result,'O_TAB2',[]);
