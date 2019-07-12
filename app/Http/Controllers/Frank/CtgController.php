@@ -514,6 +514,7 @@ class CtgController extends Controller {
 	 */
 	public function store(Request $req)
 	{
+		if(!Auth::user()->can(['ctg-add'])) die('Permission denied -- ctg-add');
 		$data['name'] = isset($_REQUEST['name']) ? $_REQUEST['name'] : '';
 		$data['email'] = isset($_REQUEST['email']) ? $_REQUEST['email'] : '';
 		$data['note'] = isset($_REQUEST['note']) ? $_REQUEST['note'] : '';
