@@ -54,9 +54,8 @@ class GetAsin extends Command
 		$date_end=date('Ymd',strtotime('-'.$before.' days'));	
 		$appkey = 'site0001';
 		$appsecret= 'testsite0001';
-		//$date_start=date('Ymd',strtotime('-1000 days'));
-		//$date_end=date('Ymd');
-		$array['date_start']=$date_start;
+
+		$array['date_start']='';
 		$array['appid']= $appkey;
 		$array['method']='getAsin';
 		ksort($array);
@@ -66,7 +65,7 @@ class GetAsin extends Command
 		}
 		$authstr=$authstr.$appsecret;
 		$sign = strtoupper(sha1($authstr));
-		$res = file_get_contents('http://116.6.105.153:18003/rfc_site.php?appid='.$appkey.'&method=getAsin&date_start='.$date_start.'&date_end='.$date_end.'&sign='.$sign);
+		$res = file_get_contents('http://116.6.105.153:18003/rfc_site.php?appid='.$appkey.'&method=getAsin&date_start=&date_end=&sign='.$sign);
 		$result = json_decode($res,true);
 		
 		if(!array_get($result,'data')) die();
@@ -74,12 +73,6 @@ class GetAsin extends Command
 
 		foreach($asinList as $asin){
 
-			if(array_get($asin,'ZDELETE')=='X'){
-				Asin::where('asin', trim(array_get($asin,'ASIN')))->where('site', 'www.'.trim(array_get($asin,'SITE')))->where('sellersku', trim(array_get($asin,'SELLER_SKU')))->delete();
-				DB::table('asin_seller_count')->where('asin', trim(array_get($asin,'ASIN')))->where('site', 'www.'.trim(array_get($asin,'SITE')))->update(array('updated_at'=>date('Y-m-d H:i:s'),'status'=>'X'));
-				continue;
-			} 
-			
 			
 			$last_keywords=Skusweekdetails::where('asin',trim(array_get($asin,'ASIN','')))->where('site','www.'.trim(array_get($asin,'SITE','')))->whereNotNull('keywords')->orderBy('weeks','desc')->take(1)->value('keywords');
 			
