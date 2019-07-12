@@ -45,7 +45,7 @@ class GetAsin extends Command
      */
     public function handle()
     {
-		
+		$exec_date = date('Y-m-d H:i:s',strtotime('-5 min'));
         $after =  $this->argument('after');
 		$before =  $this->argument('before');
         if(!$after) $after = '3';
@@ -154,7 +154,7 @@ class GetAsin extends Command
 			
 			
     	}
-		Asin::where('asin_last_update_date','<',date('Y-m-d H:i:s'))->delete();
+		Asin::where('asin_last_update_date','<',$exec_date)->delete();
 	}
 
 }
