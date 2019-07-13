@@ -48,6 +48,18 @@ th,td,td>span {
                     <div class="table-container">
 							@permission('rsgrequests-batch-update')
 							<div class="table-actions-wrapper">
+								{{--更新processor--}}
+								<select id="processor" class="table-group-action-input form-control input-inline input-small input-sm">
+									<option value="">Select Processor</option>
+									<?php
+									foreach($users as $k=>$v){
+										echo '<option value="'.$k.'">'.$v.'</option>';
+									}?>
+								</select>
+
+								<button class="btn btn-sm green table-processor-action-submit">
+									<i class="fa fa-check"></i> Update</button>
+
 								<select id="customstatus" class="table-group-action-input form-control input-inline input-small input-sm">
 									<option value="">Select Step</option>
 									<?php 
@@ -71,6 +83,7 @@ th,td,td>span {
 										</label>
 									</th>
 									<th width="10%"> Submit Date </th>
+									<th width="10%"> Channel </th>
 									<th width="6%"> Customer Email </th>
 									<th width="6%"> Request Product </th>
 									<th width="8%"> Current Step </th>
@@ -81,9 +94,10 @@ th,td,td>span {
 									<th width="6%"> Star rating</th>
 									<th width="6%"> Follow</th>
 									<th width="6%"> Next follow date</th>
-									<th width="4%"> User</th>
+									<th width="4%"> Sales</th>
 									<th width="6%"> Site</th>
 									<th width="10%"> Update Date </th>
+									<th width="10%"> Processor </th>
 									<th width="10%"> Action</th>
 								</tr>
 								<tr role="row" class="filter">
@@ -107,6 +121,18 @@ th,td,td>span {
 										</div>
 
 									</td>
+
+									<td>
+
+										<select id="channel" name="channel" class="form-control  form-filter input-sm">
+											<option value="-1">Select Channel</option>
+											<?php
+											foreach(getRsgRequestChannel() as $k=>$v){
+												echo '<option value="'.$k.'">'.$v.'</option>';
+											}?>
+										</select>
+									</td>
+
 									<td>
 										<input type="text" class="form-control form-filter input-sm" placeholder='customer email' value="{!! $email !!}" name="customer_email">
 									</td>
@@ -199,6 +225,15 @@ th,td,td>span {
 											</span>
 										</div>
 									</td>
+
+									<td>
+										<select name="processor" class="form-control form-filter input-sm">
+											<option value="">Processor</option>
+											@foreach ($users as $user_id=>$user_name)
+												<option value="{{$user_id}}">{{$user_name}}</option>
+											@endforeach
+										</select>
+									</td>
 									
 									<td>
 										<div class="margin-bottom-5">
@@ -254,7 +289,7 @@ th,td,td>span {
 											"dom": "<'row'<'col-md-6 col-sm-12'pli><'col-md-6 col-sm-12'<'table-group-actions pull-right'>>r>t<'row'<'col-md-6 col-sm-12'pli><'col-md-6 col-sm-12'>>",
 						
 											"bStateSave": true, // save datatable state(pagination, sort, etc) in cookie.
-											"aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0 ,2,3,4,5,7,8,9,10,11,12,13,15 ] }],
+											"aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0 ,2,3,4,5,6,8,9,10,11,12,13,14,16 ] }],
 											"lengthMenu": [
 												[-1,10, 20, 50],
 												['All',10, 20, 50] // change per page values here
@@ -298,9 +333,39 @@ th,td,td>span {
 										}
 						
 									});
+									//设置负责人操作
+                                    grid.getTableWrapper().on('click', '.table-processor-action-submit', function (e) {
+                                        e.preventDefault();
+                                        var customstatus = $("#processor", grid.getTableWrapper());
+                                        if ((customstatus.val() != "") && grid.getSelectedRowsCount() > 0) {
+                                            grid.setAjaxParam("customActionType", "processor_action");
+                                            grid.setAjaxParam("customstatus", customstatus.val());
+                                            grid.setAjaxParam("id", grid.getSelectedRows());
+                                            grid.getDataTable().draw(false);
+                                            //grid.clearAjaxParams();
+                                        } else if (customstatus.val() == "") {
+                                            App.alert({
+                                                type: 'danger',
+                                                icon: 'warning',
+                                                message: 'Please select an processor',
+                                                container: grid.getTableWrapper(),
+                                                place: 'prepend'
+                                            });
+                                        } else if (grid.getSelectedRowsCount() === 0) {
+                                            App.alert({
+                                                type: 'danger',
+                                                icon: 'warning',
+                                                message: 'No record selected',
+                                                container: grid.getTableWrapper(),
+                                                place: 'prepend'
+                                            });
+                                        }
+
+                                    });
 						
 									grid.setAjaxParam("date_from", $("input[name='date_from']").val());
 									grid.setAjaxParam("date_to", $("input[name='date_to']").val());
+                                    grid.setAjaxParam("channel", $("select[name='channel']").val());
 									grid.setAjaxParam("asin", $("input[name='asin']").val());
 									grid.setAjaxParam("customer_email", $("input[name='customer_email']").val());
 									grid.setAjaxParam("customer_paypal_email", $("input[name='customer_paypal_email']").val());
@@ -309,6 +374,7 @@ th,td,td>span {
 									grid.setAjaxParam("price_from", $("input[name='price_from']").val());
 									grid.setAjaxParam("price_to", $("input[name='price_to']").val());
 									grid.setAjaxParam("step", $("select[name='step']").val());
+                                    grid.setAjaxParam("processor", $("select[name='processor']").val());
 									grid.getDataTable().ajax.reload(null,false);
 									//grid.clearAjaxParams();
 								}

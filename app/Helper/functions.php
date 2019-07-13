@@ -733,3 +733,11 @@ function getCtgChannel()
 {
 	return array(0=>'CTG',1=>'Cashback',2=>'BOGO',3=>'Non-CTG',4=>'CS-Email',5=>'CS-Chat',6=>'CS-Call');
 }
+
+/*
+ * rsgrequest的channel枚举
+ */
+function getRsgRequestChannel()
+{
+	return array(0=>'Web',1=>'CS team',2=>'EDM',3=>'Facebook');
+}

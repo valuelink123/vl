@@ -60,9 +60,9 @@ class RsgrequestsController extends Controller
 		//$orderby = 'updated_at';
 		$order_column = $request->input('order.0.column','14');
 
-		if($order_column == 14){
+		if($order_column == 15){
 			$orderby = 'updated_at';
-		}else if($order_column == 6){
+		}else if($order_column == 7){
 			$orderby = 'transfer_amount';
 		}else if($order_column == 1){
 			$orderby = 'created_at';
@@ -71,6 +71,8 @@ class RsgrequestsController extends Controller
 		}
 
         $sort = $request->input('order.0.dir','desc');
+
+		$channelKeyVal = getRsgRequestChannel();
 
         if ($request->input("customActionType") == "group_action") {
 				
@@ -84,6 +86,14 @@ class RsgrequestsController extends Controller
 					self::mailchimp($rule->customer_email,array_get($step_to_tags,$request->input("customstatus")),[]);
 				}
         }
+        //更新负责人
+		if ($request->input("customActionType") == "processor_action") {
+
+			if(!Auth::user()->can(['rsgrequests-batch-update'])) die('Permission denied -- rsgrequests-batch-update');
+			$updateDate = [];
+			$updateDate['processor'] = $request->input("customstatus");
+			RsgRequest::whereIn('id',$request->input("id"))->update($updateDate);
+		}
 		$date_from=$request->input('date_from')?$request->input('date_from'):date('Y-m-d',strtotime('- 90 days'));
         $date_to=$request->input('date_to')?$request->input('date_to'):date('Y-m-d');
 
@@ -106,6 +116,13 @@ class RsgrequestsController extends Controller
 			$datas = $datas->where('sap_seller_id', Auth::user()->sap_seller_id);
 		} else {
 		
+		}
+
+		if($request->input('channel')!='-1'){
+			$datas = $datas->where('channel', $request->input('channel'));
+		}
+		if($request->input('processor')){
+			$datas = $datas->where('processor', $request->input('processor'));
 		}
 		
         if($request->input('customer_email')){
@@ -174,6 +191,7 @@ class RsgrequestsController extends Controller
             $records["data"][] = array(
                 '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input name="id[]" type="checkbox" class="checkboxes" value="'.$list['id'].'"/><span></span></label>',
 				$list['created_at'],
+				isset($channelKeyVal[$list['channel']]) ? $channelKeyVal[$list['channel']] : '',
 				$list['customer_email'],
 				'<a href="https://'.array_get($list,'site').'/dp/'.array_get($list,'asin').'?m='.array_get($list,'seller_id').'" target="_blank">'.$list['asin'].'</a>',
 				'<span class="badge badge-success">'.array_get(getStepStatus(),$list['step']).'</span>',
@@ -187,6 +205,7 @@ class RsgrequestsController extends Controller
 				array_get($users,$list['user_id']),
 				$list['site'],
 				$list['updated_at'],
+				array_get($users,$list['processor']),
 				'<a data-target="#ajax" data-toggle="modal" href="'.url('rsgrequests/'.$list['id'].'/edit').'" class="badge badge-success"> View </a> <a class="btn btn-danger btn-xs" href="'.url('rsgrequests/process?email='.$list['customer_email']).'" target="_blank">Process</a>'
 				
             );
@@ -254,6 +273,8 @@ class RsgrequestsController extends Controller
 		$rule->transfer_currency = $request->get('transfer_currency');
 		$rule->review_url = $request->get('review_url');
         $rule->step = intval($request->get('step'));
+		$rule->channel = $request->get('channel');
+		$rule->processor = intval(Auth::user()->id);
 		if(intval($request->get('product_id'))) $rule->product_id = intval($request->get('product_id'));
 		$rule->star_rating = $request->get('star_rating');
 		$rule->follow = $request->get('follow');
@@ -321,6 +342,7 @@ class RsgrequestsController extends Controller
 		$rule->star_rating = $request->get('star_rating');
 		$rule->follow = $request->get('follow');
 		$rule->next_follow_date = $request->get('next_follow_date');
+		$rule->channel = $request->get('channel');
 
         $rule->user_id = intval(Auth::user()->id);
         if ($rule->save()) {
@@ -398,6 +420,7 @@ class RsgrequestsController extends Controller
 
 		$arrayData = array();
 		$headArray[] = 'Submit Date';
+		$headArray[] = 'Channel';
 		$headArray[] = 'Customer Email';
 		$headArray[] = 'Request Product';
 		$headArray[] = 'Current Step';
@@ -409,9 +432,10 @@ class RsgrequestsController extends Controller
 		$headArray[] = 'Star rating';
 		$headArray[] = 'Follow';
 		$headArray[] = 'Next follow date';
-		$headArray[] = 'User';
+		$headArray[] = 'Sales';
 		$headArray[] = 'Site';
 		$headArray[] = 'Update Date';
+		$headArray[] = 'Processor';
 
 		$arrayData[] = $headArray;
 
@@ -424,11 +448,13 @@ class RsgrequestsController extends Controller
 		//$datas->count();
 		$lists =  $datas->orderBy($orderby,$sort)->get(['rsg_requests.*','rsg_products.asin','rsg_products.site','rsg_products.seller_id','rsg_products.user_id'])->toArray();
 		$users = $this->getUsers();
+		$channelKeyVal = getRsgRequestChannel();
 
 		foreach ($lists as $key=>$val){
 
 			$arrayData[] = array(
 				$val['created_at'],
+				isset($channelKeyVal[$val['channel']]) ? $channelKeyVal[$val['channel']] : '',
 				$val['customer_email'],
 				$val['asin'],
 				array_get(getStepStatus(),$val['step']),
@@ -443,6 +469,7 @@ class RsgrequestsController extends Controller
 				array_get($users,$val['user_id']),
 				$val['site'],
 				$val['updated_at'],
+				array_get($users,$val['processor']),
 			);
 		}
 

@@ -113,8 +113,17 @@
 							<input type="text" class="form-control" name="next_follow_date" id="next_follow_date">
 
 						</div>
-						
 
+                        <div class="form-group col-md-6">
+                            <label>Channel</label>
+                            <select class="form-control " name="channel" id="channel" required>
+								<?php
+								foreach(getRsgRequestChannel() as $k=>$v){
+									echo '<option value="'.$k.'" >'.$v.'</option>';
+								}?>
+
+                            </select>
+                        </div>
 						
                     </div>
                     <div class="form-actions">

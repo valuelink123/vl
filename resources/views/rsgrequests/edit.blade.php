@@ -138,6 +138,18 @@
 							<input type="text" class="form-control" name="next_follow_date" id="next_follow_date" value="{{array_get($rule,'next_follow_date')}}">
 
 						</div>
+
+						<div class="form-group col-md-6">
+							<label>Channel</label>
+							<select class="form-control " name="channel" id="channel" required>
+								<?php
+								foreach(getRsgRequestChannel() as $k=>$v){
+									$selected = ($k==$rule['channel'])?'selected':'';
+									echo '<option value="'.$k.'" '.$selected.'>'.$v.'</option>';
+								}?>
+
+							</select>
+						</div>
 						
 						@if (array_get($rule,'trans'))
 						<table class="table table-hover col-md-12">
