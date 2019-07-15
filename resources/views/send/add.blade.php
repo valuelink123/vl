@@ -26,7 +26,7 @@
 		   title = title.replace(rename, "");
 		   title = title.replace(remail, "");	
 		   title = title.replace(retitle, "");	
-		   desc = desc.replace(rename, "");
+		   // desc = desc.replace(rename, "");
 		   desc = desc.replace(remail, "");
 		   desc = desc.replace(retitle, "");
 		   $( "#subject" ).val(title);

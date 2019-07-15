@@ -77,17 +77,22 @@
                             </select>
                         </div>
                     </div>
-                    @permission('non-ctg-export')
                     <div class="col-md-2">
+                        @permission('non-ctg-export')
                         <div class="btn-group">
-
                             <button id="export" class="btn sbold blue"> Export
                                 <i class="fa fa-download"></i>
                             </button>
-
                         </div>
+                        @endpermission
+
+                        @permission('compose')
+                        <div class="btn-group">
+                            <button id="batch-send" class="btn sbold blue"> Batch Send
+                            </button>
+                        </div>
+                        @endpermission
                     </div>
-                    @endpermission
                 </div>
             </div>
             <div style="clear:both;height:50px; text-align: right;">
@@ -295,6 +300,20 @@
         $("#export").click(function(){
             location.href='/nonctg/export';
         });
+
+        //批量发邮件
+        $('#batch-send').click(function(){
+            let selectedRows = dtApi.rows({selected: true})
+
+            let ctgRows = selectedRows.data().toArray().map(obj => [obj.email])
+
+            if (!ctgRows.length) {
+                toastr.error('Please select some rows first !')
+                return
+            }
+            var email = ctgRows.join(';');
+            location.href='/send/create?to_address='+email;
+        })
 
     </script>
 

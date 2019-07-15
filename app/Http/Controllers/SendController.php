@@ -193,7 +193,17 @@ class SendController extends Controller
 				$sendbox->from_address = trim($request->get('from_address'));
 				$sendbox->to_address = substr(trim($to_address),0,99);
 				$sendbox->subject = $request->get('subject');
-				$sendbox->text_html = $request->get('content');
+				$content = $request->get('content');
+				//去nonctg那边查看是否有此邮箱的数据(因为nonctg那边有现成的用户名)，如果有此邮箱的数据，把{CUSTOMER_NAME}替换成用户姓名
+				$dataRow = NonCtg::selectRaw('name')->where('email',$sendbox->to_address)->limit(1)->first();
+				if($dataRow){
+					$name = $dataRow['name'];
+				}else{
+					$name = '';
+				}
+				$content = str_replace("{CUSTOMER_NAME}",$name,$content);
+
+				$sendbox->text_html = $content;
 				$sendbox->date = date('Y-m-d H:i:s');
 				if($request->get('plan_date')) $sendbox->plan_date = strtotime($request->get('plan_date'));
 				$sendbox->status = $request->get('asDraft')?'Draft':'Waiting';
