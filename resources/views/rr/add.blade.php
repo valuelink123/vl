@@ -67,8 +67,32 @@
                                 <select class="form-control" name="type" id="type" required>
 								<option value="">Please Select...</option>
 								<option value="_GET_AFN_INVENTORY_DATA_">_GET_AFN_INVENTORY_DATA_</option>
-				
+								<option value="_GET_FBA_FULFILLMENT_INVENTORY_ADJUSTMENTS_DATA_">_GET_FBA_FULFILLMENT_INVENTORY_ADJUSTMENTS_DATA_</option>
+								<option value="_GET_FBA_FULFILLMENT_REMOVAL_SHIPMENT_DETAIL_DATA_">_GET_FBA_FULFILLMENT_REMOVAL_SHIPMENT_DETAIL_DATA_</option>
 								</select>
+                            </div>
+                        </div>
+						
+						<div class="form-group">
+                            <label>Report Date</label>
+                            <div class="input-group ">
+                                
+                                <div class="input-group date date-picker margin-bottom-5" data-date-format="yyyy-mm-dd">
+                                        <input type="text" class="form-control input-sm" readonly name="startdate" placeholder="From" value="{{date('Y-m-d',strtotime('-1day'))}}">
+                                        <span class="input-group-btn">
+                                                                    <button class="btn btn-sm default" type="button">
+                                                                        <i class="fa fa-calendar"></i>
+                                                                    </button>
+                                                                </span>
+                                    </div>
+                                    <div class="input-group date date-picker" data-date-format="yyyy-mm-dd">
+                                        <input type="text" class="form-control form-filter input-sm" readonly name="enddate" placeholder="To" value="{{date('Y-m-d')}}">
+                                        <span class="input-group-btn">
+                                                                    <button class="btn btn-sm default" type="button">
+                                                                        <i class="fa fa-calendar"></i>
+                                                                    </button>
+                                                                </span>
+                                    </div>
                             </div>
                         </div>
 
@@ -110,5 +134,10 @@
 
     </div>
 
-
+<script>
+$('.date-picker').datepicker({
+	rtl: App.isRTL(),
+	autoclose: true
+});
+</script>
 @endsection

@@ -49,6 +49,7 @@
                         <tr>
                             <th> Account </th>
                             <th> Report Type </th>
+							<th> Report Date </th>
                             <th> Request Date </th>
 							<th> Complete Date </th>
 							<th> Status </th>
@@ -63,6 +64,9 @@
                                 </td>
                                 <td>
                                     {{$data->Type}}
+                                </td>
+								<td>
+                                    {{$data->StartDate}} -- {{$data->EndDate}}
                                 </td>
                                 <td>
                                     {{$data->RequestDate}}

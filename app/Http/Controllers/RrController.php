@@ -82,11 +82,15 @@ class RrController extends Controller
         $this->validate($request, [
             'sellerid' => 'required|array',
             'type' => 'required|string',
+			'startdate' => 'required|string',
+			'enddate' => 'required|string',
         ]);
 		$insertData=[];
 		foreach($request->get('sellerid') as $sellerid){
 		$insertData[] = array('SellerId'=>$sellerid,
 			'Type'=>$request->get('type'),
+			'StartDate'=>$request->get('startdate'),
+			'EndDate'=>$request->get('enddate'),
 			'UserId'=>Auth::user()->id,
 			'Message'=>'_IN_PROGRESS_',
 			'RequestDate'=>date('Y-m-d H:i:s')
