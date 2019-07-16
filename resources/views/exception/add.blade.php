@@ -373,9 +373,9 @@
 							</span>
 								<select class="form-control" name="countrycode" id="countrycode" required>
 									<option value="">Select</option>
-								@foreach(getCountryCode() as $value)
+								@foreach(getCountryCode() as $key=>$value)
 
-									<option value="{{$value}}">{{$value}}</option>
+									<option value="{{$key}}">{{$key}}</option>
 
 								@endforeach
 								</select>
@@ -521,7 +521,6 @@
      * 把物料的库存列表带出来(包括fba、fbm)以供选择重发
      */
     function handleItemCodeSearch(e) {
-
         let $item_code = $(e.currentTarget)
 
         let item_code = $item_code.val().trim()
@@ -546,9 +545,10 @@
             var postData = {item_code}
         }
 
+        countryCode = $('#countrycode').val();
         $.ajax({
             method: 'POST',
-            url: '/kms/stocklist',
+            url: '/kms/stocklist?countryCode='+countryCode,
             data: postData,
             dataType: 'json',
             success(stocks) {
@@ -765,6 +765,7 @@
                 html = '<input type="text" class="form-control" name="state" id="state" value="'+statevalue+'" >';
                 $('#state-div').html(html);
 			}
+
         });
     })
 </script>

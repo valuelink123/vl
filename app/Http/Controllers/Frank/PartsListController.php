@@ -177,6 +177,7 @@ class PartsListController extends Controller {
     public function getStockList(Request $req) {
 
         $item_code = $req->input('item_code');
+		$countryCode = $req->input('countryCode');
 
         if (empty($item_code)) {
 
@@ -245,20 +246,25 @@ class PartsListController extends Controller {
         );
 
 		$validStock = $this->getFbmAccsStock();
-        foreach ($rows as &$row) {
+		$storeByCountryCode= getCountryCode();
+        foreach ($rows as $key=>$row) {
             // 全部转成 INT，避免 JS 数字字符串的陷阱(比较、加法会出麻烦)
             // 通过配置 PDO、MYSQLI 可以默认返回数字
             // PDO::ATTR_STRINGIFY_FETCHES
             // MYSQLI_OPT_INT_AND_FLOAT_NATIVE
-            $row['stock'] = (int)$row['stock'];
+			$rows[$key]['stock'] = (int)$row['stock'];
             if($row['seller_id']=='FBM'){
 				if(isset($validStock[$row['item_code']]) && is_array($validStock[$row['item_code']])){
 					$valid = '';
 					foreach($validStock[$row['item_code']] as $k=>$v){
-						$valid = $valid.$k.':'.$v.',';
+						if($countryCode && in_array($k,$storeByCountryCode[$countryCode]['store'])){
+							$valid = $valid.$k.':'.$v.',';
+						}
 					}
-
-					$row['stock'] = $valid;
+					$rows[$key]['stock'] = $valid;
+					if(empty($valid)){
+						unset($rows[$key]);
+					}
 				}
 			}
         }

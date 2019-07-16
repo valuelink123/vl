@@ -683,17 +683,68 @@ function getBrandProcessor()
 }
 
 /*
- * 得到所有的countryCode
+ * 得到所有的countryCode对应的仓库
  */
 function getCountryCode()
 {
 	$arr = array(
-		'AE','AT','AU','BE','BM','BR','CA','CL','CO','CR','CY',
-		'CZ','DE','DK','ES','FR','GB','GR','GU','HK','HU','ID',
-		'IE','IL','IN','IS','IT','JM','JP','KR','KW','LU','MT',
-		'MX','MY','NG','NL','NO','NZ','PE','PH','PL','PR','PT',
-		'PW','QA','RO','SA','SE','SG','SK','TR','TT','TW','UK',
-		'US','ZA'
+		'AE'=>array('store'=>array('HK01-SZ6','HK03-CHK3')),
+		'AT'=>array('store'=>array('HK01-SZ6','HK03-CHK3','UK02-UK3')),
+		'AU'=>array('store'=>array('HK01-SZ6','HK03-CHK3')),
+		'BE'=>array('store'=>array('HK01-SZ6','HK03-CHK3','UK02-UK3')),
+		'BM'=>array('store'=>array('HK01-SZ6','HK03-CHK3')),
+		'BR'=>array('store'=>array('HK01-SZ6','HK03-CHK3')),
+		'CA'=>array('store'=>array('HK01-SZ6','HK03-CHK3')),
+		'CL'=>array('store'=>array('HK01-SZ6','HK03-CHK3')),
+		'CO'=>array('store'=>array('HK01-SZ6','HK03-CHK3')),
+		'CR'=>array('store'=>array('HK01-SZ6','HK03-CHK3')),
+		'CY'=>array('store'=>array('HK01-SZ6','HK03-CHK3')),
+		'CZ'=>array('store'=>array('HK01-SZ6','HK03-CHK3','UK02-UK3')),
+		'DE'=>array('store'=>array('HK01-SZ6','HK03-CHK3','UK02-UK3')),
+		'DK'=>array('store'=>array('HK01-SZ6','HK03-CHK3','UK02-UK3')),
+		'ES'=>array('store'=>array('HK01-SZ6','HK03-CHK3','UK02-UK3')),
+		'FR'=>array('store'=>array('HK01-SZ6','HK03-CHK3','UK02-UK3')),
+		'GB'=>array('store'=>array('HK01-SZ6','HK03-CHK3','UK02-UK3')),
+		'GR'=>array('store'=>array('HK01-SZ6','HK03-CHK3','UK02-UK3')),
+		'GU'=>array('store'=>array('HK01-SZ6','HK03-CHK3')),
+		'HK'=>array('store'=>array('HK01-SZ6','HK03-CHK3')),
+		'HU'=>array('store'=>array('HK01-SZ6','HK03-CHK3','UK02-UK3')),
+		'ID'=>array('store'=>array('HK01-SZ6','HK03-CHK3')),
+		'IE'=>array('store'=>array('HK01-SZ6','HK03-CHK3','UK02-UK3')),
+		'IL'=>array('store'=>array('HK01-SZ6','HK03-CHK3')),
+		'IN'=>array('store'=>array('HK01-SZ6','HK03-CHK3')),
+		'IS'=>array('store'=>array('HK01-SZ6','HK03-CHK3','UK02-UK3')),
+		'IT'=>array('store'=>array('HK01-SZ6','HK03-CHK3','UK02-UK3')),
+		'JM'=>array('store'=>array('HK01-SZ6','HK03-CHK3')),
+		'JP'=>array('store'=>array('HK01-SZ6','HK03-CHK3')),
+		'KR'=>array('store'=>array('HK01-SZ6','HK03-CHK3')),
+		'KW'=>array('store'=>array('HK01-SZ6','HK03-CHK3')),
+		'LU'=>array('store'=>array('HK01-SZ6','HK03-CHK3','UK02-UK3')),
+		'MT'=>array('store'=>array('HK01-SZ6','HK03-CHK3','UK02-UK3')),
+		'MX'=>array('store'=>array('HK01-SZ6','HK03-CHK3')),
+		'MY'=>array('store'=>array('HK01-SZ6','HK03-CHK3')),
+		'NG'=>array('store'=>array('HK01-SZ6','HK03-CHK3')),
+		'NL'=>array('store'=>array('HK01-SZ6','HK03-CHK3')),
+		'NO'=>array('store'=>array('HK01-SZ6','HK03-CHK3','UK02-UK3')),
+		'NZ'=>array('store'=>array('HK01-SZ6','HK03-CHK3')),
+		'PE'=>array('store'=>array('HK01-SZ6','HK03-CHK3')),
+		'PH'=>array('store'=>array('HK01-SZ6','HK03-CHK3')),
+		'PL'=>array('store'=>array('HK01-SZ6','HK03-CHK3','UK02-UK3')),
+		'PR'=>array('store'=>array('HK01-SZ6','HK03-CHK3')),
+		'PT'=>array('store'=>array('HK01-SZ6','HK03-CHK3','UK02-UK3')),
+		'PW'=>array('store'=>array('HK01-SZ6','HK03-CHK3')),
+		'QA'=>array('store'=>array('HK01-SZ6','HK03-CHK3')),
+		'RO'=>array('store'=>array('HK01-SZ6','HK03-CHK3','UK02-UK3')),
+		'SA'=>array('store'=>array('HK01-SZ6','HK03-CHK3')),
+		'SE'=>array('store'=>array('HK01-SZ6','HK03-CHK3','UK02-UK3')),
+		'SG'=>array('store'=>array('HK01-SZ6','HK03-CHK3')),
+		'SK'=>array('store'=>array('HK01-SZ6','HK03-CHK3','UK02-UK3')),
+		'TR'=>array('store'=>array('HK01-SZ6','HK03-CHK3')),
+		'TT'=>array('store'=>array('HK01-SZ6','HK03-CHK3')),
+		'TW'=>array('store'=>array('HK01-SZ6','HK03-CHK3')),
+		'UK'=>array('store'=>array('HK01-SZ6','HK03-CHK3','UK02-UK3')),
+		'US'=>array('store'=>array('HK01-SZ6','HK03-CHK3','UK02-UK3')),
+		'ZA'=>array('store'=>array('HK01-SZ6','HK03-CHK3'))
 	);
 	return $arr;
 }
