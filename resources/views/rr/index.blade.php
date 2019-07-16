@@ -153,9 +153,7 @@
                             //"targets": [2]
                         }
                     ],
-                    "order": [
-                        [1, "asc"]
-                    ] // set first column as a default sort by asc
+					"ordering":false;
                 });
 
             }
