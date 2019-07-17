@@ -265,6 +265,8 @@ class PartsListController extends Controller {
 					if(empty($valid)){
 						unset($rows[$key]);
 					}
+				}else{
+					unset($rows[$key]);
 				}
 			}
         }
