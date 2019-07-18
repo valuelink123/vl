@@ -70,12 +70,13 @@ class GetSkuBaseInfo extends Command
 				$VKBUR= $otab2['VKBUR'];
 				array_shift($otab2);
 				array_shift($otab2);
+				sleep(1);
 				$res = $sap->getStockAge(['sku' => $MATNR,'site' => $VKBUR]);
 				$otab2['ZCRATIO'] = array_get($res,'1.ZCRATIO',0);
 				$otab2['FBAPRICE'] = array_get($res,'1.FBAPRICE',0);
 				$otab2['YCL'] = getSapNumber(array_get($res,'1.YCL',0));
 				$otab2['RATE'] = array_get($res,'1.RATE',0);
-				
+				sleep(1);
 				$res = $sap->getTureSales(['sku' => $MATNR,'site' => $VKBUR,'month' => date('Ym',strtotime('-1 month'))]);
 					
 				$otab2['PRICE1'] = getSapNumber(array_get($res,'1.VV001',0))?round(getSapNumber(array_get($res,'1.VSRHJ',0))/getSapNumber(array_get($res,'1.VV001',0)),4):0;
@@ -86,7 +87,7 @@ class GetSkuBaseInfo extends Command
 				$otab2['XSE1'] = getSapNumber(array_get($res,'1.VSRHJ',0));
 
 
-
+				sleep(1);
 				$res = $sap->getTureSales(['sku' => $MATNR,'site' => $VKBUR,'month' => date('Ym',strtotime('-2 month'))]);
 				
 				$otab2['PRICE2'] = getSapNumber(array_get($res,'1.VV001',0))?round(getSapNumber(array_get($res,'1.VSRHJ',0))/getSapNumber(array_get($res,'1.VV001',0)),4):0;
@@ -95,7 +96,7 @@ class GetSkuBaseInfo extends Command
 				$otab2['YWJLL2'] = getSapNumber(array_get($res,'1.VSRHJ',0))?round((getSapNumber(array_get($res,'1.VVVVV',0))+getSapNumber(array_get($res,'1.VV024',0))+getSapNumber(array_get($res,'1.VV015',0)))/getSapNumber(array_get($res,'1.VSRHJ',0)),4):0;
 				$otab2['XL2'] = getSapNumber(array_get($res,'1.VV001',0));
 				$otab2['XSE2'] = getSapNumber(array_get($res,'1.VSRHJ',0));
-				
+				sleep(1);
 				$res = $sap->getTureSales(['sku' => $MATNR,'site' => $VKBUR,'month' => date('Ym',strtotime('-3 month'))]);
 				
 				
