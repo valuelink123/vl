@@ -680,7 +680,7 @@
             //当countrycode为US和CA的时候，StateOrRegion填的值必须强制为两个大写字母,且当countrycode为US的时候，StateOrRegion为固定下拉选项
 			var countryCode = $('#countrycode').val();
 
-            if(countryCode=='US' || countryCode=='CA'){
+            if($('#type').val()==2 && (countryCode=='US' || countryCode=='CA')){
                 var state = $('#state').val();
                 if (!(state.length==2 && /^[A-Z]+$/.test(state))){
                     alert('StateOrRegion has to be an abbreviation');
