@@ -212,7 +212,8 @@ class ExceptionController extends Controller
 							];
 						}
 						$o_sap_seller_id = Asin::where('sellersku',array_get(explode('*',$customersList['order_sku']),0))->where('asin',$customersList['asin'])->where('site','www.'.$customersList['saleschannel'])->value('sap_seller_id');
-						if($sap_sku_info = Asin::where('sellersku',array_get($product,'seller_sku'))->first()){
+						$sap_sku_asin = DB::table('fba_stock')->where('seller_sku',array_get($product,'seller_sku'))->where('seller_id',array_get($product,'seller_id'))->value('asin');
+						if($sap_sku_info = Asin::where('sellersku',array_get($product,'seller_sku'))->where('asin',$sap_sku_asin)->first()){
 							$sap_sku_info = $sap_sku_info->toArray();
 						}else{
 							$sap_sku_info=[];

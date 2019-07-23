@@ -618,7 +618,6 @@
 
             let skusInfo = $(this).data('skusInfo') || {}
             let info = skusInfo[this.value]
-
             let $repeatRow = $(this).closest('.mt-repeater-row')
 
             if(info){

@@ -153,7 +153,7 @@
                             //"targets": [2]
                         }
                     ],
-					"ordering":false;
+					
                 });
 
             }
