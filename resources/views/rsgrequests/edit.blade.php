@@ -1,4 +1,11 @@
-
+<style>
+	.inactive{
+		color:red;
+	}
+	.active{
+		color:black;
+	}
+</style>
     <div class="row"><div class="col-md-12">
         <div class="portlet light bordered">
 
@@ -37,7 +44,7 @@
                             
                              
                                 <select class="form-control" name="product_id" id="product_id" required>
-									<option value="{{$rule['product_id']}}" >{{array_get($product,'product_name')}}</option>
+									<option value="{{$rule['product_id']}}" class="{{array_get($product,'class')}}">{{array_get($product,'product_name')}}</option>
 									<?php 
 									$c_s='';$i=0;
 									$p_c=count($products);
@@ -46,7 +53,7 @@
 										if($pd['site']<>$c_s && $c_s) echo '</optgroup>';
 										if($pd['site']<>$c_s) echo '<optgroup label="'.$pd['site'].'">';
 										$c_s = $pd['site'];
-										if($pd['id']!=$rule['product_id']) echo '<option value="'.$pd['id'].'" >'.$pd['product_name'].' </option>';
+										if($pd['id']!=$rule['product_id']) echo '<option value="'.$pd['id'].'" class="'.$pd['class'].'">'.$pd['product_name'].' </option>';
 										if($i==$p_c) echo '</optgroup>';
 									}?>
 									
@@ -194,4 +201,17 @@
     </div>
 
     </div>
+	<script>
+        $("#product_id").change(function(){
+            var optionclass = $(this).find("option:selected").attr('class');
+            $('#product_id').removeClass('inactive');
+            $('#product_id').removeClass('active');
+            $('#product_id').addClass(optionclass);
+
+        });
+
+        $(function() {
+            $("#product_id").trigger("change");
+        });
+	</script>
 

@@ -1,4 +1,11 @@
-
+<style>
+    .inactive{
+        color:red;
+    }
+    .active{
+        color:black;
+    }
+</style>
     <div class="row"><div class="col-md-12">
         <div class="portlet light bordered">
 
@@ -25,7 +32,7 @@
 										if($pd['site']<>$c_s && $c_s) echo '</optgroup>';
 										if($pd['site']<>$c_s) echo '<optgroup label="'.$pd['site'].'">';
 										$c_s = $pd['site'];
-										echo '<option value="'.$pd['id'].'" >'.$pd['product_name'].' </option>';
+										echo '<option value="'.$pd['id'].'" class="'.$pd['class'].'">'.$pd['product_name'].' </option>';
 										if($i==$p_c) echo '</optgroup>';
 									}?>
 								</select>
@@ -142,3 +149,16 @@
 
     </div>
 
+<script>
+    $("#product_id").change(function(){
+        var optionclass = $(this).find("option:selected").attr('class');
+        $('#product_id').removeClass('inactive');
+        $('#product_id').removeClass('active');
+        $('#product_id').addClass(optionclass);
+
+    });
+
+    $(function() {
+        $("#product_id").trigger("change");
+    });
+</script>

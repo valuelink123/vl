@@ -313,12 +313,21 @@ class RsgrequestsController extends Controller
         }
 		if(array_get($rule,'customer_paypal_email')) $rule['trans']=self::getTrans(array_get($rule,'customer_paypal_email'));
 		$product= RsgProduct::where('id',$rule['product_id'])->first()->toArray();
+		if($product['status']==2){
+			$product['class'] = 'inactive';
+		}
         return view('rsgrequests/edit',['rule'=>$rule,'product'=>$product,'products'=>self::getproducts()]);
     }
 	
 	public function getproducts(){
 		$date=date('Y-m-d');
 		$products = RsgProduct::whereIn('status',array(1,2))->where('daily_remain','>',0)->where('start_date','<=',$date)->where('end_date','>=',$date)->orderBy('site','asc')->get()->toArray();
+		foreach($products as $key=>$val){
+			$products[$key]['class'] = 'active';
+			if($val['status']==2){
+				$products[$key]['class'] = 'inactive';
+			}
+		}
 		return $products;
 	}
 

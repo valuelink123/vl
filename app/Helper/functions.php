@@ -790,5 +790,5 @@ function getCtgChannel()
  */
 function getRsgRequestChannel()
 {
-	return array(0=>'Web',1=>'CS team',2=>'EDM',3=>'Facebook');
+	return array(0=>'Web',1=>'CS team',2=>'EDM',3=>'Facebook',4=>'Sales');
 }

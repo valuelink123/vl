@@ -67,10 +67,13 @@ th,td,td>span {
 										echo '<option value="'.$k.'">'.$v.'</option>';
 									}?>
 								</select>
-								
-												
 								<button class="btn btn-sm green table-group-action-submit">
 									<i class="fa fa-check"></i> Update</button>
+
+								@permission('compose')
+								<button class="btn btn-sm green" id="batch-send">
+									<i class="fa fa-check"></i> Batch Send</button>
+								@endpermission
 							</div>
 							@endpermission
 							<table class="table table-striped table-bordered table-hover table-checkable" id="datatable_ajax_rsg_requests">
@@ -361,6 +364,32 @@ th,td,td>span {
                                             });
                                         }
 
+                                    });
+
+                                    //批量发邮件操作
+                                    grid.getTableWrapper().on('click', '#batch-send', function (e) {
+                                        e.preventDefault();
+
+                                        if (grid.getSelectedRowsCount() > 0) {
+                                            selectId = grid.getSelectedRows();
+                                            var email = '';
+											//通过选中的ID得到选中的email
+                                            $('table tbody tr').each(function (i){
+                                                var id = $(this).find('.checkboxes').val();
+                                                if(selectId.indexOf(id) > -1){
+													email = email + $(this).find("td:eq(3)").text() + ';';
+                                                }
+                                            });
+                                            location.href='/send/create?to_address='+email;
+                                        } else if (grid.getSelectedRowsCount() === 0) {
+                                            App.alert({
+                                                type: 'danger',
+                                                icon: 'warning',
+                                                message: 'No record selected',
+                                                container: grid.getTableWrapper(),
+                                                place: 'prepend'
+                                            });
+                                        }
                                     });
 						
 									grid.setAjaxParam("date_from", $("input[name='date_from']").val());
