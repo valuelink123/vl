@@ -428,6 +428,17 @@
 
                     </li>
 					@endpermission
+
+                    @permission('mcforders')
+                    <li class="nav-item <?php if($action=='mcforder') echo 'active';?>">
+                        <a href="{{ url('mcforder') }}" class="nav-link nav-toggle">
+                            <i class="fa fa-sticky-note-o"></i>
+                            <span class="title">Mcf Order</span>
+							<?php if($action=='mcforder') echo '<span class="selected"></span>';?>
+                        </a>
+                    </li>
+                    @endpermission
+
 					@permission('ctg-show')
                     @include('layouts.menu', ['text'=>'C T G', 'uri'=>'/ctg/list', 'fa'=>'google'])
 
@@ -594,15 +605,7 @@
                         </a>
                     </li>
 					@endpermission
-					@permission('mcforders')
-					<li class="nav-item <?php if($action=='mcforder') echo 'active';?>">
-                        <a href="{{ url('mcforder') }}" class="nav-link nav-toggle">
-                            <i class="fa fa-sticky-note-o"></i>
-                            <span class="title">Mcf Order</span>
-                            <?php if($action=='mcforder') echo '<span class="selected"></span>';?>
-                        </a>
-                    </li>
-					@endpermission
+
 					@permission('price-model')
 
 					<li class="nav-item <?php if($action=='price') echo 'active';?>">

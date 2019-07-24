@@ -60,7 +60,13 @@
                                 </td>
                                 
 								<td>
-    
+                                    <select name="country" class="form-control form-filter input-sm">
+                                        <option value="">Select Country</option>
+										<?php
+										foreach($country as $k){
+											echo '<option value="'.$k.'">'.$k.'</option>';
+										}?>
+                                    </select>
                                 </td>
                                 <td>
          							<select name="status" class="form-control form-filter input-sm">

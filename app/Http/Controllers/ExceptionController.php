@@ -79,7 +79,14 @@ class ExceptionController extends Controller
 				$customers = $customers->whereIn('user_id',  $userid);
             }
         //}
-		
+
+		//筛选operator,列表中显示的是若无此id,则显示的是该所在分组的leader,所以可能存在选了leader的数据异常问题
+		if (array_get($_REQUEST, 'operator_id')) {
+			$_userid = array_get($_REQUEST, 'operator_id');
+			$userid = explode(',',$_userid);
+			$customers = $customers->whereIn('process_user_id',  $userid);
+		}
+
         if(array_get($_REQUEST,'sellerid')){
             $customers = $customers->where('sellerid',  array_get($_REQUEST, 'sellerid'));
 			
@@ -627,6 +634,13 @@ class ExceptionController extends Controller
 				$customers = $customers->whereIn('user_id',  $userid);
             }
         //}
+
+		//筛选operator,列表中显示的是若无此id,则显示的是该所在分组的leader,所以可能存在选了leader的数据异常问题
+		if (array_get($_REQUEST, 'operator_id')) {
+			$_userid = array_get($_REQUEST, 'operator_id');
+			$userid = explode(',',$_userid);
+			$customers = $customers->whereIn('process_user_id',  $userid);
+		}
 
         if(array_get($_REQUEST,'sellerid')){
             $customers = $customers->where('sellerid',  array_get($_REQUEST, 'sellerid'));

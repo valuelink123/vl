@@ -169,7 +169,12 @@ th,td,td>span {
 								<input type="text" class="form-control form-filter input-sm" name="resku" placeholder="Replace SKU">
                                 </td>
 								 <td>
-                                   
+                                     <input type="hidden" class="form-filter"  id="from-operatorid" name="operator_id" value="">
+                                     <select class="mt-multiselect btn btn-default select-operator-id" multiple="multiple" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" name="operator_id[]" id="operator_id[]" value="">
+                                         @foreach ($users as $user_id=>$user)
+                                             <option value="{{$user_id}}">{{$user}}</option>
+                                         @endforeach
+                                     </select>
                                 </td>
                                 <td>
                                     
@@ -315,6 +320,7 @@ th,td,td>span {
             grid.setAjaxParam("order_sku", $("input[name='order_sku']").val());
 			grid.setAjaxParam("status", $("select[name='status']").val());
             // grid.setAjaxParam("status", $("select[name='mcf_status']").val());
+            grid.setAjaxParam("operator_id", $("input[name='operator_id']").val());
             grid.setAjaxParam("user_id", $("input[name='user_id']").val());
 			grid.setAjaxParam("group_id", $("select[name='group_id']").val());
             grid.getDataTable().ajax.reload(null,false);
@@ -338,6 +344,7 @@ $(function() {
     //点击搜索框的重置的时候
     $('.filter-cancel').click(function(){
         $('#from-userid').val('');
+        $('#from-operatorid').val('');
     })
 
     $("table").delegate(".select-user-id","change",function(){
@@ -345,10 +352,15 @@ $(function() {
         $('#from-userid').val(user_id);
     });
 
+    $("table").delegate(".select-operator-id","change",function(){
+        var operator_id = $("select[name='operator_id[]']").val();
+        $('#from-operatorid').val(operator_id);
+    });
+
     TableDatatablesAjax.init();
 
 	$("#vl_list_export").click(function(){
-		location.href='/exceptionexport?sellerid='+$("select[name='sellerid']").val()+'&amazon_order_id='+$("input[name='amazon_order_id']").val()+'&date_from='+$("input[name='date_from']").val()+'&date_to='+$("input[name='date_to']").val()+'&type='+$("select[name='type']").val()+'&order_sku='+$("input[name='order_sku']").val()+'&status='+$("select[name='status']").val()+'&user_id='+$("input[name='user_id']").val()+'&group_id='+$("select[name='group_id']").val();
+		location.href='/exceptionexport?sellerid='+$("select[name='sellerid']").val()+'&amazon_order_id='+$("input[name='amazon_order_id']").val()+'&date_from='+$("input[name='date_from']").val()+'&date_to='+$("input[name='date_to']").val()+'&type='+$("select[name='type']").val()+'&order_sku='+$("input[name='order_sku']").val()+'&status='+$("select[name='status']").val()+'&user_id='+$("input[name='user_id']").val()+'&group_id='+$("select[name='group_id']").val()+'&operator_id='+$("input[name='operator_id']").val();
 	});
 });
 

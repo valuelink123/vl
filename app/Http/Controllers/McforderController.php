@@ -34,9 +34,13 @@ class McforderController extends Controller
     {
         if(!Auth::user()->can(['mcforders'])) die('Permission denied -- mcforders');
 		$date_from=date('Y-m-d',strtotime('-90 days'));		
-		$date_to=date('Y-m-d');	
-
-        return view('mcforder/index',['date_from'=>$date_from ,'date_to'=>$date_to,'accounts'=>$this->getSellerId()]);
+		$date_to=date('Y-m-d');
+		//country下拉选择框
+		$country= DB::connection('order')->select('SELECT DISTINCT CountryCode FROM amazon_mcf_orders');
+		foreach($country as $key=>$val){
+			$country[$key] = $val->CountryCode;
+		}
+        return view('mcforder/index',['date_from'=>$date_from ,'date_to'=>$date_to,'country'=>$country,'accounts'=>$this->getSellerId()]);
     }
 	
 	public function getSellerId(){
@@ -93,6 +97,10 @@ class McforderController extends Controller
 		if($request->input('name')){
             $datas = $datas->where('Name', $request->input('name'));
         }
+		//country下拉选择框
+		if($request->input('country')){
+			$datas = $datas->where('CountryCode', $request->input('country'));
+		}
 
         $iTotalRecords = $datas->count();
         $iDisplayLength = intval($_REQUEST['length']);

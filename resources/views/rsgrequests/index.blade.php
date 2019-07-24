@@ -380,7 +380,8 @@ th,td,td>span {
 													email = email + $(this).find("td:eq(3)").text() + ';';
                                                 }
                                             });
-                                            location.href='/send/create?to_address='+email;
+                                            window.open('/send/create?to_address='+email,'_blank');
+                                            // location.href='/send/create?to_address='+email;
                                         } else if (grid.getSelectedRowsCount() === 0) {
                                             App.alert({
                                                 type: 'danger',
