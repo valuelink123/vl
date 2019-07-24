@@ -119,6 +119,7 @@ th,td,td>span {
 
                                     <select class="form-control form-filter input-sm" name="status">
                                         <option value="">Select...</option>
+										<option value="Unmatched">Unmatched</option>
                                         @foreach (getAsinStatus() as $key=>$val)
                                             <option value="{{$key}}">{{$val}}</option>
                                         @endforeach

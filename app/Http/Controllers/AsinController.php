@@ -65,7 +65,16 @@ class AsinController extends Controller
 		$orderby = 'asin';
         $sort = 'asc';
   
-        $customers = new Asin;
+        if (array_get($_REQUEST, 'status')=='Unmatched') {
+		$customers = Asin::select('fba_stock.seller_id','fba_stock.asin','fba_stock.seller_sku as sellersku','asin.id','asin.site','asin.item_no','asin.brand','asin.seller','asin.review_user_id','asin.group_id','asin.brand_line','asin.status','asin.star','asin.item_model','asin.bg','asin.bu','asin.store','asin.item_group','asin.sap_seller_id','asin.sap_site_id','asin.sap_store_id','asin.sap_warehouse_id','asin.sap_factory_id','asin.sap_shipment_id','asin.asin_last_update_date','asin.sales_28_22','asin.sales_21_15','asin.sales_14_08','asin.sales_07_01','asin.item_status','asin.sku_ranking','asin.sku_rating','asin.sku_review','asin.sku_price','asin.sku_sales','asin.last_keywords','asin.sku_strategy')
+		->rightJoin('fba_stock',function($q){
+				$q->on('fba_stock.asin', '=', 'asin.asin')
+					->on('fba_stock.seller_sku', '=', 'asin.sellersku');
+			})->whereNull('asin.id')->whereRaw('fba_stock+fba_transfer>0');
+		}else{
+		
+			$customers = new Asin;
+		}
 		
 		if (array_get($_REQUEST, 'group_id')) {
 			if($_REQUEST['group_id']=='empty'){
@@ -95,7 +104,7 @@ class AsinController extends Controller
 			$customers = $customers->where('site', $_REQUEST['site']);
 		}
 		
-		if (array_get($_REQUEST, 'status')) {
+		if (array_get($_REQUEST, 'status') && array_get($_REQUEST, 'status')!='Unmatched') {
 			$customers = $customers->where('status', $_REQUEST['status']);
 		}
 		
@@ -107,11 +116,11 @@ class AsinController extends Controller
             $customers = $customers->where('item_model', 'like', '%'.$_REQUEST['item_model'].'%');
         }
         if(array_get($_REQUEST,'asin')){
-            $customers = $customers->where('asin', 'like', '%'.$_REQUEST['asin'].'%');
+            $customers = $customers->where(((array_get($_REQUEST, 'status')=='Unmatched')?'fba_stock.asin':'asin'), 'like', '%'.$_REQUEST['asin'].'%');
         }
 		
 		 if(array_get($_REQUEST,'sellersku')){
-            $customers = $customers->where('sellersku', 'like', '%'.$_REQUEST['sellersku'].'%');
+            $customers = $customers->where(((array_get($_REQUEST, 'status')=='Unmatched')?'fba_stock.seller_sku':'sellersku'), 'like', '%'.$_REQUEST['sellersku'].'%');
         }
 		if(array_get($_REQUEST,'item_group')){
             $customers = $customers->where('item_group', 'like', '%'.$_REQUEST['item_group'].'%');
@@ -236,7 +245,17 @@ class AsinController extends Controller
 			if($updateDate) $updatebox->whereIN('id',$_REQUEST["id"])->update($updateDate);
             unset($updateDate);
         }
-        $customers = new Asin;
+        
+		if (array_get($_REQUEST, 'status')=='Unmatched') {
+		$customers = Asin::select('fba_stock.seller_id','fba_stock.asin','fba_stock.seller_sku as sellersku','asin.id','asin.site','asin.item_no','asin.brand','asin.seller','asin.review_user_id','asin.group_id','asin.brand_line','asin.status','asin.star','asin.item_model','asin.bg','asin.bu','asin.store','asin.item_group','asin.sap_seller_id','asin.sap_site_id','asin.sap_store_id','asin.sap_warehouse_id','asin.sap_factory_id','asin.sap_shipment_id','asin.asin_last_update_date','asin.sales_28_22','asin.sales_21_15','asin.sales_14_08','asin.sales_07_01','asin.item_status','asin.sku_ranking','asin.sku_rating','asin.sku_review','asin.sku_price','asin.sku_sales','asin.last_keywords','asin.sku_strategy')
+		->rightJoin('fba_stock',function($q){
+				$q->on('fba_stock.asin', '=', 'asin.asin')
+					->on('fba_stock.seller_sku', '=', 'asin.sellersku');
+			})->whereNull('asin.id')->whereRaw('fba_stock+fba_transfer>0');
+		}else{
+		
+			$customers = new Asin;
+		}
 		if (array_get($_REQUEST, 'group_id')) {
 			if($_REQUEST['group_id']=='empty'){
 				$customers = $customers->where(function ($query)  {
@@ -264,7 +283,7 @@ class AsinController extends Controller
 			$customers = $customers->where('site', $_REQUEST['site']);
 		}
 		
-		if (array_get($_REQUEST, 'status')) {
+		if (array_get($_REQUEST, 'status') && array_get($_REQUEST, 'status')!='Unmatched') {
 			$customers = $customers->where('status', $_REQUEST['status']);
 		}
 		
@@ -276,11 +295,11 @@ class AsinController extends Controller
             $customers = $customers->where('item_model', 'like', '%'.$_REQUEST['item_model'].'%');
         }
         if(array_get($_REQUEST,'asin')){
-            $customers = $customers->where('asin', 'like', '%'.$_REQUEST['asin'].'%');
+            $customers = $customers->where(((array_get($_REQUEST, 'status')=='Unmatched')?'fba_stock.asin':'asin'), 'like', '%'.$_REQUEST['asin'].'%');
         }
 		
 		 if(array_get($_REQUEST,'sellersku')){
-            $customers = $customers->where('sellersku', 'like', '%'.$_REQUEST['sellersku'].'%');
+            $customers = $customers->where(((array_get($_REQUEST, 'status')=='Unmatched')?'fba_stock.seller_sku':'sellersku'), 'like', '%'.$_REQUEST['sellersku'].'%');
         }
 		if(array_get($_REQUEST,'item_group')){
             $customers = $customers->where('item_group', 'like', '%'.$_REQUEST['item_group'].'%');
