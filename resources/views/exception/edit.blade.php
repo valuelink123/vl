@@ -68,7 +68,17 @@
 				$("#district", $("#exception_form")).val(data.District);
 				$("#state", $("#exception_form")).val(data.StateOrRegion);
 				$("#postalcode", $("#exception_form")).val(data.PostalCode);
-				$("#countrycode", $("#exception_form")).val(data.CountryCode);
+                $('#state-div').attr('statevalue',data.StateOrRegion);
+				// $("#countrycode", $("#exception_form")).val(data.CountryCode);
+                $("select[name='countrycode']>option").each(function(){
+                    if($(this).text() == data.CountryCode){
+                        $(this).prop('selected', true)
+                    }else{
+                        $(this).prop('selected',false);
+                    }
+                });
+                $("#countrycode").trigger("change");//触发countrycode改变事件
+
 				$("#phone", $("#exception_form")).val(data.Phone);
 				
 				$("div[data-repeater-list='group-products']").html('');
@@ -93,7 +103,7 @@
 <form  action="{{ url('exception/'.$exception['id']) }}" id="exception_form" method="POST" enctype="multipart/form-data">
 <?php 
 $mcf_order_str='';
-if(($exception['user_id'] == Auth::user()->id || Auth::user()->can(['exception-check']) || in_array($exception['group_id'],array_get($mygroups,'manage_groups',array()))) && $exception['process_status'] =='cancel'){
+if(($exception['user_id'] == Auth::user()->id || Auth::user()->can(['exception-check']) || in_array($exception['group_id'],array_get($mygroups,'manage_groups',array()))) && ($exception['process_status'] =='cancel' || $exception['process_status'] =='submit')){
 	$disable='';
 }else{
 	$disable='disabled';
@@ -192,7 +202,15 @@ if(($exception['user_id'] == Auth::user()->id || Auth::user()->can(['exception-c
 			<span class="input-group-addon">
 				<i class="fa fa-bookmark"></i>
 			</span>
-				<input type="text" class="form-control" name="request_content" id="request_content" value="{{$exception['request_content']}}" {{$disable}}>
+				<select class="form-control" name="request_content" id="request_content" required {{$disable}}>
+					<option value="">Select</option>
+					@foreach($requestContentHistoryValues as $rcValue)
+
+						<option value="{{$rcValue}}" @if($exception['request_content']==$rcValue) selected @endif>{{$rcValue}}</option>
+
+					@endforeach
+				</select>
+				{{--<input type="text" class="form-control" name="request_content" id="request_content" value="{{$exception['request_content']}}" {{$disable}}>--}}
 			</div>
 		</div>
 
@@ -325,7 +343,18 @@ if(($exception['user_id'] == Auth::user()->id || Auth::user()->can(['exception-c
 							<span class="input-group-addon">
 								<i class="fa fa-bookmark"></i>
 							</span>
-								<input type="text" {{$disable}} class="form-control" name="state" id="state" value="{{array_get($replace,'state')}}" >
+								<div id="state-div" statevalue="{{array_get($replace,'state')}}" {{$disable}} ableattr="{{$disable}}">
+									<input type="text" class="form-control" name="state" id="state" value="{{array_get($replace,'state')}}" {{$disable}}>
+								</div>
+								<div id="state-select" style="display:none;" {{$disable}}>
+									<option value="">Select</option>
+									@foreach(getStateOrRegionByUS() as $key=>$value)
+
+										<option value="{{$key}}" @if(array_get($replace,'state')==$key) selected @endif>{{$value}}</option>
+
+									@endforeach
+								</div>
+								{{--<input type="text" {{$disable}} class="form-control" name="state" id="state" value="{{array_get($replace,'state')}}" >--}}
 							</div>
 						</div>
 						<div class="form-group">
@@ -352,7 +381,15 @@ if(($exception['user_id'] == Auth::user()->id || Auth::user()->can(['exception-c
 							<span class="input-group-addon">
 								<i class="fa fa-bookmark"></i>
 							</span>
-								<input type="text" {{$disable}} class="form-control" name="countrycode" id="countrycode" value="{{array_get($replace,'countrycode')}}" >
+								<select class="form-control" name="countrycode" id="countrycode" required {{$disable}}>
+									<option value="">Select</option>
+									@foreach(getCountryCode() as $key=>$value)
+
+										<option value="{{$key}}" @if(array_get($replace,'countrycode')==$key) selected @endif>{{$key}}</option>
+
+									@endforeach
+								</select>
+								{{--<input type="text" {{$disable}} class="form-control" name="countrycode" id="countrycode" value="{{array_get($replace,'countrycode')}}" >--}}
 							</div>
 						</div>
 						<div class="form-group">
@@ -489,7 +526,7 @@ if((Auth::user()->can(['exception-check']) || in_array($exception['group_id'],ar
         </div>
 
     </div>
-    <div class="portlet-body">
+    <div class="portlet-body" >
 		<div class="col-xs-12">
 		
 		 
@@ -627,7 +664,8 @@ if((Auth::user()->can(['exception-check']) || in_array($exception['group_id'],ar
 		</div>
 	</div><div style="clear:both;"></div>
 
-		@if($exception['process_status']!='done' and $exception['process_status']!='auto done' and $exception['update_status_log'])
+		{{--@if($exception['process_status']!='done' and $exception['process_status']!='auto done' and $exception['update_status_log'])--}}
+		@if($exception['update_status_log'])
 		<div style="margin-top:20px;margin-left:35px;margin-right: 30px;">
 			<pre>{!! $exception['update_status_log'] !!}</pre>
 		</div>
@@ -635,5 +673,85 @@ if((Auth::user()->can(['exception-check']) || in_array($exception['group_id'],ar
 
 		</div></div></div>					
 </form>
+<script>
+    $(function() {
+        //当countrycode为US的时候，StateOrRegion为固定下拉选项
+        $("#countrycode").change(function(){
+            var country = $('#countrycode').val();
+            var  able = $('#state-div').attr('ableattr');
+            //当countrycode选择US的时候，StateOrRegion为固定的下拉选项
+            var html = '';
+            var statevalue = $('#state-div').attr('statevalue');
+            if(country=='US'){
+                html += '<select class="form-control" name="state" id="state" required '+able+'>';
+                html += $('#state-select').html();
+                html += '</select>';
+                $('#state-div').html(html);
+                $("select[name='state']>option").each(function(){
+                    if($(this).val() == statevalue){
+                        $(this).prop('selected', true)
+                    }else{
+                        $(this).prop('selected',false);
+                    }
+                });
+            }else{
+                html = '<input type="text" class="form-control" name="state" id="state" value="'+statevalue+'" '+able+'>';
+                $('#state-div').html(html);
+            }
+        });
+
+        $("#countrycode").trigger("change");
+
+        $(exception_form).submit(function (e) {
+
+            let type = $('#type').val()
+
+            for(let input of $(this).find('[name]')){
+
+                let tabID = $(input).closest('.tab-pane').attr('id')
+
+                if(tabID){
+                    if(!(type & tabID.substr(-1))) continue
+                }
+
+                // if($.contains($replacementProductList[0], input)){ }
+
+                if(!input.reportValidity()) {
+                    toastr.error('The form is not complete yet.')
+                    return false
+                }
+            }
+
+            //当quantity的数量大于1的时候，弹出提示框， You will send out MORE THAN ONE replacement. Please confirm before you submit!
+            var obj = $('.quantity-input');
+            var sub = 0;
+            $.each(obj,function(i,item){
+                var value = $(this).val();
+                if(value>1){
+                    var flag = confirm('You will send out MORE THAN ONE replacement. Please confirm before you submit!');
+                    if(flag!=true && sub==0){
+                        sub = 1;
+                    }
+                }
+            })
+
+            if(sub==1){
+                return false;
+            }
+            //当countrycode为US和CA的时候，StateOrRegion填的值必须强制为两个大写字母,且当countrycode为US的时候，StateOrRegion为固定下拉选项
+            var countryCode = $('#countrycode').val();
+
+            if($('#type').val()==2 && (countryCode=='US' || countryCode=='CA')){
+                var state = $('#state').val();
+                if (!(state.length==2 && /^[A-Z]+$/.test(state))){
+                    alert('StateOrRegion has to be an abbreviation');
+                    return false;
+                }
+            }
+
+        })
+
+    });
+</script>
 <div style="clear:both;"></div>
 @endsection

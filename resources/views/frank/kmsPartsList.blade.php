@@ -88,6 +88,7 @@
                         <th>Fbm Valid Stock</th>
                         <th>Fba Stock</th>
                         <th>Fba Transfer</th>
+                        <th>Unsellable</th>
                         <th></th>
                     </tr>
                     </thead>
@@ -110,6 +111,7 @@
                 <th>Fbm Valid Stock</th>
                 <th>Fba Stock</th>
                 <th>Fba Transfer</th>
+                <th>Unsellable</th>
             </tr>
             </thead>
             <tbody>
@@ -124,6 +126,7 @@
                 <td>${row.fbm_valid_stock}</td>
                 <td>${row.fba_stock}</td>
                 <td>${row.fba_transfer}</td>
+                <td>${row.unsellable}</td>
             </tr>
             <% } %>
             </tbody>
@@ -154,7 +157,7 @@
             serverSide: true,
             pagingType: 'bootstrap_extended',
             processing: true,
-            aoColumnDefs: [ { "bSortable": false, "aTargets": [ 6 ] }],
+            aoColumnDefs: [ { "bSortable": false, "aTargets": [ 6,9 ] }],
             columns: [
                 {data: 'item_code', name: 'item_code'},
                 {data: 'seller_name', name: 'seller_name'},
@@ -165,6 +168,7 @@
                 {data: 'fbm_valid_stock', name: 'fbm_valid_stock'},
                 {data: 'fba_stock', name: 'fba_stock'},
                 {data: 'fba_transfer', name: 'fba_transfer'},
+                {data: 'unsellable', name: 'unsellable'},
                 {
                     width: "2px",
                     "className": 'details-control disabled',

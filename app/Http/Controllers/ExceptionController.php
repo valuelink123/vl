@@ -80,11 +80,33 @@ class ExceptionController extends Controller
             }
         //}
 
+		$groupleaders = $this->getGroupLeader();
+		$users = $this->getUsers();
 		//筛选operator,列表中显示的是若无此id,则显示的是该所在分组的leader,所以可能存在选了leader的数据异常问题
 		if (array_get($_REQUEST, 'operator_id')) {
 			$_userid = array_get($_REQUEST, 'operator_id');
 			$userid = explode(',',$_userid);
-			$customers = $customers->whereIn('process_user_id',  $userid);
+
+			$groupid = array();
+			foreach($userid as $k=>$v){
+				$userName = $users[$v];
+				foreach($groupleaders as $gk=>$gv){
+					if(strpos($gv,$userName) !== false){
+						$groupid[] = $gk;
+					}
+				}
+			}
+
+			if($groupid){
+				$customers = $customers->where(function ($query) use ($userid,$groupid,$users) {
+					$query->whereIn('process_user_id',  $userid)
+						->Orwhere(function ($que) use ($users,$groupid) {
+							$que->whereIn('group_id',  $groupid)->whereNotIn('process_user_id',array_keys($users));
+						});
+				});
+			}else{
+				$customers = $customers->whereIn('process_user_id',  $userid);
+			}
 		}
 
         if(array_get($_REQUEST,'sellerid')){
@@ -134,6 +156,7 @@ class ExceptionController extends Controller
 		$headArray[] = 'Operator';
 		$headArray[] = 'Group';
 		$headArray[] = 'Creator';
+		$headArray[] = 'Confirm Date';
         $headArray[] =  'Process Date';
 
 		$arrayAmazon[] =['Status','Account','Returned/Urgent','MerchantFulfillmentOrderID','DisplayableOrderID','DisplayableOrderDate','MerchantSKU','Quantity','MerchantFulfillmentOrderItemID','GiftMessage','DisplayableComment','PerUnitDeclaredValue','DisplayableOrderComment','DeliverySLA','AddressName','AddressFieldOne','AddressFieldTwo','AddressFieldThree','AddressCity','AddressCountryCode','AddressStateOrRegion','AddressPostalCode','AddressPhoneNumber','NotificationEmail','FulfillmentAction','MarketplaceID'];
@@ -141,9 +164,7 @@ class ExceptionController extends Controller
 		$arraySap[] =['Status','Returned/Urgent','平台编号','站点','平台订单号','售达方','订单类型','订单交易号','付款日期','付款交易ID(不能重复)','买家ID','买家姓名','国家代码','城市名','州/省','街道1','街道2','邮编','邮箱','电话1','成交费','货币','佣金','货币','订单总价','货币','实际运输方式','平台订单号','站点','行号','SAP物料号','数量','工厂','仓库','行项目ID','帖子ID','帖子标题','销售员编号','行交易ID','标记完成'];
 
 		$arrayData[] = $headArray;
-		$users=$this->getUsers();
 		$groups = $this->getGroups();
-		$groupleaders = $this->getGroupLeader();
 		$accounts = $this->getAccounts();
         $status_list['done'] = "Done";
         $status_list['cancel'] = "Cancelled";
@@ -301,6 +322,7 @@ class ExceptionController extends Controller
 				array_get($users,$customersList['process_user_id'])?array_get($users,$customersList['process_user_id']):array_get($groupleaders,$customersList['group_id']),
                 array_get($groups,$customersList['group_id'].'.group_name'),
 				array_get($users,$customersList['user_id']),
+				$this->getConfirmDate($customersList['update_status_log']),//得到修改为confirmed状态时间
                 $customersList['process_date'],
             );
 		}
@@ -412,7 +434,22 @@ class ExceptionController extends Controller
 
 		if($last_inbox) $last_inboxid= $last_inbox->id;
 
-        return view('exception/edit',['exception'=>$rule,'groups'=>$this->getGroups(),'mygroups'=>$this->getUserGroup(),'sellerids'=>$this->getAccounts(),'last_inboxid'=>$last_inboxid,'mcf_orders'=>$mcf_orders,'auto_create_mcf_logs'=>$auto_create_mcf_logs,'users'=>$this->getUsers()]);
+
+		 $requestContentHistoryValues = array(
+			 'quality issue',
+			 'Damage in Transit/lost in Transit',
+			 'cx did not receive the product',
+			 'Replacement parts',
+			 'SG gift',
+			 'RSG-gift',
+			 'CTG-gift',
+			 'Remove NRW',
+			 'others',
+			 'FBM sales order',
+			 'B2B'
+		 );
+
+        return view('exception/edit',['exception'=>$rule,'groups'=>$this->getGroups(),'mygroups'=>$this->getUserGroup(),'sellerids'=>$this->getAccounts(),'last_inboxid'=>$last_inboxid,'mcf_orders'=>$mcf_orders,'auto_create_mcf_logs'=>$auto_create_mcf_logs,'users'=>$this->getUsers(),'requestContentHistoryValues'=>$requestContentHistoryValues]);
     }
 
     public function update(Request $request,$id)
@@ -444,10 +481,22 @@ class ExceptionController extends Controller
         //需要保存更改信息记录的状态，当由别的状态改为'done','auto done'时或者由'done','auto done'状态改为其他的状态的时候，才要保存更新状态记录，并且别的改为'done','auto done'，然后'done','auto done'改为其他状态，这种情况下才要显示更改状态记录信息
         $status = $request->get('process_status');
         $saveLogArray = array('done','auto done');
-        if(in_array($exception->process_status,$saveLogArray) || in_array($status,$saveLogArray)){
-            $exception->update_status_log = $exception->update_status_log.'Status changed to '.$status.' at  '.date('H:i:s,Y-m-d').'<br>';
-        }
+        // if(in_array($exception->process_status,$saveLogArray) || in_array($status,$saveLogArray)){
+        //     $exception->update_status_log = $exception->update_status_log.'Status changed to '.$status.' at  '.date('H:i:s,Y-m-d').'<br>';
+        // }
+		//由原先的逻辑现改为任何状态都保存记录日志，并显示
+		if($exception->process_status != $status){
+			if(($exception->process_status!='cancel' && $request->get('process_status')!='submit') || $exception->process_status=='cancel') {
+				if($exception->process_status=='cancel'){
+					$exception->update_status_log = $exception->update_status_log . 'Status changed to submit at  ' . date('H:i:s,Y-m-d') . '<br>';
+				}else{
+					$exception->update_status_log = $exception->update_status_log . 'Status changed to ' . $status . ' at  ' . date('H:i:s,Y-m-d') . '<br>';
+				}
+
+			}
+		}
 		$exception->save();
+		//当状态为cancel的时候，才能修改状态为submit,否则不能
 		if(($exception->process_status!='cancel') && $request->get('process_status')!='submit'){
 			if(!Auth::user()->can(['exception-check'])) die('Permission denied -- exception-check');
 			$this->validate($request, [
@@ -492,7 +541,8 @@ class ExceptionController extends Controller
 				return redirect()->back()->withInput();
 			}
 		}
-		if($exception->process_status=='cancel'){
+		//当状态为cancel或者submit的时候，可以编辑左边页面数据
+		if($exception->process_status=='cancel' || $exception->process_status=='submit'){
 			 if(!Auth::user()->can(['exception-update'])) die('Permission denied -- exception-update');
 			 $this->validate($request, [
 				'group_id' => 'required|string',
@@ -500,6 +550,7 @@ class ExceptionController extends Controller
 				'rebindordersellerid' => 'required|string',
 				'rebindorderid' => 'required|string',
 				'type' => 'required|string',
+				 'descrip' => 'required|string',
 			]);
 			$exception->type = $request->get('type');
 			$exception->name = $request->get('name');
@@ -511,10 +562,17 @@ class ExceptionController extends Controller
 			$exception->user_id = intval(Auth::user()->id);
 			$exception->request_content = $request->get('request_content');
 			$exception->process_status = 'submit';
+			$exception->descrip = $request->get('descrip');
 			if( $exception->type == 1 || $exception->type == 3){
 				$exception->refund = round($request->get('refund'),2);
 			}else{
 				$exception->refund = 0;
+			}
+
+			if( $exception->type == 4){
+				$exception->gift_card_amount = round($request->get('gift_card_amount'),2)??0;
+			}else{
+				$exception->gift_card_amount = 0;
 			}
 
 			if( $exception->type == 2 || $exception->type == 3){
@@ -532,6 +590,17 @@ class ExceptionController extends Controller
 					}
 					$products[]=$product_arr;
 				}
+
+				//当countrycode为US和CA的时候，StateOrRegion填的值必须强制为两个大写字母
+				$specialCountry = array('US','CA');
+				if(in_array($request->get('countrycode'),$specialCountry)){
+					$state = $request->get('state');
+					if(strtoupper($state)!= $state || strlen($state)!=2){
+						$request->session()->flash('error_message','StateOrRegion has to be an abbreviation');
+						return redirect()->back()->withInput();
+					}
+				}
+
 				$exception->replacement = serialize(
 				array(
 					'shipname'=>$request->get('shipname'),
@@ -635,11 +704,35 @@ class ExceptionController extends Controller
             }
         //}
 
+
+		$groupleaders = $this->getGroupLeader();
+		$users = $this->getUsers();
 		//筛选operator,列表中显示的是若无此id,则显示的是该所在分组的leader,所以可能存在选了leader的数据异常问题
 		if (array_get($_REQUEST, 'operator_id')) {
 			$_userid = array_get($_REQUEST, 'operator_id');
 			$userid = explode(',',$_userid);
-			$customers = $customers->whereIn('process_user_id',  $userid);
+
+			//选中的operator是否是leader,如若是leader获取到该group_id,查询的时候or一下在该group_id内但是不存在users内
+			$groupid = array();
+			foreach($userid as $k=>$v){
+				$userName = $users[$v];
+				foreach($groupleaders as $gk=>$gv){
+					if(strpos($gv,$userName) !== false){
+						$groupid[] = $gk;
+					}
+				}
+			}
+
+			if($groupid){
+				$customers = $customers->where(function ($query) use ($userid,$groupid,$users) {
+					$query->whereIn('process_user_id',  $userid)
+						->Orwhere(function ($que) use ($users,$groupid) {
+							$que->whereIn('group_id',  $groupid)->whereNotIn('process_user_id',array_keys($users));
+						});
+				});
+			}else{
+				$customers = $customers->whereIn('process_user_id',  $userid);
+			}
 		}
 
         if(array_get($_REQUEST,'sellerid')){
@@ -674,15 +767,15 @@ class ExceptionController extends Controller
         $iDisplayLength = $iDisplayLength < 0 ? $iTotalRecords : $iDisplayLength;
         $iDisplayStart = intval($_REQUEST['start']);
         $sEcho = intval($_REQUEST['draw']);
+
 		$customersLists =  $customers->orderBy($orderby,$sort)->skip($iDisplayStart)->take($iDisplayLength)->get()->toArray();
+
         $records = array();
         $records["data"] = array();
 
         $end = $iDisplayStart + $iDisplayLength;
         $end = $end > $iTotalRecords ? $iTotalRecords : $end;
-        $users = $this->getUsers();
 		$groups = $this->getGroups();
-		$groupleaders = $this->getGroupLeader();
 		$accounts = $this->getAccounts();
         $status_list['auto done'] = "<span class=\"label label-sm label-success\">Auto Done</span>";
         $status_list['confirmed'] = "<span class=\"label label-sm label-info\">Confirmed</span>";
@@ -756,6 +849,7 @@ class ExceptionController extends Controller
 				$operate,
 				array_get($users,$customersList['process_user_id'])?array_get($users,$customersList['process_user_id']):array_get($groupleaders,$customersList['group_id']),
                 array_get($groups,$customersList['group_id'].'.group_name').' > '.array_get($users,$customersList['user_id']),
+				$this->getConfirmDate($customersList['update_status_log']),//得到修改为confirmed状态时间
                 ((Auth::user()->admin || in_array($customersList['group_id'],array_get($this->getUserGroup(),'manage_groups',array()))) && ($customersList['process_status']=='submit' || $customersList['process_status']=='confirmed')) ?'<a href="/exception/'.$customersList['id'].'/edit" class="btn btn-sm red btn-outline " target="_blank"><i class="fa fa-search"></i> Process </a>':'<a href="/exception/'.$customersList['id'].'/edit" class="btn blue btn-sm btn-outline green" target="_blank"><i class="fa fa-search"></i> View </a>',
             );
 		}
@@ -1108,6 +1202,22 @@ class ExceptionController extends Controller
 			}
 		}
 		die(json_encode(array('result'=>$re , 'message'=>$message)));
+	}
+
+	/*
+	 *得到最近一次的Confirm状态的时间
+	 */
+	public function getConfirmDate($statusLog)
+	{
+		$confirmDate = '';
+		$statusLog = explode('<br>',$statusLog);
+		foreach($statusLog as $lg=>$lv){
+			if(strpos($lv,'confirmed at ') !== false){
+				$time = explode(',',substr($lv, -19));
+				$confirmDate = $time[1].','.$time[0];
+			}
+		}
+		return $confirmDate;
 	}
 
 }

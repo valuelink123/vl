@@ -92,11 +92,12 @@ th,td,td>span {
                                 <th width="8%"> Type </th>
 								<th width="15%">Order Sku </th>
 								<th width="10%">Create Date</th>
-								<th width="8%">Status</th>
+								<th width="5%">Status</th>
                                 {{--<th width="8%">MCF Status</th>--}}
 								<th width="22%"> Operate </th>
                                 <th width="8%"> Operator </th>
 								<th width="15%">Creator</th>
+                                <th width="15%">Confirm Date</th>
                                 <th width="5%"> Action </th>
                             </tr>
                             <tr role="row" class="filter">
@@ -197,6 +198,9 @@ th,td,td>span {
                                     </div>
                                 </td>
                                 <td>
+
+                                </td>
+                                <td>
                                     <div class="margin-bottom-5">
                                         <button class="btn btn-sm green btn-outline filter-submit margin-bottom">
                                             <i class="fa fa-search"></i> Search</button>
@@ -260,7 +264,7 @@ th,td,td>span {
                     "dom": "<'row'<'col-md-6 col-sm-12'pli><'col-md-6 col-sm-12'<'table-group-actions pull-right'>>r>t<'row'<'col-md-6 col-sm-12'pli><'col-md-6 col-sm-12'>>",
 
                     "bStateSave": true, // save datatable state(pagination, sort, etc) in cookie.
-                    "aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0 , 4,7,8,10 ] }],
+                    "aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0 , 4,7,8,10,11 ] }],
                     "lengthMenu": [
                         [10, 20, 50],
                         [10, 20, 50] // change per page values here

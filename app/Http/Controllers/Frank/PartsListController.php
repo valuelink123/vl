@@ -71,6 +71,7 @@ class PartsListController extends Controller {
             ->get();
 		$validStock = $this->getFbmAccsStock();
 		//账号机的状态为1的时候，表示为无效账号机，此时标红显示
+		$unsellableData = $this->getUnsellableData();//获取unsellable数据
 		foreach($rows as $key=>$val){
 			if($val->account_status==1){
 				$rows[$key]->seller_name = '<div class="invalid-account">'.$val->seller_name.'</div>';
@@ -83,6 +84,11 @@ class PartsListController extends Controller {
 				$rows[$key]->fbm_valid_stock = $valid;
 			}else{
 				$rows[$key]->fbm_valid_stock = 0;
+			}
+			//设置unsellable数量
+			$rows[$key]->unsellable = 0;
+			if(isset($unsellableData[$val->seller_sku.'-'.$val->asin])){
+				$rows[$key]->unsellable = $unsellableData[$val->seller_sku.'-'.$val->asin];
 			}
 		}
 		return $rows;
@@ -148,6 +154,8 @@ class PartsListController extends Controller {
         $rows = $this->queryRows($sql);
         $validStock = $this->getFbmAccsStock();
 
+		$unsellableData = $this->getUnsellableData();//获取unsellable数据
+
         foreach($rows as $key=>$val){
         	//账号机的状态为1的时候，表示为无效账号机，此时标红显示
         	if($val['account_status']==1){
@@ -162,6 +170,11 @@ class PartsListController extends Controller {
 				}
 
 				$rows[$key]['fbm_valid_stock'] = $valid;
+			}
+			//设置unsellable数量
+			$rows[$key]['unsellable'] = 0;
+			if(isset($unsellableData[$val['seller_sku'].'-'.$val['asin']])){
+				$rows[$key]['unsellable'] = $unsellableData[$val['seller_sku'].'-'.$val['asin']];
 			}
 		}
 
@@ -297,6 +310,27 @@ class PartsListController extends Controller {
 		}
 		return $data;
 
+	}
+	/*
+	 * 获取unsellable数据,以sellersku和asin组合为唯一键，查询最新的一条数据的UNSELLABLE的数量
+	 */
+	public function getUnsellableData()
+	{
+		$sql = "SELECT CONCAT(`SellerSku`,'-',`Asin`) as skuasin,Quantity 
+				FROM amazon_fba_stock as a 
+				JOIN(
+					SELECT ANY_VALUE(SellerSku) as t_sku,ANY_VALUE(Asin) as t_asin,CONCAT(`SellerSku`,'-',`Asin`) as skuasin,max(SnapshotDate) as maxdate
+					FROM amazon_fba_stock 
+					where WarehouseConditionCode='UNSELLABLE' 
+					group by skuasin
+				) as t on SellerSku = t_sku and Asin=t_asin and a.SnapshotDate=t.maxdate
+				where WarehouseConditionCode='UNSELLABLE' ";
+		$_unsellableData= DB::connection('order')->select($sql);
+		$unsellableData = array();
+		foreach($_unsellableData as $key=>$val){
+			$unsellableData[$val->skuasin] = $val->Quantity;
+		}
+		return $unsellableData;
 	}
 
 }
