@@ -381,7 +381,7 @@ if(($exception['user_id'] == Auth::user()->id || Auth::user()->can(['exception-c
 							<span class="input-group-addon">
 								<i class="fa fa-bookmark"></i>
 							</span>
-								<select class="form-control" name="countrycode" id="countrycode" required {{$disable}}>
+								<select class="form-control" name="countrycode" id="countrycode" {{$disable}}>
 									<option value="">Select</option>
 									@foreach(getCountryCode() as $key=>$value)
 
