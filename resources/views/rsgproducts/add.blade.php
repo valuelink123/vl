@@ -80,7 +80,7 @@
                             <label>Product Image</label>
                             
                       
-                                <input type="text" class="form-control" name="product_img" id="product_img" value="">
+                                <input type="text" class="form-control" name="product_img" id="product_img" value="" required>
                            
                         </div>
 						
@@ -135,7 +135,7 @@
 						
 						
 						<div class="form-group col-md-6">
-                            <label>Positive Daily Limit</label>
+                            <label>Reviews needed weekly</label>
                             
                       
                                 <input type="text" class="form-control" name="positive_daily_limit" id="positive_daily_limit" value="">
@@ -155,6 +155,12 @@
 
 
                             <input type="text" class="form-control" name="number_of_reviews" id="number_of_reviews" value="">
+
+                        </div>
+
+                        <div class="form-group col-md-6">
+                            <label>Sales' target reviews</label>
+                            <input type="text" class="form-control" name="sales_target_reviews" id="sales_target_reviews" value="" pattern="[0-9]*" required>
 
                         </div>
 						

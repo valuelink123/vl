@@ -83,7 +83,7 @@
                             <label>Product Image</label>
                             
                       
-                                <input type="text" class="form-control" name="product_img" id="product_img" value="{{array_get($rule,'product_img')}}">
+                                <input type="text" class="form-control" name="product_img" id="product_img" value="{{array_get($rule,'product_img')}}" required>
                            
                         </div>
 						
@@ -139,7 +139,7 @@
 						
 						
 						<div class="form-group col-md-6">
-                            <label>Positive Daily Limit</label>
+                            <label>Reviews needed weekly</label>
                             
                       
                                 <input type="text" class="form-control" name="positive_daily_limit" id="positive_daily_limit" value="{{intval(array_get($rule,'positive_daily_limit'))}}">
@@ -159,6 +159,12 @@
 
 
                             <input type="text" class="form-control" name="number_of_reviews" id="number_of_reviews" value="{{intval(array_get($rule,'number_of_reviews'))}}">
+
+                        </div>
+
+                        <div class="form-group col-md-6">
+                            <label>Sales' target reviews</label>
+                            <input type="text" class="form-control" name="sales_target_reviews" id="sales_target_reviews" value="{{intval(array_get($rule,'sales_target_reviews'))}}" required pattern="[0-9]*">
 
                         </div>
 						

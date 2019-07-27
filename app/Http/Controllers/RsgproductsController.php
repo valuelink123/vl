@@ -223,6 +223,8 @@ class RsgproductsController extends Controller
         $rule->review_rating = intval($request->get('review_rating'));
         $rule->number_of_reviews = intval($request->get('number_of_reviews'));
 
+		$rule->sales_target_reviews = intval($request->get('sales_target_reviews'));
+
         if ($rule->save()) {
             $request->session()->flash('success_message','Set Rsg Product Success');
             return redirect('rsgproducts');
@@ -273,6 +275,7 @@ class RsgproductsController extends Controller
         //$rule->user_id = intval(Auth::user()->id);
         $rule->review_rating = intval($request->get('review_rating'));
         $rule->number_of_reviews = intval($request->get('number_of_reviews'));
+		$rule->sales_target_reviews = intval($request->get('sales_target_reviews'));
         if ($rule->save()) {
             $request->session()->flash('success_message','Set Rsg Product Success');
             return redirect('rsgproducts');
