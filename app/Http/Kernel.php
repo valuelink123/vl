@@ -8,6 +8,7 @@ use Illuminate\Foundation\Http\Kernel as HttpKernel;
 // 最好的方式是加在 composer.json ( autoload.files ) 中
 // 由于我不便执行 composer，临时从 bootstrap/app.php 移到这里
 require __DIR__.'/../Helper/functions.php';
+require __DIR__.'/../Helper/basicFunctions.php';
 
 class Kernel extends HttpKernel
 {

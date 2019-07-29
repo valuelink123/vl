@@ -100,6 +100,8 @@ th,td,td>span {
 									<th width="4%"> Sales</th>
 									<th width="6%"> Site</th>
 									<th width="10%"> Update Date </th>
+									<th width="6%">Facebook Name</th>
+									<th width="6%">Group</th>
 									<th width="10%"> Processor </th>
 									<th width="10%"> Action</th>
 								</tr>
@@ -229,6 +231,8 @@ th,td,td>span {
 										</div>
 									</td>
 
+									<td></td>
+									<td></td>
 									<td>
 										<select name="processor" class="form-control form-filter input-sm">
 											<option value="">Processor</option>
@@ -292,7 +296,7 @@ th,td,td>span {
 											"dom": "<'row'<'col-md-6 col-sm-12'pli><'col-md-6 col-sm-12'<'table-group-actions pull-right'>>r>t<'row'<'col-md-6 col-sm-12'pli><'col-md-6 col-sm-12'>>",
 						
 											"bStateSave": true, // save datatable state(pagination, sort, etc) in cookie.
-											"aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0 ,2,3,4,5,6,8,9,10,11,12,13,14,16 ] }],
+											"aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0 ,2,3,4,5,6,8,9,10,11,12,13,14,16,17,18,19 ] }],
 											"lengthMenu": [
 												[-1,10, 20, 50],
 												['All',10, 20, 50] // change per page values here

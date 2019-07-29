@@ -131,6 +131,30 @@
 
                             </select>
                         </div>
+
+                        <div class="form-group col-md-6">
+                            <label>Customer's FB Name</label>
+                            <input type="text" class="form-control" name="facebook_name" id="facebook_name">
+
+                        </div>
+
+                        <div class="form-group col-md-6">
+                            <label>FB Group</label>
+                            <input id="facebook_group" class="form-control" name="facebook_group" list="list-facebook_group" placeholder="Facebook Group"/>
+                            <datalist id="list-facebook_group">
+                                @foreach(getFacebookGroup() as $id=>$name)
+                                    <option value="{!! $id !!} | {!! $name !!}"></option>
+                                @endforeach
+                            </datalist>
+                        </div>
+
+                        <div class="form-group col-md-6">
+                            <label>Auto Send</label>
+                            <select class="form-control " name="auto_send_status" id="auto_send_status" required>
+                                <option value="0">Yes</option>
+                                <option value="1">No</option>
+                            </select>
+                        </div>
 						
                     </div>
                     <div class="form-actions">

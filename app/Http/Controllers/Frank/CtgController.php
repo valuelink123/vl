@@ -141,8 +141,11 @@ class CtgController extends Controller {
             t4.bgs,
             t4.bus,
             t4.brands,
+		    facebook_name,
+		    facebook_group,
 		    '{$channelName}' as channel 
-        FROM {$table} t1
+        FROM {$table} t1 
+        LEFT JOIN client_info ON client_info.email = t1.email 
         LEFT JOIN users t2
           ON t2.id = t1.processor
         LEFT JOIN (
@@ -184,7 +187,10 @@ class CtgController extends Controller {
         ";
 		// echo $sql;exit;
         $data = $this->queryRows($sql);
-
+		$fbgroupConfig = getFacebookGroup();
+        foreach($data as $key=>$val){
+			$data[$key]['facebook_group'] = isset($fbgroupConfig[$val['facebook_group']]) ? $fbgroupConfig[ $val['facebook_group']] : '';
+		}
         $recordsTotal = $recordsFiltered = $this->queryOne('SELECT FOUND_ROWS()');
 
         return compact('data', 'recordsTotal', 'recordsFiltered');
@@ -473,7 +479,15 @@ class CtgController extends Controller {
 					$trackLogData[$k]['note'] = nl2br($v['note']);
 				}
 			}
-
+			//查询该邮箱是否存在于client_info中，查出需要显示的facebook_name和facebook_group
+			$clientInfo = DB::table('client_info')->where('email',$ctgRow['email'])->get(array('facebook_name','facebook_group'))->first();
+			if($clientInfo){
+				$fbgroupConfig = getFacebookGroup();
+				$steps = json_decode($ctgRow['steps'],true);
+				$steps['facebook_name'] = $clientInfo->facebook_name;
+				$steps['facebook_group'] = isset($fbgroupConfig[ $clientInfo->facebook_group]) ? $fbgroupConfig[ $clientInfo->facebook_group] : '';
+				$ctgRow['steps'] = json_encode($steps);
+			}
 
             return view('frank.ctgProcess', compact('ctgRow', 'users', 'trackLogData','order', 'emails'));
 
@@ -488,11 +502,28 @@ class CtgController extends Controller {
             $updates['processor'] = (int)$req->input('processor');
         }
 
+
+		$updateClient = array();//新添加facebook_group和facebook_name
         if ($req->has('steps')) {
             $updates['status'] = $req->input('status');
             $updates['commented'] = $req->input('commented');
-            $updates['steps'] = json_encode($req->input('steps'));
+			$steps = $req->input('steps');
+			if(isset($steps['facebook_group']) && $steps['facebook_group']){
+				$updateClient['facebook_group'] = (int)$steps['facebook_group'];
+				unset($steps['facebook_group']);
+			}
+			if(isset($steps['facebook_name']) && $steps['facebook_name']){
+				$updateClient['facebook_name'] = $steps['facebook_name'];
+				unset($steps['facebook_name']);
+			}
+            $updates['steps'] = json_encode($steps);
         }
+
+		//查client_info表中是否有此客户的数据，如若有就更新facebook_name和facebook_group字段数据，如若没有就插入客户信息数据到client和client_info表
+		if($updateClient){
+			$ctgRow['from'] = 'CTG';
+			updateCrm($ctgRow,$updateClient);
+		}
 
         $ctgRow->where($wheres)->update($updates);
 

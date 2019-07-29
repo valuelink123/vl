@@ -187,6 +187,36 @@
 	已退款
 	完成
                                     </pre>
+                                    {{--新添加的Customer's FB Name和FB Group--}}
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label>
+                                                    Customer's FB Name
+                                                    <input autocomplete="off" class="xform-autotrim form-control" placeholder="Facebook Name" name="facebook_name"/>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label>
+                                                    FB Group
+                                                    <input id="facebook_group" class="form-control xform-autotrim" name="facebook_group" list="list-facebook_group" placeholder="Facebook Group" autocomplete="off" />
+                                                    <datalist id="list-facebook_group">
+                                                        @foreach(getFacebookGroup() as $id=>$name)
+                                                        <option value="{!! $id !!} | {!! $name !!}"></option>
+                                                        @endforeach
+                                                    </datalist>
+
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
                                 </div>
                             </div>
                         </form>

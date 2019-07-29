@@ -58,6 +58,7 @@ class CrmController extends Controller
 
 		$recordsTotal = $recordsFiltered = $this->queryOne('SELECT FOUND_ROWS()');
 
+		$fbgroupConfig = getFacebookGroup();
 		foreach($data as $key=>$val){
 			if(!Auth::user()->can(['crm-update'])){
 				$action = '<a class="btn btn-danger btn-xs" href="'.url('crm/show?id='.$val['id']).'" target="_blank">Show</a>';
@@ -76,6 +77,8 @@ class CrmController extends Controller
 			if($val['times_negative_review']>0){
 				$data[$key]['times_negative_review'] = '<a href="/review?email='.$email.'" target="_blank">'.$val['times_negative_review'].'</a>';
 			}
+			//显示facebook_group内容
+			$data[$key]['facebook_group'] = isset($fbgroupConfig[$val['facebook_group']]) ? $fbgroupConfig[ $val['facebook_group']] : '';
 		}
 		return compact('data', 'recordsTotal', 'recordsFiltered');
 	}
@@ -153,7 +156,7 @@ class CrmController extends Controller
 		}
 
 		$sql = "select SQL_CALC_FOUND_ROWS t1.id as id,t1.date as date,c.name as name,c.email as email,c.phone as phone,c.country as country,c.`from` as `from`,c.brand as brand,
-t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as times_negative_review,t1.times_positive_review as times_positive_review,if(num>0,num,0) as order_num,b.name as processor,b.bg as bg,b.bu as bu 
+t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as times_negative_review,t1.times_positive_review as times_positive_review,if(num>0,num,0) as order_num,b.name as processor,b.bg as bg,b.bu as bu,c.facebook_name as facebook_name,c.facebook_group as facebook_group  
 			FROM client as t1 
 		  	left join(
 				select users.id as processor,min(name) as name,min(bg) as bg,min(bu) as bu 
@@ -163,7 +166,7 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 				order by users.id desc
 			) as b on b.processor = t1.processor 
 			join (
-					select count(*) as num,client_id,max(t1.name) as name,max(t1.email) as email,max(t1.phone) as phone,max(t1.country) as country,max(t1.`from`) as `from`,max(t1.brand) as brand 
+					select count(*) as num,client_id,max(t1.name) as name,max(t1.email) as email,max(t1.phone) as phone,max(t1.country) as country,max(t1.`from`) as `from`,max(t1.brand) as brand,any_value(facebook_name) as facebook_name,any_value(facebook_group) as facebook_group 
 					from client_info t1
 					left join client_order_info as t2 on t1.id = t2.ci_id 
 			  		{$whereInfo} 

@@ -157,6 +157,30 @@
 
 							</select>
 						</div>
+
+						<div class="form-group col-md-6">
+							<label>Customer's FB Name</label>
+							<input type="text" class="form-control" name="facebook_name" id="facebook_name" value="{{array_get($rule,'facebook_name')}}">
+
+						</div>
+
+						<div class="form-group col-md-6">
+							<label>FB Group</label>
+							<input id="facebook_group" class="form-control" name="facebook_group" list="list-facebook_group" placeholder="Facebook Group" value="{{$rule['facebook_group']}}"/>
+							<datalist id="list-facebook_group">
+								@foreach(getFacebookGroup() as $id=>$name)
+									<option value="{!! $id !!} | {!! $name !!}"></option>
+								@endforeach
+							</datalist>
+						</div>
+
+						<div class="form-group col-md-6">
+							<label>Auto Send</label>
+							<select class="form-control " name="auto_send_status" id="auto_send_status" disabled readonly>
+								<option value="0" @if($rule['auto_send_status']==0) selected @endif>Yes</option>
+								<option value="1" @if($rule['auto_send_status']==1) selected @endif>No</option>
+							</select>
+						</div>
 						
 						@if (array_get($rule,'trans'))
 						<table class="table table-hover col-md-12">

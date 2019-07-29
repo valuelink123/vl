@@ -173,6 +173,8 @@
                         <th >Order</th>
                         <th >BG</th>
                         <th >BU</th>
+                        <th>Facebook Name</th>
+                        <th>Group</th>
                         <th >Processor</th>
                         <th >Action</th>
                     </tr>
@@ -264,7 +266,7 @@
                 // blurable: true, // unselect on blur
                 selector: 'td:first-child', // 指定第一列可以点击选中
             },
-            "aoColumnDefs": [ { "bSortable": false, "aTargets": [17] }],
+            "aoColumnDefs": [ { "bSortable": false, "aTargets": [16,17,19] }],
             columns: [
                 {
                     width: "1px",
@@ -287,6 +289,8 @@
                 {data: 'order_num', name: 'order_num'},
                 {data: 'bg', name: 'bg'},
                 {data: 'bu', name: 'bu'},
+                {data:'facebook_name',name:'facebook_name'},
+                {data:'facebook_group',name:'facebook_group'},
                 {data: 'processor', name: 'processor'},
                 {data: 'action', name: 'action'},
             ],
@@ -317,7 +321,7 @@
 
             postByJson('/crm/batchAssignTask', {processor, ctgRows}).then(arr => {
                 // 向服务器请求数据然后刷新数据
-                dtApi.cell(0, 9).data(arr[1]).draw()
+                dtApi.cell(0, 18).data(arr[1]).draw()
 
                 toastr.success('Saved !')
                 $this.val('')

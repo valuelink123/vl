@@ -167,6 +167,8 @@ th,td,td>span {
                         <th>BG</th>
                         <th>BU</th>
                         <th>Channel</th>
+                        <th>Facebook Name</th>
+                        <th>Group</th>
                         <th>Processor</th>
                         <th>Action</th>
                     </tr>
@@ -332,6 +334,8 @@ th,td,td>span {
                 {data: 'bgs', name: 'bgs'},
                 {data: 'bus', name: 'bus'},
                 {data:'channel',name:'channel'},
+                {data:'facebook_name',name:'facebook_name'},
+                {data:'facebook_group',name:'facebook_group'},
                 {data: 'processor', name: 'processor', width: "120px"},
                 {
                     width: "20px",

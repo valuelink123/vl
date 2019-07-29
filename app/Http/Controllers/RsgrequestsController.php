@@ -102,7 +102,7 @@ class RsgrequestsController extends Controller
 
 		$datas= RsgRequest::leftJoin('rsg_products',function($q){
 				$q->on('rsg_requests.product_id', '=', 'rsg_products.id');
-			})->leftJoin(DB::raw("(select asin,site,max(sap_seller_id) as sap_seller_id,max(bg) as bg,max(bu) as bu from asin group by asin,site) as asin"),function($q){
+			})->join('client_info', 'rsg_requests.customer_email', '=', 'client_info.email')->leftJoin(DB::raw("(select asin,site,max(sap_seller_id) as sap_seller_id,max(bg) as bg,max(bu) as bu from asin group by asin,site) as asin"),function($q){
 				$q->on('rsg_products.asin', '=', 'asin.asin')
 				  ->on('rsg_products.site', '=', 'asin.site');
 			})
@@ -178,10 +178,11 @@ class RsgrequestsController extends Controller
         $iDisplayLength = $iDisplayLength < 0 ? $iTotalRecords : $iDisplayLength;
         $iDisplayStart = intval($_REQUEST['start']);
         $sEcho = intval($_REQUEST['draw']);
-		$lists =  $datas->orderBy($orderby,$sort)->offset($iDisplayStart)->limit($iDisplayLength)->get(['rsg_requests.*','rsg_products.asin','rsg_products.site','rsg_products.seller_id','rsg_products.user_id'])->toArray();
+		$lists =  $datas->orderBy($orderby,$sort)->offset($iDisplayStart)->limit($iDisplayLength)->get(['rsg_requests.*','rsg_products.asin','rsg_products.site','rsg_products.seller_id','rsg_products.user_id','client_info.facebook_name','client_info.facebook_group'])->toArray();
         $records = array();
         $records["data"] = array();
 
+		$fbgroupConfig = getFacebookGroup();
         $end = $iDisplayStart + $iDisplayLength;
         $end = $end > $iTotalRecords ? $iTotalRecords : $end;
 		$accounts = $this->getAccounts();
@@ -205,6 +206,9 @@ class RsgrequestsController extends Controller
 				array_get($users,$list['user_id']),
 				$list['site'],
 				$list['updated_at'],
+				//显示facebook_group内容
+				$list['facebook_name'],
+				isset($fbgroupConfig[$list['facebook_group']]) ? $fbgroupConfig[ $list['facebook_group']] : '',
 				array_get($users,$list['processor']),
 				'<a data-target="#ajax" data-toggle="modal" href="'.url('rsgrequests/'.$list['id'].'/edit').'" class="badge badge-success"> View </a> <a class="btn btn-danger btn-xs" href="'.url('rsgrequests/process?email='.$list['customer_email']).'" target="_blank">Process</a>'
 				
@@ -281,20 +285,46 @@ class RsgrequestsController extends Controller
 		$rule->next_follow_date = $request->get('next_follow_date');
 
         $rule->user_id = intval(Auth::user()->id);
+		$rule->auto_send_status = intval( $request->get('auto_send_status'));
+
+		$ruleData = $rule->where('customer_email',$rule->customer_email)->where('product_id',$rule->product_id)->take(1)->get()->toArray();
+		if($ruleData){
+			$request->session()->flash('error_message','Rsg Request Failed,One customer cannot test two identical products');
+			return redirect()->back()->withInput();
+		}
         if ($rule->save()) {
+			//查client_info表中是否有此客户的数据，如若有就更新facebook_name和facebook_group字段数据，如若没有就插入客户信息数据到client和client_info表
+			$updateClient = array();
+			if(isset($_REQUEST['facebook_group']) && $_REQUEST['facebook_group']){
+				$updateClient['facebook_group'] = (int)$_REQUEST['facebook_group'];
+			}
+			if(isset($_REQUEST['facebook_name']) && $_REQUEST['facebook_name']){
+				$updateClient['facebook_name'] = $_REQUEST['facebook_name'];
+			}
+			if($updateClient){
+				$data['email'] = $rule->customer_email;
+				$data['order_id'] = $rule->amazon_order_id;
+				$data['from'] = 'RSG';
+				$data['processor'] = intval(Auth::user()->id);
+				updateCrm($data,$updateClient);
+			}
+
 			$step_to_tags = getStepIdToTags();
 			$product= RsgProduct::where('id',$rule->product_id)->first()->toArray();
-			$mailchimpData = array(
-				'PROIMG'=>$product['product_img'],'PRONAME'=>$product['product_name'],'PROKEY'=>$product['keyword'],'PROPAGE'=>$product['page'],'PROPOS'=>$product['position'],'MARKET'=>str_replace('www.','',$product['site'])
-			);
-			if($rule->customer_paypal_email) $mailchimpData['PAYPAL'] = $rule->customer_paypal_email;
-			if($rule->transfer_amount) $mailchimpData['FUNDED'] = $rule->transfer_amount.' '.$rule->transfer_currency;
-			if($rule->amazon_order_id) $mailchimpData['ORDERID'] = $rule->amazon_order_id;
-			if($rule->review_url) $mailchimpData['REVIEWURL'] = $rule->review_url;
-			self::mailchimp($rule->customer_email,array_get($step_to_tags,$rule->step),[
-						'email_address' => $rule->customer_email,
-						'status'        => 'subscribed',
-						'merge_fields' => $mailchimpData]);
+			//auto_send_status为0的时候时候才触发自动发信，选NO为1的时候不触发发信
+			if($rule->auto_send_status==0){
+				$mailchimpData = array(
+					'PROIMG'=>$product['product_img'],'PRONAME'=>$product['product_name'],'PROKEY'=>$product['keyword'],'PROPAGE'=>$product['page'],'PROPOS'=>$product['position'],'MARKET'=>str_replace('www.','',$product['site'])
+				);
+				if($rule->customer_paypal_email) $mailchimpData['PAYPAL'] = $rule->customer_paypal_email;
+				if($rule->transfer_amount) $mailchimpData['FUNDED'] = $rule->transfer_amount.' '.$rule->transfer_currency;
+				if($rule->amazon_order_id) $mailchimpData['ORDERID'] = $rule->amazon_order_id;
+				if($rule->review_url) $mailchimpData['REVIEWURL'] = $rule->review_url;
+				self::mailchimp($rule->customer_email,array_get($step_to_tags,$rule->step),[
+					'email_address' => $rule->customer_email,
+					'status'        => 'subscribed',
+					'merge_fields' => $mailchimpData]);
+			}
             $request->session()->flash('success_message','Set Rsg Request Success');
             return redirect('rsgrequests');
         }else{
@@ -315,6 +345,16 @@ class RsgrequestsController extends Controller
 		$product= RsgProduct::where('id',$rule['product_id'])->first()->toArray();
 		if($product['status']==2){
 			$product['class'] = 'inactive';
+		}
+		//查询该邮箱是否存在于client_info中，查出需要显示的facebook_name和facebook_group
+		$rule['facebook_name'] = '';
+		$rule['facebook_group'] = '';
+		$clientInfo = DB::table('client_info')->where('email',$rule['customer_email'])->get(array('facebook_name','facebook_group'))->first();
+		if($clientInfo){
+			$fbgroupConfig = getFacebookGroup();
+			$rule['facebook_name'] = $clientInfo->facebook_name;
+			$rule['facebook_group'] = isset($fbgroupConfig[ $clientInfo->facebook_group]) ? $fbgroupConfig[ $clientInfo->facebook_group] : $clientInfo->facebook_group;
+
 		}
         return view('rsgrequests/edit',['rule'=>$rule,'product'=>$product,'products'=>self::getproducts()]);
     }
@@ -352,22 +392,41 @@ class RsgrequestsController extends Controller
 		$rule->follow = $request->get('follow');
 		$rule->next_follow_date = $request->get('next_follow_date');
 		$rule->channel = $request->get('channel');
+		// $rule->auto_send_status = intval( $request->get('auto_send_status'));
 
         $rule->user_id = intval(Auth::user()->id);
         if ($rule->save()) {
+			//查client_info表中是否有此客户的数据，如若有就更新facebook_name和facebook_group字段数据，如若没有就插入客户信息数据到client和client_info表
+			$updateClient = array();
+			if(isset($_REQUEST['facebook_group']) && $_REQUEST['facebook_group']){
+				$updateClient['facebook_group'] = (int)$_REQUEST['facebook_group'];
+			}
+			if(isset($_REQUEST['facebook_name']) && $_REQUEST['facebook_name']){
+				$updateClient['facebook_name'] = $_REQUEST['facebook_name'];
+			}
+			if($updateClient){
+				$data['email'] = $rule->customer_email;
+				$data['order_id'] = $rule->amazon_order_id;
+				$data['from'] = 'RSG';
+				$data['processor'] = intval(Auth::user()->id);
+				updateCrm($data,$updateClient);
+			}
+
 			$step_to_tags = getStepIdToTags();
 			$product= RsgProduct::where('id',$rule->product_id)->first()->toArray();
-			$mailchimpData = array(
-				'PROIMG'=>$product['product_img'],'PRONAME'=>$product['product_name'],'PROKEY'=>$product['keyword'],'PROPAGE'=>$product['page'],'PROPOS'=>$product['position']
-			);
-			if($rule->customer_paypal_email) $mailchimpData['PAYPAL'] = $rule->customer_paypal_email;
-			if($rule->transfer_amount) $mailchimpData['FUNDED'] = $rule->transfer_amount.' '.$rule->transfer_currency;
-			if($rule->amazon_order_id) $mailchimpData['ORDERID'] = $rule->amazon_order_id;
-			if($rule->review_url) $mailchimpData['REVIEWURL'] = $rule->review_url;
-			self::mailchimp($rule->customer_email,array_get($step_to_tags,$rule->step),[
-						'email_address' => $rule->customer_email,
-						'status'        => 'subscribed',
-						'merge_fields' => $mailchimpData]);
+			if($rule->auto_send_status==0) {
+				$mailchimpData = array(
+					'PROIMG' => $product['product_img'], 'PRONAME' => $product['product_name'], 'PROKEY' => $product['keyword'], 'PROPAGE' => $product['page'], 'PROPOS' => $product['position']
+				);
+				if ($rule->customer_paypal_email) $mailchimpData['PAYPAL'] = $rule->customer_paypal_email;
+				if ($rule->transfer_amount) $mailchimpData['FUNDED'] = $rule->transfer_amount . ' ' . $rule->transfer_currency;
+				if ($rule->amazon_order_id) $mailchimpData['ORDERID'] = $rule->amazon_order_id;
+				if ($rule->review_url) $mailchimpData['REVIEWURL'] = $rule->review_url;
+				self::mailchimp($rule->customer_email, array_get($step_to_tags, $rule->step), [
+					'email_address' => $rule->customer_email,
+					'status' => 'subscribed',
+					'merge_fields' => $mailchimpData]);
+			}
             $request->session()->flash('success_message','Set Rsg Request Success');
             return redirect('rsgrequests');
         }else{
