@@ -116,9 +116,9 @@ th,td,td>span {
                                 <td>
 									<select class="form-control form-filter input-sm" name="type">
                                         <option value="">Select...</option>
-                                        <option value="3">Refund & Replacement
-				<option value="2">Replacement
-				<option value="1">Refund
+                                        <option value="2">Replacement
+                                        <option value="1">Refund
+                                        <option value="4">Gift Card
                                     </select>
                                 </td>
 								

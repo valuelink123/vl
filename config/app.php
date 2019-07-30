@@ -65,7 +65,7 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    'timezone' => 'PRC',
 
     /*
     |--------------------------------------------------------------------------
@@ -228,7 +228,7 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
 		'Entrust' => Zizaco\Entrust\EntrustFacade::class,
-		'UEditor'=>Stevenyangecho\UEditor\UEditorServiceProvider::class
+		// 'UEditor'=>Stevenyangecho\UEditor\UEditorServiceProvider::class
     ],
 
 ];

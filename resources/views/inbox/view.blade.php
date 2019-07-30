@@ -717,7 +717,7 @@
                                     foreach($order->item as $item){ ?>
                                     <tr>
                                         <td>
-                                            <h4>{{$item->ASIN}} ( {{$item->SellerSKU}} )</h4>
+                                            <h4><a href="https://www.{{$order->SalesChannel}}/dp/{{$item->ASIN}}" target="_blank" rel="noreferrer">{{$item->ASIN}}</a> ( {{$item->SellerSKU}} )</h4>
                                             <p> {{$item->Title}} </p>
                                         </td>
                                         <td class="text-center sbold">{{$item->QuantityOrdered}}</td>

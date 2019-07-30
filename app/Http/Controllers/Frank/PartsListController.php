@@ -65,8 +65,12 @@ class PartsListController extends Controller {
         if (empty($subCodes)) return [];
 
         // kms_stock 为 fba_stockk + fbm_stock 的视图
-		$rows = DB::table('kms_stock')
-            ->select('item_code', 'asin', 'fba_stock', 'fba_transfer', 'fbm_stock', 'item_name', 'seller_name', 'seller_sku','account_status')
+
+		$rows = DB::table('kms_stock')->leftJoin('asin', function ($join) {
+			$join->on('asin.asin', '=', 'kms_stock.asin')
+				->ON('asin.sellersku', '=', 'kms_stock.seller_sku');
+				})
+            ->select('item_code', 'kms_stock.asin', 'fba_stock', 'fba_transfer', 'fbm_stock', 'item_name', 'seller_name', 'seller_sku','account_status','asin.site')
             ->whereIn('item_code', $subCodes)
             ->get();
 		$validStock = $this->getFbmAccsStock();
@@ -90,6 +94,7 @@ class PartsListController extends Controller {
 			if(isset($unsellableData[$val->seller_sku.'-'.$val->asin])){
 				$rows[$key]->unsellable = $unsellableData[$val->seller_sku.'-'.$val->asin];
 			}
+			$rows[$key]->asin = '<a href="https://'.$val->site.'/dp/'.$val->asin.'" target="_blank" rel="noreferrer">'.$val->asin.'</a>';
 		}
 		return $rows;
 
@@ -113,7 +118,7 @@ class PartsListController extends Controller {
      */
     public function get(Request $req) {
 		if(!Auth::user()->can(['partslist-show'])) die('Permission denied -- partslist-show');
-        $where = $this->dtWhere($req, ['item_code', 'item_name', 'asin', 'seller_id', 'seller_name', 'seller_sku'], ['item_group' => 't3.item_group', 'brand' => 't3.brand', 'item_model' => 't3.item_model']);
+        $where = $this->dtWhere($req, ['item_code', 'item_name', 't1.asin', 'seller_id', 'seller_name', 'seller_sku'], ['item_group' => 't3.item_group', 'brand' => 't3.brand', 'item_model' => 't3.item_model']);
 
         $orderby = $this->dtOrderBy($req);
         $limit = $this->dtLimit($req);
@@ -133,6 +138,7 @@ class PartsListController extends Controller {
         t1.fba_transfer,
         t1.fbm_stock,
         t1.item_name,
+        asin.site as site,
 	    t1.account_status
 
         FROM kms_stock t1
@@ -141,11 +147,13 @@ class PartsListController extends Controller {
             ANY_VALUE(item_group) AS item_group,
             ANY_VALUE(brand) AS brand,
             ANY_VALUE(item_model) AS item_model,
+            ANY_VALUE(site) as site,
             item_no AS item_code
             FROM asin
             GROUP BY item_no
         ) t3
-        USING(item_code)
+        USING(item_code) 
+        LEFT JOIN asin on t1.asin = asin.asin and t1.seller_sku = asin.sellersku 
         WHERE $where
         ORDER BY $orderby
         LIMIT $limit
@@ -176,6 +184,8 @@ class PartsListController extends Controller {
 			if(isset($unsellableData[$val['seller_sku'].'-'.$val['asin']])){
 				$rows[$key]['unsellable'] = $unsellableData[$val['seller_sku'].'-'.$val['asin']];
 			}
+			//在列表显示的asin加超链接，点击即可跳转到Amazon商品页面
+			$rows[$key]['asin'] = '<a href="https://'.$val['site'].'/dp/'.$val['asin'].'" target="_blank" rel="noreferrer">'.$val['asin'].'</a>';
 		}
 
         $total = $this->queryOne('SELECT FOUND_ROWS()');

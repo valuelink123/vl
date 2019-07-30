@@ -156,8 +156,10 @@ class ExceptionController extends Controller
 		$headArray[] = 'Operator';
 		$headArray[] = 'Group';
 		$headArray[] = 'Creator';
+		$headArray[] = 'Comment';
 		$headArray[] = 'Confirm Date';
-        $headArray[] =  'Process Date';
+		$headArray[] = 'Auto Done/Done Date';
+        $headArray[] = 'Process Date';
 
 		$arrayAmazon[] =['Status','Account','Returned/Urgent','MerchantFulfillmentOrderID','DisplayableOrderID','DisplayableOrderDate','MerchantSKU','Quantity','MerchantFulfillmentOrderItemID','GiftMessage','DisplayableComment','PerUnitDeclaredValue','DisplayableOrderComment','DeliverySLA','AddressName','AddressFieldOne','AddressFieldTwo','AddressFieldThree','AddressCity','AddressCountryCode','AddressStateOrRegion','AddressPostalCode','AddressPhoneNumber','NotificationEmail','FulfillmentAction','MarketplaceID'];
 
@@ -171,9 +173,7 @@ class ExceptionController extends Controller
         $status_list['submit'] = "Pending";
         $status_list['auto done'] = "Auto Done";
         $status_list['confirmed'] = "Confirmed";
-		$type_list['1'] = "Refund";
-        $type_list['2'] = "Replacement";
-        $type_list['3'] = "Refund & Replacement";
+		$type_list = array(1=>'Refund',2=>'Replacement',3=>'Refund & Replacement',4=>'Gift Card');
 		foreach ( $customersLists as $customersList){
 			$customersList['Replacement Order ID'] = $customersList['S-Amazon Order ID'] = '-';
 			$operate = '';
@@ -295,6 +295,7 @@ class ExceptionController extends Controller
 			}
             if($customersList['type']==4) $operate.= 'Gift Card : '.$customersList['gift_card_amount'].PHP_EOL;
 
+			$operDate = $this->getOperaDate($customersList['update_status_log']);////得到操作各个状态的时间
             $arrayData[] = array(
 				array_get($accounts,$customersList['sellerid']),
                 $customersList['amazon_order_id'],
@@ -322,7 +323,9 @@ class ExceptionController extends Controller
 				array_get($users,$customersList['process_user_id'])?array_get($users,$customersList['process_user_id']):array_get($groupleaders,$customersList['group_id']),
                 array_get($groups,$customersList['group_id'].'.group_name'),
 				array_get($users,$customersList['user_id']),
-				$this->getConfirmDate($customersList['update_status_log']),//得到修改为confirmed状态时间
+				$customersList['comment'],
+				$operDate['confirm'],//得到修改为confirmed状态时间
+				$operDate['done'],
                 $customersList['process_date'],
             );
 		}
@@ -782,9 +785,7 @@ class ExceptionController extends Controller
         $status_list['done'] = "<span class=\"label label-sm label-success\">Done</span>";
         $status_list['cancel'] = "<span class=\"label label-sm label-danger\">Cancelled</span>";
         $status_list['submit'] = "<span class=\"label label-sm label-warning\">Pending</span>";
-		$type_list['1'] = "Refund";
-        $type_list['2'] = "Replacement";
-        $type_list['3'] = "Refund & Replacement";
+		$type_list = array(1=>'Refund',2=>'Replacement',3=>'Refund & Replacement',4=>'Gift Card');
 
 		$mcf_result=array('0'=>'Waiting','1'=>'Success','-1'=>'Failed');
 		
@@ -836,6 +837,7 @@ class ExceptionController extends Controller
             //得到列表的状态值（在状态值下面显示score值）
             $statusScore = array_get($status_list,$customersList['process_status']).'<br/><br/>'.$customersList['score'];
 
+			$operDate = $this->getOperaDate($customersList['update_status_log']);////得到操作各个状态的时间
             $records["data"][] = array(
                 ((Auth::user()->admin || in_array($customersList['group_id'],array_get($this->getUserGroup(),'manage_groups',array()))) && $customersList['process_status']=='submit')?'<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input name="id[]" type="checkbox" class="checkboxes" value="'.$customersList['id'].'"/><span></span></label>':'',
 
@@ -849,7 +851,7 @@ class ExceptionController extends Controller
 				$operate,
 				array_get($users,$customersList['process_user_id'])?array_get($users,$customersList['process_user_id']):array_get($groupleaders,$customersList['group_id']),
                 array_get($groups,$customersList['group_id'].'.group_name').' > '.array_get($users,$customersList['user_id']),
-				$this->getConfirmDate($customersList['update_status_log']),//得到修改为confirmed状态时间
+				$operDate['confirm'],//得到修改为confirmed状态时间
                 ((Auth::user()->admin || in_array($customersList['group_id'],array_get($this->getUserGroup(),'manage_groups',array()))) && ($customersList['process_status']=='submit' || $customersList['process_status']=='confirmed')) ?'<a href="/exception/'.$customersList['id'].'/edit" class="btn btn-sm red btn-outline " target="_blank"><i class="fa fa-search"></i> Process </a>':'<a href="/exception/'.$customersList['id'].'/edit" class="btn blue btn-sm btn-outline green" target="_blank"><i class="fa fa-search"></i> View </a>',
             );
 		}
@@ -1205,19 +1207,24 @@ class ExceptionController extends Controller
 	}
 
 	/*
-	 *得到最近一次的Confirm状态的时间
+	 *得到最近一次的Confirm状态的时间,
 	 */
-	public function getConfirmDate($statusLog)
+	public function getOperaDate($statusLog)
 	{
-		$confirmDate = '';
+		$operaDate = array('confirm'=>'','done'=>'');
 		$statusLog = explode('<br>',$statusLog);
 		foreach($statusLog as $lg=>$lv){
 			if(strpos($lv,'confirmed at ') !== false){
 				$time = explode(',',substr($lv, -19));
-				$confirmDate = $time[1].','.$time[0];
+				$operaDate['confirm'] = $time[1].','.$time[0];
+			}
+			if(strpos($lv,'done') !== false || strpos($lv,'auto done') !== false){
+				$time = explode(',',substr($lv, -19));
+				$operaDate['done'] = $time[1].','.$time[0];
 			}
 		}
-		return $confirmDate;
+		return $operaDate;
 	}
+
 
 }
