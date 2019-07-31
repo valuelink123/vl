@@ -117,7 +117,7 @@ class GetEmails extends Command
 					$insert_data['subject'] = $message->getSubject();
 					$insert_data['text_html'] = $message->getBodyHtml();
 					$insert_data['text_plain'] = $message->getBodyText();
-					$insert_data['date'] = gmdate('Y-m-d H:i:s',strtotime($message->getDate()->format('c')));//$message->getDate()->format('Y-m-d H:i:s');
+					$insert_data['date'] = date('Y-m-d H:i:s',strtotime($message->getDate()->format('c')));//$message->getDate()->format('Y-m-d H:i:s');
 					$insert_data['type'] = $this->runAccount['type'];
 					$insert_data['get_date'] = date('Y-m-d H:i:s');
 					//$insert_data['message_id']=$message->getId();
