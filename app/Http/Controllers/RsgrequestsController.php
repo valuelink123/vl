@@ -102,7 +102,7 @@ class RsgrequestsController extends Controller
 
 		$datas= RsgRequest::leftJoin('rsg_products',function($q){
 				$q->on('rsg_requests.product_id', '=', 'rsg_products.id');
-			})->join('client_info', 'rsg_requests.customer_email', '=', 'client_info.email')->leftJoin(DB::raw("(select asin,site,max(sap_seller_id) as sap_seller_id,max(bg) as bg,max(bu) as bu from asin group by asin,site) as asin"),function($q){
+			})->leftjoin('client_info', 'rsg_requests.customer_email', '=', 'client_info.email')->leftJoin(DB::raw("(select asin,site,max(sap_seller_id) as sap_seller_id,max(bg) as bg,max(bu) as bu from asin group by asin,site) as asin"),function($q){
 				$q->on('rsg_products.asin', '=', 'asin.asin')
 				  ->on('rsg_products.site', '=', 'asin.site');
 			})
