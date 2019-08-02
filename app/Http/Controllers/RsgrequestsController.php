@@ -44,10 +44,10 @@ class RsgrequestsController extends Controller
 
 		if(!Auth::user()->can(['rsgrequests-show'])) die('Permission denied -- rsgrequests-show');
 		$email = isset($_REQUEST['email']) ? $_REQUEST['email'] : '';
-		$date_from=date('Y-m-d',strtotime('-90 days'));		
+		$date_from=date('Y-m-d',strtotime('-180 days'));		
 		$date_to=date('Y-m-d');
 
-		$submit_date_from=date('Y-m-d',strtotime('-90 days'));
+		$submit_date_from=date('Y-m-d',strtotime('-180 days'));
 		$submit_date_to=date('Y-m-d');
 
 		return view('rsgrequests/index',['date_from'=>$date_from ,'date_to'=>$date_to ,'submit_date_from'=>$submit_date_from ,'submit_date_to'=>$submit_date_to,'users'=>$this->getUsers(),'email'=>$email]);
