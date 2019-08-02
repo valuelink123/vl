@@ -432,7 +432,7 @@ class ExceptionController extends Controller
 				}
 			}
 		}
-
+		 //得到列表记录的所有亚马逊id
 		$mcf_orders = DB::connection('order')->table('amazon_mcf_shipment_package')->whereIn('SellerFulfillmentOrderId',$replacement_order_ids)->get();
 
 		if($last_inbox) $last_inboxid= $last_inbox->id;
@@ -545,13 +545,13 @@ class ExceptionController extends Controller
 			}
 		}
 		//当状态为cancel或者submit的时候，可以编辑左边页面数据
-		if($exception->process_status=='cancel' || $exception->process_status=='submit'){
+		if(($exception->process_status=='cancel' || $exception->process_status=='submit') && Auth::user()->id==$exception->user_id){
 			 if(!Auth::user()->can(['exception-update'])) die('Permission denied -- exception-update');
 			 $this->validate($request, [
 				'group_id' => 'required|string',
 				'name' => 'required|string',
 				'rebindordersellerid' => 'required|string',
-				'rebindorderid' => 'required|string',
+				// 'rebindorderid' => 'required|string',
 				'type' => 'required|string',
 				 'descrip' => 'required|string',
 			]);
@@ -560,7 +560,7 @@ class ExceptionController extends Controller
 			$exception->order_sku = $request->get('order_sku');
 			$exception->date = date('Y-m-d H:i:s');
 			$exception->sellerid = $request->get('rebindordersellerid');
-			$exception->amazon_order_id = $request->get('rebindorderid');
+			// $exception->amazon_order_id = $request->get('rebindorderid');
 			$exception->group_id = $request->get('group_id');
 			$exception->user_id = intval(Auth::user()->id);
 			$exception->request_content = $request->get('request_content');
@@ -579,20 +579,18 @@ class ExceptionController extends Controller
 			}
 
 			if( $exception->type == 2 || $exception->type == 3){
-
+				$replacements = unserialize($exception->replacement);
 				$products=[];
-				$products_arr = $request->get('group-products');
-
-				$id_add=0;
-				foreach($products_arr as $product_arr){
-					$id_add++;
-					if(array_get($product_arr,'seller_id')==$request->get('rebindordersellerid')){
-						$product_arr['replacement_order_id']=$request->get('rebindorderid').'-0'.$id_add;
-					}else{
-						$product_arr['replacement_order_id']=substr($request->get('rebindorderid'),4).'-0'.$id_add;
+				$products_arr = array_get($replacements,'products',array());
+				if(is_array($products_arr)){
+					$id_add=0;
+					foreach( $products_arr as $product_arr){
+						$product_arr['replacement_order_id']=$request->input('replacement_order_id.'.$id_add);
+						$products[]=$product_arr;
+						$id_add++;
 					}
-					$products[]=$product_arr;
 				}
+				$replacements['products']=$products;
 
 				//当countrycode为US和CA的时候，StateOrRegion填的值必须强制为两个大写字母
 				$specialCountry = array('US','CA');
@@ -789,26 +787,35 @@ class ExceptionController extends Controller
 
 		$mcf_result=array('0'=>'Waiting','1'=>'Success','-1'=>'Failed');
 		
-        /*mcf订单状态先不要
-        //得到列表记录的所有亚马逊id
-        $amazon_ids = $_mcfStatus = $mcfStatus = array();
+
+        //得到列表记录的所有亚马逊id(重发单号)
+		$orderid_sellerid = $_mcfStatus = $mcfStatus = array();
         foreach ( $customersLists as $customersList){
             $_replacement = unserialize($customersList['replacement']);
-            // $amazon_ids[] = $_replacement['products']['replacement_order_id'];
+			if(is_array($_replacement['products'])){
+				foreach( $_replacement['products'] as $product){
+					//重发单与sellerid组合为唯一性
+					if(isset($product['replacement_order_id']) && $product['replacement_order_id']){
+						$orderid_sellerid[] = $product['replacement_order_id'].'_'.$customersList['sellerid'];
+					}
+
+				}
+			}
+
 
         }
         //根据亚马逊id得到该订单的mcf物流状态
         //exception表的 的 replacement 字段中的 replacement_order_id 是对应的order库的amazon_mcf_orders表的SellerFulfillmentOrderId字段,amazon_mcf_orders表里的FulfillmentOrderStatus表示订单状态
-        if($amazon_ids){
-            $_mcfStatus = DB::connection('order')->table('amazon_mcf_orders')->wherein('SellerFulfillmentOrderId',$amazon_ids)->get(['SellerFulfillmentOrderId','FulfillmentOrderStatus']);
-
+        if($orderid_sellerid){
+        	$sql = "select concat(SellerFulfillmentOrderId,'_',SellerId) as orderid_sellerid,FulfillmentOrderStatus from amazon_mcf_orders where concat(SellerFulfillmentOrderId,'_',SellerId) in('".join("','",$orderid_sellerid)."')";
+            // $_mcfStatus = DB::connection('order')->table('amazon_mcf_orders')->wherein('SellerFulfillmentOrderId',$amazon_ids)->get(['SellerFulfillmentOrderId','FulfillmentOrderStatus']);
+			$_mcfStatus = DB::connection('order')->select($sql);
             if($_mcfStatus){
                 foreach($_mcfStatus as $key=>$val){
-                    $mcfStatus[$val->SellerFulfillmentOrderId] = $val->FulfillmentOrderStatus;
+                    $mcfStatus[$val->orderid_sellerid] = $val->FulfillmentOrderStatus;
                 }
             }
         }
-        */
 
 		foreach ( $customersLists as $customersList){
 			$operate = '';
@@ -827,6 +834,11 @@ class ExceptionController extends Controller
 						}
 
 						$operate.= '<span class="label label-sm label-primary">'.array_get($accounts,$seller_id,$seller_id).'</span></BR>'.(((array_get($accounts,$seller_id)?array_get($product,'seller_sku'):array_get($product,'item_code'))??array_get($product,'sku')??null)??array_get($product,'title')).'*'.array_get($product,'qty').'</BR>';
+
+						$mcf = isset($product['replacement_order_id']) && isset($mcfStatus[$product['replacement_order_id'].'_'.$customersList['sellerid']]) ? $mcfStatus[$product['replacement_order_id'].'_'.$customersList['sellerid']] : '';
+						if($mcf){
+							$operate .= 'Mcf Status:'.$mcf.'<br/>';
+						}
 					}
 					if($customersList['auto_create_mcf']){
 						$operate.= 'Auto Mcf : '.array_get($mcf_result,$customersList['auto_create_mcf_result']).'</BR>'.$customersList['last_auto_create_mcf_log'];

@@ -103,7 +103,7 @@
 <form  action="{{ url('exception/'.$exception['id']) }}" id="exception_form" method="POST" enctype="multipart/form-data">
 <?php 
 $mcf_order_str='';
-if(($exception['user_id'] == Auth::user()->id || Auth::user()->can(['exception-check']) || in_array($exception['group_id'],array_get($mygroups,'manage_groups',array()))) && ($exception['process_status'] =='cancel' || $exception['process_status'] =='submit')){
+if($exception['user_id'] == Auth::user()->id && ($exception['process_status'] =='cancel' || $exception['process_status'] =='submit')){
 	$disable='';
 }else{
 	$disable='disabled';
@@ -174,7 +174,7 @@ if(($exception['user_id'] == Auth::user()->id || Auth::user()->can(['exception-c
                                                  
 													
 															
-                                                                <input id="rebindorderid" class="form-control" type="text" name="rebindorderid" placeholder="Amazon Order ID" value="{{$exception['amazon_order_id']}}" required {{$disable}} > 
+                                                                <input id="rebindorderid" class="form-control" type="text" name="rebindorderid" placeholder="Amazon Order ID" value="{{$exception['amazon_order_id']}}" required disabled >
                                                             <span class="input-group-btn">
                                                                 <button id="rebindorder" class="btn btn-success" type="button"  {{$disable}}>
                                                                     Get Order Info</button>
@@ -412,7 +412,7 @@ if(($exception['user_id'] == Auth::user()->id || Auth::user()->can(['exception-c
 
 
                        <div class="form-group mt-repeater">
-							<div data-repeater-list="group-products">
+							<div data-repeater-list="group-products" id="replacement-product-list">
 								<?php 
 								$products_details = array_get($replace,'products',array());
 								$replacement_order_ids=[];
@@ -426,35 +426,42 @@ if(($exception['user_id'] == Auth::user()->id || Auth::user()->can(['exception-c
 									<div class="row mt-repeater-row">
 										<div class="col-md-3">
 											<label class="control-label">Item No.</label>
-											 <input type="text" {{$disable}} class="form-control"  name="sku"  value="{{array_get($detail,'item_code')}}">
+											 <input type="text" class="form-control"  name="sku"  value="{{array_get($detail,'item_code')}}" disabled>
 								
 										</div>
 										<div class="col-md-5">
 											<label class="control-label">{{array_get($detail,'title')}}</label>
-											 <input type="text" {{$disable}} class="form-control"  name="title" value="{{array_get($detail,'note')??array_get($detail,'seller_sku')??array_get($detail,'sku')}}" >
+											 <input type="text" class="form-control"  name="title" value="{{array_get($detail,'note')??array_get($detail,'seller_sku')??array_get($detail,'sku')}}" disabled>
 								
 										</div>
 										<div class="col-md-2">
 											<label class="control-label">Quantity</label>
-											 <input type="text" {{$disable}} class="form-control"  name="qty" value="{{array_get($detail,'qty')}}">
+											 <input type="text" class="form-control quantity-input"  name="qty" value="{{array_get($detail,'qty')}}" disabled>
 								
 										</div>
 										<div class="col-md-2">
-											<label class="control-label"><input type="checkbox" name="addattr" {{$disable}} value="Returned" <?php if(in_array('Returned',$addattr)) echo "checked";?> >Returned</label>
-											<label class="control-label"><input type="checkbox" name="addattr" {{$disable}} value="Urgent" <?php if(in_array('Urgent',$addattr)) echo "checked";?>>Urgent</label>
+											<label class="control-label"><input type="checkbox" name="addattr" disabled value="Returned" <?php if(in_array('Returned',$addattr)) echo "checked";?> >Returned</label>
+											<label class="control-label"><input type="checkbox" name="addattr" disabled value="Urgent" <?php if(in_array('Urgent',$addattr)) echo "checked";?>>Urgent</label>
 										</div>
 										<div class="col-md-1">
-											<a href="javascript:;" data-repeater-delete class="btn btn-danger mt-repeater-delete"  {{$disable}}>
-												<i class="fa fa-close"></i>
-											</a>
+											{{--<a href="javascript:;" data-repeater-delete class="btn btn-danger mt-repeater-delete"  {{$disable}}>--}}
+												{{--<i class="fa fa-close"></i>--}}
+											{{--</a>--}}
 										</div>
 									</div>
 								</div>
 								<?php }} ?>
 							</div>
-							<a href="javascript:;" data-repeater-create class="btn btn-info mt-repeater-add"  {{$disable}}>
-								<i class="fa fa-plus"></i> Add Product</a>
+							{{--<a href="javascript:;" data-repeater-create class="btn btn-info mt-repeater-add"  {{$disable}}>--}}
+								{{--<i class="fa fa-plus"></i> Add Product</a>--}}
 						</div>
+						<script id="tplStockDatalist" type="text/template">
+							<datalist id="list-${item_code}-stocks">
+								<% for(let {seller_name,seller_id,seller_sku,stock} of stocks){ %>
+								<option value="${seller_name} | ${seller_sku}" label="Stock: ${stock}">
+									<% } %>
+							</datalist>
+						</script>
                         <div style="clear:both;"></div>
                     </div>
                         
@@ -599,9 +606,6 @@ if((Auth::user()->can(['exception-check']) || in_array($exception['group_id'],ar
 						<div class="input-group "><input type="text" class="form-control form-filter" name="replacement_order_id[]"  value="{{$replacement_order_id}}"  {{$disable}}></div>
 					@endforeach
 					<BR />
-					@foreach ($mcf_orders as $mcf_order)
-						{{$mcf_order->SellerFulfillmentOrderId}} : {{$mcf_order->TrackingNumber}} {{$mcf_order->CarrierCode}}
-					@endforeach
 				</div>
 				
 				
@@ -627,7 +631,7 @@ if((Auth::user()->can(['exception-check']) || in_array($exception['group_id'],ar
 					@endforeach
 				</div>
 				<?php } ?>
-				
+
 			</div>
 		</div>
 
@@ -663,6 +667,12 @@ if((Auth::user()->can(['exception-check']) || in_array($exception['group_id'],ar
 		
 		</div>
 	</div><div style="clear:both;"></div>
+
+	<div style="margin-top:20px;margin-left:35px;margin-right: 30px;">
+		@foreach ($mcf_orders as $mcf_order)
+			{{$mcf_order->SellerFulfillmentOrderId}} :<br/> {{$mcf_order->PackageNumber}}, {{$mcf_order->CarrierCode}}, {{$mcf_order->TrackingNumber}}, {{$mcf_order->EstimatedArrivalDateTime}}<BR /><br/>
+		@endforeach
+	</div>
 
 		{{--@if($exception['process_status']!='done' and $exception['process_status']!='auto done' and $exception['update_status_log'])--}}
 		@if($exception['update_status_log'])
@@ -723,29 +733,39 @@ if((Auth::user()->can(['exception-check']) || in_array($exception['group_id'],ar
             }
 
             //当quantity的数量大于1的时候，弹出提示框， You will send out MORE THAN ONE replacement. Please confirm before you submit!
-            var obj = $('.quantity-input');
-            var sub = 0;
-            $.each(obj,function(i,item){
-                var value = $(this).val();
-                if(value>1){
-                    var flag = confirm('You will send out MORE THAN ONE replacement. Please confirm before you submit!');
-                    if(flag!=true && sub==0){
-                        sub = 1;
-                    }
-                }
-            })
-
-            if(sub==1){
-                return false;
-            }
+            // var obj = $('.quantity-input');
+            // var sub = 0;
+            // $.each(obj,function(i,item){
+            //     var value = $(this).val();
+            //     if(value>1){
+            //         var flag = confirm('You will send out MORE THAN ONE replacement. Please confirm before you submit!');
+            //         if(flag!=true && sub==0){
+            //             sub = 1;
+            //         }
+            //     }
+            // })
+			//
+            // if(sub==1){
+            //     return false;
+            // }
             //当countrycode为US和CA的时候，StateOrRegion填的值必须强制为两个大写字母,且当countrycode为US的时候，StateOrRegion为固定下拉选项
             var countryCode = $('#countrycode').val();
 
-            if($('#type').val()==2 && (countryCode=='US' || countryCode=='CA')){
-                var state = $('#state').val();
-                if (!(state.length==2 && /^[A-Z]+$/.test(state))){
-                    alert('StateOrRegion has to be an abbreviation');
-                    return false;
+            if($('#type').val()==2){
+                if(countryCode=='US' || countryCode=='CA'){
+                    var state = $('#state').val();
+                    if (!(state.length==2 && /^[A-Z]+$/.test(state))){
+                        alert('StateOrRegion has to be an abbreviation');
+                        return false;
+                    }
+                }
+                //提交请求为Replacement类型时，Name，AddressLine1，City，StateOrRegion，PostalCode和CountryCode，Item No. 和Search by Item No and select，以及Quantity均为必填项
+                var a = {'shipname':'Name','address1':'AddressLine1','city':'City','state':'StateOrRegion','postalcode':'PostalCode','countrycode':'CountryCode'};
+                for(var e in a){
+                    if(!$('#'+e+'').val()){
+                        alert(a[e]+' are required');
+                        return false;
+                    }
                 }
             }
 

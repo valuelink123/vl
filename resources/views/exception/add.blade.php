@@ -413,7 +413,7 @@
                                         </div>
                                         <div class="col-lg-2 col-md-2">
                                             <label class="control-label">Quantity</label>
-                                            <input type="text" class="form-control"  name="qty" value="1" placeholder="Quantity" required />
+                                            <input type="text" class="form-control quantity-input"  name="qty" value="1" placeholder="Quantity" required />
                                         </div>
                                         <div class="col-lg-1 col-md-2">
                                             <label class="control-label"><input type="checkbox" name="addattr" value="Returned">Returned</label>
@@ -679,13 +679,24 @@
             //当countrycode为US和CA的时候，StateOrRegion填的值必须强制为两个大写字母,且当countrycode为US的时候，StateOrRegion为固定下拉选项
 			var countryCode = $('#countrycode').val();
 
-            if($('#type').val()==2 && (countryCode=='US' || countryCode=='CA')){
-                var state = $('#state').val();
-                if (!(state.length==2 && /^[A-Z]+$/.test(state))){
-                    alert('StateOrRegion has to be an abbreviation');
-                    return false;
-				}
+            if($('#type').val()==2){
+                if(countryCode=='US' || countryCode=='CA'){
+                    var state = $('#state').val();
+                    if (!(state.length==2 && /^[A-Z]+$/.test(state))){
+                        alert('StateOrRegion has to be an abbreviation');
+                        return false;
+                    }
+                }
+                //提交请求为Replacement类型时，Name，AddressLine1，City，StateOrRegion，PostalCode和CountryCode，Item No. 和Search by Item No and select，以及Quantity均为必填项
+                var a = {'shipname':'Name','address1':'AddressLine1','city':'City','state':'StateOrRegion','postalcode':'PostalCode','countrycode':'CountryCode'};
+                for(var e in a){
+                    if(!$('#'+e+'').val()){
+                        alert(a[e]+' are required');
+                        return false;
+                    }
+                }
 			}
+
 
 
 			var havewarnwords='';
