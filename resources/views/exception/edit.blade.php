@@ -760,13 +760,13 @@ if((Auth::user()->can(['exception-check']) || in_array($exception['group_id'],ar
                     }
                 }
                 //提交请求为Replacement类型时，Name，AddressLine1，City，StateOrRegion，PostalCode和CountryCode，Item No. 和Search by Item No and select，以及Quantity均为必填项
-                var a = {'shipname':'Name','address1':'AddressLine1','city':'City','state':'StateOrRegion','postalcode':'PostalCode','countrycode':'CountryCode'};
-                for(var e in a){
-                    if(!$('#'+e+'').val()){
-                        alert(a[e]+' are required');
-                        return false;
-                    }
-                }
+                // var a = {'shipname':'Name','address1':'AddressLine1','city':'City','state':'StateOrRegion','postalcode':'PostalCode','countrycode':'CountryCode'};
+                // for(var e in a){
+                //     if(!$('#'+e+'').val()){
+                //         alert(a[e]+' are required');
+                //         return false;
+                //     }
+                // }
             }
 
         })
