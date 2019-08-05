@@ -401,7 +401,19 @@ if($exception['user_id'] == Auth::user()->id && ($exception['process_status'] ==
 								<input type="text" {{$disable}} class="form-control" name="phone" id="phone" value="{{array_get($replace,'phone')}}" >
 							</div>
 						</div>
-						
+						<div class="form-group">
+							<label>Shipping Speed</label>
+							<div class="input-group ">
+							<span class="input-group-addon">
+								<i class="fa fa-bookmark"></i>
+							</span>
+								<select  class="form-control" name="shippingspeed" id="shippingspeed"{{$disable}} >
+								<option value="Standard" <?php if("Standard" ==array_get($replace,'shippingspeed')) echo 'selected' ?>>Standard</option>
+								<option value="Expedited" <?php if("Expedited" ==array_get($replace,'shippingspeed')) echo 'selected' ?>>Expedited</option>
+								<option value="Priority" <?php if("Priority" ==array_get($replace,'shippingspeed')) echo 'selected' ?>>Priority</option>
+								</select>
+							</div>
+						</div>
 						
 						
 						

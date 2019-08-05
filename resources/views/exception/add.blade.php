@@ -390,6 +390,19 @@
 								<input type="text" class="form-control" name="phone" id="phone" value="{{old('phone')}}" >
 							</div>
 						</div>
+						<div class="form-group">
+							<label>Shipping Speed</label>
+							<div class="input-group ">
+							<span class="input-group-addon">
+								<i class="fa fa-bookmark"></i>
+							</span>
+								<select  class="form-control" name="shippingspeed" id="shippingspeed" >
+								<option value="Standard">Standard</option>
+								<option value="Expedited">Expedited</option>
+								<option value="Priority">Priority</option>
+								</select>
+							</div>
+						</div>
                         <div style="clear:both;"></div>
 
                     </div>

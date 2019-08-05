@@ -615,6 +615,7 @@ class ExceptionController extends Controller
 					'postalcode'=>$request->get('postalcode'),
 					'countrycode'=>$request->get('countrycode'),
 					'phone'=>$request->get('phone'),
+					'shippingspeed'=>$request->get('shippingspeed'),
 					'products'=>$products,
 				));
 			}else{
@@ -840,9 +841,17 @@ class ExceptionController extends Controller
 							$operate .= 'Mcf Status:'.$mcf.'<br/>';
 						}
 					}
+					if(!$customersList['auto_create_mcf'] && ($customersList['type']==2 || $customersList['type']==3) && $customersList['process_status']=='auto done'){
+						$operate.= '<span class="label label-sm label-danger">Not Set Auto Mcf</span><BR>';
+					}
 					if($customersList['auto_create_mcf']){
 						$operate.= 'Auto Mcf : '.array_get($mcf_result,$customersList['auto_create_mcf_result']).'</BR>'.$customersList['last_auto_create_mcf_log'];
 					}
+					
+					if(($customersList['type']==2 || $customersList['type']==3) && ($customersList['process_status']=='done' || $customersList['process_status']=='auto done')){
+						$operate.= 'Auto Sap : '.array_get($mcf_result,$customersList['auto_create_sap_result']).'</BR>'.$customersList['last_auto_create_sap_log'];
+					}
+					
 				}
 			}
             if($customersList['type']==4) $operate.= 'Gift Card : '.$customersList['gift_card_amount'].PHP_EOL;
@@ -991,6 +1000,7 @@ class ExceptionController extends Controller
 				'postalcode'=>$request->get('postalcode'),
 				'countrycode'=>$request->get('countrycode'),
 				'phone'=>$request->get('phone'),
+				'shippingspeed'=>$request->get('shippingspeed'),
 				'products'=>$products,
 			));
 		}else{
