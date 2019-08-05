@@ -845,11 +845,11 @@ class ExceptionController extends Controller
 						$operate.= '<span class="label label-sm label-danger">Not Set Auto Mcf</span><BR>';
 					}
 					if($customersList['auto_create_mcf']){
-						$operate.= 'Auto Mcf : '.array_get($mcf_result,$customersList['auto_create_mcf_result']).'</BR>'.$customersList['last_auto_create_mcf_log'];
+						$operate.= 'Auto Mcf : '.array_get($mcf_result,$customersList['auto_create_mcf_result']).'</BR>'.$customersList['last_auto_create_mcf_log'].'</BR>';
 					}
 					
 					if(($customersList['type']==2 || $customersList['type']==3) && ($customersList['process_status']=='done' || $customersList['process_status']=='auto done')){
-						$operate.= 'Auto Sap : '.array_get($mcf_result,$customersList['auto_create_sap_result']).'</BR>'.$customersList['last_auto_create_sap_log'];
+						$operate.= 'Auto Sap : '.array_get($mcf_result,$customersList['auto_create_sap_result']).'</BR>'.$customersList['last_auto_create_sap_log'].'</BR>';
 					}
 					
 				}
