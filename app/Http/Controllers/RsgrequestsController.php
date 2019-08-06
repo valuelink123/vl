@@ -58,9 +58,9 @@ class RsgrequestsController extends Controller
     {
 		if(!Auth::user()->can(['rsgrequests-show'])) die('Permission denied -- rsgrequests-show');
 		//$orderby = 'updated_at';
-		$order_column = $request->input('order.0.column','14');
+		$order_column = $request->input('order.0.column','12');
 
-		if($order_column == 15){
+		if($order_column == 13){
 			$orderby = 'updated_at';
 		}else if($order_column == 7){
 			$orderby = 'transfer_amount';
@@ -157,13 +157,13 @@ class RsgrequestsController extends Controller
 			$datas = $datas->where('star_rating', $request->input('star_rating'));
 		}
 
-		if($request->input('follow')){
-			$datas = $datas->where('follow','like', '%'.$request->input('follow').'%');
-		}
-
-		if($request->input('next_follow_date')){
-			$datas = $datas->where('next_follow_date','like', '%'.$request->input('next_follow_date').'%');
-		}
+		// if($request->input('follow')){
+		// 	$datas = $datas->where('follow','like', '%'.$request->input('follow').'%');
+		// }
+		//
+		// if($request->input('next_follow_date')){
+		// 	$datas = $datas->where('next_follow_date','like', '%'.$request->input('next_follow_date').'%');
+		// }
 
 		if($request->input('user_id')){
 			$datas = $datas->where('rsg_products.user_id', $request->input('user_id'));
@@ -201,8 +201,8 @@ class RsgrequestsController extends Controller
 				$list['amazon_order_id'],
 				'<div style="width: 200px;word-wrap: break-word;text-align: center;">'.$list['review_url'].'<BR><span class="text-danger">'.$list['transaction_id'].'</span></div>',
 				$list['star_rating'],
-				'<div style="width: 200px;word-wrap: break-word;text-align: center;">'.$list['follow'].'</div>',
-				$list['next_follow_date'],
+				// '<div style="width: 200px;word-wrap: break-word;text-align: center;">'.$list['follow'].'</div>',
+				// $list['next_follow_date'],
 				array_get($users,$list['user_id']),
 				$list['site'],
 				$list['updated_at'],
@@ -281,8 +281,8 @@ class RsgrequestsController extends Controller
 		$rule->processor = intval(Auth::user()->id);
 		if(intval($request->get('product_id'))) $rule->product_id = intval($request->get('product_id'));
 		$rule->star_rating = $request->get('star_rating');
-		$rule->follow = $request->get('follow');
-		$rule->next_follow_date = $request->get('next_follow_date');
+		// $rule->follow = $request->get('follow');
+		// $rule->next_follow_date = $request->get('next_follow_date');
 
         $rule->user_id = intval(Auth::user()->id);
 		$rule->auto_send_status = intval( $request->get('auto_send_status'));
@@ -389,8 +389,8 @@ class RsgrequestsController extends Controller
         $rule->step = intval($request->get('step'));
 		if(intval($request->get('product_id'))) $rule->product_id = intval($request->get('product_id'));
 		$rule->star_rating = $request->get('star_rating');
-		$rule->follow = $request->get('follow');
-		$rule->next_follow_date = $request->get('next_follow_date');
+		// $rule->follow = $request->get('follow');
+		// $rule->next_follow_date = $request->get('next_follow_date');
 		$rule->channel = $request->get('channel');
 		// $rule->auto_send_status = intval( $request->get('auto_send_status'));
 
@@ -498,8 +498,8 @@ class RsgrequestsController extends Controller
 		$headArray[] = 'Review Url';
 		$headArray[] = 'Remark';
 		$headArray[] = 'Star rating';
-		$headArray[] = 'Follow';
-		$headArray[] = 'Next follow date';
+		// $headArray[] = 'Follow';
+		// $headArray[] = 'Next follow date';
 		$headArray[] = 'Sales';
 		$headArray[] = 'Site';
 		$headArray[] = 'Update Date';
@@ -532,8 +532,8 @@ class RsgrequestsController extends Controller
 				$val['review_url'],
 				$val['transaction_id'],
 				$val['star_rating'],
-				$val['follow'],
-				$val['next_follow_date'],
+				// $val['follow'],
+				// $val['next_follow_date'],
 				array_get($users,$val['user_id']),
 				$val['site'],
 				$val['updated_at'],
@@ -551,6 +551,7 @@ class RsgrequestsController extends Controller
 					'A1'         // Top left coordinate of the worksheet range where
 				//    we want to set these values (default is A1)
 				);
+
 			header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');//告诉浏览器输出07Excel文件
 			header('Content-Disposition: attachment;filename="Export_RSG_Requests.xlsx"');//告诉浏览器输出浏览器名称
 			header('Cache-Control: max-age=0');//禁止缓存

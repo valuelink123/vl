@@ -71,6 +71,7 @@ or tbl_review_hunter_review.created_at>=:date_from1)",['date_from' => $date_from
 			$insert_data['vp'] = $review->vp;
 			$insert_data['title'] = $review->title;
 			$insert_data['is_delete'] = $review->is_delete;
+			$insert_data['last_updated_date'] = date('Y-m-d H:i:s');
 			foreach($words as $word){
 				if(stripos($review->content,$word) !== false) $insert_data['warn'] = 1;
 			}

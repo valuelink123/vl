@@ -137,6 +137,14 @@ th,td,td>span {
                         </a>
                     </div>
                     @endpermission
+
+                    @permission('compose')
+                    <div class="btn-group" style="margin-top:10px;margin-left:15px;">
+                        <button id="batch-send" class="btn sbold blue"> Batch Send
+                        </button>
+                    </div>
+                    @endpermission
+
                 </div>
             </div>
             <div style="clear:both;height:50px; text-align: right;">
@@ -399,6 +407,20 @@ th,td,td>span {
             var channel = $('#channel').val();
             location.href='/ctg/export?channel='+channel;
         });
+
+        //批量发邮件
+        $('#batch-send').click(function(){
+            let selectedRows = dtApi.rows({selected: true})
+
+            let ctgRows = selectedRows.data().toArray().map(obj => [obj.email])
+
+            if (!ctgRows.length) {
+                toastr.error('Please select some rows first !')
+                return
+            }
+            var email = ctgRows.join(';');
+            location.href='/send/create?to_address='+email;
+        })
 
     </script>
 

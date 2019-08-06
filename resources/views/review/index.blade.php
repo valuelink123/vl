@@ -266,6 +266,7 @@ th,td,td>span {
 								<th style="max-width:40px;">SKU</th>
 								<th style="max-width:80px;">Follow</th>
                                 <th style="max-width:50px;">User</th>
+                                <th style="max-width:50px;">Last Update</th>
                                 <th style="max-width:90px;">Action</th>
                             </tr>
 							
@@ -330,7 +331,7 @@ th,td,td>span {
                     "pageLength": 10, // default record count per page
 
 
-					"aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0,13,14,16] }],	
+					"aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0,13,14,16,17] }],
 					 "order": [
                         [1, "desc"]
                     ],
@@ -425,8 +426,8 @@ $(function() {
     TableDatatablesAjax.init();
 	$('#data_search').on('click',function(){
 		var dttable = $('#datatable_ajax_asin').dataTable();
-		dttable.fnDestroy(); //还原初始化了的datatable
-	    dttable.fnClearTable(); //清空一下table
+		dttable.fnDestroy(); //杩樺師鍒濆鍖栦簡鐨刣atatable
+	    dttable.fnClearTable(); //娓呯┖涓�涓媡able
 		dttable.fnDestroy();
 		TableDatatablesAjax.init();
 	});

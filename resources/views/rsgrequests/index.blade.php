@@ -95,8 +95,8 @@ th,td,td>span {
 									<th width="6%"> Amazon OrderID </th>
 									<th width="6%"> Review Url</th>
 									<th width="6%"> Star rating</th>
-									<th width="6%"> Follow</th>
-									<th width="6%"> Next follow date</th>
+									{{--<th width="6%"> Follow</th>--}}
+									{{--<th width="6%"> Next follow date</th>--}}
 									<th width="4%"> Sales</th>
 									<th width="6%"> Site</th>
 									<th width="10%"> Update Date </th>
@@ -187,12 +187,12 @@ th,td,td>span {
 											<option value="5">5</option>
 										</select>
 									</td>
-									<td>
-										<input type="text" class="form-control form-filter input-sm" placeholder='Follow' name="follow">
-									</td>
-									<td>
-										<input type="text" class="form-control form-filter input-sm" placeholder='Next follow date' name="next_follow_date">
-									</td>
+									{{--<td>--}}
+										{{--<input type="text" class="form-control form-filter input-sm" placeholder='Follow' name="follow">--}}
+									{{--</td>--}}
+									{{--<td>--}}
+										{{--<input type="text" class="form-control form-filter input-sm" placeholder='Next follow date' name="next_follow_date">--}}
+									{{--</td>--}}
 									<td>
 										<select name="user_id" class="form-control form-filter input-sm">
 											<option value="">Users</option>
@@ -296,7 +296,7 @@ th,td,td>span {
 											"dom": "<'row'<'col-md-6 col-sm-12'pli><'col-md-6 col-sm-12'<'table-group-actions pull-right'>>r>t<'row'<'col-md-6 col-sm-12'pli><'col-md-6 col-sm-12'>>",
 						
 											"bStateSave": true, // save datatable state(pagination, sort, etc) in cookie.
-											"aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0 ,2,3,4,5,6,8,9,10,11,12,13,14,16,17,18,19 ] }],
+											"aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0 ,2,3,4,5,6,8,9,10,11,12,14,15,16,17 ] }],
 											"lengthMenu": [
 												[-1,10, 20, 50],
 												['All',10, 20, 50] // change per page values here

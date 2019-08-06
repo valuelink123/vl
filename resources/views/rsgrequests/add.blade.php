@@ -109,17 +109,17 @@
 
 						</div>
 
-						<div class="form-group col-md-6">
-							<label>Follow</label>
-							<input type="text" class="form-control" name="follow" id="follow" >
+						{{--<div class="form-group col-md-6">--}}
+							{{--<label>Follow</label>--}}
+							{{--<input type="text" class="form-control" name="follow" id="follow" >--}}
 
-						</div>
+						{{--</div>--}}
 
-						<div class="form-group col-md-6">
-							<label>Next follow date</label>
-							<input type="text" class="form-control" name="next_follow_date" id="next_follow_date">
+						{{--<div class="form-group col-md-6">--}}
+							{{--<label>Next follow date</label>--}}
+							{{--<input type="text" class="form-control" name="next_follow_date" id="next_follow_date">--}}
 
-						</div>
+						{{--</div>--}}
 
                         <div class="form-group col-md-6">
                             <label>Channel</label>

@@ -16,6 +16,9 @@ use PDO;
 use DB;
 use Illuminate\Http\Response;
 use App\Models\NonCtg;
+use App\Models\Ctg;
+use App\Models\B1g1;
+use App\Models\Cashback;
 class SendController extends Controller
 {
     /**
@@ -200,6 +203,25 @@ class SendController extends Controller
 					$name = $dataRow['name'];
 				}else{
 					$name = '';
+				}
+				//去ctg那边查看是否有此邮箱的数据(因为ctg那边有现成的用户名)，如果有此邮箱的数据，把{CUSTOMER_NAME}替换成用户姓名
+				if(empty($name)){
+					$dataRow = Ctg::selectRaw('name')->where('email',$sendbox->to_address)->limit(1)->first();
+					if($dataRow){
+						$name = $dataRow['name'];
+					}else{
+						$dataRow = B1g1::selectRaw('name')->where('email',$sendbox->to_address)->limit(1)->first();
+						if($dataRow){
+							$name = $dataRow['name'];
+						}else{
+							$dataRow = Cashback::selectRaw('name')->where('email',$sendbox->to_address)->limit(1)->first();
+							if($dataRow){
+								$name = $dataRow['name'];
+							}else{
+								$name = '';
+							}
+						}
+					}
 				}
 				$content = str_replace("{CUSTOMER_NAME}",$name,$content);
 

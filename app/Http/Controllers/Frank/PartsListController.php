@@ -70,7 +70,7 @@ class PartsListController extends Controller {
 			$join->on('asin.asin', '=', 'kms_stock.asin')
 				->ON('asin.sellersku', '=', 'kms_stock.seller_sku');
 				})
-            ->select('item_code', 'kms_stock.asin', 'fba_stock', 'fba_transfer', 'fbm_stock', 'item_name', 'seller_name', 'seller_sku','account_status','asin.site')
+            ->select('item_code', 'kms_stock.asin', 'fba_stock', 'fba_transfer', 'fbm_stock', 'item_name', 'seller_name', 'seller_sku','account_status','asin.site','fba_update','fbm_update')
             ->whereIn('item_code', $subCodes)
             ->get();
 		$validStock = $this->getFbmAccsStock();
@@ -139,7 +139,9 @@ class PartsListController extends Controller {
         t1.fbm_stock,
         t1.item_name,
         asin.site as site,
-	    t1.account_status
+	    t1.account_status,
+	    t1.fba_update,
+	    t1.fbm_update
 
         FROM kms_stock t1
         LEFT JOIN (

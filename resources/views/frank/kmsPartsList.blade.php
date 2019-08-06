@@ -89,6 +89,8 @@
                         <th>Fba Stock</th>
                         <th>Fba Transfer</th>
                         <th>Unsellable</th>
+                        <th>Fbm Update</th>
+                        <th>Fba Update</th>
                         <th></th>
                     </tr>
                     </thead>
@@ -112,6 +114,8 @@
                 <th>Fba Stock</th>
                 <th>Fba Transfer</th>
                 <th>Unsellable</th>
+                <th>Fbm Update</th>
+                <th>Fba Update</th>
             </tr>
             </thead>
             <tbody>
@@ -127,6 +131,8 @@
                 <td>${row.fba_stock}</td>
                 <td>${row.fba_transfer}</td>
                 <td>${row.unsellable}</td>
+                <td>${row.fbm_update}</td>
+                <td>${row.fba_update}</td>
             </tr>
             <% } %>
             </tbody>
@@ -169,6 +175,8 @@
                 {data: 'fba_stock', name: 'fba_stock'},
                 {data: 'fba_transfer', name: 'fba_transfer'},
                 {data: 'unsellable', name: 'unsellable'},
+                {data: 'fbm_update', name: 'fbm_update'},
+                {data: 'fba_update', name: 'fba_update'},
                 {
                     width: "2px",
                     "className": 'details-control disabled',

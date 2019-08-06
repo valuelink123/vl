@@ -583,7 +583,8 @@ class ReviewController extends Controller
 				$ordersList[$i]['nextdate'],
 				$ordersList[$i]['item_no'],
 				strip_tags(array_get($fol_arr,$ordersList[$i]['status'].'.do_content')),
-				array_get($users_array,intval(array_get($ordersList[$i],'user_id')),''),				
+				array_get($users_array,intval(array_get($ordersList[$i],'user_id')),''),
+				$ordersList[$i]['last_updated_date'],
 				(($ordersList[$i]['warn']>0)?'<i class="fa fa-warning" title="Contains dangerous words"></i>&nbsp;&nbsp;&nbsp;':'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;').'<a href="https://'.$ordersList[$i]['site'].'/gp/customer-reviews/'.$ordersList[$i]['review'].'" target="_blank" class="btn btn-success btn-xs"> View </a>'.'<a href="/review/'.$ordersList[$i]['id'].'/edit" target="_blank" class="btn btn-danger btn-xs"><i class="fa fa-search"></i> Resolve </a>'
 			);
         }
