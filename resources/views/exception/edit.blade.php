@@ -744,41 +744,45 @@ if((Auth::user()->can(['exception-check']) || in_array($exception['group_id'],ar
                 }
             }
 
-            //当quantity的数量大于1的时候，弹出提示框， You will send out MORE THAN ONE replacement. Please confirm before you submit!
-            // var obj = $('.quantity-input');
-            // var sub = 0;
-            // $.each(obj,function(i,item){
-            //     var value = $(this).val();
-            //     if(value>1){
-            //         var flag = confirm('You will send out MORE THAN ONE replacement. Please confirm before you submit!');
-            //         if(flag!=true && sub==0){
-            //             sub = 1;
-            //         }
-            //     }
-            // })
-			//
-            // if(sub==1){
-            //     return false;
-            // }
-            //当countrycode为US和CA的时候，StateOrRegion填的值必须强制为两个大写字母,且当countrycode为US的时候，StateOrRegion为固定下拉选项
-            var countryCode = $('#countrycode').val();
+            var  able = $('#state-div').attr('ableattr');
+            //可以修改左边编辑框的内容的时候才检验数据
+            if(able=='') {
+                //当quantity的数量大于1的时候，弹出提示框， You will send out MORE THAN ONE replacement. Please confirm before you submit!
+                // var obj = $('.quantity-input');
+                // var sub = 0;
+                // $.each(obj, function (i, item) {
+                //     var value = $(this).val();
+                //     if (value > 1) {
+                //         var flag = confirm('You will send out MORE THAN ONE replacement. Please confirm before you submit!');
+                //         if (flag != true && sub == 0) {
+                //             sub = 1;
+                //         }
+                //     }
+                // })
+				//
+                // if (sub == 1) {
+                //     return false;
+                // }
+                //当countrycode为US和CA的时候，StateOrRegion填的值必须强制为两个大写字母,且当countrycode为US的时候，StateOrRegion为固定下拉选项
+                var countryCode = $('#countrycode').val();
 
-            if($('#type').val()==2){
-                if(countryCode=='US' || countryCode=='CA'){
-                    var state = $('#state').val();
-                    if (!(state.length==2 && /^[A-Z]+$/.test(state))){
-                        alert('StateOrRegion has to be an abbreviation');
-                        return false;
+                if ($('#type').val() == 2) {
+                    if (countryCode == 'US' || countryCode == 'CA') {
+                        var state = $('#state').val();
+                        if (!(state.length == 2 && /^[A-Z]+$/.test(state))) {
+                            alert('StateOrRegion has to be an abbreviation');
+                            return false;
+                        }
+                    }
+                    //提交请求为Replacement类型时，Name，AddressLine1，City，StateOrRegion，PostalCode和CountryCode，Item No. 和Search by Item No and select，以及Quantity均为必填项
+                    var a = {'shipname': 'Name', 'address1': 'AddressLine1', 'city': 'City', 'state': 'StateOrRegion', 'postalcode': 'PostalCode', 'countrycode': 'CountryCode'};
+                    for (var e in a) {
+                        if (!$('#' + e + '').val()) {
+                            alert(a[e] + ' are required');
+                            return false;
+                        }
                     }
                 }
-                //提交请求为Replacement类型时，Name，AddressLine1，City，StateOrRegion，PostalCode和CountryCode，Item No. 和Search by Item No and select，以及Quantity均为必填项
-                // var a = {'shipname':'Name','address1':'AddressLine1','city':'City','state':'StateOrRegion','postalcode':'PostalCode','countrycode':'CountryCode'};
-                // for(var e in a){
-                //     if(!$('#'+e+'').val()){
-                //         alert(a[e]+' are required');
-                //         return false;
-                //     }
-                // }
             }
 
         })
