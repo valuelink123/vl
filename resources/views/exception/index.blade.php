@@ -278,7 +278,8 @@ th,td,td>span {
                     ],// set first column as a default sort by asc
                     "createdRow": function( row, data, dataIndex ) {
                         $(row).children('td').eq(4).attr('style', 'text-align: left;')
-						 $(row).children('td').eq(7).attr('style', 'text-align: left;')
+						 $(row).children('td').eq(7).attr('style', 'max-width: 350px;word-wrap: break-word;word-break: normal;text-align: left; ')
+
                     },
                 }
             });
