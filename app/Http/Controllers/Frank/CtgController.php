@@ -150,12 +150,13 @@ class CtgController extends Controller {
           ON t2.id = t1.processor
         LEFT JOIN (
           SELECT
-            SalesChannel,
-            MarketPlaceId,
-            SellerId,
-            AmazonOrderId
+            ANY_VALUE(SalesChannel) as SalesChannel,
+			ANY_VALUE(MarketPlaceId) as MarketPlaceId,
+			ANY_VALUE(SellerId) as SellerId,
+			ANY_VALUE(AmazonOrderId) as AmazonOrderId
           FROM ctg_order
-            WHERE $timeRange
+            WHERE $timeRange 
+            group by AmazonOrderId 
           ) t3
           ON t3.AmazonOrderId = t1.order_id
         LEFT JOIN (
@@ -185,7 +186,6 @@ class CtgController extends Controller {
         ORDER BY $orderby
         LIMIT $limit
         ";
-		// echo $sql;exit;
         $data = $this->queryRows($sql);
 		$fbgroupConfig = getFacebookGroup();
         foreach($data as $key=>$val){
@@ -270,11 +270,12 @@ class CtgController extends Controller {
           ON t2.id = t1.processor
         LEFT JOIN (
           SELECT
-            SalesChannel,
-            MarketPlaceId,
-            SellerId,
-            AmazonOrderId
-          FROM ctg_order
+            ANY_VALUE(SalesChannel) as SalesChannel,
+			ANY_VALUE(MarketPlaceId) as MarketPlaceId,
+			ANY_VALUE(SellerId) as SellerId,
+			ANY_VALUE(AmazonOrderId) as AmazonOrderId 
+          FROM ctg_order 
+          group by AmazonOrderId 
           ) t3
           ON t3.AmazonOrderId = t1.order_id
         LEFT JOIN (
