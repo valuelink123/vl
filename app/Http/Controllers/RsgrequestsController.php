@@ -353,7 +353,7 @@ class RsgrequestsController extends Controller
 		if($clientInfo){
 			$fbgroupConfig = getFacebookGroup();
 			$rule['facebook_name'] = $clientInfo->facebook_name;
-			$rule['facebook_group'] = isset($fbgroupConfig[ $clientInfo->facebook_group]) ? $fbgroupConfig[ $clientInfo->facebook_group] : $clientInfo->facebook_group;
+			$rule['facebook_group'] = isset($fbgroupConfig[ $clientInfo->facebook_group]) ? $clientInfo->facebook_group.' | '.$fbgroupConfig[ $clientInfo->facebook_group] : $clientInfo->facebook_group;
 
 		}
         return view('rsgrequests/edit',['rule'=>$rule,'product'=>$product,'products'=>self::getproducts()]);
