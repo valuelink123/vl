@@ -70,6 +70,9 @@ class ProlineController extends Controller
             $datas = $datas->where('asin.sap_seller_id', $request->input('sap_seller_id'));
         }
 		
+		
+		
+		
 		if($request->input('bgbu') ){
 			   $bgbu = $request->input('bgbu');
 			   $bgbu_arr = explode('_',$bgbu);
@@ -86,6 +89,17 @@ class ProlineController extends Controller
 		if($request->input('sap_site_id')){
             $datas = $datas->where('sap_site_id', $request->input('sap_site_id'));
         }
+		
+		
+		if (Auth::user()->seller_rules) {
+			$rules = explode("-",Auth::user()->seller_rules);
+			if(array_get($rules,0)!='*') $datas = $datas->where('bg', array_get($rules,0));
+			if(array_get($rules,1)!='*') $datas = $datas->where('bu', array_get($rules,1));
+		} elseif (Auth::user()->sap_seller_id) {
+			$datas = $datas->where('asin.sap_seller_id', Auth::user()->sap_seller_id);
+		} else {
+		
+		}
 		
 		
 		$iTotalRecords = $datas->count();
