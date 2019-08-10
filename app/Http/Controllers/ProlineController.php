@@ -95,10 +95,8 @@ class ProlineController extends Controller
 			$rules = explode("-",Auth::user()->seller_rules);
 			if(array_get($rules,0)!='*') $datas = $datas->where('bg', array_get($rules,0));
 			if(array_get($rules,1)!='*') $datas = $datas->where('bu', array_get($rules,1));
-		} elseif (Auth::user()->sap_seller_id) {
+		} else{
 			$datas = $datas->where('asin.sap_seller_id', Auth::user()->sap_seller_id);
-		} else {
-		
 		}
 		
 		
