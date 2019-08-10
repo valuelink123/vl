@@ -32,6 +32,7 @@ class ProlineController extends Controller
      */
     public function index()
     {	
+		if((Auth::user()->id)!=46) die('Permission denied -- proline-show');
 		if(!Auth::user()->can(['proline-show'])) die('Permission denied -- proline-show');
 		$teams= DB::select('select bg,bu from asin group by bg,bu ORDER BY BG ASC,BU ASC');
         return view('proline/index',['teams'=>$teams,'users'=>$this->getUsers()]);
@@ -95,8 +96,10 @@ class ProlineController extends Controller
 			$rules = explode("-",Auth::user()->seller_rules);
 			if(array_get($rules,0)!='*') $datas = $datas->where('bg', array_get($rules,0));
 			if(array_get($rules,1)!='*') $datas = $datas->where('bu', array_get($rules,1));
-		} else{
+		} elseif (Auth::user()->sap_seller_id) {
 			$datas = $datas->where('asin.sap_seller_id', Auth::user()->sap_seller_id);
+		} else {
+		
 		}
 		
 		
