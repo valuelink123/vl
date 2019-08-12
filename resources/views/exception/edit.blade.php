@@ -615,7 +615,7 @@ if((Auth::user()->can(['exception-check']) || in_array($exception['group_id'],ar
 				<div class="col-md-6">
 					<label>Replacement Order Id:</label>
 					@foreach ($replacement_order_ids as $replacement_order_id)
-						<div class="input-group "><input type="text" class="form-control form-filter" name="replacement_order_id[]"  value="{{$replacement_order_id}}"  {{$disable}}></div>
+						<div class="input-group "><input type="text" class="form-control form-filter" name="replacement_order_id[]"  value="{{$replacement_order_id}}"  {{$disable}} {{(($replacement_order_id==$exception['amazon_order_id'])?'readonly':'')}}></div>
 					@endforeach
 					<BR />
 				</div>

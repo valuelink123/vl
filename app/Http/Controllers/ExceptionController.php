@@ -867,7 +867,7 @@ class ExceptionController extends Controller
 				array_get($accounts,$customersList['sellerid']),
                 $customersList['amazon_order_id'],
                 array_get($type_list,$customersList['type']),
-                $customersList['order_sku'],
+                $customersList['order_sku'].' ('.$customersList['asin'].')',
 				$customersList['date'],
                 $statusScore,
 				// isset($mcfStatus[$customersList['amazon_order_id']]) ? $mcfStatus[$customersList['amazon_order_id']] : 'unknown',
@@ -976,7 +976,8 @@ class ExceptionController extends Controller
 					$product_arr['replacement_order_id']=$request->get('rebindorderid').'-0'.$id_add;
 				}else{
 					$product_arr['replacement_order_id']=substr($request->get('rebindorderid'),4).'-0'.$id_add;	
-				}		
+				}
+				if($product_arr['seller_id']=='FBM') $product_arr['replacement_order_id']=$request->get('rebindorderid');
 				$products[]=$product_arr;
 			}
 			//当countrycode为US和CA的时候，StateOrRegion填的值必须强制为两个大写字母
