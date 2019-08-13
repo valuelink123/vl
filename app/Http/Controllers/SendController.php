@@ -224,6 +224,7 @@ class SendController extends Controller
 					}
 				}
 				$content = str_replace("{CUSTOMER_NAME}",$name,$content);
+				$sendbox->subject = str_replace("{CUSTOMER_NAME}",$name,$sendbox->subject);
 
 				$sendbox->text_html = $content;
 				$sendbox->date = date('Y-m-d H:i:s');

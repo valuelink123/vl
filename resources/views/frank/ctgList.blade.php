@@ -419,7 +419,7 @@ th,td,td>span {
                 return
             }
             var email = ctgRows.join(';');
-            location.href='/send/create?to_address='+email;
+            window.open('/send/create?to_address='+email,'_blank');
         })
 
     </script>
