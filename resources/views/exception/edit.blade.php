@@ -86,7 +86,7 @@
 				var order_sku='';
 				for( var child_i in items )
 			　　{
-			　　		$("div[data-repeater-list='group-products']").append('<div data-repeater-item class="mt-repeater-item"><div class="row mt-repeater-row"><div class="col-md-3"><label class="control-label">Replaced SKU</label><input type="text"class="form-control"name="group-products['+child_i+'][sku]"placeholder="SKU"value="'+ items[child_i].SellerSKU +'"></div><div class="col-md-5"><label class="control-label">Replaced Product/Accessories Name</label><input type="text"class="form-control"name="group-products['+child_i+'][title]"placeholder="title"value="'+ items[child_i].Title +'"></div><div class="col-md-2"><label class="control-label">Quantity</label><input type="text"class="form-control"name="group-products['+child_i+'][qty]"placeholder="Quantity"value="'+ items[child_i].QuantityOrdered +'"></div><div class="col-md-1"><a href="javascript:;"data-repeater-delete class="btn btn-danger mt-repeater-delete"><i class="fa fa-close"></i></a></div></div></div>');　
+			　　		$("div[data-repeater-list='group-products']").append('<div data-repeater-item class="mt-repeater-item"><div class="row mt-repeater-row"><div class="col-md-2"><label class="control-label">Replaced SKU</label><input type="text"class="form-control"name="group-products['+child_i+'][sku]"placeholder="SKU"value="'+ items[child_i].SellerSKU +'"></div><div class="col-md-4"><label class="control-label">Replaced Product/Accessories Name</label><input type="text"class="form-control"name="group-products['+child_i+'][title]"placeholder="title"value="'+ items[child_i].Title +'"></div><div class="col-md-2"><label class="control-label">Quantity</label><input type="text"class="form-control"name="group-products['+child_i+'][qty]"placeholder="Quantity"value="'+ items[child_i].QuantityOrdered +'"></div><div class="col-md-2"><label class="control-label">ShipFrom</label><input type="text"class="form-control"name="group-products['+child_i+'][shipfrom]"placeholder="ShipFrom"value="'+ data.CountryCode +'"></div><div class="col-md-1"><a href="javascript:;"data-repeater-delete class="btn btn-danger mt-repeater-delete"><i class="fa fa-close"></i></a></div></div></div>');　
 					order_sku+=items[child_i].SellerSKU+'*'+items[child_i].QuantityOrdered+'; ';
 			　　}
 				$("#order_sku", $("#exception_form")).val(order_sku);
@@ -436,12 +436,12 @@ if($exception['user_id'] == Auth::user()->id && ($exception['process_status'] ==
 								?>
 								<div data-repeater-item class="mt-repeater-item">
 									<div class="row mt-repeater-row">
-										<div class="col-md-3">
+										<div class="col-md-2">
 											<label class="control-label">Item No.</label>
 											 <input type="text" class="form-control"  name="sku"  value="{{array_get($detail,'item_code')}}" disabled>
 								
 										</div>
-										<div class="col-md-5">
+										<div class="col-md-4">
 											<label class="control-label">{{array_get($detail,'title')}}</label>
 											 <input type="text" class="form-control"  name="title" value="{{array_get($detail,'note')??array_get($detail,'seller_sku')??array_get($detail,'sku')}}" disabled>
 								
@@ -449,6 +449,11 @@ if($exception['user_id'] == Auth::user()->id && ($exception['process_status'] ==
 										<div class="col-md-2">
 											<label class="control-label">Quantity</label>
 											 <input type="text" class="form-control quantity-input"  name="qty" value="{{array_get($detail,'qty')}}" disabled>
+								
+										</div>
+										<div class="col-md-2">
+											<label class="control-label">ShipFrom</label>
+											 <input type="text" class="form-control shipfrom-input"  name="shipfrom" value="{{array_get($detail,'shipfrom')}}" disabled>
 								
 										</div>
 										<div class="col-md-2">
@@ -659,7 +664,7 @@ if((Auth::user()->can(['exception-check']) || in_array($exception['group_id'],ar
 		
 		<div class="form-actions">
                         <div class="row">
-                            <div class="col-md-offset-4 col-md-8">
+                            <div class="col-md-12">
 								<?php
 if((Auth::user()->can(['exception-check']) || in_array($exception['group_id'],array_get($mygroups,'manage_groups',array()))) && ($exception['process_status']!='cancel')){ ?>
                                 <button type="submit" class="btn blue"  {{$disable}}>Submit</button>

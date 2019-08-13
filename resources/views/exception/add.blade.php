@@ -46,7 +46,7 @@
 				$("#state", $("#exception_form")).val(data.StateOrRegion);
 				$("#postalcode", $("#exception_form")).val(data.PostalCode);
                 $('#state-div').attr('statevalue',data.StateOrRegion)
-				// $("#countrycode", $("#exception_form")).val(data.CountryCode);
+				
                 $("select[name='countrycode']>option").each(function(){
 					if($(this).text() == data.CountryCode){
 						$(this).prop('selected', true)
@@ -69,7 +69,7 @@
 
                 rebindordersellerid.value = data.SellerId
                 let site = `www.${data.SalesChannel}`.toLowerCase()
-                setReplacementItemList(items, site)
+                setReplacementItemList(items, site,data.CountryCode)
 
 			}else{
 				toastr.error(redata.message);
@@ -419,7 +419,7 @@
                                             <input type="hidden" class="seller_sku" name="seller_sku" />
                                             <input type="hidden" class="find_item_by" name="find_item_by" />
                                         </div>
-                                        <div class="col-lg-6 col-md-5">
+                                        <div class="col-lg-4 col-md-4">
                                             <label class="control-label">Search by Item No and select</label>
                                             <input type="hidden" class="item_name" name="title" />
                                             <input type="text" class="form-control seller-sku-selector" name="note" placeholder="Seller Account and SKU" autocomplete="off" required />
@@ -428,7 +428,20 @@
                                             <label class="control-label">Quantity</label>
                                             <input type="text" class="form-control quantity-input"  name="qty" value="1" placeholder="Quantity" required />
                                         </div>
-                                        <div class="col-lg-1 col-md-2">
+										 <div class="col-lg-2 col-md-2">
+                                            <label class="control-label">ShipFrom</label>
+                                            <select class="form-control shipfrom-input"  name="shipfrom" required />
+											<option value='FBM'>FBM</option>
+											<option value='US'>US</option>
+											<option value='GB'>GB</option>
+											<option value='DE'>DE</option>
+											<option value='FR'>FR</option>
+											<option value='IT'>IT</option>
+											<option value='ES'>ES</option>
+											<option value='JP'>JP</option>
+											</select>
+                                        </div>
+                                        <div class="col-lg-1 col-md-1">
                                             <label class="control-label"><input type="checkbox" name="addattr" value="Returned">Returned</label>
                                             <label class="control-label"><input type="checkbox" name="addattr" value="Urgent">Urgent</label>
                                         </div>
@@ -503,7 +516,7 @@
     let replacementItemRepeater = $replacementProductList.parent().repeater({defaultValues:{qty:1}})
 
     // 将原订单SKU填充到重发列表，并带出库存信息
-    function setReplacementItemList(items, site){
+    function setReplacementItemList(items, site,countrycode){
         replacementItemRepeater.setList(items.map(i => {
             return {
                 find_item_by: JSON.stringify({
@@ -512,7 +525,8 @@
                     seller_id: i.SellerId,
                     seller_sku: i.SellerSKU,
                 }),
-                qty: i.QuantityOrdered
+                qty: i.QuantityOrdered,
+				shipfrom:countrycode
             }
         }));
 
