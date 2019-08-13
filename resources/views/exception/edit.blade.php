@@ -638,7 +638,7 @@ if((Auth::user()->can(['exception-check']) || in_array($exception['group_id'],ar
 				if($auto_create_mcf_logs){ ?>
 				<div class="col-md-12">
 				 	@foreach ($auto_create_mcf_logs as $auto_create_mcf_log)
-					{{array_get($users,$auto_create_mcf_log->user_id )}} {{($auto_create_mcf_log->status)?'submited':'canceled'}} at  {{$auto_create_mcf_log->date}}
+					{{array_get($users,$auto_create_mcf_log->user_id )}} {{($auto_create_mcf_log->status)?'submited':'canceled'}} {{($auto_create_mcf_log->type)?$auto_create_mcf_log->type:'MCF'}} at  {{$auto_create_mcf_log->date}}
 					<BR />
 					@endforeach
 				</div>
@@ -672,6 +672,16 @@ if((Auth::user()->can(['exception-check']) || in_array($exception['group_id'],ar
 								<button type="submit" class="btn blue" name="acf" value="0">Cancel Auto Create MCF</button>
 								<?php }else{ ?>
 								<button type="submit" class="btn blue" name="acf" value="1">Auto Create MCF</button>
+								<?php }} ?>
+								
+								
+								<?php 
+								if($exception['process_status']=='auto done' || $exception['process_status']=='done'){
+									if(array_get($exception,'auto_create_sap')){
+								?>
+								<button type="submit" class="btn blue" name="acp" value="0">Cancel Auto Create SAP</button>
+								<?php }else{ ?>
+								<button type="submit" class="btn blue" name="acp" value="1">Auto Create SAP</button>
 								<?php }} ?>
                             </div>
                         </div>
