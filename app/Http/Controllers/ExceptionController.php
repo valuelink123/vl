@@ -482,7 +482,7 @@ class ExceptionController extends Controller
 		if(isset($acp) && ($exception->process_status=='auto done' || $exception->process_status=='done' ) && $exception->auto_create_sap_result!=1){
 			if(!Auth::user()->can(['exception-check'])) die('Permission denied -- exception-check');
 			$exception->auto_create_sap = $acp;
-			if($acf){
+			if($acp){
 				$exception->auto_create_sap_result = 0;
 				$exception->last_auto_create_sap_date = date('Y-m-d H:i:s');
 			}
