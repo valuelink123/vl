@@ -472,8 +472,28 @@ class ExceptionController extends Controller
 			array(
 				'user_id'=>intval(Auth::user()->id),
 				'exception_id'=>$id,
+				'type'=>'MCF',
 				'date'=>date('Y-m-d H:i:s'),
 				'status'=>$acf,
+			));
+			return redirect('exception/'.$id.'/edit');
+		}
+		$acp = $request->get('acp');
+		if(isset($acp) && ($exception->process_status=='auto done' || $exception->process_status=='done' ) && $exception->auto_create_sap_result!=1){
+			if(!Auth::user()->can(['exception-check'])) die('Permission denied -- exception-check');
+			$exception->auto_create_sap = $acp;
+			if($acf){
+				$exception->auto_create_sap_result = 0;
+				$exception->last_auto_create_sap_date = date('Y-m-d H:i:s');
+			}
+			$exception->save();
+			DB::table('mcf_auto_create_log')->insert(
+			array(
+				'user_id'=>intval(Auth::user()->id),
+				'exception_id'=>$id,
+				'type'=>'SAP',
+				'date'=>date('Y-m-d H:i:s'),
+				'status'=>$acp,
 			));
 			return redirect('exception/'.$id.'/edit');
 		}
