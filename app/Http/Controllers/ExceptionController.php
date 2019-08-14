@@ -672,8 +672,21 @@ class ExceptionController extends Controller
 			if(!Auth::user()->can(['exception-batch-update'])) die('Permission denied -- exception-batch-update');
             $updateDate=array();
             if(isset($_REQUEST['process_status']) && $_REQUEST['process_status']!='' && array_get($_REQUEST,"process_content")){
-                $updateDate['process_status'] = $_REQUEST['process_status'];
-				$updateDate['process_content'] = $_REQUEST['process_content'];
+			
+				if($_REQUEST['process_status']=='auto_sap'){
+					$updateDate['auto_create_sap'] = 1;
+					$updateDate['auto_create_sap_result'] = 0;
+					$updateDate['last_auto_create_sap_date'] = date('Y-m-d H:i:s');
+					$updateDate['last_auto_create_sap_log'] = NULL;
+				}elseif($_REQUEST['process_status']=='auto_mcf'){
+					$updateDate['auto_create_mcf'] = 1;
+					$updateDate['auto_create_mcf_result'] = 0;
+					$updateDate['last_auto_create_mcf_date'] = date('Y-m-d H:i:s');
+					$updateDate['last_auto_create_mcf_log'] = NULL;
+				}else{
+					$updateDate['process_status'] = $_REQUEST['process_status'];	
+				}
+                $updateDate['process_content'] = $_REQUEST['process_content'];
             }
 
             if(Auth::user()->admin){
@@ -681,7 +694,7 @@ class ExceptionController extends Controller
             }else{
                 $updatebox = Exception::whereIn('group_id'  , array_get($this->getUserGroup(),'manage_groups',array()));
             }
-            $updatebox->where('process_status','submit')->whereIN('id',$_REQUEST["id"])->update($updateDate);
+            $updatebox->whereIN('id',$_REQUEST["id"])->update($updateDate);
             //$request->session()->flash('success_message','Group action successfully has been completed. Well done!');
             //$records["customActionStatus"] = "OK"; // pass custom message(useful for getting status of group actions)
            // $records["customActionMessage"] = "Group action successfully has been completed. Well done!"; // pass custom message(useful for getting status of group actions)

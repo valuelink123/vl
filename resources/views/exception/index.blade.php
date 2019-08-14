@@ -68,7 +68,10 @@ th,td,td>span {
                             <select id="process_status" class="table-group-action-input form-control input-inline input-small input-sm">
                                 <option value="">Select...</option>
                                 <option value="done">Done</option>
+								<option value="auto done">Auto Done</option>
                                 <option value="cancel">Cancelled</option>
+								<option value="auto_sap">Auto SAP</option>
+								<option value="auto_mcf">Auto MCF</option>
                             </select>
 							
 																	
