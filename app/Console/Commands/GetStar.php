@@ -7,6 +7,7 @@ use PhpImap;
 use Illuminate\Support\Facades\Input;
 use App\Star;
 use App\Starhistory;
+use App\Listinghistory;
 use PDO;
 use DB;
 use Log;
@@ -84,8 +85,52 @@ where create_at>:date_from',['date_from' => $date_from]);
 				
 			}catch (\Exception $e){
 				Log::Info($e->getMessage());
-				print_r( $e->getMessage() );
 			}	
+    	}
+		
+		
+		
+		
+		$asinList = DB::connection('review_new')->select('select * from tbl_star_system_product
+where last_updated>:date_from',['date_from' => $date_from]);
+		$patterns = '/\d+[\.,]?\d+(%)?/is';
+		foreach($asinList as $asin){
+			$coupon_n=$coupon_p=0;
+			$price = 0;
+			$status = ($asin->product_status=='available')?1:0;
+			if($asin->price){
+				if(in_array($asin->domain,array('www.amazon.ca','www.amazon.com'))){
+					$price = round($asin->price/100,2);
+				}else(
+					$price = round($asin->price/10000,2);
+				)
+			}
+			if($asin->coupon){
+				preg_match($patterns, $asin->coupon,$arr);
+				if($arr){
+					$arr_val = str_replace([',','%'],['.'.''],$arr[0]);
+					if(array_get($arr,'1')=='%'){
+						$coupon_p=round($arr_val,2);
+						$coupon_n=round($price*$coupon_p/100);
+					}else{
+						$coupon_n=round($arr_val,2);
+						$coupon_p=round($coupon_n/$price,2);
+					}
+				}
+			}
+
+			Listinghistory::updateOrCreate([
+				'asin' => $asin->asin,
+				'domain' => $asin->domain,
+				'date' => substr($asin->last_updated,0,10)
+			],
+			[
+				'coupon_n' => $coupon_n,
+				'coupon_p' => $coupon_p,
+				'price' => $price,
+				'status' => $status
+			]);
+
     	}
 	}
 
