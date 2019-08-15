@@ -50,7 +50,7 @@ class GetStar extends Command
         if(!$time) $time = '3days';
 		$date_from=date('Y-m-d',strtotime('-'.$time));		
 
-		/*
+		
 		$reviewList = DB::connection('review_new')->select('select * from tbl_star_system_star_info
 where create_at>:date_from',['date_from' => $date_from]);
 		
@@ -89,7 +89,7 @@ where create_at>:date_from',['date_from' => $date_from]);
     	}
 		
 		
-		*/
+		
 		
 		$lists = DB::connection('review_new')->select('select * from tbl_star_system_product
 where last_updated>:date_from',['date_from' => $date_from]);
