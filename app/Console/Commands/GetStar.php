@@ -50,7 +50,7 @@ class GetStar extends Command
         if(!$time) $time = '3days';
 		$date_from=date('Y-m-d',strtotime('-'.$time));		
 
-		
+		/*
 		$reviewList = DB::connection('review_new')->select('select * from tbl_star_system_star_info
 where create_at>:date_from',['date_from' => $date_from]);
 		
@@ -89,24 +89,25 @@ where create_at>:date_from',['date_from' => $date_from]);
     	}
 		
 		
+		*/
 		
-		
-		$asinList = DB::connection('review_new')->select('select * from tbl_star_system_product
+		$lists = DB::connection('review_new')->select('select * from tbl_star_system_product
 where last_updated>:date_from',['date_from' => $date_from]);
 		$patterns = '/\d+[\.,]?\d+(%)?/is';
-		foreach($asinList as $asin){
+		foreach($lists as $list){
+			
 			$coupon_n=$coupon_p=0;
 			$price = 0;
-			$status = ($asin->product_status=='available')?1:0;
-			if($asin->price){
-				if(in_array($asin->domain,array('www.amazon.ca','www.amazon.com'))){
-					$price = round($asin->price/100,2);
+			$status = ($list->product_status=='available')?1:0;
+			if($list->price){
+				if(in_array($list->domain,array('www.amazon.ca','www.amazon.com'))){
+					$price = round($list->price/100,2);
 				}else{
-					$price = round($asin->price/10000,2);
+					$price = round($list->price/10000,2);
 				}
 			}
-			if($asin->coupon){
-				preg_match($patterns, $asin->coupon,$arr);
+			if($list->coupon){
+				preg_match($patterns, $list->coupon,$arr);
 				if($arr){
 					$arr_val = str_replace([',','%'],['.',''],$arr[0]);
 					if(array_get($arr,'1')=='%'){
@@ -118,11 +119,10 @@ where last_updated>:date_from',['date_from' => $date_from]);
 					}
 				}
 			}
-
 			Listinghistory::updateOrCreate([
-				'asin' => $asin->asin,
-				'domain' => $asin->domain,
-				'date' => substr($asin->last_updated,0,10)
+				'asin' => $list->asin,
+				'domain' => $list->domain,
+				'date' => substr($list->last_updated,0,10)
 			],
 			[
 				'coupon_n' => $coupon_n,

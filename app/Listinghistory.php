@@ -7,5 +7,6 @@ class Listinghistory extends Model
 {
     //
     protected $table = 'listing_history';
-    public $timestamps = true;
+    public $timestamps = false;
+	 protected $guarded = [];
 }
