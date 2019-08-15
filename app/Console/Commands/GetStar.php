@@ -108,7 +108,7 @@ where last_updated>:date_from',['date_from' => $date_from]);
 			if($asin->coupon){
 				preg_match($patterns, $asin->coupon,$arr);
 				if($arr){
-					$arr_val = str_replace([',','%'],['.'.''],$arr[0]);
+					$arr_val = str_replace([',','%'],['.',''],$arr[0]);
 					if(array_get($arr,'1')=='%'){
 						$coupon_p=round($arr_val,2);
 						$coupon_n=round($price*$coupon_p/100);
