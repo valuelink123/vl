@@ -101,9 +101,9 @@ where last_updated>:date_from',['date_from' => $date_from]);
 			if($asin->price){
 				if(in_array($asin->domain,array('www.amazon.ca','www.amazon.com'))){
 					$price = round($asin->price/100,2);
-				}else(
+				}else{
 					$price = round($asin->price/10000,2);
-				)
+				}
 			}
 			if($asin->coupon){
 				preg_match($patterns, $asin->coupon,$arr);
