@@ -147,7 +147,7 @@ class RsgproductsController extends Controller
 				array_get($users,$list['user_id']),
 				array_get($status_arr,$list['status']),
 				
-				'<a data-target="#ajax" data-toggle="modal" href="'.url('rsgproducts/'.$list['id'].'/edit').'" class="badge badge-success"> View </a>'
+				'<a href="'.url('rsgproducts/'.$list['id'].'/edit').'" class="badge badge-success"> View </a>'
 				
             );
 		}
@@ -225,6 +225,9 @@ class RsgproductsController extends Controller
 
 		$rule->sales_target_reviews = intval($request->get('sales_target_reviews'));
 
+		$rule->product_summary = $request->get('product_summary');
+		$rule->product_content = $request->get('product_content');
+
         if ($rule->save()) {
             $request->session()->flash('success_message','Set Rsg Product Success');
             return redirect('rsgproducts');
@@ -276,6 +279,10 @@ class RsgproductsController extends Controller
         $rule->review_rating = intval($request->get('review_rating'));
         $rule->number_of_reviews = intval($request->get('number_of_reviews'));
 		$rule->sales_target_reviews = intval($request->get('sales_target_reviews'));
+
+		$rule->product_summary = $request->get('product_summary');
+		$rule->product_content = $request->get('product_content');
+
         if ($rule->save()) {
             $request->session()->flash('success_message','Set Rsg Product Success');
             return redirect('rsgproducts');

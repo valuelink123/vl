@@ -1,4 +1,10 @@
-
+@extends('layouts.layout')
+@section('label', 'Edit RSG Products')
+@section('content')
+<script>
+    window.UEDITOR_HOME_URL = "/laravel-u-editor/";//配置编辑器的文件路径
+</script>
+@include('UEditor::head')
 
     <div class="row"><div class="col-md-12">
         <div class="portlet light bordered">
@@ -167,6 +173,18 @@
                             <input type="text" class="form-control" name="sales_target_reviews" id="sales_target_reviews" value="{{intval(array_get($rule,'sales_target_reviews'))}}" required pattern="[0-9]*">
 
                         </div>
+
+                        <div class="form-group col-md-8">
+                            <label>Product Summary</label>
+                            <textarea class="form-control"  style="height:300px;" name="product_summary">{{array_get($rule,'product_summary')}}</textarea>
+
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <label>Product Content</label>
+                                <script id="bdeditor" name="product_content" type="text/plain"><?php echo $rule['product_content']; ?></script>
+                            </div>
+                        </div>
 						
                     </div>
                     <div class="form-actions">
@@ -190,5 +208,12 @@ $('.date-picker').datepicker({
 	rtl: App.isRTL(),
 	autoclose: true
 });
+
+    var ue = UE.getEditor('bdeditor');
+    ue.ready(function() {
+        ue.execCommand('serverparam', '_token', '{{ csrf_token() }}');//此处为支持laravel5 csrf ,根据实际情况修改,目的就是设置 _token 值.
+    });
+
 });
 </script>
+@endsection
