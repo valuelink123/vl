@@ -899,7 +899,7 @@ class ExceptionController extends Controller
 
 			$operDate = $this->getOperaDate($customersList['update_status_log']);////得到操作各个状态的时间
             $records["data"][] = array(
-                ((Auth::user()->admin || in_array($customersList['group_id'],array_get($this->getUserGroup(),'manage_groups',array()))) && $customersList['process_status']=='submit')?'<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input name="id[]" type="checkbox" class="checkboxes" value="'.$customersList['id'].'"/><span></span></label>':'',
+                ((Auth::user()->admin || in_array($customersList['group_id'],array_get($this->getUserGroup(),'manage_groups',array()))))?'<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input name="id[]" type="checkbox" class="checkboxes" value="'.$customersList['id'].'"/><span></span></label>':'',
 
 				array_get($accounts,$customersList['sellerid']),
                 $customersList['amazon_order_id'],
