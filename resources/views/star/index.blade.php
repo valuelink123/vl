@@ -1,20 +1,20 @@
-
-
-
-
 @extends('layouts.layout')
 @section('label', 'Asin Rating List')
 @section('content')
-
-<style type="text/css">
-.dataTables_extended_wrapper .table.dataTable {
+<style>
+        .form-control {
+            height: 29px;
+        }
+		.dataTables_extended_wrapper .table.dataTable {
   margin: 0px !important;
 }
 
-.table-checkable tr>td:first-child, .table-checkable tr>th:first-child {
-max-width:150px !important;
-}
-</style>
+
+th,td,td>span {
+    font-size:12px !important;
+	font-family:Arial, Helvetica, sans-serif;}
+	.portlet.light .dataTables_wrapper .dt-buttons{margin-top:0px;}
+    </style>
     <h1 class="page-title font-red-intense"> Asin Rating List
         <small></small>
     </h1>
@@ -26,6 +26,7 @@ max-width:150px !important;
                     <form role="form" action="{{url('star')}}" method="GET">
                         {{ csrf_field() }}
                         <div class="row">
+						
 						<div class="col-md-2">
                             <div class="input-group date date-picker margin-bottom-5" data-date-format="yyyy-mm-dd">
                                 <input type="text" class="form-control form-filter input-sm" readonly name="date_from" placeholder="Date" value="{{$date_from}}">
@@ -68,52 +69,104 @@ max-width:150px !important;
 						</div>
 						
 						<div class="col-md-2">
-						<select class="form-control form-filter input-sm" name="asin_status">
-                                        <option value="">Asin Status</option>
-                                        <option value="Above" <?php if("Above"==array_get($_REQUEST,'asin_status')) echo 'selected';?>>Above Warning Rating</option>
-										<option value="Below" <?php if("Below"==array_get($_REQUEST,'asin_status')) echo 'selected';?>>Below Warning Rating</option>
+						<select class="form-control form-filter input-sm" name="rating_status">
+                                        <option value="">Rating Status</option>
+                                        <option value="Above" <?php if("Above"==array_get($_REQUEST,'rating_status')) echo 'selected';?>>Above Warning Rating</option>
+										<option value="Below" <?php if("Below"==array_get($_REQUEST,'rating_status')) echo 'selected';?>>Below Warning Rating</option>
                                     </select>
 						</div>
+						<div class="col-md-2">
+						<select class="form-control form-filter input-sm" name="listing_status">
+                                        <option value="">All Listing Status</option>
+                                        <option value="1" <?php if(1==array_get($_REQUEST,'listing_status')) echo 'selected';?>>Listing Down</option>
+										<option value="2" <?php if(2==array_get($_REQUEST,'listing_status')) echo 'selected';?>>Listing UnAvailable</option>
+										<option value="3" <?php if(3==array_get($_REQUEST,'listing_status')) echo 'selected';?>>Listing Available</option>
+                                    </select>
+                                       
+						</div>
 						
+						</div>
+						<div class="row">
+						<div class="col-md-1">
+						<select class="form-control form-filter input-sm" name="price_status">
+                                        <option value="">Price Fluncuation</option>
+                                        <option value=">" <?php if(1==array_get($_REQUEST,'price_status')) echo 'selected';?>>Price Increase</option>
+										<option value="<" <?php if(2==array_get($_REQUEST,'price_status')) echo 'selected';?>>Price Decrease</option>
+                                    </select>
+                                       
+						</div>
+						
+						<div class="col-md-1">
+						<select class="form-control form-filter input-sm" name="asin_status">
+                                        <option value="">Asin Level</option>
+                                        <option value="S" <?php if('S'==array_get($_REQUEST,'asin_status')) echo 'selected';?>>S</option>
+										<option value="A" <?php if('A'==array_get($_REQUEST,'asin_status')) echo 'selected';?>>A</option>
+										<option value="B" <?php if('B'==array_get($_REQUEST,'asin_status')) echo 'selected';?>>B</option>
+										<option value="C" <?php if('C'==array_get($_REQUEST,'asin_status')) echo 'selected';?>>C</option>
+										<option value="D" <?php if('D'==array_get($_REQUEST,'asin_status')) echo 'selected';?>>D</option>
+                                    </select>
+                                       
+						</div>
+						
+						<div class="col-md-1">
+						<select class="form-control form-filter input-sm" name="item_status">
+                                        <option value="">Sku Level</option>
+                                        <option value="1" <?php if(1==array_get($_REQUEST,'item_status')) echo 'selected';?>>Eliminate</option>
+										<option value="2" <?php if(2==array_get($_REQUEST,'item_status')) echo 'selected';?>>Reserved</option>
+                                    </select>
+                                       
+						</div>
+						
+						
+						<div class="col-md-4 form-inline">
+						<select class="form-filter input-sm form-group" name="coupon_than">
+                                        <option value="">Coupon Compare</option>
+                                        <option value=">" <?php if('S'==array_get($_REQUEST,'coupon_than')) echo 'selected';?>>></option>
+										<option value=">=" <?php if('A'==array_get($_REQUEST,'coupon_than')) echo 'selected';?>>>=</option>
+										<option value="=" <?php if('B'==array_get($_REQUEST,'coupon_than')) echo 'selected';?>>=</option>
+										<option value="<=" <?php if('C'==array_get($_REQUEST,'coupon_than')) echo 'selected';?>><=</option>
+										<option value="<" <?php if('D'==array_get($_REQUEST,'coupon_than')) echo 'selected';?>><</option>
+                                    </select>
+									
+									<select class="form-filter input-sm form-group" name="coupon_type">
+                                        <option value="">Coupon Type</option>
+                                        <option value="coupon_p" <?php if('coupon_p'==array_get($_REQUEST,'coupon_type')) echo 'selected';?>>%</option>
+										<option value="coupon_n" <?php if('coupon_n'==array_get($_REQUEST,'coupon_type')) echo 'selected';?>>$</option>
+                                    </select>
+                                    <input type="text" class=" form-filter input-sm form-group" name="coupon_value" placeholder="Coupon Value" value ="{{array_get($_REQUEST,'coupon_value')}}">
+						</div>
+						 <div class="col-md-2">
+						<select class="mt-multiselect btn btn-default" multiple="multiple" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" name="site[]" id="site[]">
+
+                                        @foreach (getAsinSites() as $v)
+                                            <option value="{{$v}}">{{$v}}</option>
+                                        @endforeach
+                                    </select>
+						</div>
 						
 						<div class="col-md-2">
 						<input type="text" class="form-control form-filter input-sm" name="keywords" placeholder="Keywords" value ="{{array_get($_REQUEST,'keywords')}}">
                                        
 						</div>	
+						
+						<div class="col-md-1"><button type="button" class="btn blue" id="data_search">Search</button>
 						</div>
-					<div class="row">
-						<div class="col-md-10">&nbsp;</div>
-                        <div class="col-md-2">
-							<div class="form-actions">
-								<div class="row">
-									<div class="col-md-offset-4 col-md-8">
-										<button type="button" class="btn blue" id="data_search">Search</button>
-									</div>
-								</div>
-							</div>
-                        </div>
-                    </div>
-                    </form>
+						</div>
 					
+                    </form>
+					<div style="clear:both;"></div>
                 </div>
+			
+                <div class="table-container">
 
-                <div class="portlet-title">
-                    <div class="caption font-dark">
-                        <i class="icon-settings font-dark"></i>
-                        <span class="caption-subject bold uppercase">Asin Rating List</span>
-                    </div>
-                </div>
-
-                <div class="portlet-body">
-
-                    <table class="table table-striped table-bordered table-hover table-checkable" id="datatable_ajax_asin">
+                    <table class="table table-striped table-bordered table-hover" id="datatable_ajax_asin">
                         <thead>
+							
                             <tr role="row" class="heading">
-							<th style="min-width:80px;"> Brand </th>
 								<th style="min-width:80px;"> Asin </th>	
-								<th style="min-width:80px;"> SellerSku </th>	
+								<th style="min-width:80px;"> Level </th>	
                                 <th style="min-width:80px;"> Item No. </th>
-								
+								<th style="min-width:80px;"> Status </th>	
                                 <th style="min-width:80px;"> Seller </th>
                                 <th style="min-width:80px;"> User </th>
 								<th style="min-width:100px;"> Site </th>
@@ -128,6 +181,10 @@ max-width:150px !important;
 								<th style="min-width:80px;"> Increase </th>
 								<th style="min-width:80px;"> Decrease </th>
 								<th style="min-width:80px;"> Last Update</th>
+								<th style="min-width:80px;"> Listing </th>
+                                <th style="min-width:80px;"> Price </th>
+                                <th style="min-width:80px;"> Coupon % </th>
+								<th style="min-width:80px;"> Coupon $ </th>
 								<th style="min-width:80px;"> Quantity </th>
                                 <th style="min-width:80px;"> Rating </th>
                                 <th style="min-width:80px;"> 1 Star </th>
@@ -136,6 +193,10 @@ max-width:150px !important;
 								<th style="min-width:80px;"> 4 Stars </th>
                                 <th style="min-width:80px;"> 5 Stars </th>
 								<th style="min-width:80px;"> Pre Update</th>
+								<th style="min-width:80px;"> Listing </th>
+                                <th style="min-width:80px;"> Price </th>
+                                <th style="min-width:80px;"> Coupon % </th>
+								<th style="min-width:80px;"> Coupon $ </th>
 								<th style="min-width:80px;"> Quantity </th>
                                 <th style="min-width:80px;"> Rating </th>
                                 <th style="min-width:80px;"> 1 Star </th>
@@ -147,9 +208,7 @@ max-width:150px !important;
 							
                             
                             </thead>
-                            <tbody>
-							
-                        </tbody>
+                            <tbody></tbody>
                     </table>
                 </div>
             </div>
@@ -174,7 +233,21 @@ max-width:150px !important;
                 headers: { 'X-CSRF-TOKEN' : '{{ csrf_token() }}' }
             });
             var grid = new Datatable();
-
+			grid.setAjaxParam("date_from", $("input[name='date_from']").val());
+            grid.setAjaxParam("date_to", $("input[name='date_to']").val());
+			grid.setAjaxParam("star_from", $("input[name='star_from']").val());
+            grid.setAjaxParam("star_to", $("input[name='star_to']").val());
+            grid.setAjaxParam("user_id", $("select[name='user_id[]']").val());
+			grid.setAjaxParam("rating_status", $("select[name='rating_status']").val());
+			grid.setAjaxParam("keywords", $("input[name='keywords']").val());
+			grid.setAjaxParam("listing_status", $("select[name='listing_status']").val());
+			grid.setAjaxParam("price_status", $("select[name='price_status']").val());
+			grid.setAjaxParam("asin_status", $("select[name='asin_status']").val());
+			grid.setAjaxParam("coupon_than", $("select[name='coupon_than']").val());
+			grid.setAjaxParam("coupon_type", $("select[name='coupon_type']").val());
+			grid.setAjaxParam("item_status", $("select[name='item_status']").val());
+			grid.setAjaxParam("site", $("select[name='site[]']").val());
+			grid.setAjaxParam("coupon_value", $("input[name='coupon_value']").val());
             grid.init({
                 src: $("#datatable_ajax_asin"),
                 onSuccess: function (grid, response) {
@@ -197,7 +270,7 @@ max-width:150px !important;
                     // Uncomment below line("dom" parameter) to fix the dropdown overflow issue in the datatable cells. The default datatable layout
                     // setup uses scrollable div(table-scrollable) with overflow:auto to enable vertical scroll(see: assets/global/scripts/datatable.js).
                     // So when dropdowns used the scrollable div should be removed.
-                   "autoWidth":true,
+                   
                     "lengthMenu": [
                         [20, 50, 100, -1],
                         [20, 50, 100, 'All'] // change per page values here
@@ -212,7 +285,7 @@ max-width:150px !important;
 					buttons: [],
 					
 					<?php } ?>
-					"aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0 , 6,11,12,13,14 ] }],	
+					"aoColumnDefs": [ { "bSortable": false, "aTargets": [ 6,12,13,14,15,16,27,28 ] }],	
 					 "order": [
                         [7, "asc"]
                     ],
@@ -230,6 +303,7 @@ max-width:150px !important;
                     },
 
                     
+					//"dom": "<'row' <'col-md-12'B>><'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'>r><'table-scrollable't><'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>",
 					"dom": "<'row' <'col-md-12'B>><'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'>r><'table-scrollable't><'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>",
                 }
             });
@@ -238,15 +312,15 @@ max-width:150px !important;
             
 
             //grid.setAjaxParam("customActionType", "group_action");
-            grid.setAjaxParam("date_from", $("input[name='date_from']").val());
-            grid.setAjaxParam("date_to", $("input[name='date_to']").val());
-			grid.setAjaxParam("star_from", $("input[name='star_from']").val());
-            grid.setAjaxParam("star_to", $("input[name='star_to']").val());
-            grid.setAjaxParam("user_id", $("select[name='user_id[]']").val());
-			grid.setAjaxParam("asin_status", $("select[name='asin_status']").val());
+            //grid.setAjaxParam("date_from", $("input[name='date_from']").val());
+            //grid.setAjaxParam("date_to", $("input[name='date_to']").val());
+			//grid.setAjaxParam("star_from", $("input[name='star_from']").val());
+            //grid.setAjaxParam("star_to", $("input[name='star_to']").val());
+            //grid.setAjaxParam("user_id", $("select[name='user_id[]']").val());
+			//grid.setAjaxParam("asin_status", $("select[name='asin_status']").val());
 
-			grid.setAjaxParam("keywords", $("input[name='keywords']").val());
-            grid.getDataTable().ajax.reload(null,false);
+			//grid.setAjaxParam("keywords", $("input[name='keywords']").val());
+            //grid.getDataTable().ajax.reload(null,false);
             //grid.clearAjaxParams();
         }
 
@@ -267,8 +341,8 @@ $(function() {
     TableDatatablesAjax.init();
 	$('#data_search').on('click',function(){
 		var dttable = $('#datatable_ajax_asin').dataTable();
-	    dttable.fnClearTable(); //清空一下table
-	    dttable.fnDestroy(); //还原初始化了的datatable
+	    dttable.fnClearTable(false); //娓呯┖涓�涓媡able
+	    dttable.fnDestroy(); //杩樺師鍒濆鍖栦簡鐨刣atatable
 		TableDatatablesAjax.init();
 	});
 	

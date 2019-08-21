@@ -97,10 +97,11 @@ where last_updated>:date_from',['date_from' => $date_from]);
 		foreach($lists as $list){
 			
 			$coupon_n=$coupon_p=0;
-			$price = 0;
-			$status = ($list->product_status=='available')?1:0;
+			$price = $status = 0;
+			if($list->product_status=='available') $status = 2;
+			if($list->product_status=='unavailable') $status = 1;
 			if($list->price){
-				if(in_array($list->domain,array('www.amazon.ca','www.amazon.com'))){
+				if(in_array($list->domain,array('www.amazon.ca','www.amazon.com','www.amazon.co.jp'))){
 					$price = round($list->price/100,2);
 				}else{
 					$price = round($list->price/10000,2);

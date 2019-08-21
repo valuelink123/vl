@@ -8,7 +8,6 @@ use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use App;
 use PDO;
 use DB;
-//require __DIR__.'/../Helper/functions.php';
 class Kernel extends ConsoleKernel
 {
     /**
@@ -75,7 +74,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('scan:send')->cron('*/5 * * * *')->name('sendmails')->withoutOverlapping();
 		$schedule->command('get:order')->cron('*/30 * * * *')->name('getOrder')->withoutOverlapping();
 		$schedule->command('get:review 7days')->cron('0 */4 * * *')->name('getreviews')->withoutOverlapping();
-		$schedule->command('get:star 7days')->twiceDaily(20, 22)->name('getstars')->withoutOverlapping();
+		$schedule->command('get:star 3days')->twiceDaily(20, 23)->name('getstars')->withoutOverlapping();
 		$schedule->command('get:asin 3000 0')->hourly()->name('getasins')->withoutOverlapping();
 		$schedule->command('get:kunnr 3 0')->hourly()->name('getkunnrs')->withoutOverlapping();
 		$schedule->command('get:sellers')->cron('*/1 * * * *')->name('sendmails')->withoutOverlapping();

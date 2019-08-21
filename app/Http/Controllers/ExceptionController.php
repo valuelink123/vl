@@ -463,9 +463,12 @@ class ExceptionController extends Controller
 		if(isset($acf) && $exception->process_status=='auto done' && $exception->auto_create_mcf_result!=1){
 			if(!Auth::user()->can(['exception-check'])) die('Permission denied -- exception-check');
 			$exception->auto_create_mcf = $acf;
+			$exception->auto_create_mcf_result = 0;
 			if($acf){
-				$exception->auto_create_mcf_result = 0;
+				
 				$exception->last_auto_create_mcf_date = date('Y-m-d H:i:s');
+			}else{
+				$exception->last_auto_create_mcf_date = NULL;
 			}
 			$exception->save();
 			DB::table('mcf_auto_create_log')->insert(
@@ -482,9 +485,11 @@ class ExceptionController extends Controller
 		if(isset($acp) && ($exception->process_status=='auto done' || $exception->process_status=='done' ) && $exception->auto_create_sap_result!=1){
 			if(!Auth::user()->can(['exception-check'])) die('Permission denied -- exception-check');
 			$exception->auto_create_sap = $acp;
+			$exception->auto_create_sap_result = 0;
 			if($acp){
-				$exception->auto_create_sap_result = 0;
 				$exception->last_auto_create_sap_date = date('Y-m-d H:i:s');
+			}else{
+				$exception->last_auto_create_sap_date = NULL;
 			}
 			$exception->save();
 			DB::table('mcf_auto_create_log')->insert(
