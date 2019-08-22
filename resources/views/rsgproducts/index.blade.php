@@ -52,6 +52,7 @@ th,td,td>span {
 									<option value="2">Inactive</option>
 									<option value="3">Expired</option>
 									<option value="-1">Reject</option>
+									<option value="4">Confirmed</option>
 								</select>
 
 
@@ -70,17 +71,19 @@ th,td,td>span {
 									</th>
 									<th width="15%"> Product </th>
 									<th width="10%"> ActiveDate </th>
-									<th width="5%"> Daily Gift </th>
-									<th width="5%"> Daily Remain </th>
+									{{--<th width="5%"> Daily Gift </th>--}}
+									{{--<th width="5%"> Daily Remain </th>--}}
 									<th width="5%"> Review Rating </th>
 									<th width="5%"> Number of reviews </th>
 									<th width="5%">Total Requests </th>
-									<th width="5%"> Submit Purchase </th>
-									<th width="5%"> Submit Review </th>
+									{{--<th width="5%"> Submit Purchase </th>--}}
+									{{--<th width="5%"> Submit Review </th>--}}
 									<th width="5%"> Completed </th>
 									<th width="8%"> Date </th>
 									<th width="8%"> Reviews Needed </th>
 									<th width="8%"> User </th>
+									<th width="8%"> BG </th>
+									<th width="8%"> BU </th>
 									<th width="8%"> Status</th>
 								</tr>
 								<tr role="row" class="filter">
@@ -119,7 +122,7 @@ th,td,td>span {
 										</div>
 									</td>
 
-									<td colspan="10">
+									<td colspan="5">
 									 
 										<select name="site" class="form-filter input-sm mt-multiselect btn btn-default " multiple="multiple" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" name="site[]" id="site[]" >
 									   <?php 
@@ -127,6 +130,11 @@ th,td,td>span {
 											echo '<option value="'.$v.'">'.$v.' </option>';
 										}?>
 									</select>
+									</td>
+									<td>
+										<div class="input-group">
+											<input type="text" class="form-control form-filter input-sm" name="positive_target">
+										</div>
 									</td>
 	
 									
@@ -154,6 +162,8 @@ th,td,td>span {
 										</select>
 
 									</td>
+									<td></td>
+									<td></td>
 									<td>
 									<select id="status"  name="status" class="form-control form-filter input-sm">
 										<option value="">Select Status</option>
@@ -162,6 +172,7 @@ th,td,td>span {
 										<option value="2">Inactive</option>
 										<option value="3">Expired</option>
 										<option value="-1">Reject</option>
+										<option value="4">Confirmed</option>
 									</select>
 									</td>
 
@@ -219,7 +230,7 @@ th,td,td>span {
 											"dom": "<'row'B<'col-md-6 col-sm-12'pli><'col-md-6 col-sm-12'<'table-group-actions pull-right'>>r>t<'row'<'col-md-6 col-sm-12'pli><'col-md-6 col-sm-12'>>",
 
 											"bStateSave": true, // save datatable state(pagination, sort, etc) in cookie.
-											"aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0 ,1,7,8,9,10,13,14,15 ] }],
+											"aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0 ,1,5,6,9,10,11,12,13 ] }],
 											"lengthMenu": [
 												[-1,10, 20, 50],
 												['All',10, 20, 50] // change per page values here

@@ -66,13 +66,13 @@
                             
                         </div>
 						
-						<div class="form-group col-md-6">
-                            <label>Daily Gift Quantity</label>
-                            
-                      
-                                <input type="text" class="form-control" name="daily_stock" id="daily_stock" value="" required>
-                           
-                        </div>
+						{{--<div class="form-group col-md-6">--}}
+                            {{--<label>Daily Gift Quantity</label>--}}
+                            {{----}}
+                      {{----}}
+                                {{--<input type="text" class="form-control" name="daily_stock" id="daily_stock" value="" required>--}}
+                           {{----}}
+                        {{--</div>--}}
 						<div class="form-group col-md-6">
                             <label>Product Name</label>
                             
@@ -147,21 +147,21 @@
                            
                         </div>
 
-                        <div class="form-group col-md-6">
-                            <label>Review Rating</label>
+                        {{--<div class="form-group col-md-6">--}}
+                            {{--<label>Review Rating</label>--}}
 
 
-                            <input type="text" class="form-control" name="review_rating" id="review_rating" value="">
+                            {{--<input type="text" class="form-control" name="review_rating" id="review_rating" value="">--}}
 
-                        </div>
+                        {{--</div>--}}
 
-                        <div class="form-group col-md-6">
-                            <label>Number of reviews</label>
+                        {{--<div class="form-group col-md-6">--}}
+                            {{--<label>Number of reviews</label>--}}
 
 
-                            <input type="text" class="form-control" name="number_of_reviews" id="number_of_reviews" value="">
+                            {{--<input type="text" class="form-control" name="number_of_reviews" id="number_of_reviews" value="">--}}
 
-                        </div>
+                        {{--</div>--}}
 
                         <div class="form-group col-md-6">
                             <label>Sales' target reviews</label>
