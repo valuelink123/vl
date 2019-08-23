@@ -24,7 +24,7 @@
 	
 </div>
 </div>
-<div id="lineChart" style="height: 500px"></div>
+<div id="lineChart" style="height: 500px;width:100%;"></div>
 <script type="text/javascript">
 
 $(function() {
@@ -32,6 +32,7 @@ $(function() {
 	var asin_from = $('#asin_from').val();
 	var asin_to = $('#asin_to').val();
 	var lineChart = echarts.init(document.getElementById('lineChart'));
+	lineChart.clear();
 	lineChart.showLoading();
 	$.ajax({
 		type: "POST",
