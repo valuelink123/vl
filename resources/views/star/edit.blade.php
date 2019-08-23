@@ -129,9 +129,9 @@ function loadpie(){
 				]
 			};
 			lineChart.hideLoading();
-			lineChart.setOption(option);
+			lineChart.setOption(option,true);
 		},
-		async: true
+		async: false
 	});
 }
 
