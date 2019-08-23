@@ -93,7 +93,7 @@ where create_at>:date_from',['date_from' => $date_from]);
 left(LastUpdateDate,10) as date from amazon_orders_item left join amazon_orders on amazon_orders_item.AmazonOrderId=amazon_orders.AmazonOrderId and amazon_orders_item.SellerId=amazon_orders.SellerId where left(LastUpdateDate,10)>:date_from group by asin,amazon_orders_item.marketplaceid,date',['date_from' => $date_from]);
 		$sales_value=[];
 		foreach($sales as $sale){
-			$sales_value[$sale->asin][str_replace('.','','www.'.array_get(getSiteUrl(),$sale->marketplaceid))][$sale->date]=['sales'=>rount($sale->sales,2),'amount'=>rount($sale->amount,2)];
+			$sales_value[$sale->asin][str_replace('.','','www.'.array_get(getSiteUrl(),$sale->marketplaceid))][$sale->date]=['sales'=>round($sale->sales,2),'amount'=>round($sale->amount,2)];
 		}
  
  
