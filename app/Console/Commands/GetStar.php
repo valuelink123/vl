@@ -122,7 +122,7 @@ where last_updated>:date_from',['date_from' => $date_from]);
 						$coupon_n=round($price*$coupon_p/100);
 					}else{
 						$coupon_n=round($arr_val,2);
-						$coupon_p=round($coupon_n/$price,2)*100;
+						$coupon_p=($price)?round($coupon_n/$price,2)*100:0;
 					}
 				}
 			}
