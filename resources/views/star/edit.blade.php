@@ -28,16 +28,7 @@
 <script type="text/javascript">
 
 $(function() {
-    $('.date-picker').datepicker({
-		rtl: App.isRTL(),
-		autoclose: true
-	});
-	$('.pie_set').change(function(){
-		loadpie();
-	});
-	loadpie();
-});
-function loadpie(){
+	function loadpie(){
 	var asin_from = $('#asin_from').val();
 	var asin_to = $('#asin_to').val();
 	var lineChart = echarts.init(document.getElementById('lineChart'));
@@ -134,6 +125,16 @@ function loadpie(){
 		async: false
 	});
 }
+    $('.date-picker').datepicker({
+		rtl: App.isRTL(),
+		autoclose: true
+	});
+	$('.pie_set').change(function(){
+		loadpie();
+	});
+	loadpie();
+});
+
 
 
 </script>
