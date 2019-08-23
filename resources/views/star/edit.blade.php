@@ -40,6 +40,8 @@ $(function() {
 function loadpie(){
 	var asin_from = $('#asin_from').val();
 	var asin_to = $('#asin_to').val();
+	var lineChart = echarts.init(document.getElementById('lineChart'));
+	lineChart.showLoading();
 	$.ajax({
 		type: "POST",
 		cache: false,
@@ -48,6 +50,7 @@ function loadpie(){
 		data: {'asin_from': asin_from,'asin_to': asin_to,'asin': '<?php echo $asin;?>','domain': '<?php echo $domain;?>'},
 		success: function(res) 
 		{
+			
 			var chartX=[]; var chartY1=[];var chartY2=[];var chartY3=[];var chartY4=[];var chartY5=[];var chartY6=[];
 			$.each(res, function (k, v) {
 				chartX.push(k);
@@ -59,8 +62,7 @@ function loadpie(){
 				chartY6.push(v.rating);
 			});
 			
-			var lineChart = echarts.init(document.getElementById('lineChart'));
-
+			
 			var option = {
 				tooltip : {
 					trigger: 'axis'
@@ -126,9 +128,10 @@ function loadpie(){
 					}
 				]
 			};
+			lineChart.hideLoading();
 			lineChart.setOption(option);
 		},
-		async: false
+		async: true
 	});
 }
 
