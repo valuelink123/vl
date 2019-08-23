@@ -109,7 +109,7 @@ class InboxController extends Controller
            $inbox = Inbox::findOrFail($id);
            $inbox->reply = intval($request->get('reply'));
            if($request->get('etype')) $inbox->etype = $request->get('etype');
-           if($request->get('remark')) $inbox->remark = $request->get('remark');
+           if(isset($_REQUEST['remark'])) $inbox->remark = $request->get('remark');
 		   if($request->get('mark')) $inbox->mark = $request->get('mark');
            if($request->get('sku')) $inbox->sku = strtoupper($request->get('sku'));
 		   if($request->get('asin')) $inbox->asin = strtoupper($request->get('asin'));
