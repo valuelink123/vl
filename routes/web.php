@@ -52,6 +52,8 @@ Route::resource('phone', 'PhoneController');
 Route::Post('/phone/get', 'PhoneController@get')->name('getPhone');
 Route::get('/phoneExport', 'PhoneController@export')->name('exportPhone');//call_message功能的导出功能
 Route::Post('/star/get', 'StarController@get')->name('getStar');
+Route::Post('/star/detail', 'StarController@detail')->name('getStarDetail');
+Route::get('/star/show/{asin}/{domain}', 'StarController@show')->name('showStar');
 Route::Post('/review/get', 'ReviewController@get')->name('getReview');
 Route::Post('/review/upload', 'ReviewController@upload')->name('uploadReview');
 Route::get('/template/ajax/get', 'TemplateController@get')->name('getTemplate');

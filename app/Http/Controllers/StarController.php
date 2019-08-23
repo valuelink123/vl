@@ -7,6 +7,7 @@ use App\Asin;
 use App\User;
 use App\Star;
 use App\Starhistory;
+use App\Listinghistory;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Services\MultipleQueue;
@@ -249,7 +250,7 @@ class StarController extends Controller
 			if( $ordersList[$i]['average_score'] <$ordersList[$i]['star'] ) $diff_star = "<span class=\"label label-sm label-danger\">Danger</span>";
 			if( $ordersList[$i]['average_score'] ==$ordersList[$i]['star'] ) $diff_star = "<span class=\"label label-sm label-warning\">Warning</span>";		
 			$records["data"][] = array(
-				'<a href="https://'.$ordersList[$i]['domain'].'/dp/'.$ordersList[$i]['asin'].'" target="_blank">'.$ordersList[$i]['asin'].'</a>',
+				'<a data-target="#ajax" data-toggle="modal" href="'.url('star/show/'.$ordersList[$i]['asin'].'/'.$ordersList[$i]['domain']).'">'.$ordersList[$i]['asin'].'</a>',
 				$ordersList[$i]['asin_status']?$ordersList[$i]['asin_status']:'S',
 				$ordersList[$i]['item_no'],
 				($ordersList[$i]['item_status'])?'<span class="btn btn-success btn-xs">Reserved</span>':'<span class="btn btn-danger btn-xs">Eliminate</span>',
@@ -270,19 +271,19 @@ class StarController extends Controller
 				($ordersList[$i]['coupon_p']>$ordersList[$i]['pre_coupon_p'])?'<span class="btn btn-danger btn-xs">'.round($ordersList[$i]['coupon_p'],2).'</span>':( ($ordersList[$i]['coupon_p']<$ordersList[$i]['pre_coupon_p'])?'<span class="btn btn-success btn-xs">'.round($ordersList[$i]['coupon_p'],2).'</span>':round($ordersList[$i]['coupon_p'],2)),
 				($ordersList[$i]['coupon_n']>$ordersList[$i]['pre_coupon_n'])?'<span class="btn btn-danger btn-xs">'.round($ordersList[$i]['coupon_n'],2).'</span>':( ($ordersList[$i]['coupon_n']<$ordersList[$i]['pre_coupon_n'])?'<span class="btn btn-success btn-xs">'.round($ordersList[$i]['coupon_n'],2).'</span>':round($ordersList[$i]['coupon_n'],2)),
 				$ordersList[$i]['total_star_number'],
-				$ordersList[$i]['average_score'],
+				round($ordersList[$i]['average_score'],2),
 				$ordersList[$i]['one_star_number'],
 				$ordersList[$i]['two_star_number'],
 				$ordersList[$i]['three_star_number'],
 				$ordersList[$i]['four_star_number'],
 				$ordersList[$i]['five_star_number'],
 				$ordersList[$i]['pre_create_at'],
-				$ordersList[$i]['pre_listing_status'],
-				$ordersList[$i]['pre_price'],
-				$ordersList[$i]['pre_coupon_p'],
-				$ordersList[$i]['pre_coupon_n'],
+				($ordersList[$i]['pre_listing_status']==2)?'<span class="btn btn-success btn-xs">Available</span>':(($ordersList[$i]['pre_listing_status']==1)?'<span class="btn btn-warning btn-xs">UnAvailable</span>':'<span class="btn btn-danger btn-xs">Down</span>'),
+				round($ordersList[$i]['pre_price'],2),
+				round($ordersList[$i]['pre_coupon_p'],2),
+				round($ordersList[$i]['pre_coupon_n'],2),
 				$ordersList[$i]['pre_total_star_number'],
-				$ordersList[$i]['pre_average_score'],
+				round($ordersList[$i]['pre_average_score'],2),
 				$ordersList[$i]['pre_one_star_number'],
 				$ordersList[$i]['pre_two_star_number'],
 				$ordersList[$i]['pre_three_star_number'],
@@ -323,4 +324,30 @@ class StarController extends Controller
         return false;
     }
 
+	public function show($asin,$domain){
+		return view('star/edit',['asin'=>$asin ,'domain'=>$domain]);
+	}
+	
+	public function detail(){
+		$asin_from= array_get($_REQUEST,'asin_from');
+		$asin_to= array_get($_REQUEST,'asin_to');
+		$pie_type= array_get($_REQUEST,'pie_type');
+		$asin= array_get($_REQUEST,'asin');
+		$domain= array_get($_REQUEST,'domain');
+		$datas = Starhistory::where('asin',$asin)->where('domain',$domain)->where('create_at','<=',$asin_to)->where('create_at','>=',$asin_from)->get()->toArray();
+		foreach($datas as $data){
+			$returnData[$data['create_at']]['review']= round($data['total_star_number'],2);
+			$returnData[$data['create_at']]['rating']= round($data['average_score'],2);
+		}
+		
+		$datas = Listinghistory::where('asin',$asin)->where('domain',$domain)->where('date','<=',$asin_to)->where('date','>=',$asin_from)->get()->toArray();
+		foreach($datas as $data){
+			$returnData[$data['date']]['price']= round($data['price'],2);
+			$returnData[$data['date']]['sales']= round($data['sales'],2);
+			$returnData[$data['date']]['sale_price']= round($data['price']-$data['coupon_n'],2);
+			$returnData[$data['date']]['avg_price']= ($data['sales']>0)?round($data['amount']/$data['sales'],2):0;
+		}
+		echo json_encode($returnData);
+		
+	}
 }

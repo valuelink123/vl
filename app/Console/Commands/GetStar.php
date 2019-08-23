@@ -89,8 +89,14 @@ where create_at>:date_from',['date_from' => $date_from]);
     	}
 		
 		
-		
-		
+		$sales =  DB::connection('order')->select('select sum(quantityordered) as sales,sum(ItemPriceAmount) as amount,asin,amazon_orders_item.marketplaceid,
+left(LastUpdateDate,10) as date from amazon_orders_item left join amazon_orders on amazon_orders_item.AmazonOrderId=amazon_orders.AmazonOrderId and amazon_orders_item.SellerId=amazon_orders.SellerId where left(LastUpdateDate,10)>:date_from group by asin,amazon_orders_item.marketplaceid,date',['date_from' => $date_from]);
+		$sales_value=[];
+		foreach($sales as $sale){
+			$sales_value[$sale->asin]['www.'.array_get(getSiteUrl(),$sale->marketplaceid)][$sale->date]=['sales'=>rount($sale->sales,2),'amount'=>rount($sale->amount,2)];
+		}
+ 
+ 
 		$lists = DB::connection('review_new')->select('select * from tbl_star_system_product
 where last_updated>:date_from',['date_from' => $date_from]);
 		$patterns = '/\d+[\.,]?\d+(%)?/is';
@@ -128,6 +134,8 @@ where last_updated>:date_from',['date_from' => $date_from]);
 			[
 				'coupon_n' => $coupon_n,
 				'coupon_p' => $coupon_p,
+				'sales' => array_get($sales_value,$list->asin.'.'.$list->domain.'.'.substr($list->last_updated,0,10).'.sales',0),
+				'amount' => array_get($sales_value,$list->asin.'.'.$list->domain.'.'.substr($list->last_updated,0,10).'.amount',0),
 				'price' => $price,
 				'status' => $status
 			]);

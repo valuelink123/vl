@@ -64,7 +64,14 @@ class ExceptionController extends Controller
             $customers = $customers->where('type', array_get($_REQUEST,'type'));
         }
         if(isset($_REQUEST['status']) && $_REQUEST['status']!=''){
-            $customers = $customers->where('process_status', $_REQUEST['status']);
+			if($_REQUEST['status']=='auto_failed'){
+				$customers = $customers->where('auto_create_mcf', 1)->where('auto_create_mcf_result', -1)->where('process_status', 'auto done');
+			}elseif($_REQUEST['status']=='sap_failed'){
+				$customers = $customers->where('auto_create_sap_result', -1)->whereIn('process_status', array('auto done','done'));
+			}else{
+				$customers = $customers->where('process_status', $_REQUEST['status']);
+			}
+            
         }
         //if(Auth::user()->admin) {
 		
