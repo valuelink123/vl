@@ -218,7 +218,7 @@ th,td,td>span {
                     </div>
 					
 					<div class="btn-group " style="float:right;">
-								<div class="table-actions-wrapper" id="table-actions-wrapper">
+                        <div class="table-actions-wrapper" id="table-actions-wrapper">
 							@permission('review-batch-update')
 							<select  class="table-group-action-input form-control input-inline input-small input-sm" id="giveReviewUser">
                                 
@@ -228,14 +228,24 @@ th,td,td>span {
                             </select>
                             <button class="btn  green table-group-action-submit">
                                 <i class="fa fa-check"></i> Change</button>
+
+                            <select id="customstatus" class="table-group-action-input form-control input-inline input-small input-sm">
+                                <option value="">Select Status</option>
+                                <?php
+                                foreach($follow_status as $k=>$v){
+                                    echo '<option value="'.$k.'">'.$v.'</option>';
+                                }?>
+                            </select>
+                            <button class="btn  green table-status-action-submit">
+                                <i class="fa fa-check"></i> Update</button>
                         	@endpermission	
 							@permission('review-export')
                                 <button id="vl_list_export" class="btn sbold blue"> Export
                                     <i class="fa fa-download"></i>
                                 </button>
 								@endpermission	
-                               </div>
-                            </div>
+                        </div>
+                    </div>
                 </div>
 				
                 <div class="portlet-body">
@@ -358,6 +368,37 @@ th,td,td>span {
                 }
             });
 
+            //批量更改状态操作
+            $('#table-actions-wrapper .table-status-action-submit').click(function(e){
+                e.preventDefault();
+                var giveReviewUser = $("#customstatus", $("#table-actions-wrapper"));
+
+                if (giveReviewUser.val() != "" && grid.getSelectedRowsCount() > 0) {
+                    grid.setAjaxParam("customActionType", "status_action");
+                    grid.setAjaxParam("giveReviewStatus", giveReviewUser.val());
+                    grid.setAjaxParam("id", grid.getSelectedRows());
+                    grid.getDataTable().draw(false);
+                    //grid.clearAjaxParams();
+                } else if ( giveReviewUser.val() == "" ) {
+                    App.alert({
+                        type: 'danger',
+                        icon: 'warning',
+                        message: 'Please select an action',
+                        container: $("#table-actions-wrapper"),
+                        place: 'prepend'
+                    });
+                } else if (grid.getSelectedRowsCount() === 0) {
+                    App.alert({
+                        type: 'danger',
+                        icon: 'warning',
+                        message: 'No record selected',
+                        container: $("#table-actions-wrapper"),
+                        place: 'prepend'
+                    });
+                }
+            });
+
+            //设置负责人操作
 			$("#table-actions-wrapper").unbind("click").on('click', '.table-group-action-submit', function (e) {
                 e.preventDefault();
 				var giveReviewUser = $("#giveReviewUser", $("#table-actions-wrapper"));

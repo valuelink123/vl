@@ -379,25 +379,38 @@ class ReviewController extends Controller
     {
 		$date_from=date('Y-m-d',strtotime('-90 days'));		
 		$date_to=date('Y-m-d');	
-		if (isset($_REQUEST["customActionType"]) && $_REQUEST["customActionType"] == "group_action") {
+		if (isset($_REQUEST["customActionType"])) {
 			if(!Auth::user()->can(['review-batch-update'])) die('Permission denied -- review-batch-update');
-            $updateDate=array();
-			
-			if(array_get($_REQUEST,"giveReviewUser")){
-                $updateDate['user_id'] = array_get($_REQUEST,"giveReviewUser");
-            }
-			$updatebox = new Review;
-			
-			if($updateDate) $updatebox->whereIN('id',$_REQUEST["id"])->update($updateDate);
-            unset($updateDate);
-			foreach($_REQUEST["id"] as $up_id){
-				DB::table('review_change_log')->insert(array(
-					'review_id'=>$up_id,
-					'to_user_id'=>array_get($_REQUEST,"giveReviewUser"),
-					'user_id'=>Auth::user()->id,
-					'date'=>date('Y-m-d H:i:s')
-				));
+			$updateDate=array();
+			//修改指派人
+			if($_REQUEST["customActionType"] == "group_action"){
+				if(array_get($_REQUEST,"giveReviewUser")){
+					$updateDate['user_id'] = array_get($_REQUEST,"giveReviewUser");
+				}
+				$updatebox = new Review;
+
+				if($updateDate) $updatebox->whereIN('id',$_REQUEST["id"])->update($updateDate);
+				unset($updateDate);
+				foreach($_REQUEST["id"] as $up_id){
+					DB::table('review_change_log')->insert(array(
+						'review_id'=>$up_id,
+						'to_user_id'=>array_get($_REQUEST,"giveReviewUser"),
+						'user_id'=>Auth::user()->id,
+						'date'=>date('Y-m-d H:i:s')
+					));
+				}
 			}
+			//批量修改状态
+			if($_REQUEST["customActionType"] == "status_action"){
+				if(array_get($_REQUEST,"giveReviewStatus")){
+					$updateDate['status'] = array_get($_REQUEST,"giveReviewStatus");
+				}
+				$updatebox = new Review;
+
+				if($updateDate) $updatebox->whereIN('id',$_REQUEST["id"])->update($updateDate);
+				unset($updateDate);
+			}
+
         }
 		
 		$customers = DB::table('review')

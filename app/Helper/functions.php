@@ -67,6 +67,7 @@ function getReviewStatus(){
 		'6'=>'Closed',
 		'7'=>'Need Buy',
 		'8'=>'Need Delete',
+		'9'=>'No contacts',
     );
 }
 
@@ -790,7 +791,7 @@ function getCtgChannel()
  */
 function getRsgRequestChannel()
 {
-	return array(0=>'Web',1=>'CS team',2=>'EDM',3=>'Facebook',4=>'Sales');
+	return array(0=>'Web',1=>'CS team',2=>'EDM',3=>'Facebook',4=>'Sales',5=>'Customer Referral');
 }
 
 /*
