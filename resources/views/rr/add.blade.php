@@ -72,6 +72,7 @@
 								<option value="_GET_FBA_INVENTORY_AGED_DATA_">_GET_FBA_INVENTORY_AGED_DATA_</option>
 								<option value="_GET_FBA_FULFILLMENT_REMOVAL_ORDER_DETAIL_DATA_">_GET_FBA_FULFILLMENT_REMOVAL_ORDER_DETAIL_DATA_</option>
 								<option value="_GET_FBA_FULFILLMENT_INVENTORY_RECEIPTS_DATA_">_GET_FBA_FULFILLMENT_INVENTORY_RECEIPTS_DATA_</option>
+								<option value="_GET_FLAT_FILE_ALL_ORDERS_DATA_BY_LAST_UPDATE_">_GET_FLAT_FILE_ALL_ORDERS_DATA_BY_LAST_UPDATE_</option>
 								</select>
                             </div>
                         </div>

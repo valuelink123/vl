@@ -67,14 +67,26 @@ th,td,td>span {
                                         @endforeach
                                     </select>
 						</div>
-						
+						<div class="col-md-2">
+						<select class="form-control form-filter input-sm" name="bgbu">
+                                        <option value="">Select BG && BU</option>
+										<?php 
+										$bg='';
+										foreach($teams as $team){ 
+											if($bg!=$team->bg) echo '<option value="'.$team->bg.'_">'.$team->bg.'</option>';	
+											$bg=$team->bg;
+											if($team->bg && $team->bu) echo '<option value="'.$team->bg.'_'.$team->bu.'">'.$team->bg.' - '.$team->bu.'</option>';
+										} ?>
+                                    </select>
+						</div>	
+						<!--
 						<div class="col-md-2">
 						<select class="form-control form-filter input-sm" name="rating_status">
                                         <option value="">Rating Status</option>
                                         <option value="Above" <?php if("Above"==array_get($_REQUEST,'rating_status')) echo 'selected';?>>Above Warning Rating</option>
 										<option value="Below" <?php if("Below"==array_get($_REQUEST,'rating_status')) echo 'selected';?>>Below Warning Rating</option>
                                     </select>
-						</div>
+						</div>-->
 						<div class="col-md-2">
 						<select class="form-control form-filter input-sm" name="listing_status">
                                         <option value="">All Listing Status</option>
@@ -163,47 +175,45 @@ th,td,td>span {
                         <thead>
 							
                             <tr role="row" class="heading">
-								<th style="min-width:80px;"> Asin </th>	
-								<th style="min-width:80px;"> Level </th>	
-                                <th style="min-width:80px;"> Item No. </th>
-								<th style="min-width:80px;"> Status </th>	
-                                <th style="min-width:80px;"> Seller </th>
-                                <th style="min-width:80px;"> User </th>
+								<th style="min-width:60px;"> Asin </th>	
+								<th style="min-width:40px;"> Level </th>	
+                                <th style="min-width:50px;"> Item No. </th>
+								<th style="min-width:50px;"> Status </th>	
+                                <th style="min-width:50px;"> Seller </th>
 								<th style="min-width:100px;"> Site </th>
 
 								
-                                <th style="min-width:80px;"> Quantity Changes </th>
-                                <th style="min-width:80px;"> Rating Changes </th>
-								<th style="min-width:80px;"> Positive Changes </th>
-								<th style="min-width:80px;"> Negative Changes </th>
-								<th style="min-width:80px;"> Rating Limit </th>
-								<th style="min-width:80px;"> Rating Status </th>
-								<th style="min-width:80px;"> Increase </th>
-								<th style="min-width:80px;"> Decrease </th>
-								<th style="min-width:80px;"> Last Update</th>
-								<th style="min-width:80px;"> Listing </th>
-                                <th style="min-width:80px;"> Price </th>
-                                <th style="min-width:80px;"> Coupon % </th>
-								<th style="min-width:80px;"> Coupon $ </th>
-								<th style="min-width:80px;"> Quantity </th>
-                                <th style="min-width:80px;"> Rating </th>
-                                <th style="min-width:80px;"> 1 Star </th>
-								<th style="min-width:80px;"> 2 Stars </th>
-                                <th style="min-width:80px;"> 3 Stars </th>
-								<th style="min-width:80px;"> 4 Stars </th>
-                                <th style="min-width:80px;"> 5 Stars </th>
-								<th style="min-width:80px;"> Pre Update</th>
-								<th style="min-width:80px;"> Listing </th>
-                                <th style="min-width:80px;"> Price </th>
-                                <th style="min-width:80px;"> Coupon % </th>
-								<th style="min-width:80px;"> Coupon $ </th>
-								<th style="min-width:80px;"> Quantity </th>
-                                <th style="min-width:80px;"> Rating </th>
-                                <th style="min-width:80px;"> 1 Star </th>
-								<th style="min-width:80px;"> 2 Stars </th>
-                                <th style="min-width:80px;"> 3 Stars </th>
-								<th style="min-width:80px;"> 4 Stars </th>
-                                <th style="min-width:80px;"> 5 Stars </th>
+                                <th style="min-width:50px;"> Quantity Changes </th>
+                                <th style="min-width:50px;"> Rating Changes </th>
+								<th style="min-width:50px;"> Positive Changes </th>
+								<th style="min-width:50px;"> Negative Changes </th>
+								<th style="min-width:50px;"> Rating Limit </th>
+								<th style="min-width:50px;"> Rating Status </th>
+
+								<th style="min-width:50px;"> Last Update</th>
+								<th style="min-width:50px;"> Listing </th>
+                                <th style="min-width:50px;"> Price </th>
+                                <th style="min-width:50px;"> Coupon % </th>
+								<th style="min-width:50px;"> Coupon $ </th>
+								<th style="min-width:50px;"> Quantity </th>
+                                <th style="min-width:50px;"> Rating </th>
+                                <th style="min-width:50px;"> 1 Star </th>
+								<th style="min-width:50px;"> 2 Stars </th>
+                                <th style="min-width:50px;"> 3 Stars </th>
+								<th style="min-width:50px;"> 4 Stars </th>
+                                <th style="min-width:50px;"> 5 Stars </th>
+								<th style="min-width:50px;"> Pre Update</th>
+								<th style="min-width:50px;"> Listing </th>
+                                <th style="min-width:50px;"> Price </th>
+                                <th style="min-width:50px;"> Coupon % </th>
+								<th style="min-width:50px;"> Coupon $ </th>
+								<th style="min-width:50px;"> Quantity </th>
+                                <th style="min-width:50px;"> Rating </th>
+                                <th style="min-width:50px;"> 1 Star </th>
+								<th style="min-width:50px;"> 2 Stars </th>
+                                <th style="min-width:50px;"> 3 Stars </th>
+								<th style="min-width:50px;"> 4 Stars </th>
+                                <th style="min-width:50px;"> 5 Stars </th>
                             </tr>
 							
                             
@@ -238,7 +248,7 @@ th,td,td>span {
 			grid.setAjaxParam("star_from", $("input[name='star_from']").val());
             grid.setAjaxParam("star_to", $("input[name='star_to']").val());
             grid.setAjaxParam("user_id", $("select[name='user_id[]']").val());
-			grid.setAjaxParam("rating_status", $("select[name='rating_status']").val());
+			//grid.setAjaxParam("rating_status", $("select[name='rating_status']").val());
 			grid.setAjaxParam("keywords", $("input[name='keywords']").val());
 			grid.setAjaxParam("listing_status", $("select[name='listing_status']").val());
 			grid.setAjaxParam("price_status", $("select[name='price_status']").val());
@@ -246,6 +256,7 @@ th,td,td>span {
 			grid.setAjaxParam("coupon_than", $("select[name='coupon_than']").val());
 			grid.setAjaxParam("coupon_type", $("select[name='coupon_type']").val());
 			grid.setAjaxParam("item_status", $("select[name='item_status']").val());
+			grid.setAjaxParam("bgbu", $("select[name='bgbu']").val());
 			grid.setAjaxParam("site", $("select[name='site[]']").val());
 			grid.setAjaxParam("coupon_value", $("input[name='coupon_value']").val());
             grid.init({
@@ -285,9 +296,9 @@ th,td,td>span {
 					buttons: [],
 					
 					<?php } ?>
-					"aoColumnDefs": [ { "bSortable": false, "aTargets": [ 6,12,13,14,15,16,27,28 ] }],	
+					"aoColumnDefs": [ { "bSortable": false, "aTargets": [ 11,12,24 ] }],	
 					 "order": [
-                        [7, "asc"]
+                        [1, "asc"]
                     ],
                     // scroller extension: http://datatables.net/extensions/scroller/
                     scrollY:        500,
@@ -295,7 +306,7 @@ th,td,td>span {
 					
 
 					fixedColumns:   {
-						leftColumns:2,
+						leftColumns:5,
 						rightColumns: 0
 					},
                     "ajax": {
