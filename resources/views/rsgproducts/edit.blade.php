@@ -70,13 +70,13 @@
                             
                         </div>
 						
-						{{--<div class="form-group col-md-6">--}}
-                            {{--<label>Daily Gift Quantity</label>--}}
-                            {{----}}
-                      {{----}}
-                                {{--<input type="text" class="form-control" name="daily_stock" id="daily_stock" value="{{array_get($rule,'daily_stock')}}" required>--}}
-                           {{----}}
-                        {{--</div>--}}
+						<div class="form-group col-md-6">
+                            <label>Daily Gift Quantity</label>
+
+
+                                <input type="text" class="form-control" name="daily_stock" id="daily_stock" value="{{array_get($rule,'daily_stock')}}" required>
+
+                        </div>
 						<div class="form-group col-md-6">
                             <label>Product Name</label>
                             

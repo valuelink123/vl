@@ -251,8 +251,8 @@ Web: '.$pro_req_arr[$list['id']]['channel_web'].'';
 		}
 		
         $rule->status = 0;
-		// $rule->daily_stock = intval($request->get('daily_stock'));
-		// $rule->daily_remain = intval($request->get('daily_stock'));
+		$rule->daily_stock = intval($request->get('daily_stock'));
+		$rule->daily_remain = intval($request->get('daily_stock'));
         $rule->user_id = intval(Auth::user()->id);
 
 
@@ -308,7 +308,7 @@ Web: '.$pro_req_arr[$list['id']]['channel_web'].'';
 		$rule->positive_target = intval($request->get('positive_target'));
 		$rule->positive_daily_limit = intval($request->get('positive_daily_limit'));
         $rule->status = 0;
-		// $rule->daily_stock = intval($request->get('daily_stock'));
+		$rule->daily_stock = intval($request->get('daily_stock'));
         //$rule->user_id = intval(Auth::user()->id);
         // $rule->review_rating = intval($request->get('review_rating'));
         // $rule->number_of_reviews = intval($request->get('number_of_reviews'));
