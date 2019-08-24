@@ -431,7 +431,10 @@
 										 <div class="col-lg-2 col-md-2">
                                             <label class="control-label">ShipFrom</label>
                                             <select class="form-control shipfrom-input"  name="shipfrom" required />
-											<option value='FBM'>FBM</option>
+											<option value='HK01'>HK01</option>
+											<option value='HK03'>HK03</option>
+											<option value='UK02'>UK02</option>
+											<option value='US02'>US02</option>
 											<option value='US'>US</option>
 											<option value='GB'>GB</option>
 											<option value='DE'>DE</option>
@@ -642,16 +645,20 @@
 
         // 更新隐藏表单
         $replacementProductList.on('change', '.seller-sku-selector', function (e) {
-
+			
             let skusInfo = $(this).data('skusInfo') || {}
             let info = skusInfo[this.value]
             let $repeatRow = $(this).closest('.mt-repeater-row')
-
+			
             if(info){
-
                 $repeatRow.find('.seller_id').val(info.seller_id)
                 $repeatRow.find('.seller_sku').val(info.seller_sku)
-
+				if(info.seller_id=='FBM'){
+					let stock=info.stock
+					$repeatRow.find('.shipfrom-input').val(stock.substring(0,stock.indexOf('-')))
+				}else{
+					$repeatRow.find('.shipfrom-input').val($('#countrycode').val())
+				}
                 if(info.stock <= 0){
                     alert('The stock of this item is Zero.');
                 }
@@ -659,6 +666,7 @@
                 this.value = ''
                 $repeatRow.find('.seller_id').val('')
                 $repeatRow.find('.seller_sku').val('')
+				$repeatRow.find('.shipfrom-input').val($('#countrycode').val())
 			}
 
             let item_name = info ? info.item_name : ''
