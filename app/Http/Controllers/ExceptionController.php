@@ -798,10 +798,10 @@ class ExceptionController extends Controller
 
         }
 		if(array_get($_REQUEST,'resellerid')){
-            $customers = $customers->where('replacement', 'like', '%:"'.$_REQUEST['resellerid'].'"%');
+            $customers = $customers->where('replacement', 'like', '%s:9:"seller_id";s:3:"'.$_REQUEST['resellerid'].'";%');
         }
 		if(array_get($_REQUEST,'resku')){
-            $customers = $customers->where('replacement', 'like', '%:"'.$_REQUEST['resku'].'"%');
+            $customers = $customers->where('replacement', 'like', '%:"'.$_REQUEST['resku'].'";%');
         }
 
         if(array_get($_REQUEST,'date_from')){
