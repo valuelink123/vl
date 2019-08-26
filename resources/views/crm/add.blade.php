@@ -94,6 +94,27 @@
                                                 </select>
                                             </div>
                                         </div>
+                                        {{--新添加的Customer's FB Name和FB Group--}}
+                                        <div class="form-group">
+                                            <label>
+                                                Customer's FB Name
+                                                <input autocomplete="off" class="xform-autotrim form-control" placeholder="Facebook Name" name="facebook_name"/>
+                                            </label>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>
+                                                FB Group
+                                                <input id="facebook_group" class="form-control xform-autotrim" name="facebook_group" list="list-facebook_group" placeholder="Facebook Group" autocomplete="off" />
+                                                <datalist id="list-facebook_group">
+                                                    @foreach(getFacebookGroup() as $id=>$name)
+                                                        <option value="{!! $id !!} | {!! $name !!}"></option>
+                                                    @endforeach
+                                                </datalist>
+
+                                            </label>
+                                        </div>
+
                                         <div style="clear:both;"></div>
                                     </div>
 

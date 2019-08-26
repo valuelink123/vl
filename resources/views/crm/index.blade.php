@@ -63,7 +63,7 @@
         <div class="portlet-body">
             <div class="table-toolbar" id="thetabletoolbar">
                 <div class="row">
-                    <div class="col-md-2">
+                    <div class="col-md-3">
                         <div class="input-group">
                             <span class="input-group-addon">From</span>
                             <input class="form-control" data-options="format:'yyyy-mm-dd'" value="{!! $date_from !!}" data-init-by-query="daterange.from" id="date_from"
@@ -73,6 +73,16 @@
                         <div class="input-group">
                             <span class="input-group-addon">To</span>
                             <input class="form-control" data-options="format:'yyyy-mm-dd'" value="{!! $date_to !!}" data-init-by-query="daterange.to" id="date_to" autocomplete="off"/>
+                        </div>
+                        <br/>
+                        <div class="input-group">
+                            <span class="input-group-addon">facebook_group</span>
+                            <input id="facebook_group" class="form-control xform-autotrim" name="facebook_group" list="list-facebook_group" placeholder="Facebook Group" autocomplete="off" />
+                            <datalist id="list-facebook_group">
+                                @foreach(getFacebookGroup() as $id=>$name)
+                                    <option value="{!! $id !!} | {!! $name !!}"></option>
+                                @endforeach
+                            </datalist>
                         </div>
                     </div>
                     <div class="col-md-2">
@@ -236,7 +246,7 @@
                 ands: {
                     email: email.value,
                     amazon_order_id: amazon_order_id.value,
-                    // item_model: item_model.value
+                    facebook_group: facebook_group.value
                 },
                 ins: {
                     processor: $('#processor').val(),

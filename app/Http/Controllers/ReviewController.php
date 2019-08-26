@@ -153,7 +153,7 @@ class ReviewController extends Controller
 		$date_to=date('Y-m-d');	
 		
 		$customers = DB::table('review')
-			->select('review.*','asin.status as asin_status','customers.email as email','customers.phone as phone','customers.other as other','review_customers.email as email_add','review_customers.phone as phone_add','review_customers.other as other_add','star.average_score as average_score','star.total_star_number as total_star_number')
+			->select('review.*','asin.status as asin_status','asin.bg as bg','asin.bu as bu','customers.email as email','customers.phone as phone','customers.other as other','review_customers.email as email_add','review_customers.phone as phone_add','review_customers.other as other_add','star.average_score as average_score','star.total_star_number as total_star_number')
 			->leftJoin(DB::raw('(select max(status) as status,asin,site,max(bg) as bg,max(bu) as bu from asin group by asin,site) as asin'),function($q){
 				$q->on('review.asin', '=', 'asin.asin')
 					->on('review.site', '=', 'asin.site');
@@ -293,6 +293,8 @@ class ReviewController extends Controller
 		$headArray[] = 'Review Email';
 		$headArray[] = 'Review Phone';
 		$headArray[] = 'Review Other';
+		$headArray[] = 'BG';
+		$headArray[] = 'BU';
 
 		$arrayData[] = $headArray;
 		$users_array = $this->getUsers();
@@ -331,7 +333,9 @@ class ReviewController extends Controller
 				$review['other'],
 				$review['email_add'],
 				$review['phone_add'],
-				$review['other_add']
+				$review['other_add'],
+				$review['bg'],
+				$review['bu']
 				
             );
 		}

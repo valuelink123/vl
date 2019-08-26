@@ -149,6 +149,8 @@ class CrmController extends Controller
 				}else{
 					$where .= ' and 1 !=1 ';
 				}
+			}elseif($field=='facebook_group'){
+				$where .= " and c.facebook_group = ".intval($value);
 			}else{
 				$whereInfo .= " and {$field}='{$value}'";
 			}
@@ -236,12 +238,13 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 		$contactInfo = array();
 		$contactBasic['id'] = $id;
 		if($id){
-			$sql = "select b.client_id as id,b.id as info_id,c.id as cid,b.name as name,b.email as email,b.phone as phone,b.country as country,b.`from` as `from`,b.brand as brand,c.amazon_order_id as amazon_order_id,c.order_type as order_type 
+			$sql = "select b.client_id as id,b.id as info_id,c.id as cid,b.name as name,b.email as email,b.phone as phone,b.country as country,b.`from` as `from`,b.brand as brand,b.facebook_group as facebook_group,b.facebook_name as facebook_name,c.amazon_order_id as amazon_order_id,c.order_type as order_type 
 			FROM client_info as b
 			left join client_order_info as c on b.id = c.ci_id
 			where b.client_id = $id
 			order by b.id asc ";
 			$_data = $this->queryRows($sql);
+			$fbgroupConfig = getFacebookGroup();
 			foreach($_data as $key=>$val){
             	//联系人基本信息
 				$contactInfo[$val['email']]['info_id'] = $val['info_id'];
@@ -255,6 +258,8 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 				$contactBasic['name'] = $val['name'];
 				$contactBasic['brand'] = $val['brand'];
 				$contactBasic['from'] = $val['from'];
+				$contactBasic['facebook_name'] = $val['facebook_name'];
+				$contactBasic['facebook_group'] = isset($fbgroupConfig[$val['facebook_group']]) ? $val['facebook_group'].' | '.$fbgroupConfig[$val['facebook_group']] : $val['facebook_group'];
 			}
 		}
 		if(!isset($contactBasic['name'])){
@@ -301,7 +306,7 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 			//修改client表的更新时间
 			DB::table('client')->where('id', $data['id'])->update(['updated_at'=>date('Y-m-d H:i:s')]);
 		}
-		$insertInfo = array('client_id'=>$data['id'],'name'=>$data['name'],'country'=>$data['country'],'from'=>$data['from'],'brand'=>$data['brand']);
+		$insertInfo = array('client_id'=>$data['id'],'name'=>$data['name'],'country'=>$data['country'],'from'=>$data['from'],'brand'=>$data['brand'],'facebook_name'=>$data['facebook_name'],'facebook_group'=>intval($data['facebook_group']));
 		//查出client_info表的id,把之前的该客户的client_info数据删掉
 		$_ciids = DB::table('client_info')->select('id')->where('client_id',$old_id)->get()->toArray();
 		$ciids = array();

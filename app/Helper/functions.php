@@ -606,7 +606,7 @@ function getCrmCountry()
 //CRM模块可供下拉选择的Source
 function getCrmFrom()
 {
-	return array('BOGO','Call','Cashback','Chat','CTG','Email','Facebook','Non-CTG','Purchased','Reveiw','RSG','Others');
+	return array('BOGO','Call','Cashback','Chat','CTG','Email','Facebook','Non-CTG','Purchased','Reveiw','RSG','Others','B2B');
 }
 
 //CRM模块可供下拉选择的brand
