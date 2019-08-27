@@ -110,6 +110,9 @@ or tbl_review_hunter_review.created_at>=:date_from1)",['date_from' => $date_from
 	when rating=2 then 8
 	when rating=3 then 6
 	else 0
+	End)+(case 
+	when warn=1 then 10
+	else 0
 	End),0) where date>'2015-01-01' and `status` =1");
 	
 	}

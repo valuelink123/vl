@@ -521,7 +521,7 @@ class ReviewController extends Controller
 
 
 
-		$orderby = 'date';
+		$orderby = 'negative_value';
         $sort = 'desc';
         if(isset($_REQUEST['order'][0])){
 			 if($_REQUEST['order'][0]['column']==1) $orderby = 'negative_value';

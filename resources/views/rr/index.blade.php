@@ -24,6 +24,12 @@
                                 </a>
                             </div>
 							@endpermission
+                            <div class="btn-group">
+                                <button id="batch_del" class="btn sbold red"> Delete Selected
+                                    <i class="fa fa-del"></i>
+                                </button>
+                               
+                            </div>
                         </div>
                         <!--
                         <div class="col-md-6">
@@ -42,11 +48,18 @@
                         -->
                     </div>
                 </div>
+				
                 <div class="portlet-body">
 
-                    <table class="table table-striped table-bordered table-hover order-column" id="manage_report">
+                    <table class="table table-striped table-bordered table-hover table-checkable" id="manage_report">
                         <thead>
                         <tr>
+							<th><label class="mt-checkbox mt-checkbox-single mt-checkbox-outline">
+                                        <input type="checkbox" class="group-checkable" data-set="#manage_report .checkboxes" />
+                                        <span></span>
+                                    </label>
+									
+							</th>
                             <th> Account </th>
                             <th> Report Type </th>
 							<th> Report Date </th>
@@ -59,6 +72,11 @@
                         <tbody>
                         @foreach ($datas as $data)
                             <tr class="odd gradeX">
+								<td>
+								<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline">
+									<input name="id[]" type="checkbox" class="checkboxes" value="{{$data->id}}"/><span></span>
+								</label>
+								</td>
                                 <td>
                                     {{array_get($accounts,$data->SellerId.'.name').' -- '.array_get($accounts,$data->SellerId.'.area')}}
                                 </td>
@@ -137,7 +155,7 @@
                         }
                     },
 
-                    "bStateSave": true, // save datatable state(pagination, sort, etc) in cookie.
+                    //"bStateSave": true, // save datatable state(pagination, sort, etc) in cookie.
 
                     "lengthMenu": [
                         [5, 15, 20, -1],
@@ -151,10 +169,32 @@
                         {
                             "className": "dt-right",
                             //"targets": [2]
-                        }
+                        },
+						{
+							"searchable": false,
+							"targets": [0]
+						}
                     ],
-					
+					"aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0  ] }],
                 });
+				
+				table.find('.group-checkable').change(function () {
+					var set = jQuery(this).attr("data-set");
+					var checked = jQuery(this).is(":checked");
+					jQuery(set).each(function () {
+						if (checked) {
+							$(this).prop("checked", true);
+							$(this).parents('tr').addClass("active");
+						} else {
+							$(this).prop("checked", false);
+							$(this).parents('tr').removeClass("active");
+						}
+					});
+				});
+		
+				table.on('change', 'tbody tr .checkboxes', function () {
+					$(this).parents('tr').toggleClass("active");
+				});
 
             }
 
@@ -177,6 +217,15 @@
 
 
             TableDatatablesManaged.init();
+			
+			$("#batch_del").click(function(){
+				var id_array=new Array();  
+				$('input[name="id[]"]:checked').each(function(){  
+					id_array.push($(this).val());
+				});  
+				var idstr=id_array.join(',');
+				location.href='/rr?batch_del='+idstr;
+			});
         });
 
 

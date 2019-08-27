@@ -27,9 +27,11 @@ class RrController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         if(!Auth::user()->can(['requestreport-show'])) die('Permission denied -- requestreport-show');
+		$batch_del = $request->get('batch_del');
+		if($batch_del) DB::connection('order')->table('request_report')->whereIn('id',explode(',',$batch_del))->delete();
         $datas= DB::connection('order')->table('request_report')->orderBy('RequestDate','Desc')->get()->toArray();
         return view('rr/index',['datas'=>$datas,'users'=>$this->getUsers(),'accounts'=>$this->getAccounts()]);
 
