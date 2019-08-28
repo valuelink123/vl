@@ -62,13 +62,17 @@ class Kernel extends ConsoleKernel
 			DB::update("update rsg_products set status = 3 where status>-1 and end_date<'".date('Y-m-d')."';");
         })->dailyAt('08:00');
         $accountList = DB::table('accounts')->get(array('id'));
-        $i=0;
+        $i=$x=0;
         foreach($accountList as $account){
             if($i>29) $i=0;
 			$num_i = sprintf("%02d",$i);
             $schedule->command('get:email '.$account->id)->cron($num_i.' * * * *')->name($account->id.'_get_emails_0')->withoutOverlapping();
 			$schedule->command('get:email '.$account->id)->cron(($num_i+30).' * * * *')->name($account->id.'_get_emails_30')->withoutOverlapping();
             $i++;
+			if($x>59) $x=0;
+			$schedule->command('get:email '.$account->id.' 1day')->cron($x.' 18 * * *')->name($account->id.'_get_emails_23')->withoutOverlapping();
+			$schedule->command('get:email '.$account->id.' 1day')->cron($x.' 6 * * *')->name($account->id.'_get_emails_11')->withoutOverlapping();
+			$x++;
         }
 
         $schedule->command('scan:send')->cron('*/5 * * * *')->name('sendmails')->withoutOverlapping();
