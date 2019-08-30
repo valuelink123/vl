@@ -477,7 +477,7 @@ class ReviewController extends Controller
 		if(array_get($_REQUEST,'asin_status')){
             $customers = $customers->whereIn('asin.status',array_get($_REQUEST,'asin_status'));
         }
-		if(Auth::user()->admin){
+		if(Auth::user()->can(['review-show-all'])){
 			if(array_get($_REQUEST,'user_id')){
 				$customers = $customers->whereIn('review.user_id',array_get($_REQUEST,'user_id'));
 			}
