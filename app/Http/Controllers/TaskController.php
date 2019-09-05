@@ -204,19 +204,15 @@ class TaskController extends Controller
     public function update(Request $request,$id)
     {
 		if(!Auth::user()->can(['task-update'])) die('Permission denied -- task-update');
-        $this->validate($request, [
-			'user_id' => 'required|int',
-			'type' => 'required|int',
-			'priority' => 'required|int',
-			'complete_date' => 'required|string',
-			'request' => 'required|string',
-        ]);
 
         $rule = Task::findOrFail($id);
 		if($rule->response_user_id == Auth::user()->id ){
 			$rule->response_date = date('Y-m-d H:i:s');
 			$rule->response = $request->get('response');
 			$rule->stage = intval($request->get('stage'));
+			$rule->asin = $request->get('asin');
+			$rule->sku = $request->get('sku');
+			$rule->customer_email = $request->get('customer_email');
 		}
 		if($rule->request_user_id == Auth::user()->id ){
 			$rule->type = intval($request->get('type'));
@@ -226,10 +222,11 @@ class TaskController extends Controller
 			$rule->response_user_id = intval($request->get('user_id'));
 			$rule->complete_date = $request->get('complete_date');
 			$rule->score = intval($request->get('score'));
+			$rule->asin = $request->get('asin');
+			$rule->sku = $request->get('sku');
+			$rule->customer_email = $request->get('customer_email');
 		}
-		$rule->asin = $request->get('asin');
-		$rule->sku = $request->get('sku');
-		$rule->customer_email = $request->get('customer_email');
+		
         
         $result = $rule->save();
         echo json_encode($result);
