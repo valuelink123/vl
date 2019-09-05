@@ -289,19 +289,19 @@ class RsgrequestsController extends Controller
         $rule->user_id = intval(Auth::user()->id);
 		$rule->auto_send_status = intval( $request->get('auto_send_status'));
 
-		//一个客户对一个产品只能申请一次，可以申请多个不同的产品，但是必须是上个产品complete7天后才能申请
+		//一个客户对一个产品只能申请一次，可以申请多个不同的产品，但是必须是上个产品complete后才能申请
 		$ruleData = $rule->where('customer_email',$rule->customer_email)->where('product_id',$rule->product_id)->take(1)->get()->toArray();
 		if($ruleData){
 			//该客户已经申请过该产品
 			$request->session()->flash('error_message','Rsg Request Failed,One customer cannot test two identical products');
 			return redirect()->back()->withInput();
 		}
-		//检查该客户最近一次申请产品是什么时候，要在上次申请完成后的7天后才能再申请
+		//检查该客户最近一次申请产品是什么时候，要在上次申请完成后才能再申请
 		$customerData = $rule->where('customer_email',$rule->customer_email)->orderBy('updated_at', 'desc')->take(1)->get()->toArray();
 		if($customerData){
-			$day = (time()-strtotime($customerData[0]['updated_at']))/86400;
-			if(!($customerData[0]['step']==9 && $day>7)){
-				$request->session()->flash('error_message','Rsg Request Failed,Customers only can test again after 7 days when he/she finishs last test.');
+			// $day = (time()-strtotime($customerData[0]['updated_at']))/86400;
+			if(!($customerData[0]['step']==9)){
+				$request->session()->flash('error_message',"Rsg Request Failed,Don't complete previous test yet");
 				return redirect()->back()->withInput();
 			}
 		}
@@ -404,7 +404,7 @@ class RsgrequestsController extends Controller
         $product_id = intval($request->get('product_id'));
         //当现在选择的产品跟原来的产品数据不一致的时候，才要判断客户跟产品等信息
         if($product_id != $rule->product_id) {
-			//一个客户对一个产品只能申请一次，可以申请多个不同的产品，但是必须是上个产品complete7天后才能申请
+			//一个客户对一个产品只能申请一次，可以申请多个不同的产品，但是必须是上个产品complete后才能申请
 			$ruleData = $rule->where('customer_email', $rule->customer_email)->where('product_id', $product_id)->take(1)->get()->toArray();
 			if ($ruleData) {
 				//该客户已经申请过该产品
