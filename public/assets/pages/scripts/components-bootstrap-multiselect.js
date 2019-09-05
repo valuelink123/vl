@@ -13,7 +13,7 @@ var ComponentsBootstrapMultiselect = function () {
         		var width = ($(this).data('width')) ? $(this).data('width') : '' ;
         		var height = ($(this).data('height')) ? $(this).data('height') : '' ;
         		var filter = ($(this).data('filter')) ? $(this).data('filter') : false ;
-
+				var noneSelectedText = ($(this).data('none-selected-text')) ? $(this).data('none-selected-text') : 'None Selected' ;
         		// advanced functions
         		var onchange_function = function(option, checked, select) {
 	                //alert('Changed option ' + $(option).val() + '.');
@@ -53,6 +53,7 @@ var ComponentsBootstrapMultiselect = function () {
         			onDropdownShow: dropdownshow,
         			onDropdownHide: dropdownhide,
         			buttonClass: btn_class,
+					nonSelectedText: noneSelectedText,
         			//optionClass: function(element) { return "mt-checkbox"; },
         			//optionLabel: function(element) { console.log(element); return $(element).html() + '<span></span>'; },
         			/*templates: {

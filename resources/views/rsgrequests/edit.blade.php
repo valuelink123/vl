@@ -238,4 +238,3 @@
             $("#product_id").trigger("change");
         });
 	</script>
-

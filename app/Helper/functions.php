@@ -853,3 +853,14 @@ function getFacebookGroup()
 	);
 	return $arr;
 }
+
+
+function getTaskTypeArr()
+{
+	return array(1=>'Listing优化',2=>'库存调拨',3=>'星级提升');
+}
+
+function getTaskStageArr()
+{
+	return array(0=>'None',1=>'Opening',2=>'Under Review',3=>'Finished');
+}

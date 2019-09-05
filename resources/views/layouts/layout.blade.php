@@ -311,6 +311,21 @@
                     ?>
                     <!-- END SIDEBAR TOGGLER BUTTON -->
                     <!-- DOC: To remove the search box from the sidebar you just need to completely remove the below "sidebar-search-wrapper" LI element -->
+					@permission('task-show')
+                    <li class="nav-item <?php if($action=='task') echo 'active';?> ">
+
+							<a href="{{ url('task') }}" class="nav-link nav-toggle">
+
+                            <i class="fa fa-tasks"></i>
+
+                            <span class="title">Tasks</span>
+                            <!--<span class="arrow"></span>-->
+                            <?php if($action=='task') echo '<span class="selected"></span>';?>
+
+                        </a>
+
+                    </li>
+					@endpermission
 
 
 					@permission('compose')
