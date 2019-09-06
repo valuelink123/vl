@@ -57,7 +57,7 @@ class GetStar extends Command
 			'www.amazon.fr'=>6,
 			'www.amazon.it'=>8,
 			'www.amazon.co.uk'=>9,
-			'www.amazon.co.jp'=>10,
+			'www.amazon.co.jp'=>10
 			
 		);
 		
@@ -160,7 +160,7 @@ where last_updated>:date_from',['date_from' => $date_from]);
 					]
 					,
 					$data
-				]);
+				);
 			}catch (\Exception $e){
 				Log::Info($e->getMessage());
 			}	
