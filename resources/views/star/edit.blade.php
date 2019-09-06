@@ -43,7 +43,7 @@ $(function() {
 		success: function(res) 
 		{
 			
-			var chartX=[]; var chartY1=[];var chartY2=[];var chartY3=[];var chartY4=[];var chartY5=[];var chartY6=[];
+			var chartX=[]; var chartY1=[];var chartY2=[];var chartY3=[];var chartY4=[];var chartY5=[];var chartY6=[];var chartY7=[];var chartY8=[];var chartY9=[];
 			$.each(res, function (k, v) {
 				chartX.push(k);
 				chartY1.push(v.price);
@@ -52,6 +52,9 @@ $(function() {
 				chartY4.push(v.sales);
 				chartY5.push(v.review);
 				chartY6.push(v.rating);
+				chartY7.push(v.sessions);
+				chartY8.push(v.unit_session_percentage);
+				chartY9.push(v.bsr);
 			});
 			
 			
@@ -61,11 +64,15 @@ $(function() {
 				},
 				legend: {
 					x: 'left',
-					data:['Price','Sale Price','Avg Price','Sold Qty','Review Count','Rating']
+					itemWidth:10,
+					itemHeight:10,
+					selectedMode: 'multiple',
+					data:['Price','Sale Price','Avg Price','Sold Qty','Review Count','Rating','Sessions','UnitSessionPercentage','BSR']
 				},
 
 				toolbox: {
 					show : true,
+					orient : 'vertical',
 					feature : {
 						mark : {show: true},
 						dataView : {show: true, readOnly: false},
@@ -117,6 +124,21 @@ $(function() {
 						name:'Rating',
 						type:'line',
 						data:chartY6
+					},
+					{
+						name:'Sessions',
+						type:'line',
+						data:chartY7
+					},
+					{
+						name:'UnitSessionPercentage',
+						type:'line',
+						data:chartY8
+					},
+					{
+						name:'BSR',
+						type:'line',
+						data:chartY9
 					}
 				]
 			};

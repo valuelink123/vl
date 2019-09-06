@@ -60,20 +60,21 @@ class StarController extends Controller
 			pre_star.total_star_number as pre_total_star_number,
 			pre_star.average_score as pre_average_score,
 			pre_star.create_at as pre_create_at,
-			asin.item_status,asin.asin_status,asin.seller,asin.bg,asin.bu,asin.review_user_id as user_id,asin.item_no,asin.star,
-			listing.price,listing.status as listing_status,listing.coupon_p,listing.coupon_n,
-			pre_listing.price as pre_price,pre_listing.status as pre_listing_status,pre_listing.coupon_p as pre_coupon_p,pre_listing.coupon_n as pre_coupon_n'))
+			
+			pre_star.coupon_p as pre_coupon_p,
+			pre_star.coupon_n as pre_coupon_n,
+			pre_star.price as pre_price,
+			pre_star.sales as pre_sales,
+			pre_star.amount as pre_amount,
+			pre_star.sessions as pre_sessions,
+			pre_star.unit_session_percentage as pre_unit_session_percentage,
+			pre_star.bsr as pre_bsr,
+			pre_star.status as pre_status,
+
+			asin.item_status,asin.asin_status,asin.seller,asin.bg,asin.bu,asin.review_user_id as user_id,asin.item_no,asin.star'))
 			->leftJoin( DB::raw("(select * from star_history where create_at = '".$date_to."') as pre_star") ,function($q){
 				$q->on('star.asin', '=', 'pre_star.asin')
 					->on('star.domain', '=', 'pre_star.domain');
-			})
-			->leftJoin( DB::raw("(select * from listing_history where date = '".$date_to."') as pre_listing") ,function($q){
-				$q->on('star.asin', '=', 'pre_listing.asin')
-					->on('star.domain', '=', 'pre_listing.domain');
-			})
-			->leftJoin( DB::raw("(select * from listing_history where date = '".$date_from."') as listing") ,function($q){
-				$q->on('star.asin', '=', 'listing.asin')
-					->on('star.domain', '=', 'listing.domain');
 			})
 			->leftJoin( DB::raw("(select max(star) as star,max(item_no) as item_no,max(bg) as bg,max(bu) as bu,max(seller) as seller,max(review_user_id) as review_user_id,max(item_status) as item_status, min(case when status = 'S' Then '0' else status end) as asin_status,asin,site from asin where length(asin)=10 group by asin,site) as asin") ,function($q){
 				$q->on('star.asin', '=', 'asin.asin')
@@ -131,15 +132,15 @@ class StarController extends Controller
 		}
 		
 		if(array_get($_REQUEST,'listing_status')){
-			$customers = $customers->where('listing.status',intval($_REQUEST['listing_status'])-1);
+			$customers = $customers->where('star.status',intval($_REQUEST['listing_status'])-1);
 		}
 		
 		if(array_get($_REQUEST,'price_status')){
-			$customers = $customers->whereRaw('listing.price '.array_get($_REQUEST,'price_status').' pre_listing.price');
+			$customers = $customers->whereRaw('star.price '.array_get($_REQUEST,'price_status').' pre_star.price');
 		}
 		
 		if(array_get($_REQUEST,'coupon_than') && array_get($_REQUEST,'coupon_type') && array_get($_REQUEST,'coupon_value')){
-			$customers = $customers->where('listing.'.array_get($_REQUEST,'coupon_type'),array_get($_REQUEST,'coupon_than'),array_get($_REQUEST,'coupon_value'));
+			$customers = $customers->where('star.'.array_get($_REQUEST,'coupon_type'),array_get($_REQUEST,'coupon_than'),array_get($_REQUEST,'coupon_value'));
 		}
 		
 		if(array_get($_REQUEST,'star_from')) $customers = $customers->where('star.average_score','>=',round(array_get($_REQUEST,'star_from'),1));
@@ -163,10 +164,10 @@ class StarController extends Controller
 			if($_REQUEST['order'][0]['column']==9) $orderby = DB::raw("((star.one_star_number+star.two_star_number+star.three_star_number) -( case when (pre_star.one_star_number+pre_star.two_star_number+pre_star.three_star_number)>0 then (pre_star.one_star_number+pre_star.two_star_number+pre_star.three_star_number) else 0 end))");
 			if($_REQUEST['order'][0]['column']==10) $orderby = 'asin.star';
 			
-			if($_REQUEST['order'][0]['column']==13) $orderby = 'listing.status';
-			if($_REQUEST['order'][0]['column']==14) $orderby = 'listing.price';
-			if($_REQUEST['order'][0]['column']==15) $orderby = 'listing.coupon_p';
-			if($_REQUEST['order'][0]['column']==16) $orderby = 'listing.coupon_n';
+			if($_REQUEST['order'][0]['column']==13) $orderby = 'star.status';
+			if($_REQUEST['order'][0]['column']==14) $orderby = 'star.price';
+			if($_REQUEST['order'][0]['column']==15) $orderby = 'star.coupon_p';
+			if($_REQUEST['order'][0]['column']==16) $orderby = 'star.coupon_n';
 			
 			
 			if($_REQUEST['order'][0]['column']==17) $orderby = 'star.total_star_number';
@@ -177,10 +178,10 @@ class StarController extends Controller
 			if($_REQUEST['order'][0]['column']==22) $orderby = 'star.four_star_number';
 			if($_REQUEST['order'][0]['column']==23) $orderby = 'star.five_star_number';
 			
-			if($_REQUEST['order'][0]['column']==25) $orderby = 'pre_listing.status';
-			if($_REQUEST['order'][0]['column']==26) $orderby = 'pre_listing.price';
-			if($_REQUEST['order'][0]['column']==27) $orderby = 'pre_listing.coupon_p';
-			if($_REQUEST['order'][0]['column']==28) $orderby = 'pre_listing.coupon_n';
+			if($_REQUEST['order'][0]['column']==25) $orderby = 'pre_star.status';
+			if($_REQUEST['order'][0]['column']==26) $orderby = 'pre_star.price';
+			if($_REQUEST['order'][0]['column']==27) $orderby = 'pre_star.coupon_p';
+			if($_REQUEST['order'][0]['column']==28) $orderby = 'pre_star.coupon_n';
 			
 			if($_REQUEST['order'][0]['column']==29) $orderby = 'pre_star.total_star_number';
 			if($_REQUEST['order'][0]['column']==30) $orderby = 'pre_star.average_score';
@@ -255,7 +256,7 @@ class StarController extends Controller
 				$diff_star,
 
 				$ordersList[$i]['create_at'],
-				($ordersList[$i]['listing_status']==2)?'<span class="btn btn-success btn-xs">Available</span>':(($ordersList[$i]['listing_status']==1)?'<span class="btn btn-warning btn-xs">UnAvailable</span>':'<span class="btn btn-danger btn-xs">Down</span>'),
+				($ordersList[$i]['status']==2)?'<span class="btn btn-success btn-xs">Available</span>':(($ordersList[$i]['status']==1)?'<span class="btn btn-warning btn-xs">UnAvailable</span>':'<span class="btn btn-danger btn-xs">Down</span>'),
 				($ordersList[$i]['price']>$ordersList[$i]['pre_price'])?'<span class="btn btn-danger btn-xs">'.round($ordersList[$i]['price'],2).'</span>':( ($ordersList[$i]['price']<$ordersList[$i]['pre_price'])?'<span class="btn btn-success btn-xs">'.round($ordersList[$i]['price'],2).'</span>':round($ordersList[$i]['price'],2)),
 				($ordersList[$i]['coupon_p']>$ordersList[$i]['pre_coupon_p'])?'<span class="btn btn-danger btn-xs">'.round($ordersList[$i]['coupon_p'],2).'</span>':( ($ordersList[$i]['coupon_p']<$ordersList[$i]['pre_coupon_p'])?'<span class="btn btn-success btn-xs">'.round($ordersList[$i]['coupon_p'],2).'</span>':round($ordersList[$i]['coupon_p'],2)),
 				($ordersList[$i]['coupon_n']>$ordersList[$i]['pre_coupon_n'])?'<span class="btn btn-danger btn-xs">'.round($ordersList[$i]['coupon_n'],2).'</span>':( ($ordersList[$i]['coupon_n']<$ordersList[$i]['pre_coupon_n'])?'<span class="btn btn-success btn-xs">'.round($ordersList[$i]['coupon_n'],2).'</span>':round($ordersList[$i]['coupon_n'],2)),
@@ -267,7 +268,7 @@ class StarController extends Controller
 				$ordersList[$i]['four_star_number'],
 				$ordersList[$i]['five_star_number'],
 				$ordersList[$i]['pre_create_at'],
-				($ordersList[$i]['pre_listing_status']==2)?'<span class="btn btn-success btn-xs">Available</span>':(($ordersList[$i]['pre_listing_status']==1)?'<span class="btn btn-warning btn-xs">UnAvailable</span>':'<span class="btn btn-danger btn-xs">Down</span>'),
+				($ordersList[$i]['pre_status']==2)?'<span class="btn btn-success btn-xs">Available</span>':(($ordersList[$i]['pre_status']==1)?'<span class="btn btn-warning btn-xs">UnAvailable</span>':'<span class="btn btn-danger btn-xs">Down</span>'),
 				round($ordersList[$i]['pre_price'],2),
 				round($ordersList[$i]['pre_coupon_p'],2),
 				round($ordersList[$i]['pre_coupon_n'],2),
@@ -327,14 +328,13 @@ class StarController extends Controller
 		foreach($datas as $data){
 			$returnData[$data['create_at']]['review']= round($data['total_star_number'],2);
 			$returnData[$data['create_at']]['rating']= round($data['average_score'],2);
-		}
-		
-		$datas = Listinghistory::where('asin',$asin)->where('domain',$domain)->where('date','<=',$asin_to)->where('date','>=',$asin_from)->get()->toArray();
-		foreach($datas as $data){
-			$returnData[$data['date']]['price']= round($data['price'],2);
-			$returnData[$data['date']]['sales']= round($data['sales'],2);
-			$returnData[$data['date']]['sale_price']= round($data['price']-$data['coupon_n'],2);
-			$returnData[$data['date']]['avg_price']= ($data['sales']>0)?round($data['amount']/$data['sales'],2):0;
+			$returnData[$data['create_at']]['price']= round($data['price'],2);
+			$returnData[$data['create_at']]['sales']= round($data['sales'],2);
+			$returnData[$data['create_at']]['sale_price']= round($data['price']-$data['coupon_n'],2);
+			$returnData[$data['create_at']]['avg_price']= ($data['sales']>0)?round($data['amount']/$data['sales'],2):0;
+			$returnData[$data['create_at']]['sessions']= round($data['sessions'],2);
+			$returnData[$data['create_at']]['unit_session_percentage']= round($data['unit_session_percentage'],2);
+			$returnData[$data['create_at']]['bsr']= round($data['bsr'],2);
 		}
 		echo json_encode($returnData);
 		
