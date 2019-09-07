@@ -369,7 +369,7 @@ th,td,td>span {
             });
 
             //批量更改状态操作
-            $('#table-actions-wrapper .table-status-action-submit').click(function(e){
+            $(".btn-group").unbind("click").on('click', '.table-status-action-submit', function (e) {
                 e.preventDefault();
                 var giveReviewUser = $("#customstatus", $("#table-actions-wrapper"));
 

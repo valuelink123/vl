@@ -5,6 +5,7 @@
 	.active{
 		color:black;
 	}
+	#product_id optgroup{color:black;}
 </style>
     <div class="row"><div class="col-md-12">
         <div class="portlet light bordered">
@@ -39,7 +40,7 @@
 				</div>
 				
 				<div class="clearfix margin-bottom-20"></div>
-						<div class="form-group col-md-12">
+						<div class="form-group col-md-9">
                             <label>Products</label>
                             
                              
@@ -60,6 +61,10 @@
 								</select>
                             
                         </div>
+						<div class="form-group col-md-3">
+							<label></label>
+							<input id="search_product" type="text" class="form-control" placeholder="search product">
+						</div>
 						
                         <div class="form-group col-md-6">
                             <label>Customer Email</label>
@@ -236,5 +241,18 @@
 
         $(function() {
             $("#product_id").trigger("change");
+
+            $("#search_product").keyup(function(){
+                var search_value = $(this).val().toUpperCase();
+                $('#product_id option').each(function (index,element){
+                    var content = $(element).text().toUpperCase();
+                    if(content.indexOf(search_value) >= 0 ) {
+                        //包含搜索的内容
+                        $(this).show();
+                    }else{
+                        $(this).hide();
+                    }
+                });
+            });
         });
 	</script>
