@@ -7,5 +7,6 @@ class Starhistory extends Model
 {
     //
     protected $table = 'star_history';
-    public $timestamps = true;
+    protected $guarded = [];
+    public $timestamps = false;
 }
