@@ -5,9 +5,8 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use PhpImap;
 use Illuminate\Support\Facades\Input;
-use App\Star;
+use App\Asin;
 use App\Starhistory;
-use App\Listinghistory;
 use PDO;
 use DB;
 use Log;
@@ -110,68 +109,58 @@ where last_updated>:date_from',['date_from' => $date_from]);
 		$reviewList = DB::connection('review_new')->select('select * from tbl_star_system_star_info where create_at>:date_from',['date_from' => $date_from]);
 		
 		foreach($reviewList as $review){
-			try{
-				$data = array(
-					'one_star_number' => $review->one_star_number,
-					'two_star_number' => $review->two_star_number,
-					'three_star_number' => $review->three_star_number,
-					'four_star_number' => $review->four_star_number,
-					'five_star_number' => $review->five_star_number,
-					'total_star_number' => $review->total_star_number,
-					
-					'sales' => array_get($asin_value,$review->asin.'.'.str_replace('.','',$review->domain).'.'.substr($review->create_at,0,10).'.sales',0),
-					'amount' => array_get($asin_value,$review->asin.'.'.str_replace('.','',$review->domain).'.'.substr($review->create_at,0,10).'.amount',0),
-					'coupon_n' => array_get($asin_value,$review->asin.'.'.str_replace('.','',$review->domain).'.'.substr($review->create_at,0,10).'.coupon_n',0),
-					'coupon_p' => array_get($asin_value,$review->asin.'.'.str_replace('.','',$review->domain).'.'.substr($review->create_at,0,10).'.coupon_p',0),
-					'price' => array_get($asin_value,$review->asin.'.'.str_replace('.','',$review->domain).'.'.substr($review->create_at,0,10).'.price',0),
-					'status' => array_get($asin_value,$review->asin.'.'.str_replace('.','',$review->domain).'.'.substr($review->create_at,0,10).'.status',0),
-					
-					
-					'average_score' => $review->average_score
-				);
-				
-				$ccp_datas = DB::connection("ccp")->select(
-                    "select products.asin,
-					max(product_performances.sessions) as sessions,
-					max(product_performances.unit_session_percentage) as unit_session_percentage,
-					min(products.bsr) as bsr,
-					product_performances.report_date 
-					from accounts 
-					left join products on products.account_id=accounts.id 
-					left join product_performances on products.id=product_performances.product_id 
-					where  product_performances.report_date='".substr($review->create_at,0,10)."' and asin='".$review->asin."' 
-					and marketplace_id='".array_get($siteToCcpMid,$review->domain)."' GROUP BY products.asin,product_performances.report_date;"
-                    );
-				foreach($ccp_datas as $ccp_data){
-					$data['sessions']=round($ccp_data->sessions,2);
-					$data['unit_session_percentage']=round($ccp_data->unit_session_percentage,2);
-					$data['bsr']=intval($ccp_data->bsr);
-				}
-				print_r($data);
-				
-		
-				
-				
-				
-				Starhistory::updateOrCreate(
-					[
-					'asin' => $review->asin,
-					'domain' => $review->domain,
-					'create_at' => substr($review->create_at,0,10)
-					]
-					,
-					$data
-				);
-			}catch (\Exception $e){
-				Log::Info($e->getMessage());
-			}	
+			$asin_value[$review->asin][str_replace('.','',$review->domain)][substr($review->create_at,0,10)]['one_star_number']=$review->one_star_number;
+			$asin_value[$review->asin][str_replace('.','',$review->domain)][substr($review->create_at,0,10)]['two_star_number']=$review->two_star_number;
+			$asin_value[$review->asin][str_replace('.','',$review->domain)][substr($review->create_at,0,10)]['three_star_number']=$review->three_star_number;
+			$asin_value[$review->asin][str_replace('.','',$review->domain)][substr($review->create_at,0,10)]['four_star_number']=$review->four_star_number;
+			$asin_value[$review->asin][str_replace('.','',$review->domain)][substr($review->create_at,0,10)]['five_star_number']=$review->five_star_number;
+			$asin_value[$review->asin][str_replace('.','',$review->domain)][substr($review->create_at,0,10)]['total_star_number']=$review->total_star_number;
+			$asin_value[$review->asin][str_replace('.','',$review->domain)][substr($review->create_at,0,10)]['average_score']=$review->average_score;	
     	}
 		
 		
-
 		
-		
-	}
-	
-
+		$asins = DB::select('select asin,site from asin group by asin,site');
+		foreach($asins as $asin){
+			if(!array_get($siteToCcpMid,$asin->site)) continue;
+			$ccp_datas = DB::connection("ccp")->select(
+				"select products.asin,
+				max(product_performances.sessions) as sessions,
+				max(product_performances.unit_session_percentage) as unit_session_percentage,
+				min(products.bsr) as bsr,
+				product_performances.report_date 
+				from accounts 
+				left join products on products.account_id=accounts.id 
+				left join product_performances on products.id=product_performances.product_id 
+				where  product_performances.report_date>='".$date_from."' and asin='".$asin->asin."' 
+				and marketplace_id='".array_get($siteToCcpMid,$asin->site)."' GROUP BY products.asin,product_performances.report_date;"
+			);
+			foreach($ccp_datas as $ccp_data){
+				$asin_value[$asin->asin][str_replace('.','',$asin->site)][$ccp_data->report_date]['sessions']=round($ccp_data->sessions,2);
+				$asin_value[$asin->asin][str_replace('.','',$asin->site)][$ccp_data->report_date]['unit_session_percentage']=round($ccp_data->unit_session_percentage,2);
+				$asin_value[$asin->asin][str_replace('.','',$asin->site)][$ccp_data->report_date]['bsr']=intval($ccp_data->bsr,2);
+			}
+			
+			$asin_data = array_get($asin_value,$asin->asin.'.'.str_replace('.','',$asin->site));
+			
+			if(is_array($asin_data)){
+				foreach($asin_data as $k=>$v){
+					try{
+						Starhistory::updateOrCreate(
+							[
+							'asin' => $asin->asin,
+							'domain' => $asin->site,
+							'create_at' => $k
+							]
+							,
+							$v
+						);
+					}catch (\Exception $e){
+						Log::Info($e->getMessage());
+					}	
+				
+				}
+			}
+		}	
+	}	
 }
