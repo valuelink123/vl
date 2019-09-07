@@ -133,9 +133,10 @@ where last_updated>:date_from',['date_from' => $date_from]);
 				left join products on products.account_id=accounts.id 
 				left join product_performances on products.id=product_performances.product_id 
 				where  product_performances.report_date>='".$date_from."' and asin='".$asin->asin."' 
-				and marketplace_id='".array_get($siteToCcpMid,$asin->site)."' GROUP BY products.asin,product_performances.report_date;"
+				and marketplace_id=".array_get($siteToCcpMid,$asin->site)." GROUP BY products.asin,product_performances.report_date;"
 			);
 			foreach($ccp_datas as $ccp_data){
+				print_r($ccp_data);
 				$asin_value[$asin->asin][str_replace('.','',$asin->site)][$ccp_data->report_date]['sessions']=round($ccp_data->sessions,2);
 				$asin_value[$asin->asin][str_replace('.','',$asin->site)][$ccp_data->report_date]['unit_session_percentage']=round($ccp_data->unit_session_percentage,2);
 				$asin_value[$asin->asin][str_replace('.','',$asin->site)][$ccp_data->report_date]['bsr']=intval($ccp_data->bsr,2);
