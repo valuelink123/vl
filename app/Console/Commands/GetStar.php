@@ -136,16 +136,18 @@ where last_updated>:date_from',['date_from' => $date_from]);
 				and marketplace_id=".array_get($siteToCcpMid,$asin->site)." GROUP BY products.asin,product_performances.report_date;"
 			);
 			foreach($ccp_datas as $ccp_data){
-				print_r($ccp_data);
+				
 				$asin_value[$asin->asin][str_replace('.','',$asin->site)][$ccp_data->report_date]['sessions']=round($ccp_data->sessions,2);
 				$asin_value[$asin->asin][str_replace('.','',$asin->site)][$ccp_data->report_date]['unit_session_percentage']=round($ccp_data->unit_session_percentage,2);
 				$asin_value[$asin->asin][str_replace('.','',$asin->site)][$ccp_data->report_date]['bsr']=intval($ccp_data->bsr,2);
 			}
 			
 			$asin_data = array_get($asin_value,$asin->asin.'.'.str_replace('.','',$asin->site));
-			
+			print_r($asin_data);
 			if(is_array($asin_data)){
 				foreach($asin_data as $k=>$v){
+					print_r($k);
+					print_r($v);
 					try{
 						Starhistory::updateOrCreate(
 							[
