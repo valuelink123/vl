@@ -234,6 +234,8 @@ class SendController extends Controller
 				$sendbox->warn = $request->get('warn')?intval($request->get('warn')):0;
 				$sendbox->ip = $_SERVER["REMOTE_ADDR"];
 				if($request->get('fileid')) $sendbox->attachs = $attachs;
+				$sendbox->error = NULL;
+				$sendbox->error_count = 0;
 				$sendbox->save();
 
 				NonCtg::where('email',$to_address)->where('processor',intval(Auth::user()->id))->where('status',0)->update(array('status'=>4));
