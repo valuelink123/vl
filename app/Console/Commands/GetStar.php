@@ -143,9 +143,10 @@ where last_updated>:date_from',['date_from' => $date_from]);
 			}
 			
 			$asin_data = array_get($asin_value,$asin->asin.'.'.str_replace('.','',$asin->site));
-			print_r($asin_data);
 			if(is_array($asin_data)){
 				foreach($asin_data as $k=>$v){
+					print_r($asin->asin);
+					print_r($asin->site);
 					print_r($k);
 					print_r($v);
 					try{
@@ -154,8 +155,7 @@ where last_updated>:date_from',['date_from' => $date_from]);
 							'asin' => $asin->asin,
 							'domain' => $asin->site,
 							'create_at' => $k
-							]
-							,
+							],
 							$v
 						);
 					}catch (\Exception $e){
