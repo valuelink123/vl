@@ -147,6 +147,7 @@ where last_updated>:date_from',['date_from' => $date_from]);
 					$data['unit_session_percentage']=round($ccp_data->unit_session_percentage,2);
 					$data['bsr']=intval($ccp_data->bsr);
 				}
+				print_r($data);
 				
 		
 				
