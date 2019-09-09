@@ -294,6 +294,7 @@ class RsgrequestsController extends Controller
 		if($ruleData){
 			//该客户已经申请过该产品
 			$request->session()->flash('error_message','Rsg Request Failed,One customer cannot test two identical products');
+
 			return redirect()->back()->withInput();
 		}
 		//检查该客户最近一次申请产品是什么时候，要在上次申请完成后才能再申请
@@ -381,6 +382,7 @@ class RsgrequestsController extends Controller
 			if($val['status']==2){
 				$products[$key]['class'] = 'inactive';
 			}
+			$products[$key]['product_name'] = $val['asin'].'——'.$val['product_name'];
 		}
 		return $products;
 	}

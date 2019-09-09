@@ -45,7 +45,7 @@
                             
                              
                                 <select class="form-control" name="product_id" id="product_id" required>
-									<option value="{{$rule['product_id']}}" class="{{array_get($product,'class')}}">{{array_get($product,'product_name')}}</option>
+									<option value="{{$rule['product_id']}}" class="{{array_get($product,'class')}}">{{array_get($product,'asin')}}——{{array_get($product,'product_name')}}</option>
 									<?php 
 									$c_s='';$i=0;
 									$p_c=count($products);
