@@ -7,42 +7,36 @@
 .widget-thumb .widget-thumb-heading{color:#666; margin-bottom:10px;}
 
 </style>
-<div class="row">
-
-</div>
-
-    <div class="row">
+<div class="row" >
+<div class="col-lg-12 col-xs-12 col-sm-12">
+<div class="portlet light ">
+			<div class="col-md-3">
+				<div id="pieChart" style="width:300px;height:300px;"></div>
+			</div>
 			
-            <div class="panel panel-default">
-				<div class="row widget-row">
-						<div style="margin: 20px;">
+			<div class="col-md-6">
+				<div id="lineChart" style="width:100%;height:300px;"></div>
+			</div>
+            <div class="col-md-3">
+				
 							
-<form role="form" action="{{url('home')}}" method="GET">
+					<form role="form" action="{{url('home')}}" method="GET">
                         {{ csrf_field() }}
-                        <div class="row">
 
-                        <div class="col-md-2">
-                            <div class="input-group date date-picker margin-bottom-5" data-date-format="yyyy-mm-dd">
-                                <input type="text" class="form-control form-filter input-sm" readonly name="date_start" placeholder="Date From" value="{{$date_start}}">
+                        <div class="form-group col-md-12" style="margin-top:50px;">
+                            
+                            <div class="input-group date date-picker" data-date-format="yyyy-mm">
+                                <input type="text" class="form-control form-filter input-sm" readonly name="date" placeholder="Date" value="{{$date}}">
                                 <span class="input-group-btn">
-                                                                        <button class="btn btn-sm default" type="button">
-                                                                            <i class="fa fa-calendar"></i>
-                                                                        </button>
-                                                                    </span>
+									<button class="btn btn-sm default" type="button">
+										<i class="fa fa-calendar"></i>
+									</button>
+								</span>
                             </div>
                         </div>
-                        <div class="col-md-2">
-                            <div class="input-group date date-picker" data-date-format="yyyy-mm-dd">
-                                <input type="text" class="form-control form-filter input-sm" readonly name="date_end" placeholder="Date To" value="{{$date_end}}">
-                                <span class="input-group-btn">
-                                                                        <button class="btn btn-sm default" type="button">
-                                                                            <i class="fa fa-calendar"></i>
-                                                                        </button>
-                                                                    </span>
-                            </div>
-                        </div>
+                       
 						<?php if(Auth::user()->admin){ ?>
-						<div class="col-md-2">
+						<div class="form-group col-md-12">
 						<select class="form-control form-filter input-sm"  name="user_id" id="user_id">
 										<option value="">Select User</option>
                                         @foreach ($users as $user_id=>$user_name)
@@ -51,7 +45,7 @@
                                     </select>
 						</div>
 						
-						<div class="col-md-2">
+						<div class="form-group col-md-12">
 						<select class="form-control form-filter input-sm" name="bgbu">
                                         <option value="">Select BG && BU</option>
 										<?php 
@@ -69,367 +63,596 @@
                                     </select>
 						</div>	
 						<?php } ?>
-
 						
 
-						
-						 <div class="col-md-2">
-						<select class="form-control form-filter input-sm" name="site" id="site">
-									<option value="">Select Site</option>
-                                        @foreach (getAsinSites() as $v)
-                                            <option value="{{$v}}" <?php if($v==$s_site) echo 'selected'; ?>>{{$v}}</option>
-                                        @endforeach
-                                    </select>
-						</div>
-						
-						
-						
-						</div>	
-						
-						
-						 <div class="row" style="margin-top:20px;">
-						
-						
-						
-						
-						
-						
-						
-						<div class="col-md-2">
-						<input type="text" class="form-control form-filter input-sm" name="asin" placeholder="Asin" value ="{{array_get($_REQUEST,'asin')}}">
-                                       
-						</div>	
-						<div class="col-md-1">
+						<div class="form-group col-md-12">
 							
-										<button type="submit" class="btn blue" id="data_search">Search</button>
+							<button type="submit" class="btn blue" id="data_search">Search</button>
 									
                         </div>
-					</div>
 
                     </form>
-						</div>
+			</div>
+			<div style="clear:both;"></div>
+			</div>
+			</div>
+</div>
+<div class="row">
+	<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12" style="width:20%;"> 
+		<div class="dashboard-stat2 ">
+			<div class="display">
+				<div class="number">
+					<small>E.VALUE</small>
+					<h3 class="font-green-sharp">
+						<span data-counter="counterup" data-value="7800">7800</span>
+						<small class="font-green-sharp">¥</small>
+					</h3>
 					
-						<div class="col-md-2">
-							<!-- BEGIN WIDGET THUMB -->
-							<div class="widget-thumb widget-bg-color-white  margin-bottom-20 bordered">
-								<h4 class="widget-thumb-heading">Asin Count</h4>
-								<div class="widget-thumb-wrap">
-									<i class="widget-thumb-icon bg-green icon-bulb"></i>
-									<div class="widget-thumb-body">
-										<span class="widget-thumb-subtitle">&nbsp;</span>
-										<span class="widget-thumb-body-stat">{{$total_asins}}</span>									</div>
-								</div>
-							</div>
-							<!-- END WIDGET THUMB -->
-						</div>
-						<div class="col-md-2">
-							<!-- BEGIN WIDGET THUMB -->
-							<div class="widget-thumb widget-bg-color-white  margin-bottom-20 bordered">
-								<h4 class="widget-thumb-heading">Avg Rating</h4>
-								<div class="widget-thumb-wrap">
-									<i class="widget-thumb-icon bg-red icon-layers"></i>
-									<div class="widget-thumb-body">
-										<span class="widget-thumb-subtitle">{!!$avg_rating_change!!}</span>
-										<span class="widget-thumb-body-stat">{{$avg_rating}}</span>									
+				</div>
+				<div class="icon">
+					<i class="icon-pie-chart"></i>
+				</div>
+			</div>
+			<div class="progress-info">
+				<div class="progress">
+					<span style="width: 100%;" class="progress-bar progress-bar-success green-sharp">
+						<span class="sr-only">100% progress</span>
+					</span>
+				</div>
+				<div class="status">
+					<div class="status-title"> FULL : 294 </div>
+					<div class="status-number"> PROMO : 19 </div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12" style="width:20%;">
+		<div class="dashboard-stat2 ">
+			<div class="display">
+				<div class="number">
+					<small>SALES</small>
+					<h3 class="font-red-haze">
+						<span data-counter="counterup" data-value="1349">1349</span>
+						<small class="font-red-haze">¥</small>
+					</h3>
+					
+				</div>
+				<div class="icon">
+					<i class="icon-like"></i>
+				</div>
+			</div>
+			<div class="progress-info">
+				<div class="progress">
+					<span style="width: 85%;" class="progress-bar progress-bar-success red-haze">
+						<span class="sr-only">85% change</span>
+					</span>
+				</div>
+				<div class="status">
+					<div class="status-title"> RING RATIO : 5% </div>
+					<div class="status-number"> </div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12" style="width:20%;">
+		<div class="dashboard-stat2 ">
+			<div class="display">
+				<div class="number">
+					<small>UNITS</small>
+					<h3 class="font-blue-sharp">
+						<span data-counter="counterup" data-value="567">567</span>
+					</h3>
+					
+				</div>
+				<div class="icon">
+					<i class="icon-basket"></i>
+				</div>
+			</div>
+			<div class="progress-info">
+				<div class="progress">
+					<span style="width: 45%;" class="progress-bar progress-bar-success blue-sharp">
+						<span class="sr-only">45% grow</span>
+					</span>
+				</div>
+				<div class="status">
+					<div class="status-title"> RING RATIO : 5% </div>
+					<div class="status-number">  </div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12" style="width:20%;">
+		<div class="dashboard-stat2 ">
+			<div class="display">
+			
+				<div class="number">
+				<small>AVG.PRICE</small>
+					<h3 class="font-purple-soft">
+						<span data-counter="counterup" data-value="276">276</span>
+						<small class="font-purple-soft">¥</small>
+					</h3>
+					
+				</div>
+				<div class="icon">
+					<i class="icon-user"></i>
+				</div>
+			</div>
+			<div class="progress-info">
+				<div class="progress">
+					<span style="width: 57%;" class="progress-bar progress-bar-success purple-soft">
+						<span class="sr-only">56% change</span>
+					</span>
+				</div>
+				<div class="status">
+					<div class="status-title"> STOCK VALUE : 123123 </div>
+					<div class="status-number">  </div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12" style="width:20%;"> 
+		<div class="dashboard-stat2 ">
+			<div class="display">
+				<div class="number">
+					<small>INVENTORY</small>
+					<h3 class="font-green-sharp">
+						<span data-counter="counterup" data-value="7800">7800</span>
+						<small class="font-green-sharp">PCS</small>
+					</h3>
+					
+				</div>
+				<div class="icon">
+					<i class="icon-pie-chart"></i>
+				</div>
+			</div>
+			<div class="progress-info">
+				<div class="progress">
+					<span style="width: 100%;" class="progress-bar progress-bar-success green-sharp">
+						<span class="sr-only">100% progress</span>
+					</span>
+				</div>
+				<div class="status">
+					<div class="status-title"> STOCK VALUE : 123123 </div>
+					<div class="status-number">  </div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<div class="row">
+	<div class="col-lg-12 col-xs-12 col-sm-12">
+		<div class="portlet light ">
+			<div class="portlet-title">
+				<div class="caption caption-md">
+					<i class="icon-bar-chart font-dark hide"></i>
+					<span class="caption-subject font-dark bold uppercase">My Listings</span>
+					<span class="caption-helper"></span>
+				</div>
+				<div class="actions">
+					<div class="btn-group btn-group-devided" data-toggle="buttons">
+						<button type="button" class="btn btn-circle btn-outline green btn-sm">View More>></button>
+					</div>
+				</div>
+			</div>
+			<div class="portlet-body">
+				
+				<div class="table-scrollable table-scrollable-borderless">
+					<table class="table table-hover table-light">
+						<thead>
+							<tr class="uppercase">
+								<th > ASIN </th>
+								<th> SKU </th>
+								<th> UNITS </th>
+								<th> SALES </th>
+								<th> AVG.PRICE </th>
+								<th > FBA </th>
+								<th> OUTSTOCK DATE </th>
+								<th> RATING </th>
+								<th> SESSIONS </th>
+								<th> CONVERSION RATE </th>
+								
+								<th> KEYWORD RANKING </th>
+								<th> BSR </th>
+								<th> SKU E.VALUE </th>
+								<th> SKU BONUS </th>
+							</tr>
+						</thead>
+						<tbody>
+						<tr>
+							
+							<td>
+								<a href="javascript:;" class="primary-link">1234567890</a>
+							</td>
+							<td> $345 </td>
+							<td> 45 </td>
+							<td> 124 </td>
+							<td> $345 </td>
+							<td> 45 </td>
+							<td> 124 </td>
+							<td> $345 </td>
+							<td> 45 </td>
+							<td> 124 </td>
+							<td> $345 </td>
+							<td> 45 </td>
+							<td> 124 </td>
+							<td>
+								<span class="bold theme-font">80%</span>
+							</td>
+						</tr>
+						
+						<tr>
+							
+							<td>
+								<a href="javascript:;" class="primary-link">1234567890</a>
+							</td>
+							<td> $345 </td>
+							<td> 45 </td>
+							<td> 124 </td>
+							<td> $345 </td>
+							<td> 45 </td>
+							<td> 124 </td>
+							<td> $345 </td>
+							<td> 45 </td>
+							<td> 124 </td>
+							<td> $345 </td>
+							<td> 45 </td>
+							<td> 124 </td>
+							<td>
+								<span class="bold theme-font">80%</span>
+							</td>
+						</tr>
+						
+						<tr>
+							
+							<td>
+								<a href="javascript:;" class="primary-link">1234567890</a>
+							</td>
+							<td> $345 </td>
+							<td> 45 </td>
+							<td> 124 </td>
+							<td> $345 </td>
+							<td> 45 </td>
+							<td> 124 </td>
+							<td> $345 </td>
+							<td> 45 </td>
+							<td> 124 </td>
+							<td> $345 </td>
+							<td> 45 </td>
+							<td> 124 </td>
+							<td>
+								<span class="bold theme-font">80%</span>
+							</td>
+						</tr>
+						
+						<tr>
+							
+							<td>
+								<a href="javascript:;" class="primary-link">1234567890</a>
+							</td>
+							<td> $345 </td>
+							<td> 45 </td>
+							<td> 124 </td>
+							<td> $345 </td>
+							<td> 45 </td>
+							<td> 124 </td>
+							<td> $345 </td>
+							<td> 45 </td>
+							<td> 124 </td>
+							<td> $345 </td>
+							<td> 45 </td>
+							<td> 124 </td>
+							<td>
+								<span class="bold theme-font">80%</span>
+							</td>
+						</tr>
+						
+						<tr>
+							
+							<td>
+								<a href="javascript:;" class="primary-link">1234567890</a>
+							</td>
+							<td> $345 </td>
+							<td> 45 </td>
+							<td> 124 </td>
+							<td> $345 </td>
+							<td> 45 </td>
+							<td> 124 </td>
+							<td> $345 </td>
+							<td> 45 </td>
+							<td> 124 </td>
+							<td> $345 </td>
+							<td> 45 </td>
+							<td> 124 </td>
+							<td>
+								<span class="bold theme-font">80%</span>
+							</td>
+						</tr>
+						
+					</tbody></table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>			
+<div class="row">					
+<div class="col-lg-12 col-xs-12 col-sm-12">
+	<div class="portlet light ">
+		<div class="portlet-title tabbable-line">
+			<div class="caption">
+				<i class=" icon-social-twitter font-dark hide"></i>
+				<span class="caption-subject font-dark bold uppercase">MY TASKS</span>
+				
+			</div>
+			<div class="actions">
+					<div class="btn-group btn-group-devided" data-toggle="buttons">
+						<button type="button" class="btn btn-circle btn-outline green btn-sm">View More>></button>
+					</div>
+				</div>
+			<ul class="nav nav-tabs">
+				<li class="active">
+					<a href="#tab_actions_new" data-toggle="tab" aria-expanded="true"> New </a>
+				</li>
+				<li class="">
+					<a href="#tab_actions_open" data-toggle="tab" aria-expanded="false"> Opening </a>
+				</li>
+				<li class="">
+					<a href="#tab_actions_under" data-toggle="tab" aria-expanded="false"> Under Review </a>
+				</li>
+				<li class="">
+					<a href="#tab_actions_finish" data-toggle="tab" aria-expanded="false"> Finished </a>
+				</li>
+				
+			</ul>
+		</div>
+		<div class="portlet-body">
+			<div class="tab-content">
+				<div class="tab-pane active" id="tab_actions_new">
+					<!-- BEGIN: Actions -->
+					<div class="mt-actions">
+						<div class="mt-action">
+							<div class="mt-action-body">
+								<div class="mt-action-row">
+									<div class="mt-action-info ">
+										<div class="mt-action-details ">
+											<span class="mt-action-author">Listing优化 </span>
+											<p class="mt-action-desc">Dummy text of the printing</p>
+										</div>
+									</div>
+									<div class="mt-action-datetime ">
+										<span class="mt-action-date"> Natasha Kim </span>
+										<span class="mt-action-dot bg-green"></span>
+										<span class="mt=action-time">2019-08-31</span>
+									</div>
+									<div class="mt-action-buttons ">
+										<div class="btn-group btn-group-circle">
+											<button type="button" class="btn btn-outline green btn-sm">Process</button>
+										</div>
 									</div>
 								</div>
 							</div>
-							<!-- END WIDGET THUMB -->
 						</div>
-						<div class="col-md-2">
-							<!-- BEGIN WIDGET THUMB -->
-							<div class="widget-thumb widget-bg-color-white  margin-bottom-20 bordered">
-								<h4 class="widget-thumb-heading">Negative Task</h4>
-								<div class="widget-thumb-wrap">
-									<i class="widget-thumb-icon bg-purple icon-screen-desktop"></i>
-									<div class="widget-thumb-body">
-										<span class="widget-thumb-subtitle">&nbsp;</span>
-										<span class="widget-thumb-body-stat">{{$ntask}}</span>		
+						<div class="mt-action">
+							<div class="mt-action-body">
+								<div class="mt-action-row">
+									<div class="mt-action-info ">
+										<div class="mt-action-details ">
+											<span class="mt-action-author">Listing优化</span>
+											<p class="mt-action-desc">Dummy text of the printing</p>
+										</div>
+									</div>
+									<div class="mt-action-datetime ">
+										<span class="mt-action-date">Natasha Kim</span>
+										<span class="mt-action-dot bg-red"></span>
+										<span class="mt=action-time">2019-08-31</span>
+									</div>
+									<div class="mt-action-buttons ">
+										<div class="btn-group btn-group-circle">
+											<button type="button" class="btn btn-outline green btn-sm">Process</button>
+										</div>
 									</div>
 								</div>
 							</div>
-							<!-- END WIDGET THUMB -->
 						</div>
-						<div class="col-md-2">
-							<!-- BEGIN WIDGET THUMB -->
-							<div class="widget-thumb widget-bg-color-white  margin-bottom-20 bordered">
-								<h4 class="widget-thumb-heading">Negative Importance</h4>
-								<div class="widget-thumb-wrap">
-									<i class="widget-thumb-icon bg-blue icon-bar-chart"></i>
-									<div class="widget-thumb-body">
-										<span class="widget-thumb-subtitle">&nbsp;</span>
-										<span class="widget-thumb-body-stat">{{$nimp}}</span>	
+						<div class="mt-action">
+							<div class="mt-action-body">
+								<div class="mt-action-row">
+									<div class="mt-action-info ">
+										<div class="mt-action-details ">
+											<span class="mt-action-author">Listing优化</span>
+											<p class="mt-action-desc">Dummy text of the printing</p>
+										</div>
+									</div>
+									<div class="mt-action-datetime ">
+										<span class="mt-action-date">Natasha Kim</span>
+										<span class="mt-action-dot bg-green"></span>
+										<span class="mt=action-time">2019-08-31</span>
+									</div>
+									<div class="mt-action-buttons ">
+										<div class="btn-group btn-group-circle">
+											<button type="button" class="btn btn-outline green btn-sm">Process</button>
+										</div>
 									</div>
 								</div>
 							</div>
-							<!-- END WIDGET THUMB -->
 						</div>
 						
-						<div class="col-md-2">
-							<!-- BEGIN WIDGET THUMB -->
-							<div class="widget-thumb widget-bg-color-white  margin-bottom-20 bordered">
-								<h4 class="widget-thumb-heading">Negative Closed</h4>
-								<div class="widget-thumb-wrap">
-									<i class="widget-thumb-icon bg-blue icon-bar-chart"></i>
-									<div class="widget-thumb-body">
-										<span class="widget-thumb-subtitle">&nbsp;</span>
-										<span class="widget-thumb-body-stat">{{$ctask}}</span>	
+						<div class="mt-action">
+							<div class="mt-action-body">
+								<div class="mt-action-row">
+									<div class="mt-action-info ">
+										<div class="mt-action-details ">
+											<span class="mt-action-author">Listing优化</span>
+											<p class="mt-action-desc">Dummy text of the printing</p>
+										</div>
+									</div>
+									<div class="mt-action-datetime ">
+										<span class="mt-action-date">Natasha Kim</span>
+										<span class="mt-action-dot bg-green"></span>
+										<span class="mt=action-time">2019-08-31</span>
+									</div>
+									<div class="mt-action-buttons ">
+										<div class="btn-group btn-group-circle">
+											<button type="button" class="btn btn-outline green btn-sm">Process</button>
+										</div>
 									</div>
 								</div>
 							</div>
-							<!-- END WIDGET THUMB -->
 						</div>
 						
-						<div class="col-md-2">
-							<!-- BEGIN WIDGET THUMB -->
-							<div class="widget-thumb widget-bg-color-white  margin-bottom-20 bordered">
-								<h4 class="widget-thumb-heading">Completion ratio</h4>
-								<div class="widget-thumb-wrap">
-									<i class="widget-thumb-icon bg-blue icon-bar-chart"></i>
-									<div class="widget-thumb-body">
-										<span class="widget-thumb-subtitle">&nbsp;</span>
-										<span class="widget-thumb-body-stat">{{$ptask}} %</span>	
+						<div class="mt-action">
+							<div class="mt-action-body">
+								<div class="mt-action-row">
+									<div class="mt-action-info ">
+										<div class="mt-action-details ">
+											<span class="mt-action-author">Listing优化</span>
+											<p class="mt-action-desc">Dummy text of the printing</p>
+										</div>
+									</div>
+									<div class="mt-action-datetime ">
+										<span class="mt-action-date">Natasha Kim</span>
+										<span class="mt-action-dot bg-green"></span>
+										<span class="mt=action-time">2019-08-31</span>
+									</div>
+									<div class="mt-action-buttons ">
+										<div class="btn-group btn-group-circle">
+											<button type="button" class="btn btn-outline green btn-sm">Process</button>
+										</div>
 									</div>
 								</div>
 							</div>
-							<!-- END WIDGET THUMB -->
 						</div>
 					</div>
+					<!-- END: Actions -->
+				</div>
+				<div class="tab-pane " id="tab_actions_open">
 					
+				</div>
+				<div class="tab-pane " id="tab_actions_under">
 					
+				</div>
+				<div class="tab-pane " id="tab_actions_finish">
 					
-					
-					<div class="row widget-row">
-						<div class="col-md-2">
-							<!-- BEGIN WIDGET THUMB -->
-							<div class="widget-thumb widget-bg-color-white  margin-bottom-20 bordered">
-								<h4 class="widget-thumb-heading">Review Count</h4>
-								<div class="widget-thumb-wrap">
-									<i class="widget-thumb-icon bg-green icon-bulb"></i>
-									<div class="widget-thumb-body">
-										<span class="widget-thumb-subtitle">{!!$review_count_change!!}</span>
-										<span class="widget-thumb-body-stat">{{$review_count}}</span>	
-									</div>
-								</div>
-							</div>
-							<!-- END WIDGET THUMB -->
-						</div>
-						<div class="col-md-2">
-							<!-- BEGIN WIDGET THUMB -->
-							<div class="widget-thumb widget-bg-color-white  margin-bottom-20 bordered">
-								<h4 class="widget-thumb-heading"><i class="fa fa-star"></i></h4>
-								<div class="widget-thumb-wrap">
-									<i class="widget-thumb-icon bg-red icon-layers"></i>
-									<div class="widget-thumb-body">
-										<span class="widget-thumb-subtitle">{!!$one_star_number_change!!}</span>
-										<span class="widget-thumb-body-stat">{{$one_star_number}}</span>	
-									</div>
-								</div>
-							</div>
-							<!-- END WIDGET THUMB -->
-						</div>
-						<div class="col-md-2">
-							<!-- BEGIN WIDGET THUMB -->
-							<div class="widget-thumb widget-bg-color-white  margin-bottom-20 bordered">
-								<h4 class="widget-thumb-heading"><i class="fa fa-star"></i><i class="fa fa-star"></i></h4>
-								<div class="widget-thumb-wrap">
-									<i class="widget-thumb-icon bg-purple icon-screen-desktop"></i>
-									<div class="widget-thumb-body">
-										<span class="widget-thumb-subtitle">{!!$two_star_number_change!!}</span>
-										<span class="widget-thumb-body-stat">{{$two_star_number}}</span>	
-									</div>
-								</div>
-							</div>
-							<!-- END WIDGET THUMB -->
-						</div>
-						<div class="col-md-2">
-							<!-- BEGIN WIDGET THUMB -->
-							<div class="widget-thumb widget-bg-color-white  margin-bottom-20 bordered">
-								<h4 class="widget-thumb-heading"><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i></h4>
-								<div class="widget-thumb-wrap">
-									<i class="widget-thumb-icon bg-blue icon-bar-chart"></i>
-									<div class="widget-thumb-body">
-										<span class="widget-thumb-subtitle">{!!$three_star_number_change!!}</span>
-										<span class="widget-thumb-body-stat">{{$three_star_number}}</span>	
-									</div>
-								</div>
-							</div>
-							<!-- END WIDGET THUMB -->
-						</div>
-						
-						<div class="col-md-2">
-							<!-- BEGIN WIDGET THUMB -->
-							<div class="widget-thumb widget-bg-color-white  margin-bottom-20 bordered">
-								<h4 class="widget-thumb-heading"><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i></h4>
-								<div class="widget-thumb-wrap">
-									<i class="widget-thumb-icon bg-blue icon-bar-chart"></i>
-									<div class="widget-thumb-body">
-										<span class="widget-thumb-subtitle">{!!$four_star_number_change!!}</span>
-										<span class="widget-thumb-body-stat">{{$four_star_number}}</span>	
-									</div>
-								</div>
-							</div>
-							<!-- END WIDGET THUMB -->
-						</div>
-						
-						<div class="col-md-2">
-							<!-- BEGIN WIDGET THUMB -->
-							<div class="widget-thumb widget-bg-color-white  margin-bottom-20 bordered">
-								<h4 class="widget-thumb-heading"><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i></h4>
-								<div class="widget-thumb-wrap">
-									<i class="widget-thumb-icon bg-blue icon-bar-chart"></i>
-									<div class="widget-thumb-body">
-										<span class="widget-thumb-subtitle">{!!$five_star_number_change!!}</span>
-										<span class="widget-thumb-body-stat">{{$five_star_number}}</span>		
-									</div>
-								</div>
-							</div>
-							<!-- END WIDGET THUMB -->
-						</div>
-					</div>	
-                    <div id="review" style="width:100%;height:400px; margin-top:50px;"></div>
-					
-					
-					
-					<div id="step" style="width:100%;height:400px; margin-top:50px;"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</div>
+							
 
-            </div>
-    </div>
+    
 
 
 <script type="text/javascript">
-	$(function() {
-	// 基于准备好的dom，初始化echarts实例
-		var myChart = echarts.init(document.getElementById('review'));
-	
-		// 指定图表的配置项和数据
-		option = {
-    tooltip : {
-        trigger: 'axis'
-    },
-    legend: {
-        data:['Review Count','Avg Review Rating','Rating 1','Rating 2','Rating 3','Rating 4','Rating 5']
-    },
-    toolbox: {
-        show : true,
-        feature : {
-            mark : {show: true},
-            dataView : {show: true, readOnly: false},
-            magicType : {show: true, type: ['line', 'bar', 'stack', 'tiled']},
-            restore : {show: true},
-            saveAsImage : {show: true}
-        }
-    },
-    calculable : true,
-    xAxis : [
-        {
-            type : 'category',
-            boundaryGap : false,
-            data : {!!json_encode($chat_1_x)!!} 
-        }
-    ],
-    yAxis : [
-        {
-            type : 'value'
-        }
-    ],
-    series : [
-        {
-            name:'Review Count',
-            type:'line',
-            data:{{json_encode($chat_1_y_reviewcount)}}
-        },
-        {
-            name:'Avg Review Rating',
-            type:'line',
-
-            data:{{json_encode($chat_1_y_reviewrating)}}
-        },
-        {
-            name:'Rating 1',
-            type:'line',
-
-            data:{{json_encode($chat_2_y_1)}}
-        },
-        {
-            name:'Rating 2',
-            type:'line',
-
-            data:{{json_encode($chat_2_y_2)}}
-        },
-        {
-            name:'Rating 3',
-            type:'line',
-
-            data:{{json_encode($chat_2_y_3)}}
-        },
-        {
-            name:'Rating 4',
-            type:'line',
-
-            data:{{json_encode($chat_2_y_4)}}
-        },
-        {
-            name:'Rating 5',
-            type:'line',
-
-            data:{{json_encode($chat_2_y_5)}}
-        }
-    ]
-};
-	
-		// 使用刚指定的配置项和数据显示图表。
-		myChart.setOption(option);
-		
-		
-				
-		
-		
-		
-		
-		var myChart2 = echarts.init(document.getElementById('step'));
-	
-		// 指定图表的配置项和数据
-		option2 = {
-    tooltip : {
-        trigger: 'axis'
-    },
-    legend: {
-        data:{!!json_encode($follow_status_array)!!}
-    },
-    toolbox: {
-        show : true,
-        feature : {
-            mark : {show: true},
-            dataView : {show: true, readOnly: false},
-            magicType : {show: true, type: ['line', 'bar', 'stack', 'tiled']},
-            restore : {show: true},
-            saveAsImage : {show: true}
-        }
-    },
-    calculable : true,
-    xAxis : [
-        {
-            type : 'category',
-            boundaryGap : false,
-            data : {!!json_encode($chat_2_x)!!}
-        }
-    ],
-    yAxis : [
-        {
-            type : 'value'
-        }
-    ],
-    series : {!!json_encode($char_2_y_arr)!!}
-
-};
-	
-		// 使用刚指定的配置项和数据显示图表。
-		myChart2.setOption(option2);
-		$('.date-picker').datepicker({
-                rtl: App.isRTL(),
-                autoclose: true
-            });
+$(function() {
+	$('.date-picker').datepicker({
+		rtl: App.isRTL(),
+		format: 'yyyy-mm',
+		weekStart: 1,
+		autoclose: true,
+		startView: 2,
+		maxViewMode: 1,
+		minViewMode:1,
+		forceParse: false,
+		language: 'zh-CN'
 	});
+	
+	
+	var dataStyle = {
+		normal: {
+			label: {show:false},
+			labelLine: {show:false}
+		}
+	};
+	var placeHolderStyle = {
+		normal : {
+			color: 'rgba(0,0,0,0)',
+			label: {show:false},
+			labelLine: {show:false}
+		},
+		emphasis : {
+			color: 'rgba(0,0,0,0)'
+		}
+	};
+	pieoption = {
+		title: {
+			text: '2222¥',
+			subtext: '销售提成',
+			x: 'center',
+			y: 'center',
+			itemGap: 20,
+			textStyle : {
+				color : 'rgba(30,144,255,0.8)',
+				fontFamily : '微软雅黑',
+				fontSize : 35,
+				fontWeight : 'bolder'
+			}
+		},
+	
+		series : [
+			{
+				name:'1',
+				type:'pie',
+				clockWise:false,
+				radius : [80, 100],
+				itemStyle : dataStyle,
+				data:[
+					{
+						value:100,
+					},
+					{
+						value:0,
+					}
+				]
+			}
+		]
+	};
+	var pieChart = echarts.init(document.getElementById('pieChart'));
+	pieChart.setOption(pieoption,true);
+	
+	
+	
+	lineoption = {
+		title : {
+			text: '年度提成曲线图',
+			x: 'center',
+			subtext: '2019年'
+		},
+		tooltip : {
+			trigger: 'axis'
+		},
+		legend: {
+			data:['提成']
+		},
+		calculable : true,
+		xAxis : [
+			{
+				type : 'category',
+				boundaryGap : false,
+				data : ['Jan.','Feb.','Mar.','Apr.','May.','Jun.','Jul.','Aug.','Sep.','Oct.','Nov.','Dec.']
+			}
+		],
+		yAxis : [
+			{
+				type : 'value'
+			}
+		],
+		series : [
+			{
+				name:'提成金额',
+				type:'line',
+				smooth:true,
+				itemStyle: {normal: {areaStyle: {type: 'default'}}},
+				data:[1123, 1221, 2211, 5451, 2620, 8301, 7101]
+			}
+		]
+	};
+	
+	var lineChart = echarts.init(document.getElementById('lineChart'));
+	lineChart.setOption(lineoption,true);
+                    
+});
 </script>
 @endsection

@@ -862,5 +862,5 @@ function getTaskTypeArr()
 
 function getTaskStageArr()
 {
-	return array(0=>'None',1=>'Opening',2=>'Under Review',3=>'Finished');
+	return array(0=>'New',1=>'Opening',2=>'Under Review',3=>'Finished');
 }
