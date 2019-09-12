@@ -78,8 +78,8 @@ class Kernel extends ConsoleKernel
         $schedule->command('scan:send')->cron('*/5 * * * *')->name('sendmails')->withoutOverlapping();
 		$schedule->command('get:order')->cron('*/30 * * * *')->name('getOrder')->withoutOverlapping();
 		$schedule->command('get:review 7days')->cron('0 */4 * * *')->name('getreviews')->withoutOverlapping();
-		$schedule->command('get:star 3days')->twiceDaily(11, 23)->name('getstars')->withoutOverlapping();
-		$schedule->command('get:asin 3000 0')->hourly()->name('getasins')->withoutOverlapping();
+		$schedule->command('get:star 5days')->twiceDaily(11, 23)->name('getstars')->withoutOverlapping();
+		$schedule->command('get:asin 3000 0')->cron('30 */3 * * *')->name('getasins')->withoutOverlapping();
 		$schedule->command('get:kunnr 3 0')->hourly()->name('getkunnrs')->withoutOverlapping();
 		$schedule->command('get:sellers')->cron('*/1 * * * *')->name('sendmails')->withoutOverlapping();
 		$schedule->command('get:asininfo')->cron('30 0 * * *')->name('getasininfo')->withoutOverlapping();
