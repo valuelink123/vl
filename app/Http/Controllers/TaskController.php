@@ -36,26 +36,52 @@ class TaskController extends Controller
 		if(!Auth::user()->can(['task-show'])) die('Permission denied -- task-show');
 		$date_from=date('Y-m-d',strtotime('-30 days'));	
 		$date_to=date('Y-m-d');		
-		//$teams= DB::select('select bg,bu from asin group by bg,bu ORDER BY BG ASC,BU ASC');
-        return view('task/index',['date_from'=>$date_from ,'date_to'=>$date_to,  'users'=>$this->getUsers()]);
+		$teams= DB::select('select bg,bu from asin group by bg,bu ORDER BY BG ASC,BU ASC');
+        return view('task/index',['date_from'=>$date_from ,'date_to'=>$date_to,  'users'=>$this->getUsers(),'teams'=>$teams]);
 
     }
 
     public function get()
     {
+		if (isset($_REQUEST["customActionType"])) {
+	
+			if($_REQUEST["customActionType"] == "group_action" && is_array($_REQUEST["id"])){
+				Task::where('stage','<>',3)->where('response_user_id',Auth::user()->id)->whereIn('id',$_REQUEST["id"])->update(['stage'=>3,'response_date'=>date('Y-m-d H:i:s')]);
+			}
+        }
+		
 		$date_from=date('Y-m-d',strtotime('-30 days'));	
 		$date_to=date('Y-m-d');		
 		if(array_get($_REQUEST,'date_from')) $date_from= array_get($_REQUEST,'date_from');
 		if(array_get($_REQUEST,'date_to')) $date_to= array_get($_REQUEST,'date_to');
-		$customers = Task::where('complete_date','<=',$date_to)->where('complete_date','>=',$date_from);
+		$customers = Task::select('tasks.*','users.ubg','users.ubu')->where('complete_date','<=',$date_to)->where('complete_date','>=',$date_from)
+			->leftJoin('users',function($q){
+				$q->on('tasks.response_user_id', '=', 'users.id');
+			});
+		
+		
+		
+		if(!Auth::user()->can('rsgrequests-show-all')) {
+			
+		}
 		
 		if(!Auth::user()->can(['task-show-all'])){ 
-           $user_id = $this->getUserId();
-		   $customers = $customers->where(function ($query) use ($user_id) {
-				$query->where('request_user_id', $user_id)
-					  ->orwhere('response_user_id', $user_id);
-	
-		   });
+		
+			if (Auth::user()->seller_rules) {
+				$rules = explode("-", Auth::user()->seller_rules);
+				if (array_get($rules, 0) != '*') $customers = $customers->where('users.ubg', array_get($rules, 0));
+				if (array_get($rules, 1) != '*') $customers = $customers->where('users.ubu', array_get($rules, 1));
+			} elseif (Auth::user()->sap_seller_id) {
+				$user_id = $this->getUserId();
+				$customers = $customers->where(function ($query) use ($user_id) {
+					$query->where('request_user_id', $user_id)
+						  ->orwhere('response_user_id', $user_id);
+				
+				});
+			} else {
+			
+			}
+				
         }
 		
 		if(array_get($_REQUEST,'type')){
@@ -73,6 +99,13 @@ class TaskController extends Controller
 			
 			if(array_get($_REQUEST,'request_user_id')){
 				$customers = $customers->whereIn('request_user_id',$_REQUEST['request_user_id']);
+			}
+			
+			if(array_get($_REQUEST,'bgbu')){
+			   $bgbu = array_get($_REQUEST,'bgbu');
+			   $bgbu_arr = explode('_',$bgbu);
+			   if(array_get($bgbu_arr,0)) $customers = $customers->where('users.ubg',array_get($bgbu_arr,0));
+			   if(array_get($bgbu_arr,1)) $customers = $customers->where('users.ubu',array_get($bgbu_arr,1));
 			}
 		}
 
@@ -94,14 +127,14 @@ class TaskController extends Controller
 
 				
         if(isset($_REQUEST['order'][0])){
-            if($_REQUEST['order'][0]['column']==0) $orderby = 'type';
-            if($_REQUEST['order'][0]['column']==2) $orderby = 'priority';
-            if($_REQUEST['order'][0]['column']==3) $orderby = 'request_user_id';
-			if($_REQUEST['order'][0]['column']==4) $orderby = 'complete_date';
-            if($_REQUEST['order'][0]['column']==5) $orderby = 'response_user_id';
-			if($_REQUEST['order'][0]['column']==6) $orderby = 'stage';
-			if($_REQUEST['order'][0]['column']==7) $orderby = 'request_date';
-			if($_REQUEST['order'][0]['column']==8) $orderby = 'score';
+            if($_REQUEST['order'][0]['column']==1) $orderby = 'type';
+            if($_REQUEST['order'][0]['column']==3) $orderby = 'priority';
+            if($_REQUEST['order'][0]['column']==4) $orderby = 'request_user_id';
+			if($_REQUEST['order'][0]['column']==5) $orderby = 'complete_date';
+            if($_REQUEST['order'][0]['column']==6) $orderby = 'response_user_id';
+			if($_REQUEST['order'][0]['column']==7) $orderby = 'stage';
+			if($_REQUEST['order'][0]['column']==8) $orderby = 'request_date';
+			if($_REQUEST['order'][0]['column']==9) $orderby = 'score';
             $sort = $_REQUEST['order'][0]['dir'];
         }
 		
@@ -126,8 +159,9 @@ class TaskController extends Controller
         foreach ( $datas as $data){
 		
 			$records["data"][] = array(
+				'<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input name="id[]" type="checkbox" class="checkboxes" value="'.$data['id'].'"/><span></span></label>',
 				array_get(getTaskTypeArr(),$data['type']),
-				$data['request'],
+				(($data['asin'])?'<span class="badge badge-success">'.$data['asin'].'</span>':'').$data['request'],
 				$data['priority'],
 				array_get($users_array,$data['request_user_id']),
 				$data['complete_date'],
@@ -196,7 +230,13 @@ class TaskController extends Controller
 	 public function edit(Request $request,$id)
     {
         if(!Auth::user()->can(['task-show'])) die('Permission denied -- task-show');
-		$task= Task::where('id',$id)->first()->toArray();
+		
+		$task=  Task::findOrFail($id);
+		if($task->response_user_id == Auth::user()->id  && $task->stage==0){
+			$task->stage =1;
+			$task->save();
+		}
+		$task = json_decode(json_encode( $task),true);
         return view('task/edit',['task'=>$task,'users'=>$this->getUsers()]);
     }
 	

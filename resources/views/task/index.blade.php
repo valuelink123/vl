@@ -14,7 +14,7 @@
                     <form role="form" action="{{url('task')}}" method="GET">
 						<div class="row" style="margin-bottom:20px;">
 						
-							<div class="col-md-6">
+							<div class="col-md-2">
 								@permission('task-create')
 								<div class="btn-group">
 									<a data-target="#ajax" data-toggle="modal" href="{{ url('task/create')}}"><button id="sample_editable_1_2_new" class="btn sbold blue"> Create New Tasks
@@ -23,8 +23,17 @@
 									</a>
 								</div>
 								@endpermission
+								
+								
 							</div>
-						
+							<div class="col-md-2">
+							<div class="table-actions-wrapper" id="table-actions-wrapper">
+								
+								<button class="btn  green table-group-action-submit">
+									<i class="fa fa-check"></i>Set Selected Finished</button>
+								
+							</div>
+							</div>
 						</div>
                         {{ csrf_field() }}
                         <div class="row">
@@ -52,8 +61,8 @@
                         </div>
 						</div>
 						@permission('task-show-all')
-						<div class="col-md-3">
-						<div class="col-md-6">
+						<div class="col-md-4">
+						<div class="col-md-4">
 						<select class="mt-multiselect btn btn-default input-sm form-control form-filter" multiple="multiple" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" data-none-selected-text="Assigned To" name="response_user_id[]" id="response_user_id[]">
 
                                         @foreach ($users as $user_id=>$user_name)
@@ -63,7 +72,7 @@
 						</div>
 						
 						
-						<div class="col-md-6">
+						<div class="col-md-4">
 						<select class="mt-multiselect btn btn-default input-sm form-control form-filter" multiple="multiple" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" data-none-selected-text="Assigned By" name="request_user_id[]" id="request_user_id[]">
 
                                         @foreach ($users as $user_id=>$user_name)
@@ -71,6 +80,20 @@
                                         @endforeach
                                     </select>
 						</div>
+						
+						
+						<div class="col-md-4">
+						<select class="form-control form-filter input-sm" name="bgbu">
+							<option value="">BG && BU</option>
+							<?php 
+							$bg='';
+							foreach($teams as $team){ 
+								if($bg!=$team->bg) echo '<option value="'.$team->bg.'_">'.$team->bg.'</option>';	
+								$bg=$team->bg;
+								if($team->bg && $team->bu) echo '<option value="'.$team->bg.'_'.$team->bu.'">'.$team->bg.' - '.$team->bu.'</option>';
+							} ?>
+						</select>
+						</div>	
 						</div>
 						@endpermission
 						<div class="col-md-3">
@@ -93,13 +116,16 @@
                                        
 						</div>
 						</div>
-						<div class="col-md-2">
+						<div class="col-md-1">
+						
 						<input type="text" class="form-control form-filter input-sm" name="keywords" placeholder="Keywords" value ="{{array_get($_REQUEST,'keywords')}}">
                                        
-						</div>	
-						
-						<div class="col-md-1"><button type="button" class="btn blue" id="data_search">Search</button>
 						</div>
+						
+						<div class="col-md-1">
+						<button type="button" class="btn blue" id="data_search">Search</button>
+						</div>
+					
 						</div>
 						
 					
@@ -109,10 +135,16 @@
 			
                 <div class="table-container">
 
-                    <table class="table table-striped table-bordered table-hover " id="datatable_ajax">
+                    <table class="table table-striped table-bordered table-hover table-checkable" id="datatable_ajax">
                         <thead>
 							
                             <tr role="row" class="heading">
+								<th >
+                                    <label class="mt-checkbox mt-checkbox-single mt-checkbox-outline">
+                                        <input type="checkbox" class="group-checkable" data-set="#datatable_ajax_asin .checkboxes" />
+                                        <span></span>
+                                    </label>
+                                </th>
 								<th> Task Type </th>	
 								<th> Task Details </th>	
 								<th> Priority </th>	
@@ -159,6 +191,7 @@
 			grid.setAjaxParam("keywords", $("input[name='keywords']").val());
 			grid.setAjaxParam("type", $("select[name='type']").val());
 			grid.setAjaxParam("stage", $("select[name='stage']").val());
+			grid.setAjaxParam("bgbu", $("select[name='bgbu']").val());
             grid.init({
                 src: $("#datatable_ajax"),
                 onSuccess: function (grid, response) {
@@ -180,17 +213,38 @@
                         [20, 50, 100, 'All'] // change per page values here
                     ],
                     "pageLength": 20, // default record count per page
-					"aoColumnDefs": [{ "bSortable": false, "aTargets": [1,9] }],	
+					"aoColumnDefs": [{ "bSortable": false, "aTargets": [0,2,10] }],	
 					"order": [
-                        [7, "desc"]
+                        [8, "desc"]
                     ],
                     "ajax": {
                         "url": "{{ url('task/get')}}", // ajax source
                     },
 					"createdRow": function( row, data, dataIndex ) {
-                        $(row).children('td').eq(1).attr('style', 'max-width: 400px;width: 400px;overflow:hidden;white-space:nowrap;text-align: left; ');
-						$(row).children('td').eq(1).attr('title', $(row).children('td').eq(10).text());
+                        $(row).children('td').eq(2).attr('style', 'max-width: 350px;width: 350px;overflow:hidden;white-space:nowrap;text-align: left; ');
+						$(row).children('td').eq(2).attr('title', $(row).children('td').eq(10).text());
                     },
+                }
+            });
+			
+			
+			
+			$("#table-actions-wrapper").unbind("click").on('click', '.table-group-action-submit', function (e) {
+                e.preventDefault();
+				
+                if (grid.getSelectedRowsCount() > 0) {
+                    grid.setAjaxParam("customActionType", "group_action");
+                    grid.setAjaxParam("id", grid.getSelectedRows());
+                    grid.getDataTable().draw(false);
+                    //grid.clearAjaxParams();
+                }  else {
+                    App.alert({
+                        type: 'danger',
+                        icon: 'warning',
+                        message: 'No record selected',
+                        container: $("#table-actions-wrapper"),
+                        place: 'prepend'
+                    });
                 }
             });
 

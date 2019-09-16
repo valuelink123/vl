@@ -18,7 +18,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'name', 'email', 'password','admin','sap_seller_id','bg','bu','locked','seller_rules'
     ];
 
     /**

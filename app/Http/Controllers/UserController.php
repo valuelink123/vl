@@ -149,6 +149,9 @@ class UserController extends Controller
             'name' => $request->get('name'),
             'email' => $request->get('email'),
             'password' => bcrypt($request->get('password')),
+			'ubg' => $request->get('bg'),
+            'ubu' => $request->get('bu'),
+			'sap_seller_id' => $request->get('sap_seller_id'),
 			'admin'=> ($request->get('admin'))?1:0
         ]);
         if ($user) {
@@ -841,11 +844,13 @@ where a.date>=:sdate_from and a.date<=:sdate_to
         $update['admin'] = ($request->get('admin'))?1:0;
         if($request->get('name')) $update['name'] = $request->get('name');
         if($request->get('password')) $update['password'] = Hash::make(($request->get('password')));
+		if($request->get('bg')) $update['ubg'] = $request->get('bg');
+		if($request->get('bu')) $update['ubu'] = $request->get('bu');
+		if($request->get('sap_seller_id')) $update['sap_seller_id'] = $request->get('sap_seller_id');
+			
         $user = User::find($id);
 		$result = $user->update($update);
-		
-		
-		
+
         if ($result) {
 			DB::table('role_user')->where('user_id',$id)->delete();
  
@@ -877,6 +882,8 @@ where a.date>=:sdate_from and a.date<=:sdate_to
             if($result){
                 $user->name = $request->get('name');
 				$user->sap_seller_id = intval($request->get('sap_seller_id'));
+				$user->ubg = trim($request->get('bg'));
+				$user->ubu = trim($request->get('bu'));
                 if($request->get('password')) $user->password = Hash::make(($request->get('password')));
                 $user->save();
                 $request->session()->flash('success_message', 'Set Profile Success');
