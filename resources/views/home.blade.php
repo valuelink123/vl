@@ -5,25 +5,206 @@
 .widget-thumb .widget-thumb-body .widget-thumb-body-stat {font-size:20px;}
 .widget-thumb .widget-thumb-wrap .widget-thumb-icon{width:50px;height:50px;line-height:30px;}
 .widget-thumb .widget-thumb-heading{color:#666; margin-bottom:10px;}
-
+.dashboard-stat2 { margin-bottom:0px;}
+.col-lg-1, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-md-1, .col-md-10, .col-md-11, .col-md-12, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-sm-1, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-xs-1, .col-xs-10, .col-xs-11, .col-xs-12, .col-xs-2, .col-xs-3, .col-xs-4, .col-xs-5, .col-xs-6, .col-xs-7, .col-xs-8, .col-xs-9{
+padding:0px !important;}
+.portlet {margin-bottom:0px;}
+.portlet > .portlet-title > .actions > .btn, .portlet > .portlet-title > .actions > .btn.btn-sm, .portlet > .portlet-title > .actions > .btn-group > .btn, .portlet > .portlet-title > .actions > .btn-group > .btn.btn-sm {
+    padding: 4px 10px;
+    font-size: 12px;
+    line-height: 12px;
+}
+.portlet.light{padding-top:0px;}
+.portlet.light > .portlet-title > .caption{
+padding:5px 0;
+}
+.btn-group-sm>.btn, .btn-sm {
+    padding: 3px 10px;
+    font-size: 12px;
+    line-height: 12px;
+}
+.portlet.light > .portlet-title > .actions {
+    padding: 6px 0 6px 0;
+}
+.portlet.light > .portlet-title{
+min-height:30px;
+margin-bottom:0px;}
+.table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
+    padding: 7px;
+    line-height: 12px;
+}
+.table td, .table th {
+    font-size: 12px;
+}
+.portlet.light .portlet-body{
+padding-top:0px;}
+.portlet.light > .portlet-title > .nav-tabs > li > a {
+    margin: 0;
+    padding: 5px 10px;
+    font-size: 13px;
+    color: #666;
+}
 </style>
+<link href="/assets/global/plugins/bootstrap-editable/bootstrap-editable/css/bootstrap-editable.css" rel="stylesheet" type="text/css" />
 <div class="row" >
 <div class="col-lg-12 col-xs-12 col-sm-12">
 <div class="portlet light ">
-			<div class="col-md-3">
-				<div id="pieChart" style="width:300px;height:300px;"></div>
+			<div class="col-md-1">
+				<div style="width:100px;height:100px;border: 15px solid #ff0000;border-radius:50% !important;text-align:center;line-height:70px;margin-top: 13px" >
+					<span id="tichengxianshi" style="cursor:pointer;" data-value="12312.14" class="fa fa-eye-slash"></span>
+				</div>
+			</div>
+			<div class="col-md-9">
+				<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12" style="width:20%;"> 
+					<div class="dashboard-stat2 ">
+						<div class="display">
+							<div class="number">
+								<small>E.VALUE</small>
+								<h3 class="font-green-sharp">
+									<span data-counter="counterup" data-value="7800">7800</span>
+									<small class="font-green-sharp">¥</small>
+								</h3>
+								
+							</div>
+							
+						</div>
+						<div class="progress-info">
+							<div class="progress">
+								<span style="width: 100%;" class="progress-bar progress-bar-success green-sharp">
+									<span class="sr-only">100% progress</span>
+								</span>
+							</div>
+							<div class="status">
+								<div class="status-title"> FULL : 294 </div>
+								<div class="status-number"> PROMO : 19 </div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12" style="width:20%;">
+					<div class="dashboard-stat2 ">
+						<div class="display">
+							<div class="number">
+								<small>SALES</small>
+								<h3 class="font-red-haze">
+									<span data-counter="counterup" data-value="1349">1349</span>
+									<small class="font-red-haze">¥</small>
+								</h3>
+								
+							</div>
+							
+						</div>
+						<div class="progress-info">
+							<div class="progress">
+								<span style="width: 85%;" class="progress-bar progress-bar-success red-haze">
+									<span class="sr-only">85% change</span>
+								</span>
+							</div>
+							<div class="status">
+								<div class="status-title"> RING RATIO : 5% </div>
+								<div class="status-number"> </div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12" style="width:20%;">
+					<div class="dashboard-stat2 ">
+						<div class="display">
+							<div class="number">
+								<small>UNITS</small>
+								<h3 class="font-blue-sharp">
+									<span data-counter="counterup" data-value="567">567</span>
+								</h3>
+								
+							</div>
+							
+						</div>
+						<div class="progress-info">
+							<div class="progress">
+								<span style="width: 45%;" class="progress-bar progress-bar-success blue-sharp">
+									<span class="sr-only">45% grow</span>
+								</span>
+							</div>
+							<div class="status">
+								<div class="status-title"> RING RATIO : 5% </div>
+								<div class="status-number">  </div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12" style="width:20%;">
+					<div class="dashboard-stat2 ">
+						<div class="display">
+						
+							<div class="number">
+							<small>AVG.PRICE</small>
+								<h3 class="font-purple-soft">
+									<span data-counter="counterup" data-value="276">276</span>
+									<small class="font-purple-soft">¥</small>
+								</h3>
+								
+							</div>
+							
+						</div>
+						<div class="progress-info">
+							<div class="progress">
+								<span style="width: 57%;" class="progress-bar progress-bar-success purple-soft">
+									<span class="sr-only">56% change</span>
+								</span>
+							</div>
+							<div class="status">
+								<div class="status-title"> STOCK VALUE : 123123 </div>
+								<div class="status-number">  </div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12" style="width:20%;"> 
+					<div class="dashboard-stat2 ">
+						<div class="display">
+							<div class="number">
+								<small>INVENTORY</small>
+								<h3 class="font-green-sharp">
+									<span data-counter="counterup" data-value="7800">7800</span>
+									<small class="font-green-sharp">PCS</small>
+								</h3>
+								
+							</div>
+							
+						</div>
+						<div class="progress-info">
+							<div class="progress">
+								<span style="width: 100%;" class="progress-bar progress-bar-success green-sharp">
+									<span class="sr-only">100% progress</span>
+								</span>
+							</div>
+							<div class="status">
+								<div class="status-title"> STOCK VALUE : 123123 </div>
+								<div class="status-number">  </div>
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
 			
-			<div class="col-md-6">
-				<div id="lineChart" style="width:100%;height:300px;"></div>
-			</div>
-            <div class="col-md-3">
+            <div class="col-md-2">
 				
 							
 					<form role="form" action="{{url('home')}}" method="GET">
                         {{ csrf_field() }}
 
-                        <div class="form-group col-md-12" style="margin-top:50px;">
+                        <div class="form-group col-md-6" >
+                            
+                            <div class="input-group date date-picker" data-date-format="yyyy-mm">
+                                <input type="text" class="form-control form-filter input-sm" readonly name="date" placeholder="Date" value="{{$date}}">
+                                <span class="input-group-btn">
+									<button class="btn btn-sm default" type="button">
+										<i class="fa fa-calendar"></i>
+									</button>
+								</span>
+                            </div>
+                        </div>
+						<div class="form-group col-md-6" >
                             
                             <div class="input-group date date-picker" data-date-format="yyyy-mm">
                                 <input type="text" class="form-control form-filter input-sm" readonly name="date" placeholder="Date" value="{{$date}}">
@@ -35,19 +216,19 @@
                             </div>
                         </div>
                        
-						<?php if(Auth::user()->admin){ ?>
-						<div class="form-group col-md-12">
+						
+						<div class="form-group col-md-6">
 						<select class="form-control form-filter input-sm"  name="user_id" id="user_id">
-										<option value="">Select User</option>
+										<option value="">Seller</option>
                                         @foreach ($users as $user_id=>$user_name)
                                             <option value="{{$user_id}}" <?php if($user_id==$s_user_id) echo 'selected'; ?>>{{$user_name}}</option>
                                         @endforeach
                                     </select>
 						</div>
 						
-						<div class="form-group col-md-12">
+						<div class="form-group col-md-6">
 						<select class="form-control form-filter input-sm" name="bgbu">
-                                        <option value="">Select BG && BU</option>
+                                        <option value="">BG && BU</option>
 										<?php 
 										$bg='';
 										foreach($teams as $team){ 
@@ -62,7 +243,7 @@
 										} ?>
                                     </select>
 						</div>	
-						<?php } ?>
+						
 						
 
 						<div class="form-group col-md-12">
@@ -74,150 +255,15 @@
                     </form>
 			</div>
 			<div style="clear:both;"></div>
+			<div class="col-md-12" id="lineChartDiv" style="display:none;">
+				<div id="lineChart" style="width:100%;height:200px;"></div>
+			</div>
+			<div style="clear:both;"></div>
 			</div>
 			</div>
 </div>
 <div class="row">
-	<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12" style="width:20%;"> 
-		<div class="dashboard-stat2 ">
-			<div class="display">
-				<div class="number">
-					<small>E.VALUE</small>
-					<h3 class="font-green-sharp">
-						<span data-counter="counterup" data-value="7800">7800</span>
-						<small class="font-green-sharp">¥</small>
-					</h3>
-					
-				</div>
-				<div class="icon">
-					<i class="icon-pie-chart"></i>
-				</div>
-			</div>
-			<div class="progress-info">
-				<div class="progress">
-					<span style="width: 100%;" class="progress-bar progress-bar-success green-sharp">
-						<span class="sr-only">100% progress</span>
-					</span>
-				</div>
-				<div class="status">
-					<div class="status-title"> FULL : 294 </div>
-					<div class="status-number"> PROMO : 19 </div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12" style="width:20%;">
-		<div class="dashboard-stat2 ">
-			<div class="display">
-				<div class="number">
-					<small>SALES</small>
-					<h3 class="font-red-haze">
-						<span data-counter="counterup" data-value="1349">1349</span>
-						<small class="font-red-haze">¥</small>
-					</h3>
-					
-				</div>
-				<div class="icon">
-					<i class="icon-like"></i>
-				</div>
-			</div>
-			<div class="progress-info">
-				<div class="progress">
-					<span style="width: 85%;" class="progress-bar progress-bar-success red-haze">
-						<span class="sr-only">85% change</span>
-					</span>
-				</div>
-				<div class="status">
-					<div class="status-title"> RING RATIO : 5% </div>
-					<div class="status-number"> </div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12" style="width:20%;">
-		<div class="dashboard-stat2 ">
-			<div class="display">
-				<div class="number">
-					<small>UNITS</small>
-					<h3 class="font-blue-sharp">
-						<span data-counter="counterup" data-value="567">567</span>
-					</h3>
-					
-				</div>
-				<div class="icon">
-					<i class="icon-basket"></i>
-				</div>
-			</div>
-			<div class="progress-info">
-				<div class="progress">
-					<span style="width: 45%;" class="progress-bar progress-bar-success blue-sharp">
-						<span class="sr-only">45% grow</span>
-					</span>
-				</div>
-				<div class="status">
-					<div class="status-title"> RING RATIO : 5% </div>
-					<div class="status-number">  </div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12" style="width:20%;">
-		<div class="dashboard-stat2 ">
-			<div class="display">
-			
-				<div class="number">
-				<small>AVG.PRICE</small>
-					<h3 class="font-purple-soft">
-						<span data-counter="counterup" data-value="276">276</span>
-						<small class="font-purple-soft">¥</small>
-					</h3>
-					
-				</div>
-				<div class="icon">
-					<i class="icon-user"></i>
-				</div>
-			</div>
-			<div class="progress-info">
-				<div class="progress">
-					<span style="width: 57%;" class="progress-bar progress-bar-success purple-soft">
-						<span class="sr-only">56% change</span>
-					</span>
-				</div>
-				<div class="status">
-					<div class="status-title"> STOCK VALUE : 123123 </div>
-					<div class="status-number">  </div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12" style="width:20%;"> 
-		<div class="dashboard-stat2 ">
-			<div class="display">
-				<div class="number">
-					<small>INVENTORY</small>
-					<h3 class="font-green-sharp">
-						<span data-counter="counterup" data-value="7800">7800</span>
-						<small class="font-green-sharp">PCS</small>
-					</h3>
-					
-				</div>
-				<div class="icon">
-					<i class="icon-pie-chart"></i>
-				</div>
-			</div>
-			<div class="progress-info">
-				<div class="progress">
-					<span style="width: 100%;" class="progress-bar progress-bar-success green-sharp">
-						<span class="sr-only">100% progress</span>
-					</span>
-				</div>
-				<div class="status">
-					<div class="status-title"> STOCK VALUE : 123123 </div>
-					<div class="status-number">  </div>
-				</div>
-			</div>
-		</div>
-	</div>
+	
 </div>
 
 
@@ -230,16 +276,16 @@
 					<span class="caption-subject font-dark bold uppercase">My Listings</span>
 					<span class="caption-helper"></span>
 				</div>
-				<div class="actions">
-					<div class="btn-group btn-group-devided" data-toggle="buttons">
-						<button type="button" class="btn btn-circle btn-outline green btn-sm">View More>></button>
+				
+					<div class="btn-group pull-right" >
+						<a href="{{url('star')}}"><button type="button" class="btn btn-circle btn-outline green btn-sm">View More>></button></a>
 					</div>
-				</div>
+				
 			</div>
 			<div class="portlet-body">
 				
 				<div class="table-scrollable table-scrollable-borderless">
-					<table class="table table-hover table-light">
+					<table class="table table-hover">
 						<thead>
 							<tr class="uppercase">
 								<th > ASIN </th>
@@ -385,157 +431,42 @@
 				<span class="caption-subject font-dark bold uppercase">MY TASKS</span>
 				
 			</div>
-			<div class="actions">
-					<div class="btn-group btn-group-devided" data-toggle="buttons">
-						<button type="button" class="btn btn-circle btn-outline green btn-sm">View More>></button>
+			
+					<div class="btn-group pull-right" data-toggle="buttons">
+						<a href="{{url('task')}}"><button type="button" class="btn btn-circle btn-outline green btn-sm">View More>></button></a>
 					</div>
-				</div>
-			<ul class="nav nav-tabs">
-				<li class="active">
-					<a href="#tab_actions_new" data-toggle="tab" aria-expanded="true"> New </a>
-				</li>
-				<li class="">
-					<a href="#tab_actions_open" data-toggle="tab" aria-expanded="false"> Opening </a>
-				</li>
-				<li class="">
-					<a href="#tab_actions_under" data-toggle="tab" aria-expanded="false"> Under Review </a>
-				</li>
-				<li class="">
-					<a href="#tab_actions_finish" data-toggle="tab" aria-expanded="false"> Finished </a>
-				</li>
-				
-			</ul>
+			
 		</div>
 		<div class="portlet-body">
-			<div class="tab-content">
-				<div class="tab-pane active" id="tab_actions_new">
-					<!-- BEGIN: Actions -->
-					<div class="mt-actions">
-						<div class="mt-action">
-							<div class="mt-action-body">
-								<div class="mt-action-row">
-									<div class="mt-action-info ">
-										<div class="mt-action-details ">
-											<span class="mt-action-author">Listing优化 </span>
-											<p class="mt-action-desc">Dummy text of the printing</p>
-										</div>
-									</div>
-									<div class="mt-action-datetime ">
-										<span class="mt-action-date"> Natasha Kim </span>
-										<span class="mt-action-dot bg-green"></span>
-										<span class="mt=action-time">2019-08-31</span>
-									</div>
-									<div class="mt-action-buttons ">
-										<div class="btn-group btn-group-circle">
-											<button type="button" class="btn btn-outline green btn-sm">Process</button>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-						<div class="mt-action">
-							<div class="mt-action-body">
-								<div class="mt-action-row">
-									<div class="mt-action-info ">
-										<div class="mt-action-details ">
-											<span class="mt-action-author">Listing优化</span>
-											<p class="mt-action-desc">Dummy text of the printing</p>
-										</div>
-									</div>
-									<div class="mt-action-datetime ">
-										<span class="mt-action-date">Natasha Kim</span>
-										<span class="mt-action-dot bg-red"></span>
-										<span class="mt=action-time">2019-08-31</span>
-									</div>
-									<div class="mt-action-buttons ">
-										<div class="btn-group btn-group-circle">
-											<button type="button" class="btn btn-outline green btn-sm">Process</button>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-						<div class="mt-action">
-							<div class="mt-action-body">
-								<div class="mt-action-row">
-									<div class="mt-action-info ">
-										<div class="mt-action-details ">
-											<span class="mt-action-author">Listing优化</span>
-											<p class="mt-action-desc">Dummy text of the printing</p>
-										</div>
-									</div>
-									<div class="mt-action-datetime ">
-										<span class="mt-action-date">Natasha Kim</span>
-										<span class="mt-action-dot bg-green"></span>
-										<span class="mt=action-time">2019-08-31</span>
-									</div>
-									<div class="mt-action-buttons ">
-										<div class="btn-group btn-group-circle">
-											<button type="button" class="btn btn-outline green btn-sm">Process</button>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-						
-						<div class="mt-action">
-							<div class="mt-action-body">
-								<div class="mt-action-row">
-									<div class="mt-action-info ">
-										<div class="mt-action-details ">
-											<span class="mt-action-author">Listing优化</span>
-											<p class="mt-action-desc">Dummy text of the printing</p>
-										</div>
-									</div>
-									<div class="mt-action-datetime ">
-										<span class="mt-action-date">Natasha Kim</span>
-										<span class="mt-action-dot bg-green"></span>
-										<span class="mt=action-time">2019-08-31</span>
-									</div>
-									<div class="mt-action-buttons ">
-										<div class="btn-group btn-group-circle">
-											<button type="button" class="btn btn-outline green btn-sm">Process</button>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-						
-						<div class="mt-action">
-							<div class="mt-action-body">
-								<div class="mt-action-row">
-									<div class="mt-action-info ">
-										<div class="mt-action-details ">
-											<span class="mt-action-author">Listing优化</span>
-											<p class="mt-action-desc">Dummy text of the printing</p>
-										</div>
-									</div>
-									<div class="mt-action-datetime ">
-										<span class="mt-action-date">Natasha Kim</span>
-										<span class="mt-action-dot bg-green"></span>
-										<span class="mt=action-time">2019-08-31</span>
-									</div>
-									<div class="mt-action-buttons ">
-										<div class="btn-group btn-group-circle">
-											<button type="button" class="btn btn-outline green btn-sm">Process</button>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-					<!-- END: Actions -->
-				</div>
-				<div class="tab-pane " id="tab_actions_open">
-					
-				</div>
-				<div class="tab-pane " id="tab_actions_under">
-					
-				</div>
-				<div class="tab-pane " id="tab_actions_finish">
-					
-				</div>
-			</div>
+			
+			<table class="table table-hover">
+			
+			
+			<tr class="uppercase">
+				<th width="40%" >Task Details</th>
+				<th width="20%"  >Task Response</th>
+				<th width="8%" >Due To</th>
+				<th width="8%" >To</th>
+				<th width="8%" >By</th>
+				<th width="8%" >Priority</th>
+				<th width="8%" > Stage </th>
+			</tr>
+			
+			@foreach ($tasks as $task)
+			<tr>
+				<td><a class="task_request" title="Task Details" href="javascript:;" id="{{$task['id']}}-request" data-pk="{{$task['id']}}-request" data-type="textarea" data-placement="right">{{$task['request']}}</a></td>
+				<td><a class="task_response" title="Task Response" href="javascript:;" id="{{$task['id']}}-response" data-pk="{{$task['id']}}-response" data-type="textarea" data-placeholder="Your response here..." >{{$task['response']}}</a></td>
+				<td><a class="task_complete_date" title="Due To" href="javascript:;" id="{{$task['id']}}-complete_date" data-pk="{{$task['id']}}-complete_date" data-type="date" data-viewformat="yyyy-mm-dd" data-placement="right">{{$task['complete_date']}}</a></td>
+				<td><a class="task_response_user_id" title="Assigned To" href="javascript:;" id="{{$task['id']}}-response_user_id" data-pk="{{$task['id']}}-response_user_id" data-value="{{$task['response_user_id']}}" data-type="select">{{array_get($users,$task['response_user_id'])}}</a></td>
+				<td><a class="task_request_user_id" title="Assigned By" href="javascript:;" id="{{$task['id']}}-request_user_id" data-pk="{{$task['id']}}-request_user_id" data-value="{{$task['request_user_id']}}" data-type="select">{{array_get($users,$task['request_user_id'])}}</a></td>
+				<td>
+				
+				<a class="task_priority" title="Priority" href="javascript:;" id="{{$task['id']}}-priority" data-pk="{{$task['id']}}-priority" data-type="text">{{$task['priority']}} </a>
+				</td>
+				<td><a class="task_stage" title="Stage" href="javascript:;" id="{{$task['id']}}-stage" data-pk="{{$task['id']}}-stage" data-value="{{$task['stage']}}" data-type="select" data-placement="left">{{array_get(getTaskStageArr(),$task['stage'])}}</td>
+			</tr>
+			@endforeach
+			</table>
 		</div>
 	</div>
 </div>
@@ -544,9 +475,96 @@
 
     
 
-
+<script src="/assets/global/plugins/moment.min.js" type="text/javascript"></script>
+<script src="/assets/global/plugins/jquery.mockjax.js" type="text/javascript"></script>    
+<script src="/assets/global/plugins/bootstrap-editable/bootstrap-editable/js/bootstrap-editable.js" type="text/javascript"></script>
+<script src="/assets/pages/scripts/form-editable.min.js" type="text/javascript"></script>
 <script type="text/javascript">
+var FormEditable = function() {
+
+    $.mockjaxSettings.responseTime = 500;
+
+    var initAjaxMock = function() {
+        $.mockjax({
+            url: '/taskajaxupdate',
+			type:'post',
+            response: function(settings) {
+				console.log(this);
+				console.log(settings);
+            }
+        });
+    }
+
+    var initEditables = function() {
+        $.fn.editable.defaults.inputclass = 'form-control';
+        $.fn.editable.defaults.url = '/taskajaxupdate';
+		
+		$('.task_request,.task_response').editable({
+			emptytext:'N/A'
+		});
+		var sellers = [];
+        <?php foreach($users as $k=>$v) {?>
+		sellers.push({
+			value: "<?php echo $k?>",
+			text: "<?php echo $v?>"
+		});
+		<?php }?>
+
+        $('.task_response_user_id').editable({
+            inputclass: 'form-control input-medium',
+            source: sellers
+        });
+		
+		$('.task_request_user_id').editable({
+            inputclass: 'form-control input-medium',
+            source: sellers
+        });
+		
+		var stages = [];
+        <?php foreach(getTaskStageArr() as $k=>$v) {?>
+		stages.push({
+			value: "<?php echo $k?>",
+			text: "<?php echo $v?>"
+		});
+		<?php }?>
+		$('.task_stage').editable({
+            inputclass: 'form-control input-medium',
+            source: stages
+        });
+		
+		$('.task_priority').editable({
+			emptytext:'0',
+			validate: function (value) {
+                if (isNaN(value)) {
+                    return 'Must be a number';
+                }
+            },
+			success: function (response) { 
+				var obj = JSON.parse(response);
+				for(var jitem in obj){
+					$('#'+jitem).text(obj[jitem]);
+				}
+			}, 
+			error: function (response) { 
+				return 'remote error'; 
+			} 
+		});
+		
+		$('.task_complete_date').editable({
+            format: 'yyyy-mm-dd',
+            viewformat: 'yyyy-mm-dd',
+        });
+    }
+
+    return {
+        init: function() {
+            initEditables();
+        }
+    };
+
+}();
 $(function() {
+	
 	$('.date-picker').datepicker({
 		rtl: App.isRTL(),
 		format: 'yyyy-mm',
@@ -560,71 +578,25 @@ $(function() {
 	});
 	
 	
-	var dataStyle = {
-		normal: {
-			label: {show:false},
-			labelLine: {show:false}
-		}
-	};
-	var placeHolderStyle = {
-		normal : {
-			color: 'rgba(0,0,0,0)',
-			label: {show:false},
-			labelLine: {show:false}
-		},
-		emphasis : {
-			color: 'rgba(0,0,0,0)'
-		}
-	};
-	pieoption = {
-		title: {
-			text: '2222¥',
-			subtext: '销售提成',
-			x: 'center',
-			y: 'center',
-			itemGap: 20,
-			textStyle : {
-				color : 'rgba(30,144,255,0.8)',
-				fontFamily : '微软雅黑',
-				fontSize : 35,
-				fontWeight : 'bolder'
-			}
-		},
 	
-		series : [
-			{
-				name:'1',
-				type:'pie',
-				clockWise:false,
-				radius : [80, 100],
-				itemStyle : dataStyle,
-				data:[
-					{
-						value:100,
-					},
-					{
-						value:0,
-					}
-				]
-			}
-		]
-	};
-	var pieChart = echarts.init(document.getElementById('pieChart'));
-	pieChart.setOption(pieoption,true);
 	
 	
 	
 	lineoption = {
 		title : {
-			text: '年度提成曲线图',
-			x: 'center',
-			subtext: '2019年'
+			show: false,
 		},
 		tooltip : {
 			trigger: 'axis'
 		},
 		legend: {
 			data:['提成']
+		},
+		grid: {
+			x:40,
+			y:40,
+			x2:40,
+			y2:40,
 		},
 		calculable : true,
 		xAxis : [
@@ -652,7 +624,27 @@ $(function() {
 	
 	var lineChart = echarts.init(document.getElementById('lineChart'));
 	lineChart.setOption(lineoption,true);
-                    
+	$("#tichengxianshi").click(function(){
+
+		if($(this).hasClass('fa-eye-slash')){
+			$(this).removeClass('fa-eye-slash');
+			$(this).removeClass('fa');	
+			$(this).html($(this).data('value'));
+			$(this).text($(this).data('value'));	
+			$("#lineChartDiv").show();
+			lineChart.resize();
+		}else{
+			$(this).addClass('fa-eye-slash');
+			$(this).addClass('fa');	
+			$(this).html('');
+			$(this).text('');		
+			$("#lineChartDiv").hide();
+		}
+	});
+	
+	
+	lineChart.resize();
+    FormEditable.init();
 });
 </script>
 @endsection

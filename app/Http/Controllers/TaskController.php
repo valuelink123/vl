@@ -217,13 +217,7 @@ class TaskController extends Controller
 		}
 		
         $result = Task::insert($insert_data);
-        if ($result) {
-            $request->session()->flash('success_message','Create Task Success');
-            return redirect('task');
-        }else{
-            $request->session()->flash('error_message','Create Task Failed');
-            return redirect()->back()->withInput();
-        }
+        echo json_encode($result);
     }
 	
 	
@@ -288,5 +282,13 @@ class TaskController extends Controller
         }
         return $users_array;
     }
+	
+	public function taskAjaxUpdate(Request $request){
+		$name = $request->get('name');
+		$data = explode("-",$name);
+		Task::where('id',array_get($data,0))->update([array_get($data,1)=>$request->get('value')]);
+		$return[$name]=$request->get('value');
+		echo json_encode($return);
+	}
 
 }

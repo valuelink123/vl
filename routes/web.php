@@ -132,3 +132,4 @@ Route::match(['post','get'],'/crm/batchAssignTask', 'CrmController@batchAssignTa
 
 Route::resource('task', 'TaskController');
 Route::Post('/task/get', 'TaskController@get')->name('getTask');
+Route::Post('/taskajaxupdate', 'TaskController@taskAjaxUpdate')->name('taskAjaxUpdate');

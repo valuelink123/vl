@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Groupdetail;
 use App\User;
+use App\Task;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Services\MultipleQueue;
@@ -69,6 +70,7 @@ class HomeController extends Controller
 		$returnDate['date']= $date;
 		$returnDate['s_user_id']= $user_id;
 		$returnDate['bgbu']= $bgbu;
+		$returnDate['tasks']= Task::take(10)->get()->toArray();
         return view('home',$returnDate);
 
     }

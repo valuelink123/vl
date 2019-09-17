@@ -727,6 +727,15 @@
     <div class="page-footer">
         <div class="page-footer-inner"> 2018 © Valuelink Ltd.
         </div>
+		@permission('task-create')
+		<nav class="quick-nav">
+            <a class="quick-nav-trigger" data-target="#global_task_ajax" data-toggle="modal" href="{{ url('task/create')}}">
+                <span aria-hidden="true"></span>
+            </a>
+            
+            <span aria-hidden="true" class="quick-nav-bg"></span>
+        </nav>
+		@endpermission
         <div class="scroll-to-top">
             <i class="icon-arrow-up"></i>
         </div>
@@ -764,7 +773,16 @@
     });
 </script>
 
-
+<div class="modal fade bs-modal-lg" id="global_task_ajax" role="basic" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content" >
+			<div class="modal-body" >
+				<img src="../assets/global/img/loading-spinner-grey.gif" alt="" class="loading">
+				<span>Loading... </span>
+			</div>
+		</div>
+	</div>
+</div>
 
 <!-- END THEME LAYOUT SCRIPTS -->
 </body>

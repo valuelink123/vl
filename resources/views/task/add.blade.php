@@ -4,7 +4,7 @@
 			<h1 class="page-title font-red-intense">Add Tasks
 			</h1>
             <div class="portlet-body form">
-                <form role="form" action="{{ url('task') }}" method="POST">
+                <form id="add_task_form"  name="add_task_form">
                     {{ csrf_field() }}
 
                     <div class="form-body">
@@ -155,8 +155,43 @@ $('.ajax-mt-multiselect').each(function(){
 		}*/
 	});   
 });
-$('.date-picker').datepicker({
-	rtl: App.isRTL(),
-	autoclose: true
+
+$(function() {
+	$('.date-picker').datepicker({
+		rtl: App.isRTL(),
+		autoclose: true
+	});
+	$('#add_task_form').submit(function() {
+		$.ajaxSetup({
+			headers: { 'X-CSRF-TOKEN' : '{{ csrf_token() }}' }
+		});
+		$.ajax({
+			type: "POST",
+			dataType: "json",
+			url: "{{ url('task') }}",
+			data: $('#add_task_form').serialize(),
+			success: function (data) {
+				if(data==1){
+					alert('Add Task Success');
+					$('#ajax').modal('hide');//隐藏modal
+					$('#global_task_ajax').modal('hide');
+					$('.modal-backdrop').remove();
+					if ( $('#datatable_ajax').length > 0 ){
+						var dttable = $('#datatable_ajax').dataTable();
+						dttable.fnClearTable(false); //清空一下table
+						dttable.fnDestroy(); //还原初始化了的datatable
+						TableDatatablesAjax.init();
+					} 
+		
+				}else{
+					alert(data);
+				}
+			},
+			error: function(data) {
+				alert("error:"+data.responseText);
+			}
+		});
+		return false;
+	});
 });
 </script>

@@ -13,19 +13,7 @@
 					
                     <form role="form" action="{{url('task')}}" method="GET">
 						<div class="row" style="margin-bottom:20px;">
-						
-							<div class="col-md-2">
-								@permission('task-create')
-								<div class="btn-group">
-									<a data-target="#ajax" data-toggle="modal" href="{{ url('task/create')}}"><button id="sample_editable_1_2_new" class="btn sbold blue"> Create New Tasks
-										<i class="fa fa-plus"></i>
-									</button>
-									</a>
-								</div>
-								@endpermission
-								
-								
-							</div>
+	
 							<div class="col-md-2">
 							<div class="table-actions-wrapper" id="table-actions-wrapper">
 								
