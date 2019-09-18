@@ -287,7 +287,21 @@ class TaskController extends Controller
 		$name = $request->get('name');
 		$data = explode("-",$name);
 		Task::where('id',array_get($data,0))->update([array_get($data,1)=>$request->get('value')]);
-		$return[$name]=$request->get('value');
+					
+		if(array_get($data,1)=='stage'){
+			$exist_ids = $request->get('exist_ids');
+			$exist_ids = explode(',',$exist_ids);
+			$return = Task::where('response_user_id',Auth::user()->id)->whereNotIn('id',$exist_ids)->where('stage','<',3)->orderBy('priority','desc')->first();
+			if($return){
+				$return=$return->toArray();
+				$return['request_user'] = array_get($this->getUsers(),$return['request_user_id']);
+			}else{
+				$return['id']=0;
+			}
+		}else{
+			$return[$name]=$request->get('value');
+			
+		}
 		echo json_encode($return);
 	}
 

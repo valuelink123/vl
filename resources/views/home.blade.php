@@ -5,7 +5,7 @@
 .widget-thumb .widget-thumb-body .widget-thumb-body-stat {font-size:20px;}
 .widget-thumb .widget-thumb-wrap .widget-thumb-icon{width:50px;height:50px;line-height:30px;}
 .widget-thumb .widget-thumb-heading{color:#666; margin-bottom:10px;}
-.dashboard-stat2 { margin-bottom:0px;}
+.dashboard-stat2 { margin-bottom:0px;margin-top: 8px;}
 .col-lg-1, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-md-1, .col-md-10, .col-md-11, .col-md-12, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-sm-1, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-xs-1, .col-xs-10, .col-xs-11, .col-xs-12, .col-xs-2, .col-xs-3, .col-xs-4, .col-xs-5, .col-xs-6, .col-xs-7, .col-xs-8, .col-xs-9{
 padding:0px !important;}
 .portlet {margin-bottom:0px;}
@@ -13,7 +13,9 @@ padding:0px !important;}
 .portlet.light > .portlet-title > .caption{
 padding:5px 0;
 }
-
+.portlet.light > .portlet-title a{
+ font-size:12px;
+}
 .portlet.light > .portlet-title > .actions {
     padding: 6px 0 6px 0;
 }
@@ -40,8 +42,30 @@ padding-top:0px;}
 }
 .dashboard-stat2 .display .number h3 {
 
-    font-size: 24px;
+    font-size: 20px;
     font-weight: bold;
+}
+.dashboard-stat2 .display .number h3 > small {
+    font-size: 14px;
+}
+.primary-link {
+    font-size: 14px;
+}
+.portlet.light > .portlet-title > .caption > .caption-subject {
+    font-size: 12px;
+}
+table{ 
+table-layout:fixed; 
+}
+td.text_s{       
+text-overflow:ellipsis; 
+-moz-text-overflow: ellipsis; 
+overflow:hidden;      
+white-space: nowrap;      
+} 
+textarea.form-control{width:400px!important;}
+.editable-pre-wrapped {
+    white-space: nowrap !important;   
 }
 </style>
 <link href="/assets/global/plugins/bootstrap-editable/bootstrap-editable/css/bootstrap-editable.css" rel="stylesheet" type="text/css" />
@@ -49,11 +73,12 @@ padding-top:0px;}
 <div class="col-lg-12 col-xs-12 col-sm-12">
 <div class="portlet light ">
 			<div class="col-md-1">
-				<div style="width:100px;height:100px;border: 15px solid #ff0000;border-radius:50% !important;text-align:center;line-height:70px;margin-top: 13px" >
+				<div style="width:100px;height:100px;border: 15px solid #ff0000;border-radius:50% !important;text-align:center;line-height:70px;margin:auto;margin-top: 13px" >
 					<span id="tichengxianshi" style="cursor:pointer;" data-value="12312.14" class="fa fa-eye-slash"></span>
 				</div>
 			</div>
 			<div class="col-md-8">
+				<div class="col-md-10 col-md-offset-1">
 				<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12" style="width:20%;"> 
 					<div class="dashboard-stat2 ">
 						<div class="display">
@@ -184,9 +209,10 @@ padding-top:0px;}
 						</div>
 					</div>
 				</div>
+				</div>
 			</div>
 			
-            <div class="col-md-3">
+            <div class="col-md-3" style="    padding-top: 10px !important;">
 				
 							
 					<form role="form" action="{{url('home')}}" method="GET">
@@ -194,8 +220,8 @@ padding-top:0px;}
 
                         <div class="form-group col-md-5" >
                             
-                            <div class="input-group date date-picker" data-date-format="yyyy-mm">
-                                <input type="text" class="form-control form-filter input-sm" readonly name="date" placeholder="Date" value="{{$date}}">
+                            <div class="input-group date date-picker" data-date-format="yyyy-mm-dd">
+                                <input type="text" class="form-control form-filter input-sm" readonly name="date" placeholder="Date" value="{{$date_from}}">
                                 <span class="input-group-btn">
 									<button class="btn btn-sm default" type="button">
 										<i class="fa fa-calendar"></i>
@@ -205,8 +231,8 @@ padding-top:0px;}
                         </div>
 						<div class="form-group col-md-5 col-md-offset-2" >
                             
-                            <div class="input-group date date-picker" data-date-format="yyyy-mm">
-                                <input type="text" class="form-control form-filter input-sm" readonly name="date" placeholder="Date" value="{{$date}}">
+                            <div class="input-group date date-picker" data-date-format="yyyy-mm-dd">
+                                <input type="text" class="form-control form-filter input-sm" readonly name="date" placeholder="Date" value="{{$date_to}}">
                                 <span class="input-group-btn">
 									<button class="btn btn-sm default" type="button">
 										<i class="fa fa-calendar"></i>
@@ -217,12 +243,13 @@ padding-top:0px;}
                        
 						
 						<div class="form-group col-md-5">
-						<select class="form-control form-filter input-sm"  name="user_id" id="user_id">
-										<option value="">Seller</option>
-                                        @foreach ($users as $user_id=>$user_name)
-                                            <option value="{{$user_id}}" <?php if($user_id==$s_user_id) echo 'selected'; ?>>{{$user_name}}</option>
-                                        @endforeach
-                                    </select>
+						<select class="mt-multiselect btn btn-default form-control form-filter input-sm " data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" name="user_id" id="user_id">
+
+								@foreach ($users as $user_id=>$user_name)
+									<option value="{{$user_id}}" <?php if($user_id==$s_user_id) echo 'selected'; ?>>{{$user_name}}</option>
+								@endforeach
+							</select>
+						
 						</div>
 						
 						<div class="form-group col-md-5 col-md-offset-2">
@@ -276,9 +303,9 @@ padding-top:0px;}
 				
 			</div>
 			
-					<div class="btn-group pull-right" data-toggle="buttons">
-						<a href="{{url('star')}}"><button type="button" class="btn btn-circle btn-outline green btn-sm">View More>></button></a>
-					</div>
+			<div class="pull-right">
+				<a href="{{url('star')}}">View More&gt;&gt;</a>
+			</div>
 			
 		</div>
 			<div class="portlet-body">
@@ -291,11 +318,11 @@ padding-top:0px;}
 								<th> UNITS </th>
 								<th> SALES </th>
 								<th> AVG.PRICE </th>
-								<th > FBA </th>
+								<th >FBA</th>
 								<th> OUTSTOCK DATE </th>
 								<th> RATING </th>
-								<th> SESSIONS </th>
-								<th> CONVERSION RATE </th>
+								<th> SESSIONS <font style="color:#ff0000;"><i  class="fa fa-info-circle popovers" data-container="body" onclick=" " data-trigger="hover" data-placement="top" data-html="true" data-content="Average data from {{date('Y-m-d',strtotime('-10days'))}} to {{date('Y-m-d',strtotime('-4days'))}}"></i></font></th>
+								<th> CR <font style="color:#ff0000;"><i  class="fa fa-info-circle popovers" data-container="body" onclick=" " data-trigger="hover" data-placement="top" data-html="true" data-content="Average data from {{date('Y-m-d',strtotime('-10days'))}} to {{date('Y-m-d',strtotime('-4days'))}}"></i></font></th>
 								
 								<th> KEYWORD RANKING </th>
 								<th> BSR </th>
@@ -430,38 +457,35 @@ padding-top:0px;}
 				
 			</div>
 			
-					<div class="btn-group pull-right" data-toggle="buttons">
-						<a href="{{url('task')}}"><button type="button" class="btn btn-circle btn-outline green btn-sm">View More>></button></a>
+					<div class="pull-right">
+						<a href="{{url('task')}}">View More&gt;&gt;</a>
 					</div>
-			
 		</div>
 		<div class="portlet-body">
 			
-			<table class="table table-hover">
+			<table class="table table-hover" id="tasks_list">
 			
 			
 			<tr class="uppercase">
-				<th width="40%" >Task Details</th>
-				<th width="20%"  >Task Response</th>
+				<th width="2%"><font style="color:#ff0000;"><i  class="fa fa-info-circle popovers" data-container="body" onclick="" data-trigger="hover" data-placement="right" data-html="true" data-content="Click to complete the task quickly"></i></font></th>
+				<th width="44%" >Task Details</th>
+				<th width="30%"  >Task Response</th>
 				<th width="8%" >Due To</th>
-				<th width="8%" >To</th>
 				<th width="8%" >By</th>
 				<th width="8%" >Priority</th>
-				<th width="8%" > Stage </th>
 			</tr>
 			
 			@foreach ($tasks as $task)
-			<tr>
-				<td><a class="task_request primary-link" title="Task Details" href="javascript:;" id="{{$task['id']}}-request" data-pk="{{$task['id']}}-request" data-type="textarea" data-placement="right">{{$task['request']}}</a></td>
-				<td><a class="task_response" title="Task Response" href="javascript:;" id="{{$task['id']}}-response" data-pk="{{$task['id']}}-response" data-type="textarea" data-placeholder="Your response here..." >{{$task['response']}}</a></td>
-				<td><a class="task_complete_date" title="Due To" href="javascript:;" id="{{$task['id']}}-complete_date" data-pk="{{$task['id']}}-complete_date" data-type="date" data-viewformat="yyyy-mm-dd" data-placement="right">{{$task['complete_date']}}</a></td>
-				<td><a class="task_response_user_id" title="Assigned To" href="javascript:;" id="{{$task['id']}}-response_user_id" data-pk="{{$task['id']}}-response_user_id" data-value="{{$task['response_user_id']}}" data-type="select">{{array_get($users,$task['response_user_id'])}}</a></td>
-				<td><a class="task_request_user_id" title="Assigned By" href="javascript:;" id="{{$task['id']}}-request_user_id" data-pk="{{$task['id']}}-request_user_id" data-value="{{$task['request_user_id']}}" data-type="select">{{array_get($users,$task['request_user_id'])}}</a></td>
-				<td>
-				
-				<a class="task_priority" title="Priority" href="javascript:;" id="{{$task['id']}}-priority" data-pk="{{$task['id']}}-priority" data-type="text">{{$task['priority']}} </a>
+			<tr id="task_{{$task['id']}}">
+				<td><input type="checkbox" class="task_quick_complete" id="{{$task['id']}}" /></a>
 				</td>
-				<td><a class="task_stage" title="Stage" href="javascript:;" id="{{$task['id']}}-stage" data-pk="{{$task['id']}}-stage" data-value="{{$task['stage']}}" data-type="select" data-placement="left">{{array_get(getTaskStageArr(),$task['stage'])}}</td>
+				<td class="text_s"><a class="task_request primary-link" title="Task Details" href="javascript:;" id="{{$task['id']}}-request" data-pk="{{$task['id']}}-request" data-type="textarea" data-placement="right">{{$task['request']}}</a></td>
+				<td class="text_s"><a class="task_response" title="Task Response" href="javascript:;" id="{{$task['id']}}-response" data-pk="{{$task['id']}}-response" data-type="textarea" data-placeholder="Your response here..." >{{$task['response']}}</a></td>
+				<td><a class="task_complete_date" title="Due To" href="javascript:;" id="{{$task['id']}}-complete_date" data-pk="{{$task['id']}}-complete_date" data-type="date" data-viewformat="yyyy-mm-dd" data-placement="right">{{$task['complete_date']}}</a></td>
+				<td>{{array_get($users,$task['request_user_id'])}}</td>
+				<td  class="text_s">
+				<a class="task_priority" title="Priority" href="javascript:;" id="{{$task['id']}}-priority" data-pk="{{$task['id']}}-priority" data-type="text" data-placement="left">{{$task['priority']}}</a>
+				</td>
 			</tr>
 			@endforeach
 			</table>
@@ -496,7 +520,6 @@ var FormEditable = function() {
     var initEditables = function() {
         $.fn.editable.defaults.inputclass = 'form-control';
         $.fn.editable.defaults.url = '/taskajaxupdate';
-		
 		$('.task_request,.task_response').editable({
 			emptytext:'N/A'
 		});
@@ -576,13 +599,14 @@ $(function() {
 	
 	lineoption = {
 		title : {
-			show: false,
+			text: 'Estimated Commission, paid according to actual calculation',
+
 		},
 		tooltip : {
 			trigger: 'axis'
 		},
 		legend: {
-			data:['提成']
+			data:['Commission']
 		},
 		grid: {
 			x:40,
@@ -605,7 +629,7 @@ $(function() {
 		],
 		series : [
 			{
-				name:'提成金额',
+				name:'Commission',
 				type:'line',
 				smooth:true,
 				itemStyle: {normal: {areaStyle: {type: 'default'}}},
@@ -632,6 +656,36 @@ $(function() {
 			$(this).text('');		
 			$("#lineChartDiv").slideUp();
 		}
+	});
+	
+	$(".task_quick_complete").on('click',function(){
+	
+		var task_id = $(this).attr('id');
+		var exist_ids = [];
+		$(".task_quick_complete").each(function(){
+			exist_ids.push($(this).attr('id'));
+		});
+		exist_ids.join(',');
+		$.ajaxSetup({
+			headers: { 'X-CSRF-TOKEN' : '{{ csrf_token() }}' }
+		});
+		$.ajax({
+			type: "POST",
+			dataType: "json",
+			url: "{{ url('taskajaxupdate') }}",
+			data: "name="+task_id+"-stage&value=3&exist_ids="+exist_ids,
+			success: function (redata) {
+				$("#task_"+task_id).remove();
+				if(redata.id){
+					var str='<tr id="task_'+redata.id+'"><td><input type="checkbox" class="task_quick_complete" id="'+redata.id+'" /></a></td><td class="text_s"><a class="task_request primary-link" title="Task Details" href="javascript:;" id="'+redata.id+'-request" data-pk="'+redata.id+'-request" data-type="textarea" data-placement="right">'+redata.request+'</a></td><td class="text_s"><a class="task_response" title="Task Response" href="javascript:;" id="'+redata.id+'-response" data-pk="'+redata.id+'-response" data-type="textarea" data-placeholder="Your response here..." >'+((redata.response)?redata.response:"N/A")+'</a></td><td><a class="task_complete_date" title="Due To" href="javascript:;" id="'+redata.id+'-complete_date" data-pk="'+redata.id+'-complete_date" data-type="date" data-viewformat="yyyy-mm-dd" data-placement="right">'+redata.complete_date+'</a></td><td>'+redata.request_user+'</td><td  class="text_s"><a class="task_priority" title="Priority" href="javascript:;" id="'+redata.id+'-priority" data-pk="'+redata.id+'-priority" data-type="text" data-placement="left">'+redata.priority+'</a></td></tr>';
+					$("#tasks_list").append(str);
+					FormEditable.init();
+				}
+			},
+			error: function(data) {
+				alert("error:"+data.responseText);
+			}
+		});
 	});
 	
 	

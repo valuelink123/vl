@@ -56,8 +56,8 @@ class HomeController extends Controller
 			$user_id = Auth::user()->id;
 		}
 		
-		$date = $request->get('date')?$request->get('date'):date('Y-m');
-
+		$date_from = $request->get('date_from')?$request->get('date_from'):date('Y-m').'-01';
+		$date_to = $request->get('date_to')?$request->get('date_to'):date('Y-m-d',strtotime('-1day'));
 		if($user_id){
 			$where_star.= "and b.user_id=".$user_id;
 			$where.= "and b.review_user_id=".$user_id;
@@ -67,10 +67,11 @@ class HomeController extends Controller
 		
 		$returnDate['teams']= DB::select('select bg,bu from asin group by bg,bu ORDER BY BG ASC,BU ASC');
 		$returnDate['users']= $this->getUsers();
-		$returnDate['date']= $date;
+		$returnDate['date_from']= $date_from;
+		$returnDate['date_to']= $date_to;
 		$returnDate['s_user_id']= $user_id;
 		$returnDate['bgbu']= $bgbu;
-		$returnDate['tasks']= Task::take(10)->get()->toArray();
+		$returnDate['tasks']= Task::where('response_user_id',Auth::user()->id)->where('stage','<',3)->take(10)->orderBy('priority','desc')->get()->toArray();
         return view('home',$returnDate);
 
     }
