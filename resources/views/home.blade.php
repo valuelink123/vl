@@ -9,20 +9,11 @@
 .col-lg-1, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-md-1, .col-md-10, .col-md-11, .col-md-12, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-sm-1, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-xs-1, .col-xs-10, .col-xs-11, .col-xs-12, .col-xs-2, .col-xs-3, .col-xs-4, .col-xs-5, .col-xs-6, .col-xs-7, .col-xs-8, .col-xs-9{
 padding:0px !important;}
 .portlet {margin-bottom:0px;}
-.portlet > .portlet-title > .actions > .btn, .portlet > .portlet-title > .actions > .btn.btn-sm, .portlet > .portlet-title > .actions > .btn-group > .btn, .portlet > .portlet-title > .actions > .btn-group > .btn.btn-sm {
-    padding: 4px 10px;
-    font-size: 12px;
-    line-height: 12px;
-}
 .portlet.light{padding-top:0px;}
 .portlet.light > .portlet-title > .caption{
 padding:5px 0;
 }
-.btn-group-sm>.btn, .btn-sm {
-    padding: 3px 10px;
-    font-size: 12px;
-    line-height: 12px;
-}
+
 .portlet.light > .portlet-title > .actions {
     padding: 6px 0 6px 0;
 }
@@ -44,6 +35,14 @@ padding-top:0px;}
     font-size: 13px;
     color: #666;
 }
+.dashboard-stat2 .display {
+    margin-bottom: 10px;
+}
+.dashboard-stat2 .display .number h3 {
+
+    font-size: 24px;
+    font-weight: bold;
+}
 </style>
 <link href="/assets/global/plugins/bootstrap-editable/bootstrap-editable/css/bootstrap-editable.css" rel="stylesheet" type="text/css" />
 <div class="row" >
@@ -54,7 +53,7 @@ padding-top:0px;}
 					<span id="tichengxianshi" style="cursor:pointer;" data-value="12312.14" class="fa fa-eye-slash"></span>
 				</div>
 			</div>
-			<div class="col-md-9">
+			<div class="col-md-8">
 				<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12" style="width:20%;"> 
 					<div class="dashboard-stat2 ">
 						<div class="display">
@@ -187,13 +186,13 @@ padding-top:0px;}
 				</div>
 			</div>
 			
-            <div class="col-md-2">
+            <div class="col-md-3">
 				
 							
 					<form role="form" action="{{url('home')}}" method="GET">
                         {{ csrf_field() }}
 
-                        <div class="form-group col-md-6" >
+                        <div class="form-group col-md-5" >
                             
                             <div class="input-group date date-picker" data-date-format="yyyy-mm">
                                 <input type="text" class="form-control form-filter input-sm" readonly name="date" placeholder="Date" value="{{$date}}">
@@ -204,7 +203,7 @@ padding-top:0px;}
 								</span>
                             </div>
                         </div>
-						<div class="form-group col-md-6" >
+						<div class="form-group col-md-5 col-md-offset-2" >
                             
                             <div class="input-group date date-picker" data-date-format="yyyy-mm">
                                 <input type="text" class="form-control form-filter input-sm" readonly name="date" placeholder="Date" value="{{$date}}">
@@ -217,7 +216,7 @@ padding-top:0px;}
                         </div>
                        
 						
-						<div class="form-group col-md-6">
+						<div class="form-group col-md-5">
 						<select class="form-control form-filter input-sm"  name="user_id" id="user_id">
 										<option value="">Seller</option>
                                         @foreach ($users as $user_id=>$user_name)
@@ -226,7 +225,7 @@ padding-top:0px;}
                                     </select>
 						</div>
 						
-						<div class="form-group col-md-6">
+						<div class="form-group col-md-5 col-md-offset-2">
 						<select class="form-control form-filter input-sm" name="bgbu">
                                         <option value="">BG && BU</option>
 										<?php 
@@ -270,23 +269,22 @@ padding-top:0px;}
 <div class="row">
 	<div class="col-lg-12 col-xs-12 col-sm-12">
 		<div class="portlet light ">
-			<div class="portlet-title">
-				<div class="caption caption-md">
-					<i class="icon-bar-chart font-dark hide"></i>
-					<span class="caption-subject font-dark bold uppercase">My Listings</span>
-					<span class="caption-helper"></span>
-				</div>
-				
-					<div class="btn-group pull-right" >
-						<a href="{{url('star')}}"><button type="button" class="btn btn-circle btn-outline green btn-sm">View More>></button></a>
-					</div>
+			<div class="portlet-title tabbable-line">
+			<div class="caption">
+				<i class=" icon-social-twitter font-dark hide"></i>
+				<span class="caption-subject font-dark bold uppercase">MY Listings</span>
 				
 			</div>
+			
+					<div class="btn-group pull-right" data-toggle="buttons">
+						<a href="{{url('star')}}"><button type="button" class="btn btn-circle btn-outline green btn-sm">View More>></button></a>
+					</div>
+			
+		</div>
 			<div class="portlet-body">
 				
-				<div class="table-scrollable table-scrollable-borderless">
 					<table class="table table-hover">
-						<thead>
+						
 							<tr class="uppercase">
 								<th > ASIN </th>
 								<th> SKU </th>
@@ -304,29 +302,7 @@ padding-top:0px;}
 								<th> SKU E.VALUE </th>
 								<th> SKU BONUS </th>
 							</tr>
-						</thead>
-						<tbody>
-						<tr>
-							
-							<td>
-								<a href="javascript:;" class="primary-link">1234567890</a>
-							</td>
-							<td> $345 </td>
-							<td> 45 </td>
-							<td> 124 </td>
-							<td> $345 </td>
-							<td> 45 </td>
-							<td> 124 </td>
-							<td> $345 </td>
-							<td> 45 </td>
-							<td> 124 </td>
-							<td> $345 </td>
-							<td> 45 </td>
-							<td> 124 </td>
-							<td>
-								<span class="bold theme-font">80%</span>
-							</td>
-						</tr>
+						
 						
 						<tr>
 							
@@ -416,8 +392,30 @@ padding-top:0px;}
 							</td>
 						</tr>
 						
-					</tbody></table>
-				</div>
+						<tr>
+							
+							<td>
+								<a href="javascript:;" class="primary-link">1234567890</a>
+							</td>
+							<td> $345 </td>
+							<td> 45 </td>
+							<td> 124 </td>
+							<td> $345 </td>
+							<td> 45 </td>
+							<td> 124 </td>
+							<td> $345 </td>
+							<td> 45 </td>
+							<td> 124 </td>
+							<td> $345 </td>
+							<td> 45 </td>
+							<td> 124 </td>
+							<td>
+								<span class="bold theme-font">80%</span>
+							</td>
+						</tr>
+						
+				</table>
+				
 			</div>
 		</div>
 	</div>
@@ -454,7 +452,7 @@ padding-top:0px;}
 			
 			@foreach ($tasks as $task)
 			<tr>
-				<td><a class="task_request" title="Task Details" href="javascript:;" id="{{$task['id']}}-request" data-pk="{{$task['id']}}-request" data-type="textarea" data-placement="right">{{$task['request']}}</a></td>
+				<td><a class="task_request primary-link" title="Task Details" href="javascript:;" id="{{$task['id']}}-request" data-pk="{{$task['id']}}-request" data-type="textarea" data-placement="right">{{$task['request']}}</a></td>
 				<td><a class="task_response" title="Task Response" href="javascript:;" id="{{$task['id']}}-response" data-pk="{{$task['id']}}-response" data-type="textarea" data-placeholder="Your response here..." >{{$task['response']}}</a></td>
 				<td><a class="task_complete_date" title="Due To" href="javascript:;" id="{{$task['id']}}-complete_date" data-pk="{{$task['id']}}-complete_date" data-type="date" data-viewformat="yyyy-mm-dd" data-placement="right">{{$task['complete_date']}}</a></td>
 				<td><a class="task_response_user_id" title="Assigned To" href="javascript:;" id="{{$task['id']}}-response_user_id" data-pk="{{$task['id']}}-response_user_id" data-value="{{$task['response_user_id']}}" data-type="select">{{array_get($users,$task['response_user_id'])}}</a></td>
@@ -567,14 +565,8 @@ $(function() {
 	
 	$('.date-picker').datepicker({
 		rtl: App.isRTL(),
-		format: 'yyyy-mm',
-		weekStart: 1,
+		format: 'yyyy-mm-dd',
 		autoclose: true,
-		startView: 2,
-		maxViewMode: 1,
-		minViewMode:1,
-		forceParse: false,
-		language: 'zh-CN'
 	});
 	
 	
@@ -631,14 +623,14 @@ $(function() {
 			$(this).removeClass('fa');	
 			$(this).html($(this).data('value'));
 			$(this).text($(this).data('value'));	
-			$("#lineChartDiv").show();
+			$("#lineChartDiv").slideDown();
 			lineChart.resize();
 		}else{
 			$(this).addClass('fa-eye-slash');
 			$(this).addClass('fa');	
 			$(this).html('');
 			$(this).text('');		
-			$("#lineChartDiv").hide();
+			$("#lineChartDiv").slideUp();
 		}
 	});
 	

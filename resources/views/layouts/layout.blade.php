@@ -724,18 +724,18 @@
     </div>
     <!-- END CONTAINER -->
     <!-- BEGIN FOOTER -->
+	@permission('task-create')
+	<a data-target="#global_task_ajax" data-toggle="modal" href="{{ url('task/create')}}" class="btn btn-circle btn-lg green" style="position: fixed;
+    right: 10px;
+    bottom: 50px;"> Task
+		<i class="fa fa-plus"></i>
+	</a>
+	
+	@endpermission
     <div class="page-footer">
         <div class="page-footer-inner"> 2018 © Valuelink Ltd.
         </div>
-		@permission('task-create')
-		<nav class="quick-nav">
-            <a class="quick-nav-trigger" data-target="#global_task_ajax" data-toggle="modal" href="{{ url('task/create')}}">
-                <span aria-hidden="true"></span>
-            </a>
-            
-            <span aria-hidden="true" class="quick-nav-bg"></span>
-        </nav>
-		@endpermission
+		
         <div class="scroll-to-top">
             <i class="icon-arrow-up"></i>
         </div>
