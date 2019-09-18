@@ -240,15 +240,15 @@ class TaskController extends Controller
 		if(!Auth::user()->can(['task-update'])) die('Permission denied -- task-update');
 
         $rule = Task::findOrFail($id);
-		if($rule->response_user_id == Auth::user()->id ){
+		//if($rule->response_user_id == Auth::user()->id ){
 			$rule->response_date = date('Y-m-d H:i:s');
 			$rule->response = $request->get('response');
 			$rule->stage = intval($request->get('stage'));
 			$rule->asin = $request->get('asin');
 			$rule->sku = $request->get('sku');
 			$rule->customer_email = $request->get('customer_email');
-		}
-		if($rule->request_user_id == Auth::user()->id ){
+		//}
+		//if($rule->request_user_id == Auth::user()->id ){
 			$rule->type = intval($request->get('type'));
 			$rule->request = $request->get('request');
 			
@@ -259,7 +259,7 @@ class TaskController extends Controller
 			$rule->asin = $request->get('asin');
 			$rule->sku = $request->get('sku');
 			$rule->customer_email = $request->get('customer_email');
-		}
+		//}
 		
         
         $result = $rule->save();

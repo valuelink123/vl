@@ -73,7 +73,7 @@ textarea.form-control{width:400px!important;}
 <div class="col-lg-12 col-xs-12 col-sm-12">
 <div class="portlet light ">
 			<div class="col-md-1">
-				<div style="width:100px;height:100px;border: 15px solid #ff0000;border-radius:50% !important;text-align:center;line-height:70px;margin:auto;margin-top: 13px" >
+				<div style="width:100px;height:100px;border: 15px solid #f36a5a;border-radius:50% !important;text-align:center;line-height:70px;margin:auto;margin-top: 13px" >
 					<span id="tichengxianshi" style="cursor:pointer;" data-value="12312.14" class="fa fa-eye-slash"></span>
 				</div>
 			</div>

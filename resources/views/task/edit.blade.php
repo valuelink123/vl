@@ -7,9 +7,10 @@
                     {{ csrf_field() }}
 					{{ method_field('PUT') }}
 					<?php
-					$response_user = ($task['response_user_id']!=Auth::user()->id)?'Disabled':'';
-					$request_user = ($task['request_user_id']!=Auth::user()->id)?'Disabled':'';
-					$other_user = (!$request_user || !$response_user)?'':'Disabled';
+					$response_user=$request_user=$other_user='';
+					//$response_user = ($task['response_user_id']!=Auth::user()->id)?'Disabled':'';
+					//$request_user = ($task['request_user_id']!=Auth::user()->id)?'Disabled':'';
+					//$other_user = (!$request_user || !$response_user)?'':'Disabled';
 					?>
                     <div class="form-body">
 						<div class="form-group col-md-12">
