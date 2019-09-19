@@ -58,7 +58,7 @@ th,td,td>span {
                                 <input type="text" class="form-control form-filter input-sm"  name="star_to" placeholder="Rating To" value="{{array_get($_REQUEST,'star_to')}}">
 
                         </div>
-						
+						@if(Auth::user()->seller_rules)
 						<div class="col-md-2">
 						<select class="mt-multiselect btn btn-default input-sm form-control form-filter" multiple="multiple" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" name="user_id[]" id="user_id[]">
 
@@ -79,6 +79,7 @@ th,td,td>span {
 										} ?>
                                     </select>
 						</div>	
+						@endif
 						<!--
 						<div class="col-md-2">
 						<select class="form-control form-filter input-sm" name="rating_status">

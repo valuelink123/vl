@@ -71,20 +71,27 @@ class StarController extends Controller
 			pre_star.bsr as pre_bsr,
 			pre_star.status as pre_status,
 
-			asin.item_status,asin.asin_status,asin.seller,asin.bg,asin.bu,asin.review_user_id as user_id,asin.item_no,asin.star'))
+			asin.item_status,asin.asin_status,asin.seller,asin.bg,asin.bu,asin.sap_seller_id as sap_seller_id,asin.review_user_id as review_user_id,asin.item_no,asin.star'))
 			->leftJoin( DB::raw("(select * from star_history where create_at = '".$date_to."') as pre_star") ,function($q){
 				$q->on('star.asin', '=', 'pre_star.asin')
 					->on('star.domain', '=', 'pre_star.domain');
 			})
-			->leftJoin( DB::raw("(select max(star) as star,max(item_no) as item_no,max(bg) as bg,max(bu) as bu,max(seller) as seller,max(review_user_id) as review_user_id,max(item_status) as item_status, min(case when status = 'S' Then '0' else status end) as asin_status,asin,site from asin where length(asin)=10 group by asin,site) as asin") ,function($q){
+			->leftJoin( DB::raw("(select max(star) as star,max(item_no) as item_no,max(bg) as bg,max(bu) as bu,max(seller) as seller,max(sap_seller_id) as sap_seller_id,max(review_user_id) as review_user_id,max(item_status) as item_status, min(case when status = 'S' Then '0' else status end) as asin_status,asin,site from asin where length(asin)=10 group by asin,site) as asin") ,function($q){
 				$q->on('star.asin', '=', 'asin.asin')
 					->on('star.domain', '=', 'asin.site');
 			})->whereNotNull('asin.asin_status');
 		
-		if(!Auth::user()->can(['asin-rating-show-all'])){ 
-            $customers = $customers->where('asin.review_user_id',$this->getUserId());
-        }
-		
+		if(!Auth::user()->can('asin-rating-show-all')) {
+			if (Auth::user()->seller_rules) {
+				$rules = explode("-", Auth::user()->seller_rules);
+				if (array_get($rules, 0) != '*') $customers = $customers->where('asin.bg', array_get($rules, 0));
+				if (array_get($rules, 1) != '*') $customers = $customers->where('asin.bu', array_get($rules, 1));
+			} elseif (Auth::user()->sap_seller_id) {
+				$datas = $datas->where('asin.sap_seller_id', Auth::user()->sap_seller_id);
+			} else {
+				$datas = $datas->where('asin.review_user_id', Auth::user()->id);
+			}
+		}
 		
 
 
@@ -116,7 +123,7 @@ class StarController extends Controller
         }
 		if(Auth::user()->can(['asin-rating-show-all'])){
 			if(array_get($_REQUEST,'user_id')){
-				$customers = $customers->whereIn('asin.review_user_id',$_REQUEST['user_id']);
+				$customers = $customers->whereIn('asin.sap_seller_id',$_REQUEST['user_id']);
 			}
 		}
 		if(array_get($_REQUEST,'site')){
@@ -295,10 +302,10 @@ class StarController extends Controller
     }
 	
 	public function getUsers(){
-        $users = User::get()->toArray();
+        $users = User::where('sap_seller_id','>',0)->get()->toArray();
         $users_array = array();
         foreach($users as $user){
-            $users_array[$user['id']] = $user['name'];
+            $users_array[$user['sap_seller_id']] = $user['name'];
         }
         return $users_array;
     }

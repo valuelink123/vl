@@ -857,7 +857,7 @@ function getFacebookGroup()
 
 function getTaskTypeArr()
 {
-	return array(1=>'Listing优化',2=>'库存调拨',3=>'星级提升',4=>'邮件跟进',5=>'广告优化');
+	return array(1=>'Listing优化',2=>'库存调拨',3=>'星级提升',4=>'邮件跟进',5=>'广告优化','6'=>'帖子排名','99'=>'其他');
 }
 
 function getTaskStageArr()

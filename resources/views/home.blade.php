@@ -65,7 +65,16 @@ white-space: nowrap;
 } 
 textarea.form-control{width:400px!important;}
 .editable-pre-wrapped {
-    white-space: nowrap !important;   
+text-overflow:ellipsis !important; 
+-moz-text-overflow: ellipsis !important; 
+overflow:hidden !important;      
+white-space: nowrap !important; 
+}
+.editable-click, 
+a.editable-click, 
+a.editable-click:hover {
+    text-decoration: none;
+    border-bottom: none !important;
 }
 </style>
 <link href="/assets/global/plugins/bootstrap-editable/bootstrap-editable/css/bootstrap-editable.css" rel="stylesheet" type="text/css" />
@@ -349,7 +358,7 @@ textarea.form-control{width:400px!important;}
 							<td> 45 </td>
 							<td> 124 </td>
 							<td>
-								<span class="bold theme-font">80%</span>
+								80%
 							</td>
 						</tr>
 						
@@ -371,7 +380,7 @@ textarea.form-control{width:400px!important;}
 							<td> 45 </td>
 							<td> 124 </td>
 							<td>
-								<span class="bold theme-font">80%</span>
+								80%
 							</td>
 						</tr>
 						
@@ -393,7 +402,7 @@ textarea.form-control{width:400px!important;}
 							<td> 45 </td>
 							<td> 124 </td>
 							<td>
-								<span class="bold theme-font">80%</span>
+								80%
 							</td>
 						</tr>
 						
@@ -415,7 +424,7 @@ textarea.form-control{width:400px!important;}
 							<td> 45 </td>
 							<td> 124 </td>
 							<td>
-								<span class="bold theme-font">80%</span>
+								80%
 							</td>
 						</tr>
 						
@@ -437,7 +446,7 @@ textarea.form-control{width:400px!important;}
 							<td> 45 </td>
 							<td> 124 </td>
 							<td>
-								<span class="bold theme-font">80%</span>
+								80%
 							</td>
 						</tr>
 						
@@ -462,7 +471,7 @@ textarea.form-control{width:400px!important;}
 					</div>
 		</div>
 		<div class="portlet-body">
-			
+
 			<table class="table table-hover" id="tasks_list">
 			
 			
@@ -479,8 +488,8 @@ textarea.form-control{width:400px!important;}
 			<tr id="task_{{$task['id']}}">
 				<td><input type="checkbox" class="task_quick_complete" id="{{$task['id']}}" /></a>
 				</td>
-				<td class="text_s"><a class="task_request primary-link" title="Task Details" href="javascript:;" id="{{$task['id']}}-request" data-pk="{{$task['id']}}-request" data-type="textarea" data-placement="right">{{$task['request']}}</a></td>
-				<td class="text_s"><a class="task_response" title="Task Response" href="javascript:;" id="{{$task['id']}}-response" data-pk="{{$task['id']}}-response" data-type="textarea" data-placeholder="Your response here..." >{{$task['response']}}</a></td>
+				<td class="text_s"><a class="task_request primary-link" title="Task Details" href="javascript:;" id="{{$task['id']}}-request" data-pk="{{$task['id']}}-request" data-type="textarea" data-placement="right" style="width:90%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; display:block;">{{$task['request']}}</a></td>
+				<td class="text_s"><a class="task_response" title="Task Response" href="javascript:;" id="{{$task['id']}}-response" data-pk="{{$task['id']}}-response" data-type="textarea" data-placeholder="Your response here..." style="width:90%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; display:block;" >{{$task['response']}}</a></td>
 				<td><a class="task_complete_date" title="Due To" href="javascript:;" id="{{$task['id']}}-complete_date" data-pk="{{$task['id']}}-complete_date" data-type="date" data-viewformat="yyyy-mm-dd" data-placement="right">{{$task['complete_date']}}</a></td>
 				<td>{{array_get($users,$task['request_user_id'])}}</td>
 				<td  class="text_s">
