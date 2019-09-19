@@ -24,7 +24,7 @@ min-height:30px;
 margin-bottom:0px;}
 .table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
     padding: 7px;
-    line-height: 12px;
+    line-height: 15px;
 }
 .table td, .table th {
     font-size: 12px;
