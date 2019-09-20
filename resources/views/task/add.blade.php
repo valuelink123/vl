@@ -59,16 +59,18 @@
                         </div>
 						
 						<div class="form-group col-md-4">
-                            <label>Asin</label>
-                                <input type="text" class="form-control" name="asin" id="asin" placeholder="Optional" >
-                           
-                        </div>
-						
-						<div class="form-group col-md-4">
                             <label>Sku</label>
                                 <input type="text" class="form-control" name="sku" id="sku" placeholder="Optional" >
                            
                         </div>
+						<div class="form-group col-md-4">
+                            <label>Asin</label>
+							<input list="skuasins" type="text" class="form-control" name="asin" id="asin"  placeholder="Optional" autoComplete="off" >
+							<datalist id="skuasins">
+							</datalist>	
+                        </div>
+						
+						
 						
 						<div class="form-group col-md-4">
                             <label>Customer Email</label>
@@ -192,6 +194,30 @@ $(function() {
 			}
 		});
 		return false;
+	});
+
+	$('#sku').change(function() {
+		var sku = $(this).val();
+		if(sku.length>=6){
+			$('#skuasins').empty();
+			$.ajaxSetup({
+				headers: { 'X-CSRF-TOKEN' : '{{ csrf_token() }}' }
+			});
+			$.ajax({
+				type: "POST",
+				dataType: "json",
+				url: "{{ url('getasinbysku') }}",
+				data: "sku="+sku,
+				success: function (data) {
+					$.each(data, function (k, v) {
+						$('#skuasins').append('<option value="' + v.asin + '">');
+					});
+				},
+				error: function(data) {
+					alert("error:"+data.responseText);
+				}
+			});
+		}
 	});
 });
 </script>

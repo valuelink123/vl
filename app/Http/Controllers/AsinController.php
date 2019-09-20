@@ -403,5 +403,13 @@ class AsinController extends Controller
         return false;
     }
 
+	public function getAsinBySku(Request $request)   
+    {	
+		$sku = $request->get('sku');
 
+        $asins = Asin::where('item_no','LIKE','%'.$sku.'%')->groupBy(['asin'])->get(['asin'])->toArray();
+		
+        echo json_encode($asins);
+		
+	}
 }

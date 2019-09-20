@@ -559,10 +559,15 @@
                                         <div class="mt-content border-grey-steel">
                                     <span class="btn btn-circle <?php echo ($s_email['send_date'])?'green':'red';?>">
                                          <?php
-                                        echo $s_email['status'];
+										echo $s_email['status'].' ';
+										
 										if($s_email['send_date']) echo ' at '.$s_email['send_date'];
-									
-                                        if($s_email['error']) echo ' Error :'.$s_email['error'];
+										
+                                        if($s_email['error']){ 
+											echo ' Error :'.$s_email['error'];
+										}elseif($s_email['plan_date']){
+											echo ' Plan at :'.date('Y-m-d H:i:s',$s_email['plan_date']);
+										}
                                         ?>
                                     </span>
 									<?php if($s_email['status']=='Waiting'){ ?>

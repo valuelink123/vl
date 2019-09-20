@@ -151,7 +151,7 @@ class UserController extends Controller
             'password' => bcrypt($request->get('password')),
 			'ubg' => $request->get('bg'),
             'ubu' => $request->get('bu'),
-			'sap_seller_id' => $request->get('sap_seller_id'),
+			'sap_seller_id' => intval($request->get('sap_seller_id')),
 			'admin'=> ($request->get('admin'))?1:0
         ]);
         if ($user) {
@@ -846,7 +846,7 @@ where a.date>=:sdate_from and a.date<=:sdate_to
         if($request->get('password')) $update['password'] = Hash::make(($request->get('password')));
 		if($request->get('bg')) $update['ubg'] = $request->get('bg');
 		if($request->get('bu')) $update['ubu'] = $request->get('bu');
-		if($request->get('sap_seller_id')) $update['sap_seller_id'] = $request->get('sap_seller_id');
+		if($request->get('sap_seller_id')) $update['sap_seller_id'] = intval($request->get('sap_seller_id'));
 			
         $user = User::find($id);
 		$result = $user->update($update);

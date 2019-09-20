@@ -56,18 +56,19 @@
                             <label>Task Details</label>
                             <textarea class="form-control" name="request" rows="5" required {{$request_user}}>{{$task['request']}}</textarea>
                         </div>
-						
-						<div class="form-group col-md-4">
-                            <label>Asin</label>
-                                <input type="text" class="form-control" name="asin" id="asin" placeholder="Optional" value="{{$task['asin']}}" {{$other_user}}>
-                           
-                        </div>
-						
 						<div class="form-group col-md-4">
                             <label>Sku</label>
                                 <input type="text" class="form-control" name="sku" id="sku" placeholder="Optional"  value="{{$task['sku']}}" {{$other_user}}>
                            
                         </div>
+						<div class="form-group col-md-4">
+                            <label>Asin</label>
+                                <input list="skuasins" type="text" class="form-control" name="asin" id="asin" placeholder="Optional" autoComplete="off"  value="{{$task['asin']}}" {{$other_user}}>
+                           		<datalist id="skuasins">
+							</datalist>
+                        </div>
+						
+						
 						
 						<div class="form-group col-md-4">
                             <label>Customer Email</label>
@@ -184,6 +185,31 @@ $(function() {
 		});
 		return false;
 	});
+	
+	$('#sku').change(function() {
+		var sku = $(this).val();
+		if(sku.length>=6){
+			$('#skuasins').empty();
+			$.ajaxSetup({
+				headers: { 'X-CSRF-TOKEN' : '{{ csrf_token() }}' }
+			});
+			$.ajax({
+				type: "POST",
+				dataType: "json",
+				url: "{{ url('getasinbysku') }}",
+				data: "sku="+sku,
+				success: function (data) {
+					$.each(data, function (k, v) {
+						$('#skuasins').append('<option value="' + v.asin + '">');
+					});
+				},
+				error: function(data) {
+					alert("error:"+data.responseText);
+				}
+			});
+		}
+	});
+	
 	$('.date-picker').datepicker({
 		rtl: App.isRTL(),
 		autoclose: true
