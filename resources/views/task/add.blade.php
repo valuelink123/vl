@@ -184,7 +184,9 @@ $(function() {
 						dttable.fnDestroy(); //还原初始化了的datatable
 						TableDatatablesAjax.init();
 					} 
-		
+					if ( location.pathname=='/home' ){
+						location.reload();
+					}
 				}else{
 					alert(data);
 				}

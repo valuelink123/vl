@@ -83,7 +83,7 @@ a.editable-click:hover {
 <div class="portlet light ">
 			<div class="col-md-1">
 				<div style="width:100px;height:100px;border: 15px solid #f36a5a;border-radius:50% !important;text-align:center;line-height:70px;margin:auto;margin-top: 13px" >
-					<span id="tichengxianshi" style="cursor:pointer;" data-value="12312.14" class="fa fa-eye-slash"></span>
+					<span id="tichengxianshi" style="cursor:pointer;" data-value="2000" class="fa fa-eye-slash"></span>
 				</div>
 			</div>
 			<div class="col-md-8">
@@ -94,7 +94,7 @@ a.editable-click:hover {
 							<div class="number">
 								<small>E.VALUE</small>
 								<h3 class="font-green-sharp">
-									<span data-counter="counterup" data-value="7800">7800</span>
+									<span data-counter="counterup">50000</span>
 									<small class="font-green-sharp">¥</small>
 								</h3>
 								
@@ -104,12 +104,12 @@ a.editable-click:hover {
 						<div class="progress-info">
 							<div class="progress">
 								<span style="width: 100%;" class="progress-bar progress-bar-success green-sharp">
-									<span class="sr-only">100% progress</span>
+									
 								</span>
 							</div>
 							<div class="status">
-								<div class="status-title"> FULL : 294 </div>
-								<div class="status-number"> PROMO : 19 </div>
+								<div class="status-title"> FULL : 1 </div>
+								<div class="status-number"> PROMO : 2 </div>
 							</div>
 						</div>
 					</div>
@@ -120,7 +120,7 @@ a.editable-click:hover {
 							<div class="number">
 								<small>SALES</small>
 								<h3 class="font-red-haze">
-									<span data-counter="counterup" data-value="1349">1349</span>
+									<span data-counter="counterup" >1000</span>
 									<small class="font-red-haze">¥</small>
 								</h3>
 								
@@ -129,12 +129,12 @@ a.editable-click:hover {
 						</div>
 						<div class="progress-info">
 							<div class="progress">
-								<span style="width: 85%;" class="progress-bar progress-bar-success red-haze">
-									<span class="sr-only">85% change</span>
+								<span style="width: 100%;" class="progress-bar progress-bar-success red-haze">
+									
 								</span>
 							</div>
 							<div class="status">
-								<div class="status-title"> RING RATIO : 5% </div>
+								<div class="status-title"> RING RATIO : 5 </div>
 								<div class="status-number"> </div>
 							</div>
 						</div>
@@ -146,7 +146,7 @@ a.editable-click:hover {
 							<div class="number">
 								<small>UNITS</small>
 								<h3 class="font-blue-sharp">
-									<span data-counter="counterup" data-value="567">567</span>
+									<span data-counter="counterup" >500</span>
 								</h3>
 								
 							</div>
@@ -154,12 +154,12 @@ a.editable-click:hover {
 						</div>
 						<div class="progress-info">
 							<div class="progress">
-								<span style="width: 45%;" class="progress-bar progress-bar-success blue-sharp">
-									<span class="sr-only">45% grow</span>
+								<span style="width: 100%;" class="progress-bar progress-bar-success blue-sharp">
+									
 								</span>
 							</div>
 							<div class="status">
-								<div class="status-title"> RING RATIO : 5% </div>
+								<div class="status-title"> RING RATIO : 5 </div>
 								<div class="status-number">  </div>
 							</div>
 						</div>
@@ -172,7 +172,7 @@ a.editable-click:hover {
 							<div class="number">
 							<small>AVG.PRICE</small>
 								<h3 class="font-purple-soft">
-									<span data-counter="counterup" data-value="276">276</span>
+									<span data-counter="counterup" >400</span>
 									<small class="font-purple-soft">¥</small>
 								</h3>
 								
@@ -181,12 +181,12 @@ a.editable-click:hover {
 						</div>
 						<div class="progress-info">
 							<div class="progress">
-								<span style="width: 57%;" class="progress-bar progress-bar-success purple-soft">
-									<span class="sr-only">56% change</span>
+								<span style="width: 100%;" class="progress-bar progress-bar-success purple-soft">
+									
 								</span>
 							</div>
 							<div class="status">
-								<div class="status-title"> STOCK VALUE : 123123 </div>
+								<div class="status-title"> STOCK VALUE : 320 </div>
 								<div class="status-number">  </div>
 							</div>
 						</div>
@@ -198,7 +198,7 @@ a.editable-click:hover {
 							<div class="number">
 								<small>INVENTORY</small>
 								<h3 class="font-green-sharp">
-									<span data-counter="counterup" data-value="7800">7800</span>
+									<span data-counter="counterup" >7800</span>
 									<small class="font-green-sharp">PCS</small>
 								</h3>
 								
@@ -208,11 +208,11 @@ a.editable-click:hover {
 						<div class="progress-info">
 							<div class="progress">
 								<span style="width: 100%;" class="progress-bar progress-bar-success green-sharp">
-									<span class="sr-only">100% progress</span>
+									
 								</span>
 							</div>
 							<div class="status">
-								<div class="status-title"> STOCK VALUE : 123123 </div>
+								<div class="status-title"> STOCK VALUE : 320 </div>
 								<div class="status-number">  </div>
 							</div>
 						</div>
@@ -330,8 +330,8 @@ a.editable-click:hover {
 								<th >FBA</th>
 								<th> OUTSTOCK DATE </th>
 								<th> RATING </th>
-								<th> SESSIONS <font style="color:#ff0000;"><i  class="fa fa-info-circle popovers" data-container="body" onclick=" " data-trigger="hover" data-placement="top" data-html="true" data-content="Average data from {{date('Y-m-d',strtotime('-10days'))}} to {{date('Y-m-d',strtotime('-4days'))}}"></i></font></th>
-								<th> CR <font style="color:#ff0000;"><i  class="fa fa-info-circle popovers" data-container="body" onclick=" " data-trigger="hover" data-placement="top" data-html="true" data-content="Average data from {{date('Y-m-d',strtotime('-10days'))}} to {{date('Y-m-d',strtotime('-4days'))}}"></i></font></th>
+								<th> SESSIONS <font style="color:#ccc;"><i  class="fa fa-info-circle popovers" data-container="body" onclick=" " data-trigger="hover" data-placement="top" data-html="true" data-content="Average data from {{date('Y-m-d',strtotime('-10days'))}} to {{date('Y-m-d',strtotime('-4days'))}}"></i></font></th>
+								<th> CR <font style="color:#ccc;"><i  class="fa fa-info-circle popovers" data-container="body" onclick=" " data-trigger="hover" data-placement="top" data-html="true" data-content="Average data from {{date('Y-m-d',strtotime('-10days'))}} to {{date('Y-m-d',strtotime('-4days'))}}"></i></font></th>
 								
 								<th> KEYWORD RANKING </th>
 								<th> BSR </th>
@@ -476,7 +476,7 @@ a.editable-click:hover {
 			
 			
 			<tr class="uppercase">
-				<th width="2%"><font style="color:#ff0000;"><i  class="fa fa-info-circle popovers" data-container="body" onclick="" data-trigger="hover" data-placement="right" data-html="true" data-content="Click to complete the task quickly"></i></font></th>
+				<th width="2%"><font style="color:#ccc;"><i  class="fa fa-info-circle popovers" data-container="body" onclick="" data-trigger="hover" data-placement="right" data-html="true" data-content="Click to complete the task quickly"></i></font></th>
 				<th width="44%" >Task Details</th>
 				<th width="30%"  >Task Response</th>
 				<th width="8%" >Due To</th>
@@ -605,7 +605,18 @@ $(function() {
 	
 	
 	
+	var date_data = [];
+	var comm_data = [];
+	<?php 
+	$date_comms['2019-09-01']=$date_comms['2019-09-03']=$date_comms['2019-09-05']=$date_comms['2019-09-07']=$date_comms['2019-09-09']=$date_comms['2019-09-11']=$date_comms['2019-09-13']=$date_comms['2019-09-15']=$date_comms['2019-09-17']=$date_comms['2019-09-19']=300;
 	
+	$date_comms['2019-09-2']=$date_comms['2019-09-4']=$date_comms['2019-09-6']=$date_comms['2019-09-8']=$date_comms['2019-09-10']=$date_comms['2019-09-12']=$date_comms['2019-09-14']=$date_comms['2019-09-16']=$date_comms['2019-09-18']=$date_comms['2019-09-20']='500';
+	foreach($date_comms as $k=>$v) {?>
+	date_data.push('<?php echo $k?>');
+	comm_data.push('<?php echo $v?>');
+	<?php }?>
+	console.log(date_data);
+	console.log(comm_data);
 	lineoption = {
 		title : {
 			text: 'Estimated Commission, paid according to actual calculation',
@@ -628,7 +639,7 @@ $(function() {
 			{
 				type : 'category',
 				boundaryGap : false,
-				data : ['Jan.','Feb.','Mar.','Apr.','May.','Jun.','Jul.','Aug.','Sep.','Oct.','Nov.','Dec.']
+				data : date_data
 			}
 		],
 		yAxis : [
@@ -642,7 +653,7 @@ $(function() {
 				type:'line',
 				smooth:true,
 				itemStyle: {normal: {areaStyle: {type: 'default'}}},
-				data:[1123, 1221, 2211, 5451, 2620, 8301, 7101]
+				data:comm_data
 			}
 		]
 	};
