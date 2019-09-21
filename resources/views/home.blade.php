@@ -610,7 +610,8 @@ $(function() {
 	<?php 
 	$date_comms['2019-09-01']=$date_comms['2019-09-03']=$date_comms['2019-09-05']=$date_comms['2019-09-07']=$date_comms['2019-09-09']=$date_comms['2019-09-11']=$date_comms['2019-09-13']=$date_comms['2019-09-15']=$date_comms['2019-09-17']=$date_comms['2019-09-19']=300;
 	
-	$date_comms['2019-09-2']=$date_comms['2019-09-4']=$date_comms['2019-09-6']=$date_comms['2019-09-8']=$date_comms['2019-09-10']=$date_comms['2019-09-12']=$date_comms['2019-09-14']=$date_comms['2019-09-16']=$date_comms['2019-09-18']=$date_comms['2019-09-20']='500';
+	$date_comms['2019-09-02']=$date_comms['2019-09-04']=$date_comms['2019-09-06']=$date_comms['2019-09-08']=$date_comms['2019-09-10']=$date_comms['2019-09-12']=$date_comms['2019-09-14']=$date_comms['2019-09-16']=$date_comms['2019-09-18']=$date_comms['2019-09-20']='500';
+	ksort($date_comms);
 	foreach($date_comms as $k=>$v) {?>
 	date_data.push('<?php echo $k?>');
 	comm_data.push('<?php echo $v?>');
