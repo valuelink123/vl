@@ -343,7 +343,7 @@ a.editable-click:hover {
 						
 						@foreach ($asins as $asin)
 						
-						<?php $sales = ((((array_get($asin,'sales_07_01')??array_get($asin,'sales_14_08'))??array_get($asin,'sales_21_15'))??array_get($asin,'sales_28_22'))??7)/7 ;?>
+						<?php $sales = ((((array_get($asin,'sales_07_01')??array_get($asin,'sales_14_08'))??array_get($asin,'sales_21_15'))??array_get($asin,'sales_28_22'))??0)/7 ;?>
 						<tr>
 							<td>
 								<a href="https://{{array_get($asin,'site')}}/dp/{{array_get($asin,'asin')}}" class="primary-link">{{array_get($asin,'asin')}}</a>
@@ -353,7 +353,7 @@ a.editable-click:hover {
 							<td> - </td>
 							<td> - </td>
 							<td> {{array_get($asin,'fba_stock')+array_get($asin,'fba_transfer')}} </td>
-							<td> {{round(array_get($asin,'fba_stock')/$sales,2)}} </td>
+							<td> {{($sales>0)?date('Y-m-d',strtotime('+'.intval((array_get($asin,'fba_stock')+array_get($asin,'fba_transfer'))/$sales).' days')):'∞'}} </td>
 							<td> {{array_get($asin,'rating')}} </td>
 							<td> {{intval(array_get($asin,'sessions'))}} </td>
 							<td> {{round(array_get($asin,'unit_session_percentage',2))}} </td>
