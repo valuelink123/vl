@@ -99,7 +99,7 @@ class HomeController extends Controller
 		}
 		
 		
-		$fba_stock_info = DB::select("select sum(fba_stock*fba_cost) as fba_total_amount,sum(fba_stock) as fba_total_stock from (select avg(fba_stock) as fba_stock,avg(fba_cost) as fba_cost from asin where $sumwhere group by asin,sellersku ) as fba_total");
+		$fba_stock_info = DB::select("select sum(fba_stock*fba_cost) as fba_total_amount,sum(fba_stock) as fba_total_stock from (select avg(fba_stock+fba_transfer) as fba_stock,avg(fba_cost) as fba_cost from asin where $sumwhere group by asin,sellersku ) as fba_total");
 		
 		$fbm_stock_info = DB::select("select sum(fbm_stock*fbm_cost) as fbm_total_amount,sum(fbm_stock) as fbm_total_stock from (select avg(fbm_stock) as fbm_stock,avg(fbm_cost) as fbm_cost from asin where $sumwhere group by item_no) as fbm_total");
 		
