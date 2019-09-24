@@ -198,7 +198,7 @@ a.editable-click:hover {
 							<div class="number">
 								<small>INVENTORY</small>
 								<h3 class="font-green-sharp">
-									<span data-counter="counterup" >{{$fbm_stock_info[0]->fbm_total_stock + $fba_stock_info[0]->fba_total_stock}}</span>
+									<span data-counter="counterup" >{{intval($fbm_stock_info[0]->fbm_total_stock + $fba_stock_info[0]->fba_total_stock)}}</span>
 									<small class="font-green-sharp">PCS</small>
 								</h3>
 								
@@ -212,7 +212,7 @@ a.editable-click:hover {
 								</span>
 							</div>
 							<div class="status">
-								<div class="status-title"> STOCK VALUE : {{$fbm_stock_info[0]->fbm_total_amount + $fba_stock_info[0]->fba_total_amount}} </div>
+								<div class="status-title"> STOCK VALUE : {{round($fbm_stock_info[0]->fbm_total_amount + $fba_stock_info[0]->fba_total_amount,2)}} </div>
 								<div class="status-number">  </div>
 							</div>
 						</div>
