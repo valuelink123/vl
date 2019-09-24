@@ -115,7 +115,10 @@ where last_updated>:date_from',['date_from' => $date_from]);
 			$asin_value[$review->asin][str_replace('.','',$review->domain)][substr($review->create_at,0,10)]['four_star_number']=$review->four_star_number;
 			$asin_value[$review->asin][str_replace('.','',$review->domain)][substr($review->create_at,0,10)]['five_star_number']=$review->five_star_number;
 			$asin_value[$review->asin][str_replace('.','',$review->domain)][substr($review->create_at,0,10)]['total_star_number']=$review->total_star_number;
-			$asin_value[$review->asin][str_replace('.','',$review->domain)][substr($review->create_at,0,10)]['average_score']=$review->average_score;	
+			$asin_value[$review->asin][str_replace('.','',$review->domain)][substr($review->create_at,0,10)]['average_score']=$review->average_score;
+			if( substr($review->create_at,0,10)>=date('Y-m-d',strtotime('-1day')) ){
+				DB::table('asin')->where('asin',$review->asin)->where('site',$review->domain)->update(['rating'=>round($review->average_score,2),'review_count'=>intval($review->total_star_number)]);
+			}	
     	}
 		
 		

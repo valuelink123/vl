@@ -83,7 +83,7 @@ a.editable-click:hover {
 <div class="portlet light ">
 			<div class="col-md-1">
 				<div style="width:100px;height:100px;border: 15px solid #f36a5a;border-radius:50% !important;text-align:center;line-height:70px;margin:auto;margin-top: 13px" >
-					<span id="tichengxianshi" style="cursor:pointer;" data-value="2000" class="fa fa-eye-slash"></span>
+					<span id="tichengxianshi" style="cursor:pointer;" data-value="----" class="fa fa-eye-slash"></span>
 				</div>
 			</div>
 			<div class="col-md-8">
@@ -94,7 +94,7 @@ a.editable-click:hover {
 							<div class="number">
 								<small>E.VALUE</small>
 								<h3 class="font-green-sharp">
-									<span data-counter="counterup">50000</span>
+									<span data-counter="counterup">-</span>
 									<small class="font-green-sharp">¥</small>
 								</h3>
 								
@@ -108,8 +108,8 @@ a.editable-click:hover {
 								</span>
 							</div>
 							<div class="status">
-								<div class="status-title"> FULL : 1 </div>
-								<div class="status-number"> PROMO : 2 </div>
+								<div class="status-title"> FULL : - </div>
+								<div class="status-number"> PROMO : - </div>
 							</div>
 						</div>
 					</div>
@@ -120,7 +120,7 @@ a.editable-click:hover {
 							<div class="number">
 								<small>SALES</small>
 								<h3 class="font-red-haze">
-									<span data-counter="counterup" >1000</span>
+									<span data-counter="counterup" >-</span>
 									<small class="font-red-haze">¥</small>
 								</h3>
 								
@@ -134,7 +134,7 @@ a.editable-click:hover {
 								</span>
 							</div>
 							<div class="status">
-								<div class="status-title"> RING RATIO : 5 </div>
+								<div class="status-title"> RING RATIO : - </div>
 								<div class="status-number"> </div>
 							</div>
 						</div>
@@ -146,7 +146,7 @@ a.editable-click:hover {
 							<div class="number">
 								<small>UNITS</small>
 								<h3 class="font-blue-sharp">
-									<span data-counter="counterup" >500</span>
+									<span data-counter="counterup" >-</span>
 								</h3>
 								
 							</div>
@@ -159,7 +159,7 @@ a.editable-click:hover {
 								</span>
 							</div>
 							<div class="status">
-								<div class="status-title"> RING RATIO : 5 </div>
+								<div class="status-title"> RING RATIO : - </div>
 								<div class="status-number">  </div>
 							</div>
 						</div>
@@ -172,7 +172,7 @@ a.editable-click:hover {
 							<div class="number">
 							<small>AVG.PRICE</small>
 								<h3 class="font-purple-soft">
-									<span data-counter="counterup" >400</span>
+									<span data-counter="counterup" >-</span>
 									<small class="font-purple-soft">¥</small>
 								</h3>
 								
@@ -186,7 +186,7 @@ a.editable-click:hover {
 								</span>
 							</div>
 							<div class="status">
-								<div class="status-title"> STOCK VALUE : 320 </div>
+								<div class="status-title"> STOCK VALUE : - </div>
 								<div class="status-number">  </div>
 							</div>
 						</div>
@@ -198,7 +198,7 @@ a.editable-click:hover {
 							<div class="number">
 								<small>INVENTORY</small>
 								<h3 class="font-green-sharp">
-									<span data-counter="counterup" >7800</span>
+									<span data-counter="counterup" >{{$fbm_stock_info[0]->fbm_total_stock + $fba_stock_info[0]->fba_total_stock}}</span>
 									<small class="font-green-sharp">PCS</small>
 								</h3>
 								
@@ -212,7 +212,7 @@ a.editable-click:hover {
 								</span>
 							</div>
 							<div class="status">
-								<div class="status-title"> STOCK VALUE : 320 </div>
+								<div class="status-title"> STOCK VALUE : {{$fbm_stock_info[0]->fbm_total_amount + $fba_stock_info[0]->fba_total_amount}} </div>
 								<div class="status-number">  </div>
 							</div>
 						</div>
@@ -249,11 +249,13 @@ a.editable-click:hover {
 								</span>
                             </div>
                         </div>
-                       
+                       	
+						
+						@if (Auth::user()->seller_rules)
 						
 						<div class="form-group col-md-5">
 						<select class="mt-multiselect btn btn-default form-control form-filter input-sm " data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" name="user_id" id="user_id">
-
+								<option value="">Sellers</option>
 								@foreach ($users as $user_id=>$user_name)
 									<option value="{{$user_id}}" <?php if($user_id==$s_user_id) echo 'selected'; ?>>{{$user_name}}</option>
 								@endforeach
@@ -279,7 +281,7 @@ a.editable-click:hover {
                                     </select>
 						</div>	
 						
-						
+						@endif
 
 						<div class="form-group col-md-12">
 							
@@ -334,121 +336,36 @@ a.editable-click:hover {
 								<th> CR <font style="color:#ccc;"><i  class="fa fa-info-circle popovers" data-container="body" onclick=" " data-trigger="hover" data-placement="top" data-html="true" data-content="Average data from {{date('Y-m-d',strtotime('-10days'))}} to {{date('Y-m-d',strtotime('-4days'))}}"></i></font></th>
 								
 								<th> KEYWORD RANKING </th>
-								<th> BSR </th>
+								<th> BSR  <font style="color:#ccc;"><i  class="fa fa-info-circle popovers" data-container="body" onclick=" " data-trigger="hover" data-placement="top" data-html="true" data-content="Average data from {{date('Y-m-d',strtotime('-10days'))}} to {{date('Y-m-d',strtotime('-4days'))}}"></i></font></th>
 								<th> SKU E.VALUE </th>
 								<th> SKU BONUS </th>
 							</tr>
 						
-						
+						@foreach ($asins as $asin)
 						<tr>
-							
 							<td>
-								<a href="javascript:;" class="primary-link">1234567890</a>
+								<a href="https://{{array_get($asin,'site')}}/dp/{{array_get($asin,'asin')}}" class="primary-link">{{array_get($asin,'asin')}}</a>
 							</td>
-							<td> $345 </td>
-							<td> 45 </td>
-							<td> 124 </td>
-							<td> $345 </td>
-							<td> 45 </td>
-							<td> 124 </td>
-							<td> $345 </td>
-							<td> 45 </td>
-							<td> 124 </td>
-							<td> $345 </td>
-							<td> 45 </td>
-							<td> 124 </td>
+							<td> {{array_get($asin,'item_no')}} </td>
+							<td> - </td>
+							<td> - </td>
+							<td> - </td>
+							<td> {{array_get($asin,'fba_stock')}} </td>
+							<td> {{array_get($asin,'fba_stock')}} </td>
+							<td> {{array_get($asin,'rating')}} </td>
+							<td> {{intval(array_get($asin,'sessions'))}} </td>
+							<td> {{round(array_get($asin,'unit_session_percentage',2))}} </td>
+							<td> {{array_get($asin,'sku_ranking')}} </td>
+							<td> {{intval(array_get($asin,'bsr'))}} </td>
+							
+							<td> - </td>
 							<td>
-								80%
+								-
 							</td>
 						</tr>
+						@endforeach
 						
-						<tr>
-							
-							<td>
-								<a href="javascript:;" class="primary-link">1234567890</a>
-							</td>
-							<td> $345 </td>
-							<td> 45 </td>
-							<td> 124 </td>
-							<td> $345 </td>
-							<td> 45 </td>
-							<td> 124 </td>
-							<td> $345 </td>
-							<td> 45 </td>
-							<td> 124 </td>
-							<td> $345 </td>
-							<td> 45 </td>
-							<td> 124 </td>
-							<td>
-								80%
-							</td>
-						</tr>
 						
-						<tr>
-							
-							<td>
-								<a href="javascript:;" class="primary-link">1234567890</a>
-							</td>
-							<td> $345 </td>
-							<td> 45 </td>
-							<td> 124 </td>
-							<td> $345 </td>
-							<td> 45 </td>
-							<td> 124 </td>
-							<td> $345 </td>
-							<td> 45 </td>
-							<td> 124 </td>
-							<td> $345 </td>
-							<td> 45 </td>
-							<td> 124 </td>
-							<td>
-								80%
-							</td>
-						</tr>
-						
-						<tr>
-							
-							<td>
-								<a href="javascript:;" class="primary-link">1234567890</a>
-							</td>
-							<td> $345 </td>
-							<td> 45 </td>
-							<td> 124 </td>
-							<td> $345 </td>
-							<td> 45 </td>
-							<td> 124 </td>
-							<td> $345 </td>
-							<td> 45 </td>
-							<td> 124 </td>
-							<td> $345 </td>
-							<td> 45 </td>
-							<td> 124 </td>
-							<td>
-								80%
-							</td>
-						</tr>
-						
-						<tr>
-							
-							<td>
-								<a href="javascript:;" class="primary-link">1234567890</a>
-							</td>
-							<td> $345 </td>
-							<td> 45 </td>
-							<td> 124 </td>
-							<td> $345 </td>
-							<td> 45 </td>
-							<td> 124 </td>
-							<td> $345 </td>
-							<td> 45 </td>
-							<td> 124 </td>
-							<td> $345 </td>
-							<td> 45 </td>
-							<td> 124 </td>
-							<td>
-								80%
-							</td>
-						</tr>
 						
 				</table>
 				

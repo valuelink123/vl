@@ -83,6 +83,9 @@ class GetAsininfo extends Command
 				'fbm_stock'=> array_get($asin,'LBKUM_FBM',0),
 				'fbm_amount'=> array_get($asin,'SALK3_FBM',0),
 			);
+			
+			DB::table('asin')->where('item_no',array_get($asin,'MATNR'))->update(['fbm_cost'=>array_get($asin,'SALK3_FBM',0),'fba_cost'=>array_get($asin,'VERPR_FBA',0),'fbm_stock'=>array_get($asin,'LBKUM_FBM',0)]);
+	
 			$exists = DB::table('fbm_stock')->where('item_code',array_get($asin,'MATNR',''))->get()->toArray();
 			if(!$exists){
 				DB::table('fbm_stock')->insert(
@@ -154,6 +157,8 @@ class GetAsininfo extends Command
 		DB::table('fba_stock')->truncate();
 		$fs = DB::connection('order')->select('select InStock as stock,(Total-InStock) as transfer ,asin,sellerid,sellersku,updated_at from amazon_inventory_supply where Total>0');
 		foreach($fs as $fsd){
+			DB::table('asin')->where('asin',$fsd->asin)->where('sellersku',$fsd->sellersku)->update(['fba_stock'=>intval($fsd->stock), 'fba_transfer'=>intval($fsd->transfer)]);
+			
 			$exists_item_code = DB::table('asin')->where('asin',$fsd->asin)->where('sellersku',$fsd->sellersku)->first();
 			$name = array_get($sellerid_name,$fsd->sellerid);
 			DB::table('fba_stock')->insert(
