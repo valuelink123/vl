@@ -84,7 +84,7 @@ class GetAsininfo extends Command
 				'fbm_amount'=> array_get($asin,'SALK3_FBM',0),
 			);
 			
-			DB::table('asin')->where('item_no',array_get($asin,'MATNR'))->update(['fbm_cost'=>round(array_get($asin,'SALK3_FBM',0)/(array_get($asin,'LBKUM_FBM',0)??1),2),'fba_cost'=>array_get($asin,'VERPR_FBA',0),'fbm_stock'=>array_get($asin,'LBKUM_FBM',0)]);
+			DB::table('asin')->where('item_no',array_get($asin,'MATNR'))->update(['fbm_cost'=>round(array_get($asin,'SALK3_FBM',0)/((array_get($asin,'LBKUM_FBM')>0)?array_get($asin,'LBKUM_FBM'):1),2),'fba_cost'=>array_get($asin,'VERPR_FBA',0),'fbm_stock'=>array_get($asin,'LBKUM_FBM',0)]);
 	
 			$exists = DB::table('fbm_stock')->where('item_code',array_get($asin,'MATNR',''))->get()->toArray();
 			if(!$exists){
