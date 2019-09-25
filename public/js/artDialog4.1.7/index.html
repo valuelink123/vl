@@ -1,0 +1,21 @@
+<script type="text/javascript" src="./artDialog.js?skin=blue"></script>
+        <script type="text/javascript" src="./plugins/iframeTools.js"></script>
+        <script type="text/javascript" src="./jquery-1.7.2.min.js"></script>
+
+
+<button data-event="test">open dialog</button>
+
+<script>
+
+    $('button[data-event=test]').on('click', function () {
+        art.dialog({
+            id: 'art_ban',
+            title: 'title',
+            content: '123456',
+            okVal: 'OK',
+            cancel: true,
+            cancelVal:'取消'
+        });
+    });
+
+</script>
