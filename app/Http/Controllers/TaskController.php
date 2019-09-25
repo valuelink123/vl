@@ -71,15 +71,13 @@ class TaskController extends Controller
 				$rules = explode("-", Auth::user()->seller_rules);
 				if (array_get($rules, 0) != '*') $customers = $customers->where('users.ubg', array_get($rules, 0));
 				if (array_get($rules, 1) != '*') $customers = $customers->where('users.ubu', array_get($rules, 1));
-			} elseif (Auth::user()->sap_seller_id) {
+			} else {
 				$user_id = $this->getUserId();
 				$customers = $customers->where(function ($query) use ($user_id) {
 					$query->where('request_user_id', $user_id)
 						  ->orwhere('response_user_id', $user_id);
 				
 				});
-			} else {
-			
 			}
 				
         }
@@ -92,7 +90,7 @@ class TaskController extends Controller
 		}
 		
 		
-		if(Auth::user()->can(['task-show-all'])){
+		//if(Auth::user()->can(['task-show-all'])){
 			if(array_get($_REQUEST,'response_user_id')){
 				$customers = $customers->whereIn('response_user_id',$_REQUEST['response_user_id']);
 			}
@@ -107,7 +105,7 @@ class TaskController extends Controller
 			   if(array_get($bgbu_arr,0)) $customers = $customers->where('users.ubg',array_get($bgbu_arr,0));
 			   if(array_get($bgbu_arr,1)) $customers = $customers->where('users.ubu',array_get($bgbu_arr,1));
 			}
-		}
+		//}
 
 
         if(array_get($_REQUEST,'keywords')){

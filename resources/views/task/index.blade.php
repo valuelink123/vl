@@ -48,7 +48,7 @@
                             </div>
                         </div>
 						</div>
-						@permission('task-show-all')
+						@if (Auth::user()->seller_rules)
 						<div class="col-md-4">
 						<div class="col-md-4">
 						<select class="mt-multiselect btn btn-default input-sm form-control form-filter" multiple="multiple" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" data-none-selected-text="Assigned To" name="response_user_id[]" id="response_user_id[]">
@@ -83,7 +83,7 @@
 						</select>
 						</div>	
 						</div>
-						@endpermission
+						@endif
 						<div class="col-md-3">
 						<div class="col-md-6">
 						<select class="form-control form-filter input-sm" name="type">
