@@ -279,7 +279,7 @@
                                             <ul class="dropdown-menu pull-left">
 												@permission('productTransfer-show')
                                                 <li class="">
-                                                    <a href="{{ url('productTransfer') }};" class="nav-link nav-toggle ">
+                                                    <a href="{{ url('productTransfer') }}" class="nav-link nav-toggle ">
                                                        Product Transfer
                                                         <span class="arrow"></span>
                                                     </a>    
