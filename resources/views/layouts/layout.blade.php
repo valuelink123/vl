@@ -115,137 +115,528 @@
     <!-- END PAGE LEVEL SCRIPTS -->
     <link rel="shortcut icon" href="/favicon.ico" />
     <link href="/css/common.css?v=9" rel="stylesheet" type="text/css"/>
-
-    <script type="text/javascript" src="/js/artDialog4.1.7/artDialog.js?skin=blue"></script>
+	<script type="text/javascript" src="/js/artDialog4.1.7/artDialog.js?skin=blue"></script>
     <script type="text/javascript" src="/js/artDialog4.1.7/plugins/iframeTools.js"></script>
 </head>
 <!-- END HEAD -->
 
-<body class="page-header-fixed page-sidebar-closed-hide-logo page-container-bg-solid page-content-white page-sidebar-closed">
+<body class="page-header-fixed page-sidebar-closed-hide-logo page-container-bg-solid page-content-white">
 <div class="page-wrapper">
     <!-- BEGIN HEADER -->
     <div class="page-header navbar navbar-fixed-top">
+	
+		
         <!-- BEGIN HEADER INNER -->
-        <div class="page-header-inner ">
+        <div class="page-header-inner">
             <!-- BEGIN LOGO -->
             <div class="page-logo">
-                <a href="/">
-                    <img src="/assets/layouts/layout/img/logo.png" alt="logo" class="logo-default" /> </a>
-                <div class="menu-toggler sidebar-toggler">
-                    <span></span>
-                </div>
+               
+                    <img src="/assets/layouts/layout/img/logo.png" alt="logo" class="logo-default" />
+            
             </div>
             <!-- END LOGO -->
-            <!-- BEGIN RESPONSIVE MENU TOGGLER -->
-            <a href="javascript:;" class="menu-toggler responsive-toggler" data-toggle="collapse" data-target=".navbar-collapse">
-                <span></span>
-            </a>
-            <!-- END RESPONSIVE MENU TOGGLER -->
+            
             <!-- BEGIN TOP NAVIGATION MENU -->
+			<div class="hor-menu  ">
+                                    <ul class="nav navbar-nav">
+                                        
+                                        <li class="menu-dropdown classic-menu-dropdown ">
+                                            <a href="/home"> Home
+                                                <span class="arrow"></span>
+                                            </a>
+                                            <ul class="dropdown-menu pull-left">
+												@permission('sales-report-show')
+                                                <li class="">
+                                                    <a href="/skus" class="nav-link nav-toggle ">
+                                                        Daily Report
+                                                        <span class="arrow"></span>
+                                                    </a>    
+                                                </li>
+												@endpermission
+												@permission('sales-management')
+												<li class="">
+                                                    <a href="/seller" class="nav-link nav-toggle ">
+                                                        Sales Management
+                                                        <span class="arrow"></span>
+                                                    </a>    
+                                                </li>
+												@endpermission
+                                            </ul>
+                                        </li>
+										
+										@permission('task-show')
+										<li class="menu-dropdown classic-menu-dropdown ">
+                                            <a href="/task"> Task
+												<span class="badge badge-danger" >{{intval($untasks)}}</span>
+                                                <span class="arrow"></span>
+                                            </a>
+                                            
+                                        </li>
+										@endpermission
+										
+										<li class="menu-dropdown classic-menu-dropdown ">
+                                            <a href="javascript:;"> Listing
+                                                <span class="arrow"></span>
+                                            </a>
+                                            <ul class="dropdown-menu pull-left">
+												@permission('asin-rating-show')
+                                                <li class="">
+                                                    <a href="/star" class="nav-link nav-toggle ">
+                                                        My Listing
+                                                        <span class="arrow"></span>
+                                                    </a>    
+                                                </li>
+												@endpermission
+												@permission('asin-table-show')
+												<li class="">
+                                                    <a href="/asin" class="nav-link nav-toggle ">
+                                                        Asin Table
+                                                        <span class="arrow"></span>
+                                                    </a>    
+                                                </li>
+												 @endpermission
+                                            </ul>
+                                        </li>
+										
+										<li class="menu-dropdown classic-menu-dropdown ">
+                                            <a href="javascript:;"> Review
+                                                <span class="arrow"></span>
+                                            </a>
+                                            <ul class="dropdown-menu pull-left">
+                                                @permission('review-show')
+												<li class="">
+                                                    <a href="/review" class="nav-link nav-toggle ">
+                                                        Review Table
+                                                        <span class="arrow"></span>
+                                                    </a>    
+                                                </li>
+												@endpermission
+												@permission('ctg-show')
+												<li class="">
+                                                    <a href="/ctg/list" class="nav-link nav-toggle ">
+                                                        CTG
+                                                        <span class="arrow"></span>
+                                                    </a>    
+                                                </li>
+												@endpermission
+												@permission('non-ctg-show')
+												<li class="">
+                                                    <a href="/nonctg" class="nav-link nav-toggle ">
+                                                        Non-CTG
+                                                        <span class="arrow"></span>
+                                                    </a>    
+                                                </li>
+												@endpermission
+												@permission('crm-show')
+												<li class="">
+                                                    <a href="/crm" class="nav-link nav-toggle ">
+                                                        CRM
+                                                        <span class="arrow"></span>
+                                                    </a>    
+                                                </li>
+												@endpermission
+												
+												@permission('rsgrequests-show')
+												<li class="">
+                                                    <a href="/rsgrequests" class="nav-link nav-toggle ">
+                                                        RSG
+                                                        <span class="arrow"></span>
+                                                    </a>    
+                                                </li>
+												@endpermission
+												@permission('rsgproducts-show')
+												<li class="">
+                                                    <a href="/rsgproducts" class="nav-link nav-toggle ">
+                                                        RSG Product
+                                                        <span class="arrow"></span>
+                                                    </a>    
+                                                </li>
+												@endpermission
+                                            </ul>
+                                        </li>
+										
+										<li class="menu-dropdown classic-menu-dropdown ">
+                                            <a href="javascript:;"> Marketing
+                                                <span class="arrow"></span>
+                                            </a>
+                                            <ul class="dropdown-menu pull-left">
+												@permission('fee-split-show')
+                                                <li class="">
+                                                    <a href="/fees" class="nav-link nav-toggle ">
+                                                        Fees List
+                                                        <span class="arrow"></span>
+                                                    </a>    
+                                                </li>
+												@endpermission
+												
+                                            </ul>
+                                        </li>
+										
+										<li class="menu-dropdown classic-menu-dropdown ">
+                                            <a href="javascript:;"> Inventory
+                                                <span class="arrow"></span>
+                                            </a>
+                                            <ul class="dropdown-menu pull-left">
+												@permission('productTransfer-show')
+                                                <li class="">
+                                                    <a href="{{ url('productTransfer') }};" class="nav-link nav-toggle ">
+                                                       Product Transfer
+                                                        <span class="arrow"></span>
+                                                    </a>    
+                                                </li>
+												@endpermission
+												
+												@permission('distribution-analysis-show')
+												<li class="">
+                                                    <a href="/tran" class="nav-link nav-toggle ">
+                                                        Distribution analysis 
+                                                        <span class="arrow"></span>
+                                                    </a>    
+                                                </li>
+												@endpermission
+												@permission('partslist-show')
+												<li class="">
+                                                    <a href="/kms/partslist" class="nav-link nav-toggle ">
+                                                        Inventory Inquiry 
+                                                        <span class="arrow"></span>
+                                                    </a>    
+                                                </li>
+												@endpermission
+                                            </ul>
+                                        </li>
+											
+
+										
+										<li class="menu-dropdown classic-menu-dropdown ">
+                                            <a href="javascript:;"> Price
+                                                <span class="arrow"></span>
+                                            </a>
+                                            <ul class="dropdown-menu pull-left">
+                                                @permission('price-model')
+												<li class="">
+                                                    <a href="/price" class="nav-link nav-toggle ">
+                                                        Price Model
+                                                        <span class="arrow"></span>
+                                                    </a>    
+                                                </li>
+												@endpermission
+												@permission('auto-price-show')
+												<li class="">
+                                                    <a href="/autoprice" class="nav-link nav-toggle ">
+                                                        Automatic price adjustment
+                                                        <span class="arrow"></span>
+                                                    </a>    
+                                                </li>
+												@endpermission
+                                            </ul>
+                                        </li>
+										
+
+
+
+										
+										
+										<li class="menu-dropdown classic-menu-dropdown ">
+                                            <a href="javascript:;"> Email
+                                                <span class="badge badge-danger" >{{intval(array_get($unreply,'Site',0)+array_get($unreply,'Amazon',0))}}</span>
+                                            </a>
+                                            <ul class="dropdown-menu pull-left">
+												@permission('inbox-show')
+												<li class="dropdown-submenu ">
+                                                    <a href="javascript:;" class="nav-link nav-toggle ">
+                                                        Inbox
+														<span class="badge badge-danger" style="margin-right:20px;">{{intval(array_get($unreply,'Site',0)+array_get($unreply,'Amazon',0))}}</span>
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                    <ul class="dropdown-menu">
+                                                        <li class=" ">
+                                                            <a href="{{url('inbox/filter/Site')}}" class="nav-link "> Site  <span class="badge badge-danger" >{{intval(array_get($unreply,'Site',0))}}</span></a>
+                                                        </li>
+                                                        <li class=" ">
+                                                            <a href="{{url('inbox/filter/Amazon')}}" class="nav-link "> Amazon  <span class="badge badge-danger" >{{intval(array_get($unreply,'Amazon',0))}}</span></a>
+                                                        </li>
+                                                    </ul>
+                                                </li>
+												@endpermission
+												@permission('sendbox-show')
+                                                <li class="">
+                                                    <a href="/send" class="nav-link nav-toggle ">
+                                                        Send Box
+                                                        <span class="arrow"></span>
+                                                    </a>    
+                                                </li>
+												@endpermission
+												@permission('templates-show')
+												<li class="">
+                                                    <a href="/template" class="nav-link nav-toggle ">
+                                                        Template
+                                                        <span class="arrow"></span>
+                                                    </a>    
+                                                </li>
+												@endpermission
+												@permission('callmessage-show')
+												<li class="">
+                                                    <a href="/phone" class="nav-link nav-toggle ">
+                                                        Call Message
+                                                        <span class="arrow"></span>
+                                                    </a>    
+                                                </li>
+												@endpermission
+												@permission('compose')
+												<li class="">
+                                                    <a href="/send/create" class="nav-link nav-toggle ">
+                                                        Compose
+                                                        <span class="arrow"></span>
+                                                    </a>    
+                                                </li>
+												@endpermission
+												
+												@permission('auto-reply-show')
+												<li class="">
+                                                    <a href="/auto" class="nav-link nav-toggle ">
+                                                        Auto Reply
+                                                        <span class="arrow"></span>
+                                                    </a>    
+                                                </li>
+							
+												@endpermission
+                                                
+                                            </ul>
+                                        </li>
+										
+										<li class="menu-dropdown classic-menu-dropdown ">
+                                            <a href="javascript:;"> Tools
+                                                <span class="arrow"></span>
+                                            </a>
+											<ul class="dropdown-menu pull-left">
+                                            @permission('exception-show')
+											<li class="">
+												<a href="/exception" class="nav-link nav-toggle ">
+													Refund & Replacement
+													<span class="arrow"></span>
+												</a>    
+											</li>
+											@endpermission
+											@permission('mcforder')
+											<li class="">
+												<a href="/mcforder" class="nav-link nav-toggle ">
+													Mcf Order
+													<span class="arrow"></span>
+												</a>    
+											</li>
+											@endpermission
+											
+											
+											@permission('sales-prediction-show')
+											<li class="">
+												<a href="/salesp" class="nav-link nav-toggle ">
+													Sales Prediction
+													<span class="arrow"></span>
+												</a>    
+											</li>
+											
+											@endpermission
+
+											
+											@permission('proline-show')
+											<li class="">
+												<a href="/proline" class="nav-link nav-toggle ">
+													Proline Report
+													<span class="arrow"></span>
+												</a>    
+											</li>
+											
+											@endpermission
+					
+											</ul>
+                                        </li>
+                                       
+									   <li class="menu-dropdown classic-menu-dropdown ">
+                                            <a href="javascript:;"> KMS
+                                                <span class="arrow"></span>
+                                            </a>
+                                            <ul class="dropdown-menu pull-left">
+												@permission('product-guide-show')
+                                                <li class="">
+                                                    <a href="/kms/productguide" class="nav-link nav-toggle ">
+                                                        Product Guide
+                                                        <span class="arrow"></span>
+                                                    </a>    
+                                                </li>
+												@endpermission
+												@permission('user-manual-show')
+												<li class="">
+                                                    <a href="/kms/usermanual" class="nav-link nav-toggle ">
+                                                        User Manual
+                                                        <span class="arrow"></span>
+                                                    </a>    
+                                                </li>
+												@endpermission
+												@permission('video-show')
+												<li class="">
+                                                    <a href="/kms/videolist" class="nav-link nav-toggle ">
+                                                        Video List
+                                                        <span class="arrow"></span>
+                                                    </a>    
+                                                </li>
+												@endpermission
+												@permission('qa-show')
+												<li class="">
+                                                    <a href="/qa" class="nav-link nav-toggle ">
+                                                        Knowledge Base
+                                                        <span class="arrow"></span>
+                                                    </a>    
+                                                </li>
+												@endpermission
+												@permission('qa-show')
+												<li class="">
+                                                    <a href="/question" class="nav-link nav-toggle ">
+                                                        Knowledge Center
+                                                        <span class="arrow"></span>
+                                                    </a>    
+                                                </li>
+												@endpermission
+												@permission('qa-category-show')
+												<li class="">
+                                                    <a href="/category" class="nav-link nav-toggle ">
+                                                        Knowledge Category
+                                                        <span class="arrow"></span>
+                                                    </a>    
+                                                </li>
+												@endpermission
+												@permission('learn-center')
+												<li class="">
+                                                    <a href="/kms/learn" class="nav-link nav-toggle ">
+                                                        Learning Center
+                                                        <span class="arrow"></span>
+                                                    </a>    
+                                                </li>
+												
+												@endpermission
+												
+												@permission('notice-center')
+												<li class="">
+                                                    <a href="/kms/notice" class="nav-link nav-toggle ">
+                                                        Notice Center
+                                                        <span class="arrow"></span>
+                                                    </a>    
+                                                </li>
+												
+												@endpermission
+                                            </ul>
+                                        </li>
+									   
+									   
+									   <li class="menu-dropdown classic-menu-dropdown ">
+                                            <a href="javascript:;"> Report
+                                                <span class="arrow"></span>
+                                            </a>
+                                            <ul class="dropdown-menu pull-left">
+												@permission('data-statistics')
+                                                <li class="">
+                                                    <a href="/total" class="nav-link nav-toggle ">
+                                                        Data Statistics
+                                                        <span class="arrow"></span>
+                                                    </a>    
+                                                </li>
+												@endpermission
+												@permission('product-problem-show')
+												<li class="">
+                                                    <a href="/etotal" class="nav-link nav-toggle ">
+                                                        Product Problem Statistics
+                                                        <span class="arrow"></span>
+                                                    </a>    
+                                                </li>
+												@endpermission
+												@permission('requestreport-show')
+												<li class="">
+                                                    <a href="/rr" class="nav-link nav-toggle ">
+                                                        Request Report
+                                                        <span class="arrow"></span>
+                                                    </a>    
+                                                </li>
+												@endpermission
+                                            </ul>
+                                        </li>
+										
+										
+										<li class="menu-dropdown classic-menu-dropdown ">
+                                            <a href="javascript:;"> Setting
+                                                <span class="arrow"></span>
+                                            </a>
+                                            <ul class="dropdown-menu pull-left">
+												@permission('users-show')
+                                                <li class="">
+                                                    <a href="/user" class="nav-link nav-toggle ">
+                                                        User Manage
+                                                        <span class="arrow"></span>
+                                                    </a>    
+                                                </li>
+												@endpermission
+												@permission('role-show')
+												<li class="">
+                                                    <a href="/role" class="nav-link nav-toggle ">
+                                                        Role Manage
+                                                        <span class="arrow"></span>
+                                                    </a>    
+                                                </li>
+												@endpermission
+												@permission('group-show')
+												<li class="">
+                                                    <a href="/group" class="nav-link nav-toggle ">
+                                                        Group Manage
+                                                        <span class="arrow"></span>
+                                                    </a>    
+                                                </li>
+												@endpermission
+												@permission('rule-show')
+												<li class="">
+                                                    <a href="/rule" class="nav-link nav-toggle ">
+                                                        Match Rules
+                                                        <span class="arrow"></span>
+                                                    </a>    
+                                                </li>
+												@endpermission
+												@permission('accounts-show')
+												<li class="">
+                                                    <a href="/account" class="nav-link nav-toggle ">
+                                                        Seller Account Manage
+                                                        <span class="arrow"></span>
+                                                    </a>    
+                                                </li>
+												@endpermission
+												@permission('seller-tab-show')
+												<li class="">
+                                                    <a href="/sellertab" class="nav-link nav-toggle ">
+                                                        Seller Tab Config
+                                                        <span class="arrow"></span>
+                                                    </a>    
+                                                </li>
+												@endpermission
+												@permission('review-tab-show')
+												<li class="">
+                                                    <a href="/rs" class="nav-link nav-toggle ">
+                                                        Review Step Config
+                                                        <span class="arrow"></span>
+                                                    </a>    
+                                                </li>
+												@endpermission
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </div>
             <div class="top-menu">
+				
                 <ul class="nav navbar-nav pull-right">
 
                     <li class="dropdown dropdown-user">
                         <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
-                            <i class="fa fa-book" style="font-size:20px"></i>
-                            <span class="username"> KMS </span>
-                            <i class="fa fa-angle-down"></i>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-default">
-							@permission('product-guide-show')
-                            <li>
-                                <a href="/kms/productguide">
-                                    <i class="fa fa-file"></i> Product Guide
-                                </a>
-                            </li>
-							@endpermission
-							@permission('asin-table-show')
-                            <li>
-                                <a href="/asin">
-                                    <i class="fa fa-table"></i> Asin Table
-                                </a>
-                            </li>
-                            @endpermission
-							@permission('qa-category-show')
-                            <li>
-                                <a href="/category">
-                                    <i class="fa fa-files-o"></i> Knowledge Category
-                                </a>
-                            </li>
-                            @endpermission
-							@permission('qa-show')
-                            <li>
-                                <a href="/qa">
-                                    <i class="fa fa-files-o"></i> Knowledge Base
-                                </a>
-                            </li>
-							@endpermission
-							@permission('qa-show')
-                            <li>
-                                <a href="/question">
-                                    <i class="fa fa-question"></i> Knowledge Center
-                                </a>
-                            </li>
-							@endpermission
-							@permission('learn-center')
-                            <li>
-                                <a href="/kms/learn">
-                                    <i class="fa fa-book"></i> Learning Center
-                                </a>
-                            </li>
-							@endpermission
-							@permission('notice-center')
-                            <li>
-                                <a href="/kms/notice">
-                                    <i class="fa fa-inbox"></i> Notice Center
-                                </a>
-                            </li>
-							@endpermission
-							@permission('templates-show')
-                            <li>
-                                <a href="/template">
-                                    <i class="fa fa-inbox"></i> Templates
-                                </a>
-                            </li>
-							@endpermission
-							@permission('user-manual-show')
-                            <li>
-                                <a href="/kms/usermanual">
-                                    <i class="fa fa-book"></i> User Manuals
-                                </a>
-                            </li>
-							@endpermission
-							@permission('video-show')
-                            <li>
-                                <a href="/kms/videolist">
-                                    <i class="fa fa-play-circle-o"></i> Video List
-                                </a>
-                            </li>
-							@endpermission
-							@permission('partslist-show')
-                            <li>
-                                <a href="/kms/partslist">
-                                    <i class="fa fa-list"></i> Inventory Inquiry
-                                </a>
-                            </li>
-							@endpermission
-							@permission('requestreport-show')
-                            <li>
-                                <a href="/rr">
-                                    <i class="fa fa-list"></i> Request Report
-                                </a>
-                            </li>
-							@endpermission
-                        </ul>
-                    </li>
-
-                    <li class="dropdown dropdown-user">
-                        <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
                             <img alt="" class="img-circle" src="/assets/layouts/layout/img/avatar.png" />
-                            <span class="username username-hide-on-mobile"> {{Auth::user()->email}} </span>
+                            
                             <i class="fa fa-angle-down"></i>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-default">
+					
                             <li>
                                 <a href="{{ url('profile') }}">
                                     <i class="icon-user"></i> My Profile </a>
@@ -263,15 +654,6 @@
                             </li>
                         </ul>
                     </li>
-                    <!-- END USER LOGIN DROPDOWN -->
-                    <!-- BEGIN QUICK SIDEBAR TOGGLER -->
-                    <!-- DOC: Apply "dropdown-dark" class after below "dropdown-extended" to change the dropdown styte -->
-                    <li class="dropdown dropdown-quick-sidebar-toggler">
-                        <a href="javascript:;" class="dropdown-toggle">
-                            <i class="icon-logout"></i>
-                        </a>
-                    </li>
-                    <!-- END QUICK SIDEBAR TOGGLER -->
                 </ul>
             </div>
             <!-- END TOP NAVIGATION MENU -->
@@ -285,433 +667,7 @@
     <!-- BEGIN CONTAINER -->
     <div class="page-container">
         <!-- BEGIN SIDEBAR -->
-        <div class="page-sidebar-wrapper">
-            <!-- BEGIN SIDEBAR -->
-            <!-- DOC: Set data-auto-scroll="false" to disable the sidebar from auto scrolling/focusing -->
-            <!-- DOC: Change data-auto-speed="200" to adjust the sub menu slide up/down speed -->
-            <div class="page-sidebar navbar-collapse collapse">
-                <!-- BEGIN SIDEBAR MENU -->
-                <!-- DOC: Apply "page-sidebar-menu-light" class right after "page-sidebar-menu" to enable light sidebar menu style(without borders) -->
-                <!-- DOC: Apply "page-sidebar-menu-hover-submenu" class right after "page-sidebar-menu" to enable hoverable(hover vs accordion) sub menu mode -->
-                <!-- DOC: Apply "page-sidebar-menu-closed" class right after "page-sidebar-menu" to collapse("page-sidebar-closed" class must be applied to the body element) the sidebar sub menu mode -->
-                <!-- DOC: Set data-auto-scroll="false" to disable the sidebar from auto scrolling/focusing -->
-                <!-- DOC: Set data-keep-expand="true" to keep the submenues expanded -->
-                <!-- DOC: Set data-auto-speed="200" to adjust the sub menu slide up/down speed -->
-                <ul class="page-sidebar-menu  page-header-fixed page-sidebar-menu-closed" data-keep-expanded="false" data-auto-scroll="true" data-slide-speed="200" style="padding-top: 20px">
-                    <!-- DOC: To remove the sidebar toggler from the sidebar you just need to completely remove the below "sidebar-toggler-wrapper" LI element -->
-                    <!-- BEGIN SIDEBAR TOGGLER BUTTON -->
-                    <li class="sidebar-toggler-wrapper hide">
-                        <div class="sidebar-toggler">
-                            <span></span>
-                        </div>
-                    </li>
-                    <?php
-                    $action_method = explode('.', request()->route()->getAction()['as'] ?? '');
-
-                    $action = $action_method[0];
-                    $method = isset($action_method[1])?$action_method[1]:'';
-
-
-                    ?>
-                    <!-- END SIDEBAR TOGGLER BUTTON -->
-                    <!-- DOC: To remove the search box from the sidebar you just need to completely remove the below "sidebar-search-wrapper" LI element -->
-					@permission('task-show')
-
-					
-					<li class="nav-item <?php if($action=='task') echo 'active';?>">
-                        <a href="{{url('task')}}" class="nav-link nav-toggle">
-                            <i class="fa fa-tasks"><span class=" badge-danger " style="
-    border-radius: 5px !important;
-    font-size: 12px;
-    position: relative;
-    top: -10px;
-    left: -10px;
-">{{intval($untasks)}}</span></i>
-                            <span class="title">Tasks</span>
-                            <?php if($action=='task') echo '<span class="selected"></span>';?>
-
-                        </a>
-
-                    </li>
-					@endpermission
-
-
-					@permission('compose')
-                    <li class="nav-item <?php if($action=='send' && $method=='create') echo 'active';?> ">
-
-							<a href="{{ url('send/create') }}" class="nav-link nav-toggle">
-
-                            <i class="fa fa-edit"></i>
-
-                            <span class="title">Compose</span>
-                            <!--<span class="arrow"></span>-->
-                            <?php if($action=='send') echo '<span class="selected"></span>';?>
-
-                        </a>
-
-                    </li>
-					@endpermission
-					@permission('inbox-show')
-                    <li class="nav-item <?php if($action=='inbox') echo 'active';?>">
-                        <a href="{{url('inbox')}}" class="nav-link nav-toggle">
-                            <i class="fa fa-envelope-o"><span class=" badge-danger " style="
-    border-radius: 5px !important;
-    font-size: 12px;
-    position: relative;
-    top: -10px;
-    left: -10px;
-">{{intval(array_get($unreply,'Site',0)+array_get($unreply,'Amazon',0))}}</span></i>
-                            <span class="title">InBox</span>
-                            <?php if($action=='inbox') echo '<span class="selected"></span>';?>
-
-                        </a>
-
-                    </li>
-
-
-					<?php $filtertype=isset($type)?$type:''; ?>
-					@foreach (getAccountTypes() as $type)
-
-					<li class="nav-item <?php if($action=='filterInbox' && $filtertype==$type) echo 'active';?>">
-                        <a href="{{url('inbox/filter/'.$type)}}" class="nav-link nav-toggle">
-                            <i class="fa fa-envelope-o"><span class=" badge-danger " style="
-    border-radius: 5px !important;
-    font-size: 12px;
-    position: relative;
-    top: -10px;
-    left: -10px;
-">{{intval(array_get($unreply,$type,0))}}</span></i>
-                            <span class="title">{{$type}} InBox</span>
-                            <?php if($action=='filterInbox' && $filtertype==$type) echo '<span class="selected"></span>';?>
-                        </a>
-                    </li>
-					@endforeach
-
-					@endpermission
-					@permission('callmessage-show')
-					<li class="nav-item <?php if($action=='phone') echo 'active';?>">
-                        <a href="{{url('phone')}}" class="nav-link nav-toggle">
-                            <i class="fa fa-phone"></i>
-                            <span class="title">Call Message</span>
-                            <?php if($action=='phone') echo '<span class="selected"></span>';?>
-
-                        </a>
-
-                    </li>
-
-					@endpermission
-					@permission('sendbox-show')
-
-                    <li class="nav-item <?php if($action=='send' && $method!='create') echo 'active';?>">
-                        <a href="{{url('send')}}" class="nav-link nav-toggle">
-                            <i class="fa fa-share-square-o"></i>
-                            <span class="title">SendBox</span>
-                            <?php if($action=='send') echo '<span class="selected"></span>';?>
-
-                        </a>
-
-                    </li>
-
-					@endpermission
-					@permission('review-show')
-
-
-                    <li class="nav-item <?php if($action=='review') echo 'active';?>">
-                        <a href="{{ url('review') }}" class="nav-link nav-toggle">
-                            <i class="fa fa-table"></i>
-                            <span class="title">Reviews Table</span>
-                            <?php if($action=='review') echo '<span class="selected"></span>';?>
-
-                        </a>
-
-                    </li>
-
-					@endpermission
-					@permission('asin-rating-show')
-
-                    <li class="nav-item <?php if($action=='star') echo 'active';?>">
-                        <a href="{{ url('star') }}" class="nav-link nav-toggle">
-                            <i class="fa fa-star"></i>
-                            <span class="title">Asin Rating Table</span>
-                            <?php if($action=='star') echo '<span class="selected"></span>';?>
-
-                        </a>
-
-                    </li>
-
-					@endpermission
-					@permission('exception-show')
-					<li class="nav-item <?php if($action=='exception') echo 'active';?>">
-                        <a href="{{ url('exception') }}" class="nav-link nav-toggle">
-                            <i class="fa fa-ticket"></i>
-                            <span class="title">Refund & Replacement</span>
-                            <?php if($action=='exception') echo '<span class="selected"></span>';?>
-
-                        </a>
-
-                    </li>
-					@endpermission
-
-                    @permission('mcforders')
-                    <li class="nav-item <?php if($action=='mcforder') echo 'active';?>">
-                        <a href="{{ url('mcforder') }}" class="nav-link nav-toggle">
-                            <i class="fa fa-sticky-note-o"></i>
-                            <span class="title">Mcf Order</span>
-							<?php if($action=='mcforder') echo '<span class="selected"></span>';?>
-                        </a>
-                    </li>
-                    @endpermission
-
-					@permission('ctg-show')
-                    @include('layouts.menu', ['text'=>'C T G', 'uri'=>'/ctg/list', 'fa'=>'google'])
-
-
-					@endpermission
-					@permission('non-ctg-show')
-                    <li class="nav-item {{$action}} <?php if($action=='nonctg') echo 'active';?>">
-                        <a href="{{ url('nonctg') }}" class="nav-link nav-toggle">
-                            <i class="fa fa-exclamation-circle"></i>
-                            <span class="title">Non-CTG</span>
-                            <?php if($action=='nonctg') echo '<span class="selected"></span>';?>
-                        </a>
-                    </li>
-                    @endpermission
-
-                    @permission('crm-show')
-                    {{--新添加的CRM模块--}}
-                    <li class="nav-item {{$action}} <?php if($action=='crm') echo 'active';?>">
-                        <a href="{{ url('crm') }}" class="nav-link nav-toggle">
-                            <i class="fa fa-user"></i>
-                            <span class="title">CRM</span>
-							<?php if($action=='crm') echo '<span class="selected"></span>';?>
-                        </a>
-                    </li>
-                    @endpermission
-
-					@permission('auto-reply-show')
-                    <li class="nav-item <?php if($action=='auto') echo 'active';?>">
-                        <a href="{{url('auto')}}" class="nav-link nav-toggle">
-                            <i class="fa fa-reply-all"></i>
-                            <span class="title">Auto Reply</span>
-                            <?php if($action=='auto') echo '<span class="selected"></span>';?>
-                        </a>
-                    </li>
-
-					@endpermission
-					@permission('rule-show')
-                    <li class="nav-item <?php if($action=='rule') echo 'active';?>">
-                        <a href="{{ url('rule') }}" class="nav-link nav-toggle">
-                            <i class="fa fa-filter"></i>
-                            <span class="title">Match Rules</span>
-                            <?php if($action=='rule') echo '<span class="selected"></span>';?>
-
-                        </a>
-
-                    </li>
-
-					@endpermission
-					@permission('group-show')
-					 <li class="nav-item <?php if($action=='group') echo 'active';?>">
-                        <a href="{{ url('group') }}" class="nav-link nav-toggle">
-                            <i class="fa fa-group"></i>
-                            <span class="title">Group Manage</span>
-                            <?php if($action=='group') echo '<span class="selected"></span>';?>
-
-                        </a>
-
-                    </li>
-					@endpermission
-					@permission('role-show')
-
-					<li class="nav-item <?php if($action=='role') echo 'active';?>">
-                        <a href="{{ url('role') }}" class="nav-link nav-toggle">
-                            <i class="fa fa-user"></i>
-                            <span class="title">Role Manage</span>
-                            <?php if($action=='role') echo '<span class="selected"></span>';?>
-
-                        </a>
-
-                    </li>
-					@endpermission
-					@permission('users-show')
-
-                    <li class="nav-item <?php if($action=='user') echo 'active';?>">
-                        <a href="{{ url('user') }}" class="nav-link nav-toggle">
-                            <i class="fa fa-user"></i>
-                            <span class="title">User Manage</span>
-                            <?php if($action=='user') echo '<span class="selected"></span>';?>
-
-                        </a>
-
-                    </li>
-					@endpermission
-					@permission('accounts-show')
-                    <li class="nav-item <?php if($action=='account') echo 'active';?>">
-                        <a href="{{ url('account') }}" class="nav-link nav-toggle">
-                            <i class="icon-diamond"></i>
-                            <span class="title">Seller Account Manage</span>
-                            <?php if($action=='account') echo '<span class="selected"></span>';?>
-
-                        </a>
-
-                    </li>
-					@endpermission
-					@permission('product-problem-show')
-
-					<li class="nav-item <?php if($action=='etotal') echo 'active';?>">
-                        <a href="{{ url('etotal') }}" class="nav-link nav-toggle">
-                            <i class="fa fa-question-circle"></i>
-                            <span class="title">Product Problem Statistics</span>
-                            <?php if($action=='etotal') echo '<span class="selected"></span>';?>
-
-                        </a>
-
-                    </li>
-					@endpermission
-					@permission('seller-tab-show')
-					<li class="nav-item <?php if($action=='sellertab') echo 'active';?>">
-                        <a href="{{ url('sellertab') }}" class="nav-link nav-toggle">
-                            <i class="fa fa-wrench"></i>
-                            <span class="title">Seller Tab Config</span>
-                            <?php if($action=='sellertab') echo '<span class="selected"></span>';?>
-
-                        </a>
-
-                    </li>
-					@endpermission
-					@permission('review-tab-show')
-					<li class="nav-item <?php if($action=='rs') echo 'active';?>">
-                        <a href="{{ url('rs') }}" class="nav-link nav-toggle">
-                            <i class="fa fa-wrench"></i>
-                            <span class="title">Review Step Config</span>
-                            <?php if($action=='rs') echo '<span class="selected"></span>';?>
-
-                        </a>
-
-                    </li>
-					@endpermission
-					@permission('data-statistics')
-					<li class="nav-item <?php if($action=='total') echo 'active';?>">
-                        <a href="{{ url('total') }}" class="nav-link nav-toggle">
-                            <i class="fa fa-download"></i>
-                            <span class="title">Data Statistics</span>
-                            <?php if($action=='total') echo '<span class="selected"></span>';?>
-
-                        </a>
-                    </li>
-					@endpermission
-					@permission('sales-management')
-					<li class="nav-item <?php if($action=='seller') echo 'active';?>">
-                        <a href="{{ url('seller') }}" class="nav-link nav-toggle">
-                            <i class="fa fa-tasks"></i>
-                            <span class="title">Sales Management</span>
-                            <?php if($action=='seller') echo '<span class="selected"></span>';?>
-                        </a>
-                    </li>
-					@endpermission
-					@permission('distribution-analysis-show')
-
-					<li class="nav-item <?php if($action=='tran') echo 'active';?>">
-                        <a href="{{ url('tran') }}" class="nav-link nav-toggle">
-                            <i class="fa fa-truck"></i>
-                            <span class="title">Distribution analysis</span>
-                            <?php if($action=='tran') echo '<span class="selected"></span>';?>
-                        </a>
-                    </li>
-					@endpermission
-					@permission('fee-split-show')
-					<li class="nav-item <?php if($action=='fees') echo 'active';?>">
-                        <a href="{{ url('fees') }}" class="nav-link nav-toggle">
-                            <i class="fa fa-dollar"></i>
-                            <span class="title">Fees Split</span>
-                            <?php if($action=='fees') echo '<span class="selected"></span>';?>
-                        </a>
-                    </li>
-					@endpermission
-
-					@permission('price-model')
-
-					<li class="nav-item <?php if($action=='price') echo 'active';?>">
-                        <a href="{{ url('price') }}" class="nav-link nav-toggle">
-                            <i class="fa fa-line-chart"></i>
-                            <span class="title">Price Model</span>
-                            <?php if($action=='price') echo '<span class="selected"></span>';?>
-                        </a>
-                    </li>
-					@endpermission
-					@permission('auto-price-show')
-					<li class="nav-item <?php if($action=='autoprice') echo 'active';?>">
-                        <a href="{{ url('autoprice') }}" class="nav-link nav-toggle">
-                            <i class="fa fa-area-chart"></i>
-                            <span class="title">Automatic Price Adjustment</span>
-                            <?php if($action=='autoprice') echo '<span class="selected"></span>';?>
-                        </a>
-                    </li>
-					@endpermission
-					@permission('sales-prediction-show')
-					<li class="nav-item <?php if($action=='salesp') echo 'active';?>">
-                        <a href="{{ url('salesp') }}" class="nav-link nav-toggle">
-                            <i class="fa fa-shopping-cart"></i>
-                            <span class="title">Sales Prediction</span>
-                            <?php if($action=='salesp') echo '<span class="selected"></span>';?>
-                        </a>
-                    </li>
-					@endpermission
-					@permission('sales-report-show')
-					<li class="nav-item <?php if($action=='skus') echo 'active';?>">
-                        <a href="{{ url('skus') }}" class="nav-link nav-toggle">
-                            <i class="fa fa-calendar"></i>
-                            <span class="title">Daily Sales Report</span>
-                            <?php if($action=='skus') echo '<span class="selected"></span>';?>
-                        </a>
-                    </li>
-					@endpermission
-					
-					@permission('proline-show')
-					<li class="nav-item <?php if($action=='proline') echo 'active';?>">
-                        <a href="{{ url('proline') }}" class="nav-link nav-toggle">
-                            <i class="fa fa-calendar"></i>
-                            <span class="title">Proline Report</span>
-                            <?php if($action=='proline') echo '<span class="selected"></span>';?>
-                        </a>
-                    </li>
-					@endpermission
-					
-					
-					@permission('rsgproducts-show')
-					<li class="nav-item <?php if($action=='rsgproducts') echo 'active';?>">
-                        <a href="{{ url('rsgproducts') }}" class="nav-link nav-toggle">
-                            <i class="fa fa-gift"></i>
-                            <span class="title">Rsg Products</span>
-                            <?php if($action=='rsgproducts') echo '<span class="selected"></span>';?>
-                        </a>
-                    </li>
-					@endpermission
-					@permission('rsgrequests-show')
-					<li class="nav-item <?php if($action=='rsgrequests') echo 'active';?>">
-                        <a href="{{ url('rsgrequests') }}" class="nav-link nav-toggle">
-                            <i class="fa fa-gift"></i>
-                            <span class="title">Rsg Requests</span>
-                            <?php if($action=='rsgrequests') echo '<span class="selected"></span>';?>
-                        </a>
-                    </li>
-					@endpermission
-
-                    @permission('productTransfer-show')
-                    <li class="nav-item <?php if($action=='productTransfer') echo 'active';?>">
-                        <a href="{{ url('productTransfer') }}" class="nav-link nav-toggle">
-                            <i class="fa fa-share"></i>
-                            <span class="title">Product Transfer</span>
-							<?php if($action=='productTransfer') echo '<span class="selected"></span>';?>
-                        </a>
-                    </li>
-                    @endpermission
-                </ul>
-                <!-- END SIDEBAR MENU -->
-                <!-- END SIDEBAR MENU -->
-            </div>
-            <!-- END SIDEBAR -->
-        </div>
+        
         <!-- END SIDEBAR -->
         <!-- BEGIN CONTENT -->
         <div class="page-content-wrapper">
