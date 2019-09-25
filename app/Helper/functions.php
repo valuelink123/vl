@@ -864,3 +864,28 @@ function getTaskStageArr()
 {
 	return array(0=>'New',1=>'Opening',2=>'Under Review',3=>'Finished');
 }
+
+/*
+ * JP，US，EU各个站点所归属的site
+ * FBM-FMA的物流周期【JP=10天，EU=12天，US=20天】(fbmfba_days)
+ * 上架时效的物流周期【JP=2天，EU=3天，US=3天】(fbmfba_shelfing)
+ */
+function getSiteArr()
+{
+	$arr['site'] = [
+		'JP' => array('www.amazon.co.jp'),
+		'US' => array('www.amazon.com','www.amazon.ca'),
+		'EU' => array('www.amazon.co.uk','www.amazon.de','www.amazon.it','www.amazon.es','www.amazon.fr'),
+	];
+	$arr['fbmfba_days'] = array('JP'=>10,'US'=>20,'EU'=>12);
+	$arr['fbmfba_shelfing'] = array('JP'=>2,'US'=>3,'EU'=>3);
+	return $arr;
+}
+/*
+ * 得到FBM的良品仓有哪些仓库
+ */
+function getGoodStoreHouse()
+{
+	$goodStoreHouse = array('US02_US2','US02_US6','JP02_CJP2','GR02_CGR2','GR04_GR4','UK02_UK3','CZ02_CZ2');
+	return $goodStoreHouse;
+}

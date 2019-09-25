@@ -8,6 +8,7 @@ use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Auth;
 use DB;
+use App\User;
 
 class Controller extends BaseController
 {
@@ -36,6 +37,28 @@ class Controller extends BaseController
 			}
 		}
 		return $asinWhere;
+	}
+
+	//得到用户的idName键值对
+	public function getUsersIdName(){
+		$users = User::get()->toArray();
+		$users_array = array();
+		foreach($users as $user){
+			$users_array[$user['id']] = $user['name'];
+		}
+		return $users_array;
+	}
+	//得到所有BG的值
+	public function getBgs()
+	{
+		$bgs = $this->queryFields('SELECT DISTINCT bg FROM asin');
+		return $bgs;
+	}
+	//得到所有BU的值
+	public function getBus()
+	{
+		$bus = $this->queryFields('SELECT DISTINCT bu FROM asin');
+		return $bus;
 	}
 
 }

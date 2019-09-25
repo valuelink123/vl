@@ -134,3 +134,16 @@ Route::resource('task', 'TaskController');
 Route::Post('/task/get', 'TaskController@get')->name('getTask');
 Route::Post('/taskajaxupdate', 'TaskController@taskAjaxUpdate')->name('taskAjaxUpdate');
 Route::Post('/getasinbysku', 'AsinController@getAsinBySku')->name('getAsinBySku');
+
+
+//产品调拨系统模块
+Route::get('/productTransfer', 'ProductTransferController@list');
+Route::post('/productTransfer', 'ProductTransferController@list');
+Route::post('/productTransfer/updateDays', 'ProductTransferController@updateDays');//批量更新天数操作
+Route::post('/productTransfer/reply', 'ProductTransferController@reply');//申请调拨操作
+Route::post('/productTransfer/ignore', 'ProductTransferController@ignore');//忽略调拨操作
+Route::get('/productTransfer/replyList', 'ProductTransferController@replyList');//调拨申请列表
+Route::post('/productTransfer/replyList', 'ProductTransferController@replyList');//调拨申请列表
+Route::post('/productTransfer/updateReply', 'ProductTransferController@updateReply');//修改申请调拨内容，例如修改调拨数量
+Route::post('/productTransfer/showLog', 'ProductTransferController@showLog');//申请列表显示操作日志
+Route::post('/productTransfer/replyAudit', 'ProductTransferController@replyAudit');//审核调拨请求的批准，拒绝状态

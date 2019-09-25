@@ -40,6 +40,7 @@ class Kernel extends ConsoleKernel
 		'App\Console\Commands\StaClient',
 		'App\Console\Commands\AddClient',
 		'App\Console\Commands\GetSkuBaseInfo',
+		'App\Console\Commands\AddTransferWarn',
     ];
 
     /**
@@ -99,6 +100,7 @@ class Kernel extends ConsoleKernel
 		$schedule->command('add:client')->dailyAt('2:00')->name('add_client')->withoutOverlapping();//添加客户数据，每天跑一次
 		$schedule->command('insert:asininfo')->dailyAt('3:00')->name('insertasin')->withoutOverlapping();
 		$schedule->command('get:skubaseinfo')->dailyAt('16:00')->name('skubaseinfo')->withoutOverlapping();
+		$schedule->command('add:transfer_warn')->dailyAt('6:00')->name('transferWarn')->withoutOverlapping();//添加调拨预警，每天跑一次
     }
 
     /**
