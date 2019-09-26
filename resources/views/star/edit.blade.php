@@ -66,8 +66,22 @@ $(function() {
 					x: 'left',
 					itemWidth:10,
 					itemHeight:10,
-					selectedMode: 'multiple',
-					data:['Price','Sale Price','Avg Price','Sold Qty','Review Count','Rating','Sessions','UnitSessionPercentage','BSR']
+					
+					data:['Price','Sale Price','Avg Price','Sold Qty','Review Count','Rating','Sessions','UnitSessionPercentage','BSR'],
+					selected: {
+						'Price': false,
+						'Sale Price': false,
+						'Avg Price': false,
+						'Sold Qty': true,
+						'Review Count': false,
+						'Rating': false,
+						'Sessions': false,
+						'UnitSessionPercentage': false,
+						'BSR': false
+					},
+					selectedMode:"single",
+					inactiveColor:"#888",
+					icon:"roundRect"
 				},
 
 				toolbox: {
@@ -98,46 +112,64 @@ $(function() {
 					{
 						name:'Price',
 						type:'line',
+						smooth:true,
+						itemStyle: {normal: {areaStyle: {type: 'default'}}},
 						data:chartY1
 					},
 					{
 						name:'Sale Price',
 						type:'line',
+						smooth:true,
+						itemStyle: {normal: {areaStyle: {type: 'default'}}},
 						data:chartY2
 					},
 					{
 						name:'Avg Price',
 						type:'line',
+						smooth:true,
+						itemStyle: {normal: {areaStyle: {type: 'default'}}},
 						data:chartY3
 					},
 					{
 						name:'Sold Qty',
 						type:'line',
+						smooth:true,
+						itemStyle: {normal: {areaStyle: {type: 'default'}}},
 						data:chartY4
 					},
 					{
 						name:'Review Count',
 						type:'line',
+						smooth:true,
+						itemStyle: {normal: {areaStyle: {type: 'default'}}},
 						data:chartY5
 					},
 					{
 						name:'Rating',
 						type:'line',
+						smooth:true,
+						itemStyle: {normal: {areaStyle: {type: 'default'}}},
 						data:chartY6
 					},
 					{
 						name:'Sessions',
 						type:'line',
+						smooth:true,
+						itemStyle: {normal: {areaStyle: {type: 'default'}}},
 						data:chartY7
 					},
 					{
 						name:'UnitSessionPercentage',
 						type:'line',
+						smooth:true,
+						itemStyle: {normal: {areaStyle: {type: 'default'}}},
 						data:chartY8
 					},
 					{
 						name:'BSR',
 						type:'line',
+						smooth:true,
+						itemStyle: {normal: {areaStyle: {type: 'default'}}},
 						data:chartY9
 					}
 				]
