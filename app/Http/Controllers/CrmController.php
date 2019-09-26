@@ -60,10 +60,16 @@ class CrmController extends Controller
 
 		$fbgroupConfig = getFacebookGroup();
 		foreach($data as $key=>$val){
+			$action = '';
 			if(!Auth::user()->can(['crm-update'])){
 				$action = '<a class="btn btn-danger btn-xs" href="'.url('crm/show?id='.$val['id']).'" target="_blank">Show</a>';
 			}else{
 				$action = '<a href="'.url('crm/edit?id='.$val['id']).'" target="_blank" class="badge badge-success"> Edit </a> <a class="btn btn-danger btn-xs" href="'.url('crm/show?id='.$val['id']).'" target="_blank">Show</a>';
+			}
+			if($val['amazon_profile_page']){
+				$amazonPage = str_replace("http://","",$val['amazon_profile_page']);
+				$amazonPage = str_replace("https://","",$amazonPage);
+				$action .= '<a href="http://'.$amazonPage.'" target="_blank"><i class="fa fa-share"></i></a>';
 			}
 			$data[$key]['action'] = $action;
 			//当点击ctg,rsg,Negative Review所属的数字时，可以链接到相对应的客户列表页面，times_ctg，times_rsg，times_negative_review
@@ -158,22 +164,22 @@ class CrmController extends Controller
 		}
 
 		$sql = "select SQL_CALC_FOUND_ROWS t1.id as id,t1.date as date,c.name as name,c.email as email,c.phone as phone,c.country as country,c.`from` as `from`,c.brand as brand,
-t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as times_negative_review,t1.times_positive_review as times_positive_review,if(num>0,num,0) as order_num,b.name as processor,b.bg as bg,b.bu as bu,c.facebook_name as facebook_name,c.facebook_group as facebook_group  
+t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as times_negative_review,t1.times_positive_review as times_positive_review,if(num>0,num,0) as order_num,b.name as processor,b.bg as bg,b.bu as bu,c.facebook_name as facebook_name,c.facebook_group as facebook_group,c.amazon_profile_page as amazon_profile_page   
 			FROM client as t1 
 		  	left join(
 				select users.id as processor,min(name) as name,min(bg) as bg,min(bu) as bu 
 				from users 
 				left join asin on users.sap_seller_id = asin.sap_seller_id 
 				group by users.id 
-				order by users.id desc
+				order by users.id desc 
 			) as b on b.processor = t1.processor 
 			join (
-					select count(*) as num,client_id,max(t1.name) as name,max(t1.email) as email,max(t1.phone) as phone,max(t1.country) as country,max(t1.`from`) as `from`,max(t1.brand) as brand,any_value(facebook_name) as facebook_name,any_value(facebook_group) as facebook_group 
-					from client_info t1
+					select count(*) as num,client_id,max(t1.name) as name,max(t1.email) as email,max(t1.phone) as phone,max(t1.country) as country,max(t1.`from`) as `from`,max(t1.brand) as brand,any_value(facebook_name) as facebook_name,any_value(facebook_group) as facebook_group,max(amazon_profile_page) as amazon_profile_page  
+					from client_info t1 
 					left join client_order_info as t2 on t1.id = t2.ci_id 
 			  		{$whereInfo} 
 			  		group by client_id 
-			) as c on t1.id = c.client_id
+			) as c on t1.id = c.client_id 
 			where $where 
 			{$orderby} ";
 		return $sql;
@@ -238,7 +244,7 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 		$contactInfo = array();
 		$contactBasic['id'] = $id;
 		if($id){
-			$sql = "select b.client_id as id,b.id as info_id,c.id as cid,b.name as name,b.email as email,b.phone as phone,b.country as country,b.`from` as `from`,b.brand as brand,b.facebook_group as facebook_group,b.facebook_name as facebook_name,c.amazon_order_id as amazon_order_id,c.order_type as order_type 
+			$sql = "select b.client_id as id,b.id as info_id,c.id as cid,b.name as name,b.email as email,b.phone as phone,b.country as country,b.`from` as `from`,b.brand as brand,b.facebook_group as facebook_group,b.facebook_name as facebook_name,c.amazon_order_id as amazon_order_id,c.order_type as order_type,c.amazon_profile_page as amazon_profile_page  
 			FROM client_info as b
 			left join client_order_info as c on b.id = c.ci_id
 			where b.client_id = $id
@@ -254,6 +260,7 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 				$contactInfo[$val['email']]['cid'][] = $val['cid'];
 				$contactInfo[$val['email']][$val['cid']]['amazon_order_id'] = $val['amazon_order_id'];
 				$contactInfo[$val['email']][$val['cid']]['order_type'] = $val['order_type'];
+				$contactInfo[$val['email']][$val['cid']]['amazon_profile_page'] = $val['amazon_profile_page'];
 				$contactBasic['country'] = $val['country'];
 				$contactBasic['name'] = $val['name'];
 				$contactBasic['brand'] = $val['brand'];
@@ -345,6 +352,7 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 					//添加现在获取到的
 					$insert['amazon_order_id'] = $v['amazon_order_id'];
 					$insert['order_type'] = $v['order_type'];
+					$insert['amazon_profile_page'] = $v['amazon_profile_page'];
 					$res = DB::table('client_order_info')->insert($insert);
 					if(empty($res)){
 						DB::rollBack();

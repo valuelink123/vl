@@ -277,7 +277,7 @@
                 // blurable: true, // unselect on blur
                 selector: 'td:first-child', // 指定第一列可以点击选中
             },
-            "aoColumnDefs": [ { "bSortable": false, "aTargets": [16,17,19] }],
+            "aoColumnDefs": [ { "bSortable": false, "aTargets": [19] }],
             columns: [
                 {
                     width: "1px",

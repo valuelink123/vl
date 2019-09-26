@@ -245,6 +245,7 @@ Web: '.$pro_req_arr[$list['id']]['channel_web'].'';
 		$date = date('Y-m-d', strtotime('-1 day'));
 		$sql = 'select total_star_number,average_score from star_history where create_at = "'.$date.'" and asin="'.$rule->asin.'" and domain="'.$rule->site.'" limit 1';
 		$_data= DB::select($sql);
+		//review_rating和number_of_reviews直接从系统中的star_history表中获取
 		if($_data){
 			$rule->review_rating = $_data[0]->average_score;
 			$rule->number_of_reviews = $_data[0]->total_star_number;

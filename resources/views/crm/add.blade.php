@@ -143,7 +143,7 @@
                                                                     <div data-repeater-item >
                                                                         <div class="form-group">
                                                                             <div class="col-lg-3">
-                                                                                <label class="control-label">Amazon_Order_Id</label>
+                                                                                <label class="control-label">Amazon Order Id</label>
                                                                             <input type="text" class="form-control"  name="amazon_order_id" pattern="\d{3}-\d{7}-\d{7}" value="" placeholder="Amazon_Order_Id"/>
                                                                             </div>
                                                                             <div class="col-lg-2">
@@ -153,6 +153,10 @@
                                                                                     <option value="{{$key}}" >{{$value}}</option>
                                                                                 @endforeach
                                                                             </select>
+                                                                            </div>
+                                                                            <div class="col-lg-6">
+                                                                                <label class="control-label">Amazon Profile Page</label>
+                                                                                <input type="text" class="form-control"  name="amazon_profile_page" placeholder="Amazon Profile Page" value="" />
                                                                             </div>
                                                                         </div>
                                                                         <a href="javascript:;" data-repeater-delete class="btn btn-danger mt-repeater-delete-son">
