@@ -417,7 +417,7 @@
 												</a>    
 											</li>
 											@endpermission
-											@permission('mcforder')
+											@permission('mcforders')
 											<li class="">
 												<a href="/mcforder" class="nav-link nav-toggle ">
 													Mcf Order
