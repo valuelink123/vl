@@ -30,7 +30,7 @@ class SapRfcRequest {
     private $appid;
     private $appsecret;
 
-    public function __construct($appid = 'site0001', $appsecret = 'testsite0001', $host = env('SAP_RFC')) {
+    public function __construct($appid = 'site0001', $appsecret = 'testsite0001', $host = '113.108.40.136:18003') {
         $this->host = $host;
         $this->appid = $appid;
         $this->appsecret = $appsecret;
