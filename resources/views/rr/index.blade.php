@@ -97,7 +97,7 @@
                                 </td>
                                 <td>
 									@if($data->Path)
-                                    <a href="http://116.6.105.153:18003/reports/{{$data->Path}}" target="_blank">
+                                    <a href="http://{{env('SAP_RFC')}}/reports/{{$data->Path}}" target="_blank">
                                         <button type="submit" class="btn btn-success btn-xs">Download</button>
                                     </a>
 									@endif

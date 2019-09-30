@@ -70,7 +70,7 @@ class GetAsininfo extends Command
 		$authstr=$authstr.$appsecret;
 		$sign = strtoupper(sha1($authstr));
 
-		$res = file_get_contents('http://116.6.105.153:18003/rfc_site.php?appid='.$appkey.'&method='.$array['method'].'&asin='.$array['asin'].'&sign='.$sign);
+		$res = file_get_contents('http://'.env("SAP_RFC").'/rfc_site.php?appid='.$appkey.'&method='.$array['method'].'&asin='.$array['asin'].'&sign='.$sign);
 		$result = json_decode($res,true);
 		$asinList = array_get($result,'data');
 		$exits_asin=[];

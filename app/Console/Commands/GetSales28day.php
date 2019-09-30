@@ -104,7 +104,7 @@ from asin where(sales_28_22+sales_21_15+sales_14_08+sales_07_01)>0 group by item
 		$authstr=$authstr.$appsecret;
 		$sign = strtoupper(sha1($authstr));
 		$array['sign']=$sign;
-		$res = curl_request('http://116.6.105.153:18003/rfc_site.php',$array);
+		$res = curl_request('http://'.env("SAP_RFC").'/rfc_site.php',$array);
 		$result = json_decode($res,true);
 		$Lists = array_get($result,'data.O_TAB');
 		$sku_sales_p=$skus_s =[];

@@ -90,7 +90,7 @@ class PriceController extends Controller
 		$authstr=$authstr.$appsecret;
 		$sign = strtoupper(sha1($authstr));
 		$array['sign']=$sign;
-		$res = curl_request('http://116.6.105.153:18003/rfc_site.php',$array);
+		$res = curl_request('http://'.env("SAP_RFC").'/rfc_site.php',$array);
 		die($res);
 	}
 	

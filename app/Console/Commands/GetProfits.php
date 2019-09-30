@@ -65,7 +65,7 @@ class GetProfits extends Command
 		$authstr=$authstr.$appsecret;
 		$sign = strtoupper(sha1($authstr));
 		
-		$res = file_get_contents('http://116.6.105.153:18003/rfc_site.php?appid='.$appkey.'&method='.$array['method'].'&date_start='.$date_start.'&date_end='.$date_end.'&sign='.$sign);
+		$res = file_get_contents('http://'.env("SAP_RFC").'/rfc_site.php?appid='.$appkey.'&method='.$array['method'].'&date_start='.$date_start.'&date_end='.$date_end.'&sign='.$sign);
 		//print_r($res);
 		$result = json_decode($res,true);
 		
