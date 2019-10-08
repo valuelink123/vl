@@ -54,16 +54,12 @@ class TaskController extends Controller
 		$date_to=date('Y-m-d');		
 		if(array_get($_REQUEST,'date_from')) $date_from= array_get($_REQUEST,'date_from');
 		if(array_get($_REQUEST,'date_to')) $date_to= array_get($_REQUEST,'date_to');
-		$customers = Task::select('tasks.*','users.ubg','users.ubu')->where('complete_date','<=',$date_to)->where('complete_date','>=',$date_from)
+		$customers = Task::select('tasks.*','users.ubg','users.ubu')->where('request_date','<=',$date_to.' 23:59:59')->where('request_date','>=',$date_from.' 00:00:00')
 			->leftJoin('users',function($q){
 				$q->on('tasks.response_user_id', '=', 'users.id');
 			});
 		
-		
-		
-		if(!Auth::user()->can('rsgrequests-show-all')) {
-			
-		}
+
 		
 		if(!Auth::user()->can(['task-show-all'])){ 
 		
