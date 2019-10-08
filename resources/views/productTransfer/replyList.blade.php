@@ -140,6 +140,11 @@
                     <th>Suggest Num</th>
                     <th>Reply Number</th>
                     <th>Reply Reason</th>
+                    <th>Label Status</th>
+                    <th>Label Type</th>
+                    <th>Reply Factory</th>
+                    <th>Reply Location</th>
+                    <th>Reply Processor</th>
                     <th>Audit date</th>
                     <th>Opera Log</th>
                     <th>Process</th>
@@ -270,6 +275,11 @@
                     {data: 'suggest_num', name: 'suggest_num'},
                     {data: 'reply_number', name: 'reply_number'},
                     {data: 'reply_reason', name: 'reply_reason'},
+                    {data: 'reply_label_status', name: 'reply_label_status'},
+                    {data: 'reply_label_type', name: 'reply_label_type'},
+                    {data: 'reply_factory', name: 'reply_factory'},
+                    {data: 'reply_location', name: 'reply_location'},
+                    {data: 'reply_processor', name: 'reply_processor'},
                     {data: 'audit_date', name: 'audit_date',class:'aduit-date'},
                     {data: 'opera_log', name: 'opera_log'},
                     {data: 'process', name: 'process'},

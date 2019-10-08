@@ -889,3 +889,21 @@ function getGoodStoreHouse()
 	$goodStoreHouse = array('US02_US2','US02_US6','JP02_CJP2','GR02_CGR2','GR04_GR4','UK02_UK3','CZ02_CZ2');
 	return $goodStoreHouse;
 }
+
+/*
+ * 得到站点与站点简写的键值对
+ */
+function getSiteShort()
+{
+	$arr = array('www.amazon.co.jp'=>'jp','www.amazon.com'=>'us','www.amazon.ca'=>'ca','www.amazon.co.uk'=>'uk','www.amazon.de'=>'de','www.amazon.it'=>'it','www.amazon.es'=>'es','www.amazon.fr'=>'fr');
+	return $arr;
+}
+
+/*
+ * 得到站点与站点简写的键值对
+ */
+function getLabelType()
+{
+	$arr = array(0=>'Active Warranty',1=>'BOGO',2=>'50% Cashback',3=>'up to 100% cashback');
+	return $arr;
+}

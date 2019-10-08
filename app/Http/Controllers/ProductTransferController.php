@@ -21,12 +21,23 @@ class ProductTransferController extends Controller
 	 * @return void
 	 *
 	 */
+	protected $date_from = '';
+	protected $date_to = '';
+	protected $dataApproveType = 0;
+	protected $dataRejectType = 0;
+	protected $dataApproContent = '';
+	protected $dataRejectContent = '';
+	protected $bgManage = '';
+	protected $buManage = '';
+	protected $userId = '';
+	protected $planUserId = array(294,298,299);
+
 
 	public function __construct()
 	{
 		$this->middleware('auth');
-
 	}
+
 	/**
 	 * Show the application dashboard.
 	 *
@@ -62,19 +73,25 @@ class ProductTransferController extends Controller
 		//bg,bu,sales,site,seller_name,sellersku,asin,item_no,product_name,sku_status,sku_grade,asin_level,avg_sales,fba_available(fba库存),fba_transfer(fba周转中),fbmfba_transfer(fbm->fba在途中)，fbmfba_sorting(fbm->fba出库中)，safety_days(安全库存天数)，fbmfba_days(fbm_fba的物流周期的天数),fbmfba_shelfing(fbm_fba的物流周期的上架时效),dmi(库存维持天数),remind(建议调拨),allocation_quantity(建议调拨数量),fbm_stock(fbm库存)，tdmi(总库存可维持天数)
 
 		//dmi(库存维持天数),remind(建议调拨),allocation_quantity(建议调拨数量),fbm(fbm库存)，tdmi(总库存可维持天数)
+		$siteShort = getSiteShort();
 		foreach($data as $key=>$val){
+			//产品名称显示在sell-sku处，鼠标移入到seller-sku的时候显示产品名称
+			$data[$key]['sellersku'] = '<div title="'.$val['product_name'].'">'.$val['sellersku'].'</div>';
+			//site显示简写
+			$data[$key]['siteshort'] = isset($siteShort[$val['site']]) ? $siteShort[$val['site']] : $val['site'];
+
 			$data[$key]['sku_status'] = ($val['sku_status'])?'<span class="btn btn-success btn-xs">Reserved</span>':'<span class="btn btn-danger btn-xs">Eliminate</span>';
-			//dmi = (fba库存+fba周转中+fbm->fba在途)/日均销量
+			//dmi = (fba库存+fba周转中+fbm->fba在途)/日均销量,修改后改为：(fba库存+fba周转中)/日均销量
 			//allocation_quantity = （7+安全库存天数+fbm_fba的物流周期的天数+fbm_fba的物流周期的上架时效）* 日均销量-FBA库存-FBA周转中-FBM->FBA在途中
 			//tdmi = (FBM库存+FBA库存+FBA周转中+FBM->FBA在途中)/日均销量
 			if($val['avg_sales']==0){
 				$data[$key]['dmi'] = $data[$key]['tdmi'] = '-';
 			}else{
-				$data[$key]['dmi'] = round(($val['fba_available']+$val['fba_transfer']+$val['fbmfba_transfer'])/$val['avg_sales'],2);
+				$data[$key]['dmi'] = round(($val['fba_available']+$val['fba_transfer'])/$val['avg_sales'],2);
 				$data[$key]['tdmi'] = round(($val['fbm_stock']+$val['fba_available']+$val['fba_transfer']+$val['fbmfba_transfer'])/$val['avg_sales'],2);
 			}
 
-			$data[$key]['allocation_quantity'] = round((7+$val['safety_days']+$val['fbmfba_days']+$val['fbmfba_shelfing'])*$val['avg_sales']-$val['fba_available']-$val['fba_transfer']-$val['fbmfba_transfer'],2);
+			$data[$key]['allocation_quantity'] = ceil((7+$val['safety_days']+$val['fbmfba_days']+$val['fbmfba_shelfing'])*$val['avg_sales']-$val['fba_available']-$val['fba_transfer']-$val['fbmfba_transfer']);
 			if($data[$key]['allocation_quantity']>0){
 				$data[$key]['remind'] = 'Transfers';
 			}elseif($data[$key]['allocation_quantity']>=-50){
@@ -180,12 +197,13 @@ class ProductTransferController extends Controller
 				}
 
 				$insertArray['tw_id'] = $id;
-				$fields = array('reply_number','reply_reason','reply_label_status','reply_factory','reply_location');
+				$fields = array('reply_number','reply_reason','reply_label_status','reply_label_type','reply_factory','reply_location');
 				foreach($fields as $field){
 					if(isset($_POST[$field]) && $_POST[$field]){
 						$insertArray[$field] = $_POST[$field];
 					}
 				}
+
 				$insertArray['reply_processor'] = Auth::user()->id;
 				$insertArray['created_at'] = date('Y-m-d H:i:s');
 				// $insertArray['updated_at'] = date('Y-m-d H:i:s');
@@ -221,97 +239,71 @@ class ProductTransferController extends Controller
 	public function replyList(Request $req)
 	{
 		if(!Auth::user()->can(['productTransfer-reply'])) die('Permission denied -- productTransfer-reply');
-		$date_from = $date_to = date('Y-m-d');
-		$userId = Auth::user()->id;
+		$this->userId = Auth::user()->id;
+
+		$this->date_from = $this->date_to = date('Y-m-d');
 
 		//看是否是bg,bu的管理者，是管理者的话，BG,BU可进行process操作，且BG的话要限制显示的状态为BU已批准的状态（>0）
-		$bgManage = $buManage = '';
 		if (Auth::user()->seller_rules) {
 			$rules = explode("-",Auth::user()->seller_rules);
-			if(array_get($rules,0)!='*') $bgManage = array_get($rules,0);
-			if(array_get($rules,1)!='*') $buManage = array_get($rules,1);
+			if(array_get($rules,0)!='*') $this->bgManage = array_get($rules,0);
+			if(array_get($rules,1)!='*') $this->buManage = array_get($rules,1);
 		}
 		//各个状态显示键值对
 		$statusArr = array(0=>'-',1=>'Rejected By BU',2=>'Approved By BU',3=>'Rejected By BG',4=>'Approved By BG',5=>'Rejected By VP',6=>'Approved By VP',7=>'Rejected By plan',8=>'Approved By plan');
-		$planUserId = array(294,298,299);
-		$dataApproveType = $dataRejectType = 0;
-		if($bgManage){
-			if($buManage){
+
+		if($this->bgManage){
+			if($this->buManage){
 				//bu管理者
-				$dataApproveType = 2;
-				$dataRejectType = 1;
+				$this->dataApproveType = 2;
+				$this->dataRejectType = 1;
 			}else{
 				//BG管理者
-				$dataApproveType = 4;
-				$dataRejectType = 3;
+				$this->dataApproveType = 4;
+				$this->dataRejectType = 3;
 			}
 		}
-		if($userId==165){//VP操作者
-			$dataApproveType = 6;
-			$dataRejectType = 5;
+		if($this->userId==165){//VP操作者
+			$this->dataApproveType = 6;
+			$this->dataRejectType = 5;
 		}
-		if(in_array($userId,$planUserId)){//计划部操作者
-			$dataApproveType = 8;
-			$dataRejectType = 7;
+		if(in_array($this->userId,$this->planUserId)){//计划部操作者
+			$this->dataApproveType = 8;
+			$this->dataRejectType = 7;
 		}
-		$dataApproContent = $dataApproveType ? $statusArr[$dataApproveType] : '';
-		$dataRejectContent = $dataRejectType ? $statusArr[$dataRejectType] : '';
+		$this->dataApproContent = $this->dataApproveType ? $statusArr[$this->dataApproveType] : '';
+		$this->dataRejectContent = $this->dataRejectType ? $statusArr[$this->dataRejectType] : '';
 
 		if ($req->isMethod('GET')) {
-			return view('productTransfer/replyList', ['date_from' => $date_from,'date_to' => $date_to,'users'=>$this->getUsersIdName(),'bgs'=>$this->getBgs(),'bus'=>$this->getBus(),'dataApproveType'=>$dataApproveType,'dataRejectType'=>$dataRejectType,'dataApproContent'=>$dataApproContent,'dataRejectContent'=>$dataRejectContent]);
-		}
-		//搜索相关
-		$searchField = array('date_from'=>array('>='=>'tr.created_at'),'date_to'=>array('<='=>'tr.created_at'),'asin'=>'tw.asin','bg'=>'asin.bg','bu'=>'asin.bu','sales'=>'users.id','site'=>'tw.site','sellersku'=>'asin.sellersku','item_no'=>'asin.item_no','sku_status'=>'asin.item_status');
-		$where = $this->getSearchSql($_POST,$searchField);
-
-
-		//reply_status， '申请状态，0默认，1BU拒绝，2BU批准，3BG拒绝，4BG批准，5VP拒绝，6VP批准，7计划部拒绝，8计划部批准',
-		if($bgManage && empty($buManage)){
-			$where .= ' and reply_status >= 2';
-		}
-		if($userId==165){//VP操作者
-			$where .= ' and reply_status >= 4';
-		}
-		if(in_array($userId,$planUserId)){//计划部操作者
-			$where .= ' and reply_status >= 6';
-			//BG1 孙彩凤(294)， BG2 谈际森(298)  BG3 罗雄(299)  BG4 谈际森
-			if($userId==298){
-				$where .= " and asin.bg in ('BG2','BG4')";
-			}
-			if($userId==299){
-				$where .= " and asin.bg in ('BG3')";
-			}
-
-		}else{
-			$where .= $this->getAsinWhere('asin.bg','asin.bu','users.id','');
+			return view('productTransfer/replyList', ['date_from' => $this->date_from,'date_to' => $this->date_to,'users'=>$this->getUsersIdName(),'bgs'=>$this->getBgs(),'bus'=>$this->getBus(),'dataApproveType'=>$this->dataApproveType,'dataRejectType'=>$this->dataRejectType,'dataApproContent'=>$this->dataApproContent,'dataRejectContent'=>$this->dataRejectContent]);
 		}
 
 
+		$sql = $this->getReplySql($req);
 		$limit = $this->dtLimit($req);
-		$sql = "
-        SELECT SQL_CALC_FOUND_ROWS
-        	tr.reply_id as id,tr.created_at as created_at,tr.reply_status as reply_status,asin.bg as bg,asin.bu as bu,users.name as sales,tw.asin as asin,tw.site as site,tw.sellersku as sellersku,fs.seller_name as seller_name,asin.item_no as item_no,asin.item_status as sku_status,asin.status as asin_level, '-' as sku_grade,tr.reply_number as reply_number,tr.reply_reason as reply_reason,tr.audit_date as audit_date,tw.safety_days as safety_days,tw.fbmfba_days as fbmfba_days,tw.fbmfba_shelfing as fbmfba_shelfing,tw.avg_sales as avg_sales, tw.fba_available as fba_available,tw.fba_transfer as fba_transfer,tw.fbmfba_transfer as fbmfba_transfer,tr.opera_log as opera_log   
-        	from transfer_reply as tr 
-            left join transfer_warn as tw on tr.tw_id = tw.id 
-		  	left join asin on asin.sellersku = tw.sellersku and asin.site = tw.site and asin.asin=tw.asin 
-        	left join users on users.sap_seller_id = asin.sap_seller_id 
-        	left join fba_stock as fs on fs.seller_sku = asin.sellersku and fs.asin = tw.asin 
-		  	left join kms_stock as ks on ks.seller_sku = asin.sellersku and ks.asin = tw.asin 
-			where 1=1 {$where}
-			order by tr.created_at desc 
-        LIMIT {$limit}";
-
+		$sql .= ' limit '.$limit;
 		$data = $this->queryRows($sql);
 
+		$labelType = getLabelType();
+		$userIdName = $this->getUsersIdName();
 		foreach($data as $key=>$val){
+			$data[$key]['reply_label_status'] = 'NO';
+			$data[$key]['reply_label_type'] = '-';
+			if($val['reply_label_status']==0){//添加标签
+				$data[$key]['reply_label_status'] = 'YES';
+				$data[$key]['reply_label_type'] = isset($labelType[$val['reply_label_type']]) ? $labelType[$val['reply_label_type']] : $val['reply_label_type'];
+			}
+			//申请者
+			$data[$key]['reply_processor'] = isset($userIdName[$val['reply_processor']]) ? $userIdName[$val['reply_processor']] : $val['reply_processor'];
+
 			$data[$key]['process'] = '<div class="process" data-id="'.$val['id'].'">'.(isset($statusArr[$val['reply_status']]) && $statusArr[$val['reply_status']] ? $statusArr[$val['reply_status']] : $val['reply_status']) .'</div>';
 			//当状态为1（BU已批准）且是bg管理者登录的时候可进行批准拒绝操作
 			$process = '<div class="process" data-id="'.$val['id'].'">
-<a href="javacript:void(0);" class="badge reply-audit badge-success process-one" data-type="'.$dataApproveType.'" data-content="'.$dataApproContent.'" data-audit="1"> Approve </a>
-<a href="javacript:void(0);" class="badge reply-audit badge-danger process-one" data-type="'.$dataRejectType.'" data-content="'.$dataRejectContent.'" data-audit="2"> Reject </a>
+<a href="javacript:void(0);" class="badge reply-audit badge-success process-one" data-type="'.$this->dataApproveType.'" data-content="'.$this->dataApproContent.'" data-audit="1"> Approve </a>
+<a href="javacript:void(0);" class="badge reply-audit badge-danger process-one" data-type="'.$this->dataRejectType.'" data-content="'.$this->dataRejectContent.'" data-audit="2"> Reject </a>
 </div>';
-			if($bgManage){
-				if($buManage){
+			if($this->bgManage){
+				if($this->buManage){
 					//bu管理者
 					if($val['reply_status']==0){//可操作的状态
 						$data[$key]['process'] = $process;
@@ -320,11 +312,11 @@ class ProductTransferController extends Controller
 					$data[$key]['process'] = $process;
 				}
 			}
-			if($userId==165 && $val['reply_status']==4){//VP操作者并且是可操作的状态
+			if($this->userId==165 && $val['reply_status']==4){//VP操作者并且是可操作的状态
 				$data[$key]['process'] = $process;
 			}
 
-			if(in_array($userId,$planUserId)){//计划部操作者
+			if(in_array($this->userId,$this->planUserId)){//计划部操作者
 				if($val['reply_status']==6) {//可操作的状态
 					$data[$key]['process'] = $process;//计划部操作者可操作
 					//计划部操作者登录的时候，这里才可以改数量
@@ -340,8 +332,53 @@ class ProductTransferController extends Controller
 				$data[$key]['audit_date'] = '-';
 			}
 		}
+
 		$recordsTotal = $recordsFiltered = $this->queryOne('SELECT FOUND_ROWS()');
 		return compact('data', 'recordsTotal', 'recordsFiltered');
+	}
+
+	public function getReplySql($req)
+	{
+		//搜索相关
+		$searchField = array('date_from'=>array('>='=>'tr.created_at'),'date_to'=>array('<='=>'tr.created_at'),'asin'=>'tw.asin','bg'=>'asin.bg','bu'=>'asin.bu','sales'=>'users.id','site'=>'tw.site','sellersku'=>'asin.sellersku','item_no'=>'asin.item_no','sku_status'=>'asin.item_status');
+		$where = $this->getSearchSql($_POST,$searchField);
+
+
+		//reply_status， '申请状态，0默认，1BU拒绝，2BU批准，3BG拒绝，4BG批准，5VP拒绝，6VP批准，7计划部拒绝，8计划部批准',
+		if($this->bgManage && empty($this->buManage)){
+			$where .= ' and reply_status >= 2';
+		}
+		if($this->userId==165){//VP操作者
+			$where .= ' and reply_status >= 4';
+		}
+		if(in_array($this->userId,$this->planUserId)){//计划部操作者
+			$where .= ' and reply_status >= 6';
+			//BG1 孙彩凤(294)， BG2 谈际森(298)  BG3 罗雄(299)  BG4 谈际森
+			if($this->userId==298){
+				$where .= " and asin.bg in ('BG2','BG4')";
+			}
+			if($this->userId==299){
+				$where .= " and asin.bg in ('BG3')";
+			}
+
+		}else{
+			$where .= $this->getAsinWhere('asin.bg','asin.bu','users.id','');
+		}
+
+
+
+		$sql = "
+        SELECT SQL_CALC_FOUND_ROWS
+        	tr.*,tr.reply_id as id,asin.bg as bg,asin.bu as bu,users.name as sales,tw.asin as asin,tw.site as site,tw.sellersku as sellersku,fs.seller_name as seller_name,asin.item_no as item_no,asin.item_status as sku_status,asin.status as asin_level, '-' as sku_grade,tw.safety_days as safety_days,tw.fbmfba_days as fbmfba_days,tw.fbmfba_shelfing as fbmfba_shelfing,tw.avg_sales as avg_sales, tw.fba_available as fba_available,tw.fba_transfer as fba_transfer,tw.fbmfba_transfer as fbmfba_transfer    
+        	from transfer_reply as tr 
+            left join transfer_warn as tw on tr.tw_id = tw.id 
+		  	left join asin on asin.sellersku = tw.sellersku and asin.site = tw.site and asin.asin=tw.asin 
+        	left join users on users.sap_seller_id = asin.sap_seller_id 
+        	left join fba_stock as fs on fs.seller_sku = asin.sellersku and fs.asin = tw.asin 
+		  	left join kms_stock as ks on ks.seller_sku = asin.sellersku and ks.asin = tw.asin 
+			where 1=1 {$where}
+			order by tr.created_at desc";
+		return $sql;
 	}
 
 	//修改申请调拨内容，例如修改调拨数量
