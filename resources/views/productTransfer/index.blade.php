@@ -7,6 +7,14 @@
         .table-container .green{
             background-color:green;
         }
+        .table-container .yellow{
+            background-color:yellow;
+        }
+        .table-container table th{
+            text-align: center;
+            vertical-align: middle;
+            background-color:#35A7EB;
+        }
     </style>
 
 
@@ -104,7 +112,7 @@
                     </div>
                     @permission('productTransfer-edit')
                     <div class="btn-group">
-                        <button id="edit" class="btn sbold blue">Edit</button>
+                        <button id="edit" class="btn sbold blue">时效调整</button>
                     </div>
                     @endpermission
                     @permission('productTransfer-reply')
@@ -122,36 +130,43 @@
                 <table class="table table-striped table-bordered" id="thetable">
                     <thead>
                     <tr>
-                        <th onclick="this===arguments[0].target && this.firstElementChild.click()">
+                        <th rowspan="2" onclick="this===arguments[0].target && this.firstElementChild.click()">
                             <input type="checkbox" onchange="this.checked?dtApi.rows().select():dtApi.rows().deselect()" id="selectAll"/>
                         </th>
-                        <th>BG</th>
-                        <th>BU</th>
-                        <th>Sales</th>
-                        <th>Site</th>
-                        <th>Seller Name</th>
-                        <th>seller-sku</th>
-                        <th>ASIN</th>
-                        <th>Item No</th>
-                        <th>Product Name</th>
-                        <th>SKU Status</th>
-                        <th>SKU Grade</th>
-                        <th>ASIN Level</th>
-                        <th title="Last seven days">Avg Sales</th>
+                        {{--<th>BG</th>--}}
+                        {{--<th>BU</th>--}}
+                        <th rowspan="2">Sales</th>
+                        <th rowspan="2">Site</th>
+                        <th rowspan="2">Seller Name</th>
+                        <th rowspan="2">seller-sku</th>
+                        <th rowspan="2">ASIN</th>
+                        <th rowspan="2">Item No</th>
+                        {{--<th>Product Name</th>--}}
+                        {{--<th>SKU Status</th>--}}
+                        {{--<th>SKU Grade</th>--}}
+                        {{--<th>ASIN Level</th>--}}
+                        <th rowspan="2" title="Last seven days">Avg Sales</th>
+                        <th colspan="2">FBA</th>
+                        <th rowspan="2">FBM-FBA Transfer</th>
+                        <th rowspan="2">FBM</th>
+                        {{--<th>Sorting</th>--}}
+                        <th colspan="3" class="green">Logistics Cycle</th>
+                        <th rowspan="2" title="Days of inventory maintenance">DMI<br>FBA维持天数</th>
+                        <th rowspan="2" class="yellow">Remind</th>
+                        <th rowspan="2" class="yellow">Allocation Quantity<br>建议调拨</th>
+
+                        {{--<th title="Days of total inventory maintenance">TDMI</th>--}}
+                        <th rowspan="2">Action</th>
+                    </tr>
+
+                    <tr>
                         <th>Available</th>
                         <th>FBA Transfer</th>
-                        <th>FBM-FBA Transfer</th>
-                        <th>Sorting</th>
                         <th class="green">Safety Days</th>
                         <th class="green">FBM-FBA</th>
                         <th class="green">Shelfing</th>
-                        <th title="Days of inventory maintenance">DMI</th>
-                        <th>Remind</th>
-                        <th>Allocation Quantity</th>
-                        <th>FBM</th>
-                        <th title="Days of total inventory maintenance">TDMI</th>
-                        <th>Action</th>
                     </tr>
+
                     </thead>
                     <tbody></tbody>
                 </table>
@@ -217,15 +232,33 @@
             <div class="form-group">
                 <label>Label</label>
                 <div class="input-group ">
-                <span class="input-group-addon">
-                    <i class="fa fa-bookmark"></i>
-                </span>
-                    <select class="form-control" name="reply_label_status">
+                    <span class="input-group-addon">
+                        <i class="fa fa-bookmark"></i>
+                    </span>
+                    <select id="reply_label_status" class="form-control" name="reply_label_status">
                         <option value="0">Yes</option>
                         <option value="1">No</option>
                     </select>
+
+
                 </div>
             </div>
+
+            {{--标贴类型--}}
+            <div class="form-group" id="reply_label_type">
+                <label>Label Type</label>
+                <div class="input-group ">
+                    <span class="input-group-addon">
+                        <i class="fa fa-bookmark"></i>
+                    </span>
+                    <select class="form-control" name="reply_label_type">
+                        @foreach(getLabelType() as $key=>$val)
+                            <option value="{{$key}}">{{$val}}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+
             <div class="form-group">
                 <label>Factory</label>
                 <div class="input-group ">
@@ -279,8 +312,8 @@
                 serverSide: true,//启用服务端分页（这是使用Ajax服务端的必须配置）
                 scrollX: 2000,
                 fixedColumns:   {
-                    leftColumns:12,
-                    rightColumns: 2
+                    leftColumns:7
+                    // rightColumns: 2
                 },
                 pagingType: 'bootstrap_extended',
                 processing: true,
@@ -299,10 +332,10 @@
                         defaultContent: '',
                         className: 'select-checkbox', // 该类根据 tr:selected 改变自己的背景
                     },
-                    {data: 'bg', name: 'bg'},
-                    {data: 'bu', name: 'bu'},
+                    // {data: 'bg', name: 'bg'},
+                    // {data: 'bu', name: 'bu'},
                     {data: 'sales', name: 'sales'},
-                    {data: 'site', name: 'site'},
+                    {data: 'siteshort', name: 'site'},
                     {data: 'seller_name', name: 'seller_name'},
                     {data: 'sellersku', name: 'sellersku'},
                     {
@@ -317,23 +350,24 @@
                         }
                     },
                     {data: 'item_no', name: 'item_no'},
-                    {data: 'product_name', name: 'product_name'},
-                    {data: 'sku_status', name: 'sku_status'},
-                    {data: 'sku_grade', name: 'sku_grade'},
-                    {data: 'asin_level', name: 'asin_level'},
+                    // {data: 'product_name', name: 'product_name'},
+                    // {data: 'sku_status', name: 'sku_status'},
+                    // {data: 'sku_grade', name: 'sku_grade'},
+                    // {data: 'asin_level', name: 'asin_level'},
                     {data: 'avg_sales', name: 'avg_sales'},
                     {data: 'fba_available', name: 'fba_available'},
                     {data: 'fba_transfer', name: 'fba_transfer'},
                     {data: 'fbmfba_transfer', name: 'fbmfba_transfer'},
-                    {data: 'fbmfba_sorting', name: 'fbmfba_sorting'},
+                    {data:'fbm_stock',name:'fbm_stock'},
+                    // {data: 'fbmfba_sorting', name: 'fbmfba_sorting'},
                     {data: 'safety_days', name: 'safety_days',className: 'safety-days'},
                     {data: 'fbmfba_days', name: 'fbmfba_days',className: 'fbmfba-days'},
                     {data: 'fbmfba_shelfing', name: 'fbmfba_shelfing',className: 'fbmfba-shelfing'},
                     {data: 'dmi', name: 'dmi'},
                     {data: 'remind', name: 'remind'},
                     {data:'allocation_quantity',name:'allocation_quantity'},
-                    {data:'fbm_stock',name:'fbm_stock'},
-                    {data:'tdmi',name:'tdmi'},
+
+                    // {data:'tdmi',name:'tdmi'},
                     {data:'action',name:'action'},
                 ],
                 ajax: {
@@ -411,6 +445,15 @@
             return false;
         });
 
+        //选择标签状态的时候，如果选了no隐藏标签类型，选择的是yes就显示标签类型
+        $('#reply_label_status').change(function(){
+            var value = $('#reply_label_status').val();
+            if(value==1){
+                $('#reply_label_type').hide();
+            }else{
+                $('#reply_label_type').show();
+            }
+        })
         //申请调拨弹窗的工厂库位的联动
         $("#reply-factory").click(function(){
             var factory = $(this).val();
