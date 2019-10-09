@@ -311,6 +311,20 @@ th,td,td>span {
                 headers: { 'X-CSRF-TOKEN' : '{{ csrf_token() }}' }
             });
             var grid = new Datatable();
+			grid.setAjaxParam("date_from", $("input[name='date_from']").val());
+            grid.setAjaxParam("date_to", $("input[name='date_to']").val());
+			grid.setAjaxParam("nextdate", $("input[name='nextdate']").val());
+			grid.setAjaxParam("vp", $("select[name='vp']").val());
+			grid.setAjaxParam("del", $("select[name='del']").val());
+            grid.setAjaxParam("user_id", $("select[name='user_id[]']").val());
+			grid.setAjaxParam("rating", $("select[name='rating']").val());
+			grid.setAjaxParam("asin_status", $("select[name='asin_status[]']").val());
+			grid.setAjaxParam("follow_status", $("select[name='follow_status[]']").val());
+			grid.setAjaxParam("site", $("select[name='site[]']").val());
+			grid.setAjaxParam("keywords", $("input[name='keywords']").val());
+			grid.setAjaxParam("bgbu", $("select[name='bgbu']").val());
+			grid.setAjaxParam("rc", $("select[name='rc']").val());
+			grid.setAjaxParam("np", $("select[name='np']").val());
             grid.init({
                 src: $("#datatable_ajax_asin"),
                 onSuccess: function (grid, response) {
@@ -428,26 +442,6 @@ th,td,td>span {
                 }
             });
             
-
-            //grid.setAjaxParam("customActionType", "group_action");
-			//alert($("select[name='user_id[]']").val());
-
-            grid.setAjaxParam("date_from", $("input[name='date_from']").val());
-            grid.setAjaxParam("date_to", $("input[name='date_to']").val());
-			grid.setAjaxParam("nextdate", $("input[name='nextdate']").val());
-			grid.setAjaxParam("vp", $("select[name='vp']").val());
-			grid.setAjaxParam("del", $("select[name='del']").val());
-            grid.setAjaxParam("user_id", $("select[name='user_id[]']").val());
-			grid.setAjaxParam("rating", $("select[name='rating']").val());
-			grid.setAjaxParam("asin_status", $("select[name='asin_status[]']").val());
-			grid.setAjaxParam("follow_status", $("select[name='follow_status[]']").val());
-			grid.setAjaxParam("site", $("select[name='site[]']").val());
-			grid.setAjaxParam("keywords", $("input[name='keywords']").val());
-			grid.setAjaxParam("bgbu", $("select[name='bgbu']").val());
-			grid.setAjaxParam("rc", $("select[name='rc']").val());
-			grid.setAjaxParam("np", $("select[name='np']").val());
-            grid.getDataTable().ajax.reload(null,false);
-            //grid.clearAjaxParams();
         }
 
 
@@ -467,9 +461,8 @@ $(function() {
     TableDatatablesAjax.init();
 	$('#data_search').on('click',function(){
 		var dttable = $('#datatable_ajax_asin').dataTable();
-		dttable.fnDestroy(); //还原初始化了的datatable
-	    dttable.fnClearTable(); //清空一下table
-		dttable.fnDestroy();
+		dttable.fnClearTable(false); //清空一下table
+	    dttable.fnDestroy(); //还原初始化了的datatable
 		TableDatatablesAjax.init();
 	});
 	$("#vl_list_export").click(function(){

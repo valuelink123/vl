@@ -145,6 +145,12 @@
                                                 <span class="arrow"></span>
                                             </a>
                                             <ul class="dropdown-menu pull-left">
+												<li class="">
+                                                    <a href="/home" class="nav-link nav-toggle ">
+                                                        Dashboard
+                                                        <span class="arrow"></span>
+                                                    </a>    
+                                                </li>
 												@permission('sales-report-show')
                                                 <li class="">
                                                     <a href="/skus" class="nav-link nav-toggle ">
@@ -504,6 +510,7 @@
                                                     </a>    
                                                 </li>
 												@endpermission
+												<!--
 												@permission('learn-center')
 												<li class="">
                                                     <a href="/kms/learn" class="nav-link nav-toggle ">
@@ -523,6 +530,7 @@
                                                 </li>
 												
 												@endpermission
+												-->
                                             </ul>
                                         </li>
 									   
