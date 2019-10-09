@@ -129,11 +129,11 @@
                 <li class="">
                     <a href="#tab_2" data-toggle="tab" aria-expanded="false"> Amazon Order Info </a>
                 </li>
-				<?php if($email['status']=='Draft'){?>
+				<?php //if($email['status']=='Draft'){?>
                 <li class="">
                     <a href="#tab_3" data-toggle="tab" aria-expanded="false"> Compose </a>
                 </li>
-				<?php } ?>
+				<?php //} ?>
             </ul>
             <div class="tab-content">
                 <div class="tab-pane active" id="tab_1">
@@ -391,7 +391,7 @@
                         } ?>
                 </div>
 
-				<?php if($email['status']=='Draft'){?>
+				<?php //if($email['status']=='Draft'){?>
                 <div class="tab-pane" id="tab_3">
                     <div class="col-xs-10">
                         <form id="fileupload" action="{{ url('send') }}" method="POST" enctype="multipart/form-data">
@@ -608,7 +608,7 @@
                     <div style="clear:both;"></div>
                 </div>
 
-				<?php } ?>
+				<?php // } ?>
                
 
             </div>

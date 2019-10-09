@@ -50,6 +50,7 @@ padding-top:0px;}
 }
 .primary-link {
     font-size: 14px;
+	    line-height: 20px;
 }
 .portlet.light > .portlet-title > .caption > .caption-subject {
     font-size: 12px;
@@ -57,19 +58,9 @@ padding-top:0px;}
 table{ 
 table-layout:fixed; 
 }
-td.text_s{       
-text-overflow:ellipsis; 
--moz-text-overflow: ellipsis; 
-overflow:hidden;      
-white-space: nowrap;      
-} 
+
 textarea.form-control{width:400px!important;}
-.editable-pre-wrapped {
-text-overflow:ellipsis !important; 
--moz-text-overflow: ellipsis !important; 
-overflow:hidden !important;      
-white-space: nowrap !important; 
-}
+
 .editable-click, 
 a.editable-click, 
 a.editable-click:hover {
@@ -409,11 +400,11 @@ a.editable-click:hover {
 			<tr id="task_{{$task['id']}}">
 				<td><input type="checkbox" class="task_quick_complete" id="{{$task['id']}}" /></a>
 				</td>
-				<td class="text_s"><a class="task_request primary-link" title="Task Details" href="javascript:;" id="{{$task['id']}}-request" data-pk="{{$task['id']}}-request" data-type="textarea" data-placement="right" style="width:90%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; display:block;">{{$task['request']}}</a></td>
-				<td class="text_s"><a class="task_response" title="Task Response" href="javascript:;" id="{{$task['id']}}-response" data-pk="{{$task['id']}}-response" data-type="textarea" data-placeholder="Your response here..." style="width:90%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; display:block;" >{{$task['response']}}</a></td>
+				<td ><a class="task_request primary-link" title="Task Details" href="javascript:;" id="{{$task['id']}}-request" data-pk="{{$task['id']}}-request" data-type="textarea" data-placement="right">{{$task['request']}}</a></td>
+				<td ><a class="task_response" title="Task Response" href="javascript:;" id="{{$task['id']}}-response" data-pk="{{$task['id']}}-response" data-type="textarea" data-placeholder="Your response here...">{{$task['response']}}</a></td>
 				<td><a class="task_complete_date" title="Due To" href="javascript:;" id="{{$task['id']}}-complete_date" data-pk="{{$task['id']}}-complete_date" data-type="date" data-viewformat="yyyy-mm-dd" data-placement="right">{{$task['complete_date']}}</a></td>
 				<td>{{array_get($users,$task['request_user_id'])}}</td>
-				<td  class="text_s">
+				<td >
 				<a class="task_priority" title="Priority" href="javascript:;" id="{{$task['id']}}-priority" data-pk="{{$task['id']}}-priority" data-type="text" data-placement="left">{{$task['priority']}}</a>
 				</td>
 			</tr>
@@ -619,7 +610,7 @@ $(function() {
 			success: function (redata) {
 				$("#task_"+task_id).remove();
 				if(redata.id){
-					var str='<tr id="task_'+redata.id+'"><td><input type="checkbox" class="task_quick_complete" id="'+redata.id+'" /></a></td><td class="text_s"><a class="task_request primary-link" title="Task Details" href="javascript:;" id="'+redata.id+'-request" data-pk="'+redata.id+'-request" data-type="textarea" data-placement="right">'+redata.request+'</a></td><td class="text_s"><a class="task_response" title="Task Response" href="javascript:;" id="'+redata.id+'-response" data-pk="'+redata.id+'-response" data-type="textarea" data-placeholder="Your response here..." >'+((redata.response)?redata.response:"N/A")+'</a></td><td><a class="task_complete_date" title="Due To" href="javascript:;" id="'+redata.id+'-complete_date" data-pk="'+redata.id+'-complete_date" data-type="date" data-viewformat="yyyy-mm-dd" data-placement="right">'+redata.complete_date+'</a></td><td>'+redata.request_user+'</td><td  class="text_s"><a class="task_priority" title="Priority" href="javascript:;" id="'+redata.id+'-priority" data-pk="'+redata.id+'-priority" data-type="text" data-placement="left">'+redata.priority+'</a></td></tr>';
+					var str='<tr id="task_'+redata.id+'"><td><input type="checkbox" class="task_quick_complete" id="'+redata.id+'" /></a></td><td><a class="task_request primary-link" title="Task Details" href="javascript:;" id="'+redata.id+'-request" data-pk="'+redata.id+'-request" data-type="textarea" data-placement="right">'+redata.request+'</a></td><td><a class="task_response" title="Task Response" href="javascript:;" id="'+redata.id+'-response" data-pk="'+redata.id+'-response" data-type="textarea" data-placeholder="Your response here..." >'+((redata.response)?redata.response:"N/A")+'</a></td><td><a class="task_complete_date" title="Due To" href="javascript:;" id="'+redata.id+'-complete_date" data-pk="'+redata.id+'-complete_date" data-type="date" data-viewformat="yyyy-mm-dd" data-placement="right">'+redata.complete_date+'</a></td><td>'+redata.request_user+'</td><td><a class="task_priority" title="Priority" href="javascript:;" id="'+redata.id+'-priority" data-pk="'+redata.id+'-priority" data-type="text" data-placement="left">'+redata.priority+'</a></td></tr>';
 					$("#tasks_list").append(str);
 					FormEditable.init();
 				}
