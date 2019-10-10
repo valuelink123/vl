@@ -349,7 +349,7 @@
                                             <ul class="dropdown-menu pull-left">
 												@permission('inbox-show')
 												<li class="dropdown-submenu ">
-                                                    <a href="javascript:;" class="nav-link nav-toggle ">
+                                                    <a href="{{url('inbox')}}"" class="nav-link nav-toggle ">
                                                         Inbox
 														<span class="badge badge-danger" style="margin-right:20px;">{{intval(array_get($unreply,'Site',0)+array_get($unreply,'Amazon',0))}}</span>
                                                         <span class="arrow"></span>

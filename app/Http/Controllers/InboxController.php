@@ -296,7 +296,7 @@ class InboxController extends Controller
         }else{
             $customers = Inbox::whereIn('group_id',array_get($this->getUserGroup(),'groups',array()));
         }
-		if(array_get($_REQUEST,'show_all')=='show_all') $customers = new Inbox;
+		//if(array_get($_REQUEST,'show_all')=='show_all') $customers = new Inbox;
 		
 		if(array_get($_REQUEST,'mail_type')){
             $customers = $customers->where('type', array_get($_REQUEST,'mail_type'));
@@ -354,9 +354,9 @@ class InboxController extends Controller
         if(array_get($_REQUEST,'date_to')){
             $customers = $customers->where('date','<=',$_REQUEST['date_to'].' 23:59:59');
         }
-		if(!Auth::user()->can(['inbox-show-all'])) {
-        	 $customers = $customers->orderByRaw('case when user_id='.Auth::user()->id.' then 0 else 1 end asc');
-		}
+		//if(!Auth::user()->can(['inbox-show-all'])) {
+        	 $customers = $customers->orderByRaw('case when user_id='.Auth::user()->id.' and reply=0 then 0 else 1 end asc');
+		//}
 		$iTotalRecords = $customers->count();
         $iDisplayLength = intval($_REQUEST['length']);
         $iDisplayLength = $iDisplayLength < 0 ? $iTotalRecords : $iDisplayLength;

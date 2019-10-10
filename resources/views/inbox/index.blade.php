@@ -195,7 +195,6 @@
                     // So when dropdowns used the scrollable div should be removed.
                     "dom": "<'row'<'col-md-6 col-sm-12'pli><'col-md-6 col-sm-12'<'table-group-actions pull-right'>>r>t<'row'<'col-md-6 col-sm-12'pli><'col-md-6 col-sm-12'>>",
 
-                    "bStateSave": true, // save datatable state(pagination, sort, etc) in cookie.
                     "aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0 , 5 ] }],
                     "lengthMenu": [
                         [10, 20, 50],

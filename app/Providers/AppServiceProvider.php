@@ -21,7 +21,7 @@ class AppServiceProvider extends ServiceProvider
 			$unreply=[];
 			if($user_id){
 				$unreply = Inbox::selectRaw('count(*) as count,type')->where('user_id',$user_id)->where('reply',0)->groupBy('type')->pluck('count','type');
-				$untasks = Task::selectRaw('count(*) as count')->where('response_user_id',$user_id)->where('stage',0)->value('count');
+				$untasks = Task::selectRaw('count(*) as count')->where('response_user_id',$user_id)->where('complete_date','<=',date('Y-m-d'))->where('stage',3)->value('count');
 			}
 			
 			$view->with('unreply',$unreply);
