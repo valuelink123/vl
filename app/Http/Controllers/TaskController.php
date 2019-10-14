@@ -154,8 +154,8 @@ class TaskController extends Controller
 		
 			$records["data"][] = array(
 				'<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input name="id[]" type="checkbox" class="checkboxes" value="'.$data['id'].'"/><span></span></label>',
-				array_get(getTaskTypeArr(),$data['type']),
-				(($data['asin'])?'<span class="badge badge-success">'.$data['asin'].'</span>':'').$data['request'],
+				'<a data-target="#ajax" data-toggle="modal" href="'.url('task/'.$data['id'].'/edit').'" >'.array_get(getTaskTypeArr(),$data['type']).'</a>',
+				'<a data-target="#ajax" data-toggle="modal" href="'.url('task/'.$data['id'].'/edit').'" >'.((($data['asin'])?'<span class="badge badge-success">'.$data['asin'].'</span>':'').$data['request']).'</a>',
 				$data['priority'],
 				array_get($users_array,$data['request_user_id']),
 				$data['complete_date'],

@@ -209,7 +209,7 @@
                         "url": "{{ url('task/get')}}", // ajax source
                     },
 					"createdRow": function( row, data, dataIndex ) {
-                        $(row).children('td').eq(2).attr('style', 'max-width: 350px;width: 350px;overflow:hidden;white-space:nowrap;text-align: left; ');
+                        $(row).children('td').eq(2).attr('style', 'max-width: 350px;width: 350px;word-wrap:break-word;text-align: left; ');
 						$(row).children('td').eq(2).attr('title', $(row).children('td').eq(10).text());
                     },
                 }
