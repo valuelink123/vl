@@ -48,7 +48,7 @@ class UpdateNonctg extends Command
         set_time_limit(0);
         $today = date('Y-m-d');
         $yestoday = date('Y-m-d 00:00:00',strtotime("-1 day"));
-        // $yestoday = '2018-06-20 00:00:00';//测试数据
+        $yestoday = '2019-09-27 00:00:00';//测试数据
         echo 'Execution update_nonctg.php script start time:'.$today."\n";
         DB::connection()->enableQueryLog(); // 开启查询日志
         $config = getActiveUserConfig();//得到配置信息
