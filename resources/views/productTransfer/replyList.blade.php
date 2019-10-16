@@ -111,6 +111,11 @@
                             <button id="reject" class="btn sbold blue approve-reject" data-audit="2" data-type="{{$dataRejectType}}" data-content="{{$dataRejectContent}}">Reject</button>
                         </div>
                         @endif
+                        @permission('productTransfer-reply-download')
+                            <button id="export" class="btn sbold blue"> Export
+                            <i class="fa fa-download"></i>
+                            </button>
+                        @endpermission
                     </div>
                 </div>
 
@@ -224,7 +229,7 @@
         var initTable = function () {
             $theTable.dataTable({
                 searching: false,//关闭搜索
-                search: {search: $("#search-form").serialize()},
+                // search: {search: $("#search-form").serialize()},
                 serverSide: true,//启用服务端分页（这是使用Ajax服务端的必须配置）
                 scrollX: 2000,
                 fixedColumns: {
@@ -254,7 +259,7 @@
                     {data: 'bg', name: 'bg'},
                     {data: 'bu', name: 'bu'},
                     {data: 'sales', name: 'sales'},
-                    {data: 'site', name: 'site'},
+                    {data: 'siteshort', name: 'site'},
                     {data: 'seller_name', name: 'seller_name'},
                     {data: 'sellersku', name: 'sellersku'},
                     {
@@ -286,7 +291,8 @@
                 ],
                 ajax: {
                     type: 'POST',
-                    url: location.href
+                    url: location.href,
+                    data:  {search: $("#search-form").serialize()}
                 }
             })
         }
@@ -296,9 +302,17 @@
 
         //点击提交按钮重新绘制表格，并将输入框中的值赋予检索框
         $('#search').click(function () {
-            $theTable.fnClearTable(false); //清空一下table
-            $theTable.fnDestroy(); //还原初始化了的datatable
-            initTable();
+            // $theTable.fnClearTable(false); //清空一下table
+            // $theTable.fnDestroy(); //还原初始化了的datatable
+            // initTable();
+            dtApi.settings()[0].ajax.data = {search: $("#search-form").serialize()};
+            dtApi.ajax.reload();
+            return false;
+        });
+
+        $("#export").click(function(){
+            // location.href='/productTransfer/replyExport?'+$("#search-form").serialize();
+            window.open('/productTransfer/replyExport?'+$("#search-form").serialize(),'_blank');
             return false;
         });
 
@@ -309,7 +323,6 @@
             let dataRows = selectedRows.data().toArray().map(obj => [obj.id])
             let ids = dataRows.join(',');
 
-            console.log(dataRows);
             if (dataRows.length==0) {
                 toastr.error('Please select some rows first !');
                 return false;

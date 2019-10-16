@@ -147,3 +147,4 @@ Route::post('/productTransfer/replyList', 'ProductTransferController@replyList')
 Route::post('/productTransfer/updateReply', 'ProductTransferController@updateReply');//修改申请调拨内容，例如修改调拨数量
 Route::post('/productTransfer/showLog', 'ProductTransferController@showLog');//申请列表显示操作日志
 Route::post('/productTransfer/replyAudit', 'ProductTransferController@replyAudit');//审核调拨请求的批准，拒绝状态
+Route::get('/productTransfer/replyExport', 'ProductTransferController@replyExport');//调拨请求的下载功能

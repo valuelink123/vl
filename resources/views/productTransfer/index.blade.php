@@ -4,16 +4,16 @@
 @endsection
 @section('content')
     <style>
-        .table-container .green{
-            background-color:green;
-        }
-        .table-container .yellow{
-            background-color:yellow;
-        }
         .table-container table th{
             text-align: center;
             vertical-align: middle;
-            background-color:#35A7EB;
+            background-color:#35A7EB !important;;
+        }
+        .table-container .green{
+            background-color:green !important;
+        }
+        .table-container .yellow{
+            background-color:yellow !important;;
         }
     </style>
 
@@ -129,6 +129,7 @@
             <div class="table-container" style="">
                 <table class="table table-striped table-bordered" id="thetable">
                     <thead>
+                    {{--<input type="hidden" name="searchdata" value="123456">--}}
                     <tr>
                         <th rowspan="2" onclick="this===arguments[0].target && this.firstElementChild.click()">
                             <input type="checkbox" onchange="this.checked?dtApi.rows().select():dtApi.rows().deselect()" id="selectAll"/>
@@ -145,7 +146,7 @@
                         {{--<th>SKU Status</th>--}}
                         {{--<th>SKU Grade</th>--}}
                         {{--<th>ASIN Level</th>--}}
-                        <th rowspan="2" title="Last seven days">Avg Sales</th>
+                        <th rowspan="2" title="Last 14days Avg. Sales unit">Avg Sales</th>
                         <th colspan="2">FBA</th>
                         <th rowspan="2">FBM-FBA Transfer</th>
                         <th rowspan="2">FBM</th>
@@ -304,11 +305,10 @@
 
         let $theTable = $(thetable)
 
-
         var initTable = function () {
             $theTable.dataTable({
                 searching: false,//关闭搜索
-                search: {search: $("#search-form").serialize()},
+                // search: {search: $("#search-form").serialize()},
                 serverSide: true,//启用服务端分页（这是使用Ajax服务端的必须配置）
                 scrollX: 2000,
                 fixedColumns:   {
@@ -317,15 +317,16 @@
                 },
                 pagingType: 'bootstrap_extended',
                 processing: true,
-                ordering:  false,
-                // order: [[1, 'desc']],
+                // ordering:  false,
+                aoColumnDefs: [ { "bSortable": false, "aTargets": [ 0,3,4,8,9,10,12,13,14,15,16,18] }],
+                order: [[17, 'desc']],
                 select: {
                     style: 'os',
                     info: true, // info N rows selected
                     // blurable: true, // unselect on blur
                     selector: 'td:first-child', // 指定第一列可以点击选中
                 },
-                // "aoColumnDefs": [ { "bSortable": true, "aTargets": [] }],
+                // aoColumnDefs: [ { "bSortable": true, "aTargets": [1,2,3,4] }],
                 columns: [
                     {
                         width: "1px",
@@ -372,7 +373,8 @@
                 ],
                 ajax: {
                     type: 'POST',
-                    url: location.href
+                    url: location.href,
+                    data:  {search: $("#search-form").serialize()}
                 }
             })
         }
@@ -384,9 +386,7 @@
 
         //点击提交按钮重新绘制表格，并将输入框中的值赋予检索框
         $('#search').click(function () {
-            $theTable.fnClearTable(false); //清空一下table
-            $theTable.fnDestroy(); //还原初始化了的datatable
-            initTable();
+            dtApi.settings()[0].ajax.data = {search: $("#search-form").serialize()};
             dtApi.ajax.reload();
             return false;
         });
@@ -396,6 +396,7 @@
             let selectedRows = dtApi.rows({selected: true})
 
             let dataRows = selectedRows.data().toArray().map(obj => [obj.id])
+
             let ids = dataRows.join(',');
             $('#ids').val(ids);
 

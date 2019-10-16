@@ -291,6 +291,15 @@
                                                     </a>    
                                                 </li>
 												@endpermission
+
+												@permission('productTransfer-reply')
+												<li class="">
+													<a href="{{ url('productTransfer/replyList') }}" class="nav-link nav-toggle ">
+														Transfer ReplyList
+														<span class="arrow"></span>
+													</a>
+												</li>
+												@endpermission
 												
 												@permission('distribution-analysis-show')
 												<li class="">

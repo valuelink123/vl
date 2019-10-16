@@ -47,26 +47,30 @@ class ProductTransferController extends Controller
 	{
 		if(!Auth::user()->can(['productTransfer-show'])) die('Permission denied -- productTransfer-show');
 		$date = date('Y-m-d');
+		// $date = date('2019-09-24');//测试时间
 		if ($req->isMethod('GET')) {
 			return view('productTransfer/index', ['date' => $date,'users'=>$this->getUsersIdName(),'bgs'=>$this->getBgs(),'bus'=>$this->getBus()]);
 		}
 		//搜索相关
 		$searchField = array('date'=>'tw.date','asin'=>'tw.asin','bg'=>'asin.bg','bu'=>'asin.bu','sales'=>'users.id','site'=>'tw.site','sellersku'=>'asin.sellersku','item_no'=>'asin.item_no','sku_status'=>'asin.item_status');
-		$where = $this->getSearchSql($_POST,$searchField);
+		$search = isset($_POST['search']) ? $_POST['search'] : '';
+		$where = $this->getSearchSql($search,$searchField);
 		$where .= $this->getAsinWhere('asin.bg','asin.bu','users.id','productTransfer-showall');
 
 		$limit = $this->dtLimit($req);
+		$orderby = $this->dtOrderBy($req);
 
+		// $data[$key]['allocation_quantity'] = ceil((7+$val['safety_days']+$val['fbmfba_days']+$val['fbmfba_shelfing'])*$val['avg_sales']-$val['fba_available']-$val['fba_transfer']-$val['fbmfba_transfer']);
 		$sql = "
         SELECT SQL_CALC_FOUND_ROWS
-        	tw.id as id,tw.asin as asin,tw.site as site,tw.sellersku as sellersku,asin.item_no as item_no,asin.seller as seller,asin.bg as bg,asin.bu as bu,asin.status as asin_level, users.name as sales,fs.seller_name as seller_name,asin.item_status as sku_status,'-' as sku_grade, tw.avg_sales as avg_sales,tw.fba_available as fba_available,tw.fba_transfer as fba_transfer,tw.fbmfba_transfer as fbmfba_transfer,tw.fbmfba_sorting as fbmfba_sorting,tw.safety_days as safety_days,tw.fbmfba_days as fbmfba_days,tw.fbmfba_shelfing as fbmfba_shelfing,tw.status as status,fbm_stock.item_name as product_name,tw.fbm_stock as fbm_stock  
+        	tw.id as id,tw.asin as asin,tw.site as site,tw.sellersku as sellersku,asin.item_no as item_no,asin.seller as seller,asin.bg as bg,asin.bu as bu,asin.status as asin_level, users.name as sales,fs.seller_name as seller_name,asin.item_status as sku_status,'-' as sku_grade, tw.avg_sales as avg_sales,tw.fba_available as fba_available,tw.fba_transfer as fba_transfer,tw.fbmfba_transfer as fbmfba_transfer,tw.fbmfba_sorting as fbmfba_sorting,tw.safety_days as safety_days,tw.fbmfba_days as fbmfba_days,tw.fbmfba_shelfing as fbmfba_shelfing,tw.status as status,fbm_stock.item_name as product_name,tw.fbm_stock as fbm_stock,CEILING((7+tw.safety_days+tw.fbmfba_days+tw.fbmfba_shelfing) *tw.avg_sales-tw.fba_available-tw.fba_transfer-tw.fbmfba_transfer) as allocation_quantity 
             from transfer_warn as tw  
 		  	left join asin on asin.sellersku = tw.sellersku and asin.site = tw.site and asin.asin=tw.asin 
         	left join users on users.sap_seller_id = asin.sap_seller_id 
         	left join fba_stock as fs on fs.seller_sku = asin.sellersku and fs.asin = tw.asin 
 		  	left join fbm_stock on fbm_stock.item_code = asin.item_no 
 			where 1 = 1  {$where} 
-			order by avg_sales desc 
+			order by {$orderby} 
         LIMIT {$limit}";
 		$data = $this->queryRows($sql);
 
@@ -91,7 +95,7 @@ class ProductTransferController extends Controller
 				$data[$key]['tdmi'] = round(($val['fbm_stock']+$val['fba_available']+$val['fba_transfer']+$val['fbmfba_transfer'])/$val['avg_sales'],2);
 			}
 
-			$data[$key]['allocation_quantity'] = ceil((7+$val['safety_days']+$val['fbmfba_days']+$val['fbmfba_shelfing'])*$val['avg_sales']-$val['fba_available']-$val['fba_transfer']-$val['fbmfba_transfer']);
+			// $data[$key]['allocation_quantity'] = ceil((7+$val['safety_days']+$val['fbmfba_days']+$val['fbmfba_shelfing'])*$val['avg_sales']-$val['fba_available']-$val['fba_transfer']-$val['fbmfba_transfer']);
 			if($data[$key]['allocation_quantity']>0){
 				$data[$key]['remind'] = 'Transfers';
 			}elseif($data[$key]['allocation_quantity']>=-50){
@@ -119,10 +123,8 @@ class ProductTransferController extends Controller
 	/*
 	 * 得到搜索
 	 */
-	public function getSearchSql($data,$searchField)
+	public function getSearchSql($search,$searchField)
 	{
-		$_POST = $data;
-		$search = isset($_POST['search']['value']) ? $_POST['search']['value'] : '';
 		$search = explode('&',$search);
 		$searchData = array();
 		foreach($search as $val){
@@ -250,7 +252,7 @@ class ProductTransferController extends Controller
 			if(array_get($rules,1)!='*') $this->buManage = array_get($rules,1);
 		}
 		//各个状态显示键值对
-		$statusArr = array(0=>'-',1=>'Rejected By BU',2=>'Approved By BU',3=>'Rejected By BG',4=>'Approved By BG',5=>'Rejected By VP',6=>'Approved By VP',7=>'Rejected By plan',8=>'Approved By plan');
+		$statusArr = getReplyAduitStatus();
 
 		if($this->bgManage){
 			if($this->buManage){
@@ -286,7 +288,10 @@ class ProductTransferController extends Controller
 
 		$labelType = getLabelType();
 		$userIdName = $this->getUsersIdName();
+		$siteShort = getSiteShort();
 		foreach($data as $key=>$val){
+			//site显示简写
+			$data[$key]['siteshort'] = isset($siteShort[$val['site']]) ? $siteShort[$val['site']] : $val['site'];
 			$data[$key]['reply_label_status'] = 'NO';
 			$data[$key]['reply_label_type'] = '-';
 			if($val['reply_label_status']==0){//添加标签
@@ -325,7 +330,7 @@ class ProductTransferController extends Controller
 			}
 
 			$data[$key]['sku_status'] = ($val['sku_status'])?'<span class="btn btn-success btn-xs">Reserved</span>':'<span class="btn btn-danger btn-xs">Eliminate</span>';
-			$data[$key]['suggest_num'] = round((7+$val['safety_days']+$val['fbmfba_days']+$val['fbmfba_shelfing'])*$val['avg_sales']-$val['fba_available']-$val['fba_transfer']-$val['fbmfba_transfer'],2);
+			$data[$key]['suggest_num'] = ceil((7+$val['safety_days']+$val['fbmfba_days']+$val['fbmfba_shelfing'])*$val['avg_sales']-$val['fba_available']-$val['fba_transfer']-$val['fbmfba_transfer']);
 
 			$data[$key]['opera_log'] = '<a href="javacript:void(0);" class="badge log-detail badge-success"  data-id="'.$val['id'].'"> Log details </a>';
 			if(!$val['audit_date']){
@@ -336,12 +341,114 @@ class ProductTransferController extends Controller
 		$recordsTotal = $recordsFiltered = $this->queryOne('SELECT FOUND_ROWS()');
 		return compact('data', 'recordsTotal', 'recordsFiltered');
 	}
+	/*
+	 *下载申请列表
+	 */
+	public function replyExport(Request $req)
+	{
+		if(!Auth::user()->can(['productTransfer-reply-download'])) die('Permission denied -- productTransfer-reply-download');
+		$this->userId = Auth::user()->id;
+
+		//看是否是bg,bu的管理者，是管理者的话，BG,BU可进行process操作，且BG的话要限制显示的状态为BU已批准的状态（>0）
+		if (Auth::user()->seller_rules) {
+			$rules = explode("-",Auth::user()->seller_rules);
+			if(array_get($rules,0)!='*') $this->bgManage = array_get($rules,0);
+			if(array_get($rules,1)!='*') $this->buManage = array_get($rules,1);
+		}
+
+		$sql = $this->getReplySql($req);
+		$data = $this->queryRows($sql);
+
+		$arrayData = array();
+		$headArray = array('ID','Date','BG','BU','Sales','Site','Seller Name','seller-sku','ASIN','Item No','SKU Status','SKU Grade','ASIN Level','Suggest Num','Reply Number','Reply Reason','Label Status','Label Type','Reply Factory','Reply Location','Reply Processor','Audit date','Status');
+		$arrayData[] = $headArray;
+
+		$labelType = getLabelType();
+		$userIdName = $this->getUsersIdName();
+		$siteShort = getSiteShort();
+		//各个状态显示键值对
+		$statusArr = getReplyAduitStatus();
+		foreach ($data as $key=>$val){
+			//site显示简写
+			$val['siteshort'] = isset($siteShort[$val['site']]) ? $siteShort[$val['site']] : $val['site'];
+
+			if($val['reply_label_status']==0){//添加标签
+				$val['reply_label_status'] = 'YES';
+				$val['reply_label_type'] = isset($labelType[$val['reply_label_type']]) ? $labelType[$val['reply_label_type']] : $val['reply_label_type'];
+			}else{//不添加标签
+				$val['reply_label_status'] = 'NO';
+				$val['reply_label_type'] = '-';
+			}
+
+			$val['reply_processor'] = isset($userIdName[$val['reply_processor']]) ? $userIdName[$val['reply_processor']] : $val['reply_processor'];//申请操作者
+			$val['process'] = isset($statusArr[$val['reply_status']]) ? $statusArr[$val['reply_status']] : '-';//审核状态
+			$val['sku_status'] = ($val['sku_status'])?'Reserved':'Eliminate';
+			$val['suggest_num'] = ceil((7+$val['safety_days']+$val['fbmfba_days']+$val['fbmfba_shelfing'])*$val['avg_sales']-$val['fba_available']-$val['fba_transfer']-$val['fbmfba_transfer']);//建议数量
+
+			if(!$val['audit_date']){
+				$val['audit_date'] = '-';
+			}
+			//赋值数据
+			$arrayData[] = array(
+				$val['id'],
+				$val['created_at'],
+				$val['bg'],
+				$val['bu'],
+				$val['sales'],
+				$val['siteshort'],
+				$val['seller_name'],
+				$val['sellersku'],
+				$val['asin'],
+				$val['item_no'],
+				$val['sku_status'],
+				$val['sku_grade'],
+				$val['asin_level'],
+				$val['suggest_num'],
+				$val['reply_number'],
+				$val['reply_reason'],
+				$val['reply_label_status'],
+				$val['reply_label_type'],
+				$val['reply_factory'],
+				$val['reply_location'],
+				$val['reply_processor'],
+				$val['audit_date'],
+				$val['process'],
+				// strval($val['times_ctg']),//数字转化为字符串，不然整数0导出到excel会显示空白
+			);
+		}
+		if($arrayData){
+			$spreadsheet = new Spreadsheet();
+
+			$spreadsheet->getActiveSheet()
+				->fromArray(
+					$arrayData,  // The data to set
+					NULL,        // Array values with this value will not be set
+					'A1'         // Top left coordinate of the worksheet range where
+				//    we want to set these values (default is A1)
+				);
+			header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');//告诉浏览器输出07Excel文件
+			header('Content-Disposition: attachment;filename="Export_replyList.xlsx"');//告诉浏览器输出浏览器名称
+			header('Cache-Control: max-age=0');//禁止缓存
+			$writer = new Xlsx($spreadsheet);
+			$writer->save('php://output');
+		}
+		die();
+	}
 
 	public function getReplySql($req)
 	{
 		//搜索相关
 		$searchField = array('date_from'=>array('>='=>'tr.created_at'),'date_to'=>array('<='=>'tr.created_at'),'asin'=>'tw.asin','bg'=>'asin.bg','bu'=>'asin.bu','sales'=>'users.id','site'=>'tw.site','sellersku'=>'asin.sellersku','item_no'=>'asin.item_no','sku_status'=>'asin.item_status');
-		$where = $this->getSearchSql($_POST,$searchField);
+
+		$search = isset($_POST['search']) ? $_POST['search'] : '';
+		if(empty($search)){
+			//下载的时候为get请求
+			foreach($_REQUEST as $key=>$val){
+				$search .= $key.'='.$val.'&';
+			}
+		}
+
+		$where = $this->getSearchSql($search,$searchField);
 
 
 		//reply_status， '申请状态，0默认，1BU拒绝，2BU批准，3BG拒绝，4BG批准，5VP拒绝，6VP批准，7计划部拒绝，8计划部批准',
@@ -430,7 +537,6 @@ class ProductTransferController extends Controller
 			$res = 0;
 		}
 		return $res;
-
 	}
 
 	//点击显示操作日志

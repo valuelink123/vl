@@ -900,10 +900,18 @@ function getSiteShort()
 }
 
 /*
- * 得到站点与站点简写的键值对
+ * 得到LabelType的键值对
  */
 function getLabelType()
 {
 	$arr = array(0=>'Active Warranty',1=>'BOGO',2=>'50% Cashback',3=>'up to 100% cashback');
 	return $arr;
+}
+/*
+ * 得到调拨申请的审核状态的键值对
+ */
+function getReplyAduitStatus()
+{
+	$statusArr = array(0=>'-',1=>'Rejected By BU',2=>'Approved By BU',3=>'Rejected By BG',4=>'Approved By BG',5=>'Rejected By VP',6=>'Approved By VP',7=>'Rejected By plan',8=>'Approved By plan');
+	return $statusArr;
 }
