@@ -258,6 +258,15 @@
                                                     </a>    
                                                 </li>
 												@endpermission
+
+												@permission('rsgUser-show')
+												<li class="">
+													<a href="/rsgUser/list" class="nav-link nav-toggle ">
+														RSG User
+														<span class="arrow"></span>
+													</a>
+												</li>
+												@endpermission
                                             </ul>
                                         </li>
 										

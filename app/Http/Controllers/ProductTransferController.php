@@ -126,16 +126,7 @@ class ProductTransferController extends Controller
 	public function getSearchSql($search,$searchField)
 	{
 		$search = explode('&',$search);
-		$searchData = array();
-		foreach($search as $val){
-			$sv = explode('=',$val);
-			if(isset($sv[1]) && $sv[1]){
-				$searchData[$sv[0]] = $sv[1];
-				if($sv[0]=='date_to'){
-					$searchData[$sv[0]] = $sv[1].' 23:59:59';
-				}
-			}
-		}
+		$searchData = $this->getSearchData($search);
 
 		$where = '';
 		foreach($searchField as $fk=>$fv){

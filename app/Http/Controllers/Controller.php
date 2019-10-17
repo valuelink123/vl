@@ -1,5 +1,8 @@
 <?php
-
+/* Date: 2019.10.15
+ * Author: wulanfnag
+ * 一些公共数据处理方法
+ */
 namespace App\Http\Controllers;
 
 use Illuminate\Foundation\Bus\DispatchesJobs;
@@ -61,4 +64,44 @@ class Controller extends BaseController
 		return $bus;
 	}
 
+	/*
+	 * 得到搜索数据内容的键值对
+	 */
+	public function getSearchData($search)
+	{
+		$searchData = array();
+		foreach($search as $val){
+			$sv = explode('=',$val);
+			if(isset($sv[1])){
+				$searchData[$sv[0]] = $sv[1];
+				if($sv[0]=='date_to'){
+					$searchData[$sv[0]] = $sv[1].' 23:59:59';
+				}
+			}
+		}
+		return $searchData;
+	}
+
+	/*
+	 * 得到搜索的where语句
+	 * $searchData为搜索内容的键值对，例如array('id'=>1,'name'=>123)
+	 * $searchField为搜索字段与查询字段对应关系，例如array('id'=>'a.id','name'=>'a.name')
+	 * 如果有起始时间等特殊查询，可用array('date_from'=>array('>='=>'created_at'),'date_to'=>array('<='=>'created_at'));
+	 */
+	public function getSearchWhereSql($searchData,$searchField)
+	{
+		$where = '';
+		foreach($searchField as $fk=>$fv){
+			if(isset($searchData[$fk]) && $searchData[$fk]){
+				if(is_array($fv)){
+					foreach($fv as $vk=>$vv){
+						$where .= " and {$vv} {$vk} '".$searchData[$fk]."'";
+					}
+				}else{
+					$where .= " and {$fv} = '".$searchData[$fk]."'";
+				}
+			}
+		}
+		return $where;
+	}
 }
