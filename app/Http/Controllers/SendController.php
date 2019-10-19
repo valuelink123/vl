@@ -238,7 +238,7 @@ class SendController extends Controller
 				$sendbox->error_count = 0;
 				$sendbox->save();
 
-				NonCtg::where('email',$to_address)->where('processor',intval(Auth::user()->id))->where('status',0)->update(array('status'=>4));
+				NonCtg::where('email',$sendbox->to_address)->where('processor',intval(Auth::user()->id))->where('status',0)->update(array('status'=>4));
 			}
 		}
         
