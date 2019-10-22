@@ -78,6 +78,20 @@ class BrandLineController extends Controller {
         ";
         // $rows = DB::connection('frank')->table('asin')->select('item_group', 'item_model', 'brand')->groupBy('item_group', 'item_model')->get()->toArray();
         $rows = $this->queryRows($sql);
+        foreach($rows as $key => $val){
+        	if(empty($val['manualink'])){//manualink为空的时候
+        		//item group,brand,model这三个参数都不为空的时候，就显示上传文件upload
+				//brand,item_group,item_model
+				$invalidModel = array('无型号');
+				if($val['brand'] && $val['item_group'] && $val['item_model'] && !in_array($val['item_model'],$invalidModel) && Auth::user()->can(['user-manual-update'])){
+					$rows[$key]['manualink'] = "<button  class='btn btn-success btn-xs btn-upload' data-brand='".$val['brand']."' data-group='".$val['item_group']."' data-model='".$val['item_model']."'>Upload</button>";
+				}
+			}else{
+				$rows[$key]['manualink'] = "<a href='".$val['manualink']."' target='_blank' class='btn btn-success btn-xs'>View</a>";
+			}
+			$rows[$key]['manualink'] .= "<a href='/kms/usermanual?brand=".$val['brand']."&item_group=".$val['item_group']."&item_model=".$val['item_model']." target='_blank' class='btn btn-success btn-xs'>More</a>";
+
+		}
 
         $total = $this->queryOne('SELECT FOUND_ROWS()');
 

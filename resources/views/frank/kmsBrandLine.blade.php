@@ -6,6 +6,18 @@
 
     @include('frank.common')
 
+    <div class="container-top-msg">
+        <div class="row">
+            <div class="col-xs-12">
+                @if($msg = $errors->dataImport->first('success'))
+                    <div class="alert alert-success"><strong>Success !</strong> {!! $msg !!}</div>
+                @elseif($msg = $errors->dataImport->first('error'))
+                    <div class="alert alert-danger"><strong>Error !</strong> {!! $msg !!}</div>
+                @endif
+            </div>
+        </div>
+    </div>
+
     <style>
         .user-manual-file {
             text-overflow: ellipsis;
@@ -86,6 +98,40 @@
         </div>
     </div>
 
+    {{--点击upload按钮，弹窗出现添加文件内容--}}
+    <div id="art-content" style="display:none;">
+        <form id="edit-form" method="post" enctype="multipart/form-data" action="/kms/usermanual/import">
+            {!! csrf_field() !!}
+            <input type="hidden" name="item_group" value="">
+            <input type="hidden" name="brand" value="">
+            <input type="hidden" name="item_model" value="">
+            <div class="form-group">
+                <label>Item Group：<span class="art-item_group">123</span></label>
+            </div>
+            <div class="form-group">
+                <label>Brand：<span class="art-brand">123</span></label>
+            </div>
+            <div class="form-group">
+                <label>Item Model：<span class="art-item_model">123</span></label>
+            </div>
+            <div class="form-group">
+                <input  type="file" required style="margin-top: 5px;" name="uploadfile"/>
+            </div>
+            <div class="form-group">
+                <label>Note</label>
+                <div class="input-group ">
+                    <span class="input-group-addon">
+                        <i class="fa fa-bookmark"></i>
+                    </span>
+                    <input type="text" class="form-control" name="note" value="">
+                </div>
+            </div>
+            <div class="form-group">
+                <button  type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        </form>
+    </div>
+
     <script>
 
         let $theTable = $(thetable);
@@ -135,21 +181,21 @@
                     className: 'dt-body-right',
                     data: 'manualink', name: 'manualink',
                     // defaultContent: '<button class="btn btn-success btn-xs">View</button>',
-                    render(data, type, row, meta) {
-                        // let args = {'item_group': row.item_group, 'item_model': row.item_model}
-                        // jQuery.param( ) 坑爹啊 jQuery uses + instead of %20 to URL-encode spaces
-                        // enc_type http://php.net/manual/en/function.http-build-query.php
-
-                        let href = `/kms/usermanual?${objectToQueryString(objectFilte(row, ['item_group', 'brand', 'item_model'], false))}`
-
-                        if (data) {
-                            let ms = data.match(/([^/]+\.\w+)$/)
-                            let file = ms ? ms[1] : data
-                            return `<a href="${data}" target="_blank" class="user-manual-file">${file}</a> <a href="${href}" target="_blank" class='btn btn-success btn-xs'>More</a>`
-                        } else {
-                            return `<a href="${href}" target="_blank" class='btn btn-default btn-xs'>No Data Available</a>`
-                        }
-                    }
+                    // render(data, type, row, meta) {
+                    //     // let args = {'item_group': row.item_group, 'item_model': row.item_model}
+                    //     // jQuery.param( ) 坑爹啊 jQuery uses + instead of %20 to URL-encode spaces
+                    //     // enc_type http://php.net/manual/en/function.http-build-query.php
+                    //
+                    //     let href = `/kms/usermanual?${objectToQueryString(objectFilte(row, ['item_group', 'brand', 'item_model'], false))}`
+                    //
+                    //     if (data) {
+                    //         let ms = data.match(/([^/]+\.\w+)$/)
+                    //         let file = ms ? ms[1] : data
+                    //         return `<a href="${data}" target="_blank" class="user-manual-file">${file}</a> <a href="${href}" target="_blank" class='btn btn-success btn-xs'>More</a>`
+                    //     } else {
+                    //         return `<a href="${href}" target="_blank" class='btn btn-success btn-xs'>More</a>`
+                    //     }
+                    // }
                 },
                 {
                     data: 'has_video', name: 'has_video',
@@ -176,6 +222,28 @@
                 url: '/kms/productguide/get',
                 // dataSrc(json) { return json.data }
             }
+        })
+
+        $(".table-container").on('click', '.btn-upload',function(){
+            var brand = $(this).attr('data-brand');
+            var group = $(this).attr('data-group');
+            var model = $(this).attr('data-model');
+
+            //赋值
+            $('input[name="item_group"]').val(group);
+            $('.art-item_group').html(group);
+            $('input[name="brand"]').val(brand);
+            $('.art-brand').html(brand);
+            $('input[name="item_model"]').val(model);
+            $('.art-item_model').html(model);
+
+            //弹窗显示form表单内容
+            art.dialog({
+                id: 'art_upload',
+                title: 'upload',
+                content: document.getElementById('art-content')
+            });
+            return false;
         })
 
         // `<button type='button' class='btn btn-success btn-xs' data-search='${JSON.stringify(search)}'>View</button>`

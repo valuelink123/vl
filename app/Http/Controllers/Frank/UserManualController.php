@@ -73,6 +73,7 @@ class UserManualController extends Controller {
         // todo UPDATE asin SET xxx=TRIM(IFNULL(xxx, ''))
         $sql = "
         SELECT SQL_CALC_FOUND_ROWS
+	    id,
         item_group,
         item_model,
         link,
@@ -96,10 +97,58 @@ class UserManualController extends Controller {
         ";
 
         $rows = $this->queryRows($sql);
+		if(Auth::user()->can(['user-manual-update'])){//有修改编辑权限
+			foreach($rows as $key=>$val){
+				$rows[$key]['action'] = '<a class="btn btn-danger btn-xs" href="'.url('kms/usermanual/edit?id='.$val['id']).'" target="_blank">Edit</a>';;
+			}
+		}else{
+			//无修改编辑权限
+			foreach($rows as $key=>$val){
+				$rows[$key]['action'] = '-';
+			}
+		}
+
 
         $total = $this->queryOne('SELECT FOUND_ROWS()');
 
         return ['data' => $rows, 'recordsTotal' => $total, 'recordsFiltered' => $total];
     }
+
+    /*
+     * 编辑某条操作
+     */
+    public function edit(Request $req)
+	{
+
+		if(!Auth::user()->can(['user-manual-update'])) die('Permission denied -- user-manual-update');
+		$id = isset($_REQUEST['id']) && $_REQUEST['id'] ? $_REQUEST['id'] : '';
+		$data= KmsUserManual::where('id',$id)->first()->toArray();
+		if(!$data){
+			$req->session()->flash('error_message','user manual not Exists');
+			return redirect('kms/usermanual');
+		}
+
+		$rows = $this->queryRows('SELECT item_group,brand,GROUP_CONCAT(DISTINCT item_model) AS item_models FROM asin GROUP BY item_group,brand');
+
+		foreach ($rows as $row) {
+			$vars['itemGroupBrandModels'][$row['item_group']][$row['brand']] = explode(',', $row['item_models']);
+		}
+		return view('frank/kmsUserManualEdit', ['itemGroupBrandModels'=>$vars['itemGroupBrandModels'],'data'=>$data]);
+	}
+
+	/*
+	 * 更新数据操作
+	 */
+	public function update(Request $req)
+	{
+		if(!Auth::user()->can(['user-manual-update'])) die('Permission denied -- user-manual-update');
+		try {
+			$count = KmsUserManual::import($req);
+			$errors = ['success' => "Update $count Records."];
+		} catch (\Exception $e) {
+			$errors = ['error' => $e->getMessage()];
+		}
+		return redirect()->back()->withErrors($errors, 'dataImport');
+	}
 
 }

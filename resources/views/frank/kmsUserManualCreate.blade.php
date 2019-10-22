@@ -25,7 +25,7 @@
     <div class="portlet light bordered">
         <div class="portlet-body">
 
-            <form method="post" class="row">
+            <form method="post" class="row" enctype="multipart/form-data">
                 <div class="col-lg-4">
 
                     <div class="form-group">
@@ -60,7 +60,8 @@
                     <div class="form-group">
                         <label>
                             Manual Link
-                            <input required pattern=".*\S+.*" autocomplete="off" class="xform-autotrim form-control" placeholder="Link" name="link" title="This field is required."/>
+                            <input pattern=".*\S+.*" autocomplete="off" class="xform-autotrim form-control" placeholder="Link" name="link" title="This field is required."/>
+                            <input  type="file" style="margin-top: 5px;" name="uploadfile"/>
                         </label>
                     </div>
 

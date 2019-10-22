@@ -41,6 +41,7 @@
                         <th>Model</th>
                         <th>Manual</th>
                         <th>Date</th>
+                        <th>Action</th>
                     </tr>
                     </thead>
                     <tbody></tbody>
@@ -89,7 +90,8 @@
                 {
                     data: 'updated_at',
                     name: 'updated_at',
-                }
+                },
+                {data: 'action', orderable: false,name: 'action'}
             ],
             ajax: {
                 type: 'POST',

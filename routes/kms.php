@@ -21,7 +21,9 @@ Route::post('/videolist/import', 'VideoListController@create');
 Route::get('/usermanual', 'UserManualController@index');
 Route::post('/usermanual/get', 'UserManualController@get');
 Route::get('/usermanual/import', 'UserManualController@import');
-Route::post('/usermanual/import', 'UserManualController@create');
+Route::post('/usermanual/import', 'UserManualController@create');//添加数据
+Route::get('/usermanual/edit', 'UserManualController@edit');//编辑usermanual操作
+Route::post('/usermanual/update', 'UserManualController@update');//更新usermanual操作
 
 Route::get('/partslist', 'PartsListController@index');
 Route::post('/partslist/get', 'PartsListController@get');
