@@ -89,7 +89,7 @@ trait DataTables {
         if (!empty($req->input('search.value'))) {
             $word = addslashes($req->input('search.value'));
             $ors = [];
-            foreach ($fuzzyFields as $field) {
+            foreach ($fuzzyFields as $key=>$field) {
                 if (0 === strpos($field, 'f:')) {
                     $field = substr($field, 2);
                     $ors[] = "MATCH({$field}) AGAINST('{$word}')";
@@ -97,7 +97,11 @@ trait DataTables {
                     // 表中数据多到一定程度以后，% LIKE 会很慢
                     // todo 使用全文索引，XunSearch、ElasticSearch
                     // 或者就用 MySQL 自带的全文索引，把所有需要搜索的字段，拼成一个用于搜索的 FullText 字段
-                    $ors[] = "{$field} LIKE '%{$word}%'";
+					if($key=='email'){//email字段设置查询的时候不区分大小写，例如non-ctg功能中
+						$ors[] = "{$field} LIKE '%{$word}%' collate  `utf8_unicode_ci`";
+					}else{
+						$ors[] = "{$field} LIKE '%{$word}%'";
+					}
                 }
             }
             if($ors){
