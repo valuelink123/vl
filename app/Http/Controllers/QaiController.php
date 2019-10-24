@@ -25,7 +25,7 @@ class QaiController extends Controller
     {
 
         $this->middleware('auth');
-
+		parent::__construct();
     }
 	
 	

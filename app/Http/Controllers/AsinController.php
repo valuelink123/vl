@@ -26,7 +26,7 @@ class AsinController extends Controller
     {
 
         $this->middleware('auth');
-
+		parent::__construct();
     }
 	
 	public function getUsers(){
@@ -195,9 +195,9 @@ class AsinController extends Controller
 					'A1'         // Top left coordinate of the worksheet range where
 								 //    we want to set these values (default is A1)
 				);
-			header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');//¸æËßä¯ÀÀÆ÷Êä³ö07ExcelÎÄ¼ş
-			header('Content-Disposition: attachment;filename="Export_'.array_get($_REQUEST,'ExportType').'.xlsx"');//¸æËßä¯ÀÀÆ÷Êä³öä¯ÀÀÆ÷Ãû³Æ
-			header('Cache-Control: max-age=0');//½ûÖ¹»º´æ
+			header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');//å‘Šè¯‰æµè§ˆå™¨è¾“å‡º07Excelæ–‡ä»¶
+			header('Content-Disposition: attachment;filename="Export_'.array_get($_REQUEST,'ExportType').'.xlsx"');//å‘Šè¯‰æµè§ˆå™¨è¾“å‡ºæµè§ˆå™¨åç§°
+			header('Cache-Control: max-age=0');//ç¦æ­¢ç¼“å­˜
 			$writer = new Xlsx($spreadsheet);
 			$writer->save('php://output');
 		}

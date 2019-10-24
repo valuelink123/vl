@@ -24,6 +24,7 @@ class CategoryController extends Controller
     {
 
         $this->middleware('auth');
+		parent::__construct();
 
     }
 	

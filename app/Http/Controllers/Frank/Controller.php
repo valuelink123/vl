@@ -15,6 +15,7 @@ class Controller extends \App\Http\Controllers\Controller {
     public function __construct() {
         app('debugbar')->disable();
         $this->middleware('auth', ['except' => static::$authExcept]);
+		parent::__construct();
     }
 
 }
