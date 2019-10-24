@@ -90,8 +90,8 @@ class KmsUserManual extends Model {
 			//link为空的时候，判断是否有上传文件
 			if(empty($link)){
 				if(isset($_FILES['uploadfile']) && $_FILES['uploadfile']['name']){
-					if($_FILES['uploadfile']['size'] > 3 * 1024 * 1024){
-						throw new DataImportException('File exceeds 3M limit!', 102);
+					if($_FILES['uploadfile']['size'] > 5 * 1024 * 1024){
+						throw new DataImportException('File exceeds 5M limit!', 102);
 					}
 					$file = $req->file('uploadfile');
 					$fileInfo = $_FILES['uploadfile'];
