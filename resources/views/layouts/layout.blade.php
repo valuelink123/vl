@@ -704,16 +704,18 @@
 					{{--倒计时开始--}}
 					<div class="mod-holiday—countdown">
 						<div class="holiday—countdown">
+							<div style=" width:5%;border: 1px solid #D9EDF7;"></div>
 							@if(Session::get('countDown.black_friday'))
 								<div>距离<span class="holiday">Black Friday</span>还有<span class="day">{{ Session::get('countDown.black_friday') }}</span>天</div>
 							@endif
 							@if(Session::get('countDown.cyber_monday'))
-								<div>距离<span class="holiday">Cyber Monday</span>还有<span class="day">{{ session()->get('countDown.cyber_monday') }}</span>天</div>
+								<div>距离<span class="holiday">Cyber Monday</span>还有<span class="day">{{Session::get('countDown.cyber_monday') }}</span>天</div>
 							@endif
 							@if(Session::get('countDown.christmas'))
 								<div>距离<span class="holiday">Christmas</span>还有<span class="day">{{ Session::get('countDown.christmas') }}</span>天</div>
 							@endif
-								<div style="clear:both;">
+							<div style=" width:5%;border: 1px solid #D9EDF7;"></div>
+							<div style="clear:both;">
 						</div>
 					</div>
 					{{--倒计时结束--}}
