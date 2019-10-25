@@ -231,8 +231,15 @@ th,td,td>span {
 										</div>
 									</td>
 
-									<td></td>
-									<td></td>
+									<td><input type="text" class="form-control form-filter input-sm" placeholder='Facebook Name' name="facebook_name"></td>
+									<td>
+										<input id="facebook_group" type="text" class="form-control form-filter input-sm" name="facebook_group" list="list-facebook_group" placeholder="Facebook Group"/>
+										<datalist id="list-facebook_group">
+											@foreach(getFacebookGroup() as $id=>$name)
+												<option value="{!! $id !!} | {!! $name !!}"></option>
+											@endforeach
+										</datalist>
+									</td>
 									<td>
 										<select name="processor" class="form-control form-filter input-sm">
 											<option value="">Processor</option>
@@ -306,7 +313,7 @@ th,td,td>span {
 												"url": "{{ url('rsgrequests/get')}}", // ajax source
 											},
 											"order": [
-												[14, "desc"]
+												[1, "desc"]
 											],// set first column as a default sort by asc
 										}
 									});

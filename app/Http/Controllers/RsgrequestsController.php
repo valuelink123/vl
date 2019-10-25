@@ -175,7 +175,15 @@ class RsgrequestsController extends Controller
 		if($request->input('site')){
 			$datas = $datas->where('rsg_products.site','like', '%'.$request->input('site').'%');
 		}
-		
+		//搜索facebook_group和facebook_name
+		if($request->input('facebook_group')){
+			$datas = $datas->where('facebook_group', intval($request->input('facebook_group')));
+		}
+
+		if($request->input('facebook_name')){
+			$datas = $datas->where('facebook_name','like', '%'.$request->input('facebook_name').'%');
+		}
+
 		$iTotalRecords = $datas->count();
         $iDisplayLength = intval($_REQUEST['length']);
         $iDisplayLength = $iDisplayLength < 0 ? $iTotalRecords : $iDisplayLength;
