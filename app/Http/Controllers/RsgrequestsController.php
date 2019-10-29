@@ -214,7 +214,7 @@ class RsgrequestsController extends Controller
 				$list['star_rating'],
 				// '<div style="width: 200px;word-wrap: break-word;text-align: center;">'.$list['follow'].'</div>',
 				// $list['next_follow_date'],
-				array_get($users,$list['user_id']),
+				isset($users[$list['user_id']]) ? $users[$list['user_id']] : $list['user_id'],
 				$list['site'],
 				$list['updated_at'],
 				//显示facebook_group内容
@@ -539,6 +539,8 @@ class RsgrequestsController extends Controller
 		$headArray[] = 'Sales';
 		$headArray[] = 'Site';
 		$headArray[] = 'Update Date';
+		$headArray[] = 'Facebook Name';
+		$headArray[] = 'Group';
 		$headArray[] = 'Processor';
 
 		$arrayData[] = $headArray;
@@ -547,13 +549,14 @@ class RsgrequestsController extends Controller
 		$sort = 'desc';
 		$datas= RsgRequest::leftJoin('rsg_products',function($q){
 			$q->on('rsg_requests.product_id', '=', 'rsg_products.id');
-		});
+		})->leftjoin('client_info', 'rsg_requests.customer_email', '=', 'client_info.email');
 
 		//$datas->count();
-		$lists =  $datas->orderBy($orderby,$sort)->get(['rsg_requests.*','rsg_products.asin','rsg_products.site','rsg_products.seller_id','rsg_products.user_id'])->toArray();
+		$lists =  $datas->orderBy($orderby,$sort)->get(['rsg_requests.*','rsg_products.asin','rsg_products.site','rsg_products.seller_id','rsg_products.user_id','client_info.facebook_name','client_info.facebook_group'])->toArray();
+
 		$users = $this->getUsers();
 		$channelKeyVal = getRsgRequestChannel();
-
+		$fbgroupConfig = getFacebookGroup();
 		foreach ($lists as $key=>$val){
 
 			$arrayData[] = array(
@@ -570,9 +573,12 @@ class RsgrequestsController extends Controller
 				$val['star_rating'],
 				// $val['follow'],
 				// $val['next_follow_date'],
-				array_get($users,$val['user_id']),
+				isset($users[$val['user_id']]) ? $users[$val['user_id']] : $val['user_id'],
 				$val['site'],
 				$val['updated_at'],
+				//显示facebook_group内容
+				$val['facebook_name'],
+				isset($fbgroupConfig[$val['facebook_group']]) ? $fbgroupConfig[ $val['facebook_group']] : '',
 				array_get($users,$val['processor']),
 			);
 		}

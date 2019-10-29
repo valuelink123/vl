@@ -76,6 +76,7 @@ th,td,td>span {
 								@endpermission
 							</div>
 							@endpermission
+							<div style="overflow:auto;width: 100%;">
 							<table class="table table-striped table-bordered table-hover table-checkable" id="datatable_ajax_rsg_requests">
 								<thead>
 								<tr role="row" class="heading">
@@ -99,11 +100,11 @@ th,td,td>span {
 									{{--<th width="6%"> Next follow date</th>--}}
 									<th width="4%"> Sales</th>
 									<th width="6%"> Site</th>
-									<th width="10%"> Update Date </th>
-									<th width="6%">Facebook Name</th>
+									<th width="4%"> Update Date </th>
+									<th width="6%">FB Name</th>
 									<th width="6%">Group</th>
-									<th width="10%"> Processor </th>
-									<th width="10%"> Action</th>
+									<th width="4%"> Processor </th>
+									<th width="4%"> Action</th>
 								</tr>
 								<tr role="row" class="filter">
 									<td> </td>
@@ -261,6 +262,7 @@ th,td,td>span {
 								</thead>
 								<tbody> </tbody>
 							</table>
+							</div>
 							<script>
 							var TableDatatablesAjax = function () {
 						
@@ -301,7 +303,6 @@ th,td,td>span {
 											// setup uses scrollable div(table-scrollable) with overflow:auto to enable vertical scroll(see: assets/global/scripts/datatable.js).
 											// So when dropdowns used the scrollable div should be removed.
 											"dom": "<'row'<'col-md-6 col-sm-12'pli><'col-md-6 col-sm-12'<'table-group-actions pull-right'>>r>t<'row'<'col-md-6 col-sm-12'pli><'col-md-6 col-sm-12'>>",
-						
 											"bStateSave": true, // save datatable state(pagination, sort, etc) in cookie.
 											"aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0 ,2,3,4,5,6,8,9,10,11,12,14,15,16,17 ] }],
 											"lengthMenu": [
