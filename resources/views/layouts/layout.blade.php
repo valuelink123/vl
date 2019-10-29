@@ -715,7 +715,7 @@
 								<div>距离<span class="holiday">Christmas</span>还有<span class="day">{{ Session::get('countDown.christmas') }}</span>天</div>
 							@endif
 							<div style=" width:5%;border: 1px solid #D9EDF7;"></div>
-							<div style="clear:both;">
+							<div style="clear:both;"></div>
 						</div>
 					</div>
 					{{--倒计时结束--}}
