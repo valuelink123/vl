@@ -278,7 +278,9 @@ class SkuDaily extends Command
 				$skus_info[$key]['eliminate2']=( $eliminate2>0)? $eliminate2:0;
 			}
 			print_r($skus_info[$key]);
-			SkusDailyInfo::updateOrCreate($skus_info[$key]);
+			SkusDailyInfo::updateOrCreate(
+			['sku'=>$skus_info[$key]['sku'], 'site'=>$skus_info[$key]['site'], 'date'=>$skus_info[$key]['date']]
+			,$skus_info[$key]);
 		}
 		
     }
