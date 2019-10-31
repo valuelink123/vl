@@ -915,3 +915,27 @@ function getReplyAduitStatus()
 	$statusArr = array(0=>'-',1=>'Rejected By BU',2=>'Approved By BU',3=>'Rejected By BG',4=>'Approved By BG',5=>'Rejected By VP',6=>'Approved By VP',7=>'Rejected By plan',8=>'Approved By plan');
 	return $statusArr;
 }
+
+
+function getShipRate()
+{
+	$arr = [
+	'US'=>['default'=>'1890'],
+	'UK'=>['default'=>'1470'],
+	'DE'=>['default'=>'2170'],
+	'FR'=>['default'=>'2170'],
+	'ES'=>['default'=>'2310'],
+	'IT'=>['default'=>'2310'],
+	'JP'=>[
+		'default'=>'1330',
+		'HA0618'=>'2534',
+		'HA0697'=>'2534',
+		'CS0517'=>'2534',
+		'CS0510'=>'2534',
+		'CS0548'=>'2534',
+		'CS0656'=>'2534'
+	],
+	'CA'=>['default'=>'2660']
+	];
+	return $arr;
+}
