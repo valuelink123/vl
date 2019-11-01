@@ -221,7 +221,7 @@ a.editable-click:hover {
                         <div class="form-group col-md-5" >
                             
                             <div class="input-group date date-picker" data-date-format="yyyy-mm-dd">
-                                <input type="text" class="form-control form-filter input-sm" readonly name="date" placeholder="Date" value="{{$date_from}}">
+                                <input type="text" class="form-control form-filter input-sm" readonly name="date_from" placeholder="Date" value="{{$date_from}}">
                                 <span class="input-group-btn">
 									<button class="btn btn-sm default" type="button">
 										<i class="fa fa-calendar"></i>
@@ -232,7 +232,7 @@ a.editable-click:hover {
 						<div class="form-group col-md-5 col-md-offset-2" >
                             
                             <div class="input-group date date-picker" data-date-format="yyyy-mm-dd">
-                                <input type="text" class="form-control form-filter input-sm" readonly name="date" placeholder="Date" value="{{$date_to}}">
+                                <input type="text" class="form-control form-filter input-sm" readonly name="date_to" placeholder="Date" value="{{$date_to}}">
                                 <span class="input-group-btn">
 									<button class="btn btn-sm default" type="button">
 										<i class="fa fa-calendar"></i>

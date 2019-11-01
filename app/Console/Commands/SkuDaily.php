@@ -44,6 +44,7 @@ class SkuDaily extends Command
      */
     public function handle()
     {
+		$skus_info[$key]['tax']=round($skus_info[$key]['cost']*$tax,2);
 		
 		$date=date('Y-m-d',strtotime('-2 day'));
 		$skus_info=[];
@@ -240,20 +241,20 @@ class SkuDaily extends Command
 			$skus_info[$key]['size']=($sku_base)?intval($sku_base->size):0;
 			//关税
 			$tax_rate=DB::table('tax_rate')->where('site',$site)->whereIn('sku',array('*',$sku))->pluck('tax','sku');
-			$tax = ((array_get($tax_rate,$sku)??array_get($tax_rate,'*'))??0);
+			$tax = round(((array_get($tax_rate,$sku)??array_get($tax_rate,'*'))??0),4);
 			$skus_info[$key]['tax']=round($skus_info[$key]['cost']*$tax,2);
 			//头程运费
 			$shipfee = (array_get(getShipRate(),$site.'.'.$sku)??array_get(getShipRate(),$site.'.default'))??0;
-			$skus_info[$key]['headshipfee']=round($skus_info[$key]['volume']*$shipfee,2);
+			$skus_info[$key]['headshipfee']=round($skus_info[$key]['volume']*round($shipfee,4),2);
 			
 			//FBM仓储费
 			$fbm_stock = DB::table('fbm_accs_stock')->select(DB::raw('sum(LABST) as stock'))->whereRaw("left(WERKS,2)='$site' and matnr='$sku'")->value('stock');
 			$skus_info[$key]['fbm_stock']=intval($fbm_stock);
-			$skus_info[$key]['fbm_storage']=round(array_get($storage_fee,'FBM-'.$site.'-'.$skus_info[$key]['size'],0)*$fbm_stock*$skus_info[$key]['volume']/date("t",strtotime($date)),2);
+			$skus_info[$key]['fbm_storage']=round(array_get($storage_fee,'FBM-'.$site.'-'.$skus_info[$key]['size'],0)*intval($fbm_stock)*$skus_info[$key]['volume']/date("t",strtotime($date)),2);
 			
 			//FBA仓储费
 			if(!isset($skus_info[$key]['fba_stock'])) $skus_info[$key]['fba_stock']=0;			
-			$skus_info[$key]['fba_storage']=round(array_get($storage_fee,'FBA-'.$site.'-'.$skus_info[$key]['size'],0)*$skus_info[$key]['fba_stock']*$skus_info[$key]['volume']/date("t",strtotime($date)),2);
+			$skus_info[$key]['fba_storage']=round(array_get($storage_fee,'FBA-'.$site.'-'.$skus_info[$key]['size'],0)*intval($skus_info[$key]['fba_stock'])*$skus_info[$key]['volume']/date("t",strtotime($date)),2);
 			
 			//单位仓储费
 			if(isset($skus_info[$key]['sales'])){
