@@ -46,6 +46,8 @@ class HomeController extends Controller
 			if (array_get($rules, 0) != '*'){
 				$limit_bg = array_get($rules, 0);
 				$bonus_point = 0.1;
+			}else{
+				$bonus_point = 1;
 			}
 			if (array_get($rules, 1) != '*'){
 				$limit_bu = array_get($rules, 1);
@@ -56,6 +58,7 @@ class HomeController extends Controller
 			$bonus_point = 0.6;
 		} else {
 			$limit_review_user_id = Auth::user()->id;
+			$bonus_point = 0.04;
 		}
 			
 		
