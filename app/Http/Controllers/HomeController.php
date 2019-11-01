@@ -179,6 +179,23 @@ class HomeController extends Controller
 				$limit_bu = array_get($rules, 1);
 				$bonus_point = 0.3;
 			}
+			if(array_get($_REQUEST,'bgbu')){
+				$bgbu = array_get($_REQUEST,'bgbu');
+				$bgbu_arr = explode('_',$bgbu);
+				if(array_get($bgbu_arr,0)) {
+					$sumwhere.=" and bg='".array_get($bgbu_arr,0)."'";
+				}
+				if(array_get($bgbu_arr,1)){
+					$sumwhere.=" and bu='".array_get($bgbu_arr,1)."'";
+				}
+			}
+			
+			
+			if(array_get($_REQUEST,'user_id')){
+				$sap_seller_id = User::where('id',array_get($_REQUEST,'user_id'))->value('sap_seller_id');
+				$select_user_id=array_get($_REQUEST,'user_id');
+				$sumwhere.=" and (sap_seller_id='$sap_seller_id' or review_user_id='$select_user_id')";
+			}
 		} elseif (Auth::user()->sap_seller_id) {
 			$limit_sap_seller_id = Auth::user()->sap_seller_id;
 			$bonus_point = 0.6;
@@ -203,27 +220,11 @@ class HomeController extends Controller
 
 			$sumwhere.=" and review_user_id='$limit_review_user_id'";
 		}
-
-		if(array_get($_REQUEST,'bgbu')){
-			$bgbu = array_get($_REQUEST,'bgbu');
-			$bgbu_arr = explode('_',$bgbu);
-			if(array_get($bgbu_arr,0)) {
-				$sumwhere.=" and bg='".array_get($bgbu_arr,0)."'";
-			}
-			if(array_get($bgbu_arr,1)){
-				$sumwhere.=" and bu='".array_get($bgbu_arr,1)."'";
-			}
-		}
 		
 		
-		if(array_get($_REQUEST,'user_id')){
-			$sap_seller_id = User::where('id',array_get($_REQUEST,'user_id'))->value('sap_seller_id');
-			$select_user_id=array_get($_REQUEST,'user_id');
-			$sumwhere.=" and (sap_seller_id='$sap_seller_id' or review_user_id='$select_user_id')";
-		}
 		$date_from = $request->get('date_from')?$request->get('date_from'):date('Y-m-d',strtotime('-32days'));
 		$date_to = $request->get('date_to')?$request->get('date_to'):date('Y-m-d',strtotime('-2days'));
-		
+
 		$total_info = SkusDailyInfo::select(DB::raw('sku,site,sum(amount) as amount,sum(sales) as sales,sum(fulfillmentfee) as fulfillmentfee,sum(commission) as commission,sum(otherfee) as otherfee,sum(refund) as refund,sum(deal) as deal,sum(coupon) as coupon,sum(cpc) as cpc,sum(fbm_storage) as fbm_storage,sum(fba_storage) as fba_storage,sum(amount_used) as amount_used,sum(economic) as economic,sum(bonus) as bonus'))->whereRaw($sumwhere." and date>='$date_from' and date<='$date_to'")->groupBy(['sku','site'])->get()->toArray();
 		
 		
