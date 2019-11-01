@@ -74,7 +74,7 @@ a.editable-click:hover {
 <div class="portlet light ">
 			<div class="col-md-1">
 				<div style="width:100px;height:100px;border: 15px solid #f36a5a;border-radius:50% !important;text-align:center;line-height:70px;margin:auto;margin-top: 13px" >
-					<span id="tichengxianshi" style="cursor:pointer;" data-value="----" class="fa fa-eye-slash"></span>
+					<span id="tichengxianshi" style="cursor:pointer;" data-value="{{array_get($total_info,'bonus',0)}}" class="fa fa-eye-slash"></span>
 				</div>
 			</div>
 			<div class="col-md-8">
@@ -85,7 +85,7 @@ a.editable-click:hover {
 							<div class="number">
 								<small>E.VALUE</small>
 								<h3 class="font-green-sharp">
-									<span data-counter="counterup">-</span>
+									<span data-counter="counterup">{{array_get($total_info,'economic',0)}}</span>
 									<small class="font-green-sharp">¥</small>
 								</h3>
 								
@@ -99,8 +99,8 @@ a.editable-click:hover {
 								</span>
 							</div>
 							<div class="status">
-								<div class="status-title"> FULL : - </div>
-								<div class="status-number"> PROMO : - </div>
+								<div class="status-title">  </div>
+								<div class="status-number">  </div>
 							</div>
 						</div>
 					</div>
@@ -111,7 +111,7 @@ a.editable-click:hover {
 							<div class="number">
 								<small>SALES</small>
 								<h3 class="font-red-haze">
-									<span data-counter="counterup" >-</span>
+									<span data-counter="counterup" >{{array_get($total_info,'amount',0)}}</span>
 									<small class="font-red-haze">¥</small>
 								</h3>
 								
@@ -125,7 +125,7 @@ a.editable-click:hover {
 								</span>
 							</div>
 							<div class="status">
-								<div class="status-title"> RING RATIO : - </div>
+								<div class="status-title">  </div>
 								<div class="status-number"> </div>
 							</div>
 						</div>
@@ -137,7 +137,7 @@ a.editable-click:hover {
 							<div class="number">
 								<small>UNITS</small>
 								<h3 class="font-blue-sharp">
-									<span data-counter="counterup" >-</span>
+									<span data-counter="counterup" >{{array_get($total_info,'sales',0)}}</span>
 								</h3>
 								
 							</div>
@@ -150,7 +150,7 @@ a.editable-click:hover {
 								</span>
 							</div>
 							<div class="status">
-								<div class="status-title"> RING RATIO : - </div>
+								<div class="status-title">  </div>
 								<div class="status-number">  </div>
 							</div>
 						</div>
@@ -163,7 +163,7 @@ a.editable-click:hover {
 							<div class="number">
 							<small>AVG.PRICE</small>
 								<h3 class="font-purple-soft">
-									<span data-counter="counterup" >-</span>
+									<span data-counter="counterup" >{{(array_get($total_info,'sales',0)>0)?round(array_get($total_info,'amount',0)/array_get($total_info,'sales',0),2):0}}</span>
 									<small class="font-purple-soft">¥</small>
 								</h3>
 								
@@ -177,7 +177,7 @@ a.editable-click:hover {
 								</span>
 							</div>
 							<div class="status">
-								<div class="status-title"> STOCK VALUE : - </div>
+								<div class="status-title">  </div>
 								<div class="status-number">  </div>
 							</div>
 						</div>
@@ -342,9 +342,9 @@ a.editable-click:hover {
 								<a href="https://{{array_get($asin,'site')}}/dp/{{array_get($asin,'asin')}}" class="primary-link" target="_blank">{{array_get($asin,'asin')}}</a>
 							</td>
 							<td> {{array_get($asin,'item_no')}} </td>
-							<td> - </td>
-							<td> - </td>
-							<td> - </td>
+							<td> {{array_get($asin,'sales')}} </td>
+							<td> {{array_get($asin,'amount')}} </td>
+							<td> {{(array_get($asin,'sales')>0)?round(array_get($asin,'amount')/array_get($asin,'sales'),2):0}} </td>
 							<td> {{array_get($asin,'fba_stock')}} </td>
 							<td> {{($sales>0)?date('Y-m-d',strtotime('+'.intval(array_get($asin,'fba_stock')/$sales).' days')):'∞'}} </td>
 							<td> {{array_get($asin,'rating')}} </td>
@@ -353,9 +353,9 @@ a.editable-click:hover {
 							<td> {{array_get($asin,'sku_ranking')}} </td>
 							<td> {{intval(array_get($asin,'bsr'))}} </td>
 							
-							<td> - </td>
+							<td> {{array_get($asin,'economic')}} </td>
 							<td>
-								-
+								{{array_get($asin,'bonus')}}
 							</td>
 						</tr>
 						@endforeach
@@ -520,11 +520,8 @@ $(function() {
 	var date_data = [];
 	var comm_data = [];
 	<?php 
-	$date_comms['2019-09-01']=$date_comms['2019-09-03']=$date_comms['2019-09-05']=$date_comms['2019-09-07']=$date_comms['2019-09-09']=$date_comms['2019-09-11']=$date_comms['2019-09-13']=$date_comms['2019-09-15']=$date_comms['2019-09-17']=$date_comms['2019-09-19']=300;
 	
-	$date_comms['2019-09-02']=$date_comms['2019-09-04']=$date_comms['2019-09-06']=$date_comms['2019-09-08']=$date_comms['2019-09-10']=$date_comms['2019-09-12']=$date_comms['2019-09-14']=$date_comms['2019-09-16']=$date_comms['2019-09-18']=$date_comms['2019-09-20']='500';
-	ksort($date_comms);
-	foreach($date_comms as $k=>$v) {?>
+	foreach($daily_info as $k=>$v) {?>
 	date_data.push('<?php echo $k?>');
 	comm_data.push('<?php echo $v?>');
 	<?php }?>

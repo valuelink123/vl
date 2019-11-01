@@ -81,13 +81,14 @@ class SkuDaily extends Command
 			if(!$sku) continue;
 			if(!$sku['item_no']) continue;
 			if(!$sku['sap_seller_id']) continue;
-			$key=strtoupper(trim($sku['item_no']).'|'.str_replace('.','',$sale->MarketplaceName).'|'.$sku['sap_seller_id']);
+			$key=strtoupper(trim($sku['item_no']).'|'.$sale->MarketplaceName.'|'.$sku['sap_seller_id']);
 			if(!isset($skus_info[$key]['amount'])) $skus_info[$key]['amount']=0;
 			if(!isset($skus_info[$key]['sales'])) $skus_info[$key]['sales']=0;
 			if(!isset($skus_info[$key]['fulfillmentfee'])) $skus_info[$key]['fulfillmentfee']=0;
 			if(!isset($skus_info[$key]['commission'])) $skus_info[$key]['commission']=0;
 			if(!isset($skus_info[$key]['otherfee'])) $skus_info[$key]['otherfee']=0;
 			if(!isset($skus_info[$key]['status'])) $skus_info[$key]['status']=$sku['item_status'];
+			if(!isset($skus_info[$key]['review_user_id'])) $skus_info[$key]['status']=$sku['review_user_id'];
 			if($sale->type=='Principal'){
 				$skus_info[$key]['amount']+=round($sale->amount*array_get($rates,$sale->currency),2);
 			}elseif($sale->type=='FBAPerUnitFulfillmentFee'){
@@ -109,9 +110,10 @@ class SkuDaily extends Command
 			if(!$sku) continue;
 			if(!$sku['item_no']) continue;
 			if(!$sku['sap_seller_id']) continue;
-			$key=strtoupper(trim($sku['item_no']).'|'.str_replace('.','',$refund->MarketplaceName).'|'.$sku['sap_seller_id']);
+			$key=strtoupper(trim($sku['item_no']).'|'.$refund->MarketplaceName.'|'.$sku['sap_seller_id']);
 			if(!isset($skus_info[$key]['refund'])) $skus_info[$key]['refund']=0;
 			if(!isset($skus_info[$key]['status'])) $skus_info[$key]['status']=$sku['item_status'];
+			if(!isset($skus_info[$key]['review_user_id'])) $skus_info[$key]['status']=$sku['review_user_id'];
 			$skus_info[$key]['refund']+=round($refund->amount*array_get($rates,$refund->currency),2);
 		}
 		print_r('Deal相关计算开始...');
@@ -140,6 +142,7 @@ class SkuDaily extends Command
 				$key=strtoupper(trim($sku['item_no']).'|'.array_get(getSapSiteCode(),$coupon->site_code).'|'.$sku['sap_seller_id']);
 				if(!isset($skus_info[$key]['deal'])) $skus_info[$key]['deal']=0;
 				if(!isset($skus_info[$key]['status'])) $skus_info[$key]['status']=$sku['item_status'];
+				if(!isset($skus_info[$key]['review_user_id'])) $skus_info[$key]['status']=$sku['review_user_id'];
 				$skus_info[$key]['deal']+=round($sku_amount*array_get($rates,$coupon->currency),2);
 			}
 		}
@@ -169,6 +172,7 @@ class SkuDaily extends Command
 				$key=strtoupper(trim($sku['item_no']).'|'.array_get(getSapSiteCode(),$coupon->site_code).'|'.$sku['sap_seller_id']);
 				if(!isset($skus_info[$key]['coupon'])) $skus_info[$key]['coupon']=0;
 				if(!isset($skus_info[$key]['status'])) $skus_info[$key]['status']=$sku['item_status'];
+				if(!isset($skus_info[$key]['review_user_id'])) $skus_info[$key]['status']=$sku['review_user_id'];
 				$skus_info[$key]['coupon']+=round($sku_amount*array_get($rates,$coupon->currency),2);
 			}
 		}
@@ -198,6 +202,7 @@ class SkuDaily extends Command
 				$key=strtoupper(trim($sku['item_no']).'|'.array_get(getSiteUrl(),$coupon->marketplace_id).'|'.$sku['sap_seller_id']);
 				if(!isset($skus_info[$key]['cpc'])) $skus_info[$key]['cpc']=0;
 				if(!isset($skus_info[$key]['status'])) $skus_info[$key]['status']=$sku['item_status'];
+				if(!isset($skus_info[$key]['review_user_id'])) $skus_info[$key]['status']=$sku['review_user_id'];
 				$skus_info[$key]['cpc']+=round($sku_amount*array_get($rates,array_get(getSiteCur(),array_get(getSiteUrl(),$coupon->marketplace_id))),2);
 			}
 		}
@@ -212,6 +217,7 @@ class SkuDaily extends Command
 			$key=strtoupper(trim($sku['item_no']).'|'.str_replace('www.','',$sku['site']).'|'.$sku['sap_seller_id']);
 			if(!isset($skus_info[$key]['fba_stock'])) $skus_info[$key]['fba_stock']=0;
 			if(!isset($skus_info[$key]['status'])) $skus_info[$key]['status']=$sku['item_status'];
+			if(!isset($skus_info[$key]['review_user_id'])) $skus_info[$key]['status']=$sku['review_user_id'];
 			$skus_info[$key]['fba_stock']+=intval($sellersku_s->instock);		
 		}
 		
@@ -268,6 +274,56 @@ class SkuDaily extends Command
 			
 			if($skus_info[$key]['status']==1){
 				$skus_info[$key]['reserved'] = ($skus_info[$key]['economic']>0)?$skus_info[$key]['economic']:0;
+				$skus_info[$key]['bonus'] = $skus_info[$key]['reserved']*0.04;
+			}elseif($skus_info[$key]['status']==2){
+				$oa_datas = DB::connection('oa')->table('formtable_main_193_dt1')->where('SKU',$sku)->where('zhand',$site)->first();
+				$oa_datas = json_decode(json_encode($oa_datas), true);
+				$oa_amount_target_total = round(array_get($oa_datas,'xiaose'.date('n',strtotime($date)),0),2);
+				if($oa_amount_target_total>=600000){
+					$pro_base=1000;
+				}elseif($oa_amount_target_total>=400000){
+					$pro_base=800;
+				}elseif($oa_amount_target_total>=200000){
+					$pro_base=600;
+				}elseif($oa_amount_target_total>=100000){
+					$pro_base=400;
+				}elseif($oa_amount_target_total>=10000){
+					$pro_base=200;
+				}else{
+					$pro_base=0;
+				}
+				
+				
+				$oa_amount_target = round(array_get($oa_datas,'xiaose'.date('n',strtotime($date)),0)/date("t",strtotime($date)),2);
+				$oa_profit_target = round(array_get($oa_datas,'yewlr'.date('n',strtotime($date)),0)/date("t",strtotime($date)),2);
+				$amount_per = ($oa_amount_target)?round(round(array_get($skus_info[$key],'amount',0)/$oa_amount_target,4):0;
+				if($oa_profit_target<0){
+					$profit_per = round(2-(round(array_get($skus_info[$key],'amount',0)+array_get($skus_info[$key],'fulfillmentfee',0)+array_get($skus_info[$key],'commission',0)+array_get($skus_info[$key],'otherfee',0)+array_get($skus_info[$key],'refund',0)-array_get($skus_info[$key],'deal',0)-array_get($skus_info[$key],'coupon',0)-array_get($skus_info[$key],'cpc',0)-(array_get($skus_info[$key],'cost',0)+array_get($skus_info[$key],'tax',0)+array_get($skus_info[$key],'headshipfee',0))*array_get($skus_info[$key],'sales',0)-array_get($skus_info[$key],'fbm_storage',0)-array_get($skus_info[$key],'fba_storage',0),2)/$oa_profit_target),4);
+				}elseif($oa_profit_target>0){
+					$profit_per =round(round(array_get($skus_info[$key],'amount',0)+array_get($skus_info[$key],'fulfillmentfee',0)+array_get($skus_info[$key],'commission',0)+array_get($skus_info[$key],'otherfee',0)+array_get($skus_info[$key],'refund',0)-array_get($skus_info[$key],'deal',0)-array_get($skus_info[$key],'coupon',0)-array_get($skus_info[$key],'cpc',0)-(array_get($skus_info[$key],'cost',0)+array_get($skus_info[$key],'tax',0)+array_get($skus_info[$key],'headshipfee',0))*array_get($skus_info[$key],'sales',0)-array_get($skus_info[$key],'fbm_storage',0)-array_get($skus_info[$key],'fba_storage',0),2)/$oa_profit_target,4)
+				}else{
+					$profit_per =0;
+				}
+				$skus_info[$key]['amount_target'] = $oa_amount_target;
+				$skus_info[$key]['profit_target'] = $oa_profit_target;
+				$skus_info[$key]['amount_per'] = $amount_per;
+				$skus_info[$key]['profit_per'] = $profit_per;
+				
+				
+				
+				
+				if($profit_per>=1.6){
+					if($profit_per>5) $profit_per=5;
+					$skus_info[$key]['bonus'] = $pro_base*(1+0.2*1+0.2*1.1+0.2*1.2+($profit_per-1.6)*1.3);
+				}elseif($profit_per>=1.4){
+					$skus_info[$key]['bonus'] = $pro_base*(1+0.2*1+0.2*1.1+($profit_per-1.4)*1.2);
+				}elseif($profit_per>=1.2){
+					$skus_info[$key]['bonus'] = $pro_base*(1+0.2*1+($profit_per-1.2)*1.1);
+				}elseif($profit_per>=1){
+					$skus_info[$key]['bonus'] = $pro_base*$profit_per;
+				}else{
+					$skus_info[$key]['bonus']=0;
+				}			
 			}else{
 				 $eliminate1 = round(array_get($skus_info[$key],'amount',0)+array_get($skus_info[$key],'fulfillmentfee',0)+array_get($skus_info[$key],'commission',0)+array_get($skus_info[$key],'otherfee',0)+array_get($skus_info[$key],'refund',0)-array_get($skus_info[$key],'deal',0)-array_get($skus_info[$key],'coupon',0)-array_get($skus_info[$key],'cpc',0)-array_get($skus_info[$key],'cost_set',0)*array_get($skus_info[$key],'sales',0),2);
 				 
@@ -276,6 +332,7 @@ class SkuDaily extends Command
 				$eliminate2 = round(array_get($skus_info[$key],'unit_storage',0)/2+(array_get($skus_info[$key],'cost',0)+array_get($skus_info[$key],'tax',0)+array_get($skus_info[$key],'headshipfee',0))/2*0.015,2);
 				
 				$skus_info[$key]['eliminate2']=( $eliminate2>0)? $eliminate2:0;
+				$skus_info[$key]['bonus'] = $skus_info[$key]['eliminate1']*0.03+$skus_info[$key]['eliminate2']*0.4;
 			}
 			print_r($skus_info[$key]);
 			SkusDailyInfo::updateOrCreate(

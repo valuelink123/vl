@@ -7,6 +7,7 @@ use App\Groupdetail;
 use App\User;
 use App\Task;
 use App\Asin;
+use App\SkusDailyInfo;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Services\MultipleQueue;
@@ -38,7 +39,7 @@ class HomeController extends Controller
     {
 		$limit_bg = $limit_bu = $limit_sap_seller_id = $limit_review_user_id='';
 		
-		$sumwhere = 'length(asin)=10';
+		$sumwhere = '1=1';
 		if (Auth::user()->seller_rules) {
 			$rules = explode("-", Auth::user()->seller_rules);
 			if (array_get($rules, 0) != '*') $limit_bg = array_get($rules, 0);
@@ -103,14 +104,28 @@ class HomeController extends Controller
 		
 		$fbm_stock_info = DB::select("select sum(fbm_stock*fbm_cost) as fbm_total_amount,sum(fbm_stock) as fbm_total_stock from (select avg(fbm_stock) as fbm_stock,avg(fbm_cost) as fbm_cost from asin where $sumwhere group by item_no) as fbm_total");
 		
+		
 		$asins = $asins->take(5)->get();
 		$asins = json_decode(json_encode($asins), true);
-		$date_from = $request->get('date_from')?$request->get('date_from'):date('Y-m').'-01';
-		$date_to = $request->get('date_to')?$request->get('date_to'):date('Y-m-d');
+		$date_from = $request->get('date_from')?$request->get('date_from'):date('Y-m-d',strtotime('-32days'));
+		$date_to = $request->get('date_to')?$request->get('date_to'):date('Y-m-d',strtotime('-2days'));
+		
+		$total_info = SkusDailyInfo::select(DB::raw('sum(bonus) as bonus,sum(economic) as economic,sum(amount) as amount,sum(sales) as sales'))->whereRaw($sumwhere." and date>='$date_from' and date<='$date_to'")->first()->toArray();
+		
+		$daily_info = SkusDailyInfo::select(DB::raw('sum(bonus) as sumbonus,date'))->whereRaw($sumwhere." and date>='$date_from' and date<='$date_to'")->groupBy(['date'])->pluck('sumbonus','date');
+		
+		foreach($asins as $key=>$asin){
+			$asin_info = SkusDailyInfo::select(DB::raw('sum(bonus) as bonus,sum(economic) as economic,sum(amount) as amount,sum(sales) as sales'))->whereRaw("sku='".$asin['item_no']."' and site='".$asin['site']."' and date>='$date_from' and date<='$date_to'")->first()->toArray();
+			$asins[$key]['bonus']=$asin_info['bonus'];
+			$asins[$key]['economic']=$asin_info['economic'];
+			$asins[$key]['amount']=$asin_info['amount'];
+			$asins[$key]['sales']=$asin_info['sales'];
+			
+		}
 		
 		
-		
-		
+		$returnDate['total_info']= $total_info;
+		$returnDate['daily_info']= $daily_info;
 		$returnDate['teams']= $user_teams;
 		$returnDate['users']= $this->getUsers();
 		$returnDate['date_from']= $date_from;
