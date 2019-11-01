@@ -120,7 +120,7 @@ class GetAsin extends Command
 				'sap_warehouse_id' => trim(array_get($asin,'LGORT','')),
 				'sap_factory_id' => trim(array_get($asin,'WERKS','')),
 				'sap_shipment_id' => trim(array_get($asin,'SDABW','')),
-				'item_status' => ($new_pro)?2:intval(array_get($asin,'MATNRZT',0)),
+				'item_status' => (($new_pro)?2:intval(array_get($asin,'MATNRZT',0))),
 				'sku_ranking'=>$sku_ranking,
 				'sku_rating'=>$sku_rating,
 				'sku_review'=>$sku_review,
