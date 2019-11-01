@@ -275,14 +275,15 @@ class SkuDaily extends Command
 			$skus_info[$key]['economic'] = round(array_get($skus_info[$key],'amount',0)+array_get($skus_info[$key],'fulfillmentfee',0)+array_get($skus_info[$key],'commission',0)+array_get($skus_info[$key],'otherfee',0)+array_get($skus_info[$key],'refund',0)-array_get($skus_info[$key],'deal',0)-array_get($skus_info[$key],'coupon',0)-array_get($skus_info[$key],'cpc',0)-(array_get($skus_info[$key],'cost',0)+array_get($skus_info[$key],'tax',0)+array_get($skus_info[$key],'headshipfee',0))*array_get($skus_info[$key],'sales',0)-array_get($skus_info[$key],'fbm_storage',0)-array_get($skus_info[$key],'fba_storage',0)-array_get($skus_info[$key],'amount_used',0),2);
 			
 			if($skus_info[$key]['status']==1){
-				$skus_info[$key]['reserved'] = ($skus_info[$key]['economic']>0)?$skus_info[$key]['economic']:0;
 				$cut_fee = 0;
 				if($sku == 'AP0373' && $site =='US') $cut_fee = round(250000/date("t",strtotime($date)),2);
 				if($sku == 'CS0503' && $site =='US') $cut_fee = round(350000/date("t",strtotime($date)),2);
 				if($sku == 'CS0523' && $site =='US') $cut_fee = round(100000/date("t",strtotime($date)),2);
 				if($sku == 'HPC0133' && $site =='US') $cut_fee = round(150000/date("t",strtotime($date)),2);
 				if($sku == 'MP0602' && $site =='US') $cut_fee = round(50000/date("t",strtotime($date)),2);
-				$skus_info[$key]['bonus'] = ($skus_info[$key]['reserved']-$cut_fee)*0.04;
+				$skus_info[$key]['reserved'] = ($skus_info[$key]['economic']-$cut_fee>0)?($skus_info[$key]['economic']-$cut_fee):0;
+				
+				$skus_info[$key]['bonus'] = $skus_info[$key]['reserved']*0.04;
 			}elseif($skus_info[$key]['status']==2){
 				$oa_datas = DB::connection('oa')->table('formtable_main_193_dt1')->where('SKU',$sku)->where('zhand',$site)->first();
 				$oa_datas = json_decode(json_encode($oa_datas), true);
