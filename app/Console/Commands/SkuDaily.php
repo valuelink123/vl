@@ -44,6 +44,7 @@ class SkuDaily extends Command
      */
     public function handle()
     {	
+		
 		$date=date('Y-m-d',strtotime('-2 day'));
 		$skus_info=[];
 		$sku=$departments=[];
@@ -225,7 +226,8 @@ class SkuDaily extends Command
 			$key_s = explode('|',$key);
 			if(count($key_s)!=3) continue;
 			$sku = trim($key_s[0]);
-			$site = strtoupper(substr($key_s[1],-2));
+			$site = substr($key_s[1],-2);
+			if($site=='OM') $site='US';
 			$skus_info[$key]['sku']=$sku;
 			$skus_info[$key]['site']=strtolower('www.'.$key_s[1]);
 			$skus_info[$key]['date']=$date;
@@ -241,6 +243,7 @@ class SkuDaily extends Command
 			$tax_rate=DB::table('tax_rate')->where('site',$site)->whereIn('sku',array('OTHERSKU',$sku))->pluck('tax','sku');
 			$tax = round(((array_get($tax_rate,$sku)??array_get($tax_rate,'OTHERSKU'))??0),4);
 			$skus_info[$key]['tax']=round($skus_info[$key]['cost']*$tax,2);
+
 			//头程运费
 			$shipfee = (array_get(getShipRate(),$site.'.'.$sku)??array_get(getShipRate(),$site.'.default'))??0;
 			$skus_info[$key]['headshipfee']=round($skus_info[$key]['volume']*round($shipfee,4),2);
@@ -279,13 +282,10 @@ class SkuDaily extends Command
 				if($sku == 'CS0523' && $site =='US') $cut_fee = round(100000/date("t",strtotime($date)),2);
 				if($sku == 'HPC0133' && $site =='US') $cut_fee = round(150000/date("t",strtotime($date)),2);
 				if($sku == 'MP0602' && $site =='US') $cut_fee = round(50000/date("t",strtotime($date)),2);
-				
-
 				$skus_info[$key]['bonus'] = ($skus_info[$key]['reserved']-$cut_fee)*0.04;
 			}elseif($skus_info[$key]['status']==2){
 				$oa_datas = DB::connection('oa')->table('formtable_main_193_dt1')->where('SKU',$sku)->where('zhand',$site)->first();
 				$oa_datas = json_decode(json_encode($oa_datas), true);
-				print_r($oa_datas);
 				$oa_amount_target_total = round(array_get($oa_datas,'xiaose'.date('n',strtotime($date)),0),2);
 				if($oa_amount_target_total>=600000){
 					$pro_base=1000;
