@@ -88,7 +88,7 @@ class SkuDaily extends Command
 			if(!isset($skus_info[$key]['commission'])) $skus_info[$key]['commission']=0;
 			if(!isset($skus_info[$key]['otherfee'])) $skus_info[$key]['otherfee']=0;
 			if(!isset($skus_info[$key]['status'])) $skus_info[$key]['status']=$sku['item_status'];
-			if(!isset($skus_info[$key]['review_user_id'])) $skus_info[$key]['status']=$sku['review_user_id'];
+			if(!isset($skus_info[$key]['review_user_id'])) $skus_info[$key]['review_user_id']=$sku['review_user_id'];
 			if($sale->type=='Principal'){
 				$skus_info[$key]['amount']+=round($sale->amount*array_get($rates,$sale->currency),2);
 			}elseif($sale->type=='FBAPerUnitFulfillmentFee'){
@@ -113,7 +113,7 @@ class SkuDaily extends Command
 			$key=strtoupper(trim($sku['item_no']).'|'.$refund->MarketplaceName.'|'.$sku['sap_seller_id']);
 			if(!isset($skus_info[$key]['refund'])) $skus_info[$key]['refund']=0;
 			if(!isset($skus_info[$key]['status'])) $skus_info[$key]['status']=$sku['item_status'];
-			if(!isset($skus_info[$key]['review_user_id'])) $skus_info[$key]['status']=$sku['review_user_id'];
+			if(!isset($skus_info[$key]['review_user_id'])) $skus_info[$key]['review_user_id']=$sku['review_user_id'];
 			$skus_info[$key]['refund']+=round($refund->amount*array_get($rates,$refund->currency),2);
 		}
 		print_r('Deal相关计算开始...');
@@ -142,7 +142,7 @@ class SkuDaily extends Command
 				$key=strtoupper(trim($sku['item_no']).'|'.array_get(getSapSiteCode(),$coupon->site_code).'|'.$sku['sap_seller_id']);
 				if(!isset($skus_info[$key]['deal'])) $skus_info[$key]['deal']=0;
 				if(!isset($skus_info[$key]['status'])) $skus_info[$key]['status']=$sku['item_status'];
-				if(!isset($skus_info[$key]['review_user_id'])) $skus_info[$key]['status']=$sku['review_user_id'];
+				if(!isset($skus_info[$key]['review_user_id'])) $skus_info[$key]['review_user_id']=$sku['review_user_id'];
 				$skus_info[$key]['deal']+=round($sku_amount*array_get($rates,$coupon->currency),2);
 			}
 		}
@@ -172,7 +172,7 @@ class SkuDaily extends Command
 				$key=strtoupper(trim($sku['item_no']).'|'.array_get(getSapSiteCode(),$coupon->site_code).'|'.$sku['sap_seller_id']);
 				if(!isset($skus_info[$key]['coupon'])) $skus_info[$key]['coupon']=0;
 				if(!isset($skus_info[$key]['status'])) $skus_info[$key]['status']=$sku['item_status'];
-				if(!isset($skus_info[$key]['review_user_id'])) $skus_info[$key]['status']=$sku['review_user_id'];
+				if(!isset($skus_info[$key]['review_user_id'])) $skus_info[$key]['review_user_id']=$sku['review_user_id'];
 				$skus_info[$key]['coupon']+=round($sku_amount*array_get($rates,$coupon->currency),2);
 			}
 		}
@@ -202,7 +202,7 @@ class SkuDaily extends Command
 				$key=strtoupper(trim($sku['item_no']).'|'.array_get(getSiteUrl(),$coupon->marketplace_id).'|'.$sku['sap_seller_id']);
 				if(!isset($skus_info[$key]['cpc'])) $skus_info[$key]['cpc']=0;
 				if(!isset($skus_info[$key]['status'])) $skus_info[$key]['status']=$sku['item_status'];
-				if(!isset($skus_info[$key]['review_user_id'])) $skus_info[$key]['status']=$sku['review_user_id'];
+				if(!isset($skus_info[$key]['review_user_id'])) $skus_info[$key]['review_user_id']=$sku['review_user_id'];
 				$skus_info[$key]['cpc']+=round($sku_amount*array_get($rates,array_get(getSiteCur(),array_get(getSiteUrl(),$coupon->marketplace_id))),2);
 			}
 		}
@@ -217,7 +217,7 @@ class SkuDaily extends Command
 			$key=strtoupper(trim($sku['item_no']).'|'.str_replace('www.','',$sku['site']).'|'.$sku['sap_seller_id']);
 			if(!isset($skus_info[$key]['fba_stock'])) $skus_info[$key]['fba_stock']=0;
 			if(!isset($skus_info[$key]['status'])) $skus_info[$key]['status']=$sku['item_status'];
-			if(!isset($skus_info[$key]['review_user_id'])) $skus_info[$key]['status']=$sku['review_user_id'];
+			if(!isset($skus_info[$key]['review_user_id'])) $skus_info[$key]['review_user_id']=$sku['review_user_id'];
 			$skus_info[$key]['fba_stock']+=intval($sellersku_s->instock);		
 		}
 		
