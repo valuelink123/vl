@@ -43,9 +43,7 @@ class SkuDaily extends Command
      * @return mixed
      */
     public function handle()
-    {
-		$skus_info[$key]['tax']=round($skus_info[$key]['cost']*$tax,2);
-		
+    {	
 		$date=date('Y-m-d',strtotime('-2 day'));
 		$skus_info=[];
 		$sku=$departments=[];
