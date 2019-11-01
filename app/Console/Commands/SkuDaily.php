@@ -274,10 +274,19 @@ class SkuDaily extends Command
 			
 			if($skus_info[$key]['status']==1){
 				$skus_info[$key]['reserved'] = ($skus_info[$key]['economic']>0)?$skus_info[$key]['economic']:0;
-				$skus_info[$key]['bonus'] = $skus_info[$key]['reserved']*0.04;
+				$cut_fee = 0;
+				if($sku = 'AP0373' && $sku ='US') $cut_fee = round(250000/date("t",strtotime($date)),2);
+				if($sku = 'CS0503' && $sku ='US') $cut_fee = round(350000/date("t",strtotime($date)),2);
+				if($sku = 'CS0523' && $sku ='US') $cut_fee = round(100000/date("t",strtotime($date)),2);
+				if($sku = 'HPC0133' && $sku ='US') $cut_fee = round(150000/date("t",strtotime($date)),2);
+				if($sku = 'MP0602' && $sku ='US') $cut_fee = round(50000/date("t",strtotime($date)),2);
+				
+
+				$skus_info[$key]['bonus'] = ($skus_info[$key]['reserved']-$cut_fee)*0.04;
 			}elseif($skus_info[$key]['status']==2){
 				$oa_datas = DB::connection('oa')->table('formtable_main_193_dt1')->where('SKU',$sku)->where('zhand',$site)->first();
 				$oa_datas = json_decode(json_encode($oa_datas), true);
+				print_r($oa_datas);
 				$oa_amount_target_total = round(array_get($oa_datas,'xiaose'.date('n',strtotime($date)),0),2);
 				if($oa_amount_target_total>=600000){
 					$pro_base=1000;
