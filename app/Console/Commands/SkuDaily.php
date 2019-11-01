@@ -275,11 +275,11 @@ class SkuDaily extends Command
 			if($skus_info[$key]['status']==1){
 				$skus_info[$key]['reserved'] = ($skus_info[$key]['economic']>0)?$skus_info[$key]['economic']:0;
 				$cut_fee = 0;
-				if($sku = 'AP0373' && $sku ='US') $cut_fee = round(250000/date("t",strtotime($date)),2);
-				if($sku = 'CS0503' && $sku ='US') $cut_fee = round(350000/date("t",strtotime($date)),2);
-				if($sku = 'CS0523' && $sku ='US') $cut_fee = round(100000/date("t",strtotime($date)),2);
-				if($sku = 'HPC0133' && $sku ='US') $cut_fee = round(150000/date("t",strtotime($date)),2);
-				if($sku = 'MP0602' && $sku ='US') $cut_fee = round(50000/date("t",strtotime($date)),2);
+				if($sku == 'AP0373' && $sku =='US') $cut_fee = round(250000/date("t",strtotime($date)),2);
+				if($sku == 'CS0503' && $sku =='US') $cut_fee = round(350000/date("t",strtotime($date)),2);
+				if($sku == 'CS0523' && $sku =='US') $cut_fee = round(100000/date("t",strtotime($date)),2);
+				if($sku == 'HPC0133' && $sku =='US') $cut_fee = round(150000/date("t",strtotime($date)),2);
+				if($sku == 'MP0602' && $sku =='US') $cut_fee = round(50000/date("t",strtotime($date)),2);
 				
 
 				$skus_info[$key]['bonus'] = ($skus_info[$key]['reserved']-$cut_fee)*0.04;
@@ -343,7 +343,7 @@ class SkuDaily extends Command
 				$skus_info[$key]['eliminate2']=( $eliminate2>0)? $eliminate2:0;
 				$skus_info[$key]['bonus'] = $skus_info[$key]['eliminate1']*0.03+$skus_info[$key]['eliminate2']*0.4;
 			}
-			print_r($skus_info[$key]);
+			
 			SkusDailyInfo::updateOrCreate(
 			['sku'=>$skus_info[$key]['sku'], 'site'=>$skus_info[$key]['site'], 'date'=>$skus_info[$key]['date']]
 			,$skus_info[$key]);
