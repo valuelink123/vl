@@ -40,12 +40,20 @@ class HomeController extends Controller
 		$limit_bg = $limit_bu = $limit_sap_seller_id = $limit_review_user_id='';
 		
 		$sumwhere = '1=1';
+		$bonus_point = 0;
 		if (Auth::user()->seller_rules) {
 			$rules = explode("-", Auth::user()->seller_rules);
-			if (array_get($rules, 0) != '*') $limit_bg = array_get($rules, 0);
-			if (array_get($rules, 1) != '*') $limit_bu = array_get($rules, 1);
+			if (array_get($rules, 0) != '*'){
+				$limit_bg = array_get($rules, 0);
+				$bonus_point = 0.1;
+			}
+			if (array_get($rules, 1) != '*'){
+				$limit_bu = array_get($rules, 1);
+				$bonus_point = 0.3;
+			}
 		} elseif (Auth::user()->sap_seller_id) {
 			$limit_sap_seller_id = Auth::user()->sap_seller_id;
+			$bonus_point = 0.6;
 		} else {
 			$limit_review_user_id = Auth::user()->id;
 		}
@@ -110,20 +118,20 @@ class HomeController extends Controller
 		$date_from = $request->get('date_from')?$request->get('date_from'):date('Y-m-d',strtotime('-32days'));
 		$date_to = $request->get('date_to')?$request->get('date_to'):date('Y-m-d',strtotime('-2days'));
 		
-		$total_info = SkusDailyInfo::select(DB::raw('sum(bonus) as bonus,sum(economic) as economic,sum(amount) as amount,sum(sales) as sales'))->whereRaw($sumwhere." and date>='$date_from' and date<='$date_to'")->first()->toArray();
+		$total_info = SkusDailyInfo::select(DB::raw('sum(bonus)*'.$bonus_point.' as bonus,sum(economic) as economic,sum(amount) as amount,sum(sales) as sales'))->whereRaw($sumwhere." and date>='$date_from' and date<='$date_to'")->first()->toArray();
 		
-		$daily_info = SkusDailyInfo::select(DB::raw('sum(bonus) as sumbonus,date'))->whereRaw($sumwhere." and date>='$date_from' and date<='$date_to'")->groupBy(['date'])->pluck('sumbonus','date');
+		$daily_info = SkusDailyInfo::select(DB::raw('sum(bonus)*'.$bonus_point.' as sumbonus,date'))->whereRaw($sumwhere." and date>='$date_from' and date<='$date_to'")->groupBy(['date'])->pluck('sumbonus','date');
 		
 		foreach($asins as $key=>$asin){
 			$asin_info = SkusDailyInfo::select(DB::raw('sum(bonus) as bonus,sum(economic) as economic,sum(amount) as amount,sum(sales) as sales'))->whereRaw("sku='".$asin['item_no']."' and site='".$asin['site']."' and date>='$date_from' and date<='$date_to'")->first()->toArray();
-			$asins[$key]['bonus']=$asin_info['bonus'];
+			$asins[$key]['bonus']=$asin_info['bonus']*bonus_point;
 			$asins[$key]['economic']=$asin_info['economic'];
 			$asins[$key]['amount']=$asin_info['amount'];
 			$asins[$key]['sales']=$asin_info['sales'];
 			
 		}
-		
-		
+	
+		$returnDate['bonus_point']= $bonus_point;
 		$returnDate['total_info']= $total_info;
 		$returnDate['daily_info']= $daily_info;
 		$returnDate['teams']= $user_teams;
