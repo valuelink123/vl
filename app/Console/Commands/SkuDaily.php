@@ -240,8 +240,8 @@ class SkuDaily extends Command
 			$skus_info[$key]['volume']=($sku_base)?round($sku_base->volume/1000000,8):0;
 			$skus_info[$key]['size']=($sku_base)?intval($sku_base->size):0;
 			//关税
-			$tax_rate=DB::table('tax_rate')->where('site',$site)->whereIn('sku',array('*',$sku))->pluck('tax','sku');
-			$tax = round(((array_get($tax_rate,$sku)??array_get($tax_rate,'*'))??0),4);
+			$tax_rate=DB::table('tax_rate')->where('site',$site)->whereIn('sku',array('OTHERSKU',$sku))->pluck('tax','sku');
+			$tax = round(((array_get($tax_rate,$sku)??array_get($tax_rate,'OTHERSKU'))??0),4);
 			$skus_info[$key]['tax']=round($skus_info[$key]['cost']*$tax,2);
 			//头程运费
 			$shipfee = (array_get(getShipRate(),$site.'.'.$sku)??array_get(getShipRate(),$site.'.default'))??0;
