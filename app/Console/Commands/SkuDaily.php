@@ -296,11 +296,11 @@ class SkuDaily extends Command
 				
 				$oa_amount_target = round(array_get($oa_datas,'xiaose'.date('n',strtotime($date)),0)/date("t",strtotime($date)),2);
 				$oa_profit_target = round(array_get($oa_datas,'yewlr'.date('n',strtotime($date)),0)/date("t",strtotime($date)),2);
-				$amount_per = ($oa_amount_target)?round(round(array_get($skus_info[$key],'amount',0)/$oa_amount_target,4):0;
+				$amount_per = ($oa_amount_target)?round(array_get($skus_info[$key],'amount',0)/$oa_amount_target,4):0;
 				if($oa_profit_target<0){
 					$profit_per = round(2-(round(array_get($skus_info[$key],'amount',0)+array_get($skus_info[$key],'fulfillmentfee',0)+array_get($skus_info[$key],'commission',0)+array_get($skus_info[$key],'otherfee',0)+array_get($skus_info[$key],'refund',0)-array_get($skus_info[$key],'deal',0)-array_get($skus_info[$key],'coupon',0)-array_get($skus_info[$key],'cpc',0)-(array_get($skus_info[$key],'cost',0)+array_get($skus_info[$key],'tax',0)+array_get($skus_info[$key],'headshipfee',0))*array_get($skus_info[$key],'sales',0)-array_get($skus_info[$key],'fbm_storage',0)-array_get($skus_info[$key],'fba_storage',0),2)/$oa_profit_target),4);
 				}elseif($oa_profit_target>0){
-					$profit_per =round(round(array_get($skus_info[$key],'amount',0)+array_get($skus_info[$key],'fulfillmentfee',0)+array_get($skus_info[$key],'commission',0)+array_get($skus_info[$key],'otherfee',0)+array_get($skus_info[$key],'refund',0)-array_get($skus_info[$key],'deal',0)-array_get($skus_info[$key],'coupon',0)-array_get($skus_info[$key],'cpc',0)-(array_get($skus_info[$key],'cost',0)+array_get($skus_info[$key],'tax',0)+array_get($skus_info[$key],'headshipfee',0))*array_get($skus_info[$key],'sales',0)-array_get($skus_info[$key],'fbm_storage',0)-array_get($skus_info[$key],'fba_storage',0),2)/$oa_profit_target,4)
+					$profit_per =round(round(array_get($skus_info[$key],'amount',0)+array_get($skus_info[$key],'fulfillmentfee',0)+array_get($skus_info[$key],'commission',0)+array_get($skus_info[$key],'otherfee',0)+array_get($skus_info[$key],'refund',0)-array_get($skus_info[$key],'deal',0)-array_get($skus_info[$key],'coupon',0)-array_get($skus_info[$key],'cpc',0)-(array_get($skus_info[$key],'cost',0)+array_get($skus_info[$key],'tax',0)+array_get($skus_info[$key],'headshipfee',0))*array_get($skus_info[$key],'sales',0)-array_get($skus_info[$key],'fbm_storage',0)-array_get($skus_info[$key],'fba_storage',0),2)/$oa_profit_target,4);
 				}else{
 					$profit_per =0;
 				}
