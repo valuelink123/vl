@@ -123,8 +123,8 @@ class HomeController extends Controller
 		$daily_info = SkusDailyInfo::select(DB::raw('sum(bonus)*'.$bonus_point.' as sumbonus,date'))->whereRaw($sumwhere." and date>='$date_from' and date<='$date_to'")->groupBy(['date'])->pluck('sumbonus','date');
 		
 		foreach($asins as $key=>$asin){
-			$asin_info = SkusDailyInfo::select(DB::raw('sum(bonus) as bonus,sum(economic) as economic,sum(amount) as amount,sum(sales) as sales'))->whereRaw("sku='".$asin['item_no']."' and site='".$asin['site']."' and date>='$date_from' and date<='$date_to'")->first()->toArray();
-			$asins[$key]['bonus']=$asin_info['bonus']*bonus_point;
+			$asin_info = SkusDailyInfo::select(DB::raw('sum(bonus)*'.$bonus_point.' as bonus,sum(economic) as economic,sum(amount) as amount,sum(sales) as sales'))->whereRaw("sku='".$asin['item_no']."' and site='".$asin['site']."' and date>='$date_from' and date<='$date_to'")->first()->toArray();
+			$asins[$key]['bonus']=$asin_info['bonus'];
 			$asins[$key]['economic']=$asin_info['economic'];
 			$asins[$key]['amount']=$asin_info['amount'];
 			$asins[$key]['sales']=$asin_info['sales'];
