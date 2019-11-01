@@ -14,7 +14,8 @@ use App\Services\MultipleQueue;
 use PDO;
 use DB;
 use log;
-
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 class HomeController extends Controller
 {
     /**
@@ -160,5 +161,159 @@ class HomeController extends Controller
         }
         return $users_array;
     }
+	
+	public function Export(Request $request){
+		$limit_bg = $limit_bu = $limit_sap_seller_id = $limit_review_user_id='';
+		
+		$sumwhere = '1=1';
+		$bonus_point = 0;
+		if (Auth::user()->seller_rules) {
+			$rules = explode("-", Auth::user()->seller_rules);
+			if (array_get($rules, 0) != '*'){
+				$limit_bg = array_get($rules, 0);
+				$bonus_point = 0.1;
+			}else{
+				$bonus_point = 1;
+			}
+			if (array_get($rules, 1) != '*'){
+				$limit_bu = array_get($rules, 1);
+				$bonus_point = 0.3;
+			}
+		} elseif (Auth::user()->sap_seller_id) {
+			$limit_sap_seller_id = Auth::user()->sap_seller_id;
+			$bonus_point = 0.6;
+		} else {
+			$limit_review_user_id = Auth::user()->id;
+			$bonus_point = 0.04;
+		}
+		
+		if($limit_bg){
+
+			$sumwhere.=" and bg='$limit_bg'";
+		}
+		if($limit_bu){
+
+			$sumwhere.=" and bu='$limit_bu'";
+		}
+		if($limit_sap_seller_id){
+
+			$sumwhere.=" and sap_seller_id='$limit_sap_seller_id'";
+		}
+		if($limit_review_user_id){
+
+			$sumwhere.=" and review_user_id='$limit_review_user_id'";
+		}
+
+		if(array_get($_REQUEST,'bgbu')){
+			$bgbu = array_get($_REQUEST,'bgbu');
+			$bgbu_arr = explode('_',$bgbu);
+			if(array_get($bgbu_arr,0)) {
+				$sumwhere.=" and bg='".array_get($bgbu_arr,0)."'";
+			}
+			if(array_get($bgbu_arr,1)){
+				$sumwhere.=" and bu='".array_get($bgbu_arr,1)."'";
+			}
+		}
+		
+		
+		if(array_get($_REQUEST,'user_id')){
+			$sap_seller_id = User::where('id',array_get($_REQUEST,'user_id'))->value('sap_seller_id');
+			$select_user_id=array_get($_REQUEST,'user_id');
+			$sumwhere.=" and (sap_seller_id='$sap_seller_id' or review_user_id='$select_user_id')";
+		}
+		$date_from = $request->get('date_from')?$request->get('date_from'):date('Y-m-d',strtotime('-32days'));
+		$date_to = $request->get('date_to')?$request->get('date_to'):date('Y-m-d',strtotime('-2days'));
+		
+		$total_info = SkusDailyInfo::select(DB::raw('sku,site,sum(amount) as amount,sum(sales) as sales,sum(fulfillmentfee) as fulfillmentfee,sum(commission) as commission,sum(otherfee) as otherfee,sum(refund) as refund,sum(deal) as deal,sum(coupon) as coupon,sum(cpc) as cpc,sum(fbm_storage) as fbm_storage,sum(fba_storage) as fba_storage,sum(amount_used) as amount_used,sum(economic) as economic,sum(bonus) as bonus'))->whereRaw($sumwhere." and date>='$date_from' and date<='$date_to'")->groupBy(['sku','site'])->get()->toArray();
+		
+		
+		
+		$spreadsheet = new Spreadsheet();
+		$myWorkSheet = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($spreadsheet, 'Total');
+		$spreadsheet->addSheet($myWorkSheet, 0);
+		$myWorkSheet = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($spreadsheet, 'Details');
+		$spreadsheet->addSheet($myWorkSheet, 1);
+		$arrayData=[];
+		
+		$arrayData[] = ['物料号','站点','订单金额','销量','操作费','交易费','其他费用','退款异常','Deal营销费','Coupon营销费','CPC营销费','FBM仓储费','FBA仓储费','资金占用成本','经济效益','提成基数'];
+		foreach($total_info as $val){
+			$arrayData[] = [
+				array_get($val,'sku'),
+				array_get($val,'site'),
+				array_get($val,'amount'),
+				array_get($val,'sales'),
+				array_get($val,'fulfillmentfee'),
+				array_get($val,'commission'),
+				array_get($val,'otherfee'),
+				array_get($val,'refund'),
+				array_get($val,'deal'),
+				array_get($val,'coupon'),
+				array_get($val,'cpc'),
+				array_get($val,'fbm_storage'),
+				array_get($val,'fba_storage'),
+				array_get($val,'amount_used'),
+				array_get($val,'economic'),
+				array_get($val,'bonus')
+			];
+		}
+		$spreadsheet->getSheet(0)->fromArray($arrayData,NULL,'A1');
+		
+		$arrayData=[];
+		$daily_info = SkusDailyInfo::whereRaw($sumwhere." and date>='$date_from' and date<='$date_to'")->orderby('date','asc')->get()->toArray();
+		
+		$arrayData[] = ['物料号','站点','日期','产品状态','销售员ID','BG','BU','订单金额','销量','操作费','交易费','其他费用','退款异常','Deal营销费','Coupon营销费','CPC营销费','采购成本','体积','尺寸','关税','头程运费','FBM库存','FBM仓储费','FBA库存','FBA仓储费','单位仓储费','人工成本','库存金额','资金占用成本','经济效益','保留品基数','淘汰品基数1','淘汰品基数2','新品销售目标','新品利润目标','新品销售完成率','新品利润完成率','提成基数'];
+		foreach($daily_info as $val){
+			$arrayData[] = [
+				array_get($val,'sku'),
+				array_get($val,'site'),
+				array_get($val,'date'),
+				array_get($val,'status'),
+				array_get($val,'sap_seller_id'),
+				array_get($val,'bg'),
+				array_get($val,'bu'),
+				array_get($val,'amount'),
+				array_get($val,'sales'),
+				array_get($val,'fulfillmentfee'),
+				array_get($val,'commission'),
+				array_get($val,'otherfee'),
+				array_get($val,'refund'),
+				array_get($val,'deal'),
+				array_get($val,'coupon'),
+				array_get($val,'cpc'),
+				array_get($val,'cost'),
+				array_get($val,'volume'),
+				array_get($val,'size'),
+				array_get($val,'tax'),
+				array_get($val,'headshipfee'),
+				array_get($val,'fbm_stock'),
+				array_get($val,'fbm_storage'),
+				array_get($val,'fba_stock'),
+				array_get($val,'fba_storage'),
+				array_get($val,'unit_storage'),
+				array_get($val,'cost_set'),
+				array_get($val,'stock_amount'),
+				
+				array_get($val,'amount_used'),
+				array_get($val,'economic'),
+				
+				array_get($val,'reserved'),
+				array_get($val,'eliminate1'),
+				array_get($val,'eliminate2'),
+				array_get($val,'amount_target'),
+				array_get($val,'profit_target'),
+				array_get($val,'amount_per'),
+				array_get($val,'profit_per'),
+				array_get($val,'bonus')
+			];
+		}
+		$spreadsheet->getSheet(1)->fromArray($arrayData,NULL,'A1');
+		$spreadsheet->setActiveSheetIndex(0);
+		header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');//告诉浏览器输出07Excel文件
+		header('Content-Disposition: attachment;filename="Export_'.array_get($_REQUEST,'ExportType').'.xlsx"');//告诉浏览器输出浏览器名称
+		header('Cache-Control: max-age=0');//禁止缓存
+		$writer = new Xlsx($spreadsheet);
+		$writer->save('php://output');
+	
+	}
 
 }

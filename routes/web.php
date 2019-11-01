@@ -19,6 +19,7 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
+Route::get('/homeexport', 'HomeController@export');
 Route::resource('account', 'AccountController');
 Route::resource('template', 'TemplateController');
 Route::resource('asin', 'AsinController');

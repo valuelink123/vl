@@ -277,6 +277,9 @@ a.editable-click:hover {
 						<div class="form-group col-md-12">
 							
 							<button type="submit" class="btn blue" id="data_search">Search</button>
+							
+							
+							<button type="button" class="btn green pull-right" id="data_export" >Show Details</button>
 									
                         </div>
 
@@ -513,7 +516,9 @@ $(function() {
 		autoclose: true,
 	});
 	
-	
+	$("#data_export").click(function(){
+		location.href='/homeexport?date_from='+$("input[name='date_from']").val()+'&date_to='+$("input[name='date_to']").val()+'&user_id='+$("select[name='user_id']").val()+'&bgbu='+$("select[name='bgbu']").val();
+	});
 	
 	
 	
