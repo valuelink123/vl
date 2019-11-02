@@ -300,7 +300,7 @@
         let dtApi = $theTable.api();
 
         $("#export").click(function(){
-            location.href='/nonctg/export';
+            location.href='/nonctg/export?date_from='+$("#date_from").val()+'&date_to='+$("#date_to").val();
         });
 
         //批量发邮件

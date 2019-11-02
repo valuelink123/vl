@@ -407,7 +407,7 @@ th,td,td>span {
 
         $("#ctg-export").click(function(){
             var channel = $('#channel').val();
-            location.href='/ctg/export?channel='+channel;
+            location.href='/ctg/export?channel='+channel+'&date_from='+$("#date_from").val()+'&date_to='+$("#date_to").val();
         });
 
         //批量发邮件

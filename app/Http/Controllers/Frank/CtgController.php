@@ -250,6 +250,10 @@ class CtgController extends Controller {
 			$where .= ' and channel = '.$channel;
 		}
 
+		$date_from = $_GET['date_from'];
+		$date_to = $_GET['date_to'];
+		$where .= " and t1.created_at >= '".$date_from." 00:00:00' and t1.created_at <= '".$date_to." 23:59:59'";
+
         $sql = "
         SELECT SQL_CALC_FOUND_ROWS
             t1.created_at,

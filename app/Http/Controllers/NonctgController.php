@@ -248,6 +248,9 @@ class NonctgController extends Controller
 		$arrayData[] = $headArray;
 
 		$where = ' where 1 = 1 '.$this->getAsinWhere('t3.bg','t3.bu','t1.processor','non-ctg-show-all');
+		$date_from = $_GET['date_from'];
+		$date_to = $_GET['date_to'];
+		$where .= " and t1.date >= '".$date_from." 00:00:00' and t1.date <= '".$date_to." 23:59:59'";
 
 		$sql = "SELECT SQL_CALC_FOUND_ROWS t1.id,t1.date,t1.email,t1.email,t1.name,t1.amazon_order_id as order_id,t1.asin,t3.item_group,t3.item_no,t1.from,t1.status,t2.name AS processor,t3.seller,t3.bg,t3.bu,t1.saleschannel as saleschannel,t3.site as site,t1.sellersku as sellersku 
         FROM non_ctg t1
