@@ -280,7 +280,7 @@ class SkuDaily extends Command
 			//完成率
 			
 			$oa_datas = DB::connection('oa')->table('uf_new_pro')->where('sku',$sku)->where('site',$site)->first();
-			if(!count($oa_datas) && in_array($site,array('UK,DE,FR,IT,ES'))) $oa_datas = DB::connection('oa')->table('uf_new_pro')->where('sku',$sku)->where('site','EU')->first();
+			if(!empty($oa_datas) && in_array($site,array('UK,DE,FR,IT,ES'))) $oa_datas = DB::connection('oa')->table('uf_new_pro')->where('sku',$sku)->where('site','EU')->first();
 			$oa_datas = json_decode(json_encode($oa_datas), true);
 			$oa_amount_target_total = round(array_get($oa_datas,'xiaose'.date('n',strtotime($date)),0),2);
 			
