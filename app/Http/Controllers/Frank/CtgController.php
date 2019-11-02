@@ -117,7 +117,7 @@ class CtgController extends Controller {
 		}elseif($channel==2){
 			$table = 'b1g1';
 		}else{
-			$where .= ' and channel = '.$channel;
+			$where .= ' and t1.channel = '.$channel;
 		}
 
         $sql = "
@@ -143,8 +143,11 @@ class CtgController extends Controller {
             t4.brands,
 		    facebook_name,
 		    facebook_group,
+		    t1.review_type,
+		    rsg_requests.amazon_order_id as rsg_orderid,
 		    '{$channelName}' as channel 
         FROM {$table} t1 
+        Left join rsg_requests on rsg_requests.amazon_order_id = t1.order_id 
         LEFT JOIN client_info ON client_info.email = t1.email 
         LEFT JOIN users t2
           ON t2.id = t1.processor
@@ -190,6 +193,10 @@ class CtgController extends Controller {
 		$fbgroupConfig = getFacebookGroup();
         foreach($data as $key=>$val){
 			$data[$key]['facebook_group'] = isset($fbgroupConfig[$val['facebook_group']]) ? $fbgroupConfig[ $val['facebook_group']] : '';
+			if($val['review_type']==1 && $val['rating']<4){//系统给的评论星级，并且是差评，红色底色显示
+				$data[$key]['rating'] = '<span class="btn btn-danger btn-xs">'.$val['rating'].'</span>';
+			}
+			$data[$key]['join_rsg'] = $val['rsg_orderid'] ? 'YES' : 'NO';//是否有参加RSG活动
 		}
         $recordsTotal = $recordsFiltered = $this->queryOne('SELECT FOUND_ROWS()');
 
@@ -265,7 +272,7 @@ class CtgController extends Controller {
             t4.bus,
             t4.brands,
 		   '{$channelName}' as channel 
-        FROM {$table} t1
+        FROM {$table} t1 
         LEFT JOIN users t2
           ON t2.id = t1.processor
         LEFT JOIN (

@@ -178,6 +178,7 @@ th,td,td>span {
                         <th>Facebook Name</th>
                         <th>Group</th>
                         <th>Processor</th>
+                        <th>Join RSg</th>
                         <th>Action</th>
                     </tr>
                     </thead>
@@ -261,7 +262,7 @@ th,td,td>span {
             scrollX: 2000,
             fixedColumns:   {
 						leftColumns:3,
-						rightColumns: 2
+						rightColumns: 3
 					},
             pagingType: 'bootstrap_extended',
             processing: true,
@@ -345,6 +346,7 @@ th,td,td>span {
                 {data:'facebook_name',name:'facebook_name'},
                 {data:'facebook_group',name:'facebook_group'},
                 {data: 'processor', name: 'processor', width: "120px"},
+                {data: 'join_rsg', name: 'join_rsg',orderable: false,},
                 {
                     width: "20px",
                     data: 'order_id',
