@@ -262,7 +262,7 @@ class HomeController extends Controller
 		$arrayData=[];
 		$daily_info = SkusDailyInfo::whereRaw($sumwhere." and date>='$date_from' and date<='$date_to'")->orderby('date','asc')->get()->toArray();
 		$size_set = ['0'=>'标准','1'=>'大件'];
-		$type_set = ['0'=>'淘汰','1'=>'保留','1'=>'新品'];
+		$type_set = ['0'=>'淘汰','1'=>'保留','2'=>'新品'];
 		$seller_set = User::where('sap_seller_id','>','0')->pluck('name','sap_seller_id');
 		$arrayData[] = ['物料号','站点','日期','产品状态','销售员ID','BG','BU','订单金额','销量','操作费','交易费','其他费用','退款异常','Deal营销费','Coupon营销费','CPC营销费','采购成本','体积','尺寸','关税','头程运费','FBM库存','FBM仓储费','FBA库存','FBA仓储费','单位仓储费','人工成本','库存金额','资金占用成本','经济效益','保留品基数','淘汰品基数1','淘汰品基数2','新品销售目标','新品利润目标','新品销售完成率','新品利润完成率','提成基数'];
 		foreach($daily_info as $val){
