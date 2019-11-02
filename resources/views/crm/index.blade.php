@@ -345,7 +345,8 @@
 
         let dtApi = $theTable.api();
         $("#export").click(function(){
-            location.href='/crm/export';
+            location.href='/crm/export?date_from='+$("#date_from").val()+'&date_to='+$("#date_to").val();
+
         });
 
     </script>

@@ -43,7 +43,7 @@ class CrmController extends Controller
 		$countrys = $this->queryFields('SELECT DISTINCT country FROM client_info');
 		$froms = $this->queryFields('SELECT DISTINCT `from` FROM client_info');
 		$brands = $this->queryFields('SELECT DISTINCT brand FROM client_info');
-		$date_from=date('Y-m-d',strtotime('-90 days'));
+		$date_from=date('Y-m-d',strtotime('-30 days'));
 		$date_to=date('Y-m-d');
 		return view('crm/index',['date_from'=>$date_from,'date_to'=>$date_to,'bgs'=>$bgs,'bus'=>$bus,'users'=>$users,'countrys'=>$countrys,'froms'=>$froms,'brands'=>$brands]);
 	}
@@ -190,7 +190,27 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 	{
 		set_time_limit(0);
 		if(!Auth::user()->can(['crm-export'])) die('Permission denied -- crm-export');
-		$sql = $this->getCrmSql($request);
+		$date_from = $_GET['date_from'];
+		$date_to = $_GET['date_to'];
+
+		$where = " and t1.date >= '".$date_from." 00:00:00' and t1.date <= '".$date_to." 23:59:59'";
+		$sql = $sql = "select t1.id as id,t1.date as date,c.name as name,c.email as email,c.phone as phone,c.country as country,c.`from` as `from`,c.brand as brand,
+t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as times_negative_review,t1.times_positive_review as times_positive_review,if(num>0,num,0) as order_num,b.name as processor,b.bg as bg,b.bu as bu,c.facebook_name as facebook_name,c.facebook_group as facebook_group,c.amazon_profile_page as amazon_profile_page   
+			FROM client as t1 
+		  	left join(
+				select users.id as processor,min(name) as name,min(bg) as bg,min(bu) as bu 
+				from users 
+				left join asin on users.sap_seller_id = asin.sap_seller_id 
+				group by users.id 
+				order by users.id desc 
+			) as b on b.processor = t1.processor 
+			join (
+					select count(*) as num,client_id,max(t1.name) as name,max(t1.email) as email,max(t1.phone) as phone,max(t1.country) as country,max(t1.`from`) as `from`,max(t1.brand) as brand,any_value(facebook_name) as facebook_name,any_value(facebook_group) as facebook_group,max(amazon_profile_page) as amazon_profile_page  
+					from client_info t1 
+					left join client_order_info as t2 on t1.id = t2.ci_id 
+			  		group by client_id 
+			) as c on t1.id = c.client_id 
+			where 1 = 1 $where ";
 
 		$data = $this->queryRows($sql);
 		$arrayData = array();
