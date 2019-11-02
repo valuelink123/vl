@@ -120,6 +120,7 @@
                         <th>BU</th>
                         <th>Sales</th>
                         <th>Processor</th>
+                        <th>Join RSg</th>
                         <th> Action </th>
                     </tr>
                     </thead>
@@ -244,6 +245,7 @@
                 {data: 'bu', name: 'bu'},
                 {data: 'seller', name: 'seller'},
                 {data: 'processor', name: 'processor', width: "120px"},
+                {data: 'join_rsg', name: 'join_rsg',orderable: false,},
                 {
                     width: "20px",
                     data: 'order_id',
