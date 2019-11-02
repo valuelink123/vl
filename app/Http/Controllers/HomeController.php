@@ -240,14 +240,14 @@ class HomeController extends Controller
 		foreach($total_info as $val){
 		
 			if(array_get($val,'amount_target')<0){
-				$amount_per = round(2-array_get($val,'amount')/array_get($val,'amount_target')),4);
+				$amount_per = round(2-array_get($val,'amount')/array_get($val,'amount_target'),4);
 			}elseif(array_get($val,'amount_target')>0){
 				$amount_per =round(array_get($val,'amount')/array_get($val,'amount_target'),4);
 			}else{
 				$amount_per =0;
 			}
 			if(array_get($val,'profit_target')<0){
-				$profit_per = round(2-array_get($val,'profit')/array_get($val,'profit_target')),4);
+				$profit_per = round(2-array_get($val,'profit')/array_get($val,'profit_target'),4);
 			}elseif(array_get($val,'profit_target')>0){
 				$profit_per =round(array_get($val,'profit')/array_get($val,'profit_target'),4);
 			}else{
