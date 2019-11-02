@@ -260,7 +260,10 @@ class SkuDaily extends Command
 			//单位仓储费
 			if(isset($skus_info[$key]['sales'])){
 				$unit_fee = DB::table('unit_storage')->where('sku',$sku)->where('site',$site)->value('cost');
-				$skus_info[$key]['unit_storage']=$unit_fee*$skus_info[$key]['sales'];
+				if(in_array($site,array('UK,DE,FR,IT,ES')) && !$unit_fee){
+					$unit_fee = DB::table('unit_storage')->where('sku',$sku)->where('site','EU')->value('cost');
+				}
+				$skus_info[$key]['unit_storage']=round($unit_fee,2)*$skus_info[$key]['sales'];
 			}
 			
 			//人工设定成本
@@ -309,7 +312,7 @@ class SkuDaily extends Command
 				if($oa_profit_target<0){
 					$profit_per = round(2-(round(array_get($skus_info[$key],'amount',0)+array_get($skus_info[$key],'fulfillmentfee',0)+array_get($skus_info[$key],'commission',0)+array_get($skus_info[$key],'otherfee',0)+array_get($skus_info[$key],'refund',0)-array_get($skus_info[$key],'deal',0)-array_get($skus_info[$key],'coupon',0)-array_get($skus_info[$key],'cpc',0)-(array_get($skus_info[$key],'cost',0)+array_get($skus_info[$key],'tax',0)+array_get($skus_info[$key],'headshipfee',0))*array_get($skus_info[$key],'sales',0)-array_get($skus_info[$key],'fbm_storage',0)-array_get($skus_info[$key],'fba_storage',0),2)/$oa_profit_target),4);
 				}elseif($oa_profit_target>0){
-					$profit_per =round(round(array_get($skus_info[$key],'amount',0)+array_get($skus_info[$key],'fulfillmentfee',0)+array_get($skus_info[$key],'commission',0)+array_get($skus_info[$key],'otherfee',0)+array_get($skus_info[$key],'refund',0)-array_get($skus_info[$key],'deal',0)-array_get($skus_info[$key],'coupon',0)-array_get($skus_info[$key],'cpc',0)-(array_get($skus_info[$key],'cost',0)+array_get($skus_info[$key],'tax',0)+array_get($skus_info[$key],'headshipfee',0))*array_get($skus_info[$key],'sales',0)-array_get($skus_info[$key],'fbm_storage',0)-array_get($skus_info[$key],'fba_storage',0),2)/$oa_profit_target,4);
+					$profit_per =round(round(array_get($skus_info[$key],'amount',0)+array_get($skus_info[$key],'fulfillmentfee',0)+array_get($skus_info[$key],'commission',0)+array_get($skus_info[$key],'otherfee',0)+array_get($skus_info[$key],'refund',0)-array_get($skus_info[$key],'deal',0)-array_get($skus_info[$key],'coupon',0)-array_get($skus_info[$key],'cpc',0)-(array_get($skus_info[$key],'cost',0)*1.3+array_get($skus_info[$key],'tax',0)+array_get($skus_info[$key],'headshipfee',0))*array_get($skus_info[$key],'sales',0)-array_get($skus_info[$key],'fbm_storage',0)-array_get($skus_info[$key],'fba_storage',0),2)/$oa_profit_target,4);
 				}else{
 					$profit_per =0;
 				}
@@ -338,7 +341,7 @@ class SkuDaily extends Command
 				 
 				$skus_info[$key]['eliminate1']=( $eliminate1>0)? $eliminate1:0;
 				
-				$eliminate2 = round(array_get($skus_info[$key],'unit_storage',0)/2+(array_get($skus_info[$key],'cost',0)+array_get($skus_info[$key],'tax',0)+array_get($skus_info[$key],'headshipfee',0))/2*0.015,2);
+				$eliminate2 = round(array_get($skus_info[$key],'unit_storage',0)/2+(array_get($skus_info[$key],'cost',0)+array_get($skus_info[$key],'tax',0)+array_get($skus_info[$key],'headshipfee',0))*array_get($skus_info[$key],'sales',0)/2*0.015,2);
 				
 				$skus_info[$key]['eliminate2']=( $eliminate2>0)? $eliminate2:0;
 				$skus_info[$key]['bonus'] = $skus_info[$key]['eliminate1']*0.03+$skus_info[$key]['eliminate2']*0.4;
