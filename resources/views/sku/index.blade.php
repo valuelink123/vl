@@ -191,7 +191,7 @@ white-space: nowrap;
 						}
 						
 						
-						$target_pro = round(array_get($oa_data,str_replace('.','',$data->site).'-'.$data->item_code.'.yewlr'.date('n',strtotime($date_start)),0),2);
+						$target_pro = round(array_get($oa_data,str_replace('.','',$data->site).'-'.$data->item_code.'.ywlr'.date('n',strtotime($date_start)),0),2);
 						if($target_pro>0){
 							$complete_pro = round(array_get($sap_data,str_replace('.','',$data->site).'-'.$data->item_code.'.VVVVV',0)/$target_pro*100,2);
 						}elseif($target_pro<0){
@@ -464,7 +464,7 @@ white-space: nowrap;
 								<div class="col-md-6">
 								<div class="progress">
 									<span style="width: 100%;" class="progress-bar progress-bar-success blue-sharp">
-										{{array_get($oa_data,str_replace('.','',$data->site).'-'.$data->item_code.'.yewlr'.date('n',strtotime($date_start)),0)}}
+										{{array_get($oa_data,str_replace('.','',$data->site).'-'.$data->item_code.'.ywlr'.date('n',strtotime($date_start)),0)}}
 									</span>
 								</div>
 								</div>
