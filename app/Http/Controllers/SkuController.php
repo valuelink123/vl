@@ -106,7 +106,7 @@ max(bg) as bg,max(bu) as bu,max(sap_seller_id) as sap_seller_id from asin group 
 			if(count($match_sku)>1){
 				$vv001=$vsrhj=$vvvvv=0;
 				foreach($match_sku as $k=>$v){
-					$sku_site_arr[] = "(SKU = '".$v."' and zhand='".array_get($site_code,str_replace('.','_',$data->site),'')."')";
+					$sku_site_arr[] = "(SKU = '".$v."' and site='".array_get($site_code,str_replace('.','_',$data->site),'')."')";
 					
 					$rows = $sap->getTureSales(['sku' => $v,'site' => array_get(array_flip(getSapSiteCode()),str_replace('www.','',$data->site)),'month' => date('Ym',strtotime($date_start))]);
 					$s_vv001 = array_get($rows,'1.VV001');
@@ -335,7 +335,7 @@ max(bg) as bg,max(bu) as bu,max(sap_seller_id) as sap_seller_id from asin group 
 			if(count($match_sku)>1){
 				$vv001=$vsrhj=$vvvvv=0;
 				foreach($match_sku as $k=>$v){
-					$sku_site_arr[] = "(SKU = '".$v."' and zhand='".array_get($site_code,str_replace('.','_',$data['site']),'')."')";
+					$sku_site_arr[] = "(SKU = '".$v."' and site='".array_get($site_code,str_replace('.','_',$data['site']),'')."')";
 					
 					$rows = $sap->getTureSales(['sku' => $v,'site' => array_get(array_flip(getSapSiteCode()),str_replace('www.','',$data['site'])),'month' => date('Ym',strtotime($date_start))]);
 					$s_vv001 = array_get($rows,'1.VV001');
@@ -364,7 +364,7 @@ max(bg) as bg,max(bu) as bu,max(sap_seller_id) as sap_seller_id from asin group 
 				
 			
 			}else{
-				$sku_site_arr[] = "(SKU = '".$data['item_code']."' and zhand='".array_get($site_code,str_replace('.','_',$data['site']),'')."')";
+				$sku_site_arr[] = "(SKU = '".$data['item_code']."' and site='".array_get($site_code,str_replace('.','_',$data['site']),'')."')";
 				
 				$rows = $sap->getTureSales(['sku' => $data['item_code'],'site' => array_get(array_flip(getSapSiteCode()),str_replace('www.','',$data['site'])),'month' => date('Ym',strtotime($date_start))]);
 				$vv001 = array_get($rows,'1.VV001');
@@ -388,7 +388,7 @@ max(bg) as bg,max(bu) as bu,max(sap_seller_id) as sap_seller_id from asin group 
 			}
 			
 			
-			$oa_datas = DB::connection('oa')->table('formtable_main_193_dt1')->whereRaw('('.implode(' or ',$sku_site_arr).')')->get();
+			$oa_datas = DB::connection('oa')->table('uf_new_pro')->whereRaw('('.implode(' or ',$sku_site_arr).')')->get();
 			
 				$oa_datas=json_decode(json_encode($oa_datas), true);
 				foreach($oa_datas as $od){
@@ -427,7 +427,7 @@ max(bg) as bg,max(bu) as bu,max(sap_seller_id) as sap_seller_id from asin group 
 			}
 			
 			
-			$target_pro = round(array_get($oa_data,str_replace('.','',$data['site']).'-'.$data['item_code'].'.yewlr'.date('n',strtotime($date_start)),0),2);
+			$target_pro = round(array_get($oa_data,str_replace('.','',$data['site']).'-'.$data['item_code'].'.ywlr'.date('n',strtotime($date_start)),0),2);
 			if($target_pro>0){
 				$complete_pro = round(array_get($sap_data,str_replace('.','',$data['site']).'-'.$data['item_code'].'.VVVVV',0)/$target_pro*100,2);
 			}elseif($target_pro<0){
