@@ -66,15 +66,13 @@ class Kernel extends ConsoleKernel
         $accountList = DB::table('accounts')->get(array('id'));
         $i=$x=0;
         foreach($accountList as $account){
-            if($i>29) $i=0;
+            if($i>59) $i=0;
 			$num_i = sprintf("%02d",$i);
             $schedule->command('get:email '.$account->id)->cron($num_i.' * * * *')->name($account->id.'_get_emails_0')->withoutOverlapping();
-			$schedule->command('get:email '.$account->id)->cron(($num_i+30).' * * * *')->name($account->id.'_get_emails_30')->withoutOverlapping();
-            $i++;
-			if($x>59) $x=0;
+			//$schedule->command('get:email '.$account->id)->cron(($num_i+30).' * * * *')->name($account->id.'_get_emails_30')->withoutOverlapping();
 			$schedule->command('get:email '.$account->id.' --time=1day')->cron($x.' 18 * * *')->name($account->id.'_get_emails_18')->withoutOverlapping();
 			$schedule->command('get:email '.$account->id.' --time=1day')->cron($x.' 6 * * *')->name($account->id.'_get_emails_6')->withoutOverlapping();
-			$x++;
+			$i++;
         }
 
         $schedule->command('scan:send')->cron('*/5 * * * *')->name('sendmails')->withoutOverlapping();
