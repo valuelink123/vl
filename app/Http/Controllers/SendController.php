@@ -223,6 +223,16 @@ class SendController extends Controller
 						}
 					}
 				}
+				//去CRM那边查看是否有此邮箱的数据(因为CRM那边有现成的用户名)，如果有此邮箱的数据，把{CUSTOMER_NAME}替换成用户姓名
+				if(empty($name)) {
+					$dataRow = DB::table('client_info')->where('email', $sendbox->to_address)->first();
+					if ($dataRow) {
+						$name = $dataRow->name;
+					} else {
+						$name = '';
+					}
+				}
+
 				$content = str_replace("{CUSTOMER_NAME}",$name,$content);
 				$sendbox->subject = str_replace("{CUSTOMER_NAME}",$name,$sendbox->subject);
 

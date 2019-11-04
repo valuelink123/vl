@@ -38,6 +38,13 @@
             </button>
             @endpermission
 
+            @permission('compose')
+            <div class="btn-group">
+                <button id="batch-send" class="btn sbold blue"> Batch Send
+                </button>
+            </div>
+            @endpermission
+
             <div class="btn-group " style="float:right;">
                 <form action="{{url('/crm/import')}}" method="post" enctype="multipart/form-data">
                     <div class="col-md-12">
@@ -348,6 +355,20 @@
             location.href='/crm/export?date_from='+$("#date_from").val()+'&date_to='+$("#date_to").val();
 
         });
+
+        //批量发邮件
+        $('#batch-send').click(function(){
+            let selectedRows = dtApi.rows({selected: true})
+
+            let ctgRows = selectedRows.data().toArray().map(obj => [obj.email])
+
+            if (!ctgRows.length) {
+                toastr.error('Please select some rows first !')
+                return
+            }
+            var email = ctgRows.join(';');
+            window.open('/send/create?to_address='+email,'_blank');
+        })
 
     </script>
 
