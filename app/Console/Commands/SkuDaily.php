@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Input;
 use App\Asin;
 use App\SkusDailyInfo;
+use App\AsinDailyInfo;
 use PDO;
 use DB;
 use Log;
@@ -65,7 +66,6 @@ class SkuDaily extends Command
 		sum(Amount) as amount from finances_shipment_event where left(PostedDate,10)='$date' 
 		group by sellersku,MarketplaceName,type,currency");
 		foreach($sales as $sale){
-			
 			if($sale->MarketplaceName=='Non-Amazon'){
 				$sale->MarketplaceName = DB::connection('order')->table('finances_shipment_event')->where('sellersku',$sale->sellersku)->where('currency',$sale->currency)->orderBy('PostedDate','desc')->value('MarketplaceName');
 			}
@@ -88,6 +88,7 @@ class SkuDaily extends Command
 			if(!isset($skus_info[$key]['commission'])) $skus_info[$key]['commission']=0;
 			if(!isset($skus_info[$key]['otherfee'])) $skus_info[$key]['otherfee']=0;
 			if(!isset($skus_info[$key]['status'])) $skus_info[$key]['status']=$sku['item_status'];
+			if(!isset($skus_info[$key]['level'])) $skus_info[$key]['level']=$sku['status'];
 			if(!isset($skus_info[$key]['review_user_id'])) $skus_info[$key]['review_user_id']=$sku['review_user_id'];
 			if($sale->type=='Principal'){
 				$skus_info[$key]['amount']+=round($sale->amount*array_get($rates,$sale->currency),2);
@@ -113,8 +114,27 @@ class SkuDaily extends Command
 			$key=strtoupper(trim($sku['item_no']).'|'.$refund->MarketplaceName.'|'.$sku['sap_seller_id']);
 			if(!isset($skus_info[$key]['refund'])) $skus_info[$key]['refund']=0;
 			if(!isset($skus_info[$key]['status'])) $skus_info[$key]['status']=$sku['item_status'];
+			if(!isset($skus_info[$key]['level'])) $skus_info[$key]['level']=$sku['status'];
 			if(!isset($skus_info[$key]['review_user_id'])) $skus_info[$key]['review_user_id']=$sku['review_user_id'];
 			$skus_info[$key]['refund']+=round($refund->amount*array_get($rates,$refund->currency),2);
+		}
+		
+		print_r('退货相关计算开始...');
+		//退货明细
+		$returns =  DB::connection('order')->select("select asin,sellersku,sum(quantity) as quantity from amazon_returns
+		where left(ReturnDate,10)='$date' group by asin,sellersku");
+		foreach($returns as $return){
+			$sku = Asin::where('asin',trim($return->asin))->where('sellersku',trim($return->sellersku))->first();
+			if(!$sku) continue;
+			if(!$sku['item_no']) continue;
+			if(!$sku['sap_seller_id']) continue;
+			if(!$sku['site']) continue;
+			$key=strtoupper(trim($sku['item_no']).'|'.str_replace('www.','',$sku->site).'|'.$sku['sap_seller_id']);
+			if(!isset($skus_info[$key]['return'])) $skus_info[$key]['return']=0;
+			if(!isset($skus_info[$key]['status'])) $skus_info[$key]['status']=$sku['item_status'];
+			if(!isset($skus_info[$key]['level'])) $skus_info[$key]['level']=$sku['status'];
+			if(!isset($skus_info[$key]['review_user_id'])) $skus_info[$key]['review_user_id']=$sku['review_user_id'];
+			$skus_info[$key]['return']+=intval($return->quantity);
 		}
 		print_r('Deal相关计算开始...');
 		//deal
@@ -142,6 +162,7 @@ class SkuDaily extends Command
 				$key=strtoupper(trim($sku['item_no']).'|'.array_get(getSapSiteCode(),$coupon->site_code).'|'.$sku['sap_seller_id']);
 				if(!isset($skus_info[$key]['deal'])) $skus_info[$key]['deal']=0;
 				if(!isset($skus_info[$key]['status'])) $skus_info[$key]['status']=$sku['item_status'];
+				if(!isset($skus_info[$key]['level'])) $skus_info[$key]['level']=$sku['status'];
 				if(!isset($skus_info[$key]['review_user_id'])) $skus_info[$key]['review_user_id']=$sku['review_user_id'];
 				$skus_info[$key]['deal']+=round($sku_amount*array_get($rates,$coupon->currency),2);
 			}
@@ -172,6 +193,7 @@ class SkuDaily extends Command
 				$key=strtoupper(trim($sku['item_no']).'|'.array_get(getSapSiteCode(),$coupon->site_code).'|'.$sku['sap_seller_id']);
 				if(!isset($skus_info[$key]['coupon'])) $skus_info[$key]['coupon']=0;
 				if(!isset($skus_info[$key]['status'])) $skus_info[$key]['status']=$sku['item_status'];
+				if(!isset($skus_info[$key]['level'])) $skus_info[$key]['level']=$sku['status'];
 				if(!isset($skus_info[$key]['review_user_id'])) $skus_info[$key]['review_user_id']=$sku['review_user_id'];
 				$skus_info[$key]['coupon']+=round($sku_amount*array_get($rates,$coupon->currency),2);
 			}
@@ -202,6 +224,7 @@ class SkuDaily extends Command
 				$key=strtoupper(trim($sku['item_no']).'|'.array_get(getSiteUrl(),$coupon->marketplace_id).'|'.$sku['sap_seller_id']);
 				if(!isset($skus_info[$key]['cpc'])) $skus_info[$key]['cpc']=0;
 				if(!isset($skus_info[$key]['status'])) $skus_info[$key]['status']=$sku['item_status'];
+				if(!isset($skus_info[$key]['level'])) $skus_info[$key]['level']=$sku['status'];
 				if(!isset($skus_info[$key]['review_user_id'])) $skus_info[$key]['review_user_id']=$sku['review_user_id'];
 				$skus_info[$key]['cpc']+=round($sku_amount*array_get($rates,array_get(getSiteCur(),array_get(getSiteUrl(),$coupon->marketplace_id))),2);
 			}
@@ -217,6 +240,7 @@ class SkuDaily extends Command
 			$key=strtoupper(trim($sku['item_no']).'|'.str_replace('www.','',$sku['site']).'|'.$sku['sap_seller_id']);
 			if(!isset($skus_info[$key]['fba_stock'])) $skus_info[$key]['fba_stock']=0;
 			if(!isset($skus_info[$key]['status'])) $skus_info[$key]['status']=$sku['item_status'];
+			if(!isset($skus_info[$key]['level'])) $skus_info[$key]['level']=$sku['status'];
 			if(!isset($skus_info[$key]['review_user_id'])) $skus_info[$key]['review_user_id']=$sku['review_user_id'];
 			$skus_info[$key]['fba_stock']+=intval($sellersku_s->instock);		
 		}
@@ -361,6 +385,68 @@ class SkuDaily extends Command
 			
 			SkusDailyInfo::updateOrCreate(
 			['sku'=>$skus_info[$key]['sku'], 'site'=>$skus_info[$key]['site'], 'date'=>$skus_info[$key]['date']]
+			,$skus_info[$key]);
+		}
+		
+		
+		
+		//计算ASIN维度销量明细
+		print_r('订单相关计算开始...');
+		$skus_info=[];
+		$sales =  DB::connection('order')->select("select sellersku,MarketplaceName,type,currency,sum(quantityshipped) as sales,
+		sum(Amount) as amount from finances_shipment_event where left(PostedDate,10)='$date' 
+		group by sellersku,MarketplaceName,type,currency");
+		foreach($sales as $sale){
+			if($sale->MarketplaceName=='Non-Amazon'){
+				$sale->MarketplaceName = DB::connection('order')->table('finances_shipment_event')->where('sellersku',$sale->sellersku)->where('currency',$sale->currency)->orderBy('PostedDate','desc')->value('MarketplaceName');
+			}
+			if(strtolower($sale->MarketplaceName)=='si us prod marketplace') $sale->MarketplaceName='amazon.com';
+			if(strtolower($sale->MarketplaceName)=='si ca prod marketplace') $sale->MarketplaceName='amazon.ca';
+			if(strtolower($sale->MarketplaceName)=='si uk prod marketplace') $sale->MarketplaceName='amazon.co.uk';
+			if(strtolower($sale->MarketplaceName)=='si prod es marketplace') $sale->MarketplaceName='amazon.es';
+			if(strtolower($sale->MarketplaceName)=='si prod it marketplace') $sale->MarketplaceName='amazon.it';
+			if(strtolower($sale->MarketplaceName)=='si prod de marketplace') $sale->MarketplaceName='amazon.de';
+			if(strtolower($sale->MarketplaceName)=='si prod fr marketplace') $sale->MarketplaceName='amazon.fr';
+
+			$sku = Asin::where('site',strtolower('www.'.$sale->MarketplaceName))->where('sellersku',$sale->sellersku)->first();
+			if(!$sku) continue;
+			if(!$sku['asin']) continue;
+			if(!$sku['sap_seller_id']) continue;
+			$key=strtoupper(trim($sku['asin']).'|'.$sale->MarketplaceName.'|'.$sku['sap_seller_id']);
+			if(!isset($skus_info[$key]['amount'])) $skus_info[$key]['amount']=0;
+			if(!isset($skus_info[$key]['sales'])) $skus_info[$key]['sales']=0;
+			if(!isset($skus_info[$key]['fulfillmentfee'])) $skus_info[$key]['fulfillmentfee']=0;
+			if(!isset($skus_info[$key]['commission'])) $skus_info[$key]['commission']=0;
+			if(!isset($skus_info[$key]['otherfee'])) $skus_info[$key]['otherfee']=0;
+			if(!isset($skus_info[$key]['status'])) $skus_info[$key]['status']=$sku['item_status'];
+			if(!isset($skus_info[$key]['level'])) $skus_info[$key]['level']=$sku['status'];
+			if(!isset($skus_info[$key]['review_user_id'])) $skus_info[$key]['review_user_id']=$sku['review_user_id'];
+			if($sale->type=='Principal'){
+				$skus_info[$key]['amount']+=round($sale->amount*array_get($rates,$sale->currency),2);
+			}elseif($sale->type=='FBAPerUnitFulfillmentFee'){
+				$skus_info[$key]['sales']+=$sale->sales;
+				$skus_info[$key]['fulfillmentfee']+=round($sale->amount*array_get($rates,$sale->currency),2);
+			}elseif($sale->type=='Commission'){
+				$skus_info[$key]['commission']+=round($sale->amount*array_get($rates,$sale->currency),2);
+			}else{
+				$skus_info[$key]['otherfee']+=round($sale->amount*array_get($rates,$sale->currency),2);
+			}
+
+		}
+		
+		foreach($skus_info as $key=>$v){
+			$key_s = explode('|',$key);
+			if(count($key_s)!=3) continue;
+			$asin = trim($key_s[0]);
+			$skus_info[$key]['asin']=$asin;
+			$skus_info[$key]['site']=strtolower('www.'.$key_s[1]);
+			$skus_info[$key]['date']=$date;
+			$skus_info[$key]['sap_seller_id']=intval($key_s[2]);
+			$skus_info[$key]['bg'] = array_get($departments,$sap_seller_id.'.bg');
+			$skus_info[$key]['bu'] = array_get($departments,$sap_seller_id.'.bu');
+			
+			AsinDailyInfo::updateOrCreate(
+			['asin'=>$skus_info[$key]['asin'], 'site'=>$skus_info[$key]['site'], 'date'=>$skus_info[$key]['date']]
 			,$skus_info[$key]);
 		}
 		
