@@ -66,22 +66,24 @@ class SkuDaily extends Command
 		sum(Amount) as amount from finances_shipment_event where left(PostedDate,10)='$date' 
 		group by sellersku,MarketplaceName,type,currency");
 		foreach($sales as $sale){
-			if($sale->MarketplaceName=='Non-Amazon'){
-				$sale->MarketplaceName = DB::connection('order')->table('finances_shipment_event')->where('sellersku',$sale->sellersku)->where('currency',$sale->currency)->orderBy('PostedDate','desc')->value('MarketplaceName');
+			$match_site = $sale->MarketplaceName;
+			if($match_site=='Non-Amazon'){
+				$match_site = DB::connection('order')->table('finances_shipment_event')->where('sellersku',$sale->sellersku)->where('currency',$sale->currency)->where('MarketplaceName','<>','Non-Amazon')->orderBy('PostedDate','desc')->value('MarketplaceName');
+				if(!$match_site) continue;
 			}
-			if(strtolower($sale->MarketplaceName)=='si us prod marketplace') $sale->MarketplaceName='amazon.com';
-			if(strtolower($sale->MarketplaceName)=='si ca prod marketplace') $sale->MarketplaceName='amazon.ca';
-			if(strtolower($sale->MarketplaceName)=='si uk prod marketplace') $sale->MarketplaceName='amazon.co.uk';
-			if(strtolower($sale->MarketplaceName)=='si prod es marketplace') $sale->MarketplaceName='amazon.es';
-			if(strtolower($sale->MarketplaceName)=='si prod it marketplace') $sale->MarketplaceName='amazon.it';
-			if(strtolower($sale->MarketplaceName)=='si prod de marketplace') $sale->MarketplaceName='amazon.de';
-			if(strtolower($sale->MarketplaceName)=='si prod fr marketplace') $sale->MarketplaceName='amazon.fr';
+			if(strtolower($match_site)=='si us prod marketplace') $match_site='amazon.com';
+			if(strtolower($match_site)=='si ca prod marketplace') $match_site='amazon.ca';
+			if(strtolower($match_site)=='si uk prod marketplace') $match_site='amazon.co.uk';
+			if(strtolower($match_site)=='si prod es marketplace') $match_site='amazon.es';
+			if(strtolower($match_site)=='si prod it marketplace') $match_site='amazon.it';
+			if(strtolower($match_site)=='si prod de marketplace') $match_site='amazon.de';
+			if(strtolower($match_site)=='si prod fr marketplace') $match_site='amazon.fr';
 
-			$sku = Asin::where('site',strtolower('www.'.$sale->MarketplaceName))->where('sellersku',$sale->sellersku)->first();
+			$sku = Asin::where('site',strtolower('www.'.$match_site))->where('sellersku',$sale->sellersku)->whereRaw('length(asin)=10')->first();
 			if(!$sku) continue;
 			if(!$sku['item_no']) continue;
 			if(!$sku['sap_seller_id']) continue;
-			$key=strtoupper(trim($sku['item_no']).'|'.$sale->MarketplaceName.'|'.$sku['sap_seller_id']);
+			$key=strtoupper(trim($sku['item_no']).'|'.$match_site.'|'.$sku['sap_seller_id']);
 			if(!isset($skus_info[$key]['amount'])) $skus_info[$key]['amount']=0;
 			if(!isset($skus_info[$key]['sales'])) $skus_info[$key]['sales']=0;
 			if(!isset($skus_info[$key]['fulfillmentfee'])) $skus_info[$key]['fulfillmentfee']=0;
@@ -93,9 +95,10 @@ class SkuDaily extends Command
 			if($sale->type=='Principal'){
 				$skus_info[$key]['amount']+=round($sale->amount*array_get($rates,$sale->currency),2);
 			}elseif($sale->type=='FBAPerUnitFulfillmentFee'){
-				$skus_info[$key]['sales']+=$sale->sales;
 				$skus_info[$key]['fulfillmentfee']+=round($sale->amount*array_get($rates,$sale->currency),2);
+				if($sale->MarketplaceName=='Non-Amazon') $skus_info[$key]['sales']+=$sale->sales;
 			}elseif($sale->type=='Commission'){
+				$skus_info[$key]['sales']+=$sale->sales;
 				$skus_info[$key]['commission']+=round($sale->amount*array_get($rates,$sale->currency),2);
 			}else{
 				$skus_info[$key]['otherfee']+=round($sale->amount*array_get($rates,$sale->currency),2);
@@ -287,7 +290,7 @@ class SkuDaily extends Command
 				if(in_array($site,array('UK,DE,FR,IT,ES')) && !$unit_fee){
 					$unit_fee = DB::table('unit_storage')->where('sku',$sku)->where('site','EU')->value('cost');
 				}
-				$skus_info[$key]['unit_storage']=round($unit_fee,2)*$skus_info[$key]['sales'];
+				$skus_info[$key]['unit_storage']=round($unit_fee,2);
 			}
 			
 			//人工设定成本
@@ -377,7 +380,7 @@ class SkuDaily extends Command
 				 
 				$skus_info[$key]['eliminate1']=( $eliminate1>0)? $eliminate1:0;
 				
-				$eliminate2 = round(array_get($skus_info[$key],'unit_storage',0)/2+(array_get($skus_info[$key],'cost',0)+array_get($skus_info[$key],'tax',0)+array_get($skus_info[$key],'headshipfee',0))*array_get($skus_info[$key],'sales',0)/2*0.015,2);
+				$eliminate2 = round(array_get($skus_info[$key],'unit_storage',0)*array_get($skus_info[$key],'sales',0)/2+(array_get($skus_info[$key],'cost',0)+array_get($skus_info[$key],'tax',0)+array_get($skus_info[$key],'headshipfee',0))*array_get($skus_info[$key],'sales',0)/2*0.015,2);
 				
 				$skus_info[$key]['eliminate2']=( $eliminate2>0)? $eliminate2:0;
 				$skus_info[$key]['bonus'] = $skus_info[$key]['eliminate1']*0.03+$skus_info[$key]['eliminate2']*0.4;
@@ -397,22 +400,25 @@ class SkuDaily extends Command
 		sum(Amount) as amount from finances_shipment_event where left(PostedDate,10)='$date' 
 		group by sellersku,MarketplaceName,type,currency");
 		foreach($sales as $sale){
-			if($sale->MarketplaceName=='Non-Amazon'){
-				$sale->MarketplaceName = DB::connection('order')->table('finances_shipment_event')->where('sellersku',$sale->sellersku)->where('currency',$sale->currency)->orderBy('PostedDate','desc')->value('MarketplaceName');
+			$match_site = $sale->MarketplaceName;
+			if($match_site=='Non-Amazon'){
+				$match_site = DB::connection('order')->table('finances_shipment_event')->where('sellersku',$sale->sellersku)->where('currency',$sale->currency)->where('MarketplaceName','<>','Non-Amazon')->orderBy('PostedDate','desc')->value('MarketplaceName');
+				if(!$match_site) continue;
 			}
-			if(strtolower($sale->MarketplaceName)=='si us prod marketplace') $sale->MarketplaceName='amazon.com';
-			if(strtolower($sale->MarketplaceName)=='si ca prod marketplace') $sale->MarketplaceName='amazon.ca';
-			if(strtolower($sale->MarketplaceName)=='si uk prod marketplace') $sale->MarketplaceName='amazon.co.uk';
-			if(strtolower($sale->MarketplaceName)=='si prod es marketplace') $sale->MarketplaceName='amazon.es';
-			if(strtolower($sale->MarketplaceName)=='si prod it marketplace') $sale->MarketplaceName='amazon.it';
-			if(strtolower($sale->MarketplaceName)=='si prod de marketplace') $sale->MarketplaceName='amazon.de';
-			if(strtolower($sale->MarketplaceName)=='si prod fr marketplace') $sale->MarketplaceName='amazon.fr';
 
-			$sku = Asin::where('site',strtolower('www.'.$sale->MarketplaceName))->where('sellersku',$sale->sellersku)->first();
+			if(strtolower($match_site)=='si us prod marketplace') $match_site='amazon.com';
+			if(strtolower($match_site)=='si ca prod marketplace') $match_site='amazon.ca';
+			if(strtolower($match_site)=='si uk prod marketplace') $match_site='amazon.co.uk';
+			if(strtolower($match_site)=='si prod es marketplace') $match_site='amazon.es';
+			if(strtolower($match_site)=='si prod it marketplace') $match_site='amazon.it';
+			if(strtolower($match_site)=='si prod de marketplace') $match_site='amazon.de';
+			if(strtolower($match_site)=='si prod fr marketplace') $match_site='amazon.fr';
+
+			$sku = Asin::where('site',strtolower('www.'.$match_site))->where('sellersku',$sale->sellersku)->whereRaw('length(asin)=10')->first();
 			if(!$sku) continue;
 			if(!$sku['asin']) continue;
 			if(!$sku['sap_seller_id']) continue;
-			$key=strtoupper(trim($sku['asin']).'|'.$sale->MarketplaceName.'|'.$sku['sap_seller_id']);
+			$key=strtoupper(trim($sku['asin']).'|'.$match_site.'|'.$sku['sap_seller_id']);
 			if(!isset($skus_info[$key]['amount'])) $skus_info[$key]['amount']=0;
 			if(!isset($skus_info[$key]['sales'])) $skus_info[$key]['sales']=0;
 			if(!isset($skus_info[$key]['fulfillmentfee'])) $skus_info[$key]['fulfillmentfee']=0;
@@ -424,9 +430,10 @@ class SkuDaily extends Command
 			if($sale->type=='Principal'){
 				$skus_info[$key]['amount']+=round($sale->amount*array_get($rates,$sale->currency),2);
 			}elseif($sale->type=='FBAPerUnitFulfillmentFee'){
-				$skus_info[$key]['sales']+=$sale->sales;
 				$skus_info[$key]['fulfillmentfee']+=round($sale->amount*array_get($rates,$sale->currency),2);
+				if($sale->MarketplaceName=='Non-Amazon') $skus_info[$key]['sales']+=$sale->sales;
 			}elseif($sale->type=='Commission'){
+				$skus_info[$key]['sales']+=$sale->sales;
 				$skus_info[$key]['commission']+=round($sale->amount*array_get($rates,$sale->currency),2);
 			}else{
 				$skus_info[$key]['otherfee']+=round($sale->amount*array_get($rates,$sale->currency),2);
@@ -442,8 +449,8 @@ class SkuDaily extends Command
 			$skus_info[$key]['site']=strtolower('www.'.$key_s[1]);
 			$skus_info[$key]['date']=$date;
 			$skus_info[$key]['sap_seller_id']=intval($key_s[2]);
-			$skus_info[$key]['bg'] = array_get($departments,$sap_seller_id.'.bg');
-			$skus_info[$key]['bu'] = array_get($departments,$sap_seller_id.'.bu');
+			$skus_info[$key]['bg'] = array_get($departments,$skus_info[$key]['sap_seller_id'].'.bg');
+			$skus_info[$key]['bu'] = array_get($departments,$skus_info[$key]['sap_seller_id'].'.bu');
 			
 			AsinDailyInfo::updateOrCreate(
 			['asin'=>$skus_info[$key]['asin'], 'site'=>$skus_info[$key]['site'], 'date'=>$skus_info[$key]['date']]
