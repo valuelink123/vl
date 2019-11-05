@@ -227,7 +227,7 @@ class HomeController extends Controller
 		$date_from = $request->get('date_from')?$request->get('date_from'):date('Y-m-d',strtotime('-32days'));
 		$date_to = $request->get('date_to')?$request->get('date_to'):date('Y-m-d',strtotime('-2days'));
 
-		$total_info = SkusDailyInfo::select(DB::raw('sku,site,sum(amount) as amount,sum(sales) as sales,sum((cost+tax+headshipfee)*sales) as total_cost,sum(fulfillmentfee) as fulfillmentfee,sum(commission) as commission,sum(otherfee) as otherfee,sum(refund) as refund,sum(return) as return,sum(deal) as deal,sum(coupon) as coupon,sum(cpc) as cpc,sum(fbm_storage) as fbm_storage,sum(fba_storage) as fba_storage,sum(amount_used) as amount_used,sum(economic) as economic,sum(profit) as profit,sum(amount_target) as amount_target,sum(profit_target) as profit_target,sum(bonus) as bonus'))->whereRaw($sumwhere." and date>='$date_from' and date<='$date_to'")->groupBy(['sku','site'])->get()->toArray();
+		$total_info = SkusDailyInfo::select(DB::raw('sku,site,sum(amount) as amount,sum(sales) as sales,sum((cost+tax+headshipfee)*sales) as total_cost,sum(fulfillmentfee) as fulfillmentfee,sum(commission) as commission,sum(otherfee) as otherfee,sum(refund) as refund,sum(returnqty) as returnqty,sum(deal) as deal,sum(coupon) as coupon,sum(cpc) as cpc,sum(fbm_storage) as fbm_storage,sum(fba_storage) as fba_storage,sum(amount_used) as amount_used,sum(economic) as economic,sum(profit) as profit,sum(amount_target) as amount_target,sum(profit_target) as profit_target,sum(bonus) as bonus'))->whereRaw($sumwhere." and date>='$date_from' and date<='$date_to'")->groupBy(['sku','site'])->get()->toArray();
 		
 		
 		
@@ -265,7 +265,7 @@ class HomeController extends Controller
 				array_get($val,'commission'),
 				array_get($val,'otherfee'),
 				array_get($val,'refund'),
-				array_get($val,'return'),
+				array_get($val,'returnqty'),
 				array_get($val,'deal'),
 				array_get($val,'coupon'),
 				array_get($val,'cpc'),
@@ -311,7 +311,7 @@ class HomeController extends Controller
 				array_get($val,'commission'),
 				array_get($val,'otherfee'),
 				array_get($val,'refund'),
-				array_get($val,'return'),
+				array_get($val,'returnqty'),
 				array_get($val,'deal'),
 				array_get($val,'coupon'),
 				array_get($val,'cpc'),

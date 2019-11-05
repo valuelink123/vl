@@ -133,11 +133,11 @@ class SkuDaily extends Command
 			if(!$sku['sap_seller_id']) continue;
 			if(!$sku['site']) continue;
 			$key=strtoupper(trim($sku['item_no']).'|'.str_replace('www.','',$sku->site).'|'.$sku['sap_seller_id']);
-			if(!isset($skus_info[$key]['return'])) $skus_info[$key]['return']=0;
+			if(!isset($skus_info[$key]['returnqty'])) $skus_info[$key]['returnqty']=0;
 			if(!isset($skus_info[$key]['status'])) $skus_info[$key]['status']=$sku['item_status'];
 			if(!isset($skus_info[$key]['level'])) $skus_info[$key]['level']=$sku['status'];
 			if(!isset($skus_info[$key]['review_user_id'])) $skus_info[$key]['review_user_id']=$sku['review_user_id'];
-			$skus_info[$key]['return']+=intval($return->quantity);
+			$skus_info[$key]['returnqty']+=intval($return->quantity);
 		}
 		print_r('Deal相关计算开始...');
 		//deal
