@@ -18,7 +18,7 @@ class SkuDaily extends Command
      *
      * @var string
      */
-    protected $signature = 'scan:skudaily';
+    protected $signature = 'scan:skudaily {--time=}';
 
     /**
      * The console command description.
@@ -45,8 +45,9 @@ class SkuDaily extends Command
      */
     public function handle()
     {	
-		
-		$date=date('Y-m-d',strtotime('-2 day'));
+		$time =  $this->option('time');
+        if(!$time) $time='2day';
+		$date=date('Y-m-d',strtotime('-'.$time));
 		$skus_info=[];
 		$sku=$departments=[];
 		//取汇率
