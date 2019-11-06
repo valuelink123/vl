@@ -23,7 +23,7 @@ class SendEmails extends Command
      *
      * @var string
      */
-    protected $signature = 'scan:send';
+    protected $signature = 'scan:send {Id}';
 
     /**
      * The console command description.
@@ -50,13 +50,15 @@ class SendEmails extends Command
      */
     public function handle()
     {
-		set_time_limit(300);
+		set_time_limit(1140);
+		$Id =  $this->argument('Id');
         $count = $smtp_array = $signature_arrays = array();
         $command = $this;
-        $smtp_config =  Accounts::whereNotNull('smtp_host')->whereNotNull('smtp_port')->whereNotNull('smtp_ssl')->get();
-		
+        $smtp_config =  Accounts::where('id',$Id)->whereNotNull('smtp_host')->whereNotNull('smtp_port')->whereNotNull('smtp_ssl')->get();
+		$select_mail = '';
         foreach($smtp_config as $smtp_value){
             $smtp_arrays[strtolower(trim($smtp_value->account_email))] = array('password'=>$smtp_value->password,'smtp_host'=>$smtp_value->smtp_host,'smtp_port'=>$smtp_value->smtp_port,'smtp_ssl'=>$smtp_value->smtp_ssl);
+			$select_mail=strtolower(trim($smtp_value->account_email));
         }
 		
 		$signature_config =  Accounts::whereNotNull('signature')->get();
@@ -66,7 +68,7 @@ class SendEmails extends Command
 		
 		
 		
-        $tasks = Sendbox::where('status','Waiting')->where('plan_date','<',strtotime(date('Y-m-d H:i:s')))->where('error_count','<',1)->orderBy('from_address','asc')->take(50)->get();
+        $tasks = Sendbox::where('status','Waiting')->where('from_address',$select_mail)->where('plan_date','<',strtotime(date('Y-m-d H:i:s')))->where('error_count','<',1)->orderBy('from_address','asc')->take(120)->get();
 		$this->run_email = '';
 		foreach ($tasks as $task) {
 

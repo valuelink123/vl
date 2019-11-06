@@ -73,9 +73,18 @@ class Kernel extends ConsoleKernel
 			$schedule->command('get:email '.$account->id.' --time=1day')->cron($x.' 18 * * *')->name($account->id.'_get_emails_18')->withoutOverlapping();
 			$schedule->command('get:email '.$account->id.' --time=1day')->cron($x.' 6 * * *')->name($account->id.'_get_emails_6')->withoutOverlapping();
 			$i++;
+			
+			if($x>19) $x=0;
+			$num_x = sprintf("%02d",$x);
+			//$schedule->command('scan:send '.$account->id)->cron($num_x.' * * * *')->name($account->id.'sendmails_19')->withoutOverlapping();
+			//$schedule->command('scan:send '.$account->id)->cron($num_x+20.' * * * *')->name($account->id.'sendmails_39')->withoutOverlapping();
+			//$schedule->command('scan:send '.$account->id)->cron($num_x+40.' * * * *')->name($account->id.'sendmails_59')->withoutOverlapping();
+			$x++;
+			
+			
         }
 
-        $schedule->command('scan:send')->cron('*/5 * * * *')->name('sendmails')->withoutOverlapping();
+        
 		$schedule->command('get:order')->cron('*/30 * * * *')->name('getOrder')->withoutOverlapping();
 		$schedule->command('get:review 7days')->cron('0 */4 * * *')->name('getreviews')->withoutOverlapping();
 		$schedule->command('get:star 5days')->twiceDaily(11, 23)->name('getstars')->withoutOverlapping();
