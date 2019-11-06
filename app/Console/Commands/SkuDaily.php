@@ -92,13 +92,13 @@ class SkuDaily extends Command
 			if(!isset($skus_info[$key]['status'])) $skus_info[$key]['status']=$sku['item_status'];
 			if(!isset($skus_info[$key]['level'])) $skus_info[$key]['level']=$sku['status'];
 			if(!isset($skus_info[$key]['review_user_id'])) $skus_info[$key]['review_user_id']=$sku['review_user_id'];
-			if($sale->type=='Principal'){
+			if(in_array($sale->type,['Principal','CostOfPointsGranted','GiftWrap','GiftWrapTax','PaymentMethodFee','ShippingCharge','ShippingTax','Tax','LowValueGoodsTax-Principal','LowValueGoodsTax-Shipping','MarketplaceFacilitatorTax-Other','MarketplaceFacilitatorTax-Principal','MarketplaceFacilitatorTax-Shipping','PromotionMetaDataDefinitionValue'])){
 				$skus_info[$key]['amount']+=round($sale->amount*array_get($rates,$sale->currency),2);
-			}elseif($sale->type=='FBAPerUnitFulfillmentFee'){
+			}elseif(in_array($sale->type,['FBAPerUnitFulfillmentFee','CODChargeback','GiftwrapChargeback','ShippingChargeback'])){
 				$skus_info[$key]['fulfillmentfee']+=round($sale->amount*array_get($rates,$sale->currency),2);
-				if($sale->MarketplaceName=='Non-Amazon') $skus_info[$key]['sales']+=$sale->sales;
-			}elseif($sale->type=='Commission'){
-				$skus_info[$key]['sales']+=$sale->sales;
+				if($sale->MarketplaceName=='Non-Amazon' && $sale->type=='FBAPerUnitFulfillmentFee') $skus_info[$key]['sales']+=$sale->sales;
+			}elseif(in_array($sale->type,['Commission','ShippingHB'])){
+				if($sale->type == 'Commission') $skus_info[$key]['sales']+=$sale->sales;
 				$skus_info[$key]['commission']+=round($sale->amount*array_get($rates,$sale->currency),2);
 			}else{
 				$skus_info[$key]['otherfee']+=round($sale->amount*array_get($rates,$sale->currency),2);
@@ -107,19 +107,31 @@ class SkuDaily extends Command
 		}
 		print_r('退款相关计算开始...');
 		//退款明细
-		$refunds =  DB::connection('order')->select("select MarketplaceName,sellersku,currency,sum(Amount) as amount from finances_refund_event
-		where left(PostedDate,10)='$date' group by MarketplaceName,SellerSKU,Currency");
+		$refunds =  DB::connection('order')->select("select MarketplaceName,sellersku,type,currency,sum(Amount) as amount from finances_refund_event
+		where left(PostedDate,10)='$date' group by MarketplaceName,SellerSKU,type,Currency");
 		foreach($refunds as $refund){
 			$sku = Asin::where('site',strtolower('www.'.$refund->MarketplaceName))->where('sellersku',$refund->sellersku)->first();
 			if(!$sku) continue;
 			if(!$sku['item_no']) continue;
 			if(!$sku['sap_seller_id']) continue;
 			$key=strtoupper(trim($sku['item_no']).'|'.$refund->MarketplaceName.'|'.$sku['sap_seller_id']);
-			if(!isset($skus_info[$key]['refund'])) $skus_info[$key]['refund']=0;
+			if(!isset($skus_info[$key]['amount'])) $skus_info[$key]['amount']=0;
+			if(!isset($skus_info[$key]['fulfillmentfee'])) $skus_info[$key]['fulfillmentfee']=0;
+			if(!isset($skus_info[$key]['commission'])) $skus_info[$key]['commission']=0;
+			if(!isset($skus_info[$key]['otherfee'])) $skus_info[$key]['otherfee']=0;
 			if(!isset($skus_info[$key]['status'])) $skus_info[$key]['status']=$sku['item_status'];
 			if(!isset($skus_info[$key]['level'])) $skus_info[$key]['level']=$sku['status'];
 			if(!isset($skus_info[$key]['review_user_id'])) $skus_info[$key]['review_user_id']=$sku['review_user_id'];
-			$skus_info[$key]['refund']+=round($refund->amount*array_get($rates,$refund->currency),2);
+			if(in_array($refund->type,['CostOfPointsReturned','GiftWrap','GiftWrapTax','Goodwill','PointsAdjusted','Principal','RestockingFee','ShippingCharge','ShippingTax','Tax','LowValueGoodsTax-Principal','LowValueGoodsTax-Shipping','MarketplaceFacilitatorTax-Other','MarketplaceFacilitatorTax-Principal','MarketplaceFacilitatorTax-RestockingFee','MarketplaceFacilitatorTax-Shipping','PromotionMetaDataDefinitionValue'])){
+				$skus_info[$key]['amount']+=round($refund->amount*array_get($rates,$refund->currency),2);
+			}elseif(in_array($refund->type,['GiftwrapChargeback','ShippingChargeback'])){
+				$skus_info[$key]['fulfillmentfee']+=round($refund->amount*array_get($rates,$refund->currency),2);
+			}elseif(in_array($refund->type,['Commission','RefundCommission'])){
+				$skus_info[$key]['commission']+=round($refund->amount*array_get($rates,$refund->currency),2);
+			}else{
+				$skus_info[$key]['otherfee']+=round($refund->amount*array_get($rates,$refund->currency),2);
+			}
+
 		}
 		
 		print_r('退货相关计算开始...');
@@ -134,10 +146,12 @@ class SkuDaily extends Command
 			if(!$sku['site']) continue;
 			$key=strtoupper(trim($sku['item_no']).'|'.str_replace('www.','',$sku->site).'|'.$sku['sap_seller_id']);
 			if(!isset($skus_info[$key]['returnqty'])) $skus_info[$key]['returnqty']=0;
+			if(!isset($skus_info[$key]['sales'])) $skus_info[$key]['sales']=0;
 			if(!isset($skus_info[$key]['status'])) $skus_info[$key]['status']=$sku['item_status'];
 			if(!isset($skus_info[$key]['level'])) $skus_info[$key]['level']=$sku['status'];
 			if(!isset($skus_info[$key]['review_user_id'])) $skus_info[$key]['review_user_id']=$sku['review_user_id'];
 			$skus_info[$key]['returnqty']+=intval($return->quantity);
+			$skus_info[$key]['sales']=$skus_info[$key]['sales']-intval($return->quantity);
 		}
 		print_r('Deal相关计算开始...');
 		//deal
@@ -302,7 +316,7 @@ class SkuDaily extends Command
 			$skus_info[$key]['amount_used']=round($skus_info[$key]['stock_amount']*0.015/date("t",strtotime($date)),2);
 			
 			//经济效益
-			$skus_info[$key]['economic'] = round(array_get($skus_info[$key],'amount',0)+array_get($skus_info[$key],'fulfillmentfee',0)+array_get($skus_info[$key],'commission',0)+array_get($skus_info[$key],'otherfee',0)+array_get($skus_info[$key],'refund',0)-array_get($skus_info[$key],'deal',0)-array_get($skus_info[$key],'coupon',0)-array_get($skus_info[$key],'cpc',0)-(array_get($skus_info[$key],'cost',0)+array_get($skus_info[$key],'tax',0)+array_get($skus_info[$key],'headshipfee',0))*array_get($skus_info[$key],'sales',0)-array_get($skus_info[$key],'fbm_storage',0)-array_get($skus_info[$key],'fba_storage',0)-array_get($skus_info[$key],'amount_used',0),2);
+			$skus_info[$key]['economic'] = round(array_get($skus_info[$key],'amount',0)+array_get($skus_info[$key],'fulfillmentfee',0)+array_get($skus_info[$key],'commission',0)+array_get($skus_info[$key],'otherfee',0)-array_get($skus_info[$key],'deal',0)-array_get($skus_info[$key],'coupon',0)-array_get($skus_info[$key],'cpc',0)-(array_get($skus_info[$key],'cost',0)+array_get($skus_info[$key],'tax',0)+array_get($skus_info[$key],'headshipfee',0))*array_get($skus_info[$key],'sales',0)-array_get($skus_info[$key],'fbm_storage',0)-array_get($skus_info[$key],'fba_storage',0)-array_get($skus_info[$key],'amount_used',0),2);
 			
 			//完成率
 			
@@ -313,7 +327,7 @@ class SkuDaily extends Command
 			
 			$oa_amount_target = round(array_get($oa_datas,'xiaose'.date('n',strtotime($date)),0)/date("t",strtotime($date)),2);
 			$oa_profit_target = round(array_get($oa_datas,'yewjlr'.date('n',strtotime($date)),0)/date("t",strtotime($date)),2);
-			$skus_info[$key]['profit'] = round(array_get($skus_info[$key],'amount',0)+array_get($skus_info[$key],'fulfillmentfee',0)+array_get($skus_info[$key],'commission',0)+array_get($skus_info[$key],'otherfee',0)+array_get($skus_info[$key],'refund',0)-array_get($skus_info[$key],'deal',0)-array_get($skus_info[$key],'coupon',0)-array_get($skus_info[$key],'cpc',0)-(array_get($skus_info[$key],'cost',0)*1.3+array_get($skus_info[$key],'tax',0)+array_get($skus_info[$key],'headshipfee',0))*array_get($skus_info[$key],'sales',0)-array_get($skus_info[$key],'fbm_storage',0)-array_get($skus_info[$key],'fba_storage',0),2);
+			$skus_info[$key]['profit'] = round(array_get($skus_info[$key],'amount',0)+array_get($skus_info[$key],'fulfillmentfee',0)+array_get($skus_info[$key],'commission',0)+array_get($skus_info[$key],'otherfee',0)-array_get($skus_info[$key],'deal',0)-array_get($skus_info[$key],'coupon',0)-array_get($skus_info[$key],'cpc',0)-(array_get($skus_info[$key],'cost',0)*1.3+array_get($skus_info[$key],'tax',0)+array_get($skus_info[$key],'headshipfee',0))*array_get($skus_info[$key],'sales',0)-array_get($skus_info[$key],'fbm_storage',0)-array_get($skus_info[$key],'fba_storage',0),2);
 			
 			if($oa_amount_target<0){
 				$amount_per = round(2-array_get($skus_info[$key],'amount',0)/$oa_amount_target,4);
@@ -376,7 +390,7 @@ class SkuDaily extends Command
 					$skus_info[$key]['bonus']=0;
 				}			
 			}else{
-				 $eliminate1 = round(array_get($skus_info[$key],'amount',0)+array_get($skus_info[$key],'fulfillmentfee',0)+array_get($skus_info[$key],'commission',0)+array_get($skus_info[$key],'otherfee',0)+array_get($skus_info[$key],'refund',0)-array_get($skus_info[$key],'deal',0)-array_get($skus_info[$key],'coupon',0)-array_get($skus_info[$key],'cpc',0)-array_get($skus_info[$key],'cost_set',0)*array_get($skus_info[$key],'sales',0),2);
+				 $eliminate1 = round(array_get($skus_info[$key],'amount',0)+array_get($skus_info[$key],'fulfillmentfee',0)+array_get($skus_info[$key],'commission',0)+array_get($skus_info[$key],'otherfee',0)-array_get($skus_info[$key],'deal',0)-array_get($skus_info[$key],'coupon',0)-array_get($skus_info[$key],'cpc',0)-array_get($skus_info[$key],'cost_set',0)*array_get($skus_info[$key],'sales',0),2);
 				 
 				$skus_info[$key]['eliminate1']=( $eliminate1>0)? $eliminate1:0;
 				

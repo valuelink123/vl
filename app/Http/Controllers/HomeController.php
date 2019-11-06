@@ -129,12 +129,12 @@ class HomeController extends Controller
 		
 		foreach($asins as $key=>$asin){
 			$sku_info = SkusDailyInfo::select(DB::raw('sum(bonus)*'.$bonus_point.' as bonus,sum(economic) as economic'))->whereRaw("sku='".$asin['item_no']."' and site='".$asin['site']."' and date>='$date_from' and date<='$date_to'")->first()->toArray();
-			$asins[$key]['bonus']=$sku_info['bonus'];
-			$asins[$key]['economic']=$sku_info['economic'];
+			$asins[$key]['bonus']=array_get($sku_info,'bonus',0);
+			$asins[$key]['economic']=array_get($sku_info,'economic',0);
 			
 			$asin_info = AsinDailyInfo::select(DB::raw('sum(amount) as amount,sum(sales) as sales'))->whereRaw("asin='".$asin['asin']."' and site='".$asin['site']."' and date>='$date_from' and date<='$date_to'")->first()->toArray();
-			$asins[$key]['amount']=$asin_info['amount'];
-			$asins[$key]['sales']=$asin_info['sales'];
+			$asins[$key]['amount']=array_get($asin_info,'amount',0);
+			$asins[$key]['sales']=array_get($asin_info,'sales',0);
 		}
 	
 		$returnDate['bonus_point']= $bonus_point;
@@ -227,7 +227,7 @@ class HomeController extends Controller
 		$date_from = $request->get('date_from')?$request->get('date_from'):date('Y-m-d',strtotime('-32days'));
 		$date_to = $request->get('date_to')?$request->get('date_to'):date('Y-m-d',strtotime('-2days'));
 
-		$total_info = SkusDailyInfo::select(DB::raw('sku,site,sum(amount) as amount,sum(sales) as sales,sum((cost+tax+headshipfee)*sales) as total_cost,sum(fulfillmentfee) as fulfillmentfee,sum(commission) as commission,sum(otherfee) as otherfee,sum(refund) as refund,sum(returnqty) as returnqty,sum(deal) as deal,sum(coupon) as coupon,sum(cpc) as cpc,sum(fbm_storage) as fbm_storage,sum(fba_storage) as fba_storage,sum(amount_used) as amount_used,sum(economic) as economic,sum(profit) as profit,sum(amount_target) as amount_target,sum(profit_target) as profit_target,sum(bonus) as bonus'))->whereRaw($sumwhere." and date>='$date_from' and date<='$date_to'")->groupBy(['sku','site'])->get()->toArray();
+		$total_info = SkusDailyInfo::select(DB::raw('sku,site,sum(amount) as amount,sum(sales) as sales,sum((cost+tax+headshipfee)*sales) as total_cost,sum(fulfillmentfee) as fulfillmentfee,sum(commission) as commission,sum(otherfee) as otherfee,sum(returnqty) as returnqty,sum(deal) as deal,sum(coupon) as coupon,sum(cpc) as cpc,sum(fbm_storage) as fbm_storage,sum(fba_storage) as fba_storage,sum(amount_used) as amount_used,sum(economic) as economic,sum(profit) as profit,sum(amount_target) as amount_target,sum(profit_target) as profit_target,sum(bonus) as bonus'))->whereRaw($sumwhere." and date>='$date_from' and date<='$date_to'")->groupBy(['sku','site'])->get()->toArray();
 		
 		
 		
@@ -238,7 +238,7 @@ class HomeController extends Controller
 		$spreadsheet->addSheet($myWorkSheet, 1);
 		$arrayData=[];
 		
-		$arrayData[] = ['物料号','站点','订单金额','销量','总成本','操作费','交易费','其他费用','退款异常','退货数量','Deal营销费','Coupon营销费','CPC营销费','FBM仓储费','FBA仓储费','资金占用成本','经济效益','业务净利润','销售目标','利润目标','销售完成率','利润完成率','提成基数'];
+		$arrayData[] = ['物料号','站点','订单金额','销量','总成本','操作费','交易费','其他费用','退货数量','Deal营销费','Coupon营销费','CPC营销费','FBM仓储费','FBA仓储费','资金占用成本','经济效益','业务净利润','销售目标','利润目标','销售完成率','利润完成率','提成基数'];
 		foreach($total_info as $val){
 		
 			if(array_get($val,'amount_target')<0){
@@ -288,7 +288,7 @@ class HomeController extends Controller
 		$size_set = ['0'=>'标准','1'=>'大件'];
 		$type_set = ['0'=>'淘汰','1'=>'保留','2'=>'新品'];
 		$seller_set = User::where('sap_seller_id','>','0')->pluck('name','sap_seller_id');
-		$arrayData[] = ['物料号','站点','日期','产品状态','销售员ID','BG','BU','采购单价','体积','尺寸','关税单价','头程运费单价','单位仓储费','人工成本','订单金额','销量','操作费','交易费','其他费用','退款异常','退货数量','Deal营销费','Coupon营销费','CPC营销费','FBM库存','FBM仓储费','FBA库存','FBA仓储费','库存金额','资金占用成本','经济效益','业务净利润','保留品基数','淘汰品基数1','淘汰品基数2','销售目标','利润目标','销售完成率','利润完成率','提成基数'];
+		$arrayData[] = ['物料号','站点','日期','产品状态','销售员ID','BG','BU','采购单价','体积','尺寸','关税单价','头程运费单价','单位仓储费','人工成本','订单金额','销量','操作费','交易费','其他费用','退货数量','Deal营销费','Coupon营销费','CPC营销费','FBM库存','FBM仓储费','FBA库存','FBA仓储费','库存金额','资金占用成本','经济效益','业务净利润','保留品基数','淘汰品基数1','淘汰品基数2','销售目标','利润目标','销售完成率','利润完成率','提成基数'];
 		foreach($daily_info as $val){
 			$arrayData[] = [
 				array_get($val,'sku'),
@@ -310,7 +310,6 @@ class HomeController extends Controller
 				array_get($val,'fulfillmentfee'),
 				array_get($val,'commission'),
 				array_get($val,'otherfee'),
-				array_get($val,'refund'),
 				array_get($val,'returnqty'),
 				array_get($val,'deal'),
 				array_get($val,'coupon'),
