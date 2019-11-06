@@ -77,8 +77,8 @@ class Kernel extends ConsoleKernel
 			if($x>19) $x=0;
 			$num_x = sprintf("%02d",$x);
 			$schedule->command('scan:send '.$account->id)->cron($num_x.' * * * *')->name($account->id.'sendmails_19')->withoutOverlapping();
-			$schedule->command('scan:send '.$account->id)->cron($num_x+20.' * * * *')->name($account->id.'sendmails_39')->withoutOverlapping();
-			$schedule->command('scan:send '.$account->id)->cron($num_x+40.' * * * *')->name($account->id.'sendmails_59')->withoutOverlapping();
+			$schedule->command('scan:send '.$account->id)->cron(($num_x+20).' * * * *')->name($account->id.'sendmails_39')->withoutOverlapping();
+			$schedule->command('scan:send '.$account->id)->cron(($num_x+40).' * * * *')->name($account->id.'sendmails_59')->withoutOverlapping();
 			$x++;
 			
 			
