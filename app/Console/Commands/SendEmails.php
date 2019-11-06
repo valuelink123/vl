@@ -57,7 +57,7 @@ class SendEmails extends Command
 		$select_mail =  Accounts::where('id',$Id)->value('account_email');
 		$select_mail =  strtolower(trim($select_mail));
         foreach($smtp_config as $smtp_value){
-            $smtp_arrays[strtolower(trim($smtp_value->account_email))] = array('password'=>$smtp_value->password,'smtp_host'=>$smtp_value->smtp_host,'smtp_port'=>$smtp_value->smtp_port,'smtp_ssl'=>$smtp_value->smtp_ssl);
+            $smtp_array[strtolower(trim($smtp_value->account_email))] = array('password'=>$smtp_value->password,'smtp_host'=>$smtp_value->smtp_host,'smtp_port'=>$smtp_value->smtp_port,'smtp_ssl'=>$smtp_value->smtp_ssl);
         }
 		$signature_config =  Accounts::whereNotNull('signature')->get();
 		foreach($signature_config as $signature_value){
