@@ -53,14 +53,12 @@ class SendEmails extends Command
 		set_time_limit(1140);
 		$Id =  $this->argument('Id');
         $count = $smtp_array = $signature_arrays = array();
-        $command = $this;
-        $smtp_config =  Accounts::where('id',$Id)->whereNotNull('smtp_host')->whereNotNull('smtp_port')->whereNotNull('smtp_ssl')->get();
-		$select_mail = '';
+        $smtp_config =  Accounts::whereNotNull('smtp_host')->whereNotNull('smtp_port')->whereNotNull('smtp_ssl')->get();
+		$select_mail =  Accounts::where('id',$Id)->value('account_email');
+		$select_mail =  strtolower(trim($select_mail));
         foreach($smtp_config as $smtp_value){
             $smtp_arrays[strtolower(trim($smtp_value->account_email))] = array('password'=>$smtp_value->password,'smtp_host'=>$smtp_value->smtp_host,'smtp_port'=>$smtp_value->smtp_port,'smtp_ssl'=>$smtp_value->smtp_ssl);
-			$select_mail=strtolower(trim($smtp_value->account_email));
         }
-		print_r($select_mail);
 		$signature_config =  Accounts::whereNotNull('signature')->get();
 		foreach($signature_config as $signature_value){
 			$signature_arrays[strtolower(trim($signature_value->account_email))] = $signature_value->signature;  
@@ -115,7 +113,7 @@ class SendEmails extends Command
 						}
 					}
 				});
-				print_r($to);
+
 				if (count(Mail::failures()) > 0) {
 					//print_r(Mail::failures());
 					$result = false ;
@@ -130,7 +128,7 @@ class SendEmails extends Command
 					$task->error = 'Failed to send to '.trim($task->to_address);
 					$task->error_count = $task->error_count + 1;
 				}
-				print_r($result);
+
 			} catch (\Exception $e) {
 				//\Log::error('Send Mail '.$task->id.' Error' . $e->getMessage());
 				$task->error = $this->filterEmoji($e->getMessage());
