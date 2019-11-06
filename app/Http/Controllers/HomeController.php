@@ -264,7 +264,6 @@ class HomeController extends Controller
 				array_get($val,'fulfillmentfee'),
 				array_get($val,'commission'),
 				array_get($val,'otherfee'),
-				array_get($val,'refund'),
 				array_get($val,'returnqty'),
 				array_get($val,'deal'),
 				array_get($val,'coupon'),
