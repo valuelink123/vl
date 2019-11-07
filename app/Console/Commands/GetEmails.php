@@ -75,6 +75,7 @@ class GetEmails extends Command
 				$lastMailTime = strtotime('- 1day');
 			}
 			$lastMailDate=date('Y-m-d H:i:s',$lastMailTime);
+			print_r($lastMailDate);
 			self::saveEmails($lastMailDate);
         }
     }
@@ -88,11 +89,10 @@ class GetEmails extends Command
 		$connection = $server->authenticate($this->runAccount['email'], $this->runAccount['password']);
 		$mailboxes = $connection->getMailboxes();
 		$search = new SearchExpression();
-		$search->addCondition(new To($this->runAccount['email']));
+		//$search->addCondition(new To($this->runAccount['email']));
 		$search->addCondition(new Since($sinceTime));	
 
 		foreach ($mailboxes as $mailbox) {
-			
 			if ($mailbox->getAttributes() & \LATT_NOSELECT) {
 				continue;
 			}
