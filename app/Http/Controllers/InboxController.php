@@ -172,6 +172,7 @@ class InboxController extends Controller
 
 		$email = $email->toArray();
 		
+		
 		$email_unread_history = Inbox::where('id','<>',$id)->where('reply',0)->where('from_address',$email['from_address'])->where('to_address',$email['to_address'])->take(10)->orderBy('date','desc')->get();
 		
         $email_from_history = Inbox::where('date','<',$email['date'])->where('from_address',$email['from_address'])->where('to_address',$email['to_address'])

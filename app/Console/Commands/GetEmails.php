@@ -92,7 +92,6 @@ class GetEmails extends Command
 		$search->addCondition(new Since($sinceTime));	
 
 		foreach ($mailboxes as $mailbox) {
-			print_r($mailbox->getName());
 			if ($mailbox->getAttributes() & \LATT_NOSELECT) {
 				continue;
 			}
