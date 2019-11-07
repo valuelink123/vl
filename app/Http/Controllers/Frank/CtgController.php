@@ -178,7 +178,7 @@ class CtgController extends Controller {
               GROUP_CONCAT(DISTINCT asin.brand) AS brands
             FROM ctg_order_item t4_1
             LEFT JOIN asin
-              ON asin.site = t4_1.MarketPlaceSite AND asin.asin = t4_1.ASIN AND asin.sellersku = t4_1.SellerSKU 
+              ON asin.site = t4_1.MarketPlaceSite AND asin.sellersku = t4_1.SellerSKU 
             LEFT JOIN fbm_stock
               ON fbm_stock.item_code = asin.item_no
             WHERE $timeRange
@@ -305,7 +305,7 @@ class CtgController extends Controller {
               GROUP_CONCAT(DISTINCT asin.brand) AS brands
             FROM ctg_order_item t4_1
             LEFT JOIN asin
-              ON asin.site = t4_1.MarketPlaceSite AND asin.asin = t4_1.ASIN AND asin.sellersku = t4_1.SellerSKU
+              ON asin.site = t4_1.MarketPlaceSite AND asin.sellersku = t4_1.SellerSKU
             LEFT JOIN fbm_stock
               ON fbm_stock.item_code = asin.item_no
             GROUP BY MarketPlaceId,AmazonOrderId,SellerId
