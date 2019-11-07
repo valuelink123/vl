@@ -612,7 +612,7 @@ function getCrmFrom()
 //CRM模块可供下拉选择的brand
 function getCrmBrand()
 {
-	return array('DBPOWER','TENKER','KOIOS','SPACEKEY','Mooka','Natrogix','Miropure','NURSAL','DROCON','Runme','OXA','Lyps','SPACEKEYBRANDS','TECBEAN','Babysteps','VIPSUPPORT');
+	return array('DBPOWER','TENKER','KOIOS','SPACEKEY','Mooka','Natrogix','Miropure','NURSAL','DROCON','Runme','OXA','Lyps','SPACEKEYBRANDS','TECBEAN','Babysteps','VIPSUPPORT','AZEUS');
 }
 
 //CRM模块可供下拉选择的订单类型
