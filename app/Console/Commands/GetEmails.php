@@ -75,7 +75,6 @@ class GetEmails extends Command
 				$lastMailTime = strtotime('- 1day');
 			}
 			$lastMailDate=date('Y-m-d H:i:s',$lastMailTime);
-			print_r($lastMailDate);
 			self::saveEmails($lastMailDate);
         }
     }
@@ -89,18 +88,28 @@ class GetEmails extends Command
 		$connection = $server->authenticate($this->runAccount['email'], $this->runAccount['password']);
 		$mailboxes = $connection->getMailboxes();
 		$search = new SearchExpression();
-		//$search->addCondition(new To($this->runAccount['email']));
+		//$search->addCondition(new To($this->runAccount['email']));又不起作用了？
 		$search->addCondition(new Since($sinceTime));	
 
 		foreach ($mailboxes as $mailbox) {
+			print_r($mailbox->getName());
 			if ($mailbox->getAttributes() & \LATT_NOSELECT) {
 				continue;
 			}
 			if($mailbox->getName()=='Sent Messages' || $mailbox->getName()=='Deleted Messages' || $mailbox->getName()=='Drafts'){
 				continue;
 			}
+			if($mailbox->getName()=='Outbox' || $mailbox->getName()=='Sent' || $mailbox->getName()=='Deleted' || $mailbox->getName()=='Drafts'){
+				continue;
+			}
 			$messages = $mailbox->getMessages($search);
 			foreach($messages as $message){
+				$to_addresses_arr=[];
+				$to_addresses = $message->getTo();
+				foreach($to_addresses as $to_a){
+					$to_addresses_arr[]=strtolower($to_a->getAddress());
+				}
+				if(!in_array($this->runAccount['email'],$to_addresses_arr)) continue;
 				try{
 				$mail_id = ($message->getId())?$message->getId():$message->getNumber();
 				$exists = DB::table('inbox')->where('mail_address', $this->runAccount['email'])->where('mail_id', $mail_id)->first();
@@ -113,7 +122,7 @@ class GetEmails extends Command
 					$insert_data['from_address']= ($reply_to)?$reply_to->getAddress():$message->getFrom()->getAddress();
 					$insert_data['from_name']=$message->getFrom()->getName();
 
-					$insert_data['to_address'] = $this->runAccount['account_email'];
+					$insert_data['to_address'] = $this->runAccount['email'];
 					$insert_data['subject'] = $message->getSubject();
 					$insert_data['text_html'] = $message->getBodyHtml();
 					$insert_data['text_plain'] = $message->getBodyText();
