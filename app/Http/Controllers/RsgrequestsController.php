@@ -412,9 +412,12 @@ class RsgrequestsController extends Controller
 		$rule->transfer_currency = $request->get('transfer_currency');
 		$rule->review_url = $request->get('review_url');
         $rule->step = intval($request->get('step'));
+		
         $product_id = intval($request->get('product_id'));
         //当现在选择的产品跟原来的产品数据不一致的时候，才要判断客户跟产品等信息
         if($product_id != $rule->product_id) {
+			$request->session()->flash('error_message', 'No changes to the product are allowed');
+			return redirect()->back()->withInput();
 			//一个客户对一个产品只能申请一次，可以申请多个不同的产品，但是必须是上个产品complete后才能申请
 			$ruleData = $rule->where('customer_email', $rule->customer_email)->where('product_id', $product_id)->take(1)->get()->toArray();
 			if ($ruleData) {
@@ -423,7 +426,9 @@ class RsgrequestsController extends Controller
 				return redirect()->back()->withInput();
 			}
 		}
+		/*取消变更产品功能
 		if($product_id) $rule->product_id = $product_id;
+		*/
 		$rule->star_rating = $request->get('star_rating');
 		// $rule->follow = $request->get('follow');
 		// $rule->next_follow_date = $request->get('next_follow_date');
