@@ -33,13 +33,13 @@ th,td,td>span {
                     <div class="col-md-2">
                         <div class="input-group">
                             <span class="input-group-addon">From</span>
-                            <input class="form-control" data-options="format:'yyyy-mm-dd'" value="{!! date('Y-m-d', strtotime('-90 day')) !!}" data-init-by-query="daterange.from" id="date_from"
+                            <input class="form-control" data-options="format:'yyyy-mm-dd'" value="{!! date('Y-m-d', strtotime('-7 day')) !!}" data-init-by-query="daterange.from" id="date_from"
                                    autocomplete="off"/>
                         </div>
                         <br/>
                         <div class="input-group">
                             <span class="input-group-addon">To</span>
-                            <input class="form-control" data-options="format:'yyyy-mm-dd'" value="{!! date('Y-m-d', strtotime('+1 day')) !!}" data-init-by-query="daterange.to" id="date_to" autocomplete="off"/>
+                            <input class="form-control" data-options="format:'yyyy-mm-dd'" value="{!! date('Y-m-d') !!}" data-init-by-query="daterange.to" id="date_to" autocomplete="off"/>
                         </div>
                     </div>
                     <div class="col-md-2">
