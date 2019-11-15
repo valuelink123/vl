@@ -85,7 +85,7 @@ a.editable-click:hover {
 							<div class="number">
 								<small>E.VALUE</small>
 								<h3 class="font-green-sharp">
-									<span data-counter="counterup">{{array_get($total_info,'economic',0)}}</span>
+									<span data-counter="counterup">{{round(array_get($total_info,'economic',0)/10000,2)}} 万</span>
 									<small class="font-green-sharp">¥</small>
 								</h3>
 								
@@ -111,7 +111,7 @@ a.editable-click:hover {
 							<div class="number">
 								<small>SALES</small>
 								<h3 class="font-red-haze">
-									<span data-counter="counterup" >{{array_get($total_info,'amount',0)}}</span>
+									<span data-counter="counterup" >{{round(array_get($total_info,'amount',0)/10000,2)}} 万</span>
 									<small class="font-red-haze">¥</small>
 								</h3>
 								
@@ -189,7 +189,8 @@ a.editable-click:hover {
 							<div class="number">
 								<small>INVENTORY</small>
 								<h3 class="font-green-sharp">
-									<span data-counter="counterup" >{{intval($fbm_stock_info[0]->fbm_total_stock + $fba_stock_info[0]->fba_total_stock)}}</span>
+									<span data-counter="counterup" >
+									{{round(intval($fbm_stock_info[0]->fbm_total_stock + $fba_stock_info[0]->fba_total_stock)/10000,2)}} 万</span>
 									<small class="font-green-sharp">PCS</small>
 								</h3>
 								
@@ -203,7 +204,7 @@ a.editable-click:hover {
 								</span>
 							</div>
 							<div class="status">
-								<div class="status-title"> STOCK VALUE : {{round($fbm_stock_info[0]->fbm_total_amount + $fba_stock_info[0]->fba_total_amount,2)}} </div>
+								<div class="status-title"> STOCK VALUE : {{round(($fbm_stock_info[0]->fbm_total_amount + $fba_stock_info[0]->fba_total_amount)/10000,2)}} 万 </div>
 								<div class="status-number">  </div>
 							</div>
 						</div>
