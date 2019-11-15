@@ -64,7 +64,7 @@ class SkuDaily extends Command
 		//收入明细
 		print_r('订单相关计算开始...');
 		$sales =  DB::connection('order')->select("select sellersku,MarketplaceName,type,currency,sum(quantityshipped) as sales,
-		sum(Amount) as amount from finances_shipment_event where left(PostedDate,10)='$date' 
+		sum(Amount) as amount from finances_shipment_event where date='$date' 
 		group by sellersku,MarketplaceName,type,currency");
 		foreach($sales as $sale){
 			$match_site = $sale->MarketplaceName;
@@ -109,7 +109,7 @@ class SkuDaily extends Command
 		print_r('退款相关计算开始...');
 		//退款明细
 		$refunds =  DB::connection('order')->select("select MarketplaceName,sellersku,type,currency,sum(Amount) as amount from finances_refund_event
-		where left(PostedDate,10)='$date' group by MarketplaceName,SellerSKU,type,Currency");
+		where date='$date' group by MarketplaceName,SellerSKU,type,Currency");
 		foreach($refunds as $refund){
 			$sku = Asin::where('site',strtolower('www.'.$refund->MarketplaceName))->where('sellersku',$refund->sellersku)->first();
 			if(!$sku) continue;
@@ -412,7 +412,7 @@ class SkuDaily extends Command
 		print_r('订单相关计算开始...');
 		$skus_info=[];
 		$sales =  DB::connection('order')->select("select sellersku,MarketplaceName,type,currency,sum(quantityshipped) as sales,
-		sum(Amount) as amount from finances_shipment_event where left(PostedDate,10)='$date' 
+		sum(Amount) as amount from finances_shipment_event where date='$date' 
 		group by sellersku,MarketplaceName,type,currency");
 		foreach($sales as $sale){
 			$match_site = $sale->MarketplaceName;
