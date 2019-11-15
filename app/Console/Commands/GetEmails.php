@@ -13,15 +13,6 @@ use Illuminate\Support\Facades\Input;
 use PDO;
 use DB;
 use Log;
-use Keepa\API\Request;
-use Keepa\API\ResponseStatus;
-use Keepa\helper\CSVType;
-use Keepa\helper\CSVTypeWrapper;
-use Keepa\helper\KeepaTime;
-use Keepa\helper\ProductAnalyzer;
-use Keepa\helper\ProductType;
-use Keepa\KeepaAPI;
-use Keepa\objects\AmazonLocale;
 
 
 class GetEmails extends Command
