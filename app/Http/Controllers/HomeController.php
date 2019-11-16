@@ -62,13 +62,15 @@ class HomeController extends Controller
 			$limit_review_user_id = Auth::user()->id;
 			$bonus_point = 0.04;
 		}
-			
+		
+		
 		
 		$asins = DB::table( DB::raw("(select max(sku_ranking) as sku_ranking,max(rating) as rating,max(item_no) as item_no,sum(fba_stock+fba_transfer) as fba_stock,sum(sales_07_01) as sales_07_01,sum(sales_14_08) as sales_14_08,sum(sales_21_15) as sales_21_15,sum(sales_28_22) as sales_28_22,max(bg) as bg,max(bu) as bu,max(sap_seller_id) as sap_seller_id,max(review_user_id) as review_user_id, min(case when status = 'S' Then '0' else status end) as status,asin,site from asin where length(asin)=10 group by asin,site) as asin") )->orderByRaw("status asc,sales_07_01 desc")
 		->leftJoin( DB::raw("(select asin as asin_b,domain,avg(sessions) as sessions,avg(unit_session_percentage) as unit_session_percentage,avg(bsr) as bsr from star_history where create_at >= '".date('Y-m-d',strtotime('-10day'))."' group by asin,domain) as asin_star") ,function($q){
 			$q->on('asin.asin', '=', 'asin_star.asin_b')
 				->on('asin.site', '=', 'asin_star.domain');
 		});
+		
 		
 		if($limit_bg){
 			$asins = $asins->where('asin.bg',$limit_bg);
@@ -100,17 +102,32 @@ class HomeController extends Controller
 				$sumwhere.=" and bu='".array_get($bgbu_arr,1)."'";
 			}
 		}
-		
-		
 		if(array_get($_REQUEST,'user_id')){
-			$sap_seller_id = User::where('id',array_get($_REQUEST,'user_id'))->value('sap_seller_id');
-			$select_user_id=array_get($_REQUEST,'user_id');
-			$asins = $asins->where(function ($query) use ($sap_seller_id,$select_user_id) {
-				$query->where('asin.sap_seller_id', $sap_seller_id)
-				->orwhere('asin.review_user_id', $select_user_id);
-			});
-			$sumwhere.=" and (sap_seller_id='$sap_seller_id' or review_user_id='$select_user_id')";
+			$user_info = User::where('id',array_get($_REQUEST,'user_id'))->first();
+			
+			if ($user_info->seller_rules) {
+				$rules = explode("-", $user_info->seller_rules);
+				if (array_get($rules, 0) != '*'){
+					$limit_bg = array_get($rules, 0);
+					$bonus_point = 0.1;
+				}else{
+					$bonus_point = 1;
+				}
+				if (array_get($rules, 1) != '*'){
+					$limit_bu = array_get($rules, 1);
+					$bonus_point = 0.3;
+				}
+			} elseif ($user_info->sap_seller_id) {
+				$limit_sap_seller_id = $user_info->sap_seller_id;
+				$bonus_point = 0.6;
+			} else {
+				$limit_review_user_id = $user_info->id;
+				$bonus_point = 0.04;
+			}
 		}
+		
+		
+		
 		
 		
 		$fba_stock_info = DB::select("select sum(fba_stock*fba_cost) as fba_total_amount,sum(fba_stock) as fba_total_stock from (select avg(fba_stock+fba_transfer) as fba_stock,avg(fba_cost) as fba_cost from asin where $sumwhere group by asin,sellersku ) as fba_total");
