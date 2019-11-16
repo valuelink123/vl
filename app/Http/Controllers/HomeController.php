@@ -71,6 +71,26 @@ class HomeController extends Controller
 				->on('asin.site', '=', 'asin_star.domain');
 		});
 		
+		
+		if($limit_bg){
+			$asins = $asins->where('asin.bg',$limit_bg);
+			$sumwhere.=" and bg='$limit_bg'";
+		}
+		if($limit_bu){
+			$asins = $asins->where('asin.bu',$limit_bu);
+			$sumwhere.=" and bu='$limit_bu'";
+		}
+		if($limit_sap_seller_id){
+			$asins = $asins->where('asin.sap_seller_id',$limit_sap_seller_id);
+			$sumwhere.=" and sap_seller_id='$limit_sap_seller_id'";
+		}
+		if($limit_review_user_id){
+			$asins = $asins->where('asin.review_user_id',$limit_review_user_id);
+			$sumwhere.=" and review_user_id='$limit_review_user_id'";
+		}
+		
+		$user_teams = DB::select("select bg,bu from asin where $sumwhere group by bg,bu ORDER BY BG ASC,BU ASC");
+		
 		if(array_get($_REQUEST,'user_id')){
 			$user_info = User::where('id',array_get($_REQUEST,'user_id'))->first();
 			
@@ -110,8 +130,7 @@ class HomeController extends Controller
 			$asins = $asins->where('asin.review_user_id',$limit_review_user_id);
 			$sumwhere.=" and review_user_id='$limit_review_user_id'";
 		}
-		
-		$user_teams = DB::select("select bg,bu from asin where $sumwhere group by bg,bu ORDER BY BG ASC,BU ASC");
+
 		if(array_get($_REQUEST,'bgbu')){
 			$bgbu = array_get($_REQUEST,'bgbu');
 			$bgbu_arr = explode('_',$bgbu);
