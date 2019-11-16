@@ -71,7 +71,29 @@ class HomeController extends Controller
 				->on('asin.site', '=', 'asin_star.domain');
 		});
 		
-		
+		if(array_get($_REQUEST,'user_id')){
+			$user_info = User::where('id',array_get($_REQUEST,'user_id'))->first();
+			
+			if ($user_info->seller_rules) {
+				$rules = explode("-", $user_info->seller_rules);
+				if (array_get($rules, 0) != '*'){
+					$limit_bg = array_get($rules, 0);
+					$bonus_point = 0.1;
+				}else{
+					$bonus_point = 1;
+				}
+				if (array_get($rules, 1) != '*'){
+					$limit_bu = array_get($rules, 1);
+					$bonus_point = 0.3;
+				}
+			} elseif ($user_info->sap_seller_id) {
+				$limit_sap_seller_id = $user_info->sap_seller_id;
+				$bonus_point = 0.6;
+			} else {
+				$limit_review_user_id = $user_info->id;
+				$bonus_point = 0.04;
+			}
+		}
 		if($limit_bg){
 			$asins = $asins->where('asin.bg',$limit_bg);
 			$sumwhere.=" and bg='$limit_bg'";
@@ -102,29 +124,7 @@ class HomeController extends Controller
 				$sumwhere.=" and bu='".array_get($bgbu_arr,1)."'";
 			}
 		}
-		if(array_get($_REQUEST,'user_id')){
-			$user_info = User::where('id',array_get($_REQUEST,'user_id'))->first();
-			
-			if ($user_info->seller_rules) {
-				$rules = explode("-", $user_info->seller_rules);
-				if (array_get($rules, 0) != '*'){
-					$limit_bg = array_get($rules, 0);
-					$bonus_point = 0.1;
-				}else{
-					$bonus_point = 1;
-				}
-				if (array_get($rules, 1) != '*'){
-					$limit_bu = array_get($rules, 1);
-					$bonus_point = 0.3;
-				}
-			} elseif ($user_info->sap_seller_id) {
-				$limit_sap_seller_id = $user_info->sap_seller_id;
-				$bonus_point = 0.6;
-			} else {
-				$limit_review_user_id = $user_info->id;
-				$bonus_point = 0.04;
-			}
-		}
+		
 		
 		
 		
