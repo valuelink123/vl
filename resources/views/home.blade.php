@@ -76,7 +76,7 @@ a.editable-click:hover {
 			<div class="col-md-9">
 				<div class="col-md-2">
 				<div style="width: 140px;height: 140px;border: 20px solid #f36a5a;border-radius:50% !important;text-align:center;line-height: 100px;margin:auto;font-size: 18px;" >
-					<span id="tichengxianshi" style="cursor:pointer;" data-value="{{array_get($total_info,'bonus',0)}}" class="fa fa-eye-slash"></span>
+					<span id="tichengxianshi" style="cursor:pointer;" data-value="{{round(array_get($total_info,'bonus',0),2)}}" class="fa fa-eye-slash"></span>
 				</div>
 				</div>
 				<div class="col-md-10">
