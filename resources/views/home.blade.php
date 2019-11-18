@@ -72,13 +72,14 @@ a.editable-click:hover {
 <div class="row" >
 <div class="col-lg-12 col-xs-12 col-sm-12">
 <div class="portlet light ">
-			<div class="col-md-1">
-				<div style="width:100px;height:100px;border: 15px solid #f36a5a;border-radius:50% !important;text-align:center;line-height:70px;margin:auto;margin-top: 13px" >
+			
+			<div class="col-md-9">
+				<div class="col-md-2">
+				<div style="width: 140px;height: 140px;border: 20px solid #f36a5a;border-radius:50% !important;text-align:center;line-height: 100px;margin:auto;font-size: 18px;" >
 					<span id="tichengxianshi" style="cursor:pointer;" data-value="{{array_get($total_info,'bonus',0)}}" class="fa fa-eye-slash"></span>
 				</div>
-			</div>
-			<div class="col-md-8">
-				<div class="col-md-10 col-md-offset-1">
+				</div>
+				<div class="col-md-10">
 				<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12" style="width:20%;"> 
 					<div class="dashboard-stat2 ">
 						<div class="display">
