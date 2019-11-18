@@ -319,7 +319,7 @@ a.editable-click:hover {
 					<table class="table table-hover">
 						
 							<tr class="uppercase">
-								<th > ASIN </th>
+								<th> ASIN </th>
 								<th> SKU </th>
 								<th> UNITS </th>
 								<th> SALES </th>
@@ -351,7 +351,7 @@ a.editable-click:hover {
 							<td> {{(array_get($asin,'sales')>0)?round(array_get($asin,'amount')/array_get($asin,'sales'),2):0}} </td>
 							<td> {{array_get($asin,'fba_stock')}} </td>
 							<td> {{($sales>0)?date('Y-m-d',strtotime('+'.intval(array_get($asin,'fba_stock')/$sales).' days')):'∞'}} </td>
-							<td> {{array_get($asin,'rating')}} </td>
+							<td> {{array_get($asin,'rating')}} ({{array_get($asin,'review_count')}})</td>
 							<td> {{intval(array_get($asin,'sessions'))}} </td>
 							<td> {{round(array_get($asin,'unit_session_percentage'),2)}} </td>
 							<td> {{array_get($asin,'sku_ranking')}} </td>

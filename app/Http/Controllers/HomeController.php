@@ -65,8 +65,8 @@ class HomeController extends Controller
 		
 		
 		
-		$asins = DB::table( DB::raw("(select max(sku_ranking) as sku_ranking,max(rating) as rating,max(item_no) as item_no,sum(fba_stock+fba_transfer) as fba_stock,sum(sales_07_01) as sales_07_01,sum(sales_14_08) as sales_14_08,sum(sales_21_15) as sales_21_15,sum(sales_28_22) as sales_28_22,max(bg) as bg,max(bu) as bu,max(sap_seller_id) as sap_seller_id,max(review_user_id) as review_user_id, min(case when status = 'S' Then '0' else status end) as status,asin,site from asin where length(asin)=10 group by asin,site) as asin") )->orderByRaw("status asc,sales_07_01 desc")
-		->leftJoin( DB::raw("(select asin as asin_b,domain,avg(sessions) as sessions,avg(unit_session_percentage) as unit_session_percentage,avg(bsr) as bsr from star_history where create_at >= '".date('Y-m-d',strtotime('-10day'))."' group by asin,domain) as asin_star") ,function($q){
+		$asins = DB::table( DB::raw("(select max(sku_ranking) as sku_ranking,max(rating) as rating,max(review_count) as review_count,max(item_no) as item_no,sum(fba_stock+fba_transfer) as fba_stock,sum(sales_07_01) as sales_07_01,sum(sales_14_08) as sales_14_08,sum(sales_21_15) as sales_21_15,sum(sales_28_22) as sales_28_22,max(bg) as bg,max(bu) as bu,max(sap_seller_id) as sap_seller_id,max(review_user_id) as review_user_id, min(case when status = 'S' Then '0' else status end) as status,asin,site from asin where length(asin)=10 group by asin,site) as asin") )->orderByRaw("status asc,sales_07_01 desc")
+		->leftJoin( DB::raw("(select asin as asin_b,domain,sessions,unit_session_percentage,bsr from star_history where create_at = '".date('Y-m-d',strtotime('-3day'))."') as asin_star") ,function($q){
 			$q->on('asin.asin', '=', 'asin_star.asin_b')
 				->on('asin.site', '=', 'asin_star.domain');
 		});

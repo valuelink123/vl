@@ -76,14 +76,14 @@ class GetAsin extends Command
 			
 			$last_keywords=Skusweekdetails::where('asin',trim(array_get($asin,'ASIN','')))->where('site','www.'.trim(array_get($asin,'SITE','')))->whereNotNull('keywords')->orderBy('weeks','desc')->take(1)->value('keywords');
 			
-			$sku_reports = Skusweekdetails::where('asin',trim(array_get($asin,'ASIN','')))->where('site','www.'.trim(array_get($asin,'SITE','')))->orderBy('weeks','asc')->take(7)->get()->toArray();
+			$sku_reports = Skusweekdetails::where('asin',trim(array_get($asin,'ASIN','')))->where('site','www.'.trim(array_get($asin,'SITE','')))->orderBy('weeks','desc')->take(7)->get()->toArray();
 			$sku_price=$sku_price_num=$sku_sales=$sku_sales_num=0;
 			$sku_ranking=$sku_rating=$sku_review=$sku_strategy=NULL;
 			foreach($sku_reports as $sku_report){
-				$sku_ranking=$sku_report['ranking'];
-				$sku_rating=$sku_report['rating'];
-				$sku_review=$sku_report['review'];
-				$sku_strategy=$sku_report['strategy'];
+				if(!$sku_ranking) $sku_ranking=$sku_report['ranking'];
+				if(!$sku_rating) $sku_rating=$sku_report['rating'];
+				if(!$sku_review) $sku_review=$sku_report['review'];
+				if(!$sku_strategy) $sku_strategy=$sku_report['strategy'];
 				if(is_numeric($sku_report['price'])){
 					$sku_price_num++;
 					$sku_price+=$sku_report['price'];
