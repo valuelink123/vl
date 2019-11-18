@@ -235,7 +235,7 @@ a.editable-click:hover {
 							<div class="status">
 								<div class="status-title {{$class}}">
 								
-								 {{$ap-$hb_ap}}
+								 {{round($ap-$hb_ap,2)}}
 								
 								</div>
 								<div class="status-number">{{$hb_ap}}</div>
