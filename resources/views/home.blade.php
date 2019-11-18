@@ -67,6 +67,11 @@ a.editable-click:hover {
     text-decoration: none;
     border-bottom: none !important;
 }
+
+.dashboard-stat2 .progress-info .status {
+    font-size: 12px;
+    color: #666;
+}
 </style>
 <link href="/assets/global/plugins/bootstrap-editable/bootstrap-editable/css/bootstrap-editable.css" rel="stylesheet" type="text/css" />
 <div class="row" >
@@ -80,13 +85,25 @@ a.editable-click:hover {
 				</div>
 				</div>
 				<div class="col-md-10">
+				<?php
+				$class="";
+				$ap = array_get($total_info,'economic',0);
+				$hb_ap = array_get($hb_total_info,'economic',0);
+				if($ap>$hb_ap){
+					$class="font-red-haze";
+
+				}
+				if($ap<$hb_ap){
+					$class="font-green-sharp";
+				}
+				?>
 				<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12" style="width:20%;"> 
 					<div class="dashboard-stat2 ">
 						<div class="display">
 							<div class="number">
 								<small>E.VALUE</small>
 								<h3 class="font-green-sharp">
-									<span data-counter="counterup">{{round(array_get($total_info,'economic',0)/10000,2)}} 万</span>
+									<span data-counter="counterup">{{round($ap/10000,2)}} 万</span>
 									<small class="font-green-sharp">¥</small>
 								</h3>
 								
@@ -100,19 +117,33 @@ a.editable-click:hover {
 								</span>
 							</div>
 							<div class="status">
-								<div class="status-title">  </div>
-								<div class="status-number">  </div>
+								<div class="status-title {{$class}}"> {{round(($ap-$hb_ap)/10000,2)}} 万</div>
+								<div class="status-number">{{round($hb_ap/10000,2)}} 万</div>
 							</div>
 						</div>
 					</div>
 				</div>
+				
+				<?php
+				$class="";
+				$ap = array_get($total_info,'amount',0);
+				$hb_ap = array_get($hb_total_info,'amount',0);
+				if($ap>$hb_ap){
+					$class="font-red-haze";
+
+				}
+				if($ap<$hb_ap){
+					$class="font-green-sharp";
+				}
+				?>
+				
 				<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12" style="width:20%;">
 					<div class="dashboard-stat2 ">
 						<div class="display">
 							<div class="number">
 								<small>SALES</small>
 								<h3 class="font-red-haze">
-									<span data-counter="counterup" >{{round(array_get($total_info,'amount',0)/10000,2)}} 万</span>
+									<span data-counter="counterup" >{{round($ap/10000,2)}} 万</span>
 									<small class="font-red-haze">¥</small>
 								</h3>
 								
@@ -126,19 +157,32 @@ a.editable-click:hover {
 								</span>
 							</div>
 							<div class="status">
-								<div class="status-title">  </div>
-								<div class="status-number"> </div>
+								<div class="status-title {{$class}}"> {{round(($ap-$hb_ap)/10000,2)}} 万</div>
+								<div class="status-number">{{round($hb_ap/10000,2)}} 万</div>
 							</div>
 						</div>
 					</div>
 				</div>
+				
+				<?php
+				$class="";
+				$ap = array_get($total_info,'sales',0);
+				$hb_ap = array_get($hb_total_info,'sales',0);
+				if($ap>$hb_ap){
+					$class="font-red-haze";
+
+				}
+				if($ap<$hb_ap){
+					$class="font-green-sharp";
+				}
+				?>
 				<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12" style="width:20%;">
 					<div class="dashboard-stat2 ">
 						<div class="display">
 							<div class="number">
 								<small>UNITS</small>
 								<h3 class="font-blue-sharp">
-									<span data-counter="counterup" >{{array_get($total_info,'sales',0)}}</span>
+									<span data-counter="counterup" >{{$ap}}</span>
 								</h3>
 								
 							</div>
@@ -151,12 +195,23 @@ a.editable-click:hover {
 								</span>
 							</div>
 							<div class="status">
-								<div class="status-title">  </div>
-								<div class="status-number">  </div>
+								<div class="status-title {{$class}}"> {{$ap-$hb_ap}} </div>
+								<div class="status-number">{{$hb_ap}}</div>
 							</div>
 						</div>
 					</div>
 				</div>
+				<?php
+				$class="";
+				$ap = (array_get($total_info,'sales',0)>0)?round(array_get($total_info,'amount',0)/array_get($total_info,'sales',0),2):0;
+				$hb_ap = (array_get($hb_total_info,'sales',0)>0)?round(array_get($hb_total_info,'amount',0)/array_get($hb_total_info,'sales',0),2):0;
+				if($ap>$hb_ap){
+					$class="font-red-haze";
+				}
+				if($ap<$hb_ap){
+					$class="font-green-sharp";
+				}
+				?>
 				<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12" style="width:20%;">
 					<div class="dashboard-stat2 ">
 						<div class="display">
@@ -164,7 +219,7 @@ a.editable-click:hover {
 							<div class="number">
 							<small>AVG.PRICE</small>
 								<h3 class="font-purple-soft">
-									<span data-counter="counterup" >{{(array_get($total_info,'sales',0)>0)?round(array_get($total_info,'amount',0)/array_get($total_info,'sales',0),2):0}}</span>
+									<span data-counter="counterup" >{{$ap}}</span>
 									<small class="font-purple-soft">¥</small>
 								</h3>
 								
@@ -178,8 +233,12 @@ a.editable-click:hover {
 								</span>
 							</div>
 							<div class="status">
-								<div class="status-title">  </div>
-								<div class="status-number">  </div>
+								<div class="status-title {{$class}}">
+								
+								 {{$ap-$hb_ap}}
+								
+								</div>
+								<div class="status-number">{{$hb_ap}}</div>
 							</div>
 						</div>
 					</div>
