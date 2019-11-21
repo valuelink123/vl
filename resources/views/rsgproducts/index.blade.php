@@ -119,10 +119,11 @@
                         <th>Product</th>
                         <th>Site</th>
                         <th>Asin</th>
-                        <th>Item No</th>
                         <th>Type</th>
                         <th>Status</th>
+                        <th>Item No</th>
                         <th>Level</th>
+                        <th>SKU Status</th>
                         <th>Rating</th>
                         <th>Reviews</th>
                         <th>BG</th>
@@ -197,10 +198,11 @@
                     {data: 'product', name: 'product'},
                     {data: 'site', name: 'site'},
                     {data: 'asin', name: 'asin'},
-                    {data: 'item_no', name: 'item_no'},
                     {data:'type',name:'type'},
                     {data:'status',name:'status'},
+                    {data: 'item_no', name: 'item_no'},
                     {data:'sku_level',name:'level'},
+                    {data:'sku_status',name:'sku_status'},
                     {data:'rating',name:'rating'},
                     {data:'review',name:'review'},
                     {data:'bg',name:'bg'},

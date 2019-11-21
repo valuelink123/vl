@@ -128,7 +128,7 @@ class RsgproductsController extends Controller
 		$data = $this->queryRows($sql);
 		$data = $this->getReturnData($data,$date,$todayDate);
 		$arrayData = array();
-		$headArray = array('Rank','Score','Order Status','Product','Site','Asin','Item No','Type','Status','Level','Rating','Reviews','BG','BU','Seller','Unfinished','Target','Achieved','Task');
+		$headArray = array('Rank','Score','Order Status','Product','Site','Asin','Type','Status','Item No','Level','SKU Status','Rating','Reviews','BG','BU','Seller','Unfinished','Target','Achieved','Task');
 		$arrayData[] = $headArray;
 		foreach ($data as $key=>$val){
 			$arrayData[] = array(
@@ -138,10 +138,11 @@ class RsgproductsController extends Controller
 				$val['img'],
 				$val['site'],
 				$val['basic_asin'],
-				$val['item_no'],
 				$val['type'],
 				$val['status'],
+				$val['item_no'],
 				$val['sku_level'],
+				$val['sku_status'],
 				$val['rating'],
 				$val['review'],
 				$val['bg'],
@@ -273,8 +274,18 @@ class RsgproductsController extends Controller
 		$postType = getPostType();
 		$productOrderStatus = getProductOrderStatus();
 		$i = 1;
+		//sku状态信息
+		$sapSiteCode = getSapSiteCode();
+		$sku_sql = "select sku,sap_site_id,any_value(status) as sku_status from skus_status group by sku,sap_site_id";
+		$_skuData = $this->queryRows($sku_sql);
+		$skuData = array();
+		foreach($_skuData as $key=>$val){
+			$site = isset($sapSiteCode[$val['sap_site_id']]) ? 'www.'.$sapSiteCode[$val['sap_site_id']] : $val['sap_site_id'];
+			$skuData[$val['sku'].'_'.$site]['sku_status'] = $val['sku_status'];
+		}
 		foreach ($data as $key => $val) {
 			$data[$key]['rank'] = $i;
+			$data[$key]['sku_status'] = isset($skuData[$val['item_no'].'_'.$val['site']]) ? $skuData[$val['item_no'].'_'.$val['site']]['sku_status'] : '';
 			$data[$key]['basic_asin'] = $val['asin'];
 			$data[$key]['product'] = '<img src="'.$val['img'].'" width="50px" height="65px">';
 			$data[$key]['site'] = isset($siteShort[$val['site']]) ? $siteShort[$val['site']] : $val['site'];

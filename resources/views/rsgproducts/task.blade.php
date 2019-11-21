@@ -26,10 +26,11 @@
                         <th>Product</th>
                         <th>Site</th>
                         <th>Asin</th>
-                        <th>Item No</th>
                         <th>Type</th>
                         <th>Status</th>
+                        <th>Item No</th>
                         <th>Level</th>
+                        <th>SKU Status</th>
                         <th>Rating</th>
                         <th>Reviews</th>
                         <th>BG</th>
@@ -51,10 +52,11 @@
                             <th>{!! $val['product'] !!}</th>
                             <th>{!! $val['site'] !!}</th>
                             <th>{!! $val['asin'] !!}</th>
-                            <th>{!! $val['item_no'] !!}</th>
                             <th>{!! $val['type'] !!}</th>
                             <th>{!! $val['status'] !!}</th>
+                            <th>{!! $val['item_no'] !!}</th>
                             <th>{!! $val['sku_level'] !!}</th>
+                            <th>{!! $val['sku_status'] !!}</th>
                             <th>{!! $val['rating'] !!}</th>
                             <th>{!! $val['review'] !!}</th>
                             <th>{!! $val['bg'] !!}</th>
