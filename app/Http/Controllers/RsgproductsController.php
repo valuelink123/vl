@@ -11,9 +11,13 @@ use App\Group;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Services\MultipleQueue;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use DB;
 class RsgproductsController extends Controller
 {
+	use \App\Traits\Mysqli;
+	use \App\Traits\DataTables;
     /**
      * Create a new controller instance.
      *
@@ -27,297 +31,78 @@ class RsgproductsController extends Controller
 		parent::__construct();
     }
 
-    /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Http\Response
+   	public function list(Request $req)
+    {
+		if(!Auth::user()->can(['rsgproducts-show'])) die('Permission denied -- rsgproducts-show');
+		$todayDate = date('Y-m-d');
+		if ($req->isMethod('GET')) {
+			return view('rsgproducts/index', ['date' => $todayDate,'bgs'=>$this->getBgs(),'bus'=>$this->getBus()]);
+		}
+		//搜索相关
+		$searchField = array('date'=>'rsg_products.created_at','asin'=>'rsg_products.asin','bg'=>'asin.bg','bu'=>'asin.bu','site'=>'rsg_products.site','item_no'=>'asin.item_no','post_type'=>'rsg_products.post_type','post_status'=>'rsg_products.post_status');
+		$search = isset($_POST['search']) ? $_POST['search'] : '';
+		$search = $this->getSearchData(explode('&',$search));
+		$where = $where_product = $this->getSearchWhereSql($search,$searchField);
+
+		$date = $search['date'];
+		$sql = $this->getSql($where,$where_product,$date);
+
+		if($req['length'] != '-1'){
+			$limit = $this->dtLimit($req);
+			$sql .= " LIMIT {$limit} ";
+		}
+
+		$data = $this->queryRows($sql);
+		$data = $this->getReturnData($data,$date,$todayDate);
+
+		$recordsTotal = $recordsFiltered = $this->queryOne('SELECT FOUND_ROWS()');
+		return compact('data', 'recordsTotal', 'recordsFiltered');
+    }
+
+    /*
+     * 点击编辑可查看参数和编辑某些参数
      */
-    public function index()
+    public function edit(Request $request)
     {
 		if(!Auth::user()->can(['rsgproducts-show'])) die('Permission denied -- rsgproducts-show');
-	
-		$teams= DB::select('select bg,bu from asin group by bg,bu ORDER BY BG ASC,BU ASC');
+		$id = isset($_GET['id']) && $_GET['id'] ? $_GET['id'] : '';
+		$rule= RsgProduct::where('id',$id)->first()->toArray();
 
-        return view('rsgproducts/index',['teams'=>$teams,'accounts'=>$this->getAccounts(),'users'=>$this->getUsers()]);
-
+		if(!$rule){
+			$request->session()->flash('error_message','Rsg Product not Exists');
+			return redirect('rsgproducts');
+		}
+		$rule['product_summary'] = json_decode($rule['product_summary']);
+		if($rule['product_summary']){
+			$rule['product_summary'] = implode("\n",$rule['product_summary']);
+		}
+		$rule['product_content'] = htmlspecialchars($rule['product_content']);
+		return view('rsgproducts/edit',['rule'=>$rule]);
     }
-
-	public function get(Request $request)
-    {
-		if(!Auth::user()->can(['rsgproducts-show'])) die('Permission denied -- rsgproducts-show');
-		$order = $request->input('order.0.column',1);
-		$orderby = 'created_at';
-		$orderConfig = array(2=>'end_date',3=>'review_rating',4=>'number_of_reviews',7=>'created_at',8=>'positive_target');
-		if(isset($orderConfig[$order])){
-			$orderby = $orderConfig[$order];
-		}
-        $sort = $request->input('order.0.dir','desc');
-        if ($request->input("customActionType") == "group_action") {
-			   if(!Auth::user()->can(['rsgproducts-batch-update'])) die('Permission denied -- rsgproducts-batch-update');
-			   $updateDate = [];
-			   $updateDate['status'] = $request->get("customstatus")?$request->get("customstatus"):0;
-			   RsgProduct::whereIn('id',$request->input("id"))->update($updateDate);
-        }
-		
-		$datas= new RsgProduct;
-               
-        if($request->input('seller_id')){
-            $datas = $datas->where('seller_id', $request->input('seller_id'));
-        }
-		if($request->input('date_from')){
-            $datas = $datas->where('start_date','<=', $request->input('date_from'));
-        }
-		if($request->input('date_to')){
-            $datas = $datas->where('end_date','>=',$request->input('date_to'));
-        }
-		
-		if($request->input('bgbu') ){
-			   $bgbu = $request->input('bgbu');
-			   $bgbu_arr = explode('_',$bgbu);
-			   if(count($bgbu_arr)>1){
-			   	if(array_get($bgbu_arr,0)) $datas = $datas->where('bg',array_get($bgbu_arr,0));
-			   	if(array_get($bgbu_arr,1)) $datas = $datas->where('bu',array_get($bgbu_arr,1));
-			   }else{
-			   		$datas = $datas->whereNull('bg');
-			   }
-		}
-		if($request->input('user_id')){
-            $datas = $datas->where('user_id', $request->input('user_id'));
-        }
-		if($request->input('asin')){
-            $datas = $datas->where('asin','like', $request->input('asin'));
-        }
-		
-		if($request->input('site')){
-            $datas = $datas->whereIn('site', $request->input('site'));
-        }
-		if($request->input('positive_target')){
-			$datas = $datas->where('positive_target', trim($request->input('positive_target')));
-		}
-		if($request->input('status')!==NULL){
-            $datas = $datas->where('status', $request->input('status'));
-        }else{
-			$datas = $datas->where('status', '>',-1);
-		}
-
-		$iTotalRecords = $datas->count();
-        $iDisplayLength = intval($_REQUEST['length']);
-        $iDisplayLength = $iDisplayLength < 0 ? $iTotalRecords : $iDisplayLength;
-        $iDisplayStart = intval($_REQUEST['start']);
-        $sEcho = intval($_REQUEST['draw']);
-		$lists =  $datas->orderBy($orderby,$sort)->offset($iDisplayStart)->limit($iDisplayLength)->get()->toArray();
-        $records = array();
-        $records["data"] = array();
-
-        $end = $iDisplayStart + $iDisplayLength;
-        $end = $end > $iTotalRecords ? $iTotalRecords : $end;
-		$accounts = $this->getAccounts();
-		$users= $this->getUsers();
-		$pro_req_arr=[];
-		$pro_requests = DB::select('
-	select product_id,sum(a) as a,sum(b) as b,sum(c) as c,count(*) as d,sum(channel_web) as channel_web,sum(channel_csteam) as channel_csteam,sum(channel_edm) as channel_edm,sum(channel_facebook) as channel_facebook,sum(channel_sales) as channel_sales 
-	from 
-		(select product_id,
-		(case when step=9 then 1 else 0 End) as a,
-		(case when amazon_order_id is null then 0 else 1 End) as b,
-		(case when star_rating is null then 0 else 1 End) as c,
-		(case when step=9 and channel=0 then 1 else 0 End) as channel_web,
-		(case when step=9 and channel=1 then 1 else 0 End) as channel_csteam,
-		(case when step=9 and channel=2 then 1 else 0 End) as channel_edm,
-		(case when step=9 and channel=3 then 1 else 0 End) as channel_facebook,
-		(case when step=9 and channel=4 then 1 else 0 End) as channel_sales
-		from rsg_requests
-	) as f group by product_id');
-	
-		$pro_requests = json_decode(json_encode($pro_requests), true);
-		foreach($pro_requests as $pro_req){
-			$pro_req_arr[$pro_req['product_id']]=$pro_req;
-		}
-		//查询asin表，得到item NO 和 BG,BU
-		$sql = "select any_value(item_no) as item_no,concat(asin,'_',site) as asin_site,any_value(bg) as bg,any_value(bu) as bu
- from asin group by asin_site";
-		$_asinData = DB::select($sql);
-		$asinData = array();
-		foreach($_asinData as $key=>$val){
-			$asinData[$val->asin_site] = array(
-				'item_no' => $val->item_no,
-				'bg' => $val->bg,
-				'bu' => $val->bu,
-			);
-		}
-	
-		$status_arr = array('-1'=>'<span class="badge badge-default">Reject</a>',0=>'<span class="badge badge-warning">Pending</a>',1=>'<span class="badge badge-success">Active</span>',2=>'<span class="badge badge-info">Inactive</span>',3=>'<span class="badge badge-danger">Expired</span>,',4=>'<span class="badge badge-info">Confirmed</span>');
-		foreach ( $lists as $list){
-			$title = '';
-			if(isset($pro_req_arr[$list['id']])){
-				$title = 'Sales：'.$pro_req_arr[$list['id']]['channel_sales'].'
-FB: '.$pro_req_arr[$list['id']]['channel_facebook'].'
-CS team: '.$pro_req_arr[$list['id']]['channel_csteam'].'
-Web: '.$pro_req_arr[$list['id']]['channel_web'].'';
-			}
-			$item_no = isset($asinData[$list['asin'].'_'.$list['site']]) ? $asinData[$list['asin'].'_'.$list['site']]['item_no'] : '';
-            $records["data"][] = array(
-                '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input name="id[]" type="checkbox" class="checkboxes" value="'.$list['id'].'"/><span></span></label>',
-				'<img src="'.array_get($list,'product_img').'" width="50px" height="65px" align="left"/>Account : '.array_get($accounts,$list['seller_id']).'</BR>ASIN :<a href="https://'.array_get($list,'site').'/dp/'.array_get($list,'asin').'?m='.array_get($list,'seller_id').'" target="_blank">'.array_get($list,'asin').'</a></BR>Price : '.round(array_get($list,'price'),2).array_get($list,'currency').'</BR>Item No:'.$item_no,
-				$list['start_date'].'</BR>To</BR>'.$list['end_date'],
-				// $list['daily_stock'],
-                // $list['daily_remain'],
-                $list['review_rating'],
-                $list['number_of_reviews'],
-				array_get($pro_req_arr,$list['id'].'.d'),
-				// array_get($pro_req_arr,$list['id'].'.b'),
-				// array_get($pro_req_arr,$list['id'].'.c'),
-				'<div title="'.$title.'">'.array_get($pro_req_arr,$list['id'].'.a').'</div>',
-				$list['created_at'],
-				$list['positive_target'],
-				array_get($users,$list['user_id']),
-				isset($asinData[$list['asin'].'_'.$list['site']]) ? $asinData[$list['asin'].'_'.$list['site']]['bg'] : '',
-				isset($asinData[$list['asin'].'_'.$list['site']]) ? $asinData[$list['asin'].'_'.$list['site']]['bu'] : '',
-				array_get($status_arr,$list['status']),
-				
-				'<a href="'.url('rsgproducts/'.$list['id'].'/edit').'" class="badge badge-success"> View </a>'
-				
-            );
-		}
-        $records["draw"] = $sEcho;
-        $records["recordsTotal"] = $iTotalRecords;
-        $records["recordsFiltered"] = $iTotalRecords;
-        echo json_encode($records);
-    }
-
-    public function getUsers(){
-        $users = User::get()->toArray();
-        $users_array = array();
-        foreach($users as $user){
-            $users_array[$user['id']] = $user['name'];
-        }
-        return $users_array;
-    }
-
-    public function getAccounts(){
-        $seller=[];
-		$accounts= DB::connection('order')->table('accounts')->where('status',1)->groupBy(['sellername','sellerid'])->get(['sellername','sellerid']);
-		$accounts=json_decode(json_encode($accounts), true);
-		foreach($accounts as $account){
-			$seller[$account['sellerid']]=$account['sellername'];
-		}
-		return $seller;
-    }
-
-    public function create()
-    {
-		if(!Auth::user()->can(['rsgproducts-create'])) die('Permission denied -- rsgproducts-create');
-        return view('rsgproducts/add',['accounts'=>$this->getAccounts()]);
-    }
-
-
-    public function store(Request $request)
-    {
-		if(!Auth::user()->can(['rsgproducts-create'])) die('Permission denied -- rsgproducts-create');
-        $this->validate($request, [
-            'seller_id' => 'required|string',
-            'asin' => 'required|string',
-			'site' => 'required|string',
-			'start_date' => 'required|string',
-			'end_date' => 'required|string',
-			// 'daily_stock' => 'required|int',
-			'product_name' => 'required|string',
-			'product_img' => 'required|string',
-			'price' => 'required|string',
-			'currency' => 'required|string',
-        ]);
-
-        $rule = new RsgProduct;
-        $rule->seller_id = $request->get('seller_id');
-        $rule->asin = $request->get('asin');
-        $rule->site = $request->get('site');
-		$rule->start_date = $request->get('start_date');
-		$rule->end_date = $request->get('end_date');
-		$rule->product_name = $request->get('product_name');
-		$rule->product_img = $request->get('product_img');
-		$rule->price = round($request->get('price'),2);
-		$rule->currency = $request->get('currency');
-		$rule->keyword = $request->get('keyword');
-		$rule->page = intval($request->get('page'));
-		$rule->position = intval($request->get('position'));
-		$rule->positive_target = intval($request->get('positive_target'));
-		$rule->positive_daily_limit = intval($request->get('positive_daily_limit'));
-
-		$date = date('Y-m-d', strtotime('-1 day'));
-		$sql = 'select total_star_number,average_score from star_history where create_at = "'.$date.'" and asin="'.$rule->asin.'" and domain="'.$rule->site.'" limit 1';
-		$_data= DB::select($sql);
-		//review_rating和number_of_reviews直接从系统中的star_history表中获取
-		if($_data){
-			$rule->review_rating = $_data[0]->average_score;
-			$rule->number_of_reviews = $_data[0]->total_star_number;
-		}
-		
-        $rule->status = 0;
-		$rule->daily_stock = intval($request->get('daily_stock'));
-		$rule->daily_remain = intval($request->get('daily_stock'));
-        $rule->user_id = intval(Auth::user()->id);
-
-
-
-		$rule->sales_target_reviews = intval($request->get('sales_target_reviews'));
-
-		$rule->product_summary = $request->get('product_summary');
-		$rule->product_content = $request->get('product_content');
-
-        if ($rule->save()) {
-            $request->session()->flash('success_message','Set Rsg Product Success');
-            return redirect('rsgproducts');
-        } else {
-            $request->session()->flash('error_message','Set Rsg Product Failed');
-            return redirect()->back()->withInput();
-        }
-    }
-
-    public function edit(Request $request,$id)
-    {
-		if(!Auth::user()->can(['rsgproducts-show'])) die('Permission denied -- rsgproducts-show');
-        $rule= RsgProduct::where('id',$id)->first()->toArray();
-        if(!$rule){
-            $request->session()->flash('error_message','Rsg Product not Exists');
-            return redirect('rsgproducts');
-        }
-        return view('rsgproducts/edit',['rule'=>$rule,'accounts'=>$this->getAccounts()]);
-    }
-
-    public function update(Request $request,$id)
+	/*
+	 * 编辑页面点击提交，保存可更新的数据
+	 */
+    public function update(Request $request)
     {
 		if(!Auth::user()->can(['rsgproducts-update'])) die('Permission denied -- rsgproducts-update');
-        $this->validate($request, [
-			'start_date' => 'required|string',
-			'end_date' => 'required|string',
-			// 'daily_stock' => 'required|int',
-			'product_name' => 'required|string',
-			'product_img' => 'required|string',
-			'price' => 'required|string',
-			'currency' => 'required|string',
-        ]);
-		
-        $rule = RsgProduct::findOrFail($id);
-		$rule->start_date = $request->get('start_date');
-		$rule->end_date = $request->get('end_date');
-		$rule->product_name = $request->get('product_name');
-		$rule->product_img = $request->get('product_img');
-		$rule->price = round($request->get('price'),2);
-		$rule->currency = $request->get('currency');
-		$rule->keyword = $request->get('keyword');
-		$rule->page = intval($request->get('page'));
-		$rule->position = intval($request->get('position'));
-		$rule->positive_target = intval($request->get('positive_target'));
-		$rule->positive_daily_limit = intval($request->get('positive_daily_limit'));
-        $rule->status = 0;
-		$rule->daily_stock = intval($request->get('daily_stock'));
-        //$rule->user_id = intval(Auth::user()->id);
-        // $rule->review_rating = intval($request->get('review_rating'));
-        // $rule->number_of_reviews = intval($request->get('number_of_reviews'));
-		$rule->sales_target_reviews = intval($request->get('sales_target_reviews'));
+		$id = isset($_POST['id']) && $_POST['id'] ? $_POST['id'] : '';
 
-		$rule->product_summary = $request->get('product_summary');
-		$rule->product_content = $request->get('product_content');
+        $rule = RsgProduct::where('id',$id)->first();
+		if(!$rule){
+			$request->session()->flash('error_message','Rsg Product not Exists');
+			return redirect('rsgproducts');
+		}
+
+
+        if(isset($_POST['order_status'])){
+			$rule->order_status = $_POST['order_status'];
+		}
+		if(isset($_POST['order_status'])){
+			$rule->order_status = $_POST['order_status'];
+		}
+		if(isset($_POST['sales_target_reviews'])){
+			$rule->sales_target_reviews = intval($_POST['sales_target_reviews']);
+		}
 
         if ($rule->save()) {
             $request->session()->flash('success_message','Set Rsg Product Success');
@@ -327,6 +112,194 @@ Web: '.$pro_req_arr[$list['id']]['channel_web'].'';
             return redirect()->back()->withInput();
         }
     }
+
+    /*
+     * 下载数据
+     */
+    public function export()
+	{
+		if(!Auth::user()->can(['rsgproducts-export'])) die('Permission denied -- rsgproducts export');
+		$todayDate = date('Y-m-d');
+		$date = $_REQUEST['date'];
+		$where = " and created_at = '".$date."' ";
+
+		$sql = $this->getSql($where,$where,$date);
+
+		$data = $this->queryRows($sql);
+		$data = $this->getReturnData($data,$date,$todayDate);
+		$arrayData = array();
+		$headArray = array('Rank','Score','Order Status','Product','Site','Asin','Item No','Type','Status','Level','Rating','Reviews','BG','BU','Seller','Unfinished','Target','Achieved','Task');
+		$arrayData[] = $headArray;
+		foreach ($data as $key=>$val){
+			$arrayData[] = array(
+				$val['rank'],
+				$val['score'],
+				$val['order_status'],
+				$val['img'],
+				$val['site'],
+				$val['basic_asin'],
+				$val['item_no'],
+				$val['type'],
+				$val['status'],
+				$val['sku_level'],
+				$val['rating'],
+				$val['review'],
+				$val['bg'],
+				$val['bu'],
+				$val['seller'],
+				$val['unfinished'],
+				$val['target_review'],
+				$val['achieved'],
+				$val['task'],
+			);
+		}
+		if($arrayData){
+			$spreadsheet = new Spreadsheet();
+
+			$spreadsheet->getActiveSheet()
+				->fromArray(
+					$arrayData,  // The data to set
+					NULL,        // Array values with this value will not be set
+					'A1'         // Top left coordinate of the worksheet range where
+				//    we want to set these values (default is A1)
+				);
+			header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');//告诉浏览器输出07Excel文件
+			header('Content-Disposition: attachment;filename="Export_Rsg_Product.xlsx"');//告诉浏览器输出浏览器名称
+			header('Cache-Control: max-age=0');//禁止缓存
+			$writer = new Xlsx($spreadsheet);
+			$writer->save('php://output');
+		}
+		die();
+	}
+
+    /*
+     * rsgtask任务列表  只展示排名前十的数据
+     */
+    public function rsgtask(Request $req)
+	{
+		if(!Auth::user()->can(['rsgproducts-rsgtask'])) die('Permission denied -- rsgproducts rsgtask');
+		$date = $todayDate =  date('Y-m-d');
+		$where = " and created_at = '".$date."' ";
+		$where_product = " and created_at = '".$date."' and cast(rsg_products.sales_target_reviews as signed) - cast(rsg_products.requested_review as signed) > 0 ";
+
+		$sql = $this->getSql($where,$where_product,$date);
+		$sql .= ' LIMIT 0,10 ';
+
+		$data = $this->queryRows($sql);
+		$data = $this->getReturnData($data,$date,$todayDate,'task');
+
+		return view('rsgproducts/task',['data'=>$data]);
+	}
+
+	/*
+	 * 得到sql查询语句
+	 *
+	 */
+	public function getSql($where,$where_product,$date)
+	{
+		$sql = "
+        SELECT SQL_CALC_FOUND_ROWS
+        	rsg_products.id as id,rsg_products.asin as asin,rsg_products.site as site,rsg_products.post_status as post_status,rsg_products.post_type as post_type,rsg_products.sales_target_reviews as target_review,rsg_products.requested_review as requested_review,asin.bg as bg,asin.bu as bu,asin.item_no as item_no,asin .seller as seller,rsg_products.number_of_reviews as review,rsg_products.review_rating as rating, num as unfinished,rsg_products.sku_level as sku_level, rsg_products.product_img as img,rsg_products.order_status as order_status,cast(rsg_products.sales_target_reviews as signed) - cast(rsg_products.requested_review as signed) as task,(status_score*type_score*level_score*rating_score*review_score)  as score   
+            from rsg_products  
+            left join (
+				select id,
+					case post_status
+						WHEN 1 then 1
+						WHEN 2 then 2
+						ELSE 0 END as status_score,
+					case post_type
+						WHEN 1 then 1*20
+						WHEN 2 then 0.5*20
+						ELSE 0 END as type_score,
+					case sku_level
+						WHEN 'S' then 1*20
+						WHEN 'A' then 0.6*20
+						WHEN 'B' then 0.2*20
+						ELSE 0 END as level_score,
+					case review_rating
+						WHEN 5 then 1
+						WHEN 4.9 then 1
+						WHEN 4.8 then 2
+						WHEN 4.7 then 4
+						WHEN 4.6 then 2
+						WHEN 4.5 then 1
+						WHEN 4.4 then 1
+						WHEN 4.3 then 3
+						WHEN 4.2 then 5
+						WHEN 4.1 then 4
+						WHEN 0 then 1
+						ELSE 0 END as rating_score,
+					if(site='www.amazon.com',
+						case 
+							WHEN number_of_reviews < 100 then 10
+							WHEN number_of_reviews >= 100 and number_of_reviews < 400 then 7
+							WHEN number_of_reviews >= 400 and number_of_reviews < 1000 then 4
+							WHEN number_of_reviews >= 1000 and number_of_reviews < 4000 then 1
+							WHEN number_of_reviews >= 4000 then 0
+							END,
+						case 
+							WHEN number_of_reviews < 40 then 10
+							WHEN number_of_reviews >= 40 and number_of_reviews < 100 then 7
+							WHEN number_of_reviews >= 100 and number_of_reviews < 400 then 4
+							WHEN number_of_reviews >= 400 and number_of_reviews <= 1000 then 1 
+							WHEN number_of_reviews > 1000 then 0
+							END 
+					)as review_score
+				from rsg_products 
+				where created_at = '".$date."'  
+			) as rsg_score on rsg_score.id=rsg_products.id 
+		  	left join (
+				select asin,site,any_value(bg) as bg,any_value(bu) as bu,any_value(item_no) as item_no,any_value(seller) as seller from asin group by asin,site 
+				) as asin ON rsg_products.asin=asin.asin and rsg_products.site=asin.site 
+        	left join (
+        		select count(*) as num,asin,site 
+				from rsg_products 
+				left join rsg_requests on product_id = rsg_products.id and step IN(1,3,4,5,6,7,8) 
+				where rsg_requests.created_at <= '".$date." 23:59:59 ' 
+				group by asin,site 
+        	) as rsg on rsg_products.asin=rsg.asin and rsg_products.site=rsg.site  
+        	
+			where 1 = 1 {$where_product} 
+			order by rsg_products.order_status desc,score desc,id desc  ";
+		return $sql;
+	}
+
+	/*
+	 * 得到处理后的表格数据
+	 */
+	public function getReturnData($data,$date='',$todayDate='',$action='') {
+		$siteShort = getSiteShort();
+		$postStatus = getPostStatus();
+		$postType = getPostType();
+		$productOrderStatus = getProductOrderStatus();
+		$i = 1;
+		foreach ($data as $key => $val) {
+			$data[$key]['rank'] = $i;
+			$data[$key]['basic_asin'] = $val['asin'];
+			$data[$key]['product'] = '<img src="'.$val['img'].'" width="50px" height="65px">';
+			$data[$key]['site'] = isset($siteShort[$val['site']]) ? $siteShort[$val['site']] : $val['site'];
+			$data[$key]['asin'] = '<a href="https://' . $val['site'] . '/dp/' . $val['asin'] . '" target="_blank" rel="noreferrer">' . $val['asin'] . '</a>';//asin插入超链接
+			$data[$key]['type'] = isset($postType[$val['post_type']]) ? $postType[$val['post_type']]['name'] : $val['post_type'];//post_type
+			$data[$key]['status'] = isset($postStatus[$val['post_status']]) ? $postStatus[$val['post_status']]['name'] : $val['post_status'];
+			$data[$key]['achieved'] = $val['requested_review'];
+			$data[$key]['action'] = '<a data-target="#ajax" class="badge badge-success" data-toggle="modal" href="/rsgrequests/create?productid='.$val['id'].'&asin=' . $val['asin'] . '&site=' . $val['site'] . '"> 
+                                    <i class="fa fa-hand-o-up"></i></a>';
+			if($data[$key]['task']<=0){
+				$data[$key]['action'] = '<div class="badge badge-primary">Done</div>';
+			}
+			if ($action != 'task') {
+				$data[$key]['action'] .= '<a href="' . url('rsgproducts/edit?id=' . $val['id'] . '') . '" target="_blank" class="badge badge-success"> View </a>';
+			}
+
+			$data[$key]['order_status'] = isset($productOrderStatus[$val['order_status']]) ? $productOrderStatus[$val['order_status']] : $val['order_status'];
+
+			if ($date != $todayDate) {
+				$data[$key]['action'] = '-';
+			}
+			$i++;
+		}
+		return $data;
+	}
 
 
 }

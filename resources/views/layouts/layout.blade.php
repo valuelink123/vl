@@ -209,6 +209,31 @@
                                                 <span class="arrow"></span>
                                             </a>
                                             <ul class="dropdown-menu pull-left">
+
+												@permission('rsgproducts-rsgtask')
+												<li class="">
+													<a href="/rsgtask" class="nav-link nav-toggle ">
+														RSG Task
+														<span class="arrow"></span>
+													</a>
+												</li>
+												@endpermission
+												@permission('rsgrequests-show')
+												<li class="">
+													<a href="/rsgrequests" class="nav-link nav-toggle ">
+														RSG
+														<span class="arrow"></span>
+													</a>
+												</li>
+												@endpermission
+												@permission('rsgproducts-show')
+												<li class="">
+													<a href="/rsgproducts" class="nav-link nav-toggle ">
+														RSG Product
+														<span class="arrow"></span>
+													</a>
+												</li>
+												@endpermission
                                                 @permission('review-show')
 												<li class="">
                                                     <a href="/review" class="nav-link nav-toggle ">
@@ -237,23 +262,6 @@
 												<li class="">
                                                     <a href="/crm" class="nav-link nav-toggle ">
                                                         CRM
-                                                        <span class="arrow"></span>
-                                                    </a>    
-                                                </li>
-												@endpermission
-												
-												@permission('rsgrequests-show')
-												<li class="">
-                                                    <a href="/rsgrequests" class="nav-link nav-toggle ">
-                                                        RSG
-                                                        <span class="arrow"></span>
-                                                    </a>    
-                                                </li>
-												@endpermission
-												@permission('rsgproducts-show')
-												<li class="">
-                                                    <a href="/rsgproducts" class="nav-link nav-toggle ">
-                                                        RSG Product
                                                         <span class="arrow"></span>
                                                     </a>    
                                                 </li>

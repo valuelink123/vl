@@ -939,3 +939,37 @@ function getShipRate()
 	];
 	return $arr;
 }
+
+/*
+ * 得到帖子状态值的含义跟给的分数
+ */
+function getPostStatus()
+{
+	$arr = array(
+		1=>array('name'=>'Active','score'=>1),
+		2=>array('name'=>'Pushing','score'=>2),
+		3=>array('name'=>'Unavailable','score'=>0),
+		4=>array('name'=>'Abandoned','score'=>0),
+	);
+	return $arr;
+}
+
+/*
+ * 得到帖子类型值的含义跟给的分数
+ */
+function getPostType()
+{
+	$arr = array(
+		1=>array('name'=>'Main','score'=>1),
+		2=>array('name'=>'Secondary','score'=>0.5),
+		3=>array('name'=>'Other','score'=>0),
+	);
+	return $arr;
+}
+/*
+ * 产品的权重排序状态对应值
+ */
+function getProductOrderStatus()
+{
+	return array(0=>'默认',1=>'增加权重','-1'=>'降低权重');
+}

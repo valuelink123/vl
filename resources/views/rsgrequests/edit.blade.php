@@ -40,27 +40,29 @@
 				</div>
 				
 				<div class="clearfix margin-bottom-20"></div>
+
 						<div class="form-group col-md-9">
-                            <label>Products</label>
-                            
-                             
-                                <select class="form-control" name="product_id" id="product_id" required>
-									<option value="{{$rule['product_id']}}" class="{{array_get($product,'class')}}">{{array_get($product,'asin')}}——{{array_get($product,'product_name')}}</option>
-									<?php 
-									$c_s='';$i=0;
-									$p_c=count($products);
-									foreach($products as $pd){
-										$i++;
-										if($pd['site']<>$c_s && $c_s) echo '</optgroup>';
-										if($pd['site']<>$c_s) echo '<optgroup label="'.$pd['site'].'">';
-										$c_s = $pd['site'];
-										if($pd['id']!=$rule['product_id']) echo '<option value="'.$pd['id'].'" class="'.$pd['class'].'">'.$pd['product_name'].' </option>';
-										if($i==$p_c) echo '</optgroup>';
-									}?>
-									
-								</select>
-                            
-                        </div>
+							<label>Site</label>
+							<select class="form-control" name="site" id="sitesel" required disabled>
+								@foreach(getAsinSites() as $key=>$site)
+									<option value="{!! $site !!}" @if($product['site']==$site) selected @endif>{!! $site !!}</option>
+								@endforeach
+							</select>
+						</div>
+
+						<div class="form-group col-md-9">
+							<label>Products</label>
+							<select class="form-control" name="product_id" id="product_id" required disabled>
+								@foreach($products as $key=>$val)
+									<optgroup label="{!! $key !!}">
+										@foreach($val as $k=>$v)
+											<option value="{!! $v['id'] !!}" @if($v['id']==$rule['product_id']) @endif>{!! $v['product_name'] !!}</option>
+										@endforeach
+									</optgroup>
+								@endforeach
+							</select>
+						</div>
+
 						<div class="form-group col-md-3">
 							<label></label>
 							<input id="search_product" type="text" class="form-control" placeholder="search product">
@@ -231,16 +233,22 @@
 
     </div>
 	<script>
-        $("#product_id").change(function(){
-            var optionclass = $(this).find("option:selected").attr('class');
-            $('#product_id').removeClass('inactive');
-            $('#product_id').removeClass('active');
-            $('#product_id').addClass(optionclass);
-
-        });
-
         $(function() {
-            $("#product_id").trigger("change");
+            //下拉选择站点后，选择显示或者隐藏产品的选项
+            $("#sitesel").change(function(){
+                var site = $(this).val();
+                $('#product_id').val('');
+                $('#product_id optgroup').each(function (index,element){
+                    // var content = $(element).text().toUpperCase();
+                    var content = $(element).attr('label');
+                    if(content.indexOf(site) >= 0 ) {
+                        //包含搜索的内容
+                        $(this).show();
+                    }else{
+                        $(this).hide();
+                    }
+                });
+            });
 
             $("#search_product").keyup(function(){
                 var search_value = $(this).val().toUpperCase();
@@ -254,5 +262,9 @@
                     }
                 });
             });
+
+            // $("#sitesel").trigger("change");
+            $("#search_product").trigger("keyup");
+
         });
 	</script>

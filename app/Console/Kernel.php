@@ -42,6 +42,7 @@ class Kernel extends ConsoleKernel
 		'App\Console\Commands\GetSkuBaseInfo',
 		'App\Console\Commands\AddTransferWarn',
 		'App\Console\Commands\SkuDaily',
+		'App\Console\Commands\AddRsgProduct',
     ];
 
     /**
@@ -110,6 +111,7 @@ class Kernel extends ConsoleKernel
 		$schedule->command('get:skubaseinfo')->dailyAt('16:00')->name('skubaseinfo')->withoutOverlapping();
 		$schedule->command('add:transfer_warn')->dailyAt('6:00')->name('transferWarn')->withoutOverlapping();//添加调拨预警，每天跑一次
 		$schedule->command('scan:skudaily')->dailyAt('08:00')->name('skudaily')->withoutOverlapping();
+		$schedule->command('add:rsgProduct')->dailyAt('07:00')->name('addProduct')->withoutOverlapping();
     }
 
     /**

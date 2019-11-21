@@ -22,34 +22,35 @@
 				<div class="clearfix margin-bottom-20"></div>
 
 						<div class="form-group col-md-9">
+							<label>Site</label>
+						<select class="form-control" name="site" id="sitesel" required>
+							<option class="active" value="">Please select</option>
+							@foreach(getAsinSites() as $key=>$site)
+								<option value="{!! $site !!}" @if($data['site']==$site) selected @endif>{!! $site !!}</option>
+							@endforeach
+						</select>
+						</div>
+
+						<div class="form-group col-md-9">
                             <label>Products</label>
-
-
                                 <select class="form-control" name="product_id" id="product_id" required>
                                     <option class="active" value="">Please select</option>
-								<?php
-									$c_s='';$i=0;
-									$p_c=count($products);
-									foreach($products as $pd){
-										$i++;
-										if($pd['site']<>$c_s && $c_s) echo '</optgroup>';
-										if($pd['site']<>$c_s) echo '<optgroup label="'.$pd['site'].'">';
-										$c_s = $pd['site'];
-										echo '<option value="'.$pd['id'].'" class="'.$pd['class'].'">'.$pd['product_name'].' </option>';
-										if($i==$p_c) echo '</optgroup>';
-									}?>
+									@foreach($products as $key=>$val)
+										<optgroup label="{!! $key !!}">
+											@foreach($val as $k=>$v)
+												<option value="{!! $v['id'] !!}" @if($data['productid']==$v['id']) selected @endif>{!! $v['product_name'] !!}</option>
+											@endforeach
+										</optgroup>
+									@endforeach
 								</select>
                         </div>
                         <div class="form-group col-md-3">
                             <label></label>
-                            <input id="search_product" type="text" class="form-control" placeholder="search product">
+                            <input id="search_product" type="text" class="form-control" value="" placeholder="search product">
                         </div>
                         <div class="form-group col-md-6">
                             <label>Customer Email</label>
-                            
-                             
                                 <input type="text" class="form-control" name="customer_email" id="customer_email"  required>
-                            
                         </div>
 						
 						<div class="form-group col-md-6">
@@ -180,16 +181,22 @@
     </div>
 
 <script>
-    $("#product_id").change(function(){
-        var optionclass = $(this).find("option:selected").attr('class');
-        $('#product_id').removeClass('inactive');
-        $('#product_id').removeClass('active');
-        $('#product_id').addClass(optionclass);
-
-    });
-
     $(function() {
-        $("#product_id").trigger("change");
+        //下拉选择站点后，选择显示或者隐藏产品的选项
+        $("#sitesel").change(function(){
+            $("#search_product").trigger("keyup");
+            var site = $(this).val();
+            $('#product_id optgroup').each(function (index,element){
+                // var content = $(element).text().toUpperCase();
+                var content = $(element).attr('label');
+                if(content.indexOf(site) >= 0 ) {
+                    //包含搜索的内容
+                    $(this).show();
+                }else{
+                    $(this).hide();
+                }
+            });
+        });
 
         $("#search_product").keyup(function(){
             var search_value = $(this).val().toUpperCase();
@@ -203,6 +210,9 @@
                 }
             });
         });
+
+        $("#sitesel").trigger("change");
+        $("#search_product").trigger("keyup");
 
     });
 </script>

@@ -1,0 +1,160 @@
+<?php
+/*
+ * By wulanfang
+ * Date: 2019.11.14
+ * 说明：此批处理需每日凌晨跑数据
+ */
+namespace App\Console\Commands;
+
+use Illuminate\Console\Command;
+use DB;
+use Log;
+use App\Classes\SapRfcRequest;
+
+
+class AddRsgProduct extends Command
+{
+	use \App\Traits\Mysqli;
+	protected $signature = 'add:rsgProduct';
+
+	/**
+	 * The console command description.
+	 *
+	 * @var string
+	 */
+	protected $description = 'Command description';
+
+	/**
+	 * Create a new command instance.
+	 *
+	 * @return void
+	 */
+	public function __construct()
+	{
+		parent::__construct();
+
+	}
+
+	public function __destruct()
+	{
+
+	}
+
+	//添加rsgProduct数据
+	function handle()
+	{
+		set_time_limit(0);
+		$today = date('Y-m-d');
+		$yestoday = date('Y-m-d',strtotime($today)-86400);
+		$yestodayYmd = date('Ymd',strtotime($today)-86400);
+		Log::Info('Execution addRsgProduct.php script start time:'.$today."\n");
+
+		//keyword,position,product_name,product_img,price,product_summary,product_content,sku_level
+		$sql = "SELECT asin.asin as asin,asin.site as site,any_value(asin.post_status) as post_status,any_value(asin.post_type) as post_type,any_value(asin.push_date) as push_date,any_value(item_no) as sku,any_value(star_history.total_star_number) as number_of_reviews,any_value(star_history.average_score) as review_rating,any_value(rsg_products.order_status) as order_status,any_value(skus_week_details.ranking) as position,any_value(sku_keywords.keywords) as keyword 
+				FROM asin 
+				LEFT JOIN rsg_products on created_at = '".$yestoday."' 
+				LEFT JOIN star_history on create_at = '".$yestoday."' and asin.asin = star_history.asin and asin.site = star_history.domain 
+				LEFT JOIN skus_week_details on weeks = '".$yestodayYmd."' and asin.asin = skus_week_details.asin and asin.site = skus_week_details.site 
+				LEFT JOIN (
+					select t2.asin,t2.site,t2.weeks,keywords 
+					from skus_week_details as t2
+					left join (
+							select asin,site,max(weeks) as max_weeks  
+							from skus_week_details 
+							where keywords is not null group by asin,site
+					) as t1 on t1.asin=t2.asin and t1.site=t2.site and t2.weeks = t1.max_weeks 
+					where max_weeks is not null 
+				) as sku_keywords on asin.asin = sku_keywords.asin and asin.site = sku_keywords.site 
+				WHERE 1 = 1 
+				GROUP BY asin,site";
+		$data = $this->queryRows($sql);
+
+		//sku状态信息
+		$sapSiteCode = getSapSiteCode();
+		$sku_sql = "select sku,sap_site_id,any_value(level) as sku_level from skus_status group by sku,sap_site_id";
+		$_skuData = $this->queryRows($sku_sql);
+		$skuData = array();
+		foreach($_skuData as $key=>$val){
+			$site = isset($sapSiteCode[$val['sap_site_id']]) ? 'www.'.$sapSiteCode[$val['sap_site_id']] : $val['sap_site_id'];
+			$skuData[$val['sku'].'_'.$site]['sku_level'] = $val['sku_level'];
+		}
+
+		//取亚马逊的产品相关数据
+		$siteUrl = getSiteUrl();
+		$amazon_sql = "select asin,marketplaceid,title,images,features,description,price 
+				from products 
+				group by asin,marketplaceid ";
+		$_amazonData = DB::connection('amazon')->select($amazon_sql);
+		$amazonData = array();
+		foreach($_amazonData as $key=>$val){
+			$site = isset($siteUrl[$val->marketplaceid]) ? 'www.'.$siteUrl[$val->marketplaceid] : $val->marketplaceid;
+			$amazonData[$val->asin.'_'.$site]['asin'] = $val->asin;
+			$amazonData[$val->asin.'_'.$site]['marketplaceid'] = $val->marketplaceid;
+			$amazonData[$val->asin.'_'.$site]['title'] = str_replace('"',"'",$val->title);
+			$amazonData[$val->asin.'_'.$site]['features'] = str_replace('"',"'",$val->features);
+			$amazonData[$val->asin.'_'.$site]['description'] = str_replace('"',"'",$val->description);
+			$amazonData[$val->asin.'_'.$site]['price'] = $val->price;
+			$imageArr = explode(',',$val->images);
+			if($imageArr){
+				$amazonData[$val->asin.'_'.$site]['image'] = 'https://images-na.ssl-images-amazon.com/images/I/'.$imageArr[0];
+			}
+		}
+
+		$insertData = array();
+		foreach($data as $key=>$val){
+			$product_name = $product_img = $price = $product_summary = $product_content = '';
+			if(isset($amazonData[$val['asin'].'_'.$val['site']])){
+				$product_name = $amazonData[$val['asin'].'_'.$val['site']]['title'];
+				$product_img = $amazonData[$val['asin'].'_'.$val['site']]['image'];
+				$price = $amazonData[$val['asin'].'_'.$val['site']]['price'];
+				$product_summary = $amazonData[$val['asin'].'_'.$val['site']]['features'];
+				$product_content = $amazonData[$val['asin'].'_'.$val['site']]['description'];
+			}
+			//美国站点 5个/天 其他站点3个/天， 新品上线第一周(帖子状态为待推贴，并且更新时间为一周内)美国站点 10个/天 其他站点5个/天
+			if($val['post_status']==2 && (time()-strtotime($val['push_date']))<=86400*7){//新品上线第一周
+				if($val['site']=='www.amazon.com'){
+					$sales_target_reviews = 10;
+				}else{
+					$sales_target_reviews = 5;
+				}
+			}else{
+				if($val['site']=='www.amazon.com'){
+					$sales_target_reviews = 5;
+				}else{
+					$sales_target_reviews = 3;
+				}
+			}
+
+
+			$insertData[] = array(
+				'asin' => $val['asin'],
+				'site' => $val['site'],
+				'created_at' => date('Y-m-d'),
+				'updated_at' => date('Y-m-d H:i:s'),
+				'post_status' => $val['post_status'],
+				'post_type' => $val['post_type'],
+				'user_id' => 1,//user_id=1时表示为系统添加
+				'review_rating' => $val['review_rating'],//昨天星级
+				'number_of_reviews' => $val['number_of_reviews'],//昨天的评论总数
+				'sales_target_reviews' => $sales_target_reviews,
+				'order_status' => $val['order_status'],
+				'keyword' => $val['keyword'],
+				'position' => $val['position'],
+				'product_name' => $product_name,
+				'product_img' => $product_img,
+				'price' => $price,
+				'product_summary' => $product_summary,
+				'product_content' => $product_content,
+				'sku_level' => isset($skuData[$val['sku'].'_'.$val['site']]) ? $skuData[$val['sku'].'_'.$val['site']]['sku_level'] : '',
+			);
+		}
+		if($insertData){
+			batchInsert('rsg_products',$insertData);
+		}
+		Log::Info($insertData);
+		Log::Info('Execution script end');
+	}
+}
+
+
+

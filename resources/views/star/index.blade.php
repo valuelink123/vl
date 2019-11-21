@@ -108,18 +108,26 @@ th,td,td>span {
                                     </select>
                                        
 						</div>
-						
+						{{--帖子状态，帖子类型的搜索选项--}}
 						<div class="col-md-1">
-						<select class="form-control form-filter input-sm" name="asin_status">
-                                        <option value="">Asin Level</option>
-                                        <option value="S" <?php if('S'==array_get($_REQUEST,'asin_status')) echo 'selected';?>>S</option>
-										<option value="A" <?php if('A'==array_get($_REQUEST,'asin_status')) echo 'selected';?>>A</option>
-										<option value="B" <?php if('B'==array_get($_REQUEST,'asin_status')) echo 'selected';?>>B</option>
-										<option value="C" <?php if('C'==array_get($_REQUEST,'asin_status')) echo 'selected';?>>C</option>
-										<option value="D" <?php if('D'==array_get($_REQUEST,'asin_status')) echo 'selected';?>>D</option>
-                                    </select>
-                                       
+							<select class="form-control form-filter input-sm" name="post_type">
+								<option value="">Asin Type</option>
+								@foreach(getPostType() as $key=>$val)
+									<option value="{!! $key !!}" @if($key==array_get($_REQUEST,'post_type')) selected @endif>{!! $val['name'] !!}</option>
+								@endforeach
+							</select>
 						</div>
+
+						<div class="col-md-1">
+							<select class="form-control form-filter input-sm" name="post_status">
+								<option value="">Asin Status</option>
+								@foreach(getPostStatus() as $key=>$val)
+									<option value="{!! $key !!}" @if($key==array_get($_REQUEST,'post_status')) selected @endif>{!! $val['name'] !!}</option>
+								@endforeach
+							</select>
+						</div>
+
+
 						
 						<div class="col-md-1">
 						<select class="form-control form-filter input-sm" name="item_status">
@@ -131,7 +139,7 @@ th,td,td>span {
 						</div>
 						
 						
-						<div class="col-md-4 form-inline">
+						<div class="col-md-3 form-inline">
 						<select class="form-filter input-sm form-group" name="coupon_than">
                                         <option value="">Coupon Compare</option>
                                         <option value=">" <?php if('S'==array_get($_REQUEST,'coupon_than')) echo 'selected';?>>></option>
@@ -169,15 +177,21 @@ th,td,td>span {
                     </form>
 					<div style="clear:both;"></div>
                 </div>
-			
+
+				<div>
+
+				</div>
                 <div class="table-container">
 
                     <table class="table table-striped table-bordered table-hover" id="datatable_ajax_asin">
                         <thead>
 							
                             <tr role="row" class="heading">
-								<th style="min-width:60px;"> Asin </th>	
-								<th style="min-width:40px;"> Level </th>	
+								<th style="min-width:60px;"> Asin </th>
+								<th style="min-width:50px;"> Type </th>
+								<th style="min-width:50px;"> Status </th>
+
+								{{--<th style="min-width:40px;"> Level </th>	--}}
                                 <th style="min-width:50px;"> Item No. </th>
 								<th style="min-width:50px;"> Status </th>	
                                 <th style="min-width:50px;"> Seller </th>
@@ -215,6 +229,7 @@ th,td,td>span {
                                 <th style="min-width:50px;"> 3 Stars </th>
 								<th style="min-width:50px;"> 4 Stars </th>
                                 <th style="min-width:50px;"> 5 Stars </th>
+								<th style="min-width:50px;"> Action </th>
                             </tr>
 							
                             
@@ -226,6 +241,34 @@ th,td,td>span {
             <!-- END EXAMPLE TABLE PORTLET-->
         </div>
     </div>
+
+{{--编辑帖子状态和帖子类型--}}
+<div id="edit-content" style="display:none;">
+	<form id="edit-form">
+		<input type="hidden" class="form-control" name="asin" id="post-asin" value="">
+		<input type="hidden" class="form-control" name="domain" id="post-domain" value="">
+		<div class="form-group">
+			<label>Post Type</label>
+			<div class="input-group ">
+				<select id="post-type" class="table-group-action-input form-control input-inline input-small input-sm" name="post-type">
+					@foreach(getPostType() as $key=>$val)
+						<option value="{!! $key !!}">{!! $val['name'] !!}</option>
+					@endforeach
+				</select>
+			</div>
+		</div>
+		<div class="form-group">
+			<label>Post Status</label>
+			<div class="input-group ">
+				<select id="post-status" class="table-group-action-input form-control input-inline input-small input-sm" name="post-status">
+					@foreach(getPostStatus() as $key=>$val)
+						<option value="{!! $key !!}">{!! $val['name'] !!}</option>
+					@endforeach
+				</select>
+			</div>
+		</div>
+	</form>
+</div>
 
 
     <script>
@@ -260,6 +303,10 @@ th,td,td>span {
 			grid.setAjaxParam("bgbu", $("select[name='bgbu']").val());
 			grid.setAjaxParam("site", $("select[name='site[]']").val());
 			grid.setAjaxParam("coupon_value", $("input[name='coupon_value']").val());
+
+            grid.setAjaxParam("post_status", $("select[name='post_status']").val());
+            grid.setAjaxParam("post_type", $("select[name='post_type']").val());
+
             grid.init({
                 src: $("#datatable_ajax_asin"),
                 onSuccess: function (grid, response) {
@@ -297,9 +344,9 @@ th,td,td>span {
 					buttons: [],
 					
 					<?php } ?>
-					"aoColumnDefs": [ { "bSortable": false, "aTargets": [ 11,12,24 ] }],	
+					"aoColumnDefs": [ { "bSortable": false, "aTargets": [12,13,25,37 ] }],
 					 "order": [
-                        [1, "asc"]
+                        [0, "asc"]
                     ],
                     // scroller extension: http://datatables.net/extensions/scroller/
                     scrollY:        500,
@@ -307,8 +354,8 @@ th,td,td>span {
 					
 
 					fixedColumns:   {
-						leftColumns:5,
-						rightColumns: 0
+						leftColumns:6,
+						rightColumns: 1
 					},
                     "ajax": {
                         "url": "{{ url('star/get')}}", // ajax source
@@ -318,10 +365,9 @@ th,td,td>span {
 					//"dom": "<'row' <'col-md-12'B>><'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'>r><'table-scrollable't><'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>",
 					"dom": "<'row' <'col-md-12'B>><'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'>r><'table-scrollable't><'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>",
                 }
+
+
             });
-
-
-            
 
             //grid.setAjaxParam("customActionType", "group_action");
             //grid.setAjaxParam("date_from", $("input[name='date_from']").val());
@@ -334,7 +380,12 @@ th,td,td>span {
 			//grid.setAjaxParam("keywords", $("input[name='keywords']").val());
             //grid.getDataTable().ajax.reload(null,false);
             //grid.clearAjaxParams();
+
         }
+
+
+
+
 
 
         return {
@@ -357,6 +408,67 @@ $(function() {
 	    dttable.fnDestroy(); //还原初始化了的datatable
 		TableDatatablesAjax.init();
 	});
+
+	// $('.editAction').on('click',function(){
+	$('#datatable_ajax_asin').on('click','.editAction',function(){
+	    //获取值
+	    var asin = $(this).attr('data-asin');
+	    var domain = $(this).attr('data-domain');
+        var postStatus = $(this).attr('data-postStatus');
+        var postType = $(this).attr('data-postType')
+
+		//赋值值
+	    $('#post-asin').val(asin);
+        $('#post-domain').val(domain);
+        $('#post-status').val(postStatus);
+        $('#post-type').val(postType);
+        // var obj = $(this).parent();
+        var obj = $(this).parent().parent();
+        var index = $(".DTFC_RightBodyWrapper table tbody tr").index(obj);
+        console.log(index);
+
+        art.dialog({
+            id: 'art_edit',
+            title: 'edit_'+asin+'_'+domain,
+            content: document.getElementById('edit-content'),
+            okVal: 'Submit',
+            ok: function () {
+                this.title('In the submission…');
+                var data = $("#edit-form").serialize();
+                $.ajax({
+                    type: 'post',
+                    url: '/star/updatePost',
+                    data: data,
+                    dataType: 'json',
+                    success: function(res) {
+                        if(res){
+							// $("#data_search").trigger("click");
+							var statusText = $('#post-status option:selected').text();
+                            var typeText = $('#post-type option:selected').text();
+                            console.log($('.DTFC_LeftBodyWrapper table tbody tr').eq(index).find('td').html());
+							$('.DTFC_LeftBodyWrapper table tbody tr').eq(index).find('td').eq(1).text(typeText);
+                            $('.DTFC_LeftBodyWrapper table tbody tr').eq(index).find('td').eq(2).text(statusText);
+
+                            //动态改变已修改的值，不用重新加载数据
+                            obj.find('a').attr('data-postStatus',$('#post-status option:selected').val());
+                            obj.find('a').attr('data-postType',$('#post-type option:selected').val());
+							//
+                           	// obj.prev().text($('#post-type option:selected').text());
+                            // obj.prev().prev().text($('#post-status option:selected').text());
+                            toastr.success('Saved !');
+                        }else{
+                            //编辑失败
+                            alert('Failed');
+                        }
+                    }
+                });
+            },
+            cancel: true,
+            cancelVal:'Cancel'
+        });
+        return false;
+	})
+
 	
 });
 

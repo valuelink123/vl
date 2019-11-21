@@ -87,9 +87,9 @@ class Controller extends BaseController
 		foreach($search as $val){
 			$sv = explode('=',$val);
 			if(isset($sv[1])){
-				$searchData[$sv[0]] = $sv[1];
+				$searchData[$sv[0]] = trim($sv[1]);
 				if($sv[0]=='date_to'){
-					$searchData[$sv[0]] = $sv[1].' 23:59:59';
+					$searchData[$sv[0]] = trim($sv[1]).' 23:59:59';
 				}
 			}
 		}
