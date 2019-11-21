@@ -155,9 +155,14 @@ class GetAsininfo extends Command
 			}
 		}
 		DB::table('fba_stock')->truncate();
+		DB::table('asin')->update(['fba_stock'=>0, 'fba_transfer'=>0]);
 		$fs = DB::connection('order')->select('select InStock as stock,(Total-InStock) as transfer ,asin,sellerid,sellersku,updated_at from amazon_inventory_supply where Total>0');
 		foreach($fs as $fsd){
-			DB::table('asin')->where('asin',$fsd->asin)->where('sellersku',$fsd->sellersku)->update(['fba_stock'=>intval($fsd->stock), 'fba_transfer'=>intval($fsd->transfer)]);
+			$arrayArea=[];
+			if(array_get($sellerid_area,$fsd->sellerid)=='US')) $arrayArea=['www.amazon.com','www.amazon.ca'];
+			if(array_get($sellerid_area,$fsd->sellerid)=='EU')) $arrayArea=['www.amazon.it','www.amazon.es','www.amazon.fr','www.amazon.de','www.amazon.co.uk'];
+			if(array_get($sellerid_area,$fsd->sellerid)=='JP')) $arrayArea=['www.amazon.co.jp'];
+			DB::table('asin')->where('asin',$fsd->asin)->where('sellersku',$fsd->sellersku)->whereIn('site',$arrayArea)->update(['fba_stock'=>intval($fsd->stock), 'fba_transfer'=>intval($fsd->transfer)]);
 			
 			$exists_item_code = DB::table('asin')->where('asin',$fsd->asin)->where('sellersku',$fsd->sellersku)->first();
 			$name = array_get($sellerid_name,$fsd->sellerid);
