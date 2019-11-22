@@ -346,6 +346,17 @@ class HomeController extends Controller
 				$sumwhere.=" and bu='".array_get($bgbu_arr,1)."'";
 			}
 		}
+		if(array_get($_REQUEST,'site')){
+			$asins = $asins->whereIn('asin.site',$_REQUEST['site']);
+		}
+		if(array_get($_REQUEST,'keywords')){
+            $keywords = array_get($_REQUEST,'keywords');
+            $asins = $asins->where(function ($query) use ($keywords) {
+                $query->where('asin.item_no',$keywords)
+					  ->orwhere('asin.asin',$keywords);
+
+            });
+        }
 		
 		if($limit_bg){
 			$asins = $asins->where('asin.bg',$limit_bg);

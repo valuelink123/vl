@@ -26,8 +26,8 @@ th,td,td>span {
                     <form role="form" action="{{url('home/asins')}}" method="GET">
                         {{ csrf_field() }}
                         <div class="row">
-						
-						<div class="col-md-2">
+						<div class="col-md-3">
+						<div class="col-md-6">
                             <div class="input-group date date-picker margin-bottom-5" data-date-format="yyyy-mm-dd">
                                 <input type="text" class="form-control form-filter input-sm" readonly name="date_from" placeholder="Date" value="{{$date_from}}">
                                 <span class="input-group-btn">
@@ -37,7 +37,7 @@ th,td,td>span {
                                                                     </span>
                             </div>
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-md-6">
                             <div class="input-group date date-picker" data-date-format="yyyy-mm-dd">
                                 <input type="text" class="form-control form-filter input-sm" readonly name="date_to" placeholder="Compare Date" value="{{$date_to}}">
                                 <span class="input-group-btn">
@@ -47,17 +47,10 @@ th,td,td>span {
                                                                     </span>
                             </div>
                         </div>
+						</div>
                        
 						@if(Auth::user()->seller_rules)
-						<div class="col-md-2">
-						<select class="mt-multiselect btn btn-default form-control form-filter input-sm " data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" name="user_id" id="user_id">
-								<option value="">All Sellers</option>
-								@foreach ($users as $user_id=>$user_name)
-									<option value="{{$user_id}}" <?php if($user_id==$s_user_id) echo 'selected'; ?>>{{$user_name}}</option>
-								@endforeach
-							</select>
-						</div>
-						<div class="col-md-2">
+						<div class="col-md-1">
 						<select class="form-control form-filter input-sm" name="bgbu">
                                         <option value="">BG && BU</option>
 										<?php 
@@ -74,9 +67,29 @@ th,td,td>span {
 										} ?>
                                     </select>
 						</div>	
+						<div class="col-md-2">
+						<select class="mt-multiselect btn btn-default form-control form-filter input-sm " data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" name="user_id" id="user_id">
+								<option value="">All Sellers</option>
+								@foreach ($users as $user_id=>$user_name)
+									<option value="{{$user_id}}" <?php if($user_id==$s_user_id) echo 'selected'; ?>>{{$user_name}}</option>
+								@endforeach
+							</select>
+						</div>
+						
 						@endif
+						 <div class="col-md-2">
+						<select class="mt-multiselect btn btn-default" multiple="multiple" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" name="site[]" id="site[]">
+
+                                        @foreach (getAsinSites() as $v)
+                                            <option value="{{$v}}">{{$v}}</option>
+                                        @endforeach
+                                    </select>
+						</div>
 						
-						
+						<div class="col-md-2">
+						<input type="text" class="form-control form-filter input-sm" name="keywords" placeholder="Keywords" value ="{{array_get($_REQUEST,'keywords')}}">
+                                       
+						</div>	
 						<div class="col-md-1"><button type="button" class="btn blue" id="data_search">Search</button>
 						</div>
 						</div>
@@ -145,6 +158,8 @@ th,td,td>span {
             grid.setAjaxParam("date_to", $("input[name='date_to']").val());
             grid.setAjaxParam("user_id", $("select[name='user_id']").val());
 			grid.setAjaxParam("bgbu", $("select[name='bgbu']").val());
+			grid.setAjaxParam("keywords", $("input[name='keywords']").val());
+			grid.setAjaxParam("site", $("select[name='site[]']").val());
             grid.init({
                 src: $("#datatable_ajax_asin"),
                 onSuccess: function (grid, response) {
