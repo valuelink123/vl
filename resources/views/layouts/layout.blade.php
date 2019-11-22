@@ -185,6 +185,12 @@
                                                 <span class="arrow"></span>
                                             </a>
                                             <ul class="dropdown-menu pull-left">
+												<li class="">
+                                                    <a href="/home/asins" class="nav-link nav-toggle ">
+                                                        Asin Sales Data
+                                                        <span class="arrow"></span>
+                                                    </a>    
+                                                </li>
 												@permission('asin-rating-show')
                                                 <li class="">
                                                     <a href="/star" class="nav-link nav-toggle ">

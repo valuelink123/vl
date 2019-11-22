@@ -370,7 +370,7 @@ a.editable-click:hover {
 			</div>
 			
 			<div class="pull-right">
-				<a href="{{url('star')}}">View More&gt;&gt;</a>
+				<a href="{{url('home/asins?date_from='.$date_from.'&date_to='.$date_to.'&s_user_id='.$s_user_id.'&bgbu='.$bgbu)}}">View More&gt;&gt;</a>
 			</div>
 			
 		</div>
@@ -381,16 +381,18 @@ a.editable-click:hover {
 							<tr class="uppercase">
 								<th> ASIN </th>
 								<th> SKU </th>
-								<th> UNITS </th>
 								<th> SALES </th>
+								<th> UNITS </th>
+								<th> SALES/D </th>
+								<th> FBM </th>
 								<th> AVG.PRICE </th>
 								<th >FBA</th>
-								<th> OUTSTOCK DATE </th>
+								<th> OUTSTOCK </th>
 								<th> RATING </th>
-								<th> SESSIONS <font style="color:#ccc;"><i  class="fa fa-info-circle popovers" data-container="body" onclick=" " data-trigger="hover" data-placement="top" data-html="true" data-content="Average data from {{date('Y-m-d',strtotime('-10days'))}} to {{date('Y-m-d',strtotime('-4days'))}}"></i></font></th>
+								<th> SESS <font style="color:#ccc;"><i  class="fa fa-info-circle popovers" data-container="body" onclick=" " data-trigger="hover" data-placement="top" data-html="true" data-content="Average data from {{date('Y-m-d',strtotime('-10days'))}} to {{date('Y-m-d',strtotime('-4days'))}}"></i></font></th>
 								<th> CR <font style="color:#ccc;"><i  class="fa fa-info-circle popovers" data-container="body" onclick=" " data-trigger="hover" data-placement="top" data-html="true" data-content="Average data from {{date('Y-m-d',strtotime('-10days'))}} to {{date('Y-m-d',strtotime('-4days'))}}"></i></font></th>
 								
-								<th> KEYWORD RANKING </th>
+								<th> KEYWORD RANK </th>
 								<th> BSR  <font style="color:#ccc;"><i  class="fa fa-info-circle popovers" data-container="body" onclick=" " data-trigger="hover" data-placement="top" data-html="true" data-content="Average data from {{date('Y-m-d',strtotime('-10days'))}} to {{date('Y-m-d',strtotime('-4days'))}}"></i></font></th>
 								<th> SKU E.VALUE </th>
 								<th> SKU BONUS </th>
@@ -406,8 +408,10 @@ a.editable-click:hover {
 								<a href="https://{{array_get($asin,'site')}}/dp/{{array_get($asin,'asin')}}" class="primary-link" target="_blank">{{array_get($asin,'asin')}}</a>
 							</td>
 							<td> {{array_get($asin,'item_no')}} </td>
-							<td> {{array_get($asin,'sales')}} </td>
 							<td> {{array_get($asin,'amount')}} </td>
+							<td> {{array_get($asin,'sales')}} </td>
+							<td> {{round(array_get($asin,'sales')/((strtotime($date_to)-strtotime($date_from))/86400+1),2)}} </td>
+							<td> {{array_get($asin,'fbm_stock')}} </td>
 							<td> {{(array_get($asin,'sales')>0)?round(array_get($asin,'amount')/array_get($asin,'sales'),2):0}} </td>
 							<td> {{array_get($asin,'fba_stock')}} </td>
 							<td> {{($sales>0)?date('Y-m-d',strtotime('+'.intval(array_get($asin,'fba_stock')/$sales).' days')):'∞'}} </td>

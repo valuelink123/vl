@@ -20,6 +20,8 @@ Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
 Route::get('/homeexport', 'HomeController@export');
+Route::get('/home/asins', 'HomeController@asins');
+Route::Post('/home/getasins', 'HomeController@getasins');
 Route::resource('account', 'AccountController');
 Route::resource('template', 'TemplateController');
 Route::resource('asin', 'AsinController');
