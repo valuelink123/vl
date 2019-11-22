@@ -178,7 +178,7 @@ th,td,td>span {
                     ],
 					"aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0,1,2,3,4 ] }],	
 					 "order": [
-                        [2, "asc"]
+                        [5, "asc"]
                     ],
                     // scroller extension: http://datatables.net/extensions/scroller/
                     scrollY:        500,

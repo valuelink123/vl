@@ -187,14 +187,14 @@
                                             <ul class="dropdown-menu pull-left">
 												<li class="">
                                                     <a href="/home/asins" class="nav-link nav-toggle ">
-                                                        Asin Sales Data
+                                                        My Listing
                                                         <span class="arrow"></span>
                                                     </a>    
                                                 </li>
 												@permission('asin-rating-show')
                                                 <li class="">
                                                     <a href="/star" class="nav-link nav-toggle ">
-                                                        My Listing
+                                                        Rating Table
                                                         <span class="arrow"></span>
                                                     </a>    
                                                 </li>
