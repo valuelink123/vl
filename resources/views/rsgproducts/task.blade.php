@@ -22,7 +22,7 @@
                     <tr>
                         <th>Rank</th>
                         <th>Score</th>
-                        <th>Order Status</th>
+                        <th>Weight Status</th>
                         <th>Product</th>
                         <th>Site</th>
                         <th>Asin</th>
@@ -36,7 +36,7 @@
                         <th>BG</th>
                         <th>BU</th>
                         <th>Seller</th>
-                        <th>Unfinished</th>
+                        <th title="The number of applications which have PayPal but haven't completed in the last 15 days">Unfinished</th>
                         <th>Target</th>
                         <th>Achieved</th>
                         <th>Task</th>
@@ -64,7 +64,7 @@
                             <th>{!! $val['seller'] !!}</th>
                             <th>{!! $val['unfinished'] !!}</th>
                             <th>{!! $val['target_review'] !!}</th>
-                            <th>{!! $val['achieved'] !!}</th>
+                            <th>{!! $val['requested_review'] !!}</th>
                             <th>{!! $val['task'] !!}</th>
                             <th>{!! $val['action'] !!}</th>
                         </tr>

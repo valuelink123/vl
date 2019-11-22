@@ -973,3 +973,17 @@ function getProductOrderStatus()
 {
 	return array(0=>'默认',1=>'增加权重','-1'=>'降低权重');
 }
+/*
+ * 产品的权重排序状态对应值
+ */
+function getSkuLevel()
+{
+	return array('S','A','B','C','D');
+}
+/*
+ * sku状态对应值
+ */
+function getSkuStatus()
+{
+	return array('New','Normal','Obsoleted','Replaced','Observing','Accessories','Gift','Packaging');
+}

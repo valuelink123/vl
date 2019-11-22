@@ -106,7 +106,7 @@ class Controller extends BaseController
 	{
 		$where = '';
 		foreach($searchField as $fk=>$fv){
-			if(isset($searchData[$fk]) && $searchData[$fk]){
+			if(isset($searchData[$fk]) && $searchData[$fk] !=='' ){
 				if(is_array($fv)){
 					foreach($fv as $vk=>$vv){
 						$where .= " and {$vv} {$vk} '".$searchData[$fk]."'";

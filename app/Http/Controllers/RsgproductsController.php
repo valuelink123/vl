@@ -39,13 +39,14 @@ class RsgproductsController extends Controller
 			return view('rsgproducts/index', ['date' => $todayDate,'bgs'=>$this->getBgs(),'bus'=>$this->getBus()]);
 		}
 		//搜索相关
-		$searchField = array('date'=>'rsg_products.created_at','asin'=>'rsg_products.asin','bg'=>'asin.bg','bu'=>'asin.bu','site'=>'rsg_products.site','item_no'=>'asin.item_no','post_type'=>'rsg_products.post_type','post_status'=>'rsg_products.post_status');
+		$searchField = array('date'=>'rsg_products.created_at','asin'=>'rsg_products.asin','bg'=>'asin.bg','bu'=>'asin.bu','site'=>'rsg_products.site','item_no'=>'asin.item_no','post_type'=>'rsg_products.post_type','post_status'=>'rsg_products.post_status','order_status'=>'rsg_products.order_status','sku_level'=>'rsg_products.sku_level','sku_status'=>'skus_status.status');
 		$search = isset($_POST['search']) ? $_POST['search'] : '';
 		$search = $this->getSearchData(explode('&',$search));
 		$where = $where_product = $this->getSearchWhereSql($search,$searchField);
 
 		$date = $search['date'];
-		$sql = $this->getSql($where,$where_product,$date);
+		$orderby = $this->dtOrderBy($req);
+		$sql = $this->getSql($where,$where_product,$date,$orderby);
 
 		if($req['length'] != '-1'){
 			$limit = $this->dtLimit($req);
@@ -128,7 +129,7 @@ class RsgproductsController extends Controller
 		$data = $this->queryRows($sql);
 		$data = $this->getReturnData($data,$date,$todayDate);
 		$arrayData = array();
-		$headArray = array('Rank','Score','Order Status','Product','Site','Asin','Type','Status','Item No','Level','SKU Status','Rating','Reviews','BG','BU','Seller','Unfinished','Target','Achieved','Task');
+		$headArray = array('Rank','Score','Weight Status','Product','Site','Asin','Type','Status','Item No','Level','SKU Status','Rating','Reviews','BG','BU','Seller','Unfinished','Target','Achieved','Task');
 		$arrayData[] = $headArray;
 		foreach ($data as $key=>$val){
 			$arrayData[] = array(
@@ -150,7 +151,7 @@ class RsgproductsController extends Controller
 				$val['seller'],
 				$val['unfinished'],
 				$val['target_review'],
-				$val['achieved'],
+				$val['requested_review'],
 				$val['task'],
 			);
 		}
@@ -196,11 +197,17 @@ class RsgproductsController extends Controller
 	 * 得到sql查询语句
 	 *
 	 */
-	public function getSql($where,$where_product,$date)
+	public function getSql($where,$where_product,$date='',$orderby='')
 	{
+		if($orderby){
+			$orderby = " order by {$orderby} ";
+		}else{
+			$orderby = " order by rsg_products.order_status desc,score desc,id desc ";
+		}
+		$ago15day = date('Y-m-d',strtotime($date)-86400*15);
 		$sql = "
         SELECT SQL_CALC_FOUND_ROWS
-        	rsg_products.id as id,rsg_products.asin as asin,rsg_products.site as site,rsg_products.post_status as post_status,rsg_products.post_type as post_type,rsg_products.sales_target_reviews as target_review,rsg_products.requested_review as requested_review,asin.bg as bg,asin.bu as bu,asin.item_no as item_no,asin .seller as seller,rsg_products.number_of_reviews as review,rsg_products.review_rating as rating, num as unfinished,rsg_products.sku_level as sku_level, rsg_products.product_img as img,rsg_products.order_status as order_status,cast(rsg_products.sales_target_reviews as signed) - cast(rsg_products.requested_review as signed) as task,(status_score*type_score*level_score*rating_score*review_score)  as score   
+        	rsg_products.id as id,rsg_products.asin as asin,rsg_products.site as site,rsg_products.post_status as post_status,rsg_products.post_type as post_type,rsg_products.sales_target_reviews as target_review,rsg_products.requested_review as requested_review,asin.bg as bg,asin.bu as bu,asin.item_no as item_no,asin .seller as seller,rsg_products.number_of_reviews as review,rsg_products.review_rating as rating, num as unfinished,rsg_products.sku_level as sku_level, rsg_products.product_img as img,rsg_products.order_status as order_status,cast(rsg_products.sales_target_reviews as signed) - cast(rsg_products.requested_review as signed) as task,(status_score*type_score*level_score*rating_score*review_score)  as score,skus_status.status as sku_status 
             from rsg_products  
             left join (
 				select id,
@@ -213,9 +220,9 @@ class RsgproductsController extends Controller
 						WHEN 2 then 0.5*20
 						ELSE 0 END as type_score,
 					case sku_level
-						WHEN 'S' then 1*20
-						WHEN 'A' then 0.6*20
-						WHEN 'B' then 0.2*20
+						WHEN 'S' then 1
+						WHEN 'A' then 0.6
+						WHEN 'B' then 0.2
 						ELSE 0 END as level_score,
 					case review_rating
 						WHEN 5 then 1
@@ -245,7 +252,7 @@ class RsgproductsController extends Controller
 							WHEN number_of_reviews >= 400 and number_of_reviews <= 1000 then 1 
 							WHEN number_of_reviews > 1000 then 0
 							END 
-					)as review_score
+					)as review_score 
 				from rsg_products 
 				where created_at = '".$date."'  
 			) as rsg_score on rsg_score.id=rsg_products.id 
@@ -255,13 +262,13 @@ class RsgproductsController extends Controller
         	left join (
         		select count(*) as num,asin,site 
 				from rsg_products 
-				left join rsg_requests on product_id = rsg_products.id and step IN(1,3,4,5,6,7,8) 
-				where rsg_requests.created_at <= '".$date." 23:59:59 ' 
+				left join rsg_requests on product_id = rsg_products.id and step IN(4,5,6,7) 
+				where rsg_requests.created_at <= '".$date." 23:59:59 ' and rsg_requests.created_at >='".$ago15day." 00:00:00 ' 
 				group by asin,site 
-        	) as rsg on rsg_products.asin=rsg.asin and rsg_products.site=rsg.site  
-        	
+        	) as rsg on rsg_products.asin=rsg.asin and rsg_products.site=rsg.site 
+        	left join skus_status on asin.item_no = skus_status.sku and asin.site = skus_status.site 
 			where 1 = 1 {$where_product} 
-			order by rsg_products.order_status desc,score desc,id desc  ";
+			{$orderby} ";
 		return $sql;
 	}
 
@@ -275,24 +282,24 @@ class RsgproductsController extends Controller
 		$productOrderStatus = getProductOrderStatus();
 		$i = 1;
 		//sku状态信息
-		$sapSiteCode = getSapSiteCode();
-		$sku_sql = "select sku,sap_site_id,any_value(status) as sku_status from skus_status group by sku,sap_site_id";
-		$_skuData = $this->queryRows($sku_sql);
-		$skuData = array();
-		foreach($_skuData as $key=>$val){
-			$site = isset($sapSiteCode[$val['sap_site_id']]) ? 'www.'.$sapSiteCode[$val['sap_site_id']] : $val['sap_site_id'];
-			$skuData[$val['sku'].'_'.$site]['sku_status'] = $val['sku_status'];
-		}
+		// $sapSiteCode = getSapSiteCode();
+		// $sku_sql = "select sku,sap_site_id,any_value(status) as sku_status from skus_status group by sku,sap_site_id";
+		// $_skuData = $this->queryRows($sku_sql);
+		// $skuData = array();
+		// foreach($_skuData as $key=>$val){
+		// 	$site = isset($sapSiteCode[$val['sap_site_id']]) ? 'www.'.$sapSiteCode[$val['sap_site_id']] : $val['sap_site_id'];
+		// 	$skuData[$val['sku'].'_'.$site]['sku_status'] = $val['sku_status'];
+		// }
 		foreach ($data as $key => $val) {
 			$data[$key]['rank'] = $i;
-			$data[$key]['sku_status'] = isset($skuData[$val['item_no'].'_'.$val['site']]) ? $skuData[$val['item_no'].'_'.$val['site']]['sku_status'] : '';
+			// $data[$key]['sku_status'] = isset($skuData[$val['item_no'].'_'.$val['site']]) ? $skuData[$val['item_no'].'_'.$val['site']]['sku_status'] : '';
 			$data[$key]['basic_asin'] = $val['asin'];
 			$data[$key]['product'] = '<img src="'.$val['img'].'" width="50px" height="65px">';
 			$data[$key]['site'] = isset($siteShort[$val['site']]) ? $siteShort[$val['site']] : $val['site'];
 			$data[$key]['asin'] = '<a href="https://' . $val['site'] . '/dp/' . $val['asin'] . '" target="_blank" rel="noreferrer">' . $val['asin'] . '</a>';//asin插入超链接
 			$data[$key]['type'] = isset($postType[$val['post_type']]) ? $postType[$val['post_type']]['name'] : $val['post_type'];//post_type
 			$data[$key]['status'] = isset($postStatus[$val['post_status']]) ? $postStatus[$val['post_status']]['name'] : $val['post_status'];
-			$data[$key]['achieved'] = $val['requested_review'];
+			$data[$key]['requested_review'] = $val['requested_review'];
 			$data[$key]['action'] = '<a data-target="#ajax" class="badge badge-success" data-toggle="modal" href="/rsgrequests/create?productid='.$val['id'].'&asin=' . $val['asin'] . '&site=' . $val['site'] . '"> 
                                     <i class="fa fa-hand-o-up"></i></a>';
 			if($data[$key]['task']<=0){

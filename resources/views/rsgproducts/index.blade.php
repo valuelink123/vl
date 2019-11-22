@@ -88,6 +88,40 @@
                         </div>
                     </div>
 
+                    <div class="col-md-2">
+                        <div class="input-group">
+                            <span class="input-group-addon">Weight Status</span>
+                            <select  style="width:100%;height:35px;" id="order_status" name="order_status">
+                                <option value="">Select</option>
+                                @foreach(getProductOrderStatus() as $key=>$val)
+                                    <option value="{!! $key !!}">{!! $val !!}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <br>
+                        <div class="input-group">
+                            <span class="input-group-addon">Level</span>
+                            <select  style="width:100%;height:35px;" id="sku_level" name="sku_level">
+                                <option value="">Select</option>
+                                @foreach(getSkuLevel() as $key=>$val)
+                                    <option value="{!! $val !!}">{!! $val !!}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="input-group">
+                            <span class="input-group-addon">SKU Status</span>
+                            <select  style="width:100%;height:35px;" id="sku_status" name="sku_status">
+                                <option value="">Select</option>
+                                @foreach(getSkuStatus() as $key=>$val)
+                                    <option value="{!! $val !!}">{!! $val !!}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <br>
+                    </div>
+
                     <div class="btn-group">
                         <button id="search" class="btn sbold blue">Search</button>
                     </div>
@@ -115,7 +149,7 @@
                         {{--</th>--}}
                         <th>Rank</th>
                         <th>Score</th>
-                        <th>Order Status</th>
+                        <th>Weight Status</th>
                         <th>Product</th>
                         <th>Site</th>
                         <th>Asin</th>
@@ -129,7 +163,7 @@
                         <th>BG</th>
                         <th>BU</th>
                         <th>Seller</th>
-                        <th>Unfinished</th>
+                        <th title="The number of applications which have PayPal but haven't completed in the last 15 days">Unfinished</th>
                         <th>Target</th>
                         <th>Achieved</th>
                         <th>Task</th>
@@ -177,9 +211,9 @@
                 "pageLength": 20, // default record count per page
                 pagingType: 'bootstrap_extended',
                 processing: true,
-                ordering:  false,
-                // aoColumnDefs: [ { "bSortable": true}],
-                // order: [[1, 'desc']],
+                // ordering:  true,
+                aoColumnDefs: [ { "bSortable": false, "aTargets": [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,20] }],
+                order: [],
                 // select: {
                 //     style: 'os',
                 //     info: true, // info N rows selected
@@ -210,7 +244,7 @@
                     {data:'seller',name:'seller'},
                     {data:'unfinished',name:'unfinished'},
                     {data:'target_review',name:'target_review'},
-                    {data:'achieved',name:'achieved'},
+                    {data:'requested_review',name:'requested_review'},
                     {data:'task',name:'task'},
                     {data:'action',name:'action'},
                 ],
