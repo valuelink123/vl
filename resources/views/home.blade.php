@@ -86,12 +86,12 @@ a.editable-click:hover {
 				</div>
 				<div class="col-md-10">
 				<?php
-				$class="";
+				$class=$sign="";
 				$ap = array_get($total_info,'economic',0);
 				$hb_ap = array_get($hb_total_info,'economic',0);
 				if($ap>$hb_ap){
 					$class="font-red-haze";
-
+					$sign='+';
 				}
 				if($ap<$hb_ap){
 					$class="font-green-sharp";
@@ -117,7 +117,7 @@ a.editable-click:hover {
 								</span>
 							</div>
 							<div class="status">
-								<div class="status-title {{$class}}"> {{round(($ap-$hb_ap)/$hb_ap*100,2)}}%</div>
+								<div class="status-title {{$class}}"> {{$sign.round(($ap-$hb_ap)/$hb_ap*100,2)}}%</div>
 								<div class="status-number">{{round($hb_ap/10000,2)}} 万</div>
 							</div>
 						</div>
@@ -125,12 +125,12 @@ a.editable-click:hover {
 				</div>
 				
 				<?php
-				$class="";
+				$class=$sign="";
 				$ap = array_get($total_info,'amount',0);
 				$hb_ap = array_get($hb_total_info,'amount',0);
 				if($ap>$hb_ap){
 					$class="font-red-haze";
-
+					$sign='+';
 				}
 				if($ap<$hb_ap){
 					$class="font-green-sharp";
@@ -157,7 +157,7 @@ a.editable-click:hover {
 								</span>
 							</div>
 							<div class="status">
-								<div class="status-title {{$class}}"> {{round(($ap-$hb_ap)/$hb_ap*100,2)}}%</div>
+								<div class="status-title {{$class}}"> {{$sign.round(($ap-$hb_ap)/$hb_ap*100,2)}}%</div>
 								<div class="status-number">{{round($hb_ap/10000,2)}} 万</div>
 							</div>
 						</div>
@@ -165,12 +165,12 @@ a.editable-click:hover {
 				</div>
 				
 				<?php
-				$class="";
+				$class=$sign="";
 				$ap = array_get($total_info,'sales',0);
 				$hb_ap = array_get($hb_total_info,'sales',0);
 				if($ap>$hb_ap){
 					$class="font-red-haze";
-
+					$sign='+';
 				}
 				if($ap<$hb_ap){
 					$class="font-green-sharp";
@@ -195,18 +195,19 @@ a.editable-click:hover {
 								</span>
 							</div>
 							<div class="status">
-								<div class="status-title {{$class}}"> {{round(($ap-$hb_ap)/$hb_ap*100,2)}}% </div>
+								<div class="status-title {{$class}}"> {{$sign.round(($ap-$hb_ap)/$hb_ap*100,2)}}% </div>
 								<div class="status-number">{{$hb_ap}}</div>
 							</div>
 						</div>
 					</div>
 				</div>
 				<?php
-				$class="";
+				$class=$sign="";
 				$ap = (array_get($total_info,'sales',0)>0)?round(array_get($total_info,'amount',0)/array_get($total_info,'sales',0),2):0;
 				$hb_ap = (array_get($hb_total_info,'sales',0)>0)?round(array_get($hb_total_info,'amount',0)/array_get($hb_total_info,'sales',0),2):0;
 				if($ap>$hb_ap){
 					$class="font-red-haze";
+					$sign='+';
 				}
 				if($ap<$hb_ap){
 					$class="font-green-sharp";
@@ -235,7 +236,7 @@ a.editable-click:hover {
 							<div class="status">
 								<div class="status-title {{$class}}">
 								
-								 {{round(($ap-$hb_ap)/$hb_ap*100,2)}}%
+								 {{$sign.round(($ap-$hb_ap)/$hb_ap*100,2)}}%
 								
 								</div>
 								<div class="status-number">{{$hb_ap}}</div>
@@ -408,12 +409,12 @@ a.editable-click:hover {
 								<a href="https://{{array_get($asin,'site')}}/dp/{{array_get($asin,'asin')}}" class="primary-link" target="_blank">{{array_get($asin,'asin')}}</a>
 							</td>
 							<td> {{array_get($asin,'item_no')}} </td>
-							<td> {{array_get($asin,'amount')}} </td>
-							<td> {{array_get($asin,'sales')}} </td>
+							<td> {{array_get($asin,'amount',0)}} </td>
+							<td> {{array_get($asin,'sales',0)}} </td>
 							<td> {{round(array_get($asin,'sales')/((strtotime($date_to)-strtotime($date_from))/86400+1),2)}} </td>
-							<td> {{array_get($asin,'fbm_stock')}} </td>
+							<td> {{array_get($asin,'fbm_stock',0)}} </td>
 							<td> {{(array_get($asin,'sales')>0)?round(array_get($asin,'amount')/array_get($asin,'sales'),2):0}} </td>
-							<td> {{array_get($asin,'fba_stock')}} </td>
+							<td> {{array_get($asin,'fba_stock',0)}} </td>
 							<td> {{($sales>0)?date('Y-m-d',strtotime('+'.intval(array_get($asin,'fba_stock')/$sales).' days')):'∞'}} </td>
 							<td> {{array_get($asin,'rating')}} ({{array_get($asin,'review_count')}})</td>
 							<td> {{intval(array_get($asin,'sessions'))}} </td>
@@ -421,9 +422,9 @@ a.editable-click:hover {
 							<td> {{array_get($asin,'sku_ranking')}} </td>
 							<td> {{intval(array_get($asin,'bsr'))}} </td>
 							
-							<td> {{array_get($asin,'economic')}} </td>
+							<td> {{array_get($asin,'economic',0)}} </td>
 							<td>
-								{{array_get($asin,'bonus')}}
+								{{array_get($asin,'bonus',0)}}
 							</td>
 						</tr>
 						@endforeach

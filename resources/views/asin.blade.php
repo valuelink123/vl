@@ -87,7 +87,7 @@ th,td,td>span {
 						</div>
 						
 						<div class="col-md-2">
-						<input type="text" class="form-control form-filter input-sm" name="keywords" placeholder="Keywords" value ="{{array_get($_REQUEST,'keywords')}}">
+						<input type="text" class="form-control form-filter input-sm" name="keywords" placeholder="ASIN OR SKU" value ="{{array_get($_REQUEST,'keywords')}}">
                                        
 						</div>	
 						<div class="col-md-1"><button type="button" class="btn blue" id="data_search">Search</button>
