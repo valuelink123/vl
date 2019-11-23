@@ -25,6 +25,7 @@ margin-bottom:0px;}
 .table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
     padding: 7px;
     line-height: 15px;
+	text-align: right;
 }
 .table td, .table th {
     font-size: 12px;
@@ -49,8 +50,7 @@ padding-top:0px;}
     font-size: 14px;
 }
 .primary-link {
-    font-size: 14px;
-	    line-height: 20px;
+    font-size: 12px;
 }
 .portlet.light > .portlet-title > .caption > .caption-subject {
     font-size: 12px;
@@ -380,18 +380,18 @@ a.editable-click:hover {
 					<table class="table table-hover">
 						
 							<tr class="uppercase">
-								<th> ASIN </th>
-								<th> SKU </th>
+								<th style="text-align: left;"> ASIN </th>
+								<th style="text-align: left;"> SKU </th>
 								<th> SALES </th>
 								<th> UNITS </th>
-								<th> SALES/D </th>
+								<th> UNITS/D </th>
 								<th> FBM </th>
 								<th> AVG.PRICE </th>
 								<th >FBA</th>
 								<th> OUTSTOCK </th>
 								<th> RATING </th>
 								<th> SESS <font style="color:#ccc;"><i  class="fa fa-info-circle popovers" data-container="body" onclick=" " data-trigger="hover" data-placement="top" data-html="true" data-content="Average data from {{date('Y-m-d',strtotime('-10days'))}} to {{date('Y-m-d',strtotime('-4days'))}}"></i></font></th>
-								<th> CR <font style="color:#ccc;"><i  class="fa fa-info-circle popovers" data-container="body" onclick=" " data-trigger="hover" data-placement="top" data-html="true" data-content="Average data from {{date('Y-m-d',strtotime('-10days'))}} to {{date('Y-m-d',strtotime('-4days'))}}"></i></font></th>
+								<th> CR% <font style="color:#ccc;"><i  class="fa fa-info-circle popovers" data-container="body" onclick=" " data-trigger="hover" data-placement="top" data-html="true" data-content="Average data from {{date('Y-m-d',strtotime('-10days'))}} to {{date('Y-m-d',strtotime('-4days'))}}"></i></font></th>
 								
 								<th> KEYWORD RANK </th>
 								<th> BSR  <font style="color:#ccc;"><i  class="fa fa-info-circle popovers" data-container="body" onclick=" " data-trigger="hover" data-placement="top" data-html="true" data-content="Average data from {{date('Y-m-d',strtotime('-10days'))}} to {{date('Y-m-d',strtotime('-4days'))}}"></i></font></th>
@@ -405,13 +405,13 @@ a.editable-click:hover {
 
 						$sales = ((((array_get($asin,'sales_07_01')??array_get($asin,'sales_14_08'))??array_get($asin,'sales_21_15'))??array_get($asin,'sales_28_22'))??0)/7 ;?>
 						<tr>
-							<td>
+							<td style="text-align: left;">
 								<a href="https://{{array_get($asin,'site')}}/dp/{{array_get($asin,'asin')}}" class="primary-link" target="_blank">{{array_get($asin,'asin')}}</a>
-							</td>
-							<td> {{array_get($asin,'item_no')}} </td>
+							</td >
+							<td style="text-align: left;"> {{array_get($asin,'item_no')}} </td>
 							<td> {{array_get($asin,'amount',0)}} </td>
 							<td> {{array_get($asin,'sales',0)}} </td>
-							<td> {{round(array_get($asin,'sales')/((strtotime($date_to)-strtotime($date_from))/86400+1),2)}} </td>
+							<td> {{intval(array_get($asin,'sales')/((strtotime($date_to)-strtotime($date_from))/86400+1))}} </td>
 							<td> {{array_get($asin,'fbm_stock',0)}} </td>
 							<td> {{(array_get($asin,'sales')>0)?round(array_get($asin,'amount')/array_get($asin,'sales'),2):0}} </td>
 							<td> {{array_get($asin,'fba_stock',0)}} </td>
@@ -422,9 +422,9 @@ a.editable-click:hover {
 							<td> {{array_get($asin,'sku_ranking')}} </td>
 							<td> {{intval(array_get($asin,'bsr'))}} </td>
 							
-							<td> {{array_get($asin,'economic',0)}} </td>
+							<td> {{intval(array_get($asin,'economic',0))}} </td>
 							<td>
-								{{array_get($asin,'bonus',0)}}
+								{{intval(array_get($asin,'bonus',0))}}
 							</td>
 						</tr>
 						@endforeach

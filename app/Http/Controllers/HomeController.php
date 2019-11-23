@@ -375,28 +375,26 @@ class HomeController extends Controller
 			$sumwhere.=" and review_user_id='$limit_review_user_id'";
 		}
 		
-		$orderby = 'status';
-        $sort = 'asc';
+		$orderby = 'sales';
+        $sort = 'desc';
 		
         if(isset($_REQUEST['order'][0])){
-            
-			if($_REQUEST['order'][0]['column']==5) $orderby = 'asin.status';
-			if($_REQUEST['order'][0]['column']==6) $orderby = 'asin_d.amount';
-            if($_REQUEST['order'][0]['column']==7) $orderby = 'asin_d.sales';
-			if($_REQUEST['order'][0]['column']==8) $orderby = 'asin_d.sales';
-            if($_REQUEST['order'][0]['column']==9) $orderby = 'asin.fbm_stock';
-			if($_REQUEST['order'][0]['column']==10) $orderby = '(case when asin_d.sales = 0 Then 0 else asin_d.amount/asin_d.sales end)';
+           
+			if($_REQUEST['order'][0]['column']==2) $orderby = 'asin_d.amount';
+            if($_REQUEST['order'][0]['column']==3) $orderby = 'asin_d.sales';
+			if($_REQUEST['order'][0]['column']==4) $orderby = 'asin_d.sales';
+            if($_REQUEST['order'][0]['column']==5) $orderby = 'asin.fbm_stock';
+			if($_REQUEST['order'][0]['column']==6) $orderby = '(case when asin_d.sales = 0 Then 0 else asin_d.amount/asin_d.sales end)';
 			
-			if($_REQUEST['order'][0]['column']==11) $orderby = 'asin.fba_stock';
-			if($_REQUEST['order'][0]['column']==12) $orderby = '(case when asin_d.sales = 0 Then 99999999 else asin.fba_stock/asin_d.sales end)';
-			if($_REQUEST['order'][0]['column']==13) $orderby = 'asin.rating';
-			if($_REQUEST['order'][0]['column']==14) $orderby = 'asin.review_count';
-			if($_REQUEST['order'][0]['column']==15) $orderby = 'asin_star.sessions';
-			if($_REQUEST['order'][0]['column']==16) $orderby = 'asin_star.unit_session_percentage';
-			if($_REQUEST['order'][0]['column']==17) $orderby = 'asin_star.sku_ranking';
-			if($_REQUEST['order'][0]['column']==18) $orderby = 'asin_star.bsr';
-			if($_REQUEST['order'][0]['column']==19) $orderby = 'sku_d.economic';
-			if($_REQUEST['order'][0]['column']==20) $orderby = 'sku_d.bonus';
+			if($_REQUEST['order'][0]['column']==7) $orderby = 'asin.fba_stock';
+			if($_REQUEST['order'][0]['column']==9) $orderby = 'asin.rating';
+			if($_REQUEST['order'][0]['column']==10) $orderby = 'asin.review_count';
+			if($_REQUEST['order'][0]['column']==11) $orderby = 'asin_star.sessions';
+			if($_REQUEST['order'][0]['column']==12) $orderby = 'asin_star.unit_session_percentage';
+			if($_REQUEST['order'][0]['column']==13) $orderby = 'asin.sku_ranking';
+			if($_REQUEST['order'][0]['column']==14) $orderby = 'asin_star.bsr';
+			if($_REQUEST['order'][0]['column']==15) $orderby = 'sku_d.economic';
+			if($_REQUEST['order'][0]['column']==16) $orderby = 'sku_d.bonus';
 			
             $sort = $_REQUEST['order'][0]['dir'];
         }
@@ -406,7 +404,7 @@ class HomeController extends Controller
         $iDisplayLength = $iDisplayLength < 0 ? $iTotalRecords : $iDisplayLength;
         $iDisplayStart = intval($_REQUEST['start']);
         $sEcho = intval($_REQUEST['draw']);
-		$datas =  $asins->orderByRaw($orderby.' '.$sort.',sales_07_01 desc')->skip($iDisplayStart)->take($iDisplayLength)->get()->toArray();
+		$datas =  $asins->orderByRaw($orderby.' '.$sort)->skip($iDisplayStart)->take($iDisplayLength)->get()->toArray();
 		$datas = json_decode(json_encode($datas),true);
         $records = array();
         $records["data"] = array();
@@ -422,14 +420,14 @@ class HomeController extends Controller
 			$sales = ((((array_get($asin,'sales_07_01')??array_get($asin,'sales_14_08'))??array_get($asin,'sales_21_15'))??array_get($asin,'sales_28_22'))??0)/7 ;
 			$records["data"][] = array(
 				'<a href="https://'.array_get($asin,'site').'/dp/'.array_get($asin,'asin').'" class="primary-link" target="_blank">'.array_get($asin,'asin').'</a>',
-				array_get($asin,'site'),
+				//array_get($asin,'site'),
 				array_get($asin,'item_no'),
-				array_get($asin,'bg').array_get($asin,'bu'),
-				array_get($sellers_array,array_get($asin,'sap_seller_id'),array_get($asin,'sap_seller_id')),
-				array_get($asin,'status')?array_get($asin,'status'):'S',
-				array_get($asin,'amount',0),
-				array_get($asin,'sales',0),
-				round(array_get($asin,'sales')/((strtotime($date_to)-strtotime($date_from))/86400+1),2),
+				//array_get($asin,'bg').array_get($asin,'bu'),
+				//array_get($sellers_array,array_get($asin,'sap_seller_id'),array_get($asin,'sap_seller_id')),
+				//array_get($asin,'status')?array_get($asin,'status'):'S',
+				round(array_get($asin,'amount'),2),
+				round(array_get($asin,'sales'),2),
+				intval(array_get($asin,'sales')/((strtotime($date_to)-strtotime($date_from))/86400+1)),
 				array_get($asin,'fbm_stock',0),
 				(array_get($asin,'sales')>0)?round(array_get($asin,'amount')/array_get($asin,'sales'),2):0,
 				array_get($asin,'fba_stock',0),
@@ -438,10 +436,10 @@ class HomeController extends Controller
 				array_get($asin,'review_count',0),
 				intval(array_get($asin,'sessions')),
 				round(array_get($asin,'unit_session_percentage'),2),
-				array_get($asin,'sku_ranking'),
+				substr(array_get($asin,'sku_ranking'),0,20),
 				intval(array_get($asin,'bsr')),
-				array_get($asin,'economic',0),
-				round(array_get($asin,'bonus')*$bonus_point,2)
+				intval(array_get($asin,'economic',0)),
+				intval(array_get($asin,'bonus')*$bonus_point)
 			);
         }
 

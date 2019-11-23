@@ -8,8 +8,22 @@
 		.dataTables_extended_wrapper .table.dataTable {
   margin: 0px !important;
 }
+.portlet.light{
+padding:0px}
+table.dataTable thead>tr>th.sorting_asc, table.dataTable thead>tr>th.sorting_desc, table.dataTable thead>tr>th.sorting, table.dataTable thead>tr>td.sorting_asc, table.dataTable thead>tr>td.sorting_desc, table.dataTable thead>tr>td.sorting {
+    padding-right: 10px;
+}
+table.dataTable thead th, table.dataTable thead td {
+    padding: 5px;
+	text-align: center;
+}
+table.dataTable tbody th, table.dataTable tbody td {
+    padding: 8px 5px;
+}
+.dataTables_wrapper .dataTables_scroll div.dataTables_scrollBody th, .dataTables_wrapper .dataTables_scroll div.dataTables_scrollBody td {
 
-
+    text-align: right;
+}
 th,td,td>span {
     font-size:12px !important;
 	font-family:Arial, Helvetica, sans-serif;}
@@ -50,7 +64,7 @@ th,td,td>span {
 						</div>
                        
 						@if(Auth::user()->seller_rules)
-						<div class="col-md-1">
+						<div class="col-md-2">
 						<select class="form-control form-filter input-sm" name="bgbu">
                                         <option value="">BG && BU</option>
 										<?php 
@@ -104,15 +118,15 @@ th,td,td>span {
                         <thead>
 							
                             <tr role="row" class="heading">
-								<th>ASIN</th>
-								<th>SITE</th>
-								<th>SKU</th>
-								<th>BGBU</th>
-								<th>Seller</th>
-								<th>Level</th>
+								<th style="text-align: left;">ASIN</th>
+								<!--<th>SITE</th>-->
+								<th style="text-align: left;">SKU</th>
+								<!--<th>BGBU</th>-->
+								<!--<th>Seller</th>-->
+								<!--<th>Level</th>-->
 								<th>SALES</th>
 								<th>UNITS</th>
-								<th>SALES/D</th>
+								<th>UNITS/D</th>
 								<th>FBM</th>
 								<th>AVG.PRICE</th>
 								<th>FBA</th>
@@ -120,8 +134,8 @@ th,td,td>span {
 								<th>RATING</th>
 								<th>RevCount</th>
 								<th>SESS</th>
-								<th>CR</th>
-								<th>KW RANK</th>
+								<th>CR%</th>
+								<th>KEYWORD RANK</th>
 								<th>BSR</th>
 								<th>SKU E.VALUE</th>
 								<th>SKU BONUS</th>
@@ -191,21 +205,21 @@ th,td,td>span {
 					buttons: [
                         { extend: 'csv', className: 'btn purple btn-outline ',filename:'asins' }
                     ],
-					"aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0,1,2,3,4 ] }],	
+					"aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0,1,8 ] }],	
 					 "order": [
-                        [5, "asc"]
+                        [2, "desc"]
                     ],
                     // scroller extension: http://datatables.net/extensions/scroller/
-                    scrollY:        500,
+                    scrollY:        690,
                     scrollX:        true,
 					
                     "ajax": {
                         "url": "{{ url('home/getasins')}}", // ajax source
                     },
-					fixedColumns:   {
-						leftColumns:5,
-						rightColumns: 0
-					},
+					"createdRow": function( row, data, dataIndex ) {
+                        $(row).children('td').eq(0).attr('style', 'text-align: left;')
+						$(row).children('td').eq(1).attr('style', 'text-align: left;')
+                    },
 					"dom": "<'row' <'col-md-12'B>><'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'>r><'table-scrollable't><'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>",
                 }
             });
