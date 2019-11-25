@@ -53,7 +53,13 @@
 						<div class="form-group col-md-9">
 							<label>Products</label>
 							<select class="form-control" name="product_id" id="product_id" required>
-								<option value="{!! $product['id'] !!}">{!! $product['product_name'] !!}</option>
+								@foreach($products as $key=>$val)
+									<optgroup label="{!! $key !!}">
+										@foreach($val as $k=>$v)
+											<option value="{!! $v['id'] !!}" @if($v['id']==$rule['product_id']) @endif>{!! $v['product_name'] !!}</option>
+										@endforeach
+									</optgroup>
+								@endforeach
 							</select>
 						</div>
 
