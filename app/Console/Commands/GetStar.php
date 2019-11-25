@@ -61,12 +61,12 @@ class GetStar extends Command
 		);
 		
 		$asin_value=[];
-		$sales =  DB::connection('order')->select('select sum(quantityordered) as sales,sum(ItemPriceAmount) as amount,asin,amazon_orders_item.marketplaceid,
-left(LastUpdateDate,10) as date from amazon_orders_item left join amazon_orders on amazon_orders_item.AmazonOrderId=amazon_orders.AmazonOrderId and amazon_orders_item.SellerId=amazon_orders.SellerId where left(LastUpdateDate,10)>:date_from group by asin,amazon_orders_item.marketplaceid,date',['date_from' => $date_from]);
+		$sales =  DB::select('select sum(sales) as sales,sum(amount) as amount,asin,site,
+date from asin_daily_info where date>:date_from group by asin,site,date',['date_from' => $date_from]);
 		
 		foreach($sales as $sale){
-			$asin_value[$sale->asin][str_replace('.','','www.'.array_get(getSiteUrl(),$sale->marketplaceid))][$sale->date]['sales']=round($sale->sales,2);
-			$asin_value[$sale->asin][str_replace('.','','www.'.array_get(getSiteUrl(),$sale->marketplaceid))][$sale->date]['amount']=round($sale->amount,2);
+			$asin_value[$sale->asin][str_replace('.','',$sale->site)][$sale->date]['sales']=round($sale->sales,2);
+			$asin_value[$sale->asin][str_replace('.','',$sale->site)][$sale->date]['amount']=round($sale->amount,2);
 		}
  
  
@@ -139,7 +139,6 @@ where last_updated>:date_from',['date_from' => $date_from]);
 				and marketplace_id=".array_get($siteToCcpMid,$asin->site)." GROUP BY products.asin,product_performances.report_date;"
 			);
 			foreach($ccp_datas as $ccp_data){
-				
 				$asin_value[$asin->asin][str_replace('.','',$asin->site)][$ccp_data->report_date]['sessions']=round($ccp_data->sessions,2);
 				$asin_value[$asin->asin][str_replace('.','',$asin->site)][$ccp_data->report_date]['unit_session_percentage']=round($ccp_data->unit_session_percentage,2);
 				$asin_value[$asin->asin][str_replace('.','',$asin->site)][$ccp_data->report_date]['bsr']=intval($ccp_data->bsr,2);
@@ -148,10 +147,6 @@ where last_updated>:date_from',['date_from' => $date_from]);
 			$asin_data = array_get($asin_value,$asin->asin.'.'.str_replace('.','',$asin->site));
 			if(is_array($asin_data)){
 				foreach($asin_data as $k=>$v){
-					print_r($asin->asin);
-					print_r($asin->site);
-					print_r($k);
-					print_r($v);
 					try{
 						Starhistory::updateOrCreate(
 							[
@@ -166,6 +161,11 @@ where last_updated>:date_from',['date_from' => $date_from]);
 					}	
 				
 				}
+			}
+			$yesterday_star = Starhistory::where('asin',$asin->asin)->where('domain',$asin->site)->where('create_at',date('Y-m-d',strtotime('-1day')))->get(['one_star_number','two_star_number','three_star_number','four_star_number','five_star_number','total_star_number','average_score'])->first()->toArray();
+			if(array_get($yesterday_star,'average_score')==0){
+				$updateData = Starhistory::where('asin',$asin->asin)->where('domain',$asin->site)->where('create_at',date('Y-m-d',strtotime('-2day')))->get(['one_star_number','two_star_number','three_star_number','four_star_number','five_star_number','total_star_number','average_score'])->first()->toArray();
+				if($updateData)  Starhistory::where('asin',$asin->asin)->where('domain',$asin->site)->where('create_at',date('Y-m-d',strtotime('-1day')))->update($updateData);
 			}
 		}	
 	}	
