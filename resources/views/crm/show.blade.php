@@ -40,6 +40,7 @@
                                     @if($data['email'])Email: {!! $data['email'] !!}<br/>@endif
                                     @if($data['phone'])Phone: {!! $data['phone'] !!}<br/>@endif
                                     @if($data['country'])Country: {!! $data['country'] !!}<br/>@endif
+                                    @if($data['remark'])Remark: {!! $data['remark'] !!}<br/>@endif
                                     <hr>
                                 @endforeach
                                 @else

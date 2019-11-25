@@ -116,6 +116,19 @@
 
                                         </label>
                                     </div>
+                                    <div class="form-group">
+                                        <label>Type</label>
+                                        <div class="input-group ">
+                                            <span class="input-group-addon">
+                                                <i class="fa fa-bookmark"></i>
+                                            </span>
+                                            <select class="form-control" name="type" id="type">
+                                                @foreach (getCrmClientType() as $value)
+                                                    <option value="{{$value}}" @if($value==$contactBasic['type']) selected @endif>{{$value}}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
                                     <div style="clear:both;"></div>
                                 </div>
 
@@ -133,6 +146,10 @@
                                                         <div class="col-lg-2 col-md-2">
                                                             <label class="control-label">Phone</label>
                                                             <input type="text" class="form-control seller-sku-selector" name="phone" placeholder="Phone" autocomplete="off" value="{{$data['phone']}}"/>
+                                                        </div>
+                                                        <div class="col-lg-2 col-md-2">
+                                                            <label class="control-label">Remark</label>
+                                                            <input type="text" class="form-control seller-sku-selector" name="remark" placeholder="Remark" autocomplete="off" value="{{$data['remark']}}"/>
                                                         </div>
                                                         <div class="col-lg-1 col-md-1">
                                                             <a href="javascript:;" data-repeater-delete class="btn btn-danger mt-repeater-delete">
@@ -207,14 +224,15 @@
     <script>
         $(exception_form).submit(function (e) {
 
-            let type = $('#type').val()
+            //let type = $('#type').val()
 
             for (let input of $(this).find('[name]')) {
 
                 let tabID = $(input).closest('.tab-pane').attr('id')
 
                 if (tabID) {
-                    if (!(type & tabID.substr(-1))) continue
+                    //if (!(type & tabID.substr(-1))) continue
+                    if (!(tabID.substr(-1))) continue
                 }
                 if (!input.reportValidity()) {
                     toastr.error('The form is not complete yet.')

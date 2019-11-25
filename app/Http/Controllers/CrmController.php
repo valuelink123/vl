@@ -163,8 +163,8 @@ class CrmController extends Controller
 
 		}
 
-		$sql = "select SQL_CALC_FOUND_ROWS t1.id as id,t1.date as date,c.name as name,c.email as email,c.phone as phone,c.country as country,c.`from` as `from`,c.brand as brand,
-t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as times_negative_review,t1.times_positive_review as times_positive_review,if(num>0,num,0) as order_num,b.name as processor,b.bg as bg,b.bu as bu,c.facebook_name as facebook_name,c.facebook_group as facebook_group,c.amazon_profile_page as amazon_profile_page   
+		$sql = "select SQL_CALC_FOUND_ROWS t1.id as id,t1.date as date,c.name as name,c.email as email,c.phone as phone,c.remark as remark,c.country as country,c.`from` as `from`,c.brand as brand,
+t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as times_negative_review,t1.times_positive_review as times_positive_review,t1.type as 'type',if(num>0,num,0) as order_num,b.name as processor,b.bg as bg,b.bu as bu,c.facebook_name as facebook_name,c.facebook_group as facebook_group,c.amazon_profile_page as amazon_profile_page   
 			FROM client as t1 
 		  	left join(
 				select users.id as processor,min(name) as name,min(bg) as bg,min(bu) as bu 
@@ -174,10 +174,10 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 				order by users.id desc 
 			) as b on b.processor = t1.processor 
 			join (
-					select count(*) as num,client_id,max(t1.name) as name,max(t1.email) as email,max(t1.phone) as phone,max(t1.country) as country,max(t1.`from`) as `from`,max(t1.brand) as brand,any_value(facebook_name) as facebook_name,any_value(facebook_group) as facebook_group,max(amazon_profile_page) as amazon_profile_page  
+					select count(*) as num,client_id,max(t1.name) as name,max(t1.email) as email,max(t1.phone) as phone,max(t1.remark) as remark,max(t1.country) as country,max(t1.`from`) as `from`,max(t1.brand) as brand,any_value(facebook_name) as facebook_name,any_value(facebook_group) as facebook_group,max(amazon_profile_page) as amazon_profile_page  
 					from client_info t1 
-					left join client_order_info as t2 on t1.id = t2.ci_id 
-			  		{$whereInfo} 
+					left join client_order_info as t2 on t1.id = t2.ci_id
+			  		{$whereInfo}
 			  		group by client_id 
 			) as c on t1.id = c.client_id 
 			where $where 
@@ -194,8 +194,8 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 		$date_to = $_GET['date_to'];
 
 		$where = " and t1.date >= '".$date_from." 00:00:00' and t1.date <= '".$date_to." 23:59:59'";
-		$sql = $sql = "select t1.id as id,t1.date as date,c.name as name,c.email as email,c.phone as phone,c.country as country,c.`from` as `from`,c.brand as brand,
-t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as times_negative_review,t1.times_positive_review as times_positive_review,if(num>0,num,0) as order_num,b.name as processor,b.bg as bg,b.bu as bu,c.facebook_name as facebook_name,c.facebook_group as facebook_group,c.amazon_profile_page as amazon_profile_page   
+		$sql = $sql = "select t1.id as id,t1.date as date,c.name as name,c.email as email,c.phone as phone,c.remark as remark,c.country as country,c.`from` as `from`,c.brand as brand,
+t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as times_negative_review,t1.times_positive_review as times_positive_review,t1.type as 'type',if(num>0,num,0) as order_num,b.name as processor,b.bg as bg,b.bu as bu,c.facebook_name as facebook_name,c.facebook_group as facebook_group,c.amazon_profile_page as amazon_profile_page   
 			FROM client as t1 
 		  	left join(
 				select users.id as processor,min(name) as name,min(bg) as bg,min(bu) as bu 
@@ -205,7 +205,7 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 				order by users.id desc 
 			) as b on b.processor = t1.processor 
 			join (
-					select count(*) as num,client_id,max(t1.name) as name,max(t1.email) as email,max(t1.phone) as phone,max(t1.country) as country,max(t1.`from`) as `from`,max(t1.brand) as brand,any_value(facebook_name) as facebook_name,any_value(facebook_group) as facebook_group,max(amazon_profile_page) as amazon_profile_page  
+					select count(*) as num,client_id,max(t1.name) as name,max(t1.email) as email,max(t1.phone) as phone,max(t1.remark) as remark,max(t1.country) as country,max(t1.`from`) as `from`,max(t1.brand) as brand,any_value(facebook_name) as facebook_name,any_value(facebook_group) as facebook_group,max(amazon_profile_page) as amazon_profile_page  
 					from client_info t1 
 					left join client_order_info as t2 on t1.id = t2.ci_id 
 			  		group by client_id 
@@ -214,7 +214,7 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 
 		$data = $this->queryRows($sql);
 		$arrayData = array();
-		$headArray = array('ID','Date','Email','Name','Phone','Country','From','Brand','CTG','RSG','Negative Review','Positive Review','Order Number','BG','BU','Processor');
+		$headArray = array('ID','Date','Email','Name','Phone','Country','From','Brand','CTG','RSG','Negative Review','Positive Review','Order Number','BG','BU','Remark','Type','Processor');
         $arrayData[] = $headArray;
 
 		foreach ($data as $key=>$val){
@@ -234,6 +234,8 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 				strval($val['order_num']),
 				$val['bg'],
 				$val['bu'],
+				$val['remark'],
+				$val['type'],
 				$val['processor'],
             );
         }
@@ -264,9 +266,10 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 		$contactInfo = array();
 		$contactBasic['id'] = $id;
 		if($id){
-			$sql = "select b.client_id as id,b.id as info_id,c.id as cid,b.name as name,b.email as email,b.phone as phone,b.country as country,b.`from` as `from`,b.brand as brand,b.facebook_group as facebook_group,b.facebook_name as facebook_name,c.amazon_order_id as amazon_order_id,c.order_type as order_type,c.amazon_profile_page as amazon_profile_page  
+			$sql = "select b.client_id as id,b.id as info_id,c.id as cid,b.name as name,b.email as email,b.phone as phone,b.remark as remark,b.country as country,b.`from` as `from`,b.brand as brand,b.facebook_group as facebook_group,b.facebook_name as facebook_name,c.amazon_order_id as amazon_order_id,c.order_type as order_type,c.amazon_profile_page as amazon_profile_page,d.type as type
 			FROM client_info as b
 			left join client_order_info as c on b.id = c.ci_id
+			left join client as d on b.client_id = d.id
 			where b.client_id = $id
 			order by b.id asc ";
 			$_data = $this->queryRows($sql);
@@ -276,6 +279,7 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 				$contactInfo[$val['email']]['info_id'] = $val['info_id'];
 				$contactInfo[$val['email']]['email'] = $val['email'];
 				$contactInfo[$val['email']]['phone'] = $val['phone'];
+                $contactInfo[$val['email']]['remark'] = $val['remark'];
 
 				$contactInfo[$val['email']]['cid'][] = $val['cid'];
 				$contactInfo[$val['email']][$val['cid']]['amazon_order_id'] = $val['amazon_order_id'];
@@ -287,6 +291,7 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 				$contactBasic['from'] = $val['from'];
 				$contactBasic['facebook_name'] = $val['facebook_name'];
 				$contactBasic['facebook_group'] = isset($fbgroupConfig[$val['facebook_group']]) ? $val['facebook_group'].' | '.$fbgroupConfig[$val['facebook_group']] : $val['facebook_group'];
+                $contactBasic['type'] = $val['type'];
 			}
 		}
 		if(!isset($contactBasic['name'])){
@@ -323,6 +328,7 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 					'date'=>date('Y-m-d H:i:s'),
 					'created_at'=>date('Y-m-d H:i:s'),
 					'updated_at'=> date('Y-m-d H:i:s'),
+                    'type'=>$data['type'],
 					)
 				)
 			){
@@ -330,8 +336,9 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 				return redirect()->back()->withInput();
 			}
 		}else{
-			//修改client表的更新时间
-			DB::table('client')->where('id', $data['id'])->update(['updated_at'=>date('Y-m-d H:i:s')]);
+			//修改client表的更新时间和type字段
+			DB::table('client')->where('id', $data['id'])->update(['type'=>$data['type'], 'updated_at'=>date('Y-m-d H:i:s')]);
+
 		}
 		$insertInfo = array('client_id'=>$data['id'],'name'=>$data['name'],'country'=>$data['country'],'from'=>$data['from'],'brand'=>$data['brand'],'facebook_name'=>$data['facebook_name'],'facebook_group'=>intval($data['facebook_group']));
 		//查出client_info表的id,把之前的该客户的client_info数据删掉
@@ -353,6 +360,7 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 			}
 			$insertInfo['email'] = $val['email'];
 			$insertInfo['phone'] = $val['phone'];
+            $insertInfo['remark'] = $val['remark'];
 			$insert['ci_id'] = $res =  DB::table('client_info')->insertGetId($insertInfo);
 			if(empty($res)){
 				DB::rollBack();
@@ -401,7 +409,7 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 		$id = $request->input('id',0);
 		if($id){
 			$sap = new SapRfcRequest();
-			$sql = "select b.name as name,b.email as email,b.phone as phone,b.country as country,b.`from` as `from`,c.amazon_order_id as order_id
+			$sql = "select b.name as name,b.email as email,b.phone as phone,b.remark as remark,b.country as country,b.`from` as `from`,c.amazon_order_id as order_id
 			FROM client_info as b
 			left join client_order_info as c on b.id = c.ci_id
 			where b.client_id = $id
@@ -421,7 +429,7 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
                 }
 
             	//联系人基本信息
-				$contactInfo[$val['email']] = array('name'=>$val['name'],'email'=>$val['email'],'phone'=>$val['phone'],'country'=>$val['country']);
+				$contactInfo[$val['email']] = array('name'=>$val['name'],'email'=>$val['email'],'phone'=>$val['phone'],'remark'=>$val['remark'],'country'=>$val['country']);
 				$emails[] = $val['email'];
 			}
 

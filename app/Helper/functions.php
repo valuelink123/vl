@@ -597,10 +597,22 @@ function unsetEmoji($str)
 	return $str;
 }
 
+//config option的状态：0为显示，1为隐藏。
+function getConfigOptionStatus()
+{
+    return array('0','1');
+}
+
 //CRM模块可供下拉选择的country
 function getCrmCountry()
 {
 	return array('US','CA','DE','ES','GB','FR','IT','JP','MA');
+}
+
+//CRM模块可供下拉选择的type(客户类型)，0默认，1黑名单
+function getCrmClientType()
+{
+    return array('0','1');
 }
 
 //CRM模块可供下拉选择的Source
