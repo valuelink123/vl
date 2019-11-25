@@ -14,6 +14,7 @@ use PDO;
 use DB;
 use Log;
 
+
 class GetEmails extends Command
 {
     /**
@@ -108,7 +109,7 @@ class GetEmails extends Command
 				foreach($to_addresses as $to_a){
 					$to_addresses_arr[]=strtolower($to_a->getAddress());
 				}
-				if(!in_array($this->runAccount['email'],$to_addresses_arr)) continue;
+				if(!in_array(strtolower($this->runAccount['email']),$to_addresses_arr)) continue;
 				try{
 				$mail_id = ($message->getId())?$message->getId():$message->getNumber();
 				$exists = DB::table('inbox')->where('mail_address', $this->runAccount['email'])->where('mail_id', $mail_id)->first();

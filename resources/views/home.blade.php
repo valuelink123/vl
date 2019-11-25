@@ -25,6 +25,7 @@ margin-bottom:0px;}
 .table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
     padding: 7px;
     line-height: 15px;
+	text-align: right;
 }
 .table td, .table th {
     font-size: 12px;
@@ -49,8 +50,7 @@ padding-top:0px;}
     font-size: 14px;
 }
 .primary-link {
-    font-size: 14px;
-	    line-height: 20px;
+    font-size: 12px;
 }
 .portlet.light > .portlet-title > .caption > .caption-subject {
     font-size: 12px;
@@ -67,25 +67,43 @@ a.editable-click:hover {
     text-decoration: none;
     border-bottom: none !important;
 }
+
+.dashboard-stat2 .progress-info .status {
+    font-size: 12px;
+    color: #666;
+}
 </style>
 <link href="/assets/global/plugins/bootstrap-editable/bootstrap-editable/css/bootstrap-editable.css" rel="stylesheet" type="text/css" />
 <div class="row" >
 <div class="col-lg-12 col-xs-12 col-sm-12">
 <div class="portlet light ">
-			<div class="col-md-1">
-				<div style="width:100px;height:100px;border: 15px solid #f36a5a;border-radius:50% !important;text-align:center;line-height:70px;margin:auto;margin-top: 13px" >
-					<span id="tichengxianshi" style="cursor:pointer;" data-value="{{array_get($total_info,'bonus',0)}}" class="fa fa-eye-slash"></span>
+			
+			<div class="col-md-9">
+				<div class="col-md-2">
+				<div style="width: 140px;height: 140px;border: 20px solid #f36a5a;border-radius:50% !important;text-align:center;line-height: 100px;margin:auto;font-size: 18px;" >
+					<span id="tichengxianshi" style="cursor:pointer;" data-value="{{round(array_get($total_info,'bonus',0),2)}}" class="fa fa-eye-slash"></span>
 				</div>
-			</div>
-			<div class="col-md-8">
-				<div class="col-md-10 col-md-offset-1">
+				</div>
+				<div class="col-md-10">
+				<?php
+				$class=$sign="";
+				$ap = array_get($total_info,'economic',0);
+				$hb_ap = array_get($hb_total_info,'economic',0);
+				if($ap>$hb_ap){
+					$class="font-red-haze";
+					$sign='+';
+				}
+				if($ap<$hb_ap){
+					$class="font-green-sharp";
+				}
+				?>
 				<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12" style="width:20%;"> 
 					<div class="dashboard-stat2 ">
 						<div class="display">
 							<div class="number">
 								<small>E.VALUE</small>
 								<h3 class="font-green-sharp">
-									<span data-counter="counterup">{{array_get($total_info,'economic',0)}}</span>
+									<span data-counter="counterup">{{round($ap/10000,2)}} 万</span>
 									<small class="font-green-sharp">¥</small>
 								</h3>
 								
@@ -99,19 +117,33 @@ a.editable-click:hover {
 								</span>
 							</div>
 							<div class="status">
-								<div class="status-title">  </div>
-								<div class="status-number">  </div>
+								<div class="status-title {{$class}}"> {{($hb_ap)?$sign.round(($ap-$hb_ap)/$hb_ap*100,2):'0'}}%</div>
+								<div class="status-number">{{round($hb_ap/10000,2)}} 万</div>
 							</div>
 						</div>
 					</div>
 				</div>
+				
+				<?php
+				$class=$sign="";
+				$ap = array_get($total_info,'amount',0);
+				$hb_ap = array_get($hb_total_info,'amount',0);
+				if($ap>$hb_ap){
+					$class="font-red-haze";
+					$sign='+';
+				}
+				if($ap<$hb_ap){
+					$class="font-green-sharp";
+				}
+				?>
+				
 				<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12" style="width:20%;">
 					<div class="dashboard-stat2 ">
 						<div class="display">
 							<div class="number">
 								<small>SALES</small>
 								<h3 class="font-red-haze">
-									<span data-counter="counterup" >{{array_get($total_info,'amount',0)}}</span>
+									<span data-counter="counterup" >{{round($ap/10000,2)}} 万</span>
 									<small class="font-red-haze">¥</small>
 								</h3>
 								
@@ -125,19 +157,32 @@ a.editable-click:hover {
 								</span>
 							</div>
 							<div class="status">
-								<div class="status-title">  </div>
-								<div class="status-number"> </div>
+								<div class="status-title {{$class}}"> {{($hb_ap)?$sign.round(($ap-$hb_ap)/$hb_ap*100,2):'0'}}%</div>
+								<div class="status-number">{{round($hb_ap/10000,2)}} 万</div>
 							</div>
 						</div>
 					</div>
 				</div>
+				
+				<?php
+				$class=$sign="";
+				$ap = intval(array_get($total_info,'sales',0));
+				$hb_ap = intval(array_get($hb_total_info,'sales',0));
+				if($ap>$hb_ap){
+					$class="font-red-haze";
+					$sign='+';
+				}
+				if($ap<$hb_ap){
+					$class="font-green-sharp";
+				}
+				?>
 				<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12" style="width:20%;">
 					<div class="dashboard-stat2 ">
 						<div class="display">
 							<div class="number">
 								<small>UNITS</small>
 								<h3 class="font-blue-sharp">
-									<span data-counter="counterup" >{{array_get($total_info,'sales',0)}}</span>
+									<span data-counter="counterup" >{{$ap}}</span>
 								</h3>
 								
 							</div>
@@ -150,12 +195,24 @@ a.editable-click:hover {
 								</span>
 							</div>
 							<div class="status">
-								<div class="status-title">  </div>
-								<div class="status-number">  </div>
+								<div class="status-title {{$class}}"> {{($hb_ap)?$sign.round(($ap-$hb_ap)/$hb_ap*100,2):'0'}}% </div>
+								<div class="status-number">{{$hb_ap}}</div>
 							</div>
 						</div>
 					</div>
 				</div>
+				<?php
+				$class=$sign="";
+				$ap = (array_get($total_info,'sales',0)>0)?round(array_get($total_info,'amount',0)/array_get($total_info,'sales',0),2):0;
+				$hb_ap = (array_get($hb_total_info,'sales',0)>0)?round(array_get($hb_total_info,'amount',0)/array_get($hb_total_info,'sales',0),2):0;
+				if($ap>$hb_ap){
+					$class="font-red-haze";
+					$sign='+';
+				}
+				if($ap<$hb_ap){
+					$class="font-green-sharp";
+				}
+				?>
 				<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12" style="width:20%;">
 					<div class="dashboard-stat2 ">
 						<div class="display">
@@ -163,7 +220,7 @@ a.editable-click:hover {
 							<div class="number">
 							<small>AVG.PRICE</small>
 								<h3 class="font-purple-soft">
-									<span data-counter="counterup" >{{(array_get($total_info,'sales',0)>0)?round(array_get($total_info,'amount',0)/array_get($total_info,'sales',0),2):0}}</span>
+									<span data-counter="counterup" >{{$ap}}</span>
 									<small class="font-purple-soft">¥</small>
 								</h3>
 								
@@ -177,8 +234,12 @@ a.editable-click:hover {
 								</span>
 							</div>
 							<div class="status">
-								<div class="status-title">  </div>
-								<div class="status-number">  </div>
+								<div class="status-title {{$class}}">
+								
+								 {{($hb_ap)?$sign.round(($ap-$hb_ap)/$hb_ap*100,2):'0'}}%
+								
+								</div>
+								<div class="status-number">{{$hb_ap}}</div>
 							</div>
 						</div>
 					</div>
@@ -189,7 +250,8 @@ a.editable-click:hover {
 							<div class="number">
 								<small>INVENTORY</small>
 								<h3 class="font-green-sharp">
-									<span data-counter="counterup" >{{intval($fbm_stock_info[0]->fbm_total_stock + $fba_stock_info[0]->fba_total_stock)}}</span>
+									<span data-counter="counterup" >
+									{{round(intval($fbm_stock_info[0]->fbm_total_stock + $fba_stock_info[0]->fba_total_stock)/10000,2)}} 万</span>
 									<small class="font-green-sharp">PCS</small>
 								</h3>
 								
@@ -203,7 +265,7 @@ a.editable-click:hover {
 								</span>
 							</div>
 							<div class="status">
-								<div class="status-title"> STOCK VALUE : {{round($fbm_stock_info[0]->fbm_total_amount + $fba_stock_info[0]->fba_total_amount,2)}} </div>
+								<div class="status-title"> STOCK VALUE : {{round(($fbm_stock_info[0]->fbm_total_amount + $fba_stock_info[0]->fba_total_amount)/10000,2)}} 万 </div>
 								<div class="status-number">  </div>
 							</div>
 						</div>
@@ -309,7 +371,7 @@ a.editable-click:hover {
 			</div>
 			
 			<div class="pull-right">
-				<a href="{{url('star')}}">View More&gt;&gt;</a>
+				<a href="{{url('home/asins?date_from='.$date_from.'&date_to='.$date_to.'&s_user_id='.$s_user_id.'&bgbu='.$bgbu)}}">View More&gt;&gt;</a>
 			</div>
 			
 		</div>
@@ -318,18 +380,20 @@ a.editable-click:hover {
 					<table class="table table-hover">
 						
 							<tr class="uppercase">
-								<th > ASIN </th>
-								<th> SKU </th>
-								<th> UNITS </th>
+								<th style="text-align: left;"> ASIN </th>
+								<th style="text-align: left;"> SKU </th>
 								<th> SALES </th>
+								<th> UNITS </th>
+								<th> UNITS/D </th>
+								<th> FBM </th>
 								<th> AVG.PRICE </th>
 								<th >FBA</th>
-								<th> OUTSTOCK DATE </th>
+								<th> OUTSTOCK </th>
 								<th> RATING </th>
-								<th> SESSIONS <font style="color:#ccc;"><i  class="fa fa-info-circle popovers" data-container="body" onclick=" " data-trigger="hover" data-placement="top" data-html="true" data-content="Average data from {{date('Y-m-d',strtotime('-10days'))}} to {{date('Y-m-d',strtotime('-4days'))}}"></i></font></th>
-								<th> CR <font style="color:#ccc;"><i  class="fa fa-info-circle popovers" data-container="body" onclick=" " data-trigger="hover" data-placement="top" data-html="true" data-content="Average data from {{date('Y-m-d',strtotime('-10days'))}} to {{date('Y-m-d',strtotime('-4days'))}}"></i></font></th>
+								<th> SESS <font style="color:#ccc;"><i  class="fa fa-info-circle popovers" data-container="body" onclick=" " data-trigger="hover" data-placement="top" data-html="true" data-content="Average data from {{date('Y-m-d',strtotime('-10days'))}} to {{date('Y-m-d',strtotime('-4days'))}}"></i></font></th>
+								<th> CR% <font style="color:#ccc;"><i  class="fa fa-info-circle popovers" data-container="body" onclick=" " data-trigger="hover" data-placement="top" data-html="true" data-content="Average data from {{date('Y-m-d',strtotime('-10days'))}} to {{date('Y-m-d',strtotime('-4days'))}}"></i></font></th>
 								
-								<th> KEYWORD RANKING </th>
+								<th> KEYWORD RANK </th>
 								<th> BSR  <font style="color:#ccc;"><i  class="fa fa-info-circle popovers" data-container="body" onclick=" " data-trigger="hover" data-placement="top" data-html="true" data-content="Average data from {{date('Y-m-d',strtotime('-10days'))}} to {{date('Y-m-d',strtotime('-4days'))}}"></i></font></th>
 								<th> SKU E.VALUE </th>
 								<th> SKU BONUS </th>
@@ -341,24 +405,26 @@ a.editable-click:hover {
 
 						$sales = ((((array_get($asin,'sales_07_01')??array_get($asin,'sales_14_08'))??array_get($asin,'sales_21_15'))??array_get($asin,'sales_28_22'))??0)/7 ;?>
 						<tr>
-							<td>
+							<td style="text-align: left;">
 								<a href="https://{{array_get($asin,'site')}}/dp/{{array_get($asin,'asin')}}" class="primary-link" target="_blank">{{array_get($asin,'asin')}}</a>
-							</td>
-							<td> {{array_get($asin,'item_no')}} </td>
-							<td> {{array_get($asin,'sales')}} </td>
-							<td> {{array_get($asin,'amount')}} </td>
+							</td >
+							<td style="text-align: left;"> {{array_get($asin,'item_no')}} </td>
+							<td> {{array_get($asin,'amount',0)}} </td>
+							<td> {{array_get($asin,'sales',0)}} </td>
+							<td> {{intval(array_get($asin,'sales')/((strtotime($date_to)-strtotime($date_from))/86400+1))}} </td>
+							<td> {{array_get($asin,'fbm_stock',0)}} </td>
 							<td> {{(array_get($asin,'sales')>0)?round(array_get($asin,'amount')/array_get($asin,'sales'),2):0}} </td>
-							<td> {{array_get($asin,'fba_stock')}} </td>
+							<td> {{array_get($asin,'fba_stock',0)}} </td>
 							<td> {{($sales>0)?date('Y-m-d',strtotime('+'.intval(array_get($asin,'fba_stock')/$sales).' days')):'∞'}} </td>
-							<td> {{array_get($asin,'rating')}} </td>
+							<td> {{array_get($asin,'rating')}} ({{array_get($asin,'review_count')}})</td>
 							<td> {{intval(array_get($asin,'sessions'))}} </td>
 							<td> {{round(array_get($asin,'unit_session_percentage'),2)}} </td>
 							<td> {{array_get($asin,'sku_ranking')}} </td>
 							<td> {{intval(array_get($asin,'bsr'))}} </td>
 							
-							<td> {{array_get($asin,'economic')}} </td>
+							<td> {{intval(array_get($asin,'economic',0))}} </td>
 							<td>
-								{{array_get($asin,'bonus')}}
+								{{intval(array_get($asin,'bonus',0))}}
 							</td>
 						</tr>
 						@endforeach

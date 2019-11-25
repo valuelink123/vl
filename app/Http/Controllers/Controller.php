@@ -20,11 +20,14 @@ class Controller extends BaseController
 	public function __construct()
 	{
 		//计算倒计时相关天数,Black Friday=>'11.29','Cyber Monday'=>'12.2','Christmas'=>'12.24'
-		$year = date('Y');
-		$countDown['black_friday'] = (strtotime(date($year.'-11-29'))-strtotime(date('Y-m-d')))/86400;
-		$countDown['cyber_monday'] = (strtotime(date($year.'-12-02'))-strtotime(date('Y-m-d')))/86400;
-		$countDown['christmas'] = (strtotime(date($year.'-12-24'))-strtotime(date('Y-m-d')))/86400;
-		session()->put('countDown',$countDown);
+		$this->middleware(function ($request, $next) {
+			$year = date('Y');
+			$countDown['black_friday'] = (strtotime(date($year.'-11-29'))-strtotime(date('Y-m-d')))/86400;
+			$countDown['cyber_monday'] = (strtotime(date($year.'-12-2'))-strtotime(date('Y-m-d')))/86400;
+			$countDown['christmas'] = (strtotime(date($year.'-12-24'))-strtotime(date('Y-m-d')))/86400;
+			session()->put('countDown',$countDown);
+			return $next($request);
+		});
 	}
 
     public function getUserId()
@@ -84,9 +87,9 @@ class Controller extends BaseController
 		foreach($search as $val){
 			$sv = explode('=',$val);
 			if(isset($sv[1])){
-				$searchData[$sv[0]] = $sv[1];
+				$searchData[$sv[0]] = trim($sv[1]);
 				if($sv[0]=='date_to'){
-					$searchData[$sv[0]] = $sv[1].' 23:59:59';
+					$searchData[$sv[0]] = trim($sv[1]).' 23:59:59';
 				}
 			}
 		}
@@ -103,7 +106,7 @@ class Controller extends BaseController
 	{
 		$where = '';
 		foreach($searchField as $fk=>$fv){
-			if(isset($searchData[$fk]) && $searchData[$fk]){
+			if(isset($searchData[$fk]) && $searchData[$fk] !=='' ){
 				if(is_array($fv)){
 					foreach($fv as $vk=>$vv){
 						$where .= " and {$vv} {$vk} '".$searchData[$fk]."'";

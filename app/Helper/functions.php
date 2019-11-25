@@ -476,6 +476,8 @@ function getActiveUserConfig()
 		array('db'=>'drocon','dbname'=>'drocon_co','name'=>'drocon','formid'=>array(2),'fields'=>array('name'=>'1.3','email'=>2,'orderid'=>3)),
 		array('db'=>'natrogix','dbname'=>'lypsonline_com','name'=>'lypsonline','formid'=>array(2),'fields'=>array('name'=>'1.3','email'=>2,'orderid'=>3)),
 		array('db'=>'website','dbname'=>'vipsupport_jp','name'=>'vipsupport','formid'=>array(1),'fields'=>array('name'=>'2.3','email'=>3,'orderid'=>4)),
+
+		array('db'=>'website','dbname'=>'wordpress','name'=>'azeus','entry_table'=>'wp_53_gf_entry','meta_table'=>'wp_53_gf_entry_meta','formid'=>array(3),'fields'=>array('name'=>1,'email'=>3,'orderid'=>2)),//新添加的azeus官网数据
     );
 
     return $config;
@@ -950,4 +952,52 @@ function getShipRate()
 	'CA'=>['default'=>'2660']
 	];
 	return $arr;
+}
+
+/*
+ * 得到帖子状态值的含义跟给的分数
+ */
+function getPostStatus()
+{
+	$arr = array(
+		1=>array('name'=>'Active','score'=>1),
+		2=>array('name'=>'Pushing','score'=>2),
+		3=>array('name'=>'Unavailable','score'=>0),
+		4=>array('name'=>'Abandoned','score'=>0),
+	);
+	return $arr;
+}
+
+/*
+ * 得到帖子类型值的含义跟给的分数
+ */
+function getPostType()
+{
+	$arr = array(
+		1=>array('name'=>'Main','score'=>1),
+		2=>array('name'=>'Secondary','score'=>0.5),
+		3=>array('name'=>'Other','score'=>0),
+	);
+	return $arr;
+}
+/*
+ * 产品的权重排序状态对应值
+ */
+function getProductOrderStatus()
+{
+	return array(0=>'默认',1=>'增加权重','-1'=>'降低权重');
+}
+/*
+ * 产品的权重排序状态对应值
+ */
+function getSkuLevel()
+{
+	return array('S','A','B','C','D');
+}
+/*
+ * sku状态对应值
+ */
+function getSkuStatus()
+{
+	return array('New','Normal','Obsoleted','Replaced','Observing','Accessories','Gift','Packaging');
 }

@@ -14,6 +14,7 @@ use App\Services\MultipleQueue;
 use PDO;
 use DB;
 use Illuminate\Http\Response;
+use App\RsgProduct;
 class StarController extends Controller
 {
     /**
@@ -71,12 +72,12 @@ class StarController extends Controller
 			pre_star.bsr as pre_bsr,
 			pre_star.status as pre_status,
 
-			asin.item_status,asin.asin_status,asin.seller,asin.bg,asin.bu,asin.sap_seller_id as sap_seller_id,asin.review_user_id as review_user_id,asin.item_no,asin.star'))
+			asin.item_status,asin.asin_status,asin.seller,asin.bg,asin.bu,asin.sap_seller_id as sap_seller_id,asin.review_user_id as review_user_id,asin.item_no,asin.star,asin.post_status,asin.post_type'))
 			->leftJoin( DB::raw("(select * from star_history where create_at = '".$date_to."') as pre_star") ,function($q){
 				$q->on('star.asin', '=', 'pre_star.asin')
 					->on('star.domain', '=', 'pre_star.domain');
 			})
-			->leftJoin( DB::raw("(select max(star) as star,max(item_no) as item_no,max(bg) as bg,max(bu) as bu,max(seller) as seller,max(sap_seller_id) as sap_seller_id,max(review_user_id) as review_user_id,max(item_status) as item_status, min(case when status = 'S' Then '0' else status end) as asin_status,asin,site from asin where length(asin)=10 group by asin,site) as asin") ,function($q){
+			->leftJoin( DB::raw("(select max(star) as star,max(item_no) as item_no,max(bg) as bg,max(bu) as bu,max(seller) as seller,max(sap_seller_id) as sap_seller_id,max(review_user_id) as review_user_id,max(item_status) as item_status, min(case when status = 'S' Then '0' else status end) as asin_status,asin,site,max(post_status) as post_status,max(post_type) as post_type from asin where length(asin)=10 group by asin,site) as asin") ,function($q){
 				$q->on('star.asin', '=', 'asin.asin')
 					->on('star.domain', '=', 'asin.site');
 			})->whereNotNull('asin.asin_status');
@@ -134,8 +135,16 @@ class StarController extends Controller
 			$customers = $customers->where('asin.item_status',intval($_REQUEST['item_status'])-1);
 		}
 		
-		if(array_get($_REQUEST,'asin_status')){
-			$customers = $customers->where('asin.asin_status',($_REQUEST['asin_status']=='S'?'0':$_REQUEST['asin_status']));
+		// if(array_get($_REQUEST,'asin_status')){
+		// 	$customers = $customers->where('asin.asin_status',($_REQUEST['asin_status']=='S'?'0':$_REQUEST['asin_status']));
+		// }
+
+		//帖子状态和帖子类型搜索
+		if(array_get($_REQUEST,'post_status')){
+			$customers = $customers->where('asin.post_status',($_REQUEST['post_status']));
+		}
+		if(array_get($_REQUEST,'post_type')){
+			$customers = $customers->where('asin.post_type',($_REQUEST['post_type']));
 		}
 		
 		if(array_get($_REQUEST,'listing_status')){
@@ -153,50 +162,51 @@ class StarController extends Controller
 		if(array_get($_REQUEST,'star_from')) $customers = $customers->where('star.average_score','>=',round(array_get($_REQUEST,'star_from'),1));
 		if(array_get($_REQUEST,'star_to')) $customers = $customers->where('star.average_score','<=',round(array_get($_REQUEST,'star_to'),1));
 
-		$orderby = 'asin.asin_status';
+		$orderby = 'asin.asin';
         $sort = 'asc';
 
 				
         if(isset($_REQUEST['order'][0])){
             if($_REQUEST['order'][0]['column']==0) $orderby = 'star.asin';
-            if($_REQUEST['order'][0]['column']==1) $orderby = 'asin.asin_status';
-            if($_REQUEST['order'][0]['column']==2) $orderby = 'asin.item_no';
-			if($_REQUEST['order'][0]['column']==3) $orderby = 'asin.item_status';
-            if($_REQUEST['order'][0]['column']==4) $orderby = 'asin.seller';
-			if($_REQUEST['order'][0]['column']==5) $orderby = 'star.domain';
+            if($_REQUEST['order'][0]['column']==1) $orderby = 'asin.post_type';
+			if($_REQUEST['order'][0]['column']==2) $orderby = 'asin.post_status';
+            if($_REQUEST['order'][0]['column']==3) $orderby = 'asin.item_no';
+			if($_REQUEST['order'][0]['column']==4) $orderby = 'asin.item_status';
+            if($_REQUEST['order'][0]['column']==5) $orderby = 'asin.seller';
+			if($_REQUEST['order'][0]['column']==6) $orderby = 'star.domain';
 			
-			if($_REQUEST['order'][0]['column']==6) $orderby = DB::raw("(star.total_star_number -( case when pre_star.total_star_number>0 then pre_star.total_star_number else 0 end))");
-			if($_REQUEST['order'][0]['column']==7) $orderby = DB::raw("(star.average_score -( case when pre_star.average_score>0 then pre_star.average_score else 0 end))");
-			if($_REQUEST['order'][0]['column']==8) $orderby = DB::raw("((star.five_star_number+star.four_star_number) -( case when (pre_star.five_star_number+pre_star.four_star_number)>0 then (pre_star.five_star_number+pre_star.four_star_number) else 0 end))");
-			if($_REQUEST['order'][0]['column']==9) $orderby = DB::raw("((star.one_star_number+star.two_star_number+star.three_star_number) -( case when (pre_star.one_star_number+pre_star.two_star_number+pre_star.three_star_number)>0 then (pre_star.one_star_number+pre_star.two_star_number+pre_star.three_star_number) else 0 end))");
-			if($_REQUEST['order'][0]['column']==10) $orderby = 'asin.star';
+			if($_REQUEST['order'][0]['column']==7) $orderby = DB::raw("(star.total_star_number -( case when pre_star.total_star_number>0 then pre_star.total_star_number else 0 end))");
+			if($_REQUEST['order'][0]['column']==8) $orderby = DB::raw("(star.average_score -( case when pre_star.average_score>0 then pre_star.average_score else 0 end))");
+			if($_REQUEST['order'][0]['column']==9) $orderby = DB::raw("((star.five_star_number+star.four_star_number) -( case when (pre_star.five_star_number+pre_star.four_star_number)>0 then (pre_star.five_star_number+pre_star.four_star_number) else 0 end))");
+			if($_REQUEST['order'][0]['column']==10) $orderby = DB::raw("((star.one_star_number+star.two_star_number+star.three_star_number) -( case when (pre_star.one_star_number+pre_star.two_star_number+pre_star.three_star_number)>0 then (pre_star.one_star_number+pre_star.two_star_number+pre_star.three_star_number) else 0 end))");
+			if($_REQUEST['order'][0]['column']==11) $orderby = 'asin.star';
 			
-			if($_REQUEST['order'][0]['column']==13) $orderby = 'star.status';
-			if($_REQUEST['order'][0]['column']==14) $orderby = 'star.price';
-			if($_REQUEST['order'][0]['column']==15) $orderby = 'star.coupon_p';
-			if($_REQUEST['order'][0]['column']==16) $orderby = 'star.coupon_n';
+			if($_REQUEST['order'][0]['column']==14) $orderby = 'star.status';
+			if($_REQUEST['order'][0]['column']==15) $orderby = 'star.price';
+			if($_REQUEST['order'][0]['column']==16) $orderby = 'star.coupon_p';
+			if($_REQUEST['order'][0]['column']==17) $orderby = 'star.coupon_n';
 			
 			
-			if($_REQUEST['order'][0]['column']==17) $orderby = 'star.total_star_number';
-			if($_REQUEST['order'][0]['column']==18) $orderby = 'star.average_score';
-			if($_REQUEST['order'][0]['column']==19) $orderby = 'star.one_star_number';
-			if($_REQUEST['order'][0]['column']==20) $orderby = 'star.two_star_number';
-			if($_REQUEST['order'][0]['column']==21) $orderby = 'star.three_star_number';
-			if($_REQUEST['order'][0]['column']==22) $orderby = 'star.four_star_number';
-			if($_REQUEST['order'][0]['column']==23) $orderby = 'star.five_star_number';
+			if($_REQUEST['order'][0]['column']==18) $orderby = 'star.total_star_number';
+			if($_REQUEST['order'][0]['column']==19) $orderby = 'star.average_score';
+			if($_REQUEST['order'][0]['column']==20) $orderby = 'star.one_star_number';
+			if($_REQUEST['order'][0]['column']==21) $orderby = 'star.two_star_number';
+			if($_REQUEST['order'][0]['column']==22) $orderby = 'star.three_star_number';
+			if($_REQUEST['order'][0]['column']==23) $orderby = 'star.four_star_number';
+			if($_REQUEST['order'][0]['column']==24) $orderby = 'star.five_star_number';
 			
-			if($_REQUEST['order'][0]['column']==25) $orderby = 'pre_star.status';
-			if($_REQUEST['order'][0]['column']==26) $orderby = 'pre_star.price';
-			if($_REQUEST['order'][0]['column']==27) $orderby = 'pre_star.coupon_p';
-			if($_REQUEST['order'][0]['column']==28) $orderby = 'pre_star.coupon_n';
+			if($_REQUEST['order'][0]['column']==26) $orderby = 'pre_star.status';
+			if($_REQUEST['order'][0]['column']==27) $orderby = 'pre_star.price';
+			if($_REQUEST['order'][0]['column']==28) $orderby = 'pre_star.coupon_p';
+			if($_REQUEST['order'][0]['column']==29) $orderby = 'pre_star.coupon_n';
 			
-			if($_REQUEST['order'][0]['column']==29) $orderby = 'pre_star.total_star_number';
-			if($_REQUEST['order'][0]['column']==30) $orderby = 'pre_star.average_score';
-			if($_REQUEST['order'][0]['column']==31) $orderby = 'pre_star.one_star_number';
-			if($_REQUEST['order'][0]['column']==32) $orderby = 'pre_star.two_star_number';
-			if($_REQUEST['order'][0]['column']==33) $orderby = 'pre_star.three_star_number';
-			if($_REQUEST['order'][0]['column']==34) $orderby = 'pre_star.four_star_number';
-			if($_REQUEST['order'][0]['column']==35) $orderby = 'pre_star.five_star_number';
+			if($_REQUEST['order'][0]['column']==30) $orderby = 'pre_star.total_star_number';
+			if($_REQUEST['order'][0]['column']==31) $orderby = 'pre_star.average_score';
+			if($_REQUEST['order'][0]['column']==32) $orderby = 'pre_star.one_star_number';
+			if($_REQUEST['order'][0]['column']==33) $orderby = 'pre_star.two_star_number';
+			if($_REQUEST['order'][0]['column']==34) $orderby = 'pre_star.three_star_number';
+			if($_REQUEST['order'][0]['column']==35) $orderby = 'pre_star.four_star_number';
+			if($_REQUEST['order'][0]['column']==36) $orderby = 'pre_star.five_star_number';
             $sort = $_REQUEST['order'][0]['dir'];
 			
 			
@@ -217,8 +227,9 @@ class StarController extends Controller
 
         $end = $iDisplayStart + $iDisplayLength;
         $end = $end > $iTotalRecords ? $iTotalRecords : $end;
-		
 
+		$postStatus = getPostStatus();//帖子状态状态对应值
+		$postType = getPostType();//帖子类型状态对应值
 		
 		$users_array = $this->getUsers();
         for($i = $iDisplayStart; $i < $end; $i++) {
@@ -250,7 +261,11 @@ class StarController extends Controller
 			if( $ordersList[$i]['average_score'] ==$ordersList[$i]['star'] ) $diff_star = "<span class=\"label label-sm label-warning\">Warning</span>";		
 			$records["data"][] = array(
 				'<a data-target="#ajax" data-toggle="modal" href="'.url('star/show/'.$ordersList[$i]['asin'].'/'.$ordersList[$i]['domain']).'">'.$ordersList[$i]['asin'].'</a>',
-				$ordersList[$i]['asin_status']?$ordersList[$i]['asin_status']:'S',
+
+				isset($postType[$ordersList[$i]['post_type']]['name']) ? $postType[$ordersList[$i]['post_type']]['name'] : $ordersList[$i]['post_type'],//帖子类型
+				isset($postStatus[$ordersList[$i]['post_status']]['name']) ? $postStatus[$ordersList[$i]['post_status']]['name'] : $ordersList[$i]['post_status'],//帖子状态
+
+				// $ordersList[$i]['asin_status']?$ordersList[$i]['asin_status']:'S',
 				$ordersList[$i]['item_no'],
 				($ordersList[$i]['item_status'])?'<span class="btn btn-success btn-xs">Reserved</span>':'<span class="btn btn-danger btn-xs">Eliminate</span>',
 				$ordersList[$i]['seller'],
@@ -286,9 +301,9 @@ class StarController extends Controller
 				$ordersList[$i]['pre_three_star_number'],
 				$ordersList[$i]['pre_four_star_number'],
 				$ordersList[$i]['pre_five_star_number'],
-				
-				
-				
+
+				'<a class="btn btn-success editAction" data-asin="'.$ordersList[$i]['asin'].'" data-domain="'.$ordersList[$i]['domain'].'" data-postStatus="'.$ordersList[$i]['post_status'].'" data-postType="'.$ordersList[$i]['post_type'].'" href="javascript:void(0)">Edit</a>'//添加编辑操作
+
 			);
         }
 
@@ -345,5 +360,33 @@ class StarController extends Controller
 		}
 		echo json_encode($returnData);
 		
+	}
+
+	/*
+	 * 更新帖子状态和帖子类型
+	 */
+	public function updatePost()
+	{
+		$asin = isset($_POST['asin']) && $_POST['asin'] ? $_POST['asin'] : '';
+		$domain = isset($_POST['domain']) && $_POST['domain'] ? $_POST['domain'] : '';
+
+		$updateData = $updateProduct = array();
+		if(isset($_POST['post-status']) && $_POST['post-status']){
+			$updateData['post_status'] = $updateProduct['post_status'] = $_POST['post-status'];
+			if($updateData['post_status']==2){
+				$updateData['push_date'] = date('Y-m-d H:i:s');
+			}
+		}
+		if(isset($_POST['post-type']) && $_POST['post-type']){
+			$updateData['post_type'] = $updateProduct['post_type'] = $_POST['post-type'];
+		}
+		$res = 1;
+		if(Asin::where('asin',$asin)->where('site',$domain)->update($updateData)){
+			//更新rsg产品表的帖子状态和帖子类型
+			$date = date('Y-m-d');
+			$updateProduct['updated_at'] = date('Y-m-d H:i:s');
+			RsgProduct::where('asin',$asin)->where('site',$domain)->where('created_at',$date)->update($updateProduct);
+		}
+		echo $res;
 	}
 }

@@ -147,7 +147,9 @@ class CtgController extends Controller {
 		    rsg_requests.amazon_order_id as rsg_orderid,
 		    '{$channelName}' as channel 
         FROM {$table} t1 
-        Left join rsg_requests on rsg_requests.amazon_order_id = t1.order_id 
+        Left join ( 
+					select amazon_order_id from rsg_requests group by amazon_order_id 
+				) as rsg_requests on rsg_requests.amazon_order_id = t1.order_id 
         LEFT JOIN client_info ON client_info.email = t1.email 
         LEFT JOIN users t2
           ON t2.id = t1.processor
@@ -189,6 +191,7 @@ class CtgController extends Controller {
         ORDER BY $orderby
         LIMIT $limit
         ";
+
         $data = $this->queryRows($sql);
 		$fbgroupConfig = getFacebookGroup();
         foreach($data as $key=>$val){

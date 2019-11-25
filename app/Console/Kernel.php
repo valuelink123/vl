@@ -42,6 +42,7 @@ class Kernel extends ConsoleKernel
 		'App\Console\Commands\GetSkuBaseInfo',
 		'App\Console\Commands\AddTransferWarn',
 		'App\Console\Commands\SkuDaily',
+		'App\Console\Commands\AddRsgProduct',
     ];
 
     /**
@@ -91,7 +92,7 @@ class Kernel extends ConsoleKernel
 		$schedule->command('get:asin 3000 0')->cron('30 */3 * * *')->name('getasins')->withoutOverlapping();
 		$schedule->command('get:kunnr 3 0')->hourly()->name('getkunnrs')->withoutOverlapping();
 		$schedule->command('get:sellers')->cron('*/1 * * * *')->name('sendmails')->withoutOverlapping();
-		$schedule->command('get:asininfo')->cron('30 0 * * *')->name('getasininfo')->withoutOverlapping();
+		$schedule->command('get:asininfo')->cron('30 8 * * *')->name('getasininfo')->withoutOverlapping();
 		$schedule->command('get:ads 10 1')->cron('5 0 * * *')->name('getads')->withoutOverlapping();
 		$schedule->command('get:profits 10 1 ')->cron('10 0 * * *')->name('getprotit')->withoutOverlapping();
         //$schedule->command('scan:warn')->hourly()->name('warningcheck')->withoutOverlapping();
@@ -110,6 +111,7 @@ class Kernel extends ConsoleKernel
 		$schedule->command('get:skubaseinfo')->dailyAt('16:00')->name('skubaseinfo')->withoutOverlapping();
 		$schedule->command('add:transfer_warn')->dailyAt('6:00')->name('transferWarn')->withoutOverlapping();//添加调拨预警，每天跑一次
 		$schedule->command('scan:skudaily')->dailyAt('08:00')->name('skudaily')->withoutOverlapping();
+		$schedule->command('add:rsgProduct')->dailyAt('07:00')->name('addProduct')->withoutOverlapping();
     }
 
     /**

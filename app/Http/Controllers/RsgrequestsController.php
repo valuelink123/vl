@@ -265,7 +265,10 @@ class RsgrequestsController extends Controller
 	public function create()
     {
 		if(!Auth::user()->can(['rsgrequests-create'])) die('Permission denied -- rsgrequests-create');
-        return view('rsgrequests/add',['products'=>self::getproducts()]);
+		$data['asin'] = isset($_GET['asin']) ? trim($_GET['asin']) : '';
+		$data['site'] = isset($_GET['site']) ? trim($_GET['site']) : '';
+		$data['productid'] = isset($_GET['productid']) ? trim($_GET['productid']) : '';
+        return view('rsgrequests/add',['products'=>self::getproducts(),'data'=>$data]);
     }
 
 
@@ -277,7 +280,6 @@ class RsgrequestsController extends Controller
 			'product_id' => 'required|int',
 			'customer_email' => 'required|email'
         ]);
-		
         $rule = new RsgRequest();
 		$rule->customer_email = $request->get('customer_email');
 		$rule->customer_paypal_email = $request->get('customer_paypal_email');
@@ -300,12 +302,14 @@ class RsgrequestsController extends Controller
 
 		//一个客户对一个产品只能申请一次，可以申请多个不同的产品，但是必须是上个产品complete后才能申请
 		$ruleData = $rule->where('customer_email',$rule->customer_email)->where('product_id',$rule->product_id)->take(1)->get()->toArray();
+
 		if($ruleData){
 			//该客户已经申请过该产品
 			$request->session()->flash('error_message','Rsg Request Failed,One customer cannot test two identical products');
 
 			return redirect()->back()->withInput();
 		}
+
 		//检查该客户最近一次申请产品是什么时候，要在上次申请完成后才能再申请
 		$customerData = $rule->where('customer_email',$rule->customer_email)->orderBy('updated_at', 'desc')->take(1)->get()->toArray();
 		if($customerData){
@@ -315,6 +319,8 @@ class RsgrequestsController extends Controller
 				return redirect()->back()->withInput();
 			}
 		}
+
+		DB::beginTransaction();//开启事务处理
 
         if ($rule->save()) {
 			//查client_info表中是否有此客户的数据，如若有就更新facebook_name和facebook_group字段数据，如若没有就插入客户信息数据到client和client_info表
@@ -335,6 +341,11 @@ class RsgrequestsController extends Controller
 
 			$step_to_tags = getStepIdToTags();
 			$product= RsgProduct::where('id',$rule->product_id)->first()->toArray();
+			$res = RsgProduct::where('id',$rule->product_id)->update(array('requested_review'=>($product['requested_review']+1)));
+			if(empty($res)){
+				DB::rollBack();
+			}
+			DB::commit();
 			//auto_send_status为0的时候时候才触发自动发信，选NO为1的时候不触发发信
 			if($rule->auto_send_status==0){
 				$mailchimpData = array(
@@ -350,7 +361,7 @@ class RsgrequestsController extends Controller
 					'merge_fields' => $mailchimpData]);
 			}
             $request->session()->flash('success_message','Set Rsg Request Success');
-            return redirect('rsgrequests');
+			return redirect()->back()->withInput();
         }else{
             $request->session()->flash('error_message','Set Rsg Request Failed');
             return redirect()->back()->withInput();
@@ -385,13 +396,11 @@ class RsgrequestsController extends Controller
 	
 	public function getproducts(){
 		$date=date('Y-m-d');
-		$products = RsgProduct::whereIn('status',array(1,2))->where('daily_remain','>',0)->where('start_date','<=',$date)->where('end_date','>=',$date)->orderBy('site','asc')->get()->toArray();
-		foreach($products as $key=>$val){
-			$products[$key]['class'] = 'active';
-			if($val['status']==2){
-				$products[$key]['class'] = 'inactive';
-			}
-			$products[$key]['product_name'] = $val['asin'].'——'.$val['product_name'];
+		$_products = RsgProduct::where('created_at','=',$date)->orderBy('order_status','desc')->get()->toArray();
+		$products = array();
+		foreach($_products as $key=>$val){
+			$products[$val['site']][$key] = $val;
+			$products[$val['site']][$key]['product_name'] = $val['asin'].'——'.$val['product_name'];
 		}
 		return $products;
 	}
@@ -412,18 +421,10 @@ class RsgrequestsController extends Controller
 		$rule->transfer_currency = $request->get('transfer_currency');
 		$rule->review_url = $request->get('review_url');
         $rule->step = intval($request->get('step'));
-        $product_id = intval($request->get('product_id'));
-        //当现在选择的产品跟原来的产品数据不一致的时候，才要判断客户跟产品等信息
-        if($product_id != $rule->product_id) {
-			//一个客户对一个产品只能申请一次，可以申请多个不同的产品，但是必须是上个产品complete后才能申请
-			$ruleData = $rule->where('customer_email', $rule->customer_email)->where('product_id', $product_id)->take(1)->get()->toArray();
-			if ($ruleData) {
-				//该客户已经申请过该产品
-				$request->session()->flash('error_message', 'Rsg Request Failed,One customer cannot test two identical products');
-				return redirect()->back()->withInput();
-			}
-		}
+		
+        /*取消变更产品功能
 		if($product_id) $rule->product_id = $product_id;
+		*/
 		$rule->star_rating = $request->get('star_rating');
 		// $rule->follow = $request->get('follow');
 		// $rule->next_follow_date = $request->get('next_follow_date');

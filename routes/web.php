@@ -20,6 +20,8 @@ Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
 Route::get('/homeexport', 'HomeController@export');
+Route::get('/home/asins', 'HomeController@asins');
+Route::Post('/home/getasins', 'HomeController@getasins');
 Route::resource('account', 'AccountController');
 Route::resource('template', 'TemplateController');
 Route::resource('asin', 'AsinController');
@@ -92,7 +94,14 @@ Route::resource('couponkunnr', 'CouponkunnrController');
 Route::Post('/couponkunnr/get', 'CouponkunnrController@get')->name('getkunnrs');
 Route::Post('/couponkunnr/upload', 'CouponkunnrController@upload')->name('uploadkunnr');
 Route::Post('/mcforder/get', 'McforderController@get')->name('getMcforder');
-Route::resource('rsgproducts', 'RsgproductsController');
+// Route::resource('rsgproducts', 'RsgproductsController');
+Route::match(['post','get'],'/rsgproducts', 'RsgproductsController@list');//产品列表
+Route::get('/rsgproducts/edit', 'RsgproductsController@edit');//编辑产品
+Route::post('/rsgproducts/update', 'RsgproductsController@update');//更新产品
+Route::match(['post','get'],'/rsgproducts/export', 'RsgproductsController@export');//下载产品列表
+Route::match(['post','get'],'/rsgtask', 'RsgproductsController@rsgtask');//rsgTask任务列表
+
+
 Route::Post('/rsgproducts/get', 'RsgproductsController@get')->name('getrsgproducts');
 Route::get('/rsgrequests/process', 'RsgrequestsController@process');
 Route::Post('/rsgrequests/process', 'RsgrequestsController@process');
@@ -151,3 +160,6 @@ Route::post('/productTransfer/replyAudit', 'ProductTransferController@replyAudit
 Route::get('/productTransfer/replyExport', 'ProductTransferController@replyExport');//调拨请求的下载功能
 //RsgUser模块
 Route::match(['post','get'],'/rsgUser/list', 'RsgUserController@list');//rsgUser列表展示
+
+Route::post('/star/updatePost', 'StarController@updatePost');//更新帖子状态和帖子类型
+
