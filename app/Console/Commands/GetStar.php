@@ -162,10 +162,10 @@ where last_updated>:date_from',['date_from' => $date_from]);
 				
 				}
 			}
-			$yesterday_star = Starhistory::where('asin',$asin->asin)->where('domain',$asin->site)->where('create_at',date('Y-m-d',strtotime('-1day')))->get(['one_star_number','two_star_number','three_star_number','four_star_number','five_star_number','total_star_number','average_score'])->first()->toArray();
-			if(array_get($yesterday_star,'average_score')==0){
-				$updateData = Starhistory::where('asin',$asin->asin)->where('domain',$asin->site)->where('create_at',date('Y-m-d',strtotime('-2day')))->get(['one_star_number','two_star_number','three_star_number','four_star_number','five_star_number','total_star_number','average_score'])->first()->toArray();
-				if($updateData)  Starhistory::where('asin',$asin->asin)->where('domain',$asin->site)->where('create_at',date('Y-m-d',strtotime('-1day')))->update($updateData);
+			$yesterday_star = Starhistory::where('asin',$asin->asin)->where('domain',$asin->site)->where('create_at',date('Y-m-d',strtotime('-1day')))->get(['one_star_number','two_star_number','three_star_number','four_star_number','five_star_number','total_star_number','average_score'])->first();
+			if(!empty($yesterday_star) && $yesterday_star->average_score==0){
+				$updateData = Starhistory::where('asin',$asin->asin)->where('domain',$asin->site)->where('create_at',date('Y-m-d',strtotime('-2day')))->get(['one_star_number','two_star_number','three_star_number','four_star_number','five_star_number','total_star_number','average_score'])->first();
+				if(!empty($updateData))  Starhistory::where('asin',$asin->asin)->where('domain',$asin->site)->where('create_at',date('Y-m-d',strtotime('-1day')))->update($updateData->toArray());
 			}
 		}	
 	}	
