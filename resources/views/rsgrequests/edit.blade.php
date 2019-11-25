@@ -52,7 +52,7 @@
 
 						<div class="form-group col-md-9">
 							<label>Products</label>
-							<select class="form-control" name="product_id" id="product_id" required disabled>
+							<select class="form-control" name="product_id" id="product_id" required>
 								<option value="{!! $product['id'] !!}">{!! $product['product_name'] !!}</option>
 							</select>
 						</div>
