@@ -423,9 +423,10 @@ class RsgrequestsController extends Controller
 		$rule->review_url = $request->get('review_url');
         $rule->step = intval($request->get('step'));
 		
-        /*取消变更产品功能
+        //回复变更产品功能
+		$product_id = intval($request->get('product_id'));
 		if($product_id) $rule->product_id = $product_id;
-		*/
+		
 		$rule->star_rating = $request->get('star_rating');
 		// $rule->follow = $request->get('follow');
 		// $rule->next_follow_date = $request->get('next_follow_date');
