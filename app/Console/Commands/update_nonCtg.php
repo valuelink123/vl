@@ -57,10 +57,12 @@ class UpdateNonctg extends Command
         //凌晨跑前一天的数据，遍历各个官网的前一天的数据，再根据邮箱判断是否存在存在ctg表中，如果不存在就插入到nonctg数据表中
         foreach($config as $key=>$val){
             //遍历循环，一个一个官网进行处理
+			$entry_table = isset($val['entry_table']) && $val['entry_table'] ? $val['entry_table'] : 'wp_gf_entry';
+			$meta_table = isset($val['meta_table']) && $val['meta_table'] ? $val['meta_table'] : 'wp_gf_entry_meta';
             $insertData = $data = $orderidArr = array();
             $sql = "select entry_id, meta_key,meta_value,date_created 
-            from {$val['dbname']}.wp_gf_entry as a
-            left join {$val['dbname']}. wp_gf_entry_meta as b on a.id = b.entry_id 
+            from {$val['dbname']}.{$entry_table} as a
+            left join {$val['dbname']}. {$meta_table} as b on a.id = b.entry_id 
             where b.form_id in (".join(',',$val['formid']).")
             and date_created >= '{$yestoday}'";
             $_data = DB::connection($val['db'])->select($sql);

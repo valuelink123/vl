@@ -476,6 +476,8 @@ function getActiveUserConfig()
 		array('db'=>'drocon','dbname'=>'drocon_co','name'=>'drocon','formid'=>array(2),'fields'=>array('name'=>'1.3','email'=>2,'orderid'=>3)),
 		array('db'=>'natrogix','dbname'=>'lypsonline_com','name'=>'lypsonline','formid'=>array(2),'fields'=>array('name'=>'1.3','email'=>2,'orderid'=>3)),
 		array('db'=>'website','dbname'=>'vipsupport_jp','name'=>'vipsupport','formid'=>array(1),'fields'=>array('name'=>'2.3','email'=>3,'orderid'=>4)),
+
+		array('db'=>'website','dbname'=>'wordpress','name'=>'azeus','entry_table'=>'wp_53_gf_entry','meta_table'=>'wp_53_gf_entry_meta','formid'=>array(3),'fields'=>array('name'=>1,'email'=>3,'orderid'=>2)),//新添加的azeus官网数据
     );
 
     return $config;
