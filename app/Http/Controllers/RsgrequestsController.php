@@ -378,9 +378,10 @@ class RsgrequestsController extends Controller
         }
 		if(array_get($rule,'customer_paypal_email')) $rule['trans']=self::getTrans(array_get($rule,'customer_paypal_email'));
 		$product= RsgProduct::where('id',$rule['product_id'])->first()->toArray();
-		if($product['status']==2){
-			$product['class'] = 'inactive';
+		if($product){
+			$product['product_name'] = $product['asin'].'——'.$product['product_name'];
 		}
+
 		//查询该邮箱是否存在于client_info中，查出需要显示的facebook_name和facebook_group
 		$rule['facebook_name'] = '';
 		$rule['facebook_group'] = '';
@@ -422,9 +423,10 @@ class RsgrequestsController extends Controller
 		$rule->review_url = $request->get('review_url');
         $rule->step = intval($request->get('step'));
 		
-        /*取消变更产品功能
+        //回复变更产品功能
+		$product_id = intval($request->get('product_id'));
 		if($product_id) $rule->product_id = $product_id;
-		*/
+		
 		$rule->star_rating = $request->get('star_rating');
 		// $rule->follow = $request->get('follow');
 		// $rule->next_follow_date = $request->get('next_follow_date');
