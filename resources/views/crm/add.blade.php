@@ -121,8 +121,10 @@
                                                     <i class="fa fa-bookmark"></i>
                                                 </span>
                                                 <select class="form-control" name="type" id="type">
-                                                    @foreach (getCrmClientType() as $value)
-                                                        <option value="{{$value}}" >{{$value}}</option>
+                                                    @foreach (getCrmClientType() as $key => $value)
+                                                        <option value="{{$key}}" >
+                                                            {{$value}}
+                                                        </option>
                                                     @endforeach
                                                 </select>
                                             </div>

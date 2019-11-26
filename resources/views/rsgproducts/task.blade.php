@@ -1,11 +1,15 @@
 @extends('layouts.layout')
 @section('crumb')
-    @include('layouts.crumb', ['crumbs'=>['sgTask']])
+    @include('layouts.crumb', ['crumbs'=>['rsgTask']])
 @endsection
 @section('content')
 
     <style>
         th,td{text-align:center;}
+        table .special-content{
+            background-color: #FF66FF;
+            font-size: 20px !important;
+        }
     </style>
 
     <link rel="stylesheet" href="/js/chosen/chosen.min.css"/>
@@ -39,7 +43,7 @@
                         <th title="The number of applications which have PayPal but haven't completed in the last 15 days">Unfinished</th>
                         <th>Target</th>
                         <th>Achieved</th>
-                        <th>Task</th>
+                        <th class="special-content">Task</th>
                         <th>Action</th>
                     </tr>
                     </thead>
@@ -65,7 +69,7 @@
                             <th>{!! $val['unfinished'] !!}</th>
                             <th>{!! $val['target_review'] !!}</th>
                             <th>{!! $val['requested_review'] !!}</th>
-                            <th>{!! $val['task'] !!}</th>
+                            <th class="special-content">{!! $val['task'] !!}</th>
                             <th>{!! $val['action'] !!}</th>
                         </tr>
                     @endforeach

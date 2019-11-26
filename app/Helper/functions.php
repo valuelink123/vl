@@ -614,7 +614,7 @@ function getCrmCountry()
 //CRM模块可供下拉选择的type(客户类型)，0默认，1黑名单
 function getCrmClientType()
 {
-    return array('0','1');
+    return array(0=>'default',1=>'blacklist');
 }
 
 //CRM模块可供下拉选择的Source
