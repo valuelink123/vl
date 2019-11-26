@@ -312,7 +312,14 @@
                 {data:'facebook_name',name:'facebook_name'},
                 {data:'facebook_group',name:'facebook_group'},
                 {data:'remark',name:'remark'},
-                {data:'type',name:'type'},
+                {
+                    data:'type',
+                    name:'type',
+                    render(data){
+                        return data == "0" ? "default":"blacklist";
+                    }
+                },
+
                 {data: 'processor', name: 'processor'},
                 {data: 'action', name: 'action'},
             ],

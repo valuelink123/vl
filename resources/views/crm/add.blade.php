@@ -122,7 +122,13 @@
                                                 </span>
                                                 <select class="form-control" name="type" id="type">
                                                     @foreach (getCrmClientType() as $value)
-                                                        <option value="{{$value}}" >{{$value}}</option>
+                                                        <option value="{{$value}}" >
+                                                        @if($value =='0')
+                                                            default
+                                                        @else
+                                                            blacklist
+                                                        @endif
+                                                        </option>
                                                     @endforeach
                                                 </select>
                                             </div>
