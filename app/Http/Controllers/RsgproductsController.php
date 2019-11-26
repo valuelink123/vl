@@ -34,7 +34,7 @@ class RsgproductsController extends Controller
    	public function list(Request $req)
     {
 		if(!Auth::user()->can(['rsgproducts-show'])) die('Permission denied -- rsgproducts-show');
-		$todayDate = date('Y-m-d');
+		$todayDate = $this->getDefaultDate(date('Y-m-d'));
 		if ($req->isMethod('GET')) {
 			return view('rsgproducts/index', ['date' => $todayDate,'bgs'=>$this->getBgs(),'bus'=>$this->getBus()]);
 		}
@@ -73,7 +73,7 @@ class RsgproductsController extends Controller
 			$request->session()->flash('error_message','Rsg Product not Exists');
 			return redirect('rsgproducts');
 		}
-		$rule['product_summary'] = json_decode($rule['product_summary']);
+		$rule['product_summary'] = json_decode(str_replace("'",'"',$rule['product_summary']),TRUE);
 		if($rule['product_summary']){
 			$rule['product_summary'] = implode("\n",$rule['product_summary']);
 		}
@@ -180,7 +180,8 @@ class RsgproductsController extends Controller
     public function rsgtask(Request $req)
 	{
 		if(!Auth::user()->can(['rsgproducts-rsgtask'])) die('Permission denied -- rsgproducts rsgtask');
-		$date = $todayDate =  date('Y-m-d');
+		$date = $todayDate = $this->getDefaultDate(date('Y-m-d'));
+
 		$where = " and created_at = '".$date."' ";
 		$where_product = " and created_at = '".$date."' and cast(rsg_products.sales_target_reviews as signed) - cast(rsg_products.requested_review as signed) > 0 ";
 
@@ -280,7 +281,6 @@ class RsgproductsController extends Controller
 		$postStatus = getPostStatus();
 		$postType = getPostType();
 		$productOrderStatus = getProductOrderStatus();
-		$i = 1;
 		//sku状态信息
 		// $sapSiteCode = getSapSiteCode();
 		// $sku_sql = "select sku,sap_site_id,any_value(status) as sku_status from skus_status group by sku,sap_site_id";
@@ -290,6 +290,7 @@ class RsgproductsController extends Controller
 		// 	$site = isset($sapSiteCode[$val['sap_site_id']]) ? 'www.'.$sapSiteCode[$val['sap_site_id']] : $val['sap_site_id'];
 		// 	$skuData[$val['sku'].'_'.$site]['sku_status'] = $val['sku_status'];
 		// }
+		$i = 1;
 		foreach ($data as $key => $val) {
 			$data[$key]['rank'] = $i;
 			// $data[$key]['sku_status'] = isset($skuData[$val['item_no'].'_'.$val['site']]) ? $skuData[$val['item_no'].'_'.$val['site']]['sku_status'] : '';
@@ -317,6 +318,20 @@ class RsgproductsController extends Controller
 			$i++;
 		}
 		return $data;
+	}
+
+	/*
+	 * 得到默认的查询数据日期
+	 * 因为脚本数据是早上7点更新，所以在凌晨到早上7点之间显示当天的数据的时候会显示空白
+	 * 因此凌晨到七点半之间要显示的是昨天的数据
+	 */
+	public function getDefaultDate($todayDate)
+	{
+		if(time()-strtotime($todayDate.' 07:30:00') < 0){
+			//凌晨到七点半之间要显示的是昨天的数据
+			$todayDate = date('Y-m-d',strtotime($todayDate)-86400);
+		}
+		return $todayDate;
 	}
 
 
