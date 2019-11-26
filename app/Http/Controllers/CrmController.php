@@ -72,6 +72,9 @@ class CrmController extends Controller
 				$action .= '<a href="http://'.$amazonPage.'" target="_blank"><i class="fa fa-share"></i></a>';
 			}
 			$data[$key]['action'] = $action;
+            //0默认，1黑名单
+            $data[$key]['type'] = getCrmClientType()[$data[$key]['type']];
+
 			//当点击ctg,rsg,Negative Review所属的数字时，可以链接到相对应的客户列表页面，times_ctg，times_rsg，times_negative_review
 			$email = $val['email'];
 			if($val['times_ctg']>0){
@@ -88,6 +91,7 @@ class CrmController extends Controller
 		}
 		return compact('data', 'recordsTotal', 'recordsFiltered');
 	}
+
 	/*
 	得到列表搜索的sql语句，导出和列表共用一个sql语句,列表就是再加上限制的条数
 	 */
