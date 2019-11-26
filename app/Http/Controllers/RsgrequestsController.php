@@ -397,7 +397,7 @@ class RsgrequestsController extends Controller
 	
 	public function getproducts(){
 		$date=date('Y-m-d');
-		if(time()-strtotime($date.' 11:30:00') < 0){
+		if(time()-strtotime($date.' 07:30:00') < 0){
 			//凌晨到七点半之间要显示的是昨天的数据
 			$date = date('Y-m-d',strtotime($date)-86400);
 		}
