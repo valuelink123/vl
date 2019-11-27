@@ -51,7 +51,7 @@ border-top:1px solid #333;
         <div class="caption">
             <i class="icon-microphone font-green"></i>
             <span class="caption-subject bold font-green">Price Model</span>
-            <span class="caption-helper"><br />本模型用于计算同一SKU不同销售定价下不同销量所带来的经济效益差别, 作为销售定价的参考作为销售定价的参考<br />建议每周测算一次建议每周测算一次,	最少每月重新测算一次并定价, 当定价与销量发生明显变化时亦须重新测算</span>
+            <span class="caption-helper"><br />本模型用于计算同一SKU不同销售定价下不同销量所带来的经济效益差别, 作为销售定价的参考<br />建议每周测算一次建议每周测算一次,	最少每月重新测算一次并定价, 当定价与销量发生明显变化时亦须重新测算</span>
         </div>
 
     </div>
@@ -566,7 +566,8 @@ border-top:1px solid #333;
 				 </div>
 		
 				</div>
-				</div><div class="mt-repeater-item">
+				</div>
+				<!--<div class="mt-repeater-item">
 				<div class="row mt-repeater-row">
 				 <div class="col-md-4">
 					产品类型
@@ -583,7 +584,8 @@ border-top:1px solid #333;
 				 </div>
 		
 				</div>
-				</div><div class="mt-repeater-item">
+				</div>-->
+				<div class="mt-repeater-item">
 				<div class="row mt-repeater-row">
 				 <div class="col-md-4">
 					平均库龄
