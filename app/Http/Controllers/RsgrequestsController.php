@@ -430,7 +430,18 @@ class RsgrequestsController extends Controller
 		
         //回复变更产品功能
 		$product_id = intval($request->get('product_id'));
-		if($product_id) $rule->product_id = $product_id;
+		if($rule->product_id != $product_id){//修改后的产品id不等于原来的产品id
+			//原来的产品已请求数量-1
+			$beforeProduct= RsgProduct::where('id',$rule->product_id)->first()->toArray();
+			$request_review = $beforeProduct['requested_review']-1 > 0 ? $beforeProduct['requested_review']-1 : 0;
+			RsgProduct::where('id',$rule->product_id)->update(array('requested_review'=>$request_review));
+
+			//修改后的产品的已请求数量+1
+			$laterProduct= RsgProduct::where('id',$product_id)->first()->toArray();
+			RsgProduct::where('id',$product_id)->update(array('requested_review'=>($laterProduct['requested_review']+1)));
+
+			$rule->product_id = $product_id;//修改后的产品id覆盖
+		}
 		
 		$rule->star_rating = $request->get('star_rating');
 		// $rule->follow = $request->get('follow');
