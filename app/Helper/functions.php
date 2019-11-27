@@ -602,7 +602,7 @@ function unsetEmoji($str)
 //config option的状态：0为显示，1为隐藏。
 function getConfigOptionStatus()
 {
-    return array('0','1');
+    return array(0=>'Visible', 1=>"Hidden");
 }
 
 //CRM模块可供下拉选择的country
