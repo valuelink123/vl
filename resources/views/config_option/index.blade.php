@@ -143,7 +143,10 @@
         ],
 
         //默认以某列排序，列的序号从0开始。
-        "order": [[3, "asc"]],
+        //"order": [[3, "asc"]],
+        //禁止排序（控制器中已按规则排序）
+        ordering:false,
+
         //指定某列不能排序。列的序号从0开始。
         "aoColumnDefs": [ { "bSortable": false, "aTargets": [7] }],
 
@@ -160,11 +163,6 @@
     var data_table = $('#the_table').dataTable($dataTablesSettings);
 
     $('select').on('change', function() {
-        var params = [
-                        {"name": "co_pid", "value": $('#co_pid').val()},
-                        {"name": "co_status", "value": $('#co_status').val()}
-                      ];
-        redraw_data_table(data_table, $dataTablesSettings, params);
 
         //这里重新设置参数
         $dataTablesSettings.fnServerParams = function (aoData) {

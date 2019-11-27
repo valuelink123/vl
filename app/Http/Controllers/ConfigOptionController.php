@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\ConfigOption;
 use Illuminate\Support\Facades\Auth;
-
+use DB;
 
 class ConfigOptionController extends Controller
 {
@@ -49,18 +49,52 @@ class ConfigOptionController extends Controller
             }
         }
 
-        $config_options = ConfigOption::whereRaw('1 = 1');
-        if($request->post('co_pid')){
-            $config_options = $config_options->where('co_pid',$request->post('co_pid'));
-        }
-        //不要使用：if($request->post('co_pid'))
-        //原因：如果$request->post('co_status')值为0，则if(0)为false，起不到过滤效果。
-        if(!is_null($request->post('co_status'))){
-            $config_options = $config_options->where('co_status',$request->post('co_status'));
+        $co_pid = $request->post('co_pid');
+        $co_status = $request->post('co_status');
+        $data = [];
+
+        //当没有设置筛选条件时，按一级类目分组，组内的二级类目按order倒序排列
+        if (is_null($co_pid) && is_null($co_status)){
+
+            $parent_counts = DB::select('select co_pid, count(*) as count from config_option where co_pid <> 0 group by co_pid order by co_pid;');
+            $parent_counts_array = array_map('get_object_vars', $parent_counts);
+
+            $parent_records = DB::select('select * from config_option where co_pid=0 order by co_pid;');
+            $parent_array = array_map('get_object_vars', $parent_records);
+
+            $child_records = DB::select('select * from config_option where co_pid <> 0 order by co_pid, co_order desc;');
+            $child_records_array = array_map('get_object_vars', $child_records);
+
+            $sum = 0;
+
+            for($i=0; $i<count($parent_counts_array); $i++){
+
+                array_push($data, $parent_array[$i]);
+                $current_parent_count = $parent_counts_array[$i]['count'];
+                for($j=0; $j<$current_parent_count; $j++){
+                    array_push($data, $child_records_array[$sum+$j]);
+
+                }
+                $sum += $current_parent_count;
+            }
 
         }
+        //当设置筛选条件时（通过Parent Name，Status选择）
+        else{
+            $config_options = ConfigOption::whereRaw('1 = 1');
 
-        $data = $config_options->get()->toArray();
+            if($co_pid){
+                $config_options = $config_options->where('co_pid',$co_pid);
+            }
+            //不要使用：if($request->post('co_pid'))
+            //原因：如果$request->post('co_status')值为0，则if(0)为false，起不到过滤效果。
+            if(!is_null($co_status)){
+                $config_options = $config_options->where('co_status',$co_status);
+
+            }
+            $data = $config_options->orderBy('co_order', 'DESC')->get()->toArray();
+
+        }
 
         foreach($data as $key=>$val){
             $action = '';
@@ -162,7 +196,7 @@ class ConfigOptionController extends Controller
 
     public function edit(Request $request,$id)
     {
-        if(!Auth::user()->can(['config-option-show'])) die('Permission denied -- config-option-show');
+        if(!Auth::user()->can(['config-option-update'])) die('Permission denied -- config-option-show');
         $config_option= ConfigOption::where('id',$id)->first()->toArray();
 
         if(!$config_option){
