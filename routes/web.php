@@ -80,6 +80,12 @@ Route::Post('/exception/getrepeatorder', 'ExceptionController@getRepeatOrder')->
 Route::get('/exceptionexport', 'ExceptionController@export')->name('exportException');
 Route::get('/reviewexport', 'ReviewController@export')->name('exportReview');
 Route::get('/dreportexport', 'SkuController@export')->name('exportDreport');
+Route::get('/config_option', 'ConfigOptionController@index')->name('config_option');
+Route::Post('/config_option/get', 'ConfigOptionController@get')->name('config_option_get');
+Route::get('/config_option/create', 'ConfigOptionController@create')->name('config_option_create');
+Route::Post('/config_option/store', 'ConfigOptionController@store')->name('config_option_store');
+Route::get('/config_option/{id}/edit', 'ConfigOptionController@edit')->name('config_option_edit');
+Route::Post('/config_option/{id}/update', 'ConfigOptionController@update')->name('config_option_update');
 
 Route::get('/asinexport', 'AsinController@export')->name('exportAsin');
 Route::get('/fees', 'FeesController@index')->name('fees');

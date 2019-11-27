@@ -661,6 +661,15 @@
                                                     </a>    
                                                 </li>
 												@endpermission
+                                                @permission('config-option-show')
+                                                <li class="">
+                                                    <a href="/config_option" class="nav-link nav-toggle ">
+                                                        Config Options
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
+                                                @endpermission
+
                                             </ul>
                                         </li>
                                     </ul>
