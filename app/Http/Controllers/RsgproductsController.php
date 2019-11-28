@@ -42,11 +42,15 @@ class RsgproductsController extends Controller
 		$searchField = array('date'=>'rsg_products.created_at','asin'=>'rsg_products.asin','bg'=>'asin.bg','bu'=>'asin.bu','site'=>'rsg_products.site','item_no'=>'asin.item_no','post_type'=>'rsg_products.post_type','post_status'=>'rsg_products.post_status','order_status'=>'rsg_products.order_status','sku_level'=>'rsg_products.sku_level','sku_status'=>'skus_status.status');
 		$search = isset($_POST['search']) ? $_POST['search'] : '';
 		$search = $this->getSearchData(explode('&',$search));
+		$leftskus = 0;//$leftskus为是否关联查询skus_status表的开关，因为关联查询后速度就变慢
+		if($search['sku_status']){
+			$leftskus = 1;
+		}
 		$where = $where_product = $this->getSearchWhereSql($search,$searchField);
 
 		$date = $search['date'];
 		$orderby = $this->dtOrderBy($req);
-		$sql = $this->getSql($where,$where_product,$date,$orderby);
+		$sql = $this->getSql($leftskus,$where,$where_product,$date,$orderby);
 
 		if($req['length'] != '-1'){
 			$limit = $this->dtLimit($req);
@@ -54,7 +58,7 @@ class RsgproductsController extends Controller
 		}
 
 		$data = $this->queryRows($sql);
-		$data = $this->getReturnData($data,$date,$todayDate);
+		$data = $this->getReturnData($leftskus,$data,$date,$todayDate);
 
 		$recordsTotal = $recordsFiltered = $this->queryOne('SELECT FOUND_ROWS()');
 		return compact('data', 'recordsTotal', 'recordsFiltered');
@@ -124,10 +128,10 @@ class RsgproductsController extends Controller
 		$date = $_REQUEST['date'];
 		$where = " and created_at = '".$date."' ";
 
-		$sql = $this->getSql($where,$where,$date);
+		$sql = $this->getSql(0,$where,$where,$date);
 
 		$data = $this->queryRows($sql);
-		$data = $this->getReturnData($data,$date,$todayDate);
+		$data = $this->getReturnData(0,$data,$date,$todayDate);
 		$arrayData = array();
 		$headArray = array('Rank','Score','Weight Status','Product','Site','Asin','Type','Status','Item No','Level','SKU Status','Rating','Reviews','BG','BU','Seller','Unfinished','Target','Achieved','Task');
 		$arrayData[] = $headArray;
@@ -185,12 +189,20 @@ class RsgproductsController extends Controller
 		$where = " and created_at = '".$date."' ";
 		$where_product = " and created_at = '".$date."' and cast(rsg_products.sales_target_reviews as signed) - cast(rsg_products.requested_review as signed) > 0 ";
 
-		$sql = $this->getSql($where,$where_product,$date);
+		//限制站点搜索
+		$siteArrConfig = getSiteArr()['site'];
+		$site = isset($_POST['site']) && $_POST['site'] ? $_POST['site'] : 'US';
+		$siteArr = isset($siteArrConfig[$site]) ? $siteArrConfig[$site] : array();
+		$where_product .= " and rsg_products.site in('".join($siteArr,"','")."')";
+
+		$sql = $this->getSql(0,$where,$where_product,$date);
 		$sql .= ' LIMIT 0,10 ';
 
 		$data = $this->queryRows($sql);
-		$data = $this->getReturnData($data,$date,$todayDate,'task');
-
+		$data = $this->getReturnData(0,$data,$date,$todayDate,'task');
+		if($_POST){
+			echo json_encode($data);exit;
+		}
 		return view('rsgproducts/task',['data'=>$data]);
 	}
 
@@ -198,7 +210,7 @@ class RsgproductsController extends Controller
 	 * 得到sql查询语句
 	 *
 	 */
-	public function getSql($where,$where_product,$date='',$orderby='')
+	public function getSql($leftskus,$where,$where_product,$date='',$orderby='')
 	{
 		if($orderby){
 			$orderby = " order by {$orderby} ";
@@ -206,9 +218,14 @@ class RsgproductsController extends Controller
 			$orderby = " order by rsg_products.order_status desc,score desc,id desc ";
 		}
 		$ago15day = date('Y-m-d',strtotime($date)-86400*15);
+		$field = $joinSkus = ' ';
+		if($leftskus == 1){
+			$field = ',skus_status.status as sku_status ';
+			$joinSkus = ' left join skus_status on asin.item_no = skus_status.sku and asin.site = skus_status.site ';
+		}
 		$sql = "
         SELECT SQL_CALC_FOUND_ROWS
-        	rsg_products.id as id,rsg_products.asin as asin,rsg_products.site as site,rsg_products.post_status as post_status,rsg_products.post_type as post_type,rsg_products.sales_target_reviews as target_review,rsg_products.requested_review as requested_review,asin.bg as bg,asin.bu as bu,asin.item_no as item_no,asin .seller as seller,rsg_products.number_of_reviews as review,rsg_products.review_rating as rating, num as unfinished,rsg_products.sku_level as sku_level, rsg_products.product_img as img,rsg_products.order_status as order_status,cast(rsg_products.sales_target_reviews as signed) - cast(rsg_products.requested_review as signed) as task,(status_score*type_score*level_score*rating_score*review_score)  as score,skus_status.status as sku_status 
+        	rsg_products.id as id,rsg_products.asin as asin,rsg_products.site as site,rsg_products.post_status as post_status,rsg_products.post_type as post_type,rsg_products.sales_target_reviews as target_review,rsg_products.requested_review as requested_review,asin.bg as bg,asin.bu as bu,asin.item_no as item_no,asin .seller as seller,rsg_products.number_of_reviews as review,rsg_products.review_rating as rating, num as unfinished,rsg_products.sku_level as sku_level, rsg_products.product_img as img,rsg_products.order_status as order_status,cast(rsg_products.sales_target_reviews as signed) - cast(rsg_products.requested_review as signed) as task,(status_score*type_score*level_score*rating_score*review_score)  as score {$field} 
             from rsg_products  
             left join (
 				select id,
@@ -267,7 +284,7 @@ class RsgproductsController extends Controller
 				where rsg_requests.created_at <= '".$date." 23:59:59 ' and rsg_requests.created_at >='".$ago15day." 00:00:00 ' 
 				group by asin,site 
         	) as rsg on rsg_products.asin=rsg.asin and rsg_products.site=rsg.site 
-        	left join skus_status on asin.item_no = skus_status.sku and asin.site = skus_status.site 
+        	{$joinSkus} 
 			where 1 = 1 {$where_product} 
 			{$orderby} ";
 		return $sql;
@@ -276,26 +293,31 @@ class RsgproductsController extends Controller
 	/*
 	 * 得到处理后的表格数据
 	 */
-	public function getReturnData($data,$date='',$todayDate='',$action='') {
+	public function getReturnData($leftskus,$data,$date='',$todayDate='',$action='') {
 		$siteShort = getSiteShort();
 		$postStatus = getPostStatus();
 		$postType = getPostType();
 		$productOrderStatus = getProductOrderStatus();
-		//sku状态信息
-		// $sapSiteCode = getSapSiteCode();
-		// $sku_sql = "select sku,sap_site_id,any_value(status) as sku_status from skus_status group by sku,sap_site_id";
-		// $_skuData = $this->queryRows($sku_sql);
-		// $skuData = array();
-		// foreach($_skuData as $key=>$val){
-		// 	$site = isset($sapSiteCode[$val['sap_site_id']]) ? 'www.'.$sapSiteCode[$val['sap_site_id']] : $val['sap_site_id'];
-		// 	$skuData[$val['sku'].'_'.$site]['sku_status'] = $val['sku_status'];
-		// }
+		//sku状态信息,任务列表的时候不关联查询skus_status表，因此用此种方法获取sku状态信息，因为关联查询此表速度会慢很多，产品列表是因为要搜索status，所以需要关联查询
+		if (empty($leftskus)){
+			$sapSiteCode = getSapSiteCode();
+			$sku_sql = "select sku,sap_site_id,any_value(status) as sku_status from skus_status group by sku,sap_site_id";
+			$_skuData = $this->queryRows($sku_sql);
+			$skuData = array();
+			foreach($_skuData as $key=>$val){
+				$site = isset($sapSiteCode[$val['sap_site_id']]) ? 'www.'.$sapSiteCode[$val['sap_site_id']] : $val['sap_site_id'];
+				$skuData[$val['sku'].'_'.$site]['sku_status'] = $val['sku_status'];
+			}
+		}
+
 		$i = 1;
 		foreach ($data as $key => $val) {
 			$data[$key]['rank'] = $i;
-			// $data[$key]['sku_status'] = isset($skuData[$val['item_no'].'_'.$val['site']]) ? $skuData[$val['item_no'].'_'.$val['site']]['sku_status'] : '';
+			if(!isset($val['sku_status'])){
+				$data[$key]['sku_status'] = isset($skuData[$val['item_no'].'_'.$val['site']]) ? $skuData[$val['item_no'].'_'.$val['site']]['sku_status'] : '';
+			}
 			$data[$key]['basic_asin'] = $val['asin'];
-			$data[$key]['product'] = '<img src="'.$val['img'].'" width="50px" height="65px">';
+			$data[$key]['product'] = '<a target="_blank" href="https://rsg.claimthegift.com/product/detail?id='.$val['id'].'"><img src="'.$val['img'].'" width="50px" height="65px"></a>';
 			$data[$key]['site'] = isset($siteShort[$val['site']]) ? $siteShort[$val['site']] : $val['site'];
 			$data[$key]['asin'] = '<a href="https://' . $val['site'] . '/dp/' . $val['asin'] . '" target="_blank" rel="noreferrer">' . $val['asin'] . '</a>';//asin插入超链接
 			$data[$key]['type'] = isset($postType[$val['post_type']]) ? $postType[$val['post_type']]['name'] : $val['post_type'];//post_type
