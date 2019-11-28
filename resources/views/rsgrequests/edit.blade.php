@@ -192,9 +192,10 @@
 						<table class="table table-hover col-md-12">
 							<thead>
 								<tr>
+									<th> Sender </th>
 									<th> Date </th>
 									<th> Type </th>
-									<th> Email </th>
+									<th> Receiver </th>
 									<th> TransactionID </th>
 									<th> Amount </th>
 									<th> Status </th>
@@ -203,12 +204,13 @@
 							<tbody>
 								@foreach ($rule['trans'] as $tran)
 								<tr>
-									<td> {{array_get($tran,'Timestamp')}} </td>
-									<td> {{array_get($tran,'Type')}}  </td>
-									<td> {{array_get($tran,'Payer')}}  </td>
-									<td> {{array_get($tran,'TransactionID')}}  </td>
-									<td> {{array_get($tran,'GrossAmount.value').' '.array_get($tran,'GrossAmount.currencyID')}}  </td>
-									<td> {{array_get($tran,'Status')}}  </td>
+									<td> {{array_get($tran,'paypal_account')}} </td>
+									<td> {{array_get($tran,'timestamp')}} </td>
+									<td> {{array_get($tran,'type')}}  </td>
+									<td> {{array_get($tran,'payer')}}  </td>
+									<td> {{array_get($tran,'transaction_id')}}  </td>
+									<td> {{array_get($tran,'gross_amount').' '.array_get($tran,'gross_amount_currency')}}  </td>
+									<td> {{array_get($tran,'status')}}  </td>
 								</tr>
 								 @endforeach
 							</tbody>

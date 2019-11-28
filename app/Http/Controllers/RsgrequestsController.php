@@ -516,25 +516,10 @@ class RsgrequestsController extends Controller
 	}
 	
 	public function getTrans($customer_paypal_email){
-		$transactionSearchRequest = new TransactionSearchRequestType();
-		$transactionSearchRequest->StartDate='2018-01-01T00:00:00Z';
-		$transactionSearchRequest->EndDate=date('Y-m-d\TH:i:s\Z');
-		$transactionSearchRequest->Payer=$customer_paypal_email;
-		$tranSearchReq = new TransactionSearchReq();
-		$tranSearchReq->TransactionSearchRequest = $transactionSearchRequest;
-		$config = array(
-			"acct1.UserName" => env('PAYPAL_USERNAME', ''),
-			"acct1.Password" => env('PAYPAL_PASSWORD', ''),
-			"acct1.Signature" => env('PAYPAL_SIGNATURE', ''),
-			"mode" => "live",
-			'log.LogEnabled' => false,
-			'log.FileName' => '../PayPal.log',
-			'log.LogLevel' => 'FINE'
-		);
-		$paypalService = new PayPalAPIInterfaceServiceService($config);
-		$transactionSearchResponse = $paypalService->TransactionSearch($tranSearchReq);
-		$transactionSearchResponse = json_decode(json_encode($transactionSearchResponse), true);
-		return array_get($transactionSearchResponse,'PaymentTransactions',[]);
+		$payments = DB::connection('amazon')->select("select paypal_account,timestamp,type,payer,transaction_id,payments_history.`status`,gross_amount,gross_amount_currency 
+from paypal_accounts left join payments_history on paypal_accounts.id=payments_history.paypal_account_id
+where payer='$customer_paypal_email' order by timestamp asc");
+		return json_decode(json_encode($payments),true);
 	}
 
 	public function export(){
