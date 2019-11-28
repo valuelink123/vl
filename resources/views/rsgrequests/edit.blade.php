@@ -195,7 +195,6 @@
 									<th> Sender </th>
 									<th> Date </th>
 									<th> Type </th>
-									<th> Receiver </th>
 									<th> TransactionID </th>
 									<th> Amount </th>
 									<th> Status </th>
@@ -207,7 +206,6 @@
 									<td> {{array_get($tran,'paypal_account')}} </td>
 									<td> {{array_get($tran,'timestamp')}} </td>
 									<td> {{array_get($tran,'type')}}  </td>
-									<td> {{array_get($tran,'payer')}}  </td>
 									<td> {{array_get($tran,'transaction_id')}}  </td>
 									<td> {{array_get($tran,'gross_amount').' '.array_get($tran,'gross_amount_currency')}}  </td>
 									<td> {{array_get($tran,'status')}}  </td>
