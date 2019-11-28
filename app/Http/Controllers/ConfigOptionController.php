@@ -54,28 +54,37 @@ class ConfigOptionController extends Controller
         $data = [];
 
         //当没有设置筛选条件时，按一级类目分组，组内的二级类目按order倒序排列
-        if (is_null($co_pid) && is_null($co_status)){
+        if (is_null($co_pid)){
 
-            $parent_counts = DB::select('select co_pid, count(*) as count from config_option where co_pid <> 0 group by co_pid order by co_pid;');
-            $parent_counts_array = array_map('get_object_vars', $parent_counts);
+            //所有的一级类目
+            $level_one_array = ConfigOption::where('co_pid','0')->orderBy('co_pid', 'ASC')->get()->toArray();
 
-            $parent_records = DB::select('select * from config_option where co_pid=0 order by co_pid;');
-            $parent_array = array_map('get_object_vars', $parent_records);
+            $config_options = ConfigOption::whereRaw('1 = 1');
 
-            $child_records = DB::select('select * from config_option where co_pid <> 0 order by co_pid, co_order desc;');
-            $child_records_array = array_map('get_object_vars', $child_records);
+            //每个一级类目下的二级类目个数
+            $level_one_child_counts = DB::select('select co_pid, count(*) as count from config_option where co_pid <> 0 group by co_pid order by co_pid;');
+            if(!is_null($co_status)){
+                $config_options = $config_options->where('co_status',$co_status);
+                //如果Status选择了Visible或者Hidden，重新计算$level_one_child_counts
+                $level_one_child_counts = DB::select('select co_pid, count(*) as count from config_option where co_pid <> 0 and co_status='.$co_status.' group by co_pid order by co_pid;');
+            }
+
+            $level_one_child_counts_array = array_map('get_object_vars', $level_one_child_counts);
+
+            $level_two_array = $config_options->where('co_pid','<>','0')->orderBy('co_pid','ASC')->orderBy('co_order','DESC')->get()->toArray();
 
             $sum = 0;
-
-            for($i=0; $i<count($parent_counts_array); $i++){
-
-                array_push($data, $parent_array[$i]);
-                $current_parent_count = $parent_counts_array[$i]['count'];
-                for($j=0; $j<$current_parent_count; $j++){
-                    array_push($data, $child_records_array[$sum+$j]);
+            for($i=0; $i<count($level_one_child_counts_array); $i++){
+                //当Status没有选择值，或者选择了Visible时，列表才会显示一级类目（一级类目的状态总是Visible）。
+                if(is_null($co_status) || $co_status == 0){
+                    array_push($data, $level_one_array[$i]);
+                }
+                $child_count = $level_one_child_counts_array[$i]['count'];
+                for($j=0; $j<$child_count; $j++){
+                    array_push($data, $level_two_array[$sum+$j]);
 
                 }
-                $sum += $current_parent_count;
+                $sum += $child_count;
             }
 
         }
@@ -83,9 +92,10 @@ class ConfigOptionController extends Controller
         else{
             $config_options = ConfigOption::whereRaw('1 = 1');
 
-            if($co_pid){
+            if(!is_null($co_pid)){
                 $config_options = $config_options->where('co_pid',$co_pid);
             }
+
             //不要使用：if($request->post('co_pid'))
             //原因：如果$request->post('co_status')值为0，则if(0)为false，起不到过滤效果。
             if(!is_null($co_status)){

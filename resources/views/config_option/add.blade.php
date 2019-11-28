@@ -53,7 +53,7 @@
 							<span class="input-group-addon">
 								<i class="fa fa-tag"></i>
 							</span>
-								<input type="number" class="form-control" name="co_order" id="co_order" value="" required />
+								<input type="number" class="form-control" name="co_order" id="co_order" value="0" required />
 							</div>
 						</div>
 						<div class="form-group">
