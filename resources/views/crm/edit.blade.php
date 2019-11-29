@@ -11,6 +11,11 @@
         .mt-repeater-delete-son{
             margin-top:25px;
         }
+        .div-border{
+            border: 1px solid;
+            padding: 6px;
+            border-color: #cccccc;
+        }
     </style>
     <form  action="{{ url('/crm/update') }}" id="exception_form" novalidate method="POST">
         {{ csrf_field() }}
@@ -140,6 +145,7 @@
                                             @foreach ($contactInfo as $id=>$data)
                                                 <div data-repeater-item class="mt-repeater-item">
                                                     <div class="row mt-repeater-row">
+
                                                         <input type="hidden" name="info_id" autocomplete="off" value="{{$data['info_id']}}"/>
                                                         <div class="col-lg-4 col-md-4">
                                                             <label class="control-label">Email</label>
@@ -158,6 +164,16 @@
                                                                 <i class="fa fa-close"></i>
                                                             </a>
                                                         </div>
+                                                        <div style="clear:both;"></div>
+                                                        <div class="form-group col-lg-8 col-md-8" style="margin-top:15px">
+                                                            <label class="control-label">Tag Types</label>
+                                                            <div class="input-group div-border" style="width:100%">
+                                                                @foreach ($co_id_name_pairs as $key => $value)
+                                                                    <label><input type="checkbox" name="tag_types" value="{{$key}}" @if(in_array($key, $data['client_info_type'])) checked @endif />&nbsp;{{$value}}</label>&nbsp;&nbsp;&nbsp;&nbsp;
+                                                                @endforeach
+                                                            </div>
+                                                        </div>
+
                                                         <div style="clear:both;"></div>
                                                         <div class = "inner-repeater">
                                                         <div data-repeater-list = "order-list">

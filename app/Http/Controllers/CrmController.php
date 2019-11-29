@@ -9,7 +9,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Illuminate\Support\Facades\Auth;
 use App\Accounts;
 use App\User;
-
+use App\ConfigOption;
 
 class CrmController extends Controller
 {
@@ -270,7 +270,7 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 		$contactInfo = array();
 		$contactBasic['id'] = $id;
 		if($id){
-			$sql = "select b.client_id as id,b.id as info_id,c.id as cid,b.name as name,b.email as email,b.phone as phone,b.remark as remark,b.country as country,b.`from` as `from`,b.brand as brand,b.facebook_group as facebook_group,b.facebook_name as facebook_name,c.amazon_order_id as amazon_order_id,c.order_type as order_type,c.amazon_profile_page as amazon_profile_page,d.type as type
+			$sql = "select b.client_id as id,b.id as info_id,c.id as cid,b.name as name,b.email as email,b.phone as phone,b.remark as remark,b.type as client_info_type, b.country as country,b.`from` as `from`,b.brand as brand,b.facebook_group as facebook_group,b.facebook_name as facebook_name,c.amazon_order_id as amazon_order_id,c.order_type as order_type,c.amazon_profile_page as amazon_profile_page,d.type as type
 			FROM client_info as b
 			left join client_order_info as c on b.id = c.ci_id
 			left join client as d on b.client_id = d.id
@@ -284,6 +284,14 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 				$contactInfo[$val['email']]['email'] = $val['email'];
 				$contactInfo[$val['email']]['phone'] = $val['phone'];
                 $contactInfo[$val['email']]['remark'] = $val['remark'];
+
+                $client_info_type = $val['client_info_type'];
+                $client_info_type_array = [];
+                //不为null或者""
+                if(!empty($client_info_type)){
+                    $client_info_type_array = explode(",",$client_info_type);
+                }
+                $contactInfo[$val['email']]['client_info_type'] = $client_info_type_array;
 
 				$contactInfo[$val['email']]['cid'][] = $val['cid'];
 				$contactInfo[$val['email']][$val['cid']]['amazon_order_id'] = $val['amazon_order_id'];
@@ -303,15 +311,25 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 			return redirect('/crm');
 		}
 
-		return view('crm/edit',['contactInfo'=>$contactInfo,'contactBasic'=>$contactBasic]);
+        $co_id_name_pairs = CrmController::get_co_id_name_pairs();
+
+		return view('crm/edit',['contactInfo'=>$contactInfo,'contactBasic'=>$contactBasic,'co_id_name_pairs'=>$co_id_name_pairs]);
 	}
 	//添加客户信息
 	public function create(Request $request)
 	{
 		if(!Auth::user()->can(['crm-add'])) die('Permission denied -- crm-add');
 		$id = DB::table('client')->max('id')+1;
-		return view('crm/add',['id'=>$id]);
+
+        $co_id_name_pairs = CrmController::get_co_id_name_pairs();
+
+		return view('crm/add',['id'=>$id, 'co_id_name_pairs'=>$co_id_name_pairs]);
 	}
+
+    //获取标签类型下的所有二级类目的id=>name,并按照Order倒序排列
+	public function get_co_id_name_pairs(){
+	    return ConfigOption::where('co_pid','1')->orderBy('co_order', 'DESC')->pluck('co_name','id');
+    }
 
 	/*
 	 * 在编辑页面保存，更新数据库里的该条数据
@@ -344,6 +362,7 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 			DB::table('client')->where('id', $data['id'])->update(['type'=>$data['type'], 'updated_at'=>date('Y-m-d H:i:s')]);
 
 		}
+
 		$insertInfo = array('client_id'=>$data['id'],'name'=>$data['name'],'country'=>$data['country'],'from'=>$data['from'],'brand'=>$data['brand'],'facebook_name'=>$data['facebook_name'],'facebook_group'=>intval($data['facebook_group']));
 		//查出client_info表的id,把之前的该客户的client_info数据删掉
 		$_ciids = DB::table('client_info')->select('id')->where('client_id',$old_id)->get()->toArray();
@@ -365,6 +384,14 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 			$insertInfo['email'] = $val['email'];
 			$insertInfo['phone'] = $val['phone'];
             $insertInfo['remark'] = $val['remark'];
+
+            $tag_types = '';
+            //至少选择了一个Tag Type。多个值之间用','隔开。例如： 6 或者 2,4,5
+            if(isset($val['tag_types'])){
+                $tag_types = implode(',',$val['tag_types']);
+            }
+            $insertInfo['type'] = $tag_types;
+
 			$insert['ci_id'] = $res =  DB::table('client_info')->insertGetId($insertInfo);
 			if(empty($res)){
 				DB::rollBack();

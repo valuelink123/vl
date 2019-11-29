@@ -11,6 +11,12 @@
         .mt-repeater-delete-son{
             margin-top:25px;
         }
+        .div-border{
+            border: 1px solid;
+            padding: 6px;
+            border-color: #cccccc;
+        }
+
     </style>
     <form  action="{{ url('/crm/update') }}" id="exception_form" novalidate method="POST">
         {{ csrf_field() }}
@@ -154,6 +160,16 @@
                                                                 <a href="javascript:;" data-repeater-delete class="btn btn-danger mt-repeater-delete">
                                                                     <i class="fa fa-close"></i>
                                                                 </a>
+                                                            </div>
+                                                            <div style="clear:both;"></div>
+                                                            <div class="col-lg-8 col-md-8" style="margin-top:15px">
+                                                                <label class="control-label">Tag Types</label>
+                                                                <div class="input-group div-border" style="width:100%">
+                                                                    @foreach ($co_id_name_pairs as $key => $value)
+                                                                        <label><input type="checkbox" name="tag_types" value="{{$key}}" />&nbsp;{{$value}}</label>&nbsp;&nbsp;&nbsp;&nbsp;
+
+                                                                    @endforeach
+                                                                </div>
                                                             </div>
                                                             <div style="clear:both;"></div>
                                                             <div class = "inner-repeater">
