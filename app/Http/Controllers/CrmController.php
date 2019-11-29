@@ -73,7 +73,10 @@ class CrmController extends Controller
 			}
 			$data[$key]['action'] = $action;
             //0默认，1黑名单
-            $data[$key]['type'] = getCrmClientType()[$data[$key]['type']];
+            //$data[$key]['type'] = getCrmClientType()[$data[$key]['type']];
+            if($data[$key]['type'] == 1){
+                $data[$key]['email'] = $data[$key]['email'].'<br/><font color="red">'.getCrmClientType()[1].'</font>';
+            }
 
 			//当点击ctg,rsg,Negative Review所属的数字时，可以链接到相对应的客户列表页面，times_ctg，times_rsg，times_negative_review
 			$email = $val['email'];

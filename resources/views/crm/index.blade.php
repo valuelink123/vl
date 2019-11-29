@@ -194,7 +194,7 @@
                         <th>Facebook Name</th>
                         <th>Group</th>
                         <th>Remark</th>
-                        <th>Type</th>
+                        {{--<th>Type</th>--}}
                         <th >Processor</th>
                         <th >Action</th>
                     </tr>
@@ -286,7 +286,7 @@
                 // blurable: true, // unselect on blur
                 selector: 'td:first-child', // 指定第一列可以点击选中
             },
-            "aoColumnDefs": [ { "bSortable": false, "aTargets": [21] }],
+            "aoColumnDefs": [ { "bSortable": false, "aTargets": [20] }],
             columns: [
                 {
                     width: "1px",
@@ -312,7 +312,7 @@
                 {data:'facebook_name',name:'facebook_name'},
                 {data:'facebook_group',name:'facebook_group'},
                 {data:'remark',name:'remark'},
-                {data:'type', name:'type'},
+//                {data:'type', name:'type'},
                 {data: 'processor', name: 'processor'},
                 {data: 'action', name: 'action'},
             ],
