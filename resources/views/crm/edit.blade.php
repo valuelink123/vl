@@ -121,19 +121,51 @@
 
                                         </label>
                                     </div>
-                                    <div class="form-group">
-                                        <label>Type</label>
-                                        <div class="input-group ">
-                                            <span class="input-group-addon">
-                                                <i class="fa fa-bookmark"></i>
-                                            </span>
-                                            <select class="form-control" name="type" id="type">
-                                                @foreach (getCrmClientType() as $key => $value)
-                                                    <option value="{{$key}}" @if($key==$contactBasic['type']) selected @endif>
-                                                        {{$value}}
-                                                    </option>
-                                                @endforeach
-                                            </select>
+                                    <div class="row form-group">
+                                        <div class="col-lg-4 col-md-4">
+                                            <label>Type</label>
+                                            <div class="input-group">
+                                                <span class="input-group-addon">
+                                                    <i class="fa fa-bookmark"></i>
+                                                </span>
+                                                <select class="form-control" name="type" id="type">
+                                                    @foreach (getCrmClientType() as $key => $value)
+                                                        <option value="{{$key}}" @if($key==$contactBasic['type']) selected @endif>
+                                                            {{$value}}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4 col-md-4">
+                                            <label>Subscribe</label>
+                                            <div class="input-group">
+                                                <span class="input-group-addon">
+                                                    <i class="fa fa-bookmark"></i>
+                                                </span>
+                                                <select class="form-control" name="subscribe" id="subscribe">
+                                                    @foreach (getCrmSubscribe() as $key => $value)
+                                                        <option value="{{$key}}" @if($key==$contactBasic['subscribe']) selected @endif>
+                                                            {{$value}}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4 col-md-4">
+                                            <label>Block</label>
+                                            <div class="input-group">
+                                                <span class="input-group-addon">
+                                                    <i class="fa fa-bookmark"></i>
+                                                </span>
+                                                <select class="form-control" name="block" id="block">
+                                                    @foreach (getCrmBlock() as $key => $value)
+                                                        <option value="{{$key}}" @if($key==$contactBasic['block']) selected @endif>
+                                                            {{$value}}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
                                         </div>
                                     </div>
                                     <div style="clear:both;"></div>

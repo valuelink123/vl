@@ -202,7 +202,7 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 
 		$where = " and t1.date >= '".$date_from." 00:00:00' and t1.date <= '".$date_to." 23:59:59'";
 		$sql = $sql = "select t1.id as id,t1.date as date,c.name as name,c.email as email,c.phone as phone,c.remark as remark,c.country as country,c.`from` as `from`,c.brand as brand,
-t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as times_negative_review,t1.times_positive_review as times_positive_review,t1.type as 'type',if(num>0,num,0) as order_num,b.name as processor,b.bg as bg,b.bu as bu,c.facebook_name as facebook_name,c.facebook_group as facebook_group,c.amazon_profile_page as amazon_profile_page   
+t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as times_negative_review,t1.times_positive_review as times_positive_review,if(num>0,num,0) as order_num,b.name as processor,b.bg as bg,b.bu as bu,c.facebook_name as facebook_name,c.facebook_group as facebook_group,c.amazon_profile_page as amazon_profile_page   
 			FROM client as t1 
 		  	left join(
 				select users.id as processor,min(name) as name,min(bg) as bg,min(bu) as bu 
@@ -221,7 +221,7 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 
 		$data = $this->queryRows($sql);
 		$arrayData = array();
-		$headArray = array('ID','Date','Email','Name','Phone','Country','From','Brand','CTG','RSG','Negative Review','Positive Review','Order Number','BG','BU','Remark','Type','Processor');
+		$headArray = array('ID','Date','Email','Name','Phone','Country','From','Brand','CTG','RSG','Negative Review','Positive Review','Order Number','BG','BU','Remark','Processor');
         $arrayData[] = $headArray;
 
 		foreach ($data as $key=>$val){
@@ -242,7 +242,6 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 				$val['bg'],
 				$val['bu'],
 				$val['remark'],
-				$val['type'],
 				$val['processor'],
             );
         }
@@ -273,7 +272,7 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 		$contactInfo = array();
 		$contactBasic['id'] = $id;
 		if($id){
-			$sql = "select b.client_id as id,b.id as info_id,c.id as cid,b.name as name,b.email as email,b.phone as phone,b.remark as remark,b.type as client_info_type, b.country as country,b.`from` as `from`,b.brand as brand,b.facebook_group as facebook_group,b.facebook_name as facebook_name,c.amazon_order_id as amazon_order_id,c.order_type as order_type,c.amazon_profile_page as amazon_profile_page,d.type as type
+			$sql = "select b.client_id as id,b.id as info_id,c.id as cid,b.name as name,b.email as email,b.phone as phone,b.remark as remark,b.type as client_info_type, b.country as country,b.`from` as `from`,b.brand as brand,b.facebook_group as facebook_group,b.facebook_name as facebook_name,c.amazon_order_id as amazon_order_id,c.order_type as order_type,c.amazon_profile_page as amazon_profile_page,d.type as type,d.subscribe as subscribe,d.block as block
 			FROM client_info as b
 			left join client_order_info as c on b.id = c.ci_id
 			left join client as d on b.client_id = d.id
@@ -307,6 +306,8 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 				$contactBasic['facebook_name'] = $val['facebook_name'];
 				$contactBasic['facebook_group'] = isset($fbgroupConfig[$val['facebook_group']]) ? $val['facebook_group'].' | '.$fbgroupConfig[$val['facebook_group']] : $val['facebook_group'];
                 $contactBasic['type'] = $val['type'];
+                $contactBasic['subscribe'] = $val['subscribe'];
+                $contactBasic['block'] = $val['block'];
 			}
 		}
 		if(!isset($contactBasic['name'])){
@@ -354,6 +355,8 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 					'created_at'=>date('Y-m-d H:i:s'),
 					'updated_at'=> date('Y-m-d H:i:s'),
                     'type'=>$data['type'],
+                    'subscribe'=>$data['subscribe'],
+                    'block'=>$data['block']
 					)
 				)
 			){
@@ -361,9 +364,8 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 				return redirect()->back()->withInput();
 			}
 		}else{
-			//修改client表的更新时间和type字段
-			DB::table('client')->where('id', $data['id'])->update(['type'=>$data['type'], 'updated_at'=>date('Y-m-d H:i:s')]);
-
+			//修改client表的更新时间,以及type,subscribe,block 3个字段
+			DB::table('client')->where('id', $data['id'])->update(['type'=>$data['type'], 'subscribe'=>$data['subscribe'], 'block'=>$data['block'], 'updated_at'=>date('Y-m-d H:i:s')]);
 		}
 
 		$insertInfo = array('client_id'=>$data['id'],'name'=>$data['name'],'country'=>$data['country'],'from'=>$data['from'],'brand'=>$data['brand'],'facebook_name'=>$data['facebook_name'],'facebook_group'=>intval($data['facebook_group']));

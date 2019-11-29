@@ -614,7 +614,19 @@ function getCrmCountry()
 //CRM模块可供下拉选择的type(客户类型)，0默认，1黑名单
 function getCrmClientType()
 {
-    return array(0=>'default',1=>'blacklist');
+    return array(0=>'Default',1=>'Blacklist');
+}
+
+//CRM模块可供下拉选择的subscribe(订阅)，0默认，1已订阅
+function getCrmSubscribe()
+{
+    return array(0=>'Default',1=>'Subscribe');
+}
+
+//CRM模块可供下拉选择的block(屏蔽)，0默认，1已屏蔽
+function getCrmBlock()
+{
+    return array(0=>'Default',1=>'Block');
 }
 
 //CRM模块可供下拉选择的Source
