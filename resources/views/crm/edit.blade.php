@@ -165,15 +165,17 @@
                                                             </a>
                                                         </div>
                                                         <div style="clear:both;"></div>
+                                                        @if(count($co_id_name_pairs) > 0)
                                                         <div class="form-group col-lg-8 col-md-8" style="margin-top:15px">
                                                             <label class="control-label">Tag Types</label>
-                                                            <div class="input-group div-border" style="width:100%">
+                                                            {{--当用户还没有添加二级类目时，div高度会缩小，所以要指定高度--}}
+                                                            <div class="input-group div-border" style="height:35px; width:100%">
                                                                 @foreach ($co_id_name_pairs as $key => $value)
                                                                     <label><input type="checkbox" name="tag_types" value="{{$key}}" @if(in_array($key, $data['client_info_type'])) checked @endif />&nbsp;{{$value}}</label>&nbsp;&nbsp;&nbsp;&nbsp;
                                                                 @endforeach
                                                             </div>
                                                         </div>
-
+                                                        @endif
                                                         <div style="clear:both;"></div>
                                                         <div class = "inner-repeater">
                                                         <div data-repeater-list = "order-list">
