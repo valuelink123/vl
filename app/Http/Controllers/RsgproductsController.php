@@ -194,14 +194,22 @@ class RsgproductsController extends Controller
 		$site = isset($_POST['site']) && $_POST['site'] ? $_POST['site'] : 'US';
 		$siteArr = isset($siteArrConfig[$site]) ? $siteArrConfig[$site] : array();
 		$where_product .= " and rsg_products.site in('".join($siteArr,"','")."')";
+		// if($site=='JP'){
+		// 	$where_product .= " and rsg_products.order_status = 1 ";
+		// }
 
 		$sql = $this->getSql(0,$where,$where_product,$date);
-		$sql .= ' LIMIT 0,10 ';
+		$sql .= ' LIMIT 0,10';
 
 		$data = $this->queryRows($sql);
 		$data = $this->getReturnData(0,$data,$date,$todayDate,'task');
 		if($_POST){
-			echo json_encode($data);exit;
+			$return['status'] = 0;
+			if($data){
+				$return['data'] = $data;
+				$return['status'] = 1;
+			}
+			echo json_encode($return);exit;
 		}
 		return view('rsgproducts/task',['data'=>$data]);
 	}
@@ -225,7 +233,7 @@ class RsgproductsController extends Controller
 		}
 		$sql = "
         SELECT SQL_CALC_FOUND_ROWS
-        	rsg_products.id as id,rsg_products.asin as asin,rsg_products.site as site,rsg_products.post_status as post_status,rsg_products.post_type as post_type,rsg_products.sales_target_reviews as target_review,rsg_products.requested_review as requested_review,asin.bg as bg,asin.bu as bu,asin.item_no as item_no,asin .seller as seller,rsg_products.number_of_reviews as review,rsg_products.review_rating as rating, num as unfinished,rsg_products.sku_level as sku_level, rsg_products.product_img as img,rsg_products.order_status as order_status,cast(rsg_products.sales_target_reviews as signed) - cast(rsg_products.requested_review as signed) as task,(status_score*type_score*level_score*rating_score*review_score)  as score {$field} 
+        	rsg_products.id as id,rsg_products.asin as asin,rsg_products.site as site,rsg_products.post_status as post_status,rsg_products.post_type as post_type,rsg_products.sales_target_reviews as target_review,rsg_products.requested_review as requested_review,asin.bg as bg,asin.bu as bu,asin.item_no as item_no,asin.seller as seller,asin.id as asin_id,rsg_products.number_of_reviews as review,rsg_products.review_rating as rating, num as unfinished,rsg_products.sku_level as sku_level, rsg_products.product_img as img,rsg_products.order_status as order_status,cast(rsg_products.sales_target_reviews as signed) - cast(rsg_products.requested_review as signed) as task,(status_score*type_score*level_score*rating_score*review_score)  as score {$field} 
             from rsg_products  
             left join (
 				select id,
@@ -274,9 +282,7 @@ class RsgproductsController extends Controller
 				from rsg_products 
 				where created_at = '".$date."'  
 			) as rsg_score on rsg_score.id=rsg_products.id 
-		  	left join (
-				select asin,site,any_value(bg) as bg,any_value(bu) as bu,any_value(item_no) as item_no,any_value(seller) as seller from asin group by asin,site 
-				) as asin ON rsg_products.asin=asin.asin and rsg_products.site=asin.site 
+		  	left join  asin ON rsg_products.asin=asin.asin and rsg_products.site=asin.site and rsg_products.sellersku = asin.sellersku 
         	left join (
         		select count(*) as num,asin,site 
 				from rsg_products 
@@ -329,7 +335,7 @@ class RsgproductsController extends Controller
 				$data[$key]['action'] = '<div class="badge badge-primary">Done</div>';
 			}
 			if ($action != 'task') {
-				$data[$key]['action'] .= '<a href="' . url('rsgproducts/edit?id=' . $val['id'] . '') . '" target="_blank" class="badge badge-success"> View </a>';
+				$data[$key]['action'] .= '<a href="' . url('rsgproducts/edit?id=' . $val['id'] . '') . '" target="_blank" class="badge badge-success"> Edit </a>';
 			}
 
 			$data[$key]['order_status'] = isset($productOrderStatus[$val['order_status']]) ? $productOrderStatus[$val['order_status']] : $val['order_status'];

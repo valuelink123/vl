@@ -129,28 +129,33 @@
                     url: '/rsgtask',
                     data: {site:value},
                     dataType: 'json',
-                    success: function(data) {
+                    success: function(res) {
                         var html = '';
-                        $.each(data,function(key,val){
-                            html += '<tr>';
-                            html += '<th>' + val.product + '</th>';
-                            html += '<th>' + val.site + '</th>';
-                            html += '<th>' + val.asin + '</th>';
-                            html += '<th>' + val.type + '</th>';
-                            html += '<th>' + val.status + '</th>';
-                            html += '<th>' + val.item_no + '</th>';
-                            html += '<th>' + val.sku_level + '</th>';
-                            html += '<th>' + val.sku_status + '</th>';
-                            html += '<th>' + val.rating + '</th>';
-                            html += '<th>' + val.review + '</th>';
-                            html += '<th>' + val.seller + '</th>';
-                            html += '<th>' + val.unfinished + '</th>';
-                            html += '<th>' + val.target_review + '</th>';
-                            html += '<th>' + val.requested_review + '</th>';
-                            html += '<th class="special-content">' + val.task + '</th>';
-                            html += '<th>' + val.action + '</th>';
-                            html += '</tr>';
-                        });
+                        if(res.status==1){
+                            var data = res.data;
+                            $.each(data,function(key,val){
+                                html += '<tr>';
+                                html += '<th>' + val.product + '</th>';
+                                html += '<th>' + val.site + '</th>';
+                                html += '<th>' + val.asin + '</th>';
+                                html += '<th>' + val.type + '</th>';
+                                html += '<th>' + val.status + '</th>';
+                                html += '<th>' + val.item_no + '</th>';
+                                html += '<th>' + val.sku_level + '</th>';
+                                html += '<th>' + val.sku_status + '</th>';
+                                html += '<th>' + val.rating + '</th>';
+                                html += '<th>' + val.review + '</th>';
+                                html += '<th>' + val.seller + '</th>';
+                                html += '<th>' + val.unfinished + '</th>';
+                                html += '<th>' + val.target_review + '</th>';
+                                html += '<th>' + val.requested_review + '</th>';
+                                html += '<th class="special-content">' + val.task + '</th>';
+                                html += '<th>' + val.action + '</th>';
+                                html += '</tr>';
+                            });
+                        }else{
+                            html = '<tr><th colspan="16">No Data</th></tr>';
+                        }
                         $('#thetable tbody').html(html);
                     }
                 });
