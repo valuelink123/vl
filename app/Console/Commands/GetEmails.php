@@ -89,7 +89,7 @@ class GetEmails extends Command
 		$connection = $server->authenticate($this->runAccount['email'], $this->runAccount['password']);
 		$mailboxes = $connection->getMailboxes();
 		$search = new SearchExpression();
-		//$search->addCondition(new To($this->runAccount['email']));åˆä¸èµ·ä½œç”¨äº†ï¼Ÿ
+		//$search->addCondition(new To($this->runAccount['email']));ÓÖ²»Æğ×÷ÓÃÁË£¿
 		$search->addCondition(new Since($sinceTime));	
 
 		foreach ($mailboxes as $mailbox) {
@@ -221,8 +221,8 @@ class GetEmails extends Command
     }
 
     public function matchOrder($mail){
-        //å…ˆåŒ¹é…ä¸­é—´ä»¶1ä¸ªæœˆå†…è®¢å•ï¼ŒåŒæ­¥åˆ°å¯¼å…¥åˆ°æœ¬åœ°ï¼Œå†åŒ¹é…æœ¬åœ°è®¢å•
-        //æ ‡é¢˜ä¸­å«æœ‰è®¢å•å·
+        //ÏÈÆ¥ÅäÖĞ¼ä¼ş1¸öÔÂÄÚ¶©µ¥£¬Í¬²½µ½µ¼Èëµ½±¾µØ£¬ÔÙÆ¥Åä±¾µØ¶©µ¥
+        //±êÌâÖĞº¬ÓĞ¶©µ¥ºÅ
         $data = array();
         preg_match('/\d{3}-\d{7}-\d{7}/i', $mail['subject'], $order_str);
         if(isset($order_str[0])){
@@ -342,7 +342,7 @@ class GetEmails extends Command
             $orderAsins[]=$item['ASIN'];
         }
         foreach($rules as $rule){
-            //æ ‡é¢˜åŒ¹é…
+            //±êÌâÆ¥Åä
             if($rule->subject){
                 $matched = false;
                 $subject_match_array = explode(';',$rule->subject);
@@ -361,7 +361,7 @@ class GetEmails extends Command
                 if(!$matched) continue;
             }
 
-            //å‘ä»¶äººåŒ¹é…
+            //·¢¼şÈËÆ¥Åä
             if($rule->from_email){
                 $matched = false;
                 $from_match_array = explode(';',$rule->from_email);
@@ -373,7 +373,7 @@ class GetEmails extends Command
                 if(!$matched) continue;
             }
 
-            //æ”¶ä»¶äººåŒ¹é…
+            //ÊÕ¼şÈËÆ¥Åä
             if($rule->to_email){
                 $matched = false;
                 $to_match_array = explode(';',$rule->to_email);
@@ -385,7 +385,7 @@ class GetEmails extends Command
                 if(!$matched) continue;
             }
 
-            //ç«™ç‚¹åŒ¹é…
+            //Õ¾µãÆ¥Åä
             /*
             if($rule->site){
                 $matched = false;
@@ -396,7 +396,7 @@ class GetEmails extends Command
                 if(!$matched) continue;
             }
             */
-            //AsinåŒ¹é…
+            //AsinÆ¥Åä
             if($rule->asin){
                 $matched = false;
                 $asin_match_array = explode(';',$rule->asin);
@@ -409,7 +409,7 @@ class GetEmails extends Command
             }
 
 
-            //SkuåŒ¹é…
+            //SkuÆ¥Åä
             if($rule->sku){
                 $matched = false;
                 $sku_match_array = explode(';',$rule->sku);
