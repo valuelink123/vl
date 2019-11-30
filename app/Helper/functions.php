@@ -997,7 +997,7 @@ function getPostType()
  */
 function getProductOrderStatus()
 {
-	return array(0=>'默认',1=>'增加权重','-1'=>'降低权重');
+	return array(0=>'默认',1=>'置顶','-1'=>'屏蔽');
 }
 /*
  * 产品的权重排序状态对应值
