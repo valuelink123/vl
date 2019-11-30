@@ -103,6 +103,7 @@ class GetEmails extends Command
 				continue;
 			}
 			$messages = $mailbox->getMessages($search,\SORTDATE,false);
+			/*
 			$auto_exit=0;
 			$auto_exit_num=0;
 			if(!count($messages)){
@@ -113,6 +114,7 @@ class GetEmails extends Command
 				);
 				$auto_exit=1;
 			}
+			*/
 			foreach($messages as $message){
 				$to_addresses_arr=[];
 				$to_addresses = $message->getTo();
