@@ -130,7 +130,6 @@
                     data: {site:value},
                     dataType: 'json',
                     success: function(data) {
-                        console.log(data);
                         var html = '';
                         $.each(data,function(key,val){
                             html += '<tr>';
@@ -148,11 +147,10 @@
                             html += '<th>' + val.unfinished + '</th>';
                             html += '<th>' + val.target_review + '</th>';
                             html += '<th>' + val.requested_review + '</th>';
-                            html += '<th>' + val.task + '</th>';
+                            html += '<th class="special-content">' + val.task + '</th>';
                             html += '<th>' + val.action + '</th>';
                             html += '</tr>';
                         });
-                        console.log(html);
                         $('#thetable tbody').html(html);
                     }
                 });
