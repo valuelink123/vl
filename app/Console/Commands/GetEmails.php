@@ -105,7 +105,7 @@ class GetEmails extends Command
 			$messages = $mailbox->getMessages($search,\SORTDATE,false);
 			$auto_exit=0;
 			$auto_exit_num=0;
-			if(empty($messages)){
+			if(!count($messages)){
 				$messages = $mailbox->getMessages(
 					NULL,
 					\SORTDATE, // Sort criteria
