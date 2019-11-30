@@ -102,7 +102,17 @@ class GetEmails extends Command
 			if($mailbox->getName()=='Outbox' || $mailbox->getName()=='Sent' || $mailbox->getName()=='Deleted' || $mailbox->getName()=='Drafts'){
 				continue;
 			}
-			$messages = $mailbox->getMessages($search);
+			$messages = $mailbox->getMessages($search,\SORTDATE,false);
+			$auto_exit=0;
+			$auto_exit_num=0;
+			if(emtpy($messages)){
+				$messages = $mailbox->getMessages(
+					NULL,
+					\SORTDATE, // Sort criteria
+					true // Descending order
+				);
+				$auto_exit=1;
+			}
 			foreach($messages as $message){
 				$to_addresses_arr=[];
 				$to_addresses = $message->getTo();
@@ -195,6 +205,8 @@ class GetEmails extends Command
 					Log::Info(' '.$this->runAccount['account_email'].' MailID '.$mail_id.' Insert Success...');
 				}else{
 					Log::Info(' '.$this->runAccount['account_email'].' MailID '.$mail_id.' AlReady Exists...');
+					$auto_exit_num++;
+					if($auto_exit && $auto_exit_num>10) break 1;
 				}		
 				}catch (\Exception $e){
 					Log::Info(' '.$this->runAccount['account_email'].' MailID '.$mail_id.' from '.$message->getFrom()->getAddress().' Insert Error...'.$e->getMessage());
