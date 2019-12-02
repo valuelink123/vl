@@ -49,8 +49,14 @@ class AddRsgProduct extends Command
 		$yestodayYmd = date('Ymd',strtotime($today)-86400);
 		Log::Info('Execution addRsgProduct.php script start time:'.$today."\n");
 
-		$sql = "SELECT asin.asin as asin,asin.site as site,any_value(asin.post_status) as post_status,any_value(asin.post_type) as post_type,any_value(asin.push_date) as push_date,any_value(item_no) as sku,any_value(star_history.total_star_number) as number_of_reviews,any_value(star_history.average_score) as review_rating,any_value(skus_week_details.ranking) as position,any_value(sku_keywords.keywords) as keyword
-				FROM asin
+		$sql = "SELECT asin.asin as asin,asin.site as site,any_value(asin.post_status) as post_status,any_value(asin.post_type) as post_type,any_value(asin.push_date) as push_date,any_value(item_no) as sku,any_value(star_history.total_star_number) as number_of_reviews,any_value(star_history.average_score) as review_rating,any_value(skus_week_details.ranking) as position,any_value(sku_keywords.keywords) as keyword,any_value(users.id) as user_id,any_value(asin.sellersku) as sellersku   
+				from  (
+					select asin,site,max(asin.sellersku) as sellersku 
+					from asin 
+					group by asin,site 
+				) as asin2 
+				left join asin on asin.asin = asin2.asin and asin.site = asin2.site and asin.sellersku = asin2.sellersku  
+				LEFT JOIN users on users.sap_seller_id = asin.sap_seller_id 
 				LEFT JOIN star_history on create_at = '".$yestoday."' and asin.asin = star_history.asin and asin.site = star_history.domain
 				LEFT JOIN skus_week_details on weeks = '".$yestodayYmd."' and asin.asin = skus_week_details.asin and asin.site = skus_week_details.site
 				LEFT JOIN (
@@ -87,6 +93,7 @@ class AddRsgProduct extends Command
 			$site = isset($sapSiteCode[$val['sap_site_id']]) ? 'www.'.$sapSiteCode[$val['sap_site_id']] : $val['sap_site_id'];
 			$skuData[$val['sku'].'_'.$site]['sku_level'] = $val['sku_level'];
 		}
+
 
 		//取亚马逊的产品相关数据
 		$amazon_sql = "select asin,marketplaceid,title,images,features,description,price 
@@ -138,11 +145,12 @@ class AddRsgProduct extends Command
 			$insertData[] = array(
 				'asin' => $val['asin'],
 				'site' => $val['site'],
+				'sellersku' => $val['sellersku'],
 				'created_at' => date('Y-m-d'),
 				'updated_at' => date('Y-m-d H:i:s'),
 				'post_status' => $val['post_status'],
 				'post_type' => $val['post_type'],
-				'user_id' => 1,//user_id=1时表示为系统添加
+				'user_id' => $val['user_id'],//user_id=1时表示为系统添加
 				'review_rating' => $val['review_rating'],//昨天星级
 				'number_of_reviews' => $val['number_of_reviews'],//昨天的评论总数
 				'sales_target_reviews' => $sales_target_reviews,
