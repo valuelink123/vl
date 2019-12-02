@@ -728,15 +728,11 @@
 					<div class="mod-holiday—countdown">
 						<div class="holiday—countdown">
 							<div style=" width:5%;border: 1px solid #D9EDF7;"></div>
-							@if(Session::get('countDown.black_friday')>0)
-								<div>距离<span class="holiday">Black Friday</span>还有<span class="day">{{ Session::get('countDown.black_friday') }}</span>天</div>
-							@endif
-							@if(Session::get('countDown.cyber_monday')>0)
-								<div>距离<span class="holiday">Cyber Monday</span>还有<span class="day">{{Session::get('countDown.cyber_monday') }}</span>天</div>
-							@endif
-							@if(Session::get('countDown.christmas')>0)
-								<div>距离<span class="holiday">Christmas</span>还有<span class="day">{{ Session::get('countDown.christmas') }}</span>天</div>
-							@endif
+							@foreach(Session::get('countDown') as $key=>$val)
+								@if($val['day']>0)
+								<div class="col-md-3">距离<span class="holiday">{!! $val['name'] !!}</span>还有<span class="day">{!! $val['day'] !!}</span>天</div>
+								@endif
+							@endforeach
 							<div style=" width:5%;border: 1px solid #D9EDF7;"></div>
 							<div style="clear:both;"></div>
 						</div>

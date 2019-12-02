@@ -194,9 +194,9 @@ class RsgproductsController extends Controller
 		$site = isset($_POST['site']) && $_POST['site'] ? $_POST['site'] : 'US';
 		$siteArr = isset($siteArrConfig[$site]) ? $siteArrConfig[$site] : array();
 		$where_product .= " and rsg_products.site in('".join($siteArr,"','")."')";
-		// if($site=='JP'){
-		// 	$where_product .= " and rsg_products.order_status = 1 ";
-		// }
+		if($site=='JP'){
+			$where_product .= " and rsg_products.order_status = 1 ";
+		}
 
 		$sql = $this->getSql(0,$where,$where_product,$date);
 		$sql .= ' LIMIT 0,10';
@@ -209,7 +209,7 @@ class RsgproductsController extends Controller
 				$return['data'] = $data;
 				$return['status'] = 1;
 			}
-			echo json_encode($return);exit;
+			return json_encode($return);
 		}
 		return view('rsgproducts/task',['data'=>$data]);
 	}
@@ -322,8 +322,9 @@ class RsgproductsController extends Controller
 			if(!isset($val['sku_status'])){
 				$data[$key]['sku_status'] = isset($skuData[$val['item_no'].'_'.$val['site']]) ? $skuData[$val['item_no'].'_'.$val['site']]['sku_status'] : '';
 			}
+			$data[$key]['unfinished'] = $val['unfinished'] > 0 ? $val['unfinished'] : 0;
 			$data[$key]['basic_asin'] = $val['asin'];
-			$data[$key]['product'] = '<a target="_blank" href="https://rsg.claimthegift.com/product/detail?id='.$val['id'].'"><img src="'.$val['img'].'" width="50px" height="65px"></a>';
+			$data[$key]['product'] = '<a target="_blank" href="https://rsg.claimthegift.com/product/detail?id='.$val['asin_id'].'"><img src="'.$val['img'].'" width="50px" height="65px"></a>';
 			$data[$key]['site'] = isset($siteShort[$val['site']]) ? $siteShort[$val['site']] : $val['site'];
 			$data[$key]['asin'] = '<a href="https://' . $val['site'] . '/dp/' . $val['asin'] . '" target="_blank" rel="noreferrer">' . $val['asin'] . '</a>';//asin插入超链接
 			$data[$key]['type'] = isset($postType[$val['post_type']]) ? $postType[$val['post_type']]['name'] : $val['post_type'];//post_type

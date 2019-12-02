@@ -21,10 +21,17 @@ class Controller extends BaseController
 	{
 		//计算倒计时相关天数,Black Friday=>'11.29','Cyber Monday'=>'12.2','Christmas'=>'12.24'
 		$this->middleware(function ($request, $next) {
-			$year = date('Y');
-			$countDown['black_friday'] = (strtotime(date($year.'-11-29'))-strtotime(date('Y-m-d')))/86400;
-			$countDown['cyber_monday'] = (strtotime(date($year.'-12-2'))-strtotime(date('Y-m-d')))/86400;
-			$countDown['christmas'] = (strtotime(date($year.'-12-24'))-strtotime(date('Y-m-d')))/86400;
+			$configArr = array(
+				array('date'=>'2019-12-24','name'=>'Christmas'),//圣诞节
+				array('date'=>'2020-01-01','name'=>'2020'),//元旦
+				array('date'=>'2020-01-24','name'=>'Chinese New Year'),//春节
+				array('date'=>'2020-04-04','name'=>'Qingming Festival'),//清明节
+			);
+			$countDown = array();
+			foreach($configArr as $key=>$val){
+				$countDown[$key]['name'] = $val['name'];
+				$countDown[$key]['day'] = (strtotime(date($val['date']))-strtotime(date('Y-m-d')))/86400;
+			}
 			session()->put('countDown',$countDown);
 			return $next($request);
 		});

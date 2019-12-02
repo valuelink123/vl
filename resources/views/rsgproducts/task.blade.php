@@ -128,7 +128,7 @@
                     type: 'post',
                     url: '/rsgtask',
                     data: {site:value},
-                    dataType: 'json',
+                    dataType:'json',
                     success: function(res) {
                         var html = '';
                         if(res.status==1){
