@@ -1,12 +1,12 @@
 <?php
-
 namespace App\Console\Commands;
-
 use Illuminate\Console\Command;
 use Ddeboer\Imap\Server;
 use Ddeboer\Imap\SearchExpression;
 use Ddeboer\Imap\Search\Email\To;
+use Ddeboer\Imap\Search\Email\From;
 use Ddeboer\Imap\Search\Date\Since;
+use Ddeboer\Imap\Search\RawExpression;
 use DateTimeImmutable;
 use DateInterval;
 use Illuminate\Support\Facades\Input;
@@ -80,7 +80,6 @@ class GetEmails extends Command
         }
     }
 
-
     public function saveEmails($lastMailDate){
 		$last_date = $lastMailDate;
 		$date = new DateTimeImmutable($lastMailDate);
@@ -89,7 +88,6 @@ class GetEmails extends Command
 		$connection = $server->authenticate($this->runAccount['email'], $this->runAccount['password']);
 		$mailboxes = $connection->getMailboxes();
 		$search = new SearchExpression();
-		//$search->addCondition(new To($this->runAccount['email']));ÓÖ²»Æğ×÷ÓÃÁË£¿
 		$search->addCondition(new Since($sinceTime));	
 
 		foreach ($mailboxes as $mailbox) {
@@ -103,9 +101,9 @@ class GetEmails extends Command
 				continue;
 			}
 			$messages = $mailbox->getMessages($search,\SORTDATE,false);
-			/*
 			$auto_exit=0;
 			$auto_exit_num=0;
+			/*
 			if(!count($messages)){
 				$messages = $mailbox->getMessages(
 					NULL,
@@ -221,8 +219,8 @@ class GetEmails extends Command
     }
 
     public function matchOrder($mail){
-        //ÏÈÆ¥ÅäÖĞ¼ä¼ş1¸öÔÂÄÚ¶©µ¥£¬Í¬²½µ½µ¼Èëµ½±¾µØ£¬ÔÙÆ¥Åä±¾µØ¶©µ¥
-        //±êÌâÖĞº¬ÓĞ¶©µ¥ºÅ
+        //å…ˆåŒ¹é…ä¸­é—´ä»¶1ä¸ªæœˆå†…è®¢å•ï¼ŒåŒæ­¥åˆ°å¯¼å…¥åˆ°æœ¬åœ°ï¼Œå†åŒ¹é…æœ¬åœ°è®¢å•
+        //æ ‡é¢˜ä¸­å«æœ‰è®¢å•å·
         $data = array();
         preg_match('/\d{3}-\d{7}-\d{7}/i', $mail['subject'], $order_str);
         if(isset($order_str[0])){
@@ -342,7 +340,7 @@ class GetEmails extends Command
             $orderAsins[]=$item['ASIN'];
         }
         foreach($rules as $rule){
-            //±êÌâÆ¥Åä
+            //æ ‡é¢˜åŒ¹é…
             if($rule->subject){
                 $matched = false;
                 $subject_match_array = explode(';',$rule->subject);
@@ -361,7 +359,7 @@ class GetEmails extends Command
                 if(!$matched) continue;
             }
 
-            //·¢¼şÈËÆ¥Åä
+            //å‘ä»¶äººåŒ¹é…
             if($rule->from_email){
                 $matched = false;
                 $from_match_array = explode(';',$rule->from_email);
@@ -373,7 +371,7 @@ class GetEmails extends Command
                 if(!$matched) continue;
             }
 
-            //ÊÕ¼şÈËÆ¥Åä
+            //æ”¶ä»¶äººåŒ¹é…
             if($rule->to_email){
                 $matched = false;
                 $to_match_array = explode(';',$rule->to_email);
@@ -385,7 +383,7 @@ class GetEmails extends Command
                 if(!$matched) continue;
             }
 
-            //Õ¾µãÆ¥Åä
+            //ç«™ç‚¹åŒ¹é…
             /*
             if($rule->site){
                 $matched = false;
@@ -396,7 +394,7 @@ class GetEmails extends Command
                 if(!$matched) continue;
             }
             */
-            //AsinÆ¥Åä
+            //AsinåŒ¹é…
             if($rule->asin){
                 $matched = false;
                 $asin_match_array = explode(';',$rule->asin);
@@ -409,7 +407,7 @@ class GetEmails extends Command
             }
 
 
-            //SkuÆ¥Åä
+            //SkuåŒ¹é…
             if($rule->sku){
                 $matched = false;
                 $sku_match_array = explode(';',$rule->sku);
