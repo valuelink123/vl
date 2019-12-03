@@ -83,7 +83,7 @@ class GetEmails extends Command
     public function saveEmails($lastMailDate){
 		$last_date = $lastMailDate;
 		$date = new DateTimeImmutable($lastMailDate);
-		$sinceTime = $date->sub(new DateInterval('PT5M'));
+		$sinceTime = $date->sub(new DateInterval('PT1H'));
 		$server = new Server($this->runAccount['imap_host']);
 		$connection = $server->authenticate($this->runAccount['email'], $this->runAccount['password']);
 		$mailboxes = $connection->getMailboxes();
@@ -121,7 +121,7 @@ class GetEmails extends Command
 						if($last_date<date('Y-m-d H:i:s',strtotime($message->getDate()->format('c')))) $last_date = date('Y-m-d H:i:s',strtotime($message->getDate()->format('c')));
 					}
 					if($result==2) $auto_exit_num++;
-					if($auto_exit_num>=10) break;
+					if($auto_exit_num>=5) break;
 				}
 			}
 		}

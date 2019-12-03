@@ -117,7 +117,7 @@ a.editable-click:hover {
 								</span>
 							</div>
 							<div class="status">
-								<div class="status-title {{$class}}"> {{($hb_ap)?$sign.round(($ap-$hb_ap)/$hb_ap*100,2):'0'}}%</div>
+								<div class="status-title {{$class}}"> {{($hb_ap!=0)?$sign.round(($ap-$hb_ap)/$hb_ap*100,2):'0'}}%</div>
 								<div class="status-number">{{round($hb_ap/10000,2)}} 万</div>
 							</div>
 						</div>
@@ -157,7 +157,7 @@ a.editable-click:hover {
 								</span>
 							</div>
 							<div class="status">
-								<div class="status-title {{$class}}"> {{($hb_ap)?$sign.round(($ap-$hb_ap)/$hb_ap*100,2):'0'}}%</div>
+								<div class="status-title {{$class}}"> {{($hb_ap!=0)?$sign.round(($ap-$hb_ap)/$hb_ap*100,2):'0'}}%</div>
 								<div class="status-number">{{round($hb_ap/10000,2)}} 万</div>
 							</div>
 						</div>
@@ -195,7 +195,7 @@ a.editable-click:hover {
 								</span>
 							</div>
 							<div class="status">
-								<div class="status-title {{$class}}"> {{($hb_ap)?$sign.round(($ap-$hb_ap)/$hb_ap*100,2):'0'}}% </div>
+								<div class="status-title {{$class}}"> {{($hb_ap!=0)?$sign.round(($ap-$hb_ap)/$hb_ap*100,2):'0'}}% </div>
 								<div class="status-number">{{$hb_ap}}</div>
 							</div>
 						</div>
@@ -236,7 +236,7 @@ a.editable-click:hover {
 							<div class="status">
 								<div class="status-title {{$class}}">
 								
-								 {{($hb_ap)?$sign.round(($ap-$hb_ap)/$hb_ap*100,2):'0'}}%
+								 {{($hb_ap!=0)?$sign.round(($ap-$hb_ap)/$hb_ap*100,2):'0'}}%
 								
 								</div>
 								<div class="status-number">{{$hb_ap}}</div>
