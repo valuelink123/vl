@@ -170,43 +170,44 @@ class StarController extends Controller
             if($_REQUEST['order'][0]['column']==0) $orderby = 'star.asin';
             if($_REQUEST['order'][0]['column']==1) $orderby = 'asin.post_type';
 			if($_REQUEST['order'][0]['column']==2) $orderby = 'asin.post_status';
-            if($_REQUEST['order'][0]['column']==3) $orderby = 'asin.item_no';
-			if($_REQUEST['order'][0]['column']==4) $orderby = 'asin.item_status';
-            if($_REQUEST['order'][0]['column']==5) $orderby = 'asin.seller';
-			if($_REQUEST['order'][0]['column']==6) $orderby = 'star.domain';
+			if($_REQUEST['order'][0]['column']==3) $orderby = 'asin.asin_status';
+            if($_REQUEST['order'][0]['column']==4) $orderby = 'asin.item_no';
+			if($_REQUEST['order'][0]['column']==5) $orderby = 'asin.item_status';
+            if($_REQUEST['order'][0]['column']==6) $orderby = 'asin.seller';
+			if($_REQUEST['order'][0]['column']==7) $orderby = 'star.domain';
 			
-			if($_REQUEST['order'][0]['column']==7) $orderby = DB::raw("(star.total_star_number -( case when pre_star.total_star_number>0 then pre_star.total_star_number else 0 end))");
-			if($_REQUEST['order'][0]['column']==8) $orderby = DB::raw("(star.average_score -( case when pre_star.average_score>0 then pre_star.average_score else 0 end))");
-			if($_REQUEST['order'][0]['column']==9) $orderby = DB::raw("((star.five_star_number+star.four_star_number) -( case when (pre_star.five_star_number+pre_star.four_star_number)>0 then (pre_star.five_star_number+pre_star.four_star_number) else 0 end))");
-			if($_REQUEST['order'][0]['column']==10) $orderby = DB::raw("((star.one_star_number+star.two_star_number+star.three_star_number) -( case when (pre_star.one_star_number+pre_star.two_star_number+pre_star.three_star_number)>0 then (pre_star.one_star_number+pre_star.two_star_number+pre_star.three_star_number) else 0 end))");
-			if($_REQUEST['order'][0]['column']==11) $orderby = 'asin.star';
+			if($_REQUEST['order'][0]['column']==8) $orderby = DB::raw("(star.total_star_number -( case when pre_star.total_star_number>0 then pre_star.total_star_number else 0 end))");
+			if($_REQUEST['order'][0]['column']==9) $orderby = DB::raw("(star.average_score -( case when pre_star.average_score>0 then pre_star.average_score else 0 end))");
+			if($_REQUEST['order'][0]['column']==10) $orderby = DB::raw("((star.five_star_number+star.four_star_number) -( case when (pre_star.five_star_number+pre_star.four_star_number)>0 then (pre_star.five_star_number+pre_star.four_star_number) else 0 end))");
+			if($_REQUEST['order'][0]['column']==11) $orderby = DB::raw("((star.one_star_number+star.two_star_number+star.three_star_number) -( case when (pre_star.one_star_number+pre_star.two_star_number+pre_star.three_star_number)>0 then (pre_star.one_star_number+pre_star.two_star_number+pre_star.three_star_number) else 0 end))");
+			if($_REQUEST['order'][0]['column']==12) $orderby = 'asin.star';
 			
-			if($_REQUEST['order'][0]['column']==14) $orderby = 'star.status';
-			if($_REQUEST['order'][0]['column']==15) $orderby = 'star.price';
-			if($_REQUEST['order'][0]['column']==16) $orderby = 'star.coupon_p';
-			if($_REQUEST['order'][0]['column']==17) $orderby = 'star.coupon_n';
+			if($_REQUEST['order'][0]['column']==15) $orderby = 'star.status';
+			if($_REQUEST['order'][0]['column']==16) $orderby = 'star.price';
+			if($_REQUEST['order'][0]['column']==17) $orderby = 'star.coupon_p';
+			if($_REQUEST['order'][0]['column']==18) $orderby = 'star.coupon_n';
 			
 			
-			if($_REQUEST['order'][0]['column']==18) $orderby = 'star.total_star_number';
-			if($_REQUEST['order'][0]['column']==19) $orderby = 'star.average_score';
-			if($_REQUEST['order'][0]['column']==20) $orderby = 'star.one_star_number';
-			if($_REQUEST['order'][0]['column']==21) $orderby = 'star.two_star_number';
-			if($_REQUEST['order'][0]['column']==22) $orderby = 'star.three_star_number';
-			if($_REQUEST['order'][0]['column']==23) $orderby = 'star.four_star_number';
-			if($_REQUEST['order'][0]['column']==24) $orderby = 'star.five_star_number';
+			if($_REQUEST['order'][0]['column']==19) $orderby = 'star.total_star_number';
+			if($_REQUEST['order'][0]['column']==20) $orderby = 'star.average_score';
+			if($_REQUEST['order'][0]['column']==21) $orderby = 'star.one_star_number';
+			if($_REQUEST['order'][0]['column']==22) $orderby = 'star.two_star_number';
+			if($_REQUEST['order'][0]['column']==23) $orderby = 'star.three_star_number';
+			if($_REQUEST['order'][0]['column']==24) $orderby = 'star.four_star_number';
+			if($_REQUEST['order'][0]['column']==25) $orderby = 'star.five_star_number';
 			
-			if($_REQUEST['order'][0]['column']==26) $orderby = 'pre_star.status';
-			if($_REQUEST['order'][0]['column']==27) $orderby = 'pre_star.price';
-			if($_REQUEST['order'][0]['column']==28) $orderby = 'pre_star.coupon_p';
-			if($_REQUEST['order'][0]['column']==29) $orderby = 'pre_star.coupon_n';
+			if($_REQUEST['order'][0]['column']==27) $orderby = 'pre_star.status';
+			if($_REQUEST['order'][0]['column']==28) $orderby = 'pre_star.price';
+			if($_REQUEST['order'][0]['column']==29) $orderby = 'pre_star.coupon_p';
+			if($_REQUEST['order'][0]['column']==30) $orderby = 'pre_star.coupon_n';
 			
-			if($_REQUEST['order'][0]['column']==30) $orderby = 'pre_star.total_star_number';
-			if($_REQUEST['order'][0]['column']==31) $orderby = 'pre_star.average_score';
-			if($_REQUEST['order'][0]['column']==32) $orderby = 'pre_star.one_star_number';
-			if($_REQUEST['order'][0]['column']==33) $orderby = 'pre_star.two_star_number';
-			if($_REQUEST['order'][0]['column']==34) $orderby = 'pre_star.three_star_number';
-			if($_REQUEST['order'][0]['column']==35) $orderby = 'pre_star.four_star_number';
-			if($_REQUEST['order'][0]['column']==36) $orderby = 'pre_star.five_star_number';
+			if($_REQUEST['order'][0]['column']==31) $orderby = 'pre_star.total_star_number';
+			if($_REQUEST['order'][0]['column']==32) $orderby = 'pre_star.average_score';
+			if($_REQUEST['order'][0]['column']==33) $orderby = 'pre_star.one_star_number';
+			if($_REQUEST['order'][0]['column']==34) $orderby = 'pre_star.two_star_number';
+			if($_REQUEST['order'][0]['column']==35) $orderby = 'pre_star.three_star_number';
+			if($_REQUEST['order'][0]['column']==36) $orderby = 'pre_star.four_star_number';
+			if($_REQUEST['order'][0]['column']==37) $orderby = 'pre_star.five_star_number';
             $sort = $_REQUEST['order'][0]['dir'];
 			
 			
@@ -265,7 +266,7 @@ class StarController extends Controller
 				isset($postType[$ordersList[$i]['post_type']]['name']) ? $postType[$ordersList[$i]['post_type']]['name'] : $ordersList[$i]['post_type'],//帖子类型
 				isset($postStatus[$ordersList[$i]['post_status']]['name']) ? $postStatus[$ordersList[$i]['post_status']]['name'] : $ordersList[$i]['post_status'],//帖子状态
 
-				// $ordersList[$i]['asin_status']?$ordersList[$i]['asin_status']:'S',
+				$ordersList[$i]['asin_status']?$ordersList[$i]['asin_status']:'S',
 				$ordersList[$i]['item_no'],
 				($ordersList[$i]['item_status'])?'<span class="btn btn-success btn-xs">Reserved</span>':'<span class="btn btn-danger btn-xs">Eliminate</span>',
 				$ordersList[$i]['seller'],
