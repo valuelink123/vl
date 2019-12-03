@@ -191,7 +191,7 @@ th,td,td>span {
 								<th style="min-width:50px;"> Type </th>
 								<th style="min-width:50px;"> Status </th>
 
-								{{--<th style="min-width:40px;"> Level </th>	--}}
+								<th style="min-width:40px;"> Level </th>
                                 <th style="min-width:50px;"> Item No. </th>
 								<th style="min-width:50px;"> Status </th>	
                                 <th style="min-width:50px;"> Seller </th>
@@ -344,7 +344,7 @@ th,td,td>span {
 					buttons: [],
 					
 					<?php } ?>
-					"aoColumnDefs": [ { "bSortable": false, "aTargets": [12,13,25,37 ] }],
+					"aoColumnDefs": [ { "bSortable": false, "aTargets": [13,14,26,38 ] }],
 					 "order": [
                         [0, "asc"]
                     ],

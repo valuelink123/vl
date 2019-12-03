@@ -25,7 +25,7 @@ class Controller extends BaseController
 				array('date'=>'2019-12-24','name'=>'Christmas'),//圣诞节
 				array('date'=>'2020-01-01','name'=>'2020'),//元旦
 				array('date'=>'2020-01-24','name'=>'Chinese New Year'),//春节
-				array('date'=>'2020-04-04','name'=>'Qingming Festival'),//清明节
+				// array('date'=>'2020-04-04','name'=>'Qingming Festival'),//清明节
 			);
 			$countDown = array();
 			foreach($configArr as $key=>$val){
