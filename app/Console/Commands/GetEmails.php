@@ -100,7 +100,7 @@ class GetEmails extends Command
 			if($mailbox->getName()=='Outbox' || $mailbox->getName()=='Sent' || $mailbox->getName()=='Deleted' || $mailbox->getName()=='Drafts'){
 				continue;
 			}
-			$messages = [];//$mailbox->getMessages($search,\SORTDATE,false);
+			$messages = $mailbox->getMessages($search,\SORTDATE,false);
 			foreach($messages as $message){
 				$result = self::saveMessage($message);	
 				if($result==1){
