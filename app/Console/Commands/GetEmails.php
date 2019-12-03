@@ -89,7 +89,7 @@ class GetEmails extends Command
 		$mailboxes = $connection->getMailboxes();
 		$search = new SearchExpression();
 		$search->addCondition(new Since($sinceTime));	
-
+		$has_save_message=false;
 		foreach ($mailboxes as $mailbox) {
 			if ($mailbox->getAttributes() & \LATT_NOSELECT) {
 				continue;
@@ -100,124 +100,122 @@ class GetEmails extends Command
 			if($mailbox->getName()=='Outbox' || $mailbox->getName()=='Sent' || $mailbox->getName()=='Deleted' || $mailbox->getName()=='Drafts'){
 				continue;
 			}
-			$messages = $mailbox->getMessages($search,\SORTDATE,false);
-			$auto_exit=0;
-			$auto_exit_num=0;
-			/*
-			if(!count($messages)){
-				$messages = $mailbox->getMessages(
-					NULL,
-					\SORTDATE, // Sort criteria
-					true // Descending order
-				);
-				$auto_exit=1;
-			}
-			*/
+			$messages = [];//$mailbox->getMessages($search,\SORTDATE,false);
 			foreach($messages as $message){
-				$to_addresses_arr=[];
-				$to_addresses = $message->getTo();
-				foreach($to_addresses as $to_a){
-					$to_addresses_arr[]=strtolower($to_a->getAddress());
+				$result = self::saveMessage($message);	
+				if($result==1){
+					$has_save_message=true;
+					if($last_date<date('Y-m-d H:i:s',strtotime($message->getDate()->format('c')))) $last_date = date('Y-m-d H:i:s',strtotime($message->getDate()->format('c')));
 				}
-				if(!in_array(strtolower($this->runAccount['email']),$to_addresses_arr)) continue;
-				try{
-				$mail_id = ($message->getId())?$message->getId():$message->getNumber();
-				$exists = DB::table('inbox')->where('mail_address', $this->runAccount['email'])->where('mail_id', $mail_id)->first();
-				if(!$exists) {
-					$insert_data=[];
-					$attach_data = array();
-					$insert_data['mail_id'] = $mail_id;
-					$insert_data['mail_address'] = $this->runAccount['email'];
-					$reply_to = current($message->getReplyTo());
-					$insert_data['from_address']= ($reply_to)?$reply_to->getAddress():$message->getFrom()->getAddress();
-					$insert_data['from_name']=$message->getFrom()->getName();
-
-					$insert_data['to_address'] = $this->runAccount['email'];
-					$insert_data['subject'] = $message->getSubject();
-					$insert_data['text_html'] = $message->getBodyHtml();
-					$insert_data['text_plain'] = $message->getBodyText();
-					$insert_data['date'] = date('Y-m-d H:i:s',strtotime($message->getDate()->format('c')));//$message->getDate()->format('Y-m-d H:i:s');
-					$insert_data['type'] = $this->runAccount['type'];
-					$insert_data['get_date'] = date('Y-m-d H:i:s');
-					//$insert_data['message_id']=$message->getId();
-					//$insert_data['mail_id']=$message->getNumber();
-
-					if($last_date<$insert_data['date']) $last_date = $insert_data['date'];
-					
-					$attachments = $message->getAttachments();
-					$i=0;
-					foreach ($attachments as $attachment) {
-						$i++;
-						if ($attachment->isEmbeddedMessage()) {
-							$embeddedMessage = $attachment->getEmbeddedMessage()->getContent();
-							$insert_data['text_html'].=$embeddedMessage;
-						}else{
-							$ifid = $attachment->getStructure()->ifid;
-							if($ifid){
-								$attId = $attachment->getStructure()->id;
-								$attName = $attachment->getStructure()->id.'.'.$attachment->getStructure()->subtype;
-							}else{
-								$attName = $attachment->getFilename();
-								if(!$attName) $attName = $i.'.'.$attachment->getStructure()->subtype;
-							}
-
-							
-							$attPath=public_path('attachs').'/'.date('Ymd').'/'.$this->runAccount['id'].'/'.md5($message->getId());
-							if (!is_dir($attPath)) mkdir($attPath, 0777,true);
-							file_put_contents($attPath.'/'.$attName,$attachment->getDecodedContent());
-							$attach_data[] = str_ireplace(public_path(),'',$attPath).'/'.$attName;
-							if($ifid) $insert_data['text_html'] = str_ireplace('cid:'.$attId,str_ireplace(public_path(),'',$attPath).'/'.$attName,$insert_data['text_html']);
-						}
+			}
+			
+			if(!count($messages)){
+				$auto_exit_num=0;
+				$messages = $mailbox->getMessages(NULL);
+				$mcc=count($messages);
+				for($mc=$mcc-1;$mc>=0;$mc--){
+					$message = $mailbox->getMessage($messages[$mc]);
+					$result = self::saveMessage($message);
+					if($result==1){
+						$has_save_message=true;
+						if($last_date<date('Y-m-d H:i:s',strtotime($message->getDate()->format('c')))) $last_date = date('Y-m-d H:i:s',strtotime($message->getDate()->format('c')));
 					}
-					$insert_data['attachs']=serialize($attach_data);
-
-
-					$orderInfo = self::matchOrder($insert_data);
-					$insert_data['amazon_order_id'] = array_get($orderInfo,'amazon_order_id','');
-					$insert_data['amazon_seller_id'] = array_get($orderInfo,'order.SellerId',NULL);
-					$insert_data['sku'] = array_get($orderInfo,'order.Sku', NULL);
-					$insert_data['asin'] = array_get($orderInfo,'order.ASIN', NULL);
-					$match_rule = self::matchUser($insert_data,array_get($orderInfo,'order',array()));
-
-					if($match_rule['reply_status']==99){
-						if(env('AFTER_GET_MAIL_DELETE',0)){
-							//$mailbox->getMessage($insert_data['mail_id'])->delete();
-						}
-						Log::Info(' Mail From '.$insert_data['from_address'].' To '.$this->runAccount['account_email'].' have been trashed...');
-						continue;
-					}
-					if(array_get($match_rule,'etype')) $insert_data['etype'] = $match_rule['etype'];
-					if(array_get($match_rule,'remark')) $insert_data['remark'] = $match_rule['remark'];
-					if(array_get($match_rule,'sku')) $insert_data['sku'] = $match_rule['sku'];
-					if(array_get($match_rule,'asin')) $insert_data['asin'] = $match_rule['asin'];
-					if(array_get($match_rule,'mark')) $insert_data['mark'] = $match_rule['mark'];
-					if(array_get($match_rule,'item_no')) $insert_data['item_no'] = $match_rule['item_no'];
-					if(array_get($match_rule,'epoint')) $insert_data['epoint'] = $match_rule['epoint'];
-					$insert_data['user_id'] = $match_rule['user_id'];
-					$insert_data['group_id'] = $match_rule['group_id'];
-					$insert_data['rule_id'] = $match_rule['rule_id'];
-					$insert_data['reply'] = $match_rule['reply_status'];
-					//print_r($insert_data);
-					$result = DB::table('inbox')->insert($insert_data);
-					if(env('AFTER_GET_MAIL_DELETE',0) && $result){
-						//$mailbox->getMessage($insert_data['mail_id'])->delete();
-					}
-					Log::Info(' '.$this->runAccount['account_email'].' MailID '.$mail_id.' Insert Success...');
-				}else{
-					Log::Info(' '.$this->runAccount['account_email'].' MailID '.$mail_id.' AlReady Exists...');
-					$auto_exit_num++;
-					if($auto_exit && $auto_exit_num>10) break 1;
-				}		
-				}catch (\Exception $e){
-					Log::Info(' '.$this->runAccount['account_email'].' MailID '.$mail_id.' from '.$message->getFrom()->getAddress().' Insert Error...'.$e->getMessage());
-				}	
+					if($result==2) $auto_exit_num++;
+					if($auto_exit_num>=10) break;
+				}
 			}
 		}
 		
-		DB::table('accounts')->where('id',$this->runAccount['id'])->update(['last_mail_date'=>$last_date]);
-		Log::Info(' '.$this->runAccount['account_email'].' Since '.$lastMailDate.' Emails Scan Complete...');
+		if($has_save_message){
+			DB::table('accounts')->where('id',$this->runAccount['id'])->update(['last_mail_date'=>$last_date]);
+		}
+		Log::Info(' Since '.$lastMailDate.' Emails Scan Complete...');
     }
-
+	
+	public function saveMessage($message){
+		$to_addresses_arr=[];
+		$to_addresses = $message->getTo();
+		foreach($to_addresses as $to_a){
+			$to_addresses_arr[]=strtolower($to_a->getAddress());
+		}
+		if(!in_array(strtolower($this->runAccount['email']),$to_addresses_arr)) return 0;
+		try{
+			$mail_id = ($message->getId())?$message->getId():$message->getNumber();
+			$exists = DB::table('inbox')->where('mail_address', $this->runAccount['email'])->where('mail_id', $mail_id)->first();
+			if(!$exists) {
+				$insert_data=[];
+				$attach_data = array();
+				$insert_data['mail_id'] = $mail_id;
+				$insert_data['mail_address'] = $this->runAccount['email'];
+				$reply_to = current($message->getReplyTo());
+				$insert_data['from_address']= ($reply_to)?$reply_to->getAddress():$message->getFrom()->getAddress();
+				$insert_data['from_name']=$message->getFrom()->getName();
+		
+				$insert_data['to_address'] = $this->runAccount['email'];
+				$insert_data['subject'] = $message->getSubject();
+				$insert_data['text_html'] = $message->getBodyHtml();
+				$insert_data['text_plain'] = $message->getBodyText();
+				$insert_data['date'] = date('Y-m-d H:i:s',strtotime($message->getDate()->format('c')));
+				$insert_data['type'] = $this->runAccount['type'];
+				$insert_data['get_date'] = date('Y-m-d H:i:s');
+				$attachments = $message->getAttachments();
+				$i=0;
+				foreach ($attachments as $attachment) {
+					$i++;
+					if ($attachment->isEmbeddedMessage()) {
+						$embeddedMessage = $attachment->getEmbeddedMessage()->getContent();
+						$insert_data['text_html'].=$embeddedMessage;
+					}else{
+						$ifid = $attachment->getStructure()->ifid;
+						if($ifid){
+							$attId = $attachment->getStructure()->id;
+							$attName = $attachment->getStructure()->id.'.'.$attachment->getStructure()->subtype;
+						}else{
+							$attName = $attachment->getFilename();
+							if(!$attName) $attName = $i.'.'.$attachment->getStructure()->subtype;
+						}
+		
+						
+						$attPath=public_path('attachs').'/'.date('Ymd').'/'.$this->runAccount['id'].'/'.md5($message->getId());
+						if (!is_dir($attPath)) mkdir($attPath, 0777,true);
+						file_put_contents($attPath.'/'.$attName,$attachment->getDecodedContent());
+						$attach_data[] = str_ireplace(public_path(),'',$attPath).'/'.$attName;
+						if($ifid) $insert_data['text_html'] = str_ireplace('cid:'.$attId,str_ireplace(public_path(),'',$attPath).'/'.$attName,$insert_data['text_html']);
+					}
+				}
+				$insert_data['attachs']=serialize($attach_data);
+		
+		
+				$orderInfo = self::matchOrder($insert_data);
+				$insert_data['amazon_order_id'] = array_get($orderInfo,'amazon_order_id','');
+				$insert_data['amazon_seller_id'] = array_get($orderInfo,'order.SellerId',NULL);
+				$insert_data['sku'] = array_get($orderInfo,'order.Sku', NULL);
+				$insert_data['asin'] = array_get($orderInfo,'order.ASIN', NULL);
+				$match_rule = self::matchUser($insert_data,array_get($orderInfo,'order',array()));
+				if(array_get($match_rule,'etype')) $insert_data['etype'] = $match_rule['etype'];
+				if(array_get($match_rule,'remark')) $insert_data['remark'] = $match_rule['remark'];
+				if(array_get($match_rule,'sku')) $insert_data['sku'] = $match_rule['sku'];
+				if(array_get($match_rule,'asin')) $insert_data['asin'] = $match_rule['asin'];
+				if(array_get($match_rule,'mark')) $insert_data['mark'] = $match_rule['mark'];
+				if(array_get($match_rule,'item_no')) $insert_data['item_no'] = $match_rule['item_no'];
+				if(array_get($match_rule,'epoint')) $insert_data['epoint'] = $match_rule['epoint'];
+				$insert_data['user_id'] = $match_rule['user_id'];
+				$insert_data['group_id'] = $match_rule['group_id'];
+				$insert_data['rule_id'] = $match_rule['rule_id'];
+				$insert_data['reply'] = $match_rule['reply_status'];
+				$result = DB::table('inbox')->insert($insert_data);
+				Log::Info(' '.$this->runAccount['account_email'].' MailID '.$mail_id.' Insert Success...');
+				return 1;
+			}else{
+				Log::Info(' MailID '.$mail_id.' AlReady Exists...');
+				return 2;
+			}		
+		}catch (\Exception $e){
+			Log::Info(' MailID '.$mail_id.' from '.$message->getFrom()->getAddress().' Insert Error...'.$e->getMessage());			
+			return -1;
+		}
+	
+	}
     public function matchOrder($mail){
         //先匹配中间件1个月内订单，同步到导入到本地，再匹配本地订单
         //标题中含有订单号
@@ -251,11 +249,8 @@ class GetEmails extends Command
 			$user_mail_count = DB::table('inbox')->select(DB::raw('count(*) as count,user_id,group_id'))->where('group_id',$group_id)->whereIn('user_id',$users_arr)->where('date','<=',$date.' 23:59:59')->where('date','>=',$date.' 00:00:00')->groupBy(['user_id','group_id'])
     		->orderBy('count', 'asc')->get();
 			if(count($user_mail_count)>0){
-				//print_r($user_mail_count);
-				//print_r($user_mail_count[0]->user_id);
 				return $user_mail_count[0]->user_id;
 			}else{
-				//print_r($users_arr[0]);
 				return $users_arr[0];
 			}
 		}else{

@@ -28,7 +28,6 @@
         "php-imap/php-imap": "^3.0",
         "phpoffice/phpspreadsheet": "^1.2",
         "stevenyangecho/laravel-u-editor": "1.4.2",
-        "webklex/laravel-imap": "^1.4",
         "yadakhov/insert-on-duplicate-key": "^1.2",
         "zizaco/entrust": "5.2.x-dev"
     },

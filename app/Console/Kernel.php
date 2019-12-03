@@ -17,7 +17,6 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         'App\Console\Commands\GetEmails',
-        'App\Console\Commands\ScanEmails',
         'App\Console\Commands\SendEmails',
         'App\Console\Commands\Warning',
         'App\Console\Commands\AutoReply',
