@@ -71,10 +71,10 @@ td.details-control.disabled {
     position: relative;
     height: 285px;
     min-width: 1004px;
-    /*width: 100%;*/
-    width:1920px;
+    width: 100%;
+    /*width:1920px;*/
     overflow: hidden;
-    margin-left: 200px;
+    /*margin-left: 200px;*/
 }
 .slider .slider-pointer {
     position: absolute;
