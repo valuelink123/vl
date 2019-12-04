@@ -1,7 +1,6 @@
 @extends('layouts.layout')
 @section('label', 'Amazon Seller Accounts List')
 @section('content')
-<?php print_r($sellers_info);?>
     <h1 class="page-title font-red-intense"> Amazon Seller Accounts List
         <small>Configure your Amazon account, email, and proxy email.</small>
     </h1>
