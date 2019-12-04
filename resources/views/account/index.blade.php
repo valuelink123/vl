@@ -1,6 +1,7 @@
 @extends('layouts.layout')
 @section('label', 'Amazon Seller Accounts List')
 @section('content')
+<?php print_r($sellers_info);?>
     <h1 class="page-title font-red-intense"> Amazon Seller Accounts List
         <small>Configure your Amazon account, email, and proxy email.</small>
     </h1>
@@ -49,10 +50,11 @@
                         <thead>
                         <tr>
                             <th > ID </th>
-                            <th > Amazon Email </th>
-                            <th> Seller ID </th>
+							<th> Account Name </th>
+                            <th> Seller Account </th>
+							<th> Level </th>
                             <th> Receive Email </th>
-                            <th> Imap Host / Imap SSL / Imap Port </th>
+                            <th> Logs</th>
                             <th> Actions </th>
                         </tr>
                         </thead>
@@ -62,17 +64,20 @@
                                 <td>
                                     {{$seller_account['id']}}
                                 </td>
-                                <td>
-                                    {{$seller_account['account_email']}}
+								<td>
+                                    {{$seller_account['account_name']}}
                                 </td>
                                 <td>
-                                    {{$seller_account['account_sellerid']}}
+                                  {{array_get($sellers_info,$seller_account['account_sellerid'],$seller_account['account_sellerid'])}}
+                                </td>
+								<td>
+                                    {{array_get(getAccountLevel(),$seller_account['level'],$seller_account['level'])}}
                                 </td>
                                 <td>
                                     {{$seller_account['email']}}
                                 </td>
                                 <td>
-                                    {{$seller_account['imap_host']}} / {{$seller_account['imap_ssl']}} / {{$seller_account['imap_port']}}
+                                    {{$seller_account['last_logs']}}
                                 </td>
                                 <td>
 
@@ -150,7 +155,7 @@
                         }
                     ],
                     "order": [
-                        [1, "asc"]
+                        [3, "desc"]
                     ] // set first column as a default sort by asc
                 });
 

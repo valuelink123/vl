@@ -44,7 +44,19 @@
                                 <input type="text" class="form-control" name="account_name" id="account_sellerid" value="{{old('account_sellerid')}}" required>
                             </div>
                         </div>
-						
+						<div class="form-group">
+                            <label>Account Level</label>
+                            <div class="input-group col-md-6">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-user"></i>
+                                </span>
+                                <select class="form-control form-filter input-sm" name="type">
+									@foreach (getAccountLevel() as $k=>$v)
+										<option value="{{$k}}" <?php if($k==old('level')) echo 'selected';?>>{{$v}}</option>
+									@endforeach
+								</select>
+                            </div>
+                        </div>
 						<div class="form-group">
                             <label>Account Type</label>
                             <div class="input-group col-md-6">

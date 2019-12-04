@@ -1,10 +1,23 @@
 <?php
+use Illuminate\Support\Facades\DB;
 function getAccountTypes(){
     return array(
         'Amazon','Site'
     );
 }
-
+function getAccountLevel(){
+    return array(
+        '9'=>'S',
+		'8'=>'A',
+		'7'=>'B',
+		'6'=>'C',
+		'5'=>'D',
+		'0'=>'None'
+    );
+}
+function getSellerAccount(){
+	return DB::connection('order')->table("accounts")->where('status',1)->groupby(['sellerid','sellername'])->pluck('sellername','sellerid');
+}
 function getAsinSites(){
     return array(
         'www.amazon.com','www.amazon.ca','www.amazon.mx','www.amazon.co.uk','www.amazon.fr','www.amazon.de','www.amazon.it','www.amazon.es','www.amazon.co.jp'

@@ -47,6 +47,19 @@
                         </div>
 						
 						<div class="form-group">
+                            <label>Account Level</label>
+                            <div class="input-group col-md-6">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-user"></i>
+                                </span>
+                                <select class="form-control form-filter input-sm" name="level">
+									@foreach (getAccountLevel() as $k=>$v)
+										<option value="{{$k}}" <?php if($k==$seller_account['level']) echo 'selected';?>>{{$v}}</option>
+									@endforeach
+								</select>
+                            </div>
+                        </div>
+						<div class="form-group">
                             <label>Account Type</label>
                             <div class="input-group col-md-6">
                                 <span class="input-group-addon">
@@ -59,7 +72,6 @@
 								</select>
                             </div>
                         </div>
-						
                         <div class="form-group">
                             <label>Amazon Seller ID</label>
                             <div class="input-group col-md-6">

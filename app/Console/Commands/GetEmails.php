@@ -81,55 +81,62 @@ class GetEmails extends Command
     }
 
     public function saveEmails($lastMailDate){
-		$last_date = $lastMailDate;
-		$date = new DateTimeImmutable($lastMailDate);
-		$sinceTime = $date->sub(new DateInterval('PT1H'));
-		$server = new Server($this->runAccount['imap_host']);
-		$connection = $server->authenticate($this->runAccount['email'], $this->runAccount['password']);
-		$mailboxes = $connection->getMailboxes();
-		$search = new SearchExpression();
-		$search->addCondition(new Since($sinceTime));	
-		$has_save_message=false;
-		foreach ($mailboxes as $mailbox) {
-			if ($mailbox->getAttributes() & \LATT_NOSELECT) {
-				continue;
-			}
-			if($mailbox->getName()=='Sent Messages' || $mailbox->getName()=='Deleted Messages' || $mailbox->getName()=='Drafts'){
-				continue;
-			}
-			if($mailbox->getName()=='Outbox' || $mailbox->getName()=='Sent' || $mailbox->getName()=='Deleted' || $mailbox->getName()=='Drafts'){
-				continue;
-			}
-			$messages = $mailbox->getMessages($search,\SORTDATE,false);
-			foreach($messages as $message){
-				$result = self::saveMessage($message);	
-				if($result==1){
-					$has_save_message=true;
-					if($last_date<date('Y-m-d H:i:s',strtotime($message->getDate()->format('c')))) $last_date = date('Y-m-d H:i:s',strtotime($message->getDate()->format('c')));
+		$update_data = [];
+		try{
+			$last_date = $lastMailDate;
+			$date = new DateTimeImmutable($lastMailDate);
+			$sinceTime = $date->sub(new DateInterval('PT1H'));
+			$server = new Server($this->runAccount['imap_host']);
+			$connection = $server->authenticate($this->runAccount['email'], $this->runAccount['password']);
+			$mailboxes = $connection->getMailboxes();
+			$search = new SearchExpression();
+			$search->addCondition(new Since($sinceTime));	
+			$has_save_message=false;
+			foreach ($mailboxes as $mailbox) {
+				if ($mailbox->getAttributes() & \LATT_NOSELECT) {
+					continue;
 				}
-			}
-			
-			if(!count($messages)){
-				$auto_exit_num=0;
-				$messages = $mailbox->getMessages(NULL);
-				$mcc=count($messages);
-				for($mc=$mcc-1;$mc>=0;$mc--){
-					$message = $mailbox->getMessage($messages[$mc]);
-					$result = self::saveMessage($message);
+				if($mailbox->getName()=='Sent Messages' || $mailbox->getName()=='Deleted Messages' || $mailbox->getName()=='Drafts'){
+					continue;
+				}
+				if($mailbox->getName()=='Outbox' || $mailbox->getName()=='Sent' || $mailbox->getName()=='Deleted' || $mailbox->getName()=='Drafts'){
+					continue;
+				}
+				$messages = $mailbox->getMessages($search,\SORTDATE,false);
+				foreach($messages as $message){
+					$result = self::saveMessage($message);	
 					if($result==1){
 						$has_save_message=true;
 						if($last_date<date('Y-m-d H:i:s',strtotime($message->getDate()->format('c')))) $last_date = date('Y-m-d H:i:s',strtotime($message->getDate()->format('c')));
 					}
-					if($result==2) $auto_exit_num++;
-					if($auto_exit_num>=5) break;
+				}
+				
+				if(!count($messages)){
+					$auto_exit_num=0;
+					$messages = $mailbox->getMessages(NULL);
+					$mcc=count($messages);
+					for($mc=$mcc-1;$mc>=0;$mc--){
+						$message = $mailbox->getMessage($messages[$mc]);
+						$result = self::saveMessage($message);
+						if($result==1){
+							$has_save_message=true;
+							if($last_date<date('Y-m-d H:i:s',strtotime($message->getDate()->format('c')))) $last_date = date('Y-m-d H:i:s',strtotime($message->getDate()->format('c')));
+						}
+						if($result==2) $auto_exit_num++;
+						if($auto_exit_num>=5) break;
+					}
 				}
 			}
+			
+			if($has_save_message){
+				$update_data['last_mail_date'] = $last_date;
+				$update_data['last_logs'] = $last_date.' Get Emails Success';
+			}
+		}catch (\Exception $e){
+			$update_data['last_logs'] = $e->getMessage();
+			
 		}
-		
-		if($has_save_message){
-			DB::table('accounts')->where('id',$this->runAccount['id'])->update(['last_mail_date'=>$last_date]);
-		}
-		Log::Info(' Since '.$lastMailDate.' Emails Scan Complete...');
+		if($update_data) DB::table('accounts')->where('id',$this->runAccount['id'])->update($update_data);
     }
 	
 	public function saveMessage($message){

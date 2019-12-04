@@ -35,7 +35,7 @@ class AccountController extends Controller
     {
         if(!Auth::user()->can(['accounts-show'])) die('Permission denied -- accounts-show');
         $seller_accounts = Accounts::get()->toArray();
-        return view('account/index',['seller_accounts'=>$seller_accounts]);
+        return view('account/index',['seller_accounts'=>$seller_accounts,'sellers_info'=>getSellerAccount()]);
 
     }
 
@@ -53,6 +53,7 @@ class AccountController extends Controller
             'account_email' => 'required|email',
             'account_name' => 'required|string',
 			'type' => 'required|string',
+			'level' => 'required|int',
             'account_sellerid' => 'required|string',
             'email' => 'required|string',
             'password' => 'required|string',
@@ -80,6 +81,7 @@ class AccountController extends Controller
         $seller_account->smtp_ssl = $request->get('smtp_ssl');
         $seller_account->smtp_port = $request->get('smtp_port');
 		$seller_account->type = $request->get('type');
+		$seller_account->level = $request->get('level');
 		$seller_account->signature = $request->get('signature');
 
         if($request->get('id')>0){
@@ -122,6 +124,7 @@ class AccountController extends Controller
             'account_email' => 'required|email',
             'account_name' => 'required|string',
 			'type' => 'required|string',
+			'level' => 'required|int',
             'account_sellerid' => 'required|string',
             'email' => 'required|string',
             'password' => 'required|string',
@@ -147,6 +150,7 @@ class AccountController extends Controller
         $seller_account->smtp_ssl = $request->get('smtp_ssl');
         $seller_account->smtp_port = $request->get('smtp_port');
 		$seller_account->type = $request->get('type');
+		$seller_account->level = $request->get('level');
 		$seller_account->signature = $request->get('signature');
         if ($seller_account->save()) {
             $request->session()->flash('success_message','Set Seller Account Success');
