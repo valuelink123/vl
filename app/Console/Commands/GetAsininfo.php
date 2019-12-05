@@ -109,14 +109,13 @@ class GetAsininfo extends Command
 			DB::table('fbm_accs_stock')->insert($acc);
 		}
 		
-		$date_from = date('Y-m-d',strtotime('-15 day')).' 00:00:00';
-		$date_to = date('Y-m-d',strtotime('-1 day')).' 23:59:59';
-		$sales = DB::connection('order')->select('select sum(quantityordered) as sale,asin,marketplaceid from amazon_orders_item where AmazonOrderId in (select AmazonOrderId from amazon_orders where PurchaseDate>=:date_from and PurchaseDate<=:date_to)
- group by asin,marketplaceid',['date_from' => $date_from,'date_to' => $date_to]);
+		$date_from = date('Y-m-d',strtotime('-15 day'));
+		$date_to = date('Y-m-d',strtotime('-1 day'));
+		$sales = DB::select('select sum(sales) as sale,asin,site from asin_daily_info where date>=:date_from and date<=:date_to group by asin,site',['date_from' => $date_from,'date_to' => $date_to]);
 		foreach($sales as $sale){
-			$data[$sale->asin][$sale->marketplaceid]['sales'] = round(intval($sale->sale)/14,2);
-			if(!array_get($sales_t,$sale->asin.'.'.array_get($marketplaceid_area,$sale->marketplaceid).'.total_sales')) $sales_t[$sale->asin][array_get($marketplaceid_area,$sale->marketplaceid)]['total_sales']=0;
-			$sales_t[$sale->asin][array_get($marketplaceid_area,$sale->marketplaceid)]['total_sales']+=round(intval($sale->sale)/14,2);
+			$data[$sale->asin][array_get(array_flip(getSiteUrl()),str_replace('www.','',$sale->site))]['sales'] = round(intval($sale->sale)/14,2);
+			if(!array_get($sales_t,$sale->asin.'.'.array_get($marketplaceid_area,array_get(array_flip(getSiteUrl()),str_replace('www.','',$sale->site))).'.total_sales')) $sales_t[$sale->asin][array_get($marketplaceid_area,array_get(array_flip(getSiteUrl()),str_replace('www.','',$sale->site)))]['total_sales']=0;
+			$sales_t[$sale->asin][array_get($marketplaceid_area,array_get(array_flip(getSiteUrl()),str_replace('www.','',$sale->site)))]['total_sales']+=round(intval($sale->sale)/14,2);
 		}
 
 		$sellerid_area=$sellerid_name=[];
@@ -136,12 +135,12 @@ class GetAsininfo extends Command
 			$sellerid_name[$sellerid->sellerid] = $sellerid->sellername;
 		}
 		
-		$stocks = DB::connection('order')->select('select sum(InStock) as stock,sum(Total-InStock) as transfer ,asin,sellerid from amazon_inventory_supply where InStock>0 or Total>0 group by asin,sellerid');
+		$stocks = DB::connection('amazon')->select('select sum(afn_sellable) as stock,sum(afn_transfer) as transfer ,asin,marketplaceid from seller_skus where afn_total>0 group by asin,marketplaceid');
 		foreach($stocks as $stock){
-			if(!array_get($stock_t,$stock->asin.'.'.array_get($sellerid_area,$stock->sellerid).'.stock')) $stock_t[$stock->asin][array_get($sellerid_area,$stock->sellerid)]['stock']=0;
-			if(!array_get($stock_t,$stock->asin.'.'.array_get($sellerid_area,$stock->sellerid).'.transfer')) $stock_t[$stock->asin][array_get($sellerid_area,$stock->sellerid)]['transfer']=0;
-			$stock_t[$stock->asin][array_get($sellerid_area,$stock->sellerid)]['stock']+= intval($stock->stock);
-			$stock_t[$stock->asin][array_get($sellerid_area,$stock->sellerid)]['transfer']+= intval($stock->transfer);
+			if(!array_get($stock_t,$stock->asin.'.'.array_get($marketplaceid_area,$stock->marketplaceid).'.stock')) $stock_t[$stock->asin][array_get($marketplaceid_area,$stock->marketplaceid)]['stock']=0;
+			if(!array_get($stock_t,$stock->asin.'.'.array_get($marketplaceid_area,$stock->marketplaceid).'.transfer')) $stock_t[$stock->asin][array_get($marketplaceid_area,$stock->marketplaceid)]['transfer']=0;
+			$stock_t[$stock->asin][array_get($marketplaceid_area,$stock->marketplaceid)]['stock']+= intval($stock->stock);
+			$stock_t[$stock->asin][array_get($marketplaceid_area,$stock->marketplaceid)]['transfer']+= intval($stock->transfer);
 		}
 		
 		
@@ -156,7 +155,9 @@ class GetAsininfo extends Command
 		}
 		DB::table('fba_stock')->truncate();
 		DB::table('asin')->update(['fba_stock'=>0, 'fba_transfer'=>0]);
-		$fs = DB::connection('order')->select('select InStock as stock,(Total-InStock) as transfer ,asin,sellerid,sellersku,updated_at from amazon_inventory_supply where Total>0');
+		$fs = DB::connection('amazon')->select('select a.afn_sellable as stock,a.afn_transfer as transfer ,a.asin,a.seller_sku as sellersku,b.mws_seller_id as sellerid,a.updated_at from seller_skus as a 
+left join seller_accounts as b
+on a.seller_account_id=b.id where a.afn_total>0');
 		foreach($fs as $fsd){
 			$arrayArea=[];
 			if(array_get($sellerid_area,$fsd->sellerid)=='US') $arrayArea=['www.amazon.com','www.amazon.ca'];
