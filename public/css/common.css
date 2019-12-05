@@ -69,12 +69,10 @@ td.details-control.disabled {
 /*图片轮播样式*/
 .slider {
     position: relative;
-    height: 285px;
+    height: 253px;
     min-width: 1004px;
     width: 100%;
-    /*width:1920px;*/
     overflow: hidden;
-    /*margin-left: 200px;*/
 }
 .slider .slider-pointer {
     position: absolute;
