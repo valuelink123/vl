@@ -117,6 +117,8 @@
     <link href="/css/common.css?v=9.1" rel="stylesheet" type="text/css"/>
 	<script type="text/javascript" src="/js/artDialog4.1.7/artDialog.js?skin=blue"></script>
     <script type="text/javascript" src="/js/artDialog4.1.7/plugins/iframeTools.js"></script>
+
+	<script type="text/javascript" src="/js/banner.js"></script>
 </head>
 <!-- END HEAD -->
 
@@ -124,22 +126,22 @@
 <div class="page-wrapper">
     <!-- BEGIN HEADER -->
     <div class="page-header navbar navbar-fixed-top">
-	
-		
+
+
         <!-- BEGIN HEADER INNER -->
         <div class="page-header-inner">
             <!-- BEGIN LOGO -->
             <div class="page-logo">
-               
+
                     <img src="/assets/layouts/layout/img/logo.png" alt="logo" class="logo-default" />
-            
+
             </div>
             <!-- END LOGO -->
-            
+
             <!-- BEGIN TOP NAVIGATION MENU -->
 			<div class="hor-menu  ">
                                     <ul class="nav navbar-nav">
-                                        
+
                                         <li class="menu-dropdown classic-menu-dropdown ">
                                             <a href="/home"> Home
                                                 <span class="arrow"></span>
@@ -149,14 +151,14 @@
                                                     <a href="/home" class="nav-link nav-toggle ">
                                                         Dashboard
                                                         <span class="arrow"></span>
-                                                    </a>    
+                                                    </a>
                                                 </li>
 												@permission('sales-report-show')
                                                 <li class="">
                                                     <a href="/skus" class="nav-link nav-toggle ">
                                                         Daily Report
                                                         <span class="arrow"></span>
-                                                    </a>    
+                                                    </a>
                                                 </li>
 												@endpermission
 												@permission('sales-management')
@@ -164,22 +166,22 @@
                                                     <a href="/seller" class="nav-link nav-toggle ">
                                                         Sales Management
                                                         <span class="arrow"></span>
-                                                    </a>    
+                                                    </a>
                                                 </li>
 												@endpermission
                                             </ul>
                                         </li>
-										
+
 										@permission('task-show')
 										<li class="menu-dropdown classic-menu-dropdown ">
                                             <a href="/task"> Task
 												<span class="badge badge-danger" >{{intval($untasks)}}</span>
                                                 <span class="arrow"></span>
                                             </a>
-                                            
+
                                         </li>
 										@endpermission
-										
+
 										<li class="menu-dropdown classic-menu-dropdown ">
                                             <a href="javascript:;"> Listing
                                                 <span class="arrow"></span>
@@ -189,14 +191,14 @@
                                                     <a href="/home/asins" class="nav-link nav-toggle ">
                                                         My Listing
                                                         <span class="arrow"></span>
-                                                    </a>    
+                                                    </a>
                                                 </li>
 												@permission('asin-rating-show')
                                                 <li class="">
                                                     <a href="/star" class="nav-link nav-toggle ">
                                                         Rating Table
                                                         <span class="arrow"></span>
-                                                    </a>    
+                                                    </a>
                                                 </li>
 												@endpermission
 												@permission('asin-table-show')
@@ -204,12 +206,12 @@
                                                     <a href="/asin" class="nav-link nav-toggle ">
                                                         Asin Table
                                                         <span class="arrow"></span>
-                                                    </a>    
+                                                    </a>
                                                 </li>
 												 @endpermission
                                             </ul>
                                         </li>
-										
+
 										<li class="menu-dropdown classic-menu-dropdown ">
                                             <a href="javascript:;"> Review
                                                 <span class="arrow"></span>
@@ -245,7 +247,7 @@
                                                     <a href="/review" class="nav-link nav-toggle ">
                                                         Review Table
                                                         <span class="arrow"></span>
-                                                    </a>    
+                                                    </a>
                                                 </li>
 												@endpermission
 												@permission('ctg-show')
@@ -253,7 +255,7 @@
                                                     <a href="/ctg/list" class="nav-link nav-toggle ">
                                                         CTG
                                                         <span class="arrow"></span>
-                                                    </a>    
+                                                    </a>
                                                 </li>
 												@endpermission
 												@permission('non-ctg-show')
@@ -261,7 +263,7 @@
                                                     <a href="/nonctg" class="nav-link nav-toggle ">
                                                         Non-CTG
                                                         <span class="arrow"></span>
-                                                    </a>    
+                                                    </a>
                                                 </li>
 												@endpermission
 												@permission('crm-show')
@@ -269,7 +271,7 @@
                                                     <a href="/crm" class="nav-link nav-toggle ">
                                                         CRM
                                                         <span class="arrow"></span>
-                                                    </a>    
+                                                    </a>
                                                 </li>
 												@endpermission
 
@@ -283,7 +285,7 @@
 												@endpermission
                                             </ul>
                                         </li>
-										
+
 										<li class="menu-dropdown classic-menu-dropdown ">
                                             <a href="javascript:;"> Marketing
                                                 <span class="arrow"></span>
@@ -294,13 +296,13 @@
                                                     <a href="/fees" class="nav-link nav-toggle ">
                                                         Fees List
                                                         <span class="arrow"></span>
-                                                    </a>    
+                                                    </a>
                                                 </li>
 												@endpermission
-												
+
                                             </ul>
                                         </li>
-										
+
 										<li class="menu-dropdown classic-menu-dropdown ">
                                             <a href="javascript:;"> Inventory
                                                 <span class="arrow"></span>
@@ -311,7 +313,7 @@
                                                     <a href="{{ url('productTransfer') }}" class="nav-link nav-toggle ">
                                                        Product Transfer
                                                         <span class="arrow"></span>
-                                                    </a>    
+                                                    </a>
                                                 </li>
 												@endpermission
 
@@ -323,28 +325,28 @@
 													</a>
 												</li>
 												@endpermission
-												
+
 												@permission('distribution-analysis-show')
 												<li class="">
                                                     <a href="/tran" class="nav-link nav-toggle ">
-                                                        Distribution analysis 
+                                                        Distribution analysis
                                                         <span class="arrow"></span>
-                                                    </a>    
+                                                    </a>
                                                 </li>
 												@endpermission
 												@permission('partslist-show')
 												<li class="">
                                                     <a href="/kms/partslist" class="nav-link nav-toggle ">
-                                                        Inventory Inquiry 
+                                                        Inventory Inquiry
                                                         <span class="arrow"></span>
-                                                    </a>    
+                                                    </a>
                                                 </li>
 												@endpermission
                                             </ul>
                                         </li>
-											
 
-										
+
+
 										<li class="menu-dropdown classic-menu-dropdown ">
                                             <a href="javascript:;"> Price
                                                 <span class="arrow"></span>
@@ -355,7 +357,7 @@
                                                     <a href="/price" class="nav-link nav-toggle ">
                                                         Price Model
                                                         <span class="arrow"></span>
-                                                    </a>    
+                                                    </a>
                                                 </li>
 												@endpermission
 												@permission('auto-price-show')
@@ -363,17 +365,17 @@
                                                     <a href="/autoprice" class="nav-link nav-toggle ">
                                                         Automatic price adjustment
                                                         <span class="arrow"></span>
-                                                    </a>    
+                                                    </a>
                                                 </li>
 												@endpermission
                                             </ul>
                                         </li>
-										
 
 
 
-										
-										
+
+
+
 										<li class="menu-dropdown classic-menu-dropdown ">
                                             <a href="javascript:;"> Email
                                                 <span class="badge badge-danger" >{{intval(array_get($unreply,'Site',0)+array_get($unreply,'Amazon',0))}}</span>
@@ -401,7 +403,7 @@
                                                     <a href="/send" class="nav-link nav-toggle ">
                                                         Send Box
                                                         <span class="arrow"></span>
-                                                    </a>    
+                                                    </a>
                                                 </li>
 												@endpermission
 												@permission('templates-show')
@@ -409,7 +411,7 @@
                                                     <a href="/template" class="nav-link nav-toggle ">
                                                         Template
                                                         <span class="arrow"></span>
-                                                    </a>    
+                                                    </a>
                                                 </li>
 												@endpermission
 												@permission('callmessage-show')
@@ -417,7 +419,7 @@
                                                     <a href="/phone" class="nav-link nav-toggle ">
                                                         Call Message
                                                         <span class="arrow"></span>
-                                                    </a>    
+                                                    </a>
                                                 </li>
 												@endpermission
 												@permission('compose')
@@ -425,23 +427,23 @@
                                                     <a href="/send/create" class="nav-link nav-toggle ">
                                                         Compose
                                                         <span class="arrow"></span>
-                                                    </a>    
+                                                    </a>
                                                 </li>
 												@endpermission
-												
+
 												@permission('auto-reply-show')
 												<li class="">
                                                     <a href="/auto" class="nav-link nav-toggle ">
                                                         Auto Reply
                                                         <span class="arrow"></span>
-                                                    </a>    
+                                                    </a>
                                                 </li>
-							
+
 												@endpermission
-                                                
+
                                             </ul>
                                         </li>
-										
+
 										<li class="menu-dropdown classic-menu-dropdown ">
                                             <a href="javascript:;"> Tools
                                                 <span class="arrow"></span>
@@ -452,7 +454,7 @@
 												<a href="/exception" class="nav-link nav-toggle ">
 													Refund & Replacement
 													<span class="arrow"></span>
-												</a>    
+												</a>
 											</li>
 											@endpermission
 											@permission('mcforders')
@@ -460,35 +462,35 @@
 												<a href="/mcforder" class="nav-link nav-toggle ">
 													Mcf Order
 													<span class="arrow"></span>
-												</a>    
+												</a>
 											</li>
 											@endpermission
-											
-											
+
+
 											@permission('sales-prediction-show')
 											<li class="">
 												<a href="/salesp" class="nav-link nav-toggle ">
 													Sales Prediction
 													<span class="arrow"></span>
-												</a>    
+												</a>
 											</li>
-											
+
 											@endpermission
 
-											
+
 											@permission('proline-show')
 											<li class="">
 												<a href="/proline" class="nav-link nav-toggle ">
 													Proline Report
 													<span class="arrow"></span>
-												</a>    
+												</a>
 											</li>
-											
+
 											@endpermission
-					
+
 											</ul>
                                         </li>
-                                       
+
 									   <li class="menu-dropdown classic-menu-dropdown ">
                                             <a href="javascript:;"> KMS
                                                 <span class="arrow"></span>
@@ -499,7 +501,7 @@
                                                     <a href="/kms/productguide" class="nav-link nav-toggle ">
                                                         Product Guide
                                                         <span class="arrow"></span>
-                                                    </a>    
+                                                    </a>
                                                 </li>
 												@endpermission
 												@permission('user-manual-show')
@@ -507,7 +509,7 @@
                                                     <a href="/kms/usermanual" class="nav-link nav-toggle ">
                                                         User Manual
                                                         <span class="arrow"></span>
-                                                    </a>    
+                                                    </a>
                                                 </li>
 												@endpermission
 												@permission('video-show')
@@ -515,7 +517,7 @@
                                                     <a href="/kms/videolist" class="nav-link nav-toggle ">
                                                         Video List
                                                         <span class="arrow"></span>
-                                                    </a>    
+                                                    </a>
                                                 </li>
 												@endpermission
 												@permission('qa-show')
@@ -523,7 +525,7 @@
                                                     <a href="/qa" class="nav-link nav-toggle ">
                                                         Knowledge Base
                                                         <span class="arrow"></span>
-                                                    </a>    
+                                                    </a>
                                                 </li>
 												@endpermission
 												@permission('qa-show')
@@ -531,7 +533,7 @@
                                                     <a href="/question" class="nav-link nav-toggle ">
                                                         Knowledge Center
                                                         <span class="arrow"></span>
-                                                    </a>    
+                                                    </a>
                                                 </li>
 												@endpermission
 												@permission('qa-category-show')
@@ -539,7 +541,7 @@
                                                     <a href="/category" class="nav-link nav-toggle ">
                                                         Knowledge Category
                                                         <span class="arrow"></span>
-                                                    </a>    
+                                                    </a>
                                                 </li>
 												@endpermission
 												<!--
@@ -548,25 +550,25 @@
                                                     <a href="/kms/learn" class="nav-link nav-toggle ">
                                                         Learning Center
                                                         <span class="arrow"></span>
-                                                    </a>    
+                                                    </a>
                                                 </li>
-												
+
 												@endpermission
-												
+
 												@permission('notice-center')
 												<li class="">
                                                     <a href="/kms/notice" class="nav-link nav-toggle ">
                                                         Notice Center
                                                         <span class="arrow"></span>
-                                                    </a>    
+                                                    </a>
                                                 </li>
-												
+
 												@endpermission
 												-->
                                             </ul>
                                         </li>
-									   
-									   
+
+
 									   <li class="menu-dropdown classic-menu-dropdown ">
                                             <a href="javascript:;"> Report
                                                 <span class="arrow"></span>
@@ -577,7 +579,7 @@
                                                     <a href="/total" class="nav-link nav-toggle ">
                                                         Data Statistics
                                                         <span class="arrow"></span>
-                                                    </a>    
+                                                    </a>
                                                 </li>
 												@endpermission
 												@permission('product-problem-show')
@@ -585,7 +587,7 @@
                                                     <a href="/etotal" class="nav-link nav-toggle ">
                                                         Product Problem Statistics
                                                         <span class="arrow"></span>
-                                                    </a>    
+                                                    </a>
                                                 </li>
 												@endpermission
 												@permission('requestreport-show')
@@ -593,13 +595,13 @@
                                                     <a href="/rr" class="nav-link nav-toggle ">
                                                         Request Report
                                                         <span class="arrow"></span>
-                                                    </a>    
+                                                    </a>
                                                 </li>
 												@endpermission
                                             </ul>
                                         </li>
-										
-										
+
+
 										<li class="menu-dropdown classic-menu-dropdown ">
                                             <a href="javascript:;"> Setting
                                                 <span class="arrow"></span>
@@ -610,7 +612,7 @@
                                                     <a href="/user" class="nav-link nav-toggle ">
                                                         User Manage
                                                         <span class="arrow"></span>
-                                                    </a>    
+                                                    </a>
                                                 </li>
 												@endpermission
 												@permission('role-show')
@@ -618,7 +620,7 @@
                                                     <a href="/role" class="nav-link nav-toggle ">
                                                         Role Manage
                                                         <span class="arrow"></span>
-                                                    </a>    
+                                                    </a>
                                                 </li>
 												@endpermission
 												@permission('group-show')
@@ -626,7 +628,7 @@
                                                     <a href="/group" class="nav-link nav-toggle ">
                                                         Group Manage
                                                         <span class="arrow"></span>
-                                                    </a>    
+                                                    </a>
                                                 </li>
 												@endpermission
 												@permission('rule-show')
@@ -634,7 +636,7 @@
                                                     <a href="/rule" class="nav-link nav-toggle ">
                                                         Match Rules
                                                         <span class="arrow"></span>
-                                                    </a>    
+                                                    </a>
                                                 </li>
 												@endpermission
 												@permission('accounts-show')
@@ -642,7 +644,7 @@
                                                     <a href="/account" class="nav-link nav-toggle ">
                                                         Seller Account Manage
                                                         <span class="arrow"></span>
-                                                    </a>    
+                                                    </a>
                                                 </li>
 												@endpermission
 												@permission('seller-tab-show')
@@ -650,7 +652,7 @@
                                                     <a href="/sellertab" class="nav-link nav-toggle ">
                                                         Seller Tab Config
                                                         <span class="arrow"></span>
-                                                    </a>    
+                                                    </a>
                                                 </li>
 												@endpermission
 												@permission('review-tab-show')
@@ -658,7 +660,7 @@
                                                     <a href="/rs" class="nav-link nav-toggle ">
                                                         Review Step Config
                                                         <span class="arrow"></span>
-                                                    </a>    
+                                                    </a>
                                                 </li>
 												@endpermission
                                                 @permission('config-option-show')
@@ -675,17 +677,17 @@
                                     </ul>
                                 </div>
             <div class="top-menu">
-				
+
                 <ul class="nav navbar-nav pull-right">
 
                     <li class="dropdown dropdown-user">
                         <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
                             <img alt="" class="img-circle" src="/assets/layouts/layout/img/avatar.png" />
-                            
+
                             <i class="fa fa-angle-down"></i>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-default">
-					
+
                             <li>
                                 <a href="{{ url('profile') }}">
                                     <i class="icon-user"></i> My Profile </a>
@@ -714,9 +716,10 @@
     <div class="clearfix"> </div>
     <!-- END HEADER & CONTENT DIVIDER -->
     <!-- BEGIN CONTAINER -->
+
     <div class="page-container">
         <!-- BEGIN SIDEBAR -->
-        
+
         <!-- END SIDEBAR -->
         <!-- BEGIN CONTENT -->
         <div class="page-content-wrapper">
@@ -724,19 +727,32 @@
             <div class="page-content">
 
                 <div class="page-bar">
-					{{--倒计时开始--}}
-					<div class="mod-holiday—countdown">
-						<div class="holiday—countdown text-center">
-							<div style=" width:5%;border: 1px solid #D9EDF7;"></div>
-							@foreach(Session::get('countDown') as $key=>$val)
-								@if($val['day']>0)
-								<div class="col-md-4">距离<span class="holiday">{!! $val['name'] !!}</span>还有<span class="day">{!! $val['day'] !!}</span>天</div>
-								@endif
-							@endforeach
-							<div style=" width:5%;border: 1px solid #D9EDF7;"></div>
-							<div style="clear:both;"></div>
+
+					{{--轮播图--}}
+					<div class="slider" id="slider">
+						<div class="slider-inner">
+							<div class="item">
+								<img class="img" style="background: url('/image/slide_1.jpg');">
+							</div>
+							<div class="item">
+								<img class="img" style="background: url('/image/slide_2.jpg');">
+							</div>
 						</div>
 					</div>
+
+					{{--倒计时开始--}}
+					{{--<div class="mod-holiday—countdown">--}}
+						{{--<div class="holiday—countdown text-center">--}}
+							{{--<div style=" width:5%;border: 1px solid #D9EDF7;"></div>--}}
+							{{--@foreach(Session::get('countDown') as $key=>$val)--}}
+								{{--@if($val['day']>0)--}}
+								{{--<div class="col-md-4">距离<span class="holiday">{!! $val['name'] !!}</span>还有<span class="day">{!! $val['day'] !!}</span>天</div>--}}
+								{{--@endif--}}
+							{{--@endforeach--}}
+							{{--<div style=" width:5%;border: 1px solid #D9EDF7;"></div>--}}
+							{{--<div style="clear:both;"></div>--}}
+						{{--</div>--}}
+					{{--</div>--}}
 					{{--倒计时结束--}}
 					<div>
                     <ul class="page-breadcrumb" style="margin-left:20px;">
@@ -766,12 +782,12 @@
     bottom: 50px;"> Task
 		<i class="fa fa-plus"></i>
 	</a>
-	
+
 	@endpermission
     <div class="page-footer">
         <div class="page-footer-inner"> 2018 © Valuelink Ltd.
         </div>
-		
+
         <div class="scroll-to-top">
             <i class="icon-arrow-up"></i>
         </div>
@@ -806,6 +822,10 @@
             toastr.error("{{Session::get('error_message')}}");
             {{Session::forget('error_message')}}
         @endif
+    });
+
+    jQuery(document).ready(function($) {
+        $('#slider').Slider();
     });
 </script>
 
