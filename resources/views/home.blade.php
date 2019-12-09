@@ -579,6 +579,7 @@ $(function() {
 	$('.date-picker').datepicker({
 		rtl: App.isRTL(),
 		format: 'yyyy-mm-dd',
+		orientation: 'bottom',
 		autoclose: true,
 	});
 	
