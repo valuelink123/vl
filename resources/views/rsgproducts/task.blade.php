@@ -10,6 +10,22 @@
             background-color: #ED6B75;
             font-size: 20px !important;
         }
+        #switch-content .switch-btn{
+            margin-right: 20px;
+            margin-top: 14px;
+            border-radius: 4px !important;
+        }
+        #switch-content .rsg-copy{
+            margin-right: 35px;
+            margin-top: 14px;
+        }
+        #switch-content .rsg-copy img{
+            width:30px;
+            cursor: pointer;
+        }
+        #switch-content .switch-btn .btn{
+            border-radius: 4px !important;
+        }
     </style>
 
     <link rel="stylesheet" href="/js/chosen/chosen.min.css"/>
@@ -18,26 +34,37 @@
     @include('frank.common')
 
     <div id="switch-content">
-        <div class="switch-one right-float">
-            <div class="switch-type active" data-value="US">
-                <div>United States</div>
+        <div class="switch">
+            <div class="switch-one right-float">
+                <div class="switch-type active" data-value="US">
+                    <div>United States</div>
+                </div>
+                <div class="triangle"></div>
             </div>
-            <div class="triangle"></div>
+
+            <div class="switch-one right-float">
+                <div class="switch-type" data-value="EU">
+                    <div>European</div>
+                </div>
+                <div class="triangle" style="display:none;"></div>
+            </div>
+            <div class="switch-one right-float">
+                <div class="switch-type" data-value="JP">
+                    <div>Japanese</div>
+                </div>
+                <div class="triangle" style="display:none;"></div>
+            </div>
         </div>
 
-        <div class="switch-one right-float">
-            <div class="switch-type" data-value="EU">
-                <div>European</div>
+        <div class="rsg-website">
+            <div class="rsg-copy right-float">
+                <img src="/image/copy.jpg">
             </div>
-            <div class="triangle" style="display:none;"></div>
-        </div>
-        <div class="switch-one right-float">
-            <div class="switch-type" data-value="JP">
-                <div>Japanese</div>
+            <input id="rsg-link" value="{!! $rsg_link !!}"  style="opacity: 0" readonly>
+            <div class="switch-btn right-float">
+                <button type="button" class="btn btn-danger rsg-btn">RSG Website</button>
             </div>
-            <div class="triangle" style="display:none;"></div>
         </div>
-
     </div>
 
     <div class="portlet light bordered">
@@ -160,6 +187,22 @@
                     }
                 });
             })
+
+            //点击按钮跳转到rsg官网并带上user_id
+            $('#switch-content .rsg-btn').click(function() {
+                var rsg_link = $('#rsg-link').val();
+                window.open(rsg_link, '_blank');
+                return false;
+            });
+
+            //实现复制功能
+            $(".rsg-copy").click(function() {
+                var rsg_link = $('#rsg-link').val();
+                var e = document.getElementById("rsg-link");
+                e.select(); // 选择对象
+                document.execCommand("Copy"); // 执行浏览器复制命令
+            })
+
         });
 
     </script>

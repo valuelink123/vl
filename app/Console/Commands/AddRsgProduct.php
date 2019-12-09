@@ -54,7 +54,7 @@ class AddRsgProduct extends Command
 				group by asin,site 
 			) as t2 
 		SET t1.post_status = t2.post_status,t1.post_type = t2.post_type WHERE t1.asin = t2.asin and t1.site = t2.site";
-		$this->queryRows($asin_sql);
+		DB::select($asin_sql);
 
 		$sql = "SELECT asin.asin as asin,asin.site as site,any_value(asin.post_status) as post_status,any_value(asin.post_type) as post_type,any_value(asin.push_date) as push_date,any_value(item_no) as sku,any_value(star_history.total_star_number) as number_of_reviews,any_value(star_history.average_score) as review_rating,any_value(skus_week_details.ranking) as position,any_value(sku_keywords.keywords) as keyword,any_value(users.id) as user_id,any_value(asin.sellersku) as sellersku   
 				from  (

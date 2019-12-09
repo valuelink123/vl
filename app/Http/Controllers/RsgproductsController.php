@@ -211,7 +211,7 @@ class RsgproductsController extends Controller
 			}
 			return json_encode($return);
 		}
-		return view('rsgproducts/task',['data'=>$data]);
+		return view('rsgproducts/task',['data'=>$data,'rsg_link'=> 'https://rsg.claimthegift.com?user=V'.Auth::user()->id ]);
 	}
 
 	/*
