@@ -660,6 +660,14 @@ function getCrmOrderType()
 	return array(0=>'Default Type',1=>'RSG Type');
 }
 
+function getTrackLogChannel(){
+    return array(0=>'Live Chat',1=>'Call',2=>'Facebook Messenger',3=>'Email');
+}
+
+function getTrackLogType(){
+    return array(0=>"NON-CTG",1=>'CTG',2=>'CRM');
+}
+
 function getStepIdToTags(){
 	return array(
 				'1'  => 'RSG Join',

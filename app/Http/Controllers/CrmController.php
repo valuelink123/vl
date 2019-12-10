@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Accounts;
 use App\User;
 use App\ConfigOption;
+use App\Category;
+use App\Models\TrackLog;
 
 class CrmController extends Controller
 {
@@ -62,9 +64,11 @@ class CrmController extends Controller
 		foreach($data as $key=>$val){
 			$action = '';
 			if(!Auth::user()->can(['crm-update'])){
-				$action = '<a class="btn btn-danger btn-xs" href="'.url('crm/show?id='.$val['id']).'" target="_blank">Show</a>';
+                $data[$key]['email'] = '<a href="'.url('crm/show?id='.$val['id']).'" target="_blank">'.$val['email'].'</a>';
 			}else{
-				$action = '<a href="'.url('crm/edit?id='.$val['id']).'" target="_blank" class="badge badge-success"> Edit </a> <a class="btn btn-danger btn-xs" href="'.url('crm/show?id='.$val['id']).'" target="_blank">Show</a>';
+                $data[$key]['email'] = '<a href="'.url('crm/show?id='.$val['id']).'" target="_blank">'.$val['email'].'</a><br/>'.'<a href="'.url('crm/edit?id='.$val['id']).'" target="_blank" class="badge badge-success"> Edit </a>';
+
+                $action = '<a href="'.url('crm/trackLogAdd?id='.$val['id']).'" target="_blank" class="badge badge-success"> Add Activity </a>';
 			}
 			if($val['amazon_profile_page']){
 				$amazonPage = str_replace("http://","",$val['amazon_profile_page']);
@@ -478,9 +482,41 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 			//与联系人的邮箱联系内容
 			$emails = DB::table('sendbox')->whereIn('to_address', $emails)->orderBy('date', 'desc')->get();
             $emails = json_decode(json_encode($emails), true); // todo
+
+            $track_log_array = TrackLog::where('record_id',$id)->where('type',2)->orderBy('created_at','desc')->get()->toArray();
+            $subject_type =  $this->getSubjectType();
+
 		}
-		return view('crm/show',['orderArr'=>$orderArr, 'contactInfo'=> $contactInfo, 'emails' => $emails,'users'=>$users]);
+		return view('crm/show',['orderArr'=>$orderArr, 'contactInfo'=> $contactInfo, 'emails' => $emails,'users'=>$users,'track_log_array'=>$track_log_array,'subject_type'=>$subject_type, 'record_id'=>$id]);
 	}
+
+    public function getTrackLog(){
+
+        $record_id = $_POST['record_id'];
+        $sql = 'select id,channel,email,subject_type,note,created_at from track_log where record_id='.$record_id.' and type=2 order by created_at desc';
+        $data = DB::select($sql);
+        $data = array_map('get_object_vars', $data);
+        $subject_type =  $this->getSubjectType();
+
+        foreach($data as $key=>$val) {
+            $data[$key]['channel'] = array_get(getTrackLogChannel(),array_get($val,'channel'));
+            $data[$key]['subject_type'] = array_get($subject_type,array_get($val,'subject_type'));
+
+              $note_complete = array_get($val,'note');
+            //删除<br>, <br/>
+            $note_simple=preg_replace('/<br[\/]?>/','',$note_complete);
+            //<p></p>后面加一个换行符<br/>
+            $note_simple = str_replace('</p>','</p><br/>',$note_simple);
+            //去掉除<br/>之外的所有html标签，保留标签之内的文字
+            $note_simple = preg_replace('/<(?!br\s*\/?)[^>]+>/','',$note_simple);
+
+            $data[$key]['note'] = '<div class="text" style="text-align:left">'.$note_simple.'</div><a href="javascript:see_more('.$val['id'].');" class="pull-right" number="'.$val['id'].'">See More</a><div style="text-align:left; display:none">'.$note_complete.'</div>';
+
+        }
+
+        return compact(['data']);
+
+    }
 
 	/*
 	 * 导入excel表格数据到CRM模块
@@ -663,6 +699,45 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 		return [true, $user->name];
 	}
 
+    public function trackLogAdd(Request $req){
+        if(!Auth::user()->can(['crm-update'])) die('Permission denied -- crm-add');
 
+        $record_id = $req->input('id');
+        $subject_type =  $this->getSubjectType();
+        $users = $this->getUsers();
 
+        $emails = DB::select('select email from client_info where client_id='.$record_id.' order by email desc');
+        $emails = array_map('get_object_vars', $emails);
+        $email = '';
+        if(count($emails) > 0){
+            $email = $emails[0]['email'];
+        }
+
+        return view('crm/trackLogAdd', compact(['record_id', 'subject_type','users', 'email']));
+    }
+
+    public function getSubjectType(){
+        return Category::where('category_pid',28)->orderBy('created_at','desc')->pluck('category_name','id');
+    }
+
+    public function trackLogStore(Request $request)
+    {
+        if(!Auth::user()->can(['crm-update'])) die('Permission denied -- templates-create');
+        $this->validate($request, [
+            'email' => 'required|email',
+            'note' => 'required|string',
+        ]);
+
+        $data = array('type'=>2,'record_id'=>$request->get('record_id'),'channel'=>$request->get('channel'),'email'=>$request->get('email'),'subject_type'=>$request->get('subject_type'),'note'=>$request->get('note'));
+
+        $track_log = new TrackLog();
+        $track_log->add($data);
+
+        return redirect('crm');
+
+    }
+
+    public function getUsers(){
+        return User::pluck('name','id');
+    }
 }

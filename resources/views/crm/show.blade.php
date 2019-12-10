@@ -59,7 +59,11 @@
                         <div class="table-container">
                             @include('nonctg.emailList')
                         </div>
+                        <div class="table-container">
+                            @include('crm.trackLogList')
+                        </div>
                     </div>
+
                 </div>
 
             </div>

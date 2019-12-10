@@ -145,6 +145,9 @@ Route::match(['post','get'],'/crm/create', 'CrmController@create');
 Route::Post('/crm/import', 'CrmController@import');
 Route::get('/crm/download', 'CrmController@download');
 Route::match(['post','get'],'/crm/batchAssignTask', 'CrmController@batchAssignTask');
+Route::get('/crm/trackLogAdd','CrmController@trackLogAdd')->name('trackLogAdd');
+Route::post('/crm/trackLogStore','CrmController@trackLogStore')->name('trackLogStore');
+Route::post('/crm/getTrackLog','CrmController@getTrackLog')->name('getTrackLog');
 
 Route::resource('task', 'TaskController');
 Route::Post('/task/get', 'TaskController@get')->name('getTask');
