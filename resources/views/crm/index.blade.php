@@ -45,6 +45,15 @@
             </div>
             @endpermission
 
+            @permission('ctg-add')
+            <div class="btn-group">
+                <a data-target="#ajax" data-toggle="modal" href="{{ url('ctg/create')}}">
+                    <button id="ctg-add" class="btn sbold blue"> Create New SG
+                    </button>
+                </a>
+            </div>
+            @endpermission
+
             <div class="btn-group " style="float:right;">
                 <form action="{{url('/crm/import')}}" method="post" enctype="multipart/form-data">
                     <div class="col-md-12">
@@ -219,6 +228,17 @@
                 </script>
                 @endpermission
                 <input id="search_str" type="hidden" name="search_str" value="">
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade bs-modal-lg" id="ajax" role="basic" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content" >
+                <div class="modal-body" >
+                    <img src="../assets/global/img/loading-spinner-grey.gif" alt="" class="loading">
+                    <span>Loading... </span>
+                </div>
             </div>
         </div>
     </div>

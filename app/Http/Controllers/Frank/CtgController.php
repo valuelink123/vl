@@ -566,6 +566,8 @@ class CtgController extends Controller {
 		$data['note'] = isset($_REQUEST['note']) ? $_REQUEST['note'] : '';
 		$channel= isset($_REQUEST['channel']) ? $_REQUEST['channel'] : '';
 		$data['order_id'] = isset($_REQUEST['order_id']) ? $_REQUEST['order_id'] : '';
+		$data['processor'] = Auth::user()->id;
+
 		$res = 0;
 		$msg = '';
 		try{

@@ -1,5 +1,5 @@
 @extends('layouts.layout')
-@section('label', 'Crm Add')
+@section('label', 'Create A New User')
 @section('content')
     <style>
         .mt-repeater-add-son{
@@ -33,7 +33,7 @@
                     <div class="portlet-title">
                         <div class="caption">
                             <i class="icon-microphone font-green"></i>
-                            <span class="caption-subject bold font-green">Crm Add</span>
+                            <span class="caption-subject bold font-green">Create A New User</span>
                         </div>
                     </div>
                     <div class="portlet-body">

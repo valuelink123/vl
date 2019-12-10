@@ -131,7 +131,8 @@ th,td,td>span {
 					@endpermission
                     @permission('ctg-add')
                     <div class="btn-group" style="float:right;margin-top:10px;">
-                        <a href="{{ url('ctg/create')}}"><button id="ctg-add" class="btn sbold blue"> Add New
+                        <a data-target="#ajax" data-toggle="modal" href="{{ url('ctg/create')}}">
+                            <button id="ctg-add" class="btn sbold blue"> Add New
                                 <i class="fa fa-plus"></i>
                             </button>
                         </a>
@@ -203,6 +204,16 @@ th,td,td>span {
         </div>
     </div>
     <input type="hidden" id="email" value="{!! $email !!}">
+    <div class="modal fade bs-modal-lg" id="ajax" role="basic" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content" >
+                <div class="modal-body" >
+                    <img src="../assets/global/img/loading-spinner-grey.gif" alt="" class="loading">
+                    <span>Loading... </span>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script>
 
@@ -423,7 +434,7 @@ th,td,td>span {
             var email = ctgRows.join(';');
             window.open('/send/create?to_address='+email,'_blank');
         })
-
+        
     </script>
 
 @endsection
