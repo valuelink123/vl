@@ -154,3 +154,16 @@ td.details-control.disabled {
     display: block;
     right: 20px;
 }
+
+.orange{
+    color:#FF6400;
+}
+.light-green{
+    color:#259DA8;
+}
+.green{
+    color:#008000;
+}
+.red{
+    color:#FF0000;
+}
