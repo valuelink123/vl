@@ -115,12 +115,11 @@ class RsgrequestsController extends Controller
 		if(isset($search['keyword']) && $search['keyword']){
 			$keyword = $search['keyword'];
 			$datas = $datas->where(function($query)use($keyword){
-				$query->where('amazon_order_id','like','%'.$keyword.'%')
+				$query->where('facebook_name','like','%'.$keyword.'%')
 					->orWhere('customer_email', 'like', '%'.$keyword.'%')
 					->orWhere('customer_paypal_email', 'like', '%'.$keyword.'%')
 					->orWhere('rsg_products.asin', 'like', '%'.$keyword.'%');
 			});
-
 		}
 
 		//求符合条件的状态统计数目，需查出所有符合条件的数据，然后进行累计统计
@@ -363,10 +362,10 @@ class RsgrequestsController extends Controller
 			//凌晨到七点半之间要显示的是昨天的数据
 			$date = date('Y-m-d',strtotime($date)-86400);
 		}
-
-		$_products = RsgProduct::where('created_at','=',$date)->orderBy('order_status','desc')->get()->toArray();
+		$_products = DB::select("select * from `rsg_products` where `created_at` = '".$date."' and `sales_target_reviews` > `requested_review` order by `order_status` desc");
 		$products = array();
 		foreach($_products as $key=>$val){
+			$val = (array)$val;
 			$products[$val['site']][$key] = $val;
 			$products[$val['site']][$key]['product_name'] = $val['asin'].'——'.$val['product_name'];
 		}

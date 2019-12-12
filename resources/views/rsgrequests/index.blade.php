@@ -20,15 +20,25 @@
 			font-family:Arial, Helvetica, sans-serif;
 		}
 		.status-statis .status-one{
-			width:225px;
+			width:175px;
 			margin-top:10px;
 			margin-bottom: 10px;
 			cursor:pointer;
 		}
 		.status-statis .status-show{
-			width:100px;
+			width:65px;
 			margin-top:10px;
 			margin-bottom: 10px;
+		}
+		.status-one .active{
+			background-color: #7D8CA1;
+			/*margin-right: 20px;*/
+			border: 1px solid #C8D2E0;
+			padding-right:5px;
+			padding-left: 5px;
+			border-radius: 4px !important;
+			color: #DDF8F9;
+			width:98%;
 		}
 		#thetabletoolbar{
 			margin-top: 80px;
@@ -42,31 +52,32 @@
 				<div class="portlet-title">
 					{{--新添加的状态统计数据--}}
 					<form id="search-form">
+						<input type="hidden" id="search-type" value="0">
 						<input type="hidden" id="search-status" name="status" value="">
 						<div class="caption status-statis font-dark col-md-12">
 							<div class="static-pending">
 								<div class="col-md-12">
 									<div class="status-show pull-left">Pending </div>
-									<div class="status-one pull-left" data-status="-1">All Pending (<span class="all-pending-data">12</span>)</div>
-									<div class="status-one pull-left orange" data-status="3">Submit PayPal (<span class="submit-paypal-data">0</span>)</div>
-									<div class="status-one pull-left light-green" data-status="4">Waiting Payment (<span class="waiting-payment-data">5</span>)</div>
-									<div class="status-one pull-left orange" data-status="5">Submit Order ID (<span class="submit-order-id-data">1</span>)</div>
-									<div class="status-one pull-left light-green" data-status="6">Check Order ID (<span class="check-order-id-data">3</span>)</div>
-									<div class="status-one pull-left orange" data-status="7">Submit Review ID (<span class="submit-review-id-data">0</span>)</div>
-									<div class="status-one pull-left light-green" data-status="8">Check Review ID (<span class="check-review-id-data">3</span>)</div>
+									<div class="status-one pull-left" data-status="-1"><div class="status-content">All Pending (<span class="all-pending-data">12</span>)</div></div>
+									<div class="status-one pull-left orange" data-status="3"><div class="status-content">Submit PayPal (<span class="submit-paypal-data">0</span>)</div></div>
+									<div class="status-one pull-left light-green" data-status="4"><div class="status-content">Waiting Payment (<span class="waiting-payment-data">5</span>)</div></div>
+									<div class="status-one pull-left orange" data-status="5"><div class="status-content">Submit Order ID (<span class="submit-order-id-data">1</span>)</div></div>
+									<div class="status-one pull-left light-green" data-status="6"><div class="status-content">Check Order ID (<span class="check-order-id-data">3</span>)</div></div>
+									<div class="status-one pull-left orange" data-status="7"><div class="status-content">Submit Review ID (<span class="submit-review-id-data">0</span>)</div></div>
+									<div class="status-one pull-left light-green" data-status="8"><div class="status-content">Check Review ID (<span class="check-review-id-data">3</span>)</div></div>
 								</div>
 							</div>
 
 							<div class="static-status">
 								<div class="col-md-12">
 									<div class="status-show pull-left ">Status </div>
-									<div class="status-one pull-left" data-status="0">All Requests (<span class="all-requests-data">24</span>)</div>
-									<div class="status-one pull-left green" data-status="9">Completed (<span class="completed-data">5</span>)</div>
-									<div class="status-one pull-left green" data-status="10">Closed (<span class="closed-data">5</span>)</div>
-									<div class="status-one pull-left red" data-status="11">Charge Back (<span class="charge-back-data">2</span>)</div>
-									<div class="status-one pull-left green" data-status="1">Check customer (<span class="check-customer-data">5</span>)</div>
-									<div class="status-one pull-left green" data-status="2">Reject (<span class="reject-data">5</span>)</div>
-									<div class="status-one pull-left green" data-status="-1">Pending (<span class="all-pending-data">12</span>)</div>
+									<div class="status-one pull-left" data-status="0"><div class="status-content default active">All Requests (<span class="all-requests-data">24</span>)</div></div>
+									<div class="status-one pull-left " data-status="9"><div class="status-content">Completed (<span class="completed-data">5</span>)</div></div>
+									<div class="status-one pull-left " data-status="10"><div class="status-content">Closed (<span class="closed-data">5</span>)</div></div>
+									<div class="status-one pull-left " data-status="11"><div class="status-content">Charge Back (<span class="charge-back-data">2</span>)</div></div>
+									<div class="status-one pull-left " data-status="1"><div class="status-content">Check customer (<span class="check-customer-data">5</span>)</div></div>
+									<div class="status-one pull-left " data-status="2"><div class="status-content">Reject (<span class="reject-data">5</span>)</div></div>
+									<div class="status-one pull-left " data-status="-1"><div class="status-content">Pending (<span class="all-pending-data">12</span>)</div></div>
 								</div>
 							</div>
 						</div>
@@ -78,7 +89,9 @@
 										<span class="input-group-addon">Date_from</span>
 										<input  class="form-control" data-options="format:'yyyy-mm-dd'" value="{{$submit_date_from}}" id="date_from" name="submit_date_from"/>
 									</div>
-									<br>
+								</div>
+
+								<div class="col-md-2">
 									<div class="input-group">
 										<span class="input-group-addon">Date_to</span>
 										<input  class="form-control" data-options="format:'yyyy-mm-dd'" value="{{$submit_date_to}}" id="date_to" name="submit_date_to"/>
@@ -95,7 +108,8 @@
 											@endforeach
 										</select>
 									</div>
-									<br>
+								</div>
+								<div class="col-md-2">
 									<div class="input-group">
 										<span class="input-group-addon">FacebookGroup</span>
 										<input id="facebook_group" type="text" class="form-control form-filter input-sm" name="facebook_group" list="list-facebook_group" placeholder="Facebook Group"/>
@@ -117,16 +131,22 @@
 										</select>
 									</div>
 									<br>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-4">
 									<div class="input-group">
 										<span class="input-group-addon">Keywords</span>
-										<input name="keyword" type="text" value="{{$email}}" class="form-control form-filter input-sm" placeholder="支持ID、邮箱、PayPal、ASIN搜索">
+										<input name="keyword" type="text" value="{{$email}}" class="form-control form-filter input-sm" placeholder="Search by Email、PayPal、Name、Asin">
 									</div>
 								</div>
 
-								<div class="btn-group">
+								<div class="btn-group pull-left">
 									<button id="search" class="btn sbold blue">Search</button>
 								</div>
-
+								<div class="btn-group pull-left" style="margin-left:20px;">
+									<button id="clear-search" class="btn sbold blue">Clear All Search Conditions</button>
+								</div>
 							</div>
 						</div>
 					</form>
@@ -212,8 +232,6 @@
 								<tbody> </tbody>
 							</table>
 						</div>
-
-
 					</div>
 				</div>
 			</div>
@@ -293,23 +311,26 @@
                 ajax: {
                     type: 'POST',
                     url: "{{ url('rsgrequests/get')}}",
-                    data:  {search: $("#search-form").serialize()},
+                    data:  {search: decodeURIComponent($("#search-form").serialize(),true)},
                     "dataSrc": function (json) {
+						var search_type = $('#search-type').val();
+						if(search_type == 0){
+                            var staticStatus = json.staticStatus;
+                            $('.all-pending-data').text(staticStatus.all_pending);
+                            $('.submit-paypal-data').text(staticStatus.submit_paypal);
+                            $('.waiting-payment-data').text(staticStatus.waiting_payment);
+                            $('.submit-order-id-data').text(staticStatus.submit_order_id);
+                            $('.check-order-id-data').text(staticStatus.check_order_id);
+                            $('.submit-review-id-data').text(staticStatus.submit_review_id);
+                            $('.check-review-id-data').text(staticStatus.check_review_id);
+                            $('.all-requests-data').text(staticStatus.all_requests);
+                            $('.completed-data').text(staticStatus.completed);
+                            $('.closed-data').text(staticStatus.closed);
+                            $('.charge-back-data').text(staticStatus.charge_back);
+                            $('.check-customer-data').text(staticStatus.check_customer);
+                            $('.reject-data').text(staticStatus.reject);
+						}
 
-                        var staticStatus = json.staticStatus;
-						$('.all-pending-data').text(staticStatus.all_pending);
-						$('.submit-paypal-data').text(staticStatus.submit_paypal);
-						$('.waiting-payment-data').text(staticStatus.waiting_payment);
-						$('.submit-order-id-data').text(staticStatus.submit_order_id);
-						$('.check-order-id-data').text(staticStatus.check_order_id);
-						$('.submit-review-id-data').text(staticStatus.submit_review_id);
-						$('.check-review-id-data').text(staticStatus.check_review_id);
-						$('.all-requests-data').text(staticStatus.all_requests);
-						$('.completed-data').text(staticStatus.completed);
-						$('.closed-data').text(staticStatus.closed);
-						$('.charge-back-data').text(staticStatus.charge_back);
-						$('.check-customer-data').text(staticStatus.check_customer);
-						$('.reject-data').text(staticStatus.reject);
                         return json.data;
                     },
                 }
@@ -375,20 +396,58 @@
             }
         });
 
+        //点击提交按钮重新绘制表格，并将输入框中的值赋予检索框
+        $('#search').click(function () {
+            $('#search-type').val(0);
+            $('.status-one').find('.active').removeClass('active');
+			$('.static-status .status-one .default').addClass('active');
+            $('#search-status').val(0);
+            dtApi.settings()[0].ajax.data = {search: decodeURIComponent($("#search-form").serialize(),true)};
+            dtApi.ajax.reload();
+            return false;
+        });
+
 		//点击状态统计切换列表数据（只展示该状态下的数据）
         $('.status-one').click(function(){
 			var search_status = $(this).attr('data-status');
 			$('#search-status').val(search_status);
-            dtApi.settings()[0].ajax.data = {search: $("#search-form").serialize()};
-            dtApi.ajax.reload();
-            return false;
-		})
+            $('.status-one').find('.status-content').removeClass('active');
+			$(this).find('.status-content').addClass('active');
+			if(search_status!=0){
+                $('#search-type').val(1);//search-type默认为0，为0的时候更新状态统计数目，为1的时候不刷新状态统计数目
+			}else{
+                $('#search-type').val(0);
+			}
 
-        //点击提交按钮重新绘制表格，并将输入框中的值赋予检索框
-        $('#search').click(function () {
-            dtApi.settings()[0].ajax.data = {search: $("#search-form").serialize()};
+            dtApi.settings()[0].ajax.data = {search: decodeURIComponent($("#search-form").serialize(),true)};
             dtApi.ajax.reload();
             return false;
+		});
+
+        //点击清除搜索内容按钮清除搜索框的内容 ，起止时间范围除外
+		$('#clear-search').click(function(){
+			$('#channel').val('-1');
+			$('#facebook_group').val('');
+			$('select[name="processor"]').val('');
+            $('input[name="keyword"]').val('');
+            $("#search").trigger("click");
+		});
+
+		//起止时间范围和下拉框改变值的时候，自动更新数据
+        $('#date_from').change(function(){
+            $("#search").trigger("click");
+		});
+        $('#date_to').change(function(){
+            $("#search").trigger("click");
+        });
+        $('#channel').change(function(){
+            $("#search").trigger("click");
+        });
+        $('#facebook_group').change(function(){
+            $("#search").trigger("click");
+        });
+        $('select[name="processor"]').change(function(){
+            $("#search").trigger("click");
         });
 
         //下载数据
