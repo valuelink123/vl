@@ -292,13 +292,7 @@ a.editable-click:hover {
 							<button type="submit" class="btn blue" id="data_search">Search</button>
 						</div>	
 
-						<div class="form-group col-md-12">
-							
-							
-							<button type="submit" class="btn blue" id="data_search">Search</button>
-							
-						
-                        </div>
+
 
                     </form>
 			</div>
@@ -465,15 +459,18 @@ $(function() {
 	var chat_data = [];
 	var messager_data = [];
 	var call_data = [];
+	var sg_data = [];
+	var rsg_data = [];
 	<?php 
 	foreach($details as $k=>$v) {?>
 	date_data.push('<?php echo $k?>');
-	comm_data.push('<?php echo intval(array_get($v,'0')+array_get($v,'1')+array_get($v,'2')+array_get($v,'3'))?>');
-	email_data.push('<?php echo intval(array_get($v,'0'))?>');
-	chat_data.push('<?php echo intval(array_get($v,'1'))?>');
+	comm_data.push('<?php echo intval(array_get($v,'0',0)+array_get($v,'1',0)+array_get($v,'2',0)+array_get($v,'3',0)+array_get($v,'sg',0)+array_get($v,'rsg',0))?>');
+	email_data.push('<?php echo intval(array_get($v,'3'))?>');
+	chat_data.push('<?php echo intval(array_get($v,'0'))?>');
 	messager_data.push('<?php echo intval(array_get($v,'2'))?>');
-	call_data.push('<?php echo intval(array_get($v,'3'))?>');
-	
+	call_data.push('<?php echo intval(array_get($v,'1'))?>');
+	sg_data.push('<?php echo intval(array_get($v,'sg'))?>');
+	rsg_data.push('<?php echo intval(array_get($v,'rsg'))?>');
 	<?php }?>
 	lineoption = {
 		title : {
@@ -484,7 +481,22 @@ $(function() {
 			trigger: 'axis'
 		},
 		legend: {
-			data:['Score','Email','Chat','Messager','Call']
+			x: 'right',
+			itemWidth:10,
+			itemHeight:10,
+			data:['Score','Email','Chat','Messager','Call','Sg','Rsg'],
+			selected: {
+				'Score': true,
+				'Email': false,
+				'Chat': false,
+				'Messager': false,
+				'Call': false,
+				'Sg': false,
+				'Rsg': false
+			},
+			inactiveColor:"#888",
+			icon:"roundRect",
+			selectedMode: 'single'
 		},
 		grid: {
 			x:40,
@@ -514,33 +526,47 @@ $(function() {
 				data:comm_data
 			},
 			{
-				name:'Score',
+				name:'Email',
 				type:'line',
 				smooth:true,
 				itemStyle: {normal: {areaStyle: {type: 'default'}}},
-				data:comm_data
+				data:email_data
 			},
 			{
-				name:'Score',
+				name:'Chat',
 				type:'line',
 				smooth:true,
 				itemStyle: {normal: {areaStyle: {type: 'default'}}},
-				data:comm_data
+				data:chat_data
 			},
 			{
-				name:'Score',
+				name:'Messager',
 				type:'line',
 				smooth:true,
 				itemStyle: {normal: {areaStyle: {type: 'default'}}},
-				data:comm_data
+				data:messager_data
 			}
 			,
 			{
-				name:'Score',
+				name:'Call',
 				type:'line',
 				smooth:true,
 				itemStyle: {normal: {areaStyle: {type: 'default'}}},
-				data:comm_data
+				data:call_data
+			},
+			{
+				name:'Sg',
+				type:'line',
+				smooth:true,
+				itemStyle: {normal: {areaStyle: {type: 'default'}}},
+				data:sg_data
+			},
+			{
+				name:'Rsg',
+				type:'line',
+				smooth:true,
+				itemStyle: {normal: {areaStyle: {type: 'default'}}},
+				data:rsg_data
 			}
 		]
 	};

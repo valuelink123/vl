@@ -143,12 +143,12 @@
                                     <ul class="nav navbar-nav">
 
                                         <li class="menu-dropdown classic-menu-dropdown ">
-                                            <a href="/home"> Home
+                                            <a href="/{{(Auth::user()->seller_rules || Auth::user()->sap_seller_id)?'home':'service'}}"> Home
                                                 <span class="arrow"></span>
                                             </a>
                                             <ul class="dropdown-menu pull-left">
 												<li class="">
-                                                    <a href="/home" class="nav-link nav-toggle ">
+                                                    <a href="/{{(Auth::user()->seller_rules || Auth::user()->sap_seller_id)?'home':'service'}}" class="nav-link nav-toggle ">
                                                         Dashboard
                                                         <span class="arrow"></span>
                                                     </a>
@@ -757,7 +757,7 @@
 					<div>
                     <ul class="page-breadcrumb" style="margin-left:20px;">
                         <li>
-                            <a href="{{url('home')}}">Home</a>
+                            <a href="{{url((Auth::user()->seller_rules || Auth::user()->sap_seller_id)?'home':'service')}}">Home</a>
                             <i class="fa fa-circle"></i>
                         </li>
                         <li>
