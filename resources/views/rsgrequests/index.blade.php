@@ -311,7 +311,7 @@
                 ajax: {
                     type: 'POST',
                     url: "{{ url('rsgrequests/get')}}",
-                    data:  {search: decodeURIComponent($("#search-form").serialize(),true)},
+                    data:  {search: decodeURIComponent($("#search-form").serialize().replace(/\+/g," "),true)},
                     "dataSrc": function (json) {
 						var search_type = $('#search-type').val();
 						if(search_type == 0){
@@ -402,7 +402,7 @@
             $('.status-one').find('.active').removeClass('active');
 			$('.static-status .status-one .default').addClass('active');
             $('#search-status').val(0);
-            dtApi.settings()[0].ajax.data = {search: decodeURIComponent($("#search-form").serialize(),true)};
+            dtApi.settings()[0].ajax.data = {search: decodeURIComponent($("#search-form").serialize().replace(/\+/g," "),true)};
             dtApi.ajax.reload();
             return false;
         });
@@ -419,7 +419,7 @@
                 $('#search-type').val(0);
 			}
 
-            dtApi.settings()[0].ajax.data = {search: decodeURIComponent($("#search-form").serialize(),true)};
+            dtApi.settings()[0].ajax.data = {search: decodeURIComponent($("#search-form").serialize().replace(/\+/g," "),true)};
             dtApi.ajax.reload();
             return false;
 		});
