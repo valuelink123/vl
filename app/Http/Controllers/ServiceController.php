@@ -44,7 +44,7 @@ class ServiceController extends Controller
 		if(array_get($_REQUEST,'user_id') && array_key_exists(array_get($_REQUEST,'user_id'),$users)){
 			$user_id = intval(array_get($_REQUEST,'user_id'));
 		}
-		$user_id=77;
+		//$user_id=77;
 		$details = $dash = [];
 		$total_score = 0;
 		$channel_score = ['0'=>2,'1'=>3,'2'=>3,'3'=>1,'sg'=>5,'rsg'=>20];
