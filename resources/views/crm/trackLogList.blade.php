@@ -9,6 +9,7 @@
         <th>Note</th>
         {{--<th>Processor</th>--}}
         <th>Created At</th>
+        <th>Processor</th>
     </tr>
     </thead>
     <tbody></tbody>
@@ -46,7 +47,9 @@
                 {data: 'email', name: 'email'},
                 {data: 'subject_type', name: 'subject_type'},
                 {data: 'note', name: 'note'},
-                {data: 'created_at', name: 'created_at'}
+                {data: 'created_at', name: 'created_at'},
+                {data: 'processor', name: 'processor'}
+
             ],
             columnDefs: [
                 //给第5列指定宽度

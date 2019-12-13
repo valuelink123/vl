@@ -493,7 +493,7 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
     public function getTrackLog(){
 
         $record_id = $_POST['record_id'];
-        $sql = 'select id,channel,email,subject_type,note,created_at from track_log where record_id='.$record_id.' and type=2 order by created_at desc';
+        $sql = 'select id,channel,email,subject_type,note,created_at,processor from track_log where record_id='.$record_id.' and type=2 order by created_at desc';
         $data = DB::select($sql);
         $data = array_map('get_object_vars', $data);
         $subject_type =  $this->getSubjectType();
@@ -501,8 +501,9 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
         foreach($data as $key=>$val) {
             $data[$key]['channel'] = array_get(getTrackLogChannel(),array_get($val,'channel'));
             $data[$key]['subject_type'] = array_get($subject_type,array_get($val,'subject_type'));
+            $data[$key]['processor'] = array_get($this->getUsers(),array_get($val,'processor'));
 
-              $note_complete = array_get($val,'note');
+            $note_complete = array_get($val,'note');
             //删除<br>, <br/>
             $note_simple=preg_replace('/<br[\/]?>/','',$note_complete);
             //<p></p>后面加一个换行符<br/>
