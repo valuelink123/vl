@@ -112,6 +112,9 @@ class RsgrequestsController extends Controller
 		if(isset($search['processor']) && $search['processor']){
 			$datas = $datas->where('processor', $search['processor']);
 		}
+		if(isset($search['site']) && $search['site']){
+			$datas = $datas->where('rsg_products.site','like', '%'.$search['site'].'%');
+		}
 		if(isset($search['keyword']) && $search['keyword']){
 			$keyword = $search['keyword'];
 			$datas = $datas->where(function($query)use($keyword){
