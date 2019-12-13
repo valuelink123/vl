@@ -132,6 +132,19 @@
 									</div>
 									<br>
 								</div>
+
+								<div class="col-md-2">
+									<div class="input-group">
+										<span class="input-group-addon">Site</span>
+										<select name="site" id="site" class="form-control form-filter input-sm">
+											<option value="">Site</option>
+											@foreach (getAsinSites() as $v)
+												<option value="{{$v}}">{{$v}}</option>
+											@endforeach
+										</select>
+									</div>
+									<br>
+								</div>
 							</div>
 							<div class="row">
 								<div class="col-md-4">
@@ -447,6 +460,9 @@
             $("#search").trigger("click");
         });
         $('select[name="processor"]').change(function(){
+            $("#search").trigger("click");
+        });
+        $('#site').change(function(){
             $("#search").trigger("click");
         });
 
