@@ -143,12 +143,12 @@
                                     <ul class="nav navbar-nav">
 
                                         <li class="menu-dropdown classic-menu-dropdown ">
-                                            <a href="/home"> Home
+                                            <a href="/{{(Auth::user()->seller_rules || Auth::user()->sap_seller_id)?'home':'service'}}"> Home
                                                 <span class="arrow"></span>
                                             </a>
                                             <ul class="dropdown-menu pull-left">
 												<li class="">
-                                                    <a href="/home" class="nav-link nav-toggle ">
+                                                    <a href="/{{(Auth::user()->seller_rules || Auth::user()->sap_seller_id)?'home':'service'}}" class="nav-link nav-toggle ">
                                                         Dashboard
                                                         <span class="arrow"></span>
                                                     </a>
@@ -729,35 +729,35 @@
                 <div class="page-bar">
 
 					{{--轮播图--}}
-					<div class="slider" id="slider">
-						<div class="slider-inner">
-							<div class="item">
-								<img class="img" style="background: url('/image/slide_1.jpg');">
-							</div>
-							<div class="item">
-								<img class="img" style="background: url('/image/slide_2.jpg');">
-							</div>
-						</div>
-					</div>
-
-					{{--倒计时开始--}}
-					{{--<div class="mod-holiday—countdown">--}}
-						{{--<div class="holiday—countdown text-center">--}}
-							{{--<div style=" width:5%;border: 1px solid #D9EDF7;"></div>--}}
-							{{--@foreach(Session::get('countDown') as $key=>$val)--}}
-								{{--@if($val['day']>0)--}}
-								{{--<div class="col-md-4">距离<span class="holiday">{!! $val['name'] !!}</span>还有<span class="day">{!! $val['day'] !!}</span>天</div>--}}
-								{{--@endif--}}
-							{{--@endforeach--}}
-							{{--<div style=" width:5%;border: 1px solid #D9EDF7;"></div>--}}
-							{{--<div style="clear:both;"></div>--}}
+					{{--<div class="slider" id="slider">--}}
+						{{--<div class="slider-inner">--}}
+							{{--<div class="item">--}}
+								{{--<img class="img" style="background: url('/image/slide_1.jpg');">--}}
+							{{--</div>--}}
+							{{--<div class="item">--}}
+								{{--<img class="img" style="background: url('/image/slide_2.jpg');">--}}
+							{{--</div>--}}
 						{{--</div>--}}
 					{{--</div>--}}
+
+					{{--倒计时开始--}}
+					<div class="mod-holiday—countdown">
+						<div class="holiday—countdown text-center">
+							<div style=" width:5%;border: 1px solid #D9EDF7;"></div>
+							@foreach(Session::get('countDown') as $key=>$val)
+								@if($val['day']>0)
+								<div class="col-md-4">距离<span class="holiday">{!! $val['name'] !!}</span>还有<span class="day">{!! $val['day'] !!}</span>天</div>
+								@endif
+							@endforeach
+							<div style=" width:5%;border: 1px solid #D9EDF7;"></div>
+							<div style="clear:both;"></div>
+						</div>
+					</div>
 					{{--倒计时结束--}}
 					<div>
                     <ul class="page-breadcrumb" style="margin-left:20px;">
                         <li>
-                            <a href="{{url('home')}}">Home</a>
+                            <a href="{{url((Auth::user()->seller_rules || Auth::user()->sap_seller_id)?'home':'service')}}">Home</a>
                             <i class="fa fa-circle"></i>
                         </li>
                         <li>

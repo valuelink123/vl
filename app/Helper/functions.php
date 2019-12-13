@@ -1,5 +1,6 @@
 <?php
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 function getAccountTypes(){
     return array(
         'Amazon','Site'
@@ -17,6 +18,19 @@ function getAccountLevel(){
 }
 function getSellerAccount(){
 	return DB::connection('order')->table("accounts")->where('status',1)->groupby(['sellerid','sellername'])->pluck('sellername','sellerid');
+}
+function getUserGroupDetails(){
+	$groups = json_decode(json_encode(DB::table('group_detail')->leftJoin('group',
+					function($q){
+						$q->on('group_detail.group_id', '=', 'group.id');
+					}
+				)->where('user_id',Auth::user()->id)->where('leader',1)->pluck('group_name','group_id')),true);
+	$users = json_decode(json_encode(DB::table('group_detail')->leftJoin('users',
+					function($q){
+						$q->on('group_detail.user_id', '=', 'users.id');
+					}
+				)->whereIn('group_id',array_keys($groups))->where('locked',0)->pluck('users.name','users.id')),true);
+	return ['groups'=>$groups,'users'=>$users];
 }
 function getAsinSites(){
     return array(

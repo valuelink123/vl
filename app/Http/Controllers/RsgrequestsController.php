@@ -42,64 +42,38 @@ class RsgrequestsController extends Controller
      */
     public function index()
     {
-
 		if(!Auth::user()->can(['rsgrequests-show'])) die('Permission denied -- rsgrequests-show');
 		$email = isset($_REQUEST['email']) ? $_REQUEST['email'] : '';
-		$date_from=date('Y-m-d',strtotime('-180 days'));		
-		$date_to=date('Y-m-d');
 
-		$submit_date_from=date('Y-m-d',strtotime('-180 days'));
+		$submit_date_from=date('Y-m-d',strtotime('-90 days'));
 		$submit_date_to=date('Y-m-d');
 
-		return view('rsgrequests/index',['date_from'=>$date_from ,'date_to'=>$date_to ,'submit_date_from'=>$submit_date_from ,'submit_date_to'=>$submit_date_to,'users'=>$this->getUsers(),'email'=>$email]);
+		return view('rsgrequests/index',['submit_date_from'=>$submit_date_from ,'submit_date_to'=>$submit_date_to,'users'=>$this->getUsers(),'email'=>$email]);
 
     }
 	
 	public function get(Request $request)
     {
 		if(!Auth::user()->can(['rsgrequests-show'])) die('Permission denied -- rsgrequests-show');
-		//$orderby = 'updated_at';
-		$order_column = $request->input('order.0.column','12');
 
+		$order_column = $request->input('order.0.column','1');
 		if($order_column == 13){
 			$orderby = 'updated_at';
-		}else if($order_column == 7){
-			$orderby = 'transfer_amount';
 		}else if($order_column == 1){
 			$orderby = 'created_at';
 		}else{
-			$orderby = 'updated_at';
+			$orderby = 'created_at';
 		}
 
         $sort = $request->input('order.0.dir','desc');
-
 		$channelKeyVal = getRsgRequestChannel();
 
-        if ($request->input("customActionType") == "group_action") {
-				
-			   if(!Auth::user()->can(['rsgrequests-batch-update'])) die('Permission denied -- rsgrequests-batch-update');
-			   $updateDate = [];
-			   $updateDate['step'] = $request->input("customstatus");
-			   RsgRequest::whereIn('id',$request->input("id"))->update($updateDate);
-			   foreach($request->input("id") as $r_id){
-				   $rule = RsgRequest::findOrFail($r_id);
-				   $step_to_tags = getStepIdToTags();
-					self::mailchimp($rule->customer_email,array_get($step_to_tags,$request->input("customstatus")),[]);
-				}
-        }
-        //更新负责人
-		if ($request->input("customActionType") == "processor_action") {
+		$search = isset($_POST['search']) ? $_POST['search'] : '';
+		$search = $this->getSearchData(explode('&',$search));
 
-			if(!Auth::user()->can(['rsgrequests-batch-update'])) die('Permission denied -- rsgrequests-batch-update');
-			$updateDate = [];
-			$updateDate['processor'] = $request->input("customstatus");
-			RsgRequest::whereIn('id',$request->input("id"))->update($updateDate);
-		}
-		$date_from=$request->input('date_from')?$request->input('date_from'):date('Y-m-d',strtotime('- 90 days'));
-        $date_to=$request->input('date_to')?$request->input('date_to'):date('Y-m-d');
-
-		$submit_date_from=$request->input('submit_date_from')?$request->input('submit_date_from'):date('Y-m-d',strtotime('- 90 days'));
-		$submit_date_to=$request->input('submit_date_to')?$request->input('submit_date_to'):date('Y-m-d');
+		//搜索时间范围
+		$submit_date_from = isset($search['submit_date_from']) && $search['submit_date_from'] ? $search['submit_date_from'] : date('Y-m-d',strtotime('- 90 days'));
+		$submit_date_to = isset($search['submit_date_to']) && $search['submit_date_to'] ? $search['submit_date_to'] : date('Y-m-d');
 
 		$datas= RsgRequest::leftJoin('rsg_products',function($q){
 				$q->on('rsg_requests.product_id', '=', 'rsg_products.id');
@@ -107,7 +81,7 @@ class RsgrequestsController extends Controller
 				$q->on('rsg_products.asin', '=', 'asin.asin')
 				  ->on('rsg_products.site', '=', 'asin.site');
 			})
-			->where('rsg_requests.updated_at','>=',$date_from.' 00:00:00')->where('rsg_requests.updated_at','<=',$date_to.' 23:59:59')->where('rsg_requests.created_at','>=',$submit_date_from.' 00:00:00')->where('rsg_requests.created_at','<=',$submit_date_to.' 23:59:59');
+			->where('rsg_requests.created_at','>=',$submit_date_from.' 00:00:00')->where('rsg_requests.created_at','<=',$submit_date_to.' 23:59:59');
 
 		if(!Auth::user()->can('rsgrequests-show-all')) {
 			if (Auth::user()->seller_rules) {
@@ -121,114 +95,101 @@ class RsgrequestsController extends Controller
 			}
 		}
 
-		if($request->input('channel')!='-1'){
-			$datas = $datas->where('channel', $request->input('channel'));
-		}
-		if($request->input('processor')){
-			$datas = $datas->where('processor', $request->input('processor'));
-		}
-		
-        if($request->input('customer_email')){
-            $datas = $datas->where('customer_email', $request->input('customer_email'));
-        }
-		if($request->input('step')){
-            $datas = $datas->where('step', $request->input('step'));
-        }
-		if($request->input('asin')){
-            $datas = $datas->where('rsg_products.asin', $request->input('asin'));
-        }
-		if($request->input('price_from')){
-            $datas = $datas->where('transfer_amount','>=', round($request->input('price_from'),2));
-        }
-		if($request->input('price_to')){
-            $datas = $datas->where('transfer_amount','<=', round($request->input('price_to'),2));
-        }
-		
-		if($request->input('customer_paypal_email')){
-            $datas = $datas->where('customer_paypal_email', $request->input('customer_paypal_email'));
-        }
-		
-		if($request->input('amazon_order_id')){
-            $datas = $datas->where('amazon_order_id', $request->input('amazon_order_id'));
-        }
-
-		if($request->input('review_url')){
-            $datas = $datas->where('review_url','like', '%'.$request->input('review_url').'%');
-        }
-
-		if($request->input('star_rating')){
-			$datas = $datas->where('star_rating', $request->input('star_rating'));
+		if(isset($search['status']) && $search['status']){
+			$statusArr = array($search['status']);
+			if($search['status'] == '-1'){
+				$statusArr = array(3,4,5,6,7,8);//-1为选择了all pending状态
+			}
+			$datas = $datas->whereIn('step', $statusArr);
 		}
 
-		// if($request->input('follow')){
-		// 	$datas = $datas->where('follow','like', '%'.$request->input('follow').'%');
-		// }
-		//
-		// if($request->input('next_follow_date')){
-		// 	$datas = $datas->where('next_follow_date','like', '%'.$request->input('next_follow_date').'%');
-		// }
-
-		if($request->input('user_id')){
-			$datas = $datas->where('rsg_products.user_id', $request->input('user_id'));
+		if(isset($search['channel']) && $search['channel'] != '-1'){
+			$datas = $datas->where('channel', $search['channel']);
+		}
+		if(isset($search['facebook_group']) && $search['facebook_group']){
+			$datas = $datas->where('facebook_group', intval($search['facebook_group']));
+		}
+		if(isset($search['processor']) && $search['processor']){
+			$datas = $datas->where('processor', $search['processor']);
+		}
+		if(isset($search['keyword']) && $search['keyword']){
+			$keyword = $search['keyword'];
+			$datas = $datas->where(function($query)use($keyword){
+				$query->where('facebook_name','like','%'.$keyword.'%')
+					->orWhere('customer_email', 'like', '%'.$keyword.'%')
+					->orWhere('customer_paypal_email', 'like', '%'.$keyword.'%')
+					->orWhere('rsg_products.asin', 'like', '%'.$keyword.'%');
+			});
 		}
 
-		if($request->input('site')){
-			$datas = $datas->where('rsg_products.site','like', '%'.$request->input('site').'%');
-		}
-		//搜索facebook_group和facebook_name
-		if($request->input('facebook_group')){
-			$datas = $datas->where('facebook_group', intval($request->input('facebook_group')));
-		}
+		//求符合条件的状态统计数目，需查出所有符合条件的数据，然后进行累计统计
+		$staticStatus = array(
+			'submit_paypal' => 0,
+			'waiting_payment' => 0,
+			'submit_order_id' => 0,
+			'check_order_id' => 0,
+			'submit_review_id' => 0,
+			'check_review_id' => 0,
+			'completed' => 0,
+			'closed' => 0,
+			'charge_back' => 0,
+			'check_customer' => 0,
+			'reject' => 0,
+			'all_pending' => 0,
+			'all_requests' => 0,
+		);
+		$config = array(
+			'submit_paypal' => array(3),
+			'waiting_payment' => array(4),
+			'submit_order_id' => array(5),
+			'check_order_id' => array(6),
+			'submit_review_id' => array(7),
+			'check_review_id' => array(8),
 
-		if($request->input('facebook_name')){
-			$datas = $datas->where('facebook_name','like', '%'.$request->input('facebook_name').'%');
-		}
+			'completed' => array(9),
+			'closed' => array(10),
+			'charge_back' => array(11),
+			'check_customer' => array(1),
+			'reject' => array(2),
 
+			'all_pending' => array(3,4,5,6,7,8),
+			'all_requests' => array(1,2,3,4,5,6,7,8,9,10,11),
+		);
 		$iTotalRecords = $datas->count();
+		$countData = $datas->get(['rsg_requests.step'])->toArray();
+		foreach($countData as $key=>$val){
+//统计各个状态的数量值
+			foreach($config as $k=>$v){
+				if(in_array($val['step'],$v)){
+					$staticStatus[$k] = $staticStatus[$k] + 1;
+				}
+			}
+		}
+
         $iDisplayLength = intval($_REQUEST['length']);
         $iDisplayLength = $iDisplayLength < 0 ? $iTotalRecords : $iDisplayLength;
         $iDisplayStart = intval($_REQUEST['start']);
-        $sEcho = intval($_REQUEST['draw']);
 		$lists =  $datas->orderBy($orderby,$sort)->offset($iDisplayStart)->limit($iDisplayLength)->get(['rsg_requests.*','rsg_products.asin','rsg_products.site','rsg_products.seller_id','rsg_products.user_id','client_info.facebook_name','client_info.facebook_group'])->toArray();
-        $records = array();
-        $records["data"] = array();
 
 		$fbgroupConfig = getFacebookGroup();
-        $end = $iDisplayStart + $iDisplayLength;
-        $end = $end > $iTotalRecords ? $iTotalRecords : $end;
-		$accounts = $this->getAccounts();
 		$users= $this->getUsers();
-		$status_arr = array(0=>'<span class="badge badge-default">Disabled</a>',1=>'<span class="badge badge-success">Enabled</span>');
-		foreach ( $lists as $list){
-            $records["data"][] = array(
-                '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input name="id[]" type="checkbox" class="checkboxes" value="'.$list['id'].'"/><span></span></label>',
-				$list['created_at'],
-				isset($channelKeyVal[$list['channel']]) ? $channelKeyVal[$list['channel']] : '',
-				$list['customer_email'],
-				'<a href="https://'.array_get($list,'site').'/dp/'.array_get($list,'asin').'?m='.array_get($list,'seller_id').'" target="_blank">'.$list['asin'].'</a>',
-				'<span class="badge badge-success">'.array_get(getStepStatus(),$list['step']).'</span>',
-				$list['customer_paypal_email'],
-                $list['transfer_amount'].' '.$list['transfer_currency'],
-				$list['amazon_order_id'],
-				'<div style="width: 200px;word-wrap: break-word;text-align: center;">'.$list['review_url'].'<BR><span class="text-danger">'.$list['transaction_id'].'</span></div>',
-				$list['star_rating'],
-				// '<div style="width: 200px;word-wrap: break-word;text-align: center;">'.$list['follow'].'</div>',
-				// $list['next_follow_date'],
-				isset($users[$list['user_id']]) ? $users[$list['user_id']] : $list['user_id'],
-				$list['site'],
-				$list['updated_at'],
-				//显示facebook_group内容
-				$list['facebook_name'],
-				isset($fbgroupConfig[$list['facebook_group']]) ? $fbgroupConfig[ $list['facebook_group']] : '',
-				array_get($users,$list['processor']),
-				'<a data-target="#ajax" data-toggle="modal" href="'.url('rsgrequests/'.$list['id'].'/edit').'" class="badge badge-success"> View </a> <a class="btn btn-danger btn-xs" href="'.url('rsgrequests/process?email='.$list['customer_email']).'" target="_blank">Process</a>'
-				
-            );
+
+		foreach ( $lists as $key=>$list){
+			$lists[$key]['channel'] = isset($channelKeyVal[$list['channel']]) ? $channelKeyVal[$list['channel']] : '';
+			$lists[$key]['asin_link'] = '<a href="https://'.array_get($list,'site').'/dp/'.array_get($list,'asin').'?m='.array_get($list,'seller_id').'" target="_blank">'.$list['asin'].'</a>';
+			$lists[$key]['step'] = '<span class="badge badge-success">'.array_get(getStepStatus(),$list['step']).'</span>';
+			$lists[$key]['funded'] = $list['transfer_amount'].' '.$list['transfer_currency'];
+			$lists[$key]['review_url'] = '<div style="width: 200px;word-wrap: break-word;text-align: center;">'.$list['review_url'].'<BR><span class="text-danger">'.$list['transaction_id'].'</span></div>';
+			$lists[$key]['sales'] = isset($users[$list['user_id']]) ? $users[$list['user_id']] : $list['user_id'];
+			$lists[$key]['group'] = isset($fbgroupConfig[$list['facebook_group']]) ? $fbgroupConfig[ $list['facebook_group']] : '';
+			$lists[$key]['processor'] = array_get($users,$list['processor']);
+			$lists[$key]['action'] = '<a data-target="#ajax" data-toggle="modal" href="'.url('rsgrequests/'.$list['id'].'/edit').'" class="badge badge-success"> View </a> <a class="btn btn-danger btn-xs" href="'.url('rsgrequests/process?email='.$list['customer_email']).'" target="_blank">Process</a>';
 		}
-        $records["draw"] = $sEcho;
-        $records["recordsTotal"] = $iTotalRecords;
-        $records["recordsFiltered"] = $iTotalRecords;
-        echo json_encode($records);
+
+        $recordsTotal = $iTotalRecords;
+        $recordsFiltered = $iTotalRecords;
+        $data = $lists;
+		return compact('data', 'recordsTotal', 'recordsFiltered','staticStatus');
     }
 
     public function getUsers(){
@@ -401,10 +362,10 @@ class RsgrequestsController extends Controller
 			//凌晨到七点半之间要显示的是昨天的数据
 			$date = date('Y-m-d',strtotime($date)-86400);
 		}
-
-		$_products = RsgProduct::where('created_at','=',$date)->orderBy('order_status','desc')->get()->toArray();
+		$_products = DB::select("select * from `rsg_products` where `created_at` = '".$date."' and `sales_target_reviews` > `requested_review` order by `order_status` desc");
 		$products = array();
 		foreach($_products as $key=>$val){
+			$val = (array)$val;
 			$products[$val['site']][$key] = $val;
 			$products[$val['site']][$key]['product_name'] = $val['asin'].'——'.$val['product_name'];
 		}
@@ -605,6 +566,36 @@ where payer='$customer_paypal_email' order by timestamp asc");
 			$writer->save('php://output');
 		}
 		die();
+	}
+
+	//更新操作
+	public function updateAction()
+	{
+		if(!Auth::user()->can(['rsgrequests-batch-update'])) die('Permission denied -- rsgrequests-batch-update');
+		$type = isset($_POST['type']) && $_POST['type'] ? $_POST['type'] : 0;
+		$res = 0;
+		$ids = array();
+		if(isset($_POST['id']) && $_POST['id']){
+			foreach($_POST['id'] as $key=>$val){
+				$ids[] = $val[0];
+			}
+		}
+
+		if(isset($_POST['data']) && $_POST['data']) {
+			if ($type == 1) {
+				//更新processor
+				$res = RsgRequest::whereIn('id', $ids)->update(array('processor' => $_POST['data']));
+			} elseif ($type == 2) {
+				//更新状态
+				$res = RsgRequest::whereIn('id', $ids)->update(array('step' => $_POST['data']));
+				foreach ($ids as $r_id) {
+					$rule = RsgRequest::findOrFail($r_id);
+					$step_to_tags = getStepIdToTags();
+					self::mailchimp($rule->customer_email, array_get($step_to_tags, $_POST['data']), []);
+				}
+			}
+		}
+		echo $res;
 	}
 
 

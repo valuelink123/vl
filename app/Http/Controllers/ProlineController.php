@@ -32,7 +32,7 @@ class ProlineController extends Controller
      */
     public function index()
     {	
-		if((Auth::user()->id)!=46) die('Permission denied -- proline-show');
+
 		if(!Auth::user()->can(['proline-show'])) die('Permission denied -- proline-show');
 		$teams= DB::select('select bg,bu from asin group by bg,bu ORDER BY BG ASC,BU ASC');
         return view('proline/index',['teams'=>$teams,'users'=>$this->getUsers()]);

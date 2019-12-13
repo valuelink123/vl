@@ -45,6 +45,11 @@ class LoginController extends Controller
             array_merge($this->credentials($request),['locked'=>0]), $request->filled('remember')
         );
     }
+	
+	public function authenticated(Request $request, $user){    
+		return ($user->seller_rules || $user->sap_seller_id)?redirect('home'):redirect('service');
+	}
+	
 	public function redirectTo(){
 		if(array_get($_REQUEST,'redirect_url')){
 			return array_get($_REQUEST,'redirect_url');
