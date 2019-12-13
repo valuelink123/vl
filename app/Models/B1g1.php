@@ -69,7 +69,7 @@ class B1g1 extends Model {
 
             $row['processor'] = isset($row['processor']) ? $row['processor'] : 0;
 
-            if (!empty($asinRow->sap_seller_id)) {
+            if (!empty($asinRow->sap_seller_id) && $row['processor']==0) {
 
                 $user = User::select('id')->where('sap_seller_id', $asinRow->sap_seller_id)->limit(1)->first();
 
