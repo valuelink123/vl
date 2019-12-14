@@ -233,7 +233,7 @@ class RsgproductsController extends Controller
 		}
 		$sql = "
         SELECT SQL_CALC_FOUND_ROWS
-        	rsg_products.id as id,rsg_products.asin as asin,rsg_products.site as site,rsg_products.post_status as post_status,rsg_products.post_type as post_type,rsg_products.sales_target_reviews as target_review,rsg_products.requested_review as requested_review,asin.bg as bg,asin.bu as bu,asin.item_no as item_no,asin.seller as seller,asin.id as asin_id,rsg_products.number_of_reviews as review,rsg_products.review_rating as rating, num as unfinished,rsg_products.sku_level as sku_level, rsg_products.product_img as img,rsg_products.order_status as order_status,cast(rsg_products.sales_target_reviews as signed) - cast(rsg_products.requested_review as signed) as task,(status_score*type_score*level_score*rating_score*review_score)  as score {$field} 
+        	rsg_products.id as id,rsg_products.asin as asin,rsg_products.site as site,rsg_products.seller_id as seller_id,rsg_products.post_status as post_status,rsg_products.post_type as post_type,rsg_products.sales_target_reviews as target_review,rsg_products.requested_review as requested_review,asin.bg as bg,asin.bu as bu,asin.item_no as item_no,asin.seller as seller,asin.id as asin_id,rsg_products.number_of_reviews as review,rsg_products.review_rating as rating, num as unfinished,rsg_products.sku_level as sku_level, rsg_products.product_img as img,rsg_products.order_status as order_status,cast(rsg_products.sales_target_reviews as signed) - cast(rsg_products.requested_review as signed) as task,(status_score*type_score*level_score*rating_score*review_score)  as score {$field} 
             from rsg_products  
             left join (
 				select id,
@@ -326,7 +326,7 @@ class RsgproductsController extends Controller
 			$data[$key]['basic_asin'] = $val['asin'];
 			$data[$key]['product'] = '<a target="_blank" href="https://rsg.claimthegift.com/product/detail?id='.$val['asin_id'].'"><img src="'.$val['img'].'" width="50px" height="65px"></a>';
 			$data[$key]['site'] = isset($siteShort[$val['site']]) ? $siteShort[$val['site']] : $val['site'];
-			$data[$key]['asin'] = '<a href="https://' . $val['site'] . '/dp/' . $val['asin'] . '" target="_blank" rel="noreferrer">' . $val['asin'] . '</a>';//asin插入超链接
+			$data[$key]['asin'] = '<a href="https://' . $val['site'] . '/dp/' . $val['asin'] . '?m='.$val['seller_id'].'" target="_blank" rel="noreferrer">' . $val['asin'] . '</a>';//asin插入超链接
 			$data[$key]['type'] = isset($postType[$val['post_type']]) ? $postType[$val['post_type']]['name'] : $val['post_type'];//post_type
 			$data[$key]['status'] = isset($postStatus[$val['post_status']]) ? $postStatus[$val['post_status']]['name'] : $val['post_status'];
 			$data[$key]['requested_review'] = $val['requested_review'];

@@ -103,9 +103,8 @@ class AddRsgProduct extends Command
 
 
 		//取亚马逊的产品相关数据
-		$amazon_sql = "select asin,marketplaceid,title,images,features,description,price 
-				from products 
-				group by asin,marketplaceid ";
+		$amazon_sql = "select asin,marketplaceid,title,images,features,description,price,buybox_sellerid  
+				from asins";
 		$_amazonData = DB::connection('amazon')->select($amazon_sql);
 		$amazonData = array();
 		$siteUrl = getSiteUrl();
@@ -117,6 +116,7 @@ class AddRsgProduct extends Command
 			$amazonData[$val->asin.'_'.$site]['features'] = str_replace('"',"'",$val->features);
 			$amazonData[$val->asin.'_'.$site]['description'] = str_replace('"',"'",$val->description);
 			$amazonData[$val->asin.'_'.$site]['price'] = $val->price;
+			$amazonData[$val->asin.'_'.$site]['seller_id'] = $val->buybox_sellerid;
 			$imageArr = explode(',',$val->images);
 			if($imageArr){
 				$amazonData[$val->asin.'_'.$site]['image'] = 'https://images-na.ssl-images-amazon.com/images/I/'.$imageArr[0];
@@ -125,13 +125,14 @@ class AddRsgProduct extends Command
 
 		$insertData = array();
 		foreach($data as $key=>$val){
-			$product_name = $product_img = $price = $product_summary = $product_content = '';
+			$product_name = $product_img = $price = $product_summary = $product_content = $seller_id = '';
 			if(isset($amazonData[$val['asin'].'_'.$val['site']])){
 				$product_name = $amazonData[$val['asin'].'_'.$val['site']]['title'];
 				$product_img = $amazonData[$val['asin'].'_'.$val['site']]['image'];
 				$price = $amazonData[$val['asin'].'_'.$val['site']]['price'];
 				$product_summary = $amazonData[$val['asin'].'_'.$val['site']]['features'];
 				$product_content = $amazonData[$val['asin'].'_'.$val['site']]['description'];
+				$seller_id = $amazonData[$val['asin'].'_'.$val['site']]['seller_id'];
 			}
 			//美国站点 5个/天 其他站点3个/天， 新品上线第一周(帖子状态为待推贴，并且更新时间为一周内)美国站点 10个/天 其他站点5个/天
 			if($val['post_status']==2 && (time()-strtotime($val['push_date'])) <= 86400*7){//新品上线第一周
@@ -170,6 +171,7 @@ class AddRsgProduct extends Command
 				'product_summary' => $product_summary,
 				'product_content' => $product_content,
 				'sku_level' => isset($skuData[$val['sku'].'_'.$val['site']]) ? $skuData[$val['sku'].'_'.$val['site']]['sku_level'] : '',
+				'seller_id' => $seller_id,
 			);
 		}
 		if($insertData){

@@ -62,7 +62,7 @@ class StaClient extends Command
 	function getTimesCtgRsgPositive()
 	{
 		$ctgData = $this->getCtgData();
-		$updateCtg = $updateRsg = $updatePositive = array();
+		$updateCtg = $updateRsg = $updatePositive = $updateSg = array();
 		foreach($ctgData as $key=>$val){
 			//times_ctg次数
 			$updateCtg[$val['id']]['id'] = $val['id'];
@@ -73,6 +73,9 @@ class StaClient extends Command
 				if(!empty($steps['commented']) && $steps['commented'] == 1){
 					$updatePositive[$val['id']]['id'] = $val['id'];
 					$updatePositive[$val['id']]['times_positive_review'] = isset($updatePositive[$val['id']]['times_positive_review']) ? $updatePositive[$val['id']]['times_positive_review'] + 1 : 1;
+					//sg数量（CTG中留好评的数量）
+					$updateSg[$val['id']]['id'] = $val['id'];
+					$updateSg[$val['id']]['times_sg'] = isset($updateSg[$val['id']]['times_sg']) ? $updateSg[$val['id']]['times_sg'] + 1 : 1;
 				}
 			}
 		}
@@ -89,7 +92,7 @@ class StaClient extends Command
 				$updatePositive[$val['id']]['times_positive_review'] = isset($updatePositive[$val['id']]['times_positive_review']) ? $updatePositive[$val['id']]['times_positive_review'] + 1 : 1;
 			}
 		}
-		Log::Info($updateCtg,$updateRsg,$updatePositive);
+		Log::Info($updateCtg,$updateRsg,$updatePositive,$updateSg);
 		//更改数据
 		if($updateCtg){
 			batchUpdate($updateCtg,'id','client');
@@ -99,6 +102,9 @@ class StaClient extends Command
 		}
 		if($updatePositive){
 			batchUpdate($updatePositive,'id','client');
+		}
+		if($updateSg){//更新统计的sg数量(CTG中的好评数量)
+			batchUpdate($updateSg,'id','client');
 		}
 
 		return true;
