@@ -50,7 +50,7 @@
                                 <span class="input-group-addon">
                                     <i class="fa fa-user"></i>
                                 </span>
-                                <select class="form-control form-filter input-sm" name="type">
+                                <select class="form-control form-filter input-sm" name="level">
 									@foreach (getAccountLevel() as $k=>$v)
 										<option value="{{$k}}" <?php if($k==old('level')) echo 'selected';?>>{{$v}}</option>
 									@endforeach
