@@ -76,10 +76,17 @@ class CrmController extends Controller
 				$action .= '<a href="http://'.$amazonPage.'" target="_blank"><i class="fa fa-share"></i></a>';
 			}
 			$data[$key]['action'] = $action;
-            //0默认，1黑名单
+            //0默认; 1黑名单; 2 Limited Comment by Amazon 数据库中的取值可能为：'1','2','1,2','0'
             //$data[$key]['type'] = getCrmClientType()[$data[$key]['type']];
-            if($data[$key]['type'] == 1){
-                $data[$key]['email'] = $data[$key]['email'].'<br/><font color="red">'.getCrmClientType()[1].'</font>';
+            $type = $data[$key]['type'];
+            if($type != '0'){
+                $types_array = explode(",",$type);
+                $types_array_text = [];
+                foreach($types_array as $value){
+                    $types_array_text[] = array_get(getCrmClientType(), $value);
+                }
+                $type_text = implode(',', $types_array_text);
+                $data[$key]['email'] = $data[$key]['email'].'<br/><font color="red">'.$type_text.'</font>';
             }
 
 			//当点击ctg,rsg,Negative Review所属的数字时，可以链接到相对应的客户列表页面，times_ctg，times_rsg，times_negative_review
@@ -175,7 +182,7 @@ class CrmController extends Controller
 		}
 
 		$sql = "select SQL_CALC_FOUND_ROWS t1.id as id,t1.date as date,c.name as name,c.email as email,c.phone as phone,c.remark as remark,c.country as country,c.`from` as `from`,c.brand as brand,
-t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as times_negative_review,t1.times_positive_review as times_positive_review,t1.type as 'type',if(num>0,num,0) as order_num,b.name as processor,b.bg as bg,b.bu as bu,c.facebook_name as facebook_name,c.facebook_group as facebook_group,c.amazon_profile_page as amazon_profile_page   
+t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_sg as times_sg,t1.times_negative_review as times_negative_review,t1.times_positive_review as times_positive_review,t1.type as 'type',if(num>0,num,0) as order_num,b.name as processor,b.bg as bg,b.bu as bu,c.facebook_name as facebook_name,c.facebook_group as facebook_group,c.amazon_profile_page as amazon_profile_page   
 			FROM client as t1 
 		  	left join(
 				select users.id as processor,min(name) as name,min(bg) as bg,min(bu) as bu 
@@ -346,6 +353,12 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 	public function update(Request $request)
 	{
 		$data = $_POST;
+		$type = '0';
+		//传到后台的值可能为：'', '1','2','1,2','0'('0'是edit页面可能传回的值)
+		if(isset($data['type']) && $data['type'] != ''){
+		    var_dump($data['type']);
+		    $type = $data['type'];
+        }
 		$old_id = isset($data['old_id']) ? $data['old_id'] : 0;
 		//查填写的客户id是否存在，如果不存在就要新添加记录
 		$clientData = DB::table('client')->select('id')->where('id',$data['id'])->get()->toArray();
@@ -358,7 +371,7 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 					'date'=>date('Y-m-d H:i:s'),
 					'created_at'=>date('Y-m-d H:i:s'),
 					'updated_at'=> date('Y-m-d H:i:s'),
-                    'type'=>$data['type'],
+                    'type'=>$type,
                     'subscribe'=>$data['subscribe'],
                     'block'=>$data['block']
 					)
@@ -369,7 +382,7 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 			}
 		}else{
 			//修改client表的更新时间,以及type,subscribe,block 3个字段
-			DB::table('client')->where('id', $data['id'])->update(['type'=>$data['type'], 'subscribe'=>$data['subscribe'], 'block'=>$data['block'], 'updated_at'=>date('Y-m-d H:i:s')]);
+			DB::table('client')->where('id', $data['id'])->update(['type'=>$type, 'subscribe'=>$data['subscribe'], 'block'=>$data['block'], 'updated_at'=>date('Y-m-d H:i:s')]);
 		}
 
 		$insertInfo = array('client_id'=>$data['id'],'name'=>$data['name'],'country'=>$data['country'],'from'=>$data['from'],'brand'=>$data['brand'],'facebook_name'=>$data['facebook_name'],'facebook_group'=>intval($data['facebook_group']));

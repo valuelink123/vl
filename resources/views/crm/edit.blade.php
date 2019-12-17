@@ -1,6 +1,10 @@
 @extends('layouts.layout')
 @section('label', 'Email Details')
 @section('content')
+
+    <link rel="stylesheet" href="/assets/global/plugins/bootstrap/css/bootstrap-select.min.css">
+    <script src="/assets/global/plugins/bootstrap/js/bootstrap-select.min.js"></script>
+
     <style>
         .mt-repeater-add-son{
             margin-top:25px;
@@ -124,48 +128,34 @@
                                     <div class="row form-group">
                                         <div class="col-lg-4 col-md-4">
                                             <label>Type</label>
-                                            <div class="input-group">
-                                                <span class="input-group-addon">
-                                                    <i class="fa fa-bookmark"></i>
-                                                </span>
-                                                <select class="form-control" name="type" id="type">
-                                                    @foreach (getCrmClientType() as $key => $value)
-                                                        <option value="{{$key}}" @if($key==$contactBasic['type']) selected @endif>
-                                                            {{$value}}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
+                                            <input type="text" id="type" name="type" hidden value="{{$contactBasic['type']}}"/>
+                                            <select class="selectpicker show-tick form-control" multiple id="select_type" title="Select...">
+                                                @foreach (getCrmClientType() as $key => $value)
+                                                    <option value="{{$key}}">
+                                                        {{$value}}
+                                                    </option>
+                                                @endforeach
+                                            </select>
                                         </div>
                                         <div class="col-lg-4 col-md-4">
                                             <label>Subscribe</label>
-                                            <div class="input-group">
-                                                <span class="input-group-addon">
-                                                    <i class="fa fa-bookmark"></i>
-                                                </span>
-                                                <select class="form-control" name="subscribe" id="subscribe">
-                                                    @foreach (getCrmSubscribe() as $key => $value)
-                                                        <option value="{{$key}}" @if($key==$contactBasic['subscribe']) selected @endif>
-                                                            {{$value}}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
+                                            <select class="form-control" name="subscribe" id="subscribe">
+                                                @foreach (getCrmSubscribe() as $key => $value)
+                                                    <option value="{{$key}}" @if($key==$contactBasic['subscribe']) selected @endif>
+                                                        {{$value}}
+                                                    </option>
+                                                @endforeach
+                                            </select>
                                         </div>
                                         <div class="col-lg-4 col-md-4">
                                             <label>Block</label>
-                                            <div class="input-group">
-                                                <span class="input-group-addon">
-                                                    <i class="fa fa-bookmark"></i>
-                                                </span>
-                                                <select class="form-control" name="block" id="block">
-                                                    @foreach (getCrmBlock() as $key => $value)
-                                                        <option value="{{$key}}" @if($key==$contactBasic['block']) selected @endif>
-                                                            {{$value}}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
+                                            <select class="form-control" name="block" id="block">
+                                                @foreach (getCrmBlock() as $key => $value)
+                                                    <option value="{{$key}}" @if($key==$contactBasic['block']) selected @endif>
+                                                        {{$value}}
+                                                    </option>
+                                                @endforeach
+                                            </select>
                                         </div>
                                     </div>
                                     <div style="clear:both;"></div>
@@ -274,6 +264,17 @@
     </form>
     @include('frank.common')
     <script>
+        $(function(){
+            var type = '{{$contactBasic['type']}}';
+            if(type != '0'){
+                $("#select_type").val(type.split(','));
+            }
+        });
+
+        $('#select_type').on('changed.bs.select', function(e) {
+            $("#type").val($(this).val());
+        });
+
         $(exception_form).submit(function (e) {
 
             //let type = $('#type').val()

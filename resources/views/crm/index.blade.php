@@ -194,6 +194,7 @@
                         <th title="From is a source for customers to contact for the first time. Customers may contact through a variety of ways and means">From</th>
                         <th title="Brand is the source of customers' first purchase of products or consultation questions. They may purchase products of several brands. Please check the order information for details">Brand</th>
                         <th title="The number of times the client participates in CTG does not represent the success of the review">CTG</th>
+                        <th title="">SG</th>
                         <th title="The number of times the customer participates in RSG and the status is Complete">RSG</th>
                         <th title="The number of times to leave comments on the bad comment list as determined by the customer's email">Negative</th>
                         <th title="Data default to CTG retention status showing the sum of Yes and RSG retention, without excluding CTG retention">Positive</th>
@@ -306,7 +307,7 @@
                 // blurable: true, // unselect on blur
                 selector: 'td:first-child', // 指定第一列可以点击选中
             },
-            "aoColumnDefs": [ { "bSortable": false, "aTargets": [20] }],
+            "aoColumnDefs": [ { "bSortable": false, "aTargets": [21] }],
             columns: [
                 {
                     width: "1px",
@@ -323,6 +324,7 @@
                 {data: 'from', name: 'from'},
                 {data: 'brand', name: 'brand'},
                 {data: 'times_ctg', name: 'times_ctg'},
+                {data: 'times_sg', name: 'times_sg'},
                 {data: 'times_rsg', name: 'times_rsg'},
                 {data: 'times_negative_review', name: 'times_negative_review'},
                 {data: 'times_positive_review', name: 'times_positive_review'},

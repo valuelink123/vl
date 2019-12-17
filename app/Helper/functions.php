@@ -638,10 +638,10 @@ function getCrmCountry()
 	return array('US','CA','DE','ES','GB','FR','IT','JP','MA');
 }
 
-//CRM模块可供下拉选择的type(客户类型)，0默认，1黑名单
+//CRM模块可供下拉选择的type(客户类型)，0默认，1黑名单,2 Limited Comment by Amazon
 function getCrmClientType()
 {
-    return array(0=>'Default',1=>'Blacklist');
+    return array(1=>'Blacklist', 2=>'Limited Comment by Amazon');
 }
 
 //CRM模块可供下拉选择的subscribe(订阅)，0默认，1已订阅
