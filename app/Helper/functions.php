@@ -16,6 +16,24 @@ function getAccountLevel(){
 		'0'=>'None'
     );
 }
+function getUsers($type=''){
+	switch($type)
+	{
+	case 'sap_seller':
+		$data = DB::table('users')->where('locked',0)->where('sap_seller_id','>',0)->pluck('name','sap_seller_id');
+		break;
+	case 'sap_bgbu':
+		$data = DB::table('users')->selectRaw('ubg as bg,ubu as bu')->where('locked',0)->groupBy(['bg','bu'])->orderByRaw('bg asc,bu asc')->get();
+		break;
+	default:
+		$data = DB::table('users')->where('locked',0)->pluck('name','id');
+	}
+	return $data;
+}
+
+function getYearWeeks($year){
+	return $year;
+}
 function getSellerAccount(){
 	return DB::connection('order')->table("accounts")->where('status',1)->groupby(['sellerid','sellername'])->pluck('sellername','sellerid');
 }

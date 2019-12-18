@@ -124,7 +124,9 @@ Route::resource('proline', 'ProlineController');
 Route::Post('/proline/get', 'ProlineController@get')->name('getproline');
 Route::get('/skus', 'SkuController@index');
 Route::Post('/skus', 'SkuController@update');
-
+Route::get('/budgets', 'BudgetController@index');
+Route::Post('/budgets', 'BudgetController@update');
+Route::get('/budgets/edit', 'BudgetController@edit');
 Route::get('/nonctg', 'NonctgController@index');//non-ctg功能
 Route::Post('/nonctg/get', 'NonctgController@get')->name('getnonctg');//non-ctg功能，ajax请求数据
 Route::Post('/nonctg/batchAssignTask', 'NonctgController@batchAssignTask')->name('batchAssignTaskNonctg');//non-ctg功能的分配功能
