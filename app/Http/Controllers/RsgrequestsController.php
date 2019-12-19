@@ -77,7 +77,7 @@ class RsgrequestsController extends Controller
 
 		$datas= RsgRequest::leftJoin('rsg_products',function($q){
 				$q->on('rsg_requests.product_id', '=', 'rsg_products.id');
-			})->leftjoin('client_info', 'rsg_requests.customer_email', '=', 'client_info.email')->leftJoin(DB::raw("(select asin,site,max(sap_seller_id) as sap_seller_id,max(bg) as bg,max(bu) as bu from asin group by asin,site) as asin"),function($q){
+			})->leftjoin('client_info', 'rsg_requests.customer_email', '=', 'client_info.email')->leftjoin('client', 'client.id', '=', 'client_info.client_id')->leftJoin(DB::raw("(select asin,site,max(sap_seller_id) as sap_seller_id,max(bg) as bg,max(bu) as bu from asin group by asin,site) as asin"),function($q){
 				$q->on('rsg_products.asin', '=', 'asin.asin')
 				  ->on('rsg_products.site', '=', 'asin.site');
 			})
@@ -172,12 +172,23 @@ class RsgrequestsController extends Controller
         $iDisplayLength = intval($_REQUEST['length']);
         $iDisplayLength = $iDisplayLength < 0 ? $iTotalRecords : $iDisplayLength;
         $iDisplayStart = intval($_REQUEST['start']);
-		$lists =  $datas->orderBy($orderby,$sort)->offset($iDisplayStart)->limit($iDisplayLength)->get(['rsg_requests.*','rsg_products.asin','rsg_products.site','rsg_products.seller_id','rsg_products.user_id','client_info.facebook_name','client_info.facebook_group'])->toArray();
+		$lists =  $datas->orderBy($orderby,$sort)->offset($iDisplayStart)->limit($iDisplayLength)->get(['rsg_requests.*','rsg_products.asin','rsg_products.site','rsg_products.seller_id','rsg_products.user_id','client_info.facebook_name','client_info.facebook_group','client.rsg_status','client.rsg_status_explain'])->toArray();
 
 		$fbgroupConfig = getFacebookGroup();
 		$users= $this->getUsers();
+		//Check Customer(1)，Submit Paypal(3)，Check Paypal(4)
 
+		$rsgStatusArr = getCrmRsgStatusArr();
 		foreach ( $lists as $key=>$list){
+			if(in_array($list['step'],array(1,3,4))){
+				$explain = isset($rsgStatusArr[$list['rsg_status_explain']]) ? $rsgStatusArr[$list['rsg_status_explain']]['vop'] : $list['rsg_status_explain'];
+				if($list['rsg_status']==1){
+					$lists[$key]['customer_email'] = $list['customer_email'].'<div class="unavailable" title="'.$explain.'"></div>';
+				}else{
+					$lists[$key]['customer_email'] = $list['customer_email'].'<div class="available"></div>';
+				}
+
+			}
 			$lists[$key]['channel'] = isset($channelKeyVal[$list['channel']]) ? $channelKeyVal[$list['channel']] : '';
 			$lists[$key]['asin_link'] = '<a href="https://'.array_get($list,'site').'/dp/'.array_get($list,'asin').'?m='.array_get($list,'seller_id').'" target="_blank">'.$list['asin'].'</a>';
 			$lists[$key]['step'] = '<span class="badge badge-success">'.array_get(getStepStatus(),$list['step']).'</span>';
