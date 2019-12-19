@@ -168,18 +168,18 @@ td.details-control.disabled {
     color:#FF0000;
 }
 .unavailable{
-    width: 15px;
-    height: 15px;
+    width: 10px;
+    height: 10px;
     border-radius: 100px;
     background-color: red;
-    border-radius: 30px !important;
+    border-radius: 20px !important;
     float: right;
 }
 .available{
-    width: 15px;
-    height: 15px;
+    width: 10px;
+    height: 10px;
     border-radius: 100px;
     background-color: green;
-    border-radius: 30px !important;
+    border-radius: 20px !important;
     float: right;
 }
