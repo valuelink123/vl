@@ -31,8 +31,9 @@ function getUsers($type=''){
 	return $data;
 }
 
-function getYearWeeks($year){
-	return $year;
+function getBudgetStageArr()
+{
+	return array(0=>'待提交',1=>'待审核',2=>'已确认');
 }
 function getSellerAccount(){
 	return DB::connection('order')->table("accounts")->where('status',1)->groupby(['sellerid','sellername'])->pluck('sellername','sellerid');
