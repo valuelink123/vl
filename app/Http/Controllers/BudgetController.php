@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use App\User;
 use App\Budgets;
+use App\Budgetskus;
 use App\Budgetdetails;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -41,7 +42,7 @@ class BudgetController extends Controller
 		$sku = $request->get('sku');
 	    $year = $request->get('year')?$request->get('year'):date('Y',strtotime('+1 month'));
 		$user_id = $request->get('user_id');
-		$where = "status in ('New','Normal','Observing','Obsoleted')";
+		$where = "1=1";
 		if (Auth::user()->seller_rules) {
 			$rules = explode("-",Auth::user()->seller_rules);
 			if(array_get($rules,0)!='*') $where.= " and bg='".array_get($rules,0)."'";
@@ -74,13 +75,18 @@ class BudgetController extends Controller
 		}
 		
 		
-		$sql = "(select skus.*,case when skus_status.`level` = 'S' Then '0' else skus_status.`level` end as level,skus_status.`status`,skus_status.description from (select item_no as sku,site,max(sap_seller_id) as sap_seller_id,max(bg) as bg,max(bu) as bu from asin
-where sap_seller_id<>323 group by sku,site) as skus left join skus_status on skus.sku=skus_status.sku and 
-skus.site=skus_status.site) as sku_tmp_cc";
+		$sql = "(
+		select budget_skus.*,budgets_1.qty as qty1,budgets_1.amount as amount1,budgets_1.profit as profit1,budgets_1.status as budget_status,budgets_1.remark
+,budgets_2.qty as qty2,budgets_2.amount as amount2,budgets_2.profit as profit2 from budget_skus 
+		left join (select * from budgets where year = '$year') as budgets_1 
+		on budget_skus.sku = budgets_1.sku and budget_skus.site = budgets_1.site
+		left join (select * from budgets where year = '$year-1') as budgets_2 
+		on budget_skus.sku = budgets_2.sku and budget_skus.site = budgets_2.site
+		) as sku_tmp_cc";
  		$datas = DB::table(DB::raw($sql))->whereRaw($where)->paginate(20);
 		
-        $data['teams']= DB::select('select bg,bu from asin where sap_seller_id<>323 group by bg,bu ORDER BY BG ASC,BU ASC');
-		$data['users']= $this->getUsers();
+        $data['teams']= getUsers('sap_bgbu');
+		$data['users']= getUsers('sap_seller');
 		$data['year']=$year;
 		$data['datas']= $datas;
         return view('budget/index',$data);
@@ -101,71 +107,60 @@ skus.site=skus_status.site) as sku_tmp_cc";
 		$data['site']=$site;
 		$data['year']=$year;
 		$data['budget_id']=$budget_id;
-		$data['datas']= [];
-		//print_r(getUsers());
-		//print_r(getUsers('sap_seller'));
-		//print_r(getUsers('sap_bgbu'));
+		$data['datas']= Budgetdetails::selectRaw('weeks,any_value(ranking) as ranking,any_value(price) as price,sum(qty) as qty,any_value(promote_price) as promote_price,sum(promote_qty) as promote_qty,any_value(promotion) as promotion')->where('budget_id',$budget_id)->groupBy('weeks')->get()->keyBy('weeks')->toArray();
+		$data['base_data']= Budgetdetails::selectRaw('weeks,any_value(ranking) as ranking,any_value(price) as price,sum(qty) as qty,any_value(promote_price) as promote_price,sum(promote_qty) as promote_qty,any_value(promotion) as promotion')->where('budget_id',$budget_id)->groupBy('weeks')->get()->keyBy('weeks')->toArray();
 		return view('budget/edit',$data);
     }
-
-
-	public function export(Request $request){
-		if(!Auth::user()->can(['sales-report-export'])) die('Permission denied -- sales-report-export');
-		
-
-		if($arrayData){
-			$spreadsheet = new Spreadsheet();
-
-			$spreadsheet->getActiveSheet()
-				->fromArray(
-					$arrayData,  // The data to set
-					NULL,        // Array values with this value will not be set
-					'A1'         // Top left coordinate of the worksheet range where
-								 //    we want to set these values (default is A1)
-				);
-			header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');//告诉浏览器输出07Excel文件
-			header('Content-Disposition: attachment;filename="Export_d_report.xlsx"');//告诉浏览器输出浏览器名称
-			header('Cache-Control: max-age=0');//禁止缓存
-			$writer = new Xlsx($spreadsheet);
-			$writer->save('php://output');
-		}
-		die();
-	}
 	
-    public function getUsers(){
-        $users = User::where('sap_seller_id','>',0)->get()->toArray();
-        $users_array = array();
-        foreach($users as $user){
-            $users_array[$user['sap_seller_id']] = $user['name'];
-        }
-        return $users_array;
-    }
-	
-	public function getWeek($date_start){
-		$week = date('YW',strtotime($date_start));
-		if(date('m',strtotime($date_start))==1 && date('W',strtotime($date_start))>50) $week = (date('Y',strtotime($date_start))-1).date('W',strtotime($date_start));
-		if(date('m',strtotime($date_start))==12 && date('W',strtotime($date_start))<2) $week = (date('Y',strtotime($date_start))+1).date('W',strtotime($date_start));
-		return $week;
-	}
 
     public function update(Request $request)
     {
-		if(!Auth::user()->can(['sales-report-update'])) die('Permission denied -- sales-report-update');
 		$name = $request->get('name');
 		$data = explode("-",$name);
-		Skusweekdetails::updateOrCreate([
-				'asin' => array_get($data,1),
-				'site' => array_get($data,0),
-				'weeks' => array_get($data,2)],[array_get($data,3)=>$request->get('value')]);
-		if(in_array(strtoupper(substr(array_get($data,3),0,2)),array('SA','FB'))){
-			$ex = Skusweekdetails::where('asin',array_get($data,1))->where('site',array_get($data,0))->where('weeks', array_get($data,2))->first()->toArray();
-			$return[str_replace('.','',array_get($data,0)).'-'.array_get($data,1).'-'.array_get($data,2).'-total_stock']=intval($ex['fba_stock']+$ex['fbm_stock']+$ex['fba_transfer']);
-			$return[str_replace('.','',array_get($data,0)).'-'.array_get($data,1).'-'.array_get($data,2).'-fba_keep']=($ex['sales'])?round(intval($ex['fba_stock'])/$ex['sales'],2):'∞';
-			$return[str_replace('.','',array_get($data,0)).'-'.array_get($data,1).'-'.array_get($data,2).'-total_keep']=($ex['sales'])?round((intval($ex['fba_stock'])+intval($ex['fba_transfer'])+intval($ex['fbm_stock']))/$ex['sales'],2):'∞';
-			 echo json_encode($return);
-			
+		$budget_id = intval(array_get($data,0));
+		$budget = Budgets::find($budget_id);
+		if(empty($budget)) die;
+		if(array_get($data,1)=='budget_remark'){
+			$budget->remark = $request->get('value');
+			$budget->save();
 		}
-				
+		if(array_get($data,1)=='budget_status'){
+			$budget->status = $request->get('value');
+			$budget->save();
+		}
+		if(intval(array_get($data,1))>0){
+			$week = array_get($data,1);
+			
+			$week_per = ['0'=>1.13/7.01,'1'=>1.12/7.01,'2'=>1.09/7.01,'3'=>1.04/7.01,'4'=>0.91/7.01,'5'=>0.86/7.01,'6'=>0.86/7.01];
+			if(in_array(array_get($data,2),['qty','promote_qty'])){
+				$week_value = round($request->get('value'));
+			}elseif(array_get($data,2)=='promotion'){
+				$week_value = round($request->get('value'),4);
+			}else{
+				$week_value = $request->get('value');
+			}
+			$max_value=0;
+			for($i=0;$i<=6;$i++){
+				$date = date("Y-m-d", strtotime($budget->year . 'W' . sprintf("%02d",$week))+86400*$i);
+				if(in_array(array_get($data,2),['qty','promote_qty'])){
+					$value = round($week_value*array_get($week_per,$i));
+					if($max_value+$value>$week_value) $value = $week_value-$max_value;
+					if($max_value<=$week_value && $i==6) $value = $week_value-$max_value;
+					$max_value+=$value;
+				}else{
+					$value = $week_value;
+				}
+				Budgetdetails::updateOrCreate(
+					['budget_id' => array_get($data,0),'weeks' => array_get($data,1),'date'=>$date],
+					[array_get($data,2)=>$value]
+				);
+			}
+			
+			if(array_get($data,2)!='ranking'){
+				$return[$request->get('name')]=$request->get('value');
+				echo json_encode($return);
+			}
+		}		
     }
 
 
