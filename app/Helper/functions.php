@@ -1066,3 +1066,39 @@ function getSkuStatus()
 {
 	return array('New','Normal','Obsoleted','Replaced','Observing','Accessories','Gift','Packaging');
 }
+
+/*
+ * 客户参与RSG资格判断为红色Unaviliable的时候
+ * 因何种原因被判为红色(rsg_status_explain)对应的提示词语
+ * rsg_status_explain对应的键值对，提示词语分为RSG官网提示和VOP提示
+ * 1，标签为黑名单、客户账号留评被限制的客户
+ * 2，有过已付款未购买情况的客户
+ * 3，留差评客户
+ * 4，最近30天有参与4次RSG
+ * 5，留评率低于90%的客户
+ * 6，上个活动不是Completed状态
+ */
+function getCrmRsgStatusArr()
+{
+	$data = array(
+		1 => array(
+			'vop' => '受限制客户(黑名单/账号被限制留评) Restricted customers(blacklist/Amazon account is limited for comment)',
+		),
+		2 => array(
+			'vop' => '开过退款申诉 Disputed',
+		),
+		3 => array(
+			'vop' => '曾留过差评 Have left negative reviews',
+		),
+		4 => array(
+			'vop' => '最近30天参与4次以上 Has participated more than 4 times RSG in the last 30 days',
+		),
+		5 => array(
+			'vop' => '留评率低于90% Review Rate < 90%',
+		),
+		6 => array(
+			'vop' => '上个活动还未结束 There is ongoing application',
+		),
+	);
+	return $data;
+}
