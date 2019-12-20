@@ -292,6 +292,20 @@ class RsgrequestsController extends Controller
         $rule->user_id = intval(Auth::user()->id);
 		$rule->auto_send_status = intval( $request->get('auto_send_status'));
 
+		//根据客户的rsg_status判断该客户的邮箱是否可以再次申请rsg产品
+		$clientData = DB::table('client')->leftJoin('client_info',function($q){
+			$q->on('client.id', '=', 'client_info.client_id');
+		})
+			->where('client_info.email',$rule->customer_email)->get(['client.rsg_status','client.rsg_status_explain'])->first();
+
+		if($clientData && $clientData->rsg_status==1){
+			//rsg_status=1表示该客户不能申请rsg产品，
+			$rsgStatusArr = getCrmRsgStatusArr();
+			$explain = isset($rsgStatusArr[$clientData->rsg_status_explain]) ? $rsgStatusArr[$clientData->rsg_status_explain]['vop'] : $clientData->rsg_status_explain;
+			$request->session()->flash('error_message',$explain);
+			return redirect()->back()->withInput();
+		}
+
 		//一个客户对一个产品只能申请一次，可以申请多个不同的产品，但是必须是上个产品complete后才能申请
 		$ruleData = $rule->where('customer_email',$rule->customer_email)->where('product_id',$rule->product_id)->take(1)->get()->toArray();
 
@@ -393,7 +407,7 @@ class RsgrequestsController extends Controller
 			//凌晨到七点半之间要显示的是昨天的数据
 			$date = date('Y-m-d',strtotime($date)-86400);
 		}
-		$_products = DB::select("select * from `rsg_products` where `created_at` = '".$date."' and `sales_target_reviews` > `requested_review` order by `order_status` desc");
+		$_products = DB::select("select * from `rsg_products` where `created_at` = '".$date."' and `sales_target_reviews` > `requested_review` and `order_status` != -1  order by `order_status` desc");
 		$products = array();
 		foreach($_products as $key=>$val){
 			$val = (array)$val;
