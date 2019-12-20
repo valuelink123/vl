@@ -111,7 +111,7 @@ class RsgrequestsController extends Controller
 			$datas = $datas->where('facebook_group', intval($search['facebook_group']));
 		}
 		if(isset($search['processor']) && $search['processor']){
-			$datas = $datas->where('processor', $search['processor']);
+			$datas = $datas->where('rsg_requests.processor', $search['processor']);
 		}
 		if(isset($search['user_id']) && $search['user_id']){
 			$datas = $datas->where('rsg_products.user_id', $search['user_id']);
