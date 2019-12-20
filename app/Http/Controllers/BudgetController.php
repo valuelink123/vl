@@ -101,14 +101,31 @@ class BudgetController extends Controller
 		$sku = $request->get('sku');
 		$site = $request->get('site');
 		$year = $request->get('year');
+		$base_data = Budgetskus::where('sku',$sku)->where('site',$site)->first();
+		if(empty($base_data)) die('没有该SKU对应预算基础信息，请联系管理员新增！');
+		$cur = 'EUR';
+		if($site=='www.amazon.com') $cur = 'USD';
+		if($site=='www.amazon.ca') $cur = 'CAD';
+		if($site=='www.amazon.co.uk') $cur = 'GBP';
+		if($site=='www.amazon.co.jp') $cur = 'JPY';
 		$budget = Budgets::firstOrCreate(['sku'=>$sku,'site'=>$site,'year'=>$year]);
 		$budget_id = $budget->id;
 		$data['sku']=$sku;
 		$data['site']=$site;
 		$data['year']=$year;
 		$data['budget_id']=$budget_id;
+		$data['budget']=$budget;
 		$data['datas']= Budgetdetails::selectRaw('weeks,any_value(ranking) as ranking,any_value(price) as price,sum(qty) as qty,any_value(promote_price) as promote_price,sum(promote_qty) as promote_qty,any_value(promotion) as promotion')->where('budget_id',$budget_id)->groupBy('weeks')->get()->keyBy('weeks')->toArray();
-		$data['base_data']= Budgetdetails::selectRaw('weeks,any_value(ranking) as ranking,any_value(price) as price,sum(qty) as qty,any_value(promote_price) as promote_price,sum(promote_qty) as promote_qty,any_value(promotion) as promotion')->where('budget_id',$budget_id)->groupBy('weeks')->get()->keyBy('weeks')->toArray();
+		$data['base_data']= $base_data->toArray();
+		$data['rate']= array_get(DB::table('cur_rate')->pluck('rate','cur'),$cur,0);
+		
+		$data['site_code'] = strtoupper(substr($site,-2));
+		if($data['site_code']=='OM') $data['site_code']='US';
+			
+		$tax_rate=DB::table('tax_rate')->where('site',$data['site_code'])->whereIn('sku',array('OTHERSKU',$sku))->pluck('tax','sku');
+		$data['base_data']['tax']= round(((array_get($tax_rate,$sku)??array_get($tax_rate,'OTHERSKU'))??0),4);
+		$shipfee = (array_get(getShipRate(),$data['site_code'].'.'.$sku)??array_get(getShipRate(),$data['site_code'].'.default'))??0;
+		$data['base_data']['headshipfee']=round($data['base_data']['volume']/1000000*round($shipfee,4),2);
 		return view('budget/edit',$data);
     }
 	
@@ -120,13 +137,19 @@ class BudgetController extends Controller
 		$budget_id = intval(array_get($data,0));
 		$budget = Budgets::find($budget_id);
 		if(empty($budget)) die;
-		if(array_get($data,1)=='budget_remark'){
-			$budget->remark = $request->get('value');
-			$budget->save();
-		}
-		if(array_get($data,1)=='budget_status'){
-			$budget->status = $request->get('value');
-			$budget->save();
+		
+		if(!is_numeric(array_get($data,1))){
+			if(array_get($data,1)=='status' || array_get($data,1)=='remark'){
+				$budget->{array_get($data,1)} = $request->get('value');
+				$budget->save();
+				die();
+			}else{
+				Budgetskus::where('sku',$budget->sku)->where('site',$budget->site)->update([array_get($data,1)=>$request->get('value')]);	
+				$return[$request->get('name')]=round($request->get('value'),4);
+				echo json_encode($return);
+				die();
+			
+			}
 		}
 		if(intval(array_get($data,1))>0){
 			$week = array_get($data,1);
@@ -157,8 +180,9 @@ class BudgetController extends Controller
 			}
 			
 			if(array_get($data,2)!='ranking'){
-				$return[$request->get('name')]=$request->get('value');
+				$return[$request->get('name')]=round($request->get('value'),4);
 				echo json_encode($return);
+				die();
 			}
 		}		
     }

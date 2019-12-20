@@ -1000,14 +1000,14 @@ function getReplyAduitStatus()
 function getShipRate()
 {
 	$arr = [
-	'US'=>['default'=>'1890'],
-	'UK'=>['default'=>'1470'],
-	'DE'=>['default'=>'2170'],
-	'FR'=>['default'=>'2170'],
-	'ES'=>['default'=>'2310'],
-	'IT'=>['default'=>'2310'],
+	'US'=>['default'=>'1200'],
+	'UK'=>['default'=>'1050'],
+	'DE'=>['default'=>'1550'],
+	'FR'=>['default'=>'1550'],
+	'ES'=>['default'=>'1650'],
+	'IT'=>['default'=>'1650'],
 	'JP'=>[
-		'default'=>'1330',
+		'default'=>'950',
 		'HA0618'=>'2534',
 		'HA0697'=>'2534',
 		'CS0517'=>'2534',
@@ -1015,7 +1015,7 @@ function getShipRate()
 		'CS0548'=>'2534',
 		'CS0656'=>'2534'
 	],
-	'CA'=>['default'=>'2660']
+	'CA'=>['default'=>'1900']
 	];
 	return $arr;
 }
