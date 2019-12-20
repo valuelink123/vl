@@ -19,6 +19,7 @@ use PayPal\PayPalAPI\TransactionSearchRequestType;
 use PayPal\Service\PayPalAPIInterfaceServiceService;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Illuminate\Support\Facades\Artisan;
 
 class RsgrequestsController extends Controller
 {
@@ -112,6 +113,9 @@ class RsgrequestsController extends Controller
 		if(isset($search['processor']) && $search['processor']){
 			$datas = $datas->where('processor', $search['processor']);
 		}
+		if(isset($search['user_id']) && $search['user_id']){
+			$datas = $datas->where('rsg_products.user_id', $search['user_id']);
+		}
 		if(isset($search['site']) && $search['site']){
 			$datas = $datas->where('rsg_products.site','like', '%'.$search['site'].'%');
 		}
@@ -121,6 +125,7 @@ class RsgrequestsController extends Controller
 				$query->where('facebook_name','like','%'.$keyword.'%')
 					->orWhere('customer_email', 'like', '%'.$keyword.'%')
 					->orWhere('customer_paypal_email', 'like', '%'.$keyword.'%')
+					->orWhere('review_url', 'like', '%'.$keyword.'%')
 					->orWhere('rsg_products.asin', 'like', '%'.$keyword.'%');
 			});
 		}
@@ -180,18 +185,30 @@ class RsgrequestsController extends Controller
 
 		$rsgStatusArr = getCrmRsgStatusArr();
 		foreach ( $lists as $key=>$list){
+			$lists[$key]['step'] = '<span class="badge badge-success">'.array_get(getStepStatus(),$list['step']).'</span>';
 			if(in_array($list['step'],array(1,3,4))){
 				$explain = isset($rsgStatusArr[$list['rsg_status_explain']]) ? $rsgStatusArr[$list['rsg_status_explain']]['vop'] : $list['rsg_status_explain'];
 				if($list['rsg_status']==1){
+					//邮箱后面显示红色圆圈
+					//当rsg_status_explain=6的时候，还要看rsg request的状态
 					$lists[$key]['customer_email'] = $list['customer_email'].'<div class="unavailable" title="'.$explain.'"></div>';
+					// $lists[$key]['step'] = '<span class="badge badge-success">'.array_get(getStepStatus(),$list['step']).'</span><div class="fa red fa-times pull-right"></div>';
+					if($list['rsg_status_explain']==6){
+						$noComplete = DB::table('rsg_requests')->where('customer_email',$list['customer_email'])->where('created_at','<',$list['created_at'])->whereNotIn('step',array(2,9,10))->get(['id'])->toArray();
+						if(empty($noComplete)){//在此条数据之前未完成数据为空，则为打钩显示
+							// $lists[$key]['step'] = '<span class="badge badge-success">'.array_get(getStepStatus(),$list['step']).'</span><div class="fa green fa-check pull-right"></div>';
+							$lists[$key]['customer_email'] = $list['customer_email'].'<div class="unavailable" title="'.$explain.'"></div>';
+						}
+					}
 				}else{
+					//邮箱后面显示绿色圆圈
 					$lists[$key]['customer_email'] = $list['customer_email'].'<div class="available"></div>';
+					// $lists[$key]['step'] = '<span class="badge badge-success">'.array_get(getStepStatus(),$list['step']).'</span><div class="fa green fa-check pull-right"></div>';
 				}
 
 			}
 			$lists[$key]['channel'] = isset($channelKeyVal[$list['channel']]) ? $channelKeyVal[$list['channel']] : '';
 			$lists[$key]['asin_link'] = '<a href="https://'.array_get($list,'site').'/dp/'.array_get($list,'asin').'?m='.array_get($list,'seller_id').'" target="_blank">'.$list['asin'].'</a>';
-			$lists[$key]['step'] = '<span class="badge badge-success">'.array_get(getStepStatus(),$list['step']).'</span>';
 			$lists[$key]['funded'] = $list['transfer_amount'].' '.$list['transfer_currency'];
 			$lists[$key]['review_url'] = '<div style="width: 200px;word-wrap: break-word;text-align: center;">'.$list['review_url'].'<BR><span class="text-danger">'.$list['transaction_id'].'</span></div>';
 			$lists[$key]['sales'] = isset($users[$list['user_id']]) ? $users[$list['user_id']] : $list['user_id'];
@@ -611,6 +628,4 @@ where payer='$customer_paypal_email' order by timestamp asc");
 		}
 		echo $res;
 	}
-
-
 }

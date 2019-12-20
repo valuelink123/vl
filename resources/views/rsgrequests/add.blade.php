@@ -99,7 +99,7 @@
                         </div>
 						
 						<div class="form-group col-md-6">
-                            <label>Review Url</label>
+                            <label>Review ID</label>
                                 <input type="text" class="form-control" name="review_url" id="review_url" >
                            
                         </div>

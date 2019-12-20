@@ -145,12 +145,25 @@
 									</div>
 									<br>
 								</div>
+
+								<div class="col-md-2">
+									<div class="input-group">
+										<span class="input-group-addon">Sales</span>
+										<select name="user_id" class="form-control form-filter input-sm">
+											<option value="">Sales</option>
+											@foreach ($users as $user_id=>$user_name)
+												<option value="{{$user_id}}">{{$user_name}}</option>
+											@endforeach
+										</select>
+									</div>
+									<br>
+								</div>
 							</div>
 							<div class="row">
 								<div class="col-md-4">
 									<div class="input-group">
 										<span class="input-group-addon">Keywords</span>
-										<input name="keyword" type="text" value="{{$email}}" class="form-control form-filter input-sm" placeholder="Search by Email、PayPal、Name、Asin">
+										<input name="keyword" type="text" value="{{$email}}" class="form-control form-filter input-sm" placeholder="Search by Email、PayPal、Name、Asin、Review Id">
 									</div>
 								</div>
 
@@ -222,8 +235,8 @@
 										<input type="checkbox" onchange="this.checked?dtApi.rows().select():dtApi.rows().deselect()" id="selectAll"/>
 									</th>
 									<th width="10%"> Submit Date </th>
-									<th width="10%"> Channel </th>
-									<th width="6%"> Customer Email </th>
+									<th width="6%"> Channel </th>
+									<th width="13%"> Customer Email </th>
 									<th width="6%"> Request Product </th>
 									<th width="8%"> Current Step </th>
 									<th width="4%"> Customer Paypal </th>
@@ -442,7 +455,8 @@
 			$('#channel').val('-1');
 			$('#facebook_group').val('');
 			$('select[name="processor"]').val('');
-            $('input[name="keyword"]').val('');
+            $('input[name="keyword"]').val('');//
+            $('select[name="user_id"]').val('');
             $("#search").trigger("click");
 		});
 
@@ -463,6 +477,9 @@
             $("#search").trigger("click");
         });
         $('#site').change(function(){
+            $("#search").trigger("click");
+        });
+        $('select[name="user_id"]').change(function(){
             $("#search").trigger("click");
         });
 
