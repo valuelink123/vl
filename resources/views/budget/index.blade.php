@@ -57,7 +57,7 @@ white-space: nowrap;
                         {{ csrf_field() }}
                         <div class="row">
 
-                        <div class="col-md-2">
+                        <div class="col-md-1">
                             <div class="input-group date date-picker margin-bottom-5" data-date-format="yyyy">
                                 <input type="text" class="form-control form-filter input-sm" readonly name="year" placeholder="Year" value="{{$year}}">
                                 <span class="input-group-btn">
@@ -76,7 +76,7 @@ white-space: nowrap;
                                     </select>
 						</div>
 						
-						<div class="col-md-2">
+						<div class="col-md-1">
 						<select class="form-control form-filter input-sm" name="bgbu">
                                         <option value="">Select BGBU</option>
 										<?php 
@@ -95,7 +95,7 @@ white-space: nowrap;
 						</div>	
 						
 
-						 <div class="col-md-2">
+						 <div class="col-md-1">
 						<select class="form-control form-filter input-sm" name="site" id="site">
 									<option value="">Select Site</option>
                                         @foreach (getAsinSites() as $v)
@@ -124,6 +124,13 @@ white-space: nowrap;
 										<button type="submit" class="btn blue" id="data_search">Search</button>
 									
                         </div>
+
+						<div class="col-md-1">
+							<a data-target="#ajax" data-toggle="modal" href="{{ url('/budgets/create')}}"><button id="sample_editable_1_2_new" class="btn sbold red"> Add New
+									<i class="fa fa-plus"></i>
+								</button>
+							</a>
+						</div>
 						</div>	
 						
 						
@@ -234,8 +241,17 @@ white-space: nowrap;
             <!-- END EXAMPLE TABLE PORTLET-->
         </div>
     </div>
-	
-	
+
+<div class="modal fade bs-modal-lg" id="ajax" role="basic" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content" >
+			<div class="modal-body" >
+				<img src="../assets/global/img/loading-spinner-grey.gif" alt="" class="loading">
+				<span>Loading... </span>
+			</div>
+		</div>
+	</div>
+</div>
 <script src="/assets/global/plugins/moment.min.js" type="text/javascript"></script>
 <script src="/assets/global/plugins/jquery.mockjax.js" type="text/javascript"></script>    
 <script src="/assets/global/plugins/bootstrap-editable/bootstrap-editable/js/bootstrap-editable.js" type="text/javascript"></script>
@@ -253,6 +269,12 @@ jQuery(document).ready(function() {
 		orientation: 'bottom',
 		autoclose: true
 	});
+});
+
+$(function() {
+    $("#ajax").on("hidden.bs.modal",function(){
+        $(this).find('.modal-content').html('<div class="modal-body"><img src="../assets/global/img/loading-spinner-grey.gif" alt="" class="loading"><span>Loading... </span></div>');
+    });
 });
 
 
