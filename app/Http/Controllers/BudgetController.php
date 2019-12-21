@@ -77,9 +77,9 @@ class BudgetController extends Controller
 		$sql = "(
 		select budget_skus.*,budgets_1.qty as qty1,budgets_1.income as amount1,(budgets_1.income-budgets_1.cost) as profit1,(budgets_1.income-budgets_1.cost-budgets_1.common_fee-budgets_1.pick_fee-budgets_1.promotion_fee-budgets_1.amount_fee-budgets_1.storage_fee) as economic1,budgets_1.status as budget_status,budgets_1.remark
 ,budgets_2.qty as qty2,budgets_2.income as amount2,(budgets_2.income-budgets_2.cost) as profit2,(budgets_2.income-budgets_2.cost-budgets_2.common_fee-budgets_2.pick_fee-budgets_2.promotion_fee-budgets_2.amount_fee-budgets_2.storage_fee) as economic2 from budget_skus 
-		left join (select * from budgets where year = '$year') as budgets_1 
+		left join (select * from budgets where year = $year) as budgets_1 
 		on budget_skus.sku = budgets_1.sku and budget_skus.site = budgets_1.site
-		left join (select * from budgets where year = '$year-1') as budgets_2 
+		left join (select * from budgets where year = ".($year-1).") as budgets_2 
 		on budget_skus.sku = budgets_2.sku and budget_skus.site = budgets_2.site
 		) as sku_tmp_cc";
  		$datas = DB::table(DB::raw($sql))->whereRaw($where)->paginate(20);
