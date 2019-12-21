@@ -136,6 +136,41 @@ class BudgetController extends Controller
 		return view('budget/edit',$data);
     }
 	
+	
+	public function upload( Request $request )
+	{	
+		if($request->isMethod('POST')){  
+            $file = $request->file('importFile');  
+  			if($file){
+            if($file->isValid()){  
+                $originalName = $file->getClientOriginalName();  
+                $ext = $file->getClientOriginalExtension();  
+                $type = $file->getClientMimeType();  
+                $realPath = $file->getRealPath();  
+                $newname = date('Y-m-d-H-i-S').'-'.uniqid().'.'.$ext;  
+				$newpath = '/uploads/BudgetsUpload/'.date('Ymd').'/';
+				$inputFileName = public_path().$newpath.$newname;
+  				$bool = $file->move(public_path().$newpath,$newname);
+
+				if($bool){
+					$spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($inputFileName);
+					$importData = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);		
+					foreach($importData as $key => $data){
+						
+					}
+					$request->session()->flash('success_message','Import Success!');
+				}else{
+					$request->session()->flash('error_message','UploadFailed');
+				}          
+            } 
+			}else{
+				$request->session()->flash('error_message','Please Select Upload File');
+			} 
+        } 
+		return;
+	
+	}
+	
 
     public function update(Request $request)
     {
