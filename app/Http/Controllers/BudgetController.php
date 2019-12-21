@@ -33,7 +33,6 @@ class BudgetController extends Controller
 	
     public function index(Request $request)
     {	
-
 		//if(!Auth::user()->can(['budgets-show'])) die('Permission denied -- budgets-show');
 		$site = $request->get('site');
 		$bgbu = $request->get('bgbu');
@@ -76,8 +75,8 @@ class BudgetController extends Controller
 		
 		
 		$sql = "(
-		select budget_skus.*,budgets_1.qty as qty1,budgets_1.amount as amount1,budgets_1.profit as profit1,budgets_1.status as budget_status,budgets_1.remark
-,budgets_2.qty as qty2,budgets_2.amount as amount2,budgets_2.profit as profit2 from budget_skus 
+		select budget_skus.*,budgets_1.qty as qty1,budgets_1.income as amount1,(budgets_1.income-budgets_1.cost) as profit1,(budgets_1.income-budgets_1.cost-budgets_1.common_fee-budgets_1.pick_fee-budgets_1.promotion_fee-budgets_1.amount_fee-budgets_1.storage_fee) as economic1,budgets_1.status as budget_status,budgets_1.remark
+,budgets_2.qty as qty2,budgets_2.income as amount2,(budgets_2.income-budgets_2.cost) as profit2,(budgets_2.income-budgets_2.cost-budgets_2.common_fee-budgets_2.pick_fee-budgets_2.promotion_fee-budgets_2.amount_fee-budgets_2.storage_fee) as economic2 from budget_skus 
 		left join (select * from budgets where year = '$year') as budgets_1 
 		on budget_skus.sku = budgets_1.sku and budget_skus.site = budgets_1.site
 		left join (select * from budgets where year = '$year-1') as budgets_2 
@@ -103,6 +102,9 @@ class BudgetController extends Controller
 		$year = $request->get('year');
 		$base_data = Budgetskus::where('sku',$sku)->where('site',$site)->first();
 		if(empty($base_data)) die('没有该SKU对应预算基础信息，请联系管理员新增！');
+		
+		
+		
 		$cur = 'EUR';
 		if($site=='www.amazon.com') $cur = 'USD';
 		if($site=='www.amazon.ca') $cur = 'CAD';
@@ -121,11 +123,16 @@ class BudgetController extends Controller
 		
 		$data['site_code'] = strtoupper(substr($site,-2));
 		if($data['site_code']=='OM') $data['site_code']='US';
-			
+		
+		$storage_fee = json_decode(json_encode(DB::table('storage_fee')->where('type','FBA')->where('site',$data['site_code'])->where('size',$data['base_data']['size'])->first()),true);
+
+		
 		$tax_rate=DB::table('tax_rate')->where('site',$data['site_code'])->whereIn('sku',array('OTHERSKU',$sku))->pluck('tax','sku');
 		$data['base_data']['tax']= round(((array_get($tax_rate,$sku)??array_get($tax_rate,'OTHERSKU'))??0),4);
 		$shipfee = (array_get(getShipRate(),$data['site_code'].'.'.$sku)??array_get(getShipRate(),$data['site_code'].'.default'))??0;
 		$data['base_data']['headshipfee']=round($data['base_data']['volume']/1000000*round($shipfee,4),2);
+		$data['base_data']['cold_storagefee']=round(array_get($storage_fee,'2_10_fee',0)*$data['base_data']['volume']/1000000/8,4);
+		$data['base_data']['hot_storagefee']=round(array_get($storage_fee,'11_1_fee',0)*$data['base_data']['volume']/1000000/8,4);
 		return view('budget/edit',$data);
     }
 	
@@ -137,10 +144,56 @@ class BudgetController extends Controller
 		$budget_id = intval(array_get($data,0));
 		$budget = Budgets::find($budget_id);
 		if(empty($budget)) die;
+		$week_per = ['0'=>1.13/7.01,'1'=>1.12/7.01,'2'=>1.09/7.01,'3'=>1.04/7.01,'4'=>0.91/7.01,'5'=>0.86/7.01,'6'=>0.86/7.01];
 		
 		if(!is_numeric(array_get($data,1))){
 			if(array_get($data,1)=='status' || array_get($data,1)=='remark'){
 				$budget->{array_get($data,1)} = $request->get('value');
+				
+				if(array_get($data,1)=='status' && $request->get('value')==1){
+					$income = $cost = $common_fee = $pick_fee = $promotion_fee = $amount_fee = $storage_fee = $qty = $promote_qty =0;
+					$weeks = date("W", mktime(0, 0, 0, 12, 28, $budget->year));
+					$updateData = [];
+					for($i=1;$i<=$weeks;$i++){
+						$data = explode('|',$request->get($i.'-week_line_data'));
+						if(count($data)!=9) continue;
+						
+						for($j=0;$j<=8;$j++){
+							$max_value=0;
+							$week_value = $data[$j];
+							if($j==0) $field = 'income';$income+=$week_value;
+							if($j==1) $field = 'cost';$cost+=$week_value;
+							if($j==2) $field = 'common_fee';$common_fee+=$week_value;
+							if($j==3) $field = 'pick_fee';$pick_fee+=$week_value;
+							if($j==4) $field = 'promotion_fee';$promotion_fee+=$week_value;
+							if($j==5) $field = 'amount_fee';$amount_fee+=$week_value;
+							if($j==6) $field = 'storage_fee';$storage_fee+=$week_value;
+							if($j==7) $field = 'qty';$qty+=$week_value;
+							if($j==8) $field = 'promote_qty';$promote_qty+=$week_value;
+								
+							for($k=0;$k<=6;$k++){
+								$date = date("Y-m-d", strtotime($budget->year . 'W' . sprintf("%02d",$i))+86400*$k);
+								$value = ($field=='qty' || $field == 'promote_qty')?round($week_value*array_get($week_per,$k)):round($week_value*array_get($week_per,$k),2);
+								if($max_value+$value>$week_value) $value = $week_value-$max_value;
+								if($max_value<=$week_value && $i==6) $value = $week_value-$max_value;
+								$max_value+=$value;
+								$updateData[$date]['budget_id']=$budget_id;
+								$updateData[$date]['weeks']=$i;
+								$updateData[$date]['date']=$date;
+								$updateData[$date][$field]=$value;
+							}
+						}
+					}
+					if($updateData) Budgetdetails::insertOnDuplicateWithDeadlockCatching(array_values($updateData), ['qty','promote_qty','income','cost', 'common_fee', 'pick_fee', 'promotion_fee', 'amount_fee', 'storage_fee']);
+					$budget->income = $income;
+					$budget->cost = $cost;
+					$budget->common_fee = $common_fee;
+					$budget->pick_fee = $pick_fee;
+					$budget->promotion_fee = $promotion_fee;
+					$budget->amount_fee = $amount_fee;
+					$budget->storage_fee = $storage_fee;
+					$budget->qty = round($promote_qty+$qty);
+				}
 				$budget->save();
 				die();
 			}else{
@@ -148,13 +201,12 @@ class BudgetController extends Controller
 				$return[$request->get('name')]=round($request->get('value'),4);
 				echo json_encode($return);
 				die();
-			
 			}
 		}
 		if(intval(array_get($data,1))>0){
 			$week = array_get($data,1);
 			
-			$week_per = ['0'=>1.13/7.01,'1'=>1.12/7.01,'2'=>1.09/7.01,'3'=>1.04/7.01,'4'=>0.91/7.01,'5'=>0.86/7.01,'6'=>0.86/7.01];
+			
 			if(in_array(array_get($data,2),['qty','promote_qty'])){
 				$week_value = round($request->get('value'));
 			}elseif(array_get($data,2)=='promotion'){
@@ -174,7 +226,7 @@ class BudgetController extends Controller
 					$value = $week_value;
 				}
 				Budgetdetails::updateOrCreate(
-					['budget_id' => array_get($data,0),'weeks' => array_get($data,1),'date'=>$date],
+					['budget_id' => $budget_id,'weeks' => array_get($data,1),'date'=>$date],
 					[array_get($data,2)=>$value]
 				);
 			}
