@@ -403,7 +403,12 @@ var FormEditable = function() {
 			   if(i==weeks-5) n_stock=parseInt(n_stock*1.306);
 			   if(i==weeks-6) n_stock=parseInt(n_stock*1.127);
 			}
+			<?php if($base_data['status']=='淘汰'){ ?>
+			var endStock = stock;
+			<?php }else{ ?>
 			var endStock = stock>n_stock?stock:n_stock;
+			<?php }?>
+			
 			endStock = endStock>0?endStock:0;
 			$('#'+budget_id+'-'+(i)+'-stock_end').val(endStock);
 			//平均库存
