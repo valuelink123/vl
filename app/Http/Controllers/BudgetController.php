@@ -151,53 +151,22 @@ class BudgetController extends Controller
 				$budget->{array_get($data,1)} = $request->get('value');
 				
 				if(array_get($data,1)=='status' && $request->get('value')==1){
-					$income = $cost = $common_fee = $pick_fee = $promotion_fee = $amount_fee = $storage_fee = $qty = $promote_qty =0;
 					$weeks = date("W", mktime(0, 0, 0, 12, 28, $budget->year));
 					$updateData = [];
 					for($i=1;$i<=$weeks;$i++){
 						$data = explode('|',$request->get($i.'-week_line_data'));
-						if(count($data)!=9) continue;
+						if(count($data)!=7) continue;
 						
-						for($j=0;$j<=8;$j++){
+						for($j=0;$j<=6;$j++){
 							$max_value=0;
 							$week_value = $data[$j];
-							if($j==0){
-								$field = 'income';
-								$income+=$week_value;
-							} 
-							if($j==1){
-								$field = 'cost';
-								$cost+=$week_value;
-							} 
-							if($j==2){
-								$field = 'common_fee';
-								$common_fee+=$week_value;
-							} 
-							if($j==3){
-								$field = 'pick_fee';
-								$pick_fee+=$week_value;
-							} 
-							if($j==4){
-								$field = 'promotion_fee';
-								$promotion_fee+=$week_value;
-							} 
-							if($j==5){
-								$field = 'amount_fee';
-								$amount_fee+=$week_value;
-							} 
-							if($j==6){
-								$field = 'storage_fee';
-								$storage_fee+=$week_value;
-							}
-							if($j==7){
-								$field = 'qty';
-								$qty+=$week_value;
-							}
-							if($j==8){
-								$field = 'promote_qty';
-								$promote_qty+=$week_value;
-							}
-								
+							if($j==0) $field = 'income';
+							if($j==1) $field = 'cost';
+							if($j==2) $field = 'common_fee';
+							if($j==3) $field = 'pick_fee';
+							if($j==4) $field = 'promotion_fee';
+							if($j==5) $field = 'amount_fee';
+							if($j==6) $field = 'storage_fee';
 							for($k=0;$k<=6;$k++){
 								$date = date("Y-m-d", strtotime($budget->year . 'W' . sprintf("%02d",$i))+86400*$k);
 								$value = ($field=='qty' || $field == 'promote_qty')?round($week_value*array_get($week_per,$k)):round($week_value*array_get($week_per,$k),2);
@@ -212,14 +181,14 @@ class BudgetController extends Controller
 						}
 					}
 					if($updateData) Budgetdetails::insertOnDuplicateWithDeadlockCatching(array_values($updateData), ['qty','promote_qty','income','cost', 'common_fee', 'pick_fee', 'promotion_fee', 'amount_fee', 'storage_fee']);
-					$budget->income = $income;
-					$budget->cost = $cost;
-					$budget->common_fee = $common_fee;
-					$budget->pick_fee = $pick_fee;
-					$budget->promotion_fee = $promotion_fee;
-					$budget->amount_fee = $amount_fee;
-					$budget->storage_fee = $storage_fee;
-					$budget->qty = round($promote_qty+$qty);
+					$budget->qty = round($request->get('total_qty'));
+					$budget->income = round($request->get('total_income'),2);
+					$budget->cost = round($request->get('total_cost'),2);
+					$budget->common_fee = round($request->get('total_commonfee'),2);
+					$budget->pick_fee = round($request->get('total_pickfee'),2);
+					$budget->promotion_fee = round($request->get('total_profee'),2);
+					$budget->amount_fee = round($request->get('total_amountfee'),2);
+					$budget->storage_fee = round($request->get('total_storagefee'),2);
 				}
 				$budget->save();
 				die();

@@ -266,7 +266,15 @@ var FormEditable = function() {
 				var weeks = {{date("W", mktime(0, 0, 0, 12, 28, $year))}};
 				var budget_id = {{$budget_id}};
 				for (let i = 1;i <= weeks;i++){
-					params[i+'-week_line_data'] = parseFloat($('#'+budget_id+'-'+i+'-week_line_income').text())+'|'+parseFloat($('#'+budget_id+'-'+i+'-week_line_cost').text())+'|'+parseFloat($('#'+budget_id+'-'+i+'-week_line_commonfee').text())+'|'+parseFloat($('#'+budget_id+'-'+i+'-week_line_pickfee').text())+'|'+parseFloat($('#'+budget_id+'-'+i+'-week_line_profee').text())+'|'+parseFloat($('#'+budget_id+'-'+i+'-week_line_amountfee').text())+'|'+parseFloat($('#'+budget_id+'-'+i+'-week_line_storagefee').text())+'|'+parseInt($('#'+budget_id+'-'+i+'-qty').text())+'|'+parseInt($('#'+budget_id+'-'+i+'-promote_qty').text());
+					params[i+'-week_line_data'] = parseFloat($('#'+budget_id+'-'+i+'-week_line_income').text())+'|'+parseFloat($('#'+budget_id+'-'+i+'-week_line_cost').text())+'|'+parseFloat($('#'+budget_id+'-'+i+'-week_line_commonfee').text())+'|'+parseFloat($('#'+budget_id+'-'+i+'-week_line_pickfee').text())+'|'+parseFloat($('#'+budget_id+'-'+i+'-week_line_profee').text())+'|'+parseFloat($('#'+budget_id+'-'+i+'-week_line_amountfee').text())+'|'+parseFloat($('#'+budget_id+'-'+i+'-week_line_storagefee').text());
+					params['total_qty'] = $('#'+budget_id+'-total_qty').text();
+					params['total_income'] = $('#'+budget_id+'-total_income').text();
+					params['total_cost'] = $('#'+budget_id+'-total_cost').text();
+					params['total_commonfee'] = $('#'+budget_id+'-total_commonfee').text();
+					params['total_pickfee'] = $('#'+budget_id+'-total_pickfee').text();
+					params['total_storagefee'] = $('#'+budget_id+'-total_storagefee').text();
+					params['total_profee'] = $('#'+budget_id+'-total_profee').text();
+					params['total_amountfee'] = $('#'+budget_id+'-total_amountfee').text();
 				}
 				return params;
 			}
