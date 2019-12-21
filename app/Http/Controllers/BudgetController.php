@@ -161,15 +161,42 @@ class BudgetController extends Controller
 						for($j=0;$j<=8;$j++){
 							$max_value=0;
 							$week_value = $data[$j];
-							if($j==0) $field = 'income';$income+=$week_value;
-							if($j==1) $field = 'cost';$cost+=$week_value;
-							if($j==2) $field = 'common_fee';$common_fee+=$week_value;
-							if($j==3) $field = 'pick_fee';$pick_fee+=$week_value;
-							if($j==4) $field = 'promotion_fee';$promotion_fee+=$week_value;
-							if($j==5) $field = 'amount_fee';$amount_fee+=$week_value;
-							if($j==6) $field = 'storage_fee';$storage_fee+=$week_value;
-							if($j==7) $field = 'qty';$qty+=$week_value;
-							if($j==8) $field = 'promote_qty';$promote_qty+=$week_value;
+							if($j==0){
+								$field = 'income';
+								$income+=$week_value;
+							} 
+							if($j==1){
+								$field = 'cost';
+								$cost+=$week_value;
+							} 
+							if($j==2){
+								$field = 'common_fee';
+								$common_fee+=$week_value;
+							} 
+							if($j==3){
+								$field = 'pick_fee';
+								$pick_fee+=$week_value;
+							} 
+							if($j==4){
+								$field = 'promotion_fee';
+								$promotion_fee+=$week_value;
+							} 
+							if($j==5){
+								$field = 'amount_fee';
+								$amount_fee+=$week_value;
+							} 
+							if($j==6){
+								$field = 'storage_fee';
+								$storage_fee+=$week_value;
+							}
+							if($j==7){
+								$field = 'qty';
+								$qty+=$week_value;
+							}
+							if($j==8){
+								$field = 'promote_qty';
+								$promote_qty+=$week_value;
+							}
 								
 							for($k=0;$k<=6;$k++){
 								$date = date("Y-m-d", strtotime($budget->year . 'W' . sprintf("%02d",$i))+86400*$k);
