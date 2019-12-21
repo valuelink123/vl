@@ -111,8 +111,8 @@ white-space: nowrap;
 						<td><a class="budgetskus_stock editable" title="期初库存" href="javascript:;" id="{{$budget_id}}-stock" data-pk="{{$budget_id}}-stock" data-type="text" data-placement="bottom">{{$base_data['stock']}}</a></td>
 						<td>{{array_get(getUsers('sap_seller'),$base_data['sap_seller_id'],$base_data['sap_seller_id'])}}</td>
 						<td>{{$base_data['description']}}</td>
-						<td><a class="budget_remark editable" title="备注" href="javascript:;" id="{{$budget_id}}-remark" data-pk="{{$budget_id}}-remark" data-type="textarea" data-placement="bottom" data-placeholder="Your response here...">{{$budget->remark}}</a></td>
-						<td><a class="budget_status editable" href="javascript:;" data-placement="left" id="{{$budget_id}}-status" data-type="select" data-pk="{{$budget_id}}-status" data-value="{{($budget->status)??0}}">{{array_get(getBudgetStageArr(),($budget->status)??0)}}</a>
+						<td><a class="budget_remark" title="备注" href="javascript:;" id="{{$budget_id}}-remark" data-pk="{{$budget_id}}-remark" data-type="textarea" data-placement="bottom" data-placeholder="Your response here...">{{$budget->remark}}</a></td>
+						<td><a class="budget_status" href="javascript:;" data-placement="left" id="{{$budget_id}}-status" data-type="select" data-pk="{{$budget_id}}-status" data-value="{{($budget->status)??0}}">{{array_get(getBudgetStageArr(),($budget->status)??0)}}</a>
 						</td>
 					  </tr>
 					  </tbody>
@@ -236,22 +236,10 @@ var FormEditable = function() {
 
     $.mockjaxSettings.responseTime = 500;
 
-    var initAjaxMock = function() {
-        $.mockjax({
-            url: '/budgets',
-			type:'post',
-            response: function(settings) {
-            }
-        });
-    }
+    $.fn.editable.defaults.inputclass = 'form-control';
+    $.fn.editable.defaults.url = '/budgets';
 
-    var initEditables = function() {
-        $.fn.editable.defaults.inputclass = 'form-control';
-        $.fn.editable.defaults.url = '/budgets';
-		
-		$('.sku_ranking,.budget_remark').editable({
-			emptytext:'N/A'
-		});
+    var initBasetables = function() {
 		var stages = [];
         <?php foreach(getBudgetStageArr() as $k=>$v) {?>
 		stages.push({
@@ -277,16 +265,36 @@ var FormEditable = function() {
 					params['total_amountfee'] = $('#'+budget_id+'-total_amountfee').text();
 				}
 				return params;
+			},
+			success: function (status) {
+				$('.budget_status').data('value',status);
+				initBudgettables();
 			}
         });
+		$('.budget_remark').editable({
+			emptytext:'N/A'
+		});
+		initBudgettables();
+		initEndStock('<?php echo $budget_id?>-');
+	}
+	var initBudgettables = function() {
+		var budget_status = $('.budget_status').data('value');
+		console.log(budget_status);
+		var is_seller = true;
+		<?php if($base_data['sap_seller_id']==Auth::user()->sap_seller_id){ ?>
+		is_seller = true;
+		<?php } ?>
 		
+		$('.sku_ranking').editable({
+			emptytext:'N/A'
+		});		
 		$('.sku_price,.sku_qty,.sku_pro_price,.sku_pro_qty,.sku_pro_per,.budgetskus_cost,.budgetskus_common_fee,.budgetskus_pick_fee,.budgetskus_exception,.budgetskus_stock').editable({
 			emptytext:'0',
 			validate: function (value) {
-                if (isNaN(value)) {
-                    return 'Must be a number';
-                }
-            },
+				if (isNaN(value)) {
+					return 'Must be a number';
+				}
+			},
 			success: function (response) { 
 				var obj = JSON.parse(response);
 				
@@ -299,7 +307,15 @@ var FormEditable = function() {
 				return 'remote error'; 
 			} 
 		});
-		initEndStock('<?=$budget_id?>-');
+		
+		
+		if(budget_status!=1 && is_seller){
+			option='enable';
+		}else{
+			option='disable';
+		}
+		$('.sku_ranking,.sku_price,.sku_qty,.sku_pro_price,.sku_pro_qty,.sku_pro_per,.budgetskus_cost,.budgetskus_common_fee,.budgetskus_pick_fee,.budgetskus_exception,.budgetskus_stock').editable(option);
+		
     }
 	
 	var initEndStock = function(id){
@@ -451,7 +467,7 @@ var FormEditable = function() {
 						
     return {
         init: function() {
-            initEditables();
+            initBasetables();
 			$('.editable').on('hidden', function(e, reason) {
                 if (reason === 'save' || reason === 'nochange') {
                     var $next = $(this).closest('td').next().find('.editable');

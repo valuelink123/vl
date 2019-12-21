@@ -177,10 +177,11 @@ class BudgetController extends Controller
 								$updateData[$date]['weeks']=$i;
 								$updateData[$date]['date']=$date;
 								$updateData[$date][$field]=$value;
+								$updateData[$date]['created_at']=$updateData[$date]['updated_at']=date('Y-m-d H:i:s');
 							}
 						}
 					}
-					if($updateData) Budgetdetails::insertOnDuplicateWithDeadlockCatching(array_values($updateData), ['qty','promote_qty','income','cost', 'common_fee', 'pick_fee', 'promotion_fee', 'amount_fee', 'storage_fee']);
+					if($updateData) Budgetdetails::insertOnDuplicateWithDeadlockCatching(array_values($updateData), ['qty','promote_qty','income','cost', 'common_fee', 'pick_fee', 'promotion_fee', 'amount_fee', 'storage_fee','created_at','updated_at']);
 					$budget->qty = round($request->get('total_qty'));
 					$budget->income = round($request->get('total_income'),2);
 					$budget->cost = round($request->get('total_cost'),2);
@@ -191,6 +192,7 @@ class BudgetController extends Controller
 					$budget->storage_fee = round($request->get('total_storagefee'),2);
 				}
 				$budget->save();
+				echo $budget->status;
 				die();
 			}else{
 				Budgetskus::where('sku',$budget->sku)->where('site',$budget->site)->update([array_get($data,1)=>$request->get('value')]);	
