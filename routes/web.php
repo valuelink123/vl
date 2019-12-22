@@ -127,6 +127,7 @@ Route::Post('/skus', 'SkuController@update');
 Route::get('/budgets', 'BudgetController@index');
 Route::Post('/budgets', 'BudgetController@update');
 Route::get('/budgets/edit', 'BudgetController@edit');
+Route::match(['post','get'],'/budgets/create', 'BudgetController@create');
 Route::get('/nonctg', 'NonctgController@index');//non-ctg功能
 Route::Post('/nonctg/get', 'NonctgController@get')->name('getnonctg');//non-ctg功能，ajax请求数据
 Route::Post('/nonctg/batchAssignTask', 'NonctgController@batchAssignTask')->name('batchAssignTaskNonctg');//non-ctg功能的分配功能
@@ -175,4 +176,3 @@ Route::get('/productTransfer/replyExport', 'ProductTransferController@replyExpor
 Route::match(['post','get'],'/rsgUser/list', 'RsgUserController@list');//rsgUser列表展示
 
 Route::post('/star/updatePost', 'StarController@updatePost');//更新帖子状态和帖子类型
-

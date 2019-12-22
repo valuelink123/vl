@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Hash;
 use DB;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use App\Models\TaxRate;
 
 class BudgetController extends Controller
 {
@@ -273,5 +274,76 @@ class BudgetController extends Controller
     }
 
 
+	/*
+	* 添加新品的sku
+	*/
+	public function create(Request $request)
+	{
+		// if(!Auth::user()->can(['budgets-add'])) die('Permission denied -- budgets-add');
+		if($_POST){
+			$userData = Auth::user();
+			$item_group = $request->get('item_group');
+			$site = $request->get('site');
+			//退货率和关税税率在页面上的时候会输入%，但是存入数据库的时候不要把%存进去
+			$exception = explode('%',$request->get('exception'))[0];
+			$tax = explode('%',$request->get('tax'))[0];
+
+			//添加的新品的sku编码为item_group20200001
+			$year = date('Y');
+			$year = $year > 2020 ? $year : 2020;
+			$groupYear = $item_group.$year;
+			$itemSku = Budgetskus::where('sku','like',$groupYear.'%')->orderBy('sku','desc')->first();
+
+			//item_group原先有添加新品的时候，sku编码为在原先的编码基础上+1,item_group原先没有添加新品的时候，sku编码为item_group20200001
+			$sku = empty($itemSku) ? $groupYear.'0001' : $groupYear.sprintf("%04d",explode($groupYear,$itemSku->sku)[1] + 1);
+			DB::beginTransaction();
+			$res = Budgetskus::updateOrCreate(
+				['sku' => $sku,'site' => $site],
+				[
+					'sku' => $sku,
+					'description' => $request->get('description'),
+					'site' => $site,
+					'status' => '新品规划',
+					// 'level' => 0,
+					// 'stock' => 0,
+					'volume' => $request->get('volume'),
+					// 'size' => 0,
+					'cost' => $request->get('cost'),
+					'common_fee' => $request->get('common_fee'),
+					'pick_fee' => $request->get('pick_fee'),
+					'exception' => $exception,
+					'bg' => $userData->ubg,
+					'bu' => $userData->ubu,
+					'sap_seller_id' => $userData->sap_seller_id,
+				]
+			);
+			if(empty($res)){
+				DB::rollBack();
+				$request->session()->flash('error_message','Save budget-skus Failed! Please resubmit!');
+				return redirect()->back()->withInput();
+			}else{
+				$siteShort = getSiteShort();
+				$res = TaxRate::updateOrCreate(
+					['sku' => $sku,'site' => $site],
+					[
+						'sku' => $sku,
+						'site' => isset($siteShort[$site]) ? strtoupper($siteShort[$site]) : $site,
+						'tax' => $tax,
+					]
+				);
+				if(empty($res)){
+					DB::rollBack();
+					$request->session()->flash('error_message','Save tax-rate Failed! Please resubmit!');
+					return redirect()->back()->withInput();
+				}
+			}
+			DB::commit();
+			$request->session()->flash('success_message','Add New Success');
+			return redirect()->back()->withInput();
+		}else{
+			$itemGroup  = $this->getItemGroup();
+			return view('budget/addNew',array('itemGroup'=>$itemGroup));
+		}
+	}
 
 }

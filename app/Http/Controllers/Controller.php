@@ -125,4 +125,18 @@ class Controller extends BaseController
 		}
 		return $where;
 	}
+
+	/*
+	 * 得到item_group的键值对
+	 * key为item_group，val为item_group——brand_line
+	 */
+	public function getItemGroup()
+	{
+		$data = array();
+		$_data = DB::select('SELECT item_group,any_value(brand_line) as brand_line FROM asin group by item_group order by item_group asc');
+		foreach($_data as $key=>$val){
+			$data[$val->item_group] = $val->item_group.'——'.$val->brand_line;
+		}
+		return $data;
+	}
 }
