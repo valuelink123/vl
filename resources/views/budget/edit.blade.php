@@ -53,15 +53,16 @@ white-space: nowrap;
                 <div class="portlet-body">	
                     <div class="table-container">
 					<div class="row pull-right" >
-						<form action="{{url('review/upload')}}" method="post" enctype="multipart/form-data">
+						<form action="{{url('budgets/upload')}}" method="post" enctype="multipart/form-data">
 						<div class="col-md-4" style="text-align:right;" >
 
-							<a href="{{ url('/uploads/reviewUpload/review_customers.csv')}}" >Import Template
+							<a href="{{ url('/uploads/budgetsUpload/data.csv')}}" >Import Template
                                 </a>	
 						</div>
 						<div class="col-md-4">
 							{{ csrf_field() }}
 								 <input type="file" name="importFile"  />
+								 <input type="hidden" name="budget_id" value="{{$budget_id}}"  />
 						</div>
 						<div class="col-md-4">
 							<button type="submit" class="btn blue btn-sm" id="data_search">Upload</button>
