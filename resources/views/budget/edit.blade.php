@@ -297,7 +297,6 @@ var FormEditable = function() {
 	}
 	var initBudgettables = function() {
 		var budget_status = $('.budget_status').data('value');
-		console.log(budget_status);
 		var is_seller = true;
 		<?php if($base_data['sap_seller_id']==Auth::user()->sap_seller_id){ ?>
 		is_seller = true;
@@ -349,7 +348,7 @@ var FormEditable = function() {
 			initLine(budget_id,week_id);
 		}
 		var stock =  parseInt($('#'+budget_id+'-stock').text());
-		var first4WeeksQty =stock;
+		var first4WeeksQty = stock;
 		var tax = parseFloat($('#tax').text());
 		var headshipfee = parseFloat($('#headshipfee').text());
 		var cold_storagefee = parseFloat($('#cold_storagefee').val());
@@ -373,9 +372,10 @@ var FormEditable = function() {
 		var total_amountfee=0; 
 		var total_economic=0;   
 			   
-		
+		var endStock = 0;
+		var startStock = stock;
 		for (let i = 1;i <= weeks;i++){
-			var startStock = stock;
+			
 			var week_line_qty = parseInt($('#'+budget_id+'-'+i+'-week_line_qty').text());
 			var week_line_profit = parseFloat($('#'+budget_id+'-'+i+'-week_line_profit').text());
 			var week_line_fee = parseFloat($('#'+budget_id+'-'+i+'-week_line_fee').text());
@@ -405,22 +405,22 @@ var FormEditable = function() {
 			   if(i==weeks-6) n_stock=parseInt(n_stock*1.127);
 			}
 			<?php if($base_data['status']=='淘汰'){ ?>
-			var endStock = stock;
+			endStock = stock;
 			<?php }else{ ?>
-			var endStock = stock>n_stock?stock:n_stock;
+			endStock = stock>n_stock?stock:n_stock;
 			<?php }?>
 			
 			endStock = endStock>0?endStock:0;
 			$('#'+budget_id+'-'+(i)+'-stock_end').val(endStock);
 			//平均库存
 			avgStock[i] = parseInt((startStock+endStock)/2);
+			startStock = endStock;
 			var week_line_amountfee = parseFloat(cost*avgStock[i]*0.00375).toFixed(2);
 			$('#'+budget_id+'-'+(i)+'-week_line_amountfee').text(week_line_amountfee);
 			
 			if(i<=4){
 				var week_line_storagefee = parseFloat(first4WeeksQty*0.656*hot_storagefee).toFixed(2);
 			}else{
-			  	
 				var week_line_storagefee = parseFloat(avgStock[i-4]*(i>43?hot_storagefee:cold_storagefee)).toFixed(2);
 			}
 			$('#'+budget_id+'-'+(i)+'-week_line_storagefee').text(week_line_storagefee);  
@@ -453,6 +453,7 @@ var FormEditable = function() {
 		$('#'+budget_id+'-total_profee').text(total_profee.toFixed(2));
 		$('#'+budget_id+'-total_amountfee').text(total_amountfee.toFixed(2));
 		$('#'+budget_id+'-total_economic').text(total_economic.toFixed(2));
+		
 	}
 
 	
