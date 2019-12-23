@@ -19,13 +19,23 @@
                                 <input type="text" class="form-control" name="name" id="name" value="{{old('name')}}" required >
                             </div>
                         </div>
+
                         <div class="form-group">
                             <label>Email</label>
                             <div class="input-group ">
                                 <span class="input-group-addon">
                                     <i class="fa fa-bookmark"></i>
                                 </span>
+                                @if(count($emails) == 0)
                                 <input type="text" class="form-control" name="email" id="email" value="{{old('email')}}" required >
+                                @else
+                                <select class="form-control" name="email" id="email">
+                                    @foreach ($emails as $value)
+                                        <option value="{{$value}}" @if(old('email')==$value) selected @endif>{{$value}}</option>
+                                    @endforeach
+                                </select>
+                                @endif
+
                             </div>
                         </div>
                         <div class="form-group">
@@ -60,6 +70,15 @@
                             </div>
                         </div>
 
+                        <div class="form-group">
+                            <label>Review ID</label>
+                            <div class="input-group ">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-bookmark"></i>
+                                </span>
+                                <input required pattern="^\w+( +\w+)*$" autocomplete="off" class="xform-autotrim form-control" placeholder="Review ID Separated by spaces" name="review_id" oninput="value=value.replace(/[^(\w|\s)]/g,'')" />
+                            </div>
+                        </div>
                         <div style="clear:both;"></div>
                     </div>
                     <div class="form-actions">

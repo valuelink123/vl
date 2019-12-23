@@ -133,7 +133,7 @@
                                             <div class="form-group">
                                                 <label>
                                                     <span>And the review ID ?</span>
-                                                    <input required pattern="^\w+( +\w+)*$" autocomplete="off" class="xform-autotrim form-control" placeholder="Review ID Separated by spaces" name="review_id"
+                                                    <input required pattern="^\w+( +\w+)*$" autocomplete="off" class="xform-autotrim form-control" placeholder="Review ID Separated by spaces" name="review_id" oninput="value=value.replace(/[^(\w|\s)]/g,'')"
                                                            data-enable-radio="commented"/>
                                                 </label>
                                             </div>

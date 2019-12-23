@@ -254,13 +254,28 @@ class RsgrequestsController extends Controller
 		return $seller;
     }
 	
-	public function create()
+	public function create(Request $request)
     {
 		if(!Auth::user()->can(['rsgrequests-create'])) die('Permission denied -- rsgrequests-create');
 		$data['asin'] = isset($_GET['asin']) ? trim($_GET['asin']) : '';
 		$data['site'] = isset($_GET['site']) ? trim($_GET['site']) : '';
 		$data['productid'] = isset($_GET['productid']) ? trim($_GET['productid']) : '';
-        return view('rsgrequests/add',['products'=>self::getproducts(),'data'=>$data]);
+
+        $emails = [];
+        $contactBasic = [];
+        $id = isset($_GET['id']) ? $_GET['id'] : '';
+        if($id != ''){
+            $results = DB::select('select email,facebook_name,facebook_group from client_info where client_id='.$id);
+            $results = array_map('get_object_vars', $results);
+            $fbgroupConfig = getFacebookGroup();
+            foreach($results as $key=>$val){
+                $emails[] = $val['email'];
+                $contactBasic['facebook_name'] = $val['facebook_name'];
+                $contactBasic['facebook_group'] = isset($fbgroupConfig[$val['facebook_group']]) ? $val['facebook_group'].' | '.$fbgroupConfig[$val['facebook_group']] : $val['facebook_group'];
+            }
+        }
+
+        return view('rsgrequests/add',['products'=>self::getproducts(),'data'=>$data, 'emails'=>$emails, 'contactBasic'=>$contactBasic]);
     }
 
 

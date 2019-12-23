@@ -1,5 +1,5 @@
 @extends('layouts.layout')
-@section('label', 'Email Details')
+@section('label', 'Crm Edit')
 @section('content')
 
     <link rel="stylesheet" href="/assets/global/plugins/bootstrap/css/bootstrap-select.min.css">
@@ -38,6 +38,22 @@
                             <i class="icon-microphone font-green"></i>
                             <span class="caption-subject bold font-green">Crm Edit</span>
                         </div>
+                        @permission('rsgrequests-create')
+                        <div class="btn-group" style="float:right;margin-left:5px">
+                            <a data-target="#ajax_rsg" data-toggle="modal" href="{{ url('rsgrequests/create').'?id='.$contactBasic['id']}}">
+                                <button id="rsgrequests-create" class="btn sbold blue"> Add RSG Request
+                                </button>
+                            </a>
+                        </div>
+                        @endpermission
+                        @permission('ctg-add')
+                        <div class="btn-group" style="float:right;margin-left:5px">
+                            <a data-target="#ajax_ctg" data-toggle="modal" href="{{ url('ctg/create').'?id='.$contactBasic['id']}}">
+                                <button id="ctg-add" class="btn sbold blue"> Create New SG
+                                </button>
+                            </a>
+                        </div>
+                        @endpermission
                     </div>
                     <div class="portlet-body">
                         <div class="tabbable-line">
@@ -262,6 +278,28 @@
             </div>
         </div>
     </form>
+
+    <div class="modal fade bs-modal-lg" id="ajax_rsg" role="basic" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content" >
+                <div class="modal-body" >
+                    <img src="../assets/global/img/loading-spinner-grey.gif" alt="" class="loading">
+                    <span>Loading... </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade bs-modal-lg" id="ajax_ctg" role="basic" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content" >
+                <div class="modal-body" >
+                    <img src="../assets/global/img/loading-spinner-grey.gif" alt="" class="loading">
+                    <span>Loading... </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     @include('frank.common')
     <script>
         $(function(){

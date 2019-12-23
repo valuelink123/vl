@@ -548,18 +548,24 @@ class CtgController extends Controller {
     /*
      * 添加CTG数据（点击add进入到ctg添加页面）
      */
-	public function create()
+	public function create(Request $req)
 	{
 		if(!Auth::user()->can(['ctg-add'])) die('Permission denied -- ctg-add');
 		$channel = getCtgChannel();
+        $emails = [];
+        $id = isset($_REQUEST['id']) ? $_REQUEST['id'] : '';
+        if($id != ''){
+            $emails = DB::table('client_info')->where('client_id', $id)->pluck('email');
+        }
 
-		return view('frank/ctgAdd', compact('channel'));
+		return view('frank/ctgAdd', compact(['channel','emails']));
 	}
 	/*
 	 * 添加ctg数据操作
 	 */
 	public function store(Request $req)
 	{
+
 		if(!Auth::user()->can(['ctg-add'])) die('Permission denied -- ctg-add');
 		$data['name'] = isset($_REQUEST['name']) ? $_REQUEST['name'] : '';
 		$data['email'] = isset($_REQUEST['email']) ? $_REQUEST['email'] : '';
@@ -568,17 +574,34 @@ class CtgController extends Controller {
 		$data['order_id'] = isset($_REQUEST['order_id']) ? $_REQUEST['order_id'] : '';
 		$data['processor'] = Auth::user()->id;
 
+        $updates = [];
+        $review_id = isset($_REQUEST['review_id']) ? $_REQUEST['review_id'] : '';
+        $updates['commented'] = 1;
+        $updates['status'] = 'Confirm Review';
+        $steps_array = array('commented'=>"1", 'review_id'=>$review_id, 'shipment_id'=>'', 'facebook_name'=>'','facebook_group'=>'','track_notes'=>[]);
+        $updates['steps'] = json_encode($steps_array);
+
 		$res = 0;
 		$msg = '';
 		try{
 			if($channel==1){
 				$res = Cashback::add($data);
+                $ctgRow = Cashback::selectRaw('*')->orderBy('created_at','desc')->limit(1)->first();
 			}elseif($channel==2){
 				$res = B1g1::add($data);
+                $ctgRow = B1g1::selectRaw('*')->orderBy('created_at','desc')->limit(1)->first();
 			}else{
 				$data['channel'] = $channel;
 				$res = Ctg::add($data);
-			}
+                $ctgRow = Ctg::selectRaw('*')->orderBy('created_at','desc')->limit(1)->first();
+            }
+
+            $wheres = [
+                ['created_at', $ctgRow['created_at']],
+                ['order_id', $ctgRow['order_id']],
+            ];
+            $ctgRow->where($wheres)->update($updates);
+
 		} catch (\Exception $e) {
 			$msg = str_replace("For help, please mail to support@claimthegift.com", "", $e->getMessage());
 		}

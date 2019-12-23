@@ -50,7 +50,15 @@
                         </div>
                         <div class="form-group col-md-6">
                             <label>Customer Email</label>
+                            @if(count($emails) == 0)
                                 <input type="text" class="form-control" name="customer_email" id="customer_email"  required>
+                            @else
+                                <select class="form-control" name="customer_email" id="customer_email">
+                                    @foreach ($emails as $value)
+                                        <option value="{{$value}}" @if(old('customer_email')==$value) selected @endif>{{$value}}</option>
+                                    @endforeach
+                                </select>
+                            @endif
                         </div>
 						
 						<div class="form-group col-md-6">
@@ -86,12 +94,7 @@
 								</div>
                             
                         </div>
-						
-						
 
-						
-						
-						
 						<div class="form-group col-md-6">
                             <label>Amazon Order Id</label>
                                 <input type="text" class="form-control" name="amazon_order_id" id="amazon_order_id" >
@@ -141,13 +144,12 @@
 
                         <div class="form-group col-md-6">
                             <label>Customer's FB Name</label>
-                            <input type="text" class="form-control" name="facebook_name" id="facebook_name">
-
+                            <input type="text" class="form-control" name="facebook_name" id="facebook_name" @if(count($contactBasic) > 0) value="{{$contactBasic['facebook_name']}}" @endif />
                         </div>
 
                         <div class="form-group col-md-6">
                             <label>FB Group</label>
-                            <input id="facebook_group" class="form-control" name="facebook_group" list="list-facebook_group" placeholder="Facebook Group"/>
+                            <input id="facebook_group" class="form-control" name="facebook_group" list="list-facebook_group" placeholder="Facebook Group" autocomplete="off" @if(count($contactBasic) > 0)  value="{{$contactBasic['facebook_group']}}" @endif />
                             <datalist id="list-facebook_group">
                                 @foreach(getFacebookGroup() as $id=>$name)
                                     <option value="{!! $id !!} | {!! $name !!}"></option>
