@@ -42,6 +42,8 @@ class BudgetController extends Controller
 		$sku = $request->get('sku');
 	    $year = $request->get('year')?$request->get('year'):date('Y',strtotime('+1 month'));
 		$user_id = $request->get('user_id');
+		$sku_status = $request->get('sku_status');
+		$b_status = $request->get('b_status');
 		$where = "1=1";
 		if (Auth::user()->seller_rules) {
 			$rules = explode("-",Auth::user()->seller_rules);
@@ -69,7 +71,12 @@ class BudgetController extends Controller
 		if($level){
 			$where.= " and level = '".$level."'";
 		}
-		
+		if($sku_status){
+			$where.= " and status = '".$sku_status."'";
+		}
+		if($b_status){
+			$where.= " and budget_status = '".$b_status."'";
+		}
 		if($sku){
 			$where.= " and (sku='".$sku."' or description like '%".$sku."%')";
 		}
@@ -83,10 +90,11 @@ class BudgetController extends Controller
 		left join (select * from budgets where year = ".($year-1).") as budgets_2 
 		on budget_skus.sku = budgets_2.sku and budget_skus.site = budgets_2.site
 		) as sku_tmp_cc";
- 		$datas = DB::table(DB::raw($sql))->whereRaw($where)->paginate(20);
+ 		$datas = DB::table(DB::raw($sql))->whereRaw($where)->orderByRaw("case when level = 'S' Then '0' else level end asc")->paginate(20);
 		
         $data['teams']= getUsers('sap_bgbu');
 		$data['users']= getUsers('sap_seller');
+		$data['sku_status']= Budgetskus::groupBy('status')->pluck('status');
 		$data['year']=$year;
 		$data['datas']= $datas;
         return view('budget/index',$data);

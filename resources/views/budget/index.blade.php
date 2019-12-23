@@ -104,7 +104,7 @@ white-space: nowrap;
                                     </select>
 						</div>
 						
-						 <div class="col-md-1">
+						<div class="col-md-1">
 						<select class="form-control form-filter input-sm" name="level" id="level">
 									<option value="">Level</option>
 										<option value="S" <?php if('S'==array_get($_REQUEST,'level')) echo 'selected'; ?>>S</option>
@@ -113,6 +113,24 @@ white-space: nowrap;
 										<option value="C" <?php if('C'==array_get($_REQUEST,'level')) echo 'selected'; ?>>C</option>
 										<option value="D" <?php if('D'==array_get($_REQUEST,'level')) echo 'selected'; ?>>D</option>
                                     </select>
+						</div>
+						
+						<div class="col-md-1">
+						<select class="form-control form-filter input-sm" name="sku_status" id="sku_status">
+									<option value="">Sku Status</option>
+										@foreach ($sku_status as $k=>$v)
+                                            <option value="{{$v}}" <?php if($v==array_get($_REQUEST,'sku_status')) echo 'selected'; ?>>{{$v}}</option>
+                                        @endforeach
+                                    </select>
+						</div>
+						
+						<div class="col-md-1">
+						<select class="form-control form-filter input-sm" name="b_status" id="b_status">
+								<option value="">Budget Status</option>
+									@foreach (getBudgetStageArr() as $k=>$v)
+								<option value="{{$k}}" <?php if($k==array_get($_REQUEST,'b_status')) echo 'selected'; ?>>{{$v}}</option>
+							@endforeach
+						</select>
 						</div>
 						
 						<div class="col-md-2">
