@@ -47,11 +47,11 @@
 
 						<div class="form-group col-md-6">
 							<label>佣金比例</label>
-							<input type="text" class="form-control" name="common_fee" id="common_fee" pattern="^[0-9]*[.]{0,1}[0-9]{0,2}" required>
+							<input type="text" class="form-control" name="common_fee" id="common_fee" pattern="^[0-9]*[.]{0,1}[0-9]{0,2}[%]$" required>
 						</div>
 
 						<div class="form-group col-md-6">
-							<label>拣配费金额（CNY）</label>
+							<label>拣配费金额（外币）</label>
 							<input type="text" class="form-control" name="pick_fee" id="pick_fee" pattern="^[0-9]*[.]{0,1}[0-9]{0,2}" required>
 						</div>
 
