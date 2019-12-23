@@ -71,7 +71,7 @@ class BudgetController extends Controller
 		}
 		
 		if($sku){
-			$where.= " (sku='".$sku."' or description like '%".$sku."%')";
+			$where.= " and (sku='".$sku."' or description like '%".$sku."%')";
 		}
 		
 		
@@ -163,17 +163,23 @@ class BudgetController extends Controller
 						$updateData=[];
 						foreach($importData as $key => $data){
 							if($key>2 && $key<($weeks+3)){
-								$max_value=0;
+								
 								
 								foreach(['C'=>'ranking','D'=>'price','E'=>'qty','F'=>'promote_price','G'=>'promote_qty','H'=>'promotion'] as $temp_k=>$temp_v){
+									$max_value=0;
+									$week_value = array_get($data,$temp_k);
 									for($k=0;$k<=6;$k++){
 										$date = date("Y-m-d", strtotime($budget->year . 'W' . sprintf("%02d",($key-2)))+86400*$k);
-										$value = ($temp_v=='qty' || $temp_v == 'promote_qty')?round(array_get($data,$temp_k)*array_get($week_per,$k)):round(array_get($data,$temp_k)*array_get($week_per,$k),2);
-										if($max_value+$value>$week_value) $value = $week_value-$max_value;
-										if($max_value<=$week_value && $i==6) $value = $week_value-$max_value;
-										$max_value+=$value;
+										if($temp_v=='qty' || $temp_v == 'promote_qty'){
+											$value = round($week_value*array_get($week_per,$k));			
+											if($max_value+$value>$week_value) $value = $week_value-$max_value;
+											if($max_value<=$week_value && $k==6) $value = $week_value-$max_value;
+											$max_value+=$value;
+										}else{
+											$value = ($temp_v=='ranking')?$week_value:round($week_value,2);
+										}
 										$updateData[$date]['budget_id']=$budget_id;
-										$updateData[$date]['weeks']=$i;
+										$updateData[$date]['weeks']=($key-2);
 										$updateData[$date]['date']=$date;
 										$updateData[$date][$temp_v]=$value;
 										$updateData[$date]['created_at']=$updateData[$date]['updated_at']=date('Y-m-d H:i:s');
@@ -230,7 +236,7 @@ class BudgetController extends Controller
 								$date = date("Y-m-d", strtotime($budget->year . 'W' . sprintf("%02d",$i))+86400*$k);
 								$value = ($field=='qty' || $field == 'promote_qty')?round($week_value*array_get($week_per,$k)):round($week_value*array_get($week_per,$k),2);
 								if($max_value+$value>$week_value) $value = $week_value-$max_value;
-								if($max_value<=$week_value && $i==6) $value = $week_value-$max_value;
+								if($max_value<=$week_value && $k==6) $value = $week_value-$max_value;
 								$max_value+=$value;
 								$updateData[$date]['budget_id']=$budget_id;
 								$updateData[$date]['weeks']=$i;
