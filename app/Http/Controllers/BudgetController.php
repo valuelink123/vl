@@ -162,6 +162,7 @@ class BudgetController extends Controller
 	{	
 		$budget_id = intval($request->get('budget_id'));
 		$budget = Budgets::find($budget_id);
+		if($budget->status!=0) die('预算已经提交或确认！');
 		if(empty($budget)) die;
 		if($request->isMethod('POST')){  
             $file = $request->file('importFile');  
