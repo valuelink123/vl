@@ -325,8 +325,7 @@ var FormEditable = function() {
 			} 
 		});
 		
-		
-		if(budget_status!=1 && is_seller){
+		if(budget_status==0 && is_seller){
 			option='enable';
 		}else{
 			option='disable';
