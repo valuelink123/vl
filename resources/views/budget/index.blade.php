@@ -192,23 +192,21 @@ white-space: nowrap;
 			<col width="2%"></col>
 			<col width="6%"></col>
 			<col width="9%"></col>
-			<col width="3%"></col>
-			<col width="3%"></col>
-			<col width="3%"></col>
+			<col width="4%"></col>
+			<col width="4%"></col>
 			<col width="4%"></col>
 			<col width="5%"></col>
 			<col width="5%"></col>
-			<col width="4%"></col>
-			<col width="5%"></col>
-			<col width="4%"></col>
 			<col width="5%"></col>
 			<col width="5%"></col>
-			<col width="4%"></col>
-			<col width="5%"></col>
-			<col width="4%"></col>
 			<col width="5%"></col>
 			<col width="5%"></col>
-			<col width="4%"></col>
+			<col width="5%"></col>
+			<col width="5%"></col>
+			<col width="5%"></col>
+			<col width="5%"></col>
+			<col width="5%"></col>
+			<col width="5%"></col>
 			<col width="5%"></col>
 			<col width="6%"></col>
 			</colgroup>
@@ -221,26 +219,24 @@ white-space: nowrap;
 						<td rowspan="2" width="3%">站点</td>
 						<td rowspan="2" width="5%">状态</td>
 						<td rowspan="2" width="3%">等级</td>
-						<td colspan="5" width="23%">{{$year}}预算</td>
-						<td colspan="5" width="23%">{{$year-1}}实际</td>
-						<td colspan="5" width="23%">环比</td>
+						<td rowspan="2" width="5%">期初库存</td>
+						<td colspan="4" width="20%">{{$year}}预算</td>
+						<td colspan="4" width="20%">{{$year-1}}实际</td>
+						<td colspan="4" width="20%">环比</td>
 						<td rowspan="2" width="6%">状态</td>
 					  </tr>
 					  <tr class="head" >
-						<td width="4%">销量</td>
+						<td width="5%">销量</td>
 						<td width="5%">销售额</td>
-						<td width="5%">利润额</td>
-						<td width="4%">异常率</td>
+						<td width="5%">利润率</td>
 						<td width="5%">经济效益</td>
-						<td width="4%">销量</td>
+						<td width="5%">销量</td>
 						<td width="5%">销售额</td>
-						<td width="5%">利润额</td>
-						<td width="4%">异常率</td>
+						<td width="5%">利润率</td>
 						<td width="5%">经济效益</td>
-						<td width="4%">销量</td>
+						<td width="5%">销量</td>
 						<td width="5%">销售额</td>
-						<td width="5%">利润额</td>
-						<td width="4%">异常率</td>
+						<td width="5%">利润率</td>
 						<td width="5%">经济效益</td>
 					  </tr>
 					  </thead>
@@ -257,21 +253,20 @@ white-space: nowrap;
 						<td>{{(strtoupper(substr($data->site,-2))=='OM')?'US':strtoupper(substr($data->site,-2))}}</td>
 						<td>{{$data->status}}</td>
 						<td>{{($data->level=='0')?'S':$data->level}}</td>
+						<td>{{$data->stock}}</td>
 						<td>{{$data->qty1}}</td>
 						<td>{{$data->amount1}}</td>
-						<td>{{$data->profit1}}</td>
-						<td>{{$data->exception*100}}%</td>
+						<td>{{($data->amount1==0)?0:round($data->economic1/$data->amount1,4)*100}}%</td>
 						<td>{{$data->economic1}}</td>
 						<td>{{$data->qty2}}</td>
 						<td>{{$data->amount2}}</td>
-						<td>{{$data->profit2}}</td>
-						<td>{{$data->exception*100}}%</td>
+						<td>{{($data->amount2==0)?0:round($data->economic2/$data->amount2,4)*100}}%</td>
 						<td>{{$data->economic2}}</td>
-						<td>0</td>
-						<td>0</td>
-						<td>0</td>
-						<td>0</td>
-						<td>0</td>
+						<td>{{$data->qty1-$data->qty2}}</td>
+						<td>{{$data->amount1-$data->amount2}}</td>
+						<td>{{(($data->amount1==0)?0:round($data->economic1/$data->amount1,4)*100)-(($data->amount2==0)?0:round($data->economic2/$data->amount2,4)*100)}}%</td>
+						<td>{{$data->economic1-$data->economic2}}</td>
+	
 						<td><a href="{{url('/budgets/edit?sku='.$data->sku.'&site='.$data->site.'&year='.$year)}}">{{array_get(getBudgetStageArr(),($data->budget_status)??0)}}</a></td>
 					  </tr>
 					  @endforeach

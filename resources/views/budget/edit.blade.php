@@ -56,7 +56,7 @@ white-space: nowrap;
 						<form action="{{url('budgets/upload')}}" method="post" enctype="multipart/form-data">
 						<div class="col-md-4" style="text-align:right;" >
 
-							<a href="{{ url('/uploads/budgetsUpload/data.csv')}}" >Import Template
+							<a href="{{ url('/uploads/BudgetsUpload/data.csv')}}" >Import Template
                                 </a>	
 						</div>
 						<div class="col-md-4">
