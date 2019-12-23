@@ -96,7 +96,7 @@ white-space: nowrap;
 						<td width="5%">状态</td>
 						<td width="5%">等级</td>
 						<td width="4%">不含税采购单价(CNY)</td>
-						<td width="4%">关税</td>
+						<td width="4%">关税税率</td>
 						<td width="4%">头程运费(CNY)</td>
 						<td width="5%">佣金比率</td>
 						<td width="4%">拣配费(外币)</td>
@@ -348,7 +348,7 @@ var FormEditable = function() {
 		}
 		var stock =  parseInt($('#'+budget_id+'-stock').text());
 		var first4WeeksQty = stock;
-		var tax = parseFloat($('#tax').text());
+		var tax = parseFloat($('#tax').text())*0.4;
 		var headshipfee = parseFloat($('#headshipfee').text());
 		var cold_storagefee = parseFloat($('#cold_storagefee').val());
 		var hot_storagefee = parseFloat($('#hot_storagefee').val());
@@ -458,7 +458,7 @@ var FormEditable = function() {
 	
 	var initLine = function(budget_id,week_id){
 		var rate = parseFloat($('#rate').text());
-		var tax = parseFloat($('#tax').text());
+		var tax = parseFloat($('#tax').text())*0.4;
 		var headshipfee = parseFloat($('#headshipfee').text());
 		var cost = parseFloat($('#'+budget_id+'-cost').text());
 		var common_fee = parseFloat($('#'+budget_id+'-common_fee').text())/100;
