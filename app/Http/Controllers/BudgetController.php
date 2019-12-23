@@ -67,7 +67,7 @@ class BudgetController extends Controller
 		}
 		
 		if($level){
-			$where.= " and level = '".(($level=='S')?0:$level)."'";
+			$where.= " and level = '".$level."'";
 		}
 		
 		if($sku){
