@@ -57,7 +57,6 @@ white-space: nowrap;
 							
 					<div class="table-toolbar">
                     <form role="form" action="{{url('budgets')}}" method="GET">
-                        {{ csrf_field() }}
                         <div class="row">
 
                         <div class="col-md-1">
@@ -169,11 +168,13 @@ white-space: nowrap;
 
                     </form>
                 </div>
+				
+					<form action="{{\Request::getRequestUri()}}" method="POST">
                     <div class="table-container">
 					<div class="row">
 						<div class="col-md-3">
-							<button type="submit" class="btn blue" id="data_search">批量确认</button>
-							<button type="submit" class="btn blue" id="data_search">批量退回</button>
+							<button type="submit" class="btn blue" name="BatchUpdate" value='2'>批量确认</button>
+							<button type="submit" class="btn blue" name="BatchUpdate" value='0'>批量退回</button>
 						</div>
 						<div class="col-md-3">
 							<button type="button" class="btn red">待提交 {{array_get($finish,'0',0)}}</button>
@@ -214,7 +215,7 @@ white-space: nowrap;
 					  <thead>
 					  <tr class="head" >
 					     <td rowspan="2" width="3%">
-                                        <input type="checkbox" class="group-checkable" data-set="#datatable_ajax_asin .checkboxes" /></td>
+                                        <input type="checkbox" class="group-checkable" /></td>
 						<td rowspan="2" width="6%">SKU</td>
 						<td rowspan="2" width="8%">描述</td>
 						<td rowspan="2" width="3%">站点</td>
@@ -248,7 +249,7 @@ white-space: nowrap;
 					  <tr>
 					    <td>
 						@if($data->budget_status==1)
-						<input type="checkbox" class="group-checkable" data-set="#datatable_ajax_asin .checkboxes" />
+						<input type="checkbox" name="budget_id[]" value="{{$data->budget_id}}" />
 						@endif
 						</td>
 						<td><a href="{{url('/budgets/edit?sku='.$data->sku.'&site='.$data->site.'&year='.$year)}}">{{$data->sku}}</a></td>
@@ -279,6 +280,7 @@ white-space: nowrap;
 					
 					{{ $datas->appends($_REQUEST)->links() }}   
                     </div>
+					</form>
                 </div>
             </div>
             <!-- END EXAMPLE TABLE PORTLET-->
@@ -311,6 +313,13 @@ jQuery(document).ready(function() {
 		minViewMode:2,
 		orientation: 'bottom',
 		autoclose: true
+	});
+	$('.group-checkable',$('.table')).change(function() {
+		var set = $('.table').find('tbody > tr > td:nth-child(1) input[type="checkbox"]');
+		var checked = $(this).prop("checked");
+		$(set).each(function() {
+			$(this).prop("checked", checked);
+		});
 	});
 });
 

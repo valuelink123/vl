@@ -255,7 +255,7 @@ var FormEditable = function() {
     $.mockjaxSettings.responseTime = 500;
 
     $.fn.editable.defaults.inputclass = 'form-control';
-    $.fn.editable.defaults.url = '/budgets';
+    $.fn.editable.defaults.url = '/budget';
 
     var initBasetables = function() {
 		var stages = [];
