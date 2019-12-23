@@ -119,7 +119,7 @@ white-space: nowrap;
 						<input type="hidden" id ="hot_storagefee"  value="{{$base_data['hot_storagefee']}}" />
 						
 						</td>
-						<td><a class="budgetskus_cost editable" title="成本" href="javascript:;" id="{{$budget_id}}-cost" data-pk="{{$budget_id}}-cost" data-type="text" data-placement="bottom">{{round($base_data['cost'])}}</a></td>
+						<td><a class="budgetskus_cost editable" title="成本" href="javascript:;" id="{{$budget_id}}-cost" data-pk="{{$budget_id}}-cost" data-type="text" data-placement="bottom">{{round($base_data['cost'],2)}}</a></td>
 						<td><span id = "tax">{{$base_data['tax']}}</span></td>
 						<td><span id = "headshipfee">{{$base_data['headshipfee']}}</span></td>
 						<td><a class="budgetskus_common_fee editable" title="佣金比率%" href="javascript:;" id="{{$budget_id}}-common_fee" data-pk="{{$budget_id}}-common_fee" data-type="text" data-placement="bottom">{{$base_data['common_fee']*100}}</a>%</td>
