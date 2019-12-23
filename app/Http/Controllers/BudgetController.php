@@ -184,8 +184,6 @@ class BudgetController extends Controller
 						$updateData=[];
 						foreach($importData as $key => $data){
 							if($key>2 && $key<($weeks+3)){
-								
-								
 								foreach(['C'=>'ranking','D'=>'price','E'=>'qty','F'=>'promote_price','G'=>'promote_qty','H'=>'promotion'] as $temp_k=>$temp_v){
 									$max_value=0;
 									$week_value = array_get($data,$temp_k);
@@ -255,7 +253,7 @@ class BudgetController extends Controller
 							if($j==6) $field = 'storage_fee';
 							for($k=0;$k<=6;$k++){
 								$date = date("Y-m-d", strtotime($budget->year . 'W' . sprintf("%02d",$i))+86400*$k);
-								$value = ($field=='qty' || $field == 'promote_qty')?round($week_value*array_get($week_per,$k)):round($week_value*array_get($week_per,$k),2);
+								$value = round($week_value*array_get($week_per,$k),2);
 								if($max_value+$value>$week_value) $value = $week_value-$max_value;
 								if($max_value<=$week_value && $k==6) $value = $week_value-$max_value;
 								$max_value+=$value;
@@ -267,7 +265,7 @@ class BudgetController extends Controller
 							}
 						}
 					}
-					if($updateData) Budgetdetails::insertOnDuplicateWithDeadlockCatching(array_values($updateData), ['qty','promote_qty','income','cost', 'common_fee', 'pick_fee', 'promotion_fee', 'amount_fee', 'storage_fee','created_at','updated_at']);
+					if($updateData) Budgetdetails::insertOnDuplicateWithDeadlockCatching(array_values($updateData), ['income','cost', 'common_fee', 'pick_fee', 'promotion_fee', 'amount_fee', 'storage_fee','created_at','updated_at']);
 					$budget->qty = round($request->get('total_qty'));
 					$budget->income = round($request->get('total_income'),2);
 					$budget->cost = round($request->get('total_cost'),2);
