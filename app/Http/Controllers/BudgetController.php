@@ -140,35 +140,58 @@ class BudgetController extends Controller
 	
 	public function upload( Request $request )
 	{	
+		$budget_id = intval($request->get('budget_id'));
+		$budget = Budgets::find($budget_id);
+		if(empty($budget)) die;
 		if($request->isMethod('POST')){  
             $file = $request->file('importFile');  
   			if($file){
-            if($file->isValid()){  
-                $originalName = $file->getClientOriginalName();  
-                $ext = $file->getClientOriginalExtension();  
-                $type = $file->getClientMimeType();  
-                $realPath = $file->getRealPath();  
-                $newname = date('Y-m-d-H-i-S').'-'.uniqid().'.'.$ext;  
-				$newpath = '/uploads/BudgetsUpload/'.date('Ymd').'/';
-				$inputFileName = public_path().$newpath.$newname;
-  				$bool = $file->move(public_path().$newpath,$newname);
-
-				if($bool){
-					$spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($inputFileName);
-					$importData = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);		
-					foreach($importData as $key => $data){
-						
-					}
-					$request->session()->flash('success_message','Import Success!');
-				}else{
-					$request->session()->flash('error_message','UploadFailed');
-				}          
-            } 
+				if($file->isValid()){  
+					$originalName = $file->getClientOriginalName();  
+					$ext = $file->getClientOriginalExtension();  
+					$type = $file->getClientMimeType();  
+					$realPath = $file->getRealPath();  
+					$newname = date('Y-m-d-H-i-S').'-'.uniqid().'.'.$ext;  
+					$newpath = '/uploads/BudgetsUpload/'.date('Ymd').'/';
+					$inputFileName = public_path().$newpath.$newname;
+					$bool = $file->move(public_path().$newpath,$newname);
+					if($bool){
+						$weeks = date("W", mktime(0, 0, 0, 12, 28, $budget->year));
+						$spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($inputFileName);
+						$importData = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
+						$week_per = ['0'=>1.13/7.01,'1'=>1.12/7.01,'2'=>1.09/7.01,'3'=>1.04/7.01,'4'=>0.91/7.01,'5'=>0.86/7.01,'6'=>0.86/7.01];		
+						$updateData=[];
+						foreach($importData as $key => $data){
+							if($key>2 && $key<($weeks+3)){
+								$max_value=0;
+								
+								foreach(['C'=>'ranking','D'=>'price','E'=>'qty','F'=>'promote_price','G'=>'promote_qty','H'=>'promotion'] as $temp_k=>$temp_v){
+									for($k=0;$k<=6;$k++){
+										$date = date("Y-m-d", strtotime($budget->year . 'W' . sprintf("%02d",($key-2)))+86400*$k);
+										$value = ($temp_v=='qty' || $temp_v == 'promote_qty')?round(array_get($data,$temp_k)*array_get($week_per,$k)):round(array_get($data,$temp_k)*array_get($week_per,$k),2);
+										if($max_value+$value>$week_value) $value = $week_value-$max_value;
+										if($max_value<=$week_value && $i==6) $value = $week_value-$max_value;
+										$max_value+=$value;
+										$updateData[$date]['budget_id']=$budget_id;
+										$updateData[$date]['weeks']=$i;
+										$updateData[$date]['date']=$date;
+										$updateData[$date][$temp_v]=$value;
+										$updateData[$date]['created_at']=$updateData[$date]['updated_at']=date('Y-m-d H:i:s');
+									}
+								}
+							}
+						}
+						if($updateData) Budgetdetails::insertOnDuplicateWithDeadlockCatching(array_values($updateData), ['ranking','price','qty','promote_price', 'promote_qty', 'promotion','created_at','updated_at']);
+						$request->session()->flash('success_message','Import Success!');
+					}else{
+						$request->session()->flash('error_message','UploadFailed');
+					}          
+				} 
 			}else{
 				$request->session()->flash('error_message','Please Select Upload File');
 			} 
         } 
-		return;
+		return redirect('budgets/edit?sku='.$budget->sku.'&site='.$budget->site.'&year='.$budget->year);
 	
 	}
 	
