@@ -83,13 +83,18 @@ class BudgetController extends Controller
 		
 		
 		$sql = "(
-		select budget_skus.*,budgets_1.qty as qty1,budgets_1.income as amount1,(budgets_1.income-budgets_1.cost) as profit1,(budgets_1.income-budgets_1.cost-budgets_1.common_fee-budgets_1.pick_fee-budgets_1.promotion_fee-budgets_1.amount_fee-budgets_1.storage_fee) as economic1,budgets_1.status as budget_status,budgets_1.remark
+		select budget_skus.*,budgets_1.qty as qty1,budgets_1.income as amount1,(budgets_1.income-budgets_1.cost) as profit1,(budgets_1.income-budgets_1.cost-budgets_1.common_fee-budgets_1.pick_fee-budgets_1.promotion_fee-budgets_1.amount_fee-budgets_1.storage_fee) as economic1,IFNULL(budgets_1.status,0) as budget_status,budgets_1.remark
 ,budgets_2.qty as qty2,budgets_2.income as amount2,(budgets_2.income-budgets_2.cost) as profit2,(budgets_2.income-budgets_2.cost-budgets_2.common_fee-budgets_2.pick_fee-budgets_2.promotion_fee-budgets_2.amount_fee-budgets_2.storage_fee) as economic2 from budget_skus 
 		left join (select * from budgets where year = $year) as budgets_1 
 		on budget_skus.sku = budgets_1.sku and budget_skus.site = budgets_1.site
 		left join (select * from budgets where year = ".($year-1).") as budgets_2 
 		on budget_skus.sku = budgets_2.sku and budget_skus.site = budgets_2.site
 		) as sku_tmp_cc";
+		
+		$finish = DB::table(DB::raw($sql))->selectRaw('count(*) as count,budget_status')->groupBy('budget_status')->pluck('count','budget_status');
+	
+		
+		
  		$datas = DB::table(DB::raw($sql))->whereRaw($where)->orderByRaw("case when level = 'S' Then '0' else level end asc")->paginate(20);
 		
         $data['teams']= getUsers('sap_bgbu');
@@ -97,6 +102,7 @@ class BudgetController extends Controller
 		$data['sku_status']= Budgetskus::groupBy('status')->pluck('status');
 		$data['year']=$year;
 		$data['datas']= $datas;
+		$data['finish']= $finish;
         return view('budget/index',$data);
 
     }

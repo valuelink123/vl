@@ -44,6 +44,9 @@ white-space: nowrap;
 .portlet.light {
     padding:0;
 }
+.pagination {
+    float: right;
+}
     </style>
 	<div class="row">
         <div class="col-md-12">
@@ -167,12 +170,27 @@ white-space: nowrap;
                     </form>
                 </div>
                     <div class="table-container">
-					{{ $datas->appends($_REQUEST)->links() }} 
+					<div class="row">
+						<div class="col-md-3">
+							<button type="submit" class="btn blue" id="data_search">批量确认</button>
+							<button type="submit" class="btn blue" id="data_search">批量退回</button>
+						</div>
+						<div class="col-md-3">
+							<button type="button" class="btn red">待提交 {{array_get($finish,'0',0)}}</button>
+							<button type="button" class="btn yellow">待审核  {{array_get($finish,'1',0)}}</button>
+							<button type="button" class="btn green">已确认  {{array_get($finish,'2',0)}}</button>
+						</div>
+						<div class="col-md-6 pull-right" >{{ $datas->appends($_REQUEST)->links() }} </div>
+					</div>
+					
+					
+					
 					
 					<table class="table table-striped table-bordered table-hover">
 					 <colgroup>
-			<col width="7%"></col>
-			<col width="10%"></col>
+			<col width="2%"></col>
+			<col width="6%"></col>
+			<col width="9%"></col>
 			<col width="3%"></col>
 			<col width="3%"></col>
 			<col width="3%"></col>
@@ -195,8 +213,10 @@ white-space: nowrap;
 			</colgroup>
 					  <thead>
 					  <tr class="head" >
-						<td rowspan="2" width="4%">SKU</td>
-						<td rowspan="2" width="10%">描述</td>
+					     <td rowspan="2" width="3%">
+                                        <input type="checkbox" class="group-checkable" data-set="#datatable_ajax_asin .checkboxes" /></td>
+						<td rowspan="2" width="6%">SKU</td>
+						<td rowspan="2" width="8%">描述</td>
 						<td rowspan="2" width="3%">站点</td>
 						<td rowspan="2" width="5%">状态</td>
 						<td rowspan="2" width="3%">等级</td>
@@ -226,6 +246,11 @@ white-space: nowrap;
 					  <tbody>
 					  @foreach ($datas as $data)
 					  <tr>
+					    <td>
+						@if($data->budget_status==1)
+						<input type="checkbox" class="group-checkable" data-set="#datatable_ajax_asin .checkboxes" />
+						@endif
+						</td>
 						<td><a href="{{url('/budgets/edit?sku='.$data->sku.'&site='.$data->site.'&year='.$year)}}">{{$data->sku}}</a></td>
 						<td style="overflow: hidden;text-overflow:ellipsis;white-space: nowrap;">{{$data->description}}</td>
 						<td>{{(strtoupper(substr($data->site,-2))=='OM')?'US':strtoupper(substr($data->site,-2))}}</td>
