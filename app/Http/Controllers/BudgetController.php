@@ -260,7 +260,9 @@ class BudgetController extends Controller
 				echo $budget->status;
 				die();
 			}else{
-				Budgetskus::where('sku',$budget->sku)->where('site',$budget->site)->update([array_get($data,1)=>$request->get('value')]);	
+				$field_rate = (array_get($data,1)=='exception' || array_get($data,1)=='common_fee')?0.01:1;
+				Budgetskus::where('sku',$budget->sku)->where('site',$budget->site)->update([array_get($data,1)=>($request->get('value'))*$field_rate]);	
+				
 				$return[$request->get('name')]=round($request->get('value'),4);
 				echo json_encode($return);
 				die();
@@ -268,12 +270,10 @@ class BudgetController extends Controller
 		}
 		if(intval(array_get($data,1))>0){
 			$week = array_get($data,1);
-			
-			
 			if(in_array(array_get($data,2),['qty','promote_qty'])){
 				$week_value = round($request->get('value'));
 			}elseif(array_get($data,2)=='promotion'){
-				$week_value = round($request->get('value'),4);
+				$week_value = round($request->get('value'),2)/100;
 			}else{
 				$week_value = $request->get('value');
 			}

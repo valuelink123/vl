@@ -95,11 +95,11 @@ white-space: nowrap;
 						<td width="8%">SKU</td>
 						<td width="5%">状态</td>
 						<td width="5%">等级</td>
-						<td width="4%">成本</td>
+						<td width="4%">不含税采购单价(CNY)</td>
 						<td width="4%">关税</td>
-						<td width="4%">头程运费</td>
+						<td width="4%">头程运费(CNY)</td>
 						<td width="5%">佣金比率</td>
-						<td width="4%">拣配费</td>
+						<td width="4%">拣配费(外币)</td>
 						<td width="5%">异常率</td>
 						<td width="5%">汇率</td>
 						<td width="5%">期初库存</td>
@@ -122,9 +122,9 @@ white-space: nowrap;
 						<td><a class="budgetskus_cost editable" title="成本" href="javascript:;" id="{{$budget_id}}-cost" data-pk="{{$budget_id}}-cost" data-type="text" data-placement="bottom">{{round($base_data['cost'])}}</a></td>
 						<td><span id = "tax">{{$base_data['tax']}}</span></td>
 						<td><span id = "headshipfee">{{$base_data['headshipfee']}}</span></td>
-						<td><a class="budgetskus_common_fee editable" title="佣金比率" href="javascript:;" id="{{$budget_id}}-common_fee" data-pk="{{$budget_id}}-common_fee" data-type="text" data-placement="bottom">{{$base_data['common_fee']}}</a></td>
+						<td><a class="budgetskus_common_fee editable" title="佣金比率%" href="javascript:;" id="{{$budget_id}}-common_fee" data-pk="{{$budget_id}}-common_fee" data-type="text" data-placement="bottom">{{$base_data['common_fee']*100}}</a>%</td>
 						<td><a class="budgetskus_pick_fee editable" title="拣配费" href="javascript:;" id="{{$budget_id}}-pick_fee" data-pk="{{$budget_id}}-pick_fee" data-type="text" data-placement="bottom">{{$base_data['pick_fee']}}</a></td>
-						<td><a class="budgetskus_exception editable" title="异常率" href="javascript:;" id="{{$budget_id}}-exception" data-pk="{{$budget_id}}-exception" data-type="text" data-placement="bottom">{{$base_data['exception']}}</a></td>
+						<td><a class="budgetskus_exception editable" title="异常率%" href="javascript:;" id="{{$budget_id}}-exception" data-pk="{{$budget_id}}-exception" data-type="text" data-placement="bottom">{{$base_data['exception']*100}}</a>%</td>
 						<td><span id = "rate">{{$rate}}</span></td>
 						<td><a class="budgetskus_stock editable" title="期初库存" href="javascript:;" id="{{$budget_id}}-stock" data-pk="{{$budget_id}}-stock" data-type="text" data-placement="bottom">{{$base_data['stock']}}</a></td>
 						<td>{{array_get(getUsers('sap_seller'),$base_data['sap_seller_id'],$base_data['sap_seller_id'])}}</td>
@@ -174,11 +174,11 @@ white-space: nowrap;
 					  </tr>
 					  <tr class="head" >
 						<td width="5%">排名目标</td>
-						<td width="5%">售价</td>
-						<td width="4%">销量</td>
-						<td width="5%">促销价</td>
+						<td width="5%">正常售价(外币)</td>
+						<td width="4%">正常销量</td>
+						<td width="5%">促销价(外币)</td>
 						<td width="4%">促销销量</td>
-						<td width="5%">推广费率</td>
+						<td width="5%">推广费比率</td>
 						<td width="5%">收入</td>
 						<td width="5%">成本</td>
 						<td width="5%">毛利</td>
@@ -203,7 +203,7 @@ white-space: nowrap;
 						<td><a class="sku_qty editable" title="{{$year.' 第'.$i.'周正常销量'}}" href="javascript:;" id="{{$budget_id.'-'.$i}}-qty" data-pk="{{$budget_id.'-'.$i}}-qty" data-type="text"> {{round(array_get($datas,$i.'.qty'))}} </a></td>
 						<td><a class="sku_pro_price editable" title="{{$year.' 第'.$i.'周促销售价'}}" href="javascript:;" id="{{$budget_id.'-'.$i}}-promote_price" data-pk="{{$budget_id.'-'.$i}}-promote_price" data-type="text"> {{round(array_get($datas,$i.'.promote_price'),2)}} </a></td>
 						<td><a class="sku_pro_qty editable" title="{{$year.' 第'.$i.'周促销销量'}}" href="javascript:;" id="{{$budget_id.'-'.$i}}-promote_qty" data-pk="{{$budget_id.'-'.$i}}-promote_qty" data-type="text"> {{round(array_get($datas,$i.'.promote_qty'))}} </a></td>
-						<td><a class="sku_pro_per editable" title="{{$year.' 第'.$i.'周推广费比率'}}" href="javascript:;" id="{{$budget_id.'-'.$i}}-promotion" data-pk="{{$budget_id.'-'.$i}}-promotion" data-type="text"> {{round(array_get($datas,$i.'.promotion'),4)}} </a></td>
+						<td><a class="sku_pro_per editable" title="{{$year.' 第'.$i.'周推广费比率%'}}" href="javascript:;" id="{{$budget_id.'-'.$i}}-promotion" data-pk="{{$budget_id.'-'.$i}}-promotion" data-type="text"> {{round(array_get($datas,$i.'.promotion')*100,2)}} </a>%</td>
 						<td>0</td>
 						<td><span id="{{$budget_id.'-'.$i}}-week_line_qty">0</span></td>
 						<td><span id="{{$budget_id.'-'.$i}}-week_line_income">0</span></td>
@@ -461,16 +461,16 @@ var FormEditable = function() {
 		var tax = parseFloat($('#tax').text());
 		var headshipfee = parseFloat($('#headshipfee').text());
 		var cost = parseFloat($('#'+budget_id+'-cost').text());
-		var common_fee = parseFloat($('#'+budget_id+'-common_fee').text());
-		var pick_fee = parseFloat($('#'+budget_id+'-pick_fee').text());
+		var common_fee = parseFloat($('#'+budget_id+'-common_fee').text())/100;
+		var pick_fee = parseFloat(parseFloat($('#'+budget_id+'-pick_fee').text())*rate).toFixed(2);
 		cost = parseFloat(cost*(1+tax)+headshipfee).toFixed(2);
-		var exception = parseFloat($('#'+budget_id+'-exception').text());
+		var exception = parseFloat($('#'+budget_id+'-exception').text())/100;
 		var stock = parseInt($('#'+budget_id+'-stock').text());
 		var qty = parseInt($('#'+budget_id+'-'+week_id+'-qty').text());
 		var promote_qty = parseInt($('#'+budget_id+'-'+week_id+'-promote_qty').text());
 		var price = parseFloat($('#'+budget_id+'-'+week_id+'-price').text());
 		var promote_price = parseFloat($('#'+budget_id+'-'+week_id+'-promote_price').text());
-		var promotion = parseFloat($('#'+budget_id+'-'+week_id+'-promotion').text());
+		var promotion = parseFloat($('#'+budget_id+'-'+week_id+'-promotion').text())/100;
 		var week_line_qty = parseInt(qty+promote_qty);
 		var week_line_income = parseFloat((qty*price+promote_qty*promote_price)*(1-exception)*rate).toFixed(2);
 		var week_line_cost = parseFloat((qty+promote_qty)*cost).toFixed(2);

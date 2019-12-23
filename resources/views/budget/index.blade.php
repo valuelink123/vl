@@ -216,12 +216,12 @@ white-space: nowrap;
 						<td>{{$data->qty1}}</td>
 						<td>{{$data->amount1}}</td>
 						<td>{{$data->profit1}}</td>
-						<td>{{$data->exception}}</td>
+						<td>{{$data->exception*100}}%</td>
 						<td>{{$data->economic1}}</td>
 						<td>{{$data->qty2}}</td>
 						<td>{{$data->amount2}}</td>
 						<td>{{$data->profit2}}</td>
-						<td>{{$data->exception}}</td>
+						<td>{{$data->exception*100}}%</td>
 						<td>{{$data->economic2}}</td>
 						<td>0</td>
 						<td>0</td>
