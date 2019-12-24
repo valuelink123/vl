@@ -303,7 +303,7 @@ var FormEditable = function() {
 	var initBudgettables = function() {
 		var budget_status = $('.budget_status').data('value');
 		var is_seller = false;
-		<?php if($base_data['sap_seller_id']==Auth::user()->sap_seller_id){ ?>
+		<?php if($base_data['sap_seller_id'] && $base_data['sap_seller_id']==Auth::user()->sap_seller_id){ ?>
 		is_seller = true;
 		<?php } ?>
 		
@@ -477,9 +477,9 @@ var FormEditable = function() {
 		var promote_price = parseFloat($('#'+budget_id+'-'+week_id+'-promote_price').text());
 		var promotion = parseFloat($('#'+budget_id+'-'+week_id+'-promotion').text())/100;
 		var week_line_qty = parseInt(qty+promote_qty);
-		var week_line_income = parseFloat((qty*price+promote_qty*promote_price)*(1-exception)*rate).toFixed(2);
+		var week_line_income = (exception==1)?0:parseFloat((qty*price+promote_qty*promote_price)*(1-exception)*rate).toFixed(2);
 		var week_line_cost = parseFloat((qty+promote_qty)*cost).toFixed(2);
-		var week_line_commonfee = parseFloat(week_line_income*common_fee+0.2*week_line_income/(1-exception)*common_fee*exception);
+		var week_line_commonfee = parseFloat(week_line_income*common_fee+(exception==1)?0:(0.2*week_line_income/(1-exception)*common_fee*exception));
 		var week_line_pickfee = parseFloat(week_line_qty*pick_fee);
 		var week_line_profee = parseFloat(week_line_income*promotion).toFixed(2);
 		$('#'+budget_id+'-'+week_id+'-week_line_qty').text(week_line_qty);
