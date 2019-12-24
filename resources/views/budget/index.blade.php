@@ -1,5 +1,5 @@
 @extends('layouts.layout')
-@section('label', 'Budgets')
+@section('label', 'Sales Budget')
 @section('content')
 <link href="/assets/global/plugins/bootstrap-editable/bootstrap-editable/css/bootstrap-editable.css" rel="stylesheet" type="text/css" />
 <style>
@@ -172,16 +172,21 @@ white-space: nowrap;
 					<form action="{{\Request::getRequestUri()}}" method="POST">
                     <div class="table-container">
 					<div class="row">
-						<div class="col-md-3">
-							<button type="submit" class="btn blue" name="BatchUpdate" value='2'>批量确认</button>
-							<button type="submit" class="btn blue" name="BatchUpdate" value='0'>批量退回</button>
+						<div class="col-md-2">
+							<button type="submit" class="btn btn-sm green-meadow" name="BatchUpdate" value='2'>批量确认</button>
+							<button type="submit" class="btn btn-sm red-sunglo" name="BatchUpdate" value='0'>批量退回</button>
 						</div>
-						<div class="col-md-3">
-							<button type="button" class="btn red">待提交 {{array_get($finish,'0',0)}}</button>
-							<button type="button" class="btn yellow">待审核  {{array_get($finish,'1',0)}}</button>
-							<button type="button" class="btn green">已确认  {{array_get($finish,'2',0)}}</button>
+						<div class="col-md-5">
+							<?php 
+							$color_arr=['0'=>'red-sunglo','1'=>'yellow-crusta','2'=>'purple-plum','3'=>'blue-hoki','4'=>'blue-madison','5'=>'green-meadow'];
+							foreach (getBudgetStageArr() as $k=>$v){ 
+							?>
+							
+							
+							<button type="button" class="btn btn-sm {{array_get($color_arr,$k)}}">{{$v}} {{array_get($finish,$k,0)}}</button>
+							<?php } ?>
 						</div>
-						<div class="col-md-6 pull-right" >{{ $datas->appends($_REQUEST)->links() }} </div>
+						<div class="col-md-5 pull-right" >{{ $datas->appends($_REQUEST)->links() }} </div>
 					</div>
 					
 					

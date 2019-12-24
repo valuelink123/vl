@@ -30,7 +30,7 @@ class BudgetController extends Controller
 		parent::__construct();
     }
 
-
+	public $week_per = ['0'=>1.13/7.01,'1'=>1.12/7.01,'2'=>1.09/7.01,'3'=>1.04/7.01,'4'=>0.91/7.01,'5'=>0.86/7.01,'6'=>0.86/7.01];
 	
     public function index(Request $request)
     {	
@@ -117,7 +117,7 @@ class BudgetController extends Controller
 	
 	public function edit(Request $request)
     {	
-		//if(!Auth::user()->can(['budgets-show'])) die('Permission denied -- budgets-show');
+		if(!Auth::user()->can(['budgets-show'])) die('Permission denied -- budgets-show');
 		$sku = $request->get('sku');
 		$site = $request->get('site');
 		$year = $request->get('year');
@@ -160,6 +160,7 @@ class BudgetController extends Controller
 	
 	public function upload( Request $request )
 	{	
+		if(!Auth::user()->can(['budgets-show'])) die('Permission denied -- budgets-show');
 		$budget_id = intval($request->get('budget_id'));
 		$budget = Budgets::find($budget_id);
 		if($budget->status!=0) die('预算已经提交或确认！');
@@ -180,7 +181,7 @@ class BudgetController extends Controller
 						$weeks = date("W", mktime(0, 0, 0, 12, 28, $budget->year));
 						$spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($inputFileName);
 						$importData = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
-						$week_per = ['0'=>1.13/7.01,'1'=>1.12/7.01,'2'=>1.09/7.01,'3'=>1.04/7.01,'4'=>0.91/7.01,'5'=>0.86/7.01,'6'=>0.86/7.01];		
+						$week_per = $this->week_per;		
 						$updateData=[];
 						foreach($importData as $key => $data){
 							if($key>2 && $key<($weeks+3)){
@@ -223,12 +224,13 @@ class BudgetController extends Controller
 
     public function update(Request $request)
     {
+		if(!Auth::user()->can(['budgets-show'])) die('Permission denied -- budgets-show');
 		$name = $request->get('name');
 		$data = explode("-",$name);
 		$budget_id = intval(array_get($data,0));
 		$budget = Budgets::find($budget_id);
 		if(empty($budget)) die;
-		$week_per = ['0'=>1.13/7.01,'1'=>1.12/7.01,'2'=>1.09/7.01,'3'=>1.04/7.01,'4'=>0.91/7.01,'5'=>0.86/7.01,'6'=>0.86/7.01];
+		$week_per = $this->week_per;
 		
 		if(!is_numeric(array_get($data,1))){
 			if(array_get($data,1)=='status' || array_get($data,1)=='remark'){

@@ -33,7 +33,11 @@ function getUsers($type=''){
 
 function getBudgetStageArr()
 {
-	return array(0=>'待提交',1=>'待审核',2=>'已确认');
+	return array(0=>'待提交',1=>'BU经理审核',2=>'BG总监审核',3=>'企管审核',4=>'VP审核',5=>'已确认');
+}
+function getBudgetRuleForRole()
+{
+	return array(0=>'待提交',1=>'BU经理审核',2=>'BG总监审核',3=>'企管审核',4=>'VP审核',5=>'已确认');
 }
 function getSellerAccount(){
 	return DB::connection('order')->table("accounts")->where('status',1)->groupby(['sellerid','sellername'])->pluck('sellername','sellerid');

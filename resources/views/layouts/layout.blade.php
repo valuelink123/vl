@@ -169,6 +169,14 @@
                                                     </a>
                                                 </li>
 												@endpermission
+												@permission('budgets-show')
+												<li class="">
+                                                    <a href="/budgets" class="nav-link nav-toggle ">
+                                                        Sales Budget
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
+												@endpermission
                                             </ul>
                                         </li>
 
@@ -211,12 +219,7 @@
 												 @endpermission
 												 
 												
-												<li class="">
-                                                    <a href="/budgets" class="nav-link nav-toggle ">
-                                                        Budgets
-                                                        <span class="arrow"></span>
-                                                    </a>
-                                                </li>
+												
 												
                                             </ul>
                                         </li>
