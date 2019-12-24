@@ -52,21 +52,27 @@ white-space: nowrap;
             <div class="portlet light bordered">
                 <div class="portlet-body">	
                     <div class="table-container">
-					<div class="row pull-right" >
-						<form action="{{url('budgets/upload')}}" method="post" enctype="multipart/form-data">
-						<div class="col-md-4" style="text-align:right;" >
+					
+					<div class="row" >
+						<div class="col-md-2">
+						<a href="{{$remember_list_url}}"><button type="button" class="btn btn-sm green-meadow">返回列表</button></a>
+						</div>
+						<div class="col-md-10">
+						<form action="{{url('budgets/upload')}}" method="post" enctype="multipart/form-data" class="pull-right">
+						<div class=" pull-left">
 
 							<a href="{{ url('/uploads/BudgetsUpload/data.csv')}}" >Import Template
                                 </a>	
 						</div>
-						<div class="col-md-4">
+						<div class="pull-left">
 							{{ csrf_field() }}
 								 <input type="file" name="importFile"  />
 								 <input type="hidden" name="budget_id" value="{{$budget_id}}"  />
 						</div>
-						<div class="col-md-4">
+						<div class=" pull-left">
 							<button type="submit" class="btn blue btn-sm" id="data_search">Upload</button>
 
+						</div>
 						</div>
 						</form>
 					</div>
@@ -296,7 +302,7 @@ var FormEditable = function() {
 	}
 	var initBudgettables = function() {
 		var budget_status = $('.budget_status').data('value');
-		var is_seller = true;
+		var is_seller = false;
 		<?php if($base_data['sap_seller_id']==Auth::user()->sap_seller_id){ ?>
 		is_seller = true;
 		<?php } ?>

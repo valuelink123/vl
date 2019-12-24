@@ -109,6 +109,7 @@ class BudgetController extends Controller
 		$data['year']=$year;
 		$data['datas']= $datas;
 		$data['finish']= $finish;
+		session()->put('remember_list_url',\Request::getRequestUri());
         return view('budget/index',$data);
 
     }
@@ -154,6 +155,7 @@ class BudgetController extends Controller
 		$data['base_data']['headshipfee']=round($data['base_data']['volume']/1000000*1.2*round($shipfee,4),2);
 		$data['base_data']['cold_storagefee']=round(array_get($storage_fee,'2_10_fee',0)*$data['base_data']['volume']/1000000/8,4);
 		$data['base_data']['hot_storagefee']=round(array_get($storage_fee,'11_1_fee',0)*$data['base_data']['volume']/1000000/8,4);
+		$data['remember_list_url'] = session()->get('remember_list_url');
 		return view('budget/edit',$data);
     }
 	
