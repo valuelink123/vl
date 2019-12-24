@@ -35,8 +35,8 @@ class BudgetController extends Controller
     public function index(Request $request)
     {	
 		if(!Auth::user()->can(['budgets-show'])) die('Permission denied -- budgets-show');
-		if($request->isMethod('POST')){ 
-
+		
+		if($request->isMethod('POST') && $request->get('budget_id')){ 
 			Budgets::whereIn('id',$request->get('budget_id'))->update(['status'=>$request->get('BatchUpdate')]);
 			$request->session()->flash('success_message','Update Success!'); 
 		}

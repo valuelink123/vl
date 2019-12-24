@@ -258,7 +258,7 @@ var FormEditable = function() {
 
     var initBasetables = function() {
 		var stages = [];
-        <?php foreach(getBudgetStageArr() as $k=>$v) {?>
+        <?php foreach(getBudgetRuleForRole() as $k=>$v) {?>
 		stages.push({
 			value: "<?php echo $k?>",
 			text: "<?php echo $v?>"

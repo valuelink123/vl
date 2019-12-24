@@ -37,7 +37,12 @@ function getBudgetStageArr()
 }
 function getBudgetRuleForRole()
 {
-	return array(0=>'待提交',1=>'BU经理审核',2=>'BG总监审核',3=>'企管审核',4=>'VP审核',5=>'已确认');
+	if(Auth::user()->can(['budgets-vp-check']) return getBudgetStageArr();
+	if(Auth::user()->can(['budgets-business-check']) return array_slice($agetBudgetStageArr(),0,5);
+	if(Auth::user()->can(['budgets-bg-check']) return array_slice($agetBudgetStageArr(),0,4);
+	if(Auth::user()->can(['budgets-bu-check']) return array_slice($agetBudgetStageArr(),0,3);
+	if(Auth::user()->can(['budgets-show']) return array_slice($agetBudgetStageArr(),0,2);
+	return array();
 }
 function getSellerAccount(){
 	return DB::connection('order')->table("accounts")->where('status',1)->groupby(['sellerid','sellername'])->pluck('sellername','sellerid');
