@@ -242,52 +242,6 @@ white-space: nowrap;
             <!-- END EXAMPLE TABLE PORTLET-->
         </div>
     </div>
-	 <div id="tableDiv" style="width:500px;overflow:auto;">
-<table style="width:720px;">
-<tr>
-<td style="width:100px;">迭代名称</td>
-<td style="width:80px;">得分</td>
-<td style="width:100px;">代码覆盖率</td>
-<td style="width:120px;">新需求个数</td>
-<td style="width:160px;">通过的需求个数</td>
-<td style="width:160px;">未通过的需求个数</td>
-</tr>
-<tr>
-<td>迭代一</td>
-<td>45</td>
-<td>56%</td>
-<td>450</td>
-<td>12</td>
-<td>90</td>
-</tr>
-<tr>
-<td>迭代五</td>
-<td>36</td>
-<td>78%</td>
-<td>216</td>
-<td>97</td>
-<td>12</td>
-</tr>
-<tr>
-<td>迭代三</td>
-<td>37</td>
-<td>91%</td>
-<td>404</td>
-<td>17</td>
-<td>34</td>
-</tr>
-</table>
- </div>
- <script>
-$("#tableDiv").scroll(function(){
-    var top = $("#tableDiv").scrollTop();
-    var tr = $("#tableDiv table  tr").first();
-
-    tr.children().each(function(i){
-		$(this).css({"position":"relative","top":: top });
-	});
-});
- </script>
 	
 <script src="/assets/global/plugins/moment.min.js" type="text/javascript"></script>
 <script src="/assets/global/plugins/jquery.mockjax.js" type="text/javascript"></script>    
