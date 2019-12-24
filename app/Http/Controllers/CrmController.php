@@ -70,6 +70,9 @@ class CrmController extends Controller
 
                 $action = '<a href="'.url('crm/trackLogAdd?id='.$val['id']).'" target="_blank" class="badge badge-success"> Add Activity </a>';
 			}
+			//点击Batch Send群发邮件时，提取收件人email。
+			$data[$key]['email_hidden'] = $val['email'];
+
 			if($val['amazon_profile_page']){
 				$amazonPage = str_replace("http://","",$val['amazon_profile_page']);
 				$amazonPage = str_replace("https://","",$amazonPage);
@@ -356,7 +359,6 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 		$type = '0';
 		//传到后台的值可能为：'', '1','2','1,2','0'('0'是edit页面可能传回的值)
 		if(isset($data['type']) && $data['type'] != ''){
-		    var_dump($data['type']);
 		    $type = $data['type'];
         }
 		$old_id = isset($data['old_id']) ? $data['old_id'] : 0;
@@ -710,6 +712,7 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 			$ids[] =  $row[0];
 		}
 		DB::table('client')->whereIn('id', $ids)->update(['processor' => $processor,'updated_at'=>date('Y-m-d H:i:s')]);
+
 		return [true, $user->name];
 	}
 

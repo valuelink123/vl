@@ -204,9 +204,9 @@
                         <th>Facebook Name</th>
                         <th>Group</th>
                         <th>Remark</th>
-                        {{--<th>Type</th>--}}
                         <th >Processor</th>
                         <th >Action</th>
+                        <th>Email-Hidden</th>
                     </tr>
                     </thead>
                     <tbody></tbody>
@@ -307,7 +307,10 @@
                 // blurable: true, // unselect on blur
                 selector: 'td:first-child', // 指定第一列可以点击选中
             },
-            "aoColumnDefs": [ { "bSortable": false, "aTargets": [21] }],
+            "aoColumnDefs": [
+                { "bSortable": false, "aTargets": [21] },
+                { "bVisible": false, "aTargets": [22] }
+                ],
             columns: [
                 {
                     width: "1px",
@@ -334,9 +337,9 @@
                 {data:'facebook_name',name:'facebook_name'},
                 {data:'facebook_group',name:'facebook_group'},
                 {data:'remark',name:'remark'},
-//                {data:'type', name:'type'},
                 {data: 'processor', name: 'processor'},
                 {data: 'action', name: 'action'},
+                {data: 'email_hidden', name: 'email_hidden'},
             ],
             ajax: {
                 type: 'POST',
@@ -386,7 +389,7 @@
         $('#batch-send').click(function(){
             let selectedRows = dtApi.rows({selected: true})
 
-            let ctgRows = selectedRows.data().toArray().map(obj => [obj.email])
+            let ctgRows = selectedRows.data().toArray().map(obj => [obj.email_hidden])
 
             if (!ctgRows.length) {
                 toastr.error('Please select some rows first !')
