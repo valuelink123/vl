@@ -270,6 +270,13 @@ white-space: nowrap;
 					  </thead>
 					  <tbody>
 					  @foreach ($datas as $data)
+					  
+					  <?php
+					  $qty_z = $data->qty1-$data->qty2;
+					  $amount_z = $data->amount1-$data->amount2;
+					  $profit_z = (($data->amount1==0)?0:round($data->economic1/$data->amount1,4)*100)-(($data->amount2==0)?0:round($data->economic2/$data->amount2,4)*100);
+					  $economic_z = $data->economic1-$data->economic2;
+					   ?>
 					  <tr>
 					    <td>
 						@if(in_array($data->budget_status,array_keys(getBudgetRuleForRole())) && $data->budget_status>=1)
@@ -290,10 +297,10 @@ white-space: nowrap;
 						<td>{{$data->amount2}}</td>
 						<td>{{($data->amount2==0)?0:round($data->economic2/$data->amount2,4)*100}}%</td>
 						<td>{{$data->economic2}}</td>
-						<td>{{$data->qty1-$data->qty2}}</td>
-						<td>{{$data->amount1-$data->amount2}}</td>
-						<td>{{(($data->amount1==0)?0:round($data->economic1/$data->amount1,4)*100)-(($data->amount2==0)?0:round($data->economic2/$data->amount2,4)*100)}}%</td>
-						<td>{{$data->economic1-$data->economic2}}</td>
+						<td><span class="{{($qty_z>0)?'red':'green'}}">{{$qty_z}}</span></td>
+						<td><span class="{{($amount_z>0)?'red':'green'}}">{{$amount_z}}</span></td>
+						<td><span class="{{($profit_z>0)?'red':'green'}}">{{$profit_z}}%</span></td>
+						<td><span class="{{($economic_z>0)?'red':'green'}}">{{$economic_z}}</span></td>
 	
 						<td><a href="{{url('/budgets/edit?sku='.$data->sku.'&site='.$data->site.'&year='.$year)}}">{{array_get(getBudgetStageArr(),($data->budget_status)??0)}}</a></td>
 					  </tr>

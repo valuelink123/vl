@@ -97,7 +97,7 @@ class BudgetController extends Controller
 		on budget_skus.sku = budgets_2.sku and budget_skus.site = budgets_2.site
 		) as sku_tmp_cc";
 		
-		$finish = DB::table(DB::raw($sql))->selectRaw('count(*) as count,budget_status')->groupBy('budget_status')->pluck('count','budget_status');
+		$finish = DB::table(DB::raw($sql))->whereRaw($where)->selectRaw('count(*) as count,budget_status')->groupBy('budget_status')->pluck('count','budget_status');
 	
 		
 		
