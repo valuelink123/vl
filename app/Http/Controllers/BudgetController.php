@@ -335,9 +335,9 @@ class BudgetController extends Controller
 			$item_group = $request->get('item_group');
 			$site = $request->get('site');
 			//退货率和关税税率在页面上的时候会输入%，但是存入数据库的时候不要把%存进去
-			$exception = explode('%',$request->get('exception'))[0];
-			$tax = explode('%',$request->get('tax'))[0];
-			$common_fee = explode('%',$request->get('common_fee'))[0];
+			$exception = explode('%',$request->get('exception'))[0]/100;
+			$tax = explode('%',$request->get('tax'))[0]/100;
+			$common_fee = explode('%',$request->get('common_fee'))[0]/100;
 
 			//添加的新品的sku编码为item_group20200001
 			$year = date('Y');
