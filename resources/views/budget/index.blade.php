@@ -47,6 +47,9 @@ white-space: nowrap;
 .pagination {
     float: right;
 }
+.dropdown-menu{
+	min-width:96px;
+}
     </style>
 	<div class="row">
         <div class="col-md-12">
@@ -173,8 +176,28 @@ white-space: nowrap;
                     <div class="table-container">
 					<div class="row">
 						<div class="col-md-2">
-							<button type="submit" class="btn btn-sm green-meadow" name="BatchUpdate" value='2'>批量确认</button>
-							<button type="submit" class="btn btn-sm red-sunglo" name="BatchUpdate" value='0'>批量退回</button>
+							<div class="btn-group">
+								<button type="button" class="btn btn-sm green-meadow">批量操作</button>
+								<button type="button" class="btn btn-sm green-meadow dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+									<i class="fa fa-angle-down"></i>
+								</button>
+								<ul class="dropdown-menu" role="menu">
+								
+									<?php 
+									$color_arr=['0'=>'red-sunglo','1'=>'yellow-crusta','2'=>'purple-plum','3'=>'blue-hoki','4'=>'blue-madison','5'=>'green-meadow'];
+									foreach (getBudgetRuleForRole() as $k=>$v){
+									if(count(getBudgetRuleForRole())==2 && $k==1) break; //不允许销售批量提交，因为需要单个计算
+									?>
+									<li>
+									
+									<button type="submit" class="btn btn-sm {{array_get($color_arr,$k)}}" value="{{$k}}">{{$v}}</button>
+									
+									</li>
+									<li class="divider"> </li>
+									<?php } ?>
+							
+								</ul>
+							</div>
 						</div>
 						<div class="col-md-5">
 							<?php 
@@ -249,7 +272,7 @@ white-space: nowrap;
 					  @foreach ($datas as $data)
 					  <tr>
 					    <td>
-						@if($data->budget_status==1)
+						@if(in_array($data->budget_status,array_keys(getBudgetRuleForRole())) && $data->budget_status>=1)
 						<input type="checkbox" name="budget_id[]" value="{{$data->budget_id}}" />
 						@endif
 						</td>
