@@ -55,7 +55,7 @@ white-space: nowrap;
 					
 					<div class="row" >
 						<div class="col-md-2">
-						<a href="{{$remember_list_url}}"><button type="button" class="btn btn-sm green-meadow">返回列表</button></a>
+						<a href="{{($remember_list_url)??url('budgets')}}"><button type="button" class="btn btn-sm green-meadow">返回列表</button></a>
 						</div>
 						<div class="col-md-10">
 						<form action="{{url('budgets/upload')}}" method="post" enctype="multipart/form-data" class="pull-right">
