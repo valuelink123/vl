@@ -190,7 +190,7 @@ white-space: nowrap;
 									?>
 									<li>
 									
-									<button type="submit" class="btn btn-sm {{array_get($color_arr,$k)}}" value="{{$k}}">{{$v}}</button>
+									<button type="submit" name="BatchUpdate" class="btn btn-sm {{array_get($color_arr,$k)}}" value="{{$k}}">{{$v}}</button>
 									
 									</li>
 									<li class="divider"> </li>
