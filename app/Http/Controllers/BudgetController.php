@@ -234,7 +234,9 @@ class BudgetController extends Controller
 							if($key>2 && $key<($weeks+3)){
 								foreach(['C'=>'ranking','D'=>'price','E'=>'qty','F'=>'promote_price','G'=>'promote_qty','H'=>'promotion'] as $temp_k=>$temp_v){
 									$max_value=0;
-									$week_value = array_get($data,$temp_k);
+									$week_value = array_get($data,$temp_k,NULL);
+									if($temp_k == 'E' || $temp_k == 'G') $week_value=intval($week_value);
+									if($temp_k == 'D' || $temp_k == 'F' || $temp_k == 'H') $week_value=round($week_value,4);
 									for($k=0;$k<=6;$k++){
 										$date = date("Y-m-d", strtotime($budget->year . 'W' . sprintf("%02d",($key-2)))+86400*$k);
 										if($temp_v=='qty' || $temp_v == 'promote_qty'){
