@@ -30,6 +30,9 @@ class RsgrequestsController extends Controller
      *
      */
 
+	use \App\Traits\Mysqli;
+	use \App\Traits\DataTables;
+
     public function __construct()
     {
         $this->middleware('auth');
@@ -188,22 +191,61 @@ class RsgrequestsController extends Controller
 			$lists[$key]['step'] = '<span class="badge badge-success">'.array_get(getStepStatus(),$list['step']).'</span>';
 			if(in_array($list['step'],array(1,3,4))){
 				$explain = isset($rsgStatusArr[$list['rsg_status_explain']]) ? $rsgStatusArr[$list['rsg_status_explain']]['vop'] : $list['rsg_status_explain'];
+				$explain_step = $explain;
 				if($list['rsg_status']==1){
 					//邮箱后面显示红色圆圈
-					//当rsg_status_explain=6的时候，还要看rsg request的状态
 					$lists[$key]['customer_email'] = $list['customer_email'].'<div class="unavailable" title="'.$explain.'"></div>';
-					// $lists[$key]['step'] = '<span class="badge badge-success">'.array_get(getStepStatus(),$list['step']).'</span><div class="fa red fa-times pull-right"></div>';
+					//下面是关于step后面显示的红色打叉和绿色打钩的处理（rsg申请自动审核状态）
+					//当rsg_status_explain=6的时候，还要看rsg request的状态
 					if($list['rsg_status_explain']==6){
+						//6，看rsg request的状态，当条数据之前的数据的状态有未完成的状态的时候，就为红色x显示
 						$noComplete = DB::table('rsg_requests')->where('customer_email',$list['customer_email'])->where('created_at','<',$list['created_at'])->whereNotIn('step',array(2,9,10))->get(['id'])->toArray();
-						if(empty($noComplete)){//在此条数据之前未完成数据为空，则为打钩显示
-							// $lists[$key]['step'] = '<span class="badge badge-success">'.array_get(getStepStatus(),$list['step']).'</span><div class="fa green fa-check pull-right"></div>';
-							$lists[$key]['customer_email'] = $list['customer_email'].'<div class="unavailable" title="'.$explain.'"></div>';
+						if($noComplete){
+							$lists[$key]['step'] .= '<div class="fa red fa-times pull-right" title="'.$explain_step.'"></div>';
+						}else{
+							//7，当帖子为不在线（帖子列表中listing参数不为Available）的状态也标红显示（status!=2，红色打叉显示
+							$yestoday = date('Y-m-d',strtotime("-1 day"));
+							$listingStatus = DB::table('star_history')->where('create_at',$yestoday)->where('asin',$list['asin'])->where('domain',$list['site'])->get(array('status'))->first();
+							if(empty($listingStatus) || $listingStatus->status != 2){
+								$explain_step = isset($rsgStatusArr[7]) ? $rsgStatusArr[7]['vop'] : 7;
+								$lists[$key]['step'] .= '<div class="fa red fa-times pull-right" title="'.$explain_step.'"></div>';
+							}else{
+								//8，当前库存维持天数<30天，红色打叉显示
+								$sql = "SELECT
+										sum(fba_stock + fba_transfer) AS fba_stock,
+										sum(sales_07_01) AS sales_07_01,
+										sum(sales_14_08) AS sales_14_08,
+										sum(sales_21_15) AS sales_21_15,
+										sum(sales_28_22) AS sales_28_22,
+										asin,
+										site
+									FROM asin 
+									WHERE asin = '".$list['asin']."' and site = '".$list['site']."' GROUP BY asin,site";
+								$asin = $this->queryRow($sql);
+								//平均日销量
+								$sales = ((((array_get($asin,'sales_07_01')??array_get($asin,'sales_14_08'))??array_get($asin,'sales_21_15'))??array_get($asin,'sales_28_22'))??0)/7 ;
+								//库存可维持的天数
+								$days = $sales > 0 ? $asin['fba_stock']/$sales : '100';//每日销量为0的时候，默认可维持天数为100，此时不会为红色打叉
+								if($days < 30){
+									$explain_step = isset($rsgStatusArr[8]) ? $rsgStatusArr[8]['vop'] : 8;
+									$lists[$key]['step'] .= '<div class="fa red fa-times pull-right" title="'.$explain_step.'"></div>';
+								}else{
+									//9,rsg任务权重为屏蔽，红色打叉显示
+									$lrsgStatus = DB::table('rsg_products')->where('id',$list['product_id'])->get(array('order_status'))->first();
+									if($lrsgStatus->order_status == '-1'){
+										$explain_step = isset($rsgStatusArr[9]) ? $rsgStatusArr[9]['vop'] : 9;
+										$lists[$key]['step'] .= '<div class="fa red fa-times pull-right" title="'.$explain_step.'"></div>';
+									}else{
+										$lists[$key]['step'] .= '<div class="fa green fa-check pull-right"></div>';
+									}
+								}
+							}
 						}
 					}
 				}else{
-					//邮箱后面显示绿色圆圈
+					//邮箱后面显示绿色圆圈,step后面显示绿色打钩
 					$lists[$key]['customer_email'] = $list['customer_email'].'<div class="available"></div>';
-					// $lists[$key]['step'] = '<span class="badge badge-success">'.array_get(getStepStatus(),$list['step']).'</span><div class="fa green fa-check pull-right"></div>';
+					$lists[$key]['step'] .= '<div class="fa green fa-check pull-right"></div>';
 				}
 
 			}

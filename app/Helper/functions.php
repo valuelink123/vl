@@ -1109,6 +1109,15 @@ function getCrmRsgStatusArr()
 		6 => array(
 			'vop' => '上个活动还未结束 There is ongoing application',
 		),
+		7 => array(
+			'vop' => '当前帖子不在线 The Listing is Unaviliable Now',
+		),
+		8 => array(
+			'vop' => '当前库存维持天数<30天 Less than 30 days of current inventory maintenance',
+		),
+		9 => array(
+			'vop' => 'Rsg 任务权重为屏蔽 Products no longer need to do RSG',
+		),
 	);
 	return $data;
 }
