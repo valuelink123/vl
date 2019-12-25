@@ -331,6 +331,8 @@ white-space: nowrap;
 <script src="/assets/global/plugins/jquery.mockjax.js" type="text/javascript"></script>    
 <script src="/assets/global/plugins/bootstrap-editable/bootstrap-editable/js/bootstrap-editable.js" type="text/javascript"></script>
 <script src="/assets/pages/scripts/form-editable.min.js" type="text/javascript"></script>
+
+
 <script>
 
 

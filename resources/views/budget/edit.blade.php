@@ -45,6 +45,11 @@ white-space: nowrap;
 .portlet.light {
     padding:0;
 }
+
+.table-head{padding-right:17px;background-color:#999;color:#000;}
+.table-body{width:100%; max-height:500px;overflow-y:scroll;}
+.table-head table,.table-body table{width:100%;}
+.table-body table tr:nth-child(2n+1){background-color:#f2f2f2;}
     </style>
 	<div class="row">
         <div class="col-md-12">
@@ -54,10 +59,32 @@ white-space: nowrap;
                     <div class="table-container">
 					
 					<div class="row" >
-						<div class="col-md-2">
+						<div class="col-md-4">
 						<a href="{{($remember_list_url)??url('budgets')}}"><button type="button" class="btn btn-sm green-meadow">返回列表</button></a>
+						
+						<div class="btn-group">
+							<button type="button" class="btn btn-sm green-meadow">切换周期</button>
+							<button type="button" class="btn btn-sm green-meadow dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+								<i class="fa fa-angle-down"></i>
+							</button>
+							<ul class="dropdown-menu" role="menu">
+								<li>
+									<a href="{{'/budgets/edit?sku='.$base_data['sku'].'&site='.$base_data['site'].'&year='.$year.'&showtype=seasons'}}"> 季度 </a>
+								</li>
+								<li>
+									<a href="{{'/budgets/edit?sku='.$base_data['sku'].'&site='.$base_data['site'].'&year='.$year.'&showtype=months'}}"> 月 </a>
+								</li>
+								<li>
+									<a href="{{'/budgets/edit?sku='.$base_data['sku'].'&site='.$base_data['site'].'&year='.$year}}"> 周 (填写模块)</a>
+								</li>
+								<li>
+									<a href="{{'/budgets/edit?sku='.$base_data['sku'].'&site='.$base_data['site'].'&year='.$year.'&showtype=days'}}"> 日 </a>
+								</li>
+							</ul>
 						</div>
-						<div class="col-md-10">
+						
+						</div>
+						<div class="col-md-8">
 						<form action="{{url('budgets/upload')}}" method="post" enctype="multipart/form-data" class="pull-right">
 						<div class=" pull-left">
 
@@ -73,10 +100,11 @@ white-space: nowrap;
 							<button type="submit" class="btn blue btn-sm" id="data_search">Upload</button>
 
 						</div>
-						</div>
 						</form>
+						</div>
+						
 					</div>
-					<table class="table table-striped table-bordered table-hover">
+					<table class="table table-striped table-bordered table-hover tbl1">
 					<colgroup>
 			<col width="4%"></col>
 			<col width="8%"></col>
@@ -141,7 +169,10 @@ white-space: nowrap;
 					  </tr>
 					  </tbody>
 					</table>
-					<table class="table table-striped table-bordered table-hover">
+					
+					
+					<div class="table-head">
+					<table class="table table-striped table-bordered table-hover" style="margin-bottom:0px;">
 			<colgroup>
 			<col width="4%"></col>
 			<col width="8%"></col>
@@ -193,11 +224,155 @@ white-space: nowrap;
 						<td width="5%">合计</td>
 					  </tr>
 					  </thead>
+					 </table>
+					</div>
+	
+					<div class="table-body">
+					<table class="table table-striped table-bordered table-hover" style="margin-bottom:0px;">
+			<colgroup>
+			<col width="4%"></col>
+			<col width="8%"></col>
+			<col width="5%"></col>
+			<col width="5%"></col>
+			<col width="4%"></col>
+			<col width="5%"></col>
+			<col width="4%"></col>
+			<col width="5%"></col>
+			<col width="5%"></col>
+			<col width="5%"></col>
+			<col width="5%"></col>
+			<col width="5%"></col>
+			<col width="5%"></col>
+			<col width="5%"></col>
+			<col width="5%"></col>
+			<col width="5%"></col>
+			<col width="5%"></col>
+			<col width="5%"></col>
+			<col width="5%"></col>
+			<col width="5%"></col>
+			</colgroup>
+
 					  <tbody>
 					  
 					  <?php 
-					  $weeks = date("W", mktime(0, 0, 0, 12, 28, $year));
-					  for($i=1;$i<=$weeks;$i++){
+					  $s_t_qty=$s_t_income=$s_t_cost=$s_t_common_fee=$s_t_pick_fee=$s_t_storage_fee=$s_t_promotion_fee=$s_t_amount_fee=0;
+					  if($showtype=='seasons') {
+					  	$i=0;
+					  	foreach($datas as $k=>$v){
+					  ?>
+					  <tr>
+						<td>{{++$i}}
+						</td>
+						<td>{{$year.'年'.(3*($i-1)+1).'月 -- '.$year.'年'.(3*($i-1)+3).'月'}}</td>
+						<td>≈{{$v['ranking']}}</td>
+						<td>{{($v['qty']!=0)?round($v['amount_n']/$v['qty'],2):0}}</td>
+						<td>{{$v['qty']}}</td>
+						<td>{{($v['promote_qty']!=0)?round($v['amount_p']/$v['promote_qty'],2):0}}</td>
+						<td>{{$v['promote_qty']}}</td>
+						<td>{{($v['income']!=0)?round($v['promotion_fee']/$v['income'],4)*100:0}}%</td>
+						<td>0</td>
+						<td>{{$v['qty']+$v['promote_qty']}}</td>
+						<td>{{$v['income']}}</td>
+						<td>{{$v['cost']}}</td>
+						<td>{{$v['income']-$v['cost']}}</td>
+						<td>{{$v['common_fee']}}</td>
+						<td>{{$v['pick_fee']}}</td>
+						<td>{{$v['common_fee']+$v['pick_fee']}}</td>
+						<td>{{$v['storage_fee']}}</td>
+						<td>{{$v['promotion_fee']}}</td>
+						<td>{{$v['amount_fee']}}</td>
+						<td>{{$v['income']-$v['cost']-$v['common_fee']-$v['pick_fee']-$v['storage_fee']-$v['promotion_fee']-$v['amount_fee']}}</td>
+					  </tr>
+					  <?php 
+					  		$s_t_qty+=$v['qty']+$v['promote_qty'];
+							$s_t_income+=$v['income'];
+							$s_t_cost+=$v['cost'];
+							$s_t_common_fee+=$v['common_fee'];
+							$s_t_pick_fee+=$v['pick_fee'];
+							$s_t_storage_fee+=$v['storage_fee'];
+							$s_t_promotion_fee+=$v['promotion_fee'];
+							$s_t_amount_fee+=$v['amount_fee'];
+					  	} 
+					  }elseif($showtype=='months'){
+					  
+					    $i=0;
+					  	foreach($datas as $k=>$v){
+					  ?>
+					  <tr>
+						<td>{{++$i}}
+						</td>
+						<td>{{$v['month']}}</td>
+						<td>≈{{$v['ranking']}}</td>
+						<td>{{round($v['price'],2)}}</td>
+						<td>{{$v['qty']}}</td>
+						<td>{{round($v['promote_price'],2)}}</td>
+						<td>{{$v['promote_qty']}}</td>
+						<td>{{round($v['promotion']*100,2)}}%</td>
+						<td>0</td>
+						<td>{{$v['qty']+$v['promote_qty']}}</td>
+						<td>{{$v['income']}}</td>
+						<td>{{$v['cost']}}</td>
+						<td>{{$v['income']-$v['cost']}}</td>
+						<td>{{$v['common_fee']}}</td>
+						<td>{{$v['pick_fee']}}</td>
+						<td>{{$v['common_fee']+$v['pick_fee']}}</td>
+						<td>{{$v['storage_fee']}}</td>
+						<td>{{$v['promotion_fee']}}</td>
+						<td>{{$v['amount_fee']}}</td>
+						<td>{{$v['income']-$v['cost']-$v['common_fee']-$v['pick_fee']-$v['storage_fee']-$v['promotion_fee']-$v['amount_fee']}}</td>
+					  </tr>
+					  <?php 
+					  		$s_t_qty+=$v['qty']+$v['promote_qty'];
+							$s_t_income+=$v['income'];
+							$s_t_cost+=$v['cost'];
+							$s_t_common_fee+=$v['common_fee'];
+							$s_t_pick_fee+=$v['pick_fee'];
+							$s_t_storage_fee+=$v['storage_fee'];
+							$s_t_promotion_fee+=$v['promotion_fee'];
+							$s_t_amount_fee+=$v['amount_fee'];
+					  	} 
+					  }elseif($showtype=='days') {
+					  
+					  	$i=0;
+					  	foreach($datas as $k=>$v){
+					  ?>
+					  <tr>
+						<td>{{++$i}}
+						</td>
+						<td>{{$v['date']}}</td>
+						<td>{{$v['ranking']}}</td>
+						<td>{{round($v['price'],2)}}</td>
+						<td>{{$v['qty']}}</td>
+						<td>{{round($v['promote_price'],2)}}</td>
+						<td>{{$v['promote_qty']}}</td>
+						<td>{{round($v['promotion']*100,2)}}%</td>
+						<td>0</td>
+						<td>{{$v['qty']+$v['promote_qty']}}</td>
+						<td>{{$v['income']}}</td>
+						<td>{{$v['cost']}}</td>
+						<td>{{$v['income']-$v['cost']}}</td>
+						<td>{{$v['common_fee']}}</td>
+						<td>{{$v['pick_fee']}}</td>
+						<td>{{$v['common_fee']+$v['pick_fee']}}</td>
+						<td>{{$v['storage_fee']}}</td>
+						<td>{{$v['promotion_fee']}}</td>
+						<td>{{$v['amount_fee']}}</td>
+						<td>{{$v['income']-$v['cost']-$v['common_fee']-$v['pick_fee']-$v['storage_fee']-$v['promotion_fee']-$v['amount_fee']}}</td>
+					  </tr>
+					  <?php 
+					  		$s_t_qty+=$v['qty']+$v['promote_qty'];
+							$s_t_income+=$v['income'];
+							$s_t_cost+=$v['cost'];
+							$s_t_common_fee+=$v['common_fee'];
+							$s_t_pick_fee+=$v['pick_fee'];
+							$s_t_storage_fee+=$v['storage_fee'];
+							$s_t_promotion_fee+=$v['promotion_fee'];
+							$s_t_amount_fee+=$v['amount_fee'];
+					  	} 
+					  
+					  }else{
+						  $weeks = date("W", mktime(0, 0, 0, 12, 28, $year));
+						  for($i=1;$i<=$weeks;$i++){
 					  ?>
 					  <tr>
 						<td>{{$i}}
@@ -223,11 +398,58 @@ white-space: nowrap;
 						<td><span id="{{$budget_id.'-'.$i}}-week_line_amountfee">0</span></td>
 						<td><span id="{{$budget_id.'-'.$i}}-week_line_economic">0</span></td>
 					  </tr>
-					  <?php } ?>
+					  <?php 
+					  	} 
+					  }
+					  ?>
 					  
+					  
+					  </tbody>
+					</table>
+					</div>
+					<div class="table-head">
+					<table class="table table-striped table-bordered table-hover" style="margin-bottom:0px;">
+					<colgroup>
+					<col width="4%"></col>
+					<col width="8%"></col>
+					<col width="5%"></col>
+					<col width="5%"></col>
+					<col width="4%"></col>
+					<col width="5%"></col>
+					<col width="4%"></col>
+					<col width="5%"></col>
+					<col width="5%"></col>
+					<col width="5%"></col>
+					<col width="5%"></col>
+					<col width="5%"></col>
+					<col width="5%"></col>
+					<col width="5%"></col>
+					<col width="5%"></col>
+					<col width="5%"></col>
+					<col width="5%"></col>
+					<col width="5%"></col>
+					<col width="5%"></col>
+					<col width="5%"></col>
+					</colgroup>
+					  <thead>
 					  <tr class="head">
 						<td colspan="8">合计：</td>
 						<td>0</td>
+						<?php if($showtype){ ?>
+						<td>{{$s_t_qty}}</td>
+						<td>{{$s_t_income}}</td>
+						<td>{{$s_t_cost}}</td>
+						<td>{{$s_t_income-$s_t_cost}}</td>
+						<td>{{$s_t_common_fee}}</td>
+						<td>{{$s_t_pick_fee}}</td>
+						<td>{{$s_t_common_fee+$s_t_pick_fee}}</td>
+						<td>{{$s_t_storage_fee}}</td>
+						<td>{{$s_t_promotion_fee}}</td>
+						<td>{{$s_t_amount_fee}}</td>
+						<td>{{$s_t_income-$s_t_cost-$s_t_common_fee-$s_t_pick_fee-$s_t_storage_fee-$s_t_promotion_fee-$s_t_amount_fee}}</td>
+						
+						
+						<?php }else{ ?>
 						<td><span id="{{$budget_id}}-total_qty">0</span></td>
 						<td><span id="{{$budget_id}}-total_income">0</span></td>
 						<td><span id="{{$budget_id}}-total_cost">0</span></td>
@@ -239,16 +461,18 @@ white-space: nowrap;
 						<td><span id="{{$budget_id}}-total_profee">0</span></td>
 						<td><span id="{{$budget_id}}-total_amountfee">0</span></td>
 						<td><span id="{{$budget_id}}-total_economic">0</span></td>
+						<?php }?>
 					  </tr>
-					  </tbody>
-					</table>
+					  </thead>
+					 </table>
+					</div>
                     </div>
                 </div>
             </div>
             <!-- END EXAMPLE TABLE PORTLET-->
         </div>
     </div>
-	
+
 <script src="/assets/global/plugins/moment.min.js" type="text/javascript"></script>
 <script src="/assets/global/plugins/jquery.mockjax.js" type="text/javascript"></script>    
 <script src="/assets/global/plugins/bootstrap-editable/bootstrap-editable/js/bootstrap-editable.js" type="text/javascript"></script>
@@ -273,6 +497,7 @@ var FormEditable = function() {
 		$('.budget_status').editable({
             inputclass: 'form-control input-medium',
             source: stages,
+			<?php if(!$showtype) {?>
 			params: function(params) {
 				var weeks = {{date("W", mktime(0, 0, 0, 12, 28, $year))}};
 				var budget_id = {{$budget_id}};
@@ -289,16 +514,21 @@ var FormEditable = function() {
 				}
 				return params;
 			},
+			<?php } ?>
 			success: function (status) {
 				$('.budget_status').data('value',status);
+				<?php if(!$showtype) {?>
 				initBudgettables();
+				<?php } ?>
 			}
         });
 		$('.budget_remark').editable({
 			emptytext:'N/A'
 		});
+		<?php if(!$showtype) {?>
 		initBudgettables();
 		initEndStock('<?php echo $budget_id?>-');
+		<?php } ?>
 	}
 	var initBudgettables = function() {
 		var budget_status = $('.budget_status').data('value');
@@ -329,7 +559,11 @@ var FormEditable = function() {
 				return 'remote error'; 
 			} 
 		});
-		
+		if(budget_status>0){
+			$('.btn-group').show();
+		}else{
+			$('.btn-group').hide();
+		}
 		if(budget_status==0 && is_seller){
 			option='enable';
 		}else{
@@ -513,6 +747,7 @@ var FormEditable = function() {
 
 jQuery(document).ready(function() {
     FormEditable.init();
+
 });
 </script>
 

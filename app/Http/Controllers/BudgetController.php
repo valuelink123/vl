@@ -122,11 +122,9 @@ class BudgetController extends Controller
 		$sku = $request->get('sku');
 		$site = $request->get('site');
 		$year = $request->get('year');
+		$showtype=$request->get('showtype');
 		$base_data = Budgetskus::where('sku',$sku)->where('site',$site)->first();
 		if(empty($base_data)) die('没有该SKU对应预算基础信息，请联系管理员新增！');
-		
-		
-		
 		$cur = 'EUR';
 		if($site=='www.amazon.com') $cur = 'USD';
 		if($site=='www.amazon.ca') $cur = 'CAD';
@@ -139,7 +137,51 @@ class BudgetController extends Controller
 		$data['year']=$year;
 		$data['budget_id']=$budget_id;
 		$data['budget']=$budget;
-		$data['datas']= Budgetdetails::selectRaw('weeks,any_value(ranking) as ranking,any_value(price) as price,sum(qty) as qty,any_value(promote_price) as promote_price,sum(promote_qty) as promote_qty,any_value(promotion) as promotion')->where('budget_id',$budget_id)->groupBy('weeks')->get()->keyBy('weeks')->toArray();
+		if($showtype=='seasons' || $showtype=='months'){
+			$data['datas'] = Budgetdetails::selectRaw("date_format(date,'%Y%m') as month,any_value(ranking) as ranking,sum(price*qty)/sum(qty) as price,sum(qty) as qty,sum(promote_price*promote_qty)/sum(promote_qty) as promote_price,sum(promote_qty) as promote_qty,sum(promotion_fee)/sum(income) as promotion,sum(income) as income,sum(cost) as cost,sum(common_fee) as common_fee,sum(pick_fee) as pick_fee,sum(promotion_fee) as promotion_fee,sum(amount_fee) as amount_fee,sum(storage_fee) as storage_fee")->where('budget_id',$budget_id)->whereRaw("left(date,4)=$year")->groupBy('month')->get()->keyBy('month')->toArray();
+			if($showtype=='seasons'){
+				$i=1;
+				$type_datas=[];
+				foreach($data['datas'] as $k=>$v){
+					if($k<=($year.'03')) $i=1;
+					if($k<=($year.'06') && $k>=($year.'04')) $i=2;
+					if($k<=($year.'09') && $k>=($year.'07')) $i=3;
+					if($k>=($year.'10')) $i=4;
+					if(!isset($type_datas[$i]['amount_n'])) $type_datas[$i]['amount_n']=0 ;
+					if(!isset($type_datas[$i]['qty'])) $type_datas[$i]['qty']=0 ;
+					if(!isset($type_datas[$i]['amount_p'])) $type_datas[$i]['amount_p']=0 ;
+					if(!isset($type_datas[$i]['promote_qty'])) $type_datas[$i]['promote_qty']=0 ;
+					if(!isset($type_datas[$i]['income'])) $type_datas[$i]['income']=0 ;
+					if(!isset($type_datas[$i]['cost'])) $type_datas[$i]['cost']=0 ;
+					if(!isset($type_datas[$i]['common_fee'])) $type_datas[$i]['common_fee']=0 ;
+					if(!isset($type_datas[$i]['pick_fee'])) $type_datas[$i]['pick_fee']=0 ;
+					if(!isset($type_datas[$i]['promotion_fee'])) $type_datas[$i]['promotion_fee']=0 ;
+					if(!isset($type_datas[$i]['amount_fee'])) $type_datas[$i]['amount_fee']=0 ;
+					if(!isset($type_datas[$i]['storage_fee']))$type_datas[$i]['storage_fee'] =0 ;
+					$type_datas[$i]['ranking']=$v['ranking'];
+					$type_datas[$i]['amount_n']+=$v['price']*$v['qty'];
+					$type_datas[$i]['qty']+=$v['qty'];
+					$type_datas[$i]['amount_p']+=$v['promote_price']*$v['promote_qty'];
+					$type_datas[$i]['promote_qty']+=$v['promote_qty'];
+					$type_datas[$i]['income']+=$v['income'];
+					$type_datas[$i]['cost']+=$v['cost'];
+					$type_datas[$i]['common_fee']+=$v['common_fee'];
+					$type_datas[$i]['pick_fee']+=$v['pick_fee'];
+					$type_datas[$i]['promotion_fee']+=$v['promotion_fee'];
+					$type_datas[$i]['amount_fee']+=$v['amount_fee'];
+					$type_datas[$i]['storage_fee']+=$v['storage_fee'];
+				}
+				unset($data['datas']);
+				$data['datas']=$type_datas;
+			}
+			
+			
+		}elseif($showtype=='days'){
+			$data['datas']= Budgetdetails::where('budget_id',$budget_id)->whereRaw("left(date,4)=$year")->orderBy('date','asc')->get()->toArray();
+		}else{
+			$data['datas']= Budgetdetails::selectRaw('weeks,any_value(ranking) as ranking,any_value(price) as price,sum(qty) as qty,any_value(promote_price) as promote_price,sum(promote_qty) as promote_qty,any_value(promotion) as promotion')->where('budget_id',$budget_id)->groupBy('weeks')->get()->keyBy('weeks')->toArray();
+		}
+		$data['showtype'] = $showtype;
 		$data['base_data']= $base_data->toArray();
 		$data['rate']= array_get(DB::table('cur_rate')->pluck('rate','cur'),$cur,0);
 		
@@ -148,7 +190,6 @@ class BudgetController extends Controller
 		
 		$storage_fee = json_decode(json_encode(DB::table('storage_fee')->where('type','FBA')->where('site',$data['site_code'])->where('size',$data['base_data']['size'])->first()),true);
 
-		
 		$tax_rate=DB::table('tax_rate')->where('site',$data['site_code'])->whereIn('sku',array('OTHERSKU',$sku))->pluck('tax','sku');
 		$data['base_data']['tax']= round(((array_get($tax_rate,$sku)??array_get($tax_rate,'OTHERSKU'))??0),4);
 		$shipfee = (array_get(getShipRate(),$data['site_code'].'.'.$sku)??array_get(getShipRate(),$data['site_code'].'.default'))??0;
