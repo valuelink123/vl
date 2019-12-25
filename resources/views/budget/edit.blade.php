@@ -436,16 +436,16 @@ white-space: nowrap;
 						<td colspan="8">合计：</td>
 						<td>0</td>
 						<?php if($showtype){ ?>
-						<td>{{$s_t_qty}}</td>
-						<td>{{$s_t_income}}</td>
-						<td>{{$s_t_cost}}</td>
-						<td>{{$s_t_income-$s_t_cost}}</td>
-						<td>{{$s_t_common_fee}}</td>
-						<td>{{$s_t_pick_fee}}</td>
-						<td>{{$s_t_common_fee+$s_t_pick_fee}}</td>
-						<td>{{$s_t_storage_fee}}</td>
-						<td>{{$s_t_promotion_fee}}</td>
-						<td>{{$s_t_amount_fee}}</td>
+						<td>{{round($s_t_qty)}}</td>
+						<td>{{round($s_t_income,2)}}</td>
+						<td>{{round($s_t_cost,2)}}</td>
+						<td>{{round($s_t_income-$s_t_cost,2)}}</td>
+						<td>{{round($s_t_common_fee,2)}}</td>
+						<td>{{round($s_t_pick_fee,2)}}</td>
+						<td>{{round($s_t_common_fee+$s_t_pick_fee,2)}}</td>
+						<td>{{round($s_t_storage_fee,2)}}</td>
+						<td>{{round($s_t_promotion_fee,2)}}</td>
+						<td>{{round($s_t_amount_fee,2)}}</td>
 						<td>{{$s_t_income-$s_t_cost-$s_t_common_fee-$s_t_pick_fee-$s_t_storage_fee-$s_t_promotion_fee-$s_t_amount_fee}}</td>
 						
 						
