@@ -2,9 +2,6 @@
 @section('label', 'Crm Edit')
 @section('content')
 
-    <link rel="stylesheet" href="/assets/global/plugins/bootstrap/css/bootstrap-select.min.css">
-    <script src="/assets/global/plugins/bootstrap/js/bootstrap-select.min.js"></script>
-
     <style>
         .mt-repeater-add-son{
             margin-top:25px;
@@ -20,6 +17,10 @@
             padding: 6px;
             border-color: #cccccc;
         }
+        .bootstrap-select.btn-group .dropdown-menu li.selected a .glyphicon{
+            color: blue;
+        }
+
     </style>
     <form  action="{{ url('/crm/update') }}" id="exception_form" novalidate method="POST">
         {{ csrf_field() }}
@@ -145,7 +146,7 @@
                                         <div class="col-lg-4 col-md-4">
                                             <label>Type</label>
                                             <input type="text" id="type" name="type" hidden value="{{$contactBasic['type']}}"/>
-                                            <select class="selectpicker show-tick form-control" multiple id="select_type" title="Select...">
+                                            <select class="selectpicker show-tick form-control" multiple id="select_type" title="Select..." data-selected-text-format="count">
                                                 @foreach (getCrmClientType() as $key => $value)
                                                     <option value="{{$key}}">
                                                         {{$value}}
