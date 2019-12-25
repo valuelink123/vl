@@ -61,8 +61,7 @@ white-space: nowrap;
 					<div class="row" >
 						<div class="col-md-4">
 						<a href="{{($remember_list_url)??url('budgets')}}"><button type="button" class="btn btn-sm green-meadow">返回列表</button></a>
-						
-						<div class="btn-group">
+						<div class="btn-group" {{($budget->status>0)?'':'style="display:none;"'}}>
 							<button type="button" class="btn btn-sm green-meadow">切换周期</button>
 							<button type="button" class="btn btn-sm green-meadow dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
 								<i class="fa fa-angle-down"></i>
@@ -83,9 +82,11 @@ white-space: nowrap;
 							</ul>
 						</div>
 						
+						
 						</div>
 						<div class="col-md-8">
-						<form action="{{url('budgets/upload')}}" method="post" enctype="multipart/form-data" class="pull-right">
+						<div class="form-upload">
+						<form action="{{url('budgets/upload')}}" method="post" enctype="multipart/form-data" class="pull-right " >
 						<div class=" pull-left">
 
 							<a href="{{ url('/uploads/BudgetsUpload/data.csv')}}" >Import Template
@@ -101,6 +102,9 @@ white-space: nowrap;
 
 						</div>
 						</form>
+						</div>
+						
+						
 						</div>
 						
 					</div>
@@ -197,7 +201,17 @@ white-space: nowrap;
 			</colgroup>
 					  <thead>
 					  <tr class="head" >
-						<td rowspan="2" width="4%">周</td>
+						<td rowspan="2" width="4%">
+						@if($showtype=='seasons')
+						季
+						@elseif($showtype=='months')
+						月
+						@elseif($showtype=='days')
+						日
+						@else
+						周
+						@endif
+						</td>
 						<td rowspan="2" width="8%">日期</td>
 						<td colspan="6" width="28%">{{$year}}年销售预算</td>
 						<td rowspan="2" width="5%">销售预测</td>
@@ -517,26 +531,35 @@ var FormEditable = function() {
 			<?php } ?>
 			success: function (status) {
 				$('.budget_status').data('value',status);
-				<?php if(!$showtype) {?>
 				initBudgettables();
-				<?php } ?>
 			}
         });
 		$('.budget_remark').editable({
 			emptytext:'N/A'
 		});
-		<?php if(!$showtype) {?>
 		initBudgettables();
+		<?php if(!$showtype) {?>
 		initEndStock('<?php echo $budget_id?>-');
 		<?php } ?>
 	}
 	var initBudgettables = function() {
 		var budget_status = $('.budget_status').data('value');
-		var is_seller = false;
+		var is_seller = true;
 		<?php if($base_data['sap_seller_id'] && $base_data['sap_seller_id']==Auth::user()->sap_seller_id){ ?>
 		is_seller = true;
 		<?php } ?>
+		if(budget_status>0){
+			$('.btn-group').show();
+		}
+		if(budget_status==0 && is_seller){
+			option='enable';
+			$('.form-upload').show();
+		}else{
+			option='disable';
+			$('.form-upload').hide();
+		}
 		
+		<?php if(!$showtype && $base_data['sap_seller_id'] && $base_data['sap_seller_id']==Auth::user()->sap_seller_id ) {?>
 		$('.sku_ranking').editable({
 			emptytext:'N/A'
 		});		
@@ -559,17 +582,9 @@ var FormEditable = function() {
 				return 'remote error'; 
 			} 
 		});
-		if(budget_status>0){
-			$('.btn-group').show();
-		}else{
-			$('.btn-group').hide();
-		}
-		if(budget_status==0 && is_seller){
-			option='enable';
-		}else{
-			option='disable';
-		}
+		
 		$('.sku_ranking,.sku_price,.sku_qty,.sku_pro_price,.sku_pro_qty,.sku_pro_per,.budgetskus_cost,.budgetskus_common_fee,.budgetskus_pick_fee,.budgetskus_exception,.budgetskus_stock').editable(option);
+		<?php } ?>
 		
     }
 	

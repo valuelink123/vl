@@ -137,6 +137,7 @@ class BudgetController extends Controller
 		$data['year']=$year;
 		$data['budget_id']=$budget_id;
 		$data['budget']=$budget;
+		if($budget->status==0) $showtype="";
 		if($showtype=='seasons' || $showtype=='months'){
 			$data['datas'] = Budgetdetails::selectRaw("date_format(date,'%Y%m') as month,any_value(ranking) as ranking,sum(price*qty)/sum(qty) as price,sum(qty) as qty,sum(promote_price*promote_qty)/sum(promote_qty) as promote_price,sum(promote_qty) as promote_qty,sum(promotion_fee)/sum(income) as promotion,sum(income) as income,sum(cost) as cost,sum(common_fee) as common_fee,sum(pick_fee) as pick_fee,sum(promotion_fee) as promotion_fee,sum(amount_fee) as amount_fee,sum(storage_fee) as storage_fee")->where('budget_id',$budget_id)->whereRaw("left(date,4)=$year")->groupBy('month')->get()->keyBy('month')->toArray();
 			if($showtype=='seasons'){
