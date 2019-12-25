@@ -76,7 +76,7 @@
                                 <span class="input-group-addon">
                                     <i class="fa fa-bookmark"></i>
                                 </span>
-                                <input required pattern="^\w+( +\w+)*$" autocomplete="off" class="xform-autotrim form-control" placeholder="Review ID Separated by spaces" name="review_id" oninput="value=value.replace(/[^(\w|\s)]/g,'')" />
+                                <input autocomplete="off" class="xform-autotrim form-control" placeholder="Please enter Review ID (eg. R39KLJDEWLEI90)" name="review_id" />
                             </div>
                         </div>
                         <div style="clear:both;"></div>

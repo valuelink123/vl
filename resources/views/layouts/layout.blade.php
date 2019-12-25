@@ -28,6 +28,7 @@
     <link href="/assets/global/plugins/bootstrap-toastr/toastr.min.css" rel="stylesheet" type="text/css" />
     <link href="/assets/pages/css/pricing.min.css" rel="stylesheet" type="text/css" />
     <link href="/assets/global/plugins/bootstrap-multiselect/css/bootstrap-multiselect.css" rel="stylesheet" type="text/css" />
+    <link href="/assets/global/plugins/bootstrap/css/bootstrap-select.min.css" rel="stylesheet" type="text/css" />
     <!-- END PAGE LEVEL PLUGINS -->
     <!-- BEGIN THEME GLOBAL STYLES -->
     <link href="/assets/global/css/components.css" rel="stylesheet" id="style_components" type="text/css" />
@@ -69,6 +70,8 @@
 	<script src="/assets/pages/scripts/form-repeater.js?v=laji" type="text/javascript"></script>
     <script src="/assets/global/plugins/bootstrap-multiselect/js/bootstrap-multiselect.js" type="text/javascript"></script>
     <script src="/assets/pages/scripts/components-bootstrap-multiselect.js" type="text/javascript"></script>
+    <script src="/assets/global/plugins/bootstrap/js/bootstrap-select.min.js" type="text/javascript"></script>
+
     <!-- BEGIN PAGE LEVEL SCRIPTS -->
     <script src="/assets/global/plugins/bootstrap-toastr/toastr.min.js" type="text/javascript"></script>
 	<script src="/assets/global/plugins/bootbox/bootbox.min.js" type="text/javascript"></script>
