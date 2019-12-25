@@ -713,6 +713,13 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 		}
 		DB::table('client')->whereIn('id', $ids)->update(['processor' => $processor,'updated_at'=>date('Y-m-d H:i:s')]);
 
+		//CRM中修改processor后，相应地更新ctg和non_ctg表里的processor
+        $emails = DB::table('client_info')->whereIn('client_id', $ids)->pluck('email');
+        DB::table('ctg')->whereIn('email', $emails)->update(['processor' => $processor,'updated_at'=>date('Y-m-d H:i:s')]);
+        DB::table('cashback')->whereIn('email', $emails)->update(['processor' => $processor,'updated_at'=>date('Y-m-d H:i:s')]);
+        DB::table('b1g1')->whereIn('email', $emails)->update(['processor' => $processor,'updated_at'=>date('Y-m-d H:i:s')]);
+        DB::table('non_ctg')->whereIn('email', $emails)->update(['processor' => $processor]);
+
 		return [true, $user->name];
 	}
 

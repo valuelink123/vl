@@ -273,7 +273,7 @@
 
             let selectedRows = dtApi.rows({selected: true})
 
-            let ctgRows = selectedRows.data().toArray().map(obj => [obj.id])
+            let ctgRows = selectedRows.data().toArray().map(obj => [obj.id,obj.email])
 
             if (!ctgRows.length) {
                 $this.val('')

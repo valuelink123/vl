@@ -125,6 +125,15 @@ class NonctgController extends Controller
                 ]);
             }
         })->update(compact('processor'));
+
+        //修改processor后，相应地更新CRM client表里的processor
+        $emails = array();
+        foreach ($req->input('ctgRows') as $row) {
+            $emails[] = $row[1];
+        }
+        $client_ids = DB::table('client_info')->whereIn('email', $emails)->pluck('client_id')->unique();
+        DB::table('client')->whereIn('id', $client_ids)->update(['processor' => $processor,'updated_at'=>date('Y-m-d H:i:s')]);
+
         return [true, $user->name];
     }
 

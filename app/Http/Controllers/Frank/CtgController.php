@@ -424,6 +424,13 @@ class CtgController extends Controller {
 			})->where('channel',$channel)->update(compact('processor'));
 		}
 
+        //修改processor后，相应地更新CRM client表里的processor
+        $emails = array();
+        foreach ($req->input('ctgRows') as $row) {
+            $emails[] = $row[2];
+        }
+        $client_ids = DB::table('client_info')->whereIn('email', $emails)->pluck('client_id')->unique();
+        DB::table('client')->whereIn('id', $client_ids)->update(['processor' => $processor,'updated_at'=>date('Y-m-d H:i:s')]);
 
 
         // foreach ($req->input('order_ids') as $order_id) {
@@ -522,6 +529,9 @@ class CtgController extends Controller {
         if ($req->has('steps')) {
             $updates['status'] = $req->input('status');
             $updates['commented'] = $req->input('commented');
+            if($updates['commented']){
+                $updates['processor'] = Auth::user()->id;
+            }
 			$steps = $req->input('steps');
 			if(isset($steps['facebook_group']) && $steps['facebook_group']){
 				$updateClient['facebook_group'] = (int)$steps['facebook_group'];

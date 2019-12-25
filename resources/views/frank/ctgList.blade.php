@@ -385,7 +385,7 @@ th,td,td>span {
 
             let selectedRows = dtApi.rows({selected: true})
 
-            let ctgRows = selectedRows.data().toArray().map(obj => [obj.created_at, obj.order_id])
+            let ctgRows = selectedRows.data().toArray().map(obj => [obj.created_at, obj.order_id, obj.email])
 
             if (!ctgRows.length) {
                 $this.val('')
