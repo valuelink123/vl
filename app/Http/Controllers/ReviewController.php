@@ -154,7 +154,7 @@ class ReviewController extends Controller
 		
 		$customers = DB::table('review')
 			->select('review.*','asin.status as asin_status','asin.bg as bg','asin.bu as bu','customers.email as email','customers.phone as phone','customers.other as other','review_customers.email as email_add','review_customers.phone as phone_add','review_customers.other as other_add','star.average_score as average_score','star.total_star_number as total_star_number')
-			->leftJoin(DB::raw('(select max(status) as status,asin,site,max(bg) as bg,max(bu) as bu from asin group by asin,site) as asin'),function($q){
+			->leftJoin(DB::raw('(select max(status) as status,max(item_no) as item_no,asin,site,max(bg) as bg,max(bu) as bu from asin group by asin,site) as asin'),function($q){
 				$q->on('review.asin', '=', 'asin.asin')
 					->on('review.site', '=', 'asin.site');
 			})->leftJoin('star',function($q){
