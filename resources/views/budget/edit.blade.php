@@ -544,7 +544,7 @@ var FormEditable = function() {
 	}
 	var initBudgettables = function() {
 		var budget_status = $('.budget_status').data('value');
-		var is_seller = true;
+		var is_seller = false;
 		<?php if($base_data['sap_seller_id'] && $base_data['sap_seller_id']==Auth::user()->sap_seller_id){ ?>
 		is_seller = true;
 		<?php } ?>
