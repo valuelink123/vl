@@ -408,7 +408,7 @@ white-space: nowrap;
 					</table>
 					</div>
 					<div class="table-head">
-					<table class="table table-striped table-bordered table-hover" style="margin-bottom:0px;">
+					<table class="table table-striped table-bordered table-hover" style="margin-bottom:50px;">
 					<colgroup>
 					<col width="4%"></col>
 					<col width="8%"></col>
@@ -446,7 +446,7 @@ white-space: nowrap;
 						<td>{{round($s_t_storage_fee,2)}}</td>
 						<td>{{round($s_t_promotion_fee,2)}}</td>
 						<td>{{round($s_t_amount_fee,2)}}</td>
-						<td>{{$s_t_income-$s_t_cost-$s_t_common_fee-$s_t_pick_fee-$s_t_storage_fee-$s_t_promotion_fee-$s_t_amount_fee}}</td>
+						<td>{{round($s_t_income-$s_t_cost-$s_t_common_fee-$s_t_pick_fee-$s_t_storage_fee-$s_t_promotion_fee-$s_t_amount_fee,2)}}</td>
 						
 						
 						<?php }else{ ?>
