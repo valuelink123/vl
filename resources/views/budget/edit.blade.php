@@ -658,10 +658,10 @@ var FormEditable = function() {
 			   if(i==weeks-5) n_stock=parseInt(n_stock*1.306);
 			   if(i==weeks-6) n_stock=parseInt(n_stock*1.127);
 			}
-			<?php if($base_data['status']=='淘汰'){ ?>
-			endStock = stock;
-			<?php }else{ ?>
+			<?php if($base_data['status']=='保留' || $base_data['status']=='新品' || $base_data['status']=='新品规划'){ ?>
 			endStock = stock>n_stock?stock:n_stock;
+			<?php }else{ ?>
+			endStock = stock;
 			<?php }?>
 			
 			endStock = endStock>0?endStock:0;
