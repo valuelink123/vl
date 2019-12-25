@@ -703,7 +703,8 @@ var FormEditable = function() {
 		var common_fee = parseFloat($('#'+budget_id+'-common_fee').text())/100;
 		var pick_fee = parseFloat(parseFloat($('#'+budget_id+'-pick_fee').text())*rate).toFixed(2);
 		cost = parseFloat(cost*(1+tax)+headshipfee).toFixed(2);
-		var exception = parseFloat($('#'+budget_id+'-exception').text())/100;
+		var exception = parseFloat($('#'+budget_id+'-exception').text()).toFixed(2)/100;
+		
 		var stock = parseInt($('#'+budget_id+'-stock').text());
 		var qty = parseInt($('#'+budget_id+'-'+week_id+'-qty').text());
 		var promote_qty = parseInt($('#'+budget_id+'-'+week_id+'-promote_qty').text());
@@ -713,7 +714,8 @@ var FormEditable = function() {
 		var week_line_qty = parseInt(qty+promote_qty);
 		var week_line_income = (exception==1)?0:parseFloat((qty*price+promote_qty*promote_price)*(1-exception)*rate).toFixed(2);
 		var week_line_cost = parseFloat((qty+promote_qty)*cost).toFixed(2);
-		var week_line_commonfee = parseFloat(week_line_income*common_fee+(exception==1)?0:(0.2*week_line_income/(1-exception)*common_fee*exception));
+		var week_line_commonfee = (exception==1)?0:parseFloat(week_line_income*common_fee+(0.2*week_line_income/(1-exception)*common_fee*exception));
+		console.log(week_line_commonfee);
 		var week_line_pickfee = parseFloat(week_line_qty*pick_fee);
 		var week_line_profee = parseFloat(week_line_income*promotion).toFixed(2);
 		$('#'+budget_id+'-'+week_id+'-week_line_qty').text(week_line_qty);
