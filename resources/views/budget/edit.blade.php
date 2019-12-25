@@ -288,14 +288,14 @@ white-space: nowrap;
 						<td>{{$v['qty']+$v['promote_qty']}}</td>
 						<td>{{$v['income']}}</td>
 						<td>{{$v['cost']}}</td>
-						<td>{{$v['income']-$v['cost']}}</td>
+						<td>{{round($v['income']-$v['cost'],2)}}</td>
 						<td>{{$v['common_fee']}}</td>
 						<td>{{$v['pick_fee']}}</td>
-						<td>{{$v['common_fee']+$v['pick_fee']}}</td>
+						<td>{{round($v['common_fee']+$v['pick_fee'],2)}}</td>
 						<td>{{$v['storage_fee']}}</td>
 						<td>{{$v['promotion_fee']}}</td>
 						<td>{{$v['amount_fee']}}</td>
-						<td>{{$v['income']-$v['cost']-$v['common_fee']-$v['pick_fee']-$v['storage_fee']-$v['promotion_fee']-$v['amount_fee']}}</td>
+						<td>{{round($v['income']-$v['cost']-$v['common_fee']-$v['pick_fee']-$v['storage_fee']-$v['promotion_fee']-$v['amount_fee'],2)}}</td>
 					  </tr>
 					  <?php 
 					  		$s_t_qty+=$v['qty']+$v['promote_qty'];
@@ -326,14 +326,14 @@ white-space: nowrap;
 						<td>{{$v['qty']+$v['promote_qty']}}</td>
 						<td>{{$v['income']}}</td>
 						<td>{{$v['cost']}}</td>
-						<td>{{$v['income']-$v['cost']}}</td>
+						<td>{{round($v['income']-$v['cost'],2)}}</td>
 						<td>{{$v['common_fee']}}</td>
 						<td>{{$v['pick_fee']}}</td>
-						<td>{{$v['common_fee']+$v['pick_fee']}}</td>
+						<td>{{round($v['common_fee']+$v['pick_fee'],2)}}</td>
 						<td>{{$v['storage_fee']}}</td>
 						<td>{{$v['promotion_fee']}}</td>
 						<td>{{$v['amount_fee']}}</td>
-						<td>{{$v['income']-$v['cost']-$v['common_fee']-$v['pick_fee']-$v['storage_fee']-$v['promotion_fee']-$v['amount_fee']}}</td>
+						<td>{{round($v['income']-$v['cost']-$v['common_fee']-$v['pick_fee']-$v['storage_fee']-$v['promotion_fee']-$v['amount_fee'],2)}}</td>
 					  </tr>
 					  <?php 
 					  		$s_t_qty+=$v['qty']+$v['promote_qty'];
@@ -364,14 +364,14 @@ white-space: nowrap;
 						<td>{{$v['qty']+$v['promote_qty']}}</td>
 						<td>{{$v['income']}}</td>
 						<td>{{$v['cost']}}</td>
-						<td>{{$v['income']-$v['cost']}}</td>
+						<td>{{round($v['income']-$v['cost'],2)}}</td>
 						<td>{{$v['common_fee']}}</td>
 						<td>{{$v['pick_fee']}}</td>
-						<td>{{$v['common_fee']+$v['pick_fee']}}</td>
+						<td>{{round($v['common_fee']+$v['pick_fee'],2)}}</td>
 						<td>{{$v['storage_fee']}}</td>
 						<td>{{$v['promotion_fee']}}</td>
 						<td>{{$v['amount_fee']}}</td>
-						<td>{{$v['income']-$v['cost']-$v['common_fee']-$v['pick_fee']-$v['storage_fee']-$v['promotion_fee']-$v['amount_fee']}}</td>
+						<td>{{round($v['income']-$v['cost']-$v['common_fee']-$v['pick_fee']-$v['storage_fee']-$v['promotion_fee']-$v['amount_fee'],2)}}</td>
 					  </tr>
 					  <?php 
 					  		$s_t_qty+=$v['qty']+$v['promote_qty'];
