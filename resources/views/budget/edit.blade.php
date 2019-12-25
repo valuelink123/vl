@@ -50,6 +50,7 @@ white-space: nowrap;
 .table-body{width:100%; max-height:500px;overflow-y:scroll;}
 .table-head table,.table-body table{width:100%;}
 .table-body table tr:nth-child(2n+1){background-color:#f2f2f2;}
+.editable-input textarea.form-control {width:500px;font-size:12px;}
     </style>
 	<div class="row">
         <div class="col-md-12">
@@ -167,7 +168,7 @@ white-space: nowrap;
 						<td><a class="budgetskus_stock editable" title="期初库存" href="javascript:;" id="{{$budget_id}}-stock" data-pk="{{$budget_id}}-stock" data-type="text" data-placement="bottom">{{$base_data['stock']}}</a></td>
 						<td>{{array_get(getUsers('sap_seller'),$base_data['sap_seller_id'],$base_data['sap_seller_id'])}}</td>
 						<td>{{$base_data['description']}}</td>
-						<td><a class="budget_remark" title="备注" href="javascript:;" id="{{$budget_id}}-remark" data-pk="{{$budget_id}}-remark" data-type="textarea" data-placement="bottom" data-placeholder="Your response here...">{{$budget->remark}}</a></td>
+						<td><a class="budget_remark" title="备注" href="javascript:;" id="{{$budget_id}}-remark" data-pk="{{$budget_id}}-remark" data-type="textarea" data-rows="10" data-placement="left" data-placeholder="Your response here...">{{$budget->remark}}</a></td>
 						<td><a class="budget_status" href="javascript:;" data-placement="left" id="{{$budget_id}}-status" data-type="select" data-pk="{{$budget_id}}-status" data-value="{{($budget->status)??0}}">{{array_get(getBudgetStageArr(),($budget->status)??0)}}</a>
 						</td>
 					  </tr>
