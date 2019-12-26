@@ -92,8 +92,8 @@ class BudgetController extends Controller
 		if($sku_status){
 			$where.= " and status = '".$sku_status."'";
 		}
-		if($b_status!==NULL){
-			$where.= " and budget_status = '".$b_status."'";
+		if($b_status){
+			$where.= " and budget_status = '".($b_status-1)."'";
 		}
 		if($sku){
 			$where.= " and (sku='".$sku."' or description like '%".$sku."%')";
@@ -163,8 +163,8 @@ class BudgetController extends Controller
 		if($sku_status){
 			$where.= " and c.status = '".$sku_status."'";
 		}
-		if($b_status!==NULL){
-			$where.= " and b.status = '".$b_status."'";
+		if($b_status){
+			$where.= " and b.status = '".($b_status-1)."'";
 		}
 		if($sku){
 			$where.= " and (c.sku='".$sku."' or c.description like '%".$sku."%')";
@@ -192,13 +192,14 @@ left join budget_skus as c on b.sku=c.sku and b.site=c.site where b.status>0 and
 			}
 		}
 		$arrayData[] = $headArray;
+		$sap_sellers = getUsers('sap_seller');
 		foreach ( $datas as $data){
 			$month = intval(substr($data->month,-2,2));
 			if(!isset($arrayData[$data->id])){
 				$arrayData[$data->id][0] = $data->bg.$data->bu;
 				$arrayData[$data->id][1] = $data->sku;
 				$arrayData[$data->id][2] = $data->description;
-				$arrayData[$data->id][3] = $data->sap_seller_id;
+				$arrayData[$data->id][3] = array_get($sap_sellers,$data->sap_seller_id,$data->sap_seller_id);
 				$arrayData[$data->id][4] = $data->status;
 				$arrayData[$data->id][5] = $data->site;
 				$arrayData[$data->id][6] = $data->stock;

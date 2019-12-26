@@ -133,7 +133,7 @@ white-space: nowrap;
 						<select class="form-control form-filter input-sm" name="b_status" id="b_status">
 								<option value="">Budget Status</option>
 									@foreach (getBudgetStageArr() as $k=>$v)
-								<option value="{{$k}}" <?php if(intval($k)===intval(array_get($_REQUEST,'b_status'))) echo 'selected'; ?>>{{$v}}</option>
+								<option value="{{$k+1}}" <?php if($k+1==array_get($_REQUEST,'b_status')) echo 'selected'; ?>>{{$v}}</option>
 							@endforeach
 						</select>
 						</div>
@@ -155,13 +155,7 @@ white-space: nowrap;
 							</a>
 						</div>
 						
-						<div class="col-md-1  col-md-offset-11">
-
-								<button id="vl_list_export" class="btn blue"> Export
-                                    <i class="fa fa-download"></i>
-                                </button>
-									
-                        </div>
+						
 						</div>	
 						
 						
@@ -178,6 +172,13 @@ white-space: nowrap;
 					</div>
 
                     </form>
+					<div class="col-md-1  col-md-offset-11">
+
+								<button id="vl_list_export" class="btn blue"> Export
+                                    <i class="fa fa-download"></i>
+                                </button>
+									
+                        </div>
                 </div>
 				
 					<form action="{{\Request::getRequestUri()}}" method="POST">
