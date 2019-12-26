@@ -133,7 +133,7 @@ white-space: nowrap;
 						<select class="form-control form-filter input-sm" name="b_status" id="b_status">
 								<option value="">Budget Status</option>
 									@foreach (getBudgetStageArr() as $k=>$v)
-								<option value="{{$k}}" <?php if($k==array_get($_REQUEST,'b_status')) echo 'selected'; ?>>{{$v}}</option>
+								<option value="{{$k}}" <?php if(intval($k)===intval(array_get($_REQUEST,'b_status'))) echo 'selected'; ?>>{{$v}}</option>
 							@endforeach
 						</select>
 						</div>
@@ -142,18 +142,26 @@ white-space: nowrap;
 						<input type="text" class="form-control form-filter input-sm" name="sku" placeholder="SKU OR Description" value ="{{array_get($_REQUEST,'sku')}}">
                                        
 						</div>
-						<div class="col-md-1">
+						
+						<div class="col-md-1  col-offset-md-11">
 							
 										<button type="submit" class="btn blue" id="data_search">Search</button>
 									
                         </div>
-
 						<div class="col-md-1">
-							<a data-target="#ajax" data-toggle="modal" href="{{ url('/budgets/create')}}"><button id="sample_editable_1_2_new" class="btn sbold red"> Add New
+							<a data-target="#ajax" data-toggle="modal" href="{{ url('/budgets/create')}}"><button id="sample_editable_1_2_new" class="btn red"> Add New
 									<i class="fa fa-plus"></i>
 								</button>
 							</a>
 						</div>
+						
+						<div class="col-md-1  col-md-offset-11">
+
+								<button id="vl_list_export" class="btn blue"> Export
+                                    <i class="fa fa-download"></i>
+                                </button>
+									
+                        </div>
 						</div>	
 						
 						
@@ -359,6 +367,10 @@ $(function() {
     $("#ajax").on("hidden.bs.modal",function(){
         $(this).find('.modal-content').html('<div class="modal-body"><img src="../assets/global/img/loading-spinner-grey.gif" alt="" class="loading"><span>Loading... </span></div>');
     });
+	
+	$("#vl_list_export").click(function(){
+		location.href='/budgets/export?user_id='+(($("select[name='user_id[]']").val())?$("select[name='user_id[]']").val():'')+'&year='+$("input[name='year']").val()+'&bgbu='+$("select[name='bgbu']").val()+'&site='+$("select[name='site']").val()+'&level='+$("select[name='level']").val()+'&sku_status='+$("select[name='sku_status']").val()+'&b_status='+$("select[name='b_status']").val()+'&sku='+$('input[name="sku"]').val();
+	});
 });
 
 

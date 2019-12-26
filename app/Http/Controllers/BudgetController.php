@@ -58,6 +58,18 @@ class BudgetController extends Controller
 		} elseif (Auth::user()->sap_seller_id) {
 			$where.= " and sap_seller_id=".Auth::user()->sap_seller_id;
 		}
+		
+		$sql = "(
+		select budget_skus.*,budgets_1.qty as qty1,budgets_1.income as amount1,(budgets_1.income-budgets_1.cost) as profit1,(budgets_1.income-budgets_1.cost-budgets_1.common_fee-budgets_1.pick_fee-budgets_1.promotion_fee-budgets_1.amount_fee-budgets_1.storage_fee) as economic1,IFNULL(budgets_1.id,0) as budget_id,IFNULL(budgets_1.status,0) as budget_status,budgets_1.remark
+,budgets_2.qty as qty2,budgets_2.income as amount2,(budgets_2.income-budgets_2.cost) as profit2,(budgets_2.income-budgets_2.cost-budgets_2.common_fee-budgets_2.pick_fee-budgets_2.promotion_fee-budgets_2.amount_fee-budgets_2.storage_fee) as economic2 from budget_skus 
+		left join (select * from budgets where year = $year) as budgets_1 
+		on budget_skus.sku = budgets_1.sku and budget_skus.site = budgets_1.site
+		left join (select * from budgets where year = ".($year-1).") as budgets_2 
+		on budget_skus.sku = budgets_2.sku and budget_skus.site = budgets_2.site
+		) as sku_tmp_cc";
+
+		$finish = DB::table(DB::raw($sql))->whereRaw($where)->selectRaw('count(*) as count,budget_status')->groupBy('budget_status')->pluck('count','budget_status');
+
 		if($bgbu){
 		   $bgbu_arr = explode('_',$bgbu);
 		   if(array_get($bgbu_arr,0)){
@@ -80,7 +92,7 @@ class BudgetController extends Controller
 		if($sku_status){
 			$where.= " and status = '".$sku_status."'";
 		}
-		if($b_status){
+		if($b_status!==NULL){
 			$where.= " and budget_status = '".$b_status."'";
 		}
 		if($sku){
@@ -88,16 +100,8 @@ class BudgetController extends Controller
 		}
 		
 		
-		$sql = "(
-		select budget_skus.*,budgets_1.qty as qty1,budgets_1.income as amount1,(budgets_1.income-budgets_1.cost) as profit1,(budgets_1.income-budgets_1.cost-budgets_1.common_fee-budgets_1.pick_fee-budgets_1.promotion_fee-budgets_1.amount_fee-budgets_1.storage_fee) as economic1,IFNULL(budgets_1.id,0) as budget_id,IFNULL(budgets_1.status,0) as budget_status,budgets_1.remark
-,budgets_2.qty as qty2,budgets_2.income as amount2,(budgets_2.income-budgets_2.cost) as profit2,(budgets_2.income-budgets_2.cost-budgets_2.common_fee-budgets_2.pick_fee-budgets_2.promotion_fee-budgets_2.amount_fee-budgets_2.storage_fee) as economic2 from budget_skus 
-		left join (select * from budgets where year = $year) as budgets_1 
-		on budget_skus.sku = budgets_1.sku and budget_skus.site = budgets_1.site
-		left join (select * from budgets where year = ".($year-1).") as budgets_2 
-		on budget_skus.sku = budgets_2.sku and budget_skus.site = budgets_2.site
-		) as sku_tmp_cc";
+				
 		
-		$finish = DB::table(DB::raw($sql))->whereRaw($where)->selectRaw('count(*) as count,budget_status')->groupBy('budget_status')->pluck('count','budget_status');
 	
 		
 		
@@ -114,6 +118,134 @@ class BudgetController extends Controller
 
     }
 	
+	public function export(Request $request)
+    {
+		set_time_limit(0);
+		$arrayData=[];
+		
+		$site = $request->get('site');
+		$bgbu = $request->get('bgbu');
+		$sap_seller_id = $request->get('sap_seller_id');
+		$level = $request->get('level');
+		$sku = $request->get('sku');
+	    $year = $request->get('year')?$request->get('year'):date('Y',strtotime('+1 month'));
+		$user_id = $request->get('user_id');
+		$sku_status = $request->get('sku_status');
+		$b_status = $request->get('b_status');
+		$where = "";
+		if (Auth::user()->seller_rules) {
+			$rules = explode("-",Auth::user()->seller_rules);
+			if(array_get($rules,0)!='*') $where.= " and c.bg='".array_get($rules,0)."'";
+			if(array_get($rules,1)!='*') $where.= " and c.bu='".array_get($rules,1)."'";
+		} elseif (Auth::user()->sap_seller_id) {
+			$where.= " and c.sap_seller_id=".Auth::user()->sap_seller_id;
+		}
+
+		if($bgbu){
+		   $bgbu_arr = explode('_',$bgbu);
+		   if(array_get($bgbu_arr,0)){
+				$where.= " and c.bg='".array_get($bgbu_arr,0)."'";
+		   }
+		   if(array_get($bgbu_arr,1)){
+				$where.= " and c.bu='".array_get($bgbu_arr,1)."'";
+		   }
+		}
+		if($site){
+			$where.= " and c.site='".$site."'";
+		}
+		if($user_id){
+			$where.= " and c.sap_seller_id in (".implode(',',$user_id).")";
+		}
+		
+		if($level){
+			$where.= " and c.level = '".$level."'";
+		}
+		if($sku_status){
+			$where.= " and c.status = '".$sku_status."'";
+		}
+		if($b_status!==NULL){
+			$where.= " and b.status = '".$b_status."'";
+		}
+		if($sku){
+			$where.= " and (c.sku='".$sku."' or c.description like '%".$sku."%')";
+		}
+ 		$datas = DB::select("select b.id,a.month,c.bg,c.bu,c.sku,c.description,c.sap_seller_id,c.status,c.level,c.site,c.stock,c.cost as sku_cost,c.exception,(a.qty+a.promote_qty) as qty,a.income,a.cost,
+a.common_fee,a.pick_fee,a.promotion_fee,a.storage_fee,a.amount_fee,b.status as budget_status from (select budget_id,date_format(date,'%Y%m') as month,
+sum(qty) as qty,
+sum(promote_qty) as promote_qty,
+sum(income) as income,sum(cost) as cost,sum(common_fee) as common_fee,sum(pick_fee) as pick_fee,sum(promotion_fee) as promotion_fee,
+sum(amount_fee) as amount_fee,sum(storage_fee) as storage_fee
+from budget_details group by month,budget_id) as a left join budgets as b on a.budget_id=b.id
+left join budget_skus as c on b.sku=c.sku and b.site=c.site where b.status>0 and a.month>='".$year."01' and a.month<='".$year."12' $where order by b.id,a.month asc");
+		$headArray[0]='BGBU';
+		$headArray[1]='SKU';
+		$headArray[2]='描述';
+		$headArray[3]='销售员';
+		$headArray[4]='产品状态';
+		$headArray[5]='站点';
+		$headArray[6]='期初库存';
+		$headArray[7]='不含税采购单价';
+		$headArray[8]='异常率';
+		foreach( ['销量','收入','成本','佣金','拣配费','推广费','仓储费','资金占用成本','经济效益'] as $k=>$v){
+			for($i=1;$i<=13;$i++){
+				$headArray[(8+$i+$k*13)] = ((($i==13)?'合计':($i.'月')).$v);
+			}
+		}
+		$arrayData[] = $headArray;
+		foreach ( $datas as $data){
+			$month = intval(substr($data->month,-2,2));
+			if(!isset($arrayData[$data->id])){
+				$arrayData[$data->id][0] = $data->bg.$data->bu;
+				$arrayData[$data->id][1] = $data->sku;
+				$arrayData[$data->id][2] = $data->description;
+				$arrayData[$data->id][3] = $data->sap_seller_id;
+				$arrayData[$data->id][4] = $data->status;
+				$arrayData[$data->id][5] = $data->site;
+				$arrayData[$data->id][6] = $data->stock;
+				$arrayData[$data->id][7] = $data->sku_cost;
+				$arrayData[$data->id][8] = $data->exception;
+				$arrayData[$data->id][21] = 0;
+				$arrayData[$data->id][34] = 0;
+				$arrayData[$data->id][47] = 0;
+				$arrayData[$data->id][60] = 0;
+				$arrayData[$data->id][73] = 0;
+				$arrayData[$data->id][86] = 0;
+				$arrayData[$data->id][99] = 0;
+				$arrayData[$data->id][112] = 0;
+				$arrayData[$data->id][125] = 0;
+			}
+			$arrayData[$data->id][$month+8] = $data->qty;
+			$arrayData[$data->id][$month+21] = $data->income;
+			$arrayData[$data->id][$month+34] = $data->cost;
+			$arrayData[$data->id][$month+47] = $data->common_fee;
+			$arrayData[$data->id][$month+60] = $data->pick_fee;
+			$arrayData[$data->id][$month+73] = $data->promotion_fee;
+			$arrayData[$data->id][$month+86] = $data->storage_fee;
+			$arrayData[$data->id][$month+99] = $data->amount_fee;
+			$arrayData[$data->id][$month+112] = round($data->income-$data->cost-$data->common_fee-$data->pick_fee-$data->promotion_fee-$data->amount_fee-$data->storage_fee,2);
+			
+			$arrayData[$data->id][21] += round($data->qty);
+			$arrayData[$data->id][34] += round($data->income,2);
+			$arrayData[$data->id][47] += round($data->cost,2);
+			$arrayData[$data->id][60] += round($data->common_fee,2);
+			$arrayData[$data->id][73] += round($data->pick_fee,2);
+			$arrayData[$data->id][86] += round($data->promotion_fee,2);
+			$arrayData[$data->id][99] += round($data->storage_fee,2);
+			$arrayData[$data->id][112] += round($data->amount_fee,2);
+			$arrayData[$data->id][125] += round($data->income-$data->cost-$data->common_fee-$data->pick_fee-$data->promotion_fee-$data->amount_fee-$data->storage_fee,2);
+			if($month==12) ksort($arrayData[$data->id]);
+		}
+		if($arrayData){
+			$spreadsheet = new Spreadsheet();
+			$spreadsheet->getActiveSheet()->fromArray($arrayData,NULL,'A1');
+			header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+			header('Content-Disposition: attachment;filename="Export_review.xlsx"');
+			header('Cache-Control: max-age=0');
+			$writer = new Xlsx($spreadsheet);
+			$writer->save('php://output');
+		}
+		die();
+	}
 	
 	
 	public function edit(Request $request)
