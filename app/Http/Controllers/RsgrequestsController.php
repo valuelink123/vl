@@ -186,6 +186,17 @@ class RsgrequestsController extends Controller
 		$users= $this->getUsers();
 		//Check Customer(1)，Submit Paypal(3)，Check Paypal(4)
 
+		//funded那一列=star功能的Price-Coupon,所以查出帖子的price和coupon_n等信息
+		$yestoday = date('Y-m-d',strtotime("-1 day"));
+		$sql = "SELECT asin,domain,price,coupon_n
+		FROM star_history
+		WHERE create_at = '".$yestoday."' group by asin,domain";
+		$_starData = $this->queryRows($sql);
+		$starData = array();
+		foreach($_starData as $key=>$val){
+			$starData[$val['asin'].'_'.$val['domain']] = $val['price'] - $val['coupon_n'];
+		}
+
 		$rsgStatusArr = getCrmRsgStatusArr();
 		foreach ( $lists as $key=>$list){
 			$lists[$key]['step'] = '<span class="badge badge-success">'.array_get(getStepStatus(),$list['step']).'</span>';
@@ -251,7 +262,7 @@ class RsgrequestsController extends Controller
 			}
 			$lists[$key]['channel'] = isset($channelKeyVal[$list['channel']]) ? $channelKeyVal[$list['channel']] : '';
 			$lists[$key]['asin_link'] = '<a href="https://'.array_get($list,'site').'/dp/'.array_get($list,'asin').'?m='.array_get($list,'seller_id').'" target="_blank">'.$list['asin'].'</a>';
-			$lists[$key]['funded'] = $list['transfer_amount'].' '.$list['transfer_currency'];
+			$lists[$key]['funded'] = sprintf("%.2f",(isset($starData[$list['asin'].'_'.$list['site']]) ? $starData[$list['asin'].'_'.$list['site']] : $list['transfer_amount'])).' '.$list['transfer_currency'];
 			$lists[$key]['review_url'] = '<div style="width: 200px;word-wrap: break-word;text-align: center;">'.$list['review_url'].'<BR><span class="text-danger">'.$list['transaction_id'].'</span></div>';
 			$lists[$key]['sales'] = isset($users[$list['user_id']]) ? $users[$list['user_id']] : $list['user_id'];
 			$lists[$key]['group'] = isset($fbgroupConfig[$list['facebook_group']]) ? $fbgroupConfig[ $list['facebook_group']] : '';
