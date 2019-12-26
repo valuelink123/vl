@@ -187,15 +187,7 @@ class RsgrequestsController extends Controller
 		//Check Customer(1)，Submit Paypal(3)，Check Paypal(4)
 
 		//funded那一列=star功能的Price-Coupon,所以查出帖子的price和coupon_n等信息
-		$yestoday = date('Y-m-d',strtotime("-1 day"));
-		$sql = "SELECT asin,domain,price,coupon_n
-		FROM star_history
-		WHERE create_at = '".$yestoday."' group by asin,domain";
-		$_starData = $this->queryRows($sql);
-		$starData = array();
-		foreach($_starData as $key=>$val){
-			$starData[$val['asin'].'_'.$val['domain']] = $val['price'] - $val['coupon_n'];
-		}
+		$starData = $this->getStarData();
 
 		$rsgStatusArr = getCrmRsgStatusArr();
 		foreach ( $lists as $key=>$list){
@@ -635,6 +627,7 @@ where payer='$customer_paypal_email' order by timestamp asc");
 		$users = $this->getUsers();
 		$channelKeyVal = getRsgRequestChannel();
 		$fbgroupConfig = getFacebookGroup();
+		$starData = $this->getStarData();
 		foreach ($lists as $key=>$val){
 
 			$arrayData[] = array(
@@ -644,7 +637,8 @@ where payer='$customer_paypal_email' order by timestamp asc");
 				$val['asin'],
 				array_get(getStepStatus(),$val['step']),
 				$val['customer_paypal_email'],
-				$val['transfer_amount'].$val['transfer_currency'],
+				// $val['transfer_amount'].$val['transfer_currency'],
+				sprintf("%.2f",(isset($starData[$val['asin'].'_'.$val['site']]) ? $starData[$val['asin'].'_'.$val['site']] : $val['transfer_amount'])).' '.$val['transfer_currency'],
 				$val['amazon_order_id'],
 				$val['review_url'],
 				$val['transaction_id'],
@@ -709,5 +703,22 @@ where payer='$customer_paypal_email' order by timestamp asc");
 			}
 		}
 		echo $res;
+	}
+
+	/*
+	 * 查出帖子的price和coupon_n等信息，rsgrequest列表的funded那一列=star功能的Price-Coupon,
+	 */
+	public function getStarData()
+	{
+		$yestoday = date('Y-m-d',strtotime("-1 day"));
+		$sql = "SELECT asin,domain,price,coupon_n
+		FROM star_history
+		WHERE create_at = '".$yestoday."' group by asin,domain";
+		$_starData = $this->queryRows($sql);
+		$starData = array();
+		foreach($_starData as $key=>$val){
+			$starData[$val['asin'].'_'.$val['domain']] = $val['price'] - $val['coupon_n'];
+		}
+		return $starData;
 	}
 }
