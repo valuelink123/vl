@@ -31,6 +31,7 @@ table .head{
 text-align:center;
 vertical-align:middle;
 background:#fff2cc;
+font-weight:bold;
 }
 td.strategy_s,td.keyword_s{       
 text-overflow:ellipsis; 
@@ -314,6 +315,25 @@ white-space: nowrap;
 						<td><a href="{{url('/budgets/edit?sku='.$data->sku.'&site='.$data->site.'&year='.$year)}}">{{array_get(getBudgetStageArr(),($data->budget_status)??0)}}</a></td>
 					  </tr>
 					  @endforeach
+					  
+					   <tr class="head">
+					    <td colspan="6" style="text-align:right"> 合计：</td>
+						<td>{{$sum->stock}}</td>
+						<td>{{$sum->qty1}}</td>
+						<td>{{$sum->amount1}}</td>
+						<td>{{($sum->amount1==0)?0:round($sum->economic1/$sum->amount1,4)*100}}%</td>
+						<td>{{$sum->economic1}}</td>
+						<td>{{$sum->qty2}}</td>
+						<td>{{$sum->amount2}}</td>
+						<td>{{($sum->amount2==0)?0:round($sum->economic2/$sum->amount2,4)*100}}%</td>
+						<td>{{$sum->economic2}}</td>
+						<td><span class="{{($sum->qty1-$sum->qty2>0)?'red':'green'}}">{{$sum->qty1-$sum->qty2}}</span></td>
+						<td><span class="{{($sum->amount1-$sum->amount2>0)?'red':'green'}}">{{$sum->amount1-$sum->amount2}}</span></td>
+						<td><span class="{{((($sum->amount1==0)?0:round($sum->economic1/$sum->amount1,4)*100)-(($sum->amount2==0)?0:round($sum->economic2/$sum->amount2,4)*100)>0)?'red':'green'}}">{{(($sum->amount1==0)?0:round($sum->economic1/$sum->amount1,4)*100)-(($sum->amount2==0)?0:round($sum->economic2/$sum->amount2,4)*100)}}%</span></td>
+						<td><span class="{{($sum->economic1-$sum->economic2>0)?'red':'green'}}">{{$sum->economic1-$sum->economic2}}</span></td>
+	
+						<td></td>
+					  </tr>
 					  </tbody>
 					</table>
 					

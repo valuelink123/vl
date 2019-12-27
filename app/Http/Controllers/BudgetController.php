@@ -101,6 +101,7 @@ class BudgetController extends Controller
 		}
 		
 		
+		$sum = DB::table(DB::raw($sql))->whereRaw($where)->selectRaw('sum(stock) as stock,sum(qty1) as qty1,sum(amount1) as amount1,sum(economic1) as economic1,sum(qty2) as qty2,sum(amount2) as amount2,sum(economic2) as economic2')->first();
 		
 				
 		
@@ -115,6 +116,7 @@ class BudgetController extends Controller
 		$data['year']=$year;
 		$data['datas']= $datas;
 		$data['finish']= $finish;
+		$data['sum']= $sum;
 		session()->put('remember_list_url',\Request::getRequestUri());
         return view('budget/index',$data);
 
