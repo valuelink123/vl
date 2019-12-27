@@ -145,12 +145,15 @@ class CtgController extends Controller {
 		    facebook_group,
 		    t1.review_type,
 		    rsg_requests.amazon_order_id as rsg_orderid,
-		    '{$channelName}' as channel 
+		    '{$channelName}' as channel,
+		    client.rsg_status as rsg_status,
+		    client.rsg_status_explain as rsg_status_explain
         FROM {$table} t1 
         Left join ( 
 					select amazon_order_id from rsg_requests group by amazon_order_id 
 				) as rsg_requests on rsg_requests.amazon_order_id = t1.order_id 
         LEFT JOIN client_info ON client_info.email = t1.email 
+        LEFT JOIN client ON client_info.client_id = client.id  
         LEFT JOIN users t2
           ON t2.id = t1.processor
         LEFT JOIN (
@@ -194,12 +197,22 @@ class CtgController extends Controller {
 
         $data = $this->queryRows($sql);
 		$fbgroupConfig = getFacebookGroup();
+        $rsgStatusArr = getCrmRsgStatusArr();
         foreach($data as $key=>$val){
 			$data[$key]['facebook_group'] = isset($fbgroupConfig[$val['facebook_group']]) ? $fbgroupConfig[ $val['facebook_group']] : '';
 			if($val['review_type']==1 && $val['rating']<4){//系统给的评论星级，并且是差评，红色底色显示
 				$data[$key]['rating'] = '<span class="btn btn-danger btn-xs">'.$val['rating'].'</span>';
 			}
 			$data[$key]['join_rsg'] = $val['rsg_orderid'] ? 'YES' : 'NO';//是否有参加RSG活动
+
+            $explain = isset($rsgStatusArr[$val['rsg_status_explain']]) ? $rsgStatusArr[$val['rsg_status_explain']]['vop'] : $val['rsg_status_explain'];
+            if($val['rsg_status']==1) {
+                //邮箱后面显示红色圆圈
+                $data[$key]['email'] = $val['email'].'<div class="unavailable" title="'.$explain.'"></div>';
+            }else{
+                //邮箱后面显示绿色圆圈
+                $data[$key]['email'] = $val['email'].'<div class="available"></div>';
+            }
 		}
         $recordsTotal = $recordsFiltered = $this->queryOne('SELECT FOUND_ROWS()');
 

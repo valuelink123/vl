@@ -61,12 +61,23 @@ class CrmController extends Controller
 		$recordsTotal = $recordsFiltered = $this->queryOne('SELECT FOUND_ROWS()');
 
 		$fbgroupConfig = getFacebookGroup();
+        $rsgStatusArr = getCrmRsgStatusArr();
 		foreach($data as $key=>$val){
 			$action = '';
+            $explain = isset($rsgStatusArr[$val['rsg_status_explain']]) ? $rsgStatusArr[$val['rsg_status_explain']]['vop'] : $val['rsg_status_explain'];
+            $emailHtml = '<a href="'.url('crm/show?id='.$val['id']).'" target="_blank">'.$val['email'].'</a>';
+            if($val['rsg_status']==1) {
+                //邮箱后面显示红色圆圈
+                $rsgStatusHtml = '<div class="unavailable" title="'.$explain.'"></div>';
+            }else{
+                //邮箱后面显示绿色圆圈
+                $rsgStatusHtml = '<div class="available"></div>';
+            }
+
 			if(!Auth::user()->can(['crm-update'])){
-                $data[$key]['email'] = '<a href="'.url('crm/show?id='.$val['id']).'" target="_blank">'.$val['email'].'</a>';
+                $data[$key]['email'] = $emailHtml.$rsgStatusHtml;
 			}else{
-                $data[$key]['email'] = '<a href="'.url('crm/show?id='.$val['id']).'" target="_blank">'.$val['email'].'</a><br/>'.'<a href="'.url('crm/edit?id='.$val['id']).'" target="_blank" class="badge badge-success"> Edit </a>';
+                $data[$key]['email'] = $emailHtml.$rsgStatusHtml.'<br/><a href="'.url('crm/edit?id='.$val['id']).'" target="_blank" class="badge badge-success"> Edit </a>';
 
                 $action = '<a href="'.url('crm/trackLogAdd?id='.$val['id']).'" target="_blank" class="badge badge-success"> Add Activity </a>';
 			}
@@ -185,7 +196,7 @@ class CrmController extends Controller
 		}
 
 		$sql = "select SQL_CALC_FOUND_ROWS t1.id as id,t1.date as date,c.name as name,c.email as email,c.phone as phone,c.remark as remark,c.country as country,c.`from` as `from`,c.brand as brand,
-t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_sg as times_sg,t1.times_negative_review as times_negative_review,t1.times_positive_review as times_positive_review,t1.type as 'type',if(num>0,num,0) as order_num,b.name as processor,b.bg as bg,b.bu as bu,c.facebook_name as facebook_name,c.facebook_group as facebook_group,c.amazon_profile_page as amazon_profile_page   
+t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_sg as times_sg,t1.times_negative_review as times_negative_review,t1.times_positive_review as times_positive_review,t1.type as 'type', t1.rsg_status as rsg_status,t1.rsg_status_explain as rsg_status_explain,if(num>0,num,0) as order_num,b.name as processor,b.bg as bg,b.bu as bu,c.facebook_name as facebook_name,c.facebook_group as facebook_group,c.amazon_profile_page as amazon_profile_page   
 			FROM client as t1 
 		  	left join(
 				select users.id as processor,min(name) as name,min(bg) as bg,min(bu) as bu 
