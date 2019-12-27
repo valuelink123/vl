@@ -363,6 +363,9 @@ class InboxController extends Controller
         $iDisplayLength = $iDisplayLength < 0 ? $iTotalRecords : $iDisplayLength;
         $iDisplayStart = intval($_REQUEST['start']);
         $sEcho = intval($_REQUEST['draw']);
+        $customers = $customers->leftJoin(DB::raw('(select email, rsg_status, rsg_status_explain from client_info left join client on client_info.client_id = client.id) as t1'),function($q){
+            $q->on('inbox.from_address', '=', 't1.email');
+        });
 		$customersLists =  $customers->orderBy($orderby,$sort)->skip($iDisplayStart)->take($iDisplayLength)->get()->toArray();
         $records = array();
         $records["data"] = array();
@@ -375,7 +378,8 @@ class InboxController extends Controller
         $status_list[2] = "<span class=\"label label-sm label-success\">Replied</span>";
         $status_list[1] = "<span class=\"label label-sm label-warning\">Do not need to reply</span>";
         $status_list[0] = "<span class=\"label label-sm label-danger\">Need reply</span>";
-		
+        $rsgStatusArr = getCrmRsgStatusArr();
+
 		foreach ( $customersLists as $customersList){
 			$warnText = '';
             if($customersList['reply']==0){
@@ -383,11 +387,18 @@ class InboxController extends Controller
                     $warnText = $this->time_diff(strtotime(date('Y-m-d H:i:s')), strtotime('+ '.array_get($rules,$customersList['rule_id']),strtotime($customersList['date'])));
                 }
             }
-
+            $explain = isset($rsgStatusArr[$customersList['rsg_status_explain']]) ? $rsgStatusArr[$customersList['rsg_status_explain']]['vop'] : $customersList['rsg_status_explain'];
+            if($customersList['rsg_status']==1) {
+                //邮箱后面显示红色圆圈
+                $rsgStatus = '<div class="unavailable" title="'.$explain.'"></div>';
+            }else{
+                //邮箱后面显示绿色圆圈
+                $rsgStatus = '<div class="available"></div>';
+            }
             $records["data"][] = array(
                 '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input name="id[]" type="checkbox" class="checkboxes" value="'.$customersList['id'].'"/><span></span></label>',
                 
-				$customersList['from_address'].'</BR>'.(array_get($customersList,'from_name')?'<span class="label label-sm label-primary">'.array_get($customersList,'from_name').'</span> ':' ').$status_list[$customersList['reply']],
+				$customersList['from_address'].$rsgStatus.'</BR>'.(array_get($customersList,'from_name')?'<span class="label label-sm label-primary">'.array_get($customersList,'from_name').'</span> ':' ').$status_list[$customersList['reply']],
                 $customersList['to_address'].'</BR>'.'<span class="label label-sm label-primary">'.array_get($groups,$customersList['group_id'].'.group_name').' - '.array_get($users,$customersList['user_id']).'</span> ',
                 (($customersList['mark'])?'<span class="label label-sm label-danger">'.$customersList['mark'].'</span> ':'').(($customersList['sku'])?'<span class="label label-sm label-primary">'.$customersList['sku'].'</span> ':'').(($customersList['etype'])?'<span class="label label-sm label-danger">'.$customersList['etype'].'</span> ':'').'<a href="/inbox/'.$customersList['id'].'" target="_blank" style="color:#333;">'.(($customersList['read'])?'':'<strong>').$customersList['subject'].(($customersList['read'])?'':'</strong>').'</a>'.(($warnText)?'<span class="label label-sm label-danger">'.$warnText.'</span> ':'').(($customersList['remark'])?'<BR/><span class="label label-sm label-info">'.$customersList['remark'].'</span> ':''),
                 $customersList['date'],
