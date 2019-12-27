@@ -113,6 +113,9 @@ class NonctgController extends Controller
                 //邮箱后面显示绿色圆圈
                 $data[$key]['email'] = $val['email'].'<div class="available"></div>';
             }
+
+            //点击Batch Send群发邮件时，提取收件人email。
+            $data[$key]['email_hidden'] = $val['email'];
         }
         return compact('data', 'recordsTotal', 'recordsFiltered');
     }
