@@ -50,7 +50,7 @@ class BudgetController extends Controller
 		$user_id = $request->get('user_id');
 		$sku_status = $request->get('sku_status');
 		$b_status = $request->get('b_status');
-		$where = "1=1";
+		$where = "(stock>=100 and (status<>'淘汰' or status <>'替换' or status <>'待定' or status <>'配件'))";
 		if (Auth::user()->seller_rules) {
 			$rules = explode("-",Auth::user()->seller_rules);
 			if(array_get($rules,0)!='*') $where.= " and bg='".array_get($rules,0)."'";
@@ -58,18 +58,6 @@ class BudgetController extends Controller
 		} elseif (Auth::user()->sap_seller_id) {
 			$where.= " and sap_seller_id=".Auth::user()->sap_seller_id;
 		}
-		
-		$sql = "(
-		select budget_skus.*,budgets_1.qty as qty1,budgets_1.income as amount1,(budgets_1.income-budgets_1.cost) as profit1,(budgets_1.income-budgets_1.cost-budgets_1.common_fee-budgets_1.pick_fee-budgets_1.promotion_fee-budgets_1.amount_fee-budgets_1.storage_fee) as economic1,IFNULL(budgets_1.id,0) as budget_id,IFNULL(budgets_1.status,0) as budget_status,budgets_1.remark
-,budgets_2.qty as qty2,budgets_2.income as amount2,(budgets_2.income-budgets_2.cost) as profit2,(budgets_2.income-budgets_2.cost-budgets_2.common_fee-budgets_2.pick_fee-budgets_2.promotion_fee-budgets_2.amount_fee-budgets_2.storage_fee) as economic2 from budget_skus 
-		left join (select * from budgets where year = $year) as budgets_1 
-		on budget_skus.sku = budgets_1.sku and budget_skus.site = budgets_1.site
-		left join (select * from budgets where year = ".($year-1).") as budgets_2 
-		on budget_skus.sku = budgets_2.sku and budget_skus.site = budgets_2.site
-		) as sku_tmp_cc";
-
-		$finish = DB::table(DB::raw($sql))->whereRaw($where)->selectRaw('count(*) as count,budget_status')->groupBy('budget_status')->pluck('count','budget_status');
-
 		if($bgbu){
 		   $bgbu_arr = explode('_',$bgbu);
 		   if(array_get($bgbu_arr,0)){
@@ -92,12 +80,26 @@ class BudgetController extends Controller
 		if($sku_status){
 			$where.= " and status = '".$sku_status."'";
 		}
-		if($b_status){
-			$where.= " and budget_status = '".($b_status-1)."'";
-		}
 		if($sku){
 			$where.= " and (sku='".$sku."' or description like '%".$sku."%')";
 		}
+		
+		$sql = "(
+		select budget_skus.*,budgets_1.qty as qty1,budgets_1.income as amount1,(budgets_1.income-budgets_1.cost) as profit1,(budgets_1.income-budgets_1.cost-budgets_1.common_fee-budgets_1.pick_fee-budgets_1.promotion_fee-budgets_1.amount_fee-budgets_1.storage_fee) as economic1,IFNULL(budgets_1.id,0) as budget_id,IFNULL(budgets_1.status,0) as budget_status,budgets_1.remark
+,budgets_2.qty as qty2,budgets_2.income as amount2,(budgets_2.income-budgets_2.cost) as profit2,(budgets_2.income-budgets_2.cost-budgets_2.common_fee-budgets_2.pick_fee-budgets_2.promotion_fee-budgets_2.amount_fee-budgets_2.storage_fee) as economic2 from budget_skus 
+		left join (select * from budgets where year = $year) as budgets_1 
+		on budget_skus.sku = budgets_1.sku and budget_skus.site = budgets_1.site
+		left join (select * from budgets where year = ".($year-1).") as budgets_2 
+		on budget_skus.sku = budgets_2.sku and budget_skus.site = budgets_2.site
+		) as sku_tmp_cc";
+
+		$finish = DB::table(DB::raw($sql))->whereRaw($where)->selectRaw('count(*) as count,budget_status')->groupBy('budget_status')->pluck('count','budget_status');
+
+		
+		if($b_status){
+			$where.= " and budget_status = '".($b_status-1)."'";
+		}
+		
 		
 		
 				
