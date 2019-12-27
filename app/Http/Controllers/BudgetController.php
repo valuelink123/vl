@@ -50,7 +50,7 @@ class BudgetController extends Controller
 		$user_id = $request->get('user_id');
 		$sku_status = $request->get('sku_status');
 		$b_status = $request->get('b_status');
-		$where = "(stock>=100 or status<>'淘汰' or status <>'替换' or status <>'待定' or status <>'配件')";
+		$where = "(stock>=100 or (status<>'淘汰' and status <>'替换' and status <>'待定' and status <>'配件'))";
 		if (Auth::user()->seller_rules) {
 			$rules = explode("-",Auth::user()->seller_rules);
 			if(array_get($rules,0)!='*') $where.= " and bg='".array_get($rules,0)."'";
