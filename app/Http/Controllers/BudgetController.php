@@ -50,7 +50,7 @@ class BudgetController extends Controller
 		$user_id = $request->get('user_id');
 		$sku_status = $request->get('sku_status');
 		$b_status = $request->get('b_status');
-		$where = "(stock>=100 or (status<>'淘汰' and status <>'替换' and status <>'待定' and status <>'配件'))";
+		$where = "1=1";
 		if (Auth::user()->seller_rules) {
 			$rules = explode("-",Auth::user()->seller_rules);
 			if(array_get($rules,0)!='*') $where.= " and bg='".array_get($rules,0)."'";
@@ -93,7 +93,7 @@ class BudgetController extends Controller
 		on budget_skus.sku = budgets_2.sku and budget_skus.site = budgets_2.site
 		) as sku_tmp_cc";
 
-		$finish = DB::table(DB::raw($sql))->whereRaw($where)->selectRaw('count(*) as count,budget_status')->groupBy('budget_status')->pluck('count','budget_status');
+		$finish = DB::table(DB::raw($sql))->whereRaw($where." and (stock>=100 or (status<>'淘汰' and status <>'替换' and status <>'待定' and status <>'配件')) ")->selectRaw('count(*) as count,budget_status')->groupBy('budget_status')->pluck('count','budget_status');
 
 		
 		if($b_status){
