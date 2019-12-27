@@ -122,6 +122,7 @@
                         <th>Processor</th>
                         <th>Join RSg</th>
                         <th> Action </th>
+                        <th>Email-Hidden</th>
                     </tr>
                     </thead>
                     <tbody></tbody>
@@ -205,6 +206,9 @@
                 // blurable: true, // unselect on blur
                 selector: 'td:first-child', // 指定第一列可以点击选中
             },
+            "aoColumnDefs": [
+                { "bVisible": false, "aTargets": [18] }
+            ],
             columns: [
                 {
                     width: "1px",
@@ -254,7 +258,8 @@
                     render(data, type, row) {
                         return `<a class="btn btn-danger btn-xs" href="/nonctg/process?order_id=${data}&id=${row.id}" target="_blank">Process</a>`
                     }
-                }
+                },
+                {data: 'email_hidden', name: 'email_hidden'}
             ],
             ajax: {
                 type: 'POST',
@@ -307,7 +312,7 @@
         $('#batch-send').click(function(){
             let selectedRows = dtApi.rows({selected: true})
 
-            let ctgRows = selectedRows.data().toArray().map(obj => [obj.email])
+            let ctgRows = selectedRows.data().toArray().map(obj => [obj.email_hidden])
 
             if (!ctgRows.length) {
                 toastr.error('Please select some rows first !')

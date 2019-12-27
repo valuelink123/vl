@@ -204,6 +204,8 @@ class CtgController extends Controller {
 				$data[$key]['rating'] = '<span class="btn btn-danger btn-xs">'.$val['rating'].'</span>';
 			}
 			$data[$key]['join_rsg'] = $val['rsg_orderid'] ? 'YES' : 'NO';//是否有参加RSG活动
+            //点击Batch Send群发邮件时，提取收件人email。
+            $data[$key]['email_hidden'] = $val['email'];
 
             $explain = isset($rsgStatusArr[$val['rsg_status_explain']]) ? $rsgStatusArr[$val['rsg_status_explain']]['vop'] : $val['rsg_status_explain'];
             if($val['rsg_status']==1) {
