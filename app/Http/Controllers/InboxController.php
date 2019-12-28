@@ -388,12 +388,17 @@ class InboxController extends Controller
                 }
             }
             $explain = isset($rsgStatusArr[$customersList['rsg_status_explain']]) ? $rsgStatusArr[$customersList['rsg_status_explain']]['vop'] : $customersList['rsg_status_explain'];
-            if($customersList['rsg_status']==1) {
-                //邮箱后面显示红色圆圈
-                $rsgStatus = '<div class="unavailable" title="'.$explain.'"></div>';
+            //亚马逊客户是不能邀请做RSG的，不显示红色或绿色圆圈。
+            if($customersList['type'] != 'Site'){
+                $rsgStatus = '';
             }else{
-                //邮箱后面显示绿色圆圈
-                $rsgStatus = '<div class="available"></div>';
+                if($customersList['rsg_status']==1) {
+                    //邮箱后面显示红色圆圈
+                    $rsgStatus = '<div class="unavailable" title="'.$explain.'"></div>';
+                }else{
+                    //邮箱后面显示绿色圆圈
+                    $rsgStatus = '<div class="available"></div>';
+                }
             }
             $records["data"][] = array(
                 '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input name="id[]" type="checkbox" class="checkboxes" value="'.$customersList['id'].'"/><span></span></label>',

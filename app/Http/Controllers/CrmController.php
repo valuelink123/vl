@@ -66,12 +66,17 @@ class CrmController extends Controller
 			$action = '';
             $explain = isset($rsgStatusArr[$val['rsg_status_explain']]) ? $rsgStatusArr[$val['rsg_status_explain']]['vop'] : $val['rsg_status_explain'];
             $emailHtml = '<a href="'.url('crm/show?id='.$val['id']).'" target="_blank">'.$val['email'].'</a>';
-            if($val['rsg_status']==1) {
-                //邮箱后面显示红色圆圈
-                $rsgStatusHtml = '<div class="unavailable" title="'.$explain.'"></div>';
+            //亚马逊客户是不能邀请做RSG的，不显示红色或绿色圆圈。@amazon.com, @amazon.co, @marketplace.amazon.com
+            if($val['email'] && preg_match("/.+@.*amazon.+/", $val['email'])){
+                $rsgStatusHtml = '';
             }else{
-                //邮箱后面显示绿色圆圈
-                $rsgStatusHtml = '<div class="available"></div>';
+                if($val['rsg_status']==1) {
+                    //邮箱后面显示红色圆圈
+                    $rsgStatusHtml = '<div class="unavailable" title="'.$explain.'"></div>';
+                }else{
+                    //邮箱后面显示绿色圆圈
+                    $rsgStatusHtml = '<div class="available"></div>';
+                }
             }
 
 			if(!Auth::user()->can(['crm-update'])){
