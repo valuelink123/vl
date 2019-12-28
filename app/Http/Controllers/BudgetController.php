@@ -173,7 +173,7 @@ class BudgetController extends Controller
 		if($sku){
 			$where.= " and (c.sku='".$sku."' or c.description like '%".$sku."%')";
 		}
- 		$datas = DB::select("select b.id,a.month,c.bg,c.bu,c.sku,c.description,c.sap_seller_id,c.status,c.level,c.site,c.stock,c.cost as sku_cost,c.exception,(a.qty+a.promote_qty) as qty,a.income,a.cost,
+ 		$datas = DB::select("select b.id,b.remark,a.month,c.bg,c.bu,c.sku,c.description,c.sap_seller_id,c.status,c.level,c.site,c.stock,c.cost as sku_cost,c.exception,(a.qty+a.promote_qty) as qty,a.income,a.cost,
 a.common_fee,a.pick_fee,a.promotion_fee,a.storage_fee,a.amount_fee,b.status as budget_status from (select budget_id,date_format(date,'%Y%m') as month,
 sum(qty) as qty,
 sum(promote_qty) as promote_qty,
@@ -190,11 +190,14 @@ left join budget_skus as c on b.sku=c.sku and b.site=c.site where b.status>0 and
 		$headArray[6]='期初库存';
 		$headArray[7]='不含税采购单价';
 		$headArray[8]='异常率';
+		
 		foreach( ['销量','收入','成本','佣金','拣配费','推广费','仓储费','资金占用成本','经济效益'] as $k=>$v){
 			for($i=1;$i<=13;$i++){
 				$headArray[(8+$i+$k*13)] = ((($i==13)?'合计':($i.'月')).$v);
 			}
 		}
+		$headArray[126]='备注';
+		
 		$arrayData[] = $headArray;
 		$sap_sellers = getUsers('sap_seller');
 		foreach ( $datas as $data){
@@ -218,6 +221,7 @@ left join budget_skus as c on b.sku=c.sku and b.site=c.site where b.status>0 and
 				$arrayData[$data->id][99] = 0;
 				$arrayData[$data->id][112] = 0;
 				$arrayData[$data->id][125] = 0;
+				$arrayData[$data->id][126] = $data->remark;
 			}
 			$arrayData[$data->id][$month+8] = $data->qty;
 			$arrayData[$data->id][$month+21] = $data->income;
