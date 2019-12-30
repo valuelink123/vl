@@ -308,9 +308,9 @@ white-space: nowrap;
 						<td>{{($data->amount2==0)?0:round($data->economic2/$data->amount2,4)*100}}%</td>
 						<td>{{$data->economic2}}</td>
 						<td><span class="{{($qty_z>0)?'red':'green'}}">{{$qty_z}}</span></td>
-						<td><span class="{{($amount_z>0)?'red':'green'}}">{{$amount_z}}</span></td>
-						<td><span class="{{($profit_z>0)?'red':'green'}}">{{$profit_z}}%</span></td>
-						<td><span class="{{($economic_z>0)?'red':'green'}}">{{$economic_z}}</span></td>
+						<td><span class="{{($amount_z>0)?'red':'green'}}">{{round($amount_z,2)}}</span></td>
+						<td><span class="{{($profit_z>0)?'red':'green'}}">{{round($profit_z,2)}}%</span></td>
+						<td><span class="{{($economic_z>0)?'red':'green'}}">{{round($economic_z,2)}}</span></td>
 	
 						<td><a href="{{url('/budgets/edit?sku='.$data->sku.'&site='.$data->site.'&year='.$year)}}">{{array_get(getBudgetStageArr(),($data->budget_status)??0)}}</a></td>
 					  </tr>
@@ -328,9 +328,9 @@ white-space: nowrap;
 						<td>{{($sum->amount2==0)?0:round($sum->economic2/$sum->amount2,4)*100}}%</td>
 						<td>{{$sum->economic2}}</td>
 						<td><span class="{{($sum->qty1-$sum->qty2>0)?'red':'green'}}">{{$sum->qty1-$sum->qty2}}</span></td>
-						<td><span class="{{($sum->amount1-$sum->amount2>0)?'red':'green'}}">{{$sum->amount1-$sum->amount2}}</span></td>
+						<td><span class="{{($sum->amount1-$sum->amount2>0)?'red':'green'}}">{{round($sum->amount1-$sum->amount2,2)}}</span></td>
 						<td><span class="{{((($sum->amount1==0)?0:round($sum->economic1/$sum->amount1,4)*100)-(($sum->amount2==0)?0:round($sum->economic2/$sum->amount2,4)*100)>0)?'red':'green'}}">{{(($sum->amount1==0)?0:round($sum->economic1/$sum->amount1,4)*100)-(($sum->amount2==0)?0:round($sum->economic2/$sum->amount2,4)*100)}}%</span></td>
-						<td><span class="{{($sum->economic1-$sum->economic2>0)?'red':'green'}}">{{$sum->economic1-$sum->economic2}}</span></td>
+						<td><span class="{{($sum->economic1-$sum->economic2>0)?'red':'green'}}">{{round($sum->economic1-$sum->economic2,2)}}</span></td>
 	
 						<td></td>
 					  </tr>
