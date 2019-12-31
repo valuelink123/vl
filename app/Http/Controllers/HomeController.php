@@ -64,12 +64,12 @@ class HomeController extends Controller
 		
 		
 		
-		$asins = DB::table( DB::raw("(select max(sku_ranking) as sku_ranking,max(rating) as rating,max(review_count) as review_count,max(item_no) as item_no,sum(fba_stock+fba_transfer) as fba_stock,max(fbm_stock) as fbm_stock,sum(sales_07_01) as sales_07_01,sum(sales_14_08) as sales_14_08,sum(sales_21_15) as sales_21_15,sum(sales_28_22) as sales_28_22,max(bg) as bg,max(bu) as bu,max(sap_seller_id) as sap_seller_id,max(review_user_id) as review_user_id, min(case when status = 'S' Then '0' else status end) as status,asin,site from asin where length(asin)=10 group by asin,site) as asin") )->orderByRaw("status asc,sales_07_01 desc")
+		$asins = DB::table( DB::raw("(select max(sku_ranking) as sku_ranking,max(rating) as rating,max(review_count) as review_count,max(item_no) as item_no,sum(fba_stock) as fba_stock,sum(fba_transfer) as fba_transfer,max(fbm_stock) as fbm_stock,sum(sales_07_01) as sales_07_01,sum(sales_14_08) as sales_14_08,sum(sales_21_15) as sales_21_15,sum(sales_28_22) as sales_28_22,max(bg) as bg,max(bu) as bu,max(sap_seller_id) as sap_seller_id,max(review_user_id) as review_user_id, min(case when status = 'S' Then '0' else status end) as status,asin,site from asin where length(asin)=10 group by asin,site) as asin") )->orderByRaw("status asc,sales_07_01 desc")
 		->leftJoin( DB::raw("(select asin as asin_b,domain,avg(sessions) as sessions,avg(unit_session_percentage) as unit_session_percentage,avg(bsr) as bsr from star_history where create_at >= '".date('Y-m-d',strtotime('-10day'))."' group by asin,domain) as asin_star") ,function($q){
 			$q->on('asin.asin', '=', 'asin_star.asin_b')->on('asin.site', '=', 'asin_star.domain');
-		});
-		
-		
+		})->leftJoin("skus_status" ,function($q){
+			$q->on('asin.item_no', '=', 'skus_status.sku')->on('asin.site', '=', 'skus_status.site');
+		})->selectRaw("asin.*,asin_star.*,skus_status.status as sku_status,skus_status.level as sku_level");
 		if($limit_bg){
 			$asins = $asins->where('asin.bg',$limit_bg);
 			$sumwhere.=" and bg='$limit_bg'";
@@ -300,14 +300,16 @@ class HomeController extends Controller
 		
 		
 		
-		$asins = DB::table( DB::raw("(select max(sku_ranking) as sku_ranking,max(rating) as rating,max(review_count) as review_count,max(item_no) as item_no,sum(fba_stock+fba_transfer) as fba_stock,max(fbm_stock) as fbm_stock,sum(sales_07_01) as sales_07_01,sum(sales_14_08) as sales_14_08,sum(sales_21_15) as sales_21_15,sum(sales_28_22) as sales_28_22,max(bg) as bg,max(bu) as bu,max(sap_seller_id) as sap_seller_id,max(review_user_id) as review_user_id, min(case when status = 'S' Then '0' else status end) as status,asin,site from asin where length(asin)=10 group by asin,site) as asin") )
+		$asins = DB::table( DB::raw("(select max(sku_ranking) as sku_ranking,max(rating) as rating,max(review_count) as review_count,max(item_no) as item_no,sum(fba_stock) as fba_stock,sum(fba_transfer) as fba_transfer,max(fbm_stock) as fbm_stock,sum(sales_07_01) as sales_07_01,sum(sales_14_08) as sales_14_08,sum(sales_21_15) as sales_21_15,sum(sales_28_22) as sales_28_22,max(bg) as bg,max(bu) as bu,max(sap_seller_id) as sap_seller_id,max(review_user_id) as review_user_id, min(case when status = 'S' Then '0' else status end) as status,asin,site from asin where length(asin)=10 group by asin,site) as asin") )
 		->leftJoin( DB::raw("(select asin as asin_b,domain,avg(sessions) as sessions,avg(unit_session_percentage) as unit_session_percentage,avg(bsr) as bsr from star_history where create_at >= '".date('Y-m-d',strtotime('-10day'))."' group by asin,domain) as asin_star") ,function($q){
 			$q->on('asin.asin', '=', 'asin_star.asin_b')->on('asin.site', '=', 'asin_star.domain');
 		})->leftJoin( DB::raw("(select sum(amount) as amount,sum(sales) as sales,asin as asin_a,site as site_a from asin_daily_info where date>='$date_from' and date<='$date_to' group by asin,site) as asin_d") ,function($q){
 			$q->on('asin.asin', '=', 'asin_d.asin_a')->on('asin.site', '=', 'asin_d.site_a');
 		})->leftJoin( DB::raw("(select sum(bonus) as bonus,sum(economic) as economic,sku as sku_s,site  as site_s from skus_daily_info where date>='$date_from' and date<='$date_to' group by sku,site) as sku_d") ,function($q){
 			$q->on('asin.item_no', '=', 'sku_d.sku_s')->on('asin.site', '=', 'sku_d.site_s');
-		});
+		})->leftJoin("skus_status" ,function($q){
+			$q->on('asin.item_no', '=', 'skus_status.sku')->on('asin.site', '=', 'skus_status.site');
+		})->selectRaw("asin.*,asin_star.*,asin_d.*,sku_d.*,skus_status.status as sku_status,skus_status.level as sku_level");;
 		
 		
 		
@@ -380,21 +382,23 @@ class HomeController extends Controller
 		
         if(isset($_REQUEST['order'][0])){
            
-			if($_REQUEST['order'][0]['column']==2) $orderby = 'asin_d.amount';
-            if($_REQUEST['order'][0]['column']==3) $orderby = 'asin_d.sales';
-			if($_REQUEST['order'][0]['column']==4) $orderby = 'asin_d.sales';
-            if($_REQUEST['order'][0]['column']==5) $orderby = 'asin.fbm_stock';
+			if($_REQUEST['order'][0]['column']==3) $orderby = 'asin_d.amount';
+            if($_REQUEST['order'][0]['column']==4) $orderby = 'asin_d.sales';
+			if($_REQUEST['order'][0]['column']==5) $orderby = 'asin_d.sales';
+           
 			if($_REQUEST['order'][0]['column']==6) $orderby = '(case when asin_d.sales = 0 Then 0 else asin_d.amount/asin_d.sales end)';
 			
 			if($_REQUEST['order'][0]['column']==7) $orderby = 'asin.fba_stock';
-			if($_REQUEST['order'][0]['column']==9) $orderby = 'asin.rating';
-			if($_REQUEST['order'][0]['column']==10) $orderby = 'asin.review_count';
-			if($_REQUEST['order'][0]['column']==11) $orderby = 'asin_star.sessions';
-			if($_REQUEST['order'][0]['column']==12) $orderby = 'asin_star.unit_session_percentage';
-			if($_REQUEST['order'][0]['column']==13) $orderby = 'asin.sku_ranking';
-			if($_REQUEST['order'][0]['column']==14) $orderby = 'asin_star.bsr';
-			if($_REQUEST['order'][0]['column']==15) $orderby = 'sku_d.economic';
-			if($_REQUEST['order'][0]['column']==16) $orderby = 'sku_d.bonus';
+			if($_REQUEST['order'][0]['column']==8) $orderby = 'asin.fba_transfer';
+			if($_REQUEST['order'][0]['column']==10) $orderby = 'asin.fbm_stock';
+			if($_REQUEST['order'][0]['column']==11) $orderby = 'asin.rating';
+			if($_REQUEST['order'][0]['column']==12) $orderby = 'asin.review_count';
+			if($_REQUEST['order'][0]['column']==13) $orderby = 'asin_star.sessions';
+			if($_REQUEST['order'][0]['column']==14) $orderby = 'asin_star.unit_session_percentage';
+			if($_REQUEST['order'][0]['column']==15) $orderby = 'asin.sku_ranking';
+			if($_REQUEST['order'][0]['column']==16) $orderby = 'asin_star.bsr';
+			if($_REQUEST['order'][0]['column']==17) $orderby = 'sku_d.economic';
+			if($_REQUEST['order'][0]['column']==18) $orderby = 'sku_d.bonus';
 			
             $sort = $_REQUEST['order'][0]['dir'];
         }
@@ -420,18 +424,16 @@ class HomeController extends Controller
 			$sales = ((((array_get($asin,'sales_07_01')??array_get($asin,'sales_14_08'))??array_get($asin,'sales_21_15'))??array_get($asin,'sales_28_22'))??0)/7 ;
 			$records["data"][] = array(
 				'<a href="https://'.array_get($asin,'site').'/dp/'.array_get($asin,'asin').'" class="primary-link" target="_blank">'.array_get($asin,'asin').'</a>',
-				//array_get($asin,'site'),
 				array_get($asin,'item_no'),
-				//array_get($asin,'bg').array_get($asin,'bu'),
-				//array_get($sellers_array,array_get($asin,'sap_seller_id'),array_get($asin,'sap_seller_id')),
-				//array_get($asin,'status')?array_get($asin,'status'):'S',
+				array_get($asin,'sku_status'),
 				round(array_get($asin,'amount'),2),
 				round(array_get($asin,'sales'),2),
 				intval(array_get($asin,'sales')/((strtotime($date_to)-strtotime($date_from))/86400+1)),
-				array_get($asin,'fbm_stock',0),
 				(array_get($asin,'sales')>0)?round(array_get($asin,'amount')/array_get($asin,'sales'),2):0,
 				array_get($asin,'fba_stock',0),
+				array_get($asin,'fba_transfer'),
 				($sales>0)?date('Y-m-d',strtotime('+'.intval(array_get($asin,'fba_stock')/$sales).' days')):'∞',
+				array_get($asin,'fbm_stock',0),
 				array_get($asin,'rating',0),
 				array_get($asin,'review_count',0),
 				intval(array_get($asin,'sessions')),

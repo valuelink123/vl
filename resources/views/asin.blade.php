@@ -118,27 +118,26 @@ th,td,td>span {
                         <thead>
 							
                             <tr role="row" class="heading">
-								<th style="text-align: left;">ASIN</th>
-								<!--<th>SITE</th>-->
-								<th style="text-align: left;">SKU</th>
-								<!--<th>BGBU</th>-->
-								<!--<th>Seller</th>-->
-								<!--<th>Level</th>-->
-								<th>SALES</th>
-								<th>UNITS</th>
-								<th>UNITS/D</th>
+								<th style="text-align: left;">Asin</th>
+								<th style="text-align: left;">Sku</th>
+								<th style="text-align: left;">Sku Status</th>
+								<th>Sales</th>
+								<th>Units</th>
+								<th>Units/D</th>
+								
+								<th>AvgPrice</th>
+								<th>Instock</th>
+								<th>Reserved</th>
+								<th>Outstock</th>
 								<th>FBM</th>
-								<th>AVG.PRICE</th>
-								<th>FBA</th>
-								<th>OUTSTOCK</th>
-								<th>RATING</th>
-								<th>RevCount</th>
-								<th>SESS</th>
+								<th>Rating</th>
+								<th>Rev</th>
+								<th>Sess</th>
 								<th>CR%</th>
-								<th>KEYWORD RANK</th>
-								<th>BSR</th>
-								<th>SKU E.VALUE</th>
-								<th>SKU BONUS</th>
+								<th>Rank</th>
+								<th>Bsr</th>
+								<th>SkuE.Val</th>
+								<th>SkuBonus</th>
                             </tr>
 							
                             
@@ -205,9 +204,9 @@ th,td,td>span {
 					buttons: [
                         { extend: 'csv', className: 'btn purple btn-outline ',filename:'asins' }
                     ],
-					"aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0,1,8 ] }],	
+					"aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0,1,2,9 ] }],	
 					 "order": [
-                        [2, "desc"]
+                        [3, "desc"]
                     ],
                     // scroller extension: http://datatables.net/extensions/scroller/
                     scrollY:        690,
@@ -219,6 +218,7 @@ th,td,td>span {
 					"createdRow": function( row, data, dataIndex ) {
                         $(row).children('td').eq(0).attr('style', 'text-align: left;')
 						$(row).children('td').eq(1).attr('style', 'text-align: left;')
+						$(row).children('td').eq(2).attr('style', 'text-align: left;')
                     },
 					"dom": "<'row' <'col-md-12'B>><'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'>r><'table-scrollable't><'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>",
                 }

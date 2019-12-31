@@ -28,7 +28,7 @@ margin-bottom:0px;}
 	text-align: right;
 }
 .table td, .table th {
-    font-size: 12px;
+    font-size: 11px;
 }
 .portlet.light .portlet-body{
 padding-top:0px;}
@@ -379,24 +379,27 @@ a.editable-click:hover {
 				
 					<table class="table table-hover">
 						
-							<tr class="uppercase">
-								<th style="text-align: left;"> ASIN </th>
-								<th style="text-align: left;"> SKU </th>
-								<th> SALES </th>
-								<th> UNITS </th>
-								<th> UNITS/D </th>
-								<th> FBM </th>
-								<th> AVG.PRICE </th>
-								<th >FBA</th>
-								<th> OUTSTOCK </th>
-								<th> RATING </th>
-								<th> SESS <font style="color:#ccc;"><i  class="fa fa-info-circle popovers" data-container="body" onclick=" " data-trigger="hover" data-placement="top" data-html="true" data-content="Average data from {{date('Y-m-d',strtotime('-10days'))}} to {{date('Y-m-d',strtotime('-4days'))}}"></i></font></th>
-								<th> CR% <font style="color:#ccc;"><i  class="fa fa-info-circle popovers" data-container="body" onclick=" " data-trigger="hover" data-placement="top" data-html="true" data-content="Average data from {{date('Y-m-d',strtotime('-10days'))}} to {{date('Y-m-d',strtotime('-4days'))}}"></i></font></th>
+							<tr>
+								<th style="text-align: left;" width="8%">Asin</th>
+								<th style="text-align: left;" width="6%">Sku</th>
+								<th style="text-align: left;" width="6%">Status</th>
+								<th width="6%">Sales</th>
+								<th width="5%">Units</th>
+								<th width="5%">Units/D</th>
 								
-								<th> KEYWORD RANK </th>
-								<th> BSR  <font style="color:#ccc;"><i  class="fa fa-info-circle popovers" data-container="body" onclick=" " data-trigger="hover" data-placement="top" data-html="true" data-content="Average data from {{date('Y-m-d',strtotime('-10days'))}} to {{date('Y-m-d',strtotime('-4days'))}}"></i></font></th>
-								<th> SKU E.VALUE </th>
-								<th> SKU BONUS </th>
+								<th width="5%">AvgPrice</th>
+								<th width="5%">Instock</th>
+								<th width="5%">Reserved</th>
+								<th width="6%">Outstock</th>
+								<th width="5%">FBM</th>
+								<th width="6%">Rating</th>
+								<th width="5%">Sess<font style="color:#ccc;"><i  class="fa fa-info-circle popovers" data-container="body" onclick=" " data-trigger="hover" data-placement="top" data-html="true" data-content="Average data from {{date('Y-m-d',strtotime('-10days'))}} to {{date('Y-m-d',strtotime('-4days'))}}"></i></font></th>
+								<th width="5%">CR% <font style="color:#ccc;"><i  class="fa fa-info-circle popovers" data-container="body" onclick=" " data-trigger="hover" data-placement="top" data-html="true" data-content="Average data from {{date('Y-m-d',strtotime('-10days'))}} to {{date('Y-m-d',strtotime('-4days'))}}"></i></font></th>
+								
+								<th width="5%">Rank</th>
+								<th width="5%">Bsr<font style="color:#ccc;"><i  class="fa fa-info-circle popovers" data-container="body" onclick=" " data-trigger="hover" data-placement="top" data-html="true" data-content="Average data from {{date('Y-m-d',strtotime('-10days'))}} to {{date('Y-m-d',strtotime('-4days'))}}"></i></font></th>
+								<th width="6%">SkuE.Val</th>
+								<th width="6%">SkuBonus</th>
 							</tr>
 						
 						@foreach ($asins as $asin)
@@ -409,13 +412,16 @@ a.editable-click:hover {
 								<a href="https://{{array_get($asin,'site')}}/dp/{{array_get($asin,'asin')}}" class="primary-link" target="_blank">{{array_get($asin,'asin')}}</a>
 							</td >
 							<td style="text-align: left;"> {{array_get($asin,'item_no')}} </td>
+							<td style="text-align: left;"> {{array_get($asin,'sku_status')}} </td>
 							<td> {{array_get($asin,'amount',0)}} </td>
 							<td> {{array_get($asin,'sales',0)}} </td>
 							<td> {{intval(array_get($asin,'sales')/((strtotime($date_to)-strtotime($date_from))/86400+1))}} </td>
-							<td> {{array_get($asin,'fbm_stock',0)}} </td>
+							
 							<td> {{(array_get($asin,'sales')>0)?round(array_get($asin,'amount')/array_get($asin,'sales'),2):0}} </td>
 							<td> {{array_get($asin,'fba_stock',0)}} </td>
+							<td> {{array_get($asin,'fba_transfer',0)}} </td>
 							<td> {{($sales>0)?date('Y-m-d',strtotime('+'.intval(array_get($asin,'fba_stock')/$sales).' days')):'∞'}} </td>
+							<td> {{array_get($asin,'fbm_stock',0)}} </td>
 							<td> {{array_get($asin,'rating')}} ({{array_get($asin,'review_count')}})</td>
 							<td> {{intval(array_get($asin,'sessions'))}} </td>
 							<td> {{round(array_get($asin,'unit_session_percentage'),2)}} </td>
