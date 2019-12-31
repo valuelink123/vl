@@ -348,36 +348,38 @@
         })
 
         let users = @json($users) ;
-        $theTable.closest('.table-scrollable').after(tplRender(bottomtoolbar, {users}))
-        $(assignto).change(e => {
+        if($("#bottomtoolbar").length>0) {
+            $theTable.closest('.table-scrollable').after(tplRender(bottomtoolbar, {users}))
+            $(assignto).change(e => {
 
-            $this = $(e.currentTarget)
+                $this = $(e.currentTarget)
 
-            let processor = parseInt($this.val())
-            if (isNaN(processor)) return
+                let processor = parseInt($this.val())
+                if (isNaN(processor)) return
 
-            let selectedRows = dtApi.rows({selected: true})
+                let selectedRows = dtApi.rows({selected: true})
 
-            let ctgRows = selectedRows.data().toArray().map(obj => [obj.id])
+                let ctgRows = selectedRows.data().toArray().map(obj => [obj.id])
 
-            if (!ctgRows.length) {
-                $this.val('')
-                toastr.error('Please select some rows first !')
-                return
-            }
+                if (!ctgRows.length) {
+                    $this.val('')
+                    toastr.error('Please select some rows first !')
+                    return
+                }
 
-            postByJson('/crm/batchAssignTask', {processor, ctgRows}).then(arr => {
-                // 向服务器请求数据然后刷新数据
-                dtApi.cell(0, 18).data(arr[1]).draw()
+                postByJson('/crm/batchAssignTask', {processor, ctgRows}).then(arr => {
+                    // 向服务器请求数据然后刷新数据
+                    dtApi.cell(0, 18).data(arr[1]).draw()
 
-                toastr.success('Saved !')
-                $this.val('')
-                selectAll.checked = false
+                    toastr.success('Saved !')
+                    $this.val('')
+                    selectAll.checked = false
 
-            }).catch(err => {
-                toastr.error(err.message)
+                }).catch(err => {
+                    toastr.error(err.message)
+                })
             })
-        })
+        }
 
         let dtApi = $theTable.api();
         $("#export").click(function(){
