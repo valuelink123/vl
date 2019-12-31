@@ -420,7 +420,7 @@ a.editable-click:hover {
 							<td> {{(array_get($asin,'sales')>0)?round(array_get($asin,'amount')/array_get($asin,'sales'),2):0}} </td>
 							<td> {{array_get($asin,'fba_stock',0)}} </td>
 							<td> {{array_get($asin,'fba_transfer',0)}} </td>
-							<td> {{($sales>0)?date('Y-m-d',strtotime('+'.intval(array_get($asin,'fba_stock')/$sales).' days')):'∞'}} </td>
+							<td> {{($sales>0)?date('Y-m-d',strtotime('+'.intval((array_get($asin,'fba_stock',0)+array_get($asin,'fba_transfer',0))/$sales).' days')):'∞'}} </td>
 							<td> {{array_get($asin,'fbm_stock',0)}} </td>
 							<td> {{array_get($asin,'rating')}} ({{array_get($asin,'review_count')}})</td>
 							<td> {{intval(array_get($asin,'sessions'))}} </td>
