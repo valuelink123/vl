@@ -156,6 +156,7 @@ Route::match(['post','get'],'/crm/batchAssignTask', 'CrmController@batchAssignTa
 Route::get('/crm/trackLogAdd','CrmController@trackLogAdd')->name('trackLogAdd');
 Route::post('/crm/trackLogStore','CrmController@trackLogStore')->name('trackLogStore');
 Route::post('/crm/getTrackLog','CrmController@getTrackLog')->name('getTrackLog');
+Route::post('/crm/getRsgRequestList','CrmController@getRsgRequestList')->name('getRsgRequestList');
 
 Route::resource('task', 'TaskController');
 Route::Post('/task/get', 'TaskController@get')->name('getTask');

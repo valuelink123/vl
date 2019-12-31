@@ -27,6 +27,7 @@
                     <li role="presentation" class="active"><a href="#ctg-info" aria-controls="ctg-info" role="tab" data-toggle="tab">Contact Info</a></li>
                     <li role="presentation"><a href="#order-info" aria-controls="order-info" role="tab" data-toggle="tab">Amazon Order Info</a></li>
                     <li role="presentation"><a href="#email-history" aria-controls="email-history" role="tab" data-toggle="tab">Email History</a></li>
+                    <li role="presentation"><a href="#rsg-request" aria-controls="email-history" role="tab" data-toggle="tab">Rsg Request List</a></li>
                 </ul>
 
                 <div class="tab-content">
@@ -61,6 +62,11 @@
                         </div>
                         <div class="table-container">
                             @include('crm.trackLogList')
+                        </div>
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="rsg-request">
+                        <div class="table-container">
+                            @include('crm.rsgRequestList')
                         </div>
                     </div>
 

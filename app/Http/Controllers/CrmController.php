@@ -12,6 +12,7 @@ use App\User;
 use App\ConfigOption;
 use App\Category;
 use App\Models\TrackLog;
+use App\RsgRequest;
 
 class CrmController extends Controller
 {
@@ -520,6 +521,24 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 		}
 		return view('crm/show',['orderArr'=>$orderArr, 'contactInfo'=> $contactInfo, 'emails' => $emails,'users'=>$users,'track_log_array'=>$track_log_array,'subject_type'=>$subject_type, 'record_id'=>$id]);
 	}
+
+    public function getRsgRequestList(){
+        $client_id = $_POST['record_id'];
+        $data = RsgRequest::leftJoin('rsg_products',function($q){
+            $q->on('rsg_requests.product_id', '=', 'rsg_products.id');
+        })->leftjoin('client_info', 'rsg_requests.customer_email', '=', 'client_info.email')->leftjoin('client', 'client.id', '=', 'client_info.client_id')->leftJoin(DB::raw("(select asin,site,max(sap_seller_id) as sap_seller_id,max(bg) as bg,max(bu) as bu from asin group by asin,site) as asin"),function($q){
+            $q->on('rsg_products.asin', '=', 'asin.asin')
+                ->on('rsg_products.site', '=', 'asin.site');
+        })
+        ->orderBy('rsg_requests.customer_email', 'asc')->where('client.id', '=',$client_id)->get()->toArray();
+
+        foreach ($data as $key=>$list){
+            $data[$key]['step'] = '<span class="badge badge-success">'.array_get(getStepStatus(),$list['step']).'</span>';
+            $data[$key]['asin_link'] = '<a href="https://'.array_get($list,'site').'/dp/'.array_get($list,'asin').'?m='.array_get($list,'seller_id').'" target="_blank">'.$list['asin'].'</a>';
+        }
+
+        return compact(['data']);
+    }
 
     public function getTrackLog(){
 
