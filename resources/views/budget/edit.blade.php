@@ -503,7 +503,10 @@ var FormEditable = function() {
 
     var initBasetables = function() {
 		var stages = [];
-        <?php foreach(getBudgetRuleForRole() as $k=>$v) {?>
+        <?php 
+		$budgetRule = getBudgetRuleForRole();
+		if($base_data['sap_seller_id'] && $base_data['sap_seller_id']==Auth::user()->sap_seller_id && !(($budget->status)??0)) $budgetRule = array_slice(getBudgetStageArr(),0,2);
+		foreach($budgetRule as $k=>$v) {?>
 		stages.push({
 			value: "<?php echo $k?>",
 			text: "<?php echo $v?>"
