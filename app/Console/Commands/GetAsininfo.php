@@ -135,7 +135,7 @@ class GetAsininfo extends Command
 			$sellerid_name[$sellerid->sellerid] = $sellerid->sellername;
 		}
 		
-		$stocks = DB::connection('amazon')->select('select sum(afn_sellable) as stock,sum(afn_transfer) as transfer ,asin,marketplaceid from seller_skus where afn_total>0 group by asin,marketplaceid');
+		$stocks = DB::connection('amazon')->select('select sum(afn_sellable) as stock,sum(afn_reserved) as transfer ,asin,marketplaceid from seller_skus where afn_total>0 group by asin,marketplaceid');
 		foreach($stocks as $stock){
 			if(!array_get($stock_t,$stock->asin.'.'.array_get($marketplaceid_area,$stock->marketplaceid).'.stock')) $stock_t[$stock->asin][array_get($marketplaceid_area,$stock->marketplaceid)]['stock']=0;
 			if(!array_get($stock_t,$stock->asin.'.'.array_get($marketplaceid_area,$stock->marketplaceid).'.transfer')) $stock_t[$stock->asin][array_get($marketplaceid_area,$stock->marketplaceid)]['transfer']=0;
@@ -155,7 +155,7 @@ class GetAsininfo extends Command
 		}
 		DB::table('fba_stock')->truncate();
 		DB::table('asin')->update(['fba_stock'=>0, 'fba_transfer'=>0]);
-		$fs = DB::connection('amazon')->select('select a.afn_sellable as stock,a.afn_transfer as transfer ,a.asin,a.seller_sku as sellersku,b.mws_seller_id as sellerid,a.updated_at from seller_skus as a 
+		$fs = DB::connection('amazon')->select('select a.afn_sellable as stock,a.afn_reserved as transfer ,a.asin,a.seller_sku as sellersku,b.mws_seller_id as sellerid,a.updated_at from seller_skus as a 
 left join seller_accounts as b
 on a.seller_account_id=b.id where a.afn_total>0');
 		foreach($fs as $fsd){
