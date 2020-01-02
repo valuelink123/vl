@@ -533,6 +533,12 @@ var FormEditable = function() {
 			success: function (status) {
 				$('.budget_status').data('value',status);
 				initBudgettables();
+				if(status==0){
+					<?php if($base_data['sap_seller_id'] && $base_data['sap_seller_id']==Auth::user()->sap_seller_id && $showtype){ ?>
+					location.reload();
+					<?php } ?>
+				}
+				
 			}
         });
 		$('.budget_remark').editable({
