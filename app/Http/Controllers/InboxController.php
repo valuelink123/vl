@@ -183,12 +183,12 @@ class InboxController extends Controller
         $email_to = Sendbox::where('inbox_id',$id)->orderBy('date','asc')->get()->toArray();
         $order=array();
 		$account = Accounts::where('account_email',$email['to_address'])->first();
-		$account_type = $account->type;
+        $account_type = $account ? $account->type : null;
         if($email['amazon_order_id']){
 			$amazon_seller_id = $email['amazon_seller_id'];
 			
 			if(!$amazon_seller_id){
-            	$amazon_seller_id = $account->account_sellerid;
+                $amazon_seller_id = $account ? $account->account_sellerid : null;
 			}
             $order = DB::table('amazon_orders')->where('SellerId', $amazon_seller_id)->where('AmazonOrderId', $email['amazon_order_id'])->first();
             if($order) $order->item = DB::table('amazon_orders_item')->where('SellerId', $amazon_seller_id)->where('AmazonOrderId', $email['amazon_order_id'])->get();
@@ -224,6 +224,15 @@ class InboxController extends Controller
             }
             $email_history[$key] = $mail;
         }
+
+        $rsgStatusArr = getCrmRsgStatusArr();
+        foreach($email_history as $key => $value){
+            $from_address = $value['from_address'];
+            $to_address = $value['to_address'];
+            $email_history[$key]['fromAddressRsgStatusHtml'] = $this->getRsgStatusAttr($value, $from_address, $rsgStatusArr, 'from_address');
+            $email_history[$key]['toAddressRsgStatusHtml'] = $this->getRsgStatusAttr($value, $to_address, $rsgStatusArr, 'to_address');
+        }
+
         krsort($email_history);
 		$email_change_log = DB::table('inbox_change_log')->where('inbox_id',$id)->whereRaw('user_id <> to_user_id')->orderBy('date','asc')->get();
 		$order_by = 'created_at';
@@ -233,6 +242,36 @@ class InboxController extends Controller
 
         return view('inbox/view',['email_history'=>$email_history,'unread_history'=>$email_unread_history,'order'=>$order,'email'=>$email,'users'=>$this->getUsers(),'groups'=>$this->getGroups(),'sellerids'=>$this->getSellerIds(),'accounts'=>$this->getAccounts(),'account_type'=>$account_type,'tree'=>$tree,'email_change_log'=>$email_change_log]);
     }
+
+    public function getRsgStatusAttr($emailDetails, $email, $rsgStatusArr, $fromOrTo){
+        $rsgStatusArray = DB::table('client_info')->leftJoin('client',function($q){
+            $q->on('client.id', '=', 'client_info.client_id');
+        })->where('client_info.email',$email)->select(['rsg_status','rsg_status_explain'])->first();
+        $rsgStatusHtml = '';
+        //亚马逊客户是不能邀请做RSG的，不显示红色或绿色圆圈。
+        if(! ($emailDetails[$fromOrTo] && preg_match("/.+@.*amazon.+/", $emailDetails[$fromOrTo]))){
+            if($rsgStatusArray){
+                $explain = isset($rsgStatusArr[$rsgStatusArray->rsg_status_explain]) ? $rsgStatusArr[$rsgStatusArray->rsg_status_explain]['vop'] : $rsgStatusArray->rsg_status_explain;
+                $rsgStatusHtml = $this->getRsgStatusHtml($rsgStatusArray, $explain);
+            }
+            else{
+                $rsgStatusHtml = '<div class="available"></div>';
+            }
+        }
+
+        return $rsgStatusHtml;
+    }
+
+    public function getRsgStatusHtml($rsgStatusArray, $explain){
+        //邮箱后面显示绿色圆圈
+        $rsgStatus = '<div class="available"></div>';
+        if ($rsgStatusArray->rsg_status == 1) {
+            //邮箱后面显示红色圆圈
+            $rsgStatus = '<div class="unavailable" title="' . $explain . '"></div>';
+        }
+        return $rsgStatus;
+    }
+
     public function get(Request $request)
     {
         /*
