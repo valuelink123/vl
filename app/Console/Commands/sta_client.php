@@ -55,6 +55,9 @@ class StaClient extends Command
 	 */
 	function handle()
 	{
+		$sql = "update client set rsg_status = 0,rsg_status_explain = 0,times_ctg = 0,times_rsg = 0,times_sg = 0,times_negative_review = 0,times_positive_review = 0,updated_at = '".date('Y-m-d H:i:s')."'";
+		DB::select($sql);
+
 		set_time_limit(0);
 		//求参加了ctg客户的数据，然后同一客户进行统计
 		$this->getTimesCtgRsgPositive();
@@ -177,9 +180,6 @@ class StaClient extends Command
 	 */
 	function updateRsgStatus()
 	{
-		$sql = "update client set rsg_status = 0,rsg_status_explain = 0";
-		DB::select($sql);
-
 		//6,有活动不是Completed状态（包含9,10,2）的客户标记红色
 		$sql = "update client as t1, (
 					select client_id as id 
