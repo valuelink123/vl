@@ -203,10 +203,16 @@ right join budget_skus as c on b.sku=c.sku and b.site=c.site where ((a.month>='"
 		}
 		$headArray[126]='备注';
 		$arrayData[] = $headArray;
+		
+		$emptyData = [];
+		for($i=0;$i<=126;$i++){
+			$emptyData[$i] = 0;
+		}
 		$sap_sellers = getUsers('sap_seller');
 		foreach ( $datas as $data){
 			$month = intval(substr($data->month,-2,2));
 			if(!isset($arrayData[$data->id])){
+				$arrayData[$data->id] = $emptyData;
 				$arrayData[$data->id][0] = $data->bg.$data->bu;
 				$arrayData[$data->id][1] = $data->sku;
 				$arrayData[$data->id][2] = $data->description;
@@ -216,6 +222,7 @@ right join budget_skus as c on b.sku=c.sku and b.site=c.site where ((a.month>='"
 				$arrayData[$data->id][6] = $data->stock;
 				$arrayData[$data->id][7] = $data->sku_cost;
 				$arrayData[$data->id][8] = $data->exception;
+				
 				$arrayData[$data->id][21] = 0;
 				$arrayData[$data->id][34] = 0;
 				$arrayData[$data->id][47] = 0;
