@@ -170,8 +170,8 @@ class GetEmails extends Command
 				foreach ($attachments as $attachment) {
 					$i++;
 					if ($attachment->isEmbeddedMessage()) {
-						$embeddedMessage = $attachment->getEmbeddedMessage()->getContent();
-						$insert_data['text_html'].=$embeddedMessage;
+						//$embeddedMessage = $attachment->getEmbeddedMessage()->getContent();
+						//$insert_data['text_html'].=$embeddedMessage;
 					}else{
 						$ifid = $attachment->getStructure()->ifid;
 						if($ifid){

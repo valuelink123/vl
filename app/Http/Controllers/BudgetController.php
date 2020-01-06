@@ -165,22 +165,27 @@ class BudgetController extends Controller
 			$where.= " and c.level = '".$level."'";
 		}
 		if($sku_status){
+			
 			$where.= " and c.status = '".$sku_status."'";
 		}
 		if($b_status){
-			$where.= " and b.status = '".($b_status-1)."'";
+			if($b_status==1){
+				$where.= " and (b.status = '".($b_status-1)."' or b.status is null)";
+			}else{
+				$where.= " and b.status = '".($b_status-1)."'";
+			}	
 		}
 		if($sku){
 			$where.= " and (c.sku='".$sku."' or c.description like '%".$sku."%')";
 		}
- 		$datas = DB::select("select b.id,b.remark,a.month,c.bg,c.bu,c.sku,c.description,c.sap_seller_id,c.status,c.level,c.site,c.stock,c.cost as sku_cost,c.exception,(a.qty+a.promote_qty) as qty,a.income,a.cost,
+ 		$datas = DB::select("select c.id,b.remark,a.month,c.bg,c.bu,c.sku,c.description,c.sap_seller_id,c.status,c.level,c.site,c.stock,c.cost as sku_cost,c.exception,(a.qty+a.promote_qty) as qty,a.income,a.cost,
 a.common_fee,a.pick_fee,a.promotion_fee,a.storage_fee,a.amount_fee,b.status as budget_status from (select budget_id,date_format(date,'%Y%m') as month,
 sum(qty) as qty,
 sum(promote_qty) as promote_qty,
 sum(income) as income,sum(cost) as cost,sum(common_fee) as common_fee,sum(pick_fee) as pick_fee,sum(promotion_fee) as promotion_fee,
 sum(amount_fee) as amount_fee,sum(storage_fee) as storage_fee
 from budget_details group by month,budget_id) as a left join budgets as b on a.budget_id=b.id
-left join budget_skus as c on b.sku=c.sku and b.site=c.site where b.status>0 and a.month>='".$year."01' and a.month<='".$year."12' $where order by b.id,a.month asc");
+right join budget_skus as c on b.sku=c.sku and b.site=c.site where ((a.month>='202001' and a.month<='202012' ) or a.month is null) $where order by b.id,a.month asc");
 		$headArray[0]='BGBU';
 		$headArray[1]='SKU';
 		$headArray[2]='描述';
@@ -197,7 +202,6 @@ left join budget_skus as c on b.sku=c.sku and b.site=c.site where b.status>0 and
 			}
 		}
 		$headArray[126]='备注';
-		
 		$arrayData[] = $headArray;
 		$sap_sellers = getUsers('sap_seller');
 		foreach ( $datas as $data){
