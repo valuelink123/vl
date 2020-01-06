@@ -50,7 +50,7 @@ class ExceptionController extends Controller
 	public function export(Request $request){
 		if(!Auth::user()->can(['exception-export'])) die('Permission denied -- exception-export');
 		//if(Auth::user()->admin){
-            $customers = new Exception;
+        //     $customers = new Exception;
         //}else{
 		//	$mgroup_ids  = array_get($this->getUserGroup(),'manage_groups',array());
 		//	$user_id  = Auth::user()->id;
@@ -60,6 +60,15 @@ class ExceptionController extends Controller
 //
         //    });
         //}
+
+		//得到订单号对应的站点和bg,bu，销售员等信息
+		$customers= Exception::leftJoin(DB::raw("(SELECT amazon_orders.AmazonOrderId as AmazonOrderId,asin.site as site,asin.bg as bg,asin.bu as bu,asin.seller as sales 
+				FROM `amazon_orders` 
+				LEFT JOIN `amazon_orders_item` ON `amazon_orders_item`.`AmazonOrderId` = `amazon_orders`.`AmazonOrderId`
+				LEFT JOIN `asin` ON `asin`.`asin` = `amazon_orders_item`.`ASIN` AND `asin`.`site` = concat('www.',`amazon_orders`.`SalesChannel`) AND `asin`.`sellersku` = `amazon_orders_item`.`SellerSKU`) as order_info"),function($q){
+			$q->on('order_info.AmazonOrderId', '=', 'exception.amazon_order_id');
+		});
+
 		if(array_get($_REQUEST,'type')){
             $customers = $customers->where('type', array_get($_REQUEST,'type'));
         }
@@ -138,6 +147,7 @@ class ExceptionController extends Controller
 		$customersLists =  $customers->orderBy('date','desc')->get()->toArray();
 		$arrayData = $arrayAmazon = $arraySap = array();
 		$headArray[] = 'Account';
+		$headArray[] = 'Site';
 		$headArray[] = 'Amazon OrderID';
 		$headArray[] = 'Replacement Order ID';
 		$headArray[] = 'S-Amazon Order ID';
@@ -166,7 +176,12 @@ class ExceptionController extends Controller
 		$headArray[] = 'Comment';
 		$headArray[] = 'Confirm Date';
 		$headArray[] = 'Auto Done/Done Date';
-        $headArray[] = 'Process Date';
+		$headArray[] = 'Process Date';
+        $headArray[] = 'BG';
+		$headArray[] = 'BU';
+		$headArray[] = 'Sales';
+		$headArray[] = 'CNY amount';
+
 
 		$arrayAmazon[] =['Status','Account','Returned/Urgent','MerchantFulfillmentOrderID','DisplayableOrderID','DisplayableOrderDate','MerchantSKU','Quantity','MerchantFulfillmentOrderItemID','GiftMessage','DisplayableComment','PerUnitDeclaredValue','DisplayableOrderComment','DeliverySLA','AddressName','AddressFieldOne','AddressFieldTwo','AddressFieldThree','AddressCity','AddressCountryCode','AddressStateOrRegion','AddressPostalCode','AddressPhoneNumber','NotificationEmail','FulfillmentAction','MarketplaceID'];
 
@@ -181,6 +196,7 @@ class ExceptionController extends Controller
         $status_list['auto done'] = "Auto Done";
         $status_list['confirmed'] = "Confirmed";
 		$type_list = array(1=>'Refund',2=>'Replacement',3=>'Refund & Replacement',4=>'Gift Card');
+
 		foreach ( $customersLists as $customersList){
 			$customersList['Replacement Order ID'] = $customersList['S-Amazon Order ID'] = '-';
 			$operate = '';
@@ -305,6 +321,7 @@ class ExceptionController extends Controller
 			$operDate = $this->getOperaDate($customersList['update_status_log']);////得到操作各个状态的时间
             $arrayData[] = array(
 				array_get($accounts,$customersList['sellerid']),
+				$customersList['site'],
                 $customersList['amazon_order_id'],
 				$customersList['Replacement Order ID'],
 				$customersList['S-Amazon Order ID'],
@@ -334,6 +351,10 @@ class ExceptionController extends Controller
 				$operDate['confirm'],//得到修改为confirmed状态时间
 				$operDate['done'],
                 $customersList['process_date'],
+				$customersList['bg'],
+				$customersList['bu'],
+				$customersList['sales'],
+				$customersList['amount'],
             );
 		}
 
@@ -512,6 +533,7 @@ class ExceptionController extends Controller
 
         $exception->score = $request->get('score');
         $exception->comment = $request->get('comment');
+		$exception->amount = $request->get('amount');
         $exception->process_content = $request->get('process_content');
         //需要保存更改信息记录的状态，当由别的状态改为'done','auto done'时或者由'done','auto done'状态改为其他的状态的时候，才要保存更新状态记录，并且别的改为'done','auto done'，然后'done','auto done'改为其他状态，这种情况下才要显示更改状态记录信息
         $status = $request->get('process_status');
@@ -672,11 +694,11 @@ class ExceptionController extends Controller
         $sort = 'desc';
         if(isset($_REQUEST['order'][0])){
             if($_REQUEST['order'][0]['column']==1) $orderby = 'sellerid';
-            if($_REQUEST['order'][0]['column']==2) $orderby = 'amazon_order_id';
-            if($_REQUEST['order'][0]['column']==3) $orderby = 'type';
-            if($_REQUEST['order'][0]['column']==5) $orderby = 'date';
-            if($_REQUEST['order'][0]['column']==6) $orderby = 'process_status';
-            if($_REQUEST['order'][0]['column']==9) $orderby = 'user_id';
+            if($_REQUEST['order'][0]['column']==3) $orderby = 'amazon_order_id';
+            if($_REQUEST['order'][0]['column']==4) $orderby = 'type';
+            if($_REQUEST['order'][0]['column']==6) $orderby = 'date';
+            if($_REQUEST['order'][0]['column']==7) $orderby = 'process_status';
+            if($_REQUEST['order'][0]['column']==10) $orderby = 'user_id';
             $sort = $_REQUEST['order'][0]['dir'];
         }
 
@@ -713,7 +735,7 @@ class ExceptionController extends Controller
             unset($updateDate);
         }
         //if(Auth::user()->admin){
-            $customers = new Exception;
+        //     $customers = new Exception;
         //}else{
 //			$mgroup_ids  = array_get($this->getUserGroup(),'manage_groups',array());
 //			$user_id  = Auth::user()->id;
@@ -724,6 +746,14 @@ class ExceptionController extends Controller
 //
 //            });
 //        }
+		//得到订单号对应的站点和bg,bu，销售员等信息
+		$customers= Exception::leftJoin(DB::raw("(SELECT amazon_orders.AmazonOrderId as AmazonOrderId,asin.site as site,asin.bg as bg,asin.bu as bu,asin.seller as sales 
+				FROM `amazon_orders` 
+				LEFT JOIN `amazon_orders_item` ON `amazon_orders_item`.`AmazonOrderId` = `amazon_orders`.`AmazonOrderId`
+				LEFT JOIN `asin` ON `asin`.`asin` = `amazon_orders_item`.`ASIN` AND `asin`.`site` = concat('www.',`amazon_orders`.`SalesChannel`) AND `asin`.`sellersku` = `amazon_orders_item`.`SellerSKU`) as order_info"),function($q){
+			$q->on('order_info.AmazonOrderId', '=', 'exception.amazon_order_id');
+		});
+
 		if(array_get($_REQUEST,'type')){
             $customers = $customers->where('type', array_get($_REQUEST,'type'));
         }
@@ -914,6 +944,7 @@ class ExceptionController extends Controller
                 ((Auth::user()->admin || in_array($customersList['group_id'],array_get($this->getUserGroup(),'manage_groups',array()))))?'<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input name="id[]" type="checkbox" class="checkboxes" value="'.$customersList['id'].'"/><span></span></label>':'',
 
 				array_get($accounts,$customersList['sellerid']),
+				$customersList['site'],
                 $customersList['amazon_order_id'],
                 array_get($type_list,$customersList['type']),
                 $customersList['order_sku'].' ('.$customersList['asin'].')',
@@ -924,6 +955,9 @@ class ExceptionController extends Controller
 				array_get($users,$customersList['process_user_id'])?array_get($users,$customersList['process_user_id']):array_get($groupleaders,$customersList['group_id']),
                 array_get($groups,$customersList['group_id'].'.group_name').' > '.array_get($users,$customersList['user_id']),
 				$operDate['confirm'],//得到修改为confirmed状态时间
+				$customersList['bg'],
+                $customersList['bu'],
+				$customersList['sales'],
                 ((Auth::user()->admin || in_array($customersList['group_id'],array_get($this->getUserGroup(),'manage_groups',array()))) && ($customersList['process_status']=='submit' || $customersList['process_status']=='confirmed')) ?'<a href="/exception/'.$customersList['id'].'/edit" class="btn btn-sm red btn-outline " target="_blank"><i class="fa fa-search"></i> Process </a>':'<a href="/exception/'.$customersList['id'].'/edit" class="btn blue btn-sm btn-outline green" target="_blank"><i class="fa fa-search"></i> View </a>',
             );
 		}
@@ -1162,7 +1196,7 @@ class ExceptionController extends Controller
 					}
 					$authstr=$authstr.$appsecret;
 					$sign = strtoupper(sha1($authstr));
-					
+
 					$res = file_get_contents('http://'.env("SAP_RFC").'/rfc_site.php?appid='.$appkey.'&sellerid='.$sellerid.'&method=getOrder&orderId='.$orderid.'&sign='.$sign);
 					$result = json_decode($res,true);
 					
@@ -1299,6 +1333,5 @@ class ExceptionController extends Controller
 		}
 		return $operaDate;
 	}
-
 
 }
