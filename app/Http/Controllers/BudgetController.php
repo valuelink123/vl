@@ -184,8 +184,8 @@ sum(qty) as qty,
 sum(promote_qty) as promote_qty,
 sum(income) as income,sum(cost) as cost,sum(common_fee) as common_fee,sum(pick_fee) as pick_fee,sum(promotion_fee) as promotion_fee,
 sum(amount_fee) as amount_fee,sum(storage_fee) as storage_fee
-from budget_details group by month,budget_id) as a left join budgets as b on a.budget_id=b.id
-right join budget_skus as c on b.sku=c.sku and b.site=c.site where ((a.month>='202001' and a.month<='202012' ) or a.month is null) $where order by b.id,a.month asc");
+from budget_details group by month,budget_id) as a right join (select * from budgets where year='".$year."') as b on a.budget_id=b.id
+right join budget_skus as c on b.sku=c.sku and b.site=c.site where ((a.month>='".$year."01' and a.month<='".$year."12' ) or a.month is null) $where order by b.id,a.month asc");
 		$headArray[0]='BGBU';
 		$headArray[1]='SKU';
 		$headArray[2]='描述';
