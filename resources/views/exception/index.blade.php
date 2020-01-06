@@ -91,6 +91,7 @@ th,td,td>span {
                                     </label>
                                 </th>
                                 <th width="8%"> Account </th>
+                                <th width="8%"> Site </th>
                                 <th width="8%"> OrderID </th>
                                 <th width="8%"> Type </th>
 								<th width="15%">Order Sku </th>
@@ -101,6 +102,9 @@ th,td,td>span {
                                 <th width="8%"> Operator </th>
 								<th width="15%">Creator</th>
                                 <th width="15%">Confirm Date</th>
+                                <th width="8%"> BG </th>
+                                <th width="8%"> BU </th>
+                                <th width="8%"> Sales </th>
                                 <th width="5%"> Action </th>
                             </tr>
                             <tr role="row" class="filter">
@@ -113,6 +117,7 @@ th,td,td>span {
 								@endforeach
 								</select>
                                 </td>
+                                <td></td>
                                 <td>
                                     <input type="text" class="form-control form-filter input-sm" name="amazon_order_id">
                                 </td>
@@ -204,6 +209,9 @@ th,td,td>span {
                                 <td>
 
                                 </td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
                                 <td>
                                     <div class="margin-bottom-5">
                                         <button class="btn btn-sm green btn-outline filter-submit margin-bottom">
@@ -268,7 +276,7 @@ th,td,td>span {
                     "dom": "<'row'<'col-md-6 col-sm-12'pli><'col-md-6 col-sm-12'<'table-group-actions pull-right'>>r>t<'row'<'col-md-6 col-sm-12'pli><'col-md-6 col-sm-12'>>",
 
                     "bStateSave": true, // save datatable state(pagination, sort, etc) in cookie.
-                    "aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0 , 4,7,8,10,11 ] }],
+                    "aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0 ,2, 5,8,9,11,12,13,14,15 ] }],
                     "lengthMenu": [
                         [10, 20, 50],
                         [10, 20, 50] // change per page values here
@@ -278,7 +286,7 @@ th,td,td>span {
                         "url": "{{ url('exception/get')}}", // ajax source
                     },
                     "order": [
-                        [4, "desc"]
+                        [5, "desc"]
                     ],// set first column as a default sort by asc
                     "createdRow": function( row, data, dataIndex ) {
                         $(row).children('td').eq(4).attr('style', 'text-align: left;')

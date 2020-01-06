@@ -491,10 +491,10 @@
                                         </div>
                                         <div class="mt-author" style="float:right;text-align:right">
                                             <div class="mt-author-name" style="text-align:right">
-                                                <span class="font-red-madison" >From : {{$s_email['from_name']}}  < {{$s_email['from_address']}} ></span>
+                                                <span class="font-red-madison" >From : {{$s_email['from_name']}}  < {{$s_email['from_address']}} ></span>{!! $s_email['fromAddressRsgStatusHtml'] !!}
                                             </div>
                                             <div class="mt-author-name" style="text-align:right">
-                                                <span class="font-blue-madison" >To : {{$accounts[strtolower($s_email['to_address'])]}} < {{$s_email['to_address']}} ></span>
+                                                <span class="font-blue-madison" >To : @if(isset($accounts[strtolower($s_email['to_address'])])) {{$accounts[strtolower($s_email['to_address'])]}} @endif < {{$s_email['to_address']}} ></span>{!! $s_email['toAddressRsgStatusHtml'] !!}
                                             </div>
                                             <div class="mt-author-notes font-grey-mint" style="text-align:right">{{$s_email['date']}} <span class="label label-sm label-danger">{{array_get($users,$s_email['user_id'])}}</span></div>
                                         </div>
@@ -547,12 +547,14 @@
                                             <h3 class="mt-content-title">{{$s_email['subject']}}</h3>
                                         </div>
                                         <div class="mt-author" style="float:left;text-align:left">
-                                            <div class="mt-author-name" style="text-align:left">
-                                                <span class="font-red-madison" >From : {{$accounts[strtolower($s_email['from_address'])]}} < {{$s_email['from_address']}} ></span>
+                                            <div class="mt-author-name" style="text-align:left; float:left">
+                                                <span class="font-red-madison" >From : @if(isset($accounts[strtolower($s_email['from_address'])])) {{$accounts[strtolower($s_email['from_address'])]}} @endif < {{$s_email['from_address']}} ></span>{!! $s_email['fromAddressRsgStatusHtml'] !!}
                                             </div>
-                                            <div class="mt-author-name" style="text-align:left">
-                                                <span href="javascript:;" class="font-blue-madison" >To : {{$s_email['to_address']}}</span>
+                                            <div style="clear: both"></div>
+                                            <div class="mt-author-name" style="text-align:left; float:left">
+                                                <span href="javascript:;" class="font-blue-madison" >To : {{$s_email['to_address']}}</span>{!! $s_email['toAddressRsgStatusHtml'] !!}
                                             </div>
+                                            <div style="clear: both"></div>
                                             <div class="mt-author-notes font-grey-mint" style="text-align:left">{{$s_email['date']}} <span class="label label-sm label-danger">{{array_get($users,$s_email['user_id'])}}</span></div>
                                         </div>
 

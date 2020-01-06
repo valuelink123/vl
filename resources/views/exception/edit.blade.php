@@ -582,7 +582,7 @@ if((Auth::user()->can(['exception-check']) || in_array($exception['group_id'],ar
 
 		<div class="form-group mt-repeater">
 			<div class="row mt-repeater-row">
-				<div class="col-md-6">
+				<div class="col-md-4">
 					<label class="control-label">Score</label>
 					<div class="input-group ">
 				<span class="input-group-addon">
@@ -592,7 +592,7 @@ if((Auth::user()->can(['exception-check']) || in_array($exception['group_id'],ar
 					</div>
 				</div>
 
-				<div class="col-md-6">
+				<div class="col-md-4">
 					<label class="control-label">Comment</label>
 					<div class="input-group ">
 				<span class="input-group-addon">
@@ -601,6 +601,18 @@ if((Auth::user()->can(['exception-check']) || in_array($exception['group_id'],ar
 						<input type="text" class="form-control" name="comment"  id="comment" value="{{$exception['comment']}}"  {{$disable}}>
 					</div>
 				</div>
+
+				@if($exception['type']==4)
+				<div class="col-md-4">
+					<label class="control-label">CNY Amount</label>
+					<div class="input-group ">
+						<span class="input-group-addon">
+							<i class="fa fa-bookmark"></i>
+						</span>
+						<input type="text" class="form-control" name="amount" onkeyup="this.value=this.value.replace(/[^\d.]/g,'')"  id="amount" value="{{$exception['amount']}}"  {{$disable}}>
+					</div>
+				</div>
+				@endif
 			</div>
 		</div>
 		
