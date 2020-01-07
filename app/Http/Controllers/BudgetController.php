@@ -202,10 +202,11 @@ right join budget_skus as c on b.sku=c.sku and b.site=c.site where ((a.month>='"
 			}
 		}
 		$headArray[126]='备注';
+		$headArray[127]='状态';
 		$arrayData[] = $headArray;
 		
 		$emptyData = [];
-		for($i=0;$i<=126;$i++){
+		for($i=0;$i<=127;$i++){
 			$emptyData[$i] = 0;
 		}
 		$sap_sellers = getUsers('sap_seller');
@@ -233,6 +234,7 @@ right join budget_skus as c on b.sku=c.sku and b.site=c.site where ((a.month>='"
 				$arrayData[$data->id][112] = 0;
 				$arrayData[$data->id][125] = 0;
 				$arrayData[$data->id][126] = $data->remark;
+				$arrayData[$data->id][127] = array_get(getBudgetStageArr(),intval($data->budget_status));
 			}
 			$arrayData[$data->id][$month+8] = $data->qty;
 			$arrayData[$data->id][$month+21] = $data->income;
