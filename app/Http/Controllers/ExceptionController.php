@@ -745,8 +745,8 @@ class ExceptionController extends Controller
 //            });
 //        }
 		//得到订单号对应的站点和bg,bu，销售员等信息
-		$customers= Exception::leftJoin(DB::raw("(SELECT asin,substring(site,5) as site ,any_value(bg) as bg,any_value(bu) as bu,any_value(seller) as sales FROM  `asin` group by asin,site) as order_info"),function($q){
-			$q->on('order_info.asin', '=', 'exception.asin')
+		$customers= Exception::leftJoin(DB::raw("(SELECT asin as asin_a,substring(site,5) as site ,any_value(bg) as bg,any_value(bu) as bu,any_value(seller) as sales FROM  `asin` group by asin_a,site) as order_info"),function($q){
+			$q->on('order_info.asin_a', '=', 'exception.asin')
 			  ->on('order_info.site', '=', 'exception.saleschannel');
 		});
 
@@ -824,7 +824,7 @@ class ExceptionController extends Controller
 
         }
 		if(array_get($_REQUEST,'resellerid')){
-            $customers = $customers->where('replacement', 'like', '%s:9:"seller_id";s:3:"'.$_REQUEST['resellerid'].'";%');
+            $customers = $customers->where('replacement', 'like', '%:"'.$_REQUEST['resellerid'].'";%');
         }
 		if(array_get($_REQUEST,'resku')){
             $customers = $customers->where('replacement', 'like', '%:"'.$_REQUEST['resku'].'";%');
@@ -870,7 +870,7 @@ class ExceptionController extends Controller
 				foreach( $_replacement['products'] as $product){
 					//重发单与sellerid组合为唯一性
 					if(isset($product['replacement_order_id']) && $product['replacement_order_id']){
-						$orderid_sellerid[] = $product['replacement_order_id'].'_'.$customersList['sellerid'];
+						$orderid_sellerid[] = " ( SellerFulfillmentOrderId = '".$product['replacement_order_id']."' and SellerId = '".$product['seller_id']."') ";
 					}
 
 				}
@@ -881,12 +881,12 @@ class ExceptionController extends Controller
         //根据亚马逊id得到该订单的mcf物流状态
         //exception表的 的 replacement 字段中的 replacement_order_id 是对应的order库的amazon_mcf_orders表的SellerFulfillmentOrderId字段,amazon_mcf_orders表里的FulfillmentOrderStatus表示订单状态
         if($orderid_sellerid){
-        	$sql = "select concat(SellerFulfillmentOrderId,'_',SellerId) as orderid_sellerid,FulfillmentOrderStatus from amazon_mcf_orders where concat(SellerFulfillmentOrderId,'_',SellerId) in('".join("','",$orderid_sellerid)."')";
+        	$sql = "select SellerFulfillmentOrderId,SellerId,FulfillmentOrderStatus from amazon_mcf_orders where ( ".implode(' or ',$orderid_sellerid)." )";
             // $_mcfStatus = DB::connection('order')->table('amazon_mcf_orders')->wherein('SellerFulfillmentOrderId',$amazon_ids)->get(['SellerFulfillmentOrderId','FulfillmentOrderStatus']);
 			$_mcfStatus = DB::connection('order')->select($sql);
             if($_mcfStatus){
                 foreach($_mcfStatus as $key=>$val){
-                    $mcfStatus[$val->orderid_sellerid] = $val->FulfillmentOrderStatus;
+                    $mcfStatus[$val->SellerFulfillmentOrderId.'_'.$val->SellerId] = $val->FulfillmentOrderStatus;
                 }
             }
         }
