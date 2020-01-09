@@ -62,11 +62,9 @@ class ExceptionController extends Controller
         //}
 
 		//得到订单号对应的站点和bg,bu，销售员等信息
-		$customers= Exception::leftJoin(DB::raw("(SELECT amazon_orders.AmazonOrderId as AmazonOrderId,asin.site as site,asin.bg as bg,asin.bu as bu,asin.seller as sales 
-				FROM `amazon_orders` 
-				LEFT JOIN `amazon_orders_item` ON `amazon_orders_item`.`AmazonOrderId` = `amazon_orders`.`AmazonOrderId`
-				LEFT JOIN `asin` ON `asin`.`asin` = `amazon_orders_item`.`ASIN` AND `asin`.`site` = concat('www.',`amazon_orders`.`SalesChannel`) AND `asin`.`sellersku` = `amazon_orders_item`.`SellerSKU`) as order_info"),function($q){
-			$q->on('order_info.AmazonOrderId', '=', 'exception.amazon_order_id');
+		$customers= Exception::leftJoin(DB::raw("(SELECT asin,substring(site,5) as site ,any_value(bg) as bg,any_value(bu) as bu,any_value(seller) as sales FROM  `asin` group by asin,site) as order_info"),function($q){
+			$q->on('order_info.asin', '=', 'exception.asin')
+			  ->on('order_info.site', '=', 'exception.saleschannel');
 		});
 
 		if(array_get($_REQUEST,'type')){
@@ -747,11 +745,9 @@ class ExceptionController extends Controller
 //            });
 //        }
 		//得到订单号对应的站点和bg,bu，销售员等信息
-		$customers= Exception::leftJoin(DB::raw("(SELECT amazon_orders.AmazonOrderId as AmazonOrderId,asin.site as site,asin.bg as bg,asin.bu as bu,asin.seller as sales 
-				FROM `amazon_orders` 
-				LEFT JOIN `amazon_orders_item` ON `amazon_orders_item`.`AmazonOrderId` = `amazon_orders`.`AmazonOrderId`
-				LEFT JOIN `asin` ON `asin`.`asin` = `amazon_orders_item`.`ASIN` AND `asin`.`site` = concat('www.',`amazon_orders`.`SalesChannel`) AND `asin`.`sellersku` = `amazon_orders_item`.`SellerSKU`) as order_info"),function($q){
-			$q->on('order_info.AmazonOrderId', '=', 'exception.amazon_order_id');
+		$customers= Exception::leftJoin(DB::raw("(SELECT asin,substring(site,5) as site ,any_value(bg) as bg,any_value(bu) as bu,any_value(seller) as sales FROM  `asin` group by asin,site) as order_info"),function($q){
+			$q->on('order_info.asin', '=', 'exception.asin')
+			  ->on('order_info.site', '=', 'exception.saleschannel');
 		});
 
 		if(array_get($_REQUEST,'type')){
