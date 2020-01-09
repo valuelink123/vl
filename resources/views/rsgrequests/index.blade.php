@@ -195,8 +195,8 @@
 					</div>
 				</div>
 				<div class="portlet-body">
-					@permission('rsgrequests-batch-update')
 					<div class="table-actions-wrapper pull-right">
+						@permission('rsgrequests-batch-update')
 						{{--更新processor--}}
 						<select id="processor" class="table-group-action-input form-control input-inline input-small input-sm">
 							<option value="">Select Processor</option>
@@ -219,12 +219,13 @@
 						<button class="btn btn-sm green table-action-submit" data-type="2">
 							<i class="fa fa-check"></i> Update</button>
 
+						@endpermission
 						@permission('compose')
 						<button class="btn btn-sm green" id="batch-send">
 							<i class="fa fa-check"></i> Batch Send</button>
 						@endpermission
 					</div>
-					@endpermission
+
 					<div class="table-container">
 
 						<div style="overflow:auto;width: 100%;">
