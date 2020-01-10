@@ -72,9 +72,31 @@ a.editable-click:hover {
     font-size: 12px;
     color: #666;
 }
+	.tongji span{
+		margin-left:20px;
+		font-size:15px;
+	}
 </style>
 <link href="/assets/global/plugins/bootstrap-editable/bootstrap-editable/css/bootstrap-editable.css" rel="stylesheet" type="text/css" />
 <div class="row" >
+{{--快速查询功能--}}
+	<!--
+	<div class="col-lg-12 col-xs-12 col-sm-12 fast-search">
+		<div>
+			<div class="search-type active pull-left" type="0">Order ID</div>
+			<div class="search-type pull-left" type="1">Customer Info</div>
+			<div class="search-type pull-left" type="2">Parts List</div>
+			<div class="search-type pull-left" type="3">Inventory</div>
+			<div class="search-type pull-left" type="4">Manual</div>
+			<div class="search-type pull-left" type="5">QA</div>
+		</div>
+		<div class="clearfix"></div>
+		<div>
+			<input type="text" id="fast-search">
+			<button type="button" class="btn btn-danger">Search</button>
+		</div>
+	</div>
+	-->
 <div class="col-lg-12 col-xs-12 col-sm-12">
 <div class="portlet light ">
 			
@@ -311,8 +333,13 @@ a.editable-click:hover {
 		<div class="portlet-title tabbable-line">
 			<div class="caption">
 				<i class=" icon-social-twitter font-dark hide"></i>
-				<span class="caption-subject font-dark bold uppercase">MY TASKS</span>
-				
+				<span class="caption-subject font-dark bold uppercase pull-left">MY TASKS</span>
+				<div class="tongji red pull-left">
+					<span>inbox（{{$statis['inbox']}}）</span>
+					<span>Time out（{{$statis['timeout']}}）</span>
+					<span>R&R Done（{{$statis['done']}}）</span>
+					<span>R&R Canceled（{{$statis['calcel']}}）</span>
+				</div>
 			</div>
 			
 					<div class="pull-right">

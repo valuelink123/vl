@@ -164,7 +164,7 @@ class AddRsgProduct extends Command
 				}
 			}else{
 				if($val['site']=='www.amazon.com'){
-					$sales_target_reviews = 5;
+					$sales_target_reviews = 10;
 				}else{
 					$sales_target_reviews = 3;
 				}

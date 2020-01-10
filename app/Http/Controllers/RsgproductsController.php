@@ -245,7 +245,7 @@ class RsgproductsController extends Controller
 						WHEN 1 then 1*20
 						WHEN 2 then 0.5*20
 						ELSE 0 END as type_score,
-                 	if(stock_days<30,0,1) as days_score,
+                 	if(stock_days<60,0,1) as days_score,
 					case sku_level
 						WHEN 'S' then 1
 						WHEN 'A' then 0.6

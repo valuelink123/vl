@@ -107,10 +107,13 @@ class ServiceController extends Controller
 			}
 			
 		}
-		
+
+		//得到需要统计的数量
+		$statis = $this->getNoreplyData();
+		$statis = $statis + $this->getRRData();
 		
 		$tasks = Task::where('response_user_id',Auth::user()->id)->where('stage','<',3)->take(10)->orderBy('priority','desc')->get()->toArray();
-        return view('service',compact('total_score','tasks','dash','details','users','date_from','date_to','user_id'));
+        return view('service',compact('total_score','tasks','dash','details','users','date_from','date_to','user_id','statis'));
 
     }
 	
