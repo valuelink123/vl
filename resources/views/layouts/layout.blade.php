@@ -760,7 +760,7 @@
 						<div class="holiday—countdown text-center">
 							<div style=" width:5%;border: 1px solid #D9EDF7;"></div>
 							@foreach(Session::get('countDown') as $key=>$val)
-								@if($val['day']>0)
+								@if($key < 3)
 								<div class="col-md-4">距离<span class="holiday">{!! $val['name'] !!}</span>还有<span class="day">{!! $val['day'] !!}</span>天</div>
 								@endif
 							@endforeach

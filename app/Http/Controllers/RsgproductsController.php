@@ -193,6 +193,9 @@ class RsgproductsController extends Controller
 		$siteArrConfig = getSiteArr()['site'];
 		$site = isset($_POST['site']) && $_POST['site'] ? $_POST['site'] : 'US';
 		$siteArr = isset($siteArrConfig[$site]) ? $siteArrConfig[$site] : array();
+		if($site == 'US'){//特殊处理： US里面不用展示CA站点的产品
+			$siteArr = array('www.amazon.com');
+		}
 		$where_product .= " and rsg_products.site in('".join($siteArr,"','")."')";
 		if($site=='JP'){
 			$where_product .= " and rsg_products.order_status = 1 ";

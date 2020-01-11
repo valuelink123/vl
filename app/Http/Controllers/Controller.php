@@ -25,15 +25,22 @@ class Controller extends BaseController
 		//计算倒计时相关天数,Black Friday=>'11.29','Cyber Monday'=>'12.2','Christmas'=>'12.24'
 		$this->middleware(function ($request, $next) {
 			$configArr = array(
-				array('date'=>'2019-12-24','name'=>'Christmas'),//圣诞节
-				array('date'=>'2020-01-01','name'=>'2020'),//元旦
 				array('date'=>'2020-01-24','name'=>'Chinese New Year'),//春节
-				// array('date'=>'2020-04-04','name'=>'Qingming Festival'),//清明节
+				array('date'=>'2020-02-14','name'=>"Valentine's Day"),//情人节
+				array('date'=>'2020-05-14','name'=>"Mother's Day"),//母亲节
+				array('date'=>'2020-06-18','name'=>"Father's Day"),//父亲节
+				array('date'=>'2020-11-01','name'=>"All Saints' Day"),//万圣节
+				array('date'=>'2020-11-23','name'=>'Thanksgiving Day'),//感恩节
+				array('date'=>'2020-11-24','name'=>'Black Friday'),//黑色星期五
+				array('date'=>'2020-11-27','name'=>'Cyber Monday'),//网络星期一
+				array('date'=>'2020-12-25','name'=>'Christmas'),//圣诞节
 			);
 			$countDown = array();
 			foreach($configArr as $key=>$val){
-				$countDown[$key]['name'] = $val['name'];
-				$countDown[$key]['day'] = (strtotime(date($val['date']))-strtotime(date('Y-m-d')))/86400;
+				 $days = (strtotime(date($val['date']))-strtotime(date('Y-m-d')))/86400;
+				 if($days >= 0){
+					 $countDown[] = array('name'=>$val['name'],'day'=>$days);
+				 }
 			}
 			session()->put('countDown',$countDown);
 			return $next($request);
