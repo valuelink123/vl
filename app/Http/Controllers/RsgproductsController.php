@@ -193,6 +193,9 @@ class RsgproductsController extends Controller
 		$siteArrConfig = getSiteArr()['site'];
 		$site = isset($_POST['site']) && $_POST['site'] ? $_POST['site'] : 'US';
 		$siteArr = isset($siteArrConfig[$site]) ? $siteArrConfig[$site] : array();
+		if($site == 'US'){//特殊处理： US里面不用展示CA站点的产品
+			$siteArr = array('www.amazon.com');
+		}
 		$where_product .= " and rsg_products.site in('".join($siteArr,"','")."')";
 		if($site=='JP'){
 			$where_product .= " and rsg_products.order_status = 1 ";
@@ -233,7 +236,7 @@ class RsgproductsController extends Controller
 		}
 		$sql = "
         SELECT SQL_CALC_FOUND_ROWS
-        	rsg_products.id as id,rsg_products.asin as asin,rsg_products.site as site,rsg_products.seller_id as seller_id,rsg_products.post_status as post_status,rsg_products.post_type as post_type,rsg_products.sales_target_reviews as target_review,rsg_products.requested_review as requested_review,asin.bg as bg,asin.bu as bu,asin.item_no as item_no,asin.seller as seller,asin.id as asin_id,rsg_products.number_of_reviews as review,rsg_products.review_rating as rating, num as unfinished,rsg_products.sku_level as sku_level, rsg_products.product_img as img,rsg_products.order_status as order_status,cast(rsg_products.sales_target_reviews as signed) - cast(rsg_products.requested_review as signed) as task,(status_score*type_score*level_score*rating_score*review_score)  as score {$field} 
+        	rsg_products.id as id,rsg_products.asin as asin,rsg_products.site as site,rsg_products.seller_id as seller_id,rsg_products.post_status as post_status,rsg_products.post_type as post_type,rsg_products.sales_target_reviews as target_review,rsg_products.requested_review as requested_review,asin.bg as bg,asin.bu as bu,asin.item_no as item_no,asin.seller as seller,asin.id as asin_id,rsg_products.number_of_reviews as review,rsg_products.review_rating as rating, num as unfinished,rsg_products.sku_level as sku_level, rsg_products.product_img as img,rsg_products.order_status as order_status,cast(rsg_products.sales_target_reviews as signed) - cast(rsg_products.requested_review as signed) as task,(status_score*type_score*level_score*rating_score*review_score*days_score)  as score {$field} 
             from rsg_products  
             left join (
 				select id,
@@ -245,6 +248,7 @@ class RsgproductsController extends Controller
 						WHEN 1 then 1*20
 						WHEN 2 then 0.5*20
 						ELSE 0 END as type_score,
+                 	if(stock_days<60,0,1) as days_score,
 					case sku_level
 						WHEN 'S' then 1
 						WHEN 'A' then 0.6

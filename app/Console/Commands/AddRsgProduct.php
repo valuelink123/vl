@@ -101,6 +101,26 @@ class AddRsgProduct extends Command
 			$skuData[$val['sku'].'_'.$site]['sku_level'] = $val['sku_level'];
 		}
 
+		//求出当前库存可维持天数
+		$sql = "SELECT
+				sum(fba_stock + fba_transfer) AS fba_stock,
+				sum(sales_07_01) AS sales_07_01,
+				sum(sales_14_08) AS sales_14_08,
+				sum(sales_21_15) AS sales_21_15,
+				sum(sales_28_22) AS sales_28_22,
+				asin,
+				site
+			FROM asin 
+			GROUP BY asin,site";
+		$_saleData = $this->queryRows($sql);
+		$saleData = array();
+
+		foreach($_saleData as $key=>$val){
+			//平均日销量
+			$sales = ((((array_get($val,'sales_07_01')??array_get($val,'sales_14_08'))??array_get($val,'sales_21_15'))??array_get($val,'sales_28_22'))??0)/7 ;
+			//库存可维持的天数
+			$saleData[$val['asin'].'_'.$val['site']] = $sales > 0 ? $val['fba_stock']/$sales : '10000';//每日销量为0的时候，默认可维持天数为10000
+		}
 
 		//取亚马逊的产品相关数据
 		$amazon_sql = "select asin,marketplaceid,title,images,features,description,price,buybox_sellerid  
@@ -134,6 +154,7 @@ class AddRsgProduct extends Command
 				$product_content = $amazonData[$val['asin'].'_'.$val['site']]['description'];
 				$seller_id = $amazonData[$val['asin'].'_'.$val['site']]['seller_id'];
 			}
+			$days = isset($saleData[$val['asin'].'_'.$val['site']]) ? $saleData[$val['asin'].'_'.$val['site']] : 10000;
 			//美国站点 5个/天 其他站点3个/天， 新品上线第一周(帖子状态为待推贴，并且更新时间为一周内)美国站点 10个/天 其他站点5个/天
 			if($val['post_status']==2 && (time()-strtotime($val['push_date'])) <= 86400*7){//新品上线第一周
 				if($val['site']=='www.amazon.com'){
@@ -143,7 +164,7 @@ class AddRsgProduct extends Command
 				}
 			}else{
 				if($val['site']=='www.amazon.com'){
-					$sales_target_reviews = 5;
+					$sales_target_reviews = 10;
 				}else{
 					$sales_target_reviews = 3;
 				}
@@ -172,6 +193,7 @@ class AddRsgProduct extends Command
 				'product_content' => $product_content,
 				'sku_level' => isset($skuData[$val['sku'].'_'.$val['site']]) ? $skuData[$val['sku'].'_'.$val['site']]['sku_level'] : '',
 				'seller_id' => $seller_id,
+				'stock_days' => $days,
 			);
 		}
 		if($insertData){
