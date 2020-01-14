@@ -54,12 +54,13 @@ class GetRequestReviewTasks extends Command
 			$sales_channel = str_replace('www.','',$asin->site);
 			$orders = DB::connection('amazon')->select("select * from orders where order_status='Shipped' and fulfillment_channel='AFN' and  date(last_update_date)='$date' and sales_channel='$sales_channel' and asins like '%".$asin->asin."*%'");
 			foreach($orders as $order){
-				try{
+				try{	
 					$sellerid = array_get($accounts_config,$order->seller_account_id.'.mws_seller_id');
 					$marketplaceid = array_get($accounts_config,$order->seller_account_id.'.mws_marketplaceid');
+					if(!$sellerid || !$marketplaceid) continue;
 					$exists_feedback = DB::connection('order')->table('amazon_feedback')->where('AmazonOrderId',$order->amazon_order_id)->value('AmazonOrderId');
 					if($exists_feedback) continue;
-					$exists_refund = DB::connection('order')->table('finances_refund_event')->where('AmazonOrderId',$order->amazon_order_id)->value('amazon_order_id');
+					$exists_refund = DB::connection('order')->table('finances_refund_event')->where('AmazonOrderId',$order->amazon_order_id)->value('AmazonOrderId');
 					if($exists_refund) continue;
 					$exists_exception = DB::table('exception')->where('amazon_order_id',$order->amazon_order_id)->whereIn('type',[1,2])->value('amazon_order_id');
 					if($exists_exception) continue;
