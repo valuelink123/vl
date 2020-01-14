@@ -220,6 +220,14 @@
                                                     </a>
                                                 </li>
 												 @endpermission
+												 @permission('reqrev-show')
+												<li class="">
+                                                    <a href="/reqrev" class="nav-link nav-toggle ">
+                                                        Auto Request Reviews
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
+												 @endpermission
 												 
 												
 												

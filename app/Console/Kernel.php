@@ -42,6 +42,7 @@ class Kernel extends ConsoleKernel
 		'App\Console\Commands\AddTransferWarn',
 		'App\Console\Commands\SkuDaily',
 		'App\Console\Commands\AddRsgProduct',
+		'App\Console\Commands\GetRequestReviewTasks',
     ];
 
     /**
@@ -98,7 +99,7 @@ class Kernel extends ConsoleKernel
         //$schedule->command('scan:auto')->hourly()->name('autocheck')->withoutOverlapping();
         $schedule->command('get:awsinfo')->dailyAt('23:00')->name('getawsinfo')->withoutOverlapping();
 		$schedule->command('get:dailysales 7')->dailyAt('1:00')->name('getdailysales')->withoutOverlapping();
-
+		$schedule->command('get:requestreviewtasks')->dailyAt('18:00')->name('getrr')->withoutOverlapping();
         $filePath = base_path().'/storage/logs/noctg.log';
         // $schedule->command('add:nonctg')->monthly()->appendOutputTo($filePath)->name('add_history_nonctg')->withoutOverlapping();//添加nonctg数据，此脚本只执行一次
         $schedule->command('update:nonctg')->cron('*/30 * * * *')->appendOutputTo($filePath)->name('update_nonctg')->withoutOverlapping();

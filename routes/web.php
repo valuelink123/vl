@@ -76,6 +76,7 @@ Route::get('/seller/{asin}/{marketplaceid}', 'SellerController@show')->name('vie
 Route::Post('/ratingdetails', 'SellerController@getrating')->name('getRating');
 Route::resource('exception', 'ExceptionController');
 Route::Post('/exception/get', 'ExceptionController@get')->name('getException');
+Route::get('/exception/111/111', 'ExceptionController@get')->name('getException');
 Route::Post('/exception/getorder', 'ExceptionController@getrfcorder')->name('getExceptionOrder');
 Route::Post('/exception/getrepeatorder', 'ExceptionController@getRepeatOrder')->name('getRepeatOrder');
 Route::get('/exceptionexport', 'ExceptionController@export')->name('exportException');
@@ -126,6 +127,8 @@ Route::get('/skus', 'SkuController@index');
 Route::Post('/skus', 'SkuController@update');
 Route::get('/budgets', 'BudgetController@index');
 Route::Post('/budgets', 'BudgetController@index');
+Route::get('/reqrev', 'ReqrevController@index');
+Route::Post('/reqrev', 'ReqrevController@index');
 Route::Post('/budget', 'BudgetController@update');
 Route::get('/budgets/edit', 'BudgetController@edit');
 Route::Post('/budgets/upload', 'BudgetController@upload')->name('uploadBudget');
