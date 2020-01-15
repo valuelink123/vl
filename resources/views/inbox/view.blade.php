@@ -239,7 +239,7 @@
                 <div class="tab-pane active" id="tab_1">
 				
 				
-				<div class="col-xs-10">
+				<div class="col-xs-9">
                         <form id="fileupload" action="{{ url('send') }}" method="POST" enctype="multipart/form-data">
                             {{ csrf_field() }}
 							<input type="hidden" name="warn" id="warn" value="0">
@@ -445,7 +445,7 @@
                         </form>
                         <div style="clear:both;"></div>
                     </div>
-                <div class="col-xs-2">
+                <div class="col-xs-3">
                     @include('inbox.rightBar')
                 </div>
                     <div style="clear:both;"></div>

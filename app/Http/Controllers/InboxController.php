@@ -19,8 +19,13 @@ use Illuminate\Support\Facades\Hash;
 use App\Services\MultipleQueue;
 use PDO;
 use DB;
+use App\Models\TrackLog;
+use App\Classes\SapRfcRequest;
+
 class InboxController extends Controller
 {
+    use \App\Traits\Mysqli;
+
     /**
      * Create a new controller instance.
      *
@@ -171,8 +176,25 @@ class InboxController extends Controller
 		}
 
 		$email = $email->toArray();
-		
-		
+        $client_email = $email['to_address'];
+        $client_id_query = DB::table('client_info')->leftJoin('client',function($q){
+            $q->on('client.id', '=', 'client_info.client_id');
+        })->where('client_info.email',$client_email)->select(['client.id'])->first();
+
+        $latestConversationList = $recentEventsList = array();
+        $recentEventsNumbers = array('times_non_ctg'=>0, 'times_ctg'=>0, 'times_rsg'=>0, 'times_negative_review'=>0);
+        if($client_id_query){
+            $client_id = $client_id_query->id;
+            //Latest conversations...
+            $latestConversationList = $this->getLatestConversationList($client_id);
+            //Recent events...
+            $recentEvents = $this->getRecentEvents($client_id);
+            $recentEventsNumbers = $recentEvents[0];
+            $recentEventsList = $recentEvents[1];
+        }
+        //RSG Task...
+        $rsgTaskData = $this->getRsgTask('US');
+
 		$email_unread_history = Inbox::where('id','<>',$id)->where('reply',0)->where('from_address',$email['from_address'])->where('to_address',$email['to_address'])->take(10)->orderBy('date','desc')->get();
 		
         $email_from_history = Inbox::where('date','<',$email['date'])->where('from_address',$email['from_address'])->where('to_address',$email['to_address'])
@@ -240,7 +262,7 @@ class InboxController extends Controller
 		$lists =  Category::orderBy($order_by,$sort)->get()->toArray();
 		$tree = $this->getTree($lists,28);
 
-        return view('inbox/view',['email_history'=>$email_history,'unread_history'=>$email_unread_history,'order'=>$order,'email'=>$email,'users'=>$this->getUsers(),'groups'=>$this->getGroups(),'sellerids'=>$this->getSellerIds(),'accounts'=>$this->getAccounts(),'account_type'=>$account_type,'tree'=>$tree,'email_change_log'=>$email_change_log]);
+        return view('inbox/view',['email_history'=>$email_history,'unread_history'=>$email_unread_history,'order'=>$order,'email'=>$email,'users'=>$this->getUsers(),'groups'=>$this->getGroups(),'sellerids'=>$this->getSellerIds(),'accounts'=>$this->getAccounts(),'account_type'=>$account_type,'tree'=>$tree,'email_change_log'=>$email_change_log,'client_email'=>$client_email,'latestConversationList'=>$latestConversationList,'recentEventsList'=>$recentEventsList,'recentEventsNumbers'=>$recentEventsNumbers,'rsgTaskData'=>$rsgTaskData,'rsg_link'=> 'https://rsg.claimthegift.com?user=V'.Auth::user()->id ]);
     }
 
     public function getRsgStatusAttr($emailDetails, $email, $rsgStatusArr, $fromOrTo){
@@ -260,6 +282,307 @@ class InboxController extends Controller
         }
 
         return $rsgStatusHtml;
+    }
+
+    //按created_at降序排列
+    public function sortCreatedAtDesc($a,$b){
+        if($a['created_at'] < $b['created_at']){
+            return 1;
+        }
+    }
+
+    //获取邮件和跟进记录。数据来源参考：CRM show页面Email History选项卡。
+    public function getLatestConversationList($client_id){
+        $sql = "select b.name as name,b.email as email,b.phone as phone,b.remark as remark,b.country as country,b.`from` as `from`,c.amazon_order_id as order_id
+			FROM client_info as b
+			left join client_order_info as c on b.id = c.ci_id
+			where b.client_id = $client_id
+			order by b.id desc ";
+        $_data = $this->queryRows($sql);
+        $send_to_emails = array();
+        foreach ($_data as $val) {
+            $send_to_emails[] = $val['email'];
+        }
+
+        $sendboxEmails = DB::table('sendbox')->whereIn('to_address', $send_to_emails)->orderBy('date', 'desc')->get();
+        $sendboxEmails = json_decode(json_encode($sendboxEmails), true);
+        $track_log_array = TrackLog::where('record_id', $client_id)->where('type', 2)->orderBy('created_at', 'desc')->get()->toArray();
+
+        $latestConversationList = array();
+        foreach ($sendboxEmails as $val) {
+            $latestConversationList[] = $val;
+        }
+        foreach ($track_log_array as $val) {
+            $latestConversationList[] = $val;
+        }
+        //自定义排序：按创建时间倒序排列
+        usort($latestConversationList, array($this, 'sortCreatedAtDesc'));
+        //最多显示最新的3条记录。
+        $latestConversationList = array_slice($latestConversationList, 0, 3);
+        $now = time();
+        foreach ($latestConversationList as $key => $val) {
+            $diff_seconds = ($now - strtotime($val['created_at']));
+            if ($diff_seconds >= 86400) {
+                $latestConversationList[$key]['interval'] = floor($diff_seconds / 86400) . 'D';
+            } else {
+                $latestConversationList[$key]['interval'] = floor($diff_seconds / 3600) . 'h';
+            }
+            //跟进记录
+            if (!isset($val['inbox_id'])) {
+                $latestConversationList[$key]['note'] = preg_replace('/<\/?.+?\/?>/','', array_get($val, 'note'));
+            }
+        }
+
+        return $latestConversationList;
+    }
+
+    public function getRecentEvents($client_id)
+    {
+        //numbers of ctg, rsg, negative_review
+        $recentEventsNumbers = DB::table('client')->where('id', $client_id)->select(['times_ctg', 'times_rsg', 'times_negative_review'])->first();
+        $recentEventsNumbers = json_decode(json_encode($recentEventsNumbers), true);
+        //non-ctg
+        $clientEmailArray = DB::table('client_info')->where('client_id', $client_id)->select(['email'])->first();
+        $clientEmailArray = json_decode(json_encode($clientEmailArray), true);
+
+        $recentEventsList = array();
+        $nonCtgRecords = DB::table('non_ctg')->whereIn('email', $clientEmailArray)->get();
+        $nonCtgRecords = json_decode(json_encode($nonCtgRecords), true);
+        $sap = new SapRfcRequest();
+        foreach ($nonCtgRecords as $key => $val) {
+            $sapOrderInfo = SapRfcRequest::sapOrderDataTranslate($sap->getOrder(['orderId' => $val['amazon_order_id']]));
+            if ($sapOrderInfo) {
+                $asin = $sapOrderInfo['orderItems'][0]['ASIN'];
+                $marketPlaceSite = $sapOrderInfo['orderItems'][0]['MarketPlaceSite'];
+                $nonCtgRecords[$key]['asin'] = $asin;
+                $nonCtgRecords[$key]['marketPlaceSite'] = $marketPlaceSite;
+                $nonCtgRecords[$key]['event_type'] = 'non_ctg';
+                $nonCtgRecords[$key]['created_at'] = $val['date'];
+                $recentEventsList[] = $nonCtgRecords[$key];
+            }
+        }
+        //numbers of non_ctg
+        $recentEventsNumbers['times_non_ctg'] = count($recentEventsList);
+
+        //ctg(ctg,b1g1,cashback)
+        $ctgTables = array('ctg', 'b1g1', 'cashback');
+        $clientEmailArrayWithQuotes = array_map(function ($v) {
+            return "'" . $v . "'";
+        }, $clientEmailArray);
+        $clientEmailArrayInSql = '(' . implode(',', $clientEmailArrayWithQuotes) . ')';
+        for ($i = 0; $i < count($ctgTables); $i++) {
+            $sql = 'select ASIN as asin,MarketPlaceSite as marketPlaceSite,' . $ctgTables[$i] . '.email as email,' . $ctgTables[$i] . '.created_at as created_at from ' . $ctgTables[$i] . ' JOIN ctg_order_item on ' . $ctgTables[$i] . '.order_id=ctg_order_item.AmazonOrderId and ' . $ctgTables[$i] . '.email IN ' . $clientEmailArrayInSql . ';';
+            $ctgRecords = $this->queryRows($sql);
+            if ($ctgRecords) {
+                foreach ($ctgRecords as $key => $val) {
+                    $ctgRecords[$key]['event_type'] = 'ctg';
+                    $recentEventsList[] = $ctgRecords[$key];
+                }
+            }
+        }
+
+        //rsg
+        $sql = 'select asin, site as marketPlaceSite, rsg_requests.customer_email as email, rsg_requests.created_at as created_at from rsg_requests JOIN rsg_products on rsg_requests.product_id=rsg_products.id and rsg_requests.customer_email IN ' . $clientEmailArrayInSql . ';';
+        $rsgRecords = $this->queryRows($sql);
+        if ($rsgRecords) {
+            foreach ($rsgRecords as $key => $val) {
+                $rsgRecords[$key]['event_type'] = 'rsg';
+                $recentEventsList[] = $rsgRecords[$key];
+            }
+        }
+
+        //自定义排序：按创建时间倒序排列
+        usort($recentEventsList, array($this, 'sortCreatedAtDesc'));
+        //最多显示最新的3条记录。
+        $recentEventsList = array_slice($recentEventsList, 0, 3);
+        $now = time();
+        foreach ($recentEventsList as $key => $val) {
+            $diff_seconds = ($now - strtotime($val['created_at']));
+            if ($diff_seconds >= 86400) {
+                $recentEventsList[$key]['interval'] = floor($diff_seconds / 86400) . 'D';
+            } else {
+                $recentEventsList[$key]['interval'] = floor($diff_seconds / 3600) . 'h';
+            }
+        }
+
+        return [$recentEventsNumbers, $recentEventsList];
+    }
+
+
+    public function getRsgTaskData(Request $req){
+        $site = isset($_POST['site']) && $_POST['site'] ? $_POST['site'] : 'US';
+        $data = $this->getRsgTask($site);
+
+        $return['status'] = 0;
+        if($data){
+            $return['data'] = $data;
+            $return['status'] = 1;
+        }
+        return json_encode($return);
+    }
+
+
+
+
+    public function getRsgTask($site){
+        $date = $this->getDefaultDate(date('Y-m-d'));
+        $ago15day = date('Y-m-d',strtotime($date)-86400*15);
+
+        //限制站点搜索
+        $siteArrConfig = getSiteArr()['site'];
+        $siteArr = isset($siteArrConfig[$site]) ? $siteArrConfig[$site] : array();
+        $siteSql = " and rsg_products.site in('".join($siteArr,"','")."')";
+        if($site=='JP'){
+            $siteSql .= " and rsg_products.order_status = 1 ";
+        }
+
+        $sql = "
+                SELECT SQL_CALC_FOUND_ROWS
+                    rsg_products.id as id,
+                    rsg_products.asin as asin,
+                    rsg_products.site as site,
+                    rsg_products.seller_id as seller_id,
+                    rsg_products.post_status as post_status,
+                    rsg_products.post_type as post_type,
+                    rsg_products.sales_target_reviews as target_review,
+                    rsg_products.requested_review as requested_review,
+                    asin.bg as bg,
+                    asin.bu as bu,
+                    asin.item_no as item_no,
+                    asin.seller as seller,
+                    asin.id as asin_id,
+                    rsg_products.number_of_reviews as review,
+                    rsg_products.review_rating as rating,
+                    num as unfinished,
+                    rsg_products.sku_level as sku_level,
+                    rsg_products.product_img as img,
+                    rsg_products.order_status as order_status,
+                    cast(rsg_products.sales_target_reviews as signed) - cast(rsg_products.requested_review as signed) as task,
+                    (status_score * type_score * level_score * rating_score * review_score * days_score) as score
+                from
+                    rsg_products
+                        left join
+                    (select 
+                        id,
+                            case post_status
+                                WHEN 1 then 1
+                                WHEN 2 then 2
+                                ELSE 0
+                            END as status_score,
+                            case post_type
+                                WHEN 1 then 1 * 20
+                                WHEN 2 then 0.5 * 20
+                                ELSE 0
+                            END as type_score,
+                            if(stock_days < 60, 0, 1) as days_score,
+                            case sku_level
+                                WHEN 'S' then 1
+                                WHEN 'A' then 0.6
+                                WHEN 'B' then 0.2
+                                ELSE 0
+                            END as level_score,
+                            case review_rating
+                                WHEN 5 then 1
+                                WHEN 4.9 then 1
+                                WHEN 4.8 then 2
+                                WHEN 4.7 then 4
+                                WHEN 4.6 then 2
+                                WHEN 4.5 then 1
+                                WHEN 4.4 then 1
+                                WHEN 4.3 then 3
+                                WHEN 4.2 then 5
+                                WHEN 4.1 then 4
+                                WHEN 0 then 1
+                                ELSE 0
+                            END as rating_score,
+                            if(site = 'www.amazon.com', case
+                                WHEN number_of_reviews < 100 then 10
+                                WHEN
+                                    number_of_reviews >= 100
+                                        and number_of_reviews < 400
+                                then
+                                    7
+                                WHEN
+                                    number_of_reviews >= 400
+                                        and number_of_reviews < 1000
+                                then
+                                    4
+                                WHEN
+                                    number_of_reviews >= 1000
+                                        and number_of_reviews < 4000
+                                then
+                                    1
+                                WHEN number_of_reviews >= 4000 then 0
+                            END, case
+                                WHEN number_of_reviews < 40 then 10
+                                WHEN
+                                    number_of_reviews >= 40
+                                        and number_of_reviews < 100
+                                then
+                                    7
+                                WHEN
+                                    number_of_reviews >= 100
+                                        and number_of_reviews < 400
+                                then
+                                    4
+                                WHEN
+                                    number_of_reviews >= 400
+                                        and number_of_reviews <= 1000
+                                then
+                                    1
+                                WHEN number_of_reviews > 1000 then 0
+                            END) as review_score
+                    from
+                        rsg_products
+                    where
+                        created_at = '".$date."') as rsg_score ON rsg_score.id = rsg_products.id
+                        left join
+                    asin ON rsg_products.asin = asin.asin
+                        and rsg_products.site = asin.site
+                        and rsg_products.sellersku = asin.sellersku
+                        left join
+                    (select 
+                        count(*) as num, asin, site
+                    from
+                        rsg_products
+                    left join rsg_requests ON product_id = rsg_products.id
+                        and step IN (4 , 5, 6, 7)
+                    where
+                        rsg_requests.created_at <= '".$date." 23:59:59 ' 
+                            and rsg_requests.created_at >= '".$ago15day." 00:00:00 ' 
+                    group by asin , site) as rsg ON rsg_products.asin = rsg.asin
+                        and rsg_products.site = rsg.site
+                where
+                    1 = 1 and created_at = '".$date."' 
+                        and cast(rsg_products.sales_target_reviews as signed) - cast(rsg_products.requested_review as signed) > 0
+                        {$siteSql} ".
+            "order by rsg_products.order_status desc , score desc , id desc
+                LIMIT 0 , 10        
+        ";
+
+        $data = $this->queryRows($sql);
+        $i = 1;
+        foreach ($data as $key => $val) {
+            $data[$key]['rank'] = $i;
+            $data[$key]['product'] = '<a target="_blank" href="https://rsg.claimthegift.com/product/detail?id='.$val['asin_id'].'"><img src="'.$val['img'].'" width="50px" height="65px"></a>';
+            $data[$key]['asin'] = '<a href="https://' . $val['site'] . '/dp/' . $val['asin'] . '?m='.$val['seller_id'].'" target="_blank" rel="noreferrer">' . $val['asin'] . '</a>';//asin插入超链接
+            $data[$key]['action'] = '<a data-target="#ajax" class="badge badge-success" data-toggle="modal" href="/rsgrequests/create?productid='.$val['id'].'&asin=' . $val['asin'] . '&site=' . $val['site'] . '"> 
+                                    <i class="fa fa-hand-o-up"></i></a>';
+            if($data[$key]['task']<=0){
+                $data[$key]['action'] = '<div class="badge badge-primary">Done</div>';
+            }
+            $i++;
+        }
+
+        return $data;
+    }
+
+    public function getDefaultDate($todayDate){
+        if(time()-strtotime($todayDate.' 07:30:00') < 0){
+            //凌晨到七点半之间要显示的是昨天的数据
+            $todayDate = date('Y-m-d',strtotime($todayDate)-86400);
+        }
+        return $todayDate;
     }
 
     public function getRsgStatusHtml($rsgStatusArray, $explain){
@@ -1092,5 +1415,10 @@ class InboxController extends Controller
 		}
 		return $tree;
 	}
+
+    public function getSubjectType(){
+        return Category::where('category_pid',28)->orderBy('created_at','desc')->pluck('category_name','id');
+    }
+
 
 }

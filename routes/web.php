@@ -47,6 +47,7 @@ Route::Post('/inbox/getItemGroup', 'InboxController@getItemGroup')->name('getIte
 Route::Post('/inbox/getItem', 'InboxController@getItem')->name('getItem');
 Route::Post('/asin/get', 'AsinController@get')->name('getAsin');
 Route::Post('/inbox/change', 'InboxController@change')->name('changeInbox');
+Route::Post('/inbox/getRsgTaskData', 'InboxController@getRsgTaskData')->name('getRsgTaskData');
 Route::resource('send', 'SendController');
 Route::Post('/send/get', 'SendController@get')->name('getSendbox');
 Route::get('/send/deletefile/{filename}', 'SendController@deletefile')->name('deleteFile');
