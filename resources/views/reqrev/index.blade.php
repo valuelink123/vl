@@ -122,7 +122,7 @@ white-space: nowrap;
                         </div>
 						
 						<div class="col-md-4" style="font-size:12px;">
-							系统每日18:00对设置为Enabled的所有Asin, 查询对应7天前更新为Shipped的订单, 排除当时已有差feedback, 退款, 重发的, 全部列入自动索评任务.<br />
+							系统每日18:00对设置为Enabled的所有Asin, 查询对应15天前更新为Shipped的订单, 排除当时已有差feedback, 退款, 重发的, 全部列入自动索评任务.<br />
 							索评失败原因 1.已经发过索评 REVIEW_REQUEST_ALREADY_SENT 2.未到或超出索评时间范围 REVIEW_REQUEST_OUTSIDE_TIME_WINDOW
 									
                         </div>

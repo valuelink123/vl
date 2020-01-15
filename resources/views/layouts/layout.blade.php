@@ -220,14 +220,7 @@
                                                     </a>
                                                 </li>
 												 @endpermission
-												 @permission('reqrev-show')
-												<li class="">
-                                                    <a href="/reqrev" class="nav-link nav-toggle ">
-                                                        Auto Request Reviews
-                                                        <span class="arrow"></span>
-                                                    </a>
-                                                </li>
-												 @endpermission
+												 
 												 
 												
 												
@@ -306,6 +299,14 @@
 													</a>
 												</li>
 												@endpermission
+												@permission('reqrev-show')
+												<li class="">
+                                                    <a href="/reqrev" class="nav-link nav-toggle ">
+                                                        Auto Request Reviews
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
+												 @endpermission
                                             </ul>
                                         </li>
 
@@ -801,8 +802,8 @@
     <!-- BEGIN FOOTER -->
 	@permission('task-create')
 	<a data-target="#global_task_ajax" data-toggle="modal" href="{{ url('task/create')}}" class="btn btn-circle btn-lg green" style="position: fixed;
-    right: 10px;
-    bottom: 50px;"> Task
+    right: 70px;
+    bottom: 5px;"> Task
 		<i class="fa fa-plus"></i>
 	</a>
 
