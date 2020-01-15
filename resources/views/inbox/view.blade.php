@@ -237,17 +237,15 @@
             </ul>
             <div class="tab-content">
                 <div class="tab-pane active" id="tab_1">
-				
-				
-				<div class="col-xs-9">
+                    <div class="col-xs-9">
                         <form id="fileupload" action="{{ url('send') }}" method="POST" enctype="multipart/form-data">
                             {{ csrf_field() }}
-							<input type="hidden" name="warn" id="warn" value="0">
-							<input type="hidden" name="account_type" id="account_type" value="{{$account_type}}">
+                            <input type="hidden" name="warn" id="warn" value="0">
+                            <input type="hidden" name="account_type" id="account_type" value="{{$account_type}}">
                             <input type="hidden" name="from_address" id="from_address" value="{{$email['to_address']}}">
                             <input type="hidden" name="to_address" id="to_address" value="{{$email['from_address']}}">
                             <input type="hidden" name="inbox_id" id="inbox_id" value="{{$email['id']}}">
-							<input type="hidden" name="sendbox_id" id="sendbox_id" value="{{array_get($email,'draftId',0)}}">
+                            <input type="hidden" name="sendbox_id" id="sendbox_id" value="{{array_get($email,'draftId',0)}}">
                             <input type="hidden" name="user_id" id="user_id" value="{{Auth::user()->id}}">
                             <div class="form-group">
                             <label>Templates</label>
@@ -258,7 +256,7 @@
                                 <input type="text" class="form-control" id="tags" >
                             </div>
                         </div>
-						<div class="form-group">
+                        <div class="form-group">
                                 <label>Subject</label>
                                 <div class="input-group ">
                                 <span class="input-group-addon">
@@ -267,23 +265,23 @@
                                     <input type="text" class="form-control" name="subject" id="subject" value="{{array_get($email,'draftSubject','Re:'.$email['subject'])}}" >
                                 </div>
                             </div>
-							<div class="form-group">
-							<label class="control-label">Specify time to send ( UTC Time )</label>
-							<div class="input-group">
-								<div class="input-group date form_datetime">
-									<input type="text" size="16" name="plan_date" readonly class="form-control">
-									<span class="input-group-btn">
-										<button class="btn default date-clear" type="button">
-											<i class="fa fa-times"></i>
-										</button>
-										<button class="btn default date-set" type="button">
-											<i class="fa fa-calendar"></i>
-										</button>
-									</span>
-								</div>
-							</div>
-							
-						</div>
+                            <div class="form-group">
+                            <label class="control-label">Specify time to send ( UTC Time )</label>
+                            <div class="input-group">
+                                <div class="input-group date form_datetime">
+                                    <input type="text" size="16" name="plan_date" readonly class="form-control">
+                                    <span class="input-group-btn">
+                                        <button class="btn default date-clear" type="button">
+                                            <i class="fa fa-times"></i>
+                                        </button>
+                                        <button class="btn default date-set" type="button">
+                                            <i class="fa fa-calendar"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                            </div>
+
+                        </div>
                             <div class="form-group" >
                                     @include('UEditor::head')
 
@@ -337,38 +335,38 @@
                                     <!-- The table listing the files available for upload/download -->
                                     <table role="presentation" class="table table-striped clearfix">
                                         <tbody class="files">
-										<?php
-										if(array_get($email,'draftAttachs')) {
-											$attachs = unserialize($email['draftAttachs']);
-											foreach($attachs  as $attach){
-											$name = basename($attach);
-											if(file_exists(public_path().$attach)){
-												$filesize = round(filesize(public_path().$attach)/1028,2).'KB';
-											}else{
-												$filesize = 0;
-											}
-											$url = $attach;
-											$deleteUrl = url('send/deletefile/' . base64_encode($attach));
-										?>
-										
-										<tr class="template-download fade in">
-											<td>
-												<p class="name">
-													<a href="{{$url}}" title="{{$name}}" download="{{$name}}" >{{$name}}</a>
-														<input type="hidden" name="fileid[]" value="{{$url}}">
-			 </td>
-											<td>
-												<span class="size">{{$filesize}}</span>
-											</td>
-											<td>
-												<button class="btn red delete btn-sm" data-type="get" data-url="{{$deleteUrl}}" >
-													<i class="fa fa-trash-o"></i>
-													<span>Delete</span>
-												</button>
-												<input type="checkbox" name="delete" value="1" class="toggle"></td>
-										</tr>
-										<?php }} ?>
-										</tbody>
+                                        <?php
+                                        if(array_get($email,'draftAttachs')) {
+                                            $attachs = unserialize($email['draftAttachs']);
+                                            foreach($attachs  as $attach){
+                                            $name = basename($attach);
+                                            if(file_exists(public_path().$attach)){
+                                                $filesize = round(filesize(public_path().$attach)/1028,2).'KB';
+                                            }else{
+                                                $filesize = 0;
+                                            }
+                                            $url = $attach;
+                                            $deleteUrl = url('send/deletefile/' . base64_encode($attach));
+                                        ?>
+
+                                        <tr class="template-download fade in">
+                                            <td>
+                                                <p class="name">
+                                                    <a href="{{$url}}" title="{{$name}}" download="{{$name}}" >{{$name}}</a>
+                                                        <input type="hidden" name="fileid[]" value="{{$url}}">
+             </td>
+                                            <td>
+                                                <span class="size">{{$filesize}}</span>
+                                            </td>
+                                            <td>
+                                                <button class="btn red delete btn-sm" data-type="get" data-url="{{$deleteUrl}}" >
+                                                    <i class="fa fa-trash-o"></i>
+                                                    <span>Delete</span>
+                                                </button>
+                                                <input type="checkbox" name="delete" value="1" class="toggle"></td>
+                                        </tr>
+                                        <?php }} ?>
+                                        </tbody>
                                     </table>
                                 <div id="blueimp-gallery" class="blueimp-gallery blueimp-gallery-controls" data-filter=":even">
                                     <div class="slides"> </div>
@@ -437,192 +435,181 @@
                                     <div class="col-md-offset-4 col-md-8">
                                         <button type="submit" class="btn blue">Submit</button>
                                         <button type="reset" class="btn grey-salsa btn-outline">Cancel</button>
-										<button type="submit" class="btn yellow" name='asDraft' value="1">Save as Draft</button>
+                                        <button type="submit" class="btn yellow" name='asDraft' value="1">Save as Draft</button>
                                     </div>
                                 </div>
                             </div>
                             <div style="clear:both;"></div>
                         </form>
                         <div style="clear:both;"></div>
-                    </div>
-                <div class="col-xs-3">
-                    @include('inbox.rightBar')
-                </div>
-                    <div style="clear:both;"></div>
-					
-					
-
-		<div class="caption" style="margin:100px 5%;">
-                                                                <i class="icon-settings font-red-mint"></i>
-                                                                <span class="caption-subject font-red-mint bold uppercase">Email History</span>
-                                                            </div>
-		
-                    <div style="text-align: center;">
-                    <?php
-					if($email['mark']) echo '<span class="btn btn-circle btn-danger">'.$email['mark'].'</span> ';
-                    if($email['sku']) echo '<span class="btn btn-circle btn-primary">'.$email['sku'].'</span> ';
-					if($email['asin']) echo '<span class="btn btn-circle btn-primary">'.$email['asin'].'</span> ';
-                    if($email['etype']) echo '<span class="btn btn-circle btn-danger">'.$email['etype'].'</span> ';
-                    if($email['remark']) echo '<span class="btn btn-circle btn-info">'.$email['remark'].'</span> ';
-                    if($email['reply']==0) echo '<span class="btn btn-circle red">Need reply</span>';
-                    if($email['reply']==1) echo '<span class="btn btn-circle yellow">Do not need to reply</span>';
-                    if($email['reply']==2) echo '<span class="btn btn-circle green">Replied</span>';
-                    ?>
-                    </div>
-                    <BR>
-                    <div class="mt-timeline-2">
-
-                        <ul class="mt-container">
+                        <div class="caption" style="margin:50px 5%;">
+                            <i class="icon-settings font-red-mint"></i>
+                            <span class="caption-subject font-red-mint bold uppercase">Email History</span>
+                        </div>
+                        <div style="text-align: center;">
+                            <?php
+                            if($email['mark']) echo '<span class="btn btn-circle btn-danger">'.$email['mark'].'</span> ';
+                            if($email['sku']) echo '<span class="btn btn-circle btn-primary">'.$email['sku'].'</span> ';
+                            if($email['asin']) echo '<span class="btn btn-circle btn-primary">'.$email['asin'].'</span> ';
+                            if($email['etype']) echo '<span class="btn btn-circle btn-danger">'.$email['etype'].'</span> ';
+                            if($email['remark']) echo '<span class="btn btn-circle btn-info">'.$email['remark'].'</span> ';
+                            if($email['reply']==0) echo '<span class="btn btn-circle red">Need reply</span>';
+                            if($email['reply']==1) echo '<span class="btn btn-circle yellow">Do not need to reply</span>';
+                            if($email['reply']==2) echo '<span class="btn btn-circle green">Replied</span>';
+                            ?>
+                        </div>
+                        <BR>
+                        <div class="mt-timeline-2">
+                            <ul class="mt-container">
+                            <?php foreach($email_history as $s_email){ ?>
 
 
-                        <?php foreach($email_history as $s_email){ ?>
-
-
-                        <?php if(isset($s_email['mail_id'])){ ?>
-                        <!--接收-->
-                            <li class="mt-item">
-                                <div class="mt-timeline-icon bg-red bg-font-red border-grey-steel" style="left:5%;">
-                                    <i class="icon-action-redo"></i>
-                                </div>
-                                <div class="mt-timeline-content" style="width:95%;">
-                                    <div class="mt-content-container" style="margin-right: 0px;margin-left:12%;">
-                                        <div class="mt-title" style="float:left;text-align:left;">
-                                            <h3 class="mt-content-title">{{$s_email['subject']}}</h3>
-                                        </div>
-                                        <div class="mt-author" style="float:right;text-align:right">
-                                            <div class="mt-author-name" style="text-align:right">
-                                                <span class="font-red-madison" >From : {{$s_email['from_name']}}  < {{$s_email['from_address']}} ></span>{!! $s_email['fromAddressRsgStatusHtml'] !!}
+                            <?php if(isset($s_email['mail_id'])){ ?>
+                            <!--接收-->
+                                <li class="mt-item">
+                                    <div class="mt-timeline-icon bg-red bg-font-red border-grey-steel" style="left:5%;">
+                                        <i class="icon-action-redo"></i>
+                                    </div>
+                                    <div class="mt-timeline-content" style="width:95%;">
+                                        <div class="mt-content-container" style="margin-right: 0px;margin-left:12%;">
+                                            <div class="mt-title" style="float:left;text-align:left;">
+                                                <h3 class="mt-content-title">{{$s_email['subject']}}</h3>
                                             </div>
-                                            <div class="mt-author-name" style="text-align:right">
-                                                <span class="font-blue-madison" >To : @if(isset($accounts[strtolower($s_email['to_address'])])) {{$accounts[strtolower($s_email['to_address'])]}} @endif < {{$s_email['to_address']}} ></span>{!! $s_email['toAddressRsgStatusHtml'] !!}
+                                            <div class="mt-author" style="float:right;text-align:right">
+                                                <div class="mt-author-name" style="text-align:right">
+                                                    <span class="font-red-madison" >From : {{$s_email['from_name']}}  < {{$s_email['from_address']}} ></span>{!! $s_email['fromAddressRsgStatusHtml'] !!}
+                                                </div>
+                                                <div class="mt-author-name" style="text-align:right">
+                                                    <span class="font-blue-madison" >To : @if(isset($accounts[strtolower($s_email['to_address'])])) {{$accounts[strtolower($s_email['to_address'])]}} @endif < {{$s_email['to_address']}} ></span>{!! $s_email['toAddressRsgStatusHtml'] !!}
+                                                </div>
+                                                <div class="mt-author-notes font-grey-mint" style="text-align:right">{{$s_email['date']}} <span class="label label-sm label-danger">{{array_get($users,$s_email['user_id'])}}</span></div>
                                             </div>
-                                            <div class="mt-author-notes font-grey-mint" style="text-align:right">{{$s_email['date']}} <span class="label label-sm label-danger">{{array_get($users,$s_email['user_id'])}}</span></div>
+                                            <div class="mt-content border-grey-salt">
+
+                                                <?php
+                                                if($s_email['text_html']){
+                                                    $s_email['text_html'] = preg_replace( "/<script[\s\S]*?<\/script>/i", "", $s_email['text_html'] );
+                                                    $s_email['text_html'] = preg_replace( "/<iframe[\s\S]*?<\/iframe>/i", "", $s_email['text_html'] );
+                                                    $s_email['text_html'] = preg_replace( "/<style[\s\S]*?<\/style>/i", "", $s_email['text_html'] );
+                                                    $config = array('indent' => TRUE,
+                                                        'output-xhtml' => TRUE,
+                                                        'wrap' => 200);
+
+                                                    $tidy = tidy_parse_string($s_email['text_html'], $config, 'UTF8');
+
+                                                    $tidy->cleanRepair();
+                                                    echo $tidy;
+
+                                                }else{
+                                                    echo '<pre>'.htmlspecialchars($s_email['text_plain']).'</pre>';
+                                                }
+                                                ?>
+
+
+                                                <BR>
+                                                <?php if($s_email['attachs']){
+                                                    $attachs = unserialize($s_email['attachs']);
+                                                    foreach($attachs as $attach){
+                                                        $name = basename($attach);
+                                                        echo '<a href="'.$attach.'" target="_blank" class="btn btn-circle btn-outline green-jungle">'.$name.'</a>';
+                                                    }
+
+                                                }?>
+                                            </div>
                                         </div>
-                                        <div class="mt-content border-grey-salt">
-										
-											<?php
-                                            if($s_email['text_html']){
-												$s_email['text_html'] = preg_replace( "/<script[\s\S]*?<\/script>/i", "", $s_email['text_html'] );   
-												$s_email['text_html'] = preg_replace( "/<iframe[\s\S]*?<\/iframe>/i", "", $s_email['text_html'] );   
-												$s_email['text_html'] = preg_replace( "/<style[\s\S]*?<\/style>/i", "", $s_email['text_html'] ); 
-                                                $config = array('indent' => TRUE,
-                                                    'output-xhtml' => TRUE,
-                                                    'wrap' => 200);
+                                    </div>
 
-                                                $tidy = tidy_parse_string($s_email['text_html'], $config, 'UTF8');
+                                </li>
+                                <!--接收-->
+                            <?php }else{ ?>
+                            <!--发送-->
+                                <li class="mt-item">
+                                    <div class="mt-timeline-icon bg-green-jungle bg-font-green-jungle border-grey-steel" style="left:95%;">
+                                        <i class="icon-action-undo"></i>
+                                    </div>
+                                    <div class="mt-timeline-content" style="width:95%;left:5%;">
+                                        <div class="mt-content-container " style="margin-right: 12%;margin-left:0;">
+                                            <div class="mt-title" style="float:right;text-align:right;">
+                                                <h3 class="mt-content-title">{{$s_email['subject']}}</h3>
+                                            </div>
+                                            <div class="mt-author" style="float:left;text-align:left">
+                                                <div class="mt-author-name" style="text-align:left; float:left">
+                                                    <span class="font-red-madison" >From : @if(isset($accounts[strtolower($s_email['from_address'])])) {{$accounts[strtolower($s_email['from_address'])]}} @endif < {{$s_email['from_address']}} ></span>{!! $s_email['fromAddressRsgStatusHtml'] !!}
+                                                </div>
+                                                <div style="clear: both"></div>
+                                                <div class="mt-author-name" style="text-align:left; float:left">
+                                                    <span href="javascript:;" class="font-blue-madison" >To : {{$s_email['to_address']}}</span>{!! $s_email['toAddressRsgStatusHtml'] !!}
+                                                </div>
+                                                <div style="clear: both"></div>
+                                                <div class="mt-author-notes font-grey-mint" style="text-align:left">{{$s_email['date']}} <span class="label label-sm label-danger">{{array_get($users,$s_email['user_id'])}}</span></div>
+                                            </div>
 
-                                                $tidy->cleanRepair();
-                                                echo $tidy;
+                                            <div class="mt-content border-grey-steel">
+                                        <span class="btn btn-circle <?php echo ($s_email['send_date'])?'green':'red';?>">
+                                             <?php
+                                            echo $s_email['status'].' ';
 
-                                            }else{
-                                                echo '<pre>'.htmlspecialchars($s_email['text_plain']).'</pre>';
+                                            if($s_email['send_date']) echo ' at '.$s_email['send_date'];
+
+                                            if($s_email['error']){
+                                                echo ' Error :'.$s_email['error'];
+                                            }elseif($s_email['plan_date']){
+                                                echo ' Plan at :'.date('Y-m-d H:i:s',$s_email['plan_date']);
                                             }
                                             ?>
-                                           
+                                        </span>
+                                                <?php if($s_email['status']=='Waiting'){ ?>
+                                                <a class="btn green-sharp btn-circle" data-toggle="confirmation" data-popout="true" href="{{url('sendcs/'.$s_email['id'])}}">Withdraw</a>
+                                                <?php } ?>
+                                                <BR>
+                                                <?php
+                                                $config = array(
+                                                    'output-xhtml'=>true,
+                                                    'drop-empty-paras'=>FALSE,
+                                                    'join-classes'=>TRUE,
+                                                    'show-body-only'=>TRUE,
+                                                );
 
-                                            <BR>
-                                            <?php if($s_email['attachs']){
-                                                $attachs = unserialize($s_email['attachs']);
-                                                foreach($attachs as $attach){
-                                                    $name = basename($attach);
-                                                    echo '<a href="'.$attach.'" target="_blank" class="btn btn-circle btn-outline green-jungle">'.$name.'</a>';
-                                                }
 
-                                            }?>
+                                                $str = tidy_repair_string($s_email['text_html'], $config, 'UTF8');
+
+                                                $str = tidy_parse_string($str,$config, 'UTF8');
+
+                                                echo $str;
+
+                                                ?>
+
+
+                                                <BR>
+                                                <?php if($s_email['attachs']){
+                                                    $attachs = unserialize($s_email['attachs']);
+                                                    foreach($attachs as $attach){
+                                                        $name = basename($attach);
+                                                        echo '<a href="'.$attach.'" target="_blank" class="btn btn-circle btn-outline green-jungle">'.$name.'</a>';
+                                                    }
+
+                                                }?>
+                                            </div>
+
+
                                         </div>
                                     </div>
-                                </div>
+                                </li>
+                                <!--发送-->
 
-                            </li>
-                            <!--接收-->
-                        <?php }else{ ?>
-                        <!--发送-->
-                            <li class="mt-item">
-                                <div class="mt-timeline-icon bg-green-jungle bg-font-green-jungle border-grey-steel" style="left:95%;">
-                                    <i class="icon-action-undo"></i>
-                                </div>
-                                <div class="mt-timeline-content" style="width:95%;left:5%;">
-                                    <div class="mt-content-container " style="margin-right: 12%;margin-left:0;">
-                                        <div class="mt-title" style="float:right;text-align:right;">
-                                            <h3 class="mt-content-title">{{$s_email['subject']}}</h3>
-                                        </div>
-                                        <div class="mt-author" style="float:left;text-align:left">
-                                            <div class="mt-author-name" style="text-align:left; float:left">
-                                                <span class="font-red-madison" >From : @if(isset($accounts[strtolower($s_email['from_address'])])) {{$accounts[strtolower($s_email['from_address'])]}} @endif < {{$s_email['from_address']}} ></span>{!! $s_email['fromAddressRsgStatusHtml'] !!}
-                                            </div>
-                                            <div style="clear: both"></div>
-                                            <div class="mt-author-name" style="text-align:left; float:left">
-                                                <span href="javascript:;" class="font-blue-madison" >To : {{$s_email['to_address']}}</span>{!! $s_email['toAddressRsgStatusHtml'] !!}
-                                            </div>
-                                            <div style="clear: both"></div>
-                                            <div class="mt-author-notes font-grey-mint" style="text-align:left">{{$s_email['date']}} <span class="label label-sm label-danger">{{array_get($users,$s_email['user_id'])}}</span></div>
-                                        </div>
-
-                                        <div class="mt-content border-grey-steel">
-                                    <span class="btn btn-circle <?php echo ($s_email['send_date'])?'green':'red';?>">
-                                         <?php
-										echo $s_email['status'].' ';
-										
-										if($s_email['send_date']) echo ' at '.$s_email['send_date'];
-										
-                                        if($s_email['error']){ 
-											echo ' Error :'.$s_email['error'];
-										}elseif($s_email['plan_date']){
-											echo ' Plan at :'.date('Y-m-d H:i:s',$s_email['plan_date']);
-										}
-                                        ?>
-                                    </span>
-									<?php if($s_email['status']=='Waiting'){ ?>
-									<a class="btn green-sharp btn-circle" data-toggle="confirmation" data-popout="true" href="{{url('sendcs/'.$s_email['id'])}}">Withdraw</a>
-									<?php } ?>
-                                            <BR>
-                                            <?php
-                                           $config = array( 
-											'output-xhtml'=>true,
-											'drop-empty-paras'=>FALSE,
-											'join-classes'=>TRUE,
-											'show-body-only'=>TRUE,
-											); 
+                                <?php } ?>
 
 
-											$str = tidy_repair_string($s_email['text_html'], $config, 'UTF8');
-	 
-											$str = tidy_parse_string($str,$config, 'UTF8');
+                                <?php } ?>
+                            </ul>
+                        </div>
+                    </div>
 
-                                            echo $str;
-											
-                                            ?>
-											
-											
-                                            <BR>
-                                            <?php if($s_email['attachs']){
-                                                $attachs = unserialize($s_email['attachs']);
-                                                foreach($attachs as $attach){
-                                                    $name = basename($attach);
-                                                    echo '<a href="'.$attach.'" target="_blank" class="btn btn-circle btn-outline green-jungle">'.$name.'</a>';
-                                                }
-
-                                            }?>
-                                        </div>
-
-
-                                    </div>
-                                </div>
-                            </li>
-                            <!--发送-->
-
-                            <?php } ?>
-
-
-                            <?php } ?>
-
-
-
-
-                        </ul>
+                    <div class="col-xs-3">
+                        @include('inbox.rightBar')
                     </div>
                 </div>
-
+                <div style="clear:both;"></div>
 
                 <div class="tab-pane" id="tab_2">
 
