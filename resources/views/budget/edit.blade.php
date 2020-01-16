@@ -512,6 +512,7 @@ var FormEditable = function() {
 			text: "<?php echo $v?>"
 		});
 		<?php }?>
+		<?php if(in_array(intval(($budget->status)??0),array_keys($budgetRule))) {?>
 		$('.budget_status').editable({
             inputclass: 'form-control input-medium',
             source: stages,
@@ -544,6 +545,7 @@ var FormEditable = function() {
 				
 			}
         });
+		<?php } ?>
 		$('.budget_remark').editable({
 			emptytext:'N/A'
 		});
