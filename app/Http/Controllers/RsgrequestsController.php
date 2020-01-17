@@ -256,7 +256,7 @@ class RsgrequestsController extends Controller
 
 			}
 			$lists[$key]['channel'] = isset($channelKeyVal[$list['channel']]) ? $channelKeyVal[$list['channel']] : '';
-			$lists[$key]['asin_link'] = '<a href="https://'.array_get($list,'site').'/dp/'.array_get($list,'asin').'?m='.array_get($list,'seller_id').'" target="_blank">'.$list['asin'].'</a>';
+			$lists[$key]['asin_link'] = '<a href="https://'.array_get($list,'site').'/dp/'.array_get($list,'asin').'" target="_blank">'.$list['asin'].'</a>';
 			$lists[$key]['funded'] = sprintf("%.2f",(isset($starData[$list['asin'].'_'.$list['site']]) ? $starData[$list['asin'].'_'.$list['site']] : $list['transfer_amount'])).' '.$list['transfer_currency'];
 			$lists[$key]['review_url'] = '<div style="width: 200px;word-wrap: break-word;text-align: center;">'.$list['review_url'].'<BR><span class="text-danger">'.$list['transaction_id'].'</span></div>';
 			$lists[$key]['sales'] = isset($users[$list['user_id']]) ? $users[$list['user_id']] : $list['user_id'];

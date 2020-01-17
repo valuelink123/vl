@@ -330,7 +330,7 @@ class RsgproductsController extends Controller
 			$data[$key]['basic_asin'] = $val['asin'];
 			$data[$key]['product'] = '<a target="_blank" href="https://rsg.claimthegift.com/product/detail?id='.$val['asin_id'].'"><img src="'.$val['img'].'" width="50px" height="65px"></a>';
 			$data[$key]['site'] = isset($siteShort[$val['site']]) ? $siteShort[$val['site']] : $val['site'];
-			$data[$key]['asin'] = '<a href="https://' . $val['site'] . '/dp/' . $val['asin'] . '?m='.$val['seller_id'].'" target="_blank" rel="noreferrer">' . $val['asin'] . '</a>';//asin插入超链接
+			$data[$key]['asin'] = '<a href="https://' . $val['site'] . '/dp/' . $val['asin'] .'" target="_blank" rel="noreferrer">' . $val['asin'] . '</a>';//asin插入超链接
 			$data[$key]['type'] = isset($postType[$val['post_type']]) ? $postType[$val['post_type']]['name'] : $val['post_type'];//post_type
 			$data[$key]['status'] = isset($postStatus[$val['post_status']]) ? $postStatus[$val['post_status']]['name'] : $val['post_status'];
 			$data[$key]['requested_review'] = $val['requested_review'];

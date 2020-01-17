@@ -565,7 +565,7 @@ class InboxController extends Controller
         foreach ($data as $key => $val) {
             $data[$key]['rank'] = $i;
             $data[$key]['product'] = '<a target="_blank" href="https://rsg.claimthegift.com/product/detail?id='.$val['asin_id'].'"><img src="'.$val['img'].'" width="50px" height="65px"></a>';
-            $data[$key]['asin'] = '<a href="https://' . $val['site'] . '/dp/' . $val['asin'] . '?m='.$val['seller_id'].'" target="_blank" rel="noreferrer">' . $val['asin'] . '</a>';//asin插入超链接
+            $data[$key]['asin'] = '<a href="https://' . $val['site'] . '/dp/' . $val['asin'] . '" target="_blank" rel="noreferrer">' . $val['asin'] . '</a>';//asin插入超链接
             $data[$key]['action'] = '<a data-target="#ajax" class="badge badge-success" data-toggle="modal" href="/rsgrequests/create?productid='.$val['id'].'&asin=' . $val['asin'] . '&site=' . $val['site'] . '"> 
                                     <i class="fa fa-hand-o-up"></i></a>';
             if($data[$key]['task']<=0){
