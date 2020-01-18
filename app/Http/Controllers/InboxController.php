@@ -176,7 +176,7 @@ class InboxController extends Controller
 		}
 
 		$email = $email->toArray();
-        $client_email = $email['to_address'];
+        $client_email = $email['from_address'];
         $client_id_query = DB::table('client_info')->leftJoin('client',function($q){
             $q->on('client.id', '=', 'client_info.client_id');
         })->where('client_info.email',$client_email)->select(['client.id'])->first();
