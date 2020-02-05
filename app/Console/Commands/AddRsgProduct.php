@@ -158,13 +158,15 @@ class AddRsgProduct extends Command
 			//美国站点 5个/天 其他站点3个/天， 新品上线第一周(帖子状态为待推贴，并且更新时间为一周内)美国站点 10个/天 其他站点5个/天
 			if($val['post_status']==2 && (time()-strtotime($val['push_date'])) <= 86400*7){//新品上线第一周
 				if($val['site']=='www.amazon.com'){
-					$sales_target_reviews = 20;
+					$sales_target_reviews = 10;
 				}else{
 					$sales_target_reviews = 5;
 				}
 			}else{
-				if($val['site']=='www.amazon.com'){
+				if($val['site']=='www.amazon.com' && $val['order_status']==1){
 					$sales_target_reviews = 20;
+				}elseif($val['site']=='www.amazon.com'){
+					$sales_target_reviews = 10;
 				}else{
 					$sales_target_reviews = 3;
 				}
