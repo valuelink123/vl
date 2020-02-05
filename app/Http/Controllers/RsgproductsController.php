@@ -187,7 +187,7 @@ class RsgproductsController extends Controller
 		$date = $todayDate = $this->getDefaultDate(date('Y-m-d'));
 
 		$where = " and created_at = '".$date."' ";
-		$where_product = " and created_at = '".$date."' and cast(rsg_products.sales_target_reviews as signed) - cast(rsg_products.requested_review as signed) > 0 ";
+		$where_product = " and created_at = '".$date."' and cast(rsg_products.sales_target_reviews as signed) - cast(rsg_products.requested_review as signed) > 0 and rsg_products.order_status != -1";
 
 		//限制站点搜索
 		$siteArrConfig = getSiteArr()['site'];
