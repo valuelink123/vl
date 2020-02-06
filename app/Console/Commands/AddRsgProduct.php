@@ -163,7 +163,7 @@ class AddRsgProduct extends Command
 					$sales_target_reviews = 5;
 				}
 			}else{
-				if($val['site']=='www.amazon.com' && $val['order_status']==1){
+				if($val['site']=='www.amazon.com' && array_get($orderdata,$val['asin'].'_'.$val['site'])==1){
 					$sales_target_reviews = 20;
 				}elseif($val['site']=='www.amazon.com'){
 					$sales_target_reviews = 10;
