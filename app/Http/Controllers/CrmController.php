@@ -637,7 +637,7 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 
 						//循环得到已存在的邮箱和已存在的订单号
 						foreach($_data as $key=>$val){
-							$sameEmail[$val['email']] = $val['id'];
+							$sameEmail[strtoupper($val['email'])] = $val['id'];
 						}
 						
 						$sql = 'select amazon_order_id
@@ -645,7 +645,7 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 								where amazon_order_id in ("'.join('","',$orderArr).'")';
 						$_data = $this->queryRows($sql);
 						foreach($_data as $key=>$val){
-							$sameOrder[$val['amazon_order_id']] = $val['amazon_order_id'];
+							$sameOrder[strtoupper($val['amazon_order_id'])] = $val['amazon_order_id'];
 						}
 						$insertOrder = array();
 
@@ -653,13 +653,13 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 						DB::beginTransaction();//开启事务处理
 						//循环处理插入数据
 						foreach($importData as $key => $data){
-							if(isset($sameOrder[$data['D']])){//存在相同的订单的数据就忽略掉
+							if(isset($sameOrder[strtoupper($data['D'])])){//存在相同的订单的数据就忽略掉
 								unset($importData[$key]);
 								continue;
 							}
 
 							//检查是否有相同的邮箱,email要保持唯一性,得到相同邮箱的client_info的id
-							$ci_id = isset($sameEmail[$data['B']]) ? $sameEmail[$data['B']] : 0;
+							$ci_id = isset($sameEmail[strtoupper($data['B'])]) ? $sameEmail[strtoupper($data['B'])] : 0;
 							if(empty($ci_id)){
 								$insertInfo = array(
 									'name'=>$data['A'],
@@ -673,7 +673,7 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 								$insertInfo['client_id'] = $res = DB::table('client')->insertGetId(array('date'=>date('Y-m-d H:i:s'),'created_at'=>date('Y-m-d H:i:s'),'updated_at'=>date('Y-m-d H:i:s')));
 								if($res){
 									$ci_id = DB::table('client_info')->insertGetId($insertInfo);
-									$sameEmail[$data['B']] = $ci_id;//此邮箱添加的数据的client_info的id保存
+									$sameEmail[strtoupper($data['B'])] = $ci_id;//此邮箱添加的数据的client_info的id保存
 								}
 
 							}
