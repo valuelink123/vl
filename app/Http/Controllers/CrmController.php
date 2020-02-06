@@ -627,20 +627,26 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 							$request->session()->flash('error_message','Import Data Failed,You can only add 600 pieces of data');
 							return redirect()->back()->withInput();
 						}
+						
+						$sameEmail = $sameOrder = array();
 						//判断email和oderid是否已经存在，已经存在就提示
-						$sql = 'select b.id as id,b.email as email,c.amazon_order_id as amazon_order_id
-								FROM client_info as b
-								left join client_order_info as c on b.id = c.ci_id 
-								where email in("'.join('","',$emailArr).'") and amazon_order_id in ("'.join('","',$orderArr).'")';
+						$sql = 'select id ,email
+								FROM client_info
+								where email in("'.join('","',$emailArr).'")';
 						$_data = $this->queryRows($sql);
 
 						//循环得到已存在的邮箱和已存在的订单号
-						$sameEmail = $sameOrder = array();
 						foreach($_data as $key=>$val){
 							$sameEmail[$val['email']] = $val['id'];
+						}
+						
+						$sql = 'select amazon_order_id
+								FROM client_order_info
+								where amazon_order_id in ("'.join('","',$orderArr).'")';
+						$_data = $this->queryRows($sql);
+						foreach($_data as $key=>$val){
 							$sameOrder[$val['amazon_order_id']] = $val['amazon_order_id'];
 						}
-
 						$insertOrder = array();
 
 						//开始插入数据
