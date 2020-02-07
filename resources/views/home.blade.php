@@ -380,18 +380,18 @@ a.editable-click:hover {
 					<table class="table table-hover">
 						
 							<tr>
-								<th style="text-align: left;" width="8%">Asin</th>
+								<th style="text-align: left;" width="11%">Asin</th>
 								<th style="text-align: left;" width="6%">Sku</th>
-								<th style="text-align: left;" width="6%">Status</th>
+								<th style="text-align: left;" width="5%">Status</th>
 								<th width="6%">Sales</th>
-								<th width="5%">Units</th>
+								<th width="4%">Units</th>
 								<th width="5%">Units/D</th>
 								
 								<th width="5%">AvgPrice</th>
 								<th width="5%">Instock</th>
 								<th width="5%">Reserved</th>
 								<th width="6%">Outstock</th>
-								<th width="5%">FBM</th>
+								<th width="4%">FBM</th>
 								<th width="6%">Rating</th>
 								<th width="5%">Sess<font style="color:#ccc;"><i  class="fa fa-info-circle popovers" data-container="body" onclick=" " data-trigger="hover" data-placement="top" data-html="true" data-content="Average data from {{date('Y-m-d',strtotime('-10days'))}} to {{date('Y-m-d',strtotime('-4days'))}}"></i></font></th>
 								<th width="5%">CR% <font style="color:#ccc;"><i  class="fa fa-info-circle popovers" data-container="body" onclick=" " data-trigger="hover" data-placement="top" data-html="true" data-content="Average data from {{date('Y-m-d',strtotime('-10days'))}} to {{date('Y-m-d',strtotime('-4days'))}}"></i></font></th>
@@ -409,7 +409,7 @@ a.editable-click:hover {
 						$sales = ((((array_get($asin,'sales_07_01')??array_get($asin,'sales_14_08'))??array_get($asin,'sales_21_15'))??array_get($asin,'sales_28_22'))??0)/7 ;?>
 						<tr>
 							<td style="text-align: left;">
-								<a href="https://{{array_get($asin,'site')}}/dp/{{array_get($asin,'asin')}}" class="primary-link" target="_blank">{{array_get($asin,'asin')}}</a>
+								<a href="https://{{array_get($asin,'site')}}/dp/{{array_get($asin,'asin')}}" class="primary-link" target="_blank">{{array_get($asin,'asin')}}</a> <a href="/seller/{{array_get($asin,'asin')}}/{{array_get(siteToMarketplaceid(),array_get($asin,'site'))}}"><i class="fa fa-info-circle"></i></a>
 							</td >
 							<td style="text-align: left;"> {{array_get($asin,'item_no')}} </td>
 							<td style="text-align: left;"> {{array_get($asin,'sku_status')}} </td>
