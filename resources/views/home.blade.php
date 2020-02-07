@@ -409,7 +409,7 @@ a.editable-click:hover {
 						$sales = ((((array_get($asin,'sales_07_01')??array_get($asin,'sales_14_08'))??array_get($asin,'sales_21_15'))??array_get($asin,'sales_28_22'))??0)/7 ;?>
 						<tr>
 							<td style="text-align: left;">
-								<a href="https://{{array_get($asin,'site')}}/dp/{{array_get($asin,'asin')}}" class="primary-link" target="_blank">{{array_get($asin,'asin')}}</a> <a href="/seller/{{array_get($asin,'asin')}}/{{array_get(siteToMarketplaceid(),array_get($asin,'site'))}}"><i class="fa fa-info-circle"></i></a>
+								<a href="https://{{array_get($asin,'site')}}/dp/{{array_get($asin,'asin')}}" class="primary-link" target="_blank">{{array_get($asin,'asin')}}</a> <a href="/seller/{{array_get($asin,'asin')}}/{{array_get(siteToMarketplaceid(),array_get($asin,'site'))}}"><i class="fa fa-tasks"></i></a>
 							</td >
 							<td style="text-align: left;"> {{array_get($asin,'item_no')}} </td>
 							<td style="text-align: left;"> {{array_get($asin,'sku_status')}} </td>
