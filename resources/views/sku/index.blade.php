@@ -238,7 +238,7 @@ font-weight:bold;
 						  <tr>
 							<td style="word-wrap: break-word;"><a href="https://{{$data->site}}/dp/{{strip_tags(str_replace('&nbsp;','',$data->asin))}}" target="_blank">{{strip_tags(str_replace('&nbsp;','',$data->asin))}}</a></td>
 							<td>{{strtoupper(substr(strrchr($data->site, '.'), 1))}}</td>
-							<td>{{$data->item_code}}</td>
+							<td>{!!str_replace(',','<br />',$data->item_code)!!}</td>
 							<td>{!!($data->status)?'<span class="btn btn-success btn-xs">Reserved</span>':'<span class="btn btn-danger btn-xs">Eliminate</span>'!!}</td>
 							<td>{{((($data->pro_status) === '0')?'S':$data->pro_status)}}</td>
 							
@@ -248,7 +248,7 @@ font-weight:bold;
 							<td colspan="3" class="keyword_s"><a class="sku_keywords" href="javascript:;" id="{{$data->site.'-'.$data->asin.'-'.$curr_date}}-keywords" data-pk="{{$data->site.'-'.$data->asin.'-'.$curr_date}}-keywords" data-type="text"> {{$data->last_keywords}} </a></td>
 							
 							
-							<td colspan="4">{{$data->item_name}}</td>
+							<td colspan="4">{!!str_replace(',','<br />',$data->item_name)!!}</td>
 						  </tr>
 						  
 						  
