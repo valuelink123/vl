@@ -209,7 +209,7 @@ font-weight:bold;
 						
 						if($data->target_amount>0){
 							$complete_amount = round($data->amount/$data->target_amount*100,2);
-						}elseif($data->target_sales<0){
+						}elseif($data->target_amount<0){
 							$complete_amount = round((2-$data->amount/$data->target_amount)*100,2);
 						}else{
 							$complete_amount =0;
@@ -217,7 +217,7 @@ font-weight:bold;
 						
 						if($data->target_profit>0){
 							$complete_profit = round($data->profit/$data->target_profit*100,2);
-						}elseif($data->target_sales<0){
+						}elseif($data->target_profit<0){
 							$complete_profit = round((2-$data->profit/$data->target_profit)*100,2);
 						}else{
 							$complete_profit =0;
