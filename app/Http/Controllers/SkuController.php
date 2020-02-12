@@ -8,6 +8,10 @@ use App\Classes\SapRfcRequest;
 use App\User;
 use App\Skusweek;
 use App\Skusweekdetails;
+use App\SkusDailyInfo;
+use App\Budgets;
+use App\Budgetskus;
+use App\Budgetdetails;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Services\MultipleQueue;
@@ -40,8 +44,9 @@ class SkuController extends Controller
 		$user_id = $request->get('user_id');
 		$sku = $request->get('sku');
 		$level = $request->get('level');
-	    $date_start = $request->get('date_start')?$request->get('date_start'):date('Y-m-d',strtotime('+ 8hours'));
-		$week = self::getWeek($date_start);
+	    $date_start = $request->get('date_start')?$request->get('date_start'):date('Y-m-d',strtotime('-14 days'));
+		$date_end = $request->get('date_end')?$request->get('date_end'):date('Y-m-d');
+		if($date_end<$date_start) $date_end = $date_start;
 
 		$where= "where length(trim(asin))=10";
 		
@@ -75,21 +80,20 @@ class SkuController extends Controller
 		}
 		$where_add='1=1';
 		if($sku){
-			$where_add = " (asin='".$sku."' or item_code like '%".$sku."%')";
+			$where_add = " (asin='".$sku."' or item_code like '%".$sku."%' or item_name like '%".$sku."%')";
 		}
 		
 		
-		$sql = "(select * from (select asin,site,GROUP_CONCAT(a.item_no) as item_code,GROUP_CONCAT(b.item_name) as item_name,max(item_status) as status,
-min(status) as pro_status, max(bg) as bg,max(bu) as bu,max(sap_seller_id) as sap_seller_id
+		$sql = "(select * from (select asin,site,group_concat(a.item_no) as item_code,group_concat(b.item_name) as item_name,any_value(item_status) as status,
+any_value(status) as pro_status, any_value(bg) as bg,any_value(bu) as bu,any_value(sap_seller_id) as sap_seller_id
 from 
 
-(select asin,site,item_no,max(item_status) as item_status,
-min(case when status = 'S' Then '0' else status end) as status, 
-max(bg) as bg,max(bu) as bu,max(sap_seller_id) as sap_seller_id from asin group by asin,site,item_no)
+(select asin,site,item_no,any_value(item_status) as item_status,
+any_value(case when status = 'S' Then '0' else status end) as status, 
+any_value(bg) as bg,any_value(bu) as bu,any_value(sap_seller_id) as sap_seller_id from asin group by asin,site,item_no)
 
  as a left join fbm_stock as b on a.item_no=b.item_code   group by asin,site) as c $where order by pro_status asc) as sku_tmp_cc";
  		$datas = DB::table(DB::raw($sql))->whereRaw($where_add)->paginate(5);
-		$date_arr=$asin_site_arr=$datas_details=$oa_data=$sap_data=$last_keywords=[];
 		$site_code['www_amazon_com']='US';
 		$site_code['www_amazon_ca']='CA';
 		$site_code['www_amazon_de']='DE';
@@ -98,118 +102,37 @@ max(bg) as bg,max(bu) as bu,max(sap_seller_id) as sap_seller_id from asin group 
 		$site_code['www_amazon_co_uk']='UK';
 		$site_code['www_amazon_fr']='FR';
 		$site_code['www_amazon_co_jp']='JP';
-		$sap = new SapRfcRequest();
 		foreach($datas as $data){
-			$sku_site_arr=[];
-			$asin_site_arr[] = "(asin = '".$data->asin."' and site='".$data->site."')";
 			$match_sku = explode(',',$data->item_code);
-			if(count($match_sku)>1){
-				$vv001=$vsrhj=$vvvvv=0;
-				foreach($match_sku as $k=>$v){
-					$sku_site_arr[] = "(SKU = '".$v."' and site='".array_get($site_code,str_replace('.','_',$data->site),'')."')";
-					
-					$rows = $sap->getTureSales(['sku' => $v,'site' => array_get(array_flip(getSapSiteCode()),str_replace('www.','',$data->site)),'month' => date('Ym',strtotime($date_start))]);
-					$s_vv001 = array_get($rows,'1.VV001');
-					if(substr($s_vv001, -1) =='-'){
-						$s_vv001 = round('-'.rtrim($s_vv001, "-"),2);
-					}else{
-						$s_vv001 = round($s_vv001,2);
-					}
-					$s_vsrhj = array_get($rows,'1.VSRHJ');
-					if(substr($s_vsrhj, -1) =='-'){
-						$s_vsrhj = round('-'.rtrim($s_vsrhj, "-"),2);
-					}else{
-						$s_vsrhj = round($s_vsrhj,2);
-					}
-					$s_vvvvv = array_get($rows,'1.VVVVV');
-					if(substr($s_vvvvv, -1) =='-'){
-						$s_vvvvv = round('-'.rtrim($s_vvvvv, "-"),2);
-					}else{
-						$s_vvvvv = round($s_vvvvv,2); 
-					}
-					$vv001+=$s_vv001;
-					$vsrhj+=$s_vsrhj;
-					$vvvvv+=$s_vvvvv;
-				}
-				
-				
+			$rows = SkusDailyInfo::whereIn('sku',$match_sku)->where('site',$data->site)->selectRaw('sum(amount) as amount,sum(sales) as sales,sum(profit) as profit')
+			->where('date','>=',$date_start)->where('date','<=',$date_end)->first()->toArray();
+			$data->amount=round($rows['amount'],2);
+			$data->sales=round($rows['sales'],2);
+			$data->profit=round($rows['profit'],2);
 			
-			}else{
-				$sku_site_arr[] = "(SKU = '".$data->item_code."' and site='".array_get($site_code,str_replace('.','_',$data->site),'')."')";
-				
-				$rows = $sap->getTureSales(['sku' => $data->item_code,'site' => array_get(array_flip(getSapSiteCode()),str_replace('www.','',$data->site)),'month' => date('Ym',strtotime($date_start))]);
-				$vv001 = array_get($rows,'1.VV001');
-				if(substr($vv001, -1) =='-'){
-					$vv001 = round('-'.rtrim($vv001, "-"),2);
-				}else{
-					$vv001 = round($vv001,2);
-				}
-				$vsrhj = array_get($rows,'1.VSRHJ');
-				if(substr($vsrhj, -1) =='-'){
-					$vsrhj = round('-'.rtrim($vsrhj, "-"),2);
-				}else{
-					$vsrhj = round($vsrhj,2);
-				}
-				$vvvvv = array_get($rows,'1.VVVVV');
-				if(substr($vvvvv, -1) =='-'){
-					$vvvvv = round('-'.rtrim($vvvvv, "-"),2);
-				}else{
-					$vvvvv = round($vvvvv,2);
-				}
-			}
+			$budgets_ids = Budgets::whereIn('sku',$match_sku)->where('site',$data->site)->pluck('id');
 			
 			
-			$oa_datas = DB::connection('oa')->table('uf_new_pro')->whereRaw('('.implode(' or ',$sku_site_arr).')')->get();
+			$rows = Budgetdetails::whereIn('budget_id',$budgets_ids)->selectRaw('sum(income) as target_amount,sum(qty) as target_sales,sum(income-cost-common_fee-pick_fee-promotion_fee-amount_fee-storage_fee) as target_profit')
+			->where('date','>=',$date_start)->where('date','<=',$date_end)->first()->toArray();
 			
-				$oa_datas=json_decode(json_encode($oa_datas), true);
-				foreach($oa_datas as $od){
-					$oa_data[str_replace('.','',$data->site).'-'.$data->item_code] = $od;
-				}
-				
-			$sap_data[str_replace('.','',$data->site).'-'.$data->item_code] = array(
-				'VV001'=>$vv001,
-				'VSRHJ'=>$vsrhj,
-				'VVVVV'=>$vvvvv,
-			);
-			
-			$last_keywords[str_replace('.','',$data->site).'-'.$data->asin]=Skusweekdetails::where('asin',$data->asin)->where('site',$data->site)->whereNotNull('keywords')->orderBy('weeks','desc')->take(1)->value('keywords');
-			
-			
-			
-			
+			$data->target_amount=round($rows['target_amount'],2);
+			$data->target_sales=round($rows['target_sales'],2);
+			$data->target_profit=round($rows['target_profit'],2);
+			$data->last_keywords=Skusweekdetails::where('asin',$data->asin)->where('site',$data->site)->whereNotNull('keywords')->orderBy('weeks','desc')->take(1)->value('keywords');	
+			$data->details=Skusweekdetails::where('weeks','>=',date('Ymd',strtotime($date_start)))->where('weeks','<=',date('Ymd',strtotime($date_end)))->where('asin',$data->asin)->where('site',$data->site)->get()->keyBy('weeks')->toArray();
  		}
-		for($i=7;$i>=0;$i--){
-			$date_arr[]=date('Ymd',strtotime($date_start)+(-($i)*3600*24));
-		}
-		if($asin_site_arr){
-			$datas_item=Skusweekdetails::whereIn('weeks',$date_arr)->whereRaw('('.implode(' or ',$asin_site_arr).')')->get()->toArray();
-			
-			
-			
-			
-			foreach($datas_item as $di){
-				$datas_details[str_replace('.','',$di['site']).'-'.$di['asin'].'-'.$di['weeks']] = $di;
-			}
-			
-			
-			
-		}
-   
-        $returnDate['teams']= DB::select('select bg,bu from asin group by bg,bu ORDER BY BG ASC,BU ASC');
-		$returnDate['users']= $this->getUsers();
+        $returnDate['teams']= getUsers('sap_bgbu');
+		$returnDate['users']= getUsers('sap_seller');
 		$returnDate['date_start']= $date_start;
+		$returnDate['date_end']= $date_end;
 		$returnDate['s_user_id']= $user_id?$user_id:[];
 		$returnDate['bgbu']= $bgbu;
-		$returnDate['week']= $week;
 		$returnDate['s_level']= $level;
 		$returnDate['sku']= $sku;
 		$returnDate['s_site']= $site;
 		$returnDate['site_code']= $site_code;
 		$returnDate['datas']= $datas;
-		$returnDate['datas_details']= $datas_details;
-		$returnDate['oa_data']= $oa_data;
-		$returnDate['sap_data']= $sap_data;
-		$returnDate['last_keywords']= $last_keywords;
         return view('sku/index',$returnDate);
 
     }
@@ -223,11 +146,12 @@ max(bg) as bg,max(bu) as bu,max(sap_seller_id) as sap_seller_id from asin group 
 		$user_id = $request->get('user_id');
 		$sku = $request->get('sku');
 		$level = $request->get('level');
-	    $date_start = $request->get('date_start')?$request->get('date_start'):date('Y-m-d',strtotime('+ 8hours'));
-		$week = self::getWeek($date_start);
+	    $date_start = $request->get('date_start')?date('Ymd',strtotime($request->get('date_start'))):date('Ymd',strtotime('-14 days'));
+		$date_end = $request->get('date_end')?date('Ymd',strtotime($request->get('date_end'))):date('Ymd');
+		if($date_end<$date_start) $date_end = $date_start;
 
 		
-		$where= " length(trim(asin))=10";
+		$where= " length(trim(asin))=10 and weeks>='$date_start' and weeks<='$date_end' ";
 		if (Auth::user()->seller_rules) {
 			$rules = explode("-",Auth::user()->seller_rules);
 			if(array_get($rules,0)!='*') $where.= " and bg='".array_get($rules,0)."'";
@@ -258,19 +182,19 @@ max(bg) as bg,max(bu) as bu,max(sap_seller_id) as sap_seller_id from asin group 
 		}
 		
 		if($sku){
-			$where.= " and (asin='".$sku."' or sku_tmp_cc.item_code  like '%".$sku."%')";
+			$where.= " and (asin='".$sku."' or sku_tmp_cc.item_code  like '%".$sku."%' or sku_tmp_cc.item_name like '%".$sku."%')";
 		}
 		
 			
 		$month = date('Ym',strtotime($date_start));
-        $datas=Skusweekdetails::whereRaw("left(weeks,6)='".$month."' ")->whereRaw($where)
-			->leftJoin(DB::raw("(select asin as asin_p,site as site_p,GROUP_CONCAT(a.item_no) as item_code,GROUP_CONCAT(b.item_name) as item_name,max(item_status) as status,
-min(status) as pro_status, max(bg) as bg,max(bu) as bu,max(sap_seller_id) as sap_seller_id
+        $datas=Skusweekdetails::whereRaw($where)
+			->leftJoin(DB::raw("(select asin as asin_p,site as site_p,GROUP_CONCAT(a.item_no) as item_code,GROUP_CONCAT(b.item_name) as item_name,any_value(item_status) as status,
+any_value(status) as pro_status, any_value(bg) as bg,any_value(bu) as bu,any_value(sap_seller_id) as sap_seller_id
 from 
 
-(select asin,site,item_no,max(item_status) as item_status,
-min(case when status = 'S' Then '0' else status end) as status, 
-max(bg) as bg,max(bu) as bu,max(sap_seller_id) as sap_seller_id from asin group by asin,site,item_no)
+(select asin,site,item_no,any_value(item_status) as item_status,
+any_value(case when status = 'S' Then '0' else status end) as status, 
+any_value(bg) as bg,any_value(bu) as bu,any_value(sap_seller_id) as sap_seller_id from asin group by asin,site,item_no)
 
  as a left join fbm_stock as b on a.item_no=b.item_code   group by asin,site order by pro_status asc ) as sku_tmp_cc"),function($q){
 				$q->on('skus_week_details.asin', '=', 'sku_tmp_cc.asin_p')
@@ -305,136 +229,11 @@ max(bg) as bg,max(bu) as bu,max(sap_seller_id) as sap_seller_id from asin group 
 		$headArray[] = 'FBA Keep';
 		$headArray[] = 'Total Keep';
 		$headArray[] = 'Strategy';
-		$headArray[] = 'Sold Qty Target';
-		$headArray[] = 'Sold Qty Completed';
-		$headArray[] = 'Sold Qty Completion ratio';
-		$headArray[] = 'Sales Target';
-		$headArray[] = 'Sales Completed';
-		$headArray[] = 'Sales Completion ratio';
-		$headArray[] = 'Profit Target';
-		$headArray[] = 'Profit Completed';
-		$headArray[] = 'Profit Completion ratio';
 
 		$arrayData[] = $headArray;
-		$users_array = $this->getUsers();
-		$site_code['www_amazon_com']='US';
-		$site_code['www_amazon_ca']='CA';
-		$site_code['www_amazon_de']='DE';
-		$site_code['www_amazon_it']='IT';
-		$site_code['www_amazon_es']='ES';
-		$site_code['www_amazon_co_uk']='UK';
-		$site_code['www_amazon_fr']='FR';
-		$site_code['www_amazon_co_jp']='JP';
-		$sap = new SapRfcRequest();
-		$oa_data=$sap_data=[];
+		$users_array = getUsers('sap_seller');;
 		
 		foreach($datas as $data){
-			if(!isset($sap_data[str_replace('.','',$data['site']).'-'.$data['item_code']])){
-			$sku_site_arr=[];
-			$match_sku = explode(',',$data['item_code']);
-			if(count($match_sku)>1){
-				$vv001=$vsrhj=$vvvvv=0;
-				foreach($match_sku as $k=>$v){
-					$sku_site_arr[] = "(SKU = '".$v."' and site='".array_get($site_code,str_replace('.','_',$data['site']),'')."')";
-					
-					$rows = $sap->getTureSales(['sku' => $v,'site' => array_get(array_flip(getSapSiteCode()),str_replace('www.','',$data['site'])),'month' => date('Ym',strtotime($date_start))]);
-					$s_vv001 = array_get($rows,'1.VV001');
-					if(substr($s_vv001, -1) =='-'){
-						$s_vv001 = round('-'.rtrim($s_vv001, "-"),2);
-					}else{
-						$s_vv001 = round($s_vv001,2);
-					}
-					$s_vsrhj = array_get($rows,'1.VSRHJ');
-					if(substr($s_vsrhj, -1) =='-'){
-						$s_vsrhj = round('-'.rtrim($s_vsrhj, "-"),2);
-					}else{
-						$s_vsrhj = round($s_vsrhj,2);
-					}
-					$s_vvvvv = array_get($rows,'1.VVVVV');
-					if(substr($s_vvvvv, -1) =='-'){
-						$s_vvvvv = round('-'.rtrim($s_vvvvv, "-"),2);
-					}else{
-						$s_vvvvv = round($s_vvvvv,2);
-					}
-					$vv001+=$s_vv001;
-					$vsrhj+=$s_vsrhj;
-					$vvvvv+=$s_vvvvv;
-				}
-				
-				
-			
-			}else{
-				$sku_site_arr[] = "(SKU = '".$data['item_code']."' and site='".array_get($site_code,str_replace('.','_',$data['site']),'')."')";
-				
-				$rows = $sap->getTureSales(['sku' => $data['item_code'],'site' => array_get(array_flip(getSapSiteCode()),str_replace('www.','',$data['site'])),'month' => date('Ym',strtotime($date_start))]);
-				$vv001 = array_get($rows,'1.VV001');
-				if(substr($vv001, -1) =='-'){
-					$vv001 = round('-'.rtrim($vv001, "-"),2);
-				}else{
-					$vv001 = round($vv001,2);
-				}
-				$vsrhj = array_get($rows,'1.VSRHJ');
-				if(substr($vsrhj, -1) =='-'){
-					$vsrhj = round('-'.rtrim($vsrhj, "-"),2);
-				}else{
-					$vsrhj = round($vsrhj,2);
-				}
-				$vvvvv = array_get($rows,'1.VVVVV');
-				if(substr($vvvvv, -1) =='-'){
-					$vvvvv = round('-'.rtrim($vvvvv, "-"),2);
-				}else{
-					$vvvvv = round($vvvvv,2);
-				}
-			}
-			
-			
-			$oa_datas = DB::connection('oa')->table('uf_new_pro')->whereRaw('('.implode(' or ',$sku_site_arr).')')->get();
-			
-				$oa_datas=json_decode(json_encode($oa_datas), true);
-				foreach($oa_datas as $od){
-					$oa_data[str_replace('.','',$data['site']).'-'.$data['item_code']] = $od;
-				}
-				
-			$sap_data[str_replace('.','',$data['site']).'-'.$data['item_code']] = array(
-				'VV001'=>$vv001,
-				'VSRHJ'=>$vsrhj,
-				'VVVVV'=>$vvvvv,
-			);
-			
-			
-			
- 			}
-		
-	
-			
-			
-			$target_sold = round(array_get($oa_data,str_replace('.','',$data['site']).'-'.$data['item_code'].'.xiaol'.date('n',strtotime($date_start)),0),2);
-			if($target_sold>0){
-				$complete_sold = round(array_get($sap_data,str_replace('.','',$data['site']).'-'.$data['item_code'].'.VV001',0)/$target_sold*100,2);
-			}elseif($target_sold<0){
-				$complete_sold = round((2-array_get($sap_data,str_replace('.','',$data['site']).'-'.$data['item_code'].'.VV001',0)/$target_sold)*100,2);
-			}else{
-				$complete_sold =0;
-			}
-			
-			$target_sales = round(array_get($oa_data,str_replace('.','',$data['site']).'-'.$data['item_code'].'.xiaose'.date('n',strtotime($date_start)),0),2);
-			if($target_sales>0){
-				$complete_sales = round(array_get($sap_data,str_replace('.','',$data['site']).'-'.$data['item_code'].'.VSRHJ',0)/$target_sales*100,2);
-			}elseif($target_sales<0){
-				$complete_sales = round((2-array_get($sap_data,str_replace('.','',$data['site']).'-'.$data['item_code'].'.VSRHJ',0)/$target_sales)*100,2);
-			}else{
-				$complete_sales =0;
-			}
-			
-			
-			$target_pro = round(array_get($oa_data,str_replace('.','',$data['site']).'-'.$data['item_code'].'.ywlr'.date('n',strtotime($date_start)),0),2);
-			if($target_pro>0){
-				$complete_pro = round(array_get($sap_data,str_replace('.','',$data['site']).'-'.$data['item_code'].'.VVVVV',0)/$target_pro*100,2);
-			}elseif($target_pro<0){
-				$complete_pro = round((2-array_get($sap_data,str_replace('.','',$data['site']).'-'.$data['item_code'].'.VVVVV',0)/$target_pro)*100,2);
-			}else{
-				$complete_pro =0;
-			}
 			
 			
 			
@@ -463,19 +262,7 @@ max(bg) as bg,max(bu) as bu,max(sap_seller_id) as sap_seller_id from asin group 
 				intval($data['fba_stock']+$data['fba_transfer']+$data['fbm_stock']),
 				($data['sales'])?round(intval($data['fba_stock'])/$data['sales'],2):'∞',
 				($data['sales'])?round((intval($data['fba_stock'])+intval($data['fba_transfer'])+intval($data['fbm_stock']))/$data['sales'],2):'∞',
-				$data['strategy'],
-				
-				$target_sold,
-				array_get($sap_data,str_replace('.','',$data['site']).'-'.$data['item_code'].'.VV001',0),
-				$complete_sold.'%',
-				
-				$target_sales,
-				array_get($sap_data,str_replace('.','',$data['site']).'-'.$data['item_code'].'.VSRHJ',0),
-				$complete_sales.'%',
-				
-				$target_pro,
-				array_get($sap_data,str_replace('.','',$data['site']).'-'.$data['item_code'].'.VVVVV',0),
-				$complete_pro.'%'
+				$data['strategy']
             );
 		}
 
