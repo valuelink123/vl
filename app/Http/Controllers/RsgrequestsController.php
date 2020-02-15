@@ -208,43 +208,12 @@ class RsgrequestsController extends Controller
 						}else{
 							//7，当帖子为不在线（帖子列表中listing参数不为Available）的状态也标红显示（status!=2，红色打叉显示
 							$yestoday = date('Y-m-d',strtotime("-1 day"));
-							$listingStatus = DB::table('star_history')->where('create_at',$yestoday)->where('asin',$list['asin'])->where('domain',$list['site'])->get(array('status'))->first();
-							if(empty($listingStatus) || $listingStatus->status != 2){
+							$listingStatus = RsgProduct::where('created_at','>=',$yestoday)->where('asin',$list['asin'])->where('site',$list['site'])->orderBy('created_at','desc')->value('seller_id');
+							if(strlen($listingStatus) < 10){
 								$explain_step = isset($rsgStatusArr[7]) ? $rsgStatusArr[7]['vop'] : 7;
 								$lists[$key]['step'] .= '<div class="fa red fa-times pull-right" title="'.$explain_step.'"></div>';
 							}else{
-								/*
-								 * RSG Request 的状态限制，暂时先取消当前库存维持天数和RSG任务权重为屏蔽的限制
-								//8，当前库存维持天数<30天，红色打叉显示
-								$sql = "SELECT
-										sum(fba_stock + fba_transfer) AS fba_stock,
-										sum(sales_07_01) AS sales_07_01,
-										sum(sales_14_08) AS sales_14_08,
-										sum(sales_21_15) AS sales_21_15,
-										sum(sales_28_22) AS sales_28_22,
-										asin,
-										site
-									FROM asin 
-									WHERE asin = '".$list['asin']."' and site = '".$list['site']."' GROUP BY asin,site";
-								$asin = $this->queryRow($sql);
-								//平均日销量
-								$sales = ((((array_get($asin,'sales_07_01')??array_get($asin,'sales_14_08'))??array_get($asin,'sales_21_15'))??array_get($asin,'sales_28_22'))??0)/7 ;
-								//库存可维持的天数
-								$days = $sales > 0 ? $asin['fba_stock']/$sales : '100';//每日销量为0的时候，默认可维持天数为100，此时不会为红色打叉
-								if($days < 30){
-									$explain_step = isset($rsgStatusArr[8]) ? $rsgStatusArr[8]['vop'] : 8;
-									$lists[$key]['step'] .= '<div class="fa red fa-times pull-right" title="'.$explain_step.'"></div>';
-								}else{
-									//9,rsg任务权重为屏蔽，红色打叉显示
-									$lrsgStatus = DB::table('rsg_products')->where('id',$list['product_id'])->get(array('order_status'))->first();
-									if($lrsgStatus->order_status == '-1'){
-										$explain_step = isset($rsgStatusArr[9]) ? $rsgStatusArr[9]['vop'] : 9;
-										$lists[$key]['step'] .= '<div class="fa red fa-times pull-right" title="'.$explain_step.'"></div>';
-									}else{
-										$lists[$key]['step'] .= '<div class="fa green fa-check pull-right"></div>';
-									}
-								}
-								*/
+								
 							}
 						}
 					}
