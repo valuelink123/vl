@@ -414,7 +414,7 @@ a.editable-click:hover {
 							<td style="text-align: left;"> {{array_get($asin,'item_no')}} </td>
 							<td style="text-align: left;"> {{array_get($asin,'sku_status')}} </td>
 							<td> {{array_get($asin,'amount',0)}} </td>
-							<td><a href="/skus?date_start={{date('Y-m-d')}}&sku={{array_get($asin,'asin')}}">{{array_get($asin,'sales',0)}} </a></td>
+							<td><a href="/skus?sku={{array_get($asin,'asin')}}">{{array_get($asin,'sales',0)}} </a></td>
 							<td> {{intval(array_get($asin,'sales')/((strtotime($date_to)-strtotime($date_from))/86400+1))}} </td>
 							
 							<td> {{(array_get($asin,'sales')>0)?round(array_get($asin,'amount')/array_get($asin,'sales'),2):0}} </td>
