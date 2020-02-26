@@ -320,14 +320,17 @@ class SkuDaily extends Command
 			$skus_info[$key]['economic'] = round(array_get($skus_info[$key],'amount',0)+array_get($skus_info[$key],'fulfillmentfee',0)+array_get($skus_info[$key],'commission',0)+array_get($skus_info[$key],'otherfee',0)-array_get($skus_info[$key],'deal',0)-array_get($skus_info[$key],'coupon',0)-array_get($skus_info[$key],'cpc',0)-(array_get($skus_info[$key],'cost',0)+array_get($skus_info[$key],'tax',0)+array_get($skus_info[$key],'headshipfee',0))*array_get($skus_info[$key],'sales',0)-array_get($skus_info[$key],'fbm_storage',0)-array_get($skus_info[$key],'fba_storage',0)-array_get($skus_info[$key],'amount_used',0),2);
 			
 			//完成率
+			$budget_year = date('Y',strtotime($date));
+			$budget_id = intval(DB::table('budgets')->where('sku',$sku)->where('site',$skus_info[$key]['site'])->where('year',$budget_year)->value('id'));
+			$day_budget_datas = DB::table('budget_details')->where('budget_id',$budget_id)->where('date',$date)->selectRaw('income as amount,(income-cost-common_fee-pick_fee-storage_fee-promotion_fee-amount_fee) as profit')->first();
+			$day_budget_datas = json_decode(json_encode($day_budget_datas), true);
+			$budget_month = date('Y-m',strtotime($date));
+			$month_budget_datas = DB::table('budget_details')->where('budget_id',$budget_id)->whereRaw("left(date,7) = '".$budget_month."'")->selectRaw('sum(income) as amount,sum(income-cost-common_fee-pick_fee-storage_fee-promotion_fee-amount_fee) as profit')->first();
+			$month_budget_datas = json_decode(json_encode($month_budget_datas), true);
+			$oa_amount_target = round(array_get($day_budget_datas,'amount',0),2);
+			$oa_profit_target = round(array_get($day_budget_datas,'profit',0),2);
+			$oa_amount_target_total = round(array_get($month_budget_datas,'amount',0),2);
 			
-			$oa_datas = DB::connection('oa')->table('uf_new_pro')->where('sku',$sku)->where('site',$site)->first();
-			if(!empty($oa_datas) && in_array($site,array('UK,DE,FR,IT,ES'))) $oa_datas = DB::connection('oa')->table('uf_new_pro')->where('sku',$sku)->where('site','EU')->first();
-			$oa_datas = json_decode(json_encode($oa_datas), true);
-			$oa_amount_target_total = round(array_get($oa_datas,'xiaose'.date('n',strtotime($date)),0),2);
-			
-			$oa_amount_target = round(array_get($oa_datas,'xiaose'.date('n',strtotime($date)),0)/date("t",strtotime($date)),2);
-			$oa_profit_target = round(array_get($oa_datas,'yewjlr'.date('n',strtotime($date)),0)/date("t",strtotime($date)),2);
 			$skus_info[$key]['profit'] = round(array_get($skus_info[$key],'amount',0)+array_get($skus_info[$key],'fulfillmentfee',0)+array_get($skus_info[$key],'commission',0)+array_get($skus_info[$key],'otherfee',0)-array_get($skus_info[$key],'deal',0)-array_get($skus_info[$key],'coupon',0)-array_get($skus_info[$key],'cpc',0)-(array_get($skus_info[$key],'cost',0)*1.3+array_get($skus_info[$key],'tax',0)+array_get($skus_info[$key],'headshipfee',0))*array_get($skus_info[$key],'sales',0)-array_get($skus_info[$key],'fbm_storage',0)-array_get($skus_info[$key],'fba_storage',0),2);
 			
 			if($oa_amount_target<0){
