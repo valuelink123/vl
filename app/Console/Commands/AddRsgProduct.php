@@ -187,8 +187,8 @@ class AddRsgProduct extends Command
 				'number_of_reviews' => $val['number_of_reviews'],//昨天的评论总数
 				'sales_target_reviews' => $sales_target_reviews,
 				'order_status' => isset($orderdata[$val['asin'].'_'.$val['site']]) ? $orderdata[$val['asin'].'_'.$val['site']]['order_status'] : 0,
-				'keyword' => $val['keyword'],
-				'position' => $val['position'],
+				'keyword' => addslashes($val['keyword']),
+				'position' => addslashes($val['position']),
 				'product_name' => $product_name,
 				'product_img' => $product_img,
 				'price' => $price,
