@@ -322,11 +322,12 @@ class SkuDaily extends Command
 			//完成率
 			$budget_year = date('Y',strtotime($date));
 			$budget_id = intval(DB::table('budgets')->where('sku',$sku)->where('site',$skus_info[$key]['site'])->where('year',$budget_year)->value('id'));
-			$day_budget_datas = DB::table('budget_details')->where('budget_id',$budget_id)->where('date',$date)->selectRaw('income as amount,(income-cost-common_fee-pick_fee-storage_fee-promotion_fee-amount_fee) as profit')->first();
+			$day_budget_datas = DB::table('budget_details')->where('budget_id',$budget_id)->where('date',$date)->selectRaw('qty as qty,income as amount,(income-cost-common_fee-pick_fee-storage_fee-promotion_fee-amount_fee) as profit')->first();
 			$day_budget_datas = json_decode(json_encode($day_budget_datas), true);
 			$budget_month = date('Y-m',strtotime($date));
-			$month_budget_datas = DB::table('budget_details')->where('budget_id',$budget_id)->whereRaw("left(date,7) = '".$budget_month."'")->selectRaw('sum(income) as amount,sum(income-cost-common_fee-pick_fee-storage_fee-promotion_fee-amount_fee) as profit')->first();
+			$month_budget_datas = DB::table('budget_details')->where('budget_id',$budget_id)->whereRaw("left(date,7) = '".$budget_month."'")->selectRaw('sum(qty) as qty,sum(income) as amount,sum(income-cost-common_fee-pick_fee-storage_fee-promotion_fee-amount_fee) as profit')->first();
 			$month_budget_datas = json_decode(json_encode($month_budget_datas), true);
+			$oa_qty_target = round(array_get($day_budget_datas,'qty',0),2);
 			$oa_amount_target = round(array_get($day_budget_datas,'amount',0),2);
 			$oa_profit_target = round(array_get($day_budget_datas,'profit',0),2);
 			$oa_amount_target_total = round(array_get($month_budget_datas,'amount',0),2);
@@ -341,6 +342,14 @@ class SkuDaily extends Command
 				$amount_per =0;
 			}
 			
+			if($oa_qty_target<0){
+				$sales_per = round(2-array_get($skus_info[$key],'sales',0)/$oa_qty_target,4);
+			}elseif($oa_amount_target>0){
+				$sales_per =round(array_get($skus_info[$key],'sales',0)/$oa_qty_target,4);
+			}else{
+				$sales_per =0;
+			}
+			
 			if($oa_profit_target<0){
 				$profit_per = round(2-array_get($skus_info[$key],'profit',0)/$oa_profit_target,4);
 			}elseif($oa_profit_target>0){
@@ -350,9 +359,10 @@ class SkuDaily extends Command
 			}
 			$skus_info[$key]['amount_target'] = $oa_amount_target;
 			$skus_info[$key]['profit_target'] = $oa_profit_target;
+			$skus_info[$key]['sales_target'] = $oa_qty_target;
 			$skus_info[$key]['amount_per'] = $amount_per;
 			$skus_info[$key]['profit_per'] = $profit_per;
-				
+			$skus_info[$key]['sales_per'] = $sales_per;	
 			if($skus_info[$key]['status']==1){
 				$cut_fee = 0;
 				if($sku == 'AP0373' && $site =='US') $cut_fee = round(250000/date("t",strtotime($date)),2);

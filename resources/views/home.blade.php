@@ -89,11 +89,12 @@ a.editable-click:hover {
 				$class=$sign="";
 				$ap = array_get($total_info,'economic',0);
 				$hb_ap = array_get($hb_total_info,'economic',0);
-				if($ap>$hb_ap){
+				
+				$ap_hb_ap = ($hb_ap!=0)?round(($ap-$hb_ap)/$hb_ap*100,2):'0';
+				if($ap_hb_ap>=0){
 					$class="font-red-haze";
 					$sign='+';
-				}
-				if($ap<$hb_ap){
+				}else{
 					$class="font-green-sharp";
 				}
 				?>
@@ -117,7 +118,7 @@ a.editable-click:hover {
 								</span>
 							</div>
 							<div class="status">
-								<div class="status-title {{$class}}"> {{($hb_ap!=0)?$sign.round(($ap-$hb_ap)/$hb_ap*100,2):'0'}}%</div>
+								<div class="status-title {{$class}}"> {{$sign.$ap_hb_ap}}%</div>
 								<div class="status-number">{{round($hb_ap/10000,2)}} 万</div>
 							</div>
 						</div>
@@ -128,11 +129,11 @@ a.editable-click:hover {
 				$class=$sign="";
 				$ap = array_get($total_info,'amount',0);
 				$hb_ap = array_get($hb_total_info,'amount',0);
-				if($ap>$hb_ap){
+				$ap_hb_ap = ($hb_ap!=0)?round(($ap-$hb_ap)/$hb_ap*100,2):'0';
+				if($ap_hb_ap>=0){
 					$class="font-red-haze";
 					$sign='+';
-				}
-				if($ap<$hb_ap){
+				}else{
 					$class="font-green-sharp";
 				}
 				?>
@@ -157,7 +158,7 @@ a.editable-click:hover {
 								</span>
 							</div>
 							<div class="status">
-								<div class="status-title {{$class}}"> {{($hb_ap!=0)?$sign.round(($ap-$hb_ap)/$hb_ap*100,2):'0'}}%</div>
+								<div class="status-title {{$class}}"> {{$sign.$ap_hb_ap}}%</div>
 								<div class="status-number">{{round($hb_ap/10000,2)}} 万</div>
 							</div>
 						</div>
@@ -168,11 +169,11 @@ a.editable-click:hover {
 				$class=$sign="";
 				$ap = intval(array_get($total_info,'sales',0));
 				$hb_ap = intval(array_get($hb_total_info,'sales',0));
-				if($ap>$hb_ap){
+				$ap_hb_ap = ($hb_ap!=0)?round(($ap-$hb_ap)/$hb_ap*100,2):'0';
+				if($ap_hb_ap>=0){
 					$class="font-red-haze";
 					$sign='+';
-				}
-				if($ap<$hb_ap){
+				}else{
 					$class="font-green-sharp";
 				}
 				?>
@@ -195,7 +196,7 @@ a.editable-click:hover {
 								</span>
 							</div>
 							<div class="status">
-								<div class="status-title {{$class}}"> {{($hb_ap!=0)?$sign.round(($ap-$hb_ap)/$hb_ap*100,2):'0'}}% </div>
+								<div class="status-title {{$class}}"> {{$sign.$ap_hb_ap}}% </div>
 								<div class="status-number">{{$hb_ap}}</div>
 							</div>
 						</div>
@@ -205,11 +206,11 @@ a.editable-click:hover {
 				$class=$sign="";
 				$ap = (array_get($total_info,'sales',0)>0)?round(array_get($total_info,'amount',0)/array_get($total_info,'sales',0),2):0;
 				$hb_ap = (array_get($hb_total_info,'sales',0)>0)?round(array_get($hb_total_info,'amount',0)/array_get($hb_total_info,'sales',0),2):0;
-				if($ap>$hb_ap){
+				$ap_hb_ap = ($hb_ap!=0)?round(($ap-$hb_ap)/$hb_ap*100,2):'0';
+				if($ap_hb_ap>=0){
 					$class="font-red-haze";
 					$sign='+';
-				}
-				if($ap<$hb_ap){
+				}else{
 					$class="font-green-sharp";
 				}
 				?>
@@ -236,7 +237,7 @@ a.editable-click:hover {
 							<div class="status">
 								<div class="status-title {{$class}}">
 								
-								 {{($hb_ap!=0)?$sign.round(($ap-$hb_ap)/$hb_ap*100,2):'0'}}%
+								 {{$sign.$ap_hb_ap}}%
 								
 								</div>
 								<div class="status-number">{{$hb_ap}}</div>
