@@ -344,7 +344,7 @@ class SkuDaily extends Command
 			
 			if($oa_qty_target<0){
 				$sales_per = round(2-array_get($skus_info[$key],'sales',0)/$oa_qty_target,4);
-			}elseif($oa_amount_target>0){
+			}elseif($oa_qty_target>0){
 				$sales_per =round(array_get($skus_info[$key],'sales',0)/$oa_qty_target,4);
 			}else{
 				$sales_per =0;
