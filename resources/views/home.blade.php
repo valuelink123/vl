@@ -74,6 +74,9 @@ a.editable-click:hover {
 }
 .pagination > li > a, .pagination > li > span{padding:3px;}
 .dataTables_wrapper .dataTables_paginate .paginate_button{padding:0px;margin: 0em 1em}
+.table thead tr th {
+    font-size: 11px;
+}
 </style>
 <link href="/assets/global/plugins/bootstrap-editable/bootstrap-editable/css/bootstrap-editable.css" rel="stylesheet" type="text/css" />
 <div class="row" >
