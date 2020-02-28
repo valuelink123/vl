@@ -168,6 +168,11 @@ class HomeController extends Controller
 		
 		$daily_info = SkusDailyInfo::select(DB::raw('sum(bonus)*'.$bonus_point.' as sumbonus,date'))->whereRaw($sumwhere." and date>='$date_from' and date<='$date_to'")->groupBy(['date'])->pluck('sumbonus','date');
 		
+		$curr_month = date('Y-m',strtotime('-2days'));
+		$month_budget = SkusDailyInfo::select(DB::raw('sum(economic) as economic,sum(amount) as amount,sum(sales) as sales,sum(profit_target) as economic_target,sum(sales_target) as sales_target,sum(amount_target) as amount_target,sku,any_value(level) as level,any_value(status) as status'))->whereRaw($sumwhere." and left(date,7)='$curr_month'")->groupBy(['sku'])->orderBy('economic','desc')->get()->toArray();
+		
+		$month_budget_pie = SkusDailyInfo::select(DB::raw('sum(economic) as economic,sum(amount) as amount,sum(sales) as sales,sum(profit_target) as economic_target,sum(sales_target) as sales_target,sum(amount_target) as amount_target'))->whereRaw($sumwhere." and left(date,7)='$curr_month'")->first()->toArray();
+		
 		foreach($asins as $key=>$asin){
 			$sku_info = SkusDailyInfo::select(DB::raw('sum(bonus)*'.$bonus_point.' as bonus,sum(economic) as economic'))->whereRaw("sku='".$asin['item_no']."' and site='".$asin['site']."' and date>='$date_from' and date<='$date_to'")->first()->toArray();
 			$asins[$key]['bonus']=array_get($sku_info,'bonus',0);
@@ -177,7 +182,7 @@ class HomeController extends Controller
 			$asins[$key]['amount']=array_get($asin_info,'amount',0);
 			$asins[$key]['sales']=array_get($asin_info,'sales',0);
 		}
-	
+		$returnDate['month_budget']= $month_budget;
 		$returnDate['bonus_point']= $bonus_point;
 		$returnDate['total_info']= $total_info;
 		$returnDate['hb_total_info']= $hb_total_info;

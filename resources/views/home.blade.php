@@ -58,7 +58,7 @@ padding-top:0px;}
 table{ 
 table-layout:fixed; 
 }
-
+.row{ background:#fff;}
 textarea.form-control{width:400px!important;}
 
 .editable-click, 
@@ -72,6 +72,8 @@ a.editable-click:hover {
     font-size: 12px;
     color: #666;
 }
+.pagination > li > a, .pagination > li > span{padding:3px;}
+.dataTables_wrapper .dataTables_paginate .paginate_button{padding:0px;margin: 0em 1em}
 </style>
 <link href="/assets/global/plugins/bootstrap-editable/bootstrap-editable/css/bootstrap-editable.css" rel="stylesheet" type="text/css" />
 <div class="row" >
@@ -86,6 +88,8 @@ a.editable-click:hover {
 				</div>
 				<div class="col-md-10">
 				<?php
+				$status_arr=['2'=>'New','1'=>'Reserved','0'=>'Eliminated'];
+				$time_rate = date('d',strtotime('-2days'))/date('t',strtotime('-2days'));
 				$class=$sign="";
 				$ap = array_get($total_info,'economic',0);
 				$hb_ap = array_get($hb_total_info,'economic',0);
@@ -490,6 +494,103 @@ a.editable-click:hover {
 	</div>
 </div>
 </div>
+
+<div class="row">
+	<div class="col-md-6">
+	<div class="portlet light ">
+		<div class="portlet-title tabbable-line">
+			<div class="caption">
+				<i class=" icon-social-twitter font-dark hide"></i>
+				<span class="caption-subject font-dark bold uppercase">Budget completion rate</span>
+				
+			</div>
+			
+			<div class="pull-right">
+				
+			</div>
+		</div>
+		<div class="portlet-body">
+		<table class="table" id="manage_account">
+			<thead>
+			<tr>
+				<th> Sku </th>
+				<th> Status</th>
+				<th> Units </th>
+				<th> Sales</th>
+				<th> E.Val </th>
+				<th> Units </th>
+				<th> Sales </th>
+				<th> E.Val </th>
+			</tr>
+			</thead>
+			<tbody>
+			@foreach ($month_budget as $sku_budget)
+			
+				<?php
+				
+				if($sku_budget['amount_target']<0){
+					$amount_per = round(2-$sku_budget['amount']/$sku_budget['amount_target'],4);
+				}elseif($sku_budget['amount_target']>0){
+					$amount_per =round($sku_budget['amount']/$sku_budget['amount_target'],4);
+				}else{
+					$amount_per =0;
+				}
+				
+				if($sku_budget['sales_target']<0){
+					$sales_per = round(2-$sku_budget['sales']/$sku_budget['sales_target'],4);
+				}elseif($sku_budget['sales_target']>0){
+					$sales_per =round($sku_budget['sales']/$sku_budget['sales_target'],4);
+				}else{
+					$sales_per =0;
+				}
+				
+				if($sku_budget['economic_target']<0){
+					$profit_per = round(2-$sku_budget['economic']/$sku_budget['economic_target'],4);
+				}elseif($sku_budget['economic_target']>0){
+					$profit_per =round($sku_budget['economic']/$sku_budget['economic_target'],4);
+				}else{
+					$profit_per =0;
+				}
+				?>
+				<tr class="odd gradeX">
+					<td>
+						{{$sku_budget['sku']}}
+					</td>
+					<td>
+						{{array_get($status_arr,$sku_budget['status'])}}
+					</td>
+					<td>
+						{{$sku_budget['sales']}}
+					</td>
+					<td>
+						{{$sku_budget['amount']}}
+					</td>
+					<td>
+						{{$sku_budget['economic']}}
+					</td>
+					<td>
+						{{$sku_budget['sales_target']}}
+						<span class="{{($sales_per>=$time_rate)?'font-red-haze':'font-green-sharp'}}">{{$sales_per*100}}%</span>
+					</td>
+					<td>
+						{{$sku_budget['amount_target']}}
+						<span class="{{($amount_per>=$time_rate)?'font-red-haze':'font-green-sharp'}}">{{$amount_per*100}}%</span>
+					</td>
+					<td>
+						{{$sku_budget['economic_target']}}
+						<span class="{{($profit_per>=$time_rate)?'font-red-haze':'font-green-sharp'}}">{{$profit_per*100}}%</span>
+					</td>
+				</tr>
+			@endforeach
+
+
+
+			</tbody>
+		</table>
+		</div>
+		</div>
+	</div>
+</div>
 							
 
     
@@ -582,7 +683,76 @@ var FormEditable = function() {
 
 }();
 $(function() {
-	
+	var TableDatatablesManaged = function () {
+
+            var initTable = function () {
+
+			var table = $('#manage_account');
+
+			// begin first table
+			table.dataTable({
+
+				// Internationalisation. For more info refer to http://datatables.net/manual/i18n
+				"language": {
+					"aria": {
+						"sortAscending": ": activate to sort column ascending",
+						"sortDescending": ": activate to sort column descending"
+					},
+					"emptyTable": "No data available in table",
+					"info": "Showing _START_ to _END_ of _TOTAL_ records",
+					"infoEmpty": "No records found",
+					"infoFiltered": "(filtered1 from _MAX_ total records)",
+					"lengthMenu": "Show _MENU_",
+					"search": "Search:",
+					"zeroRecords": "No matching records found",
+					"paginate": {
+						"previous":"Prev",
+						"next": "Next",
+						"last": "Last",
+						"first": "First"
+					}
+				},
+
+				"bStateSave": false, // save datatable state(pagination, sort, etc) in cookie.
+				// set the initial value
+				"pageLength": 5,
+				"pagingType": "simple",
+				"columnDefs": [
+
+					{
+						"className": "dt-right",
+						//"targets": [2]
+					}
+				],
+				"info":false,
+				"searching":false,
+				"lengthChange":false,
+				"order": [
+					[4, "desc"]
+				] // set first column as a default sort by asc
+			});
+
+		}
+
+
+		return {
+
+			//main function to initiate the module
+			init: function () {
+				if (!jQuery().dataTable) {
+					return;
+				}
+
+				initTable();
+			}
+
+		};
+
+	}();
+
+
+
+	TableDatatablesManaged.init();
 	$('.date-picker').datepicker({
 		rtl: App.isRTL(),
 		format: 'yyyy-mm-dd',

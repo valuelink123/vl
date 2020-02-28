@@ -351,9 +351,9 @@ class SkuDaily extends Command
 			}
 			
 			if($oa_profit_target<0){
-				$profit_per = round(2-array_get($skus_info[$key],'profit',0)/$oa_profit_target,4);
+				$profit_per = round(2-array_get($skus_info[$key],'economic',0)/$oa_profit_target,4);
 			}elseif($oa_profit_target>0){
-				$profit_per =round(array_get($skus_info[$key],'profit',0)/$oa_profit_target,4);
+				$profit_per =round(array_get($skus_info[$key],'economic',0)/$oa_profit_target,4);
 			}else{
 				$profit_per =0;
 			}
