@@ -88,6 +88,7 @@ class HomeController extends Controller
 		}
 		
 		$user_teams = DB::select("select bg,bu from asin where $sumwhere group by bg,bu ORDER BY BG ASC,BU ASC");
+		$sku_statuses = DB::select("select status from skus_status group by status");
 		
 		if(array_get($_REQUEST,'user_id')){
 			$user_info = User::where('id',array_get($_REQUEST,'user_id'))->first();
@@ -141,15 +142,26 @@ class HomeController extends Controller
 				$sumwhere.=" and bu='".array_get($bgbu_arr,1)."'";
 			}
 		}
+		$sku_daily_info_where=$asin_where="";
+		if(array_get($_REQUEST,'keywords')){
+			$asins = $asins->where('asin.item_no','like','%'.array_get($_REQUEST,'keywords').'%');
+			$sku_daily_info_where=" and skus_daily_info.sku like '%".array_get($_REQUEST,'keywords')."%'";
+			$asin_where=" and asin.item_no like '%".array_get($_REQUEST,'keywords')."%'";
+		}
+		
+		if(array_get($_REQUEST,'sku_status')){
+			$asins = $asins->where('skus_status.status',array_get($_REQUEST,'sku_status'));
+			$sumwhere.=" and skus_status.status =  '".array_get($_REQUEST,'sku_status')."'";
+		}
 		
 		
 		
 		
 		
 		
-		$fba_stock_info = DB::select("select sum(fba_stock*fba_cost) as fba_total_amount,sum(fba_stock) as fba_total_stock from (select avg(fba_stock+fba_transfer) as fba_stock,avg(fba_cost) as fba_cost from asin where $sumwhere group by asin,sellersku ) as fba_total");
+		$fba_stock_info = DB::select("select sum(fba_stock*fba_cost) as fba_total_amount,sum(fba_stock) as fba_total_stock from (select avg(fba_stock+fba_transfer) as fba_stock,avg(fba_cost) as fba_cost from asin left join skus_status on asin.item_no=skus_status.sku and asin.site=skus_status.site where $sumwhere $asin_where group by asin,sellersku ) as fba_total");
 		
-		$fbm_stock_info = DB::select("select sum(fbm_stock*fbm_cost) as fbm_total_amount,sum(fbm_stock) as fbm_total_stock from (select avg(fbm_stock) as fbm_stock,avg(fbm_cost) as fbm_cost from asin where $sumwhere group by item_no) as fbm_total");
+		$fbm_stock_info = DB::select("select sum(fbm_stock*fbm_cost) as fbm_total_amount,sum(fbm_stock) as fbm_total_stock from (select avg(fbm_stock) as fbm_stock,avg(fbm_cost) as fbm_cost from asin left join skus_status on asin.item_no=skus_status.sku and asin.site=skus_status.site where $sumwhere $asin_where group by item_no) as fbm_total");
 		
 		
 		$asins = $asins->take(5)->get();
@@ -162,16 +174,23 @@ class HomeController extends Controller
 		$hb_date_to = date('Y-m-d',strtotime($date_from)-86400);
 		$hb_date_from = date('Y-m-d',2*strtotime($date_from)-strtotime($date_to)-86400);
 		
-		$total_info = SkusDailyInfo::select(DB::raw('sum(bonus)*'.$bonus_point.' as bonus,sum(economic) as economic,sum(amount) as amount,sum(sales) as sales'))->whereRaw($sumwhere." and date>='$date_from' and date<='$date_to'")->first()->toArray();
+		$total_info = SkusDailyInfo::select(DB::raw('sum(bonus)*'.$bonus_point.' as bonus,sum(economic) as economic,sum(amount) as amount,sum(sales) as sales'))->leftJoin("skus_status" ,function($q){
+			$q->on('skus_daily_info.sku', '=', 'skus_status.sku')->on('skus_daily_info.site', '=', 'skus_status.site');
+		})->whereRaw($sumwhere.$sku_daily_info_where." and date>='$date_from' and date<='$date_to'")->first()->toArray();
 		
-		$hb_total_info = SkusDailyInfo::select(DB::raw('sum(bonus)*'.$bonus_point.' as bonus,sum(economic) as economic,sum(amount) as amount,sum(sales) as sales'))->whereRaw($sumwhere." and date>='$hb_date_from' and date<='$hb_date_to'")->first()->toArray();
+		$hb_total_info = SkusDailyInfo::select(DB::raw('sum(bonus)*'.$bonus_point.' as bonus,sum(economic) as economic,sum(amount) as amount,sum(sales) as sales'))->leftJoin("skus_status" ,function($q){
+			$q->on('skus_daily_info.sku', '=', 'skus_status.sku')->on('skus_daily_info.site', '=', 'skus_status.site');
+		})->whereRaw($sumwhere.$sku_daily_info_where." and date>='$hb_date_from' and date<='$hb_date_to'")->first()->toArray();
 		
-		$daily_info = SkusDailyInfo::select(DB::raw('sum(bonus)*'.$bonus_point.' as sumbonus,date'))->whereRaw($sumwhere." and date>='$date_from' and date<='$date_to'")->groupBy(['date'])->pluck('sumbonus','date');
+		$daily_info = SkusDailyInfo::select(DB::raw('sum(bonus)*'.$bonus_point.' as sumbonus,date'))->leftJoin("skus_status" ,function($q){
+			$q->on('skus_daily_info.sku', '=', 'skus_status.sku')->on('skus_daily_info.site', '=', 'skus_status.site');
+		})->whereRaw($sumwhere.$sku_daily_info_where." and date>='$date_from' and date<='$date_to'")->groupBy(['date'])->pluck('sumbonus','date');
 		
 		$curr_month = date('Y-m',strtotime('-2days'));
-		$month_budget = SkusDailyInfo::select(DB::raw('sum(economic) as economic,sum(amount) as amount,sum(sales) as sales,sum(profit_target) as economic_target,sum(sales_target) as sales_target,sum(amount_target) as amount_target,sku,any_value(level) as level,any_value(status) as status'))->whereRaw($sumwhere." and left(date,7)='$curr_month'")->groupBy(['sku'])->orderBy('economic','desc')->get()->toArray();
-		
-		$month_budget_pie = SkusDailyInfo::select(DB::raw('sum(economic) as economic,sum(amount) as amount,sum(sales) as sales,sum(profit_target) as economic_target,sum(sales_target) as sales_target,sum(amount_target) as amount_target'))->whereRaw($sumwhere." and left(date,7)='$curr_month'")->first()->toArray();
+		$month_budget = SkusDailyInfo::select(DB::raw('sum(economic) as economic,sum(amount) as amount,sum(sales) as sales,sum(profit_target) as economic_target,sum(sales_target) as sales_target,sum(amount_target) as amount_target,skus_daily_info.sku as sku,skus_daily_info.site as site,any_value(skus_status.status) as sku_status'))->leftJoin("skus_status" ,function($q){
+			$q->on('skus_daily_info.sku', '=', 'skus_status.sku')->on('skus_daily_info.site', '=', 'skus_status.site');
+		})->whereRaw($sumwhere.$sku_daily_info_where." and left(date,7)='$curr_month'")->groupBy(['sku','site'])->orderBy('economic','desc')->get()->toArray();
+
 		
 		foreach($asins as $key=>$asin){
 			$sku_info = SkusDailyInfo::select(DB::raw('sum(bonus)*'.$bonus_point.' as bonus,sum(economic) as economic'))->whereRaw("sku='".$asin['item_no']."' and site='".$asin['site']."' and date>='$date_from' and date<='$date_to'")->first()->toArray();
@@ -188,6 +207,9 @@ class HomeController extends Controller
 		$returnDate['hb_total_info']= $hb_total_info;
 		$returnDate['daily_info']= $daily_info;
 		$returnDate['teams']= $user_teams;
+		$returnDate['sku_statuses']= $sku_statuses;
+		$returnDate['s_sku_status']= $request->get('sku_status');
+		$returnDate['s_keywords']= $request->get('keywords');
 		$returnDate['users']= $this->getUsers();
 		$returnDate['date_from']= $date_from;
 		$returnDate['date_to']= $date_to;

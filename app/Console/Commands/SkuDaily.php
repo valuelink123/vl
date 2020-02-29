@@ -48,8 +48,6 @@ class SkuDaily extends Command
 		$time =  $this->option('time');
         if(!$time) $time='2day';
 		$date=date('Y-m-d',strtotime('-'.$time));
-		for($xxx=2;$xxx<=28;$xxx++){
-		$date=date('Y-m-d',strtotime('-'.$xxx.'day'));
 		print_r($date.'start...');
 		$skus_info=[];
 		$sku=$departments=[];
@@ -321,7 +319,8 @@ class SkuDaily extends Command
 			
 			//经济效益
 			$skus_info[$key]['economic'] = round(array_get($skus_info[$key],'amount',0)+array_get($skus_info[$key],'fulfillmentfee',0)+array_get($skus_info[$key],'commission',0)+array_get($skus_info[$key],'otherfee',0)-array_get($skus_info[$key],'deal',0)-array_get($skus_info[$key],'coupon',0)-array_get($skus_info[$key],'cpc',0)-(array_get($skus_info[$key],'cost',0)+array_get($skus_info[$key],'tax',0)+array_get($skus_info[$key],'headshipfee',0))*array_get($skus_info[$key],'sales',0)-array_get($skus_info[$key],'fbm_storage',0)-array_get($skus_info[$key],'fba_storage',0)-array_get($skus_info[$key],'amount_used',0),2);
-			
+			//SKU状态
+			$skus_info[$key]['sku_status'] = DB::table('skus_status')->where('sku',$sku)->where('site',$skus_info[$key]['site'])->value('status');
 			//完成率
 			$budget_year = date('Y',strtotime($date));
 			$budget_id = intval(DB::table('budgets')->where('sku',$sku)->where('site',$skus_info[$key]['site'])->where('year',$budget_year)->value('id'));
@@ -486,8 +485,6 @@ class SkuDaily extends Command
 			AsinDailyInfo::updateOrCreate(
 			['asin'=>$skus_info[$key]['asin'], 'site'=>$skus_info[$key]['site'], 'date'=>$skus_info[$key]['date']]
 			,$skus_info[$key]);
-		}
-		
 		}
     }
 

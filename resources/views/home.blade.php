@@ -91,7 +91,7 @@ a.editable-click:hover {
 				</div>
 				<div class="col-md-10">
 				<?php
-				$status_arr=['2'=>'New','1'=>'Reserved','0'=>'Eliminated'];
+				$total_sales = $total_amount = $total_profit = $total_sales_target = $total_amount_target = $total_profit_target = 0;
 				$time_rate = date('d',strtotime('-2days'))/date('t',strtotime('-2days'));
 				$class=$sign="";
 				$ap = array_get($total_info,'economic',0);
@@ -343,6 +343,20 @@ a.editable-click:hover {
 						</div>	
 						
 						@endif
+						
+						<div class="form-group col-md-5">
+						<select class="form-control form-filter input-sm" name="sku_status" id="sku_status">
+								<option value="">All Status</option>
+								@foreach ($sku_statuses as $k=>$v)
+									<option value="{{$v->status}}" <?php if($v->status==$s_sku_status) echo 'selected'; ?>>{{$v->status}}</option>
+								@endforeach
+							</select>
+						
+						</div>
+						
+						<div class="form-group col-md-5 col-md-offset-2">
+						<input class="form-control form-filter input-sm" name="keywords" id="keywords" value="{{$s_keywords}}">
+						</div>	
 
 						<div class="form-group col-md-12">
 							
@@ -499,12 +513,12 @@ a.editable-click:hover {
 </div>
 
 <div class="row">
-	<div class="col-md-6">
+	<div class="col-md-12">
 	<div class="portlet light ">
 		<div class="portlet-title tabbable-line">
 			<div class="caption">
 				<i class=" icon-social-twitter font-dark hide"></i>
-				<span class="caption-subject font-dark bold uppercase">Budget completion rate</span>
+				<span class="caption-subject font-dark bold uppercase">Current monthly completion rate</span>
 				
 			</div>
 			
@@ -517,20 +531,26 @@ a.editable-click:hover {
 			<thead>
 			<tr>
 				<th> Sku </th>
+				<th> Site </th>
 				<th> Status</th>
-				<th> Units </th>
-				<th> Sales</th>
-				<th> E.Val </th>
-				<th> Units </th>
-				<th> Sales </th>
-				<th> E.Val </th>
+				<th> Current Units </th>
+				<th> Current Sales</th>
+				<th> Current E.Val </th>
+				<th> Units Target </th>
+				<th> Sales Target </th>
+				<th> E.Val Target </th>
 			</tr>
 			</thead>
 			<tbody>
 			@foreach ($month_budget as $sku_budget)
 			
 				<?php
-				
+				$total_sales+=$sku_budget['sales'];
+				$total_amount+=$sku_budget['amount'];
+				$total_profit+=$sku_budget['economic'];
+				$total_sales_target+=$sku_budget['sales_target'];
+				$total_amount_target+=$sku_budget['amount_target'];
+				$total_profit_target+=$sku_budget['economic_target'];
 				if($sku_budget['amount_target']<0){
 					$amount_per = round(2-$sku_budget['amount']/$sku_budget['amount_target'],4);
 				}elseif($sku_budget['amount_target']>0){
@@ -560,28 +580,36 @@ a.editable-click:hover {
 						{{$sku_budget['sku']}}
 					</td>
 					<td>
-						{{array_get($status_arr,$sku_budget['status'])}}
+						{{$sku_budget['site']}}
 					</td>
 					<td>
-						{{$sku_budget['sales']}}
+						{{$sku_budget['sku_status']}}
 					</td>
 					<td>
-						{{$sku_budget['amount']}}
+						{{intval($sku_budget['sales'])}}
 					</td>
 					<td>
-						{{$sku_budget['economic']}}
+						{{round($sku_budget['amount'],2)}}
 					</td>
 					<td>
-						{{$sku_budget['sales_target']}}
-						<span class="{{($sales_per>=$time_rate)?'font-red-haze':'font-green-sharp'}}">{{$sales_per*100}}%</span>
+						{{round($sku_budget['economic'],2)}}
 					</td>
 					<td>
-						{{$sku_budget['amount_target']}}
-						<span class="{{($amount_per>=$time_rate)?'font-red-haze':'font-green-sharp'}}">{{$amount_per*100}}%</span>
+						<span class="{{($sales_per>=$time_rate)?'font-red-haze':'font-green-sharp'}}">{{$sales_per*100}}%</span>&nbsp;&nbsp;
+						
+						{{intval($sku_budget['sales_target'])}}
+						
 					</td>
 					<td>
-						{{$sku_budget['economic_target']}}
-						<span class="{{($profit_per>=$time_rate)?'font-red-haze':'font-green-sharp'}}">{{$profit_per*100}}%</span>
+						<span class="{{($amount_per>=$time_rate)?'font-red-haze':'font-green-sharp'}}">{{$amount_per*100}}%</span>&nbsp;&nbsp;
+						{{round($sku_budget['amount_target'],2)}}
+						
+					</td>
+					<td>
+						<span class="{{($profit_per>=$time_rate)?'font-red-haze':'font-green-sharp'}}">{{$profit_per*100}}%</span>&nbsp;&nbsp;
+						
+						{{round($sku_budget['economic_target'],2)}}
+						
 					</td>
 				</tr>
 			@endforeach
@@ -589,6 +617,42 @@ a.editable-click:hover {
 
 
 			</tbody>
+			<?php
+			if($total_sales_target<0){
+				$total_sales_per = round(2-$total_sales/$total_sales_target,4);
+			}elseif($total_sales_target>0){
+				$total_sales_per =round($total_sales/$total_sales_target,4);
+			}else{
+				$total_sales_per =0;
+			}
+			
+			if($total_amount_target<0){
+				$total_amount_per = round(2-$total_amount/$total_amount_target,4);
+			}elseif($total_amount_target>0){
+				$total_amount_per =round($total_amount/$total_amount_target,4);
+			}else{
+				$total_amount_per =0;
+			}
+			
+			if($total_profit_target<0){
+				$total_profit_per = round(2-$total_profit/$total_profit_target,4);
+			}elseif($total_profit_target>0){
+				$total_profit_per =round($total_profit/$total_profit_target,4);
+			}else{
+				$total_profit_per =0;
+			}
+			?>
+			<thead>
+			<tr>
+				<th colspan="3"> Total:</th>
+				<th> {{intval($total_sales)}} </th>
+				<th> {{round($total_amount,2)}}</th>
+				<th> {{round($total_profit,2)}} </th>
+				<th><span class="{{($total_sales_per>=$time_rate)?'font-red-haze':'font-green-sharp'}}">{{$total_sales_per*100}}%</span>&nbsp;&nbsp; {{intval($total_sales_target)}} </th>
+				<th><span class="{{($total_amount_per>=$time_rate)?'font-red-haze':'font-green-sharp'}}">{{$total_amount_per*100}}%</span>&nbsp;&nbsp; {{round($total_amount_target,2)}} </th>
+				<th><span class="{{($total_profit_per>=$time_rate)?'font-red-haze':'font-green-sharp'}}">{{$total_profit_per*100}}%</span>&nbsp;&nbsp; {{round($total_profit_target,2)}} </th>
+			</tr>
+			</thead>
 		</table>
 		</div>
 		</div>
