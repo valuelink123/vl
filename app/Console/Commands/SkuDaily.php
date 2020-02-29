@@ -48,6 +48,9 @@ class SkuDaily extends Command
 		$time =  $this->option('time');
         if(!$time) $time='2day';
 		$date=date('Y-m-d',strtotime('-'.$time));
+		for($xxx=2;$xxx<=28;$xxx++){
+		$date=date('Y-m-d',strtotime('-'.$xxx.'day'));
+		print_r($date.'start...');
 		$skus_info=[];
 		$sku=$departments=[];
 		//取汇率
@@ -62,7 +65,7 @@ class SkuDaily extends Command
 		if(date('m',strtotime($date))>1 && date('m',strtotime($date))<11) $m_f='2_10_fee';
 		$storage_fee = DB::table('storage_fee')->select(DB::raw("CONCAT(type,'-',site,'-',size) as skey, $m_f as svalue"))->pluck('svalue','skey');
 		//收入明细
-		print_r('订单相关计算开始...');
+		print_r('order...');
 		$sales =  DB::connection('order')->select("select sellersku,MarketplaceName,type,currency,sum(quantityshipped) as sales,
 		sum(Amount) as amount from finances_shipment_event where date='$date' 
 		group by sellersku,MarketplaceName,type,currency");
@@ -106,7 +109,7 @@ class SkuDaily extends Command
 			}
 
 		}
-		print_r('退款相关计算开始...');
+		print_r('refund...');
 		//退款明细
 		$refunds =  DB::connection('order')->select("select MarketplaceName,sellersku,type,currency,sum(Amount) as amount from finances_refund_event
 		where date='$date' group by MarketplaceName,SellerSKU,type,Currency");
@@ -135,7 +138,7 @@ class SkuDaily extends Command
 
 		}
 		
-		print_r('退货相关计算开始...');
+		print_r('return...');
 		//退货明细
 		$returns =  DB::connection('order')->select("select asin,sellersku,sum(quantity) as quantity from amazon_returns
 		where left(ReturnDate,10)='$date' and status<>'Reimbursed' group by asin,sellersku");
@@ -154,7 +157,7 @@ class SkuDaily extends Command
 			$skus_info[$key]['returnqty']+=intval($return->quantity);
 			$skus_info[$key]['sales']=$skus_info[$key]['sales']-intval($return->quantity);
 		}
-		print_r('Deal相关计算开始...');
+		print_r('Deal...');
 		//deal
 		$coupons =  DB::connection('order')->select("select totalamount,currency,sku,site_code from finances_deal_event
 		where left(PostedDate,10)='$date'");
@@ -186,7 +189,7 @@ class SkuDaily extends Command
 			}
 		}
 		
-		print_r('Coupon相关计算开始...');
+		print_r('Coupon...');
 		//coupon
 		$coupons =  DB::connection('order')->select("select totalamount,currency,sku,site_code from finances_coupon_event
 		where left(PostedDate,10)='$date'");
@@ -217,7 +220,7 @@ class SkuDaily extends Command
 			}
 		}
 		
-		print_r('CPC相关计算开始...');
+		print_r('CPC...');
 		//cpc
 		$coupons =  DB::select("select marketplace_id,cost,sku from aws_report
 		where date='$date' and state='enabled'");
@@ -247,7 +250,7 @@ class SkuDaily extends Command
 				$skus_info[$key]['cpc']+=round($sku_amount*array_get($rates,array_get(getSiteCur(),array_get(getSiteUrl(),$coupon->marketplace_id))),2);
 			}
 		}
-		print_r('FBA库存匹配开始...');
+		print_r('FBA...');
 		//FBA库存对应
 		$sellerskus =  DB::connection('order')->select("select sellersku,asin,instock from amazon_inventory_supply where instock>0");
 		foreach($sellerskus as $sellersku_s){
@@ -263,7 +266,7 @@ class SkuDaily extends Command
 			$skus_info[$key]['fba_stock']+=intval($sellersku_s->instock);		
 		}
 		
-		print_r('基础信息匹配开始...');
+		print_r('baseinfo...');
 		foreach($skus_info as $key=>$v){
 			$key_s = explode('|',$key);
 			if(count($key_s)!=3) continue;
@@ -322,10 +325,10 @@ class SkuDaily extends Command
 			//完成率
 			$budget_year = date('Y',strtotime($date));
 			$budget_id = intval(DB::table('budgets')->where('sku',$sku)->where('site',$skus_info[$key]['site'])->where('year',$budget_year)->value('id'));
-			$day_budget_datas = DB::table('budget_details')->where('budget_id',$budget_id)->where('date',$date)->selectRaw('(qty+promote) as qty,income as amount,(income-cost-common_fee-pick_fee-storage_fee-promotion_fee-amount_fee) as profit')->first();
+			$day_budget_datas = DB::table('budget_details')->where('budget_id',$budget_id)->where('date',$date)->selectRaw('(qty+promote_qty) as qty,income as amount,(income-cost-common_fee-pick_fee-storage_fee-promotion_fee-amount_fee) as profit')->first();
 			$day_budget_datas = json_decode(json_encode($day_budget_datas), true);
 			$budget_month = date('Y-m',strtotime($date));
-			$month_budget_datas = DB::table('budget_details')->where('budget_id',$budget_id)->whereRaw("left(date,7) = '".$budget_month."'")->selectRaw('sum(qty+promote) as qty,sum(income) as amount,sum(income-cost-common_fee-pick_fee-storage_fee-promotion_fee-amount_fee) as profit')->first();
+			$month_budget_datas = DB::table('budget_details')->where('budget_id',$budget_id)->whereRaw("left(date,7) = '".$budget_month."'")->selectRaw('sum(qty+promote_qty) as qty,sum(income) as amount,sum(income-cost-common_fee-pick_fee-storage_fee-promotion_fee-amount_fee) as profit')->first();
 			$month_budget_datas = json_decode(json_encode($month_budget_datas), true);
 			$oa_qty_target = round(array_get($day_budget_datas,'qty',0),2);
 			$oa_amount_target = round(array_get($day_budget_datas,'amount',0),2);
@@ -422,7 +425,7 @@ class SkuDaily extends Command
 		
 		
 		//计算ASIN维度销量明细
-		print_r('订单相关计算开始...');
+		print_r('asinorder...');
 		$skus_info=[];
 		$sales =  DB::connection('order')->select("select sellersku,MarketplaceName,type,currency,sum(quantityshipped) as sales,
 		sum(Amount) as amount from finances_shipment_event where date='$date' 
@@ -485,6 +488,7 @@ class SkuDaily extends Command
 			,$skus_info[$key]);
 		}
 		
+		}
     }
 
     
