@@ -70,7 +70,7 @@
                             <label>Sap Seller Id</label>
                             <div class="input-group col-md-6">
                                 <span class="input-group-addon">
-                                    <i class="fa fa-user"></i>
+                                    <i class="fa fa-envelope"></i>
                                 </span>
                                 <input type="text" class="form-control" name="sap_seller_id" id="sap_seller_id" value="{{$user['sap_seller_id']}}">
                             </div>
@@ -79,18 +79,20 @@
                             <label>BG</label>
                             <div class="input-group col-md-6">
                                 <span class="input-group-addon">
-                                    <i class="fa fa-user"></i>
+                                    <i class="fa fa-envelope"></i>
                                 </span>
-                                <input type="text" class="form-control" name="bg" id="bg" value="{{$user['ubg']}}">
+                                <input type="text" class="form-control" name="bg" id="bg" value="{{$user['ubg']}}" autocomplete="off" >
                             </div>
                         </div>
 						<div class="form-group">
                             <label>BU</label>
                             <div class="input-group col-md-6">
                                 <span class="input-group-addon">
-                                    <i class="fa fa-user"></i>
+                                    <i class="fa fa-envelope"></i>
                                 </span>
-                                <input type="text" class="form-control" name="bu" id="bu" value="{{$user['ubu']}}">
+                                <input type="text" class="form-control" name="bu" id="bu" value="{{$user['ubu']}}" autocomplete="off" 
+readonly 
+onfocus="this.removeAttribute('readonly');" onblur="this.setAttribute('readonly',true);">
                             </div>
                         </div>
 						
@@ -99,16 +101,18 @@
                             <label>New Password</label>
                             <div class="input-group col-md-6">
                                 <span class="input-group-addon">
-                                    <i class="fa fa-key"></i>
+                                    <i class="fa fa-envelope"></i>
                                 </span>
-                                <input type="password" class="form-control" name="password" id="password" value="" placeholder="Leave blank to indicate no change">
+                                <input type="password" class="form-control" name="password" id="password" value="" autocomplete="off" 
+readonly 
+onfocus="this.removeAttribute('readonly');" onblur="this.setAttribute('readonly',true);"  placeholder="Leave blank to indicate no change" >
                             </div>
                         </div>
                         <div class="form-group">
                             <label>Re-type New Password</label>
                             <div class="input-group col-md-6">
                                 <span class="input-group-addon">
-                                    <i class="fa fa-key"></i>
+                                    <i class="fa fa-envelope"></i>
                                 </span>
                                 <input type="password" class="form-control" name="password_confirmation" id="password_confirmation" value="">
                             </div>

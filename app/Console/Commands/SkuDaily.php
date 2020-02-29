@@ -322,10 +322,10 @@ class SkuDaily extends Command
 			//完成率
 			$budget_year = date('Y',strtotime($date));
 			$budget_id = intval(DB::table('budgets')->where('sku',$sku)->where('site',$skus_info[$key]['site'])->where('year',$budget_year)->value('id'));
-			$day_budget_datas = DB::table('budget_details')->where('budget_id',$budget_id)->where('date',$date)->selectRaw('qty as qty,income as amount,(income-cost-common_fee-pick_fee-storage_fee-promotion_fee-amount_fee) as profit')->first();
+			$day_budget_datas = DB::table('budget_details')->where('budget_id',$budget_id)->where('date',$date)->selectRaw('(qty+promote) as qty,income as amount,(income-cost-common_fee-pick_fee-storage_fee-promotion_fee-amount_fee) as profit')->first();
 			$day_budget_datas = json_decode(json_encode($day_budget_datas), true);
 			$budget_month = date('Y-m',strtotime($date));
-			$month_budget_datas = DB::table('budget_details')->where('budget_id',$budget_id)->whereRaw("left(date,7) = '".$budget_month."'")->selectRaw('sum(qty) as qty,sum(income) as amount,sum(income-cost-common_fee-pick_fee-storage_fee-promotion_fee-amount_fee) as profit')->first();
+			$month_budget_datas = DB::table('budget_details')->where('budget_id',$budget_id)->whereRaw("left(date,7) = '".$budget_month."'")->selectRaw('sum(qty+promote) as qty,sum(income) as amount,sum(income-cost-common_fee-pick_fee-storage_fee-promotion_fee-amount_fee) as profit')->first();
 			$month_budget_datas = json_decode(json_encode($month_budget_datas), true);
 			$oa_qty_target = round(array_get($day_budget_datas,'qty',0),2);
 			$oa_amount_target = round(array_get($day_budget_datas,'amount',0),2);

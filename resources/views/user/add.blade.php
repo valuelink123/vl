@@ -31,7 +31,7 @@
                                 <span class="input-group-addon">
                                     <i class="fa fa-envelope"></i>
                                 </span>
-                                <input type="email" name="email" class="form-control" value="" required />
+                                <input type="email" name="email" class="form-control" value="{{old('email')}}" required />
                             </div>
                         </div>
 
@@ -43,7 +43,7 @@
                                 <span class="input-group-addon">
                                     <i class="fa fa-user"></i>
                                 </span>
-                                <input type="text" class="form-control" name="name" id="name" required>
+                                <input type="text" class="form-control" name="name" id="name" value="{{old('name')}}" required>
                             </div>
                         </div>
 						
@@ -67,27 +67,29 @@
                             <label>Sap Seller Id</label>
                             <div class="input-group col-md-6">
                                 <span class="input-group-addon">
-                                    <i class="fa fa-user"></i>
+                                    <i class="fa fa-envelope"></i>
                                 </span>
-                                <input type="text" class="form-control" name="sap_seller_id" id="sap_seller_id" >
+                                <input type="text" class="form-control" name="sap_seller_id" id="sap_seller_id" value="{{old('sap_seller_id')}}" autocomplete="off">
                             </div>
                         </div>
 						<div class="form-group">
                             <label>BG</label>
                             <div class="input-group col-md-6">
                                 <span class="input-group-addon">
-                                    <i class="fa fa-user"></i>
+                                    <i class="fa fa-envelope"></i>
                                 </span>
-                                <input type="text" class="form-control" name="bg" id="bg" >
+                                <input type="text" class="form-control" name="bg" id="bg" value="{{old('bg')}}" autocomplete="off" >
                             </div>
                         </div>
 						<div class="form-group">
                             <label>BU</label>
                             <div class="input-group col-md-6">
                                 <span class="input-group-addon">
-                                    <i class="fa fa-user"></i>
+                                    <i class="fa fa-envelope"></i>
                                 </span>
-                                <input type="text" class="form-control" name="bu" id="bu">
+                                <input type="text" class="form-control" name="bu" id="bu" value="{{old('bu')}}" autocomplete="off" 
+readonly 
+onfocus="this.removeAttribute('readonly');" onblur="this.setAttribute('readonly',true);">
                             </div>
                         </div>
 						
@@ -95,18 +97,20 @@
                             <label>New Password</label>
                             <div class="input-group col-md-6">
                                 <span class="input-group-addon">
-                                    <i class="fa fa-key"></i>
+                                    <i class="fa fa-envelope"></i>
                                 </span>
-                                <input type="password" class="form-control" name="password" id="password" required>
+                                <input type="password" class="form-control" name="password" id="password" value="{{old('password')}}" autocomplete="off" 
+readonly 
+onfocus="this.removeAttribute('readonly');" onblur="this.setAttribute('readonly',true);" required>
                             </div>
                         </div>
                         <div class="form-group">
                             <label>Re-type New Password</label>
                             <div class="input-group col-md-6">
                                 <span class="input-group-addon">
-                                    <i class="fa fa-key"></i>
+                                    <i class="fa fa-envelope"></i>
                                 </span>
-                                <input type="password" class="form-control" name="password_confirmation" id="password_confirmation" required>
+                                <input type="password" class="form-control" name="password_confirmation" id="password_confirmation" value="{{old('password_confirmation')}}" required>
                             </div>
                         </div>
 						
