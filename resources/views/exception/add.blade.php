@@ -21,7 +21,43 @@
 	if(!rebindorderid.reportValidity()){
 	    return
 	}
+	
+	var havewarnwords='';
+			
 
+	  $.ajax({ 
+		type: "post", 
+		url: "/exception/getrepeatorder", 
+		 cache:false, 
+	   data:{
+		"_token":"{{csrf_token()}}",
+		"id":0,
+		"orderid":$("#rebindorderid").val()
+	  },
+	   async:false, 
+	
+	   success: function(data){ 
+			var redata = JSON.parse(data);
+			
+			for( var child_i in redata )
+			{
+				havewarnwords+='Post at '+redata[child_i].date+' by '+redata[child_i].name+'<BR>';
+			}
+
+			
+		} 
+	
+	});
+			
+
+		if(havewarnwords){   
+		   bootbox.dialog({
+				message: "Similar orders already exists, please confirm before submit!<BR><BR>"+havewarnwords,
+				title: "Warning",
+				
+			});
+		}
+		
 	$.post("/exception/getorder",
 	  {
 	  	"_token":"{{csrf_token()}}",

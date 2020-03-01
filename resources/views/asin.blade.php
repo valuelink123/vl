@@ -62,9 +62,9 @@ th,td,td>span {
                             </div>
                         </div>
 						</div>
-                       
+                       <div class="col-md-6">
 						@if(Auth::user()->seller_rules)
-						<div class="col-md-2">
+						<div class="col-md-3">
 						<select class="form-control form-filter input-sm" name="bgbu">
                                         <option value="">BG && BU</option>
 										<?php 
@@ -81,7 +81,7 @@ th,td,td>span {
 										} ?>
                                     </select>
 						</div>	
-						<div class="col-md-2">
+						<div class="col-md-3">
 						<select class="mt-multiselect btn btn-default form-control form-filter input-sm " data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" name="user_id" id="user_id">
 								<option value="">All Sellers</option>
 								@foreach ($users as $user_id=>$user_name)
@@ -91,13 +91,23 @@ th,td,td>span {
 						</div>
 						
 						@endif
-						 <div class="col-md-2">
+						 <div class="col-md-3">
 						<select class="mt-multiselect btn btn-default" multiple="multiple" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" name="site[]" id="site[]">
 
                                         @foreach (getAsinSites() as $v)
                                             <option value="{{$v}}">{{$v}}</option>
                                         @endforeach
                                     </select>
+						</div>
+						
+						<div class="col-md-3">
+						<select class="form-control form-filter input-sm" name="sku_status">
+
+							@foreach ($sku_statuses as $k=>$v)
+								<option value="{{$v->status}}">{{$v->status}}</option>
+							@endforeach
+						</select>
+						</div>
 						</div>
 						
 						<div class="col-md-2">
@@ -171,6 +181,7 @@ th,td,td>span {
             grid.setAjaxParam("date_to", $("input[name='date_to']").val());
             grid.setAjaxParam("user_id", $("select[name='user_id']").val());
 			grid.setAjaxParam("bgbu", $("select[name='bgbu']").val());
+			grid.setAjaxParam("sku_status", $("select[name='sku_status']").val());
 			grid.setAjaxParam("keywords", $("input[name='keywords']").val());
 			grid.setAjaxParam("site", $("select[name='site[]']").val());
             grid.init({

@@ -291,12 +291,13 @@ class HomeController extends Controller
         $date_from = $request->get('date_from')?$request->get('date_from'):(date('Y-m',strtotime('-2days')).'-01');
 		$date_to = $request->get('date_to')?$request->get('date_to'):date('Y-m-d',strtotime('-2days'));
 		$teams = DB::select("select bg,bu from asin where $sumwhere group by bg,bu ORDER BY BG ASC,BU ASC");
+		$sku_statuses = DB::select("select status from skus_status group by status");
 		$users = $this->getUsers();
 		if($date_to>date('Y-m-d',strtotime('-2days'))) $date_to=date('Y-m-d',strtotime('-2days'));
 		if($date_from>$date_to) $date_from=$date_to;
 		$s_user_id = $request->get('user_id');
 		$bgbu = $request->get('bgbu');
-		return view('asin',compact('date_from','date_to','s_user_id','bgbu','teams','users'));	
+		return view('asin',compact('date_from','date_to','s_user_id','bgbu','teams','users','sku_statuses'));	
     }
 	
 	public function getasins(Request $request){
@@ -377,6 +378,9 @@ class HomeController extends Controller
 		}
 		if(array_get($_REQUEST,'site')){
 			$asins = $asins->whereIn('asin.site',$_REQUEST['site']);
+		}
+		if(array_get($_REQUEST,'sku_status')){
+			$asins = $asins->where('skus_status.status',$_REQUEST['sku_status']);
 		}
 		if(array_get($_REQUEST,'keywords')){
             $keywords = array_get($_REQUEST,'keywords');

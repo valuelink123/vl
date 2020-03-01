@@ -355,7 +355,7 @@ a.editable-click:hover {
 						</div>
 						
 						<div class="form-group col-md-5 col-md-offset-2">
-						<input class="form-control form-filter input-sm" name="keywords" id="keywords" value="{{$s_keywords}}">
+						<input class="form-control form-filter input-sm" name="keywords" id="keywords" value="{{$s_keywords}}" placeholder="SKU">
 						</div>	
 
 						<div class="form-group col-md-12">
