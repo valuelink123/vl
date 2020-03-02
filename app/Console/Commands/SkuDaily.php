@@ -48,7 +48,7 @@ class SkuDaily extends Command
 		$time =  $this->option('time');
         if(!$time) $time='2day';
 		$date=date('Y-m-d',strtotime('-'.$time));
-		for($xxx=3;$xxx<=30;$xxx++){
+		for($xxx=14;$xxx<=31;$xxx++){
 		$date=date('Y-m-d',strtotime('-'.$xxx.'day'));
 		print_r($date.'start...');
 		$skus_info=[];
@@ -417,7 +417,7 @@ class SkuDaily extends Command
 				$skus_info[$key]['eliminate2']=( $eliminate2>0)? $eliminate2:0;
 				$skus_info[$key]['bonus'] = $skus_info[$key]['eliminate1']*0.03+$skus_info[$key]['eliminate2']*0.4;
 			}
-			
+			SkusDailyInfo::where('sku',$skus_info[$key]['sku'])->where('site',$skus_info[$key]['site'])->where('date',$skus_info[$key]['date'])->delete();
 			SkusDailyInfo::updateOrCreate(
 			['sku'=>$skus_info[$key]['sku'], 'site'=>$skus_info[$key]['site'], 'date'=>$skus_info[$key]['date']]
 			,$skus_info[$key]);
@@ -483,7 +483,7 @@ class SkuDaily extends Command
 			$skus_info[$key]['sap_seller_id']=intval($key_s[2]);
 			$skus_info[$key]['bg'] = array_get($departments,$skus_info[$key]['sap_seller_id'].'.bg');
 			$skus_info[$key]['bu'] = array_get($departments,$skus_info[$key]['sap_seller_id'].'.bu');
-			
+			AsinDailyInfo::where('asin',$skus_info[$key]['asin'])->where('site',$skus_info[$key]['site'])->where('date',$skus_info[$key]['date'])->delete();
 			AsinDailyInfo::updateOrCreate(
 			['asin'=>$skus_info[$key]['asin'], 'site'=>$skus_info[$key]['site'], 'date'=>$skus_info[$key]['date']]
 			,$skus_info[$key]);
