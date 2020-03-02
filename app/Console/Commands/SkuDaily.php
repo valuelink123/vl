@@ -48,6 +48,8 @@ class SkuDaily extends Command
 		$time =  $this->option('time');
         if(!$time) $time='2day';
 		$date=date('Y-m-d',strtotime('-'.$time));
+		for($xxx=3;$xxx<=30;$xxx++){
+		$date=date('Y-m-d',strtotime('-'.$xxx.'day'));
 		print_r($date.'start...');
 		$skus_info=[];
 		$sku=$departments=[];
@@ -485,6 +487,8 @@ class SkuDaily extends Command
 			AsinDailyInfo::updateOrCreate(
 			['asin'=>$skus_info[$key]['asin'], 'site'=>$skus_info[$key]['site'], 'date'=>$skus_info[$key]['date']]
 			,$skus_info[$key]);
+		}
+		
 		}
     }
 
