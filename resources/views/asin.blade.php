@@ -102,7 +102,7 @@ th,td,td>span {
 						
 						<div class="col-md-3">
 						<select class="form-control form-filter input-sm" name="sku_status">
-
+							<option value="">All Status</option>
 							@foreach ($sku_statuses as $k=>$v)
 								<option value="{{$v->status}}">{{$v->status}}</option>
 							@endforeach
