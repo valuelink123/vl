@@ -220,7 +220,7 @@ th,td,td>span {
                         [3, "desc"]
                     ],
                     // scroller extension: http://datatables.net/extensions/scroller/
-                    scrollY:        690,
+                    scrollY:        740,
                     scrollX:        true,
 					
                     "ajax": {

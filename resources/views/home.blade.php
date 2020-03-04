@@ -91,7 +91,7 @@ a.editable-click:hover {
 				</div>
 				<div class="col-md-10">
 				<?php
-				$total_sales = $total_amount = $total_profit = $total_sales_target = $total_amount_target = $total_profit_target = 0;
+				$total_sales = $total_return = $total_amount = $total_profit = $total_sales_target = $total_amount_target = $total_profit_target = 0;
 				$time_rate = date('d',strtotime('-2days'))/date('t',strtotime('-2days'));
 				$class=$sign="";
 				$ap = array_get($total_info,'economic',0);
@@ -534,6 +534,7 @@ a.editable-click:hover {
 				<th> Site </th>
 				<th> Status</th>
 				<th> Current Units </th>
+				<th> Return Units </th>
 				<th> Current Sales</th>
 				<th> Current E.Val </th>
 				<th> Units Target </th>
@@ -546,6 +547,7 @@ a.editable-click:hover {
 			
 				<?php
 				$total_sales+=$sku_budget['sales'];
+				$total_return+=$sku_budget['returns'];
 				$total_amount+=$sku_budget['amount'];
 				$total_profit+=$sku_budget['economic'];
 				$total_sales_target+=$sku_budget['sales_target'];
@@ -587,6 +589,9 @@ a.editable-click:hover {
 					</td>
 					<td>
 						{{intval($sku_budget['sales'])}}
+					</td>
+					<td>
+						{{intval($sku_budget['returns'])}}
 					</td>
 					<td>
 						{{round($sku_budget['amount'],2)}}
@@ -646,8 +651,10 @@ a.editable-click:hover {
 			<tr>
 				<th colspan="3"> Total:</th>
 				<th> {{intval($total_sales)}} </th>
+				<th> {{intval($total_return)}} </th>
 				<th> {{round($total_amount,2)}}</th>
 				<th> {{round($total_profit,2)}} </th>
+				
 				<th><span class="{{($total_sales_per>=$time_rate)?'font-red-haze':'font-green-sharp'}}">{{$total_sales_per*100}}%</span>&nbsp;&nbsp; {{intval($total_sales_target)}} </th>
 				<th><span class="{{($total_amount_per>=$time_rate)?'font-red-haze':'font-green-sharp'}}">{{$total_amount_per*100}}%</span>&nbsp;&nbsp; {{round($total_amount_target,2)}} </th>
 				<th><span class="{{($total_profit_per>=$time_rate)?'font-red-haze':'font-green-sharp'}}">{{$total_profit_per*100}}%</span>&nbsp;&nbsp; {{round($total_profit_target,2)}} </th>

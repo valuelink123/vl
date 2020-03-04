@@ -42,6 +42,12 @@ class HomeController extends Controller
 		
 		$sumwhere = '1=1';
 		$bonus_point = 0;
+		$date_from = $request->get('date_from')?$request->get('date_from'):(date('Y-m',strtotime('-2days')).'-01');
+		$date_to = $request->get('date_to')?$request->get('date_to'):date('Y-m-d',strtotime('-2days'));
+		
+		if($date_to>date('Y-m-d',strtotime('-2days'))) $date_to=date('Y-m-d',strtotime('-2days'));
+		if($date_from>$date_to) $date_from=$date_to;
+		
 		if (Auth::user()->seller_rules) {
 			$rules = explode("-", Auth::user()->seller_rules);
 			if (array_get($rules, 0) != '*'){
@@ -63,13 +69,16 @@ class HomeController extends Controller
 		}
 		
 		
-		
-		$asins = DB::table( DB::raw("(select max(sku_ranking) as sku_ranking,max(rating) as rating,max(review_count) as review_count,max(item_no) as item_no,sum(fba_stock) as fba_stock,sum(fba_transfer) as fba_transfer,max(fbm_stock) as fbm_stock,sum(sales_07_01) as sales_07_01,sum(sales_14_08) as sales_14_08,sum(sales_21_15) as sales_21_15,sum(sales_28_22) as sales_28_22,max(bg) as bg,max(bu) as bu,max(sap_seller_id) as sap_seller_id,max(review_user_id) as review_user_id, min(case when status = 'S' Then '0' else status end) as status,asin,site from asin where length(asin)=10 group by asin,site) as asin") )->orderByRaw("status asc,sales_07_01 desc")
-		->leftJoin( DB::raw("(select asin as asin_b,domain,avg(sessions) as sessions,avg(unit_session_percentage) as unit_session_percentage,avg(bsr) as bsr from star_history where create_at >= '".date('Y-m-d',strtotime('-10day'))."' group by asin,domain) as asin_star") ,function($q){
+		$asins = DB::table( DB::raw("(select max(sku_ranking) as sku_ranking,max(rating) as rating,max(review_count) as review_count,max(item_no) as item_no,sum(fba_stock) as fba_stock,sum(fba_transfer) as fba_transfer,max(fbm_stock) as fbm_stock,sum(sales_07_01) as sales_07_01,sum(sales_14_08) as sales_14_08,sum(sales_21_15) as sales_21_15,sum(sales_28_22) as sales_28_22,max(bg) as bg,max(bu) as bu,max(sap_seller_id) as sap_seller_id,max(review_user_id) as review_user_id, min(case when status = 'S' Then '0' else status end) as status,asin,site from asin where length(asin)=10 group by asin,site) as asin") )
+		->leftJoin( DB::raw("(select sum(bonus)*".$bonus_point." as bonus,sum(economic) as economic,sku,site from skus_daily_info where date>='".$date_from."' and date<='".$date_to."' group by sku,site) as sku_info") ,function($q){
+			$q->on('asin.item_no', '=', 'sku_info.sku')->on('asin.site', '=', 'sku_info.site');
+		})->leftJoin( DB::raw("(select sum(amount) as amount,sum(sales) as sales,asin,site from asin_daily_info where date>='".$date_from."' and date<='".$date_to."' group by asin,site) as asin_info") ,function($q){
+			$q->on('asin.asin', '=', 'asin_info.asin')->on('asin.site', '=', 'asin_info.site');
+		})->leftJoin( DB::raw("(select asin as asin_b,domain,avg(sessions) as sessions,avg(unit_session_percentage) as unit_session_percentage,avg(bsr) as bsr from star_history where create_at >= '".date('Y-m-d',strtotime('-10day'))."' group by asin,domain) as asin_star") ,function($q){
 			$q->on('asin.asin', '=', 'asin_star.asin_b')->on('asin.site', '=', 'asin_star.domain');
 		})->leftJoin("skus_status" ,function($q){
 			$q->on('asin.item_no', '=', 'skus_status.sku')->on('asin.site', '=', 'skus_status.site');
-		})->selectRaw("asin.*,asin_star.*,skus_status.status as sku_status,skus_status.level as sku_level");
+		})->orderByRaw("amount desc")->selectRaw("asin.*,asin_star.*,skus_status.status as sku_status,skus_status.level as sku_level,sku_info.bonus,sku_info.economic,asin_info.amount,asin_info.sales");
 		if($limit_bg){
 			$asins = $asins->where('asin.bg',$limit_bg);
 			$sumwhere.=" and bg='$limit_bg'";
@@ -166,11 +175,7 @@ class HomeController extends Controller
 		
 		$asins = $asins->take(5)->get();
 		$asins = json_decode(json_encode($asins), true);
-		$date_from = $request->get('date_from')?$request->get('date_from'):(date('Y-m',strtotime('-2days')).'-01');
-		$date_to = $request->get('date_to')?$request->get('date_to'):date('Y-m-d',strtotime('-2days'));
 		
-		if($date_to>date('Y-m-d',strtotime('-2days'))) $date_to=date('Y-m-d',strtotime('-2days'));
-		if($date_from>$date_to) $date_from=$date_to;
 		$hb_date_to = date('Y-m-d',strtotime($date_from)-86400);
 		$hb_date_from = date('Y-m-d',2*strtotime($date_from)-strtotime($date_to)-86400);
 		
@@ -187,20 +192,12 @@ class HomeController extends Controller
 		})->whereRaw($sumwhere.$sku_daily_info_where." and date>='$date_from' and date<='$date_to'")->groupBy(['date'])->pluck('sumbonus','date');
 		
 		$curr_month = date('Y-m',strtotime('-2days'));
-		$month_budget = SkusDailyInfo::select(DB::raw('sum(economic) as economic,sum(amount) as amount,sum(sales) as sales,sum(profit_target) as economic_target,sum(sales_target) as sales_target,sum(amount_target) as amount_target,skus_daily_info.sku as sku,skus_daily_info.site as site,any_value(skus_status.status) as sku_status'))->leftJoin("skus_status" ,function($q){
+		$month_budget = SkusDailyInfo::select(DB::raw('sum(economic) as economic,sum(amount) as amount,sum(sales) as sales,sum(returnqty) as returns,sum(profit_target) as economic_target,sum(sales_target) as sales_target,sum(amount_target) as amount_target,skus_daily_info.sku as sku,skus_daily_info.site as site,any_value(skus_status.status) as sku_status'))->leftJoin("skus_status" ,function($q){
 			$q->on('skus_daily_info.sku', '=', 'skus_status.sku')->on('skus_daily_info.site', '=', 'skus_status.site');
-		})->whereRaw($sumwhere.$sku_daily_info_where." and left(date,7)='$curr_month'")->groupBy(['sku','site'])->orderBy('economic','desc')->get()->toArray();
+		})->whereRaw($sumwhere.$sku_daily_info_where." and left(date,7)='$curr_month'")->groupBy(['sku','site'])->orderBy('sales','desc')->get()->toArray();
 
 		
-		foreach($asins as $key=>$asin){
-			$sku_info = SkusDailyInfo::select(DB::raw('sum(bonus)*'.$bonus_point.' as bonus,sum(economic) as economic'))->whereRaw("sku='".$asin['item_no']."' and site='".$asin['site']."' and date>='$date_from' and date<='$date_to'")->first()->toArray();
-			$asins[$key]['bonus']=array_get($sku_info,'bonus',0);
-			$asins[$key]['economic']=array_get($sku_info,'economic',0);
-			
-			$asin_info = AsinDailyInfo::select(DB::raw('sum(amount) as amount,sum(sales) as sales'))->whereRaw("asin='".$asin['asin']."' and site='".$asin['site']."' and date>='$date_from' and date<='$date_to'")->first()->toArray();
-			$asins[$key]['amount']=array_get($asin_info,'amount',0);
-			$asins[$key]['sales']=array_get($asin_info,'sales',0);
-		}
+		
 		$returnDate['month_budget']= $month_budget;
 		$returnDate['bonus_point']= $bonus_point;
 		$returnDate['total_info']= $total_info;
@@ -451,6 +448,8 @@ class HomeController extends Controller
 		
 		$users_array = $this->getUsers();
 		$sellers_array = $this->getSellers();
+		$total_amount = $total_sales = $total_fba_stock = $total_fba_transfer = $total_fbm_stock = $total_review_count = $total_economic = $total_bonus =0;
+		$exists_sku=[];
         foreach ( $datas as $asin){
 			$sales = ((((array_get($asin,'sales_07_01')??array_get($asin,'sales_14_08'))??array_get($asin,'sales_21_15'))??array_get($asin,'sales_28_22'))??0)/7 ;
 			$records["data"][] = array(
@@ -474,9 +473,41 @@ class HomeController extends Controller
 				intval(array_get($asin,'economic',0)),
 				intval(array_get($asin,'bonus')*$bonus_point)
 			);
+			$total_amount+=round(array_get($asin,'amount'),2);
+			$total_sales+=round(array_get($asin,'sales'),2);
+			$total_fba_stock+=round(array_get($asin,'fba_stock'),2);
+			$total_fba_transfer+=round(array_get($asin,'fba_transfer'),2);
+			$total_fbm_stock+=round(array_get($asin,'fbm_stock'),2);
+			$total_review_count+=round(array_get($asin,'review_count'),2);
+			
+			if(!array_key_exists(array_get($asin,'item_no').'_'.array_get($asin,'site'),$exists_sku)){
+				$total_economic+=intval(array_get($asin,'economic',0));
+				$total_bonus+=intval(array_get($asin,'bonus')*$bonus_point);
+				$exists_sku[array_get($asin,'item_no').'_'.array_get($asin,'site')]=1;
+			}
         }
 
-
+		$records["data"][] = array(
+			'Total:',
+			'',
+			'',
+			round($total_amount,2),
+			$total_sales,
+			intval($total_sales/((strtotime($date_to)-strtotime($date_from))/86400+1)),
+			'',
+			$total_fba_stock,
+			$total_fba_transfer,
+			'',
+			$total_fbm_stock,
+			'',
+			$total_review_count,
+			'',
+			'',
+			'',
+			'',
+			$total_economic,
+			$total_bonus
+		);
 
         $records["draw"] = $sEcho;
         $records["recordsTotal"] = $iTotalRecords;
