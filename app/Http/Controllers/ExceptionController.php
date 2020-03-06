@@ -43,7 +43,7 @@ class ExceptionController extends Controller
     public function index($type = '')
     {
 		if(!Auth::user()->can(['exception-show'])) die('Permission denied -- exception-show');
-        return view('exception/index',['users'=>$this->getUsers(),'groups'=>$this->getGroups(),'mygroups'=>$this->getUserGroup(),'sellerids'=>$this->getAccounts()]);
+        return view('exception/index',['users'=>$this->getUsers(),'groups'=>$this->getGroups(),'mygroups'=>$this->getUserGroup(),'sellerids'=>$this->getAccounts(),'teams'=> getUsers('sap_bgbu'),'sap_sellers'=>getUsers('sap_seller')]);
 
     }
 	
@@ -745,7 +745,7 @@ class ExceptionController extends Controller
 //            });
 //        }
 		//得到订单号对应的站点和bg,bu，销售员等信息
-		$customers= Exception::leftJoin(DB::raw("(SELECT asin as asin_a,substring(site,5) as site ,any_value(bg) as bg,any_value(bu) as bu,any_value(seller) as sales FROM  `asin` group by asin_a,site) as order_info"),function($q){
+		$customers= Exception::leftJoin(DB::raw("(SELECT asin as asin_a,substring(site,5) as site ,any_value(bg) as bg,any_value(bu) as bu,any_value(sap_seller_id) as sap_seller_id FROM  `asin` group by asin_a,site) as order_info"),function($q){
 			$q->on('order_info.asin_a', '=', 'exception.asin')
 			  ->on('order_info.site', '=', 'exception.saleschannel');
 		});
@@ -836,6 +836,18 @@ class ExceptionController extends Controller
         if(array_get($_REQUEST,'date_to')){
             $customers = $customers->where('date','<=',$_REQUEST['date_to'].' 23:59:59');
         }
+		if(array_get($_REQUEST,'bgbu')){
+			$bgbu_arr = explode('_',array_get($_REQUEST,'bgbu'));
+		   if(array_get($bgbu_arr,0)){
+				$customers = $customers->where('bg',array_get($bgbu_arr,0));
+		   }
+		   if(array_get($bgbu_arr,0)){
+				$customers = $customers->where('bu',array_get($bgbu_arr,1));
+		   }
+        }
+		if(array_get($_REQUEST,'sap_seller_id')){
+            $customers = $customers->where('sap_seller_id',array_get($_REQUEST,'sap_seller_id'));
+        }
 
 		$iTotalRecords = $customers->count();
         $iDisplayLength = intval($_REQUEST['length']);
@@ -852,6 +864,7 @@ class ExceptionController extends Controller
         $end = $end > $iTotalRecords ? $iTotalRecords : $end;
 		$groups = $this->getGroups();
 		$accounts = $this->getAccounts();
+		$sap_sellers = getUsers('sap_seller');
         $status_list['auto done'] = "<span class=\"label label-sm label-success\">Auto Done</span>";
         $status_list['confirmed'] = "<span class=\"label label-sm label-info\">Confirmed</span>";
         $status_list['done'] = "<span class=\"label label-sm label-success\">Done</span>";
@@ -936,24 +949,23 @@ class ExceptionController extends Controller
             $statusScore = array_get($status_list,$customersList['process_status']).'<br/><br/>'.$customersList['score'];
 
 			$operDate = $this->getOperaDate($customersList['update_status_log']);////得到操作各个状态的时间
+			
             $records["data"][] = array(
                 ((Auth::user()->admin || in_array($customersList['group_id'],array_get($this->getUserGroup(),'manage_groups',array()))))?'<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input name="id[]" type="checkbox" class="checkboxes" value="'.$customersList['id'].'"/><span></span></label>':'',
 
 				array_get($accounts,$customersList['sellerid']),
-				$customersList['site'],
                 $customersList['amazon_order_id'],
                 array_get($type_list,$customersList['type']),
                 $customersList['order_sku'].' ('.$customersList['asin'].')',
-				$customersList['date'],
+				$customersList['date'].'<br>'.$operDate['confirm'],
                 $statusScore,
 				// isset($mcfStatus[$customersList['amazon_order_id']]) ? $mcfStatus[$customersList['amazon_order_id']] : 'unknown',
 				$operate,
 				array_get($users,$customersList['process_user_id'])?array_get($users,$customersList['process_user_id']):array_get($groupleaders,$customersList['group_id']),
                 array_get($groups,$customersList['group_id'].'.group_name').' > '.array_get($users,$customersList['user_id']),
-				$operDate['confirm'],//得到修改为confirmed状态时间
-				$customersList['bg'],
-                $customersList['bu'],
-				$customersList['sales'],
+				//得到修改为confirmed状态时间
+				$customersList['bg'].$customersList['bu'],
+				array_get($sap_sellers,$customersList['sap_seller_id'],$customersList['sap_seller_id']),
                 ((Auth::user()->admin || in_array($customersList['group_id'],array_get($this->getUserGroup(),'manage_groups',array()))) && ($customersList['process_status']=='submit' || $customersList['process_status']=='confirmed')) ?'<a href="/exception/'.$customersList['id'].'/edit" class="btn btn-sm red btn-outline " target="_blank"><i class="fa fa-search"></i> Process </a>':'<a href="/exception/'.$customersList['id'].'/edit" class="btn blue btn-sm btn-outline green" target="_blank"><i class="fa fa-search"></i> View </a>',
             );
 		}

@@ -91,19 +91,16 @@ th,td,td>span {
                                     </label>
                                 </th>
                                 <th width="8%"> Account </th>
-                                <th width="8%"> Site </th>
+                                
                                 <th width="8%"> OrderID </th>
                                 <th width="8%"> Type </th>
 								<th width="15%">Order Sku </th>
 								<th width="10%">Create Date</th>
 								<th width="5%">Status</th>
-                                {{--<th width="8%">MCF Status</th>--}}
 								<th width="22%"> Operate </th>
                                 <th width="8%"> Operator </th>
 								<th width="15%">Creator</th>
-                                <th width="15%">Confirm Date</th>
-                                <th width="8%"> BG </th>
-                                <th width="8%"> BU </th>
+                                <th width="8%"> BGBU </th>
                                 <th width="8%"> Sales </th>
                                 <th width="5%"> Action </th>
                             </tr>
@@ -117,7 +114,7 @@ th,td,td>span {
 								@endforeach
 								</select>
                                 </td>
-                                <td></td>
+                              
                                 <td>
                                     <input type="text" class="form-control form-filter input-sm" name="amazon_order_id">
                                 </td>
@@ -166,8 +163,7 @@ th,td,td>span {
                                     </select>
                                 </td>
 
-                                {{--<td></td>--}}
-
+                               
 								 <td>
                                 <select id="resellerid" class="form-control form-filter input-sm" name="resellerid">
 								<option value ="">Replace Account
@@ -207,11 +203,28 @@ th,td,td>span {
                                     </div>
                                 </td>
                                 <td>
-
-                                </td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
+								<select class="form-control form-filter input-sm" name="bgbu">
+                                        <option value="">BGBU</option>
+										<?php 
+										$bg='';
+										foreach($teams as $team){ 
+											$selected = '';
+											if($bg!=$team->bg) echo '<option value="'.$team->bg.'_">'.$team->bg.'</option>';	
+											$bg=$team->bg;
+											$selected = '';
+											if($team->bg && $team->bu) echo '<option value="'.$team->bg.'_'.$team->bu.'" '.$selected.'>'.$team->bg.' - '.$team->bu.'</option>';
+										} ?>
+                                    </select>
+									
+									</td>
+                                <td>
+								<select class="form-control form-filter input-sm" name="sap_seller_id" id="sap_seller_id">
+										<option value="">Sellers</option>
+                                        @foreach ($sap_sellers as $user_id=>$user_name)
+                                            <option value="{{$user_id}}" >{{$user_name}}</option>
+                                        @endforeach
+                                    </select>
+								</td>
                                 <td>
                                     <div class="margin-bottom-5">
                                         <button class="btn btn-sm green btn-outline filter-submit margin-bottom">
@@ -276,7 +289,7 @@ th,td,td>span {
                     "dom": "<'row'<'col-md-6 col-sm-12'pli><'col-md-6 col-sm-12'<'table-group-actions pull-right'>>r>t<'row'<'col-md-6 col-sm-12'pli><'col-md-6 col-sm-12'>>",
 
                     "bStateSave": true, // save datatable state(pagination, sort, etc) in cookie.
-                    "aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0 ,2, 5,8,9,11,12,13,14,15 ] }],
+                    "aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0 ,4,7,8,9,10,11,12] }],
                     "lengthMenu": [
                         [10, 20, 50],
                         [10, 20, 50] // change per page values here
@@ -290,7 +303,7 @@ th,td,td>span {
                     ],// set first column as a default sort by asc
                     "createdRow": function( row, data, dataIndex ) {
                         $(row).children('td').eq(4).attr('style', 'text-align: left;')
-						 $(row).children('td').eq(7).attr('style', 'max-width: 350px;word-wrap: break-word;word-break: normal;text-align: left; ')
+						 $(row).children('td').eq(7).attr('style', 'max-width: 250px;word-wrap: break-word;word-break: normal;text-align: left; ')
 
                     },
                 }
@@ -340,6 +353,8 @@ th,td,td>span {
             grid.setAjaxParam("operator_id", $("input[name='operator_id']").val());
             grid.setAjaxParam("user_id", $("input[name='user_id']").val());
 			grid.setAjaxParam("group_id", $("select[name='group_id']").val());
+			grid.setAjaxParam("bgbu", $("select[name='bgbu']").val());
+			grid.setAjaxParam("sap_seller_id", $("select[name='sap_seller_id']").val());
             grid.getDataTable().ajax.reload(null,false);
             //grid.clearAjaxParams();
         }
