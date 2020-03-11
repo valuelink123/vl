@@ -81,14 +81,14 @@ class AddRsgProduct extends Command
 		$data = $this->queryRows($sql);
 
 		//取前一天产品表里面的order_status
-		$order_sql = "select concat(asin,'_',site) as asin_site,any_value(rsg_products.order_status) as order_status 
-					  from rsg_products 
+		$order_sql = "select concat(asin,'_',site) as asin_site,any_value(rsg_products.order_status) as order_status ,any_value(rsg_products.sales_target_reviews_set) as sales_target_reviews_set from rsg_products 
 					  where created_at = '".$yestoday."' 
 					  group by asin,site";
 		$_orderdata = $this->queryRows($order_sql);
 		$orderdata = array();
 		foreach($_orderdata as $key=>$val){
 			$orderdata[$val['asin_site']]['order_status'] = $val['order_status'];
+			$orderdata[$val['asin_site']]['sales_target_reviews_set'] = $val['sales_target_reviews_set'];
 		}
 
 		//sku状态信息
@@ -172,7 +172,10 @@ class AddRsgProduct extends Command
 					$sales_target_reviews = 3;
 				}
 			}
-
+			if(isset($orderdata[$val['asin'].'_'.$val['site']])){
+				$sales_target_reviews == intval(array_get($orderdata[$val['asin'].'_'.$val['site']],'sales_target_reviews_set'))??$sales_target_reviews;
+			}
+			
 
 			$insertData[] = array(
 				'asin' => $val['asin'],

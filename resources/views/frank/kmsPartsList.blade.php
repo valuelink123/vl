@@ -44,10 +44,11 @@
                     <div class="col-md-8"></div>
                     <div class="col-md-4">
                         <div class="btn-group " style="float:right;">
-
+							<a href="/kms/partslist/export" target="_blank">
                             <button id="excel-export" class="btn sbold blue"> Export
                                 <i class="fa fa-download"></i>
                             </button>
+							</a>
 
                         </div>
                     </div>

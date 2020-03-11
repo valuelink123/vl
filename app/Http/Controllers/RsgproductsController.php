@@ -107,6 +107,7 @@ class RsgproductsController extends Controller
 		}
 		if(isset($_POST['sales_target_reviews'])){
 			$rule->sales_target_reviews = intval($_POST['sales_target_reviews']);
+			$rule->sales_target_reviews_set = intval($_POST['sales_target_reviews']);
 		}
 
         if ($rule->save()) {

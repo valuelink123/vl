@@ -12,7 +12,8 @@ use App\Classes\SapRfcRequest;
 use App\Exceptions\DataInputException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 class PartsListController extends Controller {
 
     use \App\Traits\Mysqli;
@@ -194,6 +195,100 @@ class PartsListController extends Controller {
 
         return ['data' => $rows, 'recordsTotal' => $total, 'recordsFiltered' => $total];
     }
+	
+	
+	/*
+     * 下载数据
+     */
+    public function export()
+	{
+		$sql = "
+        SELECT SQL_CALC_FOUND_ROWS
+        t1.item_code,
+        t1.seller_name,
+        t1.asin,
+        t1.seller_sku,
+        t1.fba_stock,
+        t1.fba_transfer,
+        t1.fbm_stock,
+        t1.item_name,
+        asin.site as site,
+	    t1.account_status,
+	    t1.fba_update,
+	    t1.fbm_update
+
+        FROM kms_stock t1
+        LEFT JOIN (
+            SELECT
+            ANY_VALUE(item_group) AS item_group,
+            ANY_VALUE(brand) AS brand,
+            ANY_VALUE(item_model) AS item_model,
+            ANY_VALUE(site) as site,
+            item_no AS item_code
+            FROM asin
+            GROUP BY item_no
+        ) t3
+        USING(item_code) 
+        LEFT JOIN asin on t1.asin = asin.asin and t1.seller_sku = asin.sellersku
+        ";
+
+        $rows = $this->queryRows($sql);
+        $validStock = $this->getFbmAccsStock();
+
+		$unsellableData = $this->getUnsellableData();//获取unsellable数据
+
+        foreach($rows as $key=>$val){
+			$rows[$key]['fbm_valid_stock'] = 0;
+        	if(isset($validStock[$val['item_code']]) && is_array($validStock[$val['item_code']])){
+        		$valid = '';
+				foreach($validStock[$val['item_code']] as $k=>$v){
+					$valid = $valid.$k.':'.$v.'<br>';
+				}
+
+				$rows[$key]['fbm_valid_stock'] = $valid;
+			}
+			//设置unsellable数量
+			$rows[$key]['unsellable'] = 0;
+			if(isset($unsellableData[$val['seller_sku'].'-'.$val['asin']])){
+				$rows[$key]['unsellable'] = $unsellableData[$val['seller_sku'].'-'.$val['asin']];
+			}
+			//在列表显示的asin加超链接，点击即可跳转到Amazon商品页面
+			$rows[$key]['asin'] = $val['asin'];
+		}
+		$arrayData = array();
+		$arrayData[] = array('Sku','Seller Name','Asin','Seller SKU','Item Name','Fbm Stock','Fbm Valid Stock','Fba Stock','Fba Transfer','Unsellable');
+		foreach ($rows as $key=>$val){
+			$arrayData[] = array(
+				$val['item_code'],
+				$val['seller_name'],
+				$val['asin'],
+				$val['seller_sku'],
+				$val['item_name'],
+				$val['fbm_stock'],
+				$val['fbm_valid_stock'],
+				$val['fba_stock'],
+				$val['fba_transfer'],
+				$val['unsellable']
+			);
+		}
+		if($arrayData){
+			$spreadsheet = new Spreadsheet();
+
+			$spreadsheet->getActiveSheet()
+				->fromArray(
+					$arrayData,  // The data to set
+					NULL,        // Array values with this value will not be set
+					'A1'         // Top left coordinate of the worksheet range where
+				//    we want to set these values (default is A1)
+				);
+			header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');//告诉浏览器输出07Excel文件
+			header('Content-Disposition: attachment;filename="Export_Inventory.xlsx"');//告诉浏览器输出浏览器名称
+			header('Cache-Control: max-age=0');//禁止缓存
+			$writer = new Xlsx($spreadsheet);
+			$writer->save('php://output');
+		}
+		die();
+	}
 
     /**
      * @throws DataInputException
