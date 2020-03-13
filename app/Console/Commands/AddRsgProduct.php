@@ -173,7 +173,7 @@ class AddRsgProduct extends Command
 				}
 			}
 			if(isset($orderdata[$val['asin'].'_'.$val['site']])){
-				$sales_target_reviews == intval(array_get($orderdata[$val['asin'].'_'.$val['site']],'sales_target_reviews_set'))??$sales_target_reviews;
+				$sales_target_reviews = (intval(array_get($orderdata[$val['asin'].'_'.$val['site']],'sales_target_reviews_set'))??$sales_target_reviews);
 			}
 			
 
