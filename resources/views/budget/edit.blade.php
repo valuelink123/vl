@@ -69,16 +69,16 @@ white-space: nowrap;
 							</button>
 							<ul class="dropdown-menu" role="menu">
 								<li>
-									<a href="{{'/budgets/edit?sku='.$base_data['sku'].'&site='.$base_data['site'].'&year='.$year.'&showtype=seasons'}}"> 季度 </a>
+									<a href="{{'/budgets/edit?sku='.$base_data['sku'].'&site='.$base_data['site'].'&year='.$year.'&quarter='.$quarter.'&showtype=seasons'}}"> 季度 </a>
 								</li>
 								<li>
-									<a href="{{'/budgets/edit?sku='.$base_data['sku'].'&site='.$base_data['site'].'&year='.$year.'&showtype=months'}}"> 月 </a>
+									<a href="{{'/budgets/edit?sku='.$base_data['sku'].'&site='.$base_data['site'].'&year='.$year.'&quarter='.$quarter.'&showtype=months'}}"> 月 </a>
 								</li>
 								<li>
-									<a href="{{'/budgets/edit?sku='.$base_data['sku'].'&site='.$base_data['site'].'&year='.$year}}"> 周 (填写模块)</a>
+									<a href="{{'/budgets/edit?sku='.$base_data['sku'].'&site='.$base_data['site'].'&quarter='.$quarter.'&year='.$year}}"> 周 (填写模块)</a>
 								</li>
 								<li>
-									<a href="{{'/budgets/edit?sku='.$base_data['sku'].'&site='.$base_data['site'].'&year='.$year.'&showtype=days'}}"> 日 </a>
+									<a href="{{'/budgets/edit?sku='.$base_data['sku'].'&site='.$base_data['site'].'&year='.$year.'&quarter='.$quarter.'&showtype=days'}}"> 日 </a>
 								</li>
 							</ul>
 						</div>
@@ -90,8 +90,7 @@ white-space: nowrap;
 						<form action="{{url('budgets/upload')}}" method="post" enctype="multipart/form-data" class="pull-right " >
 						<div class=" pull-left">
 
-							<a href="{{ url('/uploads/BudgetsUpload/data.csv')}}" >Import Template
-                                </a>	
+							<a href="{{ url('/uploads/BudgetsUpload/data.csv')}}">Import Template</a>	
 						</div>
 						<div class="pull-left">
 							{{ csrf_field() }}
@@ -152,22 +151,22 @@ white-space: nowrap;
 					  <tr>
 						<td>{{$site_code}}</td>
 						<td>{{$base_data['sku']}}</td>
-						<td>{{$base_data['status']}}</td>
-						<td>{{($base_data['level']=='0')?'S':$base_data['level']}}
+						<td>{{array_get(getSkuStatuses(),$base_data['then_status'])}}</td>
+						<td>{{($base_data['then_level']=='0')?'S':$base_data['then_level']}}
 						<input type="hidden" id ="cold_storagefee"  value="{{$base_data['cold_storagefee']}}" />
 						<input type="hidden" id ="hot_storagefee"  value="{{$base_data['hot_storagefee']}}" />
 						
 						</td>
-						<td><a class="budgetskus_cost editable" title="成本" href="javascript:;" id="{{$budget_id}}-cost" data-pk="{{$budget_id}}-cost" data-type="text" data-placement="bottom">{{round($base_data['cost'],2)}}</a></td>
+						<td><a class="budgetskus_cost editable" title="成本" href="javascript:;" id="{{$budget_id}}-cost" data-pk="{{$budget_id}}-cost" data-type="text" data-placement="bottom">{{round($base_data['then_cost'],2)}}</a></td>
 						<td><span id = "tax">{{$base_data['tax']}}</span></td>
 						<td><span id = "headshipfee">{{$base_data['headshipfee']}}</span></td>
-						<td><a class="budgetskus_common_fee editable" title="佣金比率%" href="javascript:;" id="{{$budget_id}}-common_fee" data-pk="{{$budget_id}}-common_fee" data-type="text" data-placement="bottom">{{$base_data['common_fee']*100}}</a>%</td>
-						<td><a class="budgetskus_pick_fee editable" title="拣配费" href="javascript:;" id="{{$budget_id}}-pick_fee" data-pk="{{$budget_id}}-pick_fee" data-type="text" data-placement="bottom">{{$base_data['pick_fee']}}</a></td>
-						<td><a class="budgetskus_exception editable" title="异常率%" href="javascript:;" id="{{$budget_id}}-exception" data-pk="{{$budget_id}}-exception" data-type="text" data-placement="bottom">{{$base_data['exception']*100}}</a>%</td>
+						<td><a class="budgetskus_common_fee editable" title="佣金比率%" href="javascript:;" id="{{$budget_id}}-common_fee" data-pk="{{$budget_id}}-common_fee" data-type="text" data-placement="bottom">{{$base_data['then_common_fee']*100}}</a>%</td>
+						<td><a class="budgetskus_pick_fee editable" title="拣配费" href="javascript:;" id="{{$budget_id}}-pick_fee" data-pk="{{$budget_id}}-pick_fee" data-type="text" data-placement="bottom">{{$base_data['then_pick_fee']}}</a></td>
+						<td>{{$base_data['then_exception']*100}}%</td>
 						<td><span id = "rate">{{$rate}}</span></td>
-						<td><a class="budgetskus_stock editable" title="期初库存" href="javascript:;" id="{{$budget_id}}-stock" data-pk="{{$budget_id}}-stock" data-type="text" data-placement="bottom">{{$base_data['stock']}}</a></td>
-						<td>{{array_get(getUsers('sap_seller'),$base_data['sap_seller_id'],$base_data['sap_seller_id'])}}</td>
-						<td>{{$base_data['description']}}</td>
+						<td><a class="budgetskus_stock editable" title="期初库存" href="javascript:;" id="{{$budget_id}}-stock" data-pk="{{$budget_id}}-stock" data-type="text" data-placement="bottom">{{$base_data['then_stock']}}</a></td>
+						<td>{{array_get(getUsers('sap_seller'),$base_data['then_sap_seller_id'],$base_data['then_sap_seller_id'])}}</td>
+						<td>{{$base_data['then_description']}}</td>
 						<td><a class="budget_remark" title="备注" href="javascript:;" id="{{$budget_id}}-remark" data-pk="{{$budget_id}}-remark" data-type="textarea" data-rows="10" data-placement="left" data-placeholder="Your response here...">{{$budget->remark}}</a></td>
 						<td><a class="budget_status" href="javascript:;" data-placement="left" id="{{$budget_id}}-status" data-type="select" data-pk="{{$budget_id}}-status" data-value="{{($budget->status)??0}}">{{array_get(getBudgetStageArr(),($budget->status)??0)}}</a>
 						</td>
@@ -214,8 +213,7 @@ white-space: nowrap;
 						@endif
 						</td>
 						<td rowspan="2" width="8%">日期</td>
-						<td colspan="6" width="28%">{{$year}}年销售预算</td>
-						<td rowspan="2" width="5%">销售预测</td>
+						<td colspan="7" width="33%">{{$year}}Q{{$quarter}} 版本销售预算</td>
 						<td rowspan="2" width="5%">销量</td>
 						<td colspan="3" width="15%">毛利</td>
 						<td colspan="3" width="15%">平台费用</td>
@@ -231,6 +229,7 @@ white-space: nowrap;
 						<td width="5%">促销价(外币)</td>
 						<td width="4%">促销销量</td>
 						<td width="5%">推广费比率</td>
+						<td width="5%">异常率</td>
 						<td width="5%">收入</td>
 						<td width="5%">成本</td>
 						<td width="5%">毛利</td>
@@ -285,7 +284,7 @@ white-space: nowrap;
 						<td>{{($v['promote_qty']!=0)?round($v['amount_p']/$v['promote_qty'],2):0}}</td>
 						<td>{{$v['promote_qty']}}</td>
 						<td>{{($v['income']!=0)?round($v['promotion_fee']/$v['income'],4)*100:0}}%</td>
-						<td>0</td>
+						<td>{{(($v['amount_n']+$v['amount_p'])!=0)?round($v['exception_fee']/($v['amount_n']+$v['amount_p']),4)*100:0}}%</td>
 						<td>{{$v['qty']+$v['promote_qty']}}</td>
 						<td>{{$v['income']}}</td>
 						<td>{{$v['cost']}}</td>
@@ -323,7 +322,7 @@ white-space: nowrap;
 						<td>{{round($v['promote_price'],2)}}</td>
 						<td>{{$v['promote_qty']}}</td>
 						<td>{{round($v['promotion']*100,2)}}%</td>
-						<td>0</td>
+						<td>{{(($v['qty']*$v['price']+$v['promote_qty']*$v['promote_price'])!=0)?round($v['exception_fee']/($v['qty']*$v['price']+$v['promote_qty']*$v['promote_price']),4)*100:0}}%</td>
 						<td>{{$v['qty']+$v['promote_qty']}}</td>
 						<td>{{$v['income']}}</td>
 						<td>{{$v['cost']}}</td>
@@ -361,7 +360,7 @@ white-space: nowrap;
 						<td>{{round($v['promote_price'],2)}}</td>
 						<td>{{$v['promote_qty']}}</td>
 						<td>{{round($v['promotion']*100,2)}}%</td>
-						<td>0</td>
+						<td>{{round($v['exception']*100,2)}}%</td>
 						<td>{{$v['qty']+$v['promote_qty']}}</td>
 						<td>{{$v['income']}}</td>
 						<td>{{$v['cost']}}</td>
@@ -400,7 +399,7 @@ white-space: nowrap;
 						<td><a class="sku_pro_price editable" title="{{$year.' 第'.$i.'周促销售价'}}" href="javascript:;" id="{{$budget_id.'-'.$i}}-promote_price" data-pk="{{$budget_id.'-'.$i}}-promote_price" data-type="text"> {{round(array_get($datas,$i.'.promote_price'),2)}} </a></td>
 						<td><a class="sku_pro_qty editable" title="{{$year.' 第'.$i.'周促销销量'}}" href="javascript:;" id="{{$budget_id.'-'.$i}}-promote_qty" data-pk="{{$budget_id.'-'.$i}}-promote_qty" data-type="text"> {{round(array_get($datas,$i.'.promote_qty'))}} </a></td>
 						<td><a class="sku_pro_per editable" title="{{$year.' 第'.$i.'周推广费比率%'}}" href="javascript:;" id="{{$budget_id.'-'.$i}}-promotion" data-pk="{{$budget_id.'-'.$i}}-promotion" data-type="text"> {{round(array_get($datas,$i.'.promotion')*100,2)}} </a>%</td>
-						<td>0</td>
+						<td><a class="sku_exception_per editable" title="{{$year.' 第'.$i.'周异常率%'}}" href="javascript:;" id="{{$budget_id.'-'.$i}}-exception" data-pk="{{$budget_id.'-'.$i}}-exception" data-type="text"> {{round(array_get($datas,$i.'.exception')*100,2)}} </a>%</td>
 						<td><span id="{{$budget_id.'-'.$i}}-week_line_qty">0</span></td>
 						<td><span id="{{$budget_id.'-'.$i}}-week_line_income">0</span></td>
 						<td><span id="{{$budget_id.'-'.$i}}-week_line_cost">0</span></td>
@@ -505,7 +504,7 @@ var FormEditable = function() {
 		var stages = [];
         <?php 
 		$budgetRule = getBudgetRuleForRole();
-		if($base_data['sap_seller_id'] && $base_data['sap_seller_id']==Auth::user()->sap_seller_id && !(($budget->status)??0)) $budgetRule = array_slice(getBudgetStageArr(),0,2);
+		if($base_data['then_sap_seller_id'] && $base_data['then_sap_seller_id']==Auth::user()->sap_seller_id && !(($budget->status)??0)) $budgetRule = array_slice(getBudgetStageArr(),0,2);
 		foreach($budgetRule as $k=>$v) {?>
 		stages.push({
 			value: "<?php echo $k?>",
@@ -538,7 +537,7 @@ var FormEditable = function() {
 				$('.budget_status').data('value',status);
 				initBudgettables();
 				if(status==0){
-					<?php if($base_data['sap_seller_id'] && $base_data['sap_seller_id']==Auth::user()->sap_seller_id && $showtype){ ?>
+					<?php if($base_data['then_sap_seller_id'] && $base_data['then_sap_seller_id']==Auth::user()->sap_seller_id && $showtype){ ?>
 					location.reload();
 					<?php } ?>
 				}
@@ -557,7 +556,7 @@ var FormEditable = function() {
 	var initBudgettables = function() {
 		var budget_status = $('.budget_status').data('value');
 		var is_seller = false;
-		<?php if($base_data['sap_seller_id'] && $base_data['sap_seller_id']==Auth::user()->sap_seller_id){ ?>
+		<?php if($base_data['then_sap_seller_id'] && $base_data['then_sap_seller_id']==Auth::user()->sap_seller_id){ ?>
 		is_seller = true;
 		<?php } ?>
 		if(budget_status>0){
@@ -571,11 +570,11 @@ var FormEditable = function() {
 			$('.form-upload').hide();
 		}
 		
-		<?php if(!$showtype && $base_data['sap_seller_id'] && $base_data['sap_seller_id']==Auth::user()->sap_seller_id ) {?>
+		<?php if(!$showtype && $base_data['then_sap_seller_id'] && $base_data['then_sap_seller_id']==Auth::user()->sap_seller_id ) {?>
 		$('.sku_ranking').editable({
 			emptytext:'N/A'
 		});		
-		$('.sku_price,.sku_qty,.sku_pro_price,.sku_pro_qty,.sku_pro_per,.budgetskus_cost,.budgetskus_common_fee,.budgetskus_pick_fee,.budgetskus_exception,.budgetskus_stock').editable({
+		$('.sku_price,.sku_qty,.sku_pro_price,.sku_pro_qty,.sku_pro_per,.sku_exception_per,.budgetskus_cost,.budgetskus_common_fee,.budgetskus_pick_fee,.budgetskus_stock').editable({
 			emptytext:'0',
 			validate: function (value) {
 				if (isNaN(value)) {
@@ -595,7 +594,7 @@ var FormEditable = function() {
 			} 
 		});
 		
-		$('.sku_ranking,.sku_price,.sku_qty,.sku_pro_price,.sku_pro_qty,.sku_pro_per,.budgetskus_cost,.budgetskus_common_fee,.budgetskus_pick_fee,.budgetskus_exception,.budgetskus_stock').editable(option);
+		$('.sku_ranking,.sku_price,.sku_qty,.sku_pro_price,.sku_pro_qty,.sku_pro_per,.sku_exception_per,.budgetskus_cost,.budgetskus_common_fee,.budgetskus_pick_fee,.budgetskus_stock').editable(option);
 		<?php } ?>
 		
     }
@@ -669,7 +668,7 @@ var FormEditable = function() {
 			   if(i==weeks-5) n_stock=parseInt(n_stock*1.306);
 			   if(i==weeks-6) n_stock=parseInt(n_stock*1.127);
 			}
-			<?php if($base_data['status']=='保留' || $base_data['status']=='新品' || $base_data['status']=='新品规划'){ ?>
+			<?php if($base_data['then_status']==1 || $base_data['then_status']==2 || $base_data['then_status']==99){ ?>
 			endStock = stock>n_stock?stock:n_stock;
 			<?php }else{ ?>
 			endStock = stock;
@@ -680,7 +679,7 @@ var FormEditable = function() {
 			//平均库存
 			avgStock[i] = parseInt((startStock+endStock)/2);
 			startStock = endStock;
-			var week_line_amountfee = parseFloat(cost*avgStock[i]*0.00375).toFixed(2);
+			var week_line_amountfee = parseFloat(cost*avgStock[i]*0.00375*1.3).toFixed(2);
 			$('#'+budget_id+'-'+(i)+'-week_line_amountfee').text(week_line_amountfee);
 			
 			if(i<=4){
@@ -730,7 +729,7 @@ var FormEditable = function() {
 		var common_fee = parseFloat($('#'+budget_id+'-common_fee').text())/100;
 		var pick_fee = parseFloat(parseFloat($('#'+budget_id+'-pick_fee').text())*rate).toFixed(2);
 		cost = parseFloat(cost*(1+tax)+headshipfee).toFixed(2);
-		var exception = parseFloat($('#'+budget_id+'-exception').text()).toFixed(2)/100;
+		
 		
 		var stock = parseInt($('#'+budget_id+'-stock').text());
 		var qty = parseInt($('#'+budget_id+'-'+week_id+'-qty').text());
@@ -738,11 +737,11 @@ var FormEditable = function() {
 		var price = parseFloat($('#'+budget_id+'-'+week_id+'-price').text());
 		var promote_price = parseFloat($('#'+budget_id+'-'+week_id+'-promote_price').text());
 		var promotion = parseFloat($('#'+budget_id+'-'+week_id+'-promotion').text())/100;
+		var exception = parseFloat($('#'+budget_id+'-'+week_id+'-exception').text())/100;
 		var week_line_qty = parseInt(qty+promote_qty);
 		var week_line_income = (exception==1)?0:parseFloat((qty*price+promote_qty*promote_price)*(1-exception)*rate).toFixed(2);
 		var week_line_cost = parseFloat((qty+promote_qty)*cost).toFixed(2);
 		var week_line_commonfee = (exception==1)?0:parseFloat(week_line_income*common_fee+(0.2*week_line_income/(1-exception)*common_fee*exception));
-		console.log(week_line_commonfee);
 		var week_line_pickfee = parseFloat(week_line_qty*pick_fee);
 		var week_line_profee = parseFloat(week_line_income*promotion).toFixed(2);
 		$('#'+budget_id+'-'+week_id+'-week_line_qty').text(week_line_qty);

@@ -16,6 +16,43 @@ function getAccountLevel(){
 		'0'=>'None'
     );
 }
+
+function getSkuStatuses(){
+    return array(
+        '0'=>'淘汰',
+        '1'=>'保留',
+        '2'=>'新品',
+        '3'=>'配件',
+        '4'=>'替换',
+        '5'=>'待定',
+        '99'=>'新品规划'
+    );    
+}
+
+function getBudgetQuarter(){
+    $startYear = 2020;
+    $nowYear = date('Y');
+    $nowMonth =  date('m');
+    $budget_quarter = [];
+    if($nowMonth>=1) $now_quarter = 2;
+    if($nowMonth>=4) $now_quarter = 3;
+    if($nowMonth>=7) $now_quarter = 4;
+    if($nowMonth>=10){
+        $now_quarter = 1;
+        $nowYear= $nowYear+1;
+    }
+    for($i=$startYear;$i<=$nowYear;$i++){
+        if($i<$nowYear){
+            $quarter = 4;
+        }else{
+            $quarter = $now_quarter;     
+        }
+        for($m=1;$m<=$quarter;$m++){
+           $budget_quarter[]=$i.'Q'.$m;     
+        }
+    }
+    return $budget_quarter;
+}
 function getUsers($type=''){
 	switch($type)
 	{

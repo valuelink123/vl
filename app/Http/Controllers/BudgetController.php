@@ -46,7 +46,24 @@ class BudgetController extends Controller
 		$sap_seller_id = $request->get('sap_seller_id');
 		$level = $request->get('level');
 		$sku = $request->get('sku');
-	    $year = $request->get('year')?$request->get('year'):date('Y',strtotime('+1 month'));
+
+		$nowYear = date('Y');
+	    $nowMonth =  date('m');
+	    if($nowMonth>=1) $now_quarter = 2;
+	    if($nowMonth>=4) $now_quarter = 3;
+	    if($nowMonth>=7) $now_quarter = 4;
+	    if($nowMonth>=10){
+	    	$now_quarter = 1;
+	    	$nowYear=$nowYear+1;
+	    }
+	    $default_year_from = $nowYear.'Q'.$now_quarter;
+	    $default_year_to = ($now_quarter==1)?($nowYear-1).'Q4':$nowYear.'Q'.($now_quarter-1);
+
+	    $year_from = $request->get('year_from')?$request->get('year_from'):$default_year_from;
+	    $year_to = $request->get('year_to')?$request->get('year_to'):$default_year_to;
+	    $year_from_arr = explode('Q', $year_from);
+	    $year_to_arr = explode('Q', $year_to);
+
 		$user_id = $request->get('user_id');
 		$sku_status = $request->get('sku_status');
 		$b_status = $request->get('b_status');
@@ -78,7 +95,7 @@ class BudgetController extends Controller
 			$where.= " and level = '".$level."'";
 		}
 		if($sku_status){
-			$where.= " and status = '".$sku_status."'";
+			$where.= " and status = '".($sku_status-1)."'";
 		}
 		if($sku){
 			$where.= " and (sku='".$sku."' or description like '%".$sku."%')";
@@ -87,13 +104,13 @@ class BudgetController extends Controller
 		$sql = "(
 		select budget_skus.*,budgets_1.qty as qty1,budgets_1.income as amount1,(budgets_1.income-budgets_1.cost) as profit1,(budgets_1.income-budgets_1.cost-budgets_1.common_fee-budgets_1.pick_fee-budgets_1.promotion_fee-budgets_1.amount_fee-budgets_1.storage_fee) as economic1,IFNULL(budgets_1.id,0) as budget_id,IFNULL(budgets_1.status,0) as budget_status,budgets_1.remark
 ,budgets_2.qty as qty2,budgets_2.income as amount2,(budgets_2.income-budgets_2.cost) as profit2,(budgets_2.income-budgets_2.cost-budgets_2.common_fee-budgets_2.pick_fee-budgets_2.promotion_fee-budgets_2.amount_fee-budgets_2.storage_fee) as economic2 from budget_skus 
-		left join (select * from budgets where year = $year) as budgets_1 
+		left join (select * from budgets where year = ".$year_from_arr[0]." and quarter = ".$year_from_arr[1]." ) as budgets_1 
 		on budget_skus.sku = budgets_1.sku and budget_skus.site = budgets_1.site
-		left join (select * from budgets where year = ".($year-1).") as budgets_2 
+		left join (select * from budgets where year = ".$year_to_arr[0]." and quarter = ".$year_to_arr[1].") as budgets_2 
 		on budget_skus.sku = budgets_2.sku and budget_skus.site = budgets_2.site
 		) as sku_tmp_cc";
 
-		$finish = DB::table(DB::raw($sql))->whereRaw($where." and (stock>=100 or (status<>'淘汰' and status <>'替换' and status <>'待定' and status <>'配件')) ")->selectRaw('count(*) as count,budget_status')->groupBy('budget_status')->pluck('count','budget_status');
+		$finish = DB::table(DB::raw($sql))->whereRaw($where." and (stock>=100 or (status<>0 and status <>4 and status <>5 and status <>3)) ")->selectRaw('count(*) as count,budget_status')->groupBy('budget_status')->pluck('count','budget_status');
 
 		
 		if($b_status){
@@ -112,8 +129,11 @@ class BudgetController extends Controller
 		
         $data['teams']= getUsers('sap_bgbu');
 		$data['users']= getUsers('sap_seller');
-		$data['sku_status']= Budgetskus::groupBy('status')->pluck('status');
-		$data['year']=$year;
+		$data['sku_status']= getSkuStatuses();
+		$data['year']=$year_from_arr[0];
+		$data['quarter']=$year_from_arr[1];
+		$data['year_from']=$year_from;
+		$data['year_to']=$year_to;
 		$data['datas']= $datas;
 		$data['finish']= $finish;
 		$data['sum']= $sum;
@@ -132,7 +152,8 @@ class BudgetController extends Controller
 		$sap_seller_id = $request->get('sap_seller_id');
 		$level = $request->get('level');
 		$sku = $request->get('sku');
-	    $year = $request->get('year')?$request->get('year'):date('Y',strtotime('+1 month'));
+	    $year_from = $request->get('year_from');
+	    $year_from_arr = explode('Q', $year_from);
 		$user_id = $request->get('user_id');
 		$sku_status = $request->get('sku_status');
 		$b_status = $request->get('b_status');
@@ -166,7 +187,7 @@ class BudgetController extends Controller
 		}
 		if($sku_status){
 			
-			$where.= " and c.status = '".$sku_status."'";
+			$where.= " and c.status = '".($sku_status-1)."'";
 		}
 		if($b_status){
 			if($b_status==1){
@@ -184,7 +205,7 @@ sum(qty) as qty,
 sum(promote_qty) as promote_qty,
 sum(income) as income,sum(cost) as cost,sum(common_fee) as common_fee,sum(pick_fee) as pick_fee,sum(promotion_fee) as promotion_fee,
 sum(amount_fee) as amount_fee,sum(storage_fee) as storage_fee
-from budget_details group by month,budget_id) as a right join (select * from budgets where year='".$year."') as b on a.budget_id=b.id
+from budget_details group by month,budget_id) as a right join (select * from budgets where year = ".$year_from_arr[0]." and quarter = ".$year_from_arr[1].") as b on a.budget_id=b.id
 right join budget_skus as c on b.sku=c.sku and b.site=c.site where ((a.month>='".$year."01' and a.month<='".$year."12' ) or a.month is null) $where order by b.id,a.month asc");
 		$headArray[0]='BGBU';
 		$headArray[1]='SKU';
@@ -276,27 +297,43 @@ right join budget_skus as c on b.sku=c.sku and b.site=c.site where ((a.month>='"
 		$sku = $request->get('sku');
 		$site = $request->get('site');
 		$year = $request->get('year');
+		$quarter = $request->get('quarter');
 		$showtype=$request->get('showtype');
-		$base_data = Budgetskus::where('sku',$sku)->where('site',$site)->first();
-		if(empty($base_data)) die('没有该SKU对应预算基础信息，请联系管理员新增！');
+		$sku_base_data = Budgetskus::where('sku',$sku)->where('site',$site)->first();
+		if(empty($sku_base_data)) die('没有该SKU对应预算基础信息，请联系管理员新增！');
 		$cur = 'EUR';
 		if($site=='www.amazon.com') $cur = 'USD';
 		if($site=='www.amazon.ca') $cur = 'CAD';
 		if($site=='www.amazon.co.uk') $cur = 'GBP';
 		if($site=='www.amazon.co.jp') $cur = 'JPY';
-		$budget = Budgets::firstOrCreate(['sku'=>$sku,'site'=>$site,'year'=>$year]);
+		$budget = Budgets::firstOrCreate(['sku'=>$sku,'site'=>$site,'year'=>$year,'quarter'=>$quarter],[
+			'then_status'=>$sku_base_data->status,
+			'then_level'=>$sku_base_data->level,
+			'then_stock'=>$sku_base_data->stock,
+			'then_volume'=>$sku_base_data->volume,
+			'then_size'=>$sku_base_data->size,
+			'then_cost'=>$sku_base_data->cost,
+			'then_common_fee'=>$sku_base_data->common_fee,
+			'then_pick_fee'=>$sku_base_data->pick_fee,
+			'then_exception'=>$sku_base_data->exception,
+			'then_bg'=>$sku_base_data->bg,
+			'then_bu'=>$sku_base_data->bu,
+			'then_description'=>$sku_base_data->description,
+			'then_sap_seller_id'=>$sku_base_data->sap_seller_id
+		]);
 		$budget_id = $budget->id;
 		$data['sku']=$sku;
 		$data['site']=$site;
 		$data['year']=$year;
+		$data['quarter']=$quarter;
 		$data['budget_id']=$budget_id;
 		$data['budget']=$budget;
 		if($budget->status==0 && $showtype){
 			$request->session()->flash('error_message','需要在周视图填写提交后才可切换视图！');
-			return redirect('budgets/edit?sku='.$budget->sku.'&site='.$budget->site.'&year='.$budget->year);
+			return redirect('budgets/edit?sku='.$budget->sku.'&site='.$budget->site.'&year='.$budget->year.'&quarter='.$budget->quarter);
 		}	
 		if($showtype=='seasons' || $showtype=='months'){
-			$data['datas'] = Budgetdetails::selectRaw("date_format(date,'%Y%m') as month,any_value(ranking) as ranking,sum(price*qty)/sum(qty) as price,sum(qty) as qty,sum(promote_price*promote_qty)/sum(promote_qty) as promote_price,sum(promote_qty) as promote_qty,sum(promotion_fee)/sum(income) as promotion,sum(income) as income,sum(cost) as cost,sum(common_fee) as common_fee,sum(pick_fee) as pick_fee,sum(promotion_fee) as promotion_fee,sum(amount_fee) as amount_fee,sum(storage_fee) as storage_fee")->where('budget_id',$budget_id)->whereRaw("left(date,4)=$year")->groupBy('month')->get()->keyBy('month')->toArray();
+			$data['datas'] = Budgetdetails::selectRaw("date_format(date,'%Y%m') as month,any_value(ranking) as ranking,sum(price*qty)/sum(qty) as price,sum(qty) as qty,sum(promote_price*promote_qty)/sum(promote_qty) as promote_price,sum(promote_qty) as promote_qty,sum(promotion_fee)/sum(income) as promotion,sum(income) as income,sum(cost) as cost,sum(common_fee) as common_fee,sum(pick_fee) as pick_fee,sum(promotion_fee) as promotion_fee,sum(amount_fee) as amount_fee,sum(storage_fee) as storage_fee,sum((price*qty+promote_price*promote_qty)*exception) as exception_fee")->where('budget_id',$budget_id)->whereRaw("left(date,4)=$year")->groupBy('month')->get()->keyBy('month')->toArray();
 			if($showtype=='seasons'){
 				$i=1;
 				$type_datas=[];
@@ -308,17 +345,19 @@ right join budget_skus as c on b.sku=c.sku and b.site=c.site where ((a.month>='"
 					if(!isset($type_datas[$i]['amount_n'])) $type_datas[$i]['amount_n']=0 ;
 					if(!isset($type_datas[$i]['qty'])) $type_datas[$i]['qty']=0 ;
 					if(!isset($type_datas[$i]['amount_p'])) $type_datas[$i]['amount_p']=0 ;
-					if(!isset($type_datas[$i]['promote_qty'])) $type_datas[$i]['promote_qty']=0 ;
+					if(!isset($type_datas[$i]['exception_fee'])) $type_datas[$i]['exception_fee']=0 ;
+					if(!isset($type_datas[$i]['promote_qty'])) $type_datas[$i]['promote_qty']=0;
 					if(!isset($type_datas[$i]['income'])) $type_datas[$i]['income']=0 ;
 					if(!isset($type_datas[$i]['cost'])) $type_datas[$i]['cost']=0 ;
 					if(!isset($type_datas[$i]['common_fee'])) $type_datas[$i]['common_fee']=0 ;
 					if(!isset($type_datas[$i]['pick_fee'])) $type_datas[$i]['pick_fee']=0 ;
 					if(!isset($type_datas[$i]['promotion_fee'])) $type_datas[$i]['promotion_fee']=0 ;
 					if(!isset($type_datas[$i]['amount_fee'])) $type_datas[$i]['amount_fee']=0 ;
-					if(!isset($type_datas[$i]['storage_fee']))$type_datas[$i]['storage_fee'] =0 ;
+					if(!isset($type_datas[$i]['storage_fee'])) $type_datas[$i]['storage_fee']=0 ;
 					$type_datas[$i]['ranking']=$v['ranking'];
 					$type_datas[$i]['amount_n']+=$v['price']*$v['qty'];
 					$type_datas[$i]['qty']+=$v['qty'];
+					$type_datas[$i]['exception_fee']+=$v['exception_fee'];
 					$type_datas[$i]['amount_p']+=$v['promote_price']*$v['promote_qty'];
 					$type_datas[$i]['promote_qty']+=$v['promote_qty'];
 					$type_datas[$i]['income']+=$v['income'];
@@ -337,23 +376,23 @@ right join budget_skus as c on b.sku=c.sku and b.site=c.site where ((a.month>='"
 		}elseif($showtype=='days'){
 			$data['datas']= Budgetdetails::where('budget_id',$budget_id)->whereRaw("left(date,4)=$year")->orderBy('date','asc')->get()->toArray();
 		}else{
-			$data['datas']= Budgetdetails::selectRaw('weeks,any_value(ranking) as ranking,any_value(price) as price,sum(qty) as qty,any_value(promote_price) as promote_price,sum(promote_qty) as promote_qty,any_value(promotion) as promotion')->where('budget_id',$budget_id)->groupBy('weeks')->get()->keyBy('weeks')->toArray();
+			$data['datas']= Budgetdetails::selectRaw('weeks,any_value(ranking) as ranking,any_value(price) as price,sum(qty) as qty,any_value(promote_price) as promote_price,sum(promote_qty) as promote_qty,any_value(promotion) as promotion,any_value(exception) as exception')->where('budget_id',$budget_id)->groupBy('weeks')->get()->keyBy('weeks')->toArray();
 		}
 		$data['showtype'] = $showtype;
-		$data['base_data']= $base_data->toArray();
+		$data['base_data']= $budget->toArray();
 		$data['rate']= array_get(DB::table('cur_rate')->pluck('rate','cur'),$cur,0);
 		
 		$data['site_code'] = strtoupper(substr($site,-2));
 		if($data['site_code']=='OM') $data['site_code']='US';
 		
-		$storage_fee = json_decode(json_encode(DB::table('storage_fee')->where('type','FBA')->where('site',$data['site_code'])->where('size',$data['base_data']['size'])->first()),true);
+		$storage_fee = json_decode(json_encode(DB::table('storage_fee')->where('type','FBA')->where('site',$data['site_code'])->where('size',$data['base_data']['then_size'])->first()),true);
 
 		$tax_rate=DB::table('tax_rate')->where('site',$data['site_code'])->whereIn('sku',array('OTHERSKU',$sku))->pluck('tax','sku');
 		$data['base_data']['tax']= round(((array_get($tax_rate,$sku)??array_get($tax_rate,'OTHERSKU'))??0),4);
 		$shipfee = (array_get(getShipRate(),$data['site_code'].'.'.$sku)??array_get(getShipRate(),$data['site_code'].'.default'))??0;
-		$data['base_data']['headshipfee']=round($data['base_data']['volume']/1000000*1.2*round($shipfee,4),2);
-		$data['base_data']['cold_storagefee']=round(array_get($storage_fee,'2_10_fee',0)*$data['base_data']['volume']/1000000/8,4);
-		$data['base_data']['hot_storagefee']=round(array_get($storage_fee,'11_1_fee',0)*$data['base_data']['volume']/1000000/8,4);
+		$data['base_data']['headshipfee']=round($data['base_data']['then_volume']/1000000*1.2*round($shipfee,4),2);
+		$data['base_data']['cold_storagefee']=round(array_get($storage_fee,'2_10_fee',0)*$data['base_data']['then_volume']/1000000/6,4);
+		$data['base_data']['hot_storagefee']=round(array_get($storage_fee,'11_1_fee',0)*$data['base_data']['then_volume']/1000000/6,4);
 		$data['remember_list_url'] = session()->get('remember_list_url');
 		return view('budget/edit',$data);
     }
@@ -386,11 +425,11 @@ right join budget_skus as c on b.sku=c.sku and b.site=c.site where ((a.month>='"
 						$updateData=[];
 						foreach($importData as $key => $data){
 							if($key>2 && $key<($weeks+3)){
-								foreach(['C'=>'ranking','D'=>'price','E'=>'qty','F'=>'promote_price','G'=>'promote_qty','H'=>'promotion'] as $temp_k=>$temp_v){
+								foreach(['C'=>'ranking','D'=>'price','E'=>'qty','F'=>'promote_price','G'=>'promote_qty','H'=>'promotion','I'=>'exception'] as $temp_k=>$temp_v){
 									$max_value=0;
 									$week_value = array_get($data,$temp_k,NULL);
 									if($temp_k == 'E' || $temp_k == 'G') $week_value=intval($week_value);
-									if($temp_k == 'D' || $temp_k == 'F' || $temp_k == 'H') $week_value=round($week_value,4);
+									if($temp_k == 'D' || $temp_k == 'F' || $temp_k == 'H' || $temp_k == 'I') $week_value=round($week_value,4);
 									for($k=0;$k<=6;$k++){
 										$date = date("Y-m-d", strtotime($budget->year . 'W' . sprintf("%02d",($key-2)))+86400*$k);
 										if($temp_v=='qty' || $temp_v == 'promote_qty'){
@@ -410,7 +449,7 @@ right join budget_skus as c on b.sku=c.sku and b.site=c.site where ((a.month>='"
 								}
 							}
 						}
-						if($updateData) Budgetdetails::insertOnDuplicateWithDeadlockCatching(array_values($updateData), ['ranking','price','qty','promote_price', 'promote_qty', 'promotion','created_at','updated_at']);
+						if($updateData) Budgetdetails::insertOnDuplicateWithDeadlockCatching(array_values($updateData), ['ranking','price','qty','promote_price', 'promote_qty', 'promotion', 'exception','created_at','updated_at']);
 						$request->session()->flash('success_message','Import Success!');
 					}else{
 						$request->session()->flash('error_message','UploadFailed');
@@ -420,7 +459,7 @@ right join budget_skus as c on b.sku=c.sku and b.site=c.site where ((a.month>='"
 				$request->session()->flash('error_message','Please Select Upload File');
 			} 
         } 
-		return redirect('budgets/edit?sku='.$budget->sku.'&site='.$budget->site.'&year='.$budget->year);
+		return redirect('budgets/edit?sku='.$budget->sku.'&site='.$budget->site.'&year='.$budget->year.'&quarter='.$budget->quarter);
 	
 	}
 	
@@ -485,8 +524,8 @@ right join budget_skus as c on b.sku=c.sku and b.site=c.site where ((a.month>='"
 				die();
 			}else{
 				$field_rate = (array_get($data,1)=='exception' || array_get($data,1)=='common_fee')?0.01:1;
-				Budgetskus::where('sku',$budget->sku)->where('site',$budget->site)->update([array_get($data,1)=>($request->get('value'))*$field_rate]);	
-				
+				$budget->{'then_'.array_get($data,1)} = $request->get('value')*$field_rate;	
+				$budget->save();
 				$return[$request->get('name')]=round($request->get('value'),4);
 				echo json_encode($return);
 				die();
@@ -496,7 +535,7 @@ right join budget_skus as c on b.sku=c.sku and b.site=c.site where ((a.month>='"
 			$week = array_get($data,1);
 			if(in_array(array_get($data,2),['qty','promote_qty'])){
 				$week_value = round($request->get('value'));
-			}elseif(array_get($data,2)=='promotion'){
+			}elseif(array_get($data,2)=='promotion' || array_get($data,2)=='exception'){
 				$week_value = round($request->get('value'),2)/100;
 			}else{
 				$week_value = $request->get('value');
@@ -557,7 +596,7 @@ right join budget_skus as c on b.sku=c.sku and b.site=c.site where ((a.month>='"
 					'sku' => $sku,
 					'description' => $request->get('description'),
 					'site' => $site,
-					'status' => '新品规划',
+					'status' => 99,
 					// 'level' => 0,
 					// 'stock' => 0,
 					'volume' => $request->get('volume'),

@@ -64,14 +64,19 @@ white-space: nowrap;
                         <div class="row">
 
                         <div class="col-md-1">
-                            <div class="input-group date date-picker margin-bottom-5" data-date-format="yyyy">
-                                <input type="text" class="form-control form-filter input-sm" readonly name="year" placeholder="Year" value="{{$year}}">
-                                <span class="input-group-btn">
-									<button class="btn btn-sm default" type="button">
-										<i class="fa fa-calendar"></i>
-									</button>
-								</span>
-                            </div>
+                            <select class="form-control form-filter input-sm" name="year_from" id="year_from">
+                                        @foreach (getBudgetQuarter() as $k=>$v)
+                                            <option value="{{$v}}" <?php if($v==$year_from) echo 'selected'; ?>>{{$v}}</option>
+                                        @endforeach
+                                    </select>
+                        </div>
+
+                        <div class="col-md-1">
+                            <select class="form-control form-filter input-sm" name="year_to" id="year_to">
+                                        @foreach (getBudgetQuarter() as $k=>$v)
+                                            <option value="{{$v}}" <?php if($v==$year_to) echo 'selected'; ?>>{{$v}}</option>
+                                        @endforeach
+                                    </select>
                         </div>
                        
 						<div class="col-md-2">
@@ -125,7 +130,7 @@ white-space: nowrap;
 						<select class="form-control form-filter input-sm" name="sku_status" id="sku_status">
 									<option value="">Sku Status</option>
 										@foreach ($sku_status as $k=>$v)
-                                            <option value="{{$v}}" <?php if($v==array_get($_REQUEST,'sku_status')) echo 'selected'; ?>>{{$v}}</option>
+                                            <option value="{{$k+1}}" <?php if($k+1==array_get($_REQUEST,'sku_status')) echo 'selected'; ?>>{{$v}}</option>
                                         @endforeach
                                     </select>
 						</div>
@@ -149,12 +154,7 @@ white-space: nowrap;
 										<button type="submit" class="btn blue" id="data_search">Search</button>
 									
                         </div>
-						<div class="col-md-1">
-							<a data-target="#ajax" data-toggle="modal" href="{{ url('/budgets/create')}}"><button id="sample_editable_1_2_new" class="btn red"> Add New
-									<i class="fa fa-plus"></i>
-								</button>
-							</a>
-						</div>
+						
 						
 						
 						</div>	
@@ -173,13 +173,19 @@ white-space: nowrap;
 					</div>
 
                     </form>
-					<div class="col-md-1  col-md-offset-11">
+					<div class="col-md-1  col-md-offset-9">
 
 								<button id="vl_list_export" class="btn blue"> Export
                                     <i class="fa fa-download"></i>
                                 </button>
 									
                         </div>
+                        <div class="col-md-1">
+							<a data-target="#ajax" data-toggle="modal" href="{{ url('/budgets/create')}}"><button class="btn red"> Add New
+									<i class="fa fa-plus"></i>
+								</button>
+							</a>
+						</div>
                 </div>
 				
 					<form action="{{\Request::getRequestUri()}}" method="POST">
@@ -258,8 +264,8 @@ white-space: nowrap;
 						<td rowspan="2" width="5%">状态</td>
 						<td rowspan="2" width="3%">等级</td>
 						<td rowspan="2" width="5%">期初库存</td>
-						<td colspan="4" width="20%">{{$year}}预算</td>
-						<td colspan="4" width="20%">{{$year-1}}实际</td>
+						<td colspan="4" width="20%">{{$year_from}}预算</td>
+						<td colspan="4" width="20%">{{$year_to}}预算</td>
 						<td colspan="4" width="20%">环比</td>
 						<td rowspan="2" width="6%">状态</td>
 					  </tr>
@@ -296,7 +302,7 @@ white-space: nowrap;
 						<td><a href="{{url('/budgets/edit?sku='.$data->sku.'&site='.$data->site.'&year='.$year)}}">{{$data->sku}}</a></td>
 						<td style="overflow: hidden;text-overflow:ellipsis;white-space: nowrap;">{{$data->description}}</td>
 						<td>{{(strtoupper(substr($data->site,-2))=='OM')?'US':strtoupper(substr($data->site,-2))}}</td>
-						<td>{{$data->status}}</td>
+						<td>{{array_get(getSkuStatuses(),$data->status)}}</td>
 						<td>{{($data->level=='0')?'S':$data->level}}</td>
 						<td>{{$data->stock}}</td>
 						<td>{{$data->qty1}}</td>
@@ -312,7 +318,7 @@ white-space: nowrap;
 						<td><span class="{{($profit_z>0)?'red':'green'}}">{{round($profit_z,2)}}%</span></td>
 						<td><span class="{{($economic_z>0)?'red':'green'}}">{{round($economic_z,2)}}</span></td>
 	
-						<td><a href="{{url('/budgets/edit?sku='.$data->sku.'&site='.$data->site.'&year='.$year)}}">{{array_get(getBudgetStageArr(),($data->budget_status)??0)}}</a></td>
+						<td><a href="{{url('/budgets/edit?sku='.$data->sku.'&site='.$data->site.'&year='.$year.'&quarter='.$quarter)}}">{{array_get(getBudgetStageArr(),($data->budget_status)??0)}}</a></td>
 					  </tr>
 					  @endforeach
 					  
@@ -390,7 +396,7 @@ $(function() {
     });
 	
 	$("#vl_list_export").click(function(){
-		location.href='/budgets/export?user_id='+(($("select[name='user_id[]']").val())?$("select[name='user_id[]']").val():'')+'&year='+$("input[name='year']").val()+'&bgbu='+$("select[name='bgbu']").val()+'&site='+$("select[name='site']").val()+'&level='+$("select[name='level']").val()+'&sku_status='+$("select[name='sku_status']").val()+'&b_status='+$("select[name='b_status']").val()+'&sku='+$('input[name="sku"]').val();
+		location.href='/budgets/export?user_id='+(($("select[name='user_id[]']").val())?$("select[name='user_id[]']").val():'')+'&year_from='+$("input[name='year_from']").val()+'&bgbu='+$("select[name='bgbu']").val()+'&site='+$("select[name='site']").val()+'&level='+$("select[name='level']").val()+'&sku_status='+$("select[name='sku_status']").val()+'&b_status='+$("select[name='b_status']").val()+'&sku='+$('input[name="sku"]').val();
 	});
 });
 
