@@ -256,12 +256,13 @@ class PartsListController extends Controller {
 			$rows[$key]['asin'] = $val['asin'];
 		}
 		$arrayData = array();
-		$arrayData[] = array('Sku','Seller Name','Asin','Seller SKU','Item Name','Fbm Stock','Fbm Valid Stock','Fba Stock','Fba Transfer','Unsellable');
+		$arrayData[] = array('Sku','Seller Name','Asin','Site','Seller SKU','Item Name','Fbm Stock','Fbm Valid Stock','Fba Stock','Fba Transfer','Unsellable');
 		foreach ($rows as $key=>$val){
 			$arrayData[] = array(
 				$val['item_code'],
 				$val['seller_name'],
 				$val['asin'],
+                $val['site'],
 				$val['seller_sku'],
 				$val['item_name'],
 				$val['fbm_stock'],
