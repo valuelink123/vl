@@ -625,7 +625,7 @@ right join budget_skus as c on b.sku=c.sku and b.site=c.site where ((a.month>='"
 			if(empty($res)){
 				DB::rollBack();
 				$request->session()->flash('error_message','Save budget-skus Failed! Please resubmit!');
-				return redirect()->back()->withInput();
+				return redirect('budgets');
 			}else{
 				$siteShort = getSiteShort();
 				$res = TaxRate::updateOrCreate(
@@ -639,12 +639,12 @@ right join budget_skus as c on b.sku=c.sku and b.site=c.site where ((a.month>='"
 				if(empty($res)){
 					DB::rollBack();
 					$request->session()->flash('error_message','Save tax-rate Failed! Please resubmit!');
-					return redirect()->back()->withInput();
+					return redirect('budgets');
 				}
 			}
 			DB::commit();
 			$request->session()->flash('success_message','Add New Success');
-			return redirect()->back()->withInput();
+			return redirect('budgets');
 		}else{
 			$itemGroup  = $this->getItemGroup();
 			return view('budget/addNew',array('itemGroup'=>$itemGroup));
