@@ -447,8 +447,8 @@ white-space: nowrap;
 					</colgroup>
 					  <thead>
 					  <tr class="head">
-						<td colspan="8">合计：</td>
-						<td>0</td>
+						<td colspan="9">合计：</td>
+						
 						<?php if($showtype){ ?>
 						<td>{{round($s_t_qty)}}</td>
 						<td>{{round($s_t_income,2)}}</td>
