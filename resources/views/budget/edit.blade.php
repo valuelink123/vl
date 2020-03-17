@@ -679,7 +679,7 @@ var FormEditable = function() {
 			//平均库存
 			avgStock[i] = parseInt((startStock+endStock)/2);
 			startStock = endStock;
-			var week_line_amountfee = parseFloat(cost*avgStock[i]*0.00375*1.3).toFixed(2);
+			var week_line_amountfee = parseFloat(cost*avgStock[i]*0.00375*<?php echo (($year==2020 && $quarter==1)?1:1.3)?>).toFixed(2);
 			$('#'+budget_id+'-'+(i)+'-week_line_amountfee').text(week_line_amountfee);
 			
 			if(i<=4){
