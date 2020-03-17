@@ -298,6 +298,7 @@ right join budget_skus as c on b.sku=c.sku and b.site=c.site where ((a.month>='"
 		$site = $request->get('site');
 		$year = $request->get('year');
 		$quarter = $request->get('quarter');
+		if(empty($quarter)) die('没有该SKU对应预算版本！');
 		$showtype=$request->get('showtype');
 		$sku_base_data = Budgetskus::where('sku',$sku)->where('site',$site)->first();
 		if(empty($sku_base_data)) die('没有该SKU对应预算基础信息，请联系管理员新增！');
@@ -328,6 +329,17 @@ right join budget_skus as c on b.sku=c.sku and b.site=c.site where ((a.month>='"
 		$data['quarter']=$quarter;
 		$data['budget_id']=$budget_id;
 		$data['budget']=$budget;
+		//如果没有预算默认导入本年上版本预算
+		$exists_count = Budgetdetails::where('budget_id',$budget_id)->count();
+		if(!$exists_count){
+			$pre_budget_id = Budgets::where('sku',$sku)->where('site',$site)->where('year',$year)->where('quarter',($quarter-1))->value('id');
+			$pre_budget_datas= Budgetdetails::selectRaw("$budget_id as budget_id,weeks,date,ranking,price,qty,promote_price, promote_qty, promotion, exception,created_at,updated_at")->where('budget_id',$pre_budget_id)->get()->toArray();
+			if($pre_budget_datas) Budgetdetails::insertOnDuplicateWithDeadlockCatching(array_values($pre_budget_datas), ['ranking','price','qty','promote_price', 'promote_qty', 'promotion', 'exception','created_at','updated_at']);
+
+		}
+		
+
+
 		if($budget->status==0 && $showtype){
 			$request->session()->flash('error_message','需要在周视图填写提交后才可切换视图！');
 			return redirect('budgets/edit?sku='.$budget->sku.'&site='.$budget->site.'&year='.$budget->year.'&quarter='.$budget->quarter);
