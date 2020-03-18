@@ -82,7 +82,7 @@ white-space: nowrap;
 								</li>
 							</ul>
 						</div>
-						<a href="{{($remember_list_url)??url('budgets')}}"><button type="button" class="btn btn-sm red">Export</button></a>
+						<a href="{{url('budgets/exportsku?budget_id='.$budget_id)}}"><button type="button" class="btn btn-sm red">Export</button></a>
 						
 						
 						</div>

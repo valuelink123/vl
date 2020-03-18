@@ -307,7 +307,7 @@ right join budget_skus as c on b.sku=c.sku and b.site=c.site where ((a.month>='"
 			$spreadsheet = new Spreadsheet();
 			$spreadsheet->getActiveSheet()->fromArray($arrayData,NULL,'A1');
 			header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-			header('Content-Disposition: attachment;filename="Export_review.xlsx"');
+			header('Content-Disposition: attachment;filename="Export_Budgets.xlsx"');
 			header('Cache-Control: max-age=0');
 			$writer = new Xlsx($spreadsheet);
 			$writer->save('php://output');
@@ -315,6 +315,34 @@ right join budget_skus as c on b.sku=c.sku and b.site=c.site where ((a.month>='"
 		die();
 	}
 	
+
+	public function exportSku(Request $request)
+    {
+		set_time_limit(0);
+		$arrayData=[];
+		$budget_id = intval($request->get('budget_id'));
+		$budget = Budgets::find($budget_id);
+		if(empty($budget)) die;
+ 		$datas =  Budgetdetails::selectRaw('weeks,any_value(ranking) as ranking,any_value(price) as price,sum(qty) as qty,any_value(promote_price) as promote_price,sum(promote_qty) as promote_qty,any_value(promotion) as promotion,any_value(exception) as exception')->where('budget_id',$budget_id)->groupBy('weeks')->orderBy('weeks','asc')->get()->keyBy('weeks')->toArray();
+		$arrayData[][0]='预算导出表格，可以直接修改数值用于导入';
+		$arrayData[] = ['0'=>'周','1'=>'日期','2'=>'排名目标','3'=>'正常售价（外币','4'=>'正常销量','5'=>'促销价（外币）','6'=>'促销销量','7'=>'推广费率','8'=>'异常率'];
+		
+		$weeks = date("W", mktime(0, 0, 0, 12, 28, $budget->year));
+
+		for($i=1;$i<=$weeks;$i++){
+			$arrayData[] = ['0'=>$i,'1'=>date("Ymd", strtotime($budget->year . 'W' . sprintf("%02d",$i))).'-'.date("Ymd", strtotime($budget->year . 'W' . sprintf("%02d",$i))+86400*6),'2'=>array_get($datas,$i.'.ranking'),'3'=>array_get($datas,$i.'.price'),'4'=>array_get($datas,$i.'.qty'),'5'=>array_get($datas,$i.'.promote_price'),'6'=>array_get($datas,$i.'.promote_qty'),'7'=>array_get($datas,$i.'.promotion'),'8'=>array_get($datas,$i.'.exception')];
+		}
+		if($arrayData){
+			$spreadsheet = new Spreadsheet();
+			$spreadsheet->getActiveSheet()->fromArray($arrayData,NULL,'A1');
+			header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+			header('Content-Disposition: attachment;filename="Export_Budget_Sku.xlsx"');
+			header('Cache-Control: max-age=0');
+			$writer = new Xlsx($spreadsheet);
+			$writer->save('php://output');
+		}
+		die();
+	}
 	
 	public function edit(Request $request)
     {	

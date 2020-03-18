@@ -134,6 +134,7 @@ Route::Post('/budget', 'BudgetController@update');
 Route::get('/budgets/edit', 'BudgetController@edit');
 Route::Post('/budgets/upload', 'BudgetController@upload')->name('uploadBudget');
 Route::get('/budgets/export', 'BudgetController@export')->name('exportBudgets');
+Route::get('/budgets/exportsku', 'BudgetController@exportSku')->name('exportBudgetSku');
 Route::match(['post','get'],'/budgets/create', 'BudgetController@create');
 Route::get('/nonctg', 'NonctgController@index');//non-ctg功能
 Route::Post('/nonctg/get', 'NonctgController@get')->name('getnonctg');//non-ctg功能，ajax请求数据
