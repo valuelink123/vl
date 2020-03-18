@@ -192,6 +192,7 @@ class AddRsgProduct extends Command
 				'review_rating' => $val['review_rating'],//昨天星级
 				'number_of_reviews' => $val['number_of_reviews'],//昨天的评论总数
 				'sales_target_reviews' => $sales_target_reviews,
+				'sales_target_reviews_set' => isset($orderdata[$val['asin'].'_'.$val['site']]) ? $orderdata[$val['asin'].'_'.$val['site']]['sales_target_reviews_set'] : 0,
 				'order_status' => isset($orderdata[$val['asin'].'_'.$val['site']]) ? $orderdata[$val['asin'].'_'.$val['site']]['order_status'] : 0,
 				'keyword' => addslashes($val['keyword']),
 				'position' => addslashes($val['position']),
