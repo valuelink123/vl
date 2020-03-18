@@ -71,23 +71,107 @@ white-space: nowrap;
                                     </select>
                         </div>
 
-                        <div class="col-md-1">
-                            <select class="form-control form-filter input-sm" name="year_to" id="year_to">
-                                        @foreach (getBudgetQuarter() as $k=>$v)
-                                            <option value="{{$v}}" <?php if($v==$year_to) echo 'selected'; ?>>{{$v}}</option>
-                                        @endforeach
-                                    </select>
+
+                        <div class="col-md-3">
+                        	<div class="col-md-6">
+                        	 <div class="input-group date date-picker margin-bottom-5 " data-date-format="yyyy-mm-dd">
+                                        <input type="text" class="form-control form-filter input-sm" readonly name="year_from_from" placeholder="From" value="{{$year_from_from}}">
+                                        <span class="input-group-btn">
+                                                                    <button class="btn btn-sm default" type="button">
+                                                                        <i class="fa fa-calendar"></i>
+                                                                    </button>
+                                                                </span>
+                                    </div>
+                                </div><div class="col-md-6">
+                                    <div class="input-group date date-picker" data-date-format="yyyy-mm-dd">
+                                        <input type="text" class="form-control form-filter input-sm" readonly name="year_from_to" placeholder="To" value="{{$year_from_to}}">
+                                        <span class="input-group-btn">
+                                            <button class="btn btn-sm default" type="button">
+                                                <i class="fa fa-calendar"></i>
+                                            </button>
+                                        </span>
+                             </div>
+                         </div>
                         </div>
+
+
+
                        
-						<div class="col-md-2">
-						<select class="mt-multiselect btn btn-default " multiple="multiple" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" name="user_id[]" id="user_id[]">
-                                        @foreach ($users as $user_id=>$user_name)
-                                            <option value="{{$user_id}}" <?php if(in_array($user_id,array_get($_REQUEST,'user_id',[]))) echo 'selected'; ?>>{{$user_name}}</option>
+						
+						
+
+						 <div class="col-md-2">
+						<select class="form-control form-filter input-sm" name="site" id="site">
+									<option value="">Select Site</option>
+                                        @foreach (getAsinSites() as $v)
+                                            <option value="{{$v}}" <?php if($v==array_get($_REQUEST,'site')) echo 'selected'; ?>>{{$v}}</option>
                                         @endforeach
                                     </select>
 						</div>
 						
+						<div class="col-md-2">
+						<select class="form-control form-filter input-sm" name="level" id="level">
+									<option value="">Level</option>
+										<option value="S" <?php if('S'==array_get($_REQUEST,'level')) echo 'selected'; ?>>S</option>
+                                        <option value="A" <?php if('A'==array_get($_REQUEST,'level')) echo 'selected'; ?>>A</option>
+										<option value="B" <?php if('B'==array_get($_REQUEST,'level')) echo 'selected'; ?>>B</option>
+										<option value="C" <?php if('C'==array_get($_REQUEST,'level')) echo 'selected'; ?>>C</option>
+										<option value="D" <?php if('D'==array_get($_REQUEST,'level')) echo 'selected'; ?>>D</option>
+                                    </select>
+						</div>
+						
+						<div class="col-md-2">
+						<select class="form-control form-filter input-sm" name="sku_status" id="sku_status">
+									<option value="">Sku Status</option>
+										@foreach ($sku_status as $k=>$v)
+                                            <option value="{{$k+1}}" <?php if($k+1==array_get($_REQUEST,'sku_status')) echo 'selected'; ?>>{{$v}}</option>
+                                        @endforeach
+                                    </select>
+						</div>
+						
+						<div class="col-md-2">
+						<select class="form-control form-filter input-sm" name="b_status" id="b_status">
+								<option value="">Budget Status</option>
+									@foreach (getBudgetStageArr() as $k=>$v)
+								<option value="{{$k+1}}" <?php if($k+1==array_get($_REQUEST,'b_status')) echo 'selected'; ?>>{{$v}}</option>
+							@endforeach
+						</select>
+						</div>
+
+						</div>
+						 <div class="row" style="margin-top:20px;">
 						<div class="col-md-1">
+                            <select class="form-control form-filter input-sm" name="year_to" id="year_to">
+                                        @foreach (getBudgetQuarter() as $k=>$v)
+                                            <option value="{{$v}}" <?php if($v==$year_to) echo 'selected'; ?>>{{$v}}</option>
+                                        @endforeach
+                                        <option value="0Q0" <?php if($year_to=='0Q0') echo 'selected'; ?>>Current</option>
+                                    </select>
+                        </div>
+
+                        <div class="col-md-3">
+                        	<div class="col-md-6">
+                        	 <div class="input-group date date-picker margin-bottom-5 " data-date-format="yyyy-mm-dd">
+                                        <input type="text" class="form-control form-filter input-sm" readonly name="year_to_from" placeholder="From" value="{{$year_to_from}}">
+                                        <span class="input-group-btn">
+                                                                    <button class="btn btn-sm default" type="button">
+                                                                        <i class="fa fa-calendar"></i>
+                                                                    </button>
+                                                                </span>
+                                    </div>
+                                </div><div class="col-md-6">
+                                    <div class="input-group date date-picker" data-date-format="yyyy-mm-dd">
+                                        <input type="text" class="form-control form-filter input-sm" readonly name="year_to_to" placeholder="To" value="{{$year_to_to}}">
+                                        <span class="input-group-btn">
+                                            <button class="btn btn-sm default" type="button">
+                                                <i class="fa fa-calendar"></i>
+                                            </button>
+                                        </span>
+                             </div>
+                         </div>
+                        </div>
+
+                        <div class="col-md-2">
 						<select class="form-control form-filter input-sm" name="bgbu">
                                         <option value="">Select BGBU</option>
 										<?php 
@@ -104,52 +188,21 @@ white-space: nowrap;
 										} ?>
                                     </select>
 						</div>	
-						
-
-						 <div class="col-md-1">
-						<select class="form-control form-filter input-sm" name="site" id="site">
-									<option value="">Select Site</option>
-                                        @foreach (getAsinSites() as $v)
-                                            <option value="{{$v}}" <?php if($v==array_get($_REQUEST,'site')) echo 'selected'; ?>>{{$v}}</option>
+						<div class="col-md-2">
+						<select class="mt-multiselect btn btn-default " multiple="multiple" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" name="user_id[]" id="user_id[]">
+                                        @foreach ($users as $user_id=>$user_name)
+                                            <option value="{{$user_id}}" <?php if(in_array($user_id,array_get($_REQUEST,'user_id',[]))) echo 'selected'; ?>>{{$user_name}}</option>
                                         @endforeach
                                     </select>
 						</div>
 						
-						<div class="col-md-1">
-						<select class="form-control form-filter input-sm" name="level" id="level">
-									<option value="">Level</option>
-										<option value="S" <?php if('S'==array_get($_REQUEST,'level')) echo 'selected'; ?>>S</option>
-                                        <option value="A" <?php if('A'==array_get($_REQUEST,'level')) echo 'selected'; ?>>A</option>
-										<option value="B" <?php if('B'==array_get($_REQUEST,'level')) echo 'selected'; ?>>B</option>
-										<option value="C" <?php if('C'==array_get($_REQUEST,'level')) echo 'selected'; ?>>C</option>
-										<option value="D" <?php if('D'==array_get($_REQUEST,'level')) echo 'selected'; ?>>D</option>
-                                    </select>
-						</div>
-						
-						<div class="col-md-1">
-						<select class="form-control form-filter input-sm" name="sku_status" id="sku_status">
-									<option value="">Sku Status</option>
-										@foreach ($sku_status as $k=>$v)
-                                            <option value="{{$k+1}}" <?php if($k+1==array_get($_REQUEST,'sku_status')) echo 'selected'; ?>>{{$v}}</option>
-                                        @endforeach
-                                    </select>
-						</div>
-						
-						<div class="col-md-1">
-						<select class="form-control form-filter input-sm" name="b_status" id="b_status">
-								<option value="">Budget Status</option>
-									@foreach (getBudgetStageArr() as $k=>$v)
-								<option value="{{$k+1}}" <?php if($k+1==array_get($_REQUEST,'b_status')) echo 'selected'; ?>>{{$v}}</option>
-							@endforeach
-						</select>
-						</div>
 						
 						<div class="col-md-2">
 						<input type="text" class="form-control form-filter input-sm" name="sku" placeholder="SKU OR Description" value ="{{array_get($_REQUEST,'sku')}}">
                                        
 						</div>
 						
-						<div class="col-md-1  col-offset-md-11">
+						<div class="col-md-2 ">
 							
 										<button type="submit" class="btn blue" id="data_search">Search</button>
 									
@@ -265,7 +318,7 @@ white-space: nowrap;
 						<td rowspan="2" width="3%">等级</td>
 						<td rowspan="2" width="5%">期初库存</td>
 						<td colspan="4" width="20%">{{$year_from}}预算</td>
-						<td colspan="4" width="20%">{{$year_to}}预算</td>
+						<td colspan="4" width="20%">{{($year_to=='0Q0')?'实际完成':$year_to.'预算'}}</td>
 						<td colspan="4" width="20%">环比</td>
 						<td rowspan="2" width="6%">状态</td>
 					  </tr>
@@ -299,7 +352,7 @@ white-space: nowrap;
 						<input type="checkbox" name="budget_id[]" value="{{$data->budget_id}}" />
 						@endif
 						</td>
-						<td><a href="{{url('/budgets/edit?sku='.$data->sku.'&site='.$data->site.'&year='.$year)}}">{{$data->sku}}</a></td>
+						<td><a href="{{url('/budgets/edit?sku='.$data->sku.'&site='.$data->site.'&year='.$year.'&quarter='.$quarter)}}">{{$data->sku}}</a></td>
 						<td style="overflow: hidden;text-overflow:ellipsis;white-space: nowrap;">{{$data->description}}</td>
 						<td>{{(strtoupper(substr($data->site,-2))=='OM')?'US':strtoupper(substr($data->site,-2))}}</td>
 						<td>{{array_get(getSkuStatuses(),$data->status)}}</td>
@@ -374,10 +427,6 @@ white-space: nowrap;
 jQuery(document).ready(function() {
 	$('.date-picker').datepicker({
 		rtl: App.isRTL(),
-		format: 'yyyy',
-		startView: 2, 
-		maxViewMode: 2,
-		minViewMode:2,
 		orientation: 'bottom',
 		autoclose: true
 	});
@@ -396,7 +445,7 @@ $(function() {
     });
 	
 	$("#vl_list_export").click(function(){
-		location.href='/budgets/export?user_id='+(($("select[name='user_id[]']").val())?$("select[name='user_id[]']").val():'')+'&year_from='+$("input[name='year_from']").val()+'&bgbu='+$("select[name='bgbu']").val()+'&site='+$("select[name='site']").val()+'&level='+$("select[name='level']").val()+'&sku_status='+$("select[name='sku_status']").val()+'&b_status='+$("select[name='b_status']").val()+'&sku='+$('input[name="sku"]').val();
+		location.href='/budgets/export?user_id='+(($("select[name='user_id[]']").val())?$("select[name='user_id[]']").val():'')+'&year_from='+$("select[name='year_from']").val()+'&bgbu='+$("select[name='bgbu']").val()+'&site='+$("select[name='site']").val()+'&level='+$("select[name='level']").val()+'&sku_status='+$("select[name='sku_status']").val()+'&b_status='+$("select[name='b_status']").val()+'&sku='+$('input[name="sku"]').val();
 	});
 });
 

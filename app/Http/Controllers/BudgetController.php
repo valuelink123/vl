@@ -59,6 +59,13 @@ class BudgetController extends Controller
 	    $default_year_from = $nowYear.'Q'.$now_quarter;
 	    $default_year_to = ($now_quarter==1)?($nowYear-1).'Q4':$nowYear.'Q'.($now_quarter-1);
 
+	    $year_from_from = $request->get('year_from_from')?$request->get('year_from_from'):$nowYear.'-01-01';
+	    $year_from_to = $request->get('year_from_to')?$request->get('year_from_to'):$nowYear.'-12-31';
+
+	    $year_to_from = $request->get('year_to_from')?$request->get('year_to_from'):$nowYear.'-01-01';
+	    $year_to_to = $request->get('year_to_to')?$request->get('year_to_to'):$nowYear.'-12-31';
+
+
 	    $year_from = $request->get('year_from')?$request->get('year_from'):$default_year_from;
 	    $year_to = $request->get('year_to')?$request->get('year_to'):$default_year_to;
 	    $year_from_arr = explode('Q', $year_from);
@@ -101,12 +108,23 @@ class BudgetController extends Controller
 			$where.= " and (sku='".$sku."' or description like '%".$sku."%')";
 		}
 		
+		$table_from = "select a.sku,a.site,a.id,a.status,a.remark,b.* from budgets as a left join (select budget_id,sum(qty+promote_qty) as qty,sum(income) as income,sum(cost) as cost,sum(common_fee) as common_fee,sum(pick_fee) as pick_fee,sum(promotion_fee) as promotion_fee,sum(amount_fee) as amount_fee,sum(storage_fee) as storage_fee from budget_details
+where date>='".$year_from_from."' and date<='".$year_from_to."' group by budget_id) as b on a.id=b.budget_id where a.year=".$year_from_arr[0]." and a.quarter=".$year_from_arr[1]." and a.status>0";
+		if($year_to_arr[0]==0 || $year_to_arr[1]==0){	
+			$table_to = "select sku,site,sum(sales) as qty,sum(amount) as income,sum((cost+tax+headshipfee)*sales) as cost,-1*sum(commission) as common_fee,-1*sum(fulfillmentfee) as pick_fee,sum(deal+cpc+coupon) as promotion_fee,
+sum(amount_used) as amount_fee, sum(fba_storage+fbm_storage) as storage_fee from skus_daily_info where date>='".$year_to_from."' and date<='".$year_to_to."' group by  sku,site";
+		}else{
+			$table_to = "select a.sku,a.site,b.* from budgets as a left join (select budget_id,sum(qty+promote_qty) as qty,sum(income) as income,sum(cost) as cost,sum(common_fee) as common_fee,sum(pick_fee) as pick_fee,sum(promotion_fee) as promotion_fee,sum(amount_fee) as amount_fee,sum(storage_fee) as storage_fee from budget_details
+where date>='".$year_to_from."' and date<='".$year_to_to."' group by budget_id) as b on a.id=b.budget_id where a.year=".$year_to_arr[0]." and a.quarter=".$year_to_arr[1]." and a.status>0";
+		}
+		
+		
 		$sql = "(
 		select budget_skus.*,budgets_1.qty as qty1,budgets_1.income as amount1,(budgets_1.income-budgets_1.cost) as profit1,(budgets_1.income-budgets_1.cost-budgets_1.common_fee-budgets_1.pick_fee-budgets_1.promotion_fee-budgets_1.amount_fee-budgets_1.storage_fee) as economic1,IFNULL(budgets_1.id,0) as budget_id,IFNULL(budgets_1.status,0) as budget_status,budgets_1.remark
 ,budgets_2.qty as qty2,budgets_2.income as amount2,(budgets_2.income-budgets_2.cost) as profit2,(budgets_2.income-budgets_2.cost-budgets_2.common_fee-budgets_2.pick_fee-budgets_2.promotion_fee-budgets_2.amount_fee-budgets_2.storage_fee) as economic2 from budget_skus 
-		left join (select * from budgets where year = ".$year_from_arr[0]." and quarter = ".$year_from_arr[1]." ) as budgets_1 
+		left join (".$table_from." ) as budgets_1 
 		on budget_skus.sku = budgets_1.sku and budget_skus.site = budgets_1.site
-		left join (select * from budgets where year = ".$year_to_arr[0]." and quarter = ".$year_to_arr[1].") as budgets_2 
+		left join (".$table_to.") as budgets_2 
 		on budget_skus.sku = budgets_2.sku and budget_skus.site = budgets_2.site
 		) as sku_tmp_cc";
 
@@ -134,6 +152,13 @@ class BudgetController extends Controller
 		$data['quarter']=$year_from_arr[1];
 		$data['year_from']=$year_from;
 		$data['year_to']=$year_to;
+
+		$data['year_from_from']=$year_from_from;
+		$data['year_from_to']=$year_from_to;
+
+		$data['year_to_from']=$year_to_from;
+		$data['year_to_to']=$year_to_to;
+
 		$data['datas']= $datas;
 		$data['finish']= $finish;
 		$data['sum']= $sum;
