@@ -34,10 +34,10 @@ function getBudgetQuarter(){
     $nowYear = date('Y');
     $nowMonth =  date('m');
     $budget_quarter = [];
-    if($nowMonth>=1) $now_quarter = 2;
-    if($nowMonth>=4) $now_quarter = 3;
-    if($nowMonth>=7) $now_quarter = 4;
-    if($nowMonth>=10){
+    if($nowMonth>=3) $now_quarter = 2;
+    if($nowMonth>=6) $now_quarter = 3;
+    if($nowMonth>=9) $now_quarter = 4;
+    if($nowMonth>=12){
         $now_quarter = 1;
         $nowYear= $nowYear+1;
     }
@@ -48,7 +48,7 @@ function getBudgetQuarter(){
             $quarter = $now_quarter;     
         }
         for($m=1;$m<=$quarter;$m++){
-           $budget_quarter[]=$i.'Q'.$m;     
+           $budget_quarter[]=$i.'Ver'.$m;     
         }
     }
     return $budget_quarter;

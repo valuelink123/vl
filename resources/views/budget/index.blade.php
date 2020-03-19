@@ -51,7 +51,11 @@ white-space: nowrap;
 .dropdown-menu{
 	min-width:96px;
 }
-    </style>
+</style>
+<?php 
+	$bg='';
+	$quarters_arr=['1','2','3','4'];
+?>
 	<div class="row">
         <div class="col-md-12">
             <!-- BEGIN EXAMPLE TABLE PORTLET-->
@@ -63,7 +67,7 @@ white-space: nowrap;
                     <form role="form" action="{{url('budgets')}}" method="GET">
                         <div class="row">
 
-                        <div class="col-md-1">
+                        <div class="col-md-2">
                             <select class="form-control form-filter input-sm" name="year_from" id="year_from">
                                         @foreach (getBudgetQuarter() as $k=>$v)
                                             <option value="{{$v}}" <?php if($v==$year_from) echo 'selected'; ?>>{{$v}}</option>
@@ -72,26 +76,12 @@ white-space: nowrap;
                         </div>
 
 
-                        <div class="col-md-3">
-                        	<div class="col-md-6">
-                        	 <div class="input-group date date-picker margin-bottom-5 " data-date-format="yyyy-mm-dd">
-                                        <input type="text" class="form-control form-filter input-sm" readonly name="year_from_from" placeholder="From" value="{{$year_from_from}}">
-                                        <span class="input-group-btn">
-                                                                    <button class="btn btn-sm default" type="button">
-                                                                        <i class="fa fa-calendar"></i>
-                                                                    </button>
-                                                                </span>
-                                    </div>
-                                </div><div class="col-md-6">
-                                    <div class="input-group date date-picker" data-date-format="yyyy-mm-dd">
-                                        <input type="text" class="form-control form-filter input-sm" readonly name="year_from_to" placeholder="To" value="{{$year_from_to}}">
-                                        <span class="input-group-btn">
-                                            <button class="btn btn-sm default" type="button">
-                                                <i class="fa fa-calendar"></i>
-                                            </button>
-                                        </span>
-                             </div>
-                         </div>
+                        <div class="col-md-2">
+                        	<select class="mt-multiselect btn btn-default " multiple="multiple" data-label="left" data-width="100%" data-action-onchange="true" name="quarter_from[]" id="quarter_from[]">
+                            @foreach ($quarters_arr as $v)
+                                <option value="{{$v}}" <?php if(in_array($v,array_get($_REQUEST,'quarter_from',[]))) echo 'selected'; ?>>Quarter{{$v}}</option>
+                            @endforeach
+                        	</select>
                         </div>
 
 
@@ -140,71 +130,58 @@ white-space: nowrap;
 
 						</div>
 						 <div class="row" style="margin-top:20px;">
-						<div class="col-md-1">
+						<div class="col-md-2">
                             <select class="form-control form-filter input-sm" name="year_to" id="year_to">
-                                        @foreach (getBudgetQuarter() as $k=>$v)
-                                            <option value="{{$v}}" <?php if($v==$year_to) echo 'selected'; ?>>{{$v}}</option>
-                                        @endforeach
-                                        <option value="0Q0" <?php if($year_to=='0Q0') echo 'selected'; ?>>Current</option>
-                                    </select>
-                        </div>
-
-                        <div class="col-md-3">
-                        	<div class="col-md-6">
-                        	 <div class="input-group date date-picker margin-bottom-5 " data-date-format="yyyy-mm-dd">
-                                        <input type="text" class="form-control form-filter input-sm" readonly name="year_to_from" placeholder="From" value="{{$year_to_from}}">
-                                        <span class="input-group-btn">
-                                                                    <button class="btn btn-sm default" type="button">
-                                                                        <i class="fa fa-calendar"></i>
-                                                                    </button>
-                                                                </span>
-                                    </div>
-                                </div><div class="col-md-6">
-                                    <div class="input-group date date-picker" data-date-format="yyyy-mm-dd">
-                                        <input type="text" class="form-control form-filter input-sm" readonly name="year_to_to" placeholder="To" value="{{$year_to_to}}">
-                                        <span class="input-group-btn">
-                                            <button class="btn btn-sm default" type="button">
-                                                <i class="fa fa-calendar"></i>
-                                            </button>
-                                        </span>
-                             </div>
-                         </div>
+                                @foreach (getBudgetQuarter() as $k=>$v)
+                                    <option value="{{$v}}" <?php if($v==$year_to) echo 'selected'; ?>>{{$v}}</option>
+                                @endforeach
+                            </select>
                         </div>
 
                         <div class="col-md-2">
-						<select class="form-control form-filter input-sm" name="bgbu">
-                                        <option value="">Select BGBU</option>
-										<?php 
-										$bg='';
-										foreach($teams as $team){ 
-											$selected = '';
-											if(array_get($_REQUEST,'bgbu')==($team->bg.'_')) $selected = 'selected';
-											
-											if($bg!=$team->bg) echo '<option value="'.$team->bg.'_" '.$selected.'>'.$team->bg.'</option>';	
-											$bg=$team->bg;
-											$selected = '';
-											if(array_get($_REQUEST,'bgbu')==($team->bg.'_'.$team->bu)) $selected = 'selected';
-											if($team->bg && $team->bu) echo '<option value="'.$team->bg.'_'.$team->bu.'" '.$selected.'>'.$team->bg.' - '.$team->bu.'</option>';
-										} ?>
-                                    </select>
-						</div>	
+                        	<select class="mt-multiselect btn btn-default " multiple="multiple" data-label="left" data-width="100%" data-action-onchange="true"  name="quarter_to[]" id="quarter_to[]">
+                            @foreach ($quarters_arr as $v)
+                                <option value="{{$v}}" <?php if(in_array($v,array_get($_REQUEST,'quarter_to',[]))) echo 'selected'; ?>>Quarter{{$v}}</option>
+                            @endforeach
+                        	</select>
+                        </div>
+
+                        
 						<div class="col-md-2">
 						<select class="mt-multiselect btn btn-default " multiple="multiple" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" name="user_id[]" id="user_id[]">
-                                        @foreach ($users as $user_id=>$user_name)
-                                            <option value="{{$user_id}}" <?php if(in_array($user_id,array_get($_REQUEST,'user_id',[]))) echo 'selected'; ?>>{{$user_name}}</option>
-                                        @endforeach
-                                    </select>
+                            @foreach ($users as $user_id=>$user_name)
+                                <option value="{{$user_id}}" <?php if(in_array($user_id,array_get($_REQUEST,'user_id',[]))) echo 'selected'; ?>>{{$user_name}}</option>
+                            @endforeach
+                        </select>
 						</div>
 						
+
+						<div class="col-md-2">
+							<select class="form-control form-filter input-sm" name="bgbu">
+                                <option value="">Select BGBU</option>
+								<?php
+								foreach($teams as $team){ 
+									$selected = '';
+									if(array_get($_REQUEST,'bgbu')==($team->bg.'_')) $selected = 'selected';
+									
+									if($bg!=$team->bg) echo '<option value="'.$team->bg.'_" '.$selected.'>'.$team->bg.'</option>';	
+									$bg=$team->bg;
+									$selected = '';
+									if(array_get($_REQUEST,'bgbu')==($team->bg.'_'.$team->bu)) $selected = 'selected';
+									if($team->bg && $team->bu) echo '<option value="'.$team->bg.'_'.$team->bu.'" '.$selected.'>'.$team->bg.' - '.$team->bu.'</option>';
+								} 
+								?>
+                            </select>
+						</div>	
 						
 						<div class="col-md-2">
-						<input type="text" class="form-control form-filter input-sm" name="sku" placeholder="SKU OR Description" value ="{{array_get($_REQUEST,'sku')}}">
+						<input type="text" class="form-control form-filter input-sm" name="sku" placeholder="SKU! More Use , Separate" value ="{{array_get($_REQUEST,'sku')}}">
                                        
 						</div>
 						
 						<div class="col-md-2 ">
 							
-										<button type="submit" class="btn blue" id="data_search">Search</button>
+							<button type="submit" class="btn blue" id="data_search">Search</button>
 									
                         </div>
 						
@@ -280,46 +257,48 @@ white-space: nowrap;
 						</div>
 						<div class="col-md-5 pull-right" >{{ $datas->appends($_REQUEST)->links() }} </div>
 					</div>
-					
-					
-					
-					
+
 					<table class="table table-striped table-bordered table-hover">
 					 <colgroup>
-			<col width="2%"></col>
-			<col width="6%"></col>
-			<col width="9%"></col>
-			<col width="4%"></col>
-			<col width="4%"></col>
-			<col width="4%"></col>
-			<col width="5%"></col>
-			<col width="5%"></col>
-			<col width="5%"></col>
-			<col width="5%"></col>
-			<col width="5%"></col>
-			<col width="5%"></col>
-			<col width="5%"></col>
-			<col width="5%"></col>
-			<col width="5%"></col>
-			<col width="5%"></col>
-			<col width="5%"></col>
-			<col width="5%"></col>
-			<col width="5%"></col>
-			<col width="6%"></col>
-			</colgroup>
+						<col width="2%"></col>
+						<col width="6%"></col>
+						<col width="9%"></col>
+						<col width="4%"></col>
+						<col width="4%"></col>
+						<col width="4%"></col>
+						<col width="5%"></col>
+						<col width="5%"></col>
+						<col width="5%"></col>
+						<col width="5%"></col>
+						<col width="5%"></col>
+						<col width="5%"></col>
+						<col width="5%"></col>
+						<col width="5%"></col>
+						<col width="5%"></col>
+						<col width="5%"></col>
+						<col width="5%"></col>
+						<col width="5%"></col>
+						<col width="5%"></col>
+						<col width="6%"></col>
+						</colgroup>
 					  <thead>
 					  <tr class="head" >
-					     <td rowspan="2" width="3%">
-                                        <input type="checkbox" class="group-checkable" /></td>
+					    <td rowspan="2" width="3%">
+                           <input type="checkbox" class="group-checkable" /></td>
 						<td rowspan="2" width="6%">SKU</td>
 						<td rowspan="2" width="8%">描述</td>
 						<td rowspan="2" width="3%">站点</td>
 						<td rowspan="2" width="5%">状态</td>
 						<td rowspan="2" width="3%">等级</td>
 						<td rowspan="2" width="5%">期初库存</td>
-						<td colspan="4" width="20%">{{$year_from}}预算</td>
-						<td colspan="4" width="20%">{{($year_to=='0Q0')?'实际完成':$year_to.'预算'}}</td>
-						<td colspan="4" width="20%">环比</td>
+						<td colspan="4" width="20%">{{$year_from}}预算   
+							<span class="badge badge-danger" id="ToggleCompare" style="cursor: pointer;">切换环比 预算/实际</span>
+						</td>
+						<td colspan="4" width="20%" class="showCompare">{{$year_to.'预算'}}</td>
+						<td colspan="4" width="20%" class="showCompare">环比</td>
+
+						<td colspan="4" width="20%" class="showCurrent" style="display: none;">实际完成</td>
+						<td colspan="4" width="20%" class="showCurrent" style="display: none;">环比</td>
 						<td rowspan="2" width="6%">状态</td>
 					  </tr>
 					  <tr class="head" >
@@ -327,14 +306,27 @@ white-space: nowrap;
 						<td width="5%">销售额</td>
 						<td width="5%">利润率</td>
 						<td width="5%">经济效益</td>
-						<td width="5%">销量</td>
-						<td width="5%">销售额</td>
-						<td width="5%">利润率</td>
-						<td width="5%">经济效益</td>
-						<td width="5%">销量</td>
-						<td width="5%">销售额</td>
-						<td width="5%">利润率</td>
-						<td width="5%">经济效益</td>
+
+						<td width="5%" class="showCompare">销量</td>
+						<td width="5%" class="showCompare">销售额</td>
+						<td width="5%" class="showCompare">利润率</td>
+						<td width="5%" class="showCompare">经济效益</td>
+
+						<td width="5%" class="showCompare">销量</td>
+						<td width="5%" class="showCompare">销售额</td>
+						<td width="5%" class="showCompare">利润率</td>
+						<td width="5%" class="showCompare">经济效益</td>
+
+						<td width="5%" class="showCurrent" style="display: none;">销量</td>
+						<td width="5%" class="showCurrent" style="display: none;">销售额</td>
+						<td width="5%" class="showCurrent" style="display: none;">利润率</td>
+						<td width="5%" class="showCurrent" style="display: none;">经济效益</td>
+
+						<td width="5%" class="showCurrent" style="display: none;">销量</td>
+						<td width="5%" class="showCurrent" style="display: none;">销售额</td>
+						<td width="5%" class="showCurrent" style="display: none;">利润率</td>
+						<td width="5%" class="showCurrent" style="display: none;">经济效益</td>
+
 					  </tr>
 					  </thead>
 					  <tbody>
@@ -345,6 +337,12 @@ white-space: nowrap;
 					  $amount_z = $data->amount1-$data->amount2;
 					  $profit_z = (($data->amount1==0)?0:round($data->economic1/$data->amount1,4)*100)-(($data->amount2==0)?0:round($data->economic2/$data->amount2,4)*100);
 					  $economic_z = $data->economic1-$data->economic2;
+
+
+					  $qty_c = $data->qty1-$data->qty3;
+					  $amount_c = $data->amount1-$data->amount3;
+					  $profit_c = (($data->amount1==0)?0:round($data->economic1/$data->amount1,4)*100)-(($data->amount3==0)?0:round($data->economic3/$data->amount3,4)*100);
+					  $economic_c = $data->economic1-$data->economic3;
 					   ?>
 					  <tr>
 					    <td>
@@ -352,7 +350,7 @@ white-space: nowrap;
 						<input type="checkbox" name="budget_id[]" value="{{$data->budget_id}}" />
 						@endif
 						</td>
-						<td><a href="{{url('/budgets/edit?sku='.$data->sku.'&site='.$data->site.'&year='.$year.'&quarter='.$quarter)}}">{{$data->sku}}</a></td>
+						<td style="overflow: hidden;text-overflow:ellipsis;white-space: nowrap;"><a href="{{url('/budgets/edit?sku='.$data->sku.'&site='.$data->site.'&year='.$year.'&quarter='.$quarter)}}">{{$data->sku}}</a></td>
 						<td style="overflow: hidden;text-overflow:ellipsis;white-space: nowrap;">{{$data->description}}</td>
 						<td>{{(strtoupper(substr($data->site,-2))=='OM')?'US':strtoupper(substr($data->site,-2))}}</td>
 						<td>{{array_get(getSkuStatuses(),$data->status)}}</td>
@@ -362,14 +360,23 @@ white-space: nowrap;
 						<td>{{$data->amount1}}</td>
 						<td>{{($data->amount1==0)?0:round($data->economic1/$data->amount1,4)*100}}%</td>
 						<td>{{$data->economic1}}</td>
-						<td>{{$data->qty2}}</td>
-						<td>{{$data->amount2}}</td>
-						<td>{{($data->amount2==0)?0:round($data->economic2/$data->amount2,4)*100}}%</td>
-						<td>{{$data->economic2}}</td>
-						<td><span class="{{($qty_z>0)?'red':'green'}}">{{$qty_z}}</span></td>
-						<td><span class="{{($amount_z>0)?'red':'green'}}">{{round($amount_z,2)}}</span></td>
-						<td><span class="{{($profit_z>0)?'red':'green'}}">{{round($profit_z,2)}}%</span></td>
-						<td><span class="{{($economic_z>0)?'red':'green'}}">{{round($economic_z,2)}}</span></td>
+						<td class="showCompare">{{$data->qty2}}</td>
+						<td class="showCompare">{{$data->amount2}}</td>
+						<td class="showCompare">{{($data->amount2==0)?0:round($data->economic2/$data->amount2,4)*100}}%</td>
+						<td class="showCompare">{{$data->economic2}}</td>
+						<td class="showCompare"><span class="{{($qty_z>0)?'red':'green'}}">{{$qty_z}}</span></td>
+						<td class="showCompare"><span class="{{($amount_z>0)?'red':'green'}}">{{round($amount_z,2)}}</span></td>
+						<td class="showCompare"><span class="{{($profit_z>0)?'red':'green'}}">{{round($profit_z,2)}}%</span></td>
+						<td class="showCompare"><span class="{{($economic_z>0)?'red':'green'}}">{{round($economic_z,2)}}</span></td>
+
+						<td class="showCurrent" style="display: none;">{{$data->qty3}}</td>
+						<td class="showCurrent" style="display: none;">{{$data->amount3}}</td>
+						<td class="showCurrent" style="display: none;">{{($data->amount3==0)?0:round($data->economic3/$data->amount3,4)*100}}%</td>
+						<td class="showCurrent" style="display: none;">{{$data->economic3}}</td>
+						<td class="showCurrent" style="display: none;"><span class="{{($qty_c>0)?'red':'green'}}">{{$qty_c}}</span></td>
+						<td class="showCurrent" style="display: none;"><span class="{{($amount_c>0)?'red':'green'}}">{{round($amount_c,2)}}</span></td>
+						<td class="showCurrent" style="display: none;"><span class="{{($profit_c>0)?'red':'green'}}">{{round($profit_c,2)}}%</span></td>
+						<td class="showCurrent" style="display: none;"><span class="{{($economic_c>0)?'red':'green'}}">{{round($economic_c,2)}}</span></td>
 	
 						<td><a href="{{url('/budgets/edit?sku='.$data->sku.'&site='.$data->site.'&year='.$year.'&quarter='.$quarter)}}">{{array_get(getBudgetStageArr(),($data->budget_status)??0)}}</a></td>
 					  </tr>
@@ -382,20 +389,28 @@ white-space: nowrap;
 						<td>{{$sum->amount1}}</td>
 						<td>{{($sum->amount1==0)?0:round($sum->economic1/$sum->amount1,4)*100}}%</td>
 						<td>{{$sum->economic1}}</td>
-						<td>{{$sum->qty2}}</td>
-						<td>{{$sum->amount2}}</td>
-						<td>{{($sum->amount2==0)?0:round($sum->economic2/$sum->amount2,4)*100}}%</td>
-						<td>{{$sum->economic2}}</td>
-						<td><span class="{{($sum->qty1-$sum->qty2>0)?'red':'green'}}">{{$sum->qty1-$sum->qty2}}</span></td>
-						<td><span class="{{($sum->amount1-$sum->amount2>0)?'red':'green'}}">{{round($sum->amount1-$sum->amount2,2)}}</span></td>
-						<td><span class="{{((($sum->amount1==0)?0:round($sum->economic1/$sum->amount1,4)*100)-(($sum->amount2==0)?0:round($sum->economic2/$sum->amount2,4)*100)>0)?'red':'green'}}">{{(($sum->amount1==0)?0:round($sum->economic1/$sum->amount1,4)*100)-(($sum->amount2==0)?0:round($sum->economic2/$sum->amount2,4)*100)}}%</span></td>
-						<td><span class="{{($sum->economic1-$sum->economic2>0)?'red':'green'}}">{{round($sum->economic1-$sum->economic2,2)}}</span></td>
+						<td class="showCompare">{{$sum->qty2}}</td>
+						<td class="showCompare">{{$sum->amount2}}</td>
+						<td class="showCompare">{{($sum->amount2==0)?0:round($sum->economic2/$sum->amount2,4)*100}}%</td>
+						<td class="showCompare">{{$sum->economic2}}</td>
+						<td class="showCompare"><span class="{{($sum->qty1-$sum->qty2>0)?'red':'green'}}">{{$sum->qty1-$sum->qty2}}</span></td>
+						<td class="showCompare"><span class="{{($sum->amount1-$sum->amount2>0)?'red':'green'}}">{{round($sum->amount1-$sum->amount2,2)}}</span></td>
+						<td class="showCompare"><span class="{{((($sum->amount1==0)?0:round($sum->economic1/$sum->amount1,4)*100)-(($sum->amount2==0)?0:round($sum->economic2/$sum->amount2,4)*100)>0)?'red':'green'}}">{{(($sum->amount1==0)?0:round($sum->economic1/$sum->amount1,4)*100)-(($sum->amount2==0)?0:round($sum->economic2/$sum->amount2,4)*100)}}%</span></td>
+						<td class="showCompare"><span class="{{($sum->economic1-$sum->economic2>0)?'red':'green'}}">{{round($sum->economic1-$sum->economic2,2)}}</span></td>
+
+						<td class="showCurrent" style="display: none;">{{$sum->qty3}}</td>
+						<td class="showCurrent" style="display: none;">{{$sum->amount3}}</td>
+						<td class="showCurrent" style="display: none;">{{($sum->amount3==0)?0:round($sum->economic3/$sum->amount3,4)*100}}%</td>
+						<td class="showCurrent" style="display: none;">{{$sum->economic3}}</td>
+						<td class="showCurrent" style="display: none;"><span class="{{($sum->qty1-$sum->qty3>0)?'red':'green'}}">{{$sum->qty1-$sum->qty3}}</span></td>
+						<td class="showCurrent" style="display: none;"><span class="{{($sum->amount1-$sum->amount3>0)?'red':'green'}}">{{round($sum->amount1-$sum->amount3,2)}}</span></td>
+						<td class="showCurrent" style="display: none;"><span class="{{((($sum->amount1==0)?0:round($sum->economic1/$sum->amount1,4)*100)-(($sum->amount3==0)?0:round($sum->economic3/$sum->amount3,4)*100)>0)?'red':'green'}}">{{(($sum->amount1==0)?0:round($sum->economic1/$sum->amount1,4)*100)-(($sum->amount3==0)?0:round($sum->economic3/$sum->amount3,4)*100)}}%</span></td>
+						<td class="showCurrent" style="display: none;"><span class="{{($sum->economic1-$sum->economic3>0)?'red':'green'}}">{{round($sum->economic1-$sum->economic3,2)}}</span></td>
 	
 						<td></td>
 					  </tr>
 					  </tbody>
 					</table>
-					
 					{{ $datas->appends($_REQUEST)->links() }}   
                     </div>
 					</form>
@@ -429,6 +444,16 @@ jQuery(document).ready(function() {
 		rtl: App.isRTL(),
 		orientation: 'bottom',
 		autoclose: true
+	});
+	$('#ToggleCompare').click(function(){
+		if($('.showCurrent').is(":hidden")){
+			$('.showCompare').hide();
+			$('.showCurrent').show();
+		}else{
+			$('.showCurrent').hide();
+			$('.showCompare').show();	
+		}
+		
 	});
 	$('.group-checkable',$('.table')).change(function() {
 		var set = $('.table').find('tbody > tr > td:nth-child(1) input[type="checkbox"]');

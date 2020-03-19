@@ -52,6 +52,16 @@ white-space: nowrap;
 .table-body table tr:nth-child(2n+1){background-color:#f2f2f2;}
 .editable-input textarea.form-control {width:500px;font-size:12px;}
     </style>
+    <?php
+    $weeks = date("W", mktime(0, 0, 0, 12, 28, $year));
+	$start_week = 1;	
+	for($i=1;$i<=$weeks;$i++){
+		if(date("Ymd", strtotime($year . 'W' . sprintf("%02d",$i))+86400*6)>$year.sprintf("%02d",($quarter-1)*3).'31'){
+			$start_week = $i; 
+			break;	
+		}	
+	}
+    ?>
 	<div class="row">
         <div class="col-md-12">
             <!-- BEGIN EXAMPLE TABLE PORTLET-->
@@ -386,8 +396,9 @@ white-space: nowrap;
 					  	} 
 					  
 					  }else{
-						  $weeks = date("W", mktime(0, 0, 0, 12, 28, $year));
-						  for($i=1;$i<=$weeks;$i++){
+
+							for($i=1;$i<=$weeks;$i++){
+								if($i>=$start_week){
 					  ?>
 					  <tr>
 						<td>{{$i}}
@@ -414,6 +425,35 @@ white-space: nowrap;
 						<td><span id="{{$budget_id.'-'.$i}}-week_line_economic">0</span></td>
 					  </tr>
 					  <?php 
+					  		}else{
+
+					  ?>
+					  <tr>
+						<td>{{$i}}
+						
+						</td>
+						<td>{{date("Ymd", strtotime($year . 'W' . sprintf("%02d",$i))).'-'.date("Ymd", strtotime($year . 'W' . sprintf("%02d",$i))+86400*6)}}</td>
+						<td>{{array_get($datas,$i.'.ranking')}}</td>
+						<td>{{round(array_get($datas,$i.'.price'),2)}}</td>
+						<td>{{round(array_get($datas,$i.'.qty'))}} </td>
+						<td>{{round(array_get($datas,$i.'.promote_price'),2)}}</td>
+						<td>{{round(array_get($datas,$i.'.promote_qty'))}} </td>
+						<td>{{round(array_get($datas,$i.'.promotion')*100,2)}} %</td>
+						<td>{{round(array_get($datas,$i.'.exception')*100,2)}} %</td>
+						<td><span id="{{$budget_id.'-'.$i}}-week_line_qty">{{round(array_get($datas,$i.'.qty')+array_get($datas,$i.'.promote_qty'))}}</span></td>
+						<td><span id="{{$budget_id.'-'.$i}}-week_line_income">{{round(array_get($datas,$i.'.income'),2)}}</span></td>
+						<td><span id="{{$budget_id.'-'.$i}}-week_line_cost">{{round(array_get($datas,$i.'.cost'),2)}}</span></td>
+						<td><span id="{{$budget_id.'-'.$i}}-week_line_profit">{{round(array_get($datas,$i.'.income')-array_get($datas,$i.'.cost'),2)}}</span></td>
+						<td><span id="{{$budget_id.'-'.$i}}-week_line_commonfee">{{round(array_get($datas,$i.'.common_fee'),2)}}0</span></td>
+						<td><span id="{{$budget_id.'-'.$i}}-week_line_pickfee">{{round(array_get($datas,$i.'.pick_fee'),2)}}</span></td>
+						<td><span id="{{$budget_id.'-'.$i}}-week_line_fee">{{round(array_get($datas,$i.'.common_fee')+array_get($datas,$i.'.pick_fee'),2)}}</span></td>
+						<td><span id="{{$budget_id.'-'.$i}}-week_line_storagefee">{{round(array_get($datas,$i.'.storage_fee'),2)}}</span></td>
+						<td><span id="{{$budget_id.'-'.$i}}-week_line_profee">{{round(array_get($datas,$i.'.promotion_fee'),2)}}</span></td>
+						<td><span id="{{$budget_id.'-'.$i}}-week_line_amountfee">{{round(array_get($datas,$i.'.amount_fee'),2)}}</span></td>
+						<td><span id="{{$budget_id.'-'.$i}}-week_line_economic">{{round(array_get($datas,$i.'.income')-array_get($datas,$i.'.cost')-array_get($datas,$i.'.common_fee')-array_get($datas,$i.'.pick_fee')-array_get($datas,$i.'.storage_fee')-array_get($datas,$i.'.promotion_fee')-array_get($datas,$i.'.amount_fee'),2)}}</span></td>
+					  </tr>
+					  <?php
+					  		}
 					  	} 
 					  }
 					  ?>
@@ -605,8 +645,9 @@ var FormEditable = function() {
 		var budget_id = id[0];
 		var week_id = id[1];
 		var weeks = {{date("W", mktime(0, 0, 0, 12, 28, $year))}};
+		var start_week = {{$start_week}};
 		if (parseFloat(week_id).toString() == "NaN") {
-			for (let i = 1;i <= weeks;i++){
+			for (let i = start_week;i <= weeks;i++){
 				initLine(budget_id,i);
 			}
 		}else{
@@ -649,51 +690,63 @@ var FormEditable = function() {
 			var week_line_cost = parseFloat($('#'+budget_id+'-'+i+'-week_line_cost').text());
 			var week_line_commonfee = parseFloat($('#'+budget_id+'-'+i+'-week_line_commonfee').text());
 			var week_line_pickfee = parseFloat($('#'+budget_id+'-'+i+'-week_line_pickfee').text());
-		
-			stock = (stock-week_line_qty>0)?stock-week_line_qty:0;
-			var n_stock = 0;
-			if(i<=weeks-7){
-			   for (let ix = 1;ix <= 7;ix++){
-					n_stock+=parseInt($('#'+budget_id+'-'+(i+ix)+'-week_line_qty').text());
-			   }
-			}else if(i==weeks){
-			   n_stock=parseInt(parseInt($('#'+budget_id+'-'+(i)+'-week_line_qty').text())*5.688);  
+			if(i>=start_week){
+				stock = (stock-week_line_qty>0)?stock-week_line_qty:0;
+				var n_stock = 0;
+				if(i<=weeks-7){
+				   for (let ix = 1;ix <= 7;ix++){
+						n_stock+=parseInt($('#'+budget_id+'-'+(i+ix)+'-week_line_qty').text());
+				   }
+				}else if(i==weeks){
+				   n_stock=parseInt(parseInt($('#'+budget_id+'-'+(i)+'-week_line_qty').text())*5.688);  
+				}else{
+				   for (let ix = i+1;ix <= weeks;ix++){
+						n_stock+=parseInt($('#'+budget_id+'-'+(ix)+'-week_line_qty').text());
+				   }
+				   if(i==weeks-1) n_stock=parseInt(n_stock*5.919);
+				   if(i==weeks-2) n_stock=parseInt(n_stock*3.019);
+				   if(i==weeks-3) n_stock=parseInt(n_stock*2.038);
+				   if(i==weeks-4) n_stock=parseInt(n_stock*1.579);
+				   if(i==weeks-5) n_stock=parseInt(n_stock*1.306);
+				   if(i==weeks-6) n_stock=parseInt(n_stock*1.127);
+				}
+				<?php if($base_data['then_status']==1 || $base_data['then_status']==2 || $base_data['then_status']==99){ ?>
+				endStock = stock>n_stock?stock:n_stock;
+				<?php }else{ ?>
+				endStock = stock;
+				<?php }?>
+				
+				endStock = endStock>0?endStock:0;
+				$('#'+budget_id+'-'+(i)+'-stock_end').val(endStock);
+				//平均库存
+				avgStock[i] = parseInt((startStock+endStock)/2);
+				startStock = endStock;
+				var week_line_amountfee = parseFloat(cost*avgStock[i]*0.00375*<?php echo (($year==2020 && $quarter==1)?1:1.3)?>).toFixed(2);
+				$('#'+budget_id+'-'+(i)+'-week_line_amountfee').text(week_line_amountfee);
+				
+				if(i<=4){
+					var week_line_storagefee = parseFloat(first4WeeksQty*0.656*hot_storagefee).toFixed(2);
+				}else{
+					if(i>=(start_week+4)){
+						var week_line_storagefee = parseFloat(avgStock[i-4]*(i>43?hot_storagefee:cold_storagefee)).toFixed(2);	
+					}else{
+						var week_line_storagefee = parseFloat(avgStock[i]*(i>43?hot_storagefee:cold_storagefee)).toFixed(2);	
+					}
+					
+				}
+				$('#'+budget_id+'-'+(i)+'-week_line_storagefee').text(week_line_storagefee);  
+				
+				var week_line_economic = parseFloat(week_line_profit-week_line_fee-week_line_profee-week_line_amountfee-week_line_storagefee).toFixed(2);
+				
+				$('#'+budget_id+'-'+(i)+'-week_line_economic').text(week_line_economic);
+				
+				
 			}else{
-			   for (let ix = i+1;ix <= weeks;ix++){
-					n_stock+=parseInt($('#'+budget_id+'-'+(ix)+'-week_line_qty').text());
-			   }
-			   if(i==weeks-1) n_stock=parseInt(n_stock*5.919);
-			   if(i==weeks-2) n_stock=parseInt(n_stock*3.019);
-			   if(i==weeks-3) n_stock=parseInt(n_stock*2.038);
-			   if(i==weeks-4) n_stock=parseInt(n_stock*1.579);
-			   if(i==weeks-5) n_stock=parseInt(n_stock*1.306);
-			   if(i==weeks-6) n_stock=parseInt(n_stock*1.127);
+				var week_line_amountfee = parseFloat($('#'+budget_id+'-'+(i)+'-week_line_amountfee').text()).toFixed(2);
+				var week_line_storagefee = parseFloat($('#'+budget_id+'-'+(i)+'-week_line_storagefee').text()).toFixed(2);	
+				var week_line_economic = parseFloat($('#'+budget_id+'-'+(i)+'-week_line_economic').text()).toFixed(2);
 			}
-			<?php if($base_data['then_status']==1 || $base_data['then_status']==2 || $base_data['then_status']==99){ ?>
-			endStock = stock>n_stock?stock:n_stock;
-			<?php }else{ ?>
-			endStock = stock;
-			<?php }?>
-			
-			endStock = endStock>0?endStock:0;
-			$('#'+budget_id+'-'+(i)+'-stock_end').val(endStock);
-			//平均库存
-			avgStock[i] = parseInt((startStock+endStock)/2);
-			startStock = endStock;
-			var week_line_amountfee = parseFloat(cost*avgStock[i]*0.00375*<?php echo (($year==2020 && $quarter==1)?1:1.3)?>).toFixed(2);
-			$('#'+budget_id+'-'+(i)+'-week_line_amountfee').text(week_line_amountfee);
-			
-			if(i<=4){
-				var week_line_storagefee = parseFloat(first4WeeksQty*0.656*hot_storagefee).toFixed(2);
-			}else{
-				var week_line_storagefee = parseFloat(avgStock[i-4]*(i>43?hot_storagefee:cold_storagefee)).toFixed(2);
-			}
-			$('#'+budget_id+'-'+(i)+'-week_line_storagefee').text(week_line_storagefee);  
-			
-			var week_line_economic = parseFloat(week_line_profit-week_line_fee-week_line_profee-week_line_amountfee-week_line_storagefee).toFixed(2);
-			
-			$('#'+budget_id+'-'+(i)+'-week_line_economic').text(week_line_economic);
-			
+
 			total_qty+=parseInt(week_line_qty);
 			total_income+=parseFloat(week_line_income);
 			total_cost+=parseFloat(week_line_cost);
