@@ -95,10 +95,7 @@ class GetAsin extends Command
 			}
 			$sku_price= ($sku_price_num)?round($sku_price/$sku_price_num,2):0;
 			$sku_sales= ($sku_sales_num)?round($sku_sales/$sku_sales_num,2):0;
-			
-			
-			$new_pro=DB::table('new_skus')->where('sku',trim(array_get($asin,'MATNR','')))->where('site','www.'.trim(array_get($asin,'SITE','')))->value('sku');
-			
+
 			Asin::updateOrCreate(
 			[
 				'asin' => trim(array_get($asin,'ASIN','')),
@@ -120,7 +117,7 @@ class GetAsin extends Command
 				'sap_warehouse_id' => trim(array_get($asin,'LGORT','')),
 				'sap_factory_id' => trim(array_get($asin,'WERKS','')),
 				'sap_shipment_id' => trim(array_get($asin,'SDABW','')),
-				'item_status' => (($new_pro)?2:intval(array_get($asin,'MATNRZT',0))),
+				'item_status' => intval(array_get($asin,'MATNRZT',0)),
 				'sku_ranking'=>$sku_ranking,
 				'sku_rating'=>$sku_rating,
 				'sku_review'=>$sku_review,
