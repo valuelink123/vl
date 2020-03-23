@@ -99,10 +99,10 @@ white-space: nowrap;
 						<div class="col-md-7">
 						<div class="form-upload">
 						<form action="{{url('budgets/upload')}}" method="post" enctype="multipart/form-data" class="pull-right " >
-						<div class=" pull-left">
+						<!--<div class=" pull-left">
 
 							<a href="{{ url('/uploads/BudgetsUpload/data.csv')}}">Import Template</a>	
-						</div>
+						</div>-->
 						<div class="pull-left">
 							{{ csrf_field() }}
 								 <input type="file" name="importFile"  />

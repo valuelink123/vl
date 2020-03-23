@@ -79,7 +79,7 @@ white-space: nowrap;
                         <div class="col-md-2">
                         	<select class="mt-multiselect btn btn-default " multiple="multiple" data-label="left" data-width="100%" data-action-onchange="true" name="quarter_from[]" id="quarter_from[]">
                             @foreach ($quarters_arr as $v)
-                                <option value="{{$v}}" <?php if(in_array($v,array_get($_REQUEST,'quarter_from',[]))) echo 'selected'; ?>>Quarter{{$v}}</option>
+                                <option value="{{$v}}" <?php if(in_array($v,$quarter_from)) echo 'selected'; ?>>Quarter{{$v}}</option>
                             @endforeach
                         	</select>
                         </div>
@@ -141,7 +141,7 @@ white-space: nowrap;
                         <div class="col-md-2">
                         	<select class="mt-multiselect btn btn-default " multiple="multiple" data-label="left" data-width="100%" data-action-onchange="true"  name="quarter_to[]" id="quarter_to[]">
                             @foreach ($quarters_arr as $v)
-                                <option value="{{$v}}" <?php if(in_array($v,array_get($_REQUEST,'quarter_to',[]))) echo 'selected'; ?>>Quarter{{$v}}</option>
+                                <option value="{{$v}}" <?php if(in_array($v,$quarter_to)) echo 'selected'; ?>>Quarter{{$v}}</option>
                             @endforeach
                         	</select>
                         </div>
