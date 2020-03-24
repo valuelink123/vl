@@ -13,8 +13,14 @@ use Illuminate\Support\Facades\Hash;
 use PDO;
 use DB;
 use log;
+use App\Classes\SapRfcRequest;
+use App\Accounts;
+use App\Category;
+
 class ServiceController extends Controller
 {
+    use \App\Traits\Mysqli;
+
     /**
      * Create a new controller instance.
      *
@@ -116,6 +122,84 @@ class ServiceController extends Controller
         return view('service',compact('total_score','tasks','dash','details','users','date_from','date_to','user_id','statis'));
 
     }
-	
+
+    public function fastSearch(Request $req){
+        $searchType = $req->input('searchType', 0);
+        $searchTerm = trim($req->input('searchTerm', ''));
+
+        if($searchTerm != '') {
+            //Order ID
+            if ($searchType == 0) {
+                $sap = new SapRfcRequest();
+                try{
+                    $order = SapRfcRequest::sapOrderDataTranslate($sap->getOrder(['orderId' => $searchTerm]));
+                    $order['SellerName'] = Accounts::where('account_sellerid', $order['SellerId'])->first()->account_name ?? 'No Match';
+                }catch(\Exception $e){
+                    return 'No matching order...';
+                }
+                return view('service.orderinfo', ['order' => $order]);
+
+            }
+            //Customer Info
+            else if ($searchType == 1) {
+                $id = $searchTerm;
+                $sap = new SapRfcRequest();
+                $sql = "select b.name as name,b.email as email,b.phone as phone,b.remark as remark,b.country as country,b.`from` as `from`,c.amazon_order_id as order_id
+			FROM client_info as b
+			left join client_order_info as c on b.id = c.ci_id
+			where b.client_id = $id
+			order by b.id desc ";
+
+                try{
+                    $_data = $this->queryRows($sql);
+                }catch (\Exception $e) {
+                    return 'No matching customer...';
+                }
+
+                if(empty($_data)){
+                    return 'No matching customer...';
+                }
+
+                $orderArr = array();
+                $contactInfo = array();
+                $emails = array();
+                foreach ($_data as $key => $val) {
+                    //获取sap订单信息
+                    $orderid = $val['order_id'];
+                    try {
+                        $orderArr[$key] = SapRfcRequest::sapOrderDataTranslate($sap->getOrder(['orderId' => $orderid]));
+                        $orderArr[$key]['SellerName'] = Accounts::where('account_sellerid', $orderArr[$key]['SellerId'])->first()->account_name ?? 'No Match';
+                    } catch (\Exception $e) {
+
+                    }
+                    //联系人基本信息
+                    $contactInfo[$val['email']] = array('name' => $val['name'], 'email' => $val['email'], 'phone' => $val['phone'], 'remark' => $val['remark'], 'country' => $val['country']);
+                    $emails[] = $val['email'];
+                }
+
+                $userRows = DB::table('users')->select('id', 'name')->get();
+
+                $users = array();
+                foreach ($userRows as $row) {
+                    $users[$row->id] = $row->name;
+                }
+                //与联系人的邮箱联系内容
+                $emails = DB::table('sendbox')->whereIn('to_address', $emails)->orderBy('date', 'desc')->get();
+                $emails = json_decode(json_encode($emails), true); // todo
+
+                $track_log_array = TrackLog::where('record_id', $id)->where('type', 2)->orderBy('created_at', 'desc')->get()->toArray();
+                $subject_type = $this->getSubjectType();
+
+                return view('service/customerinfo', ['orderArr' => $orderArr, 'contactInfo' => $contactInfo, 'emails' => $emails, 'users' => $users, 'track_log_array' => $track_log_array, 'subject_type' => $subject_type, 'record_id' => $id]);
+
+            }
+        }
+
+    }
+
+    public function getSubjectType(){
+        return Category::where('category_pid',28)->orderBy('created_at','desc')->pluck('category_name','id');
+    }
+
 
 }

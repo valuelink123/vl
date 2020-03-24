@@ -23,6 +23,7 @@ Route::get('/homeexport', 'HomeController@export');
 Route::get('/home/asins', 'HomeController@asins');
 Route::Post('/home/getasins', 'HomeController@getasins');
 Route::get('/service', 'ServiceController@index')->name('service');
+Route::get('/service/fastSearch', 'ServiceController@fastSearch')->name('fastSearch');
 Route::resource('account', 'AccountController');
 Route::resource('template', 'TemplateController');
 Route::resource('asin', 'AsinController');

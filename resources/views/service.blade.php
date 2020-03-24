@@ -72,259 +72,305 @@ a.editable-click:hover {
     font-size: 12px;
     color: #666;
 }
-	.tongji span{
-		margin-left:20px;
-		font-size:15px;
-	}
+.tongji span{
+	margin-left:20px;
+	font-size:15px;
+}
+
+#fast-search{
+	background-color: #FFFFFF;
+	width: 100%;
+	height: 90px;
+}
+#fast-search .search-type{
+	text-align: center;
+	width: 85px;
+	height: 36px;
+	/*padding: 0px 0px;*/
+	/*margin: 0px 0px 0px 0px;*/
+	background-color: #FFFFFF;
+	cursor: pointer;
+	font-size: 13px;
+	display: table;
+}
+
+#fast-search .search-type span{
+	display: table-cell;
+	vertical-align: middle;
+}
+
+#fast-search .active{
+	background-color: #3598DC;
+	color:#FFFFFF;
+}
+.mycustom {
+	border: 1px solid #c2cad8;
+	position: relative;
+	width: 510px;
+	height: 38px;
+}
+.mycustom input[type=text] {
+	border: none;
+	width: 100%;
+	padding-right: 123px;
+}
+.mycustom .input-group-prepend {
+	position: absolute;
+	right: 4px;
+	top: 4px;
+	bottom: 4px;z-index:9;
+}
 </style>
 <link href="/assets/global/plugins/bootstrap-editable/bootstrap-editable/css/bootstrap-editable.css" rel="stylesheet" type="text/css" />
-<div class="row" >
-{{--快速查询功能--}}
-	<!--
-	<div class="col-lg-12 col-xs-12 col-sm-12 fast-search">
-		<div>
-			<div class="search-type active pull-left" type="0">Order ID</div>
-			<div class="search-type pull-left" type="1">Customer Info</div>
-			<div class="search-type pull-left" type="2">Parts List</div>
-			<div class="search-type pull-left" type="3">Inventory</div>
-			<div class="search-type pull-left" type="4">Manual</div>
-			<div class="search-type pull-left" type="5">QA</div>
-		</div>
-		<div class="clearfix"></div>
-		<div>
-			<input type="text" id="fast-search">
-			<button type="button" class="btn btn-danger">Search</button>
+
+<div id="fast-search">
+	<div class="pull-right">
+		<input type="text" name="searchType" id="searchType" value="0" hidden />
+		<div class="search-type pull-left active" type="0"><span>Order ID</span></div>
+		<div class="search-type pull-left" type="1"><span>Customer Info</span></div>
+		<div class="search-type pull-left" type="2"><span>Parts List</span></div>
+		<div class="search-type pull-left" type="3"><span>Inventory</span></div>
+		<div class="search-type pull-left" type="4"><span>Manual</span></div>
+		<div class="search-type pull-left" type="5"><span>QA</span></div>
+	</div>
+	<div class="clearfix"></div>
+	<div class="input-group mycustom pull-right">
+		<input type="text" name="searchTerm" id="searchTerm" class="form-control rounded-0" placeholder="Please enter a search term..." />
+		<div class="input-group-prepend">
+			<a data-target="#myModal" data-toggle="modal" id="modalLink" href="/task/create">
+				<input type="button" value="Search" id="searchBtn" class="btn btn-danger btn-sm rounded-0" />
+			</a>
 		</div>
 	</div>
-	-->
+</div>
+
+<div class="row" >
 <div class="col-lg-12 col-xs-12 col-sm-12">
-<div class="portlet light ">
-			
-			<div class="col-md-9">
-				<div class="col-md-2">
-				<div style="width: 140px;height: 140px;border: 20px solid #f36a5a;border-radius:50% !important;text-align:center;line-height: 100px;margin:auto;font-size: 18px;" >
-					<span id="tichengxianshi" style="cursor:pointer;" data-value="{{intval($total_score)}}" class="fa fa-eye-slash"></span>
-				</div>
-				</div>
-				<div class="col-md-10">
-				<?php
-				$class=$sign="";
-				$ap = intval(array_get($dash,'0.0',0));
-				$hb_ap = intval(array_get($dash,'0.1',0));
-				if($ap>$hb_ap){
-					$class="font-red-haze";
-					$sign='+';
-				}
-				if($ap<$hb_ap){
-					$class="font-green-sharp";
-				}
-				?>
-				<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12" style="width:25%;"> 
-					<div class="dashboard-stat2 ">
-						<div class="display">
-							<div class="number">
-								<small>Tickets</small>
-								<h3 class="font-green-sharp">
-									<span data-counter="counterup">{{$ap}}</span>
-									<small class="font-green-sharp"></small>
-								</h3>
-								
-							</div>
-							
+	<div class="portlet light ">
+		<div class="col-md-9">
+			<div class="col-md-2">
+			<div style="width: 140px;height: 140px;border: 20px solid #f36a5a;border-radius:50% !important;text-align:center;line-height: 100px;margin:auto;font-size: 18px;" >
+				<span id="tichengxianshi" style="cursor:pointer;" data-value="{{intval($total_score)}}" class="fa fa-eye-slash"></span>
+			</div>
+			</div>
+			<div class="col-md-10">
+			<?php
+			$class=$sign="";
+			$ap = intval(array_get($dash,'0.0',0));
+			$hb_ap = intval(array_get($dash,'0.1',0));
+			if($ap>$hb_ap){
+				$class="font-red-haze";
+				$sign='+';
+			}
+			if($ap<$hb_ap){
+				$class="font-green-sharp";
+			}
+			?>
+			<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12" style="width:25%;">
+				<div class="dashboard-stat2 ">
+					<div class="display">
+						<div class="number">
+							<small>Tickets</small>
+							<h3 class="font-green-sharp">
+								<span data-counter="counterup">{{$ap}}</span>
+								<small class="font-green-sharp"></small>
+							</h3>
+
 						</div>
-						<div class="progress-info">
-							<div class="progress">
-								<span style="width: 100%;" class="progress-bar progress-bar-success green-sharp">
-									
-								</span>
-							</div>
-							<div class="status">
-								<div class="status-title {{$class}}"> {{($hb_ap!=0)?$sign.round(($ap-$hb_ap)/$hb_ap*100,2):'0'}}%</div>
-								<div class="status-number">Yesterday:{{$hb_ap}}</div>
-							</div>
+
+					</div>
+					<div class="progress-info">
+						<div class="progress">
+							<span style="width: 100%;" class="progress-bar progress-bar-success green-sharp">
+
+							</span>
+						</div>
+						<div class="status">
+							<div class="status-title {{$class}}"> {{($hb_ap!=0)?$sign.round(($ap-$hb_ap)/$hb_ap*100,2):'0'}}%</div>
+							<div class="status-number">Yesterday:{{$hb_ap}}</div>
 						</div>
 					</div>
 				</div>
-				
-				<?php
-				$class=$sign="";
-				$ap = intval(array_get($dash,'2.0',0)+array_get($dash,'3.0',0));
-				$hb_ap = intval(array_get($dash,'2.1',0)+array_get($dash,'3.1',0));
-				if($ap>$hb_ap){
-					$class="font-red-haze";
-					$sign='+';
-				}
-				if($ap<$hb_ap){
-					$class="font-green-sharp";
-				}
-				?>
-				
-				<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12" style="width:25%;">
-					<div class="dashboard-stat2 ">
-						<div class="display">
-							<div class="number">
-								<small>Postive Reviews</small>
-								<h3 class="font-red-haze">
-									<span data-counter="counterup" >{{$ap}}</span>
-									<small class="font-red-haze"></small>
-								</h3>
-								
-							</div>
-							
+			</div>
+
+			<?php
+			$class=$sign="";
+			$ap = intval(array_get($dash,'2.0',0)+array_get($dash,'3.0',0));
+			$hb_ap = intval(array_get($dash,'2.1',0)+array_get($dash,'3.1',0));
+			if($ap>$hb_ap){
+				$class="font-red-haze";
+				$sign='+';
+			}
+			if($ap<$hb_ap){
+				$class="font-green-sharp";
+			}
+			?>
+
+			<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12" style="width:25%;">
+				<div class="dashboard-stat2 ">
+					<div class="display">
+						<div class="number">
+							<small>Postive Reviews</small>
+							<h3 class="font-red-haze">
+								<span data-counter="counterup" >{{$ap}}</span>
+								<small class="font-red-haze"></small>
+							</h3>
+
 						</div>
-						<div class="progress-info">
-							<div class="progress">
-								<span style="width: 100%;" class="progress-bar progress-bar-success red-haze">
-									
-								</span>
-							</div>
-							<div class="status">
-								<div class="status-title {{$class}}"> {{($hb_ap!=0)?$sign.round(($ap-$hb_ap)/$hb_ap*100,2):'0'}}%</div>
-								<div class="status-number">Yesterday:{{$hb_ap}}</div>
-							</div>
+
+					</div>
+					<div class="progress-info">
+						<div class="progress">
+							<span style="width: 100%;" class="progress-bar progress-bar-success red-haze">
+
+							</span>
+						</div>
+						<div class="status">
+							<div class="status-title {{$class}}"> {{($hb_ap!=0)?$sign.round(($ap-$hb_ap)/$hb_ap*100,2):'0'}}%</div>
+							<div class="status-number">Yesterday:{{$hb_ap}}</div>
 						</div>
 					</div>
 				</div>
-				
-				<?php
-				$class=$sign="";
-				$ap = intval(array_get($dash,'2.0',0));
-				$hb_ap = intval(array_get($dash,'2.1',0));
-				if($ap>$hb_ap){
-					$class="font-red-haze";
-					$sign='+';
-				}
-				if($ap<$hb_ap){
-					$class="font-green-sharp";
-				}
-				?>
-				<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12" style="width:25%;">
-					<div class="dashboard-stat2 ">
-						<div class="display">
-							<div class="number">
-								<small>SG</small>
-								<h3 class="font-blue-sharp">
-									<span data-counter="counterup" >{{$ap}}</span>
-								</h3>
-								
-							</div>
-							
+			</div>
+
+			<?php
+			$class=$sign="";
+			$ap = intval(array_get($dash,'2.0',0));
+			$hb_ap = intval(array_get($dash,'2.1',0));
+			if($ap>$hb_ap){
+				$class="font-red-haze";
+				$sign='+';
+			}
+			if($ap<$hb_ap){
+				$class="font-green-sharp";
+			}
+			?>
+			<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12" style="width:25%;">
+				<div class="dashboard-stat2 ">
+					<div class="display">
+						<div class="number">
+							<small>SG</small>
+							<h3 class="font-blue-sharp">
+								<span data-counter="counterup" >{{$ap}}</span>
+							</h3>
+
 						</div>
-						<div class="progress-info">
-							<div class="progress">
-								<span style="width: 100%;" class="progress-bar progress-bar-success blue-sharp">
-									
-								</span>
-							</div>
-							<div class="status">
-								<div class="status-title {{$class}}"> {{($hb_ap!=0)?$sign.round(($ap-$hb_ap)/$hb_ap*100,2):'0'}}% </div>
-								<div class="status-number">Yesterday:{{$hb_ap}}</div>
-							</div>
+
+					</div>
+					<div class="progress-info">
+						<div class="progress">
+							<span style="width: 100%;" class="progress-bar progress-bar-success blue-sharp">
+
+							</span>
+						</div>
+						<div class="status">
+							<div class="status-title {{$class}}"> {{($hb_ap!=0)?$sign.round(($ap-$hb_ap)/$hb_ap*100,2):'0'}}% </div>
+							<div class="status-number">Yesterday:{{$hb_ap}}</div>
 						</div>
 					</div>
 				</div>
-				<?php
-				$class=$sign="";
-				$ap = intval(array_get($dash,'3.0',0));
-				$hb_ap = intval(array_get($dash,'3.1',0));
-				if($ap>$hb_ap){
-					$class="font-red-haze";
-					$sign='+';
-				}
-				if($ap<$hb_ap){
-					$class="font-green-sharp";
-				}
-				?>
-				<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12" style="width:25%;">
-					<div class="dashboard-stat2 ">
-						<div class="display">
-						
-							<div class="number">
-							<small>RSG</small>
-								<h3 class="font-purple-soft">
-									<span data-counter="counterup" >{{$ap}}</span>
-									<small class="font-purple-soft"></small>
-								</h3>
-								
-							</div>
-							
+			</div>
+			<?php
+			$class=$sign="";
+			$ap = intval(array_get($dash,'3.0',0));
+			$hb_ap = intval(array_get($dash,'3.1',0));
+			if($ap>$hb_ap){
+				$class="font-red-haze";
+				$sign='+';
+			}
+			if($ap<$hb_ap){
+				$class="font-green-sharp";
+			}
+			?>
+			<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12" style="width:25%;">
+				<div class="dashboard-stat2 ">
+					<div class="display">
+
+						<div class="number">
+						<small>RSG</small>
+							<h3 class="font-purple-soft">
+								<span data-counter="counterup" >{{$ap}}</span>
+								<small class="font-purple-soft"></small>
+							</h3>
+
 						</div>
-						<div class="progress-info">
-							<div class="progress">
-								<span style="width: 100%;" class="progress-bar progress-bar-success purple-soft">
-									
-								</span>
+
+					</div>
+					<div class="progress-info">
+						<div class="progress">
+							<span style="width: 100%;" class="progress-bar progress-bar-success purple-soft">
+
+							</span>
+						</div>
+						<div class="status">
+							<div class="status-title {{$class}}">
+
+							 {{($hb_ap!=0)?$sign.round(($ap-$hb_ap)/$hb_ap*100,2):'0'}}%
+
 							</div>
-							<div class="status">
-								<div class="status-title {{$class}}">
-								
-								 {{($hb_ap!=0)?$sign.round(($ap-$hb_ap)/$hb_ap*100,2):'0'}}%
-								
-								</div>
-								<div class="status-number">Yesterday:{{$hb_ap}}</div>
-							</div>
+							<div class="status-number">Yesterday:{{$hb_ap}}</div>
 						</div>
 					</div>
 				</div>
-				
-				</div>
 			</div>
-			
-            <div class="col-md-3" style="    padding-top: 10px !important;">
-				
-							
-					<form role="form" action="{{url('service')}}" method="GET">
-                        {{ csrf_field() }}
 
-                        <div class="form-group col-md-5" >
-                            
-                            <div class="input-group date date-picker" data-date-format="yyyy-mm-dd">
-                                <input type="text" class="form-control form-filter input-sm" readonly name="date_from" placeholder="Date" value="{{$date_from}}">
-                                <span class="input-group-btn">
-									<button class="btn btn-sm default" type="button">
-										<i class="fa fa-calendar"></i>
-									</button>
-								</span>
-                            </div>
-                        </div>
-						<div class="form-group col-md-5 col-md-offset-2" >
-                            
-                            <div class="input-group date date-picker" data-date-format="yyyy-mm-dd">
-                                <input type="text" class="form-control form-filter input-sm" readonly name="date_to" placeholder="Date" value="{{$date_to}}">
-                                <span class="input-group-btn">
-									<button class="btn btn-sm default" type="button">
-										<i class="fa fa-calendar"></i>
-									</button>
-								</span>
-                            </div>
-                        </div>
+			</div>
+		</div>
+		<div class="col-md-3" style="    padding-top: 10px !important;">
 
-						
-						<div class="form-group col-md-5">
-						<select class="mt-multiselect btn btn-default form-control form-filter input-sm " data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" name="user_id" id="user_id">
-								<option value="">All Sellers</option>
-								@foreach ($users as $id=>$user_name)
-									<option value="{{$id}}" <?php if($user_id==$id) echo 'selected'; ?>>{{$user_name}}</option>
-								@endforeach
-							</select>
-						
+
+				<form role="form" action="{{url('service')}}" method="GET">
+					{{ csrf_field() }}
+
+					<div class="form-group col-md-5" >
+
+						<div class="input-group date date-picker" data-date-format="yyyy-mm-dd">
+							<input type="text" class="form-control form-filter input-sm" readonly name="date_from" placeholder="Date" value="{{$date_from}}">
+							<span class="input-group-btn">
+								<button class="btn btn-sm default" type="button">
+									<i class="fa fa-calendar"></i>
+								</button>
+							</span>
 						</div>
-						
-						<div class="form-group col-md-5 col-md-offset-2">
-							<button type="submit" class="btn blue" id="data_search">Search</button>
-						</div>	
+					</div>
+					<div class="form-group col-md-5 col-md-offset-2" >
+
+						<div class="input-group date date-picker" data-date-format="yyyy-mm-dd">
+							<input type="text" class="form-control form-filter input-sm" readonly name="date_to" placeholder="Date" value="{{$date_to}}">
+							<span class="input-group-btn">
+								<button class="btn btn-sm default" type="button">
+									<i class="fa fa-calendar"></i>
+								</button>
+							</span>
+						</div>
+					</div>
+
+
+					<div class="form-group col-md-5">
+					<select class="mt-multiselect btn btn-default form-control form-filter input-sm " data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" name="user_id" id="user_id">
+							<option value="">All Sellers</option>
+							@foreach ($users as $id=>$user_name)
+								<option value="{{$id}}" <?php if($user_id==$id) echo 'selected'; ?>>{{$user_name}}</option>
+							@endforeach
+						</select>
+
+					</div>
+
+					<div class="form-group col-md-5 col-md-offset-2">
+						<button type="submit" class="btn blue" id="data_search">Search</button>
+					</div>
 
 
 
-                    </form>
-			</div>
-			<div style="clear:both;"></div>
-			<div class="col-md-12" id="lineChartDiv" style="display:none;">
-				<div id="lineChart" style="width:100%;height:200px;"></div>
-			</div>
-			<div style="clear:both;"></div>
-			</div>
-			</div>
+				</form>
+		</div>
+		<div style="clear:both;"></div>
+		<div class="col-md-12" id="lineChartDiv" style="display:none;">
+			<div id="lineChart" style="width:100%;height:200px;"></div>
+		</div>
+		<div style="clear:both;"></div>
+	</div>
+</div>
 </div>
 		
 <div class="row">					
@@ -378,15 +424,41 @@ a.editable-click:hover {
 	</div>
 </div>
 </div>
-							
 
-    
+<div class="modal fade bs-modal-lg" id="myModal" role="basic" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content" >
+			<div class="modal-body" >
+			</div>
+		</div>
+	</div>
+	<input type="hidden" value="" id="aaa"  />
+</div>
 
 <script src="/assets/global/plugins/moment.min.js" type="text/javascript"></script>
 <script src="/assets/global/plugins/jquery.mockjax.js" type="text/javascript"></script>    
 <script src="/assets/global/plugins/bootstrap-editable/bootstrap-editable/js/bootstrap-editable.js" type="text/javascript"></script>
 <script src="/assets/pages/scripts/form-editable.min.js" type="text/javascript"></script>
+
 <script type="text/javascript">
+
+$('#searchBtn').click(function(){
+	var searchType = $("#searchType").val();
+	var searchTerm = $('#searchTerm').val().trim();
+	if(searchTerm == '') {
+		return false;
+	}
+	$('.modal-content').html('Please wait...');
+	$('#modalLink').attr('href', '/service/fastSearch?searchType='+searchType+'&searchTerm='+searchTerm);
+});
+
+$('#fast-search .search-type').click(function() {
+	$('#fast-search .search-type').removeClass('active');
+	$(this).addClass('active');
+	var value = $(this).attr('type');
+	$('#searchType').val(value);
+});
+
 var FormEditable = function() {
 
     $.mockjaxSettings.responseTime = 500;

@@ -53,7 +53,7 @@
             ],
             columnDefs: [
                 //给第5列指定宽度
-                { "width": "500px", "targets": 4 }
+                //{ "width": "500px", "targets": 4 }
             ],
 
             "bStateSave": false, // save datatable state(pagination, sort, etc) in cookie.
