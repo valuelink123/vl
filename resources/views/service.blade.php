@@ -348,7 +348,7 @@ a.editable-click:hover {
 
 					<div class="form-group col-md-5">
 					<select class="mt-multiselect btn btn-default form-control form-filter input-sm " data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" name="user_id" id="user_id">
-							<option value="">All Sellers</option>
+							<option value="">All CS</option>
 							@foreach ($users as $id=>$user_name)
 								<option value="{{$id}}" <?php if($user_id==$id) echo 'selected'; ?>>{{$user_name}}</option>
 							@endforeach
