@@ -6,7 +6,7 @@
                                     <th>Subject</th>
                                     <th>Date</th>
                                     <th>User</th>
-                                    <th>Status</th>
+                                    <th width="110px">Status</th>
                                 </tr>
                                 </thead>
                                 <tbody>
