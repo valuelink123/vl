@@ -79,19 +79,22 @@ a.editable-click:hover {
 
 #fast-search{
 	background-color: #FFFFFF;
-	width: 100%;
+	width: 543px;
 	height: 90px;
+	margin: auto;
 }
 #fast-search .search-type{
 	text-align: center;
 	width: 85px;
 	height: 36px;
-	/*padding: 0px 0px;*/
-	/*margin: 0px 0px 0px 0px;*/
 	background-color: #FFFFFF;
 	cursor: pointer;
-	font-size: 13px;
+	font-size: 14px;
 	display: table;
+}
+
+#fast-search .search-type-wider{
+	width: 118px !important;
 }
 
 #fast-search .search-type span{
@@ -101,12 +104,13 @@ a.editable-click:hover {
 
 #fast-search .active{
 	background-color: #3598DC;
+	border-radius: 5px 5px 0px 0px !important;
 	color:#FFFFFF;
 }
 .mycustom {
 	border: 1px solid #c2cad8;
 	position: relative;
-	width: 510px;
+	width: 543px;
 	height: 38px;
 }
 .mycustom input[type=text] {
@@ -123,23 +127,27 @@ a.editable-click:hover {
 </style>
 <link href="/assets/global/plugins/bootstrap-editable/bootstrap-editable/css/bootstrap-editable.css" rel="stylesheet" type="text/css" />
 
-<div id="fast-search">
-	<div class="pull-right">
-		<input type="text" name="searchType" id="searchType" value="0" hidden />
-		<div class="search-type pull-left active" type="0"><span>Order ID</span></div>
-		<div class="search-type pull-left" type="1"><span>Customer Info</span></div>
-		<div class="search-type pull-left" type="2"><span>Parts List</span></div>
-		<div class="search-type pull-left" type="3"><span>Inventory</span></div>
-		<div class="search-type pull-left" type="4"><span>Manual</span></div>
-		<div class="search-type pull-left" type="5"><span>QA</span></div>
-	</div>
-	<div class="clearfix"></div>
-	<div class="input-group mycustom pull-right">
-		<input type="text" name="searchTerm" id="searchTerm" class="form-control rounded-0" placeholder="Please enter a search term..." />
-		<div class="input-group-prepend">
-			<a data-target="#myModal" data-toggle="modal" id="modalLink" href="/task/create">
-				<input type="button" value="Search" id="searchBtn" class="btn btn-danger btn-sm rounded-0" />
-			</a>
+<div class="row">
+	<div style="width:100%; background-color: #ffffff">
+		<div id="fast-search">
+			<div class="pull-right">
+				<input type="text" name="searchType" id="searchType" value="0" hidden />
+				<div class="search-type pull-left active" type="0"><span>Order ID</span></div>
+				<div class="search-type search-type-wider pull-left" type="1"><span>Customer Info</span></div>
+				<div class="search-type pull-left" type="2"><span>Parts List</span></div>
+				<div class="search-type pull-left" type="3"><span>Inventory</span></div>
+				<div class="search-type pull-left" type="4"><span>Manual</span></div>
+				<div class="search-type pull-left" type="5"><span>QA</span></div>
+			</div>
+			<div class="clearfix"></div>
+			<div class="input-group mycustom pull-right">
+				<input type="text" name="searchTerm" id="searchTerm" class="form-control rounded-0" placeholder="Please enter a search term..." />
+				<div class="input-group-prepend">
+					<a data-target="#myModal" data-toggle="modal" id="modalLink" href="/task/create">
+						<input type="button" value="Search" id="searchBtn" class="btn btn-danger btn-sm rounded-0" />
+					</a>
+				</div>
+			</div>
 		</div>
 	</div>
 </div>
@@ -443,9 +451,20 @@ a.editable-click:hover {
 <script type="text/javascript">
 
 $('#searchBtn').click(function(){
-	var searchType = $("#searchType").val();
+	//当搜索类型为QA时，$("#searchType").val()的值为5，页面跳转到知识中心，回退网页到service页面，这时Order ID处于active状态，但此时$("#searchType").val()的值仍为5. 所以不能用var searchType = $("#searchType").val()
+	//var searchType = $("#searchType").val();
+	var searchType = $('#fast-search .active').attr('type');
 	var searchTerm = $('#searchTerm').val().trim();
-	if(searchTerm == '') {
+
+    if(searchTerm == '') {
+        return false;
+    }
+	//将搜索内容中的''（空格）全部替换成'+'，否则会出现问题
+    var searchTerm = searchTerm.replace(/\s+/g, '+');
+    //当搜索类型为QA时，页面跳转到含有搜索内容的知识中心页面。
+    if(searchType == 5){
+		var knowledgeUrl = "/question?knowledge_type=&group=ALL&item_group=ALL&keywords=" + searchTerm;
+		window.location.href=knowledgeUrl;
 		return false;
 	}
 	$('.modal-content').html('Please wait...');

@@ -145,9 +145,22 @@ class ServiceController extends Controller
                 return view('service.orderinfo', ['order' => $order]);
 
             }
-            //Customer Info
+            //Customer Info, 可按邮箱，电话，［facebook帐号］，paypal帐号查找。
+            //多个客户可能有同样的facebook name, 只会展示其中的一个客户。所以先排除按facebook帐号搜索。
             else if ($searchType == 1) {
-                $id = $searchTerm;
+                //rsg_requests查看paypal帐号（customer_paypal_email）
+                $emails = DB::table('rsg_requests')->where('customer_paypal_email', $searchTerm)->pluck('customer_email');
+                if(count($emails) > 0){
+                    $ids = DB::table('client_info')->where('email',$emails[0])->pluck('client_id');
+                }
+                else{
+                    $ids = DB::table('client_info')->where('email',$searchTerm)->orWhere('phone',$searchTerm)->pluck('client_id');
+                }
+
+                if(count($ids) == 0){
+                    return 'No matching customer...';
+                }
+                $id = $ids[0];
                 $sap = new SapRfcRequest();
                 $sql = "select b.name as name,b.email as email,b.phone as phone,b.remark as remark,b.country as country,b.`from` as `from`,c.amazon_order_id as order_id
 			FROM client_info as b
@@ -161,7 +174,7 @@ class ServiceController extends Controller
                     return 'No matching customer...';
                 }
 
-                if(empty($_data)){
+                if(count($_data) == 0){
                     return 'No matching customer...';
                 }
 
@@ -198,6 +211,37 @@ class ServiceController extends Controller
                 return view('service/customerinfo', ['orderArr' => $orderArr, 'contactInfo' => $contactInfo, 'emails' => $emails, 'users' => $users, 'track_log_array' => $track_log_array, 'subject_type' => $subject_type, 'record_id' => $id]);
 
             }
+            //Parts List, Inventory
+            else if ($searchType == 2 || $searchType == 3){
+                $sql = "
+        SELECT seller_name,any_value(account_status) as account_status FROM kms_stock group by seller_name";
+                $_sellerName = $this->queryRows($sql);
+                $sellerName = array();
+                foreach($_sellerName as $key=>$val){
+                    if($val['seller_name']){
+                        $sellerName[$val['seller_name']]['seller_name'] = $val['seller_name'];
+                        $sellerName[$val['seller_name']]['class'] = '';
+                        if($val['account_status']==1){
+                            $sellerName[$val['seller_name']]['class'] = 'invalid-account';
+                        }
+                    }
+                }
+
+                return view('service.partslist',['sellerName'=>$sellerName, 'searchTerm'=>$searchTerm]);
+            }
+            //Manual
+            else if ($searchType == 4){
+                return view('service/kmsUserManual', ['searchTerm'=>$searchTerm]);
+            }
+            //
+            else if ($searchType == 5){
+                //页面跳转到含有搜索内容的Knowledge Center（知识中心）页面。前端已经实现。
+//                $knowledgeUrl = "/question?knowledge_type=&group=ALL&item_group=ALL&keywords=". $searchTerm;
+//                $scriptForward = "<script type='text/javascript'>window.location.href='$knowledgeUrl';</script>";
+//
+//                return $scriptForward;
+            }
+
         }
 
     }
