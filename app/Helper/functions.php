@@ -25,6 +25,7 @@ function getSkuStatuses(){
         '3'=>'配件',
         '4'=>'替换',
         '5'=>'待定',
+        '6'=>'停售',
         '99'=>'新品规划'
     );    
 }
@@ -870,7 +871,7 @@ function getCountryCode()
 		'TT'=>array('store'=>array('HK01-SZ6','HK03-CHK3')),
 		'TW'=>array('store'=>array('HK01-SZ6','HK03-CHK3')),
 		'UK'=>array('store'=>array('HK01-SZ6','HK03-CHK3','UK02-UK3')),
-		'US'=>array('store'=>array('HK01-SZ6','HK03-CHK3','US02-US2')),
+		'US'=>array('store'=>array('HK01-SZ6','HK03-CHK3','US02-US2','US04-US1')),
 		'ZA'=>array('store'=>array('HK01-SZ6','HK03-CHK3'))
 	);
 	return $arr;

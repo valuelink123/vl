@@ -410,7 +410,7 @@ class PartsListController extends Controller {
 	 */
 	public function getFbmAccsStock()
 	{
-		$sql = "SELECT MATNR,concat(WERKS,'-',LGORT) as WerksLgort,sum(LABST) as stock from fbm_accs_stock where LABST>0 group by MATNR,WerksLgort";
+		$sql = "SELECT MATNR,concat(WERKS,'-',LGORT) as WerksLgort,sum(LABST) as stock from fbm_accs_stock where LABST>0 and WERKS<>'US04' AND LGORT<>'US2' group by MATNR,WerksLgort";
 		$_data = $this->queryRows($sql);
 		$data = array();
 		foreach($_data as $key=>$val){
