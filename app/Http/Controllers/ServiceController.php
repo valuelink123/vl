@@ -145,9 +145,18 @@ class ServiceController extends Controller
                 return view('service.orderinfo', ['order' => $order]);
 
             }
-            //Customer Info
+            //Customer Info, 可按邮箱，电话，［facebook帐号］，paypal帐号查找。
+            //多个客户可能有同样的facebook name, 只会展示其中的一个客户。所以先排除按facebook帐号搜索。
             else if ($searchType == 1) {
-                $ids = DB::table('client_info')->where('email',$searchTerm)->pluck('client_id');
+                //rsg_requests查看paypal帐号（customer_paypal_email）
+                $emails = DB::table('rsg_requests')->where('customer_paypal_email', $searchTerm)->pluck('customer_email');
+                if(count($emails) > 0){
+                    $ids = DB::table('client_info')->where('email',$emails[0])->pluck('client_id');
+                }
+                else{
+                    $ids = DB::table('client_info')->where('email',$searchTerm)->orWhere('phone',$searchTerm)->pluck('client_id');
+                }
+
                 if(count($ids) == 0){
                     return 'No matching customer...';
                 }
