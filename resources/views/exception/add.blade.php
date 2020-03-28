@@ -471,6 +471,7 @@
 											<option value='HK03'>HK03</option>
 											<option value='UK02'>UK02</option>
 											<option value='US02'>US02</option>
+											<option value='US04'>US04</option>
 											<option value='US'>US</option>
 											<option value='GB'>GB</option>
 											<option value='DE'>DE</option>
