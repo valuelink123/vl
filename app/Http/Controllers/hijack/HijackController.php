@@ -60,7 +60,7 @@ class HijackController extends Controller
         if ($page != 0) {
             $page = $limit * $page;
         }
-        $productList = DB::connection('vl')->table('asins')
+        $productList = DB::connection('vlz')->table('asins')
             ->select('id', 'asin', 'images', 'marketplaceid', 'title', 'images', 'listed_at', 'mpn', 'seller_count', 'updated_at', 'reselling_switch')
             ->whereNotNull('title')
             ->groupBy('asin')
@@ -81,7 +81,7 @@ class HijackController extends Controller
 
         //查询跟卖数据
         $resellingidList = [];
-        $resellingList = DB::connection('vl')->table('tbl_reselling_asin')
+        $resellingList = DB::connection('vlz')->table('tbl_reselling_asin')
             ->select('id', 'asin', 'product_id')
             ->whereIn('product_id', array_unique($asinIdList))
             ->get()->map(function ($value) {
@@ -92,7 +92,7 @@ class HijackController extends Controller
                 $resellingidList[] = $rlv['id'];
             }
             //查询对应的asin 下面 跟卖数量
-            $taskList = DB::connection('vl')->table('tbl_reselling_task')
+            $taskList = DB::connection('vlz')->table('tbl_reselling_task')
                 ->select('id', 'reselling_num', 'reselling_time', 'created_at', 'reselling_asin_id')
                 ->whereIn('reselling_asin_id', array_unique($resellingidList))
                 ->groupBy('reselling_asin_id')
@@ -113,7 +113,7 @@ class HijackController extends Controller
         }
 
         //中间对应关系数据
-        $sap_asin_match_sku = DB::connection('vl')->table('sap_asin_match_sku')
+        $sap_asin_match_sku = DB::connection('vlz')->table('sap_asin_match_sku')
             ->select('sap_seller_id', 'asin', 'sap_seller_bg', 'sap_seller_bu', 'id', 'status', 'updated_at', 'sku_status', 'sku')
             ->whereIn('asin', array_unique($asinList))
             ->groupBy('asin')
@@ -209,7 +209,7 @@ class HijackController extends Controller
             //查询用户列表
             $users = User::select('name', 'email')->where('locked', '=', '0')->get()->toArray();
 //查询 like title or asin
-            $productList = DB::connection('vl')->table('asins')
+            $productList = DB::connection('vlz')->table('asins')
                 ->select('id', 'asin', 'images', 'marketplaceid', 'title', 'images', 'listed_at', 'mpn', 'seller_count', 'updated_at', 'reselling_switch')
                 ->where('title', 'like', '%' . $param . '%')
                 ->orwhere('asin', 'like', '%' . $param . '%')
@@ -230,7 +230,7 @@ class HijackController extends Controller
             //查询跟卖数据
             $resellingidList = [];
             if (!empty($asinIdList)) {
-                $resellingList = DB::connection('vl')->table('tbl_reselling_asin')
+                $resellingList = DB::connection('vlz')->table('tbl_reselling_asin')
                     ->select('id', 'asin', 'product_id')
                     ->whereIn('product_id', array_unique($asinIdList))
                     ->get()->map(function ($value) {
@@ -242,7 +242,7 @@ class HijackController extends Controller
                     $resellingidList[] = $rlv['id'];
                 }
                 //查询对应的asin 下面 跟卖数量
-                $taskList = DB::connection('vl')->table('tbl_reselling_task')
+                $taskList = DB::connection('vlz')->table('tbl_reselling_task')
                     ->select('id', 'reselling_num', 'reselling_time', 'created_at', 'reselling_asin_id')
                     ->whereIn('reselling_asin_id', array_unique($resellingidList))
                     ->groupBy('reselling_asin_id')
@@ -262,7 +262,7 @@ class HijackController extends Controller
 
 
             //中间对应关系数据
-            $sap_asin_match_sku = DB::connection('vl')->table('sap_asin_match_sku')
+            $sap_asin_match_sku = DB::connection('vlz')->table('sap_asin_match_sku')
                 ->select('sap_seller_id', 'asin', 'sap_seller_bg', 'sap_seller_bu', 'id', 'status', 'updated_at', 'sku_status', 'sku')
                 ->whereIn('asin', array_unique($asinList))
                 ->get()->map(function ($value) {
@@ -333,7 +333,7 @@ class HijackController extends Controller
             //==================== 查询 like sku ===================================//
             $asinList = [];
             //中间对应关系数据
-            $sap_asin_match_sku2 = DB::connection('vl')->table('sap_asin_match_sku')
+            $sap_asin_match_sku2 = DB::connection('vlz')->table('sap_asin_match_sku')
                 ->select('sap_seller_id', 'asin', 'sap_seller_bg', 'sap_seller_bu', 'id', 'status', 'updated_at', 'sku_status', 'sku')
                 ->where('sku', 'like', '%' . $param . '%')
                 ->get()->map(function ($value) {
@@ -353,7 +353,7 @@ class HijackController extends Controller
 
                     }
                 }
-                $productList2 = DB::connection('vl')->table('asins')
+                $productList2 = DB::connection('vlz')->table('asins')
                     ->select('id', 'asin', 'images', 'marketplaceid', 'title', 'images', 'listed_at', 'mpn', 'seller_count', 'updated_at', 'reselling_switch')
                     ->whereNotNull('title')
                     ->whereIn('asin', array_unique($asinList))
@@ -372,7 +372,7 @@ class HijackController extends Controller
 
                 //查询跟卖数据
                 $resellingidList = [];
-                $resellingList = DB::connection('vl')->table('tbl_reselling_asin')
+                $resellingList = DB::connection('vlz')->table('tbl_reselling_asin')
                     ->select('id', 'asin', 'product_id')
                     ->whereIn('product_id', array_unique($asinIdList))
                     ->get()->map(function ($value) {
@@ -383,7 +383,7 @@ class HijackController extends Controller
                         $resellingidList[] = $rlv['id'];
                     }
                     //查询对应的asin 下面 跟卖数量
-                    $taskList = DB::connection('vl')->table('tbl_reselling_task')
+                    $taskList = DB::connection('vlz')->table('tbl_reselling_task')
                         ->select('id', 'reselling_num', 'reselling_time', 'created_at', 'reselling_asin_id')
                         ->whereIn('reselling_asin_id', array_unique($resellingidList))
                         ->groupBy('reselling_asin_id')
@@ -475,11 +475,11 @@ class HijackController extends Controller
                 $toup = 1;
             }
             $arr_id = explode(',', $_POST['id']);
-            $result = DB::connection('vl')->table('asins')
+            $result = DB::connection('vlz')->table('asins')
                 ->whereIn('id', $arr_id)
                 ->update(['reselling_switch' => $toup]);
 
-            $asinOne = DB::connection('vl')->table('asins')
+            $asinOne = DB::connection('vlz')->table('asins')
                 ->select('id', 'asin', 'marketplaceid', 'listed_at')
                 ->whereIn('id', $arr_id)
                 ->get()->map(function ($value) {
@@ -493,7 +493,7 @@ class HijackController extends Controller
                 echo '更新成功';
                 if ($toup == 1) {
                     //防止添加重复数据，所以先删除后增加
-                    DB::connection('vl')->table('tbl_reselling_asin')->whereIn('product_id',$arr_id)->delete();//删除1条
+                    DB::connection('vlz')->table('tbl_reselling_asin')->whereIn('product_id',$arr_id)->delete();//删除1条
                     foreach ($asinOne as $k=>$v){
                         $data = [
                             'product_id' => $v['id'],
@@ -502,12 +502,12 @@ class HijackController extends Controller
                             'reselling' => 1
                         ];
                         //新增tbl_reselling_asin
-                        DB::connection('vl')->table('tbl_reselling_asin')->insert($data);
+                        DB::connection('vlz')->table('tbl_reselling_asin')->insert($data);
                     }
 
                 } else {
                     //防止添加重复数据，所以先删除后增加
-                    DB::connection('vl')->table('tbl_reselling_asin')->whereIn('product_id',$arr_id)->delete();//删除1条
+                    DB::connection('vlz')->table('tbl_reselling_asin')->whereIn('product_id',$arr_id)->delete();//删除1条
                 }
 
             } else {
@@ -540,7 +540,7 @@ class HijackController extends Controller
             $r_asin_id_l = [];//对应asinid 数组
             $productIdList = [];
             //查询对应的asin 下面 跟卖数量
-            $taskList = DB::connection('vl')->table('tbl_reselling_task')
+            $taskList = DB::connection('vlz')->table('tbl_reselling_task')
                 ->select('id', 'reselling_num', 'reselling_time', 'created_at', 'reselling_asin_id')
                 ->where('reselling_time', '>=', $startTime)
                 ->where('reselling_time', '<=', $endTime)
@@ -553,7 +553,7 @@ class HijackController extends Controller
                 $r_asin_id_l[] = $tlv['reselling_asin_id'];
             }
 
-            $resellingList = DB::connection('vl')->table('tbl_reselling_asin')
+            $resellingList = DB::connection('vlz')->table('tbl_reselling_asin')
                 ->select('id', 'asin', 'product_id')
                 ->whereIn('id', array_unique($r_asin_id_l))
                 ->get()->map(function ($value) {
@@ -597,7 +597,7 @@ class HijackController extends Controller
         } else {
             $idList = explode(',', $idList);
         }
-        $productList = DB::connection('vl')->table('asins')
+        $productList = DB::connection('vlz')->table('asins')
             ->select('id', 'asin', 'images', 'marketplaceid', 'title', 'images', 'listed_at', 'mpn', 'seller_count', 'updated_at', 'reselling_switch')
             ->whereNotNull('title')
             ->whereIn('id', $idList)
@@ -617,7 +617,7 @@ class HijackController extends Controller
 
 
         //中间对应关系数据
-        $sap_asin_match_sku = DB::connection('vl')->table('sap_asin_match_sku')
+        $sap_asin_match_sku = DB::connection('vlz')->table('sap_asin_match_sku')
             ->select('sap_seller_id', 'asin', 'sap_seller_bg', 'sap_seller_bu', 'id', 'status', 'updated_at', 'sku_status', 'sku')
             ->whereIn('asin', array_unique($asinList))
             ->get()->map(function ($value) {
@@ -689,7 +689,7 @@ class HijackController extends Controller
         /** 查询跟卖信息*/
         if (!empty($resellingList) && !empty($resellingidList)) {
             $taskIdList = [];
-            $taskList = DB::connection('vl')->table('tbl_reselling_task')
+            $taskList = DB::connection('vlz')->table('tbl_reselling_task')
                 ->select('id', 'reselling_asin_id', 'reselling_num', 'reselling_time', 'created_at')
                 ->whereIn('reselling_asin_id', array_unique(array_keys($resellingidList)))
                 ->get()->map(function ($value) {
@@ -701,7 +701,7 @@ class HijackController extends Controller
                 }
 
                 /** 查询detail **/
-                $taskDetail = DB::connection('vl')->table('tbl_reselling_detail')
+                $taskDetail = DB::connection('vlz')->table('tbl_reselling_detail')
                     ->select('id', 'task_id', 'price', 'shipping_fee', 'account', 'white', 'sellerid', 'created_at', 'reselling_remark')
                     ->whereIn('task_id', array_unique($taskIdList))
                     ->get()->map(function ($value) {
@@ -792,7 +792,7 @@ class HijackController extends Controller
         $endTime = isset($request['endTime']) ? $request['endTime'] : 0;
         //根据ID 查询asins 信息
         if ($request['id']) {
-            $asins = DB::connection('vl')->table('asins')
+            $asins = DB::connection('vlz')->table('asins')
                 ->select('id', 'asin', 'images', 'marketplaceid', 'title', 'images', 'listed_at', 'mpn', 'updated_at')
                 ->where('id', $request['id'])
                 ->get()->map(function ($value) {
@@ -807,7 +807,7 @@ class HijackController extends Controller
                 $sku_status = '';
                 $domainUrl = $DOMIN_MARKETPLACEID[isset($as['marketplaceid']) ? $as['marketplaceid'] : ''];
                 //中间对应关系数据
-                $sap_asin_match_sku = DB::connection('vl')->table('sap_asin_match_sku')
+                $sap_asin_match_sku = DB::connection('vlz')->table('sap_asin_match_sku')
                     ->select('sap_seller_id', 'asin', 'sap_seller_bg', 'sap_seller_bu', 'id', 'status', 'updated_at', 'sku_status', 'sku')
                     ->where('asin', $asin)
                     ->groupBy('asin')
@@ -842,7 +842,7 @@ class HijackController extends Controller
 
 
                 if (!empty($domainUrl) && !empty($asin)) {
-                    $resellingList = DB::connection('vl')->table('tbl_reselling_asin')
+                    $resellingList = DB::connection('vlz')->table('tbl_reselling_asin')
                         ->select('reselling_num', 'updated_at', 'created_at', 'reselling_remark', 'id', 'asin')
                         ->where('asin', $asin)
                         ->where('product_id', $as['id'])
@@ -859,7 +859,7 @@ class HijackController extends Controller
                             //查询跟卖数据
                             //时间范围 筛选条件
                             if ($startTime > 0 && $endTime > 0) {
-                                $taskList = DB::connection('vl')->table('tbl_reselling_task')
+                                $taskList = DB::connection('vlz')->table('tbl_reselling_task')
                                     ->select('id', 'reselling_num', 'reselling_time', 'created_at')
                                     ->whereIn('reselling_asin_id', array_unique($reselling_asin_id_l))
                                     ->where('reselling_time', '>=', $startTime)
@@ -870,7 +870,7 @@ class HijackController extends Controller
 
                             } else {
                                 //没有时间范围 正常查询
-                                $taskList = DB::connection('vl')->table('tbl_reselling_task')
+                                $taskList = DB::connection('vlz')->table('tbl_reselling_task')
                                     ->select('id', 'reselling_num', 'reselling_time', 'created_at')
                                     ->whereIn('reselling_asin_id', array_unique($reselling_asin_id_l))
                                     ->get()->map(function ($value) {
@@ -911,7 +911,7 @@ class HijackController extends Controller
         $timecount = 0;
         $taskDetail = [];
         if ($taskId > 0) {
-            $taskDetail = DB::connection('vl')->table('tbl_reselling_detail')
+            $taskDetail = DB::connection('vlz')->table('tbl_reselling_detail')
                 ->select('id', 'price', 'shipping_fee', 'account', 'white', 'sellerid', 'created_at', 'reselling_remark')
                 ->where('task_id', $taskId)
                 ->get()->map(function ($value) {
@@ -949,7 +949,7 @@ class HijackController extends Controller
     public function upResellingDetail(Request $request)
     {
         if (!empty($request['id']) && $request['id'] > 0 && $request['remark']) {
-            $result = DB::connection('vl')->table('tbl_reselling_detail')
+            $result = DB::connection('vlz')->table('tbl_reselling_detail')
                 ->where('id', $request['id'])
                 ->update(['reselling_remark' => $request['remark']]);
             if ($result > 0) {
