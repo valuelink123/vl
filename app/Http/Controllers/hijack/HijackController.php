@@ -3,15 +3,12 @@
 namespace App\Http\Controllers\Hijack;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use DB;
 use log;
 use App\User;
 use App\Asin;
-use Illuminate\Support\Facades\Auth;
 
-header('Access-Control-Allow-Origin:*');
 
 class HijackController extends Controller
 {
@@ -85,12 +82,15 @@ class HijackController extends Controller
 
         //查询跟卖数据
         $resellingidList = [];
-        $resellingList = DB::connection('vlz')->table('tbl_reselling_asin')
-            ->select('id', 'asin', 'product_id')
-            ->whereIn('product_id', array_unique($asinIdList))
-            ->get()->map(function ($value) {
-                return (array)$value;
-            })->toArray();
+        if(!empty($asinIdList)){
+            $resellingList = DB::connection('vlz')->table('tbl_reselling_asin')
+                ->select('id', 'asin', 'product_id')
+                ->whereIn('product_id', array_unique($asinIdList))
+                ->get()->map(function ($value) {
+                    return (array)$value;
+                })->toArray();
+        }
+
         if (!empty($resellingList)) {
             foreach ($resellingList as $rlk => $rlv) {
                 $resellingidList[] = $rlv['id'];

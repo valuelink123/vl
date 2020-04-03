@@ -187,16 +187,16 @@ Route::match(['post','get'],'/rsgUser/list', 'RsgUserController@list');//rsgUser
 
 Route::post('/star/updatePost', 'StarController@updatePost');//更新帖子状态和帖子类型
 
-Route::get('/hijack/index1/', 'Hijack\\HijackController@index1')->name('index1');
-Route::get('/hijack/index/', 'Hijack\\HijackController@index')->name('hijack');
-Route::get('/hijack/detail/', 'Hijack\\HijackController@detail')->name('detail');
-Route::post('/hijack/index', 'Hijack\\HijackController@index');//查询产品信息
-Route::post('/hijack/asinSearch', 'Hijack\\HijackController@asinSearch');//查询产品信息
-Route::post('/hijack/updateAsinSta', 'Hijack\\HijackController@updateAsinSta');//修改asin 开启关闭
-Route::post('/hijack/resellingList', 'Hijack\\HijackController@resellingList');//查询跟卖列表信息
-Route::post('/hijack/resellingDetail', 'Hijack\\HijackController@resellingDetail');
-Route::post('/hijack/upResellingDetail', 'Hijack\\HijackController@upResellingDetail');//修改 detail 备注信息
-Route::post('/hijack/hijackExport', 'Hijack\\HijackController@hijackExport');//导出
+Route::get('/hijack/index1/', 'hijack\\HijackController@index1')->name('index1');
+Route::get('/hijack/index/', 'hijack\\HijackController@index')->name('index');
+Route::get('/hijack/detail/', 'hijack\\HijackController@detail')->name('detail');
+Route::post('/hijack/index', 'hijack\\HijackController@index');//查询产品信息
+Route::post('/hijack/asinSearch', 'hijack\\HijackController@asinSearch');//查询产品信息
+Route::post('/hijack/updateAsinSta', 'hijack\\HijackController@updateAsinSta');//修改asin 开启关闭
+Route::post('/hijack/resellingList', 'hijack\\HijackController@resellingList');//查询跟卖列表信息
+Route::post('/hijack/resellingDetail', 'hijack\\HijackController@resellingDetail');
+Route::post('/hijack/upResellingDetail', 'hijack\\HijackController@upResellingDetail');//修改 detail 备注信息
+Route::post('/hijack/hijackExport', 'hijack\\HijackController@hijackExport');//导出
 
 //跟卖追踪
 //Route::get('/hijack/index', 'HijackController@index')->name('hijack');
