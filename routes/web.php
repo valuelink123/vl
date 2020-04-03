@@ -196,8 +196,7 @@ Route::post('/hijack/resellingDetail', 'Hijack\\HijackController@resellingDetail
 Route::post('/hijack/upResellingDetail', 'Hijack\\HijackController@upResellingDetail');//修改 detail 备注信息
 Route::post('/hijack/hijackExport', 'Hijack\\HijackController@hijackExport');//导出
 
-//Route::group('hijack.',function(){
-//
-////    App::setLocale($locale);
-//    Route::get('/hijack/index', 'Hijack\\HijackController@index')->name('index');
-//});
+//跟卖追踪
+Route::get('/hijack/index', 'HijackController@index')->name('hijack');
+//跟卖追踪详情
+Route::get('/hijack/detail', 'HijackController@detail')->name('detail');

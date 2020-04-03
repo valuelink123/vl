@@ -63,7 +63,7 @@ class HijackController extends Controller
         $productList = DB::connection('vlz')->table('asins')
             ->select('id', 'asin', 'images', 'marketplaceid', 'title', 'images', 'listed_at', 'mpn', 'seller_count', 'updated_at', 'reselling_switch')
             ->whereNotNull('title')
-            ->groupBy('asin')
+            ->groupBy(['asin'])
             ->orderBy('updated_at', 'desc')
 //            ->offset($page)
 //            ->limit($limit)

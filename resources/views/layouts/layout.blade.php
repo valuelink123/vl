@@ -212,6 +212,12 @@
                                                     </a>
                                                 </li>
 												@endpermission
+												<li class="">
+												    <a href="/hijack/index" class="nav-link nav-toggle ">
+														Hijacker Alerts
+														<span class="arrow"></span>
+												    </a>
+												</li>
 												@permission('asin-table-show')
 												<li class="">
                                                     <a href="/asin" class="nav-link nav-toggle ">
@@ -220,7 +226,7 @@
                                                     </a>
                                                 </li>
 												 @endpermission
-												 
+												
 												 
 												
 												
