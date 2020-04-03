@@ -186,3 +186,18 @@ Route::get('/productTransfer/replyExport', 'ProductTransferController@replyExpor
 Route::match(['post','get'],'/rsgUser/list', 'RsgUserController@list');//rsgUser列表展示
 
 Route::post('/star/updatePost', 'StarController@updatePost');//更新帖子状态和帖子类型
+
+Route::get('/hijack/index/{params}', 'Hijack\\HijackController@index')->name('index');
+Route::post('/hijack/index', 'Hijack\\HijackController@index');//查询产品信息
+Route::post('/hijack/asinSearch', 'Hijack\\HijackController@asinSearch');//查询产品信息
+Route::post('/hijack/updateAsinSta', 'Hijack\\HijackController@updateAsinSta');//修改asin 开启关闭
+Route::post('/hijack/resellingList', 'Hijack\\HijackController@resellingList');//查询跟卖列表信息
+Route::post('/hijack/resellingDetail', 'Hijack\\HijackController@resellingDetail');
+Route::post('/hijack/upResellingDetail', 'Hijack\\HijackController@upResellingDetail');//修改 detail 备注信息
+Route::post('/hijack/hijackExport', 'Hijack\\HijackController@hijackExport');//导出
+
+//Route::group('hijack.',function(){
+//
+////    App::setLocale($locale);
+//    Route::get('/hijack/index', 'Hijack\\HijackController@index')->name('index');
+//});
