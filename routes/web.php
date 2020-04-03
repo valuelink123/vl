@@ -186,3 +186,7 @@ Route::get('/productTransfer/replyExport', 'ProductTransferController@replyExpor
 Route::match(['post','get'],'/rsgUser/list', 'RsgUserController@list');//rsgUser列表展示
 
 Route::post('/star/updatePost', 'StarController@updatePost');//更新帖子状态和帖子类型
+//跟卖追踪
+Route::get('/hijack/index', 'HijackController@index')->name('hijack');
+//跟卖追踪详情
+Route::get('/hijack/detail', 'HijackController@detail')->name('detail');
