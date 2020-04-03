@@ -39,15 +39,19 @@ class HijackController extends Controller
      *
      * @return void
      */
-
-    public function index(Request $request)
+    public function index()
+    {
+        return view('hijack.index');
+    }
+    public function detail()
+    {
+        return view('hijack.detail');
+    }
+    public function index1()
     {
         header('Access-Control-Allow-Origin:*');
         //得到登录用户信息
         // $user = Auth::user()->toArray();
-        if ($request) {
-            //   echo $request->params;
-        }
         //查询用户列表
         $users = User::select('name', 'email')->where('locked', '=', '0')->get()->toArray();
         //查询所有 asin 信息

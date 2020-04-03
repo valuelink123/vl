@@ -205,7 +205,7 @@
 				],
 				"serverSide": false,
 				ajax: {
-					url: "http://10.10.42.14/vl/public/hijack/resellingList",
+					url: "/hijack/resellingList",
 					type: "post",
 					data : function(){
 						reqList = {
@@ -257,7 +257,7 @@
 				"serverSide": true,
 				"ordering": false, // 禁止排序
 				"ajax": {
-					url: "http://10.10.42.14/vl/public/hijack/resellingDetail",
+					url: "/hijack/resellingDetail",
 					type: "post",
 					data : function(){
 						rowdata = {"taskId" : detailId};
@@ -296,7 +296,7 @@
 									listObj.cell(cell).data(text);
 									$.ajax({
 										type:"post",
-										url:'http://10.10.42.14/vl/public/hijack/upResellingDetail',
+										url:'/hijack/upResellingDetail',
 										data:{
 											id: rowData.id,
 											remark: rowData.reselling_remark
