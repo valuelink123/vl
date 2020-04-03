@@ -37,14 +37,15 @@
             pagingType: 'bootstrap_extended',
             processing: true,
             columns: [
-                {data: 'item_group', name: 'item_group'},
-                {data: 'brand_line', name: 'brand_line', width: '180px'},
-                {data: 'brand', name: 'brand'},
-                {data: 'item_model', name: 'item_model'},
+                {data: 'item_group', name: 'item_group', width: '70px'},
+                {data: 'brand_line', name: 'brand_line', width: '181px'},
+                {data: 'brand', name: 'brand', width: '70px'},
+                {data: 'item_model', name: 'item_model', width: '70px'},
                 {
                     data: 'link',
                     name: 'link',
                     orderable: false,
+                    width: '70px',
                     render(data) {
                         return `<a href="${data}" target="_blank" class='btn btn-success btn-xs'>View</a>`
                     }
@@ -52,8 +53,9 @@
                 {
                     data: 'updated_at',
                     name: 'updated_at',
+                    width: '70px'
                 },
-                {data: 'action', orderable: false,name: 'action'}
+                {data: 'action', orderable: false,name: 'action', width: '70px'}
             ],
             ajax: {
                 type: 'POST',
