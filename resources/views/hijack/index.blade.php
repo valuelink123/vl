@@ -400,6 +400,9 @@
 						$(".sellerList").append("<option value='" + value.name + "'>" + value.name + "</option>");
 					})
 					return res.productList
+				},
+				error: function (xhr, error, thrown){
+					console.error(error);
 				}
 			},
 			"pagingType": 'full_numbers',

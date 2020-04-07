@@ -115,7 +115,7 @@
 			<div class="detail_span">
 				<p class="product_title"></p>
 				<p class="product_span">
-					<span class="country"></span>
+					<span class="country" id='country'></span>
 					<span class="span1"></span>
 					/
 					<span class="span2"></span>
@@ -227,7 +227,11 @@
 						$('.span1').text(product.asin);
 						$('.span2').text(product.sku);
 						$('.product_img').attr("src",img);
-						$('.country').text(product.domin_sx)
+						if(product.domin_sx != undefined){
+							$('#country').text(product.domin_sx).show();
+						}else{
+							$('#country').text(product.domin_sx).hide();
+						}
 						$('.times').text(product.asin_reselling_time);
 						$('.number').text(product.asin_reselling_num);
 						$('.status').text(product.sku_status);
@@ -235,6 +239,9 @@
 						res[1][0] != undefined ? detailId = res[1][0].id : detailId = ''	
 						listObj.ajax.reload()
 						return dataList = res[1];
+					},
+					error: function (xhr, error, thrown){
+						console.error(error);
 					}
 				},
 				data: [],
@@ -265,6 +272,9 @@
 					},
 					dataSrc:function(res){
 						return res
+					},
+					error: function (xhr, error, thrown){
+						console.error(error);
 					}
 				},
 				"columns": [
@@ -308,6 +318,9 @@
 											listObj.ajax.reload()
 										}
 									});
+								}else{
+									$(cell).html(text);
+									listObj.cell(cell).data(text);
 								}
 								
 								
@@ -336,8 +349,7 @@
 				time2 = dateStr($('.date2').val());
 				tableObj.ajax.reload();
 				
-			})
-			
+			})	
 		})
 	</script>
 
