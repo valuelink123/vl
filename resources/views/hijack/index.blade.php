@@ -394,7 +394,7 @@
 			"ordering": true,
 			"serverSide": false,//是否所有的请求都请求服务器
 			"ajax": {
-				url: "http://10.10.42.14/vl/public/hijack/index/1",
+				url: "http://10.10.42.14/vl/public/hijack/index1",
 				dataSrc:function(res){
 					$.each(res.userList, function (index, value) {
 						$(".sellerList").append("<option value='" + value.name + "'>" + value.name + "</option>");

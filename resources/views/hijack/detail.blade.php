@@ -1,8 +1,8 @@
 @extends('layouts.layout')
 @section('crumb')
     <a href="/hijack/index">Hijack Alerts</a>
-		@endsection
-	@section('content')
+@endsection
+@section('content')
 <style>
 		
 		table thead tr th{
