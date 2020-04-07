@@ -848,6 +848,7 @@ class HijackController extends Controller
 
 
                 if (!empty($domainUrl) && !empty($asin)) {
+                    $asins[0]['domin_sx'] =  $DOMIN_MARKETPLACEID_SX[isset($asins[0]['marketplaceid']) ? $asins[0]['marketplaceid'] : ''];
                     $resellingList = DB::connection('vlz')->table('tbl_reselling_asin')
                         ->select('reselling_num', 'updated_at', 'created_at', 'reselling_remark', 'id', 'asin')
                         ->where('asin', $asin)
@@ -883,14 +884,14 @@ class HijackController extends Controller
                                         return (array)$value;
                                     })->toArray();
                             }
-
                             if (!empty($taskList)) {
+
                                 $asins[0]['asin_reselling_num'] = $taskList[0]['reselling_num'];
                                 $asins[0]['asin_reselling_time'] = date('Y/m/d H:i:s',$taskList[0]['reselling_time']);
                                 $asins[0]['sku'] = $sku;
                                 $asins[0]['sku_status'] = $sku_status;
                                 $asins[0]['user_name'] = $user_name;
-                                $asins[0]['domin_sx'] =  $DOMIN_MARKETPLACEID_SX[isset($asins[0]['marketplaceid']) ? $asins[0]['marketplaceid'] : ''];
+
                                 foreach ($taskList as $tk =>$tv){
                                     $taskList[$tk]['reselling_time']=date('Y/m/d H:i:s',$tv['reselling_time']);
                                 }
