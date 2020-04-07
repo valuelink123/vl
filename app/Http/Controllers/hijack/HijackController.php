@@ -9,7 +9,7 @@ use log;
 use App\User;
 use App\Asin;
 
-
+header('Access-Control-Allow-Origin:*');
 class HijackController extends Controller
 {
     /*
