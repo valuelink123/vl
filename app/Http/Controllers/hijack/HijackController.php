@@ -3,15 +3,12 @@
 namespace App\Http\Controllers\Hijack;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use DB;
 use log;
 use App\User;
 use App\Asin;
-use Illuminate\Support\Facades\Auth;
 
-header('Access-Control-Allow-Origin:*');
 
 class HijackController extends Controller
 {
@@ -39,15 +36,19 @@ class HijackController extends Controller
      *
      * @return void
      */
-
-    public function index(Request $request)
+    public function index()
+    {
+        return view('hijack.index');
+    }
+    public function detail()
+    {
+        return view('hijack.detail');
+    }
+    public function index1()
     {
         header('Access-Control-Allow-Origin:*');
         //得到登录用户信息
         // $user = Auth::user()->toArray();
-        if ($request) {
-            //   echo $request->params;
-        }
         //查询用户列表
         $users = User::select('name', 'email')->where('locked', '=', '0')->get()->toArray();
         //查询所有 asin 信息
@@ -81,12 +82,15 @@ class HijackController extends Controller
 
         //查询跟卖数据
         $resellingidList = [];
-        $resellingList = DB::connection('vlz')->table('tbl_reselling_asin')
-            ->select('id', 'asin', 'product_id')
-            ->whereIn('product_id', array_unique($asinIdList))
-            ->get()->map(function ($value) {
-                return (array)$value;
-            })->toArray();
+        if(!empty($asinIdList)){
+            $resellingList = DB::connection('vlz')->table('tbl_reselling_asin')
+                ->select('id', 'asin', 'product_id')
+                ->whereIn('product_id', array_unique($asinIdList))
+                ->get()->map(function ($value) {
+                    return (array)$value;
+                })->toArray();
+        }
+
         if (!empty($resellingList)) {
             foreach ($resellingList as $rlk => $rlv) {
                 $resellingidList[] = $rlv['id'];

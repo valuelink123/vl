@@ -394,7 +394,7 @@
 			"ordering": true,
 			"serverSide": false,//是否所有的请求都请求服务器
 			"ajax": {
-				url: "http://10.10.42.14/vl/public/hijack/index1",
+				url: "/hijack/index1",
 				dataSrc:function(res){
 					$.each(res.userList, function (index, value) {
 						$(".sellerList").append("<option value='" + value.name + "'>" + value.name + "</option>");
@@ -487,7 +487,7 @@
 							reselling_switch == 0 ? reselling_switch = 1 : reselling_switch = 0
 							$.ajax({
 								type:"post",
-								url:"http://10.10.42.14/vl/public/hijack/updateAsinSta",
+								url:"/hijack/updateAsinSta",
 								data:{
 									"id": rowData.id,
 									"reselling_switch": reselling_switch
@@ -544,7 +544,7 @@
 			});
 			$.ajax({
 				type:"post",
-				url:"http://10.10.42.14/vl/public/hijack/updateAsinSta",
+				url:"/hijack/updateAsinSta",
 				data:{
 					"id": chk_value,
 					"reselling_switch": 1
@@ -569,7 +569,7 @@
 			});
 			$.ajax({
 				type:"post",
-				url:"http://10.10.42.14/vl/public/hijack/updateAsinSta",
+				url:"/hijack/updateAsinSta",
 				data:{
 					"id": chk_value,
 					"reselling_switch": 0
@@ -633,7 +633,7 @@
 				 });
 				 
 				 $.ajax({
-				     url: "http://10.10.42.14/vl/public/hijack/hijackExport",
+				     url: "/hijack/hijackExport",
 				     method: 'POST',
 				     cache: false,
 				     data: {

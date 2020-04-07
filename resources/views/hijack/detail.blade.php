@@ -228,9 +228,9 @@
 						$('.span2').text(product.sku);
 						$('.product_img').attr("src",img);
 						if(product.domin_sx != undefined){
-							$('#country').text(product.domin_sx).show();
+							$('#country').text(product.domin_sx).show()
 						}else{
-							$('#country').text(product.domin_sx).hide();
+							$('#country').text(product.domin_sx).hide()
 						}
 						$('.times').text(product.asin_reselling_time);
 						$('.number').text(product.asin_reselling_num);
