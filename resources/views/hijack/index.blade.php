@@ -394,12 +394,18 @@
 			"ordering": true,
 			"serverSide": false,//是否所有的请求都请求服务器
 			"ajax": {
+
 				url: "/hijack/index1",
+
 				dataSrc:function(res){
 					$.each(res.userList, function (index, value) {
 						$(".sellerList").append("<option value='" + value.name + "'>" + value.name + "</option>");
 					})
 					return res.productList
+
+				},
+				error: function (xhr, error, thrown){
+					console.error(error);
 				}
 			},
 			"pagingType": 'full_numbers',

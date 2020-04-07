@@ -850,7 +850,7 @@ class HijackController extends Controller
                         ->select('reselling_num', 'updated_at', 'created_at', 'reselling_remark', 'id', 'asin')
                         ->where('asin', $asin)
                         ->where('product_id', $as['id'])
-                      //  ->where('domain', $domainUrl)
+                        //  ->where('domain', $domainUrl)
                         ->get()->map(function ($value) {
                             return (array)$value;
                         })->toArray();
