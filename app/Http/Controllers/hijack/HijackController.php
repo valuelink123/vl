@@ -473,6 +473,8 @@ class HijackController extends Controller
     public function updateAsinSta(Request $request)
     {
         $DOMIN_MARKETPLACEID = Asin::DOMIN_MARKETPLACEID;
+        $DOMIN_MARKETPLACEID_URL = Asin::DOMIN_MARKETPLACEID_URL;
+
         if (!empty($_POST['id'])) {
             $toup = 0;
             if (@$_POST['reselling_switch'] == 1) {
@@ -501,7 +503,7 @@ class HijackController extends Controller
                     foreach ($asinOne as $k=>$v){
                         $data = [
                             'product_id' => $v['id'],
-                            'domain' => $DOMIN_MARKETPLACEID[$v['marketplaceid']],
+                            'domain' => $DOMIN_MARKETPLACEID_URL[$v['marketplaceid']],
                             'asin' => $v['asin'],
                             'reselling' => 1
                         ];
