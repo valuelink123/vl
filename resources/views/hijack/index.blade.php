@@ -384,6 +384,9 @@
 			keyword_filter()
 		})
 		
+		//禁止警告弹窗弹出
+		$.fn.dataTable.ext.errMode = 'none';
+		
 		editTableObj = $('#tableObj').DataTable({
 			"searching": true,  //去掉搜索框
 			"bLengthChange": false, //去掉每页多少条框体
@@ -401,9 +404,6 @@
 					})
 					return res.productList
 				},
-				error: function (xhr, error, thrown){
-					console.error(error);
-				}
 			},
 			"pagingType": 'full_numbers',
 			data: [],

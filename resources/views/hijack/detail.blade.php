@@ -190,6 +190,9 @@
 			urlIndex=ids.lastIndexOf("=");
 			ids=ids.substring(urlIndex+1,ids.length);
 			
+			//禁止警告弹窗弹出
+			$.fn.dataTable.ext.errMode = 'none';
+			
 			//左边table
 			tableObj = $('#tabsObj').DataTable({
 				"searching": false,  //去掉搜索框
@@ -205,7 +208,7 @@
 				],
 				"serverSide": false,
 				ajax: {
-					url: "http://10.10.42.14/vl/public/hijack/resellingList",
+					url: "/hijack/resellingList",
 					type: "post",
 					data : function(){
 						reqList = {
@@ -240,9 +243,6 @@
 						listObj.ajax.reload()
 						return dataList = res[1];
 					},
-					error: function (xhr, error, thrown){
-						console.error(error);
-					}
 				},
 				data: [],
 				"fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {  //行回调函数
@@ -264,7 +264,7 @@
 				"serverSide": true,
 				"ordering": false, // 禁止排序
 				"ajax": {
-					url: "http://10.10.42.14/vl/public/hijack/resellingDetail",
+					url: "/hijack/resellingDetail",
 					type: "post",
 					data : function(){
 						rowdata = {"taskId" : detailId};
@@ -273,9 +273,6 @@
 					dataSrc:function(res){
 						return res
 					},
-					error: function (xhr, error, thrown){
-						console.error(error);
-					}
 				},
 				"columns": [
 					{ "data": "account"},
@@ -306,7 +303,7 @@
 									listObj.cell(cell).data(text);
 									$.ajax({
 										type:"post",
-										url:'http://10.10.42.14/vl/public/hijack/upResellingDetail',
+										url:'/hijack/upResellingDetail',
 										data:{
 											id: rowData.id,
 											remark: rowData.reselling_remark
