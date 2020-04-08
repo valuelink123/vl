@@ -18,8 +18,15 @@
 		table.dataTable.stripe tbody tr.odd, table.dataTable.display tbody tr.odd{
 			background: #fff;
 		}
+		table.dataTable.order-column tbody tr>.sorting_1, table.dataTable.order-column tbody tr>.sorting_2, table.dataTable.order-column tbody tr>.sorting_3, table.dataTable.display tbody tr>.sorting_1, table.dataTable.display tbody tr>.sorting_2, table.dataTable.display tbody tr>.sorting_3{
+			background: none !important;
+		}
 		.dataTables_wrapper .dataTables_paginate .paginate_button{
 			padding: 0.2em .5em;
+		}
+		
+		#tabsObj.dataTable tbody tr{
+			cursor: pointer !important;
 		}
 		.content {
 			padding-top: 20px;
@@ -105,6 +112,9 @@
 			background: #2096fa;
 			color: #fff;
 			padding: 2px 7px;
+		}
+		.bgC{
+			background: #eef1f5 !important;
 		}
 	</style>
 	<div class="content">
@@ -200,7 +210,7 @@
 				"paging": true,  // 是否显示分页
 				"info": false,// 是否表格左下角显示的文字
 				"pageLength": 10,
-				"ordering": false,
+				"order": [ 0, "desc" ],
 				"pagingType": 'numbers',
 				columns: [
 					{ data: "reselling_time",},
@@ -250,6 +260,7 @@
 						detailId = aData.id
 						var rowdata = {"taskId" : detailId,};
 						listObj.ajax.reload()
+						$(this).addClass('bgC').siblings().removeClass('bgC');
 					});
 				},
 			});
@@ -347,6 +358,8 @@
 				tableObj.ajax.reload();
 				
 			})	
+			
+			
 		})
 	</script>
 
