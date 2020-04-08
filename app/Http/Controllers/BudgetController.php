@@ -49,10 +49,10 @@ class BudgetController extends Controller
 
 		$nowYear = date('Y');
 	    $nowMonth =  date('m');
-	    if($nowMonth>=1) $now_quarter = 2;
-	    if($nowMonth>=4) $now_quarter = 3;
-	    if($nowMonth>=7) $now_quarter = 4;
-	    if($nowMonth>=10){
+	    if($nowMonth>=3) $now_quarter = 2;
+	    if($nowMonth>=6) $now_quarter = 3;
+	    if($nowMonth>=9) $now_quarter = 4;
+	    if($nowMonth>=12){
 	    	$now_quarter = 1;
 	    	$nowYear=$nowYear+1;
 	    }
