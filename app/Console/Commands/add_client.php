@@ -156,7 +156,7 @@ class AddClient extends Command
 				left join client_info as t5 on t5.email = t1.from_address
 				left join client_order_info as t6 on t6.amazon_order_id=t1.amazon_order_id
 				WHERE {$where} and t1.from_address is not null 
-				and type = 'Site' and t6.id is null 
+				and t1.type = 'Site' and t6.id is null 
 				order by date asc";
 
 		Log::Info($sql);
