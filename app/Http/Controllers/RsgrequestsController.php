@@ -213,7 +213,7 @@ class RsgrequestsController extends Controller
 								$explain_step = isset($rsgStatusArr[7]) ? $rsgStatusArr[7]['vop'] : 7;
 								$lists[$key]['step'] .= '<div class="fa red fa-times pull-right" title="'.$explain_step.'"></div>';
 							}else{
-								
+								$lists[$key]['step'] .= '<div class="fa green fa-check pull-right"></div>';
 							}
 						}
 					}
