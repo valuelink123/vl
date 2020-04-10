@@ -1285,6 +1285,8 @@ class HijackController extends Controller
                 foreach ($taskDetail as $k => $v) {
                     $taskDetail[$k]['timecount'] = $reselling_count_list[$v['sellerid']];
                     $taskDetail[$k]['price'] = $v['price'] / 100;
+                    $taskDetail[$k]['shipping_fee'] = $v['shipping_fee'] / 100;
+
                 }
             }
         }
