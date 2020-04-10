@@ -50,6 +50,7 @@ class HijackController extends Controller
 
     /**
      * 首页接口请求
+     * 备用
      * @return mixed
      */
     public function index2()
@@ -190,20 +191,56 @@ class HijackController extends Controller
         return $returnDate;
     }
 
+    /**
+     * 首页接口请求
+     * 目前使用
+     * @return mixed
+     */
     public function index1()
     {
         header('Access-Control-Allow-Origin:*');
         //得到登录用户信息
-        $sap_seller_id = 0;//todo 改为 0
         $userasinL = [];
+        $sap_seller_id_list=[];
         //todo  打开 查询登录用户对应的 asin
-        // if(!empty(Auth::user()->toArray())){
-        // $user=Auth::user()->toArray();
-        //  $sap_seller_id=$user['sap_seller_id'];
-        if($sap_seller_id>0){
+         if(!empty(Auth::user()->toArray())){
+         $user=Auth::user()->toArray();
+         //判断是否是销售 及 对应领导角色
+         if($user['ubu']!=''|| $user['ubg']!=''||$user['seller_rules']!=''){
+             $allUsers =  DB::table('users')->select('id', 'sap_seller_id','ubg','ubu')
+                 ->where('ubg', $user['ubg'])
+                 ->get()->map(function ($value) {
+                     return (array)$value;
+                 })->toArray();
+             //BG一层
+             if($user['ubu']==''&&$user['ubg']!=''&&$user['seller_rules']!=''){
+                 /**查询所有BG下面员工*/
+                 if(!empty($allUsers)){
+                     foreach ($allUsers as $auk=>$auv){
+                         $sap_seller_id_list[]=$auv['sap_seller_id'];
+                     }
+                 }
+             }else if($user['ubu']!=''&&$user['seller_rules']==''){
+                 /**此条件为 普通销售*/
+                 $sap_seller_id_list[]=$user['sap_seller_id'];
+             }else if($user['ubu']!=''&&$user['ubg']!=''&&$user['seller_rules']!=''){
+                 /**  bu 负责人 及所有下属 */
+                  if(!empty($allUsers)){
+                     foreach ($allUsers as $auk=>$auv){
+                         if($auv['ubu']==$user['ubu']){
+                             $sap_seller_id_list[]=$auv['sap_seller_id'];
+                         }
+                     }
+                 }
+             }
+         }else{
+             echo '非销售，非特殊权限人员';exit;
+         }
+
+        if(!empty($sap_seller_id_list)){
             $user_asin_list = DB::connection('vlz')->table('sap_asin_match_sku')
                 ->select('asin')
-                ->where('sap_seller_id', $sap_seller_id)
+                ->whereIn('sap_seller_id', $sap_seller_id_list)
                 ->groupBy('asin')
                 ->get()->map(function ($value) {
                     return (array)$value;
@@ -214,7 +251,7 @@ class HijackController extends Controller
                 }
             }
         }
-        // }
+         }
         //查询所有 asin 信息
         $DOMIN_MARKETPLACEID_SX = Asin::DOMIN_MARKETPLACEID_SX;
         $DOMIN_MARKETPLACEID_RUL = Asin::DOMIN_MARKETPLACEID_URL;
