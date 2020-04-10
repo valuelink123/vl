@@ -248,6 +248,8 @@ class HijackController extends Controller
                         $userasinL[] = $uslv['asin'];
                     }
                 }
+            }else{
+                return 'No matching records found';
             }
         }
         //查询所有 asin 信息
