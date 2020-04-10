@@ -205,12 +205,12 @@
                                                     </a>
                                                 </li>
 												@permission('asin-rating-show')
-                                                <li class="">
-                                                    <a href="/star" class="nav-link nav-toggle ">
-                                                        Rating Table
-                                                        <span class="arrow"></span>
-                                                    </a>
-                                                </li>
+												<li class="">
+												    <a href="/star" class="nav-link nav-toggle ">
+												        Rating Table
+												        <span class="arrow"></span>
+												    </a>
+												</li>
 												@endpermission
 												<li class="">
 												    <a href="/hijack/index" class="nav-link nav-toggle ">
@@ -220,11 +220,11 @@
 												</li>
 												@permission('asin-table-show')
 												<li class="">
-                                                    <a href="/asin" class="nav-link nav-toggle ">
-                                                        Asin Table
-                                                        <span class="arrow"></span>
-                                                    </a>
-                                                </li>
+												    <a href="/asin" class="nav-link nav-toggle ">
+												        Asin Table
+												        <span class="arrow"></span>
+												    </a>
+												</li>
 												 @endpermission
 												
 												 

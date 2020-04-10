@@ -43,7 +43,9 @@
  			margin-left: 20px;
  			color: #666666;
  		}
-		
+		.export_btn{
+			float: right !important;	
+		}
  		.form_main {
  			margin-top: 15px;
  			overflow: hidden;
@@ -99,15 +101,15 @@
  		/* switch开关 */
 		.switch{
 			cursor: pointer;
-			  width:40px;
-			  height:20px;
-			  border-radius:30px !important;
-			  overflow: hidden;
-			  vertical-align:middle;
-			  position:relative;
-			  display: inline-block;
-			  background:#ccc;
-			  box-shadow: 0 0 1px #61c737;
+			width:40px;
+			height:20px;
+			border-radius:30px !important;
+			overflow: hidden;
+			vertical-align:middle;
+			position:relative;
+			display: inline-block;
+			background:#ccc;
+			box-shadow: 0 0 1px #61c737;
 		}
 		.switch input{
 		  visibility: hidden;
@@ -154,6 +156,9 @@
  		.isSwitchHide{
  			display: none;
  		}
+		table.dataTable.display tbody tr td a,table.dataTable.display tbody tr td a:active,table.dataTable.display tbody tr td a:hover{
+			color: #333 !important;
+		}
  		.product_main{
  			overflow: hidden;
 			margin: auto;
@@ -250,8 +255,8 @@
 			top: 11px;
 			display: none;
 		}
+		
  	</style>
- </head>
  
  <body class="dt-tableObj">
  	<div class="content">
@@ -299,9 +304,10 @@
 				<option value="ES">www.amazon.es</option>
 				<option value="JP">www.amazon.co.jp</option>
 			</select>
- 			<button class="export_btn">Export</button>
+ 			
  			<button class="start_btn status_btn isHide">Turn On</button>
  			<button class="close_btn status_btn isHide">Turn Off</button>
+			<button class="export_btn">Export</button>
  		</div>
  		<div>
  		
@@ -384,6 +390,9 @@
 			keyword_filter()
 		})
 		
+		//禁止警告弹窗弹出
+		$.fn.dataTable.ext.errMode = 'none';
+		
 		editTableObj = $('#tableObj').DataTable({
 			"searching": true,  //去掉搜索框
 			"bLengthChange": false, //去掉每页多少条框体
@@ -400,6 +409,10 @@
 						$(".sellerList").append("<option value='" + value.name + "'>" + value.name + "</option>");
 					})
 					return res.productList
+				},
+				error:function(err){
+					alert(err.responseText)
+					window.location.href="/service"
 				}
 			},
 			"pagingType": 'full_numbers',
@@ -441,14 +454,8 @@
 							dot = str.split(',');
 							dot.length > 1 ? img = 'https://images-na.ssl-images-amazon.com/images/I/' + dot[1] : img = ''
 						}
-						return '<div class="product_main"><div class="product_img"><img src="'+img+'" alt=""></div><div class="product_text"><p class="product_title" title="'+row.title+'">'+row.title+'</p><div class="product_span"><span class="country_img">'+row.domin_sx+'</span><span>'+row.asin+'</span> / <span>'+row.sku+'</span></div></div></div>';
+						return '<a target="_blank" href="detail?id='+row.id+'"><div class="product_main"><div class="product_img"><img src="'+img+'" alt=""></div><div class="product_text"><p class="product_title" title="'+row.title+'">'+row.title+'</p><div class="product_span"><span class="country_img">'+row.domin_sx+'</span><span>'+row.asin+'</span> / <span>'+row.sku+'</span></div></div></div></a>';
 					},
-					"createdCell": function (cell, cellData, rowData, rowIndex, colIndex) {
-						$(cell).click(function () {
-							let processId = rowData.id;
-							window.location.href = "detail?id=" + processId;
-						});
-					}
 				},
 				{ 
 					data: "sku_status",	
@@ -490,7 +497,7 @@
 									"reselling_switch": reselling_switch
 								},
 								success:function(res){
-									window.location.reload()
+									editTableObj.ajax.reload();
 								},
 								error:function(err){
 									alert('Failed to update.')
@@ -547,7 +554,13 @@
 					"reselling_switch": 1
 				},
 				success:function(res){
-					window.location.reload()
+					editTableObj.ajax.reload();
+					setTimeout(function(){
+						$('#selectAll').removeAttr('checked');
+						$('.start_btn').hide();
+						$('.close_btn').hide();
+					},3000)	
+					
 				},
 				error:function(err){
 					alert('Failed to update.')
@@ -572,7 +585,13 @@
 					"reselling_switch": 0
 				},
 				success:function(res){
-					window.location.reload()
+					editTableObj.ajax.reload();
+					setTimeout(function(){
+						$('#selectAll').removeAttr('checked');
+						$('.start_btn').hide();
+						$('.close_btn').hide();
+					},3000)	
+					
 				},
 				error:function(err){
 					alert('Failed to update.')
@@ -600,7 +619,7 @@
 		})
 		//取消导出
 		 $('.handlerCancel').click(function(){
-		 		 $('.dialogMain').hide();
+		 	$('.dialogMain').hide();
 		 })
 		 //时间戳转换
 		 function dateStr(str){
@@ -625,8 +644,7 @@
 						 chk_value = chk_value + ',' + $(this).val()	
 					 }else{
 						 chk_value = chk_value + $(this).val()
-					 }
-				 		 			
+					 }				 		 			
 				 });
 				 
 				 $.ajax({
