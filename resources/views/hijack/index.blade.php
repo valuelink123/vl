@@ -410,6 +410,10 @@
 					})
 					return res.productList
 				},
+				error:function(err){
+					alert(err.responseText)
+					window.location.href="/service"
+				}
 			},
 			"pagingType": 'full_numbers',
 			data: [],
