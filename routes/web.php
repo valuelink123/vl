@@ -188,6 +188,7 @@ Route::match(['post','get'],'/rsgUser/list', 'RsgUserController@list');//rsgUser
 Route::post('/star/updatePost', 'StarController@updatePost');//更新帖子状态和帖子类型
 
 //跟卖追踪
+
 Route::get('/hijack/index1/', 'hijack\\HijackController@index1')->name('index1');
 Route::get('/hijack/index2/', 'hijack\\HijackController@index2')->name('index2');
 Route::get('/hijack/index/', 'hijack\\HijackController@index')->name('index');

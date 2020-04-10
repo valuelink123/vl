@@ -18,8 +18,15 @@
 		table.dataTable.stripe tbody tr.odd, table.dataTable.display tbody tr.odd{
 			background: #fff;
 		}
+		table.dataTable.order-column tbody tr>.sorting_1, table.dataTable.order-column tbody tr>.sorting_2, table.dataTable.order-column tbody tr>.sorting_3, table.dataTable.display tbody tr>.sorting_1, table.dataTable.display tbody tr>.sorting_2, table.dataTable.display tbody tr>.sorting_3{
+			background: none !important;
+		}
 		.dataTables_wrapper .dataTables_paginate .paginate_button{
 			padding: 0.2em .5em;
+		}
+		
+		#tabsObj.dataTable tbody tr{
+			cursor: pointer !important;
 		}
 		.content {
 			padding-top: 20px;
@@ -106,6 +113,9 @@
 			color: #fff;
 			padding: 2px 7px;
 		}
+		.bgC{
+			background: #eef1f5 !important;
+		}
 	</style>
 	<div class="content">
 		<div style="overflow: hidden;">
@@ -115,7 +125,9 @@
 			<div class="detail_span">
 				<p class="product_title"></p>
 				<p class="product_span">
+
 					<span class="country" id="country"></span>
+
 					<span class="span1"></span>
 					/
 					<span class="span2"></span>
@@ -190,6 +202,9 @@
 			urlIndex=ids.lastIndexOf("=");
 			ids=ids.substring(urlIndex+1,ids.length);
 			
+			//禁止警告弹窗弹出
+			$.fn.dataTable.ext.errMode = 'none';
+			
 			//左边table
 			tableObj = $('#tabsObj').DataTable({
 				"searching": false,  //去掉搜索框
@@ -197,7 +212,7 @@
 				"paging": true,  // 是否显示分页
 				"info": false,// 是否表格左下角显示的文字
 				"pageLength": 10,
-				"ordering": false,
+				"order": [ 0, "desc" ],
 				"pagingType": 'numbers',
 				columns: [
 					{ data: "reselling_time",},
@@ -239,7 +254,7 @@
 						res[1][0] != undefined ? detailId = res[1][0].id : detailId = ''
 						listObj.ajax.reload()
 						return dataList = res[1];
-					}
+					},
 				},
 				data: [],
 				"fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {  //行回调函数
@@ -247,6 +262,7 @@
 						detailId = aData.id
 						var rowdata = {"taskId" : detailId,};
 						listObj.ajax.reload()
+						$(this).addClass('bgC').siblings().removeClass('bgC');
 					});
 				},
 			});
@@ -269,7 +285,7 @@
 					},
 					dataSrc:function(res){
 						return res
-					}
+					},
 				},
 				"columns": [
 					{ "data": "account"},
@@ -312,6 +328,9 @@
 											listObj.ajax.reload()
 										}
 									});
+								}else{
+									$(cell).html(text);
+									listObj.cell(cell).data(text);
 								}
 								
 								
@@ -340,7 +359,8 @@
 				time2 = dateStr($('.date2').val());
 				tableObj.ajax.reload();
 				
-			})
+			})	
+			
 			
 		})
 	</script>

@@ -69,7 +69,7 @@ class InboxController extends Controller
 				$ret['data'][]=$r;
 			}
 		}
-		echo json_encode($ret,true);exit(0);
+		echo json_encode($ret,true);
 	}
 
 	public function getItemGroup(){
@@ -79,12 +79,12 @@ class InboxController extends Controller
 			$ItemGroup = $ItemGroup->where('item_no', 'like', '%'.$_REQUEST['item_no'].'%');
 			$ItemGroupList = $ItemGroup->limit(1)->get()->toArray();
 			if(!empty($ItemGroupList)){
-				echo json_encode(['code'=>200,'data'=>$ItemGroupList]);exit(0);
+				echo json_encode(['code'=>200,'data'=>$ItemGroupList]);
 			}else{
-				echo json_encode(['code'=>204]);exit(0);
+				echo json_encode(['code'=>204]);
 			}
 		}else{
-			echo json_encode(['code'=>204]);exit(0);
+			echo json_encode(['code'=>204]);
 		}
 
 	}
@@ -96,12 +96,12 @@ class InboxController extends Controller
 			$Item = $Item->where('sellersku', 'like', '%'.$_REQUEST['sku'].'%');
 			$ItemList = $Item->limit(1)->get()->toArray();
 			if(!empty($ItemList)){
-				echo json_encode(['code'=>200,'data'=>$ItemList]);exit(0);
+				echo json_encode(['code'=>200,'data'=>$ItemList]);
 			}else{
-				echo json_encode(['code'=>204]);exit(0);
+				echo json_encode(['code'=>204]);
 			}
 		}else{
-			echo json_encode(['code'=>204]);exit(0);
+			echo json_encode(['code'=>204]);
 		}
 
 	}

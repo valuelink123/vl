@@ -541,6 +541,7 @@ font-weight:bold;
 jQuery(document).ready(function() {
 	$('.date-picker').datepicker({
 		rtl: App.isRTL(),
+		orientation: 'bottom',
 		autoclose: true
 	});
 });
