@@ -212,7 +212,5 @@ Route::post('/hijack/resellingDetail', 'hijack\\HijackController@resellingDetail
 Route::post('/hijack/upResellingDetail', 'hijack\\HijackController@upResellingDetail');//修改 detail 备注信息
 Route::post('/hijack/hijackExport', 'hijack\\HijackController@hijackExport');//导出
 
-//跟卖追踪
-//Route::get('/hijack/index', 'HijackController@index')->name('hijack');
-////跟卖追踪详情
-//Route::get('/hijack/detail', 'HijackController@detail')->name('detail');
+//RSG
+Route::get('/marketingPlan/index', 'MarketingPlanController@index')->name('marketingPlan');
