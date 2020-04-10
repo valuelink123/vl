@@ -15,6 +15,7 @@
                         <div class="table-actions-wrapper">
                             <span> </span>
 							<input type="hidden" id='mailType' value="{{$type}}" />
+                            <input type="hidden" id='linkIndex' value="{{$linkIndex}}" />
                             <select id="replyStatus" class="table-group-action-input form-control input-inline input-small input-sm">
                                 <option value="">Select...</option>
                                 <option value="1">Do not need to reply</option>
@@ -70,7 +71,7 @@
                                         <option value="">Select Status</option>
                                         <option value="2">Replied</option>
                                         <option value="1">Do not need to reply</option>
-                                        <option value="0">Need reply</option>
+                                        <option value="0" @if($fromService) selected @endif>Need reply</option>
                                     </select>
 									</div>
                                 </td>
@@ -94,7 +95,7 @@
                                         <option value="">User</option>
 										@foreach (array_get($mygroups,'users',array()) as $user_id=>$user)
 										
-											<option value="{{$user_id}}">{{array_get($users,$user_id)}}</option>
+											<option value="{{$user_id}}" @if($currentUserId==$user_id) selected @endif>{{array_get($users,$user_id)}}</option>
 											
 										@endforeach
                                     </select>
@@ -181,11 +182,11 @@
                 onError: function (grid) {
                     // execute some code on network or other general error
                 },
+                //onDataLoad每次表格数据加载完后都执行（1. 表格初始化后 2. 重新设置搜索条件，点击search按钮后 3. 列表分页时，切换页面）
                 onDataLoad: function(grid) {
                     // execute some code on ajax data load
-                    //alert('123');
-                    //alert($("#subject").val());
-                    //grid.setAjaxParam("subject", $("#subject").val());
+                    //如果将linkIndex的值清空，从service链接过来的列表有多页时，切换页面就不能正确显示每页内容以及总记录数
+                    //grid.setAjaxParam("linkIndex", '');
                 },
                 loadingMessage: 'Loading...',
                 dataTable: { // here you can define a typical datatable settings from http://datatables.net/usage/options
@@ -252,6 +253,8 @@
 
             //grid.setAjaxParam("customActionType", "group_action");
 			grid.setAjaxParam("mail_type", $("#mailType").val());
+			//linkIndex 从service页面的超链接带过来
+            grid.setAjaxParam("linkIndex", $("#linkIndex").val());
             grid.setAjaxParam("from_address", $("input[name='from_address']").val());
             grid.setAjaxParam("to_address", $("input[name='to_address']").val());
             grid.setAjaxParam("date_from", $("input[name='date_from']").val());

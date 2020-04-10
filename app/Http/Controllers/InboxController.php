@@ -47,9 +47,22 @@ class InboxController extends Controller
     public function index($type = '')
     {
 		if(!Auth::user()->can(['inbox-show'])) die('Permission denied -- inbox-show');
-        return view('inbox/index',['users'=>$this->getUsers(),'groups'=>$this->getGroups(),'type'=>$type,'mygroups'=>$this->getUserGroup()]);
-		
+        $fromService = '';
+        $currentUserId = '';
+        $linkIndex = '';
 
+        return view('inbox/index',['users'=>$this->getUsers(),'groups'=>$this->getGroups(),'type'=>$type,'mygroups'=>$this->getUserGroup(), 'fromService'=>$fromService, 'currentUserId'=>$currentUserId, 'linkIndex'=>$linkIndex]);
+   }
+
+    public function fromService(Request $request)
+    {
+        if(!Auth::user()->can(['inbox-show'])) die('Permission denied -- inbox-show');
+        $type = '';
+        $fromService = isset($_REQUEST['fromService']) ? $_REQUEST['fromService'] : '';
+        $currentUserId = Auth::user()->id;
+        $linkIndex = isset($_REQUEST['linkIndex']) ? $_REQUEST['linkIndex'] : '';
+
+        return view('inbox/index',['users'=>$this->getUsers(),'groups'=>$this->getGroups(),'type'=>$type,'mygroups'=>$this->getUserGroup(), 'fromService'=>$fromService, 'currentUserId'=>$currentUserId, 'linkIndex'=>$linkIndex]);
     }
 
 
@@ -408,7 +421,6 @@ class InboxController extends Controller
         return [$recentEventsNumbers, $recentEventsList];
     }
 
-
     public function getRsgTaskData(Request $req){
         $site = isset($_POST['site']) && $_POST['site'] ? $_POST['site'] : 'US';
         $data = $this->getRsgTask($site);
@@ -420,9 +432,6 @@ class InboxController extends Controller
         }
         return json_encode($return);
     }
-
-
-
 
     public function getRsgTask($site){
         $date = $this->getDefaultDate(date('Y-m-d'));
@@ -717,6 +726,13 @@ class InboxController extends Controller
         if(array_get($_REQUEST,'date_to')){
             $customers = $customers->where('date','<=',$_REQUEST['date_to'].' 23:59:59');
         }
+        //从service页面的Time out超链接过来的
+        if(array_get($_REQUEST,'linkIndex') == 1){
+            $customers = $customers->leftJoin(DB::raw('(select id as r_id, if(timeout IS NULL, 0, timeout*3600) as timeout from rules) as new_rules'),function($q){
+                $q->on('inbox.rule_id', '=', 'new_rules.r_id');
+            })->whereRaw('TIMESTAMPDIFF(SECOND, inbox.date, now()) > new_rules.timeout');
+        }
+
 		//if(!Auth::user()->can(['inbox-show-all'])) {
         	 $customers = $customers->orderByRaw('case when user_id='.Auth::user()->id.' and reply=0 then 0 else 1 end asc');
 		//}
@@ -728,6 +744,7 @@ class InboxController extends Controller
         $customers = $customers->leftJoin(DB::raw('(select email, rsg_status, rsg_status_explain from client_info left join client on client_info.client_id = client.id) as t1'),function($q){
             $q->on('inbox.from_address', '=', 't1.email');
         });
+
 		$customersLists =  $customers->orderBy($orderby,$sort)->skip($iDisplayStart)->take($iDisplayLength)->get()->toArray();
         $records = array();
         $records["data"] = array();
