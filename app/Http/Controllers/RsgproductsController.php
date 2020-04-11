@@ -39,7 +39,7 @@ class RsgproductsController extends Controller
 			return view('rsgproducts/index', ['date' => $todayDate,'bgs'=>$this->getBgs(),'bus'=>$this->getBus()]);
 		}
 		//搜索相关
-		$searchField = array('date'=>'rsg_products.created_at','asin'=>'rsg_products.asin','bg'=>'asin.bg','bu'=>'asin.bu','site'=>'rsg_products.site','item_no'=>'asin.item_no','post_type'=>'rsg_products.post_type','post_status'=>'rsg_products.post_status','order_status'=>'rsg_products.order_status','sku_level'=>'rsg_products.sku_level','sku_status'=>'skus_status.status');
+		$searchField = array('date'=>'rsg_products.created_at','asin'=>'rsg_products.asin','bg'=>'asin.bg','bu'=>'asin.bu','site'=>'rsg_products.site','item_no'=>'asin.item_no','post_type'=>'rsg_products.post_type','post_status'=>'rsg_products.post_status','order_status'=>'rsg_products.order_status','sku_level'=>'rsg_products.sku_level','sku_status'=>'skus_status.status','seller_id'=>'rsg_products.seller_id');
 		$search = isset($_POST['search']) ? $_POST['search'] : '';
 		$search = $this->getSearchData(explode('&',$search));
 		$leftskus = 0;//$leftskus为是否关联查询skus_status表的开关，因为关联查询后速度就变慢
@@ -308,6 +308,7 @@ class RsgproductsController extends Controller
 		$siteShort = getSiteShort();
 		$postStatus = getPostStatus();
 		$postType = getPostType();
+		$sellerAccounts = getSellerAccount();
 		$productOrderStatus = getProductOrderStatus();
 		//sku状态信息,任务列表的时候不关联查询skus_status表，因此用此种方法获取sku状态信息，因为关联查询此表速度会慢很多，产品列表是因为要搜索status，所以需要关联查询
 		if (empty($leftskus)){
@@ -329,6 +330,7 @@ class RsgproductsController extends Controller
 			}
 			$data[$key]['unfinished'] = $val['unfinished'] > 0 ? $val['unfinished'] : 0;
 			$data[$key]['basic_asin'] = $val['asin'];
+			$data[$key]['seller_id'] = isset($sellerAccounts[$val['seller_id']])?$sellerAccounts[$val['seller_id']]:'Others';
 			$data[$key]['product'] = '<a target="_blank" href="https://rsg.claimthegift.com/product/detail?id='.$val['asin_id'].'"><img src="'.$val['img'].'" width="50px" height="65px"></a>';
 			$data[$key]['site'] = isset($siteShort[$val['site']]) ? $siteShort[$val['site']] : $val['site'];
 			$data[$key]['asin'] = '<a href="https://' . $val['site'] . '/dp/' . $val['asin'] .'" target="_blank" rel="noreferrer">' . $val['asin'] . '</a>';//asin插入超链接

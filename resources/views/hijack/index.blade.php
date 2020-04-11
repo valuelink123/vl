@@ -255,7 +255,45 @@
 			top: 11px;
 			display: none;
 		}
+		.success_mask{
+			width: 400px;
+			height: 50px;
+			border-radius: 10px !important;
+			position: fixed;
+			left: 50%;
+			margin-left: -200px;
+			top: 250px;
+			margin-top: -70px;
+			background: #f0f9eb;
+			border: 1px solid #e1f3d8;
+			display: none;
+		}
+		.mask_icon{
+			float: left;
+			margin: 11px 15px;
+		}
+		.mask_text{
+			float: left;
+			line-height: 45px;
+			color: #67c23a;
+		}
 		
+		.error_mask{
+			width: 400px;
+			height: 50px;
+			border-radius: 10px !important;
+			position: fixed;
+			left: 50%;
+			margin-left: -200px;
+			top: 250px;
+			margin-top: -70px;
+			background: #fef0f0;
+			border: 1px solid #fde2e2;
+			display: none;
+		}
+		.error_mask .mask_text{
+			color: #f56c6c !important;
+		}
  	</style>
  
  <body class="dt-tableObj">
@@ -363,6 +401,18 @@
 			</div>
 		</div>
 	</div>
+	<div class="success_mask">
+		<span class="mask_icon">
+			<svg t="1586572594956" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="12690" width="24" height="24"><path d="M511.1296 0.2816C228.7616 0.2816 0 229.1456 0 511.4368c0 282.2656 228.864 511.1296 511.1296 511.1296 282.2912 0 511.1552-228.864 511.1552-511.1296C1022.2848 229.1712 793.4208 0.256 511.1296 0.256z m-47.104 804.8384l-244.5056-219.9808 72.448-73.2672 145.5872 112.9728c184.832-251.136 346.624-331.776 346.624-331.776l20.1984 30.464c-195.6864 152.192-340.48 481.5872-340.352 481.5872z" fill="#1DC50C" p-id="12691" data-spm-anchor-id="a313x.7781069.0.i18" class="selected"></path></svg>
+		</span>
+		<span class="mask_text">success to update.</span>
+	</div>
+	<div class="error_mask">
+		<span class="mask_icon">
+			<svg t="1586574167843" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="13580" width="24" height="24"><path d="M512 0A512 512 0 1 0 1024 512 512 512 0 0 0 512 0z m209.204301 669.673978a36.555699 36.555699 0 0 1-51.750538 51.640431L511.779785 563.64043 353.995699 719.662796a36.555699 36.555699 0 1 1-52.301075-51.089893 3.303226 3.303226 0 0 1 0.88086-0.88086L460.249462 511.779785l-157.013333-157.453763a36.665806 36.665806 0 1 1 48.777634-55.053764 37.876989 37.876989 0 0 1 2.972904 2.972903l157.233548 158.114409 157.784086-156.132473a36.555699 36.555699 0 0 1 51.420215 52.08086L563.750538 512.220215l157.013333 157.453763z" fill="#FF5252" p-id="13581"></path></svg>
+		</span>
+		<span class="mask_text">Failed to update.</span>
+	</div>
  </body>
  
  </html>
@@ -405,14 +455,20 @@
 			"ajax": {
 				url: "/hijack/index1",
 				dataSrc:function(res){
+					console.log(res)
+					if(res.status == -1){
+						alert(res.message)
+						window.location.href="/service"
+					}
 					$.each(res.userList, function (index, value) {
 						$(".sellerList").append("<option value='" + value.name + "'>" + value.name + "</option>");
 					})
 					return res.productList
+					
+					
 				},
 				error:function(err){
 					alert(err.responseText)
-					window.location.href="/service"
 				}
 			},
 			"pagingType": 'full_numbers',
@@ -553,17 +609,29 @@
 					"id": chk_value,
 					"reselling_switch": 1
 				},
-				success:function(res){
+				success:function(res){			
+					if(res.status == 0){
+						$('.error_mask').fadeIn(1000);
+						setTimeout(function(){
+							$('.error_mask').fadeOut(1000);
+						},2000)
+					}else if(res.status == 1){
+						$('.success_mask').fadeIn(1000);
+						setTimeout(function(){
+							$('.success_mask').fadeOut(1000);
+						},2000)	
+					}
 					editTableObj.ajax.reload();
-					setTimeout(function(){
-						$('#selectAll').removeAttr('checked');
-						$('.start_btn').hide();
-						$('.close_btn').hide();
-					},3000)	
+					$('#selectAll').removeAttr('checked');
+					$('.start_btn').hide();
+					$('.close_btn').hide();
 					
 				},
 				error:function(err){
-					alert('Failed to update.')
+					$('.error_mask').fadeIn(1000);
+					setTimeout(function(){
+						$('.error_mask').fadeOut(1000);
+					},2000)
 				},
 			});
 		})
@@ -585,16 +653,27 @@
 					"reselling_switch": 0
 				},
 				success:function(res){
+					if(res.status == 0){
+						$('.error_mask').fadeIn(1000);
+						setTimeout(function(){
+							$('.error_mask').fadeOut(1000);
+						},2000)
+					}else if(res.status == 1){
+						$('.success_mask').fadeIn(1000);
+						setTimeout(function(){
+							$('.success_mask').fadeOut(1000);
+						},2000)	
+					}
 					editTableObj.ajax.reload();
-					setTimeout(function(){
-						$('#selectAll').removeAttr('checked');
-						$('.start_btn').hide();
-						$('.close_btn').hide();
-					},3000)	
-					
+					$('#selectAll').removeAttr('checked');
+					$('.start_btn').hide();
+					$('.close_btn').hide();			
 				},
 				error:function(err){
-					alert('Failed to update.')
+					$('.error_mask').fadeIn(1000);
+					setTimeout(function(){
+						$('.error_mask').fadeOut(1000);
+					},2000)
 				},
 			});
 		})

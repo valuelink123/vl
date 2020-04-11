@@ -120,20 +120,33 @@
                             </select>
                         </div>
                         <br>
+						<div class="input-group">
+                            <span class="input-group-addon">Account</span>
+                            <select  style="width:100%;height:35px;" id="seller_id" name="seller_id">
+                                <option value="">Select</option>
+                                @foreach(getSellerAccount() as $key=>$val)
+                                    <option value="{!! $key !!}">{!! $val !!}</option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
+					<div class="col-md-2 pull-right" style="margin-top:20px;">
+						<div class="input-group">
+							@permission('rsgproducts-export')
+							<div class="btn-group pull-right">
+							<button id="export" class="btn sbold blue"> Export
+								<i class="fa fa-download"></i>
+							</button>
+							</div>
+							@endpermission
+							<div class="btn-group pull-right" style="margin-right:20px;">
+								<button id="search" class="btn sbold blue">Search</button>
+							</div>
+						</div>
+					</div>
 
-                    <div class="btn-group">
-                        <button id="search" class="btn sbold blue">Search</button>
-                    </div>
 
-
-                    @permission('rsgproducts-export')
-                    <div class="btn-group">
-                    <button id="export" class="btn sbold blue"> Export
-                        <i class="fa fa-download"></i>
-                    </button>
-                    </div>
-                    @endpermission
+                    
                 </div>
             </div>
 
@@ -153,6 +166,7 @@
                         <th>Product</th>
                         <th>Site</th>
                         <th>Asin</th>
+						<th>Account</th>
                         <th>Type</th>
                         <th>Status</th>
                         <th>Item No</th>
@@ -212,7 +226,7 @@
                 pagingType: 'bootstrap_extended',
                 processing: true,
                 // ordering:  true,
-                aoColumnDefs: [ { "bSortable": false, "aTargets": [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,20] }],
+                aoColumnDefs: [ { "bSortable": false, "aTargets": [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,21] }],
                 order: [],
                 // select: {
                 //     style: 'os',
@@ -232,6 +246,7 @@
                     {data: 'product', name: 'product'},
                     {data: 'site', name: 'site'},
                     {data: 'asin', name: 'asin'},
+					{data: 'seller_id', name: 'seller_id'},
                     {data:'type',name:'type'},
                     {data:'status',name:'status'},
                     {data: 'item_no', name: 'item_no'},

@@ -43,10 +43,24 @@ class ExceptionController extends Controller
     public function index($type = '')
     {
 		if(!Auth::user()->can(['exception-show'])) die('Permission denied -- exception-show');
-        return view('exception/index',['users'=>$this->getUsers(),'groups'=>$this->getGroups(),'mygroups'=>$this->getUserGroup(),'sellerids'=>$this->getAccounts(),'teams'=> getUsers('sap_bgbu'),'sap_sellers'=>getUsers('sap_seller')]);
+        $fromService = '';
+        $currentUserId = '';
+        $linkIndex = '';
 
+        return view('exception/index',['users'=>$this->getUsers(),'groups'=>$this->getGroups(),'mygroups'=>$this->getUserGroup(),'sellerids'=>$this->getAccounts(),'teams'=> getUsers('sap_bgbu'),'sap_sellers'=>getUsers('sap_seller'), 'fromService'=>$fromService, 'currentUserId'=>$currentUserId, 'linkIndex'=>$linkIndex]);
     }
-	
+
+    public function fromService(Request $request)
+    {
+        if(!Auth::user()->can(['exception-show'])) die('Permission denied -- exception-show');
+        $type = '';
+        $fromService = isset($_REQUEST['fromService']) ? $_REQUEST['fromService'] : '';
+        $currentUserId = Auth::user()->id;
+        $linkIndex = isset($_REQUEST['linkIndex']) ? $_REQUEST['linkIndex'] : '';
+
+        return view('exception/index',['users'=>$this->getUsers(),'groups'=>$this->getGroups(),'mygroups'=>$this->getUserGroup(),'sellerids'=>$this->getAccounts(),'teams'=> getUsers('sap_bgbu'),'sap_sellers'=>getUsers('sap_seller'), 'fromService'=>$fromService, 'currentUserId'=>$currentUserId, 'linkIndex'=>$linkIndex]);
+    }
+
 	public function export(Request $request){
 		if(!Auth::user()->can(['exception-export'])) die('Permission denied -- exception-export');
 		//if(Auth::user()->admin){
@@ -70,16 +84,24 @@ class ExceptionController extends Controller
 		if(array_get($_REQUEST,'type')){
             $customers = $customers->where('type', array_get($_REQUEST,'type'));
         }
-        if(isset($_REQUEST['status']) && $_REQUEST['status']!=''){
-			if($_REQUEST['status']=='auto_failed'){
-				$customers = $customers->where('auto_create_mcf', 1)->where('auto_create_mcf_result', -1)->where('process_status', 'auto done');
-			}elseif($_REQUEST['status']=='sap_failed'){
-				$customers = $customers->where('auto_create_sap_result', -1)->whereIn('process_status', array('auto done','done'));
-			}else{
-				$customers = $customers->where('process_status', $_REQUEST['status']);
-			}
-            
+        if(isset($_REQUEST['status'])){
+            if($_REQUEST['status']==''){
+                //如果是从service页面的R&R Done超链接过来的
+                if(array_get($_REQUEST,'linkIndex') == 2){
+                    $customers = $customers->whereIn('process_status', array('auto done','done'));
+                }
+            }
+            else{
+                if($_REQUEST['status']=='auto_failed'){
+                    $customers = $customers->where('auto_create_mcf', 1)->where('auto_create_mcf_result', -1)->where('process_status', 'auto done');
+                }elseif($_REQUEST['status']=='sap_failed'){
+                    $customers = $customers->where('auto_create_sap_result', -1)->whereIn('process_status', array('auto done','done'));
+                }else{
+                    $customers = $customers->where('process_status', $_REQUEST['status']);
+                }
+            }
         }
+
         //if(Auth::user()->admin) {
 		
 			if (array_get($_REQUEST, 'group_id')) {
@@ -753,15 +775,22 @@ class ExceptionController extends Controller
 		if(array_get($_REQUEST,'type')){
             $customers = $customers->where('type', array_get($_REQUEST,'type'));
         }
-        if(isset($_REQUEST['status']) && $_REQUEST['status']!=''){
-			if($_REQUEST['status']=='auto_failed'){
-				$customers = $customers->where('auto_create_mcf', 1)->where('auto_create_mcf_result', -1)->where('process_status', 'auto done');
-			}elseif($_REQUEST['status']=='sap_failed'){
-				$customers = $customers->where('auto_create_sap_result', -1)->whereIn('process_status', array('auto done','done'));
-			}else{
-				$customers = $customers->where('process_status', $_REQUEST['status']);
-			}
-            
+        if(isset($_REQUEST['status'])){
+		    if($_REQUEST['status']==''){
+                //如果是从service页面的R&R Done超链接过来的
+		        if(array_get($_REQUEST,'linkIndex') == 2){
+                    $customers = $customers->whereIn('process_status', array('auto done','done'));
+                }
+            }
+            else{
+                if($_REQUEST['status']=='auto_failed'){
+                    $customers = $customers->where('auto_create_mcf', 1)->where('auto_create_mcf_result', -1)->where('process_status', 'auto done');
+                }elseif($_REQUEST['status']=='sap_failed'){
+                    $customers = $customers->where('auto_create_sap_result', -1)->whereIn('process_status', array('auto done','done'));
+                }else{
+                    $customers = $customers->where('process_status', $_REQUEST['status']);
+                }
+            }
         }
 
         //if(Auth::user()->admin) {
@@ -949,7 +978,6 @@ class ExceptionController extends Controller
             $statusScore = array_get($status_list,$customersList['process_status']).'<br/><br/>'.$customersList['score'];
 
 			$operDate = $this->getOperaDate($customersList['update_status_log']);////得到操作各个状态的时间
-			
             $records["data"][] = array(
                 ((Auth::user()->admin || in_array($customersList['group_id'],array_get($this->getUserGroup(),'manage_groups',array()))))?'<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input name="id[]" type="checkbox" class="checkboxes" value="'.$customersList['id'].'"/><span></span></label>':'',
 
