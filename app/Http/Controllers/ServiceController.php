@@ -48,7 +48,7 @@ class ServiceController extends Controller
 		$user_id = Auth::user()->id;
 		$post_user_ids = array_get($request,'user_id',[]);
 		$users = array_get($group_info,'users',[]);
-		$user_ids = ($post_user_ids)?$post_user_ids:$users;
+		$user_ids = ($post_user_ids)?$post_user_ids:array_keys($users);
 		
 		$hb_date_to = date('Y-m-d',strtotime($date_from)-86400);
 		$hb_date_from = date('Y-m-d',2*strtotime($date_from)-strtotime($date_to)-86400);
