@@ -86,16 +86,23 @@ function getSellerAccount(){
 	return DB::connection('order')->table("accounts")->where('status',1)->groupby(['sellerid','sellername'])->pluck('sellername','sellerid');
 }
 function getUserGroupDetails(){
-	$groups = json_decode(json_encode(DB::table('group_detail')->leftJoin('group',
-					function($q){
-						$q->on('group_detail.group_id', '=', 'group.id');
-					}
-				)->where('user_id',Auth::user()->id)->where('leader',1)->pluck('group_name','group_id')),true);
-	$users = json_decode(json_encode(DB::table('group_detail')->leftJoin('users',
-					function($q){
-						$q->on('group_detail.user_id', '=', 'users.id');
-					}
-				)->whereIn('group_id',array_keys($groups))->where('locked',0)->pluck('users.name','users.id')),true);
+	$groups=$users =[];
+	$datas = DB::table('group_detail')->leftJoin('group',
+				function($q){
+					$q->on('group_detail.group_id', '=', 'group.id');
+				}
+			)->where('user_id',Auth::user()->id)->where('leader',1)->pluck('group_name','group_id');
+	foreach($datas as $k=>$v){
+		$group_users = json_decode(json_encode(DB::table('group_detail')->leftJoin('users',
+			function($q){
+				$q->on('group_detail.user_id', '=', 'users.id');
+			}
+		)->where('group_id',$k)->where('locked',0)->pluck('users.name','users.id')),true);
+		$groups[$k]['group_name'] = $v;
+		$groups[$k]['users'] = $group_users;
+		$users+=$group_users;
+	}
+	
 	return ['groups'=>$groups,'users'=>$users];
 }
 function getAsinSites(){
