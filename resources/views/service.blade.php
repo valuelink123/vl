@@ -124,6 +124,9 @@ a.editable-click:hover {
 	top: 4px;
 	bottom: 4px;z-index:9;
 }
+.dropdown-menu{font-size:12px;}
+.dropdown-menu > li > a {
+    padding: 5px;}
 </style>
 <link href="/assets/global/plugins/bootstrap-editable/bootstrap-editable/css/bootstrap-editable.css" rel="stylesheet" type="text/css" />
 
@@ -195,7 +198,7 @@ a.editable-click:hover {
 						</div>
 						<div class="status">
 							<div class="status-title {{$class}}"> {{($hb_ap!=0)?$sign.round(($ap-$hb_ap)/$hb_ap*100,2):'0'}}%</div>
-							<div class="status-number">Yesterday:{{$hb_ap}}</div>
+							<div class="status-number">{{$hb_ap}}</div>
 						</div>
 					</div>
 				</div>
@@ -235,7 +238,7 @@ a.editable-click:hover {
 						</div>
 						<div class="status">
 							<div class="status-title {{$class}}"> {{($hb_ap!=0)?$sign.round(($ap-$hb_ap)/$hb_ap*100,2):'0'}}%</div>
-							<div class="status-number">Yesterday:{{$hb_ap}}</div>
+							<div class="status-number">{{$hb_ap}}</div>
 						</div>
 					</div>
 				</div>
@@ -273,7 +276,7 @@ a.editable-click:hover {
 						</div>
 						<div class="status">
 							<div class="status-title {{$class}}"> {{($hb_ap!=0)?$sign.round(($ap-$hb_ap)/$hb_ap*100,2):'0'}}% </div>
-							<div class="status-number">Yesterday:{{$hb_ap}}</div>
+							<div class="status-number">{{$hb_ap}}</div>
 						</div>
 					</div>
 				</div>
@@ -316,7 +319,7 @@ a.editable-click:hover {
 							 {{($hb_ap!=0)?$sign.round(($ap-$hb_ap)/$hb_ap*100,2):'0'}}%
 
 							</div>
-							<div class="status-number">Yesterday:{{$hb_ap}}</div>
+							<div class="status-number">{{$hb_ap}}</div>
 						</div>
 					</div>
 				</div>
@@ -355,12 +358,16 @@ a.editable-click:hover {
 
 
 					<div class="form-group col-md-5">
-					<select class="mt-multiselect btn btn-default form-control form-filter input-sm " data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" name="user_id" id="user_id">
-							<option value="">All CS</option>
-							@foreach ($users as $id=>$user_name)
-								<option value="{{$id}}" <?php if($user_id==$id) echo 'selected'; ?>>{{$user_name}}</option>
-							@endforeach
-						</select>
+					<select name="user_id[]" id="user_id[]" class="mt-multiselect btn btn-default" multiple="multiple" data-clickable-groups="true" data-collapse-groups="true" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" data-select-all="true">
+						@foreach ($groups as $key => $group)
+							 <optgroup label="{{$group['group_name']}}">
+									@foreach (array_get($group,'users',[]) as $u_id=>$u_name)
+									<option value="{{$u_id}}" {{ in_array($u_id,array_values($post_user_ids))?'selected':''}}>{{$u_name}}</option>
+									@endforeach
+							 </optgroup>
+						@endforeach
+					</select>
+				
 
 					</div>
 
