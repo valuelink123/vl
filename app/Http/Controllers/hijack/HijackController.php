@@ -200,8 +200,20 @@ class HijackController extends Controller
         $admin = array("charlie@valuelinkcorp.com", "zouyuanxun@valuelinkcorp.com", "zanhaifang@valuelinkcorp.com", "huzaoli@valuelinkcorp.com", 'fanlinxi@valuelinkcorp.com');
         $userasinL = [];
         $sapSellerIdList = [];
+//        $user = ['id' => '367',
+//            'name' => 'test',
+//            'email' => 'test@qq.com',
+//            'created_at' => '2020-03-27 14:58:11',
+//            'updated_at' => '2020-03-27 14:58:11',
+//            'admin' => 0,
+//            'sap_seller_id' => 279,
+//            'seller_rules' => 'BG3-BU3-* ',
+//            'locked' => 0,
+//            'ubg' => 'BG3',
+//            'ubu' => 'BU3',
+//        ];
         //!empty(Auth::user()->toArray())  //todo
-        if (!empty(Auth::user()->toArray())) {
+        if (!empty(Auth::user()->toArray()) ) {
             $user = Auth::user()->toArray(); //todo  打开
             if (!empty($user['email']) && in_array($user['email'], $admin)) {
                 //特殊权限着
@@ -671,7 +683,6 @@ class HijackController extends Controller
                 })->toArray();
 
             if ($result > 0) {
-                echo '更新成功';
                 if ($toup == 1) {
                     //防止添加重复数据，所以先删除后增加
                     DB::connection('vlz')->table('tbl_reselling_asin')->whereIn('product_id', $arr_id)->delete();//删除1条
@@ -689,13 +700,14 @@ class HijackController extends Controller
                     //防止添加重复数据，所以先删除后增加
                     DB::connection('vlz')->table('tbl_reselling_asin')->whereIn('product_id', $arr_id)->delete();//删除1条
                 }
-
+                $r_message=['status'=>1,'msg'=>'更新成功'];
             } else {
-                echo '更新失败';
+                $r_message=['status'=>0,'msg'=>'更新失败'];
             }
         } else {
-            echo '缺少参数';
+            $r_message=['status'=>0,'msg'=>'缺少参数'];
         }
+        return $r_message;
         exit;
     }
 
