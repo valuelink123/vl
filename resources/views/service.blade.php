@@ -396,13 +396,17 @@ a.editable-click:hover {
 				<i class=" icon-social-twitter font-dark hide"></i>
 				<span class="caption-subject font-dark bold uppercase pull-left">MY TASKS</span>
 				<div class="tongji red pull-left">
-					<span>inbox（{{$statis['inbox']}}）</span>
-					<span>Time out（{{$statis['timeout']}}）</span>
-					<span>R&R Done（{{$statis['done']}}）</span>
-					<span>R&R Canceled（{{$statis['calcel']}}）</span>
+					<a class="hyperlink" aIndex="0" href="{{url('/inbox/fromService')}}"><span>inbox（{{$statis['inbox']}}）</span></a>
+					<a class="hyperlink" aIndex="1" href="{{url('/inbox/fromService')}}"><span>Time out（{{$statis['timeout']}}）</span></a>
+					<a class="hyperlink" aIndex="2" href="{{url('/exception/fromService')}}"><span>R&R Done（{{$statis['done']}}）</span></a>
+					<a class="hyperlink" aIndex="3" href="{{url('/exception/fromService')}}"><span>R&R Canceled（{{$statis['calcel']}}）</span></a>
 				</div>
+				<form id="serviceHyperLink" action="" method="post" target="_blank">
+					{{ csrf_field() }}
+					<input type="hidden" name="linkIndex" id="linkIndex" value="0">
+					<input type="hidden" name="fromService" value="yes" />
+				</form>
 			</div>
-			
 					<div class="pull-right">
 						<a href="{{url('task')}}">View More&gt;&gt;</a>
 					</div>
@@ -447,7 +451,6 @@ a.editable-click:hover {
 			</div>
 		</div>
 	</div>
-	<input type="hidden" value="" id="aaa"  />
 </div>
 
 <script src="/assets/global/plugins/moment.min.js" type="text/javascript"></script>
@@ -456,6 +459,17 @@ a.editable-click:hover {
 <script src="/assets/pages/scripts/form-editable.min.js" type="text/javascript"></script>
 
 <script type="text/javascript">
+
+$(function(){
+	$(".hyperlink").click(function(){
+		var href = $(this).attr("href");
+		var aIndex = $(this).attr("aIndex");
+		$('#linkIndex').val(aIndex);
+		$('#serviceHyperLink').attr("action", href).submit();
+		return false;
+	});
+})
+
 
 $('#searchBtn').click(function(){
 	//当搜索类型为QA时，$("#searchType").val()的值为5，页面跳转到知识中心，回退网页到service页面，这时Order ID处于active状态，但此时$("#searchType").val()的值仍为5. 所以不能用var searchType = $("#searchType").val()

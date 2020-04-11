@@ -82,6 +82,7 @@ th,td,td>span {
                         </div>
 						<?php } ?>
                         <table class="table table-striped table-bordered table-hover table-checkable" id="datatable_ajax">
+                            <input type="hidden" id='linkIndex' value="{{$linkIndex}}" />
                             <thead>
                             <tr role="row" class="heading">
                                 <th width="2%">
@@ -154,7 +155,7 @@ th,td,td>span {
                                     <select name="status" class="form-control form-filter input-sm">
                                         <option value="">Select...</option>
                                         <option value="submit">Pending</option>
-                                        <option value="cancel">Cancelled</option>
+                                        <option value="cancel" @if($linkIndex==3) selected @endif>Cancelled</option>
                                         <option value="done">Done</option>
                                         <option value="confirmed">Confirmed</option>
                                         <option value="auto done">Auto Done</option>
@@ -194,10 +195,10 @@ th,td,td>span {
                                     </select>
 
                                     <div class="usergrouptot">
-                                        <input type="hidden" class="form-filter"  id="from-userid" name="user_id" value="">
+                                        <input type="hidden" class="form-filter"  id="from-userid" name="user_id" value="{{$currentUserId}}">
                                         <select class="mt-multiselect btn btn-default select-user-id" multiple="multiple" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" name="user_id[]" id="user_id[]" value="">
                                             @foreach ($users as $user_id=>$user)
-                                                <option value="{{$user_id}}">{{$user}}</option>
+                                                <option value="{{$user_id}}" @if($currentUserId==$user_id) selected @endif>{{$user}}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -274,11 +275,11 @@ th,td,td>span {
                 onError: function (grid) {
                     // execute some code on network or other general error
                 },
+                //onDataLoad每次表格数据加载完后都执行（1. 表格初始化后 2. 重新设置搜索条件，点击search按钮后 3. 列表分页时，切换页面）
                 onDataLoad: function(grid) {
                     // execute some code on ajax data load
-                    //alert('123');
-                    //alert($("#subject").val());
-                    //grid.setAjaxParam("subject", $("#subject").val());
+                    //如果将linkIndex的值清空，从service链接过来的列表有多页时，切换页面就不能正确显示每页内容以及总记录数
+                    //grid.setAjaxParam("linkIndex", '');
                 },
                 loadingMessage: 'Loading...',
                 dataTable: { // here you can define a typical datatable settings from http://datatables.net/usage/options
@@ -342,6 +343,8 @@ th,td,td>span {
             });
 
             //grid.setAjaxParam("customActionType", "group_action");
+            //linkIndex 从service页面的超链接带过来。
+            grid.setAjaxParam("linkIndex", $("#linkIndex").val());
             grid.setAjaxParam("sellerid", $("input[name='sellerid']").val());
             grid.setAjaxParam("amazon_order_id", $("input[name='amazon_order_id']").val());
             grid.setAjaxParam("date_from", $("input[name='date_from']").val());
