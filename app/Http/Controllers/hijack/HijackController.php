@@ -248,6 +248,8 @@ class HijackController extends Controller
                         $userasinL[] = $uslv['asin'];
                     }
                 }
+            }else{
+                return 'No matching records found';
             }
         }
         //查询所有 asin 信息
@@ -1283,6 +1285,8 @@ class HijackController extends Controller
                 foreach ($taskDetail as $k => $v) {
                     $taskDetail[$k]['timecount'] = $reselling_count_list[$v['sellerid']];
                     $taskDetail[$k]['price'] = $v['price'] / 100;
+                    $taskDetail[$k]['shipping_fee'] = $v['shipping_fee'] / 100;
+
                 }
             }
         }
