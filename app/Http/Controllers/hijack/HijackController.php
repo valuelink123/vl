@@ -319,6 +319,7 @@ class HijackController extends Controller
             foreach ($productList as $key => $value) {
                 $asinList[] = $value['asin'];
                 $productList[$key]['domin_sx'] = $DOMIN_MARKETPLACEID_SX[$value['marketplaceid']];
+                $productList[$key]['toUrl'] = $DOMIN_MARKETPLACEID_RUL[$value['marketplaceid']];
                 $productList[$key]['reselling_time'] = $value['reselling_time'] ? date('Y/m/d H:i:s', $value['reselling_time']) : '';
             }
         }
