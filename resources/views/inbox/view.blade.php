@@ -988,7 +988,7 @@
                                     <span class="input-group-addon">
                                         <i class="fa fa-bookmark"></i>
                                     </span>
-                                        <input type="text" class="form-control" name="item_group" id="item_group" value="{{$email['item_no']}}" >
+                                        <input type="text" class="form-control" name="item_group" id="item_group" value="{{$email['item_group']}}" >
                                     </div>
                                 </div>
 
