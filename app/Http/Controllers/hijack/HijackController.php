@@ -200,8 +200,9 @@ class HijackController extends Controller
         $admin = array("charlie@valuelinkcorp.com", "zouyuanxun@valuelinkcorp.com", "zanhaifang@valuelinkcorp.com", "huzaoli@valuelinkcorp.com", 'fanlinxi@valuelinkcorp.com');
         $userasinL = [];
         $sapSellerIdList = [];
+        //!empty(Auth::user()->toArray())  //todo
         if (!empty(Auth::user()->toArray())) {
-            $user = Auth::user()->toArray();
+            $user = Auth::user()->toArray(); //todo  打开
             if (!empty($user['email']) && in_array($user['email'], $admin)) {
                 //特殊权限着
             } else if ($user['ubu'] != '' || $user['ubg'] != '' || $user['seller_rules'] != '') {
@@ -232,7 +233,8 @@ class HijackController extends Controller
                     }
                 }
             } else {
-                return 'No matching records found';
+                $err_message = ['status' => '-1', 'message' => 'No matching records found'];
+                return $err_message;
             }
 
             if (!empty($sapSellerIdList)) {
@@ -248,8 +250,9 @@ class HijackController extends Controller
                         $userasinL[] = $uslv['asin'];
                     }
                 }
-            }else{
-                return 'No matching records found';
+            } else {
+                $err_message = ['status' => '-1', 'message' => 'No matching records found'];
+                return $err_message;
             }
         }
         //查询所有 asin 信息
@@ -310,7 +313,7 @@ class HijackController extends Controller
         $sap_asin_match_sku = DB::connection('vlz')->table('sap_asin_match_sku')
             ->select('sap_seller_id', 'asin', 'sap_seller_bg', 'sap_seller_bu', 'id', 'status', 'updated_at', 'sku_status', 'sku')
             ->whereIn('asin', $asinList)
-         //   ->whereIn('sap_seller_id',$sapSellerIdList)
+            //   ->whereIn('sap_seller_id',$sapSellerIdList)
             ->groupBy('asin')
             ->get()->map(function ($value) {
                 return (array)$value;
@@ -660,7 +663,6 @@ class HijackController extends Controller
             $result = DB::connection('vlz')->table('asins')
                 ->whereIn('id', $arr_id)
                 ->update(['reselling_switch' => $toup]);
-
             $asinOne = DB::connection('vlz')->table('asins')
                 ->select('id', 'asin', 'marketplaceid', 'listed_at')
                 ->whereIn('id', $arr_id)
