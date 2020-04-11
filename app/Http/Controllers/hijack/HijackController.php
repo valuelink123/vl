@@ -202,7 +202,7 @@ class HijackController extends Controller
         $sapSellerIdList = [];
 //        $user = ['id' => '367',
 //            'name' => 'test',
-//            'email' => 'test@qq.com',
+//            'email' => 'zanhaifang@valuelinkcorp.com',
 //            'created_at' => '2020-03-27 14:58:11',
 //            'updated_at' => '2020-03-27 14:58:11',
 //            'admin' => 0,
@@ -212,11 +212,13 @@ class HijackController extends Controller
 //            'ubg' => 'BG3',
 //            'ubu' => 'BU3',
 //        ];
-        //!empty(Auth::user()->toArray())  //todo
+        $bool_admin=0;//是否是管理员
+        //!empty(Auth::user()->toArray())
         if (!empty(Auth::user()->toArray()) ) {
             $user = Auth::user()->toArray(); //todo  打开
             if (!empty($user['email']) && in_array($user['email'], $admin)) {
                 //特殊权限着
+                $bool_admin=1;
             } else if ($user['ubu'] != '' || $user['ubg'] != '' || $user['seller_rules'] != '') {
                 //判断是否是销售 及 对应领导角色
                 $allUsers = DB::table('users')->select('id', 'sap_seller_id', 'ubg', 'ubu')
@@ -262,7 +264,7 @@ class HijackController extends Controller
                         $userasinL[] = $uslv['asin'];
                     }
                 }
-            } else {
+            } else if($bool_admin==0){
                 $err_message = ['status' => '-1', 'message' => 'No matching records found'];
                 return $err_message;
             }
