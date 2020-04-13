@@ -223,7 +223,7 @@ class PhoneController extends Controller
         $rule->linkage5 = $request->get('linkage5');
 		$rule->asin = $request->get('asin');
 		$rule->item_no = $request->get('item_no');
-		$rule->epoint = $request->get('epoint');
+		//$rule->epoint = $request->get('epoint');
         $rule->date = date('Y-m-d H:i:s');
 		if($request->get('rebindordersellerid')){
 			$account_email = $this->getSellerIdsEmail();
@@ -289,7 +289,7 @@ class PhoneController extends Controller
         $rule->linkage5 = $request->get('linkage5');
         $rule->asin = $request->get('asin');
 		$rule->item_no = $request->get('item_no');
-		$rule->epoint = $request->get('epoint');
+		//$rule->epoint = $request->get('epoint');
 		if($request->get('rebindordersellerid')){
 			$account_email = $this->getSellerIdsEmail();
 			$rule->seller_id = $request->get('rebindordersellerid');

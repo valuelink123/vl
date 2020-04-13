@@ -233,15 +233,15 @@
                         {{--</div>--}}
                     {{--</div>--}}
 
-                    <div class="form-group">
-                        <label>Problem Point</label>
-                        <div class="input-group ">
-                            <span class="input-group-addon">
-                                <i class="fa fa-bookmark"></i>
-                            </span>
-                            <input type="text" class="form-control" name="epoint" id="epoint" >
-                        </div>
-                    </div>
+                    {{--<div class="form-group">--}}
+                        {{--<label>Problem Point</label>--}}
+                        {{--<div class="input-group ">--}}
+                            {{--<span class="input-group-addon">--}}
+                                {{--<i class="fa fa-bookmark"></i>--}}
+                            {{--</span>--}}
+                            {{--<input type="text" class="form-control" name="epoint" id="epoint" >--}}
+                        {{--</div>--}}
+                    {{--</div>--}}
 
                     <div class="form-group">
                         <label>Question Type</label>
