@@ -213,7 +213,6 @@ class HijackController extends Controller
 //            'ubu' => 'BU3',
 //        ];
         $bool_admin = 0;//是否是管理员
-        //!empty(Auth::user()->toArray())
         if (!empty(Auth::user()->toArray())) {
             $user = Auth::user()->toArray(); //todo  打开
             if (!empty($user['email']) && in_array($user['email'], $admin)) {
@@ -337,7 +336,6 @@ class HijackController extends Controller
         $sap_seller_id_list = [];
         if (!empty($sap_asin_match_sku)) {
             foreach ($sap_asin_match_sku as $k => $v) {
-                $sap_seller_id_list[$v['sap_seller_id']][$k]['asin'] = $v['asin'];
                 foreach ($productList as $pk => $pv) {
                     if ($pv['asin'] == $v['asin'] && $pv['marketplaceid'] == $v['marketplace_id']) {
                         $productList[$pk]['sap_seller_id'] = $v['sap_seller_id'];
@@ -349,7 +347,6 @@ class HijackController extends Controller
                     }
                 }
             }
-
         }
         $userList = DB::table('users')->select('id', 'name', 'email', 'sap_seller_id')
             ->whereIn('sap_seller_id', $sapSellerIdList)
@@ -358,30 +355,10 @@ class HijackController extends Controller
             })->toArray();
         if (!empty($userList)) {
             $userIdList = [];
-            foreach ($userList as $uk => $uv) {
-                $userIdList[] = $uv['id'];
-                foreach ($sap_seller_id_list as $sk => $sv) {
-                    if ($uv['sap_seller_id'] == $sk) {
-                        foreach ($sv as $s_sk => $s_sv) {
-                            $userList[$uk]['asin'] = $s_sv['asin'];
-                            $userList[$uk]['BG'] = $s_sv['BG'];
-                            $userList[$uk]['BU'] = $s_sv['BU'];
-                            $userList[$uk]['sku'] = $s_sv['sku'];
-                            $userList[$uk]['sku_status'] = $s_sv['sku_status'];
-                            $userList[$uk]['sap_updated_at'] = $s_sv['sap_updated_at'];
-                        }
-                    }
-                }
-            }
+            $productListNew=[];
             foreach ($productList as $pk => $pv) {
-                $productList[$pk]['userName'] = '';
-                $productList[$pk]['email'] = '';
-                $productList[$pk]['BG'] = '';
-                $productList[$pk]['BU'] = '';
-                $productList[$pk]['sku'] = '';
-                $productList[$pk]['sku_status'] = '';
-                $productList[$pk]['sap_updated_at'] = '';
                 foreach ($userList as $ulk => $ulv) {
+                    $userIdList[] = $ulv['id'];
                     if (!empty($pv['sap_seller_id'])) {
                         if ($pv['sap_seller_id'] == $ulv['id']) {
                             $productList[$pk]['userName'] = $ulv['name'];
@@ -390,11 +367,16 @@ class HijackController extends Controller
                     }
                 }
             }
+            foreach ($productList as $pk => $pv) {
+                if (!empty($pv['sap_seller_id'])) {
+                    if (in_array($pv['sap_seller_id'], $userIdList)) {
+                        $productListNew[] = $pv;
+                    }
+                }
+            }
         }
-
         $returnDate['userList'] = $userList;
-        $returnDate['productList'] = $productList;
-        //   echo count($userList).'---'.count($productList);exit;
+        $returnDate['productList'] = $productListNew;
         return $returnDate;
     }
 
