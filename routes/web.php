@@ -207,3 +207,7 @@ Route::post('/hijack/hijackExport', 'hijack\\HijackController@hijackExport');//�
 //跟卖追踪 END
 
 
+
+//RSG
+Route::get('/marketingPlan/index', 'MarketingPlanController@index')->name('marketingPlan');
+
