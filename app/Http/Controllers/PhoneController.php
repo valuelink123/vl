@@ -215,10 +215,15 @@ class PhoneController extends Controller
         $rule->buyer_email = $request->get('buyer_email');
         $rule->sku = $request->get('sku');
 		$rule->remark = $request->get('remark');
-		$rule->etype = $request->get('etype');
+		//$rule->etype = $request->get('etype');
+        $rule->linkage1 = $request->get('linkage1');
+        $rule->linkage2 = $request->get('linkage2');
+        $rule->linkage3 = $request->get('linkage3');
+        $rule->linkage4 = $request->get('linkage4');
+        $rule->linkage5 = $request->get('linkage5');
 		$rule->asin = $request->get('asin');
 		$rule->item_no = $request->get('item_no');
-		$rule->epoint = $request->get('epoint');
+		//$rule->epoint = $request->get('epoint');
         $rule->date = date('Y-m-d H:i:s');
 		if($request->get('rebindordersellerid')){
 			$account_email = $this->getSellerIdsEmail();
@@ -276,10 +281,15 @@ class PhoneController extends Controller
         $rule->buyer_email = $request->get('buyer_email');
         $rule->sku = $request->get('sku');
 		$rule->remark = $request->get('remark');
-		$rule->etype = $request->get('etype');
-		$rule->asin = $request->get('asin');
+		//$rule->etype = $request->get('etype');
+        $rule->linkage1 = $request->get('linkage1');
+        $rule->linkage2 = $request->get('linkage2');
+        $rule->linkage3 = $request->get('linkage3');
+        $rule->linkage4 = $request->get('linkage4');
+        $rule->linkage5 = $request->get('linkage5');
+        $rule->asin = $request->get('asin');
 		$rule->item_no = $request->get('item_no');
-		$rule->epoint = $request->get('epoint');
+		//$rule->epoint = $request->get('epoint');
 		if($request->get('rebindordersellerid')){
 			$account_email = $this->getSellerIdsEmail();
 			$rule->seller_id = $request->get('rebindordersellerid');
