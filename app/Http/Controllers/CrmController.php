@@ -516,10 +516,11 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
             $emails = json_decode(json_encode($emails), true); // todo
 
             $track_log_array = TrackLog::where('record_id',$id)->where('type',2)->orderBy('created_at','desc')->get()->toArray();
-            $subject_type =  $this->getSubjectType();
+//            $subject_type =  $this->getSubjectType();
 
 		}
-		return view('crm/show',['orderArr'=>$orderArr, 'contactInfo'=> $contactInfo, 'emails' => $emails,'users'=>$users,'track_log_array'=>$track_log_array,'subject_type'=>$subject_type, 'record_id'=>$id]);
+//		return view('crm/show',['orderArr'=>$orderArr, 'contactInfo'=> $contactInfo, 'emails' => $emails,'users'=>$users,'track_log_array'=>$track_log_array,'subject_type'=>$subject_type, 'record_id'=>$id]);
+		return view('crm/show',['orderArr'=>$orderArr, 'contactInfo'=> $contactInfo, 'emails' => $emails,'users'=>$users,'track_log_array'=>$track_log_array,'record_id'=>$id]);
 	}
 
     public function getRsgRequestList(){
@@ -543,14 +544,27 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
     public function getTrackLog(){
 
         $record_id = $_POST['record_id'];
-        $sql = 'select id,channel,email,subject_type,note,created_at,processor from track_log where record_id='.$record_id.' and type=2 order by created_at desc';
+        $sql = 'select id,channel,email,linkage1,linkage2,linkage3,linkage4,linkage5,note,created_at,processor from track_log where record_id='.$record_id.' and type=2 order by created_at desc';
         $data = DB::select($sql);
         $data = array_map('get_object_vars', $data);
-        $subject_type =  $this->getSubjectType();
-
+//        $subject_type =  $this->getSubjectType();
+        $categoryIdNamePairs = $this->getCategoryIdNamePairs();
         foreach($data as $key=>$val) {
             $data[$key]['channel'] = array_get(getTrackLogChannel(),array_get($val,'channel'));
-            $data[$key]['subject_type'] = array_get($subject_type,array_get($val,'subject_type'));
+//            $data[$key]['subject_type'] = array_get($subject_type,array_get($val,'subject_type'));
+
+            for($a=1; $a<=5; $a++){
+                $linkageName = 'linkage'.strval($a);
+                $categoryId = array_get($val,$linkageName);
+                if($categoryId != null && array_get($categoryIdNamePairs,$categoryId) != null){
+                    $data[$key][$linkageName] = array_get($categoryIdNamePairs,$categoryId);
+                }
+                else{
+                    $data[$key][$linkageName] = '---';
+                }
+            }
+
+
             $data[$key]['processor'] = array_get($this->getUsers(),array_get($val,'processor'));
 
             $note_complete = array_get($val,'note');
@@ -768,7 +782,7 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
         if(!Auth::user()->can(['crm-update'])) die('Permission denied -- crm-add');
 
         $record_id = $req->input('id');
-        $subject_type =  $this->getSubjectType();
+//        $subject_type =  $this->getSubjectType();
         $users = $this->getUsers();
 
         $emails = DB::select('select email from client_info where client_id='.$record_id.' order by email desc');
@@ -778,12 +792,18 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
             $email = $emails[0]['email'];
         }
 
-        return view('crm/trackLogAdd', compact(['record_id', 'subject_type','users', 'email']));
+//        return view('crm/trackLogAdd', compact(['record_id', 'subject_type','users', 'email']));
+        return view('crm/trackLogAdd', compact(['record_id', 'users', 'email']));
     }
 
-    public function getSubjectType(){
-        return Category::where('category_pid',28)->orderBy('created_at','desc')->pluck('category_name','id');
+//    public function getSubjectType(){
+//        return Category::where('category_pid',28)->orderBy('created_at','desc')->pluck('category_name','id');
+//    }
+
+    public function getCategoryIdNamePairs(){
+        return Category::pluck('category_name','id');
     }
+
 
     public function trackLogStore(Request $request)
     {
@@ -793,7 +813,8 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
             'note' => 'required|string',
         ]);
 
-        $data = array('type'=>2,'record_id'=>$request->get('record_id'),'channel'=>$request->get('channel'),'email'=>$request->get('email'),'subject_type'=>$request->get('subject_type'),'note'=>$request->get('note'));
+//        $data = array('type'=>2,'record_id'=>$request->get('record_id'),'channel'=>$request->get('channel'),'email'=>$request->get('email'),'subject_type'=>$request->get('subject_type'),'note'=>$request->get('note'));
+        $data = array('type'=>2,'record_id'=>$request->get('record_id'),'channel'=>$request->get('channel'),'email'=>$request->get('email'),'linkage1'=>$request->get('linkage1'),'linkage2'=>$request->get('linkage2'),'linkage3'=>$request->get('linkage3'),'linkage4'=>$request->get('linkage4'),'linkage5'=>$request->get('linkage5'),'note'=>$request->get('note'));
 
         $track_log = new TrackLog();
         $track_log->add($data);
