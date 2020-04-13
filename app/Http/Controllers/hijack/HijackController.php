@@ -1022,7 +1022,7 @@ class HijackController extends Controller
         $DOMIN_MARKETPLACEID_SX = Asin::DOMIN_MARKETPLACEID_SX;
         //查询跟卖数据 根据开始时间 结束时间
         $startTime = isset($request['startTime']) ? $request['startTime'] : 0;
-        $endTime = isset($request['endTime']) ? $request['endTime'] : 0;
+        $endTime = isset($request['endTime']) ? $request['endTime']+3600*24 : 0;
         //根据ID 查询asins 信息
         if ($request['id']) {
             $asins = DB::connection('vlz')->table('asins')
@@ -1035,7 +1035,7 @@ class HijackController extends Controller
             if (!empty($asins)) {
                 $as = $asins[0];
                 $asin = $asins[0]['asin'];
-                $asinId = $asins[0]['id'];
+                $marketplaceid = $asins[0]['marketplaceid'];
                 $sku = '';
                 $sku_status = '';
                 $domainUrl = $DOMIN_MARKETPLACEID[isset($as['marketplaceid']) ? $as['marketplaceid'] : ''];
@@ -1043,6 +1043,7 @@ class HijackController extends Controller
                 $sap_asin_match_sku = DB::connection('vlz')->table('sap_asin_match_sku')
                     ->select('sap_seller_id', 'asin', 'sap_seller_bg', 'sap_seller_bu', 'id', 'status', 'updated_at', 'sku_status', 'sku')
                     ->where('asin', $asin)
+                    ->where('marketplace_id',$marketplaceid)
                     ->groupBy('asin')
                     ->get()->map(function ($value) {
                         return (array)$value;
@@ -1073,7 +1074,6 @@ class HijackController extends Controller
                     }
                 }
 
-
                 if (!empty($domainUrl) && !empty($asin)) {
                     $asins[0]['domin_sx'] = $DOMIN_MARKETPLACEID_SX[isset($asins[0]['marketplaceid']) ? $asins[0]['marketplaceid'] : ''];
                     $resellingList = DB::connection('vlz')->table('tbl_reselling_asin')
@@ -1099,6 +1099,7 @@ class HijackController extends Controller
                                     ->where('reselling_time', '>=', $startTime)
                                     ->where('reselling_time', '<=', $endTime)
                                     ->orderBy('reselling_time', 'desc')
+                                    ->limit(720)
                                     ->get()->map(function ($value) {
                                         return (array)$value;
                                     })->toArray();
@@ -1109,6 +1110,7 @@ class HijackController extends Controller
                                     ->select('id', 'reselling_num', 'reselling_time', 'created_at')
                                     ->whereIn('reselling_asin_id', array_unique($reselling_asin_id_l))
                                     ->orderBy('reselling_time', 'desc')
+                                    ->limit(720)
                                     ->get()->map(function ($value) {
                                         return (array)$value;
                                     })->toArray();
@@ -1134,49 +1136,6 @@ class HijackController extends Controller
         }
 
     }
-
-    /**
-     * 跟卖detail
-     */
-    public function resellingDetail_old(Request $request)
-    {
-        $taskId = $request['taskId'];
-        $taskIdList = [];
-        $uptime = 0;
-        $timecount = 0;
-        $taskDetail = [];
-        if ($taskId > 0) {
-            $taskDetail = DB::connection('vlz')->table('tbl_reselling_detail')
-                ->select('id', 'price', 'task_id', 'shipping_fee', 'account', 'white', 'sellerid', 'created_at', 'reselling_remark')
-                ->where('task_id', $taskId)
-                ->where('white', 0)
-                ->get()->map(function ($value) {
-                    return (array)$value;
-                })->toArray();
-            //查询每个task 时间
-            $taskList = DB::connection('vlz')->table('tbl_reselling_task')
-                ->select('id', 'reselling_num', 'reselling_time')
-                ->groupBy('reselling_asin_id')
-                ->orderBy('reselling_time', 'desc')
-                ->get()->map(function ($value) {
-                    return (array)$value;
-                })->toArray();
-            if (!empty($taskList)) {
-                foreach ($taskList as $tk => $tv) {
-
-                }
-            }
-            if (!empty($taskDetail)) {
-                foreach ($taskDetail as $k => $v) {
-                    $taskDetail[$k]['timecount'] = $timecount;
-                    $taskDetail[$k]['price'] = $v['price'] / 100;
-                }
-            }
-        }
-        return $taskDetail;
-
-    }
-
     public function resellingDetail(Request $request)
     {
         $taskId = $request['taskId'];
