@@ -81,8 +81,10 @@
 								<td>{{$v->sku}}</td>
 								<td>{{$v->asin}}</td>
 								<td>{{$v->item_no}}</td>
-								<td>{{$v->etype}}</td>
-								<td>{{$v->epoint}}</td>
+								{{--<td>{{$v->etype}}</td>--}}
+								{{--<td>{{$v->epoint}}</td>--}}
+								<td>{{$v->linkage1}}</td>
+								<td>{{$v->linkage2}}</td>
 								<td>{{$v->remark}}</td>
 								<td>{{array_get($users,$v->user_id,'Not Set')}}</td>
                             </tr>
