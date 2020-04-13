@@ -778,9 +778,9 @@ class HijackController extends Controller
         $idList = isset($request['idList']) ? $request['idList'] : '';
         if (!empty($request['startTime'] && !empty($request['endTime']))) {
 
-            //查询跟卖数据 根据开始时间 结束时间
+            //查询跟卖数据 根据开始时间 结束时间默认增加1天
             $startTime = $request['startTime'];
-            $endTime = $request['endTime'];
+            $endTime = $request['endTime']+3600*24;
             $resellingidList = [];
             $r_asin_id_l = [];//对应asinid 数组
             $productIdList = [];
@@ -797,7 +797,6 @@ class HijackController extends Controller
             foreach ($taskList as $tlk => $tlv) {
                 $r_asin_id_l[] = $tlv['reselling_asin_id'];
             }
-
             $resellingList = DB::connection('vlz')->table('tbl_reselling_asin')
                 ->select('id', 'asin', 'product_id')
                 ->whereIn('id', array_unique($r_asin_id_l))
@@ -834,8 +833,6 @@ class HijackController extends Controller
             'Shipping,' .
             'Date,' .
             'Duration' . "\r\n" . "\r\n";
-        //查询用户列表
-        $users = User::select('name', 'email')->where('locked', '=', '0')->get()->toArray();
         //查询所有 asin 信息
         if ($idList == '' || empty($idList)) {
             $idList = array_unique($productIdList);
@@ -859,7 +856,7 @@ class HijackController extends Controller
                 $asinIdList[] = $value['id'];
             }
         }
-
+// todo 这里修改
 
         //中间对应关系数据
         $sap_asin_match_sku = DB::connection('vlz')->table('sap_asin_match_sku')
@@ -871,57 +868,39 @@ class HijackController extends Controller
         $sap_seller_id_list = [];
         if (!empty($sap_asin_match_sku)) {
             foreach ($sap_asin_match_sku as $k => $v) {
-                if (!in_array($v['sap_seller_id'], $sap_seller_id_list)) {
-                    $sap_seller_id_list[$v['sap_seller_id']]['asin'] = $v['asin'];
-                    $sap_seller_id_list[$v['sap_seller_id']]['BG'] = $v['sap_seller_bg'];
-                    $sap_seller_id_list[$v['sap_seller_id']]['BU'] = $v['sap_seller_bu'];
-                    $sap_seller_id_list[$v['sap_seller_id']]['sku'] = $v['sku'];
-                    $sap_seller_id_list[$v['sap_seller_id']]['sap_updated_at'] = $v['updated_at'];
-                    $sap_seller_id_list[$v['sap_seller_id']]['sku_status'] = $v['sku_status'];
-
+                $sap_seller_id_list[]=$v['sap_seller_id'];
+                foreach ($productList as $pk => $pv) {
+                    //&& $pv['marketplaceid'] == $v['marketplace_id']  //todo 不清楚是否需要
+                    if ($pv['asin'] == $v['asin'] ) {
+                        $productList[$pk]['sap_seller_id'] = $v['sap_seller_id'];
+                        $productList[$pk]['BG'] = $v['sap_seller_bg'];
+                        $productList[$pk]['BU'] = $v['sap_seller_bu'];
+                        $productList[$pk]['sku'] = $v['sku'];
+                        $productList[$pk]['sap_updated_at'] = $v['updated_at'];
+                        $productList[$pk]['sku_status'] = $v['sku_status'];
+                    }
                 }
             }
         }
-        $userList = DB::table('users')->select('id', 'name', 'email', 'sap_seller_id')->whereIn('sap_seller_id', array_keys($sap_seller_id_list))->get()->map(function ($value) {
+        $userList = DB::table('users')->select('id', 'name', 'email', 'sap_seller_id')
+            ->whereIn('sap_seller_id', $sap_seller_id_list)->get()->map(function ($value) {
             return (array)$value;
         })->toArray();
         if (!empty($userList)) {
-            foreach ($userList as $uk => $uv) {
-                foreach ($sap_seller_id_list as $sk => $sv) {
-                    if ($uv['sap_seller_id'] == $sk) {
-                        $userList[$uk]['asin'] = $sv['asin'];
-                        $userList[$uk]['BG'] = $sv['BG'];
-                        $userList[$uk]['BU'] = $sv['BU'];
-                        $userList[$uk]['sku'] = $sv['sku'];
-                        $userList[$uk]['sku_status'] = $sv['sku_status'];
-                        $userList[$uk]['sap_updated_at'] = $sv['sap_updated_at'];
+            foreach ($productList as $pk => $pv) {
+                foreach ($userList as $ulk => $ulv) {
+                    if (!empty($pv['sap_seller_id'])) {
+                        if ($pv['sap_seller_id'] == $ulv['sap_seller_id']) {
+                            $productList[$pk]['userName'] = $ulv['name'];
+                            $productList[$pk]['email'] = $ulv['email'];
+                        }
                     }
                 }
+            }
 
-            }
         }
-        //  $userList2 = User::whereIn('sap_seller_id', $sap_seller_id_list)->groupBy(['email'])->get()->toArray();
         foreach ($productList as $pk => $pv) {
-            foreach ($userList as $ulk => $ulv) {
-                if ($pv['asin'] == $ulv['asin']) {
-                    $productList[$pk]['userName'] = $ulv['name'];
-                    $productList[$pk]['email'] = $ulv['email'];
-                    $productList[$pk]['BG'] = $ulv['BG'];
-                    $productList[$pk]['BU'] = $ulv['BU'];
-                    $productList[$pk]['sku'] = $ulv['sku'];
-                    $productList[$pk]['sku_status'] = $ulv['sku_status'];
-                    $productList[$pk]['sap_updated_at'] = $ulv['sap_updated_at'];
-                } else {
-                    $productList[$pk]['userName'] = '';
-                    $productList[$pk]['email'] = '';
-                    $productList[$pk]['BG'] = '';
-                    $productList[$pk]['BU'] = '';
-                    $productList[$pk]['sku'] = '';
-                    $productList[$pk]['sku_status'] = '';
-                    $productList[$pk]['sap_updated_at'] = '';
-                }
-            }
-            foreach ($resellingList as $resk => $resv) {
+               foreach ($resellingList as $resk => $resv) {
                 if ($pv['id'] == $resv['product_id']) {
                     $productList[$pk]['reselling_num'] = $resv['reselling_num'];
                     $productList[$pk]['reselling_time'] = $resv['reselling_time'];
@@ -931,7 +910,7 @@ class HijackController extends Controller
                 }
             }
         }
-        /** 查询跟卖信息*/
+        /** 查询跟卖信息 */
         if (!empty($resellingList) && !empty($resellingidList)) {
             $taskIdList = [];
             $taskList = DB::connection('vlz')->table('tbl_reselling_task')
@@ -980,11 +959,17 @@ class HijackController extends Controller
                         }
                         foreach ($taskList as $taK => $tav) {
                             if ($tv['task_id'] == $tav['id']) {
-                                $taskDetail[$tk]['product_id'] = $tav['reselling_asin_id'];
+                                $taskDetail[$tk]['reselling_asin_id'] = $tav['reselling_asin_id'];
                             }
                         }
                     }
-
+                    foreach ($taskDetail as $tdkey => $tdval) {
+                        foreach ($resellingList as $rlk => $rlv){
+                            if($tdval['reselling_asin_id']==$rlv['id']){
+                                $taskDetail[$tdkey]['product_id']=$rlv['product_id'];
+                            }
+                        }
+                    }
                     foreach ($taskDetail as $tdkey => $tdval) {
                         foreach ($productList as $pkey => $pval) {
                             if ($tdval['product_id'] == $pval['id']) {
@@ -996,7 +981,6 @@ class HijackController extends Controller
                             }
                         }
                     }
-
                     if (!empty($taskDetail)) {
                         foreach ($taskDetail as $key => $dv) {
                             if (!empty($dv['asin'])) {
