@@ -216,8 +216,21 @@ class HijackController extends Controller
         if (!empty(Auth::user()->toArray())) {
             $user = Auth::user()->toArray(); //todo  打开
             if (!empty($user['email']) && in_array($user['email'], $admin)) {
-                //特殊权限着
+                /**  特殊权限着 查询所有用户 */
                 $bool_admin = 1;
+                $allUsers = DB::table('users')->select('id', 'name', 'email', 'sap_seller_id', 'seller_rules', 'ubg', 'ubu')
+                    ->where('ubu','!=',"")
+                    ->orwhere('ubg','!=',"")
+                    ->orwhere('seller_rules','!=',"")
+                    ->get()->map(function ($value) {
+                        return (array)$value;
+                    })->toArray();
+                if (!empty($allUsers)) {
+                    foreach ($allUsers as $auk => $auv) {
+                        $sapSellerIdList[] = $auv['sap_seller_id'];
+                    }
+                }
+
             } else if ($user['ubu'] != '' || $user['ubg'] != '' || $user['seller_rules'] != '') {
                 //判断是否是销售 及 对应领导角色
                 $allUsers = DB::table('users')->select('id', 'sap_seller_id', 'ubg', 'ubu')
@@ -293,16 +306,6 @@ class HijackController extends Controller
             FROM(asins AS a LEFT JOIN tbl_reselling_asin AS rl_asin ON a.id = rl_asin.product_id)
             LEFT JOIN tbl_reselling_task AS rl_task ON rl_asin.id = rl_task.reselling_asin_id
             where a.title !="" ';
-        // sa.sap_seller_id,
-        //            sa.sap_seller_bg as BG,
-        //            sa.sap_seller_bu as BU,
-        //            sa.id AS sap_asin_id,
-        //            sa. STATUS,
-        //            sa.updated_at as sap_updated_at,
-        //            sa.sku_status,
-        //            sa.sku
-        // LEFT JOIN sap_asin_match_sku AS sa ON sa.asin = a.asin
-        $sql_seller = '';//' AND sa.sap_seller_id in (' . $sap_seller_id . ')';
 
         $sql_g = ' GROUP BY a.asin  ORDER BY a.reselling_switch DESC , rl_task.reselling_num DESC';
         /**  判断对应用户 以及对应管理人员 所有下属ID */
@@ -327,17 +330,17 @@ class HijackController extends Controller
         //中间对应关系数据
         $sap_asin_match_sku = DB::connection('vlz')->table('sap_asin_match_sku')
             ->select('marketplace_id', 'sap_seller_id', 'asin', 'sap_seller_bg', 'sap_seller_bu', 'id', 'status', 'updated_at', 'sku_status', 'sku')
-            ->whereIn('asin', $asinList)
-            //   ->whereIn('sap_seller_id',$sapSellerIdList)
+           // ->whereIn('asin', $asinList)
+            ->whereIn('sap_seller_id',$sapSellerIdList)
             ->groupBy('asin')
             ->get()->map(function ($value) {
                 return (array)$value;
             })->toArray();
-        $sap_seller_id_list = [];
         if (!empty($sap_asin_match_sku)) {
             foreach ($sap_asin_match_sku as $k => $v) {
                 foreach ($productList as $pk => $pv) {
-                    if ($pv['asin'] == $v['asin'] && $pv['marketplaceid'] == $v['marketplace_id']) {
+                    //&& $pv['marketplaceid'] == $v['marketplace_id']  //todo 不清楚是否需要
+                    if ($pv['asin'] == $v['asin'] ) {
                         $productList[$pk]['sap_seller_id'] = $v['sap_seller_id'];
                         $productList[$pk]['BG'] = $v['sap_seller_bg'];
                         $productList[$pk]['BU'] = $v['sap_seller_bu'];
@@ -348,35 +351,27 @@ class HijackController extends Controller
                 }
             }
         }
+
         $userList = DB::table('users')->select('id', 'name', 'email', 'sap_seller_id')
             ->whereIn('sap_seller_id', $sapSellerIdList)
             ->get()->map(function ($value) {
                 return (array)$value;
             })->toArray();
         if (!empty($userList)) {
-            $userIdList = [];
-            $productListNew=[];
             foreach ($productList as $pk => $pv) {
                 foreach ($userList as $ulk => $ulv) {
-                    $userIdList[] = $ulv['id'];
                     if (!empty($pv['sap_seller_id'])) {
-                        if ($pv['sap_seller_id'] == $ulv['id']) {
+                        if ($pv['sap_seller_id'] == $ulv['sap_seller_id']) {
                             $productList[$pk]['userName'] = $ulv['name'];
                             $productList[$pk]['email'] = $ulv['email'];
                         }
                     }
                 }
             }
-            foreach ($productList as $pk => $pv) {
-                if (!empty($pv['sap_seller_id'])) {
-                    if (in_array($pv['sap_seller_id'], $userIdList)) {
-                        $productListNew[] = $pv;
-                    }
-                }
-            }
+
         }
         $returnDate['userList'] = $userList;
-        $returnDate['productList'] = $productListNew;
+        $returnDate['productList'] = $productList;
         return $returnDate;
     }
 
