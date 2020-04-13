@@ -929,6 +929,7 @@ class HijackController extends Controller
                 $taskDetail = DB::connection('vlz')->table('tbl_reselling_detail')
                     ->select('id', 'task_id', 'price', 'shipping_fee', 'account', 'white', 'sellerid', 'created_at', 'reselling_remark')
                     ->whereIn('task_id', array_unique($taskIdList))
+                    ->where('white', 0)//增加白名单
                     ->get()->map(function ($value) {
                         return (array)$value;
                     })->toArray();
