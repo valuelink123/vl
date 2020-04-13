@@ -5,7 +5,12 @@
         {{--<th>Type</th>--}}
         <th>Channel</th>
         <th>Email</th>
-        <th>Subject Type</th>
+        {{--<th>Subject Type</th>--}}
+        <th>Linkage1</th>
+        <th>Linkage2</th>
+        <th>Linkage3</th>
+        <th>Linkage4</th>
+        <th>Linkage5</th>
         <th>Note</th>
         {{--<th>Processor</th>--}}
         <th>Created At</th>
@@ -45,7 +50,12 @@
                 {data: 'id', name: 'id'},
                 {data: 'channel', name: 'channel'},
                 {data: 'email', name: 'email'},
-                {data: 'subject_type', name: 'subject_type'},
+//                {data: 'subject_type', name: 'subject_type'},
+                {data: 'linkage1', name: 'linkage1'},
+                {data: 'linkage2', name: 'linkage2'},
+                {data: 'linkage3', name: 'linkage3'},
+                {data: 'linkage4', name: 'linkage4'},
+                {data: 'linkage5', name: 'linkage5'},
                 {data: 'note', name: 'note'},
                 {data: 'created_at', name: 'created_at'},
                 {data: 'processor', name: 'processor'}
