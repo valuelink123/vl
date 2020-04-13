@@ -508,7 +508,7 @@
 						if(row.images != null){
 							str = row.images;
 							dot = str.split(',');
-							dot.length > 1 ? img = 'https://images-na.ssl-images-amazon.com/images/I/' + dot[1] : img = ''
+							dot.length > 1 ? img = 'https://images-na.ssl-images-amazon.com/images/I/' + dot[0] : img = ''
 						}
 						return '<a target="_blank" href="detail?id='+row.id+'"><div class="product_main"><div class="product_img"><img src="'+img+'" alt=""></div><div class="product_text"><p class="product_title" title="'+row.title+'">'+row.title+'</p><div class="product_span"><span class="country_img">'+row.domin_sx+'</span><span>'+row.asin+'</span> / <span>'+row.sku+'</span></div></div></div></a>';
 					},

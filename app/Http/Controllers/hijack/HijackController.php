@@ -212,13 +212,13 @@ class HijackController extends Controller
 //            'ubg' => 'BG3',
 //            'ubu' => 'BU3',
 //        ];
-        $bool_admin=0;//是否是管理员
+        $bool_admin = 0;//是否是管理员
         //!empty(Auth::user()->toArray())
-        if (!empty(Auth::user()->toArray()) ) {
+        if (!empty(Auth::user()->toArray())) {
             $user = Auth::user()->toArray(); //todo  打开
             if (!empty($user['email']) && in_array($user['email'], $admin)) {
                 //特殊权限着
-                $bool_admin=1;
+                $bool_admin = 1;
             } else if ($user['ubu'] != '' || $user['ubg'] != '' || $user['seller_rules'] != '') {
                 //判断是否是销售 及 对应领导角色
                 $allUsers = DB::table('users')->select('id', 'sap_seller_id', 'ubg', 'ubu')
@@ -250,10 +250,9 @@ class HijackController extends Controller
                 $err_message = ['status' => '-1', 'message' => 'No matching records found'];
                 return $err_message;
             }
-
             if (!empty($sapSellerIdList)) {
                 $user_asin_list = DB::connection('vlz')->table('sap_asin_match_sku')
-                    ->select('asin')
+                    ->select('asin', 'marketplace_id')
                     ->whereIn('sap_seller_id', $sapSellerIdList)
                     ->groupBy('asin')
                     ->get()->map(function ($value) {
@@ -261,10 +260,13 @@ class HijackController extends Controller
                     })->toArray();
                 if (!empty($user_asin_list)) {
                     foreach ($user_asin_list as $uslk => $uslv) {
-                        $userasinL[] = $uslv['asin'];
+                        if (strlen($uslv['asin']) > 8) {
+                            $userasinL[] = $uslv['asin'];
+                            $marketplaceid[] = $uslv['marketplace_id'];
+                        }
                     }
                 }
-            } else if($bool_admin==0){
+            } else if ($bool_admin == 0) {
                 $err_message = ['status' => '-1', 'message' => 'No matching records found'];
                 return $err_message;
             }
@@ -278,7 +280,6 @@ class HijackController extends Controller
             a.images,
             a.marketplaceid,
             a.title,
-            a.images,
             a.listed_at,
             a.mpn,
             a.seller_count,
@@ -308,6 +309,7 @@ class HijackController extends Controller
         /**  判断对应用户 以及对应管理人员 所有下属ID */
         if (!empty($userasinL)) {
             $sql_as = 'AND a.asin in ("' . implode($userasinL, '","') . '")';
+            $sql_marketplaceid = ' AND a.marketplaceid in ("' . implode($marketplaceid, '","') . '")';
             $sql = $sql_s . $sql_as . $sql_g;
         } else {
             $sql = $sql_s . $sql_g;
@@ -323,10 +325,9 @@ class HijackController extends Controller
                 $productList[$key]['reselling_time'] = $value['reselling_time'] ? date('Y/m/d H:i:s', $value['reselling_time']) : '';
             }
         }
-
         //中间对应关系数据
         $sap_asin_match_sku = DB::connection('vlz')->table('sap_asin_match_sku')
-            ->select('sap_seller_id', 'asin', 'sap_seller_bg', 'sap_seller_bu', 'id', 'status', 'updated_at', 'sku_status', 'sku')
+            ->select('marketplace_id', 'sap_seller_id', 'asin', 'sap_seller_bg', 'sap_seller_bu', 'id', 'status', 'updated_at', 'sku_status', 'sku')
             ->whereIn('asin', $asinList)
             //   ->whereIn('sap_seller_id',$sapSellerIdList)
             ->groupBy('asin')
@@ -336,31 +337,39 @@ class HijackController extends Controller
         $sap_seller_id_list = [];
         if (!empty($sap_asin_match_sku)) {
             foreach ($sap_asin_match_sku as $k => $v) {
-                if (!in_array($v['sap_seller_id'], $sap_seller_id_list)) {
-                    $sap_seller_id_list[$v['sap_seller_id']]['asin'] = $v['asin'];
-                    $sap_seller_id_list[$v['sap_seller_id']]['BG'] = $v['sap_seller_bg'];
-                    $sap_seller_id_list[$v['sap_seller_id']]['BU'] = $v['sap_seller_bu'];
-                    $sap_seller_id_list[$v['sap_seller_id']]['sku'] = $v['sku'];
-                    $sap_seller_id_list[$v['sap_seller_id']]['sap_updated_at'] = $v['updated_at'];
-                    $sap_seller_id_list[$v['sap_seller_id']]['sku_status'] = $v['sku_status'];
+                $sap_seller_id_list[$v['sap_seller_id']][$k]['asin'] = $v['asin'];
+                foreach ($productList as $pk => $pv) {
+                    if ($pv['asin'] == $v['asin'] && $pv['marketplaceid'] == $v['marketplace_id']) {
+                        $productList[$pk]['sap_seller_id'] = $v['sap_seller_id'];
+                        $productList[$pk]['BG'] = $v['sap_seller_bg'];
+                        $productList[$pk]['BU'] = $v['sap_seller_bu'];
+                        $productList[$pk]['sku'] = $v['sku'];
+                        $productList[$pk]['sap_updated_at'] = $v['updated_at'];
+                        $productList[$pk]['sku_status'] = $v['sku_status'];
+                    }
                 }
             }
+
         }
         $userList = DB::table('users')->select('id', 'name', 'email', 'sap_seller_id')
-            ->whereIn('sap_seller_id', array_keys($sap_seller_id_list))
+            ->whereIn('sap_seller_id', $sapSellerIdList)
             ->get()->map(function ($value) {
                 return (array)$value;
             })->toArray();
         if (!empty($userList)) {
+            $userIdList = [];
             foreach ($userList as $uk => $uv) {
+                $userIdList[] = $uv['id'];
                 foreach ($sap_seller_id_list as $sk => $sv) {
                     if ($uv['sap_seller_id'] == $sk) {
-                        $userList[$uk]['asin'] = $sv['asin'];
-                        $userList[$uk]['BG'] = $sv['BG'];
-                        $userList[$uk]['BU'] = $sv['BU'];
-                        $userList[$uk]['sku'] = $sv['sku'];
-                        $userList[$uk]['sku_status'] = $sv['sku_status'];
-                        $userList[$uk]['sap_updated_at'] = $sv['sap_updated_at'];
+                        foreach ($sv as $s_sk => $s_sv) {
+                            $userList[$uk]['asin'] = $s_sv['asin'];
+                            $userList[$uk]['BG'] = $s_sv['BG'];
+                            $userList[$uk]['BU'] = $s_sv['BU'];
+                            $userList[$uk]['sku'] = $s_sv['sku'];
+                            $userList[$uk]['sku_status'] = $s_sv['sku_status'];
+                            $userList[$uk]['sap_updated_at'] = $s_sv['sap_updated_at'];
+                        }
                     }
                 }
             }
@@ -373,18 +382,16 @@ class HijackController extends Controller
                 $productList[$pk]['sku_status'] = '';
                 $productList[$pk]['sap_updated_at'] = '';
                 foreach ($userList as $ulk => $ulv) {
-                    if ($pv['asin'] == $ulv['asin']) {
-                        $productList[$pk]['userName'] = $ulv['name'];
-                        $productList[$pk]['email'] = $ulv['email'];
-                        $productList[$pk]['BG'] = $ulv['BG'];
-                        $productList[$pk]['BU'] = $ulv['BU'];
-                        $productList[$pk]['sku'] = $ulv['sku'];
-                        $productList[$pk]['sku_status'] = $ulv['sku_status'];
-                        $productList[$pk]['sap_updated_at'] = $ulv['sap_updated_at'];
+                    if (!empty($pv['sap_seller_id'])) {
+                        if ($pv['sap_seller_id'] == $ulv['id']) {
+                            $productList[$pk]['userName'] = $ulv['name'];
+                            $productList[$pk]['email'] = $ulv['email'];
+                        }
                     }
                 }
             }
         }
+
         $returnDate['userList'] = $userList;
         $returnDate['productList'] = $productList;
         //   echo count($userList).'---'.count($productList);exit;
@@ -463,7 +470,7 @@ class HijackController extends Controller
 
             //中间对应关系数据
             $sap_asin_match_sku = DB::connection('vlz')->table('sap_asin_match_sku')
-                ->select('sap_seller_id', 'asin', 'sap_seller_bg', 'sap_seller_bu', 'id', 'status', 'updated_at', 'sku_status', 'sku')
+                ->select('marketplace_id', 'sap_seller_id', 'asin', 'sap_seller_bg', 'sap_seller_bu', 'id', 'status', 'updated_at', 'sku_status', 'sku')
                 ->whereIn('asin', array_unique($asinList))
                 ->get()->map(function ($value) {
                     return (array)$value;
@@ -481,7 +488,10 @@ class HijackController extends Controller
 
                     }
                 }
+
             }
+            var_dump($productList);
+            exit;
             $userList = DB::table('users')->select('id', 'name', 'email', 'sap_seller_id')->whereIn('sap_seller_id', array_keys($sap_seller_id_list))->get()->map(function ($value) {
                 return (array)$value;
             })->toArray();
@@ -703,12 +713,12 @@ class HijackController extends Controller
                     //防止添加重复数据，所以先删除后增加
                     DB::connection('vlz')->table('tbl_reselling_asin')->whereIn('product_id', $arr_id)->delete();//删除1条
                 }
-                $r_message=['status'=>1,'msg'=>'更新成功'];
+                $r_message = ['status' => 1, 'msg' => '更新成功'];
             } else {
-                $r_message=['status'=>0,'msg'=>'更新失败'];
+                $r_message = ['status' => 0, 'msg' => '更新失败'];
             }
         } else {
-            $r_message=['status'=>0,'msg'=>'缺少参数'];
+            $r_message = ['status' => 0, 'msg' => '缺少参数'];
         }
         return $r_message;
         exit;
@@ -725,7 +735,7 @@ class HijackController extends Controller
         $asinsList = DB::connection('vlz')->table('asins')
             ->select('id')
             ->where('reselling_switch', 0)
-            ->limit(30)
+            ->limit(300)
             ->get()
             ->map(function ($value) {
                 return (array)$value;
@@ -737,7 +747,7 @@ class HijackController extends Controller
         }
 
         $toup = 1;  //TODO 0
-        $arr_id = array_unique($asinsIdList);// explode(',', $_POST['id']); //todo 改回 arr_id
+        $arr_id = array_unique($asinsIdList);
         $result = DB::connection('vlz')->table('asins')
             ->whereIn('id', $arr_id)
             ->update(['reselling_switch' => $toup]);
