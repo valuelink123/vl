@@ -770,6 +770,7 @@ class HijackController extends Controller
     {
         header('Access-Control-Allow-Origin:*');
         $DOMIN_MARKETPLACEID = Asin::DOMIN_MARKETPLACEID;
+        $DOMIN_MARKETPLACEID_URL=Asin::DOMIN_MARKETPLACEID_URL;
         //得到登录用户信息
         // $user = Auth::user()->toArray();
         if ($request) {
@@ -832,7 +833,7 @@ class HijackController extends Controller
             'Price,' .
             'Shipping,' .
             'Date,' .
-            'Duration' . "\r\n" . "\r\n";
+            'Duration(h)' . "\r\n" . "\r\n";
         //查询所有 asin 信息
         if ($idList == '' || empty($idList)) {
             $idList = array_unique($productIdList);
@@ -977,13 +978,15 @@ class HijackController extends Controller
                                 $taskDetail[$tdkey]['asin'] = $pval['asin'];
                                 $taskDetail[$tdkey]['sku'] = $pval['sku'];
                                 $taskDetail[$tdkey]['userName'] = $pval['userName'];
-                                $taskDetail[$tdkey]['marketplaceid'] = $DOMIN_MARKETPLACEID[$pval['marketplaceid']];
+                                $taskDetail[$tdkey]['marketplaceid'] = $DOMIN_MARKETPLACEID_URL[$pval['marketplaceid']];
                             }
                         }
                     }
                     if (!empty($taskDetail)) {
                         foreach ($taskDetail as $key => $dv) {
                             if (!empty($dv['asin'])) {
+                                $price = @$dv['price']>0?$dv['price']/100:0;
+                                $shipping_fee = @$dv['shipping_fee']>0?$dv['shipping_fee']/100:0;
                                 echo '"' . @$dv['asin'] . '",' .
                                     '"' . @$dv['marketplaceid'] . '",' .
                                     '"' . @$dv['sku'] . '",' .
@@ -992,8 +995,8 @@ class HijackController extends Controller
                                     '"' . @$dv['title'] . '",' .
                                     '"' . @$dv['sellerid'] . '",' .
                                     '"' . @$dv['account'] . '",' .
-                                    '"' . @$dv['price'] . '",' .
-                                    '"' . @$dv['shipping_fee'] . '",' .
+                                    '"' . $price. '",' .
+                                    '"' . $shipping_fee . '",' .
                                     '"' . date('Y-m-d H:i', @$dv['created_at']) . '",' .
                                     '"' . @$dv['timecount'] . '"' .
                                     "\r\n";

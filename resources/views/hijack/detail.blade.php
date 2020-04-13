@@ -184,7 +184,7 @@
 							<th class="w6">Seller ID</th>
 							<th class="w6">Price</th>
 							<th class="w8">Delivery</th>
-							<th class="w6">Duration of Hijacking</th>
+							<th class="w6">Duration of Hijacking(h)</th>
 							<th class="w200">Notes</th>
 						</tr>
 					</thead>
@@ -236,7 +236,7 @@
 						if(product.images != null){
 							str = product.images;
 							dot = str.split(',');
-							dot.length > 1 ? img = 'https://images-na.ssl-images-amazon.com/images/I/' + dot[1] : img = ''
+							dot.length > 1 ? img = 'https://images-na.ssl-images-amazon.com/images/I/' + dot[0] : img = ''
 						}
 						$('.product_title').text(product.title);
 						$('.span1').text(product.asin);
