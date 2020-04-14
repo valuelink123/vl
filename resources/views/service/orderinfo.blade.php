@@ -2,7 +2,7 @@
 <script src="/assets/global/plugins/jquery.min.js" type="text/javascript"></script>
 <script src="/assets/global/plugins/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
 
-<div class="row">
+<div>
     <div class="col-md-12">
         <div class="portlet light bordered">
         @if(!empty($order['orderItems']))
@@ -53,7 +53,7 @@
                     </div>
                 </div>
                 <BR><BR>
-                <div class="row invoice-body">
+                <div class="invoice-body">
                     <div class="col-xs-12 table-responsive">
                         <table class="table table-hover">
                             <thead>
@@ -84,7 +84,7 @@
                         </table>
                     </div>
                 </div>
-                <div class="row invoice-subtotal">
+                <div class="invoice-subtotal">
                     <div class="col-xs-6">
                         <h4 class="invoice-title uppercase">Total</h4>
                         <p class="invoice-desc grand-total">{{round($order['Amount'],2)}} {{$order['CurrencyCode']}}</p>

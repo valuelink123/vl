@@ -29,7 +29,7 @@
                                     <hr>
                                 @endforeach
                             @else
-                                <b>not find Contact</b>
+                                <b>Contact not found.</b>
                             @endif
                             <br/>
                         </div>
