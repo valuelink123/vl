@@ -159,94 +159,33 @@ class ServiceController extends Controller
                     return 'No matching customer...';
                 }
                 $id = $ids[0];
-                $sap = new SapRfcRequest();
-                $sql = "select b.name as name,b.email as email,b.phone as phone,b.remark as remark,b.country as country,b.`from` as `from`,c.amazon_order_id as order_id
-			FROM client_info as b
-			left join client_order_info as c on b.id = c.ci_id
-			where b.client_id = $id
-			order by b.id desc ";
 
-                try{
-                    $_data = $this->queryRows($sql);
-                }catch (\Exception $e) {
-                    return 'No matching customer...';
-                }
-
-                if(count($_data) == 0){
-                    return 'No matching customer...';
-                }
-
-                $orderArr = array();
-                $contactInfo = array();
-                $emails = array();
-                foreach ($_data as $key => $val) {
-                    //获取sap订单信息
-                    $orderid = $val['order_id'];
-                    try {
-                        $orderArr[$key] = SapRfcRequest::sapOrderDataTranslate($sap->getOrder(['orderId' => $orderid]));
-                        $orderArr[$key]['SellerName'] = Accounts::where('account_sellerid', $orderArr[$key]['SellerId'])->first()->account_name ?? 'No Match';
-                    } catch (\Exception $e) {
-
-                    }
-                    //联系人基本信息
-                    $contactInfo[$val['email']] = array('name' => $val['name'], 'email' => $val['email'], 'phone' => $val['phone'], 'remark' => $val['remark'], 'country' => $val['country']);
-                    $emails[] = $val['email'];
-                }
-
-                $userRows = DB::table('users')->select('id', 'name')->get();
-
-                $users = array();
-                foreach ($userRows as $row) {
-                    $users[$row->id] = $row->name;
-                }
-                //与联系人的邮箱联系内容
-                $emails = DB::table('sendbox')->whereIn('to_address', $emails)->orderBy('date', 'desc')->get();
-                $emails = json_decode(json_encode($emails), true); // todo
-
-                $track_log_array = TrackLog::where('record_id', $id)->where('type', 2)->orderBy('created_at', 'desc')->get()->toArray();
-                $subject_type = $this->getSubjectType();
-
-                return view('service/customerinfo', ['orderArr' => $orderArr, 'contactInfo' => $contactInfo, 'emails' => $emails, 'users' => $users, 'track_log_array' => $track_log_array, 'subject_type' => $subject_type, 'record_id' => $id]);
-
+                $forwardUrl = "/crm/show?id=".$id;
+                return $this->getScriptForward($forwardUrl);
             }
+
             //Parts List, Inventory
             else if ($searchType == 2 || $searchType == 3){
-                $sql = "
-        SELECT seller_name,any_value(account_status) as account_status FROM kms_stock group by seller_name";
-                $_sellerName = $this->queryRows($sql);
-                $sellerName = array();
-                foreach($_sellerName as $key=>$val){
-                    if($val['seller_name']){
-                        $sellerName[$val['seller_name']]['seller_name'] = $val['seller_name'];
-                        $sellerName[$val['seller_name']]['class'] = '';
-                        if($val['account_status']==1){
-                            $sellerName[$val['seller_name']]['class'] = 'invalid-account';
-                        }
-                    }
-                }
-
-                return view('service.partslist',['sellerName'=>$sellerName, 'searchTerm'=>$searchTerm]);
+                $forwardUrl = "/kms/partslist?search=".$searchTerm;
+                return $this->getScriptForward($forwardUrl);
             }
             //Manual
             else if ($searchType == 4){
-                return view('service/kmsUserManual', ['searchTerm'=>$searchTerm]);
+                $forwardUrl = "/kms/usermanual?search=".$searchTerm;
+                return $this->getScriptForward($forwardUrl);
             }
-            //
+            //QA
             else if ($searchType == 5){
-                //页面跳转到含有搜索内容的Knowledge Center（知识中心）页面。前端已经实现。
-//                $knowledgeUrl = "/question?knowledge_type=&group=ALL&item_group=ALL&keywords=". $searchTerm;
-//                $scriptForward = "<script type='text/javascript'>window.location.href='$knowledgeUrl';</script>";
-//
-//                return $scriptForward;
+                $forwardUrl = "/question?knowledge_type=&group=ALL&item_group=ALL&keywords=". $searchTerm;
+                return $this->getScriptForward($forwardUrl);
             }
 
         }
-
     }
 
-    public function getSubjectType(){
-        return Category::where('category_pid',28)->orderBy('created_at','desc')->pluck('category_name','id');
+    public function getScriptForward($forwardUrl){
+        $scriptForward = "<script type='text/javascript'>window.location.href='$forwardUrl';</script>";
+        return $scriptForward;
     }
-
 
 }
