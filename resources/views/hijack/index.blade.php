@@ -44,7 +44,8 @@
  			color: #666666;
  		}
 		.export_btn{
-			float: right !important;	
+			float: right !important;
+			outline: none;
 		}
  		.form_main {
  			margin-top: 15px;
@@ -69,7 +70,6 @@
  			color: #fff;
  			float: left;
  			margin-right: 10px;
- 			border-radius: 5px;
  		}
  
  		.no-footer {
@@ -453,7 +453,7 @@
 			"ordering": true,
 			"serverSide": false,//是否所有的请求都请求服务器
 			"ajax": {
-				url: "/hijack/index1",
+				url: "http://10.10.42.14/vl/public/hijack/index1",
 				dataSrc:function(res){
 					console.log(res)
 					if(res.status == -1){
@@ -500,7 +500,7 @@
 					}
 				},
 				{
-					data: 'images',
+					data: null,
 					orderable: true,
 					bSortable: true,
 					render: function (data, type, row) {
@@ -510,7 +510,7 @@
 							dot = str.split(',');
 							dot.length > 1 ? img = 'https://images-na.ssl-images-amazon.com/images/I/' + dot[1] : img = ''
 						}
-						return '<a target="_blank" href="detail?id='+row.id+'"><div class="product_main"><div class="product_img"><img src="'+img+'" alt=""></div><div class="product_text"><p class="product_title" title="'+row.title+'">'+row.title+'</p><div class="product_span"><span class="country_img">'+row.domin_sx+'</span><span>'+row.asin+'</span> / <span>'+row.sku+'</span></div></div></div></a>';
+						return '<a target="_blank" href="detail?id='+row.id+'?name='+row.userName+'"><div class="product_main"><div class="product_img"><img src="'+img+'" alt=""></div><div class="product_text"><p class="product_title" title="'+row.title+'">'+row.title+'</p><div class="product_span"><span class="country_img">'+row.domin_sx+'</span><span>'+row.asin+'</span> / <span>'+row.sku+'</span></div></div></div></a>';
 					},
 				},
 				{ 
@@ -680,22 +680,18 @@
 		//导出功能
 		$('.export_btn').click(function(){
 			let checkedBox = $("input[name='checkedInput']:checked");
-			if (checkedBox.length == 0) {
-			    alert("Please choose at least 1 product");
-			    return;
-			} else {
-			    $('.dialogMain').show();
-				let oDate = new Date();
-				let year = oDate.getFullYear();
-				let month = oDate.getMonth()+1; 
-				let day = oDate.getDate();
-				month < 10 ? month = '0'+ month : month = month
-				day < 10 ? day = '0'+ day : day = day
-				let date = year + '-' + month + '-' + day;
-				$('.date1').val(date);
-				$('.date2').val(date)
-			}
+			$('.dialogMain').show();
+			let oDate = new Date();
+			let year = oDate.getFullYear();
+			let month = oDate.getMonth()+1; 
+			let day = oDate.getDate();
+			month < 10 ? month = '0'+ month : month = month
+			day < 10 ? day = '0'+ day : day = day
+			let date = year + '-' + month + '-' + day;
+			$('.date1').val(date);
+			$('.date2').val(date)
 		})
+		
 		//取消导出
 		 $('.handlerCancel').click(function(){
 		 	$('.dialogMain').hide();
@@ -717,60 +713,60 @@
 		
 		//导出
 		$('.handlerExport').click(function(){
-				 let chk_value = '';
-				 $("input[name='checkedInput']:checked").each(function () {
-					 if(chk_value != ''){
-						 chk_value = chk_value + ',' + $(this).val()	
-					 }else{
-						 chk_value = chk_value + $(this).val()
-					 }				 		 			
-				 });
-				 
-				 $.ajax({
-				     url: "/hijack/hijackExport",
-				     method: 'POST',
-				     cache: false,
-				     data: {
-				         startTime: dateStr($('.date1').val()),
-				         endTime: dateStr($('.date2').val()),
-				         idList: chk_value
-				     },
-				 				
-				     success: function (data) {
-						$('.dialogMain').hide();
-				         if(data != ""){
-				            var fileName = "VOP Hijack";
-				             function msieversion() {
-				                 var ua = window.navigator.userAgent;
-				                 var msie = ua.indexOf("MSIE ");
-				                 if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./)) {
-				                     return true;
-				                 } else {
-				                     return false;
-				                 }
-				                 return false;
-				             }
-				 
-				             if (msieversion()) {
-				                 var IEwindow = window.open();
-				                 IEwindow.document.write('sep=,\r\n' + data);
-				                 IEwindow.document.close();
-				                 IEwindow.document.execCommand('SaveAs', true, fileName + ".csv");
-				                 IEwindow.close();
-				             } else {
-				                 var uri = "data:text/csv;charset=utf-8,\ufeff" + data;
-				                 var uri = 'data:application/csv;charset=utf-8,\ufeff' + encodeURI(data);
-				                 var link = document.createElement("a");
-				                 link.href = uri;
-				                 link.style = "visibility:hidden";
-				                 link.download = fileName + ".csv";
-				                 document.body.appendChild(link);
-				                 link.click();
-				                 document.body.removeChild(link);
-				             }
-				         }
-				     }
-				 });
+			 let chk_value = '';
+			 $("input[name='checkedInput']:checked").each(function () {
+				 if(chk_value != ''){
+					 chk_value = chk_value + ',' + $(this).val()	
+				 }else{
+					 chk_value = chk_value + $(this).val()
+				 }				 		 			
+			 });
+			 chk_value == ""? chk_value = -1 : chk_value;
+			 $.ajax({
+				 url: "/hijack/hijackExport",
+				 method: 'POST',
+				 cache: false,
+				 data: {
+					 startTime: dateStr($('.date1').val()),
+					 endTime: dateStr($('.date2').val()),
+					 idList: chk_value
+				 },
+							
+				 success: function (data) {
+					$('.dialogMain').hide();
+					 if(data != ""){
+						var fileName = "VOP Hijack";
+						 function msieversion() {
+							 var ua = window.navigator.userAgent;
+							 var msie = ua.indexOf("MSIE ");
+							 if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./)) {
+								 return true;
+							 } else {
+								 return false;
+							 }
+							 return false;
+						 }
+			 
+						 if (msieversion()) {
+							 var IEwindow = window.open();
+							 IEwindow.document.write('sep=,\r\n' + data);
+							 IEwindow.document.close();
+							 IEwindow.document.execCommand('SaveAs', true, fileName + ".csv");
+							 IEwindow.close();
+						 } else {
+							 var uri = "data:text/csv;charset=utf-8,\ufeff" + data;
+							 var uri = 'data:application/csv;charset=utf-8,\ufeff' + encodeURI(data);
+							 var link = document.createElement("a");
+							 link.href = uri;
+							 link.style = "visibility:hidden";
+							 link.download = fileName + ".csv";
+							 document.body.appendChild(link);
+							 link.click();
+							 document.body.removeChild(link);
+						 }
+					 }
+				 }
+			 });
 				 
 		})
  	})
