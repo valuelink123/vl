@@ -16,6 +16,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use DB;
 class RsgproductsController extends Controller
 {
+
 	use \App\Traits\Mysqli;
 	use \App\Traits\DataTables;
     /**
@@ -207,6 +208,7 @@ class RsgproductsController extends Controller
 
 		$data = $this->queryRows($sql);
 		$data = $this->getReturnData(0,$data,$date,$todayDate,'task');
+
 		if($_POST){
 			$return['status'] = 0;
 			if($data){
@@ -305,6 +307,7 @@ class RsgproductsController extends Controller
 	 * 得到处理后的表格数据
 	 */
 	public function getReturnData($leftskus,$data,$date='',$todayDate='',$action='') {
+
 		$siteShort = getSiteShort();
 		$postStatus = getPostStatus();
 		$postType = getPostType();
