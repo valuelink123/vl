@@ -144,9 +144,9 @@ a.editable-click:hover {
 			</div>
 			<div class="clearfix"></div>
 			<div class="input-group mycustom pull-right">
-				<input type="text" name="searchTerm" id="searchTerm" class="form-control rounded-0" placeholder="Please enter a search term..." />
+				<input type="text" name="searchTerm" id="searchTerm" class="form-control rounded-0" placeholder="Please enter Order ID" />
 				<div class="input-group-prepend">
-					<a data-target="#myModal" data-toggle="modal" id="modalLink" href="/task/create">
+					<a id="modalLink" href="" target="_blank">
 						<input type="button" value="Search" id="searchBtn" class="btn btn-danger btn-sm rounded-0" />
 					</a>
 				</div>
@@ -444,15 +444,6 @@ a.editable-click:hover {
 </div>
 </div>
 
-<div class="modal fade bs-modal-lg" id="myModal" role="basic" aria-hidden="true">
-	<div class="modal-dialog modal-lg">
-		<div class="modal-content" >
-			<div class="modal-body" >
-			</div>
-		</div>
-	</div>
-</div>
-
 <script src="/assets/global/plugins/moment.min.js" type="text/javascript"></script>
 <script src="/assets/global/plugins/jquery.mockjax.js" type="text/javascript"></script>    
 <script src="/assets/global/plugins/bootstrap-editable/bootstrap-editable/js/bootstrap-editable.js" type="text/javascript"></script>
@@ -470,25 +461,15 @@ $(function(){
 	});
 })
 
-
 $('#searchBtn').click(function(){
-	//当搜索类型为QA时，$("#searchType").val()的值为5，页面跳转到知识中心，回退网页到service页面，这时Order ID处于active状态，但此时$("#searchType").val()的值仍为5. 所以不能用var searchType = $("#searchType").val()
-	//var searchType = $("#searchType").val();
+	//当搜索类型为Order ID以外的选项时，$("#searchType").val()的值不为0，如果此浏览器标签页跳转到其它页面，再回退到service页面，这时Order ID处于active状态，但此时$("#searchType").val()的值仍为上一次的值，而不是0. 所以不能用var searchType = $("#searchType").val()来获取searchType的值。
 	var searchType = $('#fast-search .active').attr('type');
 	var searchTerm = $('#searchTerm').val().trim();
-
     if(searchTerm == '') {
         return false;
     }
 	//将搜索内容中的''（空格）全部替换成'+'，否则会出现问题
     var searchTerm = searchTerm.replace(/\s+/g, '+');
-    //当搜索类型为QA时，页面跳转到含有搜索内容的知识中心页面。
-    if(searchType == 5){
-		var knowledgeUrl = "/question?knowledge_type=&group=ALL&item_group=ALL&keywords=" + searchTerm;
-		window.location.href=knowledgeUrl;
-		return false;
-	}
-	$('.modal-content').html('Please wait...');
 	$('#modalLink').attr('href', '/service/fastSearch?searchType='+searchType+'&searchTerm='+searchTerm);
 });
 
@@ -496,7 +477,26 @@ $('#fast-search .search-type').click(function() {
 	$('#fast-search .search-type').removeClass('active');
 	$(this).addClass('active');
 	var value = $(this).attr('type');
-	$('#searchType').val(value);
+    $('#searchType').val(value);
+
+	var placeholder = "Please enter Order ID";
+	if(value == 1) {
+        placeholder = "Please enter Email, Phone number or Paypal account";
+    }
+	else if(value == 2){
+        placeholder = "Please enter Item No., ASIN or Seller SKU of the Part";
+	}
+    else if(value == 3){
+        placeholder = "Please enter Item No., ASIN or Seller SKU of the Product";
+    }
+    else if(value == 4){
+        placeholder = "Please enter Item Group(Description), Brand or Model";
+    }
+    else if(value == 5){
+        placeholder = "Please enter Keywords";
+    }
+	$('#searchTerm').attr('placeholder', placeholder);
+
 });
 
 var FormEditable = function() {
