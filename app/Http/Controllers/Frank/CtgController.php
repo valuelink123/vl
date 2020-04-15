@@ -37,7 +37,8 @@ class CtgController extends Controller {
 		if(!Auth::user()->can(['ctg-show'])) die('Permission denied -- ctg-show');
         if ($req->isMethod('GET')) {
 			
-            $userRows = DB::table('users')->select('id', 'name')->get();
+            //目前在职的，而且sap_seller_id不为0
+            $userRows = DB::table('users')->where('sap_seller_id', '>', 0)->where('locked', '=',0)->select('id', 'name')->get();
             $selchannel = isset($_REQUEST['channel']) ? $_REQUEST['channel'] : '';
 
             foreach ($userRows as $row) {
@@ -502,8 +503,8 @@ class CtgController extends Controller {
             $emails = json_decode(json_encode($emails), true); // todo
 
 
-            $userRows = DB::table('users')->select('id', 'name')->get();
-
+            //目前在职的，而且sap_seller_id不为0
+            $userRows = DB::table('users')->where('sap_seller_id', '>', 0)->where('locked', '=',0)->select('id', 'name')->get();
             foreach ($userRows as $row) {
                 $users[$row->id] = $row->name;
             }
