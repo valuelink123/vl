@@ -4,13 +4,13 @@
 @endsection
 @section('content')
 <style>
-		
+
 		table thead tr th{
 			text-align: center !important;
 		}
 		table.dataTable tbody th,
 		table.dataTable tbody td {
-			padding: 8px 10px;	
+			padding: 8px 10px;
 		}
 		table.dataTable tr{
 			border-bottom: 1px solid #eee;
@@ -24,7 +24,7 @@
 		.dataTables_wrapper .dataTables_paginate .paginate_button{
 			padding: 0.2em .5em;
 		}
-		
+
 		#tabsObj.dataTable tbody tr{
 			cursor: pointer !important;
 		}
@@ -190,21 +190,21 @@
 					</thead>
 				</table>
 			</div>
-				
+
 		</div>
-		
+
 	</div>
-	
+
 	<script>
 		$(document).ready(function () {
 			let tableObj , ids , urlIndex , detailId , listObj,time1,time2;
 			ids = window.location.href
 			urlIndex=ids.lastIndexOf("=");
 			ids=ids.substring(urlIndex+1,ids.length);
-			
+
 			//禁止警告弹窗弹出
 			$.fn.dataTable.ext.errMode = 'none';
-			
+
 			//左边table
 			tableObj = $('#tabsObj').DataTable({
 				"searching": false,  //去掉搜索框
@@ -266,7 +266,7 @@
 					});
 				},
 			});
-			
+
 
 			//右边table
 			listObj = $('#listObj').DataTable({
@@ -302,7 +302,7 @@
 						render: function (data, type, row) {
 							return '<div><span>'+data+'</span><img src="../assets/global/img/editor.png" alt="" style="float:right" class="country_img"></div>';
 						},
-						
+
 						createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
 							$(cell).click(function (e) {
 								$(this).html('<input type="text" size="16" style="width: 100%"/>');
@@ -332,14 +332,14 @@
 									$(cell).html(text);
 									listObj.cell(cell).data(text);
 								}
-								
-								
+
+
 							})
 						}
 					}
 				],
 			});
-			
+
 			//时间选择器
 			function initPickers() {
 			    $('.date-picker').datepicker({
@@ -358,10 +358,10 @@
 				time1 = dateStr($('.date1').val());
 				time2 = dateStr($('.date2').val());
 				tableObj.ajax.reload();
-				
-			})	
-			
-			
+
+			})
+
+
 		})
 	</script>
 
