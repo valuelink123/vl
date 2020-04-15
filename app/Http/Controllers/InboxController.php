@@ -206,7 +206,8 @@ class InboxController extends Controller
             $recentEventsList = $recentEvents[1];
         }
         //RSG Task...
-        $rsgTaskData = $this->getRsgTask('US');
+        $rsgProductsController = new RsgproductsController();
+        $rsgTaskData = $rsgProductsController->getTableData();
 
 		$email_unread_history = Inbox::where('id','<>',$id)->where('reply',0)->where('from_address',$email['from_address'])->where('to_address',$email['to_address'])->take(10)->orderBy('date','desc')->get();
 		
