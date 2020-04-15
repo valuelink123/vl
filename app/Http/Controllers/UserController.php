@@ -41,19 +41,19 @@ class UserController extends Controller
      */
 	 
 	 public function getGroups(){
-        $users = Group::get()->toArray();
-        $users_array = array();
-        foreach($users as $user){
-            $users_array[$user['id']]['group_name'] = $user['group_name'];
-			$users_array[$user['id']]['user_ids'] = explode(",",$user['user_ids']);
+        $groups = Group::get()->toArray();
+        $groups_array = array();
+        foreach($groups as $group){
+            $groups_array[$group['id']]['group_name'] = $group['group_name'];
+            $groups_array[$group['id']]['user_ids'] = explode(",",$group['user_ids']);
         }
-        return $users_array;
+        return $groups_array;
     }
 	
 	public function getUserGroups(){
 		$groups = Groupdetail::where('user_id',Auth::user()->id)->get();
 		$group_arr = array();
-		foreach($groupss as $group){
+		foreach($groups as $group){
 			$group_arr[] = $group->group_id;
 		}
         $users = Group::whereIn('id',$group_arr)->get()->toArray();

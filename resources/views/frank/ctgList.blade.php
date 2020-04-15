@@ -193,9 +193,9 @@ th,td,td>span {
                                 <span class="input-group-addon">Task Assign to</span>
                                 <input class="xform-autotrim form-control" list="list-assignto" id="assignto"/>
                                 <datalist id="list-assignto">
-                                    <% for(let user_id in users) { %>
-                                    <option value="${user_id} | ${users[user_id]}">
-                                        <% } %>
+                                    @foreach($users as $id=>$name)
+                                        <option value="{!! $id !!} | {!! $name !!}">
+                                    @endforeach
                                 </datalist>
                             </div>
                         </div>
