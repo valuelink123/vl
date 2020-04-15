@@ -117,7 +117,7 @@
             var value = $(this).attr('data-value');
             $.ajax({
                 type: 'post',
-                url: '/inbox/getRsgTaskData',
+                url: '/rsgtask',
                 data: {site:value},
                 dataType:'json',
                 success: function(res) {
