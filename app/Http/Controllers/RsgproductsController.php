@@ -316,7 +316,7 @@ class RsgproductsController extends Controller
 		//sku状态信息,任务列表的时候不关联查询skus_status表，因此用此种方法获取sku状态信息，因为关联查询此表速度会慢很多，产品列表是因为要搜索status，所以需要关联查询
 		if (empty($leftskus)){
 			$sapSiteCode = getSapSiteCode();
-			$sku_sql = "select sku,sap_site_id,any_value(status) as sku_status from skus_status group by sku,sap_site_id";
+			$sku_sql = "select sku,sap_site_id,max(status) as sku_status from skus_status group by sku,sap_site_id";
 			$_skuData = $this->queryRows($sku_sql);
 			$skuData = array();
 			foreach($_skuData as $key=>$val){
