@@ -22,13 +22,11 @@ class MarketingPlanController extends Controller
 
     public function index()
     {
-
-        $asinList=[];
+        $asinList = [];
         if (!empty(Auth::user()->toArray())) {
-
-            $user =Auth::user()->toArray(); //当前用户信息
+            $user = Auth::user()->toArray(); //当前用户信息
             $user_asin_list = DB::connection('vlz')->table('sap_asin_match_sku')
-                ->select('asin', 'marketplace_id')
+                ->select('asin', 'marketplace_id','sku_status','sku')
                 ->where('sap_seller_id', $user['sap_seller_id'])
                 ->groupBy('asin')
                 ->get()->map(function ($value) {
@@ -38,14 +36,25 @@ class MarketingPlanController extends Controller
             if (!empty($user_asin_list)) {
                 foreach ($user_asin_list as $k => $v) {
                     if (strlen($v['asin']) > 8) {
-                        $asinList[] = $v['asin'].','.$v['marketplace_id'];
+                        $asinList[] = $v['asin'] . ',' . $v['marketplace_id'].','.$v['sku'].','.$v['sku_status'];
                     }
                 }
-                echo '<pre>';
-                var_dump($asinList);exit;
+
             }
         }
-        return view('marketingPlan.index');
+        echo '<pre>';
+        var_dump(@$asinList);
+        exit;
+        return view('marketingPlan.index', ['asinList' => $asinList]);
+    }
+
+    /**
+     * 获取asin 详情
+     * @param Request $request
+     */
+    public function getAsinDetail(Request $request)
+    {
+
     }
 
     public function detail()
