@@ -4,13 +4,13 @@
 @endsection
 @section('content')
 <style>
-		
+
 		table thead tr th{
 			text-align: center !important;
 		}
 		table.dataTable tbody th,
 		table.dataTable tbody td {
-			padding: 8px 10px;	
+			padding: 8px 10px;
 		}
 		table.dataTable tr{
 			border-bottom: 1px solid #eee;
@@ -24,7 +24,7 @@
 		.dataTables_wrapper .dataTables_paginate .paginate_button{
 			padding: 0.2em .5em;
 		}
-		
+
 		#tabsObj.dataTable tbody tr{
 			cursor: pointer !important;
 		}
@@ -125,7 +125,9 @@
 			<div class="detail_span">
 				<p class="product_title"></p>
 				<p class="product_span">
-					<span class="country" id='country'></span>
+
+					<span class="country" id="country"></span>
+
 					<span class="span1"></span>
 					/
 					<span class="span2"></span>
@@ -182,30 +184,31 @@
 							<th class="w6">Seller ID</th>
 							<th class="w6">Price</th>
 							<th class="w8">Delivery</th>
-							<th class="w6">Duration of Hijacking</th>
+							<th class="w6">Duration of Hijacking(h)</th>
 							<th class="w200">Notes</th>
 							<th>Action</th>
 						</tr>
 					</thead>
 				</table>
 			</div>
-				
+
 		</div>
-		
+
 	</div>
-	
+
 	<script>
 		$(document).ready(function () {
+
 			let tableObj  , urlIndex , detailId , listObj,time1,time2;
 			let url = window.location.href
 			let name = decodeURIComponent(url.substr(url.lastIndexOf('=') + 1));
 			let str = url.substr(url.lastIndexOf('=', url.lastIndexOf('=') - 1) + 1);
 			let ind1 = str.lastIndexOf('?');
 			let ids = str.substring(0,ind1)	;
-			
+
 			//禁止警告弹窗弹出
 			$.fn.dataTable.ext.errMode = 'none';
-			
+
 			//左边table
 			tableObj = $('#tabsObj').DataTable({
 				"searching": false,  //去掉搜索框
@@ -238,7 +241,7 @@
 						if(product.images != null){
 							str = product.images;
 							dot = str.split(',');
-							dot.length > 1 ? img = 'https://images-na.ssl-images-amazon.com/images/I/' + dot[1] : img = ''
+							dot.length > 1 ? img = 'https://images-na.ssl-images-amazon.com/images/I/' + dot[0] : img = ''
 						}
 						$('.product_title').text(product.title);
 						$('.span1').text(product.asin);
@@ -252,8 +255,8 @@
 						$('.times').text(product.asin_reselling_time);
 						$('.number').text(product.asin_reselling_num);
 						$('.status').text(product.sku_status);
-						$('.prople').text(product.user_name); 
-						res[1][0] != undefined ? detailId = res[1][0].id : detailId = ''	
+						$('.prople').text(product.user_name);
+						res[1][0] != undefined ? detailId = res[1][0].id : detailId = ''
 						listObj.ajax.reload()
 						return dataList = res[1];
 					},
@@ -268,7 +271,7 @@
 					});
 				},
 			});
-			
+
 
 			//右边table
 			listObj = $('#listObj').DataTable({
@@ -305,7 +308,7 @@
 						render: function (data, type, row) {
 							return '<div><span>'+data+'</span><img src="../assets/global/img/editor.png" alt="" style="float:right" class="country_img"></div>';
 						},
-						
+
 						createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
 							$(cell).click(function (e) {
 								$(this).html('<input type="text" size="16" style="width: 100%"/>');
@@ -335,8 +338,8 @@
 									$(cell).html(text);
 									listObj.cell(cell).data(text);
 								}
-								
-								
+
+
 							})
 						}
 					},
@@ -351,7 +354,7 @@
 					}
 				],
 			});
-			
+
 			//时间选择器
 			function initPickers() {
 			    $('.date-picker').datepicker({
@@ -370,10 +373,10 @@
 				time1 = dateStr($('.date1').val());
 				time2 = dateStr($('.date2').val());
 				tableObj.ajax.reload();
-				
-			})	
-			
-			
+
+			})
+
+
 		})
 	</script>
 
