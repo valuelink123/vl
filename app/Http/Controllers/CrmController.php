@@ -824,6 +824,7 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
     }
 
     public function getUsers(){
-        return User::pluck('name','id');
+        //目前在职的.不只是销售人员
+        return User::where('locked', '=', 0)->pluck('name','id');
     }
 }
