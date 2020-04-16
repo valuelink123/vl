@@ -224,7 +224,7 @@
 				],
 				"serverSide": false,
 				ajax: {
-					url: "http://10.10.42.14/vl/public/hijack/resellingList",
+					url: "/hijack/resellingList",
 					type: "post",
 					data : function(){
 						reqList = {

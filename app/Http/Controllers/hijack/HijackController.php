@@ -213,8 +213,7 @@ class HijackController extends Controller
 //            'ubu' => 'BU3',
 //        ];
         $bool_admin = 0;//是否是管理员
-        //Auth::user()->toArray()
-        $user = Auth::user()->toArray(); //todo  打开
+        $user =Auth::user()->toArray(); //todo  打开
         if (!empty($user)) {
             if (!empty($user['email']) && in_array($user['email'], $admin)) {
                 /**  特殊权限着 查询所有用户 */
@@ -398,10 +397,7 @@ class HijackController extends Controller
         if (!empty($param)) {
             header('Access-Control-Allow-Origin:*');
             //得到登录用户信息
-            // $user = Auth::user()->toArray();
-            if ($request) {
-                //   echo $request->params;
-            }
+
             //查询用户列表
             $users = User::select('name', 'email')->where('locked', '=', '0')->get()->toArray();
 //查询 like title or asin
