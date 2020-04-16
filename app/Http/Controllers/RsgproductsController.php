@@ -208,7 +208,6 @@ class RsgproductsController extends Controller
 
 		$data = $this->queryRows($sql);
 		$data = $this->getReturnData(0,$data,$date,$todayDate,'task');
-
 		if($_POST){
 			$return['status'] = 0;
 			if($data){
@@ -219,6 +218,36 @@ class RsgproductsController extends Controller
 		}
 		return view('rsgproducts/task',['data'=>$data,'rsg_link'=> 'https://rsg.claimthegift.com?user=V'.Auth::user()->id ]);
 	}
+
+	//Inbox中的Email Details右边栏会展示rsgtask，InboxController中将会调用此方法。
+	public function getTableData(){
+        $date = $todayDate = $this->getDefaultDate(date('Y-m-d'));
+
+        $where = " and created_at = '".$date."' ";
+        $where_product = " and created_at = '".$date."' and cast(rsg_products.sales_target_reviews as signed) - cast(rsg_products.requested_review as signed) > 0 and rsg_products.order_status != -1";
+
+        //限制站点搜索
+        $siteArrConfig = getSiteArr()['site'];
+        $site = isset($_POST['site']) && $_POST['site'] ? $_POST['site'] : 'US';
+        $siteArr = isset($siteArrConfig[$site]) ? $siteArrConfig[$site] : array();
+        if($site == 'US'){//特殊处理： US里面不用展示CA站点的产品
+            $siteArr = array('www.amazon.com');
+        }
+        $where_product .= " and rsg_products.site in('".join($siteArr,"','")."')";
+        if($site=='JP'){
+            $where_product .= " and rsg_products.order_status = 1 ";
+        }
+
+        $sql = $this->getSql(0,$where,$where_product,$date);
+        $sql .= ' LIMIT 0,10';
+
+//return $sql;
+
+        $data = $this->queryRows($sql);
+        $data = $this->getReturnData(0,$data,$date,$todayDate,'task');
+
+        return $data;
+    }
 
 	/*
 	 * 得到sql查询语句

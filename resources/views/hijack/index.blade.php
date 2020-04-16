@@ -449,7 +449,8 @@
 			"paging": true,  // 是否显示分页
 			"pagingType": 'numbers',
 			"info": false,// 是否表格左下角显示的文字
-			"pageLength": 10,
+			pageLength: 20,
+			lengthMenu: [50,100,200],
 			"ordering": true,
 			"serverSide": false,//是否所有的请求都请求服务器
 			"ajax": {

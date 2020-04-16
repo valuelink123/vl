@@ -41,7 +41,8 @@ class NonctgController extends Controller
     {
 		if(!Auth::user()->can(['non-ctg-show'])) die('Permission denied -- non-ctg-show');
         $users = array();
-        $userRows = DB::table('users')->select('id', 'name')->get();
+        //目前在职的，而且sap_seller_id不为0
+        $userRows = DB::table('users')->where('sap_seller_id', '>', 0)->where('locked', '=',0)->select('id', 'name')->get();
         foreach ($userRows as $row) {
             $users[$row->id] = $row->name;
         }
