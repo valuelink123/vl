@@ -214,8 +214,8 @@ class HijackController extends Controller
 //        ];
         $bool_admin = 0;//是否是管理员
         //Auth::user()->toArray()
-        if (!empty(Auth::user()->toArray())) {
-            //  $user = Auth::user()->toArray(); //todo  打开
+        $user = Auth::user()->toArray(); //todo  打开
+        if (!empty($user)) {
             if (!empty($user['email']) && in_array($user['email'], $admin)) {
                 /**  特殊权限着 查询所有用户 */
                 $bool_admin = 1;
