@@ -222,9 +222,9 @@ class HomeController extends Controller
     }
 	
 	public function getUsers(){
-        $users = User::get();
-		
-		if (Auth::user()->seller_rules) {
+        //目前在职的（locked=0）销售人员（sap_seller_id>0）
+        $users = User::where('sap_seller_id', '>', 0)->where('locked', '=',0)->get();
+        if (Auth::user()->seller_rules) {
 			$rules = explode("-", Auth::user()->seller_rules);
 			if (array_get($rules, 0) != '*'){
 				$users = $users->where('ubg',array_get($rules, 0));

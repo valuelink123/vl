@@ -820,7 +820,8 @@ class InboxController extends Controller
     }
 
     public function getUsers(){
-        $users = User::get()->toArray();
+        //目前在职的.不只是销售人员
+        $users = User::where('locked', '=', 0)->get()->toArray();
         $users_array = array();
         foreach($users as $user){
             $users_array[$user['id']] = $user['name'];
@@ -829,13 +830,22 @@ class InboxController extends Controller
     }
 	
 	public function getGroups(){
-        $users = Group::get()->toArray();
-        $users_array = array();
-        foreach($users as $user){
-            $users_array[$user['id']]['group_name'] = $user['group_name'];
-			$users_array[$user['id']]['user_ids'] = explode(",",$user['user_ids']);
+        $groups = Group::get()->toArray();
+        $groups_array = array();
+        $users_array = $this->getUsers();
+        foreach($groups as $group){
+            $groups_array[$group['id']]['group_name'] = $group['group_name'];
+            $userIds = explode(",",$group['user_ids']);
+            $filteredUserIds = array();
+            foreach($userIds as $userId){
+                //目前在职的.不只是销售人员
+                if(isset($users_array[$userId])){
+                    $filteredUserIds[] = $userId;
+                }
+            }
+            $groups_array[$group['id']]['user_ids'] = $filteredUserIds;
         }
-        return $users_array;
+        return $groups_array;
     }
 
     public function getAccounts(){
@@ -1118,7 +1128,7 @@ class InboxController extends Controller
 	}
 	
 	public function getUserGroup(){
-	
+
 		if(Auth::user()->can(['inbox-show-all'])){
             $groups = Groupdetail::get(['group_id']);
 			$group_arr =array();
@@ -1129,7 +1139,13 @@ class InboxController extends Controller
 			foreach($users as $user){
 				$group_arr['users'][$user->user_id] = $user->user_id;
 			}
+
+//            var_dump ($group_arr);
+//            exit;
+
 			return $group_arr;
+
+
         }else{
 			$user_id = Auth::user()->id;
             $groups = Groupdetail::where('user_id',$user_id)->get(['group_id']);
@@ -1142,11 +1158,7 @@ class InboxController extends Controller
 				$group_arr['users'][$user->user_id] = $user->user_id;
 			}
 			return $group_arr;
-			
         }
-		
-		
-		
 	}
 	
 	public function getrfcorder(Request $request){

@@ -54,7 +54,8 @@ class FeesController extends Controller
 	}
 	
 	public function getUsers(){
-        $users = User::where('sap_seller_id','>',0)->get()->toArray();
+        //目前在职的（locked=0）销售人员（sap_seller_id>0）
+        $users = User::where('sap_seller_id', '>', 0)->where('locked', '=', 0)->get()->toArray();
         $users_array = array();
         foreach($users as $user){
             $users_array[$user['id']] = $user['name'];
