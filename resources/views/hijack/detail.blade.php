@@ -4,13 +4,13 @@
 @endsection
 @section('content')
 <style>
-		
+
 		table thead tr th{
 			text-align: center !important;
 		}
 		table.dataTable tbody th,
 		table.dataTable tbody td {
-			padding: 8px 10px;	
+			padding: 8px 10px;
 		}
 		table.dataTable tr{
 			border-bottom: 1px solid #eee;
@@ -24,7 +24,7 @@
 		.dataTables_wrapper .dataTables_paginate .paginate_button{
 			padding: 0.2em .5em;
 		}
-		
+
 		#tabsObj.dataTable tbody tr{
 			cursor: pointer !important;
 		}
@@ -186,25 +186,29 @@
 							<th class="w8">Delivery</th>
 							<th class="w6">Duration of Hijacking(h)</th>
 							<th class="w200">Notes</th>
+							<th>Action</th>
 						</tr>
 					</thead>
 				</table>
 			</div>
-				
+
 		</div>
-		
+
 	</div>
-	
+
 	<script>
 		$(document).ready(function () {
-			let tableObj , ids , urlIndex , detailId , listObj,time1,time2;
-			ids = window.location.href
-			urlIndex=ids.lastIndexOf("=");
-			ids=ids.substring(urlIndex+1,ids.length);
-			
+
+			let tableObj  , urlIndex , detailId , listObj,time1,time2;
+			let url = window.location.href
+			let name = decodeURIComponent(url.substr(url.lastIndexOf('=') + 1));
+			let str = url.substr(url.lastIndexOf('=', url.lastIndexOf('=') - 1) + 1);
+			let ind1 = str.lastIndexOf('?');
+			let ids = str.substring(0,ind1)	;
+
 			//禁止警告弹窗弹出
 			$.fn.dataTable.ext.errMode = 'none';
-			
+
 			//左边table
 			tableObj = $('#tabsObj').DataTable({
 				"searching": false,  //去掉搜索框
@@ -226,7 +230,8 @@
 						reqList = {
 							"id" : ids,
 							"startTime": time1,
-							"endTime":time2
+							"endTime":time2,
+							"name": name,
 						};
 						return reqList;
 					},
@@ -266,7 +271,7 @@
 					});
 				},
 			});
-			
+
 
 			//右边table
 			listObj = $('#listObj').DataTable({
@@ -294,6 +299,7 @@
 					{ "data": "shipping_fee"},
 					{ "data": "timecount"},
 					{ "data": "reselling_remark"},
+					{ "data": null},
 				],
 				data: [],
 				columnDefs: [
@@ -302,7 +308,7 @@
 						render: function (data, type, row) {
 							return '<div><span>'+data+'</span><img src="../assets/global/img/editor.png" alt="" style="float:right" class="country_img"></div>';
 						},
-						
+
 						createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
 							$(cell).click(function (e) {
 								$(this).html('<input type="text" size="16" style="width: 100%"/>');
@@ -332,14 +338,23 @@
 									$(cell).html(text);
 									listObj.cell(cell).data(text);
 								}
-								
-								
+
+
 							})
 						}
+					},
+					{
+						"targets": [6],
+						render: function (data, type, row) {
+							var html = '<a href="https://'+row.toUrl+'/dp/'+ row.asin +'" target="_blank">'
+								+ '<svg t="1585549427364" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5258" width="26" height="26"><path d="M836.096 192H640a32 32 0 0 1 0-64h272a32 32 0 0 1 32 32v281.92a32 32 0 1 1-64 0V238.592L534.912 592.256a32 32 0 1 1-45.824-44.672L836.096 192zM768 826.368V570.176a32 32 0 1 1 64 0v288.192a32 32 0 0 1-32 32h-640a32 32 0 0 1-32-32V281.92a32 32 0 0 1 32-32h384a32 32 0 0 1 0 64H192v512.448h576z" p-id="5259" fill="#bfbfbf"></path></svg>'
+							'</a>';
+							return html;
+						},
 					}
 				],
 			});
-			
+
 			//时间选择器
 			function initPickers() {
 			    $('.date-picker').datepicker({
@@ -358,10 +373,10 @@
 				time1 = dateStr($('.date1').val());
 				time2 = dateStr($('.date2').val());
 				tableObj.ajax.reload();
-				
-			})	
-			
-			
+
+			})
+
+
 		})
 	</script>
 

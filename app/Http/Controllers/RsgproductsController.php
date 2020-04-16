@@ -16,6 +16,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use DB;
 class RsgproductsController extends Controller
 {
+
 	use \App\Traits\Mysqli;
 	use \App\Traits\DataTables;
     /**
@@ -185,7 +186,28 @@ class RsgproductsController extends Controller
     public function rsgtask(Request $req)
 	{
 		if(!Auth::user()->can(['rsgproducts-rsgtask'])) die('Permission denied -- rsgproducts rsgtask');
-		$data = $this->getTableData();
+		$date = $todayDate = $this->getDefaultDate(date('Y-m-d'));
+
+		$where = " and created_at = '".$date."' ";
+		$where_product = " and created_at = '".$date."' and cast(rsg_products.sales_target_reviews as signed) - cast(rsg_products.requested_review as signed) > 0 and rsg_products.order_status != -1";
+
+		//限制站点搜索
+		$siteArrConfig = getSiteArr()['site'];
+		$site = isset($_POST['site']) && $_POST['site'] ? $_POST['site'] : 'US';
+		$siteArr = isset($siteArrConfig[$site]) ? $siteArrConfig[$site] : array();
+		if($site == 'US'){//特殊处理： US里面不用展示CA站点的产品
+			$siteArr = array('www.amazon.com');
+		}
+		$where_product .= " and rsg_products.site in('".join($siteArr,"','")."')";
+		if($site=='JP'){
+			$where_product .= " and rsg_products.order_status = 1 ";
+		}
+
+		$sql = $this->getSql(0,$where,$where_product,$date);
+		$sql .= ' LIMIT 0,10';
+
+		$data = $this->queryRows($sql);
+		$data = $this->getReturnData(0,$data,$date,$todayDate,'task');
 		if($_POST){
 			$return['status'] = 0;
 			if($data){
@@ -314,6 +336,7 @@ class RsgproductsController extends Controller
 	 * 得到处理后的表格数据
 	 */
 	public function getReturnData($leftskus,$data,$date='',$todayDate='',$action='') {
+
 		$siteShort = getSiteShort();
 		$postStatus = getPostStatus();
 		$postType = getPostType();
@@ -322,7 +345,7 @@ class RsgproductsController extends Controller
 		//sku状态信息,任务列表的时候不关联查询skus_status表，因此用此种方法获取sku状态信息，因为关联查询此表速度会慢很多，产品列表是因为要搜索status，所以需要关联查询
 		if (empty($leftskus)){
 			$sapSiteCode = getSapSiteCode();
-			$sku_sql = "select sku,sap_site_id,any_value(status) as sku_status from skus_status group by sku,sap_site_id";
+			$sku_sql = "select sku,sap_site_id,max(status) as sku_status from skus_status group by sku,sap_site_id";
 			$_skuData = $this->queryRows($sku_sql);
 			$skuData = array();
 			foreach($_skuData as $key=>$val){
