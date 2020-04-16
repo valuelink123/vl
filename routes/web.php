@@ -216,3 +216,4 @@ Route::post('/hijack/hijackExport', 'hijack\\HijackController@hijackExport');//å
 
 //RSG
 Route::get('/marketingPlan/index', 'MarketingPlanController@index')->name('marketingPlan');
+Route::get('/marketingPlan/detail', 'MarketingPlanController@detail')->name('detail');
