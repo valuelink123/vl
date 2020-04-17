@@ -136,14 +136,14 @@
                         <th>Site</th>
                         <th>Asin</th>
                         <th>Type</th>
-						 <th>Item No</th>
-						 <th>Rating</th>
-						 <th>Reviews</th>
-						 <th>Seller</th>
-						 <th title="The number of applications which have PayPal but haven't completed in the last 15 days">Unfinished</th>
-                        <th>Status</th>
+						<th>Status</th>
+						<th>Item No</th>
 						<th>Level</th>
-                        <th>SKU Status</th>                
+						<th>SKU Status</th>  
+						<th>Rating</th>
+						<th>Reviews</th>
+						<th>Seller</th>
+						<th title="The number of applications which have PayPal but haven't completed in the last 15 days">Unfinished</th>            
                         {{--<th>BG</th>--}}
                         {{--<th>BU</th>--}}
                         <th>Target</th>
@@ -169,26 +169,26 @@
                     <tbody>
                     @foreach($data as $key=>$val)
                         <tr>
-                            {{--<th>{!! $val['rank'] !!}</th>--}}
+							{{--<th>{!! $val['rank'] !!}</th>--}}
                             {{--<th>{!! $val['score'] !!}</th>--}}
                             {{--<th>{!! $val['order_status'] !!}</th>--}}
                             <th>{!! $val['product'] !!}</th>
                             <th>{!! $val['site'] !!}</th>
                             <th>{!! $val['asin'] !!}</th>
-                           <th>{!! $val['type'] !!}</th>
+                            <th>{!! $val['type'] !!}</th>
+						    <th>{!! $val['status'] !!}</th>
 							<th>{!! $val['item_no'] !!}</th>
+							<th>{!! $val['sku_level'] !!}</th>
+							<th>{!! $val['sku_status'] !!}</th>    
 							<th>{!! $val['rating'] !!}</th>
 							<th>{!! $val['review'] !!}</th>
 							<th>{!! $val['seller'] !!}</th>
-							<th>{!! $val['unfinished'] !!}</th>
-                            <th>{!! $val['status'] !!}</th>
-                            <th>{!! $val['sku_level'] !!}</th>
-                            <th>{!! $val['sku_status'] !!}</th>       
+							<th>{!! $val['unfinished'] !!}</th>                            
                             {{--<th>{!! $val['bg'] !!}</th>--}}
                             {{--<th>{!! $val['bu'] !!}</th>--}}  
                             <th>{!! $val['target_review'] !!}</th>
                             <th>{!! $val['requested_review'] !!}</th>
-                           <th class="special-content">{!! $val['task'] !!}</th>
+							<th class="special-content">{!! $val['task'] !!}</th>
 							<!-- <th>D-6</th>
 							<th>D-5</th>
 							<th>D-4</th>
@@ -249,15 +249,15 @@
                                 html += '<th>' + val.product + '</th>';
                                 html += '<th>' + val.site + '</th>';
                                 html += '<th>' + val.asin + '</th>';
-                                html += '<th>' + val.type + '</th>';                               
-                                html += '<th>' + val.item_no + '</th>';                              
+                                html += '<th>' + val.type + '</th>'; 
+								html += '<th>' + val.status + '</th>';
+                                html += '<th>' + val.item_no + '</th>';   
+								html += '<th>' + val.sku_level + '</th>';
+								html += '<th>' + val.sku_status + '</th>';
                                 html += '<th>' + val.rating + '</th>';
                                 html += '<th>' + val.review + '</th>';
                                 html += '<th>' + val.seller + '</th>';
-                                html += '<th>' + val.unfinished + '</th>';
-								html += '<th>' + val.status + '</th>';
-								html += '<th>' + val.sku_level + '</th>';
-								html += '<th>' + val.sku_status + '</th>';
+                                html += '<th>' + val.unfinished + '</th>';									
                                 html += '<th>' + val.target_review + '</th>';
                                 html += '<th>' + val.requested_review + '</th>';
                                 html += '<th class="special-content">' + val.task + '</th>';
