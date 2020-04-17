@@ -1034,7 +1034,7 @@ class HijackController extends Controller
                     'Price,' .
                     'Shipping,' .
                     'Date,' .
-                    'Duration(h)' . "\r\n" . "\r\n";
+                    'Duration(h1)' . "\r\n" . "\r\n";
 
                 if (!empty($taskDetail)) {
                     foreach ($taskDetail as $key => $dv) {
