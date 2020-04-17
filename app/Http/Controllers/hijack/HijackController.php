@@ -996,7 +996,7 @@ class HijackController extends Controller
                             $created_at = $tv['created_at'];
                         }
                     }
-                    $taskDetail[$tlk]['count'] = $reselling_count;
+                    $taskDetail[$tlk]['count'] = $reselling_count+1;
                     foreach ($taskList as $taK => $tav) {
                         if ($tlv['task_id'] == $tav['id']) {
                             $taskDetail[$tlk]['reselling_asin_id'] = $tav['reselling_asin_id'];
@@ -1034,7 +1034,7 @@ class HijackController extends Controller
                     'Price,' .
                     'Shipping,' .
                     'Date,' .
-                    'Duration(h1)' . "\r\n" . "\r\n";
+                    'Duration(h)' . "\r\n" . "\r\n";
 
                 if (!empty($taskDetail)) {
                     foreach ($taskDetail as $key => $dv) {
