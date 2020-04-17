@@ -208,9 +208,11 @@ Route::post('/hijack/hijackExport', 'hijack\\HijackController@hijackExport');//�
 
 
 
-//RSG
+//RSG MarketingPlan
 Route::get('/marketingPlan/index', 'MarketingPlanController@index')->name('marketingPlan');
 Route::post('/marketingPlan/showData', 'MarketingPlanController@showData');//展示基础信息
-Route::get('/marketingPlan/detail', 'MarketingPlanController@detail')->name('detail');
+Route::get('/marketingPlan/updatePlan', 'MarketingPlanController@updatePlan');//修改计划信息
+Route::post('/marketingPlan/updatePlan', 'MarketingPlanController@updatePlan');//修改计划信息
+Route::get('/marketingPlan/detail/', 'MarketingPlanController@detail')->name('detail');
 
 
