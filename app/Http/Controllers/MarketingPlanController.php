@@ -32,7 +32,7 @@ class MarketingPlanController extends Controller
                 ->get()->map(function ($value) {
                     return (array)$value;
                 })->toArray();
-
+            //asin 站点 suk suk状态
             if (!empty($user_asin_list)) {
                 foreach ($user_asin_list as $k => $v) {
                     if (strlen($v['asin']) > 8) {
@@ -41,9 +41,15 @@ class MarketingPlanController extends Controller
                 }
 
             }
+            //查询所有汇率信息
+            $currency_rates = DB::connection('vlz')->table('currency_rates')
+                ->select('currency', 'rate','id','updated_at')
+                ->get()->map(function ($value) {
+                    return (array)$value;
+                })->toArray();
         }
         echo '<pre>';
-        var_dump(@$asinList);
+        var_dump($currency_rates);
         exit;
         return view('marketingPlan.index', ['asinList' => $asinList]);
     }
