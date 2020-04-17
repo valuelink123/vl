@@ -25,33 +25,29 @@ class MarketingPlanController extends Controller
         $asinList = [];
         if (!empty(Auth::user()->toArray())) {
             $user = Auth::user()->toArray(); //当前用户信息
-            $user_asin_list = DB::connection('vlz')->table('sap_asin_match_sku')
-                ->select('asin', 'marketplace_id','sku_status','sku')
-                ->where('sap_seller_id', $user['sap_seller_id'])
-                ->groupBy('asin')
-                ->get()->map(function ($value) {
-                    return (array)$value;
-                })->toArray();
-            //asin 站点 suk suk状态
+            $sql = "SELECT sams.asin,sams.marketplace_id,sams.sku_status,sams.sku,asins.reviews,asins.rating from sap_asin_match_sku as sams LEFT JOIN asins on asins.asin= sams.asin WHERE sap_seller_id =" . $user['sap_seller_id'] . " GROUP BY
+	                sams.marketplace_id,sams.asin;";
+            $user_asin_list_obj = DB::connection('vlz')->select($sql);
+            $user_asin_list = (json_decode(json_encode($user_asin_list_obj), true));            //asin 站点 suk suk状态
             if (!empty($user_asin_list)) {
                 foreach ($user_asin_list as $k => $v) {
-                    if (strlen($v['asin']) > 8) {
-                        $asinList[] = $v['asin'] . ',' . $v['marketplace_id'].','.$v['sku'].','.$v['sku_status'];
+                    if (strlen($v['asin']) < 8) {
+                        unset($user_asin_list[$k]);
                     }
                 }
 
             }
             //查询所有汇率信息
             $currency_rates = DB::connection('vlz')->table('currency_rates')
-                ->select('currency', 'rate','id','updated_at')
+                ->select('currency', 'rate', 'id', 'updated_at')
                 ->get()->map(function ($value) {
                     return (array)$value;
                 })->toArray();
         }
         echo '<pre>';
-        var_dump($currency_rates);
+        var_dump($user_asin_list);
         exit;
-        return view('marketingPlan.index', ['asinList' => $asinList]);
+        return view('marketingPlan.index', ['user_asin_list' => $user_asin_list]);
     }
 
     /**
@@ -63,8 +59,17 @@ class MarketingPlanController extends Controller
 
     }
 
-    public function detail()
+    /**
+     * 编辑修改 rsg plan
+     * @author DYS
+     * @copyright 2020年4月17日
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function detail(Request $request)
     {
+        if ($request['id'] > 0) {
+
+        }
         return view('marketingPlan.detail');
     }
 

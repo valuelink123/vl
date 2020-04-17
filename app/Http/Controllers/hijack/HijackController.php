@@ -200,20 +200,20 @@ class HijackController extends Controller
         $admin = array("charlie@valuelinkcorp.com", "zouyuanxun@valuelinkcorp.com", "zanhaifang@valuelinkcorp.com", "huzaoli@valuelinkcorp.com", 'fanlinxi@valuelinkcorp.com');
         $userasinL = [];
         $sapSellerIdList = [];
-//        $user = ['id' => '154',
-//            'name' => 'test',
-//            'email' => 'test@valuelinkcorp.com',
-//            'created_at' => '2020-03-27 14:58:11',
-//            'updated_at' => '2020-03-27 14:58:11',
-//            'admin' => 0,
-//            'sap_seller_id' => 279,
-//            'seller_rules' => 'BG3-BU3-* ',
-//            'locked' => 0,
-//            'ubg' => 'BG3',
-//            'ubu' => 'BU3',
-//        ];
+        $user = ['id' => '154',
+            'name' => 'test',
+            'email' => 'test@valuelinkcorp.com',
+            'created_at' => '2020-03-27 14:58:11',
+            'updated_at' => '2020-03-27 14:58:11',
+            'admin' => 0,
+            'sap_seller_id' => 279,
+            'seller_rules' => 'BG3-BU3-* ',
+            'locked' => 0,
+            'ubg' => 'BG3',
+            'ubu' => 'BU3',
+        ];
         $bool_admin = 0;//是否是管理员
-        $user =Auth::user()->toArray(); //todo  打开
+      //  $user =Auth::user()->toArray(); //todo  打开
         if (!empty($user)) {
             if (!empty($user['email']) && in_array($user['email'], $admin)) {
                 /**  特殊权限着 查询所有用户 */
@@ -1319,6 +1319,7 @@ class HijackController extends Controller
     {
         $DOMIN_MARKETPLACEID = Asin::DOMIN_MARKETPLACEID;
         $DOMIN_MARKETPLACEID_SX = Asin::DOMIN_MARKETPLACEID_SX;
+        $DOMIN_MARKETPLACEID_URL= Asin::DOMIN_MARKETPLACEID_URL;
         //查询跟卖数据 根据开始时间 结束时间
         $startTime = isset($request['startTime']) ? $request['startTime'] : 0;
         $endTime = isset($request['endTime']) ? $request['endTime'] + 3600 * 24 : 0;
@@ -1351,6 +1352,7 @@ class HijackController extends Controller
 
                 if (!empty($domainUrl) && !empty($as['asin'])) {
                     $asins[0]['domin_sx'] = $DOMIN_MARKETPLACEID_SX[isset($asins[0]['marketplaceid']) ? $asins[0]['marketplaceid'] : ''];
+                    $asins[0]['domin_url'] = $DOMIN_MARKETPLACEID_URL[isset($asins[0]['marketplaceid']) ? $asins[0]['marketplaceid'] : ''];
                     $resellingList = DB::connection('vlz')->table('tbl_reselling_asin')
                         ->select('reselling_num', 'updated_at', 'created_at', 'reselling_remark', 'id', 'asin')
                         ->where('asin', $as['asin'])
