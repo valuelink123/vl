@@ -269,7 +269,7 @@
                                 html += '</tr>';
                             });
                         }else{
-                            html = '<tr><th colspan="23">No Data</th></tr>';
+                            html = '<tr><th colspan="9">No Data</th></tr>';
                         }
                         $('#thetable tbody').html(html);
                     }

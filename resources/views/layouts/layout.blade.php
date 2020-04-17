@@ -329,7 +329,7 @@
                                                     </a>
                                                 </li>
 												@endpermission
-												<!-- @permission('fee-split-show')
+												@permission('fee-split-show')
 												<li class="">
 												    <a href="/marketingPlan/index" class="nav-link nav-toggle ">
 												        Marketing Plan
@@ -337,7 +337,7 @@
 												    </a>
 												</li>
 												@endpermission
- -->
+
                                             </ul>
                                         </li>
 
