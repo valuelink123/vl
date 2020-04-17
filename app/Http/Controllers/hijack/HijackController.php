@@ -987,7 +987,7 @@ class HijackController extends Controller
                     $created_at = 0;
                     $reselling_count = 0;
                     foreach ($taskDetail as $tk => $tv) {
-                        if ($tlv['sellerid'] == $tv['sellerid']&&$tlv['task_id'] == $tv['task_id']) {
+                        if ($tlv['sellerid'] == $tv['sellerid']) {
                             if ($tv['created_at'] - $created_at > 3600 && $reselling_count == 0) {
                             } elseif ($tv['created_at'] - $created_at > 3600) {
                             } elseif ($tv['created_at'] - $created_at < 3600) {
