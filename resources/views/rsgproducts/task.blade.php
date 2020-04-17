@@ -73,7 +73,7 @@
     @include('frank.common')
 
     <div id="switch-content">
-		<div class="filter_content">
+		<!-- <div class="filter_content">
 			<select name="" class="bgList" onchange="status_filter(this.value,0)">
 				<option value="">All BG</option>
 				<option value="BG1">BG1</option>
@@ -89,7 +89,7 @@
 				<option value="BU4">BU4</option>
 				<option value="BU5">BU5</option>
 			</select>
-		</div>
+		</div> -->
         <div class="switch">
             <div class="switch-one right-float">
                 <div class="switch-type active" data-value="US">
@@ -151,7 +151,7 @@
                         <!-- <th>Target</th>
                         <th>Achieved</th>
                         <th class="special-content">Task</th> -->
-						<th>D-6</th>
+						<!-- <th>D-6</th>
 						<th>D-5</th>
 						<th>D-4</th>
 						<th>D-3</th>
@@ -164,7 +164,7 @@
 						<th>D4</th>
 						<th>D5</th>
 						<th>D6</th>
-						<th>D7</th>
+						<th>D7</th> -->
                         <th>Action</th>
                     </tr>
                     </thead>
@@ -193,7 +193,7 @@
                             <!-- <th>{!! $val['target_review'] !!}</th>
                             <th>{!! $val['requested_review'] !!}</th> -->
                           <!--  <th class="special-content">{!! $val['task'] !!}</th> -->
-							<th>D-6</th>
+							<!-- <th>D-6</th>
 							<th>D-5</th>
 							<th>D-4</th>
 							<th>D-3</th>
@@ -206,7 +206,7 @@
 							<th>D4</th>
 							<th>D5</th>
 							<th>D6</th>
-							<th>D7</th>						
+							<th>D7</th>		 -->				
                             <th>{!! $val['action'] !!}</th>
                         </tr>
                     @endforeach
@@ -269,7 +269,7 @@
                                 html += '</tr>';
                             });
                         }else{
-                            html = '<tr><th colspan="23">No Data</th></tr>';
+                            html = '<tr><th colspan="9">No Data</th></tr>';
                         }
                         $('#thetable tbody').html(html);
                     }
