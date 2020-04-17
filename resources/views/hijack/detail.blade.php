@@ -199,7 +199,7 @@
 	<script>
 		$(document).ready(function () {
 
-			let tableObj  , urlIndex , detailId , listObj,time1,time2;
+			let tableObj  , urlIndex , detailId , listObj,time1,time2,domin_url;
 			let url = window.location.href
 			let name = decodeURIComponent(url.substr(url.lastIndexOf('=') + 1));
 			let str = url.substr(url.lastIndexOf('=', url.lastIndexOf('=') - 1) + 1);
@@ -243,6 +243,7 @@
 							dot = str.split(',');
 							dot.length > 1 ? img = 'https://images-na.ssl-images-amazon.com/images/I/' + dot[0] : img = ''
 						}
+						domin_url = product.domin_url
 						$('.product_title').text(product.title);
 						$('.span1').text(product.asin);
 						$('.span2').text(product.sku);
@@ -346,7 +347,7 @@
 					{
 						"targets": [6],
 						render: function (data, type, row) {
-							var html = '<a href="https://'+row.toUrl+'/dp/'+ row.asin +'" target="_blank">'
+							var html = '<a href="https://'+domin_url+'/sp?seller='+ row.sellerid +'" target="_blank">'
 								+ '<svg t="1585549427364" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5258" width="26" height="26"><path d="M836.096 192H640a32 32 0 0 1 0-64h272a32 32 0 0 1 32 32v281.92a32 32 0 1 1-64 0V238.592L534.912 592.256a32 32 0 1 1-45.824-44.672L836.096 192zM768 826.368V570.176a32 32 0 1 1 64 0v288.192a32 32 0 0 1-32 32h-640a32 32 0 0 1-32-32V281.92a32 32 0 0 1 32-32h384a32 32 0 0 1 0 64H192v512.448h576z" p-id="5259" fill="#bfbfbf"></path></svg>'
 							'</a>';
 							return html;

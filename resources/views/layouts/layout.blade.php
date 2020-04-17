@@ -336,8 +336,8 @@
 												        <span class="arrow"></span>
 												    </a>
 												</li>
-												@endpermission
- -->
+												@endpermission -->
+
                                             </ul>
                                         </li>
 
