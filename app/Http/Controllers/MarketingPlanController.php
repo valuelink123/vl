@@ -9,6 +9,7 @@ use log;
 use Illuminate\Support\Facades\Auth;
 use App\User;
 use App\Asin;
+use App\RsgProduct;
 
 header('Access-Control-Allow-Origin:*');
 
@@ -36,7 +37,6 @@ class MarketingPlanController extends Controller
                         unset($user_asin_list[$k]);
                     }
                 }
-
             }
             //查询所有汇率信息
             $currency_rates = DB::connection('vlz')->table('currency_rates')
@@ -115,10 +115,13 @@ class MarketingPlanController extends Controller
                     mp.id =" . $request['id'];
             $marketing_plan = json_decode(json_encode(DB::connection('vlz')->select($sql)), true);
         }
+        if($user['sap_seller_id']!=$marketing_plan[0]['sap_seller_id']&&$role==0){
+            $marketing_plan=NULL;
+        }
         echo '<pre>';
         var_dump($marketing_plan);
         exit;
-        return view('marketingPlan.detail', ['role' => $role]);
+        return view('marketingPlan.detail', ['role' => $role,'marketing_plan'=>$marketing_plan]);
     }
 
     public function showData()
@@ -129,20 +132,24 @@ class MarketingPlanController extends Controller
     /**
      * 修改 计划 包括状态  信息
      * @author DYS
+     * @param id  marketing_plan id
+     * @param  plan_status
      * @param Request $request
      */
     public function updatePlan(Request $request)
     {
         //$user = Auth::user()->toArray();//todo 打开
+        $DOMIN_MARKETPLACEID_RUL = Asin::DOMIN_MARKETPLACEID_URL;
         $user['sap_seller_id'] = 351;
         $update = 0;
         if (!empty($request)) {
             $id = $request['id'];
+            $notes=isset($request['notes'])?$request['notes']:'';//备注
             $plan_status = $request['plan_status'];
-            $r_message = [];//更新返回
+            $r_message = $resProductIds = [];//更新返回
             //查询当前 plan_status 状态
             $old_m_plan = DB::connection('vlz')->table('marketing_plan')
-                ->select('plan_status', 'goal', 'id', 'updated_at')
+                ->select('rsg_d_target', 'from_time', 'to_time', 'plan_status', 'goal', 'id', 'updated_at', 'asin', 'marketplaceid')
                 ->where('id', $id)
                 ->first();
             $old_m_plan = json_decode(json_encode($old_m_plan), true);
@@ -150,25 +157,152 @@ class MarketingPlanController extends Controller
             if ($old_m_plan['plan_status'] == 2 && $plan_status == 4) {
                 /** 进行中”状态下，只能改为“已中止 */
                 $update = 1;
-            } else if ($old_m_plan['plan_status'] == 1 && ($plan_status == 2||$plan_status == 4||$plan_status == 5)) {
+            } else if ($old_m_plan['plan_status'] == 1 && ($plan_status == 2 || $plan_status == 4 || $plan_status == 5)) {
                 /**  待审批 只能改为 进行中 */
                 $update = 1;
             }
 
-
             if ($update > 0) {
                 $result = DB::connection('vlz')->table('marketing_plan')
                     ->where('id', $id)
-                    ->update(['plan_status' => $plan_status, 'updated_at' => time(), 'updated_user_id' => $user['sap_seller_id']]);
+                    ->update(['plan_status' => $plan_status,
+                        'updated_at' => time(),
+                        'updated_user_id' => @$user['sap_seller_id'],
+                        'notes'=>$notes
+                    ]);
                 if ($result == 1) {
                     $r_message = ['status' => 1, 'msg' => '更新成功'];
+                    //获取regproduct 列  对应数据
+                    $site = $DOMIN_MARKETPLACEID_RUL[$old_m_plan['marketplaceid']];
+                    $regProduct = RsgProduct::select('id', 'asin', 'created_at')
+                        ->where('site', '=', $site)
+                        ->where('asin', '=', $old_m_plan['asin'])
+                        ->where('created_at', '=', date('Y-m-d', time()))
+                        ->get()->toArray();
+                    foreach ($regProduct as $rk => $rv) {
+                        $resProductIds[] = $rv['id'];
+                    }
+                    //进行中 更新rsgproduct 列表中的target
+                    if ($old_m_plan['from_time'] <= time() && $old_m_plan['to_time'] >= time()) {
+                        if ($plan_status == 2) {
+                            if (!empty($resProductIds)) {
+                                RsgProduct::whereIn('id', $resProductIds)->update(['sales_target_reviews' => $old_m_plan['rsg_d_target']]);
+                            }
+                        } elseif ($plan_status == 3 || $plan_status == 4) {
+                            /**  已终止或  已完结 更新 target 为 0 */
+                            if (!empty($resProductIds)) {
+                                RsgProduct::whereIn('id', $resProductIds)->update(['sales_target_reviews' => 0]);
+                            }
+                        }
+                    } else {
+                        echo $old_m_plan['from_time'] . '----' . time() . '----' . $old_m_plan['to_time'];
+                    }
                 } else {
                     $r_message = ['status' => 0, 'msg' => '更新失败'];
                 }
+            } else {
+                $r_message = ['status' => 0, 'msg' => '条件不符'];
             }
 
             return $r_message;
         }
+
+    }
+
+    /**
+     * 完成目标
+     * 更新 完成时间
+     */
+    public function achieveGoals()
+    {
+        /** 查询所有未完成的 信息 状态 非 已拒绝*/
+        $m_p = DB::connection('vlz')->table('marketing_plan')
+            ->select('plan_status', 'id', 'to_time', 'marketplaceid', 'asin', 'target_rating', 'target_reviews')
+            ->where('plan_status', '!=', 5)
+            ->where('complete_at', 0)
+            ->get()->map(function ($value) {
+                return (array)$value;
+            })->toArray();
+        $r_message = [];
+        if (!empty($m_p)) {
+            foreach ($m_p as $mk => $mv) {
+                $id = $mv['id'];
+                $asin = $mv['asin'];
+                $marketplaceid = $mv['marketplaceid'];
+                $target_reviews = $mv['target_reviews'];
+                $target_rating = $mv['target_rating'];
+                if (isset($asin) && isset($marketplaceid) && $target_reviews > 0 && $target_rating > 0 && $id > 0) {
+                    $asin = DB::connection('vlz')->table('asins')
+                        ->select('id')
+                        ->where('asin', $asin)
+                        ->where('marketplaceid', $marketplaceid)
+                        ->where('reviews', '>=', $target_reviews)
+                        ->where('rating', '>=', $target_rating)
+                        ->get()->map(function ($value) {
+                            return (array)$value;
+                        })->toArray();
+                    if (!empty($asin) && count($asin) > 0) {
+                        //更新 达成时间
+                        $result = DB::connection('vlz')->table('marketing_plan')
+                            ->where('id', $id)
+                            ->update(['complete_at' => time(), 'updated_at' => time()]);
+                        if ($result > 0) {
+                            $r_message = ['status' => 1, 'msg' => $id . '已完成目标，并更新完成时间'];
+                        }
+                    }
+                }
+            }
+            return $r_message;
+        }
+    }
+
+    /**
+     * 定时任务
+     * 查询到达 结束时间 更新状态为  已完结
+     */
+    public function timingUpdate()
+    {
+        $DOMIN_MARKETPLACEID_RUL = Asin::DOMIN_MARKETPLACEID_URL;
+        $end_time = strtotime(date('Y-m-d', time()));
+        $idList = $resProductIds = $r_message = [];
+        $m_p = DB::connection('vlz')->table('marketing_plan')
+            ->select('plan_status', 'id', 'to_time', 'marketplaceid', 'asin')
+            ->where('plan_status', 2)
+            ->where('to_time', '<', $end_time)
+            ->get()->map(function ($value) {
+                return (array)$value;
+            })->toArray();
+        if (!empty($m_p)) {
+            foreach ($m_p as $k => $v) {
+                $idList[] = $v['id'];
+                //获取regproduct 列  对应数据
+                $site = $DOMIN_MARKETPLACEID_RUL[$v['marketplaceid']];
+                $regProduct = RsgProduct::select('id', 'asin', 'created_at')
+                    ->where('site', '=', $site)
+                    ->where('asin', '=', $v['asin'])
+                    ->where('created_at', '=', date('Y-m-d', time()))
+                    ->get()->toArray();
+                //进行中 更新rsgproduct 列表中的target
+                //已终止或  已完结 更新 target 为 0
+                if (!empty($regProduct)) {
+                    foreach ($regProduct as $rk => $rv) {
+                        $resProductIds[] = $rv['id'];
+                    }
+                }
+            }
+            if (!empty($idList)) {
+                $result = DB::connection('vlz')->table('marketing_plan')
+                    ->whereIn('id', $idList)
+                    ->update(['plan_status' => 3, 'updated_at' => time()]);
+                if ($result > 0 && !empty($resProductIds)) {
+                    RsgProduct::whereIn('id', $resProductIds)->update(['sales_target_reviews' => 0]);
+                    $r_message = ['status' => 1, 'msg' => '更新成功'];
+                }
+            }
+        } else {
+            $r_message = ['status' => 0, 'msg' => '没有到达结束时间的任务'];
+        }
+        return $r_message;
 
     }
 
@@ -217,4 +351,6 @@ class MarketingPlanController extends Controller
         }
 
     }
+
+
 }

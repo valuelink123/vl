@@ -126,6 +126,10 @@ class AddRsgProduct extends Command
 		$amazon_sql = "select asin,marketplaceid,title,images,features,description,price,buybox_sellerid  
 				from asins";
 		$_amazonData = DB::connection('amazon')->select($amazon_sql);
+		//获取marketing_plan rsg 申请任务 数据
+        $market_sql ="SELECT asin,marketplaceid,id,plan_status,rsg_d_target FROM marketing_plan WHERE from_time <= ".strtotime(date('Y-m-d', time()))." and to_time >= ".strtotime(date('Y-m-d', time()))." AND plan_status=2;";
+        $marketingData = DB::connection('amazon')->select($market_sql);
+
 		$amazonData = array();
 		$siteUrl = getSiteUrl();
 		foreach($_amazonData as $key=>$val){
@@ -141,11 +145,17 @@ class AddRsgProduct extends Command
 			if($imageArr){
 				$amazonData[$val->asin.'_'.$site]['image'] = 'https://images-na.ssl-images-amazon.com/images/I/'.$imageArr[0];
 			}
+            foreach($marketingData as $mkey=>$mval){
+                if($val->asin==$mval->asin&&$val->marketplaceid==$mval->marketplaceid){
+                    $amazonData[$val->asin.'_'.$site]['m_target'] = $val->rsg_d_target;
+                }
+            }
+
 		}
 
 		$insertData = array();
 		foreach($data as $key=>$val){
-			$product_name = $product_img = $price = $product_summary = $product_content = $seller_id = '';
+			$m_target = $product_name = $product_img = $price = $product_summary = $product_content = $seller_id = '';
 			if(isset($amazonData[$val['asin'].'_'.$val['site']])){
 				$product_name = $amazonData[$val['asin'].'_'.$val['site']]['title'];
 				$product_img = $amazonData[$val['asin'].'_'.$val['site']]['image'];
@@ -153,6 +163,7 @@ class AddRsgProduct extends Command
 				$product_summary = $amazonData[$val['asin'].'_'.$val['site']]['features'];
 				$product_content = $amazonData[$val['asin'].'_'.$val['site']]['description'];
 				$seller_id = $amazonData[$val['asin'].'_'.$val['site']]['seller_id'];
+                $m_target = $amazonData[$val['asin'].'_'.$val['site']]['m_target'];
 			}
 			$days = isset($saleData[$val['asin'].'_'.$val['site']]) ? $saleData[$val['asin'].'_'.$val['site']] : 10000;
 			//美国站点 5个/天 其他站点3个/天， 新品上线第一周(帖子状态为待推贴，并且更新时间为一周内)美国站点 10个/天 其他站点5个/天
@@ -172,6 +183,10 @@ class AddRsgProduct extends Command
 					$sales_target_reviews = 3;
 				}
 			}
+			//当前存在target
+			if($m_target>0){
+                $sales_target_reviews = $m_target;
+            }
 			if(isset($orderdata[$val['asin'].'_'.$val['site']])){
 				if(intval(array_get($orderdata[$val['asin'].'_'.$val['site']],'sales_target_reviews_set'))>0){
 

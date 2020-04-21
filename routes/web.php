@@ -214,5 +214,7 @@ Route::post('/marketingPlan/showData', 'MarketingPlanController@showData');//展
 Route::get('/marketingPlan/updatePlan', 'MarketingPlanController@updatePlan');//修改计划信息
 Route::post('/marketingPlan/updatePlan', 'MarketingPlanController@updatePlan');//修改计划信息
 Route::get('/marketingPlan/detail/', 'MarketingPlanController@detail')->name('detail');
+Route::match(['post','get'],'/marketingPlan/timingUpdate', 'MarketingPlanController@timingUpdate');//定时刷新 已完结
+Route::match(['post','get'],'/marketingPlan/achieveGoals', 'MarketingPlanController@achieveGoals');//定时更新 完成时间
 
 
