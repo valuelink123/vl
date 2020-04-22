@@ -124,7 +124,7 @@ font-weight:bold;
 						<select class="form-control form-filter input-sm" name="site" id="site">
 									<option value="">Select Site</option>
                                         @foreach (getSiteCode() as $k=>$v)
-                                            <option value="{{$v}}" <?php if($v==$s_site) echo 'selected'; ?>>{{$v}}</option>
+                                            <option value="{{$v}}" <?php if($v==$s_site) echo 'selected'; ?>>{{$k}}</option>
                                         @endforeach
                                     </select>
 						</div>
@@ -421,10 +421,27 @@ var FormEditable = function() {
         $.fn.editable.defaults.inputclass = 'form-control';
         $.fn.editable.defaults.url = '/skus';
 		
-		$('.sku_keywords,.sku_strategy,.sku_ranking').editable({
+		$('.sku_keywords,.sku_strategy').editable({
 			emptytext:'N/A'
 		});
-		
+		$('.sku_ranking').editable({
+			emptytext:'N/A',
+			validate: function (value) {
+				var  objRegExp= /^P\d+\-\d+$/i;
+                if (!objRegExp.test(value)) {
+                    return 'Must be P?-? format';
+                }
+            },
+			success: function (response) { 
+				var obj = JSON.parse(response);
+				for(var jitem in obj){
+					$('#'+jitem).text(obj[jitem]);
+				}
+			}, 
+			error: function (response) { 
+				return 'remote error'; 
+			} 
+		});
 		
 		
 		
