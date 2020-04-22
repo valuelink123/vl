@@ -217,17 +217,27 @@ return [
 		],
 
 		'amazon' => [
+			'read'=>[
+				'host'=>env('DB_AMAZON_R_HOST', '127.0.0.1'),
+				'username' => env('DB_AMAZON_R_USERNAME', 'forge'),
+				'password' => env('DB_AMAZON_R_PASSWORD', '')
+			],
+			'write'=>[
+				'host'=>env('DB_AMAZON_W_HOST', '127.0.0.1'),
+				'username' => env('DB_AMAZON_W_USERNAME', 'forge'),
+				'password' => env('DB_AMAZON_W_PASSWORD', '')
+			],
 			'driver' => 'mysql',
-			'host' => env('DB_AMAZON_HOST', '127.0.0.1'),
+			//'host' => env('DB_AMAZON_HOST', '127.0.0.1'),
 			'port' => env('DB_AMAZON_PORT', '3306'),
 			'database' => env('DB_AMAZON_DATABASE', 'forge'),
-			'username' => env('DB_AMAZON_USERNAME', 'forge'),
-			'password' => env('DB_AMAZON_PASSWORD', ''),
+			//'username' => env('DB_AMAZON_USERNAME', 'forge'),
+			//'password' => env('DB_AMAZON_PASSWORD', ''),
 			'unix_socket' => env('DB_AMAZON_SOCKET', ''),
 			'charset' => 'utf8mb4',
 			'collation' => 'utf8mb4_unicode_ci',
 			'prefix' => '',
-			'strict' => false,
+			'strict' => true,
 			'engine' => null,
 		],
         'vl' => [
