@@ -294,9 +294,12 @@ any_value(sap_seller_bg) as bg,any_value(sap_seller_bu) as bu,any_value(sap_sell
 			$return[str_replace('.','',array_get($data,0)).':'.array_get($data,1).':'.array_get($data,2).':total_stock']=intval($ex['fba_stock']+$ex['fbm_stock']+$ex['fba_transfer']);
 			$return[str_replace('.','',array_get($data,0)).':'.array_get($data,1).':'.array_get($data,2).':fba_keep']=($ex['sales'])?round(intval($ex['fba_stock'])/$ex['sales'],2):'∞';
 			$return[str_replace('.','',array_get($data,0)).':'.array_get($data,1).':'.array_get($data,2).':total_keep']=($ex['sales'])?round((intval($ex['fba_stock'])+intval($ex['fba_transfer'])+intval($ex['fbm_stock']))/$ex['sales'],2):'∞';
-			 echo json_encode($return);
+			 
 			
+		}else{
+			$return[$name]=$request->get('value');
 		}
+		echo json_encode($return);
 				
     }
 
