@@ -123,7 +123,7 @@ font-weight:bold;
 						 <div class="col-md-1">
 						<select class="form-control form-filter input-sm" name="site" id="site">
 									<option value="">Select Site</option>
-                                        @foreach (getAsinSites() as $v)
+                                        @foreach (getSiteCode() as $k=>$v)
                                             <option value="{{$v}}" <?php if($v==$s_site) echo 'selected'; ?>>{{$v}}</option>
                                         @endforeach
                                     </select>
@@ -198,7 +198,8 @@ font-weight:bold;
 			</colgroup>	
 																	
 						<?php 
-						$curr_date = date('Ymd',strtotime($date_end));
+						$curr_date = date('Y-m-d',strtotime($date_end));
+						/*
 						if($data->target_sales>0){
 							$complete_sales = round($data->sales/$data->target_sales*100,2);
 						}elseif($data->target_sales<0){
@@ -222,6 +223,7 @@ font-weight:bold;
 						}else{
 							$complete_profit =0;
 						}
+						*/
 						?>
 						  <tr class="head">
 							<td style="font-weight: bold;">ASIN</td>
@@ -236,19 +238,19 @@ font-weight:bold;
 							<td colspan="4" style="font-weight: bold;">Description</td>
 						  </tr>
 						  <tr>
-							<td style="word-wrap: break-word;"><a href="https://{{$data->site}}/dp/{{strip_tags(str_replace('&nbsp;','',$data->asin))}}" target="_blank">{{strip_tags(str_replace('&nbsp;','',$data->asin))}}</a></td>
-							<td>{{strtoupper(substr(strrchr($data->site, '.'), 1))}}</td>
-							<td>{!!str_replace(',','<br />',$data->item_code)!!}</td>
-							<td>{!!($data->status)?'<span class="btn btn-success btn-xs">Reserved</span>':'<span class="btn btn-danger btn-xs">Eliminate</span>'!!}</td>
+							<td style="word-wrap: break-word;"><a href="https://{{array_get(getSiteUrl(),$data->marketplace_id)}}/dp/{{strip_tags(str_replace('&nbsp;','',$data->asin))}}" target="_blank">{{strip_tags(str_replace('&nbsp;','',$data->asin))}}</a></td>
+							<td>{{strtoupper(substr(strrchr(array_get(getSiteUrl(),$data->marketplace_id), '.'), 1))}}</td>
+							<td>{!!str_replace(',','<br />',$data->sku)!!}</td>
+							<td>{!!array_get(getSkuStatuses(),$data->status)!!}</td>
 							<td>{{((($data->pro_status) === '0')?'S':$data->pro_status)}}</td>
 							
 							<td >{{$data->bg}}</td>
 							<td >{{$data->bu}}</td>
 							<td > {{array_get($users,$data->sap_seller_id,$data->sap_seller_id)}} </td>
-							<td colspan="3" class="keyword_s"><a class="sku_keywords" href="javascript:;" id="{{$data->site.'-'.$data->asin.'-'.$curr_date}}-keywords" data-pk="{{$data->site.'-'.$data->asin.'-'.$curr_date}}-keywords" data-type="text"> {{$data->last_keywords}} </a></td>
+							<td colspan="3" class="keyword_s"><a class="sku_keywords" href="javascript:;" id="{{$data->marketplace_id.':'.$data->asin.':'.$curr_date}}:keywords" data-pk="{{$data->marketplace_id.':'.$data->asin.':'.$curr_date}}:keywords" data-type="text"> {{$data->last_keywords}} </a></td>
 							
 							
-							<td colspan="4">{!!str_replace(',','<br />',$data->item_name)!!}</td>
+							<td colspan="4">{!!str_replace(',','<br />',$data->description)!!}</td>
 						  </tr>
 						  
 						  
@@ -283,7 +285,7 @@ font-weight:bold;
 							<td style="font-weight: bold;">Sales</td>
 							<td style="font-weight: bold;">Price</td>
 							<td style="font-weight: bold;">Sessions</td>
-							<td style="font-weight: bold;">Conversion</td>
+							<td style="font-weight: bold;">Conversion %</td>
 							<td style="font-weight: bold;">FBA</td>
 							<td style="font-weight: bold;">FBA Tran</td>
 							<td style="font-weight: bold;">FBM</td>
@@ -316,8 +318,8 @@ font-weight:bold;
 						<?php 
 						$sales_data = $price_data = [];
 						$sales_sum = $price_sum =0;
-						$week_end=date('Ymd',strtotime($date_start));
-						$week=date('Ymd',strtotime($date_end));
+						$week_end=date('Y-m-d',strtotime($date_start));
+						$week=date('Y-m-d',strtotime($date_end));
 						while($week>=$week_end){
 						$details = $data->details;
 						if(isset($details[$week]['sales'])){
@@ -331,192 +333,44 @@ font-weight:bold;
 						?>
 						  <tr>
 						  	<td>{{$week}}</td>
-							<td class="ranking_s"><a class="sku_ranking" href="javascript:;" id="{{$data->site.'-'.$data->asin.'-'.$week}}-ranking" data-pk="{{$data->site.'-'.$data->asin.'-'.$week}}-ranking" data-type="text">{{array_get($data->details,$week.'.ranking')}} </a></td>
+							<td class="ranking_s"><a class="sku_ranking" href="javascript:;" id="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:ranking" data-pk="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:ranking" data-type="text" title="排名 P?-?">{{array_get($data->details,$week.'.ranking')}} </a></td>
 							
-							<td><a class="sku_rating" href="javascript:;" id="{{$data->site.'-'.$data->asin.'-'.$week}}-rating" data-pk="{{$data->site.'-'.$data->asin.'-'.$week}}-rating" data-type="text"> {{array_get($data->details,$week.'.rating')}} </a></td>
+							<td><a class="sku_rating" href="javascript:;" id="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:rating" data-pk="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:rating" data-type="text" title="星级"> {{array_get($data->details,$week.'.rating')}} </a></td>
 							
 					
-							<td><a class="sku_review" href="javascript:;" id="{{$data->site.'-'.$data->asin.'-'.$week}}-review" data-pk="{{$data->site.'-'.$data->asin.'-'.$week}}-review" data-type="text"> {{array_get($data->details,$week.'.review')}}</a></td>
+							<td><a class="sku_review" href="javascript:;" id="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:review" data-pk="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:review" data-type="text" title="review数量"> {{array_get($data->details,$week.'.review')}}</a></td>
 							
 						 
-							<td><a class="sku_sales" href="javascript:;" id="{{$data->site.'-'.$data->asin.'-'.$week}}-sales" data-pk="{{$data->site.'-'.$data->asin.'-'.$week}}-sales" data-type="text"> {{array_get($data->details,$week.'.sales')}}</a></td>
+							<td><a class="sku_sales" href="javascript:;" id="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:sales" data-pk="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:sales" data-type="text" title="销量"> {{array_get($data->details,$week.'.sales')}}</a></td>
 							
-							<td><a class="sku_price" href="javascript:;" id="{{$data->site.'-'.$data->asin.'-'.$week}}-price" data-pk="{{$data->site.'-'.$data->asin.'-'.$week}}-price" data-type="text"> {{array_get($data->details,$week.'.price')}}</a></td>
+							<td><a class="sku_price" href="javascript:;" id="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:price" data-pk="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:price" data-type="text" title="价格"> {{array_get($data->details,$week.'.price')}}</a></td>
 							
-							<td><a class="sku_flow" href="javascript:;" id="{{$data->site.'-'.$data->asin.'-'.$week}}-flow" data-pk="{{$data->site.'-'.$data->asin.'-'.$week}}-flow" data-type="text"> {{array_get($data->details,$week.'.flow')}} </a></td>
+							<td><a class="sku_flow" href="javascript:;" id="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:flow" data-pk="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:flow" data-type="text"> {{array_get($data->details,$week.'.flow')}} </a></td>
 						
-							<td><a class="sku_conversion" href="javascript:;" id="{{$data->site.'-'.$data->asin.'-'.$week}}-conversion" data-pk="{{$data->site.'-'.$data->asin.'-'.$week}}-conversion" data-type="text"> {{array_get($data->details,$week.'.conversion')}} </a></td>
+							<td><a class="sku_conversion" href="javascript:;" id="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:conversion" data-pk="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:conversion" data-type="text" title="转化率%" > {{round(array_get($data->details,$week.'.conversion')*100,2)}} </a></td>
 							
-							<td><a class="sku_fba_stock" href="javascript:;" id="{{$data->site.'-'.$data->asin.'-'.$week}}-fba_stock" data-pk="{{$data->site.'-'.$data->asin.'-'.$week}}-fba_stock" data-type="text"> {{array_get($data->details,$week.'.fba_stock')}} </a></td>
+							<td><a class="sku_fba_stock" href="javascript:;" id="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:fba_stock" data-pk="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:fba_stock" data-type="text" title="FBA库存"> {{array_get($data->details,$week.'.fba_stock')}} </a></td>
 							
-							<td><a class="sku_fba_transfer" href="javascript:;" id="{{$data->site.'-'.$data->asin.'-'.$week}}-fba_transfer" data-pk="{{$data->site.'-'.$data->asin.'-'.$week}}-fba_transfer" data-type="text"> {{array_get($data->details,$week.'.fba_transfer')}} </a></td>
+							<td><a class="sku_fba_transfer" href="javascript:;" id="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:fba_transfer" data-pk="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:fba_transfer" data-type="text" title="FBA在途"> {{array_get($data->details,$week.'.fba_transfer')}} </a></td>
 							
-							<td><a class="sku_fbm_stock" href="javascript:;" id="{{$data->site.'-'.$data->asin.'-'.$week}}-fbm_stock" data-pk="{{$data->site.'-'.$data->asin.'-'.$week}}-fbm_stock" data-type="text"> {{array_get($data->details,$week.'.fbm_stock')}} </a></td>
+							<td><a class="sku_fbm_stock" href="javascript:;" id="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:fbm_stock" data-pk="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:fbm_stock" data-type="text" title="FBM库存"> {{array_get($data->details,$week.'.fbm_stock')}} </a></td>
 							
-							<td><span id="{{str_replace('.','',$data->site).'-'.$data->asin.'-'.$week}}-total_stock"> {!!intval(array_get($data->details,$week.'.fba_stock',0)+array_get($data->details,$week.'.fbm_stock',0)+array_get($data->details,$week.'.fba_transfer',0))!!} </span></td>
+							<td><span id="{{str_replace('.','',$data->marketplace_id).':'.$data->asin.':'.$week}}:total_stock"> {!!intval(array_get($data->details,$week.'.fba_stock',0)+array_get($data->details,$week.'.fbm_stock',0)+array_get($data->details,$week.'.fba_transfer',0))!!} </span></td>
 							
-							<td><span id="{{str_replace('.','',$data->site).'-'.$data->asin.'-'.$week}}-fba_keep"> {!!(array_get($data->details,$week.'.sales',0)!=0)?round(intval(array_get($data->details,$week.'.fba_stock',0))/(array_get($data->details,$week.'.sales',0)),2):'∞'!!} </span></td>
+							<td><span id="{{str_replace('.','',$data->marketplace_id).':'.$data->asin.':'.$week}}:fba_keep"> {!!(array_get($data->details,$week.'.sales',0)!=0)?round(intval(array_get($data->details,$week.'.fba_stock',0))/(array_get($data->details,$week.'.sales',0)),2):'∞'!!} </span></td>
 							
-							<td><span id="{{str_replace('.','',$data->site).'-'.$data->asin.'-'.$week}}-total_keep"> {!!(array_get($data->details,$week.'.sales',0)!=0)?round((intval(array_get($data->details,$week.'.fba_stock',0))+intval(array_get($data->details,$week.'.fbm_stock',0))+intval(array_get($data->details,$week.'.fba_transfer',0)))/(array_get($data->details,$week.'.sales',0)),2):'∞'!!} </span></td>
+							<td><span id="{{str_replace('.','',$data->marketplace_id).':'.$data->asin.':'.$week}}:total_keep"> {!!(array_get($data->details,$week.'.sales',0)!=0)?round((intval(array_get($data->details,$week.'.fba_stock',0))+intval(array_get($data->details,$week.'.fbm_stock',0))+intval(array_get($data->details,$week.'.fba_transfer',0)))/(array_get($data->details,$week.'.sales',0)),2):'∞'!!} </span></td>
 							
-							<td class="strategy_s"><a class="sku_strategy" title="{{array_get($data->details,str_replace('.','',$data->site).'-'.$data->asin.'-'.$week.'.strategy')}}" href="javascript:;" id="{{$data->site.'-'.$data->asin.'-'.$week}}-strategy" data-placement="left"  data-pk="{{$data->site.'-'.$data->asin.'-'.$week}}-strategy" data-type="text"> {{array_get($data->details,$week.'.strategy')}} </a></td>
+							<td class="strategy_s"><a class="sku_strategy" title="{{array_get($data->details,str_replace('.','',$data->marketplace_id).':'.$data->asin.':'.$week.'.strategy')}}" href="javascript:;" id="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:strategy" data-placement="left"  data-pk="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:strategy" data-type="text"> {{array_get($data->details,$week.'.strategy')}} </a></td>
 							
 						  </tr>
 						  <?php
-						  		$week = date('Ymd',strtotime($week)-86400);
+						  		$week = date('Y-m-d',strtotime($week)-86400);
 							}
 							?>
 						  </table>
 						</div>
-						<div class="table-head" style="margin-bottom:50px;">
-						<table class="table table-bordered">
-						    <tr>
-						  	<td colspan="15">
-							<div class="col-md-12">
-								<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12" style="width:20%;"> 
-					<div class="dashboard-stat2 ">
-						<div class="display">
-							<div class="number">
-								<small>Avg.Sales</small>
-								<h3 class="font-green-sharp">
-									<span data-counter="counterup">{{count($sales_data)>0?round($sales_sum/count($sales_data),2):0}}</span>
-									<small class="font-green-sharp">Pcs</small>
-								</h3>
-								
-							</div>
-							
-						</div>
-						<div class="progress-info">
-							<div class="progress">
-								<span style="width: 100%;" class="progress-bar progress-bar-success green-sharp">
-									
-								</span>
-							</div>
-							<div class="status">
-								<div class="status-title font-green-sharp">{{count($sales_data)>0?min($sales_data):0}}</div>
-								<div class="status-number font-red-haze">{{count($sales_data)>0?max($sales_data):0}}</div>
-							</div>
-						</div>
-					</div>
-				</div>
-				
-								
-				<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12" style="width:20%;">
-					<div class="dashboard-stat2 ">
-						<div class="display">
-							<div class="number">
-								<small>Avg.Price</small>
-								<h3 class="font-red-haze">
-									<span data-counter="counterup">{{count($price_data)>0?round($price_sum/count($price_data),2):0}}</span>
-									<small class="font-red-haze"></small>
-								</h3>
-								
-							</div>
-							
-						</div>
-						<div class="progress-info">
-							<div class="progress">
-								<span style="width: 100%;" class="progress-bar progress-bar-success red-haze">
-									
-								</span>
-							</div>
-							<div class="status">
-								<div class="status-title font-green-sharp">{{count($price_data)>0?min($price_data):0}}</div>
-								<div class="status-number font-red-haze">{{count($price_data)>0?max($price_data):0}}</div>
-							</div>
-						</div>
-					</div>
-				</div>
-				
-								<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12" style="width:20%;">
-					<div class="dashboard-stat2 ">
-						<div class="display">
-							<div class="number">
-								<small>Sales Target</small>
-								<h3 class="font-blue-sharp">
-									<span data-counter="counterup">{{$complete_sales}}%</span>
-								</h3>
-								
-							</div>
-							
-						</div>
-						<div class="progress-info">
-							<div class="progress">
-								<span style="width: {{$complete_sales}}%;" class="progress-bar progress-bar-success blue-sharp">
-									
-								</span>
-							</div>
-							<div class="status">
-								<div class="status-title font-green-sharp"> {{$data->sales}} </div>
-								<div class="status-number font-red-haze">{{$data->target_sales}}</div>
-							</div>
-						</div>
-					</div>
-				</div>
-								<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12" style="width:20%;">
-					<div class="dashboard-stat2 ">
-						<div class="display">
 						
-							<div class="number">
-							<small>Amount Target</small>
-								<h3 class="font-purple-soft">
-									<span data-counter="counterup">{{$complete_amount}}%</span>
-									<small class="font-purple-soft"></small>
-								</h3>
-								
-							</div>
-							
-						</div>
-						<div class="progress-info">
-							<div class="progress">
-								<span style="width: {{$complete_amount}}%;" class="progress-bar progress-bar-success purple-soft">
-									
-								</span>
-							</div>
-							<div class="status">
-								<div class="status-title font-green-sharp">
-								
-								 {{$data->amount}}
-								
-								</div>
-								<div class="status-number font-red-haze">{{$data->target_amount}}</div>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12" style="width:20%;"> 
-					<div class="dashboard-stat2 ">
-						<div class="display">
-							<div class="number">
-								<small>Profit Target</small>
-								<h3 class="font-green-sharp">
-									<span data-counter="counterup">
-									{{$complete_profit}}%</span>
-									
-								</h3>
-								
-							</div>
-							
-						</div>
-						<div class="progress-info">
-							<div class="progress">
-								<span style="width: {{$complete_profit}}%;" class="progress-bar progress-bar-success green-sharp">
-									
-								</span>
-							</div>
-							<div class="status">
-								<div class="status-title font-green-sharp"> {{$data->profit}} </div>
-								<div class="status-number font-red-haze"> {{$data->target_profit}} </div>
-							</div>
-						</div>
-					</div>
-				</div>
-				</div>
-							
-							</td>
-						  </tr>
-						</table>
-						</div>
                         @endforeach
 						
                                {{ $datas->appends(['date_start' => $date_start,'date_end' => $date_end,'site' => $s_site,'user_id' => $s_user_id,'level' => $s_level,'bgbu' => $bgbu,'sku' => $sku])->links() }}   
@@ -567,10 +421,14 @@ var FormEditable = function() {
         $.fn.editable.defaults.inputclass = 'form-control';
         $.fn.editable.defaults.url = '/skus';
 		
-		$('.sku_keywords,.sku_strategy,.sku_ranking,.sku_rating,.sku_review,.sku_price,.sku_flow,.sku_conversion').editable({
+		$('.sku_keywords,.sku_strategy,.sku_ranking').editable({
 			emptytext:'N/A'
 		});
-		$('.sku_sales,.sku_fba_stock,.sku_fbm_stock,.sku_fba_transfer').editable({
+		
+		
+		
+		
+		$('.sku_rating,.sku_review,.sku_price,.sku_flow,.sku_conversion,.sku_sales,.sku_fba_stock,.sku_fbm_stock,.sku_fba_transfer').editable({
 			emptytext:'N/A',
 			validate: function (value) {
                 if (isNaN(value)) {
