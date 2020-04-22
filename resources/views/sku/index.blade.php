@@ -333,7 +333,7 @@ font-weight:bold;
 						?>
 						  <tr>
 						  	<td>{{$week}}</td>
-							<td class="ranking_s"><a class="sku_ranking" href="javascript:;" id="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:ranking" data-pk="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:ranking" data-type="text" title="排名 P?-?">{{array_get($data->details,$week.'.ranking')}} </a></td>
+							<td class="ranking_s"><a class="sku_ranking" href="javascript:;" id="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:ranking" data-pk="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:ranking" data-type="text" title="排名 P数字-数字 格式">{{array_get($data->details,$week.'.ranking')}} </a></td>
 							
 							<td><a class="sku_rating" href="javascript:;" id="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:rating" data-pk="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:rating" data-type="text" title="星级"> {{array_get($data->details,$week.'.rating')}} </a></td>
 							
@@ -343,7 +343,7 @@ font-weight:bold;
 						 
 							<td><a class="sku_sales" href="javascript:;" id="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:sales" data-pk="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:sales" data-type="text" title="销量"> {{array_get($data->details,$week.'.sales')}}</a></td>
 							
-							<td><a class="sku_price" href="javascript:;" id="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:price" data-pk="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:price" data-type="text" title="价格"> {{array_get($data->details,$week.'.price')}}</a></td>
+							<td><a class="sku_price" href="javascript:;" id="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:price" data-pk="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:price" data-type="text" title="价格 数字 或 数字-数字 格式"> {{array_get($data->details,$week.'.price')}}</a></td>
 							
 							<td><a class="sku_flow" href="javascript:;" id="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:flow" data-pk="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:flow" data-type="text"> {{array_get($data->details,$week.'.flow')}} </a></td>
 						
