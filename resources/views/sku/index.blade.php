@@ -444,8 +444,28 @@ var FormEditable = function() {
 		});
 		
 		
+		$('.sku_price').editable({
+			emptytext:'N/A',
+			validate: function (value) {
+				var  objRegExp= /^\d+(\.\d+)?(\-?\d+(\.\d+)?)?$/i;
+                if (!objRegExp.test(value)) {
+                    return 'Must be a number or number-number format';
+                }
+            },
+			success: function (response) { 
+				var obj = JSON.parse(response);
+				for(var jitem in obj){
+					$('#'+jitem).text(obj[jitem]);
+				}
+			}, 
+			error: function (response) { 
+				return 'remote error'; 
+			} 
+		});
 		
-		$('.sku_rating,.sku_review,.sku_price,.sku_flow,.sku_conversion,.sku_sales,.sku_fba_stock,.sku_fbm_stock,.sku_fba_transfer').editable({
+		
+		
+		$('.sku_rating,.sku_review,.sku_flow,.sku_conversion,.sku_sales,.sku_fba_stock,.sku_fbm_stock,.sku_fba_transfer').editable({
 			emptytext:'N/A',
 			validate: function (value) {
                 if (isNaN(value)) {
