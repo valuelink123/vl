@@ -4,14 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
-use App\Classes\SapRfcRequest;
 use App\User;
-use App\Skusweek;
 use App\Skusweekdetails;
-use App\SkusDailyInfo;
-use App\Budgets;
-use App\Budgetskus;
-use App\Budgetdetails;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Services\MultipleQueue;
@@ -69,7 +63,7 @@ class SkuController extends Controller
 		   }
 		}
 		if($site){
-			$where.= " and site='".$site."'";
+			$where.= " and marketplace_id='".$site."'";
 		}
 		if($user_id){
 			$where.= " and sap_seller_id in (".implode(',',$user_id).")";
@@ -80,20 +74,20 @@ class SkuController extends Controller
 		}
 		$where_add='1=1';
 		if($sku){
-			$where_add = " (asin='".$sku."' or item_code like '%".$sku."%' or item_name like '%".$sku."%')";
+			$where_add = " (asin='".$sku."' or sku like '%".$sku."%' or description like '%".$sku."%')";
 		}
 		
 		
-		$sql = "(select * from (select asin,site,group_concat(a.item_no) as item_code,group_concat(b.item_name) as item_name,any_value(item_status) as status,
+		$sql = "(select * from (select asin,marketplace_id,group_concat(a.sku) as sku,group_concat(b.description) as description,any_value(sku_status) as status,
 any_value(status) as pro_status, any_value(bg) as bg,any_value(bu) as bu,any_value(sap_seller_id) as sap_seller_id
 from 
 
-(select asin,site,item_no,any_value(item_status) as item_status,
+(select asin,marketplace_id,sku,any_value(sku_status) as sku_status,
 any_value(case when status = 'S' Then '0' else status end) as status, 
-any_value(bg) as bg,any_value(bu) as bu,any_value(sap_seller_id) as sap_seller_id from asin group by asin,site,item_no)
+any_value(sap_seller_bg) as bg,any_value(sap_seller_bu) as bu,any_value(sap_seller_id) as sap_seller_id from sap_asin_match_sku group by asin,marketplace_id,sku)
 
- as a left join fbm_stock as b on a.item_no=b.item_code   group by asin,site) as c $where order by pro_status asc) as sku_tmp_cc";
- 		$datas = DB::table(DB::raw($sql))->whereRaw($where_add)->paginate(5);
+ as a left join sap_skus as b on a.sku=b.sku group by asin,marketplace_id) as c $where order by pro_status asc) as sku_tmp_cc";
+ 		$datas = DB::connection('amazon')->table(DB::raw($sql))->whereRaw($where_add)->paginate(5);
 		$site_code['www_amazon_com']='US';
 		$site_code['www_amazon_ca']='CA';
 		$site_code['www_amazon_de']='DE';
@@ -103,24 +97,9 @@ any_value(bg) as bg,any_value(bu) as bu,any_value(sap_seller_id) as sap_seller_i
 		$site_code['www_amazon_fr']='FR';
 		$site_code['www_amazon_co_jp']='JP';
 		foreach($datas as $data){
-			$match_sku = explode(',',$data->item_code);
-			$rows = SkusDailyInfo::whereIn('sku',$match_sku)->where('site',$data->site)->selectRaw('sum(amount) as amount,sum(sales) as sales,sum(profit) as profit')
-			->where('date','>=',$date_start)->where('date','<=',$date_end)->first()->toArray();
-			$data->amount=round($rows['amount'],2);
-			$data->sales=round($rows['sales'],2);
-			$data->profit=round($rows['profit'],2);
+			$data->last_keywords=Skusweekdetails::where('asin',$data->asin)->where('marketplace_id',$data->marketplace_id)->whereNotNull('keywords')->orderBy('date','desc')->take(1)->value('keywords');	
+			$data->details=Skusweekdetails::where('date','>=',$date_start)->where('date','<=',$date_end)->where('asin',$data->asin)->where('marketplace_id',$data->marketplace_id)->get()->keyBy('date')->toArray();
 			
-			$budgets_ids = Budgets::whereIn('sku',$match_sku)->where('site',$data->site)->pluck('id');
-			
-			
-			$rows = Budgetdetails::whereIn('budget_id',$budgets_ids)->selectRaw('sum(income) as target_amount,sum(qty) as target_sales,sum(income-cost-common_fee-pick_fee-promotion_fee-amount_fee-storage_fee) as target_profit')
-			->where('date','>=',$date_start)->where('date','<=',$date_end)->first()->toArray();
-			
-			$data->target_amount=round($rows['target_amount'],2);
-			$data->target_sales=round($rows['target_sales'],2);
-			$data->target_profit=round($rows['target_profit'],2);
-			$data->last_keywords=Skusweekdetails::where('asin',$data->asin)->where('site',$data->site)->whereNotNull('keywords')->orderBy('weeks','desc')->take(1)->value('keywords');	
-			$data->details=Skusweekdetails::where('weeks','>=',date('Ymd',strtotime($date_start)))->where('weeks','<=',date('Ymd',strtotime($date_end)))->where('asin',$data->asin)->where('site',$data->site)->get()->keyBy('weeks')->toArray();
  		}
         $returnDate['teams']= getUsers('sap_bgbu');
 		$returnDate['users']= getUsers('sap_seller');
@@ -146,12 +125,12 @@ any_value(bg) as bg,any_value(bu) as bu,any_value(sap_seller_id) as sap_seller_i
 		$user_id = $request->get('user_id');
 		$sku = $request->get('sku');
 		$level = $request->get('level');
-	    $date_start = $request->get('date_start')?date('Ymd',strtotime($request->get('date_start'))):date('Ymd',strtotime('-14 days'));
-		$date_end = $request->get('date_end')?date('Ymd',strtotime($request->get('date_end'))):date('Ymd');
+	    $date_start = $request->get('date_start')?date('Y-m-d',strtotime($request->get('date_start'))):date('Ymd',strtotime('-14 days'));
+		$date_end = $request->get('date_end')?date('Y-m-d',strtotime($request->get('date_end'))):date('Ymd');
 		if($date_end<$date_start) $date_end = $date_start;
 
 		
-		$where= " length(trim(asin))=10 and weeks>='$date_start' and weeks<='$date_end' ";
+		$where= " length(trim(asin))=10 and date>='$date_start' and date<='$date_end' ";
 		if (Auth::user()->seller_rules) {
 			$rules = explode("-",Auth::user()->seller_rules);
 			if(array_get($rules,0)!='*') $where.= " and bg='".array_get($rules,0)."'";
@@ -171,7 +150,7 @@ any_value(bg) as bg,any_value(bu) as bu,any_value(sap_seller_id) as sap_seller_i
 		   }
 		}
 		if($site){
-			$where.= " and site='".$site."'";
+			$where.= " and marketplace_id='".$site."'";
 		}
 		if($user_id){
 			$where.= " and sap_seller_id in (".$user_id.")";
@@ -188,19 +167,20 @@ any_value(bg) as bg,any_value(bu) as bu,any_value(sap_seller_id) as sap_seller_i
 			
 		$month = date('Ym',strtotime($date_start));
         $datas=Skusweekdetails::whereRaw($where)
-			->leftJoin(DB::raw("(select asin as asin_p,site as site_p,GROUP_CONCAT(a.item_no) as item_code,GROUP_CONCAT(b.item_name) as item_name,any_value(item_status) as status,
+			->leftJoin(DB::raw("(
+select asin as asin_p,marketplace_id as marketplace_id_p,group_concat(a.sku) as sku,group_concat(b.description) as description,any_value(sku_status) as status,
 any_value(status) as pro_status, any_value(bg) as bg,any_value(bu) as bu,any_value(sap_seller_id) as sap_seller_id
 from 
 
-(select asin,site,item_no,any_value(item_status) as item_status,
+(select asin,marketplace_id,sku,any_value(sku_status) as sku_status,
 any_value(case when status = 'S' Then '0' else status end) as status, 
-any_value(bg) as bg,any_value(bu) as bu,any_value(sap_seller_id) as sap_seller_id from asin group by asin,site,item_no)
+any_value(sap_seller_bg) as bg,any_value(sap_seller_bu) as bu,any_value(sap_seller_id) as sap_seller_id from sap_asin_match_sku group by asin,marketplace_id,sku)
 
- as a left join fbm_stock as b on a.item_no=b.item_code   group by asin,site order by pro_status asc ) as sku_tmp_cc"),function($q){
-				$q->on('skus_week_details.asin', '=', 'sku_tmp_cc.asin_p')
-				  ->on('skus_week_details.site', '=', 'sku_tmp_cc.site_p');
+ as a left join sap_skus as b on a.sku=b.sku group by asin,marketplace_id ) as sku_tmp_cc"),function($q){
+				$q->on('asin_daily_report.asin', '=', 'sku_tmp_cc.asin_p')
+				  ->on('asin_daily_report.marketplace_id', '=', 'sku_tmp_cc.marketplace_id_p');
 			})
-		->orderBy('asin','asc')->orderBy('site','asc')->orderBy('weeks','asc')->get()->toArray();
+		->orderBy('asin','asc')->orderBy('marketplace_id','asc')->orderBy('date','asc')->get()->toArray();
 		
 		
 		$arrayData = array();
@@ -239,15 +219,15 @@ any_value(bg) as bg,any_value(bu) as bu,any_value(sap_seller_id) as sap_seller_i
 			
             $arrayData[] = array(
                	$data['asin'],
-				$data['site'],
-				$data['item_code'],
+				array_get(getSiteUrl(),$data['marketplace_id']),
+				$data['sku'],
 				array_get($users_array,intval(array_get($data,'sap_seller_id')),intval(array_get($data,'sap_seller_id'))),
 				$data['bg'],
 				$data['bu'],
-				($data['status'])?'Reserved':'Eliminate',
+				array_get(getSkuStatuses(),$data['status']),
 				($data['pro_status']==='0')?'S':$data['pro_status'],
-				$data['item_name'],
-				$data['weeks'],
+				$data['description'],
+				$data['date'],
 				$data['keywords'],
 				$data['ranking'],
 				$data['rating'],
@@ -304,19 +284,22 @@ any_value(bg) as bg,any_value(bu) as bu,any_value(sap_seller_id) as sap_seller_i
     {
 		if(!Auth::user()->can(['sales-report-update'])) die('Permission denied -- sales-report-update');
 		$name = $request->get('name');
-		$data = explode("-",$name);
+		$data = explode(":",$name);
 		Skusweekdetails::updateOrCreate([
 				'asin' => array_get($data,1),
-				'site' => array_get($data,0),
-				'weeks' => array_get($data,2)],[array_get($data,3)=>$request->get('value')]);
+				'marketplace_id' => array_get($data,0),
+				'date' => array_get($data,2)],[array_get($data,3)=>((array_get($data,3)=='conversion')?(($request->get('value'))/100):($request->get('value')))]);
 		if(in_array(strtoupper(substr(array_get($data,3),0,2)),array('SA','FB'))){
-			$ex = Skusweekdetails::where('asin',array_get($data,1))->where('site',array_get($data,0))->where('weeks', array_get($data,2))->first()->toArray();
-			$return[str_replace('.','',array_get($data,0)).'-'.array_get($data,1).'-'.array_get($data,2).'-total_stock']=intval($ex['fba_stock']+$ex['fbm_stock']+$ex['fba_transfer']);
-			$return[str_replace('.','',array_get($data,0)).'-'.array_get($data,1).'-'.array_get($data,2).'-fba_keep']=($ex['sales'])?round(intval($ex['fba_stock'])/$ex['sales'],2):'∞';
-			$return[str_replace('.','',array_get($data,0)).'-'.array_get($data,1).'-'.array_get($data,2).'-total_keep']=($ex['sales'])?round((intval($ex['fba_stock'])+intval($ex['fba_transfer'])+intval($ex['fbm_stock']))/$ex['sales'],2):'∞';
-			 echo json_encode($return);
+			$ex = Skusweekdetails::where('asin',array_get($data,1))->where('marketplace_id',array_get($data,0))->where('date', array_get($data,2))->first()->toArray();
+			$return[str_replace('.','',array_get($data,0)).':'.array_get($data,1).':'.array_get($data,2).':total_stock']=intval($ex['fba_stock']+$ex['fbm_stock']+$ex['fba_transfer']);
+			$return[str_replace('.','',array_get($data,0)).':'.array_get($data,1).':'.array_get($data,2).':fba_keep']=($ex['sales'])?round(intval($ex['fba_stock'])/$ex['sales'],2):'∞';
+			$return[str_replace('.','',array_get($data,0)).':'.array_get($data,1).':'.array_get($data,2).':total_keep']=($ex['sales'])?round((intval($ex['fba_stock'])+intval($ex['fba_transfer'])+intval($ex['fbm_stock']))/$ex['sales'],2):'∞';
+			 
 			
+		}else{
+			$return[$name]=$request->get('value');
 		}
+		echo json_encode($return);
 				
     }
 
