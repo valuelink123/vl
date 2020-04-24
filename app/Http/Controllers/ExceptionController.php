@@ -210,6 +210,7 @@ class ExceptionController extends Controller
 		$headArray[] = 'Country';
 		$headArray[] = 'Phone';
 		$headArray[] = 'Reson';
+        $headArray[] = 'Description';
 		$headArray[] = 'Operator';
 		$headArray[] = 'Group';
 		$headArray[] = 'Creator';
@@ -384,6 +385,7 @@ class ExceptionController extends Controller
 				array_get($replacements,'countrycode'),
 				array_get($replacements,'phone'),
 				$customersList['request_content'],
+                $customersList['descrip'],
 				array_get($users,$customersList['process_user_id'])?array_get($users,$customersList['process_user_id']):array_get($groupleaders,$customersList['group_id']),
                 array_get($groups,$customersList['group_id'].'.group_name'),
 				array_get($users,$customersList['user_id']),
@@ -454,7 +456,7 @@ class ExceptionController extends Controller
             'CTG-gift',
             'Remove NRW',
             'others',
-			'FBM sales order',
+			'Website order',
 			'B2B'
         );
         return view('exception/add', $vars);
@@ -516,7 +518,7 @@ class ExceptionController extends Controller
 			 'CTG-gift',
 			 'Remove NRW',
 			 'others',
-			 'FBM sales order',
+			 'Website order',
 			 'B2B'
 		 );
 
