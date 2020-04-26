@@ -6,7 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 class Skusweekdetails extends Model
 {
     //
-    protected $table = 'skus_week_details';
+	protected $connection = 'amazon';
+    protected $table = 'asin_daily_report';
+	
 	protected $guarded = [];
     public $timestamps = false;
 }

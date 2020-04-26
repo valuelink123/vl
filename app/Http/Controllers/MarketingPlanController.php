@@ -1,5 +1,6 @@
 <?php
 
+
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
@@ -16,11 +17,25 @@ header('Access-Control-Allow-Origin:*');
 class MarketingPlanController extends Controller
 {
 //判断是否登录
-//    public function __construct()
-//    {
-//        $this->middleware('auth');
-//        parent::__construct();
-//    }
+    public function __construct()
+    {
+        $this->middleware('auth');
+        parent::__construct();
+    }
+
+    public function index()
+    {
+        $user = Auth::user()->toArray();
+        $sap_seller_id = $user['sap_seller_id'];
+        return view('marketingPlan.index', ['sap_seller_id' => $sap_seller_id]);
+    }
+
+    public function detail()
+    {
+        $user = Auth::user()->toArray();
+        $sap_seller_id = $user['sap_seller_id'];
+        return view('marketingPlan.detail', ['sap_seller_id' => $sap_seller_id]);
+    }
 
     public function index1(Request $request)
     {
@@ -442,28 +457,28 @@ class MarketingPlanController extends Controller
                     unset($files[$key]);
                     $result = DB::connection('vlz')->table('marketing_plan')
                         ->where('id', $request['id'])
-                        ->update(['files'=>implode($files,',')]);
-                    if($result>0){
+                        ->update(['files' => implode($files, ',')]);
+                    if ($result > 0) {
                         $r_message = ['status' => 1, 'msg' => '删除成功'];
-                    }else{
+                    } else {
                         $r_message = ['status' => 0, 'msg' => '删除失败'];
                     }
 
-                }elseif($marketing_plan['files']==$request['files_url']){
+                } elseif ($marketing_plan['files'] == $request['files_url']) {
                     $result = DB::connection('vlz')->table('marketing_plan')
                         ->where('id', $request['id'])
-                        ->update(['files'=>'']);
-                    if($result>0){
+                        ->update(['files' => '']);
+                    if ($result > 0) {
                         $r_message = ['status' => 1, 'msg' => '删除成功'];
-                    }else{
+                    } else {
                         $r_message = ['status' => 0, 'msg' => '删除失败'];
                     }
-                }else{
+                } else {
                     $r_message = ['status' => 0, 'msg' => '没有此图片(url不存在)'];
                 }
             }
 
-        }else{
+        } else {
             $r_message = ['status' => 0, 'msg' => '需要文件url，以及id两个参数'];
         }
         return $r_message;
@@ -503,9 +518,9 @@ class MarketingPlanController extends Controller
                 'sap_seller_id' => @$request['sap_seller_id'],
                 'goal' => @$request['goal'],
                 'plan_status' => @$request['plan_status'],
-                'asin' => @$request['asin']?@$request['asin']:'',
-                'marketplaceid' => @$request['marketplaceid']?@$request['marketplaceid']:'',
-                'sku' => @$request['sku']?@$request['sku']:'',
+                'asin' => @$request['asin'] ? @$request['asin'] : '',
+                'marketplaceid' => @$request['marketplaceid'] ? @$request['marketplaceid'] : '',
+                'sku' => @$request['sku'] ? @$request['sku'] : '',
                 'sku_status' => @$request['sku_status'],
                 'sku_price' => @$request['sku_price'],
                 'currency_rates_id' => @$request['currency_rates_id'],
@@ -520,17 +535,17 @@ class MarketingPlanController extends Controller
                 'current_rank' => @$request['current_rank'], 'current_cr' => @$request['current_cr'],
                 'current_units_day' => @$request['current_units_day'], 'current_e_val' => @$request['current_e_val'], 'sap_seller_id' => @$request['sap_seller_id'],
                 'current_60romi' => @$request['current_60romi'], 'actual_rank' => @$request['actual_rank'],
-                'actual_cr' => @$request['actual_cr'], 'actual_units_day' => @$request['actual_units_day']?@$request['actual_units_day']:0,
+                'actual_cr' => @$request['actual_cr'], 'actual_units_day' => @$request['actual_units_day'] ? @$request['actual_units_day'] : 0,
                 'actual_e_val' => @$request['actual_e_val'], 'actual_60romi' => @$request['actual_60romi'],
                 'est_rank' => @$request['est_rank'], 'est_cr' => @$request['est_cr'],
-                'est_units_day' => @$request['est_units_day']?@$request['est_units_day']:0, 'est_val' => @$request['est_val']?@$request['est_val']:0,
-                'est_120d_romi' => @$request['est_120d_romi']?@$request['est_120d_romi']:0, 'cr_increase' => @$request['cr_increase']?@$request['cr_increase']:0,
+                'est_units_day' => @$request['est_units_day'] ? @$request['est_units_day'] : 0, 'est_val' => @$request['est_val'] ? @$request['est_val'] : 0,
+                'est_120d_romi' => @$request['est_120d_romi'] ? @$request['est_120d_romi'] : 0, 'cr_increase' => @$request['cr_increase'] ? @$request['cr_increase'] : 0,
                 'units_d_increase' => @$request['units_d_increase'], 'val_d_increase' => @$request['val_d_increase'],
-                'investment_return_d' => @$request['investment_return_d'], 'actual_spend' => @$request['actual_spend']?$request['actual_spend']:0,
-                'cr_complete' => @$request['cr_complete']?$request['cr_complete']:0, 'units_d_complete' => @$request['units_d_complete'],
+                'investment_return_d' => @$request['investment_return_d'], 'actual_spend' => @$request['actual_spend'] ? $request['actual_spend'] : 0,
+                'cr_complete' => @$request['cr_complete'] ? $request['cr_complete'] : 0, 'units_d_complete' => @$request['units_d_complete'],
                 'e_val_complete' => @$request['e_val_complete'], 'investment_return_c' => @$request['investment_return_c'],
                 'cr_complete' => @$request['cr_complete'], 'created_at' => time(),
-                'files' => $fileUrl, 'notes' => @$request['notes']?@$request['notes']:'',
+                'files' => $fileUrl, 'notes' => @$request['notes'] ? @$request['notes'] : '',
             ];
             $result = DB::connection('vlz')->table('marketing_plan')->insert($data);
             if ($result > 0) {
@@ -539,8 +554,8 @@ class MarketingPlanController extends Controller
                     ->orderBy('id', 'desc')
                     ->first();
                 $new_mp = (json_decode(json_encode($new_mp), true));
-                if($new_mp){
-                    $r_message = ['status' => 1, 'msg' => '新增成功','id'=>$new_mp['id']];
+                if ($new_mp) {
+                    $r_message = ['status' => 1, 'msg' => '新增成功', 'id' => $new_mp['id']];
                 }
 
             } else {
@@ -781,4 +796,3 @@ class MarketingPlanController extends Controller
     }
 
 
-}

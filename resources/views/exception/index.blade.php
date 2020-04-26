@@ -395,7 +395,7 @@ $(function() {
     TableDatatablesAjax.init();
 
 	$("#vl_list_export").click(function(){
-		location.href='/exceptionexport?sellerid='+$("select[name='sellerid']").val()+'&amazon_order_id='+$("input[name='amazon_order_id']").val()+'&date_from='+$("input[name='date_from']").val()+'&date_to='+$("input[name='date_to']").val()+'&type='+$("select[name='type']").val()+'&order_sku='+$("input[name='order_sku']").val()+'&status='+$("select[name='status']").val()+'&user_id='+$("input[name='user_id']").val()+'&group_id='+$("select[name='group_id']").val()+'&operator_id='+$("input[name='operator_id']").val();
+		location.href='/exceptionexport?sellerid='+$("select[name='sellerid']").val()+'&amazon_order_id='+$("input[name='amazon_order_id']").val()+'&date_from='+$("input[name='date_from']").val()+'&date_to='+$("input[name='date_to']").val()+'&type='+$("select[name='type']").val()+'&order_sku='+$("input[name='order_sku']").val()+'&status='+$("select[name='status']").val()+'&user_id='+$("input[name='user_id']").val()+'&group_id='+$("select[name='group_id']").val()+'&operator_id='+$("input[name='operator_id']").val()+'&resellerid='+$("select[name='resellerid']").val()+'&resku='+$("input[name='resku']").val()+'&bgbu='+$("select[name='bgbu']").val()+'&sap_seller_id='+$("select[name='sap_seller_id']").val();
 	});
 });
 

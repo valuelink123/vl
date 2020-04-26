@@ -76,7 +76,7 @@ class ExceptionController extends Controller
         //}
 
 		//得到订单号对应的站点和bg,bu，销售员等信息
-		$customers= Exception::leftJoin(DB::raw("(SELECT asin,substring(site,5) as site ,any_value(bg) as bg,any_value(bu) as bu,any_value(seller) as sales FROM  `asin` group by asin,site) as order_info"),function($q){
+		$customers= Exception::leftJoin(DB::raw("(SELECT asin,substring(site,5) as site ,any_value(bg) as bg,any_value(bu) as bu,any_value(sap_seller_id) as sap_seller_id,any_value(seller) as sales FROM  `asin` group by asin,site) as order_info"),function($q){
 			$q->on('order_info.asin', '=', 'exception.asin')
 			  ->on('order_info.site', '=', 'exception.saleschannel');
 		});
@@ -164,6 +164,26 @@ class ExceptionController extends Controller
         if(array_get($_REQUEST,'date_to')){
             $customers = $customers->where('date','<=',$_REQUEST['date_to'].' 23:59:59');
         }
+		
+		if(array_get($_REQUEST,'resellerid')){
+            $customers = $customers->where('replacement', 'like', '%:"'.$_REQUEST['resellerid'].'";%');
+        }
+		if(array_get($_REQUEST,'resku')){
+            $customers = $customers->where('replacement', 'like', '%:"'.$_REQUEST['resku'].'";%');
+        }
+		if(array_get($_REQUEST,'bgbu')){
+			$bgbu_arr = explode('_',array_get($_REQUEST,'bgbu'));
+		   if(array_get($bgbu_arr,0)){
+				$customers = $customers->where('bg',array_get($bgbu_arr,0));
+		   }
+		   if(array_get($bgbu_arr,0)){
+				$customers = $customers->where('bu',array_get($bgbu_arr,1));
+		   }
+        }
+		if(array_get($_REQUEST,'sap_seller_id')){
+            $customers = $customers->where('sap_seller_id',array_get($_REQUEST,'sap_seller_id'));
+        }
+		
 		$customersLists =  $customers->orderBy('date','desc')->get()->toArray();
 		$arrayData = $arrayAmazon = $arraySap = array();
 		$headArray[] = 'Account';
@@ -190,6 +210,7 @@ class ExceptionController extends Controller
 		$headArray[] = 'Country';
 		$headArray[] = 'Phone';
 		$headArray[] = 'Reson';
+        $headArray[] = 'Description';
 		$headArray[] = 'Operator';
 		$headArray[] = 'Group';
 		$headArray[] = 'Creator';
@@ -364,6 +385,7 @@ class ExceptionController extends Controller
 				array_get($replacements,'countrycode'),
 				array_get($replacements,'phone'),
 				$customersList['request_content'],
+                $customersList['descrip'],
 				array_get($users,$customersList['process_user_id'])?array_get($users,$customersList['process_user_id']):array_get($groupleaders,$customersList['group_id']),
                 array_get($groups,$customersList['group_id'].'.group_name'),
 				array_get($users,$customersList['user_id']),
@@ -434,7 +456,7 @@ class ExceptionController extends Controller
             'CTG-gift',
             'Remove NRW',
             'others',
-			'FBM sales order',
+			'Website order',
 			'B2B'
         );
         return view('exception/add', $vars);
@@ -496,7 +518,7 @@ class ExceptionController extends Controller
 			 'CTG-gift',
 			 'Remove NRW',
 			 'others',
-			 'FBM sales order',
+			 'Website order',
 			 'B2B'
 		 );
 

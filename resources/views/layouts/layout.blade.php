@@ -150,11 +150,19 @@
                                                 <span class="arrow"></span>
                                             </a>
                                             <ul class="dropdown-menu pull-left">
-												<li class="">
+												<li class="dropdown-submenu">
                                                     <a href="/{{(Auth::user()->seller_rules || Auth::user()->sap_seller_id)?'home':'service'}}" class="nav-link nav-toggle ">
                                                         Dashboard
                                                         <span class="arrow"></span>
                                                     </a>
+                                                    <ul class="dropdown-menu">
+                                                        <li class=" ">
+                                                            <a href="{{url('home')}}" class="nav-link "> Sales Dashboard </a>
+                                                        </li>
+                                                        <li class=" ">
+                                                            <a href="{{url('service')}}" class="nav-link "> CS Dashboard </a>
+                                                        </li>
+                                                    </ul>
                                                 </li>
 												@permission('sales-report-show')
                                                 <li class="">
@@ -329,14 +337,14 @@
                                                     </a>
                                                 </li>
 												@endpermission
-												<!-- @permission('fee-split-show')
+												@permission('fee-split-show')
 												<li class="">
 												    <a href="/marketingPlan/index" class="nav-link nav-toggle ">
 												        Marketing Plan
 												        <span class="arrow"></span>
 												    </a>
 												</li>
-												@endpermission -->
+												@endpermission
 
                                             </ul>
                                         </li>
