@@ -200,20 +200,20 @@ class HijackController extends Controller
         $admin = array("charlie@valuelinkcorp.com", "zouyuanxun@valuelinkcorp.com", "zanhaifang@valuelinkcorp.com", "huzaoli@valuelinkcorp.com", 'fanlinxi@valuelinkcorp.com');
         $userasinL = [];
         $sapSellerIdList = [];
-        $user = ['id' => '154',
-            'name' => 'test',
-            'email' => 'test@valuelinkcorp.com',
-            'created_at' => '2020-03-27 14:58:11',
-            'updated_at' => '2020-03-27 14:58:11',
-            'admin' => 0,
-            'sap_seller_id' => 279,
-            'seller_rules' => 'BG3-BU3-* ',
-            'locked' => 0,
-            'ubg' => 'BG3',
-            'ubu' => 'BU3',
-        ];
+//        $user = ['id' => '154',
+//            'name' => 'test',
+//            'email' => 'test@valuelinkcorp.com',
+//            'created_at' => '2020-03-27 14:58:11',
+//            'updated_at' => '2020-03-27 14:58:11',
+//            'admin' => 0,
+//            'sap_seller_id' => 279,
+//            'seller_rules' => 'BG3-BU3-* ',
+//            'locked' => 0,
+//            'ubg' => 'BG3',
+//            'ubu' => 'BU3',
+//        ];
         $bool_admin = 0;//是否是管理员
-      //  $user =Auth::user()->toArray(); //todo  打开
+        $user =Auth::user()->toArray(); //todo  打开
         if (!empty($user)) {
             if (!empty($user['email']) && in_array($user['email'], $admin)) {
                 /**  特殊权限着 查询所有用户 */

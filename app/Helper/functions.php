@@ -1102,10 +1102,11 @@ function getPostType()
 }
 /*
  * 产品的权重排序状态对应值
+ * 2020/04/23 去掉屏蔽选项
  */
 function getProductOrderStatus()
 {
-	return array(0=>'默认',1=>'置顶','-1'=>'屏蔽');
+	return array(0=>'默认',1=>'置顶');
 }
 /*
  * 产品的权重排序状态对应值

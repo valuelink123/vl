@@ -209,12 +209,15 @@ Route::post('/hijack/hijackExport', 'hijack\\HijackController@hijackExport');//�
 
 
 //RSG MarketingPlan
+Route::post('/marketingPlan/index1', 'MarketingPlanController@index1')->name('marketingPlan');
 Route::get('/marketingPlan/index', 'MarketingPlanController@index')->name('marketingPlan');
 Route::post('/marketingPlan/showData', 'MarketingPlanController@showData');//展示基础信息
-Route::get('/marketingPlan/updatePlan', 'MarketingPlanController@updatePlan');//修改计划信息
-Route::post('/marketingPlan/updatePlan', 'MarketingPlanController@updatePlan');//修改计划信息
-Route::get('/marketingPlan/detail/', 'MarketingPlanController@detail')->name('detail');
+Route::match(['post'],'/marketingPlan/updatePlan', 'MarketingPlanController@updatePlan');//修改计划信息
+Route::post('/marketingPlan/addMarketingPlan', 'MarketingPlanController@addMarketingPlan');//新增接口
+Route::match(['post','get'],'/marketingPlan/detailEdit/', 'MarketingPlanController@detailEdit')->name('detail');
 Route::match(['post','get'],'/marketingPlan/timingUpdate', 'MarketingPlanController@timingUpdate');//定时刷新 已完结
 Route::match(['post','get'],'/marketingPlan/achieveGoals', 'MarketingPlanController@achieveGoals');//定时更新 完成时间
+Route::match(['post','get'],'/marketingPlan/delfiles', 'MarketingPlanController@delfiles');//删除图片
 
+Route::post('/marketingPlan/getAsinDailyReport', 'MarketingPlanController@getAsinDailyReport');//
 
