@@ -456,7 +456,6 @@
 			"ajax": {
 				url: "/hijack/index1",
 				dataSrc:function(res){
-					console.log(res)
 					if(res.status == -1){
 						alert(res.message)
 						window.location.href="/service"
