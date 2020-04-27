@@ -155,22 +155,27 @@ class GetAsininfo extends Command
 		}
 		DB::table('fba_stock')->truncate();
 		DB::table('asin')->update(['fba_stock'=>0, 'fba_transfer'=>0]);
-		$fs = DB::connection('amazon')->select('select a.afn_sellable as stock,a.afn_reserved as transfer ,a.asin,a.seller_sku as sellersku,b.mws_seller_id as sellerid,a.updated_at from seller_skus as a 
+		$fs = DB::connection('amazon')->select('select b.marketplaceid as marketplaceid,a.afn_sellable as stock,a.afn_reserved as transfer ,a.asin,a.seller_sku as sellersku,b.mws_seller_id as sellerid,a.updated_at from seller_skus as a 
 left join seller_accounts as b
 on a.seller_account_id=b.id where a.afn_total>0');
 		foreach($fs as $fsd){
 			$arrayArea=[];
-			if(array_get($sellerid_area,$fsd->sellerid)=='US') $arrayArea=['www.amazon.com','www.amazon.ca'];
-			if(array_get($sellerid_area,$fsd->sellerid)=='EU') $arrayArea=['www.amazon.it','www.amazon.es','www.amazon.fr','www.amazon.de','www.amazon.co.uk'];
-			if(array_get($sellerid_area,$fsd->sellerid)=='JP') $arrayArea=['www.amazon.co.jp'];
+			if($fsd->marketplaceid=='ATVPDKIKX0DER') $arrayArea=['www.amazon.com'];
+			if($fsd->marketplaceid=='APJ6JRA9NG5V4') $arrayArea=['www.amazon.it'];
+			if($fsd->marketplaceid=='A1RKKUPIHCS9HS') $arrayArea=['www.amazon.es'];
+			if($fsd->marketplaceid=='A13V1IB3VIYZZH') $arrayArea=['www.amazon.fr'];
+			if($fsd->marketplaceid=='A1PA6795UKMFR9') $arrayArea=['www.amazon.de'];
+			if($fsd->marketplaceid=='A1F83G8C2ARO7P') $arrayArea=['www.amazon.co.uk'];
+			if($fsd->marketplaceid=='A1VC38T7YXB528') $arrayArea=['www.amazon.co.jp'];
 			DB::table('asin')->where('asin',$fsd->asin)->where('sellersku',$fsd->sellersku)->whereIn('site',$arrayArea)->update(['fba_stock'=>intval($fsd->stock), 'fba_transfer'=>intval($fsd->transfer)]);
 			
-			$exists_item_code = DB::table('asin')->where('asin',$fsd->asin)->where('sellersku',$fsd->sellersku)->first();
+			$exists_item_code = DB::table('asin')->where('asin',$fsd->asin)->where('sellersku',$fsd->sellersku)->whereIn('site',$arrayArea)->first();
 			$name = array_get($sellerid_name,$fsd->sellerid);
 			DB::table('fba_stock')->insert(
 				array(
 					'seller_id'=>$fsd->sellerid,
 					'seller_name'=>array_get($sellerid_name,$fsd->sellerid),
+					'site'=>current($arrayArea),
 					'item_code'=>isset($exists_item_code->item_no)?$exists_item_code->item_no:NULL,
 					'asin'=>$fsd->asin,
 					'seller_sku'=>$fsd->sellersku,
