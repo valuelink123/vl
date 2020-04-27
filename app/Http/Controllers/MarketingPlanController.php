@@ -17,11 +17,11 @@ header('Access-Control-Allow-Origin:*');
 class MarketingPlanController extends Controller
 {
 //判断是否登录
-    public function __construct()
-    {
-        $this->middleware('auth');
-        parent::__construct();
-    }
+//    public function __construct()
+//    {
+//        $this->middleware('auth');
+//        parent::__construct();
+//    }
 
     public function index()
     {
@@ -374,7 +374,7 @@ class MarketingPlanController extends Controller
         $update = 0;
         if (!empty($request)) {
             $id = $request['id'];
-            $notes = isset($request['notes']) ? $request['notes'] : '';//备注
+          //  $notes = isset($request['notes']) ? $request['notes'] : '';//备注
             $plan_status = $request['plan_status'];
             $r_message = $resProductIds = [];//更新返回
             //查询当前 plan_status 状态
@@ -397,8 +397,7 @@ class MarketingPlanController extends Controller
                     ->where('id', $id)
                     ->update(['plan_status' => $plan_status,
                         'updated_at' => time(),
-                        'updated_user_id' => $sap_seller_id,
-                        'notes' => $notes
+                        'updated_user_id' => $sap_seller_id
                     ]);
                 if ($result == 1) {
                     $r_message = ['status' => 1, 'msg' => '更新成功'];
@@ -796,3 +795,4 @@ class MarketingPlanController extends Controller
     }
 
 
+}
