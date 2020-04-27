@@ -188,7 +188,7 @@ class RsgproductsController extends Controller
 	{
         $DOMIN_MARKETPLACEID_SX = Asin::DOMIN_MARKETPLACEID_SX;
 		if(!Auth::user()->can(['rsgproducts-rsgtask'])) die('Permission denied -- rsgproducts rsgtask');
-		$date = $todayDate = $this->getDefaultDate(date('Y-m-d',time()-3600*24*16));
+		$date = $todayDate = $this->getDefaultDate(date('Y-m-d',time()-3600*24*6));
 		$where = " and created_at = '".$date."' ";
 		$where_product = " and created_at >= '".$date."' and cast(rsg_products.sales_target_reviews as signed) - cast(rsg_products.requested_review as signed) > 0 and rsg_products.order_status != -1";
 
