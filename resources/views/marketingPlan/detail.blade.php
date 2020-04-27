@@ -504,6 +504,7 @@
 
 
 <script>
+	/* http://10.10.42.14/vl/public */
 	let sap_seller_id = <?php echo $sap_seller_id;?>;
 	let ratVal,fulfillment,commission,cost;
 	let tableObj  , urlIndex , detailId , listObj,time1,time2,domin_url,saveId;
@@ -577,7 +578,8 @@
 		}
 		getInitalData();
 		if(ids == "null"){
-			clearInput()
+			clearInput();
+			$('.planStatus').attr("disabled",true);
 		}else{
 			$.ajax({
 				type:"post",
