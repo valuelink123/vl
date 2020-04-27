@@ -320,7 +320,9 @@ font-weight:bold;
 						$sales_sum = $price_sum =0;
 						$week_end=date('Y-m-d',strtotime($date_start));
 						$week=date('Y-m-d',strtotime($date_end));
+						$lineNum=0;
 						while($week>=$week_end){
+						$lineNum++;
 						$details = $data->details;
 						if(isset($details[$week]['sales'])){
 							$sales_data[] = intval($details[$week]['sales']);
@@ -331,7 +333,7 @@ font-weight:bold;
 							$price_sum+=round($details[$week]['price'],2);
 						}
 						?>
-						  <tr>
+						  <tr <?php echo ($lineNum%2==0)?'style="background:#ccc;"':''?>>
 						  	<td>{{$week}}</td>
 							<td class="ranking_s"><a class="sku_ranking" href="javascript:;" id="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:ranking" data-pk="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:ranking" data-type="text" title="排名 P数字-数字 格式">{{array_get($data->details,$week.'.ranking')}} </a></td>
 							
