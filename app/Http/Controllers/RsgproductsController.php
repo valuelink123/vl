@@ -242,6 +242,8 @@ class RsgproductsController extends Controller
                             break;
                         case date('Y-m-d', time()) :
                             $new_data[$ndk]['d_0'] = $d_v;
+                            $new_data[$ndk]['review'] = $v['review'];
+                            $new_data[$ndk]['rating'] = $v['rating'];
                             break;
                     }
                 }
