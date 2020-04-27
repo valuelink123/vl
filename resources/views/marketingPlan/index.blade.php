@@ -191,6 +191,10 @@
 		color: #f56c6c !important;
 	}
 </style>
+<!-- <link rel="stylesheet" type="text/css" media="all" href="daterangepicker.css" />
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.1/moment.min.js"></script>
+<script type="text/javascript" src="daterangepicker.js"></script> -->
 <div>
 	<h3 class="plan_title">Marketing Plan</h3>
 	<ul class="plan_nav">
@@ -222,8 +226,8 @@
 			<select>
 				<option value ="">This Week</option>
 			</select>
-			
-			<div class="date_box date_box1">
+			<!-- <input type="text" id="config-demo" class="form-control"> -->
+			<!-- <div class="date_box date_box1">
 				<div style="float: left; width: 70px; line-height: 30px;text-align: right;padding-right: 10px;">Est. Start</div>
 				<div style="float: left;width: 130px;">
 				    <div class="input-group date date-picker margin-bottom-5" data-date-format="yyyy-mm-dd">
@@ -271,7 +275,7 @@
 						</span>
 				    </div>
 				</div>		
-			</div>
+			</div> -->
 		
 		<div class="search_box">
 			<input type="text">
@@ -371,6 +375,48 @@
 		 else tableObj.column(column).search(value).draw();
 	 }
 	$(document).ready(function () {
+		/* updateConfig();
+		function updateConfig() {
+		  var options = {
+			  autoApply: false,
+			  showDropdowns: false,
+			  showWeekNumbers: false,
+			  showISOWeekNumbers: false,
+			  timePicker: true,
+			  timePicker24Hour: true,
+			  timePickerSeconds: true,
+			  alwaysShowCalendars: true,
+			  linkedCalendars: true,
+			  autoUpdateInput: true,
+			  showCustomRangeLabel: true,
+			  opens: 'center',
+			  drops: 'down',
+			  singleDatePicker: false,
+			  //dateLimit: { days: 7 }, 
+			  ranges : {
+			    'Today': [moment(), moment()],
+			    'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+			    'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+			    'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+			    'This Month': [moment().startOf('month'), moment().endOf('month')],
+			    'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+			  },
+			 locale: {
+			    direction: $('#rtl').is(':checked') ? 'rtl' : 'ltr',
+			    format: 'MM/DD/YYYY HH:mm',
+			    separator: ' - ',
+			    applyLabel: 'Apply',
+			    cancelLabel: 'Cancel',
+			    fromLabel: 'From',
+			    toLabel: 'To',
+			    customRangeLabel: 'Custom',
+			    daysOfWeek: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr','Sa'],
+			    monthNames: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+			    firstDay: 1
+			  }
+		  };
+		  $('#config-demo').daterangepicker(options, function(start, end, label) { console.log('New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')'); }).click();;       
+		} */
 		
 		//时间戳转换
 		function dateStr(str){
