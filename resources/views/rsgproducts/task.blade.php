@@ -189,13 +189,13 @@
                         <!-- <th>{!! $val['target_review'] !!}</th>
                             <th>{!! $val['requested_review'] !!}</th>
 							<th class="special-content">{!! $val['task'] !!}</th> -->
-                            <th>{!! @$val['d-6']?$val['d-6']:'' !!}</th>
-                            <th>{!! @$val['d-5']?$val['d-5']:'' !!}</th>
-                            <th>{!! @$val['d-4']?$val['d-4']:'' !!}</th>
-                            <th>{!! @$val['d-3']?$val['d-3']:'' !!}</th>
-                            <th>{!! @$val['d-2']?$val['d-2']:'' !!}</th>
-                            <th>{!! @$val['d-1']?$val['d-1']:'' !!}</th>
-                            <th>{!! @$val['d-0']?$val['d-0']:'' !!}</th>
+                            <th>{!! @$val['d_6']?$val['d_6']:'' !!}</th>
+                            <th>{!! @$val['d_5']?$val['d_5']:'' !!}</th>
+                            <th>{!! @$val['d_4']?$val['d_4']:'' !!}</th>
+                            <th>{!! @$val['d_3']?$val['d_3']:'' !!}</th>
+                            <th>{!! @$val['d_2']?$val['d_2']:'' !!}</th>
+                            <th>{!! @$val['d_1']?$val['d_1']:'' !!}</th>
+                            <th>{!! @$val['d_0']?$val['d_0']:'' !!}</th>
                             <th>{!! @$val['d1']?$val['d1']:'' !!}</th>
                             <th>{!! @$val['d2']?$val['d2']:'' !!}</th>
                             <th>{!! @$val['d3']?$val['d3']:'' !!}</th>
@@ -252,6 +252,21 @@
                         if(res.status==1){
                             var data = res.data;
                             $.each(data,function(key,val){
+                                let d_6 = val.hasOwnProperty("d_6") == true ? val.d_6  : val.d_6 = '';
+                                let d_5 = val.hasOwnProperty("d_5") == true ? val.d_5  : val.d_5 = '';
+                                let d_4 = val.hasOwnProperty("d_4") == true ? val.d_4  : val.d_4 = '';
+                                let d_3 = val.hasOwnProperty("d_3") == true ? val.d_3  : val.d_3 = '';
+                                let d_2 = val.hasOwnProperty("d_2") == true ? val.d_2  : val.d_2 = '';
+                                let d_1 = val.hasOwnProperty("d_1") == true ? val.d_1  : val.d_1 = '';
+                                let d_0 = val.hasOwnProperty("d_0") == true ? val.d_0  : val.d_0 = '';
+                                let d1 = val.hasOwnProperty("d1") == true ? val.d1  : val.d1 = '';
+                                let d2 = val.hasOwnProperty("d2") == true ? val.d2  : val.d2 = '';
+                                let d3 = val.hasOwnProperty("d3") == true ? val.d3  : val.d3 = '';
+                                let d4 = val.hasOwnProperty("d4") == true ? val.d4  : val.d4 = '';
+                                let d5 = val.hasOwnProperty("d5") == true ? val.d5  : val.d5 = '';
+                                let d6 = val.hasOwnProperty("d6") == true ? val.d6  : val.d6 = '';
+                                let d7 = val.hasOwnProperty("d7") == true ? val.d7  : val.d7 = '';
+
                                 html += '<tr>';
                                 html += '<th>' + val.product + '</th>';
                                 html += '<th>' + val.site + '</th>';
@@ -268,20 +283,20 @@
                                 /*  html += '<th>' + val.target_review + '</th>';
                                   html += '<th>' + val.requested_review + '</th>';
                                   html += '<th class="special-content">' + val.task + '</th>'; */
-                                html += '<th>' + val.d-6 + '</th>';
-                                html += '<th>' + val.d-5 + '</th>';
-                                html += '<th>' + val.d-4 + '</th>';
-                                html += '<th>' + val.d-3 + '</th>';
-                                html += '<th>' + val.d-2 + '</th>';
-                                html += '<th>' + val.d-1 + '</th>';
-                                html += '<th>' + val.d-0 + '</th>';
-                                html += '<th>' + val.d1 + '</th>';
-                                html += '<th>' + val.d2 + '</th>';
-                                html += '<th>' + val.d3 + '</th>';
-                                html += '<th>' + val.d4 + '</th>';
-                                html += '<th>' + val.d5 + '</th>';
-                                html += '<th>' + val.d6 + '</th>';
-                                html += '<th>' + val.d7 + '</th>';
+                                html += '<th>' + d_6 + '</th>';
+                                html += '<th>' + d_5+ '</th>';
+                                html += '<th>' + d_4 + '</th>';
+                                html += '<th>' + d_3 + '</th>';
+                                html += '<th>' + d_2 + '</th>';
+                                html += '<th>' + d_1 + '</th>';
+                                html += '<th>' + d_0 + '</th>';
+                                html += '<th>' + d1 + '</th>';
+                                html += '<th>' + d2 + '</th>';
+                                html += '<th>' + d3 + '</th>';
+                                html += '<th>' + d4 + '</th>';
+                                html += '<th>' + d5 + '</th>';
+                                html += '<th>' + d6 + '</th>';
+                                html += '<th>' + d7 + '</th>';
                                 html += '<th>' + val.action + '</th>';
                                 html += '</tr>';
                             });

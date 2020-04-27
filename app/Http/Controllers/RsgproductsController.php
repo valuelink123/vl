@@ -188,7 +188,7 @@ class RsgproductsController extends Controller
 	{
         $DOMIN_MARKETPLACEID_SX = Asin::DOMIN_MARKETPLACEID_SX;
 		if(!Auth::user()->can(['rsgproducts-rsgtask'])) die('Permission denied -- rsgproducts rsgtask');
-		$date = $todayDate = $this->getDefaultDate(date('Y-m-d',time()-3600*24*6));
+		$date = $todayDate = $this->getDefaultDate(date('Y-m-d',time()-3600*24*16));
 		$where = " and created_at = '".$date."' ";
 		$where_product = " and created_at >= '".$date."' and cast(rsg_products.sales_target_reviews as signed) - cast(rsg_products.requested_review as signed) > 0 and rsg_products.order_status != -1";
 
@@ -207,14 +207,7 @@ class RsgproductsController extends Controller
 		$sql .= ' LIMIT 0,70';
 		$data = $this->queryRows($sql);
 		$data = $this->getReturnData(0,$data,$date,$todayDate,'task');
-		if($_POST){
-			$return['status'] = 0;
-			if($data){
-				$return['data'] = $data;
-				$return['status'] = 1;
-			}
-			return json_encode($return);
-		}
+
         $asinIdList=[];
         $new_data=[];
         foreach ($data as $key => $val) {
@@ -230,25 +223,25 @@ class RsgproductsController extends Controller
                     $d_v=$v['target_review']. '(' . $v['requested_review']. ')';
                     switch ($v['created_at']) {
                         case $date :
-                            $new_data[$ndk]['d-6'] = $d_v;
+                            $new_data[$ndk]['d_6'] = $d_v;
                             break;
                         case date('Y-m-d', time() - 3600 * 24 * 5) :
-                            $new_data[$ndk]['d-5'] = $d_v;
+                            $new_data[$ndk]['d_5'] = $d_v;
                             break;
                         case date('Y-m-d', time() - 3600 * 24 * 4) :
-                            $new_data[$ndk]['d-4'] = $d_v;
+                            $new_data[$ndk]['d_4'] = $d_v;
                             break;
                         case date('Y-m-d', time() - 3600 * 24 * 3) :
-                            $new_data[$ndk]['d-3'] = $d_v;
+                            $new_data[$ndk]['d_3'] = $d_v;
                             break;
                         case date('Y-m-d', time() - 3600 * 24 * 2) :
-                            $new_data[$ndk]['d-2'] = $d_v;
+                            $new_data[$ndk]['d_2'] = $d_v;
                             break;
                         case date('Y-m-d', time() - 3600 * 24 ) :
-                            $new_data[$ndk]['d-1'] = $d_v;
+                            $new_data[$ndk]['d_1'] = $d_v;
                             break;
                         case date('Y-m-d', time()) :
-                            $new_data[$ndk]['d-0'] = $d_v;
+                            $new_data[$ndk]['d_0'] = $d_v;
                             break;
                     }
                 }
@@ -287,6 +280,14 @@ class RsgproductsController extends Controller
                     }
                 }
             }
+        }
+        if($_POST){
+            $return['status'] = 0;
+            if($new_data){
+                $return['data'] = $new_data;
+                $return['status'] = 1;
+            }
+            return json_encode($return);
         }
 		return view('rsgproducts/task',['data'=>$new_data,'rsg_link'=> 'https://rsg.claimthegift.com?user=V'.Auth::user()->id ]);
 	}
