@@ -220,7 +220,7 @@ License: You must have a valid license purchased only from themeforest(the above
 	 
 
           <div class="col-lg-3" style=" float:left;">
-              <div class="blog-post-lg bordered blog-container" style="padding:30px; background: #fff; position: fixed;">
+              <div class="blog-post-lg bordered blog-container" style="padding:30px; background: #fff; position: absolute;">
                   <h3>Knowledge Type</h3>
                   <div class="zTreeDemoBackground">
                       <ul id="treeDemo" class="ztree"></ul>
