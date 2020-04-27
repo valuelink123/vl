@@ -999,7 +999,7 @@
 				url:"/marketingPlan/addMarketingPlan",
 				data:{
 					"id": ids,
-					"sap_seller_id": sap_seller_idA,
+					"sap_seller_id": sap_seller_id,
 					"goal": goal,
 					"plan_status": plan_status,
 					"asin": asin,
