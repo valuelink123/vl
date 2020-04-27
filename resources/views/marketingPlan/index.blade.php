@@ -190,11 +190,24 @@
 	.error_mask .mask_text{
 		color: #f56c6c !important;
 	}
+	.daterangepicker .calendar-table table{
+		display: grid;
+	}
+	.daterangepicker .calendar-table td, .daterangepicker .calendar-table th{
+		background: #fff;
+	}
+	.daterangepicker td{
+		float: left;
+	}
+	.time-style{
+		display: inline-block;
+		width: 300px;
+	}
 </style>
-<!-- <link rel="stylesheet" type="text/css" media="all" href="daterangepicker.css" />
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
+<link rel="stylesheet" type="text/css" media="all" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-daterangepicker/3.0.5/daterangepicker.min.css" />
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.1/moment.min.js"></script>
-<script type="text/javascript" src="daterangepicker.js"></script> -->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-daterangepicker/3.0.5/daterangepicker.min.js"></script>
+
 <div>
 	<h3 class="plan_title">Marketing Plan</h3>
 	<ul class="plan_nav">
@@ -226,7 +239,7 @@
 			<select>
 				<option value ="">This Week</option>
 			</select>
-			<!-- <input type="text" id="config-demo" class="form-control"> -->
+			<input type="text" id="config-demo" class="form-control time-style">
 			<!-- <div class="date_box date_box1">
 				<div style="float: left; width: 70px; line-height: 30px;text-align: right;padding-right: 10px;">Est. Start</div>
 				<div style="float: left;width: 130px;">
@@ -375,7 +388,7 @@
 		 else tableObj.column(column).search(value).draw();
 	 }
 	$(document).ready(function () {
-		/* updateConfig();
+		updateConfig();
 		function updateConfig() {
 		  var options = {
 			  autoApply: false,
@@ -416,7 +429,7 @@
 			  }
 		  };
 		  $('#config-demo').daterangepicker(options, function(start, end, label) { console.log('New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')'); }).click();;       
-		} */
+		}
 		
 		//时间戳转换
 		function dateStr(str){

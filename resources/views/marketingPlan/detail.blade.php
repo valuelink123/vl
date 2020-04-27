@@ -8,11 +8,13 @@
 		padding: 30px 0;
 		background: #fff;
 		margin: 20px auto;
+		width: 1000px;
 	}
 	
 	.mask_table{
 		border: 1px solid #999;
-		margin: 0 100px;
+		margin: 0 auto;
+		width: 900px;
 	}
 	.mask_h3{
 		font-size: 22px;
@@ -228,13 +230,13 @@
 						</td>
 						<td>星级目标</td>
 						<td><input type="number" class="targetRating bw9" style="padding-left: 5px;" value=""></td>
-						<td>数量目标</td>
+						<td title="Target reviews are all reviews include organic, CTG and RSG.">数量目标</td>
 						<td><input type="number" value="" style="padding-left: 5px;" class="bw9 targetUnitsSold"></td>
 					</tr>
 					<tr>
 						<td>From</td>
 						<td style="">
-							<div class="input-group date date-picker margin-bottom-5 bw9" data-date-format="yyyy-mm-dd">
+							<div class="input-group date date-picker margin-bottom-5 bw9" id="fromDate">
 								<input type="text" class="form-control form-filter input-sm fromDate" readonly name="date_from" placeholder="From" value="">
 								<span class="input-group-btn">
 									<button class="btn btn-sm default" type="button">
@@ -254,7 +256,7 @@
 								</span>
 							</div>
 						</td>
-						<td>RSG 金额</td>
+						<td title="Money paid to RSG customers.">RSG付款金额</td>
 						<td>
 							<input type="number" value="" style="padding-left: 5px;width: 60%;" class="bw9 rsgPrice">
 							<select name="" class="rate rateSelect" style="width: 35%;padding: 1px 0;">
@@ -369,7 +371,7 @@
 							    <div>
 							        <!-- The fileupload-buttonbar contains buttons to add/delete files and start/cancel the upload -->
 							        <div class="fileupload-buttonbar">
-							            <div class="col-lg-7">
+							            <div class="col-lg-12">
 							                <!-- The fileinput-button span is used to style the file input field as button -->
 							                <span class="btn green fileinput-button">
 												<i class="fa fa-plus"></i>
@@ -394,7 +396,7 @@
 							                <span class="fileupload-process"> </span>
 							            </div>
 							            <!-- The global progress information -->
-							            <div class="col-lg-5 fileupload-progress fade">
+							            <div class="col-lg-12 fileupload-progress fade">
 							                <!-- The global progress bar -->
 							                <div class="progress progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100">
 							                    <div class="progress-bar progress-bar-success" style="width:0%;"> </div>
@@ -505,6 +507,7 @@
 
 <script>
 	/* http://10.10.42.14/vl/public */
+	
 	let sap_seller_id = <?php echo $sap_seller_id;?>;
 	let ratVal,fulfillment,commission,cost;
 	let tableObj  , urlIndex , detailId , listObj,time1,time2,domin_url,saveId;
@@ -549,8 +552,6 @@
 		  });
 	}
 	$(document).ready(function(){
-		
-		
 		//初始化获取asin和汇率的数据
 		function getInitalData(){
 			$.ajax({
@@ -601,6 +602,8 @@
 						$('.ratingVal').attr("disabled",true);
 						$('.rateSelect').attr("disabled",true);
 						$('.fromDate').attr("disabled",true);
+						$('.btn-sm').attr("disabled",true);
+						
 						$('.rsgD').attr("disabled",true);
 						$('.toDate').attr("disabled",true);
 						$('.targetRating').attr("disabled",true);
@@ -681,7 +684,6 @@
 		$('#asin-select').select2({
 			tags:true
 		});
-		
 		$('#asin-select').on("change",function(e){
 			let asinId = $(this).val();
 			let id = $(this).find("option:selected").attr("id");
@@ -735,8 +737,10 @@
 		//时间选择器
 		function initPickers() {
 		    $('.date-picker').datepicker({
-		        rtl: App.isRTL(),
-		        autoclose: true
+				format: 'yyyy-mm-dd',
+		        autoclose: true,
+				datesDisabled : new Date(),
+				startDate: '0'
 		    });
 		}
 		initPickers();
@@ -763,8 +767,9 @@
 		})
 		//日期1
 		$('.fromDate').on('change',function(){
-			$('.totalRsg').text(rsgNum($('.toDate').val(),$(this).val(),$('.rsgD').val()));	
+			$('.totalRsg').text(rsgNum($('.toDate').val(),$(this).val(),$('.rsgD').val()));
 			estSpendNum()
+			
 		})
 		//日期2
 		$('.toDate').on('change',function(){
@@ -950,7 +955,7 @@
 				asinVal = $('#asin-select').val();
 			}else{
 				asinVal = $('#select2-asin-select-container').text().substr($('#select2-asin-select-container').text().lastIndexOf('—') + 1);
-				marketplaceidVal = saveId;
+				marketplaceidVal = saveId;	
 			}
 			let asin = asinVal;
 			let marketplaceid = marketplaceidVal;
@@ -994,12 +999,13 @@
 			let units_d_complete = parseFloat($('.dailyComplete').text());
 			let e_val_complete = parseFloat($('.eComplete').text());
 			let investment_return_c = $('.investmentCycle2').text();
+			
 			$.ajax({
 				type:"post",
 				url:"/marketingPlan/addMarketingPlan",
 				data:{
 					"id": ids,
-					"sap_seller_id": sap_seller_idA,
+					"sap_seller_id": sap_seller_id,
 					"goal": goal,
 					"plan_status": plan_status,
 					"asin": asin,
@@ -1044,8 +1050,7 @@
 					"units_d_complete": units_d_complete,
 					"e_val_complete": e_val_complete,
 					"investment_return_c": investment_return_c,
-					"files":fileList
-					
+					"files": fileList
 				},
 				success:function(res){
 					if(res.status == 1){
