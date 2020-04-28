@@ -155,7 +155,7 @@ class GetAsininfo extends Command
 		}
 		DB::table('fba_stock')->truncate();
 		DB::table('asin')->update(['fba_stock'=>0, 'fba_transfer'=>0]);
-		$fs = DB::connection('amazon')->select('select b.marketplaceid as marketplaceid,a.afn_sellable as stock,a.afn_reserved as transfer ,a.asin,a.seller_sku as sellersku,b.mws_seller_id as sellerid,a.updated_at from seller_skus as a 
+		$fs = DB::connection('amazon')->select('select a.marketplaceid as marketplaceid,a.afn_sellable as stock,a.afn_reserved as transfer ,a.asin,a.seller_sku as sellersku,b.mws_seller_id as sellerid,a.updated_at from seller_skus as a 
 left join seller_accounts as b
 on a.seller_account_id=b.id where a.afn_total>0');
 		foreach($fs as $fsd){
