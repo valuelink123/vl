@@ -64,13 +64,13 @@ class SkuDaily extends Command
 		$storage_fee = DB::table('storage_fee')->select(DB::raw("CONCAT(type,'-',site,'-',size) as skey, $m_f as svalue"))->pluck('svalue','skey');
 		//收入明细
 		print_r('order...');
-		$sales =  DB::connection('order')->select("select sellersku,MarketplaceName,type,currency,sum(quantityshipped) as sales,
-		sum(Amount) as amount from finances_shipment_event where date='$date' 
+		$sales =  DB::connection('amazon')->select("select seller_sku as sellersku,marketplace_name as MarketplaceName,type,currency,sum(quantity_shipped) as sales,
+        sum(amount) as amount from finances_shipment_events where date(posted_date)='$date' 
 		group by sellersku,MarketplaceName,type,currency");
 		foreach($sales as $sale){
 			$match_site = $sale->MarketplaceName;
 			if($match_site=='Non-Amazon'){
-				$match_site = DB::connection('order')->table('finances_shipment_event')->where('sellersku',$sale->sellersku)->where('currency',$sale->currency)->where('MarketplaceName','<>','Non-Amazon')->orderBy('PostedDate','desc')->value('MarketplaceName');
+				$match_site = DB::connection('amazon')->table('finances_shipment_events')->where('seller_sku',$sale->sellersku)->where('currency',$sale->currency)->where('marketplace_name','<>','Non-Amazon')->orderBy('posted_date','desc')->value('marketplace_name');
 				if(!$match_site) continue;
 			}
 			if(strtolower($match_site)=='si us prod marketplace') $match_site='amazon.com';
@@ -95,12 +95,13 @@ class SkuDaily extends Command
 			if(!isset($skus_info[$key]['level'])) $skus_info[$key]['level']=$sku['status'];
 			if(!isset($skus_info[$key]['review_user_id'])) $skus_info[$key]['review_user_id']=$sku['review_user_id'];
 			if(in_array($sale->type,['Principal','CostOfPointsGranted','GiftWrap','GiftWrapTax','PaymentMethodFee','ShippingCharge','ShippingTax','Tax','LowValueGoodsTax-Principal','LowValueGoodsTax-Shipping','MarketplaceFacilitatorTax-Other','MarketplaceFacilitatorTax-Principal','MarketplaceFacilitatorTax-Shipping','PromotionMetaDataDefinitionValue'])){
+				if($sale->type == 'Principal') $skus_info[$key]['sales']+=$sale->sales;
 				$skus_info[$key]['amount']+=round($sale->amount*array_get($rates,$sale->currency),2);
 			}elseif(in_array($sale->type,['FBAPerUnitFulfillmentFee','CODChargeback','GiftwrapChargeback','ShippingChargeback'])){
 				$skus_info[$key]['fulfillmentfee']+=round($sale->amount*array_get($rates,$sale->currency),2);
 				if($sale->MarketplaceName=='Non-Amazon' && $sale->type=='FBAPerUnitFulfillmentFee') $skus_info[$key]['sales']+=$sale->sales;
 			}elseif(in_array($sale->type,['Commission','ShippingHB'])){
-				if($sale->type == 'Commission') $skus_info[$key]['sales']+=$sale->sales;
+				
 				$skus_info[$key]['commission']+=round($sale->amount*array_get($rates,$sale->currency),2);
 			}else{
 				$skus_info[$key]['otherfee']+=round($sale->amount*array_get($rates,$sale->currency),2);
