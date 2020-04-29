@@ -99,7 +99,7 @@ class SkuDaily extends Command
 				$skus_info[$key]['amount']+=round($sale->amount*array_get($rates,$sale->currency),2);
 			}elseif(in_array($sale->type,['FBAPerUnitFulfillmentFee','CODChargeback','GiftwrapChargeback','ShippingChargeback'])){
 				$skus_info[$key]['fulfillmentfee']+=round($sale->amount*array_get($rates,$sale->currency),2);
-				if(strtolower(substr($sale->MarketplaceName,0,6))!='Amazon' && $sale->type=='FBAPerUnitFulfillmentFee') $skus_info[$key]['sales']+=$sale->sales;
+				if(strtolower(substr($sale->MarketplaceName,0,6))!='amazon' && $sale->type=='FBAPerUnitFulfillmentFee') $skus_info[$key]['sales']+=$sale->sales;
 			}elseif(in_array($sale->type,['Commission','ShippingHB'])){
 				
 				$skus_info[$key]['commission']+=round($sale->amount*array_get($rates,$sale->currency),2);
@@ -464,7 +464,7 @@ class SkuDaily extends Command
 				$skus_info[$key]['amount']+=round($sale->amount*array_get($rates,$sale->currency),2);
 			}elseif(in_array($sale->type,['FBAPerUnitFulfillmentFee','CODChargeback','GiftwrapChargeback','ShippingChargeback'])){
 				$skus_info[$key]['fulfillmentfee']+=round($sale->amount*array_get($rates,$sale->currency),2);
-				if(strtolower(substr($sale->MarketplaceName,0,6))!='Amazon' && $sale->type=='FBAPerUnitFulfillmentFee') $skus_info[$key]['sales']+=$sale->sales;
+				if(strtolower(substr($sale->MarketplaceName,0,6))!='amazon' && $sale->type=='FBAPerUnitFulfillmentFee') $skus_info[$key]['sales']+=$sale->sales;
 			}elseif(in_array($sale->type,['Commission','ShippingHB'])){
 				
 				$skus_info[$key]['commission']+=round($sale->amount*array_get($rates,$sale->currency),2);
