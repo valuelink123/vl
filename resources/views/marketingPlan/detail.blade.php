@@ -24,6 +24,7 @@
 		text-align: center;
 		border: 1px solid #666;
 		padding: 5px 0;
+		
 	}
 	.mask_from{
 		margin: 20px 100px 0 0;
@@ -165,6 +166,14 @@
 	.fileupload-progress{
 		height: 5px;
 	}
+	.btn.default:not(.btn-outline){
+		height: 27px;
+		padding: 0 6px;
+	}
+	td svg{
+		display: inline-block;
+		    margin-bottom: -3px;
+	}
 </style>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.8/css/select2.min.css" rel="stylesheet" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.8/js/select2.min.js"></script>
@@ -179,7 +188,7 @@
 							</td>
 						</tr>
 						<tr>
-							<td>RSG 需求目的</td>
+							<td style="width: 110px;">RSG 需求目的</td>
 							<td colspan="2">
 								<select class="bw9 rsgGoal">
 									<option value ="">请选择</option>
@@ -192,7 +201,7 @@
 								</select>
 							</td>
 							<td></td>
-							<td>任务状态</td>
+							<td style="width: 120px;">任务状态</td>
 							<td>
 								<select class="bw9 planStatus">
 									<option value ="1">待审批</option>
@@ -218,8 +227,8 @@
 						<tr>
 							<td>当前售价</td>
 							<td>
-								<input type="number" value="" style="padding-left: 5px; width: 60%;border: 1px solid #ccc; background: #fff;" class="ratingVal">
-								<select name="" class="rate rateSelect" style="width: 35%;padding: 1px 0;">
+								<input type="number" value="" style="padding-left: 5px; width: 55%;border: 1px solid #ccc; background: #fff;" class="ratingVal">
+								<select name="" class="rate rateSelect" style="width: 40%;padding: 1px 0;">
 									<option value="-1">请选择</option>
 								</select>
 							</td>
@@ -235,7 +244,10 @@
 							</td>
 							<td>星级目标</td>
 							<td><input type="number" class="targetRating bw9" style="padding-left: 5px;" value=""></td>
-							<td title="Target reviews are all reviews include organic, CTG and RSG.">数量目标</td>
+							<td title="Target reviews are all reviews include organic, CTG and RSG.">
+								数量目标
+								<svg t="1588757275371" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2149" width="18" height="18"><path d="M473.8 607.4c6.4 19.1 19.1 31.8 38.2 31.8s31.8-12.7 38.2-31.8l25.4-349.9c0-38.2-31.8-63.6-63.6-63.6-38.2 0-63.6 31.8-63.6 70l25.4 343.5z m38.2 95.5c-38.2 0-63.6 25.4-63.6 63.6s25.4 63.6 63.6 63.6 63.6-25.4 63.6-63.6-25.4-63.6-63.6-63.6z" fill="#d81e06" p-id="2150"></path></svg>
+							</td>
 							<td><input type="number" value="" style="padding-left: 5px;" class="bw9 targetUnitsSold"></td>
 						</tr>
 						<tr>
@@ -261,10 +273,13 @@
 									</span>
 								</div>
 							</td>
-							<td title="Money paid to RSG customers.">RSG付款金额</td>
+							<td title="Money paid to RSG customers.">
+								RSG付款金额
+								<svg t="1588757275371" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2149" width="18" height="18"><path d="M473.8 607.4c6.4 19.1 19.1 31.8 38.2 31.8s31.8-12.7 38.2-31.8l25.4-349.9c0-38.2-31.8-63.6-63.6-63.6-38.2 0-63.6 31.8-63.6 70l25.4 343.5z m38.2 95.5c-38.2 0-63.6 25.4-63.6 63.6s25.4 63.6 63.6 63.6 63.6-25.4 63.6-63.6-25.4-63.6-63.6-63.6z" fill="#d81e06" p-id="2150"></path></svg>
+							</td>
 							<td>
-								<input type="number" value="" style="padding-left: 5px;width: 60%;" class="bw9 rsgPrice">
-								<select name="" class="rate rateSelect" style="width: 35%;padding: 1px 0;">
+								<input type="number" value="" style="padding-left: 5px;width: 55%;" class="bw9 rsgPrice">
+								<select name="" class="rate rateSelect" style="width: 40%;padding: 1px 0;">
 									<option value="-1">请选择</option>
 								</select>
 							</td>
@@ -300,7 +315,7 @@
 						</tr>
 						<tr>
 							<td>当前日均</td>
-							<td><span class="currentSold1"></span></td>
+							<td><span class="currentSold1">0</span></td>
 							<td>预计日均</td>
 							<td><input type="number" value="" style="padding-left: 5px;" class="bw9 estSold"></td>
 							<td>日均增长</td>
@@ -310,7 +325,7 @@
 							<td>经济效益/个</td>
 							<td><span class="eValue"></span></td>
 							<td>预计经济效益/个</td>
-							<td>￥<input type="number" value="" style="padding-left: 5px; width: 50%; border: 1px solid #ccc; background: #fff;" class="estDay"></td>
+							<td>￥<input type="number" value="" style="padding-left: 5px; width: 87%; border: 1px solid #ccc; background: #fff;" class="estDay"></td>
 							<td>预计经济效益增长/日</td>
 							<td><span class="estAdded"></span></td>
 						</tr>
@@ -690,7 +705,7 @@
 		
 		
 		$('#asin-select').select2({
-			tags:true
+			tags:true,
 		});
 		$('#asin-select').on("change",function(e){
 			let asinId = $(this).val();
@@ -721,7 +736,7 @@
 					//转化率提升赋值
 					$(".crChange").text(crChangeNum($('.estCr').val(),$('.currentCr1').text()) + '%');
 					//投资回报天数赋值
-					$('.investmentCycle1').text(investmentCycle1Num($('.estSpend').text(),$('.estAdded').text()));
+					//$('.investmentCycle1').text(investmentCycle1Num($('.estSpend').text(),$('.estAdded').text()));
 					fulfillment = res.fulfillment;
 					commission = res.commission;
 					cost = res.cost;
@@ -740,6 +755,9 @@
 		});
 		$('.rateSelect').on("change",function(e){
 			$(".rateSelect").val($(this).find("option:selected").attr("value"));
+			//投资回报天数赋值
+			$('.investmentCycle1').text(investmentCycle1Num($('.fromDate').val(),$('.toDate').val(),$('.estAdded').text(),$('.estSpend').text()));
+			
 			ratVal = $(this).find("option:selected").attr("rate");
 			estSpendNum()
 		})
@@ -767,12 +785,16 @@
 		//日期1
 		$('.fromDate').on('change',function(){
 			$('.totalRsg').text(rsgNum($('.toDate').val(),$(this).val(),$('.rsgD').val()));
+			//投资回报天数赋值
+			$('.investmentCycle1').text(investmentCycle1Num($('.fromDate').val(),$('.toDate').val(),$('.estAdded').text(),$('.estSpend').text()));
 			estSpendNum()
 			
 		})
 		//日期2
 		$('.toDate').on('change',function(){
 			$('.totalRsg').text(rsgNum($(this).val(),$('.fromDate').val(),$('.rsgD').val()));	
+			//投资回报天数赋值
+			$('.investmentCycle1').text(investmentCycle1Num($('.fromDate').val(),$('.toDate').val(),$('.estAdded').text(),$('.estSpend').text()));
 			estSpendNum()
 		})
 		//关闭窗口
@@ -787,6 +809,9 @@
 		//每日目标
 		$('.rsgD').on('input',function(){
 			$('.totalRsg').text(rsgNum($('.toDate').val(),$('.fromDate').val(),$(this).val()));	
+			//投资回报天数赋值
+			$('.investmentCycle1').text(investmentCycle1Num($('.fromDate').val(),$('.toDate').val(),$('.estAdded').text(),$('.estSpend').text()));
+			
 			estSpendNum()
 		})
 		//预计转化率
@@ -803,23 +828,31 @@
 			$('.estAdded').text('￥' + estAddedNum($('.estSold').val(),$(this).val(),$('.currentSold1').text(),$('.eValue').text()))
 			$('.estRoi60').text(estRoiNum($('.estAdded').text(),$('.estSpend').text(),60) + "%")
 			$('.estRoi120').text(estRoiNum($('.estAdded').text(),$('.estSpend').text(),120) + "%");
+			//投资回报天数赋值
+			$('.investmentCycle1').text(investmentCycle1Num($('.fromDate').val(),$('.toDate').val(),$('.estAdded').text(),$('.estSpend').text()));
 		})
 		
 		//RSG金额
 		$('.rsgPrice').on('input',function(){
+			//投资回报天数赋值
+			$('.investmentCycle1').text(investmentCycle1Num($('.fromDate').val(),$('.toDate').val(),$('.estAdded').text(),$('.estSpend').text()));
 			estSpendNum()
 		})
-		//预计日均  预计日均*预计经济效益/个 - 当前日均*当前经济效益/个
+		//预计成本  预计日均*预计经济效益/个 - 当前日均*当前经济效益/个
 		$('.estSold').on('input',function(){
 			//日均增长赋值
 			$('.dailyChange').text(dailyChangeNum($('.estSold').val(),$('.currentSold1').text()) + '%');
 			$('.estAdded').text('￥' + estAddedNum($(this).val(),$('.estDay').val(),$('.currentSold1').text(),$('.eValue').text()))
 			$('.estRoi60').text(estRoiNum($('.estAdded').text(),$('.estSpend').text(),60) + "%")
 			$('.estRoi120').text(estRoiNum($('.estAdded').text(),$('.estSpend').text(),120) + "%");
+			//投资回报天数赋值
+			$('.investmentCycle1').text(investmentCycle1Num($('.fromDate').val(),$('.toDate').val(),$('.estAdded').text(),$('.estSpend').text()));
 		})
 		//当前售价
 		$('.ratingVal').on('input',function(){
-			estSpendNum()
+			estSpendNum();
+			//投资回报天数赋值
+			$('.investmentCycle1').text(investmentCycle1Num($('.fromDate').val(),$('.toDate').val(),$('.estAdded').text(),$('.estSpend').text()));
 		})
 		//任务状态
 		$('.planStatus').on("change",function(){
@@ -861,13 +894,12 @@
 			let val2 = parseFloat(num2)
 			let num = (val1 - val2) / val2 * 100;
 			num = num.toFixed(2)
-			num == "Infinity"? num = 0 : num
-			return isNaN(num) ?  num = 0 :  num
+			return isNaN(num) || num == "Infinity" || num == "-Infinity" ?  num = 0 :  num
 		}
 		//日均增长 = （预计日均 - 当前日均 ）/ 当前日均 * 100
 		function dailyChangeNum(num1,num2){
-			let num =( Number(num1) - Number(2) ) / Number(2) * 100;
-			return isNaN(num) ?  num = 0 :  num
+			let num =( Number(num1) - Number(num2) ) / Number(num2) * 100;
+			return isNaN(num) || num == "Infinity" || num == "-Infinity" ?  num = 0 :  num
 		}
 		
 		
@@ -883,16 +915,22 @@
 			val4==""||val4==null? val4=0:val4
 			isNaN(val4) ?  val4 = 0 :  val4
 			let num = Number((val1 * val2)-(val3 * val4)).toFixed(2);		
-			return isNaN(num) ?  num = 0 :  num
+			return isNaN(num) || num == "Infinity" || num == "-Infinity" ?  num = 0 :  num
 		}
 		
 		
 		
-		//投资回报天数
-		function investmentCycle1Num(num1,num2){
-			let num = Math.ceil( parseFloat(num1.substring(num1.indexOf('￥') + 1)) / parseFloat(num2))
-			return isNaN(num) ?  num = 0 :  num
+		//投资回报天数 = 预计成本/ (预计经济效益增长/日 * 天数)
+		function investmentCycle1Num(num1,num2,num3,num4){
+			
+			let date1 = Math.round(new Date(num1) / 1000)
+			let date2 = Math.round(new Date(num2) / 1000)
+			let date = date1 - date2;
+			var days = Math.floor(Math.abs(date) / 60 / 60 / 24) + 1
+			let num = Number(strMoney(num4)) / (strMoney(num3) * days).toFixed(2);
+			return isNaN(num) || num == "Infinity" || num == "-Infinity" ?  num = 0 :  num
 		}
+		investmentCycle1Num();
 		
 		//时间戳转换
 		function dateStr(str){
@@ -1136,7 +1174,7 @@
 			$('.investmentCycle2').text("");
 		}
 		function strMoney(str){
-			return str = str.substr(str.lastIndexOf('￥')+1);
+			return str = str.substr(str.lastIndexOf('￥')+1);		
 		}
 		
 		

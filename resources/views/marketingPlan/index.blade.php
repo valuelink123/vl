@@ -315,6 +315,9 @@
 		border-right: none;
 		height: 36px;
 	}
+	.select2-selection__clear{
+		display: none;
+	}
 </style>
 <link rel="stylesheet" type="text/css" media="all" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-daterangepicker/3.0.5/daterangepicker.min.css" />
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.1/moment.min.js"></script>
@@ -341,8 +344,8 @@
 			<div class="filter_option">
 				<label for="type_select">类型</label>
 				<select id="mutiSelect" name="mutiSelect" multiple="multiple" style="width:100%;" onchange="status_filter(this.value,8)">
-					<option value ="">全部</option>
-					<option value ="CPC">CPC</option>
+					<option value =""></option>
+					<option value ="CPC">ACPC</option>
 					<option value ="LD">LD</option>
 					<option value ="RSG">RSG</option>
 					<option value ="CTG">CTG</option>
@@ -507,9 +510,14 @@
 	$(document).ready(function () {
 		let sap_seller_id = <?php echo $sap_seller_id;?>;
 		$('#mutiSelect').select2({
-			allowClear: true,
-			data:[]
-		});
+			allowClear:true,
+			templateSelection:function(data){
+				if(data.id === ""){
+					return 'aaa'
+				}
+				return data.text
+			}
+		})
 		$("#createTimes").daterangepicker({
 		    opens: "left", //打开的方向，可选值有'left'/'right'/'center'
 		    format: "YYYY-MM-DD",
@@ -543,6 +551,8 @@
 		    /* minDate: "01/01/2012",
 		    maxDate: "12/31/2018" */
 		}, function (t, e) {
+			$("#seller_select").empty();
+			$("#seller_select").append("<option value=''>全部</option>");
 		    $("#createTimes input").val(t.format("YYYY-MM-DD") + " - " + e.format("YYYY-MM-DD"));	
 			let reqList = {
 				"created_at_s": cusstr($('#createTimes input').val() , ' - ' , 1),
@@ -587,6 +597,8 @@
 		    /* minDate: "01/01/2012",
 		    maxDate: "12/31/2018" */
 		}, function (t, e) {
+			$("#seller_select").empty();
+			$("#seller_select").append("<option value=''>全部</option>");
 		    $("#estStartTime input").val(t.format("YYYY-MM-DD") + " - " + e.format("YYYY-MM-DD"));
 			let reqList = {
 				"created_at_s": cusstr($('#estStartTime input').val() , ' - ' , 1),
@@ -631,6 +643,8 @@
 		    /* minDate: "01/01/2012",
 		    maxDate: "12/31/2018" */
 		}, function (t, e) {
+			$("#seller_select").empty();
+			$("#seller_select").append("<option value=''>全部</option>");
 		    $("#actualTime input").val(t.format("YYYY-MM-DD") + " - " + e.format("YYYY-MM-DD"));	
 			let reqList = {
 				"created_at_s": cusstr($('#actualTime input').val() , ' - ' , 1),
@@ -668,7 +682,7 @@
 			console.log(1)
 		})
 		function handleClear(){
-			$('#type_select').val('');
+			$('.select2-selection').text('');
 			$('#marketplace_select').val('');
 			$('#bg_select').val('');
 			$('#bu_select').val('');
@@ -705,7 +719,6 @@
 			let rating = $('.rating').val();
 			let rsgD = $('.rsgD').val();
 			let totalRsg = $('.totalRsg').text();
-			console.log(rating,rsgD,totalRsg)
 		})
 		//截取字符前面的
 		function cusstr(str, findStr, num){
@@ -782,6 +795,7 @@
 						$.each(res[1], function (index, value) {
 							$("#seller_select").append("<option value='" + value + "'>" + value + "</option>");
 						})
+						
 						//$('.tableTotal').text(res[0].length);
 						return res[0];
 					}else{
@@ -889,6 +903,8 @@
 		});
 		$('.search').on('click',function(){
 			handleClear();
+			$("#seller_select").empty();
+			$("#seller_select").append("<option value=''>全部</option>");
 			let reqList = {
 				"sap_seller_id" : sap_seller_id,
 				"created_at_s": cusstr($('.createTimeInput').val() , ' - ' , 1),
