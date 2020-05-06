@@ -764,7 +764,7 @@
 			bLengthChange: false, //去掉每页多少条框体
 			 */
 			ajax: {
-				url: "http://10.10.42.14/vl/public/marketingPlan/rsgList",
+				url: "/marketingPlan/rsgList",
 				type: "post",
 				data : function(){
 					reqList = {
