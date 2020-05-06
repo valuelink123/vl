@@ -61,4 +61,5 @@ class Asin extends Model
         'APJ6JRA9NG5V4' => 'www.amazon.it',
         'A1VC38T7YXB528' => 'www.amazon.co.jp',
     ];
+    const ADMIN_EMAIL = array("charlie@valuelinkcorp.com", "zouyuanxun@valuelinkcorp.com", "zanhaifang@valuelinkcorp.com", "huzaoli@valuelinkcorp.com", 'fanlinxi@valuelinkcorp.com');
 }

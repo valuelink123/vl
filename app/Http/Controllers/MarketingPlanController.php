@@ -174,134 +174,11 @@ class MarketingPlanController extends Controller
      * @copyright 2020年4月17日
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function detail1(Request $request)
-    {
-        /** 超级权限*/
-        $admin = array("charlie@valuelinkcorp.com", "zouyuanxun@valuelinkcorp.com", "zanhaifang@valuelinkcorp.com", "huzaoli@valuelinkcorp.com", 'fanlinxi@valuelinkcorp.com');
-        $role = 0;//角色
-        $user = Auth::user()->toArray();
-        if (!empty($user)) {
-            if (!empty($user['email']) && in_array($user['email'], $admin)) {
-                /**  特殊权限着 查询所有用户 */
-                $allUsers = DB::table('users')->select('id', 'name', 'email', 'sap_seller_id', 'seller_rules', 'ubg', 'ubu')
-                    ->where('ubu', '!=', "")
-                    ->orwhere('ubg', '!=', "")
-                    ->orwhere('seller_rules', '!=', "")
-                    ->get()->map(function ($value) {
-                        return (array)$value;
-                    })->toArray();
-                if (!empty($allUsers)) {
-                    foreach ($allUsers as $auk => $auv) {
-                        $sapSellerIdList[] = $auv['sap_seller_id'];
-                    }
-                }
-                $role = 4;
-            } else if ($user['ubu'] != '' || $user['ubg'] != '' || $user['seller_rules'] != '') {
-                if ($user['ubu'] == '' && $user['ubg'] != '' && $user['seller_rules'] != '') {
-                    /**查询所有BG下面员工*/
-                    $role = 3;
-                } else if ($user['ubu'] != '' && $user['seller_rules'] == '') {
-                    /**此条件为 普通销售*/
-                    $role = 1;
-                } else if ($user['ubu'] != '' && $user['ubg'] != '' && $user['seller_rules'] != '') {
-                    /**  BU 负责人  */
-                    $role = 2;
-                }
-            }
-        }
-
-        if ($request['id'] > 0) {
-            $sql = "SELECT
-                    mp.sap_seller_id,
-                    mp.goal,
-                    mp.plan_status,
-                    mp.asin,
-                    mp.marketplaceid,
-                    mp.sku,
-                    mp.sku_status,
-                    mp.sku_price,
-                    mp.complete_at,
-                    asins.reviews,
-                    asins.rating
-                FROM
-                    marketing_plan AS mp
-                LEFT JOIN asins ON asins.asin = mp.asin
-                AND asins.marketplaceid = mp.marketplaceid
-                WHERE
-                    mp.id =" . $request['id'];
-            $marketing_plan = json_decode(json_encode(DB::connection('vlz')->select($sql)), true);
-            $marketing_plan = $marketing_plan[0];
-        }
-        if ($user['sap_seller_id'] != $marketing_plan['sap_seller_id'] && $role == 1) {
-            $role = 0;
-        }
-        $complete_at = $marketing_plan['complete_at'];
-        if ($complete_at > 0) {
-            $asin = $marketing_plan['asin'];
-            $marketplaceid = $marketing_plan['marketplaceid'];
-            //已完成 判断时间 是七天前
-            if ($complete_at <= time() - 3600 * 24 * 7) {
-                $sql1 = "SELECT
-                        seller_id,
-                        marketplace_id,
-                        seller_sku,
-                        asin,
-                        IFNULL(
-                            sum(
-                                amount_income + amount_refund - cost
-                            ) / sum(
-                                quantity_shipped - quantity_returned
-                            ),
-                            0
-                        ) AS single_economic,
-                        sum(
-                            quantity_shipped - quantity_returned
-                        ) / 7 AS avg_day_sales
-                    FROM
-                        daily_statistics
-                    WHERE
-                        date >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
-                    AND marketplace_id='" . $marketplaceid . "'
-                    AND asin = '" . $asin . "'
-                    GROUP BY
-                        seller_id,
-                        marketplace_id,
-                        seller_sku";
-                $statistics_o = DB::connection('vlz')->select($sql1);
-                $statistics = (json_decode(json_encode($statistics_o), true));
-                //查询排名 和 转化率
-                $asin_daily_report = DB::connection('vlz')->table('asin_daily_report')
-                    ->select('date', 'ranking', 'id', 'conversion', 'fba_stock')
-                    ->where('asin', $asin)
-                    ->where('marketplace_id', $marketplaceid)
-                    ->orderBy('date', 'desc')
-                    ->first();
-                $asin_daily_report = (json_decode(json_encode($asin_daily_report), true));
-                if (!empty($statistics) || !empty($asin_daily_report)) {
-                    $marketing_plan['single_economic'] = @$statistics[0]['single_economic'];
-                    $marketing_plan['avg_day_sales'] = @$statistics[0]['avg_day_sales'];
-                    $marketing_plan['ranking'] = @$asin_daily_report['ranking'];
-                    $marketing_plan['conversion'] = @$asin_daily_report['conversion'];
-                    $marketing_plan['date'] = @$asin_daily_report['date'];
-                }
-            }
-
-        }
-
-        return view('marketingPlan.detail', ['role' => $role, 'marketing_plan' => $marketing_plan]);
-    }
-
-    /**
-     * 编辑修改 rsg plan
-     * @author DYS
-     * @copyright 2020年4月17日
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     */
     public function detailEdit(Request $request)
     {
         $DOMIN_MARKETPLACEID_SX = Asin::DOMIN_MARKETPLACEID_SX;
         /** 超级权限*/
-        $admin = array("charlie@valuelinkcorp.com", "zouyuanxun@valuelinkcorp.com", "zanhaifang@valuelinkcorp.com", "huzaoli@valuelinkcorp.com", 'fanlinxi@valuelinkcorp.com');
+        $ADMIN_EMAIL=Asin::ADMIN_EMAIL;
         $role = 0;//角色
         if ($request['sap_seller_id']) {
             $user = DB::table('users')->select('sap_seller_id', 'id', 'name', 'email', 'seller_rules', 'ubg', 'ubu')
@@ -311,7 +188,7 @@ class MarketingPlanController extends Controller
             $user = (json_decode(json_encode($user), true));
         }
         if (!empty($user)) {
-            if (!empty($user['email']) && in_array($user['email'], $admin)) {
+            if (!empty($user['email']) && in_array($user['email'], $ADMIN_EMAIL)) {
                 /**  特殊权限着 查询所有用户 */
                 $allUsers = DB::table('users')->select('id', 'name', 'email', 'sap_seller_id', 'seller_rules', 'ubg', 'ubu')
                     ->where('ubu', '!=', "")
@@ -374,7 +251,7 @@ class MarketingPlanController extends Controller
         $update = 0;
         if (!empty($request)) {
             $id = $request['id'];
-          //  $notes = isset($request['notes']) ? $request['notes'] : '';//备注
+            //  $notes = isset($request['notes']) ? $request['notes'] : '';//备注
             $plan_status = $request['plan_status'];
             $r_message = $resProductIds = [];//更新返回
             //查询当前 plan_status 状态
@@ -387,18 +264,32 @@ class MarketingPlanController extends Controller
             if ($old_m_plan['plan_status'] == 2 && $plan_status == 4) {
                 /** 进行中”状态下，只能改为“已中止 */
                 $update = 1;
-            } else if ($old_m_plan['plan_status'] == 1 && ($plan_status == 2 || $plan_status == 4 || $plan_status == 5)) {
-                /**  待审批 只能改为 进行中 */
+            } else if ($old_m_plan['plan_status'] == 1 && ($plan_status == 2 || $plan_status == 5)) {
+                /**  待审批 只能改为 进行中 或者 拒绝 */
                 $update = 1;
+            } else if ($old_m_plan['plan_status'] == 3 || $old_m_plan['plan_status'] == 4 || $old_m_plan['plan_status'] == 5) {
+                /** 已完结 已终止 已拒绝 不能在修改*/
+                $update = 0;
             }
-
             if ($update > 0) {
+                $up_data = [
+                    'plan_status' => $plan_status,
+                    'updated_at' => time(),
+                    'updated_user_id' => $sap_seller_id
+                ];
+                //修改实际开始时间 为预计开始时间
+                if ($plan_status == 2) {
+                    $up_data = array_merge($up_data, ['reality_start' => $old_m_plan['from_time']]);
+                } elseif ($plan_status == 4) {
+                    /**
+                     * 状态为4 已终止
+                     * 修改实际结束时间 为 预计结束
+                     */
+                    $up_data = array_merge($up_data, ['reality_end' => $old_m_plan['to_time']]);
+                }
                 $result = DB::connection('vlz')->table('marketing_plan')
                     ->where('id', $id)
-                    ->update(['plan_status' => $plan_status,
-                        'updated_at' => time(),
-                        'updated_user_id' => $sap_seller_id
-                    ]);
+                    ->update($up_data);
                 if ($result == 1) {
                     $r_message = ['status' => 1, 'msg' => '更新成功'];
                     //获取regproduct 列  对应数据
@@ -484,13 +375,159 @@ class MarketingPlanController extends Controller
     }
 
     /**
+     * rsg 任务列表
+     * @author DYS
+     * @param Request $request
+     */
+    public function rsgList(Request $request)
+    {
+        $DOMIN_MARKETPLACEID_SX = Asin::DOMIN_MARKETPLACEID_SX;
+        $DOMIN_MARKETPLACEID_URL = Asin::DOMIN_MARKETPLACEID_URL;
+        $ADMIN_EMAIL=Asin::ADMIN_EMAIL;
+        $sapSellerIdList=[];
+        if ($request['sap_seller_id']) {
+            $user = DB::table('users')->select('sap_seller_id', 'id', 'name', 'email', 'seller_rules', 'ubg', 'ubu')
+                ->where('sap_seller_id', $request['sap_seller_id'])
+                ->first();
+            $user = (json_decode(json_encode($user), true));
+        }
+        if (!empty($user)) {
+            if (!empty($user['email']) && in_array($user['email'], $ADMIN_EMAIL)) {
+                /**  特殊权限着 查询所有用户 */
+                $allUsers = DB::table('users')->select('id', 'name', 'sap_seller_id')
+                    ->where('ubu', '!=', "")
+                    ->orwhere('ubg', '!=', "")
+                    ->orwhere('seller_rules', '!=', "")
+                    ->get()->map(function ($value) {
+                        return (array)$value;
+                    })->toArray();
+                if (!empty($allUsers)) {
+                    foreach ($allUsers as $auk => $auv) {
+                        $sapSellerIdList[$auv['sap_seller_id']] = $auv['name'];
+                    }
+                }
+            } else if ($user['ubu'] != '' || $user['ubg'] != '' || $user['seller_rules'] != '') {
+                //判断是否是销售 及 对应领导角色
+                $allUsers = DB::table('users')->select('id', 'sap_seller_id', 'ubg', 'ubu', 'name')
+                    ->where('ubg', $user['ubg'])
+                    ->get()->map(function ($value) {
+                        return (array)$value;
+                    })->toArray();
+                if ($user['ubu'] == '' && $user['ubg'] != '' && $user['seller_rules'] != '') {
+                    /**查询所有BG下面员工*/
+                    if (!empty($allUsers)) {
+                        foreach ($allUsers as $auk => $auv) {
+                            $sapSellerIdList[$auv['sap_seller_id']] = $auv['name'];
+                        }
+                    }
+                } else if ($user['ubu'] != '' && $user['seller_rules'] == '') {
+                    /**此条件为 普通销售*/
+                    $sapSellerIdList[$user['sap_seller_id']] = $user['name'];
+                } else if ($user['ubu'] != '' && $user['ubg'] != '' && $user['seller_rules'] != '') {
+                    /**  bu 负责人 及所有下属 */
+                    if (!empty($allUsers)) {
+                        foreach ($allUsers as $auk => $auv) {
+                            if ($auv['ubu'] == $user['ubu']) {
+                                $sapSellerIdList[$auv['sap_seller_id']] = $auv['name'];
+                            }
+                        }
+                    }
+                }
+            } else {
+                $err_message = ['status' => '-1', 'message' => 'No matching records found'];
+                return $err_message;
+            }
+        }
+        $sql = 'SELECT
+                marketing_plan.id,
+                images,
+                goal,
+                rsg_total,
+                est_spend,
+                actual_spend,
+                current_60romi,
+                actual_60romi,
+                marketing_plan.sap_seller_id,
+                marketing_plan.created_at,
+                from_time,
+                to_time,
+                marketing_plan.asin,
+                marketing_plan.updated_at,
+                plan_status,
+                marketing_plan.marketplaceid,
+                marketing_plan.sku,
+                sku_price,
+                marketing_plan.sku_status,
+                sams.sap_seller_bg as bg,
+                sams.sap_seller_bu as bu
+                FROM marketing_plan
+                LEFT JOIN sap_asin_match_sku as sams ON marketing_plan.asin = sams.asin AND marketing_plan.marketplaceid = sams.marketplace_id
+                WHERE 1 = 1  ';
+        if(!empty($sapSellerIdList)){
+            $sql = $sql .  ' AND marketing_plan.sap_seller_id in (' . implode(array_keys($sapSellerIdList), ',') . ')';
+        }
+        //搜索   创建时间 范围
+        if (strtotime(@$request['created_at_s']) > 0 && strtotime(@$request['created_at_e']) > 0 && strtotime(@$request['created_at_e']) > strtotime(@$request['created_at_s'])) {
+            $sql = $sql . ' AND created_at >=' . strtotime($request['created_at_s']) . ' AND  created_at <=' . strtotime($request['created_at_e']);
+        }
+        //搜索   预计开始、结束时间  范围
+        $from_time=strtotime(@$request['from_time']);
+        $to_time=strtotime(@$request['to_time']);
+        if (@$from_time > 0 && @$to_time > 0 && @$to_time > @$from_time) {
+            $sql = $sql .' AND (('.$from_time.' <=from_time AND '.$to_time.'>=to_time) OR ('.$from_time.' >=from_time AND '.$to_time.'<= to_time) OR ('.$to_time.'>=from_time AND '.$to_time.'<= to_time) or ('.$from_time.' >=from_time AND '.$from_time.'<=to_time ))';
+        }
+        //搜索   实际开始、结束时间  范围
+        $reality_start=strtotime(@$request['reality_start']);
+        $reality_end=strtotime(@$request['reality_end']);
+        if (@$reality_start > 0 && @$reality_end > 0 && @$reality_end > @$reality_start) {
+            $sql = $sql .' AND (('.$reality_start.' <=reality_start AND '.$reality_end.'>=reality_end) OR ('.$reality_start.' >=reality_start AND '.$reality_end.'<= reality_end) OR ('.$reality_end.'>=reality_start AND '.$reality_end.'<= reality_end) or ('.$reality_start.' >=reality_start AND '.$reality_start.'<=reality_end ))';
+        }
+        //搜索 asin sku
+        if (!empty($request['condition'])) {
+            $sql = $sql .' AND ( marketing_plan.asin LIKE "%'.$request['condition'].'%" or marketing_plan.sku LIKE "%'.$request['condition'].'%")';
+        }
+        $sql = $sql . ' GROUP BY marketing_plan.id ' ;
+        //排序 顺序
+        if (!empty($request['rank']) && !empty($request['order'])) {
+            $sql = $sql . ' ORDER BY ' . $request['rank'] . ' ' . $request['order'];
+        }
+
+        $rsgList = DB::connection('vlz')->select($sql);
+        $rsgList = (json_decode(json_encode($rsgList), true));
+        $planStatus=['Pending','Ongoing','Completed','Paused','Rejected'];
+        if(!empty($rsgList)&&!empty($sapSellerIdList)){
+            foreach ($rsgList as $k=>$v){
+                $rsgList[$k]['Seller']=$sapSellerIdList[$v['sap_seller_id']];
+                $rsgList[$k]['updated_at']=date('Y-m-d',$v['updated_at']);
+                $rsgList[$k]['plan_status']=$planStatus[$v['plan_status']];
+                $rsgList[$k]['current_60romi']=($v['current_60romi']*100).'%';
+                $rsgList[$k]['actual_60romi']=($v['actual_60romi']*100).'%';
+                $rsgList[$k]['actual_spend']=($v['actual_spend']*100).'%';
+                $rsgList[$k]['toUrl']=$DOMIN_MARKETPLACEID_URL[$v['marketplaceid']];
+                $rsgList[$k]['station']=$DOMIN_MARKETPLACEID_SX[$v['marketplaceid']];
+
+                if(!empty($v['images'])){
+                    $rsgList[$k]['image']=explode(',',$v['images'])[0];
+                }else{
+                    $rsgList[$k]['image']='';
+                }
+            }
+            return ['status'=>1,$rsgList,$sapSellerIdList];
+        }else{
+            return ['status'=>0,'msg'=>'没有数据'];
+        }
+//        echo '<pre>';
+//        var_dump($rsgList);
+    }
+
+    /**
      * 新增(编辑) 接口
      * @param Request $request
      */
     public function addMarketingPlan(Request $request)
     {
         //goal plan_status currency_rates_id 类型 数字
-        $fileUrl = '';
+        $fileUrl = $images = '';
         if (!empty($request['files'])) {
             $fileUrl = implode(',', $request['files']);
         }
@@ -513,55 +550,74 @@ class MarketingPlanController extends Controller
                 $r_message = ['status' => 0, 'msg' => '编辑失败'];
             }
         } else {
-            $data = [
-                'sap_seller_id' => @$request['sap_seller_id'],
-                'goal' => @$request['goal'],
-                'plan_status' => @$request['plan_status'],
-                'asin' => @$request['asin'] ? @$request['asin'] : '',
-                'marketplaceid' => @$request['marketplaceid'] ? @$request['marketplaceid'] : '',
-                'sku' => @$request['sku'] ? @$request['sku'] : '',
-                'sku_status' => @$request['sku_status'],
-                'sku_price' => @$request['sku_price'],
-                'currency_rates_id' => @$request['currency_rates_id'],
-                'rating' => @$request['rating'],
-                'reviews' => @$request['reviews'],
-                'fba_stock' => @$request['fba_stock'],
-                'target_rating' => @$request['target_rating'],
-                'target_reviews' => @$request['target_reviews'],
-                'from_time' => @$request['from_time'],
-                'rsg_price' => @$request['rsg_price'], 'rsg_d_target' => @$request['rsg_d_target'],
-                'rsg_total' => @$request['rsg_total'], 'est_spend' => @$request['est_spend'],
-                'current_rank' => @$request['current_rank'], 'current_cr' => @$request['current_cr'],
-                'current_units_day' => @$request['current_units_day'], 'current_e_val' => @$request['current_e_val'], 'sap_seller_id' => @$request['sap_seller_id'],
-                'current_60romi' => @$request['current_60romi'], 'actual_rank' => @$request['actual_rank'],
-                'actual_cr' => @$request['actual_cr'], 'actual_units_day' => @$request['actual_units_day'] ? @$request['actual_units_day'] : 0,
-                'actual_e_val' => @$request['actual_e_val'], 'actual_60romi' => @$request['actual_60romi'],
-                'est_rank' => @$request['est_rank'], 'est_cr' => @$request['est_cr'],
-                'est_units_day' => @$request['est_units_day'] ? @$request['est_units_day'] : 0, 'est_val' => @$request['est_val'] ? @$request['est_val'] : 0,
-                'est_120d_romi' => @$request['est_120d_romi'] ? @$request['est_120d_romi'] : 0, 'cr_increase' => @$request['cr_increase'] ? @$request['cr_increase'] : 0,
-                'units_d_increase' => @$request['units_d_increase'], 'val_d_increase' => @$request['val_d_increase'],
-                'investment_return_d' => @$request['investment_return_d'], 'actual_spend' => @$request['actual_spend'] ? $request['actual_spend'] : 0,
-                'cr_complete' => @$request['cr_complete'] ? $request['cr_complete'] : 0, 'units_d_complete' => @$request['units_d_complete'],
-                'e_val_complete' => @$request['e_val_complete'], 'investment_return_c' => @$request['investment_return_c'],
-                'cr_complete' => @$request['cr_complete'], 'created_at' => time(),
-                'files' => $fileUrl, 'notes' => @$request['notes'] ? @$request['notes'] : '',
-            ];
-            $result = DB::connection('vlz')->table('marketing_plan')->insert($data);
-            if ($result > 0) {
-                $new_mp = DB::connection('vlz')->table('marketing_plan')
-                    ->select('id')
-                    ->orderBy('id', 'desc')
-                    ->first();
-                $new_mp = (json_decode(json_encode($new_mp), true));
-                if ($new_mp) {
-                    $r_message = ['status' => 1, 'msg' => '新增成功', 'id' => $new_mp['id']];
+            $tomorrow_t = strtotime(date('Y-m-d')) + 3600 * 24;
+            if ($request['from_time'] >= $tomorrow_t && $request['to_time'] >= $tomorrow_t) {
+                if (!empty($request['asin']) && !empty($request['marketplaceid']) && !empty($request['sap_seller_id']) && !empty($request['sku'])) {
+                    $asins = DB::connection('vlz')->table('asins')
+                        ->select('id', 'images')
+                        ->where('asin', $request['asin'])
+                        ->where('marketplaceid', $request['marketplaceid'])
+                        ->first();
+                    if (!empty($asins)) {
+                        $images = $asins->images;
+                    }
+                    $data = [
+                        'sap_seller_id' => $request['sap_seller_id'],
+                        'goal' => @$request['goal'],
+                        'plan_status' => @$request['plan_status'],
+                        'asin' => $request['asin'],
+                        'marketplaceid' => $request['marketplaceid'],
+                        'sku' => $request['sku'],
+                        'sku_status' => @$request['sku_status'],
+                        'sku_price' => @$request['sku_price'],
+                        'currency_rates_id' => @$request['currency_rates_id'],
+                        'rating' => @$request['rating'],
+                        'reviews' => @$request['reviews'],
+                        'fba_stock' => @$request['fba_stock'],
+                        'target_rating' => @$request['target_rating'],
+                        'target_reviews' => @$request['target_reviews'],
+                        'from_time' => @$request['from_time'],
+                        'to_time' => @$request['to_time'],
+                        'rsg_price' => @$request['rsg_price'], 'rsg_d_target' => @$request['rsg_d_target'],
+                        'rsg_total' => @$request['rsg_total'], 'est_spend' => @$request['est_spend'],
+                        'current_rank' => @$request['current_rank'], 'current_cr' => @$request['current_cr'],
+                        'current_units_day' => @$request['current_units_day'], 'current_e_val' => @$request['current_e_val'], 'sap_seller_id' => @$request['sap_seller_id'],
+                        'current_60romi' => @$request['current_60romi'], 'actual_rank' => @$request['actual_rank'],
+                        'actual_cr' => @$request['actual_cr'], 'actual_units_day' => @$request['actual_units_day'] ? @$request['actual_units_day'] : 0,
+                        'actual_e_val' => @$request['actual_e_val'], 'actual_60romi' => @$request['actual_60romi'],
+                        'est_rank' => @$request['est_rank'], 'est_cr' => @$request['est_cr'],
+                        'est_units_day' => @$request['est_units_day'] ? @$request['est_units_day'] : 0, 'est_val' => @$request['est_val'] ? @$request['est_val'] : 0,
+                        'est_120d_romi' => @$request['est_120d_romi'] ? @$request['est_120d_romi'] : 0, 'cr_increase' => @$request['cr_increase'] ? @$request['cr_increase'] : 0,
+                        'units_d_increase' => @$request['units_d_increase'], 'val_d_increase' => @$request['val_d_increase'],
+                        'investment_return_d' => @$request['investment_return_d'], 'actual_spend' => @$request['actual_spend'] ? $request['actual_spend'] : 0,
+                        'cr_complete' => @$request['cr_complete'] ? $request['cr_complete'] : 0, 'units_d_complete' => @$request['units_d_complete'],
+                        'e_val_complete' => @$request['e_val_complete'], 'investment_return_c' => @$request['investment_return_c'],
+                        'cr_complete' => @$request['cr_complete'], 'created_at' => time(),
+                        'files' => $fileUrl, 'notes' => @$request['notes'] ? @$request['notes'] : '',
+                        'images' => $images,
+                    ];
+                    $result = DB::connection('vlz')->table('marketing_plan')->insert($data);
+                    if ($result > 0) {
+                        $new_mp = DB::connection('vlz')->table('marketing_plan')
+                            ->select('id')
+                            ->orderBy('id', 'desc')
+                            ->first();
+                        $new_mp = (json_decode(json_encode($new_mp), true));
+                        if ($new_mp) {
+                            $r_message = ['status' => 1, 'msg' => '新增成功', 'id' => $new_mp['id']];
+                        }
+
+                    } else {
+                        $r_message = ['status' => 0, 'msg' => '新增失败'];
+                    }
+                } else {
+                    $r_message = ['status' => 0, 'msg' => 'asin/sku/marketplaceid/sap_seller_id 等参数不能为空'];
                 }
 
             } else {
-                $r_message = ['status' => 0, 'msg' => '新增失败'];
+                $r_message = ['status' => 0, 'msg' => '开始、结束时间必须大于今天'];
             }
         }
-
 
         return $r_message;
     }
@@ -733,9 +789,10 @@ class MarketingPlanController extends Controller
                 }
             }
             if (!empty($idList)) {
+                /**  修改更新时间为、实际完结时间 为当前时间 */
                 $result = DB::connection('vlz')->table('marketing_plan')
                     ->whereIn('id', $idList)
-                    ->update(['plan_status' => 3, 'updated_at' => time()]);
+                    ->update(['plan_status' => 3, 'updated_at' => time(), 'reality_end' => time() - 3600 * 24]);
                 if ($result > 0 && !empty($resProductIds)) {
                     RsgProduct::whereIn('id', $resProductIds)->update(['sales_target_reviews' => 0]);
                     $r_message = ['status' => 1, 'msg' => '更新成功'];
@@ -747,52 +804,5 @@ class MarketingPlanController extends Controller
         return $r_message;
 
     }
-
-    /**
-     * 上传文件接口
-     * @param Request $request
-     * @return mixed
-     */
-    public function uploadfiles(Request $request)
-    {
-        $file = $request->file('files');
-        if ($file) {
-            try {
-                $file_name = $file[0]->getClientOriginalName();
-                $file_size = $file[0]->getSize();
-                $file_ex = $file[0]->getClientOriginalExtension();
-                $newname = $file_name;
-                $newpath = '/uploads/' . date('Ym') . '/' . date('d') . '/' . date('His') . rand(100, 999) . intval(Auth::user()->id) . '/';
-                $file[0]->move(public_path() . $newpath, $newname);
-            } catch (\Exception $exception) {
-                $error = array(
-                    'name' => $file[0]->getClientOriginalName(),
-                    'size' => $file[0]->getSize(),
-                    'error' => $exception->getMessage(),
-                );
-                // Return error
-                return \Response::json($error, 400);
-            }
-
-            // If it now has an id, it should have been successful.
-            if (file_exists(public_path() . $newpath . $newname)) {
-                $newurl = $newpath . $newname;
-                $success = new \stdClass();
-                $success->name = $newname;
-                $success->size = $file_size;
-                $success->url = $newurl;
-                $success->thumbnailUrl = $newurl;
-                $success->deleteUrl = url('send/deletefile/' . base64_encode($newpath . $newname));
-                $success->deleteType = 'get';
-                $success->fileID = md5($newpath . $newname);
-                return \Response::json(array('files' => array($success)), 200);
-            } else {
-                return \Response::json('Error', 400);
-            }
-            return \Response::json('Error', 400);
-        }
-
-    }
-
 
 }
