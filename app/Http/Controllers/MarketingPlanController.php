@@ -494,7 +494,7 @@ class MarketingPlanController extends Controller
 
         $rsgList = DB::connection('vlz')->select($sql);
         $rsgList = (json_decode(json_encode($rsgList), true));
-        $planStatus=['Pending','Ongoing','Completed','Paused','Rejected'];
+        $planStatus=['0','Pending','Ongoing','Completed','Paused','Rejected'];
         if(!empty($rsgList)&&!empty($sapSellerIdList)){
             foreach ($rsgList as $k=>$v){
                 $rsgList[$k]['Seller']=$sapSellerIdList[$v['sap_seller_id']];
@@ -592,7 +592,7 @@ class MarketingPlanController extends Controller
                         'investment_return_d' => @$request['investment_return_d'], 'actual_spend' => @$request['actual_spend'] ? $request['actual_spend'] : 0,
                         'cr_complete' => @$request['cr_complete'] ? $request['cr_complete'] : 0, 'units_d_complete' => @$request['units_d_complete'],
                         'e_val_complete' => @$request['e_val_complete'], 'investment_return_c' => @$request['investment_return_c'],
-                        'cr_complete' => @$request['cr_complete'], 'created_at' => time(),
+                        'cr_complete' => @$request['cr_complete'], 'created_at' => time(),'updated_at' => time(),
                         'files' => $fileUrl, 'notes' => @$request['notes'] ? @$request['notes'] : '',
                         'images' => $images,
                     ];
