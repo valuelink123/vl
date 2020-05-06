@@ -8,11 +8,13 @@
 		padding: 30px 0;
 		background: #fff;
 		margin: 20px auto;
+		width: 1000px;
 	}
 	
 	.mask_table{
 		border: 1px solid #999;
-		margin: 0 100px;
+		margin: 0 auto;
+		width: 900px;
 	}
 	.mask_h3{
 		font-size: 22px;
@@ -46,8 +48,10 @@
 		background: #fff;
 	}
 	.bw9{
-		width: 90%;
+		width: 97%;
 		margin: auto;
+		background: #fff;
+		border: 1px solid #ccc;
 	}
 	.country_txt{
 		float: left;
@@ -158,334 +162,337 @@
 		margin: 10px auto;
 		cursor: pointer;
 	}
+	.fileupload-progress{
+		height: 5px;
+	}
 </style>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.8/css/select2.min.css" rel="stylesheet" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.8/js/select2.min.js"></script>
 <body>
-	<div>
+	<div style="overflow: auto;">
 		<div class="rsg_plan_box">
-			<div class="mask_table">
-				<table class="table-bordered" width="100%" cellspacing="0" cellpadding="5">
-					<tr>
-						<td colspan="6">
-							<h3 class="mask_h3">RSG</h3>
-						</td>
-					</tr>
-					<tr>
-						<td>RSG 需求目的</td>
-						<td colspan="2">
-							<select class="bw9 rsgGoal">
-								<option value ="">请选择</option>
-								<option value ="1">Improve Ratings</option>
-								<option value ="2">Keep Ratings Satble</option>
-								<option value="3">Improve Conversion Rate</option>
-								<option value ="4">Improve Review Rate</option>
-								<option value="5">Get More Reviews</option>
-								<option value ="6">Others</option>
-							</select>
-						</td>
-						<td></td>
-						<td>任务状态</td>
-						<td>
-							<select class="bw9 planStatus">
-								<option value ="1">待审批</option>
-								<option value ="2">进行中</option>
-								<option value ="3">已完结</option>
-								<option value ="4">已终止</option>
-								<option value ="5">已拒绝</option>
-							</select>
-						</td>
-					</tr>
-					<tr>
-						<td>ASIN</td>
-						<td>
-							<select class="asin-select form-control" placeholder="请选择" id="asin-select" style="float: left;width: 90%;">
-								<option value="-1">请选择</option>
-							</select>
-						</td>
-						<td>SKU</td>
-						<td><span class="sku"></span></td>
-						<td>SKU 状态</td>
-						<td><span class="skuStatus"></span></td>
-					</tr>
-					<tr>
-						<td>当前售价</td>
-						<td>
-							<input type="number" value="" style="padding-left: 5px; width: 60%;" class="ratingVal">
-							<select name="" class="rate rateSelect" style="width: 35%;padding: 1px 0;">
-								<option value="-1">请选择</option>
-							</select>
-						</td>
-						<td>星级</td>
-						<td><span class="star"></span></td>
-						<td>星星数量</td>
-						<td><span class="reviews"></span></td>
-					</tr>
-					<tr>
-						<td>FBA 可用库存</td>
-						<td>
-							<span class="inventory"></span>
-						</td>
-						<td>星级目标</td>
-						<td><input type="number" class="targetRating bw9" style="padding-left: 5px;" value=""></td>
-						<td>数量目标</td>
-						<td><input type="number" value="" style="padding-left: 5px;" class="bw9 targetUnitsSold"></td>
-					</tr>
-					<tr>
-						<td>From</td>
-						<td style="">
-							<div class="input-group date date-picker margin-bottom-5 bw9" data-date-format="yyyy-mm-dd">
-								<input type="text" class="form-control form-filter input-sm fromDate" readonly name="date_from" placeholder="From" value="">
-								<span class="input-group-btn">
-									<button class="btn btn-sm default" type="button">
-										<i class="fa fa-calendar"></i>
-									</button>
-								</span>
-							</div>
-						</td>
-						<td style="">To</td>
-						<td>
-							<div class="input-group date date-picker bw9" data-date-format="yyyy-mm-dd">
-								<input type="text" class="form-control form-filter input-sm toDate" readonly name="date_to" placeholder="To" value="">
-								<span class="input-group-btn">
-									<button class="btn btn-sm default" type="button">
-										<i class="fa fa-calendar"></i>
-									</button>
-								</span>
-							</div>
-						</td>
-						<td>RSG 金额</td>
-						<td>
-							<input type="number" value="" style="padding-left: 5px;width: 60%;" class="bw9 rsgPrice">
-							<select name="" class="rate rateSelect" style="width: 35%;padding: 1px 0;">
-								<option value="-1">请选择</option>
-							</select>
-						</td>
-					</tr>
-					<tr>
-						<td>每日目标</td>
-						<td style=""><input type="number" value="" style="padding-left: 5px;" class="bw9 rsgD"></td>
-						<td style="">RSG 数量</td>
-						<td><span class="totalRsg"></span></td>
-						<td>预计成本</td>
-						<td><span class="estSpend"></span></td>
-					</tr>
-					<tr>
-						<td colspan="6">
-							<h4 class="mask_h4">Est. Result（1 Week After Review Goal Achieved</h4>
-						</td>
-					</tr>
-					<tr>
-						<td>当前排名</td>
-						<td><span class="currentRank1"></span></td>
-						<td>预计排名</td>
-						<td><input type="text" value="" style="padding-left: 5px;" class="bw9 estRank"></td>
-						<td></td>
-						<td></td>
-					</tr>
-					<tr>
-						<td>当前转化率</td>
-						<td><span class="currentCr1"></span></td>
-						<td>预计转化率</td>
-						<td><input type="text" value="" style="padding-left: 5px;" class="bw9 estCr"></td>
-						<td>转化率提升</td>
-						<td><span class="crChange"></span></td>
-					</tr>
-					<tr>
-						<td>当前日均</td>
-						<td><span class="currentSold1"></span></td>
-						<td>预计日均</td>
-						<td><input type="number" value="" style="padding-left: 5px;" class="bw9 estSold"></td>
-						<td>日均增长</td>
-						<td><span class="dailyChange"></span></td>
-					</tr>
-					<tr>
-						<td>经济效益/个</td>
-						<td><span class="eValue"></span></td>
-						<td>预计经济效益/个</td>
-						<td>￥<input type="number" value="" style="padding-left: 5px; width: 50%;" class="estDay"></td>
-						<td>预计经济效益增长/日</td>
-						<td><span class="estAdded"></span></td>
-					</tr>
-					<tr>
-						<td>60天预计ROI</td>
-						<td><span class="estRoi60"></span></td>
-						<td>120天预计ROI</td>
-						<td><span class="estRoi120"></span></td>
-						<td>投资回报天数</td>
-						<td><span class="investmentCycle1"></span></td>
-					</tr>
-					<tr>
-						<td colspan="6">
-							<h4 class="mask_h4">Actual Result（1 Week After Review Goal Achieved</h4>
-						</td>
-					</tr>
-					<tr>
-						<td>当前排名</td>
-						<td> <span class="currentRank2"></span></td>
-						<td colspan="2"></td>
-						<td>RSG实际成本</td>
-						<td>￥<input type="number" class="actualSpend" style="width: 50%;"></td>
-					</tr>
-					<tr>
-						<td>实际转化率</td>
-						<td><span class="currentCr2"></span></td>
-						<td colspan="2"></td>
-						<td>转化率预测达成</td>
-						<td><span class="conversionComplete"></span></td>
-					</tr>
-					<tr>
-						<td>实际日均</td>
-						<td><span class="currentSold2"></span></td>
-						<td colspan="2"></td>
-						<td>日均预测达成</td>
-						<td><span class="dailyComplete"></span></td>
-					</tr>
-					<tr>
-						<td>实际经济效益/个</td>
-						<td><span class="eUnit"></span></td>
-						<td colspan="2"></td>
-						<td>经济效益增长/日达成</td>
-						<td><span class="eComplete"></span></td>
-					</tr>
-					<tr>
-						<td>60天ROI</td>
-						<td><span class="estDay60"></span></td>
-						<td colspan="2"></td>
-						<td>投资回报天数</td>
-						<td><span class="investmentCycle2"></span></td>
-					</tr>
-					<tr>
-						<td>文档</td>
-						<td colspan="5">
-							
-							<!-- The fileupload-buttonbar contains buttons to add/delete files and start/cancel the upload -->
-							<form id="fileupload" action="{{ url('send') }}" method="POST" enctype="multipart/form-data">
-							    {{ csrf_field() }}
-								<input type="hidden" name="warn" id="warn" value="0">
-							    <input type="hidden" name="inbox_id" id="inbox_id" value="0">
-							    <input type="hidden" name="user_id" id="user_id" value="{{Auth::user()->id}}">
-												
-							    <div>
-							        <!-- The fileupload-buttonbar contains buttons to add/delete files and start/cancel the upload -->
-							        <div class="fileupload-buttonbar">
-							            <div class="col-lg-7">
-							                <!-- The fileinput-button span is used to style the file input field as button -->
-							                <span class="btn green fileinput-button">
-												<i class="fa fa-plus"></i>
-												<span> Add files... </span>
-												<input type="file" name="files[]" multiple=""> 
-											</span>
-							                <button type="submit" class="btn blue start">
-							                    <i class="fa fa-upload"></i>
-							                    <span> Start upload </span>
-							                </button>
-							                <button type="reset" class="btn warning cancel">
-							                    <i class="fa fa-ban-circle"></i>
-							                    <span> Cancel upload </span>
-							                </button>
-							
-							                <button type="button" class="btn red delete">
-							                    <i class="fa fa-trash"></i>
-							                    <span> Delete </span>
-							                </button>
-							               <!-- <input type="checkbox" class="toggle"> -->
-							                <!-- The global file processing state -->
-							                <span class="fileupload-process"> </span>
-							            </div>
-							            <!-- The global progress information -->
-							            <div class="col-lg-5 fileupload-progress fade">
-							                <!-- The global progress bar -->
-							                <div class="progress progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100">
-							                    <div class="progress-bar progress-bar-success" style="width:0%;"> </div>
-							                </div>
-							                <!-- The extended global progress information -->
-							                <div class="progress-extended"> &nbsp; </div>
-							            </div>
-							        </div>
-							        <!-- The table listing the files available for upload/download -->
-							        <table role="presentation" class="table table-striped clearfix" id="table-striped" style="margin-bottom: 0;">
-							            <tbody class="files" id="filesTable"> </tbody>
-							        </table>
-							        <div id="blueimp-gallery" class="blueimp-gallery blueimp-gallery-controls" data-filter=":even">
-							            <div class="slides"> </div>
-							            <h3 class="title"></h3>
-							            <a class="prev"> ‹ </a>
-							            <a class="next"> › </a>
-							            <a class="close white"> </a>
-							            <a class="play-pause"> </a>
-							            <ol class="indicator"> </ol>
-							        </div>
-							        <!-- BEGIN JAVASCRIPTS(Load javascripts at bottom, this will reduce page load time) -->
-							        <script id="template-upload" type="text/x-tmpl"> {% for (var i=0, file; file=o.files[i]; i++) { %}
-							        <tr class="template-upload fade">
-							            <td>
-							                <p class="name">{%=file.name%}</p>
-							                <strong class="error text-danger label label-danger"></strong>
-							            </td>
-							            <!-- <td>
-							                <p class="size">Processing...</p>
-							                <div class="progress progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-							                    <div class="progress-bar progress-bar-success" style="width:0%;"></div>
-							                </div>
-							            </td> -->
-							            <td> {% if (!i && !o.options.autoUpload) { %}
-							                <button class="btn blue start" disabled>
-							                    <i class="fa fa-upload"></i>
-							                    <span>Start</span>
-							                </button> {% } %} {% if (!i) { %}
-							                <button class="btn red cancel">
-							                    <i class="fa fa-ban"></i>
-							                    <span>Cancel</span>
-							                </button> {% } %} </td>
-							        </tr> {% } %} </script>
-							        <!-- The template to display files available for download -->
-							        <script id="template-download" type="text/x-tmpl"> {% for (var i=0, file; file=o.files[i]; i++) { %}
-							        <tr class="template-download fade">
-							            <td>
-							                <p class="name"> {% if (file.url) { %}
-							                    <a href="{%=file.url%}" title="{%=file.name%}" download="{%=file.name%}" {%=file.thumbnailUrl? 'data-gallery': ''%}>{%=file.name%}</a> {% } else { %}
-							                    <span>{%=file.name%}</span> {% } %}
-							                    {% if (file.name) { %}
-							                        <input type="hidden" name="fileid[]" class="filesUrl" value="{%=file.url%}">
-							                    {% } %}
-							
-							                    </p> {% if (file.error) { %}
-							                <div>
-							                    <span class="label label-danger">Error</span> {%=file.error%}</div> {% } %} </td>
-							            <!-- <td>
-							                <span class="size">{%=o.formatFileSize(file.size)%}</span>
-							            </td> -->
-							            <td> {% if (file.deleteUrl) { %}
-							                <button class="btn red delete btn-sm" data-type="{%=file.deleteType%}" data-url="{%=file.deleteUrl%}" {% if (file.deleteWithCredentials) { %} data-xhr-fields='{"withCredentials":true}' {% } %}>
-							                    <i class="fa fa-trash-o"></i>
-							                    <span>Delete</span>
-							                </button>
-							                <!-- <input type="checkbox" name="delete" value="1" class="toggle"> --> {% } else { %}
-							                <button class="btn yellow cancel btn-sm">
-							                    <i class="fa fa-ban"></i>
-							                    <span>Cancel</span>
-							                </button> {% } %} </td>
-							        </tr> {% } %} </script>
-							        <div style="clear:both;"></div>
-							    </div>
-							</form>	
-						</td>
-					</tr>
-					<tr>
-						<td>备注</td>
-						<td colspan="5">
-							<input type="text" value="notes" style="padding-left: 5px;" class="bw9 remarks">
-						</td>
-					</tr>
-				</table>
+				<div class="mask_table">
+					<table class="table-bordered" width="100%" cellspacing="0" cellpadding="5">
+						<tr>
+							<td colspan="6">
+								<h3 class="mask_h3">RSG</h3>
+							</td>
+						</tr>
+						<tr>
+							<td>RSG 需求目的</td>
+							<td colspan="2">
+								<select class="bw9 rsgGoal">
+									<option value ="">请选择</option>
+									<option value ="1">Improve Ratings</option>
+									<option value ="2">Keep Ratings Satble</option>
+									<option value="3">Improve Conversion Rate</option>
+									<option value ="4">Improve Review Rate</option>
+									<option value="5">Get More Reviews</option>
+									<option value ="6">Others</option>
+								</select>
+							</td>
+							<td></td>
+							<td>任务状态</td>
+							<td>
+								<select class="bw9 planStatus">
+									<option value ="1">待审批</option>
+									<option value ="2">进行中</option>
+									<option value ="3">已完结</option>
+									<option value ="4">已终止</option>
+									<option value ="5">已拒绝</option>
+								</select>
+							</td>
+						</tr>
+						<tr>
+							<td>ASIN</td>
+							<td>
+								<select class="asin-select form-control" placeholder="请选择" id="asin-select" style="float: left;width: 97%;">
+									<option value="-1">请选择</option>
+								</select>
+							</td>
+							<td>SKU</td>
+							<td><span class="sku"></span></td>
+							<td>SKU 状态</td>
+							<td><span class="skuStatus"></span></td>
+						</tr>
+						<tr>
+							<td>当前售价</td>
+							<td>
+								<input type="number" value="" style="padding-left: 5px; width: 60%;border: 1px solid #ccc; background: #fff;" class="ratingVal">
+								<select name="" class="rate rateSelect" style="width: 35%;padding: 1px 0;">
+									<option value="-1">请选择</option>
+								</select>
+							</td>
+							<td>星级</td>
+							<td><span class="star"></span></td>
+							<td>星星数量</td>
+							<td><span class="reviews"></span></td>
+						</tr>
+						<tr>
+							<td>FBA 可用库存</td>
+							<td>
+								<span class="inventory"></span>
+							</td>
+							<td>星级目标</td>
+							<td><input type="number" class="targetRating bw9" style="padding-left: 5px;" value=""></td>
+							<td title="Target reviews are all reviews include organic, CTG and RSG.">数量目标</td>
+							<td><input type="number" value="" style="padding-left: 5px;" class="bw9 targetUnitsSold"></td>
+						</tr>
+						<tr>
+							<td>From</td>
+							<td style="">
+								<div class="input-group date date-picker margin-bottom-5 bw9" id="fromDate">
+									<input type="text" class="form-control form-filter input-sm fromDate" readonly name="date_from" placeholder="From" value="">
+									<span class="input-group-btn">
+										<button class="btn btn-sm default" type="button">
+											<i class="fa fa-calendar"></i>
+										</button>
+									</span>
+								</div>
+							</td>
+							<td style="">To</td>
+							<td>
+								<div class="input-group date date-picker bw9" data-date-format="yyyy-mm-dd">
+									<input type="text" class="form-control form-filter input-sm toDate" readonly name="date_to" placeholder="To" value="">
+									<span class="input-group-btn">
+										<button class="btn btn-sm default" type="button">
+											<i class="fa fa-calendar"></i>
+										</button>
+									</span>
+								</div>
+							</td>
+							<td title="Money paid to RSG customers.">RSG付款金额</td>
+							<td>
+								<input type="number" value="" style="padding-left: 5px;width: 60%;" class="bw9 rsgPrice">
+								<select name="" class="rate rateSelect" style="width: 35%;padding: 1px 0;">
+									<option value="-1">请选择</option>
+								</select>
+							</td>
+						</tr>
+						<tr>
+							<td>每日目标</td>
+							<td style=""><input type="number" value="" style="padding-left: 5px;" class="bw9 rsgD"></td>
+							<td style="">RSG 数量</td>
+							<td><span class="totalRsg"></span></td>
+							<td>预计成本</td>
+							<td><span class="estSpend"></span></td>
+						</tr>
+						<tr>
+							<td colspan="6">
+								<h4 class="mask_h4">Est. Result（1 Week After Review Goal Achieved</h4>
+							</td>
+						</tr>
+						<tr>
+							<td>当前排名</td>
+							<td><span class="currentRank1"></span></td>
+							<td>预计排名</td>
+							<td><input type="text" value="" style="padding-left: 5px;" class="bw9 estRank"></td>
+							<td></td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>当前转化率</td>
+							<td><span class="currentCr1"></span></td>
+							<td>预计转化率</td>
+							<td><input type="text" value="" style="padding-left: 5px;" class="bw9 estCr"></td>
+							<td>转化率提升</td>
+							<td><span class="crChange"></span></td>
+						</tr>
+						<tr>
+							<td>当前日均</td>
+							<td><span class="currentSold1"></span></td>
+							<td>预计日均</td>
+							<td><input type="number" value="" style="padding-left: 5px;" class="bw9 estSold"></td>
+							<td>日均增长</td>
+							<td><span class="dailyChange"></span></td>
+						</tr>
+						<tr>
+							<td>经济效益/个</td>
+							<td><span class="eValue"></span></td>
+							<td>预计经济效益/个</td>
+							<td>￥<input type="number" value="" style="padding-left: 5px; width: 50%; border: 1px solid #ccc; background: #fff;" class="estDay"></td>
+							<td>预计经济效益增长/日</td>
+							<td><span class="estAdded"></span></td>
+						</tr>
+						<tr>
+							<td>60天预计ROI</td>
+							<td><span class="estRoi60"></span></td>
+							<td>120天预计ROI</td>
+							<td><span class="estRoi120"></span></td>
+							<td>投资回报天数</td>
+							<td><span class="investmentCycle1"></span></td>
+						</tr>
+						<tr>
+							<td colspan="6">
+								<h4 class="mask_h4">Actual Result（1 Week After Review Goal Achieved</h4>
+							</td>
+						</tr>
+						<tr>
+							<td>当前排名</td>
+							<td> <span class="currentRank2"></span></td>
+							<td colspan="2"></td>
+							<td>RSG实际成本</td>
+							<td>￥<input type="number" class="actualSpend" style="width: 90%;"></td>
+						</tr>
+						<tr>
+							<td>实际转化率</td>
+							<td><span class="currentCr2"></span></td>
+							<td colspan="2"></td>
+							<td>转化率预测达成</td>
+							<td><span class="conversionComplete"></span></td>
+						</tr>
+						<tr>
+							<td>实际日均</td>
+							<td><span class="currentSold2"></span></td>
+							<td colspan="2"></td>
+							<td>日均预测达成</td>
+							<td><span class="dailyComplete"></span></td>
+						</tr>
+						<tr>
+							<td>实际经济效益/个</td>
+							<td><span class="eUnit"></span></td>
+							<td colspan="2"></td>
+							<td>经济效益增长/日达成</td>
+							<td><span class="eComplete"></span></td>
+						</tr>
+						<tr>
+							<td>60天ROI</td>
+							<td><span class="estDay60"></span></td>
+							<td colspan="2"></td>
+							<td>投资回报天数</td>
+							<td><span class="investmentCycle2"></span></td>
+						</tr>
+						<tr>
+							<td>文档</td>
+							<td colspan="5">
+								
+								<!-- The fileupload-buttonbar contains buttons to add/delete files and start/cancel the upload -->
+								<form id="fileupload" action="{{ url('send') }}" method="POST" enctype="multipart/form-data">
+								    {{ csrf_field() }}
+									<input type="hidden" name="warn" id="warn" value="0">
+								    <input type="hidden" name="inbox_id" id="inbox_id" value="0">
+								    <input type="hidden" name="user_id" id="user_id" value="{{Auth::user()->id}}">
+													
+								    <div>
+								        <!-- The fileupload-buttonbar contains buttons to add/delete files and start/cancel the upload -->
+								        <div class="fileupload-buttonbar">
+								            <div class="col-lg-12">
+								                <!-- The fileinput-button span is used to style the file input field as button -->
+								                <span class="btn green fileinput-button">
+													<i class="fa fa-plus"></i>
+													<span> Add files... </span>
+													<input type="file" name="files[]" multiple=""> 
+												</span>
+								                <button type="submit" class="btn blue start">
+								                    <i class="fa fa-upload"></i>
+								                    <span> Start upload </span>
+								                </button>
+								                <button type="reset" class="btn warning cancel">
+								                    <i class="fa fa-ban-circle"></i>
+								                    <span> Cancel upload </span>
+								                </button>
+								
+								                <button type="button" class="btn red delete">
+								                    <i class="fa fa-trash"></i>
+								                    <span> Delete </span>
+								                </button>
+								               <!-- <input type="checkbox" class="toggle"> -->
+								                <!-- The global file processing state -->
+								                <span class="fileupload-process"> </span>
+								            </div>
+								            <!-- The global progress information -->
+								            <div class="col-lg-12 fileupload-progress fade">
+								                <!-- The global progress bar -->
+								                <div class="progress progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100">
+								                    <div class="progress-bar progress-bar-success" style="width:0%;"> </div>
+								                </div>
+								                <!-- The extended global progress information -->
+								                <div class="progress-extended"> &nbsp; </div>
+								            </div>
+								        </div>
+								        <!-- The table listing the files available for upload/download -->
+								        <table role="presentation" class="table table-striped clearfix" id="table-striped" style="margin-bottom: 0;">
+								            <tbody class="files" id="filesTable"> </tbody>
+								        </table>
+								        <div id="blueimp-gallery" class="blueimp-gallery blueimp-gallery-controls" data-filter=":even">
+								            <div class="slides"> </div>
+								            <h3 class="title"></h3>
+								            <a class="prev"> ‹ </a>
+								            <a class="next"> › </a>
+								            <a class="close white"> </a>
+								            <a class="play-pause"> </a>
+								            <ol class="indicator"> </ol>
+								        </div>
+								        <!-- BEGIN JAVASCRIPTS(Load javascripts at bottom, this will reduce page load time) -->
+								        <script id="template-upload" type="text/x-tmpl"> {% for (var i=0, file; file=o.files[i]; i++) { %}
+								        <tr class="template-upload fade">
+								            <td>
+								                <p class="name">{%=file.name%}</p>
+								                <strong class="error text-danger label label-danger"></strong>
+								            </td>
+								            <!-- <td>
+								                <p class="size">Processing...</p>
+								                <div class="progress progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+								                    <div class="progress-bar progress-bar-success" style="width:0%;"></div>
+								                </div>
+								            </td> -->
+								            <td> {% if (!i && !o.options.autoUpload) { %}
+								                <button class="btn blue start" disabled>
+								                    <i class="fa fa-upload"></i>
+								                    <span>Start</span>
+								                </button> {% } %} {% if (!i) { %}
+								                <button class="btn red cancel">
+								                    <i class="fa fa-ban"></i>
+								                    <span>Cancel</span>
+								                </button> {% } %} </td>
+								        </tr> {% } %} </script>
+								        <!-- The template to display files available for download -->
+								        <script id="template-download" type="text/x-tmpl"> {% for (var i=0, file; file=o.files[i]; i++) { %}
+								        <tr class="template-download fade">
+								            <td>
+								                <p class="name"> {% if (file.url) { %}
+								                    <a href="{%=file.url%}" title="{%=file.name%}" download="{%=file.name%}" {%=file.thumbnailUrl? 'data-gallery': ''%}>{%=file.name%}</a> {% } else { %}
+								                    <span>{%=file.name%}</span> {% } %}
+								                    {% if (file.name) { %}
+								                        <input type="hidden" name="fileid[]" class="filesUrl" value="{%=file.url%}">
+								                    {% } %}
+								
+								                    </p> {% if (file.error) { %}
+								                <div>
+								                    <span class="label label-danger">Error</span> {%=file.error%}</div> {% } %} </td>
+								            <!-- <td>
+								                <span class="size">{%=o.formatFileSize(file.size)%}</span>
+								            </td> -->
+								            <td> {% if (file.deleteUrl) { %}
+								                <button class="btn red delete btn-sm" data-type="{%=file.deleteType%}" data-url="{%=file.deleteUrl%}" {% if (file.deleteWithCredentials) { %} data-xhr-fields='{"withCredentials":true}' {% } %}>
+								                    <i class="fa fa-trash-o"></i>
+								                    <span>Delete</span>
+								                </button>
+								                <!-- <input type="checkbox" name="delete" value="1" class="toggle"> --> {% } else { %}
+								                <button class="btn yellow cancel btn-sm">
+								                    <i class="fa fa-ban"></i>
+								                    <span>Cancel</span>
+								                </button> {% } %} </td>
+								        </tr> {% } %} </script>
+								        <div style="clear:both;"></div>
+								    </div>
+								</form>	
+							</td>
+						</tr>
+						<tr>
+							<td>备注</td>
+							<td colspan="5">
+								<input type="text" value="notes" style="padding-left: 5px;" class="bw9 remarks">
+							</td>
+						</tr>
+					</table>
+					
+				</div>
 				
-			</div>
-			
-			<div class="mask_from">
-				<button class="save_submit">Submit</button>
-				<a class="mask_close" href="javascript:window.opener=null;window.open('','_self');window.close();">Close</a>
-			</div>
+				<div class="mask_from">
+					<button class="save_submit">Submit</button>
+					<a class="mask_close" href="javascript:window.opener=null;window.open('','_self');window.close();">Close</a>
+				</div>
 		</div>
 	</div>
 	<div class="success_mask">
@@ -505,6 +512,7 @@
 
 <script>
 	/* http://10.10.42.14/vl/public */
+	
 	let sap_seller_id = <?php echo $sap_seller_id;?>;
 	let ratVal,fulfillment,commission,cost;
 	let tableObj  , urlIndex , detailId , listObj,time1,time2,domin_url,saveId;
@@ -549,13 +557,12 @@
 		  });
 	}
 	$(document).ready(function(){
-		
-		
 		//初始化获取asin和汇率的数据
 		function getInitalData(){
 			$.ajax({
 				type:"post",
 				url:"/marketingPlan/index1",
+				async: false,
 				data:{
 					"sap_seller_id": sap_seller_id,
 				},
@@ -564,7 +571,7 @@
 						$("#asin-select").append("<option id='"+value.marketplaceid+"' fulfillment='"+value.fulfillment+"' commission='"+value.commission+"' cost='"+value.cost+"' rating='"+value.rating+"' value='"+value.asin + "' sku='"+value.sku+"' sku_status='"+value.sku_status+"' reviews='"+value.reviews+"'>" + value.country+" — "+ value.asin + "</option>");
 					})
 					$.each(res[1], function (index, value) {
-						$('.rateSelect').append("<option id='"+value.id+"' value='"+value.id + "' rate='"+value.rate+"'>" + value.currency + "</option>");
+						$('.rateSelect').append("<option value='"+value.id + "' rate='"+value.rate+"'>" + value.currency + "</option>");
 					})		
 				},
 				error:function(err){
@@ -601,6 +608,7 @@
 						$('.ratingVal').attr("disabled",true);
 						$('.rateSelect').attr("disabled",true);
 						$('.fromDate').attr("disabled",true);
+						$('.btn-sm').attr("disabled",true);
 						$('.rsgD').attr("disabled",true);
 						$('.toDate').attr("disabled",true);
 						$('.targetRating').attr("disabled",true);
@@ -613,12 +621,12 @@
 						$('.planStatus').attr("disabled",false);
 					}
 					$('.rsgGoal').val(res.marketing_plan.goal);
+					$('.rateSelect').val(res.marketing_plan.currency_rates_id);
 					$('.planStatus').val(res.marketing_plan.plan_status);
 					$("#asin-select").val(res.marketing_plan.asin);
 					$('.sku').text(res.marketing_plan.sku);
 					$('.skuStatus').text(res.marketing_plan.sku_status);
 					$('.ratingVal').val(res.marketing_plan.sku_price);
-					$('.rateSelect').val(res.marketing_plan.currency_rates_id);
 					$("#select2-asin-select-container").text(res.marketing_plan.country + '—'+res.marketing_plan.asin);
 					$('.inventory').text(res.marketing_plan.fba_stock);
 					$('.star').text(res.marketing_plan.rating);
@@ -656,7 +664,7 @@
 					$('.dailyComplete').text(Number(res.marketing_plan.units_d_complete).toFixed(2) + '%');
 					$('.eComplete').text(Number(res.marketing_plan.e_val_complete).toFixed(2) + '%');
 					$('.investmentCycle2').text(Number(res.marketing_plan.investment_return_c));
-					
+
 					let strHtml="";
 					if(res.marketing_plan.files != ''){
 						let fileArray = res.marketing_plan.files.split(",");
@@ -678,10 +686,12 @@
 			}); 	
 		}
 		
+		
+		
+		
 		$('#asin-select').select2({
 			tags:true
 		});
-		
 		$('#asin-select').on("change",function(e){
 			let asinId = $(this).val();
 			let id = $(this).find("option:selected").attr("id");
@@ -729,17 +739,17 @@
 			});
 		});
 		$('.rateSelect').on("change",function(e){
+			$(".rateSelect").val($(this).find("option:selected").attr("value"));
 			ratVal = $(this).find("option:selected").attr("rate");
 			estSpendNum()
 		})
 		//时间选择器
-		function initPickers() {
-		    $('.date-picker').datepicker({
-		        rtl: App.isRTL(),
-		        autoclose: true
-		    });
-		}
-		initPickers();
+		$('.date-picker').datepicker({
+			format: 'yyyy-mm-dd',
+		    autoclose: true,
+			datesDisabled : new Date(),
+			startDate: '0',
+		});
 		//开始日期跟结束日期赋值
 		function dateVal(){
 			let oDate = new Date();
@@ -753,6 +763,18 @@
 		}
 		$('.fromDate').val(dateVal());
 		$('.toDate').val(dateVal());
+		
+		//日期1
+		$('.fromDate').on('change',function(){
+			$('.totalRsg').text(rsgNum($('.toDate').val(),$(this).val(),$('.rsgD').val()));
+			estSpendNum()
+			
+		})
+		//日期2
+		$('.toDate').on('change',function(){
+			$('.totalRsg').text(rsgNum($(this).val(),$('.fromDate').val(),$('.rsgD').val()));	
+			estSpendNum()
+		})
 		//关闭窗口
 		$('.mask_close').click(function(){
 			window.close();
@@ -761,16 +783,7 @@
 		$('.rate').change(function(){
 			$('.rate').val($(this).val())
 		})
-		//日期1
-		$('.fromDate').on('change',function(){
-			$('.totalRsg').text(rsgNum($('.toDate').val(),$(this).val(),$('.rsgD').val()));	
-			estSpendNum()
-		})
-		//日期2
-		$('.toDate').on('change',function(){
-			$('.totalRsg').text(rsgNum($(this).val(),$('.fromDate').val(),$('.rsgD').val()));	
-			estSpendNum()
-		})
+		
 		//每日目标
 		$('.rsgD').on('input',function(){
 			$('.totalRsg').text(rsgNum($('.toDate').val(),$('.fromDate').val(),$(this).val()));	
@@ -810,39 +823,7 @@
 		})
 		//任务状态
 		$('.planStatus').on("change",function(){
-			if(ids != "null"){
-				$.ajax({
-					type:"post",
-					url:"/marketingPlan/updatePlan",
-					data:{
-						"sap_seller_id": sap_seller_id,
-						"id": ids,
-						"plan_status": $(this).val()
-					},
-					success:function(res){
-						if(res.status == 1){
-							$('.success_mask_text').text(res.msg)
-							$('.success_mask').fadeIn(1000);
-							setTimeout(function(){
-								$('.success_mask').fadeOut(1000);
-							},2000)	
-						}else{
-							$('.error_mask_text').text(res.msg)
-							$('.error_mask').fadeIn(1000);
-							setTimeout(function(){
-								$('.error_mask').fadeOut(1000);
-							},2000)
-						}
-					},
-					error:function(err){
-						$('.error_mask_text').text(err)
-						$('.error_mask').fadeIn(1000);
-						setTimeout(function(){
-							$('.error_mask').fadeOut(1000);
-						},2000)
-					},
-				});
-			}	
+			
 		})
 		
 		
@@ -944,13 +925,44 @@
 			for(var i=0;i<str.length;i++){
 				fileList.push(str[i].defaultValue)
 			}
-			ids == null ? ids = 0 : ids;
+			ids == null ? ids = 0 : ids;	
 			if(ids == 'null'){
 				marketplaceidVal = $('#asin-select').find("option:selected").attr("id");
 				asinVal = $('#asin-select').val();
 			}else{
 				asinVal = $('#select2-asin-select-container').text().substr($('#select2-asin-select-container').text().lastIndexOf('—') + 1);
-				marketplaceidVal = saveId;
+				marketplaceidVal = saveId;	
+				$.ajax({
+					type:"post",
+					url:"/marketingPlan/updatePlan",
+					data:{
+						"sap_seller_id": sap_seller_id,
+						"id": ids,
+						"plan_status": plan_status
+					},
+					success:function(res){
+						if(res.status == 1){
+							$('.success_mask_text').text(res.msg)
+							$('.success_mask').fadeIn(1000);
+							setTimeout(function(){
+								$('.success_mask').fadeOut(1000);
+							},2000)	
+						}else{
+							$('.error_mask_text').text(res.msg)
+							$('.error_mask').fadeIn(1000);
+							setTimeout(function(){
+								$('.error_mask').fadeOut(1000);
+							},2000)
+						}
+					},
+					error:function(err){
+						$('.error_mask_text').text(err)
+						$('.error_mask').fadeIn(1000);
+						setTimeout(function(){
+							$('.error_mask').fadeOut(1000);
+						},2000)
+					},
+				});
 			}
 			let asin = asinVal;
 			let marketplaceid = marketplaceidVal;
@@ -994,6 +1006,7 @@
 			let units_d_complete = parseFloat($('.dailyComplete').text());
 			let e_val_complete = parseFloat($('.eComplete').text());
 			let investment_return_c = $('.investmentCycle2').text();
+			
 			$.ajax({
 				type:"post",
 				url:"/marketingPlan/addMarketingPlan",
@@ -1044,8 +1057,7 @@
 					"units_d_complete": units_d_complete,
 					"e_val_complete": e_val_complete,
 					"investment_return_c": investment_return_c,
-					"files":fileList
-					
+					"files": fileList
 				},
 				success:function(res){
 					if(res.status == 1){
@@ -1076,7 +1088,7 @@
 				},
 			});
 			
-		})
+		}) 
 		
 		function clearInput(){
 			$('.rsgGoal').val("");
@@ -1085,7 +1097,7 @@
 			$('.sku').text("");
 			$('.skuStatus').text("");
 			$('.ratingVal').val("");
-			$('.rateSelect').val("");
+			$('.rateSelect').val(-1);
 			$('.inventory').text("");
 			$('.star').text("");
 			$('.reviews').text("");
@@ -1126,6 +1138,9 @@
 		function strMoney(str){
 			return str = str.substr(str.lastIndexOf('￥')+1);
 		}
+		
+		
+		
 	})
 </script>
 

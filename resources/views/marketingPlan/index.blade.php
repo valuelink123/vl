@@ -6,43 +6,13 @@
 	.table-scrollable{
 		overflow: hidden;
 	}
-	.form-control[disabled], .form-control[readonly], fieldset[disabled] .form-control{
-		background: none;
-		border: 1px solid #eaeff8;
-	}
 	.btn.default:not(.btn-outline){
 		background: #fff;
 	}
 	.page-container-bg-solid .page-content{
 		background: #eaeff8;
 	}
-	.plan_title{
-		font-weight: 900;
-		font-size: 28px;
-		margin-bottom: 0;
-		margin-top: 30px;
-	}
-	.plan_nav{
-		border-bottom: 1px solid #fff;
-		overflow: hidden;
-		padding: 0;
-		margin: 0;
-	}
-	.plan_nav > li{
-		float: left;
-		padding: 15px 20px;
-		list-style: none;
-		margin-bottom: -5px;
-	}
-	.plan_nav > li:first-child{
-		border-bottom: 5px solid #3bbeca;
-	}
-	.plan_nav > li a{
-		color: #65747f;
-		font-size: 14px;
-		display: block;
-		text-decoration: none;
-	}
+	
 	.createPlan{
 		float: right !important;
 	}
@@ -52,23 +22,23 @@
 		background: #fff;
 		border-radius: 5px !important;
 		cursor: pointer;
+		
+	}
+	.content{
+		padding: 30px 40px 40px 40px;
+		overflow: hidden;
+		border-radius: 4px !important;
+		background-color: rgba(255, 255, 255, 1);
 	}
 	.filter_box{
-		padding: 15px 30px 10px 30px;
-		background: #fff;
-		margin-top: 25px;
-		border-radius: 10px !important;
 		overflow: hidden;
-	}
-	.search_box{
-		float: right;
+		padding-bottom: 10px;
 	}
 	.filter_box select{
-		border: 1px solid #eaeff8;
-		padding: 5px 10px;
-		margin-right: 20px;
-		border-radius: 20px !important;
-		outline: none;
+		border-radius: 4px !important;
+		width: 150px;
+		height: 36px;
+		border: 1px solid rgba(220, 223, 230, 1);
 	}
 	
 	.date_box{
@@ -80,17 +50,26 @@
 		width: 400px;
 	}
 	.search_box input{
-		border: 1px solid #eaeff8;
-		padding: 6px 5px;
-		width: 250px;
-		border-radius: 20px !important;
+		width: 410px;
+		height: 36px;
+		border-top-left-radius: 4px !important;
+		border-bottom-left-radius: 4px !important;
+		border: 1px solid rgba(220, 223, 230, 1);
 	}
 	.search{
-		background: #fff;
-		border: 1px solid #eaeff8;
-		padding: 6px 20px;
-		border-radius: 20px !important;
-		margin-left: 10px;
+		width: 90px;
+		height: 36px;
+		background-color: rgba(99, 197, 209, 1);
+		border: 1px solid rgba(99, 197, 209, 1);
+		margin-left: -5px;
+		border-top-right-radius: 4px !important;
+		border-bottom-right-radius: 4px !important;
+		color: #fff;
+		outline: none;
+	}
+	.search svg{
+		display: inline-block;
+		margin-bottom: -4px;
 	}
 	.plan_item{
 		position: absolute;
@@ -107,24 +86,11 @@
 	#planTable_filter{
 		display: none;
 	}
-	.w4{
-		min-width: 40px;
-	}
-	.w6{
-		min-width: 60px;
-	}
-	.w8{
-		min-width: 80px;
-	}
-	.w10{
-		min-width: 100px;
-	}
-	.w22{
-		min-width: 220px;
-	}
+	
 	table.table-bordered.dataTable th, table.table-bordered.dataTable td{
-		text-align: center;
 		background: #fff;
+		text-align: left;
+		padding-left: 15px;
 	}
 	.table-scrollable > .table-bordered > thead > tr:last-child > th{
 		border-bottom: 1px solid #ddd;
@@ -190,122 +156,330 @@
 	.error_mask .mask_text{
 		color: #f56c6c !important;
 	}
+	.daterangepicker .calendar-table table{
+		display: grid;
+	}
+	.daterangepicker .calendar-table td, .daterangepicker .calendar-table th{
+		background: #fff;
+	}
+	.daterangepicker td{
+		float: left;
+		line-height: 15px !important;
+	}
+	.time-style{
+		display: inline-block;
+		width: 300px;
+	}
+	.calendar-time,.drp-selected{
+		display: none !important;
+	} 
+	.daterangepicker td.in-range{
+		border-radius: 0 !important;
+	}
+	.input-group .form-control{
+		height: 36px;
+		border-left: none !important;
+		border: 1px solid rgba(220, 223, 230, 1);
+		border-bottom-right-radius: 4px !important;
+		border-top-right-radius: 4px !important;
+	}
+	.input-group-btn:first-child>.btn, .input-group-btn:first-child>.btn-group{
+		border: 1px solid rgba(220, 223, 230, 1);
+		border-bottom-left-radius: 4px !important;
+		border-top-left-radius: 4px !important;
+	}
+	.filter_option{
+		float: left;
+		margin-right: 20px;
+		padding-top: 10px;
+	}
+	.filter_option > label{
+		display: block;
+		color: rgba(48, 49, 51, 1);
+		font-size: 14px;
+		text-align: left;
+		font-family: PingFangSC-Semibold;
+	}
+	.filter_option .btn{
+		padding: 7px 0 7px 12px !important;
+	}
+	.input-medium{
+		width: 215px !important;
+	}
+	.button_box{
+		text-align: right;
+		padding: 20px 0;
+	}
+	.button_box > button{
+		width: 101px;
+		height: 36px;
+		border-radius: 4px !important;
+		background-color: rgba(99, 197, 209, 1);
+		border: none;
+		color: #fff;
+		font-size: 14px;
+	}
+	.button_box > button a{
+		color: #fff;
+		width: 100%;
+		height: 100%;
+		text-decoration: none;
+	}
+	.button_box > button svg{
+		display: inline-block;
+		margin-bottom: -2px;
+	}
+	.total_records{
+		color: rgba(144, 147, 153, 1);
+		font-size: 12px;
+		font-family: PingFangSC-Regular;
+		margin-top: 35px;
+		display: block;
+	}
+	.total_records span{
+		color: #63C5D1;
+	}
+	.form-control{
+		border: 1px solid rgba(220, 223, 230, 1) !important;
+	}
+	div.dataTables_wrapper div.dataTables_length select{
+		width: 60px !important;
+		height: 28px;
+	}
+	.fa-calendar:before{
+		color: #C0C4CC;
+	}
+	.btn-circle{
+		z-index: 999;
+	}
+	#sortSelect{
+		position: absolute;
+		left: 130px;
+		width: 120px;
+		height: 28px;
+		z-index: 9999;
+		border: 1px solid rgba(220, 223, 230, 1);
+	}
+	.keyword{
+		outline: none;
+		padding-left: 10px;
+	}
+	.dataTables_empty{
+		text-align: center !important;
+	}
+	.clear{
+		width: 90px;
+		height: 36px;
+		background-color: #909399;
+		border: 1px solid #909399;
+		border-radius: 4px !important;
+		outline: none;
+		color: #fff;
+		margin-left: 20px;
+	}
+	.openscenter{
+		z-index: 99999 !important;
+	}
+	.select2-container--open .select2-dropdown--below,.select2-container .select2-search--inline .select2-search__field{
+		width: 130px !important;
+	}
+	.select2-selection__choice{
+		float: left;
+		padding: 0 5px;
+		margin-right: 5px;
+		list-style: none;
+		height: 34px;
+		background: #fff !important;
+		border: 1px solid #fff !important;
+	}
+	.select2-container .select2-search--inline .select2-search__field{
+		display: none;
+	}
+	.select2-container--bootstrap .select2-selection, .select2-container--bootstrap.select2-container--focus .select2-selection{
+		border: 1px solid rgba(220, 223, 230, 1);
+		outline: none;
+		border-radius: 4px !important;
+	}
+	.select2-container .select2-selection--multiple{
+		min-width: 150px;
+		height: 36px;
+		line-height: 36px;
+	}
+	.select2-container .select2-selection--multiple .select2-selection__rendered{
+		list-style: none;
+		padding: 0;
+		margin: 0;
+		padding-right: 10px !important;
+	}
+	.btn.default:not(.btn-outline){
+		border-right: none;
+		height: 36px;
+	}
 </style>
+<link rel="stylesheet" type="text/css" media="all" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-daterangepicker/3.0.5/daterangepicker.min.css" />
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.1/moment.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-daterangepicker/3.0.5/daterangepicker.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.8/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.8/js/select2.min.js"></script>
+
 <div>
-	<h3 class="plan_title">Marketing Plan</h3>
-	<ul class="plan_nav">
-		<li><a href="">RSG</a></li>
-		<li><a href="">Promotion</a></li>
-		<li><a href="">Others</a></li>
-		<li class="createPlan">
-			<button class="create_btn">+New Plan</button>
-			<ul class="plan_item">
-				<li class="show_rsg_plan"><a href="detail?id=null" target="_blank">RSG</a></li>
-				<li><a href="" target="_blank">Promotion</a></li>
-				<li><a href="" target="_blank">Others</a></li>
-			</ul>
-		</li>
-	</ul>
-	<div class="filter_box">
-			<select>
-				<option value ="">Campaign</option>
-			</select>
-			<select>
-				<option value ="">Activity</option>
-			</select>
-			<select>
-				<option value ="">Status</option>
-			</select>
-			<select>
-				<option value ="">Seller</option>
-			</select>
-			<select>
-				<option value ="">This Week</option>
-			</select>
+	<div class="button_box">
+		<!-- <button>
+			<svg t="1588042241983" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2835" width="14" height="14"><path d="M821.1456 276.8384c-235.9296 25.1392-449.1776 226.7136-490.5472 452.352a38.4 38.4 0 1 1-75.5712-13.824c45.568-248.576 269.312-468.48 526.6944-510.6688l-117.8112-69.1712a38.4 38.4 0 0 1 38.912-66.2528l223.3344 131.1744a38.4 38.4 0 0 1 10.1376 57.6l-170.752 206.6432a38.4 38.4 0 1 1-59.1872-48.9472l114.7904-138.9056z" p-id="2836" fill="#ffffff"></path><path d="M832 620.0832a38.4 38.4 0 0 1 76.8 0v158.208c0 85.9648-61.5936 157.8496-140.8 157.8496H204.8c-79.2064 0-140.8-71.8848-140.8-157.9008V300.3904c0-86.016 61.5936-157.8496 140.8-157.8496h220.2112a38.4 38.4 0 1 1 0 76.8H204.8c-33.8944 0-64 35.072-64 81.0496V778.24c0 45.9776 30.1056 81.1008 64 81.1008h563.2c33.8944 0 64-35.1232 64-81.1008v-158.1568z" p-id="2837" fill="#ffffff"></path></svg>
+			Export
+		</button> -->
+		<button>
+			<a href="/marketingPlan/detail?id=null" target="_blank">
+				<svg t="1588042189957" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1900" width="14" height="14"><path d="M191.703625 460.631052l639.908158 0 0 100.316753-639.908158 0 0-100.316753Z" p-id="1901" fill="#ffffff"></path><path d="M461.67022 192.045921l100.31573 0 0 639.908158-100.31573 0 0-639.908158Z" p-id="1902" fill="#ffffff"></path></svg>
+				New Plan
+			</a>
 			
-			<div class="date_box date_box1">
-				<div style="float: left; width: 70px; line-height: 30px;text-align: right;padding-right: 10px;">Est. Start</div>
-				<div style="float: left;width: 130px;">
-				    <div class="input-group date date-picker margin-bottom-5" data-date-format="yyyy-mm-dd">
-				        <input type="text" class="form-control form-filter input-sm date1" readonly name="date_from" onchange="handleFilter(this.value,10)" placeholder="From" value="">
-				        <span class="input-group-btn">
-							<button class="btn btn-sm default" type="button">
-								<i class="fa fa-calendar"></i>
-							</button>
-						</span>
-				    </div>
-				</div>
-				<div style="float: left; width: 70px; line-height: 30px;text-align: right;padding-right: 10px;">Est. End</div>
-				<div style="float: left;width: 130px;">
-				    <div class="input-group date date-picker" data-date-format="yyyy-mm-dd">
-				        <input type="text" class="form-control form-filter input-sm date2" readonly name="date_to" onchange="handleFilter(this.value,11)" placeholder="To" value="">
-				        <span class="input-group-btn">
-							<button class="btn btn-sm default" type="button">
-								<i class="fa fa-calendar"></i>
-							</button>
-						</span>
-				    </div>
-				</div>		
-			</div>
-			
-			<div class="date_box">
-				<div style="float: left; width: 90px; line-height: 30px;text-align: right;padding-right: 10px;">Actual Start</div>
-				<div style="float: left;width: 130px;">
-				    <div class="input-group date date-picker margin-bottom-5" data-date-format="yyyy-mm-dd">
-				        <input type="text" class="form-control form-filter input-sm date1" readonly name="date_from" onchange="handleFilter(this.value,15)" placeholder="From" value="">
-				        <span class="input-group-btn">
-							<button class="btn btn-sm default" type="button">
-								<i class="fa fa-calendar"></i>
-							</button>
-						</span>
-				    </div>
-				</div>
-				<div style="float: left; width: 90px; line-height: 30px;text-align: right;padding-right: 10px;">Actual End</div>
-				<div style="float: left;width: 130px;">
-				    <div class="input-group date date-picker" data-date-format="yyyy-mm-dd">
-				        <input type="text" class="form-control form-filter input-sm date2" readonly name="date_to" onchange="handleFilter(this.value,16)" placeholder="To" value="">
-				        <span class="input-group-btn">
-							<button class="btn btn-sm default" type="button">
-								<i class="fa fa-calendar"></i>
-							</button>
-						</span>
-				    </div>
-				</div>		
-			</div>
-		
-		<div class="search_box">
-			<input type="text">
-			<button class="search">Search</button>
-		</div>
+		</button>
 	</div>
-	<div>
-		<table id="planTable" class="display table-striped table-bordered table-hover" style="width:100%">
-			<thead>
-				<tr style="text-align: center;">
-					<th class="w6">Plan ID</th>
-					<th>Plan Status</th>
-					<th>SKU Status</th>
-					<th>RSG Goal</th>
-					<th>ASIN/SKU</th>
-					<th class="w6">Price/FBA Stk</th>
-					<th>Units/D</th>
-					<th class="w8">Ratings</th>
-					<th class="w8">Rank</th>
-					<th>CR%</th>
-					<th class="w8">Est. Start</th>
-					<th class="w8">Est. End</th>
-					<th class="w10">Est. RSG</th>
-					<th>RSG Spend</th>
-					<th class="w6">E Value</th>
-					<th class="w8">Actual Start</th>
-					<th class="w8">Actual End</th>
-					<th class="w8">RSG Details</th>
-					<th class="w10">Notes</th>
-					<th>Action</th>
-				</tr>
-			</thead>
-			
-		</table>
+	<div class="content">
+		<div class="filter_box">
+			<div class="filter_option">
+				<label for="type_select">类型</label>
+				<select id="mutiSelect" name="mutiSelect" multiple="multiple" style="width:100%;" onchange="status_filter(this.value,8)">
+					<option value ="">全部</option>
+					<option value ="CPC">CPC</option>
+					<option value ="LD">LD</option>
+					<option value ="RSG">RSG</option>
+					<option value ="CTG">CTG</option>
+					<option value ="Deal">Deal</option>
+				</select>
+			</div>
+			<div class="filter_option">
+				<label for="marketplace_select">站点</label>
+				<select id="marketplace_select" onchange="status_filter(this.value,2)">
+					<option value ="">全部</option>
+					<option value ="US">US</option>
+					<option value ="CA">CA</option>
+					<option value ="MX">MX</option>
+					<option value ="UK">UK</option>
+					<option value ="FR">FR</option>
+					<option value ="DE">DE</option>
+					<option value ="IT">IT</option>
+					<option value ="ES">ES</option>
+					<option value ="JP">JP</option>
+				</select>
+			</div>
+			<div class="filter_option">
+				<label for="bg_select">BG</label>
+				<select id="bg_select" onchange="status_filter(this.value,0)">
+					<option value ="">全部</option>
+					<option value ="BG">BG</option>
+					<option value ="BG1">BG1</option>
+					<option value ="BG2">BG3</option>
+					<option value ="BG3">BG4</option>
+				</select>
+			</div>
+			<div class="filter_option">
+				<label for="bu_select">BU</label>
+				<select id="bu_select" onchange="status_filter(this.value,1)">
+					<option value ="">全部</option>
+					<option value ="BU">BU</option>
+					<option value ="BU1">BU1</option>
+					<option value ="BU2">BU2</option>
+					<option value ="BU3">BU3</option>
+					<option value ="BU4">BU4</option>
+					<option value ="BU5">BU5</option>
+				</select>
+			</div>
+			<div class="filter_option">
+				<label for="seller_select">Seller</label>
+				<select id="seller_select" onchange="status_filter(this.value,7)">
+					<option value ="">全部</option>
+				</select>
+			</div>
+			<div class="filter_option">
+				<label for="status_select">状态</label>
+				<select id="status_select"  onchange="status_filter(this.value,3)">
+					<option value ="">全部</option>
+					<option value ="Pending">Pending</option>
+					<option value ="Ongoing">Ongoing</option>
+					<option value ="Finished">Finished</option>
+					<option value ="Paused">Paused</option>
+					<option value ="Rejected">Rejected</option>
+				</select>
+			</div>
+			<div class="filter_option">
+				<label for="">创建时间</label>
+				<div class="input-group input-medium" id="createTimes">
+					<span class="input-group-btn">
+					    <button class="btn default date-range-toggle" type="button">
+					        <i class="fa fa-calendar"></i>
+					    </button>
+					</span>
+				    <input type="text" class="form-control createTimeInput" id="createTimeInput">  
+				</div>
+			</div>
+			<div class="filter_option">
+				<label for="">预计起始时间</label>
+				<div class="input-group input-medium" id="estStartTime">
+					<span class="input-group-btn">
+					    <button class="btn default date-range-toggle" type="button">
+					        <i class="fa fa-calendar"></i>
+					    </button>
+					</span>
+				    <input type="text" class="form-control estTimeInput">  
+				</div>
+			</div>
+			<!-- <div class="filter_option">
+				<label for="">实际时间</label>
+				<div class="input-group input-medium" id="actualTime">
+					<span class="input-group-btn">
+					    <button class="btn default date-range-toggle" type="button">
+					        <i class="fa fa-calendar"></i>
+					    </button>
+					</span>
+				    <input type="text" class="form-control actualTimeInput">  
+				</div>
+			</div> -->
+			<div class="filter_option search_box">
+				<label for="">搜索</label>
+				<input type="text" class="keyword">
+				<button class="search">
+					<svg t="1588043111114" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3742" width="18" height="18"><path d="M400.696889 801.393778A400.668444 400.668444 0 1 1 400.696889 0a400.668444 400.668444 0 0 1 0 801.393778z m0-89.031111a311.637333 311.637333 0 1 0 0-623.331556 311.637333 311.637333 0 0 0 0 623.331556z" fill="#ffffff" p-id="3743"></path><path d="M667.904 601.998222l314.766222 314.823111-62.919111 62.976-314.823111-314.823111z" fill="#ffffff" p-id="3744"></path></svg>
+					搜索
+				</button>	
+				<button class="clear">清空筛选</button>
+			</div>
+			<!-- <div class="filter_option">
+				<span for="" class="total_records">Found total <span class="tableTotal"></span> records</span>
+			</div> -->
+		</div>
+		<div style="position: relative;">
+			<!-- <select name="" id="sortSelect">
+				<option value="">Submitted</option>
+				<option value="">ROMI</option>
+				<option value="">Actual Spend</option>
+				<option value="">Est.Spend</option>
+				<option value="">RSG Goal</option>
+				<option value="">Review %</option>
+			</select> -->
+			<table id="planTable" class="display table-striped table-bordered table-hover" style="width:100%">
+				<thead>
+					<tr style="text-align: center;">
+						<th>BG</th>
+						<th>BU</th>
+						<th>Station</th>
+						<th>planStatus</th>
+						<th><input type="checkbox" id="selectAll" /></th>
+						<th>Products</th>
+						<th>Asin/Sku</th>
+						<th>Seller</th>
+						<th>Type</th>
+						<th>Est.</th>
+						<th>Actual</th>
+						<th>ROMI</th>
+						<th>Status</th>
+						<th>Action</th>
+					</tr>
+				</thead>
+				
+			</table>
+		</div>
 	</div>
 	
 	<div class="success_mask">
@@ -322,71 +496,206 @@
 	</div>
 </div>
 <script>
-	function handleEdit(e){
-		let _this = e;
-		$(_this).find('.editorTxt').show();
-		$(_this).find('.editorData').hide();
-		$(_this).find('.editorSave').show();
-	}
-	function handleSaveEditor(e){
-		let _this = e
-		
-		let id = $(_this).parent().attr("id");
-		let val = $(_this).parent().find('.editorTxt').val();
-		$(_this).parent().find('.editorTxt').hide();
-		$(_this).parent().find('.editorData').show();
-		$(_this).parent().find('.editorSave').hide();
-		
-		/* $.ajax({
-			type:"post",
-			url:"",
-			data:{
-				"id": id,
-				"notes": val
-			},
-			success:function(res){
-				$('.success_mask_text').text('success to save.');
-				$('.success_mask').show();
-				tableObj.ajax.reload();
-				setTimeout(function(){
-					$('.success_mask').fadeOut(1000);
-				},2000)	
-			},
-			error:function(err){
-				$('.error_mask_text').text('error to save.');
-				$('.error_mask').show();
-				setTimeout(function(){
-					$('.error_mask').fadeOut(1000);
-				},2000)
-			},
-		}); */
-		event.stopPropagation();
-	}
+	
 	//筛选
-	 function handleFilter(value,column) {
-		 console.log(value,column)
-		 if (value == '') {
-			 tableObj.column(column).search('').draw();
-		 }
-		 else tableObj.column(column).search(value).draw();
-	 }
+	function status_filter(value,column) {
+	    if (value == '') {
+	        tableObj.column(column).search('').draw();
+	    }
+	    else tableObj.column(column).search(value).draw();
+	}
 	$(document).ready(function () {
+		let sap_seller_id = <?php echo $sap_seller_id;?>;
+		$('#mutiSelect').select2({
+			allowClear: true,
+			data:[]
+		});
+		$("#createTimes").daterangepicker({
+		    opens: "left", //打开的方向，可选值有'left'/'right'/'center'
+		    format: "YYYY-MM-DD",
+			autoUpdateInput: false,
+		    separator: " to ",
+		    startDate: moment(),
+		    endDate: moment(),
+			opens: 'center',
+		    ranges: {
+		        "今天": [moment(), moment()],
+		        "昨天": [moment().subtract("days", 1), moment().subtract("days", 1)],
+		        "7天前": [moment().subtract("days", 6), moment()],
+		        "30天前": [moment().subtract("days", 29), moment()],
+		        "这个月": [moment().startOf("month"), moment().endOf("month")],
+		        "上个月": [moment().subtract("month", 1).startOf("month"), moment().subtract("month", 1).endOf("month")]
+		    },
+		    locale: {
+		        applyLabel: '确定',
+		        cancelLabel: '取消',
+		        fromLabel: '起始时间',
+		        toLabel: '结束时间',
+		        customRangeLabel: '自定义',
+		        daysOfWeek: ['日', '一', '二', '三', '四', '五', '六'],
+		        monthNames: ['一月', '二月', '三月', '四月', '五月', '六月','七月', '八月', '九月', '十月', '十一月', '十二月'],
+		        firstDay: 1,
 		
+		    },
+			onChangeDateTime:function(dp,$input){
+			    console.log(1)
+			}
+		    /* minDate: "01/01/2012",
+		    maxDate: "12/31/2018" */
+		}, function (t, e) {
+		    $("#createTimes input").val(t.format("YYYY-MM-DD") + " - " + e.format("YYYY-MM-DD"));	
+			let reqList = {
+				"created_at_s": cusstr($('#createTimes input').val() , ' - ' , 1),
+				"created_at_e": cusstr1($('#createTimes input').val() , ' - ' , 1),
+			};
+			let val = ''
+			tableObj.ajax.reload();
+			handleClear();
+			status_filter(val,0);
+			status_filter(val,1);
+			status_filter(val,2);
+			status_filter(val,3);
+			status_filter(val,7);
+			status_filter(val,8);
+		})
+		$("#estStartTime").daterangepicker({
+		    opens: "left", //打开的方向，可选值有'left'/'right'/'center'
+		    format: "YYYY-MM-DD",
+		    separator: " to ",
+		    startDate: moment(),
+		    endDate: moment(),
+			opens: 'center',
+		    ranges: {
+		        "今天": [moment(), moment()],
+		        "昨天": [moment().subtract("days", 1), moment().subtract("days", 1)],
+		        "7天前": [moment().subtract("days", 6), moment()],
+		        "30天前": [moment().subtract("days", 29), moment()],
+		        "这个月": [moment().startOf("month"), moment().endOf("month")],
+		        "上个月": [moment().subtract("month", 1).startOf("month"), moment().subtract("month", 1).endOf("month")]
+		    },
+		    locale: {
+		        applyLabel: '确定',
+		        cancelLabel: '取消',
+		        fromLabel: '起始时间',
+		        toLabel: '结束时间',
+		        customRangeLabel: '自定义',
+		        daysOfWeek: ['日', '一', '二', '三', '四', '五', '六'],
+		        monthNames: ['一月', '二月', '三月', '四月', '五月', '六月','七月', '八月', '九月', '十月', '十一月', '十二月'],
+		        firstDay: 1,
+		
+		    },
+		    /* minDate: "01/01/2012",
+		    maxDate: "12/31/2018" */
+		}, function (t, e) {
+		    $("#estStartTime input").val(t.format("YYYY-MM-DD") + " - " + e.format("YYYY-MM-DD"));
+			let reqList = {
+				"created_at_s": cusstr($('#estStartTime input').val() , ' - ' , 1),
+				"created_at_e": cusstr1($('#estStartTime input').val() , ' - ' , 1),
+			};
+			let val = ''
+			tableObj.ajax.reload();
+			handleClear();
+			status_filter(val,0);
+			status_filter(val,1);
+			status_filter(val,2);
+			status_filter(val,3);
+			status_filter(val,7);
+			status_filter(val,8);
+		})
+		$("#actualTime").daterangepicker({
+		    opens: "left", //打开的方向，可选值有'left'/'right'/'center'
+		    format: "YYYY-MM-DD",
+		    separator: " to ",
+		    startDate: moment(),
+		    endDate: moment(),
+			opens: 'center',
+		    ranges: {
+		        "今天": [moment(), moment()],
+		        "昨天": [moment().subtract("days", 1), moment().subtract("days", 1)],
+		        "7天前": [moment().subtract("days", 6), moment()],
+		        "30天前": [moment().subtract("days", 29), moment()],
+		        "这个月": [moment().startOf("month"), moment().endOf("month")],
+		        "上个月": [moment().subtract("month", 1).startOf("month"), moment().subtract("month", 1).endOf("month")]
+		    },
+		    locale: {
+		        applyLabel: '确定',
+		        cancelLabel: '取消',
+		        fromLabel: '起始时间',
+		        toLabel: '结束时间',
+		        customRangeLabel: '自定义',
+		        daysOfWeek: ['日', '一', '二', '三', '四', '五', '六'],
+		        monthNames: ['一月', '二月', '三月', '四月', '五月', '六月','七月', '八月', '九月', '十月', '十一月', '十二月'],
+		        firstDay: 1,
+		
+		    },
+		    /* minDate: "01/01/2012",
+		    maxDate: "12/31/2018" */
+		}, function (t, e) {
+		    $("#actualTime input").val(t.format("YYYY-MM-DD") + " - " + e.format("YYYY-MM-DD"));	
+			let reqList = {
+				"created_at_s": cusstr($('#actualTime input').val() , ' - ' , 1),
+				"created_at_e": cusstr1($('#actualTime input').val() , ' - ' , 1),
+			};
+			let val = ''
+			tableObj.ajax.reload();
+			handleClear();
+			status_filter(val,0);
+			status_filter(val,1);
+			status_filter(val,2);
+			status_filter(val,3);
+			status_filter(val,7);
+			status_filter(val,8);
+		})
+		
+		$("#createTimes input").val(moment().format("YYYY-MM-DD")+ " - "+ moment().format("YYYY-MM-DD")); //设置初始值
+		$("#estStartTime input").val(moment().format("YYYY-MM-DD")+ " - "+ moment().format("YYYY-MM-DD")); //设置初始值
+		//$("#actualTime input").val(moment().subtract("days", 6).format("YYYY-MM-DD")+ " - "+ moment().format("YYYY-MM-DD")); //设置初始值  
+		//全选
+		$("#selectAll").on('change',function() {  
+		    $("input[name='checkedInput']").prop("checked", this.checked);
+			let checkedBox = $("input[name='checkedInput']:checked");
+			checkedBox.length > 0 ? $('.status_btn').show(): $('.status_btn').hide()
+		});  
+		//单条选中
+		$("body").on('change','.checkbox-item',function(){
+			var $subs = $("input[name='checkedInput']");
+		    $("#selectAll").prop("checked" , $subs.length == $subs.filter(":checked").length ? true :false); 
+			let checkedBox = $subs.filter(":checked");
+			checkedBox.length > 0 ? $('.status_btn').show(): $('.status_btn').hide()
+		});
+		//排序
+		$('#sortSelect').on('change',function(){
+			console.log(1)
+		})
+		function handleClear(){
+			$('#type_select').val('');
+			$('#marketplace_select').val('');
+			$('#bg_select').val('');
+			$('#bu_select').val('');
+			$('#seller_select').val('');
+			$('#status_select').val('');
+		}
+		//清空所有筛选
+		$('.clear').on('click',function(){
+			handleClear();
+			$('.createTimeInput').val("");
+			$('.estTimeInput').val("");
+			/* $('.actualTimeInput').val(); */
+			$('.keyword').val("");
+			let val = ' '
+			status_filter(val,0)
+			status_filter(val,1)
+			status_filter(val,2)
+			status_filter(val,3)
+			status_filter(val,7)
+			status_filter(val,8)
+			tableObj.ajax.reload();
+		})
 		//时间戳转换
 		function dateStr(str){
 			str = str.replace(/-/g,'/'); // 将-替换成/，因为下面这个构造函数只支持/分隔的日期字符串
 			return  Math.round(new Date(str).getTime()/1000); // 构造一个日期型数据，值为传入的字符串
 		}
-		
-		//时间选择器
-		function initPickers() {
-		    $('.date-picker').datepicker({
-		        rtl: App.isRTL(),
-		        autoclose: true
-		    });
-		}
-		initPickers();
-
 		
 		$('.create_btn').on('click',function(){
 			$('.plan_item').toggle();
@@ -398,7 +707,40 @@
 			let totalRsg = $('.totalRsg').text();
 			console.log(rating,rsgD,totalRsg)
 		})
-		
+		//截取字符前面的
+		function cusstr(str, findStr, num){
+			if(str.length > 0){
+				let idx = str.indexOf(findStr);
+				let count = 1;
+				while(idx >= 0 && count < num){
+				    idx = str.indexOf(findStr, idx+1);
+				    count++;
+				}    
+				if(idx < 0){
+				    return '';
+				}
+				return str.substring(0, idx);
+			}else{
+				return ''
+			}
+		}
+		//截取字符前面的
+		function cusstr1(str, findStr, num){
+			if(str.length > 0){
+				let idx = str.indexOf(findStr);
+				let count = 1;
+				while(idx >= 0 && count < num){
+					idx = str.indexOf(findStr, idx+1);
+					count++;
+				}    
+				if(idx < 0){
+					return '';
+				}
+				return str.substring(idx+3);
+			}else{
+				return ''
+			}
+		}
 		//禁止警告弹窗弹出
 		$.fn.dataTable.ext.errMode = 'none';
 		
@@ -413,420 +755,151 @@
 			serverSide: false,//是否所有的请求都请求服务器	
 			scrollX: "100%",
 			scrollCollapse: false,
-			fixedColumns: { //固定列的配置项
+			/* fixedColumns: { //固定列的配置项
 				leftColumns: 1, //固定左边第一列
 				rightColumns:1 //固定右边第一列
-			},
+			}, */
 			/* pagingType: 'numbers',
 			searching: true,  //去掉搜索框
 			bLengthChange: false, //去掉每页多少条框体
 			 */
-			
-			/* ajax: {
-				url: "",
+			ajax: {
+				url: "/marketingPlan/rsgList",
+				type: "post",
+				data : function(){
+					reqList = {
+						"sap_seller_id" : sap_seller_id,
+						"created_at_s": cusstr($('.createTimeInput').val() , ' - ' , 1),
+						"created_at_e": cusstr1($('.createTimeInput').val() , ' - ' , 1),
+						"from_time": cusstr($('.estTimeInput').val() , ' - ' , 1),
+						"to_time": cusstr1($('.estTimeInput').val() , ' - ' , 1),
+						"condition": $('.keyword').val(),
+					};
+					return reqList;
+				},
 				dataSrc:function(res){
-					console.log(res)
+					if(res.status == 1){
+						$.each(res[1], function (index, value) {
+							$("#seller_select").append("<option value='" + value + "'>" + value + "</option>");
+						})
+						//$('.tableTotal').text(res[0].length);
+						return res[0];
+					}else{
+						return ""
+					}
+					
 				},
-			}, */			
-			data: [
-				{
-					id: 'R00001',
-					planStatus: '待审批',
-					sukStatus: 'Normal',
-					rsgGoal: 'Improve Ratings',
-					asin: 'B0833P5XFD',
-					sku: 'WB6666',
-					price: '$19.99',
-					fba: '1466',
-					unitsBefore: 4,					
-					unitsTarget: 7,			
-					unitsAfter: 9,
-					ratingsBeforeStart: "4.8",
-					ratingsBeforeNum: 90,
-					ratingsGoalStart:"4.8",
-					ratingsGoalNum:200,
-					ratingsAfterStart: "4.8",
-					ratingsAfterNum: 240,
-					rankBefore: 'P2-10',
-					rankTarget: 'P1-5',			
-					rankAfter: 'P1-5',
-					crBefore: "15%",
-					crTarget: "10%",			
-					crAfter: "17%",
-					units: 'B00XDM3FMM',
-					ratings: 'Full: $20 Promo：$15',
-					rank: '25%',
-					cr: '50BUVNXI',
-					estDaily: 5,
-					estTotal: 100,
-					rsgEst: "$499",					
-					rsgctual: "$500",
-					eEst: "$499",
-					ectual: "$500",
-					rsgApplied: 100,
-					rsgReviews: 95,		
-					rsgReviewsB: "95%",
-					estStart: '2020-03-15',
-					estEnd: '2020-03-23',
-					estRsg: '$100',
-					rsgSpend: '20',
-					value: '$200',
-					actualStart: '2020-03-15',
-					actualEnd: '2020-03-20',
-					rsgDetails: '20',
-					notes: 'You are not required to leave a review for any product you get from',
-				},
-				{
-					id: 'R00002',
-					planStatus: '待审批',
-					sukStatus: 'Normal',
-					rsgGoal: 'Improve Ratings',
-					asin: 'B0833P5XFD',
-					sku: 'WB6666',
-					price: '$19.99',
-					fba: '1466',
-					unitsBefore: 4,					
-					unitsTarget: 7,			
-					unitsAfter: 9,
-					ratingsBeforeStart: "4.8",
-					ratingsBeforeNum: 90,
-					ratingsGoalStart:"4.8",
-					ratingsGoalNum:200,
-					ratingsAfterStart: "4.8",
-					ratingsAfterNum: 240,
-					rankBefore: 'P2-10',
-					rankTarget: 'P1-5',			
-					rankAfter: 'P1-5',
-					crBefore: "15%",
-					crTarget: "10%",			
-					crAfter: "17%",
-					units: 'B00XDM3FMM',
-					ratings: 'Full: $20 Promo：$15',
-					rank: '25%',
-					cr: '50BUVNXI',
-					estDaily: 5,
-					estTotal: 100,
-					rsgEst: "$499",					
-					rsgctual: "$500",
-					eEst: "$499",
-					ectual: "$500",
-					rsgApplied: 100,
-					rsgReviews: 95,		
-					rsgReviewsB: "95%",
-					estStart: '2020-3-15',
-					estEnd: '2020-3-23',
-					estRsg: '$100',
-					rsgSpend: '20',
-					value: '$200',
-					actualStart: '2020-3-15',
-					actualEnd: '2020-3-20',
-					rsgDetails: '20',
-					notes: 'You are not required to leave a review for any product you get from',
-				},
-				{
-					id: 'R00003',
-					planStatus: '待审批',
-					sukStatus: 'Normal',
-					rsgGoal: 'Improve Ratings',
-					asin: 'B0833P5XFD',
-					sku: 'WB6666',
-					price: '$19.99',
-					fba: '1466',
-					unitsBefore: 4,					
-					unitsTarget: 7,			
-					unitsAfter: 9,
-					ratingsBeforeStart: "4.8",
-					ratingsBeforeNum: 90,
-					ratingsGoalStart:"4.8",
-					ratingsGoalNum:200,
-					ratingsAfterStart: "4.8",
-					ratingsAfterNum: 240,
-					rankBefore: 'P2-10',
-					rankTarget: 'P1-5',			
-					rankAfter: 'P1-5',
-					crBefore: "15%",
-					crTarget: "10%",			
-					crAfter: "17%",
-					units: 'B00XDM3FMM',
-					ratings: 'Full: $20 Promo：$15',
-					rank: '25%',
-					cr: '50BUVNXI',
-					estDaily: 5,
-					estTotal: 100,
-					rsgEst: "$499",					
-					rsgctual: "$500",
-					eEst: "$499",
-					ectual: "$500",
-					rsgApplied: 100,
-					rsgReviews: 95,		
-					rsgReviewsB: "95%",
-					estStart: '2020-3-15',
-					estEnd: '2020-3-23',
-					estRsg: '$100',
-					rsgSpend: '20',
-					value: '$200',
-					actualStart: '2020-3-15',
-					actualEnd: '2020-3-20',
-					rsgDetails: '20',
-					notes: 'You are not required to leave a review for any product you get from',
-				},
-			],
+			},			
+			data: [],
 			columns: [
+				{
+					data: "bg" ,
+					visible: false,
+				},
+				{
+					data: "bu" ,
+					visible: false,
+				},
+				{
+					data: 'station',
+					visible: false,
+				},
+				{
+					data: 'plan_status',
+					visible: false,
+				},
+				{
+					data: "ids",
+					orderable: false,
+					bSortable: false,
+					render: function(data, type, row, meta) {
+						var content = '<input type="checkbox" name="checkedInput"  class="checkbox-item" value="' + data + '" />';
+						return content;
+					},
+					createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
+						
+					}
+				},
+				{
+					data: "image",
+					render: function(data, type, row, meta) {
+						let img,dot,str;
+						if(row.images != null){
+							str = row.images;
+							dot = str.split(',');
+							dot.length > 1 ? img = 'https://images-na.ssl-images-amazon.com/images/I/' + dot[0] : img = ''
+						}
+						var content = '<img src="'+img+'" alt="" style="display:block; width:50px; height:60px;">';
+						return content;
+					}
+				},
+				{
+					data: null,
+					render: function(data, type, row, meta) {
+						var content = '<div><a href="https://'+row.toUrl+'/dp/'+ row.asin +'" target="_blank" style="text-decoration:none">'+row.asin+'</a></div><div style="color: #909399;">'+row.sku+'</div>';
+						return content;
+					}
+				},
+				{
+					data: 'Seller',
+				},
+				{
+					data: 'type',
+				},
+				{ 
+					data: null,
+					render: function(data, type, row, meta) {
+						let content = '<div style="text-align:left"><div><span style="padding-right:10px">RSG Goal:</span>'+row.goal+'</div><div><span style="padding-right:10px">Est.Spendl:</span>'+row.est_spend+'</div></div>';
+						return content;
+					},
+				},
+				{
+					data: null,
+					render: function(data, type, row, meta){
+						let content = '<div style="text-align:left"><div><span style="padding-right:10px">Applied:</span>'+row.applied+'</div><div><span style="padding-right:10px">Reivews:</span>'+row.reivews+'</div><div><span style="padding-right:10px">Actual Spend:</span>'+row.actual_spend+'</div></div>';
+						return content;
+					}
+				},
+				{
+					data: null,
+					render: function(data, type, row, meta){
+						var content = '<div style="text-align:left"><div><span style="padding-right:10px">预计(60天):</span>'+row.current_60romi+'</div><div><span style="padding-right:10px">实际(60天):</span>'+row.actual_60romi+'</div></div>';
+						return content;
+					}
+				},
+				{
+					data: null,
+					render: function(data, type, row, meta){
+						var content = '<div style="text-align:left"><div>'+row.plan_status+'</div><div><span>Subm:</span>'+row.updated_at+'</div></div>';
+						return content;
+					}
+				},
 				{
 					data: "id",
 					render: function(data, type, row, meta) {
 						let id = row.id;
-						var content = '<span class="handleLook">'+id+'</span>';
+						var content = '<a style="color: #63C5D1;cursor:pointer; text-decoration: none;" href="/marketingPlan/detail?id='+ row.id +'" target="_blank">Detail</a>';
 						return content;
 					},
-					createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {	
-						$(cell).on("click", ".handleLook", function (e) {							
-							let id = rowData.id;
-							console.log(id);
-							$('.mask').show();
-							
-							$('.rsgGoal').val('Improve Ratings');
-							$('.planStatus').val('Pending');
-							$('.asin').val('B0833P5XFD');
-							$('.sku').text('2');
-							$('.skuStatus').text('3');
-							$('.star').text('2');
-							$('.reviews').text('2');
-							$('.star').text('2');
-							$('.rating').val('2');
-							$('.inventory').text('2');
-							$('.targetRating').val('2');
-							$('.targetUnitsSold').val('2');
-							$('.totalRsg').text('2');
-							$('.rsgPrice').val('2');
-							$('.estSpend').text();
-							$('.fromDate').val();
-							$('.toDate').val();
-							$('.rsgD').val();
-							$('.currentRank1').text();
-							$('.currentCr1').text();
-							$('.currentSold1').text();
-							$('.eValue').text();
-							$('.estRoi60').text();
-							$('.estRank').val();
-							$('.estCr').val();
-							$('.estSold').val();
-							$('.estDay').val();
-							$('.estRoi120').text();
-							$('.crChange').text();
-							$('.dailyChange').text();
-							$('.estAdded').text();
-							$('.investmentCycle1').text();
-							$('.currentRank2').text();
-							$('.actualSpend').val();
-							$('.currentCr2').text();
-							$('.currentSold2').text();
-							$('.eUnit').text();
-							$('.estDay60').text();
-							$('.conversionComplete').text();
-							$('.dailyComplete').text();
-							$('.eComplete').text();
-							$('.investmentCycle2').text();
-							$('.remarks').text();
-							
-						})
-					}
-				},
-				{
-					data: "planStatus" ,
-				},
-				{
-					data: 'sukStatus',
-				},
-				{
-					data: 'rsgGoal',
-				},
-				{ 
-					data: null,
-					render: function(data, type, row, meta) {
-						let url = "https://www.amazon.com/dp/"+row.asin;
-						let content = '<div><div><a href="'+url+'" target="_blank" style="color:blue">'+row.asin+'</a></div><div>'+row.sku+'</div></div>';
-						return content;
-					},
-				},
-				{
-					data: null,
-					render: function(data, type, row, meta){
-						let content = '<div><div>'+row.price+'</div><div>'+row.fba+'</div></div>';
-						return content;
-					}
-				},
-				{
-					data: null,
-					render: function(data, type, row, meta){
-						let content = '<div><div><span class="pr10">Before:</span>'+row.unitsBefore+'</div><div><span class="pr10">Target:</span>'+row.unitsTarget+'</div><div><span class="pr10">After:</span>'+row.unitsAfter+'</div></div>';
-						return content;
-					}
-				},
-				{
-					data: null,
-					render: function(data, type, row, meta){
-						let content = '<div><div><span class="pr10">Before:</span>'+row.ratingsBeforeStart+'('+row.ratingsBeforeNum+')</div><div><span class="pr10">Goal:</span>'+row.ratingsGoalStart+'('+row.ratingsGoalNum+')</div><div><span class="pr10">After:</span>'+row.ratingsAfterStart+'('+row.ratingsAfterNum+')</div></div>';
-						return content;
-					}
-				},
-				{
-					data: null,
-					render: function(data, type, row, meta){
-						let content = '<div><div><span class="pr10">Before:</span>'+row.rankBefore+'</div><div><span class="pr10">Goal:</span>'+row.rankTarget+'</div><div><span class="pr10">After:</span>'+row.rankAfter+'</div></div>';
-						return content;
-					}
-				},
-				{
-					data: null,
-					render: function(data, type, row, meta){
-						let content = '<div><div><span class="pr10">Before:</span>'+row.crBefore+'</div><div><span class="pr10">Goal:</span>'+row.crTarget+'</div><div><span class="pr10">After:</span>'+row.crAfter+'</div></div>';
-						return content;
-					}
-				},
-				{
-					data: "estStart",
-				},
-				{
-					data: "estEnd",
-				},
-				{
-					data: null,
-					render: function(data, type, row, meta){
-						let content = '<div><div><span class="pr10">Daily:</span>'+row.estDaily+'</div><div><span class="pr10">Total:</span>'+row.estTotal+'</div></div>';
-						return content;
-					}
-				},
-				{
-					data: null,
-					render: function(data, type, row, meta){
-						let content = '<div><div><span class="pr10">Est:</span>'+row.rsgEst+'</div><div><span class="pr10">Actual:</span>'+row.rsgctual+'</div></div>';
-						return content;
-					}
-				},
-				{
-					data: null,
-					render: function(data, type, row, meta){
-						let content = '<div><div><span class="pr10">Est/D:</span>'+row.eEst+'</div><div><span class="pr10">Actual/D:</span>'+row.ectual+'</div></div>';
-						return content;
-					}
-				},
-				{ 
-					data: "actualStart",
-				},
-				{
-					data: "actualEnd",
-				},
-				{
-					data: null,
-					render: function(data, type, row, meta){
-						let content = '<div><div><span class="pr10">Applied:</span>'+row.rsgApplied+'</div><div><span class="pr10">Reviews:</span>'+row.rsgReviews+'</div><div><span class="pr10">Reviews%:</span>'+row.rsgReviewsB+'</div></div>';
-						return content;
-					}
-				},
-				{
-					data: "notes",
-					render: function(data, type, row, meta){
-						let id = row.id
-						let content = '<div onclick="handleEdit(this)" id='+id+'><span class="editorData">'+data+'</span><textarea type="text" size="16" style="width: 100%; display:none" class="editorTxt" rows="3" cols="20">'+data+'</textarea><button style="display:none;" class="editorSave" onclick="handleSaveEditor(this)">Save</button></div>';
-						return content;
-					}
-					/* createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
-						$(cell).click(function (e) {
-							$(this).html('<textarea type="text" size="16" style="width: 100%"  rows="3" cols="20">'+cellData+'</textarea><button class="save">保存</button>');
-							 var aInput = $(this).find(":textarea");
-							aInput.focus().val(cellData); 
-						});
-						$(cell).on("click", ".save", function (e) {
-							var text = $(this).val();
-							console.log(text)
-							 if($(this).val() != cellData){
-								$(cell).html(text);
-								listObj.cell(cell).data(text);
-								$.ajax({
-									type:"post",
-									url:'/hijack/upResellingDetail',
-									data:{
-										id: rowData.id,
-										remark: rowData.reselling_remark
-									},
-									error:function(err){
-									    alert(err);
-									},
-									success:function(res){
-										listObj.ajax.reload()
-									}
-								});
-							}else{
-								$(cell).html(text);
-								listObj.cell(cell).data(text);
-							} 		
-						})
-					} */
-				},
-				{
-					data: "null",
-					render: function(data, type, row, meta) {
-						let id = row.id;
-						var content = '<a href="detail?id='+id+'" target="_blank"><img src="../assets/global/img/lookover.png" class="handleLook"></a>';
-						return content;
-					},
-					/* createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {	
-						$(cell).on("click", ".handleLook", function (e) {							
-							let id = rowData.id;
-							console.log(id);
-							$('.mask').show();
-							$('.rsgGoal').val('Improve Ratings');
-							$('.planStatus').val('Pending');
-							$('.asin').val('B0833P5XFD');
-							$('.sku').text('1');
-							$('.skuStatus').text('1');
-							$('.star').text('1');
-							$('.reviews').text('1');
-							$('.star').text('1');
-							$('.rating').val('1');
-							$('.inventory').text('1');
-							$('.targetRating').val('1');
-							$('.targetUnitsSold').val('1');
-							$('.totalRsg').text('1');
-							$('.rsgPrice').val('1');
-							$('.estSpend').text();
-							$('.fromDate').val();
-							$('.toDate').val();
-							$('.rsgD').val();
-							$('.currentRank1').text();
-							$('.currentCr1').text();
-							$('.currentSold1').text();
-							$('.eValue').text();
-							$('.estRoi60').text();
-							$('.estRank').val();
-							$('.estCr').val();
-							$('.estSold').val();
-							$('.estDay').val();
-							$('.estRoi120').text();
-							$('.crChange').text();
-							$('.dailyChange').text();
-							$('.estAdded').text();
-							$('.investmentCycle1').text();
-							$('.currentRank2').text();
-							$('.actualSpend').val();
-							$('.currentCr2').text();
-							$('.currentSold2').text();
-							$('.eUnit').text();
-							$('.estDay60').text();
-							$('.conversionComplete').text();
-							$('.dailyComplete').text();
-							$('.eComplete').text();
-							$('.investmentCycle2').text();
-							$('.remarks').text();
-							
-						})
-					} */
+					
 				},
 				
 			], 
 			
 		});
+		$('.search').on('click',function(){
+			handleClear();
+			let reqList = {
+				"sap_seller_id" : sap_seller_id,
+				"created_at_s": cusstr($('.createTimeInput').val() , ' - ' , 1),
+				"created_at_e": cusstr1($('.createTimeInput').val() , ' - ' , 1),
+				"from_time": cusstr($('.estTimeInput').val() , ' - ' , 1),
+				"to_time": cusstr1($('.estTimeInput').val() , ' - ' , 1),
+				"condition": $('.keyword').val(),
+			};
+			tableObj.ajax.reload();
+		})
+		
 
 	})
 </script>

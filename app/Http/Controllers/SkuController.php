@@ -84,7 +84,7 @@ from
 
 (select asin,marketplace_id,sku,any_value(sku_status) as sku_status,
 any_value(case when status = 'S' Then '0' else status end) as status, 
-any_value(sap_seller_bg) as bg,any_value(sap_seller_bu) as bu,any_value(sap_seller_id) as sap_seller_id from sap_asin_match_sku group by asin,marketplace_id,sku)
+any_value(sap_seller_bg) as bg,any_value(sap_seller_bu) as bu,any_value(sap_seller_id) as sap_seller_id from sap_asin_match_sku where actived=1 group by asin,marketplace_id,sku)
 
  as a left join sap_skus as b on a.sku=b.sku group by asin,marketplace_id) as c $where order by pro_status asc) as sku_tmp_cc";
  		$datas = DB::connection('amazon')->table(DB::raw($sql))->whereRaw($where_add)->paginate(5);
