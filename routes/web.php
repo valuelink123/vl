@@ -211,6 +211,7 @@ Route::post('/hijack/hijackExport', 'hijack\\HijackController@hijackExport');//�
 //RSG MarketingPlan
 Route::get('/marketingPlan/index', 'MarketingPlanController@index')->name('marketingPlan');
 Route::get('/marketingPlan/detail', 'MarketingPlanController@detail')->name('detail');
+<<<<<<< HEAD
 Route::match(['post','get'],'/marketingPlan/rsgList', 'MarketingPlanController@rsgList')->name('rsgList');
 Route::post('/marketingPlan/index1', 'MarketingPlanController@index1')->name('marketingPlan');
 Route::post('/marketingPlan/showData', 'MarketingPlanController@showData');//展示基础信息
@@ -222,3 +223,7 @@ Route::match(['post','get'],'/marketingPlan/achieveGoals', 'MarketingPlanControl
 Route::match(['post','get'],'/marketingPlan/delfiles', 'MarketingPlanController@delfiles');//删除图片
 Route::post('/marketingPlan/getAsinDailyReport', 'MarketingPlanController@getAsinDailyReport');
 
+=======
+//CollaborativeReplenishment
+//Route::get('/collaborativeReplenishment/index', 'CollaborativeReplenishmentController@index')->name('index');
+>>>>>>> dnn
