@@ -502,7 +502,9 @@ class MarketingPlanController extends Controller
                 $rsgList[$k]['plan_status']=$planStatus[$v['plan_status']];
                 $rsgList[$k]['current_60romi']=($v['current_60romi']*100).'%';
                 $rsgList[$k]['actual_60romi']=($v['actual_60romi']*100).'%';
-                $rsgList[$k]['actual_spend']=($v['actual_spend']*100).'%';
+                $rsgList[$k]['actual_spend']=$v['actual_spend'];
+                $rsgList[$k]['applied']=0;
+                $rsgList[$k]['reivews']=0;
                 $rsgList[$k]['toUrl']=$DOMIN_MARKETPLACEID_URL[$v['marketplaceid']];
                 $rsgList[$k]['station']=$DOMIN_MARKETPLACEID_SX[$v['marketplaceid']];
 
