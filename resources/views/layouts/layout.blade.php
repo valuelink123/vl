@@ -388,6 +388,12 @@
                                                     </a>
                                                 </li>
 												@endpermission
+												<!-- <li class="">
+												    <a href="/collaborativeReplenishment/index" class="nav-link nav-toggle ">
+												        Collaborative Replenishment
+												        <span class="arrow"></span>
+												    </a>
+												</li> -->
                                             </ul>
                                         </li>
 

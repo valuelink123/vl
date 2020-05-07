@@ -539,7 +539,7 @@
 		
 		 $.ajax({
 		  	type:"post",
-		  	url:"/marketingPlan/delfiles",
+		  	url:"http://10.10.42.14/vl/public/marketingPlan/delfiles",
 		  	data:{
 		  		"files_url": url,
 				"id": ids
@@ -576,7 +576,7 @@
 		function getInitalData(){
 			$.ajax({
 				type:"post",
-				url:"/marketingPlan/index1",
+				url:"http://10.10.42.14/vl/public/marketingPlan/index1",
 				async: false,
 				data:{
 					"sap_seller_id": sap_seller_id,
@@ -605,7 +605,7 @@
 		}else{
 			$.ajax({
 				type:"post",
-				url:"/marketingPlan/detailEdit",
+				url:"http://10.10.42.14/vl/public/marketingPlan/detailEdit",
 				data:{
 					"sap_seller_id": sap_seller_id,
 					"id": ids,
@@ -717,7 +717,7 @@
 			$('.reviews').text($(this).find("option:selected").attr("reviews"));
 			$.ajax({
 				type:"post",
-				url:"/marketingPlan/getAsinDailyReport",
+				url:"http://10.10.42.14/vl/public/marketingPlan/getAsinDailyReport",
 				data:{
 					"asin":asinId,
 					"marketplace_id": id,
@@ -927,7 +927,8 @@
 			let date2 = Math.round(new Date(num2) / 1000)
 			let date = date1 - date2;
 			var days = Math.floor(Math.abs(date) / 60 / 60 / 24) + 1
-			let num = Number(strMoney(num4)) / (strMoney(num3) * days).toFixed(2);
+			let num = Number(strMoney(num4)) / (strMoney(num3) * days);
+			num = Math.ceil(num)
 			return isNaN(num) || num == "Infinity" || num == "-Infinity" ?  num = 0 :  num
 		}
 		investmentCycle1Num();
@@ -972,7 +973,7 @@
 				marketplaceidVal = saveId;	
 				$.ajax({
 					type:"post",
-					url:"/marketingPlan/updatePlan",
+					url:"http://10.10.42.14/vl/public/marketingPlan/updatePlan",
 					data:{
 						"sap_seller_id": sap_seller_id,
 						"id": ids,
@@ -1044,10 +1045,9 @@
 			let units_d_complete = parseFloat($('.dailyComplete').text());
 			let e_val_complete = parseFloat($('.eComplete').text());
 			let investment_return_c = $('.investmentCycle2').text();
-			
 			$.ajax({
 				type:"post",
-				url:"/marketingPlan/addMarketingPlan",
+				url:"http://10.10.42.14/vl/public/marketingPlan/addMarketingPlan",
 				data:{
 					"id": ids,
 					"sap_seller_id": sap_seller_id,
@@ -1174,7 +1174,9 @@
 			$('.investmentCycle2').text("");
 		}
 		function strMoney(str){
-			return str = str.substr(str.lastIndexOf('￥')+1);		
+			if(str != null){
+				return str.substr(str.lastIndexOf('￥')+1);	
+			}
 		}
 		
 		
