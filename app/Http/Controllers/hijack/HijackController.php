@@ -287,7 +287,7 @@ class HijackController extends Controller
         //查询所有 asin 信息
         $DOMIN_MARKETPLACEID_SX = Asin::DOMIN_MARKETPLACEID_SX;
         $DOMIN_MARKETPLACEID_RUL = Asin::DOMIN_MARKETPLACEID_URL;
-        $yesterday=time() - 3600 * 10;//当前时间 前10小时 todo
+        $yesterday=time() - 3600 * 5;//当前时间 前5小时 todo
         $sql_s = 'SELECT
             a.id,
             a.asin,
