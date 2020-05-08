@@ -258,6 +258,9 @@ class HijackController extends Controller
                             }
                         }
                     }
+                }else{
+                    $err_message = ['status' => '-1', 'message' => 'No matching records found'];
+                    return $err_message;
                 }
             } else {
                 $err_message = ['status' => '-1', 'message' => 'No matching records found'];
