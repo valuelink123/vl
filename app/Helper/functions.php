@@ -30,6 +30,13 @@ function getSkuStatuses(){
     );    
 }
 
+function getStockStatus(){
+    return array(
+        '1'=>'缺货',
+		'2'=>'滞销',
+    );
+}
+
 function getBudgetQuarter(){
     $startYear = 2020;
     $nowYear = date('Y');
@@ -182,15 +189,15 @@ function getCustomerFb(){
 
 function getSiteCode(){
      return array(
-         'United States' =>'ATVPDKIKX0DER',
-         'Canada' =>'A2EUQ1WTGCTBG2',
-         'Mexico' =>'A1AM78C64UM0Y8',
-         'United Kingdom' =>'A1F83G8C2ARO7P',
-         'Germany' =>'A1PA6795UKMFR9',
-         'France' =>'A13V1IB3VIYZZH',
-         'Italy' =>'APJ6JRA9NG5V4',
-         'Spain' =>'A1RKKUPIHCS9HS',
-         'Japan' =>'A1VC38T7YXB528'
+         'US' =>'ATVPDKIKX0DER',
+         'CA' =>'A2EUQ1WTGCTBG2',
+         'MX' =>'A1AM78C64UM0Y8',
+         'GB' =>'A1F83G8C2ARO7P',
+         'DE' =>'A1PA6795UKMFR9',
+         'FR' =>'A13V1IB3VIYZZH',
+         'IT' =>'APJ6JRA9NG5V4',
+         'ES' =>'A1RKKUPIHCS9HS',
+         'JP' =>'A1VC38T7YXB528'
      );
 }
 
