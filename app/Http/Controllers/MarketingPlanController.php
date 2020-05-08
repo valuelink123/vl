@@ -155,8 +155,8 @@ class MarketingPlanController extends Controller
             $user_asin_list['ranking'] = $asin_daily_report['ranking'];
             $conversion = $asin_daily_report['conversion'] > 0 ? $asin_daily_report['conversion'] * 100 : 0;
             $user_asin_list['conversion'] = $conversion . '%';
-            $user_asin_list['single_economic'] = $single_economic;
-            $user_asin_list['avg_day_sales'] = $avg_day_sales;
+            $user_asin_list['single_economic'] = $single_economic==0?0:$single_economic;
+            $user_asin_list['avg_day_sales'] = $avg_day_sales==0?0:$avg_day_sales;
             $user_asin_list['cost'] = $cost;
 
             if (!empty($user_asin_list)) {
