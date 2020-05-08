@@ -232,8 +232,6 @@ class HijackController extends Controller
                         }
                     }
                 }
-                var_dump($sapSellerIdList);exit;
-
             } else if ($user['ubu'] != '' || $user['ubg'] != '' || $user['seller_rules'] != '') {
                 //判断是否是销售 及 对应领导角色
                 $allUsers = DB::table('users')->select('id', 'sap_seller_id', 'ubg', 'ubu')
@@ -286,6 +284,7 @@ class HijackController extends Controller
                 return $err_message;
             }
         }
+        var_dump($userasinL);exit;
         //查询所有 asin 信息
         $DOMIN_MARKETPLACEID_SX = Asin::DOMIN_MARKETPLACEID_SX;
         $DOMIN_MARKETPLACEID_RUL = Asin::DOMIN_MARKETPLACEID_URL;
