@@ -505,6 +505,7 @@ class MarketingPlanController extends Controller
                 $rsgList[$k]['actual_spend']=$v['actual_spend'];
                 $rsgList[$k]['applied']=0;// todo 暂时预留  没有数据
                 $rsgList[$k]['reivews']=0;// todo 暂时预留  没有数据
+                $rsgList[$k]['type']='RSG';
                 $rsgList[$k]['toUrl']=$DOMIN_MARKETPLACEID_URL[$v['marketplaceid']];
                 $rsgList[$k]['station']=$DOMIN_MARKETPLACEID_SX[$v['marketplaceid']];
 
