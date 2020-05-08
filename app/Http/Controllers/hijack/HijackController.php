@@ -284,10 +284,10 @@ class HijackController extends Controller
                 return $err_message;
             }
         }
-var_dump($userasinL);exit;
         //查询所有 asin 信息
         $DOMIN_MARKETPLACEID_SX = Asin::DOMIN_MARKETPLACEID_SX;
         $DOMIN_MARKETPLACEID_RUL = Asin::DOMIN_MARKETPLACEID_URL;
+        $yesterday=time() - 3600 * 10;//当前时间 前10小时 todo
         $sql_s = 'SELECT
             a.id,
             a.asin,
@@ -309,7 +309,7 @@ var_dump($userasinL);exit;
             LEFT JOIN tbl_reselling_task AS rl_task ON rl_asin.id = rl_task.reselling_asin_id
             where a.title !="" ';
 //GROUP BY a.asin
-        $sql_g = '  ORDER BY rl_task.reselling_time DESC, a.reselling_switch DESC ,rl_task.reselling_num DESC';
+        $sql_g = ' AND rl_task.created_at >='.$yesterday.'  ORDER BY rl_task.reselling_time DESC, a.reselling_switch DESC ,rl_task.reselling_num DESC';
         /**  判断对应用户 以及对应管理人员 所有下属ID */
         if (!empty($userasinL)) {
             $sql_as = 'AND a.asin in ("' . implode($userasinL, '","') . '")';
@@ -320,7 +320,6 @@ var_dump($userasinL);exit;
         }
         $productList_obj = DB::connection('vlz')->select($sql);
         $productList = (json_decode(json_encode($productList_obj), true));
-        var_dump($productList);exit;
         $asinList = [];
         if (!empty($productList)) {
             foreach ($productList as $key => $value) {
