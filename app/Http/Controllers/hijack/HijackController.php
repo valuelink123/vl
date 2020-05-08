@@ -230,6 +230,7 @@ class HijackController extends Controller
                         $sapSellerIdList[] = $auv['sap_seller_id'];
                     }
                 }
+                var_dump($sapSellerIdList);exit;
 
             } else if ($user['ubu'] != '' || $user['ubg'] != '' || $user['seller_rules'] != '') {
                 //判断是否是销售 及 对应领导角色
