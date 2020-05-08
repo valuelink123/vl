@@ -211,7 +211,7 @@
 		padding: 20px 0;
 	}
 	.button_box > button{
-		width: 101px;
+		width: 120px;
 		height: 36px;
 		border-radius: 4px !important;
 		background-color: rgba(99, 197, 209, 1);
@@ -334,7 +334,7 @@
 		<button>
 			<a href="/marketingPlan/detail?id=null" target="_blank">
 				<svg t="1588042189957" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1900" width="14" height="14"><path d="M191.703625 460.631052l639.908158 0 0 100.316753-639.908158 0 0-100.316753Z" p-id="1901" fill="#ffffff"></path><path d="M461.67022 192.045921l100.31573 0 0 639.908158-100.31573 0 0-639.908158Z" p-id="1902" fill="#ffffff"></path></svg>
-				New Plan
+				新建营销计划
 			</a>
 			
 		</button>
@@ -390,7 +390,7 @@
 				</select>
 			</div>
 			<div class="filter_option">
-				<label for="seller_select">Seller</label>
+				<label for="seller_select">销售</label>
 				<select id="seller_select" onchange="status_filter(this.value,7)">
 					<option value ="">全部</option>
 				</select>
@@ -399,11 +399,11 @@
 				<label for="status_select">状态</label>
 				<select id="status_select"  onchange="status_filter(this.value,3)">
 					<option value ="">全部</option>
-					<option value ="Pending">Pending</option>
-					<option value ="Ongoing">Ongoing</option>
-					<option value ="Finished">Finished</option>
-					<option value ="Paused">Paused</option>
-					<option value ="Rejected">Rejected</option>
+					<option value ="待审批">待审批</option>
+					<option value ="进行中">进行中</option>
+					<option value ="已完结">已完结</option>
+					<option value ="已中止">已中止</option>
+					<option value ="已拒绝">已拒绝</option>
 				</select>
 			</div>
 			<div class="filter_option">
@@ -469,15 +469,15 @@
 						<th>Station</th>
 						<th>planStatus</th>
 						<th><input type="checkbox" id="selectAll" /></th>
-						<th>Products</th>
+						<th>产品</th>
 						<th>Asin/Sku</th>
-						<th>Seller</th>
-						<th>Type</th>
-						<th>Est.</th>
-						<th>Actual</th>
+						<th>销售</th>
+						<th>类型</th>
+						<th>预计</th>
+						<th>实际</th>
 						<th>ROMI</th>
-						<th>Status</th>
-						<th>Action</th>
+						<th>状态</th>
+						<th>操作</th>
 					</tr>
 				</thead>
 				
@@ -863,14 +863,14 @@
 				{ 
 					data: null,
 					render: function(data, type, row, meta) {
-						let content = '<div style="text-align:left"><div><span style="padding-right:10px">RSG Goal:</span>'+row.goal+'</div><div><span style="padding-right:10px">Est.Spendl:</span>'+row.est_spend+'</div></div>';
+						let content = '<div style="text-align:left"><div><span style="padding-right:10px">RSG 数量:</span>'+row.goal+'</div><div><span style="padding-right:10px">预计花费:</span>'+row.est_spend+'</div></div>';
 						return content;
 					},
 				},
 				{
 					data: null,
 					render: function(data, type, row, meta){
-						let content = '<div style="text-align:left"><div><span style="padding-right:10px">Applied:</span>'+row.applied+'</div><div><span style="padding-right:10px">Reivews:</span>'+row.reivews+'</div><div><span style="padding-right:10px">Actual Spend:</span>'+row.actual_spend+'</div></div>';
+						let content = '<div style="text-align:left"><div><span style="padding-right:10px">申请数:</span>'+row.applied+'</div><div><span style="padding-right:10px">评论数:</span>'+row.reivews+'</div><div><span style="padding-right:10px">实际花费:</span>'+row.actual_spend+'</div></div>';
 						return content;
 					}
 				},
@@ -884,7 +884,7 @@
 				{
 					data: null,
 					render: function(data, type, row, meta){
-						var content = '<div style="text-align:left"><div>'+row.plan_status+'</div><div><span>Subm:</span>'+row.updated_at+'</div></div>';
+						var content = '<div style="text-align:left"><div>'+row.plan_status+'</div><div><span>提交:</span>'+row.updated_at+'</div></div>';
 						return content;
 					}
 				},
@@ -892,7 +892,7 @@
 					data: "id",
 					render: function(data, type, row, meta) {
 						let id = row.id;
-						var content = '<a style="color: #63C5D1;cursor:pointer; text-decoration: none;" href="/marketingPlan/detail?id='+ row.id +'" target="_blank">Detail</a>';
+						var content = '<a style="color: #63C5D1;cursor:pointer; text-decoration: none;" href="/marketingPlan/detail?id='+ row.id +'" target="_blank">详情</a>';
 						return content;
 					},
 					

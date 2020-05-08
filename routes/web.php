@@ -212,4 +212,4 @@ Route::post('/hijack/hijackExport', 'hijack\\HijackController@hijackExport');//å
 Route::get('/marketingPlan/index', 'MarketingPlanController@index')->name('marketingPlan');
 Route::get('/marketingPlan/detail', 'MarketingPlanController@detail')->name('detail');
 //CollaborativeReplenishment
-//Route::get('/collaborativeReplenishment/index', 'CollaborativeReplenishmentController@index')->name('index');
+Route::get('/collaborativeReplenishment/index', 'CollaborativeReplenishmentController@index')->name('index');

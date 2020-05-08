@@ -164,15 +164,23 @@
 		cursor: pointer;
 	}
 	.fileupload-progress{
-		height: 5px;
+		height: 40px;
 	}
 	.btn.default:not(.btn-outline){
-		height: 27px;
+		height: 23px;
 		padding: 0 6px;
 	}
 	td svg{
-		display: inline-block;
-		    margin-bottom: -3px;
+		position: absolute;
+		right: 5px;
+	}
+	.progress-extended{
+		margin-top: -22px;
+	}
+	.input-group .form-control:first-child{
+		border: none;
+		height: 23px;
+		background: #fff;
 	}
 </style>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.8/css/select2.min.css" rel="stylesheet" />
@@ -192,16 +200,16 @@
 							<td colspan="2">
 								<select class="bw9 rsgGoal">
 									<option value ="">请选择</option>
-									<option value ="1">Improve Ratings</option>
-									<option value ="2">Keep Ratings Satble</option>
-									<option value="3">Improve Conversion Rate</option>
-									<option value ="4">Improve Review Rate</option>
-									<option value="5">Get More Reviews</option>
-									<option value ="6">Others</option>
+									<option value ="1">提升星级</option>
+									<option value ="2">稳定星级</option>
+									<option value="3">提升转化率</option>
+									<option value ="4">提升留评率</option>
+									<option value="5">提升星星数量</option>
+									<option value ="6">其它</option>
 								</select>
 							</td>
 							<td></td>
-							<td style="width: 120px;">任务状态</td>
+							<td style="width: 135px;">任务状态</td>
 							<td>
 								<select class="bw9 planStatus">
 									<option value ="1">待审批</option>
@@ -244,14 +252,14 @@
 							</td>
 							<td>星级目标</td>
 							<td><input type="number" class="targetRating bw9" style="padding-left: 5px;" value=""></td>
-							<td title="Target reviews are all reviews include organic, CTG and RSG.">
+							<td title="数量目标为总目标，包括自然留评+CTG+RSG，非RSG目标" style="position: relative;">
 								数量目标
-								<svg t="1588757275371" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2149" width="18" height="18"><path d="M473.8 607.4c6.4 19.1 19.1 31.8 38.2 31.8s31.8-12.7 38.2-31.8l25.4-349.9c0-38.2-31.8-63.6-63.6-63.6-38.2 0-63.6 31.8-63.6 70l25.4 343.5z m38.2 95.5c-38.2 0-63.6 25.4-63.6 63.6s25.4 63.6 63.6 63.6 63.6-25.4 63.6-63.6-25.4-63.6-63.6-63.6z" fill="#d81e06" p-id="2150"></path></svg>
+								<svg t="1588835330500" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2629" width="13" height="13"><path d="M459.364486 360.47352h102.080997v-102.080997h-102.080997v102.080997z m0 408.323988h102.080997V462.554517h-102.080997v306.242991z m51.040498 255.202492c-280.722741 0-510.404984-229.682243-510.404984-510.404984S226.492212 3.190031 510.404984 3.190031s510.404984 229.682243 510.404985 510.404985-229.682243 510.404984-510.404985 510.404984z m0-918.728972C285.507788 105.271028 102.080997 288.697819 102.080997 513.595016S285.507788 921.919003 510.404984 921.919003s408.323988-183.426791 408.323988-408.323987C918.728972 288.697819 735.302181 105.271028 510.404984 105.271028z" p-id="2630" fill="#2c2c2c"></path></svg>
 							</td>
 							<td><input type="number" value="" style="padding-left: 5px;" class="bw9 targetUnitsSold"></td>
 						</tr>
 						<tr>
-							<td>From</td>
+							<td>开始</td>
 							<td style="">
 								<div class="input-group date date-picker margin-bottom-5 bw9" id="fromDate">
 									<input type="text" class="form-control form-filter input-sm fromDate" readonly name="date_from" placeholder="From" value="">
@@ -262,7 +270,7 @@
 									</span>
 								</div>
 							</td>
-							<td style="">To</td>
+							<td style="">结束</td>
 							<td>
 								<div class="input-group date date-picker bw9" data-date-format="yyyy-mm-dd">
 									<input type="text" class="form-control form-filter input-sm toDate" readonly name="date_to" placeholder="To" value="">
@@ -273,9 +281,9 @@
 									</span>
 								</div>
 							</td>
-							<td title="Money paid to RSG customers.">
+							<td title="我们承担的费用" style="position: relative;">
 								RSG付款金额
-								<svg t="1588757275371" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2149" width="18" height="18"><path d="M473.8 607.4c6.4 19.1 19.1 31.8 38.2 31.8s31.8-12.7 38.2-31.8l25.4-349.9c0-38.2-31.8-63.6-63.6-63.6-38.2 0-63.6 31.8-63.6 70l25.4 343.5z m38.2 95.5c-38.2 0-63.6 25.4-63.6 63.6s25.4 63.6 63.6 63.6 63.6-25.4 63.6-63.6-25.4-63.6-63.6-63.6z" fill="#d81e06" p-id="2150"></path></svg>
+								<svg t="1588835330500" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2629" width="13" height="13"><path d="M459.364486 360.47352h102.080997v-102.080997h-102.080997v102.080997z m0 408.323988h102.080997V462.554517h-102.080997v306.242991z m51.040498 255.202492c-280.722741 0-510.404984-229.682243-510.404984-510.404984S226.492212 3.190031 510.404984 3.190031s510.404984 229.682243 510.404985 510.404985-229.682243 510.404984-510.404985 510.404984z m0-918.728972C285.507788 105.271028 102.080997 288.697819 102.080997 513.595016S285.507788 921.919003 510.404984 921.919003s408.323988-183.426791 408.323988-408.323987C918.728972 288.697819 735.302181 105.271028 510.404984 105.271028z" p-id="2630" fill="#2c2c2c"></path></svg>
 							</td>
 							<td>
 								<input type="number" value="" style="padding-left: 5px;width: 55%;" class="bw9 rsgPrice">
@@ -294,7 +302,7 @@
 						</tr>
 						<tr>
 							<td colspan="6">
-								<h4 class="mask_h4">Est. Result（1 Week After Review Goal Achieved</h4>
+								<h4 class="mask_h4">投入效果预估(达成Review目标后1周)</h4>
 							</td>
 						</tr>
 						<tr>
@@ -339,7 +347,7 @@
 						</tr>
 						<tr>
 							<td colspan="6">
-								<h4 class="mask_h4">Actual Result（1 Week After Review Goal Achieved</h4>
+								<h4 class="mask_h4">实际投入效果(达成Review目标后1周)</h4>
 							</td>
 						</tr>
 						<tr>
@@ -395,21 +403,21 @@
 								                <!-- The fileinput-button span is used to style the file input field as button -->
 								                <span class="btn green fileinput-button">
 													<i class="fa fa-plus"></i>
-													<span> Add files... </span>
+													<span>添加文件</span>
 													<input type="file" name="files[]" multiple=""> 
 												</span>
 								                <button type="submit" class="btn blue start">
 								                    <i class="fa fa-upload"></i>
-								                    <span> Start upload </span>
+								                    <span>开始上传</span>
 								                </button>
 								                <button type="reset" class="btn warning cancel">
 								                    <i class="fa fa-ban-circle"></i>
-								                    <span> Cancel upload </span>
+								                    <span>取消上传 </span>
 								                </button>
 								
 								                <button type="button" class="btn red delete">
 								                    <i class="fa fa-trash"></i>
-								                    <span> Delete </span>
+								                    <span>删除</span>
 								                </button>
 								               <!-- <input type="checkbox" class="toggle"> -->
 								                <!-- The global file processing state -->
@@ -443,7 +451,7 @@
 								        <tr class="template-upload fade">
 								            <td>
 								                <p class="name">{%=file.name%}</p>
-								                <strong class="error text-danger label label-danger"></strong>
+								                <strong class="error text-danger label label-danger" style="padding: 0 6px;"></strong>
 								            </td>
 								            <!-- <td>
 								                <p class="size">Processing...</p>
@@ -454,11 +462,11 @@
 								            <td> {% if (!i && !o.options.autoUpload) { %}
 								                <button class="btn blue start" disabled>
 								                    <i class="fa fa-upload"></i>
-								                    <span>Start</span>
+								                    <span>开始</span>
 								                </button> {% } %} {% if (!i) { %}
 								                <button class="btn red cancel">
 								                    <i class="fa fa-ban"></i>
-								                    <span>Cancel</span>
+								                    <span>取消</span>
 								                </button> {% } %} </td>
 								        </tr> {% } %} </script>
 								        <!-- The template to display files available for download -->
@@ -481,12 +489,12 @@
 								            <td> {% if (file.deleteUrl) { %}
 								                <button class="btn red delete btn-sm" data-type="{%=file.deleteType%}" data-url="{%=file.deleteUrl%}" {% if (file.deleteWithCredentials) { %} data-xhr-fields='{"withCredentials":true}' {% } %}>
 								                    <i class="fa fa-trash-o"></i>
-								                    <span>Delete</span>
+								                    <span>删除</span>
 								                </button>
 								                <!-- <input type="checkbox" name="delete" value="1" class="toggle"> --> {% } else { %}
 								                <button class="btn yellow cancel btn-sm">
 								                    <i class="fa fa-ban"></i>
-								                    <span>Cancel</span>
+								                    <span>取消</span>
 								                </button> {% } %} </td>
 								        </tr> {% } %} </script>
 								        <div style="clear:both;"></div>
@@ -505,8 +513,8 @@
 				</div>
 				
 				<div class="mask_from">
-					<button class="save_submit">Submit</button>
-					<a class="mask_close" href="javascript:window.opener=null;window.open('','_self');window.close();">Close</a>
+					<button class="save_submit">提交</button>
+					<a class="mask_close" href="javascript:window.opener=null;window.open('','_self');window.close();">取消</a>
 				</div>
 		</div>
 	</div>
@@ -539,7 +547,7 @@
 		
 		 $.ajax({
 		  	type:"post",
-		  	url:"http://10.10.42.14/vl/public/marketingPlan/delfiles",
+		  	url:"/marketingPlan/delfiles",
 		  	data:{
 		  		"files_url": url,
 				"id": ids
@@ -576,7 +584,7 @@
 		function getInitalData(){
 			$.ajax({
 				type:"post",
-				url:"http://10.10.42.14/vl/public/marketingPlan/index1",
+				url:"/marketingPlan/index1",
 				async: false,
 				data:{
 					"sap_seller_id": sap_seller_id,
@@ -605,7 +613,7 @@
 		}else{
 			$.ajax({
 				type:"post",
-				url:"http://10.10.42.14/vl/public/marketingPlan/detailEdit",
+				url:"/marketingPlan/detailEdit",
 				data:{
 					"sap_seller_id": sap_seller_id,
 					"id": ids,
@@ -717,7 +725,7 @@
 			$('.reviews').text($(this).find("option:selected").attr("reviews"));
 			$.ajax({
 				type:"post",
-				url:"http://10.10.42.14/vl/public/marketingPlan/getAsinDailyReport",
+				url:"/marketingPlan/getAsinDailyReport",
 				data:{
 					"asin":asinId,
 					"marketplace_id": id,
@@ -861,7 +869,8 @@
 		
 		
 		/* ***********************************************计算*********************************************** */
-		//预计成本 = RSG预计成本 * RSG数量   (RSG预计成本 = 当前售价 * 汇率-物料成本-当前售价*汇率*亚马逊佣金率-拣配费-RSG金额/(1+2.6%）* 汇率)
+		//预计成本 = RSG预计成本 * RSG数量   (RSG预计成本 =（当前售价-物料成本-当前售价*亚马逊佣金率-拣配费-(RSG付款金额/(1+paypal佣金率））*汇率)
+		//
 		function estSpendNum(){
 			let rsgPriceNum = $('.rsgPrice').val();//RSG金额
 			let ratingVal = $('.ratingVal').val();//当前售价
@@ -873,7 +882,8 @@
 			fulfillment == null ? fulfillment = 0 : fulfillment;//拣配费
 			commission == null ? commission = 0 : commission;//佣金比率
 			cost == null ? cost = 0 : cost; //物料成本
-			let num = (ratingVal * ratVal - cost - ratingVal * ratVal * commission - fulfillment - rsgPriceNum / (1 + 0.026) * ratVal) * totalRsgNum;
+			//let num = (ratingVal * ratVal - cost - ratingVal * ratVal * commission - fulfillment - rsgPriceNum / (1 + 0.026) * ratVal) * totalRsgNum;
+			let num = (ratingVal - cost - ratingVal * commission - fulfillment -(rsgPriceNum / (1 + 0.026)) * ratVal) * totalRsgNum;
 			num = num.toFixed(2)
 			$('.estSpend').text('￥' + num);
 		}
@@ -973,7 +983,7 @@
 				marketplaceidVal = saveId;	
 				$.ajax({
 					type:"post",
-					url:"http://10.10.42.14/vl/public/marketingPlan/updatePlan",
+					url:"/marketingPlan/updatePlan",
 					data:{
 						"sap_seller_id": sap_seller_id,
 						"id": ids,
@@ -1047,7 +1057,7 @@
 			let investment_return_c = $('.investmentCycle2').text();
 			$.ajax({
 				type:"post",
-				url:"http://10.10.42.14/vl/public/marketingPlan/addMarketingPlan",
+				url:"/marketingPlan/addMarketingPlan",
 				data:{
 					"id": ids,
 					"sap_seller_id": sap_seller_id,
