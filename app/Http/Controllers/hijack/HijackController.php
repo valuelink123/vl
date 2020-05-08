@@ -284,7 +284,7 @@ class HijackController extends Controller
                 return $err_message;
             }
         }
-        var_dump($userasinL);exit;
+
         //查询所有 asin 信息
         $DOMIN_MARKETPLACEID_SX = Asin::DOMIN_MARKETPLACEID_SX;
         $DOMIN_MARKETPLACEID_RUL = Asin::DOMIN_MARKETPLACEID_URL;
@@ -320,6 +320,7 @@ class HijackController extends Controller
         }
         $productList_obj = DB::connection('vlz')->select($sql);
         $productList = (json_decode(json_encode($productList_obj), true));
+        var_dump($productList);exit;
         $asinList = [];
         if (!empty($productList)) {
             foreach ($productList as $key => $value) {
