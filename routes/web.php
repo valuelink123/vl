@@ -113,6 +113,7 @@ Route::post('/rsgproducts/update', 'RsgproductsController@update');//更新产�
 Route::match(['post','get'],'/rsgproducts/export', 'RsgproductsController@export');//下载产品列表
 Route::match(['post','get'],'/rsgtask', 'RsgproductsController@rsgtask');//rsgTask任务列表
 
+Route::match(['post','get'],'/mrp', 'MrpController@list');
 
 Route::Post('/rsgproducts/get', 'RsgproductsController@get')->name('getrsgproducts');
 Route::get('/rsgrequests/process', 'RsgrequestsController@process');
