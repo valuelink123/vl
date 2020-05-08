@@ -284,7 +284,7 @@ class HijackController extends Controller
                 return $err_message;
             }
         }
-
+var_dump($userasinL);exit;
         //查询所有 asin 信息
         $DOMIN_MARKETPLACEID_SX = Asin::DOMIN_MARKETPLACEID_SX;
         $DOMIN_MARKETPLACEID_RUL = Asin::DOMIN_MARKETPLACEID_URL;
