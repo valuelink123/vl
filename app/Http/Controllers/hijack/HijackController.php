@@ -227,7 +227,9 @@ class HijackController extends Controller
                     })->toArray();
                 if (!empty($allUsers)) {
                     foreach ($allUsers as $auk => $auv) {
-                        $sapSellerIdList[] = $auv['sap_seller_id'];
+                        if($auv['sap_seller_id']>0){
+                            $sapSellerIdList[] = $auv['sap_seller_id'];
+                        }
                     }
                 }
                 var_dump($sapSellerIdList);exit;
