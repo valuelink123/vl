@@ -539,7 +539,7 @@
 		
 		 $.ajax({
 		  	type:"post",
-		  	url:"http://10.10.42.14/vl/public/marketingPlan/delfiles",
+		  	url:"/marketingPlan/delfiles",
 		  	data:{
 		  		"files_url": url,
 				"id": ids
@@ -576,7 +576,7 @@
 		function getInitalData(){
 			$.ajax({
 				type:"post",
-				url:"http://10.10.42.14/vl/public/marketingPlan/index1",
+				url:"/marketingPlan/index1",
 				async: false,
 				data:{
 					"sap_seller_id": sap_seller_id,
@@ -605,7 +605,7 @@
 		}else{
 			$.ajax({
 				type:"post",
-				url:"http://10.10.42.14/vl/public/marketingPlan/detailEdit",
+				url:"/marketingPlan/detailEdit",
 				data:{
 					"sap_seller_id": sap_seller_id,
 					"id": ids,
@@ -717,7 +717,7 @@
 			$('.reviews').text($(this).find("option:selected").attr("reviews"));
 			$.ajax({
 				type:"post",
-				url:"http://10.10.42.14/vl/public/marketingPlan/getAsinDailyReport",
+				url:"/marketingPlan/getAsinDailyReport",
 				data:{
 					"asin":asinId,
 					"marketplace_id": id,
@@ -973,7 +973,7 @@
 				marketplaceidVal = saveId;	
 				$.ajax({
 					type:"post",
-					url:"http://10.10.42.14/vl/public/marketingPlan/updatePlan",
+					url:"/marketingPlan/updatePlan",
 					data:{
 						"sap_seller_id": sap_seller_id,
 						"id": ids,
@@ -1047,7 +1047,7 @@
 			let investment_return_c = $('.investmentCycle2').text();
 			$.ajax({
 				type:"post",
-				url:"http://10.10.42.14/vl/public/marketingPlan/addMarketingPlan",
+				url:"/marketingPlan/addMarketingPlan",
 				data:{
 					"id": ids,
 					"sap_seller_id": sap_seller_id,
