@@ -197,7 +197,7 @@ class HijackController extends Controller
      */
     public function index1()
     {
-        $admin = array("charlie@valuelinkcorp.com", "zouyuanxun@valuelinkcorp.com", "zanhaifang@valuelinkcorp.com", "huzaoli@valuelinkcorp.com", 'fanlinxi@valuelinkcorp.com');
+        $admin = array('chenshupeng@valuelinkcorp.com',"charlie@valuelinkcorp.com", "zouyuanxun@valuelinkcorp.com", "zanhaifang@valuelinkcorp.com", "huzaoli@valuelinkcorp.com", 'fanlinxi@valuelinkcorp.com');
         $userasinL = [];
         $sapSellerIdList = [];
 //        $user = ['id' => '154',
