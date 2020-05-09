@@ -345,7 +345,7 @@
 				<label for="type_select">类型</label>
 				<select id="mutiSelect" name="mutiSelect" multiple="multiple" style="width:100%;" onchange="status_filter(this.value,8)">
 					<option value =""></option>
-					<option value ="CPC">ACPC</option>
+					<option value ="CPC">CPC</option>
 					<option value ="LD">LD</option>
 					<option value ="RSG">RSG</option>
 					<option value ="CTG">CTG</option>
