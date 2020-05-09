@@ -212,3 +212,8 @@ Route::post('/hijack/hijackExport', 'hijack\\HijackController@hijackExport');//�
 //RSG
 Route::get('/marketingPlan/index', 'MarketingPlanController@index')->name('marketingPlan');
 
+//投入产出分析
+Route::resource('roi', 'RoiController');
+Route::Post('/roi/analyse', 'RoiController@analyse')->name('roiAnalyse');
+Route::Post('/roi/updateRecord', 'RoiController@updateRecord');
+Route::Post('/roi/get', 'RoiController@get')->name('getRoi');
