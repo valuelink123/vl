@@ -266,7 +266,6 @@ class HijackController extends Controller
                 $err_message = ['status' => '-1', 'message' => 'No matching records found'];
                 return $err_message;
             }
-           // var_dump($sapSellerIdList);exit;
             if (!empty($sapSellerIdList)) {
                 $user_asin_list = DB::connection('vlz')->table('sap_asin_match_sku')
                     ->select('asin', 'marketplace_id')

@@ -26,7 +26,7 @@ class MarketingPlanController extends Controller
     public function index()
     {
         $user = Auth::user()->toArray();
-        $sap_seller_id = $user['sap_seller_id'];
+        $sap_seller_id = $user['sap_seller_id']>0?$user['sap_seller_id']:0;
         return view('marketingPlan.index', ['sap_seller_id' => $sap_seller_id]);
     }
 
