@@ -266,6 +266,7 @@ class HijackController extends Controller
                 $err_message = ['status' => '-1', 'message' => 'No matching records found'];
                 return $err_message;
             }
+           // var_dump($sapSellerIdList);exit;
             if (!empty($sapSellerIdList)) {
                 $user_asin_list = DB::connection('vlz')->table('sap_asin_match_sku')
                     ->select('asin', 'marketplace_id')
@@ -290,7 +291,7 @@ class HijackController extends Controller
         //查询所有 asin 信息
         $DOMIN_MARKETPLACEID_SX = Asin::DOMIN_MARKETPLACEID_SX;
         $DOMIN_MARKETPLACEID_RUL = Asin::DOMIN_MARKETPLACEID_URL;
-        $yesterday=time() - 3600 * 5;//当前时间 前5小时 todo
+        $ago_time=time() - 3600 * 5;//当前时间 前5小时 todo
         $sql_s = 'SELECT
             a.id,
             a.asin,
@@ -312,7 +313,7 @@ class HijackController extends Controller
             LEFT JOIN tbl_reselling_task AS rl_task ON rl_asin.id = rl_task.reselling_asin_id
             where a.title !="" ';
 //GROUP BY a.asin
-        $sql_g = ' AND rl_task.created_at >='.$yesterday.'  ORDER BY rl_task.reselling_time DESC, a.reselling_switch DESC ,rl_task.reselling_num DESC';
+        $sql_g = ' AND rl_task.created_at >='.$ago_time.'  ORDER BY rl_task.reselling_time DESC, a.reselling_switch DESC ,rl_task.reselling_num DESC';
         /**  判断对应用户 以及对应管理人员 所有下属ID */
         if (!empty($userasinL)) {
             $sql_as = 'AND a.asin in ("' . implode($userasinL, '","') . '")';
