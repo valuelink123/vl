@@ -215,7 +215,7 @@ class HijackController extends Controller
         $bool_admin = 0;//是否是管理员
         $user = Auth::user()->toArray(); //todo  打开
         if (!empty($user)) {
-            if (!empty($user['email']) && in_array($user['email'], $admin)) {
+            if ((!empty($user['email']) && in_array($user['email'], $admin))||@$user['seller_rules']=='*-*-*') {
                 /**  特殊权限着 查询所有用户 */
                 $bool_admin = 1;
                 $allUsers = DB::table('users')->select('id', 'name', 'email', 'sap_seller_id', 'seller_rules', 'ubg', 'ubu')
@@ -290,7 +290,7 @@ class HijackController extends Controller
         //查询所有 asin 信息
         $DOMIN_MARKETPLACEID_SX = Asin::DOMIN_MARKETPLACEID_SX;
         $DOMIN_MARKETPLACEID_RUL = Asin::DOMIN_MARKETPLACEID_URL;
-        $ago_time=time() - 3600 * 5;//当前时间 前5小时 todo
+        $ago_time=time() - 3600 * 3;//当前时间 前3小时 todo
         $sql_s = 'SELECT
             a.id,
             a.asin,
