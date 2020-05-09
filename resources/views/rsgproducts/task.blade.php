@@ -155,7 +155,7 @@
                         <th>D-3</th>
                         <th>D-2</th>
                         <th>D-1</th>
-                        <th>D-0</th>
+                        <th style="background:#D8E7F9">D-0</th>
                         <th>D1</th>
                         <th>D2</th>
                         <th>D3</th>
@@ -195,7 +195,7 @@
                             <th>{!! @$val['d_3']?$val['d_3']:'' !!}</th>
                             <th>{!! @$val['d_2']?$val['d_2']:'' !!}</th>
                             <th>{!! @$val['d_1']?$val['d_1']:'' !!}</th>
-                            <th>{!! @$val['d_0']?$val['d_0']:'' !!}</th>
+                            <th style="background:#D8E7F9">{!! @$val['d_0']?$val['d_0']:'' !!}</th>
                             <th>{!! @$val['d1']?$val['d1']:'' !!}</th>
                             <th>{!! @$val['d2']?$val['d2']:'' !!}</th>
                             <th>{!! @$val['d3']?$val['d3']:'' !!}</th>
@@ -289,7 +289,7 @@
                                 html += '<th>' + d_3 + '</th>';
                                 html += '<th>' + d_2 + '</th>';
                                 html += '<th>' + d_1 + '</th>';
-                                html += '<th>' + d_0 + '</th>';
+                                html += '<th style="background:#D8E7F9">' + d_0 + '</th>';
                                 html += '<th>' + d1 + '</th>';
                                 html += '<th>' + d2 + '</th>';
                                 html += '<th>' + d3 + '</th>';
