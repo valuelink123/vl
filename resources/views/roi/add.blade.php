@@ -65,29 +65,40 @@
         padding-top: 3px;
         padding-bottom: 3px;
     }
-    .analyse-btn{
+    /*.analyse-btn{*/
+        /*background-color: #63C5D1;*/
+        /*font-size: 14px;*/
+        /*text-align: center;*/
+        /*width: 60px;*/
+        /*height: 30px;*/
+        /*border-radius: 5px !important;*/
+    /*}*/
+    /*.save-btn{*/
+        /*background-color: #63C5D1;*/
+        /*font-size: 14px;*/
+        /*text-align: center;*/
+        /*width: 100px;*/
+        /*height: 30px;*/
+        /*border-radius: 5px !important;*/
+    /*}*/
+
+    .commom-btn{
         background-color: #63C5D1;
+        color: #ffffff;
         font-size: 14px;
         text-align: center;
         width: 60px;
         height: 30px;
         border-radius: 5px !important;
     }
-    .save-btn{
-        background-color: #63C5D1;
-        font-size: 14px;
-        text-align: center;
-        width: 100px;
-        height: 30px;
-        border-radius: 5px !important;
-    }
 
 </style>
 
-<div style="">
+<div>
     <form id="roi_form" action="{{ url('roi') }}" method="post">
     {{ csrf_field() }}
     <div class="portlet light bordered">
+        <div style="height: 25px;"></div>
         <div style="font-size: 15px">投入产出表</div>
         <div style="height: 30px;"></div>
         <div class="first_row_params">
@@ -423,7 +434,7 @@
         </div>
         <div style="height: 25px;"></div>
         <div style="width: 1501px; text-align: center;">
-            <button type="button" class="analyse-btn">分析</button>
+            <button type="button" class="commom-btn" style="width:60px" id="analyse-btn">分析</button>
         </div>
         <div style="height: 30px;"></div>
         <div class="result_div">
@@ -452,7 +463,7 @@
 
         <div style="height: 25px;"></div>
         <div style="width: 1501px; text-align: center;">
-            <button type="submit" class="save-btn">保存</button>
+            <button type="submit" class="commom-btn" style="width: 100px">保存</button>
         </div>
     </div>
     </form>
@@ -490,7 +501,7 @@
         });
     });
 
-    $(".analyse-btn").on('click', function() {
+    $("#analyse-btn").on('click', function() {
         //检查是否存在没填写的输入框
 //            $("input").each(function () {
 //                if(this.value == ''){

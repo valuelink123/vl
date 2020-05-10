@@ -15,31 +15,14 @@
         table.dataTable tbody th, table.dataTable tbody td {
             padding: 10px 2px;
         }
+        th{
+            text-align: center;
+        }
         th,td,td>span {
             font-size:12px !important;
             font-family:Arial, Helvetica, sans-serif;
         }
-        .status-statis .status-one{
-            width:175px;
-            margin-top:10px;
-            margin-bottom: 10px;
-            cursor:pointer;
-        }
-        .status-statis .status-show{
-            width:65px;
-            margin-top:10px;
-            margin-bottom: 10px;
-        }
-        .status-one .active{
-            background-color: #7D8CA1;
-            /*margin-right: 20px;*/
-            border: 1px solid #C8D2E0;
-            padding-right:5px;
-            padding-left: 5px;
-            border-radius: 4px !important;
-            color: #DDF8F9;
-            width:98%;
-        }
+
         #thetabletoolbar{
             margin-top: 10px;
             margin-bottom:0px !important;
@@ -47,6 +30,7 @@
 
         .search-btn{
             background-color: #63C5D1;
+            color: #ffffff;
             font-size: 14px;
             text-align: center;
             width: 70px;
@@ -54,8 +38,9 @@
             border-radius: 0px 5px 5px 0px !important;
         }
 
-        .add-btn{
+        .common-btn{
             background-color: #63C5D1;
+            color: #ffffff;
             font-size: 14px;
             text-align: center;
             width: 70px;
@@ -66,18 +51,20 @@
     <div class="row">
         <div class="col-md-12">
             <div style="height: 20px;"></div>
-            <div style="text-align: right;">
-                <a href="{{ url('roi/create') }}"><button type="button" class="add-btn">添加</button></a>
+            <div style="float: right;">
+                <button type="button" class="common-btn" id="export-btn" style="width: 80px"><span><i class="fa fa-sign-out"></i></span> 导出</button>
             </div>
-            <div style="height: 20px;"></div>
+            <div style="float: right;">
+                <a href="{{ url('roi/create') }}"><button type="button" class="common-btn" style="margin-right: 10px;">添加</button></a>
+            </div>
             <div style="clear:both"></div>
+            <div style="height: 20px;"></div>
         </div>
-
 
         <div class="col-md-12">
             <!-- BEGIN EXAMPLE TABLE PORTLET-->
             <div class="portlet light bordered">
-
+                <div style="height: 15px;"></div>
 
                 <div class="portlet-title">
                     {{--新添加的状态统计数据--}}
@@ -101,7 +88,7 @@
                                         <i class="fa fa-calendar"></i>
                                     </button>
                                 </span>
-                                        <input type="text" style="width:125px" class="form-control form-filter input-sm" readonly name="project_end_date" placeholder="结束日期" value="{{$submit_date_to}}" id="date_to" name="submit_date_to" />
+                                        <input type="text" style="width:125px" class="form-control form-filter input-sm" readonly placeholder="结束日期" value="{{$submit_date_to}}" id="date_to" name="submit_date_to" />
                                     </div>
 
                                 </div>
@@ -155,7 +142,7 @@
                             <div style="height: 15px;"></div>
                             <div class="input-group">
                                 <input type="text" name="keyword" id="keyword" style="width: 360px; height: 29px" placeholder="输入产品名称" />
-                                <button id="search" type="button" class="search-btn input-group-addon"><span><i class="fa fa-search"></i></span>搜索</button>
+                                <button id="search" type="button" class="search-btn input-group-addon"><span><i class="fa fa-search"></i></span> 搜索</button>
                             </div>
 
                         </div>
@@ -350,6 +337,21 @@
             $("#ajax").on("hidden.bs.modal",function(){
                 $(this).find('.modal-content').html('<div class="modal-body"><img src="../assets/global/img/loading-spinner-grey.gif" alt="" class="loading"><span>Loading... </span></div>');
             });
+
+            $('.date-picker').datepicker({
+                rtl: App.isRTL(),
+                format: 'yyyy-mm-dd',
+                orientation: 'bottom',
+                autoclose: true,
+            });
+
+        });
+
+
+        //下载数据
+        $("#export-btn").click(function(){
+            location.href='/roi_export?date_from='+$("#date_from").val()+'&date_to='+$("#date_to").val();
+            return false;
         });
 
     </script>

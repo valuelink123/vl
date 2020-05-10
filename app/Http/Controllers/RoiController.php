@@ -139,7 +139,7 @@ class RoiController extends Controller
             $lists[$key]['created_at'] = date('Y-m-d',strtotime($list['created_at']));
             $lists[$key]['updated_by'] = array_get($users,$list['updated_by']);
             $lists[$key]['updated_at'] = date('Y-m-d',strtotime($list['updated_at']));
-            $lists[$key]['archived_status'] = $list['id'] == 0 ? '未归档' : '已归档';
+            $lists[$key]['archived_status'] = $list['archived_status'] == 0 ? '未归档' : '已归档';
             $edit_url = url('roi/'.$list['id']);
             $show_url = url('roi/'.$list['id'].'/edit');
             $lists[$key]['action'] = '<ul class="nav navbar-nav"><li><a href="#" class="dropdown-toggle" style="height:10px; vertical-align:middle; padding-top:0px;" data-toggle="dropdown" role="button">...</a><ul class="dropdown-menu" role="menu" style="background-color: #cccccc"><li><a href="' . $edit_url . '" >查看详情</a></li><li><a href="' . $show_url . '">编辑</a></li></ul></li></ul>';
@@ -169,6 +169,60 @@ class RoiController extends Controller
         $billingPeriods = $this->getBillingPeriods();
         $transportModes = $this->getTransportModes();
         return view('roi/add',compact('sites','billingPeriods','transportModes'));
+    }
+
+    public function export(Request $request)
+    {
+        //搜索时间范围
+        $submit_date_from = isset($_GET['date_from']) && $_GET['date_from'] ? $_GET['date_from'] : date('Y-m-d',strtotime('- 90 days'));
+        $submit_date_to = isset($_GET['date_to']) && $_GET['date_to'] ? $_GET['date_to'] : date('Y-m-d');
+
+        $data = DB::connection('amazon')->table('roi');
+        $data = $data->where('roi.created_at','>=',$submit_date_from.' 00:00:00')->where('roi.created_at','<=',$submit_date_to.' 23:59:59')->get()->toArray();
+        $data = array_map('get_object_vars', $data);;
+
+        $users= $this->getUsers();
+
+        $arrayData = array();
+        $headArray = array('ID','产品名称/SKU','站点','预计上线时间','预计年销量','预计年销售额','资金周转次数','项目利润率','投资回报率ROI(%)','投资回报额(万元)','创建人','创建日期','最新修改人','最新修改日期','归档状态');
+        $arrayData[] = $headArray;
+        foreach ($data as $key=>$val){
+            $arrayData[] = array(
+                $val['id'],
+                $val['product_name']. PHP_EOL . $val['sku'],
+                $val['site'],
+                $val['estimated_launch_time'],
+                $val['total_sales_volume'],
+                round($val['total_sales_amount']),
+                $this->twoDecimal($val['capital_turnover']),
+                $this->toPercentage($val['project_profitability']),
+                $this->toPercentage($val['roi']),
+                $this->twoDecimal($val['return_amount']/10000),
+                array_get($users,$val['creator']),
+                date('Y-m-d',strtotime($val['created_at'])),
+                array_get($users,$val['updated_by']),
+                date('Y-m-d',strtotime($val['updated_at'])),
+                $val['archived_status'] == 0 ? '未归档' : '已归档'
+            );
+        }
+        if($arrayData){
+            $spreadsheet = new Spreadsheet();
+
+            $spreadsheet->getActiveSheet()
+                ->fromArray(
+                    $arrayData,  // The data to set
+                    NULL,        // Array values with this value will not be set
+                    'A1'         // Top left coordinate of the worksheet range where
+                //    we want to set these values (default is A1)
+                );
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');//告诉浏览器输出07Excel文件
+            header('Content-Disposition: attachment;filename="Export_ROI.xlsx"');//告诉浏览器输出浏览器名称
+            header('Cache-Control: max-age=0');//禁止缓存
+            $writer = new Xlsx($spreadsheet);
+            $writer->save('php://output');
+        }
+        die();
+
     }
 
     public function edit(Request $request, $id)
@@ -317,13 +371,10 @@ class RoiController extends Controller
     }
 
     public function getUpdateData(Request $request){
-
+        //测试用数据： site选择JP; $currency_rate = 0.065767; $early_investment = 3000;
         $currency_rates = $this->getCurrencyRates();
         $site = $request->input('site','US');
         $currency_rate = $currency_rates[$site];
-        //以下两行是测试用数据，上传时去掉
-//        $currency_rate = 0.065767;
-//        $site = 'JP';
 
         $volume_month_array = $price_fc_month_array = $price_rmb_month_array = $sales_amount_month_array = array();
         $total_sales_volume = $total_sales_amount = 0;
@@ -458,9 +509,6 @@ class RoiController extends Controller
 
         //前期开发投入
         $early_investment = $request->input('estimated_labor_cost') + $request->input('business_trip_expenses') + $request->input('other_project_cost');
-        //以下一行是测试用数据，上传时去掉
-//        $early_investment = 3000;
-
         //投资回报额
         $return_amount = $total_marginal_contribution - $total_fixed_cost/2 - $early_investment/2;
         //投资回报率

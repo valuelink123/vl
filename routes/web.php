@@ -217,3 +217,5 @@ Route::resource('roi', 'RoiController');
 Route::Post('/roi/analyse', 'RoiController@analyse')->name('roiAnalyse');
 Route::Post('/roi/updateRecord', 'RoiController@updateRecord');
 Route::Post('/roi/get', 'RoiController@get')->name('getRoi');
+//下载ROI列表。如果用/roi/export, 实际上是进入了resource里面的show动作：GET /roi/{id}
+Route::get('/roi_export', 'RoiController@export');
