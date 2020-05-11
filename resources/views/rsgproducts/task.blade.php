@@ -168,7 +168,7 @@
                     </thead>
                     <tbody>
                     @foreach($data as $key=>$val)
-                        @if(!empty($val['d_0']))
+                        if(!empty($val['d_0'])){
                       <tr>
                           {{--<th>{!! $val['rank'] !!}</th>--}}
                             {{--<th>{!! $val['score'] !!}</th>--}}
@@ -206,7 +206,7 @@
                             <th>{!! @$val['d7']?$val['d7']:'' !!}</th>
                             <th>{!! $val['action'] !!}</th>
                         </tr>
-                      @endif
+}
                     @endforeach
                     </tbody>
                 </table>
