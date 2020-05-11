@@ -197,7 +197,7 @@ class HijackController extends Controller
      */
     public function index1()
     {
-        $admin = array("charlie@valuelinkcorp.com", "zouyuanxun@valuelinkcorp.com", "zanhaifang@valuelinkcorp.com", "huzaoli@valuelinkcorp.com", 'fanlinxi@valuelinkcorp.com');
+        $admin = array('duanyongsheng@dtas.com',"charlie@valuelinkcorp.com", "zouyuanxun@valuelinkcorp.com", "zanhaifang@valuelinkcorp.com", "huzaoli@valuelinkcorp.com", 'fanlinxi@valuelinkcorp.com');
         $userasinL = [];
         $sapSellerIdList = [];
 //        $user = ['id' => '154',
@@ -213,9 +213,9 @@ class HijackController extends Controller
 //            'ubu' => 'BU3',
 //        ];
         $bool_admin = 0;//是否是管理员
-        $user =Auth::user()->toArray(); //todo  打开
+        $user = Auth::user()->toArray(); //todo  打开
         if (!empty($user)) {
-            if (!empty($user['email']) && in_array($user['email'], $admin)) {
+            if ((!empty($user['email']) && in_array($user['email'], $admin))||@$user['seller_rules']=='*-*-*') {
                 /**  特殊权限着 查询所有用户 */
                 $bool_admin = 1;
                 $allUsers = DB::table('users')->select('id', 'name', 'email', 'sap_seller_id', 'seller_rules', 'ubg', 'ubu')
@@ -227,10 +227,11 @@ class HijackController extends Controller
                     })->toArray();
                 if (!empty($allUsers)) {
                     foreach ($allUsers as $auk => $auv) {
-                        $sapSellerIdList[] = $auv['sap_seller_id'];
+                        if($auv['sap_seller_id']>0){
+                            $sapSellerIdList[] = $auv['sap_seller_id'];
+                        }
                     }
                 }
-
             } else if ($user['ubu'] != '' || $user['ubg'] != '' || $user['seller_rules'] != '') {
                 //判断是否是销售 及 对应领导角色
                 $allUsers = DB::table('users')->select('id', 'sap_seller_id', 'ubg', 'ubu')
@@ -257,6 +258,9 @@ class HijackController extends Controller
                             }
                         }
                     }
+                }else{
+                    $err_message = ['status' => '-1', 'message' => 'No matching records found'];
+                    return $err_message;
                 }
             } else {
                 $err_message = ['status' => '-1', 'message' => 'No matching records found'];
@@ -286,6 +290,7 @@ class HijackController extends Controller
         //查询所有 asin 信息
         $DOMIN_MARKETPLACEID_SX = Asin::DOMIN_MARKETPLACEID_SX;
         $DOMIN_MARKETPLACEID_RUL = Asin::DOMIN_MARKETPLACEID_URL;
+        $ago_time=time() - 3600 * 3;//当前时间 前3小时 todo
         $sql_s = 'SELECT
             a.id,
             a.asin,
@@ -307,7 +312,7 @@ class HijackController extends Controller
             LEFT JOIN tbl_reselling_task AS rl_task ON rl_asin.id = rl_task.reselling_asin_id
             where a.title !="" ';
 //GROUP BY a.asin
-        $sql_g = '  ORDER BY rl_task.reselling_time DESC, a.reselling_switch DESC ,rl_task.reselling_num DESC';
+        $sql_g = ' AND rl_task.created_at >='.$ago_time.'  ORDER BY rl_task.reselling_time DESC, a.reselling_switch DESC ,rl_task.reselling_num DESC';
         /**  判断对应用户 以及对应管理人员 所有下属ID */
         if (!empty($userasinL)) {
             $sql_as = 'AND a.asin in ("' . implode($userasinL, '","') . '")';
@@ -786,7 +791,7 @@ class HijackController extends Controller
             $startTime = $request['startTime'];
             $endTime = $request['endTime'] + 3600 * 24;
             $resellingidList = [];
-            if (!empty($idList)&&isset($idList)&&$idList!='-1') {
+            if (!empty($idList) && isset($idList) && $idList != '-1') {
                 /** 存在下载的IDS*/
                 $idList = explode(',', $idList);
                 $productList = DB::connection('vlz')->table('asins')
@@ -812,7 +817,7 @@ class HijackController extends Controller
                 /** 不存在存在下载的IDS ，需要根据权限查询关联*/
                 $productIdList = [];
                 $userasinL = [];
-                $marketplaceid=[];
+                $marketplaceid = [];
                 $sapSellerIdList = [];
 
                 $user = Auth::user()->toArray(); //todo  打开
@@ -972,7 +977,6 @@ class HijackController extends Controller
             foreach ($taskList as $tlK => $tlv) {
                 $taskIdList[] = $tlv['id'];
             }
-
             /** 查询detail **/
             $taskDetail = DB::connection('vlz')->table('tbl_reselling_detail')
                 ->select('id', 'task_id', 'price', 'shipping_fee', 'account', 'white', 'sellerid', 'created_at', 'reselling_remark')
@@ -987,7 +991,7 @@ class HijackController extends Controller
                     $created_at = 0;
                     $reselling_count = 0;
                     foreach ($taskDetail as $tk => $tv) {
-                        if ($tlv['sellerid'] == $tv['sellerid']&&$tlv['task_id'] == $tv['task_id']) {
+                        if ($tlv['sellerid'] == $tv['sellerid']) {
                             if ($tv['created_at'] - $created_at > 3600 && $reselling_count == 0) {
                             } elseif ($tv['created_at'] - $created_at > 3600) {
                             } elseif ($tv['created_at'] - $created_at < 3600) {
@@ -996,7 +1000,7 @@ class HijackController extends Controller
                             $created_at = $tv['created_at'];
                         }
                     }
-                    $taskDetail[$tlk]['count'] = $reselling_count;
+                    $taskDetail[$tlk]['count'] = $reselling_count + 1;
                     foreach ($taskList as $taK => $tav) {
                         if ($tlv['task_id'] == $tav['id']) {
                             $taskDetail[$tlk]['reselling_asin_id'] = $tav['reselling_asin_id'];
@@ -1319,6 +1323,7 @@ class HijackController extends Controller
     {
         $DOMIN_MARKETPLACEID = Asin::DOMIN_MARKETPLACEID;
         $DOMIN_MARKETPLACEID_SX = Asin::DOMIN_MARKETPLACEID_SX;
+        $DOMIN_MARKETPLACEID_URL = Asin::DOMIN_MARKETPLACEID_URL;
         //查询跟卖数据 根据开始时间 结束时间
         $startTime = isset($request['startTime']) ? $request['startTime'] : 0;
         $endTime = isset($request['endTime']) ? $request['endTime'] + 3600 * 24 : 0;
@@ -1351,6 +1356,7 @@ class HijackController extends Controller
 
                 if (!empty($domainUrl) && !empty($as['asin'])) {
                     $asins[0]['domin_sx'] = $DOMIN_MARKETPLACEID_SX[isset($asins[0]['marketplaceid']) ? $asins[0]['marketplaceid'] : ''];
+                    $asins[0]['domin_url'] = $DOMIN_MARKETPLACEID_URL[isset($asins[0]['marketplaceid']) ? $asins[0]['marketplaceid'] : ''];
                     $resellingList = DB::connection('vlz')->table('tbl_reselling_asin')
                         ->select('reselling_num', 'updated_at', 'created_at', 'reselling_remark', 'id', 'asin')
                         ->where('asin', $as['asin'])
@@ -1419,23 +1425,45 @@ class HijackController extends Controller
     public function resellingDetail(Request $request)
     {
         $taskId = $request['taskId'];
-        $taskDetail = [];
-        $reselling_count_list = [];
+        $taskDetail = $reselling_count_list = $taskIdList = [];
+        $reselling_asin_id = 0;
         if ($taskId > 0) {
-            $taskDetail = DB::connection('vlz')->table('tbl_reselling_detail')
-                ->select('id', 'price', 'task_id', 'shipping_fee', 'account', 'white', 'sellerid', 'created_at', 'reselling_remark')
-                ->where('task_id', $taskId)
-                ->where('white', 0)
-                ->get()->map(function ($value) {
-                    return (array)$value;
-                })->toArray();
-            $taskDetail_list = DB::connection('vlz')->table('tbl_reselling_detail')
-                ->select('id', 'task_id', 'sellerid', 'created_at')
-                ->where('task_id', $taskId)
-                ->where('white', 0)
-                ->get()->map(function ($value) {
-                    return (array)$value;
-                })->toArray();
+            $tasktaskOne = DB::connection('vlz')->table('tbl_reselling_task')
+                ->select('id', 'reselling_asin_id')
+                ->where('id', $taskId)
+                ->first();
+            if (!empty($tasktaskOne)) {
+                $reselling_asin_id = $tasktaskOne->reselling_asin_id;
+            }
+            if ($reselling_asin_id > 0) {
+                $tasktaskAll = DB::connection('vlz')->table('tbl_reselling_task')
+                    ->select('id', 'reselling_asin_id')
+                    ->where('reselling_asin_id', $reselling_asin_id)
+                    ->get()->map(function ($value) {
+                        return (array)$value;
+                    })->toArray();
+                if (!empty($tasktaskAll)) {
+                    foreach ($tasktaskAll as $tk => $tv) {
+                        $taskIdList[] = $tv['id'];
+                    }
+                }
+            }
+            if(!empty($taskIdList)){
+                $taskDetail = DB::connection('vlz')->table('tbl_reselling_detail')
+                    ->select('id', 'price', 'task_id', 'shipping_fee', 'account', 'white', 'sellerid', 'created_at', 'reselling_remark')
+                    ->where('task_id', $taskId)
+                    ->where('white', 0)
+                    ->get()->map(function ($value) {
+                        return (array)$value;
+                    })->toArray();
+                $taskDetail_list = DB::connection('vlz')->table('tbl_reselling_detail')
+                    ->select('id', 'task_id', 'sellerid', 'created_at')
+                    ->whereIn('task_id', $taskIdList)
+                    ->where('white', 0)
+                    ->get()->map(function ($value) {
+                        return (array)$value;
+                    })->toArray();
+            }
             if (!empty($taskDetail_list)) {
                 foreach ($taskDetail_list as $tlk => $tlv) {
                     $taskDetail_list[$tlk]['count'] = 0;
