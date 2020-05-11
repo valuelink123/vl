@@ -167,8 +167,8 @@
                     </tr>
                     </thead>
                     <tbody>
-                    @foreach($data as $key=>$val)
-                        <?php if(!empty($val['d_0'])){ ?>
+                    <?php foreach($data as $key=>$val){
+                       if(!empty($val['d_0'])){ ?>
                       <tr>
                           {{--<th>{!! $val['rank'] !!}</th>--}}
                             {{--<th>{!! $val['score'] !!}</th>--}}
@@ -206,10 +206,9 @@
                             <th>{!! @$val['d7']?$val['d7']:'' !!}</th>
                             <th>{!! $val['action'] !!}</th>
                         </tr>
-<?php }else{
-                            echo 'NONO';
-} ?>
-                    @endforeach
+                    <?php }else {
+                        echo 'NONO';
+                    } } ?>
                     </tbody>
                 </table>
 
