@@ -338,12 +338,12 @@
                                                 </li>
 												@endpermission
 												@permission('fee-split-show')
-												<li class="">
-												    <a href="/marketingPlan/index" class="nav-link nav-toggle ">
-												        Marketing Plan
-												        <span class="arrow"></span>
-												    </a>
-												</li>
+												{{--<li class="">--}}
+												    {{--<a href="/marketingPlan/index" class="nav-link nav-toggle ">--}}
+												        {{--Marketing Plan--}}
+												        {{--<span class="arrow"></span>--}}
+												    {{--</a>--}}
+												{{--</li>--}}
 												@endpermission
 
                                             </ul>
