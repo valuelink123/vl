@@ -74,13 +74,13 @@
 
     <div id="switch-content">
         <div class="filter_content">
-            <select name="" class="bgList" onchange="status_filter(this.value,15)">
+            <select name="" class="bgList" onchange="status_filter(this.value,8)">
                 <option value="">All BG</option>
                 <option value="BG1">BG1</option>
                 <option value="BG3">BG3</option>
                 <option value="BG4">BG4</option>
             </select>
-            <select name="" onchange="status_filter(this.value,16)">
+            <select name="" onchange="status_filter(this.value,9)">
                 <option value="">All BU</option>
                 <option value="BG">BG</option>
                 <option value="BU1">BU1</option>
@@ -144,8 +144,8 @@
                         <th>Reviews</th>
                         <th>Seller</th>
                         <th title="The number of applications which have PayPal but haven't completed in the last 15 days">Unfinished</th>
-                        <th style="">BG</th>
-                        <th style="">BU</th>
+                        <th style="display: none;">BG</th>
+                        <th style="display: none;">BU</th>
                     <!-- <th>Target</th>
                         <th>Achieved</th>
                         <th class="special-content">Task</th> -->
@@ -185,8 +185,8 @@
                             <th>{!! $val['review'] !!}</th>
                             <th>{!! $val['seller'] !!}</th>
                             <th>{!! $val['unfinished'] !!}</th>
-                            <th style="">{!! $val['bg'] !!}</th>
-                            <th style="">{!! $val['bu'] !!}</th>
+                            <th style="display: none">{!! $val['bg'] !!}</th>
+                            <th style="display: none">{!! $val['bu'] !!}</th>
                         <!-- <th>{!! $val['target_review'] !!}</th>
                             <th>{!! $val['requested_review'] !!}</th>
 							<th class="special-content">{!! $val['task'] !!}</th> -->
@@ -226,7 +226,6 @@
     <script>
         //筛选
         function status_filter(value,column) {
-            alert(value);
             if (value == '') {
                 editTableObj.column(column).search('').draw();
             }
@@ -288,8 +287,8 @@
                                     /*  html += '<th>' + val.target_review + '</th>';
                                       html += '<th>' + val.requested_review + '</th>';
                                       html += '<th class="special-content">' + val.task + '</th>'; */
-                                    html += '<th style="">' + bg + '</th>';
-                                    html += '<th style="">' + bu + '</th>';
+                                    html += '<th style="display: none">' + bg + '</th>';
+                                    html += '<th style="display: none">' + bu + '</th>';
                                     html += '<th>' + d_6 + '</th>';
                                     html += '<th>' + d_5 + '</th>';
                                     html += '<th>' + d_4 + '</th>';

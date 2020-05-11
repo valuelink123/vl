@@ -195,6 +195,8 @@ class RsgproductsController extends Controller
 		//限制站点搜索
 		$siteArrConfig = getSiteArr()['site'];
 		$site = isset($_POST['site']) && $_POST['site'] ? $_POST['site'] : 'US';
+        $bg = isset($_POST['bg']) && $_POST['bg'] ? $_POST['bg'] : '';
+        $bu = isset($_POST['bu']) && $_POST['bu'] ? $_POST['bu'] : '';
 		$siteArr = isset($siteArrConfig[$site]) ? $siteArrConfig[$site] : array();
 		if($site == 'US'){//特殊处理： US里面不用展示CA站点的产品
 			$siteArr = array('www.amazon.com');
