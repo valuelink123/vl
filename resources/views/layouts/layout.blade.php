@@ -389,7 +389,7 @@
                                                 </li>
 												@endpermission
 												<li class="">
-                                                    <a href="/kms/list" class="nav-link nav-toggle ">
+                                                    <a href="/mrp/list" class="nav-link nav-toggle ">
                                                         Mrp
                                                         <span class="arrow"></span>
                                                     </a>
