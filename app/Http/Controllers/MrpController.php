@@ -154,6 +154,7 @@ class MrpController extends Controller
 			}
 		}else{
 			$sku = DB::connection('amazon')->table('sap_asin_match_sku')->where('asin',$asin)->where('marketplace_id',$marketplace_id)->whereRaw($where)->value('sku');
+			$keyword=$asin;
 		}
 		if(!$asin || !$sku){
 			die('No Data Match This Keywords');

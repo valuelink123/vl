@@ -60,17 +60,17 @@ white-space: nowrap;
                     <div class="table-container">
 					<form action="{{url('mrp/edit')}}" method="get" enctype="multipart/form-data" >
 					<div class="col-md-2 ">
-                        <div class="input-group">
+                        <div class="input-group date date-picker " data-date-format="yyyy-mm-dd">
                             <span class="input-group-addon">Date</span>
-                            <input  class="form-control" value="{{$date_from}}" id="date_from" name="date_from"
+                            <input  class="form-control" value="{{$date_from}}" data-options="format:'yyyy-mm-dd'" id="date_from" name="date_from"
                                    autocomplete="off"/>
                         </div>
                         <br>
                     </div>
 					<div class="col-md-2">
-                        <div class="input-group">
+                        <div class="input-group date date-picker " data-date-format="yyyy-mm-dd">
                             <span class="input-group-addon">Date</span>
-                            <input  class="form-control" value="{{$date_to}}" id="date_to" name="date_to"
+                            <input  class="form-control" value="{{$date_to}}" data-options="format:'yyyy-mm-dd'" id="date_to" name="date_to"
                                    autocomplete="off"/>
                         </div>
                         <br>
@@ -374,6 +374,7 @@ white-space: nowrap;
 <script src="/assets/global/plugins/bootstrap-editable/bootstrap-editable/js/bootstrap-editable.js" type="text/javascript"></script>
 <script src="/assets/pages/scripts/form-editable.min.js" type="text/javascript"></script>
 <script>
+
 var FormEditable = function() {
 
     $.mockjaxSettings.responseTime = 500;
@@ -461,7 +462,13 @@ var FormEditable = function() {
 }();
 
 jQuery(document).ready(function() {
+	$('.date-picker').datepicker({
+		rtl: App.isRTL(),
+		autoclose: true
+    });
     FormEditable.init();
+	
+	
 });
 </script>
 
