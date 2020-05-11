@@ -205,7 +205,6 @@ class RsgproductsController extends Controller
 		}
 		$sql = $this->getSql(0,$where,$where_product,$date);
 		$sql .= ' LIMIT 0,70';
-
 		$data = $this->queryRows($sql);
 		$data = $this->getReturnData(0,$data,$date,$todayDate,'task');
 
@@ -337,7 +336,6 @@ class RsgproductsController extends Controller
 			$orderby = " order by rsg_products.order_status desc,score desc,id desc ";
 		}
 		$ago15day = date('Y-m-d',strtotime($date)-86400*15);
-        $today = date('Y-m-d',time());
 		$field = $joinSkus = ' ';
 		if($leftskus == 1){
 			$field = ',skus_status.status as sku_status ';
@@ -400,7 +398,7 @@ class RsgproductsController extends Controller
         		select count(*) as num,asin,site 
 				from rsg_products 
 				left join rsg_requests on product_id = rsg_products.id and step IN(4,5,6,7) 
-				where rsg_requests.created_at <= '".$today." 23:59:59 ' and rsg_requests.created_at >='".$ago15day." 00:00:00 ' 
+				where rsg_requests.created_at <= '".$date." 23:59:59 ' and rsg_requests.created_at >='".$ago15day." 00:00:00 ' 
 				group by asin,site 
         	) as rsg on rsg_products.asin=rsg.asin and rsg_products.site=rsg.site 
         	{$joinSkus} 
