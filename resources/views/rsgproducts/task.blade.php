@@ -74,13 +74,13 @@
 
     <div id="switch-content">
         <div class="filter_content">
-            <select name="" class="bgList" onchange="status_filter(this.value,8)">
+            <select name="" class="bgList" onchange="status_filter(this.value,15)">
                 <option value="">All BG</option>
                 <option value="BG1">BG1</option>
                 <option value="BG3">BG3</option>
                 <option value="BG4">BG4</option>
             </select>
-            <select name="" onchange="status_filter(this.value,9)">
+            <select name="" onchange="status_filter(this.value,16)">
                 <option value="">All BU</option>
                 <option value="BG">BG</option>
                 <option value="BU1">BU1</option>
