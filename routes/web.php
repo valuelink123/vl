@@ -113,6 +113,7 @@ Route::post('/rsgproducts/update', 'RsgproductsController@update');//更新产�
 Route::match(['post','get'],'/rsgproducts/export', 'RsgproductsController@export');//下载产品列表
 Route::match(['post','get'],'/rsgtask', 'RsgproductsController@rsgtask');//rsgTask任务列表
 
+Route::match(['post','get'],'/mrp', 'MrpController@list');
 
 Route::Post('/rsgproducts/get', 'RsgproductsController@get')->name('getrsgproducts');
 Route::get('/rsgrequests/process', 'RsgrequestsController@process');
@@ -212,3 +213,10 @@ Route::post('/hijack/hijackExport', 'hijack\\HijackController@hijackExport');//�
 Route::get('/marketingPlan/index', 'MarketingPlanController@index')->name('marketingPlan');
 Route::get('/marketingPlan/detail', 'MarketingPlanController@detail')->name('detail');
 
+//投入产出分析
+Route::resource('roi', 'RoiController');
+Route::Post('/roi/analyse', 'RoiController@analyse')->name('roiAnalyse');
+Route::Post('/roi/updateRecord', 'RoiController@updateRecord');
+Route::Post('/roi/get', 'RoiController@get')->name('getRoi');
+//下载ROI列表。如果用/roi/export, 实际上是进入了resource里面的show动作：GET /roi/{id}
+Route::get('/roi_export', 'RoiController@export');
