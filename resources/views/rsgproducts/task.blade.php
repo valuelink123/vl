@@ -144,8 +144,8 @@
                         <th>Reviews</th>
                         <th>Seller</th>
                         <th title="The number of applications which have PayPal but haven't completed in the last 15 days">Unfinished</th>
-                    {{--<th>BG</th>--}}
-                    {{--<th>BU</th>--}}
+                        <th style="display: none;">BG</th>
+                        <th style="display: none;">BU</th>
                     <!-- <th>Target</th>
                         <th>Achieved</th>
                         <th class="special-content">Task</th> -->
@@ -255,7 +255,7 @@
                         if(res.status==1){
                             var data = res.data;
                             $.each(data,function(key,val){
-                                if(d_0!=''&&d_0!=null) {
+                                if(val.d_0!=''&&val.d_0!=null) {
                                     let d_6 = val.hasOwnProperty("d_6") == true ? val.d_6 : val.d_6 = '';
                                     let d_5 = val.hasOwnProperty("d_5") == true ? val.d_5 : val.d_5 = '';
                                     let d_4 = val.hasOwnProperty("d_4") == true ? val.d_4 : val.d_4 = '';
@@ -270,6 +270,8 @@
                                     let d5 = val.hasOwnProperty("d5") == true ? val.d5 : val.d5 = '';
                                     let d6 = val.hasOwnProperty("d6") == true ? val.d6 : val.d6 = '';
                                     let d7 = val.hasOwnProperty("d7") == true ? val.d7 : val.d7 = '';
+                                    let bg = val.hasOwnProperty("bg") == true ? val.bg : val.bg = '';
+                                    let bu = val.hasOwnProperty("bu") == true ? val.bu : val.bu = '';
 
                                     html += '<tr>';
                                     html += '<th>' + val.product + '</th>';
@@ -287,6 +289,8 @@
                                     /*  html += '<th>' + val.target_review + '</th>';
                                       html += '<th>' + val.requested_review + '</th>';
                                       html += '<th class="special-content">' + val.task + '</th>'; */
+                                    html += '<th style="display: none">' + bg + '</th>';
+                                    html += '<th style="display: none">' + bu + '</th>';
                                     html += '<th>' + d_6 + '</th>';
                                     html += '<th>' + d_5 + '</th>';
                                     html += '<th>' + d_4 + '</th>';
