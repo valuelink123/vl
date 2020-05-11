@@ -206,9 +206,7 @@
                             <th>{!! @$val['d7']?$val['d7']:'' !!}</th>
                             <th>{!! $val['action'] !!}</th>
                         </tr>
-                    <?php }else {
-                        echo 'NONO';
-                    } } ?>
+                    <?php } } ?>
                     </tbody>
                 </table>
 
