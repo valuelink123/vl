@@ -206,7 +206,9 @@
                             <th>{!! @$val['d7']?$val['d7']:'' !!}</th>
                             <th>{!! $val['action'] !!}</th>
                         </tr>
-<?php } ?>
+<?php }else{
+                            echo 'NONO';
+} ?>
                     @endforeach
                     </tbody>
                 </table>
