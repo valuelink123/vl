@@ -59,7 +59,7 @@ white-space: nowrap;
                 <div class="portlet-body">	
                     <div class="table-container">
 					<form action="{{url('mrp/edit')}}" method="get" enctype="multipart/form-data" >
-					<div class="col-md-2 ">
+					<div class="col-md-3 ">
                         <div class="input-group date date-picker " data-date-format="yyyy-mm-dd">
                             <span class="input-group-addon">Date</span>
                             <input  class="form-control" value="{{$date_from}}" data-options="format:'yyyy-mm-dd'" id="date_from" name="date_from"
@@ -67,7 +67,7 @@ white-space: nowrap;
                         </div>
                         <br>
                     </div>
-					<div class="col-md-2">
+					<div class="col-md-3">
                         <div class="input-group date date-picker " data-date-format="yyyy-mm-dd">
                             <span class="input-group-addon">Date</span>
                             <input  class="form-control" value="{{$date_to}}" data-options="format:'yyyy-mm-dd'" id="date_to" name="date_to"
@@ -88,7 +88,7 @@ white-space: nowrap;
                         </div>
 						 <br>
                     </div>
-					<div class="col-md-4">
+					<div class="col-md-2">
                         <div class="input-group">
                             <span class="input-group-addon">Asin/Sku</span>
                             <input  class="form-control" value="{{$keyword}}" id="keyword" name="keyword"
@@ -129,9 +129,9 @@ white-space: nowrap;
 					  </tr>
 					 </thead>
 					  <tbody>
+					  <?php  $current_stock=0;?>
 					  @foreach ($asins as $v)
 					  	<?php 
-						$current_stock=0;
 						if ($v->asin==$asin) $current_stock=intval($v->afn_sellable+$v->afn_reserved);
 						?>
 					  <tr class="asins_details">
@@ -300,14 +300,14 @@ white-space: nowrap;
 					  <?php
 					  foreach($sales_plan as $k=>$v){
 					  ?>
-					  		<tr class="{{ ($k>$cur_date)?'asin_sales_line_plan':''}}">
+					  		<tr class="{{ ($k>=$cur_date)?'asin_sales_line_plan':''}}">
 								<td>{{$k}}</td>
 								<td>{{$v['symmetry']}}</td>
 								<td>{{$v['plan_first']}}</td>
 								
 								<td>
 								<?php
-								if($show=='day' && $k>$cur_date){
+								if($show=='day' && $k>=$cur_date){
 								?>
 								<a class="plan editable" title="{{$asin.' '.$k.' Plan'}}" href="javascript:;" id="{{$k}}--quantity_last" data-pk="{{$k}}--quantity_last" data-type="text"> {{$v['plan_last']}} </a>
 								<?php
@@ -340,7 +340,7 @@ white-space: nowrap;
 								
 								<td>
 								<?php
-								if($show=='day' && $k>$cur_date){
+								if($show=='day' && $k>=$cur_date){
 								?>
 								<a class="remark editable" title="{{$asin.' '.$k.' Remark'}}" href="javascript:;" id="{{$k}}--remark" data-pk="{{$k}}--remark" data-type="text"> {{$v['remark']}} </a>
 								<?php

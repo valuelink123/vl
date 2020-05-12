@@ -8,6 +8,7 @@ use App\Accounts;
 use App\User;
 use App\Group;
 use App\AsinSalesPlan;
+use App\DailyStatistic;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Services\MultipleQueue;
@@ -157,7 +158,8 @@ class MrpController extends Controller
 			$keyword=$asin;
 		}
 		if(!$asin || !$sku){
-			die('No Data Match This Keywords');
+			$request->session()->flash('error_message','No Data Match This Keywords');
+            return redirect()->back()->withInput();
 		}
 		
 		$show = $request->get('show')??'day';
@@ -207,7 +209,8 @@ class MrpController extends Controller
 			$cur_date=date('Y-m');
 		}else{
 			$asin_symmetrys = DB::connection('amazon')->table('symmetry_asins')->where('asin',$asin)->where('marketplace_id',$marketplace_id)->where('date','>=',$date_from)->where('date','<=',$date_to)->pluck('quantity','date');
-			$asin_historys = DB::connection('amazon')->table('daily_statistics')->selectRaw('date,sum(quantity_shipped) as sold,sum(afn_sellable+afn_reserved) as stock')->where('asin',$asin)->where('marketplace_id',$marketplace_id)->where('date','>=',$date_from)->where('date','<=',$date_to)->groupBy(['date'])->get()->keyBy('date')->toArray();
+			$asin_historys = DailyStatistic::selectRaw('date,sum(quantity_shipped) as sold,sum(afn_sellable+afn_reserved) as stock')->where('asin',$asin)->where('marketplace_id',$marketplace_id)->where('date','>=',$date_from)->where('date','<=',$date_to)->groupBy(['date'])->get()->keyBy('date')->toArray();
+			
 			$asin_plans = AsinSalesPlan::where('asin',$asin)->where('marketplace_id',$marketplace_id)->where('date','>=',$date_from)->where('date','<=',$date_to)->get()->keyBy('date')->toArray();
 			
 			while($tmp_date_from<=$date_to){

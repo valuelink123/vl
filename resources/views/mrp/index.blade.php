@@ -22,7 +22,6 @@ table.dataTable thead th, table.dataTable thead td {
     <link rel="stylesheet" href="/js/chosen/chosen.min.css"/>
     <script src="/js/chosen/chosen.jquery.min.js"></script>
 
-    @include('frank.common')
 
     <div class="portlet light bordered">
         <div class="portlet-body">
@@ -165,9 +164,6 @@ table.dataTable thead th, table.dataTable thead td {
                 <table class="table table-striped table-bordered" id="thetable">
                     <thead>
                     <tr>
-                        {{--<th onclick="this===arguments[0].target && this.firstElementChild.click()">--}}
-                            {{--<input type="checkbox" onchange="this.checked?dtApi.rows().select():dtApi.rows().deselect()" id="selectAll"/>--}}
-                        {{--</th>--}}
                         <th>Asin</th>
                         <th>Site</th>
                         <th>Sku</th>
@@ -214,7 +210,6 @@ table.dataTable thead th, table.dataTable thead td {
                 processing: true,
                 ordering:  false,
                 //aoColumnDefs: [ { "bSortable": false, "aTargets": [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,21] }],
-                order: [],
                 columns: [
                     {data: 'asin', name: 'asin'},
                     {data: 'site', name: 'site'},

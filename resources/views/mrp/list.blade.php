@@ -22,8 +22,6 @@ table.dataTable thead th, table.dataTable thead td {
     <link rel="stylesheet" href="/js/chosen/chosen.min.css"/>
     <script src="/js/chosen/chosen.jquery.min.js"></script>
 
-    @include('frank.common')
-
     <div class="portlet light bordered">
         <div class="portlet-body">
             <form id="search-form">
