@@ -47,6 +47,16 @@
             height: 30px;
             border-radius: 5px !important;
         }
+
+        #archived-modal{
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%,-50%);
+            /*min-width:80%;!*这个比例可以自己按需调节*!*/
+            overflow: visible;
+            bottom: inherit;
+            right: inherit;
+        }
     </style>
     <div class="row">
         <div class="col-md-12">
@@ -133,7 +143,7 @@
                             <div style="width:220px; float:left">
                                 <div>归档状态</div>
                                 <select name="archived_status" id="archived_status" style="width:205px; height:30px">
-                                    <option value="">所有</option>
+                                    <option value="-1">所有</option>
                                     <option value="1">已归档</option>
                                     <option value="0">未归档</option>
                                 </select>
@@ -141,7 +151,7 @@
                             <div style="clear:both"></div>
                             <div style="height: 15px;"></div>
                             <div class="input-group">
-                                <input type="text" name="keyword" id="keyword" style="width: 360px; height: 29px" placeholder="输入产品名称" />
+                                <input type="text" name="keyword" id="keyword" style="width: 360px; height: 29px" placeholder="输入产品名称，项目编号 或者 SKU" />
                                 <button id="search" type="button" class="search-btn input-group-addon"><span><i class="fa fa-search"></i></span> 搜索</button>
                             </div>
 
@@ -160,8 +170,9 @@
                                     <th onclick="this===arguments[0].target && this.firstElementChild.click()">
                                         <input type="checkbox" onchange="this.checked?dtApi.rows().select():dtApi.rows().deselect()" id="selectAll"/>
                                     </th>
-                                    <th>项目ID</th>
-                                    <th>产品名称/SKU</th>
+                                    <th>产品名称</th>
+                                    <th>项目编号</th>
+                                    <th>SKU</th>
                                     <th>站点</th>
                                     <th>预计上线日期</th>
                                     <th>预计年销量</th>
@@ -176,7 +187,6 @@
                                     <th>最新修改日期</th>
                                     <th>归档状态</th>
                                     <th>操作</th>
-
                                 </tr>
                                 </thead>
                                 <tbody> </tbody>
@@ -200,7 +210,56 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="archived-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document" style="width:362px">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">归档</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="archive_form" action="{{ url('/roi_archive') }}" method="post">
+                        {{ csrf_field() }}
+                    <input type="hidden" id="roi_id" name="roi_id" value="" />
+                    <div>SKU</div>
+                    <input type="text" name="sku" style="width: 330px; height: 29px;" value="" />
+                    <div style="height: 10px;"></div>
+                    <div>预计上线时间</div>
+                    <div class="input-group">
+                        <span class="input-group-btn">
+                            <button class="btn btn-sm default time-btn" type="button">
+                                <i class="fa fa-calendar"></i>
+                            </button>
+                        </span>
+                        <input type="text" id="launch_time" name="launch_time" style="width: 298px; height: 29px;" disabled />
+                    </div>
+                    <div style="height: 10px;"></div>
+                    <div>新品规划流程</div>
+                    <input type="text" name="new_product_planning_process" style="width: 330px; height: 29px;" value="" />
+                    <div style="height: 30px;"></div>
+                    <div style="float: right;">
+                        <button type="submit" class="common-btn" id="" style="width: 80px">确定</button>
+                    </div>
+                    <div style="float: right;">
+                        <button type="button" class="common-btn" data-dismiss="modal" style="margin-right: 10px;">取消</button>
+                    </div>
+                    <div style="clear:both"></div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
     <script>
+
+        $('#archived-modal').on("show.bs.modal", function(e){
+            var launch_time = $(e.relatedTarget).data('launch_time');
+            var roi_id = $(e.relatedTarget).data('roi_id');
+            $('#launch_time').val(launch_time);
+            $('#roi_id').val(roi_id);
+
+        })
+
         $("#thetabletoolbar [id^='date']").each(function () {
 
             let defaults = {
@@ -226,7 +285,7 @@
                 pagingType: 'bootstrap_extended',
                 processing: true,
                 ordering:  true,
-                aoColumnDefs: [ { "bSortable": false, "aTargets": [0,2,3,4,5,6,7,8,9,10,11,13,15,16] }],
+                aoColumnDefs: [ { "bSortable": false, "aTargets": [0,1,2,3,4,5,6,7,8,9,10,11,12,14,16,17] }],
                 order: [],
                 select: {
                     style: 'os',
@@ -240,8 +299,10 @@
                         defaultContent: '',
                         className: 'select-checkbox', // 该类根据 tr:selected 改变自己的背景
                     },
-                    {data: 'roi_id', name: 'roi_id'},
-                    {data: 'product_name_sku', name: 'product_name_sku'},
+
+                    {data: 'product_name', name: 'product_name'},
+                    {data: 'project_code', name: 'project_code'},
+                    {data: 'sku', name: 'sku'},
                     {data: 'site', name: 'site'},
                     {data: 'estimated_launch_time', name: 'estimated_launch_time'},
                     {data: 'total_sales_volume', name: 'total_sales_volume'},
