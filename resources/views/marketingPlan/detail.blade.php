@@ -580,12 +580,13 @@
 		  });
 	}
 	$(document).ready(function(){
+		
 		//初始化获取asin和汇率的数据
 		function getInitalData(){
 			$.ajax({
 				type:"post",
 				url:"/marketingPlan/index1",
-				async: false,
+				async: true,
 				data:{
 					"sap_seller_id": sap_seller_id,
 				},
@@ -595,7 +596,8 @@
 					})
 					$.each(res[1], function (index, value) {
 						$('.rateSelect').append("<option value='"+value.id + "' rate='"+value.rate+"'>" + value.currency + "</option>");
-					})		
+					})
+					$('.rateSelect').val('1')
 				},
 				error:function(err){
 					$('.error_mask_text').text(err)
@@ -604,9 +606,11 @@
 						$('.error_mask').fadeOut(1000);
 					},2000)
 				},
-			}); 			
+			}); 
+						
 		}
 		getInitalData();
+		
 		if(ids == "null"){
 			clearInput();
 			$('.planStatus').attr("disabled",true);
@@ -713,7 +717,7 @@
 		
 		
 		$('#asin-select').select2({
-			tags:true,
+			tags:false,
 		});
 		$('#asin-select').on("change",function(e){
 			let asinId = $(this).val();
@@ -787,8 +791,18 @@
 			let date = year + '-' + month + '-' + day;
 			return date
 		}
+		function toDateVal(){
+			let oDate = new Date();
+			let year = oDate.getFullYear();
+			let month = oDate.getMonth()+1; 
+			let day = oDate.getDate() + 8;
+			month < 10 ? month = '0'+ month : month = month
+			day < 10 ? day = '0'+ day : day = day
+			let date = year + '-' + month + '-' + day;
+			return date
+		}
 		$('.fromDate').val(dateVal());
-		$('.toDate').val(dateVal());
+		$('.toDate').val(toDateVal());
 		
 		//日期1
 		$('.fromDate').on('change',function(){
@@ -869,8 +883,7 @@
 		
 		
 		/* ***********************************************计算*********************************************** */
-		//预计成本 = RSG预计成本 * RSG数量   (RSG预计成本 =（当前售价-物料成本-当前售价*亚马逊佣金率-拣配费-(RSG付款金额/(1+paypal佣金率））*汇率)
-		//
+		//预计成本 = RSG预计成本 * RSG数量   (RSG预计成本 = 物料成本+当前售价*亚马逊佣金率*汇率+拣配费+RSG付款/(1+paypal佣金率）*汇率)
 		function estSpendNum(){
 			let rsgPriceNum = $('.rsgPrice').val();//RSG金额
 			let ratingVal = $('.ratingVal').val();//当前售价
@@ -882,8 +895,8 @@
 			fulfillment == null ? fulfillment = 0 : fulfillment;//拣配费
 			commission == null ? commission = 0 : commission;//佣金比率
 			cost == null ? cost = 0 : cost; //物料成本
-			//let num = (ratingVal * ratVal - cost - ratingVal * ratVal * commission - fulfillment - rsgPriceNum / (1 + 0.026) * ratVal) * totalRsgNum;
-			let num = (ratingVal - cost - ratingVal * commission - fulfillment -(rsgPriceNum / (1 + 0.026)) * ratVal) * totalRsgNum;
+			//let num = (ratingVal - cost - ratingVal * commission - fulfillment -(rsgPriceNum / (1 + 0.026)) * ratVal) * totalRsgNum;
+			let num = (cost + ratingVal * commission * ratVal + fulfillment + rsgPriceNum / (1 + 0.026) * ratVal) * totalRsgNum;
 			num = num.toFixed(2)
 			$('.estSpend').text('￥' + num);
 		}

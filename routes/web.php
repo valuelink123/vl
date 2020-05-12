@@ -214,3 +214,9 @@ Route::get('/marketingPlan/index', 'MarketingPlanController@index')->name('marke
 Route::get('/marketingPlan/detail', 'MarketingPlanController@detail')->name('detail');
 //CollaborativeReplenishment
 Route::get('/collaborativeReplenishment/index', 'CollaborativeReplenishmentController@index')->name('index');
+
+//  Manage Distribute Time
+Route::get('/manageDistributeTime/safetyStockDays', 'ManageDistributeTimeController@safetyStockDays')->name('safetyStockDays');
+Route::get('/manageDistributeTime/fba', 'ManageDistributeTimeController@fba')->name('fba');
+Route::get('/manageDistributeTime/fbm', 'ManageDistributeTimeController@fbm')->name('fbm');
+Route::get('/manageDistributeTime/internationalTransportTime', 'ManageDistributeTimeController@internationalTransportTime')->name('internationalTransportTime');

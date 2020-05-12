@@ -393,6 +393,26 @@
 												        Collaborative Replenishment
 												        <span class="arrow"></span>
 												    </a>
+												</li>
+												<li class="dropdown-submenu ">
+												    <a href="" class="nav-link nav-toggle ">
+														Manage Distribute Time
+												       <span class="arrow"></span>
+												    </a>
+												    <ul class="dropdown-menu">
+												        <li class=" ">
+												            <a href="{{url('manageDistributeTime/safetyStockDays')}}" class="nav-link "> Safety Stock days </a>
+												        </li>
+												        <li class=" ">
+												            <a href="{{url('manageDistributeTime/fba')}}" class="nav-link "> FBA-FC Transfer time </a>
+												        </li>
+														<li class=" ">
+														    <a href="{{url('manageDistributeTime/fbm')}}" class="nav-link "> FBM-FBA Transfer time </a>
+														</li>
+														<li class=" ">
+														    <a href="{{url('manageDistributeTime/internationalTransportTime')}}" class="nav-link "> International transport Time </a>
+														</li>
+												    </ul>
 												</li> -->
                                             </ul>
                                         </li>
