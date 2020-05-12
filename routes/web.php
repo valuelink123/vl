@@ -220,6 +220,8 @@ Route::Post('/roi/updateRecord', 'RoiController@updateRecord');
 Route::Post('/roi/get', 'RoiController@get')->name('getRoi');
 //下载ROI列表。如果用/roi/export, 实际上是进入了resource里面的show动作：GET /roi/{id}
 Route::get('/roi_export', 'RoiController@export');
+Route::get('/roi_export_show_page', 'RoiController@exportShowPage');
+Route::Post('/roi_archive', 'RoiController@archive');
 
 Route::match(['post','get'],'/mrp', 'MrpController@index');
 Route::match(['post','get'],'/mrp/list', 'MrpController@list');
