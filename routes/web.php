@@ -208,7 +208,6 @@ Route::post('/hijack/hijackExport', 'hijack\\HijackController@hijackExport');//�
 //跟卖追踪 END
 
 
-
 //RSG MarketingPlan
 Route::get('/marketingPlan/index', 'MarketingPlanController@index')->name('marketingPlan');
 Route::get('/marketingPlan/detail', 'MarketingPlanController@detail')->name('detail');
@@ -223,9 +222,15 @@ Route::match(['post','get'],'/marketingPlan/achieveGoals', 'MarketingPlanControl
 Route::match(['post','get'],'/marketingPlan/delfiles', 'MarketingPlanController@delfiles');//删除图片
 Route::post('/marketingPlan/getAsinDailyReport', 'MarketingPlanController@getAsinDailyReport');
 
-
 //CollaborativeReplenishment
 Route::get('/collaborativeReplenishment/index', 'CollaborativeReplenishmentController@index')->name('index');
+
+//  Manage Distribute Time
+Route::get('/manageDistributeTime/safetyStockDays', 'ManageDistributeTimeController@safetyStockDays')->name('safetyStockDays');
+Route::get('/manageDistributeTime/fba', 'ManageDistributeTimeController@fba')->name('fba');
+Route::get('/manageDistributeTime/fbm', 'ManageDistributeTimeController@fbm')->name('fbm');
+Route::get('/manageDistributeTime/internationalTransportTime', 'ManageDistributeTimeController@internationalTransportTime')->name('internationalTransportTime');
+
 
 //投入产出分析
 Route::resource('roi', 'RoiController');
@@ -234,10 +239,15 @@ Route::Post('/roi/updateRecord', 'RoiController@updateRecord');
 Route::Post('/roi/get', 'RoiController@get')->name('getRoi');
 //下载ROI列表。如果用/roi/export, 实际上是进入了resource里面的show动作：GET /roi/{id}
 Route::get('/roi_export', 'RoiController@export');
+Route::get('/roi_export_show_page', 'RoiController@exportShowPage');
+Route::Post('/roi_archive', 'RoiController@archive');
 
 Route::match(['post','get'],'/mrp', 'MrpController@index');
 Route::match(['post','get'],'/mrp/list', 'MrpController@list');
 Route::get('/mrp/edit', 'MrpController@edit');
 Route::post('/mrp/update', 'MrpController@update');
 Route::get('/mrp/export', 'MrpController@export');
+
+Route::get('/mrp/asinexport', 'MrpController@asinExport');
 Route::post('/mrp/import', 'MrpController@import');
+

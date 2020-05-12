@@ -74,12 +74,10 @@ class RoiController extends Controller
 
     public function get(Request $request)
     {
-        $order_column = $request->input('order.0.column','1');
-        if($order_column == 1){
-            $orderby = 'id';
-        }else if($order_column == 12){
+        $order_column = $request->input('order.0.column','13');
+        if($order_column == 13){
             $orderby = 'created_at';
-        }else if($order_column == 14){
+        }else if($order_column == 15){
             $orderby = 'updated_at';
         }
 
@@ -110,9 +108,14 @@ class RoiController extends Controller
         if(isset($search['archived_status']) && $search['archived_status'] != '-1'){
             $data = $data->where('archived_status', $search['archived_status']);
         }
-        //目前keyword只查询产品名称
+        //
         if(isset($search['keyword']) && $search['keyword']){
-            $data = $data->where('product_name','like','%'.$search['keyword'].'%');
+            $keyword = $search['keyword'];
+            $data = $data->where(function ($query) use ($keyword) {
+                $query->where('product_name','like','%'.$keyword.'%')
+                    ->orWhere('sku','like','%'.$keyword.'%')
+                    ->orWhere('project_code','like','%'.$keyword.'%');
+            });
         }
 
         $iTotalRecords = $data->get()->count();
@@ -127,8 +130,11 @@ class RoiController extends Controller
 
         foreach ($lists as $key=>$list){
 
-            $lists[$key]['roi_id'] = $list['id'];
-            $lists[$key]['product_name_sku'] = '<div>'.$list['product_name'].'</div>'.'<div>'.$list['sku'].'</div>';
+            $show_url = url('roi/'.$list['id']);
+            $edit_url = url('roi/'.$list['id'].'/edit');
+
+            $lists[$key]['product_name'] = '<a href="' . $show_url . '" target="_blank">'.$list['product_name'].'</a>';
+            $lists[$key]['project_code'] = '<a href="' . $list['new_product_planning_process'] . '" target="_blank">'.$list['project_code'].'</a>';
             $lists[$key]['total_sales_volume'] = '<div style="text-align: right">'.$list['total_sales_volume'].'</div>';
             $lists[$key]['total_sales_amount'] = '<div style="text-align: right">'.round($list['total_sales_amount']).'</div>';
             $lists[$key]['capital_turnover'] = '<div style="text-align: right">'.$this->twoDecimal($list['capital_turnover']).'</div>';
@@ -140,26 +146,48 @@ class RoiController extends Controller
             $lists[$key]['updated_by'] = array_get($users,$list['updated_by']);
             $lists[$key]['updated_at'] = date('Y-m-d',strtotime($list['updated_at']));
             $lists[$key]['archived_status'] = $list['archived_status'] == 0 ? '未归档' : '已归档';
-            $edit_url = url('roi/'.$list['id']);
-            $show_url = url('roi/'.$list['id'].'/edit');
-            $lists[$key]['action'] = '<ul class="nav navbar-nav"><li><a href="#" class="dropdown-toggle" style="height:10px; vertical-align:middle; padding-top:0px;" data-toggle="dropdown" role="button">...</a><ul class="dropdown-menu" role="menu" style="background-color: #cccccc"><li><a href="' . $edit_url . '" >查看详情</a></li><li><a href="' . $show_url . '">编辑</a></li></ul></li></ul>';
+
+            $archived_item = $list['archived_status'] == 0 ? '<li><a style="text-align:center" href="#" data-toggle="modal" data-target="#archived-modal" data-roi_id="' . $list['id'] . '" data-launch_time="' .$list['estimated_launch_time'] .'" >归档</a></li>' : '';
+            $lists[$key]['action'] = '<ul class="nav navbar-nav"><li><a href="#" class="dropdown-toggle" style="height:10px; vertical-align:middle; padding-top:0px;" data-toggle="dropdown" role="button">...</a><ul class="dropdown-menu" style="min-width: 88px;" role="menu" style="color: #62c0cc8a"><li><a style="text-align:center" href="' . $show_url . '" >查看详情</a></li><li><a style="text-align:center" href="' . $edit_url . '">编辑</a></li>' . $archived_item . '</ul></li></ul>';
 //        <div>
 //            <ul class="nav navbar-nav">
 //                <li>
 //                    <a href="#" class="dropdown-toggle" style="height:10px; vertical-align:middle; padding-top:0px;" data-toggle="dropdown" role="button">...</a>
-//                    <ul class="dropdown-menu" role="menu" style="background-color: #cccccc">
-//                        <li><a href="{{ $edit_url }}">查看详情</a></li>
-//                        <li><a href="{{ $show_url }}">编辑</a></li>
+//                    <ul class="dropdown-menu" style="min-width: 100px;" role="menu" style="color: #cccccc">
+//                        <li><a style="text-align:center" href="{{ $edit_url }}">查看详情</a></li>
+//                        <li><a style="text-align:center" href="{{ $show_url }}">编辑</a></li>
+//                        <li><a style="text-align:center" href="#" data-toggle="modal" data-target="#archived-modal" data-roi_id="{{$list['id']}}" data-launch_time="{{$list['estimated_launch_time']}}">归档</a></li>
 //                    </ul>
 //                </li>
 //            </ul>
 //        </div>
         }
 
+
         $recordsTotal = $iTotalRecords;
         $recordsFiltered = $iTotalRecords;
         $data = $lists;
         return compact('data', 'recordsTotal', 'recordsFiltered');
+    }
+
+    public function archive(Request $request){
+        $roi_id = isset($_REQUEST['roi_id']) ? $_REQUEST['roi_id'] : '';
+        if($roi_id){
+            $updateDBData = array();
+//            $updateDBData['roi_id'] = $roi_id;
+            $updateDBData['sku'] = isset($_REQUEST['sku']) ? $_REQUEST['sku'] : '';
+            $updateDBData['new_product_planning_process'] = isset($_REQUEST['new_product_planning_process']) ? $_REQUEST['new_product_planning_process'] : '';
+            $updateDBData['archived_status'] = 1;
+
+            DB::beginTransaction();
+            if(!DB::connection('amazon')->table('roi')->where('id', '=', $roi_id)->update($updateDBData)){
+                $request->session()->flash('error_message','Update Failed.');
+                return redirect()->back()->withInput();
+            }else{
+                return redirect('roi');
+            }
+            DB::commit();
+        }
     }
 
     public function create(Request $request)
@@ -225,13 +253,317 @@ class RoiController extends Controller
 
     }
 
+    public function exportShowPage(Request $request){
+        $id = $_GET['id'];
+        $roi = $this->getCurrentRoi($id);
+        $roi = $this->showPageDataFormat($roi);
+
+        $output = '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />'.
+            '<style type="text/css">
+                div,table{
+                    font-size: 12px;
+                }
+                #sales_table{
+                    width:1501px;
+                    border: 1px solid #dddddd;
+                }
+                #sales_table th{
+                    text-align: left;
+                    height: 34px;
+                    padding-left: 12px;
+                }
+                #sales_table td{
+                    text-align: left;
+                    padding-left: 10px;
+                    height: 34px;
+                }
+                .result_div{
+                    width: 1501px;
+                    border: 0px solid #dddddd;
+                    background-color:#F5F7FA;
+                    padding: 20px;
+                }
+                #result_table, #params_cost_table{
+                    width:1481px;
+                    /*border：1px;*/
+                    border: 0px solid #dddddd;
+                }
+                #result_table td{
+                    text-align: left;
+                    height: 25px;
+                }
+                td input{
+                    width: 75px;
+                    height:22px;
+                    border: 0px solid #eeeeee;
+                }
+                .first_row_params input,select{
+                    width: 205px;
+                    height:26px;
+                }
+            </style>
+                <div style="height: 25px;"></div>
+                <div>
+                    <div style="font-size: 15px; float: left">投入产出表</div>
+                </div>
+                <div style="clear:both"></div>
+                <div style="height: 30px;"></div>
+                <div>
+                    <span style="padding-right: 20px;">产品名称: ' . $roi['product_name'] . '</span>
+                    <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                    <span style="padding-right: 20px">站点: ' . $roi['site'] . '</span>
+                    <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                    <span style="padding-right: 20px">预计上线时间: ' . $roi['estimated_launch_time'] . '</span>
+                    <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                    <span style="padding-right: 20px">SKU: ' . $roi['sku'] . '</span>
+                    <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                    <span style="padding-right: 20px">项目编号: ' . $roi['project_code'] . '</span>
+                    <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                    <span style="padding-right: 20px"><a href="' . $roi['new_product_planning_process'] . '" target="_blank">新品规划流程</a></span>
+                </div>
+                <div style="clear:both"></div>
+                <div style="height: 15px;"></div>
+                <div style="font-size:12px; color: #cccccc;">说明：下表的月份是从上市日起的次月起按第一个月算，以12个月为一个周期</div>
+                <div style="height: 5px;"></div>
+                <div>
+                    <table id="sales_table" border="1" cellspacing="0" cellpadding="0">
+                        <tr>
+                            <th colspan="2" width="200px" style="text-align: center">项目/时间</th>
+                            <th width="100px">' . $roi['month_1'] . '</th>
+                            <th width="100px">' . $roi['month_2'] . '</th>
+                            <th width="100px">' . $roi['month_3'] . '</th>
+                            <th width="100px">' . $roi['month_4'] . '</th>
+                            <th width="100px">' . $roi['month_5'] . '</th>
+                            <th width="100px">' . $roi['month_6'] . '</th>
+                            <th width="100px">' . $roi['month_7'] . '</th>
+                            <th width="100px">' . $roi['month_8'] . '</th>
+                            <th width="100px">' . $roi['month_9'] . '</th>
+                            <th width="100px">' . $roi['month_10'] . '</th>
+                            <th width="100px">' . $roi['month_11'] . '</th>
+                            <th width="100px">' . $roi['month_12'] . '</th>
+                            <th width="100px">合计</th>
+                        </tr>
+                        <tr>
+                            <td rowspan="4" style="padding-left: 0px; text-align: center">销售预测</td>
+                            <td style="padding-left: 10px; text-align: left">预计销量</td>
+                            <td><span>' . $roi['volume_month_1'] . '</span></td>
+                            <td><span>' . $roi['volume_month_2'] . '</span></td>
+                            <td><span>' . $roi['volume_month_3'] . '</span></td>
+                            <td><span>' . $roi['volume_month_4'] . '</span></td>
+                            <td><span>' . $roi['volume_month_5'] . '</span></td>
+                            <td><span>' . $roi['volume_month_6'] . '</span></td>
+                            <td><span>' . $roi['volume_month_7'] . '</span></td>
+                            <td><span>' . $roi['volume_month_8'] . '</span></td>
+                            <td><span>' . $roi['volume_month_9'] . '</span></td>
+                            <td><span>' . $roi['volume_month_10'] . '</span></td>
+                            <td><span>' . $roi['volume_month_11'] . '</span></td>
+                            <td><span>' . $roi['volume_month_12'] . '</span></td>
+                            <td><span>' . $roi['total_sales_volume'] . '</span></td>
+                        </tr>
+                        <tr>
+                            <td>售价（外币）</td>
+                            <td><span>' . $roi['price_fc_month_1'] .'</span></td>
+                            <td><span>' . $roi['price_fc_month_2'] .'</span></td>
+                            <td><span>' . $roi['price_fc_month_3'] .'</span></td>
+                            <td><span>' . $roi['price_fc_month_4'] .'</span></td>
+                            <td><span>' . $roi['price_fc_month_5'] .'</span></td>
+                            <td><span>' . $roi['price_fc_month_6'] .'</span></td>
+                            <td><span>' . $roi['price_fc_month_7'] .'</span></td>
+                            <td><span>' . $roi['price_fc_month_8'] .'</span></td>
+                            <td><span>' . $roi['price_fc_month_9'] .'</span></td>
+                            <td><span>' . $roi['price_fc_month_10'] .'</span></td>
+                            <td><span>' . $roi['price_fc_month_11'] .'</span></td>
+                            <td><span>' . $roi['price_fc_month_12'] .'</span></td>
+                            <td><span>' . $roi['average_price_fc'] .'</span></td>
+                        </tr>
+                        <tr>
+                            <td>售价RMB</td>
+                            <td><span>' . $roi['price_rmb_month_1'] .'</span></td>
+                            <td><span>' . $roi['price_rmb_month_2'] .'</span></td>
+                            <td><span>' . $roi['price_rmb_month_3'] .'</span></td>
+                            <td><span>' . $roi['price_rmb_month_4'] .'</span></td>
+                            <td><span>' . $roi['price_rmb_month_5'] .'</span></td>
+                            <td><span>' . $roi['price_rmb_month_6'] .'</span></td>
+                            <td><span>' . $roi['price_rmb_month_7'] .'</span></td>
+                            <td><span>' . $roi['price_rmb_month_8'] .'</span></td>
+                            <td><span>' . $roi['price_rmb_month_9'] .'</span></td>
+                            <td><span>' . $roi['price_rmb_month_10'] .'</span></td>
+                            <td><span>' . $roi['price_rmb_month_11'] .'</span></td>
+                            <td><span>' . $roi['price_rmb_month_12'] .'</span></td>
+                            <td><span>' . $roi['average_price_rmb'] .'</span></td>
+                        </tr>
+                        <tr>
+                            <td>销售金额</td>
+                            <td><span>' . $roi['sales_amount_month_1'] .'</span></td>
+                            <td><span>' . $roi['sales_amount_month_2'] .'</span></td>
+                            <td><span>' . $roi['sales_amount_month_3'] .'</span></td>
+                            <td><span>' . $roi['sales_amount_month_4'] .'</span></td>
+                            <td><span>' . $roi['sales_amount_month_5'] .'</span></td>
+                            <td><span>' . $roi['sales_amount_month_6'] .'</span></td>
+                            <td><span>' . $roi['sales_amount_month_7'] .'</span></td>
+                            <td><span>' . $roi['sales_amount_month_8'] .'</span></td>
+                            <td><span>' . $roi['sales_amount_month_9'] .'</span></td>
+                            <td><span>' . $roi['sales_amount_month_10'] .'</span></td>
+                            <td><span>' . $roi['sales_amount_month_11'] .'</span></td>
+                            <td><span>' . $roi['sales_amount_month_12'] .'</span></td>
+                            <td><span>' . $roi['total_sales_amount'] .'</span></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="padding-left: 0px; text-align: center">推广率</td>
+                            <td><span>' . $roi['promo_rate_month_1'] .'</span></td>
+                            <td><span>' . $roi['promo_rate_month_2'] .'</span></td>
+                            <td><span>' . $roi['promo_rate_month_3'] .'</span></td>
+                            <td><span>' . $roi['promo_rate_month_4'] .'</span></td>
+                            <td><span>' . $roi['promo_rate_month_5'] .'</span></td>
+                            <td><span>' . $roi['promo_rate_month_6'] .'</span></td>
+                            <td><span>' . $roi['promo_rate_month_7'] .'</span></td>
+                            <td><span>' . $roi['promo_rate_month_8'] .'</span></td>
+                            <td><span>' . $roi['promo_rate_month_9'] .'</span></td>
+                            <td><span>' . $roi['promo_rate_month_10'] .'</span></td>
+                            <td><span>' . $roi['promo_rate_month_11'] .'</span></td>
+                            <td><span>' . $roi['promo_rate_month_12'] .'</span></td>
+                            <td><span>' . $roi['average_promo_rate'] .'</span></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="padding-left: 0px; text-align: center">异常率</td>
+                            <td><span>' . $roi['exception_rate_month_1'] .'</span></td>
+                            <td><span>' . $roi['exception_rate_month_2'] .'</span></td>
+                            <td><span>' . $roi['exception_rate_month_3'] .'</span></td>
+                            <td><span>' . $roi['exception_rate_month_4'] .'</span></td>
+                            <td><span>' . $roi['exception_rate_month_5'] .'</span></td>
+                            <td><span>' . $roi['exception_rate_month_6'] .'</span></td>
+                            <td><span>' . $roi['exception_rate_month_7'] .'</span></td>
+                            <td><span>' . $roi['exception_rate_month_8'] .'</span></td>
+                            <td><span>' . $roi['exception_rate_month_9'] .'</span></td>
+                            <td><span>' . $roi['exception_rate_month_10'] .'</span></td>
+                            <td><span>' . $roi['exception_rate_month_11'] .'</span></td>
+                            <td><span>' . $roi['exception_rate_month_12'] .'</span></td>
+                            <td><span>' . $roi['average_exception_rate'] .'</span></td>
+                        </tr>
+                    </table>
+                </div>
+                <div style="clear:both"></div>
+                <div style="height: 25px;"></div>
+                <div class="result_div">
+                    <div style="font-size: 14px;">产品开发及供应链成本</div>
+                    <div style="height: 15px;"></div>
+                    <div style="width:1501px">
+                        <table id="params_cost_table" border="0" cellspacing="0" cellpadding="0">
+                            <tr>
+                                <td valign="top" width="750px">
+                                    <div>运输参数</div>
+                                    <div style="height: 7px;"></div>
+                                    <div>
+                                        <span style="padding-right: 20px">运输方式: ' . $roi['transport_mode'] . '</span>
+                                        <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                        <span style="padding-right: 20px">运输单价: ' . $roi['transport_unit_price'] . '</span>
+                                        <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                        <span style="padding-right: 20px">运输天数: ' . $roi['transport_days'] . '</span> 
+                                        <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                        <span style="padding-right: 20px">关税税率: ' . $roi['tariff_rate'] . '</span>
+                                    </div>
+                                    <div style="height: 15px;">&nbsp;</div>
+                                    <div>采购参数</div>
+                                    <div style="height: 7px;"></div>
+                                    <div>
+                                        <span style="padding-right: 20px">单PCS实重(KG): ' . $roi['weight_per_pcs'] . '</span>
+                                        <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                        <span style="padding-right: 20px">单PCS体积(cm<sup>3</sup>): ' . $roi['volume_per_pcs'] . '</span>
+                                        <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                        <span style="padding-right: 20px">不含税采购价: ' . $roi['purchase_price'] . '</span>
+                                        <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                        <span style="padding-right: 20px">MOQ(PCS): ' . $roi['moq'] . '</span>
+                                    </div>
+                                    <div style="height: 7px;"></div>
+                                    <div>供应商账期: ' . $roi['billing_period_type'] . '</div>
+
+
+                                </td>
+                                <td valign="top" width="750px">
+                                    <div>开发成本</div>
+                                    <div style="height: 15px;"></div>
+                                    <div>
+                                        <span style="padding-right: 20px">ID费用(元): ' . $roi['id_fee'] . '</span>
+                                        <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                        <span style="padding-right: 20px">模具费(元): ' . $roi['mold_fee'] . '</span>
+                                        <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                        <span style="padding-right: 20px">手板费(元): ' . $roi['prototype_fee'] . '</span>
+                                        <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                        <span style="padding-right: 20px">其他费用(元): ' . $roi['other_fixed_cost'] . '</span>
+                                    </div>
+                                    <div style="height: 15px;">&nbsp;</div>
+                                    <div>其他成本</div>
+                                    <div style="height: 15px;"></div>
+                                    <div>
+                                        <span style="padding-right: 20px">专利费(元): ' . $roi['royalty_fee'] . '</span>
+                                        <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                        <span style="padding-right: 20px">认证费(元): ' . $roi['certification_fee'] . '</span>
+                                    </div>
+                                    <div style="height: 15px;">&nbsp;</div>
+                                    <div>平台参数</div>
+                                    <div style="height: 15px;"></div>
+                                    <div>
+                                        <span style="padding-right: 20px">平台佣金(%): ' . $roi['commission_rate'] . '</span>
+                                        <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                        <span style="padding-right: 20px">平台操作费(外币/pcs): ' . $roi['unit_operating_fee'] . '</span>
+                                    </div>
+                                </td>
+
+                            </tr>
+
+                        </table>
+
+                    </div>
+                </div>
+                <div style="height: 30px;"></div>
+                <div class="result_div">
+                    <div style="font-size: 14px;">投入产出分析结果</div>
+
+                    <div style="height: 15px;"></div>
+                    <div style="width:1501px">
+                        <table id="result_table" border="0" cellspacing="0" cellpadding="0">
+                            <tr>
+                                <td width="25%">底线价格(外币/元): ' . $roi['price_floor'] . '</td>
+                                <td width="25%">库存周转天数(天): ' . $roi['inventory_turnover_days'] . '</td>
+                                <td width="25%">项目利润率(%): ' . $roi['project_profitability'] . '</td>
+                                <td width="25%">单PCS边际利润(元): ' . $roi['marginal_profit_per_pcs'] . '</td>
+                            </tr>
+                            <tr>
+                                <td>预计投资回收期(月): ' . $roi['estimated_payback_period'] . '</td>
+                                <td>资金周转次数(次): ' . $roi['capital_turnover'] . '</td>
+                                <td>投资回报率ROI(%): ' . $roi['roi'] . '</td>
+                                <td>投资回报额(万元): ' . $roi['return_amount'] . '</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+        ';
+
+        $mpdf = new \Mpdf\Mpdf(['mode' => 'utf-8', 'format' => 'A3', 'orientation' => 'L', 'tempDir' => '/tmp']);
+        //正确显示中文
+        $mpdf->autoScriptToLang = true;
+        $mpdf->autoLangToFont = true;
+
+        $mpdf->WriteHTML($output);
+        $mpdf->Output('ROI_Analysis.pdf', 'D');
+        die();
+    }
+
     public function edit(Request $request, $id)
     {
         $sites = $this->getSites();
         $billingPeriods = $this->getBillingPeriods();
         $transportModes = $this->getTransportModes();
         $roi = $this->getCurrentRoi($id);
-        return view('roi/edit',compact('sites','billingPeriods','transportModes', 'roi'));
+
+        $users = $this->getAllUsers();
+        $eh = explode(";",$roi['edit_history']);
+        $edit_history_array = array();
+        foreach(array_reverse($eh) as $key => $value){
+            $pair = explode(",",$value);
+            $edit_history_array[] = array('user_name'=>array_get($users, $pair[0]), 'updated_at'=>$pair[1]);
+        }
+        return view('roi/edit',compact('sites','billingPeriods','transportModes', 'roi', 'edit_history_array'));
     }
 
     public function getCurrentRoi($id){
@@ -282,11 +614,15 @@ class RoiController extends Controller
 
     public function show(Request $request, $id)
     {
-        $sites = $this->getSites();
+        $roi = $this->getCurrentRoi($id);
+        $roi = $this->showPageDataFormat($roi);
+
+        return view('roi/show', ['roi'=>$roi]);
+    }
+
+    public function showPageDataFormat($roi){
         $billingPeriods = $this->getBillingPeriods();
         $transportModes = $this->getTransportModes();
-        $roi_id = $id;
-        $roi = $this->getCurrentRoi($id);
         $transport_mode_int = $roi['transport_mode'];
         $roi['transport_mode'] = $transportModes[$transport_mode_int];
         $transport_unit = '<span>元/m<sup>3</sup></span>';
@@ -298,17 +634,18 @@ class RoiController extends Controller
         $estimated_launch_time = $roi['estimated_launch_time'];
         if($estimated_launch_time){
             $day = substr($estimated_launch_time,-2);
-            //$day <= 15
-            $year_month = substr($estimated_launch_time, 0,7);
-            if($day > 15){
-                $year_month = date("Y-m", strtotime("+1 months", strtotime($year_month)));
-            }
-            for($i=1; $i<=12; $i++){
-                $roi['month_'.$i] = $year_month;
+            if($day <= 15){
+                for($i=1; $i<=12; $i++){
+                    $roi['month_'.$i] = date("Y-m", strtotime("+".($i-1)." months", strtotime($estimated_launch_time)));
+                }
+            }else{
+                for($i=1; $i<=12; $i++){
+                    $roi['month_'.$i] = date("Y-m", strtotime("+".$i." months", strtotime($estimated_launch_time)));
+                }
             }
         }
 
-        return view('roi/show',compact('sites','billingPeriods','transportModes', 'roi_id', 'roi'));
+        return $roi;
     }
 
     public function store(Request $request){
@@ -693,6 +1030,9 @@ class RoiController extends Controller
         return User::where('locked', '=', 0)->where('sap_seller_id','>',0)->pluck('name','id');
     }
 
+    public function getAllUsers(){
+        return User::pluck('name','id');
+    }
 
 
 

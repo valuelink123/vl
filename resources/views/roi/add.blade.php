@@ -98,6 +98,7 @@
     <form id="roi_form" action="{{ url('roi') }}" method="post">
     {{ csrf_field() }}
     <div class="portlet light bordered">
+      <div style="width: 1502px; text-align: left; margin: auto;">
         <div style="height: 25px;"></div>
         <div style="font-size: 15px">投入产出表</div>
         <div style="height: 30px;"></div>
@@ -379,9 +380,9 @@
                 </div>
                 <div style="clear: both"></div>
                 <div style="height: 20px;"></div>
-                <div style="font-size: 13px">前期开发投入</div>
-                <div style="height: 10px;"></div>
-                <div style="display: block">
+                <div style="display: none">
+                    <div style="font-size: 13px">前期开发投入</div>
+                    <div style="height: 10px;"></div>
                     <div style="float:left; width: 328px;">
                         <div>项目起止时间</div>
                         <div class="pull-left">
@@ -420,12 +421,8 @@
                         <div>其他成本</div>
                         <input type="text" name="other_project_cost" id="other_project_cost" value="0"/>
                     </div>
+                    <div style="clear: both"></div>
                 </div>
-
-
-
-
-                <div style="clear: both"></div>
                 <div style="height: 30px;"></div>
                 {{--<div id="fold_icon" onclick="fold_cost_details()" style="font-size: 14px; color:#63C5D1; text-align: center;">收起 <i class="fa fa-angle-double-up"></i></div>--}}
                 <div style="font-size: 14px; color:#63C5D1; text-align: center;"><span onclick="fold_cost_details()">收起 <i class="fa fa-angle-double-up"></i></span></div>
@@ -465,6 +462,7 @@
         <div style="width: 1501px; text-align: center;">
             <button type="submit" class="commom-btn" style="width: 100px">保存</button>
         </div>
+      </div>
     </div>
     </form>
 </div>

@@ -8,6 +8,7 @@ use App\Accounts;
 use App\User;
 use App\Group;
 use App\AsinSalesPlan;
+use App\DailyStatistic;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Services\MultipleQueue;
@@ -52,9 +53,9 @@ class MrpController extends Controller
 		}
 		$seller_permissions = $this->getUserSellerPermissions();
 		foreach($seller_permissions as $key=>$val){
-			if($key=='bg') $where .=" and a.bg='$val'";
-			if($key=='bu') $where .=" and a.bu='$val'";
-			if($key=='sap_seller_id') $where .=" and a.sap_seller_id='$val'";
+			if($key=='bg' && $val) $where .=" and a.bg='$val'";
+			if($key=='bu' && $val) $where .=" and a.bu='$val'";
+			if($key=='sap_seller_id' && $val) $where .=" and a.sap_seller_id='$val'";
 		}
 		$orderby = $this->dtOrderBy($req);
 		$date_to = date('Y-m-d',strtotime('+'.$date.'days'));
@@ -80,7 +81,7 @@ class MrpController extends Controller
 		}
 		$date_from = date('Y-m-d',strtotime('+1 weeks monday'));
 		$date_to = date('Y-m-d',strtotime('+22 weeks sunday'));
-		$searchField = array('bg'=>'a.bg','bu'=>'a.bu','site'=>'a.marketplace_id','sku'=>'a.sku','sku_level'=>'a.status','sku_status'=>'a.skus_status','sku_level'=>'a.status','sap_seller_id'=>'a.sap_seller_id');
+		$searchField = array('bg'=>'a.bg','bu'=>'a.bu','site'=>'a.marketplace_id','sku'=>'a.sku','sku_level'=>'a.status','sku_status'=>'a.sku_status','sku_level'=>'a.status','sap_seller_id'=>'a.sap_seller_id');
 		
 		$where = $this->getSearchWhereSql($search,$searchField);
 
@@ -91,9 +92,9 @@ class MrpController extends Controller
 		}
 		$seller_permissions = $this->getUserSellerPermissions();
 		foreach($seller_permissions as $key=>$val){
-			if($key=='bg') $where .=" and a.bg='$val'";
-			if($key=='bu') $where .=" and a.bu='$val'";
-			if($key=='sap_seller_id') $where .=" and a.sap_seller_id='$val'";
+			if($key=='bg' && $val) $where .=" and a.bg='$val'";
+			if($key=='bu' && $val) $where .=" and a.bu='$val'";
+			if($key=='sap_seller_id' && $val) $where .=" and a.sap_seller_id='$val'";
 		}
 		$orderby = $this->dtOrderBy($req);
 		
@@ -137,9 +138,9 @@ class MrpController extends Controller
 		$seller_permissions = $this->getUserSellerPermissions();
 		$where='1=1';
 		foreach($seller_permissions as $key=>$val){
-			if($key=='bg') $where .=" and sap_seller_bg='$val'";
-			if($key=='bu') $where .=" and sap_seller_bu='$val'";
-			if($key=='sap_seller_id') $where .=" and sap_seller_id='$val'";
+			if($key=='bg' && $val) $where .=" and sap_seller_bg='$val'";
+			if($key=='bu' && $val) $where .=" and sap_seller_bu='$val'";
+			if($key=='sap_seller_id' && $val) $where .=" and sap_seller_id='$val'";
 		}
 		
 		if(!$asin){
@@ -157,7 +158,8 @@ class MrpController extends Controller
 			$keyword=$asin;
 		}
 		if(!$asin || !$sku){
-			die('No Data Match This Keywords');
+			$request->session()->flash('error_message','No Data Match This Keywords');
+            return redirect()->back()->withInput();
 		}
 		
 		$show = $request->get('show')??'day';
@@ -170,44 +172,50 @@ class MrpController extends Controller
 		$sku_info = DB::connection('amazon')->table('sap_sku_sites')->where('sku',$sku)->where('marketplace_id',$marketplace_id)->where('sap_factory_code',$sap_factory_code)->first();
 		$sales_plan=[];
 		if($show=='week'){
-			$sales_plan = AsinSalesPlan::selectRaw('asin_sales_plans.asin,asin_sales_plans.marketplace_id,asin_sales_plans.week_date as date,
-				any_value(asin_sales_plans.remark) as remark,
-				sum(asin_sales_plans.quantity_first) as plan_first,
-				sum(asin_sales_plans.quantity_last) as plan_last,
-				sum(symmetry_asins.quantity) as symmetry,
-				sum(c.sold) as sold,
-				IFNULL(any_value(c.stock),0) as stock')
-				->leftJoin('symmetry_asins',function($q){
-					$q->on('asin_sales_plans.asin', '=', 'symmetry_asins.asin')
-					->on('asin_sales_plans.marketplace_id', '=', 'symmetry_asins.marketplace_id')
-					->on('asin_sales_plans.date', '=', 'symmetry_asins.date');
-				})->leftJoin(DB::raw("(select asin,marketplace_id,date,sum(quantity_shipped) as sold,sum(afn_sellable+afn_reserved) as stock from daily_statistics group by asin,marketplace_id,date) as c"),function($q){
-					$q->on('asin_sales_plans.asin', '=', 'c.asin')
-					->on('asin_sales_plans.marketplace_id', '=', 'c.marketplace_id')
-					->on('asin_sales_plans.date', '=', 'c.date');
-				})->where('asin_sales_plans.asin',$asin)->where('asin_sales_plans.marketplace_id',$marketplace_id)->where('asin_sales_plans.date','>=',$date_from)->where('asin_sales_plans.date','<=',$date_to)->groupBy(['asin_sales_plans.asin','asin_sales_plans.marketplace_id','date'])->orderBy('date','asc')->get()->keyBy('date')->toArray();
-			$cur_date=date('Y-m-d',strtotime("$date Sunday"));
+			$asin_symmetrys = DB::connection('amazon')->table('symmetry_asins')->where('asin',$asin)->where('marketplace_id',$marketplace_id)->where('date','>=',$date_from)->where('date','<=',$date_to)->selectRaw('YEARWEEK(date,3) as wdate,sum(quantity) as quantity')->groupBy(['wdate'])->pluck('quantity','wdate');
+			$asin_historys = DailyStatistic::selectRaw('YEARWEEK(date,3) as wdate,sum(quantity_shipped) as sold,sum(afn_sellable+afn_reserved) as stock')->where('asin',$asin)->where('marketplace_id',$marketplace_id)->where('date','>=',$date_from)->where('date','<=',$date_to)->groupBy(['wdate'])->get()->keyBy('wdate')->toArray();
+			
+			$asin_plans = AsinSalesPlan::selectRaw('YEARWEEK(date,3) as wdate,sum(quantity_last) as quantity_last,sum(quantity_first) as quantity_first,any_value(remark) as remark')->where('asin',$asin)->where('marketplace_id',$marketplace_id)->where('date','>=',$date_from)->where('date','<=',$date_to)->groupBy(['wdate'])->get()->keyBy('wdate')->toArray();
+			$tmp_date_from = date('oW',strtotime($date_from));
+			$tmp_date_to = date('oW',strtotime($date_to));
+			$oW=0;
+			while($tmp_date_from<=$tmp_date_to){
+				$oW++;
+				$sales_plan[$tmp_date_from] = [
+					'symmetry'=>intval(array_get($asin_symmetrys,$tmp_date_from,0)),
+					'plan_first'=>intval(array_get($asin_plans,$tmp_date_from.'.quantity_first',0)),
+					'plan_last'=>intval(array_get($asin_plans,$tmp_date_from.'.quantity_last',0)),
+					'sold'=>intval(array_get($asin_historys,$tmp_date_from.'.sold',0)),
+					'stock'=>intval(array_get($asin_historys,$tmp_date_from.'.stock',0)),
+					'remark'=>array_get($asin_plans,$tmp_date_from.'.remark'),
+				];
+				$tmp_date_from = date('oW',strtotime($date_from.' +'.$oW.' week'));;
+			}
+			$cur_date=date('oW', time());
 		}elseif($show=='month'){
-			$sales_plan = AsinSalesPlan::selectRaw('asin_sales_plans.asin,asin_sales_plans.marketplace_id,left(asin_sales_plans.date,7) as date,
-				any_value(asin_sales_plans.remark) as remark,
-				sum(asin_sales_plans.quantity_first) as plan_first,
-				sum(asin_sales_plans.quantity_last) as plan_last,
-				sum(symmetry_asins.quantity) as symmetry,
-				sum(c.sold) as sold,
-				IFNULL(any_value(c.stock),0) as stock')
-				->leftJoin('symmetry_asins',function($q){
-					$q->on('asin_sales_plans.asin', '=', 'symmetry_asins.asin')
-					->on('asin_sales_plans.marketplace_id', '=', 'symmetry_asins.marketplace_id')
-					->on('asin_sales_plans.date', '=', 'symmetry_asins.date');
-				})->leftJoin(DB::raw("(select asin,marketplace_id,date,sum(quantity_shipped) as sold,sum(afn_sellable+afn_reserved) as stock from daily_statistics group by asin,marketplace_id,date) as c"),function($q){
-					$q->on('asin_sales_plans.asin', '=', 'c.asin')
-					->on('asin_sales_plans.marketplace_id', '=', 'c.marketplace_id')
-					->on('asin_sales_plans.date', '=', 'c.date');
-				})->where('asin_sales_plans.asin',$asin)->where('asin_sales_plans.marketplace_id',$marketplace_id)->where('asin_sales_plans.date','>=',$date_from)->where('asin_sales_plans.date','<=',$date_to)->groupBy(['asin_sales_plans.asin','asin_sales_plans.marketplace_id','date'])->orderBy('date','asc')->get()->keyBy('date')->toArray();
+			$asin_symmetrys = DB::connection('amazon')->table('symmetry_asins')->where('asin',$asin)->where('marketplace_id',$marketplace_id)->where('date','>=',$date_from)->where('date','<=',$date_to)->selectRaw("DATE_FORMAT(date,'%Y-%m') as wdate,sum(quantity) as quantity")->groupBy(['wdate'])->pluck('quantity','wdate');
+			$asin_historys = DailyStatistic::selectRaw("DATE_FORMAT(date,'%Y-%m') as wdate,sum(quantity_shipped) as sold,sum(afn_sellable+afn_reserved) as stock")->where('asin',$asin)->where('marketplace_id',$marketplace_id)->where('date','>=',$date_from)->where('date','<=',$date_to)->groupBy(['wdate'])->get()->keyBy('wdate')->toArray();
+			
+			$asin_plans = AsinSalesPlan::selectRaw("DATE_FORMAT(date,'%Y-%m') as wdate,sum(quantity_last) as quantity_last,sum(quantity_first) as quantity_first,any_value(remark) as remark")->where('asin',$asin)->where('marketplace_id',$marketplace_id)->where('date','>=',$date_from)->where('date','<=',$date_to)->groupBy(['wdate'])->get()->keyBy('wdate')->toArray();
+			
+			$tmp_date_from = date('Y-m',strtotime($date_from));
+			$tmp_date_to = date('Y-m',strtotime($date_to));
+			while($tmp_date_from<=$tmp_date_to){
+				$sales_plan[$tmp_date_from] = [
+					'symmetry'=>intval(array_get($asin_symmetrys,$tmp_date_from,0)),
+					'plan_first'=>intval(array_get($asin_plans,$tmp_date_from.'.quantity_first',0)),
+					'plan_last'=>intval(array_get($asin_plans,$tmp_date_from.'.quantity_last',0)),
+					'sold'=>intval(array_get($asin_historys,$tmp_date_from.'.sold',0)),
+					'stock'=>intval(array_get($asin_historys,$tmp_date_from.'.stock',0)),
+					'remark'=>array_get($asin_plans,$tmp_date_from.'.remark'),
+				];
+				$tmp_date_from = date('Y-m',strtotime($tmp_date_from.'-01 +1 month'));
+			}
 			$cur_date=date('Y-m');
 		}else{
 			$asin_symmetrys = DB::connection('amazon')->table('symmetry_asins')->where('asin',$asin)->where('marketplace_id',$marketplace_id)->where('date','>=',$date_from)->where('date','<=',$date_to)->pluck('quantity','date');
-			$asin_historys = DB::connection('amazon')->table('daily_statistics')->selectRaw('date,sum(quantity_shipped) as sold,sum(afn_sellable+afn_reserved) as stock')->where('asin',$asin)->where('marketplace_id',$marketplace_id)->where('date','>=',$date_from)->where('date','<=',$date_to)->groupBy(['date'])->get()->keyBy('date')->toArray();
+			$asin_historys = DailyStatistic::selectRaw('date,sum(quantity_shipped) as sold,sum(afn_sellable+afn_reserved) as stock')->where('asin',$asin)->where('marketplace_id',$marketplace_id)->where('date','>=',$date_from)->where('date','<=',$date_to)->groupBy(['date'])->get()->keyBy('date')->toArray();
+			
 			$asin_plans = AsinSalesPlan::where('asin',$asin)->where('marketplace_id',$marketplace_id)->where('date','>=',$date_from)->where('date','<=',$date_to)->get()->keyBy('date')->toArray();
 			
 			while($tmp_date_from<=$date_to){
@@ -250,7 +258,10 @@ class MrpController extends Controller
 						]
 					);
 		if($field=='quantity_last'){
-			if($data->quantity_first == 0) $data->quantity_first=$value;
+			if($data->quantity_first == 0){
+				$data->quantity_first=$value;
+				$return[$date.'--quantity_first'] = $value;
+			}
 			$data->save();
 			
 			$return[$asin] = AsinSalesPlan::selectRaw("sum(quantity_last) as quantity_last")->where('asin',$asin)->where('marketplace_id',$marketplace_id)->where('date','>=',$date_from)->where('date','<=',$date_to)->value('quantity_last');
@@ -265,7 +276,7 @@ class MrpController extends Controller
 		$search = $this->getSearchData(explode('&',$_SERVER['QUERY_STRING']));
 		$date_from = date('Y-m-d',strtotime('+1 weeks monday'));
 		$date_to = date('Y-m-d',strtotime('+22 weeks sunday'));
-		$searchField = array('bg'=>'a.bg','bu'=>'a.bu','site'=>'a.marketplace_id','sku'=>'a.sku','sku_level'=>'a.status','sku_status'=>'a.skus_status','sku_level'=>'a.status','sap_seller_id'=>'a.sap_seller_id');
+		$searchField = array('bg'=>'a.bg','bu'=>'a.bu','site'=>'a.marketplace_id','sku'=>'a.sku','sku_level'=>'a.status','sku_status'=>'a.sku_status','sku_level'=>'a.status','sap_seller_id'=>'a.sap_seller_id');
 		
 		$where = $this->getSearchWhereSql($search,$searchField);
 		
@@ -325,7 +336,98 @@ class MrpController extends Controller
         }
         die();
     }
+	
+	public function asinExport(Request $request)
+	{
+		$search = $this->getSearchData(explode('&',$_SERVER['QUERY_STRING']));
+		
+		$date = (intval(array_get($search,'date'))>0)?intval(array_get($search,'date')):90;
+		$searchField = array('bg'=>'a.bg','bu'=>'a.bu','site'=>'a.marketplace_id','sku'=>'a.sku','sku_level'=>'a.status','sku_status'=>'a.skus_status','sku_level'=>'a.status','sap_seller_id'=>'a.sap_seller_id');
+		
+		
+		$where = $this->getSearchWhereSql($search,$searchField);
 
+		if(array_get($search,'keyword')){
+			$where .=" and (a.asin='".array_get($search,'keyword')."' or a.sku='".array_get($search,'keyword')."')";
+		}
+		$seller_permissions = $this->getUserSellerPermissions();
+		foreach($seller_permissions as $key=>$val){
+			if($key=='bg' && $val) $where .=" and a.bg='$val'";
+			if($key=='bu' && $val) $where .=" and a.bu='$val'";
+			if($key=='sap_seller_id' && $val) $where .=" and a.sap_seller_id='$val'";
+		}
+		$date_to = date('Y-m-d',strtotime('+'.$date.'days'));
+		$date_from = date('Y-m-d');
+		$sql = $this->getSql($where,$date_from,$date_to);
+		$datas = DB::connection('amazon')->select($sql);
+		$datas = json_decode(json_encode($datas),true);
+		$data = [];
+        $headArray[] = 'Asin';
+        $headArray[] = 'Site';
+		$headArray[] = 'Sku';
+		$headArray[] = 'Status';
+		$headArray[] = 'Seller';
+		$headArray[] = 'D/Sales';
+        $headArray[] = 'TotalPlan';
+		
+		$headArray[] = 'FBAStock';
+		$headArray[] = 'FBAKeep';
+		$headArray[] = 'FBATran';
+        $headArray[] = 'FBMStock';
+		$headArray[] = 'TotalKeep';
+        $headArray[] = 'SZ';
+		$headArray[] = 'InMake';
+		$headArray[] = 'OutStock';
+		$headArray[] = 'OutStockDate';
+		$headArray[] = 'OverStock';
+        $headArray[] = 'OverStockDate';
+		$headArray[] = 'StockScore';
+        $headArray[] = 'Dist';
+        $data[] = $headArray;
+		
+		$siteCode = array_flip(getSiteCode());
+		$sellers = getUsers('sap_seller');
+		foreach ($datas as $key => $val) {
+			$key++;
+			$data[$key]['asin'] = $val['asin'];
+			$data[$key]['site'] = array_get($siteCode,$val['marketplace_id']);
+			$data[$key]['sku'] = $val['sku'];
+			$data[$key]['status'] = $val['status'];
+			$data[$key]['seller'] = array_get($sellers,$val['sap_seller_id']);
+			$data[$key]['daily_sales'] = round($val['daily_sales'],2);
+			$data[$key]['quantity'] = intval($val['quantity']);
+			$data[$key]['fba_stock'] = $val['afn_sellable']+$val['afn_reserved'];
+			$data[$key]['fba_stock_keep'] = 0;
+			$data[$key]['fba_transfer'] = 0;
+			$data[$key]['fbm_stock'] = 0;
+			$data[$key]['stock_keep'] = 0;
+			$data[$key]['sz'] = 0;
+			$data[$key]['in_make'] = 0;
+			$data[$key]['out_stock'] = 0;
+			$data[$key]['out_stock_date'] = 0;
+			$data[$key]['unsalable'] = 0;
+			$data[$key]['unsalable_date'] = 0;
+			$data[$key]['stock_score'] = 0;
+			$data[$key]['expected_distribution'] = 0;
+		}
+		if($data){
+            $spreadsheet = new Spreadsheet();
+
+            $spreadsheet->getActiveSheet()
+                ->fromArray(
+                    $data,  // The data to set
+                    NULL,        // Array values with this value will not be set
+                    'A1'         // Top left coordinate of the worksheet range where
+                //    we want to set these values (default is A1)
+                );
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');//告诉浏览器输出07Excel文件
+            header('Content-Disposition: attachment;filename="Export_Mrp.xlsx"');//告诉浏览器输出浏览器名称
+            header('Cache-Control: max-age=0');//禁止缓存
+            $writer = new Xlsx($spreadsheet);
+            $writer->save('php://output');
+        }
+        die();
+    }
 
 	public function getSql($where,$date_from,$date_to,$orderby='daily_sales desc')
 	{

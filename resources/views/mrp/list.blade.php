@@ -22,8 +22,6 @@ table.dataTable thead th, table.dataTable thead td {
     <link rel="stylesheet" href="/js/chosen/chosen.min.css"/>
     <script src="/js/chosen/chosen.jquery.min.js"></script>
 
-    @include('frank.common')
-
     <div class="portlet light bordered">
         <div class="portlet-body">
             <form id="search-form">
@@ -157,7 +155,7 @@ table.dataTable thead th, table.dataTable thead td {
                 <table class="table table-striped table-bordered" id="thetable">
                     <thead>
                     <tr>
-						<th>Seller</th>
+						<th> SellerName </th>
                         <th>Asin</th>
                         <th>Site</th>
                         <th>Sku</th>

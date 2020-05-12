@@ -338,12 +338,12 @@
                                                 </li>
 												@endpermission
 												@permission('fee-split-show')
-												{{--<li class="">--}}
-												    {{--<a href="/marketingPlan/index" class="nav-link nav-toggle ">--}}
-												        {{--Marketing Plan--}}
-												        {{--<span class="arrow"></span>--}}
-												    {{--</a>--}}
-												{{--</li>--}}
+												<li class="">
+												    <a href="/marketingPlan/index" class="nav-link nav-toggle ">
+												        Marketing Plan
+												        <span class="arrow"></span>
+												    </a>
+												</li>
 												@endpermission
 
                                             </ul>
@@ -389,13 +389,39 @@
                                                 </li>
 												@endpermission
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> dnn
 												<!-- <li class="">
 												    <a href="/collaborativeReplenishment/index" class="nav-link nav-toggle ">
 												        Collaborative Replenishment
 												        <span class="arrow"></span>
 												    </a>
+												</li>
+												<li class="dropdown-submenu ">
+												    <a href="" class="nav-link nav-toggle ">
+														Manage Distribute Time
+												       <span class="arrow"></span>
+												    </a>
+												    <ul class="dropdown-menu">
+												        <li class=" ">
+												            <a href="{{url('manageDistributeTime/safetyStockDays')}}" class="nav-link "> Safety Stock days </a>
+												        </li>
+												        <li class=" ">
+												            <a href="{{url('manageDistributeTime/fba')}}" class="nav-link "> FBA-FC Transfer time </a>
+												        </li>
+														<li class=" ">
+														    <a href="{{url('manageDistributeTime/fbm')}}" class="nav-link "> FBM-FBA Transfer time </a>
+														</li>
+														<li class=" ">
+														    <a href="{{url('manageDistributeTime/internationalTransportTime')}}" class="nav-link "> International transport Time </a>
+														</li>
+												    </ul>
 												</li> -->
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> dnn
 												<li class="">
                                                     <a href="/mrp/list" class="nav-link nav-toggle ">
                                                         Mrp
@@ -408,7 +434,10 @@
                                                         <span class="arrow"></span>
                                                     </a>
                                                 </li>
+<<<<<<< HEAD
 >>>>>>> master
+=======
+>>>>>>> dnn
                                             </ul>
                                         </li>
 
