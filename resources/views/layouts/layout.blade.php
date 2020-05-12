@@ -427,10 +427,6 @@
                                                         <span class="arrow"></span>
                                                     </a>
                                                 </li>
-<<<<<<< HEAD
->>>>>>> master
-=======
->>>>>>> dnn
                                             </ul>
                                         </li>
 
