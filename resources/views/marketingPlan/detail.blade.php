@@ -674,7 +674,7 @@
 					$('.remarks').val(res.marketing_plan.notes);
 					$('.currentRank1').text(res.marketing_plan.current_rank);
 					$('.currentCr1').text(Number(res.marketing_plan.current_cr).toFixed(2) + '%');
-					$('.currentSold1').text(Number(res.marketing_plan.current_units_day).toFixed(2));
+					$('.currentSold1').text(Math.round(res.marketing_plan.current_units_day));
 					$('.eValue').text('￥' + Number(res.marketing_plan.current_e_val).toFixed(2));
 					$('.estRoi60').text(Number(res.marketing_plan.current_60romi).toFixed(2) + '%');
 					$('.currentRank2').text(res.marketing_plan.actual_rankactual_rank);
@@ -739,8 +739,8 @@
 					$('.inventory').text(res.fba_stock);//FBA可用库存
 					$('.currentRank1').text(res.ranking);//当前排名
 					$('.currentCr1').text(res.conversion);//当前转化率
-					$('.currentSold1').text(res.avg_day_sales);//当前日均
-					$('.eValue').text(res.single_economic);//当前经济效益/个
+					$('.currentSold1').text(Math.round(res.avg_day_sales));//当前日均
+					$('.eValue').text(Number(res.single_economic).toFixed(2));//当前经济效益/个
 					//日均增长赋值
 					$('.dailyChange').text(dailyChangeNum($('.estSold').val(),$('.currentSold1').text()) + '%');
 					//预计经济效益增长/日赋值
@@ -795,7 +795,7 @@
 			let oDate = new Date();
 			let year = oDate.getFullYear();
 			let month = oDate.getMonth()+1; 
-			let day = oDate.getDate() + 8;
+			let day = oDate.getDate() + 7;
 			month < 10 ? month = '0'+ month : month = month
 			day < 10 ? day = '0'+ day : day = day
 			let date = year + '-' + month + '-' + day;
@@ -888,16 +888,17 @@
 			let rsgPriceNum = $('.rsgPrice').val();//RSG金额
 			let ratingVal = $('.ratingVal').val();//当前售价
 			let totalRsgNum = $('.totalRsg').text();//RSG数量
-			rsgPriceNum == null || rsgPriceNum == ""?rsgPriceNum=0:rsgPriceNum,
-			ratingVal == null || ratingVal == ""?ratingVal=0:ratingVal,
-			totalRsgNum == null || totalRsgNum == ""?totalRsgNum=0:totalRsgNum
-			ratVal == null ? ratVal = 0 : ratVal; //汇率
+			rsgPriceNum == null || rsgPriceNum == "" ? rsgPriceNum=0:rsgPriceNum,
+			ratingVal == null || ratingVal == "" ? ratingVal=0:ratingVal,
+			totalRsgNum == null || totalRsgNum == "" ? totalRsgNum=0:totalRsgNum
+			ratVal == null || ratVal == undefined ? ratVal = 7.0655 : ratVal; //汇率
 			fulfillment == null ? fulfillment = 0 : fulfillment;//拣配费
 			commission == null ? commission = 0 : commission;//佣金比率
 			cost == null ? cost = 0 : cost; //物料成本
 			//let num = (ratingVal - cost - ratingVal * commission - fulfillment -(rsgPriceNum / (1 + 0.026)) * ratVal) * totalRsgNum;
-			let num = (cost + ratingVal * commission * ratVal + fulfillment + rsgPriceNum / (1 + 0.026) * ratVal) * totalRsgNum;
-			num = num.toFixed(2)
+			let num = (Number(cost) + Number(ratingVal) * Number(commission) * Number(ratVal) + Number(fulfillment) + Number(rsgPriceNum) / (1 + 0.026) * Number(ratVal)) * Number(totalRsgNum);
+			num = num.toFixed(2);
+			isNaN(num) || num == "Infinity" || num == "-Infinity" ?  num = 0 :  num
 			$('.estSpend').text('￥' + num);
 		}
 		//RSG 数量 = 每日目标 * 数量
@@ -922,6 +923,7 @@
 		//日均增长 = （预计日均 - 当前日均 ）/ 当前日均 * 100
 		function dailyChangeNum(num1,num2){
 			let num =( Number(num1) - Number(num2) ) / Number(num2) * 100;
+			num = num.toFixed(2)
 			return isNaN(num) || num == "Infinity" || num == "-Infinity" ?  num = 0 :  num
 		}
 		
@@ -980,27 +982,230 @@
 		$('.estRoi60').text(estRoiNum($('.estAdded').text(),$('.estSpend').text(),60) + "%")
 		$('.estRoi120').text(estRoiNum($('.estAdded').text(),$('.estSpend').text(),120) + "%");
 		$('.save_submit').on('click',function(){
-			let goal= $('.rsgGoal').val();
-			let plan_status = $('.planStatus').val();
-			let marketplaceidVal,asinVal,fileList = [];
-			let str = $('.table-striped tbody tr td').find('.filesUrl');
-			for(var i=0;i<str.length;i++){
-				fileList.push(str[i].defaultValue)
-			}
-			ids == null ? ids = 0 : ids;	
-			if(ids == 'null'){
-				marketplaceidVal = $('#asin-select').find("option:selected").attr("id");
-				asinVal = $('#asin-select').val();
+			if($('.rsgGoal').val() == ""){
+				$('.error_mask_text').text('RSG 需求目的不能为空')
+				$('.error_mask').fadeIn(1000);
+				setTimeout(function(){
+					$('.error_mask').fadeOut(1000);
+				},2000)
+			}else if($('#asin-select').val() == '-1'){
+				$('.error_mask_text').text('ASIN不能为空')
+				$('.error_mask').fadeIn(1000);
+				setTimeout(function(){
+					$('.error_mask').fadeOut(1000);
+				},2000)
+			}else if($('.rateSelect').val() == '-1'){
+				$('.error_mask_text').text('货币类型不能为空')
+				$('.error_mask').fadeIn(1000);
+				setTimeout(function(){
+					$('.error_mask').fadeOut(1000);
+				},2000)
+			}else if($('.ratingVal').val() == ''){
+				$('.error_mask_text').text('当前售价不能为空')
+				$('.error_mask').fadeIn(1000);
+				setTimeout(function(){
+					$('.error_mask').fadeOut(1000);
+				},2000)
+			}else if($('.fromDate').val() == ''){
+				$('.error_mask_text').text('开始日期不能为空')
+				$('.error_mask').fadeIn(1000);
+				setTimeout(function(){
+					$('.error_mask').fadeOut(1000);
+				},2000)
+			}else if($('.rsgD').val() == ''){
+				$('.error_mask_text').text('每日目标不能为空')
+				$('.error_mask').fadeIn(1000);
+				setTimeout(function(){
+					$('.error_mask').fadeOut(1000);
+				},2000)
+			}else if($('.targetRating').val() == ''){
+				$('.error_mask_text').text('星级目标不能为空')
+				$('.error_mask').fadeIn(1000);
+				setTimeout(function(){
+					$('.error_mask').fadeOut(1000);
+				},2000)
+			}else if($('.toDate').val() == ''){
+				$('.error_mask_text').text('结束日期不能为空')
+				$('.error_mask').fadeIn(1000);
+				setTimeout(function(){
+					$('.error_mask').fadeOut(1000);
+				},2000)
+			}else if($('.targetUnitsSold').val() == ''){
+				$('.error_mask_text').text('数量目标不能为空')
+				$('.error_mask').fadeIn(1000);
+				setTimeout(function(){
+					$('.error_mask').fadeOut(1000);
+				},2000)
+			}else if($('.rsgPrice').val() == ''){
+				$('.error_mask_text').text('RSG付款金额不能为空')
+				$('.error_mask').fadeIn(1000);
+				setTimeout(function(){
+					$('.error_mask').fadeOut(1000);
+				},2000)
+			}else if($('.estRank').val() == ''){
+				$('.error_mask_text').text('预计排名不能为空')
+				$('.error_mask').fadeIn(1000);
+				setTimeout(function(){
+					$('.error_mask').fadeOut(1000);
+				},2000)
+			}else if($('.estCr').val() == ''){
+				$('.error_mask_text').text('预计转化率不能为空')
+				$('.error_mask').fadeIn(1000);
+				setTimeout(function(){
+					$('.error_mask').fadeOut(1000);
+				},2000)
+			}else if($('.estSold').val() == ''){
+				$('.error_mask_text').text('预计日均不能为空')
+				$('.error_mask').fadeIn(1000);
+				setTimeout(function(){
+					$('.error_mask').fadeOut(1000);
+				},2000)
+			}else if($('.estDay').val() == ''){
+				$('.error_mask_text').text('预计经济效益/个不能为空')
+				$('.error_mask').fadeIn(1000);
+				setTimeout(function(){
+					$('.error_mask').fadeOut(1000);
+				},2000)
 			}else{
-				asinVal = $('#select2-asin-select-container').text().substr($('#select2-asin-select-container').text().lastIndexOf('—') + 1);
-				marketplaceidVal = saveId;	
+				let goal= $('.rsgGoal').val();
+				let plan_status = $('.planStatus').val();
+				let marketplaceidVal,asinVal,fileList = [];
+				let str = $('.table-striped tbody tr td').find('.filesUrl');
+				for(var i=0;i<str.length;i++){
+					fileList.push(str[i].defaultValue)
+				}
+				ids == null ? ids = 0 : ids;	
+				if(ids == 'null'){
+					marketplaceidVal = $('#asin-select').find("option:selected").attr("id");
+					asinVal = $('#asin-select').val();
+				}else{
+					asinVal = $('#select2-asin-select-container').text().substr($('#select2-asin-select-container').text().lastIndexOf('—') + 1);
+					marketplaceidVal = saveId;	
+					$.ajax({
+						type:"post",
+						url:"/marketingPlan/updatePlan",
+						data:{
+							"sap_seller_id": sap_seller_id,
+							"id": ids,
+							"plan_status": plan_status
+						},
+						success:function(res){
+							if(res.status == 1){
+								$('.success_mask_text').text(res.msg)
+								$('.success_mask').fadeIn(1000);
+								setTimeout(function(){
+									$('.success_mask').fadeOut(1000);
+								},2000)	
+							}else{
+								$('.error_mask_text').text(res.msg)
+								$('.error_mask').fadeIn(1000);
+								setTimeout(function(){
+									$('.error_mask').fadeOut(1000);
+								},2000)
+							}
+						},
+						error:function(err){
+							$('.error_mask_text').text(err)
+							$('.error_mask').fadeIn(1000);
+							setTimeout(function(){
+								$('.error_mask').fadeOut(1000);
+							},2000)
+						},
+					});
+				}
+				let asin = asinVal;
+				let marketplaceid = marketplaceidVal;
+				let sku = $('.sku').text();
+				let sku_status = $('.skuStatus').text();
+				let sku_price = $('.ratingVal').val();
+				let currency_rates_id = $('.rateSelect').find("option:selected").attr("id");
+				let fba_stock = $('.inventory').text();
+				let rating = $('.star').text();
+				let reviews = $('.reviews').text();
+				let target_rating = $('.targetRating').val();
+				let target_reviews = $('.targetUnitsSold').val();
+				let fromDate = dateStr($('.fromDate').val());
+				let toDate = dateStr($('.toDate').val());
+				let rsg_price = $('.rsgPrice').val();
+				let rsg_d_target = $('.rsgD').val();
+				let rsg_total = $('.totalRsg').text();
+				let est_spend = strMoney($('.estSpend').text());
+				let est_rank = $('.estRank').val();
+				let est_cr = parseFloat($('.estCr').val());
+				let est_units_day = $('.estSold').val();
+				let est_val = $('.estDay').val();
+				let est_120d_romi = parseFloat($('.estRoi120').text());
+				let notes = $('.remarks').val();
+				let current_rank = $('.currentRank1').text();
+				let current_cr = $('.currentCr1').text();
+				let current_units_day = $('.currentSold1').text();
+				let current_e_val = $('.eValue').text();
+				let current_60romi = parseFloat($('.estRoi60').text());
+				let actual_rank = $('.currentRank2').text();
+				let actual_cr = parseFloat($('.currentCr2').text());
+				let actual_units_day = $('.currentSold2').text();
+				let actual_e_val = strMoney($('.eUnit').text());
+				let actual_60romi = parseFloat($('.estDay60').text());
+				let cr_increase = parseFloat($('.crChange').text());
+				let units_d_increase = parseFloat($('.dailyChange').text());
+				let val_d_increase = strMoney($('.estAdded').text());
+				let actual_spend = $('.actualSpend').val();
+				let investment_return_d = $('.investmentCycle1').text();
+				let cr_complete = parseFloat($('.conversionComplete').val());
+				let units_d_complete = parseFloat($('.dailyComplete').text());
+				let e_val_complete = parseFloat($('.eComplete').text());
+				let investment_return_c = $('.investmentCycle2').text();
 				$.ajax({
 					type:"post",
-					url:"/marketingPlan/updatePlan",
+					url:"/marketingPlan/addMarketingPlan",
 					data:{
-						"sap_seller_id": sap_seller_id,
 						"id": ids,
-						"plan_status": plan_status
+						"sap_seller_id": sap_seller_id,
+						"goal": goal,
+						"plan_status": plan_status,
+						"asin": asin,
+						"marketplaceid": marketplaceid,
+						"sku": sku,
+						"sku_status":sku_status,
+						"sku_price": sku_price,
+						"currency_rates_id": currency_rates_id,
+						"fba_stock": fba_stock,
+						"rating": rating,
+						"reviews": reviews,
+						"target_rating": target_rating,
+						"target_reviews": target_reviews,
+						"from_time": fromDate,
+						"to_time": toDate,
+						"rsg_price": rsg_price,
+						"rsg_d_target": rsg_d_target,
+						"rsg_total": rsg_total,
+						"est_spend": est_spend,
+						"est_rank": est_rank,
+						"est_cr": est_cr,
+						"est_units_day": est_units_day,
+						"est_val": est_val,
+						"est_120d_romi": est_120d_romi,
+						"notes": notes,
+						"current_rank": current_rank,
+						"current_cr": current_cr,
+						"current_units_day": current_units_day,
+						"current_e_val": current_e_val,
+						"current_60romi": current_60romi,
+						"actual_rank": actual_rank,
+						"actual_cr": actual_cr,
+						"actual_units_day": actual_units_day,
+						"actual_e_val": actual_e_val,
+						"actual_60romi": actual_60romi,
+						"cr_increase": cr_increase,
+						"units_d_increase": units_d_increase,
+						"val_d_increase": val_d_increase,
+						"actual_spend": actual_spend,
+						"investment_return_d": investment_return_d,
+						"cr_complete": cr_complete,
+						"units_d_complete": units_d_complete,
+						"e_val_complete": e_val_complete,
+						"investment_return_c": investment_return_c,
+						"files": fileList
 					},
 					success:function(res){
 						if(res.status == 1){
@@ -1008,7 +1213,12 @@
 							$('.success_mask').fadeIn(1000);
 							setTimeout(function(){
 								$('.success_mask').fadeOut(1000);
-							},2000)	
+							},2000);
+							if(res.id != null){
+								let urlId = res.id;
+								window.location.href = "?id=" + urlId
+							}
+						
 						}else{
 							$('.error_mask_text').text(res.msg)
 							$('.error_mask').fadeIn(1000);
@@ -1018,7 +1228,7 @@
 						}
 					},
 					error:function(err){
-						$('.error_mask_text').text(err)
+						$('.error_mask_text').text(err.statusText)
 						$('.error_mask').fadeIn(1000);
 						setTimeout(function(){
 							$('.error_mask').fadeOut(1000);
@@ -1026,128 +1236,6 @@
 					},
 				});
 			}
-			let asin = asinVal;
-			let marketplaceid = marketplaceidVal;
-			let sku = $('.sku').text();
-			let sku_status = $('.skuStatus').text();
-			let sku_price = $('.ratingVal').val();
-			let currency_rates_id = $('.rateSelect').find("option:selected").attr("id");
-			let fba_stock = $('.inventory').text();
-			let rating = $('.star').text();
-			let reviews = $('.reviews').text();
-			let target_rating = $('.targetRating').val();
-			let target_reviews = $('.targetUnitsSold').val();
-			let fromDate = dateStr($('.fromDate').val());
-			let toDate = dateStr($('.toDate').val());
-			let rsg_price = $('.rsgPrice').val();
-			let rsg_d_target = $('.rsgD').val();
-			let rsg_total = $('.totalRsg').text();
-			let est_spend = strMoney($('.estSpend').text());
-			let est_rank = $('.estRank').val();
-			let est_cr = parseFloat($('.estCr').val());
-			let est_units_day = $('.estSold').val();
-			let est_val = $('.estDay').val();
-			let est_120d_romi = parseFloat($('.estRoi120').text());
-			let notes = $('.remarks').val();
-			let current_rank = $('.currentRank1').text();
-			let current_cr = $('.currentCr1').text();
-			let current_units_day = $('.currentSold1').text();
-			let current_e_val = $('.eValue').text();
-			let current_60romi = parseFloat($('.estRoi60').text());
-			let actual_rank = $('.currentRank2').text();
-			let actual_cr = parseFloat($('.currentCr2').text());
-			let actual_units_day = $('.currentSold2').text();
-			let actual_e_val = strMoney($('.eUnit').text());
-			let actual_60romi = parseFloat($('.estDay60').text());
-			let cr_increase = parseFloat($('.crChange').text());
-			let units_d_increase = parseFloat($('.dailyChange').text());
-			let val_d_increase = strMoney($('.estAdded').text());
-			let actual_spend = $('.actualSpend').val();
-			let investment_return_d = $('.investmentCycle1').text();
-			let cr_complete = parseFloat($('.conversionComplete').val());
-			let units_d_complete = parseFloat($('.dailyComplete').text());
-			let e_val_complete = parseFloat($('.eComplete').text());
-			let investment_return_c = $('.investmentCycle2').text();
-			$.ajax({
-				type:"post",
-				url:"/marketingPlan/addMarketingPlan",
-				data:{
-					"id": ids,
-					"sap_seller_id": sap_seller_id,
-					"goal": goal,
-					"plan_status": plan_status,
-					"asin": asin,
-					"marketplaceid": marketplaceid,
-					"sku": sku,
-					"sku_status":sku_status,
-					"sku_price": sku_price,
-					"currency_rates_id": currency_rates_id,
-					"fba_stock": fba_stock,
-					"rating": rating,
-					"reviews": reviews,
-					"target_rating": target_rating,
-					"target_reviews": target_reviews,
-					"from_time": fromDate,
-					"to_time": toDate,
-					"rsg_price": rsg_price,
-					"rsg_d_target": rsg_d_target,
-					"rsg_total": rsg_total,
-					"est_spend": est_spend,
-					"est_rank": est_rank,
-					"est_cr": est_cr,
-					"est_units_day": est_units_day,
-					"est_val": est_val,
-					"est_120d_romi": est_120d_romi,
-					"notes": notes,
-					"current_rank": current_rank,
-					"current_cr": current_cr,
-					"current_units_day": current_units_day,
-					"current_e_val": current_e_val,
-					"current_60romi": current_60romi,
-					"actual_rank": actual_rank,
-					"actual_cr": actual_cr,
-					"actual_units_day": actual_units_day,
-					"actual_e_val": actual_e_val,
-					"actual_60romi": actual_60romi,
-					"cr_increase": cr_increase,
-					"units_d_increase": units_d_increase,
-					"val_d_increase": val_d_increase,
-					"actual_spend": actual_spend,
-					"investment_return_d": investment_return_d,
-					"cr_complete": cr_complete,
-					"units_d_complete": units_d_complete,
-					"e_val_complete": e_val_complete,
-					"investment_return_c": investment_return_c,
-					"files": fileList
-				},
-				success:function(res){
-					if(res.status == 1){
-						$('.success_mask_text').text(res.msg)
-						$('.success_mask').fadeIn(1000);
-						setTimeout(function(){
-							$('.success_mask').fadeOut(1000);
-						},2000);
-						if(res.id != null){
-							let urlId = res.id;
-							window.location.href = "?id=" + urlId
-						}
-					
-					}else{
-						$('.error_mask_text').text(res.msg)
-						$('.error_mask').fadeIn(1000);
-						setTimeout(function(){
-							$('.error_mask').fadeOut(1000);
-						},2000)
-					}
-				},
-				error:function(err){
-					$('.error_mask_text').text(err.statusText)
-					$('.error_mask').fadeIn(1000);
-					setTimeout(function(){
-						$('.error_mask').fadeOut(1000);
-					},2000)
-				},
-			});
 			
 		}) 
 		
