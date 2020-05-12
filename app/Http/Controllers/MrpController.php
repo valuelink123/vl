@@ -81,7 +81,7 @@ class MrpController extends Controller
 		}
 		$date_from = date('Y-m-d',strtotime('+1 weeks monday'));
 		$date_to = date('Y-m-d',strtotime('+22 weeks sunday'));
-		$searchField = array('bg'=>'a.bg','bu'=>'a.bu','site'=>'a.marketplace_id','sku'=>'a.sku','sku_level'=>'a.status','sku_status'=>'a.skus_status','sku_level'=>'a.status','sap_seller_id'=>'a.sap_seller_id');
+		$searchField = array('bg'=>'a.bg','bu'=>'a.bu','site'=>'a.marketplace_id','sku'=>'a.sku','sku_level'=>'a.status','sku_status'=>'a.sku_status','sku_level'=>'a.status','sap_seller_id'=>'a.sap_seller_id');
 		
 		$where = $this->getSearchWhereSql($search,$searchField);
 
@@ -172,22 +172,11 @@ class MrpController extends Controller
 		$sku_info = DB::connection('amazon')->table('sap_sku_sites')->where('sku',$sku)->where('marketplace_id',$marketplace_id)->where('sap_factory_code',$sap_factory_code)->first();
 		$sales_plan=[];
 		if($show=='week'){
-			$sales_plan = AsinSalesPlan::selectRaw('asin_sales_plans.asin,asin_sales_plans.marketplace_id,asin_sales_plans.week_date as date,
-				any_value(asin_sales_plans.remark) as remark,
-				sum(asin_sales_plans.quantity_first) as plan_first,
-				sum(asin_sales_plans.quantity_last) as plan_last,
-				sum(symmetry_asins.quantity) as symmetry,
-				sum(c.sold) as sold,
-				IFNULL(any_value(c.stock),0) as stock')
-				->leftJoin('symmetry_asins',function($q){
-					$q->on('asin_sales_plans.asin', '=', 'symmetry_asins.asin')
-					->on('asin_sales_plans.marketplace_id', '=', 'symmetry_asins.marketplace_id')
-					->on('asin_sales_plans.date', '=', 'symmetry_asins.date');
-				})->leftJoin(DB::raw("(select asin,marketplace_id,date,sum(quantity_shipped) as sold,sum(afn_sellable+afn_reserved) as stock from daily_statistics group by asin,marketplace_id,date) as c"),function($q){
-					$q->on('asin_sales_plans.asin', '=', 'c.asin')
-					->on('asin_sales_plans.marketplace_id', '=', 'c.marketplace_id')
-					->on('asin_sales_plans.date', '=', 'c.date');
-				})->where('asin_sales_plans.asin',$asin)->where('asin_sales_plans.marketplace_id',$marketplace_id)->where('asin_sales_plans.date','>=',$date_from)->where('asin_sales_plans.date','<=',$date_to)->groupBy(['asin_sales_plans.asin','asin_sales_plans.marketplace_id','date'])->orderBy('date','asc')->get()->keyBy('date')->toArray();
+			$asin_symmetrys = DB::connection('amazon')->table('symmetry_asins')->where('asin',$asin)->where('marketplace_id',$marketplace_id)->where('date','>=',$date_from)->where('date','<=',$date_to)->selectRaw('YEARWEEK(date) as date,sum(quantity) as quantity')->groupBy(['date'])->pluck('quantity','date');
+			$asin_historys = DailyStatistic::selectRaw('YEARWEEK(date) as date,sum(quantity_shipped) as sold,sum(afn_sellable+afn_reserved) as stock')->where('asin',$asin)->where('marketplace_id',$marketplace_id)->where('date','>=',$date_from)->where('date','<=',$date_to)->groupBy(['date'])->get()->keyBy('date')->toArray();
+			
+			$asin_plans = AsinSalesPlan::selectRaw('YEARWEEK(date) as date,sum(quantity_last) as quantity_last,sum(quantity_first) as quantity_first,any_value(remark) as remark')->where('asin',$asin)->where('marketplace_id',$marketplace_id)->where('date','>=',$date_from)->where('date','<=',$date_to)->groupBy(['date'])->get()->keyBy('date')->toArray();
+		
 			$cur_date=date('Y-m-d',strtotime("$date Sunday"));
 		}elseif($show=='month'){
 			$sales_plan = AsinSalesPlan::selectRaw('asin_sales_plans.asin,asin_sales_plans.marketplace_id,left(asin_sales_plans.date,7) as date,
@@ -268,7 +257,7 @@ class MrpController extends Controller
 		$search = $this->getSearchData(explode('&',$_SERVER['QUERY_STRING']));
 		$date_from = date('Y-m-d',strtotime('+1 weeks monday'));
 		$date_to = date('Y-m-d',strtotime('+22 weeks sunday'));
-		$searchField = array('bg'=>'a.bg','bu'=>'a.bu','site'=>'a.marketplace_id','sku'=>'a.sku','sku_level'=>'a.status','sku_status'=>'a.skus_status','sku_level'=>'a.status','sap_seller_id'=>'a.sap_seller_id');
+		$searchField = array('bg'=>'a.bg','bu'=>'a.bu','site'=>'a.marketplace_id','sku'=>'a.sku','sku_level'=>'a.status','sku_status'=>'a.sku_status','sku_level'=>'a.status','sap_seller_id'=>'a.sap_seller_id');
 		
 		$where = $this->getSearchWhereSql($search,$searchField);
 		
