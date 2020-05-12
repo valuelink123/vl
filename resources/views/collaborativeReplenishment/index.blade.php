@@ -461,10 +461,10 @@
 				//let checkedBox = $("input[name='checkedInput']:checked");
 			});  
 			//单条选中
-			$("body").on('change','.checkbox-item',function(){
+			$("body").on('change','.checkbox-item',function(e){
 				var $subs = $("input[name='checkedInput']");
 			    $("#selectAll").prop("checked" , $subs.length == $subs.filter(":checked").length ? true :false); 
-				//let checkedBox = $subs.filter(":checked");
+				e.cancelBubble=true;
 			});
 			//时间选择器
 			$('.date-picker').datepicker({
@@ -674,11 +674,15 @@
 					}
 				],
 				"fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {  //行回调函数
+				console.log(nRow);
+					/* if(){
+						
+					}
 					$(nRow).on( 'click', function () {
 						console.log(aData.id);
 						$('.mask_box').show();
-						$('.formId').val(aData.id)
-					});
+						$('.formId').val(aData.id);
+					}); */
 				},
 				columns: [
 					{
