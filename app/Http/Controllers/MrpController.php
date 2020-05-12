@@ -258,7 +258,10 @@ class MrpController extends Controller
 						]
 					);
 		if($field=='quantity_last'){
-			if($data->quantity_first == 0) $data->quantity_first=$value;
+			if($data->quantity_first == 0){
+				$data->quantity_first=$value;
+				$return[$date.'--quantity_first'] = $value;
+			}
 			$data->save();
 			
 			$return[$asin] = AsinSalesPlan::selectRaw("sum(quantity_last) as quantity_last")->where('asin',$asin)->where('marketplace_id',$marketplace_id)->where('date','>=',$date_from)->where('date','<=',$date_to)->value('quantity_last');

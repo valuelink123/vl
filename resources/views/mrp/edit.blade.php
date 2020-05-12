@@ -303,7 +303,7 @@ white-space: nowrap;
 					  		<tr class="{{ ($k>=$cur_date)?'asin_sales_line_plan':''}}">
 								<td>{{$k}}</td>
 								<td>{{$v['symmetry']}}</td>
-								<td>{{$v['plan_first']}}</td>
+								<td id="{{$k}}--quantity_first">{{$v['plan_first']}}</td>
 								
 								<td>
 								<?php
