@@ -383,6 +383,7 @@ class MarketingPlanController extends Controller
      */
     public function rsgList(Request $request)
     {
+        $SKU_STATUS_KV= Asin::SKU_STATUS_KV;
         $DOMIN_MARKETPLACEID_SX = Asin::DOMIN_MARKETPLACEID_SX;
         $DOMIN_MARKETPLACEID_URL = Asin::DOMIN_MARKETPLACEID_URL;
         $ADMIN_EMAIL=Asin::ADMIN_EMAIL;
@@ -510,6 +511,7 @@ class MarketingPlanController extends Controller
                 $rsgList[$k]['type']='RSG';
                 $rsgList[$k]['toUrl']=$DOMIN_MARKETPLACEID_URL[$v['marketplaceid']];
                 $rsgList[$k]['station']=$DOMIN_MARKETPLACEID_SX[$v['marketplaceid']];
+                $rsgList[$k]['sku_status']=$SKU_STATUS_KV[$v['sku_status']];
 
                 if(!empty($v['images'])){
                     $rsgList[$k]['image']=explode(',',$v['images'])[0];
