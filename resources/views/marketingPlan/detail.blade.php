@@ -652,6 +652,7 @@
 					$('.planStatus').val(res.marketing_plan.plan_status);
 					$("#asin-select").val(res.marketing_plan.asin);
 					$('.sku').text(res.marketing_plan.sku);
+					
 					$('.skuStatus').text(res.marketing_plan.sku_status);
 					$('.ratingVal').val(res.marketing_plan.sku_price);
 					$("#select2-asin-select-container").text(res.marketing_plan.country + '—'+res.marketing_plan.asin);
@@ -693,7 +694,8 @@
 					$('.investmentCycle2').text(Number(res.marketing_plan.investment_return_c));
 
 					let strHtml="";
-					if(res.marketing_plan.files != ''){
+					if(res.marketing_plan.files != null){
+						
 						let fileArray = res.marketing_plan.files.split(",");
 						$(fileArray).each(function(index,item){
 							item+=''
@@ -722,11 +724,6 @@
 		$('#asin-select').on("change",function(e){
 			let asinId = $(this).val();
 			let id = $(this).find("option:selected").attr("id");
-
-			$('.sku').text($(this).find("option:selected").attr("sku"));
-			$('.skuStatus').text($(this).find("option:selected").attr("sku_status"));
-			$('.star').text($(this).find("option:selected").attr("rating"));
-			$('.reviews').text($(this).find("option:selected").attr("reviews"));
 			$.ajax({
 				type:"post",
 				url:"/marketingPlan/getAsinDailyReport",
@@ -740,6 +737,10 @@
 					$('.currentRank1').text(res.ranking);//当前排名
 					$('.currentCr1').text(res.conversion);//当前转化率
 					$('.currentSold1').text(Math.round(res.avg_day_sales));//当前日均
+					$('.star').text(res.rating);
+					$('.skuStatus').text(res.sku_status);
+					$('.sku').text(res.sku);
+					$('.reviews').text(res.reviews);
 					$('.eValue').text(Number(res.single_economic).toFixed(2));//当前经济效益/个
 					//日均增长赋值
 					$('.dailyChange').text(dailyChangeNum($('.estSold').val(),$('.currentSold1').text()) + '%');
