@@ -227,3 +227,17 @@ Route::post('/marketingPlan/getAsinDailyReport', 'MarketingPlanController@getAsi
 //CollaborativeReplenishment
 Route::get('/collaborativeReplenishment/index', 'CollaborativeReplenishmentController@index')->name('index');
 
+//投入产出分析
+Route::resource('roi', 'RoiController');
+Route::Post('/roi/analyse', 'RoiController@analyse')->name('roiAnalyse');
+Route::Post('/roi/updateRecord', 'RoiController@updateRecord');
+Route::Post('/roi/get', 'RoiController@get')->name('getRoi');
+//下载ROI列表。如果用/roi/export, 实际上是进入了resource里面的show动作：GET /roi/{id}
+Route::get('/roi_export', 'RoiController@export');
+
+Route::match(['post','get'],'/mrp', 'MrpController@index');
+Route::match(['post','get'],'/mrp/list', 'MrpController@list');
+Route::get('/mrp/edit', 'MrpController@edit');
+Route::post('/mrp/update', 'MrpController@update');
+Route::get('/mrp/export', 'MrpController@export');
+Route::post('/mrp/import', 'MrpController@import');

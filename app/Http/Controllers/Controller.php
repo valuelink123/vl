@@ -194,4 +194,13 @@ class Controller extends BaseController
 		}
 		return $rules_array;
 	}
+	
+	public function getUserSellerPermissions(){
+		$userRole = User::find(Auth::user()->id)->roles->pluck('id')->toArray();
+		if(in_array(28,$userRole)) return ['bg'=>Auth::user()->ubg];
+		if(in_array(15,$userRole)) return ['bg'=>Auth::user()->ubg,'bu'=>Auth::user()->ubu];
+		if(in_array(16,$userRole)) return ['bg'=>Auth::user()->ubg,'bu'=>Auth::user()->ubu];
+		return ['sap_seller_id'=>intval(Auth::user()->sap_seller_id)];
+	}
+	
 }

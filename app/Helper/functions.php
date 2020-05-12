@@ -503,6 +503,19 @@ function getSapFactoryCode(){
 	);
 }
 
+function MptoFc(){
+	return array(
+		'ATVPDKIKX0DER'  => 'US01',
+		'A2EUQ1WTGCTBG2'  => 'CA01',
+		'A1PA6795UKMFR9'  => 'GR01',
+		'A13V1IB3VIYZZH'  => 'FR01',
+		'APJ6JRA9NG5V4'  => 'IT01',
+		'A1RKKUPIHCS9HS'  => 'ES01',
+		'A1F83G8C2ARO7P'  => 'UK01',
+		'A1VC38T7YXB528'  => 'JP01'
+	);
+}
+
 function getStepStatus(){
 	return array(
 		'1'  => 'Check Customer',
@@ -542,6 +555,9 @@ function matchMarketplaceSiteCode(){
 		'A1VC38T7YXB528'  => '1014'
 	);
 }
+
+
+
 
 //批量添加數據，可避免唯一鍵冲突时报错
 function batchInsert($table,$data){

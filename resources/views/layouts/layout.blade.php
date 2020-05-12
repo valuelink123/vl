@@ -338,12 +338,12 @@
                                                 </li>
 												@endpermission
 												@permission('fee-split-show')
-												<li class="">
-												    <a href="/marketingPlan/index" class="nav-link nav-toggle ">
-												        Marketing Plan
-												        <span class="arrow"></span>
-												    </a>
-												</li>
+												{{--<li class="">--}}
+												    {{--<a href="/marketingPlan/index" class="nav-link nav-toggle ">--}}
+												        {{--Marketing Plan--}}
+												        {{--<span class="arrow"></span>--}}
+												    {{--</a>--}}
+												{{--</li>--}}
 												@endpermission
 
                                             </ul>
@@ -388,12 +388,27 @@
                                                     </a>
                                                 </li>
 												@endpermission
+<<<<<<< HEAD
 												<!-- <li class="">
 												    <a href="/collaborativeReplenishment/index" class="nav-link nav-toggle ">
 												        Collaborative Replenishment
 												        <span class="arrow"></span>
 												    </a>
 												</li> -->
+=======
+												<li class="">
+                                                    <a href="/mrp/list" class="nav-link nav-toggle ">
+                                                        Mrp
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
+												<li class="">
+                                                    <a href="/mrp" class="nav-link nav-toggle ">
+                                                        Asin Monitor
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
+>>>>>>> master
                                             </ul>
                                         </li>
 
