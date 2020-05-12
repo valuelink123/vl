@@ -129,11 +129,7 @@ white-space: nowrap;
 					  </tr>
 					 </thead>
 					  <tbody>
-					  <?php  $current_stock=0;?>
 					  @foreach ($asins as $v)
-					  	<?php 
-						if ($v->asin==$asin) $current_stock=intval($v->afn_sellable+$v->afn_reserved);
-						?>
 					  <tr class="asins_details">
 						<td>{!!(($v->asin==$asin)?'<span class="badge badge-danger">'.$v->asin.'</span>':'<a href="/mrp/edit?asin='.$v->asin.'&marketplace_id='.$v->marketplace_id.'">'.$v->asin.'</a>')!!}</td>
 						<td>{{((intval($v->buybox_sellerid)>=0)?'OnLine':'OffLine')}}</td>
@@ -215,31 +211,31 @@ white-space: nowrap;
 					  </tbody>
 					</table>
 					<div class="row" >
-						<div class="col-md-5">
-						<div class="btn-group">
-							<button type="button" class="btn btn-sm green-meadow">Switching Cycle</button>
-							<button type="button" class="btn btn-sm green-meadow dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-								<i class="fa fa-angle-down"></i>
-							</button>
-							<ul class="dropdown-menu" role="menu">
-								<li>
-									<a href="{{'/mrp/edit?asin='.$asin.'&marketplace_id='.$marketplace_id}}"> Day </a>
-								</li>
-								<li>
-									<a href="{{'/mrp/edit?asin='.$asin.'&marketplace_id='.$marketplace_id.'&show=week'}}"> Week </a>
-								</li>
-								<li>
-									<a href="{{'/mrp/edit?asin='.$asin.'&marketplace_id='.$marketplace_id.'&show=month'}}"> Month</a>
-								</li>
-							</ul>
+						<div class="col-md-2">
+                       
+							<div class="input-group">
+								<span class="input-group-addon">Cycle</span>
+								<select class="form-control"  id="show" name="show">
+									<option value="">Day</option>
+									<option value="week" <?php if($show=='week') echo 'selected';?>>Week</option>
+									<option value="month" <?php if($show=='month') echo 'selected';?>>Month</option>
+								</select>
+							</div>
+							 <br>
 						</div>
 						
-						
+						<div class="col-md-2">
+                       
+							<div class="input-group">
+								<span class="input-group-addon">Type</span>
+								<select class="form-control"  id="type" name="type">
+									<option value="">Asin</option>
+									<option value="sku" <?php if($type=='sku') echo 'selected';?>>Sku</option>
+								</select>
+							</div>
+							 <br>
 						</div>
-						<div class="col-md-7">
 						
-						
-						</div>
 						
 					</div>
 					
@@ -307,7 +303,7 @@ white-space: nowrap;
 								
 								<td>
 								<?php
-								if($show=='day' && $k>=$cur_date){
+								if($show=='day' && $type=='asin' && $k>=$cur_date){
 								?>
 								<a class="plan editable" title="{{$asin.' '.$k.' Plan'}}" href="javascript:;" id="{{$k}}--quantity_last" data-pk="{{$k}}--quantity_last" data-type="text"> {{$v['plan_last']}} </a>
 								<?php
@@ -340,7 +336,7 @@ white-space: nowrap;
 								
 								<td>
 								<?php
-								if($show=='day' && $k>=$cur_date){
+								if($show=='day' && $type=='asin' && $k>=$cur_date){
 								?>
 								<a class="remark editable" title="{{$asin.' '.$k.' Remark'}}" href="javascript:;" id="{{$k}}--remark" data-pk="{{$k}}--remark" data-type="text"> {{$v['remark']}} </a>
 								<?php
@@ -374,18 +370,35 @@ white-space: nowrap;
 <script src="/assets/global/plugins/bootstrap-editable/bootstrap-editable/js/bootstrap-editable.js" type="text/javascript"></script>
 <script src="/assets/pages/scripts/form-editable.min.js" type="text/javascript"></script>
 <script>
+function changeURLArg(url,arg,arg_val){ 
+    var pattern=arg+'=([^&]*)'; 
+    var replaceText=arg+'='+arg_val; 
+    if(url.match(pattern)){ 
+        var tmp='/('+ arg+'=)([^&]*)/gi'; 
+        tmp=url.replace(eval(tmp),replaceText); 
+        return tmp; 
+    }else{ 
+        if(url.match('[\?]')){ 
+            return url+'&'+replaceText; 
+        }else{ 
+            return url+'?'+replaceText; 
+        } 
+    } 
+    return url+'\n'+arg+'\n'+arg_val; 
+}
 
 var FormEditable = function() {
-
+	
     $.mockjaxSettings.responseTime = 500;
 
     $.fn.editable.defaults.inputclass = 'form-control';
     $.fn.editable.defaults.url = '/mrp/update';
 	
 	
-	var params= new Array(4);
+	var params= new Array(5);
 	params['asin'] = "<?php echo $asin?>";
 	params['marketplace_id'] = "<?php echo $marketplace_id?>";
+	params['sku'] = "<?php echo $sku?>";
 	params['date_from'] = "<?php echo $date_from?>";
 	params['date_to'] = "<?php echo $date_to?>";
 
@@ -467,8 +480,9 @@ jQuery(document).ready(function() {
 		autoclose: true
     });
     FormEditable.init();
-	
-	
+	$("#show, #type").change(function(){  
+		location.href = changeURLArg(location.href,this.id,$(this).val());
+    }); 
 });
 </script>
 

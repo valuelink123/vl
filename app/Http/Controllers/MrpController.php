@@ -136,6 +136,7 @@ class MrpController extends Controller
 		$asin = $request->get('asin');
 		$marketplace_id = $request->get('marketplace_id');
 		$seller_permissions = $this->getUserSellerPermissions();
+		
 		$where='1=1';
 		foreach($seller_permissions as $key=>$val){
 			if($key=='bg' && $val) $where .=" and sap_seller_bg='$val'";
@@ -163,19 +164,30 @@ class MrpController extends Controller
 		}
 		
 		$show = $request->get('show')??'day';
-		$date = 90;
+		$type = $request->get('type')??'asin';
+		$date=90;
 		$date_to = $request->get('date_to')??date('Y-m-d',strtotime('+'.$date.'days'));
 		$date_from = $tmp_date_from = $request->get('date_from')??date('Y-m-d');
 		if($date_to<$date_from) $date_to = $date_from;
 		$asins = DB::connection('amazon')->select($this->getSql(" and a.sku = '$sku' and a.marketplace_id='$marketplace_id'",$date_from,$date_to));
+		$whereInAsins = [];
+		$current_stock=0;
+		foreach($asins as $v){
+			$whereInAsins[]=$v->asin;
+			if($type=='asin' && $v->asin==$asin){
+				$current_stock=intval($v->afn_sellable+$v->afn_reserved);
+			}else{
+				$current_stock+=intval($v->afn_sellable+$v->afn_reserved);
+			} 
+		}
 		$sap_factory_code = array_get(MpToFc(),$marketplace_id,$marketplace_id);
 		$sku_info = DB::connection('amazon')->table('sap_sku_sites')->where('sku',$sku)->where('marketplace_id',$marketplace_id)->where('sap_factory_code',$sap_factory_code)->first();
 		$sales_plan=[];
 		if($show=='week'){
-			$asin_symmetrys = DB::connection('amazon')->table('symmetry_asins')->where('asin',$asin)->where('marketplace_id',$marketplace_id)->where('date','>=',$date_from)->where('date','<=',$date_to)->selectRaw('YEARWEEK(date,3) as wdate,sum(quantity) as quantity')->groupBy(['wdate'])->pluck('quantity','wdate');
-			$asin_historys = DailyStatistic::selectRaw('YEARWEEK(date,3) as wdate,sum(quantity_shipped) as sold,sum(afn_sellable+afn_reserved) as stock')->where('asin',$asin)->where('marketplace_id',$marketplace_id)->where('date','>=',$date_from)->where('date','<=',$date_to)->groupBy(['wdate'])->get()->keyBy('wdate')->toArray();
+			$asin_symmetrys = DB::connection('amazon')->table('symmetry_asins')->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('date','>=',$date_from)->where('date','<=',$date_to)->selectRaw('YEARWEEK(date,3) as wdate,sum(quantity) as quantity')->groupBy(['wdate'])->pluck('quantity','wdate');
+			$asin_historys = DailyStatistic::selectRaw('YEARWEEK(date,3) as wdate,sum(quantity_shipped) as sold,sum(afn_sellable+afn_reserved) as stock')->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('date','>=',$date_from)->where('date','<=',$date_to)->groupBy(['wdate'])->get()->keyBy('wdate')->toArray();
 			
-			$asin_plans = AsinSalesPlan::selectRaw('YEARWEEK(date,3) as wdate,sum(quantity_last) as quantity_last,sum(quantity_first) as quantity_first,any_value(remark) as remark')->where('asin',$asin)->where('marketplace_id',$marketplace_id)->where('date','>=',$date_from)->where('date','<=',$date_to)->groupBy(['wdate'])->get()->keyBy('wdate')->toArray();
+			$asin_plans = AsinSalesPlan::selectRaw('YEARWEEK(date,3) as wdate,sum(quantity_last) as quantity_last,sum(quantity_first) as quantity_first,any_value(remark) as remark')->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('date','>=',$date_from)->where('date','<=',$date_to)->groupBy(['wdate'])->get()->keyBy('wdate')->toArray();
 			$tmp_date_from = date('oW',strtotime($date_from));
 			$tmp_date_to = date('oW',strtotime($date_to));
 			$oW=0;
@@ -193,10 +205,10 @@ class MrpController extends Controller
 			}
 			$cur_date=date('oW', time());
 		}elseif($show=='month'){
-			$asin_symmetrys = DB::connection('amazon')->table('symmetry_asins')->where('asin',$asin)->where('marketplace_id',$marketplace_id)->where('date','>=',$date_from)->where('date','<=',$date_to)->selectRaw("DATE_FORMAT(date,'%Y-%m') as wdate,sum(quantity) as quantity")->groupBy(['wdate'])->pluck('quantity','wdate');
-			$asin_historys = DailyStatistic::selectRaw("DATE_FORMAT(date,'%Y-%m') as wdate,sum(quantity_shipped) as sold,sum(afn_sellable+afn_reserved) as stock")->where('asin',$asin)->where('marketplace_id',$marketplace_id)->where('date','>=',$date_from)->where('date','<=',$date_to)->groupBy(['wdate'])->get()->keyBy('wdate')->toArray();
+			$asin_symmetrys = DB::connection('amazon')->table('symmetry_asins')->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('date','>=',$date_from)->where('date','<=',$date_to)->selectRaw("DATE_FORMAT(date,'%Y-%m') as wdate,sum(quantity) as quantity")->groupBy(['wdate'])->pluck('quantity','wdate');
+			$asin_historys = DailyStatistic::selectRaw("DATE_FORMAT(date,'%Y-%m') as wdate,sum(quantity_shipped) as sold,sum(afn_sellable+afn_reserved) as stock")->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('date','>=',$date_from)->where('date','<=',$date_to)->groupBy(['wdate'])->get()->keyBy('wdate')->toArray();
 			
-			$asin_plans = AsinSalesPlan::selectRaw("DATE_FORMAT(date,'%Y-%m') as wdate,sum(quantity_last) as quantity_last,sum(quantity_first) as quantity_first,any_value(remark) as remark")->where('asin',$asin)->where('marketplace_id',$marketplace_id)->where('date','>=',$date_from)->where('date','<=',$date_to)->groupBy(['wdate'])->get()->keyBy('wdate')->toArray();
+			$asin_plans = AsinSalesPlan::selectRaw("DATE_FORMAT(date,'%Y-%m') as wdate,sum(quantity_last) as quantity_last,sum(quantity_first) as quantity_first,any_value(remark) as remark")->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('date','>=',$date_from)->where('date','<=',$date_to)->groupBy(['wdate'])->get()->keyBy('wdate')->toArray();
 			
 			$tmp_date_from = date('Y-m',strtotime($date_from));
 			$tmp_date_to = date('Y-m',strtotime($date_to));
@@ -213,10 +225,10 @@ class MrpController extends Controller
 			}
 			$cur_date=date('Y-m');
 		}else{
-			$asin_symmetrys = DB::connection('amazon')->table('symmetry_asins')->where('asin',$asin)->where('marketplace_id',$marketplace_id)->where('date','>=',$date_from)->where('date','<=',$date_to)->pluck('quantity','date');
-			$asin_historys = DailyStatistic::selectRaw('date,sum(quantity_shipped) as sold,sum(afn_sellable+afn_reserved) as stock')->where('asin',$asin)->where('marketplace_id',$marketplace_id)->where('date','>=',$date_from)->where('date','<=',$date_to)->groupBy(['date'])->get()->keyBy('date')->toArray();
+			$asin_symmetrys = DB::connection('amazon')->table('symmetry_asins')->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('date','>=',$date_from)->where('date','<=',$date_to)->pluck('quantity','date');
+			$asin_historys = DailyStatistic::selectRaw('date,sum(quantity_shipped) as sold,sum(afn_sellable+afn_reserved) as stock')->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('date','>=',$date_from)->where('date','<=',$date_to)->groupBy(['date'])->get()->keyBy('date')->toArray();
 			
-			$asin_plans = AsinSalesPlan::where('asin',$asin)->where('marketplace_id',$marketplace_id)->where('date','>=',$date_from)->where('date','<=',$date_to)->get()->keyBy('date')->toArray();
+			$asin_plans = AsinSalesPlan::where($type,${$type})->where('marketplace_id',$marketplace_id)->where('date','>=',$date_from)->where('date','<=',$date_to)->get()->keyBy('date')->toArray();
 			
 			while($tmp_date_from<=$date_to){
 				$sales_plan[$tmp_date_from] = [
@@ -231,13 +243,14 @@ class MrpController extends Controller
 			}
 			$cur_date=date('Y-m-d');
 		}
-		return view('mrp/edit',['asin'=>$asin,'marketplace_id'=>$marketplace_id,'date_from'=>$date_from,'date_to'=>$date_to,'show'=>$show,'asins'=>$asins,'sku_info'=>$sku_info,'sales_plan'=>$sales_plan,'cur_date'=>$cur_date,'keyword'=>$keyword]);
+		return view('mrp/edit',['asin'=>$asin,'marketplace_id'=>$marketplace_id,'date_from'=>$date_from,'date_to'=>$date_to,'show'=>$show,'type'=>$type,'asins'=>$asins,'sku'=>$sku,'sku_info'=>$sku_info,'sales_plan'=>$sales_plan,'cur_date'=>$cur_date,'current_stock'=>$current_stock,'keyword'=>$keyword]);
     }
 
     public function update(Request $request)
     {
 		$asin = $request->get('asin');
 		$marketplace_id = $request->get('marketplace_id');
+		$sku = $request->get('sku');
 		$date_to = $request->get('date_to');
 		$date_from = $request->get('date_from');
 		$key = explode('--',$request->get('name'));
@@ -252,6 +265,7 @@ class MrpController extends Controller
 						],
 						[
 							$field=>$value,
+							'sku'=>$sku,
 							'week_date'=>date('Y-m-d',strtotime("$date Sunday")) ,
 							'updated_at'=>date('Y-m-d H:i:s')
 							
