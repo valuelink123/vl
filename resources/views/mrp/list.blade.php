@@ -155,7 +155,7 @@ table.dataTable thead th, table.dataTable thead td {
                 <table class="table table-striped table-bordered" id="thetable">
                     <thead>
                     <tr>
-						<th>Seller</th>
+						<th> SellerName </th>
                         <th>Asin</th>
                         <th>Site</th>
                         <th>Sku</th>

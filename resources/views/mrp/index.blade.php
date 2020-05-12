@@ -255,7 +255,7 @@ table.dataTable thead th, table.dataTable thead td {
 
         //下载数据
         $("#export").click(function(){
-            //location.href='/mrp/export?date='+$("#date").val();
+            location.href='/mrp/asinexport?'+$("#search-form").serialize();
             return false;
 
         });

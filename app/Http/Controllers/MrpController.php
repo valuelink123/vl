@@ -333,7 +333,98 @@ class MrpController extends Controller
         }
         die();
     }
+	
+	public function asinExport(Request $request)
+	{
+		$search = $this->getSearchData(explode('&',$_SERVER['QUERY_STRING']));
+		
+		$date = (intval(array_get($search,'date'))>0)?intval(array_get($search,'date')):90;
+		$searchField = array('bg'=>'a.bg','bu'=>'a.bu','site'=>'a.marketplace_id','sku'=>'a.sku','sku_level'=>'a.status','sku_status'=>'a.skus_status','sku_level'=>'a.status','sap_seller_id'=>'a.sap_seller_id');
+		
+		
+		$where = $this->getSearchWhereSql($search,$searchField);
 
+		if(array_get($search,'keyword')){
+			$where .=" and (a.asin='".array_get($search,'keyword')."' or a.sku='".array_get($search,'keyword')."')";
+		}
+		$seller_permissions = $this->getUserSellerPermissions();
+		foreach($seller_permissions as $key=>$val){
+			if($key=='bg' && $val) $where .=" and a.bg='$val'";
+			if($key=='bu' && $val) $where .=" and a.bu='$val'";
+			if($key=='sap_seller_id' && $val) $where .=" and a.sap_seller_id='$val'";
+		}
+		$date_to = date('Y-m-d',strtotime('+'.$date.'days'));
+		$date_from = date('Y-m-d');
+		$sql = $this->getSql($where,$date_from,$date_to);
+		$datas = DB::connection('amazon')->select($sql);
+		$datas = json_decode(json_encode($datas),true);
+		$data = [];
+        $headArray[] = 'Asin';
+        $headArray[] = 'Site';
+		$headArray[] = 'Sku';
+		$headArray[] = 'Status';
+		$headArray[] = 'Seller';
+		$headArray[] = 'D/Sales';
+        $headArray[] = 'TotalPlan';
+		
+		$headArray[] = 'FBAStock';
+		$headArray[] = 'FBAKeep';
+		$headArray[] = 'FBATran';
+        $headArray[] = 'FBMStock';
+		$headArray[] = 'TotalKeep';
+        $headArray[] = 'SZ';
+		$headArray[] = 'InMake';
+		$headArray[] = 'OutStock';
+		$headArray[] = 'OutStockDate';
+		$headArray[] = 'OverStock';
+        $headArray[] = 'OverStockDate';
+		$headArray[] = 'StockScore';
+        $headArray[] = 'Dist';
+        $data[] = $headArray;
+		
+		$siteCode = array_flip(getSiteCode());
+		$sellers = getUsers('sap_seller');
+		foreach ($datas as $key => $val) {
+			$key++;
+			$data[$key]['asin'] = $val['asin'];
+			$data[$key]['site'] = array_get($siteCode,$val['marketplace_id']);
+			$data[$key]['sku'] = $val['sku'];
+			$data[$key]['status'] = $val['status'];
+			$data[$key]['seller'] = array_get($sellers,$val['sap_seller_id']);
+			$data[$key]['daily_sales'] = round($val['daily_sales'],2);
+			$data[$key]['quantity'] = intval($val['quantity']);
+			$data[$key]['fba_stock'] = $val['afn_sellable']+$val['afn_reserved'];
+			$data[$key]['fba_stock_keep'] = 0;
+			$data[$key]['fba_transfer'] = 0;
+			$data[$key]['fbm_stock'] = 0;
+			$data[$key]['stock_keep'] = 0;
+			$data[$key]['sz'] = 0;
+			$data[$key]['in_make'] = 0;
+			$data[$key]['out_stock'] = 0;
+			$data[$key]['out_stock_date'] = 0;
+			$data[$key]['unsalable'] = 0;
+			$data[$key]['unsalable_date'] = 0;
+			$data[$key]['stock_score'] = 0;
+			$data[$key]['expected_distribution'] = 0;
+		}
+		if($data){
+            $spreadsheet = new Spreadsheet();
+
+            $spreadsheet->getActiveSheet()
+                ->fromArray(
+                    $data,  // The data to set
+                    NULL,        // Array values with this value will not be set
+                    'A1'         // Top left coordinate of the worksheet range where
+                //    we want to set these values (default is A1)
+                );
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');//告诉浏览器输出07Excel文件
+            header('Content-Disposition: attachment;filename="Export_Mrp.xlsx"');//告诉浏览器输出浏览器名称
+            header('Cache-Control: max-age=0');//禁止缓存
+            $writer = new Xlsx($spreadsheet);
+            $writer->save('php://output');
+        }
+        die();
+    }
 
 	public function getSql($where,$date_from,$date_to,$orderby='daily_sales desc')
 	{
