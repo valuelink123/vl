@@ -75,6 +75,7 @@ class MarketingPlanController extends Controller
     public function getAsinDailyReport(Request $request)
     {
         $DOMIN_MARKETPLACEID_SX = Asin::DOMIN_MARKETPLACEID_SX;
+        $SKU_STATUS_KV= Asin::SKU_STATUS_KV;
         $seller_sku = '';
         $single_economic = $avg_day_sales = $cost = 0;
         if (!empty($request['asin']) && !empty($request['marketplace_id'])) {
@@ -158,6 +159,7 @@ class MarketingPlanController extends Controller
             $user_asin_list['single_economic'] = $single_economic==0?0:$single_economic;
             $user_asin_list['avg_day_sales'] = $avg_day_sales==0?0:$avg_day_sales;
             $user_asin_list['cost'] = $cost;
+            $user_asin_list['sku_status'] = $SKU_STATUS_KV[$user_asin_list['sku_status']];
 
             if (!empty($user_asin_list)) {
                 return $user_asin_list;
