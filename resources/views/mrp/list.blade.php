@@ -22,20 +22,13 @@ table.dataTable thead th, table.dataTable thead td {
     <link rel="stylesheet" href="/js/chosen/chosen.min.css"/>
     <script src="/js/chosen/chosen.jquery.min.js"></script>
 
-
     <div class="portlet light bordered">
         <div class="portlet-body">
             <form id="search-form">
             <div class="table-toolbar" id="thetabletoolbar">
                 <div class="row">
                     <div class="col-md-2">
-                        <div class="input-group">
-                            <span class="input-group-addon">Date</span>
-                            <input  class="form-control" value="{!! $date !!}" id="date" name="date"
-                                   autocomplete="off"/>
-                        </div>
-                        <br>
-                        <div class="input-group">
+                         <div class="input-group">
                             <span class="input-group-addon">Site</span>
                             <select class="form-control"  id="site" name="site">
                                 <option value="">Select</option>
@@ -44,21 +37,11 @@ table.dataTable thead th, table.dataTable thead td {
                                 @endforeach
                             </select>
                         </div>
+                        <br>
+                       
                     </div>
                     <div class="col-md-2">
-                        <div class="input-group">
-                            <span class="input-group-addon">StockKeep</span>
-							<div>
-								<div class="col-md-6" style="padding:0px;">
-									<input class="form-control" value="" id="stockkeep_from" name="stockkeep_from" autocomplete="off"/>
-								</div>
-								<div class="col-md-6" style="padding:0px;">
-									<input class="form-control" value="" id="stockkeep_to" name="stockkeep_to" autocomplete="off"/>
-								</div>
-							</div>
-                        </div>
-                        <br>
-                        <div class="input-group">
+                         <div class="input-group">
                             <span class="input-group-addon">BG</span>
                             <select class="form-control" id="bg" name="bg">
                                 <option value="">Select</option>
@@ -67,22 +50,12 @@ table.dataTable thead th, table.dataTable thead td {
                                 @endforeach
                             </select>
                         </div>
+                        <br>
+                       
                     </div>
 
                     <div class="col-md-2">
-                        <div class="input-group">
-                            <span class="input-group-addon">OutStock</span>
-                            <div>
-								<div class="col-md-6" style="padding:0px;">
-									<input class="form-control" value="" id="outstock_from" name="outstock_from" autocomplete="off"/>
-								</div>
-								<div class="col-md-6" style="padding:0px;">
-									<input class="form-control" value="" id="outstock_to" name="outstock_to" autocomplete="off"/>
-								</div>
-							</div>
-                        </div>
-                        <br>
-                        <div class="input-group">
+                         <div class="input-group">
                             <span class="input-group-addon">BU</span>
                             <select  class="form-control"  id="bu" name="bu">
                                 <option value="">Select</option>
@@ -91,19 +64,11 @@ table.dataTable thead th, table.dataTable thead td {
                                 @endforeach
                             </select>
                         </div>
+                        <br>
+                       
                     </div>
 
                     <div class="col-md-2">
-                        <div class="input-group">
-                            <span class="input-group-addon">StockStatus</span>
-                            <select  class="form-control"  id="stock_status" name="stock_status">
-                                <option value="">Select</option>
-                                @foreach(getStockStatus() as $key=>$val)
-                                    <option value="{!! $key !!}">{!! $val !!}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <br>
                         <div class="input-group">
                             <span class="input-group-addon">Sellers</span>
                             <select  class="form-control"  id="sap_seller_id" name="sap_seller_id">
@@ -113,6 +78,8 @@ table.dataTable thead th, table.dataTable thead td {
                                 @endforeach
                             </select>
                         </div>
+                        <br>
+                        
                     </div>
 
                     <div class="col-md-2">
@@ -153,38 +120,53 @@ table.dataTable thead th, table.dataTable thead td {
 								<button id="search" class="btn sbold blue">Search</button>
 							</div>
 						</div>
-                    </div>  
+                    </div> 
+					
+					
+					
                 </div>
             </div>
 
             </form>
+			
+			<div class="col-md-12">
+				<div class="form-upload">
+				<form action="{{url('mrp/import')}}" method="post" enctype="multipart/form-data" class="pull-right " >
+				<!--<div class=" pull-left">
+
+					<a href="{{ url('/uploads/BudgetsUpload/data.csv')}}">Import Template</a>	
+				</div>-->
+				<div class="pull-left">
+					{{ csrf_field() }}
+						 <input type="file" name="importFile"  />
+				</div>
+				<div class=" pull-left">
+					<button type="submit" class="btn blue btn-sm" id="data_search">Upload</button>
+				</div>
+				
+				</form>
+				</div>
+				
+				
+			</div>
 
             </div>
             <div class="table-container" style="">
                 <table class="table table-striped table-bordered" id="thetable">
                     <thead>
                     <tr>
+						<th> SellerName </th>
                         <th>Asin</th>
                         <th>Site</th>
                         <th>Sku</th>
-                        <th>Status</th>
-                        <th>Seller</th>
-                        <th>D/Sales</th>
-						<th>Plan</th>
-                        <th>FBAStock</th>
-                        <th>FBAKeep</th>
-                        <th>FBATran</th>
-                        <th>FBMStock</th>
-                        <th>TotalKeep</th>
-                        <th>SZ</th>
-                        <th>InMake</th>
-                        <th>OutStock</th>
-                        <th>OutStockDate</th>
-                        <th>OverStock</th>
-                        <th>OverStockDate</th>
-                        <th>StockScore</th>
-                        <th>Dist</th>
-                        <th>Action</th>
+                        <th>MinPurchase</th>
+                        <th>W/Sales</th>
+						<th>TotalPlan</th>
+						<?php
+						for($i=1;$i<=22;$i++){
+						?>
+                        <th>{{date('Y-m-d',strtotime('+'.$i.' weeks sunday'))}}</th>
+                        <?php } ?>
                     </tr>
                     </thead>
                     <tbody></tbody>
@@ -210,28 +192,37 @@ table.dataTable thead th, table.dataTable thead td {
                 processing: true,
                 ordering:  false,
                 //aoColumnDefs: [ { "bSortable": false, "aTargets": [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,21] }],
+                order: [],
                 columns: [
+					{data: 'seller', name: 'seller'},
                     {data: 'asin', name: 'asin'},
                     {data: 'site', name: 'site'},
                     {data: 'sku', name: 'sku'},
-                    {data: 'status', name: 'status'},
-                    {data: 'seller', name: 'seller'},
-                    {data: 'daily_sales', name: 'daily_sales'},
-					{data: 'quantity', name: 'quantity'},
-                    {data:'fba_stock',name:'fba_stock'},
-                    {data:'fba_stock_keep',name:'fba_stock_keep'},
-                    {data: 'fba_transfer', name: 'fba_transfer'},
-                    {data:'fbm_stock',name:'fbm_stock'},
-                    {data:'stock_keep',name:'stock_keep'},
-                    {data:'sz',name:'sz'},
-                    {data:'in_make',name:'in_make'},
-                    {data:'out_stock',name:'out_stock'},
-                    {data:'out_stock_date',name:'out_stock_date'},
-                    {data:'unsalable',name:'unsalable'},
-                    {data:'unsalable_date',name:'unsalable_date'},
-                    {data:'stock_score',name:'stock_score'},
-                    {data:'expected_distribution',name:'expected_distribution'},
-                    {data:'action',name:'action'},
+                    {data: 'min_purchase', name: 'min_purchase'},
+                    {data: 'week_daily_sales', name: 'week_daily_sales'},
+					{data: '22_week_plan_total', name: '22_week_plan_total'},
+                    {data:'1_week_plan',name:'1_week_plan'},
+                    {data:'2_week_plan',name:'2_week_plan'},
+                   	{data:'3_week_plan',name:'3_week_plan'},
+                    {data:'4_week_plan',name:'4_week_plan'},
+					{data:'5_week_plan',name:'5_week_plan'},
+                    {data:'6_week_plan',name:'6_week_plan'},
+                   	{data:'7_week_plan',name:'7_week_plan'},
+                    {data:'8_week_plan',name:'8_week_plan'},
+					{data:'9_week_plan',name:'9_week_plan'},
+                    {data:'10_week_plan',name:'10_week_plan'},
+                   	{data:'11_week_plan',name:'11_week_plan'},
+                    {data:'12_week_plan',name:'12_week_plan'},
+					{data:'13_week_plan',name:'13_week_plan'},
+                    {data:'14_week_plan',name:'14_week_plan'},
+                   	{data:'15_week_plan',name:'15_week_plan'},
+                    {data:'16_week_plan',name:'16_week_plan'},
+					{data:'17_week_plan',name:'17_week_plan'},
+                    {data:'18_week_plan',name:'18_week_plan'},
+                   	{data:'19_week_plan',name:'19_week_plan'},
+                    {data:'20_week_plan',name:'20_week_plan'},
+					{data:'21_week_plan',name:'21_week_plan'},
+                    {data:'22_week_plan',name:'22_week_plan'}
                 ],
                 ajax: {
                     type: 'POST',
@@ -255,7 +246,8 @@ table.dataTable thead th, table.dataTable thead td {
 
         //下载数据
         $("#export").click(function(){
-            location.href='/mrp/asinexport?'+$("#search-form").serialize();
+			alert($("#search-form").serialize());
+            location.href='/mrp/export?'+$("#search-form").serialize();
             return false;
 
         });

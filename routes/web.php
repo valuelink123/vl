@@ -220,3 +220,21 @@ Route::get('/manageDistributeTime/safetyStockDays', 'ManageDistributeTimeControl
 Route::get('/manageDistributeTime/fba', 'ManageDistributeTimeController@fba')->name('fba');
 Route::get('/manageDistributeTime/fbm', 'ManageDistributeTimeController@fbm')->name('fbm');
 Route::get('/manageDistributeTime/internationalTransportTime', 'ManageDistributeTimeController@internationalTransportTime')->name('internationalTransportTime');
+
+//投入产出分析
+Route::resource('roi', 'RoiController');
+Route::Post('/roi/analyse', 'RoiController@analyse')->name('roiAnalyse');
+Route::Post('/roi/updateRecord', 'RoiController@updateRecord');
+Route::Post('/roi/get', 'RoiController@get')->name('getRoi');
+//下载ROI列表。如果用/roi/export, 实际上是进入了resource里面的show动作：GET /roi/{id}
+Route::get('/roi_export', 'RoiController@export');
+Route::get('/roi_export_show_page', 'RoiController@exportShowPage');
+Route::Post('/roi_archive', 'RoiController@archive');
+
+Route::match(['post','get'],'/mrp', 'MrpController@index');
+Route::match(['post','get'],'/mrp/list', 'MrpController@list');
+Route::get('/mrp/edit', 'MrpController@edit');
+Route::post('/mrp/update', 'MrpController@update');
+Route::get('/mrp/export', 'MrpController@export');
+Route::get('/mrp/asinexport', 'MrpController@asinExport');
+Route::post('/mrp/import', 'MrpController@import');

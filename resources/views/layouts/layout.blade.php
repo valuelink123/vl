@@ -414,6 +414,18 @@
 														</li>
 												    </ul>
 												</li> -->
+												<li class="">
+                                                    <a href="/mrp/list" class="nav-link nav-toggle ">
+                                                        Mrp
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
+												<li class="">
+                                                    <a href="/mrp" class="nav-link nav-toggle ">
+                                                        Asin Monitor
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
                                             </ul>
                                         </li>
 
