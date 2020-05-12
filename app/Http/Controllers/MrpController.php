@@ -53,9 +53,9 @@ class MrpController extends Controller
 		}
 		$seller_permissions = $this->getUserSellerPermissions();
 		foreach($seller_permissions as $key=>$val){
-			if($key=='bg') $where .=" and a.bg='$val'";
-			if($key=='bu') $where .=" and a.bu='$val'";
-			if($key=='sap_seller_id') $where .=" and a.sap_seller_id='$val'";
+			if($key=='bg' && $val) $where .=" and a.bg='$val'";
+			if($key=='bu' && $val) $where .=" and a.bu='$val'";
+			if($key=='sap_seller_id' && $val) $where .=" and a.sap_seller_id='$val'";
 		}
 		$orderby = $this->dtOrderBy($req);
 		$date_to = date('Y-m-d',strtotime('+'.$date.'days'));
@@ -92,9 +92,9 @@ class MrpController extends Controller
 		}
 		$seller_permissions = $this->getUserSellerPermissions();
 		foreach($seller_permissions as $key=>$val){
-			if($key=='bg') $where .=" and a.bg='$val'";
-			if($key=='bu') $where .=" and a.bu='$val'";
-			if($key=='sap_seller_id') $where .=" and a.sap_seller_id='$val'";
+			if($key=='bg' && $val) $where .=" and a.bg='$val'";
+			if($key=='bu' && $val) $where .=" and a.bu='$val'";
+			if($key=='sap_seller_id' && $val) $where .=" and a.sap_seller_id='$val'";
 		}
 		$orderby = $this->dtOrderBy($req);
 		
@@ -138,9 +138,9 @@ class MrpController extends Controller
 		$seller_permissions = $this->getUserSellerPermissions();
 		$where='1=1';
 		foreach($seller_permissions as $key=>$val){
-			if($key=='bg') $where .=" and sap_seller_bg='$val'";
-			if($key=='bu') $where .=" and sap_seller_bu='$val'";
-			if($key=='sap_seller_id') $where .=" and sap_seller_id='$val'";
+			if($key=='bg' && $val) $where .=" and sap_seller_bg='$val'";
+			if($key=='bu' && $val) $where .=" and sap_seller_bu='$val'";
+			if($key=='sap_seller_id' && $val) $where .=" and sap_seller_id='$val'";
 		}
 		
 		if(!$asin){
