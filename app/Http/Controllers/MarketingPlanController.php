@@ -40,7 +40,8 @@ class MarketingPlanController extends Controller
     public function index1(Request $request)
     {
         $DOMIN_MARKETPLACEID_SX = Asin::DOMIN_MARKETPLACEID_SX;
-        $sap_seller_id = $request['sap_seller_id'] ? $request['sap_seller_id'] : 351;
+        $sap_seller_id = $request['sap_seller_id'] ? $request['sap_seller_id'] : 0;
+        $user_asin_list=$currency_rates=[];
         if ($sap_seller_id > 0) {
             $sql = "SELECT sams.asin,asins.marketplaceid,sams.sku_status,sams.sku,asins.reviews,asins.rating 
                     from sap_asin_match_sku as sams LEFT JOIN asins on asins.asin= sams.asin 
@@ -249,7 +250,7 @@ class MarketingPlanController extends Controller
     {
         //$user = Auth::user()->toArray();//todo 打开
         $DOMIN_MARKETPLACEID_RUL = Asin::DOMIN_MARKETPLACEID_URL;
-        $sap_seller_id = $request['sap_seller_id'] ? $request['sap_seller_id'] : 352;
+        $sap_seller_id = $request['sap_seller_id'] ? $request['sap_seller_id'] : 0;
         $update = 0;
         if (!empty($request)) {
             $id = $request['id'];
@@ -273,7 +274,7 @@ class MarketingPlanController extends Controller
                 /** 已完结 已终止 已拒绝 不能在修改*/
                 $update = 0;
             }
-            if ($update > 0) {
+            if ($update > 0 && $sap_seller_id>0) {
                 $up_data = [
                     'plan_status' => $plan_status,
                     'updated_at' => time(),
