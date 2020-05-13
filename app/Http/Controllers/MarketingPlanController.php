@@ -323,7 +323,7 @@ class MarketingPlanController extends Controller
                     $r_message = ['status' => 0, 'msg' => '更新失败'];
                 }
             } else {
-                $r_message = ['status' => 0, 'msg' => '条件不符'];
+                $r_message = ['status' => 0, 'msg' => '任务状态修改失败'];
             }
 
             return $r_message;
