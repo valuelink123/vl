@@ -388,7 +388,7 @@
                                                     </a>
                                                 </li>
 												@endpermission
-												<li class="">
+												<!-- <li class="">
 												    <a href="/collaborativeReplenishment/index" class="nav-link nav-toggle ">
 												        Collaborative Replenishment
 												        <span class="arrow"></span>
@@ -413,7 +413,8 @@
 														    <a href="{{url('manageDistributeTime/internationalTransportTime')}}" class="nav-link "> International transport Time </a>
 														</li>
 												    </ul>
-												</li>
+
+												</li> -->
 
 												<li class="">
                                                     <a href="/mrp/list" class="nav-link nav-toggle ">
@@ -427,12 +428,12 @@
                                                         <span class="arrow"></span>
                                                     </a>
                                                 </li>
-												<li class="">
+												<!-- <li class="">
 												    <a href="/cpfr/index" class="nav-link nav-toggle ">
 												        CPFR协同补货
 												        <span class="arrow"></span>
 												    </a>
-												</li>
+												</li> -->
                                             </ul>
                                         </li>
 
