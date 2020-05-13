@@ -238,3 +238,5 @@ Route::post('/mrp/update', 'MrpController@update');
 Route::get('/mrp/export', 'MrpController@export');
 Route::get('/mrp/asinexport', 'MrpController@asinExport');
 Route::post('/mrp/import', 'MrpController@import');
+//CPFR协同补货
+Route::get('/cpfr/index', 'CpfrController@index')->name('index');

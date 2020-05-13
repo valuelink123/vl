@@ -426,6 +426,12 @@
                                                         <span class="arrow"></span>
                                                     </a>
                                                 </li>
+												<li class="">
+												    <a href="/cpfr/index" class="nav-link nav-toggle ">
+												        CPFR协同补货
+												        <span class="arrow"></span>
+												    </a>
+												</li>
                                             </ul>
                                         </li>
 

@@ -989,7 +989,7 @@
 				setTimeout(function(){
 					$('.error_mask').fadeOut(1000);
 				},2000)
-			}else if($('#asin-select').val() == '-1'){
+			}else if($('#select2-asin-select-container').text() == '-1'){
 				$('.error_mask_text').text('ASIN不能为空')
 				$('.error_mask').fadeIn(1000);
 				setTimeout(function(){
