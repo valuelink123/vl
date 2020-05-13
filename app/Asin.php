@@ -40,7 +40,7 @@ class Asin extends Model
         'ARBP9OOSHTCHU' => 'EG',
         'A1RKKUPIHCS9HS' => 'ES',
         'A13V1IB3VIYZZH' => 'FR',
-        'A1F83G8C2ARO7P' => 'GB',
+        'A1F83G8C2ARO7P' => 'UK',
         'A21TJRUUN4KGV' => 'IN',
         'APJ6JRA9NG5V4' => 'IT',
         'A1805IZSGTT6HS' => 'NL',
@@ -61,4 +61,22 @@ class Asin extends Model
         'APJ6JRA9NG5V4' => 'www.amazon.it',
         'A1VC38T7YXB528' => 'www.amazon.co.jp',
     ];
+    const SKU_STATUS_KV = [
+        '0'=>'淘汰',
+        '1'=>'保留',
+        '2'=>'新品',
+        '3'=>'配件',
+        '4'=>'替换',
+        '5'=>'待定',
+        '6'=>'停售',
+    ];
+    const ADMIN_EMAIL = array(
+        'test@qq.com',
+        'duanyongsheng@dtas.com',
+        "charlie@valuelinkcorp.com",
+        "zouyuanxun@valuelinkcorp.com",
+        "zanhaifang@valuelinkcorp.com",
+        "huzaoli@valuelinkcorp.com",
+        'fanlinxi@valuelinkcorp.com'
+    );
 }

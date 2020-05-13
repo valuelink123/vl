@@ -1,5 +1,5 @@
 @extends('layouts.layout')
-@section('label', 'Asin Monitor')
+@section('label', 'Inventory Monitor')
 @section('content')
 <link href="/assets/global/plugins/bootstrap-editable/bootstrap-editable/css/bootstrap-editable.css" rel="stylesheet" type="text/css" />
 <style>
@@ -109,7 +109,7 @@ white-space: nowrap;
 					<table class="table table-striped table-bordered table-hover tbl1">
 					<thead>
 					  <tr class="head" >
-					  	<td width="8%">Asin</td>
+					  	<td width="10%">Asin</td>
 						<td width="5%">Status</td>
 						<td width="5%">StockKeep</td>
 						<td width="5%">D/Sales</td>
@@ -125,13 +125,15 @@ white-space: nowrap;
 						<td width="7%">OverStockDate</td>
 						<td width="5%">StockScore</td>
 						<td width="5%">Dist</td>
-						<td width="13%">Next Request</td>
+						<td width="11%">Next Request</td>
 					  </tr>
 					 </thead>
 					  <tbody>
 					  @foreach ($asins as $v)
 					  <tr class="asins_details">
-						<td>{!!(($v->asin==$asin)?'<span class="badge badge-danger">'.$v->asin.'</span>':'<a href="/mrp/edit?asin='.$v->asin.'&marketplace_id='.$v->marketplace_id.'">'.$v->asin.'</a>')!!}</td>
+						<td style="text-align:left">{!!(($v->asin==$asin)?'<span class="badge badge-danger">'.$v->asin.'</span>':'<a href="/mrp/edit?asin='.$v->asin.'&marketplace_id='.$v->marketplace_id.'">'.$v->asin.'</a>')!!}
+						
+						<a class="pull-right" href="https://{{array_get(getSiteUrl(),$v->marketplace_id)}}/dp/{{$v->asin}}" target="_blank"><i class="fa fa-amazon"></i></a></td>
 						<td>{{((intval($v->buybox_sellerid)>=0)?'OnLine':'OffLine')}}</td>
 						<td>0</td>
 						<td>{{round($v->daily_sales,2)}}</td>

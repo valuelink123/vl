@@ -195,8 +195,6 @@ class RsgproductsController extends Controller
 		//限制站点搜索
 		$siteArrConfig = getSiteArr()['site'];
 		$site = isset($_POST['site']) && $_POST['site'] ? $_POST['site'] : 'US';
-        $bg = isset($_POST['bg']) && $_POST['bg'] ? $_POST['bg'] : '';
-        $bu = isset($_POST['bu']) && $_POST['bu'] ? $_POST['bu'] : '';
 		$siteArr = isset($siteArrConfig[$site]) ? $siteArrConfig[$site] : array();
 		if($site == 'US'){//特殊处理： US里面不用展示CA站点的产品
 			$siteArr = array('www.amazon.com');
@@ -207,10 +205,16 @@ class RsgproductsController extends Controller
 		}
 		$sql = $this->getSql(0,$where,$where_product,$date);
 		$sql .= ' LIMIT 0,70';
-
 		$data = $this->queryRows($sql);
 		$data = $this->getReturnData(0,$data,$date,$todayDate,'task');
-
+		if($_POST){
+			$return['status'] = 0;
+			if($data){
+				$return['data'] = $data;
+				$return['status'] = 1;
+			}
+			return json_encode($return);
+		}
         $asinIdList=[];
         $new_data=[];
         foreach ($data as $key => $val) {
@@ -226,27 +230,25 @@ class RsgproductsController extends Controller
                     $d_v=$v['target_review']. '(' . $v['requested_review']. ')';
                     switch ($v['created_at']) {
                         case $date :
-                            $new_data[$ndk]['d_6'] = $d_v;
+                            $new_data[$ndk]['d-6'] = $d_v;
                             break;
                         case date('Y-m-d', time() - 3600 * 24 * 5) :
-                            $new_data[$ndk]['d_5'] = $d_v;
+                            $new_data[$ndk]['d-5'] = $d_v;
                             break;
                         case date('Y-m-d', time() - 3600 * 24 * 4) :
-                            $new_data[$ndk]['d_4'] = $d_v;
+                            $new_data[$ndk]['d-4'] = $d_v;
                             break;
                         case date('Y-m-d', time() - 3600 * 24 * 3) :
-                            $new_data[$ndk]['d_3'] = $d_v;
+                            $new_data[$ndk]['d-3'] = $d_v;
                             break;
                         case date('Y-m-d', time() - 3600 * 24 * 2) :
-                            $new_data[$ndk]['d_2'] = $d_v;
+                            $new_data[$ndk]['d-2'] = $d_v;
                             break;
                         case date('Y-m-d', time() - 3600 * 24 ) :
-                            $new_data[$ndk]['d_1'] = $d_v;
+                            $new_data[$ndk]['d-1'] = $d_v;
                             break;
                         case date('Y-m-d', time()) :
-                            $new_data[$ndk]['d_0'] = $d_v;
-                            $new_data[$ndk]['review'] = $v['review'];
-                            $new_data[$ndk]['rating'] = $v['rating'];
+                            $new_data[$ndk]['d-0'] = $d_v;
                             break;
                     }
                 }
@@ -285,14 +287,6 @@ class RsgproductsController extends Controller
                     }
                 }
             }
-        }
-        if($_POST){
-            $return['status'] = 0;
-            if($new_data){
-                $return['data'] = $new_data;
-                $return['status'] = 1;
-            }
-            return json_encode($return);
         }
 		return view('rsgproducts/task',['data'=>$new_data,'rsg_link'=> 'https://rsg.claimthegift.com?user=V'.Auth::user()->id ]);
 	}
@@ -339,7 +333,6 @@ class RsgproductsController extends Controller
 			$orderby = " order by rsg_products.order_status desc,score desc,id desc ";
 		}
 		$ago15day = date('Y-m-d',strtotime($date)-86400*15);
-        $today = date('Y-m-d',time());
 		$field = $joinSkus = ' ';
 		if($leftskus == 1){
 			$field = ',skus_status.status as sku_status ';
@@ -402,7 +395,7 @@ class RsgproductsController extends Controller
         		select count(*) as num,asin,site 
 				from rsg_products 
 				left join rsg_requests on product_id = rsg_products.id and step IN(4,5,6,7) 
-				where rsg_requests.created_at <= '".$today." 23:59:59 ' and rsg_requests.created_at >='".$ago15day." 00:00:00 ' 
+				where rsg_requests.created_at <= '".$date." 23:59:59 ' and rsg_requests.created_at >='".$ago15day." 00:00:00 ' 
 				group by asin,site 
         	) as rsg on rsg_products.asin=rsg.asin and rsg_products.site=rsg.site 
         	{$joinSkus} 

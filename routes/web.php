@@ -208,10 +208,20 @@ Route::post('/hijack/hijackExport', 'hijack\\HijackController@hijackExport');//�
 //跟卖追踪 END
 
 
-
-//RSG
+//RSG MarketingPlan
 Route::get('/marketingPlan/index', 'MarketingPlanController@index')->name('marketingPlan');
 Route::get('/marketingPlan/detail', 'MarketingPlanController@detail')->name('detail');
+Route::match(['post','get'],'/marketingPlan/rsgList', 'MarketingPlanController@rsgList')->name('rsgList');
+Route::post('/marketingPlan/index1', 'MarketingPlanController@index1')->name('marketingPlan');
+Route::post('/marketingPlan/showData', 'MarketingPlanController@showData');//展示基础信息
+Route::match(['post'],'/marketingPlan/updatePlan', 'MarketingPlanController@updatePlan');//修改计划信息
+Route::post('/marketingPlan/addMarketingPlan', 'MarketingPlanController@addMarketingPlan');//新增接口
+Route::match(['post','get'],'/marketingPlan/detailEdit', 'MarketingPlanController@detailEdit')->name('detailEdit');
+Route::match(['post','get'],'/marketingPlan/timingUpdate', 'MarketingPlanController@timingUpdate');//定时刷新 已完结
+Route::match(['post','get'],'/marketingPlan/achieveGoals', 'MarketingPlanController@achieveGoals');//定时更新 完成时间
+Route::match(['post','get'],'/marketingPlan/delfiles', 'MarketingPlanController@delfiles');//删除图片
+Route::post('/marketingPlan/getAsinDailyReport', 'MarketingPlanController@getAsinDailyReport');
+
 //CollaborativeReplenishment
 Route::get('/collaborativeReplenishment/index', 'CollaborativeReplenishmentController@index')->name('index');
 
@@ -220,6 +230,7 @@ Route::get('/manageDistributeTime/safetyStockDays', 'ManageDistributeTimeControl
 Route::get('/manageDistributeTime/fba', 'ManageDistributeTimeController@fba')->name('fba');
 Route::get('/manageDistributeTime/fbm', 'ManageDistributeTimeController@fbm')->name('fbm');
 Route::get('/manageDistributeTime/internationalTransportTime', 'ManageDistributeTimeController@internationalTransportTime')->name('internationalTransportTime');
+
 
 //投入产出分析
 Route::resource('roi', 'RoiController');
@@ -236,7 +247,10 @@ Route::match(['post','get'],'/mrp/list', 'MrpController@list');
 Route::get('/mrp/edit', 'MrpController@edit');
 Route::post('/mrp/update', 'MrpController@update');
 Route::get('/mrp/export', 'MrpController@export');
+
 Route::get('/mrp/asinexport', 'MrpController@asinExport');
 Route::post('/mrp/import', 'MrpController@import');
+
 //CPFR协同补货
 Route::get('/cpfr/index', 'CpfrController@index')->name('index');
+

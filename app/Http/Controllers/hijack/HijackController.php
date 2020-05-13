@@ -197,21 +197,10 @@ class HijackController extends Controller
      */
     public function index1()
     {
+        $SKU_STATUS_KV= Asin::SKU_STATUS_KV;
         $admin = array('duanyongsheng@dtas.com',"charlie@valuelinkcorp.com", "zouyuanxun@valuelinkcorp.com", "zanhaifang@valuelinkcorp.com", "huzaoli@valuelinkcorp.com", 'fanlinxi@valuelinkcorp.com');
         $userasinL = [];
         $sapSellerIdList = [];
-//        $user = ['id' => '154',
-//            'name' => 'test',
-//            'email' => 'test@valuelinkcorp.com',
-//            'created_at' => '2020-03-27 14:58:11',
-//            'updated_at' => '2020-03-27 14:58:11',
-//            'admin' => 0,
-//            'sap_seller_id' => 279,
-//            'seller_rules' => 'BG3-BU3-* ',
-//            'locked' => 0,
-//            'ubg' => 'BG3',
-//            'ubu' => 'BU3',
-//        ];
         $bool_admin = 0;//是否是管理员
         $user = Auth::user()->toArray(); //todo  打开
         if (!empty($user)) {
@@ -356,7 +345,7 @@ class HijackController extends Controller
                         $productList[$pk]['BU'] = $v['sap_seller_bu'];
                         $productList[$pk]['sku'] = $v['sku'];
                         $productList[$pk]['sap_updated_at'] = $v['updated_at'];
-                        $productList[$pk]['sku_status'] = $v['sku_status'];
+                        $productList[$pk]['sku_status'] = $SKU_STATUS_KV[$v['sku_status']];
                     }
                 }
             }
@@ -1321,6 +1310,7 @@ class HijackController extends Controller
      */
     public function resellingList(Request $request)
     {
+        $SKU_STATUS_KV= Asin::SKU_STATUS_KV;
         $DOMIN_MARKETPLACEID = Asin::DOMIN_MARKETPLACEID;
         $DOMIN_MARKETPLACEID_SX = Asin::DOMIN_MARKETPLACEID_SX;
         $DOMIN_MARKETPLACEID_URL = Asin::DOMIN_MARKETPLACEID_URL;
@@ -1400,7 +1390,7 @@ class HijackController extends Controller
                                 $asins[0]['asin_reselling_num'] = $taskList[0]['reselling_num'];
                                 $asins[0]['asin_reselling_time'] = date('Y/m/d H:i:s', $taskList[0]['reselling_time']);
                                 $asins[0]['sku'] = $sku;
-                                $asins[0]['sku_status'] = $sku_status;
+                                $asins[0]['sku_status'] = $SKU_STATUS_KV[$sku_status];
                                 $asins[0]['user_name'] = $request['name'] ? $request['name'] : '';
 
                                 foreach ($taskList as $tk => $tv) {

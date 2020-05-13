@@ -36,7 +36,7 @@
         td input{
             width: 76px;
             height:22px;
-            border: 1px solid #eeeeee;
+            border: 1px solid #dddddd;
         }
         .span_td{
             text-align: left !important;
@@ -81,7 +81,7 @@
             /*height: 30px;*/
             /*border-radius: 5px !important;*/
         /*}*/
-        .commom-btn{
+        .common-btn{
             background-color: #63C5D1;
             color: #ffffff;
             font-size: 14px;
@@ -99,6 +99,15 @@
             height: 30px;
             border-radius: 5px !important;
         }
+        #edit-history-modal{
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%,-50%);
+            /*min-width:80%;!*这个比例可以自己按需调节*!*/
+            overflow: visible;
+            bottom: inherit;
+            right: inherit;
+        }
 
     </style>
 
@@ -106,10 +115,10 @@
         <div class="col-md-12">
             <div style="height: 20px;"></div>
             <div style="float: right;">
-                <button type="button" class="disabled-btn" disabled style="width: 104px;"><span><i class="fa fa-history"></i></span> 编辑历史</button>
+                <button type="button" class="common-btn" data-target="#edit-history-modal" data-toggle="modal" style="width: 104px;"><span><i class="fa fa-history"></i></span> 编辑历史</button>
             </div>
             <div style="float: right;">
-                <button type="button" class="commom-btn" id="copy-btn" style="width: 104px; margin-right: 10px"><span><i class="fa fa-copy"></i></span> 复制链接</button>
+                <button type="button" class="common-btn" id="copy-btn" style="width: 104px; margin-right: 10px"><span><i class="fa fa-copy"></i></span> 复制链接</button>
             </div>
             <div style="float: right;">
                 <button type="button" class="disabled-btn" disabled style="width: 80px; margin-right: 10px"><span><i class="fa fa-sign-out"></i></span> 导出</button>
@@ -186,46 +195,40 @@
                             <tr>
                                 <td rowspan="4">销售预测</td>
                                 <td style="padding-left: 10px; text-align: left;">预计销量</td>
-                                <td><input type="text" name="volume_month_1" id="volume_month_1" value="{{$roi['volume_month_1']}}" /></td>
-                                <td><input type="text" name="volume_month_2" id="volume_month_2" value="{{$roi['volume_month_2']}}" /></td>
-                                <td><input type="text" name="volume_month_3" id="volume_month_3" value="{{$roi['volume_month_3']}}" /></td>
-                                <td><input type="text" name="volume_month_4" id="volume_month_4" value="{{$roi['volume_month_4']}}" /></td>
-                                <td><input type="text" name="volume_month_5" id="volume_month_5" value="{{$roi['volume_month_5']}}" /></td>
-                                <td><input type="text" name="volume_month_6" id="volume_month_6" value="{{$roi['volume_month_6']}}" /></td>
-                                <td><input type="text" name="volume_month_7" id="volume_month_7" value="{{$roi['volume_month_7']}}" /></td>
-                                <td><input type="text" name="volume_month_8" id="volume_month_8" value="{{$roi['volume_month_8']}}" /></td>
-                                <td><input type="text" name="volume_month_9" id="volume_month_9" value="{{$roi['volume_month_9']}}" /></td>
-                                <td><input type="text" name="volume_month_10" id="volume_month_10" value="{{$roi['volume_month_10']}}" /></td>
-                                <td><input type="text" name="volume_month_11" id="volume_month_11" value="{{$roi['volume_month_11']}}" /></td>
-                                <td><input type="text" name="volume_month_12" id="volume_month_12" value="{{$roi['volume_month_12']}}" /></td>
-                                {{--<input type="hidden" name="total_volume" id="total_volume" />--}}
-                                {{--<td><input type="text" style="border:0px;" id="total_volume_show" value="" disabled /></td>--}}
+                                <td><input type="text" class="volume_input" name="volume_month_1" id="volume_month_1" value="{{$roi['volume_month_1']}}" /></td>
+                                <td><input type="text" class="volume_input" name="volume_month_2" id="volume_month_2" value="{{$roi['volume_month_2']}}" /></td>
+                                <td><input type="text" class="volume_input" name="volume_month_3" id="volume_month_3" value="{{$roi['volume_month_3']}}" /></td>
+                                <td><input type="text" class="volume_input" name="volume_month_4" id="volume_month_4" value="{{$roi['volume_month_4']}}" /></td>
+                                <td><input type="text" class="volume_input" name="volume_month_5" id="volume_month_5" value="{{$roi['volume_month_5']}}" /></td>
+                                <td><input type="text" class="volume_input" name="volume_month_6" id="volume_month_6" value="{{$roi['volume_month_6']}}" /></td>
+                                <td><input type="text" class="volume_input" name="volume_month_7" id="volume_month_7" value="{{$roi['volume_month_7']}}" /></td>
+                                <td><input type="text" class="volume_input" name="volume_month_8" id="volume_month_8" value="{{$roi['volume_month_8']}}" /></td>
+                                <td><input type="text" class="volume_input" name="volume_month_9" id="volume_month_9" value="{{$roi['volume_month_9']}}" /></td>
+                                <td><input type="text" class="volume_input" name="volume_month_10" id="volume_month_10" value="{{$roi['volume_month_10']}}" /></td>
+                                <td><input type="text" class="volume_input" name="volume_month_11" id="volume_month_11" value="{{$roi['volume_month_11']}}" /></td>
+                                <td><input type="text" class="volume_input" name="volume_month_12" id="volume_month_12" value="{{$roi['volume_month_12']}}" /></td>
                                 <td class="span_td"><span id="total_sales_volume">{{$roi['total_sales_volume']}}</span></td>
                             </tr>
                             <tr>
                                 <td style="padding-left: 10px; text-align: left">售价（外币）</td>
                                 <!-- fc： foregin currency -->
-                                <td><input type="text" name="price_fc_month_1" id="price_fc_month_1" value="{{$roi['price_fc_month_1']}}" /></td>
-                                <td><input type="text" name="price_fc_month_2" id="price_fc_month_2" value="{{$roi['price_fc_month_2']}}" /></td>
-                                <td><input type="text" name="price_fc_month_3" id="price_fc_month_3" value="{{$roi['price_fc_month_3']}}" /></td>
-                                <td><input type="text" name="price_fc_month_4" id="price_fc_month_4" value="{{$roi['price_fc_month_4']}}" /></td>
-                                <td><input type="text" name="price_fc_month_5" id="price_fc_month_5" value="{{$roi['price_fc_month_5']}}" /></td>
-                                <td><input type="text" name="price_fc_month_6" id="price_fc_month_6" value="{{$roi['price_fc_month_6']}}" /></td>
-                                <td><input type="text" name="price_fc_month_7" id="price_fc_month_7" value="{{$roi['price_fc_month_7']}}" /></td>
-                                <td><input type="text" name="price_fc_month_8" id="price_fc_month_8" value="{{$roi['price_fc_month_8']}}" /></td>
-                                <td><input type="text" name="price_fc_month_9" id="price_fc_month_9" value="{{$roi['price_fc_month_9']}}" /></td>
-                                <td><input type="text" name="price_fc_month_10" id="price_fc_month_10" value="{{$roi['price_fc_month_10']}}" /></td>
-                                <td><input type="text" name="price_fc_month_11" id="price_fc_month_11" value="{{$roi['price_fc_month_11']}}" /></td>
-                                <td><input type="text" name="price_fc_month_12" id="price_fc_month_12" value="{{$roi['price_fc_month_12']}}" /></td>
-                                {{--<input type="hidden" name="average_price_fc" id="average_price_fc" />--}}
-                                {{--<td><input type="text" style="border:0px;" id="average_price_fc_show" value="" disabled /></td>--}}
+                                <td><input type="text" class="price_fc_input" name="price_fc_month_1" id="price_fc_month_1" value="{{$roi['price_fc_month_1']}}" /></td>
+                                <td><input type="text" class="price_fc_input" name="price_fc_month_2" id="price_fc_month_2" value="{{$roi['price_fc_month_2']}}" /></td>
+                                <td><input type="text" class="price_fc_input" name="price_fc_month_3" id="price_fc_month_3" value="{{$roi['price_fc_month_3']}}" /></td>
+                                <td><input type="text" class="price_fc_input" name="price_fc_month_4" id="price_fc_month_4" value="{{$roi['price_fc_month_4']}}" /></td>
+                                <td><input type="text" class="price_fc_input" name="price_fc_month_5" id="price_fc_month_5" value="{{$roi['price_fc_month_5']}}" /></td>
+                                <td><input type="text" class="price_fc_input" name="price_fc_month_6" id="price_fc_month_6" value="{{$roi['price_fc_month_6']}}" /></td>
+                                <td><input type="text" class="price_fc_input" name="price_fc_month_7" id="price_fc_month_7" value="{{$roi['price_fc_month_7']}}" /></td>
+                                <td><input type="text" class="price_fc_input" name="price_fc_month_8" id="price_fc_month_8" value="{{$roi['price_fc_month_8']}}" /></td>
+                                <td><input type="text" class="price_fc_input" name="price_fc_month_9" id="price_fc_month_9" value="{{$roi['price_fc_month_9']}}" /></td>
+                                <td><input type="text" class="price_fc_input" name="price_fc_month_10" id="price_fc_month_10" value="{{$roi['price_fc_month_10']}}" /></td>
+                                <td><input type="text" class="price_fc_input" name="price_fc_month_11" id="price_fc_month_11" value="{{$roi['price_fc_month_11']}}" /></td>
+                                <td><input type="text" class="price_fc_input" name="price_fc_month_12" id="price_fc_month_12" value="{{$roi['price_fc_month_12']}}" /></td>
                                 <td class="span_td"><span id="average_price_fc">{{$roi['average_price_fc']}}</span></td>
 
                             </tr>
                             <tr>
                                 <td style="padding-left: 10px; text-align: left">售价RMB</td>
-                                <!-- fc： foregin currency -->
-                                {{--<td><input type="text" name="price_rmb_month_1" id="price_rmb_month_1" /></td>--}}
                                 <td class="span_td"><span id="price_rmb_month_1">{{$roi['price_rmb_month_1']}}</span></td>
                                 <td class="span_td"><span id="price_rmb_month_2">{{$roi['price_rmb_month_2']}}</span></td>
                                 <td class="span_td"><span id="price_rmb_month_3">{{$roi['price_rmb_month_3']}}</span></td>
@@ -238,14 +241,10 @@
                                 <td class="span_td"><span id="price_rmb_month_10">{{$roi['price_rmb_month_10']}}</span></td>
                                 <td class="span_td"><span id="price_rmb_month_11">{{$roi['price_rmb_month_11']}}</span></td>
                                 <td class="span_td"><span id="price_rmb_month_12">{{$roi['price_rmb_month_12']}}</span></td>
-                                {{--<input type="hidden" name="average_price_rmb" id="average_price_rmb" />--}}
-                                {{--<td><input type="text" style="border:0px;" id="average_price_rmb_show" value="" disabled /></td>--}}
                                 <td class="span_td"><span id="average_price_rmb">{{$roi['average_price_rmb']}}</span></td>
                             </tr>
                             <tr>
                                 <td style="padding-left: 10px; text-align: left">销售金额</td>
-                                <!-- fc： foregin currency -->
-                                {{--<td><input type="text" name="sales_amount_month_1" id="sales_amount_month_1" /></td>--}}
                                 <td class="span_td"><span id="sales_amount_month_1">{{$roi['sales_amount_month_1']}}</span></td>
                                 <td class="span_td"><span id="sales_amount_month_2">{{$roi['sales_amount_month_2']}}</span></td>
                                 <td class="span_td"><span id="sales_amount_month_3">{{$roi['sales_amount_month_3']}}</span></td>
@@ -258,48 +257,135 @@
                                 <td class="span_td"><span id="sales_amount_month_10">{{$roi['sales_amount_month_10']}}</span></td>
                                 <td class="span_td"><span id="sales_amount_month_11">{{$roi['sales_amount_month_11']}}</span></td>
                                 <td class="span_td"><span id="sales_amount_month_12">{{$roi['sales_amount_month_12']}}</span></td>
-                                {{--<input type="hidden" name="total_sales_amount" id="total_sales_amount" />--}}
-                                {{--<td><input type="text" style="border:0px;" id="total_sales_amount_show" value="" disabled /></td>--}}
                                 <td class="span_td"><span id="total_sales_amount">{{$roi['total_sales_amount']}}</span></td>
-
                             </tr>
                             <tr>
                                 <td colspan="2">推广率</td>
-                                <td><input type="text" name="promo_rate_month_1" id="promo_rate_month_1" value="{{$roi['promo_rate_month_1']}}" /></td>
-                                <td><input type="text" name="promo_rate_month_2" id="promo_rate_month_2" value="{{$roi['promo_rate_month_2']}}" /></td>
-                                <td><input type="text" name="promo_rate_month_3" id="promo_rate_month_3" value="{{$roi['promo_rate_month_3']}}" /></td>
-                                <td><input type="text" name="promo_rate_month_4" id="promo_rate_month_4" value="{{$roi['promo_rate_month_4']}}" /></td>
-                                <td><input type="text" name="promo_rate_month_5" id="promo_rate_month_5" value="{{$roi['promo_rate_month_5']}}" /></td>
-                                <td><input type="text" name="promo_rate_month_6" id="promo_rate_month_6" value="{{$roi['promo_rate_month_6']}}" /></td>
-                                <td><input type="text" name="promo_rate_month_7" id="promo_rate_month_7" value="{{$roi['promo_rate_month_7']}}" /></td>
-                                <td><input type="text" name="promo_rate_month_8" id="promo_rate_month_8" value="{{$roi['promo_rate_month_8']}}" /></td>
-                                <td><input type="text" name="promo_rate_month_9" id="promo_rate_month_9" value="{{$roi['promo_rate_month_9']}}" /></td>
-                                <td><input type="text" name="promo_rate_month_10" id="promo_rate_month_10" value="{{$roi['promo_rate_month_10']}}" /></td>
-                                <td><input type="text" name="promo_rate_month_11" id="promo_rate_month_11" value="{{$roi['promo_rate_month_11']}}" /></td>
-                                <td><input type="text" name="promo_rate_month_12" id="promo_rate_month_12" value="{{$roi['promo_rate_month_12']}}" /></td>
-                                {{--<input type="hidden" name="average_promo_rate" id="average_promo_rate" />--}}
-                                {{--<td><input type="text" style="border:0px;" id="average_promo_rate_show" value="" disabled /></td>--}}
-                                <td class="span_td"><span id="average_promo_rate">{{$roi['average_promo_rate']}}</span></td>
-
+                                <td>
+                                    <div style="border: 1px solid #dddddd;height: 22px;width: 76px;margin-left: 12px;">
+                                        <input class="promo_exception_input" type="text" name="promo_rate_month_1" id="promo_rate_month_1" style="float: left;border: none;width: 60px;height: 20px;" value="{{$roi['promo_rate_month_1']}}" ><span>%</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div style="border: 1px solid #dddddd;height: 22px;width: 76px;margin-left: 12px;">
+                                        <input class="promo_exception_input" type="text" name="promo_rate_month_2" id="promo_rate_month_2" style="float: left;border: none;width: 60px;height: 20px;" value="{{$roi['promo_rate_month_2']}}" ><span>%</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div style="border: 1px solid #dddddd;height: 22px;width: 76px;margin-left: 12px;">
+                                        <input class="promo_exception_input" type="text" name="promo_rate_month_3" id="promo_rate_month_3" style="float: left;border: none;width: 60px;height: 20px;" value="{{$roi['promo_rate_month_3']}}" ><span>%</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div style="border: 1px solid #dddddd;height: 22px;width: 76px;margin-left: 12px;">
+                                        <input class="promo_exception_input" type="text" name="promo_rate_month_4" id="promo_rate_month_4" style="float: left;border: none;width: 60px;height: 20px;" value="{{$roi['promo_rate_month_4']}}" ><span>%</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div style="border: 1px solid #dddddd;height: 22px;width: 76px;margin-left: 12px;">
+                                        <input class="promo_exception_input" type="text" name="promo_rate_month_5" id="promo_rate_month_5" style="float: left;border: none;width: 60px;height: 20px;" value="{{$roi['promo_rate_month_5']}}" ><span>%</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div style="border: 1px solid #dddddd;height: 22px;width: 76px;margin-left: 12px;">
+                                        <input class="promo_exception_input" type="text" name="promo_rate_month_6" id="promo_rate_month_6" style="float: left;border: none;width: 60px;height: 20px;" value="{{$roi['promo_rate_month_6']}}" ><span>%</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div style="border: 1px solid #dddddd;height: 22px;width: 76px;margin-left: 12px;">
+                                        <input class="promo_exception_input" type="text" name="promo_rate_month_7" id="promo_rate_month_7" style="float: left;border: none;width: 60px;height: 20px;" value="{{$roi['promo_rate_month_7']}}" ><span>%</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div style="border: 1px solid #dddddd;height: 22px;width: 76px;margin-left: 12px;">
+                                        <input class="promo_exception_input" type="text" name="promo_rate_month_8" id="promo_rate_month_8" style="float: left;border: none;width: 60px;height: 20px;" value="{{$roi['promo_rate_month_8']}}" ><span>%</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div style="border: 1px solid #dddddd;height: 22px;width: 76px;margin-left: 12px;">
+                                        <input class="promo_exception_input" type="text" name="promo_rate_month_9" id="promo_rate_month_9" style="float: left;border: none;width: 60px;height: 20px;" value="{{$roi['promo_rate_month_9']}}" ><span>%</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div style="border: 1px solid #dddddd;height: 22px;width: 76px;margin-left: 12px;">
+                                        <input class="promo_exception_input" type="text" name="promo_rate_month_10" id="promo_rate_month_10" style="float: left;border: none;width: 60px;height: 20px;" value="{{$roi['promo_rate_month_10']}}" ><span>%</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div style="border: 1px solid #dddddd;height: 22px;width: 76px;margin-left: 12px;">
+                                        <input class="promo_exception_input" type="text" name="promo_rate_month_11" id="promo_rate_month_11" style="float: left;border: none;width: 60px;height: 20px;" value="{{$roi['promo_rate_month_11']}}" ><span>%</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div style="border: 1px solid #dddddd;height: 22px;width: 76px;margin-left: 12px;">
+                                        <input class="promo_exception_input" type="text" name="promo_rate_month_12" id="promo_rate_month_12" style="float: left;border: none;width: 60px;height: 20px;" value="{{$roi['promo_rate_month_12']}}" ><span>%</span>
+                                    </div>
+                                </td>
+                             <td class="span_td"><span id="average_promo_rate">{{$roi['average_promo_rate']}}</span></td>
                             </tr>
                             <tr>
                                 <td colspan="2">异常率</td>
-                                <td><input type="text" name="exception_rate_month_1" id="exception_rate_month_1" value="{{$roi['exception_rate_month_1']}}" /></td>
-                                <td><input type="text" name="exception_rate_month_2" id="exception_rate_month_2" value="{{$roi['exception_rate_month_2']}}" /></td>
-                                <td><input type="text" name="exception_rate_month_3" id="exception_rate_month_3" value="{{$roi['exception_rate_month_3']}}" /></td>
-                                <td><input type="text" name="exception_rate_month_4" id="exception_rate_month_4" value="{{$roi['exception_rate_month_4']}}" /></td>
-                                <td><input type="text" name="exception_rate_month_5" id="exception_rate_month_5" value="{{$roi['exception_rate_month_5']}}" /></td>
-                                <td><input type="text" name="exception_rate_month_6" id="exception_rate_month_6" value="{{$roi['exception_rate_month_6']}}" /></td>
-                                <td><input type="text" name="exception_rate_month_7" id="exception_rate_month_7" value="{{$roi['exception_rate_month_7']}}" /></td>
-                                <td><input type="text" name="exception_rate_month_8" id="exception_rate_month_8" value="{{$roi['exception_rate_month_8']}}" /></td>
-                                <td><input type="text" name="exception_rate_month_9" id="exception_rate_month_9" value="{{$roi['exception_rate_month_9']}}" /></td>
-                                <td><input type="text" name="exception_rate_month_10" id="exception_rate_month_10" value="{{$roi['exception_rate_month_10']}}" /></td>
-                                <td><input type="text" name="exception_rate_month_11" id="exception_rate_month_11" value="{{$roi['exception_rate_month_11']}}" /></td>
-                                <td><input type="text" name="exception_rate_month_12" id="exception_rate_month_12" value="{{$roi['exception_rate_month_12']}}" /></td>
-                                {{--<input type="hidden" name="average_exception_rate" id="average_exception_rate" />--}}
-                                {{--<td><input type="text" style="border:0px;" id="average_exception_rate_show" value="" disabled /></td>--}}
+                                <td>
+                                    <div style="border: 1px solid #dddddd;height: 22px;width: 76px;margin-left: 12px;">
+                                        <input class="promo_exception_input" type="text" name="exception_rate_month_1" id="exception_rate_month_1" style="float: left;border: none;width: 60px;height: 20px;" value="{{$roi['exception_rate_month_1']}}"><span>%</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div style="border: 1px solid #dddddd;height: 22px;width: 76px;margin-left: 12px;">
+                                        <input class="promo_exception_input" type="text" name="exception_rate_month_2" id="exception_rate_month_2" style="float: left;border: none;width: 60px;height: 20px;" value="{{$roi['exception_rate_month_2']}}"><span>%</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div style="border: 1px solid #dddddd;height: 22px;width: 76px;margin-left: 12px;">
+                                        <input class="promo_exception_input" type="text" name="exception_rate_month_3" id="exception_rate_month_3" style="float: left;border: none;width: 60px;height: 20px;" value="{{$roi['exception_rate_month_3']}}"><span>%</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div style="border: 1px solid #dddddd;height: 22px;width: 76px;margin-left: 12px;">
+                                        <input class="promo_exception_input" type="text" name="exception_rate_month_4" id="exception_rate_month_4" style="float: left;border: none;width: 60px;height: 20px;" value="{{$roi['exception_rate_month_4']}}"><span>%</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div style="border: 1px solid #dddddd;height: 22px;width: 76px;margin-left: 12px;">
+                                        <input class="promo_exception_input" type="text" name="exception_rate_month_5" id="exception_rate_month_5" style="float: left;border: none;width: 60px;height: 20px;" value="{{$roi['exception_rate_month_5']}}"><span>%</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div style="border: 1px solid #dddddd;height: 22px;width: 76px;margin-left: 12px;">
+                                        <input class="promo_exception_input" type="text" name="exception_rate_month_6" id="exception_rate_month_6" style="float: left;border: none;width: 60px;height: 20px;" value="{{$roi['exception_rate_month_6']}}"><span>%</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div style="border: 1px solid #dddddd;height: 22px;width: 76px;margin-left: 12px;">
+                                        <input class="promo_exception_input" type="text" name="exception_rate_month_7" id="exception_rate_month_7" style="float: left;border: none;width: 60px;height: 20px;" value="{{$roi['exception_rate_month_7']}}"><span>%</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div style="border: 1px solid #dddddd;height: 22px;width: 76px;margin-left: 12px;">
+                                        <input class="promo_exception_input" type="text" name="exception_rate_month_8" id="exception_rate_month_8" style="float: left;border: none;width: 60px;height: 20px;" value="{{$roi['exception_rate_month_8']}}"><span>%</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div style="border: 1px solid #dddddd;height: 22px;width: 76px;margin-left: 12px;">
+                                        <input class="promo_exception_input" type="text" name="exception_rate_month_9" id="exception_rate_month_9" style="float: left;border: none;width: 60px;height: 20px;" value="{{$roi['exception_rate_month_9']}}"><span>%</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div style="border: 1px solid #dddddd;height: 22px;width: 76px;margin-left: 12px;">
+                                        <input class="promo_exception_input" type="text" name="exception_rate_month_10" id="exception_rate_month_10" style="float: left;border: none;width: 60px;height: 20px;" value="{{$roi['exception_rate_month_10']}}"><span>%</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div style="border: 1px solid #dddddd;height: 22px;width: 76px;margin-left: 12px;">
+                                        <input class="promo_exception_input" type="text" name="exception_rate_month_11" id="exception_rate_month_11" style="float: left;border: none;width: 60px;height: 20px;" value="{{$roi['exception_rate_month_11']}}"><span>%</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div style="border: 1px solid #dddddd;height: 22px;width: 76px;margin-left: 12px;">
+                                        <input class="promo_exception_input" type="text" name="exception_rate_month_12" id="exception_rate_month_12" style="float: left;border: none;width: 60px;height: 20px;" value="{{$roi['exception_rate_month_12']}}"><span>%</span>
+                                    </div>
+                                </td>
                                 <td class="span_td"><span id="average_exception_rate">{{$roi['average_exception_rate']}}</span></td>
-
                             </tr>
                         </table>
                     </div>
@@ -316,11 +402,13 @@
                             <div style="height: 10px;"></div>
                             <div class="param_cost">
                                 <div>平台佣金(%)</div>
-                                <input type="text" name="commission_rate" id="commission_rate" value="{{$roi['commission_rate']}}" />
+                                <div style="border: 1px solid #cccccc;height: 26px;width: 205px;">
+                                    <input class="int_or_two_digits_input" type="text" name="commission_rate" id="commission_rate" style="float: left;border: none;width: 189px;height: 23px;" value="{{$roi['commission_rate']}}"><span>%</span>
+                                </div>
                             </div>
                             <div class="param_cost">
                                 <div>平台操作费(外币/pcs)</div>
-                                <input type="text" name="unit_operating_fee" id="unit_operating_fee" value="{{$roi['unit_operating_fee']}}" />
+                                <input class="int_or_two_digits_input" type="text" name="unit_operating_fee" id="unit_operating_fee" value="{{$roi['unit_operating_fee']}}" />
                             </div>
                             <div style="clear: both"></div>
                             <div style="height: 20px;"></div>
@@ -337,17 +425,19 @@
                             <div class="param_cost">
                                 <div>运输单价</div>
                                 <div style="width: 205px;" class="input-group">
-                                    <input type="text" name="transport_unit_price" style="width: 157px" value="{{$roi['transport_unit_price']}}" />
-                                    <span id="unit_price_type" style="height:26px; padding: 4px" class="input-group-addon">元/m<sup>3</sup></span>
+                                    <input class="int_or_two_digits_input" type="text" name="transport_unit_price" style="width: 157px" value="{{$roi['transport_unit_price']}}" />
+                                    <span id="unit_price_type" style="height:26px; padding: 4px" class="input-group-addon">{!! $roi['transport_unit'] !!}</span>
                                 </div>
                             </div>
                             <div class="param_cost">
                                 <div>运输天数</div>
-                                <input type="text" name="transport_days" id="transport_days" value="{{$roi['transport_days']}}" />
+                                <input class="int_or_two_digits_input" type="text" name="transport_days" id="transport_days" value="{{$roi['transport_days']}}" />
                             </div>
                             <div class="param_cost">
                                 <div>关税税率</div>
-                                <input type="text" name="tariff_rate" id="tariff_rate" value="{{$roi['tariff_rate']}}" />
+                                <div style="border: 1px solid #cccccc;height: 26px;width: 205px;">
+                                    <input class="int_or_two_digits_input" type="text" name="tariff_rate" id="tariff_rate" style="float: left;border: none;width: 189px;height: 23px;" value="{{$roi['tariff_rate']}}"><span>%</span>
+                                </div>
                             </div>
                             <div style="clear: both"></div>
                             <div style="height: 20px;"></div>
@@ -355,19 +445,19 @@
                             <div style="height: 10px;"></div>
                             <div class="param_cost">
                                 <div>单PCS实重(KG)</div>
-                                <input type="text" name="weight_per_pcs" id="weight_per_pcs" value="{{$roi['weight_per_pcs']}}" />
+                                <input class="int_or_two_digits_input" type="text" name="weight_per_pcs" id="weight_per_pcs" value="{{$roi['weight_per_pcs']}}" />
                             </div>
                             <div style="width:220px; float:left;">
                                 <div>单PCS体积(cm<sup>3</sup>)</div>
-                                <input type="text" name="volume_per_pcs" id="volume_per_pcs" value="{{$roi['volume_per_pcs']}}" />
+                                <input class="int_or_two_digits_input" type="text" name="volume_per_pcs" id="volume_per_pcs" value="{{$roi['volume_per_pcs']}}" />
                             </div>
                             <div class="param_cost">
                                 <div>不含税采购价</div>
-                                <input type="text" name="purchase_price" id="purchase_price" value="{{$roi['purchase_price']}}" />
+                                <input class="int_or_two_digits_input" type="text" name="purchase_price" id="purchase_price" value="{{$roi['purchase_price']}}" />
                             </div>
                             <div class="param_cost">
                                 <div>MOQ(PCS)</div>
-                                <input type="text" name="moq" id="moq" value="{{$roi['moq']}}" />
+                                <input class="int_input" type="text" name="moq" id="moq" value="{{$roi['moq']}}" />
                             </div>
                             <div class="param_cost">
                                 <div>供应商账期</div>
@@ -384,29 +474,29 @@
                             <div style="height: 10px;"></div>
                             <div class="param_cost">
                                 <div>ID费用(元)</div>
-                                <input type="text" name="id_fee" id="id_fee" value="{{$roi['id_fee']}}" />
+                                <input class="int_or_two_digits_input" type="text" name="id_fee" id="id_fee" value="{{$roi['id_fee']}}" />
                             </div>
                             <div class="param_cost">
                                 <div>模具费(元)</div>
-                                <input type="text" name="mold_fee" id="mold_fee" value="{{$roi['mold_fee']}}" />
+                                <input class="int_or_two_digits_input" type="text" name="mold_fee" id="mold_fee" value="{{$roi['mold_fee']}}" />
                             </div>
                             <div class="param_cost">
                                 <div>手板费(元)</div>
-                                <input type="text" name="prototype_fee" id="prototype_fee" value="{{$roi['prototype_fee']}}" />
+                                <input class="int_or_two_digits_input" type="text" name="prototype_fee" id="prototype_fee" value="{{$roi['prototype_fee']}}" />
                             </div>
                             <div class="param_cost">
                                 <div>其他费用(元)</div>
-                                <input type="text" name="other_fixed_cost" id="other_fixed_cost" value="{{$roi['other_fixed_cost']}}" />
+                                <input class="int_or_two_digits_input" type="text" name="other_fixed_cost" id="other_fixed_cost" value="{{$roi['other_fixed_cost']}}" />
                             </div>
                             <div style="clear: both"></div>
                             <div style="height: 10px;"></div>
                             <div class="param_cost">
                                 <div>专利费(元)</div>
-                                <input type="text" name="royalty_fee" id="royalty_fee" value="{{$roi['royalty_fee']}}" />
+                                <input class="int_or_two_digits_input" type="text" name="royalty_fee" id="royalty_fee" value="{{$roi['royalty_fee']}}" />
                             </div>
                             <div class="param_cost">
                                 <div>认证费(元)</div>
-                                <input type="text" name="certification_fee" id="certification_fee" value="{{$roi['certification_fee']}}" />
+                                <input class="int_or_two_digits_input" type="text" name="certification_fee" id="certification_fee" value="{{$roi['certification_fee']}}" />
                             </div>
                             <div style="clear: both"></div>
                             <div style="height: 20px;"></div>
@@ -438,36 +528,34 @@
                                 </div>
                                 <div class="param_cost">
                                     <div>预计项目总人天数量</div>
-                                    <input type="text" name="estimated_man_day" id="estimated_man_day" value="{{$roi['estimated_man_day']}}" />
+                                    <input class="int_input" type="text" name="estimated_man_day" id="estimated_man_day" value="{{$roi['estimated_man_day']}}" />
                                 </div>
                                 <div class="param_cost">
                                     <div>预计开发人力成本</div>
-                                    <input type="text" name="estimated_labor_cost" id="estimated_labor_cost" value="{{$roi['estimated_labor_cost']}}" />
+                                    <input class="int_or_two_digits_input" type="text" name="estimated_labor_cost" id="estimated_labor_cost" value="{{$roi['estimated_labor_cost']}}" />
                                 </div>
                                 <div class="param_cost">
                                     <div>差旅费用</div>
-                                    <input type="text" name="business_trip_expenses" id="business_trip_expenses" value="{{$roi['business_trip_expenses']}}" />
+                                    <input class="int_or_two_digits_input" type="text" name="business_trip_expenses" id="business_trip_expenses" value="{{$roi['business_trip_expenses']}}" />
                                 </div>
                                 <div class="param_cost">
                                     <div>其他成本</div>
-                                    <input type="text" name="other_project_cost" id="other_project_cost" value="{{$roi['other_project_cost']}}" />
+                                    <input class="int_or_two_digits_input" type="text" name="other_project_cost" id="other_project_cost" value="{{$roi['other_project_cost']}}" />
                                 </div>
                                 <div style="clear: both"></div>
                             </div>
                             <div style="height: 30px;"></div>
-                            {{--<div id="fold_icon" onclick="fold_cost_details()" style="font-size: 14px; color:#63C5D1; text-align: center;">收起 <i class="fa fa-angle-double-up"></i></div>--}}
                             <div style="font-size: 14px; color:#63C5D1; text-align: center;"><span onclick="fold_cost_details()">收起 <i class="fa fa-angle-double-up"></i></span></div>
                         </div>
 
                     </div>
                     <div style="height: 25px;"></div>
                     <div style="width: 1501px; text-align: center;">
-                        <button type="button" class="commom-btn" style="width: 60px" id="analyse-btn">分析</button>
+                        <button type="button" class="common-btn" style="width: 60px" id="analyse-btn">分析</button>
                     </div>
                     <div style="height: 30px;"></div>
                     <div class="result_div">
                         <div style="font-size: 14px;">投入产出分析结果</div>
-
                         <div style="height: 15px;"></div>
                         <div style="width:1501px">
                             <table id="result_table" border="0" cellspacing="0" cellpadding="0">
@@ -483,15 +571,13 @@
                                     <td>投资回报率ROI(%) : <span id="roi"></span></td>
                                     <td>投资回报额(万元) : <span id="return_amount"></span></td>
                                 </tr>
-
                             </table>
-
                         </div>
                     </div>
 
                     <div style="height: 25px;"></div>
                     <div style="width: 1501px; text-align: center;">
-                        <button type="submit" class="commom-btn" style="width:100px">保存</button>
+                        <button type="submit" class="common-btn" style="width:100px">保存</button>
                     </div>
                 </div>
               </div>
@@ -499,49 +585,76 @@
 
         </div>
     </div>
+    <div class="modal fade" id="edit-history-modal" tabindex="-2" role="dialog" aria-labelledby="historyLabel">
+        <div class="modal-dialog" role="document" style="width:362px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="historyLabel">编辑历史</h4>
+                </div>
+                <div class="modal-body">
+                    <div style="width: 330px; height: 260px; overflow-y: auto;" >
+                        <table border="1" style="width: 330px; border: 0px solid #eeeeee;">
+                            <tr style="height: 26px; background-color: #eeeeee;">
+                                <th width="50%">编辑者</th>
+                                <th>编辑时间</th>
+                            </tr>
+                            <tr>
+                            @foreach($edit_history_array as $key => $val)
+                                <tr style="height: 26px;">
+                                    <td>{{$val['user_name']}}</td>
+                                    <td>{{$val['updated_at']}}</td>
+                                    @endforeach
+                                </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <script type="text/javascript">
+<script type="text/javascript">
+    var currency_rates = eval(<?php echo json_encode($currency_rates);?>);
 
-        function fold_cost_details(){
-            $('#cost_details_div').hide();
-            $('#expand_icon').show();
-        }
-
-        function expand_cost_details(){
-            $('#cost_details_div').show();
-            $('#expand_icon').hide();
-        }
-
-        function change_transport_mode(select_element){
-            var transport_mode = select_element.value;
-            if(transport_mode == 0){
-                $('#unit_price_type').html('元/m<sup>3</sup>');
-
-            }else{
-                $('#unit_price_type').html('元/KG');
-            }
-        }
-
-        //实现复制链接功能
-        $("#copy-btn").click(function() {
-            var roi_show_link = $('#roi_show_link').val();
-            var e = document.getElementById("roi_show_link");
-            e.select(); // 选择对象
-            document.execCommand("Copy"); // 执行浏览器复制命令
-        })
-
-        $(function() {
-
-            $('.date-picker').datepicker({
-                rtl: App.isRTL(),
-                format: 'yyyy-mm-dd',
-                orientation: 'bottom',
-                autoclose: true,
-            });
+    $(function() {
+        $('.date-picker').datepicker({
+            rtl: App.isRTL(),
+            format: 'yyyy-mm-dd',
+            orientation: 'bottom',
+            autoclose: true,
         });
+    });
 
-        $("#analyse-btn").on('click', function() {
-            //检查是否存在没填写的输入框
+    function fold_cost_details(){
+        $('#cost_details_div').hide();
+        $('#expand_icon').show();
+    }
+
+    function expand_cost_details(){
+        $('#cost_details_div').show();
+        $('#expand_icon').hide();
+    }
+
+    function change_transport_mode(select_element){
+        var transport_mode = select_element.value;
+        if(transport_mode == 0){
+            $('#unit_price_type').html('元/m<sup>3</sup>');
+
+        }else{
+            $('#unit_price_type').html('元/KG');
+        }
+    }
+
+    //实现复制链接功能
+    $("#copy-btn").click(function() {
+        var roi_show_link = $('#roi_show_link').val();
+        var e = document.getElementById("roi_show_link");
+        e.select(); // 选择对象
+        document.execCommand("Copy"); // 执行浏览器复制命令
+    })
+
+    $("#analyse-btn").on('click', function() {
+        //检查是否存在没填写的输入框
 //            $("input").each(function () {
 //                if(this.value == ''){
 //                    this.focus();
@@ -549,31 +662,187 @@
 //                }
 //            })
 
-            $.ajax({
-                type: 'post',
-                url: '/roi/analyse',
-                data:$("#roi_form").serialize(),
-                dataType: 'json',
-                success: function (res) {
-                    if (res) {
-                        var updateData = res.updateAjaxData;
-                        for(var key in updateData){
-                            $('#' + key).text(updateData[key]);
-                        }
-                        return false;
+        $.ajax({
+            type: 'post',
+            url: '/roi/analyse',
+            data:$("#roi_form").serialize(),
+            dataType: 'json',
+            success: function (res) {
+                if (res) {
+                    var updateData = res.updateAjaxData;
+                    for(var key in updateData){
+                        $('#' + key).text(updateData[key]);
                     }
-                    else {
-                        //操作失败
-                        alert('Failed');
-                    }
-                },
-                error: function (res){
+                    return false;
                 }
-            })
-
-            return false;
+                else {
+                    //操作失败
+                    alert('Failed');
+                }
+            },
+            error: function (res){
+            }
         })
 
-    </script>
+        return false;
+    })
+
+    //只允许输入数字
+    $('.int_input').on('input', function(){
+        var a = $(this).val().replace(/[^\d]/g,'');
+        $(this).val(a);
+    });
+    $('.int_input').on('blur', function(){
+        //如果输入的是： 012，输入框失去焦点时，自动变成12
+        var a = myParseInt($(this).val());
+//        if(a == 0){
+//            a = "";
+//        }
+        $(this).val(a);
+
+    });
+
+    //只能输入整数或者1到2位小数
+    $('.int_or_two_digits_input').on('input', function(){
+        var a = intOrTwoDigits($(this).val());
+        $(this).val(a);
+    });
+
+    //只允许输入数字，自动计算
+    $('.volume_input').on('input', function(){
+        var a = $(this).val().replace(/[^\d]/g,'');
+        $(this).val(a);
+
+        calculate_results();
+    });
+    $('.volume_input').on('blur', function(){
+        var a = myParseInt($(this).val());
+        $(this).val(a);
+    });
+
+    //只能输入整数或者1到2位小数，自动计算
+    $('.price_fc_input').on('input', function(){
+        var a = intOrTwoDigits($(this).val());
+        $(this).val(a);
+
+        calculate_results();
+    });
+
+    //只能输入整数或者1到2位小数，自动计算
+    $('.promo_exception_input').on('input', function(){
+        var a = intOrTwoDigits($(this).val());
+        $(this).val(a);
+
+        calculate_results();
+    });
+
+    //当切换站点时，自动计算
+    $('#site').on('change', function(){
+        calculate_results();
+    });
+
+    function calculate_results(){
+        var total_sales_volume = 0;
+        var total_promo_amount = 0;
+        var total_exception_amount = 0;
+        $('.volume_input').each(function(i,val){
+            //没有输入值时，输入框的值为"".
+            total_sales_volume += myParseInt(val.value.trim());
+        });
+        $('#total_sales_volume').text(total_sales_volume);
+
+        var sales_amount_month_array=new Array();
+        var site = $('#site').val();
+        var currency_rate = myParseFloat(currency_rates[site]);
+        for(var i=1; i<=12; i++){
+            var price_fc_month_i = myParseFloat($('#price_fc_month_' + i).val().trim());
+            var volume_month_i = myParseInt($('#volume_month_' + i).val().trim())
+            var price_rmb_month_i = currency_rate * price_fc_month_i;
+            sales_amount_month_array[i] = volume_month_i * price_rmb_month_i;
+            $('#price_rmb_month_' + i).text(myToFixedTwo(price_rmb_month_i));
+            $('#sales_amount_month_' + i).text(myToFixedTwo(sales_amount_month_array[i]));
+
+            var promo_rate_month_i = myParseFloat($('#promo_rate_month_' + i).val().trim()) / 100;
+            total_promo_amount += sales_amount_month_array[i] * promo_rate_month_i;
+            var exception_rate_month_i = myParseFloat($('#exception_rate_month_' + i).val().trim()) / 100;
+            total_exception_amount += sales_amount_month_array[i] * exception_rate_month_i;
+        }
+
+        var total_sales_amount = 0;
+        for(var i=1; i<=12; i++){
+            total_sales_amount += sales_amount_month_array[i];
+        }
+        $('#total_sales_amount').text(myToFixedTwo(total_sales_amount));
+
+        if(total_sales_volume == 0){
+            $('#average_price_rmb').text('0.00');
+            $('#average_price_fc').text('0.00');
+        }else{
+            var average_price_rmb = total_sales_amount / total_sales_volume;
+            var average_price_fc = average_price_rmb / currency_rate;
+            $('#average_price_rmb').text(myToFixedTwo(average_price_rmb));
+            $('#average_price_fc').text(myToFixedTwo(average_price_fc));
+        }
+
+        if(Math.abs(total_sales_amount) < 0.001){
+            $('#average_promo_rate').text('0.00');
+            $('#average_exception_rate').text('0.00');
+        }else{
+            var average_promo_rate = total_promo_amount / total_sales_amount;
+            var average_exception_rate = total_exception_amount / total_sales_amount;
+            $('#average_promo_rate').text(toPercentage(average_promo_rate));
+            $('#average_exception_rate').text(toPercentage(average_exception_rate));
+        }
+    }
+
+    //只能输入整数或者1到2位小数
+    function intOrTwoDigits(v){
+        var regStrs = [
+            ['^0(\\d+)$', '$1'], //禁止录入整数部分两位以上，但首位为0
+            ['[^\\d\\.]+$', ''], //禁止录入任何非数字和点
+            ['\\.(\\d?)\\.+', '.$1'], //禁止录入两个以上的点
+            ['^(\\d+\\.\\d{2}).+', '$1'] //禁止录入小数点后两位以上
+        ];
+        for (i = 0; i < regStrs.length; i++) {
+            var reg = new RegExp(regStrs[i][0]);
+            v = v.replace(reg, regStrs[i][1]);
+        }
+        return v;
+    }
+
+    //小数转成百分数
+    function toPercentage(num){
+        return myToFixedTwo(num*100) + '%';
+    }
+
+    function myParseInt(num){
+        if(num){
+            return parseInt(num);
+        }
+        return 0;
+    }
+
+    function myParseFloat(num){
+        if(num){
+            return parseFloat(num);
+        }
+        return parseFloat(0);
+    }
+
+    function myToFixedSix(num){
+        if(num){
+            return parseFloat(num).toFixed(6);
+        }
+        return parseFloat(0).toFixed(6);
+    }
+
+    function myToFixedTwo(num){
+        if(num){
+            return parseFloat(num).toFixed(2);
+        }
+        return parseFloat(0).toFixed(2);
+    }
+
+</script>
 
 @endsection
