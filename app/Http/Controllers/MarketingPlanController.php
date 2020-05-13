@@ -393,6 +393,8 @@ class MarketingPlanController extends Controller
                 ->where('sap_seller_id', $request['sap_seller_id'])
                 ->first();
             $user = (json_decode(json_encode($user), true));
+        }else{
+            $user = Auth::user()->toArray();
         }
         if (!empty($user)) {
             if (!empty($user['email']) && in_array($user['email'], $ADMIN_EMAIL)) {
@@ -498,7 +500,6 @@ class MarketingPlanController extends Controller
         if (!empty($request['rank']) && !empty($request['order'])) {
             $sql = $sql . ' ORDER BY ' . $request['rank'] . ' ' . $request['order'];
         }
-        echo $sql;exit;
         $rsgList = DB::connection('vlz')->select($sql);
         $rsgList = (json_decode(json_encode($rsgList), true));
         $planStatus=['0','Pending','Ongoing','Completed','Paused','Rejected'];
