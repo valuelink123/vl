@@ -396,6 +396,7 @@ class MarketingPlanController extends Controller
         }else{
             $user = Auth::user()->toArray();
         }
+        var_dump($user);exit;
         if (!empty($user)) {
             if (!empty($user['email']) && in_array($user['email'], $ADMIN_EMAIL)) {
                 /**  特殊权限着 查询所有用户 */
