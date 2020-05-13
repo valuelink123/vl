@@ -354,6 +354,18 @@
                                                 <span class="arrow"></span>
                                             </a>
                                             <ul class="dropdown-menu pull-left">
+												<li class="">
+                                                    <a href="/mrp/list" class="nav-link nav-toggle ">
+                                                        Sales Forecast-22W
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
+												<li class="">
+                                                    <a href="/mrp" class="nav-link nav-toggle ">
+                                                        Inventory Monitor
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
 												@permission('productTransfer-show')
                                                 <li class="">
                                                     <a href="{{ url('productTransfer') }}" class="nav-link nav-toggle ">
@@ -415,18 +427,7 @@
 												    </ul>
 												</li>
 
-												<li class="">
-                                                    <a href="/mrp/list" class="nav-link nav-toggle ">
-                                                        Mrp
-                                                        <span class="arrow"></span>
-                                                    </a>
-                                                </li>
-												<li class="">
-                                                    <a href="/mrp" class="nav-link nav-toggle ">
-                                                        Asin Monitor
-                                                        <span class="arrow"></span>
-                                                    </a>
-                                                </li>
+												
 												<li class="">
 												    <a href="/cpfr/index" class="nav-link nav-toggle ">
 												        CPFR协同补货
