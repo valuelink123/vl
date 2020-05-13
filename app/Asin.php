@@ -70,5 +70,12 @@ class Asin extends Model
         '5'=>'待定',
         '6'=>'停售',
     ];
-    const ADMIN_EMAIL = array("charlie@valuelinkcorp.com", "zouyuanxun@valuelinkcorp.com", "zanhaifang@valuelinkcorp.com", "huzaoli@valuelinkcorp.com", 'fanlinxi@valuelinkcorp.com');
+    const ADMIN_EMAIL = array(
+        'duanyongsheng@dtas.com',
+        "charlie@valuelinkcorp.com",
+        "zouyuanxun@valuelinkcorp.com",
+        "zanhaifang@valuelinkcorp.com",
+        "huzaoli@valuelinkcorp.com",
+        'fanlinxi@valuelinkcorp.com'
+    );
 }

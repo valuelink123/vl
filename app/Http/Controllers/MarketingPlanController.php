@@ -406,7 +406,9 @@ class MarketingPlanController extends Controller
                     })->toArray();
                 if (!empty($allUsers)) {
                     foreach ($allUsers as $auk => $auv) {
-                        $sapSellerIdList[$auv['sap_seller_id']] = $auv['name'];
+                        if(@$auv['sap_seller_id']>0){
+                            $sapSellerIdList[$auv['sap_seller_id']] = $auv['name'];
+                        }
                     }
                 }
             } else if ($user['ubu'] != '' || $user['ubg'] != '' || $user['seller_rules'] != '') {
@@ -420,7 +422,9 @@ class MarketingPlanController extends Controller
                     /**查询所有BG下面员工*/
                     if (!empty($allUsers)) {
                         foreach ($allUsers as $auk => $auv) {
-                            $sapSellerIdList[$auv['sap_seller_id']] = $auv['name'];
+                            if(@$auv['sap_seller_id']>0) {
+                                $sapSellerIdList[$auv['sap_seller_id']] = $auv['name'];
+                            }
                         }
                     }
                 } else if ($user['ubu'] != '' && $user['seller_rules'] == '') {
@@ -494,7 +498,7 @@ class MarketingPlanController extends Controller
         if (!empty($request['rank']) && !empty($request['order'])) {
             $sql = $sql . ' ORDER BY ' . $request['rank'] . ' ' . $request['order'];
         }
-
+        echo $sql;exit;
         $rsgList = DB::connection('vlz')->select($sql);
         $rsgList = (json_decode(json_encode($rsgList), true));
         $planStatus=['0','Pending','Ongoing','Completed','Paused','Rejected'];
