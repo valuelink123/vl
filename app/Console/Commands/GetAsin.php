@@ -74,9 +74,9 @@ class GetAsin extends Command
 		foreach($asinList as $asin){
 
 			
-			$last_keywords=Skusweekdetails::where('asin',trim(array_get($asin,'ASIN','')))->where('site','www.'.trim(array_get($asin,'SITE','')))->whereNotNull('keywords')->orderBy('weeks','desc')->take(1)->value('keywords');
+			$last_keywords=Skusweekdetails::where('asin',trim(array_get($asin,'ASIN','')))->where('marketplace_id',array_get(siteToMarketplaceid(),strtolower(array_get($asin,'SITE',''))))->whereNotNull('keywords')->orderBy('date','desc')->take(1)->value('keywords');
 			
-			$sku_reports = Skusweekdetails::where('asin',trim(array_get($asin,'ASIN','')))->where('site','www.'.trim(array_get($asin,'SITE','')))->orderBy('weeks','desc')->take(7)->get()->toArray();
+			$sku_reports = Skusweekdetails::where('asin',trim(array_get($asin,'ASIN','')))->where('marketplace_id',array_get(siteToMarketplaceid(),strtolower(array_get($asin,'SITE',''))))->orderBy('date','desc')->take(7)->get()->toArray();
 			$sku_price=$sku_price_num=$sku_sales=$sku_sales_num=0;
 			$sku_ranking=$sku_rating=$sku_review=$sku_strategy=NULL;
 			foreach($sku_reports as $sku_report){
