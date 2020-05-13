@@ -1129,7 +1129,7 @@
 				let toDate = dateStr($('.toDate').val());
 				let rsg_price = $('.rsgPrice').val();
 				let rsg_d_target = $('.rsgD').val();
-				let rsg_total = $('.totalRsg').text();
+				let rsg_total = $('.totalRsg').text(); 
 				let est_spend = strMoney($('.estSpend').text());
 				let est_rank = $('.estRank').val();
 				let est_cr = parseFloat($('.estCr').val());
