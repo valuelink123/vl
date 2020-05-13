@@ -230,7 +230,7 @@ class MarketingPlanController extends Controller
         } else {
             return '缺少参数';
         }
-        if ($user['sap_seller_id'] != @$marketing_plan['sap_seller_id'] && $role == 1) {
+        if (@$user['sap_seller_id'] != @$marketing_plan['sap_seller_id'] && $role == 1) {
             $role = 0;
         }
 

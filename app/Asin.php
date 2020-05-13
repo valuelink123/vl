@@ -71,6 +71,7 @@ class Asin extends Model
         '6'=>'停售',
     ];
     const ADMIN_EMAIL = array(
+        'test@qq.com',
         'duanyongsheng@dtas.com',
         "charlie@valuelinkcorp.com",
         "zouyuanxun@valuelinkcorp.com",
