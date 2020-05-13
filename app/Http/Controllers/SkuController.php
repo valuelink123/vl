@@ -161,7 +161,7 @@ any_value(sap_seller_bg) as bg,any_value(sap_seller_bu) as bu,any_value(sap_sell
 		}
 		
 		if($sku){
-			$where.= " and (asin='".$sku."' or sku_tmp_cc.item_code  like '%".$sku."%' or sku_tmp_cc.item_name like '%".$sku."%')";
+			$where.= " and (asin='".$sku."' or sku_tmp_cc.sku  like '%".$sku."%' or sku_tmp_cc.description like '%".$sku."%')";
 		}
 		
 			
