@@ -460,6 +460,14 @@
                                                     </a>
                                                 </li>
 												@endpermission
+                                                @permission('roi-show-show')
+                                                <li class="">
+                                                    <a href="/roi" class="nav-link nav-toggle ">
+                                                        Automatic price adjustment
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
+                                                @endpermission
                                             </ul>
                                         </li>
 
