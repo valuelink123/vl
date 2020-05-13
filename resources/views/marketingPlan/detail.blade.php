@@ -215,7 +215,7 @@
 									<option value ="1">待审批</option>
 									<option value ="2">进行中</option>
 									<option value ="3">已完结</option>
-									<option value ="4">已终止</option>
+									<option value ="4">已中止</option>
 									<option value ="5">已拒绝</option>
 								</select>
 							</td>
