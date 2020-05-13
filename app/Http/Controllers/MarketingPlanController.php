@@ -388,7 +388,7 @@ class MarketingPlanController extends Controller
         $DOMIN_MARKETPLACEID_URL = Asin::DOMIN_MARKETPLACEID_URL;
         $ADMIN_EMAIL=Asin::ADMIN_EMAIL;
         $sapSellerIdList=[];
-        if ($request['sap_seller_id']) {
+        if ($request['sap_seller_id']>0) {
             $user = DB::table('users')->select('sap_seller_id', 'id', 'name', 'email', 'seller_rules', 'ubg', 'ubu')
                 ->where('sap_seller_id', $request['sap_seller_id'])
                 ->first();
