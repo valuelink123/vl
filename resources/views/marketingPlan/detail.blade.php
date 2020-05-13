@@ -673,7 +673,7 @@
 					$('.estDay').val(Number(res.marketing_plan.est_val));
 					$('.estRoi120').text(Number(res.marketing_plan.est_120d_romi).toFixed(2));
 					$('.remarks').val(res.marketing_plan.notes);
-					$('.currentRank1').text(res.marketing_plan.current_rank);
+					$('.currentRank1').text(res.marketing_plan.ranking);
 					$('.currentCr1').text(Number(res.marketing_plan.current_cr).toFixed(2) + '%');
 					$('.currentSold1').text(Math.round(res.marketing_plan.current_units_day));
 					$('.eValue').text('￥' + Number(res.marketing_plan.current_e_val).toFixed(2));
