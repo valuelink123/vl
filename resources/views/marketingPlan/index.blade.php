@@ -863,7 +863,8 @@
 				{ 
 					data: null,
 					render: function(data, type, row, meta) {
-						let content = '<div style="text-align:left"><div><span style="padding-right:10px">RSG Goal:</span>'+row.rsg_total+'</div><div><span style="padding-right:10px">Est.Spendl:</span>'+row.est_spend+'</div></div>';
+
+						let content = '<div style="text-align:left"><div><span style="padding-right:10px">RSG数量:</span>'+row.goal+'</div><div><span style="padding-right:10px">预计花费:</span>'+row.est_spend+'</div></div>';
 						return content;
 					},
 				},
