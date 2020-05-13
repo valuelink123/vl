@@ -40,7 +40,7 @@ class Asin extends Model
         'ARBP9OOSHTCHU' => 'EG',
         'A1RKKUPIHCS9HS' => 'ES',
         'A13V1IB3VIYZZH' => 'FR',
-        'A1F83G8C2ARO7P' => 'GB',
+        'A1F83G8C2ARO7P' => 'UK',
         'A21TJRUUN4KGV' => 'IN',
         'APJ6JRA9NG5V4' => 'IT',
         'A1805IZSGTT6HS' => 'NL',
