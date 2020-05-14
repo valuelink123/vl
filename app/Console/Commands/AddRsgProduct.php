@@ -145,12 +145,14 @@ class AddRsgProduct extends Command
 			if($imageArr){
 				$amazonData[$val->asin.'_'.$site]['image'] = 'https://images-na.ssl-images-amazon.com/images/I/'.$imageArr[0];
 			}
-            foreach($marketingData as $mkey=>$mval){
-                if($val->asin==$mval->asin&&$val->marketplaceid==$mval->marketplaceid){
-                    $amazonData[$val->asin.'_'.$site]['m_target'] = $val->rsg_d_target;
+            $amazonData[$val->asin.'_'.$site]['m_target'] =0;
+			if(!empty($marketingData)){
+                foreach($marketingData as $mkey=>$mval){
+                    if($val->asin==$mval->asin&&$val->marketplaceid==$mval->marketplaceid){
+                        $amazonData[$val->asin.'_'.$site]['m_target'] = $mval->rsg_d_target;
+                    }
                 }
             }
-
 		}
 
 		$insertData = array();
@@ -163,7 +165,7 @@ class AddRsgProduct extends Command
 				$product_summary = $amazonData[$val['asin'].'_'.$val['site']]['features'];
 				$product_content = $amazonData[$val['asin'].'_'.$val['site']]['description'];
 				$seller_id = $amazonData[$val['asin'].'_'.$val['site']]['seller_id'];
-                $m_target = $amazonData[$val['asin'].'_'.$val['site']]['m_target'];
+                $m_target = @$amazonData[$val['asin'].'_'.$val['site']]['m_target'];
 			}
 			$days = isset($saleData[$val['asin'].'_'.$val['site']]) ? $saleData[$val['asin'].'_'.$val['site']] : 10000;
 			//美国站点 5个/天 其他站点3个/天， 新品上线第一周(帖子状态为待推贴，并且更新时间为一周内)美国站点 10个/天 其他站点5个/天

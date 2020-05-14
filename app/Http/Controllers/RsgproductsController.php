@@ -58,8 +58,8 @@ class RsgproductsController extends Controller
 			$limit = $this->dtLimit($req);
 			$sql .= " LIMIT {$limit} ";
 		}
-
 		$data = $this->queryRows($sql);
+
 		$data = $this->getReturnData($leftskus,$data,$date,$todayDate);
 
 		$recordsTotal = $recordsFiltered = $this->queryOne('SELECT FOUND_ROWS()');
