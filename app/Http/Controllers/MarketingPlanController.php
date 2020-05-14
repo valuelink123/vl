@@ -11,6 +11,9 @@ use Illuminate\Support\Facades\Auth;
 use App\User;
 use App\Asin;
 use App\RsgProduct;
+use PHPExcel_IOFactory;
+use PHPExcel;
+
 
 header('Access-Control-Allow-Origin:*');
 
@@ -816,43 +819,73 @@ class MarketingPlanController extends Controller
         return $r_message;
 
     }
-    public function importExecl($file='', $sheet=0){
-        $file = iconv("utf-8", "gb2312", $file);   //转码
-        if(empty($file) OR !file_exists($file)) {
-            die('file not exists!');
-        }
-        include('PHPExcel.php');  //引入PHP EXCEL类
-        $objRead = new PHPExcel_Reader_Excel2007();   //建立reader对象
-        if(!$objRead->canRead($file)){
-            $objRead = new PHPExcel_Reader_Excel5();
-            if(!$objRead->canRead($file)){
-                die('No Excel!');
-            }
-        }
-
-        $cellName = array('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN', 'AO', 'AP', 'AQ', 'AR', 'AS', 'AT', 'AU', 'AV', 'AW', 'AX', 'AY', 'AZ');
-
-        $obj = $objRead->load($file);  //建立excel对象
-        $currSheet = $obj->getSheet($sheet);   //获取指定的sheet表
-        $columnH = $currSheet->getHighestColumn();   //取得最大的列号
-        $columnCnt = array_search($columnH, $cellName);
-        $rowCnt = $currSheet->getHighestRow();   //获取总行数
-
-        $data = array();
-        for($_row=1; $_row<=$rowCnt; $_row++){  //读取内容
-            for($_column=0; $_column<=$columnCnt; $_column++){
-                $cellId = $cellName[$_column].$_row;
-                $cellValue = $currSheet->getCell($cellId)->getValue();
-                //$cellValue = $currSheet->getCell($cellId)->getCalculatedValue();  #获取公式计算的值
-                if($cellValue instanceof PHPExcel_RichText){   //富文本转换字符串
-                    $cellValue = $cellValue->__toString();
-                }
-
-                $data[$_row][$cellName[$_column]] = $cellValue;
-            }
-        }
-
-        return $data;
+    public function test(){
+        $user = Auth::user()->toArray();
+        $sap_seller_id = $user['sap_seller_id']>0?$user['sap_seller_id']:0;
+        return view('marketingPlan.test', ['sap_seller_id' => $sap_seller_id]);
     }
+    public function importExecl(Request $request, $sheet=0){
+        include( "../vendor/PHPExcel/PHPExcel.php" );
+        header("content-type:text/html;charset=utf-8");
+        $file = $request->file('files');
+        if($file) {
+            try {
+                $file_name = $file[0]->getClientOriginalName();
+                $file_size = $file[0]->getSize();
+                $file_ex = $file[0]->getClientOriginalExtension();
+                $newname = $file_name ;
+                $newpath = '/uploads/'.date('Ym').'/'.date('d').'/'.date('His').rand(100,999).intval(Auth::user()->id).'/';
+                $file[0]->move(public_path().$newpath,$newname);
+            } catch (\Exception $exception) {
+                $error = array(
+                    'name' => $file[0]->getClientOriginalName(),
+                    'size' => $file[0]->getSize(),
+                    'error' => $exception->getMessage(),
+                );
+                // Return error
+                return \Response::json($error, 400);
+            }
+            // If it now has an id, it should have been successful.
+            if (file_exists(public_path().$newpath.$newname)) {
+                $newurl = $newpath . $newname;
+                $success = new \stdClass();
+                $success->name = $newname;
+                $success->size = $file_size;
+                $success->url = $newurl;
+                $success->thumbnailUrl = $newurl;
+                $success->deleteUrl = url('send/deletefile/' . base64_encode($newpath . $newname));
+                $success->deleteType = 'get';
+                $success->fileID = md5($newpath . $newname);
+                //判断哪种类型
+                if($file_ex=="xlsx"){
+                    $reader = \PHPExcel_IOFactory::createReader('Excel2007');
+                }else{
+                    $reader = PHPExcel_IOFactory::createReader('Excel5');
+                }
+                $excel = $reader->load(public_path().$newpath.$newname,$encode = 'utf-8');
+                //读取第一张表
+                $sheet = $excel->getSheet(0);
+                //获取总行数
+                $row_num = $sheet->getHighestRow();
+                //获取总列数
+                $col_num = $sheet->getHighestColumn();
+                $data = []; //数组形式获取表格数据
+                for ($i = 2; $i <= $row_num; $i ++) {
+                    $data[$i]['code']  = $sheet->getCell("A".$i)->getValue();
+                    $data[$i]['last_code']  = substr($sheet->getCell("A".$i)->getValue(),-6);
+                    $time = date('Y-m-d H:i',\PHPExcel_Shared_Date::ExcelToPHP($sheet->getCell("B".$i)->getValue()));
+                    $data[$i]['time'] = strtotime($time);
+                    //将数据保存到数据库
+                }
+                echo '<pre>';
+                var_dump($data);exit;
+                return \Response::json(array('files' => array($success)), 200);
+            } else {
+                return \Response::json('Error', 400);
+            }
+            return \Response::json('Error', 400);
+        }
+    }
+
 
 }
