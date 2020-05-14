@@ -42,7 +42,7 @@
             width: 205px;
             height:26px;
         }
-        .commom-btn{
+        .common-btn{
             background-color: #63C5D1;
             color: #ffffff;
             font-size: 14px;
@@ -69,8 +69,26 @@
             border-radius: 5px !important;
             border: 1px solid #63C5D1;
         }
+        .edit-disabled-btn{
+            color: #62c0cc8a;
+            font-size: 14px;
+            text-align: center;
+            width: 60px;
+            height: 30px;
+            border-radius: 5px !important;
+            border: 1px solid #62c0cc8a;
+        }
 
         #archived-modal{
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%,-50%);
+            /*min-width:80%;!*这个比例可以自己按需调节*!*/
+            overflow: visible;
+            bottom: inherit;
+            right: inherit;
+        }
+        #edit-history-modal{
             left: 50%;
             top: 50%;
             transform: translate(-50%,-50%);
@@ -86,19 +104,19 @@
         <div class="col-md-12">
             <div style="height: 20px;"></div>
             <div style="float: right;">
-                <button type="button" class="disabled-btn" disabled style="width: 104px;"><span><i class="fa fa-history"></i></span> 编辑历史</button>
+                <button type="button" class="common-btn" data-target="#edit-history-modal" data-toggle="modal" style="width: 104px;"><span><i class="fa fa-history"></i></span> 编辑历史</button>
             </div>
             <div style="float: right;">
-                <button type="button" class="commom-btn" id="copy-btn" style="width: 104px; margin-right: 10px"><span><i class="fa fa-copy"></i></span> 复制链接</button>
+                <button type="button" class="common-btn" id="copy-btn" style="width: 104px; margin-right: 10px"><span><i class="fa fa-copy"></i></span> 复制链接</button>
             </div>
             <div style="float: right;">
-                <button type="button" class="commom-btn" id="export-btn" style="width: 80px; margin-right: 10px"><span><i class="fa fa-sign-out"></i></span> 导出</button>
+                <button type="button" class="common-btn" id="export-btn" style="width: 80px; margin-right: 10px"><span><i class="fa fa-sign-out"></i></span> 导出</button>
             </div>
             <div style="float: right;">
                 @if($roi['archived_status'] == 1)
                 <button type="button" class="disabled-btn" disabled style="width: 118px; margin-right: 10px"><span><i class="fa fa-archive"></i></span> 通过&归档</button>
                 @else
-                <button type="button" class="commom-btn" id="archived-btn" data-target="#archived-modal" data-toggle="modal" data-roi_id="{{$roi['id']}}" data-launch_time="{{$roi['estimated_launch_time']}}" style="width: 118px; margin-right: 10px"><span><i class="fa fa-archive"></i></span> 通过&归档</button>
+                <button type="button" class="common-btn" id="archived-btn" data-target="#archived-modal" data-toggle="modal" data-roi_id="{{$roi['id']}}" data-launch_time="{{$roi['estimated_launch_time']}}" style="width: 118px; margin-right: 10px"><span><i class="fa fa-archive"></i></span> 通过&归档</button>
                 @endif
             </div>
             <input id="roi_show_link" value="{{ url('roi/'.$roi['id']) }}"  style="opacity: 0; float: right" readonly>
@@ -111,9 +129,15 @@
                 <div style="height: 25px;"></div>
                 <div>
                     <div style="font-size: 15px; float: left">投入产出表</div>
+                    @if($roi['archived_status'] == 0)
                     <div style="font-size: 15px; float: right">
                         <a href="{{ url('roi/'.$roi['id'].'/edit') }}"><button type="button" class="edit-btn" style="width: 80px; margin-right: 10px"><span><i class="fa fa-edit"></i></span> 编辑</button></a>
                     </div>
+                    @else
+                    <div style="font-size: 15px; float: right">
+                        <button type="button" class="edit-disabled-btn" disabled style="width: 80px; margin-right: 10px"><span><i class="fa fa-edit"></i></span> 编辑</button>
+                    </div>
+                    @endif
                 </div>
                 <div style="clear:both"></div>
                 <div style="height: 30px;"></div>
@@ -380,7 +404,33 @@
             </div>
         </div>
     </div>
-
+    <div class="modal fade" id="edit-history-modal" tabindex="-2" role="dialog" aria-labelledby="historyLabel">
+        <div class="modal-dialog" role="document" style="width:362px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="historyLabel">编辑历史</h4>
+                </div>
+                <div class="modal-body">
+                  <div style="width: 330px; height: 260px; overflow-y: auto;" >
+                    <table border="1" style="width: 330px; border: 0px solid #eeeeee;">
+                        <tr style="height: 26px; background-color: #eeeeee;">
+                            <th width="50%">编辑者</th>
+                            <th>编辑时间</th>
+                        </tr>
+                        <tr>
+                        @foreach($edit_history_array as $key => $val)
+                        <tr style="height: 26px;">
+                            <td>{{$val['user_name']}}</td>
+                            <td>{{$val['updated_at']}}</td>
+                        @endforeach
+                        </tr>
+                    </table>
+                  </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <script type="text/javascript">
 
         $('#archived-modal').on("show.bs.modal", function(e){
@@ -390,9 +440,7 @@
             $('#roi_id').val(roi_id);
         })
 
-
-
-        function change_transport_mode(select_element){
+       function change_transport_mode(select_element){
             var transport_mode = select_element.value;
             if(transport_mode == 0){
                 $('#unit_price_type').html('元/m<sup>3</sup>');

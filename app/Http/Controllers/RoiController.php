@@ -34,47 +34,18 @@ class RoiController extends Controller
 
     public function index()
     {
+        if(!Auth::user()->can(['roi-show'])) die('Permission denied -- roi-show');
         $submit_date_from=date('Y-m-d',strtotime('-90 days'));
         $submit_date_to=date('Y-m-d');
         $users = $this->getUsers();
         $sites = $this->getSites();
 
-        $limit_bg = $limit_bu = $limit_sap_seller_id = $limit_review_user_id='';
-        $sumwhere = '1=1';
-        if (Auth::user()->seller_rules) {
-            $rules = explode("-", Auth::user()->seller_rules);
-            if (array_get($rules, 0) != '*'){
-                $limit_bg = array_get($rules, 0);
-            }else{
-            }
-            if (array_get($rules, 1) != '*'){
-                $limit_bu = array_get($rules, 1);
-            }
-        } elseif (Auth::user()->sap_seller_id) {
-            $limit_sap_seller_id = Auth::user()->sap_seller_id;
-        } else {
-            $limit_review_user_id = Auth::user()->id;
-        }
-        if($limit_bg){
-            $sumwhere.=" and bg='$limit_bg'";
-        }
-        if($limit_bu){
-            $sumwhere.=" and bu='$limit_bu'";
-        }
-        if($limit_sap_seller_id){
-            $sumwhere.=" and sap_seller_id='$limit_sap_seller_id'";
-        }
-        if($limit_review_user_id){
-            $sumwhere.=" and review_user_id='$limit_review_user_id'";
-        }
-        $teams = DB::select("select bg,bu from asin where $sumwhere group by bg,bu ORDER BY BG ASC,BU ASC");
-
-        return view('roi/index',compact('submit_date_from','submit_date_to','users', 'sites','teams'));
+        return view('roi/index',compact('submit_date_from','submit_date_to','users', 'sites'));
     }
 
     public function get(Request $request)
     {
-        $order_column = $request->input('order.0.column','13');
+        $order_column = $request->input('order.0.column','15');
         if($order_column == 13){
             $orderby = 'created_at';
         }else if($order_column == 15){
@@ -146,14 +117,14 @@ class RoiController extends Controller
             $lists[$key]['updated_by'] = array_get($users,$list['updated_by']);
             $lists[$key]['updated_at'] = date('Y-m-d',strtotime($list['updated_at']));
             $lists[$key]['archived_status'] = $list['archived_status'] == 0 ? '未归档' : '已归档';
-
+            $edit_item = $list['archived_status'] == 0 ? '<li><a style="text-align:center" href="' . $edit_url . '">编辑</a></li>' : '';
             $archived_item = $list['archived_status'] == 0 ? '<li><a style="text-align:center" href="#" data-toggle="modal" data-target="#archived-modal" data-roi_id="' . $list['id'] . '" data-launch_time="' .$list['estimated_launch_time'] .'" >归档</a></li>' : '';
-            $lists[$key]['action'] = '<ul class="nav navbar-nav"><li><a href="#" class="dropdown-toggle" style="height:10px; vertical-align:middle; padding-top:0px;" data-toggle="dropdown" role="button">...</a><ul class="dropdown-menu" style="min-width: 88px;" role="menu" style="color: #62c0cc8a"><li><a style="text-align:center" href="' . $show_url . '" >查看详情</a></li><li><a style="text-align:center" href="' . $edit_url . '">编辑</a></li>' . $archived_item . '</ul></li></ul>';
+            $lists[$key]['action'] = '<ul class="nav navbar-nav"><li><a href="#" class="dropdown-toggle" style="height:10px; vertical-align:middle; padding-top:0px;" data-toggle="dropdown" role="button">...</a><ul class="dropdown-menu" style="min-width: 88px;" role="menu" style="color: #62c0cc8a"><li><a style="text-align:center" href="' . $show_url . '" >查看详情</a></li>' . $edit_item . $archived_item . '</ul></li></ul>';
 //        <div>
 //            <ul class="nav navbar-nav">
 //                <li>
 //                    <a href="#" class="dropdown-toggle" style="height:10px; vertical-align:middle; padding-top:0px;" data-toggle="dropdown" role="button">...</a>
-//                    <ul class="dropdown-menu" style="min-width: 100px;" role="menu" style="color: #cccccc">
+//                    <ul class="dropdown-menu" style="min-width: 100px; " role="menu" style="color: #cccccc">
 //                        <li><a style="text-align:center" href="{{ $edit_url }}">查看详情</a></li>
 //                        <li><a style="text-align:center" href="{{ $show_url }}">编辑</a></li>
 //                        <li><a style="text-align:center" href="#" data-toggle="modal" data-target="#archived-modal" data-roi_id="{{$list['id']}}" data-launch_time="{{$list['estimated_launch_time']}}">归档</a></li>
@@ -171,10 +142,10 @@ class RoiController extends Controller
     }
 
     public function archive(Request $request){
+        if(!Auth::user()->can(['roi-archive'])) die('Permission denied -- roi-archive');
         $roi_id = isset($_REQUEST['roi_id']) ? $_REQUEST['roi_id'] : '';
         if($roi_id){
             $updateDBData = array();
-//            $updateDBData['roi_id'] = $roi_id;
             $updateDBData['sku'] = isset($_REQUEST['sku']) ? $_REQUEST['sku'] : '';
             $updateDBData['new_product_planning_process'] = isset($_REQUEST['new_product_planning_process']) ? $_REQUEST['new_product_planning_process'] : '';
             $updateDBData['archived_status'] = 1;
@@ -192,15 +163,18 @@ class RoiController extends Controller
 
     public function create(Request $request)
     {
-
+        if(!Auth::user()->can(['roi-create'])) die('Permission denied -- roi-create');
         $sites = $this->getSites();
         $billingPeriods = $this->getBillingPeriods();
         $transportModes = $this->getTransportModes();
-        return view('roi/add',compact('sites','billingPeriods','transportModes'));
+        $currency_rates = $this->getCurrencyRates();
+
+        return view('roi/add',compact('sites','billingPeriods','transportModes','currency_rates'));
     }
 
     public function export(Request $request)
     {
+        if(!Auth::user()->can(['roi-export'])) die('Permission denied -- roi-export');
         //搜索时间范围
         $submit_date_from = isset($_GET['date_from']) && $_GET['date_from'] ? $_GET['date_from'] : date('Y-m-d',strtotime('- 90 days'));
         $submit_date_to = isset($_GET['date_to']) && $_GET['date_to'] ? $_GET['date_to'] : date('Y-m-d');
@@ -254,6 +228,7 @@ class RoiController extends Controller
     }
 
     public function exportShowPage(Request $request){
+        if(!Auth::user()->can(['roi-export'])) die('Permission denied -- roi-export');
         $id = $_GET['id'];
         $roi = $this->getCurrentRoi($id);
         $roi = $this->showPageDataFormat($roi);
@@ -551,19 +526,36 @@ class RoiController extends Controller
 
     public function edit(Request $request, $id)
     {
+        if(!Auth::user()->can(['roi-update'])) die('Permission denied -- roi-update');
         $sites = $this->getSites();
         $billingPeriods = $this->getBillingPeriods();
         $transportModes = $this->getTransportModes();
+        $currency_rates = $this->getCurrencyRates();
         $roi = $this->getCurrentRoi($id);
+        for($i=1; $i<=12;$i++){
+            $roi['promo_rate_month_'.$i] = $this->twoDecimal($roi['promo_rate_month_'.$i] * 100);
+            $roi['exception_rate_month_'.$i] = $this->twoDecimal($roi['exception_rate_month_'.$i]* 100);
+        }
+        $roi['commission_rate'] = $this->twoDecimal($roi['commission_rate'] * 100);
+        $roi['tariff_rate'] = $this->twoDecimal($roi['tariff_rate'] * 100);
 
-        $users = $this->getAllUsers();
+        //不同的运输方式，显示不同的运输单位（元／立方米，元/KG）
+        $transport_mode_int = $roi['transport_mode'];
+        $roi['transport_mode'] = array_get($transportModes, $transport_mode_int);
+        $transport_unit = '<span>元/m<sup>3</sup></span>';
+        if($transport_mode_int == 1 || $transport_mode_int == 2) {
+            $transport_unit = '<span>元/KG</span>';
+        }
+        $roi['transport_unit'] = $transport_unit;
+
+        $users = $this->getUsers();
         $eh = explode(";",$roi['edit_history']);
         $edit_history_array = array();
         foreach(array_reverse($eh) as $key => $value){
             $pair = explode(",",$value);
             $edit_history_array[] = array('user_name'=>array_get($users, $pair[0]), 'updated_at'=>$pair[1]);
         }
-        return view('roi/edit',compact('sites','billingPeriods','transportModes', 'roi', 'edit_history_array'));
+        return view('roi/edit',compact('sites','billingPeriods','transportModes', 'roi', 'edit_history_array', 'currency_rates'));
     }
 
     public function getCurrentRoi($id){
@@ -573,19 +565,15 @@ class RoiController extends Controller
             $roi['price_fc_month_'.$i] = $this->twoDecimal($roi['price_fc_month_'.$i]);
             $roi['price_rmb_month_'.$i] = $this->twoDecimal($roi['price_fc_month_'.$i] * $roi['currency_rate']);
             $roi['sales_amount_month_'.$i] = round($roi['price_fc_month_'.$i] * $roi['currency_rate'] * $roi['volume_month_'.$i]);
-            $roi['promo_rate_month_'.$i] = $this->toPercentage($roi['promo_rate_month_'.$i]);
-            $roi['exception_rate_month_'.$i] = $this->toPercentage($roi['exception_rate_month_'.$i]);
         }
         $roi['average_price_fc'] = $this->twoDecimal($roi['average_price_fc']);
         $roi['average_price_rmb'] = $this->twoDecimal($roi['average_price_rmb']);
         $roi['total_sales_amount'] = round($roi['total_sales_amount']);
         $roi['average_promo_rate'] = $this->toPercentage($roi['average_promo_rate']);
         $roi['average_exception_rate'] = $this->toPercentage($roi['average_exception_rate']);
-        $roi['commission_rate'] = $this->toPercentage($roi['commission_rate']);
         $roi['unit_operating_fee'] = $this->twoDecimal($roi['unit_operating_fee']);
         $roi['transport_unit_price'] = $this->twoDecimal($roi['transport_unit_price']);
         $roi['transport_days'] = $this->twoDecimal($roi['transport_days']);
-        $roi['tariff_rate'] = $this->toPercentage($roi['tariff_rate']);
         $roi['weight_per_pcs'] = $this->twoDecimal($roi['weight_per_pcs']);
         $roi['volume_per_pcs'] = $this->twoDecimal($roi['volume_per_pcs']);
         $roi['purchase_price'] = $this->twoDecimal($roi['purchase_price']);
@@ -614,17 +602,26 @@ class RoiController extends Controller
 
     public function show(Request $request, $id)
     {
+        if(!Auth::user()->can(['roi-show'])) die('Permission denied -- roi-show');
         $roi = $this->getCurrentRoi($id);
         $roi = $this->showPageDataFormat($roi);
 
-        return view('roi/show', ['roi'=>$roi]);
+        $users = $this->getUsers();
+        $eh = explode(";",$roi['edit_history']);
+        $edit_history_array = array();
+        foreach(array_reverse($eh) as $key => $value){
+            $pair = explode(",",$value);
+            $edit_history_array[] = array('user_name'=>array_get($users, $pair[0]), 'updated_at'=>$pair[1]);
+        }
+
+        return view('roi/show', ['roi'=>$roi, 'edit_history_array' => $edit_history_array]);
     }
 
     public function showPageDataFormat($roi){
         $billingPeriods = $this->getBillingPeriods();
         $transportModes = $this->getTransportModes();
         $transport_mode_int = $roi['transport_mode'];
-        $roi['transport_mode'] = $transportModes[$transport_mode_int];
+        $roi['transport_mode'] = array_get($transportModes, $transport_mode_int);
         $transport_unit = '<span>元/m<sup>3</sup></span>';
         if($transport_mode_int == 1 || $transport_mode_int == 2) {
             $transport_unit = '<span>元/KG></span>';
@@ -645,10 +642,18 @@ class RoiController extends Controller
             }
         }
 
+        for($i=1; $i<=12;$i++){
+            $roi['promo_rate_month_'.$i] = $this->toPercentage($roi['promo_rate_month_'.$i]);
+            $roi['exception_rate_month_'.$i] = $this->toPercentage($roi['exception_rate_month_'.$i]);
+        }
+        $roi['commission_rate'] = $this->toPercentage($roi['commission_rate']);
+        $roi['tariff_rate'] = $this->toPercentage($roi['tariff_rate']);
+
         return $roi;
     }
 
     public function store(Request $request){
+        if(!Auth::user()->can(['roi-create'])) die('Permission denied -- roi-create');
         $updateData = $this->getUpdateData($request);
         $updateDBData = $updateData['updateDBData'];
 
@@ -674,7 +679,7 @@ class RoiController extends Controller
     }
 
     public function updateRecord(Request $request){
-
+        if(!Auth::user()->can(['roi-update'])) die('Permission denied -- roi-update');
         $updateData = $this->getUpdateData($request);
         $updateDBData = $updateData['updateDBData'];
 
@@ -728,17 +733,17 @@ class RoiController extends Controller
             //单个月销售金额(取整)
             $sales_amount_month_array[$i] = round($sales_amount_month_precise);
             //总销量
-            $total_sales_volume = $total_sales_volume + $volume_month_array[$i];
+            $total_sales_volume += $volume_month_array[$i];
             //总销售金额(销售收入)
-            $total_sales_amount = $total_sales_amount + $sales_amount_month_precise;
+            $total_sales_amount += $sales_amount_month_precise;
             //单个月推广费(百分数转成小数)
-            $promo_amount_month_array[$i] = ((float)$request->input('promo_rate_month_'.$i))/100 * $sales_amount_month_array[$i];
+            $promo_amount_month_array[$i] = $request->input('promo_rate_month_'.$i)/100 * $sales_amount_month_array[$i];
             //总推广费(营销费用)
-            $total_promo_amount = $total_promo_amount + $promo_amount_month_array[$i];
+            $total_promo_amount += $promo_amount_month_array[$i];
             //单个月异常费(百分数转成小数)
-            $exception_amount_month_array[$i] = ((float)$request->input('exception_rate_month_'.$i))/100 * $sales_amount_month_array[$i];
+            $exception_amount_month_array[$i] = $request->input('exception_rate_month_'.$i)/100 * $sales_amount_month_array[$i];
             //总异常费(退款金额)
-            $total_exception_amount = $total_exception_amount + $exception_amount_month_array[$i];
+            $total_exception_amount += $exception_amount_month_array[$i];
         }
 
         //平均售价RMB
@@ -781,7 +786,7 @@ class RoiController extends Controller
 
         //--相关税费--
         //关税税率(百分数转成小数)
-        $tariff_rate = ((float)$request->input('tariff_rate'))/100;
+        $tariff_rate = $request->input('tariff_rate')/100;
         $tariff_amount = $purchase_cost * 0.4 * $tariff_rate;
         //VAT率
         $vat_rate = ((float)$this->getVatRates()[$site])/100;
@@ -790,7 +795,7 @@ class RoiController extends Controller
 
         //--平台费用--
         //平台佣金率(百分数转成小数)
-        $commission_rate = ((float)$request->input('commission_rate'))/100;
+        $commission_rate = $request->input('commission_rate')/100;
         //平台佣金
         $commission_amount = $commission_rate * $total_sales_amount - $total_exception_amount * $commission_rate * 0.8;
         //操作费
@@ -1020,20 +1025,13 @@ class RoiController extends Controller
         return sprintf("%.2f",$num);
     }
 
-    //数值转成百分数，保留2位小数
+    //小数转成百分数，保留2位小数
     public function toPercentage($num){
         return sprintf("%.2f",$num*100).'%';
     }
 
     public function getUsers(){
-        //目前在职的销售人员
-        return User::where('locked', '=', 0)->where('sap_seller_id','>',0)->pluck('name','id');
-    }
-
-    public function getAllUsers(){
         return User::pluck('name','id');
     }
-
-
 
 }

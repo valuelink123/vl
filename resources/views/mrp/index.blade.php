@@ -1,22 +1,13 @@
 @extends('layouts.layout')
 @section('crumb')
-    @include('layouts.crumb', ['crumbs'=>['Asin Monitor']])
+    @include('layouts.crumb', ['crumbs'=>['Inventory Monitor']])
 @endsection
 @section('content')
 <style>
-table.dataTable tbody th, table.dataTable tbody td {
-    padding: 4px 5px;
+.table thead tr th,.table thead tr td,.table td, .table th{
+	font-size:11px;
+	white-space: nowrap;
 }
-table.dataTable thead th, table.dataTable thead td {
-    padding: 4px 5px;
-}
-.table thead tr th {
-    font-size: 12px;
-}
-.table td, .table th {
-    font-size: 11px;
-}
-
 </style>
 
     <link rel="stylesheet" href="/js/chosen/chosen.min.css"/>
@@ -200,12 +191,13 @@ table.dataTable thead th, table.dataTable thead td {
         var initTable = function () {
             $theTable.dataTable({
                 searching: false,
+				
                 serverSide: true,
                 "lengthMenu": [
-                    [10, 50, 100, -1],
-                    [10, 50, 100, 'All']
+                    [20, 50, 100, -1],
+                    [20, 50, 100, 'All']
                 ],
-                "pageLength": 10,
+                "pageLength": 20,
                 pagingType: 'bootstrap_extended',
                 processing: true,
                 ordering:  false,
@@ -237,7 +229,13 @@ table.dataTable thead th, table.dataTable thead td {
                     type: 'POST',
                     url: location.href,
                     data:  {search: $("#search-form").serialize()}
-                }
+                },
+				scrollY:        false,
+				scrollX:        true,
+				fixedColumns:   {
+					leftColumns:7,
+					rightColumns: 0
+				}
             })
         }
 

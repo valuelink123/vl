@@ -222,9 +222,6 @@ Route::match(['post','get'],'/marketingPlan/achieveGoals', 'MarketingPlanControl
 Route::match(['post','get'],'/marketingPlan/delfiles', 'MarketingPlanController@delfiles');//删除图片
 Route::post('/marketingPlan/getAsinDailyReport', 'MarketingPlanController@getAsinDailyReport');
 
-//CollaborativeReplenishment
-Route::get('/collaborativeReplenishment/index', 'CollaborativeReplenishmentController@index')->name('index');
-
 //  Manage Distribute Time
 Route::get('/manageDistributeTime/safetyStockDays', 'ManageDistributeTimeController@safetyStockDays')->name('safetyStockDays');
 Route::get('/manageDistributeTime/fba', 'ManageDistributeTimeController@fba')->name('fba');
@@ -253,4 +250,5 @@ Route::post('/mrp/import', 'MrpController@import');
 
 //CPFR协同补货
 Route::get('/cpfr/index', 'CpfrController@index')->name('index');
+Route::get('/cpfr/allocationProgress', 'CpfrController@allocationProgress')->name('allocationProgress');
 

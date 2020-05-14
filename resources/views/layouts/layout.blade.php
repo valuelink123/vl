@@ -354,6 +354,18 @@
                                                 <span class="arrow"></span>
                                             </a>
                                             <ul class="dropdown-menu pull-left">
+												<li class="">
+                                                    <a href="/mrp/list" class="nav-link nav-toggle ">
+                                                        Sales Forecast-22W
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
+												<li class="">
+                                                    <a href="/mrp" class="nav-link nav-toggle ">
+                                                        Inventory Monitor
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
 												@permission('productTransfer-show')
                                                 <li class="">
                                                     <a href="{{ url('productTransfer') }}" class="nav-link nav-toggle ">
@@ -388,13 +400,7 @@
                                                     </a>
                                                 </li>
 												@endpermission
-												<!-- <li class="">
-												    <a href="/collaborativeReplenishment/index" class="nav-link nav-toggle ">
-												        Collaborative Replenishment
-												        <span class="arrow"></span>
-												    </a>
-												</li>
-												<li class="dropdown-submenu ">
+												<!-- <li class="dropdown-submenu ">
 												    <a href="" class="nav-link nav-toggle ">
 														Manage Distribute Time
 												       <span class="arrow"></span>
@@ -413,22 +419,8 @@
 														    <a href="{{url('manageDistributeTime/internationalTransportTime')}}" class="nav-link "> International transport Time </a>
 														</li>
 												    </ul>
-
-												</li> -->
-
+												</li>
 												<li class="">
-                                                    <a href="/mrp/list" class="nav-link nav-toggle ">
-                                                        Mrp
-                                                        <span class="arrow"></span>
-                                                    </a>
-                                                </li>
-												<li class="">
-                                                    <a href="/mrp" class="nav-link nav-toggle ">
-                                                        Asin Monitor
-                                                        <span class="arrow"></span>
-                                                    </a>
-                                                </li>
-												<!-- <li class="">
 												    <a href="/cpfr/index" class="nav-link nav-toggle ">
 												        CPFR协同补货
 												        <span class="arrow"></span>
@@ -460,6 +452,14 @@
                                                     </a>
                                                 </li>
 												@endpermission
+                                                @permission('roi-show-show')
+                                                <li class="">
+                                                    <a href="/roi" class="nav-link nav-toggle ">
+                                                        Automatic price adjustment
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
+                                                @endpermission
                                             </ul>
                                         </li>
 

@@ -103,25 +103,11 @@
 
                                 </div>
                             </div>
-                            <div style="width:220px; float:left">
-                                <div>销售部门</div>
-                                <select name="bgbu" id="bgbu" style="width:205px; height:30px">
-                                    <option value="">请选择销售部门</option>
-                                    {{--<option value="">BG && BU</option>--}}
-                                    <?php
-                                    $bg='';
-                                    foreach($teams as $team){
-                                        $selected = '';
-//                                        if($bgbu==($team->bg.'_')) $selected = 'selected';
-
-                                        if($bg!=$team->bg) echo '<option value="'.$team->bg.'_" '.$selected.'>'.$team->bg.'</option>';
-                                        $bg=$team->bg;
-                                        $selected = '';
-//                                        if($bgbu==($team->bg.'_'.$team->bu)) $selected = 'selected';
-                                        if($team->bg && $team->bu) echo '<option value="'.$team->bg.'_'.$team->bu.'" '.$selected.'>'.$team->bg.' - '.$team->bu.'</option>';
-                                    } ?>
-                                </select>
-                            </div>
+                            {{--<div style="width:220px; float:left">--}}
+                                {{--<div>销售部门</div>--}}
+                                {{--<select name="bgbu" id="bgbu" style="width:205px; height:30px">--}}
+                                {{--</select>--}}
+                            {{--</div>--}}
                             <div style="width:220px; float:left">
                                 <div>销售人员</div>
                                 <select name="user_id" id="user_id" style="width:205px; height:30px">
@@ -257,7 +243,6 @@
             var roi_id = $(e.relatedTarget).data('roi_id');
             $('#launch_time').val(launch_time);
             $('#roi_id').val(roi_id);
-
         })
 
         $("#thetabletoolbar [id^='date']").each(function () {
@@ -284,6 +269,7 @@
                 "pageLength": 10, // default record count per page
                 pagingType: 'bootstrap_extended',
                 processing: true,
+                scrollX: false,
                 ordering:  true,
                 aoColumnDefs: [ { "bSortable": false, "aTargets": [0,1,2,3,4,5,6,7,8,9,10,11,12,14,16,17] }],
                 order: [],
@@ -381,9 +367,9 @@
         $('#date_to').change(function(){
             $("#search").trigger("click");
         });
-        $('#bgbu').change(function(){
-            $("#search").trigger("click");
-        });
+//        $('#bgbu').change(function(){
+//            $("#search").trigger("click");
+//        });
         $('#user_id').change(function(){
             $("#search").trigger("click");
         });

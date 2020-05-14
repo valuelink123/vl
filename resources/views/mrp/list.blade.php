@@ -1,22 +1,13 @@
 @extends('layouts.layout')
 @section('crumb')
-    @include('layouts.crumb', ['crumbs'=>['Asin Monitor']])
+    @include('layouts.crumb', ['crumbs'=>['Sales Forecast-22W']])
 @endsection
 @section('content')
 <style>
-table.dataTable tbody th, table.dataTable tbody td {
-    padding: 4px 5px;
+.table thead tr th,.table thead tr td,.table td, .table th{
+	font-size:11px;
+	white-space: nowrap;
 }
-table.dataTable thead th, table.dataTable thead td {
-    padding: 4px 5px;
-}
-.table thead tr th {
-    font-size: 12px;
-}
-.table td, .table th {
-    font-size: 11px;
-}
-
 </style>
 
     <link rel="stylesheet" href="/js/chosen/chosen.min.css"/>
@@ -38,6 +29,11 @@ table.dataTable thead th, table.dataTable thead td {
                             </select>
                         </div>
                         <br>
+						<div class="input-group date date-picker " data-date-format="yyyy-mm-dd">
+                            <span class="input-group-addon">Date</span>
+                            <input  class="form-control" value="{{$date}}" data-options="format:'yyyy-mm-dd'" id="date" name="date" autocomplete="off"/>
+                        </div>
+                        <br>
                        
                     </div>
                     <div class="col-md-2">
@@ -51,7 +47,11 @@ table.dataTable thead th, table.dataTable thead td {
                             </select>
                         </div>
                         <br>
-                       
+                       <div class="input-group">
+							<span class="input-group-addon">Asin/Sku</span>
+                            <input class="form-control" value="" id="keyword" name="keyword" autocomplete="off"/>
+                            
+                        </div>
                     </div>
 
                     <div class="col-md-2">
@@ -65,6 +65,13 @@ table.dataTable thead th, table.dataTable thead td {
                             </select>
                         </div>
                         <br>
+						<div class="input-group">
+							<span class="input-group-addon">Type</span>
+							<select class="form-control"  id="type" name="type">
+								<option value="">Asin</option>
+								<option value="sku">Sku</option>
+							</select>
+						</div>
                        
                     </div>
 
@@ -93,11 +100,7 @@ table.dataTable thead th, table.dataTable thead td {
                             </select>	
                         </div>
                         <br>
-                        <div class="input-group">
-							<span class="input-group-addon">Asin/Sku</span>
-                            <input class="form-control" value="" id="keyword" name="keyword" autocomplete="off"/>
-                            
-                        </div>
+                        
                     </div>
                     <div class="col-md-2">
                         <div class="input-group">
@@ -155,7 +158,7 @@ table.dataTable thead th, table.dataTable thead td {
                 <table class="table table-striped table-bordered" id="thetable">
                     <thead>
                     <tr>
-						<th> SellerName </th>
+						<th> Seller Name </th>
                         <th>Asin</th>
                         <th>Site</th>
                         <th>Sku</th>
@@ -165,7 +168,7 @@ table.dataTable thead th, table.dataTable thead td {
 						<?php
 						for($i=1;$i<=22;$i++){
 						?>
-                        <th>{{date('Y-m-d',strtotime('+'.$i.' weeks sunday'))}}</th>
+                        <th class="week_end_date">{{date('Y-m-d',strtotime($date.' +'.$i.' weeks sunday'))}}</th>
                         <?php } ?>
                     </tr>
                     </thead>
@@ -175,84 +178,114 @@ table.dataTable thead th, table.dataTable thead td {
             </div>
         </div>
     </div>
-    <script>
+<script>
 
-        let $theTable = $(thetable)
+let $theTable = $(thetable)
 
-        var initTable = function () {
-            $theTable.dataTable({
-                searching: false,
-                serverSide: true,
-                "lengthMenu": [
-                    [10, 50, 100, -1],
-                    [10, 50, 100, 'All']
-                ],
-                "pageLength": 10,
-                pagingType: 'bootstrap_extended',
-                processing: true,
-                ordering:  false,
-                //aoColumnDefs: [ { "bSortable": false, "aTargets": [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,21] }],
-                order: [],
-                columns: [
-					{data: 'seller', name: 'seller'},
-                    {data: 'asin', name: 'asin'},
-                    {data: 'site', name: 'site'},
-                    {data: 'sku', name: 'sku'},
-                    {data: 'min_purchase', name: 'min_purchase'},
-                    {data: 'week_daily_sales', name: 'week_daily_sales'},
-					{data: '22_week_plan_total', name: '22_week_plan_total'},
-                    {data:'1_week_plan',name:'1_week_plan'},
-                    {data:'2_week_plan',name:'2_week_plan'},
-                   	{data:'3_week_plan',name:'3_week_plan'},
-                    {data:'4_week_plan',name:'4_week_plan'},
-					{data:'5_week_plan',name:'5_week_plan'},
-                    {data:'6_week_plan',name:'6_week_plan'},
-                   	{data:'7_week_plan',name:'7_week_plan'},
-                    {data:'8_week_plan',name:'8_week_plan'},
-					{data:'9_week_plan',name:'9_week_plan'},
-                    {data:'10_week_plan',name:'10_week_plan'},
-                   	{data:'11_week_plan',name:'11_week_plan'},
-                    {data:'12_week_plan',name:'12_week_plan'},
-					{data:'13_week_plan',name:'13_week_plan'},
-                    {data:'14_week_plan',name:'14_week_plan'},
-                   	{data:'15_week_plan',name:'15_week_plan'},
-                    {data:'16_week_plan',name:'16_week_plan'},
-					{data:'17_week_plan',name:'17_week_plan'},
-                    {data:'18_week_plan',name:'18_week_plan'},
-                   	{data:'19_week_plan',name:'19_week_plan'},
-                    {data:'20_week_plan',name:'20_week_plan'},
-					{data:'21_week_plan',name:'21_week_plan'},
-                    {data:'22_week_plan',name:'22_week_plan'}
-                ],
-                ajax: {
-                    type: 'POST',
-                    url: location.href,
-                    data:  {search: $("#search-form").serialize()}
-                }
-            })
-        }
-
-
-        initTable();
-        let dtApi = $theTable.api();
-
-
-        //点击提交按钮重新绘制表格，并将输入框中的值赋予检索框
-        $('#search').click(function () {
-            dtApi.settings()[0].ajax.data = {search: $("#search-form").serialize()};
-            dtApi.ajax.reload();
-            return false;
-        });
-
-        //下载数据
-        $("#export").click(function(){
-			alert($("#search-form").serialize());
-            location.href='/mrp/export?'+$("#search-form").serialize();
-            return false;
-
-        });
+var initTable = function () {
+	$theTable.dataTable({
+		searching: false,
+		serverSide: true,
+		"autoWidth":true,
+		"lengthMenu": [
+			[20, 50, 100, -1],
+			[20, 50, 100, 'All']
+		],
+		"pageLength": 20,
+		pagingType: 'bootstrap_extended',
+		processing: true,
+		ordering:  false,
+		//aoColumnDefs: [ { "bSortable": false, "aTargets": [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,21] }],
+		order: [],
+		columns: [
+			{data: 'seller', name: 'seller'},
+			{data: 'asin', name: 'asin'},
+			{data: 'site', name: 'site'},
+			{data: 'sku', name: 'sku'},
+			{data: 'min_purchase', name: 'min_purchase'},
+			{data: 'week_daily_sales', name: 'week_daily_sales'},
+			{data: '22_week_plan_total', name: '22_week_plan_total'},
+			{data:'1_week_plan',name:'1_week_plan'},
+			{data:'2_week_plan',name:'2_week_plan'},
+			{data:'3_week_plan',name:'3_week_plan'},
+			{data:'4_week_plan',name:'4_week_plan'},
+			{data:'5_week_plan',name:'5_week_plan'},
+			{data:'6_week_plan',name:'6_week_plan'},
+			{data:'7_week_plan',name:'7_week_plan'},
+			{data:'8_week_plan',name:'8_week_plan'},
+			{data:'9_week_plan',name:'9_week_plan'},
+			{data:'10_week_plan',name:'10_week_plan'},
+			{data:'11_week_plan',name:'11_week_plan'},
+			{data:'12_week_plan',name:'12_week_plan'},
+			{data:'13_week_plan',name:'13_week_plan'},
+			{data:'14_week_plan',name:'14_week_plan'},
+			{data:'15_week_plan',name:'15_week_plan'},
+			{data:'16_week_plan',name:'16_week_plan'},
+			{data:'17_week_plan',name:'17_week_plan'},
+			{data:'18_week_plan',name:'18_week_plan'},
+			{data:'19_week_plan',name:'19_week_plan'},
+			{data:'20_week_plan',name:'20_week_plan'},
+			{data:'21_week_plan',name:'21_week_plan'},
+			{data:'22_week_plan',name:'22_week_plan'}
+		],
+		ajax: {
+			type: 'POST',
+			url: location.href,
+			data:  {search: $("#search-form").serialize()}
+		},
+		scrollY:        false,
+		scrollX:        true,
+		fixedColumns:   {
+			leftColumns:7,
+			rightColumns: 0
+		}
+	})
+}
 
 
-    </script>
+initTable();
+let dtApi = $theTable.api();
+
+
+//点击提交按钮重新绘制表格，并将输入框中的值赋予检索框
+$('#search').click(function () {
+	
+	
+	dtApi.settings()[0].ajax.data = {search: $("#search-form").serialize()};
+	dtApi.ajax.reload();
+	$(".week_end_date").each(function(index){
+		
+		var ndate = getNextSunday(index+1);
+		
+		$(this).text(ndate);
+	});	
+	return false;
+});
+
+//下载数据
+$("#export").click(function(){
+	alert($("#search-form").serialize());
+	location.href='/mrp/export?'+$("#search-form").serialize();
+	return false;
+
+});
+$('.date-picker').datepicker({
+	rtl: App.isRTL(),
+	autoclose: true
+});
+
+function getNextSunday(i) {
+	var now = new Date($("#date").val());
+	var day = now.getDay();
+	n = day == 0 ? 7*i : (7*(i+1)-day);
+	now.setDate(now.getDate() + n);
+	var year = now.getFullYear();
+	var month = now.getMonth() + 1;
+	date = now.getDate();
+	var s = year + "-" + (month < 10 ? ('0' + month) : month) + "-" + (date < 10 ? ('0' + date) : date);
+	return s;
+}
+
+</script>
 
 @endsection

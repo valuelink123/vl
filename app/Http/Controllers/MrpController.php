@@ -76,16 +76,19 @@ class MrpController extends Controller
     {
 		$search = isset($_POST['search']) ? $_POST['search'] : '';
 		$search = $this->getSearchData(explode('&',$search));
+		
+		$date = array_get($search,'date')??date('Y-m-d');
 		if ($req->isMethod('GET')) {
-			return view('mrp/list', ['bgs'=>$this->getBgs(),'bus'=>$this->getBus()]);
+			return view('mrp/list', ['date'=>$date,'bgs'=>$this->getBgs(),'bus'=>$this->getBus()]);
 		}
-		$date_from = date('Y-m-d',strtotime('+1 weeks monday'));
-		$date_to = date('Y-m-d',strtotime('+22 weeks sunday'));
+		$date_from = date('Y-m-d',strtotime($date.' +1 weeks monday'));
+		$date_to = date('Y-m-d',strtotime($date.' +22 weeks sunday'));
 		$searchField = array('bg'=>'a.bg','bu'=>'a.bu','site'=>'a.marketplace_id','sku'=>'a.sku','sku_level'=>'a.status','sku_status'=>'a.sku_status','sku_level'=>'a.status','sap_seller_id'=>'a.sap_seller_id');
 		
 		$where = $this->getSearchWhereSql($search,$searchField);
 
-		
+		$type = array_get($search,'type');
+		if($type!='sku') $type='asin';
 			
 		if(array_get($search,'keyword')){
 			$where .=" and (a.asin='".array_get($search,'keyword')."' or a.sku='".array_get($search,'keyword')."')";
@@ -104,24 +107,28 @@ class MrpController extends Controller
 			$limit = $this->dtLimit($req);
 			$sql .= " LIMIT {$limit} ";
 		}
-
+			
+		if($type=='sku'){
+			$sql="SELECT SQL_CALC_FOUND_ROWS sku,marketplace_id,any_value(sap_seller_id) as sap_seller_id,  count(asin) as asin, sum(daily_sales) as daily_sales,sum(quantity) as quantity from (".str_replace('SQL_CALC_FOUND_ROWS','',$sql).") as skus_table group by sku,marketplace_id order by daily_sales desc";
+		}
 		$datas = DB::connection('amazon')->select($sql);
+		
 		$datas = json_decode(json_encode($datas),true);
 		$recordsTotal = $recordsFiltered = (DB::connection('amazon')->select('SELECT FOUND_ROWS() as count'))[0]->count;
 		$data = [];
 		$siteCode = array_flip(getSiteCode());
 		$sellers = getUsers('sap_seller');
 		foreach ($datas as $key => $val) {
-			$asin_plans = AsinSalesPlan::SelectRaw('sum(quantity_last) as quantity,week_date')->where('asin',$val['asin'])->where('marketplace_id',$val['marketplace_id'])->where('date','>=',$date_from)->where('date','<=',$date_to)->groupBy(['week_date'])->get()->keyBy('week_date')->toArray();
+			$asin_plans = AsinSalesPlan::SelectRaw('sum(quantity_last) as quantity,week_date')->where($type,$val[$type])->where('marketplace_id',$val['marketplace_id'])->where('date','>=',$date_from)->where('date','<=',$date_to)->groupBy(['week_date'])->get()->keyBy('week_date')->toArray();
 			$data[$key]['seller'] = array_get($sellers,$val['sap_seller_id']);
-			$data[$key]['asin'] = '<a href="/mrp/edit?asin='.$val['asin'].'&marketplace_id='.$val['marketplace_id'].'">'.$val['asin'].'</a>';
+			$data[$key]['asin'] = ($type=='asin')?'<a href="/mrp/edit?asin='.$val['asin'].'&marketplace_id='.$val['marketplace_id'].'">'.$val['asin'].'</a>':$val['asin'];
 			$data[$key]['site'] = array_get($siteCode,$val['marketplace_id']);
-			$data[$key]['sku'] = $val['sku'];
+			$data[$key]['sku'] = ($type=='sku')?'<a href="/mrp/edit?keyword='.$val['sku'].'&marketplace_id='.$val['marketplace_id'].'">'.$val['sku'].'</a>':$val['sku'];
 			$data[$key]['min_purchase'] = 0;
 			$data[$key]['week_daily_sales'] = round($val['daily_sales']*7,2);
 			$data[$key]['22_week_plan_total'] = intval($val['quantity']);
 			for($i=1;$i<=22;$i++){
-				$data[$key][$i.'_week_plan'] = array_get($asin_plans,date('Y-m-d',strtotime('+'.$i.' weeks sunday')).'.quantity',0);
+				$data[$key][$i.'_week_plan'] = array_get($asin_plans,date('Y-m-d',strtotime($date.' +'.$i.' weeks sunday')).'.quantity',0);
             }
 		}
 		
