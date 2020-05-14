@@ -60,6 +60,7 @@
  			width: 140px;
  			margin-right: 10px;
  			float: left;
+			padding-left: 10px;
  		}
  
  		.form_main button {
@@ -342,7 +343,13 @@
 				<option value="ES">www.amazon.es</option>
 				<option value="JP">www.amazon.co.jp</option>
 			</select>
- 			
+			
+ 			<select name="switchSelect" id="switchSelect">
+				<option value="1">On</option>
+ 				<option value="2">All</option>
+ 				<option value="3">Off</option>
+ 			</select>
+			
  			<button class="start_btn status_btn isHide">Turn On</button>
  			<button class="close_btn status_btn isHide">Turn Off</button>
 			<button class="export_btn">Export</button>
@@ -391,8 +398,7 @@
 					<span class="input-group-btn">
 						<button class="btn btn-sm default" type="button">
 							<i class="fa fa-calendar"></i>
-						</button>
-					</span>
+						</button></span>
 				</div>
 			</div>
 			<div class="box_btn">
@@ -416,6 +422,7 @@
  </body>
  
  </html>
+ 
  <script>
 	//筛选
 	function status_filter(value,column) {
@@ -430,6 +437,12 @@
 	}
 
  	$(document).ready(function () {
+		let isOpen=1;
+		$('#switchSelect').on("change",function(){
+			isOpen = $(this).val()
+			console.log(isOpen)
+			editTableObj.ajax.reload();
+		})
 		$('.search_input').keyup(function(){
 			 $(this).val() != ''? $('.clear').show(): $('.clear').hide()
 		})
@@ -455,6 +468,12 @@
 			"serverSide": false,//是否所有的请求都请求服务器
 			"ajax": {
 				url: "/hijack/index1",
+				data : function(){
+					reqList = {
+						"isOpen" : isOpen,
+					};
+					return reqList;
+				},
 				dataSrc:function(res){
 					if(res.status == -1){
 						alert(res.message)
