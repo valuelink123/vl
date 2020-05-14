@@ -589,6 +589,26 @@ where a.date>=:sdate_from and a.date<=:sdate_to
 			
 			
 			
+			if(array_get($_REQUEST,'ExportType')=='EstimatedSales'){
+				$seller=[];
+				$datas= DB::connection('amazon')->table('symmetry_asins')->get();
+				$arrayData[] = ['Asin','Site','Sku','Sku Group','Date','Estimated Quantity','Estimated Date'];
+				foreach($datas as $key=>$val){
+					$arrayData[] = [
+						$val->asin,
+						array_get(getSiteUrl(),$val->marketplace_id,$val->marketplace_id),
+						$val->sku,
+						$val->sku_group,
+						$val->date,
+						$val->quantity,
+						$val->updated_at
+					];
+				}
+				
+			}
+			
+			
+			
 			if(array_get($_REQUEST,'ExportType')=='Fees'){
 				$seller=[];
 				$accounts= DB::connection('order')->table('accounts')->where('status',1)->groupBy(['sellername','sellerid'])->get(['sellername','sellerid']);
