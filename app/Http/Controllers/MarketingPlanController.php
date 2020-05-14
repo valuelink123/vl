@@ -126,7 +126,7 @@ class MarketingPlanController extends Controller
                         asin,
                         IFNULL(
                             sum(
-                                amount_income + amount_refund - cost
+                              	amount_income +  amount_refund - cost
                             ) / sum(
                                 quantity_shipped - quantity_returned
                             ),
@@ -139,12 +139,10 @@ class MarketingPlanController extends Controller
                         daily_statistics
                     WHERE
                         date >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+                        and date < CURDATE()
                     AND marketplace_id='" . $request['marketplace_id'] . "'
                     AND asin = '" . $request['asin'] . "'
-                    GROUP BY
-                        seller_id,
-                        marketplace_id,
-                        seller_sku";
+                    ";
             $statistics_o = DB::connection('vlz')->select($sql1);
             $statistics = (json_decode(json_encode($statistics_o), true));
             if (!empty($statistics)) {
@@ -709,7 +707,7 @@ class MarketingPlanController extends Controller
                         asin,
                         IFNULL(
                             sum(
-                                amount_income + amount_refund - cost
+                              	amount_income +  amount_refund - cost
                             ) / sum(
                                 quantity_shipped - quantity_returned
                             ),
@@ -722,12 +720,10 @@ class MarketingPlanController extends Controller
                         daily_statistics
                     WHERE
                         date >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
-                    AND marketplace_id='" . $marketplaceid . "'
-                    AND asin = '" . $asin . "'
-                    GROUP BY
-                        seller_id,
-                        marketplace_id,
-                        seller_sku";
+                        and date < CURDATE()
+                    AND marketplace_id='" . $request['marketplace_id'] . "'
+                    AND asin = '" . $request['asin'] . "'
+                    ";
                     $statistics_o = DB::connection('vlz')->select($sql1);
                     $statistics = (json_decode(json_encode($statistics_o), true));
                     //查询排名 和 转化率
