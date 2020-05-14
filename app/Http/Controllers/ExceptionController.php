@@ -906,7 +906,7 @@ class ExceptionController extends Controller
         $iDisplayStart = intval($_REQUEST['start']);
         $sEcho = intval($_REQUEST['draw']);
 
-		$customersLists =  $customers->orderBy($orderby,$sort)->skip($iDisplayStart)->take($iDisplayLength)->get()->toArray();
+		$customersLists =  $customers->where('user_id','<>',1)->orderBy($orderby,$sort)->skip($iDisplayStart)->take($iDisplayLength)->get()->toArray();
 
         $records = array();
         $records["data"] = array();
