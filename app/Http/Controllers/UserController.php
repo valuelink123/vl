@@ -591,7 +591,7 @@ where a.date>=:sdate_from and a.date<=:sdate_to
 			
 			if(array_get($_REQUEST,'ExportType')=='EstimatedSales'){
 				$seller=[];
-				$datas= DB::connection('amazon')->table('symmetry_asins')->get();
+				$datas= DB::connection('amazon')->table('symmetry_asins')->where('date','>=',$date_from)->where('date','<=',$date_to)->get();
 				$arrayData[] = ['Asin','Site','Sku','Sku Group','Date','Estimated Quantity','Estimated Date'];
 				foreach($datas as $key=>$val){
 					$arrayData[] = [
