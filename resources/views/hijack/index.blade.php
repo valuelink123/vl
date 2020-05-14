@@ -487,7 +487,7 @@
 					
 				},
 				error:function(err){
-					alert(err.responseText)
+					console.log(err)
 				}
 			},
 			"pagingType": 'full_numbers',
