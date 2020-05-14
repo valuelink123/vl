@@ -185,10 +185,10 @@ class MarketingPlanController extends Controller
             $user = DB::table('users')->select('sap_seller_id', 'id', 'name', 'email', 'seller_rules', 'ubg', 'ubu')
                 ->where('sap_seller_id', $request['sap_seller_id'])
                 ->first();
-
             $user = (json_decode(json_encode($user), true));
         }
         if (!empty($user)) {
+            var_dump($user);exit;
             if (!empty($user['email']) && in_array($user['email'], $ADMIN_EMAIL)) {
                 /**  特殊权限着 查询所有用户 */
                 $allUsers = DB::table('users')->select('id', 'name', 'email', 'sap_seller_id', 'seller_rules', 'ubg', 'ubu')
@@ -814,6 +814,44 @@ class MarketingPlanController extends Controller
         }
         return $r_message;
 
+    }
+    public function importExecl($file='', $sheet=0){
+        $file = iconv("utf-8", "gb2312", $file);   //转码
+        if(empty($file) OR !file_exists($file)) {
+            die('file not exists!');
+        }
+        include('PHPExcel.php');  //引入PHP EXCEL类
+        $objRead = new PHPExcel_Reader_Excel2007();   //建立reader对象
+        if(!$objRead->canRead($file)){
+            $objRead = new PHPExcel_Reader_Excel5();
+            if(!$objRead->canRead($file)){
+                die('No Excel!');
+            }
+        }
+
+        $cellName = array('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN', 'AO', 'AP', 'AQ', 'AR', 'AS', 'AT', 'AU', 'AV', 'AW', 'AX', 'AY', 'AZ');
+
+        $obj = $objRead->load($file);  //建立excel对象
+        $currSheet = $obj->getSheet($sheet);   //获取指定的sheet表
+        $columnH = $currSheet->getHighestColumn();   //取得最大的列号
+        $columnCnt = array_search($columnH, $cellName);
+        $rowCnt = $currSheet->getHighestRow();   //获取总行数
+
+        $data = array();
+        for($_row=1; $_row<=$rowCnt; $_row++){  //读取内容
+            for($_column=0; $_column<=$columnCnt; $_column++){
+                $cellId = $cellName[$_column].$_row;
+                $cellValue = $currSheet->getCell($cellId)->getValue();
+                //$cellValue = $currSheet->getCell($cellId)->getCalculatedValue();  #获取公式计算的值
+                if($cellValue instanceof PHPExcel_RichText){   //富文本转换字符串
+                    $cellValue = $cellValue->__toString();
+                }
+
+                $data[$_row][$cellName[$_column]] = $cellValue;
+            }
+        }
+
+        return $data;
     }
 
 }

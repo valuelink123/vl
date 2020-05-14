@@ -70,7 +70,8 @@ class Asin extends Model
         '5'=>'待定',
         '6'=>'停售',
     ];
-    const ADMIN_EMAIL = array(
+    const ADMIN_EMAIL =
+        array(
         'test@qq.com',
         'duanyongsheng@dtas.com',
         "charlie@valuelinkcorp.com",
