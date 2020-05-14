@@ -145,12 +145,13 @@ class AddRsgProduct extends Command
 			if($imageArr){
 				$amazonData[$val->asin.'_'.$site]['image'] = 'https://images-na.ssl-images-amazon.com/images/I/'.$imageArr[0];
 			}
-            foreach($marketingData as $mkey=>$mval){
-                if($val->asin==$mval->asin&&$val->marketplaceid==$mval->marketplaceid){
-                    $amazonData[$val->asin.'_'.$site]['m_target'] = $val->rsg_d_target;
+			if(!empty($marketingData)){
+                foreach($marketingData as $mkey=>$mval){
+                    if($val->asin==$mval->asin&&$val->marketplaceid==$mval->marketplaceid){
+                        $amazonData[$val->asin.'_'.$site]['m_target'] = $mval->rsg_d_target;
+                    }
                 }
             }
-
 		}
 
 		$insertData = array();

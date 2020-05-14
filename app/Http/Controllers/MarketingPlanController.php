@@ -126,7 +126,7 @@ class MarketingPlanController extends Controller
                         asin,
                         IFNULL(
                             sum(
-                              	amount_income + fulfillment_fee +commission + amount_refund - cost
+                              	amount_income +  amount_refund - cost
                             ) / sum(
                                 quantity_shipped - quantity_returned
                             ),
@@ -707,7 +707,7 @@ class MarketingPlanController extends Controller
                         asin,
                         IFNULL(
                             sum(
-                              	amount_income + fulfillment_fee +commission + amount_refund - cost
+                              	amount_income +  amount_refund - cost
                             ) / sum(
                                 quantity_shipped - quantity_returned
                             ),
