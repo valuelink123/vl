@@ -328,9 +328,16 @@
  			<select name="" class="sellerList" onchange="status_filter(this.value,6)">
 				<option value="">All Seller</option>
 			</select>
- 			<!-- <select name="" onchange="status_filter(this.value,2)">
+ 			<select name="" onchange="status_filter(this.value,5)">
 				<option value="">All Status</option>
-			</select> -->
+				<option value="淘汰">淘汰</option>
+				<option value="保留">保留</option>
+				<option value="新品">新品</option>
+				<option value="配件">配件</option>
+				<option value="替换">替换</option>
+				<option value="待定">待定</option>
+				<option value="停售">停售</option>
+			</select>
  			<select name="" onchange="status_filter(this.value,2)">
 				<option value="">All Marketplace</option>
 				<option value="US">www.amazon.com</option>
@@ -440,7 +447,6 @@
 		let isOpen=1;
 		$('#switchSelect').on("change",function(){
 			isOpen = $(this).val()
-			console.log(isOpen)
 			editTableObj.ajax.reload();
 		})
 		$('.search_input').keyup(function(){
