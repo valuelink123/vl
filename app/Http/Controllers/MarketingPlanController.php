@@ -186,9 +186,10 @@ class MarketingPlanController extends Controller
                 ->where('sap_seller_id', $request['sap_seller_id'])
                 ->first();
             $user = (json_decode(json_encode($user), true));
+        }else{
+            $user = Auth::user()->toArray();
         }
         if (!empty($user)) {
-            var_dump($user);exit;
             if (!empty($user['email']) && in_array($user['email'], $ADMIN_EMAIL)) {
                 /**  特殊权限着 查询所有用户 */
                 $allUsers = DB::table('users')->select('id', 'name', 'email', 'sap_seller_id', 'seller_rules', 'ubg', 'ubu')
