@@ -300,7 +300,7 @@ class HijackController extends Controller
             rl_task.created_at,
             rl_task.reselling_asin_id
             FROM(asins AS a LEFT JOIN tbl_reselling_asin AS rl_asin ON a.id = rl_asin.product_id)
-            LEFT JOIN tbl_reselling_task AS rl_task ON rl_asin.id = rl_task.reselling_asin_id
+            LEFT JOIN tbl_reselling_task AS rl_task ON rl_asin.id = rl_task.reselling_asin_id AND  rl_task.created_at >='.$ago_time.'
             where a.title !="" ';
         //GROUP BY a.asin
         //默认1开启跟卖，2.全部; 3. 关闭跟卖
@@ -318,6 +318,7 @@ class HijackController extends Controller
         } else {
             $sql = $sql_s . $sql_g;
         }
+        echo $sql;exit;
         $productList_obj = DB::connection('vlz')->select($sql);
         $productList = (json_decode(json_encode($productList_obj), true));
         $asinList = [];

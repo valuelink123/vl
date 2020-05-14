@@ -871,10 +871,9 @@ class MarketingPlanController extends Controller
                 $col_num = $sheet->getHighestColumn();
                 $data = []; //数组形式获取表格数据
                 for ($i = 2; $i <= $row_num; $i ++) {
-                    $data[$i]['code']  = $sheet->getCell("A".$i)->getValue();
-                    $data[$i]['last_code']  = substr($sheet->getCell("A".$i)->getValue(),-6);
-                    $time = date('Y-m-d H:i',\PHPExcel_Shared_Date::ExcelToPHP($sheet->getCell("B".$i)->getValue()));
-                    $data[$i]['time'] = strtotime($time);
+                    $data[$i]['rank']  = $sheet->getCell("A".$i)->getValue();
+                    $data[$i]['Score']  = $sheet->getCell("B".$i)->getValue();
+                    $data[$i]['Weight Status']  = $sheet->getCell("C".$i)->getValue();
                     //将数据保存到数据库
                 }
                 echo '<pre>';
