@@ -318,7 +318,6 @@ class HijackController extends Controller
         } else {
             $sql = $sql_s . $sql_g;
         }
-        echo $sql;exit;
         $productList_obj = DB::connection('vlz')->select($sql);
         $productList = (json_decode(json_encode($productList_obj), true));
         $asinList = [];
