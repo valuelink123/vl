@@ -54,10 +54,24 @@ class MarketingPlanController extends Controller
                     GROUP BY asins.marketplaceid,sams.asin";
         }else{
             $user = Auth::user()->toArray();
+            $allUsers = DB::table('users')->select('id', 'name', 'email', 'sap_seller_id', 'seller_rules', 'ubg', 'ubu')
+                ->where('ubu', '!=', "")
+                ->orwhere('ubg', '!=', "")
+                ->orwhere('seller_rules', '!=', "")
+                ->get()->map(function ($value) {
+                    return (array)$value;
+                })->toArray();
+            if (!empty($allUsers)) {
+                foreach ($allUsers as $auk => $auv) {
+                    if($auv['sap_seller_id']>0){
+                        $sapSellerIdList[] = $auv['sap_seller_id'];
+                    }
+                }
+            }
             if(in_array($user['email'], $ADMIN_EMAIL)){
                 $sql = "SELECT sams.asin,asins.marketplaceid,sams.sku_status,sams.sku,asins.reviews,asins.rating 
                     from sap_asin_match_sku as sams LEFT JOIN asins on asins.asin= sams.asin 
-                    WHERE  marketplaceid!=''
+                    WHERE sap_seller_id in (" . implode($sapSellerIdList, ',') . ") and marketplaceid!=''
                     GROUP BY asins.marketplaceid,sams.asin";
             }
         }
