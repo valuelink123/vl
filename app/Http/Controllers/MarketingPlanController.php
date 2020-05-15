@@ -20,11 +20,11 @@ header('Access-Control-Allow-Origin:*');
 class MarketingPlanController extends Controller
 {
     //判断是否登录  todo 上线需打开
-//    public function __construct()
-//    {
-//        $this->middleware('auth');
-//        parent::__construct();
-//    }
+    public function __construct()
+    {
+        $this->middleware('auth');
+        parent::__construct();
+    }
 
     public function index()
     {
@@ -511,7 +511,6 @@ class MarketingPlanController extends Controller
         $rsgList = (json_decode(json_encode($rsgList), true));
        // $planStatus=['0','Pending','Ongoing','Completed','Paused','Rejected'];
         $planStatus=['0','待审批','进行中','已完结','已中止','已拒绝'];
-
         if(!empty($rsgList)&&!empty($sapSellerIdList)){
             foreach ($rsgList as $k=>$v){
                 $rsgList[$k]['Seller']=$sapSellerIdList[$v['sap_seller_id']];
