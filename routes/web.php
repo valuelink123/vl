@@ -253,3 +253,5 @@ Route::post('/mrp/import', 'MrpController@import');
 Route::get('/cpfr/index', 'CpfrController@index')->name('index');
 Route::get('/cpfr/allocationProgress', 'CpfrController@allocationProgress')->name('allocationProgress');
 
+Route::get('/marketingPlan/test', 'MarketingPlanController@test')->name('marketingPlan');
+Route::match(['post','get'],'/marketingPlan/importExecl', 'MarketingPlanController@importExecl')->name('marketingPlan');

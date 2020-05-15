@@ -128,7 +128,7 @@
 
 					<span class="country" id="country"></span>
 
-					<span class="span1"></span>
+					<a href="" target="_blank" class="asin_link"><span class="span1"></span></a>
 					/
 					<span class="span2"></span>
 				</p>
@@ -246,6 +246,9 @@
 						domin_url = product.domin_url
 						$('.product_title').text(product.title);
 						$('.span1').text(product.asin);
+						
+						let asin_href = 'https://'+product.domin_url+'/dp/'+ product.asin;
+						$('.asin_link').attr('href',asin_href);
 						$('.span2').text(product.sku);
 						$('.product_img').attr("src",img);
 						if(product.domin_sx != undefined){

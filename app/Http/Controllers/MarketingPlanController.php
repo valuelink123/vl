@@ -19,12 +19,12 @@ header('Access-Control-Allow-Origin:*');
 
 class MarketingPlanController extends Controller
 {
-    //判断是否登录
-    public function __construct()
-    {
-        $this->middleware('auth');
-        parent::__construct();
-    }
+    //判断是否登录  todo 上线需打开
+//    public function __construct()
+//    {
+//        $this->middleware('auth');
+//        parent::__construct();
+//    }
 
     public function index()
     {
@@ -45,11 +45,37 @@ class MarketingPlanController extends Controller
         $DOMIN_MARKETPLACEID_SX = Asin::DOMIN_MARKETPLACEID_SX;
         $sap_seller_id = $request['sap_seller_id'] ? $request['sap_seller_id'] : 0;
         $user_asin_list=$currency_rates=[];
+        /** 超级权限*/
+        $ADMIN_EMAIL=Asin::ADMIN_EMAIL;
         if ($sap_seller_id > 0) {
             $sql = "SELECT sams.asin,asins.marketplaceid,sams.sku_status,sams.sku,asins.reviews,asins.rating 
                     from sap_asin_match_sku as sams LEFT JOIN asins on asins.asin= sams.asin 
                     WHERE sap_seller_id =" . $sap_seller_id . " AND marketplaceid!=''
                     GROUP BY asins.marketplaceid,sams.asin";
+        }else{
+            $user = Auth::user()->toArray();
+            $allUsers = DB::table('users')->select('id', 'name', 'email', 'sap_seller_id', 'seller_rules', 'ubg', 'ubu')
+                ->where('ubu', '!=', "")
+                ->orwhere('ubg', '!=', "")
+                ->orwhere('seller_rules', '!=', "")
+                ->get()->map(function ($value) {
+                    return (array)$value;
+                })->toArray();
+            if (!empty($allUsers)) {
+                foreach ($allUsers as $auk => $auv) {
+                    if($auv['sap_seller_id']>0){
+                        $sapSellerIdList[] = $auv['sap_seller_id'];
+                    }
+                }
+            }
+            if(in_array($user['email'], $ADMIN_EMAIL)){
+                $sql = "SELECT sams.asin,asins.marketplaceid,sams.sku_status,sams.sku,asins.reviews,asins.rating 
+                    from sap_asin_match_sku as sams LEFT JOIN asins on asins.asin= sams.asin 
+                    WHERE sap_seller_id in (" . implode($sapSellerIdList, ',') . ") and marketplaceid!=''
+                    GROUP BY asins.marketplaceid,sams.asin";
+            }
+        }
+        if(!empty($sql)){
             $user_asin_list_obj = DB::connection('vlz')->select($sql);
             $user_asin_list = (json_decode(json_encode($user_asin_list_obj), true));            //asin 站点 suk suk状态
             if (!empty($user_asin_list)) {
@@ -60,14 +86,13 @@ class MarketingPlanController extends Controller
                     $user_asin_list[$k]['country'] = $DOMIN_MARKETPLACEID_SX[$v['marketplaceid']];
                 }
             }
-
-            //查询所有汇率信息
-            $currency_rates = DB::connection('vlz')->table('currency_rates')
-                ->select('currency', 'rate', 'id', 'updated_at')
-                ->get()->map(function ($value) {
-                    return (array)$value;
-                })->toArray();
         }
+        //查询所有汇率信息
+        $currency_rates = DB::connection('vlz')->table('currency_rates')
+            ->select('currency', 'rate', 'id', 'updated_at')
+            ->get()->map(function ($value) {
+                return (array)$value;
+            })->toArray();
         return [$user_asin_list, $currency_rates];
         return view('marketingPlan.index', ['user_asin_list' => $user_asin_list, 'currency_rates' => $currency_rates]);
     }
@@ -230,6 +255,10 @@ class MarketingPlanController extends Controller
             $marketing_plan['to_time'] = date('Y-m-d', $marketing_plan['to_time']);
             $marketing_plan['complete_at'] = date('Y-m-d', $marketing_plan['complete_at']);
             $marketing_plan['country'] = $DOMIN_MARKETPLACEID_SX[$marketing_plan['marketplaceid']];
+            $marketing_plan['ranking'] = $marketing_plan['current_rank'];
+            $marketing_plan['conversion'] = $marketing_plan['current_cr'];
+
+
         } else {
             return '缺少参数';
         }
@@ -276,7 +305,7 @@ class MarketingPlanController extends Controller
                 /** 已完结 已终止 已拒绝 不能在修改*/
                 $update = 0;
             }
-            if ($update > 0 && $sap_seller_id>0) {
+            if ($update > 0) {
                 $up_data = [
                     'plan_status' => $plan_status,
                     'updated_at' => time(),
@@ -507,7 +536,6 @@ class MarketingPlanController extends Controller
         $rsgList = (json_decode(json_encode($rsgList), true));
        // $planStatus=['0','Pending','Ongoing','Completed','Paused','Rejected'];
         $planStatus=['0','待审批','进行中','已完结','已中止','已拒绝'];
-
         if(!empty($rsgList)&&!empty($sapSellerIdList)){
             foreach ($rsgList as $k=>$v){
                 $rsgList[$k]['Seller']=$sapSellerIdList[$v['sap_seller_id']];
@@ -569,7 +597,7 @@ class MarketingPlanController extends Controller
         } else {
             $tomorrow_t = strtotime(date('Y-m-d')) + 3600 * 24;
             if ($request['from_time'] >= $tomorrow_t && $request['to_time'] >= $tomorrow_t) {
-                if (!empty($request['asin']) && !empty($request['marketplaceid']) && !empty($request['sap_seller_id']) && !empty($request['sku'])) {
+                if (!empty($request['asin']) && !empty($request['marketplaceid'])  && !empty($request['sku'])) {
                     $asins = DB::connection('vlz')->table('asins')
                         ->select('id', 'images')
                         ->where('asin', $request['asin'])
@@ -587,7 +615,7 @@ class MarketingPlanController extends Controller
                         'sku' => $request['sku'],
                         'sku_status' => @$request['sku_status'],
                         'sku_price' => @$request['sku_price'],
-                        'currency_rates_id' => @$request['currency_rates_id'],
+                        'currency_rates_id' => @$request['currency_rates_id']>0?$request['currency_rates_id']:1,
                         'rating' => @$request['rating'],
                         'reviews' => @$request['reviews'],
                         'fba_stock' => @$request['fba_stock'],
@@ -628,7 +656,7 @@ class MarketingPlanController extends Controller
                         $r_message = ['status' => 0, 'msg' => '新增失败'];
                     }
                 } else {
-                    $r_message = ['status' => 0, 'msg' => 'asin/sku/marketplaceid/sap_seller_id 等参数不能为空'];
+                    $r_message = ['status' => 0, 'msg' => 'asin/sku/marketplaceid/ 等参数不能为空'];
                 }
 
             } else {
@@ -860,7 +888,7 @@ class MarketingPlanController extends Controller
                 if($file_ex=="xlsx"){
                     $reader = \PHPExcel_IOFactory::createReader('Excel2007');
                 }else{
-                    $reader = PHPExcel_IOFactory::createReader('Excel5');
+                    $reader = \PHPExcel_IOFactory::createReader('Excel5');
                 }
                 $excel = $reader->load(public_path().$newpath.$newname,$encode = 'utf-8');
                 //读取第一张表
@@ -874,7 +902,7 @@ class MarketingPlanController extends Controller
                     $data[$i]['rank']  = $sheet->getCell("A".$i)->getValue();
                     $data[$i]['Score']  = $sheet->getCell("B".$i)->getValue();
                     $data[$i]['Weight Status']  = $sheet->getCell("C".$i)->getValue();
-                    //将数据保存到数据库
+                    $data[$i]['Product']  = $sheet->getCell("D".$i)->getValue();
                 }
                 echo '<pre>';
                 var_dump($data);exit;

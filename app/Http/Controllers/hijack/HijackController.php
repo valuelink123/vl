@@ -32,7 +32,7 @@ class HijackController extends Controller
      * @var string
      */
     protected $redirectTo = '/home';
-
+    //上线 需打开 todo
     public function __construct()
     {
         $this->middleware('auth');

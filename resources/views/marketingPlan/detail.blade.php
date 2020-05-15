@@ -649,6 +649,7 @@
 					}
 					$('.rsgGoal').val(res.marketing_plan.goal);
 					$('.rateSelect').val(res.marketing_plan.currency_rates_id);
+					console.log(res.marketing_plan.currency_rates_id)
 					$('.planStatus').val(res.marketing_plan.plan_status);
 					$("#asin-select").val(res.marketing_plan.asin);
 					$('.sku').text(res.marketing_plan.sku);
@@ -1119,7 +1120,7 @@
 				let sku = $('.sku').text();
 				let sku_status = $('.skuStatus').text();
 				let sku_price = $('.ratingVal').val();
-				let currency_rates_id = $('.rateSelect').find("option:selected").attr("id");
+				let currency_rates_id = $('.rateSelect').val();
 				let fba_stock = $('.inventory').text();
 				let rating = $('.star').text();
 				let reviews = $('.reviews').text();
@@ -1235,7 +1236,7 @@
 							$('.error_mask').fadeOut(1000);
 						},2000)
 					},
-				});
+				}); 
 			}
 			
 		}) 
