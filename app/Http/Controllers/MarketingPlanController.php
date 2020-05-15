@@ -507,7 +507,6 @@ class MarketingPlanController extends Controller
         if (!empty($request['rank']) && !empty($request['order'])) {
             $sql = $sql . ' ORDER BY ' . $request['rank'] . ' ' . $request['order'];
         }
-        echo $sql;exit;
         $rsgList = DB::connection('vlz')->select($sql);
         $rsgList = (json_decode(json_encode($rsgList), true));
        // $planStatus=['0','Pending','Ongoing','Completed','Paused','Rejected'];
