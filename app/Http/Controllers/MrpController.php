@@ -462,7 +462,7 @@ class MrpController extends Controller
 		$sql = "
         SELECT SQL_CALC_FOUND_ROWS
         	a.*,(sales_4_weeks/28*0.5+sales_2_weeks/14*0.3+sales_1_weeks/7*0.2) as daily_sales,buybox_sellerid,
-afn_sellable,afn_reserved,quantity from (select asin,marketplace_id,any_value(sku) as sku,any_value(status) as status,
+afn_sellable,afn_reserved,mfn_sellable,quantity,0 as afn_transfer from (select asin,marketplace_id,any_value(sku) as sku,any_value(status) as status,
 any_value(sku_status) as sku_status,any_value(sap_seller_id) as sap_seller_id, 
 any_value(sap_seller_bg) as bg,any_value(sap_seller_bu) as bu from sap_asin_match_sku group by asin,marketplace_id) as a
 left join asins as b on a.asin=b.asin and a.marketplace_id=b.marketplaceid
@@ -487,10 +487,10 @@ on a.asin=c.asin and a.marketplace_id=c.marketplace_id
 			$data[$key]['daily_sales'] = round($val['daily_sales'],2);
 			$data[$key]['quantity'] = intval($val['quantity']);
 			$data[$key]['fba_stock'] = $val['afn_sellable']+$val['afn_reserved'];
-			$data[$key]['fba_stock_keep'] = 0;
-			$data[$key]['fba_transfer'] = 0;
-			$data[$key]['fbm_stock'] = 0;
-			$data[$key]['stock_keep'] = 0;
+			$data[$key]['fba_stock_keep'] = (round($val['daily_sales'],2)==0)?'∞':date('Y-m-d',strtotime('+'.intval(($val['afn_sellable']+$val['afn_reserved'])/round($val['daily_sales'],2)).'days'));
+			$data[$key]['fba_transfer'] = intval($val['afn_transfer']);
+			$data[$key]['fbm_stock'] = intval($val['mfn_sellable']);
+			$data[$key]['stock_keep'] = (round($val['daily_sales'],2)==0)?'∞':date('Y-m-d',strtotime('+'.intval(($val['afn_sellable']+$val['afn_reserved']+$val['mfn_sellable']+$val['afn_transfer'])/round($val['daily_sales'],2)).'days'));
 			$data[$key]['sz'] = 0;
 			$data[$key]['in_make'] = 0;
 			$data[$key]['out_stock'] = 0;
