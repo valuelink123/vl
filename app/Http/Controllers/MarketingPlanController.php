@@ -19,12 +19,12 @@ header('Access-Control-Allow-Origin:*');
 
 class MarketingPlanController extends Controller
 {
-    //判断是否登录
-    public function __construct()
-    {
-        $this->middleware('auth');
-        parent::__construct();
-    }
+    //判断是否登录  todo 上线需打开
+//    public function __construct()
+//    {
+//        $this->middleware('auth');
+//        parent::__construct();
+//    }
 
     public function index()
     {
@@ -230,6 +230,10 @@ class MarketingPlanController extends Controller
             $marketing_plan['to_time'] = date('Y-m-d', $marketing_plan['to_time']);
             $marketing_plan['complete_at'] = date('Y-m-d', $marketing_plan['complete_at']);
             $marketing_plan['country'] = $DOMIN_MARKETPLACEID_SX[$marketing_plan['marketplaceid']];
+            $marketing_plan['ranking'] = $marketing_plan['current_rank'];
+            $marketing_plan['conversion'] = $marketing_plan['current_cr'];
+
+
         } else {
             return '缺少参数';
         }
@@ -587,7 +591,7 @@ class MarketingPlanController extends Controller
                         'sku' => $request['sku'],
                         'sku_status' => @$request['sku_status'],
                         'sku_price' => @$request['sku_price'],
-                        'currency_rates_id' => @$request['currency_rates_id'],
+                        'currency_rates_id' => @$request['currency_rates_id']>0?$request['currency_rates_id']:1,
                         'rating' => @$request['rating'],
                         'reviews' => @$request['reviews'],
                         'fba_stock' => @$request['fba_stock'],
