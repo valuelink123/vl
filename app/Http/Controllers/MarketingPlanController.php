@@ -597,7 +597,7 @@ class MarketingPlanController extends Controller
         } else {
             $tomorrow_t = strtotime(date('Y-m-d')) + 3600 * 24;
             if ($request['from_time'] >= $tomorrow_t && $request['to_time'] >= $tomorrow_t) {
-                if (!empty($request['asin']) && !empty($request['marketplaceid']) && !empty($request['sap_seller_id']) && !empty($request['sku'])) {
+                if (!empty($request['asin']) && !empty($request['marketplaceid'])  && !empty($request['sku'])) {
                     $asins = DB::connection('vlz')->table('asins')
                         ->select('id', 'images')
                         ->where('asin', $request['asin'])
@@ -656,7 +656,7 @@ class MarketingPlanController extends Controller
                         $r_message = ['status' => 0, 'msg' => '新增失败'];
                     }
                 } else {
-                    $r_message = ['status' => 0, 'msg' => 'asin/sku/marketplaceid/sap_seller_id 等参数不能为空'];
+                    $r_message = ['status' => 0, 'msg' => 'asin/sku/marketplaceid/ 等参数不能为空'];
                 }
 
             } else {
