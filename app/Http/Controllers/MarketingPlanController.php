@@ -20,11 +20,11 @@ header('Access-Control-Allow-Origin:*');
 class MarketingPlanController extends Controller
 {
     //判断是否登录  todo 上线需打开
-    public function __construct()
-    {
-        $this->middleware('auth');
-        parent::__construct();
-    }
+//    public function __construct()
+//    {
+//        $this->middleware('auth');
+//        parent::__construct();
+//    }
 
     public function index()
     {
@@ -45,11 +45,23 @@ class MarketingPlanController extends Controller
         $DOMIN_MARKETPLACEID_SX = Asin::DOMIN_MARKETPLACEID_SX;
         $sap_seller_id = $request['sap_seller_id'] ? $request['sap_seller_id'] : 0;
         $user_asin_list=$currency_rates=[];
+        /** 超级权限*/
+        $ADMIN_EMAIL=Asin::ADMIN_EMAIL;
         if ($sap_seller_id > 0) {
             $sql = "SELECT sams.asin,asins.marketplaceid,sams.sku_status,sams.sku,asins.reviews,asins.rating 
                     from sap_asin_match_sku as sams LEFT JOIN asins on asins.asin= sams.asin 
                     WHERE sap_seller_id =" . $sap_seller_id . " AND marketplaceid!=''
                     GROUP BY asins.marketplaceid,sams.asin";
+        }else{
+            $user = Auth::user()->toArray();
+            if(in_array($user['email'], $ADMIN_EMAIL)){
+                $sql = "SELECT sams.asin,asins.marketplaceid,sams.sku_status,sams.sku,asins.reviews,asins.rating 
+                    from sap_asin_match_sku as sams LEFT JOIN asins on asins.asin= sams.asin 
+                    WHERE  marketplaceid!=''
+                    GROUP BY asins.marketplaceid,sams.asin";
+            }
+        }
+        if(!empty($sql)){
             $user_asin_list_obj = DB::connection('vlz')->select($sql);
             $user_asin_list = (json_decode(json_encode($user_asin_list_obj), true));            //asin 站点 suk suk状态
             if (!empty($user_asin_list)) {
@@ -60,14 +72,13 @@ class MarketingPlanController extends Controller
                     $user_asin_list[$k]['country'] = $DOMIN_MARKETPLACEID_SX[$v['marketplaceid']];
                 }
             }
-
-            //查询所有汇率信息
-            $currency_rates = DB::connection('vlz')->table('currency_rates')
-                ->select('currency', 'rate', 'id', 'updated_at')
-                ->get()->map(function ($value) {
-                    return (array)$value;
-                })->toArray();
         }
+        //查询所有汇率信息
+        $currency_rates = DB::connection('vlz')->table('currency_rates')
+            ->select('currency', 'rate', 'id', 'updated_at')
+            ->get()->map(function ($value) {
+                return (array)$value;
+            })->toArray();
         return [$user_asin_list, $currency_rates];
         return view('marketingPlan.index', ['user_asin_list' => $user_asin_list, 'currency_rates' => $currency_rates]);
     }
