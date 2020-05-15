@@ -188,14 +188,9 @@ class AddRsgProduct extends Command
 			//当前存在target
 			if($m_target>0){
                 $sales_target_reviews = $m_target;
-            }
-			if(isset($orderdata[$val['asin'].'_'.$val['site']])){
-				if(intval(array_get($orderdata[$val['asin'].'_'.$val['site']],'sales_target_reviews_set'))>0){
-
-					$sales_target_reviews = intval(array_get($orderdata[$val['asin'].'_'.$val['site']],'sales_target_reviews_set'));
-				}
+            }else{
+				$sales_target_reviews = 0;
 			}
-			
 
 			$insertData[] = array(
 				'asin' => $val['asin'],
