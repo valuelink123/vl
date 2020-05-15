@@ -57,6 +57,11 @@
             bottom: inherit;
             right: inherit;
         }
+
+        button.dropdown-toggle{
+            padding: 4px 12px;
+        }
+
     </style>
     <div class="row">
         <div class="col-md-12">
@@ -109,9 +114,9 @@
                                 {{--</select>--}}
                             {{--</div>--}}
                             <div style="width:220px; float:left">
-                                <div>销售人员</div>
-                                <select name="user_id" id="user_id" style="width:205px; height:30px">
-                                    <option value="">请选择销售人员</option>
+                                <div>创建人或最新修改人</div>
+                                <select name="user_id" id="user_id" data-width="205px" class="selectpicker" data-live-search="true">
+                                    <option value="">请选择</option>
                                     @foreach ($users as $user_id=>$user_name)
                                         <option value="{{$user_id}}">{{$user_name}}</option>
                                     @endforeach
@@ -237,6 +242,7 @@
         </div>
     </div>
     <script>
+//        d.$lis.filter(".active").removeClass("active");
 
         $('#archived-modal').on("show.bs.modal", function(e){
             var launch_time = $(e.relatedTarget).data('launch_time');
@@ -392,6 +398,10 @@
                 autoclose: true,
             });
 
+//            $("#user_id").selectpicker({
+//                "width":88px;
+//                "height":30px;
+//            })
         });
 
 

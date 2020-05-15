@@ -132,7 +132,7 @@
         </div>
         <div class="col-md-12">
 
-            <form id="roi_form" action="{{ url('/roi/updateRecord') }}" method="post">
+            <form id="roi_form" action="{{ url('/roi/updateRecord') }}" method="post" onsubmit="return validate_form()">
                 {{ csrf_field() }}
                 {{--{{ method_field('PUT') }}--}}
                 <input type="hidden" name="roi_id" value="{{$roi['id']}}">
@@ -144,7 +144,7 @@
                     <div class="first_row_params">
                         <div style="width:315px; float:left;">
                             <div>产品名称</div>
-                            <input type="text" name="product_name" id="product_name" style="width:300px;" value="{{$roi['product_name']}}" required />
+                            <input type="text" name="product_name" id="product_name" style="width:300px;" value="{{$roi['product_name']}}" />
                         </div>
                         <div class="param_cost">
                             <div>站点</div>
@@ -653,6 +653,31 @@
         document.execCommand("Copy"); // 执行浏览器复制命令
     })
 
+    function validate_form(){
+        var product_name = $('#product_name').val().trim();
+        if(product_name == ''){
+            //alert("Product name cannot be empty.");
+            $('#product_name').focus();
+            return false;
+        }
+        var total_sales_volume = $('#total_sales_volume').text();
+        if(total_sales_volume == '' || total_sales_volume == 0){
+            alert("Total sales volume cannot be 0.");
+            return false;
+        }
+        var total_sales_amount = $('#total_sales_amount').text();
+        if(total_sales_amount == '' || total_sales_amount == '0.00'){
+            alert("Total sales amount cannot be 0.");
+            return false;
+        }
+        var tariff_rate = $('#tariff_rate').val();
+        if(tariff_rate == '' || tariff_rate == '0.00'){
+            alert("Tariff rate cannot be 0.");
+            $('#tariff_rate').focus();
+            return false;
+        }
+    }
+
     $("#analyse-btn").on('click', function() {
         //检查是否存在没填写的输入框
 //            $("input").each(function () {
@@ -661,6 +686,23 @@
 //                    return false;
 //                }
 //            })
+        
+        var total_sales_volume = $('#total_sales_volume').text();
+        if(total_sales_volume == '' || total_sales_volume == 0){
+            alert("total sales volume cannot be 0.");
+            return false;
+        }
+        var total_sales_amount = $('#total_sales_amount').text();
+        if(total_sales_amount == '' || total_sales_amount == '0.00'){
+            alert("total sales amount cannot be 0.");
+            return false;
+        }
+        var tariff_rate = $('#tariff_rate').val();
+        if(tariff_rate == '' || tariff_rate == '0.00'){
+            alert("tariff rate cannot be 0.");
+            $('#tariff_rate').focus();
+            return false;
+        }
 
         $.ajax({
             type: 'post',
