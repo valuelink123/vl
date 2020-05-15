@@ -19,12 +19,12 @@ header('Access-Control-Allow-Origin:*');
 
 class MarketingPlanController extends Controller
 {
-//判断是否登录
-//    public function __construct()
-//    {
-//        $this->middleware('auth');
-//        parent::__construct();
-//    }
+    //判断是否登录
+    public function __construct()
+    {
+        $this->middleware('auth');
+        parent::__construct();
+    }
 
     public function index()
     {

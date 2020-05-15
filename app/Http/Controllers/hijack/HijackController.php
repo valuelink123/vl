@@ -33,6 +33,12 @@ class HijackController extends Controller
      */
     protected $redirectTo = '/home';
 
+    public function __construct()
+    {
+        $this->middleware('auth');
+        parent::__construct();
+    }
+
     /**
      * Create a new controller instance.
      *
