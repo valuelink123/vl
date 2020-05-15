@@ -276,7 +276,7 @@ class MarketingPlanController extends Controller
                 /** 已完结 已终止 已拒绝 不能在修改*/
                 $update = 0;
             }
-            if ($update > 0 && $sap_seller_id>0) {
+            if ($update > 0) {
                 $up_data = [
                     'plan_status' => $plan_status,
                     'updated_at' => time(),
@@ -860,7 +860,7 @@ class MarketingPlanController extends Controller
                 if($file_ex=="xlsx"){
                     $reader = \PHPExcel_IOFactory::createReader('Excel2007');
                 }else{
-                    $reader = PHPExcel_IOFactory::createReader('Excel5');
+                    $reader = \PHPExcel_IOFactory::createReader('Excel5');
                 }
                 $excel = $reader->load(public_path().$newpath.$newname,$encode = 'utf-8');
                 //读取第一张表
@@ -874,7 +874,7 @@ class MarketingPlanController extends Controller
                     $data[$i]['rank']  = $sheet->getCell("A".$i)->getValue();
                     $data[$i]['Score']  = $sheet->getCell("B".$i)->getValue();
                     $data[$i]['Weight Status']  = $sheet->getCell("C".$i)->getValue();
-                    //将数据保存到数据库
+                    $data[$i]['Product']  = $sheet->getCell("D".$i)->getValue();
                 }
                 echo '<pre>';
                 var_dump($data);exit;
