@@ -461,10 +461,10 @@
                                                     </a>
                                                 </li>
 												@endpermission
-                                                @permission('roi-show-show')
+                                                @permission('roi-show')
                                                 <li class="">
                                                     <a href="/roi" class="nav-link nav-toggle ">
-                                                        Automatic price adjustment
+                                                        ROI Analysis
                                                         <span class="arrow"></span>
                                                     </a>
                                                 </li>
