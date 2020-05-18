@@ -873,7 +873,6 @@ class MarketingPlanController extends Controller
                 // Return error
                 return \Response::json($error, 400);
             }
-            // If it now has an id, it should have been successful.
             if (file_exists(public_path().$newpath.$newname)) {
                 $newurl = $newpath . $newname;
                 $success = new \stdClass();
@@ -904,6 +903,7 @@ class MarketingPlanController extends Controller
                     $data[$i]['Weight Status']  = $sheet->getCell("C".$i)->getValue();
                     $data[$i]['Product']  = $sheet->getCell("D".$i)->getValue();
                 }
+                //添加入库  todo
                 echo '<pre>';
                 var_dump($data);exit;
                 return \Response::json(array('files' => array($success)), 200);
