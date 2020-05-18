@@ -36,8 +36,8 @@ class HijackController extends Controller
     //上线 需打开 todo
     public function __construct()
     {
-//        $this->middleware('auth');
-//        parent::__construct();
+        $this->middleware('auth');
+        parent::__construct();
     }
 
     /**
@@ -1122,8 +1122,8 @@ class HijackController extends Controller
             /** 超级权限*/
             $userasinL = $sapSellerIdList = [];
             $bool_admin = 0;//是否是管理员
-           // $user = Auth::user()->toArray(); //todo  打开
-            $user=['email'=>'test@qq.com','ubg'=>'BG1','ubu'=>'BU2','seller_rules'=>'BG1-BU2-*'];
+            $user = Auth::user()->toArray(); //todo  打开
+           // $user=['email'=>'test@qq.com','ubg'=>'BG1','ubu'=>'BU2','seller_rules'=>'BG1-BU2-*'];
             if (!empty($user)) {
                 if ((!empty($user['email']) && in_array($user['email'], $ADMIN_EMAIL)) || @$user['seller_rules'] == '*-*-*') {
                     /**  特殊权限着 查询所有用户 */
