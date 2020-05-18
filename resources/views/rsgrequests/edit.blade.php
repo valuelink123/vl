@@ -5,6 +5,15 @@
 	.active{
 		color:black;
 	}
+	.common-btn{
+		background-color: #63C5D1;
+		color: #ffffff;
+		font-size: 14px;
+		text-align: center;
+		width: 60px;
+		height: 30px;
+		border-radius: 5px !important;
+	}
 	#product_id optgroup{color:black;}
 </style>
     <div class="row"><div class="col-md-12">
@@ -38,7 +47,9 @@
 						</div>
 					</div>
 				</div>
-				
+				<div style="float: right;">
+					<a href="{{url('/rsgrequestsUpdateHistory?request_id='.$rule['id'])}}" style="text-decoration: none" data-target="#edit-history-modal" data-toggle="modal" ><button id="update_history_btn" type="button" class="common-btn" style="width: 140px;"><span><i class="fa fa-history"></i></span> Update History</button></a>
+				</div>
 				<div class="clearfix margin-bottom-20"></div>
 
 						<div class="form-group col-md-9">
