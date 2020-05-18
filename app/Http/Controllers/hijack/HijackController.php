@@ -36,8 +36,8 @@ class HijackController extends Controller
     //上线 需打开 todo
     public function __construct()
     {
-        $this->middleware('auth');
-        parent::__construct();
+//        $this->middleware('auth');
+//        parent::__construct();
     }
 
     /**
@@ -1116,14 +1116,16 @@ class HijackController extends Controller
         $domain =isset($request['domain'])?$request['domain']:'';
         $condition =isset($request['condition'])?$request['condition']:'';//查询条件
         //传入下载的 asinID
-        if (!empty($request['startTime'] && !empty($request['endTime'])) && ($request['endTime'] > $request['startTime'])) {
+        if (!empty($request['startTime'] && !empty($request['endTime']))) {
+            $startTime = $request['startTime'];
+            $endTime = $request['endTime'] + 3600 * 24;
             $opensql = '';//是否查询今天开启跟卖的产品
             $SKU_STATUS_KV = Asin::SKU_STATUS_KV;
             /** 超级权限*/
-            $userasinL = $sapSellerIdList = [];
+            $userasinL = $sapSellerIdList = $resellingidList=[];
             $bool_admin = 0;//是否是管理员
-            $user = Auth::user()->toArray(); //todo  打开
-           // $user=['email'=>'test@qq.com','ubg'=>'BG1','ubu'=>'BU2','seller_rules'=>'BG1-BU2-*'];
+           // $user = Auth::user()->toArray(); //todo  打开
+            $user=['email'=>'test@qq.com','ubg'=>'BG1','ubu'=>'BU2','seller_rules'=>'BG1-BU2-*'];
             if (!empty($user)) {
                 if ((!empty($user['email']) && in_array($user['email'], $ADMIN_EMAIL)) || @$user['seller_rules'] == '*-*-*') {
                     /**  特殊权限着 查询所有用户 */
@@ -1220,6 +1222,7 @@ class HijackController extends Controller
             FROM(asins AS a LEFT JOIN tbl_reselling_asin AS rl_asin ON a.id = rl_asin.product_id)
             LEFT JOIN tbl_reselling_task AS rl_task ON rl_asin.id = rl_task.reselling_asin_id AND  rl_task.created_at >=' . $ago_time . '
             where a.title !="" ';
+            // AND rl_task.reselling_time >='.$startTime. ' AND rl_task.reselling_time <= '.$endTime
             //GROUP BY a.asin
             if (!empty($idList)) {
                 $sql_s = $sql_s . ' AND a.id in (' . $idList . ')';
@@ -1237,7 +1240,7 @@ class HijackController extends Controller
             $sql_g = $opensql . '  ORDER BY rl_task.reselling_time DESC, a.reselling_switch DESC ,rl_task.reselling_num DESC';
             /**  判断对应用户 以及对应管理人员 所有下属ID */
             if (!empty($userasinL)) {
-                $sql_as = 'AND a.asin in ("' . implode($userasinL, '","') . '")';
+                $sql_as = ' AND a.asin in ("' . implode($userasinL, '","') . '")';
                 $sql_marketplaceid = ' AND a.marketplaceid in ("' . implode($marketplaceid, '","') . '")';
                 $sql = $sql_s . $sql_as . $sql_g;
             } else {
@@ -1251,6 +1254,7 @@ class HijackController extends Controller
                     //这里过滤重复 原因是 上面sql 由于排序导致无法分组， L309
                     if (!in_array($value['asin'], $asinList)) {
                         $asinList[] = $value['asin'];
+                        $taskIdList[] = $value['rlk_id'];
                         $productList[$key]['domin_sx'] = $DOMIN_MARKETPLACEID_SX[$value['marketplaceid']];
                         $productList[$key]['toUrl'] = $DOMIN_MARKETPLACEID_URL[$value['marketplaceid']];
                         $productList[$key]['reselling_time'] = $value['reselling_time'] ? date('Y/m/d H:i:s', $value['reselling_time']) : '';
@@ -1334,16 +1338,45 @@ class HijackController extends Controller
                         }
                     }
                 }
+                $productIdList = [];
                 foreach ($productList as $pk => $pv) {
                     if(!empty($pv['sap_seller_id'])){
                         if (in_array($pv['sap_seller_id'], $sapSellerIdList)) {
                             $new_productList[] = $pv;
+                            $productIdList[]=$pv['id'];
                         }
                     }
                 }
             }
             $returnDate['userList'] = $userList;
             $returnDate['productList'] = $new_productList;
+
+            $resellingList = DB::connection('vlz')->table('tbl_reselling_asin')
+                ->select('id', 'asin', 'product_id')
+                ->whereIn('product_id', array_unique($productIdList))
+                ->get()->map(function ($value) {
+                    return (array)$value;
+                })->toArray();
+            foreach ($resellingList as $rlk => $rlv) {
+                $resellingidList[] = $rlv['id'];
+            }
+         if(!empty($resellingidList)){
+             $taskList = DB::connection('vlz')->table('tbl_reselling_task')
+                 ->select('id', 'reselling_num', 'reselling_time', 'created_at', 'reselling_asin_id')
+                  ->whereIn('reselling_asin_id', $resellingidList)
+                 ->orderBy('reselling_time', 'desc')
+                 ->get()->map(function ($value) {
+                     return (array)$value;
+                 })->toArray();
+             /** 查询detail **/
+             $taskDetail = DB::connection('vlz')->table('tbl_reselling_detail')
+                 ->select('id', 'task_id', 'price', 'shipping_fee', 'account', 'white', 'sellerid', 'created_at', 'reselling_remark')
+                 ->whereIn('task_id', array_unique($taskIdList))
+                 ->where('white', 0)//增加白名单
+                 ->get()->map(function ($value) {
+                     return (array)$value;
+                 })->toArray();
+         }
             echo
                 'ASIN,' .
                 'Marketplace,' .
@@ -1357,27 +1390,71 @@ class HijackController extends Controller
                 'Shipping,' .
                 'Date,' .
                 'Duration(h)' . "\r\n" . "\r\n";
-
-            if (!empty($new_productList)) {
-                foreach ($new_productList as $key => $dv) {
-                    if (!empty($dv['asin'])) {
-                        $price = @$dv['price'] > 0 ? $dv['price'] / 100 : 0;
-                        $shipping_fee = @$dv['shipping_fee'] > 0 ? $dv['shipping_fee'] / 100 : 0;
-                        echo '"' . @$dv['asin'] . '",' .
-                            '"' . @$dv['toUrl'] . '",' .
-                            '"' . @$dv['sku'] . '",' .
-                            '"' . @$dv['userName'] . '",' .
-                            '"' . @$dv['reselling_remark'] . '",' .
-                            '"' . @$dv['title'] . '",' .
-                            '"' . @$dv['sellerid'] . '",' .
-                            '"' . @$dv['account'] . '",' .
-                            '"' . $price . '",' .
-                            '"' . $shipping_fee . '",' .
-                            '"' . date('Y-m-d H:i', @$dv['created_at']) . '",' .
-                            '"' . @$dv['count'] . '"' .
-                            "\r\n";
+            if (!empty($taskDetail)) {
+                foreach ($taskDetail as $tlk => $tlv) {
+                    $taskDetail[$tlk]['count'] = 0;
+                    $created_at = 0;
+                    $reselling_count = 0;
+                    foreach ($taskDetail as $tk => $tv) {
+                        if ($tlv['sellerid'] == $tv['sellerid']) {
+                            if ($tv['created_at'] - $created_at > 3600 && $reselling_count == 0) {
+                            } elseif ($tv['created_at'] - $created_at > 3600) {
+                            } elseif ($tv['created_at'] - $created_at < 3600) {
+                                $reselling_count++;
+                            }
+                            $created_at = $tv['created_at'];
+                        }
+                    }
+                    $taskDetail[$tlk]['count'] = $reselling_count + 1;
+                    foreach ($taskList as $taK => $tav) {
+                        if ($tlv['task_id'] == $tav['id']) {
+                            $taskDetail[$tlk]['reselling_asin_id'] = $tav['reselling_asin_id'];
+                        }
                     }
                 }
+                foreach ($taskDetail as $tdkey => $tdval) {
+                    foreach ($resellingList as $rlk => $rlv) {
+                        if ($tdval['reselling_asin_id'] == $rlv['id']) {
+                            $taskDetail[$tdkey]['product_id'] = $rlv['product_id'];
+                        }
+                    }
+                }
+                foreach ($taskDetail as $tdkey => $tdval) {
+                    foreach ($new_productList as $pkey => $pval) {
+                        if ($tdval['product_id'] == $pval['id']) {
+                            $taskDetail[$tdkey]['title'] = $pval['title'];
+                            $taskDetail[$tdkey]['asin'] = $pval['asin'];
+                            $taskDetail[$tdkey]['sku'] = $pval['sku'];
+                            $taskDetail[$tdkey]['userName'] = $pval['userName'];
+                            $taskDetail[$tdkey]['marketplaceid'] = $DOMIN_MARKETPLACEID_URL[$pval['marketplaceid']];
+
+                        }
+                    }
+                }
+
+
+                if (!empty($taskDetail)) {
+                    foreach ($taskDetail as $key => $dv) {
+                        if (!empty($dv['asin'])) {
+                            $price = @$dv['price'] > 0 ? $dv['price'] / 100 : 0;
+                            $shipping_fee = @$dv['shipping_fee'] > 0 ? $dv['shipping_fee'] / 100 : 0;
+                            echo '"' . @$dv['asin'] . '",' .
+                                '"' . @$dv['marketplaceid'] . '",' .
+                                '"' . @$dv['sku'] . '",' .
+                                '"' . @$dv['userName'] . '",' .
+                                '"' . @$dv['reselling_remark'] . '",' .
+                                '"' . @$dv['title'] . '",' .
+                                '"' . @$dv['sellerid'] . '",' .
+                                '"' . @$dv['account'] . '",' .
+                                '"' . $price . '",' .
+                                '"' . $shipping_fee . '",' .
+                                '"' . date('Y-m-d H:i', @$dv['created_at']) . '",' .
+                                '"' . @$dv['count'] . '"' .
+                                "\r\n";
+                        }
+                    }
+                }
+
             }
         }
         exit;
