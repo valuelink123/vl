@@ -36,7 +36,7 @@ function leadList($id=0){
     }
 }
 
-this.leadList(1000);
+this.leadList(2000);
 echo '----------------------------------------------------';
 $result1 = CRest::call(
     'crm.lead.get',
