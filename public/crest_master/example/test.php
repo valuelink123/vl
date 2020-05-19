@@ -15,25 +15,27 @@ include_once ('../src/crest.php');
 //);
 $result=[];
 function leadList($id=0){
-    $result = CRest::call(
-        'crm.lead.list',
-        [
-            order=> ["ID"=> "ASC" ],
-            filter=>['>ID'=>$id],
-            select=> [ "ID", "TITLE", "COMMENTS" ,'SOURCE_ID']
-        ]
-    );
-    echo '<pre>';
-    var_dump($result);
-    echo '++++++++';
-    if(!empty($result)){
-        $total = $result['total'];
-        $next =  $result['next'];
-        if($next>1){
-            $lastID = $result['result'][49]['id'];
-            this.leadList($lastID);
-        }
+    if($id<1000){
+        $result = CRest::call(
+            'crm.lead.list',
+            [
+                order=> ["ID"=> "ASC" ],
+                filter=>['>ID'=>$id],
+                select=> [ "ID", "TITLE", "COMMENTS" ,'SOURCE_ID']
+            ]
+        );
+        echo '<pre>';
+        var_dump($result);
+        echo '++++++++';
+        if(!empty($result)){
+            $total = $result['total'];
+            $next =  $result['next'];
+            if($next>1){
+                $lastID = $result['result'][49]['id'];
+                this.leadList($lastID);
+            }
 
+        }
     }
 }
 this.leadList(1);
