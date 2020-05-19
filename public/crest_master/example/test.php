@@ -17,6 +17,7 @@ $result = CRest::call(
     'crm.lead.list',
     [
         order=> ["ID"=> "ASC" ],
+        filter=>[">ID"=> 115],
         select=> [ "ID", "TITLE", "COMMENTS" ]
     ]
 );
