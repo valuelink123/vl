@@ -25,18 +25,19 @@ function leadList($id=0){
     );
     echo '<pre>';
     var_dump($result);
+    echo '++++++++';
     if(!empty($result)){
         $total = $result['total'];
         $next =  $result['next'];
         if($next>1){
             $lastID = $result['result'][49]['id'];
-            //this.leadList($lastID);
+            this.leadList($lastID);
         }
 
     }
 }
 
-this.leadList(2000);
+
 echo '----------------------------------------------------';
 $result1 = CRest::call(
     'crm.lead.get',
