@@ -19,6 +19,5 @@ $result1 = CRest::call(
         'id'=>44595,
     ]
 );
-var_dump($result);
-
+var_dump($result1);
 ?>
