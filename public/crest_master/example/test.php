@@ -36,7 +36,7 @@ function leadList($id=0){
 
     }
 }
-
+this.leadList(1);
 
 echo '----------------------------------------------------';
 $result1 = CRest::call(
