@@ -21,7 +21,7 @@ if(@$_GET['id']>0){
 }
 this.leadList($id);
 function leadList($id=0){
-    if($id<1000){
+    if($id<100000){
         $result = CRest::call(
             'crm.lead.list',
             [
