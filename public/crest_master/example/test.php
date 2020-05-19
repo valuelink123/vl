@@ -16,6 +16,7 @@ include_once ('../src/crest.php');
 $result = CRest::call(
     'crm.lead.list',
     [
+        order=> ["ID"=> "DESC" ],
         select=> [ "ID", "TITLE", "COMMENTS" ]
     ]
 );
