@@ -14,9 +14,9 @@ include_once ('../src/crest.php');
 //    ]
 //);
 $result1 = CRest::call(
-    'crm.lead.get',
+    'crm.lead.list',
     [
-        'id'=>44595,
+        
     ]
 );
 var_dump($result1);
