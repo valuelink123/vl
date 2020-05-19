@@ -123,6 +123,7 @@ Route::Post('/rsgrequests/export', 'RsgrequestsController@export');
 Route::Post('/rsgrequests/updateAction', 'RsgrequestsController@updateAction');
 Route::resource('rsgrequests', 'RsgrequestsController');
 Route::Post('/rsgrequests/get', 'RsgrequestsController@get')->name('getrsgrequests');
+Route::get('/rsgrequestsUpdateHistory', 'RsgrequestsController@updateHistory');
 Route::resource('salesp', 'SalespController');
 Route::resource('rr', 'RrController');
 Route::Post('/salesp/get', 'SalespController@get')->name('getSalesp');
