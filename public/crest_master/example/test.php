@@ -19,7 +19,7 @@ function leadList($id=0){
         'crm.lead.list',
         [
             order=> ["ID"=> "DESC" ],
-            filter=>[">ID"=> $id],
+           // filter=>[">ID"=> $id],
             select=> [ "ID", "TITLE", "COMMENTS" ,'SOURCE_ID']
         ]
     );
@@ -36,7 +36,7 @@ function leadList($id=0){
     }
 }
 
-
+this.leadList();
 echo '----------------------------------------------------';
 $result1 = CRest::call(
     'crm.lead.get',
