@@ -19,7 +19,7 @@ function leadList($id=0){
         'crm.lead.list',
         [
             order=> ["ID"=> "DESC" ],
-           // filter=>[">ID"=> $id],
+            filter=>["!SOURCE_ID"=> "","!SOURCE_ID"=> "1|FACEBOOK","!SOURCE_ID"=> "*|FACEBOOK"],
             select=> [ "ID", "TITLE", "COMMENTS" ,'SOURCE_ID']
         ]
     );
