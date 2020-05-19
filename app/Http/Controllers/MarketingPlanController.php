@@ -206,9 +206,6 @@ class MarketingPlanController extends Controller
     public function detailEdit(Request $request)
     {
         $DOMIN_MARKETPLACEID_SX = Asin::DOMIN_MARKETPLACEID_SX;
-        /** 超级权限*/
-        $ADMIN_EMAIL=Asin::ADMIN_EMAIL;
-        $role = 0;//角色
         if ($request['sap_seller_id']) {
             $user = DB::table('users')->select('sap_seller_id', 'id', 'name', 'email', 'seller_rules', 'ubg', 'ubu')
                 ->where('sap_seller_id', $request['sap_seller_id'])
@@ -217,6 +214,9 @@ class MarketingPlanController extends Controller
         }else{
             $user = Auth::user()->toArray();
         }
+        /** 超级权限*/
+        $ADMIN_EMAIL=Asin::ADMIN_EMAIL;
+        $role = 0;//角色
         if (!empty($user)) {
             if (!empty($user['email']) && in_array($user['email'], $ADMIN_EMAIL)) {
                 /**  特殊权限着 查询所有用户 */

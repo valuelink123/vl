@@ -783,7 +783,7 @@ class HijackController extends Controller
      * 数据导出
      * @param Request $request
      */
-    public function hijackExport_0518(Request $request)
+    public function hijackExport(Request $request)
     {
         header('Access-Control-Allow-Origin:*');
         $ADMIN_EMAIL = Asin::ADMIN_EMAIL;
@@ -791,6 +791,12 @@ class HijackController extends Controller
         $idList = isset($request['idList']) ? $request['idList'] : '';
         //是否打开跟卖
         $isOpen = @$request['isOpen'] >= 2 ? $request['isOpen'] : 1;
+        $bg =isset($request['bg'])?$request['bg']:'';
+        $bu =isset($request['bu'])?$request['bu']:'';
+        $sku_status =isset($request['sku_status'])?$request['sku_status']:'';
+        $domain =isset($request['domain'])?$request['domain']:'';
+        $userName =isset($request['userName'])?$request['userName']:'';
+        $condition =isset($request['condition'])?$request['condition']:'';//查询条件
         //传入下载的 asinID
         if (!empty($request['startTime'] && !empty($request['endTime']))) {
             //查询跟卖数据 根据开始时间 结束时间默认增加1天
@@ -908,9 +914,15 @@ class HijackController extends Controller
                         }
                     }
                 }
-                $ago_time = time() - 3600 * 3;//当前时间 前3小时 todo
                 //查询所有 asin 信息
                 $sql_s = 'SELECT `id`,`asin`,`reselling_switch`,`marketplaceid`,`title` FROM asins where title !="" ';
+                //默认1开启跟卖，2.全部; 3. 关闭跟卖
+                if ($isOpen == 1) {
+                    $sql_s .= ' AND reselling_switch=1 ';
+                } else if ($isOpen == 3) {
+                    $sql_s .=  ' AND reselling_switch=0 ';
+                }
+
                 $sql_g = ' GROUP BY asin ORDER BY reselling_switch DESC ';
                 /**  判断对应用户 以及对应管理人员 所有下属ID */
                 if (!empty($userasinL)) {
@@ -933,15 +945,25 @@ class HijackController extends Controller
                     $idList = array_unique($productIdList);
                 }
                 //  SAP 中间对应关系数据
-                $sap_asin_match_sku = DB::connection('vlz')->table('sap_asin_match_sku')
-                    ->select('marketplace_id', 'sap_seller_id', 'asin', 'sap_seller_bg', 'sap_seller_bu', 'id', 'status', 'updated_at', 'sku_status', 'sku')
-                    // ->whereIn('asin', $asinList)
-                    ->whereIn('sap_seller_id', $sapSellerIdList)
-                    ->groupBy('asin')
-                    ->get()->map(function ($value) {
-                        return (array)$value;
-                    })->toArray();
-
+                if(!empty($condition)){
+                    $sap_asin_match_sku = DB::connection('vlz')->table('sap_asin_match_sku')
+                        ->select('marketplace_id', 'sap_seller_id', 'asin', 'sap_seller_bg', 'sap_seller_bu', 'id', 'status', 'updated_at', 'sku_status', 'sku')
+                        ->whereIn('sap_seller_id', $sapSellerIdList)
+                        ->where('sku', 'like', '%' . $condition . '%')
+                        ->orwhere('asin', 'like', '%' . $condition . '%')
+                        ->groupBy('asin')
+                        ->get()->map(function ($value) {
+                            return (array)$value;
+                        })->toArray();
+                }else{
+                    $sap_asin_match_sku = DB::connection('vlz')->table('sap_asin_match_sku')
+                        ->select('marketplace_id', 'sap_seller_id', 'asin', 'sap_seller_bg', 'sap_seller_bu', 'id', 'status', 'updated_at', 'sku_status', 'sku')
+                        ->whereIn('sap_seller_id', $sapSellerIdList)
+                        ->groupBy('asin')
+                        ->get()->map(function ($value) {
+                            return (array)$value;
+                        })->toArray();
+                }
             }
         }
 
@@ -1068,23 +1090,28 @@ class HijackController extends Controller
 
                 if (!empty($taskDetail)) {
                     foreach ($taskDetail as $key => $dv) {
-                        if (!empty($dv['asin'])) {
-                            $price = @$dv['price'] > 0 ? $dv['price'] / 100 : 0;
-                            $shipping_fee = @$dv['shipping_fee'] > 0 ? $dv['shipping_fee'] / 100 : 0;
-                            echo '"' . @$dv['asin'] . '",' .
-                                '"' . @$dv['marketplaceid'] . '",' .
-                                '"' . @$dv['sku'] . '",' .
-                                '"' . @$dv['userName'] . '",' .
-                                '"' . @$dv['reselling_remark'] . '",' .
-                                '"' . @$dv['title'] . '",' .
-                                '"' . @$dv['sellerid'] . '",' .
-                                '"' . @$dv['account'] . '",' .
-                                '"' . $price . '",' .
-                                '"' . $shipping_fee . '",' .
-                                '"' . date('Y-m-d H:i', @$dv['created_at']) . '",' .
-                                '"' . @$dv['count'] . '"' .
-                                "\r\n";
+                        if((!empty($bg)&&$bg!=$dv['bg'])||(!empty($bu)&&$bu!=$dv['bu'])||(!empty($userName)&&$userName!=$dv['userName'])||(!empty($sku_status)&&$sku_status!=$dv['sku_status'])||(!empty($domain)&&$domain!=$dv['marketplaceid'])){
+
+                        }else{
+                            if (!empty($dv['asin'])) {
+                                $price = @$dv['price'] > 0 ? $dv['price'] / 100 : 0;
+                                $shipping_fee = @$dv['shipping_fee'] > 0 ? $dv['shipping_fee'] / 100 : 0;
+                                echo '"' . @$dv['asin'] . '",' .
+                                    '"' . @$dv['marketplaceid'] . '",' .
+                                    '"' . @$dv['sku'] . '",' .
+                                    '"' . @$dv['userName'] . '",' .
+                                    '"' . @$dv['reselling_remark'] . '",' .
+                                    '"' . @$dv['title'] . '",' .
+                                    '"' . @$dv['sellerid'] . '",' .
+                                    '"' . @$dv['account'] . '",' .
+                                    '"' . $price . '",' .
+                                    '"' . $shipping_fee . '",' .
+                                    '"' . date('Y-m-d H:i', @$dv['created_at']) . '",' .
+                                    '"' . @$dv['count'] . '"' .
+                                    "\r\n";
+                            }
                         }
+
                     }
                 }
 
@@ -1101,7 +1128,7 @@ class HijackController extends Controller
      * @copyright 2020/05/18
      * @param Request $request
      */
-    public function hijackExport(Request $request)
+    public function hijackExport_0518(Request $request)
     {
         header('Access-Control-Allow-Origin:*');
         $ADMIN_EMAIL = Asin::ADMIN_EMAIL;
