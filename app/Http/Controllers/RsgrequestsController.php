@@ -240,7 +240,28 @@ class RsgrequestsController extends Controller
 		return compact('data', 'recordsTotal', 'recordsFiltered','staticStatus');
     }
 
+    public function insertRsgRequestsLogFirstRecord($ruleClone){
+        $updateRsgRequestsLog = $this->getRsgRequestsLogArray($ruleClone);
+        $updateRsgRequestsLog['facebook_name'] = $ruleClone->facebook_name;
+        $updateRsgRequestsLog['facebook_group'] = $ruleClone->facebook_group;
+        $updateRsgRequestsLog['updated_by'] = $ruleClone->processor;
+        DB::connection('amazon')->table('rsg_requests_log')->insert($updateRsgRequestsLog);
+    }
+
     public function insertRsgRequestsLog($rule){
+        $updateRsgRequestsLog = $this->getRsgRequestsLogArray($rule);
+        if(isset($_REQUEST['facebook_group']) && $_REQUEST['facebook_group']){
+        $updateRsgRequestsLog['facebook_group'] = (int)$_REQUEST['facebook_group'];
+        }
+        if(isset($_REQUEST['facebook_name']) && $_REQUEST['facebook_name']){
+            $updateRsgRequestsLog['facebook_name'] = $_REQUEST['facebook_name'];
+        }
+
+        $updateRsgRequestsLog['updated_by'] = intval(Auth::user()->id);
+        DB::connection('amazon')->table('rsg_requests_log')->insert($updateRsgRequestsLog);
+    }
+
+    public function getRsgRequestsLogArray($rule){
         $updateRsgRequestsLog = array();
         $updateRsgRequestsLog['request_id'] = $rule->id;
         $updateRsgRequestsLog['product_id'] = $rule->product_id;
@@ -254,16 +275,10 @@ class RsgrequestsController extends Controller
         $updateRsgRequestsLog['transaction_id'] = $rule->transaction_id;
         $updateRsgRequestsLog['star_rating'] = $rule->star_rating;
         $updateRsgRequestsLog['channel'] = $rule->channel;
-        if(isset($_REQUEST['facebook_group']) && $_REQUEST['facebook_group']){
-        $updateRsgRequestsLog['facebook_group'] = (int)$_REQUEST['facebook_group'];
-        }
-        if(isset($_REQUEST['facebook_name']) && $_REQUEST['facebook_name']){
-            $updateRsgRequestsLog['facebook_name'] = $_REQUEST['facebook_name'];
-        }
         $updateRsgRequestsLog['created_at'] = $rule->created_at;
         $updateRsgRequestsLog['updated_at'] = $rule->updated_at;
-        $updateRsgRequestsLog['updated_by'] = intval(Auth::user()->id);
-        DB::connection('amazon')->table('rsg_requests_log')->insert($updateRsgRequestsLog);
+
+        return $updateRsgRequestsLog;
     }
 
     public function updateHistory(Request $req){
@@ -565,6 +580,18 @@ class RsgrequestsController extends Controller
         ]);
 		
         $rule = RsgRequest::findOrFail($id);
+        $rsgRequestLog = DB::connection('amazon')->table('rsg_requests_log')->where('request_id', '=',$rule->id)->get();
+        //对已有数据，如果第一次更新，当前rsgRequestLog表中没有记录，需要将相应的rsg_requests的记录写入rsgRequestLog表中。
+        if(count($rsgRequestLog) == 0){
+            $ruleClone = clone $rule;
+            $clientInfo = DB::table('client_info')->where('email',$rule->customer_email)->get()->first();
+            if($clientInfo){
+                $ruleClone->facebook_name = $clientInfo->facebook_name;
+                $ruleClone->facebook_group = $clientInfo->facebook_group;
+                $this->insertRsgRequestsLogFirstRecord($ruleClone);
+            }
+        }
+
 		$rule->customer_paypal_email = $request->get('customer_paypal_email');
 		$rule->transfer_paypal_account = $request->get('transfer_paypal_account');
 		$rule->transaction_id = $request->get('transaction_id');
