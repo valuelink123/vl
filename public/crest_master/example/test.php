@@ -13,16 +13,30 @@ include_once ('../src/crest.php');
 //
 //    ]
 //);
-$result = CRest::call(
-    'crm.lead.list',
-    [
-        order=> ["ID"=> "ASC" ],
-        filter=>[">ID"=> 115],
-        select=> [ "ID", "TITLE", "COMMENTS" ]
-    ]
-);
-echo '<pre>';
-var_dump($result);
+$result=[];
+function leadList($id=0){
+    $result = CRest::call(
+        'crm.lead.list',
+        [
+            order=> ["ID"=> "DESC" ],
+            filter=>[">ID"=> $id],
+            select=> [ "ID", "TITLE", "COMMENTS" ,'SOURCE_ID']
+        ]
+    );
+    echo '<pre>';
+    var_dump($result);
+    if(!empty($result)){
+        $total = $result['total'];
+        $next =  $result['next'];
+        if($next>1){
+            $lastID = $result['result'][49]['id'];
+            //this.leadList($lastID);
+        }
+
+    }
+}
+
+
 echo '----------------------------------------------------';
 $result1 = CRest::call(
     'crm.lead.get',
