@@ -13,7 +13,13 @@ include_once ('../src/crest.php');
 //
 //    ]
 //);
-$result=[];
+
+if(@$_GET['id']>0){
+    $id = $_GET['id'];
+}else{
+    $id =1;
+}
+this.leadList($id);
 function leadList($id=0){
     if($id<1000){
         $result = CRest::call(
@@ -32,7 +38,7 @@ function leadList($id=0){
             $next =  $result['next'];
             if($next>1){
                 $lastID = $result['result'][49]['id'];
-                this.leadList($lastID);
+                //this.leadList($lastID);
             }
 
         }
