@@ -14,7 +14,7 @@ include_once ('../src/crest.php');
 //    ]
 //);
 $result1 = CRest::call(
-    'user.get',
+    'crm.lead.list',
     [
 
     ]
