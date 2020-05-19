@@ -13,10 +13,19 @@ include_once ('../src/crest.php');
 //
 //    ]
 //);
-$result1 = CRest::call(
+$result = CRest::call(
     'crm.lead.list',
     [
-
+        select=> [ "ID", "TITLE", "COMMENTS" ]
+    ]
+);
+echo '<pre>';
+var_dump($result);
+echo '----------------------------------------------------';
+$result1 = CRest::call(
+    'crm.lead.get',
+    [
+        'id'=>42765
     ]
 );
 echo '<pre>';
