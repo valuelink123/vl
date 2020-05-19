@@ -129,46 +129,61 @@ white-space: nowrap;
 					  </tr>
 					 </thead>
 					  <tbody>
+					  <?php
+					  $t_daily_sales = $t_afn_stock = $t_estimated_afn = $t_mfn_stock = $t_sz_stock = $t_estimated_purchase = $t_out_stock_count = $t_out_stock_date = $t_over_stock_count = $t_over_stock_date = $t_score = $t_dist=  0;
+					  $t_afn_stock = 0;
+					  ?>
 					  @foreach ($asins as $v)
 					  <tr class="asins_details">
 						<td style="text-align:left">{!!(($v->asin==$asin)?'<span class="badge badge-danger">'.$v->asin.'</span>':'<a href="/mrp/edit?asin='.$v->asin.'&marketplace_id='.$v->marketplace_id.'">'.$v->asin.'</a>')!!}
 						
 						<a class="pull-right" href="https://{{array_get(getSiteUrl(),$v->marketplace_id)}}/dp/{{$v->asin}}" target="_blank"><i class="fa fa-amazon"></i></a></td>
 						<td>{{((intval($v->buybox_sellerid)>=0)?'OnLine':'OffLine')}}</td>
-						<td>0</td>
+						<td>{{(round($v->daily_sales,2)==0)?'¡Þ':date('Y-m-d',strtotime('+'.intval(($v->afn_sellable+$v->afn_reserved)/round($v->daily_sales,2)).'days'))}}</td>
 						<td>{{round($v->daily_sales,2)}}</td>
 						<td  id="{{$v->asin}}">{{intval($v->quantity)}}</td>
 						<td>{{intval($v->afn_sellable+$v->afn_reserved)}}</td>
+						<td>{{intval($v->sum_estimated_afn)}}</td>
+						<td>{{intval($v->mfn_sellable)}}</td>
+						<td>{{intval($v->sz_sellable)}}</td>
+						<td>{{intval($v->sum_estimated_purchase)}}</td>
+						<td>{{intval($v->out_stock_count)}}</td>
+						<td>{{$v->out_stock_date}}</td>
 						<td>0</td>
 						<td>0</td>
 						<td>0</td>
-						<td>0</td>
-						<td>0</td>
-						<td>0</td>
-						<td>0</td>
-						<td>0</td>
-						<td>0</td>
-						<td>0</td>
+						<td>{{(intval($v->afn_sellable+$v->afn_reserved+$v->mfn_sellable+$v->sum_estimated_afn-$v->sum_quantity_miss)<0?intval($v->afn_sellable+$v->afn_reserved+$v->mfn_sellable+$v->sum_estimated_afn-$v->sum_quantity_miss):0)}}</td>
 						<td>0</td>
 						</td>
 					  </tr>
+					  <?php 
+					  	$t_daily_sales+=round($v->daily_sales,2);
+						$t_afn_stock+=intval($v->afn_sellable+$v->afn_reserved);
+						$t_estimated_afn+=intval($v->sum_estimated_afn);
+						$t_mfn_stock=intval($v->mfn_sellable);
+						$t_sz_stock=intval($v->sz_sellable);
+						$t_estimated_purchase+=intval($v->sum_estimated_purchase);
+						$t_out_stock_count+=intval($v->out_stock_count);
+						$t_out_stock_date=($t_out_stock_date==0 || $t_out_stock_date>$v->out_stock_date)?$v->out_stock_date:$t_out_stock_date;
+						$t_dist+=(intval($v->afn_sellable+$v->afn_reserved+$v->mfn_sellable+$v->sum_estimated_afn-$v->sum_quantity_miss)<0?intval($v->afn_sellable+$v->afn_reserved+$v->mfn_sellable+$v->sum_estimated_afn-$v->sum_quantity_miss):0);
+					  ?>
 					  @endforeach
 					  <tr id="asins_total">
 						<td colspan="2"> Total: </td>
+						<td>{{(($t_daily_sales==0)?'¡Þ':date('Y-m-d',strtotime('+'.intval($t_afn_stock/$t_daily_sales).'days')))}}</td>
+						<td>{{$t_daily_sales}}</td>
+						<td>{{$t_sz_stock}}</td>
+						<td>{{$t_afn_stock}}</td>
+						<td>{{$t_estimated_afn}}</td>
+						<td>{{$t_mfn_stock}}</td>
+						<td>{{$t_sz_stock}}</td>
+						<td>{{$t_estimated_purchase}}</td>
+						<td>{{$t_out_stock_count}}</td>
+						<td>{{$t_out_stock_date}}</td>
 						<td>0</td>
 						<td>0</td>
 						<td>0</td>
-						<td>0</td>
-						<td>0</td>
-						<td>0</td>
-						<td>0</td>
-						<td>0</td>
-						<td>0</td>
-						<td>0</td>
-						<td>0</td>
-						<td>0</td>
-						<td>0</td>
-						<td>0</td>
+						<td>{{$t_dist}}</td>
 						<td>0</td>
 						</td>
 					  </tr>
@@ -330,11 +345,11 @@ white-space: nowrap;
 								}
 								?>
 								</td>
-								<td></td>
-								<td></td>
-								<td></td>
-								<td></td>
-								<td></td>
+								<td>{{$v['estimated_purchase']}}</td>
+								<td>{{$v['actual_purchase']}}</td>
+								<td>{{$v['estimated_afn']}}</td>
+								<td>{{$v['actual_afn']}}</td>
+								<td>{{$v['estimated_afn']}}</td>
 								
 								<td>
 								<?php
@@ -435,21 +450,14 @@ var FormEditable = function() {
 	
 	
 	var flushTable = function(){
-		var t_sales = 0;
 		var t_plan = 0;
-		var t_stock = 0;
 		$(".asins_details").each(function(){
-			t_sales += parseInt($(this).find("td").eq(3).text());
 			t_plan += parseInt($(this).find("td").eq(4).text());
-			t_stock += parseInt($(this).find("td").eq(5).text());
 		});	
-		$("#asins_total").find("td").eq(2).text(t_sales);
 		$("#asins_total").find("td").eq(3).text(t_plan);
-		$("#asins_total").find("td").eq(4).text(t_stock);
-		
 		var d_plan = 0; var d_stock = <?php echo $current_stock;?>;
 		$(".asin_sales_line_plan").each(function(){
-			d_plan += parseInt($(this).find("td").eq(3).text());
+			d_plan += (parseInt($(this).find("td").eq(3).text()) - parseInt($(this).find("td").eq(7).text()));
 			if(d_stock-d_plan<0){
 				$(this).find("td").eq(5).html("<span class='badge badge-danger'>OutStock</span>");
 			}else{
