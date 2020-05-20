@@ -224,7 +224,7 @@
 					<input type="file" name="importFile"  />
 				</div>
 				<div class="col-md-2" style="text-align: right;padding-right: 0;">
-					<button type="submit" class="btn blue" id="data_search">导出</button>
+					<button type="submit" class="btn blue" id="data_search">导入</button>
 				</div>
 				</form>
 			</div>

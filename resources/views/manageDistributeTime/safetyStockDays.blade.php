@@ -7,7 +7,7 @@
 	.title{
 		font-size: 17px;
 		font-weight: bold;
-		padding: 5px 0;
+		padding: 20px 0;
 	}
 	.content{
 		padding: 15px 40px 30px 40px;
@@ -94,7 +94,11 @@
 	}
 </style>
 <div>
-	<h4 class="title">安全库存天数管理</h4>
+	<h4 class="title">安全库存天数管理
+	<button id="export" class="btn sbold blue" style="margin-bottom: 4px;border-radius: 4px !important; float: right;"> Export
+		<i class="fa fa-download"></i>
+	</button>
+	</h4>
 	<div class="content">
 		<div class="filter_box">
 			<div class="filter_option">

@@ -123,6 +123,7 @@ Route::Post('/rsgrequests/export', 'RsgrequestsController@export');
 Route::Post('/rsgrequests/updateAction', 'RsgrequestsController@updateAction');
 Route::resource('rsgrequests', 'RsgrequestsController');
 Route::Post('/rsgrequests/get', 'RsgrequestsController@get')->name('getrsgrequests');
+Route::get('/rsgrequestsUpdateHistory', 'RsgrequestsController@updateHistory');
 Route::resource('salesp', 'SalespController');
 Route::resource('rr', 'RrController');
 Route::Post('/salesp/get', 'SalespController@get')->name('getSalesp');
@@ -260,3 +261,6 @@ Route::match(['post'],'/shipment/getNextData', 'ShipmentController@getNextData')
 
 Route::get('/marketingPlan/test', 'MarketingPlanController@test')->name('marketingPlan');
 Route::match(['post','get'],'/marketingPlan/importExecl', 'MarketingPlanController@importExecl')->name('marketingPlan');
+
+Route::get('/cpfr/purchase', 'CpfrController@purchase')->name('purchase');
+Route::get('/cpfr/barcode', 'CpfrController@barcode')->name('barcode');
