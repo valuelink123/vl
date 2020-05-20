@@ -47,9 +47,9 @@ function leadList($id=0){
 
 echo '----------------------------------------------------';
 $result1 = CRest::call(
-    'crm.contact.get',
+    'user.get',
     [
-        'id'=>9
+        'ID'=>38095
     ]
 );
 echo '<pre>';
