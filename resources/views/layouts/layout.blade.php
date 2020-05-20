@@ -400,7 +400,7 @@
                                                     </a>
                                                 </li>
 												@endpermission
-												<!-- <li class="dropdown-submenu ">
+												<li class="dropdown-submenu ">
 												    <a href="" class="nav-link nav-toggle ">
 														Manage Distribute Time
 												       <span class="arrow"></span>
@@ -425,7 +425,7 @@
 												        CPFR协同补货
 												        <span class="arrow"></span>
 												    </a>
-												</li> -->
+												</li>
                                             </ul>
                                         </li>
 
