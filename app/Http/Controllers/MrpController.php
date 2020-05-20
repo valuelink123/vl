@@ -8,6 +8,8 @@ use App\Accounts;
 use App\User;
 use App\Group;
 use App\AsinSalesPlan;
+use App\ShipmentRequest;
+use App\SapPurchase;
 use App\DailyStatistic;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -103,13 +105,15 @@ class MrpController extends Controller
 		
 		$sql = $this->getSql($where,$date_from,$date_to,$orderby);
 		
-		if($req['length'] != '-1'){
-			$limit = $this->dtLimit($req);
-			$sql .= " LIMIT {$limit} ";
-		}
+		
 			
 		if($type=='sku'){
 			$sql="SELECT SQL_CALC_FOUND_ROWS sku,marketplace_id,any_value(sap_seller_id) as sap_seller_id,  count(asin) as asin, sum(daily_sales) as daily_sales,sum(quantity) as quantity from (".str_replace('SQL_CALC_FOUND_ROWS','',$sql).") as skus_table group by sku,marketplace_id order by daily_sales desc";
+		}
+		
+		if($req['length'] != '-1'){
+			$limit = $this->dtLimit($req);
+			$sql .= " LIMIT {$limit} ";
 		}
 		$datas = DB::connection('amazon')->select($sql);
 		
@@ -196,6 +200,15 @@ class MrpController extends Controller
 			$asin_historys = DailyStatistic::selectRaw("YEARWEEK(date,3) as wdate,sum(quantity_shipped) as sold,sum(if(date_format(date,'%w')=1,(afn_sellable+afn_reserved),0)) as stock")->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('date','>=',$date_from)->where('date','<=',$date_to)->groupBy(['wdate'])->get()->keyBy('wdate')->toArray();
 			
 			$asin_plans = AsinSalesPlan::selectRaw('YEARWEEK(date,3) as wdate,sum(quantity_last) as quantity_last,sum(quantity_first) as quantity_first,any_value(remark) as remark')->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('date','>=',$date_from)->where('date','<=',$date_to)->groupBy(['wdate'])->get()->keyBy('wdate')->toArray();
+			
+			$estimated_shipment_datas = ShipmentRequest::selectRaw('sum(quantity) as quantity,YEARWEEK(received_date,3) as date')->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('received_date','>=',$date_from)->where('received_date','<=',$date_to)->where('shipment_completed',0)->groupBy(['date'])->pluck('quantity','date');
+			
+			$actual_shipment_datas = ShipmentRequest::selectRaw('sum(quantity) as quantity,YEARWEEK(received_date,3) as date')->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('received_date','>=',$date_from)->where('received_date','<=',$date_to)->where('shipment_completed',1)->groupBy(['date'])->pluck('quantity','date');
+		
+			$estimated_purchase_datas = SapPurchase::selectRaw('sum(quantity) as quantity,YEARWEEK(estimated_delivery_date,3) as date')->where('sku',$sku)->where('estimated_delivery_date','>=',$date_from)->where('estimated_delivery_date','<=',$date_to)->whereNull('actual_delivery_date')->groupBy(['date'])->pluck('quantity','date');
+			
+			$actual_purchase_datas = SapPurchase::selectRaw('sum(quantity) as quantity,YEARWEEK(actual_delivery_date,3) as date')->where('sku',$sku)->where('actual_delivery_date','>=',$date_from)->where('actual_delivery_date','<=',$date_to)->whereNotNull('actual_delivery_date')->groupBy(['date'])->pluck('quantity','date');
+		
 			$tmp_date_from = date('oW',strtotime($date_from));
 			$tmp_date_to = date('oW',strtotime($date_to));
 			$oW=0;
@@ -208,6 +221,10 @@ class MrpController extends Controller
 					'sold'=>intval(array_get($asin_historys,$tmp_date_from.'.sold',0)),
 					'stock'=>intval(array_get($asin_historys,$tmp_date_from.'.stock',0)),
 					'remark'=>array_get($asin_plans,$tmp_date_from.'.remark'),
+					'estimated_purchase'=>intval(array_get($estimated_purchase_datas,$tmp_date_from,0)),
+					'actual_purchase'=>intval(array_get($actual_purchase_datas,$tmp_date_from,0)),
+					'estimated_afn'=>intval(array_get($estimated_shipment_datas,$tmp_date_from,0)),
+					'actual_afn'=>intval(array_get($actual_shipment_datas,$tmp_date_from,0)),
 				];
 				$tmp_date_from = date('oW',strtotime($date_from.' +'.$oW.' week'));;
 			}
@@ -217,6 +234,14 @@ class MrpController extends Controller
 			$asin_historys = DailyStatistic::selectRaw("DATE_FORMAT(date,'%Y-%m') as wdate,sum(quantity_shipped) as sold,sum(if(date=concat(DATE_FORMAT(date,'%Y-%m'),'-01'),(afn_sellable+afn_reserved),0)) as stock")->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('date','>=',$date_from)->where('date','<=',$date_to)->groupBy(['wdate'])->get()->keyBy('wdate')->toArray();
 			
 			$asin_plans = AsinSalesPlan::selectRaw("DATE_FORMAT(date,'%Y-%m') as wdate,sum(quantity_last) as quantity_last,sum(quantity_first) as quantity_first,any_value(remark) as remark")->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('date','>=',$date_from)->where('date','<=',$date_to)->groupBy(['wdate'])->get()->keyBy('wdate')->toArray();
+			
+			$estimated_shipment_datas = ShipmentRequest::selectRaw("sum(quantity) as quantity,DATE_FORMAT(received_date,'%Y-%m') as date")->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('received_date','>=',$date_from)->where('received_date','<=',$date_to)->where('shipment_completed',0)->groupBy(['date'])->pluck('quantity','date');
+			
+			$actual_shipment_datas = ShipmentRequest::selectRaw("sum(quantity) as quantity,DATE_FORMAT(received_date,'%Y-%m') as date")->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('received_date','>=',$date_from)->where('received_date','<=',$date_to)->where('shipment_completed',1)->groupBy(['date'])->pluck('quantity','date');
+		
+			$estimated_purchase_datas = SapPurchase::selectRaw("sum(quantity) as quantity,DATE_FORMAT(estimated_delivery_date,'%Y-%m') as date")->where('sku',$sku)->where('estimated_delivery_date','>=',$date_from)->where('estimated_delivery_date','<=',$date_to)->whereNull('actual_delivery_date')->groupBy(['date'])->pluck('quantity','date');
+			
+			$actual_purchase_datas = SapPurchase::selectRaw("sum(quantity) as quantity,DATE_FORMAT(actual_delivery_date,'%Y-%m') as date")->where('sku',$sku)->where('actual_delivery_date','>=',$date_from)->where('actual_delivery_date','<=',$date_to)->whereNotNull('actual_delivery_date')->groupBy(['date'])->pluck('quantity','date');
 			
 			$tmp_date_from = date('Y-m',strtotime($date_from));
 			$tmp_date_to = date('Y-m',strtotime($date_to));
@@ -228,6 +253,10 @@ class MrpController extends Controller
 					'sold'=>intval(array_get($asin_historys,$tmp_date_from.'.sold',0)),
 					'stock'=>intval(array_get($asin_historys,$tmp_date_from.'.stock',0)),
 					'remark'=>array_get($asin_plans,$tmp_date_from.'.remark'),
+					'estimated_purchase'=>intval(array_get($estimated_purchase_datas,$tmp_date_from,0)),
+					'actual_purchase'=>intval(array_get($actual_purchase_datas,$tmp_date_from,0)),
+					'estimated_afn'=>intval(array_get($estimated_shipment_datas,$tmp_date_from,0)),
+					'actual_afn'=>intval(array_get($actual_shipment_datas,$tmp_date_from,0)),
 				];
 				$tmp_date_from = date('Y-m',strtotime($tmp_date_from.'-01 +1 month'));
 			}
@@ -238,6 +267,14 @@ class MrpController extends Controller
 			
 			$asin_plans = AsinSalesPlan::where($type,${$type})->where('marketplace_id',$marketplace_id)->where('date','>=',$date_from)->where('date','<=',$date_to)->get()->keyBy('date')->toArray();
 			
+			$estimated_shipment_datas = ShipmentRequest::selectRaw("sum(quantity) as quantity,received_date as date")->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('received_date','>=',$date_from)->where('received_date','<=',$date_to)->where('shipment_completed',0)->groupBy(['date'])->pluck('quantity','date');
+			
+			$actual_shipment_datas = ShipmentRequest::selectRaw("sum(quantity) as quantity,received_date as date")->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('received_date','>=',$date_from)->where('received_date','<=',$date_to)->where('shipment_completed',1)->groupBy(['date'])->pluck('quantity','date');
+		
+			$estimated_purchase_datas = SapPurchase::selectRaw("sum(quantity) as quantity,estimated_delivery_date as date")->where('sku',$sku)->where('estimated_delivery_date','>=',$date_from)->where('estimated_delivery_date','<=',$date_to)->whereNull('actual_delivery_date')->groupBy(['date'])->pluck('quantity','date');
+			
+			$actual_purchase_datas = SapPurchase::selectRaw("sum(quantity) as quantity,actual_delivery_date as date")->where('sku',$sku)->where('actual_delivery_date','>=',$date_from)->where('actual_delivery_date','<=',$date_to)->whereNotNull('actual_delivery_date')->groupBy(['date'])->pluck('quantity','date');
+			
 			while($tmp_date_from<=$date_to){
 				$sales_plan[$tmp_date_from] = [
 					'symmetry'=>intval(array_get($asin_symmetrys,$tmp_date_from,0)),
@@ -246,6 +283,10 @@ class MrpController extends Controller
 					'sold'=>intval(array_get($asin_historys,$tmp_date_from.'.sold',0)),
 					'stock'=>intval(array_get($asin_historys,$tmp_date_from.'.stock',0)),
 					'remark'=>array_get($asin_plans,$tmp_date_from.'.remark'),
+					'estimated_purchase'=>intval(array_get($estimated_purchase_datas,$tmp_date_from,0)),
+					'actual_purchase'=>intval(array_get($actual_purchase_datas,$tmp_date_from,0)),
+					'estimated_afn'=>intval(array_get($estimated_shipment_datas,$tmp_date_from,0)),
+					'actual_afn'=>intval(array_get($actual_shipment_datas,$tmp_date_from,0)),
 				];
 				$tmp_date_from = date('Y-m-d',strtotime($tmp_date_from)+86400);
 			}
@@ -419,18 +460,18 @@ class MrpController extends Controller
 			$data[$key]['daily_sales'] = round($val['daily_sales'],2);
 			$data[$key]['quantity'] = intval($val['quantity']);
 			$data[$key]['fba_stock'] = $val['afn_sellable']+$val['afn_reserved'];
-			$data[$key]['fba_stock_keep'] = 0;
-			$data[$key]['fba_transfer'] = 0;
-			$data[$key]['fbm_stock'] = 0;
-			$data[$key]['stock_keep'] = 0;
+			$data[$key]['fba_stock_keep'] = (round($val['daily_sales'],2)==0)?'∞':date('Y-m-d',strtotime('+'.intval(($val['afn_sellable']+$val['afn_reserved'])/round($val['daily_sales'],2)).'days'));
+			$data[$key]['fba_transfer'] = intval($val['sum_estimated_afn']);
+			$data[$key]['fbm_stock'] = intval($val['mfn_sellable']);
+			$data[$key]['stock_keep'] = (round($val['daily_sales'],2)==0)?'∞':date('Y-m-d',strtotime('+'.intval(($val['afn_sellable']+$val['afn_reserved']+$val['mfn_sellable']+$val['sum_estimated_afn'])/round($val['daily_sales'],2)).'days'));
 			$data[$key]['sz'] = 0;
-			$data[$key]['in_make'] = 0;
-			$data[$key]['out_stock'] = 0;
-			$data[$key]['out_stock_date'] = 0;
+			$data[$key]['in_make'] = intval($val['sum_estimated_purchase']);
+			$data[$key]['out_stock'] = intval($val['out_stock_count']);
+			$data[$key]['out_stock_date'] = $val['out_stock_date'];
 			$data[$key]['unsalable'] = 0;
 			$data[$key]['unsalable_date'] = 0;
 			$data[$key]['stock_score'] = 0;
-			$data[$key]['expected_distribution'] = 0;
+			$data[$key]['expected_distribution'] = (intval($val['afn_sellable']+$val['afn_reserved']+$val['mfn_sellable']+$val['sum_estimated_afn']-$val['sum_quantity_miss'])<0?intval($val['afn_sellable']+$val['afn_reserved']+$val['mfn_sellable']+$val['sum_estimated_afn']-$val['sum_quantity_miss']):0);
 		}
 		if($data){
             $spreadsheet = new Spreadsheet();
@@ -462,11 +503,18 @@ class MrpController extends Controller
 		$sql = "
         SELECT SQL_CALC_FOUND_ROWS
         	a.*,(sales_4_weeks/28*0.5+sales_2_weeks/14*0.3+sales_1_weeks/7*0.2) as daily_sales,buybox_sellerid,
-afn_sellable,afn_reserved,quantity from (select asin,marketplace_id,any_value(sku) as sku,any_value(status) as status,
+afn_sellable,afn_reserved,mfn_sellable,sz_sellable,quantity,sum_estimated_afn,sum_estimated_purchase,out_stock_count,out_stock_date,sum_quantity_miss from (select asin,marketplace_id,any_value(sku) as sku,any_value(status) as status,
 any_value(sku_status) as sku_status,any_value(sap_seller_id) as sap_seller_id, 
 any_value(sap_seller_bg) as bg,any_value(sap_seller_bu) as bu from sap_asin_match_sku group by asin,marketplace_id) as a
 left join asins as b on a.asin=b.asin and a.marketplace_id=b.marketplaceid
-left join (select asin,marketplace_id,sum(quantity_last) as quantity from asin_sales_plans where date>='$date_from' and date<='$date_to' group by asin,marketplace_id) as c
+left join (select sku,sum(quantity) as sz_sellable from sap_sku_sites where left(sap_factory_code,2)='HK' group by sku) as d on a.sku=d.sku
+left join (select a1.asin,a1.marketplace_id,sum(quantity_last) as quantity,
+sum(estimated_afn) as sum_estimated_afn,sum(estimated_purchase) as sum_estimated_purchase,
+sum(IF(afn_sellable+afn_reserved+mfn_sellable-quantity_miss<0,1,0)) as out_stock_count,
+min(IF(afn_sellable+afn_reserved+mfn_sellable-quantity_miss<0,a1.date,'')) as out_stock_date,
+sum(quantity_miss) as sum_quantity_miss
+from asin_sales_plans as a1 left join asins as b1 on a1.asin=b1.asin and a1.marketplace_id=b1.marketplaceid
+where a1.date>='".$date_from."' and a1.date<='".$date_to."' group by asin,marketplace_id) as c
 on a.asin=c.asin and a.marketplace_id=c.marketplace_id
 			where 1 = 1 {$where} 
 			{$orderby} ";
@@ -487,18 +535,18 @@ on a.asin=c.asin and a.marketplace_id=c.marketplace_id
 			$data[$key]['daily_sales'] = round($val['daily_sales'],2);
 			$data[$key]['quantity'] = intval($val['quantity']);
 			$data[$key]['fba_stock'] = $val['afn_sellable']+$val['afn_reserved'];
-			$data[$key]['fba_stock_keep'] = 0;
-			$data[$key]['fba_transfer'] = 0;
-			$data[$key]['fbm_stock'] = 0;
-			$data[$key]['stock_keep'] = 0;
-			$data[$key]['sz'] = 0;
-			$data[$key]['in_make'] = 0;
-			$data[$key]['out_stock'] = 0;
-			$data[$key]['out_stock_date'] = 0;
+			$data[$key]['fba_stock_keep'] = (round($val['daily_sales'],2)==0)?'∞':date('Y-m-d',strtotime('+'.intval(($val['afn_sellable']+$val['afn_reserved'])/round($val['daily_sales'],2)).'days'));
+			$data[$key]['fba_transfer'] = intval($val['sum_estimated_afn']);
+			$data[$key]['fbm_stock'] = intval($val['mfn_sellable']);
+			$data[$key]['stock_keep'] = (round($val['daily_sales'],2)==0)?'∞':date('Y-m-d',strtotime('+'.intval(($val['afn_sellable']+$val['afn_reserved']+$val['mfn_sellable']+$val['sum_estimated_afn'])/round($val['daily_sales'],2)).'days'));
+			$data[$key]['sz'] = intval($val['sz_sellable']);
+			$data[$key]['in_make'] = intval($val['sum_estimated_purchase']);
+			$data[$key]['out_stock'] = intval($val['out_stock_count']);
+			$data[$key]['out_stock_date'] = $val['out_stock_date'];
 			$data[$key]['unsalable'] = 0;
 			$data[$key]['unsalable_date'] = 0;
 			$data[$key]['stock_score'] = 0;
-			$data[$key]['expected_distribution'] = 0;
+			$data[$key]['expected_distribution'] = (intval($val['afn_sellable']+$val['afn_reserved']+$val['mfn_sellable']+$val['sum_estimated_afn']-$val['sum_quantity_miss'])<0?intval($val['afn_sellable']+$val['afn_reserved']+$val['mfn_sellable']+$val['sum_estimated_afn']-$val['sum_quantity_miss']):0);
 			$data[$key]['action'] = '<a class="badge badge-success" href="/mrp/edit?asin='.$val['asin'].'&marketplace_id='.$val['marketplace_id'].'"><i class="fa fa-hand-o-up"></i></a>';
 		}
 		return $data;

@@ -240,6 +240,125 @@ class RsgrequestsController extends Controller
 		return compact('data', 'recordsTotal', 'recordsFiltered','staticStatus');
     }
 
+    public function insertRsgRequestsLogFirstRecord($ruleClone){
+        $updateRsgRequestsLog = $this->getRsgRequestsLogArray($ruleClone);
+        $updateRsgRequestsLog['facebook_name'] = $ruleClone->facebook_name;
+        $updateRsgRequestsLog['facebook_group'] = $ruleClone->facebook_group;
+        $updateRsgRequestsLog['updated_by'] = $ruleClone->processor;
+        DB::connection('amazon')->table('rsg_requests_log')->insert($updateRsgRequestsLog);
+    }
+
+    public function insertRsgRequestsLog($rule){
+        $updateRsgRequestsLog = $this->getRsgRequestsLogArray($rule);
+        if(isset($_REQUEST['facebook_group']) && $_REQUEST['facebook_group']){
+        $updateRsgRequestsLog['facebook_group'] = (int)$_REQUEST['facebook_group'];
+        }
+        if(isset($_REQUEST['facebook_name']) && $_REQUEST['facebook_name']){
+            $updateRsgRequestsLog['facebook_name'] = $_REQUEST['facebook_name'];
+        }
+
+        $updateRsgRequestsLog['updated_by'] = intval(Auth::user()->id);
+        DB::connection('amazon')->table('rsg_requests_log')->insert($updateRsgRequestsLog);
+    }
+
+    public function getRsgRequestsLogArray($rule){
+        $updateRsgRequestsLog = array();
+        $updateRsgRequestsLog['request_id'] = $rule->id;
+        $updateRsgRequestsLog['product_id'] = $rule->product_id;
+        $updateRsgRequestsLog['customer_email'] = $rule->customer_email;
+        $updateRsgRequestsLog['step'] = $rule->step;
+        $updateRsgRequestsLog['customer_paypal_email'] = $rule->customer_paypal_email;
+        $updateRsgRequestsLog['transfer_amount'] = $rule->transfer_amount;
+        $updateRsgRequestsLog['transfer_currency'] = $rule->transfer_currency;
+        $updateRsgRequestsLog['amazon_order_id'] = $rule->amazon_order_id;
+        $updateRsgRequestsLog['review_url'] = $rule->review_url;
+        $updateRsgRequestsLog['transaction_id'] = $rule->transaction_id;
+        $updateRsgRequestsLog['star_rating'] = $rule->star_rating;
+        $updateRsgRequestsLog['channel'] = $rule->channel;
+        $updateRsgRequestsLog['created_at'] = $rule->created_at;
+        $updateRsgRequestsLog['updated_at'] = $rule->updated_at;
+
+        return $updateRsgRequestsLog;
+    }
+
+    public function updateHistory(Request $req){
+        $request_id = $req->input('request_id');
+        $rsgRequestsLogArray = DB::connection('amazon')->table('rsg_requests_log')->where('request_id', '=', $request_id)->orderBy('updated_at', 'desc')->get();
+        $rsgRequestsLogArray = json_decode(json_encode($rsgRequestsLogArray),true);
+        $output = '';
+        $users = $this->getUsers();
+        $count = count($rsgRequestsLogArray);
+        $productIds = array();
+        for($i=0; $i<$count; $i++){
+            $productIds[] = $rsgRequestsLogArray[$i]['product_id'];
+        }
+        $productIdNames = $this->getProductIdNames($productIds);
+        $updateHistory = array();
+
+        for($i=0; $i<$count-1; $i++){
+            $rsgRequestsLog = $rsgRequestsLogArray[$i];
+            $rsgRequestsLogNext = $rsgRequestsLogArray[$i+1];
+            $updated_by = array_get($users, $rsgRequestsLog['updated_by']);
+            $updated_at = $rsgRequestsLog['updated_at'];
+            $product_name = array_get($productIdNames, $rsgRequestsLog['product_id']);
+            $step = array_get(getStepStatus(),$rsgRequestsLog['step']);
+            $channel = array_get(getRsgRequestChannel(),$rsgRequestsLog['channel']);
+            $facebook_group = array_get(getFacebookGroup(),$rsgRequestsLog['facebook_group']);
+
+            $updateHistory[$i]['updated_by'] = $updated_by;
+            $updateHistory[$i]['updated_at'] = $updated_at;
+
+            if($rsgRequestsLog['product_id'] != $rsgRequestsLogNext['product_id']){
+                $updateHistory[$i]['product'] = $product_name;
+            }
+            if($rsgRequestsLog['step'] != $rsgRequestsLogNext['step']){
+                $updateHistory[$i]['current step'] = $step;
+            }
+            if($rsgRequestsLog['customer_paypal_email'] != $rsgRequestsLogNext['customer_paypal_email']){
+                $updateHistory[$i]['paypal email'] = $rsgRequestsLog['customer_paypal_email'];
+            }
+            if($rsgRequestsLog['transfer_amount'] != $rsgRequestsLogNext['transfer_amount']){
+                $updateHistory[$i]['transfer amount'] = $rsgRequestsLog['transfer_amount'];
+            }
+            if($rsgRequestsLog['transfer_currency'] != $rsgRequestsLogNext['transfer_currency']){
+                $updateHistory[$i]['transfer currency'] = $rsgRequestsLog['transfer_currency'];
+            }
+            if($rsgRequestsLog['amazon_order_id'] != $rsgRequestsLogNext['amazon_order_id']){
+                $updateHistory[$i]['amazon order id'] = $rsgRequestsLog['amazon_order_id'];
+            }
+            if($rsgRequestsLog['review_url'] != $rsgRequestsLogNext['review_url']){
+                $updateHistory[$i]['review ID'] = $rsgRequestsLog['review_url'];
+            }
+            if($rsgRequestsLog['transaction_id'] != $rsgRequestsLogNext['transaction_id']){
+                $updateHistory[$i]['remark'] = $rsgRequestsLog['transaction_id'];
+            }
+            if($rsgRequestsLog['star_rating'] != $rsgRequestsLogNext['star_rating']){
+                $updateHistory[$i]['star rating'] = $rsgRequestsLog['star_rating'];
+            }
+            if($rsgRequestsLog['channel'] != $rsgRequestsLogNext['channel']){
+                $updateHistory[$i]['channel'] = $channel;
+            }
+            if($rsgRequestsLog['facebook_name'] != $rsgRequestsLogNext['facebook_name']){
+                $updateHistory[$i]['facebook name'] = $rsgRequestsLog['facebook_name'];
+            }
+            if($rsgRequestsLog['facebook_group'] != $rsgRequestsLogNext['facebook_group']){
+                $updateHistory[$i]['facebook group'] = $facebook_group;
+            }
+        }
+
+        return view('rsgrequests/updateHistory',['updateHistory'=>$updateHistory]);
+    }
+
+    public function getProductIdNames($productIds){
+        $products = RsgProduct::WhereIn('id', $productIds)->get()->toArray();
+        $productIdNames = array();
+        foreach ($products as $key => $val){
+            $productIdNames[$val['id']] = $val['asin'].'——'.$val['product_name'];
+        }
+
+        return $productIdNames;
+    }
+
     public function getUsers(){
         //目前在职的.不只是销售人员
         $users = User::where('locked', '=', 0)->get()->toArray();
@@ -378,6 +497,9 @@ class RsgrequestsController extends Controller
 				updateCrm($data,$updateClient);
 			}
 
+			//存储在rsg_requests_log表中
+            $this->insertRsgRequestsLog($rule);
+
 			$step_to_tags = getStepIdToTags();
 			$product= RsgProduct::where('id',$rule->product_id)->first()->toArray();
 			$res = RsgProduct::where('id',$rule->product_id)->update(array('requested_review'=>($product['requested_review']+1)));
@@ -458,6 +580,18 @@ class RsgrequestsController extends Controller
         ]);
 		
         $rule = RsgRequest::findOrFail($id);
+        $rsgRequestLog = DB::connection('amazon')->table('rsg_requests_log')->where('request_id', '=',$rule->id)->get();
+        //对已有数据，如果第一次更新，当前rsgRequestLog表中没有记录，需要将相应的rsg_requests的记录写入rsgRequestLog表中。
+        if(count($rsgRequestLog) == 0){
+            $ruleClone = clone $rule;
+            $clientInfo = DB::table('client_info')->where('email',$rule->customer_email)->get()->first();
+            if($clientInfo){
+                $ruleClone->facebook_name = $clientInfo->facebook_name;
+                $ruleClone->facebook_group = $clientInfo->facebook_group;
+                $this->insertRsgRequestsLogFirstRecord($ruleClone);
+            }
+        }
+
 		$rule->customer_paypal_email = $request->get('customer_paypal_email');
 		$rule->transfer_paypal_account = $request->get('transfer_paypal_account');
 		$rule->transaction_id = $request->get('transaction_id');
@@ -521,6 +655,10 @@ class RsgrequestsController extends Controller
 					'status' => 'subscribed',
 					'merge_fields' => $mailchimpData]);
 			}
+
+            //存储在rsg_requests_log表中
+            $this->insertRsgRequestsLog($rule);
+
             $request->session()->flash('success_message','Set Rsg Request Success');
             return redirect('rsgrequests');
         }else{

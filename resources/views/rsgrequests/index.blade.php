@@ -277,6 +277,14 @@
 			</div>
 		</div>
 	</div>
+	<div class="modal fade bs-modal-lg" id="edit-history-modal" role="basic" aria-hidden="true">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content" style="width:900px; height:400px; overflow-x: hidden; overflow-y: auto">
+				<div class="modal-body" >
+				</div>
+			</div>
+		</div>
+	</div>
 	<script>
         $("#thetabletoolbar [id^='date']").each(function () {
 
