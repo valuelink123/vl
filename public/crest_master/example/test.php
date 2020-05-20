@@ -47,9 +47,9 @@ function leadList($id=0){
 
 echo '----------------------------------------------------';
 $result1 = CRest::call(
-    'user.get',
+    'user.add',
     [
-        'ID'=>38095
+        "EMAIL"=> "newuser@example.com"
     ]
 );
 echo '<pre>';
