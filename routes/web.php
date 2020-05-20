@@ -252,4 +252,5 @@ Route::post('/mrp/import', 'MrpController@import');
 //CPFR协同补货
 Route::get('/cpfr/index', 'CpfrController@index')->name('index');
 Route::get('/cpfr/allocationProgress', 'CpfrController@allocationProgress')->name('allocationProgress');
-
+Route::get('/cpfr/purchase', 'CpfrController@purchase')->name('purchase');
+Route::get('/cpfr/barcode', 'CpfrController@barcode')->name('barcode');
