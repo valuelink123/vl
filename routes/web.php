@@ -254,6 +254,7 @@ Route::get('/cpfr/index', 'CpfrController@index')->name('index');
 Route::get('/cpfr/allocationProgress', 'CpfrController@allocationProgress')->name('allocationProgress');
 Route::match(['post','get'],'/shipment/list', 'ShipmentController@list');//调拨需求列表
 Route::match(['post','get'],'/shipment/addShipment', 'ShipmentController@addShipment');//新增调拨需求列表
+Route::match(['post','get'],'/shipment/upShipment', 'ShipmentController@upShipment');//新增调拨需求列表
 Route::match(['post'],'/shipment/getNextData', 'ShipmentController@getNextData');//请求下一级 asin 或者 sellersku列表
 
 

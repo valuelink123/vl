@@ -34,7 +34,7 @@ class ShipmentController extends Controller
      */
     public function List(Request $request)
     {
-        //$user = Auth::user()->toArray();
+        //$user = Auth::user()->toArray();// todo
         /** 超级权限*/
         $ADMIN_EMAIL = Asin::ADMIN_EMAIL;
         $condition = $request['condition'] ? $request['condition'] : '';
@@ -94,23 +94,37 @@ class ShipmentController extends Controller
      */
     public function addShipment(Request $request)
     {
-        $user = Auth::user()->toArray();
+        // $user = Auth::user()->toArray();// todo
         /** 超级权限*/
         $ADMIN_EMAIL = Asin::ADMIN_EMAIL;
         $role = 0;//角色
-        if(!empty($request['sku'])&&!empty($request['asin'])&&!empty($request['seller_sku'])&&!empty($request['warehouse'])&&!empty($request['quantity'])&&!empty($request['received_date'])&&!empty($request['rms'])&&!empty($request['package'])){
-            $data=[
-                'sku'=>$request['sku'],
-                'asin'=>$request['asin'],
-                ''=>$request['seller_sku'],
-                ''=>$request['warehouse'],
-                ''=>$request['quantity'],
-                ''=>$request['received_date'],
-                ''=>$request['rms'],
-                ''=>$request['package'],
-                'marketplace_id'=>$request['marketplace_id'],
-            ];
-
+        $r_message = [];
+        if (!empty($request['asin'])) {
+            if (!empty($request['sku']) && !empty($request['seller_sku']) && !empty($request['warehouse']) && !empty($request['quantity']) && !empty($request['received_date']) && !empty($request['rms']) && !empty($request['package'])) {
+                $warehouse = explode('-', $request['warehouse']);
+                $data = [
+                    'sku' => $request['sku'],
+                    'asin' => $request['asin'],
+                    'seller_sku' => $request['seller_sku'],
+                    'sap_warehouse_code' => $warehouse[0],
+                    'sap_factory_code' => $warehouse[1],
+                    'quantity' => $request['quantity'],
+                    'received_date' => $request['received_date'],
+                    'request_date' => date('Y-m-d', time()),
+                    'rms' => $request['rms'],
+                    'package' => $request['package'],
+                    'marketplace_id' => $request['marketplace_id'],
+                    'created_at' => date('Y-m-d H:i:s', time()),
+                    'updated_at' => date('Y-m-d H:i:s', time())
+                ];
+                $result = DB::connection('vlz')->table('shipment_requests')->insert($data);
+                if ($result > 0) {
+                    $r_message = ['status' => 1, 'msg' => '新增成功'];
+                }
+            } else {
+                $r_message = ['status' => 0, 'msg' => '缺少参数'];
+            }
+            return $r_message;
         }
         if (!empty($user)) {
             if (!empty($user['email']) && in_array($user['email'], $ADMIN_EMAIL)) {
@@ -130,15 +144,6 @@ class ShipmentController extends Controller
             }
         }
         $sql = 'SELECT marketplace_id,sku,sap_seller_id from sap_asin_match_sku WHERE 1=1 ';
-//        if ($role == 3) {
-//            $sql .= ' AND sap_seller_bg ="' . $user['ubg'] . '" ';
-//        } else if ($role == 2) {
-//            $sql .= ' AND sap_seller_bg ="' . $user['ubg'] . '" AND sap_seller_bu ="' . $user['ubu'] . '" ';
-//        } else if ($role == 1) {
-//            if (@$user['sap_seller_id'] > 0) {
-//                $sql .= ' AND sap_seller_id=' . $user['sap_seller_id'];
-//            }
-//        }
         //改为根据sap_seller_id 查询
         if (@$user['sap_seller_id'] > 0) {
             $sql .= ' AND sap_seller_id=' . $user['sap_seller_id'];
@@ -150,6 +155,46 @@ class ShipmentController extends Controller
             'SKUList' => $SKUList,
         ];
         return view('add.test', $data);
+    }
+
+    /**
+     * @param Request $request
+     * 修改详情
+     * @author DYS
+     */
+    public function upShipment(Request $request)
+    {
+        $user = Auth::user()->toArray();// todo
+        $role = 0;
+        $user=[
+            'email'=>'test@qq.com',
+            'id'=>'159',
+            'sap_seller_id'=>''
+        ];
+        /** 超级权限*/
+        $ADMIN_EMAIL = Asin::ADMIN_EMAIL;
+        if (!empty($user['email']) && !empty($user)) {
+            if (in_array($user['email'], $ADMIN_EMAIL) || $user['sap_seller_id'] > 0) {
+                /**  销售角色 */
+                $role = 1;
+            } else {
+                //role_id = 23 代表 计划员
+                $roleUser = DB::table('role_user')->select('user_id')
+                    ->where('user_id', $user['id'])
+                    ->where('role_id', 23)
+                    ->get()->map(function ($value) {
+                        return (array)$value;
+                    })->toArray();
+                if(!empty($roleUser)){
+                    /** 计划员角色  */
+                    $role = 2;
+                }
+            }
+        }
+        if(!empty($request['id'])&&$request['id']>0&&empty($request['asin'])){
+
+        }
+        echo $role;exit;
     }
 
     /**
