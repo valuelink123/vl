@@ -25,14 +25,14 @@ function leadList($id=0){
         $result = CRest::call(
             'crm.lead.list',
             [
-                order=> ["ID"=> "ASC" ],
+                order=> ["ID"=> "DESC" ],
                 filter=>['>ID'=>$id,'!SOURCE_ID'=>'1|FACEBOOK'],
                 select=> [ "ID", "TITLE", "COMMENTS" ,'SOURCE_ID']
             ]
         );
         echo '<pre>';
         var_dump($result);
-        echo '++++++++';
+        echo '-----------';
         if(!empty($result)){
             $total = $result['total'];
             $next =  $result['next'];
@@ -47,7 +47,7 @@ function leadList($id=0){
 
 echo '----------------------------------------------------';
 $result1 = CRest::call(
-    'crm.lead.get',
+    'crm.contact.get',
     [
         'id'=>42765
     ]
