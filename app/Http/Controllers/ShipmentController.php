@@ -32,7 +32,7 @@ class ShipmentController extends Controller
      * @author DYS
      * return array
      */
-    public function List(Request $request)
+    public function index(Request $request)
     {
         //$user = Auth::user()->toArray();// todo
         /** 超级权限*/
@@ -40,6 +40,7 @@ class ShipmentController extends Controller
         $condition = $request['condition'] ? $request['condition'] : '';
         $date = $request['date'] ? $request['date'] : '';
         $role = 0;//角色
+        $sap_seller_id_list =$ulist= [];
         if (!empty($user)) {
             if (!empty($user['email']) && in_array($user['email'], $ADMIN_EMAIL)) {
                 /**  特殊权限着 查询所有用户 */
@@ -69,15 +70,62 @@ class ShipmentController extends Controller
                 }
             }
         }
-        $sql = 'SELECT * from shipment_requests WHERE 1=1 ';
+        $sql = 'SELECT
+                sh.id,
+                sh.sap_seller_id,
+                sh.sku,
+                sh.asin,
+                sh.marketplace_id,
+                sh.seller_sku,
+                sh.sap_warehouse_code,
+                sh.sap_factory_code,
+                sh.quantity,
+                sh.adjustment_quantity,
+                sh.rms,
+                sh.received_date,
+                sh.package,
+                sh.`status`,
+                sh.remark,
+                asins.images,
+                asins.images
+            FROM
+                shipment_requests AS sh
+            LEFT JOIN asins ON asins.asin = sh.asin
+            AND asins.marketplaceid = sh.marketplace_id ';
+
         if (!empty($condition)) {
-            $sql .= ' AND asin LIKE "%' . $condition . '%" OR sku LIKE "%' . $condition . '%"';
+            $sql .= ' AND sh.asin LIKE "%' . $condition . '%" OR sku LIKE "%' . $condition . '%"';
         }
         if (!empty($date)) {
-            $sql .= ' AND created_at >= "' . $date . '" AND created_at<= "' . $date . '"';
+            $sql .= ' AND sh.created_at >= "' . $date . '" AND created_at<= "' . $date . '"';
         }
         $shipmentList = DB::connection('vlz')->select($sql);
         $shipmentList = (json_decode(json_encode($shipmentList), true));
+        if (!empty($shipmentList)) {
+            foreach ($shipmentList as $key => $value) {
+                if (!in_array($value['sap_seller_id'], $sap_seller_id_list)) {
+                    $sap_seller_id_list[] = $value['sap_seller_id'];
+                }
+
+            }
+        }
+        if (!empty($sap_seller_id_list)) {
+            $userList = DB::table('users')->select('name', 'email', 'sap_seller_id')
+                ->whereIn('sap_seller_id', $sap_seller_id_list)
+                ->get()->map(function ($value) {
+                    return (array)$value;
+                })->toArray();
+            if (!empty($userList)) {
+                foreach ($userList as $k => $v) {
+                    $ulist[$v['sap_seller_id']]['name']=$v['name'];
+                    $ulist[$v['sap_seller_id']]['email']=$v['email'];
+                }
+            }
+        }
+        foreach ($shipmentList as $key => $value) {
+            $shipmentList[$key]['name']=$ulist[$value['sap_seller_id']]['name'];
+            $shipmentList[$key]['email']=$ulist[$value['sap_seller_id']]['email'];
+        }
         $sql_group = 'SELECT status,COUNT(id) as count_status from shipment_requests GROUP BY status=0,status=1,status=2,status=3,status=4';
         $status_group = DB::connection('vlz')->select($sql_group);
         $status_group = (json_decode(json_encode($status_group), true));
@@ -164,12 +212,12 @@ class ShipmentController extends Controller
      */
     public function upShipment(Request $request)
     {
-        $user = Auth::user()->toArray();// todo
+        //$user = Auth::user()->toArray();// todo
         $role = 0;
-        $user=[
-            'email'=>'test@qq.com',
-            'id'=>'159',
-            'sap_seller_id'=>''
+        $user = [
+            'email' => 'test@qq.com',
+            'id' => '159',
+            'sap_seller_id' => ''
         ];
         /** 超级权限*/
         $ADMIN_EMAIL = Asin::ADMIN_EMAIL;
@@ -185,16 +233,21 @@ class ShipmentController extends Controller
                     ->get()->map(function ($value) {
                         return (array)$value;
                     })->toArray();
-                if(!empty($roleUser)){
+                if (!empty($roleUser)) {
                     /** 计划员角色  */
                     $role = 2;
                 }
             }
         }
-        if(!empty($request['id'])&&$request['id']>0&&empty($request['asin'])){
-
+        if (!empty($request['id']) && $request['id'] > 0 && empty($request['asin'])) {
+            $sql = "SELECT id,`status`,sku,asin,seller_sku,sap_warehouse_code,sap_factory_code,quantity,received_date,rms,package,remark,adjustment_quantity from shipment_requests WHERE id =" . $request['id'];
+            $shipment = DB::connection('vlz')->select($sql);
+            $shipment = (json_decode(json_encode($shipment), true));
+            var_dump($shipment);
+            exit;
         }
-        echo $role;exit;
+        echo $role;
+        exit;
     }
 
     /**
