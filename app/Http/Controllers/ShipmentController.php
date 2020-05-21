@@ -40,7 +40,7 @@ class ShipmentController extends Controller
         $condition = $request['condition'] ? $request['condition'] : '';
         $date = $request['date'] ? $request['date'] : '';
         $role = 0;//角色
-        $sap_seller_id_list =$ulist= [];
+        $sap_seller_id_list = $ulist = [];
         if (!empty($user)) {
             if (!empty($user['email']) && in_array($user['email'], $ADMIN_EMAIL)) {
                 /**  特殊权限着 查询所有用户 */
@@ -117,14 +117,14 @@ class ShipmentController extends Controller
                 })->toArray();
             if (!empty($userList)) {
                 foreach ($userList as $k => $v) {
-                    $ulist[$v['sap_seller_id']]['name']=$v['name'];
-                    $ulist[$v['sap_seller_id']]['email']=$v['email'];
+                    $ulist[$v['sap_seller_id']]['name'] = $v['name'];
+                    $ulist[$v['sap_seller_id']]['email'] = $v['email'];
                 }
             }
         }
         foreach ($shipmentList as $key => $value) {
-            $shipmentList[$key]['name']=$ulist[$value['sap_seller_id']]['name'];
-            $shipmentList[$key]['email']=$ulist[$value['sap_seller_id']]['email'];
+            $shipmentList[$key]['name'] = $ulist[$value['sap_seller_id']]['name'];
+            $shipmentList[$key]['email'] = $ulist[$value['sap_seller_id']]['email'];
         }
         $sql_group = 'SELECT status,COUNT(id) as count_status from shipment_requests GROUP BY status=0,status=1,status=2,status=3,status=4';
         $status_group = DB::connection('vlz')->select($sql_group);
@@ -158,6 +158,8 @@ class ShipmentController extends Controller
                     'sap_factory_code' => $warehouse[1],
                     'quantity' => $request['quantity'],
                     'received_date' => $request['received_date'],
+                    'adjustreceived_date' => @$request['adjustreceived_date'],
+                    'adjustment_quantity' => @$request['adjustment_quantity'],
                     'request_date' => date('Y-m-d', time()),
                     'rms' => $request['rms'],
                     'package' => $request['package'],
@@ -207,10 +209,11 @@ class ShipmentController extends Controller
 
     /**
      * @param Request $request
-     * 修改详情
+     * 补货 详情页面
+     * @param id
      * @author DYS
      */
-    public function upShipment(Request $request)
+    public function detailShipment(Request $request)
     {
         //$user = Auth::user()->toArray();// todo
         $role = 0;
@@ -218,7 +221,7 @@ class ShipmentController extends Controller
             'email' => 'test@qq.com',
             'id' => '159',
             'sap_seller_id' => ''
-        ];
+        ];//todo 只用于测试  删除
         /** 超级权限*/
         $ADMIN_EMAIL = Asin::ADMIN_EMAIL;
         if (!empty($user['email']) && !empty($user)) {
@@ -239,22 +242,69 @@ class ShipmentController extends Controller
                 }
             }
         }
-        if (!empty($request['id']) && $request['id'] > 0 && empty($request['asin'])) {
-            $sql = "SELECT id,`status`,sku,asin,seller_sku,sap_warehouse_code,sap_factory_code,quantity,received_date,rms,package,remark,adjustment_quantity from shipment_requests WHERE id =" . $request['id'];
+        if (!empty($request['id']) && $request['id'] > 0) {
+            $sql = "SELECT id,`status`,sku,asin,seller_sku,sap_warehouse_code,sap_factory_code,quantity,received_date,rms,package,remark,adjustment_quantity,adjustreceived_date from shipment_requests WHERE id =" . $request['id'];
             $shipment = DB::connection('vlz')->select($sql);
             $shipment = (json_decode(json_encode($shipment), true));
-            var_dump($shipment);
-            exit;
+
         }
-        echo $role;
-        exit;
+        return [$role, $shipment];
+    }
+
+    /**
+     * @param Request $request
+     * 修改 补货
+     */
+    public function upShipment(Request $request)
+    {
+        //$user = Auth::user()->toArray();// todo
+        $user = [
+            'email' => 'test@qq.com',
+            'id' => '159',
+            'sap_seller_id' => ''
+        ];//todo 只用于测试  删除
+        $r_message = [];
+        if (!empty($user['email']) && !empty($user)) {
+            $id = @$request['id'];
+            if ($id > 0&&!empty($request['warehouse'])) {
+                $warehouse = explode('-', $request['warehouse']);
+                $data = [
+                    'status' => @$request['status'],
+                    'sku' => @$request['sku'],
+                    'asin' => @$request['asin'],
+                    'seller_sku' => @$request['seller_sku'],
+                    'sap_warehouse_code' =>  $warehouse[0],
+                    'sap_factory_code' => $warehouse[1],
+                    'quantity' => @$request['quantity'],
+                    'received_date' => @$request['received_date'],
+                    'rms' => @$request['rms'],
+                    'package' => @$request['package'],
+                    'remark' => @$request['remark']?$request['remark']:'',
+                    'adjustment_quantity' => @$request['adjustment_quantity'],
+                    'adjustreceived_date' => @$request['adjustreceived_date']
+                ];
+                if (!empty($data)) {
+                    $result = DB::connection('vlz')->table('shipment_requests')
+                        ->where('id', $id)
+                        ->update($data);
+                    if ($result > 0) {
+                        $r_message = ['status' => 1, 'msg' => '更新成功'];
+                    } else {
+                        $r_message = ['status' => 0, 'msg' => '更新失败'];
+                    }
+                }
+            }else{
+                $r_message = ['status' => 0, 'msg' => '缺少ID'];
+            }
+            return $r_message;
+        }
     }
 
     /**
      * @param Request $request
      * 根据sku 查询 asin seller_sku sap_warehouse_code 列表
      * @author DYS
-     * @return  Array_
+     * @return  Array
      */
     public function getNextData(Request $request)
     {
