@@ -149,10 +149,10 @@ white-space: nowrap;
 						<td>{{intval($v->sum_estimated_purchase)}}</td>
 						<td>{{intval($v->out_stock_count)}}</td>
 						<td>{{$v->out_stock_date}}</td>
-						<td>0</td>
-						<td>0</td>
-						<td>0</td>
-						<td>{{(intval($v->afn_sellable+$v->afn_reserved+$v->mfn_sellable+$v->sum_estimated_afn-$v->sum_quantity_miss)<0?intval($v->afn_sellable+$v->afn_reserved+$v->mfn_sellable+$v->sum_estimated_afn-$v->sum_quantity_miss):0)}}</td>
+						<td>{{intval($v->over_stock_count)}}</td>
+						<td>{{$v->over_stock_date}}</td>
+						<td>{{intval($v->out_stock_count)+intval($v->over_stock_count)*3+intval($v->unsafe_count)*4}}</td>
+						<td>{{(intval($v->afn_sellable+$v->afn_reserved+$v->mfn_sellable+$v->sum_estimated_afn-$v->sum_quantity_miss)<0?abs(intval($v->afn_sellable+$v->afn_reserved+$v->mfn_sellable+$v->sum_estimated_afn-$v->sum_quantity_miss)):0)}}</td>
 						<td>0</td>
 						</td>
 					  </tr>
@@ -165,7 +165,10 @@ white-space: nowrap;
 						$t_estimated_purchase+=intval($v->sum_estimated_purchase);
 						$t_out_stock_count+=intval($v->out_stock_count);
 						$t_out_stock_date=($t_out_stock_date==0 || $t_out_stock_date>$v->out_stock_date)?$v->out_stock_date:$t_out_stock_date;
-						$t_dist+=(intval($v->afn_sellable+$v->afn_reserved+$v->mfn_sellable+$v->sum_estimated_afn-$v->sum_quantity_miss)<0?intval($v->afn_sellable+$v->afn_reserved+$v->mfn_sellable+$v->sum_estimated_afn-$v->sum_quantity_miss):0);
+						$t_over_stock_count+=intval($v->over_stock_count);
+						$t_over_stock_date=($t_over_stock_date==0 || $t_over_stock_date>$v->over_stock_date)?$v->over_stock_date:$t_over_stock_date;
+						$t_score+=intval($v->out_stock_count)+intval($v->over_stock_count)*3+intval($v->unsafe_count)*4;
+						$t_dist+=(intval($v->afn_sellable+$v->afn_reserved+$v->mfn_sellable+$v->sum_estimated_afn-$v->sum_quantity_miss)<0?abs(intval($v->afn_sellable+$v->afn_reserved+$v->mfn_sellable+$v->sum_estimated_afn-$v->sum_quantity_miss)):0);
 					  ?>
 					  @endforeach
 					  <tr id="asins_total">
@@ -180,9 +183,9 @@ white-space: nowrap;
 						<td>{{$t_estimated_purchase}}</td>
 						<td>{{$t_out_stock_count}}</td>
 						<td>{{$t_out_stock_date}}</td>
-						<td>0</td>
-						<td>0</td>
-						<td>0</td>
+						<td>{{$t_over_stock_count}}</td>
+						<td>{{$t_over_stock_date}}</td>
+						<td>{{$t_score}}</td>
 						<td>{{$t_dist}}</td>
 						<td>0</td>
 						</td>
@@ -214,10 +217,10 @@ white-space: nowrap;
 						<td>{{array_get(getSkuStatuses(),$sku_info->status,$sku_info->status)}}</td>
 						<td>{{$sku_info->level}}</td>
 						<td>{{round($sku_info->cost,2)}}</td>
+						<td>{{intval($sku_info->min_purchase_quantity)}}</td>
 						<td>-</td>
 						<td>-</td>
-						<td>-</td>
-						<td>-</td>
+						<td>{{$sku_info->safe_quantity}}</td>
 						<td>{{$sku_info->sap_seller_name}}</td>
 						<td>{{$sku_info->sap_seller_bg}}</td>
 						<td>{{$sku_info->sap_seller_bu}}</td>

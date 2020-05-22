@@ -11,6 +11,7 @@ use App\AsinSalesPlan;
 use App\ShipmentRequest;
 use App\SapPurchase;
 use App\DailyStatistic;
+use App\SapPurchaseRecord;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Services\MultipleQueue;
@@ -108,13 +109,18 @@ class MrpController extends Controller
 		
 			
 		if($type=='sku'){
-			$sql="SELECT SQL_CALC_FOUND_ROWS sku,marketplace_id,any_value(sap_seller_id) as sap_seller_id,  count(asin) as asin, sum(daily_sales) as daily_sales,sum(quantity) as quantity from (".str_replace('SQL_CALC_FOUND_ROWS','',$sql).") as skus_table group by sku,marketplace_id order by daily_sales desc";
+			$sql="SELECT SQL_CALC_FOUND_ROWS a.sku,marketplace_id,any_value(sap_seller_id) as sap_seller_id,  count(asin) as asin, sum(daily_sales) as daily_sales,sum(quantity) as quantity, any_value(min_purchase_quantity) as min_purchase_quantity from (".str_replace('SQL_CALC_FOUND_ROWS','',$sql).") as skus_table 
+			group by sku,marketplace_id order by daily_sales desc";
 		}
+		//left join (SELECT sku,any_value(min_purchase_quantity) as min_purchase_quantity  from (SELECT sku,min_purchase_quantity FROM sap_purchase_records ORDER by created_date desc) a1 GROUP BY a1.sku) as b on a.sku=b.sku
+		
+		
 		
 		if($req['length'] != '-1'){
 			$limit = $this->dtLimit($req);
 			$sql .= " LIMIT {$limit} ";
 		}
+		
 		$datas = DB::connection('amazon')->select($sql);
 		
 		$datas = json_decode(json_encode($datas),true);
@@ -123,12 +129,13 @@ class MrpController extends Controller
 		$siteCode = array_flip(getSiteCode());
 		$sellers = getUsers('sap_seller');
 		foreach ($datas as $key => $val) {
+			$min_purchase_quantity = intval(SapPurchaseRecord::where('sku',$val['sku'])->orderBy('created_date','desc')->value('min_purchase_quantity'));
 			$asin_plans = AsinSalesPlan::SelectRaw('sum(quantity_last) as quantity,week_date')->where($type,$val[$type])->where('marketplace_id',$val['marketplace_id'])->where('date','>=',$date_from)->where('date','<=',$date_to)->groupBy(['week_date'])->get()->keyBy('week_date')->toArray();
 			$data[$key]['seller'] = array_get($sellers,$val['sap_seller_id']);
 			$data[$key]['asin'] = ($type=='asin')?'<a href="/mrp/edit?asin='.$val['asin'].'&marketplace_id='.$val['marketplace_id'].'">'.$val['asin'].'</a>':$val['asin'];
 			$data[$key]['site'] = array_get($siteCode,$val['marketplace_id']);
 			$data[$key]['sku'] = ($type=='sku')?'<a href="/mrp/edit?keyword='.$val['sku'].'&marketplace_id='.$val['marketplace_id'].'">'.$val['sku'].'</a>':$val['sku'];
-			$data[$key]['min_purchase'] = 0;
+			$data[$key]['min_purchase'] = $min_purchase_quantity;
 			$data[$key]['week_daily_sales'] = round($val['daily_sales']*7,2);
 			$data[$key]['22_week_plan_total'] = intval($val['quantity']);
 			for($i=1;$i<=22;$i++){
@@ -173,7 +180,7 @@ class MrpController extends Controller
 			$request->session()->flash('error_message','No Data Match This Keywords');
             return redirect()->back()->withInput();
 		}
-		
+		AsinSalesPlan::calPlans($asin,$marketplace_id,$sku,date('Y-m-d'),date('Y-m-d',strtotime("+22 Sunday")));
 		$show = $request->get('show')??'day';
 		$type = $request->get('type')??'asin';
 		$date=90;
@@ -192,8 +199,18 @@ class MrpController extends Controller
 				$current_stock+=intval($v->afn_sellable+$v->afn_reserved);
 			} 
 		}
-		$sap_factory_code = array_get(MpToFc(),$marketplace_id,$marketplace_id);
-		$sku_info = DB::connection('amazon')->table('sap_sku_sites')->where('sku',$sku)->where('marketplace_id',$marketplace_id)->where('sap_factory_code',$sap_factory_code)->first();
+		
+		
+		$add_where = [];
+		foreach(getMarketplaceCode() as $k=>$v){
+			foreach($v['fba_factory_warhouse'] as $k1=>$v1){
+				$add_where[] ="(sap_factory_code = '".$v1['sap_factory_code']."' and sap_warehouse_code = '".$v1['sap_warehouse_code']."')";
+			}
+		}
+		$sku_info = DB::connection('amazon')->table('sap_sku_sites')->where('sku',$sku)->where('marketplace_id',$marketplace_id)->whereRaw("(".implode(' or ',$add_where).")")->first();
+		
+		$sku_info->min_purchase_quantity = DB::connection('amazon')->table('sap_purchase_records')->where('sku',$sku)->orderBy('created_date','desc')->value('min_purchase_quantity');
+		
 		$sales_plan=[];
 		if($show=='week'){
 			$asin_symmetrys = DB::connection('amazon')->table('symmetry_asins')->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('date','>=',$date_from)->where('date','<=',$date_to)->selectRaw("YEARWEEK(date,3) as wdate,sum(quantity) as quantity")->groupBy(['wdate'])->pluck('quantity','wdate');
@@ -370,11 +387,13 @@ class MrpController extends Controller
 		foreach ($datas as $key => $val) {
 			$key++;
 			$asin_plans = AsinSalesPlan::SelectRaw('sum(quantity_last) as quantity,week_date')->where('asin',$val['asin'])->where('marketplace_id',$val['marketplace_id'])->where('date','>=',$date_from)->where('date','<=',$date_to)->groupBy(['week_date'])->get()->keyBy('week_date')->toArray();
+			
+			$min_purchase_quantity = intval(SapPurchaseRecord::where('sku',$val['sku'])->orderBy('created_date','desc')->value('min_purchase_quantity'));
 			$data[$key]['seller'] = array_get($sellers,$val['sap_seller_id']);
 			$data[$key]['asin'] = $val['asin'];
 			$data[$key]['site'] = array_get($siteCode,$val['marketplace_id']);
 			$data[$key]['sku'] = $val['sku'];
-			$data[$key]['min_purchase'] = 0;
+			$data[$key]['min_purchase'] = $min_purchase_quantity;
 			$data[$key]['week_daily_sales'] = round($val['daily_sales']*7,2);
 			$data[$key]['22_week_plan_total'] = intval($val['quantity']);
 			for($i=1;$i<=22;$i++){
@@ -468,10 +487,10 @@ class MrpController extends Controller
 			$data[$key]['in_make'] = intval($val['sum_estimated_purchase']);
 			$data[$key]['out_stock'] = intval($val['out_stock_count']);
 			$data[$key]['out_stock_date'] = $val['out_stock_date'];
-			$data[$key]['unsalable'] = 0;
-			$data[$key]['unsalable_date'] = 0;
-			$data[$key]['stock_score'] = 0;
-			$data[$key]['expected_distribution'] = (intval($val['afn_sellable']+$val['afn_reserved']+$val['mfn_sellable']+$val['sum_estimated_afn']-$val['sum_quantity_miss'])<0?intval($val['afn_sellable']+$val['afn_reserved']+$val['mfn_sellable']+$val['sum_estimated_afn']-$val['sum_quantity_miss']):0);
+			$data[$key]['unsalable'] = intval($val['over_stock_count']);
+			$data[$key]['unsalable_date'] = $val['over_stock_date'];
+			$data[$key]['stock_score'] = intval($val['out_stock_count'])+intval($val['over_stock_count'])*3+intval($val['unsafe_count'])*4;
+			$data[$key]['expected_distribution'] = (intval($val['afn_sellable']+$val['afn_reserved']+$val['mfn_sellable']+$val['sum_estimated_afn']-$val['sum_quantity_miss'])<0?abs(intval($val['afn_sellable']+$val['afn_reserved']+$val['mfn_sellable']+$val['sum_estimated_afn']-$val['sum_quantity_miss'])):0);
 		}
 		if($data){
             $spreadsheet = new Spreadsheet();
@@ -499,11 +518,18 @@ class MrpController extends Controller
 		}else{
 			$orderby = " order by daily_sales desc";
 		}
+		$add_where = [];
+		foreach(getMarketplaceCode() as $k=>$v){
+			foreach($v['fba_factory_warhouse'] as $k1=>$v1){
+				$add_where[] ="(sap_factory_code = '".$v1['sap_factory_code']."' and sap_warehouse_code = '".$v1['sap_warehouse_code']."')";
+			}
+		}
+		
 		
 		$sql = "
         SELECT SQL_CALC_FOUND_ROWS
         	a.*,(sales_4_weeks/28*0.5+sales_2_weeks/14*0.3+sales_1_weeks/7*0.2) as daily_sales,buybox_sellerid,
-afn_sellable,afn_reserved,mfn_sellable,sz_sellable,quantity,sum_estimated_afn,sum_estimated_purchase,out_stock_count,out_stock_date,sum_quantity_miss from (select asin,marketplace_id,any_value(sku) as sku,any_value(status) as status,
+afn_sellable,afn_reserved,mfn_sellable,sz_sellable,quantity,sum_estimated_afn,sum_estimated_purchase,out_stock_count,out_stock_date,over_stock_count,over_stock_date,sum_quantity_miss,unsafe_count from (select asin,marketplace_id,any_value(sku) as sku,any_value(status) as status,
 any_value(sku_status) as sku_status,any_value(sap_seller_id) as sap_seller_id, 
 any_value(sap_seller_bg) as bg,any_value(sap_seller_bu) as bu from sap_asin_match_sku group by asin,marketplace_id) as a
 left join asins as b on a.asin=b.asin and a.marketplace_id=b.marketplaceid
@@ -512,9 +538,13 @@ left join (select a1.asin,a1.marketplace_id,sum(quantity_last) as quantity,
 sum(estimated_afn) as sum_estimated_afn,sum(estimated_purchase) as sum_estimated_purchase,
 sum(IF(afn_sellable+afn_reserved+mfn_sellable-quantity_miss<0,1,0)) as out_stock_count,
 min(IF(afn_sellable+afn_reserved+mfn_sellable-quantity_miss<0,a1.date,'')) as out_stock_date,
-sum(quantity_miss) as sum_quantity_miss
+sum(IF(afn_sellable+afn_reserved+mfn_sellable-quantity_miss>0 and a1.date>DATE_SUB(curdate(),INTERVAL -120 DAY),1,0)) as over_stock_count,
+min(IF(afn_sellable+afn_reserved+mfn_sellable-quantity_miss>0 and a1.date>DATE_SUB(curdate(),INTERVAL -120 DAY),a1.date,'')) as over_stock_date,
+
+max(IF(a1.date='".$date_to."',quantity_miss,0)) as sum_quantity_miss,
+sum(IF(afn_sellable+afn_reserved+mfn_sellable-quantity_miss-sku_safe_quantity<0,1,0)) as unsafe_count
 from asin_sales_plans as a1 left join asins as b1 on a1.asin=b1.asin and a1.marketplace_id=b1.marketplaceid
-where a1.date>='".$date_from."' and a1.date<='".$date_to."' group by asin,marketplace_id) as c
+left join (select sku,marketplace_id,any_value(safe_quantity) as sku_safe_quantity  from sap_sku_sites where (".implode(" or ",$add_where).") group by sku,marketplace_id) as e on a1.sku=e.sku and a1.marketplace_id =e.marketplace_id where a1.date>='".$date_from."' and a1.date<='".$date_to."' group by asin,marketplace_id) as c
 on a.asin=c.asin and a.marketplace_id=c.marketplace_id
 			where 1 = 1 {$where} 
 			{$orderby} ";
@@ -543,10 +573,10 @@ on a.asin=c.asin and a.marketplace_id=c.marketplace_id
 			$data[$key]['in_make'] = intval($val['sum_estimated_purchase']);
 			$data[$key]['out_stock'] = intval($val['out_stock_count']);
 			$data[$key]['out_stock_date'] = $val['out_stock_date'];
-			$data[$key]['unsalable'] = 0;
-			$data[$key]['unsalable_date'] = 0;
-			$data[$key]['stock_score'] = 0;
-			$data[$key]['expected_distribution'] = (intval($val['afn_sellable']+$val['afn_reserved']+$val['mfn_sellable']+$val['sum_estimated_afn']-$val['sum_quantity_miss'])<0?intval($val['afn_sellable']+$val['afn_reserved']+$val['mfn_sellable']+$val['sum_estimated_afn']-$val['sum_quantity_miss']):0);
+			$data[$key]['unsalable'] = intval($val['over_stock_count']);
+			$data[$key]['unsalable_date'] = $val['over_stock_date'];
+			$data[$key]['stock_score'] = intval($val['out_stock_count'])+intval($val['over_stock_count'])*3+intval($val['unsafe_count'])*4;
+			$data[$key]['expected_distribution'] = (intval($val['afn_sellable']+$val['afn_reserved']+$val['mfn_sellable']+$val['sum_estimated_afn']-$val['sum_quantity_miss'])<0?abs(intval($val['afn_sellable']+$val['afn_reserved']+$val['mfn_sellable']+$val['sum_estimated_afn']-$val['sum_quantity_miss'])):0);
 			$data[$key]['action'] = '<a class="badge badge-success" href="/mrp/edit?asin='.$val['asin'].'&marketplace_id='.$val['marketplace_id'].'"><i class="fa fa-hand-o-up"></i></a>';
 		}
 		return $data;
@@ -573,8 +603,9 @@ on a.asin=c.asin and a.marketplace_id=c.marketplace_id
 						$spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($inputFileName);
 						$importData = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
 						$week_per = $this->week_per;		
-						$updateData=[];
+						
 						foreach($importData as $key => $data){
+							$updateData=[];
 							if($key>1 && array_get($data,'B') && array_get($data,'C')){
 								$asin =trim(array_get($data,'B'));
 								$marketplace_id =array_get(getSiteCode(),trim(array_get($data,'C')),trim(array_get($data,'C')));
@@ -599,9 +630,11 @@ on a.asin=c.asin and a.marketplace_id=c.marketplace_id
 										$updateData[$date]['updated_at']=$time;
 									}
 								}
+								if($updateData) AsinSalesPlan::insertOnDuplicateWithDeadlockCatching(array_values($updateData), ['week_date','quantity_last','updated_at']);
+								AsinSalesPlan::calPlans($asin,$marketplace_id,$sku,date('Y-m-d'),date('Y-m-d',strtotime("+22 Sunday")));
 							}
 						}
-						if($updateData) AsinSalesPlan::insertOnDuplicateWithDeadlockCatching(array_values($updateData), ['week_date','quantity_last','updated_at']);
+						
 						$request->session()->flash('success_message','Import Success!');
 					}else{
 						$request->session()->flash('error_message','UploadFailed');
