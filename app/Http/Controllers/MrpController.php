@@ -54,6 +54,18 @@ class MrpController extends Controller
 		if(array_get($search,'keyword')){
 			$where .=" and (a.asin='".array_get($search,'keyword')."' or a.sku='".array_get($search,'keyword')."')";
 		}
+		if(array_get($search,'stockkeep_from')){
+			$where .=" and (a.asin='".array_get($search,'keyword')."' or a.sku='".array_get($search,'keyword')."')";
+		}
+		if(array_get($search,'stockkeep_to')){
+			$where .=" and (a.asin='".array_get($search,'keyword')."' or a.sku='".array_get($search,'keyword')."')";
+		}
+		if(array_get($search,'outstock_from')){
+			$where .=" and (a.asin='".array_get($search,'keyword')."' or a.sku='".array_get($search,'keyword')."')";
+		}
+		if(array_get($search,'outstock_to')){
+			$where .=" and (a.asin='".array_get($search,'keyword')."' or a.sku='".array_get($search,'keyword')."')";
+		}
 		$seller_permissions = $this->getUserSellerPermissions();
 		foreach($seller_permissions as $key=>$val){
 			if($key=='bg' && $val) $where .=" and a.bg='$val'";
