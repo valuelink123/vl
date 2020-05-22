@@ -20,11 +20,11 @@ header('Access-Control-Allow-Origin:*');
 class MarketingPlanController extends Controller
 {
     //判断是否登录  todo 上线需打开
-//    public function __construct()
-//    {
-//        $this->middleware('auth');
-//        parent::__construct();
-//    }
+    public function __construct()
+    {
+        $this->middleware('auth');
+        parent::__construct();
+    }
 
     public function index()
     {
