@@ -537,9 +537,9 @@ left join (select sku,sum(quantity) as sz_sellable from sap_sku_sites where left
 left join (select a1.asin,a1.marketplace_id,sum(quantity_last) as quantity,
 sum(estimated_afn) as sum_estimated_afn,sum(estimated_purchase) as sum_estimated_purchase,
 sum(IF(afn_sellable+afn_reserved+mfn_sellable-quantity_miss<0,1,0)) as out_stock_count,
-min(IF(afn_sellable+afn_reserved+mfn_sellable-quantity_miss<0,a1.date,'')) as out_stock_date,
+min(IF(afn_sellable+afn_reserved+mfn_sellable-quantity_miss<0,a1.date,NULL)) as out_stock_date,
 sum(IF(afn_sellable+afn_reserved+mfn_sellable-quantity_miss>0 and a1.date>DATE_SUB(curdate(),INTERVAL -120 DAY),1,0)) as over_stock_count,
-min(IF(afn_sellable+afn_reserved+mfn_sellable-quantity_miss>0 and a1.date>DATE_SUB(curdate(),INTERVAL -120 DAY),a1.date,'')) as over_stock_date,
+min(IF(afn_sellable+afn_reserved+mfn_sellable-quantity_miss>0 and a1.date>DATE_SUB(curdate(),INTERVAL -120 DAY),a1.date,NULL)) as over_stock_date,
 
 max(IF(a1.date='".$date_to."',quantity_miss,0)) as sum_quantity_miss,
 sum(IF(afn_sellable+afn_reserved+mfn_sellable-quantity_miss-sku_safe_quantity<0,1,0)) as unsafe_count
