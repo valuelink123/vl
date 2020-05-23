@@ -34,6 +34,7 @@ function getStockStatus(){
     return array(
         '1'=>'缺货',
 		'2'=>'滞销',
+		'3'=>'缺货及滞销',
     );
 }
 
