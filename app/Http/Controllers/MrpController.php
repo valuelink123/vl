@@ -55,16 +55,16 @@ class MrpController extends Controller
 			$where .=" and (a.asin='".array_get($search,'keyword')."' or a.sku='".array_get($search,'keyword')."')";
 		}
 		if(array_get($search,'stockkeep_from')){
-			$where .=" and (a.asin='".array_get($search,'keyword')."' or a.sku='".array_get($search,'keyword')."')";
+			$where .=" and ((afn_sellable+afn_reserved+mfn_sellable+sum_estimated_afn)/(sales_4_weeks/28*0.5+sales_2_weeks/14*0.3+sales_1_weeks/7*0.2))>=".intval(array_get($search,'stockkeep_from'));
 		}
 		if(array_get($search,'stockkeep_to')){
-			$where .=" and (a.asin='".array_get($search,'keyword')."' or a.sku='".array_get($search,'keyword')."')";
+			$where .=" and ((afn_sellable+afn_reserved+mfn_sellable+sum_estimated_afn)/(sales_4_weeks/28*0.5+sales_2_weeks/14*0.3+sales_1_weeks/7*0.2))<=".intval(array_get($search,'stockkeep_to'));
 		}
 		if(array_get($search,'outstock_from')){
-			$where .=" and (a.asin='".array_get($search,'keyword')."' or a.sku='".array_get($search,'keyword')."')";
+			$where .=" and (out_stock_count>=".intval(array_get($search,'outstock_from')).")";
 		}
 		if(array_get($search,'outstock_to')){
-			$where .=" and (a.asin='".array_get($search,'keyword')."' or a.sku='".array_get($search,'keyword')."')";
+			$where .=" and (out_stock_count<=".intval(array_get($search,'outstock_to')).")";
 		}
 		$seller_permissions = $this->getUserSellerPermissions();
 		foreach($seller_permissions as $key=>$val){
@@ -96,7 +96,7 @@ class MrpController extends Controller
 		if ($req->isMethod('GET')) {
 			return view('mrp/list', ['date'=>$date,'bgs'=>$this->getBgs(),'bus'=>$this->getBus()]);
 		}
-		$date_from = date('Y-m-d',strtotime($date.' +1 weeks monday'));
+		$date_from = date('Y-m-d',strtotime($date.' next monday'));
 		$date_to = date('Y-m-d',strtotime($date.' +22 weeks sunday'));
 		$searchField = array('bg'=>'a.bg','bu'=>'a.bu','site'=>'a.marketplace_id','sku'=>'a.sku','sku_level'=>'a.status','sku_status'=>'a.sku_status','sku_level'=>'a.status','sap_seller_id'=>'a.sap_seller_id');
 		
@@ -622,27 +622,29 @@ on a.asin=c.asin and a.marketplace_id=c.marketplace_id
 								$asin =trim(array_get($data,'B'));
 								$marketplace_id =array_get(getSiteCode(),trim(array_get($data,'C')),trim(array_get($data,'C')));
 								$sku = DB::connection('amazon')->table('sap_asin_match_sku')->where('asin',$asin)->where('marketplace_id',$marketplace_id)->value('sku');
-								if(!$sku) break;
+								if(!$sku) continue;
 								foreach($xls_keys as $k=>$v){
-									$week_date = date('Y-m-d',strtotime("+".($k+1)." Sunday"));
+									$week_date = date('Y-m-d',strtotime("+".($k+1)." weeks Sunday"));
 									$week_value = array_get($data,$v,0);
 									$max_value=0;
-									for($k=0;$k<=6;$k++){
-										$date = date("Y-m-d", strtotime($week_date)-86400*$k);
+									for($ki=0;$ki<=6;$ki++){
+										$date = date("Y-m-d", strtotime($week_date)-86400*$ki);
 										
-										$value = round($week_value*array_get($week_per,$k));			
+										$value = round($week_value*array_get($week_per,$ki));			
 										if($max_value+$value>$week_value) $value = $week_value-$max_value;
-										if($max_value<=$week_value && $k==6) $value = $week_value-$max_value;
+										if($max_value<=$week_value && $ki==6) $value = $week_value-$max_value;
 										$max_value+=$value;
 										$updateData[$date]['asin']=$asin;
 										$updateData[$date]['marketplace_id']=$marketplace_id;
 										$updateData[$date]['date']=$date;
+										$updateData[$date]['sku']=$sku;
 										$updateData[$date]['week_date']=$week_date;
 										$updateData[$date]['quantity_last']=$value;
 										$updateData[$date]['updated_at']=$time;
 									}
 								}
-								if($updateData) AsinSalesPlan::insertOnDuplicateWithDeadlockCatching(array_values($updateData), ['week_date','quantity_last','updated_at']);
+								
+								if($updateData) AsinSalesPlan::insertOnDuplicateWithDeadlockCatching(array_values($updateData), ['week_date','sku','quantity_last','updated_at']);
 								AsinSalesPlan::calPlans($asin,$marketplace_id,$sku,date('Y-m-d'),date('Y-m-d',strtotime("+22 Sunday")));
 							}
 						}

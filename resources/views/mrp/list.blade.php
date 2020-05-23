@@ -264,7 +264,6 @@ $('#search').click(function () {
 
 //下载数据
 $("#export").click(function(){
-	alert($("#search-form").serialize());
 	location.href='/mrp/export?'+$("#search-form").serialize();
 	return false;
 
