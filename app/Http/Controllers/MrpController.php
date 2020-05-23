@@ -66,6 +66,12 @@ class MrpController extends Controller
 		if(array_get($search,'outstock_to')){
 			$where .=" and (out_stock_count<=".intval(array_get($search,'outstock_to')).")";
 		}
+		if(array_get($search,'stock_status')){
+			if(array_get($search,'stock_status')==1) $where .=" and out_stock_count>0";
+			if(array_get($search,'stock_status')==2) $where .=" and over_stock_count>0";
+			if(array_get($search,'stock_status')==3) $where .=" and (out_stock_count>0 or over_stock_count>0)";
+			
+		}
 		$seller_permissions = $this->getUserSellerPermissions();
 		foreach($seller_permissions as $key=>$val){
 			if($key=='bg' && $val) $where .=" and a.bg='$val'";
@@ -151,7 +157,7 @@ class MrpController extends Controller
 			$data[$key]['week_daily_sales'] = round($val['daily_sales']*7,2);
 			$data[$key]['22_week_plan_total'] = intval($val['quantity']);
 			for($i=1;$i<=22;$i++){
-				$data[$key][$i.'_week_plan'] = array_get($asin_plans,date('Y-m-d',strtotime($date.' +'.$i.' weeks sunday')).'.quantity',0);
+				$data[$key][$i.'_week_plan'] = '<a class="week_plan editable" title="'.$val['asin'].' '.array_get($siteCode,$val['marketplace_id']).' weeks '.$i.' Plan" href="javascript:;" id="'.$val['asin'].'--'.$val['marketplace_id'].'--'.date('Y-m-d',strtotime('+'.$i.' weeks sunday')).'" data-pk="'.$val['asin'].'--'.$val['marketplace_id'].'--'.date('Y-m-d',strtotime('+'.$i.' weeks sunday')).'" data-type="text">'.array_get($asin_plans,date('Y-m-d',strtotime('+'.$i.' weeks sunday')).'.quantity',0).'</a>';
             }
 		}
 		
