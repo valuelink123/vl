@@ -238,7 +238,9 @@ Route::post('/manageDistributeTime/updateFbm', 'ManageDistributeTimeController@u
 Route::get('/manageDistributeTime/exportFbm', 'ManageDistributeTimeController@exportFbm');
 Route::match(['post','get'],'/manageDistributeTime/internationalTransportTime', 'ManageDistributeTimeController@internationalTransportTime')->name('internationalTransportTime');
 Route::post('/manageDistributeTime/upload', 'ManageDistributeTimeController@upload');
-
+Route::post('/manageDistributeTime/updateTransportTime', 'ManageDistributeTimeController@updateTransportTime');
+Route::post('/manageDistributeTime/batchUpdateTransportTime', 'ManageDistributeTimeController@batchUpdateTransportTime');
+Route::get('/manageDistributeTime/exportTransportTime', 'ManageDistributeTimeController@exportTransportTime');
 
 //投入产出分析
 Route::resource('roi', 'RoiController');

@@ -23,7 +23,7 @@ class ManageDistributeTimeController extends Controller
         $skuStatuses = getSkuStatuses();
 
         if ($req->isMethod('GET')) {
-            return view('ManageDistributeTime.safetyStockDays', compact('usersIdName', 'skuStatuses'));
+            return view('manageDistributeTime.safetyStockDays', compact('usersIdName', 'skuStatuses'));
         }
 
         $sql = 'select any_value(t0.id) as id, t0.sku, t0.marketplace_id, any_value(t0.status) as status, any_value(t0.level) as level, any_value(t0.sap_seller_bg) as bg, any_value(t0.sap_seller_bu) as bu, any_value(t0.safe_quantity) as safe_quantity, any_value(t0.maintainer) as maintainer, any_value(t0.maintain_time) as maintain_time, any_value(t1.description) as description, any_value(t2.daily_sales) as daily_sales from sap_sku_sites as t0
@@ -162,7 +162,7 @@ class ManageDistributeTimeController extends Controller
         $usersIdName = $this->getUsersIdName();
 
         if ($req->isMethod('GET')) {
-            return view('ManageDistributeTime.fba', compact('estimatedMonthToFba','usersIdName'));
+            return view('manageDistributeTime.fba', compact('estimatedMonthToFba','usersIdName'));
         }
 
         $data = DB::connection('amazon')->table('fba_fc_transfer_time')->get();
@@ -233,7 +233,7 @@ class ManageDistributeTimeController extends Controller
 	    $sapFactoryCodes = $this->getAllSapFactoryCodes();
         $usersIdName = $this->getUsersIdName();
         if ($req->isMethod('GET')) {
-            return view('ManageDistributeTime.fbm', compact('sapFactoryCodes','usersIdName'));
+            return view('manageDistributeTime.fbm', compact('sapFactoryCodes','usersIdName'));
         }
 
         $data = DB::connection('amazon')->table('fbm_fba_transfer_time')->get();
@@ -331,11 +331,28 @@ class ManageDistributeTimeController extends Controller
 	    return array('US01','US02','US04','CA01','CA02','UK01','UK02','FR01','FR02','GR01','GR02','GR04','IT01','IT02','ES01','ES02','JP01','JP02');
     }
 
-	public function internationalTransportTime(Request $req)
-	{
+	public function internationalTransportTime(Request $req){
+        $factoryCodes = array();
+        $factory_code = DB::connection('amazon')->table('international_transport_time')->orderBy('factory_code', 'asc')->distinct()->get(['factory_code']);
+        foreach ($factory_code as $key=>$val){
+            $factoryCodes[] = $val->factory_code;
+        }
+        $logisticsProviders = array();
+        $logistics_provider = DB::connection('amazon')->table('international_transport_time')->orderBy('logistics_provider', 'asc')->distinct()->get(['logistics_provider']);
+        foreach ($logistics_provider as $key=>$val){
+            $logisticsProviders[] = $val->logistics_provider;
+        }
         $transportModes = $this->getTransportModes();
+
+        $regions = array();
+        $region = DB::connection('amazon')->table('international_transport_time')->orderBy('region', 'asc')->distinct()->get(['region']);
+        foreach ($region as $key=>$val){
+            $regions[] = $val->region;
+        }
+        $usersIdName = $this->getUsersIdName();
+
         if ($req->isMethod('GET')) {
-            return view('ManageDistributeTime.internationalTransportTime', compact('transportModes'));
+            return view('manageDistributeTime.internationalTransportTime', compact('factoryCodes','logisticsProviders','transportModes','regions','usersIdName'));
         }
 
         $data = DB::connection('amazon')->table('international_transport_time')->get();
@@ -343,8 +360,10 @@ class ManageDistributeTimeController extends Controller
 
         foreach ($data as $key => $val) {
             $data[$key]['transport_mode'] = array_get($transportModes,$val['transport_mode_code']);
-        }
+            $data[$key]['maintainer'] = array_get($usersIdName,$val['maintainer']);
 
+        }
+//var_dump($data);exit;
         return compact('data');
 
 	}
@@ -390,12 +409,7 @@ class ManageDistributeTimeController extends Controller
                                         'clearance_days'=>trim($data['G']),
                                         'delivery_days'=>trim($data['H']),
                                         'fba_sign_in_days'=>trim($data['I']),
-                                        //'fba_listed_days'=>trim($data['J']), //FBA上架日期在页面上没有
-                                        'total_days'=>trim($data['K']),
-                                        'maintainer'=>trim($data['L']),
-                                        'maintain_date'=>date('Y-m-d',strtotime(trim($data['M']))),
-                                        //'maintain_time'=>trim($data['N']), //FBA上架日期在页面上没有
-                                        //'whether_default' 导入表没有这一项
+                                        'total_days'=>intval(trim($data['E']))+intval(trim($data['F']))+intval(trim($data['G']))+intval(trim($data['H']))+intval(trim($data['I']))
                                     ));
                                     if ($update_result) {
                                         $successCount++;
@@ -412,12 +426,7 @@ class ManageDistributeTimeController extends Controller
                                             'clearance_days'=>trim($data['G']),
                                             'delivery_days'=>trim($data['H']),
                                             'fba_sign_in_days'=>trim($data['I']),
-                                            //'fba_listed_days'=>trim($data['J']), //FBA上架日期在页面上没有
-                                            'total_days'=>trim($data['K']),
-                                            'maintainer'=>trim($data['L']),
-                                            'maintain_date'=>date('Y-m-d',strtotime(trim($data['M']))),
-                                            //'maintain_time'=>trim($data['N']), //FBA上架日期在页面上没有
-                                            //'whether_default' 导入表没有这一项
+                                            'total_days'=>intval(trim($data['E']))+intval(trim($data['F']))+intval(trim($data['G']))+intval(trim($data['H']))+intval(trim($data['I']))
                                         )
                                     );
                                     if ($insert_result) {
@@ -438,6 +447,67 @@ class ManageDistributeTimeController extends Controller
             }
         }
         return redirect('manageDistributeTime/internationalTransportTime');
+    }
+
+    public function updateTransportTime(Request $req){
+	    $id = $req->input('id');
+        $row = DB::connection('amazon')->table('international_transport_time')->where('id','=', $id)->first();
+        if(!$row) exit;
+        $etd = intval($row->etd);
+        $eta = intval($row->eta);
+        $clearance_days = intval($row->clearance_days);
+        $delivery_days = intval($row->delivery_days);
+        $fba_sign_in_days = intval($row->fba_sign_in_days);
+        $total_days = intval($row->total_days);
+
+        $updateData = array();
+        if(isset($_POST['etd']) && $_POST['etd']){
+            $updateData['etd'] = intval($_POST['etd']);
+            $updateData['total_days'] = $total_days - $etd + intval($_POST['etd']);
+
+        }else if(isset($_POST['eta']) && $_POST['eta']){
+            $updateData['eta'] = intval($_POST['eta']);
+            $updateData['total_days'] = $total_days - $eta + intval($_POST['eta']);
+        }else if(isset($_POST['clearance_days']) && $_POST['clearance_days']){
+            $updateData['clearance_days'] = intval($_POST['clearance_days']);
+            $updateData['total_days'] = $total_days - $clearance_days + intval($_POST['clearance_days']);
+        }else{
+            $updateData['delivery_days'] = intval($_POST['delivery_days']);
+            $updateData['total_days'] = $total_days - $delivery_days + intval($_POST['delivery_days']);
+        }
+
+        $updateData['maintainer'] = intval(Auth::user()->id);
+        $updateData['maintain_time'] = date('Y-m-d H:i:s');
+        DB::connection('amazon')->table('international_transport_time')->where('id','=', $id)->update($updateData);
+    }
+
+    public function batchUpdateTransportTime(Request $req){
+        $ids = $req->input('ids');
+        $input_id = $req->input('input_id');
+        $input_value = intval($req->input('input_value'));
+        DB::beginTransaction();
+        for($i=0; $i<count($ids); $i++){
+            $id = $ids[$i];
+            $row = DB::connection('amazon')->table('international_transport_time')->where('id','=', $id)->first();
+            //if(!$row) exit;
+            $etd = intval($row->etd);
+            $eta = intval($row->eta);
+            $clearance_days = intval($row->clearance_days);
+            $delivery_days = intval($row->delivery_days);
+            $fba_sign_in_days = intval($row->fba_sign_in_days);
+            $total_days = intval($row->total_days);
+
+            $updateData = array();
+            $updateData[$input_id] = $input_value;
+            //$$input_id: $etd, $eta, $clearance_days, $delivery_days
+            $updateData['total_days'] = $total_days - $$input_id + $input_value;
+            $updateData['maintainer'] = intval(Auth::user()->id);
+            $updateData['maintain_time'] = date('Y-m-d H:i:s');
+            DB::connection('amazon')->table('international_transport_time')->where('id','=', $id)->update($updateData);
+        }
+
+        DB::commit();
+
     }
 
 
@@ -473,6 +543,10 @@ class ManageDistributeTimeController extends Controller
             'ES' =>'A1RKKUPIHCS9HS',
             'JP' =>'A1VC38T7YXB528'
         );
+    }
+
+    public function getIsDefault(){
+        return array('1'=>'是','2'=>'否');
     }
 
 }
