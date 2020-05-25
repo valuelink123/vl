@@ -253,9 +253,6 @@
 		text-decoration: none;
 		color: #666;
 	}
-	/* .nav_list li:first-child{
-		margin-left: 0 !important;
-	} */
 	.nav_active{
 		border-bottom: 2px solid #4B8DF8;
 	}

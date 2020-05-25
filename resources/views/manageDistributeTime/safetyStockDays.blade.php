@@ -216,11 +216,7 @@
 <script>
 	//正则判断输入整数
 	function validataInt(ob) {
-		if(ob.value.length==1){
-			ob.value=ob.value.replace(/[^1-9]/g,'')
-		}else{
-			ob.value=ob.value.replace(/\D/g,'')
-		}
+		ob.value = ob.value.replace(/^(0+)|[^\d]+/g,'')
 	}
 	//筛选
 	function status_filter(value,column) {
@@ -238,7 +234,7 @@
 		$('.change').on('click',function(){
 			let checkbox_list = [];
 			$("input[name='checkedInput']:checked").each(function () {
-				checkbox_list.push($(this).val());		 		 			
+				checkbox_list.push($(this).val());	
 			});
 			if(checkbox_list.length < 1){
 				alert('请先选择产品')
@@ -351,7 +347,7 @@
 				{
 					data: "id",
 					render: function(data, type, row, meta) {
-						var content = '<input type="checkbox" name="checkedInput"  class="checkbox-item" value="' + data + '" />';
+						var content = '<input type="checkbox" name="checkedInput"  class="checkbox-item" value="' + data + '" /  >';
 						return content;
 					},
 					createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
@@ -402,7 +398,7 @@
 			
 					createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
 						$(cell).click(function (e) {
-							$(this).html('<input type="text" size="16" onkeypress="validataInt(this)" οnkeyup="validataInt(this)" style="width: 100%"/>');
+							$(this).html('<input type="text" size="16" onkeyup="validataInt(this)" style="width: 100%"/>');
 							var aInput = $(this).find(":input");
 							aInput.focus().val(cellData);
 						});

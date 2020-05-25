@@ -84,7 +84,7 @@
 	}
 	.batch_list{
 		border: 1px solid rgba(220, 223, 230, 1);
-		width: 250px;
+		width: 290px;
 		margin-left: -40px !important;
 		padding: 15px 0 !important;
 		display: none;
@@ -101,7 +101,7 @@
 	}
 	.batch_list li span{
 		display: inline-block;
-		width: 60px;
+		width: 85px;
 		text-align: right;
 		margin-right: 10px;
 	}
@@ -134,9 +134,6 @@
 	.batch_list_input{
 		width: 90px;
 		padding-left: 8px;
-	}
-	.batch_operation{
-		display: none;
 	}
 	.clear{
 		width: 90px;
@@ -208,6 +205,7 @@
 					<li><span>ETA:</span><input type="number" class="batch_list_input"><button class="batch_list_button">change</button></li>
 					<li><span>清关日期:</span><input type="number" class="batch_list_input"><button class="batch_list_button">change</button></li>
 					<li><span>派送日期:</span><input type="number" class="batch_list_input"><button class="batch_list_button">change</button></li>
+					<li><span>FBA签收日期:</span><input type="number" class="batch_list_input"><button class="batch_list_button">change</button></li>
 				</ul>
 			</div>
 			<div class="col-md-10" style="float: right;padding-right: 0;">
