@@ -253,7 +253,7 @@ Route::match(['post','get'],'/mrp/list', 'MrpController@list');
 Route::get('/mrp/edit', 'MrpController@edit');
 Route::post('/mrp/update', 'MrpController@update');
 Route::get('/mrp/export', 'MrpController@export');
-
+Route::post('/mrp/weekupdate', 'MrpController@weekupdate');
 Route::get('/mrp/asinexport', 'MrpController@asinExport');
 Route::post('/mrp/import', 'MrpController@import');
 

@@ -252,9 +252,23 @@ var initTable = function () {
 		"fnDrawCallback": function (oSettings) {
 			$.mockjaxSettings.responseTime = 500;
 			$.fn.editable.defaults.inputclass = 'form-control';
-			//$.fn.editable.defaults.url = '/mrp/update';	
+			$.fn.editable.defaults.url = '/mrp/weekupdate';	
 			$('.week_plan').editable({
-				emptytext:'N/A'
+				emptytext:'0',
+				validate: function (value) {
+					if (isNaN(value)) {
+						return 'Must be a number';
+					}
+				},
+				success: function (response) { 
+					var obj = JSON.parse(response);
+					for(var jitem in obj){
+						$('#'+jitem).text(obj[jitem]);
+					}
+				}, 
+				error: function (response) { 
+					return 'remote error'; 
+				} 
 			});
 
         }
