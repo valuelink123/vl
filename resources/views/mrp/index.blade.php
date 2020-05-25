@@ -7,13 +7,15 @@
 .table thead tr th,.table thead tr td,.table td, .table th{
 	font-size:11px;
 	white-space: nowrap;
+	text-align:left;
+}
+table.dataTable thead th, table.dataTable thead td {
+    padding: 8px 10px;
 }
 </style>
 
     <link rel="stylesheet" href="/js/chosen/chosen.min.css"/>
     <script src="/js/chosen/chosen.jquery.min.js"></script>
-
-
     <div class="portlet light bordered">
         <div class="portlet-body">
             <form id="search-form">
@@ -21,7 +23,7 @@
                 <div class="row">
                     <div class="col-md-2">
                         <div class="input-group">
-                            <span class="input-group-addon">Date</span>
+                            <span class="input-group-addon">天数</span>
                             <input  class="form-control" value="{!! $date !!}" id="date" name="date"
                                    autocomplete="off"/>
                         </div>
@@ -38,7 +40,7 @@
                     </div>
                     <div class="col-md-2">
                         <div class="input-group">
-                            <span class="input-group-addon">StockKeep</span>
+                            <span class="input-group-addon">库存维持天数</span>
 							<div>
 								<div class="col-md-6" style="padding:0px;">
 									<input class="form-control" value="" id="stockkeep_from" name="stockkeep_from" autocomplete="off"/>
@@ -62,7 +64,7 @@
 
                     <div class="col-md-2">
                         <div class="input-group">
-                            <span class="input-group-addon">OutStock</span>
+                            <span class="input-group-addon">缺货天数</span>
                             <div>
 								<div class="col-md-6" style="padding:0px;">
 									<input class="form-control" value="" id="outstock_from" name="outstock_from" autocomplete="off"/>
@@ -86,7 +88,7 @@
 
                     <div class="col-md-2">
                         <div class="input-group">
-                            <span class="input-group-addon">StockStatus</span>
+                            <span class="input-group-addon">库存状态</span>
                             <select  class="form-control"  id="stock_status" name="stock_status">
                                 <option value="">Select</option>
                                 @foreach(getStockStatus() as $key=>$val)
@@ -96,7 +98,7 @@
                         </div>
                         <br>
                         <div class="input-group">
-                            <span class="input-group-addon">Sellers</span>
+                            <span class="input-group-addon">销售员</span>
                             <select  class="form-control"  id="sap_seller_id" name="sap_seller_id">
                                 <option value="">Select</option>
                                 @foreach(getUsers('sap_seller') as $key=>$val)
@@ -108,7 +110,7 @@
 
                     <div class="col-md-2">
                         <div class="input-group">
-                            <span class="input-group-addon">SkuStatus</span>
+                            <span class="input-group-addon">Sku状态</span>
                             <select  class="form-control"  id="sku_status" name="sku_status">
                                 <option value="">Select</option>
                                 @foreach(getSkuStatuses() as $key=>$val)
@@ -125,7 +127,7 @@
                     </div>
                     <div class="col-md-2">
                         <div class="input-group">
-                            <span class="input-group-addon">SkuLevel</span>
+                            <span class="input-group-addon">Sku等级</span>
                             <select class="form-control"  id="sku_level" name="sku_level">
                                 <option value="">Select</option>
                                 @foreach(getSkuLevel() as $key=>$val)
@@ -136,12 +138,12 @@
                         <br>
 						<div class="input-group">
 							<div class="btn-group pull-right">
-							<button id="export" class="btn sbold blue"> Export
+							<button id="export" class="btn sbold blue"> 导出
 								<i class="fa fa-download"></i>
 							</button>
 							</div>
 							<div class="btn-group pull-right" style="margin-right:20px;">
-								<button id="search" class="btn sbold blue">Search</button>
+								<button id="search" class="btn sbold blue">查询</button>
 							</div>
 						</div>
                     </div>  
@@ -156,26 +158,26 @@
                     <thead>
                     <tr>
                         <th>Asin</th>
-                        <th>Site</th>
+                        <th>站点</th>
                         <th>Sku</th>
-                        <th>Status</th>
-                        <th>Seller</th>
-                        <th>D/Sales</th>
-						<th>Plan</th>
-                        <th>FBAStock</th>
-                        <th>FBAKeep</th>
-                        <th>FBATran</th>
-                        <th>FBMStock</th>
-                        <th>TotalKeep</th>
-                        <th>SZ</th>
-                        <th>InMake</th>
-                        <th>OutStock</th>
-                        <th>OutStockDate</th>
-                        <th>OverStock</th>
-                        <th>OverStockDate</th>
-                        <th>StockScore</th>
-                        <th>Dist</th>
-                        <th>Action</th>
+                        <th>状态</th>
+                        <th>销售员</th>
+                        <th>加权日均</th>
+						<th>销售计划</th>
+                        <th>FBA库存</th>
+                        <th>库存维持</th>
+                        <th>FBA在途</th>
+                        <th>FBM库存</th>
+                        <th>海外库存维持</th>
+                        <th>深仓</th>
+                        <th>在制</th>
+                        <th>缺货天数</th>
+                        <th>缺货日</th>
+                        <th>滞销天数</th>
+                        <th>滞销日</th>
+                        <th>库存质量得分</th>
+                        <th>预计配货</th>
+                        <th>操作</th>
                     </tr>
                     </thead>
                     <tbody></tbody>
@@ -229,13 +231,7 @@
                     type: 'POST',
                     url: location.href,
                     data:  {search: $("#search-form").serialize()}
-                },
-				scrollY:        false,
-				scrollX:        true,
-				fixedColumns:   {
-					leftColumns:7,
-					rightColumns: 0
-				}
+                }
             })
         }
 

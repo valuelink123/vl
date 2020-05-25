@@ -17,7 +17,7 @@ class AsinSalesPlan extends Model
 	protected $guarded = [];
     public $timestamps = false;
 	
-	public function calPlans($asin,$marketplace_id,$sku,$date_from,$date_to)
+	static function calPlans($asin,$marketplace_id,$sku,$date_from,$date_to)
     {	
         $estimated_shipment_datas = ShipmentRequest::selectRaw('sum(quantity) as quantity,received_date as date')->where('asin',$asin)->where('marketplace_id',$marketplace_id)->where('received_date','>=',$date_from)->where('received_date','<=',$date_to)->where('shipment_completed',0)->groupBy(['date'])->pluck('quantity','date');
 		
