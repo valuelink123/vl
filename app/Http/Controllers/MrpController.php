@@ -138,8 +138,7 @@ class MrpController extends Controller
 			$limit = $this->dtLimit($req);
 			$sql .= " LIMIT {$limit} ";
 		}
-		print_r($sql);
-		die();
+
 		$datas = DB::connection('amazon')->select($sql);
 		
 		$datas = json_decode(json_encode($datas),true);
