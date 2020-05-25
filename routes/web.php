@@ -227,10 +227,17 @@ Route::post('/marketingPlan/getAsinDailyReport', 'MarketingPlanController@getAsi
 Route::get('/collaborativeReplenishment/index', 'CollaborativeReplenishmentController@index')->name('index');
 
 //  Manage Distribute Time
-Route::get('/manageDistributeTime/safetyStockDays', 'ManageDistributeTimeController@safetyStockDays')->name('safetyStockDays');
-Route::get('/manageDistributeTime/fba', 'ManageDistributeTimeController@fba')->name('fba');
-Route::get('/manageDistributeTime/fbm', 'ManageDistributeTimeController@fbm')->name('fbm');
-Route::get('/manageDistributeTime/internationalTransportTime', 'ManageDistributeTimeController@internationalTransportTime')->name('internationalTransportTime');
+Route::match(['post','get'],'/manageDistributeTime/safetyStockDays', 'ManageDistributeTimeController@safetyStockDays')->name('safetyStockDays');
+Route::post('/manageDistributeTime/updateSafetyStockDays', 'ManageDistributeTimeController@updateSafetyStockDays');
+Route::get('/manageDistributeTime/exportSafetyStockDays', 'ManageDistributeTimeController@exportSafetyStockDays');
+Route::match(['post','get'],'/manageDistributeTime/fba', 'ManageDistributeTimeController@fba')->name('fba');
+Route::post('/manageDistributeTime/updateFba', 'ManageDistributeTimeController@updateFba');
+Route::get('/manageDistributeTime/exportFba', 'ManageDistributeTimeController@exportFba');
+Route::match(['post','get'],'/manageDistributeTime/fbm', 'ManageDistributeTimeController@fbm')->name('fbm');
+Route::post('/manageDistributeTime/updateFbm', 'ManageDistributeTimeController@updateFbm');
+Route::get('/manageDistributeTime/exportFbm', 'ManageDistributeTimeController@exportFbm');
+Route::match(['post','get'],'/manageDistributeTime/internationalTransportTime', 'ManageDistributeTimeController@internationalTransportTime')->name('internationalTransportTime');
+Route::post('/manageDistributeTime/upload', 'ManageDistributeTimeController@upload');
 
 
 //投入产出分析

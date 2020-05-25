@@ -70,8 +70,8 @@
 		<div class="content">
 			<div class="filter_box">
 				<div class="filter_option">
-					<label for="stationSelect">站点</label>
-					<select id="stationSelect" onchange="status_filter(this.value,0)">
+					<label for="siteSelect">站点</label>
+					<select id="siteSelect" onchange="status_filter(this.value,0)">
 						<option value ="">全部</option>
 						<option value ="US">US</option>
 						<option value ="CA">CA</option>
@@ -85,15 +85,21 @@
 					</select>
 				</div>
 				<div class="filter_option">
-					<label for="skuStatusSelect">预计到FBA月份</label>
-					<select id="skuStatusSelect" onchange="status_filter(this.value,1)">
+					<label for="estimatedMonthToFbaSelect">预计到FBA月份</label>
+					<select id="estimatedMonthToFbaSelect" onchange="change_month(this.value,1)">
 						<option value ="">全部</option>
+						@foreach($estimatedMonthToFba as $key=>$val)
+						<option value ="{{$key}}">{{$val}}</option>
+						@endforeach
 					</select>
 				</div>
 				<div class="filter_option">
-					<label for="skuGradeSelect">维护人</label>
-					<select id="skuGradeSelect" onchange="status_filter(this.value,3)">
+					<label for="maintainerSelect">维护人</label>
+					<select id="maintainerSelect" onchange="change_maintainer(this.value,3)">
 						<option value ="">全部</option>
+						@foreach($usersIdName as $k=>$v)
+							<option value ="{{$k}}">{{$v}}</option>
+						@endforeach
 					</select>
 				</div>
 				<div style="float: right;margin-top: 30px;">
@@ -123,14 +129,26 @@
 		</table>
 </div>
 <script>
+    var usersIdName = eval(<?php echo json_encode($usersIdName);?>);
+    var estimatedMonthToFba = eval(<?php echo json_encode($estimatedMonthToFba);?>);
+
 	//正则判断输入整数
-	function validataInt(ob) {
-		if(ob.value.length==1){
-			ob.value=ob.value.replace(/[^1-9]/g,'')
-		}else{
-			ob.value=ob.value.replace(/\D/g,'')
-		}
-	}
+    function validataInt(ob) {
+        ob.value = ob.value.replace(/^(0+)|[^\d]+/g,'');
+    }
+//	function validataInt(ob) {
+//		if(ob.value.length==1){
+//			ob.value=ob.value.replace(/[^1-9]/g,'')
+//		}else{
+//			ob.value=ob.value.replace(/\D/g,'')
+//		}
+//	}
+
+    //下载数据
+    $("#export").click(function(){
+		location.href='/manageDistributeTime/exportFba';
+		return false;
+    });
 	//筛选
 	function status_filter(value,column) {
 	    if (value == '') {
@@ -138,9 +156,25 @@
 	    }
 	    else tableObj.column(column).search(value).draw();
 	}
+
+    function change_month(value,column){
+        var month = (value == '') ? '' : estimatedMonthToFba[value];
+        status_filter(month, column);
+    }
+
+    function change_maintainer(value,column){
+        var userName = (value == '') ? '' : usersIdName[value];
+        status_filter(userName, column);
+    }
+
+
+
 	$(document).ready(function(){
 		//清空筛选
 		$('.clear').on('click',function(){
+            $('#siteSelect').val('');
+            $('#estimatedMonthToFbaSelect').val('');
+            $('#maintainerSelect').val('');
 			status_filter('',0)
 			status_filter('',1)
 			status_filter('',3)
@@ -151,7 +185,7 @@
 		
 		tableObj = $('#fbaTable').DataTable({
 			lengthMenu: [
-			    20, 50, 100, 'All'
+			    20, 50, 100
 			],
 			order: [ 4, "desc" ],
 			dispalyLength: 2, // default record count per page
@@ -160,61 +194,61 @@
 			serverSide: false,//是否所有的请求都请求服务器	
 			scrollX: "100%",
 			scrollCollapse: false,
-			/* ajax: {
-				url: "",
+			ajax: {
+				url: "/manageDistributeTime/fba",
 				type: "post",
-				data : function(){
-					reqList = {
-						"sap_seller_id" : 1,
-					};
-					return reqList;
-				},
-				dataSrc:function(res){
-					console.log(res)
-					//return res
-				},
-			}, */	
-			data: [
-				{
-					id:1,
-					station: 'US',
-					month: '7月',
-					fba: '10',
-					maintainer: 'nana',
-					maintenanceDate: '2020-05-20',
-				},
-				{
-					id:2,
-					station: 'US',
-					month: '9月',
-					fba: '10',
-					maintainer: 'nana',
-					maintenanceDate: '2020-05-18',
-				},
-				{
-					id:3,
-					station: 'US',
-					month: '8月',
-					fba: '10',
-					maintainer: 'nana',
-					maintenanceDate: '2020-05-21',
-				}
-			],	
+//				data : function(){
+//					reqList = {
+//						"sap_seller_id" : 1,
+//					};
+//					return reqList;
+//				},
+//				dataSrc:function(res){
+//					console.log(res)
+//					//return res
+//				},
+			},
+//			data: [
+//				{
+//					id:1,
+//					station: 'US',
+//					month: '7月',
+//					fba: '10',
+//					maintainer: 'nana',
+//					maintenanceDate: '2020-05-20',
+//				},
+//				{
+//					id:2,
+//					station: 'US',
+//					month: '9月',
+//					fba: '10',
+//					maintainer: 'nana',
+//					maintenanceDate: '2020-05-18',
+//				},
+//				{
+//					id:3,
+//					station: 'US',
+//					month: '8月',
+//					fba: '10',
+//					maintainer: 'nana',
+//					maintenanceDate: '2020-05-21',
+//				}
+//			],
 			columns: [
 				{
-					data: "station" ,
+					data: "site" ,
 				},
 				{
-					data: 'month',
+					data: 'estimated_month_to_fba',
 				},
 				{
-					data: 'fba',
+					data: 'transfer_time',
 				},
 				{
 					data: "maintainer",
 				},
 				{
-					data: "maintenanceDate",
+					data: "maintain_time",
 				},
 			], 
 			columnDefs: [
@@ -227,7 +261,7 @@
 			
 					createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
 						$(cell).click(function (e) {
-							$(this).html('<input type="text" size="16" onkeypress="validataInt(this)" οnkeyup="validataInt(this)" style="width: 100%"/>');
+							$(this).html('<input type="text" size="16" onkeyup="validataInt(this)" style="width: 100%"/>');
 							var aInput = $(this).find(":input");
 							aInput.focus().val(cellData);
 						});
@@ -238,9 +272,10 @@
 								tableObj.cell(cell).data(text);
 								$.ajax({
 									type:"post",
-									url:'',
+									url:'/manageDistributeTime/updateFba',
 									data:{
 										id: rowData.id,
+                                        transfer_time:rowData.transfer_time
 									},
 									error:function(err){
 									    console.log(err);

@@ -400,7 +400,7 @@
                                                     </a>
                                                 </li>
 												@endpermission
-												<!-- <li class="">
+												<li class="">
 												    <a href="/collaborativeReplenishment/index" class="nav-link nav-toggle ">
 												        Collaborative Replenishment
 												        <span class="arrow"></span>
@@ -421,12 +421,12 @@
 														<li class=" ">
 														    <a href="{{url('manageDistributeTime/fbm')}}" class="nav-link "> FBM-FBA Transfer time </a>
 														</li>
-														<li class=" ">
-														    <a href="{{url('manageDistributeTime/internationalTransportTime')}}" class="nav-link "> International transport Time </a>
-														</li>
+														{{--<li class=" ">--}}
+														    {{--<a href="{{url('manageDistributeTime/internationalTransportTime')}}" class="nav-link "> International transport Time </a>--}}
+														{{--</li>--}}
 												    </ul>
 
-												</li> -->
+												</li>
 
 
 												<!-- <li class="">
