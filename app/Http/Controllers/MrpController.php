@@ -127,7 +127,7 @@ class MrpController extends Controller
 		
 			
 		if($type=='sku'){
-			$sql="SELECT SQL_CALC_FOUND_ROWS a.sku,marketplace_id,any_value(sap_seller_id) as sap_seller_id,  count(asin) as asin, sum(daily_sales) as daily_sales,sum(quantity) as quantity, any_value(min_purchase_quantity) as min_purchase_quantity from (".str_replace('SQL_CALC_FOUND_ROWS','',$sql).") as skus_table 
+			$sql="SELECT SQL_CALC_FOUND_ROWS sku,marketplace_id,any_value(sap_seller_id) as sap_seller_id,  count(asin) as asin, sum(daily_sales) as daily_sales,sum(quantity) as quantity from (".str_replace('SQL_CALC_FOUND_ROWS','',$sql).") as skus_table 
 			group by sku,marketplace_id order by daily_sales desc";
 		}
 		//left join (SELECT sku,any_value(min_purchase_quantity) as min_purchase_quantity  from (SELECT sku,min_purchase_quantity FROM sap_purchase_records ORDER by created_date desc) a1 GROUP BY a1.sku) as b on a.sku=b.sku
@@ -138,7 +138,8 @@ class MrpController extends Controller
 			$limit = $this->dtLimit($req);
 			$sql .= " LIMIT {$limit} ";
 		}
-		
+		print_r($sql);
+		die();
 		$datas = DB::connection('amazon')->select($sql);
 		
 		$datas = json_decode(json_encode($datas),true);
