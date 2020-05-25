@@ -32,6 +32,12 @@ class HijackController extends Controller
      * @var string
      */
     protected $redirectTo = '/home';
+    //上线 需打开 todo
+    public function __construct()
+    {
+        $this->middleware('auth');
+        parent::__construct();
+    }
 
     /**
      * Create a new controller instance.
@@ -195,16 +201,18 @@ class HijackController extends Controller
      * 目前使用
      * @return mixed
      */
-    public function index1()
+    public function index1(Request $request)
     {
+        $isOpen = @$request['isOpen']>= 2? $request['isOpen'] : 1;
+        $opensql='';//是否查询今天开启跟卖的产品
         $SKU_STATUS_KV= Asin::SKU_STATUS_KV;
-        $admin = array('duanyongsheng@dtas.com',"charlie@valuelinkcorp.com", "zouyuanxun@valuelinkcorp.com", "zanhaifang@valuelinkcorp.com", "huzaoli@valuelinkcorp.com", 'fanlinxi@valuelinkcorp.com');
-        $userasinL = [];
-        $sapSellerIdList = [];
+        /** 超级权限*/
+        $ADMIN_EMAIL=Asin::ADMIN_EMAIL;
+        $userasinL = $sapSellerIdList=[];
         $bool_admin = 0;//是否是管理员
         $user = Auth::user()->toArray(); //todo  打开
         if (!empty($user)) {
-            if ((!empty($user['email']) && in_array($user['email'], $admin))||@$user['seller_rules']=='*-*-*') {
+            if ((!empty($user['email']) && in_array($user['email'], $ADMIN_EMAIL))||@$user['seller_rules']=='*-*-*') {
                 /**  特殊权限着 查询所有用户 */
                 $bool_admin = 1;
                 $allUsers = DB::table('users')->select('id', 'name', 'email', 'sap_seller_id', 'seller_rules', 'ubg', 'ubu')
@@ -298,10 +306,16 @@ class HijackController extends Controller
             rl_task.created_at,
             rl_task.reselling_asin_id
             FROM(asins AS a LEFT JOIN tbl_reselling_asin AS rl_asin ON a.id = rl_asin.product_id)
-            LEFT JOIN tbl_reselling_task AS rl_task ON rl_asin.id = rl_task.reselling_asin_id
+            LEFT JOIN tbl_reselling_task AS rl_task ON rl_asin.id = rl_task.reselling_asin_id AND  rl_task.created_at >='.$ago_time.'
             where a.title !="" ';
-//GROUP BY a.asin
-        $sql_g = ' AND rl_task.created_at >='.$ago_time.'  ORDER BY rl_task.reselling_time DESC, a.reselling_switch DESC ,rl_task.reselling_num DESC';
+        //GROUP BY a.asin
+        //默认1开启跟卖，2.全部; 3. 关闭跟卖
+        if($isOpen==1){
+            $opensql = ' AND rl_task.created_at >='.$ago_time;
+        }else if($isOpen==3){
+            $opensql = ' AND a.reselling_switch=0 ';
+        }
+        $sql_g = $opensql . '  ORDER BY rl_task.reselling_time DESC, a.reselling_switch DESC ,rl_task.reselling_num DESC';
         /**  判断对应用户 以及对应管理人员 所有下属ID */
         if (!empty($userasinL)) {
             $sql_as = 'AND a.asin in ("' . implode($userasinL, '","') . '")';
@@ -771,7 +785,7 @@ class HijackController extends Controller
     public function hijackExport(Request $request)
     {
         header('Access-Control-Allow-Origin:*');
-        $admin = array("charlie@valuelinkcorp.com", "zouyuanxun@valuelinkcorp.com", "zanhaifang@valuelinkcorp.com", "huzaoli@valuelinkcorp.com", 'fanlinxi@valuelinkcorp.com');
+        $ADMIN_EMAIL=Asin::ADMIN_EMAIL;
         $DOMIN_MARKETPLACEID_URL = Asin::DOMIN_MARKETPLACEID_URL;
         $idList = isset($request['idList']) ? $request['idList'] : '';
         //传入下载的 asinID
@@ -811,7 +825,7 @@ class HijackController extends Controller
 
                 $user = Auth::user()->toArray(); //todo  打开
                 if (!empty($user)) {
-                    if (!empty($user['email']) && in_array($user['email'], $admin)) {
+                    if (!empty($user['email']) && in_array($user['email'], $ADMIN_EMAIL)) {
                         /**  特殊权限着 查询所有用户 */
                         $allUsers = DB::table('users')->select('id', 'name', 'email', 'sap_seller_id', 'seller_rules', 'ubg', 'ubu')
                             ->where('ubu', '!=', "")
