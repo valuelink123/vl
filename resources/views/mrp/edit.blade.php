@@ -213,18 +213,18 @@ white-space: nowrap;
 					 </thead>
 					 <tbody>
 					  <tr>
-						<td>{{$sku_info->sku}}</td>
-						<td>{{array_get(getSkuStatuses(),$sku_info->status,$sku_info->status)}}</td>
-						<td>{{$sku_info->level}}</td>
-						<td>{{round($sku_info->cost,2)}}</td>
-						<td>{{intval($sku_info->min_purchase_quantity)}}</td>
+						<td>{{$sku_info['sku']}}</td>
+						<td>{{array_get(getSkuStatuses(),$sku_info['status'],$sku_info['status'])}}</td>
+						<td>{{$sku_info['level']}}</td>
+						<td>{{round($sku_info['cost'],2)}}</td>
+						<td>{{intval($sku_info['estimated_cycle'])}}</td>
 						<td>-</td>
-						<td>-</td>
-						<td>{{$sku_info->safe_quantity}}</td>
-						<td>{{$sku_info->sap_seller_name}}</td>
-						<td>{{$sku_info->sap_seller_bg}}</td>
-						<td>{{$sku_info->sap_seller_bu}}</td>
-						<td>{{$sku_info->planer}}</td>
+						<td>{{intval($sku_info['min_purchase_quantity'])}}</td>
+						<td>{{$sku_info['safe_quantity']}}</td>
+						<td>{{$sku_info['sap_seller_name']}}</td>
+						<td>{{$sku_info['sap_seller_bg']}}</td>
+						<td>{{$sku_info['sap_seller_bu']}}</td>
+						<td>{{$sku_info['planer']}}</td>
 
 						</td>
 					  </tr>
