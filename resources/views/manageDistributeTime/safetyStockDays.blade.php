@@ -213,7 +213,6 @@
 			<th>安全库存(天)</th>
 			<th>维护人</th>
 			<th>维护日期</th>
-			<th>sap_sku_sites_id-hidden</th>
 		</tr>
 	</thead>
 </table>
@@ -406,9 +405,6 @@
 				{ 
 					data: 'maintain_time',
 				},
-                {
-                    data: 'id',
-                },
 			],
 			columnDefs: [
 				{ "bSortable": false, "aTargets": [ 0,1,2,3,4,5,6,7,8,10]},
