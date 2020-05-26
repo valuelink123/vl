@@ -163,30 +163,45 @@
 				<label for="factorySelect">工厂</label>
 				<select id="factorySelect" onchange="status_filter(this.value,1)">
 					<option value ="">全部</option>
+					@foreach($factoryCodes as $k=>$v)
+					<option value ="{{$v}}">{{$v}}</option>
+					@endforeach
 				</select>
 			</div>
 			<div class="filter_option">
 				<label for="logisticsSelect">物流商</label>
 				<select id="logisticsSelect" onchange="status_filter(this.value,2)">
 					<option value ="">全部</option>
+					@foreach($logisticsProviders as $k=>$v)
+					<option value ="{{$v}}">{{$v}}</option>
+					@endforeach
 				</select>
 			</div>
 			<div class="filter_option">
-				<label for="typeSelect">运输方式</label>
-				<select id="typeSelect" onchange="status_filter(this.value,4)">
+				<label for="transportModeSelect">运输方式</label>
+				<select id="transportModeSelect" onchange="status_filter(this.value,3)">
 					<option value ="">全部</option>
+					@foreach($transportModes as $k=>$v)
+					<option value ="{{$k}}">{{$v}}</option>
+					@endforeach
 				</select>
 			</div>
 			<div class="filter_option">
 				<label for="regionSelect">地区</label>
 				<select id="regionSelect" onchange="status_filter(this.value,5)">
 					<option value ="">全部</option>
+					@foreach($regions as $k=>$v)
+					<option value ="{{$v}}">{{$v}}</option>
+					@endforeach
 				</select>
 			</div>
 			<div class="filter_option">
-				<label for="usernameSelect">用户名</label>
-				<select id="usernameSelect" onchange="status_filter(this.value,12)">
+				<label for="maintainerSelect">用户名</label>
+				<select id="maintainerSelect" onchange="status_filter(this.value,12)">
 					<option value ="">全部</option>
+					@foreach($usersIdName as $k=>$v)
+					<option value ="{{$k}}">{{$v}}</option>
+					@endforeach
 				</select>
 			</div>
 			<div style="float: left;margin-top: 35px;">
@@ -204,10 +219,10 @@
 			<div style="z-index: 999;padding-left:0; position: absolute;" class="col-md-2">
 				<button type="button" class="btn btn-sm green-meadow batch_operation">批量操作<i class="fa fa-angle-down"></i></button>
 				<ul class="batch_list">
-					<li><span>ETD:</span><input type="number" class="batch_list_input"><button class="batch_list_button">change</button></li>
-					<li><span>ETA:</span><input type="number" class="batch_list_input"><button class="batch_list_button">change</button></li>
-					<li><span>清关日期:</span><input type="number" class="batch_list_input"><button class="batch_list_button">change</button></li>
-					<li><span>派送日期:</span><input type="number" class="batch_list_input"><button class="batch_list_button">change</button></li>
+					<li><span>ETD:</span><input type="text" id="etd" onkeyup="value=value.replace(/^(0+)|[^\d]+/g,'')" class="batch_list_input"><button id="btn_etd" class="batch_list_button change">change</button></li>
+					<li><span>ETA:</span><input type="text" id="eta" onkeyup="value=value.replace(/^(0+)|[^\d]+/g,'')" class="batch_list_input"><button id="btn_eta" class="batch_list_button change">change</button></li>
+					<li><span>清关日期:</span><input type="text" id="clearance_days" onkeyup="value=value.replace(/^(0+)|[^\d]+/g,'')" class="batch_list_input"><button id="btn_clearance_days" class="batch_list_button change">change</button></li>
+					<li><span>派送日期:</span><input type="text" id="delivery_days" onkeyup="value=value.replace(/^(0+)|[^\d]+/g,'')" class="batch_list_input"><button id="btn_delivery_days" class="batch_list_button change">change</button></li>
 				</ul>
 			</div>
 			<div class="col-md-10" style="float: right;padding-right: 0;">
@@ -215,16 +230,16 @@
 			    </div>
 				<div class="col-md-2">
 				</div>
-				<form action="{{url('review/upload')}}" method="post" enctype="multipart/form-data">
+				<form action="{{url('manageDistributeTime/upload')}}" method="post" enctype="multipart/form-data">
 				<div class="col-md-2" style="text-align:right;" >
-					<a href="{{ url('/uploads/reviewUpload/review_customers.csv')}}" >Import Template
+					<a href="{{ url('/uploads/manageDistributeTimeUpload/manage_distribute_time.xlsx')}}" >Import Template
 			            </a>	
 				</div>
 				<div class="col-md-2">
 					<input type="file" name="importFile"  />
 				</div>
 				<div class="col-md-2" style="text-align: right;padding-right: 0;">
-					<button type="submit" class="btn blue" id="data_search">导出</button>
+					<button type="submit" class="btn blue" id="data_search">导入</button>
 				</div>
 				</form>
 			</div>
@@ -271,13 +286,9 @@
 </div>
 <script>
 	//正则判断输入整数
-	function validataInt(ob) {
-		if(ob.value.length==1){
-			ob.value=ob.value.replace(/[^1-9]/g,'')
-		}else{
-			ob.value=ob.value.replace(/\D/g,'')
-		}
-	}
+    function validataInt(ob) {
+        ob.value = ob.value.replace(/^(0+)|[^\d]+/g,'');
+    }
 	//筛选
 	function status_filter(value,column) {
 	    if (value == '') {
@@ -285,12 +296,35 @@
 	    }
 	    else tableObj.column(column).search(value).draw();
 	}
-	$(document).ready(function(){
+
+    //下载数据
+    $("#export").click(function(){
+        let checkbox_list = [];
+        $("input[name='checkedInput']:checked").each(function () {
+            checkbox_list.push($(this).val());
+        });
+        if(checkbox_list.length < 1){
+            location.href='/manageDistributeTime/exportTransportTime?factory_code=' + $('#factorySelect').val() + '&logistics_provider=' + $('#logisticsSelect').val() + '&transport_mode_code=' + $('#transportModeSelect').val() + '&region=' + $('#regionSelect').val() + '&maintainer=' + $('#maintainerSelect').val();
+            return false;
+        }else{
+            var ids = checkbox_list.join(',');
+            location.href='/manageDistributeTime/exportTransportTime?ids=' + ids;
+            return false;
+        }
+
+    });
+
+    $(document).ready(function(){
 		//清空筛选
 		$('.clear').on('click',function(){
+            $('#factorySelect').val('');
+            $('#logisticsSelect').val('');
+            $('#transportModeSelect').val('');
+            $('#regionSelect').val('');
+            $('#maintainerSelect').val('');
 			status_filter('',1)
 			status_filter('',2)
-			status_filter('',4)
+			status_filter('',3)
 			status_filter('',5)
 			status_filter('',12)
 			//tableObj.ajax.reload();
@@ -309,9 +343,40 @@
 			//let checkedBox = $subs.filter(":checked");
 		});
 		//批量编辑
-		$('.change').on('click',function(){
-					
-		})
+        $('.change').on('click',function(){
+            var btn_id = this.id;
+            var input_id = btn_id.substr(4);
+            var input_value = $('#' + input_id).val();
+            if(input_value == ''){
+                $('#' + input_id).focus();
+                return false;
+            }
+
+            let checkbox_list = [];
+            $("input[name='checkedInput']:checked").each(function () {
+                checkbox_list.push($(this).val());
+            });
+
+            if(checkbox_list.length < 1){
+                alert('请先选择');
+            }else{
+                $.ajax({
+                    type:"post",
+                    url:'/manageDistributeTime/batchUpdateTransportTime',
+                    data:{
+                        ids: checkbox_list,
+						input_id:input_id,
+                        input_value: input_value
+                    },
+                    error:function(err){
+                        console.log(err);
+                    },
+                    success:function(res){
+                        tableObj.ajax.reload()
+                    }
+                });
+            }
+        })
 		//当有数据选中时展示批量操作按钮
 		function isBatchOperationShow(){
 			let checkbox_list = [];
@@ -354,7 +419,7 @@
 		$.fn.dataTable.ext.errMode = 'none';
 		tableObj = $('#logisticsTable').DataTable({
 			lengthMenu: [
-			    20, 50, 100, 'All'
+			    20, 50, 100
 			],
 			dispalyLength: 2, // default record count per page
 			paging: true,  // 是否显示分页
@@ -364,77 +429,25 @@
 			scrollX: "100%",
 			scrollCollapse: false,
 			ajax: {
-				url: "",
+				url: "/manageDistributeTime/internationalTransportTime",
 				type: "post",
-				data : function(){
-					reqList = {
-						/* "sap_seller_id" : sap_seller_id,
-						"created_at_s": cusstr($('.createTimeInput').val() , ' - ' , 1),
-						"created_at_e": cusstr1($('.createTimeInput').val() , ' - ' , 1),
-						"from_time": cusstr($('.estTimeInput').val() , ' - ' , 1),
-						"to_time": cusstr1($('.estTimeInput').val() , ' - ' , 1),
-						"condition": $('.keyword').val(), */
-					};
-					return reqList;
-				},
-				dataSrc:function(res){
-					console.log(res)
-					return res;
-				},
+//				data : function(){
+//					reqList = {
+//						/* "sap_seller_id" : sap_seller_id,
+//						"created_at_s": cusstr($('.createTimeInput').val() , ' - ' , 1),
+//						"created_at_e": cusstr1($('.createTimeInput').val() , ' - ' , 1),
+//						"from_time": cusstr($('.estTimeInput').val() , ' - ' , 1),
+//						"to_time": cusstr1($('.estTimeInput').val() , ' - ' , 1),
+//						"condition": $('.keyword').val(), */
+//					};
+//					return reqList;
+//				},
+//				dataSrc:function(res){
+//					console.log(res)
+//					return res;
+//				},
 			},			
-			data: [
-				{
-					factory: 'US01',
-					logisticsProvider: 'SZ-BAIYSHH',
-					transportCode: '70',
-					typeOfShipping: '海运+卡车',
-					region: '美东',
-					etd: '7',
-					eta: '15',
-					customsClearanceDate: '5',
-					deliveryDate: '16',
-					fbaSignInDate: '3',
-					totalAging: '46',
-					maintainer: 'WM0004',
-					maintenanceDate: '2019-4-15',
-					idDefault: '是',
-					id:3,
-				},
-				{
-					factory: 'US01',
-					logisticsProvider: 'SZ-BAIYSHH',
-					transportCode: '70',
-					typeOfShipping: '海运+卡车',
-					region: '美东',
-					etd: '7',
-					eta: '15',
-					customsClearanceDate: '5',
-					deliveryDate: '16',
-					fbaSignInDate: '3',
-					totalAging: '46',
-					maintainer: 'WM0004',
-					maintenanceDate: '2019-4-15',
-					idDefault: '是',
-					id:4,
-				},
-				{
-					factory: 'US01',
-					logisticsProvider: 'SZ-BAIYSHH',
-					transportCode: '70',
-					typeOfShipping: '海运+卡车',
-					region: '美东',
-					etd: '7',
-					eta: '15',
-					customsClearanceDate: '5',
-					deliveryDate: '16',
-					fbaSignInDate: '3',
-					totalAging: '46',
-					maintainer: 'WM0004',
-					maintenanceDate: '2019-4-15',
-					idDefault: '是',
-					id:5,
-				}
-			],
+
 			/* "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {  //行回调函数
 				$(nRow).on( 'click', function () {
 					console.log(aData.id);
@@ -456,16 +469,16 @@
 					}
 				},
 				{
-					data: "factory",
+					data: "factory_code",
 				},
 				{
-					data: 'logisticsProvider',
+					data: 'logistics_provider',
 				},
 				{
-					data: 'transportCode',
+					data: 'transport_mode_code',
 				},
 				{
-					data: 'typeOfShipping',
+					data: 'transport_mode',
 				},
 				{
 					data: 'region',
@@ -477,25 +490,25 @@
 					data: 'eta',
 				},
 				{ 
-					data: 'customsClearanceDate',
+					data: 'clearance_days',
 				},
 				{
-					data: 'deliveryDate',
+					data: 'delivery_days',
 				},
 				{
-					data: 'fbaSignInDate',
+					data: 'fba_sign_in_days',
 				},
 				{
-					data: 'totalAging',
+					data: 'total_days',
 				},
 				{
 					data: "maintainer",
 				},
 				{
-					data: "maintenanceDate",
+					data: "maintain_time",
 				},
 				{
-					data: "idDefault",
+					data: "is_default",
 				},
 				
 			], 
@@ -508,7 +521,7 @@
 							
 					createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
 						$(cell).click(function (e) {
-							$(this).html('<input type="text" onkeypress="validataInt(this)" οnkeyup="validataInt(this)" size="16" style="width: 100%"/>');
+							$(this).html('<input type="text" size="16" οnkeyup="validataInt(this)" style="width: 100%"/>');
 							var aInput = $(this).find(":input");
 							aInput.focus().val(cellData);
 						});
@@ -519,9 +532,10 @@
 								tableObj.cell(cell).data(text);
 								$.ajax({
 									type:"post",
-									url:'',
+									url:'/manageDistributeTime/updateTransportTime',
 									data:{
 										id: rowData.id,
+										etd: rowData.etd
 									},
 									error:function(err){
 									    console.log(err);
@@ -545,7 +559,7 @@
 							
 					createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
 						$(cell).click(function (e) {
-							$(this).html('<input type="text" onkeypress="validataInt(this)" οnkeyup="validataInt(this)" size="16" style="width: 100%"/>');
+							$(this).html('<input type="text" size="16" onkeyup="validataInt(this)" style="width: 100%"/>');
 							var aInput = $(this).find(":input");
 							aInput.focus().val(cellData);
 						});
@@ -556,9 +570,10 @@
 								tableObj.cell(cell).data(text);
 								$.ajax({
 									type:"post",
-									url:'',
+                                    url:'/manageDistributeTime/updateTransportTime',
 									data:{
 										id: rowData.id,
+										eta: rowData.eta
 									},
 									error:function(err){
 									    console.log(err);
@@ -582,7 +597,7 @@
 							
 					createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
 						$(cell).click(function (e) {
-							$(this).html('<input type="text" onkeypress="validataInt(this)" οnkeyup="validataInt(this)" size="16" style="width: 100%"/>');
+							$(this).html('<input type="text" οnkeyup="validataInt(this)" size="16" style="width: 100%"/>');
 							var aInput = $(this).find(":input");
 							aInput.focus().val(cellData);
 						});
@@ -593,9 +608,10 @@
 								tableObj.cell(cell).data(text);
 								$.ajax({
 									type:"post",
-									url:'',
+                                    url:'/manageDistributeTime/updateTransportTime',
 									data:{
 										id: rowData.id,
+                                        clearance_days: rowData.clearance_days
 									},
 									error:function(err){
 									    console.log(err);
@@ -619,7 +635,7 @@
 							
 					createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
 						$(cell).click(function (e) {
-							$(this).html('<input type="text" onkeypress="validataInt(this)" οnkeyup="validataInt(this)" size="16" style="width: 100%"/>');
+							$(this).html('<input type="text" οnkeyup="validataInt(this)" size="16" style="width: 100%"/>');
 							var aInput = $(this).find(":input");
 							aInput.focus().val(cellData);
 						});
@@ -630,9 +646,10 @@
 								tableObj.cell(cell).data(text);
 								$.ajax({
 									type:"post",
-									url:'',
+                                    url:'/manageDistributeTime/updateTransportTime',
 									data:{
 										id: rowData.id,
+                                        delivery_days: rowData.delivery_days
 									},
 									error:function(err){
 									    console.log(err);
@@ -648,43 +665,45 @@
 						})
 					}
 				},
-				{
-					"targets": [14],
-					render: function (data, type, row) {
-						return '<div><span>'+data+'</span><img src="../assets/global/img/editor.png" alt="" style="float:right" class="country_img"></div>';
-					},
-			
-					createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
-						$(cell).click(function (e) {
-							$(this).html('<input type="number" size="16" style="width: 100%"/>');
-							var aInput = $(this).find(":input");
-							aInput.focus().val(cellData);
-						});
-						$(cell).on("blur", ":input", function (e) {
-							var text = $(this).val();
-							if($(this).val() != cellData){
-								$(cell).html(text);
-								tableObj.cell(cell).data(text);
-								$.ajax({
-									type:"post",
-									url:'',
-									data:{
-										id: rowData.id,
-									},
-									error:function(err){
-									    console.log(err);
-									},
-									success:function(res){
-										tableObj.ajax.reload()
-									}
-								});
-							}else{
-								$(cell).html(text);
-								tableObj.cell(cell).data(text);
-							}
-						})
-					}
-				},
+                {
+                    "targets": [14],
+                    render: function (data, type, row) {
+                        return '<div>'+data+'</div>';
+                    },
+                    createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
+                        var aInput;
+                        $(cell).click(function () {
+                            $(this).html('<select style="width:50%"><option value="1">Y</option><option value="2">N</option></select>');
+                            var aInput = $(this).find(":input");
+                            aInput.focus().val("");
+                        });
+                        $(cell).on("click", ":input", function (e) {
+                            e.stopPropagation();
+                        });
+                        $(cell).on("change", ":input", function () {
+                            $(this).blur();
+                            $.ajax({
+                                type:"post",
+                                url:'/manageDistributeTime/updateTransportTime',
+                                data:{
+                                    id: rowData.id,
+                                    is_default: $(this).val()
+                                },
+                                error:function(err){
+                                    console.log(err);
+                                },
+                                success:function(res){
+                                    tableObj.ajax.reload()
+                                }
+                            });
+
+                        });
+                        $(cell).on("blur", ":input", function () {
+                            var text = $(this).find("option:selected").text();
+                            tableObj.cell(cell).data(text)
+                        });
+                    }
+                },
 			],
 			
 		});

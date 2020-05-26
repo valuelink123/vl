@@ -13,10 +13,10 @@ class ManageDistributeTimeController extends Controller
 	
 	public function __construct()
 	{
-
 		$this->middleware('auth');
 		parent::__construct();
 	}
+
 	public function safetyStockDays(Request $req)
     {
         $usersIdName = $this->getUsersIdName();
@@ -350,6 +350,7 @@ class ManageDistributeTimeController extends Controller
             $regions[] = $val->region;
         }
         $usersIdName = $this->getUsersIdName();
+        $isDefault = $this->getIsDefault();
 
         if ($req->isMethod('GET')) {
             return view('manageDistributeTime.internationalTransportTime', compact('factoryCodes','logisticsProviders','transportModes','regions','usersIdName'));
@@ -361,9 +362,8 @@ class ManageDistributeTimeController extends Controller
         foreach ($data as $key => $val) {
             $data[$key]['transport_mode'] = array_get($transportModes,$val['transport_mode_code']);
             $data[$key]['maintainer'] = array_get($usersIdName,$val['maintainer']);
-
+            $data[$key]['is_default'] = array_get($isDefault,$val['is_default'], '');
         }
-//var_dump($data);exit;
         return compact('data');
 
 	}
@@ -381,35 +381,31 @@ class ManageDistributeTimeController extends Controller
                     $newname = date('Y-m-d-H-i-S').'-'.uniqid().'.'.$ext;
                     $newpath = '/uploads/reviewUpload/'.date('Ymd').'/';
                     $inputFileName = public_path().$newpath.$newname;
-//                echo $inputFileName; exit;
                     $bool = $file->move(public_path().$newpath,$newname);
 
                     if($bool){
                         $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($inputFileName);
                         $importData = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
                         $successCount = $addCount = $errorCount = 0;
-//                        var_dump($importData);  exit;
-
                         foreach($importData as $key => $data){
                             if($key==1){
-
                                 if(array_get($data,'A')!='工厂' || array_get($data,'B')!='物流商' || array_get($data,'C')!='运输方式' || array_get($data,'D')!='地区'){
                                     die('Customer profile import template error');
                                 }
                             }
                             if($key>1 && array_get($data,'A') && array_get($data,'B') && array_get($data,'C') && array_get($data,'D')){
-
                                 $exists = DB::connection('amazon')->table('international_transport_time')->where('factory_code',trim($data['A']))->where('logistics_provider',trim($data['B']))->where('transport_mode_code',trim($data['C']))->where('region',trim($data['D']))->first();
-//                                var_dump($exists); exit;
-
                                 if($exists){
                                     $update_result = DB::connection('amazon')->table('international_transport_time')->where('factory_code',trim($data['A']))->where('logistics_provider',trim($data['B']))->where('transport_mode_code',trim($data['C']))->where('region',trim($data['D']))->update(array(
-                                        'etd'=>trim($data['E']),
-                                        'eta'=>trim($data['F']),
-                                        'clearance_days'=>trim($data['G']),
-                                        'delivery_days'=>trim($data['H']),
-                                        'fba_sign_in_days'=>trim($data['I']),
-                                        'total_days'=>intval(trim($data['E']))+intval(trim($data['F']))+intval(trim($data['G']))+intval(trim($data['H']))+intval(trim($data['I']))
+                                        'etd'=>intval(trim($data['E'])),
+                                        'eta'=>intval(trim($data['F'])),
+                                        'clearance_days'=>intval(trim($data['G'])),
+                                        'delivery_days'=>intval(trim($data['H'])),
+                                        'fba_sign_in_days'=>intval(trim($data['I'])),
+                                        'total_days'=>intval(trim($data['E']))+intval(trim($data['F']))+intval(trim($data['G']))+intval(trim($data['H']))+intval(trim($data['I'])),
+                                        'maintainer'=>Auth::user()->id,
+                                        'maintain_time'=>date('Y-m-d H:i:s')
+
                                     ));
                                     if ($update_result) {
                                         $successCount++;
@@ -421,12 +417,14 @@ class ManageDistributeTimeController extends Controller
                                             'logistics_provider'=>trim($data['B']),
                                             'transport_mode_code'=>trim($data['C']),
                                             'region'=>trim($data['D']),
-                                            'etd'=>trim($data['E']),
-                                            'eta'=>trim($data['F']),
-                                            'clearance_days'=>trim($data['G']),
-                                            'delivery_days'=>trim($data['H']),
-                                            'fba_sign_in_days'=>trim($data['I']),
-                                            'total_days'=>intval(trim($data['E']))+intval(trim($data['F']))+intval(trim($data['G']))+intval(trim($data['H']))+intval(trim($data['I']))
+                                            'etd'=>intval(trim($data['E'])),
+                                            'eta'=>intval(trim($data['F'])),
+                                            'clearance_days'=>intval(trim($data['G'])),
+                                            'delivery_days'=>intval(trim($data['H'])),
+                                            'fba_sign_in_days'=>intval(trim($data['I'])),
+                                            'total_days'=>intval(trim($data['E']))+intval(trim($data['F']))+intval(trim($data['G']))+intval(trim($data['H']))+intval(trim($data['I'])),
+                                            'maintainer'=>Auth::user()->id,
+                                            'maintain_time'=>date('Y-m-d H:i:s')
                                         )
                                     );
                                     if ($insert_result) {
@@ -464,16 +462,16 @@ class ManageDistributeTimeController extends Controller
         if(isset($_POST['etd']) && $_POST['etd']){
             $updateData['etd'] = intval($_POST['etd']);
             $updateData['total_days'] = $total_days - $etd + intval($_POST['etd']);
-
         }else if(isset($_POST['eta']) && $_POST['eta']){
             $updateData['eta'] = intval($_POST['eta']);
             $updateData['total_days'] = $total_days - $eta + intval($_POST['eta']);
         }else if(isset($_POST['clearance_days']) && $_POST['clearance_days']){
             $updateData['clearance_days'] = intval($_POST['clearance_days']);
             $updateData['total_days'] = $total_days - $clearance_days + intval($_POST['clearance_days']);
+        }else if(isset($_POST['is_default']) && $_POST['is_default']){
+            $updateData['is_default'] = $_POST['is_default'];
         }else{
-            $updateData['delivery_days'] = intval($_POST['delivery_days']);
-            $updateData['total_days'] = $total_days - $delivery_days + intval($_POST['delivery_days']);
+            //...
         }
 
         $updateData['maintainer'] = intval(Auth::user()->id);
@@ -508,6 +506,78 @@ class ManageDistributeTimeController extends Controller
 
         DB::commit();
 
+    }
+
+    public function exportTransportTime(Request $req){
+        $ids = $req->input('ids');
+        //有勾选
+        if($ids){
+            $idArray = explode(',',$ids);
+            $data = DB::connection('amazon')->table('international_transport_time')->whereIn('id', $idArray)->get();
+            $data = json_decode(json_encode($data),true);
+        }
+        //没有勾选，导出全部数据
+        else{
+            $data = DB::connection('amazon')->table('international_transport_time');
+            if($req->input('factory_code')){
+                $data = $data->where('factory_code', '=', $req->input('factory_code'));
+            }
+            if($req->input('logistics_provider')){
+                $data = $data->where('logistics_provider', '=', $req->input('logistics_provider'));
+            }
+            if($req->input('transport_mode_code')){
+                $data = $data->where('transport_mode_code', '=', $req->input('transport_mode_code'));
+            }
+            if($req->input('region')){
+                $data = $data->where('region', '=', $req->input('region'));
+            }
+            if($req->input('maintainer')){
+                $data = $data->where('maintainer', '=', $req->input('maintainer'));
+            }
+            $data = $data->get();
+            $data = json_decode(json_encode($data),true);
+        }
+
+        $usersIdName = $this->getUsersIdName();
+        $transportModes = $this->getTransportModes();
+        $isDefault = $this->getIsDefault();
+        $arrayData = array();
+        $headArray = array('工厂','物流商','运输方式代码','运输方式','地区','ETD','ETA','清关日期','派送日期','FBA签收日期','总时效','维护人','维护时间','是否默认');
+        $arrayData[] = $headArray;
+        foreach ($data as $key=>$val){
+            $arrayData[] = array(
+                $val['factory_code'],
+                $val['logistics_provider'],
+                $val['transport_mode_code'],
+                array_get($transportModes,$val['transport_mode_code']),
+                $val['region'],
+                $val['etd'],
+                $val['eta'],
+                $val['clearance_days'],
+                $val['delivery_days'],
+                $val['fba_sign_in_days'],
+                $val['total_days'],
+                array_get($usersIdName,$val['maintainer']),
+                $val['maintain_time'],
+                array_get($isDefault,$val['is_default']),
+            );
+        }
+        if($arrayData){
+            $spreadsheet = new Spreadsheet();
+            $spreadsheet->getActiveSheet()
+                ->fromArray(
+                    $arrayData,  // The data to set
+                    NULL,        // Array values with this value will not be set
+                    'A1'         // Top left coordinate of the worksheet range where
+                //    we want to set these values (default is A1)
+                );
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');//告诉浏览器输出07Excel文件
+            header('Content-Disposition: attachment;filename="Export_International_Transport_Time.xlsx"');//告诉浏览器输出浏览器名称
+            header('Cache-Control: max-age=0');//禁止缓存
+            $writer = new Xlsx($spreadsheet);
+            $writer->save('php://output');
+        }
+        die();
     }
 
 
@@ -546,7 +616,7 @@ class ManageDistributeTimeController extends Controller
     }
 
     public function getIsDefault(){
-        return array('1'=>'是','2'=>'否');
+        return array('1'=>'Y','2'=>'N');
     }
 
 }
