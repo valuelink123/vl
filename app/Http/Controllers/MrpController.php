@@ -13,6 +13,7 @@ use App\SapPurchase;
 use App\DailyStatistic;
 use App\SapPurchaseRecord;
 use App\SapSkuSite;
+use App\InternationalTransportTime;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Services\MultipleQueue;
@@ -104,7 +105,6 @@ class MrpController extends Controller
 			return view('mrp/list', ['date'=>$date,'bgs'=>$this->getBgs(),'bus'=>$this->getBus()]);
 		}
 		$date_from = date('Y-m-d',strtotime($date.' next monday'));
-		$date_week_end = date('Y-m-d',strtotime($date.' +1 weeks sunday'));
 		$date_to = date('Y-m-d',strtotime($date.' +22 weeks sunday'));
 		$searchField = array('bg'=>'a.bg','bu'=>'a.bu','site'=>'a.marketplace_id','sku'=>'a.sku','sku_level'=>'a.status','sku_status'=>'a.sku_status','sku_level'=>'a.status','sap_seller_id'=>'a.sap_seller_id');
 		
@@ -162,7 +162,7 @@ class MrpController extends Controller
 			$data[$key]['22_week_plan_total'] = intval($val['quantity']);
 			
 			for($i=1;$i<=22;$i++){
-				$data[$key][$i.'_week_plan'] = ($type!='sku' && date('Y-m-d',strtotime($date_week_end.' +'.$i.' weeks sunday'))>=date('Y-m-d',strtotime('+1 weeks sunday')))?('<a class="week_plan editable" title="'.$val['asin'].' '.array_get($siteCode,$val['marketplace_id']).' weeks '.$i.' Plan" href="javascript:;" id="'.$val['asin'].'--'.$val['marketplace_id'].'--'.$val['sku'].'--'.date('Y-m-d',strtotime($date_week_end.' +'.$i.' weeks sunday')).'" data-pk="'.$val['asin'].'--'.$val['marketplace_id'].'--'.$val['sku'].'--'.date('Y-m-d',strtotime($date_week_end.' +'.$i.' weeks sunday')).'" data-type="text" data-placement="'.$data_placement.'">'.array_get($asin_plans,date('Y-m-d',strtotime($date_week_end.' +'.$i.' weeks sunday')).'.quantity',0).'</a>'):array_get($asin_plans,date('Y-m-d',strtotime($date_week_end.' +'.$i.' weeks sunday')).'.quantity',0);
+				$data[$key][$i.'_week_plan'] = ($type!='sku' && date('Y-m-d',strtotime($date.' +'.$i.' weeks sunday'))>=date('Y-m-d',strtotime('+1 weeks sunday')))?('<a class="week_plan editable" title="'.$val['asin'].' '.array_get($siteCode,$val['marketplace_id']).' weeks '.$i.' Plan" href="javascript:;" id="'.$val['asin'].'--'.$val['marketplace_id'].'--'.$val['sku'].'--'.date('Y-m-d',strtotime($date.' +'.$i.' weeks sunday')).'" data-pk="'.$val['asin'].'--'.$val['marketplace_id'].'--'.$val['sku'].'--'.date('Y-m-d',strtotime($date.' +'.$i.' weeks sunday')).'" data-type="text" data-placement="'.$data_placement.'">'.array_get($asin_plans,date('Y-m-d',strtotime($date.' +'.$i.' weeks sunday')).'.quantity',0).'</a>'):array_get($asin_plans,date('Y-m-d',strtotime($date.' +'.$i.' weeks sunday')).'.quantity',0);
             }
 		}
 		
@@ -233,6 +233,9 @@ class MrpController extends Controller
 		$sku_purchase_info = SapPurchaseRecord::where('sku',$sku)->orderBy('created_date','desc')->first()->toArray();
 		$sku_info['min_purchase_quantity'] = $sku_purchase_info['min_purchase_quantity'];
 		$sku_info['estimated_cycle'] = $sku_purchase_info['estimated_cycle'];
+		$sku_info['international_transport_time'] = InternationalTransportTime::where('factory_code',array_get(getMarketplaceCode(),$marketplace_id.'.fba_factory_warhouse.0.sap_factory_code'))->where('is_default',1)->value('total_days');
+		
+		
 		$sales_plan=[];
 		if($show=='week'){
 			$asin_symmetrys = DB::connection('amazon')->table('symmetry_asins')->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('date','>=',$date_from)->where('date','<=',$date_to)->selectRaw("YEARWEEK(date,3) as wdate,sum(quantity) as quantity")->groupBy(['wdate'])->pluck('quantity','wdate');
@@ -550,7 +553,7 @@ class MrpController extends Controller
 			$data[$key]['fba_transfer'] = intval($val['sum_estimated_afn']);
 			$data[$key]['fbm_stock'] = intval($val['mfn_sellable']);
 			$data[$key]['stock_keep'] = (round($val['daily_sales'],2)==0)?'∞':date('Y-m-d',strtotime('+'.intval(($val['afn_sellable']+$val['afn_reserved']+$val['mfn_sellable']+$val['sum_estimated_afn'])/round($val['daily_sales'],2)).'days'));
-			$data[$key]['sz'] = 0;
+			$data[$key]['sz'] = intval($val['sz_sellable']);
 			$data[$key]['in_make'] = intval($val['sum_estimated_purchase']);
 			$data[$key]['out_stock'] = intval($val['out_stock_count']);
 			$data[$key]['out_stock_date'] = $val['out_stock_date'];

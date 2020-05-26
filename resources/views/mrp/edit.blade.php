@@ -218,7 +218,7 @@ white-space: nowrap;
 						<td>{{$sku_info['level']}}</td>
 						<td>{{round($sku_info['cost'],2)}}</td>
 						<td>{{intval($sku_info['estimated_cycle'])}}</td>
-						<td>-</td>
+						<td>{{intval($sku_info['international_transport_time'])}}</td>
 						<td>{{intval($sku_info['min_purchase_quantity'])}}</td>
 						<td>{{$sku_info['safe_quantity']}}</td>
 						<td>{{$sku_info['sap_seller_name']}}</td>
