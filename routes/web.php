@@ -249,6 +249,7 @@ Route::get('/roi_export', 'RoiController@export');
 Route::get('/roi_export_show_page', 'RoiController@exportShowPage');
 Route::Post('/roi_archive', 'RoiController@archive');
 Route::get('/roi_copy', 'RoiController@copy');
+Route::post('/roi_fresh_time', 'RoiController@roiRefreshTime');
 
 Route::match(['post','get'],'/mrp', 'MrpController@index');
 Route::match(['post','get'],'/mrp/list', 'MrpController@list');

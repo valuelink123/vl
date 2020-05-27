@@ -621,12 +621,6 @@
             alert("total sales amount cannot be 0.");
             return false;
         }
-        var tariff_rate = $('#tariff_rate').val();
-        if(tariff_rate == '' || tariff_rate == '0.00'){
-            alert("tariff rate cannot be 0.");
-            $('#tariff_rate').focus();
-            return false;
-        }
 
         $.ajax({
             type: 'post',
