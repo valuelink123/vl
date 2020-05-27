@@ -852,6 +852,15 @@ class MarketingPlanController extends Controller
         $sap_seller_id = $user['sap_seller_id']>0?$user['sap_seller_id']:0;
         return view('marketingPlan.test', ['sap_seller_id' => $sap_seller_id]);
     }
+
+    /**
+     * 导入Excel
+     * @param Request $request
+     * @param int $sheet
+     * @return mixed
+     * @throws \PHPExcel_Exception
+     * @throws \PHPExcel_Reader_Exception
+     */
     public function importExecl(Request $request, $sheet=0){
         include( "../vendor/PHPExcel/PHPExcel.php" );
         header("content-type:text/html;charset=utf-8");

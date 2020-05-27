@@ -257,13 +257,17 @@ Route::match(['post','get'],'/shipment/index', 'ShipmentController@index');//调
 Route::match(['post','get'],'/shipment/addShipment', 'ShipmentController@addShipment');//新增调拨需求列表
 Route::match(['post','get'],'/shipment/detailShipment', 'ShipmentController@detailShipment');//调拨需求  详情页面
 Route::match(['post','get'],'/shipment/upShipment', 'ShipmentController@upShipment');//新增调拨需求列表
-Route::match(['post','get'],'/shipment/upAllStatus', 'ShipmentController@upAllStatus');//批量更新状态
+Route::match(['post'],'/shipment/upAllStatus', 'ShipmentController@upAllStatus');//批量更新状态
 Route::match(['post','get'],'/shipment/purchaseList', 'ShipmentController@purchaseList');//采购列表页面
-Route::match(['post','get'],'/shipment/upAllPurchase', 'ShipmentController@upAllPurchase');//批量更改 采购状态
+Route::match(['post'],'/shipment/upAllPurchase', 'ShipmentController@upAllPurchase');//批量更改 采购状态
 Route::match(['post','get'],'/shipment/detailPurchase', 'ShipmentController@detailPurchase');// 采购 详情
 Route::match(['post','get'],'/shipment/addPurchase', 'ShipmentController@addPurchase');// 采购 新增
-Route::match(['post','get'],'/shipment/upPurchase', 'ShipmentController@upPurchase');// 采购 更新
+Route::match(['post'],'/shipment/upPurchase', 'ShipmentController@upPurchase');// 采购 更新
+Route::match(['post','get'],'/shipment/allotProgress', 'ShipmentController@allotProgress');//调拨进度列表
+Route::match(['post'],'/shipment/upCargoData', 'ShipmentController@upCargoData');//修改 大货资料
+
 Route::match(['post'],'/shipment/getNextData', 'ShipmentController@getNextData');//请求下一级 asin 或者 sellersku列表
+Route::match(['post'],'/shipment/getSellerSku', 'ShipmentController@getSellerSku');
 
 
 Route::get('/marketingPlan/test', 'MarketingPlanController@test')->name('marketingPlan');
