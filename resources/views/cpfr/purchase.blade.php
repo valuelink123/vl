@@ -223,7 +223,7 @@
 	    left: 0;
 		font-size: 12px;
 		font-weight: normal;
-		display: none;
+		display: block;
 	}
 	.wrap_one_single {
 		height: auto;
@@ -441,20 +441,16 @@
 			<label for="" class="" style="display: block;">审核</label>
 			<select name="" id="" class="col-sm-12"></select>
 		</div>
-		<form action="" method="get" class="radio_form wrap_one_single">
-			<label><input name="Fruit" type="radio" value="" checked="checked" />调拨需求</label> 
-			<label><input name="Fruit" type="radio" value="" />采购需求</label>	
-		</form>
 		<div class="warp_box">
-			<label for="" class="must wrap_one_single">SKU<select name="" id=""></select><b class="err plan_status_err">请选择SKU</b></label>
-			<label for="" class="must wrap_one_single">ASIN<select name="" id=""></select><b class="err plan_status_err">请选择ASIN</b></label>
+			<label for="" class="must wrap_one_single">SKU<select name="" id=""></select><b class="err plan_status_err">SKU不能为空!</b></label>
+			<label for="" class="must wrap_one_single">ASIN<select name="" id=""></select><b class="err plan_status_err">ASIN不能为空!</b></label>
 		</div>
 		<div class="warp_box">
-			<label for="" class="must wrap_one_single">SellerSKU<select name="" id=""></select><b class="err plan_status_err">请选择SellerSKU</b></label>
-			<label for="" class="must wrap_one_single">调入工厂<select name="" id=""></select><b class="err plan_status_err">请选择调入工厂</b></label>
+			<label for="" class="must wrap_one_single">SellerSKU<select name="" id=""></select><b class="err plan_status_err">SellerSKU不能为空!</b></label>
+			<label for="" class="must wrap_one_single">调入工厂<select name="" id=""></select><b class="err plan_status_err">调入工厂不能为空!</b></label>
 		</div>
 		<div class="warp_box">
-			<label class="must wrap_one_single" for="">数量<input type="text"><b class="err plan_status_err">请输入数量</b></label>
+			<label class="must wrap_one_single" for="">数量<input type="text"><b class="err plan_status_err">数量不能为空!</b></label>
 			<label class="must wrap_one_single" for="">
 				到货时间
 				<div class="input-group date date-picker margin-bottom-5 bw9" id="maskDate">
@@ -465,7 +461,7 @@
 						</button>
 					</span>
 				</div>
-				<b class="err plan_status_err">请选择到货时间</b>
+				<b class="err plan_status_err">到货时间不能为空!</b>
 			</label>
 		</div>
 		<!-- <div class="warp_box">
