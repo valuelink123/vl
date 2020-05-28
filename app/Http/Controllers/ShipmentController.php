@@ -34,7 +34,7 @@ class ShipmentController extends Controller
      */
     public function index(Request $request)
     {
-        //$user = Auth::user()->toArray();// todo
+        $user = Auth::user()->toArray();// todo
         /** 超级权限*/
         $ADMIN_EMAIL = Asin::ADMIN_EMAIL;
         $DOMIN_MARKETPLACEID_SX = Asin::DOMIN_MARKETPLACEID_SX;
