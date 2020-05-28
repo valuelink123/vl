@@ -32,6 +32,7 @@ Route::get('/total', 'UserController@total')->name('total');
 Route::get('/etotal', 'UserController@etotal')->name('etotal');
 Route::get('/tran', 'TranController@index')->name('tran');
 Route::get('/price', 'PriceController@index')->name('price');
+Route::get('/reservedProducts', 'PriceController@reservedProducts')->name('reservedProducts');
 Route::Post('/price/get', 'PriceController@get')->name('getPrice');
 Route::Post('/price/getStockAge', 'PriceController@getStockAge')->name('getStockAge');
 Route::resource('rule', 'RuleController');
@@ -253,6 +254,7 @@ Route::post('/mrp/import', 'MrpController@import');
 //CPFR协同补货
 Route::get('/cpfr/index', 'CpfrController@index')->name('index');
 Route::get('/cpfr/allocationProgress', 'CpfrController@allocationProgress')->name('allocationProgress');
+
 Route::match(['post','get'],'/shipment/index', 'ShipmentController@index');//调拨需求列表
 Route::match(['post','get'],'/shipment/addShipment', 'ShipmentController@addShipment');//新增调拨需求列表
 Route::match(['post','get'],'/shipment/detailShipment', 'ShipmentController@detailShipment');//调拨需求  详情页面
@@ -272,6 +274,7 @@ Route::match(['post'],'/shipment/importExecl', 'ShipmentController@getSellerSku'
 
 
 Route::get('/marketingPlan/test', 'MarketingPlanController@test')->name('marketingPlan');
+
 
 Route::get('/cpfr/purchase', 'CpfrController@purchase')->name('purchase');
 Route::get('/cpfr/barcode', 'CpfrController@barcode')->name('barcode');

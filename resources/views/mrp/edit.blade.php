@@ -61,7 +61,7 @@ white-space: nowrap;
 					<form action="{{url('mrp/edit')}}" method="get" enctype="multipart/form-data" >
 					<div class="col-md-3 ">
                         <div class="input-group date date-picker " data-date-format="yyyy-mm-dd">
-                            <span class="input-group-addon">Date</span>
+                            <span class="input-group-addon">起始日期</span>
                             <input  class="form-control" value="{{$date_from}}" data-options="format:'yyyy-mm-dd'" id="date_from" name="date_from"
                                    autocomplete="off"/>
                         </div>
@@ -69,7 +69,7 @@ white-space: nowrap;
                     </div>
 					<div class="col-md-3">
                         <div class="input-group date date-picker " data-date-format="yyyy-mm-dd">
-                            <span class="input-group-addon">Date</span>
+                            <span class="input-group-addon">结束日期</span>
                             <input  class="form-control" value="{{$date_to}}" data-options="format:'yyyy-mm-dd'" id="date_to" name="date_to"
                                    autocomplete="off"/>
                         </div>
@@ -78,7 +78,7 @@ white-space: nowrap;
 					<div class="col-md-2">
                        
                         <div class="input-group">
-                            <span class="input-group-addon">Site</span>
+                            <span class="input-group-addon">站点</span>
                             <select class="form-control"  id="marketplace_id" name="marketplace_id">
                                 <option value="">Select</option>
                                 @foreach(getSiteCode() as $key=>$val)
@@ -109,23 +109,23 @@ white-space: nowrap;
 					<table class="table table-striped table-bordered table-hover tbl1">
 					<thead>
 					  <tr class="head" >
-					  	<td width="10%">Asin</td>
-						<td width="5%">Status</td>
-						<td width="5%">StockKeep</td>
-						<td width="5%">D/Sales</td>
-						<td width="5%">Plan</td>
-						<td width="5%">FBAStock</td>
-						<td width="5%">FBATran</td>
-						<td width="5%">FBM</td>
-						<td width="5%">SZ</td>
-						<td width="5%">InMake</td>
-						<td width="5%">OutStock</td>
-						<td width="7%">OutStockDate</td>
-						<td width="5%">OverStock</td>
-						<td width="7%">OverStockDate</td>
-						<td width="5%">StockScore</td>
-						<td width="5%">Dist</td>
-						<td width="11%">Next Request</td>
+					  	<td width="10%">帖子</td>
+						<td width="5%">帖子状态</td>
+						<td width="5%">库存维持天数</td>
+						<td width="5%">加权日均</td>
+						<td width="5%">销售计划</td>
+						<td width="5%">FBA在库</td>
+						<td width="5%">FBA在途</td>
+						<td width="5%">FBM库存</td>
+						<td width="5%">深仓</td>
+						<td width="5%">在制</td>
+						<td width="5%">缺货天数</td>
+						<td width="7%">缺货日</td>
+						<td width="5%">滞销天数</td>
+						<td width="7%">滞销日</td>
+						<td width="5%">库存质量得分</td>
+						<td width="5%">预计配货</td>
+						<td width="11%">下次补货请求</td>
 					  </tr>
 					 </thead>
 					  <tbody>
@@ -139,7 +139,7 @@ white-space: nowrap;
 						
 						<a class="pull-right" href="https://{{array_get(getSiteUrl(),$v->marketplace_id)}}/dp/{{$v->asin}}" target="_blank"><i class="fa fa-amazon"></i></a></td>
 						<td>{{((intval($v->buybox_sellerid)>=0)?'OnLine':'OffLine')}}</td>
-						<td>{{(round($v->daily_sales,2)==0)?'��':date('Y-m-d',strtotime('+'.intval(($v->afn_sellable+$v->afn_reserved)/round($v->daily_sales,2)).'days'))}}</td>
+						<td>{{(round($v->daily_sales,2)==0)?'∞':date('Y-m-d',strtotime('+'.intval(($v->afn_sellable+$v->afn_reserved)/round($v->daily_sales,2)).'days'))}}</td>
 						<td>{{round($v->daily_sales,2)}}</td>
 						<td  id="{{$v->asin}}">{{intval($v->quantity)}}</td>
 						<td>{{intval($v->afn_sellable+$v->afn_reserved)}}</td>
@@ -149,10 +149,10 @@ white-space: nowrap;
 						<td>{{intval($v->sum_estimated_purchase)}}</td>
 						<td>{{intval($v->out_stock_count)}}</td>
 						<td>{{$v->out_stock_date}}</td>
-						<td>0</td>
-						<td>0</td>
-						<td>0</td>
-						<td>{{(intval($v->afn_sellable+$v->afn_reserved+$v->mfn_sellable+$v->sum_estimated_afn-$v->sum_quantity_miss)<0?intval($v->afn_sellable+$v->afn_reserved+$v->mfn_sellable+$v->sum_estimated_afn-$v->sum_quantity_miss):0)}}</td>
+						<td>{{intval($v->over_stock_count)}}</td>
+						<td>{{$v->over_stock_date}}</td>
+						<td>{{intval($v->out_stock_count)+intval($v->over_stock_count)*3+intval($v->unsafe_count)*4}}</td>
+						<td>{{(intval($v->afn_sellable+$v->afn_reserved+$v->mfn_sellable+$v->sum_estimated_afn-$v->sum_quantity_miss)<0?abs(intval($v->afn_sellable+$v->afn_reserved+$v->mfn_sellable+$v->sum_estimated_afn-$v->sum_quantity_miss)):0)}}</td>
 						<td>0</td>
 						</td>
 					  </tr>
@@ -165,12 +165,15 @@ white-space: nowrap;
 						$t_estimated_purchase+=intval($v->sum_estimated_purchase);
 						$t_out_stock_count+=intval($v->out_stock_count);
 						$t_out_stock_date=($t_out_stock_date==0 || $t_out_stock_date>$v->out_stock_date)?$v->out_stock_date:$t_out_stock_date;
-						$t_dist+=(intval($v->afn_sellable+$v->afn_reserved+$v->mfn_sellable+$v->sum_estimated_afn-$v->sum_quantity_miss)<0?intval($v->afn_sellable+$v->afn_reserved+$v->mfn_sellable+$v->sum_estimated_afn-$v->sum_quantity_miss):0);
+						$t_over_stock_count+=intval($v->over_stock_count);
+						$t_over_stock_date=($t_over_stock_date==0 || $t_over_stock_date>$v->over_stock_date)?$v->over_stock_date:$t_over_stock_date;
+						$t_score+=intval($v->out_stock_count)+intval($v->over_stock_count)*3+intval($v->unsafe_count)*4;
+						$t_dist+=(intval($v->afn_sellable+$v->afn_reserved+$v->mfn_sellable+$v->sum_estimated_afn-$v->sum_quantity_miss)<0?abs(intval($v->afn_sellable+$v->afn_reserved+$v->mfn_sellable+$v->sum_estimated_afn-$v->sum_quantity_miss)):0);
 					  ?>
 					  @endforeach
 					  <tr id="asins_total">
-						<td colspan="2"> Total: </td>
-						<td>{{(($t_daily_sales==0)?'��':date('Y-m-d',strtotime('+'.intval($t_afn_stock/$t_daily_sales).'days')))}}</td>
+						<td colspan="2"> : </td>
+						<td>{{(($t_daily_sales==0)?'∞':date('Y-m-d',strtotime('+'.intval($t_afn_stock/$t_daily_sales).'days')))}}</td>
 						<td>{{$t_daily_sales}}</td>
 						<td>{{$t_sz_stock}}</td>
 						<td>{{$t_afn_stock}}</td>
@@ -180,9 +183,9 @@ white-space: nowrap;
 						<td>{{$t_estimated_purchase}}</td>
 						<td>{{$t_out_stock_count}}</td>
 						<td>{{$t_out_stock_date}}</td>
-						<td>0</td>
-						<td>0</td>
-						<td>0</td>
+						<td>{{$t_over_stock_count}}</td>
+						<td>{{$t_over_stock_date}}</td>
+						<td>{{$t_score}}</td>
 						<td>{{$t_dist}}</td>
 						<td>0</td>
 						</td>
@@ -195,33 +198,33 @@ white-space: nowrap;
 					<thead>
 					  <tr class="head" >
 					  	<td width="10%">Sku</td>
-						<td width="10%">Status</td>
-						<td width="8%">Level</td>
-						<td width="8%">Cost</td>
-						<td width="8%">PurchasingCycle</td>
-						<td width="8%">HeadAging</td>
+						<td width="10%">状态</td>
+						<td width="8%">等级</td>
+						<td width="8%">成本</td>
+						<td width="8%">采购周期</td>
+						<td width="8%">头程时效</td>
 						<td width="8%">MOQ</td>
-						<td width="8%">SafeStockDay</td>
-						<td width="8%">Seller</td>
+						<td width="8%">安全库存</td>
+						<td width="8%">销售员</td>
 						<td width="8%">BG</td>
 						<td width="8%">BU</td>
-						<td width="8%">Planer</td>
+						<td width="8%">计划员</td>
 					  </tr>
 					 </thead>
 					 <tbody>
 					  <tr>
-						<td>{{$sku_info->sku}}</td>
-						<td>{{array_get(getSkuStatuses(),$sku_info->status,$sku_info->status)}}</td>
-						<td>{{$sku_info->level}}</td>
-						<td>{{round($sku_info->cost,2)}}</td>
-						<td>-</td>
-						<td>-</td>
-						<td>-</td>
-						<td>-</td>
-						<td>{{$sku_info->sap_seller_name}}</td>
-						<td>{{$sku_info->sap_seller_bg}}</td>
-						<td>{{$sku_info->sap_seller_bu}}</td>
-						<td>{{$sku_info->planer}}</td>
+						<td>{{$sku_info['sku']}}</td>
+						<td>{{array_get(getSkuStatuses(),$sku_info['status'],$sku_info['status'])}}</td>
+						<td>{{$sku_info['level']}}</td>
+						<td>{{round($sku_info['cost'],2)}}</td>
+						<td>{{intval($sku_info['estimated_cycle'])}}</td>
+						<td>{{intval($sku_info['international_transport_time'])}}</td>
+						<td>{{intval($sku_info['min_purchase_quantity'])}}</td>
+						<td>{{$sku_info['safe_quantity']}}</td>
+						<td>{{$sku_info['sap_seller_name']}}</td>
+						<td>{{$sku_info['sap_seller_bg']}}</td>
+						<td>{{$sku_info['sap_seller_bu']}}</td>
+						<td>{{$sku_info['planer']}}</td>
 
 						</td>
 					  </tr>
@@ -231,11 +234,11 @@ white-space: nowrap;
 						<div class="col-md-2">
                        
 							<div class="input-group">
-								<span class="input-group-addon">Cycle</span>
+								<span class="input-group-addon">显示周期</span>
 								<select class="form-control"  id="show" name="show">
-									<option value="">Day</option>
-									<option value="week" <?php if($show=='week') echo 'selected';?>>Week</option>
-									<option value="month" <?php if($show=='month') echo 'selected';?>>Month</option>
+									<option value="">日</option>
+									<option value="week" <?php if($show=='week') echo 'selected';?>>周</option>
+									<option value="month" <?php if($show=='month') echo 'selected';?>>月</option>
 								</select>
 							</div>
 							 <br>
@@ -244,10 +247,10 @@ white-space: nowrap;
 						<div class="col-md-2">
                        
 							<div class="input-group">
-								<span class="input-group-addon">Type</span>
+								<span class="input-group-addon">显示维度</span>
 								<select class="form-control"  id="type" name="type">
-									<option value="">Asin</option>
-									<option value="sku" <?php if($type=='sku') echo 'selected';?>>Sku</option>
+									<option value="">Asin维度</option>
+									<option value="sku" <?php if($type=='sku') echo 'selected';?>>Sku维度</option>
 								</select>
 							</div>
 							 <br>
@@ -274,18 +277,18 @@ white-space: nowrap;
 					</colgroup>
 					  <thead>
 					  <tr class="head" >
-						<td>Date</td>
-						<td>Estimated Sold</td>
-						<td>FirstPlan</td>
-						<td>LastPlan</td>
-						<td>SoldOut</td>
-						<td>FBAStock</td>
-						<td>Estimated SZ</td>
-						<td>Actual SZ</td>
-						<td>Estimated FBA</td>
-						<td>Actual FBA</td>
-						<td>Mrp</td>
-						<td>Remark</td>
+						<td>日期</td>
+						<td>销售预测</td>
+						<td>初始销售计划</td>
+						<td>销售计划</td>
+						<td>实际销售</td>
+						<td>FBA在库</td>
+						<td>预计交深仓</td>
+						<td>实际交深仓</td>
+						<td>预计FBA上架</td>
+						<td>实际FBA上架</td>
+						<td>MRP</td>
+						<td>备注</td>
 					  </tr>
 					  </thead>
 					 </table>

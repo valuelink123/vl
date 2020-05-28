@@ -69,12 +69,12 @@
 		<div class="content">
 			<div class="filter_box">
 				<div class="filter_option">
-					<label for="stationSelect">站点</label>
-					<select id="stationSelect" onchange="status_filter(this.value,0)">
+					<label for="siteSelect">站点</label>
+					<select id="siteSelect" onchange="status_filter(this.value,0)">
 						<option value ="">全部</option>
 						<option value ="US">US</option>
 						<option value ="CA">CA</option>
-						<option value ="MX">MX</option>
+						{{--<option value ="MX">MX</option>--}}
 						<option value ="UK">UK</option>
 						<option value ="FR">FR</option>
 						<option value ="DE">DE</option>
@@ -84,21 +84,30 @@
 					</select>
 				</div>
 				<div class="filter_option">
-					<label for="skuStatusSelect">出库工厂</label>
-					<select id="skuStatusSelect" onchange="status_filter(this.value,1)">
+					<label for="outboundSelect">出库工厂</label>
+					<select id="outboundSelect" onchange="status_filter(this.value,1)">
 						<option value ="">全部</option>
+						@foreach($sapFactoryCodes as $k=>$v)
+						<option value ="{{$v}}">{{$v}}</option>
+						@endforeach
 					</select>
 				</div>
 				<div class="filter_option">
-					<label for="skuStatusSelect">收货工厂</label>
-					<select id="skuStatusSelect" onchange="status_filter(this.value,2)">
+					<label for="inboundSelect">收货工厂</label>
+					<select id="inboundSelect" onchange="status_filter(this.value,2)">
 						<option value ="">全部</option>
+						@foreach($sapFactoryCodes as $k=>$v)
+							<option value ="{{$v}}">{{$v}}</option>
+						@endforeach
 					</select>
 				</div>
 				<div class="filter_option">
-					<label for="skuGradeSelect">维护人</label>
-					<select id="skuGradeSelect" onchange="status_filter(this.value,4)">
+					<label for="maintainerSelect">维护人</label>
+					<select id="maintainerSelect" onchange="change_maintainer(this.value,4)">
 						<option value ="">全部</option>
+						@foreach($usersIdName as $k=>$v)
+							<option value ="{{$k}}">{{$v}}</option>
+						@endforeach
 					</select>
 				</div>
 				<div style="float: right;margin-top: 30px;">
@@ -129,14 +138,17 @@
 	</table>
 </div>
 <script>
+    var usersIdName = eval(<?php echo json_encode($usersIdName);?>);
 	//正则判断输入整数
 	function validataInt(ob) {
-		if(ob.value.length==1){
-			ob.value=ob.value.replace(/[^1-9]/g,'')
-		}else{
-			ob.value=ob.value.replace(/\D/g,'')
-		}
+        ob.value = ob.value.replace(/^(0+)|[^\d]+/g,'');
 	}
+    //下载数据
+    $("#export").click(function(){
+        location.href='/manageDistributeTime/exportFbm';
+        return false;
+    });
+
 	//筛选
 	function status_filter(value,column) {
 	    if (value == '') {
@@ -144,9 +156,18 @@
 	    }
 	    else tableObj.column(column).search(value).draw();
 	}
+    function change_maintainer(value,column){
+        var userName = (value == '') ? '' : usersIdName[value];
+        status_filter(userName, column);
+    }
+
 	$(document).ready(function(){
 		//清空筛选
 		$('.clear').on('click',function(){
+            $('#siteSelect').val('');
+            $('#outboundSelect').val('');
+            $('#inboundSelect').val('');
+            $('#maintainerSelect').val('');
 			status_filter('',0)
 			status_filter('',1)
 			status_filter('',2)
@@ -158,7 +179,7 @@
 		
 		tableObj = $('#fbmTable').DataTable({
 			lengthMenu: [
-			    20, 50, 100, 'All'
+			    20, 50, 100
 			],
 			order: [ 5, "desc" ],
 			dispalyLength: 2, // default record count per page
@@ -167,67 +188,67 @@
 			serverSide: false,//是否所有的请求都请求服务器	
 			scrollX: "100%",
 			scrollCollapse: false,
-			/* ajax: {
-				url: "",
+			ajax: {
+				url: "/manageDistributeTime/fbm",
 				type: "post",
-				data : function(){
-					reqList = {
-						"sap_seller_id" : 1,
-					};
-					return reqList;
-				},
-				dataSrc:function(res){
-					console.log(res)
-					//return res
-				},
-			}, */	
-			data: [
-				{
-					id:1,
-					station: 'US',
-					outboundFactory: 'US02',
-					receivingFactory: 'US1',
-					day: 5,
-					maintainer: 'nana',
-					maintenanceDate: '2020-05-20',
-				},
-				{
-					id:2,
-					station: 'US',
-					outboundFactory: 'US02',
-					receivingFactory: 'US1',
-					day: 5,
-					maintainer: 'nana',
-					maintenanceDate: '2020-05-20',
-				},
-				{
-					id:3,
-					station: 'US',
-					outboundFactory: 'US02',
-					receivingFactory: 'US1',
-					day: 5,
-					maintainer: 'nana',
-					maintenanceDate: '2020-05-20',
-				}
-			],	
+//				data : function(){
+//					reqList = {
+//						"sap_seller_id" : 1,
+//					};
+//					return reqList;
+//				},
+//				dataSrc:function(res){
+//					console.log(res)
+//					//return res
+//				},
+			},
+//			data: [
+//				{
+//					id:1,
+//					station: 'US',
+//					outboundFactory: 'US02',
+//					receivingFactory: 'US1',
+//					day: 5,
+//					maintainer: 'nana',
+//					maintenanceDate: '2020-05-20',
+//				},
+//				{
+//					id:2,
+//					station: 'US',
+//					outboundFactory: 'US02',
+//					receivingFactory: 'US1',
+//					day: 5,
+//					maintainer: 'nana',
+//					maintenanceDate: '2020-05-20',
+//				},
+//				{
+//					id:3,
+//					station: 'US',
+//					outboundFactory: 'US02',
+//					receivingFactory: 'US1',
+//					day: 5,
+//					maintainer: 'nana',
+//					maintenanceDate: '2020-05-20',
+//				}
+//			],
 			columns: [
 				{
-					data: "station" ,
+					data: "site" ,
 				},
 				{
-					data: 'outboundFactory',
+					data: 'sap_factory_code_outbound',
 				},
 				{
-					data: 'receivingFactory',
+					data: 'sap_factory_code_inbound',
 				},
 				{
-					data: "day",
+					data: "transfer_time",
 				},
 				{
 					data: "maintainer",
 				},
 				{
-					data: "maintenanceDate",
+					data: "maintain_time",
 				},
 			], 
 			columnDefs: [
@@ -240,7 +261,7 @@
 			
 					createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
 						$(cell).click(function (e) {
-							$(this).html('<input type="text" onkeypress="validataInt(this)" οnkeyup="validataInt(this)" size="16" style="width: 100%"/>');
+							$(this).html('<input type="text" οnkeyup="validataInt(this)" size="16" style="width: 100%"/>');
 							var aInput = $(this).find(":input");
 							aInput.focus().val(cellData);
 						});
@@ -251,9 +272,10 @@
 								tableObj.cell(cell).data(text);
 								$.ajax({
 									type:"post",
-									url:'',
+									url:'/manageDistributeTime/updateFbm',
 									data:{
 										id: rowData.id,
+                                        transfer_time:rowData.transfer_time
 									},
 									error:function(err){
 									    console.log(err);

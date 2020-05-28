@@ -102,4 +102,8 @@ class PriceController extends Controller
 		$res = $saprfc->getStockAge(['sku' => strtoupper($request->get('sku')),'site' => strtoupper($request->get('site'))]);
 		die(json_encode((array_get($res,'1',[]))));
 	}
+	public function reservedProducts()
+	{
+	    return view('price/reservedProducts');
+	}
 }

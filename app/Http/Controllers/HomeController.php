@@ -153,9 +153,20 @@ class HomeController extends Controller
 		}
 		$sku_daily_info_where=$asin_where="";
 		if(array_get($_REQUEST,'keywords')){
-			$asins = $asins->where('asin.item_no','like','%'.array_get($_REQUEST,'keywords').'%');
-			$sku_daily_info_where=" and skus_daily_info.sku like '%".array_get($_REQUEST,'keywords')."%'";
-			$asin_where=" and asin.item_no like '%".array_get($_REQUEST,'keywords')."%'";
+			$keywords = array_get($_REQUEST,'keywords');
+			if($keywords){
+				$search_keys = explode(',', $keywords);
+				$asin_where.= " and ( asin.item_no ='".$keywords."'";
+				$sku_daily_info_where=" and ( skus_daily_info.sku ='".$keywords."'";
+				foreach($search_keys as $search_key){
+					$asin_where.= " or asin.item_no ='".$search_key."'";
+					$sku_daily_info_where.= " or skus_daily_info.sku ='".$search_key."'";
+				}
+				$asin_where.= ")";
+				$sku_daily_info_where.=")";
+			}
+		
+			$asins = $asins->whereRaw(substr($asin_where,5));
 		}
 		
 		if(array_get($_REQUEST,'sku_status')){

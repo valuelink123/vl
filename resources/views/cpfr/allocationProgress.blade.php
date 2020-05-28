@@ -478,9 +478,14 @@
 					data: 'method',
 					name: 'method',
 					render: function(data, type, row, meta) {
-						var content = '<button>打印</button>';
+						var content = '<button><a target="_blank" href="barcode?id='+row.id+'">打印</a></button>';
 						return content;
-					}
+					},
+					/* createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {						
+						$(cell).on( 'click', function () {
+							console.log(rowData.id) 
+						});
+					} */
 				},
 				{data: 'method',name: 'method',},
 				{

@@ -14,279 +14,290 @@
 	line-height:25px;
 	border-bottom:1px solid #666666;
 }
-.price_model{font-size:12px;}
+.price_model{
+	font-size:12px;
+	margin-top: 10px;
+}
 .price_model .form-control{
-height: 20px;
+	height: 20px;
     padding: 1px;
     font-size: 12px;
-	}
+}
 .price_model_list .col-md-1{
-width:14%; padding:5px;}
-
+	width:14%; padding:5px;
+}
 .border-right{
-border-right:1px solid #333;
+	border-right:1px solid #333;
 }
-
 .border-left{
-border-left:1px solid #333;
+	border-left:1px solid #333;
 }
-
 .border-bottom{
-border-bottom:1px solid #333;
+	border-bottom:1px solid #333;
 }
-
 .border-topbottom{
-border-bottom:1px solid #333;
-border-top:1px solid #333;
+	border-bottom:1px solid #333;
+	border-top:1px solid #333;
     height: 40px;
 }
+.portlet.light .portlet-body{
+	padding-top: 0;
+}
+.nav_list{
+	overflow: hidden;
+	height: 45px;
+	line-height: 45px;
+	border-bottom: 2px solid #fff;
+	padding: 0;
+	margin: 0;
+	background: #eef1f5;
+}
+.nav_list li{
+	float: left;
+	line-height: 34px;
+	padding: 5px 10px 0 10px;
+	margin: 0 10px 0 0;
+	list-style: none;
+}
+.nav_list li a{
+	text-decoration: none;
+	color: #666;
+	font-size: 14px;
+	font-weight: bold;
+}
+.nav_active{
+	border-bottom: 3px solid #4B8DF8;
+}
+.nav_active a{
+	color: #4B8DF8 !important;
+}
 </style>
-    <div class="col-lg-12 price_model" style="font-size:12px;">
-        <div class="col-md-12">
-<div class="portlet light portlet-fit bordered ">
-
-
-
-    <div class="portlet-title">
-        <div class="caption">
-            <i class="icon-microphone font-green"></i>
-            <span class="caption-subject bold font-green">Price Model</span>
-            <span class="caption-helper"><br />本模型用于计算同一SKU不同销售定价下不同销量所带来的经济效益差别, 作为销售定价的参考<br />建议每周测算一次建议每周测算一次,	最少每月重新测算一次并定价, 当定价与销量发生明显变化时亦须重新测算</span>
-        </div>
-
-    </div>
+<div class="col-lg-12 price_model" style="font-size:12px;">
+    <div class="col-md-12">
+		<div class="portlet light portlet-fit bordered ">
+			<div class="portlet-title">
+				<div class="caption">
+					<i class="icon-microphone font-green"></i>
+					<span class="caption-subject bold font-green">Price Model</span>
+					<span class="caption-helper">
+						<br />本模型用于计算同一SKU不同销售定价下不同销量所带来的经济效益差别, 作为销售定价的参考
+						<br />建议每周测算一次建议每周测算一次,	最少每月重新测算一次并定价, 当定价与销量发生明显变化时亦须重新测算
+					</span>
+				</div>
+			</div>
+			<ul class="nav_list">
+				<li><a href="/reservedProducts">保留品定价模型</a></li>
+				<li class="nav_active"><a href="/price">淘汰品定价模型</a></li>
+			</ul>
 	<form id="price_form">
     <div class="portlet-body" id="cus_price_form">
-<p id="dynamic_pager_content1" class="well" style="margin:0px; padding: 10px"> 	一、销售定价-经济效益测算：</p>
-		
-		
+		<p id="dynamic_pager_content1" class="well" style="margin:0px; padding: 25px 10px 10px 10px"> 	一、销售定价-经济效益测算：</p>
 		<div style="clear:both;height:30px;"></div>
-		<div class="col-md-3" style="border-right: 1px solid #ccc;">
-			
-			 <div class="col-md-6" style="line-height: 20px;
-    margin-bottom: 22px;">
+		<div class="col-md-3" style="border-right: 1px solid #ccc;">		
+			<div class="col-md-6" style="line-height: 20px;margin-bottom: 22px;">
 				<label class="control-label">SAP 物料号</label>
 				<input type="text" class="form-control"  name="I_MATNR" >
-			
-			 </div>
-			 <div class="col-md-6" style="line-height: 20px;
-    margin-bottom: 22px;">
-				 <label class="control-label">当前月份</label>
-				 <BR/>{{date('Y-m')}}
-			 </div>
-			 
-			 <div class="col-md-6" style="line-height: 20px;
-    margin-bottom: 22px;">
-				 <label class="control-label">销售站点</label>
-				 <select class="form-control" name="I_VKBUR">
-							@foreach (getSapSiteCode() as $k=>$v)
-								<option value="{{$k}}">{{$v}}</option>
-							@endforeach
-				 </select>	
-			 </div>
-			 
-			 <div class="col-md-6" style="line-height: 20px;
-    margin-bottom: 22px;">
-				 <label class="control-label">产品尺寸</label>
-				 <select class="form-control" name="I_ZCC">
+			</div>
+			<div class="col-md-6" style="line-height: 20px;margin-bottom: 22px;">
+				<label class="control-label">当前月份</label>
+				<BR/>{{date('Y-m')}}
+			</div> 
+			<div class="col-md-6" style="line-height: 20px;margin-bottom: 22px;">
+				<label class="control-label">销售站点</label>
+				<select class="form-control" name="I_VKBUR">
+					@foreach (getSapSiteCode() as $k=>$v)
+						<option value="{{$k}}">{{$v}}</option>
+					@endforeach
+				</select>	
+			</div>
+			<div class="col-md-6" style="line-height: 20px;margin-bottom: 22px;">
+				<label class="control-label">产品尺寸</label>
+				<select class="form-control" name="I_ZCC">
 					<option value="1">标准尺寸</option>
 					<option value="2">超大尺寸</option>
-				 </select>		
-			 </div>
+				</select>		
+			</div>
 		</div>								
 		<div class="form-group mt-repeater-c col-md-9 price_model_list">
-			 <div class="col-md-1 border-topbottom border-left">
-				 <label class="control-label head">价格类型</label>
-			 </div>
-			 <div class="col-md-1 border-topbottom border-left">
-				 <label class="control-label head">页面竞品定价(站点币种)</label>
-			 </div>
-			 <div class="col-md-1 border-topbottom">
-				 <label class="control-label head">该价格下销量</label>
-			 </div>
-			 <div class="col-md-1 border-topbottom border-left">
-				 <label class="control-label head">你的定价(站点币种)</label>
-			 </div>
-			 <div class="col-md-1 border-topbottom">
-				 <label class="control-label head">预计日销量</label>
-			 </div>
-			 <div class="col-md-1 border-topbottom">
-				 <label class="control-label head">促销价(站点币种)</label>
-			 </div>
-			 <div class="col-md-1 border-topbottom border-right">
-				 <label class="control-label head">月促销量</label>
-			 </div>
-
-								 
-							<div data-repeater-list="price-group">
-								<div data-repeater-item="" class="mt-repeater-item" style="border-bottom:none;" >
-									<div class=" mt-repeater-row">
-									<div class="col-md-1 border-left">
-										 <input class="form-control my_price" readonly="" name="price-group[0][ZLX]" type="text" value="Price1">
-									 </div>
-									 <div class="col-md-1 border-left ">
-										 <input class="form-control" name="price-group[0][ZJPJG]" type="text" value="0">
-									 </div>
-									 <div class="col-md-1">
-										 <input class="form-control" name="price-group[0][ZJPXL]" type="text" value="0">
-									 </div>
-									 <div class="col-md-1 border-left">
-										 <input class="form-control" name="price-group[0][PRICE]" type="text" value="0">
-									 </div>
-									 <div class="col-md-1">
-										<input class="form-control" name="price-group[0][ZXL]" type="text" value="0">
-									 </div>
-									 <div class="col-md-1">
-										<input class="form-control" name="price-group[0][CPRICE]" type="text" value="0">
-									 </div>
-									 <div class="col-md-1 border-right">
-										<input class="form-control" name="price-group[0][ZCXL]" type="text" value="0">
-									 </div>
-									
-									 
-									</div>
-								</div>
-							<div data-repeater-item="" class="mt-repeater-item" style="border-bottom:none;">
-									<div class=" mt-repeater-row">
-									<div class="col-md-1 border-left">
-										 <input class="form-control my_price" readonly="" name="price-group[1][ZLX]" type="text" value="Price2">
-									 </div>
-									 <div class="col-md-1 border-left">
-										 <input class="form-control" name="price-group[1][ZJPJG]" type="text" value="0">
-									 </div>
-									 <div class="col-md-1">
-										 <input class="form-control" name="price-group[1][ZJPXL]" type="text" value="0">
-									 </div>
-									 <div class="col-md-1 border-left">
-										 <input class="form-control" name="price-group[1][PRICE]" type="text" value="0">
-									 </div>
-									 <div class="col-md-1">
-										<input class="form-control" name="price-group[1][ZXL]" type="text" value="0">
-									 </div>
-									 <div class="col-md-1">
-										<input class="form-control" name="price-group[1][CPRICE]" type="text" value="0">
-									 </div>
-									 <div class="col-md-1 border-right">
-										<input class="form-control" name="price-group[1][ZCXL]" type="text" value="0">
-									 </div>
-									 
-									 
-									</div>
-								</div><div data-repeater-item="" class="mt-repeater-item" style="border-bottom:none;">
-									<div class=" mt-repeater-row">
-									<div class="col-md-1 border-left">
-										 <input class="form-control my_price" readonly="" name="price-group[2][ZLX]" type="text" value="Price3">
-									 </div>
-									 <div class="col-md-1 border-left">
-										 <input class="form-control" name="price-group[2][ZJPJG]" type="text" value="0">
-									 </div>
-									 <div class="col-md-1">
-										 <input class="form-control" name="price-group[2][ZJPXL]" type="text" value="0">
-									 </div>
-									 <div class="col-md-1 border-left">
-										 <input class="form-control" name="price-group[2][PRICE]" type="text" value="0">
-									 </div>
-									 <div class="col-md-1">
-										<input class="form-control" name="price-group[2][ZXL]" type="text" value="0">
-									 </div>
-									 <div class="col-md-1">
-										<input class="form-control" name="price-group[2][CPRICE]" type="text" value="0">
-									 </div>
-									 <div class="col-md-1 border-right">
-										<input class="form-control" name="price-group[2][ZCXL]" type="text" value="0">
-									 </div>
-								
-									 
-									</div>
-								</div><div data-repeater-item="" class="mt-repeater-item" style="border-bottom:none;">
-									<div class=" mt-repeater-row">
-									<div class="col-md-1 border-left">
-										 <input class="form-control my_price" readonly="" name="price-group[3][ZLX]" type="text" value="Price4">
-									 </div>
-									 <div class="col-md-1 border-left">
-										 <input class="form-control" name="price-group[3][ZJPJG]" type="text" value="0">
-									 </div>
-									 <div class="col-md-1">
-										 <input class="form-control" name="price-group[3][ZJPXL]" type="text" value="0">
-									 </div>
-									 <div class="col-md-1 border-left">
-										 <input class="form-control" name="price-group[3][PRICE]" type="text" value="0">
-									 </div>
-									 <div class="col-md-1">
-										<input class="form-control" name="price-group[3][ZXL]" type="text" value="0">
-									 </div>
-									 <div class="col-md-1">
-										<input class="form-control" name="price-group[3][CPRICE]" type="text" value="0">
-									 </div>
-									 <div class="col-md-1 border-right">
-										<input class="form-control" name="price-group[3][ZCXL]" type="text" value="0">
-									 </div>
-								
-									
-									</div>
-								</div><div data-repeater-item="" class="mt-repeater-item" style="border-bottom:none;">
-									<div class=" mt-repeater-row">
-									<div class="col-md-1 border-left">
-										 <input class="form-control my_price" readonly="" name="price-group[4][ZLX]" type="text" value="Price5">
-									 </div>
-									 <div class="col-md-1 border-left">
-										 <input class="form-control" name="price-group[4][ZJPJG]" type="text" value="0">
-									 </div>
-									 <div class="col-md-1">
-										 <input class="form-control" name="price-group[4][ZJPXL]" type="text" value="0">
-									 </div>
-									 <div class="col-md-1 border-left">
-										 <input class="form-control" name="price-group[4][PRICE]" type="text" value="0">
-									 </div>
-									 <div class="col-md-1">
-										<input class="form-control" name="price-group[4][ZXL]" type="text" value="0">
-									 </div>
-									 <div class="col-md-1">
-										<input class="form-control" name="price-group[4][CPRICE]" type="text" value="0">
-									 </div>
-									 <div class="col-md-1 border-right">
-										<input class="form-control" name="price-group[4][ZCXL]" type="text" value="0">
-									 </div>
-						
-									
-									</div>
-								</div><div data-repeater-item="" class="mt-repeater-item" style="border-bottom:none;">
-									<div class=" mt-repeater-row">
-									<div class="col-md-1 border-left border-bottom">
-										 <input class="form-control my_price" readonly="" name="price-group[5][ZLX]" type="text" value="Price6">
-									 </div>
-									 <div class="col-md-1 border-left border-bottom">
-										 <input class="form-control" name="price-group[5][ZJPJG]" type="text" value="0">
-									 </div>
-									 <div class="col-md-1 border-bottom">
-										 <input class="form-control" name="price-group[5][ZJPXL]" type="text" value="0">
-									 </div>
-									 <div class="col-md-1 border-left border-bottom">
-										 <input class="form-control" name="price-group[5][PRICE]" type="text" value="0">
-									 </div>
-									 <div class="col-md-1 border-bottom">
-										<input class="form-control" name="price-group[5][ZXL]" type="text" value="0">
-									 </div>
-									 <div class="col-md-1 border-bottom">
-										<input class="form-control" name="price-group[5][CPRICE]" type="text" value="0">
-									 </div>
-									 <div class="col-md-1 border-right border-bottom">
-										<input class="form-control" name="price-group[5][ZCXL]" type="text" value="0">
-									 </div>
-				
-									 
-									</div>
-								</div></div>
-							
-				
-							
-						</div>
-		<div style="clear:both"></div>
-		<p id="dynamic_pager_content1" class="well" style="margin:0px; padding: 10px"> 二、销量影响因子</p>
-		
-		<div style="clear:both"></div>
-		<div class="col-md-2" >
-			<div class="mt-repeater-c">
+			<div class="col-md-1 border-topbottom border-left">
+				<label class="control-label head">价格类型</label>
+			</div>
+			<div class="col-md-1 border-topbottom border-left">
+				<label class="control-label head">页面竞品定价(站点币种)</label>
+			</div>
+			<div class="col-md-1 border-topbottom">
+				<label class="control-label head">该价格下销量</label>
+			</div>
+			<div class="col-md-1 border-topbottom border-left">
+				<label class="control-label head">你的定价(站点币种)</label>
+			</div>
+			<div class="col-md-1 border-topbottom">
+				<label class="control-label head">预计日销量</label>
+			</div>
+			<div class="col-md-1 border-topbottom">
+				<label class="control-label head">促销价(站点币种)</label>
+			</div>
+			<div class="col-md-1 border-topbottom border-right">
+				<label class="control-label head">月促销量</label>
+			</div>				 
+			<div data-repeater-list="price-group">
+				<div data-repeater-item="" class="mt-repeater-item" style="border-bottom:none;" >
+					<div class=" mt-repeater-row">
+					<div class="col-md-1 border-left">
+						 <input class="form-control my_price" readonly="" name="price-group[0][ZLX]" type="text" value="Price1">
+					 </div>
+					 <div class="col-md-1 border-left ">
+						 <input class="form-control" name="price-group[0][ZJPJG]" type="text" value="0">
+					 </div>
+					 <div class="col-md-1">
+						 <input class="form-control" name="price-group[0][ZJPXL]" type="text" value="0">
+					 </div>
+					 <div class="col-md-1 border-left">
+						 <input class="form-control" name="price-group[0][PRICE]" type="text" value="0">
+					 </div>
+					 <div class="col-md-1">
+						<input class="form-control" name="price-group[0][ZXL]" type="text" value="0">
+					 </div>
+					 <div class="col-md-1">
+						<input class="form-control" name="price-group[0][CPRICE]" type="text" value="0">
+					 </div>
+					 <div class="col-md-1 border-right">
+						<input class="form-control" name="price-group[0][ZCXL]" type="text" value="0">
+					 </div>
+				</div>
+			</div>
+			<div data-repeater-item="" class="mt-repeater-item" style="border-bottom:none;">
+				<div class=" mt-repeater-row">
+					<div class="col-md-1 border-left">
+						 <input class="form-control my_price" readonly="" name="price-group[1][ZLX]" type="text" value="Price2">
+					 </div>
+					 <div class="col-md-1 border-left">
+						 <input class="form-control" name="price-group[1][ZJPJG]" type="text" value="0">
+					 </div>
+					 <div class="col-md-1">
+						 <input class="form-control" name="price-group[1][ZJPXL]" type="text" value="0">
+					 </div>
+					 <div class="col-md-1 border-left">
+						 <input class="form-control" name="price-group[1][PRICE]" type="text" value="0">
+					 </div>
+					 <div class="col-md-1">
+						<input class="form-control" name="price-group[1][ZXL]" type="text" value="0">
+					 </div>
+					 <div class="col-md-1">
+						<input class="form-control" name="price-group[1][CPRICE]" type="text" value="0">
+					 </div>
+					 <div class="col-md-1 border-right">
+						<input class="form-control" name="price-group[1][ZCXL]" type="text" value="0">
+					 </div> 
+				</div>
+			</div>
+			<div data-repeater-item="" class="mt-repeater-item" style="border-bottom:none;">
+				<div class=" mt-repeater-row">
+					<div class="col-md-1 border-left">
+						 <input class="form-control my_price" readonly="" name="price-group[2][ZLX]" type="text" value="Price3">
+					 </div>
+					 <div class="col-md-1 border-left">
+						 <input class="form-control" name="price-group[2][ZJPJG]" type="text" value="0">
+					 </div>
+					 <div class="col-md-1">
+						 <input class="form-control" name="price-group[2][ZJPXL]" type="text" value="0">
+					 </div>
+					 <div class="col-md-1 border-left">
+						 <input class="form-control" name="price-group[2][PRICE]" type="text" value="0">
+					 </div>
+					 <div class="col-md-1">
+						<input class="form-control" name="price-group[2][ZXL]" type="text" value="0">
+					 </div>
+					 <div class="col-md-1">
+						<input class="form-control" name="price-group[2][CPRICE]" type="text" value="0">
+					 </div>
+					 <div class="col-md-1 border-right">
+						<input class="form-control" name="price-group[2][ZCXL]" type="text" value="0">
+					 </div>
+				</div>
+			</div>
+			<div data-repeater-item="" class="mt-repeater-item" style="border-bottom:none;">
+				<div class=" mt-repeater-row">
+					<div class="col-md-1 border-left">
+						 <input class="form-control my_price" readonly="" name="price-group[3][ZLX]" type="text" value="Price4">
+					 </div>
+					 <div class="col-md-1 border-left">
+						 <input class="form-control" name="price-group[3][ZJPJG]" type="text" value="0">
+					 </div>
+					 <div class="col-md-1">
+						 <input class="form-control" name="price-group[3][ZJPXL]" type="text" value="0">
+					 </div>
+					 <div class="col-md-1 border-left">
+						 <input class="form-control" name="price-group[3][PRICE]" type="text" value="0">
+					 </div>
+					 <div class="col-md-1">
+						<input class="form-control" name="price-group[3][ZXL]" type="text" value="0">
+					 </div>
+					 <div class="col-md-1">
+						<input class="form-control" name="price-group[3][CPRICE]" type="text" value="0">
+					 </div>
+					 <div class="col-md-1 border-right">
+						<input class="form-control" name="price-group[3][ZCXL]" type="text" value="0">
+					 </div>
+				</div>
+			</div>
+			<div data-repeater-item="" class="mt-repeater-item" style="border-bottom:none;">
+				<div class=" mt-repeater-row">
+					<div class="col-md-1 border-left">
+						 <input class="form-control my_price" readonly="" name="price-group[4][ZLX]" type="text" value="Price5">
+					 </div>
+					 <div class="col-md-1 border-left">
+						 <input class="form-control" name="price-group[4][ZJPJG]" type="text" value="0">
+					 </div>
+					 <div class="col-md-1">
+						 <input class="form-control" name="price-group[4][ZJPXL]" type="text" value="0">
+					 </div>
+					 <div class="col-md-1 border-left">
+						 <input class="form-control" name="price-group[4][PRICE]" type="text" value="0">
+					 </div>
+					 <div class="col-md-1">
+						<input class="form-control" name="price-group[4][ZXL]" type="text" value="0">
+					 </div>
+					 <div class="col-md-1">
+						<input class="form-control" name="price-group[4][CPRICE]" type="text" value="0">
+					 </div>
+					 <div class="col-md-1 border-right">
+						<input class="form-control" name="price-group[4][ZCXL]" type="text" value="0">
+					 </div>
+				</div>
+			</div>
+			<div data-repeater-item="" class="mt-repeater-item" style="border-bottom:none;">
+				<div class=" mt-repeater-row">
+					<div class="col-md-1 border-left border-bottom">
+						 <input class="form-control my_price" readonly="" name="price-group[5][ZLX]" type="text" value="Price6">
+					 </div>
+					 <div class="col-md-1 border-left border-bottom">
+						 <input class="form-control" name="price-group[5][ZJPJG]" type="text" value="0">
+					 </div>
+					 <div class="col-md-1 border-bottom">
+						 <input class="form-control" name="price-group[5][ZJPXL]" type="text" value="0">
+					 </div>
+					 <div class="col-md-1 border-left border-bottom">
+						 <input class="form-control" name="price-group[5][PRICE]" type="text" value="0">
+					 </div>
+					 <div class="col-md-1 border-bottom">
+						<input class="form-control" name="price-group[5][ZXL]" type="text" value="0">
+					 </div>
+					 <div class="col-md-1 border-bottom">
+						<input class="form-control" name="price-group[5][CPRICE]" type="text" value="0">
+					 </div>
+					 <div class="col-md-1 border-right border-bottom">
+						<input class="form-control" name="price-group[5][ZCXL]" type="text" value="0">
+					 </div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div style="clear:both"></div>
+	<p id="dynamic_pager_content1" class="well" style="margin:0px; padding: 10px"> 二、销量影响因子</p>	
+	<div style="clear:both"></div>
+	<div class="col-md-2" >
+		<div class="mt-repeater-c">
 			<div class="mt-repeater-item" style="text-align:center;">
 				<div class="row mt-repeater-row">系数</div>
 			</div>
@@ -296,14 +307,9 @@ border-top:1px solid #333;
 			<div class="mt-repeater-item" style="line-height:20px;text-align:center;">
 				<div class="row mt-repeater-row">推广费流量趋势(i2)</div>
 			</div>
-
-			</div>
 		</div>
-
-
-
-
-		<div class="col-md-10">
+	</div>
+	<div class="col-md-10">
 		<div class="mt-repeater-c">
 			<div class="mt-repeater-item">
 				<div class="row mt-repeater-row">
@@ -342,11 +348,10 @@ border-top:1px solid #333;
 				 <div class="col-md-1">
 					12月
 				 </div>
-				</div>
 			</div>
-			
-			<div class="mt-repeater-item">
-				<div class="row mt-repeater-row">
+		</div>
+		<div class="mt-repeater-item">
+			<div class="row mt-repeater-row">
 				<div class="col-md-1">
 					 <input class="form-control" name="month-ZPXSCQS-1" type="text" value="1">
 				 </div>
@@ -365,8 +370,6 @@ border-top:1px solid #333;
 				 <div class="col-md-1">
 					<input class="form-control" name="month-ZPXSCQS-6" type="text" value="1.1">
 				 </div>
-
-
 				 <div class="col-md-1">
 					<input class="form-control" name="month-ZPXSCQS-7" type="text" value="1.5">
 				 </div>
@@ -385,11 +388,11 @@ border-top:1px solid #333;
 				 <div class="col-md-1">
 					<input class="form-control" name="month-ZPXSCQS-12" type="text" value="4">
 				 </div>
-				</div>
 			</div>
+		</div>
 			
-			<div class="mt-repeater-item">
-				<div class="row mt-repeater-row">
+		<div class="mt-repeater-item">
+			<div class="row mt-repeater-row">
 				<div class="col-md-1">
 					 <input class="form-control" name="month-ZTGFQS-1" type="text" value="1.1">
 				 </div>
@@ -426,52 +429,42 @@ border-top:1px solid #333;
 				 <div class="col-md-1">
 					<input class="form-control" name="month-ZTGFQS-12" type="text" value="1">
 				 </div>
-				</div>
 			</div>
-			</div>
-		</div><div style="clear:both"></div>
+		</div>
+	</div>
+</div>
+<div style="clear:both"></div>
 	
 
-<p id="dynamic_pager_content1" class="well" style="margin:0px; padding: 10px"> 三、参数表 <button id="genStockAge" class="btn btn-success" type="button" style="padding: 0px 5px;
-    font-size: 12px;">
-						自动获取</button></p>
-		<div style="clear:both"></div>
-		<div class="col-md-6" >
-			<div class="mt-repeater-c">
-			<div class="mt-repeater-item">
-				<div class="row mt-repeater-row"  style="line-height:20px;">
-				<div class="col-md-4" >
-					 指标
-				 </div>
-				 <div class="col-md-4">
-					 单位	
-				 </div>
-				 <div class="col-md-4">
-					 值
-				 </div>
-		
-				</div>
-
-
-
-
-
-
-			</div><div class="mt-repeater-item">
-				<div class="row mt-repeater-row">
-				 <div class="col-md-4">
+<p id="dynamic_pager_content1" class="well" style="margin:0px; padding: 10px"> 
+	三、参数表 
+	<button id="genStockAge" class="btn btn-success" type="button" style="padding: 0px 5px;font-size: 12px;">自动获取</button>
+</p>
+<div style="clear:both"></div>
+<div class="col-md-6" >
+	<div class="mt-repeater-c">
+		<div class="mt-repeater-item">
+			<div class="row mt-repeater-row"  style="line-height:20px;">
+				<div class="col-md-4" >指标</div>
+				<div class="col-md-4">单位</div>
+				<div class="col-md-4">值</div>
+			</div>
+		</div>
+		<div class="mt-repeater-item">
+			<div class="row mt-repeater-row">
+				<div class="col-md-4">
 					单位产品成本
-				 </div>
-				 <div class="col-md-4">
-					CNY
-				 </div>
-				 <div class="col-md-4">
-					 <input class="form-control" name="I_ZDWCB" type="text" value="0">
-				 </div>
-		
 				</div>
-				</div><div class="mt-repeater-item">
-				<div class="row mt-repeater-row">
+				<div class="col-md-4">
+					CNY
+				</div>
+				<div class="col-md-4">
+					<input class="form-control" name="I_ZDWCB" type="text" value="0">
+				</div>
+			</div>
+		</div>
+		<div class="mt-repeater-item">
+			<div class="row mt-repeater-row">
 				 <div class="col-md-4">
 					单位拣配费
 				 </div>
@@ -481,10 +474,10 @@ border-top:1px solid #333;
 				 <div class="col-md-4">
 					 <input class="form-control" name="I_ZDWJPF" type="text" value="0">
 				 </div>
-		
-				</div>
-				</div><div class="mt-repeater-item">
-				<div class="row mt-repeater-row">
+			</div>
+		</div>
+		<div class="mt-repeater-item">
+			<div class="row mt-repeater-row">
 				 <div class="col-md-4">
 					1-9月单位仓储费
 				 </div>
@@ -494,10 +487,10 @@ border-top:1px solid #333;
 				 <div class="col-md-4">
 					 <input class="form-control" name="I_ZDWCCF19" type="text" value="0">
 				 </div>
-		
-				</div>
-				</div><div class="mt-repeater-item">
-				<div class="row mt-repeater-row">
+			</div>
+		</div>
+		<div class="mt-repeater-item">
+			<div class="row mt-repeater-row">
 				 <div class="col-md-4">
 					10-12月单位仓储费
 				 </div>
@@ -507,12 +500,11 @@ border-top:1px solid #333;
 				 <div class="col-md-4">
 					 <input class="form-control" name="I_ZDWCCF1012" type="text" value="0">
 				 </div>
+			</div>
+		</div>
 		
-				</div>
-				</div>
-				
-				<div class="mt-repeater-item">
-				<div class="row mt-repeater-row">
+		<div class="mt-repeater-item">
+			<div class="row mt-repeater-row">
 				 <div class="col-md-4">
 					汇率
 				 </div>
@@ -522,13 +514,14 @@ border-top:1px solid #333;
 				 <div class="col-md-4">
 					 <input class="form-control" name="I_ZHL" type="text" value="0">
 				 </div>
-		
-				</div>
-				</div></div></div>
-				<div class="col-md-6" >
-			<div class="mt-repeater-c">
-			<div class="mt-repeater-item">
-				<div class="row mt-repeater-row">
+			</div>
+		</div>
+	</div>
+</div>
+<div class="col-md-6" >
+	<div class="mt-repeater-c">
+		<div class="mt-repeater-item">
+			<div class="row mt-repeater-row">
 				 <div class="col-md-4">
 					平台佣金比例
 				 </div>
@@ -538,10 +531,10 @@ border-top:1px solid #333;
 				 <div class="col-md-4">
 					 <input class="form-control" name="I_ZPTYJBL" type="text" value="0">
 				 </div>
-		
-				</div>
-				</div><div class="mt-repeater-item">
-				<div class="row mt-repeater-row">
+			</div>
+		</div>
+		<div class="mt-repeater-item">
+			<div class="row mt-repeater-row">
 				 <div class="col-md-4">
 					营销费用率
 				 </div>
@@ -551,10 +544,10 @@ border-top:1px solid #333;
 				 <div class="col-md-4">
 					 <input class="form-control" name="I_ZYXFYL" type="text" value="0">
 				 </div>
-		
-				</div>
-				</div><div class="mt-repeater-item">
-				<div class="row mt-repeater-row">
+			</div>
+		</div>
+		<div class="mt-repeater-item">
+			<div class="row mt-repeater-row">
 				 <div class="col-md-4">
 					异常率
 				 </div>
@@ -564,11 +557,11 @@ border-top:1px solid #333;
 				 <div class="col-md-4">
 					 <input class="form-control" name="I_ZYCL" type="text" value="0">
 				 </div>
-		
-				</div>
-				</div>
-				<!--<div class="mt-repeater-item">
-				<div class="row mt-repeater-row">
+			</div>
+		</div>
+		<!--
+		<div class="mt-repeater-item">
+			<div class="row mt-repeater-row">
 				 <div class="col-md-4">
 					产品类型
 				 </div>
@@ -576,17 +569,16 @@ border-top:1px solid #333;
 					A B C
 				 </div>
 				 <div class="col-md-4">
-				 	<select class="form-control" name="I_ZCPLX">
+					<select class="form-control" name="I_ZCPLX">
 						<option value="A">A.正常（非B非C）
 						<option value="B">B.快速更新换代
 						<option value="C">C.带锂电池
 					</select>
 				 </div>
-		
-				</div>
-				</div>-->
-				<div class="mt-repeater-item">
-				<div class="row mt-repeater-row">
+			</div>
+		</div>-->
+		<div class="mt-repeater-item">
+			<div class="row mt-repeater-row">
 				 <div class="col-md-4">
 					平均库龄
 				 </div>
@@ -594,14 +586,12 @@ border-top:1px solid #333;
 					月
 				 </div>
 				 <div class="col-md-4">
-
 					 <input class="form-control" name="I_ZPJCL" type="text" value="0">
-	
 				 </div>
-		
-				</div>
-				</div><div class="mt-repeater-item">
-				<div class="row mt-repeater-row">
+			</div>
+		</div>
+		<div class="mt-repeater-item">
+			<div class="row mt-repeater-row">
 				 <div class="col-md-4">
 					当前库存数量
 				 </div>
@@ -611,32 +601,28 @@ border-top:1px solid #333;
 				 <div class="col-md-4">
 					 <input class="form-control" name="I_ZKC" type="text" value="0">
 				 </div>
-		
+			</div>
+		</div>
+	</div>
+</div>
+</div>
+<div style="clear:both"></div>
+<div class="form-actions">
+			<div class="row">
+				<div class="col-md-offset-4 col-md-8">
+					<button type="button" class="btn blue" id='cus_price_submit'>Submit</button>
+					
 				</div>
 			</div>
-			</div>
-		</div></div>
-		
-		<div style="clear:both"></div>
-<div class="form-actions">
-                        <div class="row">
-                            <div class="col-md-offset-4 col-md-8">
-                                <button type="button" class="btn blue" id='cus_price_submit'>Submit</button>
-                                
-                            </div>
-                        </div>
-                    </div>
-					<div style="clear:both;height:30px;"></div>
+		</div>
+		<div style="clear:both;height:30px;"></div>
         </div>
-		
-
 		<div class="portlet light bordered" id="showData" style="display:none;">
 			<div class="portlet-body">
 				<ul class="nav nav-tabs" id='result-tab'>
 					<li class="active">
-						<a href="#price_result" data-toggle="tab" aria-expanded="true"> 经济效益测算
-</a>                                            </li>
-				   
+						<a href="#price_result" data-toggle="tab" aria-expanded="true"> 经济效益测算</a> 
+					</li>		
 				</ul>
 				<div class="tab-content" id='result-tab-content'>
 					<div class="tab-pane fade active in" id="price_result">
@@ -646,14 +632,14 @@ border-top:1px solid #333;
 				<div class="clearfix margin-bottom-20"> </div>
 			</div>
 		</div>
-		</form><div style="clear:both"></div>
-		
-		
-      </div><div style="clear:both"></div>
+	</form>
+	<div style="clear:both"></div>
+    </div>
+	<div style="clear:both"></div>
+	</div>
+	<div style="clear:both"></div>
 </div>
-		
-		<div style="clear:both"></div>
-		 </div><div style="clear:both"></div>
+<div style="clear:both"></div>
 <script>
 $(function() {
 $('.mt-repeater-c').repeater({

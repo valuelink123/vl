@@ -3,10 +3,15 @@
     @include('layouts.crumb', ['crumbs'=>['Sales Forecast-22W']])
 @endsection
 @section('content')
+<link href="/assets/global/plugins/bootstrap-editable/bootstrap-editable/css/bootstrap-editable.css" rel="stylesheet" type="text/css" />
 <style>
 .table thead tr th,.table thead tr td,.table td, .table th{
 	font-size:11px;
 	white-space: nowrap;
+	text-align:left;
+}
+table.dataTable thead th, table.dataTable thead td {
+    padding: 8px 10px;
 }
 </style>
 
@@ -20,7 +25,7 @@
                 <div class="row">
                     <div class="col-md-2">
                          <div class="input-group">
-                            <span class="input-group-addon">Site</span>
+                            <span class="input-group-addon">站点</span>
                             <select class="form-control"  id="site" name="site">
                                 <option value="">Select</option>
                                 @foreach(getSiteCode() as $key=>$val)
@@ -30,7 +35,7 @@
                         </div>
                         <br>
 						<div class="input-group date date-picker " data-date-format="yyyy-mm-dd">
-                            <span class="input-group-addon">Date</span>
+                            <span class="input-group-addon">起始日期</span>
                             <input  class="form-control" value="{{$date}}" data-options="format:'yyyy-mm-dd'" id="date" name="date" autocomplete="off"/>
                         </div>
                         <br>
@@ -66,10 +71,10 @@
                         </div>
                         <br>
 						<div class="input-group">
-							<span class="input-group-addon">Type</span>
+							<span class="input-group-addon">显示维度</span>
 							<select class="form-control"  id="type" name="type">
-								<option value="">Asin</option>
-								<option value="sku">Sku</option>
+								<option value="">Asin维度</option>
+								<option value="sku">Sku维度</option>
 							</select>
 						</div>
                        
@@ -77,7 +82,7 @@
 
                     <div class="col-md-2">
                         <div class="input-group">
-                            <span class="input-group-addon">Sellers</span>
+                            <span class="input-group-addon">销售员</span>
                             <select  class="form-control"  id="sap_seller_id" name="sap_seller_id">
                                 <option value="">Select</option>
                                 @foreach(getUsers('sap_seller') as $key=>$val)
@@ -91,7 +96,7 @@
 
                     <div class="col-md-2">
                         <div class="input-group">
-                            <span class="input-group-addon">SkuStatus</span>
+                            <span class="input-group-addon">SKU状态</span>
                             <select  class="form-control"  id="sku_status" name="sku_status">
                                 <option value="">Select</option>
                                 @foreach(getSkuStatuses() as $key=>$val)
@@ -104,7 +109,7 @@
                     </div>
                     <div class="col-md-2">
                         <div class="input-group">
-                            <span class="input-group-addon">SkuLevel</span>
+                            <span class="input-group-addon">Sku等级</span>
                             <select class="form-control"  id="sku_level" name="sku_level">
                                 <option value="">Select</option>
                                 @foreach(getSkuLevel() as $key=>$val)
@@ -115,12 +120,12 @@
                         <br>
 						<div class="input-group">
 							<div class="btn-group pull-right">
-							<button id="export" class="btn sbold blue"> Export
+							<button id="export" class="btn sbold blue"> 导出
 								<i class="fa fa-download"></i>
 							</button>
 							</div>
 							<div class="btn-group pull-right" style="margin-right:20px;">
-								<button id="search" class="btn sbold blue">Search</button>
+								<button id="search" class="btn sbold blue">查询</button>
 							</div>
 						</div>
                     </div> 
@@ -144,7 +149,7 @@
 						 <input type="file" name="importFile"  />
 				</div>
 				<div class=" pull-left">
-					<button type="submit" class="btn blue btn-sm" id="data_search">Upload</button>
+					<button type="submit" class="btn blue btn-sm" id="data_search">上传</button>
 				</div>
 				
 				</form>
@@ -158,17 +163,17 @@
                 <table class="table table-striped table-bordered" id="thetable">
                     <thead>
                     <tr>
-						<th> Seller Name </th>
+						<th> 销售员 </th>
                         <th>Asin</th>
-                        <th>Site</th>
+                        <th>站点</th>
                         <th>Sku</th>
-                        <th>MinPurchase</th>
-                        <th>W/Sales</th>
-						<th>TotalPlan</th>
+                        <th>最小起订量</th>
+                        <th>加权周销量</th>
+						<th>22周计划销量</th>
 						<?php
 						for($i=1;$i<=22;$i++){
 						?>
-                        <th class="week_end_date">{{date('Y-m-d',strtotime($date.' +'.$i.' weeks sunday'))}}</th>
+                        <th class="week_end_date">{{date('Y-m-d',strtotime($date.' +'.$i.' weeks monday')-86400*7)}}</th>
                         <?php } ?>
                     </tr>
                     </thead>
@@ -178,6 +183,10 @@
             </div>
         </div>
     </div>
+<script src="/assets/global/plugins/moment.min.js" type="text/javascript"></script>
+<script src="/assets/global/plugins/jquery.mockjax.js" type="text/javascript"></script>    
+<script src="/assets/global/plugins/bootstrap-editable/bootstrap-editable/js/bootstrap-editable.js" type="text/javascript"></script>
+<script src="/assets/pages/scripts/form-editable.min.js" type="text/javascript"></script>
 <script>
 
 let $theTable = $(thetable)
@@ -231,16 +240,41 @@ var initTable = function () {
 		ajax: {
 			type: 'POST',
 			url: location.href,
-			data:  {search: $("#search-form").serialize()}
+			data:  {search: $("#search-form").serialize()},
+			
 		},
 		scrollY:        false,
 		scrollX:        true,
 		fixedColumns:   {
 			leftColumns:7,
 			rightColumns: 0
-		}
+		},
+		"fnDrawCallback": function (oSettings) {
+			$.mockjaxSettings.responseTime = 500;
+			$.fn.editable.defaults.inputclass = 'form-control';
+			$.fn.editable.defaults.url = '/mrp/weekupdate';	
+			$('.week_plan').editable({
+				emptytext:'0',
+				validate: function (value) {
+					if (isNaN(value)) {
+						return 'Must be a number';
+					}
+				},
+				success: function (response) { 
+					var obj = JSON.parse(response);
+					for(var jitem in obj){
+						$('#'+jitem).text(obj[jitem]);
+					}
+				}, 
+				error: function (response) { 
+					return 'remote error'; 
+				} 
+			});
+
+        }
 	})
 }
+				
 
 
 initTable();
@@ -255,7 +289,7 @@ $('#search').click(function () {
 	dtApi.ajax.reload();
 	$(".week_end_date").each(function(index){
 		
-		var ndate = getNextSunday(index+1);
+		var ndate = getNextMonday(index+1);
 		
 		$(this).text(ndate);
 	});	
@@ -264,7 +298,6 @@ $('#search').click(function () {
 
 //下载数据
 $("#export").click(function(){
-	alert($("#search-form").serialize());
 	location.href='/mrp/export?'+$("#search-form").serialize();
 	return false;
 
@@ -274,10 +307,10 @@ $('.date-picker').datepicker({
 	autoclose: true
 });
 
-function getNextSunday(i) {
+function getNextMonday(i) {
 	var now = new Date($("#date").val());
 	var day = now.getDay();
-	n = day == 0 ? 7*i : (7*(i+1)-day);
+	n = day == 0 ? 7*i-6 : (7*(i+1)-day-6);
 	now.setDate(now.getDate() + n);
 	var year = now.getFullYear();
 	var month = now.getMonth() + 1;
