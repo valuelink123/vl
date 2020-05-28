@@ -105,6 +105,7 @@ class ShipmentController extends Controller
         if (!empty($status)) {
             $sql .= ' AND sh.status = ' . $status;
         }
+        $sql .= ' ORDER BY sh.created_at DESC';
         $shipmentList = DB::connection('vlz')->select($sql);
         $shipmentList = (json_decode(json_encode($shipmentList), true));
         if (!empty($shipmentList)) {
@@ -146,7 +147,8 @@ class ShipmentController extends Controller
             $shipmentList[$key]['ubu'] = $ulist[$value['sap_seller_id']]['ubu'];
             $shipmentList[$key]['ubg'] = $ulist[$value['sap_seller_id']]['ubg'];
             $shipmentList[$key]['domin_sx'] = $DOMIN_MARKETPLACEID_SX[$value['marketplace_id']];
-            $shipmentList[$key]['warehouse'] = $value['sap_warehouse_code'] . '-' . $value['sap_factory_code'];
+            //$value['sap_warehouse_code'] . '-' .
+            $shipmentList[$key]['warehouse'] = $value['sap_factory_code'];
             $shipmentList[$key]['image'] = explode(',', $value['images'])[0];
             $shipmentList[$key]['allot'] = @$allotIdList[$value['id']] ? $allotIdList[$value['id']] : 0;
             if (!in_array($ulist[$value['sap_seller_id']]['name'], $seller)) {
@@ -206,9 +208,9 @@ class ShipmentController extends Controller
         $DOMIN_MARKETPLACEID_SX = Asin::DOMIN_MARKETPLACEID_SX;
         $r_message = $seller_skus = $seller_accounts = $asins = [];
         $label = $batch_num = $stock_day_num = $transfer_num = '';
+        $FBA_keepday_num = $FBA_Stock = 0;
         if (!empty($request['asin'])) {
             if (!empty($request['asin']) && !empty($request['sku']) && !empty($request['seller_sku']) && !empty($request['warehouse']) && !empty($request['quantity']) && !empty($request['received_date'])) {
-                $warehouse = explode('-', $request['warehouse']);
                 //查询亚马逊 label
                 $seller_skus = DB::connection('vlz')->table('seller_skus')
                     ->select('id', 'seller_account_id')
@@ -250,7 +252,7 @@ class ShipmentController extends Controller
                     $asins = (json_decode(json_encode($asins), true));
                 }
                 if (!empty($asins)) {
-                    $FBA_Stock = $asins[0]['afn_sellable'] + $asins[0]['afn_reserved'];
+                    $FBA_Stock = @$asins[0]['afn_sellable'] + @$asins[0]['afn_reserved'];
                     if (@$asins[0]['daily_sales'] > 0) {
                         $stock_day_num = $FBA_Stock + $request['quantity'] / @$asins[0]['daily_sales'];
                     }
@@ -265,8 +267,7 @@ class ShipmentController extends Controller
                     'status' => @$request['status'] ? $request['status'] : 0,
                     'seller_sku' => $request['seller_sku'],
                     'label' => $label,
-                    'sap_warehouse_code' => $warehouse[0],
-                    'sap_factory_code' => $warehouse[1],
+                    'sap_factory_code' => $request['warehouse'],
                     'out_warehouse' => $request['out_warehouse'],
                     'quantity' => $request['quantity'],
                     'received_date' => $request['received_date'],
@@ -275,7 +276,7 @@ class ShipmentController extends Controller
                     'request_date' => $request['request_date'],
                     'rms' => @$request['rms'],
                     'rms_sku' => @$request['rms_sku'],
-                    'package' => $request['package'],
+                    'remark' => @$request['remark'],
                     'marketplace_id' => $request['marketplace_id'],
                     'created_at' => date('Y-m-d H:i:s', time()),
                     'updated_at' => date('Y-m-d H:i:s', time()),
@@ -325,7 +326,7 @@ class ShipmentController extends Controller
     {
         //$user = Auth::user()->toArray();// todo
         $DOMIN_MARKETPLACEID_SX = Asin::DOMIN_MARKETPLACEID_SX;
-        $sku=null;
+        $sku = null;
         $role = 0;
         $user = [
             'email' => 'test@qq.com',
@@ -358,24 +359,24 @@ class ShipmentController extends Controller
             $shipment = (json_decode(json_encode($shipment), true));
             if (!empty($shipment[0]['sap_warehouse_code']) && !empty($shipment[0]['sap_factory_code'])) {
                 //$shipment[0]['sap_warehouse_code'] . '-' .
-                $shipment[0]['warehouse'] =  $shipment[0]['sap_factory_code'];
+                $shipment[0]['warehouse'] = $shipment[0]['sap_factory_code'];
                 $shipment[0]['marketplace_id_sx'] = $DOMIN_MARKETPLACEID_SX[$shipment[0]['marketplace_id']];
             }
             $shipment_new = $shipment[0];
             $shipment_new['role'] = $role;
         }
         if (!empty($shipment_new['asin']) && !empty($shipment_new['marketplace_id'])) {
-            $sql = "SELECT sku,seller_sku from sap_asin_match_sku WHERE asin='".$shipment_new['asin']."' AND marketplace_id='".$shipment_new['marketplace_id']."' GROUP BY seller_sku;";
+            $sql = "SELECT sku,seller_sku from sap_asin_match_sku WHERE asin='" . $shipment_new['asin'] . "' AND marketplace_id='" . $shipment_new['marketplace_id'] . "' GROUP BY seller_sku;";
             $sellersku = DB::connection('vlz')->select($sql);
             $data = (json_decode(json_encode($sellersku), true));
-            if(!empty($data)){
-                $sku=$data[0]['sku'];
+            if (!empty($data)) {
+                $sku = $data[0]['sku'];
             }
-            $sql2 = "SELECT sap_factory_code from sap_asin_match_sku WHERE  marketplace_id='".$shipment_new['marketplace_id']."' AND sap_factory_code != '' GROUP BY sap_factory_code;";
+            $sql2 = "SELECT sap_factory_code from sap_asin_match_sku WHERE  marketplace_id='" . $shipment_new['marketplace_id'] . "' AND sap_factory_code != '' GROUP BY sap_factory_code;";
             $sellersku2 = DB::connection('vlz')->select($sql2);
             $data2 = (json_decode(json_encode($sellersku2), true));
         }
-        return ['shipment'=>$shipment_new,'seller_sku_list'=>$data,'factoryList'=>$data2,'sku'=>$sku];
+        return ['shipment' => $shipment_new, 'seller_sku_list' => $data, 'factoryList' => $data2, 'sku' => $sku];
 
 
     }
@@ -389,14 +390,12 @@ class ShipmentController extends Controller
         $r_message = [];
         $id = @$request['id'];
         if ($id > 0 && !empty($request['warehouse'])) {
-            $warehouse = explode('-', $request['warehouse']);
             $data = [
                 'status' => @$request['status'],
                 'sku' => @$request['sku'],
                 'asin' => @$request['asin'],
                 'seller_sku' => @$request['seller_sku'],
-                'sap_warehouse_code' => $warehouse[0],
-                'sap_factory_code' => $warehouse[1],
+                'sap_factory_code' => $request['warehouse'],
                 'quantity' => @$request['quantity'],
                 'out_warehouse' => @$request['out_warehouse'],
                 'received_date' => @$request['received_date'],
@@ -496,23 +495,21 @@ class ShipmentController extends Controller
     public function getSellerSku(Request $request)
     {
         $data = [];
-        $sx=$sku=null;
+        $sku = null;
         $DOMIN_MARKETPLACEID_SX = Asin::DOMIN_MARKETPLACEID_SX;
-        if (!empty($request['marketplace_id'])) {
-            $sx = array_search($request['marketplace_id'], $DOMIN_MARKETPLACEID_SX);
-        }
-        if (!empty($request['asin']) && !empty($sx)) {
-            $sql = "SELECT sku,seller_sku from sap_asin_match_sku WHERE asin='".$request['asin']."' AND marketplace_id='".$sx."' GROUP BY seller_sku;";
+
+        if (!empty($request['asin']) && !empty($request['marketplace_id'])) {
+            $sql = "SELECT sku,seller_sku from sap_asin_match_sku WHERE asin='" . $request['asin'] . "' AND marketplace_id='" . $request['marketplace_id'] . "' GROUP BY seller_sku;";
             $sellersku = DB::connection('vlz')->select($sql);
             $data = (json_decode(json_encode($sellersku), true));
-            if(!empty($data)){
-                $sku=$data[0]['sku'];
+            if (!empty($data)) {
+                $sku = $data[0]['sku'];
             }
-            $sql2 = "SELECT sap_factory_code from sap_asin_match_sku WHERE  marketplace_id='".$sx."' AND sap_factory_code != '' GROUP BY sap_factory_code;";
+            $sql2 = "SELECT sap_factory_code from sap_asin_match_sku WHERE  marketplace_id='" . $request['marketplace_id'] . "' AND sap_factory_code != '' GROUP BY sap_factory_code;";
             $sellersku2 = DB::connection('vlz')->select($sql2);
             $data2 = (json_decode(json_encode($sellersku2), true));
         }
-        return ['seller_sku_list'=>$data,'factoryList'=>$data2,'sku'=>$sku];
+        return ['seller_sku_list' => $data, 'factoryList' => $data2, 'sku' => $sku];
     }
     /** ==========================采购页面 方法===============================================================*/
 
@@ -942,6 +939,8 @@ class ShipmentController extends Controller
         $date_s = $request['date_s'] ? $request['date_s'] : '';
         $date_e = $request['date_e'] ? $request['date_e'] : '';
         $sap_seller_id_list = $seller = [];
+        $statusList=['资料提供中','换标中','待出库','已发货','取消发货'];
+        $downLoad = $request['downLoad'] ? $request['downLoad'] : 10;//todo  修改为0
         $sql = "SELECT
                 a.`status`,
                 a.barcode,
@@ -959,7 +958,7 @@ class ShipmentController extends Controller
                 s.quantity,
                 s.rms_sku,
                 s.asin,
-                s.sku
+                s.cargo_data
             FROM
                 allot_progress AS a
             LEFT JOIN shipment_requests AS s ON s.id = a.shipment_requests_id where 1=1 ";
@@ -969,6 +968,7 @@ class ShipmentController extends Controller
         if (!empty($condition)) {
             $sql .= ' AND s.asin LIKE "%' . $condition . '%" OR s.sku LIKE "%' . $condition . '%"';
         }
+        $sql .= ' GROUP BY a.shipment_requests_id ' ;
         $allot_progress = DB::connection('vlz')->select($sql);
         $allot_progress = (json_decode(json_encode($allot_progress), true));
         if (!empty($allot_progress)) {
@@ -1001,7 +1001,113 @@ class ShipmentController extends Controller
                 $seller[] = @$ulist[$value['sap_seller_id']]['name'];
             }
         }
+        //下载判断
+        if ($downLoad > 0) {
+            echo
+                '需求提交日期,' .
+                '调拨状态,' .
+                '销售员,' .
+                '发货批号,' .
+                '调出仓库,' .
+                '亚马逊账号,' .
+                'SKU,' .
+                '调拔数量,' .
+                'RMS标贴SKU,' .
+                '发货方式,' .
+                'Shippment ID,' .
+                '跟踪号/单据号,' .
+                '宽（IN）,' .
+                '高(IN）,' .
+                '运输方式transportation,' .
+                '卡板号pallets,' .
+                '打板尺寸,' .
+                "\r\n" . "\r\n";
+            if (!empty($allot_progress)) {
+                foreach ($allot_progress as $ak => $av) {
+                    echo '"' . @$av['created_at'] . '",' .
+                        '"' . $statusList[@$av['status']] . '",' .
+                        '"' . @$av['name'] . '",' .
+                        '"' . @$av['batch_num'] . '",' .
+                        '"' . @$av['out_warehouse'] . '",' .
+                        '"' . @$av['label'] . '",' .
+                        '"' . @$av['sku'] . '",' .
+                        '"' . @$av['quantity'] . '",' .
+                        '"' . @$av['rms_sku'] . '",' .
+                        "\r\n";
+                }
+                exit;
+            }
+        }
         return [$allot_progress, $seller];
+    }
+    /**
+     * 导入Excel
+     * @param Request $request
+     * @param int $sheet
+     * @return mixed
+     * @throws \PHPExcel_Exception
+     * @throws \PHPExcel_Reader_Exception
+     */
+    public function importExecl(Request $request, $sheet=0){
+        include( "../vendor/PHPExcel/PHPExcel.php" );
+        header("content-type:text/html;charset=utf-8");
+        $file = $request->file('files');
+        if($file) {
+            try {
+                $file_name = $file[0]->getClientOriginalName();
+                $file_size = $file[0]->getSize();
+                $file_ex = $file[0]->getClientOriginalExtension();
+                $newname = $file_name ;
+                $newpath = '/uploads/'.date('Ym').'/'.date('d').'/'.date('His').rand(100,999).intval(Auth::user()->id).'/';
+                $file[0]->move(public_path().$newpath,$newname);
+            } catch (\Exception $exception) {
+                $error = array(
+                    'name' => $file[0]->getClientOriginalName(),
+                    'size' => $file[0]->getSize(),
+                    'error' => $exception->getMessage(),
+                );
+                // Return error
+                return \Response::json($error, 400);
+            }
+            if (file_exists(public_path().$newpath.$newname)) {
+                $newurl = $newpath . $newname;
+                $success = new \stdClass();
+                $success->name = $newname;
+                $success->size = $file_size;
+                $success->url = $newurl;
+                $success->thumbnailUrl = $newurl;
+                $success->deleteUrl = url('send/deletefile/' . base64_encode($newpath . $newname));
+                $success->deleteType = 'get';
+                $success->fileID = md5($newpath . $newname);
+                //判断哪种类型
+                if($file_ex=="xlsx"){
+                    $reader = \PHPExcel_IOFactory::createReader('Excel2007');
+                }else{
+                    $reader = \PHPExcel_IOFactory::createReader('Excel5');
+                }
+                $excel = $reader->load(public_path().$newpath.$newname,$encode = 'utf-8');
+                //读取第一张表
+                $sheet = $excel->getSheet(0);
+                //获取总行数
+                $row_num = $sheet->getHighestRow();
+                //获取总列数
+                $col_num = $sheet->getHighestColumn();
+                $data = []; //数组形式获取表格数据
+                for ($i = 2; $i <= $row_num; $i ++) {
+                    $data[$i]['rank']  = $sheet->getCell("A".$i)->getValue();
+                    $data[$i]['Score']  = $sheet->getCell("B".$i)->getValue();
+                    $data[$i]['Weight Status']  = $sheet->getCell("C".$i)->getValue();
+                    $data[$i]['Product']  = $sheet->getCell("D".$i)->getValue();
+                }
+                //添加入库  todo
+                echo '<pre>';
+                var_dump($data);exit;
+                return \Response::json(array('files' => array($success)), 200);
+            } else {
+                return \Response::json('Error', 400);
+            }
+            return \Response::json('Error', 400);
+        }
     }
 
 }

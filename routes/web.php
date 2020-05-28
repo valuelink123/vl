@@ -268,10 +268,10 @@ Route::match(['post'],'/shipment/upCargoData', 'ShipmentController@upCargoData')
 
 Route::match(['post'],'/shipment/getNextData', 'ShipmentController@getNextData');//请求下一级 asin 或者 sellersku列表
 Route::match(['post'],'/shipment/getSellerSku', 'ShipmentController@getSellerSku');
+Route::match(['post'],'/shipment/importExecl', 'ShipmentController@getSellerSku');//上传 表格
 
 
 Route::get('/marketingPlan/test', 'MarketingPlanController@test')->name('marketingPlan');
-Route::match(['post','get'],'/marketingPlan/importExecl', 'MarketingPlanController@importExecl')->name('marketingPlan');
 
 Route::get('/cpfr/purchase', 'CpfrController@purchase')->name('purchase');
 Route::get('/cpfr/barcode', 'CpfrController@barcode')->name('barcode');
