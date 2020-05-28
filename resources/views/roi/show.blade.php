@@ -102,6 +102,9 @@
         .grey_color{
             color:#909399;
         }
+        input{
+            border: 1px solid #dddddd;
+        }
 
     </style>
 
@@ -151,7 +154,7 @@
                     <span style="padding-right: 20px">站点: <span class="highlight_text">{{$roi['site']}}</span></span>
                     <span style="padding-right: 20px">预计上线时间<span style="color: #999999;" title="预计新品可正式上线销售的时间"><i class="fa fa-info-circle"></i></span>: <span class="highlight_text">{{$roi['estimated_launch_time']}}</span></span>
                     <span style="padding-right: 20px">SKU<span style="color: #999999;" title="在SAP中新建的产品物料号"><i class="fa fa-info-circle"></i></span>: <span class="highlight_text">{{$roi['sku']}}</span></span>
-                    <span style="padding-right: 20px">项目编号: <span class="highlight_text">{{$roi['project_code']}}</span></span>
+                    <span style="padding-right: 20px">项目编号<span style="color: #999999;" title="新品开发项目定义好的项目编号"><i class="fa fa-info-circle"></i></span>: <span class="highlight_text">{{$roi['project_code']}}</span></span>
                     <span style="padding-right: 20px"><a href="{{$roi['new_product_planning_process']}}" target="_blank">查看新品规划流程</a><span style="color: #999999;" title="OA中新品规划流程的页面链接"><i class="fa fa-info-circle"></i></span></span>
                 </div>
                 <div style="clear:both"></div>
@@ -368,7 +371,7 @@
 
     </div>
     <div class="modal fade" id="archived-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-        <div class="modal-dialog" role="document" style="width:362px">
+        <div class="modal-dialog" role="document" style="width:480px">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -379,7 +382,7 @@
                         {{ csrf_field() }}
                         <input type="hidden" id="roi_id" name="roi_id" value="" />
                         <div>SKU<span style="color: #999999;" title="在SAP中新建的产品物料号"><i class="fa fa-info-circle"></i></span></div>
-                        <input type="text" name="sku" style="width: 330px; height: 29px;" value="" />
+                        <input type="text" name="sku" style="width: 448px; height: 29px;" value="" />
                         <div style="height: 10px;"></div>
                         <div>预计上线时间</div>
                         <div class="input-group">
@@ -388,11 +391,11 @@
                                 <i class="fa fa-calendar"></i>
                             </button>
                         </span>
-                            <input type="text" id="launch_time" name="launch_time" style="width: 298px; height: 29px;" disabled />
+                            <input type="text" id="launch_time" name="launch_time" style="width: 415px; height: 29px;" disabled />
                         </div>
                         <div style="height: 10px;"></div>
                         <div>新品规划流程<span style="color: #999999;" title="OA中新品规划流程的页面链接"><i class="fa fa-info-circle"></i></span></div>
-                        <input type="text" name="new_product_planning_process" style="width: 330px; height: 29px;" value="" />
+                        <span style="color: #999999;" title="判断是否为网址"><i class="fa fa-info-circle"></i></span><input type="text" name="new_product_planning_process" style="width: 435px; height: 29px;" value="" placeholder="http://" />
                         <div style="height: 30px;"></div>
                         <div style="float: right;">
                             <button type="submit" class="common-btn" id="" style="width: 80px">确定</button>

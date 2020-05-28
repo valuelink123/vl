@@ -64,6 +64,9 @@
         button.dropdown-toggle{
             padding: 4px 12px;
         }
+        input, select{
+            border: 1px solid #dddddd;
+        }
 
     </style>
     <div class="row">
@@ -204,7 +207,7 @@
         </div>
     </div>
     <div class="modal fade" id="archived-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-        <div class="modal-dialog" role="document" style="width:362px">
+        <div class="modal-dialog" role="document" style="width:480px">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -215,7 +218,7 @@
                         {{ csrf_field() }}
                     <input type="hidden" id="roi_id" name="roi_id" value="" />
                     <div>SKU<span style="color: #999999;" title="在SAP中新建的产品物料号"><i class="fa fa-info-circle"></i></span></div>
-                    <input type="text" name="sku" style="width: 330px; height: 29px;" value="" />
+                    <input type="text" name="sku" style="width: 448px; height: 29px; " value="" />
                     <div style="height: 10px;"></div>
                     <div>预计上线时间</div>
                     <div class="input-group">
@@ -224,11 +227,11 @@
                                 <i class="fa fa-calendar"></i>
                             </button>
                         </span>
-                        <input type="text" id="launch_time" name="launch_time" style="width: 298px; height: 29px;" disabled />
+                        <input type="text" id="launch_time" name="launch_time" style="width: 415px; height: 29px;" disabled />
                     </div>
                     <div style="height: 10px;"></div>
                     <div>新品规划流程<span style="color: #999999;" title="OA中新品规划流程的页面链接"><i class="fa fa-info-circle"></i></span></div>
-                    <input type="text" name="new_product_planning_process" style="width: 330px; height: 29px;" value="" />
+                    <span style="color: #999999;" title="判断是否为网址"><i class="fa fa-info-circle"></i></span><input type="text" name="new_product_planning_process" style="width: 435px; height: 29px;" value="" placeholder="http://" />
                     <div style="height: 30px;"></div>
                     <div style="float: right;">
                         <button type="submit" class="common-btn" id="" style="width: 80px">确定</button>
