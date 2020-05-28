@@ -22,8 +22,8 @@ class ShipmentController extends Controller
     //判断是否登录  todo 上线需打开
     public function __construct()
     {
-//        $this->middleware('auth');
-//        parent::__construct();
+        $this->middleware('auth');
+        parent::__construct();
     }
 
     /**
@@ -198,12 +198,7 @@ class ShipmentController extends Controller
      */
     public function addShipment(Request $request)
     {
-        // $user = Auth::user()->toArray();// todo
-        $user = [
-            'email' => 'test@qq.com',
-            'id' => '159',
-            'sap_seller_id' => '358'
-        ];//todo 只用于测试  删除
+        $user = Auth::user()->toArray();// todo
         /** 超级权限*/
         $DOMIN_MARKETPLACEID_SX = Asin::DOMIN_MARKETPLACEID_SX;
         $r_message = $seller_skus = $seller_accounts = $asins = [];
@@ -324,15 +319,10 @@ class ShipmentController extends Controller
      */
     public function detailShipment(Request $request)
     {
-        //$user = Auth::user()->toArray();// todo
+        $user = Auth::user()->toArray();// todo
         $DOMIN_MARKETPLACEID_SX = Asin::DOMIN_MARKETPLACEID_SX;
         $sku = null;
         $role = 0;
-        $user = [
-            'email' => 'test@qq.com',
-            'id' => '159',
-            'sap_seller_id' => ''
-        ];//todo 只用于测试  删除
         /** 超级权限*/
         $ADMIN_EMAIL = Asin::ADMIN_EMAIL;
         if (!empty($user['email']) && !empty($user)) {
