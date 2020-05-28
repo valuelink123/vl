@@ -22,8 +22,8 @@ class ShipmentController extends Controller
     //判断是否登录  todo 上线需打开
     public function __construct()
     {
-        $this->middleware('auth');
-        parent::__construct();
+//        $this->middleware('auth');
+//        parent::__construct();
     }
 
     /**
