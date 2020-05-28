@@ -164,7 +164,7 @@
 	}
 	/* 弹出框样式 */
 	.mask_box{
-		display: none;
+		display: block;
 		position: fixed;
 		top: 0;
 		right: 0;
@@ -436,7 +436,7 @@
 <div class="mask_box">
 	<div class="mask-dialog">
 		<svg t="1588919283810" class="icon cancel_mask cancel_btn" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4128" width="15" height="15"><path d="M1001.952 22.144c21.44 21.44 22.048 55.488 1.44 76.096L98.272 1003.36c-20.608 20.576-54.592 20-76.096-1.504-21.536-21.44-22.048-55.488-1.504-76.096L925.824 20.672c20.608-20.64 54.624-20 76.128 1.472" p-id="4129" fill="#707070"></path><path d="M22.176 22.112C43.616 0.672 77.6 0.064 98.24 20.672L1003.392 925.76c20.576 20.608 20 54.592-1.504 76.064-21.44 21.568-55.488 22.08-76.128 1.536L20.672 98.272C0 77.6 0.672 43.584 22.176 22.112" p-id="4130" fill="#707070"></path></svg>
-		<h4 style="text-align: center; line-height: 26px;">采购需求</h4>
+		<h4 style="text-align: center; line-height: 26px;">采购计划</h4>
 		<div class="control-label">
 			<label for="" class="" style="display: block;">审核</label>
 			<select name="" id="" class="col-sm-12"></select>
@@ -451,7 +451,7 @@
 		</div>
 		<div class="warp_box">
 			<label for="" class="must wrap_one_single">SellerSKU<select name="" id=""></select><b class="err plan_status_err">请选择SellerSKU</b></label>
-			<label for="" class="must wrap_one_single">调入仓库<select name="" id=""></select><b class="err plan_status_err">请选择调入仓库</b></label>
+			<label for="" class="must wrap_one_single">调入工厂<select name="" id=""></select><b class="err plan_status_err">请选择调入工厂</b></label>
 		</div>
 		<div class="warp_box">
 			<label class="must wrap_one_single" for="">数量<input type="text"><b class="err plan_status_err">请输入数量</b></label>
@@ -477,7 +477,7 @@
 			<input type="text" class="col-sm-12">
 		</div>
 		<div class="warp_box" style="border-top: 1px dashed #ccc; padding-top: 25px;">
-			<label for="" class="wrap_one_single">收货工厂<select name="" id=""></select></label>
+			<label for="" class="wrap_one_single">调出工厂<select name="" id=""></select></label>
 			<label for="" class="wrap_one_single">运输方式<select name="" id=""></select></label>
 		</div>
 		<div class="warp_box">
