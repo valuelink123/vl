@@ -135,20 +135,19 @@
                                 </select>
                             </div>
                             <div style="width:220px; float:left">
-                                <div>归档状态</div>
+                                <div>审核状态</div>
                                 <select name="archived_status" id="archived_status" style="width:205px; height:30px">
                                     <option value="-1">所有</option>
-                                    <option value="1">已归档</option>
-                                    <option value="0">未归档</option>
+                                    <option value="1">已审核</option>
+                                    <option value="0">未审核</option>
                                 </select>
                             </div>
                             <div style="clear:both"></div>
                             <div style="height: 15px;"></div>
                             <div class="input-group">
-                                <input type="text" name="keyword" id="keyword" style="width: 360px; height: 29px" placeholder="输入产品名称，项目编号 或者 SKU" />
+                                <input type="text" name="keyword" id="keyword" style="width: 360px; height: 29px; border: 1px solid #dddddd;" placeholder="输入产品名称，项目编号 或者 SKU" />
                                 <button id="search" type="button" class="search-btn input-group-addon"><span><i class="fa fa-search"></i></span> 搜索</button>
                             </div>
-
                         </div>
                     </form>
 
@@ -179,7 +178,7 @@
                                     <th>创建日期</th>
                                     <th>最新修改人</th>
                                     <th>最新修改日期</th>
-                                    <th>归档状态</th>
+                                    <th>审核状态</th>
                                     <th>操作</th>
                                 </tr>
                                 </thead>
@@ -209,13 +208,13 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="myModalLabel">归档</h4>
+                    <h4 class="modal-title" id="myModalLabel">审核</h4>
                 </div>
                 <div class="modal-body">
                     <form id="archive_form" action="{{ url('/roi_archive') }}" method="post">
                         {{ csrf_field() }}
                     <input type="hidden" id="roi_id" name="roi_id" value="" />
-                    <div>SKU</div>
+                    <div>SKU<span style="color: #999999;" title="在SAP中新建的产品物料号"><i class="fa fa-info-circle"></i></span></div>
                     <input type="text" name="sku" style="width: 330px; height: 29px;" value="" />
                     <div style="height: 10px;"></div>
                     <div>预计上线时间</div>
@@ -228,7 +227,7 @@
                         <input type="text" id="launch_time" name="launch_time" style="width: 298px; height: 29px;" disabled />
                     </div>
                     <div style="height: 10px;"></div>
-                    <div>新品规划流程</div>
+                    <div>新品规划流程<span style="color: #999999;" title="OA中新品规划流程的页面链接"><i class="fa fa-info-circle"></i></span></div>
                     <input type="text" name="new_product_planning_process" style="width: 330px; height: 29px;" value="" />
                     <div style="height: 30px;"></div>
                     <div style="float: right;">

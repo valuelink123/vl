@@ -117,9 +117,9 @@ class RoiController extends Controller
             $lists[$key]['created_at'] = date('Y-m-d',strtotime($list['created_at']));
             $lists[$key]['updated_by'] = array_get($users,$list['updated_by']);
             $lists[$key]['updated_at'] = date('Y-m-d',strtotime($list['updated_at']));
-            $lists[$key]['archived_status'] = $list['archived_status'] == 0 ? '未归档' : '已归档';
+            $lists[$key]['archived_status'] = $list['archived_status'] == 0 ? '未审核' : '已审核';
             $edit_item = $list['archived_status'] == 0 ? '<li><a style="text-align:center" href="' . $edit_url . '">编辑</a></li>' : '';
-            $archived_item = $list['archived_status'] == 0 ? '<li><a style="text-align:center" href="#" data-toggle="modal" data-target="#archived-modal" data-roi_id="' . $list['id'] . '" data-launch_time="' .$list['estimated_launch_time'] .'" >归档</a></li>' : '';
+            $archived_item = $list['archived_status'] == 0 ? '<li><a style="text-align:center" href="#" data-toggle="modal" data-target="#archived-modal" data-roi_id="' . $list['id'] . '" data-launch_time="' .$list['estimated_launch_time'] .'" >审核</a></li>' : '';
             $lists[$key]['action'] = '<ul class="nav navbar-nav"><li><a href="#" class="dropdown-toggle" style="height:10px; vertical-align:middle; padding-top:0px;" data-toggle="dropdown" role="button">...</a><ul class="dropdown-menu" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(-50px, 20px, 0px); min-width: 88px;" role="menu" style="color: #62c0cc8a"><li><a style="text-align:center" href="' . $show_url . '" >查看详情</a></li>' . $edit_item . $archived_item . '<li><a style="text-align:center" href="' . $copy_url .'">复制</a></li></ul></li></ul>';
 //        <div>
 //            <ul class="nav navbar-nav">
@@ -128,7 +128,7 @@ class RoiController extends Controller
 //                    <ul class="dropdown-menu" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(-120px, 20px, 0px);  min-width: 88px;" role="menu" style="color: #cccccc">
 //                        <li><a style="text-align:center" href="{{ $edit_url }}">查看详情</a></li>
 //                        <li><a style="text-align:center" href="{{ $show_url }}">编辑</a></li>
-//                        <li><a style="text-align:center" href="#" data-toggle="modal" data-target="#archived-modal" data-roi_id="{{$list['id']}}" data-launch_time="{{$list['estimated_launch_time']}}">归档</a></li>
+//                        <li><a style="text-align:center" href="#" data-toggle="modal" data-target="#archived-modal" data-roi_id="{{$list['id']}}" data-launch_time="{{$list['estimated_launch_time']}}">审核</a></li>
 //                        <li><a style="text-align:center" href="{{ $copy_url }}">复制</a></li>
 //                    </ul>
 //                </li>
@@ -701,15 +701,8 @@ class RoiController extends Controller
         $roi['billing_period_type'] = $billingPeriods[$roi['billing_period_type']]['name'];
         $estimated_launch_time = $roi['estimated_launch_time'];
         if($estimated_launch_time){
-            $day = substr($estimated_launch_time,-2);
-            if($day <= 15){
-                for($i=1; $i<=12; $i++){
-                    $roi['month_'.$i] = date("Y-m", strtotime("+".($i-1)." months", strtotime($estimated_launch_time)));
-                }
-            }else{
-                for($i=1; $i<=12; $i++){
-                    $roi['month_'.$i] = date("Y-m", strtotime("+".$i." months", strtotime($estimated_launch_time)));
-                }
+            for($i=1; $i<=12; $i++){
+                $roi['month_'.$i] = date("Y-m", strtotime("+".($i-1)." months", strtotime($estimated_launch_time)));
             }
         }
 
