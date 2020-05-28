@@ -507,10 +507,10 @@ function getSapFactoryCode(){
 function getMarketplaceCode(){
     return array(
         'A2EUQ1WTGCTBG2'=>array(
-			'fba_factory_warhouse'=>array(
+			'fba_factory_warehouse'=>array(
 				'0'=>array('sap_factory_code'=>'CA01','sap_warehouse_code'=>'AC2')
 			),
-			'fbm_factory_warhouse'=>array(
+			'fbm_factory_warehouse'=>array(
 				'0'=>array('sap_factory_code'=>'CA04','sap_warehouse_code'=>'GA4'),
 				'1'=>array('sap_factory_code'=>'CA02','sap_warehouse_code'=>'GA1')
 			),
@@ -520,10 +520,10 @@ function getMarketplaceCode(){
 		),
 		
 		'A1PA6795UKMFR9'=>array(
-			'fba_factory_warhouse'=>array(
+			'fba_factory_warehouse'=>array(
 				'0'=>array('sap_factory_code'=>'GR01','sap_warehouse_code'=>'AG2')
 			),
-			'fbm_factory_warhouse'=>array(
+			'fbm_factory_warehouse'=>array(
 				'0'=>array('sap_factory_code'=>'GR04','sap_warehouse_code'=>'GR4'),
 				'1'=>array('sap_factory_code'=>'GR02','sap_warehouse_code'=>'GR1')
 			),
@@ -533,10 +533,10 @@ function getMarketplaceCode(){
 		),
 		
 		'A1RKKUPIHCS9HS'=>array(
-			'fba_factory_warhouse'=>array(
+			'fba_factory_warehouse'=>array(
 				'0'=>array('sap_factory_code'=>'ES01','sap_warehouse_code'=>'AS2')
 			),
-			'fbm_factory_warhouse'=>array(
+			'fbm_factory_warehouse'=>array(
 				'0'=>array('sap_factory_code'=>'ES02','sap_warehouse_code'=>'ES2')
 			),
 			'site_code'=>'amazon.es',
@@ -545,10 +545,10 @@ function getMarketplaceCode(){
 		),
 		
 		'A13V1IB3VIYZZH'=>array(
-			'fba_factory_warhouse'=>array(
+			'fba_factory_warehouse'=>array(
 				'0'=>array('sap_factory_code'=>'FR01','sap_warehouse_code'=>'AF2')
 			),
-			'fbm_factory_warhouse'=>array(
+			'fbm_factory_warehouse'=>array(
 				'0'=>array('sap_factory_code'=>'FR02','sap_warehouse_code'=>'FR1')
 			),
 			'site_code'=>'amazon.fr',
@@ -557,10 +557,10 @@ function getMarketplaceCode(){
 		),
 		
 		'APJ6JRA9NG5V4'=>array(
-			'fba_factory_warhouse'=>array(
+			'fba_factory_warehouse'=>array(
 				'0'=>array('sap_factory_code'=>'IT01','sap_warehouse_code'=>'AI2')
 			),
-			'fbm_factory_warhouse'=>array(
+			'fbm_factory_warehouse'=>array(
 				'0'=>array('sap_factory_code'=>'IT02','sap_warehouse_code'=>'IT2')
 			),
 			'site_code'=>'amazon.it',
@@ -569,10 +569,10 @@ function getMarketplaceCode(){
 		),
 		
 		'A1VC38T7YXB528'=>array(
-			'fba_factory_warhouse'=>array(
+			'fba_factory_warehouse'=>array(
 				'0'=>array('sap_factory_code'=>'JP01','sap_warehouse_code'=>'AJ2')
 			),
-			'fbm_factory_warhouse'=>array(
+			'fbm_factory_warehouse'=>array(
 				'0'=>array('sap_factory_code'=>'JP02','sap_warehouse_code'=>'CJP2')
 			),
 			'site_code'=>'amazon.co.jp',
@@ -581,10 +581,10 @@ function getMarketplaceCode(){
 		),
 		
 		'A1F83G8C2ARO7P'=>array(
-			'fba_factory_warhouse'=>array(
+			'fba_factory_warehouse'=>array(
 				'0'=>array('sap_factory_code'=>'UK01','sap_warehouse_code'=>'AE3')
 			),
-			'fbm_factory_warhouse'=>array(
+			'fbm_factory_warehouse'=>array(
 				'0'=>array('sap_factory_code'=>'UK04','sap_warehouse_code'=>'UK4'),
 				'1'=>array('sap_factory_code'=>'UK02','sap_warehouse_code'=>'UK2')
 			),
@@ -594,10 +594,10 @@ function getMarketplaceCode(){
 		),
 		
 		'ATVPDKIKX0DER'=>array(
-			'fba_factory_warhouse'=>array(
+			'fba_factory_warehouse'=>array(
 				'0'=>array('sap_factory_code'=>'US01','sap_warehouse_code'=>'AA1')
 			),
-			'fbm_factory_warhouse'=>array(
+			'fbm_factory_warehouse'=>array(
 				'0'=>array('sap_factory_code'=>'US02','sap_warehouse_code'=>'US2'),
 				'1'=>array('sap_factory_code'=>'US04','sap_warehouse_code'=>'US1'),
 				'2'=>array('sap_factory_code'=>'US06','sap_warehouse_code'=>'US1')
