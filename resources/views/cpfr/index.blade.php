@@ -201,7 +201,7 @@
 	.mask-form > div > input,.mask-form > div > select{
 		width: 100%;
 		height: 28px;
-		margin-bottom: 10px;
+		margin-bottom: 18px;
 		border: 1px solid rgba(220, 223, 230, 1)
 	}
 	.mask-form > div > label{
