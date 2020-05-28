@@ -135,7 +135,7 @@
             <form id="roi_form" action="{{ url('/roi/updateRecord') }}" method="post" onsubmit="return validate_form()">
                 {{ csrf_field() }}
                 {{--{{ method_field('PUT') }}--}}
-                <input type="hidden" name="roi_id" value="{{$roi['id']}}">
+                <input type="hidden" name="roi_id" id="roi_id" value="{{$roi['id']}}">
                 <div class="portlet light bordered" style="text-align: center">
                   <div style="width: 1502px; text-align: left; margin: auto;">
                     <div style="height: 25px;"></div>
@@ -616,6 +616,20 @@
 <script type="text/javascript">
     var currency_rates = eval(<?php echo json_encode($currency_rates);?>);
 
+    function refresh_time() {
+        setTimeout(refresh_time, 1000 * 60); //这里的1000表示1秒有1000毫秒
+        var roi_id = $('#roi_id').val();
+        $.ajax({
+            "dataType": 'json',
+            "type": "post",
+            "url": "/roi_fresh_time",
+            "data": {"roi_id": roi_id},
+            "success": function (data) {
+                console.log(data);
+            }
+        });
+    }
+
     $(function() {
         $('.date-picker').datepicker({
             rtl: App.isRTL(),
@@ -623,6 +637,8 @@
             orientation: 'bottom',
             autoclose: true,
         });
+
+        refresh_time();
     });
 
     function fold_cost_details(){
@@ -668,12 +684,6 @@
         var total_sales_amount = $('#total_sales_amount').text();
         if(total_sales_amount == '' || total_sales_amount == '0.00'){
             alert("Total sales amount cannot be 0.");
-            return false;
-        }
-        var tariff_rate = $('#tariff_rate').val();
-        if(tariff_rate == '' || tariff_rate == '0.00'){
-            alert("Tariff rate cannot be 0.");
-            $('#tariff_rate').focus();
             return false;
         }
     }

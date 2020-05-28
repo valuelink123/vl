@@ -102,8 +102,8 @@
 	<div class="content">
 		<div class="filter_box">
 			<div class="filter_option">
-				<label for="stationSelect">站点</label>
-				<select id="stationSelect" onchange="status_filter(this.value,2)">
+				<label for="siteSelect">站点</label>
+				<select id="siteSelect" onchange="status_filter(this.value,2)">
 					<option value ="">全部</option>
 					<option value ="US">US</option>
 					<option value ="CA">CA</option>
@@ -118,7 +118,7 @@
 			</div>
 			<div class="filter_option">
 				<label for="skuStatusSelect">SKU状态</label>
-				<select id="skuStatusSelect" onchange="status_filter(this.value,4)">
+				<select id="skuStatusSelect" onchange="change_skustatus(this.value,4)">
 					<option value ="">全部</option>
 					<option value ="2">新品</option>
 					<option value ="1">保留</option>
@@ -130,8 +130,8 @@
 				</select>
 			</div>
 			<div class="filter_option">
-				<label for="skuGradeSelect">SKU等级</label>
-				<select id="skuGradeSelect" onchange="status_filter(this.value,5)">
+				<label for="levelSelect">SKU等级</label>
+				<select id="levelSelect" onchange="status_filter(this.value,5)">
 					<option value ="">全部</option>
 					<option value ="S">S</option>
 					<option value ="A">A</option>
@@ -164,13 +164,16 @@
 			</div>
 			<div class="filter_option">
 				<label for="maintainerSelect">维护人</label>
-				<select id="maintainerSelect" onchange="status_filter(this.value,10)">
+				<select id="maintainerSelect" onchange="change_maintainer(this.value,10)">
 					<option value ="">全部</option>
+					@foreach($usersIdName as $k=>$v)
+					<option value ="{{$k}}">{{$v}}</option>
+					@endforeach
 				</select>
 			</div>
 			<div class="filter_option search_box">
 				<label for="">搜索</label>
-				<input type="text" class="keyword" placeholder="请输入关键字">
+				<input type="text" id="searchKeyword" class="keyword" placeholder="请输入关键字">
 				<button class="search" onclick="keyword_filter()">
 					<svg t="1588043111114" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3742" width="18" height="18"><path d="M400.696889 801.393778A400.668444 400.668444 0 1 1 400.696889 0a400.668444 400.668444 0 0 1 0 801.393778z m0-89.031111a311.637333 311.637333 0 1 0 0-623.331556 311.637333 311.637333 0 0 0 0 623.331556z" fill="#ffffff" p-id="3743"></path><path d="M667.904 601.998222l314.766222 314.823111-62.919111 62.976-314.823111-314.823111z" fill="#ffffff" p-id="3744"></path></svg>
 					搜索
@@ -181,7 +184,7 @@
 		<div class="update_box">
 			<div class="filter_option change_box">
 				<label for="" style="display: inline-block; margin-right: 5px;">更改安全库存天数:</label>
-				<input type="text" class="keyword" placeholder="输入安全库存天数">
+				<input type="text" id="newSafetyStock" class="keyword" placeholder="输入安全库存天数"  onkeyup="value=value.replace(/^(0+)|[^\d]+/g,'')">
 				<button class="change">
 					<svg t="1589004081856" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1149" width="18" height="18"><path d="M310.144 605.587s107.454 38.525 172.491 110.569 121.692 134.819 121.692 134.819 49.018-104.785 178.609-245.388 213.648-178.609 213.648-178.609-10.271-58.474-11.828-107.9c-2.447-78.125 1.298-146.017 1.298-146.017s-102.746 19.244-234.635 215.391S593.834 668.62 593.834 668.62l-94.551-192.624-189.139 129.591z" fill="#ffffff" p-id="1150"></path></svg>
 					change
@@ -214,6 +217,9 @@
 	</thead>
 </table>
 <script>
+    var usersIdName = eval(<?php echo json_encode($usersIdName);?>);
+    var skuStatuses = eval(<?php echo json_encode($skuStatuses);?>);
+
 	//正则判断输入整数
 	function validataInt(ob) {
 		ob.value = ob.value.replace(/^(0+)|[^\d]+/g,'')
@@ -225,6 +231,17 @@
 	    }
 	    else tableObj.column(column).search(value).draw();
 	}
+
+	function change_skustatus(value,column){
+        var skuStatus = (value == '') ? '' : skuStatuses[value];
+        status_filter(skuStatus, column);
+	}
+
+	function change_maintainer(value,column){
+	    var userName = (value == '') ? '' : usersIdName[value];
+        status_filter(userName, column);
+	}
+
 	function keyword_filter() {
 		let val = $('.keyword').val();
 		tableObj.search(val).draw();
@@ -232,16 +249,60 @@
 	$(document).ready(function(){
 		//批量编辑
 		$('.change').on('click',function(){
+		    var days = $('#newSafetyStock').val();
+		    if(days == ''){
+                $('#newSafetyStock').focus();
+                return false;
+			}
+
 			let checkbox_list = [];
 			$("input[name='checkedInput']:checked").each(function () {
 				checkbox_list.push($(this).val());	
 			});
+
 			if(checkbox_list.length < 1){
-				alert('请先选择产品')
+				alert('请先选择产品');
 			}else{
-				console.log(checkbox_list)
-			} 		
+                $.ajax({
+                    type:"post",
+                    url:'/manageDistributeTime/updateSafetyStockDays',
+                    data:{
+                        ids: checkbox_list,
+						safe_quantity: days,
+                    },
+                    error:function(err){
+                        console.log(err);
+                    },
+                    success:function(res){
+                        tableObj.ajax.reload()
+                    }
+                });
+			}
 		})
+
+        //下载数据
+        $("#export").click(function(){
+            let checkbox_list = [];
+            $("input[name='checkedInput']:checked").each(function () {
+                checkbox_list.push($(this).val());
+            });
+            if(checkbox_list.length < 1){
+                var keyword = $('#searchKeyword').val();
+                //将搜索内容中的' '（空格）全部替换成'+'，否则会出现问题
+                if(keyword != ''){
+                    var keyword = keyword.replace(/\s+/g, '+');
+				}
+
+                location.href='/manageDistributeTime/exportSafetyStockDays?site=' + $('#siteSelect').val() + '&status=' + $('#skuStatusSelect').val() + '&level=' + $('#levelSelect').val() + '&bg=' + $('#bgSelect').val() + '&bu=' + $('#buSelect').val() + '&maintainer=' + $('#maintainerSelect').val() + '&keyword=' + keyword;
+                return false;
+            }else{
+                var ids = checkbox_list.join(',');
+				location.href='/manageDistributeTime/exportSafetyStockDays?ids=' + ids;
+				return false;
+            }
+
+        });
+
 		//全选
 		$("#selectAll").on('change',function(e) {  
 		    $("input[name='checkedInput']").prop("checked", this.checked);
@@ -259,9 +320,9 @@
 			$('#maintainerSelect').val('');
 			$('#buSelect').val('');
 			$('#bgSelect').val('');
-			$('#skuGradeSelect').val('');
+			$('#levelSelect').val('');
 			$('#skuStatusSelect').val('');
-			$('#stationSelect').val('');
+			$('#siteSelect').val('');
 			status_filter('',2)
 			status_filter('',4)
 			status_filter('',5)
@@ -276,7 +337,7 @@
 		
 		tableObj = $('#safetyStockTable').DataTable({
 			lengthMenu: [
-			    20, 50, 100, 'All'
+			    20, 50, 100
 			],
 			order: [ 9, "desc" ],
 			dispalyLength: 2, // default record count per page
@@ -285,64 +346,21 @@
 			serverSide: false,//是否所有的请求都请求服务器	
 			scrollX: "100%",
 			scrollCollapse: false,
-			/* ajax: {
-				url: "",
+			ajax: {
+				url: "/manageDistributeTime/safetyStockDays",
 				type: "post",
-				data : function(){
-					reqList = {
-						"sap_seller_id" : 1,
-					};
-					return reqList;
-				},
-				dataSrc:function(res){
-					console.log(res)
-					//return res
-				},
-			}, */	
-			data: [
-				{
-					id:1,
-					sku: 'sku',
-					station: 'station',
-					item_description: 'item_description',
-					sku_status: 'sku_status',
-					sku_grade: 'sku_grade',
-					bg: 'bg',
-					bu: 'bu',
-					average: 'average',
-					days: 'days',
-					maintainer: 'maintainer',
-					updateTime: '2020-05-20',
-				},
-				{
-					id:2,
-					sku: 'sku',
-					station: 'mmm',
-					item_description: 'item_description',
-					sku_status: 'sku_status',
-					sku_grade: 'sku_grade',
-					bg: 'bg',
-					bu: 'bu',
-					average: 'average',
-					days: 'days',
-					maintainer: 'maintainer',
-					updateTime: '2020-05-20',
-				},
-				{
-					id:2,
-					sku: 'sku',
-					station: 'station',
-					item_description: 'item_description',
-					sku_status: 'sku_status',
-					sku_grade: 'sku_grade',
-					bg: 'bg',
-					bu: 'bu',
-					average: 'average',
-					days: 'days',
-					maintainer: 'maintainer',
-					updateTime: '2020-05-20',
-				}
-			],	
+//				data : function(){
+//					reqList = {
+//						"sap_seller_id" : 1,
+//					};
+//					return reqList;
+//				},
+//				dataSrc:function(res){
+//					console.log(res)
+//					//return res
+//				},
+			},
+
 			columns: [
 				{
 					data: "id",
@@ -358,16 +376,16 @@
 					data: "sku" ,
 				},
 				{
-					data: "station" ,
+					data: "site" ,
 				},
 				{
-					data: 'item_description',
+					data: 'description',
 				},
 				{
-					data: 'sku_status',
+					data: 'status',
 				},
 				{
-					data: "sku_grade",
+					data: "level",
 				},
 				{
 					data: "bg",
@@ -376,20 +394,21 @@
 					data: 'bu',
 				},
 				{
-					data: 'average',
+					data: 'daily_sales',
 				},
 				{
-					data: 'days',
+					data: 'safe_quantity',
 				},
 				{
 					data: 'maintainer',
 				},
 				{ 
-					data: 'updateTime',
+					data: 'maintain_time',
 				},
-			], 
+			],
 			columnDefs: [
 				{ "bSortable": false, "aTargets": [ 0,1,2,3,4,5,6,7,8,10]},
+//                { "bVisible": false, "aTargets": [12] },
 				{
 					"targets": [9],
 					render: function (data, type, row) {
@@ -407,11 +426,14 @@
 							if($(this).val() != cellData){
 								$(cell).html(text);
 								tableObj.cell(cell).data(text);
+								var ids = [];
+								ids.push(rowData.id);
 								$.ajax({
 									type:"post",
-									url:'',
+									url:'/manageDistributeTime/updateSafetyStockDays',
 									data:{
-										id: rowData.id,
+										ids: ids,
+                                        safe_quantity: rowData.safe_quantity,
 									},
 									error:function(err){
 									    console.log(err);

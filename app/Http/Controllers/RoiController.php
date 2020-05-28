@@ -530,6 +530,54 @@ class RoiController extends Controller
     public function edit(Request $request, $id)
     {
         if(!Auth::user()->can(['roi-update'])) die('Permission denied -- roi-update');
+        $usersIdName = $this->getUsersIdName();
+        //编辑限制：其中一个用户编辑时，另一个用户只能查看。编辑用户关闭浏览器（标签）前未保存，则过$expiry_time = 70s后其他用户可编辑。
+        $roi_id = $id;
+        //$expiry_time 略大于edit页面ajax刷新时间60s
+        $expiry_time = 70;
+        $currentUserId = Auth::user()->id;
+        $roi_edit_lock_query = DB::connection('amazon')->table('roi_edit_lock')->where('roi_id','=', $roi_id);
+        $roi_edit_lock = $roi_edit_lock_query->first();
+        if($roi_edit_lock){
+            $roi_edit_lock = json_decode(json_encode($roi_edit_lock),true);
+            $editing_user = $roi_edit_lock['editing_user'];
+            $refresh_time = intval(strtotime($roi_edit_lock['refresh_time']));
+            //when user saved the edit page successfully, editing_user is set to 0
+            if($editing_user == 0){
+                $roi_edit_lock_query->update(
+                  array('editing_user'=>$currentUserId, 'refresh_time'=>date('Y-m-d H:i:s'))
+                );
+                //go to edit page
+            }
+            else{
+               if(Auth::user()->id  == $editing_user){
+                   $roi_edit_lock_query->update(
+                       array('refresh_time'=>date('Y-m-d H:i:s'))
+                   );
+                   //go to edit page
+               }
+               else{
+                  if(time() - $refresh_time < $expiry_time){
+                      //show error_message: someone is editing
+                      $request->session()->flash('error_message', array_get($usersIdName, $editing_user) .' is editing the file.');
+                      return redirect('roi/'.$roi_id);
+                  }
+                  else{
+                      $roi_edit_lock_query->update(
+                          array('editing_user'=>$currentUserId, 'refresh_time'=>date('Y-m-d H:i:s'))
+                      );
+                      //go to edit page
+                  }
+              }
+            }
+        }
+        else{
+            DB::connection('amazon')->table('roi_edit_lock')->insert(
+                array('roi_id'=>$roi_id, 'editing_user'=>$currentUserId, 'refresh_time'=>date('Y-m-d H:i:s'))
+            );
+            //go to edit page
+        }
+
         $sites = $this->getSites();
         $billingPeriods = $this->getBillingPeriods();
         $transportModes = $this->getTransportModes();
@@ -721,6 +769,13 @@ class RoiController extends Controller
             $request->session()->flash('error_message','Update Failed.');
             return redirect()->back()->withInput();
         }else{
+            $roi_edit_lock = DB::connection('amazon')->table('roi_edit_lock')->where('roi_id','=', $roi_id)->first();
+            if($roi_edit_lock){
+                DB::connection('amazon')->table('roi_edit_lock')->where('roi_id','=', $roi_id)->update(
+                    array('editing_user'=> '0')
+                );
+            }
+
             return redirect('roi');
         }
         DB::commit();
@@ -1238,6 +1293,18 @@ class RoiController extends Controller
 
     public function getUsers(){
         return User::pluck('name','id');
+    }
+
+    public function roiRefreshTime(Request $req){
+        $roi_id = $req->input('roi_id');
+        $roi_edit_lock = DB::connection('amazon')->table('roi_edit_lock')->where('roi_id','=', $roi_id)->first();
+        if($roi_edit_lock){
+            $updateData = array();
+            $updateData['refresh_time'] = date('Y-m-d H:i:s');
+            DB::connection('amazon')->table('roi_edit_lock')->where('roi_id','=', $roi_id)->update($updateData);
+        }
+
+        return json_encode(array('msg' => 'refresh successfullly'));
     }
 
 }

@@ -12,6 +12,8 @@ use App\ShipmentRequest;
 use App\SapPurchase;
 use App\DailyStatistic;
 use App\SapPurchaseRecord;
+use App\SapSkuSite;
+use App\InternationalTransportTime;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Services\MultipleQueue;
@@ -127,7 +129,7 @@ class MrpController extends Controller
 		
 			
 		if($type=='sku'){
-			$sql="SELECT SQL_CALC_FOUND_ROWS a.sku,marketplace_id,any_value(sap_seller_id) as sap_seller_id,  count(asin) as asin, sum(daily_sales) as daily_sales,sum(quantity) as quantity, any_value(min_purchase_quantity) as min_purchase_quantity from (".str_replace('SQL_CALC_FOUND_ROWS','',$sql).") as skus_table 
+			$sql="SELECT SQL_CALC_FOUND_ROWS sku,marketplace_id,any_value(sap_seller_id) as sap_seller_id,  count(asin) as asin, sum(daily_sales) as daily_sales,sum(quantity) as quantity from (".str_replace('SQL_CALC_FOUND_ROWS','',$sql).") as skus_table 
 			group by sku,marketplace_id order by daily_sales desc";
 		}
 		//left join (SELECT sku,any_value(min_purchase_quantity) as min_purchase_quantity  from (SELECT sku,min_purchase_quantity FROM sap_purchase_records ORDER by created_date desc) a1 GROUP BY a1.sku) as b on a.sku=b.sku
@@ -138,7 +140,7 @@ class MrpController extends Controller
 			$limit = $this->dtLimit($req);
 			$sql .= " LIMIT {$limit} ";
 		}
-		
+
 		$datas = DB::connection('amazon')->select($sql);
 		
 		$datas = json_decode(json_encode($datas),true);
@@ -148,6 +150,8 @@ class MrpController extends Controller
 		$sellers = getUsers('sap_seller');
 		foreach ($datas as $key => $val) {
 			$min_purchase_quantity = intval(SapPurchaseRecord::where('sku',$val['sku'])->orderBy('created_date','desc')->value('min_purchase_quantity'));
+			$data_placement ='top';
+			if($key<4) $data_placement='bottom';
 			$asin_plans = AsinSalesPlan::SelectRaw('sum(quantity_last) as quantity,week_date')->where($type,$val[$type])->where('marketplace_id',$val['marketplace_id'])->where('date','>=',$date_from)->where('date','<=',$date_to)->groupBy(['week_date'])->get()->keyBy('week_date')->toArray();
 			$data[$key]['seller'] = array_get($sellers,$val['sap_seller_id']);
 			$data[$key]['asin'] = ($type=='asin')?'<a href="/mrp/edit?asin='.$val['asin'].'&marketplace_id='.$val['marketplace_id'].'">'.$val['asin'].'</a>':$val['asin'];
@@ -156,8 +160,9 @@ class MrpController extends Controller
 			$data[$key]['min_purchase'] = $min_purchase_quantity;
 			$data[$key]['week_daily_sales'] = round($val['daily_sales']*7,2);
 			$data[$key]['22_week_plan_total'] = intval($val['quantity']);
+			
 			for($i=1;$i<=22;$i++){
-				$data[$key][$i.'_week_plan'] = '<a class="week_plan editable" title="'.$val['asin'].' '.array_get($siteCode,$val['marketplace_id']).' weeks '.$i.' Plan" href="javascript:;" id="'.$val['asin'].'--'.$val['marketplace_id'].'--'.date('Y-m-d',strtotime('+'.$i.' weeks sunday')).'" data-pk="'.$val['asin'].'--'.$val['marketplace_id'].'--'.date('Y-m-d',strtotime('+'.$i.' weeks sunday')).'" data-type="text">'.array_get($asin_plans,date('Y-m-d',strtotime('+'.$i.' weeks sunday')).'.quantity',0).'</a>';
+				$data[$key][$i.'_week_plan'] = ($type!='sku' && date('Y-m-d',strtotime($date.' +'.$i.' weeks sunday'))>=date('Y-m-d',strtotime('+1 weeks sunday')))?('<a class="week_plan editable" title="'.$val['asin'].' '.array_get($siteCode,$val['marketplace_id']).' weeks '.$i.' Plan" href="javascript:;" id="'.$val['asin'].'--'.$val['marketplace_id'].'--'.$val['sku'].'--'.date('Y-m-d',strtotime($date.' +'.$i.' weeks sunday')).'" data-pk="'.$val['asin'].'--'.$val['marketplace_id'].'--'.$val['sku'].'--'.date('Y-m-d',strtotime($date.' +'.$i.' weeks sunday')).'" data-type="text" data-placement="'.$data_placement.'">'.array_get($asin_plans,date('Y-m-d',strtotime($date.' +'.$i.' weeks sunday')).'.quantity',0).'</a>'):array_get($asin_plans,date('Y-m-d',strtotime($date.' +'.$i.' weeks sunday')).'.quantity',0);
             }
 		}
 		
@@ -198,7 +203,6 @@ class MrpController extends Controller
 			$request->session()->flash('error_message','No Data Match This Keywords');
             return redirect()->back()->withInput();
 		}
-		AsinSalesPlan::calPlans($asin,$marketplace_id,$sku,date('Y-m-d'),date('Y-m-d',strtotime("+22 Sunday")));
 		$show = $request->get('show')??'day';
 		$type = $request->get('type')??'asin';
 		$date=90;
@@ -225,9 +229,12 @@ class MrpController extends Controller
 				$add_where[] ="(sap_factory_code = '".$v1['sap_factory_code']."' and sap_warehouse_code = '".$v1['sap_warehouse_code']."')";
 			}
 		}
-		$sku_info = DB::connection('amazon')->table('sap_sku_sites')->where('sku',$sku)->where('marketplace_id',$marketplace_id)->whereRaw("(".implode(' or ',$add_where).")")->first();
+		$sku_info = SapSkuSite::where('sku',$sku)->where('marketplace_id',$marketplace_id)->whereRaw("(".implode(' or ',$add_where).")")->first()->toArray();
+		$sku_purchase_info = SapPurchaseRecord::where('sku',$sku)->orderBy('created_date','desc')->first()->toArray();
+		$sku_info['min_purchase_quantity'] = $sku_purchase_info['min_purchase_quantity'];
+		$sku_info['estimated_cycle'] = $sku_purchase_info['estimated_cycle'];
+		$sku_info['international_transport_time'] = InternationalTransportTime::where('factory_code',array_get(getMarketplaceCode(),$marketplace_id.'.fba_factory_warhouse.0.sap_factory_code'))->where('is_default',1)->value('total_days');
 		
-		$sku_info->min_purchase_quantity = DB::connection('amazon')->table('sap_purchase_records')->where('sku',$sku)->orderBy('created_date','desc')->value('min_purchase_quantity');
 		
 		$sales_plan=[];
 		if($show=='week'){
@@ -363,10 +370,55 @@ class MrpController extends Controller
 			$data->save();
 			
 			$return[$asin] = AsinSalesPlan::selectRaw("sum(quantity_last) as quantity_last")->where('asin',$asin)->where('marketplace_id',$marketplace_id)->where('date','>=',$date_from)->where('date','<=',$date_to)->value('quantity_last');
+			AsinSalesPlan::calPlans($asin,$marketplace_id,$sku,date('Y-m-d'),date('Y-m-d',strtotime("+22 Sunday")));
 		}
 		$return[$request->get('name')] = $value;
 		echo json_encode($return);
     }
+	
+	
+	public function weekupdate(Request $request)
+    {
+		$key = explode('--',$request->get('name'));
+		$asin = array_get($key,0);
+		$marketplace_id = array_get($key,1);
+		$sku = array_get($key,2);
+		$week_date = array_get($key,3);
+		$week_value = $request->get('value');
+		$max_value=0;
+		$week_per = $this->week_per;
+		for($ki=0;$ki<=6;$ki++){
+			$date = date("Y-m-d", strtotime($week_date)-86400*$ki);
+			
+			$value = round($week_value*array_get($week_per,$ki));			
+			if($max_value+$value>$week_value) $value = $week_value-$max_value;
+			if($max_value<=$week_value && $ki==6) $value = $week_value-$max_value;
+			$max_value+=$value;
+			$data = AsinSalesPlan::updateOrCreate(
+				[
+					'asin' => $asin,
+					'marketplace_id' => $marketplace_id,
+					'date'=>$date
+				],
+				[
+					'quantity_last'=>$value,
+					'sku'=>$sku,
+					'week_date'=>$week_date ,
+					'updated_at'=>date('Y-m-d H:i:s')
+					
+				]
+			);
+			if($data->quantity_first == 0){
+				$data->quantity_first=$value;
+			}
+			$data->save();
+		}
+									
+		
+		$return[$request->get('name')] = $week_value;
+		echo json_encode($return);
+    }
+
 
     
     public function export(Request $request)
@@ -501,7 +553,7 @@ class MrpController extends Controller
 			$data[$key]['fba_transfer'] = intval($val['sum_estimated_afn']);
 			$data[$key]['fbm_stock'] = intval($val['mfn_sellable']);
 			$data[$key]['stock_keep'] = (round($val['daily_sales'],2)==0)?'∞':date('Y-m-d',strtotime('+'.intval(($val['afn_sellable']+$val['afn_reserved']+$val['mfn_sellable']+$val['sum_estimated_afn'])/round($val['daily_sales'],2)).'days'));
-			$data[$key]['sz'] = 0;
+			$data[$key]['sz'] = intval($val['sz_sellable']);
 			$data[$key]['in_make'] = intval($val['sum_estimated_purchase']);
 			$data[$key]['out_stock'] = intval($val['out_stock_count']);
 			$data[$key]['out_stock_date'] = $val['out_stock_date'];
@@ -647,10 +699,27 @@ on a.asin=c.asin and a.marketplace_id=c.marketplace_id
 										$updateData[$date]['week_date']=$week_date;
 										$updateData[$date]['quantity_last']=$value;
 										$updateData[$date]['updated_at']=$time;
+										
+										$data = AsinSalesPlan::updateOrCreate(
+											[
+												'asin' => $asin,
+												'marketplace_id' => $marketplace_id,
+												'date'=>$date
+											],
+											[
+												'quantity_last'=>$value,
+												'sku'=>$sku,
+												'week_date'=>$week_date ,
+												'updated_at'=>$time
+												
+											]
+										);
+										if($data->quantity_first == 0){
+											$data->quantity_first=$value;
+										}
+										$data->save();
 									}
 								}
-								
-								if($updateData) AsinSalesPlan::insertOnDuplicateWithDeadlockCatching(array_values($updateData), ['week_date','sku','quantity_last','updated_at']);
 								AsinSalesPlan::calPlans($asin,$marketplace_id,$sku,date('Y-m-d'),date('Y-m-d',strtotime("+22 Sunday")));
 							}
 						}

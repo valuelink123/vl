@@ -173,7 +173,7 @@ table.dataTable thead th, table.dataTable thead td {
 						<?php
 						for($i=1;$i<=22;$i++){
 						?>
-                        <th class="week_end_date">{{date('Y-m-d',strtotime($date.' +'.$i.' weeks sunday'))}}</th>
+                        <th class="week_end_date">{{date('Y-m-d',strtotime($date.' +'.$i.' weeks monday')-86400*7)}}</th>
                         <?php } ?>
                     </tr>
                     </thead>
@@ -252,9 +252,23 @@ var initTable = function () {
 		"fnDrawCallback": function (oSettings) {
 			$.mockjaxSettings.responseTime = 500;
 			$.fn.editable.defaults.inputclass = 'form-control';
-			//$.fn.editable.defaults.url = '/mrp/update';	
+			$.fn.editable.defaults.url = '/mrp/weekupdate';	
 			$('.week_plan').editable({
-				emptytext:'N/A'
+				emptytext:'0',
+				validate: function (value) {
+					if (isNaN(value)) {
+						return 'Must be a number';
+					}
+				},
+				success: function (response) { 
+					var obj = JSON.parse(response);
+					for(var jitem in obj){
+						$('#'+jitem).text(obj[jitem]);
+					}
+				}, 
+				error: function (response) { 
+					return 'remote error'; 
+				} 
 			});
 
         }
@@ -275,7 +289,7 @@ $('#search').click(function () {
 	dtApi.ajax.reload();
 	$(".week_end_date").each(function(index){
 		
-		var ndate = getNextSunday(index+1);
+		var ndate = getNextMonday(index+1);
 		
 		$(this).text(ndate);
 	});	
@@ -293,10 +307,10 @@ $('.date-picker').datepicker({
 	autoclose: true
 });
 
-function getNextSunday(i) {
+function getNextMonday(i) {
 	var now = new Date($("#date").val());
 	var day = now.getDay();
-	n = day == 0 ? 7*i : (7*(i+1)-day);
+	n = day == 0 ? 7*i-6 : (7*(i+1)-day-6);
 	now.setDate(now.getDate() + n);
 	var year = now.getFullYear();
 	var month = now.getMonth() + 1;
