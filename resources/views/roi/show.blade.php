@@ -1,4 +1,7 @@
 @extends('layouts.layout')
+@section('crumb')
+    <a href="/roi">ROI Analysis</a>
+@endsection
 @section('content')
     <style type="text/css">
         #sales_table{
@@ -171,8 +174,8 @@
                             <th width="100px">{{$roi['month_4']}}</th>
                             <th width="100px">{{$roi['month_5']}}</th>
                             <th width="100px">{{$roi['month_6']}}</th>
-                            <th width="100px">{{$roi['month_7']}}</td>
-                            <th width="100px">{{$roi['month_8']}}</td>
+                            <th width="100px">{{$roi['month_7']}}</th>
+                            <th width="100px">{{$roi['month_8']}}</th>
                             <th width="100px">{{$roi['month_9']}}</th>
                             <th width="100px">{{$roi['month_10']}}</th>
                             <th width="100px">{{$roi['month_11']}}</th>
@@ -295,46 +298,46 @@
                                     <div>
                                         <div style="margin-right: 20px; float: left;"><span class="grey_color">不含税采购价 :</span> <span class="bold">{{$roi['purchase_price']}}</span></div>
                                         <div style="margin-right: 20px; float: left;"><span class="grey_color">MOQ(PCS) :</span> <span class="bold">{{$roi['moq']}}</span></div>
-                                        <div style="margin-right: 20px; float: left;"><span class="grey_color">单PCS实重(KG) :</span> <span class="bold">{{$roi['weight_per_pcs']}}</span></div>
-                                        <div style="margin-right: 20px; float: left;"><span class="grey_color">单PCS体积(cm<sup>3</sup>) :</span> <span class="bold">{{$roi['volume_per_pcs']}}</span></div>
+                                        <div style="margin-right: 20px; float: left;"><span class="grey_color">单PCS实重(KG) :</span> <span>{{$roi['weight_per_pcs']}}</span></div>
+                                        <div style="margin-right: 20px; float: left;"><span class="grey_color">单PCS体积(cm<sup>3</sup>) :</span> <span>{{$roi['volume_per_pcs']}}</span></div>
                                     </div>
                                     <div style="clear:both"></div>
                                     <div style="height: 7px;"></div>
                                     <div><span class="grey_color">供应商账期 :</span> <span class="bold">{{$roi['billing_period_type']}}</span></div>
                                     <div style="height: 15px;"></div>
-                                    <div class="bold">运输参数</div>
+                                    <div class="bold">平台参数</div>
                                     <div style="height: 7px;"></div>
                                     <div>
-                                        <div style="margin-right: 20px; float: left;"><span class="grey_color">运输方式 :</span> <span class="bold">{{$roi['transport_mode']}}</span></div>
-                                        <div style="margin-right: 20px; float: left;"><span class="grey_color">运输单价 :</span> <span class="bold">{!! $roi['transport_unit_price'] !!}</span></div>
-                                        <div style="margin-right: 20px; float: left;"><span class="grey_color">运输天数 :</span> <span class="bold">{{$roi['transport_days']}}</span></div>
-                                        <div style="margin-right: 20px; float: left;"><span class="grey_color">关税税率 :</span> <span class="bold">{{$roi['tariff_rate']}}</span></div>
+                                        <div style="margin-right: 20px; float: left;"><span class="grey_color">平台佣金(%) :</span> <span>{{$roi['commission_rate']}}</span></div>
+                                        <div style="margin-right: 20px; float: left;"><span class="grey_color">平台操作费(外币/pcs) :</span> <span class="bold">{{$roi['unit_operating_fee']}}</span></div>
                                     </div>
                                 </td>
                                 <td valign="top" width="750px">
                                     <div class="bold">开发成本</div>
                                     <div style="height: 7px;"></div>
                                     <div>
-                                        <div style="margin-right: 20px; float: left;"><span class="grey_color">ID费用(元) :</span> <span class="bold">{{$roi['id_fee']}}</span></div>
-                                        <div style="margin-right: 20px; float: left;"><span class="grey_color">模具费(元) :</span> <span class="bold">{{$roi['mold_fee']}}</span></div>
-                                        <div style="margin-right: 20px; float: left;"><span class="grey_color">手板费(元) :</span> <span class="bold">{{$roi['prototype_fee']}}</span></div>
-                                        <div style="margin-right: 20px; float: left;"><span class="grey_color">其他费用(元) :</span> <span class="bold">{{$roi['other_fixed_cost']}}</span></div>
+                                        <div style="margin-right: 20px; float: left;"><span class="grey_color">ID费用(元) :</span> <span>{{$roi['id_fee']}}</span></div>
+                                        <div style="margin-right: 20px; float: left;"><span class="grey_color">模具费(元) :</span> <span>{{$roi['mold_fee']}}</span></div>
+                                        <div style="margin-right: 20px; float: left;"><span class="grey_color">手板费(元) :</span> <span>{{$roi['prototype_fee']}}</span></div>
+                                        <div style="margin-right: 20px; float: left;"><span class="grey_color">其他费用(元) :</span> <span>{{$roi['other_fixed_cost']}}</span></div>
                                     </div>
                                     <div style="clear: both;"></div>
                                     <div style="height: 15px;"></div>
                                     <div class="bold">其他成本</div>
                                     <div style="height: 7px;"></div>
                                     <div>
-                                        <div style="margin-right: 20px; float: left;"><span class="grey_color">专利费(元) :</span> <span class="bold">{{$roi['royalty_fee']}}</span></div>
-                                        <div style="margin-right: 20px; float: left;"><span class="grey_color">认证费(元) :</span> <span class="bold">{{$roi['certification_fee']}}</span></div>
+                                        <div style="margin-right: 20px; float: left;"><span class="grey_color">专利费(元) :</span> <span>{{$roi['royalty_fee']}}</span></div>
+                                        <div style="margin-right: 20px; float: left;"><span class="grey_color">认证费(元) :</span> <span>{{$roi['certification_fee']}}</span></div>
                                     </div>
                                     <div style="clear: both;"></div>
                                     <div style="height: 15px;"></div>
-                                    <div class="bold">平台参数</div>
+                                    <div class="bold">运输参数</div>
                                     <div style="height: 7px;"></div>
                                     <div>
-                                        <div style="margin-right: 20px; float: left;"><span class="grey_color">平台佣金(%) :</span> <span class="bold">{{$roi['commission_rate']}}</span></div>
-                                        <div style="margin-right: 20px; float: left;"><span class="grey_color">平台操作费(外币/pcs) :</span> <span class="bold">{{$roi['unit_operating_fee']}}</span></div>
+                                        <div style="margin-right: 20px; float: left;"><span class="grey_color">运输方式 :</span> <span>{{$roi['transport_mode']}}</span></div>
+                                        <div style="margin-right: 20px; float: left;"><span class="grey_color">运输单价 :</span> <span>{!! $roi['transport_unit_price'] !!}</span></div>
+                                        <div style="margin-right: 20px; float: left;"><span class="grey_color">运输天数 :</span> <span>{{$roi['transport_days']}}</span></div>
+                                        <div style="margin-right: 20px; float: left;"><span class="grey_color">关税税率 :</span> <span>{{$roi['tariff_rate']}}</span></div>
                                     </div>
                                 </td>
                             </tr>
@@ -350,19 +353,17 @@
                     <div style="width:1501px">
                         <table id="result_table" border="0" cellspacing="0" cellpadding="0">
                             <tr>
-                                <td width="25%"><span class="grey_color">项目利润率(%) :</span> <span class="highlight_color">{{$roi['project_profitability']}}</span></td>
-                                <td width="25%"><span class="grey_color">资金周转次数(次) :</span> <span class="highlight_color">{{$roi['capital_turnover']}}</span></td>
-                                <td width="25%"><span class="grey_color">底线价格(外币/元) :</span> <span class="highlight_color">{{$roi['price_floor']}}</span></td>
-                                <td width="25%"><span class="grey_color">单PCS边际利润(元) :</span> <span class="highlight_color">{{$roi['marginal_profit_per_pcs']}}</span></td>
+                                <td><span class="grey_color">投资回报额(万元) :</span> <span class="bold">{{$roi['return_amount']}}</span></td>
+                                <td><span class="grey_color">投资回报率ROI(%) :</span> <span class="bold">{{$roi['roi']}}</span></td>
+                                <td width="25%"><span class="grey_color">项目利润率(%) :</span> <span class="bold">{{$roi['project_profitability']}}</span></td>
                             </tr>
                             <tr>
-                                <td><span class="grey_color">投资回报率ROI(%) :</span> <span class="highlight_color">{{$roi['roi']}}</span></td>
-                                <td><span class="grey_color">投资回报额(万元) :</span> <span class="highlight_color">{{$roi['return_amount']}}</span></td>
-                                <td><span class="grey_color">预计投资回收期(月) :</span> <span class="highlight_color">{{$roi['estimated_payback_period']}}</span></td>
-                                <td><span class="grey_color">库存周转天数(天) :</span> <span class="highlight_color">{{$roi['inventory_turnover_days']}}</span></td>
+                                <td width="25%"><span class="grey_color">底线价格(外币/元) :</span> <span class="bold">{{$roi['price_floor']}}</span></td>
+                                <td width="25%"><span class="grey_color">资金周转次数(次) :</span> <span class="bold">{{$roi['capital_turnover']}}</span></td>
+                                <td><span class="grey_color">库存周转天数(天) :</span> <span class="bold">{{$roi['inventory_turnover_days']}}</span></td>
+                                <td width="25%"><span class="grey_color">单PCS边际利润(元) :</span> <span class="bold">{{$roi['marginal_profit_per_pcs']}}</span></td>
                             </tr>
                         </table>
-
                     </div>
                 </div>
               </div>

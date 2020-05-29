@@ -1,4 +1,7 @@
 @extends('layouts.layout')
+@section('crumb')
+    <a href="/roi">ROI Analysis</a>
+@endsection
 @section('content')
 <style type="text/css">
     #sales_table{
@@ -79,6 +82,13 @@
     .grey_color{
         color:#909399;
     }
+
+    button.dropdown-toggle{
+        padding: 2px 12px;
+    }
+    .bootstrap-select.btn-group .dropdown-menu li.selected a .glyphicon{
+        color: blue;
+    }
 </style>
 
 <div>
@@ -124,6 +134,16 @@
                 </div>
                 <input type="text" name="project_code" id="project_code" />
             </div>
+            {{--<div class="param_cost">--}}
+                {{--<div>选择合作者</div>--}}
+                {{--boostrap-select多选下拉框选中多个值，只会传递最后一个值到后台。这里用一个隐藏的输入框保存多选值--}}
+                {{--<input type="text" id="collaborators" name="collaborators" hidden />--}}
+                {{--<select class="selectpicker show-tick form-control" multiple id="collaboratorsSelect" data-width="205px" title="请选择..." data-selected-text-format="count" data-live-search="true">--}}
+                    {{--@foreach ($users as $key => $value)--}}
+                        {{--<option value="{{$key}}">{{$value}}</option>--}}
+                    {{--@endforeach--}}
+                {{--</select>--}}
+            {{--</div>--}}
         </div>
         <div style="clear:both"></div>
         <div style="height: 15px;"></div>
@@ -139,8 +159,8 @@
                     <th width="100px">第4月</th>
                     <th width="100px">第5月</th>
                     <th width="100px">第6月</th>
-                    <th width="100px">第7月</td>
-                    <th width="100px">第8月</td>
+                    <th width="100px">第7月</th>
+                    <th width="100px">第8月</th>
                     <th width="100px">第9月</th>
                     <th width="100px">第10月</th>
                     <th width="100px">第11月</th>
@@ -521,16 +541,15 @@
             <div style="width:1501px">
                 <table id="result_table" border="0" cellspacing="0" cellpadding="0">
                     <tr>
-                        <td width="25%"><span class="grey_color">项目利润率(%) :</span> <span class="highlight_color" id="project_profitability"></span></td>
-                        <td width="25%"><span class="grey_color">资金周转次数(次) :</span> <span class="highlight_color" id="capital_turnover"></span></td>
-                        <td width="25%"><span class="grey_color">底线价格(外币/元) :</span> <span class="highlight_color" id="price_floor"></span></td>
-                        <td width="25%"><span class="grey_color">单PCS边际利润(元) :</span> <span class="highlight_color" id="marginal_profit_per_pcs"></span></td>
+                        <td><span class="grey_color">投资回报额(万元) :</span> <span class="bold" id="return_amount"></span></td>
+                        <td><span class="grey_color">投资回报率ROI(%) :</span> <span class="bold" id="roi"></span></td>
+                        <td width="25%"><span class="grey_color">项目利润率(%) :</span> <span class="bold" id="project_profitability"></span></td>
                     </tr>
                     <tr>
-                        <td><span class="grey_color">投资回报率ROI(%) :</span> <span class="highlight_color" id="roi"></span></td>
-                        <td><span class="grey_color">投资回报额(万元) :</span> <span class="highlight_color" id="return_amount"></span></td>
-                        <td><span class="grey_color">预计投资回收期(月) :</span> <span class="highlight_color" id="estimated_payback_period"></span></td>
-                        <td><span class="grey_color">库存周转天数(天) :</span> <span class="highlight_color" id="inventory_turnover_days"></span></td>
+                        <td width="25%"><span class="grey_color">底线价格(外币/元) :</span> <span class="bold" id="price_floor"></span></td>
+                        <td width="25%"><span class="grey_color">资金周转次数(次) :</span> <span class="bold" id="capital_turnover"></span></td>
+                        <td><span class="grey_color">库存周转天数(天) :</span> <span class="bold" id="inventory_turnover_days"></span></td>
+                        <td width="25%"><span class="grey_color">单PCS边际利润(元) :</span> <span class="bold" id="marginal_profit_per_pcs"></span></td>
                     </tr>
                 </table>
             </div>
@@ -547,6 +566,12 @@
 
 <script type="text/javascript">
     var currency_rates = eval(<?php echo json_encode($currency_rates);?>);
+    var users = eval(<?php echo json_encode($users);?>);
+
+    $('#collaboratorsSelect').on('changed.bs.select', function(e) {
+        var selected_values = $(this).val();
+        $('#collaborators').val(selected_values);
+    });
 
     $(function() {
         $('.date-picker').datepicker({
