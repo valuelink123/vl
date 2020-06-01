@@ -1098,6 +1098,8 @@
 								setTimeout(function(){
 									$('.success_mask').fadeOut(1000);
 								},2000)	
+							}else if(res.status == 3){
+
 							}else{
 								$('.error_mask_text').text(res.msg)
 								$('.error_mask').fadeIn(1000);

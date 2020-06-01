@@ -304,9 +304,10 @@ class MarketingPlanController extends Controller
             } else if ($old_m_plan['plan_status'] == 3 || $old_m_plan['plan_status'] == 4 || $old_m_plan['plan_status'] == 5) {
                 /** 已完结 已终止 已拒绝 不能在修改*/
                 $update = 0;
-            }else if($old_m_plan['plan_status'] == 2&&$plan_status==2){
+            }else if($old_m_plan['plan_status'] == $plan_status){
                 /** 没有修改  不作处理  */
-                return;
+                $r_message = ['status' => 3, 'msg' => '状态不变'];
+                return $r_message;
             }
             if ($update > 0) {
                 $up_data = [
