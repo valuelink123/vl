@@ -1,6 +1,6 @@
 @extends('layouts.layout')
 @section('crumb')
-    @include('layouts.crumb', ['crumbs'=>['ROI Analysis']])
+    <a href="/roi">ROI Analysis</a>
 @endsection
 @section('content')
 
@@ -60,7 +60,7 @@
             bottom: inherit;
             right: inherit;
         }
-
+        /*调整下拉框的高度*/
         button.dropdown-toggle{
             padding: 4px 12px;
         }

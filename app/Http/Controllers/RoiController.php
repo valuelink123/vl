@@ -95,7 +95,7 @@ class RoiController extends Controller
         $iDisplayStart = intval($_REQUEST['start']);
         //如果连接了asin表，后面的where的字段要加上表名。例如site：where('roi.site', $search['site'])
         $lists =  $data->orderBy($orderby,$sort)->offset($iDisplayStart)->limit($iDisplayLength)->get()->toArray();
-        $lists = array_map('get_object_vars', $lists);
+        $lists = json_decode(json_encode($lists),true);
 
         $users= $this->getUsers();
 
@@ -167,11 +167,13 @@ class RoiController extends Controller
     {
         if(!Auth::user()->can(['roi-add'])) die('Permission denied -- roi-add');
         $sites = $this->getSites();
+        $users = $this->getUsers();
         $billingPeriods = $this->getBillingPeriods();
         $transportModes = $this->getTransportModes();
         $currency_rates = $this->getCurrencyRates();
 
-        return view('roi/add',compact('sites','billingPeriods','transportModes','currency_rates'));
+
+        return view('roi/add',compact('sites', 'users', 'billingPeriods','transportModes','currency_rates'));
     }
 
     public function export(Request $request)
@@ -183,7 +185,7 @@ class RoiController extends Controller
 
         $data = DB::connection('amazon')->table('roi');
         $data = $data->where('roi.created_at','>=',$submit_date_from.' 00:00:00')->where('roi.created_at','<=',$submit_date_to.' 23:59:59')->get()->toArray();
-        $data = array_map('get_object_vars', $data);;
+        $data = json_decode(json_encode($data),true);
 
         $users= $this->getUsers();
 
@@ -530,7 +532,7 @@ class RoiController extends Controller
     public function edit(Request $request, $id)
     {
         if(!Auth::user()->can(['roi-update'])) die('Permission denied -- roi-update');
-        $usersIdName = $this->getUsersIdName();
+        $users = $this->getUsers();
         //编辑限制：其中一个用户编辑时，另一个用户只能查看。编辑用户关闭浏览器（标签）前未保存，则过$expiry_time = 70s后其他用户可编辑。
         $roi_id = $id;
         //$expiry_time 略大于edit页面ajax刷新时间60s
@@ -559,7 +561,7 @@ class RoiController extends Controller
                else{
                   if(time() - $refresh_time < $expiry_time){
                       //show error_message: someone is editing
-                      $request->session()->flash('error_message', array_get($usersIdName, $editing_user) .' is editing the file.');
+                      $request->session()->flash('error_message', array_get($users, $editing_user) .' is editing the file.');
                       return redirect('roi/'.$roi_id);
                   }
                   else{
@@ -599,7 +601,6 @@ class RoiController extends Controller
         }
         $roi['transport_unit'] = $transport_unit;
 
-        $users = $this->getUsers();
         $eh = explode(";",$roi['edit_history']);
         $edit_history_array = array();
         foreach(array_reverse($eh) as $key => $value){
@@ -610,9 +611,9 @@ class RoiController extends Controller
     }
 
     public function copy(Request $request){
-       $id = $request->get('id');
-        $roi = DB::connection('amazon')->table('roi')->where('id', '=', $id)->get()->toArray();
-        $roi = array_map('get_object_vars', $roi)[0];
+        $id = $request->get('id');
+        $roi = DB::connection('amazon')->table('roi')->where('id', '=', $id)->first();
+        $roi = json_decode(json_encode($roi),true);
 
         unset($roi['id']);
         //复制的记录，状态设置为：未归档,后续需要编辑
@@ -630,8 +631,8 @@ class RoiController extends Controller
     }
 
     public function getCurrentRoi($id){
-        $roi = DB::connection('amazon')->table('roi')->where('id', '=', $id)->get()->toArray();
-        $roi = array_map('get_object_vars', $roi)[0];
+        $roi = DB::connection('amazon')->table('roi')->where('id', '=', $id)->first();
+        $roi = json_decode(json_encode($roi),true);
         for($i=1; $i<=12;$i++){
             $roi['price_fc_month_'.$i] = $this->twoDecimal($roi['price_fc_month_'.$i]);
             $roi['price_rmb_month_'.$i] = $this->twoDecimal($roi['price_fc_month_'.$i] * $roi['currency_rate']);
@@ -698,7 +699,7 @@ class RoiController extends Controller
             $transport_unit = '<span>元/KG></span>';
         }
         $roi['transport_unit_price'] = $roi['transport_unit_price'].$transport_unit;
-        $roi['billing_period_type'] = $billingPeriods[$roi['billing_period_type']]['name'];
+        $roi['billing_period_type'] = $billingPeriods[$roi['billing_period_type']]['name'] . ' (' . $billingPeriods[$roi['billing_period_type']]['days'] . '天)';
         $estimated_launch_time = $roi['estimated_launch_time'];
         if($estimated_launch_time){
             for($i=1; $i<=12; $i++){
