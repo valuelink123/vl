@@ -290,6 +290,7 @@
 		background: #f0f9eb;
 		border: 1px solid #e1f3d8;
 		display: none;
+		z-index:9999;
 	}
 	.mask_icon{
 		float: left;
@@ -313,6 +314,7 @@
 		background: #fef0f0;
 		border: 1px solid #fde2e2;
 		display: none;
+		z-index:9999;
 	}
 	.error_mask .mask_text{
 		color: #f56c6c !important;
@@ -416,7 +418,7 @@
 			</div>
 			<div class="filter_option">
 				<label for="status_select">调拨状态</label>
-				<select id="status_select"  onchange="status_filter(this.value,24)">
+				<select id="status_select"  onchange="status_filter(this.value,23)">
 					<option value="">全部</option>
 					<option value ="资料提供中">资料提供中</option>
 					<option value ="换标中">换标中</option>
@@ -470,35 +472,34 @@
 				<button type="button" class="btn btn-sm green-meadow">已确认 : <span class="status3">0</span></button>
 				<button type="button" class="btn btn-sm blue-madison">调拨取消 : <span class="status4">0</span></button>
 			</div>
-			<table id="planTable" class="display table-striped table-bordered table-hover" style="width:100%">
+			<table id="planTable" class="display table-striped table-bordered table-hover">
 				<thead>
 					<tr style="text-align: center;">
 						<th>BG</th>
 						<th>BU</th>
 						<th>Station</th>
 						<th><input type="checkbox" id="selectAll" /></th>
-						<th>提交日期</th>
-						<th>销售员</th>
-						<th>产品图片</th>
+						<th style="width:70px;">提交日期</th>
+						<th style="width:55px;">销售员</th>
+						<th style="width:70px;">产品图片</th>
 						<th>账号</th>
 						<th>Seller SKU</th>
 						<th>ASIN <br>SKU</th>
-						<th>调入工厂仓库</th>
-						<th>需求数量</th>
-						<th>期望到货时间</th>
-						<th>是否贴标签</th>
-						<th>其它需求</th>
-						<th>可维持天数</th>
-						<th>FBA在库</th>
-						<th>FBA可维持天数</th>
-						<th>调拨在途</th>
-						<th>调拨可维持天数</th>
-						<th>审核</th>
-						<th>调整需求数量</th>
-						<th>预计到货时间</th>
-						<th>调出仓库库位</th>
-						<th>调拨状态</th>
-						<th>待办事项</th>
+						<th style="width:95px;">调入工厂仓库</th>
+						<th style="width:70px;">需求数量</th>
+						<th style="width:95px;">期望到货时间</th>
+						<th style="width:80px;">是否贴标签</th>
+						<th style="width:70px;">其它需求</th>
+						<th style="width:80px;">可维持天数</th>
+						<th style="width:70px;">FBA在库</th>
+						<th style="width:110px;">FBA可维持天数</th>
+						<th style="width:70px;">调拨在途</th>
+						<th style="width:40px;">审核</th>
+						<th style="width:100px;">调整需求数量</th>
+						<th style="width:100px;">预计到货时间</th>
+						<th style="width:100px;">调出仓库库位</th>
+						<th style="width:70px;">调拨状态</th>
+						<th style="width:70px;">待办事项</th>
 					</tr>
 				</thead>
 				
@@ -556,7 +557,7 @@
 							<div class="input-group date date-picker margin-bottom-5 bw9" id="maskDate">
 								<input type="text" class="form-control form-filter input-sm maskDate isSellerDisabled" style="height: 28px;" readonly name="date_from" placeholder="From" value="">
 								<span class="input-group-btn">
-									<button class="btn btn-sm default default_btn" type="button">
+									<button class="btn btn-sm default default_btn request_date_btn" type="button">
 										<i class="fa fa-calendar"></i>
 									</button>
 								</span>
@@ -615,7 +616,7 @@
 						<div class="input-group date date-picker margin-bottom-5 bw9" id="arrivalMaskDate">
 							<input type="text" class="form-control form-filter input-sm arrivalMaskDate isPlanDisabled" style="height: 28px;" readonly name="date_from" placeholder="From" value="">
 							<span class="input-group-btn">
-								<button class="btn btn-sm default default_btn" type="button">
+								<button class="btn btn-sm default default_btn estimated_delivery_date_btn" type="button">
 									<i class="fa fa-calendar"></i>
 								</button>
 							</span>
@@ -717,7 +718,7 @@
 	<script>
 		/* http://10.10.42.14/vl/public */
 		/*审核 销售员不可编辑 */
-		
+		//筛选
 		function status_filter(value,column) {
 		    if (value == '') {
 		        tableObj.column(column).search('').draw();
@@ -838,7 +839,6 @@
 						cargo_data: fileList
 					},
 					success: function (res) {
-						console.log(res)
 						if(res.status == 0){
 							$('.error_mask').fadeIn(1000);
 							$('.error_mask_text').text(res.msg);
@@ -861,7 +861,13 @@
 			})
 			//新建调拨计划
 			$('#addShipment').on('click',function(){
+				clearVal();
 				$('.mask_box').show();
+				$('.isPlanDisabled').attr('disabled',false).css('background',"#fff");
+				$('#audit_status_select').attr('disabled',true).css('background',"#eee");
+				$('.isSellerDisabled').attr('disabled',false).css('background',"#fff");
+				$('.estimated_delivery_date_btn').attr('disabled',false).css('background',"#fff");
+				$('.request_date_btn').attr('disabled',false).css('background',"#fff");
 			})
 			
 			$('#sku_select').on('input',function(){
@@ -953,7 +959,9 @@
 			
 			//新建调拨计划时清空内容
 			function clearVal(){
-				$('#audit_status_select').val('');
+				$('.formId').val("");
+				$('#audit_status_select').val(0);
+				$('#site_select').val('ATVPDKIKX0DER');
 				$('#sku_select').val('');
 				$('#asin_select').val('');
 				$('#seller_sku_select').val('');
@@ -963,7 +971,7 @@
 				$('.maskDate').val('');
 				$('.arrivalMaskDate').val('');
 				$('#adjustment_quantity_input').val('');
-				$('#rms_input').val('');
+				$('#rms_input').val(1);
 				$('#rms_sku_input').val('');
 				$('#remarks_input').val('');
 			}
@@ -1040,11 +1048,12 @@
 					    type: "POST",
 						url: "/shipment/upShipment",
 						data: {
+							id: $('.formId').val(),
 							sku: $('#sku_select').val(),
 							asin: $('#asin_select').val(),
 							status: $('#audit_status_select').val(),
 							seller_sku: $('#seller_sku_select').val(),
-							//warehouse: $('#warehouse_select').val(),
+							sap_factory_code: $('#warehouse_select').val(),
 							out_warehouse: $('#out_warehouse_input').val(),
 							quantity: $('#quant_select').val(),
 							received_date: $('.maskDate').val(),
@@ -1103,7 +1112,7 @@
 			$('.cancel_btn').on('click',function(){
 				$('.mask_box').hide();
 			})
-			$('.submit').on('click',function(){
+			/* $('.submit').on('click',function(){
 				$.ajax({
 				    type: "POST",//方法类型
 				    dataType: "text",//预期服务器返回的数据类型 如果是对象返回的是json 如果是字符串这里一定要定义text 之前我就是定义json 结果字符串的返回一直到额error中去
@@ -1116,7 +1125,7 @@
 						console.log(err)
 					}
 				});
-			})
+			}) */
 			//批量操作列表展开
 			$('.batch_operation').click(function(e){
 				$('.batch_list').slideToggle();
@@ -1147,17 +1156,27 @@
 							$("#warehouse_select").append("<option value='"+value.sap_factory_code+"'>"+value.sap_factory_code+"</option>");
 						});
 						if(res.shipment.role == 1){
-							$('.isSellerDisabled').attr('disabled',false);
+							$('#audit_status_select').attr('disabled',true).css('background',"#eee");
+							$('.isSellerDisabled').attr('disabled',false).css('background',"#fff");
 							$('.isPlanDisabled').attr('disabled',true).css('background',"#eee");
+							$('.estimated_delivery_date_btn').attr('disabled',true).css('background',"#eee");
+							$('.request_date_btn').attr('disabled',false).css('background',"#fff");
 						}else if(res.shipment.role == 2){
-							$('.isPlanDisabled').attr('disabled',false);
+							$('.isPlanDisabled').attr('disabled',false).css('background',"#fff");
+							$('#audit_status_select').attr('disabled',false).css('background',"#fff");
 							$('.isSellerDisabled').attr('disabled',true).css('background',"#eee");
+							$('.estimated_delivery_date_btn').attr('disabled',false).css('background',"#fff");
+							$('.request_date_btn').attr('disabled',true).css('background',"#eee");
 						}else{
+							$('#audit_status_select').attr('disabled',true).css('background',"#eee");
 							$('.isPlanDisabled').attr('disabled',true).css('background',"#eee");
 							$('.isSellerDisabled').attr('disabled',true).css('background',"#eee");
+							$('.estimated_delivery_date_btn').attr('disabled',true).css('background',"#eee");
+							$('.request_date_btn').attr('disabled',true).css('background',"#eee");
 						}
 						$('#audit_status_select').val(res.shipment.status);//审核
 						$('#sku_select').val(res.shipment.sku);//SKU
+						$('#site_select').val(res.shipment.marketplace_id);//站点
 						$('#asin_select').val(res.shipment.asin);//ASIN
 						$('#seller_sku_select').val(res.shipment.seller_sku);//SellerSku
 						$('#warehouse_select').val(res.shipment.sap_factory_code);//调入工厂
@@ -1185,6 +1204,12 @@
 				paging: true,  // 是否显示分页
 				info: false,// 是否表格左下角显示的文字
 				ordering: false,
+				//scrollX: "100%",
+				//scrollCollapse: false,
+				fixedColumns: { //固定列的配置项
+					leftColumns: 4, //固定左边第一列
+					rightColumns: 1, //固定左边第一列
+				},
 				serverSide: false,//是否所有的请求都请求服务器	
 				scrollX: "100%",
 				scrollCollapse: false,
@@ -1206,12 +1231,13 @@
 						$('.status3').text(res[1].status3);
 						$('.status4').text(res[1].status4);
 						$("#seller_select").empty();
-						$("#account_number").empty();
 						$("#seller_select").append("<option value=''>全部</option>");
-						$("#account_number").append("<option value=''>全部</option>");
 						$.each(res[2], function (index, value) {
 							$("#seller_select").append("<option value='" + value + "'>" + value + "</option>");
 						})
+						
+						$("#account_number").empty();
+						$("#account_number").append("<option value=''>全部</option>");
 						$.each(res[3], function (index, value) {
 							$("#account_number").append("<option value='" + value + "'>" + value + "</option>");
 						})
@@ -1253,7 +1279,7 @@
 					{
 						data: 'image',
 						render: function(data, type, row, meta) {
-							var content = '<img src="https://images-na.ssl-images-amazon.com/images/I/'+data+'" alt="" style="display:block; width:50px; height:60px;">';
+							var content = '<a href="https://'+row.toUrl+'/dp/'+ row.asin +'" target="_blank" style="text-decoration:none"><img src="https://images-na.ssl-images-amazon.com/images/I/'+data+'" alt="" style="display:block; width:60px; height:60px; margin:0 auto"></a>';
 							return content;
 						},
 					},
@@ -1269,6 +1295,7 @@
 						createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
 							$(cell).on( 'click', function () {
 								$('.mask_box').show();
+								$('.formId').val(rowData.id);
 								editTableData(rowData.id);
 							});
 						}
@@ -1282,6 +1309,7 @@
 						createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
 							$(cell).on( 'click', function () {
 								$('.mask_box').show();
+								$('.formId').val(rowData.id);
 								editTableData(rowData.id); 
 							});
 						}
@@ -1295,6 +1323,7 @@
 						createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
 							$(cell).on( 'click', function () {
 								$('.mask_box').show();
+								$('.formId').val(rowData.id);
 								editTableData(rowData.id); 
 							});
 						}
@@ -1308,6 +1337,7 @@
 						createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
 							$(cell).on( 'click', function () {
 								$('.mask_box').show();
+								$('.formId').val(rowData.id);
 								editTableData(rowData.id); 
 							});
 						}
@@ -1321,6 +1351,7 @@
 						createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
 							$(cell).on( 'click', function () {
 								$('.mask_box').show();
+								$('.formId').val(rowData.id);
 								editTableData(rowData.id); 
 							});
 						}
@@ -1334,6 +1365,7 @@
 						createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
 							$(cell).on( 'click', function () {
 								$('.mask_box').show();
+								$('.formId').val(rowData.id);
 								editTableData(rowData.id);
 							});
 						}
@@ -1347,6 +1379,7 @@
 						createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
 							$(cell).on( 'click', function () {
 								$('.mask_box').show();
+								$('.formId').val(rowData.id);
 								editTableData(rowData.id);
 							});
 						}
@@ -1355,7 +1388,6 @@
 					{ data: "FBA_Stock" },
 					{ data: "FBA_keepday_num" },
 					{ data: "transfer_num" },
-					{ data: "stock_day_num" },
 					{
 						data: "status",
 						render: function(data, type, row, meta) {

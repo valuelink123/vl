@@ -14,18 +14,18 @@ class CpfrController extends Controller
 	
     public function index()
     {
-        return view('Cpfr.index');
+        return view('cpfr.index');
     }
 	public function allocationProgress()
 	{
-	    return view('Cpfr.allocationProgress');
+	    return view('cpfr.allocationProgress');
 	}
 	public function purchase()
 	{
-	    return view('Cpfr.purchase');
+	    return view('cpfr.purchase');
 	}
 	public function barcode()
 	{
-	    return view('Cpfr.barcode');
+	    return view('cpfr.barcode');
 	}
 }
