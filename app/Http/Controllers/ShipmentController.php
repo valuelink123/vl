@@ -42,14 +42,14 @@ class ShipmentController extends Controller
         $date_s = $request['date_s'] ? $request['date_s'] : '';
         $date_e = $request['date_e'] ? $request['date_e'] : '';
         $status = $request['status'] ? $request['status'] : '';
-        $downLoad = $request['downLoad'] ? $request['downLoad'] : 0;//会否下载
         $sx = $request['sx'] ? $request['sx'] : '';//站点缩写
         $bg = $request['bg'] ? $request['bg'] : '';
         $bu = $request['bu'] ? $request['bu'] : '';
         $name = $request['name'] ? $request['name'] : '';
-        $downLoad = $request['downLoad'] ? $request['downLoad'] : 0;//会否下载
+        $downLoad = $request['downLoad'] ? $request['downLoad'] : 0;//是否下载
         $allor_status = $request['allor_status'] ? $request['allor_status'] : '';//调拨状态
         $label = $request['label'] ? $request['label'] : '';
+        $ids = $request['ids'] ? $request['ids'] : '';
         $role = 0;//角色
         $sap_seller_id_list = $ulist = $allotIdList = $seller = $labelList = $statusList = [];
         if (!empty($user)) {
@@ -113,6 +113,19 @@ class ShipmentController extends Controller
         if (!empty($status)) {
             $sql .= ' AND sh.status = ' . $status;
         }
+        if (!empty($label)) {
+            $sql .= ' AND sh.label = ' . $label;
+        }
+        if (!empty($allor_status)) {
+            $sql .= ' AND sh.allor_status = ' . $allor_status;
+        }
+        if (!empty($sx)) {
+            $m_id=  array_search($sx, $DOMIN_MARKETPLACEID_SX);
+            $sql .= " AND sh.marketplace_id = '" . $m_id . "'";
+        }
+        if (!empty($ids)) {
+            $sql .= " AND sh.id in (" . $ids . ")";
+        }
         $sql .= ' ORDER BY sh.created_at DESC';
         $shipmentList = DB::connection('vlz')->select($sql);
         $shipmentList = (json_decode(json_encode($shipmentList), true));
@@ -164,20 +177,71 @@ class ShipmentController extends Controller
             }
 
         }
-        //下载
-        if ($downLoad > 0) {
-            foreach ($shipmentList as $sk => $sv) {
-                if (!empty($bg) && $sv['bg'] != $bg || !empty($bu) && $sv['bu'] != $bu) {
-                    unset($shipmentList[$sk]);
-                }
-            }
-        }
+
         $sql_group = 'SELECT status,COUNT(id) as count_num from shipment_requests GROUP BY status=0,status=1,status=2,status=3,status=4';
         $status_group = DB::connection('vlz')->select($sql_group);
         $status_group = (json_decode(json_encode($status_group), true));
         if (!empty($status_group)) {
             foreach ($status_group as $sk => $sv) {
                 $statusList['status' . $sv['status']] = $sv['count_num'];
+            }
+        }
+
+        /** 下载判断 */
+        if ($downLoad > 0) {
+            foreach ($shipmentList as $sk => $v) {
+                if ((!empty($bg) && $v['bg'] != $bg) ||( !empty($bu) && $v['bu'] != $bu)||(!empty($name) && $v['name'] != $name)) {
+                    unset($shipmentList[$key]);
+                }
+            }
+            echo
+                '提交日期,' .
+                '销售员,' .
+                '账号,' .
+                'Seller SKU,' .
+                'ASIN SKU,' .
+                '调入工厂仓库,' .
+                '需求数量,' .
+                '期望到货时间,' .
+                '是否贴标签,' .
+                '其它需求,' .
+                '可维持天数,' .
+                'FBA在库,' .
+                'FBA可维持天数,' .
+                '调拨在途,' .
+                '审核状态,' .
+                '调整需求数量,' .
+                '预计到货时间,' .
+                '调出仓库库位,' .
+                '调拨状态,' .
+                "\r\n" . "\r\n";
+            if (!empty($shipmentList)) {
+                $allor_status_arr = ['资料提供中', '换标中', '待出库', '已发货', '取消发货'];
+                $status_arr = ['待确认','bu审核','bg审核','调拨取消','已确认'];
+                foreach ($shipmentList as $ak => $av) {
+                    echo
+                        '"' . @$av['created_at'] . '",' .
+                        '"' . @$av['name'] . '",' .
+                        '"' . @$av['label'] . '",' .
+                        '"' . @$av['seller_sku'] . '",' .
+                        '"' . @$av['asin'] .@$av['sku'].'",' .
+                        '"' . @$av['warehouse'] . '",' .
+                        '"' . @$av['quantity'] . '",' .
+                        '"' . @$av['request_date'] . '",' .
+                        '"' . @$av['package'] . '",' .
+                        '"' . @$av['remark'] . '",' .
+                        '"' . @$av['stock_day_num'] . '",' .
+                        '"' . @$av['FBA_Stock'] . '",' .
+                        '"' . @$av['FBA_keepday_num'] . '",' .
+                        '"' . @$av['transfer_num'] . '",' .
+                        '"' . @$status_arr[$av['status']] . '",' .
+                        '"' . @$av['adjustment_quantity'] . '",' .
+                        '"' . @$av['adjustreceived_date'] . '",' .
+                        '"' . @$av['out_warehouse'] . '",' .
+                        '"' . @$allor_status_arr[$av['allor_status']] . '",' .
+                        "\r\n";
+                }
+                exit;
             }
         }
         return [$shipmentList, $statusList, $seller, $labelList];
@@ -551,38 +615,16 @@ class ShipmentController extends Controller
         $condition = @$request['condition'] ? $request['condition'] : '';
         $date_s = $request['date_s'] ? $request['date_s'] : '';
         $date_e = $request['date_e'] ? $request['date_e'] : '';
-        $status = @$request['status'] ? $request['status'] : '';
+        $status = $request['status'] ? $request['status'] : '';
+        $sx = $request['sx'] ? $request['sx'] : '';//站点缩写
+        $bg = $request['bg'] ? $request['bg'] : '';
+        $bu = $request['bu'] ? $request['bu'] : '';
+        $name = $request['name'] ? $request['name'] : '';
+        $downLoad = $request['downLoad'] ? $request['downLoad'] : 0;//是否下载
+        $ids = $request['ids'] ? $request['ids'] : '';
         $role = 0;//角色
         $sap_seller_id_list = $ulist = $seller = $statusList = [];
-        if (!empty($user)) {
-            if (!empty($user['email']) && in_array($user['email'], $ADMIN_EMAIL)) {
-                /**  特殊权限着 查询所有用户 */
-                $allUsers = DB::table('users')->select('id', 'name', 'email', 'sap_seller_id', 'seller_rules', 'ubg', 'ubu')
-                    ->where('ubu', '!=', "")
-                    ->orwhere('ubg', '!=', "")
-                    ->orwhere('seller_rules', '!=', "")
-                    ->get()->map(function ($value) {
-                        return (array)$value;
-                    })->toArray();
-                if (!empty($allUsers)) {
-                    foreach ($allUsers as $auk => $auv) {
-                        $sapSellerIdList[] = $auv['sap_seller_id'];
-                    }
-                }
-                $role = 4;
-            } else if ($user['ubu'] != '' || $user['ubg'] != '' || $user['seller_rules'] != '') {
-                if ($user['ubu'] == '' && $user['ubg'] != '' && $user['seller_rules'] != '') {
-                    /**查询所有BG下面员工*/
-                    $role = 3;
-                } else if ($user['ubu'] != '' && $user['seller_rules'] == '') {
-                    /**此条件为 普通销售*/
-                    $role = 1;
-                } else if ($user['ubu'] != '' && $user['ubg'] != '' && $user['seller_rules'] != '') {
-                    /**  BU 负责人  */
-                    $role = 2;
-                }
-            }
-        }
+
         $sql = 'SELECT
                 pr.id,
                 pr.sap_seller_id,
@@ -627,6 +669,13 @@ class ShipmentController extends Controller
         if (!empty($status)) {
             $sql .= ' AND pr.status = ' . $status;
         }
+        if (!empty($sx)) {
+            $m_id=  array_search($sx, $DOMIN_MARKETPLACEID_SX);
+            $sql .= " AND pr.marketplace_id = '" . $m_id . "'";
+        }
+        if (!empty($ids)) {
+            $sql .= " AND pr.id in (" . $ids . ")";
+        }
         $sql .= ' ORDER BY pr.created_at DESC ';
         $purchase_requests = DB::connection('vlz')->select($sql);
         $purchase_requests = (json_decode(json_encode($purchase_requests), true));
@@ -670,6 +719,16 @@ class ShipmentController extends Controller
             foreach ($status_group as $sk => $sv) {
                 $statusList['status' . $sv['status']] = $sv['count_status'];
             }
+        }
+        /** 下载判断 */
+        if ($downLoad > 0) {
+            foreach ($purchase_requests as $sk => $v) {
+                if ((!empty($bg) && $v['bg'] != $bg) ||( !empty($bu) && $v['bu'] != $bu)||(!empty($name) && $v['name'] != $name)) {
+                    unset($purchase_requests[$key]);
+                }
+            }
+            //下载继续
+
         }
         return [$purchase_requests, $statusList, $seller];
     }
@@ -976,6 +1035,7 @@ class ShipmentController extends Controller
     public function allotProgress(Request $request)
     {
         $DOMIN_MARKETPLACEID_SX = Asin::DOMIN_MARKETPLACEID_SX;
+        $sap_seller_id_list = $seller = $label =$factoryList=$statusarr= [];
         $condition = @$request['condition'] ? $request['condition'] : '';
         $date_s = $request['date_s'] ? $request['date_s'] : '';
         $date_e = $request['date_e'] ? $request['date_e'] : '';
@@ -989,7 +1049,6 @@ class ShipmentController extends Controller
         $sap_factory_code = $request['sap_factory_code'] ? $request['sap_factory_code'] : '';
         $shipment_requests_id = $request['shipment_id'] ? $request['shipment_id'] : 0;
         $sr_id_list = $request['shipment_id_list'] ? $request['shipment_id_list'] : '';
-        $sap_seller_id_list = $seller = $label = [];
         $statusList = ['资料提供中', '换标中', '待出库', '已发货', '取消发货'];
         $downLoad = $request['downLoad'] ? $request['downLoad'] : 0;//是否下载
         $sql = "SELECT
@@ -1081,8 +1140,20 @@ class ShipmentController extends Controller
             }
         }
         foreach ($allot_progress as $key => $value) {
-            if (!empty($bg) && $value['bg'] != $bg || !empty($bu) && $value['bu'] != $bu || !empty($name) && $value['name'] != $name) {
+            if ((!empty($bg) && $value['bg'] != $bg)||(!empty($bu) && $value['bu'] != $bu )||( !empty($name) && $value['name'] != $name)) {
                 unset($allot_progress[$key]);
+            }
+        }
+        $sql_f = "SELECT sap_factory_code FROM sap_asin_match_sku WHERE sap_factory_code != ''  GROUP BY sap_factory_code";
+        $factoryList = DB::connection('vlz')->select($sql_f);
+        $factoryList = (json_decode(json_encode($factoryList), true));
+        //状态分组 统计
+        $sql_group = 'SELECT status,COUNT(id) as count_num from allot_progress GROUP BY status=0,status=1,status=2,status=3,status=4';
+        $status_group = DB::connection('vlz')->select($sql_group);
+        $status_group = (json_decode(json_encode($status_group), true));
+        if (!empty($status_group)) {
+            foreach ($status_group as $sk => $sv) {
+                $statusarr['status' . $sv['status']] = $sv['count_num'];
             }
         }
         //下载判断
@@ -1125,7 +1196,7 @@ class ShipmentController extends Controller
                 exit;
             }
         }
-        return [$allot_progress, $seller, $label];
+        return [$allot_progress, $seller, $label,$factoryList,$statusarr];
     }
 
     /**
