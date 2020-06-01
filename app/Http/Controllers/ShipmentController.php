@@ -727,7 +727,54 @@ class ShipmentController extends Controller
                     unset($purchase_requests[$key]);
                 }
             }
-            //下载继续
+            echo
+                '提交日期,' .
+                '销售员,' .
+                'ASIN,' .
+                'SKU,' .
+                '需求数量,' .
+                '期望到货时间,' .
+                '海外库存,' .
+                '未交订单,' .
+                '加权日均,' .
+                '到货后预计日销(PCS),' .
+                '利润率,' .
+                '审核结果,' .
+                '计划员,' .
+                'MOQ,' .
+                '收货工厂,' .
+                '运输方式,' .
+                '计划确认数量,' .
+                '预计交货时间	,' .
+                '采购订单号	,' .
+                "\r\n" . "\r\n";
+            if (!empty($purchase_requests)) {
+                $audit_status_arr = ['待确认','bu审核','bg审核','调拨取消','已确认'];
+                foreach ($purchase_requests as $ak => $av) {
+                    echo
+                        '"' . @$av['created_at'] . '",' .
+                        '"' . @$av['name'] . '",' .
+                        '"' . @$av['asin'] . '",' .
+                        '"' . @$av['sku'] . '",' .
+                        '"' . @$av['quantity'] . '",' .
+                        '"' . @$av['request_date'] . '",' .
+                        '"' . @$av['overseas_stock'] . '",' .
+                        '"' . @$av['backlog_order'] . '",' .
+                        '"' . @$av['day_sales'] . '",' .
+                        '"' . @$av['PCS'] . '",' .
+                        '"' . @$av['profit_margin'] . '",' .
+                        '"' . @$audit_status_arr[$av['audit_status']] . '",' .
+                        '"' . @$av['planning_name'] . '",' .
+                        '"' . @$av['MOQ'] . '",' .
+                        '"' . @$av['received_factory'] . '",' .
+                        '"' . @$av['sap_shipment_code'] . '",' .
+                        '"' . @$av['confirmed_quantity'] . '",' .
+                        '"' . @$av['estimated_delivery_date'] . '",' .
+                        '"' . @$av['order_number'] . '",' .
+                        "\r\n";
+                }
+                exit;
+            }
 
         }
         return [$purchase_requests, $statusList, $seller];
