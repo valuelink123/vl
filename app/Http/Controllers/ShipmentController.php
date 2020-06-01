@@ -186,14 +186,14 @@ class ShipmentController extends Controller
                 $statusList['status' . $sv['status']] = $sv['count_num'];
             }
         }
-
+        foreach ($shipmentList as $sk => $v) {
+            if ((!empty($bg) && $v['ubg'] != $bg) ||( !empty($bu) && $v['ubu'] != $bu)||(!empty($name) && $v['name'] != $name)) {
+                unset($shipmentList[$sk]);
+            }
+        }
         /** 下载判断 */
         if ($downLoad > 0) {
-            foreach ($shipmentList as $sk => $v) {
-                if ((!empty($bg) && $v['bg'] != $bg) ||( !empty($bu) && $v['bu'] != $bu)||(!empty($name) && $v['name'] != $name)) {
-                    unset($shipmentList[$key]);
-                }
-            }
+
             echo
                 '提交日期,' .
                 '销售员,' .
@@ -720,13 +720,14 @@ class ShipmentController extends Controller
                 $statusList['status' . $sv['status']] = $sv['count_status'];
             }
         }
+        foreach ($purchase_requests as $sk => $v) {
+            if ((!empty($bg) && $v['ubg'] != $bg) ||( !empty($bu) && $v['ubu'] != $bu)||(!empty($name) && $v['name'] != $name)) {
+                unset($purchase_requests[$sk]);
+            }
+        }
         /** 下载判断 */
         if ($downLoad > 0) {
-            foreach ($purchase_requests as $sk => $v) {
-                if ((!empty($bg) && $v['bg'] != $bg) ||( !empty($bu) && $v['bu'] != $bu)||(!empty($name) && $v['name'] != $name)) {
-                    unset($purchase_requests[$key]);
-                }
-            }
+
             echo
                 '提交日期,' .
                 '销售员,' .
