@@ -1,9 +1,9 @@
 @extends('layouts.layout')
+@section('crumb')
+    <a href="/roi">ROI Analysis</a>
+@endsection
 @section('content')
     <style type="text/css">
-        div,table{
-            font-size: 12px;
-        }
         #sales_table{
             width:1501px;
             border: 1px solid #dddddd;
@@ -27,11 +27,13 @@
         #result_table{
             width:1481px;
             border: 0px solid #dddddd;
-            font-size: 12px;
         }
         #result_table td{
             text-align: left;
             height: 25px;
+        }
+        input{
+            border: 1px solid #dddddd;
         }
         td input{
             width: 76px;
@@ -65,22 +67,6 @@
             padding-top: 3px;
             padding-bottom: 3px;
         }
-        /*.analyse-btn{*/
-            /*background-color: #63C5D1;*/
-            /*font-size: 14px;*/
-            /*text-align: center;*/
-            /*width: 60px;*/
-            /*height: 30px;*/
-            /*border-radius: 5px !important;*/
-        /*}*/
-        /*.save-btn{*/
-            /*background-color: #63C5D1;*/
-            /*font-size: 14px;*/
-            /*text-align: center;*/
-            /*width: 100px;*/
-            /*height: 30px;*/
-            /*border-radius: 5px !important;*/
-        /*}*/
         .common-btn{
             background-color: #63C5D1;
             color: #ffffff;
@@ -108,6 +94,12 @@
             bottom: inherit;
             right: inherit;
         }
+        .highlight_color{
+            color:#63C5D1;
+        }
+        .grey_color{
+            color:#909399;
+        }
 
     </style>
 
@@ -124,9 +116,9 @@
                 <button type="button" class="disabled-btn" disabled style="width: 80px; margin-right: 10px"><span><i class="fa fa-sign-out"></i></span> 导出</button>
             </div>
             <div style="float: right;">
-                <button type="button" class="disabled-btn" disabled style="width: 118px; margin-right: 10px"><span><i class="fa fa-archive"></i></span> 通过&归档</button>
+                <button type="button" class="disabled-btn" disabled style="width: 106px; margin-right: 10px"><span><i class="fa fa-archive"></i></span> 审核通过</button>
             </div>
-            <input id="roi_show_link" value="{{ url('roi/'.$roi['id']) }}"  style="opacity: 0; float: right" readonly>
+            <input id="roi_show_link" value="{{ 'www.vleop.com:88/roi/'.$roi['id'] }}"  style="opacity: 0; float: right" readonly>
             <div style="clear:both"></div>
             <div style="height: 20px;"></div>
         </div>
@@ -139,23 +131,27 @@
                 <div class="portlet light bordered" style="text-align: center">
                   <div style="width: 1502px; text-align: left; margin: auto;">
                     <div style="height: 25px;"></div>
-                    <div style="font-size: 15px">投入产出表</div>
+                    <div style="font-size: 18px; font-weight: bold">投入产出表</div>
                     <div style="height: 30px;"></div>
                     <div class="first_row_params">
                         <div style="width:315px; float:left;">
-                            <div>产品名称</div>
+                            <div >产品名称
+                                <span style="color: #999999;" title="可自定义产品名称，方便同一项目下方案对比区分。如：“乐观-榨汁机”"><i class="fa fa-info-circle"></i></span>
+                            </div>
                             <input type="text" name="product_name" id="product_name" style="width:300px;" value="{{$roi['product_name']}}" />
                         </div>
                         <div class="param_cost">
                             <div>站点</div>
-                            <select name="site" id="site">
+                            <select name="site" id="site" style="border: 1px solid #dddddd;">
                                 @foreach ($sites as $site)
                                     <option value="{{$site}}" @if($roi['site'] == $site) selected @endif>{{$site}}</option>
                                 @endforeach
                             </select>
                         </div>
                         <div style="width:165px; float:left">
-                            <div>预计上线时间</div>
+                            <div>预计上线时间
+                                <span style="color: #999999;" title="预计新品可正式上线销售的时间"><i class="fa fa-info-circle"></i></span>
+                            </div>
                             <div class="input-group date date-picker" data-date-format="yyyy-mm-dd">
                                 <input type="text" style="width:125px" class="form-control form-filter input-sm" readonly name="estimated_launch_time" placeholder="Date" value="{{$roi['estimated_launch_time']}}" />
                                 <span style="width:20px; height:26px" class="input-group-btn">
@@ -166,13 +162,15 @@
                             </div>
                         </div>
                         <div class="param_cost">
-                            <div>项目编号</div>
+                            <div>项目编号
+                                <span style="color: #999999;" title="新品开发项目定义好的项目编号"><i class="fa fa-info-circle"></i></span>
+                            </div>
                             <input type="text" name="project_code" id="project_code" value="{{$roi['project_code']}}"/>
                         </div>
                     </div>
                     <div style="clear:both"></div>
                     <div style="height: 15px;"></div>
-                    <div style="font-size:12px; color: #cccccc;">说明：下表的月份是从上市日起的次月起按第一个月算，以12个月为一个周期</div>
+                    <div style="font-size:12px; color: #cccccc;">说明：下表的月份是从上市日起的当月起按第一个月算，以12个月为一个周期</div>
                     <div style="height: 5px;"></div>
                     <div>
                         <table id="sales_table" border="1" cellspacing="0" cellpadding="0">
@@ -184,8 +182,8 @@
                                 <th width="100px">第4月</th>
                                 <th width="100px">第5月</th>
                                 <th width="100px">第6月</th>
-                                <th width="100px">第7月</td>
-                                <th width="100px">第8月</td>
+                                <th width="100px">第7月</th>
+                                <th width="100px">第8月</th>
                                 <th width="100px">第9月</th>
                                 <th width="100px">第10月</th>
                                 <th width="100px">第11月</th>
@@ -194,7 +192,9 @@
                             </tr>
                             <tr>
                                 <td rowspan="4">销售预测</td>
-                                <td style="padding-left: 10px; text-align: left;">预计销量</td>
+                                <td style="padding-left: 10px; text-align: left;">预计销量
+                                    <span style="color: #999999;" title="预计新品上线后的销量，包含正常销量、推广销量和RSG销量"><i class="fa fa-info-circle"></i></span>
+                                </td>
                                 <td><input type="text" class="volume_input" name="volume_month_1" id="volume_month_1" value="{{$roi['volume_month_1']}}" /></td>
                                 <td><input type="text" class="volume_input" name="volume_month_2" id="volume_month_2" value="{{$roi['volume_month_2']}}" /></td>
                                 <td><input type="text" class="volume_input" name="volume_month_3" id="volume_month_3" value="{{$roi['volume_month_3']}}" /></td>
@@ -207,7 +207,7 @@
                                 <td><input type="text" class="volume_input" name="volume_month_10" id="volume_month_10" value="{{$roi['volume_month_10']}}" /></td>
                                 <td><input type="text" class="volume_input" name="volume_month_11" id="volume_month_11" value="{{$roi['volume_month_11']}}" /></td>
                                 <td><input type="text" class="volume_input" name="volume_month_12" id="volume_month_12" value="{{$roi['volume_month_12']}}" /></td>
-                                <td class="span_td"><span id="total_sales_volume">{{$roi['total_sales_volume']}}</span></td>
+                                <td class="span_td"><span id="total_sales_volume" class="highlight_text">{{$roi['total_sales_volume']}}</span></td>
                             </tr>
                             <tr>
                                 <td style="padding-left: 10px; text-align: left">售价（外币）</td>
@@ -224,7 +224,7 @@
                                 <td><input type="text" class="price_fc_input" name="price_fc_month_10" id="price_fc_month_10" value="{{$roi['price_fc_month_10']}}" /></td>
                                 <td><input type="text" class="price_fc_input" name="price_fc_month_11" id="price_fc_month_11" value="{{$roi['price_fc_month_11']}}" /></td>
                                 <td><input type="text" class="price_fc_input" name="price_fc_month_12" id="price_fc_month_12" value="{{$roi['price_fc_month_12']}}" /></td>
-                                <td class="span_td"><span id="average_price_fc">{{$roi['average_price_fc']}}</span></td>
+                                <td class="span_td"><span id="average_price_fc" class="highlight_text">{{$roi['average_price_fc']}}</span></td>
 
                             </tr>
                             <tr>
@@ -241,7 +241,7 @@
                                 <td class="span_td"><span id="price_rmb_month_10">{{$roi['price_rmb_month_10']}}</span></td>
                                 <td class="span_td"><span id="price_rmb_month_11">{{$roi['price_rmb_month_11']}}</span></td>
                                 <td class="span_td"><span id="price_rmb_month_12">{{$roi['price_rmb_month_12']}}</span></td>
-                                <td class="span_td"><span id="average_price_rmb">{{$roi['average_price_rmb']}}</span></td>
+                                <td class="span_td"><span id="average_price_rmb" class="highlight_text">{{$roi['average_price_rmb']}}</span></td>
                             </tr>
                             <tr>
                                 <td style="padding-left: 10px; text-align: left">销售金额</td>
@@ -257,10 +257,13 @@
                                 <td class="span_td"><span id="sales_amount_month_10">{{$roi['sales_amount_month_10']}}</span></td>
                                 <td class="span_td"><span id="sales_amount_month_11">{{$roi['sales_amount_month_11']}}</span></td>
                                 <td class="span_td"><span id="sales_amount_month_12">{{$roi['sales_amount_month_12']}}</span></td>
-                                <td class="span_td"><span id="total_sales_amount">{{$roi['total_sales_amount']}}</span></td>
+                                <td class="span_td"><span id="total_sales_amount" class="highlight_text">{{$roi['total_sales_amount']}}</span></td>
                             </tr>
                             <tr>
-                                <td colspan="2">推广率</td>
+                                <td colspan="2">推广率
+                                    <span style="color: #999999;" title="推广费用占销售额的比例
+包含亚马逊站内广告，站外广告、Deals、测评等费用"><i class="fa fa-info-circle"></i></span>
+                                </td>
                                 <td>
                                     <div style="border: 1px solid #dddddd;height: 22px;width: 76px;margin-left: 12px;">
                                         <input class="promo_exception_input" type="text" name="promo_rate_month_1" id="promo_rate_month_1" style="float: left;border: none;width: 60px;height: 20px;" value="{{$roi['promo_rate_month_1']}}" ><span>%</span>
@@ -321,10 +324,12 @@
                                         <input class="promo_exception_input" type="text" name="promo_rate_month_12" id="promo_rate_month_12" style="float: left;border: none;width: 60px;height: 20px;" value="{{$roi['promo_rate_month_12']}}" ><span>%</span>
                                     </div>
                                 </td>
-                             <td class="span_td"><span id="average_promo_rate">{{$roi['average_promo_rate']}}</span></td>
+                             <td class="span_td"><span id="average_promo_rate" class="highlight_text">{{$roi['average_promo_rate']}}</span></td>
                             </tr>
                             <tr>
-                                <td colspan="2">异常率</td>
+                                <td colspan="2">异常率
+                                    <span style="color: #999999;" title="亚马逊退货、售后等费用占销售额比例"><i class="fa fa-info-circle"></i></span>
+                                </td>
                                 <td>
                                     <div style="border: 1px solid #dddddd;height: 22px;width: 76px;margin-left: 12px;">
                                         <input class="promo_exception_input" type="text" name="exception_rate_month_1" id="exception_rate_month_1" style="float: left;border: none;width: 60px;height: 20px;" value="{{$roi['exception_rate_month_1']}}"><span>%</span>
@@ -385,20 +390,20 @@
                                         <input class="promo_exception_input" type="text" name="exception_rate_month_12" id="exception_rate_month_12" style="float: left;border: none;width: 60px;height: 20px;" value="{{$roi['exception_rate_month_12']}}"><span>%</span>
                                     </div>
                                 </td>
-                                <td class="span_td"><span id="average_exception_rate">{{$roi['average_exception_rate']}}</span></td>
+                                <td class="span_td"><span id="average_exception_rate" class="highlight_text">{{$roi['average_exception_rate']}}</span></td>
                             </tr>
                         </table>
                     </div>
                     <div style="clear:both"></div>
                     <div style="height: 25px;"></div>
                     <div class="cost_div">
-                        <div style="font-size: 14px; float: left;">产品开发及供应链成本</div>
+                        <div style="font-size: 16px; float: left; font-weight: bold">产品开发及供应链成本</div>
                         <div id="expand_icon" style="font-size: 14px; float: right; color:#63C5D1; display: none" onclick="expand_cost_details()">展开 <i class="fa fa-angle-double-down"></i></div>
                         <div style="clear:both"></div>
 
                         <div id="cost_details_div" style="display: block">
                             <div style="height: 20px;"></div>
-                            <div style="font-size: 13px;">平台参数</div>
+                            <div class="bold">平台参数</div>
                             <div style="height: 10px;"></div>
                             <div class="param_cost">
                                 <div>平台佣金(%)</div>
@@ -412,11 +417,11 @@
                             </div>
                             <div style="clear: both"></div>
                             <div style="height: 20px;"></div>
-                            <div style="font-size: 13px">运输参数</div>
+                            <div class="bold">运输参数</div>
                             <div style="height: 10px;"></div>
                             <div class="param_cost">
                                 <div>运输方式</div>
-                                <select style="width: 205px;height:28px" name="transport_mode" onchange="change_transport_mode(this)" id="transport_mode">
+                                <select style="width: 205px;height:28px; border: 1px solid #dddddd;" name="transport_mode" onchange="change_transport_mode(this)" id="transport_mode">
                                     @foreach ($transportModes as $k => $v)
                                         <option value="{{$k}}" @if($roi['transport_mode'] == $k) selected @endif>{{$v}}</option>
                                     @endforeach
@@ -441,7 +446,7 @@
                             </div>
                             <div style="clear: both"></div>
                             <div style="height: 20px;"></div>
-                            <div style="font-size: 13px">采购参数</div>
+                            <div class="bold">采购参数</div>
                             <div style="height: 10px;"></div>
                             <div class="param_cost">
                                 <div>单PCS实重(KG)</div>
@@ -461,7 +466,7 @@
                             </div>
                             <div class="param_cost">
                                 <div>供应商账期</div>
-                                <select name="billing_period_type" id="billing_period_type">
+                                <select name="billing_period_type" id="billing_period_type" style="border: 1px solid #dddddd;">
                                     @foreach ($billingPeriods as $k => $v)
                                         <option value="{{$k}}" @if($roi['billing_period_type'] == $k) selected @endif>{{$v['name']}}</option>
                                     @endforeach
@@ -470,7 +475,7 @@
 
                             <div style="clear: both"></div>
                             <div style="height: 20px;"></div>
-                            <div style="font-size: 13px">固定成本</div>
+                            <div class="bold">固定成本</div>
                             <div style="height: 10px;"></div>
                             <div class="param_cost">
                                 <div>ID费用(元)</div>
@@ -555,21 +560,20 @@
                     </div>
                     <div style="height: 30px;"></div>
                     <div class="result_div">
-                        <div style="font-size: 14px;">投入产出分析结果</div>
+                        <div style="font-size: 16px; font-weight: bold">投入产出分析结果</div>
                         <div style="height: 15px;"></div>
                         <div style="width:1501px">
                             <table id="result_table" border="0" cellspacing="0" cellpadding="0">
                                 <tr>
-                                    <td width="25%">底线价格(外币/元) : <span id="price_floor"></span></td>
-                                    <td width="25%">库存周转天数(天) : <span id="inventory_turnover_days"></span></td>
-                                    <td width="25%">项目利润率(%) : <span id="project_profitability"></span></td>
-                                    <td width="25%">单PCS边际利润(元) : <span id="marginal_profit_per_pcs"></span></td>
+                                    <td><span class="grey_color">投资回报额(万元) :</span> <span class="bold" id="return_amount"></span></td>
+                                    <td><span class="grey_color">投资回报率ROI(%) :</span> <span class="bold" id="roi"></span></td>
+                                    <td width="25%"><span class="grey_color">项目利润率(%) :</span> <span class="bold" id="project_profitability"></span></td>
                                 </tr>
                                 <tr>
-                                    <td>预计投资回收期(月) : <span id="estimated_payback_period"></span></td>
-                                    <td>资金周转次数(次) : <span id="capital_turnover"></span></td>
-                                    <td>投资回报率ROI(%) : <span id="roi"></span></td>
-                                    <td>投资回报额(万元) : <span id="return_amount"></span></td>
+                                    <td width="25%"><span class="grey_color">底线价格(外币/元) :</span> <span class="bold" id="price_floor"></span></td>
+                                    <td width="25%"><span class="grey_color">资金周转次数(次) :</span> <span class="bold" id="capital_turnover"></span></td>
+                                    <td><span class="grey_color">库存周转天数(天) :</span> <span class="bold" id="inventory_turnover_days"></span></td>
+                                    <td width="25%"><span class="grey_color">单PCS边际利润(元) :</span> <span class="bold" id="marginal_profit_per_pcs"></span></td>
                                 </tr>
                             </table>
                         </div>

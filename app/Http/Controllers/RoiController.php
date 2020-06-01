@@ -95,7 +95,7 @@ class RoiController extends Controller
         $iDisplayStart = intval($_REQUEST['start']);
         //如果连接了asin表，后面的where的字段要加上表名。例如site：where('roi.site', $search['site'])
         $lists =  $data->orderBy($orderby,$sort)->offset($iDisplayStart)->limit($iDisplayLength)->get()->toArray();
-        $lists = array_map('get_object_vars', $lists);
+        $lists = json_decode(json_encode($lists),true);
 
         $users= $this->getUsers();
 
@@ -117,9 +117,9 @@ class RoiController extends Controller
             $lists[$key]['created_at'] = date('Y-m-d',strtotime($list['created_at']));
             $lists[$key]['updated_by'] = array_get($users,$list['updated_by']);
             $lists[$key]['updated_at'] = date('Y-m-d',strtotime($list['updated_at']));
-            $lists[$key]['archived_status'] = $list['archived_status'] == 0 ? '未归档' : '已归档';
+            $lists[$key]['archived_status'] = $list['archived_status'] == 0 ? '未审核' : '已审核';
             $edit_item = $list['archived_status'] == 0 ? '<li><a style="text-align:center" href="' . $edit_url . '">编辑</a></li>' : '';
-            $archived_item = $list['archived_status'] == 0 ? '<li><a style="text-align:center" href="#" data-toggle="modal" data-target="#archived-modal" data-roi_id="' . $list['id'] . '" data-launch_time="' .$list['estimated_launch_time'] .'" >归档</a></li>' : '';
+            $archived_item = $list['archived_status'] == 0 ? '<li><a style="text-align:center" href="#" data-toggle="modal" data-target="#archived-modal" data-roi_id="' . $list['id'] . '" data-launch_time="' .$list['estimated_launch_time'] .'" >审核</a></li>' : '';
             $lists[$key]['action'] = '<ul class="nav navbar-nav"><li><a href="#" class="dropdown-toggle" style="height:10px; vertical-align:middle; padding-top:0px;" data-toggle="dropdown" role="button">...</a><ul class="dropdown-menu" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(-50px, 20px, 0px); min-width: 88px;" role="menu" style="color: #62c0cc8a"><li><a style="text-align:center" href="' . $show_url . '" >查看详情</a></li>' . $edit_item . $archived_item . '<li><a style="text-align:center" href="' . $copy_url .'">复制</a></li></ul></li></ul>';
 //        <div>
 //            <ul class="nav navbar-nav">
@@ -128,7 +128,7 @@ class RoiController extends Controller
 //                    <ul class="dropdown-menu" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(-120px, 20px, 0px);  min-width: 88px;" role="menu" style="color: #cccccc">
 //                        <li><a style="text-align:center" href="{{ $edit_url }}">查看详情</a></li>
 //                        <li><a style="text-align:center" href="{{ $show_url }}">编辑</a></li>
-//                        <li><a style="text-align:center" href="#" data-toggle="modal" data-target="#archived-modal" data-roi_id="{{$list['id']}}" data-launch_time="{{$list['estimated_launch_time']}}">归档</a></li>
+//                        <li><a style="text-align:center" href="#" data-toggle="modal" data-target="#archived-modal" data-roi_id="{{$list['id']}}" data-launch_time="{{$list['estimated_launch_time']}}">审核</a></li>
 //                        <li><a style="text-align:center" href="{{ $copy_url }}">复制</a></li>
 //                    </ul>
 //                </li>
@@ -167,11 +167,13 @@ class RoiController extends Controller
     {
         if(!Auth::user()->can(['roi-add'])) die('Permission denied -- roi-add');
         $sites = $this->getSites();
+        $users = $this->getUsers();
         $billingPeriods = $this->getBillingPeriods();
         $transportModes = $this->getTransportModes();
         $currency_rates = $this->getCurrencyRates();
 
-        return view('roi/add',compact('sites','billingPeriods','transportModes','currency_rates'));
+
+        return view('roi/add',compact('sites', 'users', 'billingPeriods','transportModes','currency_rates'));
     }
 
     public function export(Request $request)
@@ -183,7 +185,7 @@ class RoiController extends Controller
 
         $data = DB::connection('amazon')->table('roi');
         $data = $data->where('roi.created_at','>=',$submit_date_from.' 00:00:00')->where('roi.created_at','<=',$submit_date_to.' 23:59:59')->get()->toArray();
-        $data = array_map('get_object_vars', $data);;
+        $data = json_decode(json_encode($data),true);
 
         $users= $this->getUsers();
 
@@ -530,7 +532,7 @@ class RoiController extends Controller
     public function edit(Request $request, $id)
     {
         if(!Auth::user()->can(['roi-update'])) die('Permission denied -- roi-update');
-        $usersIdName = $this->getUsersIdName();
+        $users = $this->getUsers();
         //编辑限制：其中一个用户编辑时，另一个用户只能查看。编辑用户关闭浏览器（标签）前未保存，则过$expiry_time = 70s后其他用户可编辑。
         $roi_id = $id;
         //$expiry_time 略大于edit页面ajax刷新时间60s
@@ -559,7 +561,7 @@ class RoiController extends Controller
                else{
                   if(time() - $refresh_time < $expiry_time){
                       //show error_message: someone is editing
-                      $request->session()->flash('error_message', array_get($usersIdName, $editing_user) .' is editing the file.');
+                      $request->session()->flash('error_message', array_get($users, $editing_user) .' is editing the file.');
                       return redirect('roi/'.$roi_id);
                   }
                   else{
@@ -599,7 +601,6 @@ class RoiController extends Controller
         }
         $roi['transport_unit'] = $transport_unit;
 
-        $users = $this->getUsers();
         $eh = explode(";",$roi['edit_history']);
         $edit_history_array = array();
         foreach(array_reverse($eh) as $key => $value){
@@ -610,9 +611,9 @@ class RoiController extends Controller
     }
 
     public function copy(Request $request){
-       $id = $request->get('id');
-        $roi = DB::connection('amazon')->table('roi')->where('id', '=', $id)->get()->toArray();
-        $roi = array_map('get_object_vars', $roi)[0];
+        $id = $request->get('id');
+        $roi = DB::connection('amazon')->table('roi')->where('id', '=', $id)->first();
+        $roi = json_decode(json_encode($roi),true);
 
         unset($roi['id']);
         //复制的记录，状态设置为：未归档,后续需要编辑
@@ -630,8 +631,8 @@ class RoiController extends Controller
     }
 
     public function getCurrentRoi($id){
-        $roi = DB::connection('amazon')->table('roi')->where('id', '=', $id)->get()->toArray();
-        $roi = array_map('get_object_vars', $roi)[0];
+        $roi = DB::connection('amazon')->table('roi')->where('id', '=', $id)->first();
+        $roi = json_decode(json_encode($roi),true);
         for($i=1; $i<=12;$i++){
             $roi['price_fc_month_'.$i] = $this->twoDecimal($roi['price_fc_month_'.$i]);
             $roi['price_rmb_month_'.$i] = $this->twoDecimal($roi['price_fc_month_'.$i] * $roi['currency_rate']);
@@ -698,18 +699,11 @@ class RoiController extends Controller
             $transport_unit = '<span>元/KG></span>';
         }
         $roi['transport_unit_price'] = $roi['transport_unit_price'].$transport_unit;
-        $roi['billing_period_type'] = $billingPeriods[$roi['billing_period_type']]['name'];
+        $roi['billing_period_type'] = $billingPeriods[$roi['billing_period_type']]['name'] . ' (' . $billingPeriods[$roi['billing_period_type']]['days'] . '天)';
         $estimated_launch_time = $roi['estimated_launch_time'];
         if($estimated_launch_time){
-            $day = substr($estimated_launch_time,-2);
-            if($day <= 15){
-                for($i=1; $i<=12; $i++){
-                    $roi['month_'.$i] = date("Y-m", strtotime("+".($i-1)." months", strtotime($estimated_launch_time)));
-                }
-            }else{
-                for($i=1; $i<=12; $i++){
-                    $roi['month_'.$i] = date("Y-m", strtotime("+".$i." months", strtotime($estimated_launch_time)));
-                }
+            for($i=1; $i<=12; $i++){
+                $roi['month_'.$i] = date("Y-m", strtotime("+".($i-1)." months", strtotime($estimated_launch_time)));
             }
         }
 

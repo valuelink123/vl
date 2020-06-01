@@ -222,7 +222,7 @@ class MrpController extends Controller
 		
 		$add_where = [];
 		foreach(getMarketplaceCode() as $k=>$v){
-			foreach($v['fba_factory_warhouse'] as $k1=>$v1){
+			foreach($v['fba_factory_warehouse'] as $k1=>$v1){
 				$add_where[] ="(sap_factory_code = '".$v1['sap_factory_code']."' and sap_warehouse_code = '".$v1['sap_warehouse_code']."')";
 			}
 		}
@@ -230,7 +230,7 @@ class MrpController extends Controller
 		$sku_purchase_info = SapPurchaseRecord::where('sku',$sku)->orderBy('created_date','desc')->first()->toArray();
 		$sku_info['min_purchase_quantity'] = $sku_purchase_info['min_purchase_quantity'];
 		$sku_info['estimated_cycle'] = $sku_purchase_info['estimated_cycle'];
-		$sku_info['international_transport_time'] = InternationalTransportTime::where('factory_code',array_get(getMarketplaceCode(),$marketplace_id.'.fba_factory_warhouse.0.sap_factory_code'))->where('is_default',1)->value('total_days');
+		$sku_info['international_transport_time'] = InternationalTransportTime::where('factory_code',array_get(getMarketplaceCode(),$marketplace_id.'.fba_factory_warehouse.0.sap_factory_code'))->where('is_default',1)->value('total_days');
 		
 		
 		$sales_plan=[];
@@ -588,7 +588,7 @@ class MrpController extends Controller
 		}
 		$add_where = [];
 		foreach(getMarketplaceCode() as $k=>$v){
-			foreach($v['fba_factory_warhouse'] as $k1=>$v1){
+			foreach($v['fba_factory_warehouse'] as $k1=>$v1){
 				$add_where[] ="(sap_factory_code = '".$v1['sap_factory_code']."' and sap_warehouse_code = '".$v1['sap_warehouse_code']."')";
 			}
 		}
