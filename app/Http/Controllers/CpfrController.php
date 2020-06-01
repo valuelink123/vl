@@ -14,7 +14,7 @@ class CpfrController extends Controller
 	
     public function index()
     {
-        return view('Cpfr.index');
+        return view('cpfr.index');
     }
 	public function allocationProgress()
 	{

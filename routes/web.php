@@ -274,6 +274,8 @@ Route::match(['post'],'/shipment/importExecl', 'ShipmentController@importExecl')
 Route::match(['post'],'/shipment/getBoxDetail', 'ShipmentController@getBoxDetail');//查询 装箱数据信息
 Route::match(['post'],'/shipment/upShippingMethod', 'ShipmentController@upShippingMethod');//修改 发货方式
 Route::match(['post'],'/shipment/exportExecl', 'ShipmentController@exportExecl');//调拨进度 下载
+Route::match(['post'],'/shipment/upAllAllot', 'ShipmentController@upAllAllot');//批量修改调拨状态
+//
 
 
 Route::get('/marketingPlan/test', 'MarketingPlanController@test')->name('marketingPlan');

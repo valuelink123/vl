@@ -1268,7 +1268,30 @@ class ShipmentController extends Controller
         }
         return $r_message;
     }
-
+    /**
+     * @param Request $request
+     * @return array
+     * 批量更新 调拨 状态
+     */
+    public function upAllAllot(Request $request)
+    {
+        $r_message = [];
+        $idList = explode(',', $request['idList']);
+        if ((@$request['status'] >= 0) && !empty($idList)) {
+            $data = ['status' => $request['status']];
+            $result = DB::connection('vlz')->table('allot_progress')
+                ->whereIn('id', $idList)
+                ->update($data);
+            if ($result > 0) {
+                $r_message = ['status' => 1, 'msg' => '全部更新成功'];
+            } else {
+                $r_message = ['status' => 0, 'msg' => '更新失败'];
+            }
+        } else {
+            $r_message = ['status' => 0, 'msg' => '缺少ID或状态'];
+        }
+        return $r_message;
+    }
     /**
      * 调拨进度 导出所有列表信息
      * @param Request $request
