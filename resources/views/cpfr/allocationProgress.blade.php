@@ -604,7 +604,7 @@
 		}else{
 			$.ajax({
 			    type: "POST",
-				url: "http://10.10.42.14/vl/public/shipment/upAllAllot",
+				url: "/shipment/upAllAllot",
 				data: {
 					status: status,
 					idList: chk_value
@@ -659,7 +659,7 @@
 			}
 			$.ajax({
 			    type: "POST",
-				url: "http://10.10.42.14/vl/public/shipment/importExecl",
+				url: "/shipment/importExecl",
 				data: {
 					files: fileList
 				},
@@ -696,7 +696,7 @@
 			});
 			$.ajax({
 			    type: "POST",
-				url: "http://10.10.42.14/vl/public/shipment/allotProgress",
+				url: "/shipment/allotProgress",
 				data: {
 					downLoad: 1,
 					date_s: cusstr($('.createTimeInput').val() , ' - ' , 1),
@@ -783,7 +783,7 @@
 			 	}
 			 });
 			 $.ajax({
-				url: "http://10.10.42.14/vl/public/shipment/exportExecl",
+				url: "/shipment/exportExecl",
 				 method: 'POST',
 				 cache: false,
 				 data: {
@@ -887,7 +887,7 @@
 			order: [ 1, "desc" ],
 			ajax: {
 				type: 'POST',
-				url: 'http://10.10.42.14/vl/public/shipment/allotProgress',
+				url: '/shipment/allotProgress',
 				data :  function(){
 					reqList = {
 						"condition" : $('.keyword').val(),
@@ -902,7 +902,7 @@
 					for (let row of res[0]) {
 					    let shipment_requests_id = row.shipment_requests_id
 					    // 根据每一行 shipment_requests_id 进行预查询，如果有配件数据，则将加号按钮变绿
-					    $.post('http://10.10.42.14/vl/public/shipment/getBoxDetail', {shipment_requests_id}).success(rows => {
+					    $.post('/shipment/getBoxDetail', {shipment_requests_id}).success(rows => {
 					        if (rows.length > 0) {
 					            if (false === rows[0]) return
 					            $(`#thetable .ctrl-${shipment_requests_id}`).parent().removeClass('disabled')
@@ -1060,7 +1060,7 @@
 						$(cell).on("blur", ":input", function () {
 							$.ajax({
 								type: "POST",
-								url: "http://10.10.42.14/vl/public/shipment/upShippingMethod",
+								url: "/shipment/upShippingMethod",
 								data: {
 									id: rowData.id,
 									shippingMethod: $(this).val()
@@ -1092,7 +1092,7 @@
 		async function buildSubItemTable(shipment_requests_id) {
 		
 		    let rows = await new Promise((resolve, reject) => {
-		        $.post('http://10.10.42.14/vl/public/shipment/getBoxDetail', {shipment_requests_id})
+		        $.post('/shipment/getBoxDetail', {shipment_requests_id})
 		            .success(rows => resolve(rows))
 		            .error((xhr, status, errmsg) => reject(new Error(errmsg)))
 		    })

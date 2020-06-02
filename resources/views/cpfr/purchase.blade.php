@@ -622,7 +622,7 @@
 		}else{
 			$.ajax({
 			    type: "POST",
-				url: "http://10.10.42.14/vl/public/shipment/upAllPurchase",
+				url: "/shipment/upAllPurchase",
 				data: {
 					status: status,
 					idList: chk_value
@@ -674,7 +674,7 @@
 			 	}
 			 });
 			 $.ajax({
-				url: "http://10.10.42.14/vl/public/shipment/purchaseList",
+				url: "/shipment/purchaseList",
 				 method: 'POST',
 				 cache: false,
 				 data: {
@@ -749,7 +749,7 @@
 		function getAsinData(site,sku){
 			$.ajax({
 			    type: "POST",
-				url: "http://10.10.42.14/vl/public/shipment/getNextData",
+				url: "/shipment/getNextData",
 				data: {
 					marketplace_id: site,
 					sku: sku,
@@ -815,7 +815,7 @@
 		$('#asin_select').on('change',function(){
 			$.ajax({
 			    type: "POST",
-				url: "http://10.10.42.14/vl/public/shipment/getNextData",
+				url: "/shipment/getNextData",
 				data: {
 					marketplace_id: $('#site_select').val(),
 					asin: $(this).val(),
@@ -865,7 +865,7 @@
 			if($('.formId').val() == ""){
 				$.ajax({
 				    type: "POST",
-					url: "http://10.10.42.14/vl/public/shipment/addPurchase",
+					url: "/shipment/addPurchase",
 					data: {
 						audit_status: $('#audit_status_select').val(),
 						sku: $('#sku_input').val(),
@@ -906,7 +906,7 @@
 			}else{
 				$.ajax({
 				    type: "POST",
-					url: "http://10.10.42.14/vl/public/shipment/upPurchase",
+					url: "/shipment/upPurchase",
 					data: {
 						id: $('.formId').val(),
 						audit_status: $('#audit_status_select').val(),//审核
@@ -977,7 +977,7 @@
 		function editTableData(id){
 			$.ajax({
 			    type: "POST",
-				url: "http://10.10.42.14/vl/public/shipment/detailPurchase",
+				url: "/shipment/detailPurchase",
 				data: {
 					id: id
 				},
@@ -1057,7 +1057,7 @@
 			scrollX: "100%",
 			scrollCollapse: false,
 			ajax: {
-				url: "http://10.10.42.14/vl/public/shipment/purchaseList",
+				url: "/shipment/purchaseList",
 				type: "post",
 				data :  function(){
 					reqList = {

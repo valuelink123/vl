@@ -764,7 +764,7 @@
 			}else{
 				$.ajax({
 				    type: "POST",
-					url: "http://10.10.42.14/vl/public/shipment/upAllStatus",
+					url: "/shipment/upAllStatus",
 					data: {
 						status: status,
 						idList: chk_value
@@ -829,7 +829,7 @@
 				 	}
 				 });
 				 $.ajax({
-					url: "http://10.10.42.14/vl/public/shipment/index",
+					url: "/shipment/index",
 					 method: 'POST',
 					 cache: false,
 					 data: {
@@ -900,7 +900,7 @@
 				}
 				$.ajax({
 				    type: "POST",
-					url: "http://10.10.42.14/vl/public/shipment/upCargoData",
+					url: "/shipment/upCargoData",
 					data: {
 						id: $('.uploadId').val(),
 						cargo_data: fileList
@@ -948,7 +948,7 @@
 			function getAjaxData(site,asin){
 				$.ajax({
 				    type: "POST",
-					url: "http://10.10.42.14/vl/public/shipment/getSellerSku",
+					url: "/shipment/getSellerSku",
 					data: {
 						marketplace_id: site,
 						asin: asin
@@ -1071,7 +1071,7 @@
 				if($('.formId').val() == ""){ //判断有id时为编辑，没有id为新增
 					$.ajax({
 					    type: "POST",
-						url: "http://10.10.42.14/vl/public/shipment/addShipment",
+						url: "/shipment/addShipment",
 						data: {
 							sku: $('#sku_select').val(),
 							asin: $('#asin_select').val(),
@@ -1113,7 +1113,7 @@
 				}else{
 					$.ajax({
 					    type: "POST",
-						url: "http://10.10.42.14/vl/public/shipment/upShipment",
+						url: "/shipment/upShipment",
 						data: {
 							id: $('.formId').val(),
 							sku: $('#sku_select').val(),
@@ -1181,7 +1181,7 @@
 			function editTableData(id){
 				$.ajax({
 				    type: "POST",
-					url: "http://10.10.42.14/vl/public/shipment/detailShipment",
+					url: "/shipment/detailShipment",
 					data: {
 						id: id
 					},
@@ -1257,7 +1257,7 @@
 				scrollX: "100%",
 				scrollCollapse: false,
 				ajax: {
-					url: "http://10.10.42.14/vl/public/shipment/index",
+					url: "/shipment/index",
 					type: "post",
 					data :  function(){
 						reqList = {
