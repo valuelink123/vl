@@ -1230,6 +1230,7 @@ class ShipmentController extends Controller
         //下载判断
         if ($downLoad > 0) {
             echo
+                'shipment_requests_id,' .
                 '需求提交日期,' .
                 '调拨状态,' .
                 '销售员,' .
@@ -1251,6 +1252,7 @@ class ShipmentController extends Controller
             if (!empty($allot_progress)) {
                 foreach ($allot_progress as $ak => $av) {
                     echo
+                        '"' . @$av['shipment_requests_id'] . '",' .
                         '"' . @$av['created_at'] . '",' .
                         '"' . $statusList[@$av['status']] . '",' .
                         '"' . @$av['name'] . '",' .
@@ -1361,14 +1363,15 @@ class ShipmentController extends Controller
                     if ($result) {
                         $r_message = ['status' => 1, 'msg' => '保存成功'];
                     }
-                    return $r_message;
+                }else{
+                    $r_message = ['status' => 0, 'msg' => '数据格式不对'];
                 }
 
 //                return \Response::json(array('files' => array($success)), 200);
             } else {
-                return \Response::json('Error', 400);
+                $r_message = ['status' => 0, 'msg' => '文件打开失败'];
             }
-            return \Response::json('Error', 400);
+            return $r_message;
         }
     }
 
