@@ -748,7 +748,7 @@
 			 });
 			 chk_value == ""? chk_value = -1 : chk_value;
 			 $.ajax({
-				 url: "/hijack/hijackExport",
+				 url: "/shipment/purchaseList",
 				 method: 'POST',
 				 cache: false,
 				 data: {

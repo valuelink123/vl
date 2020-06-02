@@ -220,6 +220,7 @@
 					<li><span>ETA:</span><input type="text" id="eta" onkeyup="value=value.replace(/^(0+)|[^\d]+/g,'')" class="batch_list_input"><button id="btn_eta" class="batch_list_button change">change</button></li>
 					<li><span>清关日期:</span><input type="text" id="clearance_days" onkeyup="value=value.replace(/^(0+)|[^\d]+/g,'')" class="batch_list_input"><button id="btn_clearance_days" class="batch_list_button change">change</button></li>
 					<li><span>派送日期:</span><input type="text" id="delivery_days" onkeyup="value=value.replace(/^(0+)|[^\d]+/g,'')" class="batch_list_input"><button id="btn_delivery_days" class="batch_list_button change">change</button></li>
+					<li><span>FBA签收日期:</span><input type="text" id="fba_sign_in_days" onkeyup="value=value.replace(/^(0+)|[^\d]+/g,'')" class="batch_list_input"><button id="btn_fba_sign_in_days" class="batch_list_button change">change</button></li>
 				</ul>
 			</div>
 			<div class="col-md-10" style="float: right;padding-right: 0;">
@@ -662,6 +663,44 @@
 						})
 					}
 				},
+                {
+                    "targets": [10],
+                    render: function (data, type, row) {
+                        return '<div><span>'+data+'</span><img src="../assets/global/img/editor.png" alt="" style="float:right" class="country_img"></div>';
+                    },
+
+                    createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
+                        $(cell).click(function (e) {
+                            $(this).html('<input type="text" οnkeyup="validataInt(this)" size="16" style="width: 100%"/>');
+                            var aInput = $(this).find(":input");
+                            aInput.focus().val(cellData);
+                        });
+                        $(cell).on("blur", ":input", function (e) {
+                            var text = $(this).val();
+                            if($(this).val() != cellData){
+                                $(cell).html(text);
+                                tableObj.cell(cell).data(text);
+                                $.ajax({
+                                    type:"post",
+                                    url:'/manageDistributeTime/updateTransportTime',
+                                    data:{
+                                        id: rowData.id,
+                                        fba_sign_in_days: rowData.fba_sign_in_days
+                                    },
+                                    error:function(err){
+                                        console.log(err);
+                                    },
+                                    success:function(res){
+                                        tableObj.ajax.reload()
+                                    }
+                                });
+                            }else{
+                                $(cell).html(text);
+                                tableObj.cell(cell).data(text);
+                            }
+                        })
+                    }
+                },
                 {
                     "targets": [14],
                     render: function (data, type, row) {

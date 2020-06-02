@@ -20,11 +20,11 @@ header('Access-Control-Allow-Origin:*');
 class MarketingPlanController extends Controller
 {
     //判断是否登录  todo 上线需打开
-//    public function __construct()
-//    {
-//        $this->middleware('auth');
-//        parent::__construct();
-//    }
+    public function __construct()
+    {
+        $this->middleware('auth');
+        parent::__construct();
+    }
 
     public function index()
     {
@@ -206,9 +206,6 @@ class MarketingPlanController extends Controller
     public function detailEdit(Request $request)
     {
         $DOMIN_MARKETPLACEID_SX = Asin::DOMIN_MARKETPLACEID_SX;
-        /** 超级权限*/
-        $ADMIN_EMAIL=Asin::ADMIN_EMAIL;
-        $role = 0;//角色
         if ($request['sap_seller_id']) {
             $user = DB::table('users')->select('sap_seller_id', 'id', 'name', 'email', 'seller_rules', 'ubg', 'ubu')
                 ->where('sap_seller_id', $request['sap_seller_id'])
@@ -217,6 +214,9 @@ class MarketingPlanController extends Controller
         }else{
             $user = Auth::user()->toArray();
         }
+        /** 超级权限*/
+        $ADMIN_EMAIL=Asin::ADMIN_EMAIL;
+        $role = 0;//角色
         if (!empty($user)) {
             if (!empty($user['email']) && in_array($user['email'], $ADMIN_EMAIL)) {
                 /**  特殊权限着 查询所有用户 */
@@ -304,6 +304,10 @@ class MarketingPlanController extends Controller
             } else if ($old_m_plan['plan_status'] == 3 || $old_m_plan['plan_status'] == 4 || $old_m_plan['plan_status'] == 5) {
                 /** 已完结 已终止 已拒绝 不能在修改*/
                 $update = 0;
+            }else if($old_m_plan['plan_status'] == $plan_status){
+                /** 没有修改  不作处理  */
+                $r_message = ['status' => 3, 'msg' => '状态不变'];
+                return $r_message;
             }
             if ($update > 0) {
                 $up_data = [
@@ -852,67 +856,5 @@ class MarketingPlanController extends Controller
         $sap_seller_id = $user['sap_seller_id']>0?$user['sap_seller_id']:0;
         return view('marketingPlan.test', ['sap_seller_id' => $sap_seller_id]);
     }
-    public function importExecl(Request $request, $sheet=0){
-        include( "../vendor/PHPExcel/PHPExcel.php" );
-        header("content-type:text/html;charset=utf-8");
-        $file = $request->file('files');
-        if($file) {
-            try {
-                $file_name = $file[0]->getClientOriginalName();
-                $file_size = $file[0]->getSize();
-                $file_ex = $file[0]->getClientOriginalExtension();
-                $newname = $file_name ;
-                $newpath = '/uploads/'.date('Ym').'/'.date('d').'/'.date('His').rand(100,999).intval(Auth::user()->id).'/';
-                $file[0]->move(public_path().$newpath,$newname);
-            } catch (\Exception $exception) {
-                $error = array(
-                    'name' => $file[0]->getClientOriginalName(),
-                    'size' => $file[0]->getSize(),
-                    'error' => $exception->getMessage(),
-                );
-                // Return error
-                return \Response::json($error, 400);
-            }
-            // If it now has an id, it should have been successful.
-            if (file_exists(public_path().$newpath.$newname)) {
-                $newurl = $newpath . $newname;
-                $success = new \stdClass();
-                $success->name = $newname;
-                $success->size = $file_size;
-                $success->url = $newurl;
-                $success->thumbnailUrl = $newurl;
-                $success->deleteUrl = url('send/deletefile/' . base64_encode($newpath . $newname));
-                $success->deleteType = 'get';
-                $success->fileID = md5($newpath . $newname);
-                //判断哪种类型
-                if($file_ex=="xlsx"){
-                    $reader = \PHPExcel_IOFactory::createReader('Excel2007');
-                }else{
-                    $reader = \PHPExcel_IOFactory::createReader('Excel5');
-                }
-                $excel = $reader->load(public_path().$newpath.$newname,$encode = 'utf-8');
-                //读取第一张表
-                $sheet = $excel->getSheet(0);
-                //获取总行数
-                $row_num = $sheet->getHighestRow();
-                //获取总列数
-                $col_num = $sheet->getHighestColumn();
-                $data = []; //数组形式获取表格数据
-                for ($i = 2; $i <= $row_num; $i ++) {
-                    $data[$i]['rank']  = $sheet->getCell("A".$i)->getValue();
-                    $data[$i]['Score']  = $sheet->getCell("B".$i)->getValue();
-                    $data[$i]['Weight Status']  = $sheet->getCell("C".$i)->getValue();
-                    $data[$i]['Product']  = $sheet->getCell("D".$i)->getValue();
-                }
-                echo '<pre>';
-                var_dump($data);exit;
-                return \Response::json(array('files' => array($success)), 200);
-            } else {
-                return \Response::json('Error', 400);
-            }
-            return \Response::json('Error', 400);
-        }
-    }
-
 
 }

@@ -224,12 +224,21 @@ Route::match(['post','get'],'/marketingPlan/achieveGoals', 'MarketingPlanControl
 Route::match(['post','get'],'/marketingPlan/delfiles', 'MarketingPlanController@delfiles');//删除图片
 Route::post('/marketingPlan/getAsinDailyReport', 'MarketingPlanController@getAsinDailyReport');
 
-//  Manage Distribute Time
-Route::get('/manageDistributeTime/safetyStockDays', 'ManageDistributeTimeController@safetyStockDays')->name('safetyStockDays');
-Route::get('/manageDistributeTime/fba', 'ManageDistributeTimeController@fba')->name('fba');
-Route::get('/manageDistributeTime/fbm', 'ManageDistributeTimeController@fbm')->name('fbm');
-Route::get('/manageDistributeTime/internationalTransportTime', 'ManageDistributeTimeController@internationalTransportTime')->name('internationalTransportTime');
-
+//Manage Distribute Time
+Route::match(['post','get'],'/manageDistributeTime/safetyStockDays', 'ManageDistributeTimeController@safetyStockDays');
+Route::post('/manageDistributeTime/updateSafetyStockDays', 'ManageDistributeTimeController@updateSafetyStockDays');
+Route::get('/manageDistributeTime/exportSafetyStockDays', 'ManageDistributeTimeController@exportSafetyStockDays');
+Route::match(['post','get'],'/manageDistributeTime/fba', 'ManageDistributeTimeController@fba');
+Route::post('/manageDistributeTime/updateFba', 'ManageDistributeTimeController@updateFba');
+Route::get('/manageDistributeTime/exportFba', 'ManageDistributeTimeController@exportFba');
+Route::match(['post','get'],'/manageDistributeTime/fbm', 'ManageDistributeTimeController@fbm');
+Route::post('/manageDistributeTime/updateFbm', 'ManageDistributeTimeController@updateFbm');
+Route::get('/manageDistributeTime/exportFbm', 'ManageDistributeTimeController@exportFbm');
+Route::match(['post','get'],'/manageDistributeTime/internationalTransportTime', 'ManageDistributeTimeController@internationalTransportTime');
+Route::post('/manageDistributeTime/upload', 'ManageDistributeTimeController@upload');
+Route::post('/manageDistributeTime/updateTransportTime', 'ManageDistributeTimeController@updateTransportTime');
+Route::post('/manageDistributeTime/batchUpdateTransportTime', 'ManageDistributeTimeController@batchUpdateTransportTime');
+Route::get('/manageDistributeTime/exportTransportTime', 'ManageDistributeTimeController@exportTransportTime');
 
 //投入产出分析
 Route::resource('roi', 'RoiController');
@@ -254,5 +263,32 @@ Route::post('/mrp/import', 'MrpController@import');
 //CPFR协同补货
 Route::get('/cpfr/index', 'CpfrController@index')->name('index');
 Route::get('/cpfr/allocationProgress', 'CpfrController@allocationProgress')->name('allocationProgress');
+
+Route::match(['post','get'],'/shipment/index', 'ShipmentController@index');//调拨需求列表
+Route::match(['post','get'],'/shipment/addShipment', 'ShipmentController@addShipment');//新增调拨需求列表
+Route::match(['post','get'],'/shipment/detailShipment', 'ShipmentController@detailShipment');//调拨需求  详情页面
+Route::match(['post','get'],'/shipment/upShipment', 'ShipmentController@upShipment');//新增调拨需求列表
+Route::match(['post'],'/shipment/upAllStatus', 'ShipmentController@upAllStatus');//批量更新状态
+Route::match(['post','get'],'/shipment/purchaseList', 'ShipmentController@purchaseList');//采购列表页面
+Route::match(['post'],'/shipment/upAllPurchase', 'ShipmentController@upAllPurchase');//批量更改 采购状态
+Route::match(['post','get'],'/shipment/detailPurchase', 'ShipmentController@detailPurchase');// 采购 详情
+Route::match(['post','get'],'/shipment/addPurchase', 'ShipmentController@addPurchase');// 采购 新增
+Route::match(['post'],'/shipment/upPurchase', 'ShipmentController@upPurchase');// 采购 更新
+Route::match(['post','get'],'/shipment/allotProgress', 'ShipmentController@allotProgress');//调拨进度列表
+Route::match(['post'],'/shipment/upCargoData', 'ShipmentController@upCargoData');//修改 大货资料
+
+Route::match(['post'],'/shipment/getNextData', 'ShipmentController@getNextData');//请求下一级 asin 或者 sellersku列表
+Route::match(['post'],'/shipment/getSellerSku', 'ShipmentController@getSellerSku');
+Route::match(['post'],'/shipment/importExecl', 'ShipmentController@importExecl');//上传 表格
+Route::match(['post'],'/shipment/getBoxDetail', 'ShipmentController@getBoxDetail');//查询 装箱数据信息
+Route::match(['post'],'/shipment/upShippingMethod', 'ShipmentController@upShippingMethod');//修改 发货方式
+Route::match(['post'],'/shipment/exportExecl', 'ShipmentController@exportExecl');//调拨进度 下载
+Route::match(['post'],'/shipment/upAllAllot', 'ShipmentController@upAllAllot');//批量修改调拨状态
+//
+
+
+Route::get('/marketingPlan/test', 'MarketingPlanController@test')->name('marketingPlan');
+
+
 Route::get('/cpfr/purchase', 'CpfrController@purchase')->name('purchase');
 Route::get('/cpfr/barcode', 'CpfrController@barcode')->name('barcode');

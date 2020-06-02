@@ -12,7 +12,7 @@
 
 <div>
 	<div class="button_box">
-			<form id="fileupload" action="/marketingPlan/importExecl" method="POST" enctype="multipart/form-data">
+			<form id="fileupload" action="/shipment/importExecl" method="POST" enctype="multipart/form-data">
 				<input type="hidden" name="warn" id="warn" value="0">
 				<input type="hidden" name="inbox_id" id="inbox_id" value="0">
 
