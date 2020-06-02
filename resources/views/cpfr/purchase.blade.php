@@ -337,7 +337,7 @@
 		<button id="addPurchaseBtn" class="btn sbold red"> 新建采购计划
 			<i class="fa fa-plus"></i>
 		</button>
-		<button id="export" class="btn sbold blue"> Export
+		<button id="export" class="btn sbold blue"> 导出
 			<i class="fa fa-download"></i>
 		</button>
 	</div>
@@ -450,7 +450,7 @@
 						<th>BG</th>
 						<th>BU</th>
 						<th>site</th>
-	                    <th><input type="checkbox" id="selectAll" /></th>
+	                    <th><input type="checkbox" id="selectAll" name="selectAll" /></th>
 	                    <th style="width:75px; text-align:center;">提交日期</th>
 	                    <th style="width:55px; text-align:center;">销售员</th>
 	                    <th style="text-align:center;">产品图片</th>
@@ -622,7 +622,7 @@
 		}else{
 			$.ajax({
 			    type: "POST",
-				url: "/shipment/upAllPurchase",
+				url: "http://10.10.42.14/vl/public/shipment/upAllPurchase",
 				data: {
 					status: status,
 					idList: chk_value
@@ -652,6 +652,82 @@
 		}
 	}
 	$(document).ready(function(){
+		//全选
+		$("body").on('change','#selectAll',function(e) {
+		    $("input[name='checkedInput']").prop("checked", this.checked);
+		}); 
+		//单条选中
+		$("body").on('change','.checkbox-item',function(e){
+			console.log(this.checked) 
+			var $subs = $("input[name='checkedInput']");
+			$("input[name='selectAll']").prop("checked", $subs.length == $subs.filter(":checked").length ? true :false);
+			e.cancelBubble=true;
+		});
+		//导出调拨进度
+		$('#export').click(function(){
+			 let chk_value = '';
+			 $("input[name='checkedInput']:checked").each(function (index,value) {
+			 	if(chk_value != ''){
+			 		chk_value = chk_value + ',' + $(this).val()	
+			 	}else{
+			 		chk_value = chk_value + $(this).val()	
+			 	}
+			 });
+			 $.ajax({
+				url: "http://10.10.42.14/vl/public/shipment/purchaseList",
+				 method: 'POST',
+				 cache: false,
+				 data: {
+					downLoad: 1,
+					ids: chk_value,
+					date_s: cusstr($('.createTimeInput').val() , ' - ' , 1),
+					date_e: cusstr1($('.createTimeInput').val() , ' - ' , 1),
+					status: $('#status_select').find("option:selected").attr("id"),
+					sx: $("#marketplace_select").val(),
+					bg: $("#bg_select").val(),
+					bu: $("#bu_select").val(),
+					name: $("#seller_select").val(),
+					condition: $(".keyword").val(),
+				 },
+							
+				 success: function (data) {
+					 if(data != ""){
+						var fileName = "采购计划";
+						function msieversion() {
+							 var ua = window.navigator.userAgent;
+							 var msie = ua.indexOf("MSIE ");
+							 if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./)) {
+								 return true;
+							 } else {
+								 return false;
+							 }
+							 return false;
+						}
+									 
+						if (msieversion()) {
+							 var IEwindow = window.open();
+							 IEwindow.document.write('sep=,\r\n' + data);
+							 IEwindow.document.close();
+							 IEwindow.document.execCommand('SaveAs', true, fileName + ".csv");
+							 IEwindow.close();
+						} else {
+							 var uri = "data:text/csv;charset=utf-8,\ufeff" + data;
+							 var uri = 'data:application/csv;charset=utf-8,\ufeff' + encodeURI(data);
+							 var link = document.createElement("a");
+							 link.href = uri;
+							 link.style = "visibility:hidden";
+							 link.download = fileName + ".csv";
+							 document.body.appendChild(link);
+							 link.click();
+							 document.body.removeChild(link);
+						}
+						$('#selectAll:checked').prop('checked',false);
+						$("input[name='checkedInput']:checked").prop('checked',false);
+					 }
+				 } 
+			 });
+				 
+		})
 		//新建调拨计划时清空内容
 		function clearValue(){
 			$('.formId').val("");
@@ -673,7 +749,7 @@
 		function getAsinData(site,sku){
 			$.ajax({
 			    type: "POST",
-				url: "/shipment/getNextData",
+				url: "http://10.10.42.14/vl/public/shipment/getNextData",
 				data: {
 					marketplace_id: site,
 					sku: sku,
@@ -739,7 +815,7 @@
 		$('#asin_select').on('change',function(){
 			$.ajax({
 			    type: "POST",
-				url: "/shipment/getNextData",
+				url: "http://10.10.42.14/vl/public/shipment/getNextData",
 				data: {
 					marketplace_id: $('#site_select').val(),
 					asin: $(this).val(),
@@ -789,7 +865,7 @@
 			if($('.formId').val() == ""){
 				$.ajax({
 				    type: "POST",
-					url: "/shipment/addPurchase",
+					url: "http://10.10.42.14/vl/public/shipment/addPurchase",
 					data: {
 						audit_status: $('#audit_status_select').val(),
 						sku: $('#sku_input').val(),
@@ -830,7 +906,7 @@
 			}else{
 				$.ajax({
 				    type: "POST",
-					url: "/shipment/upPurchase",
+					url: "http://10.10.42.14/vl/public/shipment/upPurchase",
 					data: {
 						id: $('.formId').val(),
 						audit_status: $('#audit_status_select').val(),//审核
@@ -871,17 +947,7 @@
 				});
 			}
 		})
-		//全选
-		$("#selectAll").on('change',function(e) {  
-		    $("input[name='checkedInput']").prop("checked", this.checked);
-			//let checkedBox = $("input[name='checkedInput']:checked");
-		});  
-		//单条选中
-		$("body").on('change','.checkbox-item',function(e){
-			var $subs = $("input[name='checkedInput']");
-		    $("#selectAll").prop("checked" , $subs.length == $subs.filter(":checked").length ? true :false); 
-			e.cancelBubble=true;
-		});
+		
 		//新建采购计划
 		$('#addPurchaseBtn').on('click',function(){
 			clearValue();
@@ -911,7 +977,7 @@
 		function editTableData(id){
 			$.ajax({
 			    type: "POST",
-				url: "/shipment/detailPurchase",
+				url: "http://10.10.42.14/vl/public/shipment/detailPurchase",
 				data: {
 					id: id
 				},
@@ -991,7 +1057,7 @@
 			scrollX: "100%",
 			scrollCollapse: false,
 			ajax: {
-				url: "/shipment/purchaseList",
+				url: "http://10.10.42.14/vl/public/shipment/purchaseList",
 				type: "post",
 				data :  function(){
 					reqList = {

@@ -419,12 +419,12 @@
 			<div class="filter_option">
 				<label for="status_select">调拨状态</label>
 				<select id="status_select"  onchange="status_filter(this.value,23)">
-					<option value="">全部</option>
-					<option value ="资料提供中">资料提供中</option>
-					<option value ="换标中">换标中</option>
-					<option value ="待出库">待出库</option>
-					<option value ="已发货">已发货</option>
-					<option value ="取消发货">取消发货</option>
+					<option id="" value="">全部</option>
+					<option id="0" value ="资料提供中">资料提供中</option>
+					<option id="1" value ="换标中">换标中</option>
+					<option id="2" value ="待出库">待出库</option>
+					<option id="3" value ="已发货">已发货</option>
+					<option id="4" value ="取消发货">取消发货</option>
 				</select>
 			</div>
 			<div class="filter_option">
@@ -478,7 +478,7 @@
 						<th>BG</th>
 						<th>BU</th>
 						<th>Station</th>
-						<th><input type="checkbox" id="selectAll" /></th>
+						<th><input type="checkbox" id="selectAll" name="selectAll" /></th>
 						<th style="width:70px;">提交日期</th>
 						<th style="width:55px;">销售员</th>
 						<th style="width:70px;">产品图片</th>
@@ -764,7 +764,7 @@
 			}else{
 				$.ajax({
 				    type: "POST",
-					url: "/shipment/upAllStatus",
+					url: "http://10.10.42.14/vl/public/shipment/upAllStatus",
 					data: {
 						status: status,
 						idList: chk_value
@@ -783,7 +783,7 @@
 								$('.success_mask').fadeOut(1000);
 							},2000)	
 							tableObj.ajax.reload();
-							$('#selectAll').removeAttr('checked');
+							$('#selectAll:checked').prop('checked',false);
 						}
 					},
 					error: function(err) {
@@ -818,6 +818,73 @@
 			}
 		}
 		$(document).ready(function () {	
+			//导出调拨进度
+			$('#export').click(function(){
+				 let chk_value = '';
+				 $("input[name='checkedInput']:checked").each(function (index,value) {
+				 	if(chk_value != ''){
+				 		chk_value = chk_value + ',' + $(this).val()	
+				 	}else{
+				 		chk_value = chk_value + $(this).val()	
+				 	}
+				 });
+				 $.ajax({
+					url: "http://10.10.42.14/vl/public/shipment/index",
+					 method: 'POST',
+					 cache: false,
+					 data: {
+						downLoad: 1,
+						ids: chk_value,
+						label: $('#account_number').val(),
+						date_s: cusstr($('.createTimeInput').val() , ' - ' , 1),
+						date_e: cusstr1($('.createTimeInput').val() , ' - ' , 1),
+						allor_status: $('#status_select').find("option:selected").attr("id"),
+						sx: $("#marketplace_select").val(),
+						ubg: $("#bg_select").val(),
+						ubu: $("#bu_select").val(),
+						name: $("#seller_select").val(),
+						condition: $(".keyword").val(),
+					 },
+								
+					 success: function (data) {
+						 if(data != ""){
+							var fileName = "调拨计划";
+							function msieversion() {
+								 var ua = window.navigator.userAgent;
+								 var msie = ua.indexOf("MSIE ");
+								 if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./)) {
+									 return true;
+								 } else {
+									 return false;
+								 }
+								 return false;
+							}
+										 
+							if (msieversion()) {
+								 var IEwindow = window.open();
+								 IEwindow.document.write('sep=,\r\n' + data);
+								 IEwindow.document.close();
+								 IEwindow.document.execCommand('SaveAs', true, fileName + ".csv");
+								 IEwindow.close();
+							} else {
+								 var uri = "data:text/csv;charset=utf-8,\ufeff" + data;
+								 var uri = 'data:application/csv;charset=utf-8,\ufeff' + encodeURI(data);
+								 var link = document.createElement("a");
+								 link.href = uri;
+								 link.style = "visibility:hidden";
+								 link.download = fileName + ".csv";
+								 document.body.appendChild(link);
+								 link.click();
+								 document.body.removeChild(link);
+							}
+							$('#selectAll:checked').prop('checked',false);
+							$("input[name='checkedInput']:checked").prop('checked',false);
+						 }
+					 } 
+				 });
+					 
+			})
+			
 			//上传大货资料弹窗隐藏
 			$('.cancelUpload').on('click',function(){
 				$('.mask_upload_box').hide();
@@ -833,7 +900,7 @@
 				}
 				$.ajax({
 				    type: "POST",
-					url: "/shipment/upCargoData",
+					url: "http://10.10.42.14/vl/public/shipment/upCargoData",
 					data: {
 						id: $('.uploadId').val(),
 						cargo_data: fileList
@@ -881,7 +948,7 @@
 			function getAjaxData(site,asin){
 				$.ajax({
 				    type: "POST",
-					url: "/shipment/getSellerSku",
+					url: "http://10.10.42.14/vl/public/shipment/getSellerSku",
 					data: {
 						marketplace_id: site,
 						asin: asin
@@ -1004,7 +1071,7 @@
 				if($('.formId').val() == ""){ //判断有id时为编辑，没有id为新增
 					$.ajax({
 					    type: "POST",
-						url: "/shipment/addShipment",
+						url: "http://10.10.42.14/vl/public/shipment/addShipment",
 						data: {
 							sku: $('#sku_select').val(),
 							asin: $('#asin_select').val(),
@@ -1046,7 +1113,7 @@
 				}else{
 					$.ajax({
 					    type: "POST",
-						url: "/shipment/upShipment",
+						url: "http://10.10.42.14/vl/public/shipment/upShipment",
 						data: {
 							id: $('.formId').val(),
 							sku: $('#sku_select').val(),
@@ -1091,17 +1158,6 @@
 				
 			})
 			
-			//全选
-			$("#selectAll").on('change',function(e) {  
-			    $("input[name='checkedInput']").prop("checked", this.checked);
-				//let checkedBox = $("input[name='checkedInput']:checked");
-			});  
-			//单条选中
-			$("body").on('change','.checkbox-item',function(e){
-				var $subs = $("input[name='checkedInput']");
-			    $("#selectAll").prop("checked" , $subs.length == $subs.filter(":checked").length ? true :false); 
-				e.cancelBubble=true;
-			});
 			//时间选择器
 			$('.date-picker').datepicker({
 				format: 'yyyy-mm-dd',
@@ -1112,20 +1168,7 @@
 			$('.cancel_btn').on('click',function(){
 				$('.mask_box').hide();
 			})
-			/* $('.submit').on('click',function(){
-				$.ajax({
-				    type: "POST",//方法类型
-				    dataType: "text",//预期服务器返回的数据类型 如果是对象返回的是json 如果是字符串这里一定要定义text 之前我就是定义json 结果字符串的返回一直到额error中去
-					url: "",//url
-					data: $('#formtest').serialize(),//这个是form表单中的id   jQuery的serialize()方法通过序列化表单值
-					success: function (result) {
-						console.log(result);
-					},
-					error : function(err) {
-						console.log(err)
-					}
-				});
-			}) */
+			
 			//批量操作列表展开
 			$('.batch_operation').click(function(e){
 				$('.batch_list').slideToggle();
@@ -1138,7 +1181,7 @@
 			function editTableData(id){
 				$.ajax({
 				    type: "POST",
-					url: "/shipment/detailShipment",
+					url: "http://10.10.42.14/vl/public/shipment/detailShipment",
 					data: {
 						id: id
 					},
@@ -1214,7 +1257,7 @@
 				scrollX: "100%",
 				scrollCollapse: false,
 				ajax: {
-					url: "/shipment/index",
+					url: "http://10.10.42.14/vl/public/shipment/index",
 					type: "post",
 					data :  function(){
 						reqList = {
@@ -1439,6 +1482,17 @@
 				
 			});
 			
+			//全选
+			$("body").on('change','#selectAll',function(e) {
+			    $("input[name='checkedInput']").prop("checked", this.checked);
+			}); 
+			//单条选中
+			$("body").on('change','.checkbox-item',function(e){
+				console.log(this.checked) 
+				var $subs = $("input[name='checkedInput']");
+				$("input[name='selectAll']").prop("checked", $subs.length == $subs.filter(":checked").length ? true :false);
+				e.cancelBubble=true;
+			});
 			$("#createTimes").daterangepicker({
 			    opens: "left", //打开的方向，可选值有'left'/'right'/'center'
 			    format: "YYYY-MM-DD",
@@ -1449,11 +1503,11 @@
 				opens: 'center',
 			    ranges: {
 			        "今天": [moment(), moment()],
-			        "昨天": [moment().subtract("days", 1), moment().subtract("days", 1)],
-			        "7天前": [moment().subtract("days", 6), moment()],
-			        "30天前": [moment().subtract("days", 29), moment()],
+			        "昨天": [moment().subtract( 1,"days"), moment().subtract(1,"days")],
+			        "7天前": [moment().subtract(6,"days"), moment()],
+			        "30天前": [moment().subtract(29,"days"), moment()],
 			        "这个月": [moment().startOf("month"), moment().endOf("month")],
-			        "上个月": [moment().subtract("month", 1).startOf("month"), moment().subtract("month", 1).endOf("month")]
+			        "上个月": [moment().subtract(1,"month").startOf("month"), moment().subtract(1,"month").endOf("month")]
 			    },
 			    locale: {
 			        applyLabel: '确定',
@@ -1468,8 +1522,8 @@
 			    },
 				onChangeDateTime:function(dp,$input){
 				}
-			    /* minDate: "01/01/2012",
-			    maxDate: "12/31/2018" */
+			    //minDate: "01/01/2012",
+			    //maxDate: "12/31/2018"
 			}, function (t, e) {
 			    $("#createTimes input").val(t.format("YYYY-MM-DD") + " - " + e.format("YYYY-MM-DD"));	
 				let reqList = {
