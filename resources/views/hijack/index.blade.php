@@ -747,8 +747,9 @@
 				 }				 		 			
 			 });
 			 chk_value == ""? chk_value = -1 : chk_value;
+			 ///hijack/hijackExport
 			 $.ajax({
-				 url: "/shipment/purchaseList",
+				 url: "/shipment/allotProgress",
 				 method: 'POST',
 				 cache: false,
 				 data: {
