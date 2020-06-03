@@ -337,7 +337,7 @@ class ShipmentController extends Controller
                     $FBA_keepday_num = (round($asins[0]['daily_sales'], 2) == 0) ? '∞' : date('Y-m-d', strtotime('+' . intval(($asins[0]['afn_sellable'] + $asins[0]['afn_reserved']) / round($asins[0]['daily_sales'], 2)) . 'days'));
                     $transfer_num = $request['quantity'];
                 }
-//计划员 保存
+                //计划员 保存
                 $sql3 = "SELECT id,sap_seller_id FROM sap_asin_match_sku  WHERE sku='" . $request['sku'] . "' and marketplace_id ='" . $request['marketplace_id'] . "'";
                 $sap_asin_match_sku = DB::connection('vlz')->select($sql3);
                 $sap_asin_match_sku = (json_decode(json_encode($sap_asin_match_sku), true));
@@ -357,7 +357,7 @@ class ShipmentController extends Controller
                 }
 
                 $data = [
-                    'sap_seller_id' => @$user['sap_seller_id'],
+                    'sap_seller_id' => $sap_seller_id,
                     'sku' => $request['sku'],
                     'asin' => $request['asin'],
                     'status' => @$request['status'] ? $request['status'] : 0,
