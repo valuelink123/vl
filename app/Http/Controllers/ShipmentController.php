@@ -38,20 +38,23 @@ class ShipmentController extends Controller
         /** 超级权限*/
         $ADMIN_EMAIL = Asin::ADMIN_EMAIL;
         $DOMIN_MARKETPLACEID_SX = Asin::DOMIN_MARKETPLACEID_SX;
+        $DOMIN_MARKETPLACEID_URL = Asin::DOMIN_MARKETPLACEID_URL;
         $condition = $request['condition'] ? $request['condition'] : '';
-        $date_s = $request['date_s'] ? $request['date_s'] : '';
-        $date_e = $request['date_e'] ? $request['date_e'] : '';
+        $date_s = $request['date_s'] ? $request['date_s'] : '';//创建时间开始
+        $date_e = $request['date_e'] ? $request['date_e'] : '';//创建时间结束
+        $received_date_s = $request['received_date_s'] ? $request['received_date_s'] : '';//预计到货时间开始
+        $received_date_e = $request['received_date_e'] ? $request['received_date_e'] : '';//预计到货时间结束
         $status = $request['status'] ? $request['status'] : '';
         $sx = $request['sx'] ? $request['sx'] : '';//站点缩写
-        $bg = $request['bg'] ? $request['bg'] : '';
-        $bu = $request['bu'] ? $request['bu'] : '';
+        $bg = $request['ubg'] ? $request['ubg'] : '';
+        $bu = $request['ubu'] ? $request['ubu'] : '';
         $name = $request['name'] ? $request['name'] : '';
         $downLoad = $request['downLoad'] ? $request['downLoad'] : 0;//是否下载
         $allor_status = $request['allor_status'] ? $request['allor_status'] : '';//调拨状态
         $label = $request['label'] ? $request['label'] : '';
         $ids = $request['ids'] ? $request['ids'] : '';
         $role = 0;//角色
-        $sap_seller_id_list = $ulist = $allotIdList = $seller = $labelList = $statusList = [];
+        $sap_seller_id_list = $ulist = $allotIdList = $seller = $labelList = $statusList = $planer=[];
         if (!empty($user)) {
             if (!empty($user['email']) && in_array($user['email'], $ADMIN_EMAIL)) {
                 /**  特殊权限着 查询所有用户 */
@@ -111,11 +114,14 @@ class ShipmentController extends Controller
         if (!empty($date_s) && !empty($date_e)) {
             $sql .= ' AND sh.created_at >= "' . $date_s . '" AND sh.created_at<= "' . $date_e . ' 24:00:00' . '"';
         }
+        if (!empty($received_date_s) && !empty($received_date_e)) {
+            $sql .= ' AND sh.adjustreceived_date >= "' . $received_date_s . '" AND sh.adjustreceived_date <= "' . $received_date_e . '"';
+        }
         if (!empty($status)) {
             $sql .= ' AND sh.status = ' . $status;
         }
         if (!empty($label)) {
-            $sql .= ' AND sh.label = ' . $label;
+            $sql .= ' AND sh.label = "' . $label.'"';
         }
         if (!empty($allor_status)) {
             $sql .= ' AND sh.allor_status = ' . $allor_status;
@@ -136,7 +142,9 @@ class ShipmentController extends Controller
                     $sap_seller_id_list[] = $value['sap_seller_id'];
                 }
                 if (!in_array($value['label'], $labelList)) {
-                    $labelList[] = $value['label'];
+                    if(!empty($value['label'])){
+                        $labelList[] = $value['label'];
+                    }
                 }
             }
         }
@@ -172,9 +180,11 @@ class ShipmentController extends Controller
             $shipmentList[$key]['image'] = explode(',', $value['images'])[0];
             $shipmentList[$key]['allot'] = @$allotIdList[$value['id']] ? $allotIdList[$value['id']] : 0;
             if (!in_array($ulist[$value['sap_seller_id']]['name'], $seller)) {
-                $seller[] = $ulist[$value['sap_seller_id']]['name'];
+                if(!empty($ulist[$value['sap_seller_id']]['name'])){
+                    $seller[] = $ulist[$value['sap_seller_id']]['name'];
+                }
             }
-
+            $shipmentList[$key]['toUrl'] = $DOMIN_MARKETPLACEID_URL[$value['marketplace_id']];
         }
 
         $sql_group = 'SELECT status,COUNT(id) as count_num from shipment_requests GROUP BY status=0,status=1,status=2,status=3,status=4';
@@ -186,6 +196,11 @@ class ShipmentController extends Controller
             }
         }
         foreach ($shipmentList as $sk => $v) {
+            if (!in_array($v['planning_name'], $planer)) {
+                if(!empty($v['planning_name'])){
+                    $planer[] = $v['planning_name'];
+                }
+            }
             if ((!empty($bg) && $v['ubg'] != $bg) || (!empty($bu) && $v['ubu'] != $bu) || (!empty($name) && $v['name'] != $name)) {
                 unset($shipmentList[$sk]);
             }
@@ -225,8 +240,8 @@ class ShipmentController extends Controller
                         '"' . @$av['asin'] . @$av['sku'] . '",' .
                         '"' . @$av['warehouse'] . '",' .
                         '"' . @$av['quantity'] . '",' .
-                        '"' . @$av['request_date'] . '",' .
-                        '"' . @$av['package'] . '",' .
+                        '"' . @$av['received_date'] . '",' .
+                        '"' . @$av['rms_sku'] . '",' .
                         '"' . @$av['remark'] . '",' .
                         '"' . @$av['stock_day_num'] . '",' .
                         '"' . @$av['FBA_Stock'] . '",' .
@@ -242,7 +257,7 @@ class ShipmentController extends Controller
                 exit;
             }
         }
-        return [$shipmentList, $statusList, $seller, $labelList];
+        return [$shipmentList, $statusList, $seller, $labelList,$planer];
     }
 
     /**
@@ -276,16 +291,10 @@ class ShipmentController extends Controller
      */
     public function addShipment(Request $request)
     {
-        // $user = Auth::user()->toArray();// todo
-        $user = [
-            'email' => 'test@qq.com',
-            'id' => '159',
-            'sap_seller_id' => '358'
-        ];//todo 只用于测试  删除
         /** 超级权限*/
         $DOMIN_MARKETPLACEID_SX = Asin::DOMIN_MARKETPLACEID_SX;
         $r_message = $seller_skus = $seller_accounts = $asins = [];
-        $label = $batch_num = $stock_day_num = $transfer_num = $planning_name='';
+        $label = $batch_num = $stock_day_num = $transfer_num = $planning_name = $seller_name = $sap_seller_id = $planer = '';
         $FBA_keepday_num = $FBA_Stock = 0;
         if (!empty($request['asin'])) {
             if (!empty($request['asin']) && !empty($request['sku']) && !empty($request['seller_sku']) && !empty($request['warehouse']) && !empty($request['quantity']) && !empty($request['received_date'])) {
@@ -337,22 +346,27 @@ class ShipmentController extends Controller
                     $FBA_keepday_num = (round($asins[0]['daily_sales'], 2) == 0) ? '∞' : date('Y-m-d', strtotime('+' . intval(($asins[0]['afn_sellable'] + $asins[0]['afn_reserved']) / round($asins[0]['daily_sales'], 2)) . 'days'));
                     $transfer_num = $request['quantity'];
                 }
-                //计划员 保存
+                //销售员 保存
                 $sql3 = "SELECT id,sap_seller_id FROM sap_asin_match_sku  WHERE sku='" . $request['sku'] . "' and marketplace_id ='" . $request['marketplace_id'] . "'";
                 $sap_asin_match_sku = DB::connection('vlz')->select($sql3);
                 $sap_asin_match_sku = (json_decode(json_encode($sap_asin_match_sku), true));
                 if (!empty($sap_asin_match_sku)) {
                     $sap_seller_id = $sap_asin_match_sku[0]['sap_seller_id'];
                 }
-                if ($sap_seller_id > 0) {
-                    $Users = DB::table('users')->select('id', 'name')
-                        ->where('sap_seller_id', $sap_seller_id)
-                        ->get()->map(function ($value) {
-                            return (array)$value;
-                        })->first();
-                    if (!empty($Users)) {
-                        /**  计划员名字  */
-                        $planning_name = $Users['name'];
+                /** 获取计划员*/
+                if (!empty($request['marketplace_id'])) {
+                    //查询计划员
+                    $market = getMarketplaceCode();
+                    $fba_factory_warehouse = $market[$request['marketplace_id']]['fba_factory_warehouse'];
+                    if (!empty($fba_factory_warehouse)) {
+                        $sap_factory_code = $fba_factory_warehouse[0]['sap_factory_code'];
+                        $sap_warehouse_code = $fba_factory_warehouse[0]['sap_warehouse_code'];
+                        $sql = "SELECT planer FROM sap_sku_sites WHERE sku='" . $request['sku'] . "' AND  marketplace_id='" . $request['marketplace_id'] . "' AND sap_factory_code='" . $sap_factory_code . "' AND sap_warehouse_code='" . $sap_warehouse_code . "'";
+                        $sap_sku_sites = DB::connection('vlz')->select($sql);
+                        $sap_sku_sites = (json_decode(json_encode($sap_sku_sites), true));
+                        if (!empty($sap_sku_sites)) {
+                            $planer = $sap_sku_sites[0]['planer'];
+                        }
                     }
                 }
 
@@ -380,7 +394,7 @@ class ShipmentController extends Controller
                     'stock_day_num' => $stock_day_num,
                     'FBA_keepday_num' => $FBA_keepday_num,
                     'transfer_num' => $transfer_num,
-                    'planning_name'=>$planning_name
+                    'planning_name' => $planer
                 ];
                 $result_id = DB::connection('vlz')->table('shipment_requests')->insertGetId($data);
                 if ($result_id > 0) {
@@ -404,8 +418,8 @@ class ShipmentController extends Controller
 
         $sql = 'SELECT marketplace_id,sku from sap_asin_match_sku WHERE 1=1 ';
         //改为根据sap_seller_id 查询
-        if (@$user['sap_seller_id'] > 0) {
-            $sql .= ' AND sap_seller_id=' . $user['sap_seller_id'];
+        if ($sap_seller_id > 0) {
+            $sql .= ' AND sap_seller_id=' . $sap_seller_id;
         }
         $sql .= ' GROUP BY sku ';
         $SKUList = DB::connection('vlz')->select($sql);
@@ -421,35 +435,42 @@ class ShipmentController extends Controller
      */
     public function detailShipment(Request $request)
     {
-        //$user = Auth::user()->toArray();// todo
+        $user = Auth::user()->toArray();//todo
         $DOMIN_MARKETPLACEID_SX = Asin::DOMIN_MARKETPLACEID_SX;
         $sku = null;
         $role = 0;
-        $user = [
-            'email' => 'test@qq.com',
-            'id' => '159',
-            'sap_seller_id' => ''
-        ];//todo 只用于测试  删除
+
         /** 超级权限*/
         $ADMIN_EMAIL = Asin::ADMIN_EMAIL;
-        if (!empty($user['email']) && !empty($user)) {
-            if (in_array($user['email'], $ADMIN_EMAIL) || $user['sap_seller_id'] > 0) {
-                /**  销售角色 */
-                $role = 1;
-            } else {
-                //role_id = 23 代表 计划员
-                $roleUser = DB::table('role_user')->select('user_id')
-                    ->where('user_id', $user['id'])
-                    ->where('role_id', 23)
-                    ->get()->map(function ($value) {
-                        return (array)$value;
-                    })->toArray();
-                if (!empty($roleUser)) {
-                    /** 计划员角色  */
-                    $role = 2;
+        if (!empty($user)) {
+            if (!empty($user['email']) && in_array($user['email'], $ADMIN_EMAIL)) {
+                /**  特殊权限着 查询所有用户 */
+                $role = 4;
+            } else if ($user['ubu'] != '' || $user['ubg'] != '' || $user['seller_rules'] != '') {
+                if ($user['ubu'] == '' && $user['ubg'] != '' && $user['seller_rules'] != '') {
+                    /**查询所有BG下面员工*/
+                    $role = 3;
+                } else if ($user['ubu'] != '' && $user['seller_rules'] == '') {
+                    /**此条件为 普通销售*/
+                    $role = 1;
+                } else if ($user['ubu'] != '' && $user['ubg'] != '' && $user['seller_rules'] != '') {
+                    /**  BU 负责人  */
+                    $role = 5;
                 }
             }
+            //role_id = 23 代表 计划员
+            $roleUser = DB::table('role_user')->select('user_id')
+                ->where('user_id', @$user['id'])
+                ->where('role_id', 23)
+                ->get()->map(function ($value) {
+                    return (array)$value;
+                })->toArray();
+            if (!empty($roleUser)) {
+                /** 计划员角色  */
+                $role = 2;
+            }
         }
+
         if (!empty($request['id']) && $request['id'] > 0) {
             $sql = "SELECT marketplace_id,out_warehouse,id,`status`,sku,asin,seller_sku,sap_warehouse_code,sap_factory_code,quantity,received_date,rms,rms_sku,package,remark,adjustment_quantity,adjustreceived_date from shipment_requests WHERE id =" . $request['id'];
             $shipment = DB::connection('vlz')->select($sql);
@@ -510,7 +531,7 @@ class ShipmentController extends Controller
                     ->update($data);
                 if ($result > 0) {
                     //已确认 状态 添加到 调拨进度表 allot_progress 表
-                    if (@$request['status'] == 4 && $id > 0) {
+                    if (@$request['status'] == 3 && $id > 0) {
                         $data = ['shipment_requests_id' => $id, 'created_at' => date('Y-m-d H:i:s', time())];
                         DB::connection('vlz')->table('allot_progress')->insert($data);
                     }
@@ -910,15 +931,10 @@ class ShipmentController extends Controller
     public function addPurchase(Request $request)
     {
         // $user = Auth::user()->toArray();// todo
-        $user = [
-            'email' => 'test@qq.com',
-            'id' => '159',
-            'sap_seller_id' => 279
-        ];//todo 只用于测试  删除
         /** 超级权限*/
         $ADMIN_EMAIL = Asin::ADMIN_EMAIL;
         $r_message = [];
-        $FBA_Stock = $overseas_stock = $day_sales = $profit_margin = $planning_name = '';
+        $FBA_Stock = $overseas_stock = $day_sales = $profit_margin = $planning_name = $sap_seller_id = $planer='';
         $profit_margin = $amount_income = $amount_refund = $cost = $backlog_order = $MOQ = $PCS = 0;
         if (!empty($request['asin'])) {
             if (!empty($request['asin']) && !empty($request['marketplace_id'])) {
@@ -970,15 +986,20 @@ class ShipmentController extends Controller
                 if (!empty($sap_asin_match_sku)) {
                     $sap_seller_id = $sap_asin_match_sku[0]['sap_seller_id'];
                 }
-                if ($sap_seller_id > 0) {
-                    $Users = DB::table('users')->select('id', 'name')
-                        ->where('sap_seller_id', $sap_seller_id)
-                        ->get()->map(function ($value) {
-                            return (array)$value;
-                        })->first();
-                    if (!empty($Users)) {
-                        /**  计划员名字  */
-                        $planning_name = $Users['name'];
+                /** 获取计划员*/
+                if (!empty($request['marketplace_id'])) {
+                    //查询计划员
+                    $market = getMarketplaceCode();
+                    $fba_factory_warehouse = $market[$request['marketplace_id']]['fba_factory_warehouse'];
+                    if (!empty($fba_factory_warehouse)) {
+                        $sap_factory_code = $fba_factory_warehouse[0]['sap_factory_code'];
+                        $sap_warehouse_code = $fba_factory_warehouse[0]['sap_warehouse_code'];
+                        $sql = "SELECT planer FROM sap_sku_sites WHERE sku='" . $request['sku'] . "' AND  marketplace_id='" . $request['marketplace_id'] . "' AND sap_factory_code='" . $sap_factory_code . "' AND sap_warehouse_code='" . $sap_warehouse_code . "'";
+                        $sap_sku_sites = DB::connection('vlz')->select($sql);
+                        $sap_sku_sites = (json_decode(json_encode($sap_sku_sites), true));
+                        if (!empty($sap_sku_sites)) {
+                            $planer = $sap_sku_sites[0]['planer'];
+                        }
                     }
                 }
                 /**  查询 最小起订量 MOQ */
@@ -1004,7 +1025,7 @@ class ShipmentController extends Controller
                 $warehouse = explode('-', $request['warehouse']);
 
                 $data = [
-                    'sap_seller_id' => $user['sap_seller_id'],
+                    'sap_seller_id' => $sap_seller_id,
                     'audit_status' => @$request['audit_status'],
                     'sku' => $request['sku'],
                     'asin' => $request['asin'],
@@ -1023,7 +1044,7 @@ class ShipmentController extends Controller
                     'day_sales' => $day_sales,
                     'MOQ' => $MOQ,
                     'PCS' => $PCS,
-                    'planning_name' => $planning_name,
+                    'planning_name' => $planer,
                     'backlog_order' => $backlog_order,
                     'profit_margin' => $profit_margin,
                     'created_at' => date('Y-m-d H:i:s', time())
@@ -1040,8 +1061,8 @@ class ShipmentController extends Controller
         //查询asinlist
         $sql = 'SELECT marketplace_id,sku from sap_asin_match_sku WHERE 1=1 ';
         //改为根据sap_seller_id 查询
-        if (@$user['sap_seller_id'] > 0) {
-            $sql .= ' AND sap_seller_id=' . $user['sap_seller_id'];
+        if ($sap_seller_id > 0) {
+            $sql .= ' AND sap_seller_id=' . $sap_seller_id;
         }
         $sql .= ' GROUP BY sku ';
         $SKUList = DB::connection('vlz')->select($sql);
@@ -1354,7 +1375,6 @@ class ShipmentController extends Controller
                         $sr_id_list[] = $sr_id;
                     }
                 }
-                //添加入库  todo
                 if (!empty($data) && !empty($sr_id_list)) {
                     $srids = implode($sr_id_list, ',');
                     $sql = 'delete from allot_progress WHERE shipment_requests_id in (' . $srids . ')';
@@ -1363,7 +1383,7 @@ class ShipmentController extends Controller
                     if ($result) {
                         $r_message = ['status' => 1, 'msg' => '保存成功'];
                     }
-                }else{
+                } else {
                     $r_message = ['status' => 0, 'msg' => '数据格式不对'];
                 }
 
