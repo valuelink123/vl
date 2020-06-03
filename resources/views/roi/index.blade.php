@@ -218,20 +218,20 @@
                         {{ csrf_field() }}
                     <input type="hidden" id="roi_id" name="roi_id" value="" />
                     <div>SKU<span style="color: #999999;" title="在SAP中新建的产品物料号"><i class="fa fa-info-circle"></i></span></div>
-                    <input type="text" name="sku" style="width: 448px; height: 29px; " value="" />
+                    <input type="text" id="sku" name="sku" style="width: 448px; height: 29px;" value="" />
                     <div style="height: 10px;"></div>
                     <div>预计上线时间</div>
-                    <div class="input-group">
-                        <span class="input-group-btn">
+                    <div class="input-group date date-picker" data-date-format="yyyy-mm-dd">
+                        <span style="width:20px; height:26px" class="input-group-btn">
                             <button class="btn btn-sm default time-btn" type="button">
                                 <i class="fa fa-calendar"></i>
                             </button>
                         </span>
-                        <input type="text" id="launch_time" name="launch_time" style="width: 415px; height: 29px;" disabled />
+                        <input type="text" id="launch_time" name="launch_time" style="width: 415px; height: 29px;" class="form-control form-filter input-sm" placeholder="Date" readonly />
                     </div>
                     <div style="height: 10px;"></div>
                     <div>新品规划流程<span style="color: #999999;" title="OA中新品规划流程的页面链接"><i class="fa fa-info-circle"></i></span></div>
-                    <span style="color: #999999;" title="判断是否为网址"><i class="fa fa-info-circle"></i></span><input type="text" name="new_product_planning_process" style="width: 435px; height: 29px;" value="" placeholder="http://" />
+                    <input type="text" id="new_product_planning_process" name="new_product_planning_process" style="width: 448px; height: 29px;" value="" placeholder="http://" />
                     <div style="height: 30px;"></div>
                     <div style="float: right;">
                         <button type="submit" class="common-btn" id="" style="width: 80px">确定</button>
@@ -247,13 +247,16 @@
         </div>
     </div>
     <script>
-//        d.$lis.filter(".active").removeClass("active");
 
         $('#archived-modal').on("show.bs.modal", function(e){
-            var launch_time = $(e.relatedTarget).data('launch_time');
             var roi_id = $(e.relatedTarget).data('roi_id');
-            $('#launch_time').val(launch_time);
+            var launch_time = $(e.relatedTarget).data('launch_time');
+            var sku = $(e.relatedTarget).data('sku');
+            var new_product_planning_process = $(e.relatedTarget).data('new_product_planning_process');
             $('#roi_id').val(roi_id);
+            $('#launch_time').val(launch_time);
+            $('#sku').val(sku);
+            $('#new_product_planning_process').val(new_product_planning_process);
         })
 
         $("#thetabletoolbar [id^='date']").each(function () {
@@ -403,10 +406,10 @@
                 autoclose: true,
             });
 
-//            $("#user_id").selectpicker({
-//                "width":88px;
-//                "height":30px;
-//            })
+            //如果不加以下代码，点击模态框里的date-picker后，模态框里的所有input元素的值都被清空。
+            $('.date-picker').on('show', function(event) {
+                event.stopPropagation();
+            });
         });
 
 

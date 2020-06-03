@@ -100,6 +100,12 @@
         .grey_color{
             color:#909399;
         }
+        button.dropdown-toggle{
+            padding: 2px 12px;
+        }
+        .bootstrap-select.btn-group .dropdown-menu li.selected a .glyphicon{
+            color: blue;
+        }
 
     </style>
 
@@ -155,10 +161,10 @@
                             <div class="input-group date date-picker" data-date-format="yyyy-mm-dd">
                                 <input type="text" style="width:125px" class="form-control form-filter input-sm" readonly name="estimated_launch_time" placeholder="Date" value="{{$roi['estimated_launch_time']}}" />
                                 <span style="width:20px; height:26px" class="input-group-btn">
-                            <button class="btn btn-sm default time-btn" type="button">
-                                <i class="fa fa-calendar"></i>
-                            </button>
-                        </span>
+                                    <button class="btn btn-sm default time-btn" type="button">
+                                        <i class="fa fa-calendar"></i>
+                                    </button>
+                                </span>
                             </div>
                         </div>
                         <div class="param_cost">
@@ -166,6 +172,16 @@
                                 <span style="color: #999999;" title="新品开发项目定义好的项目编号"><i class="fa fa-info-circle"></i></span>
                             </div>
                             <input type="text" name="project_code" id="project_code" value="{{$roi['project_code']}}"/>
+                        </div>
+                        <div class="param_cost">
+                            <div>选择合作者</div>
+                            {{--boostrap-select多选下拉框选中多个值，只会传递最后一个值到后台。这里用一个隐藏的输入框保存多选值--}}
+                            <input type="text" id="collaborators" name="collaborators" hidden />
+                            <select class="selectpicker show-tick form-control" multiple id="collaboratorsSelect" data-width="205px" title="请选择..." data-selected-text-format="count" data-live-search="true">
+                                @foreach ($users as $key => $value)
+                                    <option value="{{$key}}">{{$value}}</option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
                     <div style="clear:both"></div>
@@ -629,10 +645,15 @@
             "url": "/roi_fresh_time",
             "data": {"roi_id": roi_id},
             "success": function (data) {
-                console.log(data);
+                //console.log(data);
             }
         });
     }
+
+    $('#collaboratorsSelect').on('changed.bs.select', function(e) {
+        var selected_values = $(this).val();
+        $('#collaborators').val(selected_values);
+    });
 
     $(function() {
         $('.date-picker').datepicker({
@@ -641,6 +662,12 @@
             orientation: 'bottom',
             autoclose: true,
         });
+
+        var collaborators = "{{$roi['collaborators']}}";
+        if(collaborators){
+            $("#collaboratorsSelect").val(collaborators.split(','));
+            $('#collaborators').val(collaborators);
+        }
 
         refresh_time();
     });
@@ -709,12 +736,6 @@
         var total_sales_amount = $('#total_sales_amount').text();
         if(total_sales_amount == '' || total_sales_amount == '0.00'){
             alert("total sales amount cannot be 0.");
-            return false;
-        }
-        var tariff_rate = $('#tariff_rate').val();
-        if(tariff_rate == '' || tariff_rate == '0.00'){
-            alert("tariff rate cannot be 0.");
-            $('#tariff_rate').focus();
             return false;
         }
 
