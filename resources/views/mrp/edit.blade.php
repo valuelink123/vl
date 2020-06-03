@@ -334,7 +334,8 @@ white-space: nowrap;
 								}
 								?>
 								</td>
-								<td>{{$v['sold']}}</td>
+								<td>
+								<a href="/skus?date_start={{$date_from}}&date_end={{$date_to}}&site={{$marketplace_id}}&sku={{$asin}}">{{$v['sold']}}</a></td>
 								<td>
 								<?php
 								if($k==$cur_date){
@@ -348,15 +349,15 @@ white-space: nowrap;
 								}
 								?>
 								</td>
-								<td>{{$v['estimated_purchase']}}</td>
-								<td>{{$v['actual_purchase']}}</td>
-								<td>{{$v['estimated_afn']}}</td>
-								<td>{{$v['actual_afn']}}</td>
-								<td>{{$v['estimated_afn']}}</td>
+								<td>{{($v['estimated_purchase']>0)?$v['estimated_purchase']:''}}</td>
+								<td>{{($v['actual_purchase']>0)?$v['actual_purchase']:''}}</td>
+								<td>{{($v['estimated_afn']>0)?$v['estimated_afn']:''}}</td>
+								<td>{{($v['actual_afn']>0)?$v['actual_afn']:''}}</td>
+								<td>{{($v['estimated_afn']>0)?$v['estimated_afn']:''}}</td>
 								
 								<td>
 								<?php
-								if($show=='day' && $type=='asin' && $k>=$cur_date){
+								if($show=='day' && $type=='asin'){
 								?>
 								<a class="remark editable" title="{{$asin.' '.$k.' Remark'}}" href="javascript:;" id="{{$k}}--remark" data-pk="{{$k}}--remark" data-type="text"> {{$v['remark']}} </a>
 								<?php
@@ -455,12 +456,12 @@ var FormEditable = function() {
 	var flushTable = function(){
 		var t_plan = 0;
 		$(".asins_details").each(function(){
-			t_plan += parseInt($(this).find("td").eq(4).text());
+			t_plan += parseInt($(this).find("td").eq(4).text()==''?0:$(this).find("td").eq(4).text());
 		});	
 		$("#asins_total").find("td").eq(3).text(t_plan);
 		var d_plan = 0; var d_stock = <?php echo $current_stock;?>;
 		$(".asin_sales_line_plan").each(function(){
-			d_plan += (parseInt($(this).find("td").eq(3).text()) - parseInt($(this).find("td").eq(7).text()));
+			d_plan += (parseInt($(this).find("td").eq(3).text()==''?0:$(this).find("td").eq(3).text()) - parseInt($(this).find("td").eq(8).text()==''?0:$(this).find("td").eq(8).text()));
 			if(d_stock-d_plan<0){
 				$(this).find("td").eq(5).html("<span class='badge badge-danger'>OutStock</span>");
 			}else{
