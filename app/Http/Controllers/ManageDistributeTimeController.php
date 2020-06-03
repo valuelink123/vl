@@ -292,9 +292,11 @@ class ManageDistributeTimeController extends Controller
         die();
     }
 
+
 	public function initialTableFbmFbaTransferTime(){
-        $siteSapFactoryCodes = $this->getSiteSapFactoryCodes();
         DB::beginTransaction();
+        //插入所有非HK的数据
+        $siteSapFactoryCodes = $this->getSiteSapFactoryCodes();
         foreach ($siteSapFactoryCodes as $k=>$v){
             foreach ($v as $k1=>$v1){
                 foreach ($v as $k2=>$v2){
@@ -308,6 +310,21 @@ class ManageDistributeTimeController extends Controller
                 }
             }
         }
+
+        //插入HK的数据
+        $allSapFactoryCodes = $this->getAllSapFactoryCodes();
+        $hk = array('HK01', 'HK03');
+        foreach($hk as $v){
+            foreach ($allSapFactoryCodes as $k2=>$v2){
+                if(substr($v2, 0, 2) == 'HK') continue;
+                $updateData = array();
+                $updateData['site'] = 'HK';
+                $updateData['sap_factory_code_outbound'] = $v;
+                $updateData['sap_factory_code_inbound'] = $v2;
+                DB::connection('amazon')->table('fbm_fba_transfer_time')->insert($updateData);
+            }
+        }
+
         DB::commit();
     }
 
@@ -325,10 +342,12 @@ class ManageDistributeTimeController extends Controller
             //'HK'=>array('HK01','HK03')
         );
         return $data;
+
     }
 
+    //包含HK01，HK03
     public function getAllSapFactoryCodes(){
-	    return array('US01','US02','US04','CA01','CA02','UK01','UK02','FR01','FR02','GR01','GR02','GR04','IT01','IT02','ES01','ES02','JP01','JP02');
+	    return array('US01','US02','US04','CA01','CA02','UK01','UK02','FR01','FR02','GR01','GR02','GR04','IT01','IT02','ES01','ES02','JP01','JP02', 'HK01','HK03');
     }
 
 	public function internationalTransportTime(Request $req){
@@ -387,13 +406,16 @@ class ManageDistributeTimeController extends Controller
                         $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($inputFileName);
                         $importData = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
                         $successCount = $addCount = $errorCount = 0;
+
                         foreach($importData as $key => $data){
                             if($key==1){
                                 if(array_get($data,'A')!='工厂' || array_get($data,'B')!='物流商' || array_get($data,'C')!='运输方式' || array_get($data,'D')!='地区'){
                                     die('Customer profile import template error');
                                 }
                             }
-                            if($key>1 && array_get($data,'A') && array_get($data,'B') && array_get($data,'C') && array_get($data,'D')){
+
+                            //地区可以为空。excel表中单元格为空时，读取的值为''。
+                            if($key>1 && array_get($data,'A') && array_get($data,'B') && array_get($data,'C')){
                                 $exists = DB::connection('amazon')->table('international_transport_time')->where('factory_code',trim($data['A']))->where('logistics_provider',trim($data['B']))->where('transport_mode_code',trim($data['C']))->where('region',trim($data['D']))->first();
                                 if($exists){
                                     $update_result = DB::connection('amazon')->table('international_transport_time')->where('factory_code',trim($data['A']))->where('logistics_provider',trim($data['B']))->where('transport_mode_code',trim($data['C']))->where('region',trim($data['D']))->update(array(
@@ -456,7 +478,7 @@ class ManageDistributeTimeController extends Controller
         $clearance_days = intval($row->clearance_days);
         $delivery_days = intval($row->delivery_days);
         $fba_sign_in_days = intval($row->fba_sign_in_days);
-        $total_days = intval($row->total_days);
+        $total_days = $etd + $eta + $clearance_days + $delivery_days + $fba_sign_in_days;
 
         $updateData = array();
         if(isset($_POST['etd']) && $_POST['etd']){
@@ -468,6 +490,12 @@ class ManageDistributeTimeController extends Controller
         }else if(isset($_POST['clearance_days']) && $_POST['clearance_days']){
             $updateData['clearance_days'] = intval($_POST['clearance_days']);
             $updateData['total_days'] = $total_days - $clearance_days + intval($_POST['clearance_days']);
+        }else if(isset($_POST['delivery_days']) && $_POST['delivery_days']){
+            $updateData['delivery_days'] = intval($_POST['delivery_days']);
+            $updateData['total_days'] = $total_days - $delivery_days + intval($_POST['delivery_days']);
+        }else if(isset($_POST['fba_sign_in_days']) && $_POST['fba_sign_in_days']){
+            $updateData['fba_sign_in_days'] = intval($_POST['fba_sign_in_days']);
+            $updateData['total_days'] = $total_days - $fba_sign_in_days + intval($_POST['fba_sign_in_days']);
         }else if(isset($_POST['is_default']) && $_POST['is_default']){
             $updateData['is_default'] = $_POST['is_default'];
         }else{
@@ -493,11 +521,11 @@ class ManageDistributeTimeController extends Controller
             $clearance_days = intval($row->clearance_days);
             $delivery_days = intval($row->delivery_days);
             $fba_sign_in_days = intval($row->fba_sign_in_days);
-            $total_days = intval($row->total_days);
+            $total_days = $etd + $eta + $clearance_days + $delivery_days + $fba_sign_in_days;
 
             $updateData = array();
             $updateData[$input_id] = $input_value;
-            //$$input_id: $etd, $eta, $clearance_days, $delivery_days
+            //$$input_id: $etd, $eta, $clearance_days, $delivery_days, $fba_sign_in_days
             $updateData['total_days'] = $total_days - $$input_id + $input_value;
             $updateData['maintainer'] = intval(Auth::user()->id);
             $updateData['maintain_time'] = date('Y-m-d H:i:s');

@@ -3,6 +3,7 @@
     <a href="/cpfr/index">CPFR协同补货</a>
 @endsection
 @section('content')
+
 <style>
 	.nav_list{
 		overflow: hidden;
@@ -200,33 +201,62 @@
 		background: #fef0f0;
 		border: 1px solid #fde2e2;
 		display: none;
-		z-index:9999;
+		z-index: 9999;
 	}
 	.error_mask .mask_text{
 		color: #f56c6c !important;
 	}
 	.table-scrollable{
-		overflow-x:hidden;
+		overflow-x: hidden;
+	}
+	.table>thead:first-child>tr:first-child>th{
+		text-align: center;
+	}
+	.mask_upload_box{
+		display: none;
+		position: fixed;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		background: rgb(0,0,0,.3);
+		z-index: 999;
+	}
+	.mask_upload_dialog{
+		width: 500px;
+		height: 230px;
+		background: #fff;
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		padding: 20px;
+		margin-top: -150px;
+		margin-left: -150px;
+	}
+	.table-stripeds>tbody>tr>td{
+		padding:12px
 	}
 </style>
 <link rel="stylesheet" type="text/css" media="all" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-daterangepicker/3.0.5/daterangepicker.min.css" />
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.1/moment.min.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-daterangepicker/3.0.5/daterangepicker.min.js"></script>
+
 <div>
 	<ul class="nav_list">
 		<li><a href="/cpfr/index">调拨计划</a></li>
 		<li><a href="/cpfr/purchase">采购计划</a></li>
 		<li class="nav_active"><a href="/cpfr/allocationProgress">调拨进度</a></li>
 	</ul>
-	<div class="button_box">
-		<button id="sample_editable_1_2_new" class="btn sbold green-meadow"> 下载导入模板
+	<div class="button_box" style="overflow:hidden">
+		<button id="downloadTemplate" style="float:right" class="btn sbold green-meadow"> 下载导入模板
 			<i class="fa fa-download"></i>
 		</button>
-		<button id="sample_editable_1_2_new" class="btn sbold blue"> 上传
+		
+		<button id="export" style="float:right;margin:0 10px" class="btn sbold blue"> 导出
+			<i class="fa fa-download"></i>
+		</button>
+		<button type="submit" id="uploadFrom" class="btn sbold blue"> 上传
 			<i class="fa fa-upload"></i>
-		</button>
-		<button id="export" class="btn sbold blue"> 导出
-			<i class="fa fa-download"></i>
 		</button>
 	</div>
 	<div class="content">
@@ -252,11 +282,11 @@
 				<label for="transfer_status">调拨状态</label>
 				<select id="transfer_status" onchange="status_filter(this.value,5)">
 					<option value ="">全部</option>
-					<option value ="资料提供中">资料提供中</option>
-					<option value ="换标中">换标中</option>
-					<option value ="待出库">待出库</option>
-					<option value ="已发货">已发货</option>
-					<option value ="取消发货">取消发货</option>
+					<option id="0" value ="资料提供中">资料提供中</option>
+					<option id="1" value ="换标中">换标中</option>
+					<option id="2" value ="待出库">待出库</option>
+					<option id="3" value ="已发货">已发货</option>
+					<option id="4" value ="取消发货">取消发货</option>
 				</select>
 			</div>
 			<div class="filter_option">
@@ -344,20 +374,20 @@
 					</ul>
 				</div>
 				<div class="col-md-6"  style="position: absolute;left: 520px; z-index: 999;top:0">
-					<button type="button" class="btn btn-sm red-sunglo">资料提供中 : <span class="status0"></span></button>
-					<button type="button" class="btn btn-sm yellow-crusta">换标中 : <span class="status1"></span></button>
-					<button type="button" class="btn btn-sm purple-plum">待出库 : <span class="status2"></span></button>
-					<button type="button" class="btn btn-sm green-meadow">已发货 : <span class="status3"></span></button>
-					<button type="button" class="btn btn-sm blue-madison">取消发货 : <span class="status4"></span></button>
+					<button type="button" class="btn btn-sm red-sunglo" onclick="status_filter('资料提供中',5)">资料提供中 : <span class="status0"></span></button>
+					<button type="button" class="btn btn-sm yellow-crusta" onclick="status_filter('换标中',5)">换标中 : <span class="status1"></span></button>
+					<button type="button" class="btn btn-sm purple-plum" onclick="status_filter('待出库',5)">待出库 : <span class="status2"></span></button>
+					<button type="button" class="btn btn-sm green-meadow" onclick="status_filter('已发货',5)">已发货 : <span class="status3"></span></button>
+					<button type="button" class="btn btn-sm blue-madison" onclick="status_filter('取消发货',5)">取消发货 : <span class="status4"></span></button>
 				</div>
-	            <table class="table table-striped table-bordered" id="thetable">
+	            <table class="table table-striped table-bordered" id="thetable" style="width:100%">
 	                <thead>
 	                <tr>
 						<th>BG</th>
 						<th>BU</th>
 						<th>station</th>
 	                    <th><input type="checkbox" id="selectAll" /></th>
-	                    <th style="width:95px">需求提交日期</th>
+	                    <th style="width:90px">需求提交日期</th>
 	                    <th style="width:65px">调拨状态</th>
 	                    <th style="width:50px">销售员</th>
 	                    <th>发货批号</th>
@@ -365,15 +395,15 @@
 						<th style="width:65px">调入工厂</th>
 						<th>亚马逊账号</th>
 	                    <th>SKU</th>
-	                    <th style="width:65px">调拨数量</th>
-	                    <th style="width:95px">RMS标贴SKU</th>
-	                    <th style="width:65px">条码标签</th>
-	                    <th style="width:65px">发货方式</th>
-	                    <th style="width:65px">大货资料</th>
-	                    <th style="width:95px">Shippment ID</th>
-	                    <th style="width:95px">跟踪号/单据号</th>
-	                    <th style="width:85px">上次更新时间</th>
-	                    <th style="width:90px">展开装箱数据</th>
+	                    <th style="width:55px">调拨数量</th>
+	                    <th style="width:45px">RMS标贴SKU</th>
+	                    <th style="width:30px">条码标签</th>
+	                    <th style="width:95px">发货方式</th>
+	                    <th style="width:35px">大货资料</th>
+	                    <th style="width:25px">Shippment ID</th>
+	                    <th style="width:60px">跟踪号/单据号</th>
+	                    <th style="width:90px">上次更新时间</th>
+	                    <th style="width:20px">数据展开</th>
 	                </tr>
 	                </thead>
 	                <tbody></tbody>
@@ -394,45 +424,142 @@
 		<span class="mask_text error_mask_text"></span>
 	</div>
 </div>	
+<div class="mask_upload_box">
+		<div class="mask_upload_dialog">
+			<svg t="1588919283810"class="icon cancel_upload_btn cancelUpload" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4128" width="15" height="15"><path d="M1001.952 22.144c21.44 21.44 22.048 55.488 1.44 76.096L98.272 1003.36c-20.608 20.576-54.592 20-76.096-1.504-21.536-21.44-22.048-55.488-1.504-76.096L925.824 20.672c20.608-20.64 54.624-20 76.128 1.472" p-id="4129" fill="#707070"></path><path d="M22.176 22.112C43.616 0.672 77.6 0.064 98.24 20.672L1003.392 925.76c20.576 20.608 20 54.592-1.504 76.064-21.44 21.568-55.488 22.08-76.128 1.536L20.672 98.272C0 77.6 0.672 43.584 22.176 22.112" p-id="4130" fill="#707070"></path></svg>
+			
+			<!-- The fileupload-buttonbar contains buttons to add/delete files and start/cancel the upload -->
+			<form style="height: 130px; overflow: hidden;" id="fileupload" action="{{ url('send') }}" method="POST" enctype="multipart/form-data">
+			    {{ csrf_field() }}
+				<input type="hidden" name="warn" id="warn" value="0">
+			    <input type="hidden" name="inbox_id" id="inbox_id" value="0">
+			    <input type="hidden" name="user_id" id="user_id" value="{{Auth::user()->id}}">
+								
+			    <div>
+			        <div class="fileupload-buttonbar">
+			            <div class="col-lg-12" style="text-align: center;margin-bottom: 20px;">
+			                <span class="btn green fileinput-button">
+								<i class="fa fa-plus"></i>
+								<span>添加文件</span>
+								<input type="file" name="files[]" multiple=""> 
+							</span>
+			                <span class="fileupload-process"> </span>
+			            </div>
+			        </div>
+					<table role="presentation" class="table table-striped clearfix table-stripeds" id="table-striped" style="margin-bottom: 0;">
+					    <tbody class="files" id="filesTable"> </tbody>
+					</table>
+					<div class="col-lg-12 fileupload-progress fade">
+					    <div class="progress progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100">
+					        <div class="progress-bar progress-bar-success" style="width:0%;"> </div>
+					    </div>
+					    <div class="progress-extended"> &nbsp; </div>
+					</div>
+			        
+			        <div id="blueimp-gallery" class="blueimp-gallery blueimp-gallery-controls" data-filter=":even">
+			            <div class="slides"> </div>
+			            <h3 class="title"></h3>
+			            <a class="prev"> ‹ </a>
+			            <a class="next"> › </a>
+			            <a class="close white"> </a>
+			            <a class="play-pause"> </a>
+			            <ol class="indicator"> </ol>
+			        </div>
+			        <script id="template-upload" type="text/x-tmpl"> {% for (var i=0, file; file=o.files[i]; i++) { %}
+			        <tr class="template-upload fade">
+			            <td style="text-align: center;">
+			                <p style="width: 200px; overflow: hidden; margin: 7px auto; text-overflow: ellipsis;" class="name">{%=file.name%}</p>
+			                <strong class="error text-danger label label-danger" style="padding: 0 6px;"></strong>
+			            </td>
+			            <td style="text-align: center;"> {% if (!i && !o.options.autoUpload) { %}
+			                <button class="btn blue start" disabled>
+			                    <i class="fa fa-upload"></i>
+			                    <span>开始</span>
+			                </button> {% } %} {% if (!i) { %}
+			                <button class="btn red cancel">
+			                    <i class="fa fa-ban"></i>
+			                    <span>取消</span>
+			                </button> {% } %} </td>
+			        </tr> {% } %} </script>
+					
+			        <script id="template-download" type="text/x-tmpl"> {% for (var i=0, file; file=o.files[i]; i++) { %}
+			        <tr class="template-download fade">
+			            <td>
+			                <p class="name" style="margin:0"> {% if (file.url) { %}
+			                    <a href="{%=file.url%}" title="{%=file.name%}" download="{%=file.name%}" {%=file.thumbnailUrl? 'data-gallery': ''%}>{%=file.name%}</a> {% } else { %}
+			                    <span>{%=file.name%}</span> {% } %}
+			                    {% if (file.name) { %}
+			                        <input type="hidden" name="fileid[]" class="filesUrl" value="{%=file.url%}">
+			                    {% } %}
+			                    </p> {% if (file.error) { %}
+			                <div>
+			                    <span class="label label-danger">Error</span> {%=file.error%}</div> {% } %} </td>
+								<td></td>
+			            
+			        </tr> {% } %} </script>
+			        <div style="clear:both;"></div>
+			    </div>
+			</form>	
+			<div style="text-align: center; margin-top:10px">
+				<input type="hidden" class="uploadId">
+				<button class="btn warning cancel cancelUpload" style="width: 80px;border: 1px solid #ccc;">取消</button>
+				<button class="btn blue start" id="confirmUpload">确认上传</button>
+			</div>
+		</div>
+	</div>
 <script type="text/template" id="sub-table-tpl">
         <table class="table">
             <thead>
             <tr>
-                <th>Item No</th>
-                <th>Seller Name</th>
-                <th>Asin</th>
-                <th>Seller SKU</th>
-                <th>Item Name</th>
-                <th>Fbm Stock</th>
-                <th>Fbm Valid Stock</th>
-                <th>Fba Stock</th>
-                <th>Fba Transfer</th>
-                <th>Unsellable</th>
-                <th>Fbm Update</th>
-                <th>Fba Update</th>
+                <th>宽<div>(IN)</div></th>
+                <th>高<div>(IN)</div></div></th>
+                <th>运输方式<div>transportation</div></div></th>
+                <th>卡板号<div>pallets</div></th>
+                <th>打板尺寸<div>(in)</div><div>pallets size</div></th>
             </tr>
             </thead>
             <tbody>
             <% for(let row of rows){ %>
             <tr>
-                <td>${row.item_code}</td>
-                <td>${row.seller_name}</td>
-                <td>${row.asin}</td>
-                <td>${row.seller_sku}</td>
-                <td>${row.item_name}</td>
-                <td>${row.fbm_stock}</td>
-                <td>${row.fbm_valid_stock}</td>
-                <td>${row.fba_stock}</td>
-                <td>${row.fba_transfer}</td>
-                <td>${row.unsellable}</td>
-                <td>${row.fbm_update}</td>
-                <td>${row.fba_update}</td>
+                <td>${row.width}</td>
+                <td>${row.height}</td>
+                <td>${row.transportation}</td>
+                <td>${row.pallets}</td>
+                <td>${row.pallets_size}</td>
             </tr>
             <% } %>
             </tbody>
         </table>
     </script>
 <script>
+	
+	function tplCompile(tpl) {
+	
+	    tpl = tpl.replace(/<%([^]+?)%>/g, "`);$1;_push(`")
+	
+	    return new Function(
+	        'vars',
+	        `let _output = []
+	         let _push = _output.push.bind(_output)
+	         eval(\`var {\${Object.keys(vars).join(",")}} = vars\`)
+	         _push(\`${tpl}\`)
+	         return _output.join("")`
+	    )
+	}
+	
+	function tplRender(selector, vars) {
+	
+	    if (!(selector instanceof Element)) {
+	        selector = document.querySelector(selector)
+	        if (!selector) return ''
+	    }
+	
+	    if (!selector._compile) {
+	        selector._compile = tplCompile(selector.innerHTML)
+	    }
+	
+	    return selector._compile(vars)
+	}
 	//清空筛选
 	function handleClear(){
 		$('#createTimeInput').val("");
@@ -514,54 +641,79 @@
 	    else tableObj.column(column).search(value).draw();
 	}
 	$(document).ready(function(){
-		$('.batch_operation').click(function(e){
-			$('.batch_list').slideToggle();
-			$(document).one('click',function(){
-				$('.batch_list').hide();
-			})
-			e.stopPropagation();
+		//上传大货资料弹窗隐藏
+		$('.cancelUpload').on('click',function(){
+			$('.mask_upload_box').hide();
 		})
-		//待计划确认
-		$('.noConfirmed').on('click',function(){
-			let chk_value = '';
-			$("input[name='checkedInput']:checked").each(function () {
-				console.log($(this).val())
-				if(chk_value != ''){
-					chk_value = chk_value + ',' + $(this).val()	
-				}else{
-					chk_value = chk_value + $(this).val()
-				}				 		 			
+		//上传
+		$('#uploadFrom').on('click',function(){
+			console.log(1)
+			$('.mask_upload_box').show();
+		})
+		//确认上传
+		$('#confirmUpload').on('click',function(){
+			let fileList = '';
+			let str = $('#table-striped tbody tr td').find('.filesUrl');
+			for(var i=0;i<str.length;i++){
+				fileList=(str[0].defaultValue)
+			}
+			$.ajax({
+			    type: "POST",
+				url: "/shipment/importExecl",
+				data: {
+					files: fileList
+				},
+				success: function (res) {
+					if(res.status == 0){
+						$('.error_mask').fadeIn(1000);
+						$('.error_mask_text').text(res.msg);
+						setTimeout(function(){
+							$('.error_mask').fadeOut(1000);
+						},2000)
+					}else if(res.status == 1){
+						$('.success_mask').fadeIn(1000);
+						$('.success_mask_text').text(res.msg);
+						setTimeout(function(){
+							$('.success_mask').fadeOut(1000);
+						},2000)	
+						$('.mask_upload_box').hide();
+					}
+				},
+				error: function(err) {
+					console.log(err)
+				}
 			});
-			chk_value == ""? chk_value = -1 : chk_value;
-			tableObj.ajax.reload();
-			console.log(chk_value)
 		})
-		//导出
-		$('#export').click(function(){
-			 let chk_value = '';
-			 $("input[name='checkedInput']:checked").each(function () {
-				 if(chk_value != ''){
-					 chk_value = chk_value + ',' + $(this).val()	
-				 }else{
-					 chk_value = chk_value + $(this).val()
-				 }				 		 			
-			 });
-			 chk_value == ""? chk_value = -1 : chk_value;
-			 console.log(chk_value)
-			 /* $.ajax({
-				url: "/hijack/hijackExport",
-				 method: 'POST',
-				 cache: false,
-				 data: {
-					 startTime: dateStr($('.date1').val()),
-					 endTime: dateStr($('.date2').val()),
-					 idList: chk_value
-				 },
-							
-				 success: function (data) {
-					$('.dialogMain').hide();
-					 if(data != ""){
-						var fileName = "VOP Hijack";
+		//下载导入模板
+		$('#downloadTemplate').on('click',function(){
+			let chk_value = '';
+			$("input[name='checkedInput']:checked").each(function (index,value) {
+				if(chk_value != ''){
+					chk_value = chk_value + ',' + $(this).attr('shipment_requests_id')	
+				}else{
+					chk_value = chk_value + $(this).attr('shipment_requests_id')	
+				}
+			});
+			$.ajax({
+			    type: "POST",
+				url: "/shipment/allotProgress",
+				data: {
+					downLoad: 1,
+					date_s: cusstr($('.createTimeInput').val() , ' - ' , 1),
+					date_e: cusstr1($('.createTimeInput').val() , ' - ' , 1),
+					label: $('#account_number').val(),
+					bg: $('#bg_select').val(),
+					bu: $('#bu_select').val(),
+					name: $('#seller_select').val(),
+					status: $('#transfer_status').find("option:selected").attr("id"),
+					out_warehouse: $('#callout_factory').val(),
+					marketplace_id: $('#marketplace_select').val(),
+					sap_factory_code: $('#callin_factory').val(),
+					shipment_id_list: chk_value,
+				},
+				success: function (data) {
+					if(data != ""){
+						var fileName = "导入模板";
 						 function msieversion() {
 							 var ua = window.navigator.userAgent;
 							 var msie = ua.indexOf("MSIE ");
@@ -590,9 +742,100 @@
 							 link.click();
 							 document.body.removeChild(link);
 						 }
+						 $('#selectAll').prop('checked',false);
+						 $("input[name='checkedInput']:checked").prop('checked',false);
+					}
+				},
+				error: function(err) {
+					console.log(err)
+				}
+			});
+			
+		})
+		$('.batch_operation').click(function(e){
+			$('.batch_list').slideToggle();
+			$(document).one('click',function(){
+				$('.batch_list').hide();
+			})
+			e.stopPropagation();
+		})
+		//待计划确认
+		$('.noConfirmed').on('click',function(){
+			let chk_value = '';
+			$("input[name='checkedInput']:checked").each(function () {
+				if(chk_value != ''){
+					chk_value = chk_value + ',' + $(this).val()	
+				}else{
+					chk_value = chk_value + $(this).val()
+				}				 		 			
+			});
+			chk_value == ""? chk_value = -1 : chk_value;
+			tableObj.ajax.reload();
+		})
+		//导出调拨进度
+		$('#export').click(function(){
+			 let chk_value = '';
+			 $("input[name='checkedInput']:checked").each(function (index,value) {
+			 	if(chk_value != ''){
+			 		chk_value = chk_value + ',' + $(this).attr('shipment_requests_id')	
+			 	}else{
+			 		chk_value = chk_value + $(this).attr('shipment_requests_id')	
+			 	}
+			 });
+			 $.ajax({
+				url: "/shipment/exportExecl",
+				 method: 'POST',
+				 cache: false,
+				 data: {
+					date_s: cusstr($('.createTimeInput').val() , ' - ' , 1),
+					date_e: cusstr1($('.createTimeInput').val() , ' - ' , 1),
+					label: $('#account_number').val(),
+					bg: $('#bg_select').val(),
+					bu: $('#bu_select').val(),
+					name: $('#seller_select').val(),
+					status: $('#transfer_status').find("option:selected").attr("id"),
+					out_warehouse: $('#callout_factory').val(),
+					marketplace_id: $('#marketplace_select').val(),
+					sap_factory_code: $('#callin_factory').val(),
+					shipment_id_list: chk_value,
+				 },
+							
+				 success: function (data) {
+					 if(data != ""){
+						var fileName = "调拨进度";
+						function msieversion() {
+							 var ua = window.navigator.userAgent;
+							 var msie = ua.indexOf("MSIE ");
+							 if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./)) {
+								 return true;
+							 } else {
+								 return false;
+							 }
+							 return false;
+						}
+									 
+						if (msieversion()) {
+							 var IEwindow = window.open();
+							 IEwindow.document.write('sep=,\r\n' + data);
+							 IEwindow.document.close();
+							 IEwindow.document.execCommand('SaveAs', true, fileName + ".csv");
+							 IEwindow.close();
+						} else {
+							 var uri = "data:text/csv;charset=utf-8,\ufeff" + data;
+							 var uri = 'data:application/csv;charset=utf-8,\ufeff' + encodeURI(data);
+							 var link = document.createElement("a");
+							 link.href = uri;
+							 link.style = "visibility:hidden";
+							 link.download = fileName + ".csv";
+							 document.body.appendChild(link);
+							 link.click();
+							 document.body.removeChild(link);
+						}
+						$('#selectAll').removeAttr('checked');
+						$("input[name='checkedInput']:checked").removeAttr('checked');
 					 }
 				 } 
-			 });*/
+			 });
 				 
 		})
 		//全选
@@ -629,16 +872,16 @@
 		$.fn.dataTable.ext.errMode = 'none';
 		tableObj = $("#thetable").DataTable({
 			serverSide: false,
-			processing: true,
+			processing: false,
 			lengthMenu: [
 			    20, 50, 100, 'All'
 			],
 			scrollX: "100%",
 			scrollCollapse: false,
-			fixedColumns: { //固定列的配置项
+			/* fixedColumns: { //固定列的配置项
 				leftColumns: 4, //固定左边第一列
 				rightColumns: 1, //固定左边第一列
-			},
+			}, */
 			pageLength: 20,
 			dispalyLength: 2, // default record count per page
 			order: [ 1, "desc" ],
@@ -655,12 +898,24 @@
 					return reqList;
 				},
 				dataSrc:function(res){
-					$('.status0').text(res[1].status0);
-					$('.status1').text(res[1].status1);
-					$('.status2').text(res[1].status2);
-					$('.status3').text(res[1].status3);
-					$('.status4').text(res[1].status4);
-					$('.status5').text(res[1].status5);
+					//进行预查询,改变按钮颜色
+					for (let row of res[0]) {
+					    let shipment_requests_id = row.shipment_requests_id
+					    // 根据每一行 shipment_requests_id 进行预查询，如果有配件数据，则将加号按钮变绿
+					    $.post('/shipment/getBoxDetail', {shipment_requests_id}).success(rows => {
+					        if (rows.length > 0) {
+					            if (false === rows[0]) return
+					            $(`#thetable .ctrl-${shipment_requests_id}`).parent().removeClass('disabled')
+					        }
+					    })
+					}
+					
+					$('.status0').text(res[4].status0);
+					$('.status1').text(res[4].status1);
+					$('.status2').text(res[4].status2);
+					$('.status3').text(res[4].status3);
+					$('.status4').text(res[4].status4);
+					$('.status5').text(res[4].status5);
 					$("#seller_select").empty();
 					$("#seller_select").append("<option value=''>全部</option>");
 					$.each(res[1], function (index, value) {
@@ -692,7 +947,7 @@
 					data: "id",
 					name: 'id',
 					render: function(data, type, row, meta) {
-						var content = '<input type="checkbox" name="checkedInput"  class="checkbox-item" value="' + data + '" />';
+						var content = '<input type="checkbox" name="checkedInput" shipment_requests_id="'+ row.shipment_requests_id +'"  class="checkbox-item" value="' + data + '" />';
 						return content;
 					},
 					createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
@@ -765,9 +1020,9 @@
 				{
 					"className": 'details-control disabled',
 					"orderable": false,
-					"data": 'item_code',
-					render(item_code) {
-						return `<a class="ctrl-${item_code}"></a>`
+					"data": 'shipment_requests_id',
+					render(shipment_requests_id) {
+					    return `<a class="ctrl-${shipment_requests_id}"></a>`
 					}
 				}
 			],
@@ -778,18 +1033,18 @@
 				{
 					targets: [15],
 					render: function(data, type, row, meta) {
-						var content = '<div>'+data+'<img src="../assets/global/img/editor.png" alt="" style="float:right" class="country_img"></div>';
+						var content = '<div class="editorMethods">'+data+'<img src="../assets/global/img/editor.png" alt="" style="float:right" class="country_img"></div>';
 						return content;
 					},
 					createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
 						var aInput;
 						$(cell).click(function () {
 							$(this).html(
-									'<select style="width:100%;" placeholder="请选择发货方式">'
-									+'<option value="1">亚马逊卡派</option>'
-									+'<option value="2">亚马逊快递</option>'
-									+'<option value="3">卡派-仓库直发</option>'
-									+'<option value="4">快递-仓库直发</option>'
+									'<select style="width:100%;" placeholder="请选择发货方式" id="shippingMethodSelect">'
+									+'<option value="亚马逊卡派">亚马逊卡派</option>'
+									+'<option value="亚马逊快递">亚马逊快递</option>'
+									+'<option value="卡派-仓库直发">卡派-仓库直发</option>'
+									+'<option value="快递-仓库直发">快递-仓库直发</option>'
 									+'</select>'
 								
 								);
@@ -805,12 +1060,25 @@
 						$(cell).on("blur", ":input", function () {
 							$.ajax({
 								type: "POST",
-								url: "/api/AlarmInfo/SubmitDbd",
-								data: {},
+								url: "/shipment/upShippingMethod",
+								data: {
+									id: rowData.id,
+									shippingMethod: $(this).val()
+								},
 								success: function (res) {
-									if (res.status == 200) {//后台数据操作成功时
-										var text = $(this).find("option:selected").text();
-										$(cell).html(text);
+									if(res.status == 0){
+										$('.error_mask').fadeIn(1000);
+										$('.error_mask_text').text(res.msg);
+										setTimeout(function(){
+											$('.error_mask').fadeOut(1000);
+										},2000)
+									}else if(res.status == 1){
+										$('.success_mask').fadeIn(1000);
+										$('.success_mask_text').text(res.msg);
+										setTimeout(function(){
+											$('.success_mask').fadeOut(1000);
+										},2000)	
+										$(cell).html($("#shippingMethodSelect").val()+'<img src="../assets/global/img/editor.png" alt="" style="float:right" class="country_img">');
 									}
 								}
 							});
@@ -821,6 +1089,51 @@
 			],
 			
 		})
+		async function buildSubItemTable(shipment_requests_id) {
+		
+		    let rows = await new Promise((resolve, reject) => {
+		        $.post('/shipment/getBoxDetail', {shipment_requests_id})
+		            .success(rows => resolve(rows))
+		            .error((xhr, status, errmsg) => reject(new Error(errmsg)))
+		    })
+		
+		    if (!rows.length) return ''
+		
+		    if (false === rows[0]) return Promise.reject(new Error(rows[1]))
+		
+		    return tplRender('#sub-table-tpl', {rows})
+		}
+		
+		tableObj.on('click', 'td.details-control', function () {
+		
+		    let $td = $(this)
+		
+		    let row = tableObj.row($td.closest('tr'));
+		
+		    if (row.child.isShown()) {
+		        row.child.remove();
+		        $td.removeClass('closed');
+		    } else {
+		        let {shipment_requests_id} = row.data()
+		        let id = `sub-item-loading-${shipment_requests_id}`
+		
+		        row.child(`<div id="${id}" style="padding:3em;">Data is Loading...</div>`, 'sub-item-row').show()
+		
+		        buildSubItemTable(shipment_requests_id).then(html => {
+		            if (html) {
+		                $td.removeClass('disabled')
+		                $(`#${id}`).parent().html(html)
+		            } else {
+		                $(`#${id}`).html('Nothing to Show.')
+		            }
+		        }).catch(err => {
+		            $(`#${id}`).html(`<span style="color:red">Server Error: ${err.message}</span>`)
+		        })
+		
+		        $td.addClass('closed');
+		    }
+		});
+		
 		//截取字符前面的
 		function cusstr(str, findStr, num){
 			if(str.length > 0){
@@ -855,52 +1168,6 @@
 				return ''
 			}
 		}
-		async function buildSubItemTable(item_code) {
-		
-			let rows = await new Promise((resolve, reject) => {
-				$.post('http://192.168.10.33/kms/partslist/subitems', {item_code})
-				.success(rows => resolve(rows))
-				.error((xhr, status, errmsg) => reject(new Error(errmsg)))
-			})
-		
-			if (!rows.length) return ''
-		
-			if (false === rows[0]) return Promise.reject(new Error(rows[1]))
-		
-			return tplRender('#sub-table-tpl', {rows})
-		}
-		
-		// Add event listener for opening and closing details
-		tableObj.on('click', 'td.details-control', function () {
-		
-			let $td = $(this)
-		
-			let row = tableObj.api().row($td.closest('tr'));
-		
-			if (row.child.isShown()) {
-				row.child.remove();
-				$td.removeClass('closed');
-			} else {
-				let {item_code} = row.data()
-				let id = `sub-item-loading-${item_code}`
-		
-				row.child(`<div id="${id}" style="padding:3em;">Data is Loading...</div>`, 'sub-item-row').show()
-		
-				buildSubItemTable(item_code).then(html => {
-					if (html) {
-						$td.removeClass('disabled')
-						$(`#${id}`).parent().html(html)
-					} else {
-						$(`#${id}`).html('Nothing to Show.')
-			}
-			}).catch(err => {
-					$(`#${id}`).html(`<span style="color:red">Server Error: ${err.message}</span>`)
-			})
-		
-				$td.addClass('closed');
-			}
-		});
-		
 		//日期初始化
 		$("#createTimes").daterangepicker({
 			opens: "left", //打开的方向，可选值有'left'/'right'/'center'

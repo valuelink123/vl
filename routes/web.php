@@ -224,12 +224,21 @@ Route::match(['post','get'],'/marketingPlan/achieveGoals', 'MarketingPlanControl
 Route::match(['post','get'],'/marketingPlan/delfiles', 'MarketingPlanController@delfiles');//删除图片
 Route::post('/marketingPlan/getAsinDailyReport', 'MarketingPlanController@getAsinDailyReport');
 
-//  Manage Distribute Time
-Route::get('/manageDistributeTime/safetyStockDays', 'ManageDistributeTimeController@safetyStockDays')->name('safetyStockDays');
-Route::get('/manageDistributeTime/fba', 'ManageDistributeTimeController@fba')->name('fba');
-Route::get('/manageDistributeTime/fbm', 'ManageDistributeTimeController@fbm')->name('fbm');
-Route::get('/manageDistributeTime/internationalTransportTime', 'ManageDistributeTimeController@internationalTransportTime')->name('internationalTransportTime');
-
+//Manage Distribute Time
+Route::match(['post','get'],'/manageDistributeTime/safetyStockDays', 'ManageDistributeTimeController@safetyStockDays');
+Route::post('/manageDistributeTime/updateSafetyStockDays', 'ManageDistributeTimeController@updateSafetyStockDays');
+Route::get('/manageDistributeTime/exportSafetyStockDays', 'ManageDistributeTimeController@exportSafetyStockDays');
+Route::match(['post','get'],'/manageDistributeTime/fba', 'ManageDistributeTimeController@fba');
+Route::post('/manageDistributeTime/updateFba', 'ManageDistributeTimeController@updateFba');
+Route::get('/manageDistributeTime/exportFba', 'ManageDistributeTimeController@exportFba');
+Route::match(['post','get'],'/manageDistributeTime/fbm', 'ManageDistributeTimeController@fbm');
+Route::post('/manageDistributeTime/updateFbm', 'ManageDistributeTimeController@updateFbm');
+Route::get('/manageDistributeTime/exportFbm', 'ManageDistributeTimeController@exportFbm');
+Route::match(['post','get'],'/manageDistributeTime/internationalTransportTime', 'ManageDistributeTimeController@internationalTransportTime');
+Route::post('/manageDistributeTime/upload', 'ManageDistributeTimeController@upload');
+Route::post('/manageDistributeTime/updateTransportTime', 'ManageDistributeTimeController@updateTransportTime');
+Route::post('/manageDistributeTime/batchUpdateTransportTime', 'ManageDistributeTimeController@batchUpdateTransportTime');
+Route::get('/manageDistributeTime/exportTransportTime', 'ManageDistributeTimeController@exportTransportTime');
 
 //投入产出分析
 Route::resource('roi', 'RoiController');

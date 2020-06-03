@@ -886,6 +886,7 @@
 		
 		/* ***********************************************计算*********************************************** */
 		//预计成本 = RSG预计成本 * RSG数量   (RSG预计成本 = 物料成本+当前售价*亚马逊佣金率*汇率+拣配费+RSG付款/(1+paypal佣金率）*汇率)
+		//RSG预计成本=  [物料成本+当前售价*亚马逊佣金率*汇率+拣配费+（RSG付款/（1-paypal费率）-RSG付款）*汇率]*RSG数量
 		function estSpendNum(){
 			let rsgPriceNum = $('.rsgPrice').val();//RSG金额
 			let ratingVal = $('.ratingVal').val();//当前售价
@@ -897,8 +898,9 @@
 			fulfillment == null ? fulfillment = 0 : fulfillment;//拣配费
 			commission == null ? commission = 0 : commission;//佣金比率
 			cost == null ? cost = 0 : cost; //物料成本
-			//let num = (ratingVal - cost - ratingVal * commission - fulfillment -(rsgPriceNum / (1 + 0.026)) * ratVal) * totalRsgNum;
-			let num = (Number(cost) + Number(ratingVal) * Number(commission) * Number(ratVal) + Number(fulfillment) + Number(rsgPriceNum) / (1 + 0.026) * Number(ratVal)) * Number(totalRsgNum);
+			//let num = (Number(cost) + Number(ratingVal) * Number(commission) * Number(ratVal) + Number(fulfillment) + Number(rsgPriceNum) / (1 + 0.026) * Number(ratVal)) * Number(totalRsgNum);
+			let num = (Number(cost) + Number(ratingVal) * Number(commission) * Number(ratVal) + Number(fulfillment) + (Number(rsgPriceNum) / (1 - 0.026) - Number(rsgPriceNum)) * Number(ratVal)) * Number(totalRsgNum);
+			
 			num = num.toFixed(2);
 			isNaN(num) || num == "Infinity" || num == "-Infinity" ?  num = 0 :  num
 			$('.estSpend').text('￥' + num);
