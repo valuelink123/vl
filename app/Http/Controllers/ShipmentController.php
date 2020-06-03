@@ -40,19 +40,21 @@ class ShipmentController extends Controller
         $DOMIN_MARKETPLACEID_SX = Asin::DOMIN_MARKETPLACEID_SX;
         $DOMIN_MARKETPLACEID_URL = Asin::DOMIN_MARKETPLACEID_URL;
         $condition = $request['condition'] ? $request['condition'] : '';
-        $date_s = $request['date_s'] ? $request['date_s'] : '';
-        $date_e = $request['date_e'] ? $request['date_e'] : '';
+        $date_s = $request['date_s'] ? $request['date_s'] : '';//创建时间开始
+        $date_e = $request['date_e'] ? $request['date_e'] : '';//创建时间结束
+        $received_date_s = $request['received_date_s'] ? $request['received_date_s'] : '';//预计到货时间开始
+        $received_date_e = $request['received_date_e'] ? $request['received_date_e'] : '';//预计到货时间结束
         $status = $request['status'] ? $request['status'] : '';
         $sx = $request['sx'] ? $request['sx'] : '';//站点缩写
-        $bg = $request['bg'] ? $request['bg'] : '';
-        $bu = $request['bu'] ? $request['bu'] : '';
+        $bg = $request['ubg'] ? $request['ubg'] : '';
+        $bu = $request['ubu'] ? $request['ubu'] : '';
         $name = $request['name'] ? $request['name'] : '';
         $downLoad = $request['downLoad'] ? $request['downLoad'] : 0;//是否下载
         $allor_status = $request['allor_status'] ? $request['allor_status'] : '';//调拨状态
         $label = $request['label'] ? $request['label'] : '';
         $ids = $request['ids'] ? $request['ids'] : '';
         $role = 0;//角色
-        $sap_seller_id_list = $ulist = $allotIdList = $seller = $labelList = $statusList = [];
+        $sap_seller_id_list = $ulist = $allotIdList = $seller = $labelList = $statusList = $planer=[];
         if (!empty($user)) {
             if (!empty($user['email']) && in_array($user['email'], $ADMIN_EMAIL)) {
                 /**  特殊权限着 查询所有用户 */
@@ -111,6 +113,9 @@ class ShipmentController extends Controller
         }
         if (!empty($date_s) && !empty($date_e)) {
             $sql .= ' AND sh.created_at >= "' . $date_s . '" AND sh.created_at<= "' . $date_e . ' 24:00:00' . '"';
+        }
+        if (!empty($received_date_s) && !empty($received_date_e)) {
+            $sql .= ' AND sh.received_date >= "' . $received_date_s . '" AND sh.received_date <= "' . $received_date_e . '"';
         }
         if (!empty($status)) {
             $sql .= ' AND sh.status = ' . $status;
@@ -187,6 +192,11 @@ class ShipmentController extends Controller
             }
         }
         foreach ($shipmentList as $sk => $v) {
+            if (!in_array($v['planning_name'], $planer)) {
+                if(!empty($v['planning_name'])){
+                    $planer[] = $v['planning_name'];
+                }
+            }
             if ((!empty($bg) && $v['ubg'] != $bg) || (!empty($bu) && $v['ubu'] != $bu) || (!empty($name) && $v['name'] != $name)) {
                 unset($shipmentList[$sk]);
             }
@@ -226,8 +236,8 @@ class ShipmentController extends Controller
                         '"' . @$av['asin'] . @$av['sku'] . '",' .
                         '"' . @$av['warehouse'] . '",' .
                         '"' . @$av['quantity'] . '",' .
-                        '"' . @$av['request_date'] . '",' .
-                        '"' . @$av['package'] . '",' .
+                        '"' . @$av['received_date'] . '",' .
+                        '"' . @$av['rms_sku'] . '",' .
                         '"' . @$av['remark'] . '",' .
                         '"' . @$av['stock_day_num'] . '",' .
                         '"' . @$av['FBA_Stock'] . '",' .
@@ -243,7 +253,7 @@ class ShipmentController extends Controller
                 exit;
             }
         }
-        return [$shipmentList, $statusList, $seller, $labelList];
+        return [$shipmentList, $statusList, $seller, $labelList,$planer];
     }
 
     /**
