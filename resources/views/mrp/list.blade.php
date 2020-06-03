@@ -169,6 +169,7 @@ table.dataTable thead th, table.dataTable thead td {
                         <th>Sku</th>
                         <th>最小起订量</th>
                         <th>加权周销量</th>
+						<th>可售库存</th>
 						<th>22周计划销量</th>
 						<?php
 						for($i=1;$i<=22;$i++){
@@ -213,6 +214,7 @@ var initTable = function () {
 			{data: 'sku', name: 'sku'},
 			{data: 'min_purchase', name: 'min_purchase'},
 			{data: 'week_daily_sales', name: 'week_daily_sales'},
+			{data: 'total_sellable', name: 'total_sellable'},
 			{data: '22_week_plan_total', name: '22_week_plan_total'},
 			{data:'1_week_plan',name:'1_week_plan'},
 			{data:'2_week_plan',name:'2_week_plan'},
@@ -246,7 +248,7 @@ var initTable = function () {
 		scrollY:        false,
 		scrollX:        true,
 		fixedColumns:   {
-			leftColumns:7,
+			leftColumns:8,
 			rightColumns: 0
 		},
 		"fnDrawCallback": function (oSettings) {
