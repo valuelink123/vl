@@ -121,7 +121,7 @@ class ShipmentController extends Controller
             $sql .= ' AND sh.status = ' . $status;
         }
         if (!empty($label)) {
-            $sql .= ' AND sh.label = ' . $label;
+            $sql .= ' AND sh.label = "' . $label.'"';
         }
         if (!empty($allor_status)) {
             $sql .= ' AND sh.allor_status = ' . $allor_status;
@@ -142,7 +142,9 @@ class ShipmentController extends Controller
                     $sap_seller_id_list[] = $value['sap_seller_id'];
                 }
                 if (!in_array($value['label'], $labelList)) {
-                    $labelList[] = $value['label'];
+                    if(!empty($value['label'])){
+                        $labelList[] = $value['label'];
+                    }
                 }
             }
         }
@@ -178,7 +180,9 @@ class ShipmentController extends Controller
             $shipmentList[$key]['image'] = explode(',', $value['images'])[0];
             $shipmentList[$key]['allot'] = @$allotIdList[$value['id']] ? $allotIdList[$value['id']] : 0;
             if (!in_array($ulist[$value['sap_seller_id']]['name'], $seller)) {
-                $seller[] = $ulist[$value['sap_seller_id']]['name'];
+                if(!empty($ulist[$value['sap_seller_id']]['name'])){
+                    $seller[] = $ulist[$value['sap_seller_id']]['name'];
+                }
             }
             $shipmentList[$key]['toUrl'] = $DOMIN_MARKETPLACEID_URL[$value['marketplace_id']];
         }
