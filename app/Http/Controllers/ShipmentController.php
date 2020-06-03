@@ -115,7 +115,7 @@ class ShipmentController extends Controller
             $sql .= ' AND sh.created_at >= "' . $date_s . '" AND sh.created_at<= "' . $date_e . ' 24:00:00' . '"';
         }
         if (!empty($received_date_s) && !empty($received_date_e)) {
-            $sql .= ' AND sh.received_date >= "' . $received_date_s . '" AND sh.received_date <= "' . $received_date_e . '"';
+            $sql .= ' AND sh.adjustreceived_date >= "' . $received_date_s . '" AND sh.adjustreceived_date <= "' . $received_date_e . '"';
         }
         if (!empty($status)) {
             $sql .= ' AND sh.status = ' . $status;
