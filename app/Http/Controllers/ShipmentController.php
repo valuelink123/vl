@@ -460,7 +460,7 @@ class ShipmentController extends Controller
             }
             //role_id = 23 代表 计划员
             $roleUser = DB::table('role_user')->select('user_id')
-                ->where('user_id', $user['id'])
+                ->where('user_id', @$user['id'])
                 ->where('role_id', 23)
                 ->get()->map(function ($value) {
                     return (array)$value;
@@ -1375,7 +1375,6 @@ class ShipmentController extends Controller
                         $sr_id_list[] = $sr_id;
                     }
                 }
-                //添加入库  todo
                 if (!empty($data) && !empty($sr_id_list)) {
                     $srids = implode($sr_id_list, ',');
                     $sql = 'delete from allot_progress WHERE shipment_requests_id in (' . $srids . ')';
