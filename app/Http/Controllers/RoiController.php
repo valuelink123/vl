@@ -3,14 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Asin;
-use Illuminate\Support\Facades\Session;
-
 use App\User;
-use App\Group;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use App\Services\MultipleQueue;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use DB;
@@ -34,7 +28,6 @@ class RoiController extends Controller
 
     public function index()
     {
-        if(!Auth::user()->can(['roi-show'])) die('Permission denied -- roi-show');
         $submit_date_from=date('Y-m-d',strtotime('-90 days'));
         $submit_date_to=date('Y-m-d');
         $users = $this->getUsers();
@@ -45,6 +38,31 @@ class RoiController extends Controller
 
     public function get(Request $request)
     {
+        //name current user's id as $currentUserId
+        $currentUserId = Auth::user()->id;
+        $isUserAdmin = $this->isAdmin($currentUserId);
+        $isUserProductDirector = $this->isProductDirector($currentUserId);
+        $data = DB::connection('amazon')->table('roi')->get();
+        $data = json_decode(json_encode($data),true);
+        $visibleRoiIds = array();
+        foreach ($data as $k=>$v){
+            $roiId = $v['id'];
+            $creatorId = $v['creator'];
+            $collaborators = $v['collaborators'];
+            $isCreator = $currentUserId == $creatorId;
+            if($isCreator || $isUserAdmin || $isUserProductDirector){
+                $visibleRoiIds[] = $roiId;
+                continue;
+            }
+            $isUserDirectLeader = $this->isDirectLeader($creatorId, $currentUserId);
+            $isUserExtendedCollaborators = $this->isExtendedCollaborators($collaborators, $currentUserId);
+            if($isUserDirectLeader || $isUserExtendedCollaborators){
+                $visibleRoiIds[] = $roiId;
+            }
+        }
+
+        $data = DB::connection('amazon')->table('roi')->whereIn('id', $visibleRoiIds);
+
         $order_column = $request->input('order.0.column','15');
         if($order_column == 13){
             $orderby = 'created_at';
@@ -59,12 +77,10 @@ class RoiController extends Controller
         $submit_date_from = isset($search['submit_date_from']) && $search['submit_date_from'] ? $search['submit_date_from'] : date('Y-m-d',strtotime('- 90 days'));
         $submit_date_to = isset($search['submit_date_to']) && $search['submit_date_to'] ? $search['submit_date_to'] : date('Y-m-d');
 
-        $data = DB::connection('amazon')->table('roi');
         //如果连接了asin表，where的字段要加上表名。例如site：where('roi.site', $search['site'])
         $data = $data->where('roi.created_at','>=',$submit_date_from.' 00:00:00')->where('roi.created_at','<=',$submit_date_to.' 23:59:59');
 
         //todo: bgbu.
-
 
         if(isset($search['user_id']) && $search['user_id']) {
             $user_id = $search['user_id'];
@@ -100,10 +116,11 @@ class RoiController extends Controller
         $users= $this->getUsers();
 
         foreach ($lists as $key=>$list){
-
-            $show_url = url('roi/'.$list['id']);
-            $edit_url = url('roi/'.$list['id'].'/edit');
-            $copy_url = url('roi_copy?id='.$list['id']);
+            $roiId = $list['id'];
+            $show_url = url('roi/'.$roiId);
+            $edit_url = url('roi/'.$roiId.'/edit');
+            $copy_url = url('roi_copy?id='.$roiId);
+            $delete_url = url('roi_delete?id='.$roiId);
 
             $lists[$key]['product_name'] = '<a href="' . $show_url . '" target="_blank">'.$list['product_name'].'</a>';
             $lists[$key]['project_code'] = '<a href="' . $list['new_product_planning_process'] . '" target="_blank">'.$list['project_code'].'</a>';
@@ -119,37 +136,62 @@ class RoiController extends Controller
             $lists[$key]['updated_at'] = date('Y-m-d',strtotime($list['updated_at']));
             $lists[$key]['archived_status'] = $list['archived_status'] == 0 ? '未审核' : '已审核';
             $edit_item = $list['archived_status'] == 0 ? '<li><a style="text-align:center" href="' . $edit_url . '">编辑</a></li>' : '';
-            $archived_item = $list['archived_status'] == 0 ? '<li><a style="text-align:center" href="#" data-toggle="modal" data-target="#archived-modal" data-roi_id="' . $list['id'] . '" data-launch_time="' .$list['estimated_launch_time'] .'" >审核</a></li>' : '';
-            $lists[$key]['action'] = '<ul class="nav navbar-nav"><li><a href="#" class="dropdown-toggle" style="height:10px; vertical-align:middle; padding-top:0px;" data-toggle="dropdown" role="button">...</a><ul class="dropdown-menu" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(-50px, 20px, 0px); min-width: 88px;" role="menu" style="color: #62c0cc8a"><li><a style="text-align:center" href="' . $show_url . '" >查看详情</a></li>' . $edit_item . $archived_item . '<li><a style="text-align:center" href="' . $copy_url .'">复制</a></li></ul></li></ul>';
-//        <div>
-//            <ul class="nav navbar-nav">
-//                <li>
-//                    <a href="#" class="dropdown-toggle" style="height:10px; vertical-align:middle; padding-top:0px;" data-toggle="dropdown" role="button">...</a>
-//                    <ul class="dropdown-menu" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(-120px, 20px, 0px);  min-width: 88px;" role="menu" style="color: #cccccc">
-//                        <li><a style="text-align:center" href="{{ $edit_url }}">查看详情</a></li>
-//                        <li><a style="text-align:center" href="{{ $show_url }}">编辑</a></li>
-//                        <li><a style="text-align:center" href="#" data-toggle="modal" data-target="#archived-modal" data-roi_id="{{$list['id']}}" data-launch_time="{{$list['estimated_launch_time']}}">审核</a></li>
-//                        <li><a style="text-align:center" href="{{ $copy_url }}">复制</a></li>
-//                    </ul>
-//                </li>
-//            </ul>
-//        </div>
-        }
 
+            //Admin,产品总监 有归档状态的编辑权限
+            $canArchive = false;
+            if($isUserAdmin || $isUserProductDirector){
+                $canArchive = true;
+            }
+            $data_sku = '';
+            if($list['sku']){
+                $data_sku = $list['sku'];
+            }
+            $data_new_product_planning_process = '';
+            if($list['new_product_planning_process']){
+                $data_new_product_planning_process = $list['new_product_planning_process'];
+            }
+            $archived_item = $canArchive ? '<li><a style="text-align:center" href="#" data-toggle="modal" data-target="#archived-modal" data-roi_id="' . $list['id'] . '" data-launch_time="' .$list['estimated_launch_time'] .'" data-sku="' . $data_sku . '" data-new_product_planning_process="' . $data_new_product_planning_process . '">审核</a></li>' : '';
+
+            //创建人及其上级和管理员（Admin）有删除权限，其他 不可删除
+            $canDelete = false;
+            //已归档的状态是不可删除的
+            if($list['archived_status'] == 0){
+                $creatorId = $list['creator'];
+                $isCreator = $currentUserId == $creatorId;
+                $isUserDirectLeader = $this->isDirectLeader($creatorId, $currentUserId);
+                if($isCreator || $isUserAdmin || $isUserDirectLeader){
+                    $canDelete = true;
+                }
+            }
+            $delete_item = $canDelete ? '<li><a style="text-align:center" onclick="return confirm(\'确定删除?\');" href="' . $delete_url . '">删除</a></li>' : '';
+
+            $lists[$key]['action'] = '<ul class="nav navbar-nav"><li><a href="#" class="dropdown-toggle" style="height:10px; vertical-align:middle; padding-top:0px;" data-toggle="dropdown" role="button">...</a><ul class="dropdown-menu" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(-50px, 20px, 0px); min-width: 88px;" role="menu" style="color: #62c0cc8a"><li><a style="text-align:center" href="' . $show_url . '" >查看详情</a></li>' . $edit_item . $archived_item . '<li><a style="text-align:center" href="' . $copy_url .'">复制</a></li>' . $delete_item . '</ul></li></ul>';
+        }
 
         $recordsTotal = $iTotalRecords;
         $recordsFiltered = $iTotalRecords;
         $data = $lists;
+
         return compact('data', 'recordsTotal', 'recordsFiltered');
     }
 
     public function archive(Request $request){
-        if(!Auth::user()->can(['roi-archive'])) die('Permission denied -- roi-archive');
-        $roi_id = isset($_REQUEST['roi_id']) ? $_REQUEST['roi_id'] : '';
+        //Admin,产品总监 有归档状态的编辑权限
+        $currentUserId = Auth::user()->id;
+        $isUserAdmin = $this->isAdmin($currentUserId);
+        $isUserProductDirector = $this->isProductDirector($currentUserId);
+        $canArchive = false;
+        if($isUserAdmin || $isUserProductDirector){
+            $canArchive = true;
+        }
+        if(!$canArchive) die('Permission denied');
+
+        $roi_id = $request->input("roi_id");
         if($roi_id){
             $updateDBData = array();
-            $updateDBData['sku'] = isset($_REQUEST['sku']) ? $_REQUEST['sku'] : '';
-            $updateDBData['new_product_planning_process'] = isset($_REQUEST['new_product_planning_process']) ? $_REQUEST['new_product_planning_process'] : '';
+            if($request->input("sku")) $updateDBData['sku'] = $request->input("sku");
+            if($request->input("launch_time")) $updateDBData['estimated_launch_time'] = $request->input("launch_time");
+            if($request->input("new_product_planning_process")) $updateDBData['new_product_planning_process'] = $request->input("new_product_planning_process");
             $updateDBData['archived_status'] = 1;
 
             DB::beginTransaction();
@@ -165,7 +207,6 @@ class RoiController extends Controller
 
     public function create(Request $request)
     {
-        if(!Auth::user()->can(['roi-add'])) die('Permission denied -- roi-add');
         $sites = $this->getSites();
         $users = $this->getUsers();
         $billingPeriods = $this->getBillingPeriods();
@@ -178,19 +219,41 @@ class RoiController extends Controller
 
     public function export(Request $request)
     {
-        if(!Auth::user()->can(['roi-export'])) die('Permission denied -- roi-export');
+        //name current user's id as $currentUserId
+        $currentUserId = Auth::user()->id;
+        $isUserAdmin = $this->isAdmin($currentUserId);
+        $isUserProductDirector = $this->isProductDirector($currentUserId);
+        $data = DB::connection('amazon')->table('roi')->get();
+        $data = json_decode(json_encode($data),true);
+        $visibleRoiIds = array();
+        foreach ($data as $k=>$v){
+            $roiId = $v['id'];
+            $creatorId = $v['creator'];
+            $collaborators = $v['collaborators'];
+            $isCreator = $currentUserId == $creatorId;
+            if($isCreator || $isUserAdmin || $isUserProductDirector){
+                $visibleRoiIds[] = $roiId;
+                continue;
+            }
+            $isUserDirectLeader = $this->isDirectLeader($creatorId, $currentUserId);
+            $isUserExtendedCollaborators = $this->isExtendedCollaborators($collaborators, $currentUserId);
+            if($isUserDirectLeader || $isUserExtendedCollaborators){
+                $visibleRoiIds[] = $roiId;
+            }
+        }
+
+        $data = DB::connection('amazon')->table('roi')->whereIn('id', $visibleRoiIds);
+
         //搜索时间范围
         $submit_date_from = isset($_GET['date_from']) && $_GET['date_from'] ? $_GET['date_from'] : date('Y-m-d',strtotime('- 90 days'));
         $submit_date_to = isset($_GET['date_to']) && $_GET['date_to'] ? $_GET['date_to'] : date('Y-m-d');
-
-        $data = DB::connection('amazon')->table('roi');
-        $data = $data->where('roi.created_at','>=',$submit_date_from.' 00:00:00')->where('roi.created_at','<=',$submit_date_to.' 23:59:59')->get()->toArray();
+        $data = $data->where('roi.created_at','>=',$submit_date_from.' 00:00:00')->where('roi.created_at','<=',$submit_date_to.' 23:59:59')->orderBy('updated_at', 'desc')->get()->toArray();
         $data = json_decode(json_encode($data),true);
 
         $users= $this->getUsers();
 
         $arrayData = array();
-        $headArray = array('产品名称','项目编号','SKU','站点','预计上线时间','预计年销量','预计年销售额','资金周转次数','项目利润率','投资回报率ROI(%)','投资回报额(万元)','创建人','创建日期','最新修改人','最新修改日期','归档状态');
+        $headArray = array('产品名称','项目编号','SKU','站点','预计上线时间','预计年销量','预计年销售额','资金周转次数','项目利润率','投资回报率ROI(%)','投资回报额(万元)','创建人','创建日期','最新修改人','最新修改日期','审核状态');
         $arrayData[] = $headArray;
         foreach ($data as $key=>$val){
             $arrayData[] = array(
@@ -209,7 +272,7 @@ class RoiController extends Controller
                 date('Y-m-d',strtotime($val['created_at'])),
                 array_get($users,$val['updated_by']),
                 date('Y-m-d',strtotime($val['updated_at'])),
-                $val['archived_status'] == 0 ? '未归档' : '已归档'
+                $val['archived_status'] == 0 ? '未审核' : '已审核'
             );
         }
         if($arrayData){
@@ -233,16 +296,33 @@ class RoiController extends Controller
     }
 
     public function exportShowPage(Request $request){
-        if(!Auth::user()->can(['roi-export'])) die('Permission denied -- roi-export');
         $id = $_GET['id'];
+        //name current user's id as $currentUserId
+        $currentUserId = Auth::user()->id;
+        $isUserAdmin = $this->isAdmin($currentUserId);
+        $isUserProductDirector = $this->isProductDirector($currentUserId);
+        $data = DB::connection('amazon')->table('roi')->where('id', '=', $id)->first();
+        $data = json_decode(json_encode($data),true);
+        if(!$data) exit;
+        $visible = false;
+        $creatorId = $data['creator'];
+        $collaborators = $data['collaborators'];
+        $isCreator = $currentUserId == $creatorId;
+        if($isCreator || $isUserAdmin || $isUserProductDirector){
+            $visible = true;
+        }
+        $isUserDirectLeader = $this->isDirectLeader($creatorId, $currentUserId);
+        $isUserExtendedCollaborators = $this->isExtendedCollaborators($collaborators, $currentUserId);
+        if($isUserDirectLeader || $isUserExtendedCollaborators){
+            $visible = true;
+        }
+        if(!$visible) die('Permission denied');
+
         $roi = $this->getCurrentRoi($id);
         $roi = $this->showPageDataFormat($roi);
 
         $output = '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />'.
             '<style type="text/css">
-                div,table{
-                    font-size: 12px;
-                }
                 #sales_table{
                     width:1501px;
                     border: 1px solid #dddddd;
@@ -251,11 +331,13 @@ class RoiController extends Controller
                     text-align: left;
                     height: 34px;
                     padding-left: 12px;
+                    font-size:12px;
                 }
                 #sales_table td{
                     text-align: left;
                     padding-left: 10px;
                     height: 34px;
+                    font-size:12px;
                 }
                 .result_div{
                     width: 1501px;
@@ -281,29 +363,94 @@ class RoiController extends Controller
                     width: 205px;
                     height:26px;
                 }
+                .common-btn{
+                    background-color: #63C5D1;
+                    color: #ffffff;
+                    font-size: 14px;
+                    text-align: center;
+                    width: 60px;
+                    height: 30px;
+                    border-radius: 5px !important;
+                }
+                .disabled-btn{
+                    background-color: #62c0cc8a;
+                    color: #ffffffb3;
+                    font-size: 14px;
+                    text-align: center;
+                    width: 60px;
+                    height: 30px;
+                    border-radius: 5px !important;
+                }
+                .edit-btn{
+                    color: #63C5D1;
+                    font-size: 14px;
+                    text-align: center;
+                    width: 60px;
+                    height: 30px;
+                    border-radius: 5px !important;
+                    border: 1px solid #63C5D1;
+                }
+                .edit-disabled-btn{
+                    color: #62c0cc8a;
+                    font-size: 14px;
+                    text-align: center;
+                    width: 60px;
+                    height: 30px;
+                    border-radius: 5px !important;
+                    border: 1px solid #62c0cc8a;
+                }
+        
+                #archived-modal{
+                    left: 50%;
+                    top: 50%;
+                    transform: translate(-50%,-50%);
+                    /*min-width:80%;!*这个比例可以自己按需调节*!*/
+                    overflow: visible;
+                    bottom: inherit;
+                    right: inherit;
+                }
+                #edit-history-modal{
+                    left: 50%;
+                    top: 50%;
+                    transform: translate(-50%,-50%);
+                    /*min-width:80%;!*这个比例可以自己按需调节*!*/
+                    overflow: visible;
+                    bottom: inherit;
+                    right: inherit;
+                }
+                .highlight_color{
+                    color:#63C5D1;
+                }
+                .grey_color{
+                    color:#909399;
+                }
+                input{
+                    border: 1px solid #dddddd;
+                }
+        
             </style>
                 <div style="height: 25px;"></div>
                 <div>
-                    <div style="font-size: 15px; float: left">投入产出表</div>
+                    <div style="font-size: 18px; float: left; font-weight: bold">投入产出表</div>
                 </div>
                 <div style="clear:both"></div>
                 <div style="height: 30px;"></div>
                 <div>
-                    <span style="padding-right: 20px;">产品名称: ' . $roi['product_name'] . '</span>
+                    <span style="padding-right: 20px;">产品名称: <span class="highlight_text">' . $roi['product_name'] . '</span></span>
                     <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                    <span style="padding-right: 20px">站点: ' . $roi['site'] . '</span>
+                    <span style="padding-right: 20px">站点: <span class="highlight_text">' . $roi['site'] . '</span></span>
                     <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                    <span style="padding-right: 20px">预计上线时间: ' . $roi['estimated_launch_time'] . '</span>
+                    <span style="padding-right: 20px">预计上线时间: <span class="highlight_text">' . $roi['estimated_launch_time'] . '</span></span>
                     <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                    <span style="padding-right: 20px">SKU: ' . $roi['sku'] . '</span>
+                    <span style="padding-right: 20px">SKU: <span class="highlight_text">' . $roi['sku'] . '</span></span>
                     <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                    <span style="padding-right: 20px">项目编号: ' . $roi['project_code'] . '</span>
+                    <span style="padding-right: 20px">项目编号: <span class="highlight_text">' . $roi['project_code'] . '</span></span>
                     <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
                     <span style="padding-right: 20px"><a href="' . $roi['new_product_planning_process'] . '" target="_blank">新品规划流程</a></span>
                 </div>
                 <div style="clear:both"></div>
                 <div style="height: 15px;"></div>
-                <div style="font-size:12px; color: #cccccc;">说明：下表的月份是从上市日起的次月起按第一个月算，以12个月为一个周期</div>
+                <div style="font-size:12px; color: #cccccc;">说明：下表的月份是从上市日起的当月起按第一个月算，以12个月为一个周期</div>
                 <div style="height: 5px;"></div>
                 <div>
                     <table id="sales_table" border="1" cellspacing="0" cellpadding="0">
@@ -425,94 +572,80 @@ class RoiController extends Controller
                 <div style="clear:both"></div>
                 <div style="height: 25px;"></div>
                 <div class="result_div">
-                    <div style="font-size: 14px;">产品开发及供应链成本</div>
-                    <div style="height: 15px;"></div>
+                    <div style="font-size: 16px; font-weight: bold">产品开发及供应链成本</div>
+                    <div style="height: 20px;"></div>
                     <div style="width:1501px">
                         <table id="params_cost_table" border="0" cellspacing="0" cellpadding="0">
                             <tr>
                                 <td valign="top" width="750px">
-                                    <div>运输参数</div>
+                                    <div class="bold">采购参数</div>
                                     <div style="height: 7px;"></div>
                                     <div>
-                                        <span style="padding-right: 20px">运输方式: ' . $roi['transport_mode'] . '</span>
-                                        <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                                        <span style="padding-right: 20px">运输单价: ' . $roi['transport_unit_price'] . '</span>
-                                        <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                                        <span style="padding-right: 20px">运输天数: ' . $roi['transport_days'] . '</span> 
-                                        <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                                        <span style="padding-right: 20px">关税税率: ' . $roi['tariff_rate'] . '</span>
+                                        <span style="margin-right: 20px; float: left;"><span class="grey_color">不含税采购价 :</span> <span class="bold">' .$roi['purchase_price'] . '</span></span>&nbsp;&nbsp;&nbsp;&nbsp;
+                                        <span style="margin-right: 20px; float: left;"><span class="grey_color">MOQ(PCS) :</span> <span class="bold">' .$roi['moq'] . '</span></span>&nbsp;&nbsp;&nbsp;&nbsp;
+                                        <span style="margin-right: 20px; float: left;"><span class="grey_color">单PCS实重(KG) :</span> <span>' .$roi['weight_per_pcs'] . '</span></span>&nbsp;&nbsp;&nbsp;&nbsp;
+                                        <span style="margin-right: 20px; float: left;"><span class="grey_color">单PCS体积(cm<sup>3</sup>) :</span> <span>' .$roi['volume_per_pcs'] . '</span></span>
                                     </div>
-                                    <div style="height: 15px;">&nbsp;</div>
-                                    <div>采购参数</div>
+                                    <div style="clear:both"></div>
+                                    <div style="height: 7px;"></div>
+                                    <div><span class="grey_color">供应商账期 :</span> <span class="bold">' .$roi['billing_period_type'] . '</span></div>
+                                    <div style="height: 15px;"></div>
+                                    <div class="bold">平台参数</div>
                                     <div style="height: 7px;"></div>
                                     <div>
-                                        <span style="padding-right: 20px">单PCS实重(KG): ' . $roi['weight_per_pcs'] . '</span>
-                                        <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                                        <span style="padding-right: 20px">单PCS体积(cm<sup>3</sup>): ' . $roi['volume_per_pcs'] . '</span>
-                                        <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                                        <span style="padding-right: 20px">不含税采购价: ' . $roi['purchase_price'] . '</span>
-                                        <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                                        <span style="padding-right: 20px">MOQ(PCS): ' . $roi['moq'] . '</span>
+                                        <span style="margin-right: 20px; float: left;"><span class="grey_color">平台佣金(%) :</span> <span>' . $roi['commission_rate'] . '</span></span>&nbsp;&nbsp;&nbsp;&nbsp;
+                                        <span style="margin-right: 20px; float: left;"><span class="grey_color">平台操作费(外币/pcs) :</span> <span class="bold">' . $roi['unit_operating_fee'] . '</span></span>
                                     </div>
-                                    <div style="height: 7px;"></div>
-                                    <div>供应商账期: ' . $roi['billing_period_type'] . '</div>
-
-
                                 </td>
                                 <td valign="top" width="750px">
-                                    <div>开发成本</div>
-                                    <div style="height: 15px;"></div>
+                                    <div class="bold">开发成本</div>
+                                    <div style="height: 7px;"></div>
                                     <div>
-                                        <span style="padding-right: 20px">ID费用(元): ' . $roi['id_fee'] . '</span>
-                                        <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                                        <span style="padding-right: 20px">模具费(元): ' . $roi['mold_fee'] . '</span>
-                                        <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                                        <span style="padding-right: 20px">手板费(元): ' . $roi['prototype_fee'] . '</span>
-                                        <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                                        <span style="padding-right: 20px">其他费用(元): ' . $roi['other_fixed_cost'] . '</span>
+                                        <span style="margin-right: 20px; float: left;"><span class="grey_color">ID费用(元) :</span> <span>' . $roi['id_fee'] . '</span></span>&nbsp;&nbsp;&nbsp;&nbsp;
+                                        <span style="margin-right: 20px; float: left;"><span class="grey_color">模具费(元) :</span> <span>' . $roi['mold_fee'] . '</span></span>&nbsp;&nbsp;&nbsp;&nbsp;
+                                        <span style="margin-right: 20px; float: left;"><span class="grey_color">手板费(元) :</span> <span>' . $roi['prototype_fee'] . '</span></span>&nbsp;&nbsp;&nbsp;&nbsp;
+                                        <span style="margin-right: 20px; float: left;"><span class="grey_color">其他费用(元) :</span> <span>' . $roi['other_fixed_cost'] . '</span></span>
                                     </div>
-                                    <div style="height: 15px;">&nbsp;</div>
-                                    <div>其他成本</div>
+                                    <div style="clear: both;"></div>
                                     <div style="height: 15px;"></div>
+                                    <div class="bold">其他成本</div>
+                                    <div style="height: 7px;"></div>
                                     <div>
-                                        <span style="padding-right: 20px">专利费(元): ' . $roi['royalty_fee'] . '</span>
-                                        <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                                        <span style="padding-right: 20px">认证费(元): ' . $roi['certification_fee'] . '</span>
+                                        <span style="margin-right: 20px; float: left;"><span class="grey_color">专利费(元) :</span> <span>' . $roi['royalty_fee'] . '</span></span>&nbsp;&nbsp;&nbsp;&nbsp;
+                                        <span style="margin-right: 20px; float: left;"><span class="grey_color">认证费(元) :</span> <span>' . $roi['certification_fee'] . '</span></span>
                                     </div>
-                                    <div style="height: 15px;">&nbsp;</div>
-                                    <div>平台参数</div>
+                                    <div style="clear: both;"></div>
                                     <div style="height: 15px;"></div>
+                                    <div class="bold">运输参数</div>
+                                    <div style="height: 7px;"></div>
                                     <div>
-                                        <span style="padding-right: 20px">平台佣金(%): ' . $roi['commission_rate'] . '</span>
-                                        <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                                        <span style="padding-right: 20px">平台操作费(外币/pcs): ' . $roi['unit_operating_fee'] . '</span>
+                                        <span style="margin-right: 20px; float: left;"><span class="grey_color">运输方式 :</span> <span>' . $roi['transport_mode'] . '</span></span>&nbsp;&nbsp;&nbsp;&nbsp;
+                                        <span style="margin-right: 20px; float: left;"><span class="grey_color">运输单价 :</span> <span>' . $roi['transport_unit_price'] . '</span></span>&nbsp;&nbsp;&nbsp;&nbsp;
+                                        <span style="margin-right: 20px; float: left;"><span class="grey_color">运输天数 :</span> <span>' . $roi['transport_days'] . '</span></span>&nbsp;&nbsp;&nbsp;&nbsp;
+                                        <span style="margin-right: 20px; float: left;"><span class="grey_color">关税税率 :</span> <span>' . $roi['tariff_rate'] . '</span></span>
                                     </div>
                                 </td>
-
                             </tr>
-
                         </table>
-
                     </div>
                 </div>
                 <div style="height: 30px;"></div>
                 <div class="result_div">
-                    <div style="font-size: 14px;">投入产出分析结果</div>
+                    <div style="font-size: 16px; font-weight: bold">产品开发及供应链成本</div>
 
-                    <div style="height: 15px;"></div>
+                    <div style="height: 20px;"></div>
                     <div style="width:1501px">
                         <table id="result_table" border="0" cellspacing="0" cellpadding="0">
                             <tr>
-                                <td width="25%">底线价格(外币/元): ' . $roi['price_floor'] . '</td>
-                                <td width="25%">库存周转天数(天): ' . $roi['inventory_turnover_days'] . '</td>
-                                <td width="25%">项目利润率(%): ' . $roi['project_profitability'] . '</td>
-                                <td width="25%">单PCS边际利润(元): ' . $roi['marginal_profit_per_pcs'] . '</td>
+                                <td><span class="grey_color">投资回报额(万元) :</span> <span class="bold">' . $roi['return_amount'] . '</span></td>
+                                <td><span class="grey_color">投资回报率ROI(%) :</span> <span class="bold">' . $roi['roi'] . '</span></td>
+                                <td width="25%"><span class="grey_color">项目利润率(%) :</span> <span class="bold">' . $roi['project_profitability'] . '</span></td>
                             </tr>
                             <tr>
-                                <td>预计投资回收期(月): ' . $roi['estimated_payback_period'] . '</td>
-                                <td>资金周转次数(次): ' . $roi['capital_turnover'] . '</td>
-                                <td>投资回报率ROI(%): ' . $roi['roi'] . '</td>
-                                <td>投资回报额(万元): ' . $roi['return_amount'] . '</td>
+                                <td width="25%"><span class="grey_color">底线价格(外币/元) :</span> <span class="bold">' . $roi['price_floor'] . '</span></td>
+                                <td width="25%"><span class="grey_color">资金周转次数(次) :</span> <span class="bold">' . $roi['capital_turnover'] . '</span></td>
+                                <td><span class="grey_color">库存周转天数(天) :</span> <span class="bold">' . $roi['inventory_turnover_days'] . '</span></td>
+                                <td width="25%"><span class="grey_color">单PCS边际利润(元) :</span> <span class="bold">' . $roi['marginal_profit_per_pcs'] . '</span></td>
                             </tr>
                         </table>
                     </div>
@@ -531,7 +664,32 @@ class RoiController extends Controller
 
     public function edit(Request $request, $id)
     {
-        if(!Auth::user()->can(['roi-update'])) die('Permission denied -- roi-update');
+        //name current user's id as $currentUserId
+        $currentUserId = Auth::user()->id;
+        $isUserAdmin = $this->isAdmin($currentUserId);
+        $isUserProductDirector = $this->isProductDirector($currentUserId);
+        $data = DB::connection('amazon')->table('roi')->where('id', '=', $id)->first();
+        $data = json_decode(json_encode($data),true);
+        if(!$data) exit;
+        $visible = false;
+        $creatorId = $data['creator'];
+        $collaborators = $data['collaborators'];
+        $isCreator = $currentUserId == $creatorId;
+        if($isCreator || $isUserAdmin || $isUserProductDirector){
+            $visible = true;
+        }
+        $isUserDirectLeader = $this->isDirectLeader($creatorId, $currentUserId);
+        $isUserExtendedCollaborators = $this->isExtendedCollaborators($collaborators, $currentUserId);
+        if($isUserDirectLeader || $isUserExtendedCollaborators){
+            $visible = true;
+        }
+        if(!$visible) die('Permission denied');
+
+        //如果已归档，直接跳转到show页面。(列表页中该条roi记录的操作不会出现"编辑"。如果用户直接用该条记录编辑页的url访问，则需加此判断)
+        if($data['archived_status'] == 1){
+            return redirect('roi/'.$id);
+        }
+
         $users = $this->getUsers();
         //编辑限制：其中一个用户编辑时，另一个用户只能查看。编辑用户关闭浏览器（标签）前未保存，则过$expiry_time = 70s后其他用户可编辑。
         $roi_id = $id;
@@ -607,27 +765,76 @@ class RoiController extends Controller
             $pair = explode(",",$value);
             $edit_history_array[] = array('user_name'=>array_get($users, $pair[0]), 'updated_at'=>$pair[1]);
         }
-        return view('roi/edit',compact('sites','billingPeriods','transportModes', 'roi', 'edit_history_array', 'currency_rates'));
+        return view('roi/edit',compact('sites', 'users', 'billingPeriods','transportModes', 'roi', 'edit_history_array', 'currency_rates'));
     }
 
     public function copy(Request $request){
         $id = $request->get('id');
-        $roi = DB::connection('amazon')->table('roi')->where('id', '=', $id)->first();
-        $roi = json_decode(json_encode($roi),true);
+        $data = DB::connection('amazon')->table('roi')->where('id', '=', $id)->first();
+        $data = json_decode(json_encode($data),true);
+        if(!$data) exit;
 
-        unset($roi['id']);
-        //复制的记录，状态设置为：未归档,后续需要编辑
-        $roi['archived_status'] = 0;
-        $roi['product_name'] =  $roi['product_name'].'-copy';
+        $currentUserId = Auth::user()->id;
+        $isUserAdmin = $this->isAdmin($currentUserId);
+        $isUserProductDirector = $this->isProductDirector($currentUserId);
+        $visible = false;
+        $creatorId = $data['creator'];
+        $collaborators = $data['collaborators'];
+        $isCreator = $currentUserId == $creatorId;
+        if($isCreator || $isUserAdmin || $isUserProductDirector){
+            $visible = true;
+        }
+        $isUserDirectLeader = $this->isDirectLeader($creatorId, $currentUserId);
+        $isUserExtendedCollaborators = $this->isExtendedCollaborators($collaborators, $currentUserId);
+        if($isUserDirectLeader || $isUserExtendedCollaborators){
+            $visible = true;
+        }
+        if(!$visible) die('Permission denied');
+
+        unset($data['id']);
+        $data['creator'] = $currentUserId;
+        $data['created_at'] = date('Y-m-d H:i:s');
+        $data['updated_by'] = $currentUserId;
+        $data['updated_at'] = date('Y-m-d H:i:s');
+        $data['edit_history'] = null;
+        $data['collaborators'] = null;
+        //无论是否已归档，复制后的状态都设置为未归档,后续需要编辑
+        $data['archived_status'] = 0;
+        $data['product_name'] =  $data['product_name'].'-copy';
 
         DB::beginTransaction();
-        if(!DB::connection('amazon')->table('roi')->insert($roi)){
+        if(!DB::connection('amazon')->table('roi')->insert($data)){
             $request->session()->flash('error_message','Save Failed.');
             return redirect('roi');
         }else{
             return redirect('roi');
         }
         DB::commit();
+    }
+
+    public function deleteRecord(Request $request){
+        $id = $request->input('id');
+        $roi = DB::connection('amazon')->table('roi')->where('id', '=', $id)->first();
+        if(!$roi) exit;
+        $roi = json_decode(json_encode($roi),true);
+        $currentUserId = Auth::user()->id;
+        $isUserAdmin = $this->isAdmin($currentUserId);
+
+        //创建人及其上级和管理员（Admin）有删除权限，其他 不可删除
+        $canDelete = false;
+        //已归档的状态是不可删除的
+        if($roi['archived_status'] == 0){
+            $creatorId = $roi['creator'];
+            $isCreator = $currentUserId == $creatorId;
+            $isUserDirectLeader = $this->isDirectLeader($creatorId, $currentUserId);
+            if($isCreator || $isUserAdmin || $isUserDirectLeader){
+                $canDelete = true;
+            }
+        }
+        if(!$canDelete) die('Permission denied');
+
+        DB::connection('amazon')->table('roi')->where('id', '=', $id)->delete();
+        return redirect('roi');
     }
 
     public function getCurrentRoi($id){
@@ -674,7 +881,31 @@ class RoiController extends Controller
 
     public function show(Request $request, $id)
     {
-        if(!Auth::user()->can(['roi-show'])) die('Permission denied -- roi-show');
+        //name current user's id as $currentUserId
+        $currentUserId = Auth::user()->id;
+        $isUserAdmin = $this->isAdmin($currentUserId);
+        $isUserProductDirector = $this->isProductDirector($currentUserId);
+        $data = DB::connection('amazon')->table('roi')->where('id', '=', $id)->first();
+        $data = json_decode(json_encode($data),true);
+        $visible = false;
+        $creatorId = $data['creator'];
+        $collaborators = $data['collaborators'];
+        $isCreator = $currentUserId == $creatorId;
+        if($isCreator || $isUserAdmin || $isUserProductDirector){
+            $visible = true;
+        }
+        $isUserDirectLeader = $this->isDirectLeader($creatorId, $currentUserId);
+        $isUserExtendedCollaborators = $this->isExtendedCollaborators($collaborators, $currentUserId);
+        if($isUserDirectLeader || $isUserExtendedCollaborators){
+            $visible = true;
+        }
+        if(!$visible) die('Permission denied');
+
+        $canArchive = false;
+        if($isUserAdmin || $isUserProductDirector){
+            $canArchive = true;
+        }
+
         $roi = $this->getCurrentRoi($id);
         $roi = $this->showPageDataFormat($roi);
 
@@ -686,7 +917,7 @@ class RoiController extends Controller
             $edit_history_array[] = array('user_name'=>array_get($users, $pair[0]), 'updated_at'=>$pair[1]);
         }
 
-        return view('roi/show', ['roi'=>$roi, 'edit_history_array' => $edit_history_array]);
+        return view('roi/show', ['roi'=>$roi, 'edit_history_array' => $edit_history_array, 'canArchive'=>$canArchive]);
     }
 
     public function showPageDataFormat($roi){
@@ -699,7 +930,7 @@ class RoiController extends Controller
             $transport_unit = '<span>元/KG></span>';
         }
         $roi['transport_unit_price'] = $roi['transport_unit_price'].$transport_unit;
-        $roi['billing_period_type'] = $billingPeriods[$roi['billing_period_type']]['name'] . ' (' . $billingPeriods[$roi['billing_period_type']]['days'] . '天)';
+        $roi['billing_period_type'] = $billingPeriods[$roi['billing_period_type']]['name'];
         $estimated_launch_time = $roi['estimated_launch_time'];
         if($estimated_launch_time){
             for($i=1; $i<=12; $i++){
@@ -718,9 +949,7 @@ class RoiController extends Controller
     }
 
     public function store(Request $request){
-        if(!Auth::user()->can(['roi-add'])) die('Permission denied -- roi-add');
         $updateDBData = $this->getUpdateDBData($request);
-
         $user_id = Auth::user()->id;
         $updateDBData['creator'] = $user_id;
         $updateDBData['created_at'] = date('Y-m-d H:i:s');
@@ -743,12 +972,9 @@ class RoiController extends Controller
     }
 
     public function updateRecord(Request $request){
-        if(!Auth::user()->can(['roi-update'])) die('Permission denied -- roi-update');
         $updateDBData = $this->getUpdateDBData($request);
-
-        $user_id = Auth::user()->id;
-
-        $updateDBData['updated_by'] = $user_id;
+        $currentUserId = Auth::user()->id;
+        $updateDBData['updated_by'] = $currentUserId;
         $updateDBData['updated_at'] = date('Y-m-d H:i:s');
         //edit页面表单有隐藏元素roi_id, add页面没有
         $roi_id = $updateDBData['roi_id'];
@@ -756,7 +982,7 @@ class RoiController extends Controller
 
         $edit_history_array = DB::connection('amazon')->table('roi')->where('id', '=', $roi_id)->pluck('edit_history');
         $edit_history = $edit_history_array[0];
-        $updateDBData['edit_history'] = $edit_history.';'.$user_id.','.$updateDBData['updated_at'];
+        $updateDBData['edit_history'] = $edit_history.';'.$currentUserId.','.$updateDBData['updated_at'];
 
         DB::beginTransaction();
         if(!DB::connection('amazon')->table('roi')->where('id', '=', $roi_id)->update($updateDBData)){
@@ -1299,6 +1525,61 @@ class RoiController extends Controller
         }
 
         return json_encode(array('msg' => 'refresh successfullly'));
+    }
+
+    public function isAdmin($userId){
+        $adminUserIds = DB::table('role_user')->where('role_id', '17')->pluck('user_id');
+        $adminUserIds = json_decode(json_encode($adminUserIds),true);
+        if(in_array($userId, $adminUserIds)){
+            return true;
+        }
+        return false;
+    }
+
+    public function isProductDirector($userId){
+        $pdUserIds = DB::table('role_user')->where('role_id', '25')->pluck('user_id');
+        $pdUserIds = json_decode(json_encode($pdUserIds),true);
+        if(in_array($userId, $pdUserIds)){
+            return true;
+        }
+        return false;
+    }
+
+
+    public function isDirectLeader($childId, $checkId)
+    {
+        $groupIds = DB::table('group_detail')->where('user_id', '=', $childId)->pluck('group_id');
+//        $groupIds = DB::table('group_detail')->where('user_id', '=', 98)->pluck('group_id');
+        $groupIds = json_decode(json_encode($groupIds), true);
+        $groupDetails = DB::table('group_detail')->whereIn('group_id', $groupIds)->select('user_id', 'leader', 'group_id')->get();
+        $groupDetails = json_decode(json_encode($groupDetails), true);
+        foreach ($groupDetails as $k => $v) {
+            if ($v['user_id'] == $checkId && $v['leader'] == 1) {
+//                echo $v['user_id'];
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * $collaborators对应roi的collaborators字段的值
+     */
+    public function isExtendedCollaborators($collaborators, $checkId){
+        if($collaborators){
+            $collaboratorsIdArray = explode(',', $collaborators);
+            if(in_array($checkId, $collaboratorsIdArray)){
+                return true;
+            }
+            foreach ($collaboratorsIdArray as $k =>$v){
+                if($this->isDirectLeader($v, $checkId)){
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
 }

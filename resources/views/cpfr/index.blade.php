@@ -353,6 +353,14 @@
 		vertical-align:middle;
 		padding: 0;
 	}
+	.hover_svg{
+		position: absolute;
+		right: -15px;
+		top: 40%;
+	}
+	.hover_svg:hover path{
+		fill: red;
+	}
 </style>
 <link rel="stylesheet" type="text/css" media="all" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-daterangepicker/3.0.5/daterangepicker.min.css" />
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.1/moment.min.js"></script>
@@ -367,7 +375,7 @@
 		<button id="addShipment" class="btn sbold red"> 新建调拨计划
 			<i class="fa fa-plus"></i>
 		</button>
-		<button id="export" class="btn sbold blue"> Export
+		<button id="export" class="btn sbold blue"> 导出
 			<i class="fa fa-download"></i>
 		</button>
 	</div>
@@ -417,8 +425,12 @@
 				<select id="seller_select" onchange="status_filter(this.value,5)"></select>
 			</div>
 			<div class="filter_option">
+				<label for="planner_select">计划员</label>
+				<select id="planner_select" onchange="status_filter(this.value,6)"></select>
+			</div>
+			<div class="filter_option">
 				<label for="status_select">调拨状态</label>
-				<select id="status_select"  onchange="status_filter(this.value,23)">
+				<select id="status_select"  onchange="status_filter(this.value,24)">
 					<option id="" value="">全部</option>
 					<option id="0" value ="资料提供中">资料提供中</option>
 					<option id="1" value ="换标中">换标中</option>
@@ -429,10 +441,10 @@
 			</div>
 			<div class="filter_option">
 				<label for="account_number">账号</label>
-				<select id="account_number" onchange="status_filter(this.value,7)"></select>
+				<select id="account_number" onchange="status_filter(this.value,8)"></select>
 			</div>
 			<div class="filter_option">
-				<label for="">日期</label>
+				<label for="createTimes">提交日期</label>
 				<div class="input-group input-medium" id="createTimes">
 					<span class="input-group-btn">
 					    <button class="btn default date-range-toggle" type="button">
@@ -441,7 +453,18 @@
 					</span>
 				    <input type="text" class="form-control createTimeInput" id="createTimeInput">  
 				</div>
-			</div>		
+			</div>	
+			<div class="filter_option">
+				<label for="adjustreceivedDate">预计到货日期</label>
+				<div class="input-group input-medium" id="adjustreceivedDate">
+					<span class="input-group-btn">
+						<button class="btn default date-range-toggle" type="button">
+							<i class="fa fa-calendar"></i>
+						</button>
+					</span>
+					<input type="text" class="form-control adjustreceivedDateInput" id="adjustreceivedDateInput">  
+				</div>
+			</div>	
 			
 		</div>
 		<div style="height: 70px;">
@@ -458,46 +481,55 @@
 			<div style="position: absolute;left: 130px; z-index: 999;top:0" class="col-md-2">
 				<button type="button" class="btn btn-sm green-meadow batch_operation">批量操作<i class="fa fa-angle-down"></i></button>
 				<ul class="batch_list">
-					<li><button class="btn btn-sm red-sunglo" onclick="statusAjax(0)">待计划确认</button></li>
-					<li><button class="btn btn-sm yellow-crusta" onclick="statusAjax(1)">BU经理审核</button></li>
-					<li><button class="btn btn-sm purple-plum" onclick="statusAjax(2)">BG总监审核</button></li>
-					<li><button class="btn btn-sm green-meadow" onclick="statusAjax(3)">已确认</button></li>
-					<li><button class="btn btn-sm blue-madison" onclick="statusAjax(4)">调拨取消</button></li>
+					<li><button class="btn btn-sm red-sunglo" onclick="statusAjax(0)">BU经理审核</button></li>
+					<li><button class="btn btn-sm yellow-crusta" onclick="statusAjax(1)">BG总经理审核</button></li>
+					<li><button class="btn btn-sm purple-plum" onclick="statusAjax(2)">计划员审核</button></li>
+					<li><button class="btn btn-sm green-meadow" onclick="statusAjax(3)">计划经理确认</button></li>
+					<li><button class="btn btn-sm blue-madison" onclick="statusAjax(4)">取消调拨请求</button></li>
 				</ul>
 			</div>
 			<div class="col-md-5"  style="position: absolute;left: 520px; z-index: 999;top:0">
-				<button type="button" class="btn btn-sm red-sunglo">待计划确认 : <span class="status0">0</span></button>
-				<button type="button" class="btn btn-sm yellow-crusta">BU经理审核 : <span class="status1">0</span></button>
-				<button type="button" class="btn btn-sm purple-plum">BG总监审核 : <span class="status2">0</span></button>
-				<button type="button" class="btn btn-sm green-meadow">已确认 : <span class="status3">0</span></button>
-				<button type="button" class="btn btn-sm blue-madison">调拨取消 : <span class="status4">0</span></button>
+				<button type="button" onclick="status_filter('BU经理审核',20)" class="btn btn-sm red-sunglo">BU经理审核 : <span class="status0">0</span></button>
+				<button type="button" onclick="status_filter('BG总经理审核',20)" class="btn btn-sm yellow-crusta">BG总经理审核 : <span class="status1">0</span></button>
+				<button type="button" onclick="status_filter('计划员审核',20)" class="btn btn-sm purple-plum">计划员审核 : <span class="status2">0</span></button>
+				<button type="button" onclick="status_filter('计划经理确认',20)" class="btn btn-sm green-meadow">计划经理确认 : <span class="status3">0</span></button>
+				<button type="button" onclick="status_filter('取消调拨请求',20)" class="btn btn-sm blue-madison">取消调拨请求 : <span class="status4">0</span></button>
 			</div>
-			<table id="planTable" class="display table-striped table-bordered table-hover">
+			<table id="planTable" class="display table-striped table-bordered table-hover"style="width: 100%;">
 				<thead>
 					<tr style="text-align: center;">
 						<th>BG</th>
 						<th>BU</th>
 						<th>Station</th>
 						<th><input type="checkbox" id="selectAll" name="selectAll" /></th>
-						<th style="width:70px;">提交日期</th>
+						<th style="width:90px;">
+							<div style="position: relative;">
+								提交日期
+								<!-- <div title="123456789" class="hover_svg">
+									<svg t="1588835330500" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2629" width="13" height="13"><path d="M459.364486 360.47352h102.080997v-102.080997h-102.080997v102.080997z m0 408.323988h102.080997V462.554517h-102.080997v306.242991z m51.040498 255.202492c-280.722741 0-510.404984-229.682243-510.404984-510.404984S226.492212 3.190031 510.404984 3.190031s510.404984 229.682243 510.404985 510.404985-229.682243 510.404984-510.404985 510.404984z m0-918.728972C285.507788 105.271028 102.080997 288.697819 102.080997 513.595016S285.507788 921.919003 510.404984 921.919003s408.323988-183.426791 408.323988-408.323987C918.728972 288.697819 735.302181 105.271028 510.404984 105.271028z" p-id="2630" fill="#2c2c2c"></path></svg>
+								</div> -->
+							</div>
+							
+						</th>
 						<th style="width:55px;">销售员</th>
+						<th style="width:55px;">计划员</th>
 						<th style="width:70px;">产品图片</th>
 						<th>账号</th>
 						<th>Seller SKU</th>
 						<th>ASIN <br>SKU</th>
-						<th style="width:95px;">调入工厂仓库</th>
+						<th style="width:95px;">调入工厂</th>
 						<th style="width:70px;">需求数量</th>
 						<th style="width:95px;">期望到货时间</th>
-						<th style="width:80px;">是否贴标签</th>
-						<th style="width:70px;">其它需求</th>
+						<th style="width:80px;">是否贴RMS标签</th>
+						<th style="width:70px;">调拨理由</th>
 						<th style="width:80px;">可维持天数</th>
 						<th style="width:70px;">FBA在库</th>
 						<th style="width:110px;">FBA可维持天数</th>
 						<th style="width:70px;">调拨在途</th>
-						<th style="width:40px;">审核</th>
+						<th style="width:40px;">审核状态</th>
 						<th style="width:100px;">调整需求数量</th>
 						<th style="width:100px;">预计到货时间</th>
-						<th style="width:100px;">调出仓库库位</th>
+						<th style="width:100px;">调出工厂</th>
 						<th style="width:70px;">调拨状态</th>
 						<th style="width:70px;">待办事项</th>
 					</tr>
@@ -526,11 +558,11 @@
 			<div>
 				<label for="audit_status_select" style="display: block;">审核</label>
 				<select name="audit_status_select" disabled="disabled" id="audit_status_select" style="width:100%;height: 28px;margin-bottom: 20px;border: 1px solid rgba(220, 223, 230, 1);">
-					<option value="0">待计划确认</option>
-					<option value="1">BU经理审核</option>
-					<option value="2">BG总监审核</option>
-					<option value="3">已确认</option>
-					<option value="4">调拨取消</option>
+					<option value="0">BU经理审核</option>
+					<option value="1">BG总经理审核</option>
+					<option value="2">计划员审核</option>
+					<option value="3">计划经理确认</option>
+					<option value="4">取消调拨请求</option>
 				</select>
 			</div>
 			
@@ -539,7 +571,7 @@
 					<div>
 						<div class="wrap_one_single">
 							<label for="asin_select">ASIN</label>
-							<input type="text" id="asin_select" class="isSellerDisabled">
+							<input type="text" id="asin_select" value="" class="isSellerDisabled">
 							<span class="errCode">ASIN不能为空!</span>
 						</div>
 						<div class="wrap_one_single">
@@ -591,7 +623,7 @@
 						</div>
 						
 						
-						<label for="">是否贴RMS</label>
+						<label for="">是否贴RMS标签</label>
 						<div>
 							<select name="" id="rms_input" style="border: 1px solid rgba(220, 223, 230, 1); height: 28px;">
 								<option value="1">是</option>
@@ -602,7 +634,7 @@
 					</div>
 				</div>
 				<div style="border-bottom: 1px dashed rgba(220, 223, 230, 1);padding-bottom: 10px;">
-					<label for="" style="display: block;">备注</label>
+					<label for="" style="display: block;">调拨理由</label>
 					<input type="text" id="remarks_input" class="isSellerDisabled" style="width: 100%;margin-bottom: 10px;height: 28px;border: 1px solid rgba(220, 223, 230, 1)">
 				</div>
 				<div class="mask-form" style="padding-top: 10px;">
@@ -735,17 +767,22 @@
 			$('#account_number').val("");
 			$('.keyword').val("");
 			$('.createTimeInput').val("");
+			$('.adjustreceivedDateInput').val("");
 			let val = '';
 			status_filter(val,0);
 			status_filter(val,1);
 			status_filter(val,2);
 			status_filter(val,5);
-			status_filter(val,7);
+			status_filter(val,6);
+			status_filter(val,8);
 			status_filter(val,24);
+			status_filter(val,20)
 			let reqList = {
 				"condition" : '',
 				"date_s": '',
 				"date_e": '',
+				"received_date_s": '',
+				"received_date_e": '',
 			};
 			tableObj.ajax.reload();
 		}
@@ -797,24 +834,38 @@
 		function isShowErrCode(){
 			if($('#audit_status_select').val() == ""){
 				$('#audit_status_select').parent().find('.errCode').show();
+			}else{
+				$('#audit_status_select').parent().find('.errCode').hide();
 			}
 			if($('#sku_select').val() == ""){
 				$('#sku_select').parent().find('.errCode').show();
+			}else{
+				$('#sku_select').parent().find('.errCode').hide();
 			}
 			if($('#asin_select').val() == ""){
 				$('#asin_select').parent().find('.errCode').show();
+			}else{
+				$('#asin_select').parent().find('.errCode').hide();
 			}
 			if($('#seller_sku_select').val() == ""){
 				$('#seller_sku_select').parent().find('.errCode').show();
+			}else{
+				$('#seller_sku_select').parent().find('.errCode').hide();
 			}
 			if($('#warehouse_select').val() == ""){
 				$('#warehouse_select').parent().find('.errCode').show();
+			}else{
+				$('#warehouse_select').parent().find('.errCode').hide();
 			}
 			if($('#quant_select').val() == ""){
 				$('#quant_select').parent().find('.errCode').show();
+			}else{
+				$('#quant_select').parent().find('.errCode').hide();
 			}
 			if($('.maskDate').val() == ""){
 				$('#maskDate').parent().find('.errCode').show();
+			}else{
+				$('#maskDate').parent().find('.errCode').hide();
 			}
 		}
 		$(document).ready(function () {	
@@ -838,6 +889,8 @@
 						label: $('#account_number').val(),
 						date_s: cusstr($('.createTimeInput').val() , ' - ' , 1),
 						date_e: cusstr1($('.createTimeInput').val() , ' - ' , 1),
+						received_date_s: cusstr($('.adjustreceivedDateInput').val() , ' - ' , 1),
+						received_date_e: cusstr1($('.adjustreceivedDateInput').val() , ' - ' , 1),
 						allor_status: $('#status_select').find("option:selected").attr("id"),
 						sx: $("#marketplace_select").val(),
 						ubg: $("#bg_select").val(),
@@ -1179,6 +1232,7 @@
 			})
 			//编辑列表
 			function editTableData(id){
+				
 				$.ajax({
 				    type: "POST",
 					url: "/shipment/detailShipment",
@@ -1217,6 +1271,7 @@
 							$('.estimated_delivery_date_btn').attr('disabled',true).css('background',"#eee");
 							$('.request_date_btn').attr('disabled',true).css('background',"#eee");
 						}
+						
 						$('#audit_status_select').val(res.shipment.status);//审核
 						$('#sku_select').val(res.shipment.sku);//SKU
 						$('#site_select').val(res.shipment.marketplace_id);//站点
@@ -1231,6 +1286,7 @@
 						$('#rms_input').val(res.shipment.rms);//RMS
 						$('#rms_sku_input').val(res.shipment.rms_sku);//RMS_SKU
 						$('#remarks_input').val(res.shipment.remark);//备注
+						isShowErrCode()
 					},
 					error : function(err) {
 						console.log(err)
@@ -1264,6 +1320,8 @@
 							"condition" : $('.keyword').val(),
 							"date_s": cusstr($('.createTimeInput').val() , ' - ' , 1),
 							"date_e": cusstr1($('.createTimeInput').val() , ' - ' , 1),
+							"received_date_s": cusstr($('.adjustreceivedDateInput').val() , ' - ' , 1),
+							"received_date_e": cusstr1($('.adjustreceivedDateInput').val() , ' - ' , 1),
 						};
 						return reqList;
 					},
@@ -1283,6 +1341,12 @@
 						$("#account_number").append("<option value=''>全部</option>");
 						$.each(res[3], function (index, value) {
 							$("#account_number").append("<option value='" + value + "'>" + value + "</option>");
+						})
+						
+						$("#planner_select").empty();
+						$("#planner_select").append("<option value=''>全部</option>");
+						$.each(res[4], function (index, value) {
+							$("#planner_select").append("<option value='" + value + "'>" + value + "</option>");
 						})
 						return res[0];
 					},
@@ -1320,9 +1384,18 @@
 						data: 'name',
 					},
 					{
+						data: 'planning_name',
+					},
+					{
 						data: 'image',
 						render: function(data, type, row, meta) {
-							var content = '<a href="https://'+row.toUrl+'/dp/'+ row.asin +'" target="_blank" style="text-decoration:none"><img src="https://images-na.ssl-images-amazon.com/images/I/'+data+'" alt="" style="display:block; width:60px; height:60px; margin:0 auto"></a>';
+							let img,dot,str;
+							if(row.images != null){
+								str = row.images;
+								dot = str.split(',');
+								dot.length > 1 ? img = 'https://images-na.ssl-images-amazon.com/images/I/' + dot[0] : img = ''
+							}
+							var content = '<a href="https://'+row.toUrl+'/dp/'+ row.asin +'" target="_blank" style="text-decoration:none"><img src="'+img+'" alt="" style="display:block; width:60px; height:60px; margin:0 auto"></a>';
 							return content;
 						},
 					},
@@ -1346,16 +1419,16 @@
 					{
 						data: null,
 						render: function(data, type, row, meta) {
-							var content = '<div style="color:blue;cursor:pointer">'+row.asin +'<br>'+ row.sku+'</div>';
+							var content = '<div style="color:blue;cursor:pointer"><a href="/mrp/edit?asin='+ data.asin +'&marketplace_id='+ row.marketplace_id +'">'+ row.asin +'</a><br><a href="/mrp/edit?sku='+ data.sku +'&marketplace_id='+ row.marketplace_id +'">'+ row.sku+'</a></div>';
 							return content;
 						},
-						createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
+						/* createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
 							$(cell).on( 'click', function () {
 								$('.mask_box').show();
 								$('.formId').val(rowData.id);
 								editTableData(rowData.id); 
 							});
-						}
+						} */
 					},
 					{
 						data: 'warehouse',
@@ -1400,7 +1473,7 @@
 						}
 					},
 					{
-						data: "package",
+						data: "rms_sku",
 						render: function(data, type, row, meta) {
 							var content = '<div style="color:blue;cursor:pointer">'+data +'</div>';
 							return content;
@@ -1434,18 +1507,64 @@
 					{
 						data: "status",
 						render: function(data, type, row, meta) {
-							if(data == 0){ data = '待审核' }
-							else if(data == 1){ data = 'bu审核' }
-							else if(data == 2){ data = 'bg审核' }
-							else if(data == 3){ data = '已确认' }
-							else if(data == 4){ data = '调拨取消' }
-							var content = '<div>'+data+'</div>';
+							if(data == 0){ data = 'BU经理审核' }
+							else if(data == 1){ data = 'BG总经理审核' }
+							else if(data == 2){ data = '计划员审核' }
+							else if(data == 3){ data = '计划经理确认' }
+							else if(data == 4){ data = '取消调拨请求' }
+							var content = '<div style="color:blue;cursor:pointer">'+data+'</div>';
 							return content;
+						},
+						createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
+							$(cell).on( 'click', function () {
+								$('.mask_box').show();
+								$('.formId').val(rowData.id);
+								editTableData(rowData.id); 
+							});
 						}
 					},
-					{ data: "adjustment_quantity" },
-					{ data: "adjustreceived_date" },
-					{ data: "out_warehouse" },
+					{ 
+						data: "adjustment_quantity" ,
+						render: function(data, type, row, meta) {
+							var content = '<div style="color:blue;cursor:pointer">'+data +'</div>';
+							return content;
+						},
+						createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
+							$(cell).on( 'click', function () {
+								$('.mask_box').show();
+								$('.formId').val(rowData.id);
+								editTableData(rowData.id); 
+							});
+						}
+					},
+					{ 
+						data: "adjustreceived_date" ,
+						render: function(data, type, row, meta) {
+							var content = '<div style="color:blue;cursor:pointer">'+data +'</div>';
+							return content;
+						},
+						createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
+							$(cell).on( 'click', function () {
+								$('.mask_box').show();
+								$('.formId').val(rowData.id);
+								editTableData(rowData.id); 
+							});
+						}
+					},
+					{ 
+						data: "out_warehouse" ,
+						render: function(data, type, row, meta) {
+							var content = '<div style="color:blue;cursor:pointer">'+data +'</div>';
+							return content;
+						},
+						createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
+							$(cell).on( 'click', function () {
+								$('.mask_box').show();
+								$('.formId').val(rowData.id);
+								editTableData(rowData.id); 
+							});
+						}
+					},
 					{
 						data: "allor_status",
 						render: function(data, type, row, meta) {
@@ -1488,11 +1607,52 @@
 			}); 
 			//单条选中
 			$("body").on('change','.checkbox-item',function(e){
-				console.log(this.checked) 
 				var $subs = $("input[name='checkedInput']");
 				$("input[name='selectAll']").prop("checked", $subs.length == $subs.filter(":checked").length ? true :false);
 				e.cancelBubble=true;
 			});
+			//预计到货日期
+			$("#adjustreceivedDate").daterangepicker({
+			    opens: "left", //打开的方向，可选值有'left'/'right'/'center'
+			    format: "YYYY-MM-DD",
+				autoUpdateInput: false,
+			    separator: " to ",
+			    startDate: moment(),
+			    endDate: moment(),
+				opens: 'center',
+			    ranges: {
+			        "今天": [moment(), moment()],
+			        "昨天": [moment().subtract( 1,"days"), moment().subtract(1,"days")],
+			        "7天前": [moment().subtract(6,"days"), moment()],
+			        "30天前": [moment().subtract(29,"days"), moment()],
+			        "这个月": [moment().startOf("month"), moment().endOf("month")],
+			        "上个月": [moment().subtract(1,"month").startOf("month"), moment().subtract(1,"month").endOf("month")]
+			    },
+			    locale: {
+			        applyLabel: '确定',
+			        cancelLabel: '取消',
+			        fromLabel: '起始时间',
+			        toLabel: '结束时间',
+			        customRangeLabel: '自定义',
+			        daysOfWeek: ['日', '一', '二', '三', '四', '五', '六'],
+			        monthNames: ['一月', '二月', '三月', '四月', '五月', '六月','七月', '八月', '九月', '十月', '十一月', '十二月'],
+			        firstDay: 1,
+			
+			    },
+				onChangeDateTime:function(dp,$input){
+				}
+			    //minDate: "01/01/2012",
+			    //maxDate: "12/31/2018"
+			}, function (t, e) {
+			    $("#adjustreceivedDate input").val(t.format("YYYY-MM-DD") + " - " + e.format("YYYY-MM-DD"));	
+				let reqList = {
+					"condition" : $('.keyword').val(),
+					"created_at_s": cusstr($('#adjustreceivedDate input').val() , ' - ' , 1),
+					"created_at_e": cusstr1($('#adjustreceivedDate input').val() , ' - ' , 1),
+				};
+				tableObj.ajax.reload();
+			})
+			//提交日期
 			$("#createTimes").daterangepicker({
 			    opens: "left", //打开的方向，可选值有'left'/'right'/'center'
 			    format: "YYYY-MM-DD",
@@ -1575,6 +1735,8 @@
 					"condition" : $('.keyword').val(),
 					"date_s": cusstr($('.createTimeInput').val() , ' - ' , 1),
 					"date_e": cusstr1($('.createTimeInput').val() , ' - ' , 1),
+					"received_date_s": cusstr($('.adjustreceivedDateInput').val() , ' - ' , 1),
+					"received_date_e": cusstr1($('.adjustreceivedDateInput').val() , ' - ' , 1),
 				};
 				tableObj.ajax.reload();
 			})
@@ -1583,6 +1745,8 @@
 					"condition" : $('.keyword').val(),
 					"date_s": cusstr($('.createTimeInput').val() , ' - ' , 1),
 					"date_e": cusstr1($('.createTimeInput').val() , ' - ' , 1),
+					"received_date_s": cusstr($('.adjustreceivedDateInput').val() , ' - ' , 1),
+					"received_date_e": cusstr1($('.adjustreceivedDateInput').val() , ' - ' , 1),
 				};
 				tableObj.ajax.reload();
 			})
