@@ -139,7 +139,7 @@ white-space: nowrap;
 						
 						<a class="pull-right" href="https://{{array_get(getSiteUrl(),$v->marketplace_id)}}/dp/{{$v->asin}}" target="_blank"><i class="fa fa-amazon"></i></a></td>
 						<td>{{((intval($v->buybox_sellerid)>=0)?'OnLine':'OffLine')}}</td>
-						<td>{{(round($v->daily_sales,2)==0)?'∞':date('Y-m-d',strtotime('+'.intval(($v->afn_sellable+$v->afn_reserved)/round($v->daily_sales,2)).'days'))}}</td>
+						<td>{{$v->afn_out_stock_date}}</td>
 						<td>{{round($v->daily_sales,2)}}</td>
 						<td  id="{{$v->asin}}">{{intval($v->quantity)}}</td>
 						<td>{{intval($v->afn_sellable+$v->afn_reserved)}}</td>

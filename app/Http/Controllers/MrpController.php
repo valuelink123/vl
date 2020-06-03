@@ -451,6 +451,7 @@ class MrpController extends Controller
 		$headArray[] = 'Sku';
         $headArray[] = 'Min Purchase';
         $headArray[] = 'W/Sales';
+		$headArray[] = 'TotalSellable';
         $headArray[] = 'TotalPlan';
 		for($i=1;$i<=22;$i++){
         	$headArray[] = date('Y-m-d',strtotime($date.' +'.$i.' weeks monday')-86400*7);
@@ -605,7 +606,7 @@ class MrpController extends Controller
 		$sql = "
         SELECT SQL_CALC_FOUND_ROWS
         	a.*,(sales_4_weeks/28*0.5+sales_2_weeks/14*0.3+sales_1_weeks/7*0.2) as daily_sales,buybox_sellerid,
-afn_sellable,afn_reserved,mfn_sellable,sz_sellable,quantity,sum_estimated_afn,sum_estimated_purchase,out_stock_count,out_stock_date,over_stock_count,over_stock_date,sum_quantity_miss,unsafe_count from (select asin,marketplace_id,any_value(sku) as sku,any_value(status) as status,
+afn_sellable,afn_reserved,mfn_sellable,sz_sellable,quantity,sum_estimated_afn,sum_estimated_purchase,out_stock_count,out_stock_date,over_stock_count,over_stock_date,sum_quantity_miss,unsafe_count,afn_out_stock_date from (select asin,marketplace_id,any_value(sku) as sku,any_value(status) as status,
 any_value(sku_status) as sku_status,any_value(sap_seller_id) as sap_seller_id, 
 any_value(sap_seller_bg) as bg,any_value(sap_seller_bu) as bu from sap_asin_match_sku where sku_status<6 group by asin,marketplace_id) as a
 left join asins as b on a.asin=b.asin and a.marketplace_id=b.marketplaceid
@@ -614,6 +615,7 @@ left join (select a1.asin,a1.marketplace_id,sum(quantity_last) as quantity,
 sum(estimated_afn) as sum_estimated_afn,sum(estimated_purchase) as sum_estimated_purchase,
 sum(IF(afn_sellable+afn_reserved+mfn_sellable-quantity_miss<0,1,0)) as out_stock_count,
 min(IF(afn_sellable+afn_reserved+mfn_sellable-quantity_miss<0,a1.date,NULL)) as out_stock_date,
+min(IF(afn_sellable+afn_reserved-quantity_miss<0,a1.date,NULL)) as afn_out_stock_date,
 sum(IF(afn_sellable+afn_reserved+mfn_sellable-quantity_miss>0 and a1.date>DATE_SUB(curdate(),INTERVAL -120 DAY),1,0)) as over_stock_count,
 min(IF(afn_sellable+afn_reserved+mfn_sellable-quantity_miss>0 and a1.date>DATE_SUB(curdate(),INTERVAL -120 DAY),a1.date,NULL)) as over_stock_date,
 
@@ -641,10 +643,10 @@ on a.asin=c.asin and a.marketplace_id=c.marketplace_id
 			$data[$key]['daily_sales'] = round($val['daily_sales'],2);
 			$data[$key]['quantity'] = intval($val['quantity']);
 			$data[$key]['fba_stock'] = $val['afn_sellable']+$val['afn_reserved'];
-			$data[$key]['fba_stock_keep'] = (round($val['daily_sales'],2)==0)?'∞':date('Y-m-d',strtotime('+'.intval(($val['afn_sellable']+$val['afn_reserved'])/round($val['daily_sales'],2)).'days'));
+			$data[$key]['fba_stock_keep'] = $val['afn_out_stock_date'];
 			$data[$key]['fba_transfer'] = intval($val['sum_estimated_afn']);
 			$data[$key]['fbm_stock'] = intval($val['mfn_sellable']);
-			$data[$key]['stock_keep'] = (round($val['daily_sales'],2)==0)?'∞':date('Y-m-d',strtotime('+'.intval(($val['afn_sellable']+$val['afn_reserved']+$val['mfn_sellable']+$val['sum_estimated_afn'])/round($val['daily_sales'],2)).'days'));
+			$data[$key]['stock_keep'] = $val['out_stock_date'];
 			$data[$key]['sz'] = intval($val['sz_sellable']);
 			$data[$key]['in_make'] = intval($val['sum_estimated_purchase']);
 			$data[$key]['out_stock'] = intval($val['out_stock_count']);
