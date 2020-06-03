@@ -38,6 +38,7 @@ class ShipmentController extends Controller
         /** 超级权限*/
         $ADMIN_EMAIL = Asin::ADMIN_EMAIL;
         $DOMIN_MARKETPLACEID_SX = Asin::DOMIN_MARKETPLACEID_SX;
+        $DOMIN_MARKETPLACEID_URL = Asin::DOMIN_MARKETPLACEID_URL;
         $condition = $request['condition'] ? $request['condition'] : '';
         $date_s = $request['date_s'] ? $request['date_s'] : '';
         $date_e = $request['date_e'] ? $request['date_e'] : '';
@@ -174,7 +175,7 @@ class ShipmentController extends Controller
             if (!in_array($ulist[$value['sap_seller_id']]['name'], $seller)) {
                 $seller[] = $ulist[$value['sap_seller_id']]['name'];
             }
-
+            $shipmentList[$key]['toUrl'] = $DOMIN_MARKETPLACEID_URL[$value['marketplace_id']];
         }
 
         $sql_group = 'SELECT status,COUNT(id) as count_num from shipment_requests GROUP BY status=0,status=1,status=2,status=3,status=4';
@@ -510,7 +511,7 @@ class ShipmentController extends Controller
                     ->update($data);
                 if ($result > 0) {
                     //已确认 状态 添加到 调拨进度表 allot_progress 表
-                    if (@$request['status'] == 4 && $id > 0) {
+                    if (@$request['status'] == 3 && $id > 0) {
                         $data = ['shipment_requests_id' => $id, 'created_at' => date('Y-m-d H:i:s', time())];
                         DB::connection('vlz')->table('allot_progress')->insert($data);
                     }
