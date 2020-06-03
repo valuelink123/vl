@@ -435,35 +435,42 @@ class ShipmentController extends Controller
      */
     public function detailShipment(Request $request)
     {
-        //$user = Auth::user()->toArray();// todo
+        $user = Auth::user()->toArray();//todo
         $DOMIN_MARKETPLACEID_SX = Asin::DOMIN_MARKETPLACEID_SX;
         $sku = null;
         $role = 0;
-        $user = [
-            'email' => 'test@qq.com',
-            'id' => '159',
-            'sap_seller_id' => ''
-        ];//todo 只用于测试  删除
+
         /** 超级权限*/
         $ADMIN_EMAIL = Asin::ADMIN_EMAIL;
-        if (!empty($user['email']) && !empty($user)) {
-            if (in_array($user['email'], $ADMIN_EMAIL) || $user['sap_seller_id'] > 0) {
-                /**  销售角色 */
-                $role = 1;
-            } else {
-                //role_id = 23 代表 计划员
-                $roleUser = DB::table('role_user')->select('user_id')
-                    ->where('user_id', $user['id'])
-                    ->where('role_id', 23)
-                    ->get()->map(function ($value) {
-                        return (array)$value;
-                    })->toArray();
-                if (!empty($roleUser)) {
-                    /** 计划员角色  */
-                    $role = 2;
+        if (!empty($user)) {
+            if (!empty($user['email']) && in_array($user['email'], $ADMIN_EMAIL)) {
+                /**  特殊权限着 查询所有用户 */
+                $role = 4;
+            } else if ($user['ubu'] != '' || $user['ubg'] != '' || $user['seller_rules'] != '') {
+                if ($user['ubu'] == '' && $user['ubg'] != '' && $user['seller_rules'] != '') {
+                    /**查询所有BG下面员工*/
+                    $role = 3;
+                } else if ($user['ubu'] != '' && $user['seller_rules'] == '') {
+                    /**此条件为 普通销售*/
+                    $role = 1;
+                } else if ($user['ubu'] != '' && $user['ubg'] != '' && $user['seller_rules'] != '') {
+                    /**  BU 负责人  */
+                    $role = 5;
                 }
             }
+            //role_id = 23 代表 计划员
+            $roleUser = DB::table('role_user')->select('user_id')
+                ->where('user_id', $user['id'])
+                ->where('role_id', 23)
+                ->get()->map(function ($value) {
+                    return (array)$value;
+                })->toArray();
+            if (!empty($roleUser)) {
+                /** 计划员角色  */
+                $role = 2;
+            }
         }
+
         if (!empty($request['id']) && $request['id'] > 0) {
             $sql = "SELECT marketplace_id,out_warehouse,id,`status`,sku,asin,seller_sku,sap_warehouse_code,sap_factory_code,quantity,received_date,rms,rms_sku,package,remark,adjustment_quantity,adjustreceived_date from shipment_requests WHERE id =" . $request['id'];
             $shipment = DB::connection('vlz')->select($sql);
