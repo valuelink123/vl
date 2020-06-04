@@ -97,8 +97,7 @@ table.dataTable thead th, table.dataTable thead td {
                     <div class="col-md-2">
                         <div class="input-group">
                             <span class="input-group-addon">SKU状态</span>
-                            <select  class="form-control"  id="sku_status" name="sku_status">
-                                <option value="">Select</option>
+                            <select  class="mt-multiselect btn btn-default " multiple="multiple" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true"  id="sku_status" name="sku_status">
                                 @foreach(getSkuStatuses() as $key=>$val)
                                     <option value="{!! $key !!}">{!! $val !!}</option>
                                 @endforeach
