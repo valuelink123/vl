@@ -180,7 +180,7 @@ class ShipmentController extends Controller
             $shipmentList[$key]['warehouse'] = $value['sap_factory_code'];
             $shipmentList[$key]['image'] = explode(',', $value['images'])[0];
             $shipmentList[$key]['allot'] = @$allotIdList[$value['id']] ? $allotIdList[$value['id']] : 0;
-            if (!in_array($ulist[$value['sap_seller_id']]['name'], $seller)) {
+            if (!in_array(@$ulist[$value['sap_seller_id']]['name'], $seller)) {
                 if (!empty($ulist[$value['sap_seller_id']]['name'])) {
                     if(!empty($ulist[$value['sap_seller_id']]['name'])){
                         if (!in_array($ulist[$value['sap_seller_id']]['name'], $seller)) {
