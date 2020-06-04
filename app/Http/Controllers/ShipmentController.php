@@ -173,8 +173,8 @@ class ShipmentController extends Controller
         }
         foreach ($shipmentList as $key => $value) {
             $shipmentList[$key]['name'] = @$ulist[$value['sap_seller_id']]['name'];
-            $shipmentList[$key]['ubu'] = $ulist[$value['sap_seller_id']]['ubu'];
-            $shipmentList[$key]['ubg'] = $ulist[$value['sap_seller_id']]['ubg'];
+            $shipmentList[$key]['ubu'] = @$ulist[$value['sap_seller_id']]['ubu'];
+            $shipmentList[$key]['ubg'] = @$ulist[$value['sap_seller_id']]['ubg'];
             $shipmentList[$key]['domin_sx'] = @$DOMIN_MARKETPLACEID_SX[$value['marketplace_id']];
             //$value['sap_warehouse_code'] . '-' .
             $shipmentList[$key]['warehouse'] = $value['sap_factory_code'];
@@ -182,7 +182,11 @@ class ShipmentController extends Controller
             $shipmentList[$key]['allot'] = @$allotIdList[$value['id']] ? $allotIdList[$value['id']] : 0;
             if (!in_array($ulist[$value['sap_seller_id']]['name'], $seller)) {
                 if (!empty($ulist[$value['sap_seller_id']]['name'])) {
-                    $seller[] = $ulist[$value['sap_seller_id']]['name'];
+                    if(!empty($ulist[$value['sap_seller_id']]['name'])){
+                        if (!in_array($ulist[$value['sap_seller_id']]['name'], $seller)) {
+                            $seller[] = $ulist[$value['sap_seller_id']]['name'];
+                        }
+                    }
                 }
             }
             $shipmentList[$key]['toUrl'] = @$DOMIN_MARKETPLACEID_URL[$value['marketplace_id']];
