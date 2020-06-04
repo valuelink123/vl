@@ -138,7 +138,9 @@ class ShipmentController extends Controller
         if (!empty($shipmentList)) {
             foreach ($shipmentList as $key => $value) {
                 if (!in_array($value['sap_seller_id'], $sap_seller_id_list)) {
-                    $sap_seller_id_list[] = $value['sap_seller_id'];
+                    if($value['sap_seller_id']>0){
+                        $sap_seller_id_list[] = $value['sap_seller_id'];
+                    }
                 }
                 if (!in_array($value['label'], $labelList)) {
                     if (!empty($value['label'])) {
