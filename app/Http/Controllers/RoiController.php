@@ -208,13 +208,12 @@ class RoiController extends Controller
     public function create(Request $request)
     {
         $sites = $this->getSites();
-        $users = $this->getUsers();
+        $availableUsers = $this->getAvailableUsers();
         $billingPeriods = $this->getBillingPeriods();
         $transportModes = $this->getTransportModes();
         $currency_rates = $this->getCurrencyRates();
 
-
-        return view('roi/add',compact('sites', 'users', 'billingPeriods','transportModes','currency_rates'));
+        return view('roi/add',compact('sites', 'availableUsers', 'billingPeriods','transportModes','currency_rates'));
     }
 
     public function export(Request $request)
@@ -691,6 +690,7 @@ class RoiController extends Controller
         }
 
         $users = $this->getUsers();
+        $availableUsers = $this->getAvailableUsers();
         //编辑限制：其中一个用户编辑时，另一个用户只能查看。编辑用户关闭浏览器（标签）前未保存，则过$expiry_time = 70s后其他用户可编辑。
         $roi_id = $id;
         //$expiry_time 略大于edit页面ajax刷新时间60s
@@ -765,7 +765,8 @@ class RoiController extends Controller
             $pair = explode(",",$value);
             $edit_history_array[] = array('user_name'=>array_get($users, $pair[0]), 'updated_at'=>$pair[1]);
         }
-        return view('roi/edit',compact('sites', 'users', 'billingPeriods','transportModes', 'roi', 'edit_history_array', 'currency_rates'));
+
+        return view('roi/edit',compact('sites', 'availableUsers', 'billingPeriods','transportModes', 'roi', 'edit_history_array', 'currency_rates'));
     }
 
     public function copy(Request $request){
@@ -1513,6 +1514,11 @@ class RoiController extends Controller
 
     public function getUsers(){
         return User::pluck('name','id');
+    }
+
+    //目前在职的
+    public function getAvailableUsers(){
+        return User::where('locked', '=',0)->pluck('name','id');
     }
 
     public function roiRefreshTime(Request $req){

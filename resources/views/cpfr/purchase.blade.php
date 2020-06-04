@@ -342,7 +342,7 @@
 		</button>
 	</div>
 	<div class="content">
-		<div class="filter_box">
+		<!-- <div class="filter_box">
 			<div class="filter_option">
 				<label for="">日期</label>
 				<div class="input-group input-medium" id="createTimes">
@@ -363,8 +363,19 @@
 				</select>
 			</div>
 			
-		</div>
+		</div> -->
 		<div class="filter_box">
+			<div class="filter_option">
+				<label for="">日期</label>
+				<div class="input-group input-medium" id="createTimes">
+					<span class="input-group-btn">
+						<button class="btn default date-range-toggle" type="button">
+							<i class="fa fa-calendar"></i>
+						</button>
+					</span>
+					<input type="text" class="form-control createTimeInput" id="createTimeInput">  
+				</div>
+			</div>	
 			<div class="filter_option">
 				<label for="marketplace_select">站点</label>
 				<select id="marketplace_select" onchange="status_filter(this.value,2)">
@@ -410,6 +421,12 @@
 					<option value ="">全部</option>
 				</select>
 			</div>
+			<div class="filter_option">
+				<label for="planner_select">计划员</label>
+				<select id="planner_select" onchange="status_filter(this.value,17)">
+					<option value ="">全部</option>
+				</select>
+			</div>
 			<div class="filter_option search_box">
 				<label for="">搜索</label>
 				<input type="text" class="keyword" placeholder="Search by ASIN, SKU, or keywords">
@@ -437,14 +454,14 @@
 					</ul>
 				</div>
 				<div class="col-md-6"  style="position: absolute;left: 520px; z-index: 999;top:0">
-					<button type="button" class="btn btn-sm red-sunglo">审核中 : <span class="status0"></span></button>
-					<button type="button" class="btn btn-sm yellow-crusta">生产中 : <span class="status1"></span></button>
-					<button type="button" class="btn btn-sm purple-plum">分拣中 : <span class="status2"></span></button>
-					<button type="button" class="btn btn-sm blue-hoki">已出库 : <span class="status3"></span></button>
-					<button type="button" class="btn btn-sm blue-madison">已签收 : <span class="status4"></span></button>
-					<button type="button" class="btn btn-sm green-meadow">已完成 : <span class="status5"></span></button>
+					<button type="button" onclick="status_filter('审核中',16)" class="btn btn-sm red-sunglo">审核中 : <span class="status0"></span></button>
+					<button type="button" onclick="status_filter('生产中',16)" class="btn btn-sm yellow-crusta">生产中 : <span class="status1"></span></button>
+					<button type="button" onclick="status_filter('分拣中',16)" class="btn btn-sm purple-plum">分拣中 : <span class="status2"></span></button>
+					<button type="button" onclick="status_filter('已出库',16)" class="btn btn-sm blue-hoki">已出库 : <span class="status3"></span></button>
+					<button type="button" onclick="status_filter('已签收',16)" class="btn btn-sm blue-madison">已签收 : <span class="status4"></span></button>
+					<button type="button" onclick="status_filter('已完成',16)" class="btn btn-sm green-meadow">已完成 : <span class="status5"></span></button>
 				</div>
-	            <table class="table table-striped table-bordered" id="purchasetable">
+	            <table class="table table-striped table-bordered" id="purchasetable" style="width:100%">
 	                <thead>
 	                <tr>
 						<th>BG</th>
@@ -463,7 +480,7 @@
 	                    <th style="width:75px; text-align:center;">加权日均</th>
 	                    <th style="width:120px; text-align:center;">到货后预计日销<div style="text-align: center;">(PCS)</div></th>
 	                    <th style="width:55px; text-align:center;">利润率</th>
-	                    <th style="width:75px; text-align:center;">审核结果</th>
+	                    <th style="width:75px; text-align:center;">审核状态</th>
 	                    <th style="width:55px; text-align:center;">计划员</th>
 	                    <th>MOQ</th>
 	                    <th style="width:75px; text-align:center;">收货工厂</th>
@@ -594,12 +611,13 @@
 		$('#status_select').val("");
 		$('.keyword').val("");
 		$('#createTimeInput').val("");
+		$('#planner_select').val("");
 		let val = '';
 		status_filter(val,0);
 		status_filter(val,1);
 		status_filter(val,2);
 		status_filter(val,5);
-		status_filter(val,7);
+		status_filter(val,17);
 		let reqList = {
 			"condition" : '',
 			"date_s": '',
