@@ -45,8 +45,8 @@ class GetReview extends Command
     {
 		
         $time =  $this->argument('time');
-        if(!$time) $time = '3days';
-		$date_from=date('Y-m-d',strtotime('-'.$time));		
+        if(!$time) $time = '1days';
+		$date_from=date('Y-m-d H:i:s',strtotime('-'.$time));		
 		$words = getReviewWarnWords();
 		$reviewList = DB::connection('review_new')->query('SET NAMES latin1');
 		$reviewList = DB::connection('review_new')->select("
