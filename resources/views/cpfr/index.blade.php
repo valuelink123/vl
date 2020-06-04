@@ -357,8 +357,13 @@
 		position: absolute;
 		right: -15px;
 		top: 40%;
+		cursor: pointer;
 	}
-	.hover_svg:hover path{
+	.mask_hover_svg{
+		cursor: pointer;
+		margin-left: 5px
+	}
+	.hover_svg:hover path,.mask_hover_svg:hover path{
 		fill: red;
 	}
 </style>
@@ -502,15 +507,7 @@
 						<th>BU</th>
 						<th>Station</th>
 						<th><input type="checkbox" id="selectAll" name="selectAll" /></th>
-						<th style="width:90px;">
-							<div style="position: relative;">
-								提交日期
-								<!-- <div title="123456789" class="hover_svg">
-									<svg t="1588835330500" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2629" width="13" height="13"><path d="M459.364486 360.47352h102.080997v-102.080997h-102.080997v102.080997z m0 408.323988h102.080997V462.554517h-102.080997v306.242991z m51.040498 255.202492c-280.722741 0-510.404984-229.682243-510.404984-510.404984S226.492212 3.190031 510.404984 3.190031s510.404984 229.682243 510.404985 510.404985-229.682243 510.404984-510.404985 510.404984z m0-918.728972C285.507788 105.271028 102.080997 288.697819 102.080997 513.595016S285.507788 921.919003 510.404984 921.919003s408.323988-183.426791 408.323988-408.323987C918.728972 288.697819 735.302181 105.271028 510.404984 105.271028z" p-id="2630" fill="#2c2c2c"></path></svg>
-								</div> -->
-							</div>
-							
-						</th>
+						<th style="width:90px;">提交日期</th>
 						<th style="width:55px;">销售员</th>
 						<th style="width:55px;">计划员</th>
 						<th style="width:70px;">产品图片</th>
@@ -522,15 +519,65 @@
 						<th style="width:95px;">期望到货时间</th>
 						<th style="width:80px;">是否贴RMS标签</th>
 						<th style="width:70px;">调拨理由</th>
-						<th style="width:80px;">可维持天数</th>
-						<th style="width:70px;">FBA在库</th>
-						<th style="width:110px;">FBA可维持天数</th>
-						<th style="width:70px;">调拨在途</th>
+						<th style="width:80px;">
+							<div style="position: relative;">
+								可维持天数
+								<div title="FBA在库+转库中库存+调拨在途的库存总量可满足未来销售计划的天数" class="hover_svg">
+									<svg t="1588835330500" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2629" width="13" height="13"><path d="M459.364486 360.47352h102.080997v-102.080997h-102.080997v102.080997z m0 408.323988h102.080997V462.554517h-102.080997v306.242991z m51.040498 255.202492c-280.722741 0-510.404984-229.682243-510.404984-510.404984S226.492212 3.190031 510.404984 3.190031s510.404984 229.682243 510.404985 510.404985-229.682243 510.404984-510.404985 510.404984z m0-918.728972C285.507788 105.271028 102.080997 288.697819 102.080997 513.595016S285.507788 921.919003 510.404984 921.919003s408.323988-183.426791 408.323988-408.323987C918.728972 288.697819 735.302181 105.271028 510.404984 105.271028z" p-id="2630" fill="#2c2c2c"></path></svg>
+								</div>
+							</div>
+							
+						</th>
+						<th style="width:70px;">
+							<div style="position: relative;">
+								FBA在库
+								<div title="FBA在库=FBA可用库存+转库中库存" class="hover_svg">
+									<svg t="1588835330500" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2629" width="13" height="13"><path d="M459.364486 360.47352h102.080997v-102.080997h-102.080997v102.080997z m0 408.323988h102.080997V462.554517h-102.080997v306.242991z m51.040498 255.202492c-280.722741 0-510.404984-229.682243-510.404984-510.404984S226.492212 3.190031 510.404984 3.190031s510.404984 229.682243 510.404985 510.404985-229.682243 510.404984-510.404985 510.404984z m0-918.728972C285.507788 105.271028 102.080997 288.697819 102.080997 513.595016S285.507788 921.919003 510.404984 921.919003s408.323988-183.426791 408.323988-408.323987C918.728972 288.697819 735.302181 105.271028 510.404984 105.271028z" p-id="2630" fill="#2c2c2c"></path></svg>
+								</div>
+							</div>
+						</th>
+						<th style="width:110px;">
+							<div style="position: relative;">
+								FBA可维持天数
+								<div title="FBA可用库存和转库中库总和可满足的未来销售计划的天数" class="hover_svg">
+									<svg t="1588835330500" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2629" width="13" height="13"><path d="M459.364486 360.47352h102.080997v-102.080997h-102.080997v102.080997z m0 408.323988h102.080997V462.554517h-102.080997v306.242991z m51.040498 255.202492c-280.722741 0-510.404984-229.682243-510.404984-510.404984S226.492212 3.190031 510.404984 3.190031s510.404984 229.682243 510.404985 510.404985-229.682243 510.404984-510.404985 510.404984z m0-918.728972C285.507788 105.271028 102.080997 288.697819 102.080997 513.595016S285.507788 921.919003 510.404984 921.919003s408.323988-183.426791 408.323988-408.323987C918.728972 288.697819 735.302181 105.271028 510.404984 105.271028z" p-id="2630" fill="#2c2c2c"></path></svg>
+								</div>
+							</div>
+						</th>
+						<th style="width:70px;">
+							<div style="position: relative;">
+								调拨在途
+								<div title="在调拨中的数量，包含已审核通过的调拨未出库，和已发货亚马逊还未签收的数量" class="hover_svg">
+									<svg t="1588835330500" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2629" width="13" height="13"><path d="M459.364486 360.47352h102.080997v-102.080997h-102.080997v102.080997z m0 408.323988h102.080997V462.554517h-102.080997v306.242991z m51.040498 255.202492c-280.722741 0-510.404984-229.682243-510.404984-510.404984S226.492212 3.190031 510.404984 3.190031s510.404984 229.682243 510.404985 510.404985-229.682243 510.404984-510.404985 510.404984z m0-918.728972C285.507788 105.271028 102.080997 288.697819 102.080997 513.595016S285.507788 921.919003 510.404984 921.919003s408.323988-183.426791 408.323988-408.323987C918.728972 288.697819 735.302181 105.271028 510.404984 105.271028z" p-id="2630" fill="#2c2c2c"></path></svg>
+								</div>
+							</div>
+						</th>
 						<th style="width:40px;">审核状态</th>
-						<th style="width:100px;">调整需求数量</th>
-						<th style="width:100px;">预计到货时间</th>
+						<th style="width:100px;">
+							<div style="position: relative;">
+								调整需求数量
+								<div title="计划和物流确认后的实际可调拨数量" class="hover_svg">
+									<svg t="1588835330500" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2629" width="13" height="13"><path d="M459.364486 360.47352h102.080997v-102.080997h-102.080997v102.080997z m0 408.323988h102.080997V462.554517h-102.080997v306.242991z m51.040498 255.202492c-280.722741 0-510.404984-229.682243-510.404984-510.404984S226.492212 3.190031 510.404984 3.190031s510.404984 229.682243 510.404985 510.404985-229.682243 510.404984-510.404985 510.404984z m0-918.728972C285.507788 105.271028 102.080997 288.697819 102.080997 513.595016S285.507788 921.919003 510.404984 921.919003s408.323988-183.426791 408.323988-408.323987C918.728972 288.697819 735.302181 105.271028 510.404984 105.271028z" p-id="2630" fill="#2c2c2c"></path></svg>
+								</div>
+							</div>
+						</th>
+						<th style="width:100px;">
+							<div style="position: relative;">
+								预计到货时间
+								<div title="计划和物流确认过的预计到货时间" class="hover_svg">
+									<svg t="1588835330500" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2629" width="13" height="13"><path d="M459.364486 360.47352h102.080997v-102.080997h-102.080997v102.080997z m0 408.323988h102.080997V462.554517h-102.080997v306.242991z m51.040498 255.202492c-280.722741 0-510.404984-229.682243-510.404984-510.404984S226.492212 3.190031 510.404984 3.190031s510.404984 229.682243 510.404985 510.404985-229.682243 510.404984-510.404985 510.404984z m0-918.728972C285.507788 105.271028 102.080997 288.697819 102.080997 513.595016S285.507788 921.919003 510.404984 921.919003s408.323988-183.426791 408.323988-408.323987C918.728972 288.697819 735.302181 105.271028 510.404984 105.271028z" p-id="2630" fill="#2c2c2c"></path></svg>
+								</div>
+							</div>
+						</th>
 						<th style="width:100px;">调出工厂</th>
-						<th style="width:70px;">调拨状态</th>
+						<th style="width:70px;">
+							<div style="position: relative;">
+								调拨状态
+								<div title="该调拨请求的调拨进度，数据来源于物流部" class="hover_svg">
+									<svg t="1588835330500" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2629" width="13" height="13"><path d="M459.364486 360.47352h102.080997v-102.080997h-102.080997v102.080997z m0 408.323988h102.080997V462.554517h-102.080997v306.242991z m51.040498 255.202492c-280.722741 0-510.404984-229.682243-510.404984-510.404984S226.492212 3.190031 510.404984 3.190031s510.404984 229.682243 510.404985 510.404985-229.682243 510.404984-510.404985 510.404984z m0-918.728972C285.507788 105.271028 102.080997 288.697819 102.080997 513.595016S285.507788 921.919003 510.404984 921.919003s408.323988-183.426791 408.323988-408.323987C918.728972 288.697819 735.302181 105.271028 510.404984 105.271028z" p-id="2630" fill="#2c2c2c"></path></svg>
+								</div>
+							</div>
+						</th>
 						<th style="width:70px;">待办事项</th>
 					</tr>
 				</thead>
@@ -585,7 +632,12 @@
 							<span class="errCode">数量不能为空!</span>
 						</div>
 						<div class="wrap_one_single">
-							<label for="">到货时间</label>
+							<label for="">
+								到货时间
+								<span title="期望到货时间，为预计FBA签收时间，需满足销售计划" class="mask_hover_svg">
+									<svg t="1588835330500" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2629" width="13" height="13"><path d="M459.364486 360.47352h102.080997v-102.080997h-102.080997v102.080997z m0 408.323988h102.080997V462.554517h-102.080997v306.242991z m51.040498 255.202492c-280.722741 0-510.404984-229.682243-510.404984-510.404984S226.492212 3.190031 510.404984 3.190031s510.404984 229.682243 510.404985 510.404985-229.682243 510.404984-510.404985 510.404984z m0-918.728972C285.507788 105.271028 102.080997 288.697819 102.080997 513.595016S285.507788 921.919003 510.404984 921.919003s408.323988-183.426791 408.323988-408.323987C918.728972 288.697819 735.302181 105.271028 510.404984 105.271028z" p-id="2630" fill="#2c2c2c"></path></svg>
+								</span>
+							</label>
 							<div class="input-group date date-picker margin-bottom-5 bw9" id="maskDate">
 								<input type="text" class="form-control form-filter input-sm maskDate isSellerDisabled" style="height: 28px;" readonly name="date_from" placeholder="From" value="">
 								<span class="input-group-btn">
@@ -623,7 +675,12 @@
 						</div>
 						
 						
-						<label for="">是否贴RMS标签</label>
+						<label for="rms_input">
+							是否贴RMS标签
+							<span title="是否需要贴RMS标贴，若是，则需要输入标贴物料号" class="mask_hover_svg">
+								<svg t="1588835330500" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2629" width="13" height="13"><path d="M459.364486 360.47352h102.080997v-102.080997h-102.080997v102.080997z m0 408.323988h102.080997V462.554517h-102.080997v306.242991z m51.040498 255.202492c-280.722741 0-510.404984-229.682243-510.404984-510.404984S226.492212 3.190031 510.404984 3.190031s510.404984 229.682243 510.404985 510.404985-229.682243 510.404984-510.404985 510.404984z m0-918.728972C285.507788 105.271028 102.080997 288.697819 102.080997 513.595016S285.507788 921.919003 510.404984 921.919003s408.323988-183.426791 408.323988-408.323987C918.728972 288.697819 735.302181 105.271028 510.404984 105.271028z" p-id="2630" fill="#2c2c2c"></path></svg>
+							</span>
+						</label>
 						<div>
 							<select name="" id="rms_input" style="border: 1px solid rgba(220, 223, 230, 1); height: 28px;">
 								<option value="1">是</option>
@@ -634,17 +691,27 @@
 					</div>
 				</div>
 				<div style="border-bottom: 1px dashed rgba(220, 223, 230, 1);padding-bottom: 10px;">
-					<label for="" style="display: block;">调拨理由</label>
+					<label for="remarks_input" style="display: block;">调拨理由</label>
 					<input type="text" id="remarks_input" class="isSellerDisabled" style="width: 100%;margin-bottom: 10px;height: 28px;border: 1px solid rgba(220, 223, 230, 1)">
 				</div>
 				<div class="mask-form" style="padding-top: 10px;">
 					<div>
 						
-						<label for="">调出工厂</label><input type="text" class="isPlanDisabled" id="out_warehouse_input">
-						<label for="">计划确认数量</label><input type="text" class="isPlanDisabled" id="adjustment_quantity_input">
+						<label for="out_warehouse_input">调出工厂</label><input type="text" class="isPlanDisabled" id="out_warehouse_input">
+						<label for="adjustment_quantity_input">
+							计划确认数量
+							<span title="计划和物流确认后的实际可调拨数量" class="mask_hover_svg">
+								<svg t="1588835330500" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2629" width="13" height="13"><path d="M459.364486 360.47352h102.080997v-102.080997h-102.080997v102.080997z m0 408.323988h102.080997V462.554517h-102.080997v306.242991z m51.040498 255.202492c-280.722741 0-510.404984-229.682243-510.404984-510.404984S226.492212 3.190031 510.404984 3.190031s510.404984 229.682243 510.404985 510.404985-229.682243 510.404984-510.404985 510.404984z m0-918.728972C285.507788 105.271028 102.080997 288.697819 102.080997 513.595016S285.507788 921.919003 510.404984 921.919003s408.323988-183.426791 408.323988-408.323987C918.728972 288.697819 735.302181 105.271028 510.404984 105.271028z" p-id="2630" fill="#2c2c2c"></path></svg>
+							</span>
+						</label><input type="text" class="isPlanDisabled" id="adjustment_quantity_input">
 					</div>
 					<div>
-						<label for="">预计到货时间</label>
+						<label for="arrivalMaskDate">
+							预计到货时间
+							<span title="计划和物流确认过的预计到货时间" class="mask_hover_svg">
+								<svg t="1588835330500" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2629" width="13" height="13"><path d="M459.364486 360.47352h102.080997v-102.080997h-102.080997v102.080997z m0 408.323988h102.080997V462.554517h-102.080997v306.242991z m51.040498 255.202492c-280.722741 0-510.404984-229.682243-510.404984-510.404984S226.492212 3.190031 510.404984 3.190031s510.404984 229.682243 510.404985 510.404985-229.682243 510.404984-510.404985 510.404984z m0-918.728972C285.507788 105.271028 102.080997 288.697819 102.080997 513.595016S285.507788 921.919003 510.404984 921.919003s408.323988-183.426791 408.323988-408.323987C918.728972 288.697819 735.302181 105.271028 510.404984 105.271028z" p-id="2630" fill="#2c2c2c"></path></svg>
+							</span>
+						</label>
 						<div class="input-group date date-picker margin-bottom-5 bw9" id="arrivalMaskDate">
 							<input type="text" class="form-control form-filter input-sm arrivalMaskDate isPlanDisabled" style="height: 28px;" readonly name="date_from" placeholder="From" value="">
 							<span class="input-group-btn">
@@ -1264,13 +1331,19 @@
 							$('.isSellerDisabled').attr('disabled',true).css('background',"#eee");
 							$('.estimated_delivery_date_btn').attr('disabled',false).css('background',"#fff");
 							$('.request_date_btn').attr('disabled',true).css('background',"#eee");
-						}else{
+						}else if(res.shipment.role == 3 || res.shipment.role == 5){
+							$('#audit_status_select').attr('disabled',false).css('background',"#fff");
+							$('.isSellerDisabled').attr('disabled',false).css('background',"#fff");
+							$('.request_date_btn').attr('disabled',false).css('background',"#fff");
+							$('.isPlanDisabled').attr('disabled',true).css('background',"#eee");
+							$('.estimated_delivery_date_btn').attr('disabled',true).css('background',"#eee");
+						}/* else{
 							$('#audit_status_select').attr('disabled',true).css('background',"#eee");
 							$('.isPlanDisabled').attr('disabled',true).css('background',"#eee");
 							$('.isSellerDisabled').attr('disabled',true).css('background',"#eee");
 							$('.estimated_delivery_date_btn').attr('disabled',true).css('background',"#eee");
 							$('.request_date_btn').attr('disabled',true).css('background',"#eee");
-						}
+						} */
 						
 						$('#audit_status_select').val(res.shipment.status);//审核
 						$('#sku_select').val(res.shipment.sku);//SKU

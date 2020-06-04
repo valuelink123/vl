@@ -34,9 +34,25 @@ class ShipmentController extends Controller
      */
     public function index(Request $request)
     {
-        //$user = Auth::user()->toArray();// todo
         /** 超级权限*/
         $ADMIN_EMAIL = Asin::ADMIN_EMAIL;
+       // $user = Auth::user()->toArray();// todo
+//        if (!empty($user['email']) && in_array($user['email'], $ADMIN_EMAIL)) {
+//            /**  特殊权限着 查询所有用户 */
+//            $role = 4;
+//        } else if ($user['ubu'] != '' || $user['ubg'] != '' || $user['seller_rules'] != '') {
+//            if ($user['ubu'] == '' && $user['ubg'] != '' && $user['seller_rules'] != '') {
+//                /**查询所有BG下面员工*/
+//                $role = 3;
+//            } else if ($user['ubu'] != '' && $user['seller_rules'] == '') {
+//                /**此条件为 普通销售*/
+//                $role = 1;
+//            } else if ($user['ubu'] != '' && $user['ubg'] != '' && $user['seller_rules'] != '') {
+//                /**  BU 负责人  */
+//                $role = 5;
+//            }
+//        }
+
         $DOMIN_MARKETPLACEID_SX = Asin::DOMIN_MARKETPLACEID_SX;
         $DOMIN_MARKETPLACEID_URL = Asin::DOMIN_MARKETPLACEID_URL;
         $condition = $request['condition'] ? $request['condition'] : '';
@@ -55,23 +71,6 @@ class ShipmentController extends Controller
         $ids = $request['ids'] ? $request['ids'] : '';
         $role = 0;//角色
         $sap_seller_id_list = $ulist = $allotIdList = $seller = $labelList = $statusList = $planer=[];
-        if (!empty($user)) {
-            if (!empty($user['email']) && in_array($user['email'], $ADMIN_EMAIL)) {
-                /**  特殊权限着 查询所有用户 */
-                $role = 4;
-            } else if ($user['ubu'] != '' || $user['ubg'] != '' || $user['seller_rules'] != '') {
-                if ($user['ubu'] == '' && $user['ubg'] != '' && $user['seller_rules'] != '') {
-                    /**查询所有BG下面员工*/
-                    $role = 3;
-                } else if ($user['ubu'] != '' && $user['seller_rules'] == '') {
-                    /**此条件为 普通销售*/
-                    $role = 1;
-                } else if ($user['ubu'] != '' && $user['ubg'] != '' && $user['seller_rules'] != '') {
-                    /**  BU 负责人  */
-                    $role = 2;
-                }
-            }
-        }
         $sql = 'SELECT
                 sh.id,
                 sh.sap_seller_id,
@@ -439,7 +438,11 @@ class ShipmentController extends Controller
         $DOMIN_MARKETPLACEID_SX = Asin::DOMIN_MARKETPLACEID_SX;
         $sku = null;
         $role = 0;
-
+//        $user = [
+//            'email' => 'test@qq.com',
+//            'id' => '159',
+//            'sap_seller_id' => ''
+//        ];//todo 只用于测试  删除
         /** 超级权限*/
         $ADMIN_EMAIL = Asin::ADMIN_EMAIL;
         if (!empty($user)) {
