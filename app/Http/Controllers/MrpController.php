@@ -556,10 +556,10 @@ class MrpController extends Controller
 			$data[$key]['daily_sales'] = round($val['daily_sales'],2);
 			$data[$key]['quantity'] = intval($val['quantity']);
 			$data[$key]['fba_stock'] = $val['afn_sellable']+$val['afn_reserved'];
-			$data[$key]['fba_stock_keep'] = (round($val['daily_sales'],2)==0)?'∞':date('Y-m-d',strtotime('+'.intval(($val['afn_sellable']+$val['afn_reserved'])/round($val['daily_sales'],2)).'days'));
+			$data[$key]['fba_stock_keep'] = ($val['afn_out_stock_date'])?date('Y-m-d',strtotime($val['afn_out_stock_date'])-86400):'';
 			$data[$key]['fba_transfer'] = intval($val['sum_estimated_afn']);
 			$data[$key]['fbm_stock'] = intval($val['mfn_sellable']);
-			$data[$key]['stock_keep'] = (round($val['daily_sales'],2)==0)?'∞':date('Y-m-d',strtotime('+'.intval(($val['afn_sellable']+$val['afn_reserved']+$val['mfn_sellable']+$val['sum_estimated_afn'])/round($val['daily_sales'],2)).'days'));
+			$data[$key]['stock_keep'] = ($val['out_stock_date'])?date('Y-m-d',strtotime($val['out_stock_date'])-86400):'';
 			$data[$key]['sz'] = intval($val['sz_sellable']);
 			$data[$key]['in_make'] = intval($val['sum_estimated_purchase']);
 			$data[$key]['out_stock'] = intval($val['out_stock_count']);
@@ -643,10 +643,10 @@ on a.asin=c.asin and a.marketplace_id=c.marketplace_id
 			$data[$key]['daily_sales'] = round($val['daily_sales'],2);
 			$data[$key]['quantity'] = intval($val['quantity']);
 			$data[$key]['fba_stock'] = $val['afn_sellable']+$val['afn_reserved'];
-			$data[$key]['fba_stock_keep'] = $val['afn_out_stock_date'];
+			$data[$key]['fba_stock_keep'] = ($val['afn_out_stock_date'])?date('Y-m-d',strtotime($val['afn_out_stock_date'])-86400):'';
 			$data[$key]['fba_transfer'] = intval($val['sum_estimated_afn']);
 			$data[$key]['fbm_stock'] = intval($val['mfn_sellable']);
-			$data[$key]['stock_keep'] = $val['out_stock_date'];
+			$data[$key]['stock_keep'] = ($val['out_stock_date'])?date('Y-m-d',strtotime($val['out_stock_date'])-86400):'';
 			$data[$key]['sz'] = intval($val['sz_sellable']);
 			$data[$key]['in_make'] = intval($val['sum_estimated_purchase']);
 			$data[$key]['out_stock'] = intval($val['out_stock_count']);
