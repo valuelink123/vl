@@ -57,7 +57,7 @@ class MrpController extends Controller
 			$where .=" and (a.asin='".array_get($search,'keyword')."' or a.sku='".array_get($search,'keyword')."')";
 		}
 		
-		if(array_get($search,'sku_status')){
+		if(isset($search['sku_status'])){
 			$where .=" and a.sku_status in (".array_get($search,'sku_status').")";
 		}
 		
@@ -122,7 +122,7 @@ class MrpController extends Controller
 			$where .=" and (a.asin='".array_get($search,'keyword')."' or a.sku='".array_get($search,'keyword')."')";
 		}
 		
-		if(array_get($search,'sku_status')){
+		if(isset($search['sku_status'])){
 			$where .=" and a.sku_status in (".array_get($search,'sku_status').")";
 		}
 		
@@ -251,9 +251,12 @@ class MrpController extends Controller
 			
 			$asin_plans = AsinSalesPlan::selectRaw('YEARWEEK(date,3) as wdate,sum(quantity_last) as quantity_last,sum(quantity_first) as quantity_first,any_value(remark) as remark')->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('date','>=',$date_from)->where('date','<=',$date_to)->groupBy(['wdate'])->get()->keyBy('wdate')->toArray();
 			
-			$estimated_shipment_datas = ShipmentRequest::selectRaw('sum(quantity) as quantity,YEARWEEK(received_date,3) as date')->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('received_date','>=',$date_from)->where('received_date','<=',$date_to)->where('shipment_completed',0)->whereNotNull('shipment_id')->groupBy(['date'])->pluck('quantity','date');
+			$estimated_shipment_datas = ShipmentRequest::selectRaw('sum(quantity) as quantity,YEARWEEK(received_date,3) as date')->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('received_date','>=',$date_from)->where('received_date','<=',$date_to)->where('shipment_completed',0)->whereNotNull('shipment_id')->where('status','<>',4)->groupBy(['date'])->pluck('quantity','date');
 			
-			$actual_shipment_datas = ShipmentRequest::selectRaw('sum(quantity) as quantity,YEARWEEK(received_date,3) as date')->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('received_date','>=',$date_from)->where('received_date','<=',$date_to)->where('shipment_completed',1)->groupBy(['date'])->pluck('quantity','date');
+			
+			$mrp_datas = ShipmentRequest::selectRaw('sum(quantity) as quantity,YEARWEEK(received_date,3) as date')->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('received_date','>=',$date_from)->where('received_date','<=',$date_to)->where('status','<>',4)->groupBy(['date'])->pluck('quantity','date');
+
+			$actual_shipment_datas = ShipmentRequest::selectRaw('sum(quantity) as quantity,YEARWEEK(received_date,3) as date')->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('received_date','>=',$date_from)->where('received_date','<=',$date_to)->where('shipment_completed',1)->whereNotNull('shipment_id')->where('status','<>',4)->groupBy(['date'])->pluck('quantity','date');
 		
 			$estimated_purchase_datas = SapPurchase::selectRaw('sum(quantity) as quantity,YEARWEEK(estimated_delivery_date,3) as date')->where('sku',$sku)->where('estimated_delivery_date','>=',$date_from)->where('estimated_delivery_date','<=',$date_to)->whereNull('actual_delivery_date')->groupBy(['date'])->pluck('quantity','date');
 			
@@ -275,6 +278,7 @@ class MrpController extends Controller
 					'actual_purchase'=>intval(array_get($actual_purchase_datas,$tmp_date_from,0)),
 					'estimated_afn'=>intval(array_get($estimated_shipment_datas,$tmp_date_from,0)),
 					'actual_afn'=>intval(array_get($actual_shipment_datas,$tmp_date_from,0)),
+					'mrp'=>intval(array_get($mrp_datas,$tmp_date_from,0)),
 				];
 				$tmp_date_from = date('oW',strtotime($date_from.' +'.$oW.' week'));;
 			}
@@ -285,9 +289,12 @@ class MrpController extends Controller
 			
 			$asin_plans = AsinSalesPlan::selectRaw("DATE_FORMAT(date,'%Y-%m') as wdate,sum(quantity_last) as quantity_last,sum(quantity_first) as quantity_first,any_value(remark) as remark")->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('date','>=',$date_from)->where('date','<=',$date_to)->groupBy(['wdate'])->get()->keyBy('wdate')->toArray();
 			
-			$estimated_shipment_datas = ShipmentRequest::selectRaw("sum(quantity) as quantity,DATE_FORMAT(received_date,'%Y-%m') as date")->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('received_date','>=',$date_from)->where('received_date','<=',$date_to)->where('shipment_completed',0)->whereNotNull('shipment_id')->groupBy(['date'])->pluck('quantity','date');
+			$estimated_shipment_datas = ShipmentRequest::selectRaw("sum(quantity) as quantity,DATE_FORMAT(received_date,'%Y-%m') as date")->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('received_date','>=',$date_from)->where('received_date','<=',$date_to)->where('shipment_completed',0)->where('status','<>',4)->whereNotNull('shipment_id')->groupBy(['date'])->pluck('quantity','date');
 			
-			$actual_shipment_datas = ShipmentRequest::selectRaw("sum(quantity) as quantity,DATE_FORMAT(received_date,'%Y-%m') as date")->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('received_date','>=',$date_from)->where('received_date','<=',$date_to)->where('shipment_completed',1)->groupBy(['date'])->pluck('quantity','date');
+			
+			$mrp_datas = ShipmentRequest::selectRaw("sum(quantity) as quantity,DATE_FORMAT(received_date,'%Y-%m') as date")->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('received_date','>=',$date_from)->where('received_date','<=',$date_to)->where('status','<>',4)->groupBy(['date'])->pluck('quantity','date');
+			
+			$actual_shipment_datas = ShipmentRequest::selectRaw("sum(quantity) as quantity,DATE_FORMAT(received_date,'%Y-%m') as date")->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('received_date','>=',$date_from)->where('received_date','<=',$date_to)->where('shipment_completed',1)->whereNotNull('shipment_id')->where('status','<>',4)->groupBy(['date'])->pluck('quantity','date');
 		
 			$estimated_purchase_datas = SapPurchase::selectRaw("sum(quantity) as quantity,DATE_FORMAT(estimated_delivery_date,'%Y-%m') as date")->where('sku',$sku)->where('estimated_delivery_date','>=',$date_from)->where('estimated_delivery_date','<=',$date_to)->whereNull('actual_delivery_date')->groupBy(['date'])->pluck('quantity','date');
 			
@@ -307,6 +314,7 @@ class MrpController extends Controller
 					'actual_purchase'=>intval(array_get($actual_purchase_datas,$tmp_date_from,0)),
 					'estimated_afn'=>intval(array_get($estimated_shipment_datas,$tmp_date_from,0)),
 					'actual_afn'=>intval(array_get($actual_shipment_datas,$tmp_date_from,0)),
+					'mrp'=>intval(array_get($mrp_datas,$tmp_date_from,0)),
 				];
 				$tmp_date_from = date('Y-m',strtotime($tmp_date_from.'-01 +1 month'));
 			}
@@ -317,12 +325,12 @@ class MrpController extends Controller
 			
 			$asin_plans = AsinSalesPlan::where($type,${$type})->where('marketplace_id',$marketplace_id)->where('date','>=',$date_from)->where('date','<=',$date_to)->get()->keyBy('date')->toArray();
 			
-			$estimated_shipment_datas = ShipmentRequest::selectRaw("sum(quantity) as quantity,received_date as date")->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('received_date','>=',$date_from)->where('received_date','<=',$date_to)->where('shipment_completed',0)->whereNotNull('shipment_id')->groupBy(['date'])->pluck('quantity','date');
+			$estimated_shipment_datas = ShipmentRequest::selectRaw("sum(quantity) as quantity,received_date as date")->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('received_date','>=',$date_from)->where('received_date','<=',$date_to)->where('shipment_completed',0)->whereNotNull('shipment_id')->where('status','<>',4)->groupBy(['date'])->pluck('quantity','date');
 			
 			
-			$mrp_datas = ShipmentRequest::selectRaw("sum(quantity) as quantity,received_date as date")->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('received_date','>=',$date_from)->where('received_date','<=',$date_to)->where('shipment_completed',0)->whereNotNull('shipment_id')->groupBy(['date'])->pluck('quantity','date');
+			$mrp_datas = ShipmentRequest::selectRaw("sum(quantity) as quantity,received_date as date")->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('received_date','>=',$date_from)->where('received_date','<=',$date_to)->where('status','<>',4)->groupBy(['date'])->pluck('quantity','date');
 			
-			$actual_shipment_datas = ShipmentRequest::selectRaw("sum(quantity) as quantity,received_date as date")->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('received_date','>=',$date_from)->where('received_date','<=',$date_to)->where('shipment_completed',1)->groupBy(['date'])->pluck('quantity','date');
+			$actual_shipment_datas = ShipmentRequest::selectRaw("sum(quantity) as quantity,received_date as date")->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('received_date','>=',$date_from)->where('received_date','<=',$date_to)->where('shipment_completed',1)->whereNotNull('shipment_id')->where('status','<>',4)->groupBy(['date'])->pluck('quantity','date');
 		
 			$estimated_purchase_datas = SapPurchase::selectRaw("sum(quantity) as quantity,estimated_delivery_date as date")->where('sku',$sku)->where('estimated_delivery_date','>=',$date_from)->where('estimated_delivery_date','<=',$date_to)->whereNull('actual_delivery_date')->groupBy(['date'])->pluck('quantity','date');
 			
@@ -340,6 +348,7 @@ class MrpController extends Controller
 					'actual_purchase'=>intval(array_get($actual_purchase_datas,$tmp_date_from,0)),
 					'estimated_afn'=>intval(array_get($estimated_shipment_datas,$tmp_date_from,0)),
 					'actual_afn'=>intval(array_get($actual_shipment_datas,$tmp_date_from,0)),
+					'mrp'=>intval(array_get($mrp_datas,$tmp_date_from,0)),
 				];
 				$tmp_date_from = date('Y-m-d',strtotime($tmp_date_from)+86400);
 			}

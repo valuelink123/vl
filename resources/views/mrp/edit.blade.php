@@ -353,7 +353,7 @@ white-space: nowrap;
 								<td>{{($v['actual_purchase']>0)?$v['actual_purchase']:''}}</td>
 								<td>{{($v['estimated_afn']>0)?$v['estimated_afn']:''}}</td>
 								<td>{{($v['actual_afn']>0)?$v['actual_afn']:''}}</td>
-								<td>{{($v['estimated_afn']>0)?$v['estimated_afn']:''}}</td>
+								<td>{{($v['mrp']>0)?$v['mrp']:''}}</td>
 								
 								<td>
 								<?php
