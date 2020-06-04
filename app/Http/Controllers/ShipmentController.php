@@ -172,7 +172,7 @@ class ShipmentController extends Controller
             }
         }
         foreach ($shipmentList as $key => $value) {
-            $shipmentList[$key]['name'] = $ulist[$value['sap_seller_id']]['name'];
+            $shipmentList[$key]['name'] = @$ulist[$value['sap_seller_id']]['name'];
             $shipmentList[$key]['ubu'] = $ulist[$value['sap_seller_id']]['ubu'];
             $shipmentList[$key]['ubg'] = $ulist[$value['sap_seller_id']]['ubg'];
             $shipmentList[$key]['domin_sx'] = @$DOMIN_MARKETPLACEID_SX[$value['marketplace_id']];
