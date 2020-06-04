@@ -145,7 +145,7 @@ class MrpController extends Controller
 		$siteCode = array_flip(getSiteCode());
 		$sellers = getUsers('sap_seller');
 		foreach ($datas as $key => $val) {
-			$min_purchase_quantity = intval(SapPurchaseRecord::where('sku',$val['sku'])->where('sap_factory_code','<>','')->whereNotIn('supplier',['CN01',,'WH01','HK03'])->orderBy('created_date','desc')->value('min_purchase_quantity'));
+			$min_purchase_quantity = intval(SapPurchaseRecord::where('sku',$val['sku'])->where('sap_factory_code','<>','')->whereNotIn('supplier',['CN01','WH01','HK03'])->orderBy('created_date','desc')->value('min_purchase_quantity'));
 			$data_placement ='top';
 			if($key<4) $data_placement='bottom';
 			$asin_plans = AsinSalesPlan::SelectRaw('sum(quantity_last) as quantity,week_date')->where($type,$val[$type])->where('marketplace_id',$val['marketplace_id'])->where('date','>=',$date_from)->where('date','<=',$date_to)->groupBy(['week_date'])->get()->keyBy('week_date')->toArray();
@@ -228,7 +228,7 @@ class MrpController extends Controller
 			}
 		}
 		$sku_info = SapSkuSite::where('sku',$sku)->where('marketplace_id',$marketplace_id)->whereRaw("(".implode(' or ',$add_where).")")->first()->toArray();
-		$sku_purchase_info = SapPurchaseRecord::where('sku',$sku)->where('sap_factory_code','<>','')->whereNotIn('supplier',['CN01',,'WH01','HK03'])->orderBy('created_date','desc')->first();
+		$sku_purchase_info = SapPurchaseRecord::where('sku',$sku)->where('sap_factory_code','<>','')->whereNotIn('supplier',['CN01','WH01','HK03'])->orderBy('created_date','desc')->first();
 		$sku_info['min_purchase_quantity'] = empty($sku_purchase_info)?0:$sku_purchase_info->min_purchase_quantity;
 		$sku_info['estimated_cycle'] = empty($sku_purchase_info)?0:$sku_purchase_info->estimated_cycle;
 		$sku_info['international_transport_time'] = InternationalTransportTime::where('factory_code',array_get(getMarketplaceCode(),$marketplace_id.'.fba_factory_warehouse.0.sap_factory_code'))->where('is_default',1)->value('total_days');
@@ -464,7 +464,7 @@ class MrpController extends Controller
 			$key++;
 			$asin_plans = AsinSalesPlan::SelectRaw('sum(quantity_last) as quantity,week_date')->where('asin',$val['asin'])->where('marketplace_id',$val['marketplace_id'])->where('date','>=',$date_from)->where('date','<=',$date_to)->groupBy(['week_date'])->get()->keyBy('week_date')->toArray();
 			
-			$min_purchase_quantity = intval(SapPurchaseRecord::where('sku',$val['sku'])->where('sap_factory_code','<>','')->whereNotIn('supplier',['CN01',,'WH01','HK03'])->orderBy('created_date','desc')->value('min_purchase_quantity'));
+			$min_purchase_quantity = intval(SapPurchaseRecord::where('sku',$val['sku'])->where('sap_factory_code','<>','')->whereNotIn('supplier',['CN01','WH01','HK03'])->orderBy('created_date','desc')->value('min_purchase_quantity'));
 			$data[$key]['seller'] = array_get($sellers,$val['sap_seller_id']);
 			$data[$key]['asin'] = $val['asin'];
 			$data[$key]['site'] = array_get($siteCode,$val['marketplace_id']);
