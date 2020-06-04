@@ -139,7 +139,7 @@
                 {{--boostrap-select多选下拉框选中多个值，只会传递最后一个值到后台。这里用一个隐藏的输入框保存多选值--}}
                 <input type="text" id="collaborators" name="collaborators" hidden />
                 <select class="selectpicker show-tick form-control" multiple id="collaboratorsSelect" data-width="205px" title="请选择..." data-selected-text-format="count" data-live-search="true">
-                    @foreach ($users as $key => $value)
+                    @foreach ($availableUsers as $key => $value)
                         <option value="{{$key}}">{{$value}}</option>
                     @endforeach
                 </select>
@@ -566,7 +566,6 @@
 
 <script type="text/javascript">
     var currency_rates = eval(<?php echo json_encode($currency_rates);?>);
-    var users = eval(<?php echo json_encode($users);?>);
 
     $('#collaboratorsSelect').on('changed.bs.select', function(e) {
         var selected_values = $(this).val();
