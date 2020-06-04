@@ -456,7 +456,7 @@
 					        <i class="fa fa-calendar"></i>
 					    </button>
 					</span>
-				    <input type="text" class="form-control createTimeInput" id="createTimeInput">  
+				    <input type="text" class="form-control createTimeInput" value="-" id="createTimeInput">  
 				</div>
 			</div>	
 			<div class="filter_option">
@@ -467,7 +467,7 @@
 							<i class="fa fa-calendar"></i>
 						</button>
 					</span>
-					<input type="text" class="form-control adjustreceivedDateInput" id="adjustreceivedDateInput">  
+					<input type="text" class="form-control adjustreceivedDateInput" value="-" id="adjustreceivedDateInput">  
 				</div>
 			</div>	
 			
@@ -490,15 +490,17 @@
 					<li><button class="btn btn-sm yellow-crusta" onclick="statusAjax(1)">BG总经理审核</button></li>
 					<li><button class="btn btn-sm purple-plum" onclick="statusAjax(2)">计划员审核</button></li>
 					<li><button class="btn btn-sm green-meadow" onclick="statusAjax(3)">计划经理确认</button></li>
-					<li><button class="btn btn-sm blue-madison" onclick="statusAjax(4)">取消调拨请求</button></li>
+					<li><button type="button" class="btn btn-sm btn-success" onclick="statusAjax(4)">已审批</button></li>
+					<li><button class="btn btn-sm blue-madison" onclick="statusAjax(5)">取消调拨请求</button></li>
 				</ul>
 			</div>
-			<div class="col-md-5"  style="position: absolute;left: 520px; z-index: 999;top:0">
+			<div class="col-md-7"  style="position: absolute;left: 520px; z-index: 999;top:0">
 				<button type="button" onclick="status_filter('BU经理审核',20)" class="btn btn-sm red-sunglo">BU经理审核 : <span class="status0">0</span></button>
 				<button type="button" onclick="status_filter('BG总经理审核',20)" class="btn btn-sm yellow-crusta">BG总经理审核 : <span class="status1">0</span></button>
 				<button type="button" onclick="status_filter('计划员审核',20)" class="btn btn-sm purple-plum">计划员审核 : <span class="status2">0</span></button>
 				<button type="button" onclick="status_filter('计划经理确认',20)" class="btn btn-sm green-meadow">计划经理确认 : <span class="status3">0</span></button>
-				<button type="button" onclick="status_filter('取消调拨请求',20)" class="btn btn-sm blue-madison">取消调拨请求 : <span class="status4">0</span></button>
+				<button type="button" onclick="status_filter('已审批',20)" class="btn btn-sm btn-success">已审批 : <span class="status4">0</span></button>
+				<button type="button" onclick="status_filter('取消调拨请求',20)" class="btn btn-sm blue-madison">取消调拨请求 : <span class="status5">0</span></button>
 			</div>
 			<table id="planTable" class="display table-striped table-bordered table-hover"style="width: 100%;">
 				<thead>
@@ -609,7 +611,8 @@
 					<option value="1">BG总经理审核</option>
 					<option value="2">计划员审核</option>
 					<option value="3">计划经理确认</option>
-					<option value="4">取消调拨请求</option>
+					<option value="4">已审批</option>
+					<option value="5">取消调拨请求</option>
 				</select>
 			</div>
 			
@@ -833,8 +836,8 @@
 			$('#status_select').val("");
 			$('#account_number').val("");
 			$('.keyword').val("");
-			$('.createTimeInput').val("");
-			$('.adjustreceivedDateInput').val("");
+			$("#createTimes input").val(''+ " - " + '');
+			$("#adjustreceivedDate input").val(''+ " - " + '');
 			let val = '';
 			status_filter(val,0);
 			status_filter(val,1);
@@ -1274,8 +1277,6 @@
 						}
 					});
 				}
-				
-				
 			})
 			
 			//时间选择器
@@ -1404,6 +1405,7 @@
 						$('.status2').text(res[1].status2);
 						$('.status3').text(res[1].status3);
 						$('.status4').text(res[1].status4);
+						$('.status5').text(res[1].status5);
 						$("#seller_select").empty();
 						$("#seller_select").append("<option value=''>全部</option>");
 						$.each(res[2], function (index, value) {
@@ -1584,7 +1586,8 @@
 							else if(data == 1){ data = 'BG总经理审核' }
 							else if(data == 2){ data = '计划员审核' }
 							else if(data == 3){ data = '计划经理确认' }
-							else if(data == 4){ data = '取消调拨请求' }
+							else if(data == 4){ data = '已审批' }
+							else if(data == 5){ data = '取消调拨请求' }
 							var content = '<div style="color:blue;cursor:pointer">'+data+'</div>';
 							return content;
 						},
@@ -1686,13 +1689,18 @@
 			});
 			//预计到货日期
 			$("#adjustreceivedDate").daterangepicker({
-			    opens: "left", //打开的方向，可选值有'left'/'right'/'center'
+			    opens: 'left',
 			    format: "YYYY-MM-DD",
-				autoUpdateInput: false,
+			    autoUpdateInput: true,
+			    timePicker: true,
 			    separator: " to ",
-			    startDate: moment(),
-			    endDate: moment(),
-				opens: 'center',
+			    showISOWeekNumbers: false,
+			    autoApply: false,
+			    showDropdowns: false,
+			    showWeekNumbers: false,
+			    alwaysShowCalendars: true,
+			    linkedCalendars: true,
+			    showCustomRangeLabel: true,
 			    ranges: {
 			        "今天": [moment(), moment()],
 			        "昨天": [moment().subtract( 1,"days"), moment().subtract(1,"days")],
@@ -1716,57 +1724,85 @@
 				}
 			    //minDate: "01/01/2012",
 			    //maxDate: "12/31/2018"
-			}, function (t, e) {
-			    $("#adjustreceivedDate input").val(t.format("YYYY-MM-DD") + " - " + e.format("YYYY-MM-DD"));	
+			}, function (start, end) {
+				var s = start.format('YYYY-MM-DD');
+				var e = end.format('YYYY-MM-DD');
+				var t = s + ' 至 ' + e;
+				if (start._isValid == false && end._isValid == false) {
+					s = "";
+					e = "";
+					t ="请选择日期范围"
+					$("#adjustreceivedDate input").val(''+ " - " + '');
+				}else{
+					$("#adjustreceivedDate input").val(s + " - " + e);
+				}
 				let reqList = {
-					"condition" : $('.keyword').val(),
-					"created_at_s": cusstr($('#adjustreceivedDate input').val() , ' - ' , 1),
-					"created_at_e": cusstr1($('#adjustreceivedDate input').val() , ' - ' , 1),
+				   	"condition" : $('.keyword').val(),
+				   	"date_s": cusstr($('.createTimeInput').val() , ' - ' , 1),
+				   	"date_e": cusstr1($('.createTimeInput').val() , ' - ' , 1),
+				   	"received_date_s": cusstr($('.adjustreceivedDateInput').val() , ' - ' , 1),
+				   	"received_date_e": cusstr1($('.adjustreceivedDateInput').val() , ' - ' , 1),
 				};
-				tableObj.ajax.reload();
+				tableObj.ajax.reload(); 	 
 			})
 			//提交日期
 			$("#createTimes").daterangepicker({
-			    opens: "left", //打开的方向，可选值有'left'/'right'/'center'
-			    format: "YYYY-MM-DD",
-				autoUpdateInput: false,
-			    separator: " to ",
-			    startDate: moment(),
-			    endDate: moment(),
-				opens: 'center',
-			    ranges: {
-			        "今天": [moment(), moment()],
-			        "昨天": [moment().subtract( 1,"days"), moment().subtract(1,"days")],
-			        "7天前": [moment().subtract(6,"days"), moment()],
-			        "30天前": [moment().subtract(29,"days"), moment()],
-			        "这个月": [moment().startOf("month"), moment().endOf("month")],
-			        "上个月": [moment().subtract(1,"month").startOf("month"), moment().subtract(1,"month").endOf("month")]
-			    },
-			    locale: {
-			        applyLabel: '确定',
-			        cancelLabel: '取消',
-			        fromLabel: '起始时间',
-			        toLabel: '结束时间',
-			        customRangeLabel: '自定义',
-			        daysOfWeek: ['日', '一', '二', '三', '四', '五', '六'],
-			        monthNames: ['一月', '二月', '三月', '四月', '五月', '六月','七月', '八月', '九月', '十月', '十一月', '十二月'],
-			        firstDay: 1,
-			
-			    },
+				opens: 'left',
+				format: "YYYY-MM-DD",
+				autoUpdateInput: true,
+				timePicker: true,
+				separator: " to ",
+				showISOWeekNumbers: false,
+				autoApply: false,
+				showDropdowns: false,
+				showWeekNumbers: false,
+				alwaysShowCalendars: true,
+				linkedCalendars: true,
+				showCustomRangeLabel: true,
+				ranges: {
+				    "今天": [moment(), moment()],
+				    "昨天": [moment().subtract( 1,"days"), moment().subtract(1,"days")],
+				    "7天前": [moment().subtract(6,"days"), moment()],
+				    "30天前": [moment().subtract(29,"days"), moment()],
+				    "这个月": [moment().startOf("month"), moment().endOf("month")],
+				    "上个月": [moment().subtract(1,"month").startOf("month"), moment().subtract(1,"month").endOf("month")]
+				},
+				locale: {
+				    applyLabel: '确定',
+				    cancelLabel: '取消',
+				    fromLabel: '起始时间',
+				    toLabel: '结束时间',
+				    customRangeLabel: '自定义',
+				    daysOfWeek: ['日', '一', '二', '三', '四', '五', '六'],
+				    monthNames: ['一月', '二月', '三月', '四月', '五月', '六月','七月', '八月', '九月', '十月', '十一月', '十二月'],
+				    firstDay: 1,
+							
+				},
 				onChangeDateTime:function(dp,$input){
 				}
-			    //minDate: "01/01/2012",
-			    //maxDate: "12/31/2018"
-			}, function (t, e) {
-			    $("#createTimes input").val(t.format("YYYY-MM-DD") + " - " + e.format("YYYY-MM-DD"));	
+				//minDate: "01/01/2012",
+				//maxDate: "12/31/2018"
+			},function (start, end) {
+				var s = start.format('YYYY-MM-DD');
+				var e = end.format('YYYY-MM-DD');
+				var t = s + ' 至 ' + e;
+				if (start._isValid == false && end._isValid == false) {
+					s = "";
+					e = "";
+					t ="请选择日期范围"
+					$("#createTimes input").val(''+ " - " + '');
+				}else{
+					$("#createTimes input").val(s + " - " + e);
+				}
 				let reqList = {
-					"condition" : $('.keyword').val(),
-					"created_at_s": cusstr($('#createTimes input').val() , ' - ' , 1),
-					"created_at_e": cusstr1($('#createTimes input').val() , ' - ' , 1),
+				   	"condition" : $('.keyword').val(),
+				   	"date_s": cusstr($('.createTimeInput').val() , ' - ' , 1),
+				   	"date_e": cusstr1($('.createTimeInput').val() , ' - ' , 1),
+				   	"received_date_s": cusstr($('.adjustreceivedDateInput').val() , ' - ' , 1),
+				   	"received_date_e": cusstr1($('.adjustreceivedDateInput').val() , ' - ' , 1),
 				};
-				tableObj.ajax.reload();
-			})
-			
+				tableObj.ajax.reload(); 	 
+			})    
 			//截取字符前面的
 			function cusstr(str, findStr, num){
 				if(str.length > 0){
