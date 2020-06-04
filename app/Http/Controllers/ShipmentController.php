@@ -138,7 +138,7 @@ class ShipmentController extends Controller
         if (!empty($shipmentList)) {
             foreach ($shipmentList as $key => $value) {
                 if (!in_array($value['sap_seller_id'], $sap_seller_id_list)) {
-                    if($value['sap_seller_id']>0){
+                    if ($value['sap_seller_id'] > 0) {
                         $sap_seller_id_list[] = $value['sap_seller_id'];
                     }
                 }
@@ -182,7 +182,7 @@ class ShipmentController extends Controller
             $shipmentList[$key]['allot'] = @$allotIdList[$value['id']] ? $allotIdList[$value['id']] : 0;
             if (!in_array(@$ulist[$value['sap_seller_id']]['name'], $seller)) {
                 if (!empty($ulist[$value['sap_seller_id']]['name'])) {
-                    if(!empty($ulist[$value['sap_seller_id']]['name'])){
+                    if (!empty($ulist[$value['sap_seller_id']]['name'])) {
                         if (!in_array($ulist[$value['sap_seller_id']]['name'], $seller)) {
                             $seller[] = $ulist[$value['sap_seller_id']]['name'];
                         }
@@ -444,12 +444,7 @@ class ShipmentController extends Controller
         $DOMIN_MARKETPLACEID_SX = Asin::DOMIN_MARKETPLACEID_SX;
         $sku = null;
         $role = 0;
-//        $user = [
-//            'email' => 'test@qq.com',
-//            'id' => '159',
-//            'sap_seller_id' => ''
-//        ];//todo 只用于测试  删除
-        $user = Auth::user()->toArray();//todo
+        $user = Auth::user()->toArray();
         /** 超级权限*/
         $ADMIN_EMAIL = Asin::ADMIN_EMAIL;
         if (!empty($user)) {
@@ -573,10 +568,10 @@ class ShipmentController extends Controller
         }
 
         if ($id > 0) {
-            if (($old_status == 0)&&($old_status == $new_status||$new_status == 5)) {
+            if (($old_status == 0) && ($old_status == $new_status || $new_status == 5)) {
                 //状态不变 只是内容修改  或者   取消
                 $boole = true;
-            } else if (($old_status == 0)&&(($new_status == 1 && ($role == 5||$role == 3))||($new_status == 5 && ($role == 5||$role == 3)))) {
+            } else if (($old_status == 0) && (($new_status == 1 && ($role == 5 || $role == 3)) || ($new_status == 5 && ($role == 5 || $role == 3)))) {
                 //状态修改为1 或者 取消
                 $boole = true;
             } else if (($old_status == 1 && $new_status == 2 && $role = 3) || ($old_status == 1 && $new_status == 1 && $role = 3) || ($old_status == 1 && $new_status == 5 && $role = 3)) {
@@ -710,7 +705,7 @@ class ShipmentController extends Controller
             if (($old_status == 0 && $old_status == $new_status) || ($old_status == 0 && $new_status == 5)) {
                 //状态不变 只是内容修改  或者   取消
                 $boole = true;
-            } else if (($old_status == 0 && $new_status == 1 && $role == 5)|| ($old_status == 0 && $new_status == 5 && $role = 5)) {
+            } else if (($old_status == 0 && $new_status == 1 && $role == 5) || ($old_status == 0 && $new_status == 5 && $role = 5)) {
                 //状态修改为1 或者 取消
                 $boole = true;
             } else if (($old_status == 1 && $new_status == 2 && $role = 3) || ($old_status == 1 && $new_status == 1 && $role = 3) || ($old_status == 1 && $new_status == 5 && $role = 3)) {
@@ -726,7 +721,7 @@ class ShipmentController extends Controller
                 //最大权限 任何操作
                 $boole = true;
             }
-            if($boole==true){
+            if ($boole == true) {
                 $data = ['status' => $new_status];
                 $result = DB::connection('vlz')->table('shipment_requests')
                     ->whereIn('id', $idList)
@@ -736,7 +731,7 @@ class ShipmentController extends Controller
                 } else {
                     $r_message = ['status' => 0, 'msg' => '更新失败'];
                 }
-            }else{
+            } else {
                 $r_message = ['status' => 0, 'msg' => '该角色权限不够'];
             }
 
@@ -1337,7 +1332,12 @@ class ShipmentController extends Controller
                 a.height,
                 a.transportation,
                 a.pallets,
-                a.pallets_size
+                a.pallets_size,
+                a.length,
+                a.box_num,
+                a.pcs_box,
+                a.pcs,
+                a.weight_box
             FROM
                 allot_progress AS a
             LEFT JOIN shipment_requests AS s ON s.id = a.shipment_requests_id where 1=1 ";
@@ -1426,23 +1426,25 @@ class ShipmentController extends Controller
         if ($downLoad > 0) {
             echo
                 'shipment_requests_id,' .
-                '需求提交日期,' .
+                '登记时间,' .
                 '调拨状态,' .
-                '销售员,' .
                 '发货批号,' .
-                '调出仓库,' .
+                'Shippment ID,' .
                 '亚马逊账号,' .
                 'SKU,' .
-                '调拔数量,' .
-                'RMS标贴SKU,' .
-                '发货方式,' .
-                'Shippment ID,' .
-                '跟踪号/单据号,' .
+                'Qty调拔数量,' .
+                'New Barcode,' .
+                '箱数,' .
+                '单箱数量,' .
+                '总数量,' .
+                '单箱重量,' .
+                '长（IN）,' .
                 '宽（IN）,' .
                 '高(IN）,' .
-                '运输方式transportation,' .
                 '卡板号pallets,' .
-                '打板尺寸,' .
+                '打板尺寸(in)pallets size,' .
+                '发货方式,' .
+                '跟踪号/单据号,' .
                 "\r\n" . "\r\n";
             if (!empty($allot_progress)) {
                 foreach ($allot_progress as $ak => $av) {
@@ -1450,21 +1452,23 @@ class ShipmentController extends Controller
                         '"' . @$av['shipment_requests_id'] . '",' .
                         '"' . @$av['created_at'] . '",' .
                         '"' . $statusList[@$av['status']] . '",' .
-                        '"' . @$av['name'] . '",' .
                         '"' . @$av['batch_num'] . '",' .
-                        '"' . @$av['out_warehouse'] . '",' .
+                        '"' . @$av['shippment_id'] . '",' .
                         '"' . @$av['label'] . '",' .
                         '"' . @$av['sku'] . '",' .
                         '"' . @$av['quantity'] . '",' .
-                        '"' . @$av['rms_sku'] . '",' .
-                        '"' . @$av['shipping_method'] . '",' .
-                        '"' . @$av['shippment_id'] . '",' .
-                        '"' . @$av['receipts_num'] . '",' .
+                        '"' . @$av['barcode'] . '",' .
+                        '"' . @$av['box_num'] . '",' .
+                        '"' . @$av['pcs_box'] . '",' .
+                        '"' . @$av['pcs'] . '",' .
+                        '"' . @$av['weight_box'] . '",' .
+                        '"' . @$av['length'] . '",' .
                         '"' . @$av['width'] . '",' .
                         '"' . @$av['height'] . '",' .
-                        '"' . @$av['transportation'] . '",' .
                         '"' . @$av['pallets'] . '",' .
                         '"' . @$av['pallets_size'] . '",' .
+                        '"' . @$av['shipping_method'] . '",' .
+                        '"' . @$av['receipts_num'] . '",' .
                         "\r\n";
                 }
                 exit;
@@ -1615,6 +1619,59 @@ class ShipmentController extends Controller
     }
 
     /**
+     * ShippmentID 修改
+     * @param Request $request
+     * @return array|mixed
+     */
+    public function upShippmentID(Request $request)
+    {
+        $id = $request['id'] ? $request['id'] : 0;
+        $shippment_id = $request['shippment_id'] ? $request['shippment_id'] : '';
+        $r_message = [];
+        if ($id > 0 && !empty($shippment_id)) {
+            $data = ['shippment_id' => $shippment_id];
+            $result = DB::connection('vlz')->table('allot_progress')
+                ->where('id', $id)
+                ->update($data);
+            if ($result) {
+                $r_message = ['status' => 1, 'msg' => '修改成功'];
+            } else {
+                $r_message = ['status' => 0, 'msg' => '修改失败'];
+            }
+        } else {
+            $r_message = ['status' => 0, 'msg' => '缺少shippment_id或id'];
+        }
+        return $r_message;
+    }
+
+    /**
+     * 修改 跟踪号/单据号
+     * @param Request $request
+     * @return array
+     */
+    public function upReceiptsNum(Request $request)
+    {
+        $id = $request['id'] ? $request['id'] : 0;
+        $receipts_num = $request['receipts_num'] ? $request['receipts_num'] : '';
+        $r_message = [];
+        if ($id > 0 && !empty($receipts_num)) {
+            $data = ['receipts_num' => $receipts_num];
+            $result = DB::connection('vlz')->table('allot_progress')
+                ->where('id', $id)
+                ->update($data);
+            if ($result) {
+                $r_message = ['status' => 1, 'msg' => '修改成功'];
+            } else {
+                $r_message = ['status' => 0, 'msg' => '修改失败'];
+            }
+        } else {
+            $r_message = ['status' => 0, 'msg' => '缺少receipts_num或id'];
+        }
+        return $r_message;
+    }
+
+
+    /**
      * @param Request $request
      * @return array
      * 批量更新 调拨 状态
@@ -1687,7 +1744,12 @@ class ShipmentController extends Controller
                 a.height,
                 a.transportation,
                 a.pallets,
-                a.pallets_size
+                a.pallets_size,
+                a.length,
+                a.box_num,
+                a.pcs_box,
+                a.pcs,
+                a.weight_box
             FROM
                 allot_progress AS a
             LEFT JOIN shipment_requests AS s ON s.id = a.shipment_requests_id where 1=1 ";
@@ -1752,48 +1814,198 @@ class ShipmentController extends Controller
             }
         }
         echo
-            '需求提交日期,' .
+            'shipment_requests_id,' .
+            '登记时间,' .
             '调拨状态,' .
-            '销售员,' .
             '发货批号,' .
-            '调出仓库,' .
+            'Shippment ID,' .
             '亚马逊账号,' .
             'SKU,' .
-            '调拔数量,' .
-            'RMS标贴SKU,' .
-            '发货方式,' .
-            'Shippment ID,' .
-            '跟踪号/单据号,' .
+            'Qty调拔数量,' .
+            'New Barcode,' .
+            '箱数,' .
+            '单箱数量,' .
+            '总数量,' .
+            '单箱重量,' .
+            '长（IN）,' .
             '宽（IN）,' .
             '高(IN）,' .
-            '运输方式transportation,' .
             '卡板号pallets,' .
-            '打板尺寸,' .
+            '打板尺寸(in)pallets size,' .
+            '发货方式,' .
+            '跟踪号/单据号,' .
             "\r\n" . "\r\n";
         if (!empty($allot_progress)) {
             foreach ($allot_progress as $ak => $av) {
                 echo
+                    '"' . @$av['shipment_requests_id'] . '",' .
                     '"' . @$av['created_at'] . '",' .
                     '"' . $statusList[@$av['status']] . '",' .
-                    '"' . @$av['name'] . '",' .
                     '"' . @$av['batch_num'] . '",' .
-                    '"' . @$av['out_warehouse'] . '",' .
+                    '"' . @$av['shippment_id'] . '",' .
                     '"' . @$av['label'] . '",' .
                     '"' . @$av['sku'] . '",' .
                     '"' . @$av['quantity'] . '",' .
-                    '"' . @$av['rms_sku'] . '",' .
-                    '"' . @$av['shipping_method'] . '",' .
-                    '"' . @$av['shippment_id'] . '",' .
-                    '"' . @$av['receipts_num'] . '",' .
+                    '"' . @$av['barcode'] . '",' .
+                    '"' . @$av['box_num'] . '",' .
+                    '"' . @$av['pcs_box'] . '",' .
+                    '"' . @$av['pcs'] . '",' .
+                    '"' . @$av['weight_box'] . '",' .
+                    '"' . @$av['length'] . '",' .
                     '"' . @$av['width'] . '",' .
                     '"' . @$av['height'] . '",' .
-                    '"' . @$av['transportation'] . '",' .
                     '"' . @$av['pallets'] . '",' .
                     '"' . @$av['pallets_size'] . '",' .
+                    '"' . @$av['shipping_method'] . '",' .
+                    '"' . @$av['receipts_num'] . '",' .
                     "\r\n";
             }
             exit;
         }
     }
 
+    /**
+     * @param Request $request
+     * 调拨进度页面修改调拨计划
+     */
+    public function upShipment2(Request $request)
+    {
+        $boole = false;
+        $id = @$request['id'];
+        $r_message = $old_shipment = [];
+        $role_id = $role='';
+        $user = Auth::user()->toArray();//todo
+       // $user['id']=49;
+        /** 超级权限*/
+        $ADMIN_EMAIL = Asin::ADMIN_EMAIL;
+        if (!empty($user)) {
+            $roleUser = DB::table('role_user')->select('user_id', 'role_id')
+                ->where('user_id', @$user['id'])
+                ->get()->map(function ($value) {
+                    return (array)$value;
+                })->toArray();
+            if (!empty($roleUser)) {
+                $role_id = $roleUser[0]['role_id'];
+                if ($role_id == 23) {
+                    /** 计划员角色  */
+                    $role = 2;
+                } else if ($role_id == 31) {
+                    /** 计划 经理 */
+                    $role = 6;
+                } else if ($role_id == 20) {
+                    /** 物流操作员 */
+                    $role = 7;
+                }
+            }
+        }
+        if ($id > 0) {
+            if ($role == 4 || $role == 6 || $role == 7 || $role == 2) {
+                //最大权限 任何操作
+                $boole = true;
+            }
+            if ($boole == true) {
+                $data = [
+                    'out_warehouse' => @$request['out_warehouse'],
+                    'adjustment_quantity' => @$request['adjustment_quantity'],
+                    'adjustreceived_date' => @$request['adjustreceived_date'],
+                    'updated_at' => date('Y-m-d H:i:s', time())
+                ];
+                if (!empty($data)) {
+                    $result = DB::connection('vlz')->table('shipment_requests')
+                        ->where('id', $id)
+                        ->update($data);
+                    if ($result > 0) {
+                        $r_message = ['status' => 1, 'msg' => '更新成功'];
+                    } else {
+                        $r_message = ['status' => 0, 'msg' => '更新失败'];
+                    }
+                }
+            } else {
+                $r_message = ['status' => 0, 'msg' => '该角色权限不够'];
+            }
+
+        } else {
+            $r_message = ['status' => 0, 'msg' => '缺少ID'];
+        }
+        return $r_message;
+    }
+
+    /**
+     * @param Request $request
+     * 修改计划数量
+     */
+    public function upAdjustmentQquantity(Request $request)
+    {
+        $boole = false;
+        $id = @$request['id'];
+        $r_message = $old_shipment = [];
+        $role_id =$role='';
+        $user = Auth::user()->toArray();
+        /** 超级权限*/
+        $ADMIN_EMAIL = Asin::ADMIN_EMAIL;
+        if (!empty($user)) {
+            if (!empty($user['email']) && in_array($user['email'], $ADMIN_EMAIL)) {
+                /**  特殊权限着 查询所有用户 */
+                $role = 4;
+            } else if ($user['ubu'] != '' || $user['ubg'] != '' || $user['seller_rules'] != '') {
+                if ($user['ubu'] == '' && $user['ubg'] != '' && $user['seller_rules'] != '') {
+                    /**查询所有BG下面员工*/
+                    $role = 3;
+                } else if ($user['ubu'] != '' && $user['seller_rules'] == '') {
+                    /**此条件为 普通销售*/
+                    $role = 1;
+                } else if ($user['ubu'] != '' && $user['ubg'] != '' && $user['seller_rules'] != '') {
+                    /**  BU 负责人  */
+                    $role = 5;
+                }
+            } else {
+                $roleUser = DB::table('role_user')->select('user_id', 'role_id')
+                    ->where('user_id', @$user['id'])
+                    ->get()->map(function ($value) {
+                        return (array)$value;
+                    })->toArray();
+                if (!empty($roleUser)) {
+                    $role_id = $roleUser[0]['role_id'];
+                    if ($role_id == 23) {
+                        /** 计划员角色  */
+                        $role = 2;
+                    } else if ($role_id == 31) {
+                        /** 计划 经理 */
+                        $role = 6;
+                    } else if ($role_id == 20) {
+                        /** 物流操作员 */
+                        $role = 7;
+                    }
+                }
+            }
+        }
+        if ($id > 0) {
+            if ($role == 4 || $role == 6 || $role == 7 || $role == 2) {
+                //最大权限 任何操作
+                $boole = true;
+            }
+            if ($boole == true) {
+                $data = [
+                    'adjustment_quantity' => @$request['adjustment_quantity'],
+                    'updated_at' => date('Y-m-d H:i:s', time())
+                ];
+                if (!empty($data)) {
+                    $result = DB::connection('vlz')->table('shipment_requests')
+                        ->where('id', $id)
+                        ->update($data);
+                    if ($result > 0) {
+                        $r_message = ['status' => 1, 'msg' => '更新成功'];
+                    } else {
+                        $r_message = ['status' => 0, 'msg' => '更新失败'];
+                    }
+                }
+            } else {
+                $r_message = ['status' => 0, 'msg' => '该角色权限不够'];
+            }
+
+        } else {
+            $r_message = ['status' => 0, 'msg' => '缺少ID'];
+        }
+        return $r_message;
+    }
 }

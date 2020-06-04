@@ -286,6 +286,10 @@ Route::match(['post'],'/shipment/getBoxDetail', 'ShipmentController@getBoxDetail
 Route::match(['post'],'/shipment/upShippingMethod', 'ShipmentController@upShippingMethod');//修改 发货方式
 Route::match(['post'],'/shipment/exportExecl', 'ShipmentController@exportExecl');//调拨进度 下载
 Route::match(['post'],'/shipment/upAllAllot', 'ShipmentController@upAllAllot');//批量修改调拨状态
+Route::match(['post'],'/shipment/upShippmentID', 'ShipmentController@upShippmentID');//修改ShippmentID
+Route::match(['post'],'/shipment/upReceiptsNum', 'ShipmentController@upReceiptsNum');//修改跟踪单号
+Route::match(['post'],'/shipment/upShipment2', 'ShipmentController@upShipment2');//调拨进度页面修改调拨计划
+Route::match(['post'],'/shipment/upAdjustmentQquantity', 'ShipmentController@upAdjustmentQquantity');//修改 调整需求数量
 //
 
 
