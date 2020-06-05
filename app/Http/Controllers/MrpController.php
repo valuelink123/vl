@@ -489,7 +489,7 @@ class MrpController extends Controller
 		foreach ($datas as $key => $val) {
 			$key++;
 			$asin_plans = AsinSalesPlan::SelectRaw('sum(quantity_last) as quantity,week_date')->where('asin',$val['asin'])->where('marketplace_id',$val['marketplace_id'])->where('date','>=',$date_from)->where('date','<=',$date_to)->groupBy(['week_date'])->get()->keyBy('week_date')->toArray();
-			$plan_total =0;
+			$plan_total[$key] =0;
 			//$min_purchase_quantity = intval(SapPurchaseRecord::where('sku',$val['sku'])->where('sap_factory_code','<>','')->whereNotIn('supplier',['CN01','WH01','HK03'])->orderBy('created_date','desc')->value('min_purchase_quantity'));
 			$data[$key]['seller'] = array_get($sellers,$val['sap_seller_id']);
 			$data[$key]['asin'] = $val['asin'];
@@ -498,10 +498,10 @@ class MrpController extends Controller
 			$data[$key]['min_purchase'] = $val['min_purchase_quantity'];
 			$data[$key]['week_daily_sales'] = round($val['daily_sales']*7);
 			$data[$key]['total_sellable'] = intval($val['afn_sellable']+$val['afn_reserved']+$val['mfn_sellable']+$val['sz_sellable']);
-			$data[$key]['22_week_plan_total'] = &$plan_total;
+			$data[$key]['22_week_plan_total'] = &$plan_total[$key];
 			for($i=1;$i<=22;$i++){
 				$data[$key][$i.'_week_plan'] = array_get($asin_plans,date('Y-m-d',strtotime($date.' +'.$i.' weeks sunday')).'.quantity',0);
-				$plan_total+=intval($data[$key][$i.'_week_plan']);
+				$plan_total[$key]+=intval($data[$key][$i.'_week_plan']);
             }
 		}
 		if($data){
