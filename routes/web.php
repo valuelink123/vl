@@ -290,6 +290,8 @@ Route::match(['post'],'/shipment/upShippmentID', 'ShipmentController@upShippment
 Route::match(['post'],'/shipment/upReceiptsNum', 'ShipmentController@upReceiptsNum');//修改跟踪单号
 Route::match(['post'],'/shipment/upShipment2', 'ShipmentController@upShipment2');//调拨进度页面修改调拨计划
 Route::match(['post'],'/shipment/upAdjustmentQquantity', 'ShipmentController@upAdjustmentQquantity');//修改 调整需求数量
+Route::match(['post'],'/shipment/upAlltoStatus', 'ShipmentController@upAlltoStatus');//修改 调拨状态
+
 //
 
 

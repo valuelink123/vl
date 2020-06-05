@@ -852,9 +852,11 @@ class MarketingPlanController extends Controller
 
     }
     public function test(){
-        $user = Auth::user()->toArray();
-        $sap_seller_id = $user['sap_seller_id']>0?$user['sap_seller_id']:0;
-        return view('marketingPlan.test', ['sap_seller_id' => $sap_seller_id]);
+
+//        $user = Auth::user()->toArray();
+//        $sap_seller_id = $user['sap_seller_id']>0?$user['sap_seller_id']:0;
+//        return view('marketingPlan.test', ['sap_seller_id' => $sap_seller_id]);
     }
+
 
 }

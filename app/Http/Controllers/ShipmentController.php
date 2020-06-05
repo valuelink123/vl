@@ -271,11 +271,25 @@ class ShipmentController extends Controller
      */
     public function upCargoData(Request $request)
     {
-        $data = [
-            'cargo_data' => $request['cargo_data']
-        ];
+
+        $old_cargo_data = $cargo_data = '';
         $id = $request['id'];
-        if (!empty($data) && !empty($id)) {
+        if (!empty($request['cargo_data']) && !empty($id)) {
+            $old_shipment = DB::connection('vlz')->table('shipment_requests')
+                ->select('cargo_data')
+                ->where('id', $id)
+                ->get()->map(function ($value) {
+                    return (array)$value;
+                })->first();
+            if (!empty($old_shipment)) {
+                $old_cargo_data = $old_shipment['cargo_data'];
+            }
+            if (!empty($old_cargo_data)) {
+                $cargo_data = $old_cargo_data . ',' . $request['cargo_data'];
+            }
+            $data = [
+                'cargo_data' => $cargo_data
+            ];
             $result = DB::connection('vlz')->table('shipment_requests')
                 ->where('id', $id)
                 ->update($data);
@@ -349,7 +363,24 @@ class ShipmentController extends Controller
                         $stock_day_num = $FBA_Stock + $request['quantity'] / @$asins[0]['daily_sales'];
                     }
                     $FBA_keepday_num = (round($asins[0]['daily_sales'], 2) == 0) ? '∞' : date('Y-m-d', strtotime('+' . intval(($asins[0]['afn_sellable'] + $asins[0]['afn_reserved']) / round($asins[0]['daily_sales'], 2)) . 'days'));
-                    $transfer_num = $request['quantity'];
+
+                }
+                /**调拨在途查询*/
+                $sql2 = "
+                        SELECT
+                            adjustment_quantity
+                        FROM
+                            shipment_requests
+                        WHERE
+                            seller_sku = '". $request['seller_sku']."'
+                        AND label = '".$label."'
+                        AND marketplace_id = '".$request['marketplace_id']."'
+                        AND `status` = 4
+                        AND allor_status != 4;";
+                $shipment_r = DB::connection('vlz')->select($sql2);
+                $shipment_r = (json_decode(json_encode($shipment_r), true));
+                if (!empty($shipment_r)) {
+                    $transfer_num = $shipment_r[0]['adjustment_quantity'];
                 }
                 //销售员 保存
                 $sql3 = "SELECT id,sap_seller_id FROM sap_asin_match_sku  WHERE sku='" . $request['sku'] . "' and marketplace_id ='" . $request['marketplace_id'] . "'";
@@ -440,7 +471,6 @@ class ShipmentController extends Controller
      */
     public function detailShipment(Request $request)
     {
-
         $DOMIN_MARKETPLACEID_SX = Asin::DOMIN_MARKETPLACEID_SX;
         $sku = null;
         $role = 0;
@@ -512,10 +542,10 @@ class ShipmentController extends Controller
         $boole = false;
         $id = @$request['id'];
         $r_message = $old_shipment = [];
-        $old_status = $old_sap_seller_id = $new_status = $role_id =$marketplace_id= $planer='';
+        $old_status = $old_sap_seller_id = $new_status = $role_id = $marketplace_id = $planer = '';
         if ($id > 0) {
             $old_shipment = DB::connection('vlz')->table('shipment_requests')
-                ->select('status', 'sap_seller_id','marketplace_id')
+                ->select('status', 'sap_seller_id', 'marketplace_id')
                 ->where('id', $id)
                 ->get()->map(function ($value) {
                     return (array)$value;
@@ -524,7 +554,7 @@ class ShipmentController extends Controller
             return ['status' => 0, 'msg' => '缺少ID'];
         }
         if (!empty($old_shipment)) {
-            $marketplace_id=$old_shipment[0]['marketplace_id'];
+            $marketplace_id = $old_shipment[0]['marketplace_id'];
             $old_status = $old_shipment[0]['status'];
             $old_sap_seller_id = $old_shipment[0]['sap_seller_id'];
             $new_status = @$request['status'] >= 0 ? $request['status'] : $old_status;
@@ -594,7 +624,7 @@ class ShipmentController extends Controller
                 if (!empty($fba_factory_warehouse)) {
                     $sap_factory_code = $fba_factory_warehouse[0]['sap_factory_code'];
                     $sap_warehouse_code = $fba_factory_warehouse[0]['sap_warehouse_code'];
-                    $sql = "SELECT planer FROM sap_sku_sites WHERE sku='" . $request['sku'] . "' AND  marketplace_id='" .$marketplace_id. "' AND sap_factory_code='" . $sap_factory_code . "' AND sap_warehouse_code='" . $sap_warehouse_code . "'";
+                    $sql = "SELECT planer FROM sap_sku_sites WHERE sku='" . $request['sku'] . "' AND  marketplace_id='" . $marketplace_id . "' AND sap_factory_code='" . $sap_factory_code . "' AND sap_warehouse_code='" . $sap_warehouse_code . "'";
                     $sap_sku_sites = DB::connection('vlz')->select($sql);
                     $sap_sku_sites = (json_decode(json_encode($sap_sku_sites), true));
                     if (!empty($sap_sku_sites)) {
@@ -603,7 +633,7 @@ class ShipmentController extends Controller
                 }
             }
             /** 销售员 */
-            $sql3 = "SELECT id,sap_seller_id FROM sap_asin_match_sku  WHERE sku='" . $request['sku'] . "' and marketplace_id ='" .$marketplace_id. "'";
+            $sql3 = "SELECT id,sap_seller_id FROM sap_asin_match_sku  WHERE sku='" . $request['sku'] . "' and marketplace_id ='" . $marketplace_id . "'";
             $sap_asin_match_sku = DB::connection('vlz')->select($sql3);
             $sap_asin_match_sku = (json_decode(json_encode($sap_asin_match_sku), true));
             if (!empty($sap_asin_match_sku)) {
@@ -664,7 +694,7 @@ class ShipmentController extends Controller
     {
         $boole = false;
         $idList = explode(',', $request['idList']);
-        $data=[];
+        $data = [];
         $r_message = $old_shipment = [];
         $old_status = $old_sap_seller_id = $new_status = $role_id = '';
         if (!empty($idList)) {
@@ -755,8 +785,8 @@ class ShipmentController extends Controller
                 if ($result > 0) {
                     /** 已审核状态添加到 调拨进度表allot_progress 表 */
                     if ($new_status == 4 && !empty($idList)) {
-                        foreach ($idList as $k=>$v){
-                            $data1 []= ['shipment_requests_id' => $v, 'created_at' => date('Y-m-d H:i:s', time())];
+                        foreach ($idList as $k => $v) {
+                            $data1 [] = ['shipment_requests_id' => $v, 'created_at' => date('Y-m-d H:i:s', time())];
                         }
                         DB::connection('vlz')->table('allot_progress')->insert($data1);
                     }
@@ -1447,7 +1477,7 @@ class ShipmentController extends Controller
         $factoryList = DB::connection('vlz')->select($sql_f);
         $factoryList = (json_decode(json_encode($factoryList), true));
         //状态分组 统计
-        $sql_group = 'SELECT status,COUNT(id) as count_num from allot_progress GROUP BY status=0,status=1,status=2,status=3,status=4';
+        $sql_group = 'SELECT status,COUNT(id) as count_num from ( SELECT * FROM allot_progress GROUP BY shipment_requests_id) as a  GROUP BY status=0,status=1,status=2,status=3,status=4';
         $status_group = DB::connection('vlz')->select($sql_group);
         $status_group = (json_decode(json_encode($status_group), true));
         if (!empty($status_group)) {
@@ -1906,9 +1936,9 @@ class ShipmentController extends Controller
         $boole = false;
         $id = @$request['id'];
         $r_message = $old_shipment = [];
-        $role_id = $role='';
+        $role_id = $role = '';
         $user = Auth::user()->toArray();//todo
-       // $user['id']=49;
+        // $user['id']=49;
         /** 超级权限*/
         $ADMIN_EMAIL = Asin::ADMIN_EMAIL;
         if (!empty($user)) {
@@ -1972,7 +2002,7 @@ class ShipmentController extends Controller
         $boole = false;
         $id = @$request['id'];
         $r_message = $old_shipment = [];
-        $role_id =$role='';
+        $role_id = $role = '';
         $user = Auth::user()->toArray();
         /** 超级权限*/
         $ADMIN_EMAIL = Asin::ADMIN_EMAIL;
@@ -2027,6 +2057,93 @@ class ShipmentController extends Controller
                         ->where('id', $id)
                         ->update($data);
                     if ($result > 0) {
+                        $r_message = ['status' => 1, 'msg' => '更新成功'];
+                    } else {
+                        $r_message = ['status' => 0, 'msg' => '更新失败'];
+                    }
+                }
+            } else {
+                $r_message = ['status' => 0, 'msg' => '该角色权限不够'];
+            }
+
+        } else {
+            $r_message = ['status' => 0, 'msg' => '缺少ID'];
+        }
+        return $r_message;
+    }
+
+    /**
+     * @param Request $request
+     * 调拨状态修改
+     */
+    public function upAlltoStatus(Request $request)
+    {
+        $boole = false;
+        $shipment_requests_id = @$request['shipment_requests_id'];
+        $r_message = $old_shipment = [];
+        $role_id = $role = '';
+        // $user = Auth::user()->toArray();  //  todo 正式环境打开
+        /** 超级权限*/
+        $ADMIN_EMAIL = Asin::ADMIN_EMAIL;
+        if (!empty($user)) {
+            if (!empty($user['email']) && in_array($user['email'], $ADMIN_EMAIL)) {
+                /**  特殊权限着 查询所有用户 */
+                $role = 4;
+            } else if ($user['ubu'] != '' || $user['ubg'] != '' || $user['seller_rules'] != '') {
+                if ($user['ubu'] == '' && $user['ubg'] != '' && $user['seller_rules'] != '') {
+                    /**查询所有BG下面员工*/
+                    $role = 3;
+                } else if ($user['ubu'] != '' && $user['seller_rules'] == '') {
+                    /**此条件为 普通销售*/
+                    $role = 1;
+                } else if ($user['ubu'] != '' && $user['ubg'] != '' && $user['seller_rules'] != '') {
+                    /**  BU 负责人  */
+                    $role = 5;
+                }
+            } else {
+                $roleUser = DB::table('role_user')->select('user_id', 'role_id')
+                    ->where('user_id', @$user['id'])
+                    ->get()->map(function ($value) {
+                        return (array)$value;
+                    })->toArray();
+                if (!empty($roleUser)) {
+                    $role_id = $roleUser[0]['role_id'];
+                    if ($role_id == 23) {
+                        /** 计划员角色  */
+                        $role = 2;
+                    } else if ($role_id == 31) {
+                        /** 计划 经理 */
+                        $role = 6;
+                    } else if ($role_id == 20) {
+                        /** 物流操作员 */
+                        $role = 7;
+                    }
+                }
+            }
+        }
+        $role = 4; //todo
+        if ($shipment_requests_id > 0) {
+            if ($role == 4 || $role == 6 || $role == 7 || $role == 2) {
+                //最大权限 计划员 计划经理 物流操作 可修改
+                $boole = true;
+            }
+            if ($boole == true) {
+                $data = [
+                    'status' => @$request['status'],
+                    'updated_at' => date('Y-m-d H:i:s', time())
+                ];
+                if (!empty($data)) {
+                    $result = DB::connection('vlz')->table('allot_progress')
+                        ->where('shipment_requests_id', $shipment_requests_id)
+                        ->update($data);
+                    if ($result > 0) {
+                        $data2 = [
+                            'allor_status' => $request['status'],
+                            'updated_at' => date('Y-m-d H:i:s', time())
+                        ];
+                        $result2 = DB::connection('vlz')->table('shipment_requests')
+                            ->where('id', $shipment_requests_id)
+                            ->update($data2);
                         $r_message = ['status' => 1, 'msg' => '更新成功'];
                     } else {
                         $r_message = ['status' => 0, 'msg' => '更新失败'];
