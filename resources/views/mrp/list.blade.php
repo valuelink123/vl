@@ -173,7 +173,7 @@ table.dataTable thead th, table.dataTable thead td {
 						<?php
 						for($i=1;$i<=22;$i++){
 						?>
-                        <th class="week_end_date">{{date('Y-m-d',strtotime($date.' +'.$i.' weeks monday')-86400*7)}}</th>
+                        <th class="week_end_date">{!!date('W',strtotime($date.' +'.$i.' weeks monday')-86400*7).'周<BR />'.date('Y-m-d',strtotime($date.' +'.$i.' weeks monday')-86400*7)!!}</th>
                         <?php } ?>
                     </tr>
                     </thead>
@@ -291,8 +291,8 @@ $('#search').click(function () {
 	$(".week_end_date").each(function(index){
 		
 		var ndate = getNextMonday(index+1);
-		
-		$(this).text(ndate);
+		var yearweek = getYearWeek(ndate);
+		$(this).html(yearweek+'周<BR />'+ndate);
 	});	
 	return false;
 });
@@ -319,6 +319,17 @@ function getNextMonday(i) {
 	var s = year + "-" + (month < 10 ? ('0' + month) : month) + "-" + (date < 10 ? ('0' + date) : date);
 	return s;
 }
+
+function getYearWeek(date){ 
+	date=new Date(date);
+    var date2=new Date(date.getFullYear(), 0, 1); 
+    var day1=date.getDay(); 
+    if(day1==0) day1=7; 
+    var day2=date2.getDay(); 
+    if(day2==0) day2=7; 
+    d = Math.round((date.getTime() - date2.getTime()+(day2-day1)*(24*60*60*1000)) / 86400000);   
+    return Math.ceil(d /7)+1;  
+} 
 
 </script>
 
