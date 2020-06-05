@@ -42,22 +42,29 @@ class RoiController extends Controller
         $currentUserId = Auth::user()->id;
         $isUserAdmin = $this->isAdmin($currentUserId);
         $isUserProductDirector = $this->isProductDirector($currentUserId);
-        $data = DB::connection('amazon')->table('roi')->get();
-        $data = json_decode(json_encode($data),true);
+        $isUserPlanner = $this->isPlanner($currentUserId);
+
         $visibleRoiIds = array();
-        foreach ($data as $k=>$v){
-            $roiId = $v['id'];
-            $creatorId = $v['creator'];
-            $collaborators = $v['collaborators'];
-            $isCreator = $currentUserId == $creatorId;
-            if($isCreator || $isUserAdmin || $isUserProductDirector){
-                $visibleRoiIds[] = $roiId;
-                continue;
-            }
-            $isUserDirectLeader = $this->isDirectLeader($creatorId, $currentUserId);
-            $isUserExtendedCollaborators = $this->isExtendedCollaborators($collaborators, $currentUserId);
-            if($isUserDirectLeader || $isUserExtendedCollaborators){
-                $visibleRoiIds[] = $roiId;
+        if($isUserPlanner){
+            $visibleRoiIds = DB::connection('amazon')->table('roi')->where('archived_status', 1)->pluck('id');
+        }
+        else{
+            $data = DB::connection('amazon')->table('roi')->get();
+            $data = json_decode(json_encode($data),true);
+            foreach ($data as $k=>$v){
+                $roiId = $v['id'];
+                $creatorId = $v['creator'];
+                $collaborators = $v['collaborators'];
+                $isCreator = $currentUserId == $creatorId;
+                if($isCreator || $isUserAdmin || $isUserProductDirector){
+                    $visibleRoiIds[] = $roiId;
+                    continue;
+                }
+                $isUserDirectLeader = $this->isDirectLeader($creatorId, $currentUserId);
+                $isUserExtendedCollaborators = $this->isExtendedCollaborators($collaborators, $currentUserId);
+                if($isUserDirectLeader || $isUserExtendedCollaborators){
+                    $visibleRoiIds[] = $roiId;
+                }
             }
         }
 
@@ -135,7 +142,9 @@ class RoiController extends Controller
             $lists[$key]['updated_by'] = array_get($users,$list['updated_by']);
             $lists[$key]['updated_at'] = date('Y-m-d',strtotime($list['updated_at']));
             $lists[$key]['archived_status'] = $list['archived_status'] == 0 ? '未审核' : '已审核';
+            $show_item = '<li><a style="text-align:center" href="' . $show_url . '" >查看详情</a></li>';
             $edit_item = $list['archived_status'] == 0 ? '<li><a style="text-align:center" href="' . $edit_url . '">编辑</a></li>' : '';
+            $copy_item = $isUserPlanner ? '' : '<li><a style="text-align:center" href="' . $copy_url .'">复制</a></li>';
 
             //Admin,产品总监 有归档状态的编辑权限
             $canArchive = false;
@@ -165,7 +174,7 @@ class RoiController extends Controller
             }
             $delete_item = $canDelete ? '<li><a style="text-align:center" onclick="return confirm(\'确定删除?\');" href="' . $delete_url . '">删除</a></li>' : '';
 
-            $lists[$key]['action'] = '<ul class="nav navbar-nav"><li><a href="#" class="dropdown-toggle" style="height:10px; vertical-align:middle; padding-top:0px;" data-toggle="dropdown" role="button">...</a><ul class="dropdown-menu" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(-50px, 20px, 0px); min-width: 88px;" role="menu" style="color: #62c0cc8a"><li><a style="text-align:center" href="' . $show_url . '" >查看详情</a></li>' . $edit_item . $archived_item . '<li><a style="text-align:center" href="' . $copy_url .'">复制</a></li>' . $delete_item . '</ul></li></ul>';
+            $lists[$key]['action'] = '<ul class="nav navbar-nav"><li><a href="#" class="dropdown-toggle" style="height:10px; vertical-align:middle; padding-top:0px;" data-toggle="dropdown" role="button">...</a><ul class="dropdown-menu" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(-50px, 20px, 0px); min-width: 88px;" role="menu" style="color: #62c0cc8a">' . $show_item . $edit_item . $archived_item . $copy_item . $delete_item . '</ul></li></ul>';
         }
 
         $recordsTotal = $iTotalRecords;
@@ -886,20 +895,31 @@ class RoiController extends Controller
         $currentUserId = Auth::user()->id;
         $isUserAdmin = $this->isAdmin($currentUserId);
         $isUserProductDirector = $this->isProductDirector($currentUserId);
+        $isUserPlanner = $this->isPlanner($currentUserId);
         $data = DB::connection('amazon')->table('roi')->where('id', '=', $id)->first();
         $data = json_decode(json_encode($data),true);
+        if(!$data)  exit;
+
         $visible = false;
-        $creatorId = $data['creator'];
-        $collaborators = $data['collaborators'];
-        $isCreator = $currentUserId == $creatorId;
-        if($isCreator || $isUserAdmin || $isUserProductDirector){
-            $visible = true;
+        if($isUserPlanner){
+            if($data['archived_status'] == 1){
+                $visible = true;
+            }
         }
-        $isUserDirectLeader = $this->isDirectLeader($creatorId, $currentUserId);
-        $isUserExtendedCollaborators = $this->isExtendedCollaborators($collaborators, $currentUserId);
-        if($isUserDirectLeader || $isUserExtendedCollaborators){
-            $visible = true;
+        else{
+            $creatorId = $data['creator'];
+            $collaborators = $data['collaborators'];
+            $isCreator = $currentUserId == $creatorId;
+            if($isCreator || $isUserAdmin || $isUserProductDirector){
+                $visible = true;
+            }
+            $isUserDirectLeader = $this->isDirectLeader($creatorId, $currentUserId);
+            $isUserExtendedCollaborators = $this->isExtendedCollaborators($collaborators, $currentUserId);
+            if($isUserDirectLeader || $isUserExtendedCollaborators){
+                $visible = true;
+            }
         }
+
         if(!$visible) die('Permission denied');
 
         $canArchive = false;
@@ -1569,9 +1589,7 @@ class RoiController extends Controller
         return false;
     }
 
-    /**
-     * $collaborators对应roi的collaborators字段的值
-     */
+    //$collaborators对应roi的collaborators字段的值
     public function isExtendedCollaborators($collaborators, $checkId){
         if($collaborators){
             $collaboratorsIdArray = explode(',', $collaborators);
@@ -1585,6 +1603,16 @@ class RoiController extends Controller
             }
         }
 
+        return false;
+    }
+
+    //计划员
+    public function isPlanner($userId){
+        //目前的计划员有：许琼，李佳鑫，谈际森，张晓平。
+        $plannerIds = array(159,341,298,387);
+        if(in_array($userId, $plannerIds)){
+            return true;
+        }
         return false;
     }
 
