@@ -475,7 +475,6 @@ class ShipmentController extends Controller
                 $role = 2;
             }
         }
-
         if (!empty($request['id']) && $request['id'] > 0) {
             $sql = "SELECT marketplace_id,out_warehouse,id,`status`,sku,asin,seller_sku,sap_warehouse_code,sap_factory_code,quantity,received_date,rms,rms_sku,package,remark,adjustment_quantity,adjustreceived_date from shipment_requests WHERE id =" . $request['id'];
             $shipment = DB::connection('vlz')->select($sql);
@@ -567,7 +566,6 @@ class ShipmentController extends Controller
             }
 
         }
-
         if ($id > 0) {
             if (($old_status == 0) && ($old_status == $new_status || $new_status == 5)) {
                 //状态不变 只是内容修改  或者   取消
@@ -678,7 +676,7 @@ class ShipmentController extends Controller
                     return (array)$value;
                 })->toArray();
             if (!empty($old_shipment)) {
-                if ($old_shipment > 1) {
+                if (count($old_shipment) > 1) {
                     return ['status' => 0, 'msg' => '更新失败,被修改信息状态不一致'];
                 } else {
                     $old_status = $old_shipment[0]['status'];
@@ -758,9 +756,9 @@ class ShipmentController extends Controller
                     /** 已审核状态添加到 调拨进度表allot_progress 表 */
                     if ($new_status == 4 && !empty($idList)) {
                         foreach ($idList as $k=>$v){
-                            $data []= ['shipment_requests_id' => $v, 'created_at' => date('Y-m-d H:i:s', time())];
+                            $data1 []= ['shipment_requests_id' => $v, 'created_at' => date('Y-m-d H:i:s', time())];
                         }
-                        DB::connection('vlz')->table('allot_progress')->insert($data);
+                        DB::connection('vlz')->table('allot_progress')->insert($data1);
                     }
                     $r_message = ['status' => 1, 'msg' => '全部更新成功'];
                 } else {
