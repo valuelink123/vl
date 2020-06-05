@@ -2082,7 +2082,7 @@ class ShipmentController extends Controller
         $shipment_requests_id = @$request['shipment_requests_id'];
         $r_message = $old_shipment = [];
         $role_id = $role = '';
-        // $user = Auth::user()->toArray();  //  todo 正式环境打开
+        $user = Auth::user()->toArray();
         /** 超级权限*/
         $ADMIN_EMAIL = Asin::ADMIN_EMAIL;
         if (!empty($user)) {
@@ -2121,7 +2121,6 @@ class ShipmentController extends Controller
                 }
             }
         }
-        $role = 4; //todo
         if ($shipment_requests_id > 0) {
             if ($role == 4 || $role == 6 || $role == 7 || $role == 2) {
                 //最大权限 计划员 计划经理 物流操作 可修改
