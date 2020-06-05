@@ -513,10 +513,10 @@ class ShipmentController extends Controller
         $boole = false;
         $id = @$request['id'];
         $r_message = $old_shipment = [];
-        $old_status = $old_sap_seller_id = $new_status = $role_id = '';
+        $old_status = $old_sap_seller_id = $new_status = $role_id =$marketplace_id= $planer='';
         if ($id > 0) {
             $old_shipment = DB::connection('vlz')->table('shipment_requests')
-                ->select('status', 'sap_seller_id')
+                ->select('status', 'sap_seller_id','marketplace_id')
                 ->where('id', $id)
                 ->get()->map(function ($value) {
                     return (array)$value;
@@ -525,6 +525,7 @@ class ShipmentController extends Controller
             return ['status' => 0, 'msg' => '缺少ID'];
         }
         if (!empty($old_shipment)) {
+            $marketplace_id=$old_shipment[0]['marketplace_id'];
             $old_status = $old_shipment[0]['status'];
             $old_sap_seller_id = $old_shipment[0]['sap_seller_id'];
             $new_status = @$request['status'] >= 0 ? $request['status'] : $old_status;
@@ -587,6 +588,30 @@ class ShipmentController extends Controller
                 //最大权限 任何操作
                 $boole = true;
             }
+            /** 获取计划员*/
+            if (!empty($marketplace_id)) {
+                //查询计划员
+                $market = getMarketplaceCode();
+                $fba_factory_warehouse = $market[$marketplace_id]['fba_factory_warehouse'];
+                if (!empty($fba_factory_warehouse)) {
+                    $sap_factory_code = $fba_factory_warehouse[0]['sap_factory_code'];
+                    $sap_warehouse_code = $fba_factory_warehouse[0]['sap_warehouse_code'];
+                    $sql = "SELECT planer FROM sap_sku_sites WHERE sku='" . $request['sku'] . "' AND  marketplace_id='" .$marketplace_id. "' AND sap_factory_code='" . $sap_factory_code . "' AND sap_warehouse_code='" . $sap_warehouse_code . "'";
+                    $sap_sku_sites = DB::connection('vlz')->select($sql);
+                    $sap_sku_sites = (json_decode(json_encode($sap_sku_sites), true));
+                    if (!empty($sap_sku_sites)) {
+                        $planer = $sap_sku_sites[0]['planer'];
+                    }
+                }
+            }
+            /** 销售员 */
+            $sql3 = "SELECT id,sap_seller_id FROM sap_asin_match_sku  WHERE sku='" . $request['sku'] . "' and marketplace_id ='" .$marketplace_id. "'";
+            $sap_asin_match_sku = DB::connection('vlz')->select($sql3);
+            $sap_asin_match_sku = (json_decode(json_encode($sap_asin_match_sku), true));
+            if (!empty($sap_asin_match_sku)) {
+                $sap_seller_id = $sap_asin_match_sku[0]['sap_seller_id'];
+            }
+
             if ($boole == true) {
                 $data = [
                     'status' => $new_status,
@@ -603,7 +628,9 @@ class ShipmentController extends Controller
                     'remark' => @$request['remark'] ? $request['remark'] : '',
                     'adjustment_quantity' => @$request['adjustment_quantity'],
                     'adjustreceived_date' => @$request['adjustreceived_date'],
-                    'updated_at' => date('Y-m-d H:i:s', time())
+                    'updated_at' => date('Y-m-d H:i:s', time()),
+                    'planning_name' => $planer,
+                    'sap_seller_id' => $sap_seller_id
                 ];
                 if (!empty($data)) {
                     $result = DB::connection('vlz')->table('shipment_requests')
@@ -611,7 +638,7 @@ class ShipmentController extends Controller
                         ->update($data);
                     if ($result > 0) {
                         /** 已审核状态添加到 调拨进度表allot_progress 表 */
-                        if (@$request['status'] == 4 && $id > 0) {
+                        if ($new_status == 4 && $id > 0) {
                             $data = ['shipment_requests_id' => $id, 'created_at' => date('Y-m-d H:i:s', time())];
                             DB::connection('vlz')->table('allot_progress')->insert($data);
                         }
@@ -639,6 +666,7 @@ class ShipmentController extends Controller
     {
         $boole = false;
         $idList = explode(',', $request['idList']);
+        $data=[];
         $r_message = $old_shipment = [];
         $old_status = $old_sap_seller_id = $new_status = $role_id = '';
         if (!empty($idList)) {
@@ -727,6 +755,13 @@ class ShipmentController extends Controller
                     ->whereIn('id', $idList)
                     ->update($data);
                 if ($result > 0) {
+                    /** 已审核状态添加到 调拨进度表allot_progress 表 */
+                    if ($new_status == 4 && !empty($idList)) {
+                        foreach ($idList as $k=>$v){
+                            $data []= ['shipment_requests_id' => $v, 'created_at' => date('Y-m-d H:i:s', time())];
+                        }
+                        DB::connection('vlz')->table('allot_progress')->insert($data);
+                    }
                     $r_message = ['status' => 1, 'msg' => '全部更新成功'];
                 } else {
                     $r_message = ['status' => 0, 'msg' => '更新失败'];
