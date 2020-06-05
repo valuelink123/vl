@@ -128,9 +128,11 @@
 	.batch_list{
 		border: 1px solid rgba(220, 223, 230, 1);
 		width: 180px;
-		margin-left: -40px !important;
 		padding: 15px 0 !important;
 		display: none;
+		left: 0px;
+		position: absolute;
+		z-index: 99;
 	}
 	.batch_list,.batch_list li{
 		background: #fff;
@@ -149,13 +151,13 @@
 	}
 	.batch_list:after{
 		position: absolute;
-		top: 24px;
-		left: 50px;
+		top: -10px;
+		left: 30px;
 		right: auto;
 		display: inline-block !important;
-		border-right: 7px solid transparent;
-		border-bottom: 7px solid #fff;
-		border-left: 7px solid transparent;
+		border-right: 10px solid transparent;
+		border-bottom: 10px solid #fff;
+		border-left: 10px solid transparent;
 		content: '';
 		box-sizing: border-box;
 	}
@@ -323,6 +325,44 @@
 	.table-scrollable{
 		overflow-x: hidden;
 	}
+	.cloumn_box{
+		position: absolute;
+		right: 0;
+		z-index: 999;
+		display: none;
+		background: #fff;
+		padding: 20px;
+		border: 1px solid #eee;
+		height: 365px;
+		padding-right: 0;
+	}
+	.cloumn_list{
+		height: 300px;
+		overflow: auto;
+		padding: 0;
+		margin: 0;
+	}
+	.cloumn_list li{
+		padding: 0;
+		margin: 0;
+		line-height: 25px;
+		text-align: left;
+		list-style: none;
+	}
+	.cloumn_list li input{
+		margin-right: 10px;
+	}
+	.cloumn_box:after{
+		position: absolute;
+		top: -10px;
+		right: 45px;
+		display: inline-block !important;
+		border-right: 10px solid transparent;
+		border-bottom: 10px solid #fff;
+		border-left: 7px solid transparent;
+		content: '';
+		box-sizing: border-box;
+	}
 </style>
 <link rel="stylesheet" type="text/css" media="all" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-daterangepicker/3.0.5/daterangepicker.min.css" />
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.1/moment.min.js"></script>
@@ -442,53 +482,85 @@
 	    <div style="margin-bottom: 15px"></div>
 	    <div class="portlet-body">
 	        <div class="table-container" style="position: relative;">
-				<div style="position: absolute;left: 130px; z-index: 999;top:0" class="col-md-2">
-					<button type="button" class="btn btn-sm green-meadow batch_operation">批量操作<i class="fa fa-angle-down"></i></button>
-					<ul class="batch_list">
-						<li><button class="btn btn-sm red-sunglo noConfirmed" onclick="statusAjax(0)">审核中</button></li>
-						<li><button class="btn btn-sm yellow-crusta" onclick="statusAjax(1)">生产中</button></li>
-						<li><button class="btn btn-sm purple-plum" onclick="statusAjax(2)">分拣中</button></li>
-						<li><button class="btn btn-sm blue-hoki" onclick="statusAjax(3)">已出库</button></li>
-						<li><button class="btn btn-sm blue-madison" onclick="statusAjax(4)">已签收</button></li>
-						<li><button class="btn btn-sm green-meadow" onclick="statusAjax(5)">已完成</button></li>
-					</ul>
+				<div style="width: 100%; height: 45px; line-height: 45px;">
+					<div style="padding-left: 0;" class="col-md-3">
+						<button type="button" class="btn btn-sm green-meadow batch_operation">批量操作<i class="fa fa-angle-down"></i></button>
+						<ul class="batch_list">
+							<li><button class="btn btn-sm red-sunglo noConfirmed" onclick="statusAjax(0)">审核中</button></li>
+							<li><button class="btn btn-sm yellow-crusta" onclick="statusAjax(1)">生产中</button></li>
+							<li><button class="btn btn-sm purple-plum" onclick="statusAjax(2)">分拣中</button></li>
+							<li><button class="btn btn-sm blue-hoki" onclick="statusAjax(3)">已出库</button></li>
+							<li><button class="btn btn-sm blue-madison" onclick="statusAjax(4)">已签收</button></li>
+							<li><button class="btn btn-sm green-meadow" onclick="statusAjax(5)">已完成</button></li>
+						</ul>
+					</div>
+					<div class="col-md-7">
+						<button type="button" onclick="status_filter('审核中',16)" class="btn btn-sm red-sunglo">审核中 : <span class="status0"></span></button>
+						<button type="button" onclick="status_filter('生产中',16)" class="btn btn-sm yellow-crusta">生产中 : <span class="status1"></span></button>
+						<button type="button" onclick="status_filter('分拣中',16)" class="btn btn-sm purple-plum">分拣中 : <span class="status2"></span></button>
+						<button type="button" onclick="status_filter('已出库',16)" class="btn btn-sm blue-hoki">已出库 : <span class="status3"></span></button>
+						<button type="button" onclick="status_filter('已签收',16)" class="btn btn-sm blue-madison">已签收 : <span class="status4"></span></button>
+						<button type="button" onclick="status_filter('已完成',16)" class="btn btn-sm green-meadow">已完成 : <span class="status5"></span></button>
+					</div>
+					<div class="col-md-2" style="text-align: right;">
+						<button type="button" class="btn btn-sm green-meadow cloumn">隐藏列操作</button>
+						<div class="cloumn_box">
+							<p style="padding: 0;margin: 0;line-height: 25px; text-align: left;"><input type="checkbox" class="checkboxAll" style="margin-right: 10px;" />是否全选</p>
+							<ul class="cloumn_list">
+								<li><input type="checkbox" />提交日期</li>
+								<li><input type="checkbox" />销售员</li>
+								<li><input type="checkbox" />产品图片</li>
+								<li><input type="checkbox" />ASIN</li>
+								<li><input type="checkbox" />SKU</li>
+								<li><input type="checkbox" />需求数量</li>
+								<li><input type="checkbox" />期望到货时间</li>
+								<li><input type="checkbox" />海外库存</li>
+								<li><input type="checkbox" />未交订单</li>
+								<li><input type="checkbox" />加权日均</li>
+								<li><input type="checkbox" />到货后预计日销(PCS)</li>
+								<li><input type="checkbox" />利润率</li>
+								<li><input type="checkbox" />审核状态</li>
+								<li><input type="checkbox" />计划员</li>
+								<li><input type="checkbox" />MOQ</li>
+								<li><input type="checkbox" />收货工厂</li>
+								<li><input type="checkbox" />运输方式</li>
+								<li><input type="checkbox" />计划确认数量</li>
+								<li><input type="checkbox" />预计交货时间</li>
+								<li><input type="checkbox" />采购订单号</li>
+								<li><input type="checkbox" />完成进度</li>
+							</ul>
+						</div>
+					</div>
 				</div>
-				<div class="col-md-6"  style="position: absolute;left: 520px; z-index: 999;top:0">
-					<button type="button" onclick="status_filter('审核中',16)" class="btn btn-sm red-sunglo">审核中 : <span class="status0"></span></button>
-					<button type="button" onclick="status_filter('生产中',16)" class="btn btn-sm yellow-crusta">生产中 : <span class="status1"></span></button>
-					<button type="button" onclick="status_filter('分拣中',16)" class="btn btn-sm purple-plum">分拣中 : <span class="status2"></span></button>
-					<button type="button" onclick="status_filter('已出库',16)" class="btn btn-sm blue-hoki">已出库 : <span class="status3"></span></button>
-					<button type="button" onclick="status_filter('已签收',16)" class="btn btn-sm blue-madison">已签收 : <span class="status4"></span></button>
-					<button type="button" onclick="status_filter('已完成',16)" class="btn btn-sm green-meadow">已完成 : <span class="status5"></span></button>
-				</div>
+				
 	            <table class="table table-striped table-bordered" id="purchasetable" style="width:100%">
 	                <thead>
 	                <tr>
 						<th>BG</th>
 						<th>BU</th>
 						<th>site</th>
-	                    <th><input type="checkbox" id="selectAll" name="selectAll" /></th>
-	                    <th style="width:75px; text-align:center;">提交日期</th>
-	                    <th style="width:55px; text-align:center;">销售员</th>
+	                    <th style="text-align: center;"><input type="checkbox" id="selectAll" name="selectAll" /></th>
+	                    <th style="min-width:75px; text-align:center;">提交日期</th>
+	                    <th style="min-width:55px; text-align:center;">销售员</th>
 	                    <th style="text-align:center;">产品图片</th>
 	                    <th style="text-align:center;">ASIN</th>
 	                    <th style="text-align: center;">SKU</th>
-						<th style="width:75px; text-align:center;">需求数量</th>
-						<th style="width:110px; text-align:center;">期望到货时间</th>
-	                    <th style="width:75px; text-align:center;">海外库存</th>
-	                    <th style="width:75px; text-align:center;">未交订单</th>
-	                    <th style="width:75px; text-align:center;">加权日均</th>
-	                    <th style="width:120px; text-align:center;">到货后预计日销<div style="text-align: center;">(PCS)</div></th>
-	                    <th style="width:55px; text-align:center;">利润率</th>
-	                    <th style="width:75px; text-align:center;">审核状态</th>
-	                    <th style="width:55px; text-align:center;">计划员</th>
+						<th style="min-width:75px; text-align:center;">需求数量</th>
+						<th style="min-width:110px; text-align:center;">期望到货时间</th>
+	                    <th style="min-width:75px; text-align:center;">海外库存</th>
+	                    <th style="min-width:75px; text-align:center;">未交订单</th>
+	                    <th style="min-width:75px; text-align:center;">加权日均</th>
+	                    <th style="min-width:120px; text-align:center;">到货后预计日销<div style="text-align: center;">(PCS)</div></th>
+	                    <th style="min-width:55px; text-align:center;">利润率</th>
+	                    <th style="min-width:75px; text-align:center;">审核状态</th>
+	                    <th style="min-width:55px; text-align:center;">计划员</th>
 	                    <th>MOQ</th>
-	                    <th style="width:75px; text-align:center;">收货工厂</th>
-						<th style="width:75px; text-align:center;">运输方式</th>
-						<th style="width:100px; text-align:center;">计划确认数量</th>
-						<th style="width:100px; text-align:center;">预计交货时间</th>
-						<th style="width:80px; text-align:center;">采购订单号</th>
-						<th style="width:75px; text-align:center;">完成进度</th>
+	                    <th style="min-width:75px; text-align:center;">收货工厂</th>
+						<th style="min-width:75px; text-align:center;">运输方式</th>
+						<th style="min-width:100px; text-align:center;">计划确认数量</th>
+						<th style="min-width:100px; text-align:center;">预计交货时间</th>
+						<th style="min-width:80px; text-align:center;">采购订单号</th>
+						<th style="min-width:75px; text-align:center;">完成进度</th>
 	                </tr>
 	                </thead>
 	                <tbody></tbody>
@@ -640,7 +712,7 @@
 		}else{
 			$.ajax({
 			    type: "POST",
-				url: "/shipment/upAllPurchase",
+				url: "http://10.10.42.14/vl/public/shipment/upAllPurchase",
 				data: {
 					status: status,
 					idList: chk_value
@@ -670,6 +742,34 @@
 		}
 	}
 	$(document).ready(function(){
+		//批量操作列表展开
+		$('.cloumn').click(function(e){
+			$('.cloumn_box').slideToggle();
+			e.stopPropagation();
+		})
+		$(".cloumn_list").children("li").each(function(index,element){
+			$(this).find('input').click(function(){
+				let id = $(this).parent().index() + 4;
+				if($(this).is(':checked')){
+					tableObj.column(id).visible(false)
+				}else{
+					tableObj.column(id).visible(true)
+				}
+			})
+		})
+		$('.checkboxAll').on('click',function(){
+			if($(this).is(':checked')){
+				$(".cloumn_list").find('input').prop('checked',true);
+				for(var i=4; i<25; i++){
+					tableObj.column(i).visible(false)
+				}
+			}else{
+				$(".cloumn_list").find('input').prop('checked',false)
+				for(var i=4; i<25; i++){
+					tableObj.column(i).visible(true)
+				}
+			}
+		})
 		//全选
 		$("body").on('change','#selectAll',function(e) {
 		    $("input[name='checkedInput']").prop("checked", this.checked);
@@ -692,7 +792,7 @@
 			 	}
 			 });
 			 $.ajax({
-				url: "/shipment/purchaseList",
+				url: "http://10.10.42.14/vl/public/shipment/purchaseList",
 				 method: 'POST',
 				 cache: false,
 				 data: {
@@ -767,7 +867,7 @@
 		function getAsinData(site,sku){
 			$.ajax({
 			    type: "POST",
-				url: "/shipment/getNextData",
+				url: "http://10.10.42.14/vl/public/shipment/getNextData",
 				data: {
 					marketplace_id: site,
 					sku: sku,
@@ -833,7 +933,7 @@
 		$('#asin_select').on('change',function(){
 			$.ajax({
 			    type: "POST",
-				url: "/shipment/getNextData",
+				url: "http://10.10.42.14/vl/public/shipment/getNextData",
 				data: {
 					marketplace_id: $('#site_select').val(),
 					asin: $(this).val(),
@@ -883,7 +983,7 @@
 			if($('.formId').val() == ""){
 				$.ajax({
 				    type: "POST",
-					url: "/shipment/addPurchase",
+					url: "http://10.10.42.14/vl/public/shipment/addPurchase",
 					data: {
 						audit_status: $('#audit_status_select').val(),
 						sku: $('#sku_input').val(),
@@ -924,7 +1024,7 @@
 			}else{
 				$.ajax({
 				    type: "POST",
-					url: "/shipment/upPurchase",
+					url: "http://10.10.42.14/vl/public/shipment/upPurchase",
 					data: {
 						id: $('.formId').val(),
 						audit_status: $('#audit_status_select').val(),//审核
@@ -995,7 +1095,7 @@
 		function editTableData(id){
 			$.ajax({
 			    type: "POST",
-				url: "/shipment/detailPurchase",
+				url: "http://10.10.42.14/vl/public/shipment/detailPurchase",
 				data: {
 					id: id
 				},
@@ -1075,7 +1175,7 @@
 			scrollX: "100%",
 			scrollCollapse: false,
 			ajax: {
-				url: "/shipment/purchaseList",
+				url: "http://10.10.42.14/vl/public/shipment/purchaseList",
 				type: "post",
 				data :  function(){
 					reqList = {
