@@ -685,7 +685,7 @@ on a.asin=c.asin and a.marketplace_id=c.marketplace_id
 	
 	public function import( Request $request )
 	{	
-		if($request->isMethod('POST')){  
+		if($request->isMethod('POST')){
             $file = $request->file('importFile');  
   			if($file){
 				if($file->isValid()){  
@@ -712,6 +712,7 @@ on a.asin=c.asin and a.marketplace_id=c.marketplace_id
 								$sku = DB::connection('amazon')->table('sap_asin_match_sku')->where('asin',$asin)->where('marketplace_id',$marketplace_id)->value('sku');
 								if(!$sku) continue;
 								foreach($xls_keys as $k=>$v){
+									
 									$week_date = date('Y-m-d',strtotime("+".($k+1)." weeks Sunday"));
 									$week_value = array_get($data,$v,0);
 									$max_value=0;
@@ -730,26 +731,10 @@ on a.asin=c.asin and a.marketplace_id=c.marketplace_id
 										$updateData[$date]['quantity_last']=$value;
 										$updateData[$date]['updated_at']=$time;
 										
-										$data = AsinSalesPlan::updateOrCreate(
-											[
-												'asin' => $asin,
-												'marketplace_id' => $marketplace_id,
-												'date'=>$date
-											],
-											[
-												'quantity_last'=>$value,
-												'sku'=>$sku,
-												'week_date'=>$week_date ,
-												'updated_at'=>$time
-												
-											]
-										);
-										if($data->quantity_first == 0){
-											$data->quantity_first=$value;
-										}
-										$data->save();
 									}
 								}
+								
+								if($updateData) AsinSalesPlan::insertOnDuplicateWithDeadlockCatching(array_values($updateData), ['week_date','quantity_last','sku','updated_at']);
 								AsinSalesPlan::calPlans($asin,$marketplace_id,$sku,date('Y-m-d'),date('Y-m-d',strtotime("+22 Sunday")));
 							}
 						}
