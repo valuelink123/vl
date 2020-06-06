@@ -372,9 +372,9 @@ class ShipmentController extends Controller
                         FROM
                             shipment_requests
                         WHERE
-                            seller_sku = '". $request['seller_sku']."'
-                        AND label = '".$label."'
-                        AND marketplace_id = '".$request['marketplace_id']."'
+                            seller_sku = '" . $request['seller_sku'] . "'
+                        AND label = '" . $label . "'
+                        AND marketplace_id = '" . $request['marketplace_id'] . "'
                         AND `status` = 4
                         AND allor_status != 4;";
                 $shipment_r = DB::connection('vlz')->select($sql2);
@@ -2164,4 +2164,72 @@ class ShipmentController extends Controller
         }
         return $r_message;
     }
+
+    /**
+     * 查询二维码信息
+     * @param Request $request
+     */
+    public function getBarcodepub(Request $request)
+    {
+        $id = @$request['shipment_requests_id'];
+        $title = $asin = $marketplace_id = $seller_sku = $fnsku = NULL;
+        $sql = 'SELECT
+                sh.id,
+                sh.asin,
+                sh.marketplace_id,
+                sh.seller_sku,
+                asins.title
+                FROM
+                 shipment_requests AS sh
+                LEFT JOIN asins ON asins.asin = sh.asin
+                AND asins.marketplaceid = sh.marketplace_id
+                WHERE
+                  1 = 1
+                AND sh.id = ' . $id;
+        $allot_progress = DB::connection('vlz')->select($sql);
+        $allot_progress = (json_decode(json_encode($allot_progress), true));
+        if (!empty($allot_progress)) {
+            $title = $allot_progress[0]['title'];
+            $asin = $allot_progress[0]['asin'];
+            $marketplace_id = $allot_progress[0]['marketplace_id'];
+            $seller_sku = $allot_progress[0]['seller_sku'];
+            if (!empty($asin) && !empty($marketplace_id) && !empty($seller_sku)) {
+                $sql2 = "SELECT id,fnsku FROM seller_skus WHERE asin='" . $asin . "' AND seller_sku='" . $seller_sku . "' AND marketplaceid='" . $marketplace_id . "'";
+                $seller_skus = DB::connection('vlz')->select($sql2);
+                $seller_skus = (json_decode(json_encode($seller_skus), true));
+                if (!empty($seller_skus)) {
+                    $fnsku = $seller_skus[0]['fnsku'];
+                }
+            }
+
+        }
+        return ['title' => $title, 'fnsku' => $fnsku];
+    }
+
+    /**
+     * 获取大货资料 地址
+     * @param Request $request
+     */
+    public function getCargoData(Request $request)
+    {
+        $id = @$request['shipment_requests_id'];
+        $cargo_data = NULL;
+        $cargo_data_arr = [];
+        if ($id > 0) {
+            $sql = "SELECT id,cargo_data FROM shipment_requests WHERE id =" . $id;
+            $shipment_requests = DB::connection('vlz')->select($sql);
+            $shipment_requests = (json_decode(json_encode($shipment_requests), true));
+            if (!empty($shipment_requests)) {
+                $cargo_data = $shipment_requests[0]['cargo_data'];
+            }
+            if (!empty($cargo_data)) {
+                $cargo_data_arr = explode(',', $cargo_data);
+            }
+            return $cargo_data_arr;
+        }else {
+            return '缺少shipment_requests_id';
+        }
+
+    }
+
 }

@@ -291,7 +291,8 @@ Route::match(['post'],'/shipment/upReceiptsNum', 'ShipmentController@upReceiptsN
 Route::match(['post'],'/shipment/upShipment2', 'ShipmentController@upShipment2');//调拨进度页面修改调拨计划
 Route::match(['post'],'/shipment/upAdjustmentQquantity', 'ShipmentController@upAdjustmentQquantity');//修改 调整需求数量
 Route::match(['post'],'/shipment/upAlltoStatus', 'ShipmentController@upAlltoStatus');//修改 调拨状态
-
+Route::match(['post'],'/shipment/getBarcodepub', 'ShipmentController@getBarcodepub');//获取 条形码信息
+Route::match(['post'],'/shipment/getCargoData', 'ShipmentController@getCargoData');//获取大货资料
 //
 
 
