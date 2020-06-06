@@ -852,7 +852,12 @@ class MarketingPlanController extends Controller
 
     }
     public function test(){
-
+        $generator = new \Picqer\Barcode\BarcodeGeneratorHTML();
+        echo $generator->getBarcode('X001WAU01R', $generator::TYPE_CODE_128);
+        $generator = new \Picqer\Barcode\BarcodeGeneratorPNG();
+        $barcode = $generator->getBarcode('X001WAU01R', $generator::TYPE_CODE_128, $widthFactor = 2, $height = 30);
+        $barcode = base64_encode($barcode);
+        // echo  ' <img src="data:image/png;base64,'. $barcode .'"/>';
 //        $user = Auth::user()->toArray();
 //        $sap_seller_id = $user['sap_seller_id']>0?$user['sap_seller_id']:0;
 //        return view('marketingPlan.test', ['sap_seller_id' => $sap_seller_id]);

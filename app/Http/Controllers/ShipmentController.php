@@ -1742,13 +1742,20 @@ class ShipmentController extends Controller
     public function upAllAllot(Request $request)
     {
         $r_message = [];
-        $idList = explode(',', $request['idList']);
-        if ((@$request['status'] >= 0) && !empty($idList)) {
+        $s_r_idList = explode(',', $request['shipment_requests_id_list']);
+        if ((@$request['status'] >= 0) && !empty($s_r_idList)) {
             $data = ['status' => $request['status']];
             $result = DB::connection('vlz')->table('allot_progress')
-                ->whereIn('id', $idList)
+                ->whereIn('shipment_requests_id', $s_r_idList)
                 ->update($data);
             if ($result > 0) {
+                $data2 = [
+                    'allor_status' => $request['status'],
+                    'updated_at' => date('Y-m-d H:i:s', time())
+                ];
+                $result2 = DB::connection('vlz')->table('shipment_requests')
+                    ->whereIn('id', $s_r_idList)
+                    ->update($data2);
                 $r_message = ['status' => 1, 'msg' => '全部更新成功'];
             } else {
                 $r_message = ['status' => 0, 'msg' => '更新失败'];

@@ -13,7 +13,7 @@
         "ext-openssl": "*",
         "ext-pdo": "*",
         "barryvdh/laravel-debugbar": "^3.1",
-        "ddeboer/imap": "1.8",
+        "ddeboer/imap": "1.8.0",
         "drewm/mailchimp-api": "^2.5",
         "enkay/mws": "^0.4.0",
         "exeu/apai-io": "^2.1",
@@ -27,7 +27,7 @@
         "pda/pheanstalk": "^3.1",
         "php-imap/php-imap": "^3.0",
         "phpoffice/phpexcel": "^1.8",
-        "phpoffice/phpspreadsheet": "1.6.*",
+        "picqer/php-barcode-generator": "^2.0",
         "stevenyangecho/laravel-u-editor": "1.4.2",
         "yadakhov/insert-on-duplicate-key": "^1.2",
         "zizaco/entrust": "5.2.x-dev"
@@ -74,6 +74,10 @@
     "config": {
         "preferred-install": "dist",
         "sort-packages": true,
-        "optimize-autoloader": true
+        "optimize-autoloader": true,
+        "platform": {
+            "ext-pcntl": "7.2",
+            "ext-posix": "7.2"
+        }
     }
 }
