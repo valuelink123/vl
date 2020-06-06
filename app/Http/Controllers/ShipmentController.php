@@ -284,11 +284,11 @@ class ShipmentController extends Controller
             if (!empty($old_shipment)) {
                 $old_cargo_data = $old_shipment['cargo_data'];
             }
-            if (!empty($old_cargo_data)) {
-                $cargo_data = $old_cargo_data . ',' . $request['cargo_data'];
-            }
+//            if (!empty($old_cargo_data)) {
+//                $cargo_data = $old_cargo_data . ',' . $request['cargo_data'];
+//            }
             $data = [
-                'cargo_data' => $cargo_data
+                'cargo_data' => $request['cargo_data']
             ];
             $result = DB::connection('vlz')->table('shipment_requests')
                 ->where('id', $id)
@@ -2172,12 +2172,13 @@ class ShipmentController extends Controller
     public function getBarcodepub(Request $request)
     {
         $id = @$request['shipment_requests_id'];
-        $title = $asin = $marketplace_id = $seller_sku = $fnsku = NULL;
+        $quantity = $title = $asin = $marketplace_id = $seller_sku = $fnsku = NULL;
         $sql = 'SELECT
                 sh.id,
                 sh.asin,
                 sh.marketplace_id,
                 sh.seller_sku,
+                sh.quantity,
                 asins.title
                 FROM
                  shipment_requests AS sh
@@ -2191,6 +2192,7 @@ class ShipmentController extends Controller
         if (!empty($allot_progress)) {
             $title = $allot_progress[0]['title'];
             $asin = $allot_progress[0]['asin'];
+            $quantity = $allot_progress[0]['quantity'];
             $marketplace_id = $allot_progress[0]['marketplace_id'];
             $seller_sku = $allot_progress[0]['seller_sku'];
             if (!empty($asin) && !empty($marketplace_id) && !empty($seller_sku)) {
@@ -2203,7 +2205,7 @@ class ShipmentController extends Controller
             }
 
         }
-        return ['title' => $title, 'fnsku' => $fnsku];
+        return ['title' => $title, 'fnsku' => $fnsku, 'quantity' => $quantity];
     }
 
     /**
@@ -2226,8 +2228,51 @@ class ShipmentController extends Controller
                 $cargo_data_arr = explode(',', $cargo_data);
             }
             return $cargo_data_arr;
-        }else {
-            return '缺少shipment_requests_id';
+        } else {
+            return ['status' => 0, 'msg' => '缺少shipment_requests_id'];
+        }
+
+    }
+
+    /**
+     * @param Request $request
+     * 条形码PDF
+     */
+    public function downloadPDF(Request $request)
+    {
+        $width = @$request['width'];
+        $height = @$request['height'];
+        $fnsku = @$request['fnsku'];
+        $title = @$request['title'];
+
+        if(strlen($title)>75){
+            $title= substr($title,0,75).'...';
+        }
+        $num = @$request['num'];
+        if ($width > 0 && $height > 0 && !empty($fnsku) && !empty($title) && $num > 0) {
+            $generator = new \Picqer\Barcode\BarcodeGeneratorPNG();
+            $barcode = $generator->getBarcode($fnsku, $generator::TYPE_CODE_128, $widthFactor = 2, $height = 30);
+            $barcode = base64_encode($barcode);
+            $width=$width.'mm';
+            $height=$height.'mm';
+            // echo ' <img src="data:image/png;base64,' . $barcode . '"/>';
+            $mpdf = new \Mpdf\Mpdf(['mode' => 'utf-8', 'format' => 'A4', 'margin_top' => 0, 'margin_left' => 0, 'margin_right' => 0, 'margin_bottom' => 0]);
+            $html = '<div style="width: 210mm; height: 297mm;">
+                    <div style="transform-origin: 0px 0px; background-color: white; margin-left: 5mm;padding-top:16px">';
+            for ($i = 1; $i <= $num; $i++) {
+                $html .= '<div class="small_a4" style="width: '.$width.'; height: '.$height.'; display: inline-block; position: relative; float: left; padding-left: 1mm;padding-top:9px">
+            <div style="width: 100%; display: flex; align-items: center; padding-left: 18px">
+            <img  alt="" src="data:image/png;base64,' . $barcode . '" style="max-width: 100%; max-height: 100%;text-align: center">
+            <div style="margin-top: 5px;text-align: center">'.$fnsku.'</div>
+            <div style="margin-top: 4px">'.$title.'</div>
+            </div>
+            </div>';
+            }
+            $html .= '</div></div>';
+            //创建pdf文件
+            $mpdf->WriteHTML($html);
+            $time = date("Y-m-d") . time() . rand(1, 99999);
+            $mpdf->Output($time . ".pdf", "D");
         }
 
     }

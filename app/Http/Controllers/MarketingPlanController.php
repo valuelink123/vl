@@ -869,15 +869,16 @@ class MarketingPlanController extends Controller
 
         $mpdf = new \Mpdf\Mpdf(['mode' => 'utf-8', 'format' => 'A4', 'margin_top' => 0, 'margin_left' => 0, 'margin_right' => 0, 'margin_bottom' => 0]);
         $html = '<div style="width: 210mm; height: 297mm;">
-<div style="transform-origin: 0px 0px; background-color: white; margin-left: 12mm;">';
-        for ($i = 1; $i <= 1; $i++) {
+                    <div style="transform-origin: 0px 0px; background-color: white; margin-left: 5mm;padding-top:20px">';
+        for ($i = 1; $i <= 4; $i++) {
             $html .= '<div class="small_a4" style="width: 63.5mm; height: 38.1mm; display: inline-block; position: relative; float: left; padding-left: 1mm;">
-<div style="width: 100%; display: flex; align-items: center; padding-top:40px;">
-<img alt="" src="data:image/png;base64,' . $barcode . '" style="max-width: 100%; max-height: 100%;">
-<label>X001WAYU01R</label>
-</div></div>';
+            <div style="width: 100%; display: flex; align-items: center; padding-left: 18px">
+            <img  alt="" src="data:image/png;base64,' . $barcode . '" style="max-width: 100%; max-height: 100%;text-align: center">
+            <div style="margin-top: 5px;text-align: center">X001WAYU01R</div>
+            <div style="margin-top: 5px">aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</div>
+            </div>
+            </div>';
         }
-
         $html .= '</div></div>';
         //创建pdf文件
         $mpdf->WriteHTML($html);
