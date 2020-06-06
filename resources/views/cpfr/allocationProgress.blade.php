@@ -144,9 +144,11 @@
 	.batch_list{
 		border: 1px solid rgba(220, 223, 230, 1);
 		width: 180px;
-		margin-left: -40px !important;
+		left: 0;
 		padding: 15px 0 !important;
 		display: none;
+		position: absolute;
+		z-index: 99;
 	}
 	.batch_list,.batch_list li{
 		background: #fff;
@@ -165,13 +167,13 @@
 	}
 	.batch_list:after{
 		position: absolute;
-		top: 24px;
-		left: 50px;
+		top: -10px;
+		left: 30px;
 		right: auto;
 		display: inline-block !important;
-		border-right: 7px solid transparent;
-		border-bottom: 7px solid #fff;
-		border-left: 7px solid transparent;
+		border-right: 10px solid transparent;
+		border-bottom: 10px solid #fff;
+		border-left: 10px solid transparent;
 		content: '';
 		box-sizing: border-box;
 	}
@@ -338,7 +340,44 @@
 		margin-bottom: 10px;
 		border: 1px solid rgba(220, 223, 230, 1)
 	}
-	
+	.cloumn_box{
+		position: absolute;
+		right: 0;
+		z-index: 999;
+		display: none;
+		background: #fff;
+		padding: 20px;
+		border: 1px solid #eee;
+		height: 365px;
+		padding-right: 0;
+	}
+	.cloumn_list{
+		height: 300px;
+		overflow: auto;
+		padding: 0;
+		margin: 0;
+	}
+	.cloumn_list li{
+		padding: 0;
+		margin: 0;
+		line-height: 25px;
+		text-align: left;
+		list-style: none;
+	}
+	.cloumn_list li input{
+		margin-right: 10px;
+	}
+	.cloumn_box:after{
+		position: absolute;
+		top: -9px;
+		right: 45px;
+		display: inline-block !important;
+		border-right: 10px solid transparent;
+		border-bottom: 10px solid #fff;
+		border-left: 7px solid transparent;
+		content: '';
+		box-sizing: border-box;
+	}
 </style>
 <link rel="stylesheet" type="text/css" media="all" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-daterangepicker/3.0.5/daterangepicker.min.css" />
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.1/moment.min.js"></script>
@@ -466,23 +505,55 @@
 	    <div style="margin-bottom: 15px"></div>
 	    <div class="portlet-body">
 	        <div class="table-container" style="position: relative;">
-				<div style="position: absolute;left: 130px; z-index: 999;top:0" class="col-md-2">
-					<button type="button" class="btn btn-sm green-meadow batch_operation">批量操作<i class="fa fa-angle-down"></i></button>
-					<ul class="batch_list">
-						<li><button class="btn btn-sm red-sunglo noConfirmed" onclick="statusAjax(0)">资料提供中</button></li>
-						<li><button class="btn btn-sm yellow-crusta" onclick="statusAjax(1)">换标中</button></li>
-						<li><button class="btn btn-sm purple-plum" onclick="statusAjax(2)">待出库</button></li>
-						<li><button class="btn btn-sm blue-hoki" onclick="statusAjax(3)">已发货</button></li>
-						<li><button class="btn btn-sm blue-madison" onclick="statusAjax(4)">取消发货</button></li>
-					</ul>
+				<div style="width: 100%; height: 45px; line-height: 45px;">
+					<div style="padding-left: 0;" class="col-md-3">
+						<button type="button" class="btn btn-sm green-meadow batch_operation">批量操作<i class="fa fa-angle-down"></i></button>
+						<ul class="batch_list">
+							<li><button class="btn btn-sm red-sunglo noConfirmed" onclick="statusAjax(0)">资料提供中</button></li>
+							<li><button class="btn btn-sm yellow-crusta" onclick="statusAjax(1)">换标中</button></li>
+							<li><button class="btn btn-sm purple-plum" onclick="statusAjax(2)">待出库</button></li>
+							<li><button class="btn btn-sm blue-hoki" onclick="statusAjax(3)">已发货</button></li>
+							<li><button class="btn btn-sm blue-madison" onclick="statusAjax(4)">取消发货</button></li>
+						</ul>
+					</div>
+					<div class="col-md-7">
+						<button type="button" class="btn btn-sm red-sunglo" onclick="status_filter('资料提供中',5)">资料提供中 : <span class="status0"></span></button>
+						<button type="button" class="btn btn-sm yellow-crusta" onclick="status_filter('换标中',5)">换标中 : <span class="status1"></span></button>
+						<button type="button" class="btn btn-sm purple-plum" onclick="status_filter('待出库',5)">待出库 : <span class="status2"></span></button>
+						<button type="button" class="btn btn-sm green-meadow" onclick="status_filter('已发货',5)">已发货 : <span class="status3"></span></button>
+						<button type="button" class="btn btn-sm blue-madison" onclick="status_filter('取消发货',5)">取消发货 : <span class="status4"></span></button>
+					</div>
+					<div class="col-md-2" style="text-align: right;">
+						<button type="button" class="btn btn-sm green-meadow cloumn">隐藏列操作</button>
+						<div class="cloumn_box">
+							<p style="padding: 0;margin: 0;line-height: 25px; text-align: left;"><input type="checkbox" class="checkboxAll" style="margin-right: 10px;" />是否全选</p>
+							<ul class="cloumn_list">
+								<li><input type="checkbox" />提交日期</li>
+								<li><input type="checkbox" />销售员</li>
+								<li><input type="checkbox" />产品图片</li>
+								<li><input type="checkbox" />ASIN</li>
+								<li><input type="checkbox" />SKU</li>
+								<li><input type="checkbox" />需求数量</li>
+								<li><input type="checkbox" />期望到货时间</li>
+								<li><input type="checkbox" />海外库存</li>
+								<li><input type="checkbox" />未交订单</li>
+								<li><input type="checkbox" />加权日均</li>
+								<li><input type="checkbox" />到货后预计日销(PCS)</li>
+								<li><input type="checkbox" />利润率</li>
+								<li><input type="checkbox" />审核状态</li>
+								<li><input type="checkbox" />计划员</li>
+								<li><input type="checkbox" />MOQ</li>
+								<li><input type="checkbox" />收货工厂</li>
+								<li><input type="checkbox" />运输方式</li>
+								<li><input type="checkbox" />计划确认数量</li>
+								<li><input type="checkbox" />预计交货时间</li>
+								<li><input type="checkbox" />采购订单号</li>
+								<li><input type="checkbox" />完成进度</li>
+							</ul>
+						</div>
+					</div>
 				</div>
-				<div class="col-md-6"  style="position: absolute;left: 520px; z-index: 999;top:0">
-					<button type="button" class="btn btn-sm red-sunglo" onclick="status_filter('资料提供中',5)">资料提供中 : <span class="status0"></span></button>
-					<button type="button" class="btn btn-sm yellow-crusta" onclick="status_filter('换标中',5)">换标中 : <span class="status1"></span></button>
-					<button type="button" class="btn btn-sm purple-plum" onclick="status_filter('待出库',5)">待出库 : <span class="status2"></span></button>
-					<button type="button" class="btn btn-sm green-meadow" onclick="status_filter('已发货',5)">已发货 : <span class="status3"></span></button>
-					<button type="button" class="btn btn-sm blue-madison" onclick="status_filter('取消发货',5)">取消发货 : <span class="status4"></span></button>
-				</div>
+				
 	            <table class="table table-striped table-bordered" id="thetable" style="width:100%">
 	                <thead>
 	                <tr>
@@ -830,7 +901,7 @@
 		}else{
 			$.ajax({
 			    type: "POST",
-				url: "/shipment/upAllAllot",
+				url: "http://10.10.42.14/vl/public/shipment/upAllAllot",
 				data: {
 					status: status,
 					idList: chk_value
@@ -867,6 +938,34 @@
 	    else tableObj.column(column).search(value).draw();
 	}
 	$(document).ready(function(){
+		//批量操作列表展开
+		$('.cloumn').click(function(e){
+			$('.cloumn_box').slideToggle();
+			e.stopPropagation();
+		})
+		$(".cloumn_list").children("li").each(function(index,element){
+			$(this).find('input').click(function(){
+				let id = $(this).parent().index() + 4;
+				if($(this).is(':checked')){
+					tableObj.column(id).visible(false)
+				}else{
+					tableObj.column(id).visible(true)
+				}
+			})
+		})
+		$('.checkboxAll').on('click',function(){
+			if($(this).is(':checked')){
+				$(".cloumn_list").find('input').prop('checked',true);
+				for(var i=4; i<25; i++){
+					tableObj.column(i).visible(false)
+				}
+			}else{
+				$(".cloumn_list").find('input').prop('checked',false)
+				for(var i=4; i<25; i++){
+					tableObj.column(i).visible(true)
+				}
+			}
+		})
 		//上传大货资料弹窗隐藏
 		$('.cancelUpload').on('click',function(){
 			$('.mask_upload_box').hide();
@@ -885,7 +984,7 @@
 			}
 			$.ajax({
 			    type: "POST",
-				url: "/shipment/importExecl",
+				url: "http://10.10.42.14/vl/public/shipment/importExecl",
 				data: {
 					files: fileList
 				},
@@ -922,7 +1021,7 @@
 			});
 			$.ajax({
 			    type: "POST",
-				url: "/shipment/allotProgress",
+				url: "http://10.10.42.14/vl/public/shipment/allotProgress",
 				data: {
 					downLoad: 1,
 					date_s: cusstr($('.createTimeInput').val() , ' - ' , 1),
@@ -989,7 +1088,7 @@
 		$('.updateConfirm').on('click',function(){
 			$.ajax({
 			    type: "POST",
-				url: "/shipment/upShipment2",
+				url: "http://10.10.42.14/vl/public/shipment/upShipment2",
 				data: {
 					id: $('.formId').val(),
 					out_warehouse: $('#out_warehouse_input').val(),  
@@ -1043,7 +1142,7 @@
 			 	}
 			 });
 			 $.ajax({
-				url: "/shipment/exportExecl",
+				url: "http://10.10.42.14/vl/public/shipment/exportExecl",
 				 method: 'POST',
 				 cache: false,
 				 data: {
@@ -1132,7 +1231,7 @@
 		function editTableData(id){
 			$.ajax({
 			    type: "POST",
-				url: "/shipment/detailShipment",
+				url: "http://10.10.42.14/vl/public/shipment/detailShipment",
 				data: {
 					id: id
 				},
@@ -1180,7 +1279,7 @@
 			order: [ 1, "desc" ],
 			ajax: {
 				type: 'POST',
-				url: '/shipment/allotProgress',
+				url: 'http://10.10.42.14/vl/public/shipment/allotProgress',
 				data :  function(){
 					reqList = {
 						"condition" : $('.keyword').val(),
@@ -1195,7 +1294,7 @@
 					for (let row of res[0]) {
 					    let shipment_requests_id = row.shipment_requests_id
 					    // 根据每一行 shipment_requests_id 进行预查询，如果有配件数据，则将加号按钮变绿
-					    $.post('/shipment/getBoxDetail', {shipment_requests_id}).success(rows => {
+					    $.post('http://10.10.42.14/vl/public/shipment/getBoxDetail', {shipment_requests_id}).success(rows => {
 					        if (rows.length > 0) {
 					            if (false === rows[0]) return
 					            $(`#thetable .ctrl-${shipment_requests_id}`).parent().removeClass('disabled')
@@ -1299,7 +1398,7 @@
 						$(cell).on("blur", ":input", function () {
 							$.ajax({
 								type: "POST",
-								url: "/shipment/upAllAllot",
+								url: "http://10.10.42.14/vl/public/shipment/upAllAllot",
 								data: {
 									idList: rowData.id,
 									status: $(this).find("option:selected").attr("status"),
@@ -1474,7 +1573,7 @@
 								tableObj.cell(cell).data(text);
 								$.ajax({
 									type:"post",
-									url:'/shipment/upShippmentID',
+									url:'http://10.10.42.14/vl/public/shipment/upShippmentID',
 									data:{
 										id: rowData.id,
 					                    shippment_id: rowData.shippment_id 
@@ -1528,7 +1627,7 @@
 								tableObj.cell(cell).data(text);
 								$.ajax({
 									type:"post",
-									url:'/shipment/upReceiptsNum',
+									url:'http://10.10.42.14/vl/public/shipment/upReceiptsNum',
 									data:{
 										id: rowData.id,
 					                    receipts_num: rowData.receipts_num
@@ -1606,7 +1705,7 @@
 						$(cell).on("blur", ":input", function () {
 							$.ajax({
 								type: "POST",
-								url: "/shipment/upShippingMethod",
+								url: "http://10.10.42.14/vl/public/shipment/upShippingMethod",
 								data: {
 									id: rowData.id,
 									shippingMethod: $(this).val()
@@ -1638,7 +1737,7 @@
 		async function buildSubItemTable(shipment_requests_id) {
 		
 		    let rows = await new Promise((resolve, reject) => {
-		        $.post('/shipment/getBoxDetail', {shipment_requests_id})
+		        $.post('http://10.10.42.14/vl/public/shipment/getBoxDetail', {shipment_requests_id})
 		            .success(rows => resolve(rows))
 		            .error((xhr, status, errmsg) => reject(new Error(errmsg)))
 		    })
