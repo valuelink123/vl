@@ -134,12 +134,12 @@ class MrpController extends Controller
 		}
 		$orderby = $this->dtOrderBy($req);
 		
-		$sql = $this->getSql($where,$date_from,$date_to,$orderby);
+		$sql = $this->getSql($where,$date_from,$date_to,$orderby,false);
 		
 		
 			
 		if($type=='sku'){
-			$sql="SELECT SQL_CALC_FOUND_ROWS sku,marketplace_id,any_value(sap_seller_id) as sap_seller_id,  count(asin) as asin, sum(daily_sales) as daily_sales,sum(quantity) as quantity,sum(afn_sellable) as afn_sellable,sum(afn_reserved) as afn_reserved,any_value(mfn_sellable) as mfn_sellable,any_value(sz_sellable) as sz_sellable from (".str_replace('SQL_CALC_FOUND_ROWS','',$sql).") as skus_table 
+			$sql="SELECT SQL_CALC_FOUND_ROWS sku,marketplace_id,any_value(sap_seller_id) as sap_seller_id,  count(asin) as asin, sum(daily_sales) as daily_sales,any_value(min_purchase_quantity) as min_purchase_quantity,sum(afn_sellable) as afn_sellable,sum(afn_reserved) as afn_reserved,any_value(mfn_sellable) as mfn_sellable,any_value(sz_sellable) as sz_sellable from (".str_replace('SQL_CALC_FOUND_ROWS','',$sql).") as skus_table 
 			group by sku,marketplace_id order by daily_sales desc";
 		}
 
@@ -155,7 +155,7 @@ class MrpController extends Controller
 		$siteCode = array_flip(getSiteCode());
 		$sellers = getUsers('sap_seller');
 		foreach ($datas as $key => $val) {
-			$min_purchase_quantity = intval(SapPurchaseRecord::where('sku',$val['sku'])->where('sap_factory_code','<>','')->whereNotIn('supplier',['CN01','WH01','HK03'])->orderBy('created_date','desc')->value('min_purchase_quantity'));
+			//$min_purchase_quantity = intval(SapPurchaseRecord::where('sku',$val['sku'])->where('sap_factory_code','<>','')->whereNotIn('supplier',['CN01','WH01','HK03'])->orderBy('created_date','desc')->value('min_purchase_quantity'));
 			$data_placement ='top';
 			if($key<4) $data_placement='bottom';
 			$asin_plans = AsinSalesPlan::SelectRaw('sum(quantity_last) as quantity,week_date')->where($type,$val[$type])->where('marketplace_id',$val['marketplace_id'])->where('date','>=',$date_from)->where('date','<=',$date_to)->groupBy(['week_date'])->get()->keyBy('week_date')->toArray();
@@ -163,15 +163,19 @@ class MrpController extends Controller
 			$data[$key]['asin'] = ($type=='asin')?'<a href="/mrp/edit?asin='.$val['asin'].'&marketplace_id='.$val['marketplace_id'].'">'.$val['asin'].'</a>':$val['asin'];
 			$data[$key]['site'] = array_get($siteCode,$val['marketplace_id']);
 			$data[$key]['sku'] = ($type=='sku')?'<a href="/mrp/edit?keyword='.$val['sku'].'&marketplace_id='.$val['marketplace_id'].'">'.$val['sku'].'</a>':$val['sku'];
-			$data[$key]['min_purchase'] = $min_purchase_quantity;
+			$data[$key]['min_purchase'] = $val['min_purchase_quantity'];
 			
 			$data[$key]['total_sellable'] = intval($val['afn_sellable']+$val['afn_reserved']+$val['mfn_sellable']+$val['sz_sellable']);
 			$data[$key]['week_daily_sales'] = round($val['daily_sales']*7,2);
-			$data[$key]['22_week_plan_total'] = intval($val['quantity']);
-			
+			$data[$key]['22_week_plan_total'] =0;
 			for($i=1;$i<=22;$i++){
 				$data[$key][$i.'_week_plan'] = ($type!='sku' && date('Y-m-d',strtotime($date.' +'.$i.' weeks sunday'))>=date('Y-m-d',strtotime('+1 weeks sunday')))?('<a class="week_plan editable" title="'.$val['asin'].' '.array_get($siteCode,$val['marketplace_id']).' weeks '.$i.' Plan" href="javascript:;" id="'.$val['asin'].'--'.$val['marketplace_id'].'--'.$val['sku'].'--'.date('Y-m-d',strtotime($date.' +'.$i.' weeks sunday')).'" data-pk="'.$val['asin'].'--'.$val['marketplace_id'].'--'.$val['sku'].'--'.date('Y-m-d',strtotime($date.' +'.$i.' weeks sunday')).'" data-type="text" data-placement="'.$data_placement.'">'.array_get($asin_plans,date('Y-m-d',strtotime($date.' +'.$i.' weeks sunday')).'.quantity',0).'</a>'):array_get($asin_plans,date('Y-m-d',strtotime($date.' +'.$i.' weeks sunday')).'.quantity',0);
+				
+				$data[$key]['22_week_plan_total']+=array_get($asin_plans,date('Y-m-d',strtotime($date.' +'.$i.' weeks sunday')).'.quantity',0);
             }
+			
+			
+			
 		}
 		
 		return compact('data', 'recordsTotal', 'recordsFiltered');
@@ -448,7 +452,7 @@ class MrpController extends Controller
 		$date = array_get($search,'date')??date('Y-m-d');
 		$date_from = date('Y-m-d',strtotime($date.' next monday'));
 		$date_to = date('Y-m-d',strtotime($date.' +22 weeks sunday'));
-		$searchField = array('bg'=>'a.bg','bu'=>'a.bu','site'=>'a.marketplace_id','sku'=>'a.sku','sku_level'=>'a.status','sku_status'=>'a.sku_status','sku_level'=>'a.status','sap_seller_id'=>'a.sap_seller_id');
+		$searchField = array('bg'=>'a.bg','bu'=>'a.bu','site'=>'a.marketplace_id','sku'=>'a.sku','sku_level'=>'a.status','sku_status'=>'a.sku_status','sap_seller_id'=>'a.sap_seller_id');
 		
 		$where = $this->getSearchWhereSql($search,$searchField);
 		
@@ -461,22 +465,22 @@ class MrpController extends Controller
 			if($key=='bu' && $val) $where .=" and a.bu='$val'";
 			if($key=='sap_seller_id' && $val) $where .=" and a.sap_seller_id='$val'";
 		}
-		$sql = $this->getSql($where,$date_from,$date_to,'');
+		$sql = $this->getSql($where,$date_from,$date_to,'',false);
 
 		$datas = DB::connection('amazon')->select($sql);
 		$datas = json_decode(json_encode($datas),true);
 		$data = [];
 		
-		$headArray[] = 'Seller';
+		$headArray[] = '销售员';
         $headArray[] = 'Asin';
-        $headArray[] = 'Site';
+        $headArray[] = '站点';
 		$headArray[] = 'Sku';
-        $headArray[] = 'Min Purchase';
-        $headArray[] = 'W/Sales';
-		$headArray[] = 'TotalSellable';
-        $headArray[] = 'TotalPlan';
+        $headArray[] = '最小起订量';
+        $headArray[] = '周加权销量';
+		$headArray[] = '总可售库存';
+        $headArray[] = '销售计划合计';
 		for($i=1;$i<=22;$i++){
-        	$headArray[] = date('Y-m-d',strtotime($date.' +'.$i.' weeks monday')-86400*7);
+        	$headArray[] = date('W',strtotime($date.' +'.$i.' weeks monday')-86400*7).'周 '.date('Y-m-d',strtotime($date.' +'.$i.' weeks monday')-86400*7);
         }
         $data[] = $headArray;
 		
@@ -485,18 +489,19 @@ class MrpController extends Controller
 		foreach ($datas as $key => $val) {
 			$key++;
 			$asin_plans = AsinSalesPlan::SelectRaw('sum(quantity_last) as quantity,week_date')->where('asin',$val['asin'])->where('marketplace_id',$val['marketplace_id'])->where('date','>=',$date_from)->where('date','<=',$date_to)->groupBy(['week_date'])->get()->keyBy('week_date')->toArray();
-			
-			$min_purchase_quantity = intval(SapPurchaseRecord::where('sku',$val['sku'])->where('sap_factory_code','<>','')->whereNotIn('supplier',['CN01','WH01','HK03'])->orderBy('created_date','desc')->value('min_purchase_quantity'));
+			$plan_total[$key] =0;
+			//$min_purchase_quantity = intval(SapPurchaseRecord::where('sku',$val['sku'])->where('sap_factory_code','<>','')->whereNotIn('supplier',['CN01','WH01','HK03'])->orderBy('created_date','desc')->value('min_purchase_quantity'));
 			$data[$key]['seller'] = array_get($sellers,$val['sap_seller_id']);
 			$data[$key]['asin'] = $val['asin'];
 			$data[$key]['site'] = array_get($siteCode,$val['marketplace_id']);
 			$data[$key]['sku'] = $val['sku'];
-			$data[$key]['min_purchase'] = $min_purchase_quantity;
-			$data[$key]['week_daily_sales'] = round($val['daily_sales']*7,2);
+			$data[$key]['min_purchase'] = $val['min_purchase_quantity'];
+			$data[$key]['week_daily_sales'] = round($val['daily_sales']*7);
 			$data[$key]['total_sellable'] = intval($val['afn_sellable']+$val['afn_reserved']+$val['mfn_sellable']+$val['sz_sellable']);
-			$data[$key]['22_week_plan_total'] = intval($val['quantity']);
+			$data[$key]['22_week_plan_total'] = &$plan_total[$key];
 			for($i=1;$i<=22;$i++){
 				$data[$key][$i.'_week_plan'] = array_get($asin_plans,date('Y-m-d',strtotime($date.' +'.$i.' weeks sunday')).'.quantity',0);
+				$plan_total[$key]+=intval($data[$key][$i.'_week_plan']);
             }
 		}
 		if($data){
@@ -575,7 +580,7 @@ class MrpController extends Controller
 			$data[$key]['sku'] = $val['sku'];
 			$data[$key]['status'] = $val['status'];
 			$data[$key]['seller'] = array_get($sellers,$val['sap_seller_id']);
-			$data[$key]['daily_sales'] = round($val['daily_sales'],2);
+			$data[$key]['daily_sales'] = round($val['daily_sales']);
 			$data[$key]['quantity'] = intval($val['quantity']);
 			$data[$key]['fba_stock'] = $val['afn_sellable']+$val['afn_reserved'];
 			$data[$key]['fba_stock_keep'] = ($val['afn_out_stock_date'])?date('Y-m-d',strtotime($val['afn_out_stock_date'])-86400):'';
@@ -610,46 +615,56 @@ class MrpController extends Controller
         die();
     }
 
-	public function getSql($where,$date_from,$date_to,$orderby='daily_sales desc')
+	public function getSql($where,$date_from,$date_to,$orderby='daily_sales desc',$cal_stock=true)
 	{
 		if($orderby){
 			$orderby = " order by {$orderby} ";
 		}else{
 			$orderby = " order by daily_sales desc";
 		}
-		$add_where = [];
-		foreach(getMarketplaceCode() as $k=>$v){
-			foreach($v['fba_factory_warehouse'] as $k1=>$v1){
-				$add_where[] ="(sap_factory_code = '".$v1['sap_factory_code']."' and sap_warehouse_code = '".$v1['sap_warehouse_code']."')";
+		if($cal_stock){
+			$add_where = [];
+			foreach(getMarketplaceCode() as $k=>$v){
+				foreach($v['fba_factory_warehouse'] as $k1=>$v1){
+					$add_where[] ="(sap_factory_code = '".$v1['sap_factory_code']."' and sap_warehouse_code = '".$v1['sap_warehouse_code']."')";
+				}
 			}
-		}
-		
-		
-		$sql = "
-        SELECT SQL_CALC_FOUND_ROWS
-        	a.*,(sales_4_weeks/28*0.5+sales_2_weeks/14*0.3+sales_1_weeks/7*0.2) as daily_sales,buybox_sellerid,
-afn_sellable,afn_reserved,mfn_sellable,sz_sellable,quantity,sum_estimated_afn,sum_estimated_purchase,out_stock_count,out_stock_date,over_stock_count,over_stock_date,sum_quantity_miss,unsafe_count,afn_out_stock_date from (select asin,marketplace_id,any_value(sku) as sku,any_value(status) as status,
-any_value(sku_status) as sku_status,any_value(sap_seller_id) as sap_seller_id, 
-any_value(sap_seller_bg) as bg,any_value(sap_seller_bu) as bu from sap_asin_match_sku where sku_status<6 group by asin,marketplace_id) as a
-left join asins as b on a.asin=b.asin and a.marketplace_id=b.marketplaceid
-left join (select sku,sum(quantity) as sz_sellable from sap_sku_sites where left(sap_factory_code,2)='HK' group by sku) as d on a.sku=d.sku
-left join (select a1.asin,a1.marketplace_id,sum(quantity_last) as quantity,
+			$add_join =" left join (select a1.asin,a1.marketplace_id,sum(quantity_last) as quantity,
 sum(estimated_afn) as sum_estimated_afn,sum(estimated_purchase) as sum_estimated_purchase,
 sum(IF(afn_sellable+afn_reserved+mfn_sellable-quantity_miss<0,1,0)) as out_stock_count,
 min(IF(afn_sellable+afn_reserved+mfn_sellable-quantity_miss<0,a1.date,NULL)) as out_stock_date,
 min(IF(afn_sellable+afn_reserved-quantity_miss<0,a1.date,NULL)) as afn_out_stock_date,
 sum(IF(afn_sellable+afn_reserved+mfn_sellable-quantity_miss>0 and a1.date>DATE_SUB(curdate(),INTERVAL -120 DAY),1,0)) as over_stock_count,
 min(IF(afn_sellable+afn_reserved+mfn_sellable-quantity_miss>0 and a1.date>DATE_SUB(curdate(),INTERVAL -120 DAY),a1.date,NULL)) as over_stock_date,
-
 max(IF(a1.date='".$date_to."',quantity_miss,0)) as sum_quantity_miss,
 sum(IF(afn_sellable+afn_reserved+mfn_sellable-quantity_miss-sku_safe_quantity<0,1,0)) as unsafe_count
 from asin_sales_plans as a1 left join asins as b1 on a1.asin=b1.asin and a1.marketplace_id=b1.marketplaceid
 left join (select sku,marketplace_id,any_value(safe_quantity) as sku_safe_quantity  from sap_sku_sites where (".implode(" or ",$add_where).") group by sku,marketplace_id) as e on a1.sku=e.sku and a1.marketplace_id =e.marketplace_id where a1.date>='".$date_from."' and a1.date<='".$date_to."' group by asin,marketplace_id) as c
-on a.asin=c.asin and a.marketplace_id=c.marketplace_id
+on a.asin=c.asin and a.marketplace_id=c.marketplace_id ";
+			$add_field = ",quantity,sum_estimated_afn,sum_estimated_purchase,out_stock_count,out_stock_date,over_stock_count,over_stock_date,sum_quantity_miss,unsafe_count,afn_out_stock_date ";
+		}else{
+			$add_join =" left join (select sku,any_value(min_purchase_quantity) as min_purchase_quantity,any_value(created_date) as created_date from sap_purchase_records where sap_factory_code<>'' and supplier not in ('CN01','WH01','HK03') group by sku order by created_date desc) as c on a.sku=c.sku";
+			$add_field = ",min_purchase_quantity ";
+		}
+		
+		$sql = "
+        SELECT SQL_CALC_FOUND_ROWS
+        	a.*,(sales_4_weeks/28*0.5+sales_2_weeks/14*0.3+sales_1_weeks/7*0.2) as daily_sales,buybox_sellerid,
+afn_sellable,afn_reserved,mfn_sellable,sz_sellable ".$add_field." from (select asin,marketplace_id,any_value(sku) as sku,any_value(status) as status,
+any_value(sku_status) as sku_status,any_value(sap_seller_id) as sap_seller_id, 
+any_value(sap_seller_bg) as bg,any_value(sap_seller_bu) as bu from sap_asin_match_sku where sku_status<6 group by asin,marketplace_id) as a
+left join asins as b on a.asin=b.asin and a.marketplace_id=b.marketplaceid
+left join (select sku,sum(quantity) as sz_sellable from sap_sku_sites where left(sap_factory_code,2)='HK' group by sku) as d on a.sku=d.sku
+".$add_join."
 			where (sku_status>0 or (afn_sellable+afn_reserved+mfn_sellable+sz_sellable)>0) {$where} 
 			{$orderby} ";
 		return $sql;
 	}
+	
+	
+	
+	
+
 
 
 	public function getReturnData($data) {
@@ -662,7 +677,7 @@ on a.asin=c.asin and a.marketplace_id=c.marketplace_id
 			$data[$key]['sku'] = $val['sku'];
 			$data[$key]['status'] = $val['status'];
 			$data[$key]['seller'] = array_get($sellers,$val['sap_seller_id']);
-			$data[$key]['daily_sales'] = round($val['daily_sales'],2);
+			$data[$key]['daily_sales'] = round($val['daily_sales']);
 			$data[$key]['quantity'] = intval($val['quantity']);
 			$data[$key]['fba_stock'] = $val['afn_sellable']+$val['afn_reserved'];
 			$data[$key]['fba_stock_keep'] = ($val['afn_out_stock_date'])?date('Y-m-d',strtotime($val['afn_out_stock_date'])-86400):'';
@@ -733,7 +748,6 @@ on a.asin=c.asin and a.marketplace_id=c.marketplace_id
 										
 									}
 								}
-								
 								if($updateData) AsinSalesPlan::insertOnDuplicateWithDeadlockCatching(array_values($updateData), ['week_date','quantity_last','sku','updated_at']);
 								AsinSalesPlan::calPlans($asin,$marketplace_id,$sku,date('Y-m-d'),date('Y-m-d',strtotime("+22 Sunday")));
 							}
