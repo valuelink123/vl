@@ -323,7 +323,7 @@ white-space: nowrap;
 								
 								<td>
 								<?php
-								if($show=='day' && $type=='asin' && $k>=$cur_date){
+								if($show=='day' && $type=='asin' && $k>=$cur_date && in_array(intval(array_get($v,'status',0))+1,$dist_status)){
 								?>
 								<a class="plan editable" title="{{$asin.' '.$k.' Plan'}}" href="javascript:;" id="{{$k}}--quantity_last" data-pk="{{$k}}--quantity_last" data-type="text"> {{$v['plan_last']}} </a>
 								<?php

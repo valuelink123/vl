@@ -13,6 +13,12 @@
 table.dataTable thead th, table.dataTable thead td {
     padding: 8px 10px;
 }
+input[type=checkbox], input[type=radio]{
+	margin:0px;
+}
+.DTFC_Cloned{
+ margin-top:1px !important;
+}
 </style>
 
     <link rel="stylesheet" href="/js/chosen/chosen.min.css"/>
@@ -159,9 +165,34 @@ table.dataTable thead th, table.dataTable thead td {
 
             </div>
             <div class="table-container" style="">
+				<div style="position: relative;">
+				<div class="btn-group" style="position: absolute;left: 150px; z-index: 999;top:30px">
+					
+					<button type="button" class="btn btn-sm green-meadow">批量操作</button>
+					<button type="button" class="btn btn-sm green-meadow dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+						<i class="fa fa-angle-down"></i>
+					</button>
+					<ul class="dropdown-menu" role="menu">
+					
+						<?php 
+						$color_arr=['0'=>'red-sunglo','1'=>'yellow-crusta','2'=>'purple-plum','3'=>'blue-hoki','4'=>'blue-madison','5'=>'green-meadow'];
+						foreach (getDistRuleForRole() as $k=>$v){
+						?>
+						<li>
+						
+						<button type="button" class="btn btn-sm {{array_get($color_arr,$k)}}" onclick="updateStatusAjax({{$k}})">{{$v}}</button>
+						
+						</li>
+						<li class="divider"> </li>
+						<?php } ?>
+				
+					</ul>
+				</div>
+				</div>
                 <table class="table table-striped table-bordered" id="thetable">
                     <thead>
                     <tr>
+						<th><input type="checkbox" id="selectAll" /></th>
 						<th> 销售员 </th>
                         <th>Asin</th>
                         <th>站点</th>
@@ -207,6 +238,7 @@ var initTable = function () {
 		//aoColumnDefs: [ { "bSortable": false, "aTargets": [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,21] }],
 		order: [],
 		columns: [
+			{data: 'id', name: 'id'},
 			{data: 'seller', name: 'seller'},
 			{data: 'asin', name: 'asin'},
 			{data: 'site', name: 'site'},
@@ -247,10 +279,17 @@ var initTable = function () {
 		scrollY:        false,
 		scrollX:        true,
 		fixedColumns:   {
-			leftColumns:8,
-			rightColumns: 0
+			leftColumns:9,
+			rightColumns: 0,
+			"drawCallback": function(){
+				$(".DTFC_Cloned input[id='selectAll']").on('change',function(e) {
+					$(".DTFC_Cloned input[name='checkedInput']").prop("checked", this.checked);
+				});	
+			}
+
 		},
 		"fnDrawCallback": function (oSettings) {
+			
 			$.mockjaxSettings.responseTime = 500;
 			$.fn.editable.defaults.inputclass = 'form-control';
 			$.fn.editable.defaults.url = '/mrp/weekupdate';	
@@ -280,12 +319,9 @@ var initTable = function () {
 
 initTable();
 let dtApi = $theTable.api();
-
-
-//点击提交按钮重新绘制表格，并将输入框中的值赋予检索框
+jQuery(document).ready(function() {
+		
 $('#search').click(function () {
-	
-	
 	dtApi.settings()[0].ajax.data = {search: $("#search-form").serialize()};
 	dtApi.ajax.reload();
 	$(".week_end_date").each(function(index){
@@ -307,7 +343,7 @@ $('.date-picker').datepicker({
 	rtl: App.isRTL(),
 	autoclose: true
 });
-
+});
 function getNextMonday(i) {
 	var now = new Date($("#date").val());
 	var day = now.getDay();
@@ -331,6 +367,39 @@ function getYearWeek(date){
     return Math.ceil(d /7)+1;  
 } 
 
+
+function updateStatusAjax(status){
+	let chk_value = '';
+	$(".DTFC_Cloned input[name='checkedInput']:checked").each(function (index,value) {
+		if(chk_value != ''){
+			chk_value = chk_value + ',' + $(this).val()	
+		}else{
+			chk_value = chk_value + $(this).val()
+		}
+	});
+	if(chk_value == ""){
+		alert('请先选择需要更新的数据!')
+	}else{
+		$.ajax({
+			type: "POST",
+			url: "/mrp/updateStatus",
+			data: {
+				status: status,
+				asinlist: chk_value,
+				date: $("#date").val(),
+			},
+			success: function (res) {
+				toastr.success("更新状态成功！");
+				dtApi.settings()[0].ajax.data = {search: $("#search-form").serialize()};
+				dtApi.ajax.reload();
+			},
+			error: function(err) {
+				toastr.error("err");
+			}
+		});
+		
+	}
+}
 </script>
 
 @endsection
