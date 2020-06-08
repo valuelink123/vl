@@ -1621,7 +1621,7 @@
 					data: 'method',
 					name: 'method',
 					render: function(data, type, row, meta) {
-						var content = '<button><a target="_blank" href="barcode?id='+row.id+'">打印</a></button>';
+						var content = '<button><a target="_blank" href="barcode?id='+row.shipment_requests_id+'">打印</a></button>';
 						return content;
 					},
 				},
