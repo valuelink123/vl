@@ -224,12 +224,10 @@
 	.table>thead:first-child>tr:first-child>th{
 		text-align: center;
 	}
-	
-	
 	.table-stripeds>tbody>tr>td{
 		padding:12px
 	}
-	.mask_box,.mask_upload_box,.mask_file_upload{
+	.mask_box,.mask_file_upload{
 		display: none;
 		position: fixed;
 		top: 0;
@@ -412,9 +410,16 @@
 		<button id="export" style="float:right;margin:0 10px" class="btn sbold blue"> 导出
 			<i class="fa fa-download"></i>
 		</button>
-		<button type="submit" id="uploadFrom" class="btn sbold blue"> 上传
-			<i class="fa fa-upload"></i>
-		</button>
+		<div style="float: right;">
+			<form action="/shipment/importExecl" style="display: inline-block;" method="POST" class="pull-right " enctype="multipart/form-data">
+				{{ csrf_field() }}
+				<input style="display: inline-block;" type="file" name="files" id="input" multiple=""> 
+				<button type="submit" class="btn blue start">
+				    <i class="fa fa-upload"></i>
+				    <span>开始上传</span>
+				</button>
+			</form>
+		</div>   
 	</div>
 	<div class="content">
 		<div class="filter_box">
@@ -609,89 +614,7 @@
 		<span class="mask_text error_mask_text"></span>
 	</div>
 </div>	
-<div class="mask_upload_box">
-	<div class="mask_upload_dialog">
-		<svg t="1588919283810"class="icon cancel_upload_btn cancelUpload" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4128" width="15" height="15"><path d="M1001.952 22.144c21.44 21.44 22.048 55.488 1.44 76.096L98.272 1003.36c-20.608 20.576-54.592 20-76.096-1.504-21.536-21.44-22.048-55.488-1.504-76.096L925.824 20.672c20.608-20.64 54.624-20 76.128 1.472" p-id="4129" fill="#707070"></path><path d="M22.176 22.112C43.616 0.672 77.6 0.064 98.24 20.672L1003.392 925.76c20.576 20.608 20 54.592-1.504 76.064-21.44 21.568-55.488 22.08-76.128 1.536L20.672 98.272C0 77.6 0.672 43.584 22.176 22.112" p-id="4130" fill="#707070"></path></svg>
-		
-		<!-- The fileupload-buttonbar contains buttons to add/delete files and start/cancel the upload -->
-		<form style="height: 130px; overflow: hidden;" id="fileupload1" action="{{ url('send') }}" method="POST" enctype="multipart/form-data">
-			{{ csrf_field() }}
-			<input type="hidden" name="warn" id="warn" value="0">
-			<input type="hidden" name="inbox_id" id="inbox_id" value="0">
-			<input type="hidden" name="user_id" id="user_id" value="{{Auth::user()->id}}">
-							
-			<div>
-				<div class="fileupload-buttonbar">
-					<div class="col-lg-12" style="text-align: center;margin-bottom: 20px;">
-						<span class="btn green fileinput-button">
-							<i class="fa fa-plus"></i>
-							<span>添加文件</span>
-							<input type="file" name="files[]" multiple=""> 
-						</span>
-						<span class="fileupload-process"> </span>
-					</div>
-				</div>
-				<table role="presentation" class="table table-striped clearfix table-stripeds" id="table-striped" style="margin-bottom: 0;">
-					<tbody class="files" id="filesTable1"> </tbody>
-				</table>
-				<div class="col-lg-12 fileupload-progress fade">
-					<div class="progress progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100">
-						<div class="progress-bar progress-bar-success" style="width:0%;"> </div>
-					</div>
-					<div class="progress-extended"> &nbsp; </div>
-				</div>
-				
-				<div id="blueimp-gallery1" class="blueimp-gallery1 blueimp-gallery-controls" data-filter=":even">
-					<div class="slides"> </div>
-					<h3 class="title"></h3>
-					<a class="prev"> ‹ </a>
-					<a class="next"> › </a>
-					<a class="close white"> </a>
-					<a class="play-pause"> </a>
-					<ol class="indicator"> </ol>
-				</div>
-				<script id="template-upload1" type="text/x-tmpl"> {% for (var i=0, file; file=o.files[i]; i++) { %}
-				<tr class="template-upload1 fade">
-					<td style="text-align: center;">
-						<p style="width: 200px; overflow: hidden; margin: 7px auto; text-overflow: ellipsis;" class="name">{%=file.name%}</p>
-						<strong class="error text-danger label label-danger" style="padding: 0 6px;"></strong>
-					</td>
-					<td style="text-align: center;"> {% if (!i && !o.options.autoUpload) { %}
-						<button class="btn blue start" disabled>
-							<i class="fa fa-upload"></i>
-							<span>开始</span>
-						</button> {% } %} {% if (!i) { %}
-						<button class="btn red cancel">
-							<i class="fa fa-ban"></i>
-							<span>取消</span>
-						</button> {% } %} </td>
-				</tr> {% } %} </script>
-				
-				<script id="template-download1" type="text/x-tmpl"> {% for (var i=0, file; file=o.files[i]; i++) { %}
-				<tr class="template-download1 fade">
-					<td>
-						<p class="name" style="margin:0"> {% if (file.url) { %}
-							<a href="{%=file.url%}" title="{%=file.name%}" download="{%=file.name%}" {%=file.thumbnailUrl? 'data-gallery': ''%}>{%=file.name%}</a> {% } else { %}
-							<span>{%=file.name%}</span> {% } %}
-							{% if (file.name) { %}
-								<input type="hidden" name="fileid[]" class="filesUrl" value="{%=file.url%}">
-							{% } %}
-							</p> {% if (file.error) { %}
-						<div>
-							<span class="label label-danger">Error</span> {%=file.error%}</div> {% } %} </td>
-							<td></td>
-					
-				</tr> {% } %} </script>
-				<div style="clear:both;"></div>
-			</div>
-		</form>	
-		<div style="text-align: center; margin-top:10px">
-			<input type="hidden" class="uploadId">
-			<button class="btn warning cancel cancelUpload" style="width: 80px;border: 1px solid #ccc;">取消</button>
-			<button class="btn blue start" id="confirmUpload">确认上传</button>
-		</div>
-	</div>
-</div>
+
 	<div class="mask_box">
 		<div class="mask-dialog">
 			<svg t="1588919283810" class="icon cancel_mask cancel_btn" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4128" width="15" height="15"><path d="M1001.952 22.144c21.44 21.44 22.048 55.488 1.44 76.096L98.272 1003.36c-20.608 20.576-54.592 20-76.096-1.504-21.536-21.44-22.048-55.488-1.504-76.096L925.824 20.672c20.608-20.64 54.624-20 76.128 1.472" p-id="4129" fill="#707070"></path><path d="M22.176 22.112C43.616 0.672 77.6 0.064 98.24 20.672L1003.392 925.76c20.576 20.608 20 54.592-1.504 76.064-21.44 21.568-55.488 22.08-76.128 1.536L20.672 98.272C0 77.6 0.672 43.584 22.176 22.112" p-id="4130" fill="#707070"></path></svg>
@@ -826,7 +749,7 @@
 					    {{ csrf_field() }}
 						<input type="hidden" name="warn" id="warn" value="0">
 					    <input type="hidden" name="inbox_id" id="inbox_id" value="0">
-					    <input type="hidden" name="user_id" id="user_id" value="{{Auth::user()->id}}">
+					   <input type="hidden" name="user_id" id="user_id" value="{{Auth::user()->id}}">
 										
 					    <div style="margin-top: 20px;">
 					        <!-- The fileupload-buttonbar contains buttons to add/delete files and start/cancel the upload -->
@@ -966,7 +889,23 @@
         </table>
     </script>
 <script>
-	
+	let msg = <?php echo @$msg?$msg:0?>;
+	console.log(msg)
+	/* if(msg == 0){
+		$('.error_mask').fadeIn(1000);
+		$('.error_mask_text').text(msg);
+		setTimeout(function(){
+			$('.error_mask').fadeOut(1000);
+		},2000)
+	}else if(msg == 1){
+		$('.success_mask').fadeIn(1000);
+		$('.success_mask_text').text(msg);
+		setTimeout(function(){
+			$('.success_mask').fadeOut(1000);
+		},2000)	
+		tableObj.ajax.reload();
+		$('#selectAll').removeAttr('checked');
+	} */
 	function tplCompile(tpl) {
 	
 	    tpl = tpl.replace(/<%([^]+?)%>/g, "`);$1;_push(`")
@@ -1075,6 +1014,7 @@
 	    else tableObj.column(column).search(value).draw();
 	}
 	$(document).ready(function(){
+		
 		//上传大货资料
 		$('#fileUpload').on('click',function(){
 			let fileList1 = '';
@@ -1103,13 +1043,12 @@
 			}else if(fileList1 == "" && fileList != ""){
 				fileLists = fileList
 			}
-			console.log(fileLists)
-			/* $.ajax({
+			$.ajax({
 			    type: "POST",
 				url: "/shipment/upCargoData",
 				data: {
 					id: $('.fileId').val(),
-					cargo_data: fileLists
+					cargo_data: decodeURI(fileLists)
 				},
 				success: function (res) {
 					if(res.status == 0){
@@ -1123,50 +1062,15 @@
 						$('.success_mask_text').text(res.msg);
 						setTimeout(function(){
 							$('.success_mask').fadeOut(1000);
-						},2000)	
-						$('.mask_upload_box').hide();
+						},2000)
 					}
 					$('.mask_file_upload').hide()
 				},
 				error: function(err) {
 					console.log(err)
 				}
-			}); */
-		});
-		//确认上传
-		$('#confirmUpload').on('click',function(){
-			let fileList = '';
-			let str = $('#table-striped tbody tr td').find('.filesUrl');
-			for(var i=0;i<str.length;i++){
-				fileList=(str[0].defaultValue)
-			}
-			$.ajax({
-			    type: "POST",
-				url: "/shipment/importExecl",
-				data: {
-					files: fileList
-				},
-				success: function (res) {
-					if(res.status == 0){
-						$('.error_mask').fadeIn(1000);
-						$('.error_mask_text').text(res.msg);
-						setTimeout(function(){
-							$('.error_mask').fadeOut(1000);
-						},2000)
-					}else if(res.status == 1){
-						$('.success_mask').fadeIn(1000);
-						$('.success_mask_text').text(res.msg);
-						setTimeout(function(){
-							$('.success_mask').fadeOut(1000);
-						},2000)	
-						$('.mask_upload_box').hide();
-					}
-				},
-				error: function(err) {
-					console.log(err)
-				}
 			});
-		})
+		});
 		//批量操作列表展开
 		$('.cloumn').click(function(e){
 			$('.cloumn_box').slideToggle();
@@ -1196,20 +1100,13 @@
 			}
 		})
 		//上传大货资料弹窗隐藏
-		$('.cancelUpload').on('click',function(){
-			$('.mask_upload_box').hide();
-		})
 		$('.cancel_file').on('click',function(){
 			$('.mask_file_upload').hide();
 		})
 		$('.cancelFile').on('click',function(){
 			$('.mask_file_upload').hide();
 		})
-		//上传
-		$('#uploadFrom').on('click',function(){
-			console.log(1)
-			$('.mask_upload_box').show();
-		})
+		
 		
 		//下载导入模板
 		$('#downloadTemplate').on('click',function(){
@@ -1750,7 +1647,7 @@
 					data: 'cargo_data', 
 					name: 'cargo_data',
 					render: function(data, type, row, meta) {
-						var content = '<button>data</button>';
+						var content = '<button>查看</button>';
 						return content;
 					},
 					createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
@@ -1773,9 +1670,9 @@
 									for(var i=0;i<res.length;i++){
 										let reg = /\.(png|jpg|gif|jpeg|webp|pdf)$/;
 										if(reg.test(res[i].url)){
-											fileAddress1 += '<div><a class="titleHidden" href="decodeURI(' + res[i].url + ')" target="_blank">decodeURI(' + res[i].url + ')</a><a style="float:right" href="decodeURI(' + res[i].url + ')" class="button" download="decodeURI(' + res[i].url + ')">下载</a></div>';
+											fileAddress1 += '<div><a class="titleHidden" href="' + res[i].url + '" target="_blank">' + res[i].title + '</a><a style="float:right" href="' + res[i].url + '" class="button" download="' + res[i].title + '">下载</a></div>';
 										}else{
-											fileAddress2 += '<div><span class="titleHidden">decodeURI(' + res[i].url + ')</span><a style="float:right" href="decodeURI(' + res[i].url + ')" download="decodeURI(' + res[i].url + ')" class="button">下载</a></div>';
+											fileAddress2 += '<div><span class="titleHidden">' + res[i].title + '</span><a style="float:right" href="' + res[i].url + '" download="' + res[i].title + '" class="button">下载</a></div>';
 										}
 									}
 									$('.file_adress').append(fileAddress1 + fileAddress2 );
