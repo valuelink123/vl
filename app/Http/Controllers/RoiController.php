@@ -806,7 +806,7 @@ class RoiController extends Controller
         $data['created_at'] = date('Y-m-d H:i:s');
         $data['updated_by'] = $currentUserId;
         $data['updated_at'] = date('Y-m-d H:i:s');
-        $data['edit_history'] = null;
+        $data['edit_history'] = $currentUserId.','.$data['updated_at'];
         $data['collaborators'] = null;
         //无论是否已归档，复制后的状态都设置为未归档,后续需要编辑
         $data['archived_status'] = 0;
@@ -1457,38 +1457,46 @@ class RoiController extends Controller
 
     //账期表
     public function getBillingPeriods(){
-        //数据库中对应的字段billing_period_type，存储值为0，1，2...
-        $data = array(
-            '0' => array('name'=>'预付20%订金，尾款开3个月银行承兑汇票（见票发货）','days'=>78),
-            '1' => array('name'=>'预付50%订金，50%尾款货到付款','days'=>-15),
-            '2' => array('name'=>'货到开票（3个月银行承兑）','days'=>105),
-            '3' => array('name'=>'预付20%订金，余款月结45天','days'=>42),
-            '4' => array('name'=>'当月结15天，开三个月银行承兑','days'=>120),
-            '5' => array('name'=>'预付30%订金，尾款款到发货','days'=>-9),
-            '6' => array('name'=>'预付30%订金，尾款货到付款','days'=>-9),
-            '7' => array('name'=>'质检合格后货到三个工作日内付款','days'=>3),
-            '8' => array('name'=>'预付30%订金，尾款质检合格收到发票后3个工作日内支付','days'=>3.6),
-            '9' => array('name'=>'预付30%订金，尾款当月结15天并开三个月银行承兑','days'=>75),
-            '10' => array('name'=>'月结30天','days'=>45),
-            '11' => array('name'=>'预付20%订金，尾款货到付款','days'=>-6),
-            '12' => array('name'=>'预付20%订金，余款月结30天','days'=>30),
-            '13' => array('name'=>'预付10%订金，余款月结45天','days'=>51),
-            '14' => array('name'=>'月结60天+3个月银行承兑','days'=>165),
-            '15' => array('name'=>'月结45天+3个月银行承兑','days'=>150),
-            '16' => array('name'=>'预付50%订金，50%尾款款到发货','days'=>-15),
-            '17' => array('name'=>'月结30天+保理80天','days'=>125),
-            '18' => array('name'=>'预付20%订金，尾款款到发货','days'=>-6),
-            '19' => array('name'=>'月结90天','days'=>105),
-            '20' => array('name'=>'月结15天','days'=>30),
-            '21' => array('name'=>'月结30天+3个月银行承兑','days'=>135),
-            '22' => array('name'=>'预付40%订金，60%尾款款到发货','days'=>-12),
-            '23' => array('name'=>'月结45天','days'=>60),
-            '24' => array('name'=>'款到发货','days'=>0),
-            '25' => array('name'=>'月结60天','days'=>75),
-            '26' => array('name'=>'预付20%订金，尾款货到后7个工作日内支付（3个月银行承兑）','days'=>78)
-        );
+        //roi表的字段billing_period_type，对应roi_billing_periods表的type_number
+        $billingPeriods = DB::connection('amazon')->table('roi_billing_periods')->orderBy('id')->get();
+        $billingPeriods = json_decode(json_encode($billingPeriods),true);
+        $data = array();
+        foreach($billingPeriods as $v){
+            $data[$v['type_number']] = array('name'=>$v['name'], 'days'=>$v['days']);
+        }
 
         return $data;
+
+//        $data = array(
+//            '0' => array('name'=>'预付20%订金，尾款开3个月银行承兑汇票（见票发货）','days'=>78),
+//            '1' => array('name'=>'预付50%订金，50%尾款货到付款','days'=>-15),
+//            '2' => array('name'=>'货到开票（3个月银行承兑）','days'=>105),
+//            '3' => array('name'=>'预付20%订金，余款月结45天','days'=>42),
+//            '4' => array('name'=>'当月结15天，开三个月银行承兑','days'=>120),
+//            '5' => array('name'=>'预付30%订金，尾款款到发货','days'=>-9), //新账期表中没有了
+//            '6' => array('name'=>'预付30%订金，尾款货到付款','days'=>-9),
+//            '7' => array('name'=>'质检合格后货到三个工作日内付款','days'=>3),
+//            '8' => array('name'=>'预付30%订金，尾款质检合格收到发票后3个工作日内支付','days'=>3.6),
+//            '9' => array('name'=>'预付30%订金，尾款当月结15天并开三个月银行承兑','days'=>75),
+//            '10' => array('name'=>'月结30天','days'=>45),
+//            '11' => array('name'=>'预付20%订金，尾款货到付款','days'=>-6),
+//            '12' => array('name'=>'预付20%订金，余款月结30天','days'=>30),
+//            '13' => array('name'=>'预付10%订金，余款月结45天','days'=>51),
+//            '14' => array('name'=>'月结60天+3个月银行承兑','days'=>165),
+//            '15' => array('name'=>'月结45天+3个月银行承兑','days'=>150),
+//            '16' => array('name'=>'预付50%订金，50%尾款款到发货','days'=>-15),
+//            '17' => array('name'=>'月结30天+保理80天','days'=>125),
+//            '18' => array('name'=>'预付20%订金，尾款款到发货','days'=>-6),
+//            '19' => array('name'=>'月结90天','days'=>105),
+//            '20' => array('name'=>'月结15天','days'=>30),
+//            '21' => array('name'=>'月结30天+3个月银行承兑','days'=>135),
+//            '22' => array('name'=>'预付40%订金，60%尾款款到发货','days'=>-12),
+//            '23' => array('name'=>'月结45天','days'=>60),
+//            '24' => array('name'=>'款到发货','days'=>0),
+//            '25' => array('name'=>'月结60天','days'=>75),
+//            '26' => array('name'=>'预付20%订金，尾款货到后7个工作日内支付（3个月银行承兑）','days'=>78)
+//        );
+//        return $data;
     }
 
     //从currency_rates表中获取各站点汇率
@@ -1575,13 +1583,11 @@ class RoiController extends Controller
     public function isDirectLeader($childId, $checkId)
     {
         $groupIds = DB::table('group_detail')->where('user_id', '=', $childId)->pluck('group_id');
-//        $groupIds = DB::table('group_detail')->where('user_id', '=', 98)->pluck('group_id');
         $groupIds = json_decode(json_encode($groupIds), true);
         $groupDetails = DB::table('group_detail')->whereIn('group_id', $groupIds)->select('user_id', 'leader', 'group_id')->get();
         $groupDetails = json_decode(json_encode($groupDetails), true);
         foreach ($groupDetails as $k => $v) {
             if ($v['user_id'] == $checkId && $v['leader'] == 1) {
-//                echo $v['user_id'];
                 return true;
             }
         }
@@ -1608,8 +1614,9 @@ class RoiController extends Controller
 
     //计划员
     public function isPlanner($userId){
-        //目前的计划员有：许琼，李佳鑫，谈际森，张晓平。
-        $plannerIds = array(159,341,298,387);
+        //23 计划员，31 计划经理
+        $plannerIds = DB::table('role_user')->whereIn('role_id', ['23','31'])->pluck('user_id');
+        $plannerIds = json_decode(json_encode($plannerIds), true);
         if(in_array($userId, $plannerIds)){
             return true;
         }

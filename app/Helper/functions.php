@@ -1,6 +1,7 @@
 <?php
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use App\User;
 function getAccountTypes(){
     return array(
         'Amazon','Site'
@@ -90,6 +91,25 @@ function getBudgetRuleForRole()
 	if(Auth::user()->can(['budgets-show']))  return array_slice(getBudgetStageArr(),0,2);
 	return array();
 }
+
+
+function getDistStatusArr()
+{
+	return array(0=>'待提交',1=>'BU经理审核',2=>'BG总监审核',3=>'计划员审核',4=>'计划经理审核',5=>'已确认');
+}
+function getDistRuleForRole()
+{
+	$userRole = User::find(Auth::user()->id)->roles->pluck('id')->toArray();
+	if(in_array(31,$userRole)) return getDistStatusArr();
+	if(in_array(23,$userRole)) return array_slice(getDistStatusArr(),0,5);
+	if(in_array(28,$userRole)) return array_slice(getDistStatusArr(),0,4);
+	if(in_array(15,$userRole)) return array_slice(getDistStatusArr(),0,3);
+	if(in_array(16,$userRole)) return array_slice(getDistStatusArr(),0,3);
+	if(in_array(11,$userRole)) return array_slice(getDistStatusArr(),0,2);
+	return array();
+}
+
+
 function getSellerAccount(){
 	return DB::connection('order')->table("accounts")->where('status',1)->groupby(['sellerid','sellername'])->pluck('sellername','sellerid');
 }
