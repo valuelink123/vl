@@ -1663,7 +1663,7 @@
 					{
 						data: "sku",
 						render: function(data, type, row, meta) {
-							var content = '<div style="color:blue;cursor:pointer"><a href="/mrp/edit?sku='+ data.sku +'&marketplace_id='+ row.marketplace_id +'">'+ row.sku+'</a></div>';
+							var content = '<div style="color:blue;cursor:pointer"><a href="/mrp/edit?sku='+ row.sku +'&marketplace_id='+ row.marketplace_id +'">'+ row.sku+'</a></div>';
 							return content;
 						},
 					},
@@ -1851,7 +1851,7 @@
 											if(reg.test(res[i].url)){
 												fileAddress1 += '<div><a href="' + res[i].url + '" class="titleHidden" target="_blank">' + res[i].title + '</a><a style="float:right" href="' + res[i].url + '" class="button" download="' + res[i].title + '">下载</a></div>';
 											}else{
-												fileAddress2 += '<div><span class="titleHidden">' + res[i].title + '</span><a style="float:right"  href="' + res[i].url + '" class="button" download="' + res[i].title + '">下载</a></div>';
+												fileAddress2 += '<div class="titleHidden"><span>' + res[i].title + '</span><a style="float:right"  href="' + res[i].url + '" class="button" download="' + res[i].title + '">下载</a></div>';
 											}
 										}
 										$('.file_adress').append(fileAddress1 + fileAddress2 );
