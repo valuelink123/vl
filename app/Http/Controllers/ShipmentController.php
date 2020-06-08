@@ -1556,21 +1556,22 @@ class ShipmentController extends Controller
     {
         include("../vendor/PHPExcel/PHPExcel.php");
         header("content-type:text/html;charset=utf-8");
+        //Auth::user()->id //todo
         $file = $request->file('files');
         $sr_id_list = [];
         $r_message = '';
         if ($file) {
             try {
-                $file_name = $file[0]->getClientOriginalName();
-                $file_size = $file[0]->getSize();
-                $file_ex = $file[0]->getClientOriginalExtension();
+                $file_name = $file->getClientOriginalName();
+                $file_size = $file->getSize();
+                $file_ex = $file->getClientOriginalExtension();
                 $newname = $file_name;
-                $newpath = '/uploads/' . date('Ym') . '/' . date('d') . '/' . date('His') . rand(100, 999) . intval(Auth::user()->id) . '/';
-                $file[0]->move(public_path() . $newpath, $newname);
+                $newpath = '/uploads/' . date('Ym') . '/' . date('d') . '/' . date('His') . rand(100, 999) . intval(132) . '/';
+                $file->move(public_path() . $newpath, $newname);
             } catch (\Exception $exception) {
                 $error = array(
-                    'name' => $file[0]->getClientOriginalName(),
-                    'size' => $file[0]->getSize(),
+                    'name' => $file->getClientOriginalName(),
+                    'size' => $file->getSize(),
                     'error' => $exception->getMessage(),
                 );
                 // Return error
@@ -1627,6 +1628,7 @@ class ShipmentController extends Controller
                     $result = DB::connection('vlz')->table('allot_progress')->insert($data);
                     if ($result) {
                         $r_message = ['status' => 1, 'msg' => '保存成功'];
+                      //  return \Response::json(array('files' => array($success)), 200);
                     }
                 } else {
                     $r_message = ['status' => 0, 'msg' => '数据格式不对'];
@@ -1636,7 +1638,8 @@ class ShipmentController extends Controller
             } else {
                 $r_message = ['status' => 0, 'msg' => '文件打开失败'];
             }
-            return $r_message;
+          //  return $r_message;
+            return view('cpfr/allocationProgress', ['msg' => $r_message]);
         }
     }
 
