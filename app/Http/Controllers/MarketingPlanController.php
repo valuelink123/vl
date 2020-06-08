@@ -29,14 +29,14 @@ class MarketingPlanController extends Controller
     public function index()
     {
         $user = Auth::user()->toArray();
-        $sap_seller_id = $user['sap_seller_id']>0?$user['sap_seller_id']:0;
+        $sap_seller_id = $user['sap_seller_id'] > 0 ? $user['sap_seller_id'] : 0;
         return view('marketingPlan.index', ['sap_seller_id' => $sap_seller_id]);
     }
 
     public function detail()
     {
         $user = Auth::user()->toArray();
-        $sap_seller_id = $user['sap_seller_id']>0?$user['sap_seller_id']:0;
+        $sap_seller_id = $user['sap_seller_id'] > 0 ? $user['sap_seller_id'] : 0;
         return view('marketingPlan.detail', ['sap_seller_id' => $sap_seller_id]);
     }
 
@@ -44,15 +44,15 @@ class MarketingPlanController extends Controller
     {
         $DOMIN_MARKETPLACEID_SX = Asin::DOMIN_MARKETPLACEID_SX;
         $sap_seller_id = $request['sap_seller_id'] ? $request['sap_seller_id'] : 0;
-        $user_asin_list=$currency_rates=[];
+        $user_asin_list = $currency_rates = [];
         /** 超级权限*/
-        $ADMIN_EMAIL=Asin::ADMIN_EMAIL;
+        $ADMIN_EMAIL = Asin::ADMIN_EMAIL;
         if ($sap_seller_id > 0) {
             $sql = "SELECT sams.asin,asins.marketplaceid,sams.sku_status,sams.sku,asins.reviews,asins.rating 
                     from sap_asin_match_sku as sams LEFT JOIN asins on asins.asin= sams.asin 
                     WHERE sap_seller_id =" . $sap_seller_id . " AND marketplaceid!=''
                     GROUP BY asins.marketplaceid,sams.asin";
-        }else{
+        } else {
             $user = Auth::user()->toArray();
             $allUsers = DB::table('users')->select('id', 'name', 'email', 'sap_seller_id', 'seller_rules', 'ubg', 'ubu')
                 ->where('ubu', '!=', "")
@@ -63,19 +63,19 @@ class MarketingPlanController extends Controller
                 })->toArray();
             if (!empty($allUsers)) {
                 foreach ($allUsers as $auk => $auv) {
-                    if($auv['sap_seller_id']>0){
+                    if ($auv['sap_seller_id'] > 0) {
                         $sapSellerIdList[] = $auv['sap_seller_id'];
                     }
                 }
             }
-            if(in_array($user['email'], $ADMIN_EMAIL)){
+            if (in_array($user['email'], $ADMIN_EMAIL)) {
                 $sql = "SELECT sams.asin,asins.marketplaceid,sams.sku_status,sams.sku,asins.reviews,asins.rating 
                     from sap_asin_match_sku as sams LEFT JOIN asins on asins.asin= sams.asin 
                     WHERE sap_seller_id in (" . implode($sapSellerIdList, ',') . ") and marketplaceid!=''
                     GROUP BY asins.marketplaceid,sams.asin";
             }
         }
-        if(!empty($sql)){
+        if (!empty($sql)) {
             $user_asin_list_obj = DB::connection('vlz')->select($sql);
             $user_asin_list = (json_decode(json_encode($user_asin_list_obj), true));            //asin 站点 suk suk状态
             if (!empty($user_asin_list)) {
@@ -104,7 +104,7 @@ class MarketingPlanController extends Controller
     public function getAsinDailyReport(Request $request)
     {
         $DOMIN_MARKETPLACEID_SX = Asin::DOMIN_MARKETPLACEID_SX;
-        $SKU_STATUS_KV= Asin::SKU_STATUS_KV;
+        $SKU_STATUS_KV = Asin::SKU_STATUS_KV;
         $seller_sku = '';
         $single_economic = $avg_day_sales = $cost = 0;
         if (!empty($request['asin']) && !empty($request['marketplace_id'])) {
@@ -183,8 +183,8 @@ class MarketingPlanController extends Controller
             $user_asin_list['ranking'] = $asin_daily_report['ranking'];
             $conversion = $asin_daily_report['conversion'] > 0 ? $asin_daily_report['conversion'] * 100 : 0;
             $user_asin_list['conversion'] = $conversion . '%';
-            $user_asin_list['single_economic'] = $single_economic==0?0:$single_economic;
-            $user_asin_list['avg_day_sales'] = $avg_day_sales==0?0:$avg_day_sales;
+            $user_asin_list['single_economic'] = $single_economic == 0 ? 0 : $single_economic;
+            $user_asin_list['avg_day_sales'] = $avg_day_sales == 0 ? 0 : $avg_day_sales;
             $user_asin_list['cost'] = $cost;
             $user_asin_list['sku_status'] = $SKU_STATUS_KV[$user_asin_list['sku_status']];
 
@@ -211,11 +211,11 @@ class MarketingPlanController extends Controller
                 ->where('sap_seller_id', $request['sap_seller_id'])
                 ->first();
             $user = (json_decode(json_encode($user), true));
-        }else{
+        } else {
             $user = Auth::user()->toArray();
         }
         /** 超级权限*/
-        $ADMIN_EMAIL=Asin::ADMIN_EMAIL;
+        $ADMIN_EMAIL = Asin::ADMIN_EMAIL;
         $role = 0;//角色
         if (!empty($user)) {
             if (!empty($user['email']) && in_array($user['email'], $ADMIN_EMAIL)) {
@@ -304,7 +304,7 @@ class MarketingPlanController extends Controller
             } else if ($old_m_plan['plan_status'] == 3 || $old_m_plan['plan_status'] == 4 || $old_m_plan['plan_status'] == 5) {
                 /** 已完结 已终止 已拒绝 不能在修改*/
                 $update = 0;
-            }else if($old_m_plan['plan_status'] == $plan_status){
+            } else if ($old_m_plan['plan_status'] == $plan_status) {
                 /** 没有修改  不作处理  */
                 $r_message = ['status' => 3, 'msg' => '状态不变'];
                 return $r_message;
@@ -419,17 +419,17 @@ class MarketingPlanController extends Controller
      */
     public function rsgList(Request $request)
     {
-        $SKU_STATUS_KV= Asin::SKU_STATUS_KV;
+        $SKU_STATUS_KV = Asin::SKU_STATUS_KV;
         $DOMIN_MARKETPLACEID_SX = Asin::DOMIN_MARKETPLACEID_SX;
         $DOMIN_MARKETPLACEID_URL = Asin::DOMIN_MARKETPLACEID_URL;
-        $ADMIN_EMAIL=Asin::ADMIN_EMAIL;
-        $sapSellerIdList=[];
-        if ($request['sap_seller_id']>0) {
+        $ADMIN_EMAIL = Asin::ADMIN_EMAIL;
+        $sapSellerIdList = [];
+        if ($request['sap_seller_id'] > 0) {
             $user = DB::table('users')->select('sap_seller_id', 'id', 'name', 'email', 'seller_rules', 'ubg', 'ubu')
                 ->where('sap_seller_id', $request['sap_seller_id'])
                 ->first();
             $user = (json_decode(json_encode($user), true));
-        }else{
+        } else {
             $user = Auth::user()->toArray();
         }
         if (!empty($user)) {
@@ -444,7 +444,7 @@ class MarketingPlanController extends Controller
                     })->toArray();
                 if (!empty($allUsers)) {
                     foreach ($allUsers as $auk => $auv) {
-                        if(@$auv['sap_seller_id']>0){
+                        if (@$auv['sap_seller_id'] > 0) {
                             $sapSellerIdList[$auv['sap_seller_id']] = $auv['name'];
                         }
                     }
@@ -460,7 +460,7 @@ class MarketingPlanController extends Controller
                     /**查询所有BG下面员工*/
                     if (!empty($allUsers)) {
                         foreach ($allUsers as $auk => $auv) {
-                            if(@$auv['sap_seller_id']>0) {
+                            if (@$auv['sap_seller_id'] > 0) {
                                 $sapSellerIdList[$auv['sap_seller_id']] = $auv['name'];
                             }
                         }
@@ -508,62 +508,62 @@ class MarketingPlanController extends Controller
                 FROM marketing_plan
                 LEFT JOIN sap_asin_match_sku as sams ON marketing_plan.asin = sams.asin AND marketing_plan.marketplaceid = sams.marketplace_id
                 WHERE 1 = 1  ';
-        if(!empty($sapSellerIdList)){
-            $sql = $sql .  ' AND marketing_plan.sap_seller_id in (' . implode(array_keys($sapSellerIdList), ',') . ')';
+        if (!empty($sapSellerIdList)) {
+            $sql = $sql . ' AND marketing_plan.sap_seller_id in (' . implode(array_keys($sapSellerIdList), ',') . ')';
         }
         //搜索   创建时间 范围
         if (strtotime(@$request['created_at_s']) > 0 && strtotime(@$request['created_at_e']) > 0 && strtotime(@$request['created_at_e']) > strtotime(@$request['created_at_s'])) {
             $sql = $sql . ' AND created_at >=' . strtotime($request['created_at_s']) . ' AND  created_at <=' . strtotime($request['created_at_e']);
         }
         //搜索   预计开始、结束时间  范围
-        $from_time=strtotime(@$request['from_time']);
-        $to_time=strtotime(@$request['to_time']);
+        $from_time = strtotime(@$request['from_time']);
+        $to_time = strtotime(@$request['to_time']);
         if (@$from_time > 0 && @$to_time > 0 && @$to_time > @$from_time) {
-            $sql = $sql .' AND (('.$from_time.' <=from_time AND '.$to_time.'>=to_time) OR ('.$from_time.' >=from_time AND '.$to_time.'<= to_time) OR ('.$to_time.'>=from_time AND '.$to_time.'<= to_time) or ('.$from_time.' >=from_time AND '.$from_time.'<=to_time ))';
+            $sql = $sql . ' AND ((' . $from_time . ' <=from_time AND ' . $to_time . '>=to_time) OR (' . $from_time . ' >=from_time AND ' . $to_time . '<= to_time) OR (' . $to_time . '>=from_time AND ' . $to_time . '<= to_time) or (' . $from_time . ' >=from_time AND ' . $from_time . '<=to_time ))';
         }
         //搜索   实际开始、结束时间  范围
-        $reality_start=strtotime(@$request['reality_start']);
-        $reality_end=strtotime(@$request['reality_end']);
+        $reality_start = strtotime(@$request['reality_start']);
+        $reality_end = strtotime(@$request['reality_end']);
         if (@$reality_start > 0 && @$reality_end > 0 && @$reality_end > @$reality_start) {
-            $sql = $sql .' AND (('.$reality_start.' <=reality_start AND '.$reality_end.'>=reality_end) OR ('.$reality_start.' >=reality_start AND '.$reality_end.'<= reality_end) OR ('.$reality_end.'>=reality_start AND '.$reality_end.'<= reality_end) or ('.$reality_start.' >=reality_start AND '.$reality_start.'<=reality_end ))';
+            $sql = $sql . ' AND ((' . $reality_start . ' <=reality_start AND ' . $reality_end . '>=reality_end) OR (' . $reality_start . ' >=reality_start AND ' . $reality_end . '<= reality_end) OR (' . $reality_end . '>=reality_start AND ' . $reality_end . '<= reality_end) or (' . $reality_start . ' >=reality_start AND ' . $reality_start . '<=reality_end ))';
         }
         //搜索 asin sku
         if (!empty($request['condition'])) {
-            $sql = $sql .' AND ( marketing_plan.asin LIKE "%'.$request['condition'].'%" or marketing_plan.sku LIKE "%'.$request['condition'].'%")';
+            $sql = $sql . ' AND ( marketing_plan.asin LIKE "%' . $request['condition'] . '%" or marketing_plan.sku LIKE "%' . $request['condition'] . '%")';
         }
-        $sql = $sql . ' GROUP BY marketing_plan.id ' ;
+        $sql = $sql . ' GROUP BY marketing_plan.id ';
         //排序 顺序
         if (!empty($request['rank']) && !empty($request['order'])) {
             $sql = $sql . ' ORDER BY ' . $request['rank'] . ' ' . $request['order'];
         }
         $rsgList = DB::connection('vlz')->select($sql);
         $rsgList = (json_decode(json_encode($rsgList), true));
-       // $planStatus=['0','Pending','Ongoing','Completed','Paused','Rejected'];
-        $planStatus=['0','待审批','进行中','已完结','已中止','已拒绝'];
-        if(!empty($rsgList)&&!empty($sapSellerIdList)){
-            foreach ($rsgList as $k=>$v){
-                $rsgList[$k]['Seller']=$sapSellerIdList[$v['sap_seller_id']];
-                $rsgList[$k]['updated_at']=date('Y-m-d',$v['updated_at']);
-                $rsgList[$k]['plan_status']=$planStatus[$v['plan_status']];
-                $rsgList[$k]['current_60romi']=($v['current_60romi']*100).'%';
-                $rsgList[$k]['actual_60romi']=($v['actual_60romi']*100).'%';
-                $rsgList[$k]['actual_spend']=$v['actual_spend'];
-                $rsgList[$k]['applied']=0;// todo 暂时预留  没有数据
-                $rsgList[$k]['reivews']=0;// todo 暂时预留  没有数据
-                $rsgList[$k]['type']='RSG';
-                $rsgList[$k]['toUrl']=$DOMIN_MARKETPLACEID_URL[$v['marketplaceid']];
-                $rsgList[$k]['station']=$DOMIN_MARKETPLACEID_SX[$v['marketplaceid']];
-                $rsgList[$k]['sku_status']=$SKU_STATUS_KV[$v['sku_status']];
+        // $planStatus=['0','Pending','Ongoing','Completed','Paused','Rejected'];
+        $planStatus = ['0', '待审批', '进行中', '已完结', '已中止', '已拒绝'];
+        if (!empty($rsgList) && !empty($sapSellerIdList)) {
+            foreach ($rsgList as $k => $v) {
+                $rsgList[$k]['Seller'] = $sapSellerIdList[$v['sap_seller_id']];
+                $rsgList[$k]['updated_at'] = date('Y-m-d', $v['updated_at']);
+                $rsgList[$k]['plan_status'] = $planStatus[$v['plan_status']];
+                $rsgList[$k]['current_60romi'] = ($v['current_60romi'] * 100) . '%';
+                $rsgList[$k]['actual_60romi'] = ($v['actual_60romi'] * 100) . '%';
+                $rsgList[$k]['actual_spend'] = $v['actual_spend'];
+                $rsgList[$k]['applied'] = 0;// todo 暂时预留  没有数据
+                $rsgList[$k]['reivews'] = 0;// todo 暂时预留  没有数据
+                $rsgList[$k]['type'] = 'RSG';
+                $rsgList[$k]['toUrl'] = $DOMIN_MARKETPLACEID_URL[$v['marketplaceid']];
+                $rsgList[$k]['station'] = $DOMIN_MARKETPLACEID_SX[$v['marketplaceid']];
+                $rsgList[$k]['sku_status'] = $SKU_STATUS_KV[$v['sku_status']];
 
-                if(!empty($v['images'])){
-                    $rsgList[$k]['image']=explode(',',$v['images'])[0];
-                }else{
-                    $rsgList[$k]['image']='';
+                if (!empty($v['images'])) {
+                    $rsgList[$k]['image'] = explode(',', $v['images'])[0];
+                } else {
+                    $rsgList[$k]['image'] = '';
                 }
             }
-            return ['status'=>1,$rsgList,$sapSellerIdList];
-        }else{
-            return ['status'=>0,'msg'=>'没有数据'];
+            return ['status' => 1, $rsgList, $sapSellerIdList];
+        } else {
+            return ['status' => 0, 'msg' => '没有数据'];
         }
 //        echo '<pre>';
 //        var_dump($rsgList);
@@ -601,7 +601,7 @@ class MarketingPlanController extends Controller
         } else {
             $tomorrow_t = strtotime(date('Y-m-d')) + 3600 * 24;
             if ($request['from_time'] >= $tomorrow_t && $request['to_time'] >= $tomorrow_t) {
-                if (!empty($request['asin']) && !empty($request['marketplaceid'])  && !empty($request['sku'])) {
+                if (!empty($request['asin']) && !empty($request['marketplaceid']) && !empty($request['sku'])) {
                     $asins = DB::connection('vlz')->table('asins')
                         ->select('id', 'images')
                         ->where('asin', $request['asin'])
@@ -619,7 +619,7 @@ class MarketingPlanController extends Controller
                         'sku' => $request['sku'],
                         'sku_status' => @$request['sku_status'],
                         'sku_price' => @$request['sku_price'],
-                        'currency_rates_id' => @$request['currency_rates_id']>0?$request['currency_rates_id']:1,
+                        'currency_rates_id' => @$request['currency_rates_id'] > 0 ? $request['currency_rates_id'] : 1,
                         'rating' => @$request['rating'],
                         'reviews' => @$request['reviews'],
                         'fba_stock' => @$request['fba_stock'],
@@ -641,7 +641,7 @@ class MarketingPlanController extends Controller
                         'investment_return_d' => @$request['investment_return_d'], 'actual_spend' => @$request['actual_spend'] ? $request['actual_spend'] : 0,
                         'cr_complete' => @$request['cr_complete'] ? $request['cr_complete'] : 0, 'units_d_complete' => @$request['units_d_complete'],
                         'e_val_complete' => @$request['e_val_complete'], 'investment_return_c' => @$request['investment_return_c'],
-                        'cr_complete' => @$request['cr_complete'], 'created_at' => time(),'updated_at' => time(),
+                        'cr_complete' => @$request['cr_complete'], 'created_at' => time(), 'updated_at' => time(),
                         'files' => $fileUrl, 'notes' => @$request['notes'] ? @$request['notes'] : '',
                         'images' => $images,
                     ];
@@ -851,10 +851,43 @@ class MarketingPlanController extends Controller
         return $r_message;
 
     }
-    public function test(){
-        $user = Auth::user()->toArray();
-        $sap_seller_id = $user['sap_seller_id']>0?$user['sap_seller_id']:0;
-        return view('marketingPlan.test', ['sap_seller_id' => $sap_seller_id]);
+
+    public function test()
+    {
+        $generator = new \Picqer\Barcode\BarcodeGeneratorHTML();
+        //echo $generator->getBarcode('X001WAU01R', $generator::TYPE_CODE_128);
+        $generator = new \Picqer\Barcode\BarcodeGeneratorPNG();
+        $barcode = $generator->getBarcode('X001WAU01R', $generator::TYPE_CODE_128, $widthFactor = 2, $height = 30);
+        $barcode = base64_encode($barcode);
+
+
+        echo ' <img src="data:image/png;base64,' . $barcode . '"/>';
+//        $user = Auth::user()->toArray();
+//        $sap_seller_id = $user['sap_seller_id']>0?$user['sap_seller_id']:0;
+//        return view('marketingPlan.test', ['sap_seller_id' => $sap_seller_id]);
+
+
+        $mpdf = new \Mpdf\Mpdf(['mode' => 'utf-8', 'format' => 'A4', 'margin_top' => 0, 'margin_left' => 0, 'margin_right' => 0, 'margin_bottom' => 0]);
+        $html = '<div style="width: 210mm; height: 297mm;">
+                    <div style="transform-origin: 0px 0px; background-color: white; margin-left: 5mm;padding-top:20px">';
+        for ($i = 1; $i <= 4; $i++) {
+            $html .= '<div class="small_a4" style="width: 63.5mm; height: 38.1mm; display: inline-block; position: relative; float: left; padding-left: 1mm;">
+            <div style="width: 100%; display: flex; align-items: center; padding-left: 18px">
+            <img  alt="" src="data:image/png;base64,' . $barcode . '" style="max-width: 100%; max-height: 100%;text-align: center">
+            <div style="margin-top: 5px;text-align: center">X001WAYU01R</div>
+            <div style="margin-top: 5px">aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</div>
+            </div>
+            </div>';
+        }
+        $html .= '</div></div>';
+        //创建pdf文件
+        $mpdf->WriteHTML($html);
+
+        //$mpdf->Image($barcode, 140, 200);
+        $time = date("Y-m-d") . time() . rand(1, 99999);
+//        //$mpdf->Output("upload/".$time.".pdf","F");
+        $mpdf->Output($time . ".pdf", "D");
     }
+
 
 }

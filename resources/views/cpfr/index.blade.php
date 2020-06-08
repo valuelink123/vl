@@ -21,8 +21,7 @@
 	}
 	
 	.content{
-		padding: 30px 40px 40px 40px;
-		overflow: hidden;
+		padding: 30px 20px 40px 20px;
 		border-radius: 4px !important;
 		background-color: rgba(255, 255, 255, 1);
 	}
@@ -120,9 +119,11 @@
 	.batch_list{
 		border: 1px solid rgba(220, 223, 230, 1);
 		width: 180px;
-		margin-left: -40px !important;
+		left: 0;
 		padding: 15px 0 !important;
 		display: none;
+		position: absolute;
+		z-index: 999;
 	}
 	.batch_list,.batch_list li{
 		background: #fff;
@@ -141,13 +142,13 @@
 	}
 	.batch_list:after{
 		position: absolute;
-		top: 24px;
-		left: 50px;
+		top: -10px;
+		left: 30px;
 		right: auto;
 		display: inline-block !important;
-		border-right: 7px solid transparent;
-		border-bottom: 7px solid #fff;
-		border-left: 7px solid transparent;
+		border-right: 10px solid transparent;
+		border-bottom: 10px solid #fff;
+		border-left: 10px solid transparent;
 		content: '';
 		box-sizing: border-box;
 	}
@@ -366,6 +367,44 @@
 	.hover_svg:hover path,.mask_hover_svg:hover path{
 		fill: red;
 	}
+	.cloumn_box{
+		position: absolute;
+		right: 0;
+		z-index: 999;
+		display: none;
+		background: #fff;
+		padding: 20px;
+		border: 1px solid #eee;
+		height: 365px;
+		padding-right: 0;
+	}
+	.cloumn_list{
+		height: 300px;
+		overflow: auto;
+		padding: 0;
+		margin: 0;
+	}
+	.cloumn_list li{
+		padding: 0;
+		margin: 0;
+		line-height: 25px;
+		text-align: left;
+		list-style: none;
+	}
+	.cloumn_list li input{
+		margin-right: 10px;
+	}
+	.cloumn_box:after{
+		position: absolute;
+		top: -10px;
+		right: 45px;
+		display: inline-block !important;
+		border-right: 10px solid transparent;
+		border-bottom: 10px solid #fff;
+		border-left: 10px solid transparent;
+		content: '';
+		box-sizing: border-box;
+	}
 </style>
 <link rel="stylesheet" type="text/css" media="all" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-daterangepicker/3.0.5/daterangepicker.min.css" />
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.1/moment.min.js"></script>
@@ -435,7 +474,7 @@
 			</div>
 			<div class="filter_option">
 				<label for="status_select">调拨状态</label>
-				<select id="status_select"  onchange="status_filter(this.value,24)">
+				<select id="status_select"  onchange="status_filter(this.value,20)">
 					<option id="" value="">全部</option>
 					<option id="0" value ="资料提供中">资料提供中</option>
 					<option id="1" value ="换标中">换标中</option>
@@ -483,45 +522,75 @@
 			</div>
 		</div>
 		<div style="position: relative;">
-			<div style="position: absolute;left: 130px; z-index: 999;top:0" class="col-md-2">
-				<button type="button" class="btn btn-sm green-meadow batch_operation">批量操作<i class="fa fa-angle-down"></i></button>
-				<ul class="batch_list">
-					<li><button class="btn btn-sm red-sunglo" onclick="statusAjax(0)">BU经理审核</button></li>
-					<li><button class="btn btn-sm yellow-crusta" onclick="statusAjax(1)">BG总经理审核</button></li>
-					<li><button class="btn btn-sm purple-plum" onclick="statusAjax(2)">计划员审核</button></li>
-					<li><button class="btn btn-sm green-meadow" onclick="statusAjax(3)">计划经理确认</button></li>
-					<li><button type="button" class="btn btn-sm btn-success" onclick="statusAjax(4)">已审批</button></li>
-					<li><button class="btn btn-sm blue-madison" onclick="statusAjax(5)">取消调拨请求</button></li>
-				</ul>
+			<div style="width: 100%; height: 45px; line-height: 45px;">
+				<div class="col-md-3" style="padding-left: 0px;"><!-- style="position: absolute;left: 130px; z-index: 999;top:0" -->
+					<button type="button" class="btn btn-sm green-meadow batch_operation">批量操作<i class="fa fa-angle-down"></i></button>
+					<ul class="batch_list">
+						<li><button class="btn btn-sm red-sunglo" onclick="statusAjax(0)">BU经理审核</button></li>
+						<li><button class="btn btn-sm yellow-crusta" onclick="statusAjax(1)">BG总经理审核</button></li>
+						<li><button class="btn btn-sm purple-plum" onclick="statusAjax(2)">计划员审核</button></li>
+						<li><button class="btn btn-sm green-meadow" onclick="statusAjax(3)">计划经理确认</button></li>
+						<li><button type="button" class="btn btn-sm btn-success" onclick="statusAjax(4)">已审批</button></li>
+						<li><button class="btn btn-sm blue-madison" onclick="statusAjax(5)">取消调拨请求</button></li>
+					</ul>
+				</div>
+				<div class="col-md-7"><!--   style="position: absolute;left: 520px; z-index: 999;top:0" -->
+					<button type="button" onclick="status_filter('BU经理审核',19)" class="btn btn-sm red-sunglo">BU经理审核 : <span class="status0">0</span></button>
+					<button type="button" onclick="status_filter('BG总经理审核',19)" class="btn btn-sm yellow-crusta">BG总经理审核 : <span class="status1">0</span></button>
+					<button type="button" onclick="status_filter('计划员审核',19)" class="btn btn-sm purple-plum">计划员审核 : <span class="status2">0</span></button>
+					<button type="button" onclick="status_filter('计划经理确认',19)" class="btn btn-sm green-meadow">计划经理确认 : <span class="status3">0</span></button>
+					<button type="button" onclick="status_filter('已审批',19)" class="btn btn-sm btn-success">已审批 : <span class="status4">0</span></button>
+					<button type="button" onclick="status_filter('取消调拨请求',19)" class="btn btn-sm blue-madison">取消调拨请求 : <span class="status5">0</span></button>
+				</div>
+				<div class="col-md-2" style="text-align: right;">
+					<button type="button" class="btn btn-sm green-meadow cloumn">隐藏列操作</button>
+					<div class="cloumn_box">
+						<p style="padding: 0;margin: 0;line-height: 25px; text-align: left;"><input type="checkbox" class="checkboxAll" style="margin-right: 10px;" />是否全选</p>
+						<ul class="cloumn_list">
+							<li><input type="checkbox" />需求提交日期</li>
+							<li><input type="checkbox" />调拨状态</li>
+							<li><input type="checkbox" />销售员</li>
+							<li><input type="checkbox" />发货批号</li>
+							<li><input type="checkbox" />调出工厂</li>
+							<li><input type="checkbox" />调入工厂</li>
+							<li><input type="checkbox" />亚马逊账号</li>
+							<li><input type="checkbox" />SKU</li>
+							<li><input type="checkbox" />调拨数量</li>
+							<li><input type="checkbox" />RMS标贴SKU</li>
+							<li><input type="checkbox" />条码标签</li>
+							<li><input type="checkbox" />发货方式</li>
+							<li><input type="checkbox" />大货资料</li>
+							<li><input type="checkbox" />Shippment ID</li>
+							<li><input type="checkbox" />跟踪号/单据号</li>
+							<li><input type="checkbox" />上次更新时间</li>
+							<li><input type="checkbox" />装箱数据</li>
+						</ul>
+					</div>
+				</div>
 			</div>
-			<div class="col-md-7"  style="position: absolute;left: 520px; z-index: 999;top:0">
-				<button type="button" onclick="status_filter('BU经理审核',20)" class="btn btn-sm red-sunglo">BU经理审核 : <span class="status0">0</span></button>
-				<button type="button" onclick="status_filter('BG总经理审核',20)" class="btn btn-sm yellow-crusta">BG总经理审核 : <span class="status1">0</span></button>
-				<button type="button" onclick="status_filter('计划员审核',20)" class="btn btn-sm purple-plum">计划员审核 : <span class="status2">0</span></button>
-				<button type="button" onclick="status_filter('计划经理确认',20)" class="btn btn-sm green-meadow">计划经理确认 : <span class="status3">0</span></button>
-				<button type="button" onclick="status_filter('已审批',20)" class="btn btn-sm btn-success">已审批 : <span class="status4">0</span></button>
-				<button type="button" onclick="status_filter('取消调拨请求',20)" class="btn btn-sm blue-madison">取消调拨请求 : <span class="status5">0</span></button>
-			</div>
-			<table id="planTable" class="display table-striped table-bordered table-hover"style="width: 100%;">
+			<table id="planTable" class="display table-striped table-bordered table-hover" width="100%">
 				<thead>
 					<tr style="text-align: center;">
 						<th>BG</th>
 						<th>BU</th>
 						<th>Station</th>
-						<th><input type="checkbox" id="selectAll" name="selectAll" /></th>
-						<th style="width:90px;">提交日期</th>
-						<th style="width:55px;">销售员</th>
-						<th style="width:55px;">计划员</th>
-						<th style="width:70px;">产品图片</th>
-						<th>账号</th>
-						<th>Seller SKU</th>
-						<th>ASIN <br>SKU</th>
-						<th style="width:95px;">调入工厂</th>
-						<th style="width:70px;">需求数量</th>
-						<th style="width:95px;">期望到货时间</th>
-						<th style="width:80px;">是否贴RMS标签</th>
-						<th style="width:70px;">调拨理由</th>
-						<th style="width:80px;">
+						<th style="min-width: 20px;"><input type="checkbox" id="selectAll" name="selectAll" /></th>
+						<th style="min-width:60px;">提交日期</th>
+						<th style="min-width:55px;">销售员</th>
+						<th style="min-width:55px;">计划员</th>
+						<th style="min-width:60px;">产品图片</th>
+						<th>
+							<div>账号</div>
+							<div>Seller SKU</div>
+							<div>ASIN</div>
+						</th>
+						<th>SKU</th>
+						<th style="min-width:40px;">调入工厂</th>
+						<th style="min-width:70px;">需求数量</th>
+						<th style="min-width:60px;">期望到货时间</th>
+						<th style="min-width:80px;">是否贴RMS标签</th>
+						<th style="min-width:70px;">调拨理由</th>
+						<th style="min-width:80px;">
 							<div style="position: relative;">
 								可维持天数
 								<div title="FBA在库+转库中库存+调拨在途的库存总量可满足未来销售计划的天数" class="hover_svg">
@@ -530,7 +599,7 @@
 							</div>
 							
 						</th>
-						<th style="width:70px;">
+						<th style="min-width:70px;">
 							<div style="position: relative;">
 								FBA在库
 								<div title="FBA在库=FBA可用库存+转库中库存" class="hover_svg">
@@ -538,7 +607,7 @@
 								</div>
 							</div>
 						</th>
-						<th style="width:110px;">
+						<th style="min-width:110px;">
 							<div style="position: relative;">
 								FBA可维持天数
 								<div title="FBA可用库存和转库中库总和可满足的未来销售计划的天数" class="hover_svg">
@@ -546,7 +615,7 @@
 								</div>
 							</div>
 						</th>
-						<th style="width:70px;">
+						<th style="min-width:70px;">
 							<div style="position: relative;">
 								调拨在途
 								<div title="在调拨中的数量，包含已审核通过的调拨未出库，和已发货亚马逊还未签收的数量" class="hover_svg">
@@ -554,25 +623,8 @@
 								</div>
 							</div>
 						</th>
-						<th style="width:40px;">审核状态</th>
-						<th style="width:100px;">
-							<div style="position: relative;">
-								调整需求数量
-								<div title="计划和物流确认后的实际可调拨数量" class="hover_svg">
-									<svg t="1588835330500" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2629" width="13" height="13"><path d="M459.364486 360.47352h102.080997v-102.080997h-102.080997v102.080997z m0 408.323988h102.080997V462.554517h-102.080997v306.242991z m51.040498 255.202492c-280.722741 0-510.404984-229.682243-510.404984-510.404984S226.492212 3.190031 510.404984 3.190031s510.404984 229.682243 510.404985 510.404985-229.682243 510.404984-510.404985 510.404984z m0-918.728972C285.507788 105.271028 102.080997 288.697819 102.080997 513.595016S285.507788 921.919003 510.404984 921.919003s408.323988-183.426791 408.323988-408.323987C918.728972 288.697819 735.302181 105.271028 510.404984 105.271028z" p-id="2630" fill="#2c2c2c"></path></svg>
-								</div>
-							</div>
-						</th>
-						<th style="width:100px;">
-							<div style="position: relative;">
-								预计到货时间
-								<div title="计划和物流确认过的预计到货时间" class="hover_svg">
-									<svg t="1588835330500" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2629" width="13" height="13"><path d="M459.364486 360.47352h102.080997v-102.080997h-102.080997v102.080997z m0 408.323988h102.080997V462.554517h-102.080997v306.242991z m51.040498 255.202492c-280.722741 0-510.404984-229.682243-510.404984-510.404984S226.492212 3.190031 510.404984 3.190031s510.404984 229.682243 510.404985 510.404985-229.682243 510.404984-510.404985 510.404984z m0-918.728972C285.507788 105.271028 102.080997 288.697819 102.080997 513.595016S285.507788 921.919003 510.404984 921.919003s408.323988-183.426791 408.323988-408.323987C918.728972 288.697819 735.302181 105.271028 510.404984 105.271028z" p-id="2630" fill="#2c2c2c"></path></svg>
-								</div>
-							</div>
-						</th>
-						<th style="width:100px;">调出工厂</th>
-						<th style="width:70px;">
+						<th style="min-width:40px;">审核状态</th>
+						<th style="min-width:70px;">
 							<div style="position: relative;">
 								调拨状态
 								<div title="该调拨请求的调拨进度，数据来源于物流部" class="hover_svg">
@@ -580,7 +632,25 @@
 								</div>
 							</div>
 						</th>
-						<th style="width:70px;">待办事项</th>
+						<th style="min-width:100px;">
+							<div style="position: relative;">
+								调整需求数量
+								<div title="计划和物流确认后的实际可调拨数量" class="hover_svg">
+									<svg t="1588835330500" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2629" width="13" height="13"><path d="M459.364486 360.47352h102.080997v-102.080997h-102.080997v102.080997z m0 408.323988h102.080997V462.554517h-102.080997v306.242991z m51.040498 255.202492c-280.722741 0-510.404984-229.682243-510.404984-510.404984S226.492212 3.190031 510.404984 3.190031s510.404984 229.682243 510.404985 510.404985-229.682243 510.404984-510.404985 510.404984z m0-918.728972C285.507788 105.271028 102.080997 288.697819 102.080997 513.595016S285.507788 921.919003 510.404984 921.919003s408.323988-183.426791 408.323988-408.323987C918.728972 288.697819 735.302181 105.271028 510.404984 105.271028z" p-id="2630" fill="#2c2c2c"></path></svg>
+								</div>
+							</div>
+						</th>
+						<th style="min-width:100px;">
+							<div style="position: relative;">
+								预计到货时间
+								<div title="计划和物流确认过的预计到货时间" class="hover_svg">
+									<svg t="1588835330500" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2629" width="13" height="13"><path d="M459.364486 360.47352h102.080997v-102.080997h-102.080997v102.080997z m0 408.323988h102.080997V462.554517h-102.080997v306.242991z m51.040498 255.202492c-280.722741 0-510.404984-229.682243-510.404984-510.404984S226.492212 3.190031 510.404984 3.190031s510.404984 229.682243 510.404985 510.404985-229.682243 510.404984-510.404985 510.404984z m0-918.728972C285.507788 105.271028 102.080997 288.697819 102.080997 513.595016S285.507788 921.919003 510.404984 921.919003s408.323988-183.426791 408.323988-408.323987C918.728972 288.697819 735.302181 105.271028 510.404984 105.271028z" p-id="2630" fill="#2c2c2c"></path></svg>
+								</div>
+							</div>
+						</th>
+						<th style="min-width:100px;">调出工厂</th>
+						
+						<th style="min-width:70px;">待办事项</th>
 					</tr>
 				</thead>
 				
@@ -845,7 +915,7 @@
 			status_filter(val,5);
 			status_filter(val,6);
 			status_filter(val,8);
-			status_filter(val,24);
+			status_filter(val,19);
 			status_filter(val,20)
 			let reqList = {
 				"condition" : '',
@@ -871,7 +941,7 @@
 			}else{
 				$.ajax({
 				    type: "POST",
-					url: "/shipment/upAllStatus",
+					url: "http://10.10.42.14/vl/public/shipment/upAllStatus",
 					data: {
 						status: status,
 						idList: chk_value
@@ -939,6 +1009,34 @@
 			}
 		}
 		$(document).ready(function () {	
+			//批量操作列表展开
+			$('.cloumn').click(function(e){
+				$('.cloumn_box').slideToggle();
+				e.stopPropagation();
+			})
+			$(".cloumn_list").children("li").each(function(index,element){
+				$(this).find('input').click(function(){
+					let id = $(this).parent().index() + 4;
+					if($(this).is(':checked')){
+						tableObj.column(id).visible(false)
+					}else{
+						tableObj.column(id).visible(true)
+					}
+				})
+			})
+			$('.checkboxAll').on('click',function(){
+				if($(this).is(':checked')){
+					$(".cloumn_list").find('input').prop('checked',true);
+					for(var i=4; i<20; i++){
+						tableObj.column(i).visible(false)
+					}
+				}else{
+					$(".cloumn_list").find('input').prop('checked',false)
+					for(var i=4; i<20; i++){
+						tableObj.column(i).visible(true)
+					}
+				}
+			})
 			//导出调拨进度
 			$('#export').click(function(){
 				 let chk_value = '';
@@ -950,7 +1048,7 @@
 				 	}
 				 });
 				 $.ajax({
-					url: "/shipment/index",
+					url: "http://10.10.42.14/vl/public/shipment/index",
 					 method: 'POST',
 					 cache: false,
 					 data: {
@@ -1023,7 +1121,7 @@
 				}
 				$.ajax({
 				    type: "POST",
-					url: "/shipment/upCargoData",
+					url: "http://10.10.42.14/vl/public/shipment/upCargoData",
 					data: {
 						id: $('.uploadId').val(),
 						cargo_data: fileList
@@ -1071,7 +1169,7 @@
 			function getAjaxData(site,asin){
 				$.ajax({
 				    type: "POST",
-					url: "/shipment/getSellerSku",
+					url: "http://10.10.42.14/vl/public/shipment/getSellerSku",
 					data: {
 						marketplace_id: site,
 						asin: asin
@@ -1194,7 +1292,7 @@
 				if($('.formId').val() == ""){ //判断有id时为编辑，没有id为新增
 					$.ajax({
 					    type: "POST",
-						url: "/shipment/addShipment",
+						url: "http://10.10.42.14/vl/public/shipment/addShipment",
 						data: {
 							sku: $('#sku_select').val(),
 							asin: $('#asin_select').val(),
@@ -1236,7 +1334,7 @@
 				}else{
 					$.ajax({
 					    type: "POST",
-						url: "/shipment/upShipment",
+						url: "http://10.10.42.14/vl/public/shipment/upShipment",
 						data: {
 							id: $('.formId').val(),
 							sku: $('#sku_select').val(),
@@ -1303,7 +1401,7 @@
 				
 				$.ajax({
 				    type: "POST",
-					url: "/shipment/detailShipment",
+					url: "http://10.10.42.14/vl/public/shipment/detailShipment",
 					data: {
 						id: id
 					},
@@ -1326,13 +1424,13 @@
 							$('.isPlanDisabled').attr('disabled',true).css('background',"#eee");
 							$('.estimated_delivery_date_btn').attr('disabled',true).css('background',"#eee");
 							$('.request_date_btn').attr('disabled',false).css('background',"#fff");
-						}else if(res.shipment.role == 2){
+						}else if(res.shipment.role == 2 || res.shipment.role == 6){
 							$('.isPlanDisabled').attr('disabled',false).css('background',"#fff");
 							$('#audit_status_select').attr('disabled',false).css('background',"#fff");
 							$('.isSellerDisabled').attr('disabled',true).css('background',"#eee");
 							$('.estimated_delivery_date_btn').attr('disabled',false).css('background',"#fff");
 							$('.request_date_btn').attr('disabled',true).css('background',"#eee");
-						}else if(res.shipment.role == 3 || res.shipment.role == 5){
+						}else if(res.shipment.role == 3 || res.shipment.role == 4 || res.shipment.role == 5){
 							$('#audit_status_select').attr('disabled',false).css('background',"#fff");
 							$('.isSellerDisabled').attr('disabled',false).css('background',"#fff");
 							$('.request_date_btn').attr('disabled',false).css('background',"#fff");
@@ -1376,18 +1474,18 @@
 				dispalyLength: 2, // default record count per page
 				paging: true,  // 是否显示分页
 				info: false,// 是否表格左下角显示的文字
-				ordering: false,
+				order: [ 9, "desc" ], //设置排序
 				//scrollX: "100%",
 				//scrollCollapse: false,
 				fixedColumns: { //固定列的配置项
-					leftColumns: 4, //固定左边第一列
+					leftColumns: 10, //固定左边第一列
 					rightColumns: 1, //固定左边第一列
 				},
 				serverSide: false,//是否所有的请求都请求服务器	
 				scrollX: "100%",
 				scrollCollapse: false,
 				ajax: {
-					url: "/shipment/index",
+					url: "http://10.10.42.14/vl/public/shipment/index",
 					type: "post",
 					data :  function(){
 						reqList = {
@@ -1470,40 +1568,25 @@
 								dot = str.split(',');
 								dot.length > 1 ? img = 'https://images-na.ssl-images-amazon.com/images/I/' + dot[0] : img = ''
 							}
-							var content = '<a href="https://'+row.toUrl+'/dp/'+ row.asin +'" target="_blank" style="text-decoration:none"><img src="'+img+'" alt="" style="display:block; width:60px; height:60px; margin:0 auto"></a>';
+							var content = '<a href="https://'+row.toUrl+'/dp/'+ row.asin +'" target="_blank" style="text-decoration:none"><img src="'+img+'" alt="" style="display:block; height:60px; margin:0 auto"></a>';
 							return content;
 						},
 					},
 					{
 						data: 'label',
-					},
-					{ 
-						data: 'seller_sku',
 						render: function(data, type, row, meta) {
-							var content = '<div style="color:blue;cursor:pointer">'+data +'</div>';
+							var content = '<div class="aaa">'+ row.label +'</div>'+
+										  '<div>'+ row.seller_sku +'</div>'+
+										  '<div style="color:blue;cursor:pointer"><a href="/mrp/edit?asin='+ row.asin +'&marketplace_id='+ row.marketplace_id +'">'+ row.asin +'</a></div>';
 							return content;
 						},
-						createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
-							$(cell).on( 'click', function () {
-								$('.mask_box').show();
-								$('.formId').val(rowData.id);
-								editTableData(rowData.id);
-							});
-						}
 					},
 					{
-						data: null,
+						data: "sku",
 						render: function(data, type, row, meta) {
-							var content = '<div style="color:blue;cursor:pointer"><a href="/mrp/edit?asin='+ data.asin +'&marketplace_id='+ row.marketplace_id +'">'+ row.asin +'</a><br><a href="/mrp/edit?sku='+ data.sku +'&marketplace_id='+ row.marketplace_id +'">'+ row.sku+'</a></div>';
+							var content = '<div style="color:blue;cursor:pointer"><a href="/mrp/edit?sku='+ data.sku +'&marketplace_id='+ row.marketplace_id +'">'+ row.sku+'</a></div>';
 							return content;
 						},
-						/* createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
-							$(cell).on( 'click', function () {
-								$('.mask_box').show();
-								$('.formId').val(rowData.id);
-								editTableData(rowData.id); 
-							});
-						} */
 					},
 					{
 						data: 'warehouse',
@@ -1599,6 +1682,18 @@
 							});
 						}
 					},
+					{
+						data: "allor_status",
+						render: function(data, type, row, meta) {
+							if(data == 0){ data = '资料提供中' }
+							else if(data == 1){ data = '换标中' }
+							else if(data == 2){ data = '待出库' }
+							else if(data == 3){ data = '已发货' }
+							else if(data == 4){ data = '取消发货' }
+							var content = '<div>'+data+'</div>';
+							return content;
+						}
+					},
 					{ 
 						data: "adjustment_quantity" ,
 						render: function(data, type, row, meta) {
@@ -1641,18 +1736,7 @@
 							});
 						}
 					},
-					{
-						data: "allor_status",
-						render: function(data, type, row, meta) {
-							if(data == 0){ data = '资料提供中' }
-							else if(data == 1){ data = '换标中' }
-							else if(data == 2){ data = '待出库' }
-							else if(data == 3){ data = '已发货' }
-							else if(data == 4){ data = '取消发货' }
-							var content = '<div>'+data+'</div>';
-							return content;
-						}
-					},
+					
 					{
 						data: "allot",
 						render: function(data, type, row, meta) {
@@ -1674,7 +1758,9 @@
 						}
 					},
 				], 
-				
+				columnDefs:[
+					{ "bSortable": false, "aTargets": [ 0,1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21]},
+				]
 			});
 			
 			//全选
