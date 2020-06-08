@@ -1773,9 +1773,9 @@
 									for(var i=0;i<res.length;i++){
 										let reg = /\.(png|jpg|gif|jpeg|webp|pdf)$/;
 										if(reg.test(res[i].url)){
-											fileAddress1 += '<div><a class="titleHidden" href="' + res[i].url + '" target="_blank">' + res[i].title + '</a><a style="float:right" href="' + res[i].url + '" class="button" download="' + res[i].title + '">下载</a></div>';
+											fileAddress1 += '<div><a class="titleHidden" href="decodeURI(' + res[i].url + ')" target="_blank">decodeURI(' + res[i].url + ')</a><a style="float:right" href="decodeURI(' + res[i].url + ')" class="button" download="decodeURI(' + res[i].url + ')">下载</a></div>';
 										}else{
-											fileAddress2 += '<div><span class="titleHidden">' + res[i].title + '</span><a style="float:right" href="' + res[i].url + '" download="' + res[i].title + '" class="button">下载</a></div>';
+											fileAddress2 += '<div><span class="titleHidden">decodeURI(' + res[i].url + ')</span><a style="float:right" href="decodeURI(' + res[i].url + ')" download="decodeURI(' + res[i].url + ')" class="button">下载</a></div>';
 										}
 									}
 									$('.file_adress').append(fileAddress1 + fileAddress2 );
