@@ -283,6 +283,7 @@ Route::match(['post'],'/shipment/upCargoData', 'ShipmentController@upCargoData')
 Route::match(['post'],'/shipment/getNextData', 'ShipmentController@getNextData');//请求下一级 asin 或者 sellersku列表
 Route::match(['post'],'/shipment/getSellerSku', 'ShipmentController@getSellerSku');
 Route::match(['post'],'/shipment/importExecl', 'ShipmentController@importExecl');//上传 表格
+Route::match(['post'],'/cpfr/importExecl', 'CpfrController@importExecl');//上传 表格
 Route::match(['post'],'/shipment/getBoxDetail', 'ShipmentController@getBoxDetail');//查询 装箱数据信息
 Route::match(['post'],'/shipment/upShippingMethod', 'ShipmentController@upShippingMethod');//修改 发货方式
 Route::match(['post'],'/shipment/exportExecl', 'ShipmentController@exportExecl');//调拨进度 下载

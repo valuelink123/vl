@@ -1559,7 +1559,7 @@ class ShipmentController extends Controller
         //Auth::user()->id //todo
         $file = $request->file('files');
         $sr_id_list = [];
-        $r_message = '';
+        $r_message = $msg='';
         if ($file) {
             try {
                 $file_name = $file->getClientOriginalName();
@@ -1628,18 +1628,23 @@ class ShipmentController extends Controller
                     $result = DB::connection('vlz')->table('allot_progress')->insert($data);
                     if ($result) {
                         $r_message = ['status' => 1, 'msg' => '保存成功'];
+                        $msg = '成功';
                       //  return \Response::json(array('files' => array($success)), 200);
                     }
                 } else {
+                    $msg = '失败';
                     $r_message = ['status' => 0, 'msg' => '数据格式不对'];
                 }
 
 //                return \Response::json(array('files' => array($success)), 200);
             } else {
+                $msg = '失败';
                 $r_message = ['status' => 0, 'msg' => '文件打开失败'];
             }
           //  return $r_message;
-            return view('cpfr/allocationProgress', ['msg' => $r_message]);
+            //return view('cpfr/allocationProgress', ['msg' => $msg]);
+            return redirect('cpfr/allocationProgress');
+
         }
     }
 
