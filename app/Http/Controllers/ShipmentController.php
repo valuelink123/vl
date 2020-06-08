@@ -36,7 +36,7 @@ class ShipmentController extends Controller
     {
         /** 超级权限*/
         $ADMIN_EMAIL = Asin::ADMIN_EMAIL;
-        // $user = Auth::user()->toArray();// todo
+        // $user = Auth::user()->toArray();
 //        if (!empty($user['email']) && in_array($user['email'], $ADMIN_EMAIL)) {
 //            /**  特殊权限着 查询所有用户 */
 //            $role = 4;
@@ -179,7 +179,7 @@ class ShipmentController extends Controller
             //$value['sap_warehouse_code'] . '-' .
             $shipmentList[$key]['warehouse'] = $value['sap_factory_code'];
             $shipmentList[$key]['image'] = explode(',', $value['images'])[0];
-            $shipmentList[$key]['allot'] = @$allotIdList[$value['id']] ? $allotIdList[$value['id']] : 0;
+            $shipmentList[$key]['allot'] =!empty($value['cargo_data']) ? 1 : 0;
             if (!in_array(@$ulist[$value['sap_seller_id']]['name'], $seller)) {
                 if (!empty($ulist[$value['sap_seller_id']]['name'])) {
                     if (!empty($ulist[$value['sap_seller_id']]['name'])) {
@@ -559,7 +559,7 @@ class ShipmentController extends Controller
             $old_sap_seller_id = $old_shipment[0]['sap_seller_id'];
             $new_status = @$request['status'] >= 0 ? $request['status'] : $old_status;
         }
-        $user = Auth::user()->toArray();//todo
+        $user = Auth::user()->toArray();
         /** 超级权限*/
         $ADMIN_EMAIL = Asin::ADMIN_EMAIL;
         if (!empty($user)) {
@@ -667,7 +667,10 @@ class ShipmentController extends Controller
                     if ($result > 0) {
                         /** 已审核状态添加到 调拨进度表allot_progress 表 */
                         if ($new_status == 4 && $id > 0) {
-                            $data = ['shipment_requests_id' => $id, 'created_at' => date('Y-m-d H:i:s', time())];
+                            $data = [
+                                'shipment_requests_id' => $id,
+                                'created_at' => date('Y-m-d H:i:s', time())
+                            ];
                             DB::connection('vlz')->table('allot_progress')->insert($data);
                         }
                         $r_message = ['status' => 1, 'msg' => '更新成功'];
@@ -718,7 +721,7 @@ class ShipmentController extends Controller
             return ['status' => 0, 'msg' => '缺少ID'];
         }
 
-        $user = Auth::user()->toArray();//todo
+        $user = Auth::user()->toArray();
         /** 超级权限*/
         $ADMIN_EMAIL = Asin::ADMIN_EMAIL;
         if (!empty($user)) {
@@ -1378,7 +1381,7 @@ class ShipmentController extends Controller
                 a.shippment_id,
                 a.receipts_num,
                 a.updated_at,
-                s.created_at,
+                a.created_at,
                 s.sap_seller_id,
                 s.batch_num,
                 s.out_warehouse,
@@ -1405,7 +1408,7 @@ class ShipmentController extends Controller
                 allot_progress AS a
             LEFT JOIN shipment_requests AS s ON s.id = a.shipment_requests_id where 1=1 ";
         if (!empty($date_s) && !empty($date_e)) {
-            $sql .= ' AND s.created_at >= "' . $date_s . '" AND s.created_at <= "' . $date_e . ' 24:00:00' . '"';
+            $sql .= ' AND a.created_at >= "' . $date_s . '" AND a.created_at <= "' . $date_e . ' 24:00:00' . '"';
         }
         if (!empty($condition)) {
             $sql .= ' AND s.asin LIKE "%' . $condition . '%" OR s.sku LIKE "%' . $condition . '%"';
@@ -1944,7 +1947,7 @@ class ShipmentController extends Controller
         $id = @$request['id'];
         $r_message = $old_shipment = [];
         $role_id = $role = '';
-        $user = Auth::user()->toArray();//todo
+        $user = Auth::user()->toArray();
         // $user['id']=49;
         /** 超级权限*/
         $ADMIN_EMAIL = Asin::ADMIN_EMAIL;
@@ -1968,6 +1971,7 @@ class ShipmentController extends Controller
                 }
             }
         }
+        /** 只有物流操作员 有修改权限*/
         if ($id > 0) {
             if ($role == 4 || $role == 6 || $role == 7 || $role == 2) {
                 //最大权限 任何操作
@@ -2216,7 +2220,7 @@ class ShipmentController extends Controller
     {
         $id = @$request['shipment_requests_id'];
         $cargo_data = NULL;
-        $cargo_data_arr = [];
+        $cargo_data_arr = $cargo_data_arr_new = [];
         if ($id > 0) {
             $sql = "SELECT id,cargo_data FROM shipment_requests WHERE id =" . $id;
             $shipment_requests = DB::connection('vlz')->select($sql);
@@ -2226,8 +2230,16 @@ class ShipmentController extends Controller
             }
             if (!empty($cargo_data)) {
                 $cargo_data_arr = explode(',', $cargo_data);
+                if (!empty($cargo_data_arr)) {
+                    foreach ($cargo_data_arr as $ck => $cv) {
+                        $last = strripos($cv, '/');
+                        $fileName = substr($cv, $last + 1);
+                        $cargo_data_arr_new[$ck]['title'] = $fileName;
+                        $cargo_data_arr_new[$ck]['url'] = $cv;
+                    }
+                }
             }
-            return $cargo_data_arr;
+            return $cargo_data_arr_new;
         } else {
             return ['status' => 0, 'msg' => '缺少shipment_requests_id'];
         }
@@ -2245,26 +2257,26 @@ class ShipmentController extends Controller
         $fnsku = @$request['fnsku'];
         $title = @$request['title'];
 
-        if(strlen($title)>75){
-            $title= substr($title,0,75).'...';
+        if (strlen($title) > 75) {
+            $title = substr($title, 0, 75) . '...';
         }
         $num = @$request['num'];
         if ($width > 0 && $height > 0 && !empty($fnsku) && !empty($title) && $num > 0) {
             $generator = new \Picqer\Barcode\BarcodeGeneratorPNG();
             $barcode = $generator->getBarcode($fnsku, $generator::TYPE_CODE_128, $widthFactor = 2, $height = 30);
             $barcode = base64_encode($barcode);
-            $width=$width.'mm';
-            $height=$height.'mm';
+            $width = $width . 'mm';
+            $height = $height . 'mm';
             // echo ' <img src="data:image/png;base64,' . $barcode . '"/>';
             $mpdf = new \Mpdf\Mpdf(['mode' => 'utf-8', 'format' => 'A4', 'margin_top' => 0, 'margin_left' => 0, 'margin_right' => 0, 'margin_bottom' => 0]);
             $html = '<div style="width: 210mm; height: 297mm;">
                     <div style="transform-origin: 0px 0px; background-color: white; margin-left: 5mm;padding-top:16px">';
             for ($i = 1; $i <= $num; $i++) {
-                $html .= '<div class="small_a4" style="width: '.$width.'; height: '.$height.'; display: inline-block; position: relative; float: left; padding-left: 1mm;padding-top:9px">
+                $html .= '<div class="small_a4" style="width: ' . $width . '; height: ' . $height . '; display: inline-block; position: relative; float: left; padding-left: 1mm;padding-top:9px">
             <div style="width: 100%; display: flex; align-items: center; padding-left: 18px">
             <img  alt="" src="data:image/png;base64,' . $barcode . '" style="max-width: 100%; max-height: 100%;text-align: center">
-            <div style="margin-top: 5px;text-align: center">'.$fnsku.'</div>
-            <div style="margin-top: 4px">'.$title.'</div>
+            <div style="margin-top: 5px;text-align: center">' . $fnsku . '</div>
+            <div style="margin-top: 4px">' . $title . '</div>
             </div>
             </div>';
             }
