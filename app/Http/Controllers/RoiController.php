@@ -133,9 +133,9 @@ class RoiController extends Controller
             $lists[$key]['project_code'] = '<a href="' . $list['new_product_planning_process'] . '" target="_blank">'.$list['project_code'].'</a>';
             $lists[$key]['total_sales_volume'] = '<div style="text-align: right">'.$list['total_sales_volume'].'</div>';
             $lists[$key]['total_sales_amount'] = '<div style="text-align: right">'.round($list['total_sales_amount']).'</div>';
-            $lists[$key]['capital_turnover'] = '<div style="text-align: right">'.$this->twoDecimal($list['capital_turnover']).'</div>';
+            $lists[$key]['capital_turnover'] = $list['capital_turnover'] < 0 ? '<div style="text-align: right; font-size: 16px">∞</div>' : '<div style="text-align: right">'.$this->toPercentage($list['capital_turnover']).'</div>';
             $lists[$key]['project_profitability'] = '<div style="text-align: right">'.$this->toPercentage($list['project_profitability']).'</div>';
-            $lists[$key]['roi'] = '<div style="text-align: right">'.$this->toPercentage($list['roi']).'</div>';
+            $lists[$key]['roi'] = $list['roi'] < 0 ? '<div style="text-align: right; font-size: 16px">∞</div>' : '<div style="text-align: right">'.$this->toPercentage($list['roi']).'</div>';
             $lists[$key]['return_amount'] = '<div style="text-align: right">'.$this->twoDecimal($list['return_amount']/10000).'</div>';
             $lists[$key]['creator'] = array_get($users,$list['creator']);
             $lists[$key]['created_at'] = date('Y-m-d',strtotime($list['created_at']));
@@ -272,9 +272,9 @@ class RoiController extends Controller
                 $val['estimated_launch_time'],
                 $val['total_sales_volume'],
                 round($val['total_sales_amount']),
-                $this->twoDecimal($val['capital_turnover']),
+                $val['capital_turnover'] < 0 ? '∞' : $this->twoDecimal($val['capital_turnover']),
                 $this->toPercentage($val['project_profitability']),
-                $this->toPercentage($val['roi']),
+                $val['roi'] < 0 ? '∞' : $this->toPercentage($val['roi']),
                 $this->twoDecimal($val['return_amount']/10000),
                 array_get($users,$val['creator']),
                 date('Y-m-d',strtotime($val['created_at'])),
@@ -966,6 +966,13 @@ class RoiController extends Controller
         $roi['commission_rate'] = $this->toPercentage($roi['commission_rate']);
         $roi['tariff_rate'] = $this->toPercentage($roi['tariff_rate']);
 
+        if($roi['capital_turnover'] < 0){
+            $roi['capital_turnover'] = '∞';
+        }
+        if($roi['roi'] < 0){
+            $roi['roi'] = '∞';
+        }
+
         return $roi;
     }
 
@@ -1407,8 +1414,8 @@ class RoiController extends Controller
         $updateAjaxData['project_profitability'] = $this->toPercentage($project_profitability);
         $updateAjaxData['marginal_profit_per_pcs'] = $this->twoDecimal($marginal_profit_per_pcs);
         $updateAjaxData['estimated_payback_period'] = $estimated_payback_period > 0 ? $estimated_payback_period : '12个月以后';
-        $updateAjaxData['capital_turnover'] = $this->twoDecimal($capital_turnover);
-        $updateAjaxData['roi'] = $this->toPercentage($roi);
+        $updateAjaxData['capital_turnover'] = $capital_turnover < 0 ? '∞' : $this->twoDecimal($capital_turnover);
+        $updateAjaxData['roi'] = $roi < 0 ? '∞' : $this->toPercentage($roi);
         $updateAjaxData['return_amount'] = $this->twoDecimal($return_amount/10000);
 
         return $updateAjaxData;
