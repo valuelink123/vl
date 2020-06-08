@@ -13,6 +13,12 @@
 table.dataTable thead th, table.dataTable thead td {
     padding: 8px 10px;
 }
+input[type=checkbox], input[type=radio]{
+	margin:0px;
+}
+.DTFC_Cloned{
+ margin-top:1px !important;
+}
 </style>
 
     <link rel="stylesheet" href="/js/chosen/chosen.min.css"/>
