@@ -158,7 +158,8 @@ class MrpController extends Controller
 			//$min_purchase_quantity = intval(SapPurchaseRecord::where('sku',$val['sku'])->where('sap_factory_code','<>','')->whereNotIn('supplier',['CN01','WH01','HK03'])->orderBy('created_date','desc')->value('min_purchase_quantity'));
 			$data_placement ='top';
 			if($key<4) $data_placement='bottom';
-			$asin_plans = AsinSalesPlan::SelectRaw('sum(quantity_last) as quantity,week_date')->where($type,$val[$type])->where('marketplace_id',$val['marketplace_id'])->where('date','>=',$date_from)->where('date','<=',$date_to)->groupBy(['week_date'])->get()->keyBy('week_date')->toArray();
+			$asin_plans = AsinSalesPlan::SelectRaw('sum(quantity_last) as quantity,week_date,any_value(status) as status')->where($type,$val[$type])->where('marketplace_id',$val['marketplace_id'])->where('date','>=',$date_from)->where('date','<=',$date_to)->groupBy(['week_date'])->get()->keyBy('week_date')->toArray();
+			$data[$key]['id'] = '<input type="checkbox" name="checkedInput" value="'.$val['asin'].'--'.$val['marketplace_id'].'">';
 			$data[$key]['seller'] = array_get($sellers,$val['sap_seller_id']);
 			$data[$key]['asin'] = ($type=='asin')?'<a href="/mrp/edit?asin='.$val['asin'].'&marketplace_id='.$val['marketplace_id'].'">'.$val['asin'].'</a>':$val['asin'];
 			$data[$key]['site'] = array_get($siteCode,$val['marketplace_id']);
@@ -168,8 +169,9 @@ class MrpController extends Controller
 			$data[$key]['total_sellable'] = intval($val['afn_sellable']+$val['afn_reserved']+$val['mfn_sellable']+$val['sz_sellable']);
 			$data[$key]['week_daily_sales'] = round($val['daily_sales']*7,2);
 			$data[$key]['22_week_plan_total'] =0;
+			$dist_status = array_keys(getDistRuleForRole());
 			for($i=1;$i<=22;$i++){
-				$data[$key][$i.'_week_plan'] = ($type!='sku' && date('Y-m-d',strtotime($date.' +'.$i.' weeks sunday'))>=date('Y-m-d',strtotime('+1 weeks sunday')))?('<a class="week_plan editable" title="'.$val['asin'].' '.array_get($siteCode,$val['marketplace_id']).' weeks '.$i.' Plan" href="javascript:;" id="'.$val['asin'].'--'.$val['marketplace_id'].'--'.$val['sku'].'--'.date('Y-m-d',strtotime($date.' +'.$i.' weeks sunday')).'" data-pk="'.$val['asin'].'--'.$val['marketplace_id'].'--'.$val['sku'].'--'.date('Y-m-d',strtotime($date.' +'.$i.' weeks sunday')).'" data-type="text" data-placement="'.$data_placement.'">'.array_get($asin_plans,date('Y-m-d',strtotime($date.' +'.$i.' weeks sunday')).'.quantity',0).'</a>'):array_get($asin_plans,date('Y-m-d',strtotime($date.' +'.$i.' weeks sunday')).'.quantity',0);
+				$data[$key][$i.'_week_plan'] = ($type!='sku' && date('Y-m-d',strtotime($date.' +'.$i.' weeks sunday'))>=date('Y-m-d',strtotime('+1 weeks sunday')) && in_array(array_get($asin_plans,date('Y-m-d',strtotime($date.' +'.$i.' weeks sunday')).'.status',0)+1,$dist_status))?('<a class="week_plan editable" title="'.$val['asin'].' '.array_get($siteCode,$val['marketplace_id']).' weeks '.$i.' Plan" href="javascript:;" id="'.$val['asin'].'--'.$val['marketplace_id'].'--'.$val['sku'].'--'.date('Y-m-d',strtotime($date.' +'.$i.' weeks sunday')).'" data-pk="'.$val['asin'].'--'.$val['marketplace_id'].'--'.$val['sku'].'--'.date('Y-m-d',strtotime($date.' +'.$i.' weeks sunday')).'" data-type="text" data-placement="'.$data_placement.'">'.array_get($asin_plans,date('Y-m-d',strtotime($date.' +'.$i.' weeks sunday')).'.quantity',0).'</a>'):array_get($asin_plans,date('Y-m-d',strtotime($date.' +'.$i.' weeks sunday')).'.quantity',0);
 				
 				$data[$key]['22_week_plan_total']+=array_get($asin_plans,date('Y-m-d',strtotime($date.' +'.$i.' weeks sunday')).'.quantity',0);
             }
@@ -345,6 +347,7 @@ class MrpController extends Controller
 					'symmetry'=>intval(array_get($asin_symmetrys,$tmp_date_from,0)),
 					'plan_first'=>intval(array_get($asin_plans,$tmp_date_from.'.quantity_first',0)),
 					'plan_last'=>intval(array_get($asin_plans,$tmp_date_from.'.quantity_last',0)),
+					'status'=>intval(array_get($asin_plans,$tmp_date_from.'.status',0)),
 					'sold'=>intval(array_get($asin_historys,$tmp_date_from.'.sold',0)),
 					'stock'=>intval(array_get($asin_historys,$tmp_date_from.'.stock',0)),
 					'remark'=>array_get($asin_plans,$tmp_date_from.'.remark'),
@@ -358,7 +361,7 @@ class MrpController extends Controller
 			}
 			$cur_date=date('Y-m-d');
 		}
-		return view('mrp/edit',['asin'=>$asin,'marketplace_id'=>$marketplace_id,'date_from'=>$date_from,'date_to'=>$date_to,'show'=>$show,'type'=>$type,'asins'=>$asins,'sku'=>$sku,'sku_info'=>$sku_info,'sales_plan'=>$sales_plan,'cur_date'=>$cur_date,'current_stock'=>$current_stock,'keyword'=>$keyword]);
+		return view('mrp/edit',['asin'=>$asin,'marketplace_id'=>$marketplace_id,'date_from'=>$date_from,'date_to'=>$date_to,'show'=>$show,'type'=>$type,'asins'=>$asins,'sku'=>$sku,'sku_info'=>$sku_info,'sales_plan'=>$sales_plan,'cur_date'=>$cur_date,'current_stock'=>$current_stock,'keyword'=>$keyword,'dist_status' =>array_keys(getDistRuleForRole())]);
     }
 
     public function update(Request $request)
@@ -697,6 +700,21 @@ left join (select sku,sum(quantity) as sz_sellable from sap_sku_sites where left
 		return $data;
 	}
 	
+	public function updateStatus(Request $request){
+		$status=intval($request->get('status'));
+		$asinlist=$request->get('asinlist');
+		$date=$request->get('date');
+		$date_from = date('Y-m-d',strtotime($date.' next monday'));
+		$date_to = date('Y-m-d',strtotime($date.' +22 weeks sunday'));
+		$asin_array = explode(',',$asinlist);
+		foreach($asin_array as $val){
+			$asin_marketplaceid = explode('--',$val);
+			$add_where[] ="(asin = '".$asin_marketplaceid[0]."' and marketplace_id = '".$asin_marketplaceid[1]."')";
+		}
+		$result = AsinSalesPlan::where('date','>=',$date_from)->where('date','<=',$date_to)->whereRaw("(".implode(" or ",$add_where).")")->update(['status'=>$status]);
+		echo json_encode(['Ack'=>$result]);
+	
+	}
 	
 	public function import( Request $request )
 	{	
