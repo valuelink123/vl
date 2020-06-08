@@ -1624,11 +1624,6 @@
 						var content = '<button><a target="_blank" href="barcode?id='+row.id+'">打印</a></button>';
 						return content;
 					},
-					/* createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {						
-						$(cell).on( 'click', function () {
-							console.log(rowData.id) 
-						});
-					} */
 				},
 				{
 					data: 'shipping_method',

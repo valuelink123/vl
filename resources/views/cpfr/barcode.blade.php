@@ -152,7 +152,7 @@
 		function getBarcodeInfo(obj,url) {
 			 $.ajax({
 			  	type:"post",
-			  	url:"http://10.10.42.14/vl/public/shipment/getBarcodepub",
+			  	url:"/shipment/getBarcodepub",
 			  	data:{
 					"shipment_requests_id": ids
 			  	},
@@ -179,24 +179,24 @@
 			let total =$('.total_num').text();
 			let width = $("#barcode_pagesize_select").find("option:selected").attr("width");
 			let height = $("#barcode_pagesize_select").find("option:selected").attr("height");
-			/* $.ajax({
-			    type: "POST",
-				url: "http://10.10.42.14/vl/public/shipment/downloadPDF",
+			$.ajax({
+				url: "/shipment/downloadPDF",
+				method: 'POST',
+				cache: false,
 				data: {
-					width:
-					height:
-					num: total,
+					width: width,
+					height: height,
+					num: 10,
 					title: title,
-					fnsku: code,
-
+					fnsku: code
+				},		 
+				success: function (data) {
+					console.log(data)
 				},
-				success: function (res) {
-					console.log(res)
-				},
-				error: function(err) {
+				error:function(err){
 					console.log(err)
 				}
-			}); */
+			});
 		})
 	})
 </script>

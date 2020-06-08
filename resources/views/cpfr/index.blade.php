@@ -1197,7 +1197,6 @@
 				}else if(fileList1 == "" && fileList != ""){
 					fileLists = fileList
 				}
-				console.log(fileLists)
 				$.ajax({
 				    type: "POST",
 					url: "/shipment/upCargoData",
