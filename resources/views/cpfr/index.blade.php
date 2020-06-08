@@ -164,14 +164,14 @@
 	}
 	.mask_upload_dialog{
 		width: 500px;
-		height: 200px;
+		height: 500px;
 		background: #fff;
 		position: absolute;
 		left: 50%;
 		top: 50%;
-		padding: 20px;
-		margin-top: -150px;
-		margin-left: -150px;
+		padding: 40px;
+		margin-top: -250px;
+		margin-left: -250px;
 	}
 	.mask-dialog{
 		width: 600px;
@@ -405,6 +405,16 @@
 		content: '';
 		box-sizing: border-box;
 	}
+	.file_adress{
+		margin: 10px;
+	}
+	.titleHidden{
+		display: inline-block;
+		width: 350px;
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+	}
 </style>
 <link rel="stylesheet" type="text/css" media="all" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-daterangepicker/3.0.5/daterangepicker.min.css" />
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.1/moment.min.js"></script>
@@ -547,23 +557,27 @@
 					<div class="cloumn_box">
 						<p style="padding: 0;margin: 0;line-height: 25px; text-align: left;"><input type="checkbox" class="checkboxAll" style="margin-right: 10px;" />是否全选</p>
 						<ul class="cloumn_list">
-							<li><input type="checkbox" />需求提交日期</li>
-							<li><input type="checkbox" />调拨状态</li>
+							<li><input type="checkbox" />提交日期</li>
 							<li><input type="checkbox" />销售员</li>
-							<li><input type="checkbox" />发货批号</li>
-							<li><input type="checkbox" />调出工厂</li>
-							<li><input type="checkbox" />调入工厂</li>
-							<li><input type="checkbox" />亚马逊账号</li>
+							<li><input type="checkbox" />计划员</li>
+							<li><input type="checkbox" />产品图片</li>
+							<li><input type="checkbox" />账号</li>
 							<li><input type="checkbox" />SKU</li>
-							<li><input type="checkbox" />调拨数量</li>
-							<li><input type="checkbox" />RMS标贴SKU</li>
-							<li><input type="checkbox" />条码标签</li>
-							<li><input type="checkbox" />发货方式</li>
-							<li><input type="checkbox" />大货资料</li>
-							<li><input type="checkbox" />Shippment ID</li>
-							<li><input type="checkbox" />跟踪号/单据号</li>
-							<li><input type="checkbox" />上次更新时间</li>
-							<li><input type="checkbox" />装箱数据</li>
+							<li><input type="checkbox" />调入工厂</li>
+							<li><input type="checkbox" />需求数量</li>
+							<li><input type="checkbox" />期望到货时间</li>
+							<li><input type="checkbox" />是否贴RMS标签</li>
+							<li><input type="checkbox" />调拨理由</li>
+							<li><input type="checkbox" />可维持天数</li>
+							<li><input type="checkbox" />FBA在库</li>
+							<li><input type="checkbox" />FBA可维持天数</li>
+							<li><input type="checkbox" />调拨在途</li>
+							<li><input type="checkbox" />审核状态</li>
+							<li><input type="checkbox" />调拨状态</li>
+							<li><input type="checkbox" />调整需求数量</li>
+							<li><input type="checkbox" />预计到货时间</li>
+							<li><input type="checkbox" />调出工厂</li>
+							<li><input type="checkbox" />待办事项</li>
 						</ul>
 					</div>
 				</div>
@@ -802,85 +816,129 @@
 				<input type="hidden" class="formId">
 				<button class="updateConfirm">确认</button>
 			</div>
-			
 		</div>
+		
 	</div>
 	<div class="mask_upload_box">
 		<div class="mask_upload_dialog">
 			<svg t="1588919283810"class="icon cancel_upload_btn cancelUpload" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4128" width="15" height="15"><path d="M1001.952 22.144c21.44 21.44 22.048 55.488 1.44 76.096L98.272 1003.36c-20.608 20.576-54.592 20-76.096-1.504-21.536-21.44-22.048-55.488-1.504-76.096L925.824 20.672c20.608-20.64 54.624-20 76.128 1.472" p-id="4129" fill="#707070"></path><path d="M22.176 22.112C43.616 0.672 77.6 0.064 98.24 20.672L1003.392 925.76c20.576 20.608 20 54.592-1.504 76.064-21.44 21.568-55.488 22.08-76.128 1.536L20.672 98.272C0 77.6 0.672 43.584 22.176 22.112" p-id="4130" fill="#707070"></path></svg>
-			
-			<!-- The fileupload-buttonbar contains buttons to add/delete files and start/cancel the upload -->
-			<form style="height: 130px; overflow: hidden;" id="fileupload" action="{{ url('send') }}" method="POST" enctype="multipart/form-data">
-			    {{ csrf_field() }}
-				<input type="hidden" name="warn" id="warn" value="0">
-			    <input type="hidden" name="inbox_id" id="inbox_id" value="0">
-			    <input type="hidden" name="user_id" id="user_id" value="{{Auth::user()->id}}">
-								
-			    <div>
-			        <div class="fileupload-buttonbar">
-			            <div class="col-lg-12" style="text-align: center;margin-bottom: 20px;">
-			                <span class="btn green fileinput-button">
-								<i class="fa fa-plus"></i>
-								<span>添加文件</span>
-								<input type="file" name="files[]" multiple=""> 
-							</span>
-			                <span class="fileupload-process"> </span>
-			            </div>
-			        </div>
-					<table role="presentation" class="table table-striped clearfix" id="table-striped" style="margin-bottom: 0;">
-					    <tbody class="files" id="filesTable"> </tbody>
-					</table>
-					<div class="col-lg-12 fileupload-progress fade">
-					    <div class="progress progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100">
-					        <div class="progress-bar progress-bar-success" style="width:0%;"> </div>
-					    </div>
-					    <div class="progress-extended"> &nbsp; </div>
-					</div>
-			        
-			        <div id="blueimp-gallery" class="blueimp-gallery blueimp-gallery-controls" data-filter=":even">
-			            <div class="slides"> </div>
-			            <h3 class="title"></h3>
-			            <a class="prev"> ‹ </a>
-			            <a class="next"> › </a>
-			            <a class="close white"> </a>
-			            <a class="play-pause"> </a>
-			            <ol class="indicator"> </ol>
-			        </div>
-			        <script id="template-upload" type="text/x-tmpl"> {% for (var i=0, file; file=o.files[i]; i++) { %}
-			        <tr class="template-upload fade">
-			            <td style="text-align: center;">
-			                <p style="width: 200px; overflow: hidden; margin: 7px auto; text-overflow: ellipsis;" class="name">{%=file.name%}</p>
-			                <strong class="error text-danger label label-danger" style="padding: 0 6px;"></strong>
-			            </td>
-			            <td style="text-align: center;"> {% if (!i && !o.options.autoUpload) { %}
-			                <button class="btn blue start" disabled>
-			                    <i class="fa fa-upload"></i>
-			                    <span>开始</span>
-			                </button> {% } %} {% if (!i) { %}
-			                <button class="btn red cancel">
-			                    <i class="fa fa-ban"></i>
-			                    <span>取消</span>
-			                </button> {% } %} </td>
-			        </tr> {% } %} </script>
-			        <script id="template-download" type="text/x-tmpl"> {% for (var i=0, file; file=o.files[i]; i++) { %}
-			        <tr class="template-download fade">
-			            <td>
-			                <p class="name"> {% if (file.url) { %}
-			                    <a href="{%=file.url%}" title="{%=file.name%}" download="{%=file.name%}" {%=file.thumbnailUrl? 'data-gallery': ''%}>{%=file.name%}</a> {% } else { %}
-			                    <span>{%=file.name%}</span> {% } %}
-			                    {% if (file.name) { %}
-			                        <input type="hidden" name="fileid[]" class="filesUrl" value="{%=file.url%}">
-			                    {% } %}
-			                    </p> {% if (file.error) { %}
-			                <div>
-			                    <span class="label label-danger">Error</span> {%=file.error%}</div> {% } %} </td>
-			            
-			        </tr> {% } %} </script>
-			        <div style="clear:both;"></div>
-			    </div>
-			</form>	
+			<div style="overflow: auto; height: 395px;">
+				<div class="file_adress"></div>
+				<!-- The fileupload-buttonbar contains buttons to add/delete files and start/cancel the upload -->
+				<form id="fileupload" action="{{ url('send') }}" method="POST" enctype="multipart/form-data">
+				    {{ csrf_field() }}
+					<input type="hidden" name="warn" id="warn" value="0">
+				    <input type="hidden" name="inbox_id" id="inbox_id" value="0">
+				    <input type="hidden" name="user_id" id="user_id" value="{{Auth::user()->id}}">
+									
+				    <div style="margin-top: 20px;">
+				        <!-- The fileupload-buttonbar contains buttons to add/delete files and start/cancel the upload -->
+				        <div class="fileupload-buttonbar">
+				            <div class="col-lg-12" style="text-align: center;">
+				                <!-- The fileinput-button span is used to style the file input field as button -->
+				                <span class="btn green fileinput-button">
+									<i class="fa fa-plus"></i>
+									<span>添加文件</span>
+									<input type="file" name="files[]" multiple=""> 
+								</span>
+				                <button type="submit" class="btn blue start">
+				                    <i class="fa fa-upload"></i>
+				                    <span>开始上传</span>
+				                </button>
+				                <button type="reset" class="btn warning cancel">
+				                    <i class="fa fa-ban-circle"></i>
+				                    <span>取消上传 </span>
+				                </button>
+				
+				                <button type="button" class="btn red delete">
+				                    <i class="fa fa-trash"></i>
+				                    <span>删除</span>
+				                </button>
+				               <!-- <input type="checkbox" class="toggle"> -->
+				                <!-- The global file processing state -->
+				                <span class="fileupload-process"> </span>
+				            </div>
+				            <!-- The global progress information -->
+				            <div class="col-lg-12 fileupload-progress fade">
+				                <!-- The global progress bar -->
+				                <div class="progress progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100">
+				                    <div class="progress-bar progress-bar-success" style="width:0%;"> </div>
+				                </div>
+				                <!-- The extended global progress information -->
+				                <div class="progress-extended"> &nbsp; </div>
+				            </div>
+				        </div>
+				        <!-- The table listing the files available for upload/download -->
+				        <table role="presentation" class="table table-striped clearfix" id="table-striped" style="margin-bottom: 0;">
+				            <tbody class="files" id="filesTable"> </tbody>
+				        </table>
+				        <div id="blueimp-gallery" class="blueimp-gallery blueimp-gallery-controls" data-filter=":even">
+				            <div class="slides"> </div>
+				            <h3 class="title"></h3>
+				            <a class="prev"> ‹ </a>
+				            <a class="next"> › </a>
+				            <a class="close white"> </a>
+				            <a class="play-pause"> </a>
+				            <ol class="indicator"> </ol>
+				        </div>
+				        <!-- BEGIN JAVASCRIPTS(Load javascripts at bottom, this will reduce page load time) -->
+				        <script id="template-upload" type="text/x-tmpl"> {% for (var i=0, file; file=o.files[i]; i++) { %}
+				        <tr class="template-upload fade">
+				            <td>
+				                <p class="name" style="margin: 0;">{%=file.name%}</p>
+				                <strong class="error text-danger label label-danger" style="padding: 0 6px;"></strong>
+				            </td>
+				            <!-- <td>
+				                <p class="size">Processing...</p>
+				                <div class="progress progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+				                    <div class="progress-bar progress-bar-success" style="width:0%;"></div>
+				                </div>
+				            </td> -->
+				            <td> {% if (!i && !o.options.autoUpload) { %}
+				                <button class="btn blue start" disabled>
+				                    <i class="fa fa-upload"></i>
+				                    <span>开始</span>
+				                </button> {% } %} {% if (!i) { %}
+				                <button class="btn red cancel">
+				                    <i class="fa fa-ban"></i>
+				                    <span>取消</span>
+				                </button> {% } %} </td>
+				        </tr> {% } %} </script>
+				        <!-- The template to display files available for download -->
+				        <script id="template-download" type="text/x-tmpl"> {% for (var i=0, file; file=o.files[i]; i++) { %}
+				        <tr class="template-download fade">
+				            <td>
+				                <p class="name" style="margin: 0;"> {% if (file.url) { %}
+				                    <a href="{%=file.url%}" title="{%=file.name%}" download="{%=file.name%}" {%=file.thumbnailUrl? 'data-gallery': ''%}>{%=file.name%}</a> {% } else { %}
+				                    <span>{%=file.name%}</span> {% } %}
+				                    {% if (file.name) { %}
+				                        <input type="hidden" name="fileid[]" class="filesUrl" value="{%=file.url%}">
+				                    {% } %}
+				
+				                    </p> {% if (file.error) { %}
+				                <div>
+				                    <span class="label label-danger">Error</span> {%=file.error%}</div> {% } %} </td>
+				            <!-- <td>
+				                <span class="size">{%=o.formatFileSize(file.size)%}</span>
+				            </td> -->
+				            <td> {% if (file.deleteUrl) { %}
+				                <button class="btn red delete btn-sm" data-type="{%=file.deleteType%}" data-url="{%=file.deleteUrl%}" {% if (file.deleteWithCredentials) { %} data-xhr-fields='{"withCredentials":true}' {% } %}>
+				                    <i class="fa fa-trash-o"></i>
+				                    <span>删除</span>
+				                </button>
+				                <!-- <input type="checkbox" name="delete" value="1" class="toggle"> --> {% } else { %}
+				                <button class="btn yellow cancel btn-sm">
+				                    <i class="fa fa-ban"></i>
+				                    <span>取消</span>
+				                </button> {% } %} </td>
+				        </tr> {% } %} </script>
+				        <div style="clear:both;"></div>
+				    </div>
+				</form>	
+				
+			</div>
 			<div style="text-align: center;">
-				<input type="hidden" class="uploadId">
+				<input type="hidden" class="fileId">
 				<button class="btn warning cancel cancelUpload" style="width: 80px;border: 1px solid #ccc;">取消</button>
 				<button class="btn blue start" id="confirmUpload">确认上传</button>
 			</div>
@@ -941,7 +999,7 @@
 			}else{
 				$.ajax({
 				    type: "POST",
-					url: "http://10.10.42.14/vl/public/shipment/upAllStatus",
+					url: "/shipment/upAllStatus",
 					data: {
 						status: status,
 						idList: chk_value
@@ -1027,12 +1085,12 @@
 			$('.checkboxAll').on('click',function(){
 				if($(this).is(':checked')){
 					$(".cloumn_list").find('input').prop('checked',true);
-					for(var i=4; i<20; i++){
+					for(var i=4; i<25; i++){
 						tableObj.column(i).visible(false)
 					}
 				}else{
 					$(".cloumn_list").find('input').prop('checked',false)
-					for(var i=4; i<20; i++){
+					for(var i=4; i<25; i++){
 						tableObj.column(i).visible(true)
 					}
 				}
@@ -1048,7 +1106,7 @@
 				 	}
 				 });
 				 $.ajax({
-					url: "http://10.10.42.14/vl/public/shipment/index",
+					url: "/shipment/index",
 					 method: 'POST',
 					 cache: false,
 					 data: {
@@ -1113,18 +1171,38 @@
 			
 			//上传大货资料
 			$('#confirmUpload').on('click',function(){
+				let fileList1 = '';
+				let fileLists = " ";
+				let str1 = $('.file_adress div').find('.button')
+				for(var i=0;i<str1.length;i++){
+					if(fileList1 != ''){
+						fileList1 = fileList1 + ',' + str1[i].href;
+					}else{
+						fileList1 = fileList1 + str1[i].href;
+					}
+				}
 				let fileList = '';
-				let str = $('#table-striped tbody tr td').find('.filesUrl');
-				
+				let str = $('.table-striped tbody tr td').find('.filesUrl');
 				for(var i=0;i<str.length;i++){
-					fileList=(str[0].defaultValue)
+					if(fileList != ''){
+						fileList = fileList + ',' + str[i].defaultValue;
+					}else{
+						fileList = fileList + str[i].defaultValue;
+					}
+				}
+				if(fileList1 != "" && fileList != ""){
+					fileLists = fileList1 + ',' + fileList
+				}else if(fileList1 != "" && fileList == ""){
+					fileLists = fileList1
+				}else if(fileList1 == "" && fileList != ""){
+					fileLists = fileList
 				}
 				$.ajax({
 				    type: "POST",
-					url: "http://10.10.42.14/vl/public/shipment/upCargoData",
+					url: "/shipment/upCargoData",
 					data: {
-						id: $('.uploadId').val(),
-						cargo_data: fileList
+						id: $('.fileId').val(),
+						cargo_data: fileLists
 					},
 					success: function (res) {
 						if(res.status == 0){
@@ -1141,6 +1219,7 @@
 							},2000)	
 							$('.mask_upload_box').hide();
 						}
+						$('.mask_file_upload').hide()
 					},
 					error: function(err) {
 						console.log(err)
@@ -1169,7 +1248,7 @@
 			function getAjaxData(site,asin){
 				$.ajax({
 				    type: "POST",
-					url: "http://10.10.42.14/vl/public/shipment/getSellerSku",
+					url: "/shipment/getSellerSku",
 					data: {
 						marketplace_id: site,
 						asin: asin
@@ -1292,7 +1371,7 @@
 				if($('.formId').val() == ""){ //判断有id时为编辑，没有id为新增
 					$.ajax({
 					    type: "POST",
-						url: "http://10.10.42.14/vl/public/shipment/addShipment",
+						url: "/shipment/addShipment",
 						data: {
 							sku: $('#sku_select').val(),
 							asin: $('#asin_select').val(),
@@ -1334,7 +1413,7 @@
 				}else{
 					$.ajax({
 					    type: "POST",
-						url: "http://10.10.42.14/vl/public/shipment/upShipment",
+						url: "/shipment/upShipment",
 						data: {
 							id: $('.formId').val(),
 							sku: $('#sku_select').val(),
@@ -1401,7 +1480,7 @@
 				
 				$.ajax({
 				    type: "POST",
-					url: "http://10.10.42.14/vl/public/shipment/detailShipment",
+					url: "/shipment/detailShipment",
 					data: {
 						id: id
 					},
@@ -1485,7 +1564,7 @@
 				scrollX: "100%",
 				scrollCollapse: false,
 				ajax: {
-					url: "http://10.10.42.14/vl/public/shipment/index",
+					url: "/shipment/index",
 					type: "post",
 					data :  function(){
 						reqList = {
@@ -1753,7 +1832,31 @@
 						createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
 							$(cell).on("click",".upCargoDataBtn",function(){ 
 								$('.mask_upload_box').show();
-								$('.uploadId').val(rowData.id);
+								$('.fileId').val(rowData.id)
+								$('.table-striped #filesTable').html("");
+								$.ajax({
+									type:"post",
+									url:'/shipment/getCargoData',
+									data:{
+										shipment_requests_id: rowData.id,
+									},
+									error:function(err){
+									    console.log(err);
+									},
+									success:function(res){
+										$('.file_adress').html("")
+										let fileAddress1="" ,fileAddress2="";
+										for(var i=0;i<res.length;i++){
+											let reg = /\.(png|jpg|gif|jpeg|webp|pdf)$/;
+											if(reg.test(res[i].url)){
+												fileAddress1 += '<div><a href="' + res[i].url + '" class="titleHidden" target="_blank">' + res[i].title + '</a><a style="float:right" href="' + res[i].url + '" class="button" download="' + res[i].title + '">下载</a></div>';
+											}else{
+												fileAddress2 += '<div><span class="titleHidden">' + res[i].title + '</span><a style="float:right"  href="' + res[i].url + '" class="button" download="' + res[i].title + '">下载</a></div>';
+											}
+										}
+										$('.file_adress').append(fileAddress1 + fileAddress2 );
+									}
+								});
 							}) 
 						}
 					},
