@@ -179,6 +179,7 @@ class ShipmentController extends Controller
             //$value['sap_warehouse_code'] . '-' .
             $shipmentList[$key]['warehouse'] = $value['sap_factory_code'];
             $shipmentList[$key]['image'] = explode(',', $value['images'])[0];
+            //大货资料是否存在
             $shipmentList[$key]['allot'] =!empty($value['cargo_data']) ? 1 : 0;
             if (!in_array(@$ulist[$value['sap_seller_id']]['name'], $seller)) {
                 if (!empty($ulist[$value['sap_seller_id']]['name'])) {
