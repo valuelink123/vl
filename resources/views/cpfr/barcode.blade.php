@@ -112,18 +112,18 @@
 		</table>
 		<div class="print_box">
 			<label for="" style="font-weight: bold;">Paper/Sticker Type:</label>
-			<select>
-				<option value="">21-up labels 63.5 * 38.1 mm on A4</option>
-				<option value="">24-up labels 63.5 * 33.9 mm on A4</option>
-				<option value="">24-up labels 64.6 * 33.8 mm on A4</option>
-				<option value="">24-up labels 66 * 33.9 mm on A4</option>
-				<option value="">24-up labels 66 * 35 mm on A4</option>
-				<option value="">24-up labels 70 * 36 mm on A4</option>
-				<option value="">24-up labels 70 * 37 mm on A4</option>
-				<option value="">27-up labels 63.5 * 29.6 mm on A4</option>
-				<option value="">30-up labels 1"*2-5/8" on US Letter</option>
-				<option value="">40-up labels 52.5 * 29.7 mm on A4</option>
-				<option value="">44-up labels 48.5 * 25.4 mm on A4</option>
+			<select id="barcode_pagesize_select">
+				<option value="" width="63.5" height="38.1">21-up labels 63.5 * 38.1 mm on A4</option>
+				<option value="" width="63.5" height="33.9">24-up labels 63.5 * 33.9 mm on A4</option>
+				<option value="" width="64.6" height="33.8">24-up labels 64.6 * 33.8 mm on A4</option>
+				<option value="" width="66" height="33.9">24-up labels 66 * 33.9 mm on A4</option>
+				<option value="" width="66" height="35">24-up labels 66 * 35 mm on A4</option>
+				<option value="" width="70" height="36">24-up labels 70 * 36 mm on A4</option>
+				<option value="" width="70" height="37">24-up labels 70 * 37 mm on A4</option>
+				<option value="" width="63.5" height=" 29.6">27-up labels 63.5 * 29.6 mm on A4</option>
+				<option value="" width="1" height="2-5/8">30-up labels 1"*2-5/8" on US Letter</option>
+				<option value="" width="52.5" height="29.7">40-up labels 52.5 * 29.7 mm on A4</option>
+				<option value="" width="48.5" height="25.4">44-up labels 48.5 * 25.4 mm on A4</option>
 			</select>
 			<button class="print_btn">
 				<i class="glyphicon glyphicon-print"></i>
@@ -161,16 +161,6 @@
 					$('.barcode_title').text(res.title);
 					$('.barcode_input').val(res.quantity);
 					$('.total_num').text(res.quantity);
-			  		/* if(res.status == 1){
-			  			$('.barCode_Num').text(res.fnsku)
-			  			$('.barcode_title').text(res.title);
-			  		}else{
-			  			$('.error_mask_text').text(res.msg)
-			  			$('.error_mask').fadeIn(1000);
-			  			setTimeout(function(){
-			  				$('.error_mask').fadeOut(1000);
-			  			},2000)
-			  		} 	 */
 			  	},
 			  	error:function(err){
 			  		console.log(err)
@@ -187,7 +177,26 @@
 			let title = $('.barcode_title').text();
 			let code = $('.barCode_Num').text();
 			let total =$('.total_num').text();
-			console.log(title,code,total)
+			let width = $("#barcode_pagesize_select").find("option:selected").attr("width");
+			let height = $("#barcode_pagesize_select").find("option:selected").attr("height");
+			/* $.ajax({
+			    type: "POST",
+				url: "http://10.10.42.14/vl/public/shipment/downloadPDF",
+				data: {
+					width:
+					height:
+					num: total,
+					title: title,
+					fnsku: code,
+
+				},
+				success: function (res) {
+					console.log(res)
+				},
+				error: function(err) {
+					console.log(err)
+				}
+			}); */
 		})
 	})
 </script>

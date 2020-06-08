@@ -1197,12 +1197,13 @@
 				}else if(fileList1 == "" && fileList != ""){
 					fileLists = fileList
 				}
+				console.log(fileLists)
 				$.ajax({
 				    type: "POST",
 					url: "/shipment/upCargoData",
 					data: {
 						id: $('.fileId').val(),
-						cargo_data: fileLists
+						cargo_data: decodeURI(fileLists)
 					},
 					success: function (res) {
 						if(res.status == 0){
@@ -1822,7 +1823,7 @@
 							if(data == 0){
 								data = '<button style="width:110px" class="upCargoDataBtn">上传大货资料</button>'
 							}else if(data == 1){
-								data = '<div>维护条形码</div>'
+								data = '<button style="width:60px" class="upCargoDataBtn">查看</button>'
 							}else{
 								data = ''
 							}
@@ -1849,9 +1850,9 @@
 										for(var i=0;i<res.length;i++){
 											let reg = /\.(png|jpg|gif|jpeg|webp|pdf)$/;
 											if(reg.test(res[i].url)){
-												fileAddress1 += '<div><a href="' + res[i].url + '" class="titleHidden" target="_blank">' + res[i].title + '</a><a style="float:right" href="' + res[i].url + '" class="button" download="' + res[i].title + '">下载</a></div>';
+												fileAddress1 += '<div><a class="titleHidden" href="' + res[i].url + '" target="_blank">' + res[i].title + '</a><a style="float:right" href="' + res[i].url + '" class="button" download="' + res[i].title + '">下载</a></div>';
 											}else{
-												fileAddress2 += '<div class="titleHidden"><span>' + res[i].title + '</span><a style="float:right"  href="' + res[i].url + '" class="button" download="' + res[i].title + '">下载</a></div>';
+												fileAddress2 += '<div><span class="titleHidden">' + res[i].title + '</span><a style="float:right" href="' + res[i].url + '" download="' + res[i].title + '" class="button">下载</a></div>';
 											}
 										}
 										$('.file_adress').append(fileAddress1 + fileAddress2 );
