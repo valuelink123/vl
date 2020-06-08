@@ -416,7 +416,7 @@
 				<input style="display: inline-block;" type="file" name="files" id="input" multiple=""> 
 				<button type="submit" class="btn blue start">
 				    <i class="fa fa-upload"></i>
-				    <span>开始上传</span>
+				    <span>上传</span>
 				</button>
 			</form>
 		</div>   
@@ -1499,7 +1499,7 @@
 								type: "POST",
 								url: "/shipment/upAllAllot",
 								data: {
-									shipment_requests_id_list: rowData.id,
+									shipment_requests_id_list: rowData.shipment_requests_id,
 									status: $(this).find("option:selected").attr("status"),
 								},
 								success: function (res) {
@@ -1621,7 +1621,7 @@
 					data: 'method',
 					name: 'method',
 					render: function(data, type, row, meta) {
-						var content = '<button><a target="_blank" href="barcode?id='+row.id+'">打印</a></button>';
+						var content = '<button><a target="_blank" href="barcode?id='+row.shipment_requests_id+'">打印</a></button>';
 						return content;
 					},
 				},
