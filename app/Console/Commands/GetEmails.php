@@ -231,12 +231,12 @@ class GetEmails extends Command
         if(isset($order_str[0])){
             $data['amazon_order_id'] = $order_str[0];
         }elseif(stripos($mail['from_address'],'marketplace.amazon') !== false){
-            $data['amazon_order_id'] = self::getOrderByEmail($mail['from_address']);
+            $data['amazon_order_id'] = '';//self::getOrderByEmail($mail['from_address']);
         }else{
             $data['amazon_order_id']='';
         }
         if($data['amazon_order_id'] && stripos($mail['from_address'],'marketplace.amazon') !== false){
-            $data['order'] = self::SaveOrderToLocal($data['amazon_order_id']);
+            $data['order'] = [];//self::SaveOrderToLocal($data['amazon_order_id']);
         }
         return $data;
 
