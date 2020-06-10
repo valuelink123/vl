@@ -311,6 +311,7 @@ class ShipmentController extends Controller
      */
     public function addShipment(Request $request)
     {
+
         /** 超级权限*/
         $DOMIN_MARKETPLACEID_SX = Asin::DOMIN_MARKETPLACEID_SX;
         $r_message = $seller_skus = $seller_accounts = $asins = [];
@@ -436,7 +437,21 @@ class ShipmentController extends Controller
                 $result_id = DB::connection('vlz')->table('shipment_requests')->insertGetId($data);
                 if ($result_id > 0) {
                     $sx = $DOMIN_MARKETPLACEID_SX[$request['marketplace_id']];
-                    $batch_num = $sx . date('Ymd', time()) . $result_id;
+                    //$batch_num = $sx . date('Ymd', time()) . $result_id;
+                    /** 查询 发货批号*/
+                    $sql ='SELECT batch_num from shipment_requests GROUP BY id DESC';
+                    $shipment_requests_batch = DB::connection('vlz')->select($sql);
+                    $shipment_requests_batch = (json_decode(json_encode($shipment_requests_batch), true));
+                    if (!empty($shipment_requests_batch)) {
+                        $batch_num = $shipment_requests_batch[0]['batch_num'];
+                    }
+                    $now_date = substr($batch_num,0,8);
+                    if($now_date==date('Ymd',time())){
+                        $batch_num=$batch_num+1;
+                    }else{
+                        $batch_num=date('Ymd',time()).'001';
+                    }
+
                     if (!empty($batch_num)) {
                         $updata = ['batch_num' => $batch_num];
                         $result = DB::connection('vlz')->table('shipment_requests')
@@ -475,7 +490,8 @@ class ShipmentController extends Controller
         $DOMIN_MARKETPLACEID_SX = Asin::DOMIN_MARKETPLACEID_SX;
         $sku = null;
         $role = 0;
-        $user = Auth::user()->toArray();
+       // $user = Auth::user()->toArray();  //todo 打开
+        $role=7;//todo
         /** 超级权限*/
         $ADMIN_EMAIL = Asin::ADMIN_EMAIL;
         if (!empty($user)) {
@@ -494,20 +510,28 @@ class ShipmentController extends Controller
                     $role = 5;
                 }
             }
-            //role_id = 23 代表 计划员
-            $roleUser = DB::table('role_user')->select('user_id')
-                ->where('user_id', @$user['id'])
-                ->where('role_id', 23)
-                ->get()->map(function ($value) {
-                    return (array)$value;
-                })->toArray();
-            if (!empty($roleUser)) {
-                /** 计划员角色  */
-                $role = 2;
-            }
+                $roleUser = DB::table('role_user')->select('user_id', 'role_id')
+                    ->where('user_id', @$user['id'])
+                    ->get()->map(function ($value) {
+                        return (array)$value;
+                    })->toArray();
+                if (!empty($roleUser)) {
+                    $role_id = $roleUser[0]['role_id'];
+                    if ($role_id == 23) {
+                        /** 计划员角色  */
+                        $role = 2;
+                    } else if ($role_id == 31) {
+                        /** 计划 经理 */
+                        $role = 6;
+                    } else if ($role_id == 20) {
+                        /** 物流操作员 */
+                        $role = 7;
+                    }
+                }
         }
+
         if (!empty($request['id']) && $request['id'] > 0) {
-            $sql = "SELECT marketplace_id,out_warehouse,id,`status`,sku,asin,seller_sku,sap_warehouse_code,sap_factory_code,quantity,received_date,rms,rms_sku,package,remark,adjustment_quantity,adjustreceived_date from shipment_requests WHERE id =" . $request['id'];
+            $sql = "SELECT allor_status,marketplace_id,out_warehouse,id,`status`,sku,asin,seller_sku,sap_warehouse_code,sap_factory_code,quantity,received_date,rms,rms_sku,package,remark,adjustment_quantity,adjustreceived_date from shipment_requests WHERE id =" . $request['id'];
             $shipment = DB::connection('vlz')->select($sql);
             $shipment = (json_decode(json_encode($shipment), true));
             if (!empty($shipment[0]['sap_warehouse_code']) && !empty($shipment[0]['sap_factory_code'])) {
@@ -1657,7 +1681,7 @@ class ShipmentController extends Controller
         $sr_id = $request['shipment_requests_id'] ? $request['shipment_requests_id'] : 0;
         $BoxDetail = [];
         if ($sr_id > 0) {
-            $sql = 'SELECT id,width,height,transportation,pallets,pallets_size from allot_progress where shipment_requests_id = ' . $sr_id;
+            $sql = 'SELECT id,width,height,transportation,pallets,pallets_size,`length`,box_num,pcs_box,pcs,weight_box from allot_progress where shipment_requests_id = ' . $sr_id;
             $BoxDetail = DB::connection('vlz')->select($sql);
             $BoxDetail = (json_decode(json_encode($BoxDetail), true));
             return $BoxDetail;
@@ -2261,15 +2285,15 @@ class ShipmentController extends Controller
      */
     public function downloadPDF(Request $request)
     {
-        $width = @$request['width'];
-        $height = @$request['height'];
-        $fnsku = @$request['fnsku'];
-        $title = @$request['title'];
-
+        $width = @$request['width']?$request['width']:63.5;
+        $height = @$request['height']?$request['height']:38.1;
+        $fnsku = @$request['fnsku']?$request['fnsku']:'STHRT556623';
+        $title = @$request['title']?$request['title']:'title';
+        $num = @$request['num']?$request['num']:21;
         if (strlen($title) > 75) {
             $title = substr($title, 0, 75) . '...';
         }
-        $num = @$request['num'];
+
         if ($width > 0 && $height > 0 && !empty($fnsku) && !empty($title) && $num > 0) {
             $generator = new \Picqer\Barcode\BarcodeGeneratorPNG();
             $barcode = $generator->getBarcode($fnsku, $generator::TYPE_CODE_128, $widthFactor = 2, $height = 30);
@@ -2277,23 +2301,27 @@ class ShipmentController extends Controller
             $width = $width . 'mm';
             $height = $height . 'mm';
             // echo ' <img src="data:image/png;base64,' . $barcode . '"/>';
-            $mpdf = new \Mpdf\Mpdf(['mode' => 'utf-8', 'format' => 'A4', 'margin_top' => 0, 'margin_left' => 0, 'margin_right' => 0, 'margin_bottom' => 0]);
+
+            $mpdf = new \Mpdf\Mpdf(['mode' => 'zh-cn', 'format' => 'A4', 'margin_top' => 0, 'margin_left' => 0, 'margin_right' => 0, 'margin_bottom' => 0]);
             $html = '<div style="width: 210mm; height: 297mm;">
                     <div style="transform-origin: 0px 0px; background-color: white; margin-left: 5mm;padding-top:16px">';
             for ($i = 1; $i <= $num; $i++) {
                 $html .= '<div class="small_a4" style="width: ' . $width . '; height: ' . $height . '; display: inline-block; position: relative; float: left; padding-left: 1mm;padding-top:9px">
             <div style="width: 100%; display: flex; align-items: center; padding-left: 18px">
-            <img  alt="" src="data:image/png;base64,' . $barcode . '" style="max-width: 100%; max-height: 100%;text-align: center">
+            <img   alt="" src="data:image/png;base64,' . $barcode . '" style="margin:auto;max-width: 100%; max-height: 100%;text-align: center">
             <div style="margin-top: 5px;text-align: center">' . $fnsku . '</div>
             <div style="margin-top: 4px">' . $title . '</div>
             </div>
             </div>';
             }
             $html .= '</div></div>';
+            //echo $html;exit;
             //创建pdf文件
             $mpdf->WriteHTML($html);
             $time = date("Y-m-d") . time() . rand(1, 99999);
             $mpdf->Output($time . ".pdf", "D");
+        }else{
+            return ['status'=>0,'message'=>'缺少参数'];
         }
 
     }
