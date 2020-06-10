@@ -1655,8 +1655,8 @@
 					}
 				},
 				{
-					data: 'method',
-					name: 'method',
+					data: 'barcode',
+					name: 'barcode',
 					render: function(data, type, row, meta) {
 						var content = '<button><a target="_blank" href="barcode?id='+row.shipment_requests_id+'">打印</a></button>';
 						return content;
@@ -1665,17 +1665,6 @@
 				{
 					data: 'shipping_method',
 					name: 'shipping_method',
-					render: function(data, type, row, meta) {
-					 	if(data == 0){ data = '资料提供中' }
-					 	else if(data == 1){ data = '换标中' }
-					 	else if(data == 2){ data = '待出库' }
-					 	else if(data == 3){ data = '已发货' }
-						else if(data == 5){ data = '签收中' }
-						else if(data == 6){ data = '签收完毕' }
-					 	else if(data == 4){ data = '取消发货' }
-					 	var content = '<div>'+data+'<img src="../assets/global/img/editor.png" alt="" style="float:right" class="country_img"></div>';
-					 	return content;
-					},
 				},
 				{
 					data: 'cargo_data', 
