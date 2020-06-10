@@ -1488,6 +1488,9 @@ class ShipmentController extends Controller
             $allot_progress[$key]['bu'] = @$ulist[$value['sap_seller_id']]['ubu'];
             $allot_progress[$key]['bg'] = @$ulist[$value['sap_seller_id']]['ubg'];
             $allot_progress[$key]['shippment_id'] = $value['shippment_id']>0?$value['shippment_id']:'';
+            $allot_progress[$key]['receipts_num'] = !empty($value['receipts_num'])?$value['receipts_num']:'';
+            $allot_progress[$key]['shipping_method'] = !empty($value['shipping_method'])?$value['shipping_method']:'';
+            //
             $allot_progress[$key]['domin_sx'] = @$DOMIN_MARKETPLACEID_SX[$value['marketplace_id']];
 
             if (!in_array(@$ulist[$value['sap_seller_id']]['name'], $seller)) {
