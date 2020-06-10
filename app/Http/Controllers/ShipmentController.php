@@ -175,6 +175,8 @@ class ShipmentController extends Controller
             $shipmentList[$key]['name'] = @$ulist[$value['sap_seller_id']]['name'];
             $shipmentList[$key]['ubu'] = @$ulist[$value['sap_seller_id']]['ubu'];
             $shipmentList[$key]['ubg'] = @$ulist[$value['sap_seller_id']]['ubg'];
+            $shipmentList[$key]['rms_sku'] = !empty($value['rms_sku'])?$value['rms_sku']:'';
+            $shipmentList[$key]['remark'] = !empty($value['remark'])?$value['remark']:'';
             $shipmentList[$key]['domin_sx'] = @$DOMIN_MARKETPLACEID_SX[$value['marketplace_id']];
             //$value['sap_warehouse_code'] . '-' .
             $shipmentList[$key]['warehouse'] = $value['sap_factory_code'];
