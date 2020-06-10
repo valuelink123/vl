@@ -690,7 +690,7 @@
 			
 			<div>
 				<label for="audit_status_select" style="display: block;">审核</label>
-				<select name="audit_status_select" disabled="disabled" id="audit_status_select" style="width:100%;height: 28px;margin-bottom: 20px;border: 1px solid rgba(220, 223, 230, 1);">
+				<select name="audit_status_select" disabled="disabled" id="audit_status_select" style="width:100%;height: 28px;margin-bottom: 20px;border: 1px solid rgba(220, 223, 230, 1); background: rgba(239, 239, 239, 0.3);">
 					<option value="0">BU经理审核</option>
 					<option value="1">BG总经理审核</option>
 					<option value="2">计划员审核</option>
@@ -1231,7 +1231,7 @@
 				clearVal();
 				$('.mask_box').show();
 				$('.isPlanDisabled').attr('disabled',false).css('background',"#fff");
-				$('#audit_status_select').attr('disabled',true).css('background',"#eee");
+				$('#audit_status_select').attr('disabled',true).css('background',"rgba(239, 239, 239, 0.3)");
 				$('.isSellerDisabled').attr('disabled',false).css('background',"#fff");
 				$('.estimated_delivery_date_btn').attr('disabled',false).css('background',"#fff");
 				$('.request_date_btn').attr('disabled',false).css('background',"#fff");
@@ -1497,30 +1497,37 @@
 						$.each(res.factoryList, function (index, value) {
 							$("#warehouse_select").append("<option value='"+value.sap_factory_code+"'>"+value.sap_factory_code+"</option>");
 						});
+						if(res.shipment.allor_status == 4){
+							$('#audit_status_select').attr('disabled',true).css('background',"rgba(239, 239, 239, 0.3)");
+							$('.isPlanDisabled').attr('disabled',true).css('background',"rgba(239, 239, 239, 0.3)");
+							$('.isSellerDisabled').attr('disabled',true).css('background',"rgba(239, 239, 239, 0.3)");
+							$('.estimated_delivery_date_btn').attr('disabled',true).css('background',"rgba(239, 239, 239, 0.3)");
+							$('.request_date_btn').attr('disabled',true).css('background',"rgba(239, 239, 239, 0.3)");
+						}
 						if(res.shipment.role == 1){
-							$('#audit_status_select').attr('disabled',true).css('background',"#eee");
+							$('#audit_status_select').attr('disabled',true).css('background',"rgba(239, 239, 239, 0.3)");
 							$('.isSellerDisabled').attr('disabled',false).css('background',"#fff");
-							$('.isPlanDisabled').attr('disabled',true).css('background',"#eee");
-							$('.estimated_delivery_date_btn').attr('disabled',true).css('background',"#eee");
+							$('.isPlanDisabled').attr('disabled',true).css('background',"rgba(239, 239, 239, 0.3)");
+							$('.estimated_delivery_date_btn').attr('disabled',true).css('background',"rgba(239, 239, 239, 0.3)");
 							$('.request_date_btn').attr('disabled',false).css('background',"#fff");
 						}else if(res.shipment.role == 2 || res.shipment.role == 6){
 							$('.isPlanDisabled').attr('disabled',false).css('background',"#fff");
 							$('#audit_status_select').attr('disabled',false).css('background',"#fff");
-							$('.isSellerDisabled').attr('disabled',true).css('background',"#eee");
+							$('.isSellerDisabled').attr('disabled',true).css('background',"rgba(239, 239, 239, 0.3)");
 							$('.estimated_delivery_date_btn').attr('disabled',false).css('background',"#fff");
-							$('.request_date_btn').attr('disabled',true).css('background',"#eee");
+							$('.request_date_btn').attr('disabled',true).css('background',"rgba(239, 239, 239, 0.3)");
 						}else if(res.shipment.role == 3 || res.shipment.role == 4 || res.shipment.role == 5){
 							$('#audit_status_select').attr('disabled',false).css('background',"#fff");
 							$('.isSellerDisabled').attr('disabled',false).css('background',"#fff");
 							$('.request_date_btn').attr('disabled',false).css('background',"#fff");
-							$('.isPlanDisabled').attr('disabled',true).css('background',"#eee");
-							$('.estimated_delivery_date_btn').attr('disabled',true).css('background',"#eee");
+							$('.isPlanDisabled').attr('disabled',true).css('background',"rgba(239, 239, 239, 0.3)");
+							$('.estimated_delivery_date_btn').attr('disabled',true).css('background',"rgba(239, 239, 239, 0.3)");
 						}/* else{
-							$('#audit_status_select').attr('disabled',true).css('background',"#eee");
-							$('.isPlanDisabled').attr('disabled',true).css('background',"#eee");
-							$('.isSellerDisabled').attr('disabled',true).css('background',"#eee");
-							$('.estimated_delivery_date_btn').attr('disabled',true).css('background',"#eee");
-							$('.request_date_btn').attr('disabled',true).css('background',"#eee");
+							$('#audit_status_select').attr('disabled',true).css('background',"rgba(239, 239, 239, 0.3)");
+							$('.isPlanDisabled').attr('disabled',true).css('background',"rgba(239, 239, 239, 0.3)");
+							$('.isSellerDisabled').attr('disabled',true).css('background',"rgba(239, 239, 239, 0.3)");
+							$('.estimated_delivery_date_btn').attr('disabled',true).css('background',"rgba(239, 239, 239, 0.3)");
+							$('.request_date_btn').attr('disabled',true).css('background',"rgba(239, 239, 239, 0.3)");
 						} */
 						
 						$('#audit_status_select').val(res.shipment.status);//审核
@@ -1548,7 +1555,7 @@
 			$.fn.dataTable.ext.errMode = 'none';
 			tableObj = $('#planTable').DataTable({
 				lengthMenu: [
-				    20, 50, 100, 'All'
+				    10, 50, 100, 'All'
 				],
 				dispalyLength: 2, // default record count per page
 				paging: true,  // 是否显示分页
