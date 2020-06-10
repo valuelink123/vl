@@ -1561,14 +1561,13 @@
 				paging: true,  // 是否显示分页
 				info: false,// 是否表格左下角显示的文字
 				order: [ 9, "desc" ], //设置排序
-				//scrollX: "100%",
-				//scrollCollapse: false,
 				fixedColumns: { //固定列的配置项
 					leftColumns: 10, //固定左边第一列
 					rightColumns: 1, //固定左边第一列
 				},
 				serverSide: false,//是否所有的请求都请求服务器	
 				scrollX: "100%",
+				autoWidth:false,
 				scrollCollapse: false,
 				ajax: {
 					url: "/shipment/index",
