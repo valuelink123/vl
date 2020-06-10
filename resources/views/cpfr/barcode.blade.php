@@ -126,8 +126,10 @@
 				<option value="" width="48.5" height="25.4">44-up labels 48.5 * 25.4 mm on A4</option>
 			</select>
 			<button class="print_btn">
-				<i class="glyphicon glyphicon-print"></i>
-				Print Item Labels
+				<a href="" >
+					<i class="glyphicon glyphicon-print"></i>
+					Print Item Labels
+				</a>
 			</button>
 		</div>
 	</div>
@@ -179,24 +181,7 @@
 			let total =$('.total_num').text();
 			let width = $("#barcode_pagesize_select").find("option:selected").attr("width");
 			let height = $("#barcode_pagesize_select").find("option:selected").attr("height");
-			$.ajax({
-				url: "/shipment/downloadPDF",
-				method: 'POST',
-				cache: false,
-				data: {
-					width: width,
-					height: height,
-					num: 10,
-					title: title,
-					fnsku: code
-				},		 
-				success: function (data) {
-					console.log(data)
-				},
-				error:function(err){
-					console.log(err)
-				}
-			});
+			$(this).find('a').attr("href","/shipment/downloadPDF?width=" + width + '&height=' + height + '&fnsku=' + code + '&title=' + title)
 		})
 	})
 </script>

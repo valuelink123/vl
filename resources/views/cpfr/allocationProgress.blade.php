@@ -448,6 +448,8 @@
 					<option id="1" value ="换标中">换标中</option>
 					<option id="2" value ="待出库">待出库</option>
 					<option id="3" value ="已发货">已发货</option>
+					<option id="5" value ="签收中">签收中</option>
+					<option id="6" value ="签收完毕">签收完毕</option>
 					<option id="4" value ="取消发货">取消发货</option>
 				</select>
 			</div>
@@ -532,16 +534,20 @@
 							<li><button class="btn btn-sm red-sunglo noConfirmed" onclick="statusAjax(0)">资料提供中</button></li>
 							<li><button class="btn btn-sm yellow-crusta" onclick="statusAjax(1)">换标中</button></li>
 							<li><button class="btn btn-sm purple-plum" onclick="statusAjax(2)">待出库</button></li>
-							<li><button class="btn btn-sm blue-hoki" onclick="statusAjax(3)">已发货</button></li>
-							<li><button class="btn btn-sm blue-madison" onclick="statusAjax(4)">取消发货</button></li>
+							<li><button class="btn btn-sm btn-success" onclick="statusAjax(3)">已发货</button></li>
+							<li><button class="btn btn-sm btn-primary" onclick="statusAjax(5)">签收中</button></li>
+							<li><button class="btn btn-sm green-meadow" onclick="statusAjax(6)">签收完毕</button></li>
+							<li><button class="btn btn-sm btn-info" onclick="statusAjax(4)">取消发货</button></li>
 						</ul>
 					</div>
 					<div class="col-md-7">
 						<button type="button" class="btn btn-sm red-sunglo" onclick="status_filter('资料提供中',5)">资料提供中 : <span class="status0"></span></button>
 						<button type="button" class="btn btn-sm yellow-crusta" onclick="status_filter('换标中',5)">换标中 : <span class="status1"></span></button>
 						<button type="button" class="btn btn-sm purple-plum" onclick="status_filter('待出库',5)">待出库 : <span class="status2"></span></button>
-						<button type="button" class="btn btn-sm green-meadow" onclick="status_filter('已发货',5)">已发货 : <span class="status3"></span></button>
-						<button type="button" class="btn btn-sm blue-madison" onclick="status_filter('取消发货',5)">取消发货 : <span class="status4"></span></button>
+						<button type="button" class="btn btn-sm btn-success" onclick="status_filter('已发货',5)">已发货 : <span class="status3"></span></button>
+						<button type="button" class="btn btn-sm btn-primary" onclick="status_filter('签收中',5)">签收中 : <span class="status5"></span></button>
+						<button type="button" class="btn btn-sm green-meadow" onclick="status_filter('签收完毕',5)">签收完毕 : <span class="status6"></span></button>
+						<button type="button" class="btn btn-sm btn-info" onclick="status_filter('取消发货',5)">取消发货 : <span class="status4"></span></button>
 					</div>
 					<div class="col-md-2" style="text-align: right;">
 						<button type="button" class="btn btn-sm green-meadow cloumn">隐藏列操作</button>
@@ -569,35 +575,38 @@
 						</div>
 					</div>
 				</div>
-				
-	            <table class="table table-striped table-bordered" id="thetable" style="width:100%">
-	                <thead>
-	                <tr>
-						<th>BG</th>
-						<th>BU</th>
-						<th>station</th>
-	                    <th><input type="checkbox" id="selectAll" /></th>
-	                    <th style="width:90px">需求提交日期</th>
-	                    <th style="width:65px;min-width: 65px;">调拨状态</th>
-	                    <th style="width:50px">销售员</th>
-	                    <th>发货批号</th>
-	                    <th style="width:65px">调出工厂</th>
-						<th style="width:65px">调入工厂</th>
-						<th>亚马逊账号</th>
-	                    <th>SKU</th>
-	                    <th style="width:55px">调拨数量</th>
-	                    <th style="width:45px">RMS标贴SKU</th>
-	                    <th style="width:30px">条码标签</th>
-	                    <th style="width:95px">发货方式</th>
-	                    <th style="width:35px">大货资料</th>
-	                    <th style="width:25px">Shippment ID</th>
-	                    <th style="width:60px">跟踪号/单据号</th>
-	                    <th style="width:90px">上次更新时间</th>
-	                    <th style="width:25px;min-width: 25px; font-size: 10px;">装箱数据</th>
-	                </tr>
-	                </thead>
-	                <tbody></tbody>
-	            </table>
+				<div style="position: relative;">
+					<table class="table table-striped table-bordered" id="thetable" style="width:100%">
+					    <thead>
+					    <tr>
+							<th>BG</th>
+							<th>BU</th>
+							<th>station</th>
+					        <th><input type="checkbox" id="selectAll" /></th>
+					        <th style="width:90px">需求提交日期</th>
+					        <th style="width:65px;min-width: 65px;">调拨状态</th>
+					        <th style="width:50px">销售员</th>
+					        <th>发货批号</th>
+					        <th style="width:65px">调出工厂</th>
+							<th style="width:65px">调入工厂</th>
+							<th>亚马逊账号</th>
+					        <th>SKU</th>
+					        <th style="width:55px">调拨数量</th>
+					        <th style="width:45px">RMS标贴SKU</th>
+					        <th style="width:30px">条码标签</th>
+					        <th style="width:95px">发货方式</th>
+					        <th style="width:35px">大货资料</th>
+					        <th style="width:25px">Shippment ID</th>
+					        <th style="width:60px">跟踪号/单据号</th>
+					        <th style="width:90px">上次更新时间</th>
+					        <th style="width:25px;min-width: 25px; font-size: 10px;">装箱数据</th>
+					    </tr>
+					    </thead>
+					    <tbody></tbody>
+					</table>
+					<div style="position: absolute; bottom: 15px;left: 50%;">合计: <span class="transferredQuantity"></span></div>
+				</div>
+	            
 	        </div>
 	    </div>
 	</div>
@@ -622,7 +631,7 @@
 			
 			<div>
 				<label for="audit_status_select" style="display: block;">审核</label>
-				<select name="audit_status_select" disabled="disabled" id="audit_status_select" style="width:100%;height: 28px;margin-bottom: 20px;border: 1px solid rgba(220, 223, 230, 1);">
+				<select name="audit_status_select" disabled="disabled" id="audit_status_select" style="width:100%;height: 28px;margin-bottom: 20px;border: 1px solid rgba(220, 223, 230, 1); background: rgba(239, 239, 239, 0.3);">
 					<option value="0">BU经理审核</option>
 					<option value="1">BG总经理审核</option>
 					<option value="2">计划员审核</option>
@@ -660,7 +669,7 @@
 					</div>
 					<div>
 						<label for="site_select">站点</label>
-						<select name="site_select" id="site_select" disabled="disabled" class="isSellerDisabled">
+						<select name="site_select" id="site_select" style="background: rgba(239, 239, 239, 0.3);" disabled="disabled" class="isSellerDisabled">
 							<option value ="ATVPDKIKX0DER">US</option>
 							<option value ="A2EUQ1WTGCTBG2">CA</option>
 							<option value ="A1AM78C64UM0Y8">MX</option>
@@ -702,14 +711,13 @@
 				</div>
 				<div class="mask-form" style="padding-top: 10px;">
 					<div>
-						
-						<label for="out_warehouse_input">调出工厂</label><input type="text" class="" id="out_warehouse_input">
+						<label for="out_warehouse_input">调出工厂</label><input type="text" id="out_warehouse_input" class="isDisabledInput">
 						<label for="adjustment_quantity_input">
 							计划确认数量
 							<span title="计划和物流确认后的实际可调拨数量" class="mask_hover_svg">
 								<svg t="1588835330500" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2629" width="13" height="13"><path d="M459.364486 360.47352h102.080997v-102.080997h-102.080997v102.080997z m0 408.323988h102.080997V462.554517h-102.080997v306.242991z m51.040498 255.202492c-280.722741 0-510.404984-229.682243-510.404984-510.404984S226.492212 3.190031 510.404984 3.190031s510.404984 229.682243 510.404985 510.404985-229.682243 510.404984-510.404985 510.404984z m0-918.728972C285.507788 105.271028 102.080997 288.697819 102.080997 513.595016S285.507788 921.919003 510.404984 921.919003s408.323988-183.426791 408.323988-408.323987C918.728972 288.697819 735.302181 105.271028 510.404984 105.271028z" p-id="2630" fill="#2c2c2c"></path></svg>
 							</span>
-						</label><input type="text" class="" id="adjustment_quantity_input">
+						</label><input type="text" class="isDisabledInput" id="adjustment_quantity_input">
 					</div>
 					<div>
 						<label for="arrivalMaskDate">
@@ -719,9 +727,9 @@
 							</span>
 						</label>
 						<div class="input-group date date-picker margin-bottom-5 bw9" id="arrivalMaskDate">
-							<input type="text" class="form-control form-filter input-sm arrivalMaskDate" style="height: 28px;" readonly name="date_from" placeholder="From" value="">
+							<input type="text" class="form-control form-filter input-sm arrivalMaskDate isDisabledInput" style="height: 28px; border-left: 1px solid #eee !important;" readonly name="date_from" placeholder="From" value="">
 							<span class="input-group-btn">
-								<button class="btn btn-sm default default_btn estimated_delivery_date_btn" type="button">
+								<button class="btn btn-sm default default_btn estimated_delivery_date_btn isDisabledInput" style="border-right: 1px solid #eee !important;" type="button">
 									<i class="fa fa-calendar"></i>
 								</button>
 							</span>
@@ -873,6 +881,11 @@
                 <th>运输方式<div>transportation</div></div></th>
                 <th>卡板号<div>pallets</div></th>
                 <th>打板尺寸<div>(in)</div><div>pallets size</div></th>
+				<th>长</th>
+				<th>箱数</th>
+				<th>单箱数量</th>
+				<th>总数量</th>
+				<th>单箱总量</th>
             </tr>
             </thead>
             <tbody>
@@ -883,6 +896,11 @@
                 <td>${row.transportation}</td>
                 <td>${row.pallets}</td>
                 <td>${row.pallets_size}</td>
+				<td>${row.length}</td>
+				<td>${row.box_num}</td>
+				<td>${row.pcs_box}</td>
+				<td>${row.pcs}</td>
+				<td>${row.weight_box}</td>
             </tr>
             <% } %>
             </tbody>
@@ -890,7 +908,7 @@
     </script>
 <script>
 	let msg = <?php echo @$msg?$msg:0?>;
-	console.log(msg)
+	
 	/* if(msg == 0){
 		$('.error_mask').fadeIn(1000);
 		$('.error_mask_text').text(msg);
@@ -1349,6 +1367,11 @@
 					$('#rms_input').val(res.shipment.rms);//RMS
 					$('#rms_sku_input').val(res.shipment.rms_sku);//RMS_SKU
 					$('#remarks_input').val(res.shipment.remark);//备注
+					if(res.shipment.role == 2 || res.shipment.role == 4 || res.shipment.role == 6 || res.shipment.role == 7){
+						$('.isDisabledInput').attr('disabled',false).css('background',"#fff");
+					}else{
+						$('.isDisabledInput').attr('disabled',true).css('background',"rgba(239, 239, 239, 0.3)");
+					}
 				},
 				error : function(err) {
 					console.log(err)
@@ -1400,13 +1423,13 @@
 					        }
 					    })
 					}
-					
 					$('.status0').text(res[4].status0);
 					$('.status1').text(res[4].status1);
 					$('.status2').text(res[4].status2);
 					$('.status3').text(res[4].status3);
 					$('.status4').text(res[4].status4);
 					$('.status5').text(res[4].status5);
+					$('.status6').text(res[4].status6);
 					$("#seller_select").empty();
 					$("#seller_select").append("<option value=''>全部</option>");
 					$.each(res[1], function (index, value) {
@@ -1429,6 +1452,16 @@
 					});
 					return res[0];
 				}
+			},
+			initComplete: function( settings, json ) {
+			    let transferredCount = null
+				$('#thetable > tbody > tr').each(function(){
+					let num = Number($(this).find(".quantityText").text())
+					if(!isNaN(num)){
+						transferredCount += num
+					}
+				})
+				$('.transferredQuantity').text(transferredCount)
 			},
 			columns: [
 				{data: 'ubg', name: 'ubg', visible: false,},
@@ -1468,6 +1501,8 @@
 					 	else if(data == 1){ data = '换标中' }
 					 	else if(data == 2){ data = '待出库' }
 					 	else if(data == 3){ data = '已发货' }
+						else if(data == 5){ data = '签收中' }
+						else if(data == 6){ data = '签收完毕' }
 					 	else if(data == 4){ data = '取消发货' }
 					 	var content = '<div>'+data+'<img src="../assets/global/img/editor.png" alt="" style="float:right" class="country_img"></div>';
 					 	return content;
@@ -1481,6 +1516,8 @@
 									+'<option value="换标中" status="1">换标中</option>'
 									+'<option value="待出库" status="2">待出库</option>'
 									+'<option value="已发货" status="3">已发货</option>'
+									+'<option value="签收中" status="5">签收中</option>'
+									+'<option value="签收完毕" status="6">签收完毕</option>'
 									+'<option value="取消发货" status="4">取消发货</option>'
 									+'</select>'
 								
@@ -1591,7 +1628,7 @@
 					data: 'quantity', 
 					name: 'quantity',
 					render: function(data, type, row, meta) {
-						var content = '<div style="color:blue;cursor:pointer">'+data +'</div>';
+						var content = '<div style="color:blue;cursor:pointer" class="quantityText">'+data +'</div>';
 						return content;
 					},
 					createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
@@ -1633,6 +1670,8 @@
 					 	else if(data == 1){ data = '换标中' }
 					 	else if(data == 2){ data = '待出库' }
 					 	else if(data == 3){ data = '已发货' }
+						else if(data == 5){ data = '签收中' }
+						else if(data == 6){ data = '签收完毕' }
 					 	else if(data == 4){ data = '取消发货' }
 					 	var content = '<div>'+data+'<img src="../assets/global/img/editor.png" alt="" style="float:right" class="country_img"></div>';
 					 	return content;
@@ -1858,7 +1897,6 @@
 			],
 			
 		})
-		
 		async function buildSubItemTable(shipment_requests_id) {
 		
 		    let rows = await new Promise((resolve, reject) => {
