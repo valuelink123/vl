@@ -1494,6 +1494,7 @@ class ShipmentController extends Controller
             $allot_progress[$key]['receipts_num'] = !empty($value['receipts_num'])?$value['receipts_num']:'';
             $allot_progress[$key]['shipping_method'] = !empty($value['shipping_method'])?$value['shipping_method']:'';
             $allot_progress[$key]['rms_sku'] = !empty($value['rms_sku'])?$value['rms_sku']:'';
+            $allot_progress[$key]['label'] = !empty($value['label'])?$value['label']:'';
             //
             $allot_progress[$key]['domin_sx'] = @$DOMIN_MARKETPLACEID_SX[$value['marketplace_id']];
 
