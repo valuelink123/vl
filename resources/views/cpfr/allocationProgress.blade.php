@@ -224,12 +224,10 @@
 	.table>thead:first-child>tr:first-child>th{
 		text-align: center;
 	}
-	
-	
 	.table-stripeds>tbody>tr>td{
 		padding:12px
 	}
-	.mask_box,.mask_upload_box,.mask_file_upload{
+	.mask_box,.mask_file_upload{
 		display: none;
 		position: fixed;
 		top: 0;
@@ -412,9 +410,16 @@
 		<button id="export" style="float:right;margin:0 10px" class="btn sbold blue"> 导出
 			<i class="fa fa-download"></i>
 		</button>
-		<button type="submit" id="uploadFrom" class="btn sbold blue"> 上传
-			<i class="fa fa-upload"></i>
-		</button>
+		<div style="float: right;">
+			<form action="/shipment/importExecl" style="display: inline-block;" method="POST" class="pull-right " enctype="multipart/form-data">
+				{{ csrf_field() }}
+				<input style="display: inline-block;" type="file" name="files" id="input" multiple=""> 
+				<button type="submit" class="btn blue start">
+				    <i class="fa fa-upload"></i>
+				    <span>上传</span>
+				</button>
+			</form>
+		</div>   
 	</div>
 	<div class="content">
 		<div class="filter_box">
@@ -443,6 +448,8 @@
 					<option id="1" value ="换标中">换标中</option>
 					<option id="2" value ="待出库">待出库</option>
 					<option id="3" value ="已发货">已发货</option>
+					<option id="5" value ="签收中">签收中</option>
+					<option id="6" value ="签收完毕">签收完毕</option>
 					<option id="4" value ="取消发货">取消发货</option>
 				</select>
 			</div>
@@ -527,16 +534,20 @@
 							<li><button class="btn btn-sm red-sunglo noConfirmed" onclick="statusAjax(0)">资料提供中</button></li>
 							<li><button class="btn btn-sm yellow-crusta" onclick="statusAjax(1)">换标中</button></li>
 							<li><button class="btn btn-sm purple-plum" onclick="statusAjax(2)">待出库</button></li>
-							<li><button class="btn btn-sm blue-hoki" onclick="statusAjax(3)">已发货</button></li>
-							<li><button class="btn btn-sm blue-madison" onclick="statusAjax(4)">取消发货</button></li>
+							<li><button class="btn btn-sm btn-success" onclick="statusAjax(3)">已发货</button></li>
+							<li><button class="btn btn-sm btn-primary" onclick="statusAjax(5)">签收中</button></li>
+							<li><button class="btn btn-sm green-meadow" onclick="statusAjax(6)">签收完毕</button></li>
+							<li><button class="btn btn-sm btn-info" onclick="statusAjax(4)">取消发货</button></li>
 						</ul>
 					</div>
 					<div class="col-md-7">
 						<button type="button" class="btn btn-sm red-sunglo" onclick="status_filter('资料提供中',5)">资料提供中 : <span class="status0"></span></button>
 						<button type="button" class="btn btn-sm yellow-crusta" onclick="status_filter('换标中',5)">换标中 : <span class="status1"></span></button>
 						<button type="button" class="btn btn-sm purple-plum" onclick="status_filter('待出库',5)">待出库 : <span class="status2"></span></button>
-						<button type="button" class="btn btn-sm green-meadow" onclick="status_filter('已发货',5)">已发货 : <span class="status3"></span></button>
-						<button type="button" class="btn btn-sm blue-madison" onclick="status_filter('取消发货',5)">取消发货 : <span class="status4"></span></button>
+						<button type="button" class="btn btn-sm btn-success" onclick="status_filter('已发货',5)">已发货 : <span class="status3"></span></button>
+						<button type="button" class="btn btn-sm btn-primary" onclick="status_filter('签收中',5)">签收中 : <span class="status5"></span></button>
+						<button type="button" class="btn btn-sm green-meadow" onclick="status_filter('签收完毕',5)">签收完毕 : <span class="status6"></span></button>
+						<button type="button" class="btn btn-sm btn-info" onclick="status_filter('取消发货',5)">取消发货 : <span class="status4"></span></button>
 					</div>
 					<div class="col-md-2" style="text-align: right;">
 						<button type="button" class="btn btn-sm green-meadow cloumn">隐藏列操作</button>
@@ -564,35 +575,38 @@
 						</div>
 					</div>
 				</div>
-				
-	            <table class="table table-striped table-bordered" id="thetable" style="width:100%">
-	                <thead>
-	                <tr>
-						<th>BG</th>
-						<th>BU</th>
-						<th>station</th>
-	                    <th><input type="checkbox" id="selectAll" /></th>
-	                    <th style="width:90px">需求提交日期</th>
-	                    <th style="width:65px;min-width: 65px;">调拨状态</th>
-	                    <th style="width:50px">销售员</th>
-	                    <th>发货批号</th>
-	                    <th style="width:65px">调出工厂</th>
-						<th style="width:65px">调入工厂</th>
-						<th>亚马逊账号</th>
-	                    <th>SKU</th>
-	                    <th style="width:55px">调拨数量</th>
-	                    <th style="width:45px">RMS标贴SKU</th>
-	                    <th style="width:30px">条码标签</th>
-	                    <th style="width:95px">发货方式</th>
-	                    <th style="width:35px">大货资料</th>
-	                    <th style="width:25px">Shippment ID</th>
-	                    <th style="width:60px">跟踪号/单据号</th>
-	                    <th style="width:90px">上次更新时间</th>
-	                    <th style="width:25px;min-width: 25px; font-size: 10px;">装箱数据</th>
-	                </tr>
-	                </thead>
-	                <tbody></tbody>
-	            </table>
+				<div style="position: relative;">
+					<table class="table table-striped table-bordered" id="thetable" style="width:100%">
+					    <thead>
+					    <tr>
+							<th>BG</th>
+							<th>BU</th>
+							<th>station</th>
+					        <th><input type="checkbox" id="selectAll" /></th>
+					        <th style="width:90px">需求提交日期</th>
+					        <th style="width:65px;min-width: 65px;">调拨状态</th>
+					        <th style="width:50px">销售员</th>
+					        <th>发货批号</th>
+					        <th style="width:65px">调出工厂</th>
+							<th style="width:65px">调入工厂</th>
+							<th>亚马逊账号</th>
+					        <th>SKU</th>
+					        <th style="width:55px">调拨数量</th>
+					        <th style="width:45px">RMS标贴SKU</th>
+					        <th style="width:30px">条码标签</th>
+					        <th style="width:95px">发货方式</th>
+					        <th style="width:35px">大货资料</th>
+					        <th style="width:25px">Shippment ID</th>
+					        <th style="width:60px">跟踪号/单据号</th>
+					        <th style="width:90px">上次更新时间</th>
+					        <th style="width:25px;min-width: 25px; font-size: 10px;">装箱数据</th>
+					    </tr>
+					    </thead>
+					    <tbody></tbody>
+					</table>
+					<div style="position: absolute; bottom: 15px;left: 50%;">合计: <span class="transferredQuantity"></span></div>
+				</div>
+	            
 	        </div>
 	    </div>
 	</div>
@@ -609,89 +623,7 @@
 		<span class="mask_text error_mask_text"></span>
 	</div>
 </div>	
-<div class="mask_upload_box">
-	<div class="mask_upload_dialog">
-		<svg t="1588919283810"class="icon cancel_upload_btn cancelUpload" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4128" width="15" height="15"><path d="M1001.952 22.144c21.44 21.44 22.048 55.488 1.44 76.096L98.272 1003.36c-20.608 20.576-54.592 20-76.096-1.504-21.536-21.44-22.048-55.488-1.504-76.096L925.824 20.672c20.608-20.64 54.624-20 76.128 1.472" p-id="4129" fill="#707070"></path><path d="M22.176 22.112C43.616 0.672 77.6 0.064 98.24 20.672L1003.392 925.76c20.576 20.608 20 54.592-1.504 76.064-21.44 21.568-55.488 22.08-76.128 1.536L20.672 98.272C0 77.6 0.672 43.584 22.176 22.112" p-id="4130" fill="#707070"></path></svg>
-		
-		<!-- The fileupload-buttonbar contains buttons to add/delete files and start/cancel the upload -->
-		<form style="height: 130px; overflow: hidden;" id="fileupload1" action="{{ url('send') }}" method="POST" enctype="multipart/form-data">
-			{{ csrf_field() }}
-			<input type="hidden" name="warn" id="warn" value="0">
-			<input type="hidden" name="inbox_id" id="inbox_id" value="0">
-			<input type="hidden" name="user_id" id="user_id" value="{{Auth::user()->id}}">
-							
-			<div>
-				<div class="fileupload-buttonbar">
-					<div class="col-lg-12" style="text-align: center;margin-bottom: 20px;">
-						<span class="btn green fileinput-button">
-							<i class="fa fa-plus"></i>
-							<span>添加文件</span>
-							<input type="file" name="files[]" multiple=""> 
-						</span>
-						<span class="fileupload-process"> </span>
-					</div>
-				</div>
-				<table role="presentation" class="table table-striped clearfix table-stripeds" id="table-striped" style="margin-bottom: 0;">
-					<tbody class="files" id="filesTable1"> </tbody>
-				</table>
-				<div class="col-lg-12 fileupload-progress fade">
-					<div class="progress progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100">
-						<div class="progress-bar progress-bar-success" style="width:0%;"> </div>
-					</div>
-					<div class="progress-extended"> &nbsp; </div>
-				</div>
-				
-				<div id="blueimp-gallery1" class="blueimp-gallery1 blueimp-gallery-controls" data-filter=":even">
-					<div class="slides"> </div>
-					<h3 class="title"></h3>
-					<a class="prev"> ‹ </a>
-					<a class="next"> › </a>
-					<a class="close white"> </a>
-					<a class="play-pause"> </a>
-					<ol class="indicator"> </ol>
-				</div>
-				<script id="template-upload1" type="text/x-tmpl"> {% for (var i=0, file; file=o.files[i]; i++) { %}
-				<tr class="template-upload1 fade">
-					<td style="text-align: center;">
-						<p style="width: 200px; overflow: hidden; margin: 7px auto; text-overflow: ellipsis;" class="name">{%=file.name%}</p>
-						<strong class="error text-danger label label-danger" style="padding: 0 6px;"></strong>
-					</td>
-					<td style="text-align: center;"> {% if (!i && !o.options.autoUpload) { %}
-						<button class="btn blue start" disabled>
-							<i class="fa fa-upload"></i>
-							<span>开始</span>
-						</button> {% } %} {% if (!i) { %}
-						<button class="btn red cancel">
-							<i class="fa fa-ban"></i>
-							<span>取消</span>
-						</button> {% } %} </td>
-				</tr> {% } %} </script>
-				
-				<script id="template-download1" type="text/x-tmpl"> {% for (var i=0, file; file=o.files[i]; i++) { %}
-				<tr class="template-download1 fade">
-					<td>
-						<p class="name" style="margin:0"> {% if (file.url) { %}
-							<a href="{%=file.url%}" title="{%=file.name%}" download="{%=file.name%}" {%=file.thumbnailUrl? 'data-gallery': ''%}>{%=file.name%}</a> {% } else { %}
-							<span>{%=file.name%}</span> {% } %}
-							{% if (file.name) { %}
-								<input type="hidden" name="fileid[]" class="filesUrl" value="{%=file.url%}">
-							{% } %}
-							</p> {% if (file.error) { %}
-						<div>
-							<span class="label label-danger">Error</span> {%=file.error%}</div> {% } %} </td>
-							<td></td>
-					
-				</tr> {% } %} </script>
-				<div style="clear:both;"></div>
-			</div>
-		</form>	
-		<div style="text-align: center; margin-top:10px">
-			<input type="hidden" class="uploadId">
-			<button class="btn warning cancel cancelUpload" style="width: 80px;border: 1px solid #ccc;">取消</button>
-			<button class="btn blue start" id="confirmUpload">确认上传</button>
-		</div>
-	</div>
-</div>
+
 	<div class="mask_box">
 		<div class="mask-dialog">
 			<svg t="1588919283810" class="icon cancel_mask cancel_btn" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4128" width="15" height="15"><path d="M1001.952 22.144c21.44 21.44 22.048 55.488 1.44 76.096L98.272 1003.36c-20.608 20.576-54.592 20-76.096-1.504-21.536-21.44-22.048-55.488-1.504-76.096L925.824 20.672c20.608-20.64 54.624-20 76.128 1.472" p-id="4129" fill="#707070"></path><path d="M22.176 22.112C43.616 0.672 77.6 0.064 98.24 20.672L1003.392 925.76c20.576 20.608 20 54.592-1.504 76.064-21.44 21.568-55.488 22.08-76.128 1.536L20.672 98.272C0 77.6 0.672 43.584 22.176 22.112" p-id="4130" fill="#707070"></path></svg>
@@ -699,7 +631,7 @@
 			
 			<div>
 				<label for="audit_status_select" style="display: block;">审核</label>
-				<select name="audit_status_select" disabled="disabled" id="audit_status_select" style="width:100%;height: 28px;margin-bottom: 20px;border: 1px solid rgba(220, 223, 230, 1);">
+				<select name="audit_status_select" disabled="disabled" id="audit_status_select" style="width:100%;height: 28px;margin-bottom: 20px;border: 1px solid rgba(220, 223, 230, 1); background: rgba(239, 239, 239, 0.3);">
 					<option value="0">BU经理审核</option>
 					<option value="1">BG总经理审核</option>
 					<option value="2">计划员审核</option>
@@ -737,7 +669,7 @@
 					</div>
 					<div>
 						<label for="site_select">站点</label>
-						<select name="site_select" id="site_select" disabled="disabled" class="isSellerDisabled">
+						<select name="site_select" id="site_select" style="background: rgba(239, 239, 239, 0.3);" disabled="disabled" class="isSellerDisabled">
 							<option value ="ATVPDKIKX0DER">US</option>
 							<option value ="A2EUQ1WTGCTBG2">CA</option>
 							<option value ="A1AM78C64UM0Y8">MX</option>
@@ -779,14 +711,13 @@
 				</div>
 				<div class="mask-form" style="padding-top: 10px;">
 					<div>
-						
-						<label for="out_warehouse_input">调出工厂</label><input type="text" class="" id="out_warehouse_input">
+						<label for="out_warehouse_input">调出工厂</label><input type="text" id="out_warehouse_input" class="isDisabledInput">
 						<label for="adjustment_quantity_input">
 							计划确认数量
 							<span title="计划和物流确认后的实际可调拨数量" class="mask_hover_svg">
 								<svg t="1588835330500" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2629" width="13" height="13"><path d="M459.364486 360.47352h102.080997v-102.080997h-102.080997v102.080997z m0 408.323988h102.080997V462.554517h-102.080997v306.242991z m51.040498 255.202492c-280.722741 0-510.404984-229.682243-510.404984-510.404984S226.492212 3.190031 510.404984 3.190031s510.404984 229.682243 510.404985 510.404985-229.682243 510.404984-510.404985 510.404984z m0-918.728972C285.507788 105.271028 102.080997 288.697819 102.080997 513.595016S285.507788 921.919003 510.404984 921.919003s408.323988-183.426791 408.323988-408.323987C918.728972 288.697819 735.302181 105.271028 510.404984 105.271028z" p-id="2630" fill="#2c2c2c"></path></svg>
 							</span>
-						</label><input type="text" class="" id="adjustment_quantity_input">
+						</label><input type="text" class="isDisabledInput" id="adjustment_quantity_input">
 					</div>
 					<div>
 						<label for="arrivalMaskDate">
@@ -796,9 +727,9 @@
 							</span>
 						</label>
 						<div class="input-group date date-picker margin-bottom-5 bw9" id="arrivalMaskDate">
-							<input type="text" class="form-control form-filter input-sm arrivalMaskDate" style="height: 28px;" readonly name="date_from" placeholder="From" value="">
+							<input type="text" class="form-control form-filter input-sm arrivalMaskDate isDisabledInput" style="height: 28px; border-left: 1px solid #eee !important;" readonly name="date_from" placeholder="From" value="">
 							<span class="input-group-btn">
-								<button class="btn btn-sm default default_btn estimated_delivery_date_btn" type="button">
+								<button class="btn btn-sm default default_btn estimated_delivery_date_btn isDisabledInput" style="border-right: 1px solid #eee !important;" type="button">
 									<i class="fa fa-calendar"></i>
 								</button>
 							</span>
@@ -826,7 +757,7 @@
 					    {{ csrf_field() }}
 						<input type="hidden" name="warn" id="warn" value="0">
 					    <input type="hidden" name="inbox_id" id="inbox_id" value="0">
-					    <input type="hidden" name="user_id" id="user_id" value="{{Auth::user()->id}}">
+					   <input type="hidden" name="user_id" id="user_id" value="{{Auth::user()->id}}">
 										
 					    <div style="margin-top: 20px;">
 					        <!-- The fileupload-buttonbar contains buttons to add/delete files and start/cancel the upload -->
@@ -950,6 +881,11 @@
                 <th>运输方式<div>transportation</div></div></th>
                 <th>卡板号<div>pallets</div></th>
                 <th>打板尺寸<div>(in)</div><div>pallets size</div></th>
+				<th>长</th>
+				<th>箱数</th>
+				<th>单箱数量</th>
+				<th>总数量</th>
+				<th>单箱总量</th>
             </tr>
             </thead>
             <tbody>
@@ -960,13 +896,34 @@
                 <td>${row.transportation}</td>
                 <td>${row.pallets}</td>
                 <td>${row.pallets_size}</td>
+				<td>${row.length}</td>
+				<td>${row.box_num}</td>
+				<td>${row.pcs_box}</td>
+				<td>${row.pcs}</td>
+				<td>${row.weight_box}</td>
             </tr>
             <% } %>
             </tbody>
         </table>
     </script>
 <script>
+	let msg = <?php echo @$msg?$msg:0?>;
 	
+	/* if(msg == 0){
+		$('.error_mask').fadeIn(1000);
+		$('.error_mask_text').text(msg);
+		setTimeout(function(){
+			$('.error_mask').fadeOut(1000);
+		},2000)
+	}else if(msg == 1){
+		$('.success_mask').fadeIn(1000);
+		$('.success_mask_text').text(msg);
+		setTimeout(function(){
+			$('.success_mask').fadeOut(1000);
+		},2000)	
+		tableObj.ajax.reload();
+		$('#selectAll').removeAttr('checked');
+	} */
 	function tplCompile(tpl) {
 	
 	    tpl = tpl.replace(/<%([^]+?)%>/g, "`);$1;_push(`")
@@ -1075,6 +1032,7 @@
 	    else tableObj.column(column).search(value).draw();
 	}
 	$(document).ready(function(){
+		
 		//上传大货资料
 		$('#fileUpload').on('click',function(){
 			let fileList1 = '';
@@ -1103,13 +1061,12 @@
 			}else if(fileList1 == "" && fileList != ""){
 				fileLists = fileList
 			}
-			console.log(fileLists)
-			/* $.ajax({
+			$.ajax({
 			    type: "POST",
 				url: "/shipment/upCargoData",
 				data: {
 					id: $('.fileId').val(),
-					cargo_data: fileLists
+					cargo_data: decodeURI(fileLists)
 				},
 				success: function (res) {
 					if(res.status == 0){
@@ -1123,50 +1080,15 @@
 						$('.success_mask_text').text(res.msg);
 						setTimeout(function(){
 							$('.success_mask').fadeOut(1000);
-						},2000)	
-						$('.mask_upload_box').hide();
+						},2000)
 					}
 					$('.mask_file_upload').hide()
 				},
 				error: function(err) {
 					console.log(err)
 				}
-			}); */
-		});
-		//确认上传
-		$('#confirmUpload').on('click',function(){
-			let fileList = '';
-			let str = $('#table-striped tbody tr td').find('.filesUrl');
-			for(var i=0;i<str.length;i++){
-				fileList=(str[0].defaultValue)
-			}
-			$.ajax({
-			    type: "POST",
-				url: "/shipment/importExecl",
-				data: {
-					files: fileList
-				},
-				success: function (res) {
-					if(res.status == 0){
-						$('.error_mask').fadeIn(1000);
-						$('.error_mask_text').text(res.msg);
-						setTimeout(function(){
-							$('.error_mask').fadeOut(1000);
-						},2000)
-					}else if(res.status == 1){
-						$('.success_mask').fadeIn(1000);
-						$('.success_mask_text').text(res.msg);
-						setTimeout(function(){
-							$('.success_mask').fadeOut(1000);
-						},2000)	
-						$('.mask_upload_box').hide();
-					}
-				},
-				error: function(err) {
-					console.log(err)
-				}
 			});
-		})
+		});
 		//批量操作列表展开
 		$('.cloumn').click(function(e){
 			$('.cloumn_box').slideToggle();
@@ -1196,20 +1118,13 @@
 			}
 		})
 		//上传大货资料弹窗隐藏
-		$('.cancelUpload').on('click',function(){
-			$('.mask_upload_box').hide();
-		})
 		$('.cancel_file').on('click',function(){
 			$('.mask_file_upload').hide();
 		})
 		$('.cancelFile').on('click',function(){
 			$('.mask_file_upload').hide();
 		})
-		//上传
-		$('#uploadFrom').on('click',function(){
-			console.log(1)
-			$('.mask_upload_box').show();
-		})
+		
 		
 		//下载导入模板
 		$('#downloadTemplate').on('click',function(){
@@ -1452,6 +1367,11 @@
 					$('#rms_input').val(res.shipment.rms);//RMS
 					$('#rms_sku_input').val(res.shipment.rms_sku);//RMS_SKU
 					$('#remarks_input').val(res.shipment.remark);//备注
+					if(res.shipment.role == 2 || res.shipment.role == 4 || res.shipment.role == 6 || res.shipment.role == 7){
+						$('.isDisabledInput').attr('disabled',false).css('background',"#fff");
+					}else{
+						$('.isDisabledInput').attr('disabled',true).css('background',"rgba(239, 239, 239, 0.3)");
+					}
 				},
 				error : function(err) {
 					console.log(err)
@@ -1503,13 +1423,13 @@
 					        }
 					    })
 					}
-					
 					$('.status0').text(res[4].status0);
 					$('.status1').text(res[4].status1);
 					$('.status2').text(res[4].status2);
 					$('.status3').text(res[4].status3);
 					$('.status4').text(res[4].status4);
 					$('.status5').text(res[4].status5);
+					$('.status6').text(res[4].status6);
 					$("#seller_select").empty();
 					$("#seller_select").append("<option value=''>全部</option>");
 					$.each(res[1], function (index, value) {
@@ -1532,6 +1452,16 @@
 					});
 					return res[0];
 				}
+			},
+			initComplete: function( settings, json ) {
+			    let transferredCount = null
+				$('#thetable > tbody > tr').each(function(){
+					let num = Number($(this).find(".quantityText").text())
+					if(!isNaN(num)){
+						transferredCount += num
+					}
+				})
+				$('.transferredQuantity').text(transferredCount)
 			},
 			columns: [
 				{data: 'ubg', name: 'ubg', visible: false,},
@@ -1571,6 +1501,8 @@
 					 	else if(data == 1){ data = '换标中' }
 					 	else if(data == 2){ data = '待出库' }
 					 	else if(data == 3){ data = '已发货' }
+						else if(data == 5){ data = '签收中' }
+						else if(data == 6){ data = '签收完毕' }
 					 	else if(data == 4){ data = '取消发货' }
 					 	var content = '<div>'+data+'<img src="../assets/global/img/editor.png" alt="" style="float:right" class="country_img"></div>';
 					 	return content;
@@ -1584,6 +1516,8 @@
 									+'<option value="换标中" status="1">换标中</option>'
 									+'<option value="待出库" status="2">待出库</option>'
 									+'<option value="已发货" status="3">已发货</option>'
+									+'<option value="签收中" status="5">签收中</option>'
+									+'<option value="签收完毕" status="6">签收完毕</option>'
 									+'<option value="取消发货" status="4">取消发货</option>'
 									+'</select>'
 								
@@ -1602,7 +1536,7 @@
 								type: "POST",
 								url: "/shipment/upAllAllot",
 								data: {
-									shipment_requests_id_list: rowData.id,
+									shipment_requests_id_list: rowData.shipment_requests_id,
 									status: $(this).find("option:selected").attr("status"),
 								},
 								success: function (res) {
@@ -1694,7 +1628,7 @@
 					data: 'quantity', 
 					name: 'quantity',
 					render: function(data, type, row, meta) {
-						var content = '<div style="color:blue;cursor:pointer">'+data +'</div>';
+						var content = '<div style="color:blue;cursor:pointer" class="quantityText">'+data +'</div>';
 						return content;
 					},
 					createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
@@ -1721,36 +1655,22 @@
 					}
 				},
 				{
-					data: 'method',
-					name: 'method',
+					data: 'barcode',
+					name: 'barcode',
 					render: function(data, type, row, meta) {
-						var content = '<button><a target="_blank" href="barcode?id='+row.id+'">打印</a></button>';
+						var content = '<button><a target="_blank" href="barcode?id='+row.shipment_requests_id+'">打印</a></button>';
 						return content;
 					},
-					/* createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {						
-						$(cell).on( 'click', function () {
-							console.log(rowData.id) 
-						});
-					} */
 				},
 				{
 					data: 'shipping_method',
 					name: 'shipping_method',
-					render: function(data, type, row, meta) {
-					 	if(data == 0){ data = '资料提供中' }
-					 	else if(data == 1){ data = '换标中' }
-					 	else if(data == 2){ data = '待出库' }
-					 	else if(data == 3){ data = '已发货' }
-					 	else if(data == 4){ data = '取消发货' }
-					 	var content = '<div>'+data+'<img src="../assets/global/img/editor.png" alt="" style="float:right" class="country_img"></div>';
-					 	return content;
-					},
 				},
 				{
 					data: 'cargo_data', 
 					name: 'cargo_data',
 					render: function(data, type, row, meta) {
-						var content = '<button>data</button>';
+						var content = '<button>查看</button>';
 						return content;
 					},
 					createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
@@ -1773,9 +1693,9 @@
 									for(var i=0;i<res.length;i++){
 										let reg = /\.(png|jpg|gif|jpeg|webp|pdf)$/;
 										if(reg.test(res[i].url)){
-											fileAddress1 += '<div><a class="titleHidden" href="decodeURI(' + res[i].url + ')" target="_blank">decodeURI(' + res[i].url + ')</a><a style="float:right" href="decodeURI(' + res[i].url + ')" class="button" download="decodeURI(' + res[i].url + ')">下载</a></div>';
+											fileAddress1 += '<div><a class="titleHidden" href="' + res[i].url + '" target="_blank">' + res[i].title + '</a><a style="float:right" href="' + res[i].url + '" class="button" download="' + res[i].title + '">下载</a></div>';
 										}else{
-											fileAddress2 += '<div><span class="titleHidden">decodeURI(' + res[i].url + ')</span><a style="float:right" href="decodeURI(' + res[i].url + ')" download="decodeURI(' + res[i].url + ')" class="button">下载</a></div>';
+											fileAddress2 += '<div><span class="titleHidden">' + res[i].title + '</span><a style="float:right" href="' + res[i].url + '" download="' + res[i].title + '" class="button">下载</a></div>';
 										}
 									}
 									$('.file_adress').append(fileAddress1 + fileAddress2 );
@@ -1966,7 +1886,6 @@
 			],
 			
 		})
-		
 		async function buildSubItemTable(shipment_requests_id) {
 		
 		    let rows = await new Promise((resolve, reject) => {

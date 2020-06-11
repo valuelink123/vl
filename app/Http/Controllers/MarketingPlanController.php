@@ -854,39 +854,40 @@ class MarketingPlanController extends Controller
 
     public function test()
     {
-        $generator = new \Picqer\Barcode\BarcodeGeneratorHTML();
-        //echo $generator->getBarcode('X001WAU01R', $generator::TYPE_CODE_128);
-        $generator = new \Picqer\Barcode\BarcodeGeneratorPNG();
-        $barcode = $generator->getBarcode('X001WAU01R', $generator::TYPE_CODE_128, $widthFactor = 2, $height = 30);
-        $barcode = base64_encode($barcode);
-
-
-        echo ' <img src="data:image/png;base64,' . $barcode . '"/>';
-//        $user = Auth::user()->toArray();
-//        $sap_seller_id = $user['sap_seller_id']>0?$user['sap_seller_id']:0;
-//        return view('marketingPlan.test', ['sap_seller_id' => $sap_seller_id]);
-
-
-        $mpdf = new \Mpdf\Mpdf(['mode' => 'utf-8', 'format' => 'A4', 'margin_top' => 0, 'margin_left' => 0, 'margin_right' => 0, 'margin_bottom' => 0]);
-        $html = '<div style="width: 210mm; height: 297mm;">
-                    <div style="transform-origin: 0px 0px; background-color: white; margin-left: 5mm;padding-top:20px">';
-        for ($i = 1; $i <= 4; $i++) {
-            $html .= '<div class="small_a4" style="width: 63.5mm; height: 38.1mm; display: inline-block; position: relative; float: left; padding-left: 1mm;">
-            <div style="width: 100%; display: flex; align-items: center; padding-left: 18px">
-            <img  alt="" src="data:image/png;base64,' . $barcode . '" style="max-width: 100%; max-height: 100%;text-align: center">
-            <div style="margin-top: 5px;text-align: center">X001WAYU01R</div>
-            <div style="margin-top: 5px">aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</div>
-            </div>
-            </div>';
-        }
-        $html .= '</div></div>';
-        //创建pdf文件
-        $mpdf->WriteHTML($html);
-
-        //$mpdf->Image($barcode, 140, 200);
-        $time = date("Y-m-d") . time() . rand(1, 99999);
-//        //$mpdf->Output("upload/".$time.".pdf","F");
-        $mpdf->Output($time . ".pdf", "D");
+//        $generator = new \Picqer\Barcode\BarcodeGeneratorHTML();
+//        //echo $generator->getBarcode('X001WAU01R', $generator::TYPE_CODE_128);
+//        $generator = new \Picqer\Barcode\BarcodeGeneratorPNG();
+//        $barcode = $generator->getBarcode('X001WAU01R', $generator::TYPE_CODE_128, $widthFactor = 2, $height = 30);
+//        $barcode = base64_encode($barcode);
+//
+//
+//        echo ' <img src="data:image/png;base64,' . $barcode . '"/>';
+//
+//
+//
+//        $mpdf = new \Mpdf\Mpdf(['mode' => 'utf-8', 'format' => 'A4', 'margin_top' => 0, 'margin_left' => 0, 'margin_right' => 0, 'margin_bottom' => 0]);
+//        $html = '<div style="width: 210mm; height: 297mm;">
+//                    <div style="transform-origin: 0px 0px; background-color: white; margin-left: 5mm;padding-top:20px">';
+//        for ($i = 1; $i <= 4; $i++) {
+//            $html .= '<div class="small_a4" style="width: 63.5mm; height: 38.1mm; display: inline-block; position: relative; float: left; padding-left: 1mm;">
+//            <div style="width: 100%; display: flex; align-items: center; padding-left: 18px">
+//            <img  alt="" src="data:image/png;base64,' . $barcode . '" style="max-width: 100%; max-height: 100%;text-align: center">
+//            <div style="margin-top: 5px;text-align: center">X001WAYU01R</div>
+//            <div style="margin-top: 5px">aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</div>
+//            </div>
+//            </div>';
+//        }
+//        $html .= '</div></div>';
+//        //创建pdf文件
+//        $mpdf->WriteHTML($html);
+//
+//        //$mpdf->Image($barcode, 140, 200);
+//        $time = date("Y-m-d") . time() . rand(1, 99999);
+////        //$mpdf->Output("upload/".$time.".pdf","F");
+//        $mpdf->Output($time . ".pdf", "D");
+                $user = Auth::user()->toArray();
+        $sap_seller_id = $user['sap_seller_id']>0?$user['sap_seller_id']:0;
+        return view('marketingPlan.test', ['sap_seller_id' => $sap_seller_id]);
     }
 
 

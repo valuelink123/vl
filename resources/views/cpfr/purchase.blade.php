@@ -775,8 +775,7 @@
 		    $("input[name='checkedInput']").prop("checked", this.checked);
 		}); 
 		//单条选中
-		$("body").on('change','.checkbox-item',function(e){
-			console.log(this.checked) 
+		$("body").on('change','.checkbox-item',function(e){ 
 			var $subs = $("input[name='checkedInput']");
 			$("input[name='selectAll']").prop("checked", $subs.length == $subs.filter(":checked").length ? true :false);
 			e.cancelBubble=true;
@@ -959,7 +958,6 @@
 		})
 		//采购计划保存
 		$('.confirm').on('click',function(){
-			console.log($('.formId').val())
 			if($('#sku_input').val() == ''){
 				$('#sku_input').parent().find('.err').show();
 				return
@@ -1416,7 +1414,6 @@
 		
 			},
 			onChangeDateTime:function(dp,$input){
-				console.log(1)
 			}
 			/* minDate: "01/01/2012",
 			maxDate: "12/31/2018" */

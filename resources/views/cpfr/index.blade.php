@@ -690,7 +690,7 @@
 			
 			<div>
 				<label for="audit_status_select" style="display: block;">审核</label>
-				<select name="audit_status_select" disabled="disabled" id="audit_status_select" style="width:100%;height: 28px;margin-bottom: 20px;border: 1px solid rgba(220, 223, 230, 1);">
+				<select name="audit_status_select" disabled="disabled" id="audit_status_select" style="width:100%;height: 28px;margin-bottom: 20px;border: 1px solid rgba(220, 223, 230, 1); background: rgba(239, 239, 239, 0.3);">
 					<option value="0">BU经理审核</option>
 					<option value="1">BG总经理审核</option>
 					<option value="2">计划员审核</option>
@@ -1202,7 +1202,7 @@
 					url: "/shipment/upCargoData",
 					data: {
 						id: $('.fileId').val(),
-						cargo_data: fileLists
+						cargo_data: decodeURI(fileLists)
 					},
 					success: function (res) {
 						if(res.status == 0){
@@ -1231,7 +1231,7 @@
 				clearVal();
 				$('.mask_box').show();
 				$('.isPlanDisabled').attr('disabled',false).css('background',"#fff");
-				$('#audit_status_select').attr('disabled',true).css('background',"#eee");
+				$('#audit_status_select').attr('disabled',true).css('background',"rgba(239, 239, 239, 0.3)");
 				$('.isSellerDisabled').attr('disabled',false).css('background',"#fff");
 				$('.estimated_delivery_date_btn').attr('disabled',false).css('background',"#fff");
 				$('.request_date_btn').attr('disabled',false).css('background',"#fff");
@@ -1497,30 +1497,37 @@
 						$.each(res.factoryList, function (index, value) {
 							$("#warehouse_select").append("<option value='"+value.sap_factory_code+"'>"+value.sap_factory_code+"</option>");
 						});
+						if(res.shipment.allor_status == 4){
+							$('#audit_status_select').attr('disabled',true).css('background',"rgba(239, 239, 239, 0.3)");
+							$('.isPlanDisabled').attr('disabled',true).css('background',"rgba(239, 239, 239, 0.3)");
+							$('.isSellerDisabled').attr('disabled',true).css('background',"rgba(239, 239, 239, 0.3)");
+							$('.estimated_delivery_date_btn').attr('disabled',true).css('background',"rgba(239, 239, 239, 0.3)");
+							$('.request_date_btn').attr('disabled',true).css('background',"rgba(239, 239, 239, 0.3)");
+						}
 						if(res.shipment.role == 1){
-							$('#audit_status_select').attr('disabled',true).css('background',"#eee");
+							$('#audit_status_select').attr('disabled',true).css('background',"rgba(239, 239, 239, 0.3)");
 							$('.isSellerDisabled').attr('disabled',false).css('background',"#fff");
-							$('.isPlanDisabled').attr('disabled',true).css('background',"#eee");
-							$('.estimated_delivery_date_btn').attr('disabled',true).css('background',"#eee");
+							$('.isPlanDisabled').attr('disabled',true).css('background',"rgba(239, 239, 239, 0.3)");
+							$('.estimated_delivery_date_btn').attr('disabled',true).css('background',"rgba(239, 239, 239, 0.3)");
 							$('.request_date_btn').attr('disabled',false).css('background',"#fff");
 						}else if(res.shipment.role == 2 || res.shipment.role == 6){
 							$('.isPlanDisabled').attr('disabled',false).css('background',"#fff");
 							$('#audit_status_select').attr('disabled',false).css('background',"#fff");
-							$('.isSellerDisabled').attr('disabled',true).css('background',"#eee");
+							$('.isSellerDisabled').attr('disabled',true).css('background',"rgba(239, 239, 239, 0.3)");
 							$('.estimated_delivery_date_btn').attr('disabled',false).css('background',"#fff");
-							$('.request_date_btn').attr('disabled',true).css('background',"#eee");
+							$('.request_date_btn').attr('disabled',true).css('background',"rgba(239, 239, 239, 0.3)");
 						}else if(res.shipment.role == 3 || res.shipment.role == 4 || res.shipment.role == 5){
 							$('#audit_status_select').attr('disabled',false).css('background',"#fff");
 							$('.isSellerDisabled').attr('disabled',false).css('background',"#fff");
 							$('.request_date_btn').attr('disabled',false).css('background',"#fff");
-							$('.isPlanDisabled').attr('disabled',true).css('background',"#eee");
-							$('.estimated_delivery_date_btn').attr('disabled',true).css('background',"#eee");
+							$('.isPlanDisabled').attr('disabled',true).css('background',"rgba(239, 239, 239, 0.3)");
+							$('.estimated_delivery_date_btn').attr('disabled',true).css('background',"rgba(239, 239, 239, 0.3)");
 						}/* else{
-							$('#audit_status_select').attr('disabled',true).css('background',"#eee");
-							$('.isPlanDisabled').attr('disabled',true).css('background',"#eee");
-							$('.isSellerDisabled').attr('disabled',true).css('background',"#eee");
-							$('.estimated_delivery_date_btn').attr('disabled',true).css('background',"#eee");
-							$('.request_date_btn').attr('disabled',true).css('background',"#eee");
+							$('#audit_status_select').attr('disabled',true).css('background',"rgba(239, 239, 239, 0.3)");
+							$('.isPlanDisabled').attr('disabled',true).css('background',"rgba(239, 239, 239, 0.3)");
+							$('.isSellerDisabled').attr('disabled',true).css('background',"rgba(239, 239, 239, 0.3)");
+							$('.estimated_delivery_date_btn').attr('disabled',true).css('background',"rgba(239, 239, 239, 0.3)");
+							$('.request_date_btn').attr('disabled',true).css('background',"rgba(239, 239, 239, 0.3)");
 						} */
 						
 						$('#audit_status_select').val(res.shipment.status);//审核
@@ -1548,20 +1555,19 @@
 			$.fn.dataTable.ext.errMode = 'none';
 			tableObj = $('#planTable').DataTable({
 				lengthMenu: [
-				    20, 50, 100, 'All'
+				    10, 50, 100, 'All'
 				],
 				dispalyLength: 2, // default record count per page
 				paging: true,  // 是否显示分页
 				info: false,// 是否表格左下角显示的文字
 				order: [ 9, "desc" ], //设置排序
-				//scrollX: "100%",
-				//scrollCollapse: false,
 				fixedColumns: { //固定列的配置项
 					leftColumns: 10, //固定左边第一列
 					rightColumns: 1, //固定左边第一列
 				},
 				serverSide: false,//是否所有的请求都请求服务器	
 				scrollX: "100%",
+				autoWidth:false,
 				scrollCollapse: false,
 				ajax: {
 					url: "/shipment/index",
@@ -1822,7 +1828,7 @@
 							if(data == 0){
 								data = '<button style="width:110px" class="upCargoDataBtn">上传大货资料</button>'
 							}else if(data == 1){
-								data = '<div>维护条形码</div>'
+								data = '<button style="width:60px" class="upCargoDataBtn">查看</button>'
 							}else{
 								data = ''
 							}
@@ -1849,9 +1855,9 @@
 										for(var i=0;i<res.length;i++){
 											let reg = /\.(png|jpg|gif|jpeg|webp|pdf)$/;
 											if(reg.test(res[i].url)){
-												fileAddress1 += '<div><a href="' + res[i].url + '" class="titleHidden" target="_blank">' + res[i].title + '</a><a style="float:right" href="' + res[i].url + '" class="button" download="' + res[i].title + '">下载</a></div>';
+												fileAddress1 += '<div><a class="titleHidden" href="' + res[i].url + '" target="_blank">' + res[i].title + '</a><a style="float:right" href="' + res[i].url + '" class="button" download="' + res[i].title + '">下载</a></div>';
 											}else{
-												fileAddress2 += '<div class="titleHidden"><span>' + res[i].title + '</span><a style="float:right"  href="' + res[i].url + '" class="button" download="' + res[i].title + '">下载</a></div>';
+												fileAddress2 += '<div><span class="titleHidden">' + res[i].title + '</span><a style="float:right" href="' + res[i].url + '" download="' + res[i].title + '" class="button">下载</a></div>';
 											}
 										}
 										$('.file_adress').append(fileAddress1 + fileAddress2 );
