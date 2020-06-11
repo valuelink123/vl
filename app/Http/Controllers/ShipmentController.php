@@ -218,6 +218,7 @@ class ShipmentController extends Controller
             echo
                 '提交日期,' .
                 '销售员,' .
+                '计划员,' .
                 '账号,' .
                 'Seller SKU,' .
                 'ASIN SKU,' .
@@ -243,6 +244,7 @@ class ShipmentController extends Controller
                     echo
                         '"' . @$av['created_at'] . '",' .
                         '"' . @$av['name'] . '",' .
+                        '"' . @$av['planning_name'] . '",' .
                         '"' . @$av['label'] . '",' .
                         '"' . @$av['seller_sku'] . '",' .
                         '"' . @$av['asin'] . @$av['sku'] . '",' .
