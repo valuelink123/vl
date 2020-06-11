@@ -296,6 +296,7 @@ Route::match(['post'],'/shipment/upAlltoStatus', 'ShipmentController@upAlltoStat
 Route::match(['post'],'/shipment/getBarcodepub', 'ShipmentController@getBarcodepub');//获取 条形码信息
 Route::match(['post'],'/shipment/getCargoData', 'ShipmentController@getCargoData');//获取大货资料
 Route::match(['post','get'],'/shipment/downloadPDF', 'ShipmentController@downloadPDF');//条形码PDF
+Route::match(['post','get'],'/shipment/getShippmentIDList', 'ShipmentController@getShippmentIDList');//获取shippmentid 及订单号
 //
 
 

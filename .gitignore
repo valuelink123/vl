@@ -5,7 +5,7 @@
 /public/uploads/ueditor
 /storage
 /storage/*.key
-
+/vendor
 /.idea
 /.vagrant
 /Homestead.json

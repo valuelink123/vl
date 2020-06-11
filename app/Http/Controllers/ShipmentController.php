@@ -175,14 +175,14 @@ class ShipmentController extends Controller
             $shipmentList[$key]['name'] = @$ulist[$value['sap_seller_id']]['name'];
             $shipmentList[$key]['ubu'] = @$ulist[$value['sap_seller_id']]['ubu'];
             $shipmentList[$key]['ubg'] = @$ulist[$value['sap_seller_id']]['ubg'];
-            $shipmentList[$key]['rms_sku'] = !empty($value['rms_sku'])?$value['rms_sku']:'';
-            $shipmentList[$key]['remark'] = !empty($value['remark'])?$value['remark']:'';
+            $shipmentList[$key]['rms_sku'] = !empty($value['rms_sku']) ? $value['rms_sku'] : '';
+            $shipmentList[$key]['remark'] = !empty($value['remark']) ? $value['remark'] : '';
             $shipmentList[$key]['domin_sx'] = @$DOMIN_MARKETPLACEID_SX[$value['marketplace_id']];
             //$value['sap_warehouse_code'] . '-' .
             $shipmentList[$key]['warehouse'] = $value['sap_factory_code'];
             $shipmentList[$key]['image'] = explode(',', $value['images'])[0];
             //大货资料是否存在
-            $shipmentList[$key]['allot'] =!empty($value['cargo_data']) ? 1 : 0;
+            $shipmentList[$key]['allot'] = !empty($value['cargo_data']) ? 1 : 0;
             if (!in_array(@$ulist[$value['sap_seller_id']]['name'], $seller)) {
                 if (!empty($ulist[$value['sap_seller_id']]['name'])) {
                     if (!empty($ulist[$value['sap_seller_id']]['name'])) {
@@ -443,17 +443,17 @@ class ShipmentController extends Controller
                     $sx = $DOMIN_MARKETPLACEID_SX[$request['marketplace_id']];
                     //$batch_num = $sx . date('Ymd', time()) . $result_id;
                     /** 查询 发货批号*/
-                    $sql ='SELECT batch_num from shipment_requests GROUP BY id DESC';
+                    $sql = 'SELECT batch_num from shipment_requests GROUP BY id DESC';
                     $shipment_requests_batch = DB::connection('vlz')->select($sql);
                     $shipment_requests_batch = (json_decode(json_encode($shipment_requests_batch), true));
                     if (!empty($shipment_requests_batch)) {
                         $batch_num = $shipment_requests_batch[0]['batch_num'];
                     }
-                    $now_date = substr($batch_num,0,8);
-                    if($now_date==date('Ymd',time())){
-                        $batch_num=$batch_num+1;
-                    }else{
-                        $batch_num=date('Ymd',time()).'001';
+                    $now_date = substr($batch_num, 0, 8);
+                    if ($now_date == date('Ymd', time())) {
+                        $batch_num = $batch_num + 1;
+                    } else {
+                        $batch_num = date('Ymd', time()) . '001';
                     }
 
                     if (!empty($batch_num)) {
@@ -494,8 +494,8 @@ class ShipmentController extends Controller
         $DOMIN_MARKETPLACEID_SX = Asin::DOMIN_MARKETPLACEID_SX;
         $sku = null;
         $role = 0;
-       // $user = Auth::user()->toArray();  //todo 打开
-        $role=7;//todo
+        // $user = Auth::user()->toArray();  //todo 打开
+        $role = 7;//todo
         /** 超级权限*/
         $ADMIN_EMAIL = Asin::ADMIN_EMAIL;
         if (!empty($user)) {
@@ -514,24 +514,24 @@ class ShipmentController extends Controller
                     $role = 5;
                 }
             }
-                $roleUser = DB::table('role_user')->select('user_id', 'role_id')
-                    ->where('user_id', @$user['id'])
-                    ->get()->map(function ($value) {
-                        return (array)$value;
-                    })->toArray();
-                if (!empty($roleUser)) {
-                    $role_id = $roleUser[0]['role_id'];
-                    if ($role_id == 23) {
-                        /** 计划员角色  */
-                        $role = 2;
-                    } else if ($role_id == 31) {
-                        /** 计划 经理 */
-                        $role = 6;
-                    } else if ($role_id == 20) {
-                        /** 物流操作员 */
-                        $role = 7;
-                    }
+            $roleUser = DB::table('role_user')->select('user_id', 'role_id')
+                ->where('user_id', @$user['id'])
+                ->get()->map(function ($value) {
+                    return (array)$value;
+                })->toArray();
+            if (!empty($roleUser)) {
+                $role_id = $roleUser[0]['role_id'];
+                if ($role_id == 23) {
+                    /** 计划员角色  */
+                    $role = 2;
+                } else if ($role_id == 31) {
+                    /** 计划 经理 */
+                    $role = 6;
+                } else if ($role_id == 20) {
+                    /** 物流操作员 */
+                    $role = 7;
                 }
+            }
         }
 
         if (!empty($request['id']) && $request['id'] > 0) {
@@ -1492,11 +1492,11 @@ class ShipmentController extends Controller
             $allot_progress[$key]['bu'] = @$ulist[$value['sap_seller_id']]['ubu'];
             $allot_progress[$key]['bg'] = @$ulist[$value['sap_seller_id']]['ubg'];
 
-            $allot_progress[$key]['shippment_id'] = $value['shippment_id']>0?$value['shippment_id']:'';
-            $allot_progress[$key]['receipts_num'] = !empty($value['receipts_num'])?$value['receipts_num']:'';
-            $allot_progress[$key]['shipping_method'] = !empty($value['shipping_method'])?$value['shipping_method']:'';
-            $allot_progress[$key]['rms_sku'] = !empty($value['rms_sku'])?$value['rms_sku']:'';
-            $allot_progress[$key]['label'] = !empty($value['label'])?$value['label']:'';
+            $allot_progress[$key]['shippment_id'] = $value['shippment_id'] > 0 ? $value['shippment_id'] : '';
+            $allot_progress[$key]['receipts_num'] = !empty($value['receipts_num']) ? $value['receipts_num'] : '';
+            $allot_progress[$key]['shipping_method'] = !empty($value['shipping_method']) ? $value['shipping_method'] : '';
+            $allot_progress[$key]['rms_sku'] = !empty($value['rms_sku']) ? $value['rms_sku'] : '';
+            $allot_progress[$key]['label'] = !empty($value['label']) ? $value['label'] : '';
             //
             $allot_progress[$key]['domin_sx'] = @$DOMIN_MARKETPLACEID_SX[$value['marketplace_id']];
 
@@ -1589,12 +1589,11 @@ class ShipmentController extends Controller
      */
     public function importExecl(Request $request, $sheet = 0)
     {
-        include("../vendor/PHPExcel/PHPExcel.php");
         header("content-type:text/html;charset=utf-8");
         //Auth::user()->id //todo
         $file = $request->file('files');
         $sr_id_list = [];
-        $r_message = $msg='';
+        $r_message = $msg = '';
         if ($file) {
             try {
                 $file_name = $file->getClientOriginalName();
@@ -1664,7 +1663,7 @@ class ShipmentController extends Controller
                     if ($result) {
                         $r_message = ['status' => 1, 'msg' => '保存成功'];
                         $msg = '成功';
-                      //  return \Response::json(array('files' => array($success)), 200);
+                        //  return \Response::json(array('files' => array($success)), 200);
                     }
                 } else {
                     $msg = '失败';
@@ -1676,7 +1675,7 @@ class ShipmentController extends Controller
                 $msg = '失败';
                 $r_message = ['status' => 0, 'msg' => '文件打开失败'];
             }
-          //  return $r_message;
+            //  return $r_message;
             //return view('cpfr/allocationProgress', ['msg' => $msg]);
             return redirect('cpfr/allocationProgress');
 
@@ -1695,6 +1694,28 @@ class ShipmentController extends Controller
             $sql = 'SELECT id,width,height,transportation,pallets,pallets_size,`length`,box_num,pcs_box,pcs,weight_box from allot_progress where shipment_requests_id = ' . $sr_id;
             $BoxDetail = DB::connection('vlz')->select($sql);
             $BoxDetail = (json_decode(json_encode($BoxDetail), true));
+            if (!empty($BoxDetail)) {
+                foreach ($BoxDetail as $bk => $bv) {
+                    if (empty($bv['width']) || $bv['width'] <= 0) {
+                        $BoxDetail[$bk]['width'] = '';
+                    }
+                    if (empty($bv['height']) || $bv['height'] <= 0) {
+                        $BoxDetail[$bk]['height'] = '';
+                    }
+                    if (empty($bv['length']) || $bv['length '] <= 0) {
+                        $BoxDetail[$bk]['length'] = '';
+                    }
+                    if (empty($bv['transportation'])) {
+                        $BoxDetail[$bk]['transportation'] = '';
+                    }
+                    if (empty($bv['pallets'])) {
+                        $BoxDetail[$bk]['pallets'] = '';
+                    }
+                    if (empty($bv['pallets_size'])) {
+                        $BoxDetail[$bk]['pallets_size'] = '';
+                    }
+                }
+            }
             return $BoxDetail;
         } else {
             echo '缺少shipment_requests_id';
@@ -1759,7 +1780,7 @@ class ShipmentController extends Controller
      * @param Request $request
      * @return array
      */
-    public function upReceiptsNum(Request $request)
+    public function upReceiptsNum_old(Request $request)
     {
         $id = $request['id'] ? $request['id'] : 0;
         $receipts_num = $request['receipts_num'] ? $request['receipts_num'] : '';
@@ -2136,46 +2157,9 @@ class ShipmentController extends Controller
         $boole = false;
         $shipment_requests_id = @$request['shipment_requests_id'];
         $r_message = $old_shipment = [];
-        $role_id = $role = '';
         $user = Auth::user()->toArray();
         /** 超级权限*/
-        $ADMIN_EMAIL = Asin::ADMIN_EMAIL;
-        if (!empty($user)) {
-            if (!empty($user['email']) && in_array($user['email'], $ADMIN_EMAIL)) {
-                /**  特殊权限着 查询所有用户 */
-                $role = 4;
-            } else if ($user['ubu'] != '' || $user['ubg'] != '' || $user['seller_rules'] != '') {
-                if ($user['ubu'] == '' && $user['ubg'] != '' && $user['seller_rules'] != '') {
-                    /**查询所有BG下面员工*/
-                    $role = 3;
-                } else if ($user['ubu'] != '' && $user['seller_rules'] == '') {
-                    /**此条件为 普通销售*/
-                    $role = 1;
-                } else if ($user['ubu'] != '' && $user['ubg'] != '' && $user['seller_rules'] != '') {
-                    /**  BU 负责人  */
-                    $role = 5;
-                }
-            } else {
-                $roleUser = DB::table('role_user')->select('user_id', 'role_id')
-                    ->where('user_id', @$user['id'])
-                    ->get()->map(function ($value) {
-                        return (array)$value;
-                    })->toArray();
-                if (!empty($roleUser)) {
-                    $role_id = $roleUser[0]['role_id'];
-                    if ($role_id == 23) {
-                        /** 计划员角色  */
-                        $role = 2;
-                    } else if ($role_id == 31) {
-                        /** 计划 经理 */
-                        $role = 6;
-                    } else if ($role_id == 20) {
-                        /** 物流操作员 */
-                        $role = 7;
-                    }
-                }
-            }
-        }
+        $role = $this->getRole();
         if ($shipment_requests_id > 0) {
             if ($role == 4 || $role == 6 || $role == 7 || $role == 2) {
                 //最大权限 计划员 计划经理 物流操作 可修改
@@ -2296,11 +2280,11 @@ class ShipmentController extends Controller
      */
     public function downloadPDF(Request $request)
     {
-        $width = @$request['width']?$request['width']:63.5;
-        $height = @$request['height']?$request['height']:38.1;
-        $fnsku = @$request['fnsku']?$request['fnsku']:'STHRT556623';
-        $title = @$request['title']?$request['title']:'title';
-        $num = @$request['num']?$request['num']:21;
+        $width = @$request['width'] ? $request['width'] : 63.5;
+        $height = @$request['height'] ? $request['height'] : 38.1;
+        $fnsku = @$request['fnsku'] ? $request['fnsku'] : 'STHRT556623';
+        $title = @$request['title'] ? $request['title'] : 'title';
+        $num = @$request['num'] ? $request['num'] : 21;
         if (strlen($title) > 75) {
             $title = substr($title, 0, 75) . '...';
         }
@@ -2331,10 +2315,115 @@ class ShipmentController extends Controller
             $mpdf->WriteHTML($html);
             $time = date("Y-m-d") . time() . rand(1, 99999);
             $mpdf->Output($time . ".pdf", "D");
-        }else{
-            return ['status'=>0,'message'=>'缺少参数'];
+        } else {
+            return ['status' => 0, 'message' => '缺少参数'];
         }
 
+    }
+
+    /**
+     * 获取shippment_id 及 跟踪单号/单据号
+     * @param Request $request
+     */
+    public function getShippmentIDList(Request $request)
+    {
+        $role = $this->getRole();
+        $shippment_request_id = @$request['shippment_request_id'];
+        $shippmentID = $receipts_num = [];
+        if ($shippment_request_id > 0) {
+            $sql = "SELECT * FROM shippment WHERE shippment_request_id =" . $shippment_request_id;
+            $shippment = DB::connection('vlz')->select($sql);
+            $shippment = (json_decode(json_encode($shippment), true));
+            if (!empty($shippment)) {
+                foreach ($shippment as $k => $v) {
+                    if (!in_array($v['shippmentID'], $shippmentID)) {
+                        $shippmentID[] = $v['shippmentID'];
+                    }
+                    if (!in_array($v['receipts_num'], $receipts_num)) {
+                        $receipts_num[$v['shippmentID']][$v['id']] = $v['receipts_num'];
+                    }
+                }
+            }
+            return $receipts_num;
+        } else {
+            return ['status' => 0, 'msg' => '缺少shippment_request_id'];
+        }
+    }
+
+    /**
+     * 修改跟踪单号/单据号
+     * @param Request $request
+     */
+    public function upReceiptsNum(Request $request)
+    {
+       // $role = $this->getRole();//正式 打开 todo
+        $id = @$request['id'];
+        $receipts_num = @$request['receipts_num'];
+        $r_message = [];
+        if ($id > 0 && !empty($receipts_num)) {
+            $data = ['receipts_num' => $receipts_num];
+            $result = DB::connection('vlz')->table('shippment')
+                ->where('id', $id)
+                ->update($data);
+            if ($result) {
+                $r_message = ['status' => 1, 'msg' => '修改成功'];
+            } else {
+                $r_message = ['status' => 0, 'msg' => '修改失败'];
+            }
+        } else {
+            $r_message = ['status' => 0, 'msg' => '缺少shippment_request_id'];
+        }
+        return $r_message;
+
+    }
+    /**================================公用方法=====================================*/
+    /**
+     * 获取用户role
+     * @param Request $request
+     */
+    public function getRole()
+    {
+        $user = Auth::user()->toArray();
+        /** 超级权限*/
+        $ADMIN_EMAIL = Asin::ADMIN_EMAIL;
+        $role = 0;
+        if (!empty($user)) {
+            if (!empty($user['email']) && in_array($user['email'], $ADMIN_EMAIL)) {
+                /**  特殊权限着 查询所有用户 */
+                $role = 4;
+            } else if ($user['ubu'] != '' || $user['ubg'] != '' || $user['seller_rules'] != '') {
+                if ($user['ubu'] == '' && $user['ubg'] != '' && $user['seller_rules'] != '') {
+                    /**查询所有BG下面员工*/
+                    $role = 3;
+                } else if ($user['ubu'] != '' && $user['seller_rules'] == '') {
+                    /**此条件为 普通销售*/
+                    $role = 1;
+                } else if ($user['ubu'] != '' && $user['ubg'] != '' && $user['seller_rules'] != '') {
+                    /**  BU 负责人  */
+                    $role = 5;
+                }
+            } else {
+                $roleUser = DB::table('role_user')->select('user_id', 'role_id')
+                    ->where('user_id', @$user['id'])
+                    ->get()->map(function ($value) {
+                        return (array)$value;
+                    })->toArray();
+                if (!empty($roleUser)) {
+                    $role_id = $roleUser[0]['role_id'];
+                    if ($role_id == 23) {
+                        /** 计划员角色  */
+                        $role = 2;
+                    } else if ($role_id == 31) {
+                        /** 计划 经理 */
+                        $role = 6;
+                    } else if ($role_id == 20) {
+                        /** 物流操作员 */
+                        $role = 7;
+                    }
+                }
+            }
+        }
+        return $role;
     }
 
 }
