@@ -2326,24 +2326,35 @@ class ShipmentController extends Controller
      */
     public function getShippmentIDList(Request $request)
     {
-        $role = $this->getRole();
+        // $role = $this->getRole(); //todo 打开
+        $role = 4;//todo 删除
         $shippment_request_id = @$request['shippment_request_id'];
-        $shippmentID = $receipts_num = [];
+        $data = $data2 = [];
         if ($shippment_request_id > 0) {
-            $sql = "SELECT * FROM shippment WHERE shippment_request_id =" . $shippment_request_id;
+            $sql = "SELECT * FROM shippment WHERE shippment_request_id =" . $shippment_request_id . " GROUP BY shippmentID";
             $shippment = DB::connection('vlz')->select($sql);
             $shippment = (json_decode(json_encode($shippment), true));
             if (!empty($shippment)) {
                 foreach ($shippment as $k => $v) {
-                    if (!in_array($v['shippmentID'], $shippmentID)) {
-                        $shippmentID[$v['id']] = $v['shippmentID'];
-                    }
-                    if (!in_array($v['receipts_num'], $receipts_num)) {
-                        $receipts_num[$v['shippmentID']][$v['id']] = $v['receipts_num'];
-                    }
+                    $data[$k]['shippmentID'] = $v['shippmentID'];
+                    $data[$k]['shippment_request_id'] = $shippment_request_id;
                 }
             }
-            return ['shippmentIDList' => $shippmentID, 'receipts_num' => $receipts_num, 'role' => $role];
+            $sql2 = "SELECT * FROM shippment WHERE shippment_request_id =" . $shippment_request_id;
+            $shippment2 = DB::connection('vlz')->select($sql2);
+            $shippment2 = (json_decode(json_encode($shippment2), true));
+            if (!empty($shippment2)) {
+                foreach ($data as $dk => $dv) {
+                    foreach ($shippment2 as $sk => $sv) {
+                        if ($sv['shippmentID'] == $dv['shippmentID']) {
+                            $data[$dk]['receipts_num'][]=$sv['receipts_num'];
+                        }
+                    }
+                }
+
+            }
+
+            return ['data' => $data,  'role' => $role];
         } else {
             return ['status' => 0, 'msg' => '缺少shippment_request_id'];
         }
@@ -2356,23 +2367,68 @@ class ShipmentController extends Controller
      */
     public function addShippments(Request $request)
     {
-        $shippment_request_id = @$request['shippment_request_id'];
-        $receipts_num = @$request['receipts_num'];
-        $shippmentID = @$request['shippmentID'];
-        if ($shippment_request_id > 0 && (!empty($receipts_num) || !empty($shippmentID))) {
-            if (!empty($receipts_num) && !empty($shippmentID)) {
-                $data = ['shippment_request_id' => $shippment_request_id, 'shippmentID' => $shippmentID, 'receipts_num' => $receipts_num, 'created_at' => date('Y-m-d H:i:s', time())];
-            } else if (!empty($shippmentID)) {
-                $data = ['shippment_request_id' => $shippment_request_id, 'shippmentID' => $shippmentID, 'created_at' => date('Y-m-d H:i:s', time())];
+        $shippment_request_id = $receipts_num = $shippmentID = '';
+        $dataArr = $newData = $newData2 = $newData3 = [];
+        $data = $request['data'];
+        //todo 测试数据 删除
+//        $data = [
+//            [
+//                'shippmentID' => 'shippment_id3',
+//                'receipts_num' => ['aaa', 'bbb', 'ccc', 'ddd', 'eee'],
+//                'shippment_request_id' => 150
+//            ],
+//            [
+//                'shippmentID' => 'shippment_id32',
+//                'receipts_num' => ['aaa', 'bbb', 'ccc', 'ddd', 'eee'],
+//                'shippment_request_id' => 150
+//            ],
+//            [
+//                'shippmentID' => 'shippment_id33',
+//                'shippment_request_id' => 150
+//            ]
+//        ];
+//        $data = json_encode($data);
+        //todo 测试数据 删除 end
+
+        if (!empty($data)) {
+            $dataArr = (json_decode($data, true));
+            //var_dump($dataArr);
+            if (!empty($dataArr)) {
+                $shippment_request_id = $dataArr[0]['shippment_request_id'];
+                if ($shippment_request_id > 0) {
+                    //删除旧数据
+                    $sql = "DELETE  FROM shippment WHERE shippment_request_id ='" . $shippment_request_id . "'";
+                    $res = DB::connection('vlz')->delete($sql);
+                }
+                foreach ($dataArr as $k => $v) {
+                    if (!empty($v['receipts_num'])) {
+                        foreach ($v['receipts_num'] as $vk => $vv) {
+                            $newData[] = [
+                                'shippment_request_id' => $shippment_request_id,
+                                'shippmentID' => $v['shippmentID'],
+                                'receipts_num' => $vv,
+                                'created_at' => date('Y-m-d H:i:s', time())];
+                        }
+                    } else {
+                        $newData2[] = [
+                            'shippment_request_id' => $shippment_request_id,
+                            'shippmentID' => $v['shippmentID'],
+                            'receipts_num' => '',
+                            'created_at' => date('Y-m-d H:i:s', time())];
+                    }
+                }
             }
-            $result_id = DB::connection('vlz')->table('shippment')->insertGetId($data);
-            if ($result_id > 0) {
-                return ['status' => 1, 'msg' => '新增成功'];
+            $newData3 = array_merge($newData, $newData2);
+            if (!empty($newData3)) {
+                $result = DB::connection('vlz')->table('shippment')->insert($newData3);
+                if ($result > 0) {
+                    return ['status' => 1, 'msg' => '新增成功'];
+                } else {
+                    return ['status' => 0, 'msg' => '新增失败'];
+                }
             } else {
-                return ['status' => 0, 'msg' => '新增失败'];
+                return ['status' => 0, 'msg' => '缺少数据'];
             }
-        } else {
-            return ['status' => 0, 'msg' => '缺少shippment_request_id'];
         }
     }
 
@@ -2381,33 +2437,34 @@ class ShipmentController extends Controller
      * @param Request $request
      * @return array
      */
-    public function delShippments(Request $request)
+    public
+    function delShippments(Request $request)
     {
-       // $role = $this->getRole(); //todo 打开
-        $role=4;
+        // $role = $this->getRole(); //todo 打开
+        $role = 4;
         $id = @$request['id'];
         $shippmentID = @$request['shippmentID'];
-        if($role==2||$role==4||$role==6||$role==7){
+        if ($role == 2 || $role == 4 || $role == 6 || $role == 7) {
             if ($id > 0) {
-                $sql = 'DELETE  FROM shippment WHERE id ='.$id;
+                $sql = 'DELETE  FROM shippment WHERE id =' . $id;
                 $res = DB::connection('vlz')->delete($sql);
-                if($res>0){
+                if ($res > 0) {
                     return ['status' => 1, 'msg' => '删除成功'];
-                }else{
+                } else {
                     return ['status' => 0, 'msg' => '删除失败'];
                 }
-            }else if(!empty($shippmentID)){
-                $sql = "DELETE  FROM shippment WHERE shippmentID ='".$shippmentID."'";
+            } else if (!empty($shippmentID)) {
+                $sql = "DELETE  FROM shippment WHERE shippmentID ='" . $shippmentID . "'";
                 $res = DB::connection('vlz')->delete($sql);
-                if($res>0){
+                if ($res > 0) {
                     return ['status' => 1, 'msg' => 'shippmentID删除成功'];
-                }else{
+                } else {
                     return ['status' => 0, 'msg' => 'shippmentID删除失败'];
                 }
             } else {
                 return ['status' => 0, 'msg' => '缺少参数id或shippmentID'];
             }
-        }else{
+        } else {
             return ['status' => 0, 'msg' => '权限不够'];
         }
 
@@ -2417,7 +2474,8 @@ class ShipmentController extends Controller
      * 修改跟踪单号/单据号
      * @param Request $request
      */
-    public function upReceiptsNum(Request $request)
+    public
+    function upReceiptsNum(Request $request)
     {
         // $role = $this->getRole();//正式 打开 todo
         $id = @$request['id'];
@@ -2444,7 +2502,8 @@ class ShipmentController extends Controller
      * 修改shippmentID
      * @param Request $request
      */
-    public function upShippmentID(Request $request)
+    public
+    function upShippmentID(Request $request)
     {
         $id = $request['id'] ? $request['id'] : 0;
         $shippment_id = $request['shippment_id'] ? $request['shippment_id'] : '';
@@ -2476,12 +2535,14 @@ class ShipmentController extends Controller
         }
         return $r_message;
     }
+
     /**================================公用方法=====================================*/
     /**
      * 获取用户role
      * @param Request $request
      */
-    public function getRole()
+    public
+    function getRole()
     {
         $user = Auth::user()->toArray();
         /** 超级权限*/
