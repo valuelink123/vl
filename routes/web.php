@@ -297,6 +297,8 @@ Route::match(['post'],'/shipment/getBarcodepub', 'ShipmentController@getBarcodep
 Route::match(['post'],'/shipment/getCargoData', 'ShipmentController@getCargoData');//获取大货资料
 Route::match(['post','get'],'/shipment/downloadPDF', 'ShipmentController@downloadPDF');//条形码PDF
 Route::match(['post','get'],'/shipment/getShippmentIDList', 'ShipmentController@getShippmentIDList');//获取shippmentid 及订单号
+Route::match(['post','get'],'/shipment/addShippments', 'ShipmentController@addShippments');//增加shippment 或 跟踪单号 单据号
+Route::match('post','/shipment/delShippments', 'ShipmentController@delShippments');//删除shippment 或 跟踪单号 单据号
 //
 
 

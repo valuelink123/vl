@@ -1623,9 +1623,9 @@ class ShipmentController extends Controller
                 $success->fileID = md5($newpath . $newname);
                 //判断哪种类型
                 if ($file_ex == "xlsx") {
-                    $reader = \PHPExcel_IOFactory::createReader('Excel2007');
+                    $reader = PHPExcel_IOFactory::createReader('Excel2007');
                 } else {
-                    $reader = \PHPExcel_IOFactory::createReader('Excel5');
+                    $reader = PHPExcel_IOFactory::createReader('Excel5');
                 }
                 $excel = $reader->load(public_path() . $newpath . $newname, $encode = 'utf-8');
                 //读取第一张表
@@ -1754,7 +1754,7 @@ class ShipmentController extends Controller
      * @param Request $request
      * @return array|mixed
      */
-    public function upShippmentID(Request $request)
+    public function upShippmentID_old(Request $request)
     {
         $id = $request['id'] ? $request['id'] : 0;
         $shippment_id = $request['shippment_id'] ? $request['shippment_id'] : '';
@@ -2285,10 +2285,9 @@ class ShipmentController extends Controller
         $fnsku = @$request['fnsku'] ? $request['fnsku'] : 'STHRT556623';
         $title = @$request['title'] ? $request['title'] : 'title';
         $num = @$request['num'] ? $request['num'] : 21;
-        if (strlen($title) > 75) {
-            $title = substr($title, 0, 75) . '...';
+        if (strlen($title) > 30) {
+            $title = substr($title, 0, 13) . '...' . substr($title, -13, 13);
         }
-
         if ($width > 0 && $height > 0 && !empty($fnsku) && !empty($title) && $num > 0) {
             $generator = new \Picqer\Barcode\BarcodeGeneratorPNG();
             $barcode = $generator->getBarcode($fnsku, $generator::TYPE_CODE_128, $widthFactor = 2, $height = 30);
@@ -2296,7 +2295,6 @@ class ShipmentController extends Controller
             $width = $width . 'mm';
             $height = $height . 'mm';
             // echo ' <img src="data:image/png;base64,' . $barcode . '"/>';
-
             $mpdf = new \Mpdf\Mpdf(['mode' => 'zh-cn', 'format' => 'A4', 'margin_top' => 0, 'margin_left' => 0, 'margin_right' => 0, 'margin_bottom' => 0]);
             $html = '<div style="width: 210mm; height: 297mm;">
                     <div style="transform-origin: 0px 0px; background-color: white; margin-left: 5mm;padding-top:16px">';
@@ -2306,6 +2304,7 @@ class ShipmentController extends Controller
             <img   alt="" src="data:image/png;base64,' . $barcode . '" style="margin:auto;max-width: 100%; max-height: 100%;text-align: center">
             <div style="margin-top: 5px;text-align: center">' . $fnsku . '</div>
             <div style="margin-top: 4px">' . $title . '</div>
+            <div style="margin-top: 0px">' . "New" . '</div>
             </div>
             </div>';
             }
@@ -2337,17 +2336,81 @@ class ShipmentController extends Controller
             if (!empty($shippment)) {
                 foreach ($shippment as $k => $v) {
                     if (!in_array($v['shippmentID'], $shippmentID)) {
-                        $shippmentID[] = $v['shippmentID'];
+                        $shippmentID[$v['id']] = $v['shippmentID'];
                     }
                     if (!in_array($v['receipts_num'], $receipts_num)) {
                         $receipts_num[$v['shippmentID']][$v['id']] = $v['receipts_num'];
                     }
                 }
             }
-            return $receipts_num;
+            return ['shippmentIDList' => $shippmentID, 'receipts_num' => $receipts_num, 'role' => $role];
         } else {
             return ['status' => 0, 'msg' => '缺少shippment_request_id'];
         }
+    }
+
+    /**
+     * 增加shippmentid or 跟踪单号/单据号
+     * @param Request $request
+     * @return array
+     */
+    public function addShippments(Request $request)
+    {
+        $shippment_request_id = @$request['shippment_request_id'];
+        $receipts_num = @$request['receipts_num'];
+        $shippmentID = @$request['shippmentID'];
+        if ($shippment_request_id > 0 && (!empty($receipts_num) || !empty($shippmentID))) {
+            if (!empty($receipts_num) && !empty($shippmentID)) {
+                $data = ['shippment_request_id' => $shippment_request_id, 'shippmentID' => $shippmentID, 'receipts_num' => $receipts_num, 'created_at' => date('Y-m-d H:i:s', time())];
+            } else if (!empty($shippmentID)) {
+                $data = ['shippment_request_id' => $shippment_request_id, 'shippmentID' => $shippmentID, 'created_at' => date('Y-m-d H:i:s', time())];
+            }
+            $result_id = DB::connection('vlz')->table('shippment')->insertGetId($data);
+            if ($result_id > 0) {
+                return ['status' => 1, 'msg' => '新增成功'];
+            } else {
+                return ['status' => 0, 'msg' => '新增失败'];
+            }
+        } else {
+            return ['status' => 0, 'msg' => '缺少shippment_request_id'];
+        }
+    }
+
+    /**
+     * 删除 shippmentid 或 单据号
+     * @param Request $request
+     * @return array
+     */
+    public function delShippments(Request $request)
+    {
+       // $role = $this->getRole(); //todo 打开
+        $role=4;
+        $id = @$request['id'];
+        $shippmentID = @$request['shippmentID'];
+        if($role==2||$role==4||$role==6||$role==7){
+            if ($id > 0) {
+                $sql = 'DELETE  FROM shippment WHERE id ='.$id;
+                $res = DB::connection('vlz')->delete($sql);
+                if($res>0){
+                    return ['status' => 1, 'msg' => '删除成功'];
+                }else{
+                    return ['status' => 0, 'msg' => '删除失败'];
+                }
+            }else if(!empty($shippmentID)){
+                $sql = "DELETE  FROM shippment WHERE shippmentID ='".$shippmentID."'";
+                $res = DB::connection('vlz')->delete($sql);
+                if($res>0){
+                    return ['status' => 1, 'msg' => 'shippmentID删除成功'];
+                }else{
+                    return ['status' => 0, 'msg' => 'shippmentID删除失败'];
+                }
+            } else {
+                return ['status' => 0, 'msg' => '缺少参数id或shippmentID'];
+            }
+        }else{
+            return ['status' => 0, 'msg' => '权限不够'];
+        }
+
     }
 
     /**
@@ -2356,7 +2419,7 @@ class ShipmentController extends Controller
      */
     public function upReceiptsNum(Request $request)
     {
-       // $role = $this->getRole();//正式 打开 todo
+        // $role = $this->getRole();//正式 打开 todo
         $id = @$request['id'];
         $receipts_num = @$request['receipts_num'];
         $r_message = [];
@@ -2375,6 +2438,43 @@ class ShipmentController extends Controller
         }
         return $r_message;
 
+    }
+
+    /**
+     * 修改shippmentID
+     * @param Request $request
+     */
+    public function upShippmentID(Request $request)
+    {
+        $id = $request['id'] ? $request['id'] : 0;
+        $shippment_id = $request['shippment_id'] ? $request['shippment_id'] : '';
+        $shippment_id_old = '';
+        $r_message = [];
+        if ($id > 0 && !empty($shippment_id)) {
+            $sql = "SELECT shippmentID FROM shippment WHERE id =" . $id;
+            $shippment = DB::connection('vlz')->select($sql);
+            $shippment = (json_decode(json_encode($shippment), true));
+            if (!empty($shippment)) {
+                $shippment_id_old = $shippment[0]['shippmentID'];
+            }
+            if (!empty($shippment_id_old)) {
+                $data = ['shippmentID' => $shippment_id, 'updated_at' => date('Y-m-d H:i:s', time())];
+                $result = DB::connection('vlz')->table('shippment')
+                    ->where('shippmentID', $shippment_id_old)
+                    ->update($data);
+                if ($result) {
+                    $r_message = ['status' => 1, 'msg' => '修改成功'];
+                } else {
+                    $r_message = ['status' => 0, 'msg' => '修改失败'];
+                }
+            } else {
+                $r_message = ['status' => 0, 'msg' => '参数ID错误'];
+            }
+
+        } else {
+            $r_message = ['status' => 0, 'msg' => '缺少shippment_id或id'];
+        }
+        return $r_message;
     }
     /**================================公用方法=====================================*/
     /**
