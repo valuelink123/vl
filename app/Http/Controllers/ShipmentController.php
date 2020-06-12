@@ -2347,14 +2347,12 @@ class ShipmentController extends Controller
                 foreach ($data as $dk => $dv) {
                     foreach ($shippment2 as $sk => $sv) {
                         if ($sv['shippmentID'] == $dv['shippmentID']) {
-                            $data[$dk]['receipts_num'][]=$sv['receipts_num'];
+                            $data[$dk]['receipts_num'][] = $sv['receipts_num'];
                         }
                     }
                 }
-
             }
-
-            return ['data' => $data,  'role' => $role];
+            return ['data' => $data, 'role' => $role];
         } else {
             return ['status' => 0, 'msg' => '缺少shippment_request_id'];
         }
@@ -2429,6 +2427,8 @@ class ShipmentController extends Controller
             } else {
                 return ['status' => 0, 'msg' => '缺少数据'];
             }
+        } else {
+            return ['status' => 0, 'msg' => '缺少data数据'];
         }
     }
 
