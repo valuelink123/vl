@@ -1364,7 +1364,8 @@ class ShipmentController extends Controller
                 'sap_shipment_code' => @$request['sap_shipment_code'],
                 'confirmed_quantity' => @$request['confirmed_quantity'],
                 'estimated_delivery_date' => @$request['estimated_delivery_date'],
-                'marketplace_id' => @$request['marketplace_id']
+                'marketplace_id' => @$request['marketplace_id'],
+                'updated_at'=>date('Y-m-d H:i:s', time())
             ];
             if (!empty($data)) {
                 $result = DB::connection('vlz')->table('purchase_requests')
