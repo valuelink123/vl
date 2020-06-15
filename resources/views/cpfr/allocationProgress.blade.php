@@ -227,7 +227,7 @@
 	.table-stripeds>tbody>tr>td{
 		padding:12px
 	}
-	.mask_box,.mask_file_upload{
+	.mask_box,.mask_file_upload,.editor_mask{
 		display: none;
 		position: fixed;
 		top: 0;
@@ -248,7 +248,7 @@
 		margin-top: -370px;
 		margin-left: -300px;
 	}
-	.mask_upload_dialog,.upload_file_from{
+	.mask_upload_dialog,.upload_file_from,.editor_box{
 		width: 500px;
 		height: 220px;
 		background: #fff;
@@ -259,10 +259,17 @@
 		margin-top: -110px;
 		margin-left: -250px;
 	}
-	.upload_file_from{
+	
+	.upload_file_from,.editor_box{
 		height: 500px;
 		margin-top: -250px;
 		overflow: auto;
+	}
+	.editor_box{
+		width: 610px;
+		height: 510px;
+		margin-top: -255px;
+		margin-left: -305px;
 	}
 	.mask-dialog input{
 		padding-left: 8px;
@@ -390,6 +397,28 @@
 		overflow: hidden;
 		white-space: nowrap;
 		text-overflow: ellipsis;
+	}
+	.editor_div{
+		width: 100%; 
+		height: 100%; 
+		overflow: hidden;
+		border-bottom: 1px solid #ccc;
+		padding: 10px 0;
+	}
+	.editor_div:last-child{
+		border-bottom: none !important;
+	}
+	.shippment_txt{
+		float:left;
+		width: 50%;
+	}
+	.order_txt{
+		float: right;
+		width: 50%;
+	}
+	.editor_div input{
+		width: 160px;
+		margin: 5px 10px;
 	}
 </style>
 <link rel="stylesheet" type="text/css" media="all" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-daterangepicker/3.0.5/daterangepicker.min.css" />
@@ -582,24 +611,24 @@
 							<th>BG</th>
 							<th>BU</th>
 							<th>station</th>
-					        <th><input type="checkbox" id="selectAll" /></th>
-					        <th style="width:90px">需求提交日期</th>
-					        <th style="width:65px;min-width: 65px;">调拨状态</th>
-					        <th style="width:50px">销售员</th>
-					        <th>发货批号</th>
-					        <th style="width:65px">调出工厂</th>
-							<th style="width:65px">调入工厂</th>
-							<th>亚马逊账号</th>
-					        <th>SKU</th>
-					        <th style="width:55px">调拨数量</th>
-					        <th style="width:45px">RMS标贴SKU</th>
-					        <th style="width:30px">条码标签</th>
-					        <th style="width:95px">发货方式</th>
-					        <th style="width:35px">大货资料</th>
-					        <th style="width:25px">Shippment ID</th>
-					        <th style="width:60px">跟踪号/单据号</th>
-					        <th style="width:90px">上次更新时间</th>
-					        <th style="width:25px;min-width: 25px; font-size: 10px;">装箱数据</th>
+					        <th style="width:10px;max-width: 10px;"><input type="checkbox" id="selectAll" /></th>
+					        <th style="max-width:40px">需求提交日期</th>
+					        <th style="max-width:65px;min-width: 65px;">调拨状态</th>
+					        <th style="max-width:30px">销售员</th>
+					        <th style="max-width:40px">发货批号</th>
+					        <th style="max-width:40px">调出工厂</th>
+							<th style="max-width:40px">调入工厂</th>
+							<th style="max-width:50px">亚马逊账号</th>
+					        <th style="max-width:45px">SKU</th>
+					        <th style="max-width:35px">调拨数量</th>
+					        <th style="max-width:45px">RMS标贴SKU</th>
+					        <th style="max-width:40px">条码标签</th>
+					        <th style="max-width:95px">发货方式</th>
+					        <th style="max-width:35px">大货资料</th>
+					        <th style="max-width:75px">Shippment <div>ID</div></th>
+					        <th style="max-width:40px;min-width: 40px;">跟踪号/单据号</th>
+					        <th style="max-width:40px">上次更新时间</th>
+					        <th style="width:5px; font-size: 10px;">装箱数据</th>
 					    </tr>
 					    </thead>
 					    <tbody></tbody>
@@ -872,35 +901,50 @@
 				</div>
 			</div>
 		</div>
+<div class="editor_mask">
+	<div class="editor_box">
+		<svg t="1588919283810"class="icon cancel_upload_btn editor_cancel" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4128" width="15" height="15"><path d="M1001.952 22.144c21.44 21.44 22.048 55.488 1.44 76.096L98.272 1003.36c-20.608 20.576-54.592 20-76.096-1.504-21.536-21.44-22.048-55.488-1.504-76.096L925.824 20.672c20.608-20.64 54.624-20 76.128 1.472" p-id="4129" fill="#707070"></path><path d="M22.176 22.112C43.616 0.672 77.6 0.064 98.24 20.672L1003.392 925.76c20.576 20.608 20 54.592-1.504 76.064-21.44 21.568-55.488 22.08-76.128 1.536L20.672 98.272C0 77.6 0.672 43.584 22.176 22.112" p-id="4130" fill="#707070"></path></svg>
+		<div style="border-bottom: 1px solid #ccc; padding: 5px 0; margin: 10px 0 0 20px;"><button class="btn btn-sm btn-info handleAddShippment">新增</button></div>
+		<div style="height: 350px; overflow: auto;margin: 5px 0;">
+			<div style="padding: 10px 20px;" class="shippmenid_box">
+			</div>
+		</div>
+		<div style="text-align: center; border-top: 1px solid #ccc; line-height: 55px;">
+			<button style="padding:5px 15px;font-size:15px;margin:0 5px" class="btn btn-sm cancelSave">取消</button>
+			<button style="padding:5px 15px;font-size:15px;margin:0 5px" class="btn btn-sm blue" id="saveBtn">保存</button>
+			<input type="hidden" class="maskId">
+		</div>
+	</div>
+</div>
 <script type="text/template" id="sub-table-tpl">
         <table class="table">
             <thead>
             <tr>
+				<th>箱数</th>
+				<th>单箱数量<div>pcs/box</div></th>
+				<th>总数量<div>(pcs)</div><div>total pcs</div></th>
+				<th>单箱总量<div>(lb)</div><div>weight/box</div></th>
+				<th>长<div>(IN)</div></th>
                 <th>宽<div>(IN)</div></th>
                 <th>高<div>(IN)</div></div></th>
-                <th>运输方式<div>transportation</div></div></th>
-                <th>卡板号<div>pallets</div></th>
-                <th>打板尺寸<div>(in)</div><div>pallets size</div></th>
-				<th>长</th>
-				<th>箱数</th>
-				<th>单箱数量</th>
-				<th>总数量</th>
-				<th>单箱总量</th>
+				<th>卡板号<div>pallets</div></th>
+				<th>打板尺寸<div>(in)</div><div>pallets size</div></th>
+                <th>运输方式<div>transportation</div></div></th>	
             </tr>
             </thead>
             <tbody>
             <% for(let row of rows){ %>
             <tr>
-                <td>${row.width}</td>
-                <td>${row.height}</td>
-                <td>${row.transportation}</td>
-                <td>${row.pallets}</td>
-                <td>${row.pallets_size}</td>
-				<td>${row.length}</td>
 				<td>${row.box_num}</td>
 				<td>${row.pcs_box}</td>
 				<td>${row.pcs}</td>
 				<td>${row.weight_box}</td>
+				<td>${row.length}</td>
+                <td>${row.width}</td>
+                <td>${row.height}</td>
+				<td>${row.pallets}</td>
+				<td>${row.pallets_size}</td>
+                <td>${row.transportation}</td>
             </tr>
             <% } %>
             </tbody>
@@ -909,21 +953,6 @@
 <script>
 	let msg = <?php echo @$msg?$msg:0?>;
 	
-	/* if(msg == 0){
-		$('.error_mask').fadeIn(1000);
-		$('.error_mask_text').text(msg);
-		setTimeout(function(){
-			$('.error_mask').fadeOut(1000);
-		},2000)
-	}else if(msg == 1){
-		$('.success_mask').fadeIn(1000);
-		$('.success_mask_text').text(msg);
-		setTimeout(function(){
-			$('.success_mask').fadeOut(1000);
-		},2000)	
-		tableObj.ajax.reload();
-		$('#selectAll').removeAttr('checked');
-	} */
 	function tplCompile(tpl) {
 	
 	    tpl = tpl.replace(/<%([^]+?)%>/g, "`);$1;_push(`")
@@ -1032,7 +1061,89 @@
 	    else tableObj.column(column).search(value).draw();
 	}
 	$(document).ready(function(){
-		
+		//新增ShippmentId
+		$('.handleAddShippment').on('click',function(){
+			$('.shippmenid_box').prepend('<div class="editor_div">'
+											+'<div class="shippment_txt">'
+												+'<input type="text" />'
+												+'<button class="btn btn-sm red-sunglo deleteShippment">删除</button>'
+											+'</div>'
+											+'<div class="order_txt">'
+												+'<div><button style="margin: 5px 10px" class="btn btn-sm btn-info handleAddOrder">新增跟踪单号</button></div>'
+												+'<div class="orderList">'
+													+'<div class="orderItem">'
+														+'<input type="text" />'
+														+'<button class="btn btn-sm red-sunglo deleteOrder">删除</button>'
+													+'</div>'
+												+'</div>'
+											+'</div>'
+										+'</div>')
+		})
+		//新增跟踪单号
+		 $('body').on('click','.handleAddOrder',function(){
+			$(this).parent().parent().find('.orderList').prepend('<div class="orderItem"><input type="text" /><button class="btn btn-sm red-sunglo deleteOrder">删除</button></div>')
+		});
+		//删除跟踪单号
+		 $('body').on('click','.deleteOrder',function(){
+			$(this).parent().remove();
+		});
+		//删除跟踪单号
+		 $('body').on('click','.deleteShippment',function(){
+			$(this).parents('.editor_div').remove();
+		});
+		//保存
+		$('#saveBtn').on('click',function(){
+			let list = $(".editor_div .orderItem");
+			let arr = $('.editor_div');
+			let objList = [];
+			let orderArr = [];
+			for(var j=0; j<arr.length; j++){
+				orderArr = []
+				let orderList = $(arr[j]).find('.orderItem input');
+				for(var i=0;i<orderList.length;i++){
+					orderArr.push($(orderList[i]).val())
+				}
+				objList.push({
+					shippmentID : $(arr[j]).find('.shippment_txt input').val(),
+					receipts_num : orderArr,
+					shippment_request_id: $('.maskId').val()
+				})
+			}
+			console.log(objList)
+			$.ajax({
+				async : false,
+				cache : false,
+				type:"post",
+				url:'/shipment/addShippments',
+				data:{
+					data: objList
+				},
+				error:function(err){
+				    console.log(err);
+				},
+				success:function(res){
+					if(res.status == 0){
+						$('.error_mask').fadeIn(1000);
+						$('.error_mask_text').text(res.msg);
+						setTimeout(function(){
+							$('.error_mask').fadeOut(1000);
+						},2000)
+					}else if(res.status == 1){
+						$('.success_mask').fadeIn(1000);
+						$('.success_mask_text').text(res.msg);
+						setTimeout(function(){
+							$('.success_mask').fadeOut(1000);
+						},2000)
+					}
+					$('.editor_mask').hide()
+				}
+			});
+		})
+		//取消保存
+		$('.cancelSave').on('click',function(){
+			$('.editor_mask').hide();
+		})
+	
 		//上传大货资料
 		$('#fileUpload').on('click',function(){
 			let fileList1 = '';
@@ -1123,6 +1234,10 @@
 		})
 		$('.cancelFile').on('click',function(){
 			$('.mask_file_upload').hide();
+		})
+		//上传大货资料弹窗隐藏
+		$('.editor_cancel').on('click',function(){
+			$('.editor_mask').hide();
 		})
 		
 		
@@ -1658,7 +1773,7 @@
 					data: 'barcode',
 					name: 'barcode',
 					render: function(data, type, row, meta) {
-						var content = '<button><a target="_blank" href="barcode?id='+row.shipment_requests_id+'">打印</a></button>';
+						var content = '<button><a target="_blank" style="text-decoration: none;color:#333" href="barcode?id='+row.shipment_requests_id+'">打印</a></button>';
 						return content;
 					},
 				},
@@ -1670,7 +1785,13 @@
 					data: 'cargo_data', 
 					name: 'cargo_data',
 					render: function(data, type, row, meta) {
-						var content = '<button>查看</button>';
+						let btnText = '';
+						if(row.cargo_data != null){
+							btnText = "查看"
+						}else{
+							btnText = "上传"
+						}
+						var content = '<button>'+btnText+'</button>';
 						return content;
 					},
 					createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
@@ -1708,109 +1829,114 @@
 					data: 'shippment_id', 
 					name: 'shippment_id',
 					render: function(data, type, row, meta) {
-						var content = '<div>'+data+'<img src="../assets/global/img/editor.png" alt="" style="float:right" class="country_img"></div>';
+						console.log(data)
+						var content = '<div style="color:blue">'+data+'<img src="../assets/global/img/editor.png" alt="" style="float:right" class="country_img"></div>';
 						return content;
 					},
 					createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
-						let inputTxt = cellData
 						$(cell).click(function (e) {
-							$(this).html('<input type="text" size="16" style="width: 100%" />');
-							var aInput = $(this).find(":input");
-							aInput.focus().val(inputTxt);
-						});
-						$(cell).on("blur", ":input", function (e) {
-							var text = $(this).val();
-							if($(this).val() != inputTxt){
-								//$(cell).html(text);
-								tableObj.cell(cell).data(text);
-								$.ajax({
-									type:"post",
-									url:'/shipment/upShippmentID',
-									data:{
-										id: rowData.id,
-					                    shippment_id: rowData.shippment_id 
-									},
-									error:function(err){
-									    console.log(err);
-									},
-									success:function(res){
-										if(res.status == 0){
-											$('.error_mask').fadeIn(1000);
-											$('.error_mask_text').text(res.msg);
-											setTimeout(function(){
-												$('.error_mask').fadeOut(1000);
-											},2000)
-										}else if(res.status == 1){
-											$('.success_mask').fadeIn(1000);
-											$('.success_mask_text').text(res.msg);
-											setTimeout(function(){
-												$('.success_mask').fadeOut(1000);
-											},2000)	
-											$(cell).html(rowData.shippment_id +'<img src="../assets/global/img/editor.png" alt="" style="float:right" class="country_img">');
+							$('.shippmenid_box').html('')
+							$('.maskId').val(rowData.shipment_requests_id)
+							$.ajax({
+								type:"post",
+								url:'/shipment/getShippmentIDList',
+								data:{
+									shippment_request_id: rowData.shipment_requests_id,
+								},
+								error:function(err){
+								    console.log(err);
+								},
+								success:function(res){
+									let data = res.data
+									console.log(data)
+									for(var i=0; i<data.length;i++){
+										let shippmentStr = "";
+										let orderStr = "";
+										shippmentStr = '<div class="shippment_txt">'
+															+'<input type="text" value="'+data[i].shippmentID+'" />'
+															+'<button class="btn btn-sm red-sunglo deleteShippment">删除</button>'
+														+'</div>';
+										
+										for(var j=0;j<data[i].receipts_num.length;j++){
+											orderStr += '<div class="orderItem">'
+															+'<input type="text" value="'+data[i].receipts_num[j]+'" />'
+															+'<button class="btn btn-sm red-sunglo deleteOrder">删除</button>'
+														+'</div>'
 										}
-										inputTxt = rowData.shippment_id
+										$('.shippmenid_box').append('<div class="editor_div">'
+																		+shippmentStr 
+																		+ '<div class="order_txt">'
+																			+'<div>'
+																				+'<button style="margin: 5px 10px" class="btn btn-sm btn-info handleAddOrder">新增跟踪单号</button>'
+																			+'</div>'
+																			+'<div class="orderList">'
+																				+orderStr
+																			+'</div>'
+																			
+																		+'</div>'
+																	+'</div>')
 									}
-								});
-							}else{
-								$(cell).html(text);
-								tableObj.cell(cell).data(text);
-							}
-						})
+								}
+							});
+							$('.editor_mask').show();
+						});
 					}
 				},
 				{
 					data: 'receipts_num', 
 					name: 'receipts_num',
 					render: function(data, type, row, meta) {
-						var content = '<div>'+data+'<img src="../assets/global/img/editor.png" alt="" style="float:right" class="country_img"></div>';
+						console.log(data, type, row, meta)
+						var content = '<div style="color:blue">'+data+'<img src="../assets/global/img/editor.png" alt="" style="float:right" class="country_img"></div>';
 						return content;
 					},
 					createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
-						let inputTxt = cellData
 						$(cell).click(function (e) {
-							$(this).html('<input type="text" size="16" style="width: 100%" />');
-							var aInput = $(this).find(":input");
-							aInput.focus().val(inputTxt);
-						});
-						$(cell).on("blur", ":input", function (e) {
-							var text = $(this).val();
-							if($(this).val() != inputTxt){
-								$(cell).html(text);
-								tableObj.cell(cell).data(text);
-								$.ajax({
-									type:"post",
-									url:'/shipment/upReceiptsNum',
-									data:{
-										id: rowData.id,
-					                    receipts_num: rowData.receipts_num
-									},
-									error:function(err){
-									    console.log(err);
-									},
-									success:function(res){
-										if(res.status == 0){
-											$('.error_mask').fadeIn(1000);
-											$('.error_mask_text').text(res.msg);
-											setTimeout(function(){
-												$('.error_mask').fadeOut(1000);
-											},2000)
-										}else if(res.status == 1){
-											$('.success_mask').fadeIn(1000);
-											$('.success_mask_text').text(res.msg);
-											setTimeout(function(){
-												$('.success_mask').fadeOut(1000);
-											},2000)	
-											$(cell).html(rowData.receipts_num +'<img src="../assets/global/img/editor.png" alt="" style="float:right" class="country_img">');
-										}
+							$('.shippmenid_box').html('')
+							$('.maskId').val(rowData.shipment_requests_id)
+							$.ajax({
+								type:"post",
+								url:'/shipment/getShippmentIDList',
+								data:{
+									shippment_request_id: rowData.shipment_requests_id,
+								},
+								error:function(err){
+								    console.log(err);
+								},
+								success:function(res){
+									let data = res.data
+									console.log(data)
+									for(var i=0; i<data.length;i++){
+										let shippmentStr = "";
+										let orderStr = "";
+										shippmentStr = '<div class="shippment_txt">'
+															+'<input type="text" value="'+data[i].shippmentID+'" />'
+															+'<button class="btn btn-sm red-sunglo deleteShippment">删除</button>'
+														+'</div>';
 										
-										inputTxt = rowData.receipts_num
+										for(var j=0;j<data[i].receipts_num.length;j++){
+											orderStr += '<div class="orderItem">'
+															+'<input type="text" value="'+data[i].receipts_num[j]+'" />'
+															+'<button class="btn btn-sm red-sunglo deleteOrder">删除</button>'
+														+'</div>'
+										}
+										$('.shippmenid_box').append('<div class="editor_div">'
+																		+shippmentStr 
+																		+ '<div class="order_txt">'
+																			+'<div>'
+																				+'<button style="margin: 5px 10px" class="btn btn-sm btn-info handleAddOrder">新增跟踪单号</button>'
+																			+'</div>'
+																			+'<div class="orderList">'
+																				+orderStr
+																			+'</div>'
+																			
+																		+'</div>'
+																	+'</div>')
 									}
-								});
-							}else{
-								$(cell).html(text);
-								tableObj.cell(cell).data(text);
-							}
-						})
+								}
+							});
+							$('.editor_mask').show();
+						});
 					}
 				},
 				{data: 'updated_at', name: 'updated_at'},

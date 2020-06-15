@@ -391,12 +391,7 @@
 		//批量操作下拉框
 		$('.batch_operation').click(function(e){
 			$('.batch_list').slideToggle();
-			e.stopPropagation();
-			
-			/* $(document).one('click',function(){
-				$('.batch_list').hide();
-			}) */
-			
+			e.stopPropagation();	
 		})
 		$('.batch_list_button').on('click',function(e){
 			let checkbox_list = [];

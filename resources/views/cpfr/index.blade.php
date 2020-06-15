@@ -588,23 +588,23 @@
 						<th>BG</th>
 						<th>BU</th>
 						<th>Station</th>
-						<th style="min-width: 20px;"><input type="checkbox" id="selectAll" name="selectAll" /></th>
-						<th style="min-width:60px;">提交日期</th>
-						<th style="min-width:55px;">销售员</th>
-						<th style="min-width:55px;">计划员</th>
-						<th style="min-width:60px;">产品图片</th>
-						<th>
+						<th style="width: 10px;max-width: 10px;"><input type="checkbox" id="selectAll" name="selectAll" /></th>
+						<th style="max-width:30px;">提交日期</th>
+						<th style="max-width:30px;">销售员</th>
+						<th style="max-width:30px;">计划员</th>
+						<th style="max-width:60px;">产品图片</th>
+						<th style="max-width:45px;">
 							<div>账号</div>
 							<div>Seller SKU</div>
 							<div>ASIN</div>
 						</th>
-						<th>SKU</th>
-						<th style="min-width:40px;">调入工厂</th>
-						<th style="min-width:70px;">需求数量</th>
-						<th style="min-width:60px;">期望到货时间</th>
-						<th style="min-width:80px;">是否贴RMS标签</th>
-						<th style="min-width:70px;">调拨理由</th>
-						<th style="min-width:80px;">
+						<th style="max-width:30px;">SKU</th>
+						<th style="max-width:30px;">调入工厂</th>
+						<th style="max-width:30px;">需求数量</th>
+						<th style="max-width:40px;">期望到货时间</th>
+						<th style="max-width:35px;">是否贴RMS标签</th>
+						<th style="max-width:70px;min-width:70px;">调拨理由</th>
+						<th style="max-width:50px;">
 							<div style="position: relative;">
 								可维持天数
 								<div title="FBA在库+转库中库存+调拨在途的库存总量可满足未来销售计划的天数" class="hover_svg">
@@ -613,7 +613,7 @@
 							</div>
 							
 						</th>
-						<th style="min-width:70px;">
+						<th style="max-width:35px;">
 							<div style="position: relative;">
 								FBA在库
 								<div title="FBA在库=FBA可用库存+转库中库存" class="hover_svg">
@@ -621,7 +621,7 @@
 								</div>
 							</div>
 						</th>
-						<th style="min-width:110px;">
+						<th style="max-width:70px;">
 							<div style="position: relative;">
 								FBA可维持天数
 								<div title="FBA可用库存和转库中库总和可满足的未来销售计划的天数" class="hover_svg">
@@ -629,7 +629,7 @@
 								</div>
 							</div>
 						</th>
-						<th style="min-width:70px;">
+						<th style="max-width:40px;">
 							<div style="position: relative;">
 								调拨在途
 								<div title="在调拨中的数量，包含已审核通过的调拨未出库，和已发货亚马逊还未签收的数量" class="hover_svg">
@@ -637,8 +637,8 @@
 								</div>
 							</div>
 						</th>
-						<th style="min-width:40px;">审核状态</th>
-						<th style="min-width:70px;">
+						<th style="max-width:55px;">审核状态</th>
+						<th style="max-width:30px;">
 							<div style="position: relative;">
 								调拨状态
 								<div title="该调拨请求的调拨进度，数据来源于物流部" class="hover_svg">
@@ -646,7 +646,7 @@
 								</div>
 							</div>
 						</th>
-						<th style="min-width:100px;">
+						<th style="max-width:60px;">
 							<div style="position: relative;">
 								调整需求数量
 								<div title="计划和物流确认后的实际可调拨数量" class="hover_svg">
@@ -654,7 +654,7 @@
 								</div>
 							</div>
 						</th>
-						<th style="min-width:100px;">
+						<th style="max-width:80px;">
 							<div style="position: relative;">
 								预计到货时间
 								<div title="计划和物流确认过的预计到货时间" class="hover_svg">
@@ -662,9 +662,9 @@
 								</div>
 							</div>
 						</th>
-						<th style="min-width:100px;">调出工厂</th>
+						<th style="max-width:30px;">调出工厂</th>
 						
-						<th style="min-width:70px;">待办事项</th>
+						<th style="max-width:60px;">待办事项</th>
 					</tr>
 				</thead>
 				
