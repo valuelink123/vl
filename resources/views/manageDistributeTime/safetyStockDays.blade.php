@@ -10,7 +10,7 @@
 		padding: 20px 0;
 	}
 	.content{
-		padding: 15px 40px 30px 40px;
+		padding: 15px 40px 15px 40px;
 		overflow: hidden;
 		border-radius: 4px !important;
 		background-color: rgba(255, 255, 255, 1);
@@ -92,6 +92,56 @@
 	.tipsIcon:hover path{
 		fill: red;
 	}
+	.batch_list{
+		border: 1px solid rgba(220, 223, 230, 1);
+		width: 290px;
+		margin-left: -40px !important;
+		padding: 15px 0 !important;
+		display: none;
+	}
+	.batch_list,.batch_list li{
+		background: #fff;
+		padding: 0;
+		margin: 0;
+		list-style: none;
+	}
+	.batch_list li{
+		text-align: center;
+		margin: 10px 0;
+	}
+	.batch_list li span{
+		display: inline-block;
+		width: 92px;
+		text-align: right;
+		margin-right: 10px;
+	}
+	.batch_list li button{
+		color: #FFFFFF;
+		border: none;
+		height: 25px;
+		width: 60px;
+		margin-left: 10px;
+		background: #1BBC9B;
+	}
+	.batch_list:after{
+		position: absolute;
+		top: 24px;
+		left: 30px;
+		right: auto;
+		display: inline-block !important;
+		border-right: 7px solid transparent;
+		border-bottom: 7px solid #fff;
+		border-left: 7px solid transparent;
+		content: '';
+		box-sizing: border-box;
+	}
+	.batch_list_input{
+		width: 90px;
+		padding-left: 8px;
+	}
+	.update_box{
+		height: 30px;
+	}
 </style>
 <div>
 	<h4 class="title">安全库存天数管理
@@ -164,7 +214,7 @@
 			</div>
 			<div class="filter_option">
 				<label for="maintainerSelect">维护人</label>
-				<select id="maintainerSelect" onchange="change_maintainer(this.value,10)">
+				<select id="maintainerSelect" onchange="change_maintainer(this.value,12)">
 					<option value ="">全部</option>
 					@foreach($usersIdName as $k=>$v)
 					<option value ="{{$k}}">{{$v}}</option>
@@ -182,13 +232,21 @@
 			</div>
 		</div>
 		<div class="update_box">
-			<div class="filter_option change_box">
+			<!-- <div class="filter_option change_box">
 				<label for="" style="display: inline-block; margin-right: 5px;">更改安全库存天数:</label>
-				<input type="text" id="newSafetyStock" class="keyword" placeholder="输入安全库存天数"  onkeyup="value=value.replace(/^(0+)|[^\d]+/g,'')">
+				<input type="text" id="newSafetyStock" class="keyword" placeholder="输入安全库存天数"  onkeyup="value=value.replace(/^[^\d]+/g,'')">
 				<button class="change">
 					<svg t="1589004081856" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1149" width="18" height="18"><path d="M310.144 605.587s107.454 38.525 172.491 110.569 121.692 134.819 121.692 134.819 49.018-104.785 178.609-245.388 213.648-178.609 213.648-178.609-10.271-58.474-11.828-107.9c-2.447-78.125 1.298-146.017 1.298-146.017s-102.746 19.244-234.635 215.391S593.834 668.62 593.834 668.62l-94.551-192.624-189.139 129.591z" fill="#ffffff" p-id="1150"></path></svg>
 					change
 				</button>
+			</div> -->
+			<div style="z-index: 999;padding-left:0; position: absolute;" class="col-md-2">
+				<button type="button" class="btn btn-sm green-meadow batch_operation">批量操作<i class="fa fa-angle-down"></i></button>
+				<ul class="batch_list">
+					<li><span>内部流程时效:</span><input type="text" id="" onkeyup="value=value.replace(/^[^\d]+/g,'')" class="batch_list_input"><button id="" class="batch_list_button change">change</button></li>
+					<li><span>安全库存:</span><input type="text" id="" onkeyup="value=value.replace(/^[^\d]+/g,'')" class="batch_list_input"><button id="" class="batch_list_button change">change</button></li>
+					<li><span>最小分批数量:</span><input type="text" id="" onkeyup="value=value.replace(/^[^\d]+/g,'')" class="batch_list_input"><button id="" class="batch_list_button change">change</button></li>
+				</ul>
 			</div>
 		</div>
 	</div>
@@ -210,7 +268,9 @@
 					<svg t="1589247400458" class="icon tipsIcon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2166" width="18" height="18"><path d="M505.306 917.208c-221.127 0-400.391-179.155-400.391-400.288 0-221.127 179.263-400.424 400.391-400.424 221.093 0 400.319 179.296 400.319 400.424 0 221.133-179.227 400.288-400.319 400.288v0zM505.306 76.453c-243.249 0-440.402 197.184-440.402 440.468 0 243.144 197.151 440.332 440.402 440.332 243.179 0 440.362-197.182 440.362-440.332-0.001-243.283-197.183-440.468-440.362-440.468v0zM549.098 296.481c-15.547 0-28.898 5.091-39.974 15.137-11.144 10.043-16.684 22.155-16.684 36.327s5.539 26.281 16.684 36.189c11.076 10.046 24.427 14.998 39.974 14.998 15.513 0 28.828-4.953 39.836-14.998 11.008-9.907 16.545-22.016 16.545-36.189 0-14.174-5.537-26.284-16.545-36.327-11.009-10.046-24.323-15.137-39.836-15.137v0zM564.132 697.32c-12.283 0-20.918-1.929-25.906-5.779-4.953-3.99-7.462-11.285-7.462-22.016 0-4.403 0.756-10.732 2.338-19.13 1.512-8.389 3.234-15.825 5.159-22.289l23.669-81.461c2.268-7.432 3.885-15.547 4.747-24.495 0.862-8.943 1.31-15.273 1.31-18.852 0-17.062-6.227-30.959-18.615-41.692-12.383-10.732-29.997-16.099-52.802-16.099-12.661 0-26.145 2.201-40.352 6.605-14.172 4.266-29.067 9.633-44.615 15.825l-6.33 25.18c4.575-1.789 10.147-3.439 16.545-5.365 6.469-1.927 12.797-2.889 18.885-2.889 12.557 0 20.986 2.201 25.424 6.192 4.403 4.128 6.637 11.422 6.637 21.877 0 5.783-0.723 12.112-2.167 19.125-1.446 7.023-3.234 14.449-5.367 22.157l-23.737 81.739c-2.131 8.529-3.645 16.234-4.607 22.974-0.965 6.882-1.413 13.492-1.413 20.092 0 16.651 6.365 30.551 19.127 41.423 12.728 10.868 30.652 16.374 53.598 16.374 15 0 28.14-1.929 39.456-5.783 11.32-3.709 26.459-9.352 45.443-16.51l6.328-25.18c-3.265 1.375-8.529 3.164-15.785 5.229-7.296 1.788-13.763 2.75-19.508 2.75v0z" p-id="2167" fill="#bfbfbf"></path></svg>
 				</span>
 			</th>
+			<th>内部流程时效</th>
 			<th>安全库存(天)</th>
+			<th>最小分批数量</th>
 			<th>维护人</th>
 			<th>维护日期</th>
 		</tr>
@@ -222,7 +282,7 @@
 
 	//正则判断输入整数
 	function validataInt(ob) {
-		ob.value = ob.value.replace(/^(0+)|[^\d]+/g,'')
+		ob.value = ob.value.replace(/^[^\d]+/g,'')
 	}
 	//筛选
 	function status_filter(value,column) {
@@ -247,6 +307,11 @@
 		tableObj.search(val).draw();
 	}
 	$(document).ready(function(){
+		//批量操作下拉框
+		$('.batch_operation').click(function(e){
+			$('.batch_list').slideToggle();
+			e.stopPropagation();	
+		})
 		//批量编辑
 		$('.change').on('click',function(){
 		    var days = $('#newSafetyStock').val();
@@ -360,7 +425,53 @@
 //					//return res
 //				},
 			},
-
+			data:[
+				{
+					bg: "BG3",
+					bu: "BU3",
+					daily_sales: "235.18",
+					description: "DBPOWER DJS50 18000 毫安汽车应急电源 红",
+					id: 442,
+					level: "S",
+					maintain_time: "2020-06-03 11:14:21",
+					maintainer: "Sukey许琼",
+					marketplace_id: "ATVPDKIKX0DER",
+					safe_quantity: 14,
+					site: "US",
+					sku: "AP0373",
+					status: "保留",
+				},
+				{
+					bg: "BG3",
+					bu: "BU3",
+					daily_sales: "235.18",
+					description: "DBPOWER DJS50 18000 毫安汽车应急电源 红",
+					id: 442,
+					level: "S",
+					maintain_time: "2020-06-03 11:14:21",
+					maintainer: "Sukey许琼",
+					marketplace_id: "ATVPDKIKX0DER",
+					safe_quantity: 14,
+					site: "US",
+					sku: "AP0373",
+					status: "保留",
+				},
+				{
+					bg: "BG3",
+					bu: "BU3",
+					daily_sales: "235.18",
+					description: "DBPOWER DJS50 18000 毫安汽车应急电源 红",
+					id: 442,
+					level: "S",
+					maintain_time: "2020-06-03 11:14:21",
+					maintainer: "Sukey许琼",
+					marketplace_id: "ATVPDKIKX0DER",
+					safe_quantity: 14,
+					site: "US",
+					sku: "AP0373",
+					status: "保留",
+				}
+			],
 			columns: [
 				{
 					data: "id",
@@ -397,7 +508,13 @@
 					data: 'daily_sales',
 				},
 				{
+					data: 'internal_process_aging',
+				},
+				{
 					data: 'safe_quantity',
+				},
+				{
+					data: 'minimum_batch_number',
 				},
 				{
 					data: 'maintainer',
@@ -407,9 +524,8 @@
 				},
 			],
 			columnDefs: [
-				{ "bSortable": false, "aTargets": [ 0,1,2,3,4,5,6,7,8,10]},
-//                { "bVisible": false, "aTargets": [12] },
-				{
+				{ "bSortable": false, "aTargets": [ 0,1,2,3,4,5,6,7,8]},
+                {
 					"targets": [9],
 					render: function (data, type, row) {
 						return '<div><span>'+data+'</span><img src="../assets/global/img/editor.png" alt="" style="float:right" class="country_img"></div>';
@@ -434,6 +550,86 @@
 									data:{
 										ids: ids,
                                         safe_quantity: rowData.safe_quantity,
+									},
+									error:function(err){
+									    console.log(err);
+									},
+									success:function(res){
+										tableObj.ajax.reload()
+									}
+								});
+							}else{
+								$(cell).html(text);
+								tableObj.cell(cell).data(text);
+							}
+						})
+					}
+				},
+				{
+					"targets": [10],
+					render: function (data, type, row) {
+						return '<div><span>'+data+'</span><img src="../assets/global/img/editor.png" alt="" style="float:right" class="country_img"></div>';
+					},
+			
+					createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
+						$(cell).click(function (e) {
+							$(this).html('<input type="text" size="16" onkeyup="validataInt(this)" style="width: 100%"/>');
+							var aInput = $(this).find(":input");
+							aInput.focus().val(cellData);
+						});
+						$(cell).on("blur", ":input", function (e) {
+							var text = $(this).val();
+							if($(this).val() != cellData){
+								$(cell).html(text);
+								tableObj.cell(cell).data(text);
+								var ids = [];
+								ids.push(rowData.id);
+								$.ajax({
+									type:"post",
+									url:'/manageDistributeTime/updateSafetyStockDays',
+									data:{
+										ids: ids,
+                                        safe_quantity: rowData.safe_quantity,
+									},
+									error:function(err){
+									    console.log(err);
+									},
+									success:function(res){
+										tableObj.ajax.reload()
+									}
+								});
+							}else{
+								$(cell).html(text);
+								tableObj.cell(cell).data(text);
+							}
+						})
+					}
+				},
+				{
+					"targets": [11],
+					render: function (data, type, row) {
+						return '<div><span>'+data+'</span><img src="../assets/global/img/editor.png" alt="" style="float:right" class="country_img"></div>';
+					},
+							
+					createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
+						$(cell).click(function (e) {
+							$(this).html('<input type="text" size="16" onkeyup="validataInt(this)" style="width: 100%"/>');
+							var aInput = $(this).find(":input");
+							aInput.focus().val(cellData);
+						});
+						$(cell).on("blur", ":input", function (e) {
+							var text = $(this).val();
+							if($(this).val() != cellData){
+								$(cell).html(text);
+								tableObj.cell(cell).data(text);
+								var ids = [];
+								ids.push(rowData.id);
+								$.ajax({
+									type:"post",
+									url:'/manageDistributeTime/updateSafetyStockDays',
+									data:{
+										ids: ids,
+				                        safe_quantity: rowData.safe_quantity,
 									},
 									error:function(err){
 									    console.log(err);
