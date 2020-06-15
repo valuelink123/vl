@@ -111,7 +111,7 @@ function getDistRuleForRole()
 
 
 function getSellerAccount(){
-	return DB::connection('order')->table("accounts")->where('status',1)->groupby(['sellerid','sellername'])->pluck('sellername','sellerid');
+	return DB::connection('amazon')->table("seller_accounts")->whereNull('deleted_at')->groupby(['mws_seller_id','label'])->pluck('label','mws_seller_id');
 }
 function getUserGroupDetails(){
 	$groups=$users =[];

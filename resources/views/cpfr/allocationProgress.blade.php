@@ -1109,10 +1109,15 @@
 					shippment_request_id: $('.maskId').val()
 				})
 			}
+			console.log(objList)
 			$.ajax({
+				async : false,
+				cache : false,
 				type:"post",
 				url:'/shipment/addShippments',
-				data:objList,
+				data:{
+					data: objList
+				},
 				error:function(err){
 				    console.log(err);
 				},
@@ -1824,190 +1829,113 @@
 					data: 'shippment_id', 
 					name: 'shippment_id',
 					render: function(data, type, row, meta) {
-						var content = '<div style="color:blue">'+data+'</div>';
+						console.log(data)
+						var content = '<div style="color:blue">'+data+'<img src="../assets/global/img/editor.png" alt="" style="float:right" class="country_img"></div>';
 						return content;
 					},
 					createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
 						$(cell).click(function (e) {
+							$('.shippmenid_box').html('')
 							$('.maskId').val(rowData.shipment_requests_id)
-							/* $.ajax({
+							$.ajax({
 								type:"post",
-								url:'/shipment/addShippments',
+								url:'/shipment/getShippmentIDList',
 								data:{
-									shipment_requests_id: rowData.shipment_requests_id,
+									shippment_request_id: rowData.shipment_requests_id,
 								},
 								error:function(err){
 								    console.log(err);
 								},
 								success:function(res){
-									console.log(res)
-								}
-							}); */
-							let data = [
-								{
-									shippment_id: 'shippment_id1',
-									order:['单号1','单号2','单号3','单号4','单号5','单号6','单号7']	
-								},
-								{
-									shippment_id: 'shippment_id2',
-									order:['1111','2222','3333','4444','5555','6666','77777','8888']	
-								},
-								{
-									shippment_id: 'shippment_id3',
-									order:['aaa','bbb','ccc','ddd','eee']	
-								},
-								{
-									shippment_id: 'shippment_id4',
-									order:['sadas','sdfsdf','fdgdfg']	
-								}
-							]
-							for(var i=0; i<data.length;i++){
-								let shippmentStr = "";
-								let orderStr = "";
-								shippmentStr = '<div class="shippment_txt">'
-													+'<input type="text" value="'+data[i].shippment_id+'" />'
-													+'<button class="btn btn-sm red-sunglo deleteShippment">删除</button>'
-												+'</div>';
-								
-								for(var j=0;j<data[i].order.length;j++){
-									orderStr += '<div class="orderItem">'
-													+'<input type="text" value="'+data[i].order[j]+'" />'
-													+'<button class="btn btn-sm red-sunglo deleteOrder">删除</button>'
-												+'</div>'
-								}
-								$('.shippmenid_box').append('<div class="editor_div">'
-																+shippmentStr 
-																+ '<div class="order_txt">'
-																	+'<div>'
-																		+'<button style="margin: 5px 10px" class="btn btn-sm btn-info handleAddOrder">新增跟踪单号</button>'
-																	+'</div>'
-																	+'<div class="orderList">'
-																		+orderStr
-																	+'</div>'
-																	
-																+'</div>'
-															+'</div>')
-							}
-							$('.editor_mask').show();
-							
-						});
-						/* let inputTxt = cellData
-						$(cell).click(function (e) {
-							$(this).html('<input type="text" size="16" style="width: 100%" />');
-							var aInput = $(this).find(":input");
-							aInput.focus().val(inputTxt);
-						});
-						$(cell).on("blur", ":input", function (e) {
-							var text = $(this).val();
-							console.log(text)
-							if($(this).val() != inputTxt){
-								//$(cell).html(text);
-								tableObj.cell(cell).data(text);
-								$.ajax({
-									type:"post",
-									url:'/shipment/upShippmentID',
-									data:{
-										id: rowData.id,
-					                    shippment_id: rowData.shippment_id 
-									},
-									error:function(err){
-									    console.log(err);
-									},
-									success:function(res){
-										if(res.status == 0){
-											$('.error_mask').fadeIn(1000);
-											$('.error_mask_text').text(res.msg);
-											setTimeout(function(){
-												$('.error_mask').fadeOut(1000);
-											},2000)
-										}else if(res.status == 1){
-											$('.success_mask').fadeIn(1000);
-											$('.success_mask_text').text(res.msg);
-											setTimeout(function(){
-												$('.success_mask').fadeOut(1000);
-											},2000)	
-											$(cell).html(rowData.shippment_id +'<img src="../assets/global/img/editor.png" alt="" style="float:right" class="country_img">');
+									let data = res.data
+									console.log(data)
+									for(var i=0; i<data.length;i++){
+										let shippmentStr = "";
+										let orderStr = "";
+										shippmentStr = '<div class="shippment_txt">'
+															+'<input type="text" value="'+data[i].shippmentID+'" />'
+															+'<button class="btn btn-sm red-sunglo deleteShippment">删除</button>'
+														+'</div>';
+										
+										for(var j=0;j<data[i].receipts_num.length;j++){
+											orderStr += '<div class="orderItem">'
+															+'<input type="text" value="'+data[i].receipts_num[j]+'" />'
+															+'<button class="btn btn-sm red-sunglo deleteOrder">删除</button>'
+														+'</div>'
 										}
-										inputTxt = rowData.shippment_id
+										$('.shippmenid_box').append('<div class="editor_div">'
+																		+shippmentStr 
+																		+ '<div class="order_txt">'
+																			+'<div>'
+																				+'<button style="margin: 5px 10px" class="btn btn-sm btn-info handleAddOrder">新增跟踪单号</button>'
+																			+'</div>'
+																			+'<div class="orderList">'
+																				+orderStr
+																			+'</div>'
+																			
+																		+'</div>'
+																	+'</div>')
 									}
-								});
-							}else{
-								$(cell).html(text);
-								tableObj.cell(cell).data(text);
-							}
-						}) */
+								}
+							});
+							$('.editor_mask').show();
+						});
 					}
 				},
 				{
 					data: 'receipts_num', 
 					name: 'receipts_num',
 					render: function(data, type, row, meta) {
-						var content = '<div style="color:blue">'+data+'</div>';
+						console.log(data, type, row, meta)
+						var content = '<div style="color:blue">'+data+'<img src="../assets/global/img/editor.png" alt="" style="float:right" class="country_img"></div>';
 						return content;
 					},
 					createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
 						$(cell).click(function (e) {
+							$('.shippmenid_box').html('')
 							$('.maskId').val(rowData.shipment_requests_id)
-							/* $.ajax({
+							$.ajax({
 								type:"post",
-								url:'/shipment/addShippments',
+								url:'/shipment/getShippmentIDList',
 								data:{
-									shipment_requests_id: rowData.shipment_requests_id,
+									shippment_request_id: rowData.shipment_requests_id,
 								},
 								error:function(err){
 								    console.log(err);
 								},
 								success:function(res){
-									console.log(res)
+									let data = res.data
+									console.log(data)
+									for(var i=0; i<data.length;i++){
+										let shippmentStr = "";
+										let orderStr = "";
+										shippmentStr = '<div class="shippment_txt">'
+															+'<input type="text" value="'+data[i].shippmentID+'" />'
+															+'<button class="btn btn-sm red-sunglo deleteShippment">删除</button>'
+														+'</div>';
+										
+										for(var j=0;j<data[i].receipts_num.length;j++){
+											orderStr += '<div class="orderItem">'
+															+'<input type="text" value="'+data[i].receipts_num[j]+'" />'
+															+'<button class="btn btn-sm red-sunglo deleteOrder">删除</button>'
+														+'</div>'
+										}
+										$('.shippmenid_box').append('<div class="editor_div">'
+																		+shippmentStr 
+																		+ '<div class="order_txt">'
+																			+'<div>'
+																				+'<button style="margin: 5px 10px" class="btn btn-sm btn-info handleAddOrder">新增跟踪单号</button>'
+																			+'</div>'
+																			+'<div class="orderList">'
+																				+orderStr
+																			+'</div>'
+																			
+																		+'</div>'
+																	+'</div>')
+									}
 								}
-							}); */
-							let data = [
-								{
-									shippment_id: 'shippment_id1',
-									order:['单号1','单号2','单号3','单号4','单号5','单号6','单号7']	
-								},
-								{
-									shippment_id: 'shippment_id2',
-									order:['1111','2222','3333','4444','5555','6666','77777','8888']	
-								},
-								{
-									shippment_id: 'shippment_id3',
-									order:['aaa','bbb','ccc','ddd','eee']	
-								},
-								{
-									shippment_id: 'shippment_id4',
-									order:['sadas','sdfsdf','fdgdfg']	
-								}
-							]
-							for(var i=0; i<data.length;i++){
-								let shippmentStr = "";
-								let orderStr = "";
-								shippmentStr = '<div class="shippment_txt">'
-													+'<input type="text" value="'+data[i].shippment_id+'" />'
-													+'<button class="btn btn-sm red-sunglo deleteShippment">删除</button>'
-												+'</div>';
-								
-								for(var j=0;j<data[i].order.length;j++){
-									orderStr += '<div class="orderItem">'
-													+'<input type="text" value="'+data[i].order[j]+'" />'
-													+'<button class="btn btn-sm red-sunglo deleteOrder">删除</button>'
-												+'</div>'
-								}
-								$('.shippmenid_box').append('<div class="editor_div">'
-																+shippmentStr 
-																+ '<div class="order_txt">'
-																	+'<div>'
-																		+'<button style="margin: 5px 10px" class="btn btn-sm btn-info handleAddOrder">新增跟踪单号</button>'
-																	+'</div>'
-																	+'<div class="orderList">'
-																		+orderStr
-																	+'</div>'
-																	
-																+'</div>'
-															+'</div>')
-							}
+							});
 							$('.editor_mask').show();
-							
 						});
 					}
 				},

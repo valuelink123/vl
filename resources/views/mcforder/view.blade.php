@@ -15,26 +15,26 @@
     <div class="portlet-body">
         <div class="tab-pane" id="tab_2">
                     <?php
-                    if(isset($order->SellerFulfillmentOrderId)){
+                    if(isset($order->seller_fulfillment_order_id)){
 					?>
                     <div class="invoice-content-2 bordered">
                         <div class="row invoice-head">
                             <div class="col-md-7 col-xs-6">
                                 <div class="invoice-logo">
-                                    <h1 class="uppercase">{{$order->SellerFulfillmentOrderId}}</h1>
-                                    Buyer Email : {{implode(', ',unserialize($order->NotificationEmailList))}}<BR>
-                                    Buyer Name : {{$order->Name}}<BR>
-                                    DisplayableOrderDateTime : {{$order->DisplayableOrderDateTime}}
+                                    <h1 class="uppercase">{{$order->seller_fulfillment_order_id}}</h1>
+                                    Buyer Email : {{$order->notification_email_list}}<BR>
+                                    Buyer Name : {{$order->name}}<BR>
+                                    DisplayableOrderDateTime : {{$order->displayable_order_date_time}}
                                 </div>
                             </div>
                             <div class="col-md-5 col-xs-6">
                                 <div class="company-address">
-                                    <span class="bold ">{{$order->Name}}</span>
-                                    <br> {{$order->AddressLine1}}
-                                    <br> {{$order->AddressLine2}}
-                                    <br> {{$order->AddressLine3}}
-                                    <br> {{$order->City}} {{$order->StateOrRegion}} {{$order->CountryCode}}
-                                    <br> {{$order->PostalCode}}
+                                    <span class="bold ">{{$order->name}}</span>
+                                    <br> {{$order->address_line_1}}
+                                    <br> {{$order->address_line_2}}
+                                    <br> {{$order->address_line_3}}
+                                    <br> {{$order->city}} {{$order->state_or_region}} {{$order->country_code}}
+                                    <br> {{$order->postal_code}}
                                 </div>
                             </div>
                         </div>
@@ -42,24 +42,24 @@
                         <div class="row invoice-cust-add">
                             <div class="col-xs-3">
                                 <h4 class="invoice-title ">Seller ID</h4>
-                                <p class="invoice-desc">{{$order->SellerId}}</p>
+                                <p class="invoice-desc">{{array_get($accounts,$order->seller_account_id)}}</p>
                             </div>
                             <div class="col-xs-3">
                                 <h4 class="invoice-title ">Fulfillment Policy</h4>
-                                <p class="invoice-desc">{{$order->FulfillmentPolicy}}</p>
+                                <p class="invoice-desc">{{$order->fulfillment_policy}}</p>
                             </div>
                             <div class="col-xs-2">
                                 <h4 class="invoice-title ">Fulfillment Method</h4>
-                                <p class="invoice-desc">{{$order->FulfillmentMethod}}</p>
+                                <p class="invoice-desc">{{$order->fulfillment_method}}</p>
                             </div>
                             <div class="col-xs-2">
                                 <h4 class="invoice-title ">Ship Service Level</h4>
-                                <p class="invoice-desc">{{$order->ShippingSpeedCategory}}</p>
+                                <p class="invoice-desc">{{$order->shipping_speed_category}}</p>
                             </div>
 
                             <div class="col-xs-2">
                                 <h4 class="invoice-title ">Status</h4>
-                                <p class="invoice-desc">{{$order->FulfillmentOrderStatus}}</p>
+                                <p class="invoice-desc">{{$order->fulfillment_order_status}}</p>
                             </div>
 
 
@@ -84,12 +84,12 @@
                                     foreach($order->items as $item){
 									?>
                                     <tr>
-                                        <td class="text-center sbold">{{$item->SellerFulfillmentOrderItemId}}</td>
-                                        <td class="text-center sbold">{{$item->SellerSKU}}</td>
-                                        <td class="text-center sbold">{{$item->Quantity}}</td>
-                                        <td class="text-center sbold">{{$item->OrderItemDisposition}}</td>
-                                        <td class="text-center sbold">{{round($item->PerUnitDeclared,2)}}</td>
-										<td class="text-center sbold">{{$item->PerUnitDeclaredCurrencyCode}}</td>
+                                        <td class="text-center sbold">{{$item->seller_fulfillment_order_item_id}}</td>
+                                        <td class="text-center sbold">{{$item->seller_sku}}</td>
+                                        <td class="text-center sbold">{{$item->quantity}}</td>
+                                        <td class="text-center sbold">{{$item->order_item_disposition}}</td>
+                                        <td class="text-center sbold">{{round($item->per_unit_declared,2)}}</td>
+										<td class="text-center sbold">{{$item->per_unit_declared_currency_code}}</td>
                                     </tr>
                                     <?php } ?>
                                     </tbody>
@@ -113,10 +113,10 @@
                                     <?php
                                     foreach($order->shipments as $item){ ?>
                                     <tr>
-                                        <td class="text-center sbold">{{$item->AmazonShipmentId}}</td>
-                                        <td class="text-center sbold">{{$item->SellerSKU}}</td>
-                                        <td class="text-center sbold">{{$item->Quantity}}</td>
-                                        <td class="text-center sbold">{{$item->PackageNumber}}</td>
+                                        <td class="text-center sbold">{{$item->amazon_shipment_id}}</td>
+                                        <td class="text-center sbold">{{$item->seller_sku}}</td>
+                                        <td class="text-center sbold">{{$item->quantity}}</td>
+                                        <td class="text-center sbold">{{$item->package_number}}</td>
                                     </tr>
                                     <?php } ?>
                                     </tbody>
@@ -141,10 +141,10 @@
                                     <?php
                                     foreach($order->packages as $item){ ?>
                                     <tr>
-                                        <td class="text-center sbold">{{$item->PackageNumber}}</td>
-                                        <td class="text-center sbold">{{$item->CarrierCode}}</td>
-                                        <td class="text-center sbold">{{$item->TrackingNumber}}</td>
-                                        <td class="text-center sbold">{{$item->EstimatedArrivalDateTime}}</td>
+                                        <td class="text-center sbold">{{$item->package_number}}</td>
+                                        <td class="text-center sbold">{{$item->carrier_code}}</td>
+                                        <td class="text-center sbold">{{$item->tracking_number}}</td>
+                                        <td class="text-center sbold">{{$item->estimated_arrival_date_time}}</td>
                                     </tr>
                                     <?php } ?>
                                     </tbody>
