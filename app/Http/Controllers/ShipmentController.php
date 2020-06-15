@@ -1009,6 +1009,9 @@ class ShipmentController extends Controller
             $purchase_requests[$key]['domin_sx'] = @$DOMIN_MARKETPLACEID_SX[$value['marketplace_id']];
             //$purchase_requests[$key]['warehouse'] = $value['sap_warehouse_code'] . '-' . $value['sap_factory_code'];
             $purchase_requests[$key]['image'] = explode(',', $value['images'])[0];
+            $purchase_requests[$key]['sap_shipment_code'] =  !empty($value['sap_shipment_code'])?$value['sap_shipment_code']:'';
+            $purchase_requests[$key]['confirmed_quantity'] =  $value['confirmed_quantity']>0?$value['confirmed_quantity']:'';
+            //
             if (!in_array(@$ulist[$value['sap_seller_id']]['name'], $seller)) {
                 $seller[] = @$ulist[$value['sap_seller_id']]['name'];
             }
@@ -1492,7 +1495,7 @@ class ShipmentController extends Controller
             $allot_progress[$key]['bu'] = @$ulist[$value['sap_seller_id']]['ubu'];
             $allot_progress[$key]['bg'] = @$ulist[$value['sap_seller_id']]['ubg'];
 
-            $allot_progress[$key]['shippment_id'] = $value['shippment_id'] > 0 ? $value['shippment_id'] : '';
+            $allot_progress[$key]['shippment_id'] = $value['shippment_id']  ? $value['shippment_id'] : '';
             $allot_progress[$key]['receipts_num'] = !empty($value['receipts_num']) ? $value['receipts_num'] : '';
             $allot_progress[$key]['shipping_method'] = !empty($value['shipping_method']) ? $value['shipping_method'] : '';
             $allot_progress[$key]['rms_sku'] = !empty($value['rms_sku']) ? $value['rms_sku'] : '';
@@ -2366,32 +2369,32 @@ class ShipmentController extends Controller
     public function addShippments(Request $request)
     {
         $shippment_request_id = $receipts_num = $shippmentID = '';
-        $dataArr = $newData = $newData2 = $newData3 = [];
-        $data = $request['data'];
+        $dataArr = $newData = $newData2 = $newData3 =$receipts_num_list= $shippmentIDList=[];
+        $dataArr = $request['data'];
+
         //todo 测试数据 删除
+
 //        $data = [
 //            [
 //                'shippmentID' => 'shippment_id3',
-//                'receipts_num' => ['aaa', 'bbb', 'ccc', 'ddd', 'eee'],
-//                'shippment_request_id' => 150
+//                'receipts_num' => ['ttt', '333', 'cctttc4', 'ddd', 'eee'],
+//                'shippment_request_id' => 15
 //            ],
 //            [
 //                'shippmentID' => 'shippment_id32',
-//                'receipts_num' => ['aaa', 'bbb', 'ccc', 'ddd', 'eee'],
-//                'shippment_request_id' => 150
+//                'receipts_num' => ['444', '888', 'ccc5', 'ddd', 'eee'],
+//                'shippment_request_id' => 15
 //            ],
 //            [
 //                'shippmentID' => 'shippment_id33',
-//                'shippment_request_id' => 150
+//                'shippment_request_id' => 15
 //            ]
 //        ];
-//        $data = json_encode($data);
+//        $dataArr = json_encode($data);
+        //  $dataArr = (json_decode($dataArr, true));
         //todo 测试数据 删除 end
 
-        if (!empty($data)) {
-            $dataArr = (json_decode($data, true));
-            //var_dump($dataArr);
-            if (!empty($dataArr)) {
+        if (!empty($dataArr)) {
                 $shippment_request_id = $dataArr[0]['shippment_request_id'];
                 if ($shippment_request_id > 0) {
                     //删除旧数据
@@ -2399,8 +2402,10 @@ class ShipmentController extends Controller
                     $res = DB::connection('vlz')->delete($sql);
                 }
                 foreach ($dataArr as $k => $v) {
+                    $shippmentIDList[]=$v['shippmentID'];
                     if (!empty($v['receipts_num'])) {
                         foreach ($v['receipts_num'] as $vk => $vv) {
+                            $receipts_num_list[]=$vv;
                             $newData[] = [
                                 'shippment_request_id' => $shippment_request_id,
                                 'shippmentID' => $v['shippmentID'],
@@ -2415,11 +2420,15 @@ class ShipmentController extends Controller
                             'created_at' => date('Y-m-d H:i:s', time())];
                     }
                 }
-            }
             $newData3 = array_merge($newData, $newData2);
             if (!empty($newData3)) {
                 $result = DB::connection('vlz')->table('shippment')->insert($newData3);
                 if ($result > 0) {
+                    //$dataallot=['shippment_id'=>implode($shippmentIDList,','),'receipts_num'=>implode(@$receipts_num_list,',')];
+                    $dataallot=['shippment_id'=>$shippmentIDList[0],'receipts_num'=>@$receipts_num_list[0]];
+                    $result = DB::connection('vlz')->table('allot_progress')
+                        ->where('shipment_requests_id', $shippment_request_id)
+                        ->update($dataallot);
                     return ['status' => 1, 'msg' => '新增成功'];
                 } else {
                     return ['status' => 0, 'msg' => '新增失败'];
