@@ -1009,8 +1009,9 @@ class ShipmentController extends Controller
             $purchase_requests[$key]['domin_sx'] = @$DOMIN_MARKETPLACEID_SX[$value['marketplace_id']];
             //$purchase_requests[$key]['warehouse'] = $value['sap_warehouse_code'] . '-' . $value['sap_factory_code'];
             $purchase_requests[$key]['image'] = explode(',', $value['images'])[0];
-            $purchase_requests[$key]['sap_shipment_code'] =  !empty($value['sap_shipment_code'])?$value['sap_shipment_code']:'';
-            $purchase_requests[$key]['confirmed_quantity'] =  $value['confirmed_quantity']>0?$value['confirmed_quantity']:'';
+            $purchase_requests[$key]['sap_shipment_code'] = !empty($value['sap_shipment_code']) ? $value['sap_shipment_code'] : '';
+            $purchase_requests[$key]['confirmed_quantity'] = $value['confirmed_quantity'] > 0 ? $value['confirmed_quantity'] : '';
+            $purchase_requests[$key]['profit_margin'] = $value['profit_margin'] > 0 ? ($value['profit_margin'] * 100) . '%' : '';
             //
             if (!in_array(@$ulist[$value['sap_seller_id']]['name'], $seller)) {
                 $seller[] = @$ulist[$value['sap_seller_id']]['name'];
@@ -1302,9 +1303,9 @@ class ShipmentController extends Controller
                     'quantity' => $request['quantity'],
                     'request_date' => $request['request_date'],
                     'remark' => @$request['remark'],
-                    'received_factory' => @$request['received_factory'],
+                    'received_factory' => @$request['received_factory'] ? $request['received_factory'] : $request['sap_factory_code'],
                     'sap_shipment_code' => @$request['sap_shipment_code'],
-                    'confirmed_quantity' => @$request['confirmed_quantity'],
+                    'confirmed_quantity' => @$request['confirmed_quantity'] ? $request['confirmed_quantity'] : $request['quantity'],
                     'estimated_delivery_date' => @$request['estimated_delivery_date'] ? @$request['estimated_delivery_date'] : @$request['request_date'],
                     'marketplace_id' => @$request['marketplace_id'],
                     'overseas_stock' => $overseas_stock,
@@ -1402,7 +1403,7 @@ class ShipmentController extends Controller
         $sap_factory_code = $request['sap_factory_code'] ? $request['sap_factory_code'] : '';
         $shipment_requests_id = $request['shipment_id'] ? $request['shipment_id'] : 0;
         $sr_id_list = $request['shipment_id_list'] ? $request['shipment_id_list'] : '';
-        $statusList = ['资料提供中', '换标中', '待出库', '已发货', '取消发货'];
+        $statusList = ['资料提供中', '换标中', '待出库', '已发货', '取消发货', '签收中', '签收完毕'];
         $downLoad = $request['downLoad'] ? $request['downLoad'] : 0;//是否下载
         $sql = "SELECT
                 a.id,
@@ -1495,7 +1496,7 @@ class ShipmentController extends Controller
             $allot_progress[$key]['bu'] = @$ulist[$value['sap_seller_id']]['ubu'];
             $allot_progress[$key]['bg'] = @$ulist[$value['sap_seller_id']]['ubg'];
 
-            $allot_progress[$key]['shippment_id'] = $value['shippment_id']  ? $value['shippment_id'] : '';
+            $allot_progress[$key]['shippment_id'] = $value['shippment_id'] ? $value['shippment_id'] : '';
             $allot_progress[$key]['receipts_num'] = !empty($value['receipts_num']) ? $value['receipts_num'] : '';
             $allot_progress[$key]['shipping_method'] = !empty($value['shipping_method']) ? $value['shipping_method'] : '';
             $allot_progress[$key]['rms_sku'] = !empty($value['rms_sku']) ? $value['rms_sku'] : '';
@@ -1596,7 +1597,7 @@ class ShipmentController extends Controller
         //Auth::user()->id //todo
         $file = $request->file('files');
         $sr_id_list = [];
-        $r_message = $msg = '';
+        $r_message = $msg = $status = '';
         if ($file) {
             try {
                 $file_name = $file->getClientOriginalName();
@@ -1639,23 +1640,37 @@ class ShipmentController extends Controller
                 $col_num = $sheet->getHighestColumn();
 
                 $data = []; //数组形式获取表格数据
+
+                $statusList = ['资料提供中', '换标中', '待出库', '已发货', '取消发货', '签收中', '签收完毕'];
                 for ($i = 2; $i <= $row_num; $i++) {
-                    $data[$i]['shipment_requests_id'] = $sheet->getCell("A" . $i)->getValue();
-                    // $data[$i]['status']  = $sheet->getCell("B".$i)->getValue();
-                    // $data[$i]['name']  = $sheet->getCell("C".$i)->getValue();
-                    //  $data[$i]['batch_num']  = $sheet->getCell("D".$i)->getValue();
-                    //  $data[$i]['out_warehouse']  = $sheet->getCell("E".$i)->getValue();
-                    //  $data[$i]['label']  = $sheet->getCell("F".$i)->getValue();
-                    //  $data[$i]['sku']  = $sheet->getCell("G".$i)->getValue();
-                    //  $data[$i]['quantity']  = $sheet->getCell("H".$i)->getValue();
-                    //  $data[$i]['rms_sku']  = $sheet->getCell("I".$i)->getValue();
-                    $data[$i]['receipts_num'] = $sheet->getCell("M" . $i)->getValue();
-                    $data[$i]['shippment_id'] = $sheet->getCell("L" . $i)->getValue();
-                    $data[$i]['shipment_requests_id'] = $sheet->getCell("A" . $i)->getValue();
-                    $data[$i]['updated_at'] = date('Y-m-d H:i:s', time());
                     $sr_id = $sheet->getCell("A" . $i)->getValue();
-                    if (!in_array($sr_id, $sr_id_list)) {
-                        $sr_id_list[] = $sr_id;
+                    if ($sr_id > 0) {
+                        $data[$i]['shipment_requests_id'] = $sheet->getCell("A" . $i)->getValue();
+                        if (!empty($sheet->getCell("C" . $i)->getValue())) {
+                            $status = array_search($sheet->getCell("C" . $i)->getValue(), $statusList);
+                        }
+                        if (!empty($sheet->getCell("B" . $i)->getValue())) {
+                            $t1 = intval(($sheet->getCell("B" . $i)->getValue() - 25569) * 3600 * 24); //转换成1970年以来的秒数
+                            $createtime = gmdate('Y-m-d H:i:s', $t1);//格式化时间
+                            $data[$i]['created_at'] = $createtime;
+                        }
+                        $data[$i]['status'] = $status;
+                        // $data[$i]['name']  = $sheet->getCell("C".$i)->getValue();
+                        //  $data[$i]['batch_num']  = $sheet->getCell("D".$i)->getValue();
+                        //  $data[$i]['out_warehouse']  = $sheet->getCell("E".$i)->getValue();
+                        //  $data[$i]['label']  = $sheet->getCell("F".$i)->getValue();
+                        //  $data[$i]['sku']  = $sheet->getCell("G".$i)->getValue();
+                        //  $data[$i]['quantity']  = $sheet->getCell("H".$i)->getValue();
+                        //  $data[$i]['rms_sku']  = $sheet->getCell("I".$i)->getValue();
+                        $data[$i]['receipts_num'] = $sheet->getCell("D" . $i)->getValue();
+                        $data[$i]['shippment_id'] = $sheet->getCell("E" . $i)->getValue();
+                        $data[$i]['shipment_requests_id'] = $sheet->getCell("A" . $i)->getValue();
+                        $data[$i]['updated_at'] = date('Y-m-d H:i:s', time());
+
+
+                        if (!in_array($sr_id, $sr_id_list)) {
+                            $sr_id_list[] = $sr_id;
+                        }
                     }
                 }
                 if (!empty($data) && !empty($sr_id_list)) {
@@ -2369,63 +2384,40 @@ class ShipmentController extends Controller
     public function addShippments(Request $request)
     {
         $shippment_request_id = $receipts_num = $shippmentID = '';
-        $dataArr = $newData = $newData2 = $newData3 =$receipts_num_list= $shippmentIDList=[];
+        $dataArr = $newData = $newData2 = $newData3 = $receipts_num_list = $shippmentIDList = [];
         $dataArr = $request['data'];
-
-        //todo 测试数据 删除
-
-//        $data = [
-//            [
-//                'shippmentID' => 'shippment_id3',
-//                'receipts_num' => ['ttt', '333', 'cctttc4', 'ddd', 'eee'],
-//                'shippment_request_id' => 15
-//            ],
-//            [
-//                'shippmentID' => 'shippment_id32',
-//                'receipts_num' => ['444', '888', 'ccc5', 'ddd', 'eee'],
-//                'shippment_request_id' => 15
-//            ],
-//            [
-//                'shippmentID' => 'shippment_id33',
-//                'shippment_request_id' => 15
-//            ]
-//        ];
-//        $dataArr = json_encode($data);
-        //  $dataArr = (json_decode($dataArr, true));
-        //todo 测试数据 删除 end
-
         if (!empty($dataArr)) {
-                $shippment_request_id = $dataArr[0]['shippment_request_id'];
-                if ($shippment_request_id > 0) {
-                    //删除旧数据
-                    $sql = "DELETE  FROM shippment WHERE shippment_request_id ='" . $shippment_request_id . "'";
-                    $res = DB::connection('vlz')->delete($sql);
-                }
-                foreach ($dataArr as $k => $v) {
-                    $shippmentIDList[]=$v['shippmentID'];
-                    if (!empty($v['receipts_num'])) {
-                        foreach ($v['receipts_num'] as $vk => $vv) {
-                            $receipts_num_list[]=$vv;
-                            $newData[] = [
-                                'shippment_request_id' => $shippment_request_id,
-                                'shippmentID' => $v['shippmentID'],
-                                'receipts_num' => $vv,
-                                'created_at' => date('Y-m-d H:i:s', time())];
-                        }
-                    } else {
-                        $newData2[] = [
+            $shippment_request_id = $dataArr[0]['shippment_request_id'];
+            if ($shippment_request_id > 0) {
+                //删除旧数据
+                $sql = "DELETE  FROM shippment WHERE shippment_request_id ='" . $shippment_request_id . "'";
+                $res = DB::connection('vlz')->delete($sql);
+            }
+            foreach ($dataArr as $k => $v) {
+                $shippmentIDList[] = $v['shippmentID'];
+                if (!empty($v['receipts_num'])) {
+                    foreach ($v['receipts_num'] as $vk => $vv) {
+                        $receipts_num_list[] = $vv;
+                        $newData[] = [
                             'shippment_request_id' => $shippment_request_id,
                             'shippmentID' => $v['shippmentID'],
-                            'receipts_num' => '',
+                            'receipts_num' => $vv,
                             'created_at' => date('Y-m-d H:i:s', time())];
                     }
+                } else {
+                    $newData2[] = [
+                        'shippment_request_id' => $shippment_request_id,
+                        'shippmentID' => $v['shippmentID'],
+                        'receipts_num' => '',
+                        'created_at' => date('Y-m-d H:i:s', time())];
                 }
+            }
             $newData3 = array_merge($newData, $newData2);
             if (!empty($newData3)) {
                 $result = DB::connection('vlz')->table('shippment')->insert($newData3);
                 if ($result > 0) {
                     //$dataallot=['shippment_id'=>implode($shippmentIDList,','),'receipts_num'=>implode(@$receipts_num_list,',')];
-                    $dataallot=['shippment_id'=>$shippmentIDList[0],'receipts_num'=>@$receipts_num_list[0]];
+                    $dataallot = ['shippment_id' => $shippmentIDList[0], 'receipts_num' => @$receipts_num_list[0]];
                     $result = DB::connection('vlz')->table('allot_progress')
                         ->where('shipment_requests_id', $shippment_request_id)
                         ->update($dataallot);
