@@ -419,7 +419,7 @@ class ReviewController extends Controller
         }
 		
 		$customers = DB::table('review')
-			->select('review.*','asin.status as asin_status','asin.item_no as item_no','customers.email as email','review_customers.email as email_add','star.average_score as average_score','star.total_star_number as total_star_number')
+			->select('review.*','asin.status as asin_status','asin.item_no as item_no','customers.email as email','review_customers.email as email_add','star.average_score as average_score','star.total_star_number as total_star_number', 'fbm_stock.item_name as item_name')
 			->leftJoin(DB::raw('(select max(status) as status,asin,site,max(bg) as bg,max(bu) as bu,max(item_no) as item_no from asin group by asin,site) as asin'),function($q){
 				$q->on('review.asin', '=', 'asin.asin')
 					->on('review.site', '=', 'asin.site');
@@ -432,6 +432,8 @@ class ReviewController extends Controller
 			})->leftJoin('review_customers',function($q){
 				$q->on('review.review', '=', 'review_customers.review')
 					->on('review.site', '=', 'review_customers.site');
+            })->leftJoin('fbm_stock',function($q){
+                $q->on('asin.item_no', '=', 'fbm_stock.item_code');
 			});
 		
 		if(!Auth::user()->can(['review-show-all'])){
@@ -523,30 +525,38 @@ class ReviewController extends Controller
 
 
 
-		$orderby = 'negative_value';
+		$orderby = 'date';
         $sort = 'desc';
         if(isset($_REQUEST['order'][0])){
-			 if($_REQUEST['order'][0]['column']==1) $orderby = 'negative_value';
-            if($_REQUEST['order'][0]['column']==2) $orderby = 'asin';
-			if($_REQUEST['order'][0]['column']==3) $orderby = 'date';
-            if($_REQUEST['order'][0]['column']==4) $orderby = 'rating';
-			if($_REQUEST['order'][0]['column']==5) $orderby = 'average_score';
-			if($_REQUEST['order'][0]['column']==6) $orderby = 'total_star_number';
-            if($_REQUEST['order'][0]['column']==7) $orderby = 'reviewer_name';
-			if($_REQUEST['order'][0]['column']==8) $orderby = 'vp';
-            if($_REQUEST['order'][0]['column']==9) $orderby = 'status';
-            if($_REQUEST['order'][0]['column']==10) $orderby = 'buyer_email';
-			if($_REQUEST['order'][0]['column']==11) $orderby = 'customer_feedback';
-            if($_REQUEST['order'][0]['column']==12) $orderby = 'nextdate';
-			if($_REQUEST['order'][0]['column']==15) $orderby = 'user_id';
+            if($_REQUEST['order'][0]['column']==1) $orderby = 'date';
+            if($_REQUEST['order'][0]['column']==2) $orderby = 'site';
+			if($_REQUEST['order'][0]['column']==3) $orderby = 'asin';
+            if($_REQUEST['order'][0]['column']==4) $orderby = 'item_name';
+			if($_REQUEST['order'][0]['column']==5) $orderby = 'rating';
+			if($_REQUEST['order'][0]['column']==6) $orderby = 'review_content';
+            if($_REQUEST['order'][0]['column']==7) $orderby = 'review_content_cn';
+			if($_REQUEST['order'][0]['column']==8) $orderby = 'status';
+            if($_REQUEST['order'][0]['column']==9) $orderby = 'etype';
+            if($_REQUEST['order'][0]['column']==10) $orderby = 'remark';
+
+//            if($_REQUEST['order'][0]['column']==1) $orderby = 'negative_value';
+//            if($_REQUEST['order'][0]['column']==2) $orderby = 'asin';
+//			if($_REQUEST['order'][0]['column']==3) $orderby = 'date';
+//            if($_REQUEST['order'][0]['column']==4) $orderby = 'rating';
+//			if($_REQUEST['order'][0]['column']==5) $orderby = 'average_score';
+//			if($_REQUEST['order'][0]['column']==6) $orderby = 'total_star_number';
+//            if($_REQUEST['order'][0]['column']==7) $orderby = 'reviewer_name';
+//			if($_REQUEST['order'][0]['column']==8) $orderby = 'vp';
+//            if($_REQUEST['order'][0]['column']==9) $orderby = 'status';
+//            if($_REQUEST['order'][0]['column']==10) $orderby = 'buyer_email';
+//			if($_REQUEST['order'][0]['column']==11) $orderby = 'customer_feedback';
+//            if($_REQUEST['order'][0]['column']==12) $orderby = 'nextdate';
+//			if($_REQUEST['order'][0]['column']==15) $orderby = 'user_id';
 
             $sort = $_REQUEST['order'][0]['dir'];
 			
 			
         }
-		
-		
-		
 		
         $reviews =  $customers->orderBy($orderby,$sort)->get()->toArray();
 		$ordersList =json_decode(json_encode($reviews), true);
@@ -585,26 +595,46 @@ class ReviewController extends Controller
 					if($ordersList[$i]['updated_date']) $date_chstr = '<span class="badge badge-success">'.$ordersList[$i]['updated_date'].'</span>';
 				}	
 			}
+            //有些记录的site字段为空
+            $site = '';
+            if($ordersList[$i]['site']){
+                $site = array_get(array_flip($this->getSitePairs()), $ordersList[$i]['site'],'US');
+            }
+            $viewItem = '<li><a href="https://'.$ordersList[$i]['site'].'/gp/customer-reviews/'.$ordersList[$i]['review'].'" target="_blank"> View </a></li>';
+            $resolveItem = '<li><a href="/review/'.$ordersList[$i]['id'].'/edit" target="_blank"><i class="fa fa-search"></i> Resolve </a></li>';
+
 			$fol_arr= unserialize($ordersList[$i]['follow_content'])?unserialize($ordersList[$i]['follow_content']):array();
 			$records["data"][] = array(
 				 '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input name="id[]" type="checkbox" class="checkboxes" value="'.$ordersList[$i]['id'].'"/><span></span></label>',
-				$ordersList[$i]['negative_value'],
-				'<a href="https://'.$ordersList[$i]['site'].'/dp/'.$ordersList[$i]['asin'].'" target="_blank">'.$ordersList[$i]['asin'].'</a> <span class="label label-sm label-default">'.strtoupper(substr(strrchr($ordersList[$i]['site'], '.'), 1)).'</span>',
-				$ordersList[$i]['date'].' '.$date_chstr,
-				$ordersList[$i]['rating'].' '.$rating_chstr,
-				$ordersList[$i]['average_score'],
-				$ordersList[$i]['total_star_number'],
-				$ordersList[$i]['reviewer_name'],
-				($ordersList[$i]['vp'])?'<span class="badge badge-danger">VP</span>':'',
-				array_get($follow_status_array,$ordersList[$i]['status'],'').' '.(($ordersList[$i]['is_delete'])?'<span class="badge badge-danger">Del</span>':''),
-				(($ordersList[$i]['email'])?'<span class="badge badge-danger">C</span>':' ').(($ordersList[$i]['email_add'])?'<span class="badge badge-danger">R</span>':' ').$ordersList[$i]['buyer_email'],
-				array_get(getCustomerFb(),$ordersList[$i]['customer_feedback']),
-				$ordersList[$i]['nextdate'],
-				$ordersList[$i]['item_no'],
-				strip_tags(array_get($fol_arr,$ordersList[$i]['status'].'.do_content')),
-				array_get($users_array,intval(array_get($ordersList[$i],'user_id')),''),
-				$ordersList[$i]['last_updated_date'],
-				(($ordersList[$i]['warn']>0)?'<i class="fa fa-warning" title="Contains dangerous words"></i>&nbsp;&nbsp;&nbsp;':'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;').'<a href="https://'.$ordersList[$i]['site'].'/gp/customer-reviews/'.$ordersList[$i]['review'].'" target="_blank" class="btn btn-success btn-xs"> View </a>'.'<a href="/review/'.$ordersList[$i]['id'].'/edit" target="_blank" class="btn btn-danger btn-xs"><i class="fa fa-search"></i> Resolve </a>'
+                $ordersList[$i]['date'].' '.$date_chstr,
+                $site,
+                '<a href="https://'.$ordersList[$i]['site'].'/dp/'.$ordersList[$i]['asin'].'" target="_blank">'.$ordersList[$i]['asin'].'</a><br>'.$ordersList[$i]['item_no'],
+                $ordersList[$i]['item_name'],
+                $ordersList[$i]['rating'].' '.$rating_chstr,
+                '<span title="'.strip_tags($ordersList[$i]['review_content']).'">'.$ordersList[$i]['review_content'].'</span>',
+                strip_tags($ordersList[$i]['review_content_cn']),
+                strip_tags(array_get($fol_arr,$ordersList[$i]['status'].'.do_content')),
+                $ordersList[$i]['etype'],
+                $ordersList[$i]['remark'],
+                (($ordersList[$i]['warn']>0)?'<i class="fa fa-warning" title="Contains dangerous words"></i>&nbsp;&nbsp;&nbsp;':'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;').'<ul class="nav navbar-nav"><li><a href="#" class="dropdown-toggle" style="height:10px; vertical-align:middle; padding-top:0px;" data-toggle="dropdown" role="button">...</a><ul class="dropdown-menu" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(-50px, 20px, 0px); min-width: 88px;" role="menu" style="color: #62c0cc8a">' . $viewItem . $resolveItem . '</ul></li></ul>'
+
+//				$ordersList[$i]['negative_value'],
+//				'<a href="https://'.$ordersList[$i]['site'].'/dp/'.$ordersList[$i]['asin'].'" target="_blank">'.$ordersList[$i]['asin'].'</a> <span class="label label-sm label-default">'.strtoupper(substr(strrchr($ordersList[$i]['site'], '.'), 1)).'</span>',
+//				$ordersList[$i]['date'].' '.$date_chstr,
+//				$ordersList[$i]['rating'].' '.$rating_chstr,
+//				$ordersList[$i]['average_score'],
+//				$ordersList[$i]['total_star_number'],
+//				$ordersList[$i]['reviewer_name'],
+//				($ordersList[$i]['vp'])?'<span class="badge badge-danger">VP</span>':'',
+//				array_get($follow_status_array,$ordersList[$i]['status'],'').' '.(($ordersList[$i]['is_delete'])?'<span class="badge badge-danger">Del</span>':''),
+//				(($ordersList[$i]['email'])?'<span class="badge badge-danger">C</span>':' ').(($ordersList[$i]['email_add'])?'<span class="badge badge-danger">R</span>':' ').$ordersList[$i]['buyer_email'],
+//				array_get(getCustomerFb(),$ordersList[$i]['customer_feedback']),
+//				$ordersList[$i]['nextdate'],
+//				$ordersList[$i]['item_no'],
+//				strip_tags(array_get($fol_arr,$ordersList[$i]['status'].'.do_content')),
+//				array_get($users_array,intval(array_get($ordersList[$i],'user_id')),''),
+//				$ordersList[$i]['last_updated_date'],
+//				(($ordersList[$i]['warn']>0)?'<i class="fa fa-warning" title="Contains dangerous words"></i>&nbsp;&nbsp;&nbsp;':'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;').'<a href="https://'.$ordersList[$i]['site'].'/gp/customer-reviews/'.$ordersList[$i]['review'].'" target="_blank" class="btn btn-success btn-xs"> View </a>'.'<a href="/review/'.$ordersList[$i]['id'].'/edit" target="_blank" class="btn btn-danger btn-xs"><i class="fa fa-search"></i> Resolve </a>'
 			);
         }
 
@@ -655,10 +685,12 @@ class ReviewController extends Controller
 		$return['users'] = $this->getUsers();
 		$return['steps'] = DB::table('review_step')->get();
 		$return['review'] = $review;
+		$return['remark'] = array_get($review,'remark');
 		$return['sellerids'] = $this->getSellerIds();
 		$return['accounts'] = $this->getAccounts();
 		$return['emails'] = DB::table('sendbox')->where('to_address', array_get($review,'buyer_email'))->orderBy('date','desc')->get();
 		$return['emails'] =json_decode(json_encode($return['emails']), true);
+
 		if($order) $return['order'] = $order;
         return view('review/edit',$return);
 
@@ -681,6 +713,7 @@ class ReviewController extends Controller
 		$seller_account->buyer_email = $request->get('buyer_email');
 		$seller_account->buyer_phone = $request->get('buyer_phone');
 		$seller_account->etype = $request->get('etype');
+        $seller_account->remark = $request->get('remark');
 		$seller_account->edate = date('Y-m-d');
 		$seller_account->nextdate = $request->get('nextdate');
 		$seller_account->commented = $request->get('commented');
@@ -780,6 +813,19 @@ class ReviewController extends Controller
             $accounts_array[$account['account_sellerid']] = $account['account_name'];
         }
         return $accounts_array;
+    }
+
+    public function getSitePairs(){
+	    return array(
+            'CA' => 'www.amazon.ca',
+            'JP' => 'www.amazon.co.jp',
+            'UK' => 'www.amazon.co.uk',
+            'US' => 'www.amazon.com',
+            'DE' => 'www.amazon.de',
+            'ES' => 'www.amazon.es',
+            'FR' => 'www.amazon.fr',
+            'IT' => 'www.amazon.it'
+        );
     }
 
 }
