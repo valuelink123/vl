@@ -1646,7 +1646,7 @@ class ShipmentController extends Controller
                 for ($i = 2; $i <= $row_num; $i++) {
                     $sr_id = $sheet->getCell("A" . $i)->getValue();
                     if ($sr_id > 0) {
-                        $data[$i]['shipment_requests_id'] = $sheet->getCell("A" . $i)->getValue();
+                        $data[$i]['shipment_requests_id'] = $sr_id;
                         if (!empty($sheet->getCell("C" . $i)->getValue())) {
                             $status = array_search($sheet->getCell("C" . $i)->getValue(), $statusList);
                         }
@@ -1662,7 +1662,6 @@ class ShipmentController extends Controller
                         //  $data[$i]['label']  = $sheet->getCell("F".$i)->getValue();
                         //  $data[$i]['sku']  = $sheet->getCell("G".$i)->getValue();
                         //  $data[$i]['quantity']  = $sheet->getCell("H".$i)->getValue();
-                        //  $data[$i]['rms_sku']  = $sheet->getCell("I".$i)->getValue();
                         $data[$i]['receipts_num'] = $sheet->getCell("D" . $i)->getValue();
                         $data[$i]['shippment_id'] = $sheet->getCell("E" . $i)->getValue();
                         $data[$i]['shipment_requests_id'] = $sheet->getCell("A" . $i)->getValue();
