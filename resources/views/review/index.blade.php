@@ -1,7 +1,3 @@
-
-
-
-
 @extends('layouts.layout')
 @section('label', 'Review List')
 @section('content')
@@ -18,6 +14,16 @@ table.dataTable tbody th, table.dataTable tbody td {
 th,td,td>span {
     font-size:12px !important;
 	font-family:Arial, Helvetica, sans-serif;}
+td{
+    height:100px;
+}
+
+.text{
+    display: -webkit-box;
+    -webkit-line-clamp: 5;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
 
 </style>
     <h1 class="page-title font-red-intense"> Review List
@@ -272,7 +278,7 @@ th,td,td>span {
                                 <th style="width: 90px;">Question Type</th>
                                 <th style="width: 60px;">Comment</th>
                                 <th style="width: 60px;">Operation</th>
-
+                                <th style="width: 60px;">ID</th>
 
 								{{--<th style="max-width: 30px;">Imp.</th>--}}
 								{{--<th style="max-width:70px;">Asin</th>--}}
@@ -309,6 +315,8 @@ th,td,td>span {
 
 
     <script>
+        var newReviewContent = '';
+
         var TableDatatablesAjax = function () {
 
         var initPickers = function () {
@@ -368,10 +376,68 @@ th,td,td>span {
                     "pageLength": 10, // default record count per page
 
 
-//					"aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0,13,14,16,17] }],
+					"aoColumnDefs": [
+                        { "bSortable": false, "aTargets": [11]},
+                        { "bVisible": false, "aTargets": [12] },
+                        {
+                            "targets": [7],
+                            render: function (data, type, row) {
+                                return '<div><span>'+data+'</span><img src="../assets/global/img/editor.png" alt="" style="float:right" class="country_img"></div>';
+                            },
+
+                            createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
+                                $(cell).click(function (e) {
+                                    var tdTxt = $(this).context.innerHTML;
+                                    var divTxt = $(tdTxt).html();
+                                    var text = $(divTxt).html();
+                                    $(this).html('<textarea rows="6" type="text" style="width: 100%"></textarea>');
+                                    var aInput = $(this).find(":input");
+                                    var textCellData = cellData.replace(/<\/?.+?>/g,"");
+                                    if(text == cellData){
+                                        aInput.focus().val(textCellData);
+                                    }else{
+                                        aInput.focus().val(text);
+                                    }
+                                });
+                                $(cell).on("blur", ":input", function (e) {
+                                    var text = $(this).val();
+                                    var textCellData = cellData.replace(/<\/?.+?>/g,"");
+                                    if($(this).val() != textCellData){
+                                        $(this).val(text);
+                                        //tableObj.cell(cell).data(text);
+                                        var reviewId = rowData[12];
+                                        $.ajax({
+                                            type:"post",
+                                            url:'/reviewUpdateContentCN',
+                                            data:{
+                                                id: reviewId,
+                                                newContent: text
+                                            },
+                                            error:function(err){
+                                                console.log(err);
+                                            },
+                                            success:function(res){
+                                                //tableObj.ajax.reload()
+                                                newReviewContent = '<div class="text"><span title="' + text + '">' + text + '</div>';
+
+                                                $(cell).html(newReviewContent);
+
+                                            }
+                                        });
+                                    }else{
+                                        $(cell).html(text);
+                                        //tableObj.cell(cell).data(text);
+                                    }
+                                })
+                            }
+                        },
+
+                     ],
+
 					 "order": [
-                        [1, "desc"]
-                    ],
+                         [1, "desc"],
+
+                     ],
                     // scroller extension: http://datatables.net/extensions/scroller/
 
 //					fixedColumns:   {
@@ -383,10 +449,12 @@ th,td,td>span {
                     },
 
                     "createdRow": function( row, data, dataIndex ) {
-                        $(row).children('td').eq(8).attr('style', 'max-width: 52px;overflow:hidden;white-space:nowrap;text-align: left; ');
+                        $(row).children('td').eq(6).attr('style', 'max-width: 650px;overflow:hidden;text-align: left;');
+                        $(row).children('td').eq(7).attr('style', 'max-width: 650px;overflow:hidden;text-align: left;');
+                        $(row).children('td').eq(8).attr('style', 'max-width: 52px;overflow:hidden;white-space:nowrap;text-align: left;');
 
 //						$(row).children('td').eq(0).attr('style', 'wdith: 30px;');
-//                        $(row).children('td').eq(10).attr('style', 'max-width: 80px;overflow:hidden;white-space:nowrap;text-align: left; ');
+//                      $(row).children('td').eq(10).attr('style', 'max-width: 80px;overflow:hidden;white-space:nowrap;text-align: left; ');
 //						$(row).children('td').eq(10).attr('title', $(row).children('td').eq(10).text());
 //						$(row).children('td').eq(14).attr('style', 'max-width: 80px;overflow:hidden;white-space:nowrap;text-align: left; ');
 //						$(row).children('td').eq(14).attr('title', $(row).children('td').eq(14).text());
