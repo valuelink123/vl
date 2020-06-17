@@ -649,12 +649,12 @@ class HijackController extends Controller
         $idList = isset($request['idList']) ? $request['idList'] : '';
         //是否打开跟卖
         $isOpen = @$request['isOpen'] >= 2 ? $request['isOpen'] : 1;
-        $bg =isset($request['bg'])?$request['bg']:'';
-        $bu =isset($request['bu'])?$request['bu']:'';
-        $sku_status =isset($request['sku_status'])?$request['sku_status']:'';
-        $domain =isset($request['domain'])?$request['domain']:'';
-        $userName =isset($request['userName'])?$request['userName']:'';
-        $condition =isset($request['condition'])?$request['condition']:'';//查询条件
+        $bg = isset($request['bg']) ? $request['bg'] : '';
+        $bu = isset($request['bu']) ? $request['bu'] : '';
+        $sku_status = isset($request['sku_status']) ? $request['sku_status'] : '';
+        $domain = isset($request['domain']) ? $request['domain'] : '';
+        $userName = isset($request['userName']) ? $request['userName'] : '';
+        $condition = isset($request['condition']) ? $request['condition'] : '';//查询条件
         //传入下载的 asinID
         if (!empty($request['startTime'] && !empty($request['endTime']))) {
             //查询跟卖数据 根据开始时间 结束时间默认增加1天
@@ -778,7 +778,7 @@ class HijackController extends Controller
                 if ($isOpen == 1) {
                     $sql_s .= ' AND reselling_switch=1 ';
                 } else if ($isOpen == 3) {
-                    $sql_s .=  ' AND reselling_switch=0 ';
+                    $sql_s .= ' AND reselling_switch=0 ';
                 }
 
                 $sql_g = ' GROUP BY asin ORDER BY reselling_switch DESC ';
@@ -803,7 +803,7 @@ class HijackController extends Controller
                     $idList = array_unique($productIdList);
                 }
                 //  SAP 中间对应关系数据
-                if(!empty($condition)){
+                if (!empty($condition)) {
                     $sap_asin_match_sku = DB::connection('vlz')->table('sap_asin_match_sku')
                         ->select('marketplace_id', 'sap_seller_id', 'asin', 'sap_seller_bg', 'sap_seller_bu', 'id', 'status', 'updated_at', 'sku_status', 'sku')
                         ->whereIn('sap_seller_id', $sapSellerIdList)
@@ -813,7 +813,7 @@ class HijackController extends Controller
                         ->get()->map(function ($value) {
                             return (array)$value;
                         })->toArray();
-                }else{
+                } else {
                     $sap_asin_match_sku = DB::connection('vlz')->table('sap_asin_match_sku')
                         ->select('marketplace_id', 'sap_seller_id', 'asin', 'sap_seller_bg', 'sap_seller_bu', 'id', 'status', 'updated_at', 'sku_status', 'sku')
                         ->whereIn('sap_seller_id', $sapSellerIdList)
@@ -948,9 +948,9 @@ class HijackController extends Controller
 
                 if (!empty($taskDetail)) {
                     foreach ($taskDetail as $key => $dv) {
-                        if((!empty($bg)&&$bg!=$dv['bg'])||(!empty($bu)&&$bu!=$dv['bu'])||(!empty($userName)&&$userName!=$dv['userName'])||(!empty($sku_status)&&$sku_status!=$dv['sku_status'])||(!empty($domain)&&$domain!=$dv['marketplaceid'])){
+                        if ((!empty($bg) && $bg != $dv['bg']) || (!empty($bu) && $bu != $dv['bu']) || (!empty($userName) && $userName != $dv['userName']) || (!empty($sku_status) && $sku_status != $dv['sku_status']) || (!empty($domain) && $domain != $dv['marketplaceid'])) {
 
-                        }else{
+                        } else {
                             if (!empty($dv['asin'])) {
                                 $price = @$dv['price'] > 0 ? $dv['price'] / 100 : 0;
                                 $shipping_fee = @$dv['shipping_fee'] > 0 ? $dv['shipping_fee'] / 100 : 0;
@@ -995,11 +995,11 @@ class HijackController extends Controller
         $idList = isset($request['idList']) ? $request['idList'] : '';
         //是否打开跟卖
         $isOpen = @$request['isOpen'] >= 2 ? $request['isOpen'] : 1;
-        $bg =isset($request['bg'])?$request['bg']:'';
-        $bu =isset($request['bu'])?$request['bu']:'';
-        $sku_status =isset($request['sku_status'])?$request['sku_status']:'';
-        $domain =isset($request['domain'])?$request['domain']:'';
-        $condition =isset($request['condition'])?$request['condition']:'';//查询条件
+        $bg = isset($request['bg']) ? $request['bg'] : '';
+        $bu = isset($request['bu']) ? $request['bu'] : '';
+        $sku_status = isset($request['sku_status']) ? $request['sku_status'] : '';
+        $domain = isset($request['domain']) ? $request['domain'] : '';
+        $condition = isset($request['condition']) ? $request['condition'] : '';//查询条件
         //传入下载的 asinID
         if (!empty($request['startTime'] && !empty($request['endTime']))) {
             $startTime = $request['startTime'];
@@ -1007,10 +1007,10 @@ class HijackController extends Controller
             $opensql = '';//是否查询今天开启跟卖的产品
             $SKU_STATUS_KV = Asin::SKU_STATUS_KV;
             /** 超级权限*/
-            $userasinL = $sapSellerIdList = $resellingidList=[];
+            $userasinL = $sapSellerIdList = $resellingidList = [];
             $bool_admin = 0;//是否是管理员
-           // $user = Auth::user()->toArray(); //todo  打开
-            $user=['email'=>'test@qq.com','ubg'=>'BG1','ubu'=>'BU2','seller_rules'=>'BG1-BU2-*'];
+            // $user = Auth::user()->toArray(); //todo  打开
+            $user = ['email' => 'test@qq.com', 'ubg' => 'BG1', 'ubu' => 'BU2', 'seller_rules' => 'BG1-BU2-*'];
             if (!empty($user)) {
                 if ((!empty($user['email']) && in_array($user['email'], $ADMIN_EMAIL)) || @$user['seller_rules'] == '*-*-*') {
                     /**  特殊权限着 查询所有用户 */
@@ -1113,8 +1113,8 @@ class HijackController extends Controller
                 $sql_s = $sql_s . ' AND a.id in (' . $idList . ')';
             }
             if (!empty($domain)) {
-                $domain_mid = array_search($domain,$DOMIN_MARKETPLACEID_URL);
-                $sql_s = $sql_s . ' AND  a.marketplaceid = "' . $domain_mid .'"';
+                $domain_mid = array_search($domain, $DOMIN_MARKETPLACEID_URL);
+                $sql_s = $sql_s . ' AND  a.marketplaceid = "' . $domain_mid . '"';
             }
             //默认1开启跟卖，2.全部; 3. 关闭跟卖
             if ($isOpen == 1) {
@@ -1163,21 +1163,21 @@ class HijackController extends Controller
                     FROM
                         `sap_asin_match_sku`
                     WHERE
-                        `sap_seller_id` IN ('. implode($sapSellerIdList, ",").')';
-            if(!empty($bg)){
-                $sap_sql .=  ' AND sap_seller_bg = "'.$bg.'"';
+                        `sap_seller_id` IN (' . implode($sapSellerIdList, ",") . ')';
+            if (!empty($bg)) {
+                $sap_sql .= ' AND sap_seller_bg = "' . $bg . '"';
             }
-            if(!empty($bu)){
-                $sap_sql .= ' AND sap_seller_bu = "'.$bu.'"';
+            if (!empty($bu)) {
+                $sap_sql .= ' AND sap_seller_bu = "' . $bu . '"';
             }
-            if(!empty($condition)){
-                $sap_sql .= ' AND (asin like "%'.$condition.'%" or sku LIKE "'.$condition.'")';
+            if (!empty($condition)) {
+                $sap_sql .= ' AND (asin like "%' . $condition . '%" or sku LIKE "' . $condition . '")';
             }
-            if(!empty($sku_status)){
-                $sku_status_k = array_search($sku_status,$SKU_STATUS_KV);
-                $sap_sql .= ' AND sku_status = '.$sku_status_k;
+            if (!empty($sku_status)) {
+                $sku_status_k = array_search($sku_status, $SKU_STATUS_KV);
+                $sap_sql .= ' AND sku_status = ' . $sku_status_k;
             }
-            $sap_sql = $sap_sql.' GROUP BY  `asin`';
+            $sap_sql = $sap_sql . ' GROUP BY  `asin`';
             $sap_asin_match_sku = DB::connection('vlz')->select($sap_sql);
             $sap_asin_match_sku = (json_decode(json_encode($sap_asin_match_sku), true));
             if (!empty($sap_asin_match_sku)) {
@@ -1196,14 +1196,14 @@ class HijackController extends Controller
                 }
             }
             //根据用户名查询
-            if(!empty($request['userName'])){
+            if (!empty($request['userName'])) {
                 $userList = DB::table('users')->select('id', 'name', 'email', 'sap_seller_id')
                     ->whereIn('sap_seller_id', $sapSellerIdList)
-                    ->where('name',$request['userName'])
+                    ->where('name', $request['userName'])
                     ->get()->map(function ($value) {
                         return (array)$value;
                     })->toArray();
-            }else{
+            } else {
                 $userList = DB::table('users')->select('id', 'name', 'email', 'sap_seller_id')
                     ->whereIn('sap_seller_id', $sapSellerIdList)
                     ->get()->map(function ($value) {
@@ -1225,10 +1225,10 @@ class HijackController extends Controller
                 }
                 $productIdList = [];
                 foreach ($productList as $pk => $pv) {
-                    if(!empty($pv['sap_seller_id'])){
+                    if (!empty($pv['sap_seller_id'])) {
                         if (in_array($pv['sap_seller_id'], $sapSellerIdList)) {
                             $new_productList[] = $pv;
-                            $productIdList[]=$pv['id'];
+                            $productIdList[] = $pv['id'];
                         }
                     }
                 }
@@ -1245,23 +1245,23 @@ class HijackController extends Controller
             foreach ($resellingList as $rlk => $rlv) {
                 $resellingidList[] = $rlv['id'];
             }
-         if(!empty($resellingidList)){
-             $taskList = DB::connection('vlz')->table('tbl_reselling_task')
-                 ->select('id', 'reselling_num', 'reselling_time', 'created_at', 'reselling_asin_id')
-                  ->whereIn('reselling_asin_id', $resellingidList)
-                 ->orderBy('reselling_time', 'desc')
-                 ->get()->map(function ($value) {
-                     return (array)$value;
-                 })->toArray();
-             /** 查询detail **/
-             $taskDetail = DB::connection('vlz')->table('tbl_reselling_detail')
-                 ->select('id', 'task_id', 'price', 'shipping_fee', 'account', 'white', 'sellerid', 'created_at', 'reselling_remark')
-                 ->whereIn('task_id', array_unique($taskIdList))
-                 ->where('white', 0)//增加白名单
-                 ->get()->map(function ($value) {
-                     return (array)$value;
-                 })->toArray();
-         }
+            if (!empty($resellingidList)) {
+                $taskList = DB::connection('vlz')->table('tbl_reselling_task')
+                    ->select('id', 'reselling_num', 'reselling_time', 'created_at', 'reselling_asin_id')
+                    ->whereIn('reselling_asin_id', $resellingidList)
+                    ->orderBy('reselling_time', 'desc')
+                    ->get()->map(function ($value) {
+                        return (array)$value;
+                    })->toArray();
+                /** 查询detail **/
+                $taskDetail = DB::connection('vlz')->table('tbl_reselling_detail')
+                    ->select('id', 'task_id', 'price', 'shipping_fee', 'account', 'white', 'sellerid', 'created_at', 'reselling_remark')
+                    ->whereIn('task_id', array_unique($taskIdList))
+                    ->where('white', 0)//增加白名单
+                    ->get()->map(function ($value) {
+                        return (array)$value;
+                    })->toArray();
+            }
             echo
                 'ASIN,' .
                 'Marketplace,' .
@@ -1532,14 +1532,55 @@ class HijackController extends Controller
      */
     public function upResellingDetail(Request $request)
     {
+        $sellerid = $task_id = $reselling_asin_id = $task_id_list = NULL;
         if (!empty($request['id']) && $request['id'] > 0 && $request['remark']) {
-            $result = DB::connection('vlz')->table('tbl_reselling_detail')
+            $taskDetail = DB::connection('vlz')->table('tbl_reselling_detail')
+                ->select('id', 'task_id', 'sellerid')
                 ->where('id', $request['id'])
-                ->update(['reselling_remark' => $request['remark']]);
-            if ($result > 0) {
-                echo '更新成功';
-            } else {
-                echo '更新失败';
+                ->get()->map(function ($value) {
+                    return (array)$value;
+                })->toArray();
+            if (!empty($taskDetail)) {
+                $task_id = $taskDetail[0]['task_id'];
+                $sellerid = $taskDetail[0]['sellerid'];
+            }
+            if (!empty($task_id)) {
+                $reselling_task = DB::connection('vlz')->table('tbl_reselling_task')
+                    ->select('id', 'reselling_asin_id')
+                    ->where('id', $task_id)
+                    ->get()->map(function ($value) {
+                        return (array)$value;
+                    })->toArray();
+                if (!empty($reselling_task)) {
+                    $reselling_asin_id = $reselling_task[0]['reselling_asin_id'];
+                }
+            }
+            if (!empty($reselling_asin_id)) {
+                $reselling_task_list = DB::connection('vlz')->table('tbl_reselling_task')
+                    ->select('id')
+                    ->where('reselling_asin_id',  $reselling_asin_id)
+                    ->where('reselling_num', '>', 0)
+                    ->get()->map(function ($value) {
+                        return (array)$value;
+                    })->toArray();
+                if (!empty($reselling_task_list)) {
+                    foreach ($reselling_task_list as $k => $v) {
+                        $task_id_list[] = $v['id'];
+                    }
+                }
+            }
+            if (!empty($task_id_list)) {
+                $result = DB::connection('vlz')->table('tbl_reselling_detail')
+                    ->whereIn('task_id', $task_id_list)
+                    ->where('sellerid', $sellerid)
+                    ->update(['reselling_remark' => $request['remark']]);
+                if ($result > 0) {
+                    echo '更新成功';
+                } else {
+                    echo '更新失败';
+                }
+            }else {
+                echo '缺少参数';
             }
         } else {
             echo '缺少参数';
