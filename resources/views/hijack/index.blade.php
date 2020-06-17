@@ -749,7 +749,7 @@
 			 chk_value == ""? chk_value = -1 : chk_value;
 			 ///hijack/hijackExport
 			 $.ajax({
-				 url: "/shipment/allotProgress",
+				 url: "/hijack/hijackExport",
 				 method: 'POST',
 				 cache: false,
 				 data: {

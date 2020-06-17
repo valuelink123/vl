@@ -1365,7 +1365,7 @@ class ShipmentController extends Controller
                 'confirmed_quantity' => @$request['confirmed_quantity'],
                 'estimated_delivery_date' => @$request['estimated_delivery_date'],
                 'marketplace_id' => @$request['marketplace_id'],
-                'updated_at'=>date('Y-m-d H:i:s', time())
+                'updated_at' => date('Y-m-d H:i:s', time())
             ];
             if (!empty($data)) {
                 $result = DB::connection('vlz')->table('purchase_requests')
@@ -1664,7 +1664,6 @@ class ShipmentController extends Controller
                         //  $data[$i]['quantity']  = $sheet->getCell("H".$i)->getValue();
                         $data[$i]['receipts_num'] = $sheet->getCell("D" . $i)->getValue();
                         $data[$i]['shippment_id'] = $sheet->getCell("E" . $i)->getValue();
-                        $data[$i]['shipment_requests_id'] = $sheet->getCell("A" . $i)->getValue();
                         $data[$i]['updated_at'] = date('Y-m-d H:i:s', time());
 
 
@@ -2535,6 +2534,207 @@ class ShipmentController extends Controller
             $r_message = ['status' => 0, 'msg' => '缺少shippment_id或id'];
         }
         return $r_message;
+    }
+
+    /**
+     * 批量导入数据
+     * @param Request $request
+     * @param int $sheet
+     * @return array
+     * @throws \PHPExcel_Exception
+     * @throws \PHPExcel_Reader_Exception
+     */
+    public function importExecl2(Request $request, $sheet = 0)
+    {
+        $sql5 = "SELECT id,shipment_id  FROM  shipment_requests  WHERE id > 46";
+        $shipment_ids = DB::connection('vlz')->select($sql5);
+        $shipment_ids = (json_decode(json_encode($shipment_ids), true));
+        foreach ($shipment_ids as $sk=>$sv){
+            $data1[$sk]['shipment_requests_id'] = $sv['id'];
+            $data1[$sk]['shippment_id'] = $sv['shipment_id'];
+            $data1[$sk]['created_at'] = date('Y-m-d H:i:s', time());
+        }
+        $result1 = DB::connection('vlz')->table('allot_progress')->insert($data1);
+        echo $result1;
+        exit;
+        header("content-type:text/html;charset=utf-8");
+        $DOMIN_MARKETPLACEID_URL = Asin::DOMIN_MARKETPLACEID_URL;
+        $file = $request->file('files');
+        $sr_id_list = [];
+        $planer= $seller_sku= $label=$FBA_keepday_num = $msg = $allor_status = $marketplace_id =$sku=$sap_seller_id=$asin=$stock_day_num='';
+        $FBA_Stock=$transfer_num=0;
+        if ($file) {
+            try {
+                $file_name = $file->getClientOriginalName();
+                $file_size = $file->getSize();
+                $file_ex = $file->getClientOriginalExtension();
+                $newname = $file_name;
+                $newpath = '/uploads/' . date('Ym') . '/' . date('d') . '/' . date('His') . rand(100, 999) . intval(132) . '/';
+                $file->move(public_path() . $newpath, $newname);
+            } catch (\Exception $exception) {
+                $error = array(
+                    'name' => $file->getClientOriginalName(),
+                    'size' => $file->getSize(),
+                    'error' => $exception->getMessage(),
+                );
+                // Return error
+                return \Response::json($error, 400);
+            }
+            if (file_exists(public_path() . $newpath . $newname)) {
+                $newurl = $newpath . $newname;
+                $success = new \stdClass();
+                $success->name = $newname;
+                $success->size = $file_size;
+                $success->url = $newurl;
+                $success->thumbnailUrl = $newurl;
+                $success->deleteUrl = url('send/deletefile/' . base64_encode($newpath . $newname));
+                $success->deleteType = 'get';
+                $success->fileID = md5($newpath . $newname);
+                //判断哪种类型
+                if ($file_ex == "xlsx") {
+                    $reader = PHPExcel_IOFactory::createReader('Excel2007');
+                } else {
+                    $reader = PHPExcel_IOFactory::createReader('Excel5');
+                }
+                $excel = $reader->load(public_path() . $newpath . $newname, $encode = 'utf-8');
+                //读取第一张表
+                $sheet = $excel->getSheet(0);
+                //获取总行数
+                $row_num = $sheet->getHighestRow();
+                //获取总列数
+                $col_num = $sheet->getHighestColumn();
+
+                $data = []; //数组形式获取表格数据
+
+                $statusList = ['资料提供中', '换标中', '待出库', '已发货', '取消发货', '签收中', '签收完毕'];
+                for ($i = 4; $i <= $row_num; $i++) {
+                    $seller_sku=$sheet->getCell("B" . $i)->getValue();
+                    $data[$i]['seller_sku'] = $seller_sku;
+                    $asin=$sheet->getCell("C" . $i)->getValue();
+                    $data[$i]['asin'] =$asin;
+                    if (!empty($sheet->getCell("D" . $i)->getValue())) {
+                        $marketplace_id = array_search($sheet->getCell("D" . $i)->getValue(), $DOMIN_MARKETPLACEID_URL);
+                    }
+                    $data[$i]['marketplace_id'] = $marketplace_id;
+                    $data[$i]['sap_factory_code'] = $sheet->getCell("E" . $i)->getValue();
+                    if (!empty($sheet->getCell("F" . $i)->getValue())) {
+                        $t1 = intval(($sheet->getCell("F" . $i)->getValue() - 25569) * 3600 * 24); //转换成1970年以来的秒数
+                        $createtime = gmdate('Y-m-d H:i:s', $t1);//格式化时间
+                        $data[$i]['created_at'] = $createtime;
+                        $data[$i]['updated_at'] = $createtime;
+                    }
+                    if (!empty($sheet->getCell("G" . $i)->getValue())) {
+                        $allor_status = array_search($sheet->getCell("G" . $i)->getValue(), $statusList);
+                    }
+                    $data[$i]['allor_status'] = $allor_status;
+                    if (!empty($sheet->getCell("H" . $i)->getValue())) {
+                        $data[$i]['batch_num'] = $sheet->getCell("H" . $i)->getValue();
+                    }else{
+                        $data[$i]['batch_num']='';
+                    }
+                    if (!empty($sheet->getCell("I" . $i)->getValue())) {
+                        $data[$i]['shipment_id'] = $sheet->getCell("I" . $i)->getValue();
+                    }else{
+                        $data[$i]['shipment_id']='';
+                    }
+                    $label=$sheet->getCell("J" . $i)->getValue();
+                    $data[$i]['label'] = $label;
+                    $sku=$sheet->getCell("K" . $i)->getValue();
+                    $data[$i]['sku'] = $sku;
+                    $data[$i]['quantity'] = $sheet->getCell("L" . $i)->getValue();
+                    $data[$i]['adjustment_quantity'] = $sheet->getCell("L" . $i)->getValue();
+                    $data[$i]['status'] = 4;
+                    //销售员 保存
+                    $sql3 = "SELECT id,sap_seller_id FROM sap_asin_match_sku  WHERE sku='" . $sku . "' and marketplace_id ='" .$marketplace_id . "'";
+                    $sap_asin_match_sku = DB::connection('vlz')->select($sql3);
+                    $sap_asin_match_sku = (json_decode(json_encode($sap_asin_match_sku), true));
+                    if (!empty($sap_asin_match_sku)) {
+                        $sap_seller_id = $sap_asin_match_sku[0]['sap_seller_id'];
+                    }
+                    /** 获取计划员*/
+                    if (!empty($marketplace_id)) {
+                        //查询计划员
+                        $market = getMarketplaceCode();
+                        $fba_factory_warehouse = $market[$marketplace_id]['fba_factory_warehouse'];
+                        if (!empty($fba_factory_warehouse)) {
+                            $sap_factory_code = $fba_factory_warehouse[0]['sap_factory_code'];
+                            $sap_warehouse_code = $fba_factory_warehouse[0]['sap_warehouse_code'];
+                            $sql = "SELECT planer FROM sap_sku_sites WHERE sku='" . $sku . "' AND  marketplace_id='" . $marketplace_id. "' AND sap_factory_code='" . $sap_factory_code . "' AND sap_warehouse_code='" . $sap_warehouse_code . "'";
+                            $sap_sku_sites = DB::connection('vlz')->select($sql);
+                            $sap_sku_sites = (json_decode(json_encode($sap_sku_sites), true));
+                            if (!empty($sap_sku_sites)) {
+                                $planer = $sap_sku_sites[0]['planer'];
+                            }
+                        }
+                    }
+
+                    $data[$i]['sap_seller_id'] = $sap_seller_id;
+                    $data[$i]['planning_name'] = $planer;
+
+                    $sql = "SELECT
+                            afn_sellable,
+                            afn_reserved,
+                            (
+                                sales_4_weeks / 28 * 0.5 + sales_2_weeks / 14 * 0.3 + sales_1_weeks / 7 * 0.2
+                            ) AS daily_sales,
+                            id 
+                            FROM
+                            asins
+                            WHERE
+                            asin = '" . $asin . "'
+                            AND marketplaceid = '" . $marketplace_id . "'";
+                    $asins = DB::connection('vlz')->select($sql);
+                    $asins = (json_decode(json_encode($asins), true));
+
+                if (!empty($asins)) {
+                    $FBA_Stock = @$asins[0]['afn_sellable'] + @$asins[0]['afn_reserved'];
+                    if (@$asins[0]['daily_sales'] > 0) {
+                        $stock_day_num = $FBA_Stock + $request['quantity'] / @$asins[0]['daily_sales'];
+                    }
+                    $FBA_keepday_num = (round($asins[0]['daily_sales'], 2) == 0) ? '∞' : date('Y-m-d', strtotime('+' . intval(($asins[0]['afn_sellable'] + $asins[0]['afn_reserved']) / round($asins[0]['daily_sales'], 2)) . 'days'));
+                }
+
+                    /**调拨在途查询*/
+                    $sql2 = "
+                        SELECT
+                            adjustment_quantity
+                        FROM
+                            shipment_requests
+                        WHERE
+                            seller_sku = '" . $seller_sku . "'
+                        AND label = '" . $label . "'
+                        AND marketplace_id = '" . $marketplace_id . "'
+                        AND `status` = 4
+                        AND allor_status != 4;";
+                    $shipment_r = DB::connection('vlz')->select($sql2);
+                    $shipment_r = (json_decode(json_encode($shipment_r), true));
+                    if (!empty($shipment_r)) {
+                        $transfer_num = $shipment_r[0]['adjustment_quantity'];
+                    }
+
+                    $data[$i]['transfer_num'] = $transfer_num;
+                    $data[$i]['stock_day_num'] = $stock_day_num;
+                    $data[$i]['FBA_keepday_num'] = $FBA_keepday_num;
+                    $data[$i]['FBA_Stock'] = $FBA_Stock;
+                }
+                if (!empty($data) ) {
+                    $result = DB::connection('vlz')->table('shipment_requests')->insert($data);
+                    if ($result) {
+
+                        $r_message = ['status' => 1, 'msg' => '保存成功'];
+                        $msg = '成功';
+                    }
+                } else {
+                    $msg = '失败';
+                    $r_message = ['status' => 0, 'msg' => '数据格式不对'];
+                }
+
+            } else {
+                $msg = '失败';
+                $r_message = ['status' => 0, 'msg' => '文件打开失败'];
+            }
+              return $r_message;
+        }
     }
 
     /**================================公用方法=====================================*/

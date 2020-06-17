@@ -195,7 +195,6 @@ Route::post('/star/updatePost', 'StarController@updatePost');//更新帖子状�
 //跟卖追踪
 
 Route::get('/hijack/index1/', 'hijack\\HijackController@index1')->name('index1');
-Route::get('/hijack/index2/', 'hijack\\HijackController@index2')->name('index2');
 Route::get('/hijack/index/', 'hijack\\HijackController@index')->name('index');
 Route::get('/hijack/detail/', 'hijack\\HijackController@detail')->name('detail');
 Route::post('/hijack/index', 'hijack\\HijackController@index');//查询产品信息
@@ -283,7 +282,7 @@ Route::match(['post'],'/shipment/upCargoData', 'ShipmentController@upCargoData')
 Route::match(['post'],'/shipment/getNextData', 'ShipmentController@getNextData');//请求下一级 asin 或者 sellersku列表
 Route::match(['post'],'/shipment/getSellerSku', 'ShipmentController@getSellerSku');
 Route::match(['post'],'/shipment/importExecl', 'ShipmentController@importExecl');//上传 表格
-Route::match(['post'],'/cpfr/importExecl', 'CpfrController@importExecl');//上传 表格
+Route::match(['post'],'/shipment/importExecl2', 'ShipmentController@importExecl2');//上传 表格
 Route::match(['post'],'/shipment/getBoxDetail', 'ShipmentController@getBoxDetail');//查询 装箱数据信息
 Route::match(['post'],'/shipment/upShippingMethod', 'ShipmentController@upShippingMethod');//修改 发货方式
 Route::match(['post'],'/shipment/exportExecl', 'ShipmentController@exportExecl');//调拨进度 下载
