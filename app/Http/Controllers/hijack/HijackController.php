@@ -1538,7 +1538,8 @@ class HijackController extends Controller
     public function upResellingDetail(Request $request)
     {
         $sellerid = $task_id = $reselling_asin_id = $task_id_list = NULL;
-        if (!empty($request['id']) && $request['id'] > 0 && $request['remark']) {
+        $reselling_remark=$request['remark']?$request['remark']:'';
+        if (!empty($request['id']) && $request['id'] > 0 ) {
             $taskDetail = DB::connection('vlz')->table('tbl_reselling_detail')
                 ->select('id', 'task_id', 'sellerid')
                 ->where('id', $request['id'])
@@ -1578,7 +1579,7 @@ class HijackController extends Controller
                 $result = DB::connection('vlz')->table('tbl_reselling_detail')
                     ->whereIn('task_id', $task_id_list)
                     ->where('sellerid', $sellerid)
-                    ->update(['reselling_remark' => $request['remark']]);
+                    ->update(['reselling_remark' => $reselling_remark]);
                 if ($result > 0) {
                     echo '更新成功';
                 } else {
