@@ -949,13 +949,12 @@ class HijackController extends Controller
                 if (!empty($taskDetail)) {
                     foreach ($taskDetail as $key => $dv) {
                         if ((!empty($bg) && $bg != $dv['bg']) || (!empty($bu) && $bu != $dv['bu']) || (!empty($userName) && $userName != $dv['userName']) || (!empty($sku_status) && $sku_status != $dv['sku_status']) || (!empty($domain) && $domain != $dv['marketplaceid'])) {
-
+                            //不符合条件的过滤掉
                         } else {
                             $title='';
                             if(!empty($dv['title'])){
                                 $title= str_replace(",","，",@$dv['title']);
                             }
-
                             if (!empty($dv['asin'])) {
                                 $price = @$dv['price'] > 0 ? $dv['price'] / 100 : 0;
                                 $shipping_fee = @$dv['shipping_fee'] > 0 ? $dv['shipping_fee'] / 100 : 0;
