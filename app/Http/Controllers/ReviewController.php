@@ -611,13 +611,13 @@ class ReviewController extends Controller
                 '<a href="https://'.$ordersList[$i]['site'].'/dp/'.$ordersList[$i]['asin'].'" target="_blank">'.$ordersList[$i]['asin'].'</a><br>'.$ordersList[$i]['item_no'],
                 $ordersList[$i]['item_name'],
                 $ordersList[$i]['rating'].' '.$rating_chstr,
-                '<span title="'.strip_tags($ordersList[$i]['review_content']).'">'.$ordersList[$i]['review_content'].'</span>',
-                strip_tags($ordersList[$i]['review_content_cn']),
+                '<div class="text"><span title="'.strip_tags($ordersList[$i]['review_content']).'">'.strip_tags($ordersList[$i]['review_content']).'</span></div>',
+                '<div class="text"><span title="'.strip_tags($ordersList[$i]['review_content_cn']).'">'.strip_tags($ordersList[$i]['review_content_cn']).'</span></div>',
                 strip_tags(array_get($fol_arr,$ordersList[$i]['status'].'.do_content')),
                 $ordersList[$i]['etype'],
                 $ordersList[$i]['remark'],
-                (($ordersList[$i]['warn']>0)?'<i class="fa fa-warning" title="Contains dangerous words"></i>&nbsp;&nbsp;&nbsp;':'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;').'<ul class="nav navbar-nav"><li><a href="#" class="dropdown-toggle" style="height:10px; vertical-align:middle; padding-top:0px;" data-toggle="dropdown" role="button">...</a><ul class="dropdown-menu" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(-50px, 20px, 0px); min-width: 88px;" role="menu" style="color: #62c0cc8a">' . $viewItem . $resolveItem . '</ul></li></ul>'
-
+                (($ordersList[$i]['warn']>0)?'<i class="fa fa-warning" title="Contains dangerous words"></i>&nbsp;&nbsp;&nbsp;':'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;').'<ul class="nav navbar-nav"><li><a href="#" class="dropdown-toggle" style="height:10px; vertical-align:middle; padding-top:0px;" data-toggle="dropdown" role="button">...</a><ul class="dropdown-menu" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(-50px, 20px, 0px); min-width: 88px;" role="menu" style="color: #62c0cc8a">' . $viewItem . $resolveItem . '</ul></li></ul>',
+                $ordersList[$i]['id']
 //				$ordersList[$i]['negative_value'],
 //				'<a href="https://'.$ordersList[$i]['site'].'/dp/'.$ordersList[$i]['asin'].'" target="_blank">'.$ordersList[$i]['asin'].'</a> <span class="label label-sm label-default">'.strtoupper(substr(strrchr($ordersList[$i]['site'], '.'), 1)).'</span>',
 //				$ordersList[$i]['date'].' '.$date_chstr,
@@ -645,7 +645,17 @@ class ReviewController extends Controller
         echo json_encode($records);
 
     }
-	
+
+    public function updateContentCN(Request $request){
+	    $id = $request->input('id');
+	    $newContent = $request->input('newContent');
+        $row = DB::table('review')->where('id','=', $id)->first();
+        if(!$row) exit;
+        $updateData = array('review_content_cn' => $newContent);
+        DB::table('review')->where('id','=', $id)->update($updateData);
+        return json_encode(array('review_content_cn' => $newContent));
+    }
+
 	public function getUsers(){
         //目前在职的.不只是销售人员
         $users = User::where('locked', '=', 0)->get()->toArray();
