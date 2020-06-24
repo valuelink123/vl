@@ -706,6 +706,12 @@
                                                 <span class="arrow"></span>
                                             </a>
                                             <ul class="dropdown-menu pull-left">
+												<li class="">
+												    <a href="/management" class="nav-link nav-toggle ">
+												        management
+												        <span class="arrow"></span>
+												    </a>
+												</li>
 												@permission('users-show')
                                                 <li class="">
                                                     <a href="/user" class="nav-link nav-toggle ">

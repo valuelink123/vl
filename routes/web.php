@@ -296,3 +296,5 @@ Route::get('/marketingPlan/test', 'MarketingPlanController@test')->name('marketi
 
 Route::get('/cpfr/purchase', 'CpfrController@purchase')->name('purchase');
 Route::get('/cpfr/barcode', 'CpfrController@barcode')->name('barcode');
+//权限管理
+Route::get('/management', 'ManagementController@index')->name('index');
