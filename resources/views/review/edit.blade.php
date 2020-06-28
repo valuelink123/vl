@@ -158,7 +158,16 @@
 						</select>
 						</div>
 					</div>
-					
+                    <div class="form-group">
+                        <label>Remark</label>
+                        <div class="input-group ">
+                        <span class="input-group-addon">
+                            <i class="fa fa-envelope"></i>
+                        </span><input id="remark" class="form-control" type="text" name="remark" placeholder="Add Remark" value="{{$review['remark']}}">
+
+                        </div>
+                    </div>
+
 					
 					<div class="form-group">
 						<label>Next follow up Date</label>

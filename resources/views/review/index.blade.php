@@ -1,7 +1,3 @@
-
-
-
-
 @extends('layouts.layout')
 @section('label', 'Review List')
 @section('content')
@@ -18,6 +14,16 @@ table.dataTable tbody th, table.dataTable tbody td {
 th,td,td>span {
     font-size:12px !important;
 	font-family:Arial, Helvetica, sans-serif;}
+td{
+    height:100px;
+}
+
+.text{
+    display: -webkit-box;
+    -webkit-line-clamp: 5;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
 
 </style>
     <h1 class="page-title font-red-intense"> Review List
@@ -198,7 +204,7 @@ th,td,td>span {
 								 <input type="file" name="importFile"  />
 						</div>
 						<div class="col-md-2">
-							<button type="submit" class="btn blue" id="data_search">Upload Email</button>
+							<button type="submit" class="btn blue">Upload Email</button>
 
 						</div>
 						
@@ -261,23 +267,36 @@ th,td,td>span {
                                         <span></span>
                                     </label>
                                 </th>
-								<th style="max-width: 30px;">Imp.</th>
-								<th style="max-width:70px;">Asin</th>
-								<th style="max-width:55px;">Date</th>
-								<th style="max-width:40px;">Rating</th>
-								<th style="max-width:30px;">Rev</th>
-								<th style="max-width:40px;">RevC</th>
-								<th style="max-width:40px;">Name</th>
-								<th style="max-width:30px;">VP</th>
-								<th style="max-width:40px;">Status</th>
-								<th style="max-width:80px;">Email</th>
-								<th style="max-width:40px;">CusFB</th>
-								<th style="max-width:55px;">NextDate</th>
-								<th style="max-width:40px;">SKU</th>
-								<th style="max-width:80px;">Follow</th>
-                                <th style="max-width:50px;">User</th>
-                                <th style="max-width:50px;">Last Update</th>
-                                <th style="max-width:90px;">Action</th>
+                                <th style="width: 110px;">Review Date</th>
+                                <th style="width: 30px;">Site</th>
+                                <th style="width: 95px;">ASIN/SKU</th>
+                                <th style="width: 130px;">Product Name</th>
+                                <th style="width: 54px;">Rating</th>
+                                <th style="width: 650px;">Review Content</th>
+                                <th style="width: 650px;">Review Content CN</th>
+                                <th style="width: 52px;">Status</th>
+                                <th style="width: 90px;">Question Type</th>
+                                <th style="width: 60px;">Comment</th>
+                                <th style="width: 60px;">Operation</th>
+                                <th style="width: 60px;">ID</th>
+
+								{{--<th style="max-width: 30px;">Imp.</th>--}}
+								{{--<th style="max-width:70px;">Asin</th>--}}
+								{{--<th style="max-width:55px;">Date</th>--}}
+								{{--<th style="max-width:40px;">Rating</th>--}}
+								{{--<th style="max-width:30px;">Rev</th>--}}
+								{{--<th style="max-width:40px;">RevC</th>--}}
+								{{--<th style="max-width:40px;">Name</th>--}}
+								{{--<th style="max-width:30px;">VP</th>--}}
+								{{--<th style="max-width:40px;">Status</th>--}}
+								{{--<th style="max-width:80px;">Email</th>--}}
+								{{--<th style="max-width:40px;">CusFB</th>--}}
+								{{--<th style="max-width:55px;">NextDate</th>--}}
+								{{--<th style="max-width:40px;">SKU</th>--}}
+								{{--<th style="max-width:80px;">Follow</th>--}}
+                                {{--<th style="max-width:50px;">User</th>--}}
+                                {{--<th style="max-width:50px;">Last Update</th>--}}
+                                {{--<th style="max-width:90px;">Action</th>--}}
                             </tr>
 							
                             
@@ -296,6 +315,8 @@ th,td,td>span {
 
 
     <script>
+        var newReviewContent = '';
+
         var TableDatatablesAjax = function () {
 
         var initPickers = function () {
@@ -355,30 +376,90 @@ th,td,td>span {
                     "pageLength": 10, // default record count per page
 
 
-					"aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0,13,14,16,17] }],
+					"aoColumnDefs": [
+                        { "bSortable": false, "aTargets": [11]},
+                        { "bVisible": false, "aTargets": [12] },
+                        {
+                            "targets": [7],
+                            render: function (data, type, row) {
+                                return '<div><span>'+data+'</span><img src="../assets/global/img/editor.png" alt="" style="float:right" class="country_img"></div>';
+                            },
+
+                            createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
+                                $(cell).click(function (e) {
+                                    var tdTxt = $(this).context.innerHTML;
+                                    var divTxt = $(tdTxt).html();
+                                    var text = $(divTxt).html();
+                                    $(this).html('<textarea rows="6" type="text" style="width: 100%"></textarea>');
+                                    var aInput = $(this).find(":input");
+                                    var textCellData = cellData.replace(/<\/?.+?>/g,"");
+                                    if(text == cellData){
+                                        aInput.focus().val(textCellData);
+                                    }else{
+                                        aInput.focus().val(text);
+                                    }
+                                });
+                                $(cell).on("blur", ":input", function (e) {
+                                    var text = $(this).val();
+                                    var textCellData = cellData.replace(/<\/?.+?>/g,"");
+                                    if($(this).val() != textCellData){
+                                        $(this).val(text);
+                                        //tableObj.cell(cell).data(text);
+                                        var reviewId = rowData[12];
+                                        $.ajax({
+                                            type:"post",
+                                            url:'/reviewUpdateContentCN',
+                                            data:{
+                                                id: reviewId,
+                                                newContent: text
+                                            },
+                                            error:function(err){
+                                                console.log(err);
+                                            },
+                                            success:function(res){
+                                                //tableObj.ajax.reload()
+                                                newReviewContent = '<div class="text"><span title="' + text + '">' + text + '</div>';
+
+                                                $(cell).html(newReviewContent);
+
+                                            }
+                                        });
+                                    }else{
+                                        $(cell).html(text);
+                                        //tableObj.cell(cell).data(text);
+                                    }
+                                })
+                            }
+                        },
+
+                     ],
+
 					 "order": [
-                        [1, "desc"]
-                    ],
+                         [1, "desc"],
+
+                     ],
                     // scroller extension: http://datatables.net/extensions/scroller/
 
-					
-
-					fixedColumns:   {
-						leftColumns:0,
-						rightColumns: 1
-					},
+//					fixedColumns:   {
+//						leftColumns:0,
+//						rightColumns: 1
+//					},
                     "ajax": {
                         "url": "{{ url('review/get')}}", // ajax source
                     },
 
                     "createdRow": function( row, data, dataIndex ) {
-						$(row).children('td').eq(0).attr('style', 'wdith: 30px;');
-                        $(row).children('td').eq(10).attr('style', 'max-width: 80px;overflow:hidden;white-space:nowrap;text-align: left; ');
-						$(row).children('td').eq(10).attr('title', $(row).children('td').eq(10).text());
-						$(row).children('td').eq(14).attr('style', 'max-width: 80px;overflow:hidden;white-space:nowrap;text-align: left; ');
-						$(row).children('td').eq(14).attr('title', $(row).children('td').eq(14).text());
+                        $(row).children('td').eq(6).attr('style', 'max-width: 650px;overflow:hidden;text-align: left;');
+                        $(row).children('td').eq(7).attr('style', 'max-width: 650px;overflow:hidden;text-align: left;');
+                        $(row).children('td').eq(8).attr('style', 'max-width: 52px;overflow:hidden;white-space:nowrap;text-align: left;');
+
+//						$(row).children('td').eq(0).attr('style', 'wdith: 30px;');
+//                      $(row).children('td').eq(10).attr('style', 'max-width: 80px;overflow:hidden;white-space:nowrap;text-align: left; ');
+//						$(row).children('td').eq(10).attr('title', $(row).children('td').eq(10).text());
+//						$(row).children('td').eq(14).attr('style', 'max-width: 80px;overflow:hidden;white-space:nowrap;text-align: left; ');
+//						$(row).children('td').eq(14).attr('title', $(row).children('td').eq(14).text());
                     },
-					"dom": "<'row' <'col-md-12'>><'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'>r><'table-scrollable't><'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>",
+//					"dom": "<'row' <'col-md-12'>><'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'>r><'table-scrollable't><'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>",
                 }
             });
 

@@ -55,6 +55,7 @@ Route::resource('send', 'SendController');
 Route::Post('/send/get', 'SendController@get')->name('getSendbox');
 Route::get('/send/deletefile/{filename}', 'SendController@deletefile')->name('deleteFile');
 Route::resource('review', 'ReviewController');
+Route::post('/reviewUpdateContentCN', 'ReviewController@updateContentCN');
 Route::resource('star', 'StarController');
 Route::resource('phone', 'PhoneController');
 Route::Post('/phone/get', 'PhoneController@get')->name('getPhone');
