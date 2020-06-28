@@ -436,7 +436,14 @@ class RsgrequestsController extends Controller
         $rule->step = intval($request->get('step'));
 		$rule->channel = $request->get('channel');
 		$rule->processor = intval(Auth::user()->id);
-		if(intval($request->get('product_id'))) $rule->product_id = intval($request->get('product_id'));
+		if(intval($request->get('product_id'))){
+			$rule->product_id = intval($request->get('product_id'));
+			$laterProduct= RsgProduct::where('id',$rule->product_id)->first()->toArray();
+			if($laterProduct['requested_review']>=$laterProduct['sales_target_reviews']){
+				$request->session()->flash('error_message','Set Rsg Request Failed, Daily quantity limit exceeded');
+				return redirect()->back()->withInput();
+			}
+		}
 		$rule->star_rating = $request->get('star_rating');
 		// $rule->follow = $request->get('follow');
 		// $rule->next_follow_date = $request->get('next_follow_date');
@@ -611,6 +618,12 @@ class RsgrequestsController extends Controller
 
 			//修改后的产品的已请求数量+1
 			$laterProduct= RsgProduct::where('id',$product_id)->first()->toArray();
+			if($laterProduct['requested_review']>=$laterProduct['sales_target_reviews']){
+				$request->session()->flash('error_message','Set Rsg Request Failed, Daily quantity limit exceeded');
+         		return redirect()->back()->withInput();
+			}
+			
+			
 			RsgProduct::where('id',$product_id)->update(array('requested_review'=>($laterProduct['requested_review']+1)));
 
 			$rule->product_id = $product_id;//修改后的产品id覆盖
