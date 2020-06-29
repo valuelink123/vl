@@ -695,6 +695,7 @@
 	</div>
 <script>
 	$(document).ready(function(){
+		
 		$('#superior_department').select2({
 			tags:false,
 		});
@@ -826,7 +827,7 @@
 			}
 		})
 		//部门长
-		$('#executive_director').on('input',function(){
+		$('#executive_director').on('change',function(){
 			if($(this).val() == ''){
 				$(this).parent().find('.errCode').show();
 			}else{
@@ -843,13 +844,13 @@
 		})
 		//新建部门保存
 		$('.save_department').on('click',function(){
-			/* if($('#department_name').val() == ''){
+			if($('#department_name').val() == ''){
 				$('#department_name').parent().find('.errCode').show();
 				return
 			}else{
 				$('#department_name').parent().find('.errCode').hide();
 			}
-			if($('#superior_department').val() == ""){
+			if($("#superior_department").select2("val") == null){
 				$('#superior_department').parent().find('.errCode').show();
 				return
 			}else{
@@ -861,18 +862,19 @@
 			}else{
 				$('#first_department').parent().find('.errCode').hide();
 			}
-			if($('#executive_director').val() == ""){
+			if($("#executive_director").select2("val") == null){
 				$('#executive_director').parent().find('.errCode').show();
 				return
 			}else{
 				$('#executive_director').parent().find('.errCode').hide();
 			}
+			
 			if($('.permissions_sele').val() == ""){
 				$('#permissions_sele').parent().find('.errCode').show();
 				return
 			}else{
 				$('.permissions_sele').parent().find('.errCode').hide();
-			} */
+			}
 			if($('.permissions_id').val() != ""){
 				console.log('编辑')
 			}else{
@@ -908,7 +910,7 @@
 				url:"",
 				async: true,
 				data:{
-					"sap_seller_id": sap_seller_id,
+					//"sap_seller_id": sap_seller_id,
 				},
 				success:function(res){
 					$.each(res[0], function (index, value) {
@@ -989,7 +991,7 @@
 			}else{
 				$('#title_input').parent().find('.errCode').hide();
 			}
-			if($('#department_sele').val() == ''){
+			if($("#department_sele").select2("val") == null){
 				$('#department_sele').parent().find('.errCode').show();
 				return
 			}else{
