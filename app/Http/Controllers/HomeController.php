@@ -44,7 +44,6 @@ class HomeController extends Controller
 		$bonus_point = 0;
 		$date_from = $request->get('date_from')?$request->get('date_from'):(date('Y-m',strtotime('-2days')).'-01');
 		$date_to = $request->get('date_to')?$request->get('date_to'):date('Y-m-d',strtotime('-2days'));
-		
 		if($date_to>date('Y-m-d',strtotime('-2days'))) $date_to=date('Y-m-d',strtotime('-2days'));
 		if($date_from>$date_to) $date_from=$date_to;
 		
@@ -67,9 +66,7 @@ class HomeController extends Controller
 			$limit_review_user_id = Auth::user()->id;
 			$bonus_point = 0.04;
 		}
-		
-		
-		$asins = DB::table( DB::raw("(select max(sku_ranking) as sku_ranking,max(rating) as rating,max(review_count) as review_count,max(item_no) as item_no,sum(fba_stock) as fba_stock,sum(fba_transfer) as fba_transfer,max(fbm_stock) as fbm_stock,sum(sales_07_01) as sales_07_01,sum(sales_14_08) as sales_14_08,sum(sales_21_15) as sales_21_15,sum(sales_28_22) as sales_28_22,max(bg) as bg,max(bu) as bu,max(sap_seller_id) as sap_seller_id,max(review_user_id) as review_user_id, min(case when status = 'S' Then '0' else status end) as status,asin,site from asin where length(asin)=10 group by asin,site) as asin") )
+            $asins = DB::table( DB::raw("(select max(sku_ranking) as sku_ranking,max(rating) as rating,max(review_count) as review_count,max(item_no) as item_no,sum(fba_stock) as fba_stock,sum(fba_transfer) as fba_transfer,max(fbm_stock) as fbm_stock,sum(sales_07_01) as sales_07_01,sum(sales_14_08) as sales_14_08,sum(sales_21_15) as sales_21_15,sum(sales_28_22) as sales_28_22,max(bg) as bg,max(bu) as bu,max(sap_seller_id) as sap_seller_id,max(review_user_id) as review_user_id, min(case when status = 'S' Then '0' else status end) as status,asin,site from asin where length(asin)=10 group by asin,site) as asin") )
 		->leftJoin( DB::raw("(select sum(bonus)*".$bonus_point." as bonus,sum(economic) as economic,sku,site from skus_daily_info where date>='".$date_from."' and date<='".$date_to."' group by sku,site) as sku_info") ,function($q){
 			$q->on('asin.item_no', '=', 'sku_info.sku')->on('asin.site', '=', 'sku_info.site');
 		})->leftJoin( DB::raw("(select sum(amount) as amount,sum(sales) as sales,asin,site from asin_daily_info where date>='".$date_from."' and date<='".$date_to."' group by asin,site) as asin_info") ,function($q){
@@ -95,7 +92,6 @@ class HomeController extends Controller
 			$asins = $asins->where('asin.review_user_id',$limit_review_user_id);
 			$sumwhere.=" and review_user_id='$limit_review_user_id'";
 		}
-		
 		$user_teams = DB::select("select bg,bu from asin where $sumwhere group by bg,bu ORDER BY BG ASC,BU ASC");
 		$sku_statuses = DB::select("select status from skus_status group by status");
 		
@@ -178,9 +174,8 @@ class HomeController extends Controller
 		
 		
 		
-		
 		$fba_stock_info = DB::select("select sum(fba_stock*fba_cost) as fba_total_amount,sum(fba_stock) as fba_total_stock from (select avg(fba_stock+fba_transfer) as fba_stock,avg(fba_cost) as fba_cost from asin left join skus_status on asin.item_no=skus_status.sku and asin.site=skus_status.site where $sumwhere $asin_where group by asin,sellersku ) as fba_total");
-		
+
 		$fbm_stock_info = DB::select("select sum(fbm_stock*fbm_cost) as fbm_total_amount,sum(fbm_stock) as fbm_total_stock from (select avg(fbm_stock) as fbm_stock,avg(fbm_cost) as fbm_cost from asin left join skus_status on asin.item_no=skus_status.sku and asin.site=skus_status.site where $sumwhere $asin_where group by item_no) as fbm_total");
 		
 		
@@ -193,7 +188,6 @@ class HomeController extends Controller
 		$total_info = SkusDailyInfo::select(DB::raw('sum(bonus)*'.$bonus_point.' as bonus,sum(economic) as economic,sum(amount) as amount,sum(sales) as sales'))->leftJoin("skus_status" ,function($q){
 			$q->on('skus_daily_info.sku', '=', 'skus_status.sku')->on('skus_daily_info.site', '=', 'skus_status.site');
 		})->whereRaw($sumwhere.$sku_daily_info_where." and date>='$date_from' and date<='$date_to'")->first()->toArray();
-		
 		$hb_total_info = SkusDailyInfo::select(DB::raw('sum(bonus)*'.$bonus_point.' as bonus,sum(economic) as economic,sum(amount) as amount,sum(sales) as sales'))->leftJoin("skus_status" ,function($q){
 			$q->on('skus_daily_info.sku', '=', 'skus_status.sku')->on('skus_daily_info.site', '=', 'skus_status.site');
 		})->whereRaw($sumwhere.$sku_daily_info_where." and date>='$hb_date_from' and date<='$hb_date_to'")->first()->toArray();
@@ -207,7 +201,6 @@ class HomeController extends Controller
 			$q->on('skus_daily_info.sku', '=', 'skus_status.sku')->on('skus_daily_info.site', '=', 'skus_status.site');
 		})->whereRaw($sumwhere.$sku_daily_info_where." and left(date,7)='$curr_month'")->groupBy(['sku','site'])->orderBy('sales','desc')->get()->toArray();
 
-		
 		
 		$returnDate['month_budget']= $month_budget;
 		$returnDate['bonus_point']= $bonus_point;
@@ -613,10 +606,9 @@ class HomeController extends Controller
 		
 		$date_month = date('Y-m',strtotime($date_from));
 
-		$total_info = SkusDailyInfo::select(DB::raw('sku,site,sum(amount) as amount,sum(sales) as sales,sum((cost+tax+headshipfee)*sales) as total_cost,sum(fulfillmentfee) as fulfillmentfee,sum(commission) as commission,sum(otherfee) as otherfee,sum(returnqty) as returnqty,sum(deal) as deal,sum(coupon) as coupon,sum(cpc) as cpc,sum(fbm_storage) as fbm_storage,sum(fba_storage) as fba_storage,sum(amount_used) as amount_used,sum(economic) as economic,sum(profit) as profit,sum(amount_target) as amount_target,sum(sales_target) as sales_target,sum(profit_target) as profit_target,sum(bonus) as bonus'))->whereRaw($sumwhere." and date>='$date_from' and date<='$date_to'")->groupBy(['sku','site'])->get()->toArray();
+        $total_info = SkusDailyInfo::select(DB::raw('sku,site,sum(amount) as amount,sum(sales) as sales,sum((cost+tax+headshipfee)*sales) as total_cost,sum(fulfillmentfee) as fulfillmentfee,sum(commission) as commission,sum(otherfee) as otherfee,sum(returnqty) as returnqty,sum(deal) as deal,sum(coupon) as coupon,sum(cpc) as cpc,sum(fbm_storage) as fbm_storage,sum(fba_storage) as fba_storage,sum(amount_used) as amount_used,sum(economic) as economic,sum(profit) as profit,sum(amount_target) as amount_target,sum(sales_target) as sales_target,sum(profit_target) as profit_target,sum(bonus) as bonus'))->whereRaw($sumwhere." and date>='$date_from' and date<='$date_to'")->groupBy(['sku','site'])->get()->toArray();
 		
-		
-		
+
 		$spreadsheet = new Spreadsheet();
 		$myWorkSheet = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($spreadsheet, 'Total');
 		$spreadsheet->addSheet($myWorkSheet, 0);

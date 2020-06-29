@@ -86,7 +86,7 @@ th,td {
                             <tr class="odd gradeX">
                                 <td>
                                     <a href="/seller/{{array_get($data,'asin')}}/{{array_get(siteToMarketplaceid(),array_get($data,'site'))}}" target="_blank">
-									{{array_get($data,'asin')}} 
+									{{array_get($data,'asin')}}
 									</a> 
                                 </td>
                                 <td>

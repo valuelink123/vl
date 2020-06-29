@@ -436,7 +436,8 @@ a.editable-click:hover {
 							<td style="text-align: left;"> {{array_get($asin,'item_no')}} </td>
 							<td style="text-align: left;"> {{array_get($asin,'sku_status')}} </td>
 							<td> {{array_get($asin,'amount',0)}} </td>
-							<td><a href="/skus?site={{array_get($asin,'site')}}&sku={{array_get($asin,'asin')}}">{{array_get($asin,'sales',0)}} </a></td>
+							<td><a href="/skus?site={{array_get($asin,'site')}}&sku={{array_get($asin,'asin')}}">
+									{{array_get($asin,'sales',0)}} </a></td>
 							<td> {{intval(array_get($asin,'sales')/((strtotime($date_to)-strtotime($date_from))/86400+1))}} </td>
 							
 							<td> {{(array_get($asin,'sales')>0)?round(array_get($asin,'amount')/array_get($asin,'sales'),2):0}} </td>
@@ -544,7 +545,7 @@ a.editable-click:hover {
 			</thead>
 			<tbody>
 			@foreach ($month_budget as $sku_budget)
-			
+
 				<?php
 				$total_sales+=$sku_budget['sales'];
 				$total_return+=$sku_budget['returns'];
@@ -560,7 +561,7 @@ a.editable-click:hover {
 				}else{
 					$amount_per =0;
 				}
-				
+
 				if($sku_budget['sales_target']<0){
 					$sales_per = round(2-$sku_budget['sales']/$sku_budget['sales_target'],4);
 				}elseif($sku_budget['sales_target']>0){
@@ -568,7 +569,7 @@ a.editable-click:hover {
 				}else{
 					$sales_per =0;
 				}
-				
+
 				if($sku_budget['economic_target']<0){
 					$profit_per = round(2-$sku_budget['economic']/$sku_budget['economic_target'],4);
 				}elseif($sku_budget['economic_target']>0){
@@ -601,25 +602,23 @@ a.editable-click:hover {
 					</td>
 					<td>
 						<span class="{{($sales_per>=$time_rate)?'font-red-haze':'font-green-sharp'}}">{{$sales_per*100}}%</span>&nbsp;&nbsp;
-						
+
 						{{intval($sku_budget['sales_target'])}}
-						
+
 					</td>
 					<td>
 						<span class="{{($amount_per>=$time_rate)?'font-red-haze':'font-green-sharp'}}">{{$amount_per*100}}%</span>&nbsp;&nbsp;
 						{{round($sku_budget['amount_target'],2)}}
-						
+
 					</td>
 					<td>
 						<span class="{{($profit_per>=$time_rate)?'font-red-haze':'font-green-sharp'}}">{{$profit_per*100}}%</span>&nbsp;&nbsp;
-						
+
 						{{round($sku_budget['economic_target'],2)}}
-						
+
 					</td>
 				</tr>
 			@endforeach
-
-
 
 			</tbody>
 			<?php

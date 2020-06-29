@@ -131,14 +131,13 @@ class BudgetController extends Controller
 		
 		$table_from = "select a.sku,a.site,a.id,a.status,a.remark,b.* from budgets as a left join (select budget_id,sum(qty+promote_qty) as qty,sum(income) as income,sum(cost) as cost,sum(common_fee) as common_fee,sum(pick_fee) as pick_fee,sum(promotion_fee) as promotion_fee,sum(amount_fee) as amount_fee,sum(storage_fee) as storage_fee from budget_details
 where ".$date_add_from." group by budget_id) as b on a.id=b.budget_id where a.year=".$year_from_arr[0]." and a.quarter=".$year_from_arr[1]." and a.status>0";
-		
+
 		$table_to = "select a.sku,a.site,b.* from budgets as a left join (select budget_id,sum(qty+promote_qty) as qty,sum(income) as income,sum(cost) as cost,sum(common_fee) as common_fee,sum(pick_fee) as pick_fee,sum(promotion_fee) as promotion_fee,sum(amount_fee) as amount_fee,sum(storage_fee) as storage_fee from budget_details
 where ".$date_add_to." group by budget_id) as b on a.id=b.budget_id where a.year=".$year_to_arr[0]." and a.quarter=".$year_to_arr[1]." and a.status>0";
 
 		$table_current = "select sku,site,sum(sales) as qty,sum(amount) as income,sum((cost+tax+headshipfee)*sales) as cost,-1*sum(commission) as common_fee,-1*sum(fulfillmentfee) as pick_fee,sum(deal+cpc+coupon) as promotion_fee,
 sum(amount_used) as amount_fee, sum(fba_storage+fbm_storage) as storage_fee from skus_daily_info where ".$date_add_from." group by  sku,site";
-		
-		
+
 		$sql = "(
 		select budget_skus.*,budgets_1.qty as qty1,budgets_1.income as amount1,(budgets_1.income-budgets_1.cost) as profit1,(budgets_1.income-budgets_1.cost-budgets_1.common_fee-budgets_1.pick_fee-budgets_1.promotion_fee-budgets_1.amount_fee-budgets_1.storage_fee) as economic1,IFNULL(budgets_1.id,0) as budget_id,IFNULL(budgets_1.status,0) as budget_status,budgets_1.remark
 ,budgets_2.qty as qty2,budgets_2.income as amount2,(budgets_2.income-budgets_2.cost) as profit2,(budgets_2.income-budgets_2.cost-budgets_2.common_fee-budgets_2.pick_fee-budgets_2.promotion_fee-budgets_2.amount_fee-budgets_2.storage_fee) as economic2, budgets_3.qty as qty3,budgets_3.income as amount3,(budgets_3.income-budgets_3.cost) as profit3,(budgets_3.income-budgets_3.cost-budgets_3.common_fee-budgets_3.pick_fee-budgets_3.promotion_fee-budgets_3.amount_fee-budgets_3.storage_fee) as economic3 from budget_skus 
@@ -149,7 +148,7 @@ sum(amount_used) as amount_fee, sum(fba_storage+fbm_storage) as storage_fee from
 		left join (".$table_current.") as budgets_3 
 		on budget_skus.sku = budgets_3.sku and budget_skus.site = budgets_3.site
 		) as sku_tmp_cc";
-		
+
 		$finish = DB::table(DB::raw($sql))->whereRaw($where." and (stock>=100 or (status<>0 and status <>4 and status <>5 and status <>3)) ")->selectRaw('count(*) as count,budget_status')->groupBy('budget_status')->pluck('count','budget_status');
 
 		

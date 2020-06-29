@@ -42,6 +42,7 @@ class SellerController extends Controller
 		$config_fields = getFieldtoField();
 		$addwhere = $addwhereid= '';
 		$users = $this->getUser();
+
 		if(!Auth::user()->admin){
 			$addwhere = " and seller in ('".implode("','", $this->getUser())."')";
 			$addwhereid = " and user_id in ('".implode("','", $this->getUser(true))."')";

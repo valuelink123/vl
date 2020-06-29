@@ -758,8 +758,8 @@ class MarketingPlanController extends Controller
                         date >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
                         and date < CURDATE()
                     AND marketplace_id='" . $request['marketplace_id'] . "'
-                    AND asin = '" . $request['asin'] . "'
-                    ";
+                    AND asin = '" . $request['asin'] . "'";
+
                     $statistics_o = DB::connection('vlz')->select($sql1);
                     $statistics = (json_decode(json_encode($statistics_o), true));
                     //查询排名 和 转化率

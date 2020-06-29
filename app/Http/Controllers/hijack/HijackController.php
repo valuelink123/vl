@@ -949,7 +949,7 @@ class HijackController extends Controller
                 if (!empty($taskDetail)) {
                     foreach ($taskDetail as $key => $dv) {
                         if ((!empty($bg) && $bg != $dv['bg']) || (!empty($bu) && $bu != $dv['bu']) || (!empty($userName) && $userName != $dv['userName']) || (!empty($sku_status) && $sku_status != $dv['sku_status']) || (!empty($domain) && $domain != $dv['marketplaceid'])) {
-                            //不符合条件的过滤掉
+                            //不符合条件的过滤掉下载
                             unset($taskDetail[$key]);
                         } else {
                             $title='';
