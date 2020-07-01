@@ -1014,7 +1014,7 @@ function getCountryCode()
 		'TT'=>array('store'=>array('HK01-SZ6','HK03-CHK3')),
 		'TW'=>array('store'=>array('HK01-SZ6','HK03-CHK3')),
 		'UK'=>array('store'=>array('HK01-SZ6','HK03-CHK3','UK02-UK3')),
-		'US'=>array('store'=>array('HK01-SZ6','HK03-CHK3','US02-US2','US04-US1')),
+		'US'=>array('store'=>array('HK01-SZ6','HK03-CHK3','US02-US2','US04-US1','US06-US1')),
 		'ZA'=>array('store'=>array('HK01-SZ6','HK03-CHK3'))
 	);
 	return $arr;
