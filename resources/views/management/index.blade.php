@@ -331,6 +331,9 @@
 		max-height: 190px;
 		overflow: auto;
 	}
+	.handleCreate,.handleEdit{
+		display: none;
+	}
 </style>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.8/css/select2.min.css" rel="stylesheet" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.8/js/select2.min.js"></script>
@@ -464,7 +467,17 @@
 					<option value="手动设置">手动设置</option>			
 				</select>
 				<div class="permissions_li1" style="margin: 22px 0 0 84px; display: none;">
-					<select class="mt-multiselect btn btn-default manual_settings" multiple="multiple" data-clickable-groups="true" data-collapse-groups="true" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true">
+					<select class="mt-multiselect btn btn-default manual_settings handleCreate" multiple="multiple" data-clickable-groups="true" data-collapse-groups="true" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true">
+						<optgroup label="aaa">
+							<option value="aa">aa</option>	
+							<option value="bb">bb</option>
+						</optgroup>
+						<optgroup label="456">
+							<option value="44">44</option>	
+							<option value="55">55</option>
+						</optgroup>
+					</select>
+					<select class="mt-multiselect btn btn-default manual_settings handleEdit" multiple="multiple" data-clickable-groups="true" data-collapse-groups="true" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true">
 						<optgroup label="123">
 							<option value="33">33</option>	
 							<option value="22">22</option>
@@ -897,7 +910,10 @@
 			$('.department_title').text('新建部门');
 			$('.permissions_id').val('');
 			getDepartmentInfo();
-			
+			$('.handleCreate').show();
+			$('.handleEdit').hide();
+			$('.permissions_li1').find('.multiselect-native-select').eq(0).css('display','block');
+			$('.permissions_li1').find('.multiselect-native-select').eq(1).css('display','none');
 		})
 		//编辑部门
 		$('#handleEditPermissions').on('click',function(){
@@ -905,7 +921,11 @@
 			$('.mask_box').show();
 			$('.department_title').text('编辑部门');
 			$('.permissions_id').val(1)
-			getDepartmentInfo()
+			getDepartmentInfo();
+			$('.handleCreate').hide();
+			$('.handleEdit').show();
+			$('.permissions_li1').find('.multiselect-native-select').eq(0).css('display','none');
+			$('.permissions_li1').find('.multiselect-native-select').eq(1).css('display','block');
 		})
 		//权限设置
 		$('.permissions_sele').on('change',function(){
