@@ -1829,7 +1829,6 @@
 					data: 'shippment_id', 
 					name: 'shippment_id',
 					render: function(data, type, row, meta) {
-						console.log(data)
 						var content = '<div style="color:blue">'+data+'<img src="../assets/global/img/editor.png" alt="" style="float:right" class="country_img"></div>';
 						return content;
 					},
@@ -1848,33 +1847,60 @@
 								},
 								success:function(res){
 									let data = res.data
-									console.log(data)
-									for(var i=0; i<data.length;i++){
-										let shippmentStr = "";
-										let orderStr = "";
-										shippmentStr = '<div class="shippment_txt">'
-															+'<input type="text" value="'+data[i].shippmentID+'" />'
-															+'<button class="btn btn-sm red-sunglo deleteShippment">删除</button>'
-														+'</div>';
-										
-										for(var j=0;j<data[i].receipts_num.length;j++){
-											orderStr += '<div class="orderItem">'
-															+'<input type="text" value="'+data[i].receipts_num[j]+'" />'
-															+'<button class="btn btn-sm red-sunglo deleteOrder">删除</button>'
-														+'</div>'
+									if(res.role == 2 || res.role == 4 || res.role == 6 || res.role == 7){
+										for(var i=0; i<data.length;i++){
+											let shippmentStr = "";
+											let orderStr = "";
+											shippmentStr = '<div class="shippment_txt">'
+																+'<input type="text" value="'+data[i].shippmentID+'" />'
+																+'<button class="btn btn-sm red-sunglo deleteShippment">删除</button>'
+															+'</div>';
+											
+											for(var j=0;j<data[i].receipts_num.length;j++){
+												orderStr += '<div class="orderItem">'
+																+'<input type="text" value="'+data[i].receipts_num[j]+'" />'
+																+'<button class="btn btn-sm red-sunglo deleteOrder">删除</button>'
+															+'</div>'
+											}
+											$('.shippmenid_box').append('<div class="editor_div">'
+																			+shippmentStr 
+																			+ '<div class="order_txt">'
+																				+'<div>'
+																					+'<button style="margin: 5px 10px" class="btn btn-sm btn-info handleAddOrder">新增跟踪单号</button>'
+																				+'</div>'
+																				+'<div class="orderList">'
+																					+orderStr
+																				+'</div>'
+																				
+																			+'</div>'
+																		+'</div>')
 										}
-										$('.shippmenid_box').append('<div class="editor_div">'
-																		+shippmentStr 
-																		+ '<div class="order_txt">'
-																			+'<div>'
-																				+'<button style="margin: 5px 10px" class="btn btn-sm btn-info handleAddOrder">新增跟踪单号</button>'
+										$('.handleAddShippment').show();
+										$('#saveBtn').show();
+									}else{
+										for(var i=0; i<data.length;i++){
+											let shippmentStr = "";
+											let orderStr = "";
+											shippmentStr = '<div class="shippment_txt">'
+																+'<span>'+data[i].shippmentID+'</span>'
+															+'</div>';
+											
+											for(var j=0;j<data[i].receipts_num.length;j++){
+												orderStr += '<div class="orderItem">'
+																+'<span>'+data[i].receipts_num[j]+'</span>'
+															+'</div>'
+											}
+											$('.shippmenid_box').append('<div class="editor_div">'
+																			+shippmentStr 
+																			+ '<div class="order_txt">'
+																				+'<div class="orderList">'
+																					+orderStr
+																				+'</div>'
 																			+'</div>'
-																			+'<div class="orderList">'
-																				+orderStr
-																			+'</div>'
-																			
-																		+'</div>'
-																	+'</div>')
+																		+'</div>')
+										}
+										$('.handleAddShippment').hide();
+										$('#saveBtn').hide();
 									}
 								}
 							});
@@ -1886,7 +1912,6 @@
 					data: 'receipts_num', 
 					name: 'receipts_num',
 					render: function(data, type, row, meta) {
-						console.log(data, type, row, meta)
 						var content = '<div style="color:blue">'+data+'<img src="../assets/global/img/editor.png" alt="" style="float:right" class="country_img"></div>';
 						return content;
 					},
@@ -1905,33 +1930,60 @@
 								},
 								success:function(res){
 									let data = res.data
-									console.log(data)
-									for(var i=0; i<data.length;i++){
-										let shippmentStr = "";
-										let orderStr = "";
-										shippmentStr = '<div class="shippment_txt">'
-															+'<input type="text" value="'+data[i].shippmentID+'" />'
-															+'<button class="btn btn-sm red-sunglo deleteShippment">删除</button>'
-														+'</div>';
-										
-										for(var j=0;j<data[i].receipts_num.length;j++){
-											orderStr += '<div class="orderItem">'
-															+'<input type="text" value="'+data[i].receipts_num[j]+'" />'
-															+'<button class="btn btn-sm red-sunglo deleteOrder">删除</button>'
-														+'</div>'
+									if(res.role == 2 || res.role == 4 || res.role == 6 || res.role == 7){
+										for(var i=0; i<data.length;i++){
+											let shippmentStr = "";
+											let orderStr = "";
+											shippmentStr = '<div class="shippment_txt">'
+																+'<input type="text" value="'+data[i].shippmentID+'" />'
+																+'<button class="btn btn-sm red-sunglo deleteShippment">删除</button>'
+															+'</div>';
+											
+											for(var j=0;j<data[i].receipts_num.length;j++){
+												orderStr += '<div class="orderItem">'
+																+'<input type="text" value="'+data[i].receipts_num[j]+'" />'
+																+'<button class="btn btn-sm red-sunglo deleteOrder">删除</button>'
+															+'</div>'
+											}
+											$('.shippmenid_box').append('<div class="editor_div">'
+																			+shippmentStr 
+																			+ '<div class="order_txt">'
+																				+'<div>'
+																					+'<button style="margin: 5px 10px" class="btn btn-sm btn-info handleAddOrder">新增跟踪单号</button>'
+																				+'</div>'
+																				+'<div class="orderList">'
+																					+orderStr
+																				+'</div>'
+																				
+																			+'</div>'
+																		+'</div>')
 										}
-										$('.shippmenid_box').append('<div class="editor_div">'
-																		+shippmentStr 
-																		+ '<div class="order_txt">'
-																			+'<div>'
-																				+'<button style="margin: 5px 10px" class="btn btn-sm btn-info handleAddOrder">新增跟踪单号</button>'
+										$('.handleAddShippment').show();
+										$('#saveBtn').show();
+									}else{
+										for(var i=0; i<data.length;i++){
+											let shippmentStr = "";
+											let orderStr = "";
+											shippmentStr = '<div class="shippment_txt">'
+																+'<span>'+data[i].shippmentID+'</span>'
+															+'</div>';
+											
+											for(var j=0;j<data[i].receipts_num.length;j++){
+												orderStr += '<div class="orderItem">'
+																+'<span>'+data[i].receipts_num[j]+'</span>'
+															+'</div>'
+											}
+											$('.shippmenid_box').append('<div class="editor_div">'
+																			+shippmentStr 
+																			+ '<div class="order_txt">'
+																				+'<div class="orderList">'
+																					+orderStr
+																				+'</div>'
 																			+'</div>'
-																			+'<div class="orderList">'
-																				+orderStr
-																			+'</div>'
-																			
-																		+'</div>'
-																	+'</div>')
+																		+'</div>')
+										}
+										$('.handleAddShippment').hide();
+										$('#saveBtn').hide();
 									}
 								}
 							});

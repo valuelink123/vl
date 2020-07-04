@@ -415,6 +415,7 @@
 		white-space: nowrap;
 		text-overflow: ellipsis;
 	}
+	
 </style>
 <link rel="stylesheet" type="text/css" media="all" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-daterangepicker/3.0.5/daterangepicker.min.css" />
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.1/moment.min.js"></script>
@@ -582,29 +583,29 @@
 					</div>
 				</div>
 			</div>
-			<table id="planTable" class="display table-striped table-bordered table-hover" width="100%">
+			<table style="table-layout: fixed;margin-left: 0px;" id="planTable" class="display table-striped table-bordered table-hover">
 				<thead>
 					<tr style="text-align: center;">
 						<th>BG</th>
 						<th>BU</th>
 						<th>Station</th>
-						<th style="width: 10px;max-width: 10px;"><input type="checkbox" id="selectAll" name="selectAll" /></th>
-						<th style="max-width:30px;">提交日期</th>
-						<th style="max-width:30px;">销售员</th>
-						<th style="max-width:30px;">计划员</th>
-						<th style="max-width:60px;">产品图片</th>
-						<th style="max-width:45px;">
+						<th><input type="checkbox" id="selectAll" name="selectAll" /></th>
+						<th>提交日期</th>
+						<th>销售员</th>
+						<th>计划员</th>
+						<th>产品图片</th>
+						<th>
 							<div>账号</div>
 							<div>Seller SKU</div>
 							<div>ASIN</div>
 						</th>
-						<th style="max-width:30px;">SKU</th>
-						<th style="max-width:30px;">调入工厂</th>
-						<th style="max-width:30px;">需求数量</th>
-						<th style="max-width:40px;">期望到货时间</th>
-						<th style="max-width:35px;">是否贴RMS标签</th>
-						<th style="max-width:70px;min-width:70px;">调拨理由</th>
-						<th style="max-width:50px;">
+						<th>SKU</th>
+						<th>调入工厂</th>
+						<th>需求数量</th>
+						<th>期望到货时间</th>
+						<th>是否贴RMS标签</th>
+						<th>调拨理由</th>
+						<th>
 							<div style="position: relative;">
 								可维持天数
 								<div title="FBA在库+转库中库存+调拨在途的库存总量可满足未来销售计划的天数" class="hover_svg">
@@ -613,7 +614,7 @@
 							</div>
 							
 						</th>
-						<th style="max-width:35px;">
+						<th>
 							<div style="position: relative;">
 								FBA在库
 								<div title="FBA在库=FBA可用库存+转库中库存" class="hover_svg">
@@ -621,7 +622,7 @@
 								</div>
 							</div>
 						</th>
-						<th style="max-width:70px;">
+						<th>
 							<div style="position: relative;">
 								FBA可维持天数
 								<div title="FBA可用库存和转库中库总和可满足的未来销售计划的天数" class="hover_svg">
@@ -629,7 +630,7 @@
 								</div>
 							</div>
 						</th>
-						<th style="max-width:40px;">
+						<th>
 							<div style="position: relative;">
 								调拨在途
 								<div title="在调拨中的数量，包含已审核通过的调拨未出库，和已发货亚马逊还未签收的数量" class="hover_svg">
@@ -637,8 +638,8 @@
 								</div>
 							</div>
 						</th>
-						<th style="max-width:55px;">审核状态</th>
-						<th style="max-width:30px;">
+						<th>审核状态</th>
+						<th>
 							<div style="position: relative;">
 								调拨状态
 								<div title="该调拨请求的调拨进度，数据来源于物流部" class="hover_svg">
@@ -646,7 +647,7 @@
 								</div>
 							</div>
 						</th>
-						<th style="max-width:60px;">
+						<th>
 							<div style="position: relative;">
 								调整需求数量
 								<div title="计划和物流确认后的实际可调拨数量" class="hover_svg">
@@ -654,7 +655,7 @@
 								</div>
 							</div>
 						</th>
-						<th style="max-width:80px;">
+						<th>
 							<div style="position: relative;">
 								预计到货时间
 								<div title="计划和物流确认过的预计到货时间" class="hover_svg">
@@ -662,9 +663,9 @@
 								</div>
 							</div>
 						</th>
-						<th style="max-width:30px;">调出工厂</th>
+						<th>调出工厂</th>
 						
-						<th style="max-width:60px;">待办事项</th>
+						<th>待办事项</th>
 					</tr>
 				</thead>
 				
@@ -1561,12 +1562,13 @@
 				paging: true,  // 是否显示分页
 				info: false,// 是否表格左下角显示的文字
 				order: [ 9, "desc" ], //设置排序
-				fixedColumns: { //固定列的配置项
+				/* fixedColumns: { //固定列的配置项
 					leftColumns: 10, //固定左边第一列
 					rightColumns: 1, //固定左边第一列
-				},
+				}, */
 				serverSide: false,//是否所有的请求都请求服务器	
-				scrollX: "100%",
+				scrollX: true,
+				//colReorder: true,//拖拽
 				autoWidth:false,
 				scrollCollapse: false,
 				ajax: {
@@ -1659,6 +1661,7 @@
 					},
 					{
 						data: 'label',
+						width: '80px',
 						render: function(data, type, row, meta) {
 							var content = '<div class="aaa">'+ row.label +'</div>'+
 										  '<div>'+ row.seller_sku +'</div>'+
@@ -1824,6 +1827,7 @@
 					
 					{
 						data: "allot",
+						width: '80px',
 						render: function(data, type, row, meta) {
 							if(data == 0){
 								data = '<button style="width:110px" class="upCargoDataBtn">上传大货资料</button>'
@@ -2054,7 +2058,67 @@
 				};
 				tableObj.ajax.reload();
 			})
+			
+			
+			
+			//鼠标拖动列宽
+			var tabSize = tabSize || {};
+			tabSize.init = function (id,headTableWrapperId) {
+			    //用来存储当前更改宽度的Table Cell,避免快速移动鼠标的问题
+			    var tTD;
+			    // 获取需要修改列宽的表格
+			    var table = document.getElementById(id);
+			    // 获取固定头部的表格
+			    var tableHead = $('#'+ headTableWrapperId + ' .dataTables_scrollHeadInner table')[0];
+			    // 获取表格头部th
+			    var headTh = tableHead.rows[0];
+			    for (j = 0; j < headTh.cells.length; j++) {
+			        headTh.cells[j].onmousedown = function () {
+			            //记录单元格
+			            tTD = this;
+			            if (event.offsetX > tTD.offsetWidth - 10) {
+			                tTD.mouseDown = true;
+			                tTD.oldX = event.x;
+			                tTD.oldWidth = tTD.offsetWidth;
+			            }
+			        };
+			        headTh.cells[j].onmouseup = function () {
+			            //结束宽度调整
+			            if (tTD == undefined) tTD = this;
+			            tTD.mouseDown = false;
+			            tTD.style.cursor = 'default';
+			        };
+			        headTh.cells[j].onmousemove = function () {
+			            //更改鼠标样式
+			            if (event.offsetX > this.offsetWidth - 10)
+			                this.style.cursor = 'col-resize';
+			            else
+			                this.style.cursor = 'default';
+			
+			            //取出暂存的Table Cell
+			            if (tTD == undefined) tTD = this;
+			            //调整宽度
+			            if (tTD.mouseDown != null && tTD.mouseDown == true) {
+			                tTD.style.cursor = 'default';
+			                if (tTD.oldWidth + (event.x - tTD.oldX) > 0)
+			                    tTD.width = tTD.oldWidth + (event.x - tTD.oldX);
+			                //调整列宽
+			                tTD.style.width = tTD.width + 'px';
+			                tTD.style.cursor = 'col-resize';
+			                // 调整滚动表格的每个cell
+			                for (k = 0; k < table.rows.length; k++) {
+			                    table.rows[k].cells[tTD.cellIndex].style.width = tTD.style.width;
+			                }
+			            }
+			        };
+			    }
+			};
+			// 鼠标拖动列宽
+			setTimeout(function () {
+			    tabSize.init('planTable','planTable_wrapper');// 参数：1.table元素的id，2.datatable插件生成的最外层div的id，F12可查看到
+			}, 2000);
 		})
+		
 		
 	</script>
 @endsection
