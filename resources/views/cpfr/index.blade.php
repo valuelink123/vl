@@ -417,10 +417,7 @@
 	}
 	
 </style>
-<link rel="stylesheet" type="text/css" media="all" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-daterangepicker/3.0.5/daterangepicker.min.css" />
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.1/moment.min.js"></script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-daterangepicker/3.0.5/daterangepicker.min.js"></script>
-    <!-- <a href="/collaborativeReplenishment/index">Collaborative Replenishment</a> -->
+
 	<ul class="nav_list">
 		<li class="nav_active"><a href="/cpfr/index">调拨计划</a></li>
 		<li><a href="/cpfr/purchase">采购计划</a></li>
@@ -1556,12 +1553,12 @@
 			$.fn.dataTable.ext.errMode = 'none';
 			tableObj = $('#planTable').DataTable({
 				lengthMenu: [
-				    10, 50, 100, 'All'
+				     [10, 25, 50, -1], [10, 25, 50, "All"] 
 				],
 				dispalyLength: 2, // default record count per page
 				paging: true,  // 是否显示分页
 				info: false,// 是否表格左下角显示的文字
-				order: [ 9, "desc" ], //设置排序
+				order: [ 4, "desc" ], //设置排序
 				/* fixedColumns: { //固定列的配置项
 					leftColumns: 10, //固定左边第一列
 					rightColumns: 1, //固定左边第一列
@@ -1872,7 +1869,7 @@
 					},
 				], 
 				columnDefs:[
-					{ "bSortable": false, "aTargets": [ 0,1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21]},
+					{ "bSortable": false, "aTargets": [ 0,1,2,3,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21]},
 				]
 			});
 			

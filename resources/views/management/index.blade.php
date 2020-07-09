@@ -145,7 +145,7 @@
 	}
 	.department_list li > input,.department_list li select{
 		width: 280px;
-		height: 28px;
+		height: 30px;
 		border: 1px solid #666;
 		padding-left: 5px;
 	}
@@ -198,6 +198,7 @@
 		padding: 3px;
 		width: 280px !important;
 		border: 1px solid #666;
+		overflow: hidden;
 	}
 	.input-group-btn:last-child>.btn, .input-group-btn:last-child>.btn-group{
 		width: 25px !important;
@@ -231,8 +232,8 @@
 	}
 	/* 新建岗位 */
 	.add_Jobs_dialog{
-		height: 440px;
-		margin-top: -220px;
+		height: 550px;
+		margin-top: -275px;
 	}
 	.success_mask{
 		width: 400px;
@@ -334,9 +335,10 @@
 	.handleCreate,.handleEdit{
 		display: none;
 	}
+	.permissions_li1{
+		display: none;
+	}
 </style>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.8/css/select2.min.css" rel="stylesheet" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.8/js/select2.min.js"></script>
 <div>
 	<div class="filter_box">
 		<div class="filter_option">
@@ -433,12 +435,12 @@
 		<ul class="department_list">
 			<li class="wrap_one_single">
 				<label for="department_name">部门</label>
-				<input type="text" id="department_name">
+				<input type="text" id="department_name" placeholder="请输入部门名称">
 				<span class="errCode">部门不能为空!</span>
 			</li>
 			<li class="wrap_one_single">
 				<label for="superior_department">上级部门</label>
-				<select class="superior_department" placeholder="请选择" id="superior_department" style="float: left;">
+				<select class="superior_department" data-placeholder="请选择上级部门" id="superior_department" style="float: left;">
 					<option value="">请选择</option>
 					<option value="-1">没有上级部门</option>
 					<option value="1">一级部门1</option>
@@ -446,55 +448,28 @@
 				</select>
 				<span class="errCode">上级部门不能为空!</span>
 			</li>
-			<!-- <li class="wrap_one_single">
-				<label for="first_department">一级部门</label>
-				<input type="text" id="first_department">
-				<span class="errCode">一级部门不能为空!</span>
-			</li> -->
-			<!-- <li class="wrap_one_single">
-				<label for="executive_director">部门长</label>
-				<select class="executive_director" placeholder="请选择" id="executive_director" style="float: left;">
-					<option value="">请选择</option>
-					<option value="张三">张三</option>
-				</select>
-				<span class="errCode">部门长不能为空!</span>
-			</li> -->
+			
 			<li>
 				<label for="">权限设置</label>
 				<select name="" class="permissions_sele">
-					<option value="默认权限">默认权限</option>
-					<option value="复制权限">复制权限</option>
-					<option value="手动设置">手动设置</option>			
+					<option value="1">复制权限</option>
+					<option value="2">手动设置</option>			
 				</select>
-				<div class="permissions_li1" style="margin: 22px 0 0 84px; display: none;">
-					<select class="mt-multiselect btn btn-default manual_settings handleCreate" multiple="multiple" data-clickable-groups="true" data-collapse-groups="true" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true">
-						<optgroup label="aaa">
-							<option value="aa">aa</option>	
-							<option value="bb">bb</option>
-						</optgroup>
-						<optgroup label="456">
-							<option value="44">44</option>	
-							<option value="55">55</option>
-						</optgroup>
-					</select>
-					<select class="mt-multiselect btn btn-default manual_settings handleEdit" multiple="multiple" data-clickable-groups="true" data-collapse-groups="true" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true">
-						<optgroup label="123">
-							<option value="33">33</option>	
-							<option value="22">22</option>
-						</optgroup>
-						<optgroup label="456">
-							<option value="44">44</option>	
-							<option value="55">55</option>
-						</optgroup>
-					</select>
+				<div class="permissions_li1" style="margin: 22px 0 0 84px;">
+					<!-- <select class="roleSelect" multiple="multiple"></select> -->
+					<div class="btn-group">
+					    <select class="roleSelect" multiple="multiple">
+					    </select>
+					</div>
 				</div>
-				<div class="permissions_li2" style="margin: 22px 0 0 84px; display: none;">
+				<div class="permissions_li2" style="margin: 22px 0 0 84px;">
 					<select name="" class="copy_object" style="width: 105px;">
 						<option value="">复制类型</option>
-						<option value="部门">部门</option>
-						<option value="人员">人员</option>
+						<option value="1">部门</option>
+						<option value="2">人员</option>
 					</select>
-					<select name="" class="copy_permission"></select>
+					<select name="" class="copy_permission" data-placeholder="请选择">
+					</select>
 				</div>
 			</li>
 		</ul>
@@ -577,11 +552,10 @@
 			<li>
 				<label for="">权限设置</label>
 				<select name="" class="permissions_sele">
-					<option value="默认权限">默认权限</option>
-					<option value="复制权限">复制权限</option>
-					<option value="手动设置">手动设置</option>
+					<option value="1">复制权限</option>
+					<option value="2">手动设置</option>
 				</select>
-				<div class="permissions_li1" style="margin: 22px 0 0 84px; display: none;">
+				<div class="permissions_li1" style="margin: 22px 0 0 84px;">
 					<select class="mt-multiselect btn btn-default manual_settings" multiple="multiple" data-clickable-groups="true" data-collapse-groups="true" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true">
 						<optgroup label="aaa">
 							<option value="aa">aa</option>
@@ -597,13 +571,13 @@
 						</optgroup>
 					</select>
 				</div>
-				<div class="permissions_li2" style="margin: 22px 0 0 84px; display: none;">
+				<div class="permissions_li2" style="margin: 22px 0 0 84px;">
 					<select name="" class="copy_object" style="width: 85px;">
 						<option value="">复制类型</option>
-						<option value="部门">部门</option>
-						<option value="人员">人员</option>
+						<option value="1">部门</option>
+						<option value="2">人员</option>
 					</select>
-					<select name="" class="staff_copy_permission">
+					<select name="" class="copy_permission" data-placeholder="请选择">
 						<option value="">请选择</option>
 						<option value="1">113</option>
 					</select>
@@ -645,11 +619,6 @@
 			<li class="wrap_one_single">
 				<label for="Jobs_department">部门</label>
 				<select class="Jobs_department" placeholder="请选择" id="Jobs_department">
-					<option value="">请选择</option>
-					<option value="1">部门1</option>
-					<option value="2">部门2</option>
-					<option value="3">部门3</option>
-					<option value="4">部门4</option>
 				</select>
 				<span class="errCode">部门不能为空!</span>
 			</li>
@@ -657,33 +626,23 @@
 			<li>
 				<label for="">权限设置</label>
 				<select name="" class="permissions_sele">
-					<option value="默认权限">默认权限</option>
-					<option value="复制权限">复制权限</option>
-					<option value="手动设置">手动设置</option>
+					<option value="1">复制权限</option>
+					<option value="2">手动设置</option>
 				</select>
-				<div class="permissions_li1" style="margin: 22px 0 0 84px; display: none;">
-					<select class="mt-multiselect btn btn-default manual_settings" multiple="multiple" data-clickable-groups="true" data-collapse-groups="true" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true">
-						<optgroup label="aaa">
-							<option value="aa">aa</option>
-							<option value="bb">bb</option>
-							<option value="cc">cc</option>
-							<option value="dd">dd</option>
-						</optgroup>
-						<optgroup label="bbb">
-							<option value="aa">aa</option>
-							<option value="bb">bb</option>
-							<option value="cc">cc</option>
-							<option value="dd">dd</option>
-						</optgroup>
-					</select>
+				
+				<div class="permissions_li1" style="margin: 22px 0 0 84px;">
+					<div class="btn-group">
+					    <select class="roleSelect" multiple="multiple">
+					    </select>
+					</div>
 				</div>
-				<div class="permissions_li2" style="margin: 22px 0 0 84px; display: none;">
-					<select name="" class="copy_object" style="width: 85px;">
+				<div class="permissions_li2" style="margin: 22px 0 0 84px;">
+					<select name="" class="copy_object" style="width: 105px;">
 						<option value="">复制类型</option>
-						<option value="部门">部门</option>
-						<option value="人员">人员</option>
+						<option value="1">部门</option>
+						<option value="2">人员</option>
 					</select>
-					<select name="" class="Jobs_copy_permission" style="width: 120px;">
+					<select name="" class="copy_permission" data-placeholder="请选择">
 						<option value="">人员</option>
 					</select>
 				</div>
@@ -708,11 +667,40 @@
 		</span>
 		<span class="mask_text error_mask_text"></span>
 	</div>
+	
 <script>
+	
 	$(document).ready(function(){
+		function getPermissionsList(){
+			$.ajax({
+			    type: "POST",
+				url: "http://www.vl.test/management/getAllPermissions",
+				success: function (res) {
+					$('.roleSelect').html('');
+					$.each(res, function (index, value) {
+						if(value.group != null){
+							$('.roleSelect').append('<optgroup label="' + value.group + '"></optgroup>');
+						}else{
+							$('.roleSelect').append('<option value="' + value.id + '">' + value.opt + '</option>');
+						}
+					});
+					$('.roleSelect').multiselect({
+					    maxHeight: 230,
+					    includeSelectAllOption: true,
+					    enableFiltering: true,
+					    enableClickableOptGroups: true
+					});
+				},
+				error: function(err) {
+					console.log(err)
+				}
+			});
+			
+		}	
+		getPermissionsList($('.roleSelect'));
 		
 		/* 获取部门信息 */
-		var id1,id2,id3;
+		var id1,id2,id3,departmentId,roleId;
 		function getSubDepartments (item,id){
 			$.ajax({
 			    type: "POST",
@@ -819,13 +807,15 @@
 					department_id: ids
 				},
 				success: function (res) {
-					$('.dept_text').text(res.dept_info.dept);
-					$('.sup_dept').text(res.dept_info.sup_dept);
-					$('.rank_one_dept').text(res.dept_info.rank_one_dept);
-					$('.leader').text(res.dept_info.leader);
-					$('.permission').text(res.dept_info.permission);
-					role_info = res.role_info;
-					user_info = res.user_info;
+					if(res.status == 1){
+						$('.dept_text').text(res.dept_info.dept);
+						$('.sup_dept').text(res.dept_info.sup_dept);
+						$('.rank_one_dept').text(res.dept_info.rank_one_dept);
+						$('.leader').text(res.dept_info.leader);
+						$('.permission').text(res.dept_info.permission);
+						role_info = res.role_info;
+						user_info = res.user_info;
+					}
 				},
 				error: function(err) {
 					console.log(err)
@@ -838,6 +828,7 @@
 		$("#department1").val(id1).select2();
 		$('#department2').val(id2);
 		$('#department3').val(id3);
+		$(".js-example-basic-multiple").select2();
 		
 		$('#department1').select2({
 			tags:false,
@@ -879,9 +870,9 @@
 			$('#department_name').val("");
 			$("#superior_department").select2("val", " ");
 			/* $("#executive_director").select2("val", " "); */
-			$('.permissions_sele').val("默认权限");
+			//$('.permissions_sele').val(1);
 			$('.permissions_li1').hide();
-			$('.permissions_li2').hide();
+			$('.permissions_li2').show();
 			$('.copy_object').val("");
 			$(".copy_permission").select2("val", " "); 
 			$('select[multiple="multiple"]').multiselect('clearSelection');
@@ -903,40 +894,63 @@
 				},
 			});
 		}
+		getDepartmentInfo();
 		//新建部门
 		$('#handleAddPermissions').on('click',function(){
 			clearPermissions();
 			$('.mask_box').show();
+			$('.permissions_sele').val(1);
 			$('.department_title').text('新建部门');
 			$('.permissions_id').val('');
-			getDepartmentInfo();
-			$('.handleCreate').show();
-			$('.handleEdit').hide();
-			$('.permissions_li1').find('.multiselect-native-select').eq(0).css('display','block');
-			$('.permissions_li1').find('.multiselect-native-select').eq(1).css('display','none');
+			//getDepartmentInfo();
 		})
+		
+		function getId(){
+			if($('#department3').val() != -1){
+				departmentId = $('#department3').val()
+			}else if($('#department2').val() != -1){
+				departmentId = $('#department2').val();
+			}else{
+				departmentId = $('#department1').val();
+			}
+		}
 		//编辑部门
-		$('#handleEditPermissions').on('click',function(){
+		$('#handleEditPermissions').on('click',function(){		
+			getId()
+			$('.permissions_sele').val(2);
 			clearPermissions();
 			$('.mask_box').show();
 			$('.department_title').text('编辑部门');
-			$('.permissions_id').val(1)
-			getDepartmentInfo();
-			$('.handleCreate').hide();
-			$('.handleEdit').show();
-			$('.permissions_li1').find('.multiselect-native-select').eq(0).css('display','none');
-			$('.permissions_li1').find('.multiselect-native-select').eq(1).css('display','block');
+			$('.permissions_li1').show();
+			$('.permissions_li2').hide();
+			//getDepartmentInfo();
+			$.ajax({
+			    type: "POST",
+				url: "http://www.vl.test/management/editDepartmentInfo",
+				data:{
+					department_id: departmentId,
+				},
+				success: function (res) {
+					if(res.status = 1){
+						$("#superior_department").select2("val", [res.sup_dept_id]);
+						$("#superior_department").val([res.sup_dept_id]).trigger("change");
+						$('.roleSelect').multiselect('select', res.dept_permissions);
+						$('#department_name').val(res.display_name);
+						$('.permissions_id').val(res.sup_dept_id);
+					}
+				},
+				error: function(err) {
+					console.log(err)
+				},
+			});
 		})
 		//权限设置
 		$('.permissions_sele').on('change',function(){
-			if($(this).val() == '复制权限'){
+			if($(this).val() == 1){
 				$('.permissions_li2').show();
 				$('.permissions_li1').hide();
-			}else if($(this).val() == '手动设置'){
+			}else if($(this).val() == 2){
 				$('.permissions_li1').show();
-				$('.permissions_li2').hide();
-			}else{
-				$('.permissions_li1').hide();
 				$('.permissions_li2').hide();
 			}
 		})
@@ -980,7 +994,7 @@
 		//复制部门权限
 		$('.copy_object').on('change',function(){
 			$('.copy_permission').empty();
-			if($(this).val() == "部门"){
+			if($(this).val() == 1){
 				$.ajax({
 				    type: "POST",
 					url: "http://www.vl.test/management/getAllDepartments",
@@ -994,7 +1008,7 @@
 						console.log(err)
 					}
 				});
-			}else if($(this).val() == "人员"){
+			}else if($(this).val() == 2){
 				$.ajax({
 				    type: "POST",
 					url: "http://www.vl.test/management/getAllUsers",
@@ -1048,31 +1062,52 @@
 			}else{
 				$('#superior_department').parent().find('.errCode').hide();
 			}
-			/* if($('#first_department').val() == ""){
-				$('#first_department').parent().find('.errCode').show();
-				return
-			}else{
-				$('#first_department').parent().find('.errCode').hide();
-			} */
-			/* if($("#executive_director").select2("val") == null){
-				$('#executive_director').parent().find('.errCode').show();
-				return
-			}else{
-				$('#executive_director').parent().find('.errCode').hide();
-			} */
-			
 			if($('.permissions_sele').val() == ""){
 				$('#permissions_sele').parent().find('.errCode').show();
 				return
 			}else{
 				$('.permissions_sele').parent().find('.errCode').hide();
 			}
-			if($('.permissions_id').val() != ""){
-				console.log('编辑')
-			}else{
-				console.log('新增')
+			let arr = $('.mask_box').find('.roleSelect').val();
+			if($('.copy_permission').val() != null || $('.copy_permission').val() == -1){
+				arr = []
 			}
+			$.ajax({
+			    type: "POST",
+				url: "http://www.vl.test/management/saveDepartmentInfo",
+				data:{
+					department_name: $('#department_name').val(),
+					department_id: departmentId,
+					supDept_id: $('#superior_department').val(),
+					perm_settings: $('.permissions_sele').val(),
+					copy_type: $('.copy_object').val(),
+					selected_department_id: $('.copy_permission').val(),
+					selected_user_id: $('.copy_permission').val(),
+					selected_permissions: arr
+				},
+				success: function (res) {
+					if(res.status == 1){
+						$('.success_mask').fadeIn(1000);
+						$('.success_mask_text').text(res.msg);
+						setTimeout(function(){
+							$('.success_mask').fadeOut(1000);
+						},2000);
+						$('.mask_box').hide();
+						window.location.reload();
+					}else{
+						$('.error_mask').fadeIn(1000);
+						$('.error_mask_text').text(res.msg);
+						setTimeout(function(){
+							$('.error_mask').fadeOut(1000);
+						},2000)	
+					}
+				},
+				error: function(err) {
+					console.log(err)
+				}
+			});
 		})
+		
 		/* 添加人员 */
 		//清空添加人员信息
 		function clearStaffVal(){
@@ -1204,10 +1239,101 @@
 			$(".copy_permission").select2("val", " "); 
 			$('select[multiple="multiple"]').multiselect('clearSelection');
 		}
+		console.log(departmentId)
+		//新建岗位时获取部门列表
+		function getJobsDepartment(){
+			getId();
+			$.ajax({
+			    type: "POST",
+				url: "http://www.vl.test/management/getInnerDepartments",
+				data:{
+					department_id: departmentId
+				},
+				success: function (res) {
+					$("#Jobs_department").empty();
+					$("#Jobs_department").append("<option value='-1'>请选择</option>");
+					$.each(res, function (index, value) {
+						$("#Jobs_department").append("<option value='" + value.id + "'>" + value.display_name + "</option>");
+					})
+				},
+				error: function(err) {
+					console.log(err)
+				},
+			});
+		}
+		
+		//新建岗位
 		$('.handleAddJobs').on('click',function(){
 			clearJobsVal();
 			$('.add_Jobs_mask').show();
 			$('.Jobs_title').text('新建岗位');
+			$('.permissions_sele').val(1);
+			getJobsDepartment();
+			$('.permissions_li1').hide();
+			$('.permissions_li2').show();
+			
+		})
+		//保存岗位
+		$('.save_Jobs').on('click',function(){
+			if($('#Jobs_input').val() == ''){
+				$('#Jobs_input').parent().find('.errCode').show();
+				return
+			}else{
+				$('#Jobs_input').parent().find('.errCode').hide();
+			}
+			if($('#Jobs_title_sele').val() == ""){
+				$('#Jobs_title_sele').parent().find('.errCode').show();
+				return
+			}else{
+				$('#Jobs_title_sele').parent().find('.errCode').hide();
+			}
+			
+			if($("#Jobs_department").select2("val") == null || $("#Jobs_department").select2("val") == -1){
+				$('#Jobs_department').parent().find('.errCode').show();
+				return
+			}else{
+				$('#Jobs_department').parent().find('.errCode').hide();
+			}
+			let arr = $('.add_Jobs_mask').find('.roleSelect').val();
+			if($('.copy_permission').val() != null || $('.copy_permission').val() == -1){
+				arr = []
+			}
+			$.ajax({
+			    type: "POST",
+				url: "http://www.vl.test/management/saveRoleInfo",
+				data:{
+					role_display_name: $('#Jobs_input').val(),
+					title_id: $('#Jobs_title_sele').val(),
+					department_id: $('#Jobs_department').val(),
+					role_id: roleId,
+					perm_settings: $('.permissions_sele').val(),
+					copy_type: $('.copy_object').val(),
+					selected_department_id: $('.copy_permission').val(),
+					selected_user_id: $('.copy_permission').val(),
+					selected_permissions: arr
+				},
+				success: function (res) {
+					if(res.status == 1){
+						$('.success_mask').fadeIn(1000);
+						$('.success_mask_text').text(res.msg);
+						setTimeout(function(){
+							$('.success_mask').fadeOut(1000);
+						},2000);
+						$('.add_Jobs_mask').hide();
+						window.location.reload();
+					}else{
+						$('.error_mask').fadeIn(1000);
+						$('.error_mask_text').text(res.msg);
+						setTimeout(function(){
+							$('.error_mask').fadeOut(1000);
+						},2000)	
+					}
+				},
+				error: function(err) {
+					console.log(err)
+				}
+			});
+			
 		})
 		//岗位
 		$('#Jobs_input').on('input',function(){
@@ -1233,27 +1359,7 @@
 				$(this).parent().find('.errCode').hide();
 			}
 		})
-		//保存岗位
-		$('.save_Jobs').on('click',function(){
-			if($('#Jobs_input').val() == ''){
-				$('#Jobs_input').parent().find('.errCode').show();
-				return
-			}else{
-				$('#Jobs_input').parent().find('.errCode').hide();
-			}
-			if($('#Jobs_title_sele').val() == ""){
-				$('#Jobs_title_sele').parent().find('.errCode').show();
-				return
-			}else{
-				$('#Jobs_title_sele').parent().find('.errCode').hide();
-			}
-			if($('#Jobs_department').val() == ""){
-				$('#Jobs_department').parent().find('.errCode').show();
-				return
-			}else{
-				$('#Jobs_department').parent().find('.errCode').hide();
-			}
-		})
+		
 		
 		//禁止警告弹窗弹出
 		$.fn.dataTable.ext.errMode = 'none';
@@ -1280,9 +1386,48 @@
 					createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
 						$(cell).on( 'click', function () {
 							clearJobsVal()
-							$('.Jobs_id').val(cellData.user_id);
+							$('.Jobs_id').val(rowData.user_id);
 							$('.Jobs_title').text('编辑岗位');
 							$('.add_Jobs_mask').show();
+							getJobsDepartment();
+							$('.permissions_sele').val(2);
+							$('.permissions_li1').show();
+							$('.permissions_li2').hide();
+							$.ajax({
+								type:"post",
+								url:"http://www.vl.test/management/editRoleInfo",
+								data:{
+									"role_id": rowData.role_id,
+								},
+								success:function(res){
+									console.log(res)
+									if(res.status = 1){
+										$('#Jobs_input').val(res.display_name);
+										$('#Jobs_title_sele').val(res.title_id);
+										$("#Jobs_department").select2("val", [res.department_id]);
+										$("#superior_department").val([res.sup_dept_id]).trigger("change");
+										$('.roleSelect').multiselect('select', res.role_permissions);
+										roleId = rowData.role_id;
+									}
+									
+									/* if(res.status == 1){
+										$('.success_mask_text').text(res.msg)
+										$('.success_mask').fadeIn(1000);
+										setTimeout(function(){
+											$('.success_mask').fadeOut(1000);
+										},2000)	
+									}else{
+										$('.error_mask_text').text(res.msg)
+										$('.error_mask').fadeIn(1000);
+										setTimeout(function(){
+											$('.error_mask').fadeOut(1000);
+										},2000)
+									}	 */
+								},
+								error:function(err){
+									console.log(err)
+								},
+							});
 						});
 					}
 				},

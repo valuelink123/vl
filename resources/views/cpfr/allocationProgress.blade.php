@@ -421,9 +421,6 @@
 		margin: 5px 10px;
 	}
 </style>
-<link rel="stylesheet" type="text/css" media="all" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-daterangepicker/3.0.5/daterangepicker.min.css" />
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.1/moment.min.js"></script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-daterangepicker/3.0.5/daterangepicker.min.js"></script>
 
 <div>
 	<ul class="nav_list">
@@ -1503,7 +1500,7 @@
 			serverSide: false,
 			processing: false,
 			lengthMenu: [
-			    20, 50, 100, 'All'
+			     [10, 25, 50, -1], [10, 25, 50, "All"] 
 			],
 			scrollX: "100%",
 			scrollCollapse: false,
@@ -2004,7 +2001,7 @@
 			data:[],
 			
 			columnDefs: [
-				{ "bSortable": false, "aTargets": [ 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]},
+				{ "bSortable": false, "aTargets": [ 0,1,2,3,5,6,7,8,9,10,11,12,13,14,15]},
 				{
 					targets: [15],
 					render: function(data, type, row, meta) {

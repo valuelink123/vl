@@ -4,6 +4,16 @@
 @endsection
 @section('content')
 <style>
+	.daterangepicker .calendar-table table{
+		display: grid;
+	}
+	.daterangepicker .calendar-table td, .daterangepicker .calendar-table th{
+		background: #fff;
+	}
+	.daterangepicker td{
+		float: left;
+		line-height: 15px !important;
+	}
 	.nav_list{
 		overflow: hidden;
 		height: 45px;
@@ -364,9 +374,7 @@
 		box-sizing: border-box;
 	}
 </style>
-<link rel="stylesheet" type="text/css" media="all" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-daterangepicker/3.0.5/daterangepicker.min.css" />
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.1/moment.min.js"></script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-daterangepicker/3.0.5/daterangepicker.min.js"></script>
+
 <div>
 	<ul class="nav_list">
 		<li><a href="/cpfr/index">调拨计划</a></li>
@@ -1159,7 +1167,7 @@
 		$.fn.dataTable.ext.errMode = 'none';
 		tableObj = $("#purchasetable").DataTable({
 			lengthMenu: [
-			    20, 50, 100, 'All'
+			     [10, 25, 50, -1], [10, 25, 50, "All"] 
 			],
 			dispalyLength: 2, // default record count per page
 			paging: true,  // 是否显示分页

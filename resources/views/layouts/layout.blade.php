@@ -122,6 +122,13 @@
     <script type="text/javascript" src="/js/artDialog4.1.7/plugins/iframeTools.js"></script>
 
 	<script type="text/javascript" src="/js/banner.js"></script>
+	<link href="/assets/pages/css/select2.min.css" rel="stylesheet" type="text/css"/>
+	<script src="/assets/pages/scripts/select2.js" type="text/javascript"></script>
+	<!-- 日期插件bootstrap-daterangepicker -->
+	<link href="/assets/pages/css/daterangepicker.css" rel="stylesheet" type="text/css"/>
+	<script src="/assets/pages/scripts/moment.min.js" type="text/javascript"></script>
+	<script src="/assets/pages/scripts/daterangepicker.js" type="text/javascript"></script>
+	
 </head>
 <!-- END HEAD -->
 
@@ -706,12 +713,12 @@
                                                 <span class="arrow"></span>
                                             </a>
                                             <ul class="dropdown-menu pull-left">
-												<li class="">
+												<!-- <li class="">
 												    <a href="/management" class="nav-link nav-toggle ">
 												        management
 												        <span class="arrow"></span>
 												    </a>
-												</li>
+												</li> -->
 												@permission('users-show')
                                                 <li class="">
                                                     <a href="/user" class="nav-link nav-toggle ">
