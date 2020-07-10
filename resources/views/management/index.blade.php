@@ -141,7 +141,7 @@
 	}
 	.department_list li label{
 		display: inline-block;
-		width: 80px;
+		width: 85px;
 	}
 	.department_list li > input,.department_list li select{
 		width: 280px;
@@ -169,15 +169,15 @@
 	.errCode{
 		position: absolute;
 		color: red;
-		left: 82px;
+		left: 86px;
 		font-size: 8px;
 		bottom: -2px;
 		display: none;
 	}
 	/* 添加人员 */
 	.add_staff_dialog{
-		height: 770px;
-		margin-top: -385px;
+		height: 820px;
+		margin-top: -410px;
 	}
 	.dropdown > .dropdown-menu, .dropdown-toggle > .dropdown-menu, .btn-group > .dropdown-menu{
 		margin-top: 0;
@@ -455,21 +455,20 @@
 					<option value="1">复制权限</option>
 					<option value="2">手动设置</option>			
 				</select>
-				<div class="permissions_li1" style="margin: 22px 0 0 84px;">
+				<div class="permissions_li1" style="margin: 22px 0 0 88px;">
 					<!-- <select class="roleSelect" multiple="multiple"></select> -->
 					<div class="btn-group">
 					    <select class="roleSelect" multiple="multiple">
 					    </select>
 					</div>
 				</div>
-				<div class="permissions_li2" style="margin: 22px 0 0 84px;">
+				<div class="permissions_li2" style="margin: 22px 0 0 88px;">
 					<select name="" class="copy_object" style="width: 105px;">
 						<option value="">复制类型</option>
 						<option value="1">部门</option>
 						<option value="2">人员</option>
 					</select>
-					<select name="" class="copy_permission" data-placeholder="请选择">
-					</select>
+					<select name="" class="copy_permission" data-placeholder="请选择"></select>
 				</div>
 			</li>
 		</ul>
@@ -505,25 +504,6 @@
 				<input type="text" id="dingding_id">
 			</li>
 			<li class="wrap_one_single">
-				<label for="post_sele">岗位</label>
-				<input type="text" id="post_sele">
-				<span class="errCode">岗位不能为空!</span>
-			</li>
-			<li class="wrap_one_single">
-				<label for="title_input">职称</label>
-				<select name="" id="title_input">
-					<option value="">请选择</option>
-					<option value="1">专员</option>
-					<option value="2">主管</option>
-					<option value="3">经理</option>
-					<option value="4">总监</option>
-					<option value="5">副总裁</option>
-					<option value="6">总裁</option>
-					<option value="7">CEO</option>
-				</select>
-				<span class="errCode">职称不能为空!</span>
-			</li>
-			<li class="wrap_one_single">
 				<label for="department_sele">部门</label>
 				<select name="" class="department_sele" id="department_sele">
 					<option value="">请选择</option>
@@ -532,6 +512,41 @@
 					<option value="3">33</option>
 				</select>
 				<span class="errCode">部门不能为空!</span>
+			</li>
+			<li class="wrap_one_single">
+				<label for="post_sele">岗位</label>
+				<select name="post_sele" id="post_sele" placeholder="请选择"></select>
+				<span class="errCode">岗位不能为空!</span>
+			</li>
+			<li class="wrap_one_single">
+				<label for="title_input">职称</label>
+				<input type="text" id="title_input">
+				<span class="errCode">职称不能为空!</span>
+			</li>
+			<li>
+				<label for="">权限设置</label>
+				<select name="" class="permissions_sele">
+					<option value="1">复制权限</option>
+					<option value="2">手动设置</option>
+				</select>
+				<div class="permissions_li1" style="margin: 22px 0 0 88px;">
+					<select class="roleSelect" multiple="multiple"></select>
+				</div>
+				<div class="permissions_li2" style="margin: 22px 0 0 88px;">
+					<select name="" class="copy_object" style="width: 107px;">
+						<option value="">复制类型</option>
+						<option value="1">部门</option>
+						<option value="2">人员</option>
+					</select>
+					<select name="" class="copy_permission" data-placeholder="请选择"></select>
+				</div>
+			</li>
+			<li>
+				<label for="isDepartmentHead">是否是部门长</label>
+				<select name="" id="isDepartmentHead">
+					<option value="0">否</option>
+					<option value="1">是</option>	
+				</select>
 			</li>
 			
 			<li>
@@ -549,40 +564,7 @@
 					<option value="0">冻结</option>		
 				</select>
 			</li>
-			<li>
-				<label for="">权限设置</label>
-				<select name="" class="permissions_sele">
-					<option value="1">复制权限</option>
-					<option value="2">手动设置</option>
-				</select>
-				<div class="permissions_li1" style="margin: 22px 0 0 84px;">
-					<select class="mt-multiselect btn btn-default manual_settings" multiple="multiple" data-clickable-groups="true" data-collapse-groups="true" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true">
-						<optgroup label="aaa">
-							<option value="aa">aa</option>
-							<option value="bb">bb</option>
-							<option value="cc">cc</option>
-							<option value="dd">dd</option>
-						</optgroup>
-						<optgroup label="bbb">
-							<option value="aa">aa</option>
-							<option value="bb">bb</option>
-							<option value="cc">cc</option>
-							<option value="dd">dd</option>
-						</optgroup>
-					</select>
-				</div>
-				<div class="permissions_li2" style="margin: 22px 0 0 84px;">
-					<select name="" class="copy_object" style="width: 85px;">
-						<option value="">复制类型</option>
-						<option value="1">部门</option>
-						<option value="2">人员</option>
-					</select>
-					<select name="" class="copy_permission" data-placeholder="请选择">
-						<option value="">请选择</option>
-						<option value="1">113</option>
-					</select>
-				</div>
-			</li>
+			
 		</ul>
 		<div class="mask_btn">
 			<button onclick="$('.add_staff_mask').hide()">取消</button>
@@ -630,21 +612,19 @@
 					<option value="2">手动设置</option>
 				</select>
 				
-				<div class="permissions_li1" style="margin: 22px 0 0 84px;">
+				<div class="permissions_li1" style="margin: 22px 0 0 88px;">
 					<div class="btn-group">
 					    <select class="roleSelect" multiple="multiple">
 					    </select>
 					</div>
 				</div>
-				<div class="permissions_li2" style="margin: 22px 0 0 84px;">
+				<div class="permissions_li2" style="margin: 22px 0 0 88px;">
 					<select name="" class="copy_object" style="width: 105px;">
 						<option value="">复制类型</option>
 						<option value="1">部门</option>
 						<option value="2">人员</option>
 					</select>
-					<select name="" class="copy_permission" data-placeholder="请选择">
-						<option value="">人员</option>
-					</select>
+					<select name="" class="copy_permission" data-placeholder="请选择"></select>
 				</div>
 			</li>
 		</ul>
@@ -674,7 +654,7 @@
 		function getPermissionsList(){
 			$.ajax({
 			    type: "POST",
-				url: "http://www.vl.test/management/getAllPermissions",
+				url: "/management/getAllPermissions",
 				success: function (res) {
 					$('.roleSelect').html('');
 					$.each(res, function (index, value) {
@@ -704,7 +684,7 @@
 		function getSubDepartments (item,id){
 			$.ajax({
 			    type: "POST",
-				url: "http://www.vl.test/management/getSubDepartments",
+				url: "/management/getSubDepartments",
 				async:false,
 				data: {
 					parent_id:id
@@ -766,7 +746,7 @@
 		//获取当前用户所属的部门
 		$.ajax({
 		    type: "POST",
-			url: "http://www.vl.test/management/getUserDepartmentIds",
+			url: "/management/getUserDepartmentIds",
 			async:false,
 			data: {
 				user_id: 1
@@ -801,7 +781,7 @@
 			
 			$.ajax({
 			    type: "POST",
-				url: "http://www.vl.test/management/getDepartmentData",
+				url: "/management/getDepartmentData",
 				async:false,
 				data: {
 					department_id: ids
@@ -880,7 +860,7 @@
 		function getDepartmentInfo (){
 			$.ajax({
 			    type: "POST",
-				url: "http://www.vl.test/management/createDepartmentInfo",
+				url: "/management/createDepartmentInfo",
 				async:false,
 				success: function (res) {
 					$("#superior_department").empty();
@@ -926,12 +906,13 @@
 			//getDepartmentInfo();
 			$.ajax({
 			    type: "POST",
-				url: "http://www.vl.test/management/editDepartmentInfo",
+				url: "/management/editDepartmentInfo",
 				data:{
 					department_id: departmentId,
 				},
 				success: function (res) {
-					if(res.status = 1){
+					$('.roleSelect').multiselect('clearSelection');
+					if(res.status == 1){
 						$("#superior_department").select2("val", [res.sup_dept_id]);
 						$("#superior_department").val([res.sup_dept_id]).trigger("change");
 						$('.roleSelect').multiselect('select', res.dept_permissions);
@@ -997,9 +978,9 @@
 			if($(this).val() == 1){
 				$.ajax({
 				    type: "POST",
-					url: "http://www.vl.test/management/getAllDepartments",
+					url: "/management/getAllDepartments",
 					success: function (res) {
-						$(".copy_permission").append("<option value='-1'>请选择</option>");
+						$(".copy_permission").append("<option value=' '>请选择</option>");
 						$.each(res.departments, function (index, value) {
 							$(".copy_permission").append("<option value='" + value.id + "'>" + value.display_name + "</option>");
 						})
@@ -1011,9 +992,9 @@
 			}else if($(this).val() == 2){
 				$.ajax({
 				    type: "POST",
-					url: "http://www.vl.test/management/getAllUsers",
+					url: "/management/getAllUsers",
 					success: function (res) {
-						$(".copy_permission").append("<option value='-1'>请选择</option>");
+						$(".copy_permission").append("<option value=' '>请选择</option>");
 						$.each(res.departments, function (index, value) {
 							$(".copy_permission").append("<option value='" + value.id + "'>" + value.name + "</option>");
 						})
@@ -1074,7 +1055,7 @@
 			}
 			$.ajax({
 			    type: "POST",
-				url: "http://www.vl.test/management/saveDepartmentInfo",
+				url: "/management/saveDepartmentInfo",
 				data:{
 					department_name: $('#department_name').val(),
 					department_id: departmentId,
@@ -1108,7 +1089,7 @@
 			});
 		})
 		
-		/* 添加人员 */
+		
 		//清空添加人员信息
 		function clearStaffVal(){
 			$('#email_sele').val("");
@@ -1121,35 +1102,44 @@
 			$('#password_input').val("");
 			$('#confirm_password_input').val("");
 			$('#status_sele').val("1");
-			$('.permissions_sele').val("默认权限");
-			$('.permissions_li1').hide();
+			$('.permissions_sele').val(2);
+			$('.permissions_li1').show();
 			$('.permissions_li2').hide();
 			$('.copy_object').val("");
 			$(".staff_copy_permission").select2("val", " "); 
 			$('select[multiple="multiple"]').multiselect('clearSelection');
 		}
+		//新建人员时获取部门信息
+		function getPeopleInfo(){
+			$.ajax({
+			    type: "POST",
+				url: "/management/getAllDepartments",
+				success: function (res) {
+					$("#department_sele").append("<option value='-1'>请选择</option>");
+					$.each(res.departments, function (index, value) {
+						$("#department_sele").append("<option level='"+value.level+"' value='" + value.id + "'>" + value.display_name + "</option>");
+					})
+				},
+				error: function(err) {
+					console.log(err)
+				}
+			}); 
+		}
+		/* 新建人员 */
 		$('.handleAddStaff').on('click',function(){
+			$('.permissions_sele').val(2);
 			clearStaffVal()
 			$('.add_staff_mask').show()
-			$('.staff_title').text('新建人员');		
-			$.ajax({
-				type:"post",
-				url:"",
-				async: true,
-				data:{
-					//"sap_seller_id": sap_seller_id,
-				},
-				success:function(res){
-					$.each(res[0], function (index, value) {
-						$("#asin-select").append("<option id='"+value.marketplaceid+"' fulfillment='"+value.fulfillment+"' commission='"+value.commission+"' cost='"+value.cost+"' rating='"+value.rating+"' value='"+value.asin + "' sku='"+value.sku+"' sku_status='"+value.sku_status+"' reviews='"+value.reviews+"'>" + value.country+" — "+ value.asin + "</option>");
-					})
-					$('select[multiple="multiple"]').multiselect('refresh');
-				},
-				error:function(err){
-					console.log(err)
-				},
-			}); 
-			
+			$('.staff_title').text('新建人员');
+			$('#department_sele').empty();
+			getPeopleInfo();
+			$('#password_input').parent().show();
+			$('#confirm_password_input').parent().show();
+			$('.staff_id').val(" ");
+			$('#title_input').attr('disabled',true);
+			$('#title_input').css('background','#eee');
+			$('#email_sele').attr('disabled',false);
+			$('#email_sele').css('background','#fff');
 		})
 		//邮件
 		$('#email_sele').on('input',function(){
@@ -1168,12 +1158,45 @@
 			}
 		})
 		//岗位
-		$('#post_sele').on('input',function(){
-			if($(this).val() == ''){
+		$('#post_sele').on('change',function(){
+			if($(this).val() == -1){
 				$(this).parent().find('.errCode').show();
 			}else{
 				$(this).parent().find('.errCode').hide();
 			}
+			$.ajax({
+			    type: "POST",
+				url: "/management/getTitleForRole",
+				data:{
+					role_id: $(this).val(),
+				},
+				success: function (res) {
+					if(res.status == 1){
+						$("#title_input").val(res.title_name);
+					}else{
+						$("#title_input").val("");
+					}
+				},
+				error: function(err) {
+					console.log(err)
+				}
+			});
+			$.ajax({
+			    type: "POST",
+				url: "/management/getPermissionsForRole",
+				data:{
+					role_id: $(this).val(),
+				},
+				success: function (res) {
+					$('.roleSelect').multiselect('clearSelection');
+					if(res.status == 1){
+						$('.roleSelect').multiselect('select', res.permissions);
+					}	
+				},
+				error: function(err) {
+					console.log(err)
+				}
+			});
 		})
 		//职称
 		$('#title_input').on('input',function(){
@@ -1185,13 +1208,166 @@
 		})
 		//部门
 		$("#department_sele").on("select2:select",function(e){
+			$('#post_sele').empty();
 		　　if($(this).val() == ''){
 				$(this).parent().find('.errCode').show();
 			}else{
 				$(this).parent().find('.errCode').hide();
 			}
+			$.ajax({
+			    type: "POST",
+				url: "/management/getRolesInDept",
+				data:{
+					department_id: $(this).val(),
+				},
+				success: function (res) {
+					$("#post_sele").append("<option value='-1'>请选择</option>");
+					$.each(res, function (index, value) {
+						$("#post_sele").append("<option value='" + value.id + "'>" + value.display_name + "</option>");
+					})
+				},
+				error: function(err) {
+					console.log(err)
+				}
+			});
 		})
-		
+		staffTableObj = $("#staffTable").DataTable({
+			bLengthChange:false,
+			ordering: true,
+			dispalyLength: 20, // default record count per page
+			paging: true,  // 是否显示分页
+			info: false,// 是否表格左下角显示的文字
+			serverSide: false,//是否所有的请求都请求服务器	
+			searching : false,
+			data: user_info,
+			columns: [
+				{data: 'user_id'},
+				{data: 'name'},
+				{data: 'english_name'},
+				{data: 'role'},
+				{data: 'title'},
+				{data: 'dingtalk_id'},
+				{
+					data: 'status',
+					render: function (data, type, row, meta) {
+						//let title = row.reselling_switch == 0 ? "Hijacker monitoring turned off.":"Hijacker monitoring turned on."
+						var html = '<label class="switch"> <input type="checkbox" class="switch_input" checked value=""><span>'+data+'</span></label>';
+						return html;
+					},
+					createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
+						console.log(cell, cellData, rowData, rowIndex, colIndex)
+						if(rowData.status == 0){
+							$(cell).find('.switch_input').removeAttr("checked");
+						}else {
+							$(cell).find('.switch_input').attr("checked");
+						}
+						let element = $(cell).find('.switch_input')
+						element.click(function(){
+							let reselling_switch = rowData.status;
+							reselling_switch == 0 ? reselling_switch = 1 : reselling_switch = 0
+							$.ajax({
+								type:"post",
+								url:"/management/changeUserStatus",
+								data:{
+									"user_id": rowData.user_id,
+									"user_status": reselling_switch
+								},
+								success:function(res){
+									if(res.status == 1){
+										$('.success_mask_text').text(res.msg)
+										$('.success_mask').fadeIn(1000);
+										setTimeout(function(){
+											$('.success_mask').fadeOut(1000);
+										},2000)	
+									}else{
+										$('.error_mask_text').text(res.msg)
+										$('.error_mask').fadeIn(1000);
+										setTimeout(function(){
+											$('.error_mask').fadeOut(1000);
+										},2000)
+									}	
+								},
+								error:function(err){
+									console.log(err)
+								},
+							});
+						})
+					},
+				},
+				{
+					data: null, 
+					render: function(data, type, row, meta) {
+					 	var content = '<button class="btn btn-sm green-meadow">编辑</div>';
+					 	return content;
+					},
+					createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
+						$(cell).on( 'click', function () {					
+							clearStaffVal();
+							getPeopleInfo();
+							$('.staff_id').val(cellData.user_id);
+							$('.add_staff_mask').show();
+							$('.staff_title').text('编辑人员');
+							$('.permissions_sele').val(2);
+							$('.permissions_li1').show();
+							$('.permissions_li2').hide();
+							$('#password_input').parent().hide();
+							$('#confirm_password_input').parent().hide();
+							$('#email_sele').attr('disabled',true);
+							$('#email_sele').css('background','#eee');
+							$('#title_input').attr('disabled',true);
+							$('#title_input').css('background','#eee');
+							$.ajax({
+								type:"post",
+								url:"/management/editUserInfo",
+								data:{
+									"user_id": rowData.user_id,
+								},
+								success:function(res){
+									$('.roleSelect').multiselect('clearSelection');
+									$('#post_sele').empty();
+									if(res.status == 1){
+										$.ajax({
+											type: "POST",
+											url: "/management/getRolesInDept",
+											async: false,
+											data:{
+												department_id: res.department_id,
+											},
+											success: function (item) {
+												$("#post_sele").append("<option value='-1'>请选择</option>");
+												$.each(item, function (index, value) {
+													$("#post_sele").append("<option value='" + value.id + "'>" + value.display_name + "</option>");
+												})
+											},
+											error: function(err) {
+												console.log(err)
+											}
+										});
+										$('#email_sele').val(res.email);//邮箱
+										$('#name_input').val(res.name);//姓名
+										$('#english_name').val(res.english_name);//英文名
+										$('#dingding_id').val(res.dingtalk_id);//钉钉id
+										$('#department_sele').select2("val", [res.department_id]);//部门
+										$('#post_sele').val(res.role_id);//岗位
+										$('#title_input').val(res.title_name);//职称
+										$('.roleSelect').multiselect('select', res.user_permissions);//权限
+										$('#isDepartmentHead').val(res.is_leader);//是否是部门长
+										$('#status_sele').val(res.user_status);//账号状态
+									}
+								},
+								error:function(err){
+									console.log(err)
+								},
+							});
+							
+						});
+					}
+				},
+			],
+			columnDefs: [
+				{ "bSortable": false, "aTargets": [7]},
+			],
+		})
 		//保存人员
 		$('.save_staff').on('click',function(){
 			if($('#email_sele').val() == ''){
@@ -1206,7 +1382,13 @@
 			}else{
 				$('#name_input').parent().find('.errCode').hide();
 			}
-			if($('#post_sele').val() == ''){
+			if($("#department_sele").select2("val") == -1){
+				$('#department_sele').parent().find('.errCode').show();
+				return
+			}else{
+				$('#department_sele').parent().find('.errCode').hide();
+			}
+			if($('#post_sele').val() == -1){
 				$('#post_sele').parent().find('.errCode').show();
 				return
 			}else{
@@ -1218,12 +1400,52 @@
 			}else{
 				$('#title_input').parent().find('.errCode').hide();
 			}
-			if($("#department_sele").select2("val") == null){
-				$('#department_sele').parent().find('.errCode').show();
-				return
-			}else{
-				$('#department_sele').parent().find('.errCode').hide();
+			let arr = $('.add_staff_mask').find('.roleSelect').val();
+			if($('.copy_permission').val() != null || $('.copy_permission').val() == -1){
+				arr = []
 			}
+			$.ajax({
+			    type: "POST",
+				url: "/management/saveUserInfo",
+				data:{
+					user_id: $('.staff_id').val(),
+					email: $('#email_sele').val(),//邮箱
+					name: $('#name_input').val(),//姓名
+					english_name: $('#english_name').val(),//英文名
+					dingtalk_id: $('#dingding_id').val(),//钉钉id
+					department_id: $('#department_sele').val(),//部门
+					is_leader: $('#isDepartmentHead').val(),
+					role_id: $('#post_sele').val(),//岗位
+					password: $('#password_input').val(),
+					password_confirm: $('#confirm_password_input').val(),
+					user_status: $('#status_sele').val(),
+					perm_settings: $('.add_staff_mask').find('.permissions_sele').val(),
+					copy_type: $('.add_staff_mask').find('.copy_object').val(),
+					selected_department_id: $('.add_staff_mask').find('.copy_permission').val(),
+					selected_user_id: $('.add_staff_mask').find('.copy_permission').val(),
+					selected_permissions: arr
+				},
+				success: function (res) {
+					if(res.status == 1){
+						$('.success_mask').fadeIn(1000);
+						$('.success_mask_text').text(res.msg);
+						setTimeout(function(){
+							$('.success_mask').fadeOut(1000);
+						},2000);
+						$('.add_staff_mask').hide();
+						window.location.reload();
+					}else{
+						$('.error_mask').fadeIn(1000);
+						$('.error_mask_text').text(res.msg);
+						setTimeout(function(){
+							$('.error_mask').fadeOut(1000);
+						},2000)	
+					}
+				},
+				error: function(err) {
+					console.log(err)
+				}
+			});
 			
 		})
 		/* 添加岗位 */
@@ -1239,13 +1461,12 @@
 			$(".copy_permission").select2("val", " "); 
 			$('select[multiple="multiple"]').multiselect('clearSelection');
 		}
-		console.log(departmentId)
 		//新建岗位时获取部门列表
 		function getJobsDepartment(){
 			getId();
 			$.ajax({
 			    type: "POST",
-				url: "http://www.vl.test/management/getInnerDepartments",
+				url: "/management/getInnerDepartments",
 				data:{
 					department_id: departmentId
 				},
@@ -1300,7 +1521,7 @@
 			}
 			$.ajax({
 			    type: "POST",
-				url: "http://www.vl.test/management/saveRoleInfo",
+				url: "/management/saveRoleInfo",
 				data:{
 					role_display_name: $('#Jobs_input').val(),
 					title_id: $('#Jobs_title_sele').val(),
@@ -1395,13 +1616,13 @@
 							$('.permissions_li2').hide();
 							$.ajax({
 								type:"post",
-								url:"http://www.vl.test/management/editRoleInfo",
+								url:"/management/editRoleInfo",
 								data:{
 									"role_id": rowData.role_id,
 								},
 								success:function(res){
-									console.log(res)
-									if(res.status = 1){
+									$('.roleSelect').multiselect('clearSelection');
+									if(res.status == 1){
 										$('#Jobs_input').val(res.display_name);
 										$('#Jobs_title_sele').val(res.title_id);
 										$("#Jobs_department").select2("val", [res.department_id]);
@@ -1409,20 +1630,6 @@
 										$('.roleSelect').multiselect('select', res.role_permissions);
 										roleId = rowData.role_id;
 									}
-									
-									/* if(res.status == 1){
-										$('.success_mask_text').text(res.msg)
-										$('.success_mask').fadeIn(1000);
-										setTimeout(function(){
-											$('.success_mask').fadeOut(1000);
-										},2000)	
-									}else{
-										$('.error_mask_text').text(res.msg)
-										$('.error_mask').fadeIn(1000);
-										setTimeout(function(){
-											$('.error_mask').fadeOut(1000);
-										},2000)
-									}	 */
 								},
 								error:function(err){
 									console.log(err)
@@ -1438,88 +1645,7 @@
 		})
 		
 		
-		staffTableObj = $("#staffTable").DataTable({
-			bLengthChange:false,
-			ordering: true,
-			dispalyLength: 20, // default record count per page
-			paging: true,  // 是否显示分页
-			info: false,// 是否表格左下角显示的文字
-			serverSide: false,//是否所有的请求都请求服务器	
-			searching : false,
-			data: user_info,
-			columns: [
-				{data: 'user_id'},
-				{data: 'name'},
-				{data: 'english_name'},
-				{data: 'role'},
-				{data: 'title'},
-				{data: 'dingtalk_id'},
-				{
-					data: 'status',
-					render: function (data, type, row, meta) {
-						//let title = row.reselling_switch == 0 ? "Hijacker monitoring turned off.":"Hijacker monitoring turned on."
-						var html = '<label class="switch"> <input type="checkbox" class="switch_input" checked value=""><span>'+data+'</span></label>';
-						return html;
-					},
-					createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
-						if(rowData.status == 0){
-							$(cell).find('.switch_input').removeAttr("checked");
-						}else {
-							$(cell).find('.switch_input').attr("checked");
-						}
-						let element = $(cell).find('.switch_input')
-						element.click(function(){
-							let reselling_switch = rowData.status;
-							reselling_switch == 0 ? reselling_switch = 1 : reselling_switch = 0
-							$.ajax({
-								type:"post",
-								url:"",
-								data:{
-									"id": rowData.id,
-									"reselling_switch": reselling_switch
-								},
-								success:function(res){
-									/* if(res.status == 1){
-										$('.success_mask_text').text(res.msg)
-										$('.success_mask').fadeIn(1000);
-										setTimeout(function(){
-											$('.success_mask').fadeOut(1000);
-										},2000)	
-									}else{
-										$('.error_mask_text').text(res.msg)
-										$('.error_mask').fadeIn(1000);
-										setTimeout(function(){
-											$('.error_mask').fadeOut(1000);
-										},2000)
-									} */	
-								},
-								error:function(err){
-									console.log(err)
-								},
-							});
-						})
-					},
-				},
-				{
-					data: null, 
-					render: function(data, type, row, meta) {
-					 	var content = '<button class="btn btn-sm green-meadow">编辑</div>';
-					 	return content;
-					},
-					createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
-						$(cell).on( 'click', function () {
-							clearStaffVal();
-							$('.staff_id').val(cellData.user_id);
-							$('.add_staff_mask').show();
-							$('.staff_title').text('编辑人员')
-						});
-					}
-				},
-			],
-			columnDefs: [
-				{ "bSortable": false, "aTargets": [7]},
-			],
-		})
+		
 		
 		
 	})

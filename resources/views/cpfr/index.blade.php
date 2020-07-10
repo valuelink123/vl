@@ -26,7 +26,6 @@
 		background-color: rgba(255, 255, 255, 1);
 	}
 	.filter_box{
-		overflow: hidden;
 		padding-bottom: 5px;
 		width: 1280px;
 	}
@@ -415,7 +414,18 @@
 		white-space: nowrap;
 		text-overflow: ellipsis;
 	}
-	
+	.btn-group-vertical>.btn, .btn-group>.btn{
+		width: 150px !important;
+	}
+	.open>.dropdown-menu{
+		box-shadow: none;
+	}
+	.input-group-addon{
+		padding: 0 2px;
+	}
+	.filter_option .btn{
+		padding: 6px 2px !important;
+	}
 </style>
 
 	<ul class="nav_list">
@@ -435,8 +445,7 @@
 		<div class="filter_box">
 			<div class="filter_option">
 				<label for="marketplace_select">站点</label>
-				<select id="marketplace_select" onchange="status_filter(this.value,2)">
-					<option value ="">全部</option>
+				<select id="marketplace_select" multiple="multiple">
 					<option value ="US">US</option>
 					<option value ="CA">CA</option>
 					<option value ="MX">MX</option>
@@ -519,7 +528,8 @@
 			</div>	
 			
 		</div>
-		<div style="height: 70px;">
+		<div style="clear: both;"></div>
+		<div style="height: 70px; margin-top: 10px;">
 			<div class="filter_option search_box">
 				<input type="text" class="keyword" placeholder="Search by ASIN,SKU, or keywords">
 				<button class="search">
@@ -945,7 +955,13 @@
 	
 	<script>
 		/* http://10.10.42.14/vl/public */
-		/*审核 销售员不可编辑 */
+		$('#marketplace_select').multiselect({
+		    height: 230,
+		    includeSelectAllOption: true,
+		    enableFiltering: true,
+		    enableClickableOptGroups: true
+		});
+		
 		//筛选
 		function status_filter(value,column) {
 		    if (value == '') {
@@ -974,6 +990,7 @@
 			status_filter(val,19);
 			status_filter(val,20)
 			let reqList = {
+				"sx" : '',
 				"condition" : '',
 				"date_s": '',
 				"date_e": '',
@@ -1573,6 +1590,7 @@
 					type: "post",
 					data :  function(){
 						reqList = {
+							"sx" : $('#marketplace_select').val(),
 							"condition" : $('.keyword').val(),
 							"date_s": cusstr($('.createTimeInput').val() , ' - ' , 1),
 							"date_e": cusstr1($('.createTimeInput').val() , ' - ' , 1),
@@ -1933,6 +1951,7 @@
 					$("#adjustreceivedDate input").val(s + " - " + e);
 				}
 				let reqList = {
+					"sx" : $('#marketplace_select').val(),
 				   	"condition" : $('.keyword').val(),
 				   	"date_s": cusstr($('.createTimeInput').val() , ' - ' , 1),
 				   	"date_e": cusstr1($('.createTimeInput').val() , ' - ' , 1),
@@ -1991,6 +2010,7 @@
 					$("#createTimes input").val(s + " - " + e);
 				}
 				let reqList = {
+					"sx" : $('#marketplace_select').val(),
 				   	"condition" : $('.keyword').val(),
 				   	"date_s": cusstr($('.createTimeInput').val() , ' - ' , 1),
 				   	"date_e": cusstr1($('.createTimeInput').val() , ' - ' , 1),
@@ -2037,6 +2057,7 @@
 			//搜索
 			$('.search').on('click',function(){
 				let reqList = {
+					"sx" : $('#marketplace_select').val(),
 					"condition" : $('.keyword').val(),
 					"date_s": cusstr($('.createTimeInput').val() , ' - ' , 1),
 					"date_e": cusstr1($('.createTimeInput').val() , ' - ' , 1),
@@ -2047,6 +2068,7 @@
 			})
 			$('.keyword').on('input',function(){
 				let reqList = {
+					"sx" : $('#marketplace_select').val(),
 					"condition" : $('.keyword').val(),
 					"date_s": cusstr($('.createTimeInput').val() , ' - ' , 1),
 					"date_e": cusstr1($('.createTimeInput').val() , ' - ' , 1),
@@ -2055,7 +2077,17 @@
 				};
 				tableObj.ajax.reload();
 			})
-			
+			$('#marketplace_select').on('change',function(){
+				let reqList = {
+					"sx" : $(this).val(),
+					"condition" : $('.keyword').val(),
+					"date_s": cusstr($('.createTimeInput').val() , ' - ' , 1),
+					"date_e": cusstr1($('.createTimeInput').val() , ' - ' , 1),
+					"received_date_s": cusstr($('.adjustreceivedDateInput').val() , ' - ' , 1),
+					"received_date_e": cusstr1($('.adjustreceivedDateInput').val() , ' - ' , 1),
+				};
+				tableObj.ajax.reload();
+			})
 			
 			
 			//鼠标拖动列宽
