@@ -70,7 +70,7 @@ class ShipmentController extends Controller
         $label = $request['label'] ? $request['label'] : '';
         $ids = $request['ids'] ? $request['ids'] : '';
         $role = 0;//角色
-        $sap_seller_id_list = $ulist = $allotIdList = $seller = $labelList = $statusList = $planer = [];
+        $m_id_list = $sxList= $sap_seller_id_list = $ulist = $allotIdList = $seller = $labelList = $statusList = $planer = [];
         $sql = 'SELECT
                 sh.id,
                 sh.sap_seller_id,
@@ -125,9 +125,15 @@ class ShipmentController extends Controller
         if (!empty($allor_status)) {
             $sql .= ' AND sh.allor_status = ' . $allor_status;
         }
+        //支持多个站点
         if (!empty($sx)) {
-            $m_id = array_search($sx, $DOMIN_MARKETPLACEID_SX);
-            $sql .= " AND sh.marketplace_id = '" . $m_id . "'";
+            $sxList = explode(',',$sx);
+            if(!empty($sxList)){
+                foreach ($sxList as $sk=>$sv){
+                    $m_id_list[] = array_search($sv, $DOMIN_MARKETPLACEID_SX);
+                }
+                $sql .= " AND sh.marketplace_id in ('" . implode("','",$m_id_list) ."')";
+            }
         }
         if (!empty($ids)) {
             $sql .= " AND sh.id in (" . $ids . ")";
