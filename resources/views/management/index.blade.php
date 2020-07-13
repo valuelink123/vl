@@ -1240,6 +1240,7 @@
 			serverSide: false,//是否所有的请求都请求服务器	
 			searching : false,
 			data: user_info,
+			destroy: true,
 			columns: [
 				{data: 'user_id'},
 				{data: 'name'},
@@ -1285,7 +1286,8 @@
 										setTimeout(function(){
 											$('.error_mask').fadeOut(1000);
 										},2000)
-									}	
+									}
+									window.location.reload();
 								},
 								error:function(err){
 									console.log(err)
