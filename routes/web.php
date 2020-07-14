@@ -296,5 +296,31 @@ Route::get('/marketingPlan/test', 'MarketingPlanController@test')->name('marketi
 
 Route::get('/cpfr/purchase', 'CpfrController@purchase')->name('purchase');
 Route::get('/cpfr/barcode', 'CpfrController@barcode')->name('barcode');
+
+
 //权限管理
-Route::get('/management', 'ManagementController@index')->name('index');
+Route::match(['post','get'],'/management', 'ManagementController@index')->name('index');
+
+Route::match(['post','get'],'/management/getSubDepartments', 'ManagementController@getSubDepartments');
+Route::match(['post','get'],'/management/getUserDepartmentIds', 'ManagementController@getUserDepartmentIds');
+Route::match(['post','get'],'/management/getDepartmentData', 'ManagementController@getDepartmentData');
+
+Route::match(['post','get'],'/management/createDepartmentInfo', 'ManagementController@createDepartmentInfo');
+Route::match(['post','get'],'/management/editDepartmentInfo', 'ManagementController@editDepartmentInfo');
+Route::match(['post','get'],'/management/saveDepartmentInfo', 'ManagementController@saveDepartmentInfo');
+
+Route::match(['post','get'],'/management/editRoleInfo', 'ManagementController@editRoleInfo');
+Route::match(['post','get'],'/management/saveRoleInfo', 'ManagementController@saveRoleInfo');
+
+Route::match(['post','get'],'/management/getRolesInDept', 'ManagementController@getRolesInDept');
+Route::match(['post','get'],'/management/getTitleForRole', 'ManagementController@getTitleForRole');
+Route::match(['post','get'],'/management/getPermissionsForRole', 'ManagementController@getPermissionsForRole');
+Route::match(['post','get'],'/management/editUserInfo', 'ManagementController@editUserInfo');
+Route::match(['post','get'],'/management/saveUserInfo', 'ManagementController@saveUserInfo');
+Route::match(['post','get'],'/management/changeUserStatus', 'ManagementController@changeUserStatus');
+
+Route::match(['post','get'],'/management/getInnerDepartments', 'ManagementController@getInnerDepartments');
+Route::match(['post','get'],'/management/getAllPermissions', 'ManagementController@getAllPermissions');
+Route::match(['post','get'],'/management/getAllDepartments', 'ManagementController@getAllDepartments');
+Route::match(['post','get'],'/management/getAllUsers', 'ManagementController@getAllUsers');
+
