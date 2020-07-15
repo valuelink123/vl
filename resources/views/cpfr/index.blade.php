@@ -426,6 +426,22 @@
 	.filter_option .btn{
 		padding: 6px 2px !important;
 	}
+	.textOVerFlow{
+		color: blue;
+		cursor: pointer;
+		display: -webkit-box;
+		overflow: hidden;
+		white-space: normal !important;
+		text-overflow: ellipsis;
+		word-wrap: break-word;
+		-webkit-line-clamp: 4;
+		-webkit-box-orient: vertical;
+	}
+	.labelOVerFlow{
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis
+	}
 </style>
 
 	<ul class="nav_list">
@@ -1676,11 +1692,11 @@
 					},
 					{
 						data: 'label',
-						width: '80px',
+						width: 100,
 						render: function(data, type, row, meta) {
-							var content = '<div class="aaa">'+ row.label +'</div>'+
-										  '<div>'+ row.seller_sku +'</div>'+
-										  '<div style="color:blue;cursor:pointer"><a href="/mrp/edit?asin='+ row.asin +'&marketplace_id='+ row.marketplace_id +'">'+ row.asin +'</a></div>';
+							var content = '<div class="labelOVerFlow" title="'+row.label+'">'+ row.label +'</div>'+
+										  '<div class="labelOVerFlow" title="'+row.seller_sku+'">'+ row.seller_sku +'</div>'+
+										  '<div style="color:blue;cursor:pointer"><a class="labelOVerFlow" href="/mrp/edit?asin='+ row.asin +'&marketplace_id='+ row.marketplace_id +'" title="'+row.asin+'">'+ row.asin +'</a></div>';
 							return content;
 						},
 					},
@@ -1749,8 +1765,9 @@
 					},
 					{
 						data: "remark",
+						width: 100,
 						render: function(data, type, row, meta) {
-							var content = '<div style="color:blue;cursor:pointer">'+data +'</div>';
+							var content = '<div class="textOVerFlow" title="'+data+'">'+data +'</div>';
 							return content;
 						},
 						createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {

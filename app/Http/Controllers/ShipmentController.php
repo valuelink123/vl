@@ -245,7 +245,7 @@ class ShipmentController extends Controller
                 "\r\n" . "\r\n";
             if (!empty($shipmentList)) {
                 $allor_status_arr = ['资料提供中', '换标中', '待出库', '已发货', '取消发货'];
-                $status_arr = ['待确认', 'bu审核', 'bg审核', '调拨取消', '已确认'];
+                $status_arr = ['BU经理审核','BG总经理审核','计划员审核','计划经理确认','已审批','取消调拨请求'];
                 foreach ($shipmentList as $ak => $av) {
                     echo
                         '"' . @$av['created_at'] . '",' .
