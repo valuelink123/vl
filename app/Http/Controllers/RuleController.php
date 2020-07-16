@@ -128,8 +128,7 @@ class RuleController extends Controller
 
     public function update(Request $request,$id)
     {
-		 if(!Auth::user()->can(['rule-update'])) die('Permission denied -- rule-update');
-        if(!Auth::user()->admin) die();
+		if(!Auth::user()->can(['rule-update'])) die('Permission denied -- rule-update');
         $this->validate($request, [
             'priority' => 'required|int',
             'rule_name' => 'required|string',
