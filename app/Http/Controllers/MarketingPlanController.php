@@ -22,8 +22,8 @@ class MarketingPlanController extends Controller
     //判断是否登录  todo 上线需打开
     public function __construct()
     {
-        $this->middleware('auth');
-        parent::__construct();
+//        $this->middleware('auth');
+//        parent::__construct();
     }
 
     public function index()
@@ -885,9 +885,18 @@ class MarketingPlanController extends Controller
 //        $time = date("Y-m-d") . time() . rand(1, 99999);
 ////        //$mpdf->Output("upload/".$time.".pdf","F");
 //        $mpdf->Output($time . ".pdf", "D");
-                $user = Auth::user()->toArray();
-        $sap_seller_id = $user['sap_seller_id']>0?$user['sap_seller_id']:0;
-        return view('marketingPlan.test', ['sap_seller_id' => $sap_seller_id]);
+
+
+
+//                $user = Auth::user()->toArray();
+//        $sap_seller_id = $user['sap_seller_id']>0?$user['sap_seller_id']:0;
+//        return view('marketingPlan.test', ['sap_seller_id' => $sap_seller_id]);
+
+        $total_amount =  @$_GET['total_amount'];
+        $out_trade_no = @$_GET['out_trade_no'];
+        $user_id = @$_GET['user_id'];
+        echo $total_amount.'---'.$out_trade_no.'-------'.$user_id;
+        exit;
     }
 
 
