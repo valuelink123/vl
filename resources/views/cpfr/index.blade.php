@@ -26,7 +26,6 @@
 		background-color: rgba(255, 255, 255, 1);
 	}
 	.filter_box{
-		overflow: hidden;
 		padding-bottom: 5px;
 		width: 1280px;
 	}
@@ -415,12 +414,36 @@
 		white-space: nowrap;
 		text-overflow: ellipsis;
 	}
-	
+	.btn-group-vertical>.btn, .btn-group>.btn{
+		width: 150px !important;
+	}
+	.open>.dropdown-menu{
+		box-shadow: none;
+	}
+	.input-group-addon{
+		padding: 0 2px;
+	}
+	.filter_option .btn{
+		padding: 6px 2px !important;
+	}
+	.textOVerFlow{
+		color: blue;
+		cursor: pointer;
+		display: -webkit-box;
+		overflow: hidden;
+		white-space: normal !important;
+		text-overflow: ellipsis;
+		word-wrap: break-word;
+		-webkit-line-clamp: 4;
+		-webkit-box-orient: vertical;
+	}
+	.labelOVerFlow{
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis
+	}
 </style>
-<link rel="stylesheet" type="text/css" media="all" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-daterangepicker/3.0.5/daterangepicker.min.css" />
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.1/moment.min.js"></script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-daterangepicker/3.0.5/daterangepicker.min.js"></script>
-    <!-- <a href="/collaborativeReplenishment/index">Collaborative Replenishment</a> -->
+
 	<ul class="nav_list">
 		<li class="nav_active"><a href="/cpfr/index">调拨计划</a></li>
 		<li><a href="/cpfr/purchase">采购计划</a></li>
@@ -438,8 +461,7 @@
 		<div class="filter_box">
 			<div class="filter_option">
 				<label for="marketplace_select">站点</label>
-				<select id="marketplace_select" onchange="status_filter(this.value,2)">
-					<option value ="">全部</option>
+				<select id="marketplace_select" multiple="multiple">
 					<option value ="US">US</option>
 					<option value ="CA">CA</option>
 					<option value ="MX">MX</option>
@@ -522,7 +544,8 @@
 			</div>	
 			
 		</div>
-		<div style="height: 70px;">
+		<div style="clear: both;"></div>
+		<div style="height: 70px; margin-top: 10px;">
 			<div class="filter_option search_box">
 				<input type="text" class="keyword" placeholder="Search by ASIN,SKU, or keywords">
 				<button class="search">
@@ -948,7 +971,13 @@
 	
 	<script>
 		/* http://10.10.42.14/vl/public */
-		/*审核 销售员不可编辑 */
+		$('#marketplace_select').multiselect({
+		    height: 230,
+		    includeSelectAllOption: true,
+		    enableFiltering: true,
+		    enableClickableOptGroups: true
+		});
+		
 		//筛选
 		function status_filter(value,column) {
 		    if (value == '') {
@@ -977,6 +1006,7 @@
 			status_filter(val,19);
 			status_filter(val,20)
 			let reqList = {
+				"sx" : '',
 				"condition" : '',
 				"date_s": '',
 				"date_e": '',
@@ -1556,12 +1586,12 @@
 			$.fn.dataTable.ext.errMode = 'none';
 			tableObj = $('#planTable').DataTable({
 				lengthMenu: [
-				    10, 50, 100, 'All'
+				     [10, 25, 50, -1], [10, 25, 50, "All"] 
 				],
 				dispalyLength: 2, // default record count per page
 				paging: true,  // 是否显示分页
 				info: false,// 是否表格左下角显示的文字
-				order: [ 9, "desc" ], //设置排序
+				order: [ 4, "desc" ], //设置排序
 				/* fixedColumns: { //固定列的配置项
 					leftColumns: 10, //固定左边第一列
 					rightColumns: 1, //固定左边第一列
@@ -1576,6 +1606,7 @@
 					type: "post",
 					data :  function(){
 						reqList = {
+							"sx" : $('#marketplace_select').val(),
 							"condition" : $('.keyword').val(),
 							"date_s": cusstr($('.createTimeInput').val() , ' - ' , 1),
 							"date_e": cusstr1($('.createTimeInput').val() , ' - ' , 1),
@@ -1661,11 +1692,11 @@
 					},
 					{
 						data: 'label',
-						width: '80px',
+						width: 100,
 						render: function(data, type, row, meta) {
-							var content = '<div class="aaa">'+ row.label +'</div>'+
-										  '<div>'+ row.seller_sku +'</div>'+
-										  '<div style="color:blue;cursor:pointer"><a href="/mrp/edit?asin='+ row.asin +'&marketplace_id='+ row.marketplace_id +'">'+ row.asin +'</a></div>';
+							var content = '<div class="labelOVerFlow" title="'+row.label+'">'+ row.label +'</div>'+
+										  '<div class="labelOVerFlow" title="'+row.seller_sku+'">'+ row.seller_sku +'</div>'+
+										  '<div style="color:blue;cursor:pointer"><a class="labelOVerFlow" href="/mrp/edit?asin='+ row.asin +'&marketplace_id='+ row.marketplace_id +'" title="'+row.asin+'">'+ row.asin +'</a></div>';
 							return content;
 						},
 					},
@@ -1734,8 +1765,9 @@
 					},
 					{
 						data: "remark",
+						width: 100,
 						render: function(data, type, row, meta) {
-							var content = '<div style="color:blue;cursor:pointer">'+data +'</div>';
+							var content = '<div class="textOVerFlow" title="'+data+'">'+data +'</div>';
 							return content;
 						},
 						createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
@@ -1872,7 +1904,7 @@
 					},
 				], 
 				columnDefs:[
-					{ "bSortable": false, "aTargets": [ 0,1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21]},
+					{ "bSortable": false, "aTargets": [ 0,1,2,3,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21]},
 				]
 			});
 			
@@ -1936,6 +1968,7 @@
 					$("#adjustreceivedDate input").val(s + " - " + e);
 				}
 				let reqList = {
+					"sx" : $('#marketplace_select').val(),
 				   	"condition" : $('.keyword').val(),
 				   	"date_s": cusstr($('.createTimeInput').val() , ' - ' , 1),
 				   	"date_e": cusstr1($('.createTimeInput').val() , ' - ' , 1),
@@ -1994,6 +2027,7 @@
 					$("#createTimes input").val(s + " - " + e);
 				}
 				let reqList = {
+					"sx" : $('#marketplace_select').val(),
 				   	"condition" : $('.keyword').val(),
 				   	"date_s": cusstr($('.createTimeInput').val() , ' - ' , 1),
 				   	"date_e": cusstr1($('.createTimeInput').val() , ' - ' , 1),
@@ -2040,6 +2074,7 @@
 			//搜索
 			$('.search').on('click',function(){
 				let reqList = {
+					"sx" : $('#marketplace_select').val(),
 					"condition" : $('.keyword').val(),
 					"date_s": cusstr($('.createTimeInput').val() , ' - ' , 1),
 					"date_e": cusstr1($('.createTimeInput').val() , ' - ' , 1),
@@ -2050,6 +2085,7 @@
 			})
 			$('.keyword').on('input',function(){
 				let reqList = {
+					"sx" : $('#marketplace_select').val(),
 					"condition" : $('.keyword').val(),
 					"date_s": cusstr($('.createTimeInput').val() , ' - ' , 1),
 					"date_e": cusstr1($('.createTimeInput').val() , ' - ' , 1),
@@ -2058,7 +2094,17 @@
 				};
 				tableObj.ajax.reload();
 			})
-			
+			$('#marketplace_select').on('change',function(){
+				let reqList = {
+					"sx" : $(this).val(),
+					"condition" : $('.keyword').val(),
+					"date_s": cusstr($('.createTimeInput').val() , ' - ' , 1),
+					"date_e": cusstr1($('.createTimeInput').val() , ' - ' , 1),
+					"received_date_s": cusstr($('.adjustreceivedDateInput').val() , ' - ' , 1),
+					"received_date_e": cusstr1($('.adjustreceivedDateInput').val() , ' - ' , 1),
+				};
+				tableObj.ajax.reload();
+			})
 			
 			
 			//鼠标拖动列宽

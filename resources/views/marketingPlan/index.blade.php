@@ -319,11 +319,6 @@
 		display: none;
 	}
 </style>
-<link rel="stylesheet" type="text/css" media="all" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-daterangepicker/3.0.5/daterangepicker.min.css" />
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.1/moment.min.js"></script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-daterangepicker/3.0.5/daterangepicker.min.js"></script>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.8/css/select2.min.css" rel="stylesheet" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.8/js/select2.min.js"></script>
 
 <div>
 	<div class="button_box">
@@ -759,7 +754,7 @@
 		
 		tableObj = $('#planTable').DataTable({
 			lengthMenu: [
-			    20, 50, 100, 'All'
+			     [10, 25, 50, -1], [10, 25, 50, "All"] 
 			],
 			dispalyLength: 2, // default record count per page
 			paging: true,  // 是否显示分页
