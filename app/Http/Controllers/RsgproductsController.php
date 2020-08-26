@@ -294,7 +294,7 @@ class RsgproductsController extends Controller
             }
             return json_encode($return);
         }
-		return view('rsgproducts/task',['data'=>$new_data,'rsg_link'=> 'https://rsg.claimthegift.com?user=V'.Auth::user()->id ]);
+		return view('rsgproducts/task',['data'=>$new_data,'rsg_link'=> 'https://rsg.claimgiftsnow.com?user=V'.Auth::user()->id ]);
 	}
 
 	//Inbox中的Email Details右边栏会展示rsgtask，InboxController中将会调用此方法。
@@ -442,7 +442,7 @@ class RsgproductsController extends Controller
 			$data[$key]['unfinished'] = $val['unfinished'] > 0 ? $val['unfinished'] : 0;
 			$data[$key]['basic_asin'] = $val['asin'];
 			$data[$key]['seller_id'] = isset($sellerAccounts[$val['seller_id']])?$sellerAccounts[$val['seller_id']]:'Others';
-			$data[$key]['product'] = '<a target="_blank" href="https://rsg.claimthegift.com/product/detail?id='.$val['asin_id'].'"><img src="'.$val['img'].'" width="50px" height="65px"></a>';
+			$data[$key]['product'] = '<a target="_blank" href="https://rsg.claimgiftsnow.com/product/detail?id='.$val['asin_id'].'"><img src="'.$val['img'].'" width="50px" height="65px"></a>';
 			$data[$key]['site'] = isset($siteShort[$val['site']]) ? $siteShort[$val['site']] : $val['site'];
 			$data[$key]['asin'] = '<a href="https://' . $val['site'] . '/dp/' . $val['asin'] .'" target="_blank" rel="noreferrer">' . $val['asin'] . '</a>';//asin插入超链接
             $data[$key]['only_asin'] = $val['asin'] ;//asin

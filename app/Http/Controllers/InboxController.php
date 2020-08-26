@@ -276,7 +276,7 @@ class InboxController extends Controller
 		$lists =  Category::orderBy($order_by,$sort)->get()->toArray();
 		$tree = $this->getTree($lists,28);
 
-        return view('inbox/view',['email_history'=>$email_history,'unread_history'=>$email_unread_history,'order'=>$order,'email'=>$email,'users'=>$this->getUsers(),'groups'=>$this->getGroups(),'sellerids'=>$this->getSellerIds(),'accounts'=>$this->getAccounts(),'account_type'=>$account_type,'tree'=>$tree,'email_change_log'=>$email_change_log,'client_email'=>$client_email,'latestConversationList'=>$latestConversationList,'recentEventsList'=>$recentEventsList,'recentEventsNumbers'=>$recentEventsNumbers,'rsgTaskData'=>$rsgTaskData,'rsg_link'=> 'https://rsg.claimthegift.com?user=V'.Auth::user()->id ]);
+        return view('inbox/view',['email_history'=>$email_history,'unread_history'=>$email_unread_history,'order'=>$order,'email'=>$email,'users'=>$this->getUsers(),'groups'=>$this->getGroups(),'sellerids'=>$this->getSellerIds(),'accounts'=>$this->getAccounts(),'account_type'=>$account_type,'tree'=>$tree,'email_change_log'=>$email_change_log,'client_email'=>$client_email,'latestConversationList'=>$latestConversationList,'recentEventsList'=>$recentEventsList,'recentEventsNumbers'=>$recentEventsNumbers,'rsgTaskData'=>$rsgTaskData,'rsg_link'=> 'https://rsg.claimgiftsnow.com?user=V'.Auth::user()->id ]);
     }
 
     public function getRsgStatusAttr($emailDetails, $email, $rsgStatusArr, $fromOrTo){
@@ -574,7 +574,7 @@ class InboxController extends Controller
         $i = 1;
         foreach ($data as $key => $val) {
             $data[$key]['rank'] = $i;
-            $data[$key]['product'] = '<a target="_blank" href="https://rsg.claimthegift.com/product/detail?id='.$val['asin_id'].'"><img src="'.$val['img'].'" width="50px" height="65px"></a>';
+            $data[$key]['product'] = '<a target="_blank" href="https://rsg.claimgiftsnow.com/product/detail?id='.$val['asin_id'].'"><img src="'.$val['img'].'" width="50px" height="65px"></a>';
             $data[$key]['asin'] = '<a href="https://' . $val['site'] . '/dp/' . $val['asin'] . '" target="_blank" rel="noreferrer">' . $val['asin'] . '</a>';//asin插入超链接
             $data[$key]['action'] = '<a data-target="#ajax" class="badge badge-success" data-toggle="modal" href="/rsgrequests/create?productid='.$val['id'].'&asin=' . $val['asin'] . '&site=' . $val['site'] . '"> 
                                     <i class="fa fa-hand-o-up"></i></a>';
