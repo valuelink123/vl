@@ -21,8 +21,8 @@
                                 <option value="1">Do not need to reply</option>
                                 <option value="0">Need reply</option>
                             </select>
-							
-																	
+
+
                             <select id="giveUser" class="table-group-action-input form-control input-inline input-small input-sm">
                                 <option value="">Select...</option>
                                 @foreach ($groups as $group_id=>$group)
@@ -33,7 +33,7 @@
 									</optgroup>
                                 @endforeach
                             </select>
-							
+
 							<select id="giveMark" class="table-group-action-input form-control input-inline input-small input-sm" name="mark">
 								<option value="">Select...</option>
 								@foreach (getMarks() as $mark)
@@ -78,15 +78,15 @@
                                 <td>
 								<div class="input-group margin-bottom-5">
                                     <input type="text" class="form-control form-filter input-sm" name="to_address">
-									
+
 									</div>
 									<div class="input-group col-md-6 pull-left">
 									<select class="form-control form-filter input-sm  " name="group_id">
                                         <option value="">Group</option>
 										@foreach (array_get($mygroups,'groups',array()) as $group_id=>$group)
-										
+
 											<option value="{{$group_id}}">{{array_get($groups,$group_id.'.group_name')}}</option>
-											
+
 										@endforeach
                                     </select>
 									</div>
@@ -94,9 +94,9 @@
 									<select class="form-control form-filter input-sm " name="user_id">
                                         <option value="">User</option>
 										@foreach (array_get($mygroups,'users',array()) as $user_id=>$user)
-										
+                                            @if(array_get($users,$user_id))
 											<option value="{{$user_id}}" @if($currentUserId==$user_id) selected @endif>{{array_get($users,$user_id)}}</option>
-											
+                                            @endif
 										@endforeach
                                     </select>
 									</div>
@@ -223,7 +223,7 @@
                 var replyStatus = $("#replyStatus", grid.getTableWrapper());
                 var giveUser = $("#giveUser", grid.getTableWrapper());
 				var giveMark = $("#giveMark", grid.getTableWrapper());
-				
+
                 if ((replyStatus.val() != "" || giveUser.val() != "" || giveMark.val() != "") && grid.getSelectedRowsCount() > 0) {
                     grid.setAjaxParam("customActionType", "group_action");
                     grid.setAjaxParam("replyStatus", replyStatus.val());
