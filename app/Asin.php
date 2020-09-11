@@ -72,11 +72,7 @@ class Asin extends Model
     ];
     const ADMIN_EMAIL =
         array(
-        'test@qq.com',
-        "charlie@valuelinkcorp.com",
-        "zouyuanxun@valuelinkcorp.com",
-        "zanhaifang@valuelinkcorp.com",
-        "huzaoli@valuelinkcorp.com",
-        'fanlinxi@valuelinkcorp.com'
+        "zouyuanxun@valuelinkltd.com",
+        "sunhanshan@valuelinkltd.com"
     );
 }
