@@ -207,14 +207,7 @@ class RsgproductsController extends Controller
 		$sql .= ' LIMIT 0,70';
 		$data = $this->queryRows($sql);
 		$data = $this->getReturnData(0,$data,$date,$todayDate,'task');
-		if($_POST){
-			$return['status'] = 0;
-			if($data){
-				$return['data'] = $data;
-				$return['status'] = 1;
-			}
-			return json_encode($return);
-		}
+
         $asinIdList=[];
         $new_data=[];
         foreach ($data as $key => $val) {
@@ -230,25 +223,25 @@ class RsgproductsController extends Controller
                     $d_v=$v['target_review']. '(' . $v['requested_review']. ')';
                     switch ($v['created_at']) {
                         case $date :
-                            $new_data[$ndk]['d-6'] = $d_v;
+                            $new_data[$ndk]['d_6'] = $d_v;
                             break;
                         case date('Y-m-d', time() - 3600 * 24 * 5) :
-                            $new_data[$ndk]['d-5'] = $d_v;
+                            $new_data[$ndk]['d_5'] = $d_v;
                             break;
                         case date('Y-m-d', time() - 3600 * 24 * 4) :
-                            $new_data[$ndk]['d-4'] = $d_v;
+                            $new_data[$ndk]['d_4'] = $d_v;
                             break;
                         case date('Y-m-d', time() - 3600 * 24 * 3) :
-                            $new_data[$ndk]['d-3'] = $d_v;
+                            $new_data[$ndk]['d_3'] = $d_v;
                             break;
                         case date('Y-m-d', time() - 3600 * 24 * 2) :
-                            $new_data[$ndk]['d-2'] = $d_v;
+                            $new_data[$ndk]['d_2'] = $d_v;
                             break;
                         case date('Y-m-d', time() - 3600 * 24 ) :
-                            $new_data[$ndk]['d-1'] = $d_v;
+                            $new_data[$ndk]['d_1'] = $d_v;
                             break;
                         case date('Y-m-d', time()) :
-                            $new_data[$ndk]['d-0'] = $d_v;
+                            $new_data[$ndk]['d_0'] = $d_v;
                             break;
                     }
                 }
@@ -287,6 +280,15 @@ class RsgproductsController extends Controller
                     }
                 }
             }
+        }
+        //把post请求返回放到此处，放前面的话会导致缺少d-0等数据
+        if($_POST){
+            $return['status'] = 0;
+            if($new_data){
+                $return['data'] = $new_data;
+                $return['status'] = 1;
+            }
+            return json_encode($return);
         }
 		return view('rsgproducts/task',['data'=>$new_data,'rsg_link'=> 'https://rsg.claimgiftsnow.com?user=V'.Auth::user()->id ]);
 	}
@@ -340,8 +342,8 @@ class RsgproductsController extends Controller
 		}
 		$sql = "
         SELECT SQL_CALC_FOUND_ROWS
-        	rsg_products.id as id,	rsg_products.created_at AS created_at,rsg_products.asin as asin,rsg_products.site as site,rsg_products.seller_id as seller_id,rsg_products.post_status as post_status,rsg_products.post_type as post_type,rsg_products.sales_target_reviews as target_review,rsg_products.requested_review as requested_review,asin.bg as bg,asin.bu as bu,asin.item_no as item_no,asin.seller as seller,asin.id as asin_id,rsg_products.number_of_reviews as review,rsg_products.review_rating as rating, num as unfinished,rsg_products.sku_level as sku_level, rsg_products.product_img as img,rsg_products.order_status as order_status,cast(rsg_products.sales_target_reviews as signed) - cast(rsg_products.requested_review as signed) as task,(status_score*type_score*level_score*rating_score*review_score*days_score)  as score {$field} 
-            from rsg_products  
+        	rsg_products.id as id,	rsg_products.created_at AS created_at,rsg_products.asin as asin,rsg_products.site as site,rsg_products.seller_id as seller_id,rsg_products.post_status as post_status,rsg_products.post_type as post_type,rsg_products.sales_target_reviews as target_review,rsg_products.requested_review as requested_review,asin.bg as bg,asin.bu as bu,asin.item_no as item_no,asin.seller as seller,asin.id as asin_id,rsg_products.number_of_reviews as review,rsg_products.review_rating as rating, num as unfinished,rsg_products.sku_level as sku_level, rsg_products.product_img as img,rsg_products.order_status as order_status,cast(rsg_products.sales_target_reviews as signed) - cast(rsg_products.requested_review as signed) as task,(status_score*type_score*level_score*rating_score*review_score*days_score)  as score {$field}
+            from rsg_products
             left join (
 				select id,
 					case post_status
@@ -372,34 +374,34 @@ class RsgproductsController extends Controller
 						WHEN 0 then 1
 						ELSE 0 END as rating_score,
 					if(site='www.amazon.com',
-						case 
+						case
 							WHEN number_of_reviews < 100 then 10
 							WHEN number_of_reviews >= 100 and number_of_reviews < 400 then 7
 							WHEN number_of_reviews >= 400 and number_of_reviews < 1000 then 4
 							WHEN number_of_reviews >= 1000 and number_of_reviews < 4000 then 1
 							WHEN number_of_reviews >= 4000 then 0
 							END,
-						case 
+						case
 							WHEN number_of_reviews < 40 then 10
 							WHEN number_of_reviews >= 40 and number_of_reviews < 100 then 7
 							WHEN number_of_reviews >= 100 and number_of_reviews < 400 then 4
-							WHEN number_of_reviews >= 400 and number_of_reviews <= 1000 then 1 
+							WHEN number_of_reviews >= 400 and number_of_reviews <= 1000 then 1
 							WHEN number_of_reviews > 1000 then 0
-							END 
-					)as review_score 
-				from rsg_products 
-				where created_at = '".$date."'  
-			) as rsg_score on rsg_score.id=rsg_products.id 
-		  	left join  asin ON rsg_products.asin=asin.asin and rsg_products.site=asin.site and rsg_products.sellersku = asin.sellersku 
+							END
+					)as review_score
+				from rsg_products
+				where created_at = '".$date."'
+			) as rsg_score on rsg_score.id=rsg_products.id
+		  	left join  asin ON rsg_products.asin=asin.asin and rsg_products.site=asin.site and rsg_products.sellersku = asin.sellersku
         	left join (
-        		select count(*) as num,asin,site 
-				from rsg_products 
-				left join rsg_requests on product_id = rsg_products.id and step IN(4,5,6,7) 
-				where rsg_requests.created_at <= '".$date." 23:59:59 ' and rsg_requests.created_at >='".$ago15day." 00:00:00 ' 
-				group by asin,site 
-        	) as rsg on rsg_products.asin=rsg.asin and rsg_products.site=rsg.site 
-        	{$joinSkus} 
-			where 1 = 1 {$where_product} 
+        		select count(*) as num,asin,site
+				from rsg_products
+				left join rsg_requests on product_id = rsg_products.id and step IN(4,5,6,7)
+				where rsg_requests.created_at <= '".$date." 23:59:59 ' and rsg_requests.created_at >='".$ago15day." 00:00:00 '
+				group by asin,site
+        	) as rsg on rsg_products.asin=rsg.asin and rsg_products.site=rsg.site
+        	{$joinSkus}
+			where 1 = 1 {$where_product}
 			{$orderby} ";
 		return $sql;
 	}
@@ -442,7 +444,7 @@ class RsgproductsController extends Controller
 			$data[$key]['type'] = isset($postType[$val['post_type']]) ? $postType[$val['post_type']]['name'] : $val['post_type'];//post_type
 			$data[$key]['status'] = isset($postStatus[$val['post_status']]) ? $postStatus[$val['post_status']]['name'] : $val['post_status'];
 			$data[$key]['requested_review'] = $val['requested_review'];
-			$data[$key]['action'] = '<a data-target="#ajax" class="badge badge-success" data-toggle="modal" href="/rsgrequests/create?productid='.$val['id'].'&asin=' . $val['asin'] . '&site=' . $val['site'] . '"> 
+			$data[$key]['action'] = '<a data-target="#ajax" class="badge badge-success" data-toggle="modal" href="/rsgrequests/create?productid='.$val['id'].'&asin=' . $val['asin'] . '&site=' . $val['site'] . '">
                                     <i class="fa fa-hand-o-up"></i></a>';
 			if($data[$key]['task']<=0){
 				$data[$key]['action'] = '<div class="badge badge-primary">Done</div>';
