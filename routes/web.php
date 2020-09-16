@@ -310,3 +310,7 @@ Route::get('/cpfr/purchase', 'CpfrController@purchase')->name('purchase');
 Route::get('/cpfr/barcode', 'CpfrController@barcode')->name('barcode');
 //权限管理
 Route::get('/management', 'ManagementController@index')->name('index');
+
+// Route::get('/mws', 'MwsController@index')->name('index'); //mws后台管理
+
+Route::get('/getOrderDataBySap', 'ApiController@getOrderDataBySap')->name('getOrderDataBySap'); //获取sap接口数据
