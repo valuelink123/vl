@@ -1235,9 +1235,9 @@ class ExceptionController extends Controller
 		*/
 		if(!$message){
 			$exists = DB::table('amazon_orders')->where('AmazonOrderId', $orderid);
-			if($sellerid){
-				$exists = $exists->where('SellerId', $sellerid);
-			}
+			// if($sellerid){
+			// 	$exists = $exists->where('SellerId', $sellerid);
+			// }
 			$exists = $exists->first();
 			if(!$exists){
 				DB::beginTransaction();
@@ -1255,7 +1255,7 @@ class ExceptionController extends Controller
 					$authstr=$authstr.$appsecret;
 					$sign = strtoupper(sha1($authstr));
 
-					$res = file_get_contents('http://'.env("SAP_RFC").'/rfc_site.php?appid='.$appkey.'&sellerid='.$sellerid.'&method=getOrder&orderId='.$orderid.'&sign='.$sign);
+					$res = file_get_contents('http://'.env("SAP_RFC").'/rfc_site.php?appid='.$appkey.'&method=getOrder&orderId='.$orderid.'&sign='.$sign);
 					$result = json_decode($res,true);
 					
 					if(array_get($result,'result')){
@@ -1351,9 +1351,9 @@ class ExceptionController extends Controller
 				$sellerid =  $exists->SellerId;
 				
 				$exists_item = DB::table('amazon_orders_item')->where('AmazonOrderId', $orderid);
-				if($sellerid){
-					$exists_item = $exists_item->where('SellerId', $sellerid);
-				}
+				// if($sellerid){
+				// 	$exists_item = $exists_item->where('SellerId', $sellerid);
+				// }
 				$exists_item = $exists_item->get();
 				$order = json_decode(json_encode($exists),true);
 				$orderItemData = json_decode(json_encode($exists_item),true);
