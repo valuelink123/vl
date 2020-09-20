@@ -311,6 +311,9 @@ Route::get('/cpfr/barcode', 'CpfrController@barcode')->name('barcode');
 //权限管理
 Route::get('/management', 'ManagementController@index')->name('index');
 
-// Route::get('/mws', 'MwsController@index')->name('index'); //mws后台管理
+Route::get('/ccp', 'CcpController@index')->name('index'); //mws后台管理
+Route::post('/ccp/showTotal', 'CcpController@showTotal')->name('showTotal'); //ccp功能展示顶部统计数据
+Route::post('/ccp/list', 'CcpController@list')->name('ccpList');//ccp功能的列表展示
+Route::post('/ccp/showAccountBySite', 'CcpController@showAccountBySite')->name('showAccountBySite');//ccp功能的列表展示
 
 Route::get('/getOrderDataBySap', 'ApiController@getOrderDataBySap')->name('getOrderDataBySap'); //获取sap接口数据

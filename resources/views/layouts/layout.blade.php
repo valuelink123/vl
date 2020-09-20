@@ -786,6 +786,23 @@
 
                                             </ul>
                                         </li>
+
+										<li class="menu-dropdown classic-menu-dropdown ">
+											<a href="javascript:;"> CCP
+												<span class="arrow"></span>
+											</a>
+											<ul class="dropdown-menu pull-left">
+
+												@permission('ccp-show')
+												<li class="">
+													<a href="/ccp" class="nav-link nav-toggle ">
+														CCP
+														<span class="arrow"></span>
+													</a>
+												</li>
+												@endpermission
+											</ul>
+										</li>
                                     </ul>
                                 </div>
             <div class="top-menu">

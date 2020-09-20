@@ -32,7 +32,7 @@ class User extends Authenticatable
 
     //得到所有用户的id=>name数组
     static function getUsers(){
-        $users = User::get()->toArray();
+		$users = User::where('locked', '=', 0)->get()->toArray();
         $users_array = array();
         foreach($users as $user){
             $users_array[$user['id']] = $user['name'];
