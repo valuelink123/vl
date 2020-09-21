@@ -9,7 +9,7 @@
         /*border-color: #676464;*/
     }
     .top-total-data .weight td{
-        font-size:30px;
+        font-size:40px;
         font-weight:400;
     }
     .total-data-table td{
@@ -17,7 +17,7 @@
         line-height: 15px;
         /*border-left: 1px solid #676464;*/
         /*border-right: 1px solid #676464;*/
-        font-size: 11px;
+        font-size: 18px;
     }
     .date-search-table{
         width:60%;
@@ -37,6 +37,12 @@
     }
     #datatable th{
         text-align:center;
+    }
+    .second .danwei{
+        font-size:15px;
+    }
+    .third .danwei{
+        font-size:10px;
     }
 
 </style>
@@ -96,13 +102,13 @@
                     <td>AVG.PRICE</td>
                 </tr>
                 <tr class="weight second">
-                    <td>$<span class="sales">0</span></td>
+                    <td><span class="sales">0</span>&nbsp;<span class="danwei"></span></td>
                     <td><span class="units">0</span></td>
                     <td><span class="orders">0</span></td>
-                    <td>$<span class="avgPrice">0</span></td>
+                    <td><span class="avgPrice">0</span>&nbsp;<span class="danwei"></span></td>
                 </tr>
                 <tr class="third">
-                    <td>NET REVENUE:$<span class="revenue">0</span></td>
+                    <td>NET REVENUE:<span class="revenue">0</span>&nbsp;<span class="danwei"></span></td>
                     <td>FULL:<span class="unitsFull">0</span> | PROMO:<span class="unitsPromo">0</span></td>
                     <td>FULL:<span class="ordersFull">0</span>|PROMO:<span class="ordersPromo">0</span></td>
                     <td></td>
@@ -121,11 +127,7 @@
             </table>
         </div>
     </div>
-    <div class="row">
-        <div class="top portlet light">
 
-        </div>
-    </div>
     <div class="row">
         <div class="top portlet light">
             <div class="search_table" style="margin-bottom:50px;margin-left:-15px;">
@@ -209,6 +211,7 @@
                     $('.total-data-table .unitsPromo').text(res.unitsPromo);
                     $('.total-data-table .ordersFull').text(res.ordersFull);
                     $('.total-data-table .ordersPromo').text(res.ordersPromo);
+                    $('.total-data-table .danwei').text(res.danwei);
                 }
             });
             //改变下面表格的数据内容
