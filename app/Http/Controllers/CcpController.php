@@ -89,12 +89,12 @@ class CcpController extends Controller
 
 		//sales数据，orders数据
 		$sql = "SELECT SUM(c_order.c_orders) AS orders, SUM(c_order.c_proOrders) AS ordersPromo,SUM(c_order.c_proUnits) AS unitsPromo, 
-			SUM(c_order.c_sales) AS sales ,SUM(c_order.c_taxs) AS _taxs ,sum(c_order.c_units) as units,sum(c_order.c_promotionAmount) as promotionAmount,any_value(code) as currency_code  
+			SUM(c_order.c_sales) AS sales ,SUM(c_order.c_taxs) AS _taxs ,sum(c_order.c_units) as units,sum(c_order.c_promotionAmount) as promotionAmount,max(code) as currency_code  
 			FROM (
 				SELECT
 					order_items.asin,
 					seller_account_id,
-				    any_value(item_price_currency_code) as code,
+				    max(item_price_currency_code) as code,
 					COUNT( DISTINCT amazon_order_id ) AS c_orders,
 					SUM(case WHEN CHAR_LENGTH(promotion_ids)>10 THEN 1 ELSE 0 END) AS c_proOrders,
 					SUM(quantity_ordered) AS c_units,
@@ -204,7 +204,7 @@ class CcpController extends Controller
 		foreach($itemData as $key=>$val){
 			$data[$val->asin] = (array)$val;
 			$data[$val->asin]['avg_units'] = round($val->units/$day,2);
-			$data[$val->asin]['title'] = $data[$val->asin]['image'] = '';
+			$data[$val->asin]['title'] = $data[$val->asin]['image'] = 'N/A';
 			$asins[] = $val->asin;
 		}
 		if($asins){
@@ -213,7 +213,7 @@ class CcpController extends Controller
 			if($account){
 				$product_where .= ' and seller_account_id in('.$account.')';
 			}
-			$product_sql = "select any_value(title) as title,any_value(images) as images,any_value(asin) as asin
+			$product_sql = "select max(title) as title,max(images) as images,max(asin) as asin
 						from products
 						where asin in({$asins})
 						and marketplaceid = '{$site}'

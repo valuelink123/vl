@@ -149,7 +149,7 @@
             <table class="table table-striped table-bordered" id="datatable">
                 <thead>
                     <tr>
-                        <th></th>
+                        <th>IMAGE</th>
                         <th>PRODUCT</th>
                         <th>ASIN</th>
                         <th>SALES</th>
