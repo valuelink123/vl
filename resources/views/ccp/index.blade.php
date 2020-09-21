@@ -1,158 +1,167 @@
 @extends('layouts.layout')
 @section('crumb')
-	@include('layouts.crumb', ['crumbs'=>['MWS dashboard']])
+    @include('layouts.crumb', ['crumbs'=>['MWS dashboard']])
 @endsection
 <style>
-	.total-data-table{
-		width:100%;
-		margin-bottom: 20px;
-		/*border-color: #676464;*/
-	}
-	.top-total-data .weight td{
-		font-size:30px;
-		font-weight:400;
-	}
-	.total-data-table td{
-		padding: 7px;
-		line-height: 15px;
-		/*border-left: 1px solid #676464;*/
-		/*border-right: 1px solid #676464;*/
-		font-size: 11px;
-	}
-	.date-search-table{
-		width:60%;
-		margin-bottom: 20px;
+    .total-data-table{
+        width:100%;
+        margin-bottom: 20px;
+        /*border-color: #676464;*/
+    }
+    .top-total-data .weight td{
+        font-size:30px;
+        font-weight:400;
+    }
+    .total-data-table td{
+        padding: 7px;
+        line-height: 15px;
+        /*border-left: 1px solid #676464;*/
+        /*border-right: 1px solid #676464;*/
+        font-size: 11px;
+    }
+    .date-search-table{
+        width:60%;
+        margin-bottom: 20px;
 
-	}
-	.date-search-table td{
-		border:1px solid #676464;
-		padding: 7px 12px;
-		margin: 11px 20px 0px 0px;
-		text-align:center;
-	}
-	.date-search-table .active{
-		background-color:#CD4D00;
-		color:#ffffff;
-		border:1px solid #CD4D00;
-	}
+    }
+    .date-search-table td{
+        border:1px solid #676464;
+        padding: 7px 12px;
+        margin: 11px 20px 0px 0px;
+        text-align:center;
+    }
+    .date-search-table .active{
+        background-color:#CD4D00;
+        color:#ffffff;
+        border:1px solid #CD4D00;
+    }
     #datatable th{
         text-align:center;
     }
 
 </style>
 @section('content')
-	@include('frank.common')
-	<div class="row">
+    @include('frank.common')
+    <div class="row">
+        <div class="top portlet light" style="margin-left:-25px;">
+            <form id="search-form" >
+                <input type="hidden" name="date_type" value="">
+                <input type="hidden" class="search_asin" name="asin" value="">
+                <div class="search portlet light">
+                    <div class="col-md-2">
+                        <div class="input-group">
+                            <span class="input-group-addon">Site</span>
+                            <select  style="width:100%;height:35px;" id="site" onchange="getAccountBySite()" name="site">
+                                @foreach($site as $value)
+                                    <option value="{{ $value->marketplaceid }}">{{ $value->domain }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="input-group" id="account-div">
+                            <span class="input-group-addon">Account</span>
+                            <select class="btn btn-default" id="account" multiple="multiple" data-width="100%" data-action-onchange="true" name="account" id="account[]">
+
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="input-group">
+                            <span class="input-group-addon">BGBU</span>
+                            <select  style="width:100%;height:35px;" id="bgbu" name="bgbu">
+                                <option value="">Select</option>
+                                @foreach($bgbu as $value)
+                                    <option value="{{ $value->bg }}_{{$value->bu}}">{{ $value->bg }}_{{$value->bu}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="input-group">
+                            <div class="btn-group pull-right" >
+                                <button id="search_top" class="btn sbold blue">Search</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
         <div class="top portlet light">
-        <form id="search-form">
-            <input type="hidden" name="date_type" value="">
-            <div class="search portlet light">
+            <table class="top-total-data total-data-table">
+                <tr>
+                    <td>SALES</td>
+                    <td>UNITS</td>
+                    <td>ORDERS</td>
+                    <td>AVG.PRICE</td>
+                </tr>
+                <tr class="weight second">
+                    <td>$<span class="sales">0</span></td>
+                    <td><span class="units">0</span></td>
+                    <td><span class="orders">0</span></td>
+                    <td>$<span class="avgPrice">0</span></td>
+                </tr>
+                <tr class="third">
+                    <td>NET REVENUE:$<span class="revenue">0</span></td>
+                    <td>FULL:<span class="unitsFull">0</span> | PROMO:<span class="unitsPromo">0</span></td>
+                    <td>FULL:<span class="ordersFull">0</span>|PROMO:<span class="ordersPromo">0</span></td>
+                    <td></td>
+                </tr>
+            </table>
+
+            <table class="date-search date-search-table">
+                <tr>
+                    <td class="date_type active" data-value="1">TODAY</td>
+                    <td class="date_type" data-value="2">YESTERDAY</td>
+                    <td class="date_type" data-value="3">LAST 7 DAYS</td>
+                    <td class="date_type" data-value="4">WEEK TO DATE</td>
+                    <td class="date_type" data-value="5">LAST 30 DAYS</td>
+                    <td class="date_type" data-value="6">MONTH TO DATE</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="row">
+        <div class="top portlet light">
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="top portlet light">
+            <div class="search_table" style="margin-bottom:50px;margin-left:-15px;">
                 <div class="col-md-2">
                     <div class="input-group">
-                        <span class="input-group-addon">Site</span>
-                        <select  style="width:100%;height:35px;" id="site" onchange="getAccountBySite()" name="site">
-                            @foreach($site as $value)
-                                <option value="{{ $value->marketplaceid }}">{{ $value->domain }}</option>
-                            @endforeach
-                        </select>
+                        <span class="input-group-addon">Asin</span>
+                        <input class="form-control" value="" id="asin" placeholder="Asin"/>
                     </div>
                 </div>
                 <div class="col-md-2">
                     <div class="input-group">
-                        <span class="input-group-addon">Account</span>
-                        <select  style="width:100%;height:35px;" id="account" name="account">
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <div class="input-group">
-                        <span class="input-group-addon">BGBU</span>
-                        <select  style="width:100%;height:35px;" id="bgbu" name="bgbu">
-                            <option value="">Select</option>
-                            @foreach($bgbu as $value)
-                                <option value="{{ $value->bg }}_{{$value->bu}}">{{ $value->bg }}_{{$value->bu}}</option>
-                            @endforeach
-                        </select>
+                        <div class="btn-group pull-right" >
+                            <button id="search_table" class="btn sbold blue">Search</button>
+                        </div>
                     </div>
                 </div>
             </div>
-            </form>
-        </div>
-		<div class="top portlet light">
-			<table class="top-total-data total-data-table">
-				<tr>
-					<td>SALES</td>
-					<td>UNITS</td>
-					<td>ORDERS</td>
-					<td>AVG.PRICE</td>
-{{--					<td>NET BEFORE COG | <span class="net-before-cog">64%</span></td>--}}
-{{--					<td>NET PROFIT | <span class="net-profit">64%</span></td>--}}
-				</tr>
-				<tr class="weight second">
-					<td>$<span class="sales">0</span></td>
-					<td><span class="units">0</span></td>
-					<td><span class="orders">0</span></td>
-					<td>$<span class="avgPrice">0</span></td>
-{{--					<td>$<span class="before-cog">366</span></td>--}}
-{{--					<td>$<span class="profit">566</span></td>--}}
-				</tr>
-				<tr class="third">
-					<td>NET REVENUE:$<span class="revenue">0</span></td>
-					<td>FULL:<span class="unitsFull">0</span> | PROMO:<span class="unitsPromo">0</span></td>
-					<td>FULL:<span class="ordersFull">0</span>|PROMO:<span class="ordersPromo">0</span></td>
-{{--					<td>STOCK VALUE:$<span class="stock-value">0.23</span></td>--}}
-					<td></td>
-{{--					<td>COG:$<span class="cog">33</span></td>--}}
-{{--					<td>PPC:$<span class="ppc">363</span> | ROI:<span class="roi">0%</span></td>--}}
-				</tr>
-			</table>
 
-			<table class="date-search date-search-table">
-				<tr>
-					<td class="date_type active" data-value="1">TODAY</td>
-					<td class="date_type" data-value="2">YESTERDAY</td>
-					<td class="date_type" data-value="3">LAST 7 DAYS</td>
-					<td class="date_type" data-value="4">WEEK TO DATE</td>
-					<td class="date_type" data-value="5">LAST 30 DAYS</td>
-					<td class="date_type" data-value="6">MONTH TO DATE</td>
-				</tr>
-			</table>
-		</div>
-	</div>
-	<div class="row">
-		<div class="top portlet light">
-			<table class="table table-striped table-bordered" id="datatable">
+            <table class="table table-striped table-bordered" id="datatable">
                 <thead>
-    				<tr>
-    					<th></th>
-    					<th>PRODUCT</th>
-    					<th>ASIN</th>
-    					<th>SALES</th>
-    					<th>UNITS</th>
-    					<th>ORDERS</th>
-    {{--					<th>FEES</th>--}}
-    {{--					<th>REFUNDS</th>--}}
-    {{--					<th>NET PROFIT</th>--}}
-    {{--					<th>SESSIONS</th>--}}
-    {{--					<th>CONVERSION PATE</th>--}}
-    {{--					<th>INVENTORY</th>--}}
-    					<th>AVG.UNITS PER DAY</th>
-    {{--					<th>STOCK OUT DATE</th>--}}
-    {{--					<th>BSR</th>--}}
-    				</tr>
+                    <tr>
+                        <th></th>
+                        <th>PRODUCT</th>
+                        <th>ASIN</th>
+                        <th>SALES</th>
+                        <th>UNITS</th>
+                        <th>ORDERS</th>
+                        <th>AVG.UNITS PER DAY</th>
+                    </tr>
                 </thead>
                 <tbody></tbody>
-			</table>
-		</div>
-	</div>
+            </table>
+        </div>
+    </div>
 
-	<script>
-
-
-
-        // let $theTable = $(thetable)
-
-
+    <script>
             $('#datatable').dataTable({
                 searching: false,//关闭搜索
                 serverSide: true,//启用服务端分页（这是使用Ajax服务端的必须配置）
@@ -180,23 +189,18 @@
                 }
             })
 
-
-        // initTable();
-        // let dtApi = $theTable.api();
-        // $(selector).dataTable().api();
-
-		$('.date-search .date_type').click(function(){
-		    $('.date-search .date_type').removeClass('active');
-		    $(this).addClass('active');
-			var value = $(this).attr('data-value');
-			$('input[name="date_type"]').val(value);
-			$.ajax({
-				type: 'post',
-				url: '/ccp/showTotal',
-				data: {date_type:value},
-				dataType:'json',
-				success: function(res) {
-					$('.total-data-table .sales').text(res.sales);
+        $('.date-search .date_type').click(function(){
+            $('.date-search .date_type').removeClass('active');
+            $(this).addClass('active');
+            var value = $(this).attr('data-value');
+            $('input[name="date_type"]').val(value);
+            $.ajax({
+                type: 'post',
+                url: '/ccp/showTotal',
+                data: {search_data:$("#search-form").serialize()},
+                dataType:'json',
+                success: function(res) {
+                    $('.total-data-table .sales').text(res.sales);
                     $('.total-data-table .units').text(res.units);
                     $('.total-data-table .orders').text(res.orders);
                     $('.total-data-table .avgPrice').text(res.avgPrice);
@@ -205,42 +209,61 @@
                     $('.total-data-table .unitsPromo').text(res.unitsPromo);
                     $('.total-data-table .ordersFull').text(res.ordersFull);
                     $('.total-data-table .ordersPromo').text(res.ordersPromo);
-				}
-			});
-			//改变下面表格的数据内容
+                }
+            });
+            //改变下面表格的数据内容
             dtapi = $('#datatable').dataTable().api();
             dtapi.settings()[0].ajax.data = {search: $("#search-form").serialize()};
             dtapi.ajax.reload();
-
-		})
+        })
+        //点击上面的搜索
+        $('#search_top').click(function(){
+            $(".date-search .active").trigger("click");
+            return false;
+        })
+        //点击下面的搜索只改变下面表格的数据
+        $('#search_table').click(function(){
+            $('.search_asin').val($('#asin').val());//asin赋值到搜索表单中
+            //改变下面表格的数据内容
+            dtapi = $('#datatable').dataTable().api();
+            dtapi.settings()[0].ajax.data = {search: $("#search-form").serialize()};
+            dtapi.ajax.reload();
+            return false;
+        })
+        times = 1;
         function getAccountBySite(){
-		    var marketplaceid = $('#site option:selected').val();
-		    console.log(marketplaceid);
+            var marketplaceid = $('#site option:selected').val();
             $.ajax({
                 type: 'post',
                 url: '/ccp/showAccountBySite',
                 data: {marketplaceid:marketplaceid},
                 dataType:'json',
                 success: function(res) {
-					if(res.status==1){
-						var html = '';
+                    if(res.status==1){
+
+                        var html = '';
                         $.each(res.data,function(i,item) {
                             html += '<option value="'+item.id+'">'+item.label+'</option>';
                         })
-						console.log(html);
-						$('#account').html(html);
-					}else{
-					    alert('请先选择站点');
-					}
+                        var str = '<span class="input-group-addon">Account</span>\n' +
+                                '\t\t\t\t\t\t\t<select class="mt-multiselect btn btn-default" id="account" multiple="multiple" data-width="100%" data-action-onchange="true" name="account" id="account[]">\n' +
+                                '\n' +html+
+                                '\t\t\t\t\t\t\t</select>';
+                        $('#account-div').html(str);
+                        ComponentsBootstrapMultiselect.init();//处理account的多选显示样式
+                    }else{
+                        alert('请先选择站点');
+                    }
                 }
             });
 
-		}
+        }
 
         $(function(){
+            getAccountBySite()//触发当前选的站点得到该站点所有的账号
             // 根据搜索时间区域，调用点击事件，展示上部分的统计数据
             $(".date-search .active").trigger("click");
         })
-	</script>
+    </script>
 
 @endsection

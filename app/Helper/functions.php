@@ -1309,3 +1309,16 @@ function getMarketDomain()
 	$data= DB::connection('vlz')->select('select marketplaceid,domain from marketplaces');
 	return $data;
 }
+
+//通过亚马逊站点得到域名
+function getDomainBySite($site)
+{
+	$domain = '';
+	$siteDDomain = getMarketDomain();
+	foreach($siteDDomain as $key=>$val){
+		if($site == $val->marketplaceid){
+			$domain = $val->domain;
+		}
+	}
+	return $domain;
+}
