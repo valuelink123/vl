@@ -1,6 +1,6 @@
 @extends('layouts.layout')
 @section('crumb')
-    @include('layouts.crumb', ['crumbs'=>['MWS dashboard']])
+    @include('layouts.crumb', ['crumbs'=>['ccp dashboard']])
 @endsection
 <style>
     .total-data-table{

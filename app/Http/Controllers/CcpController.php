@@ -85,7 +85,7 @@ class CcpController extends Controller
 		$domain = substr(getDomainBySite($site), 4);//orders.sales_channel
 		$orderwhere .= " and sales_channel = '".$domain."'";
 		//用户权限sap_asin_match_sku
-		$userleft = $this->getUserLeft($site,$bgbu);
+		$userwhere = $this->getUserWhere($site,$bgbu);
 
 		//sales数据，orders数据
 		$sql = "SELECT SUM(c_order.c_orders) AS orders, SUM(c_order.c_proOrders) AS ordersPromo,SUM(c_order.c_proUnits) AS unitsPromo, 
@@ -102,7 +102,6 @@ class CcpController extends Controller
 					SUM(item_tax_amount) as c_taxs,
 				sum(promotion_discount_amount) as c_promotionAmount
 				FROM order_items 
-				{$userleft}
 				WHERE 1 = 1 {$where} 
 				and CONCAT(amazon_order_id,'_',seller_account_id) in (
 							select CONCAT(amazon_order_id,'_',seller_account_id)
@@ -110,9 +109,11 @@ class CcpController extends Controller
 							where order_status in('PendingAvailability','Pending','Unshipped','PartiallyShipped','Shipped','InvoiceUnconfirmed','Unfulfillab')
 							{$orderwhere}
 				)
-				AND quantity_ordered>0
+				AND quantity_ordered>0 
+				and order_items.asin in({$userwhere})
 				GROUP BY asin,seller_account_id 
 			) AS c_order";
+
 		$orderData = DB::connection('vlz')->select($sql);
 		$array = array(
 			'sales' => round($orderData[0]->sales,2),
@@ -149,7 +150,7 @@ class CcpController extends Controller
 		$domain = substr(getDomainBySite($site), 4);//orders.sales_channel
 		$orderwhere .= " and sales_channel = '".$domain."'";
 		//用户权限sap_asin_match_sku
-		$userleft = $this->getUserLeft($site,$bgbu);
+		$userwhere = $this->getUserWhere($site,$bgbu);
 		if($asin){
 			$where .= " and order_items.asin = '".$asin."'";
 		}
@@ -169,7 +170,6 @@ class CcpController extends Controller
 					SUM(item_tax_amount) as c_taxs,
 				sum(promotion_discount_amount) as promotionAmount
 				FROM order_items 
-				{$userleft}
 				WHERE 1 = 1 {$where} 
 				and CONCAT(amazon_order_id,'_',seller_account_id) in (
 							select CONCAT(amazon_order_id,'_',seller_account_id)
@@ -177,7 +177,8 @@ class CcpController extends Controller
 							where order_status in('PendingAvailability','Pending','Unshipped','PartiallyShipped','Shipped','InvoiceUnconfirmed','Unfulfillab')
 							{$orderwhere}
 				)
-				AND quantity_ordered>0
+				AND quantity_ordered>0 
+				and order_items.asin in({$userwhere}) 
 				GROUP BY asin order by sales desc {$limit} ";
 
 		$itemData = DB::connection('vlz')->select($sql);
@@ -219,7 +220,7 @@ class CcpController extends Controller
 			$productData = DB::connection('vlz')->select($product_sql);
 			foreach($productData as $key=>$val){
 				if(isset($data[$val->asin])){
-					$title = mb_substr($val->title,0,100);
+					$title = mb_substr($val->title,0,50);
 					$data[$val->asin]['title'] = '<span title="'.$val->title.'">'.$title.'</span>';
 					$imageArr = explode(',',$val->images);
 					if($imageArr){
@@ -229,8 +230,7 @@ class CcpController extends Controller
 				}
 			}
 		}
-		// echo '<pre>';
-		// var_dump($recordsFiltered);exit;
+
 		$data = array_values($data);
 		return compact('data', 'recordsTotal', 'recordsFiltered');
 	}
@@ -286,23 +286,23 @@ class CcpController extends Controller
 		}
 		return $return;
 	}
-	//得到用户的权限数据关联查询语句，根据sap_asin_match_sku此表去关联查询
-	public function getUserLeft($site,$bgbu)
+	//得到用户的权限数据查询语句，根据sap_asin_match_sku去查数据
+	public function getUserWhere($site,$bgbu)
 	{
 		$userdata = Auth::user();
-		$userwhere = " and marketplace_id  = '".$site."'";
+		$userWhere = " where marketplace_id  = '".$site."'";
 		if ($userdata->seller_rules) {
 			$rules = explode("-", $userdata->seller_rules);
-			if (array_get($rules, 0) != '*') $userwhere .= " and sap_seller_bg = '".array_get($rules, 0)."'";
-			if (array_get($rules, 1) != '*') $userwhere .= " and sap_seller_bu = '".array_get($rules, 1)."'";
+			if (array_get($rules, 0) != '*') $userWhere .= " and sap_seller_bg = '".array_get($rules, 0)."'";
+			if (array_get($rules, 1) != '*') $userWhere .= " and sap_seller_bu = '".array_get($rules, 1)."'";
 		}elseif($userdata->sap_seller_id){
-			$userwhere .= " and sap_seller_id = ".$userdata->sap_seller_id;
+			$userWhere .= " and sap_seller_id = ".$userdata->sap_seller_id;
 		}
 		if($bgbu){
-			$userwhere .= " and CONCAT(sap_seller_bg,'_',sap_seller_bu) = '".$bgbu."'";
+			$userWhere .= " and CONCAT(sap_seller_bg,'_',sap_seller_bu) = '".$bgbu."'";
 		}
-		$userleft = " left join sap_asin_match_sku on sap_asin_match_sku.asin = order_items.asin {$userwhere}";
-		return $userleft;
+		$userWhere = " select DISTINCT sap_asin_match_sku.asin from sap_asin_match_sku  {$userWhere}";
+		return $userWhere;
 	}
 
 
