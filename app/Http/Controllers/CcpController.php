@@ -119,7 +119,7 @@ class CcpController extends Controller
 				and order_items.asin in({$userwhere})
 				GROUP BY asin,seller_account_id 
 			) AS c_order";
-		
+
 		$orderData = DB::connection('vlz')->select($sql);
 		$array = array(
 			'sales' => round($orderData[0]->sales,2),
@@ -219,15 +219,16 @@ class CcpController extends Controller
 		if($asins){
 			$asins = "'".implode("','",$asins)."'";
 			$product_where = '';
-			if($account){
-				$product_where .= ' and seller_account_id in('.$account.')';
-			}
+			// if($account){
+			// 	$product_where .= ' and seller_account_id in('.$account.')';
+			// }
 			$product_sql = "select max(title) as title,max(images) as images,asin
 						from asins
 						where asin in({$asins})
 						and marketplaceid = '{$site}'
 						{$product_where}
 						group by asin ";
+
 			$productData = DB::connection('vlz')->select($product_sql);
 			foreach($productData as $key=>$val){
 				if(isset($data[$val->asin])){
