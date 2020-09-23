@@ -301,10 +301,7 @@ Route::match(['post','get'],'/shipment/getShippmentIDList', 'ShipmentController@
 Route::match(['post','get'],'/shipment/addShippments', 'ShipmentController@addShippments');//增加shippment 或 跟踪单号 单据号
 Route::match('post','/shipment/delShippments', 'ShipmentController@delShippments');//删除shippment 或 跟踪单号 单据号
 //
-
-
 Route::get('/marketingPlan/test', 'MarketingPlanController@test')->name('marketingPlan');
-
 
 Route::get('/cpfr/purchase', 'CpfrController@purchase')->name('purchase');
 Route::get('/cpfr/barcode', 'CpfrController@barcode')->name('barcode');
@@ -315,5 +312,6 @@ Route::get('/ccp', 'CcpController@index')->name('index'); //mws后台管理
 Route::post('/ccp/showTotal', 'CcpController@showTotal')->name('showTotal'); //ccp功能展示顶部统计数据
 Route::post('/ccp/list', 'CcpController@list')->name('ccpList');//ccp功能的列表展示
 Route::post('/ccp/showAccountBySite', 'CcpController@showAccountBySite')->name('showAccountBySite');//ccp功能的列表展示
+Route::get('ccp/showOrderList', 'CcpController@showOrderList')->name('showOrderList');//ccp功能的列表中点击订单数查看订单列表的功能
 
 Route::get('/getOrderDataBySap', 'ApiController@getOrderDataBySap')->name('getOrderDataBySap'); //获取sap接口数据
