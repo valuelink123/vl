@@ -155,20 +155,20 @@
                 </div>
             </div>
 
-{{--            <table class="table table-striped table-bordered" id="datatable">--}}
-{{--                <thead>--}}
-{{--                    <tr>--}}
-{{--                        <th>IMAGE</th>--}}
-{{--                        <th>PRODUCT</th>--}}
-{{--                        <th>ASIN</th>--}}
-{{--                        <th>SALES</th>--}}
-{{--                        <th>UNITS</th>--}}
-{{--                        <th>ORDERS</th>--}}
-{{--                        <th>AVG.UNITS PER DAY</th>--}}
-{{--                    </tr>--}}
-{{--                </thead>--}}
-{{--                <tbody></tbody>--}}
-{{--            </table>--}}
+            <table class="table table-striped table-bordered" id="">
+                <thead>
+                    <tr>
+                        <th>IMAGE</th>
+                        <th>PRODUCT</th>
+                        <th>ASIN</th>
+                        <th>SALES</th>
+                        <th>UNITS</th>
+                        <th>ORDERS</th>
+                        <th>AVG.UNITS PER DAY</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
         </div>
     </div>
 
