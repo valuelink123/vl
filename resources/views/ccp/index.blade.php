@@ -87,8 +87,8 @@
                         <div class="input-group">
                             <span class="input-group-addon">Time Type</span>
                             <select  style="width:100%;height:35px;" id="timeType" name="timeType">
-                                <option value="0">BeiJing Time</option>
                                 <option value="1">Local Time</option>
+                                <option value="0">BeiJing Time</option>
                             </select>
                         </div>
                     </div>

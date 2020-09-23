@@ -119,7 +119,7 @@ class CcpController extends Controller
 				and order_items.asin in({$userwhere})
 				GROUP BY asin,seller_account_id 
 			) AS c_order";
-
+		
 		$orderData = DB::connection('vlz')->select($sql);
 		$array = array(
 			'sales' => round($orderData[0]->sales,2),
@@ -222,22 +222,23 @@ class CcpController extends Controller
 			if($account){
 				$product_where .= ' and seller_account_id in('.$account.')';
 			}
-			$product_sql = "select max(title) as title,max(images) as images,max(asin) as asin
-						from products
+			$product_sql = "select max(title) as title,max(images) as images,asin
+						from asins
 						where asin in({$asins})
 						and marketplaceid = '{$site}'
 						{$product_where}
 						group by asin ";
-
 			$productData = DB::connection('vlz')->select($product_sql);
 			foreach($productData as $key=>$val){
 				if(isset($data[$val->asin])){
 					$title = mb_substr($val->title,0,50);
 					$data[$val->asin]['title'] = '<span title="'.$val->title.'">'.$title.'</span>';
-					$imageArr = explode(',',$val->images);
-					if($imageArr){
-						$image = 'https://images-na.ssl-images-amazon.com/images/I/'.$imageArr[0];
-						$data[$val->asin]['image'] = '<image style="width:50px;height:50px;" src="'.$image.'">';
+					if($val->images){
+						$imageArr = explode(',',$val->images);
+						if($imageArr){
+							$image = 'https://images-na.ssl-images-amazon.com/images/I/'.$imageArr[0];
+							$data[$val->asin]['image'] = '<image style="width:50px;height:50px;" src="'.$image.'">';
+						}
 					}
 				}
 			}
