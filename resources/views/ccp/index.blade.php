@@ -155,7 +155,7 @@
                 </div>
             </div>
 
-            <table class="table table-striped table-bordered" id="">
+            <table class="table table-striped table-bordered" id="datatable">
                 <thead>
                     <tr>
                         <th>IMAGE</th>
