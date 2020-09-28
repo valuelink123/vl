@@ -341,7 +341,7 @@ class CcpController extends Controller
 			//获取今天是周几
 			$week = date('w',$time);
 			//0为周天，1为周一，以此类推
-			$day = $day==0 ? 7 : $week;//周天的时候查询了7天的数据，不然周几就是查询了几天的数据
+			$day = $week==0 ? 7 : $week;//周天的时候查询了7天的数据，不然周几就是查询了几天的数据
 		}elseif($date_type == 5){//最近30天数据
 			$day = 30;
 		}elseif($date_type == 6){//本月数据
