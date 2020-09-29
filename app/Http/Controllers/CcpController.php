@@ -166,8 +166,6 @@ class CcpController extends Controller
 			$limit = $this->dtLimit($req);
 			$limit = " LIMIT {$limit} ";
 		}
-		//保证asin_price此站点今天有数据
-		$this->insertAsinPrice($site);
 
 		$date = date('Y-m-d');//当前日期
 		$sql = "SELECT SQL_CALC_FOUND_ROWS asin, SUM(c_order.c_orders) AS orders, SUM(c_order.c_proOrders) AS ordersPromo,SUM(c_order.c_proUnits) AS unitsPromo, 
