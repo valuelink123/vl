@@ -223,10 +223,13 @@
                     $('.total-data-table .danwei').text(res.danwei);
                 }
             });
-            //改变下面表格的数据内容
-            dtapi = $('#datatable').dataTable().api();
-            dtapi.settings()[0].ajax.data = {search: $("#search-form").serialize()};
-            dtapi.ajax.reload();
+            //改变下面表格的数据内容,睡眠0.5秒,确保asin_price里面已经插入数据
+            setTimeout(function(){
+                dtapi = $('#datatable').dataTable().api();
+                dtapi.settings()[0].ajax.data = {search: $("#search-form").serialize()};
+                dtapi.ajax.reload();
+            },500)
+
         })
         //点击上面的搜索
         $('#search_top').click(function(){

@@ -207,5 +207,47 @@ class Controller extends BaseController
 		if(in_array(11,$userRole)) return ['bg'=>Auth::user()->ubg,'bu'=>Auth::user()->ubu,'sap_seller_id'=>intval(Auth::user()->sap_seller_id)];
 		return [];
 	}
-	
+
+    //通过站点显示账号，ajax联动
+	public function showTheAccountBySite()
+	{
+		$marketplaceid = isset($_REQUEST['marketplaceid']) ? $_REQUEST['marketplaceid'] : '';
+		$return = array('status'=>1,'data'=>array()) ;
+		if($marketplaceid){
+			$data= DB::connection('vlz')->select("select id,label from seller_accounts where deleted_at is NULL and mws_marketplaceid = '{$marketplaceid}' order by label asc");
+			foreach($data as $key=>$val){
+				$return['data'][$key] = (array)$val;
+			}
+		}else{
+			$return['status'] = 0;
+		}
+		return $return;
+	}
+
+    //查询该站点的最近一条item_price_amount>0的item_price_amount金额,为了替换掉状态为pending并且item_price_amount=0的金额数据\
+	public function insertTheAsinPrice($site)
+	{
+		//查询该站点的最近一条item_price_amount>0的item_price_amount金额,为了替换掉状态为pending并且item_price_amount=0的金额数据\
+		$date = date('Y-m-d');//当前日期
+		//查询当前站点今天是否有价格的数据
+		$priceData = DB::connection('vlz')->select("select seller_account_id,asin,price from asin_price where marketplace_id = '".$site."' and created_at = '".$date."' group by seller_account_id,asin");
+		//当前站点今天还没有数据的话，查询到要插入的数据，更新asin_price表
+		if(empty($priceData)) {
+			DB::connection('vlz')->table('asin_price')->where('marketplace_id',$site)->delete();//没有此站点今天的数据就把此站点以前的数据删除掉
+			$insert_sql = "select a.asin as asin,ROUND((b.item_price_amount/b.quantity_ordered),2) as price,a.seller_account_id as seller_account_id,'" . $site . "' as marketplace_id,'" . $date . "' as created_at  
+    from(select asin,max(id) as id,seller_account_id 
+                    from order_items
+                    where item_price_amount>0 and quantity_ordered>0 
+                    and order_items.asin in( select DISTINCT sap_asin_match_sku.asin from sap_asin_match_sku   where marketplace_id  = '" . $site . "')
+                    group by asin,seller_account_id 
+                ) as a,order_items as b
+        where a.id = b.id";
+			$insertData = DB::connection('vlz')->select($insert_sql);
+			$insertData = array_map('get_object_vars', $insertData);//需要插入的数据
+			if ($insertData) {
+				DB::connection('vlz')->table('asin_price')->insert($insertData);
+			}
+		}
+		return true;
+	}
 }
