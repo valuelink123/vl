@@ -241,6 +241,15 @@
 												    </a>
 												</li>
 												 @endpermission
+
+                                                 @permission('skuforuser-show')
+												<li class="">
+												    <a href="/skuforuser" class="nav-link nav-toggle ">
+												        Skus For Users
+												        <span class="arrow"></span>
+												    </a>
+												</li>
+												 @endpermission
 												
 												 
 												

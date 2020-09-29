@@ -315,3 +315,8 @@ Route::post('/ccp/showAccountBySite', 'CcpController@showAccountBySite')->name('
 Route::get('ccp/showOrderList', 'CcpController@showOrderList')->name('showOrderList');//ccp功能的列表中点击订单数查看订单列表的功能
 
 Route::get('/getOrderDataBySap', 'ApiController@getOrderDataBySap')->name('getOrderDataBySap'); //获取sap接口数据
+
+Route::resource('skuforuser', 'SkuForUserController');
+Route::Post('/skuforuser/get', 'SkuForUserController@get')->name('getSkuForUser');
+Route::Post('/skuforuser/upload', 'SkuForUserController@upload')->name('uploadSkuForUser');
+Route::get('/skuforuserexport', 'SkuForUserController@export')->name('exportSkuForUser');
