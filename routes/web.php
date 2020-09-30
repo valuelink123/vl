@@ -320,3 +320,30 @@ Route::resource('skuforuser', 'SkuForUserController');
 Route::Post('/skuforuser/get', 'SkuForUserController@get')->name('getSkuForUser');
 Route::Post('/skuforuser/upload', 'SkuForUserController@upload')->name('uploadSkuForUser');
 Route::get('/skuforuserexport', 'SkuForUserController@export')->name('exportSkuForUser');
+
+/*
+ * EDM模块
+ */
+Route::get('/edm/tag', 'EdmTagController@index');//标签的列表
+Route::post('/edm/tagList', 'EdmTagController@list');//标签的列表
+Route::match(['post','get'],'/edm/tag/add', 'EdmTagController@add');//添加标签
+Route::match(['post','get'],'/edm/tag/update', 'EdmTagController@update');//更新标签
+
+Route::get('/edm/customers', 'EdmCustomersController@index')->name('edmCustomersIndex');//客户信息的列表
+Route::post('/edm/customersList', 'EdmCustomersController@list')->name('edmCustomersList');//客户信息的列表
+Route::Post('/edm/customers/import', 'EdmCustomersController@import');//导入数据
+Route::get('/edm/customers/download', 'EdmCustomersController@download');//下载模板
+Route::post('/edm/customers/action', 'EdmCustomersController@action');//客户列表中的操作
+Route::match(['post','get'],'/edm/customers/add', 'EdmCustomersController@add');//添加单个客户数据
+Route::match(['post','get'],'/edm/customers/update', 'EdmCustomersController@update');//更新单个客户数据
+
+Route::get('/edm/template', 'EdmTemplateController@index');//模板的列表
+Route::post('/edm/templateList', 'EdmTemplateController@list');//模板的列表
+Route::match(['post','get'],'/edm/template/add', 'EdmTemplateController@add');//添加模板
+Route::match(['post','get'],'/edm/template/update', 'EdmTemplateController@update');//更新模板
+
+Route::get('/edm/campaign', 'EdmCampaignController@index');//campaign活动的列表
+Route::post('/edm/campaignList', 'EdmCampaignController@list');//campaign活动的列表
+Route::match(['post','get'],'/edm/campaign/add', 'EdmCampaignController@add');//添加campaign活动
+Route::match(['post','get'],'/edm/campaign/update', 'EdmCampaignController@update');//更新campaign活动
+Route::post('/edm/getContentByTmpAsin', 'EdmCampaignController@getContentByTmpAsin');//添加campaign活动时,通过模板和asin得到发送content的内容

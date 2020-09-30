@@ -812,6 +812,47 @@
 												@endpermission
 											</ul>
 										</li>
+										<li class="menu-dropdown classic-menu-dropdown ">
+											<a href="javascript:;"> EDM
+												<span class="arrow"></span>
+											</a>
+											<ul class="dropdown-menu pull-left">
+
+												@permission('edm-tag-show')
+												<li class="">
+													<a href="/edm/tag" class="nav-link nav-toggle ">
+														Tag
+														<span class="arrow"></span>
+													</a>
+												</li>
+												@endpermission
+
+												@permission('edm-customers-show')
+												<li class="">
+													<a href="/edm/customers" class="nav-link nav-toggle ">
+														Customers Info
+														<span class="arrow"></span>
+													</a>
+												</li>
+												@endpermission
+												@permission('edm-template-show')
+												<li class="">
+													<a href="/edm/template" class="nav-link nav-toggle ">
+														Template
+														<span class="arrow"></span>
+													</a>
+												</li>
+												@endpermission
+												@permission('edm-campaign-show')
+												<li class="">
+													<a href="/edm/campaign" class="nav-link nav-toggle ">
+														Campaign
+														<span class="arrow"></span>
+													</a>
+												</li>
+												@endpermission
+											</ul>
+										</li>
                                     </ul>
                                 </div>
             <div class="top-menu">

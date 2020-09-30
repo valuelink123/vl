@@ -9,4 +9,5 @@ class ConfigOption extends Model
     //
     protected $table = 'config_option';
     public $timestamps = true;
+
 }
