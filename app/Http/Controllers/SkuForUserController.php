@@ -56,8 +56,8 @@ class SkuForUserController extends Controller
                         $importData = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
                         $successCount=0;
                         foreach($importData as $key => $data){
-                            $sku = array_get($data,'A');
-                            $site = array_get($data,'B');
+                            $sku = trim(array_get($data,'A'));
+                            $site = trim(array_get($data,'B'));
                             if($key==1){
                                 if($sku!='sku' || $site!='site'){
                                     die('import template error');
@@ -68,10 +68,10 @@ class SkuForUserController extends Controller
                                 $last_data = SkuForUser::where('sku',$sku)->where('marketplace_id',$marketplace_id)->where('date',date('Y-m-d'))->get(['producter','planer','dqe','te'])->first();
                                 $last_data = empty($last_data)?[]:$last_data->toArray();    
                                 $new_data = [
-                                    'producter'=> array_get($users_data,array_get($data,'C')),
-                                    'planer'=> array_get($users_data,array_get($data,'D')),
-                                    'dqe'=> array_get($users_data,array_get($data,'E')),
-                                    'te'=> array_get($users_data,array_get($data,'F'))
+                                    'producter'=> array_get($users_data,trim(array_get($data,'C'))),
+                                    'planer'=> array_get($users_data,trim(array_get($data,'D'))),
+                                    'dqe'=> array_get($users_data,trim(array_get($data,'E'))),
+                                    'te'=> array_get($users_data,trim(array_get($data,'F')))
                                 ];
                                 if($last_data!=$new_data){
                                     $new_data['created_user_id'] = Auth::user()->id;
@@ -109,7 +109,7 @@ class SkuForUserController extends Controller
         $datas = new SkuForUser;
         $users_data = User::where('locked',0)->pluck('name','id');
         if(array_get($_REQUEST,'sku')){
-            $datas = $datas->whereIn('sku',explode(',',array_get($_REQUEST,'sku')));
+            $datas = $datas->whereIn('sku',explode(',',str_replace(' ','',array_get($_REQUEST,'sku'))));
             $exportFileName.=array_get($_REQUEST,'sku').'_';
         }
         if(array_get($_REQUEST,'date')){
@@ -249,7 +249,7 @@ class SkuForUserController extends Controller
         $users_data = User::where('locked',0)->pluck('name','id');
         $users_data[0]='N/A';
         if(array_get($_REQUEST,'sku')){
-            $datas = $datas->whereIn('sku_for_user.sku',explode(',',array_get($_REQUEST,'sku')));
+            $datas = $datas->whereIn('sku_for_user.sku',str_replace(' ','',explode(',',array_get($_REQUEST,'sku'))));
         } 
         if(array_get($_REQUEST,'status')!==NULL && array_get($_REQUEST,'status')!==''){
             $datas = $datas->whereIn('status',array_get($_REQUEST,'status'));
