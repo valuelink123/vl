@@ -311,7 +311,7 @@ Route::get('/management', 'ManagementController@index')->name('index');
 Route::get('/ccp', 'CcpController@index')->name('index'); //mws后台管理
 Route::post('/ccp/showTotal', 'CcpController@showTotal')->name('showTotal'); //ccp功能展示顶部统计数据
 Route::post('/ccp/list', 'CcpController@list')->name('ccpList');//ccp功能的列表展示
-Route::post('/ccp/showAccountBySite', 'CcpController@showAccountBySite')->name('showAccountBySite');//ccp功能的列表展示
+Route::post('/showAccountBySite', 'Controller@showTheAccountBySite')->name('showTheAccountBySite');//ccp功能的列表展示
 Route::get('ccp/showOrderList', 'CcpController@showOrderList')->name('showOrderList');//ccp功能的列表中点击订单数查看订单列表的功能
 
 Route::get('/getOrderDataBySap', 'ApiController@getOrderDataBySap')->name('getOrderDataBySap'); //获取sap接口数据

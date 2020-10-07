@@ -284,7 +284,8 @@ function getSiteCur(){
         'amazon.co.jp'=>'JPY',
         'amazon.co.uk'=>'GBP',
         'amazon.com.mx'=>'MXN',
-        'amazon.com'=>'USD'
+        'amazon.com'=>'USD',
+		'amazon.mx'=>'MXN',
     );
 }
 

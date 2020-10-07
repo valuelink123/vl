@@ -76,28 +76,29 @@ class CcpController extends Controller
         $account = isset($search['account']) ? $search['account'] : '';//账号id,例如115,137
         $bgbu = isset($search['bgbu']) ? $search['bgbu'] : '';//bgbu,例如BG1_BU4
 		$timeType = isset($search['timeType']) ? $search['timeType'] : '';//时间类型，默认是0为北京时间，1为亚马逊后台当地时间
+		$domain = substr(getDomainBySite($site), 4);//orders.sales_channel
+		$siteCur = getSiteCur();
+		$currency_code = isset($siteCur[$domain]) ? $siteCur[$domain] : '';
 
 		$where = $orderwhere = $this->getDateWhere($date_type,$site,$timeType);
 		//$account搜索两个表的字段都为seller_account_id
 		if($account){
 			$where = $orderwhere .= ' and seller_account_id in('.$account.')';
 		}
-		$domain = substr(getDomainBySite($site), 4);//orders.sales_channel
 		$orderwhere .= " and sales_channel = '".$domain."'";
 		//用户权限sap_asin_match_sku
 		$userwhere = $this->getUserWhere($site,$bgbu);
 		//保证asin_price此站点今天有数据
-		$this->insertAsinPrice($site);
+		$this->insertTheAsinPrice($site);
 
 		//sales数据，orders数据
 		$date = date('Y-m-d');//当前日期
 		$sql = "SELECT SUM(c_order.c_orders) AS orders, SUM(c_order.c_proOrders) AS ordersPromo,SUM(c_order.c_proUnits) AS unitsPromo, 
-			SUM(c_order.c_sales) AS sales ,SUM(c_order.c_taxs) AS _taxs ,sum(c_order.c_units) as units,sum(c_order.c_promotionAmount) as promotionAmount,max(code) as currency_code  
+			SUM(c_order.c_sales) AS sales ,SUM(c_order.c_taxs) AS _taxs ,sum(c_order.c_units) as units,sum(c_order.c_promotionAmount) as promotionAmount  
 			FROM (
 				SELECT
 					order_items.asin,
 					seller_account_id,
-				    max(item_price_currency_code) as code,
 					COUNT( DISTINCT amazon_order_id ) AS c_orders,
 					SUM(case WHEN CHAR_LENGTH(promotion_ids)>10 THEN 1 ELSE 0 END) AS c_proOrders,
 					SUM(quantity_ordered) AS c_units,
@@ -131,8 +132,7 @@ class CcpController extends Controller
 			'ordersFull' => round($orderData[0]->orders - $orderData[0]->ordersPromo,2),
 			'ordersPromo' => round($orderData[0]->ordersPromo,2),
 			'avgPrice' => $orderData[0]->units==0 ? 0 : round($orderData[0]->sales/$orderData[0]->units,2),//sales/units
-			'danwei' => $orderData[0]->currency_code ? $orderData[0]->currency_code : '',
-			// 'stockValue' => '0',
+			'danwei' => $currency_code,
 		);
 		return $array;
 	}
@@ -169,12 +169,11 @@ class CcpController extends Controller
 
 		$date = date('Y-m-d');//当前日期
 		$sql = "SELECT SQL_CALC_FOUND_ROWS asin, SUM(c_order.c_orders) AS orders, SUM(c_order.c_proOrders) AS ordersPromo,SUM(c_order.c_proUnits) AS unitsPromo, 
-			SUM(c_order.c_sales) AS sales ,SUM(c_order.c_taxs) AS _taxs ,sum(c_order.c_units) as units,sum(c_order.c_promotionAmount) as promotionAmount,max(code) as currency_code  
+			SUM(c_order.c_sales) AS sales ,SUM(c_order.c_taxs) AS _taxs ,sum(c_order.c_units) as units,sum(c_order.c_promotionAmount) as promotionAmount 
 			FROM (
 				SELECT
 					order_items.asin,
 					seller_account_id,
-				    max(item_price_currency_code) as code,
 					COUNT( DISTINCT amazon_order_id ) AS c_orders,
 					SUM(case WHEN CHAR_LENGTH(promotion_ids)>10 THEN 1 ELSE 0 END) AS c_proOrders,
 					SUM(quantity_ordered) AS c_units,
@@ -266,12 +265,19 @@ class CcpController extends Controller
 		$startDate = $dateRange['startDate'];
 		$endDate = $dateRange['endDate'];
 		$date_field = 'purchase_date';
+		$dateconfig = array('A1PA6795UKMFR9','A1RKKUPIHCS9HS','A13V1IB3VIYZZH','APJ6JRA9NG5V4');//utc+2:00
 		if($timeType==1){//选的是后台当地时间
 			if($site=='A1VC38T7YXB528'){//日本站点，date字段+9hour
 				$date_field = 'date_add(purchase_date,INTERVAL 9 hour) ';
+			}elseif($site=='A1F83G8C2ARO7P'){//英国站点+1小时，uTc+1:00
+				$date_field = 'date_add(purchase_date,INTERVAL 1 hour) ';
+			}elseif(in_array($site,$dateconfig)){//站点+2小时，utc+2:00
+				$date_field = 'date_add(purchase_date,INTERVAL 2 hour) ';
 			}else{//其他站点，date字段-7hour
 				$date_field = 'date_sub(purchase_date,INTERVAL 7 hour) ';
 			}
+		}else{//北京时间加上8小时
+			$date_field = 'date_add(purchase_date,INTERVAL 8 hour) ';
 		}
 		$where = " and {$date_field} BETWEEN STR_TO_DATE( '".$startDate."', '%Y-%m-%d %H:%i:%s' ) AND STR_TO_DATE('".$endDate."', '%Y-%m-%d %H:%i:%s' )";
 		return $where;
@@ -288,14 +294,7 @@ class CcpController extends Controller
 	public function getDateRange($date_type,$site,$timeType)
 	{
 		//如果选的时间类型是后台当地时间，时间要做转化
-		$time = time();//北京时间当前时间戳
-		if($timeType==1){//选的是后台当地时间
-			if($site=='A1VC38T7YXB528'){//时间范围+1小时,日本站点
-				$time = strtotime(date('Y-m-d H:i:s', strtotime ("+1 hour", $time)));//日本站后台当前时间;
-			}else{//时间范围-15小时
-				$time =  strtotime(date('Y-m-d H:i:s', strtotime ("-15 hour", $time)));//美国站后台当前时间
-			}
-		}
+		$time = $this->getCurrentTime($site,$timeType);//获取当前时间戳
 		$startDate = date('Y-m-d 00:00:00',$time);//默认的开始时间
 		$endDate = date('Y-m-d H:i:s',$time);//默认的结束时间
 		if($date_type == 2){//昨天日期
@@ -324,14 +323,7 @@ class CcpController extends Controller
 	public function getdays($date_type,$site,$timeType)
 	{
 		//如果选的时间类型是后台当地时间，时间要做转化
-		$time = time();//北京时间当前时间戳
-		if($timeType==1){//选的是后台当地时间
-			if($site=='A1VC38T7YXB528'){//时间范围+1小时,日本站点
-				$time = strtotime(date('Y-m-d H:i:s', strtotime ("+1 hour", $time)));//日本站后台当前时间;
-			}else{//时间范围-15小时
-				$time =  strtotime(date('Y-m-d H:i:s', strtotime ("-15 hour", $time)));//美国站后台当前时间
-			}
-		}
+		$time = $this->getCurrentTime($site,$timeType);//获取当前时间戳
 		$day = 1;
 		if($date_type == 3){//最近7天数据
 			$day = 7;
@@ -347,20 +339,24 @@ class CcpController extends Controller
 		}
 		return $day;
 	}
-	//通过站点显示账号，ajax联动
-	public function showAccountBySite()
+	//得到当前时间戳
+	public function getCurrentTime($site,$timeType)
 	{
-		$marketplaceid = isset($_REQUEST['marketplaceid']) ? $_REQUEST['marketplaceid'] : '';
-		$return = array('status'=>1,'data'=>array()) ;
-		if($marketplaceid){
-			$data= DB::connection('vlz')->select("select id,label from seller_accounts where deleted_at is NULL and mws_marketplaceid = '{$marketplaceid}' order by label asc");
-			foreach($data as $key=>$val){
-				$return['data'][$key] = (array)$val;
+		//如果选的时间类型是后台当地时间，时间要做转化
+		$dateconfig = array('A1PA6795UKMFR9','A1RKKUPIHCS9HS','A13V1IB3VIYZZH','APJ6JRA9NG5V4');//utc+2:00
+		$time = time();//北京时间当前时间戳
+		if($timeType==1){//选的是后台当地时间
+			if($site=='A1VC38T7YXB528'){//时间范围+1小时,日本站点,-8+9
+				$time = strtotime(date('Y-m-d H:i:s', strtotime ("+1 hour", $time)));//日本站后台当前时间;
+			}elseif($site=='A1F83G8C2ARO7P'){//英国站点+1小时，uTc+1:00,-8+1
+				$time = strtotime(date('Y-m-d H:i:s', strtotime ("-7 hour", $time)));//英国站后台当前时间;
+			}elseif(in_array($site,$dateconfig)){//utc+2:00,-8+2
+				$time = strtotime(date('Y-m-d H:i:s', strtotime ("-6 hour", $time)));//几个特殊的站点
+			}else{//时间范围-15小时,-8-7
+				$time =  strtotime(date('Y-m-d H:i:s', strtotime ("-15 hour", $time)));//美国站后台当前时间;
 			}
-		}else{
-			$return['status'] = 0;
 		}
-		return $return;
+		return $time;
 	}
 	//得到用户的权限数据查询语句，根据sap_asin_match_sku去查数据
 	public function getUserWhere($site,$bgbu)
@@ -380,34 +376,4 @@ class CcpController extends Controller
 		$userWhere = " select DISTINCT sap_asin_match_sku.asin from sap_asin_match_sku  {$userWhere}";
 		return $userWhere;
 	}
-
-	//查询该站点的最近一条item_price_amount>0的item_price_amount金额,为了替换掉状态为pending并且item_price_amount=0的金额数据\
-	public function insertAsinPrice($site)
-	{
-		//查询该站点的最近一条item_price_amount>0的item_price_amount金额,为了替换掉状态为pending并且item_price_amount=0的金额数据\
-		$date = date('Y-m-d');//当前日期
-		//查询当前站点今天是否有价格的数据
-		$priceData = DB::connection('vlz')->select("select seller_account_id,asin,price from asin_price where marketplace_id = '".$site."' and created_at = '".$date."' group by seller_account_id,asin");
-
-		//当前站点今天还没有数据的话，查询到要插入的数据，更新asin_price表
-		if(empty($priceData)) {
-			DB::connection('vlz')->table('asin_price')->where('marketplace_id',$site)->delete();//没有此站点今天的数据就把此站点以前的数据删除掉
-			$insert_sql = "select a.asin as asin,ROUND((b.item_price_amount/b.quantity_ordered),2) as price,a.seller_account_id as seller_account_id,'" . $site . "' as marketplace_id,'" . $date . "' as created_at  
-    from(select asin,max(id) as id,seller_account_id 
-                    from order_items
-                    where item_price_amount>0 and quantity_ordered>0 
-                    and order_items.asin in( select DISTINCT sap_asin_match_sku.asin from sap_asin_match_sku   where marketplace_id  = '" . $site . "')
-                    group by asin,seller_account_id 
-                ) as a,order_items as b
-        where a.id = b.id";
-			$insertData = DB::connection('vlz')->select($insert_sql);
-			$insertData = array_map('get_object_vars', $insertData);//需要插入的数据
-			if ($insertData) {
-				DB::connection('vlz')->table('asin_price')->insert($insertData);
-			}
-		}
-		return true;
-	}
-
-
 }

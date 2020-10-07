@@ -250,7 +250,7 @@
             var marketplaceid = $('#site option:selected').val();
             $.ajax({
                 type: 'post',
-                url: '/ccp/showAccountBySite',
+                url: '/showAccountBySite',
                 data: {marketplaceid:marketplaceid},
                 dataType:'json',
                 success: function(res) {
