@@ -12,5 +12,5 @@ class SkuForUserLog extends Model
 	protected $guarded = [];
     public $timestamps = true;
 
-    const STATUS = ['1'=>'Confirm','-1'=>'Cannel'];
+    const STATUS = ['1'=>'Confirm','-1'=>'Cancel'];
 }
