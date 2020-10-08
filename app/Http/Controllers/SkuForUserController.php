@@ -178,7 +178,7 @@ class SkuForUserController extends Controller
         if(!$exportFileName) $exportFileName = 'All_';
         $exportFileName.=date('YmdHis').'.xlsx';
 
-        $datas =  $datas->orderBy('confirm_id','desc')->get()->toArray();
+        $datas =  $datas->orderBy('confirm_id','desc')->orderBy('id','asc')->get()->toArray();
         $datas = json_decode(json_encode($datas), true);
         $arrayData = array();
         $arrayData[] = [
@@ -291,7 +291,7 @@ class SkuForUserController extends Controller
         $iDisplayLength = $iDisplayLength < 0 ? $iTotalRecords : $iDisplayLength;
         $iDisplayStart = intval($_REQUEST['start']);
         $sEcho = intval($_REQUEST['draw']);
-        $lists =  $datas->offset($iDisplayStart)->limit($iDisplayLength)->orderBy('confirm_id','desc')->get()->toArray();
+        $lists =  $datas->offset($iDisplayStart)->limit($iDisplayLength)->orderBy('confirm_id','desc')->orderBy('id','asc')->get()->toArray();
         $lists = json_decode(json_encode($lists), true);
         $records = array();
         $records["data"] = array();
