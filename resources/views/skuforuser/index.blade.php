@@ -150,10 +150,21 @@ th,td,td>span {
                                 <i class="fa fa-check"></i> Update
                             </button>
                         	@endpermission	
-							@permission('review-export')
-                                <button id="vl_list_export" class="btn sbold blue"> Export
+							@permission('skuforuser-export')
+                            <div class="btn-group">
+                                <button type="button" class="btn  green-meadow">Export</button>
+                                <button type="button" class="btn  green-meadow dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                                     <i class="fa fa-download"></i>
                                 </button>
+                                <ul class="dropdown-menu" role="menu" id="vl_list_export">
+                                    <li id="all">
+                                        <a href="">All</a>
+                                    </li>
+                                    <li id="curent">
+                                        <a href="">Current Page</a>
+                                    </li>
+                                </ul>
+                            </div>
 							@endpermission	
                         </div>
                     </div>
@@ -225,6 +236,7 @@ th,td,td>span {
                 },
                 loadingMessage: 'Loading...',
                 dataTable: {
+                   //"serverSide":false,
                    "autoWidth":false,
                    "ordering": false,
                     "lengthMenu": [
@@ -234,7 +246,21 @@ th,td,td>span {
                     "pageLength": 10,
                     "ajax": {
                         "url": "{{ url('skuforuser/get')}}",
-                    }
+                    },
+
+                    /*
+                    dom: 'Bfrtip',
+                    buttons: [ 
+                        {
+                            extend: 'excelHtml5',
+                            text: '导出当前页',
+                            title: 'Data export',
+                            exportOptions: {
+                                columns: [ 3,2,6,7,8,9,4,5 ]
+                            }
+                        },
+                     ]
+                     */
                  }
             });
 
@@ -290,8 +316,15 @@ $(function() {
 	    dttable.fnDestroy(); //还原初始化了的datatable
 		TableDatatablesAjax.init();
 	});
-	$("#vl_list_export").click(function(){
-		location.href='/skuforuserexport?status='+(($("select[name='status[]']").val())?$("select[name='status[]']").val():'')+'&sku='+$("input[name='sku']").val()+'&date='+$("input[name='date']").val()+'&producter='+(($("select[name='producter[]']").val())?$("select[name='producter[]']").val():'')+'&planer='+(($("select[name='planer[]']").val())?$("select[name='planer[]']").val():'')+'&dqe='+(($("select[name='dqe[]']").val())?$("select[name='dqe[]']").val():'')+'&te='+(($("select[name='te[]']").val())?$("select[name='te[]']").val():'');
+	$("#vl_list_export li").click(function(){
+        var baseUrl ='/skuforuserexport?status='+(($("select[name='status[]']").val())?$("select[name='status[]']").val():'')+'&sku='+$("input[name='sku']").val()+'&date='+$("input[name='date']").val()+'&producter='+(($("select[name='producter[]']").val())?$("select[name='producter[]']").val():'')+'&planer='+(($("select[name='planer[]']").val())?$("select[name='planer[]']").val():'')+'&dqe='+(($("select[name='dqe[]']").val())?$("select[name='dqe[]']").val():'')+'&te='+(($("select[name='te[]']").val())?$("select[name='te[]']").val():'');
+        if(this.id =='curent'){
+            var dttable = $('#datatable_ajax_skuforuser').dataTable();
+            var oSettings = dttable.fnSettings();
+            baseUrl = baseUrl+'&offset='+oSettings._iDisplayStart;
+            baseUrl = baseUrl+'&limit='+oSettings._iDisplayLength;
+        }
+		location.href =  baseUrl;
 	});
 });
 

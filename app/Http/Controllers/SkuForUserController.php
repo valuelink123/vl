@@ -104,13 +104,26 @@ class SkuForUserController extends Controller
     public function export(Request $request){
         set_time_limit(0);
         if(!Auth::user()->can(['skuforuser-export'])) die('Permission denied -- skuforuser-export');
-        
+        $curr_date = date('Y-m-d');
+
+        $date = array_get($_REQUEST,'date')??$curr_date;
+
+        if($date>=$curr_date){
+            $datas = DB::connection('amazon')->table(DB::raw("(select * from sku_for_user where date = '$curr_date') as sku_for_user"))
+            ->select('sku_for_user.*','new_producter','new_planer','new_dqe','new_te','confirm_id')
+            ->leftJoin(DB::raw('(select id as confirm_id,sku,marketplace_id,producter as new_producter,planer as new_planer,dqe as new_dqe,te as new_te from sku_for_user_logs where status = 0) as new_data'),function($q){
+                $q->on('sku_for_user.sku', '=', 'new_data.sku')->on('sku_for_user.marketplace_id', '=', 'new_data.marketplace_id');
+            });
+        }else{
+            $datas = SkuForUser::where('date',$date)->selectRaw('*,0 as confirm_id');
+        }
+
         $exportFileName = '';
-        $datas = new SkuForUser;
         $users_data = User::where('locked',0)->pluck('name','id');
+
         if(array_get($_REQUEST,'sku')){
-            $datas = $datas->whereIn('sku',explode(',',str_replace(' ','',array_get($_REQUEST,'sku'))));
-            $exportFileName.=array_get($_REQUEST,'sku').'_';
+            $datas = $datas->whereIn('sku_for_user.sku',explode(',',str_replace(' ','',array_get($_REQUEST,'sku'))));
+            $exportFileName.=str_replace(' ','',array_get($_REQUEST,'sku')).'_';
         }
         if(array_get($_REQUEST,'date')){
             $datas = $datas->where('date',array_get($_REQUEST,'date'));
@@ -156,10 +169,17 @@ class SkuForUserController extends Controller
             }
             $exportFileName.=implode(',',$addFileName).'_';
         }
+
+        if(array_get($_REQUEST,'limit')){
+            $datas->offset(intval(array_get($_REQUEST,'offset')))->limit(intval(array_get($_REQUEST,'limit')));
+            $exportFileName.='Page'.intval(intval(array_get($_REQUEST,'offset'))/intval(array_get($_REQUEST,'limit'))+1).'_';
+        }
+
         if(!$exportFileName) $exportFileName = 'All_';
         $exportFileName.=date('YmdHis').'.xlsx';
 
-        $datas =  $datas->get()->toArray();
+        $datas =  $datas->orderBy('confirm_id','desc')->get()->toArray();
+        $datas = json_decode(json_encode($datas), true);
         $arrayData = array();
         $arrayData[] = [
             'sku','site','producter','planer','dqe','te','description','status'
@@ -249,7 +269,7 @@ class SkuForUserController extends Controller
         $users_data = User::where('locked',0)->pluck('name','id');
         $users_data[0]='N/A';
         if(array_get($_REQUEST,'sku')){
-            $datas = $datas->whereIn('sku_for_user.sku',str_replace(' ','',explode(',',array_get($_REQUEST,'sku'))));
+            $datas = $datas->whereIn('sku_for_user.sku',explode(',',str_replace(' ','',array_get($_REQUEST,'sku'))));
         } 
         if(array_get($_REQUEST,'status')!==NULL && array_get($_REQUEST,'status')!==''){
             $datas = $datas->whereIn('status',array_get($_REQUEST,'status'));
