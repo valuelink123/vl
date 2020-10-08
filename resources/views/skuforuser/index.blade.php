@@ -232,9 +232,11 @@ th,td,td>span {
             grid.setAjaxParam("dqe", $("select[name='dqe[]']").val());
             grid.setAjaxParam("te", $("select[name='te[]']").val());
             grid.setAjaxParam("status", $("select[name='status[]']").val());
+            
             grid.init({
                 src: $("#datatable_ajax_skuforuser"),
                 onSuccess: function (grid, response) {
+                    grid.setAjaxParam("customActionType", '');
                 },
                 onError: function (grid) {
                 },
