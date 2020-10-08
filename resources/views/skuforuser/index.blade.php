@@ -335,12 +335,10 @@ $(function() {
 
     $("#current_export").click(function(){
         var baseUrl ='/skuforuserexport?status='+(($("select[name='status[]']").val())?$("select[name='status[]']").val():'')+'&sku='+$("input[name='sku']").val()+'&date='+$("input[name='date']").val()+'&producter='+(($("select[name='producter[]']").val())?$("select[name='producter[]']").val():'')+'&planer='+(($("select[name='planer[]']").val())?$("select[name='planer[]']").val():'')+'&dqe='+(($("select[name='dqe[]']").val())?$("select[name='dqe[]']").val():'')+'&te='+(($("select[name='te[]']").val())?$("select[name='te[]']").val():'');
-        if(this.id =='curent'){
-            var dttable = $('#datatable_ajax_skuforuser').dataTable();
-            var oSettings = dttable.fnSettings();
-            baseUrl = baseUrl+'&offset='+oSettings._iDisplayStart;
-            baseUrl = baseUrl+'&limit='+oSettings._iDisplayLength;
-        }
+        var dttable = $('#datatable_ajax_skuforuser').dataTable();
+        var oSettings = dttable.fnSettings();
+        baseUrl = baseUrl+'&offset='+oSettings._iDisplayStart;
+        baseUrl = baseUrl+'&limit='+oSettings._iDisplayLength;
 		location.href =  baseUrl;
 	});
 
