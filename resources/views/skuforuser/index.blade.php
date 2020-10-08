@@ -151,6 +151,12 @@ th,td,td>span {
                             </button>
                         	@endpermission	
 							@permission('skuforuser-export')
+
+                            <button type="button" class="btn  green-meadow" id = "current_export">Export Current</button>
+
+                            <button type="button" class="btn  green-meadow" id = "all_export">Export All</button>
+
+                            <!--
                             <div class="btn-group">
                                 <button type="button" class="btn  green-meadow">Export</button>
                                 <button type="button" class="btn  green-meadow dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
@@ -164,7 +170,7 @@ th,td,td>span {
                                         <a href="">Current Page</a>
                                     </li>
                                 </ul>
-                            </div>
+                            </div>-->
 							@endpermission	
                         </div>
                     </div>
@@ -324,6 +330,22 @@ $(function() {
             baseUrl = baseUrl+'&offset='+oSettings._iDisplayStart;
             baseUrl = baseUrl+'&limit='+oSettings._iDisplayLength;
         }
+		location.href =  baseUrl;
+	});
+
+    $("#current_export").click(function(){
+        var baseUrl ='/skuforuserexport?status='+(($("select[name='status[]']").val())?$("select[name='status[]']").val():'')+'&sku='+$("input[name='sku']").val()+'&date='+$("input[name='date']").val()+'&producter='+(($("select[name='producter[]']").val())?$("select[name='producter[]']").val():'')+'&planer='+(($("select[name='planer[]']").val())?$("select[name='planer[]']").val():'')+'&dqe='+(($("select[name='dqe[]']").val())?$("select[name='dqe[]']").val():'')+'&te='+(($("select[name='te[]']").val())?$("select[name='te[]']").val():'');
+        if(this.id =='curent'){
+            var dttable = $('#datatable_ajax_skuforuser').dataTable();
+            var oSettings = dttable.fnSettings();
+            baseUrl = baseUrl+'&offset='+oSettings._iDisplayStart;
+            baseUrl = baseUrl+'&limit='+oSettings._iDisplayLength;
+        }
+		location.href =  baseUrl;
+	});
+
+    $("#all_export").click(function(){
+        var baseUrl ='/skuforuserexport?status='+(($("select[name='status[]']").val())?$("select[name='status[]']").val():'')+'&sku='+$("input[name='sku']").val()+'&date='+$("input[name='date']").val()+'&producter='+(($("select[name='producter[]']").val())?$("select[name='producter[]']").val():'')+'&planer='+(($("select[name='planer[]']").val())?$("select[name='planer[]']").val():'')+'&dqe='+(($("select[name='dqe[]']").val())?$("select[name='dqe[]']").val():'')+'&te='+(($("select[name='te[]']").val())?$("select[name='te[]']").val():'');
 		location.href =  baseUrl;
 	});
 });
