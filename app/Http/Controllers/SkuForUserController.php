@@ -120,9 +120,9 @@ class SkuForUserController extends Controller
 
         $exportFileName = '';
         $users_data = User::where('locked',0)->pluck('name','id');
-
+        $users_data[0]='N/A';
         if(array_get($_REQUEST,'sku')){
-            $datas = $datas->whereIn('sku_for_user.sku',explode(',',str_replace(' ','',array_get($_REQUEST,'sku'))));
+            $datas = $datas->whereIn('sku_for_user.sku',explode(',',str_replace([' ','	'],'',array_get($_REQUEST,'sku'))));
             $exportFileName.=str_replace(' ','',array_get($_REQUEST,'sku')).'_';
         }
         if(array_get($_REQUEST,'date')){
@@ -269,7 +269,7 @@ class SkuForUserController extends Controller
         $users_data = User::where('locked',0)->pluck('name','id');
         $users_data[0]='N/A';
         if(array_get($_REQUEST,'sku')){
-            $datas = $datas->whereIn('sku_for_user.sku',explode(',',str_replace(' ','',array_get($_REQUEST,'sku'))));
+            $datas = $datas->whereIn('sku_for_user.sku',explode(',',str_replace([' ','	'],'',array_get($_REQUEST,'sku'))));
         } 
         if(array_get($_REQUEST,'status')!==NULL && array_get($_REQUEST,'status')!==''){
             $datas = $datas->whereIn('status',array_get($_REQUEST,'status'));
