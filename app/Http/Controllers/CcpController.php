@@ -203,6 +203,7 @@ class CcpController extends Controller
 		$asins = array();
 
         $day = $this->getdays($date_type,$site,$timeType);//获取查询的时间范围有几天
+
 		$showOrder = Auth::user()->can(['ccp-showOrderList']) ? 1 : 0;//是否有查看详情权限
 		foreach($itemData as $key=>$val){
 			$data[$val->asin] = (array)$val;
@@ -290,53 +291,35 @@ class CcpController extends Controller
 	 * 北京时间            UTC+8:00
 	 * 所以查询时间为   date - 7 hour  / date + 9 hour
 	 * 查询时间范围为  时间 - 15 hour  / 时间 + 1 hour
+	 * $date_type变量的键值对应关系如下
+	 * 1=>TODAY,2=>YESTERDAY,3=>LAST 3 DAYS,4=>LAST 7 DAYS,5=>LAST 15 DAYS,6=>LAST 30 DAYS
 	 */
 	public function getDateRange($date_type,$site,$timeType)
 	{
 		//如果选的时间类型是后台当地时间，时间要做转化
+		$configDays = array(1=>1,2=>1,3=>3,4=>7,5=>15,6=>30);
 		$time = $this->getCurrentTime($site,$timeType);//获取当前时间戳
 		$startDate = date('Y-m-d 00:00:00',$time);//默认的开始时间
 		$endDate = date('Y-m-d H:i:s',$time);//默认的结束时间
 		if($date_type == 2){//昨天日期
 			$startDate = date("Y-m-d 00:00:00",strtotime("-1 day",$time));
 			$endDate = date('Y-m-d 23:59:59',strtotime("-1 day",$time));
-		}elseif($date_type == 3){//最近7天数据
-			$startDate = date("Y-m-d 00:00:00",strtotime("-6 day",$time));
-		}elseif($date_type == 4){//本周数据
-			//获取今天是周几
-			$day = date('w',$time);
-			//0为周天，1为周一，以此类推
-			$lastday = $day==0 ? 6 : $day - 1;
-			$startDate = date("Y-m-d 00:00:00",strtotime("-".$lastday." day",$time));
-		}elseif($date_type == 5){//最近30天数据
-			$startDate = date("Y-m-d 00:00:00",strtotime("-29 day",$time));
-		}elseif($date_type == 6){//本月数据
-			$startDate = date('Y-m-01 00:00:00',$time);
+		}elseif($date_type > 2){
+			$lastday = isset($configDays[$date_type]) ? $configDays[$date_type] : 1;
+			$startDate = date("Y-m-d 00:00:00",strtotime("-".($lastday-1)." day",$time));
 		}
 		return array('startDate'=>$startDate,'endDate'=>$endDate);
 	}
 
 	/*
 	 * 获取查询的时间范围有几天
-	 *
+	 * $date_type变量的键值对应关系如下
+	 * 1=>TODAY,2=>YESTERDAY,3=>LAST 3 DAYS,4=>LAST 7 DAYS,5=>LAST 15 DAYS,6=>LAST 30 DAYS
 	 */
 	public function getdays($date_type,$site,$timeType)
 	{
-		//如果选的时间类型是后台当地时间，时间要做转化
-		$time = $this->getCurrentTime($site,$timeType);//获取当前时间戳
-		$day = 1;
-		if($date_type == 3){//最近7天数据
-			$day = 7;
-		}elseif($date_type == 4){//本周数据
-			//获取今天是周几
-			$week = date('w',$time);
-			//0为周天，1为周一，以此类推
-			$day = $week==0 ? 7 : $week;//周天的时候查询了7天的数据，不然周几就是查询了几天的数据
-		}elseif($date_type == 5){//最近30天数据
-			$day = 30;
-		}elseif($date_type == 6){//本月数据
-			$day = date('m',$time);
-		}
+		$configDays = array(1=>1,2=>1,3=>3,4=>7,5=>15,6=>30);
+		$day = isset($configDays[$date_type]) ? $configDays[$date_type] : 1;
 		return $day;
 	}
 	//得到当前时间戳

@@ -128,10 +128,10 @@
                 <tr>
                     <td class="date_type active" data-value="1">TODAY</td>
                     <td class="date_type" data-value="2">YESTERDAY</td>
-                    <td class="date_type" data-value="3">LAST 7 DAYS</td>
-                    <td class="date_type" data-value="4">WEEK TO DATE</td>
-                    <td class="date_type" data-value="5">LAST 30 DAYS</td>
-                    <td class="date_type" data-value="6">MONTH TO DATE</td>
+                    <td class="date_type" data-value="3">LAST 3 DAYS</td>
+                    <td class="date_type" data-value="4">LAST 7 DAYS</td>
+                    <td class="date_type" data-value="5">LAST 15 DAYS</td>
+                    <td class="date_type" data-value="6">LAST 30 DAYS</td>
                 </tr>
             </table>
         </div>
