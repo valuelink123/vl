@@ -175,7 +175,9 @@ class EdmCampaignController extends Controller
 					)
 				);
 
-				$pushCap['settings'] = array('subject_line'=>$_POST['subject'],'title'=>$_POST['name'],'template_id'=>$template_id,'from_name'=>'吴','reply_to'=>'1016104367@qq.com');
+				$from_name = env('MAILCHIMP_FROM_NAME', '');
+				$reply_to = env('MAILCHIMP_REPLY_TO', '');
+				$pushCap['settings'] = array('subject_line'=>$_POST['subject'],'title'=>$_POST['name'],'template_id'=>$template_id,'from_name'=>$from_name,'reply_to'=>$reply_to);
 				$response = $MailChimp->post("/campaigns",$pushCap);//添加一个campaign到mailchimp
 
 				if(isset($response['id'])){
@@ -280,7 +282,9 @@ class EdmCampaignController extends Controller
 					)
 				);
 
-				$pushCap['settings'] = array('campaign_id'=>$mailchimp_campid,'subject_line'=>$_POST['subject'],'title'=>$_POST['name'],'template_id'=>$mailchimp_tmpid,'from_name'=>'吴','reply_to'=>'1016104367@qq.com');
+				$from_name = env('MAILCHIMP_FROM_NAME', '');
+				$reply_to = env('MAILCHIMP_REPLY_TO', '');
+				$pushCap['settings'] = array('campaign_id'=>$mailchimp_campid,'subject_line'=>$_POST['subject'],'title'=>$_POST['name'],'template_id'=>$mailchimp_tmpid,'from_name'=>$from_name,'reply_to'=>$reply_to);
 				$response = $MailChimp->PATCH('/campaigns/'.$mailchimp_campid,$pushCap);//添加一个campaign到mailchimp
 
 				if(isset($response['id'])){
