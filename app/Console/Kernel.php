@@ -44,6 +44,7 @@ class Kernel extends ConsoleKernel
 		'App\Console\Commands\SkuDaily',
 		'App\Console\Commands\AddRsgProduct',
 		'App\Console\Commands\GetRequestReviewTasks',
+		'App\Console\Commands\SendEdmMailchimp',
     ];
 
     /**
@@ -75,18 +76,18 @@ class Kernel extends ConsoleKernel
 			$schedule->command('get:email '.$account->id.' --time=1day')->cron($x.' 18 * * *')->name($account->id.'_get_emails_18')->withoutOverlapping();
 			$schedule->command('get:email '.$account->id.' --time=1day')->cron($x.' 6 * * *')->name($account->id.'_get_emails_6')->withoutOverlapping();
 			$i++;
-			
+
 			if($x>19) $x=0;
 			$num_x = sprintf("%02d",$x);
 			$schedule->command('scan:send '.$account->id)->cron($num_x.' * * * *')->name($account->id.'sendmails_19')->withoutOverlapping();
 			$schedule->command('scan:send '.$account->id)->cron(($num_x+20).' * * * *')->name($account->id.'sendmails_39')->withoutOverlapping();
 			$schedule->command('scan:send '.$account->id)->cron(($num_x+40).' * * * *')->name($account->id.'sendmails_59')->withoutOverlapping();
 			$x++;
-			
-			
+
+
         }
 
-        
+
 		$schedule->command('get:order')->cron('*/30 * * * *')->name('getOrder')->withoutOverlapping();
 		$schedule->command('get:review 1days')->cron('0 */1 * * *')->name('getreviews')->withoutOverlapping();
 		$schedule->command('get:reviewTranslate')->cron('*/1 * * * *')->name('getreviewTranslate')->withoutOverlapping();
@@ -114,6 +115,8 @@ class Kernel extends ConsoleKernel
 		$schedule->command('add:transfer_warn')->dailyAt('6:00')->name('transferWarn')->withoutOverlapping();//添加调拨预警，每天跑一次
 		$schedule->command('scan:skudaily')->dailyAt('08:00')->name('skudaily')->withoutOverlapping();
 		$schedule->command('add:rsgProduct')->dailyAt('07:00')->name('addProduct')->withoutOverlapping();
+
+		$schedule->command('send:mailchimp')->hourly()->name('sendMailchimp')->withoutOverlapping();
     }
 
     /**

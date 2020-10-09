@@ -179,12 +179,11 @@ class EdmCampaignController extends Controller
 				$reply_to = env('MAILCHIMP_REPLY_TO', '');
 				$pushCap['settings'] = array('subject_line'=>$_POST['subject'],'title'=>$_POST['name'],'template_id'=>$template_id,'from_name'=>$from_name,'reply_to'=>$reply_to);
 				$response = $MailChimp->post("/campaigns",$pushCap);//添加一个campaign到mailchimp
-
 				if(isset($response['id'])){
 					$campaign_id = $response['id'];
 					if($set==0){//立即发送邮件
 						$response = $MailChimp->post("/campaigns/$campaign_id/actions/send");//488782，tag6
-						if($response){
+						if(empty($response)){
 							$insertData['send_status'] = 1;
 							$insertData['real_sendtime'] = date('y-m-d H:i:s');
 						}
@@ -290,7 +289,7 @@ class EdmCampaignController extends Controller
 				if(isset($response['id'])){
 					if($set==0){//立即发送邮件
 						$response = $MailChimp->post("/campaigns/$mailchimp_campid/actions/send");
-						if($response){
+						if(empty($response)){
 							$update['send_status'] = 1;
 							$update['real_sendtime'] = date('y-m-d H:i:s');
 						}
