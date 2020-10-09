@@ -8,7 +8,7 @@
 	</style>
 	<form  action="/edm/template/update" id="form" novalidate method="POST" onsubmit="return validate_form()">
 		{{ csrf_field() }}
-		<input type="hidden" class="form-control" name="id" value="{{$customerData['id']}}">
+		<input type="hidden" class="form-control" name="id" value="{{$data['id']}}">
 		<div class="col-lg-9">
 			<div class="col-md-12">
 				<div class="portlet light portlet-fit bordered ">

@@ -29,42 +29,6 @@ class EdmCustomersController extends Controller
 	 */
 	public function index()
 	{
-		// $MailChimp = new MailChimp(env('MAILCHIMP_KEY', ''));
-		// $MailChimp->verify_ssl=false;//测试时才开启
-		// $list_id = env('MAILCHIMP_LISTID', '');
-		// $response = $MailChimp->post("lists/$list_id/members/tags", [
-		// 	'name' => 'test',
-		// 	'status' => 'active',
-		// ]);
-		// $pushdata['members'][] = array(
-		// 	'email_address' => '15@qq.com',
-		// 	'status' => 'subscribed',
-		// 	'tags'=>['test3','test2']
-		// 	// 'tags'=>[
-		// 	// 	['name' => 'test1', 'status' => 'active'],
-		// 	//
-		// 	// ]
-		// );
-		// $response = $MailChimp->post("lists/$list_id",$pushdata);//批量添加/更新成员列表，每次最多添加/更新500个
-
-		// $pushdata = array(
-		// 	'email_address' => '13@qq.com',
-		// 	'status' => 'subscribed',
-		// 	'tags'=>['test1','test2']
-		// 	// 'tags'=>[
-		// 	// 	['name' => 'test1', 'status' => 'active',]
-		// 	// ]
-		// 	// 'tags'=>[
-		// 	// 	['name' => 'test1', 'status' => 'active'],
-		// 	//
-		// 	// ]
-		// );
-		// $response = $MailChimp->post("lists/$list_id/members",$pushdata);//添加一个客户到mailchimp
-
-		// echo '<pre>';
-		// var_dump($response);
-		// exit;
-
 		if(!Auth::user()->can(['edm-customers-show'])) die('Permission denied -- edm-customers-show');
 		$tag = EdmTag::getEdmCustomerTag();
 		$status = array(0=>'active',1=>'inactive');
@@ -152,7 +116,6 @@ class EdmCustomersController extends Controller
 		}elseif ($request->isMethod('post')){
 			//push客户信息到mailchimp后台
 			$MailChimp = new MailChimp(env('MAILCHIMP_KEY', ''));
-			$MailChimp->verify_ssl=false;//测试时才开启
 			$list_id = env('MAILCHIMP_LISTID', '');
 			$customerData = EdmCustomer::where('email',$_POST['email'])->first();//判断此用户是否已经存在
 			if($customerData){
@@ -160,6 +123,7 @@ class EdmCustomersController extends Controller
 				return redirect()->back()->withInput();
 			}
 			$configfield = array('email'=>'email_address','first_name'=>'first_name','last_name'=>'last_name','address'=>'address','phone'=>'phone_number','tag_id'=>'tag_id');
+
 			$pushdata['status'] = 'subscribed';
 			$insertData = array();
 			foreach($configfield as $key=>$field){
@@ -172,7 +136,50 @@ class EdmCustomersController extends Controller
 					}
 				}
 			}
+			//处理发送给接口的地址数据
+			$pushAddress = '';
+			if(isset($insertData['address']) && $insertData['address']){
+				$addressArray = explode(',',$insertData['address']);
+				if(count($addressArray)==6){
+					$pushAddress = array(
+						"addr1"=> $addressArray[0],
+						"addr2"=>$addressArray[1],
+						"city"=> $addressArray[2],
+						"state"=> $addressArray[3],
+						"zip"=> $addressArray[4],
+						"country"=> $addressArray[5]
+					);
+				}
+			}
+			$pushdata['merge_fields'] = array('FNAME'=>$_POST['first_name'],'LNAME'=>$_POST['last_name'],'PHONE'=>$_POST['phone']);
+			if($pushAddress){
+				$pushdata['merge_fields']['ADDRESS'] = $pushAddress;
+			}
+
+			//整理标签名称
+			$tagIdArray = EdmTag::getEdmCustomerTag();
+			$pushTag = array();
+			$tag_id = explode(',',$insertData['tag_id']);
+			foreach($tag_id as $key=>$tag){
+				if(isset($tagIdArray[$tag])){
+					$pushTag[] = $tagIdArray[$tag];
+				}
+			}
+			$pushdata['tags'] =  $pushTag;
 			$response = $MailChimp->post("lists/$list_id/members",$pushdata);//添加一个客户到mailchimp
+			if(isset($response['tags'])){
+				$updateTag = array();
+				foreach($response['tags'] as $k=>$v){
+					$tag_id = array_search($v['name'], $tagIdArray);
+					if($tag_id){
+						$updateTag[] = array('id'=>$tag_id,'mailchimp_tagid'=>$v['id']);
+					}
+				}
+				if($updateTag){
+					EdmTag::insertOnDuplicateKey($updateTag);
+				}
+			}
+
 			if($response){
 				if(isset($response['detail'])){
 					$insertData['error_info'] = $response['detail'];
@@ -206,16 +213,44 @@ class EdmCustomersController extends Controller
 			}
 		}elseif ($request->isMethod('post')){
 			$id = isset($_POST['id']) && $_POST['id'] ? $_POST['id'] : '';
+			$customerData = EdmCustomer::where('id',$id)->first();
+			$oldTagId = explode(',',$customerData['tag_id']);
 			if(isset($_POST['tag_id']) && $_POST['tag_id']){
 				$update['tag_id'] = implode(',',$_POST['tag_id']);
 			}else{
 				$update['tag_id'] = '';
 			}
-			$res = EdmCustomer::where('id',$id)->update($update);
-			if($res){
-				return redirect('/edm/customers');
+			//更新到mailchimp
+			$MailChimp = new MailChimp(env('MAILCHIMP_KEY', ''));
+			$list_id = env('MAILCHIMP_LISTID', '');
+			//整理标签名称
+			$tagIdArray = EdmTag::getEdmCustomerTag();
+			$pushTag = array();
+			$tag_id = explode(',',$update['tag_id']);
+			foreach($oldTagId as $key=>$tag){
+				$pushTag[$tag] = array('name'=>$tagIdArray[$tag],'status'=>'inactive');
+			}
+			foreach($tag_id as $key=>$tag){
+				if(isset($tagIdArray[$tag])){
+					$pushTag[$tag] = array('name'=>$tagIdArray[$tag],'status'=>'active');
+				}
+			}
+			$pushTag = array_values($pushTag);//数组格式化
+			$subscriber_hash = $MailChimp->subscriberHash($_POST['email']);
+			$response = $MailChimp->post("lists/$list_id/members/$subscriber_hash/tags", [
+				'tags'=>$pushTag
+			]);
+			if(!isset($response['detail'])){
+				//更新数据库表
+				$res = EdmCustomer::where('id',$id)->update($update);
+				if($res){
+					return redirect('/edm/customers');
+				}else{
+					$request->session()->flash('error_message','Update Failed');
+					return redirect()->back()->withInput();
+				}
 			}else{
-				$request->session()->flash('error_message','Update Failed');
+				$request->session()->flash('error_message','Update Tag Failed');
 				return redirect()->back()->withInput();
 			}
 		}
@@ -244,12 +279,22 @@ class EdmCustomersController extends Controller
 						$importData = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
 						//得到的数据中,A=>email,B=>first_name,C=>last_name,D=>address,E=>phone,F=>tag_id
 						$insertData = $mailchimp_data = array();
+						$tagIdArray = EdmTag::getEdmCustomerTag();
+
 						foreach($importData as $key => $val){
 							if($key==1 || empty($val['A'])){
 								unset($importData[$key]);
 								continue;
 							}
-
+							//整理标签名称
+							$pushTag = array();
+							$tag_id = explode(',',$val['F']);
+							foreach($tag_id as $key=>$tag){
+								if(isset($tagIdArray[$tag])){
+									$pushTag[] = $tagIdArray[$tag];
+								}
+							}
+							//插入数据库数据
 							$insertData[$val['A']] = array(
 								'email' => $val['A'],
 								'first_name' => $val['B'],
@@ -260,38 +305,52 @@ class EdmCustomersController extends Controller
 								'error_info' => '',
 								'mailchimp_status' => 0,
 							);
+							//处理发送给接口的地址数据
+							$pushAddress = '';
+							if(isset($val['D']) && $val['D']){
+								$addressArray = explode(',',$val['D']);
+								if(count($addressArray)==6){
+									$pushAddress = array(
+										"addr1"=> $addressArray[0],
+										"addr2"=>$addressArray[1],
+										"city"=> $addressArray[2],
+										"state"=> $addressArray[3],
+										"zip"=> $addressArray[4],
+										"country"=> $addressArray[5]
+									);
+								}
+							}
+							//发送到mailchimp接口数据
 							$mailchimp_data[] = array(
 								'email_address' => $val['A'],
 								'status' => 'subscribed',
-								// 'tags' => 'vop_edm',
-								'first_name' => $val['B'],
-								'last_name' => $val['C'],
-								'address' => $val['D'],
-								'phone_number' => $val['E'],
+								'tags'=> $pushTag,
+								'merge_fields' => array('FNAME'=>$val['B'],'LNAME'=>$val['C'],'ADDRESS'=>$pushAddress,'PHONE'=>$val['E']),
 							);
 						}
-						// EdmCustomer::insertOnDuplicateWithDeadlockCatching($insertData,['email']);//数据插入edm_customer表中
 						//把客户信息数据推送到mailchimp中
 						$MailChimp = new MailChimp(env('MAILCHIMP_KEY', ''));
-						$MailChimp->verify_ssl=false;//测试时才开启
 						$list_id = env('MAILCHIMP_LISTID', '');
 						$mailchimp_data = array_chunk($mailchimp_data,500);//把数组分成每500个一组,分批处理
 						foreach($mailchimp_data as $key=>$val){
 							$pushdata['members'] = $val;//推送到mailchimp中的数据要以members为键
-							$pushdata['tags'] = 'test';
 							 $response = $MailChimp->post("lists/$list_id",$pushdata);//批量添加/更新成员列表，每次最多添加/更新500个
+							//处理mailchimp接口返回的tagid
+							$this->insertMailchimpTagId($response);
 							//错误代码为ERROR_CONTACT_EXISTS时,表示mailchimp列表中已存在
-							$errorInfo = $response['errors'];//API接口返回的错误信息
-							foreach($errorInfo as $k=>$v){
-								if($v['error_code']!='ERROR_CONTACT_EXISTS'){
-									$insertData[$v['email_address']]['email'] = $v['email_address'];
-									$insertData[$v['email_address']]['error_info'] = $v['error'];
-									$insertData[$v['email_address']]['mailchimp_status'] = 1;
+							$errorInfo = isset($response['errors']) ? $response['errors'] : '';//API接口返回的错误信息
+							if(is_array($errorInfo)){
+								foreach($errorInfo as $k=>$v){
+									if($v['error_code']!='ERROR_CONTACT_EXISTS'){
+										$insertData[$v['email_address']]['email'] = $v['email_address'];
+										$insertData[$v['email_address']]['error_info'] = $v['error'];
+										$insertData[$v['email_address']]['mailchimp_status'] = 1;
+									}
 								}
 							}
 						}
-						$insertData = array_values($insertData);
 
+						$insertData = array_values($insertData);
 						EdmCustomer::insertOnDuplicateWithDeadlockCatching($insertData,['email']);//数据插入edm_customer表中
 
 						if (!$MailChimp->success()) {
@@ -299,18 +358,17 @@ class EdmCustomersController extends Controller
 							print_r($MailChimp->getLastResponse());
 							die();
 						}
-
 						$request->session()->flash('success_message','Import Data Success!');
 					}else{
 						$request->session()->flash('error_message','Import Data Failed');
 					}
 				}else{
 					$request->session()->flash('error_message','Import Data Failed,The file is too large');
-					// return redirect()->back()->withInput();
+					return redirect()->back()->withInput();
 				}
 			}else{
 				$request->session()->flash('error_message','Please Select Upload File');
-				// return redirect()->back()->withInput();
+				return redirect()->back()->withInput();
 			}
 		}
 		return redirect('/edm/customers');
@@ -344,9 +402,19 @@ class EdmCustomersController extends Controller
 		if($type==1){
 			//push客户信息到mailchimp后台
 			$MailChimp = new MailChimp(env('MAILCHIMP_KEY', ''));
-			$MailChimp->verify_ssl=false;//测试时才开启
 			$list_id = env('MAILCHIMP_LISTID', '');
 			$customerData = EdmCustomer::where('id',$id)->first()->toArray();
+
+			//整理标签名称
+			$tagIdArray = EdmTag::getEdmCustomerTag();
+			$pushTag = array();
+			$tag_id = explode(',',$customerData['tag_id']);
+			foreach($tag_id as $key=>$tag){
+				if(isset($tagIdArray[$tag])){
+					$pushTag[] = $tagIdArray[$tag];
+				}
+			}
+
 			$pushdata = array(
 				'email_address' => $customerData['email'],
 				'status' => 'subscribed',
@@ -354,19 +422,24 @@ class EdmCustomersController extends Controller
 				'last_name' => $customerData['last_name'],
 				'address' => $customerData['address'],
 				'phone_number' => $customerData['phone'],
+				'tags'=>$pushTag,
 			);
 			//推送到mailchimp中的数据要以members为键
-			$response = $MailChimp->post("lists/$list_id/members",$pushdata);//批量添加/更新成员列表，每次最多添加/更新500个exit;
+			$response = $MailChimp->post("lists/$list_id/members",$pushdata);//更新成员列表
 			if($response){
 				if(isset($response['id'])){//请求成功
 					$update['mailchimp_status'] = 0;
 				}elseif($response['detail']){
 					$update['error_info'] = $response['detail'];
 					$return['msg'] =  $response['detail'];
+					$res = EdmCustomer::where('id',$id)->update($update);
+					if($res){
+						$return['msg'] = 'Push 异常';
+					}
 					return $return;
 				}
 			}else{
-				$return['msg'] = 'Push异常';
+				$return['msg'] = 'Push 异常';
 				return $return;
 			}
 		}elseif($type==2){
@@ -382,6 +455,38 @@ class EdmCustomersController extends Controller
 		}
 		return $return;
 	}
+
+	//处理mailchimp接口返回的tagid
+	public function insertMailchimpTagId($response)
+	{
+		$updateTag = array();
+		$tagIdArray = EdmTag::getEdmCustomerTag();
+		if(isset($response['new_members'])){
+			foreach($response['new_members'] as $key=>$val){
+				foreach($val['tags'] as $k=>$v){
+					$tag_id = array_search($v['name'], $tagIdArray);
+					if($tag_id){
+						$updateTag[] = array('id'=>$tag_id,'mailchimp_tagid'=>$v['id']);
+					}
+				}
+			}
+		}
+		if(isset($response['updated_members'])){
+			foreach($response['updated_members'] as $key=>$val){
+				foreach($val['tags'] as $k=>$v){
+					$tag_id = array_search($v['name'], $tagIdArray);
+					if($tag_id){
+						$updateTag[] = array('id'=>$tag_id,'mailchimp_tagid'=>$v['id']);
+					}
+				}
+			}
+		}
+		if($updateTag){
+			EdmTag::insertOnDuplicateKey($updateTag);
+		}
+		return true;
+	}
+
 
 
 }

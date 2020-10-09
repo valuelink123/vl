@@ -179,6 +179,7 @@
                 dataType:'json',
                 success: function(res) {
                     if(res.status==1){
+                        alert('success');
                         $("#search_table").trigger("click");
                     }else{
                         alert(res.msg);

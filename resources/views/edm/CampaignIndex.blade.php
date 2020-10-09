@@ -57,6 +57,7 @@
 						<th>Asin</th>
 						<th>Subject</th>
 						<th>Template Name</th>
+						<th>Send Status</th>
 						<th>Set Send Time</th>
 						<th>Real Send Time</th>
 						<th>Date Added</th>
@@ -87,6 +88,7 @@
                 {data: 'asin',name:'asin'},
                 {data: 'subject',name:'subject'},
                 {data: 'template_name',name:'template_name'},
+                {data: 'send_status_name',name:'send_status_name'},
                 {data: 'set_sendtime',name:'set_sendtime'},
                 {data: 'real_sendtime',name:'real_sendtime'},
                 {data: 'created_at',name:'created_at'},
