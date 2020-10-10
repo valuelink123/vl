@@ -370,12 +370,14 @@
                                                 <span class="arrow"></span>
                                             </a>
                                             <ul class="dropdown-menu pull-left">
+												@permission('sales-forecast-show')
 												<li class="">
                                                     <a href="/mrp/list" class="nav-link nav-toggle ">
                                                         Sales Forecast-22W
                                                         <span class="arrow"></span>
                                                     </a>
                                                 </li>
+												@endpermission
 												<li class="">
                                                     <a href="/mrp" class="nav-link nav-toggle ">
                                                         Inventory Monitor

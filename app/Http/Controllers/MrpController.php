@@ -102,6 +102,8 @@ class MrpController extends Controller
 	
 	public function list(Request $req)
     {
+		if(!Auth::user()->can(['sales-forecast-show'])) die('Permission denied -- sales-forecast-show');
+		$updateRole = Auth::user()->can(['sales-forecast-update']) ? 1 : 0;//是否有更新数据的权限
 		$search = isset($_POST['search']) ? $_POST['search'] : '';
 		$search = $this->getSearchData(explode('&',$search));
 		
@@ -175,7 +177,7 @@ class MrpController extends Controller
 			for($i=1;$i<=22;$i++){
 				$date_w = date('Y-m-d',strtotime($date.' +'.$i.' weeks sunday'));
 				//处理显示的预测销售数量
-				if($type!='sku' && $date_w >= $date_1w && in_array(array_get($asin_plans,$date_w.'.status',0)+1,$dist_status)){
+				if($updateRole==1 && $type!='sku' && $date_w >= $date_1w && in_array(array_get($asin_plans,$date_w.'.status',0)+1,$dist_status)){
 					$week_plan = '<a class="week_plan editable" title="'.$val['asin'].' '.array_get($siteCode,$val['marketplace_id']).' weeks '.$i.' Plan" href="javascript:;" id="'.$val['asin'].'--'.$val['marketplace_id'].'--'.$val['sku'].'--'.$date_w.'" data-pk="'.$val['asin'].'--'.$val['marketplace_id'].'--'.$val['sku'].'--'.$date_w.'" data-type="text" data-placement="'.$data_placement.'">'.array_get($asin_plans,$date_w.'.quantity',0).'</a>';
 				}else{
 					$week_plan = array_get($asin_plans,$date_w.'.quantity',0);

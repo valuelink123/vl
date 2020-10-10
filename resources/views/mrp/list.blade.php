@@ -125,9 +125,11 @@ input[type=checkbox], input[type=radio]{
                         <br>
 						<div class="input-group">
 							<div class="btn-group pull-right">
-							<button id="export" class="btn sbold blue"> 导出
-								<i class="fa fa-download"></i>
-							</button>
+								@permission('sales-forecast-export')
+									<button id="export" class="btn sbold blue"> 导出
+										<i class="fa fa-download"></i>
+									</button>
+								@endpermission
 							</div>
 							<div class="btn-group pull-right" style="margin-right:20px;">
 								<button id="search" class="btn sbold blue">查询</button>
@@ -143,32 +145,32 @@ input[type=checkbox], input[type=radio]{
             </form>
 			
 			<div class="col-md-12">
-				<div class="form-upload">
-				<form action="{{url('mrp/import')}}" method="post" enctype="multipart/form-data" class="pull-right " style="width:500px;" >
-				<div class="col-md-4"  >
-					<a href="/mrp/download" >Import Template
-					</a>
-				</div>
+				@permission('sales-forecast-add')
+					<div class="form-upload">
+					<form action="{{url('mrp/import')}}" method="post" enctype="multipart/form-data" class="pull-right " style="width:500px;" >
+					<div class="col-md-4"  >
+						<a href="/mrp/download" >Import Template
+						</a>
+					</div>
 
-				<div class="pull-left">
-					{{ csrf_field() }}
-						 <input type="file" name="importFile"  />
-				</div>
-				<div class=" pull-left">
-					<button type="submit" class="btn blue btn-sm" id="data_search">上传</button>
-				</div>
-				
-				</form>
-				</div>
-				
-				
+					<div class="pull-left">
+						{{ csrf_field() }}
+							 <input type="file" name="importFile"  />
+					</div>
+					<div class=" pull-left">
+						<button type="submit" class="btn blue btn-sm" id="data_search">上传</button>
+					</div>
+
+					</form>
+					</div>
+				@endpermission
 			</div>
 
             </div>
             <div class="table-container" style="">
 				<div style="position: relative;">
 				<div class="btn-group" style="position: absolute;left: 150px; z-index: 999;top:30px">
-					
+					@permission('sales-forecast-update')
 					<button type="button" class="btn btn-sm green-meadow">批量操作</button>
 					<button type="button" class="btn btn-sm green-meadow dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
 						<i class="fa fa-angle-down"></i>
@@ -186,8 +188,8 @@ input[type=checkbox], input[type=radio]{
 						</li>
 						<li class="divider"> </li>
 						<?php } ?>
-				
 					</ul>
+					@endpermission
 				</div>
 				</div>
                 <table class="table table-striped table-bordered" id="thetable">
