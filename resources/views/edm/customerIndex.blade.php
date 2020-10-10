@@ -53,19 +53,28 @@
 							</select>
 						</div>
 					</div>
-					<div class="col-md-2">
+					<div class="col-md-1">
 						<div class="input-group">
 							<div class="btn-group pull-right" >
 								<button id="search_table" class="btn sbold blue">Search</button>
 							</div>
 						</div>
 					</div>
+					@permission('edm-customers-add')
+					<div class="col-md-1"  style="margin-left: -60px;">
+						<div class="input-group">
+							<div class="btn-group pull-right" ><button id="pull-by-mailchimp" class="btn sbold blue">Pull</button></div>
+						</div>
+					</div>
+					<div class="col-md-1"  style="margin-left: -60px;">
+						<div id="loading" style="display:none;"><img style="width:50px;heoght:50px;" src='/image/loading.gif' /></div>
+					</div>
+					@endpermission
 				</form>
 			</div>
 				@permission('edm-customers-add')
 				<div class="btn-group " style="float:right;margin-top:20px;">
 					<div class="col-md-12">
-						@permission('edm-customers-add')
 						<form action="/edm/customers/import" method="post" enctype="multipart/form-data">
 						<div class="col-md-4"  >
 							<a href="/edm/customers/download" >Import Template
@@ -86,7 +95,6 @@
 								</button>
 							</a>
 						</div>
-						@endpermission
 					</div>
 				</div>
 				@endpermission
@@ -186,6 +194,26 @@
                     }
                 }
             });
+		})
+		$('#pull-by-mailchimp').click(function(){
+            $.ajax({
+                type: 'post',
+                url: '/edm/customers/pullByMailchimp',
+                dataType:'json',
+                beforeSend:function(){
+                    $("#loading").css('display','block');
+                },
+                success: function(res) {
+                    if(res.status==1){
+                        $("#loading").css('display','none');
+                        alert(res.msg);
+                        $("#search_table").trigger("click");
+                    }else{
+                        alert(res.msg);
+                    }
+                }
+            });
+            return false;
 		})
 
         $(function(){

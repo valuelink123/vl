@@ -486,6 +486,69 @@ class EdmCustomersController extends Controller
 		}
 		return true;
 	}
+	//从mailchimp拉取数据
+	public function pullByMailchimp($members=array(),$page=0)
+	{
+		//push客户信息到mailchimp后台
+		$MailChimp = new MailChimp(env('MAILCHIMP_KEY', ''));
+		$list_id = env('MAILCHIMP_LISTID', '');
+		$numPerPage = 20;
+		$offset = $numPerPage * $page;
+		$args = array(
+			'count' => $numPerPage,
+			'status' => 'subscribed',
+			'fields' => 'members.merge_fields,members.email_address,total_items,members.tags',//查只需要的字段
+			'offset' => $offset,
+		);
+
+		$response = $MailChimp->get("/lists/$list_id/members",$args);//更新成员列表
+
+		if(isset($response['members']) && $response['members']){
+			$members = isset($members) ? array_merge($members,$response['members']) : $response['members'];
+			$total = $response['total_items'];
+			$page = $page + 1;
+			$offset = $numPerPage * $page;
+			if($offset < $total){
+				$this->pullByMailchimp($members,$page);
+			}
+
+			$insertData = array();
+			$tagData = EdmTag::getEdmMailchimpTag();//ID=>mailchimp_tagid
+			foreach($members as $key=>$val){
+				$address = $val['merge_fields']['ADDRESS'] ? implode(',',array_values($val['merge_fields']['ADDRESS'])) : '';
+				$memberTags = $val['tags'];
+				$push_tag = array();
+				if($memberTags){
+					foreach($memberTags as $tk=>$tv){//返回的成员
+						if(!in_array($tv['id'],$tagData)){
+							$insertTag = array(
+								'mailchimp_tagid' => $tv['id'],
+								'name' => $tv['name'],
+							);
+							$tag_id = DB::table('edm_tag')->insertGetId($insertTag);//插入数据库
+						}else{
+							$tag_id = array_search($tv['id'], $tagData);
+						}
+						$push_tag[] = $tag_id;//多个标签id数组(数据库自增id)
+						$tagData[$tag_id] = $tv['id'];//插入成功后添加到$tagData数组中
+					}
+				}
+				$push_tagstr = $push_tag ? implode(',',$push_tag) : '';//多个tag的话，逗号分隔存到数据库中
+				$insertData[] = array(
+					'email' => $val['email_address'],
+					'first_name' => $val['merge_fields']['FNAME'],
+					'last_name' => $val['merge_fields']['LNAME'],
+					'address' => $address,
+					'phone' => $val['merge_fields']['PHONE'],
+					'tag_id' => $push_tagstr,
+				);
+			}
+			EdmCustomer::insertOnDuplicateWithDeadlockCatching($insertData,['email']);//数据插入edm_customer表中
+			return ['status'=>1,'msg'=>'pull success'];
+		}
+		return ['status'=>0,'msg'=>'pull failed'];
+	}
+
 
 
 

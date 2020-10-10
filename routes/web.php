@@ -336,6 +336,7 @@ Route::get('/edm/customers/download', 'EdmCustomersController@download');//下�
 Route::post('/edm/customers/action', 'EdmCustomersController@action');//客户列表中的操作
 Route::match(['post','get'],'/edm/customers/add', 'EdmCustomersController@add');//添加单个客户数据
 Route::match(['post','get'],'/edm/customers/update', 'EdmCustomersController@update');//更新单个客户数据
+Route::Post('/edm/customers/pullByMailchimp', 'EdmCustomersController@pullByMailchimp');//从mailchimp拉取数据
 
 Route::get('/edm/template', 'EdmTemplateController@index');//模板的列表
 Route::post('/edm/templateList', 'EdmTemplateController@list');//模板的列表
