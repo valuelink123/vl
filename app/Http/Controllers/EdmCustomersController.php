@@ -492,7 +492,7 @@ class EdmCustomersController extends Controller
 		//push客户信息到mailchimp后台
 		$MailChimp = new MailChimp(env('MAILCHIMP_KEY', ''));
 		$list_id = env('MAILCHIMP_LISTID', '');
-		$numPerPage = 20;
+		$numPerPage = 1000;
 		$offset = $numPerPage * $page;
 		$args = array(
 			'count' => $numPerPage,
