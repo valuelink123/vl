@@ -112,7 +112,7 @@
 					<th>Last Name</th>
 					<th>Address</th>
 					<th>Phone Number</th>
-					<th>Group Name</th>
+					<th>Tag Name</th>
 					<th>Status</th>
 					<th>Mailchimp Status</th>
 					<th>Date Added</th>
