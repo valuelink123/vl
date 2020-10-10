@@ -159,6 +159,7 @@ class MrpController extends Controller
 			$data_placement ='top';
 			if($key<4) $data_placement='bottom';
 			$asin_plans = AsinSalesPlan::SelectRaw('sum(quantity_last) as quantity,week_date,any_value(status) as status')->where($type,$val[$type])->where('marketplace_id',$val['marketplace_id'])->where('date','>=',$date_from)->where('date','<=',$date_to)->groupBy(['week_date'])->get()->keyBy('week_date')->toArray();
+
 			$data[$key]['id'] = '<input type="checkbox" name="checkedInput" value="'.$val['asin'].'--'.$val['marketplace_id'].'">';
 			$data[$key]['seller'] = array_get($sellers,$val['sap_seller_id']);
 			$data[$key]['asin'] = ($type=='asin')?'<a href="/mrp/edit?asin='.$val['asin'].'&marketplace_id='.$val['marketplace_id'].'">'.$val['asin'].'</a>':$val['asin'];
@@ -169,9 +170,17 @@ class MrpController extends Controller
 			$data[$key]['total_sellable'] = intval($val['afn_sellable']+$val['afn_reserved']+$val['mfn_sellable']+$val['sz_sellable']);
 			$data[$key]['week_daily_sales'] = round($val['daily_sales']*7,2);
 			$data[$key]['22_week_plan_total'] =0;
-			$dist_status = array_keys(getDistRuleForRole());
+			$dist_status = array_keys(getDistRuleForRole());//该用户角色应该所拥有的状态值
+			$date_1w = date('Y-m-d',strtotime('+1 weeks sunday'));//下周末的日期
 			for($i=1;$i<=22;$i++){
-				$data[$key][$i.'_week_plan'] = ($type!='sku' && date('Y-m-d',strtotime($date.' +'.$i.' weeks sunday'))>=date('Y-m-d',strtotime('+1 weeks sunday')) && in_array(array_get($asin_plans,date('Y-m-d',strtotime($date.' +'.$i.' weeks sunday')).'.status',0)+1,$dist_status))?('<a class="week_plan editable" title="'.$val['asin'].' '.array_get($siteCode,$val['marketplace_id']).' weeks '.$i.' Plan" href="javascript:;" id="'.$val['asin'].'--'.$val['marketplace_id'].'--'.$val['sku'].'--'.date('Y-m-d',strtotime($date.' +'.$i.' weeks sunday')).'" data-pk="'.$val['asin'].'--'.$val['marketplace_id'].'--'.$val['sku'].'--'.date('Y-m-d',strtotime($date.' +'.$i.' weeks sunday')).'" data-type="text" data-placement="'.$data_placement.'">'.array_get($asin_plans,date('Y-m-d',strtotime($date.' +'.$i.' weeks sunday')).'.quantity',0).'</a>'):array_get($asin_plans,date('Y-m-d',strtotime($date.' +'.$i.' weeks sunday')).'.quantity',0);
+				$date_w = date('Y-m-d',strtotime($date.' +'.$i.' weeks sunday'));
+				//处理显示的预测销售数量
+				if($type!='sku' && $date_w >= $date_1w && in_array(array_get($asin_plans,$date_w.'.status',0)+1,$dist_status)){
+					$week_plan = '<a class="week_plan editable" title="'.$val['asin'].' '.array_get($siteCode,$val['marketplace_id']).' weeks '.$i.' Plan" href="javascript:;" id="'.$val['asin'].'--'.$val['marketplace_id'].'--'.$val['sku'].'--'.$date_w.'" data-pk="'.$val['asin'].'--'.$val['marketplace_id'].'--'.$val['sku'].'--'.$date_w.'" data-type="text" data-placement="'.$data_placement.'">'.array_get($asin_plans,$date_w.'.quantity',0).'</a>';
+				}else{
+					$week_plan = array_get($asin_plans,$date_w.'.quantity',0);
+				}
+				$data[$key][$i.'_week_plan'] = $week_plan;
 				
 				$data[$key]['22_week_plan_total']+=array_get($asin_plans,date('Y-m-d',strtotime($date.' +'.$i.' weeks sunday')).'.quantity',0);
             }
@@ -742,17 +751,17 @@ left join (select sku,sum(quantity) as sz_sellable from sap_sku_sites where left
 							if($key>1 && array_get($data,'B') && array_get($data,'C')){
 								$asin =trim(array_get($data,'B'));
 								$marketplace_id =array_get(getSiteCode(),trim(array_get($data,'C')),trim(array_get($data,'C')));
-								$sku = DB::connection('amazon')->table('sap_asin_match_sku')->where('asin',$asin)->where('marketplace_id',$marketplace_id)->value('sku');
+								$sku = DB::connection('amazon')->table('sap_asin_match_sku')->where('asin',$asin)->where('marketplace_id',$marketplace_id)->value('sku');//检测此站点此asin是否有sku
 								if(!$sku) continue;
 								foreach($xls_keys as $k=>$v){
 									
-									$week_date = date('Y-m-d',strtotime("+".($k+1)." weeks Sunday"));
-									$week_value = array_get($data,$v,0);
+									$week_date = date('Y-m-d',strtotime("+".($k+1)." weeks Sunday"));//下周天的日期
+									$week_value = array_get($data,$v,0);//表格中此列的值,这周预测的值
 									$max_value=0;
-									for($ki=0;$ki<=6;$ki++){
+									for($ki=0;$ki<=6;$ki++){//处理这一周内每一天的数据,0表示周天，1表示周六，以此类推
 										$date = date("Y-m-d", strtotime($week_date)-86400*$ki);
 										
-										$value = round($week_value*array_get($week_per,$ki));			
+										$value = round($week_value*array_get($week_per,$ki));	//等于表格中预测此周的值*配置值
 										if($max_value+$value>$week_value) $value = $week_value-$max_value;
 										if($max_value<=$week_value && $ki==6) $value = $week_value-$max_value;
 										$max_value+=$value;
@@ -770,7 +779,6 @@ left join (select sku,sum(quantity) as sz_sellable from sap_sku_sites where left
 								AsinSalesPlan::calPlans($asin,$marketplace_id,$sku,date('Y-m-d'),date('Y-m-d',strtotime("+22 Sunday")));
 							}
 						}
-						
 						$request->session()->flash('success_message','Import Success!');
 					}else{
 						$request->session()->flash('error_message','UploadFailed');
@@ -782,6 +790,23 @@ left join (select sku,sum(quantity) as sz_sellable from sap_sku_sites where left
         } 
 		return redirect('mrp/list');
 	
+	}
+
+	/*
+	 * 下载导入excel表格的模板
+	 */
+	public function download(Request $request)
+	{
+		// if(!Auth::user()->can(['edm-customers-add'])) die('Permission denied -- edm-customers-add');
+		$filepath = 'Mrp_import_template.xlsx';
+		$file=fopen($filepath,"r");
+		header("Content-type:text/html;charset=utf-8");
+		header("Content-Type: application/octet-stream");
+		header("Accept-Ranges: bytes");
+		header("Accept-Length: ".filesize($filepath));
+		header("Content-Disposition: attachment; filename=".$filepath);
+		echo fread($file,filesize($filepath));
+		fclose($file);
 	}
 
 

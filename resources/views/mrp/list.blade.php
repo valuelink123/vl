@@ -144,11 +144,12 @@ input[type=checkbox], input[type=radio]{
 			
 			<div class="col-md-12">
 				<div class="form-upload">
-				<form action="{{url('mrp/import')}}" method="post" enctype="multipart/form-data" class="pull-right " >
-				<!--<div class=" pull-left">
+				<form action="{{url('mrp/import')}}" method="post" enctype="multipart/form-data" class="pull-right " style="width:500px;" >
+				<div class="col-md-4"  >
+					<a href="/mrp/download" >Import Template
+					</a>
+				</div>
 
-					<a href="{{ url('/uploads/BudgetsUpload/data.csv')}}">Import Template</a>	
-				</div>-->
 				<div class="pull-left">
 					{{ csrf_field() }}
 						 <input type="file" name="importFile"  />

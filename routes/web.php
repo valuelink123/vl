@@ -263,6 +263,7 @@ Route::post('/mrp/weekupdate', 'MrpController@weekupdate');
 Route::post('/mrp/updateStatus', 'MrpController@updateStatus');
 Route::get('/mrp/asinexport', 'MrpController@asinExport');
 Route::post('/mrp/import', 'MrpController@import');
+Route::get('/mrp/download', 'MrpController@download');//下载上传的execl表格模板
 
 //CPFR协同补货
 Route::get('/cpfr/index', 'CpfrController@index')->name('index');
