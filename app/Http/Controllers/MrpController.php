@@ -106,10 +106,10 @@ class MrpController extends Controller
 		$updateRole = Auth::user()->can(['sales-forecast-update']) ? 1 : 0;//是否有更新数据的权限
 		$search = isset($_POST['search']) ? $_POST['search'] : '';
 		$search = $this->getSearchData(explode('&',$search));
-		
+		$dist_status = array_keys(getDistRuleForRole());//该用户角色应该所拥有的状态值
 		$date = array_get($search,'date')??date('Y-m-d');
 		if ($req->isMethod('GET')) {
-			return view('mrp/list', ['date'=>$date,'bgs'=>$this->getBgs(),'bus'=>$this->getBus()]);
+			return view('mrp/list', ['date'=>$date,'bgs'=>$this->getBgs(),'bus'=>$this->getBus(),'dist_status'=>$dist_status]);
 		}
 		$date_from = date('Y-m-d',strtotime($date.' next monday'));
 		$date_to = date('Y-m-d',strtotime($date.' +22 weeks sunday'));
@@ -156,6 +156,7 @@ class MrpController extends Controller
 		$data = [];
 		$siteCode = array_flip(getSiteCode());
 		$sellers = getUsers('sap_seller');
+
 		foreach ($datas as $key => $val) {
 			//$min_purchase_quantity = intval(SapPurchaseRecord::where('sku',$val['sku'])->where('sap_factory_code','<>','')->whereNotIn('supplier',['CN01','WH01','HK03'])->orderBy('created_date','desc')->value('min_purchase_quantity'));
 			$data_placement ='top';
@@ -172,7 +173,6 @@ class MrpController extends Controller
 			$data[$key]['total_sellable'] = intval($val['afn_sellable']+$val['afn_reserved']+$val['mfn_sellable']+$val['sz_sellable']);
 			$data[$key]['week_daily_sales'] = round($val['daily_sales']*7,2);
 			$data[$key]['22_week_plan_total'] =0;
-			$dist_status = array_keys(getDistRuleForRole());//该用户角色应该所拥有的状态值
 			$date_1w = date('Y-m-d',strtotime('+1 weeks sunday'));//下周末的日期
 			for($i=1;$i<=22;$i++){
 				$date_w = date('Y-m-d',strtotime($date.' +'.$i.' weeks sunday'));

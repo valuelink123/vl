@@ -171,6 +171,7 @@ input[type=checkbox], input[type=radio]{
 				<div style="position: relative;">
 				<div class="btn-group" style="position: absolute;left: 150px; z-index: 999;top:30px">
 					@permission('sales-forecast-update')
+					@if($dist_status)
 					<button type="button" class="btn btn-sm green-meadow">批量操作</button>
 					<button type="button" class="btn btn-sm green-meadow dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
 						<i class="fa fa-angle-down"></i>
@@ -189,6 +190,7 @@ input[type=checkbox], input[type=radio]{
 						<li class="divider"> </li>
 						<?php } ?>
 					</ul>
+					@endif
 					@endpermission
 				</div>
 				</div>
