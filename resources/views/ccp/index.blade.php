@@ -161,6 +161,7 @@
                         <th>IMAGE</th>
                         <th>PRODUCT</th>
                         <th>ASIN</th>
+                        <th>Item No.</th>
                         <th>SALES</th>
                         <th>UNITS</th>
                         <th>ORDERS</th>
@@ -177,7 +178,7 @@
                 searching: false,//关闭搜索
                 serverSide: true,//启用服务端分页（这是使用Ajax服务端的必须配置）
                 ordering:false,
-                "pageLength": 10, // default record count per page
+                "pageLength": 50, // default record count per page
                 "lengthMenu": [
                     [10, 20,50,],
                     [10, 20,50,] // change per page values here
@@ -188,6 +189,7 @@
                     {data: 'image',name:'image'},
                     {data: 'title',name:'title'},
                     {data: 'asin',name:'asin'},
+                    {data: 'item_no',name:'item_no'},
                     {data: 'sales',name:'sales'},
                     {data: 'units',name:'units'},
                     {data: 'orders',name:'orders'},

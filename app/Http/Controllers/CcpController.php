@@ -168,6 +168,7 @@ class CcpController extends Controller
 		}
 
 		$date = date('Y-m-d');//当前日期
+		// $date = '2020-09-01';//测试日期
 		$sql = "SELECT SQL_CALC_FOUND_ROWS asin, SUM(c_order.c_orders) AS orders, SUM(c_order.c_proOrders) AS ordersPromo,SUM(c_order.c_proUnits) AS unitsPromo, 
 			SUM(c_order.c_sales) AS sales ,SUM(c_order.c_taxs) AS _taxs ,sum(c_order.c_units) as units,sum(c_order.c_promotionAmount) as promotionAmount 
 			FROM (
@@ -208,7 +209,7 @@ class CcpController extends Controller
 		foreach($itemData as $key=>$val){
 			$data[$val->asin] = (array)$val;
 			$data[$val->asin]['avg_units'] = round($val->units/$day,2);
-			$data[$val->asin]['title'] = $data[$val->asin]['image'] = 'N/A';
+			$data[$val->asin]['title'] = $data[$val->asin]['image'] = $data[$val->asin]['item_no'] = 'N/A';
 			if($showOrder==1) {
 				$data[$val->asin]['orders'] = '<a target="_blank" href="/ccp/showOrderList?asin=' . $val->asin . '&' . $_REQUEST['search'] . '">' . $val->orders . '</a>';
 			}
@@ -220,7 +221,7 @@ class CcpController extends Controller
 			// if($account){
 			// 	$product_where .= ' and seller_account_id in('.$account.')';
 			// }
-			$product_sql = "select max(title) as title,max(images) as images,asin
+			$product_sql = "select max(title) as title,max(images) as images,asin,max(sku) as item_no
 						from asins
 						where asin in({$asins})
 						and marketplaceid = '{$site}'
@@ -232,11 +233,12 @@ class CcpController extends Controller
 				if(isset($data[$val->asin])){
 					$title = mb_substr($val->title,0,50);
 					$data[$val->asin]['title'] = '<span title="'.$val->title.'">'.$title.'</span>';
+					$data[$val->asin]['item_no'] = $val->item_no ? $val->item_no : $data[$val->asin]['item_no'];
 					if($val->images){
 						$imageArr = explode(',',$val->images);
 						if($imageArr){
 							$image = 'https://images-na.ssl-images-amazon.com/images/I/'.$imageArr[0];
-							$data[$val->asin]['image'] = '<image style="width:50px;height:50px;" src="'.$image.'">';
+							$data[$val->asin]['image'] = '<a href="https://www.' .$domain. '/dp/' . $val->asin .'" target="_blank" rel="noreferrer"><image style="width:50px;height:50px;" src="'.$image.'"></a>';
 						}
 					}
 				}
@@ -328,6 +330,7 @@ class CcpController extends Controller
 		//如果选的时间类型是后台当地时间，时间要做转化
 		$dateconfig = array('A1PA6795UKMFR9','A1RKKUPIHCS9HS','A13V1IB3VIYZZH','APJ6JRA9NG5V4');//utc+2:00
 		$time = time();//北京时间当前时间戳
+		// $time = strtotime('2020-09-01');//测试日期
 		if($timeType==1){//选的是后台当地时间
 			if($site=='A1VC38T7YXB528'){//时间范围+1小时,日本站点,-8+9
 				$time = strtotime(date('Y-m-d H:i:s', strtotime ("+1 hour", $time)));//日本站后台当前时间;
