@@ -94,27 +94,22 @@ class CcpController extends Controller
 		//sales数据，orders数据
 		$date = date('Y-m-d');//当前日期
 		// $date = '2020-09-01';//测试日期
-		$sql = "SELECT SUM( item_price_amount ) AS sales,SUM( quantity_ordered ) AS units,SUM( quantity_ordered * PROMO ) AS unitsPromo,
-       				COUNT( DISTINCT amazon_order_id ) AS orders,COUNT(DISTINCT PROMO_ORDER_ID) AS ordersPromo,sum(c_promotionAmount) as promotionAmount
-				FROM
+		$sql ="SELECT kk.asin,SUM( item_price_amount ) AS sales,SUM( quantity_ordered ) AS units,SUM( quantity_ordered * PROMO ) AS unitsPromo,COUNT( DISTINCT amazon_order_id ) AS orders,COUNT(DISTINCT PROMO_ORDER_ID) AS ordersPromo,sum(c_promotionAmount) as promotionAmount 
+			FROM
+			  (SELECT order_items.amazon_order_id,order_items.asin,asin_price.price AS default_unit_price,order_items.quantity_ordered,
+			  		CASE order_items.item_price_amount WHEN 0.00 THEN asin_price.price * order_items.quantity_ordered ELSE order_items.item_price_amount END AS item_price_amount,
+			   		LENGTH( order_items.promotion_ids )> 10 AS PROMO,promotion_discount_amount as c_promotionAmount,
+			  		CASE WHEN LENGTH( order_items.promotion_ids )> 10 THEN amazon_order_id ELSE '' END AS PROMO_ORDER_ID  
+			  	FROM order_items 
+				LEFT JOIN asin_price ON order_items.seller_account_id = asin_price.seller_account_id   AND order_items.asin = asin_price.asin  AND asin_price.marketplace_id = 'ATVPDKIKX0DER' 
+			  	WHERE order_items.amazon_order_id IN 
 				  (
-				  SELECT order_items.amazon_order_id,order_items.asin,asin_price.price AS default_unit_price,order_items.quantity_ordered,
-				 	order_items.seller_account_id as seller_account_id,sum(promotion_discount_amount) as c_promotionAmount,
-				  	CASE order_items.item_price_amount WHEN 0.00 THEN asin_price.price * order_items.quantity_ordered ELSE order_items.item_price_amount  END AS item_price_amount,
-					LENGTH( order_items.promotion_ids )> 10 AS PROMO,CASE WHEN LENGTH( order_items.promotion_ids )> 10 THEN amazon_order_id ELSE '' END AS PROMO_ORDER_ID 
-				  FROM order_items
-				  LEFT JOIN asin_price ON order_items.seller_account_id = asin_price.seller_account_id  AND order_items.asin = asin_price.asin  AND asin_price.marketplace_id = 'ATVPDKIKX0DER' 
-				  WHERE order_items.amazon_order_id IN (
-						SELECT amazon_order_id 
-						FROM orders 
-						WHERE order_status IN ( 'PendingAvailability', 'Pending', 'Unshipped', 'PartiallyShipped', 'Shipped', 'InvoiceUnconfirmed', 'Unfulfillab' ) 
-						{$orderwhere}
-						AND quantity_ordered>0 
-						and order_items.asin in({$userwhere})
-					  )
-				  {$where} 
-				  GROUP BY asin,seller_account_id 
-			  ) AS kk ";
+					SELECT amazon_order_id 
+					FROM orders 
+					WHERE order_status IN ( 'PendingAvailability', 'Pending', 'Unshipped', 'PartiallyShipped', 'Shipped', 'InvoiceUnconfirmed', 'Unfulfillab' ) {$orderwhere}
+				  )
+			  	{$where} 
+			) AS kk";
 
 		$orderData = DB::connection('vlz')->select($sql);
 		$array = array(
@@ -164,28 +159,24 @@ class CcpController extends Controller
 
 		$date = date('Y-m-d');//当前日期
 		// $date = '2020-09-01';//测试日期
-		$sql = "SELECT SQL_CALC_FOUND_ROWS kk.asin as asin,SUM( item_price_amount ) AS sales,SUM( quantity_ordered ) AS units,SUM( quantity_ordered * PROMO ) AS unitsPromo,
-       				COUNT( DISTINCT amazon_order_id ) AS orders,COUNT(DISTINCT PROMO_ORDER_ID) AS ordersPromo,sum(c_promotionAmount) as promotionAmount
-				FROM
-				  (
-				  SELECT order_items.amazon_order_id,order_items.asin,asin_price.price AS default_unit_price,order_items.quantity_ordered,
-				 	order_items.seller_account_id as seller_account_id,sum(promotion_discount_amount) as c_promotionAmount,
-				  	CASE order_items.item_price_amount WHEN 0.00 THEN asin_price.price * order_items.quantity_ordered ELSE order_items.item_price_amount  END AS item_price_amount,
-					LENGTH( order_items.promotion_ids )> 10 AS PROMO,CASE WHEN LENGTH( order_items.promotion_ids )> 10 THEN amazon_order_id ELSE '' END AS PROMO_ORDER_ID 
-				  FROM order_items
-				  LEFT JOIN asin_price ON order_items.seller_account_id = asin_price.seller_account_id  AND order_items.asin = asin_price.asin  AND asin_price.marketplace_id = 'ATVPDKIKX0DER' 
-				  WHERE order_items.amazon_order_id IN (
-						SELECT amazon_order_id 
-						FROM orders 
-						WHERE order_status IN ( 'PendingAvailability', 'Pending', 'Unshipped', 'PartiallyShipped', 'Shipped', 'InvoiceUnconfirmed', 'Unfulfillab' ) 
-						{$orderwhere}
-						AND quantity_ordered>0 
-						and order_items.asin in({$userwhere})
-					  )
-				  {$where} 
-				  GROUP BY asin,seller_account_id 
-			  ) AS kk GROUP BY kk.asin order by sales desc {$limit}";
 
+		$sql ="SELECT SQL_CALC_FOUND_ROWS kk.asin,SUM( item_price_amount ) AS sales,SUM( quantity_ordered ) AS units,SUM( quantity_ordered * PROMO ) AS unitsPromo,COUNT( DISTINCT amazon_order_id ) AS orders,COUNT(DISTINCT PROMO_ORDER_ID) AS ordersPromo,sum(c_promotionAmount) as promotionAmount 
+			FROM
+			  (SELECT order_items.amazon_order_id,order_items.asin,asin_price.price AS default_unit_price,order_items.quantity_ordered,
+			  		CASE order_items.item_price_amount WHEN 0.00 THEN asin_price.price * order_items.quantity_ordered ELSE order_items.item_price_amount END AS item_price_amount,
+			   		LENGTH( order_items.promotion_ids )> 10 AS PROMO,promotion_discount_amount as c_promotionAmount,
+			  		CASE WHEN LENGTH( order_items.promotion_ids )> 10 THEN amazon_order_id ELSE '' END AS PROMO_ORDER_ID  
+			  	FROM order_items 
+				LEFT JOIN asin_price ON order_items.seller_account_id = asin_price.seller_account_id   AND order_items.asin = asin_price.asin  AND asin_price.marketplace_id = 'ATVPDKIKX0DER' 
+			  	WHERE order_items.amazon_order_id IN 
+				  (
+					SELECT amazon_order_id 
+					FROM orders 
+					WHERE order_status IN ( 'PendingAvailability', 'Pending', 'Unshipped', 'PartiallyShipped', 'Shipped', 'InvoiceUnconfirmed', 'Unfulfillab' ) {$orderwhere}
+				  )
+			  	{$where} 
+			) AS kk GROUP BY kk.asin order by sales desc {$limit}";
+		// echo $sql;exit;
 		$itemData = DB::connection('vlz')->select($sql);
 		$recordsTotal = $recordsFiltered = DB::connection('vlz')->select('SELECT FOUND_ROWS() as total');
 		$recordsTotal = $recordsFiltered = $recordsTotal[0]->total;
