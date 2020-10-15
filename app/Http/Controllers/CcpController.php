@@ -85,7 +85,7 @@ class CcpController extends Controller
 		if($account){
 			$where = $orderwhere .= ' and order_items.seller_account_id in('.$account.')';
 		}
-		$orderwhere .= " and sales_channel = '".$domain."'";
+		$orderwhere .= " and sales_channel = '".ucfirst($domain)."'";
 		//用户权限sap_asin_match_sku
 		$userwhere = $this->getUserWhere($site,$bgbu);
 		//保证asin_price此站点今天有数据
@@ -145,7 +145,7 @@ class CcpController extends Controller
 			$where = $orderwhere .= ' and order_items.seller_account_id in('.$account.')';
 		}
 		$domain = substr(getDomainBySite($site), 4);//orders.sales_channel
-		$orderwhere .= " and sales_channel = '".$domain."'";
+		$orderwhere .= " and sales_channel = '".ucfirst($domain)."'";
 		//用户权限sap_asin_match_sku
 		$userwhere = $this->getUserWhere($site,$bgbu);
 		if($asin){
@@ -176,7 +176,7 @@ class CcpController extends Controller
 				  )
 			  	{$where} 
 			) AS kk GROUP BY kk.asin order by sales desc {$limit}";
-		// echo $sql;exit;
+
 		$itemData = DB::connection('vlz')->select($sql);
 		$recordsTotal = $recordsFiltered = DB::connection('vlz')->select('SELECT FOUND_ROWS() as total');
 		$recordsTotal = $recordsFiltered = $recordsTotal[0]->total;
