@@ -92,16 +92,14 @@ class CcpController extends Controller
 		$this->insertTheAsinPrice($site);
 
 		//sales数据，orders数据
-		$date = date('Y-m-d');//当前日期
-		// $date = '2020-09-01';//测试日期
-		$sql ="SELECT kk.asin,SUM( item_price_amount ) AS sales,SUM( quantity_ordered ) AS units,SUM( quantity_ordered * PROMO ) AS unitsPromo,COUNT( DISTINCT amazon_order_id ) AS orders,COUNT(DISTINCT PROMO_ORDER_ID) AS ordersPromo,sum(c_promotionAmount) as promotionAmount 
+		$sql ="SELECT SUM( item_price_amount ) AS sales,SUM( quantity_ordered ) AS units,SUM( quantity_ordered * PROMO ) AS unitsPromo,COUNT( DISTINCT amazon_order_id ) AS orders,COUNT(DISTINCT PROMO_ORDER_ID) AS ordersPromo,sum(c_promotionAmount) as promotionAmount 
 			FROM
 			  (SELECT order_items.amazon_order_id,order_items.asin,asin_price.price AS default_unit_price,order_items.quantity_ordered,
 			  		CASE order_items.item_price_amount WHEN 0.00 THEN asin_price.price * order_items.quantity_ordered ELSE order_items.item_price_amount END AS item_price_amount,
 			   		LENGTH( order_items.promotion_ids )> 10 AS PROMO,promotion_discount_amount as c_promotionAmount,
 			  		CASE WHEN LENGTH( order_items.promotion_ids )> 10 THEN amazon_order_id ELSE '' END AS PROMO_ORDER_ID  
 			  	FROM order_items 
-				LEFT JOIN asin_price ON order_items.seller_account_id = asin_price.seller_account_id   AND order_items.asin = asin_price.asin  AND asin_price.marketplace_id = 'ATVPDKIKX0DER' 
+				LEFT JOIN asin_price ON order_items.seller_account_id = asin_price.seller_account_id   AND order_items.asin = asin_price.asin  AND asin_price.marketplace_id = '".$site."' 
 			  	WHERE order_items.amazon_order_id IN 
 				  (
 					SELECT amazon_order_id 
@@ -109,6 +107,7 @@ class CcpController extends Controller
 					WHERE order_status IN ( 'PendingAvailability', 'Pending', 'Unshipped', 'PartiallyShipped', 'Shipped', 'InvoiceUnconfirmed', 'Unfulfillab' ) {$orderwhere}
 				  )
 			  	{$where} 
+			  	and order_items.asin in({$userwhere})
 			) AS kk";
 
 		$orderData = DB::connection('vlz')->select($sql);
@@ -157,9 +156,6 @@ class CcpController extends Controller
 			$limit = " LIMIT {$limit} ";
 		}
 
-		$date = date('Y-m-d');//当前日期
-		// $date = '2020-09-01';//测试日期
-
 		$sql ="SELECT SQL_CALC_FOUND_ROWS kk.asin,SUM( item_price_amount ) AS sales,SUM( quantity_ordered ) AS units,SUM( quantity_ordered * PROMO ) AS unitsPromo,COUNT( DISTINCT amazon_order_id ) AS orders,COUNT(DISTINCT PROMO_ORDER_ID) AS ordersPromo,sum(c_promotionAmount) as promotionAmount 
 			FROM
 			  (SELECT order_items.amazon_order_id,order_items.asin,asin_price.price AS default_unit_price,order_items.quantity_ordered,
@@ -167,7 +163,7 @@ class CcpController extends Controller
 			   		LENGTH( order_items.promotion_ids )> 10 AS PROMO,promotion_discount_amount as c_promotionAmount,
 			  		CASE WHEN LENGTH( order_items.promotion_ids )> 10 THEN amazon_order_id ELSE '' END AS PROMO_ORDER_ID  
 			  	FROM order_items 
-				LEFT JOIN asin_price ON order_items.seller_account_id = asin_price.seller_account_id   AND order_items.asin = asin_price.asin  AND asin_price.marketplace_id = 'ATVPDKIKX0DER' 
+				LEFT JOIN asin_price ON order_items.seller_account_id = asin_price.seller_account_id   AND order_items.asin = asin_price.asin  AND asin_price.marketplace_id = '".$site."'
 			  	WHERE order_items.amazon_order_id IN 
 				  (
 					SELECT amazon_order_id 
@@ -175,6 +171,7 @@ class CcpController extends Controller
 					WHERE order_status IN ( 'PendingAvailability', 'Pending', 'Unshipped', 'PartiallyShipped', 'Shipped', 'InvoiceUnconfirmed', 'Unfulfillab' ) {$orderwhere}
 				  )
 			  	{$where} 
+			  	and order_items.asin in({$userwhere}) 
 			) AS kk GROUP BY kk.asin order by sales desc {$limit}";
 
 		$itemData = DB::connection('vlz')->select($sql);
