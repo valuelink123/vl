@@ -102,15 +102,15 @@ class MrpController extends Controller
 	
 	public function list(Request $req)
     {
-		if(!Auth::user()->can(['sales-forecast-show'])) die('Permission denied -- sales-forecast-show');
+    	if(!Auth::user()->can(['sales-forecast-show'])) die('Permission denied -- sales-forecast-show');
 		$updateRole = Auth::user()->can(['sales-forecast-update']) ? 1 : 0;//是否有更新数据的权限
 		$search = isset($_POST['search']) ? $_POST['search'] : '';
 		$search = $this->getSearchData(explode('&',$search));
-		$dist_status = array_keys(getDistRuleForRole());//该用户角色应该所拥有的状态值
 		$date = array_get($search,'date')??date('Y-m-d');
 		if ($req->isMethod('GET')) {
-			return view('mrp/list', ['date'=>$date,'bgs'=>$this->getBgs(),'bus'=>$this->getBus(),'dist_status'=>$dist_status]);
+			return view('mrp/list', ['date'=>$date,'bgs'=>$this->getBgs(),'bus'=>$this->getBus(),'weekDate'=>$this->get22WeekDate($date)]);
 		}
+
 		$date_from = date('Y-m-d',strtotime($date.' next monday'));
 		$date_to = date('Y-m-d',strtotime($date.' +22 weeks sunday'));
 		$searchField = array('bg'=>'a.bg','bu'=>'a.bu','site'=>'a.marketplace_id','sku'=>'a.sku','sku_level'=>'a.status','sku_level'=>'a.status','sap_seller_id'=>'a.sap_seller_id');
@@ -137,8 +137,6 @@ class MrpController extends Controller
 		$orderby = $this->dtOrderBy($req);
 		
 		$sql = $this->getSql($where,$date_from,$date_to,$orderby,false);
-		
-		
 			
 		if($type=='sku'){
 			$sql="SELECT SQL_CALC_FOUND_ROWS sku,marketplace_id,any_value(sap_seller_id) as sap_seller_id,  count(asin) as asin, sum(daily_sales) as daily_sales,any_value(min_purchase_quantity) as min_purchase_quantity,sum(afn_sellable) as afn_sellable,sum(afn_reserved) as afn_reserved,any_value(mfn_sellable) as mfn_sellable,any_value(sz_sellable) as sz_sellable from (".str_replace('SQL_CALC_FOUND_ROWS','',$sql).") as skus_table 
@@ -156,60 +154,80 @@ class MrpController extends Controller
 		$data = [];
 		$siteCode = array_flip(getSiteCode());
 		$sellers = getUsers('sap_seller');
-
+		$sap_seller_id = Auth::user()->sap_seller_id;
 		foreach ($datas as $key => $val) {
 			//$min_purchase_quantity = intval(SapPurchaseRecord::where('sku',$val['sku'])->where('sap_factory_code','<>','')->whereNotIn('supplier',['CN01','WH01','HK03'])->orderBy('created_date','desc')->value('min_purchase_quantity'));
 			$data_placement ='top';
 			if($key<4) $data_placement='bottom';
-			$asin_plans = AsinSalesPlan::SelectRaw('sum(quantity_last) as quantity,week_date,any_value(status) as status')->where($type,$val[$type])->where('marketplace_id',$val['marketplace_id'])->where('date','>=',$date_from)->where('date','<=',$date_to)->groupBy(['week_date'])->get()->keyBy('week_date')->toArray();
+			$asin_plans = AsinSalesPlan::SelectRaw('sum(quantity_last) as quantity,week_date,any_value(status) as status')->where($type,$val[$type])->where('marketplace_id',$val['marketplace_id'])->where('week_date','>=',$date)->where('week_date','<=',$date_to)->groupBy(['week_date'])->get()->keyBy('week_date')->toArray();
 
 			$data[$key]['id'] = '<input type="checkbox" name="checkedInput" value="'.$val['asin'].'--'.$val['marketplace_id'].'">';
 			$data[$key]['seller'] = array_get($sellers,$val['sap_seller_id']);
 			$data[$key]['asin'] = ($type=='asin')?'<a href="/mrp/edit?asin='.$val['asin'].'&marketplace_id='.$val['marketplace_id'].'">'.$val['asin'].'</a>':$val['asin'];
 			$data[$key]['site'] = array_get($siteCode,$val['marketplace_id']);
 			$data[$key]['sku'] = ($type=='sku')?'<a href="/mrp/edit?keyword='.$val['sku'].'&marketplace_id='.$val['marketplace_id'].'">'.$val['sku'].'</a>':$val['sku'];
-			$data[$key]['min_purchase'] = $val['min_purchase_quantity'];
+			$data[$key]['min_purchase'] = $val['min_purchase_quantity'];//最小起订量
 			
-			$data[$key]['total_sellable'] = intval($val['afn_sellable']+$val['afn_reserved']+$val['mfn_sellable']+$val['sz_sellable']);
-			$data[$key]['week_daily_sales'] = round($val['daily_sales']*7,2);
+			$data[$key]['total_sellable'] = intval($val['afn_sellable']+$val['afn_reserved']+$val['mfn_sellable']+$val['sz_sellable']);//可售库存数量
+			$data[$key]['week_daily_sales'] = round($val['daily_sales']*7,2);//加权周销量
 			$data[$key]['22_week_plan_total'] =0;
-			$date_1w = date('Y-m-d',strtotime('+1 weeks sunday'));//下周末的日期
-			for($i=1;$i<=22;$i++){
-				$date_w = date('Y-m-d',strtotime($date.' +'.$i.' weeks sunday'));
-				//处理显示的预测销售数量
-				if($updateRole==1 && $type!='sku' && $date_w >= $date_1w && in_array(array_get($asin_plans,$date_w.'.status',0)+1,$dist_status)){
-					$week_plan = '<a class="week_plan editable" title="'.$val['asin'].' '.array_get($siteCode,$val['marketplace_id']).' weeks '.$i.' Plan" href="javascript:;" id="'.$val['asin'].'--'.$val['marketplace_id'].'--'.$val['sku'].'--'.$date_w.'" data-pk="'.$val['asin'].'--'.$val['marketplace_id'].'--'.$val['sku'].'--'.$date_w.'" data-type="text" data-placement="'.$data_placement.'">'.array_get($asin_plans,$date_w.'.quantity',0).'</a>';
-				}else{
-					$week_plan = array_get($asin_plans,$date_w.'.quantity',0);
+			$date_0w = date('Y-m-d',strtotime($date.'+0 weeks sunday'));//选定日期的本周末的日期
+			$date_1wdate = date('Y-m-d',strtotime('+1 weeks sunday'));//当前时间的下周末的日期
+			$date_update = date('Y-m-d',strtotime('+4 weeks sunday'));//可修改数据的日期，从这之后的数据都可以修改(以当前时间为主)
+			$data[$key]['status_name'] = isset($asin_plans[$date_0w]) && $asin_plans[$date_0w]['status']==1 ? '已确认'  : '未确认';//本周数据的状态
+			for($i=0;$i<=22;$i++){//$i=0时为本周的数据，展示本周和未来22周的预测数据
+				$date_w = date('Y-m-d',strtotime($date.' +'.$i.' weeks sunday'));//第n周周天的日期
+				//处理显示的预测销售数量,销售填写的预测数据只有销售本人才可以更改
+				$quantity = array_get($asin_plans,$date_w.'.quantity',0);
+				$data[$key][$i.'_week_plan'] = $quantity;
+				$ok = isset($asin_plans[$date_w]) && $asin_plans[$date_w]['status']==1 ? 1 : 0;//确认状态，0表示未确认，1表示已确认
+				if($updateRole==1 && $val['sap_seller_id']==$sap_seller_id &&  $type!='sku'){
+					//此处为可编辑的显示内容
+					if(($ok==0 && $date_w >= $date_1wdate) || ($ok==1 && $date_w>$date_update)){//未确认状态可以更新预测数据，如果已确认状态可以更新4周后的预测数据
+						$data[$key][$i.'_week_plan'] = '<a class="week_plan editable" title="'.$val['asin'].' '.array_get($siteCode,$val['marketplace_id']).' weeks '.$i.' Plan" href="javascript:;" id="'.$val['asin'].'--'.$val['marketplace_id'].'--'.$val['sku'].'--'.$date_w.'" data-pk="'.$val['asin'].'--'.$val['marketplace_id'].'--'.$val['sku'].'--'.$date_w.'" data-type="text" data-placement="'.$data_placement.'">'.$quantity.'</a>';
+					}
 				}
-				$data[$key][$i.'_week_plan'] = $week_plan;
-				
-				$data[$key]['22_week_plan_total']+=array_get($asin_plans,date('Y-m-d',strtotime($date.' +'.$i.' weeks sunday')).'.quantity',0);
+				if($ok==0){//未确认的数据，加个背景色特殊显示
+					$data[$key][$i.'_week_plan'] = '<div class="bg-danger">'.$data[$key][$i.'_week_plan'].'</div>';
+				}
+				if($i>0){//本周的数据不累加到总数里面
+					$data[$key]['22_week_plan_total'] += $quantity;
+				}
             }
-			
-			
-			
 		}
 		
 		return compact('data', 'recordsTotal', 'recordsFiltered');
     }
+    /*
+     * 得到22周日期
+     */
+	public function get22WeekDate($date='')
+	{
+		$date = isset($_POST['date']) && $_POST['date'] ? $_POST['date'] : $date;
+		$data = array();
+		for($i=0;$i<=22;$i++){
+			$data[] = date('W',strtotime($date.' +'.$i.' week last monday')).'周<BR/>'.date('Y-m-d',strtotime($date.' +'.$i.' week last monday'));
+		}
+		return $data;
+	}
 
-
+	//展示预测数据的详细数据
     public function edit(Request $request)
     {
+		if(!Auth::user()->can(['sales-forecast-show'])) die('Permission denied -- sales-forecast-show');
 		$keyword = $request->get('keyword');
 		$asin=$sku='';
 		$asin = $request->get('asin');
 		$marketplace_id = $request->get('marketplace_id');
 		$seller_permissions = $this->getUserSellerPermissions();
-		
+
 		$where='1=1';
 		foreach($seller_permissions as $key=>$val){
 			if($key=='bg' && $val) $where .=" and sap_seller_bg='$val'";
 			if($key=='bu' && $val) $where .=" and sap_seller_bu='$val'";
 			if($key=='sap_seller_id' && $val) $where .=" and sap_seller_id='$val'";
 		}
-		
+
 		if(!$asin){
 			$keyword_info = DB::connection('amazon')->table('sap_asin_match_sku')->where('marketplace_id',$marketplace_id)->whereRaw($where)
 			->where(function ($query) use ($keyword) {
@@ -228,193 +246,101 @@ class MrpController extends Controller
 			$request->session()->flash('error_message','No Data Match This Keywords');
             return redirect()->back()->withInput();
 		}
-		$show = $request->get('show')??'day';
 		$type = $request->get('type')??'asin';
+		//没选日期的话，默认查询最近90的数据
 		$date=90;
 		$date_to = $request->get('date_to')??date('Y-m-d',strtotime('+'.$date.'days'));
 		$date_from = $tmp_date_from = $request->get('date_from')??date('Y-m-d');
 		if($date_to<$date_from) $date_to = $date_from;
-		$asins = DB::connection('amazon')->select($this->getSql(" and a.sku = '$sku' and a.marketplace_id='$marketplace_id'",$date_from,$date_to));
-		$whereInAsins = [];
-		$current_stock=0;
+		//开始时间为date_from的周一日期，结束时间为date_to的周天日期(查询数据的开始时间和结束时间)
+		$date_start = date("Y-m-d", strtotime('monday this week', strtotime($date_from)));
+		$date_end = date("Y-m-d", strtotime('sunday this week', strtotime($date_to)));
+
+		$asins = DB::connection('amazon')->select($this->getSql(" and a.sku = '$sku' and a.marketplace_id='$marketplace_id'",$date_start,$date_end));
+		//sum_estimated_afn为fba在途数据
+		$current_stock=0;//当前库存数量(FBA在库数量)
 		foreach($asins as $v){
-			$whereInAsins[]=$v->asin;
 			if($type=='asin' && $v->asin==$asin){
 				$current_stock=intval($v->afn_sellable+$v->afn_reserved);
 			}
 			if($type=='sku'){
 				$current_stock+=intval($v->afn_sellable+$v->afn_reserved);
-			} 
-		}
-		
-		
-		$add_where = [];
-		foreach(getMarketplaceCode() as $k=>$v){
-			foreach($v['fba_factory_warehouse'] as $k1=>$v1){
-				$add_where[] ="(sap_factory_code = '".$v1['sap_factory_code']."' and sap_warehouse_code = '".$v1['sap_warehouse_code']."')";
 			}
 		}
-		$sku_info = SapSkuSite::where('sku',$sku)->where('marketplace_id',$marketplace_id)->whereRaw("(".implode(' or ',$add_where).")")->first()->toArray();
-		$sku_purchase_info = SapPurchaseRecord::where('sku',$sku)->where('sap_factory_code','<>','')->whereNotIn('supplier',['CN01','WH01','HK03'])->orderBy('created_date','desc')->first();
-		$sku_info['min_purchase_quantity'] = empty($sku_purchase_info)?0:$sku_purchase_info->min_purchase_quantity;
-		$sku_info['estimated_cycle'] = empty($sku_purchase_info)?0:$sku_purchase_info->estimated_cycle;
-		$sku_info['international_transport_time'] = InternationalTransportTime::where('factory_code',array_get(getMarketplaceCode(),$marketplace_id.'.fba_factory_warehouse.0.sap_factory_code'))->where('is_default',1)->value('total_days');
-		
-		
-		$sales_plan=[];
-		if($show=='week'){
-			$asin_symmetrys = DB::connection('amazon')->table('symmetry_asins')->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('date','>=',$date_from)->where('date','<=',$date_to)->selectRaw("YEARWEEK(date,3) as wdate,sum(quantity) as quantity")->groupBy(['wdate'])->pluck('quantity','wdate');
-			$asin_historys = DailyStatistic::selectRaw("YEARWEEK(date,3) as wdate,sum(quantity_shipped) as sold,sum(if(date_format(date,'%w')=1,(afn_sellable+afn_reserved),0)) as stock")->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('date','>=',$date_from)->where('date','<=',$date_to)->groupBy(['wdate'])->get()->keyBy('wdate')->toArray();
-			
-			$asin_plans = AsinSalesPlan::selectRaw('YEARWEEK(date,3) as wdate,sum(quantity_last) as quantity_last,sum(quantity_first) as quantity_first,any_value(remark) as remark')->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('date','>=',$date_from)->where('date','<=',$date_to)->groupBy(['wdate'])->get()->keyBy('wdate')->toArray();
-			
-			$estimated_shipment_datas = ShipmentRequest::selectRaw('sum(quantity) as quantity,YEARWEEK(received_date,3) as date')->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('received_date','>=',$date_from)->where('received_date','<=',$date_to)->where('shipment_completed',0)->whereNotNull('shipment_id')->where('status','<>',4)->groupBy(['date'])->pluck('quantity','date');
-			
-			
-			$mrp_datas = ShipmentRequest::selectRaw('sum(quantity) as quantity,YEARWEEK(received_date,3) as date')->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('received_date','>=',$date_from)->where('received_date','<=',$date_to)->where('status','<>',4)->groupBy(['date'])->pluck('quantity','date');
 
-			$actual_shipment_datas = ShipmentRequest::selectRaw('sum(quantity) as quantity,YEARWEEK(received_date,3) as date')->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('received_date','>=',$date_from)->where('received_date','<=',$date_to)->where('shipment_completed',1)->whereNotNull('shipment_id')->where('status','<>',4)->groupBy(['date'])->pluck('quantity','date');
-		
-			$estimated_purchase_datas = SapPurchase::selectRaw('sum(quantity) as quantity,YEARWEEK(estimated_delivery_date,3) as date')->where('sku',$sku)->where('estimated_delivery_date','>=',$date_from)->where('estimated_delivery_date','<=',$date_to)->whereNull('actual_delivery_date')->groupBy(['date'])->pluck('quantity','date');
-			
-			$actual_purchase_datas = SapPurchase::selectRaw('sum(quantity) as quantity,YEARWEEK(actual_delivery_date,3) as date')->where('sku',$sku)->where('actual_delivery_date','>=',$date_from)->where('actual_delivery_date','<=',$date_to)->whereNotNull('actual_delivery_date')->groupBy(['date'])->pluck('quantity','date');
-		
-			$tmp_date_from = date('oW',strtotime($date_from));
-			$tmp_date_to = date('oW',strtotime($date_to));
-			$oW=0;
-			while($tmp_date_from<=$tmp_date_to){
-				$oW++;
-				$sales_plan[$tmp_date_from] = [
-					'symmetry'=>intval(array_get($asin_symmetrys,$tmp_date_from,0)),
-					'plan_first'=>intval(array_get($asin_plans,$tmp_date_from.'.quantity_first',0)),
-					'plan_last'=>intval(array_get($asin_plans,$tmp_date_from.'.quantity_last',0)),
-					'sold'=>intval(array_get($asin_historys,$tmp_date_from.'.sold',0)),
-					'stock'=>intval(array_get($asin_historys,$tmp_date_from.'.stock',0)),
-					'remark'=>array_get($asin_plans,$tmp_date_from.'.remark'),
-					'estimated_purchase'=>intval(array_get($estimated_purchase_datas,$tmp_date_from,0)),
-					'actual_purchase'=>intval(array_get($actual_purchase_datas,$tmp_date_from,0)),
-					'estimated_afn'=>intval(array_get($estimated_shipment_datas,$tmp_date_from,0)),
-					'actual_afn'=>intval(array_get($actual_shipment_datas,$tmp_date_from,0)),
-					'mrp'=>intval(array_get($mrp_datas,$tmp_date_from,0)),
-				];
-				$tmp_date_from = date('oW',strtotime($date_from.' +'.$oW.' week'));;
+		$sales_plan=[];
+		$asin_symmetrys = DB::connection('amazon')->table('symmetry_asins')->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('date','>=',$date_start)->where('date','<=',$date_end)->selectRaw("YEARWEEK(date,3) as wdate,sum(quantity) as quantity")->groupBy(['wdate'])->pluck('quantity','wdate');//预测销售数量
+
+		$asin_historys = DailyStatistic::selectRaw("YEARWEEK(date,3) as wdate,sum(quantity_shipped) as sold,sum(if(date_format(date,'%w')=1,(afn_sellable+afn_reserved),0)) as stock")->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('date','>=',$date_start)->where('date','<=',$date_end)->groupBy(['wdate'])->get()->keyBy('wdate')->toArray();//该asin实际销量和库存
+
+		$asin_plans = AsinSalesPlan::selectRaw("YEARWEEK(week_date,3) as wdate,sum(quantity_last) as quantity_last,sum(estimated_afn) as estimated_afn,any_value(remark) as remark")->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('week_date','>=',$date_start)->where('week_date','<=',$date_end)->groupBy(['wdate'])->get()->keyBy('wdate')->toArray();//销售填的预测数据
+
+		$actual_shipment_datas = ShipmentRequest::selectRaw('sum(quantity) as quantity,YEARWEEK(received_date,3) as date')->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('received_date','>=',$date_start)->where('received_date','<=',$date_end)->where('shipment_completed',1)->whereNotNull('shipment_id')->where('status','<>',4)->groupBy(['date'])->pluck('quantity','date');//实际FBA上架(与FBA在途的区别在于状态为shipment_completed=1装运完成)
+
+		$adjustreceived_shipment_datas = ShipmentRequest::selectRaw('YEARWEEK(adjustreceived_date,3) as date,max(adjustreceived_date) as adjustreceived_date')->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('received_date','>=',$date_start)->where('received_date','<=',$date_end)->where('shipment_completed',0)->whereNotNull('shipment_id')->where('status','<>',4)->groupBy(['date'])->pluck('adjustreceived_date','date');//预计到达时间
+
+		$tmp_date_from = date('oW',strtotime($date_from));
+		$tmp_date_to = date('oW',strtotime($date_to));//例如202042
+		$oW=0;
+		$updatePer = Auth::user()->can(['sales-forecast-update']) ? 1 : 0;
+
+		while($tmp_date_from <= $tmp_date_to){
+			$oW++;
+			$plan_last = intval(array_get($asin_plans,$tmp_date_from.'.quantity_last',0));
+			$sold = intval(array_get($asin_historys,$tmp_date_from.'.sold',0));
+			$week_date = getWeekDate($tmp_date_from);//获取本周的周一跟周日的日期
+			$remark = array_get($asin_plans,$tmp_date_from.'.remark','');
+			if($type=='asin' && $updatePer){
+				$remark = '<a class="remark editable" title="'.$asin.' '.$tmp_date_from.' Remark" href="javascript:;" id="'.$tmp_date_from.'--remark" data-pk="'.$tmp_date_from.'--remark" data-type="text"> '.$remark.' </a>';
 			}
-			$cur_date=date('oW', time());
-		}elseif($show=='month'){
-			$asin_symmetrys = DB::connection('amazon')->table('symmetry_asins')->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('date','>=',$date_from)->where('date','<=',$date_to)->selectRaw("DATE_FORMAT(date,'%Y-%m') as wdate,sum(quantity) as quantity")->groupBy(['wdate'])->pluck('quantity','wdate');
-			$asin_historys = DailyStatistic::selectRaw("DATE_FORMAT(date,'%Y-%m') as wdate,sum(quantity_shipped) as sold,sum(if(date=concat(DATE_FORMAT(date,'%Y-%m'),'-01'),(afn_sellable+afn_reserved),0)) as stock")->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('date','>=',$date_from)->where('date','<=',$date_to)->groupBy(['wdate'])->get()->keyBy('wdate')->toArray();
-			
-			$asin_plans = AsinSalesPlan::selectRaw("DATE_FORMAT(date,'%Y-%m') as wdate,sum(quantity_last) as quantity_last,sum(quantity_first) as quantity_first,any_value(remark) as remark")->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('date','>=',$date_from)->where('date','<=',$date_to)->groupBy(['wdate'])->get()->keyBy('wdate')->toArray();
-			
-			$estimated_shipment_datas = ShipmentRequest::selectRaw("sum(quantity) as quantity,DATE_FORMAT(received_date,'%Y-%m') as date")->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('received_date','>=',$date_from)->where('received_date','<=',$date_to)->where('shipment_completed',0)->where('status','<>',4)->whereNotNull('shipment_id')->groupBy(['date'])->pluck('quantity','date');
-			
-			
-			$mrp_datas = ShipmentRequest::selectRaw("sum(quantity) as quantity,DATE_FORMAT(received_date,'%Y-%m') as date")->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('received_date','>=',$date_from)->where('received_date','<=',$date_to)->where('status','<>',4)->groupBy(['date'])->pluck('quantity','date');
-			
-			$actual_shipment_datas = ShipmentRequest::selectRaw("sum(quantity) as quantity,DATE_FORMAT(received_date,'%Y-%m') as date")->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('received_date','>=',$date_from)->where('received_date','<=',$date_to)->where('shipment_completed',1)->whereNotNull('shipment_id')->where('status','<>',4)->groupBy(['date'])->pluck('quantity','date');
-		
-			$estimated_purchase_datas = SapPurchase::selectRaw("sum(quantity) as quantity,DATE_FORMAT(estimated_delivery_date,'%Y-%m') as date")->where('sku',$sku)->where('estimated_delivery_date','>=',$date_from)->where('estimated_delivery_date','<=',$date_to)->whereNull('actual_delivery_date')->groupBy(['date'])->pluck('quantity','date');
-			
-			$actual_purchase_datas = SapPurchase::selectRaw("sum(quantity) as quantity,DATE_FORMAT(actual_delivery_date,'%Y-%m') as date")->where('sku',$sku)->where('actual_delivery_date','>=',$date_from)->where('actual_delivery_date','<=',$date_to)->whereNotNull('actual_delivery_date')->groupBy(['date'])->pluck('quantity','date');
-			
-			$tmp_date_from = date('Y-m',strtotime($date_from));
-			$tmp_date_to = date('Y-m',strtotime($date_to));
-			while($tmp_date_from<=$tmp_date_to){
-				$sales_plan[$tmp_date_from] = [
-					'symmetry'=>intval(array_get($asin_symmetrys,$tmp_date_from,0)),
-					'plan_first'=>intval(array_get($asin_plans,$tmp_date_from.'.quantity_first',0)),
-					'plan_last'=>intval(array_get($asin_plans,$tmp_date_from.'.quantity_last',0)),
-					'sold'=>intval(array_get($asin_historys,$tmp_date_from.'.sold',0)),
-					'stock'=>intval(array_get($asin_historys,$tmp_date_from.'.stock',0)),
-					'remark'=>array_get($asin_plans,$tmp_date_from.'.remark'),
-					'estimated_purchase'=>intval(array_get($estimated_purchase_datas,$tmp_date_from,0)),
-					'actual_purchase'=>intval(array_get($actual_purchase_datas,$tmp_date_from,0)),
-					'estimated_afn'=>intval(array_get($estimated_shipment_datas,$tmp_date_from,0)),
-					'actual_afn'=>intval(array_get($actual_shipment_datas,$tmp_date_from,0)),
-					'mrp'=>intval(array_get($mrp_datas,$tmp_date_from,0)),
-				];
-				$tmp_date_from = date('Y-m',strtotime($tmp_date_from.'-01 +1 month'));
-			}
-			$cur_date=date('Y-m');
-		}else{
-			$asin_symmetrys = DB::connection('amazon')->table('symmetry_asins')->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('date','>=',$date_from)->where('date','<=',$date_to)->pluck('quantity','date');
-			$asin_historys = DailyStatistic::selectRaw('date,sum(quantity_shipped) as sold,sum(afn_sellable+afn_reserved) as stock')->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('date','>=',$date_from)->where('date','<=',$date_to)->groupBy(['date'])->get()->keyBy('date')->toArray();
-			
-			$asin_plans = AsinSalesPlan::where($type,${$type})->where('marketplace_id',$marketplace_id)->where('date','>=',$date_from)->where('date','<=',$date_to)->get()->keyBy('date')->toArray();
-			
-			$estimated_shipment_datas = ShipmentRequest::selectRaw("sum(quantity) as quantity,received_date as date")->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('received_date','>=',$date_from)->where('received_date','<=',$date_to)->where('shipment_completed',0)->whereNotNull('shipment_id')->where('status','<>',4)->groupBy(['date'])->pluck('quantity','date');
-			
-			
-			$mrp_datas = ShipmentRequest::selectRaw("sum(quantity) as quantity,received_date as date")->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('received_date','>=',$date_from)->where('received_date','<=',$date_to)->where('status','<>',4)->groupBy(['date'])->pluck('quantity','date');
-			
-			$actual_shipment_datas = ShipmentRequest::selectRaw("sum(quantity) as quantity,received_date as date")->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('received_date','>=',$date_from)->where('received_date','<=',$date_to)->where('shipment_completed',1)->whereNotNull('shipment_id')->where('status','<>',4)->groupBy(['date'])->pluck('quantity','date');
-		
-			$estimated_purchase_datas = SapPurchase::selectRaw("sum(quantity) as quantity,estimated_delivery_date as date")->where('sku',$sku)->where('estimated_delivery_date','>=',$date_from)->where('estimated_delivery_date','<=',$date_to)->whereNull('actual_delivery_date')->groupBy(['date'])->pluck('quantity','date');
-			
-			$actual_purchase_datas = SapPurchase::selectRaw("sum(quantity) as quantity,actual_delivery_date as date")->where('sku',$sku)->where('actual_delivery_date','>=',$date_from)->where('actual_delivery_date','<=',$date_to)->whereNotNull('actual_delivery_date')->groupBy(['date'])->pluck('quantity','date');
-			
-			while($tmp_date_from<=$date_to){
-				$sales_plan[$tmp_date_from] = [
-					'symmetry'=>intval(array_get($asin_symmetrys,$tmp_date_from,0)),
-					'plan_first'=>intval(array_get($asin_plans,$tmp_date_from.'.quantity_first',0)),
-					'plan_last'=>intval(array_get($asin_plans,$tmp_date_from.'.quantity_last',0)),
-					'status'=>intval(array_get($asin_plans,$tmp_date_from.'.status',0)),
-					'sold'=>intval(array_get($asin_historys,$tmp_date_from.'.sold',0)),
-					'stock'=>intval(array_get($asin_historys,$tmp_date_from.'.stock',0)),
-					'remark'=>array_get($asin_plans,$tmp_date_from.'.remark'),
-					'estimated_purchase'=>intval(array_get($estimated_purchase_datas,$tmp_date_from,0)),
-					'actual_purchase'=>intval(array_get($actual_purchase_datas,$tmp_date_from,0)),
-					'estimated_afn'=>intval(array_get($estimated_shipment_datas,$tmp_date_from,0)),
-					'actual_afn'=>intval(array_get($actual_shipment_datas,$tmp_date_from,0)),
-					'mrp'=>intval(array_get($mrp_datas,$tmp_date_from,0)),
-				];
-				$tmp_date_from = date('Y-m-d',strtotime($tmp_date_from)+86400);
-			}
-			$cur_date=date('Y-m-d');
+
+			$sales_plan[$tmp_date_from] = [
+				'symmetry'=>intval(array_get($asin_symmetrys,$tmp_date_from,0)),
+				'plan_last'=>$plan_last,
+				'sold'=> $sold,
+				'stock'=>intval(array_get($asin_historys,$tmp_date_from.'.stock',0)),
+				'remark'=>$remark,
+				'actual_afn'=>intval(array_get($actual_shipment_datas,$tmp_date_from,0)),//实际FBA上架
+				'adjustreceived_date'=>array_get($adjustreceived_shipment_datas,$tmp_date_from,'-'),//预计到达时间
+				'finishing_rate'=>$plan_last>0 ? (round($sold*100/$plan_last,2).'%') : '-',
+				'week_date' => $week_date[0].'~'.$week_date[1],
+				'estimated_afn' => array_get($asin_plans,$tmp_date_from.'.estimated_afn',0),
+			];
+			$tmp_date_from = date('oW',strtotime($date_from.' +'.$oW.' week'));
 		}
-		return view('mrp/edit',['asin'=>$asin,'marketplace_id'=>$marketplace_id,'date_from'=>$date_from,'date_to'=>$date_to,'show'=>$show,'type'=>$type,'asins'=>$asins,'sku'=>$sku,'sku_info'=>$sku_info,'sales_plan'=>$sales_plan,'cur_date'=>$cur_date,'current_stock'=>$current_stock,'keyword'=>$keyword,'dist_status' =>array_keys(getDistRuleForRole())]);
+		$cur_date=date('oW', time());//此时的周数202042
+
+		return view('mrp/edit',['asin'=>$asin,'marketplace_id'=>$marketplace_id,'date_from'=>$date_from,'date_to'=>$date_to,'type'=>$type,'sku'=>$sku,'sales_plan'=>$sales_plan,'cur_date'=>$cur_date,'current_stock'=>$current_stock,'keyword'=>$keyword]);
     }
 
+    //在详情页中修改备注的时候
     public function update(Request $request)
     {
+		if(!Auth::user()->can(['sales-forecast-update'])) die('Permission denied -- sales-forecast-update');
 		$asin = $request->get('asin');
 		$marketplace_id = $request->get('marketplace_id');
 		$sku = $request->get('sku');
-		$date_to = $request->get('date_to');
-		$date_from = $request->get('date_from');
 		$key = explode('--',$request->get('name'));
 		$date = array_get($key,0);
 		$field = array_get($key,1);
 		$value = $request->get('value');
 		$data = AsinSalesPlan::updateOrCreate(
-						[
-							'asin' => $asin,
-							'marketplace_id' => $marketplace_id,
-							'date'=>$date
-						],
-						[
-							$field=>$value,
-							'sku'=>$sku,
-							'week_date'=>date('Y-m-d',strtotime("$date Sunday")) ,
-							'updated_at'=>date('Y-m-d H:i:s')
-							
-						]
-					);
-		if($field=='quantity_last'){
-			if($data->quantity_first == 0){
-				$data->quantity_first=$value;
-				$return[$date.'--quantity_first'] = $value;
-			}
-			$data->save();
-			
-			$return[$asin] = AsinSalesPlan::selectRaw("sum(quantity_last) as quantity_last")->where('asin',$asin)->where('marketplace_id',$marketplace_id)->where('date','>=',$date_from)->where('date','<=',$date_to)->value('quantity_last');
-			AsinSalesPlan::calPlans($asin,$marketplace_id,$sku,date('Y-m-d'),date('Y-m-d',strtotime("+22 Sunday")));
-		}
+			[
+				'asin' => $asin,
+				'marketplace_id' => $marketplace_id,
+				'week_date'=>getWeekDate($date)[1],
+			],
+			[
+				$field=>$value,
+				'sku'=>$sku,
+				'updated_at'=>date('Y-m-d H:i:s')
+			]
+		);
 		$return[$request->get('name')] = $value;
 		echo json_encode($return);
     }
 	
-	
+	//在22周销售预测功能的列表中更新预测数据时
 	public function weekupdate(Request $request)
     {
 		$key = explode('--',$request->get('name'));
@@ -423,36 +349,21 @@ class MrpController extends Controller
 		$sku = array_get($key,2);
 		$week_date = array_get($key,3);
 		$week_value = $request->get('value');
-		$max_value=0;
-		$week_per = $this->week_per;
-		for($ki=0;$ki<=6;$ki++){
-			$date = date("Y-m-d", strtotime($week_date)-86400*$ki);
-			
-			$value = round($week_value*array_get($week_per,$ki));			
-			if($max_value+$value>$week_value) $value = $week_value-$max_value;
-			if($max_value<=$week_value && $ki==6) $value = $week_value-$max_value;
-			$max_value+=$value;
-			$data = AsinSalesPlan::updateOrCreate(
-				[
-					'asin' => $asin,
-					'marketplace_id' => $marketplace_id,
-					'date'=>$date
-				],
-				[
-					'quantity_last'=>$value,
-					'sku'=>$sku,
-					'week_date'=>$week_date ,
-					'updated_at'=>date('Y-m-d H:i:s')
-					
-				]
-			);
-			if($data->quantity_first == 0){
-				$data->quantity_first=$value;
-			}
-			$data->save();
-		}
-									
-		
+		$data = AsinSalesPlan::updateOrCreate(
+			[
+				'asin' => $asin,
+				'marketplace_id' => $marketplace_id,
+				'week_date'=>$week_date ,
+			],
+			[
+				'quantity_last'=>$week_value,
+				'sku'=>$sku,
+				'updated_at'=>date('Y-m-d H:i:s')
+
+			]
+		);
+
+		$data->save();
 		$return[$request->get('name')] = $week_value;
 		echo json_encode($return);
     }
@@ -493,7 +404,7 @@ class MrpController extends Controller
         $headArray[] = '周加权销量';
 		$headArray[] = '总可售库存';
         $headArray[] = '销售计划合计';
-		for($i=1;$i<=22;$i++){
+		for($i=0;$i<=22;$i++){//本周的数据也要显示
         	$headArray[] = date('W',strtotime($date.' +'.$i.' weeks monday')-86400*7).'周 '.date('Y-m-d',strtotime($date.' +'.$i.' weeks monday')-86400*7);
         }
         $data[] = $headArray;
@@ -502,18 +413,18 @@ class MrpController extends Controller
 		$sellers = getUsers('sap_seller');
 		foreach ($datas as $key => $val) {
 			$key++;
-			$asin_plans = AsinSalesPlan::SelectRaw('sum(quantity_last) as quantity,week_date')->where('asin',$val['asin'])->where('marketplace_id',$val['marketplace_id'])->where('date','>=',$date_from)->where('date','<=',$date_to)->groupBy(['week_date'])->get()->keyBy('week_date')->toArray();
+			$asin_plans = AsinSalesPlan::SelectRaw('sum(quantity_last) as quantity,week_date')->where('asin',$val['asin'])->where('marketplace_id',$val['marketplace_id'])->where('week_date','>=',$date)->where('week_date','<=',$date_to)->groupBy(['week_date'])->get()->keyBy('week_date')->toArray();
 			$plan_total[$key] =0;
 			//$min_purchase_quantity = intval(SapPurchaseRecord::where('sku',$val['sku'])->where('sap_factory_code','<>','')->whereNotIn('supplier',['CN01','WH01','HK03'])->orderBy('created_date','desc')->value('min_purchase_quantity'));
 			$data[$key]['seller'] = array_get($sellers,$val['sap_seller_id']);
 			$data[$key]['asin'] = $val['asin'];
 			$data[$key]['site'] = array_get($siteCode,$val['marketplace_id']);
 			$data[$key]['sku'] = $val['sku'];
-			$data[$key]['min_purchase'] = $val['min_purchase_quantity'];
-			$data[$key]['week_daily_sales'] = round($val['daily_sales']*7);
-			$data[$key]['total_sellable'] = intval($val['afn_sellable']+$val['afn_reserved']+$val['mfn_sellable']+$val['sz_sellable']);
+			$data[$key]['min_purchase'] = $val['min_purchase_quantity'];//最小起订量
+			$data[$key]['week_daily_sales'] = round($val['daily_sales']*7);//加权周销量
+			$data[$key]['total_sellable'] = intval($val['afn_sellable']+$val['afn_reserved']+$val['mfn_sellable']+$val['sz_sellable']);//可售库存数量
 			$data[$key]['22_week_plan_total'] = &$plan_total[$key];
-			for($i=1;$i<=22;$i++){
+			for($i=0;$i<=22;$i++){//$i=0时为本周数据
 				$data[$key][$i.'_week_plan'] = array_get($asin_plans,date('Y-m-d',strtotime($date.' +'.$i.' weeks sunday')).'.quantity',0);
 				$plan_total[$key]+=intval($data[$key][$i.'_week_plan']);
             }
@@ -529,7 +440,7 @@ class MrpController extends Controller
                 //    we want to set these values (default is A1)
                 );
             header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');//告诉浏览器输出07Excel文件
-            header('Content-Disposition: attachment;filename="Export_Mrp.xlsx"');//告诉浏览器输出浏览器名称
+            header('Content-Disposition: attachment;filename="Export_Mrp_Sales.xlsx"');//告诉浏览器输出浏览器名称
             header('Cache-Control: max-age=0');//禁止缓存
             $writer = new Xlsx($spreadsheet);
             $writer->save('php://output');
@@ -636,31 +547,12 @@ class MrpController extends Controller
 		}else{
 			$orderby = " order by daily_sales desc";
 		}
-		if($cal_stock){
-			$add_where = [];
-			foreach(getMarketplaceCode() as $k=>$v){
-				foreach($v['fba_factory_warehouse'] as $k1=>$v1){
-					$add_where[] ="(sap_factory_code = '".$v1['sap_factory_code']."' and sap_warehouse_code = '".$v1['sap_warehouse_code']."')";
-				}
-			}
-			$add_join =" left join (select a1.asin,a1.marketplace_id,sum(quantity_last) as quantity,
-sum(estimated_afn) as sum_estimated_afn,sum(estimated_purchase) as sum_estimated_purchase,
-sum(IF(afn_sellable+afn_reserved+mfn_sellable-quantity_miss<0,1,0)) as out_stock_count,
-min(IF(afn_sellable+afn_reserved+mfn_sellable-quantity_miss<0,a1.date,NULL)) as out_stock_date,
-min(IF(afn_sellable+afn_reserved-quantity_miss<0,a1.date,NULL)) as afn_out_stock_date,
-sum(IF(afn_sellable+afn_reserved+mfn_sellable-quantity_miss>0 and a1.date>DATE_SUB(curdate(),INTERVAL -120 DAY),1,0)) as over_stock_count,
-min(IF(afn_sellable+afn_reserved+mfn_sellable-quantity_miss>0 and a1.date>DATE_SUB(curdate(),INTERVAL -120 DAY),a1.date,NULL)) as over_stock_date,
-max(IF(a1.date='".$date_to."',quantity_miss,0)) as sum_quantity_miss,
-sum(IF(afn_sellable+afn_reserved+mfn_sellable-quantity_miss-sku_safe_quantity<0,1,0)) as unsafe_count
-from asin_sales_plans as a1 left join asins as b1 on a1.asin=b1.asin and a1.marketplace_id=b1.marketplaceid
-left join (select sku,marketplace_id,any_value(safe_quantity) as sku_safe_quantity  from sap_sku_sites where (".implode(" or ",$add_where).") group by sku,marketplace_id) as e on a1.sku=e.sku and a1.marketplace_id =e.marketplace_id where a1.date>='".$date_from."' and a1.date<='".$date_to."' group by asin,marketplace_id) as c
-on a.asin=c.asin and a.marketplace_id=c.marketplace_id ";
-			$add_field = ",quantity,sum_estimated_afn,sum_estimated_purchase,out_stock_count,out_stock_date,over_stock_count,over_stock_date,sum_quantity_miss,unsafe_count,afn_out_stock_date ";
-		}else{
-			$add_join =" left join (select sku,any_value(min_purchase_quantity) as min_purchase_quantity,any_value(created_date) as created_date from sap_purchase_records where sap_factory_code<>'' and supplier not in ('CN01','WH01','HK03') group by sku order by created_date desc) as c on a.sku=c.sku";
-			$add_field = ",min_purchase_quantity ";
+		//列表页的sql
+		$add_join =" left join (select sku,any_value(min_purchase_quantity) as min_purchase_quantity,any_value(created_date) as created_date from sap_purchase_records where sap_factory_code<>'' and supplier not in ('CN01','WH01','HK03') group by sku order by created_date desc) as c on a.sku=c.sku";
+		$add_field = ",min_purchase_quantity ";
+		if($cal_stock){//详情页的sql
+			$add_join = $add_field = "";
 		}
-		
 		$sql = "
         SELECT SQL_CALC_FOUND_ROWS
         	a.*,(sales_4_weeks/28*0.5+sales_2_weeks/14*0.3+sales_1_weeks/7*0.2) as daily_sales,buybox_sellerid,
@@ -674,12 +566,6 @@ left join (select sku,sum(quantity) as sz_sellable from sap_sku_sites where left
 			{$orderby} ";
 		return $sql;
 	}
-	
-	
-	
-	
-
-
 
 	public function getReturnData($data) {
 
@@ -712,19 +598,17 @@ left join (select sku,sum(quantity) as sz_sellable from sap_sku_sites where left
 	}
 	
 	public function updateStatus(Request $request){
-		$status=intval($request->get('status'));
 		$asinlist=$request->get('asinlist');
 		$date=$request->get('date');
-		$date_from = date('Y-m-d',strtotime($date.' next monday'));
-		$date_to = date('Y-m-d',strtotime($date.' +22 weeks sunday'));
+		$date_from = date('Y-m-d',strtotime($date.' +1 weeks sunday'));//下周末
+		$date_to = date('Y-m-d',strtotime($date.' +22 weeks sunday'));//之后第22周的周末
 		$asin_array = explode(',',$asinlist);
 		foreach($asin_array as $val){
 			$asin_marketplaceid = explode('--',$val);
 			$add_where[] ="(asin = '".$asin_marketplaceid[0]."' and marketplace_id = '".$asin_marketplaceid[1]."')";
 		}
-		$result = AsinSalesPlan::where('date','>=',$date_from)->where('date','<=',$date_to)->whereRaw("(".implode(" or ",$add_where).")")->update(['status'=>$status]);
+		$result = AsinSalesPlan::where('week_date','>=',$date_from)->where('week_date','<=',$date_to)->whereRaw("(".implode(" or ",$add_where).")")->update(['status'=>1]);
 		echo json_encode(['Ack'=>$result]);
-	
 	}
 	
 	public function import( Request $request )
@@ -743,11 +627,11 @@ left join (select sku,sum(quantity) as sz_sellable from sap_sku_sites where left
 					$bool = $file->move(public_path().$newpath,$newname);
 					if($bool){
 						$time = date('Y-m-d H:i:s');
-						$xls_keys = ['I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','AB','AC','AD'];
+						$xls_keys = ['E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
 						$spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($inputFileName);
 						$importData = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
-						$week_per = $this->week_per;		
-						
+						$current_date = date('Y-m-d');//当前时间戳
+						$current_date = '2020-05-01';//测试时间
 						foreach($importData as $key => $data){
 							$updateData=[];
 							if($key>1 && array_get($data,'B') && array_get($data,'C')){
@@ -756,29 +640,19 @@ left join (select sku,sum(quantity) as sz_sellable from sap_sku_sites where left
 								$sku = DB::connection('amazon')->table('sap_asin_match_sku')->where('asin',$asin)->where('marketplace_id',$marketplace_id)->value('sku');//检测此站点此asin是否有sku
 								if(!$sku) continue;
 								foreach($xls_keys as $k=>$v){
-									
-									$week_date = date('Y-m-d',strtotime("+".($k+1)." weeks Sunday"));//下周天的日期
+									$week_date = date('Y-m-d',strtotime($current_date."+".($k+1)." weeks Sunday"));//第n周的周天的日期
 									$week_value = array_get($data,$v,0);//表格中此列的值,这周预测的值
-									$max_value=0;
-									for($ki=0;$ki<=6;$ki++){//处理这一周内每一天的数据,0表示周天，1表示周六，以此类推
-										$date = date("Y-m-d", strtotime($week_date)-86400*$ki);
-										
-										$value = round($week_value*array_get($week_per,$ki));	//等于表格中预测此周的值*配置值
-										if($max_value+$value>$week_value) $value = $week_value-$max_value;
-										if($max_value<=$week_value && $ki==6) $value = $week_value-$max_value;
-										$max_value+=$value;
-										$updateData[$date]['asin']=$asin;
-										$updateData[$date]['marketplace_id']=$marketplace_id;
-										$updateData[$date]['date']=$date;
-										$updateData[$date]['sku']=$sku;
-										$updateData[$date]['week_date']=$week_date;
-										$updateData[$date]['quantity_last']=$value;
-										$updateData[$date]['updated_at']=$time;
-										
-									}
+									$updateData[] = array(
+										'asin' => $asin,
+										'marketplace_id' => $marketplace_id,
+										'sku' => $sku,
+										'week_date' => $week_date,
+										'quantity_last' => $week_value,
+										'updated_at' => $time
+									);
 								}
 								if($updateData) AsinSalesPlan::insertOnDuplicateWithDeadlockCatching(array_values($updateData), ['week_date','quantity_last','sku','updated_at']);
-								AsinSalesPlan::calPlans($asin,$marketplace_id,$sku,date('Y-m-d'),date('Y-m-d',strtotime("+22 Sunday")));
+								AsinSalesPlan::calPlans($asin,$marketplace_id,$sku,date('Y-m-d',strtotime("+1 Sunday")),date('Y-m-d',strtotime("+22 Sunday")));
 							}
 						}
 						$request->session()->flash('success_message','Import Success!');

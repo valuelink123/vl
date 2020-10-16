@@ -378,6 +378,14 @@
                                                     </a>
                                                 </li>
 												@endpermission
+												@permission('plans-forecast-show')
+												<li class="">
+													<a href="/plansforecast/list" class="nav-link nav-toggle ">
+														Plans Forecast-22W
+														<span class="arrow"></span>
+													</a>
+												</li>
+												@endpermission
 												<li class="">
                                                     <a href="/mrp" class="nav-link nav-toggle ">
                                                         Inventory Monitor

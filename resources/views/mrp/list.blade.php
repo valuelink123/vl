@@ -170,28 +170,7 @@ input[type=checkbox], input[type=radio]{
             <div class="table-container" style="">
 				<div style="position: relative;">
 				<div class="btn-group" style="position: absolute;left: 150px; z-index: 999;top:30px">
-					@permission('sales-forecast-update')
-					@if($dist_status)
-					<button type="button" class="btn btn-sm green-meadow">批量操作</button>
-					<button type="button" class="btn btn-sm green-meadow dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-						<i class="fa fa-angle-down"></i>
-					</button>
-					<ul class="dropdown-menu" role="menu">
-					
-						<?php 
-						$color_arr=['0'=>'red-sunglo','1'=>'yellow-crusta','2'=>'purple-plum','3'=>'blue-hoki','4'=>'blue-madison','5'=>'green-meadow'];
-						foreach (getDistRuleForRole() as $k=>$v){
-						?>
-						<li>
-						
-						<button type="button" class="btn btn-sm {{array_get($color_arr,$k)}}" onclick="updateStatusAjax({{$k}})">{{$v}}</button>
-						
-						</li>
-						<li class="divider"> </li>
-						<?php } ?>
-					</ul>
-					@endif
-					@endpermission
+					<button type="button" class="btn btn-sm green-meadow" onclick="updateStatusAjax()">确认</button>
 				</div>
 				</div>
                 <table class="table table-striped table-bordered" id="thetable">
@@ -206,11 +185,10 @@ input[type=checkbox], input[type=radio]{
                         <th>加权周销量</th>
 						<th>可售库存</th>
 						<th>22周计划销量</th>
-						<?php
-						for($i=1;$i<=22;$i++){
-						?>
-                        <th class="week_end_date">{!!date('W',strtotime($date.' +'.$i.' weeks monday')-86400*7).'周<BR />'.date('Y-m-d',strtotime($date.' +'.$i.' weeks monday')-86400*7)!!}</th>
-                        <?php } ?>
+						<th>Status</th>
+						@foreach($weekDate as $key=>$val)
+                        <th class="week_end_date">{!! $val !!}</th>
+                        @endforeach
                     </tr>
                     </thead>
                     <tbody></tbody>
@@ -252,6 +230,8 @@ var initTable = function () {
 			{data: 'week_daily_sales', name: 'week_daily_sales'},
 			{data: 'total_sellable', name: 'total_sellable'},
 			{data: '22_week_plan_total', name: '22_week_plan_total'},
+            {data: 'status_name', name: 'status_name'},
+            {data:'0_week_plan',name:'0_week_plan'},
 			{data:'1_week_plan',name:'1_week_plan'},
 			{data:'2_week_plan',name:'2_week_plan'},
 			{data:'3_week_plan',name:'3_week_plan'},
@@ -328,13 +308,18 @@ jQuery(document).ready(function() {
 		
 $('#search').click(function () {
 	dtApi.settings()[0].ajax.data = {search: $("#search-form").serialize()};
-	dtApi.ajax.reload();
-	$(".week_end_date").each(function(index){
-		
-		var ndate = getNextMonday(index+1);
-		var yearweek = getYearWeek(ndate);
-		$(this).html(yearweek+'周<BR />'+ndate);
-	});	
+    dtApi.ajax.reload();
+    //获取周数和日期数据改用ajax获取,避免php数据和js数据不一致问题
+    $.ajax({
+        type: "POST",
+        url: "/get22WeekDate",
+        data: {date: $("#date").val()},
+        success: function (data){
+			$(".week_end_date").each(function(index){
+				$(this).html(data[index]);
+			})
+		}
+    });
 	return false;
 });
 
@@ -349,31 +334,7 @@ $('.date-picker').datepicker({
 	autoclose: true
 });
 });
-function getNextMonday(i) {
-	var now = new Date($("#date").val());
-	var day = now.getDay();
-	n = day == 0 ? 7*i-6 : (7*(i+1)-day-6);
-	now.setDate(now.getDate() + n);
-	var year = now.getFullYear();
-	var month = now.getMonth() + 1;
-	date = now.getDate();
-	var s = year + "-" + (month < 10 ? ('0' + month) : month) + "-" + (date < 10 ? ('0' + date) : date);
-	return s;
-}
-
-function getYearWeek(date){ 
-	date=new Date(date);
-    var date2=new Date(date.getFullYear(), 0, 1); 
-    var day1=date.getDay(); 
-    if(day1==0) day1=7; 
-    var day2=date2.getDay(); 
-    if(day2==0) day2=7; 
-    d = Math.round((date.getTime() - date2.getTime()+(day2-day1)*(24*60*60*1000)) / 86400000);   
-    return Math.ceil(d /7)+1;  
-} 
-
-
-function updateStatusAjax(status){
+function updateStatusAjax(){
 	let chk_value = '';
 	$(".DTFC_Cloned input[name='checkedInput']:checked").each(function (index,value) {
 		if(chk_value != ''){
@@ -383,18 +344,17 @@ function updateStatusAjax(status){
 		}
 	});
 	if(chk_value == ""){
-		alert('请先选择需要更新的数据!')
+		alert('请先选择需要确认的数据!')
 	}else{
 		$.ajax({
 			type: "POST",
 			url: "/mrp/updateStatus",
 			data: {
-				status: status,
 				asinlist: chk_value,
 				date: $("#date").val(),
 			},
 			success: function (res) {
-				toastr.success("更新状态成功！");
+				toastr.success("确认成功！");
 				dtApi.settings()[0].ajax.data = {search: $("#search-form").serialize()};
 				dtApi.ajax.reload();
 			},

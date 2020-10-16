@@ -250,4 +250,16 @@ class Controller extends BaseController
 		}
 		return true;
 	}
+	/*
+     * 得到22周日期
+     */
+	public function get22WeekDate($date='')
+	{
+		$date = isset($_POST['date']) && $_POST['date'] ? $_POST['date'] : $date;
+		$data = array();
+		for($i=0;$i<=22;$i++){
+			$data[] = date('W',strtotime($date.' +'.$i.' week last monday')).'周<BR/>'.date('Y-m-d',strtotime($date.' +'.$i.' week last monday'));
+		}
+		return $data;
+	}
 }

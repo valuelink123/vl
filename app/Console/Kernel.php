@@ -45,6 +45,7 @@ class Kernel extends ConsoleKernel
 		'App\Console\Commands\AddRsgProduct',
 		'App\Console\Commands\GetRequestReviewTasks',
 		'App\Console\Commands\SendEdmMailchimp',
+		'App\Console\Commands\AddSalesRemind',
     ];
 
     /**
@@ -116,7 +117,8 @@ class Kernel extends ConsoleKernel
 		$schedule->command('scan:skudaily')->dailyAt('08:00')->name('skudaily')->withoutOverlapping();
 		$schedule->command('add:rsgProduct')->dailyAt('07:00')->name('addProduct')->withoutOverlapping();
 
-		$schedule->command('send:mailchimp')->hourly()->name('sendMailchimp')->withoutOverlapping();
+		$schedule->command('send:mailchimp')->hourly()->name('sendMailchimp')->withoutOverlapping();//添加edmcampaign的时候，设置了发送时间，批处理发送edm邮件
+		$schedule->command('add:sales_remind')->dailyAt('07:00')->name('addSalesRemind')->withoutOverlapping();//22周销售计划中，还没有填写销售计划的时候，插件提醒销售去添加计划
     }
 
     /**

@@ -264,6 +264,7 @@ Route::post('/mrp/updateStatus', 'MrpController@updateStatus');
 Route::get('/mrp/asinexport', 'MrpController@asinExport');
 Route::post('/mrp/import', 'MrpController@import');
 Route::get('/mrp/download', 'MrpController@download');//下载上传的execl表格模板
+Route::post('/get22WeekDate', 'Controller@get22WeekDate');//得到22周日期
 
 //CPFR协同补货
 Route::get('/cpfr/index', 'CpfrController@index')->name('index');
@@ -349,3 +350,14 @@ Route::post('/edm/campaignList', 'EdmCampaignController@list');//campaign活动�
 Route::match(['post','get'],'/edm/campaign/add', 'EdmCampaignController@add');//添加campaign活动
 Route::match(['post','get'],'/edm/campaign/update', 'EdmCampaignController@update');//更新campaign活动
 Route::post('/edm/getContentByTmpAsin', 'EdmCampaignController@getContentByTmpAsin');//添加campaign活动时,通过模板和asin得到发送content的内容
+
+/*
+ * 计划员预测销售情况
+ */
+Route::match(['post','get'],'/plansforecast/list', 'PlansForecastController@list');
+Route::post('/plansforecast/import', 'PlansForecastController@import');
+Route::post('/plansforecast/updateStatus', 'PlansForecastController@updateStatus');
+Route::get('/plansforecast/export', 'PlansForecastController@export');
+Route::post('/plansforecast/weekupdate', 'PlansForecastController@weekupdate');
+Route::post('/plansforecast/updateStatus', 'PlansForecastController@updateStatus');
+Route::get('/plansforecast/edit', 'PlansForecastController@edit');
