@@ -88,7 +88,11 @@ class MrpController extends Controller
 		$orderby = $this->dtOrderBy($req);
 		$date_to = date('Y-m-d',strtotime('+'.$date.'days'));
 		$date_from = date('Y-m-d');
-		$sql = $this->getSql($where,$date_from,$date_to,$orderby);
+		//开始时间为date_from的周一日期，结束时间为date_to的周天日期(查询数据的开始时间和结束时间)
+		$date_start = date("Y-m-d", strtotime('monday this week', strtotime($date_from)));
+		$date_end = date("Y-m-d", strtotime('sunday this week', strtotime($date_to)));
+
+		$sql = $this->getSql($where,$date_start,$date_end,$orderby);
 		if($req['length'] != '-1'){
 			$limit = $this->dtLimit($req);
 			$sql .= " LIMIT {$limit} ";
@@ -256,7 +260,7 @@ class MrpController extends Controller
 		$date_start = date("Y-m-d", strtotime('monday this week', strtotime($date_from)));
 		$date_end = date("Y-m-d", strtotime('sunday this week', strtotime($date_to)));
 
-		$asins = DB::connection('amazon')->select($this->getSql(" and a.sku = '$sku' and a.marketplace_id='$marketplace_id'",$date_start,$date_end));
+		$asins = DB::connection('amazon')->select($this->getSql(" and a.sku = '$sku' and a.marketplace_id='$marketplace_id'",$date_start,$date_end,'',false));
 		//sum_estimated_afn为fba在途数据
 		$current_stock=0;//当前库存数量(FBA在库数量)
 		foreach($asins as $v){
@@ -551,7 +555,25 @@ class MrpController extends Controller
 		$add_join =" left join (select sku,any_value(min_purchase_quantity) as min_purchase_quantity,any_value(created_date) as created_date from sap_purchase_records where sap_factory_code<>'' and supplier not in ('CN01','WH01','HK03') group by sku order by created_date desc) as c on a.sku=c.sku";
 		$add_field = ",min_purchase_quantity ";
 		if($cal_stock){//详情页的sql
-			$add_join = $add_field = "";
+			$add_where = [];
+			foreach(getMarketplaceCode() as $k=>$v){
+				foreach($v['fba_factory_warehouse'] as $k1=>$v1){
+					$add_where[] ="(sap_factory_code = '".$v1['sap_factory_code']."' and sap_warehouse_code = '".$v1['sap_warehouse_code']."')";
+				}
+			}
+			$add_join =" left join (select a1.asin,a1.marketplace_id,sum(quantity_last) as quantity,
+sum(estimated_afn) as sum_estimated_afn,sum(estimated_purchase) as sum_estimated_purchase,
+sum(IF(afn_sellable+afn_reserved+mfn_sellable-quantity_miss<0,1,0)) as out_stock_count,
+min(IF(afn_sellable+afn_reserved+mfn_sellable-quantity_miss<0,a1.week_date,NULL)) as out_stock_date,
+min(IF(afn_sellable+afn_reserved-quantity_miss<0,a1.week_date,NULL)) as afn_out_stock_date,
+sum(IF(afn_sellable+afn_reserved+mfn_sellable-quantity_miss>0 and a1.week_date>DATE_SUB(curdate(),INTERVAL -120 DAY),1,0)) as over_stock_count,
+min(IF(afn_sellable+afn_reserved+mfn_sellable-quantity_miss>0 and a1.week_date>DATE_SUB(curdate(),INTERVAL -120 DAY),a1.week_date,NULL)) as over_stock_date,
+max(IF(a1.week_date='".$date_to."',quantity_miss,0)) as sum_quantity_miss,
+sum(IF(afn_sellable+afn_reserved+mfn_sellable-quantity_miss-sku_safe_quantity<0,1,0)) as unsafe_count
+from asin_sales_plans as a1 left join asins as b1 on a1.asin=b1.asin and a1.marketplace_id=b1.marketplaceid
+left join (select sku,marketplace_id,any_value(safe_quantity) as sku_safe_quantity  from sap_sku_sites where (".implode(" or ",$add_where).") group by sku,marketplace_id) as e on a1.sku=e.sku and a1.marketplace_id =e.marketplace_id where a1.week_date>='".$date_from."' and a1.week_date<='".$date_to."' group by asin,marketplace_id) as c
+on a.asin=c.asin and a.marketplace_id=c.marketplace_id ";
+			$add_field = ",quantity,sum_estimated_afn,sum_estimated_purchase,out_stock_count,out_stock_date,over_stock_count,over_stock_date,sum_quantity_miss,unsafe_count,afn_out_stock_date ";
 		}
 		$sql = "
         SELECT SQL_CALC_FOUND_ROWS
@@ -572,7 +594,7 @@ left join (select sku,sum(quantity) as sz_sellable from sap_sku_sites where left
 		$siteCode = array_flip(getSiteCode());
 		$sellers = getUsers('sap_seller');
 		foreach ($data as $key => $val) {
-			$data[$key]['asin'] = '<a href="/mrp/edit?asin='.$val['asin'].'&marketplace_id='.$val['marketplace_id'].'">'.$val['asin'].'</a>';
+			$data[$key]['asin'] = $val['asin'];
 			$data[$key]['site'] = array_get($siteCode,$val['marketplace_id']);
 			$data[$key]['sku'] = $val['sku'];
 			$data[$key]['status'] = $val['status'];
@@ -592,7 +614,7 @@ left join (select sku,sum(quantity) as sz_sellable from sap_sku_sites where left
 			$data[$key]['unsalable_date'] = $val['over_stock_date'];
 			$data[$key]['stock_score'] = intval($val['out_stock_count'])+intval($val['over_stock_count'])*3+intval($val['unsafe_count'])*4;
 			$data[$key]['expected_distribution'] = (intval($val['afn_sellable']+$val['afn_reserved']+$val['mfn_sellable']+$val['sum_estimated_afn']-$val['sum_quantity_miss'])<0?abs(intval($val['afn_sellable']+$val['afn_reserved']+$val['mfn_sellable']+$val['sum_estimated_afn']-$val['sum_quantity_miss'])):0);
-			$data[$key]['action'] = '<a class="badge badge-success" href="/mrp/edit?asin='.$val['asin'].'&marketplace_id='.$val['marketplace_id'].'"><i class="fa fa-hand-o-up"></i></a>';
+			$data[$key]['action'] = '-';
 		}
 		return $data;
 	}
