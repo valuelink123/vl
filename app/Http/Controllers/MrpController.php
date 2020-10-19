@@ -202,18 +202,6 @@ class MrpController extends Controller
 		
 		return compact('data', 'recordsTotal', 'recordsFiltered');
     }
-    /*
-     * 得到22周日期
-     */
-	public function get22WeekDate($date='')
-	{
-		$date = isset($_POST['date']) && $_POST['date'] ? $_POST['date'] : $date;
-		$data = array();
-		for($i=0;$i<=22;$i++){
-			$data[] = date('W',strtotime($date.' +'.$i.' week last monday')).'周<BR/>'.date('Y-m-d',strtotime($date.' +'.$i.' week last monday'));
-		}
-		return $data;
-	}
 
 	//展示预测数据的详细数据
     public function edit(Request $request)

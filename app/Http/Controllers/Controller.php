@@ -257,7 +257,10 @@ class Controller extends BaseController
 	{
 		$date = isset($_POST['date']) && $_POST['date'] ? $_POST['date'] : $date;
 		$data = array();
-		for($i=0;$i<=22;$i++){
+		$day = date('w',strtotime($date));
+		$monday = strtotime($date) - (($day == 0 ? 7 : $day) - 1) * 24 * 3600;//本周一的日期
+		$data[] = date('W',$monday).'周<BR/>'.date('Y-m-d', $monday);//加上本周数据
+		for($i=1;$i<=22;$i++){
 			$data[] = date('W',strtotime($date.' +'.$i.' week last monday')).'周<BR/>'.date('Y-m-d',strtotime($date.' +'.$i.' week last monday'));
 		}
 		return $data;
