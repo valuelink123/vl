@@ -178,7 +178,7 @@ class MrpController extends Controller
 			$date_0w = date('Y-m-d',strtotime($date.'+0 weeks sunday'));//选定日期的本周末的日期
 			$date_1wdate = date('Y-m-d',strtotime('+1 weeks sunday'));//当前时间的下周末的日期
 			$date_update = date('Y-m-d',strtotime('+4 weeks sunday'));//可修改数据的日期，从这之后的数据都可以修改(以当前时间为主)
-			$data[$key]['status_name'] = isset($asin_plans[$date_0w]) && $asin_plans[$date_0w]['status']==1 ? '已确认'  : '未确认';//本周数据的状态
+			$data[$key]['status_name'] = isset($asin_plans[$date_0w]) && $asin_plans[$date_0w]['status']==1 ? '已提交'  : '未提交';//本周数据的状态
 			for($i=0;$i<=22;$i++){//$i=0时为本周的数据，展示本周和未来22周的预测数据
 				$date_w = date('Y-m-d',strtotime($date.' +'.$i.' weeks sunday'));//第n周周天的日期
 				//处理显示的预测销售数量,销售填写的预测数据只有销售本人才可以更改

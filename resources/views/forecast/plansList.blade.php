@@ -133,7 +133,7 @@
 		<div class="table-container" style="">
 			<div style="position: relative;">
 				<div class="btn-group" style="position: absolute;left: 150px; z-index: 999;top:30px">
-					<button type="button" class="btn btn-sm green-meadow" onclick="updateStatusAjax()">确认</button>
+					<button type="button" class="btn btn-sm green-meadow" onclick="updateStatusAjax()">提交</button>
 				</div>
 			</div>
 			<table class="table table-striped table-bordered" id="thetable">
@@ -305,7 +305,7 @@
                 }
             });
             if(chk_value == ""){
-                alert('请先选择需要确认的数据!')
+                alert('请先选择需要提交的数据!')
             }else{
                 $.ajax({
                     type: "POST",
@@ -315,7 +315,7 @@
                         date: $("#date").val(),
                     },
                     success: function (res) {
-                        toastr.success("确认成功！");
+                        toastr.success("提交成功！");
                         dtApi.settings()[0].ajax.data = {search: $("#search-form").serialize()};
                         dtApi.ajax.reload();
                     },

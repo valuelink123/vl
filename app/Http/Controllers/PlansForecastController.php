@@ -98,7 +98,7 @@ class PlansForecastController extends Controller
 			$date_0w = date('Y-m-d',strtotime($date.'+0 weeks sunday'));//选定日期的本周末的日期
 			$date_1wdate = date('Y-m-d',strtotime('+1 weeks sunday'));//当前时间的下周末的日期
 			$date_update = date('Y-m-d',strtotime('+4 weeks sunday'));//可修改数据的日期，从这之后的数据都可以修改(以当前时间为主)
-			$data[$key]['status_name'] = isset($asin_plans[$date_0w]) && $asin_plans[$date_0w]['status']==1 ? '已确认'  : '未确认';//本周数据的状态
+			$data[$key]['status_name'] = isset($asin_plans[$date_0w]) && $asin_plans[$date_0w]['status']==1 ? '已提交'  : '未提交';//本周数据的状态
 			for($i=0;$i<=22;$i++){//$i=0时为本周的数据，展示本周和未来22周的预测数据
 				$date_w = date('Y-m-d',strtotime($date.' +'.$i.' weeks sunday'));//第n周周天的日期
 				//处理显示的预测销售数量,销售填写的预测数据只有销售本人才可以更改
@@ -369,7 +369,7 @@ sum(IF(afn_sellable+afn_reserved+mfn_sellable-quantity_miss>0 and a1.week_date>D
 min(IF(afn_sellable+afn_reserved+mfn_sellable-quantity_miss>0 and a1.week_date>DATE_SUB(curdate(),INTERVAL -120 DAY),a1.week_date,NULL)) as over_stock_date,
 max(IF(a1.week_date='".$date_to."',quantity_miss,0)) as sum_quantity_miss,
 sum(IF(afn_sellable+afn_reserved+mfn_sellable-quantity_miss-sku_safe_quantity<0,1,0)) as unsafe_count
-from asin_sales_plans as a1 left join asins as b1 on a1.asin=b1.asin and a1.marketplace_id=b1.marketplaceid
+from asin_plans_plans as a1 left join asins as b1 on a1.asin=b1.asin and a1.marketplace_id=b1.marketplaceid
 left join (select sku,marketplace_id,any_value(safe_quantity) as sku_safe_quantity  from sap_sku_sites where (".implode(" or ",$add_where).") group by sku,marketplace_id) as e on a1.sku=e.sku and a1.marketplace_id =e.marketplace_id where a1.week_date>='".$date_from."' and a1.week_date<='".$date_to."' group by asin,marketplace_id) as c
 on a.asin=c.asin and a.marketplace_id=c.marketplace_id ";
 			$add_field = ",quantity,sum_estimated_afn,sum_estimated_purchase,out_stock_count,out_stock_date,over_stock_count,over_stock_date,sum_quantity_miss,unsafe_count,afn_out_stock_date ";
