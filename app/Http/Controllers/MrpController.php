@@ -653,7 +653,7 @@ left join (select sku,sum(quantity) as sz_sellable from sap_sku_sites where left
 						$spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($inputFileName);
 						$importData = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
 						$current_date = date('Y-m-d');//当前时间戳
-						$current_date = '2020-05-01';//测试时间
+						// $current_date = '2020-05-01';//测试时间
 						foreach($importData as $key => $data){
 							$updateData=[];
 							if($key>1 && array_get($data,'B') && array_get($data,'C')){
