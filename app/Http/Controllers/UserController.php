@@ -187,13 +187,14 @@ class UserController extends Controller
 
     public function total(Request $request)
     {
-       if(!Auth::user()->can(['data-statistics'])) die('Permission denied -- data-statistics');
+       
 		
 		$date_from = array_get($_REQUEST,'date_from')?array_get($_REQUEST,'date_from'):date('Y-m-d',strtotime('-7day'));
         $date_to = array_get($_REQUEST,'date_to')?array_get($_REQUEST,'date_to'):date('Y-m-d');
 		$arrayData= array();
 		if (array_get($_REQUEST,'ExportType')) {
             if(array_get($_REQUEST,'ExportType')=='Users'){
+				if(!Auth::user()->can(['data-statistics-users'])) die('Permission denied -- data-statistics-users');
 				$users=$this->getUsers();
 				$user_received_total=array();
 				$user_key=array();
@@ -271,6 +272,7 @@ class UserController extends Controller
 			
 			
 			if(array_get($_REQUEST,'ExportType')=='Accounts'){
+				if(!Auth::user()->can(['data-statistics-accounts'])) die('Permission denied -- data-statistics-accounts');
 			    $accounts=$this->getAccounts();
 				$account_received_total=array();
 				$account_key=array();
@@ -348,6 +350,7 @@ class UserController extends Controller
 			
 			
 			if(array_get($_REQUEST,'ExportType')=='Performance'){
+				if(!Auth::user()->can(['data-statistics-preformance'])) die('Permission denied -- data-statistics-preformance');
 				$problemList = DB::select("select a.*,b.out_count,b.out_date,c.purchasedate,d.brand_line,d.item_no from (select count(*) as in_count,from_address,to_address,min(date) as in_date,max(amazon_order_id) as  amazon_order_id
 ,max(sku) as  sku
 ,max(asin) as  asin
@@ -397,6 +400,7 @@ left join asin as d on a.sku=d.sellersku and a.asin=d.asin and CONCAT('www.',c.S
 			}
 			
 			if(array_get($_REQUEST,'ExportType')=='Reply'){
+				if(!Auth::user()->can(['data-statistics-reply'])) die('Permission denied -- data-statistics-reply');
 				$problemList = DB::select("select b.from_address,b.to_address,b.amazon_order_id,b.sku,b.asin,b.date as f_date,a.date as s_date,a.user_id,c.purchasedate,d.brand_line,d.item_no
  from (select min(date) as date ,user_id,inbox_id from sendbox where inbox_id in (select inbox_id from sendbox where inbox_id<>0 and status='Send' and date>=:date_from and date<=:date_to group by inbox_id) group by user_id,inbox_id) as a 
 left join inbox as b on a.inbox_id = b.id
@@ -441,6 +445,7 @@ where a.date>=:sdate_from and a.date<=:sdate_to
 			
 			
 			if(array_get($_REQUEST,'ExportType')=='Review'){
+				if(!Auth::user()->can(['data-statistics-review'])) die('Permission denied -- data-statistics-review');
 				$getList = DB::select("select count(*) as getcount ,review_user_id as user_id from review a left join asin b on a.site=b.site and a.sellersku=b.sellersku and a.asin=b.asin where date>=:date_from and date<=:date_to group by review_user_id",['date_from' => $date_from,'date_to' => $date_to]);
 				$finishList = DB::select("select count(*) as finishcount ,a.status,review_user_id as user_id from review a left join asin b on a.site=b.site and a.sellersku=b.sellersku and a.asin=b.asin where edate>=:date_from and edate<=:date_to and a.status in (3,4,5) group by status,review_user_id",['date_from' => $date_from,'date_to' => $date_to]);
 				$headArray[] = 'User';
@@ -477,6 +482,7 @@ where a.date>=:sdate_from and a.date<=:sdate_to
 			
 			
 			if(array_get($_REQUEST,'ExportType')=='Removal'){
+				if(!Auth::user()->can(['data-statistics-removal'])) die('Permission denied -- data-statistics-removal');
 				$seller=[];
 				$accounts= DB::connection('order')->table('accounts')->where('status',1)->groupBy(['sellername','sellerid'])->get(['sellername','sellerid']);
 				$accounts=json_decode(json_encode($accounts), true);
@@ -514,6 +520,7 @@ where a.date>=:sdate_from and a.date<=:sdate_to
 			
 			
 			if(array_get($_REQUEST,'ExportType')=='Return'){
+				if(!Auth::user()->can(['data-statistics-return'])) die('Permission denied -- data-statistics-return');
 				$seller=[];
 				$accounts= DB::connection('order')->table('accounts')->where('status',1)->groupBy(['sellername','sellerid'])->get(['sellername','sellerid']);
 				$accounts=json_decode(json_encode($accounts), true);
@@ -549,6 +556,7 @@ where a.date>=:sdate_from and a.date<=:sdate_to
 			
 			
 			if(array_get($_REQUEST,'ExportType')=='Reimbursements'){
+				if(!Auth::user()->can(['data-statistics-reimbursements'])) die('Permission denied -- data-statistics-reimbursements');
 				$seller=[];
 				$accounts= DB::connection('order')->table('accounts')->where('status',1)->groupBy(['sellername','sellerid'])->get(['sellername','sellerid']);
 				$accounts=json_decode(json_encode($accounts), true);
@@ -590,6 +598,7 @@ where a.date>=:sdate_from and a.date<=:sdate_to
 			
 			
 			if(array_get($_REQUEST,'ExportType')=='EstimatedSales'){
+				if(!Auth::user()->can(['data-statistics-estimatedSales'])) die('Permission denied -- data-statistics-estimatedSales');
 				$seller=[];
 				$datas= DB::connection('amazon')->table('symmetry_asins')->where('date','>=',$date_from)->where('date','<=',$date_to)->get();
 				$arrayData[] = ['Asin','Site','Sku','Sku Group','Date','Estimated Quantity','Estimated Date'];
@@ -610,6 +619,7 @@ where a.date>=:sdate_from and a.date<=:sdate_to
 			
 			
 			if(array_get($_REQUEST,'ExportType')=='Fees'){
+				if(!Auth::user()->can(['data-statistics-fees'])) die('Permission denied -- data-statistics-fees');
 				$seller=[];
 				$accounts= DB::connection('order')->table('accounts')->where('status',1)->groupBy(['sellername','sellerid'])->get(['sellername','sellerid']);
 				$accounts=json_decode(json_encode($accounts), true);

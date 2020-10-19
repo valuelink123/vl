@@ -699,7 +699,7 @@
                                                 <span class="arrow"></span>
                                             </a>
                                             <ul class="dropdown-menu pull-left">
-												@permission('data-statistics')
+												@permission('data-statistics-show')
                                                 <li class="">
                                                     <a href="/total" class="nav-link nav-toggle ">
                                                         Data Statistics

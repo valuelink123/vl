@@ -35,17 +35,36 @@
                         <div class="col-md-8">
                         <div class="form-actions">
                             <div class="row">
-                                
+                                    @permission('data-statistics-users')
                                     <button type="submit" class="btn blue" name ="ExportType" value ="Users">Export Users Report</button>
+                                    @endpermission
+                                    @permission('data-statistics-accounts')
 									<button type="submit" class="btn blue" name ="ExportType" value ="Accounts">Export Accounts Report</button>
+                                    @endpermission
+                                    @permission('data-statistics-performance')
 									<button type="submit" class="btn blue" name ="ExportType" value ="Performance">Export Performance Report</button>
+                                    @endpermission
+                                    @permission('data-statistics-reply')
 									<button type="submit" class="btn blue" name ="ExportType" value ="Reply">Export Reply Report</button>
-									<button type="submit" class="btn blue" name ="ExportType" value ="Review">Export Review Report</button> 
+                                    @endpermission
+                                    @permission('data-statistics-review')
+									<button type="submit" class="btn blue" name ="ExportType" value ="Review">Export Review Report</button>
+                                    @endpermission
+                                    @permission('data-statistics-fees')
 									<button type="submit" class="btn blue" name ="ExportType" value ="Fees">Export Fees Report</button>
+                                    @endpermission
+                                    @permission('data-statistics-removal')
 									<button type="submit" class="btn blue" name ="ExportType" value ="Removal">Export Removal Report</button>
+                                    @endpermission
+                                    @permission('data-statistics-return')
 									<button type="submit" class="btn blue" name ="ExportType" value ="Return">Export Return Report</button>
+                                    @endpermission
+                                    @permission('data-statistics-reimbursements')
 									<button type="submit" class="btn blue" name ="ExportType" value ="Reimbursements">Export Reimbursements Report</button>
+                                    @endpermission
+                                    @permission('data-statistics-estimatedSales')
                                 	<button type="submit" class="btn blue" name ="ExportType" value ="EstimatedSales">Export Estimated Sales Report</button>
+                                    @endpermission
                             </div>
                         </div>
                         </div>
