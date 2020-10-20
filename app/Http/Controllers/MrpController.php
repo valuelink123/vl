@@ -20,6 +20,7 @@ use App\Services\MultipleQueue;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use DB;
+use App\Models\AsinData;
 class MrpController extends Controller
 {
 
@@ -98,6 +99,16 @@ class MrpController extends Controller
 			$sql .= " LIMIT {$limit} ";
 		}
 		$data = DB::connection('amazon')->select($sql);
+
+		$asin_plans = AsinSalesPlan::selectRaw("sum(quantity_last) as quantity_last,CONCAT(marketplace_id,'_',asin) as marketplace_asin")->where('week_date','>=',$date_start)->where('week_date','<=',$date_end)->groupBy(['marketplace_asin'])->get()->keyBy('marketplace_asin')->toArray();//销售填的预测数据
+
+		foreach($data as $key=>$val){
+			$data[$key]->quantity = '0';
+			if(isset($asin_plans[$val->marketplace_id.'_'.$val->asin])){
+				$data[$key]->quantity = $asin_plans[$val->marketplace_id.'_'.$val->asin]['quantity_last'];
+			}
+		}
+
 		$data = $this->getReturnData(json_decode(json_encode($data),true));
 		$recordsTotal = $recordsFiltered = (DB::connection('amazon')->select('SELECT FOUND_ROWS() as count'))[0]->count;
 		return compact('data', 'recordsTotal', 'recordsFiltered');
@@ -265,7 +276,9 @@ class MrpController extends Controller
 
 		$asin_historys = DailyStatistic::selectRaw("YEARWEEK(date,3) as wdate,sum(quantity_shipped) as sold,sum(if(date_format(date,'%w')=1,(afn_sellable+afn_reserved),0)) as stock")->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('date','>=',$date_start)->where('date','<=',$date_end)->groupBy(['wdate'])->get()->keyBy('wdate')->toArray();//该asin实际销量和库存
 
-		$asin_plans = AsinSalesPlan::selectRaw("YEARWEEK(week_date,3) as wdate,sum(quantity_last) as quantity_last,sum(estimated_afn) as estimated_afn,any_value(remark) as remark")->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('week_date','>=',$date_start)->where('week_date','<=',$date_end)->groupBy(['wdate'])->get()->keyBy('wdate')->toArray();//销售填的预测数据
+		$asin_plans = AsinSalesPlan::selectRaw("YEARWEEK(week_date,3) as wdate,sum(quantity_last) as quantity_last,any_value(remark) as remark")->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('week_date','>=',$date_start)->where('week_date','<=',$date_end)->groupBy(['wdate'])->get()->keyBy('wdate')->toArray();//销售填的预测数据
+
+		$estimated_shipment_datas = ShipmentRequest::selectRaw('sum(quantity) as quantity,YEARWEEK(received_date,3) as date')->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('received_date','>=',$date_from)->where('received_date','<=',$date_to)->where('shipment_completed',0)->whereNotNull('shipment_id')->where('status','<>',4)->groupBy(['date'])->pluck('quantity','date');//FBA在途数据
 
 		$actual_shipment_datas = ShipmentRequest::selectRaw('sum(quantity) as quantity,YEARWEEK(received_date,3) as date')->where($type,${$type})->where('marketplace_id',$marketplace_id)->where('received_date','>=',$date_start)->where('received_date','<=',$date_end)->where('shipment_completed',1)->whereNotNull('shipment_id')->where('status','<>',4)->groupBy(['date'])->pluck('quantity','date');//实际FBA上架(与FBA在途的区别在于状态为shipment_completed=1装运完成)
 
@@ -296,7 +309,7 @@ class MrpController extends Controller
 				'adjustreceived_date'=>array_get($adjustreceived_shipment_datas,$tmp_date_from,'-'),//预计到达时间
 				'finishing_rate'=>$plan_last>0 ? (round($sold*100/$plan_last,2).'%') : '-',
 				'week_date' => $week_date[0].'~'.$week_date[1],
-				'estimated_afn' => array_get($asin_plans,$tmp_date_from.'.estimated_afn',0),
+				'estimated_afn'=>intval(array_get($estimated_shipment_datas,$tmp_date_from,0)),
 			];
 			$tmp_date_from = date('oW',strtotime($date_from.' +'.$oW.' week'));
 		}
@@ -542,14 +555,14 @@ class MrpController extends Controller
 		//列表页的sql
 		$add_join =" left join (select sku,any_value(min_purchase_quantity) as min_purchase_quantity,any_value(created_date) as created_date from sap_purchase_records where sap_factory_code<>'' and supplier not in ('CN01','WH01','HK03') group by sku order by created_date desc) as c on a.sku=c.sku";
 		$add_field = ",min_purchase_quantity ";
-		if($cal_stock){//详情页的sql
+		if($cal_stock){//mrp/index详情页的sql,不是销售计划模块，所以用quantity_miss此字段，表示确认后的字段
 			$add_where = [];
 			foreach(getMarketplaceCode() as $k=>$v){
 				foreach($v['fba_factory_warehouse'] as $k1=>$v1){
 					$add_where[] ="(sap_factory_code = '".$v1['sap_factory_code']."' and sap_warehouse_code = '".$v1['sap_warehouse_code']."')";
 				}
 			}
-			$add_join =" left join (select a1.asin,a1.marketplace_id,sum(quantity_last) as quantity,
+			$add_join =" left join (select a1.asin,a1.marketplace_id,
 sum(estimated_afn) as sum_estimated_afn,sum(estimated_purchase) as sum_estimated_purchase,
 sum(IF(afn_sellable+afn_reserved+mfn_sellable-quantity_miss<0,1,0)) as out_stock_count,
 min(IF(afn_sellable+afn_reserved+mfn_sellable-quantity_miss<0,a1.week_date,NULL)) as out_stock_date,
@@ -558,10 +571,10 @@ sum(IF(afn_sellable+afn_reserved+mfn_sellable-quantity_miss>0 and a1.week_date>D
 min(IF(afn_sellable+afn_reserved+mfn_sellable-quantity_miss>0 and a1.week_date>DATE_SUB(curdate(),INTERVAL -120 DAY),a1.week_date,NULL)) as over_stock_date,
 max(IF(a1.week_date='".$date_to."',quantity_miss,0)) as sum_quantity_miss,
 sum(IF(afn_sellable+afn_reserved+mfn_sellable-quantity_miss-sku_safe_quantity<0,1,0)) as unsafe_count
-from asin_sales_plans as a1 left join asins as b1 on a1.asin=b1.asin and a1.marketplace_id=b1.marketplaceid
+from asin_data as a1 left join asins as b1 on a1.asin=b1.asin and a1.marketplace_id=b1.marketplaceid
 left join (select sku,marketplace_id,any_value(safe_quantity) as sku_safe_quantity  from sap_sku_sites where (".implode(" or ",$add_where).") group by sku,marketplace_id) as e on a1.sku=e.sku and a1.marketplace_id =e.marketplace_id where a1.week_date>='".$date_from."' and a1.week_date<='".$date_to."' group by asin,marketplace_id) as c
 on a.asin=c.asin and a.marketplace_id=c.marketplace_id ";
-			$add_field = ",quantity,sum_estimated_afn,sum_estimated_purchase,out_stock_count,out_stock_date,over_stock_count,over_stock_date,sum_quantity_miss,unsafe_count,afn_out_stock_date ";
+			$add_field = ",sum_estimated_afn,sum_estimated_purchase,out_stock_count,out_stock_date,over_stock_count,over_stock_date,sum_quantity_miss,unsafe_count,afn_out_stock_date ";
 		}
 		$sql = "
         SELECT SQL_CALC_FOUND_ROWS
@@ -662,7 +675,7 @@ left join (select sku,sum(quantity) as sz_sellable from sap_sku_sites where left
 									);
 								}
 								if($updateData) AsinSalesPlan::insertOnDuplicateWithDeadlockCatching(array_values($updateData), ['week_date','quantity_last','sku','updated_at']);
-								AsinSalesPlan::calPlans($asin,$marketplace_id,$sku,date('Y-m-d',strtotime("+1 Sunday")),date('Y-m-d',strtotime("+22 Sunday")));
+								AsinData::calPlans(1,$asin,$marketplace_id,$sku,date('Y-m-d',strtotime("+1 Sunday")),date('Y-m-d',strtotime("+22 Sunday")));
 							}
 						}
 						$request->session()->flash('success_message','Import Success!');
