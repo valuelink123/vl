@@ -284,7 +284,7 @@ class PlansForecastController extends Controller
 		die();
 	}
 
-	//确认数据
+	//确认数据,确认数据的时候不更改查询日期的周末的状态，只更新查询日期的未来22周的状态
 	public function updateStatus(Request $request){
 		$asinlist=$request->get('asinlist');
 		$date=$request->get('date');

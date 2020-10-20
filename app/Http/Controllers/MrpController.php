@@ -474,8 +474,20 @@ class MrpController extends Controller
 		}
 		$date_to = date('Y-m-d',strtotime('+'.$date.'days'));
 		$date_from = date('Y-m-d');
-		$sql = $this->getSql($where,$date_from,$date_to);
+		//开始时间为date_from的周一日期，结束时间为date_to的周天日期(查询数据的开始时间和结束时间)
+		$date_start = date("Y-m-d", strtotime('monday this week', strtotime($date_from)));
+		$date_end = date("Y-m-d", strtotime('sunday this week', strtotime($date_to)));
+
+		$sql = $this->getSql($where,$date_start,$date_end);
 		$datas = DB::connection('amazon')->select($sql);
+		$asin_plans = AsinSalesPlan::selectRaw("sum(quantity_last) as quantity_last,CONCAT(marketplace_id,'_',asin) as marketplace_asin")->where('week_date','>=',$date_start)->where('week_date','<=',$date_end)->groupBy(['marketplace_asin'])->get()->keyBy('marketplace_asin')->toArray();//销售填的预测数据
+
+		foreach($datas as $key=>$val){
+			$datas[$key]->quantity = '0';
+			if(isset($asin_plans[$val->marketplace_id.'_'.$val->asin])){
+				$datas[$key]->quantity = $asin_plans[$val->marketplace_id.'_'.$val->asin]['quantity_last'];
+			}
+		}
 		$datas = json_decode(json_encode($datas),true);
 		$data = [];
         $headArray[] = 'Asin';
