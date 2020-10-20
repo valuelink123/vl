@@ -50,9 +50,7 @@ class PlansForecastController extends Controller
 		$searchField = array('site'=>'a.marketplace_id','sku'=>'a.sku','sku_level'=>'a.status','sku_level'=>'a.status','sap_seller_id'=>'a.sap_seller_id');
 
 		$where = $this->getSearchWhereSql($search,$searchField);
-
-		$type = array_get($search,'type');
-		if($type!='sku') $type='asin';
+		$type='sku';//之前$type有asin和sku维度，现销售只要asin维度,计划只要sku维度
 
 		if(array_get($search,'keyword')){
 			$where .=" and (a.asin='".array_get($search,'keyword')."' or a.sku='".array_get($search,'keyword')."')";
@@ -106,11 +104,11 @@ class PlansForecastController extends Controller
 				$quantity = array_get($asin_plans,$date_w.'.quantity',0);
 				$data[$key][$i.'_week_plan'] = $quantity;
 				$ok = isset($asin_plans[$date_w]) && $asin_plans[$date_w]['status']==1 ? 1 : 0;//确认状态，0表示未确认，1表示已确认
-				if($updateRole==1 && $type!='sku' && ($ok==0 && $date_w >= $date_1wdate) || ($ok==1 && $date_w>$date_update)){
-					//此处为可编辑的显示内容
-					//未确认状态可以更新预测数据，如果已确认状态可以更新4周后的预测数据
-					$data[$key][$i.'_week_plan'] = '<a class="week_plan editable" title="'.$val['asin'].' '.array_get($siteCode,$val['marketplace_id']).' weeks '.$i.' Plan" href="javascript:;" id="'.$val['asin'].'--'.$val['marketplace_id'].'--'.$val['sku'].'--'.$date_w.'" data-pk="'.$val['asin'].'--'.$val['marketplace_id'].'--'.$val['sku'].'--'.$date_w.'" data-type="text" data-placement="'.$data_placement.'">'.$quantity.'</a>';
-				}
+				// if($updateRole==1 && $type!='sku' && ($ok==0 && $date_w >= $date_1wdate) || ($ok==1 && $date_w>$date_update)){
+				// 	//此处为可编辑的显示内容
+				// 	//未确认状态可以更新预测数据，如果已确认状态可以更新4周后的预测数据
+				// 	$data[$key][$i.'_week_plan'] = '<a class="week_plan editable" title="'.$val['asin'].' '.array_get($siteCode,$val['marketplace_id']).' weeks '.$i.' Plan" href="javascript:;" id="'.$val['asin'].'--'.$val['marketplace_id'].'--'.$val['sku'].'--'.$date_w.'" data-pk="'.$val['asin'].'--'.$val['marketplace_id'].'--'.$val['sku'].'--'.$date_w.'" data-type="text" data-placement="'.$data_placement.'">'.$quantity.'</a>';
+				// }
 				if($ok==0){//未确认的数据，加个背景色特殊显示
 					$data[$key][$i.'_week_plan'] = '<div class="bg-danger">'.$data[$key][$i.'_week_plan'].'</div>';
 				}

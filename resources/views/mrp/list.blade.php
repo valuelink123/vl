@@ -76,13 +76,13 @@ input[type=checkbox], input[type=radio]{
                             </select>
                         </div>
                         <br>
-						<div class="input-group">
-							<span class="input-group-addon">显示维度</span>
-							<select class="form-control"  id="type" name="type">
-								<option value="">Asin维度</option>
-								<option value="sku">Sku维度</option>
-							</select>
-						</div>
+{{--						<div class="input-group">--}}
+{{--							<span class="input-group-addon">显示维度</span>--}}
+{{--							<select class="form-control"  id="type" name="type">--}}
+{{--								<option value="">Asin维度</option>--}}
+{{--								<option value="sku">Sku维度</option>--}}
+{{--							</select>--}}
+{{--						</div>--}}
                        
                     </div>
 

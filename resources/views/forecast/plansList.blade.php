@@ -49,10 +49,12 @@
 						</div>
 						<div class="col-md-2">
 							<div class="input-group">
-								<span class="input-group-addon">显示维度</span>
-								<select class="form-control"  id="type" name="type">
-									<option value="">Asin维度</option>
-									<option value="sku">Sku维度</option>
+								<span class="input-group-addon">Sku等级</span>
+								<select class="form-control"  id="sku_level" name="sku_level">
+									<option value="">Select</option>
+									@foreach(getSkuLevel() as $key=>$val)
+										<option value="{!! $val !!}">{!! $val !!}</option>
+									@endforeach
 								</select>
 							</div>
 							<br>
@@ -73,15 +75,6 @@
 								</select>
 							</div>
 							<br>
-							<div class="input-group">
-								<span class="input-group-addon">Sku等级</span>
-								<select class="form-control"  id="sku_level" name="sku_level">
-									<option value="">Select</option>
-									@foreach(getSkuLevel() as $key=>$val)
-										<option value="{!! $val !!}">{!! $val !!}</option>
-									@endforeach
-								</select>
-							</div>
 
 						</div>
 						<div class="col-md-2">

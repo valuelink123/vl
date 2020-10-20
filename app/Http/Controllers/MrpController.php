@@ -131,9 +131,7 @@ class MrpController extends Controller
 		$searchField = array('bg'=>'a.bg','bu'=>'a.bu','site'=>'a.marketplace_id','sku'=>'a.sku','sku_level'=>'a.status','sku_level'=>'a.status','sap_seller_id'=>'a.sap_seller_id');
 		
 		$where = $this->getSearchWhereSql($search,$searchField);
-
-		$type = array_get($search,'type');
-		if($type!='sku') $type='asin';
+		$type='asin';//之前$type有asin和sku维度，现销售只要asin维度,计划只要sku维度
 		
 		if(array_get($search,'keyword')){
 			$where .=" and (a.asin='".array_get($search,'keyword')."' or a.sku='".array_get($search,'keyword')."')";
