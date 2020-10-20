@@ -130,7 +130,7 @@ white-space: nowrap;
 					 </thead>
 					  <tbody>
 					  <?php
-					  $t_daily_sales = $t_afn_stock = $t_estimated_afn = $t_mfn_stock = $t_sz_stock = $t_estimated_purchase = $t_out_stock_count = $t_out_stock_date = $t_over_stock_count = $t_over_stock_date = $t_score = $t_dist=  0;
+					  $t_daily_sales = $t_afn_stock = $t_estimated_afn = $t_mfn_stock = $t_sz_stock = $t_estimated_purchase = $t_out_stock_count = $t_out_stock_date = $t_over_stock_count = $t_over_stock_date = $t_score = $t_dist = $t_quantity = 0;
 					  $t_afn_stock = 0;
 					  ?>
 					  @foreach ($asins as $v)
@@ -161,6 +161,7 @@ white-space: nowrap;
 						$t_estimated_afn+=intval($v->sum_estimated_afn);
 						$t_mfn_stock=intval($v->mfn_sellable);
 						$t_sz_stock=intval($v->sz_sellable);
+					  	$t_quantity+=intval($v->quantity);
 						$t_estimated_purchase+=intval($v->sum_estimated_purchase);
 						$t_out_stock_count+=intval($v->out_stock_count);
 						$t_out_stock_date=($t_out_stock_date==0 || $t_out_stock_date>$v->out_stock_date)?$v->out_stock_date:$t_out_stock_date;
@@ -174,7 +175,7 @@ white-space: nowrap;
 						<td colspan="2"> : </td>
 						<td>{{(($t_daily_sales==0)?'∞':date('Y-m-d',strtotime('+'.intval($t_afn_stock/$t_daily_sales).'days')))}}</td>
 						<td>{{$t_daily_sales}}</td>
-						<td>{{$t_sz_stock}}</td>
+						<td>{{$t_quantity}}</td>
 						<td>{{$t_afn_stock}}</td>
 						<td>{{$t_estimated_afn}}</td>
 						<td>{{$t_mfn_stock}}</td>

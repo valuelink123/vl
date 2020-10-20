@@ -247,7 +247,7 @@ class MrpController extends Controller
 			$request->session()->flash('error_message','No Data Match This Keywords');
             return redirect()->back()->withInput();
 		}
-		$type = $request->get('type')??'asin';
+		$type = 'asin';
 		//没选日期的话，默认查询最近90的数据
 		$date=90;
 		$date_to = $request->get('date_to')??date('Y-m-d',strtotime('+'.$date.'days'));

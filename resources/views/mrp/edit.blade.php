@@ -95,16 +95,6 @@ white-space: nowrap;
                         </div>
                         <br>
                     </div>
-						<div class="col-md-2">
-							<div class="input-group">
-								<span class="input-group-addon">显示维度</span>
-								<select class="form-control"  id="type" name="type">
-									<option value="">Asin维度</option>
-									<option value="sku" <?php if($type=='sku') echo 'selected';?>>Sku维度</option>
-								</select>
-							</div>
-							<br>
-						</div>
 					<div class="col-md-2">
                         <div class="input-group">
 							<div class="btn-group pull-right" style="margin-right:20px;">
@@ -112,7 +102,6 @@ white-space: nowrap;
 							</div>
 						</div>
                         <br>
-
                     </div>  
 					</form>
 					<div class="row" >
