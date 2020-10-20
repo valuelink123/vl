@@ -46,6 +46,7 @@ class Kernel extends ConsoleKernel
 		'App\Console\Commands\GetRequestReviewTasks',
 		'App\Console\Commands\SendEdmMailchimp',
 		'App\Console\Commands\AddSalesRemind',
+		'App\Console\Commands\AddAsinData',
     ];
 
     /**
@@ -118,7 +119,8 @@ class Kernel extends ConsoleKernel
 		$schedule->command('add:rsgProduct')->dailyAt('07:00')->name('addProduct')->withoutOverlapping();
 
 		$schedule->command('send:mailchimp')->hourly()->name('sendMailchimp')->withoutOverlapping();//添加edmcampaign的时候，设置了发送时间，批处理发送edm邮件
-		$schedule->command('add:sales_remind')->dailyAt('07:00')->name('addSalesRemind')->withoutOverlapping();//22周销售计划中，还没有填写销售计划的时候，插件提醒销售去添加计划
+		$schedule->command('add:sales_remind')->dailyAt('07:15')->name('addSalesRemind')->withoutOverlapping();//22周销售计划中，还没有填写销售计划的时候，插件提醒销售去添加计划
+		$schedule->command('add:asin_data')->dailyAt('07:30')->name('addAsinData')->withoutOverlapping();//添加asin数据，每日更新，每周库存跟在途等数据
     }
 
     /**
