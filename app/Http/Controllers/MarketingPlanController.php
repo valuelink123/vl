@@ -532,11 +532,13 @@ class MarketingPlanController extends Controller
         if (!empty($request['condition'])) {
             $sql = $sql . ' AND ( marketing_plan.asin LIKE "%' . $request['condition'] . '%" or marketing_plan.sku LIKE "%' . $request['condition'] . '%")';
         }
-        $sql = $sql . ' GROUP BY marketing_plan.id order by updated_at desc';
+        $sql = $sql . ' GROUP BY marketing_plan.id';
         //排序 顺序
         if (!empty($request['rank']) && !empty($request['order'])) {
             $sql = $sql . ' ORDER BY ' . $request['rank'] . ' ' . $request['order'];
-        }
+        }else{
+			$sql = $sql.' ORDER BY updated_at desc';
+		}
 
         $rsgList = DB::connection('vlz')->select($sql);
         $rsgList = (json_decode(json_encode($rsgList), true));
