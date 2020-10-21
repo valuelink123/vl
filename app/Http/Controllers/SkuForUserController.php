@@ -68,10 +68,10 @@ class SkuForUserController extends Controller
                                 $last_data = SkuForUser::where('sku',$sku)->where('marketplace_id',$marketplace_id)->where('date',date('Y-m-d'))->get(['producter','planer','dqe','te'])->first();
                                 $last_data = empty($last_data)?[]:$last_data->toArray();    
                                 $new_data = [
-                                    'producter'=> array_get($users_data,trim(array_get($data,'C'))),
-                                    'planer'=> array_get($users_data,trim(array_get($data,'D'))),
-                                    'dqe'=> array_get($users_data,trim(array_get($data,'E'))),
-                                    'te'=> array_get($users_data,trim(array_get($data,'F')))
+                                    'producter'=> intval(array_get($users_data,trim(array_get($data,'C')))),
+                                    'planer'=> intval(array_get($users_data,trim(array_get($data,'D')))),
+                                    'dqe'=> intval(array_get($users_data,trim(array_get($data,'E')))),
+                                    'te'=> intval(array_get($users_data,trim(array_get($data,'F'))))
                                 ];
                                 if($last_data!=$new_data){
                                     $new_data['created_user_id'] = Auth::user()->id;
