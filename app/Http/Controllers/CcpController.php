@@ -44,12 +44,14 @@ class CcpController extends Controller
 		if(!Auth::user()->can(['ccp-show'])) die('Permission denied -- ccp show');
 		$where = ' where 1 = 1';
 		$userdata = Auth::user();
-		if ($userdata->seller_rules) {
-			$rules = explode("-", $userdata->seller_rules);
-			if (array_get($rules, 0) != '*') $where .= " and bg = '".array_get($rules, 0)."'";
-			if (array_get($rules, 1) != '*') $where .= " and bu = '".array_get($rules, 1)."'";
-		}elseif($userdata->ubg && $userdata->ubu){
-			$where .= " and bg = '".$userdata->ubg."' and bu = '".$userdata->ubu."'";
+		if (!in_array($userdata->email, $this->ccpAdmin)) {
+			if ($userdata->seller_rules) {
+				$rules = explode("-", $userdata->seller_rules);
+				if (array_get($rules, 0) != '*') $where .= " and bg = '" . array_get($rules, 0) . "'";
+				if (array_get($rules, 1) != '*') $where .= " and bu = '" . array_get($rules, 1) . "'";
+			} elseif ($userdata->ubg && $userdata->ubu) {
+				$where .= " and bg = '" . $userdata->ubg . "' and bu = '" . $userdata->ubu . "'";
+			}
 		}
 		$bgbu= DB::select('select bg,bu from asin '.$where.' group by bg,bu ORDER BY BG ASC,BU ASC');//获取bgbu选项
 		$site = getMarketDomain();//获取站点选项
@@ -338,7 +340,7 @@ class CcpController extends Controller
 				$userWhere .= " and sap_seller_id = ".$userdata->sap_seller_id;
 			}
 		}
-		
+
 		if($bgbu){
 			$userWhere .= " and CONCAT(sap_seller_bg,'_',sap_seller_bu) = '".$bgbu."'";
 		}
