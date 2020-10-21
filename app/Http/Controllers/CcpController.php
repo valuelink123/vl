@@ -25,6 +25,9 @@ class CcpController extends Controller
 	 */
 	use \App\Traits\DataTables;
 	use \App\Traits\Mysqli;
+
+	public $ccpAdmin = array("xumeiling@valuelinkcorp.com");
+
 	public function __construct()
 	{
 		$this->middleware('auth');
@@ -326,13 +329,16 @@ class CcpController extends Controller
 	{
 		$userdata = Auth::user();
 		$userWhere = " where marketplace_id  = '".$site."'";
-		if ($userdata->seller_rules) {
-			$rules = explode("-", $userdata->seller_rules);
-			if (array_get($rules, 0) != '*') $userWhere .= " and sap_seller_bg = '".array_get($rules, 0)."'";
-			if (array_get($rules, 1) != '*') $userWhere .= " and sap_seller_bu = '".array_get($rules, 1)."'";
-		}elseif($userdata->sap_seller_id){
-			$userWhere .= " and sap_seller_id = ".$userdata->sap_seller_id;
+		if (!in_array(Auth::user()->email, $this->ccpAdmin)) {
+			if ($userdata->seller_rules) {
+				$rules = explode("-", $userdata->seller_rules);
+				if (array_get($rules, 0) != '*') $userWhere .= " and sap_seller_bg = '".array_get($rules, 0)."'";
+				if (array_get($rules, 1) != '*') $userWhere .= " and sap_seller_bu = '".array_get($rules, 1)."'";
+			}elseif($userdata->sap_seller_id){
+				$userWhere .= " and sap_seller_id = ".$userdata->sap_seller_id;
+			}
 		}
+		
 		if($bgbu){
 			$userWhere .= " and CONCAT(sap_seller_bg,'_',sap_seller_bu) = '".$bgbu."'";
 		}

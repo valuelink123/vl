@@ -484,33 +484,34 @@ class MarketingPlanController extends Controller
             }
         }
         $sql = 'SELECT
-                marketing_plan.id,
-                images,
-                goal,
-                rsg_total,
-                est_spend,
-                actual_spend,
-                current_60romi,
-                actual_60romi,
-                marketing_plan.sap_seller_id,
-                marketing_plan.created_at,
-                from_time,
-                to_time,
-                marketing_plan.asin,
-                marketing_plan.updated_at,
-                plan_status,
-                marketing_plan.marketplaceid,
-                marketing_plan.sku,
-                sku_price,
-                marketing_plan.sku_status,
-                sams.sap_seller_bg as bg,
-                sams.sap_seller_bu as bu
+				marketing_plan.id,
+                any_value(images) as images,
+                any_value(goal) as goal,
+                any_value(rsg_total) as rsg_total,
+                any_value(est_spend) as est_spend,
+                any_value(actual_spend) as actual_spend,
+                any_value(current_60romi) as current_60romi,
+                any_value(actual_60romi) as actual_60romi,
+                any_value(marketing_plan.sap_seller_id) as sap_seller_id,
+                any_value(marketing_plan.created_at) as created_at,
+                any_value(from_time) as from_time,
+                any_value(to_time) as to_time,
+                any_value(marketing_plan.asin) as asin,
+                any_value(marketing_plan.updated_at) as updated_at,
+                any_value(plan_status) as plan_status,
+                any_value(marketing_plan.marketplaceid) as marketplaceid,
+                any_value(marketing_plan.sku) as sku,
+                any_value(sku_price) as sku_price,
+                any_value(marketing_plan.sku_status) as sku_status,
+                any_value(sams.sap_seller_bg) as bg,
+                any_value(sams.sap_seller_bu) as bu 
                 FROM marketing_plan
                 LEFT JOIN sap_asin_match_sku as sams ON marketing_plan.asin = sams.asin AND marketing_plan.marketplaceid = sams.marketplace_id
                 WHERE 1 = 1  ';
         if (!empty($sapSellerIdList)) {
-            $sql = $sql . ' AND marketing_plan.sap_seller_id in (' . implode(array_keys($sapSellerIdList), ',') . ')';
+            $sql = $sql . ' AND marketing_plan.sap_seller_id in (' . implode(array_filter(array_keys($sapSellerIdList)), ',') . ')';//要去掉空数组
         }
+
         //搜索   创建时间 范围
         if (strtotime(@$request['created_at_s']) > 0 && strtotime(@$request['created_at_e']) > 0 && strtotime(@$request['created_at_e']) > strtotime(@$request['created_at_s'])) {
             $sql = $sql . ' AND created_at >=' . strtotime($request['created_at_s']) . ' AND  created_at <=' . strtotime($request['created_at_e']);
@@ -531,11 +532,12 @@ class MarketingPlanController extends Controller
         if (!empty($request['condition'])) {
             $sql = $sql . ' AND ( marketing_plan.asin LIKE "%' . $request['condition'] . '%" or marketing_plan.sku LIKE "%' . $request['condition'] . '%")';
         }
-        $sql = $sql . ' GROUP BY marketing_plan.id ';
+        $sql = $sql . ' GROUP BY marketing_plan.id order by updated_at desc';
         //排序 顺序
         if (!empty($request['rank']) && !empty($request['order'])) {
             $sql = $sql . ' ORDER BY ' . $request['rank'] . ' ' . $request['order'];
         }
+
         $rsgList = DB::connection('vlz')->select($sql);
         $rsgList = (json_decode(json_encode($rsgList), true));
         // $planStatus=['0','Pending','Ongoing','Completed','Paused','Rejected'];
