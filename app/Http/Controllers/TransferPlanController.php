@@ -42,7 +42,7 @@ class TransferPlanController extends Controller
                 DB::beginTransaction();
                 try{ 
                     if($updateData) TransferPlan::whereIn('id',$_REQUEST["id"])->where('status','<>',1)->update($updateData);
-                    if($updateData['status'] == 1) $transferTaskKey = uniqid('transferTask',true).rand(1000,9999);
+                    if($updateData['status'] == 1) $transferTaskKey = uniqid('Task');
                     foreach($_REQUEST["id"] as $plan_id){
                         $transferPlan = TransferPlan::where('status',$updateData['status'])->find($plan_id);
                         if(empty($transferPlan)) continue;
@@ -51,15 +51,17 @@ class TransferPlanController extends Controller
                             if($transferPlan->require_rebrand) $status=2;
                             if($transferPlan->require_purchase) $status=1;
                             if($transferPlan->require_attach) $status=0;
-                            $result = TransferTask::insertIgnore(
-                                array(
-                                    'transfer_plan_id'=>$transferPlan->id,
+                            $result = TransferTask::firstOrCreate(
+                                [
+                                    'transfer_plan_id'=>$transferPlan->id
+                                ],
+                                [
                                     'transfer_task_key'=>$transferTaskKey,
                                     'status'=>$status,
-                                    'user_id'=>Auth::user()->id,
-                                )
+                                    'user_id'=>Auth::user()->id
+                                ]
                             );
-                            if($result) SaveOperationLog('transfer_tasks', $result->id, ['status'=>$status]);
+                            if($result->wasRecentlyCreated) SaveOperationLog('transfer_tasks', $result->id, ['status'=>$status]);
                         }
                         SaveOperationLog('transfer_plans', $transferPlan->id, $updateData);
                     }
@@ -119,27 +121,27 @@ class TransferPlanController extends Controller
 
 		foreach ( $lists as $list){
             $records["data"][] = array(
-                '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input name="id[]" type="checkbox" class="checkboxes" value="'.$list['id'].'"  /></label>',
-                array_get(getMarketplaceCode(),$list['marketplace_id'].'.country_code'),
+                '<input name="id[]" type="checkbox" class="checkboxes" value="'.$list['id'].'"  />',
+                array_get(array_flip(getSiteCode()),$list['marketplace_id']),
                 $list['bg'],
                 $list['bu'],
                 $list['out_factory'],
                 $list['in_factory'],
                 $list['asin'],
                 $list['sku'],
-                $list['status'],
+                ($list['status']!==NUll)?array_get(TransferPlan::STATUS,$list['status']):'',
                 $list['request_quantity'],
                 $list['quantity'],
-                $list['carrier_code'].'\n'.$list['ship_method'],
+                $list['carrier_code'].($list['ship_method']?'</BR>'.$list['ship_method']:''),
                 $list['out_date'],
                 $list['in_date'],
                 $list['rms'],
-                $list['require_attach'],
-                $list['require_purchase'],
-                $list['require_rebrand'],
+                $list['require_attach']?'Y':'N',
+                $list['require_purchase']?'Y':'N',
+                $list['require_rebrand']?'Y':'N',
                 $list['transfer_task_key'],
-                $list['task_status'],
-                $list['task_carrier_code'].'\n'.$list['task_ship_method'].'\n'.$list['task_tracking_number'],
+                ($list['task_status']!==NUll)?array_get(TransferTask::STATUS,$list['task_status']):'',
+                $list['task_carrier_code'].($list['task_ship_method']?'</BR>'.$list['task_ship_method']:'').($list['tracking_number']?'</BR>'.$list['tracking_number']:''),
                 $list['task_out_date'],
 				$list['task_in_date'],
             );

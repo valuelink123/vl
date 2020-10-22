@@ -108,7 +108,7 @@ th,td,td>span {
 					
 					<div class="btn-group " style="float:right;">
                         <div class="table-actions-wrapper" id="table-actions-wrapper">
-							@permission('transfer-plan-batch-update')
+							
                             <select id="confirmStatus" class="table-group-action-input form-control input-inline input-small input-sm">
                                 <option value="">选择更新状态</option>
                                 <?php
@@ -119,7 +119,7 @@ th,td,td>span {
                             <button class="btn  green table-status-action-submit">
                                 <i class="fa fa-check"></i> 执行批量更新
                             </button>
-                        	@endpermission	
+                        		
                         </div>
                     </div>
                 </div>
@@ -129,11 +129,10 @@ th,td,td>span {
                         <table class="table table-striped table-bordered table-hover" id="datatable_ajax">
                             <thead>
                                 <tr role="row" class="heading">
-                                    <th style="width:20px;">
-                                        <label class="mt-checkbox mt-checkbox-single mt-checkbox-outline">
+                                    <th >
+         
                                             <input type="checkbox" class="group-checkable" data-set="#datatable_ajax .checkboxes" />
-                                            <span></span>
-                                        </label>
+                                            
                                     </th>
                                     <th>站点</th>
 									<th>Bg</th>
@@ -144,6 +143,7 @@ th,td,td>span {
 									<th>Sku</th>
 									<th>计划状态</th>
 									<th>申请数量</th>
+									<th>计划数量</th>
 									<th>计划物流</th>
 									<th>计划调出日</th>
 									<th>计划调入日</th>
