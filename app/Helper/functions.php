@@ -72,6 +72,12 @@ function getUsers($type=''){
 	case 'sap_bgbu':
 		$data = DB::table('users')->selectRaw('ubg as bg,ubu as bu')->where('locked',0)->groupBy(['bg','bu'])->orderByRaw('bg asc,bu asc')->get();
 		break;
+	case 'sap_bg':
+		$data = DB::table('users')->selectRaw('ubg as bg')->where('locked',0)->whereNotNull('ubg')->where('ubg','<>','')->groupBy(['bg'])->orderByRaw('bg asc')->get();
+		break;
+	case 'sap_bu':
+		$data = DB::table('users')->selectRaw('ubu as bu')->where('locked',0)->whereNotNull('ubu')->where('ubu','<>','')->groupBy(['bu'])->orderByRaw('bu asc')->get();
+		break;
 	default:
 		$data = DB::table('users')->where('locked',0)->pluck('name','id');
 	}
@@ -1359,4 +1365,22 @@ function getWeekDate($yearWeekNum){
 		$enddate=date('Y-m-d',mktime(0,0,0,1,$day+6,$year));
 	}
 	return array($startdate,$enddate);
+}
+
+
+//存日志
+function SaveOperationLog(string $table = NULL, int $primary_id = 0 , array $inputData = array()){
+	DB::table('operation_log')->insert(
+		array(
+			'user_id'=>Auth::user()->id,
+			'path'=>$_SERVER["REQUEST_URI"],
+			'method'=>$_SERVER['REQUEST_METHOD'],
+			'ip'=>$_SERVER["REMOTE_ADDR"],
+			'table'=>$table,
+			'primary_id'=>$primary_id,
+			'input'=>json_encode(empty($inputData)?$_REQUEST:$inputData),
+			'created_at'=>date('Y-m-d H:i:s'),
+			'updated_at'=>date('Y-m-d H:i:s'),
+		)
+	);
 }

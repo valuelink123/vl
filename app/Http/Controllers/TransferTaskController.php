@@ -4,15 +4,13 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use App\User;
-use App\SkuForUser;
-use App\SkuForUserLog;
+use App\TransferTask;
+use App\TransferPlan;
 use Illuminate\Support\Facades\Auth;
 use PDO;
 use DB;
 use Illuminate\Http\Response;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-class SkuForUserController extends Controller
+class TransferTaskController extends Controller
 {
     /**
      * Create a new controller instance.
@@ -215,7 +213,6 @@ class SkuForUserController extends Controller
         if(!Auth::user()->can(['skuforuser-show'])) die('Permission denied -- skuforuser-show');
         $date=date('Y-m-d');
         $users_data = User::where('locked',0)->pluck('name','id');
-        
         return view('skuforuser/index',['date'=>$date ,'users'=>$users_data,'status'=>SkuForUserLog::STATUS]);
 
     }
@@ -254,7 +251,7 @@ class SkuForUserController extends Controller
                 unset($updateData);      
             }
         }
-
+        
         $date = array_get($_REQUEST,'date')??$curr_date;
 
         if($date>=$curr_date){

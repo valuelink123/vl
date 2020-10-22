@@ -361,3 +361,10 @@ Route::get('/plansforecast/export', 'PlansForecastController@export');
 Route::post('/plansforecast/weekupdate', 'PlansForecastController@weekupdate');
 Route::post('/plansforecast/updateStatus', 'PlansForecastController@updateStatus');
 Route::get('/plansforecast/edit', 'PlansForecastController@edit');
+
+//调拨计划
+Route::resource('transferPlan', 'TransferPlanController');
+Route::Post('/transferPlan/get', 'TransferPlanController@get')->name('getTransferPlan');
+//调拨任务
+Route::resource('transferTask', 'TransferTaskController');
+Route::Post('/transferTask/get', 'TransferTaskController@get')->name('getTransferTask');
