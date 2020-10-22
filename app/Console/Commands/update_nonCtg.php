@@ -114,7 +114,7 @@ class UpdateNonctg extends Command
 										'processor' => $userid,
                                     );
                                 } catch (\Exception $e) {
-                                    // echo '不添加异常的订单号：'.$orderid."\n";
+                                    echo '不添加异常的订单号：'.$orderid."\n";
                                 }
                             }
                         }
