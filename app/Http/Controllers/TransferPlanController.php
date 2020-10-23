@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Session;
 use App\User;
 use App\Models\TransferTask;
 use App\Models\TransferPlan;
+use App\Models\TransferRequest;
 use Illuminate\Support\Facades\Auth;
 use PDO;
 use DB;
@@ -34,6 +35,7 @@ class TransferPlanController extends Controller
 
     public function get(Request $request)
     {
+        $records = array();
         if (isset($_REQUEST["customActionType"])) {
             //if(!Auth::user()->can(['transfer-plan-batch-update'])) die('Permission denied -- transfer-plan-batch-update');
             $updateData=array();
@@ -41,35 +43,29 @@ class TransferPlanController extends Controller
                 $updateData['status'] = intval(array_get($_REQUEST,"confirmStatus"));
                 DB::beginTransaction();
                 try{ 
-                    if($updateData) TransferPlan::whereIn('id',$_REQUEST["id"])->where('status','<>',1)->update($updateData);
+                    if($updateData) $success = TransferPlan::whereIn('id',$_REQUEST["id"])->where('status','<>',1)->update($updateData);
                     if($updateData['status'] == 1) $transferTaskKey = uniqid('Task');
                     foreach($_REQUEST["id"] as $plan_id){
                         $transferPlan = TransferPlan::where('status',$updateData['status'])->find($plan_id);
                         if(empty($transferPlan)) continue;
                         if($updateData['status'] == 1){
-                            $status = 3;
-                            if($transferPlan->require_rebrand) $status=2;
-                            if($transferPlan->require_purchase) $status=1;
-                            if($transferPlan->require_attach) $status=0;
-                            $result = TransferTask::firstOrCreate(
-                                [
-                                    'transfer_plan_id'=>$transferPlan->id
-                                ],
-                                [
-                                    'transfer_task_key'=>$transferTaskKey,
-                                    'status'=>$status,
-                                    'user_id'=>Auth::user()->id
-                                ]
-                            );
-                            if($result->wasRecentlyCreated) SaveOperationLog('transfer_tasks', $result->id, ['status'=>$status]);
+                            self::createTransferTask($transferPlan,$transferTaskKey);
                         }
-                        SaveOperationLog('transfer_plans', $transferPlan->id, $updateData);
+                        saveOperationLog('transfer_plans', $transferPlan->id, $updateData);
                     }
-                    DB::commit(); 
-                    $request->session()->flash('success_message','Update Success');
+                    DB::commit();
+                    if($success){
+                        $records["customActionStatus"] = 'OK';
+                        $records["customActionMessage"] = "Update Success!";     
+                    }else{
+                        $records["customActionStatus"] = '';
+                        $records["customActionMessage"] = "Unable to update selection, Update Failed!";
+                    }
+                    
                 }catch (\Exception $e) { 
-                    $request->session()->flash('error_message',$e->getMessage());
-                    DB::rollBack(); 
+                    DB::rollBack();
+                    $records["customActionStatus"] = '';
+                    $records["customActionMessage"] = $e->getMessage();
                 }    
                 unset($updateData);      
             }
@@ -116,7 +112,7 @@ class TransferPlanController extends Controller
         $iDisplayStart = intval($_REQUEST['start']);
         $sEcho = intval($_REQUEST['draw']);
         $lists =  $datas->offset($iDisplayStart)->limit($iDisplayLength)->orderBy('transfer_plans.id','desc')->get()->toArray();
-        $records = array();
+        
         $records["data"] = array();
 
 		foreach ( $lists as $list){
@@ -141,7 +137,7 @@ class TransferPlanController extends Controller
                 $list['require_rebrand']?'Y':'N',
                 $list['transfer_task_key'],
                 ($list['task_status']!==NUll)?array_get(TransferTask::STATUS,$list['task_status']):'',
-                $list['task_carrier_code'].($list['task_ship_method']?'</BR>'.$list['task_ship_method']:'').($list['tracking_number']?'</BR>'.$list['tracking_number']:''),
+                ($list['tracking_number']?$list['tracking_number']:'').($list['task_carrier_code']?'</BR>'.$list['task_carrier_code']:'').($list['task_ship_method']?'</BR>'.$list['task_ship_method']:''),
                 $list['task_out_date'],
 				$list['task_in_date'],
             );
@@ -150,5 +146,62 @@ class TransferPlanController extends Controller
         $records["recordsTotal"] = $iTotalRecords;
         $records["recordsFiltered"] = $iTotalRecords;
         echo json_encode($records);
+    }
+
+    public function edit(Request $request,$id)
+    {
+        //if(!Auth::user()->can(['transfer-plan-show'])) die('Permission denied -- transfer-plan-show');
+        $transferPlan =  TransferPlan::find($id);
+        if(empty($transferPlan)) die('计划不存在!');
+        $transferRequest = TransferRequest::find($transferPlan->transfer_request_id);
+        $transferTask = TransferTask::where('transfer_plan_id',$id)->first();
+        return view('transfer/planEdit',['transferPlan'=>$transferPlan,'transferRequest'=>$transferRequest,'transferTask'=>$transferTask,'sellers'=>getUsers('sap_seller'), 'users'=>getUsers(), 'planStatus'=>TransferPlan::STATUS, 'requestStatus'=>TransferRequest::STATUS, 'taskStatus'=>TransferTask::STATUS]);
+    }
+	
+
+    public function update(Request $request,$id)
+    {
+		//if(!Auth::user()->can(['transfer-plan-update'])) die('Permission denied -- transfer-plan-update');
+        DB::beginTransaction();
+        try{ 
+            $data = TransferPlan::findOrFail($id);
+            if($data->status == 1 ) throw new \Exception("计划已审核，无法再次更新！");
+            $fileds = array(
+                'out_factory','out_date','in_factory','in_date','quantity','rms','carrier_code','ship_method','require_attach','require_purchase','require_rebrand','status'
+            );
+            foreach($fileds as $filed){
+                $data->{$filed} = $request->get($filed);
+            }
+            $data->save();
+            if($data->status == 1 ) self::createTransferTask($data);
+            saveOperationLog('transfer_plans', $data->id, $request->all());
+            DB::commit();
+            $records["customActionStatus"] = 'OK';
+            $records["customActionMessage"] = "Update Success!";     
+        }catch (\Exception $e) { 
+            DB::rollBack();
+            $records["customActionStatus"] = '';
+            $records["customActionMessage"] = $e->getMessage();
+        }
+        echo json_encode($records);
+    }
+
+    public function createTransferTask(TransferPlan $transferPlan,string $transferTaskKey = ''){
+        if(!$transferTaskKey) $transferTaskKey = uniqid('Task');
+        $status = 3;
+        if($transferPlan->require_rebrand) $status=2;
+        if($transferPlan->require_purchase) $status=1;
+        if($transferPlan->require_attach) $status=0;
+        $result = TransferTask::firstOrCreate(
+            [
+                'transfer_plan_id'=>$transferPlan->id
+            ],
+            [
+                'transfer_task_key'=>$transferTaskKey,
+                'status'=>$status,
+                'user_id'=>Auth::user()->id
+            ]
+        );
+        if($result->wasRecentlyCreated) saveOperationLog('transfer_tasks', $result->id, ['status'=>$status]);
     }
 }

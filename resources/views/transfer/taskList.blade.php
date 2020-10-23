@@ -1,5 +1,5 @@
 @extends('layouts.layout')
-@section('label', '调拨计划列表')
+@section('label', '调拨任务列表')
 @section('content')
 <style type="text/css">
 .dataTables_extended_wrapper .table.dataTable {
@@ -28,30 +28,10 @@ th,td,td>span {
             <!-- BEGIN EXAMPLE TABLE PORTLET-->
             <div class="portlet light bordered">
                 <div class="table-toolbar">
-                    <form role="form" action="{{url('transferPlan')}}" method="GET">
+                    <form role="form" action="{{url('transferTask')}}" method="GET">
                         {{ csrf_field() }}
                         <div class="row">
-						<div class="col-md-2">
-						<select class="mt-multiselect btn btn-default " multiple="multiple" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" data-none-selected-text="选择站点" name="marketplace_id[]" id="marketplace_id[]">
-                            @foreach (getSiteCode() as $k=>$v)
-                                <option value="{{$v}}">{{$k}}</option>
-                            @endforeach
-                        </select>
-						</div>
-                        <div class="col-md-2">
-						<select class="mt-multiselect btn btn-default " multiple="multiple" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" data-none-selected-text="选择BG" name="bg[]" id="bg[]">
-                            @foreach (getUsers('sap_bg') as $k=>$v)
-                                <option value="{{$v->bg}}">{{$v->bg}}</option>
-                            @endforeach
-                        </select>
-						</div>
-                        <div class="col-md-2">
-						<select class="mt-multiselect btn btn-default " multiple="multiple" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" data-none-selected-text="选择BU" name="bu[]" id="bu[]">
-                            @foreach (getUsers('sap_bu') as $k=>$v)
-                                <option value="{{$v->bu}}">{{$v->bu}}</option>
-                            @endforeach
-                        </select>
-						</div>
+						
                         <div class="col-md-2">
 						<input type="text" class="form-control " name="out_factory" placeholder="调出工厂">
 						</div>
@@ -63,19 +43,12 @@ th,td,td>span {
 						<div class="col-md-2">
 						<input type="text" class="form-control" name="asin" placeholder="Asin">
 						</div>
-						
-						
-						
-
-						</div>	
-						
-						
-						 <div class="row" style="margin-top:20px;">
 							
-                            <div class="col-md-2">
+                        <div class="col-md-2">
                                 <input type="text" class="form-control" name="sku" placeholder="Sku">             
-                            </div>	
-							<div class="col-md-2">
+                        </div>
+
+						<div class="col-md-2">
 						<select class="mt-multiselect btn btn-default" multiple="multiple" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" data-none-selected-text="选择状态" name="status[]" id="status[]" >
                             @foreach ($status as $k=>$v)
                                 <option value="{{$k}}" >{{$v}}</option>
@@ -83,12 +56,11 @@ th,td,td>span {
                         </select>
 						</div>
 						
-						
-						    <div class="col-md-2">
-							
-							<button type="button" class="btn blue" id="data_search">搜索</button>
-									
-                            </div>
+                        <div class="col-md-2">
+                        
+                        <button type="button" class="btn blue" id="data_search">搜索</button>
+                                
+                        </div>
 					    </div>
 
                     </form>
@@ -103,46 +75,23 @@ th,td,td>span {
                 <div class="portlet-title">
                     <div class="caption font-dark">
                         <i class="icon-settings font-dark"></i>
-                        <span class="caption-subject bold uppercase">调拨计划列表</span>
+                        <span class="caption-subject bold uppercase">调拨任务列表</span>
                     </div>
 					
-					<div class="btn-group " style="float:right;">
-                        <div class="table-actions-wrapper" id="table-actions-wrapper">
-							
-                            <select id="confirmStatus" class="table-group-action-input form-control input-inline input-small input-sm">
-                                <option value="">选择更新状态</option>
-                                <?php
-                                foreach($status as $k=>$v){
-                                    echo '<option value="'.$k.'">'.$v.'</option>';
-                                }?>
-                            </select>
-                            <button class="btn  green table-status-action-submit">
-                                <i class="fa fa-check"></i> 执行批量更新
-                            </button>
-                        		
-                        </div>
-                    </div>
                 </div>
 				
                 <div class="portlet-body">
                     <div class="table-container">
-                        <table class="table table-striped table-bordered table-hover table-checkable" id="datatable_ajax">
+                        <table class="table table-striped table-bordered table-hover" id="datatable_ajax">
                             <thead>
                                 <tr role="row" class="heading">
                                     <th >
-         
-                                            <input type="checkbox" class="group-checkable" data-set="#datatable_ajax .checkboxes" />
-                                            
+                                        <input type="checkbox" class="group-checkable" data-set="#datatable_ajax .checkboxes" /> 
                                     </th>
-                                    <th>站点</th>
-									<th>Bg</th>
-									<th>Bu</th>
 									<th>调出工厂</th>
 									<th>调入工厂</th>
 									<th>Asin</th>
 									<th>Sku</th>
-									<th>计划状态</th>
-									<th>申请数量</th>
 									<th>计划数量</th>
 									<th>计划物流</th>
 									<th>计划调出日</th>
@@ -155,7 +104,7 @@ th,td,td>span {
 									<th>任务状态</th>
 									<th>实际物流</th>
 									<th>实际调出日</th>
-									<th>实际调入日</th>                              
+									<th>实际调入日</th>                       
                                 </tr>
                             </thead>
                             <tbody>	
@@ -189,9 +138,6 @@ th,td,td>span {
 			grid.setAjaxParam("in_factory", $("input[name='in_factory']").val());
 			grid.setAjaxParam("asin", $("input[name='asin']").val());
 			grid.setAjaxParam("sku", $("input[name='sku']").val());
-            grid.setAjaxParam("marketplace_id", $("select[name='marketplace_id[]']").val());
-			grid.setAjaxParam("bg", $("select[name='bg[]']").val());
-            grid.setAjaxParam("bu", $("select[name='bu[]']").val());
             grid.setAjaxParam("status", $("select[name='status[]']").val());
             grid.init({
                 src: $("#datatable_ajax"),
@@ -214,7 +160,7 @@ th,td,td>span {
                     ],
                     "pageLength": 10,
                     "ajax": {
-                        "url": "{{ url('transferPlan/get')}}",
+                        "url": "{{ url('transferTask/get')}}",
                     },
 
                     /*
@@ -233,41 +179,11 @@ th,td,td>span {
                  }
             });
 
-            //批量更改状态操作
-            $(".btn-group").unbind("click").on('click', '.table-status-action-submit', function (e) {
-                e.preventDefault();
-                var confirmStatus = $("#confirmStatus", $("#table-actions-wrapper"));
-
-                if (confirmStatus.val() != "" && grid.getSelectedRowsCount() > 0) {
-                    grid.setAjaxParam("customActionType", "group_action");
-                    grid.setAjaxParam("confirmStatus", confirmStatus.val());
-                    grid.setAjaxParam("id", grid.getSelectedRows());
-                    grid.getDataTable().draw(false);
-                } else if ( confirmStatus.val() == "" ) {
-                    App.alert({
-                        type: 'danger',
-                        icon: 'warning',
-                        message: 'Please select an action',
-                        container: $("#table-actions-wrapper"),
-                        place: 'prepend'
-                    });
-                } else if (grid.getSelectedRowsCount() === 0) {
-                    App.alert({
-                        type: 'danger',
-                        icon: 'warning',
-                        message: 'No record selected',
-                        container: $("#table-actions-wrapper"),
-                        place: 'prepend'
-                    });
-                }
-            });
-
         }
 
 
         return {
 
-            //main function to initiate the module
             init: function () {
                 initPickers();
                 initTable();
@@ -288,12 +204,10 @@ $(function() {
 	});
 	$('#datatable_ajax').on('click', 'td:not(:has(input))', function (e) {
         e.preventDefault();
-
-        var planId = $(this).closest('tr').find('.checkboxes').prop('value');
+        var taskId = $(this).closest('tr').find('.checkboxes').prop('value');
         $('#ajax').modal({
-            remote: '/transferPlan/'+planId+'/edit'
+            remote: '/transferTask/'+taskId+'/edit'
         });
-        
     } );
 	
 });

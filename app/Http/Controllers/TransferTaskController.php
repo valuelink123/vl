@@ -4,8 +4,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use App\User;
-use App\TransferTask;
-use App\TransferPlan;
+use App\Models\TransferTask;
+use App\Models\TransferPlan;
+use App\Models\TransferRequest;
 use Illuminate\Support\Facades\Auth;
 use PDO;
 use DB;
@@ -25,294 +26,121 @@ class TransferTaskController extends Controller
         parent::__construct();
     }
 
-    /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Http\Response
-     */
-
-    public function upload( Request $request )
-    {
-        if(!Auth::user()->can(['skuforuser-import'])) die('Permission denied -- skuforuser-import');
-        if($request->isMethod('POST')){
-            $file = $request->file('importFile');
-            if($file){
-                if($file->isValid()){
-
-                    $originalName = $file->getClientOriginalName();
-                    $ext = $file->getClientOriginalExtension();
-                    $type = $file->getClientMimeType();
-                    $realPath = $file->getRealPath();
-                    $newname = date('Y-m-d-H-i-S').'-'.uniqid().'.'.$ext;
-                    $newpath = '/uploads/skuforuserUpload/'.date('Ymd').'/';
-                    $inputFileName = public_path().$newpath.$newname;
-                    $bool = $file->move(public_path().$newpath,$newname);
-
-                    if($bool){
-                        $users_data = User::where('locked',0)->pluck('id','name');
-                        $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($inputFileName);
-                        $importData = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
-                        $successCount=0;
-                        foreach($importData as $key => $data){
-                            $sku = trim(array_get($data,'A'));
-                            $site = trim(array_get($data,'B'));
-                            if($key==1){
-                                if($sku!='sku' || $site!='site'){
-                                    die('import template error');
-                                }
-                            }
-                            if($key>1 && $sku && $site){
-                                $marketplace_id = array_get(siteToMarketplaceid(),strtolower($site));
-                                $last_data = SkuForUser::where('sku',$sku)->where('marketplace_id',$marketplace_id)->where('date',date('Y-m-d'))->get(['producter','planer','dqe','te'])->first();
-                                $last_data = empty($last_data)?[]:$last_data->toArray();    
-                                $new_data = [
-                                    'producter'=> intval(array_get($users_data,trim(array_get($data,'C')))),
-                                    'planer'=> intval(array_get($users_data,trim(array_get($data,'D')))),
-                                    'dqe'=> intval(array_get($users_data,trim(array_get($data,'E')))),
-                                    'te'=> intval(array_get($users_data,trim(array_get($data,'F'))))
-                                ];
-                                if($last_data!=$new_data){
-                                    $new_data['created_user_id'] = Auth::user()->id;
-                                    $successCount++;
-                                    SkuForUserLog::updateOrCreate(
-                                        [
-                                            'sku'=>$sku,
-                                            'marketplace_id'=>$marketplace_id,
-                                            'status'=>0
-                                        ],
-                                        $new_data
-                                    );    
-                                }
-                            }
-                        }
-                        $request->session()->flash('success_message','Import Success! '.$successCount);
-                    }else{
-                        $request->session()->flash('error_message','Upload Failed');
-                    }
-                }
-            }else{
-                $request->session()->flash('error_message','Please Select Upload File');
-            }
-        }
-        return redirect('skuforuser');
-
-    }
-
-
-    public function export(Request $request){
-        set_time_limit(0);
-        if(!Auth::user()->can(['skuforuser-export'])) die('Permission denied -- skuforuser-export');
-        $curr_date = date('Y-m-d');
-
-        $date = array_get($_REQUEST,'date')??$curr_date;
-
-        if($date>=$curr_date){
-            $datas = DB::connection('amazon')->table(DB::raw("(select * from sku_for_user where date = '$curr_date') as sku_for_user"))
-            ->select('sku_for_user.*','new_producter','new_planer','new_dqe','new_te','confirm_id')
-            ->leftJoin(DB::raw('(select id as confirm_id,sku,marketplace_id,producter as new_producter,planer as new_planer,dqe as new_dqe,te as new_te from sku_for_user_logs where status = 0) as new_data'),function($q){
-                $q->on('sku_for_user.sku', '=', 'new_data.sku')->on('sku_for_user.marketplace_id', '=', 'new_data.marketplace_id');
-            });
-        }else{
-            $datas = SkuForUser::where('date',$date)->selectRaw('*,0 as confirm_id');
-        }
-
-        $exportFileName = '';
-        $users_data = User::where('locked',0)->pluck('name','id');
-        $users_data[0]='N/A';
-        if(array_get($_REQUEST,'sku')){
-            $datas = $datas->whereIn('sku_for_user.sku',explode(',',str_replace([' ','	'],'',array_get($_REQUEST,'sku'))));
-            $exportFileName.=str_replace(' ','',array_get($_REQUEST,'sku')).'_';
-        }
-        if(array_get($_REQUEST,'date')){
-            $datas = $datas->where('date',array_get($_REQUEST,'date'));
-            $exportFileName.=array_get($_REQUEST,'date').'_';
-        }
-        if(array_get($_REQUEST,'status')!==NULL && array_get($_REQUEST,'status')!==''){
-            $datas = $datas->whereIn('status',explode(',',array_get($_REQUEST,'status')));
-            $addFileName=[];
-            foreach(explode(',',array_get($_REQUEST,'status')) as $val){
-                $addFileName[] = array_get(getSkuStatuses(),$val);
-            }
-            $exportFileName.=implode(',',$addFileName).'_';
-        }
-        if(array_get($_REQUEST,'producter')){
-            $datas = $datas->whereIn('producter',explode(',',array_get($_REQUEST,'producter')));
-            $addFileName=[];
-            foreach(explode(',',array_get($_REQUEST,'producter')) as $val){
-                $addFileName[] = array_get($users_data,$val);
-            }
-            $exportFileName.=implode(',',$addFileName).'_';
-        }
-        if(array_get($_REQUEST,'planer')){
-            $datas = $datas->whereIn('planer',explode(',',array_get($_REQUEST,'planer')));
-            $addFileName=[];
-            foreach(explode(',',array_get($_REQUEST,'planer')) as $val){
-                $addFileName[] = array_get($users_data,$val);
-            }
-            $exportFileName.=implode(',',$addFileName).'_';
-        }
-        if(array_get($_REQUEST,'dqe')){
-            $datas = $datas->whereIn('dqe',explode(',',array_get($_REQUEST,'dqe')));
-            $addFileName=[];
-            foreach(explode(',',array_get($_REQUEST,'dqe')) as $val){
-                $addFileName[] = array_get($users_data,$val);
-            }
-            $exportFileName.=implode(',',$addFileName).'_';
-        }
-        if(array_get($_REQUEST,'te')){
-            $datas = $datas->whereIn('te',explode(',',array_get($_REQUEST,'te')));
-            $addFileName=[];
-            foreach(explode(',',array_get($_REQUEST,'te')) as $val){
-                $addFileName[] = array_get($users_data,$val);
-            }
-            $exportFileName.=implode(',',$addFileName).'_';
-        }
-
-        if(array_get($_REQUEST,'limit')){
-            $datas->offset(intval(array_get($_REQUEST,'offset')))->limit(intval(array_get($_REQUEST,'limit')));
-            $exportFileName.='Page'.intval(intval(array_get($_REQUEST,'offset'))/intval(array_get($_REQUEST,'limit'))+1).'_';
-        }
-
-        if(!$exportFileName) $exportFileName = 'All_';
-        $exportFileName.=date('YmdHis').'.xlsx';
-
-        $datas =  $datas->orderBy('confirm_id','desc')->orderBy('id','asc')->get()->toArray();
-        $datas = json_decode(json_encode($datas), true);
-        $arrayData = array();
-        $arrayData[] = [
-            'sku','site','producter','planer','dqe','te','description','status'
-        ];
-        foreach ( $datas as $data){
-            $arrayData[] = array(
-                $data['sku'],
-                array_get(getSiteUrl(),$data['marketplace_id']),
-                array_get($users_data,$data['producter']),
-                array_get($users_data,$data['planer']),
-                array_get($users_data,$data['dqe']),
-                array_get($users_data,$data['te']),
-                $data['description'],
-                array_get(getSkuStatuses(),$data['status']),    
-            );
-        }
-
-        if($arrayData){
-            $spreadsheet = new Spreadsheet();
-            $spreadsheet->getActiveSheet()->fromArray($arrayData,NULL,'A1');
-            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-            header('Content-Disposition: attachment;filename="'.$exportFileName.'"');
-            header('Cache-Control: max-age=0');
-            $writer = new Xlsx($spreadsheet);
-            $writer->save('php://output');
-        }
-        die();
-    }
-
-
     public function index()
     {
-        if(!Auth::user()->can(['skuforuser-show'])) die('Permission denied -- skuforuser-show');
-        $date=date('Y-m-d');
-        $users_data = User::where('locked',0)->pluck('name','id');
-        return view('skuforuser/index',['date'=>$date ,'users'=>$users_data,'status'=>SkuForUserLog::STATUS]);
+        //if(!Auth::user()->can(['transfer-task-show'])) die('Permission denied -- transfer-task-show');
+        return view('transfer/taskList',['sellers'=>getUsers('sap_seller'), 'users'=>getUsers(), 'status'=>TransferTask::STATUS]);
 
     }
 
-    public function get()
+    public function get(Request $request)
     {
-        $curr_date = date('Y-m-d');
-        if (isset($_REQUEST["customActionType"])) {
-            if(!Auth::user()->can(['skuforuser-batch-update'])) die('Permission denied -- skuforuser-batch-update');
-            $updateData=array();
-            if($_REQUEST["customActionType"] == "group_action"){
-                if(array_get($_REQUEST,"confirmStatus")){
-                    $updateData['status'] = array_get($_REQUEST,"confirmStatus");
-                    $updateData['updated_user_id'] = Auth::user()->id;
-                }
-                if($updateData['status'] == 1){
-                    foreach($_REQUEST["id"] as $log_id){
-                        $skuForUserLog = SkuForUserLog::where('status',0)->find($log_id);
-                        SkuForUser::where('sku',$skuForUserLog->sku)->where('marketplace_id',$skuForUserLog->marketplace_id)->where('date',$curr_date)
-                        ->update(
-                            array(
-                                'producter'=>$skuForUserLog->producter,
-                                'planer'=>$skuForUserLog->planer,
-                                'dqe'=>$skuForUserLog->dqe,
-                                'te'=>$skuForUserLog->te,
-                            )
-                        );
-                        $skuForUserLog->status = $updateData['status'];
-                        $skuForUserLog->updated_user_id = $updateData['updated_user_id'];
-                        $skuForUserLog->save();
-                    }
-                }else{
-                    if($updateData) SkuForUserLog::whereIn('id',$_REQUEST["id"])->update($updateData);
-                }
-                
-                unset($updateData);      
-            }
-        }
+        $records = array();
+        $datas = TransferTask::select('transfer_plans.*','transfer_tasks.id as id','transfer_requests.marketplace_id','transfer_requests.bg','transfer_requests.bu','transfer_requests.asin','transfer_requests.sku'
+        ,'transfer_requests.quantity as request_quantity','transfer_tasks.transfer_task_key','transfer_tasks.status as task_status','transfer_tasks.carrier_code as task_carrier_code'
+        ,'transfer_tasks.ship_method as task_ship_method','transfer_tasks.tracking_number','transfer_tasks.out_date as task_out_date','transfer_tasks.in_date as task_in_date')
+        ->leftJoin('transfer_plans',function($q){
+            $q->on('transfer_tasks.transfer_plan_id', '=', 'transfer_plans.id');
+        })
+        ->leftjoin('transfer_requests',function($q){
+            $q->on('transfer_plans.transfer_request_id', '=', 'transfer_requests.id');
+        });
         
-        $date = array_get($_REQUEST,'date')??$curr_date;
-
-        if($date>=$curr_date){
-            $datas = DB::connection('amazon')->table(DB::raw("(select * from sku_for_user where date = '$curr_date') as sku_for_user"))
-            ->select('sku_for_user.*','new_producter','new_planer','new_dqe','new_te','confirm_id')
-            ->leftJoin(DB::raw('(select id as confirm_id,sku,marketplace_id,producter as new_producter,planer as new_planer,dqe as new_dqe,te as new_te from sku_for_user_logs where status = 0) as new_data'),function($q){
-                $q->on('sku_for_user.sku', '=', 'new_data.sku')->on('sku_for_user.marketplace_id', '=', 'new_data.marketplace_id');
-            });
-        }else{
-            $datas = SkuForUser::where('date',$date)->selectRaw('*,0 as confirm_id');
+        if(array_get($_REQUEST,'out_factory')){
+            $datas = $datas->where('out_factory',array_get($_REQUEST,'out_factory'));
         }
-
-        $users_data = User::where('locked',0)->pluck('name','id');
-        $users_data[0]='N/A';
+        if(array_get($_REQUEST,'in_factory')){
+            $datas = $datas->where('in_factory',array_get($_REQUEST,'in_factory'));
+        }
+        if(array_get($_REQUEST,'asin')){
+            $datas = $datas->whereIn('transfer_requests.asin',explode(',',str_replace([' ','	'],'',array_get($_REQUEST,'asin'))));
+        }
         if(array_get($_REQUEST,'sku')){
-            $datas = $datas->whereIn('sku_for_user.sku',explode(',',str_replace([' ','	'],'',array_get($_REQUEST,'sku'))));
+            $datas = $datas->whereIn('transfer_requests.sku',explode(',',str_replace([' ','	'],'',array_get($_REQUEST,'sku'))));
         } 
         if(array_get($_REQUEST,'status')!==NULL && array_get($_REQUEST,'status')!==''){
-            $datas = $datas->whereIn('status',array_get($_REQUEST,'status'));
+            $datas = $datas->whereIn('transfer_tasks.status',array_get($_REQUEST,'status'));
         }
-        if(array_get($_REQUEST,'producter')){
-            $datas = $datas->whereIn('producter',array_get($_REQUEST,'producter'));
-        }
-        if(array_get($_REQUEST,'planer')){
-            $datas = $datas->whereIn('planer',array_get($_REQUEST,'planer'));
-        }
-        if(array_get($_REQUEST,'dqe')){
-            $datas = $datas->whereIn('dqe',array_get($_REQUEST,'dqe'));
-        }
-        if(array_get($_REQUEST,'te')){
-            $datas = $datas->whereIn('te',array_get($_REQUEST,'te'));
-        }
+        
         $iTotalRecords = $datas->count();
         $iDisplayLength = intval($_REQUEST['length']);
         $iDisplayLength = $iDisplayLength < 0 ? $iTotalRecords : $iDisplayLength;
         $iDisplayStart = intval($_REQUEST['start']);
         $sEcho = intval($_REQUEST['draw']);
-        $lists =  $datas->offset($iDisplayStart)->limit($iDisplayLength)->orderBy('confirm_id','desc')->orderBy('id','asc')->get()->toArray();
-        $lists = json_decode(json_encode($lists), true);
-        $records = array();
+        $lists =  $datas->offset($iDisplayStart)->limit($iDisplayLength)->orderBy('transfer_tasks.id','desc')->get()->toArray();
+        $users = getUsers();
         $records["data"] = array();
 
 		foreach ( $lists as $list){
-            $iDisplayStart++;
+  
             $records["data"][] = array(
-                array_get($list,'confirm_id')?'<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input name="id[]" type="checkbox" class="checkboxes" value="'.$list['confirm_id'].'"  /><span></span></label>':'',
-                $iDisplayStart,
-                array_get(getSiteUrl(),$list['marketplace_id']),
+                '<input name="id[]" type="checkbox" class="checkboxes" value="'.$list['id'].'"  />',
+                $list['out_factory'],
+                $list['in_factory'],
+                $list['asin'],
                 $list['sku'],
-				$list['description'],
-				array_get(getSkuStatuses(),$list['status']),
-                (array_get($list,'new_producter')?('<span class="badge" style="text-decoration: line-through;">'.array_get($users_data,$list['producter']).'</span><span class="badge badge-danger">'.array_get($users_data,$list['new_producter']).'</span>'):array_get($users_data,$list['producter'])),
-                (array_get($list,'new_planer')?('<span class="badge" style="text-decoration: line-through;">'.array_get($users_data,$list['planer']).'</span><span class="badge badge-danger">'.array_get($users_data,$list['new_planer']).'</span>'):array_get($users_data,$list['planer'])),
-                (array_get($list,'new_dqe')?('<span class="badge" style="text-decoration: line-through;">'.array_get($users_data,$list['dqe']).'</span><span class="badge badge-danger">'.array_get($users_data,$list['new_dqe']).'</span>'):array_get($users_data,$list['dqe'])),
-                (array_get($list,'new_te')?('<span class="badge" style="text-decoration: line-through;">'.array_get($users_data,$list['te']).'</span><span class="badge badge-danger">'.array_get($users_data,$list['new_te']).'</span>'):array_get($users_data,$list['te'])),
+                $list['quantity'],
+                $list['carrier_code'].($list['ship_method']?'</BR>'.$list['ship_method']:''),
+                $list['out_date'],
+                $list['in_date'],
+                $list['rms'],
+                $list['require_attach']?'Y':'N',
+                $list['require_purchase']?'Y':'N',
+                $list['require_rebrand']?'Y':'N',
+                $list['transfer_task_key'],
+                ($list['task_status']!==NUll)?array_get(TransferTask::STATUS,$list['task_status']):'',
+                ($list['tracking_number']?$list['tracking_number']:'').($list['task_carrier_code']?'</BR>'.$list['task_carrier_code']:'').($list['task_ship_method']?'</BR>'.$list['task_ship_method']:''),
+                $list['task_out_date'],
+                $list['task_in_date']
             );
 		}
         $records["draw"] = $sEcho;
         $records["recordsTotal"] = $iTotalRecords;
         $records["recordsFiltered"] = $iTotalRecords;
         echo json_encode($records);
-
     }
+
+    public function edit(Request $request,$id)
+    {
+        //if(!Auth::user()->can(['transfer-task-show'])) die('Permission denied -- transfer-task-show');
+        $transferTask =  TransferTask::find($id);
+        if(empty($transferTask)) die('计划不存在!');
+        $transferPlan = TransferPlan::find($transferTask->transfer_plan_id);
+        $transferRequest = TransferRequest::find($transferPlan->transfer_request_id);
+        $users = getUsers();
+        $logs = getOperationLog(['table'=>'transfer_tasks','primary_id'=>$id]);
+        $logArr = [];
+        foreach($logs  as $log){
+            $logArr[]= $log->created_at.' '.array_get($users,$log->user_id).' '.array_get(TransferTask::STATUS,array_get(json_decode($log->input,true),'status')); 
+        }
+        return view('transfer/taskEdit',['transferPlan'=>$transferPlan,'transferRequest'=>$transferRequest,'transferTask'=>$transferTask,'sellers'=>getUsers('sap_seller'), 'users'=>$users, 'planStatus'=>TransferPlan::STATUS, 'requestStatus'=>TransferRequest::STATUS, 'taskStatus'=>TransferTask::STATUS,'logArr'=>$logArr]);
+    }
+	
+
+    public function update(Request $request,$id)
+    {
+		//if(!Auth::user()->can(['transfer-task-update'])) die('Permission denied -- transfer-task-update');
+        DB::beginTransaction();
+        try{ 
+            $data = TransferTask::findOrFail($id);
+            if($data->status != $request->get('status') ) saveOperationLog('transfer_tasks', $data->id, ['status'=>$request->get('status')]);
+            $fileds = array(
+                'out_date','in_date','tracking_number','status'
+            );
+            foreach($fileds as $filed){
+                $data->{$filed} = $request->get($filed);
+            }
+            $data->save();           
+            DB::commit();
+            $records["customActionStatus"] = 'OK';
+            $records["customActionMessage"] = "Update Success!";     
+        }catch (\Exception $e) { 
+            DB::rollBack();
+            $records["customActionStatus"] = '';
+            $records["customActionMessage"] = $e->getMessage();
+        }
+        echo json_encode($records);
+    }
+    
+    
 }

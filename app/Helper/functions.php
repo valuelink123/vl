@@ -1369,7 +1369,7 @@ function getWeekDate($yearWeekNum){
 
 
 //存日志
-function SaveOperationLog(string $table = NULL, int $primary_id = 0 , array $inputData = array()){
+function saveOperationLog(string $table = NULL, int $primary_id = 0 , array $inputData = array()){
 	DB::table('operation_log')->insert(
 		array(
 			'user_id'=>Auth::user()->id,
@@ -1383,4 +1383,11 @@ function SaveOperationLog(string $table = NULL, int $primary_id = 0 , array $inp
 			'updated_at'=>date('Y-m-d H:i:s'),
 		)
 	);
+}
+function getOperationLog(array $filters){
+	$logs = DB::table('operation_log');
+	foreach($filters as $k=>$v){
+		$logs = $logs->where($k,$v);
+	}
+	return $logs->get();
 }
