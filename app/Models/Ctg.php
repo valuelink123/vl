@@ -46,7 +46,7 @@ class Ctg extends Model {
             }
 
         } catch (\Exception $e) {
-            throw new HypocriteException($e->getMessage() . ' For help, please mail to support@claimthegift.com');
+            throw new HypocriteException($e->getMessage() . ' For help, please mail to support@claimgiftsnow.com');
         }
 
 
@@ -109,7 +109,7 @@ class Ctg extends Model {
             return $obj;
 
         } catch (\Exception $e) {
-            throw new HypocriteException($e->getMessage() . ' For help, please mail to support@claimthegift.com');
+            throw new HypocriteException($e->getMessage() . ' For help, please mail to support@claimgiftsnow.com');
         }
     }
 }

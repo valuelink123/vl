@@ -822,6 +822,7 @@
 												@endpermission
 											</ul>
 										</li>
+
 										<li class="menu-dropdown classic-menu-dropdown ">
 											<a href="javascript:;"> EDM
 												<span class="arrow"></span>
@@ -857,6 +858,23 @@
 												<li class="">
 													<a href="/edm/campaign" class="nav-link nav-toggle ">
 														Campaign
+														<span class="arrow"></span>
+													</a>
+												</li>
+												@endpermission
+											</ul>
+										</li>
+
+										<li class="menu-dropdown classic-menu-dropdown ">
+											<a href="javascript:;"> CPFR协同补货
+												<span class="arrow"></span>
+											</a>
+											<ul class="dropdown-menu pull-left">
+
+												@permission('transfer-request-show')
+												<li class="">
+													<a href="/transfer/request/list" class="nav-link nav-toggle ">
+														Transfer Request
 														<span class="arrow"></span>
 													</a>
 												</li>
