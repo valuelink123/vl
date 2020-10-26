@@ -32,7 +32,7 @@
                         </div>
                         <div class="form-group col-md-3">
                             <label>销售员:</label>
-                            {{$transferRequest->bg}} - {{$transferRequest->bu}} - {{$transferRequest->sap_seller_id}}
+                            {{$transferRequest->bg}} - {{$transferRequest->bu}} - {{array_get($sellers,$transferRequest->sap_seller_id)}}
                         </div>
                         <div class="form-group col-md-3">
                             <label>Asin:</label>

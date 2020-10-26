@@ -73,14 +73,23 @@ class TransferPlanController extends Controller
 
         $datas = TransferPlan::select('transfer_plans.*','transfer_requests.marketplace_id','transfer_requests.bg','transfer_requests.bu','transfer_requests.asin','transfer_requests.sku'
         ,'transfer_requests.quantity as request_quantity','transfer_tasks.transfer_task_key','transfer_tasks.status as task_status','transfer_tasks.carrier_code as task_carrier_code'
-        ,'transfer_tasks.ship_method as task_ship_method','transfer_tasks.tracking_number','transfer_tasks.out_date as task_out_date','transfer_tasks.in_date as task_in_date')
+        ,'transfer_tasks.ship_method as task_ship_method','transfer_tasks.tracking_number','transfer_tasks.out_date as task_out_date','transfer_tasks.in_date as task_in_date','asin.fba_stock',
+        'asin.fba_transfer','asin.sales')
         ->leftJoin('transfer_requests',function($q){
             $q->on('transfer_plans.transfer_request_id', '=', 'transfer_requests.id');
         })
         ->leftjoin('transfer_tasks',function($q){
             $q->on('transfer_plans.id', '=', 'transfer_tasks.transfer_plan_id');
+        })
+        ->leftjoin('marketplaces',function($q){
+            $q->on('transfer_requests.marketplace_id', '=', 'marketplaces.marketplace_id');
+        })
+        ->leftJoin(DB::raw("(select sum(fba_stock) as fba_stock,sum(fba_transfer) as fba_transfer,sum(sales_07_01*0.1+sales_14_08*0.2+sales_21_15*0.3+sales_28_22*0.5)/7 as sales ,asin,site from asin where length(asin)=10 group by asin,site) as asin"),function($q){
+            $q->on('transfer_requests.asin', '=', 'asin.asin')->on('marketplaces.site', '=', 'asin.site');
         });
         
+
+
         if(array_get($_REQUEST,'marketplace_id')){
             $datas = $datas->whereIn('transfer_requests.marketplace_id',array_get($_REQUEST,'marketplace_id'));
         }
@@ -128,6 +137,9 @@ class TransferPlanController extends Controller
                 ($list['status']!==NUll)?array_get(TransferPlan::STATUS,$list['status']):'',
                 $list['request_quantity'],
                 $list['quantity'],
+                $list['fba_stock']??0,
+                $list['fba_transfer']??0,
+                ($list['sales']>0)?date('Y-m-d',strtotime('+'.intval((array_get($list,'fba_stock',0)+array_get($list,'fba_transfer',0))/$list['sales']).' days')):'∞',
                 $list['carrier_code'].($list['ship_method']?'</BR>'.$list['ship_method']:''),
                 $list['out_date'],
                 $list['in_date'],
@@ -155,7 +167,17 @@ class TransferPlanController extends Controller
         if(empty($transferPlan)) die('计划不存在!');
         $transferRequest = TransferRequest::find($transferPlan->transfer_request_id);
         $transferTask = TransferTask::where('transfer_plan_id',$id)->first();
-        return view('transfer/planEdit',['transferPlan'=>$transferPlan,'transferRequest'=>$transferRequest,'transferTask'=>$transferTask,'sellers'=>getUsers('sap_seller'), 'users'=>getUsers(), 'planStatus'=>TransferPlan::STATUS, 'requestStatus'=>TransferRequest::STATUS, 'taskStatus'=>TransferTask::STATUS]);
+
+        $users = getUsers();
+        $logArr = [];
+        if(!empty($transferTask)){
+        $logs = getOperationLog(['table'=>'transfer_tasks','primary_id'=>$transferTask->id]);
+            foreach($logs  as $log){
+                $logArr[]= $log->created_at.' '.array_get($users,$log->user_id).' '.array_get(TransferTask::STATUS,array_get(json_decode($log->input,true),'status')); 
+            }
+        }
+        
+        return view('transfer/planEdit',['transferPlan'=>$transferPlan,'transferRequest'=>$transferRequest,'transferTask'=>$transferTask,'sellers'=>getUsers('sap_seller'), 'users'=>$users, 'planStatus'=>TransferPlan::STATUS, 'requestStatus'=>TransferRequest::STATUS, 'taskStatus'=>TransferTask::STATUS,'logArr'=>$logArr]);
     }
 	
 

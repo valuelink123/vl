@@ -32,7 +32,7 @@
                         </div>
                         <div class="form-group col-md-3">
                             <label>销售员:</label>
-                            {{$transferRequest->bg}} - {{$transferRequest->bu}} - {{$transferRequest->sap_seller_id}}
+                            {{$transferRequest->bg}} - {{$transferRequest->bu}} - {{array_get($sellers,$transferRequest->sap_seller_id)}}
                         </div>
                         <div class="form-group col-md-3">
                             <label>Asin:</label>
@@ -216,7 +216,7 @@
                             <label>状态:</label>
                             {{array_get($taskStatus,$transferTask->status)}}
                         </div>
-
+                        <div style="clear:both;"></div>    
                         <div class="form-group col-md-6">
                             <label>创建日期:</label>
                             {{$transferTask->created_at}}
@@ -225,7 +225,10 @@
                             <label>最后更新:</label>
                             {{$transferTask->updated_at}}
                         </div>
-
+                        <div class="form-group col-md-12">
+                            <label>操作日志:</label><BR>
+                            {!!implode('</BR>',$logArr)!!}
+                        </div>        
 						<?php } ?>
 
                         

@@ -2,26 +2,7 @@
 @section('label', '调拨计划列表')
 @section('content')
 <style type="text/css">
-.dataTables_extended_wrapper .table.dataTable {
-  margin: 0px !important;
-}
-
-table.dataTable thead th, table.dataTable thead td {
-    padding: 10px 2px !important;}
-table.dataTable tbody th, table.dataTable tbody td {
-    padding: 10px 2px;
-    text-align: left;
-}
-th,td,td>span {
-    font-size:12px !important;
-	font-family:Arial, Helvetica, sans-serif;}
-.text{
-    display: -webkit-box;
-    -webkit-line-clamp: 5;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
-
+	th, td { white-space: nowrap;word-break:break-all; }
 </style>
     <div class="row">
         <div class="col-md-12">
@@ -134,7 +115,7 @@ th,td,td>span {
                                             <input type="checkbox" class="group-checkable" data-set="#datatable_ajax .checkboxes" />
                                             
                                     </th>
-                                    <th>站点</th>
+                                    <th width="50px" style="widht:50px;">站点</th>
 									<th>Bg</th>
 									<th>Bu</th>
 									<th>调出工厂</th>
@@ -144,6 +125,9 @@ th,td,td>span {
 									<th>计划状态</th>
 									<th>申请数量</th>
 									<th>计划数量</th>
+                                    <th>FBA在库</th>
+                                    <th>FBA在途</th>
+                                    <th>维持天数</th>
 									<th>计划物流</th>
 									<th>计划调出日</th>
 									<th>计划调入日</th>
@@ -216,7 +200,8 @@ th,td,td>span {
                     "ajax": {
                         "url": "{{ url('transferPlan/get')}}",
                     },
-
+                    "scrollX": true,
+                    //"autoWidth":true
                     /*
                     dom: 'Bfrtip',
                     buttons: [ 

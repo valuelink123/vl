@@ -2,26 +2,7 @@
 @section('label', '调拨任务列表')
 @section('content')
 <style type="text/css">
-.dataTables_extended_wrapper .table.dataTable {
-  margin: 0px !important;
-}
-
-table.dataTable thead th, table.dataTable thead td {
-    padding: 10px 2px !important;}
-table.dataTable tbody th, table.dataTable tbody td {
-    padding: 10px 2px;
-    text-align: left;
-}
-th,td,td>span {
-    font-size:12px !important;
-	font-family:Arial, Helvetica, sans-serif;}
-.text{
-    display: -webkit-box;
-    -webkit-line-clamp: 5;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
-
+	th, td { white-space: nowrap;word-break:break-all; }
 </style>
     <div class="row">
         <div class="col-md-12">
@@ -162,7 +143,7 @@ th,td,td>span {
                     "ajax": {
                         "url": "{{ url('transferTask/get')}}",
                     },
-
+                    "scrollX": true,
                     /*
                     dom: 'Bfrtip',
                     buttons: [ 

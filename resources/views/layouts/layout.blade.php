@@ -879,6 +879,22 @@
 													</a>
 												</li>
 												@endpermission
+                                                @permission('transfer-plan-show')
+												<li class="">
+													<a href="/transferPlan" class="nav-link nav-toggle ">
+														Transfer Plan
+														<span class="arrow"></span>
+													</a>
+												</li>
+												@endpermission
+                                                @permission('transfer-task-show')
+												<li class="">
+													<a href="/transferTask" class="nav-link nav-toggle ">
+														Transfer Task
+														<span class="arrow"></span>
+													</a>
+												</li>
+												@endpermission
 											</ul>
 										</li>
                                     </ul>
