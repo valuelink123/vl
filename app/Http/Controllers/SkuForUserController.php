@@ -177,7 +177,17 @@ class SkuForUserController extends Controller
 
         if(!$exportFileName) $exportFileName = 'All_';
         $exportFileName.=date('YmdHis').'.xlsx';
-
+        
+        if(!Auth::user()->can(['skuforuser-show-all'])){
+            $user_ids = [];
+            $user_ids[] = Auth::user()->id;
+            $datas = $datas->where(function ($query) use ($user_ids) {
+                $query->whereIn('producter', $user_ids)
+                        ->orwhereIn('planer', $user_ids)
+						 ->orwhereIn('dqe', $user_ids)
+						  ->orwhereIn('te', $user_ids);
+            });
+        }
         $datas =  $datas->orderBy('confirm_id','desc')->orderBy('id','asc')->get()->toArray();
         $datas = json_decode(json_encode($datas), true);
         $arrayData = array();
@@ -287,11 +297,24 @@ class SkuForUserController extends Controller
         if(array_get($_REQUEST,'te')){
             $datas = $datas->whereIn('te',array_get($_REQUEST,'te'));
         }
+
+        if(!Auth::user()->can(['skuforuser-show-all'])){
+            $user_ids = [];
+            $user_ids[] = Auth::user()->id;
+            $datas = $datas->where(function ($query) use ($user_ids) {
+                $query->whereIn('producter', $user_ids)
+                        ->orwhereIn('planer', $user_ids)
+						 ->orwhereIn('dqe', $user_ids)
+						  ->orwhereIn('te', $user_ids);
+            });
+        }
+        
         $iTotalRecords = $datas->count();
         $iDisplayLength = intval($_REQUEST['length']);
         $iDisplayLength = $iDisplayLength < 0 ? $iTotalRecords : $iDisplayLength;
         $iDisplayStart = intval($_REQUEST['start']);
         $sEcho = intval($_REQUEST['draw']);
+        
         $lists =  $datas->offset($iDisplayStart)->limit($iDisplayLength)->orderBy('confirm_id','desc')->orderBy('id','asc')->get()->toArray();
         $lists = json_decode(json_encode($lists), true);
         $records = array();
