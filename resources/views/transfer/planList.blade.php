@@ -14,8 +14,8 @@
                         <div class="row">
 						<div class="col-md-2">
 						<select class="mt-multiselect btn btn-default " multiple="multiple" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" data-none-selected-text="选择站点" name="marketplace_id[]" id="marketplace_id[]">
-                            @foreach (getSiteCode() as $k=>$v)
-                                <option value="{{$v}}">{{$k}}</option>
+                            @foreach ($siteCode as $k=>$v)
+                                <option value="{{$k}}">{{$v}}</option>
                             @endforeach
                         </select>
 						</div>
@@ -86,11 +86,11 @@
                         <i class="icon-settings font-dark"></i>
                         <span class="caption-subject bold uppercase">调拨计划列表</span>
                     </div>
-					
+					@permission('transfer-plan-update')
 					<div class="btn-group " style="float:right;">
                         <div class="table-actions-wrapper" id="table-actions-wrapper">
 							
-                            <select id="confirmStatus" class="table-group-action-input form-control input-inline input-small input-sm">
+                            <select id="confirmStatus" class="table-group-action-input form-control input-inline">
                                 <option value="">选择更新状态</option>
                                 <?php
                                 foreach($status as $k=>$v){
@@ -103,6 +103,7 @@
                         		
                         </div>
                     </div>
+                    @endpermission
                 </div>
 				
                 <div class="portlet-body">
@@ -110,12 +111,10 @@
                         <table class="table table-striped table-bordered table-hover table-checkable" id="datatable_ajax">
                             <thead>
                                 <tr role="row" class="heading">
-                                    <th >
-         
-                                            <input type="checkbox" class="group-checkable" data-set="#datatable_ajax .checkboxes" />
-                                            
+                                    <th>
+                                        <input type="checkbox" class="group-checkable" data-set="#datatable_ajax .checkboxes" />
                                     </th>
-                                    <th width="50px" style="widht:50px;">站点</th>
+                                    <th>站点</th>
 									<th>Bg</th>
 									<th>Bu</th>
 									<th>调出工厂</th>
@@ -200,7 +199,7 @@
                     "ajax": {
                         "url": "{{ url('transferPlan/get')}}",
                     },
-                    "scrollX": true,
+                    //"scrollX": true,
                     //"autoWidth":true
                     /*
                     dom: 'Bfrtip',
@@ -273,12 +272,10 @@ $(function() {
 	});
 	$('#datatable_ajax').on('click', 'td:not(:has(input))', function (e) {
         e.preventDefault();
-
         var planId = $(this).closest('tr').find('.checkboxes').prop('value');
         $('#ajax').modal({
             remote: '/transferPlan/'+planId+'/edit'
         });
-        
     } );
 	
 });

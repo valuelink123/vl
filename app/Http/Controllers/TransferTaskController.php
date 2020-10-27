@@ -28,7 +28,7 @@ class TransferTaskController extends Controller
 
     public function index()
     {
-        //if(!Auth::user()->can(['transfer-task-show'])) die('Permission denied -- transfer-task-show');
+        if(!Auth::user()->can(['transfer-task-show'])) die('Permission denied -- transfer-task-show');
         return view('transfer/taskList',['sellers'=>getUsers('sap_seller'), 'users'=>getUsers(), 'status'=>TransferTask::STATUS]);
 
     }
@@ -72,7 +72,6 @@ class TransferTaskController extends Controller
         $records["data"] = array();
 
 		foreach ( $lists as $list){
-  
             $records["data"][] = array(
                 '<input name="id[]" type="checkbox" class="checkboxes" value="'.$list['id'].'"  />',
                 $list['out_factory'],
@@ -102,24 +101,26 @@ class TransferTaskController extends Controller
 
     public function edit(Request $request,$id)
     {
-        //if(!Auth::user()->can(['transfer-task-show'])) die('Permission denied -- transfer-task-show');
+        if(!Auth::user()->can(['transfer-task-show'])) die('Permission denied -- transfer-task-show');
         $transferTask =  TransferTask::find($id);
         if(empty($transferTask)) die('计划不存在!');
         $transferPlan = TransferPlan::find($transferTask->transfer_plan_id);
         $transferRequest = TransferRequest::find($transferPlan->transfer_request_id);
         $users = getUsers();
+        $siteCode = DB::table('marketplaces')->pluck('country_code','marketplace_id');
+        $accountCode = DB::connection('amazon')->table('seller_accounts')->whereNull('deleted_at')->pluck('label','mws_seller_id');
         $logs = getOperationLog(['table'=>'transfer_tasks','primary_id'=>$id]);
         $logArr = [];
         foreach($logs  as $log){
             $logArr[]= $log->created_at.' '.array_get($users,$log->user_id).' '.array_get(TransferTask::STATUS,array_get(json_decode($log->input,true),'status')); 
         }
-        return view('transfer/taskEdit',['transferPlan'=>$transferPlan,'transferRequest'=>$transferRequest,'transferTask'=>$transferTask,'sellers'=>getUsers('sap_seller'), 'users'=>$users, 'planStatus'=>TransferPlan::STATUS, 'requestStatus'=>TransferRequest::STATUS, 'taskStatus'=>TransferTask::STATUS,'logArr'=>$logArr]);
+        return view('transfer/taskEdit',['transferPlan'=>$transferPlan,'transferRequest'=>$transferRequest,'transferTask'=>$transferTask,'sellers'=>getUsers('sap_seller'), 'users'=>$users, 'planStatus'=>TransferPlan::STATUS, 'requestStatus'=>TransferRequest::STATUS, 'taskStatus'=>TransferTask::STATUS,'logArr'=>$logArr,'siteCode'=>$siteCode,'accountCode'=>$accountCode]);
     }
 	
 
     public function update(Request $request,$id)
     {
-		//if(!Auth::user()->can(['transfer-task-update'])) die('Permission denied -- transfer-task-update');
+		if(!Auth::user()->can(['transfer-task-update'])) die('Permission denied -- transfer-task-update');
         DB::beginTransaction();
         try{ 
             $data = TransferTask::findOrFail($id);

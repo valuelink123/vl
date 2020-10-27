@@ -143,7 +143,7 @@
                     "ajax": {
                         "url": "{{ url('transferTask/get')}}",
                     },
-                    "scrollX": true,
+                    //"scrollX": true,
                     /*
                     dom: 'Bfrtip',
                     buttons: [ 

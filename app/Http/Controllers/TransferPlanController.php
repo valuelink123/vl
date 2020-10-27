@@ -28,8 +28,8 @@ class TransferPlanController extends Controller
 
     public function index()
     {
-        //if(!Auth::user()->can(['transfer-plan-show'])) die('Permission denied -- transfer-plan-show');
-        return view('transfer/planList',['sellers'=>getUsers('sap_seller'), 'users'=>getUsers(), 'status'=>TransferPlan::STATUS]);
+        if(!Auth::user()->can(['transfer-plan-show'])) die('Permission denied -- transfer-plan-show');
+        return view('transfer/planList',['sellers'=>getUsers('sap_seller'), 'users'=>getUsers(), 'status'=>TransferPlan::STATUS, 'siteCode' => (DB::table('marketplaces')->pluck('country_code','marketplace_id'))]);
 
     }
 
@@ -37,7 +37,7 @@ class TransferPlanController extends Controller
     {
         $records = array();
         if (isset($_REQUEST["customActionType"])) {
-            //if(!Auth::user()->can(['transfer-plan-batch-update'])) die('Permission denied -- transfer-plan-batch-update');
+            if(!Auth::user()->can(['transfer-plan-update'])) die('Permission denied -- transfer-plan-update');
             $updateData=array();
             if($_REQUEST["customActionType"] == "group_action"){
                 $updateData['status'] = intval(array_get($_REQUEST,"confirmStatus"));
@@ -123,11 +123,11 @@ class TransferPlanController extends Controller
         $lists =  $datas->offset($iDisplayStart)->limit($iDisplayLength)->orderBy('transfer_plans.id','desc')->get()->toArray();
         
         $records["data"] = array();
-
+        $siteCode = DB::table('marketplaces')->pluck('country_code','marketplace_id');
 		foreach ( $lists as $list){
             $records["data"][] = array(
                 '<input name="id[]" type="checkbox" class="checkboxes" value="'.$list['id'].'"  />',
-                array_get(array_flip(getSiteCode()),$list['marketplace_id']),
+                array_get($siteCode,$list['marketplace_id']),
                 $list['bg'],
                 $list['bu'],
                 $list['out_factory'],
@@ -162,13 +162,15 @@ class TransferPlanController extends Controller
 
     public function edit(Request $request,$id)
     {
-        //if(!Auth::user()->can(['transfer-plan-show'])) die('Permission denied -- transfer-plan-show');
+        if(!Auth::user()->can(['transfer-plan-show'])) die('Permission denied -- transfer-plan-show');
         $transferPlan =  TransferPlan::find($id);
         if(empty($transferPlan)) die('计划不存在!');
         $transferRequest = TransferRequest::find($transferPlan->transfer_request_id);
         $transferTask = TransferTask::where('transfer_plan_id',$id)->first();
 
         $users = getUsers();
+        $siteCode = DB::table('marketplaces')->pluck('country_code','marketplace_id');
+        $accountCode = DB::connection('amazon')->table('seller_accounts')->whereNull('deleted_at')->pluck('label','mws_seller_id');
         $logArr = [];
         if(!empty($transferTask)){
         $logs = getOperationLog(['table'=>'transfer_tasks','primary_id'=>$transferTask->id]);
@@ -177,13 +179,13 @@ class TransferPlanController extends Controller
             }
         }
         
-        return view('transfer/planEdit',['transferPlan'=>$transferPlan,'transferRequest'=>$transferRequest,'transferTask'=>$transferTask,'sellers'=>getUsers('sap_seller'), 'users'=>$users, 'planStatus'=>TransferPlan::STATUS, 'requestStatus'=>TransferRequest::STATUS, 'taskStatus'=>TransferTask::STATUS,'logArr'=>$logArr]);
+        return view('transfer/planEdit',['transferPlan'=>$transferPlan,'transferRequest'=>$transferRequest,'transferTask'=>$transferTask,'sellers'=>getUsers('sap_seller'), 'users'=>$users, 'planStatus'=>TransferPlan::STATUS, 'requestStatus'=>TransferRequest::STATUS, 'taskStatus'=>TransferTask::STATUS,'logArr'=>$logArr,'siteCode'=>$siteCode,'accountCode'=>$accountCode]);
     }
 	
 
     public function update(Request $request,$id)
     {
-		//if(!Auth::user()->can(['transfer-plan-update'])) die('Permission denied -- transfer-plan-update');
+		if(!Auth::user()->can(['transfer-plan-update'])) die('Permission denied -- transfer-plan-update');
         DB::beginTransaction();
         try{ 
             $data = TransferPlan::findOrFail($id);

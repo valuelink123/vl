@@ -20,11 +20,11 @@
 
                         <div class="form-group col-md-3">
                             <label>站点:</label>
-                            {{$transferRequest->marketplace_id}}
+                            {{array_get($siteCode,$transferRequest->marketplace_id)}}
                         </div>
                         <div class="form-group col-md-3">
                             <label>账号:</label>
-                            {{$transferRequest->seller_id}}
+                            {{array_get($accountCode,$transferRequest->seller_id)}}
                         </div>
                         <div class="form-group col-md-3">
                             <label>状态:</label>
