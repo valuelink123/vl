@@ -1391,3 +1391,13 @@ function getOperationLog(array $filters){
 	}
 	return $logs->get();
 }
+
+//协同补货模块状态枚举
+function transferRequestStatus()
+{
+	return array(0=>'已申请',1=>'BU已审核',2=>'BG已审核',3=>'BU退回',4=>'BG退回',5=>'计划退回',6=>'计划确认',7=>'关闭',8=>'计划已生成');
+}
+//得到账号的IDName
+function getAccountIdName(){
+	return DB::connection('amazon')->table("seller_accounts")->whereNull('deleted_at')->groupby(['id','label'])->pluck('label','id');
+}

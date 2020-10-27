@@ -265,4 +265,34 @@ class Controller extends BaseController
 		}
 		return $data;
 	}
+	/*
+	 * 销售在页面上填写asin，ajax检测是否属于自己的asin
+	 */
+	public function checkAsin()
+	{
+		$userdata = Auth::user();
+		$return = array('status'=>0,'msg'=>'Please fill in your own ASIN');
+		$asin = isset($_POST['asin']) && $_POST['asin'] ? $_POST['asin'] : '';
+		if(empty($asin)){
+			return $return;
+		}
+		$site = isset($_POST['site']) && $_POST['site'] ? $_POST['site'] : '';
+		$siteUrl = getSiteUrl();
+		$url = isset($siteUrl[$site]) && $siteUrl[$site] ? 'www.'.$siteUrl[$site] : $site;
+		$where = " where asin = '".$asin."' and site = '".$url."'";
+		if ($userdata->seller_rules) {
+			$rules = explode("-", $userdata->seller_rules);
+			if (array_get($rules, 0) != '*') $where .= " and bg = '".array_get($rules, 0)."'";
+			if (array_get($rules, 1) != '*') $where .= " and bu = '".array_get($rules, 1)."'";
+		}elseif($userdata->sap_seller_id){
+			$where .= " and sap_seller_id = ".$userdata->sap_seller_id;
+		}
+		$sql = 'select asin from asin '.$where .' limit 1';
+		$user_asin_list_obj = DB::select($sql);
+		$user_asin_list = (json_decode(json_encode($user_asin_list_obj), true));
+		if($user_asin_list){
+			$return = array('status'=>1,'msg'=>'success');
+		}
+		return $return;
+	}
 }

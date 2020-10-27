@@ -226,4 +226,64 @@ class TransferPlanController extends Controller
         );
         if($result->wasRecentlyCreated) saveOperationLog('transfer_tasks', $result->id, ['status'=>$status]);
     }
+
+	//生成计划
+	public function createPlan(Request $request)
+	{
+		$userInfo = Auth::user();//登录用户信息
+		if(!$userInfo->can(['transfer-plan-add'])) die('Permission denied -- transfer-plan-add');
+		$ids = isset($_REQUEST['id']) && $_REQUEST['id'] ? $_REQUEST['id'] : '';
+		$id_array = explode(',',$ids);
+		$data = DB::table('transfer_requests')->where('status',6)->whereIn('id',$id_array)->select('id','asin','quantity','sku')->get()->toArray();//获取此id的数据
+		if(empty($data)){
+			$request->session()->flash('error_message','ID error');
+			return redirect()->back()->withInput();
+		}else{
+			foreach($data as $key=>$val){
+				$data[$key] = (array)$val;
+				$total[$val->sku] = isset($total[$val->sku]) ? $total[$val->sku] + $val->quantity : $val->quantity;//同一sku的数量相加
+			}
+			if(count($total)>1){
+				$request->session()->flash('error_message','同时生成多条计划的时候，只能为同一SKU');
+				return redirect()->back()->withInput();
+			}
+		}
+
+		if($request->isMethod('get')){
+			return view('transfer/planAdd',['data'=>$data,'total'=>$total,'ids'=>$ids]);
+		}elseif ($request->isMethod('post')){
+			$insert['status'] = 0;
+			$insert['planer'] = $userInfo->id;
+			$insert['transfer_plan_key'] = md5(time());
+			$configField = array('out_factory','in_factory','carrier_code','ship_method','require_rms','require_attach','out_date','in_date');
+			foreach($configField as $field){
+				$insert[$field] = isset($_POST[$field]) && $_POST[$field]!=='' ? $_POST[$field] : '';
+			}
+			$quantity = isset($_POST['quantity']) && $_POST['quantity'] ? $_POST['quantity'] : 0;//计划员输入的调拨数量
+			$number = array();
+			foreach($data as $key=>$val){
+				$number[$val['id']] = $total[key($total)]>0 ? round($quantity*$val['quantity']/$total[key($total)]) : 0;
+			}
+
+			$num = 0;
+			foreach($id_array as $key=>$val){
+				$insert['transfer_request_id'] = $val;
+				$insert['created_at'] = $insert['updated_at'] = date('Y-m-d H:i:s');
+				$insert['quantity'] = isset($number[$val]) ? $number[$val] : 0;
+				//添加表的数据
+				$resId = DB::table('transfer_plans')->insertGetId($insert);
+				if($resId){
+					DB::table('transfer_requests')->where('id',$val)->update(array('status'=>8));
+					SaveOperationLog('transfer_requests', $resId, $insert);//添加操作存日志
+					$num++;
+				}
+			}
+			if($num==0){
+				$request->session()->flash('error_message','Add Failed');
+				return redirect()->back()->withInput();
+			}
+
+			return redirect('/transferPlan');
+		}
+	}
 }

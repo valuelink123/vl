@@ -362,10 +362,21 @@ Route::post('/plansforecast/weekupdate', 'PlansForecastController@weekupdate');
 Route::post('/plansforecast/updateStatus', 'PlansForecastController@updateStatus');
 Route::get('/plansforecast/edit', 'PlansForecastController@edit');
 
+
+/*
+ * 协同补货模块
+ */
+Route::match(['post','get'],'/transfer/request/list', 'TransferRequestController@list');//调货请求列表
+Route::match(['post','get'],'/transfer/request/add', 'TransferRequestController@add');//添加调货请求列表
+Route::match(['post','get'],'/transfer/request/edit', 'TransferRequestController@edit');//更新/查看调货请求内容
+Route::post('/checkAsin', 'Controller@checkAsin');//销售在页面上填写asin，ajax检测是否属于自己的asin
+Route::post('/transfer/request/updateStatus', 'TransferRequestController@updateStatus');//审核操作，更新状态
+
 //调拨计划
 Route::resource('transferPlan', 'TransferPlanController');
 Route::Post('/transferPlan/get', 'TransferPlanController@get')->name('getTransferPlan');
 Route::Post('/transferPlan/batchUpdate', 'TransferPlanController@batchUpdate')->name('transferPlanBatchUpdate');
+Route::match(['post','get'],'/transfer/plan/createPlan', 'TransferPlanController@createPlan');//计划确认后的挑货请求，生成计划
 //调拨任务
 Route::resource('transferTask', 'TransferTaskController');
 Route::Post('/transferTask/get', 'TransferTaskController@get')->name('getTransferTask');
