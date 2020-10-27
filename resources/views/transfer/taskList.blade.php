@@ -72,8 +72,9 @@
 									<th>调出工厂</th>
 									<th>调入工厂</th>
 									<th>Asin</th>
-									<th>Sku</th>
-									<th>计划数量</th>
+									<th>申请Sku</th>
+                                    <th>调出Sku</th>
+									<th>调出数量</th>
 									<th>计划物流</th>
 									<th>计划调出日</th>
 									<th>计划调入日</th>
@@ -190,7 +191,9 @@ $(function() {
             remote: '/transferTask/'+taskId+'/edit'
         });
     } );
-	
+    $('#ajax').on('hidden.bs.modal', function (e) {
+        $('#ajax .modal-content').html('<div class="modal-body" >Loading...</div>');
+    });
 });
 
 
@@ -200,8 +203,7 @@ $(function() {
 	<div class="modal-dialog modal-lg">
 		<div class="modal-content" >
 			<div class="modal-body" >
-				<img src="../assets/global/img/loading-spinner-grey.gif" alt="" class="loading">
-				<span>Loading... </span>
+				Loading...
 			</div>
 		</div>
 	</div>

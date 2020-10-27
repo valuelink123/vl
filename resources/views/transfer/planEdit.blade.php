@@ -32,7 +32,7 @@
                         </div>
                         <div class="form-group col-md-3">
                             <label>销售员:</label>
-                            {{$transferRequest->bg}} - {{$transferRequest->bu}} - {{array_get($sellers,$transferRequest->sap_seller_id)}}
+                            {{$transferRequest->bg}}{{$transferRequest->bu}}-{{array_get($sellers,$transferRequest->sap_seller_id)}}
                         </div>
                         <div class="form-group col-md-3">
                             <label>Asin:</label>
@@ -88,13 +88,13 @@
 
                         <div class="form-group col-md-3">
                             <label>调出工厂</label>
-                            <input type="text" class="form-control" name="out_factory" id="out_factory" value='{{$transferPlan->out_factory}}' required>  
+                            <input type="text" class="form-control" name="out_factory" id="out_factory" value='{{$transferPlan->out_factory}}' >  
                         </div>
 						
 						<div class="form-group col-md-3">
                             <label>调出日期</label>
 							<div class="input-group date date-picker margin-bottom-5" data-date-format="yyyy-mm-dd">
-                                <input type="text" class="form-control" name="out_date" value="{{$transferPlan->out_date}}" required>
+                                <input type="text" class="form-control" name="out_date" value="{{$transferPlan->out_date}}" >
                                 <span class="input-group-btn">
 									<button class="btn btn-sm default" type="button">
 										<i class="fa fa-calendar"></i>
@@ -105,13 +105,13 @@
 
                         <div class="form-group col-md-3">
                             <label>调入工厂</label>
-                            <input type="text" class="form-control" name="in_factory" id="in_factory" value='{{$transferPlan->in_factory}}' required>  
+                            <input type="text" class="form-control" name="in_factory" id="in_factory" value='{{$transferPlan->in_factory}}' >  
                         </div>
 						
 						<div class="form-group col-md-3">
                             <label>调入日期</label>
 							<div class="input-group date date-picker margin-bottom-5" data-date-format="yyyy-mm-dd">
-                                <input type="text" class="form-control" name="in_date" value="{{$transferPlan->in_date}}" required>
+                                <input type="text" class="form-control" name="in_date" value="{{$transferPlan->in_date}}" >
                                 <span class="input-group-btn">
 									<button class="btn btn-sm default" type="button">
 										<i class="fa fa-calendar"></i>
@@ -120,25 +120,26 @@
                             </div>	                          
                         </div>
                         
+                        <div class="form-group col-md-3">
+                            <label>调出Sku</label>
+                            <input type="text" class="form-control" name="sku" id="sku" value='{{$transferPlan->sku??$transferRequest->sku}}' >  
+                        </div>
+
 
                         <div class="form-group col-md-3">
                             <label>调出数量</label>
-                            <input type="text" class="form-control" name="quantity" id="quantity" value='{{$transferPlan->quantity}}' required>  
+                            <input type="text" class="form-control" name="quantity" id="quantity" value='{{$transferPlan->quantity}}' >  
                         </div>
 
-                        <div class="form-group col-md-3">
-                            <label>RMS标贴</label>
-                            <input type="text" class="form-control" name="rms" id="rms" value='{{$transferPlan->rms}}' required>  
-                        </div>
 
                         <div class="form-group col-md-3">
                             <label>计划物流</label>
-                            <input type="text" class="form-control" name="carrier_code" id="carrier_code" value='{{$transferPlan->carrier_code}}' required>  
+                            <input type="text" class="form-control" name="carrier_code" id="carrier_code" value='{{$transferPlan->carrier_code}}' >  
                         </div>
 
                         <div class="form-group col-md-3">
                             <label>发货方式</label>
-                            <input type="text" class="form-control" name="ship_method" id="ship_method" value='{{$transferPlan->ship_method}}' required>  
+                            <input type="text" class="form-control" name="ship_method" id="ship_method" value='{{$transferPlan->ship_method}}' >  
                         </div>
 
 
@@ -172,6 +173,23 @@
 							</select>
                         </div>
 
+
+                        <div class="form-group col-md-3">
+                            <label>需RMS标贴</label>
+                            <select class="form-control " name="require_rms" id="require_rms">
+							<?php 
+							foreach($trueOrFalse as $k=>$v){ 	
+								echo '<option value="'.$k.'" '.(($k==$transferPlan->require_rms)?'selected':'').'>'.$v.'</option>';
+							}?>
+							</select>
+                        </div>
+
+                        <div class="form-group col-md-3">
+                            <label>RMS标贴</label>
+                            <input type="text" class="form-control" name="rms" id="rms" value='{{$transferPlan->rms}}'>  
+                        </div>
+
+
                         <div class="form-group col-md-3">
                             <label>状态</label>
                             <select class="form-control " name="status" id="status">
@@ -181,7 +199,7 @@
 							}?>
 							</select>
                         </div>
-
+                        <div style="clear:both;"></div>
                         <div class="form-group col-md-6">
                             <label>创建日期:</label>
                             {{$transferPlan->created_at}}

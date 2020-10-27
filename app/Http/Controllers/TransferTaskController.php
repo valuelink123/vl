@@ -36,7 +36,7 @@ class TransferTaskController extends Controller
     public function get(Request $request)
     {
         $records = array();
-        $datas = TransferTask::select('transfer_plans.*','transfer_tasks.id as id','transfer_requests.marketplace_id','transfer_requests.bg','transfer_requests.bu','transfer_requests.asin','transfer_requests.sku'
+        $datas = TransferTask::select('transfer_plans.*','transfer_tasks.id as id','transfer_requests.marketplace_id','transfer_requests.bg','transfer_requests.bu','transfer_requests.asin','transfer_requests.sku as request_sku'
         ,'transfer_requests.quantity as request_quantity','transfer_tasks.transfer_task_key','transfer_tasks.status as task_status','transfer_tasks.carrier_code as task_carrier_code'
         ,'transfer_tasks.ship_method as task_ship_method','transfer_tasks.tracking_number','transfer_tasks.out_date as task_out_date','transfer_tasks.in_date as task_in_date')
         ->leftJoin('transfer_plans',function($q){
@@ -77,12 +77,13 @@ class TransferTaskController extends Controller
                 $list['out_factory'],
                 $list['in_factory'],
                 $list['asin'],
+                $list['request_sku'],
                 $list['sku'],
                 $list['quantity'],
                 $list['carrier_code'].($list['ship_method']?'</BR>'.$list['ship_method']:''),
                 $list['out_date'],
                 $list['in_date'],
-                $list['rms'],
+                $list['require_rms']?'Y':'N',
                 $list['require_attach']?'Y':'N',
                 $list['require_purchase']?'Y':'N',
                 $list['require_rebrand']?'Y':'N',

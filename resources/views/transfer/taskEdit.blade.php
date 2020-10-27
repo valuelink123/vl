@@ -32,7 +32,7 @@
                         </div>
                         <div class="form-group col-md-3">
                             <label>销售员:</label>
-                            {{$transferRequest->bg}} - {{$transferRequest->bu}} - {{array_get($sellers,$transferRequest->sap_seller_id)}}
+                            {{$transferRequest->bg}}{{$transferRequest->bu}}-{{array_get($sellers,$transferRequest->sap_seller_id)}}
                         </div>
                         <div class="form-group col-md-3">
                             <label>Asin:</label>
@@ -105,14 +105,14 @@
 								                          
                         </div>
                         
+                        <div class="form-group col-md-3">
+                            <label>调出Sku:</label>{{$transferPlan->sku}}
+                        </div>
 
                         <div class="form-group col-md-3">
                             <label>调出数量:</label>{{$transferPlan->quantity}}
                         </div>
 
-                        <div class="form-group col-md-3">
-                            <label>RMS标贴:</label>{{$transferPlan->rms}}
-                        </div>
 
                         <div class="form-group col-md-3">
                             <label>计划物流:</label>{{$transferPlan->carrier_code}} 
@@ -134,12 +134,19 @@
                         <div class="form-group col-md-3">
                             <label>需换标:</label>{{array_get($trueOrFalse,$transferPlan->require_rebrand)}}
                         </div>
+                        
+                        <div class="form-group col-md-3">
+                            <label>需RMS标贴:</label>{{array_get($trueOrFalse,$transferPlan->require_rms)}}
+                        </div>
+
+                        <div class="form-group col-md-3">
+                            <label>RMS标贴:</label>{{$transferPlan->rms}}
+                        </div>
 
                         <div class="form-group col-md-3">
                             <label>状态:</label>{{array_get($planStatus,$transferPlan->status)}}
-                            
                         </div>
-
+                        <div style="clear:both;"></div>
                         <div class="form-group col-md-6">
                             <label>创建日期:</label>
                             {{$transferPlan->created_at}}

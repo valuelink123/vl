@@ -35,7 +35,7 @@ class TransferPlanController extends Controller
 
     public function get(Request $request)
     {
-        $datas = TransferPlan::select('transfer_plans.*','transfer_requests.marketplace_id','transfer_requests.bg','transfer_requests.bu','transfer_requests.asin','transfer_requests.sku'
+        $datas = TransferPlan::select('transfer_plans.*','transfer_requests.marketplace_id','transfer_requests.bg','transfer_requests.bu','transfer_requests.asin','transfer_requests.sku as request_sku'
         ,'transfer_requests.quantity as request_quantity','transfer_tasks.transfer_task_key','transfer_tasks.status as task_status','transfer_tasks.carrier_code as task_carrier_code'
         ,'transfer_tasks.ship_method as task_ship_method','transfer_tasks.tracking_number','transfer_tasks.out_date as task_out_date','transfer_tasks.in_date as task_in_date','asin.fba_stock',
         'asin.fba_transfer','asin.sales')
@@ -97,9 +97,10 @@ class TransferPlanController extends Controller
                 $list['out_factory'],
                 $list['in_factory'],
                 $list['asin'],
-                $list['sku'],
-                ($list['status']!==NUll)?array_get(TransferPlan::STATUS,$list['status']):'',
+                $list['request_sku'],
                 $list['request_quantity'],
+                ($list['status']!==NUll)?array_get(TransferPlan::STATUS,$list['status']):'',
+                $list['sku'],
                 $list['quantity'],
                 $list['fba_stock']??0,
                 $list['fba_transfer']??0,
@@ -107,7 +108,7 @@ class TransferPlanController extends Controller
                 $list['carrier_code'].($list['ship_method']?'</BR>'.$list['ship_method']:''),
                 $list['out_date'],
                 $list['in_date'],
-                $list['rms'],
+                $list['require_rms']?'Y':'N',
                 $list['require_attach']?'Y':'N',
                 $list['require_purchase']?'Y':'N',
                 $list['require_rebrand']?'Y':'N',
@@ -155,7 +156,7 @@ class TransferPlanController extends Controller
             $data = TransferPlan::findOrFail($id);
             if($data->status == 1 ) throw new \Exception("计划已审核，无法再次更新!");
             $fileds = array(
-                'out_factory','out_date','in_factory','in_date','quantity','rms','carrier_code','ship_method','require_attach','require_purchase','require_rebrand','status'
+                'out_factory','out_date','in_factory','in_date','sku','quantity','rms','carrier_code','ship_method','require_rms','require_attach','require_purchase','require_rebrand','status'
             );
             foreach($fileds as $filed){
                 $data->{$filed} = $request->get($filed);
