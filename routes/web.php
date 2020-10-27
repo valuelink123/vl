@@ -365,6 +365,7 @@ Route::get('/plansforecast/edit', 'PlansForecastController@edit');
 //调拨计划
 Route::resource('transferPlan', 'TransferPlanController');
 Route::Post('/transferPlan/get', 'TransferPlanController@get')->name('getTransferPlan');
+Route::Post('/transferPlan/batchUpdate', 'TransferPlanController@batchUpdate')->name('transferPlanBatchUpdate');
 //调拨任务
 Route::resource('transferTask', 'TransferTaskController');
 Route::Post('/transferTask/get', 'TransferTaskController@get')->name('getTransferTask');

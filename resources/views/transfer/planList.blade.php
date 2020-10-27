@@ -180,7 +180,6 @@
                 src: $("#datatable_ajax"),
                 onSuccess: function (grid, response) {
                     grid.setAjaxParam("customActionType", '');
-					
                 },
                 onError: function (grid) {
                 },
@@ -221,28 +220,31 @@
             $(".btn-group").unbind("click").on('click', '.table-status-action-submit', function (e) {
                 e.preventDefault();
                 var confirmStatus = $("#confirmStatus", $("#table-actions-wrapper"));
-
                 if (confirmStatus.val() != "" && grid.getSelectedRowsCount() > 0) {
-                    grid.setAjaxParam("customActionType", "group_action");
-                    grid.setAjaxParam("confirmStatus", confirmStatus.val());
-                    grid.setAjaxParam("id", grid.getSelectedRows());
-                    grid.getDataTable().draw(false);
+                    $.ajaxSetup({
+                        headers: { 'X-CSRF-TOKEN' : '{{ csrf_token() }}' }
+                    });
+                    $.ajax({
+                        type: "POST",
+                        dataType: "json",
+                        url: "{{ url('transferPlan/batchUpdate') }}",
+                        data: {confirmStatus:confirmStatus.val(),id:grid.getSelectedRows()},
+                        success: function (data) {
+                            if(data.customActionStatus=='OK'){
+                                grid.getDataTable().draw(false);
+                                toastr.success(data.customActionMessage);
+                            }else{
+                                toastr.error(data.customActionMessage);
+                            }
+                        },
+                        error: function(data) {
+                            toastr.error(data.responseText);
+                        }
+                    });
                 } else if ( confirmStatus.val() == "" ) {
-                    App.alert({
-                        type: 'danger',
-                        icon: 'warning',
-                        message: 'Please select an action',
-                        container: $("#table-actions-wrapper"),
-                        place: 'prepend'
-                    });
+                    toastr.error('Please select an action');
                 } else if (grid.getSelectedRowsCount() === 0) {
-                    App.alert({
-                        type: 'danger',
-                        icon: 'warning',
-                        message: 'No record selected',
-                        container: $("#table-actions-wrapper"),
-                        place: 'prepend'
-                    });
+                    toastr.error('No record selected');
                 }
             });
 

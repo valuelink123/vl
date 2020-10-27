@@ -271,7 +271,7 @@ $(function() {
 				if(data.customActionStatus=='OK'){
 					$('#ajax').modal('hide');
 					$('.modal-backdrop').remove();
-                    toastr.success("Update Success");
+                    toastr.success(data.customActionMessage);
                     var dttable = $('#datatable_ajax').dataTable();
 					dttable.api().ajax.reload(null, false);
 				}else{

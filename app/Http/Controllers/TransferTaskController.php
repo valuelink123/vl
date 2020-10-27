@@ -134,7 +134,7 @@ class TransferTaskController extends Controller
             $data->save();           
             DB::commit();
             $records["customActionStatus"] = 'OK';
-            $records["customActionMessage"] = "Update Success!";     
+            $records["customActionMessage"] = "更新成功!";     
         }catch (\Exception $e) { 
             DB::rollBack();
             $records["customActionStatus"] = '';

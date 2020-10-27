@@ -35,42 +35,6 @@ class TransferPlanController extends Controller
 
     public function get(Request $request)
     {
-        $records = array();
-        if (isset($_REQUEST["customActionType"])) {
-            if(!Auth::user()->can(['transfer-plan-update'])) die('Permission denied -- transfer-plan-update');
-            $updateData=array();
-            if($_REQUEST["customActionType"] == "group_action"){
-                $updateData['status'] = intval(array_get($_REQUEST,"confirmStatus"));
-                DB::beginTransaction();
-                try{ 
-                    if($updateData) $success = TransferPlan::whereIn('id',$_REQUEST["id"])->where('status','<>',1)->update($updateData);
-                    if($updateData['status'] == 1) $transferTaskKey = uniqid('Task');
-                    foreach($_REQUEST["id"] as $plan_id){
-                        $transferPlan = TransferPlan::where('status',$updateData['status'])->find($plan_id);
-                        if(empty($transferPlan)) continue;
-                        if($updateData['status'] == 1){
-                            self::createTransferTask($transferPlan,$transferTaskKey);
-                        }
-                        saveOperationLog('transfer_plans', $transferPlan->id, $updateData);
-                    }
-                    DB::commit();
-                    if($success){
-                        $records["customActionStatus"] = 'OK';
-                        $records["customActionMessage"] = "Update Success!";     
-                    }else{
-                        $records["customActionStatus"] = '';
-                        $records["customActionMessage"] = "Unable to update selection, Update Failed!";
-                    }
-                    
-                }catch (\Exception $e) { 
-                    DB::rollBack();
-                    $records["customActionStatus"] = '';
-                    $records["customActionMessage"] = $e->getMessage();
-                }    
-                unset($updateData);      
-            }
-        }
-
         $datas = TransferPlan::select('transfer_plans.*','transfer_requests.marketplace_id','transfer_requests.bg','transfer_requests.bu','transfer_requests.asin','transfer_requests.sku'
         ,'transfer_requests.quantity as request_quantity','transfer_tasks.transfer_task_key','transfer_tasks.status as task_status','transfer_tasks.carrier_code as task_carrier_code'
         ,'transfer_tasks.ship_method as task_ship_method','transfer_tasks.tracking_number','transfer_tasks.out_date as task_out_date','transfer_tasks.in_date as task_in_date','asin.fba_stock',
@@ -189,7 +153,7 @@ class TransferPlanController extends Controller
         DB::beginTransaction();
         try{ 
             $data = TransferPlan::findOrFail($id);
-            if($data->status == 1 ) throw new \Exception("计划已审核，无法再次更新！");
+            if($data->status == 1 ) throw new \Exception("计划已审核，无法再次更新!");
             $fileds = array(
                 'out_factory','out_date','in_factory','in_date','quantity','rms','carrier_code','ship_method','require_attach','require_purchase','require_rebrand','status'
             );
@@ -201,7 +165,7 @@ class TransferPlanController extends Controller
             saveOperationLog('transfer_plans', $data->id, $request->all());
             DB::commit();
             $records["customActionStatus"] = 'OK';
-            $records["customActionMessage"] = "Update Success!";     
+            $records["customActionMessage"] = "更新成功!";     
         }catch (\Exception $e) { 
             DB::rollBack();
             $records["customActionStatus"] = '';
@@ -210,6 +174,39 @@ class TransferPlanController extends Controller
         echo json_encode($records);
     }
 
+    public function batchUpdate(Request $request){
+        if(!Auth::user()->can(['transfer-plan-update'])) die('Permission denied -- transfer-plan-update');
+        $updateData=array();
+        $updateData['status'] = intval(array_get($_REQUEST,"confirmStatus"));
+        DB::beginTransaction();
+        try{ 
+            if($updateData) $success = TransferPlan::whereIn('id',$_REQUEST["id"])->where('status','<>',1)->update($updateData);
+            if($updateData['status'] == 1) $transferTaskKey = uniqid('Task');
+            foreach($_REQUEST["id"] as $plan_id){
+                $transferPlan = TransferPlan::where('status',$updateData['status'])->find($plan_id);
+                if(empty($transferPlan)) continue;
+                if($updateData['status'] == 1){
+                    self::createTransferTask($transferPlan,$transferTaskKey);
+                }
+                saveOperationLog('transfer_plans', $transferPlan->id, $updateData);
+            }
+            DB::commit();
+            if($success){
+                $records["customActionStatus"] = 'OK';
+                $records["customActionMessage"] = "更新成功!";     
+            }else{
+                $records["customActionStatus"] = '';
+                $records["customActionMessage"] = "更新失败,计划已审核或无更新!";
+            }
+            
+        }catch (\Exception $e) { 
+            DB::rollBack();
+            $records["customActionStatus"] = '';
+            $records["customActionMessage"] = $e->getMessage();
+        }    
+        echo json_encode($records);   
+
+    }
     public function createTransferTask(TransferPlan $transferPlan,string $transferTaskKey = ''){
         if(!$transferTaskKey) $transferTaskKey = uniqid('Task');
         $status = 3;
