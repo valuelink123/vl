@@ -78,6 +78,9 @@ function getUsers($type=''){
 	case 'sap_bu':
 		$data = DB::table('users')->selectRaw('ubu as bu')->where('locked',0)->whereNotNull('ubu')->where('ubu','<>','')->groupBy(['bu'])->orderByRaw('bu asc')->get();
 		break;
+	case 'seller_user':
+		$data = DB::table('users')->where('locked',0)->where('sap_seller_id','>',0)->pluck('name','id');
+		break;
 	default:
 		$data = DB::table('users')->where('locked',0)->pluck('name','id');
 	}
