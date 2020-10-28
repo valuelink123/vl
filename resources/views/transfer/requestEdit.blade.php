@@ -158,18 +158,20 @@
 
 							<div class="col-sm-12">
 								@if($data['attach_data'])
-									<form id="upload-form" action="/transfer/request/uploadAttach" method="post" enctype="multipart/form-data"  multiple="multiple" style="width:500px;" >
+									<form id="upload-form" action="/transfer/request/uploadAttach" method="post" enctype="multipart/form-data"   style="width:500px;" >
 										<input type="hidden" id="upload-id" name="id" value="{!! $data['id'] !!}">
 										<div class="pull-left">
 											{{ csrf_field() }}
-											<input type="file" name="uploadFile" id="uploadFile" />
+											<input type="file" name="uploadFile[]" id="uploadFile" multiple="multiple" />
 										</div>
 										<div class=" pull-left">
 											<button type="submit" class="upload-btn btn blue btn-sm" id="data_search">更新大货资料</button>
 										</div>
 									</form>
 									<div class=" pull-left" style="margin-left:50px;">
-										<a href="/transfer/request/downloadAttach?id={!! $data['id'] !!}" ><button class="view-btn" id="data_search" style="color: #FFFFFF;background-color: #3598dc;border-color: #3598dc;height: 30px;">查看大货资料</button></a>
+										@foreach($data['files'] as $file)
+											<a href="/transfer/request/downloadAttach?src={!! $file['src'] !!}" >{!! $file['showname'] !!}</a><br><br>
+										@endforeach
 									</div>
 								@endif
 							</div>

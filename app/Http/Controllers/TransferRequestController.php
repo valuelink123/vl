@@ -157,6 +157,19 @@ class TransferRequestController extends Controller
 		}
 
 		if($request->isMethod('get')){
+			//把上传的大货资料的文件名分开来显示
+			$file = array();
+			if($data['attach_data']){
+				$filearray = explode(',',$data['attach_data']);//数据库中的文件名称，可能为多个文件
+				foreach($filearray as $filename){
+					$array = explode('/',$filename);
+					$newfilename = explode('__',end($array));//$filename为文件名称
+					unset($newfilename[0]);
+					$newfilename = implode('',$newfilename);//重组filename,让下载的文件名称跟上传时的名称一致
+					$file[] = ['showname'=>$newfilename,'src'=>ltrim($filename,'/')];
+				}
+			}
+			$data['files'] = $file;
 			return view('transfer/requestEdit',['type'=>$type,'showtype'=>$type==1 ? 'disabled="disabled"' : '','data'=>$data]);
 		}elseif ($request->isMethod('post')){
 			if($type==1){
@@ -222,26 +235,31 @@ class TransferRequestController extends Controller
 			$request->session()->flash('error_message','ID error');
 			return redirect()->back()->withInput();
 		}
-		$file = $request->file('uploadFile');
-		if ($file) {
-			if ($file->isValid()) {
-				$originalName = $file->getClientOriginalName();
-				$newpath = '/uploads/requestAttach/' . date('Ymd') . '/';
-				$newname = time().'__'.$originalName;//文件名称加个时间戳，这样子不同销售上传的文件名可以一样
-				$bool = $file->move(public_path() . $newpath, $newname);
+		$files = $request->file('uploadFile');
+		if ($files) {
+			$updateData = array();
+			foreach($files as $file){
+				if ($file->isValid()) {
+					$originalName = $file->getClientOriginalName();
+					$newpath = '/uploads/requestAttach/' . date('Ymd') . '/';
+					$newname = time().'__'.$originalName;//文件名称加个时间戳，这样子不同销售上传的文件名可以一样
+					$bool = $file->move(public_path() . $newpath, $newname);
 
-				if($bool){
-					//更新表的数据
-					$updateData['updated_at'] = date('Y-m-d H:i:s');
-					$updateData['attach_data'] = $newpath.$newname;
-					$res = DB::table('transfer_requests')->where('id',$id)->update($updateData);
-					if($res){
-						SaveOperationLog('transfer_requests', $id, $updateData);//添加操作存日志
-						$request->session()->flash('success_message','upload success');
-						return redirect()->back()->withInput();
+					if($bool){
+						//更新表的数据
+						$updateData['updated_at'] = date('Y-m-d H:i:s');
+						$updateData['attach_data'] = isset($updateData['attach_data']) ? $updateData['attach_data'].','.$newpath.$newname : $newpath.$newname;
 					}
-				}
 
+				}
+			}
+			if($updateData){
+				$res = DB::table('transfer_requests')->where('id',$id)->update($updateData);
+				if($res){
+					SaveOperationLog('transfer_requests', $id, $updateData);//添加操作存日志
+					$request->session()->flash('success_message','upload success');
+					return redirect()->back()->withInput();
+				}
 			}
 		}
 		$request->session()->flash('error_message','upload failed');
@@ -250,26 +268,17 @@ class TransferRequestController extends Controller
 	//下载查看大货资料
 	public function downloadAttach(Request $request)
 	{
-		$userInfo = Auth::user();//登录用户信息
-		if(!$userInfo->can(['transfer-request-update'])) die('Permission denied -- transfer-request-update');
-		$id = isset($_REQUEST['id']) && $_REQUEST['id'] ? $_REQUEST['id'] : '';
-		$data = DB::table('transfer_requests')->where('id',$id)->select('attach_data')->first();//获取此id的数据
-		if(empty($data)){
-			$request->session()->flash('error_message','ID error');
-			return redirect()->back()->withInput();
-		}
-		$array = explode('/',$data->attach_data);
-		$filename = explode('__',end($array));//$filename为文件名称
-		unset($filename[0]);
-		$filename = implode('',$filename);//重组filename,让下载的文件名称跟上传时的名称一致
-		$filepath = ltrim($data->attach_data,'/');//去掉最左侧的/
-		$file=fopen($filepath,"r");//打开文件
-
+		$filepath = isset($_REQUEST['src']) && $_REQUEST['src'] ? $_REQUEST['src'] : '';
+		$array = explode('/',$filepath);
+		$newfilename = explode('__',end($array));//$filename为文件名称
+		unset($newfilename[0]);
+		$newfilename = implode('',$newfilename);//重组filename,让下载的文件名称跟上传时的名称一致
+		$file=fopen($filepath,"r");
 		header("Content-type:text/html;charset=utf-8");
 		header("Content-Type: application/octet-stream");
 		header("Accept-Ranges: bytes");
 		header("Accept-Length: ".filesize($filepath));
-		header("Content-Disposition: attachment; filename=".$filename);
+		header("Content-Disposition: attachment; filename=".$newfilename);
 		echo fread($file,filesize($filepath));
 		fclose($file);
 	}

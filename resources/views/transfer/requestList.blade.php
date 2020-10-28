@@ -186,11 +186,11 @@
 		</div>
 	</div>
 	<div id="upload-attach" style="display:none;">
-		<form id="upload-form" action="/transfer/request/uploadAttach" method="post" enctype="multipart/form-data"  multiple="multiple" style="width:500px;" >
+		<form id="upload-form" action="/transfer/request/uploadAttach" method="post" enctype="multipart/form-data"  tyle="width:500px;" >
 			<input type="hidden" id="upload-id" name="id" value="">
 			<div class="pull-left">
 				{{ csrf_field() }}
-				<input type="file" name="uploadFile" id="uploadFile" />
+				<input type="file" name="uploadFile[]" id="uploadFile" multiple="multiple"/>
 			</div>
 			<div class=" pull-left">
 				<button type="submit" class="upload-btn btn blue btn-sm" id="data_search">上传</button>
