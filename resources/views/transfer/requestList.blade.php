@@ -185,6 +185,18 @@
 
 		</div>
 	</div>
+	<div id="upload-attach" style="display:none;">
+		<form id="upload-form" action="/transfer/request/uploadAttach" method="post" enctype="multipart/form-data"  multiple="multiple" style="width:500px;" >
+			<input type="hidden" id="upload-id" name="id" value="">
+			<div class="pull-left">
+				{{ csrf_field() }}
+				<input type="file" name="uploadFile" id="uploadFile" />
+			</div>
+			<div class=" pull-left">
+				<button type="submit" class="upload-btn btn blue btn-sm" id="data_search">上传</button>
+			</div>
+		</form>
+	</div>
 
 	<script src="/assets/global/plugins/moment.min.js" type="text/javascript"></script>
 	<script src="/assets/global/plugins/jquery.mockjax.js" type="text/javascript"></script>
@@ -278,6 +290,22 @@
                 $(this).parent().parent().addClass('selected');
 			});
 		}
+
+        //上传大货资料操作
+        $("#thetable").on('click', '.up-attach',function(){
+            var id = $(this).attr('data-id');
+			$('#upload-id').val(id);
+            art.dialog({
+                id: 'art_upload-attach',
+                title: 'upload attach',
+				lock:true,
+                content: document.getElementById('upload-attach'),
+                ok: false,
+                cancel: true,
+                cancelVal:'Cancel'
+            });
+            return false;
+        });
 		//生成计划
 		function checkAddPlan(){
             let ids_value = '';//id的拼接值

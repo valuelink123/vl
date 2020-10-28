@@ -79,9 +79,9 @@ class TransferRequestController extends Controller
 			if($val['status'] == 0 && $val['user_id'] == $userInfo->id){//状态为0并且自己只能更改自己添加的申请
 				$data[$key]['action'] = '<a href="/transfer/request/edit?id='.$id.'">Edit</a>';
 			}
-			if($val['plan_status']==1 && $val['require_attach']==1){
+			if($val['plan_status']==1 && $val['require_attach']==1 && $val['user_id'] == $userInfo->id && $val['attach_data']==''){
 				//计划状态为已审核，并且需要大货资料
-				$data[$key]['action'] .= '<br><button style="width:62px" class="upCargoDataBtn">上传资料</button>';
+				$data[$key]['action'] .= '<br><button style="width:62px" data-id="'.$val['id'].'" class="up-attach">上传资料</button>';
 			}
 		}
 
@@ -211,6 +211,67 @@ class TransferRequestController extends Controller
 		}
 		return 0;
 	}
+	//上传大货资料
+	public function uploadAttach(Request $request)
+	{
+		$userInfo = Auth::user();//登录用户信息
+		if(!$userInfo->can(['transfer-request-update'])) die('Permission denied -- transfer-request-update');
+		$id = isset($_REQUEST['id']) && $_REQUEST['id'] ? $_REQUEST['id'] : '';
+		$data = DB::table('transfer_requests')->where('id',$id)->first();//获取此id的数据
+		if(empty($data)){
+			$request->session()->flash('error_message','ID error');
+			return redirect()->back()->withInput();
+		}
+		$file = $request->file('uploadFile');
+		if ($file) {
+			if ($file->isValid()) {
+				$originalName = $file->getClientOriginalName();
+				$newpath = '/uploads/requestAttach/' . date('Ymd') . '/';
+				$newname = time().'__'.$originalName;//文件名称加个时间戳，这样子不同销售上传的文件名可以一样
+				$bool = $file->move(public_path() . $newpath, $newname);
 
+				if($bool){
+					//更新表的数据
+					$updateData['updated_at'] = date('Y-m-d H:i:s');
+					$updateData['attach_data'] = $newpath.$newname;
+					$res = DB::table('transfer_requests')->where('id',$id)->update($updateData);
+					if($res){
+						SaveOperationLog('transfer_requests', $id, $updateData);//添加操作存日志
+						$request->session()->flash('success_message','upload success');
+						return redirect()->back()->withInput();
+					}
+				}
+
+			}
+		}
+		$request->session()->flash('error_message','upload failed');
+		return redirect()->back()->withInput();
+	}
+	//下载查看大货资料
+	public function downloadAttach(Request $request)
+	{
+		$userInfo = Auth::user();//登录用户信息
+		if(!$userInfo->can(['transfer-request-update'])) die('Permission denied -- transfer-request-update');
+		$id = isset($_REQUEST['id']) && $_REQUEST['id'] ? $_REQUEST['id'] : '';
+		$data = DB::table('transfer_requests')->where('id',$id)->select('attach_data')->first();//获取此id的数据
+		if(empty($data)){
+			$request->session()->flash('error_message','ID error');
+			return redirect()->back()->withInput();
+		}
+		$array = explode('/',$data->attach_data);
+		$filename = explode('__',end($array));//$filename为文件名称
+		unset($filename[0]);
+		$filename = implode('',$filename);//重组filename,让下载的文件名称跟上传时的名称一致
+		$filepath = ltrim($data->attach_data,'/');//去掉最左侧的/
+		$file=fopen($filepath,"r");//打开文件
+
+		header("Content-type:text/html;charset=utf-8");
+		header("Content-Type: application/octet-stream");
+		header("Accept-Ranges: bytes");
+		header("Accept-Length: ".filesize($filepath));
+		header("Content-Disposition: attachment; filename=".$filename);
+		echo fread($file,filesize($filepath));
+		fclose($file);
+	}
 
 }

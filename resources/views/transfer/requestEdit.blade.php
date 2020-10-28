@@ -6,8 +6,6 @@
 			text-align:center;
 		}
 	</style>
-	<form  action="/transfer/request/edit" id="form" novalidate method="POST" onsubmit="return validate_form()">
-		{{ csrf_field() }}
 		<div class="col-lg-9">
 			<div class="col-md-12">
 				<div class="portlet light portlet-fit bordered ">
@@ -26,6 +24,8 @@
 					</div>
 					<div class="portlet-body">
 						<div class="tabbable-line">
+							<form  action="/transfer/request/edit" id="form" novalidate method="POST" onsubmit="return validate_form()">
+								{{ csrf_field() }}
 							<div class="">
 								<input  type="hidden" value="{!! $data['id'] !!}" name="id">
 								<div class="col-lg-8">
@@ -145,22 +145,43 @@
 									</div>
 								</div>
 							</div>
-						</div>
-					</div>
+								<div class="form-actions">
+									<div class="row">
+										<div class="col-md-offset-4 col-md-8">
+											@if($type==2)
+												<button type="submit" class="btn blue">Submit</button>
+											@endif
+										</div>
+									</div>
+								</div>
+							</form>
 
-					<div class="form-actions">
-						<div class="row">
-							<div class="col-md-offset-4 col-md-8">
-								@if($type==2)
-								<button type="submit" class="btn blue">Submit</button>
+							<div class="col-sm-12">
+								@if($data['attach_data'])
+									<form id="upload-form" action="/transfer/request/uploadAttach" method="post" enctype="multipart/form-data"  multiple="multiple" style="width:500px;" >
+										<input type="hidden" id="upload-id" name="id" value="{!! $data['id'] !!}">
+										<div class="pull-left">
+											{{ csrf_field() }}
+											<input type="file" name="uploadFile" id="uploadFile" />
+										</div>
+										<div class=" pull-left">
+											<button type="submit" class="upload-btn btn blue btn-sm" id="data_search">更新大货资料</button>
+										</div>
+									</form>
+									<div class=" pull-left" style="margin-left:50px;">
+										<a href="/transfer/request/downloadAttach?id={!! $data['id'] !!}" ><button class="view-btn" id="data_search" style="color: #FFFFFF;background-color: #3598dc;border-color: #3598dc;height: 30px;">查看大货资料</button></a>
+									</div>
 								@endif
 							</div>
 						</div>
 					</div>
 
+
 				</div>
 			</div>
-	</form>
+		</div>
+
+
 	@include('frank.common')
 	<script>
         //日期控件初始化
