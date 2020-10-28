@@ -177,29 +177,30 @@ class TransferPlanController extends Controller
 
     public function batchUpdate(Request $request){
         if(!Auth::user()->can(['transfer-plan-update'])) die('Permission denied -- transfer-plan-update');
-        $updateData=array();
-        $updateData['status'] = intval(array_get($_REQUEST,"confirmStatus"));
+        $status = intval(array_get($_REQUEST,"confirmStatus"));
         DB::beginTransaction();
         try{ 
-            if($updateData) $success = TransferPlan::whereIn('id',$_REQUEST["id"])->where('status','<>',1)->update($updateData);
-            if($updateData['status'] == 1) $transferTaskKey = uniqid('Task');
+            $customActionMessage='';
+            if($status == 1) $transferTaskKey = uniqid('Task');
             foreach($_REQUEST["id"] as $plan_id){
-                $transferPlan = TransferPlan::where('status',$updateData['status'])->find($plan_id);
-                if(empty($transferPlan)) continue;
-                if($updateData['status'] == 1){
-                    self::createTransferTask($transferPlan,$transferTaskKey);
+                $transferPlan = TransferPlan::where('status','<>',1)->find($plan_id);
+                if(empty($transferPlan)){
+                    $customActionMessage.='ID:'.$plan_id.' 已审核或不存在!</BR>';
+                    continue;
                 }
-                saveOperationLog('transfer_plans', $transferPlan->id, $updateData);
+                if($transferPlan->status == $status){
+                    $customActionMessage.='ID:'.$plan_id.' 无更新!</BR>';
+                    continue;
+                }
+                $transferPlan->status = $status;
+                $transferPlan->save();
+                $customActionMessage.='ID:'.$plan_id.' 更新成功!</BR>';
+                if($status == 1) self::createTransferTask($transferPlan,$transferTaskKey);
+                saveOperationLog('transfer_plans', $transferPlan->id, ['status'=>$status]);
             }
             DB::commit();
-            if($success){
-                $records["customActionStatus"] = 'OK';
-                $records["customActionMessage"] = "更新成功!";     
-            }else{
-                $records["customActionStatus"] = '';
-                $records["customActionMessage"] = "更新失败,计划已审核或无更新!";
-            }
-            
+            $records["customActionStatus"] = 'OK';
+            $records["customActionMessage"] = $customActionMessage;     
         }catch (\Exception $e) { 
             DB::rollBack();
             $records["customActionStatus"] = '';
