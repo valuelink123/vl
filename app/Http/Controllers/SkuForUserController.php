@@ -232,6 +232,7 @@ class SkuForUserController extends Controller
 
     public function get()
     {
+        set_time_limit(0);
         $curr_date = date('Y-m-d');
         if (isset($_REQUEST["customActionType"])) {
             if(!Auth::user()->can(['skuforuser-batch-update'])) die('Permission denied -- skuforuser-batch-update');

@@ -254,6 +254,7 @@ th,td,td>span {
                     "pageLength": 10,
                     "ajax": {
                         "url": "{{ url('skuforuser/get')}}",
+                        "timeout" : 3600000, 
                     },
 
                     /*
