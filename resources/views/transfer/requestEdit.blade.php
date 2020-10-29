@@ -22,7 +22,7 @@
 							<span class="caption-subject bold font-green">Edit A Transfer Request</span>
 						</div>
 					</div>
-					<div class="portlet-body">
+					<div class="portlet-body" style="min-height:700px !important;">
 						<div class="tabbable-line">
 							<form  action="/transfer/request/edit" id="form" novalidate method="POST" onsubmit="return validate_form()">
 								{{ csrf_field() }}
@@ -69,6 +69,16 @@
 									</div>
 
 									<div class="form-group">
+										<label>Rms Sku</label>
+										<div class="input-group ">
+                                            <span class="input-group-addon">
+                                                <i class="fa fa-bookmark"></i>
+                                            </span>
+											<input type="text" class="form-control" name="rms_sku" id="rms_sku" value="{!! $data['rms_sku'] !!}"  {!! $showtype !!}>
+										</div>
+									</div>
+
+									<div class="form-group">
 										<label>Reason</label>
 										<div class="input-group ">
                                             <span class="input-group-addon">
@@ -80,7 +90,7 @@
 
 									<div class="col-md-6" style="margin-left:-15px;">
 										<div class="form-group">
-											<label>transfer Request Key</label>
+											<label>Transfer Request Key</label>
 											<div class="input-group ">
 												<span class="input-group-addon">
 													<i class="fa fa-bookmark"></i>
@@ -196,6 +206,7 @@
             var site = $('#site').val();
             var account = $('#account').val();
             var request_reason = $('#request_reason').val();
+            var rms_sku = $('#rms_sku').val();
             if(site == ''){
                 alert("site cannot be empty.");
                 return false;
@@ -204,10 +215,16 @@
                 alert("account cannot be empty.");
                 return false;
             }
-            if(request_reason == ''){
-                alert("request_reason cannot be empty.");
+            if(rms_sku == ''){
+                alert("Rms Sku cannot be empty.");
                 return false;
             }
+
+            if(request_reason == ''){
+                alert("Request Reason cannot be empty.");
+                return false;
+            }
+
             var flag = 0;
             $(".asin").each(function(ii,vv){ //ii 指第几个元素的序列号,vv 指遍历得到的元素
                 var asin = $(this).val();

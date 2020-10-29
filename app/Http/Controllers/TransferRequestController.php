@@ -99,6 +99,7 @@ class TransferRequestController extends Controller
 			$insertData['seller_id'] = isset($_POST['account']) && $_POST['account'] ? $_POST['account'] : '';
 			$insertData['delivery_date'] = isset($_POST['date']) && $_POST['date'] ? $_POST['date'] : '';
 			$insertData['request_reason'] = isset($_POST['request_reason']) && $_POST['request_reason'] ? $_POST['request_reason'] : '';
+			$insertData['rms_sku'] = isset($_POST['rms_sku']) && $_POST['rms_sku'] ? $_POST['rms_sku'] : '';
 			$site = isset($_POST['site']) && $_POST['site'] ? $_POST['site'] : '';
 
 			$userInfo = Auth::user();
@@ -180,6 +181,7 @@ class TransferRequestController extends Controller
 			$updateData['seller_id'] = isset($_POST['account']) && $_POST['account'] ? $_POST['account'] : '';
 			$updateData['delivery_date'] = isset($_POST['date']) && $_POST['date'] ? $_POST['date'] : '';
 			$updateData['request_reason'] = isset($_POST['request_reason']) && $_POST['request_reason'] ? $_POST['request_reason'] : '';
+			$updateData['rms_sku'] = isset($_POST['rms_sku']) && $_POST['rms_sku'] ? $_POST['rms_sku'] : '';
 			$site = isset($_POST['site']) && $_POST['site'] ? $_POST['site'] : '';
 			$updateData['updated_at'] = date('Y-m-d H:i:s');
 
