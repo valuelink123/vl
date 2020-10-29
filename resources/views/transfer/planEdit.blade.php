@@ -46,6 +46,12 @@
                             <label>申请数量:</label>
                             {{$transferRequest->quantity}}
                         </div>
+
+                        <div class="form-group col-md-3">
+                            <label>RMS标贴:</label>
+                            {{$transferRequest->rms_sku}}
+                        </div>
+                        
                         <div class="form-group col-md-3">
                             <label>入库日期:</label>
                             {{$transferRequest->delivery_date}}
@@ -182,11 +188,6 @@
 								echo '<option value="'.$k.'" '.(($k==$transferPlan->require_rms)?'selected':'').'>'.$v.'</option>';
 							}?>
 							</select>
-                        </div>
-
-                        <div class="form-group col-md-3">
-                            <label>RMS标贴</label>
-                            <input type="text" class="form-control" name="rms" id="rms" value='{{$transferPlan->rms}}'>  
                         </div>
 
 

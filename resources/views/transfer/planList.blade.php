@@ -131,7 +131,7 @@
 									<th>计划物流</th>
 									<th>计划调出日</th>
 									<th>计划调入日</th>
-									<th>RMS标</th>
+									<th>需RMS标</th>
 									<th>需大货资料</th>
 									<th>需采购</th>
 									<th>需换标</th>

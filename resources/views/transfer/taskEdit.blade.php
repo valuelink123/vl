@@ -46,6 +46,13 @@
                             <label>申请数量:</label>
                             {{$transferRequest->quantity}}
                         </div>
+
+                        <div class="form-group col-md-3">
+                            <label>RMS标贴:</label>
+                            {{$transferRequest->rms_sku}}
+                        </div>
+
+
                         <div class="form-group col-md-3">
                             <label>入库日期:</label>
                             {{$transferRequest->delivery_date}}
@@ -137,10 +144,6 @@
                         
                         <div class="form-group col-md-3">
                             <label>需RMS标贴:</label>{{array_get($trueOrFalse,$transferPlan->require_rms)}}
-                        </div>
-
-                        <div class="form-group col-md-3">
-                            <label>RMS标贴:</label>{{$transferPlan->rms}}
                         </div>
 
                         <div class="form-group col-md-3">
