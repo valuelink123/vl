@@ -371,6 +371,8 @@ Route::match(['post','get'],'/transfer/request/add', 'TransferRequestController@
 Route::match(['post','get'],'/transfer/request/edit', 'TransferRequestController@edit');//更新/查看调货请求内容
 Route::post('/checkAsin', 'Controller@checkAsin');//销售在页面上填写asin，ajax检测是否属于自己的asin
 Route::post('/transfer/request/updateStatus', 'TransferRequestController@updateStatus');//审核操作，更新状态
+Route::post('/transfer/request/uploadAttach', 'TransferRequestController@uploadAttach');//上传大货资料
+Route::get('/transfer/request/downloadAttach', 'TransferRequestController@downloadAttach');//查看大货资料
 
 //调拨计划
 Route::resource('transferPlan', 'TransferPlanController');

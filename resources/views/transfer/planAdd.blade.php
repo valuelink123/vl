@@ -8,7 +8,7 @@
 	</style>
 	<form  action="/transfer/plan/createPlan" id="form" novalidate method="POST" onsubmit="return validate_form()">
 		{{ csrf_field() }}
-		<div class="col-lg-9">
+		<div class="col-lg-12">
 			<div class="col-md-12">
 				<div class="portlet light portlet-fit bordered ">
 					@if($errors->any())
@@ -18,7 +18,6 @@
 							@endforeach
 						</div>
 					@endif
-					<input type="hidden" value="{!! $ids !!}" name="id">
 					<div class="portlet-title">
 						<div class="caption">
 							<i class="icon-microphone font-green"></i>
@@ -28,9 +27,9 @@
 					<div class="portlet-body">
 						<div class="tabbable-line">
 							<div class="">
-								<div class="col-lg-8">
+								<div class="col-lg-12">
 									@foreach($data as $k=>$v)
-										<div class="col-md-4">
+										<div class="col-md-2">
 											<div class="form-group">
 												<label>Asin</label>
 												<div class="input-group ">
@@ -41,7 +40,7 @@
 												</div>
 											</div>
 										</div>
-									<div class="col-md-4">
+									<div class="col-md-2">
 										<div class="form-group">
 											<label>ItemNo</label>
 											<div class="input-group ">
@@ -52,7 +51,7 @@
 											</div>
 										</div>
 									</div>
-									<div class="col-md-4">
+									<div class="col-md-2">
 										<div class="form-group">
 											<label>Quantity</label>
 											<div class="input-group ">
@@ -63,30 +62,64 @@
 											</div>
 										</div>
 									</div>
+										<input type="hidden" value="{!! $v['id'] !!}" name="id[]">
+										<div class="col-md-2">
+											<div class="form-group">
+												<label>调拨数量</label>
+												<div class="input-group ">
+                                            <span class="input-group-addon">
+                                                <i class="fa fa-bookmark"></i>
+                                            </span>
+													<input type="text" class="form-control" id="quantity"  value="" name="quantity[]">
+												</div>
+											</div>
+										</div>
+										<div class="col-md-1">
+											<div class="form-group">
+												<label>是否RMS标贴</label>
+												<div class="input-group ">
+                                            <span class="input-group-addon">
+                                                <i class="fa fa-bookmark"></i>
+                                            </span>
+													<select class="form-control"  id="require_rms" name="require_rms[]">
+														<option value="0">否</option>
+														<option value="1">是</option>
+													</select>
+												</div>
+											</div>
+										</div>
+										<div class="col-md-1">
+											<div class="form-group">
+												<label>是否大货资料</label>
+												<div class="input-group ">
+                                            <span class="input-group-addon">
+                                                <i class="fa fa-bookmark"></i>
+                                            </span>
+													<select class="form-control"  id="require_attach" name="require_attach[]">
+														<option value="0">否</option>
+														<option value="1">是</option>
+													</select>
+												</div>
+											</div>
+										</div>
+
+										<div class="col-md-1">
+											<div class="form-group">
+												<label>是否换标</label>
+												<div class="input-group ">
+                                            <span class="input-group-addon">
+                                                <i class="fa fa-bookmark"></i>
+                                            </span>
+													<select class="form-control"  id="require_rebrand" name="require_rebrand[]">
+														<option value="0">否</option>
+														<option value="1">是</option>
+													</select>
+												</div>
+											</div>
+										</div>
 									@endforeach
-									<div class="col-md-6">
-									<div class="form-group">
-										<label>ItemNo</label>
-										<div class="input-group ">
-                                            <span class="input-group-addon">
-                                                <i class="fa fa-bookmark"></i>
-                                            </span>
-											<input type="text" class="form-control"  value="{!! key($total) !!}" disabled="disabled">
-										</div>
-									</div>
-									</div>
-									<div class="col-md-6">
-									<div class="form-group">
-										<label>Quantity</label>
-										<div class="input-group ">
-                                            <span class="input-group-addon">
-                                                <i class="fa fa-bookmark"></i>
-                                            </span>
-											<input type="text" class="form-control"  value="{!! $total[key($total)] !!}" disabled="disabled">
-										</div>
-									</div>
-									</div>
-									<div class="col-md-6">
+
+									<div class="col-md-4">
 									<div class="form-group">
 										<label>调出工厂</label>
 										<div class="input-group ">
@@ -97,7 +130,7 @@
 										</div>
 									</div>
 									</div>
-									<div class="col-md-6">
+									<div class="col-md-4">
 									<div class="form-group">
 										<label>调入工厂</label>
 										<div class="input-group ">
@@ -108,18 +141,8 @@
 										</div>
 									</div>
 									</div>
-									<div class="col-md-6">
-										<div class="form-group">
-											<label>调拨数量</label>
-											<div class="input-group ">
-                                            <span class="input-group-addon">
-                                                <i class="fa fa-bookmark"></i>
-                                            </span>
-												<input type="text" class="form-control" id="quantity"  value="" name="quantity">
-											</div>
-										</div>
-									</div>
-									<div class="col-md-6">
+
+									<div class="col-md-4">
 										<div class="form-group">
 											<label>物流商代码</label>
 											<div class="input-group ">
@@ -130,7 +153,7 @@
 											</div>
 										</div>
 									</div>
-									<div class="col-md-6">
+									<div class="col-md-4">
 										<div class="form-group">
 											<label>发货模式</label>
 											<div class="input-group ">
@@ -141,50 +164,8 @@
 											</div>
 										</div>
 									</div>
-									<div class="col-md-6">
-										<div class="form-group">
-											<label>是否RMS标贴</label>
-											<div class="input-group ">
-                                            <span class="input-group-addon">
-                                                <i class="fa fa-bookmark"></i>
-                                            </span>
-												<select class="form-control"  id="require_rms" name="require_rms">
-													<option value="0">否</option>
-													<option value="1">是</option>
-												</select>
-											</div>
-										</div>
-									</div>
-									<div class="col-md-6">
-										<div class="form-group">
-											<label>是否大货资料</label>
-											<div class="input-group ">
-                                            <span class="input-group-addon">
-                                                <i class="fa fa-bookmark"></i>
-                                            </span>
-												<select class="form-control"  id="require_attach" name="require_attach">
-													<option value="0">否</option>
-													<option value="1">是</option>
-												</select>
-											</div>
-										</div>
-									</div>
 
-									<div class="col-md-6">
-										<div class="form-group">
-											<label>是否换标</label>
-											<div class="input-group ">
-                                            <span class="input-group-addon">
-                                                <i class="fa fa-bookmark"></i>
-                                            </span>
-												<select class="form-control"  id="require_rebrand" name="require_rebrand">
-													<option value="0">否</option>
-													<option value="1">是</option>
-												</select>
-											</div>
-										</div>
-									</div>
-									<div class="col-md-6">
+									<div class="col-md-4">
 									<div class="form-group">
 										<label>调出时间</label>
 										<div class="input-group ">
@@ -197,7 +178,7 @@
 										</div>
 									</div>
 									</div>
-									<div class="col-md-6">
+									<div class="col-md-4">
 									<div class="form-group">
 										<label>调入时间</label>
 										<div class="input-group ">

@@ -79,9 +79,9 @@ class TransferRequestController extends Controller
 			if($val['status'] == 0 && $val['user_id'] == $userInfo->id){//状态为0并且自己只能更改自己添加的申请
 				$data[$key]['action'] = '<a href="/transfer/request/edit?id='.$id.'">Edit</a>';
 			}
-			if($val['plan_status']==1 && $val['require_attach']==1){
+			if($val['plan_status']==1 && $val['require_attach']==1 && $val['user_id'] == $userInfo->id && $val['attach_data']==''){
 				//计划状态为已审核，并且需要大货资料
-				$data[$key]['action'] .= '<br><button style="width:62px" class="upCargoDataBtn">上传资料</button>';
+				$data[$key]['action'] .= '<br><button style="width:62px" data-id="'.$val['id'].'" class="up-attach">上传资料</button>';
 			}
 		}
 
@@ -99,6 +99,7 @@ class TransferRequestController extends Controller
 			$insertData['seller_id'] = isset($_POST['account']) && $_POST['account'] ? $_POST['account'] : '';
 			$insertData['delivery_date'] = isset($_POST['date']) && $_POST['date'] ? $_POST['date'] : '';
 			$insertData['request_reason'] = isset($_POST['request_reason']) && $_POST['request_reason'] ? $_POST['request_reason'] : '';
+			$insertData['rms_sku'] = isset($_POST['rms_sku']) && $_POST['rms_sku'] ? $_POST['rms_sku'] : '';
 			$site = isset($_POST['site']) && $_POST['site'] ? $_POST['site'] : '';
 
 			$userInfo = Auth::user();
@@ -157,6 +158,19 @@ class TransferRequestController extends Controller
 		}
 
 		if($request->isMethod('get')){
+			//把上传的大货资料的文件名分开来显示
+			$file = array();
+			if($data['attach_data']){
+				$filearray = explode(',',$data['attach_data']);//数据库中的文件名称，可能为多个文件
+				foreach($filearray as $filename){
+					$array = explode('/',$filename);
+					$newfilename = explode('__',end($array));//$filename为文件名称
+					unset($newfilename[0]);
+					$newfilename = implode('',$newfilename);//重组filename,让下载的文件名称跟上传时的名称一致
+					$file[] = ['showname'=>$newfilename,'src'=>ltrim($filename,'/')];
+				}
+			}
+			$data['files'] = $file;
 			return view('transfer/requestEdit',['type'=>$type,'showtype'=>$type==1 ? 'disabled="disabled"' : '','data'=>$data]);
 		}elseif ($request->isMethod('post')){
 			if($type==1){
@@ -167,6 +181,7 @@ class TransferRequestController extends Controller
 			$updateData['seller_id'] = isset($_POST['account']) && $_POST['account'] ? $_POST['account'] : '';
 			$updateData['delivery_date'] = isset($_POST['date']) && $_POST['date'] ? $_POST['date'] : '';
 			$updateData['request_reason'] = isset($_POST['request_reason']) && $_POST['request_reason'] ? $_POST['request_reason'] : '';
+			$updateData['rms_sku'] = isset($_POST['rms_sku']) && $_POST['rms_sku'] ? $_POST['rms_sku'] : '';
 			$site = isset($_POST['site']) && $_POST['site'] ? $_POST['site'] : '';
 			$updateData['updated_at'] = date('Y-m-d H:i:s');
 
@@ -211,6 +226,63 @@ class TransferRequestController extends Controller
 		}
 		return 0;
 	}
+	//上传大货资料
+	public function uploadAttach(Request $request)
+	{
+		$userInfo = Auth::user();//登录用户信息
+		if(!$userInfo->can(['transfer-request-update'])) die('Permission denied -- transfer-request-update');
+		$id = isset($_REQUEST['id']) && $_REQUEST['id'] ? $_REQUEST['id'] : '';
+		$data = DB::table('transfer_requests')->where('id',$id)->first();//获取此id的数据
+		if(empty($data)){
+			$request->session()->flash('error_message','ID error');
+			return redirect()->back()->withInput();
+		}
+		$files = $request->file('uploadFile');
+		if ($files) {
+			$updateData = array();
+			foreach($files as $file){
+				if ($file->isValid()) {
+					$originalName = $file->getClientOriginalName();
+					$newpath = '/uploads/requestAttach/' . date('Ymd') . '/';
+					$newname = time().'__'.$originalName;//文件名称加个时间戳，这样子不同销售上传的文件名可以一样
+					$bool = $file->move(public_path() . $newpath, $newname);
 
+					if($bool){
+						//更新表的数据
+						$updateData['updated_at'] = date('Y-m-d H:i:s');
+						$updateData['attach_data'] = isset($updateData['attach_data']) ? $updateData['attach_data'].','.$newpath.$newname : $newpath.$newname;
+					}
+
+				}
+			}
+			if($updateData){
+				$res = DB::table('transfer_requests')->where('id',$id)->update($updateData);
+				if($res){
+					SaveOperationLog('transfer_requests', $id, $updateData);//添加操作存日志
+					$request->session()->flash('success_message','upload success');
+					return redirect()->back()->withInput();
+				}
+			}
+		}
+		$request->session()->flash('error_message','upload failed');
+		return redirect()->back()->withInput();
+	}
+	//下载查看大货资料
+	public function downloadAttach(Request $request)
+	{
+		$filepath = isset($_REQUEST['src']) && $_REQUEST['src'] ? $_REQUEST['src'] : '';
+		$array = explode('/',$filepath);
+		$newfilename = explode('__',end($array));//$filename为文件名称
+		unset($newfilename[0]);
+		$newfilename = implode('',$newfilename);//重组filename,让下载的文件名称跟上传时的名称一致
+		$file=fopen($filepath,"r");
+		header("Content-type:text/html;charset=utf-8");
+		header("Content-Type: application/octet-stream");
+		header("Accept-Ranges: bytes");
+		header("Accept-Length: ".filesize($filepath));
+		header("Content-Disposition: attachment; filename=".$newfilename);
+		echo fread($file,filesize($filepath));
+		fclose($file);
+	}
 
 }

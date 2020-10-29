@@ -6,8 +6,6 @@
 			text-align:center;
 		}
 	</style>
-	<form  action="/transfer/request/edit" id="form" novalidate method="POST" onsubmit="return validate_form()">
-		{{ csrf_field() }}
 		<div class="col-lg-9">
 			<div class="col-md-12">
 				<div class="portlet light portlet-fit bordered ">
@@ -24,8 +22,10 @@
 							<span class="caption-subject bold font-green">Edit A Transfer Request</span>
 						</div>
 					</div>
-					<div class="portlet-body">
+					<div class="portlet-body" style="min-height:700px !important;">
 						<div class="tabbable-line">
+							<form  action="/transfer/request/edit" id="form" novalidate method="POST" onsubmit="return validate_form()">
+								{{ csrf_field() }}
 							<div class="">
 								<input  type="hidden" value="{!! $data['id'] !!}" name="id">
 								<div class="col-lg-8">
@@ -69,6 +69,16 @@
 									</div>
 
 									<div class="form-group">
+										<label>Rms Sku</label>
+										<div class="input-group ">
+                                            <span class="input-group-addon">
+                                                <i class="fa fa-bookmark"></i>
+                                            </span>
+											<input type="text" class="form-control" name="rms_sku" id="rms_sku" value="{!! $data['rms_sku'] !!}"  {!! $showtype !!}>
+										</div>
+									</div>
+
+									<div class="form-group">
 										<label>Reason</label>
 										<div class="input-group ">
                                             <span class="input-group-addon">
@@ -80,7 +90,7 @@
 
 									<div class="col-md-6" style="margin-left:-15px;">
 										<div class="form-group">
-											<label>transfer Request Key</label>
+											<label>Transfer Request Key</label>
 											<div class="input-group ">
 												<span class="input-group-addon">
 													<i class="fa fa-bookmark"></i>
@@ -145,22 +155,45 @@
 									</div>
 								</div>
 							</div>
-						</div>
-					</div>
+								<div class="form-actions">
+									<div class="row">
+										<div class="col-md-offset-4 col-md-8">
+											@if($type==2)
+												<button type="submit" class="btn blue">Submit</button>
+											@endif
+										</div>
+									</div>
+								</div>
+							</form>
 
-					<div class="form-actions">
-						<div class="row">
-							<div class="col-md-offset-4 col-md-8">
-								@if($type==2)
-								<button type="submit" class="btn blue">Submit</button>
+							<div class="col-sm-12">
+								@if($data['attach_data'])
+									<form id="upload-form" action="/transfer/request/uploadAttach" method="post" enctype="multipart/form-data"   style="width:500px;" >
+										<input type="hidden" id="upload-id" name="id" value="{!! $data['id'] !!}">
+										<div class="pull-left">
+											{{ csrf_field() }}
+											<input type="file" name="uploadFile[]" id="uploadFile" multiple="multiple" />
+										</div>
+										<div class=" pull-left">
+											<button type="submit" class="upload-btn btn blue btn-sm" id="data_search">更新大货资料</button>
+										</div>
+									</form>
+									<div class=" pull-left" style="margin-left:50px;">
+										@foreach($data['files'] as $file)
+											<a href="/transfer/request/downloadAttach?src={!! $file['src'] !!}" >{!! $file['showname'] !!}</a><br><br>
+										@endforeach
+									</div>
 								@endif
 							</div>
 						</div>
 					</div>
 
+
 				</div>
 			</div>
-	</form>
+		</div>
+
+
 	@include('frank.common')
 	<script>
         //日期控件初始化
@@ -173,6 +206,7 @@
             var site = $('#site').val();
             var account = $('#account').val();
             var request_reason = $('#request_reason').val();
+            var rms_sku = $('#rms_sku').val();
             if(site == ''){
                 alert("site cannot be empty.");
                 return false;
@@ -181,10 +215,16 @@
                 alert("account cannot be empty.");
                 return false;
             }
-            if(request_reason == ''){
-                alert("request_reason cannot be empty.");
+            if(rms_sku == ''){
+                alert("Rms Sku cannot be empty.");
                 return false;
             }
+
+            if(request_reason == ''){
+                alert("Request Reason cannot be empty.");
+                return false;
+            }
+
             var flag = 0;
             $(".asin").each(function(ii,vv){ //ii 指第几个元素的序列号,vv 指遍历得到的元素
                 var asin = $(this).val();
