@@ -322,7 +322,7 @@ Route::resource('skuforuser', 'SkuForUserController');
 Route::Post('/skuforuser/get', 'SkuForUserController@get')->name('getSkuForUser');
 Route::Post('/skuforuser/upload', 'SkuForUserController@upload')->name('uploadSkuForUser');
 Route::get('/skuforuserexport', 'SkuForUserController@export')->name('exportSkuForUser');
-
+Route::Post('/skuforuser/batchUpdate', 'SkuForUserController@batchUpdate')->name('skuforuserBatchUpdate');
 /*
  * EDM模块
  */

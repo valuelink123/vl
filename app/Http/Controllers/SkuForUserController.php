@@ -234,37 +234,6 @@ class SkuForUserController extends Controller
     {
         set_time_limit(0);
         $curr_date = date('Y-m-d');
-        if (isset($_REQUEST["customActionType"])) {
-            if(!Auth::user()->can(['skuforuser-batch-update'])) die('Permission denied -- skuforuser-batch-update');
-            $updateData=array();
-            if($_REQUEST["customActionType"] == "group_action"){
-                if(array_get($_REQUEST,"confirmStatus")){
-                    $updateData['status'] = array_get($_REQUEST,"confirmStatus");
-                    $updateData['updated_user_id'] = Auth::user()->id;
-                }
-                if($updateData['status'] == 1){
-                    foreach($_REQUEST["id"] as $log_id){
-                        $skuForUserLog = SkuForUserLog::where('status',0)->find($log_id);
-                        SkuForUser::where('sku',$skuForUserLog->sku)->where('marketplace_id',$skuForUserLog->marketplace_id)->where('date',$curr_date)
-                        ->update(
-                            array(
-                                'producter'=>$skuForUserLog->producter,
-                                'planer'=>$skuForUserLog->planer,
-                                'dqe'=>$skuForUserLog->dqe,
-                                'te'=>$skuForUserLog->te,
-                            )
-                        );
-                        $skuForUserLog->status = $updateData['status'];
-                        $skuForUserLog->updated_user_id = $updateData['updated_user_id'];
-                        $skuForUserLog->save();
-                    }
-                }else{
-                    if($updateData) SkuForUserLog::whereIn('id',$_REQUEST["id"])->update($updateData);
-                }
-                
-                unset($updateData);      
-            }
-        }
 
         $date = array_get($_REQUEST,'date')??$curr_date;
 
@@ -309,7 +278,7 @@ class SkuForUserController extends Controller
 						  ->orwhereIn('te', $user_ids);
             });
         }
-        
+
         $iTotalRecords = $datas->count();
         $iDisplayLength = intval($_REQUEST['length']);
         $iDisplayLength = $iDisplayLength < 0 ? $iTotalRecords : $iDisplayLength;
@@ -341,5 +310,48 @@ class SkuForUserController extends Controller
         $records["recordsFiltered"] = $iTotalRecords;
         echo json_encode($records);
 
+    }
+
+
+    public function batchUpdate()
+    {
+        set_time_limit(0);
+        $curr_date = date('Y-m-d');
+        if(!Auth::user()->can(['skuforuser-batch-update'])) die('Permission denied -- skuforuser-batch-update');
+        DB::beginTransaction();
+        try{ 
+            $updateData=array();
+            if(array_get($_REQUEST,"confirmStatus")){
+                $updateData['status'] = array_get($_REQUEST,"confirmStatus");
+                $updateData['updated_user_id'] = Auth::user()->id;
+            }
+            if($updateData['status'] == 1){
+                foreach($_REQUEST["id"] as $log_id){
+                    $skuForUserLog = SkuForUserLog::where('status',0)->find($log_id);
+                    SkuForUser::where('sku',$skuForUserLog->sku)->where('marketplace_id',$skuForUserLog->marketplace_id)->where('date',$curr_date)
+                    ->update(
+                        array(
+                            'producter'=>$skuForUserLog->producter,
+                            'planer'=>$skuForUserLog->planer,
+                            'dqe'=>$skuForUserLog->dqe,
+                            'te'=>$skuForUserLog->te,
+                        )
+                    );
+                    $skuForUserLog->status = $updateData['status'];
+                    $skuForUserLog->updated_user_id = $updateData['updated_user_id'];
+                    $skuForUserLog->save();
+                }
+            }else{
+                if($updateData) SkuForUserLog::whereIn('id',$_REQUEST["id"])->update($updateData);
+            }
+            DB::commit();
+            $records["customActionStatus"] = 'OK';
+            $records["customActionMessage"] = '更新成功!';     
+        }catch (\Exception $e) { 
+            DB::rollBack();
+            $records["customActionStatus"] = '';
+            $records["customActionMessage"] = $e->getMessage();
+        }    
+        echo json_encode($records);  
     }
 }
