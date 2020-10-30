@@ -76,6 +76,9 @@ class SendEmails extends Command
 				}else{
 					$attachs = array();
 				}
+
+
+
 				$from=trim($task->from_address);
 				$to = trim($task->to_address);
 				$subject=$task->subject;
