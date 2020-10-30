@@ -819,6 +819,12 @@
 														<span class="arrow"></span>
 													</a>
 												</li>
+												<li class="">
+													<a href="/ccp/salesboard" class="nav-link nav-toggle ">
+														CCP环比数据分析
+														<span class="arrow"></span>
+													</a>
+												</li>
 												@endpermission
 											</ul>
 										</li>
