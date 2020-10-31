@@ -27,6 +27,7 @@ class CcpController extends Controller
 	use \App\Traits\Mysqli;
 
 	public $ccpAdmin = array("xumeiling@valuelinkcorp.com");
+	public $date = '';
 
 	public function __construct()
 	{
@@ -55,7 +56,8 @@ class CcpController extends Controller
 		}
 		$bgbu= DB::select('select bg,bu from asin '.$where.' group by bg,bu ORDER BY BG ASC,BU ASC');//获取bgbu选项
 		$site = getMarketDomain();//获取站点选项
-		return view('ccp/index',['bgbu'=>$bgbu,'site'=>$site]);
+		$date = date('Y-m-d');
+		return view('ccp/index',['bgbu'=>$bgbu,'site'=>$site,'date'=>$date]);
 	}
 	/*
 	*获取mws后台总统计数据的方法
@@ -81,6 +83,7 @@ class CcpController extends Controller
         $account = isset($search['account']) ? $search['account'] : '';//账号id,例如115,137
         $bgbu = isset($search['bgbu']) ? $search['bgbu'] : '';//bgbu,例如BG1_BU4
 		$timeType = isset($search['timeType']) ? $search['timeType'] : '';//时间类型，默认是0为北京时间，1为亚马逊后台当地时间
+		$this->date = isset($search['date']) ? $search['date'] : '';//date搜索框的值
 		$domain = substr(getDomainBySite($site), 4);//orders.sales_channel
 		$siteCur = getSiteCur();
 		$currency_code = isset($siteCur[$domain]) ? $siteCur[$domain] : '';
@@ -140,9 +143,9 @@ class CcpController extends Controller
         $site = isset($search['site']) ? $search['site'] : '';//站点，为marketplaceid
         $account = isset($search['account']) ? $search['account'] : '';//账号id,例如115,137
         $bgbu = isset($search['bgbu']) ? $search['bgbu'] : '';//bgbu,例如BG1_BU4
-        $asin = isset($search['asin']) ? $search['asin'] : '';//asin输入框的值
+        $asin = isset($search['asin']) ? trim($search['asin'],'+') : '';//asin输入框的值
 		$timeType = isset($search['timeType']) ? $search['timeType'] : '';//时间类型，默认是0为北京时间，1为亚马逊后台当地时间
-
+		$this->date = isset($search['date']) ? $search['date'] : '';//date搜索框的值
 		$where = $orderwhere = $this->getDateWhere($date_type,$site,$timeType);
 		//$account搜索两个表的字段都为seller_account_id
 		if($account){
@@ -184,7 +187,6 @@ class CcpController extends Controller
 		$recordsTotal = $recordsFiltered = $recordsTotal[0]->total;
 		$data = array();
 		$asins = array();
-
         $day = $this->getdays($date_type,$site,$timeType);//获取查询的时间范围有几天
 
 		$showOrder = Auth::user()->can(['ccp-showOrderList']) ? 1 : 0;//是否有查看详情权限
@@ -311,8 +313,8 @@ class CcpController extends Controller
 	{
 		//如果选的时间类型是后台当地时间，时间要做转化
 		$dateconfig = array('A1PA6795UKMFR9','A1RKKUPIHCS9HS','A13V1IB3VIYZZH','APJ6JRA9NG5V4');//utc+2:00
-		$time = time();//北京时间当前时间戳
-		// $time = strtotime('2020-09-01');//测试日期
+		// $time = time();//北京时间当前时间戳
+		$time = strtotime($this->date);//测试日期
 		if($timeType==1){//选的是后台当地时间
 			if($site=='A1VC38T7YXB528'){//时间范围+1小时,日本站点,-8+9
 				$time = strtotime(date('Y-m-d H:i:s', strtotime ("+1 hour", $time)));//日本站后台当前时间;

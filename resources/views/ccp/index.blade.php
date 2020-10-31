@@ -94,6 +94,12 @@
                     </div>
                     <div class="col-md-2">
                         <div class="input-group">
+                            <span class="input-group-addon">Date</span>
+                            <input  class="form-control" value="{!! $date !!}" data-date-format="yyyy-mm-dd" data-options="format:'yyyy-mm-dd'" id="date" name="date"/>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="input-group">
                             <div class="btn-group pull-right" >
                                 <button id="search_top" class="btn sbold blue">Search</button>
                             </div>
@@ -174,6 +180,12 @@
     </div>
 
     <script>
+        //日期控件初始化
+        $('#date').datepicker({
+            rtl: App.isRTL(),
+            autoclose: true
+        });
+
             $('#datatable').dataTable({
                 searching: false,//关闭搜索
                 serverSide: true,//启用服务端分页（这是使用Ajax服务端的必须配置）
