@@ -117,7 +117,7 @@ class CcpController extends Controller
 			  	{$where} 
 			  	and order_items.asin in({$userwhere})
 			) AS kk";
-
+		
 		$orderData = DB::connection('vlz')->select($sql);
 		$array = array(
 			'sales' => round($orderData[0]->sales,2),
@@ -286,7 +286,7 @@ class CcpController extends Controller
 		$configDays = array(1=>1,2=>1,3=>3,4=>7,5=>15,6=>30);
 		$time = $this->getCurrentTime($site,$timeType);//获取当前时间戳
 		$startDate = date('Y-m-d 00:00:00',$time);//默认的开始时间
-		$endDate = date('Y-m-d H:i:s',$time);//默认的结束时间
+		$endDate = date('Y-m-d 23:59:59',$time);//默认的结束时间
 		if($date_type == 2){//昨天日期
 			$startDate = date("Y-m-d 00:00:00",strtotime("-1 day",$time));
 			$endDate = date('Y-m-d 23:59:59',strtotime("-1 day",$time));
