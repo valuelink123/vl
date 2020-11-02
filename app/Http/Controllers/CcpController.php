@@ -56,8 +56,13 @@ class CcpController extends Controller
 		}
 		$bgbu= DB::select('select bg,bu from asin '.$where.' group by bg,bu ORDER BY BG ASC,BU ASC');//获取bgbu选项
 		$site = getMarketDomain();//获取站点选项
-		$date = date('Y-m-d');
-		return view('ccp/index',['bgbu'=>$bgbu,'site'=>$site,'date'=>$date]);
+		$date = $this->date = date('Y-m-d');
+		$siteDate = array();
+		foreach($site as $kk=>$vv){
+			$siteDate[$vv->marketplaceid] = date('Y-m-d',$this->getCurrentTime($vv->marketplaceid,1,$this->date));
+		}
+		$date = $siteDate[current($site)->marketplaceid];
+		return view('ccp/index',['bgbu'=>$bgbu,'site'=>$site,'date'=>$date,'siteDate'=>$siteDate]);
 	}
 	/*
 	*获取mws后台总统计数据的方法
@@ -117,7 +122,7 @@ class CcpController extends Controller
 			  	{$where} 
 			  	and order_items.asin in({$userwhere})
 			) AS kk";
-		
+
 		$orderData = DB::connection('vlz')->select($sql);
 		$array = array(
 			'sales' => round($orderData[0]->sales,2),
@@ -284,7 +289,7 @@ class CcpController extends Controller
 	{
 		//如果选的时间类型是后台当地时间，时间要做转化
 		$configDays = array(1=>1,2=>1,3=>3,4=>7,5=>15,6=>30);
-		$time = $this->getCurrentTime($site,$timeType);//获取当前时间戳
+		$time = strtotime($this->date);
 		$startDate = date('Y-m-d 00:00:00',$time);//默认的开始时间
 		$endDate = date('Y-m-d 23:59:59',$time);//默认的结束时间
 		if($date_type == 2){//昨天日期
@@ -308,26 +313,7 @@ class CcpController extends Controller
 		$day = isset($configDays[$date_type]) ? $configDays[$date_type] : 1;
 		return $day;
 	}
-	//得到当前时间戳
-	public function getCurrentTime($site,$timeType)
-	{
-		//如果选的时间类型是后台当地时间，时间要做转化
-		$dateconfig = array('A1PA6795UKMFR9','A1RKKUPIHCS9HS','A13V1IB3VIYZZH','APJ6JRA9NG5V4');//utc+2:00
-		// $time = time();//北京时间当前时间戳
-		$time = strtotime($this->date);//测试日期
-		if($timeType==1){//选的是后台当地时间
-			if($site=='A1VC38T7YXB528'){//时间范围+1小时,日本站点,-8+9
-				$time = strtotime(date('Y-m-d H:i:s', strtotime ("+1 hour", $time)));//日本站后台当前时间;
-			}elseif($site=='A1F83G8C2ARO7P'){//英国站点+1小时，uTc+1:00,-8+1
-				$time = strtotime(date('Y-m-d H:i:s', strtotime ("-7 hour", $time)));//英国站后台当前时间;
-			}elseif(in_array($site,$dateconfig)){//utc+2:00,-8+2
-				$time = strtotime(date('Y-m-d H:i:s', strtotime ("-6 hour", $time)));//几个特殊的站点
-			}else{//时间范围-15小时,-8-7
-				$time =  strtotime(date('Y-m-d H:i:s', strtotime ("-15 hour", $time)));//美国站后台当前时间;
-			}
-		}
-		return $time;
-	}
+
 	//得到用户的权限数据查询语句，根据sap_asin_match_sku去查数据
 	public function getUserWhere($site,$bgbu)
 	{

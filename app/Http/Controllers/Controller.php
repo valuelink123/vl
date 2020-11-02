@@ -295,4 +295,25 @@ class Controller extends BaseController
 		}
 		return $return;
 	}
+	//得到当前时间戳
+	public function getCurrentTime($site,$timeType,$date)
+	{
+		//如果选的时间类型是后台当地时间，时间要做转化
+		$dateconfig = array('A1PA6795UKMFR9','A1RKKUPIHCS9HS','A13V1IB3VIYZZH','APJ6JRA9NG5V4');//utc+2:00
+		// $time = time();//北京时间当前时间戳
+		$time = strtotime($date);//测试日期
+		if($timeType==1){//选的是后台当地时间
+			if($site=='A1VC38T7YXB528'){//时间范围+1小时,日本站点,-8+9
+				$time = strtotime(date('Y-m-d H:i:s', strtotime ("+1 hour", $time)));//日本站后台当前时间;
+			}elseif($site=='A1F83G8C2ARO7P'){//英国站点+1小时，uTc+1:00,-8+1
+				$time = strtotime(date('Y-m-d H:i:s', strtotime ("-7 hour", $time)));//英国站后台当前时间;
+			}elseif(in_array($site,$dateconfig)){//utc+2:00,-8+2
+				$time = strtotime(date('Y-m-d H:i:s', strtotime ("-6 hour", $time)));//几个特殊的站点
+			}else{//时间范围-15小时,-8-7
+				$time =  strtotime(date('Y-m-d H:i:s', strtotime ("-15 hour", $time)));//美国站后台当前时间;
+			}
+		}
+		return $time;
+	}
+
 }
