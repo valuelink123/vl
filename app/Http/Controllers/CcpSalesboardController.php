@@ -361,7 +361,7 @@ class CcpSalesBoardController extends Controller
 	    if(!$date_type) $date_type = 1;
         //如果选的时间类型是后台当地时间，时间要做转化
 		$configDays = array(1=>1,2=>1,3=>3,4=>7,5=>15,6=>30);
-		$time = $this->getCurrentTime($site,$timeType);//获取当前时间戳
+		$time = $this->getPresentTime($site,$timeType);//获取当前时间戳
         $startDate = date('Y-m-d 00:00:00',$time);//默认的开始时间
         $endDate = date('Y-m-d H:i:s',$time);//默认的结束时间
 		$dateRange = array();
@@ -391,7 +391,7 @@ class CcpSalesBoardController extends Controller
 	}
 
     //得到当前时间戳
-	public function getCurrentTime($site,$timeType)
+	public function getPresentTime($site,$timeType)
 	{
 		//如果选的时间类型是后台当地时间，时间要做转化
 		$dateconfig = array('A1PA6795UKMFR9','A1RKKUPIHCS9HS','A13V1IB3VIYZZH','APJ6JRA9NG5V4');//utc+2:00
