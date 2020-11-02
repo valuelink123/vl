@@ -59,7 +59,7 @@ class CcpController extends Controller
 		$date = $this->date = date('Y-m-d');
 		$siteDate = array();
 		foreach($site as $kk=>$vv){
-			$siteDate[$vv->marketplaceid] = date('Y-m-d',$this->getCurrentTime($vv->marketplaceid,1,$this->date));
+			$siteDate[$vv->marketplaceid] = date('Y-m-d',$this->getCurrentTime($vv->marketplaceid,1));
 		}
 		$date = $siteDate[current($site)->marketplaceid];
 		return view('ccp/index',['bgbu'=>$bgbu,'site'=>$site,'date'=>$date,'siteDate'=>$siteDate]);
