@@ -180,7 +180,10 @@ class SkuForUserController extends Controller
         
         if(!Auth::user()->can(['skuforuser-show-all'])){
             $user_ids = [];
-            $user_ids[] = Auth::user()->id;
+            $user_ids[] = $userid = Auth::user()->id;
+			if($userid==382){
+				$user_ids = [382,380,442,266,457];
+			}
             $datas = $datas->where(function ($query) use ($user_ids) {
                 $query->whereIn('producter', $user_ids)
                         ->orwhereIn('planer', $user_ids)
@@ -270,7 +273,10 @@ class SkuForUserController extends Controller
 
         if(!Auth::user()->can(['skuforuser-show-all'])){
             $user_ids = [];
-            $user_ids[] = Auth::user()->id;
+            $user_ids[] = $userid = Auth::user()->id;
+            if($userid==382){
+				$user_ids = [382,380,442,266,457];
+			}
             $datas = $datas->where(function ($query) use ($user_ids) {
                 $query->whereIn('producter', $user_ids)
                         ->orwhereIn('planer', $user_ids)
