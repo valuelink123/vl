@@ -446,8 +446,8 @@ where a.date>=:sdate_from and a.date<=:sdate_to
 			
 			if(array_get($_REQUEST,'ExportType')=='Review'){
 				if(!Auth::user()->can(['data-statistics-review'])) die('Permission denied -- data-statistics-review');
-				$getList = DB::select("select count(*) as getcount ,review_user_id as user_id from review a left join asin b on a.site=b.site and a.sellersku=b.sellersku and a.asin=b.asin where date>=:date_from and date<=:date_to group by review_user_id",['date_from' => $date_from,'date_to' => $date_to]);
-				$finishList = DB::select("select count(*) as finishcount ,a.status,review_user_id as user_id from review a left join asin b on a.site=b.site and a.sellersku=b.sellersku and a.asin=b.asin where edate>=:date_from and edate<=:date_to and a.status in (3,4,5) group by status,review_user_id",['date_from' => $date_from,'date_to' => $date_to]);
+				$getList = DB::select("select count(*) as getcount ,review_user_id as user_id from review a left join asin b on a.site=b.site  and a.asin=b.asin where date>=:date_from and date<=:date_to group by review_user_id",['date_from' => $date_from,'date_to' => $date_to]);
+				$finishList = DB::select("select count(*) as finishcount ,a.status,review_user_id as user_id from review a left join asin b on a.site=b.site and a.asin=b.asin where edate>=:date_from and edate<=:date_to and a.status in (3,4,5) group by status,review_user_id",['date_from' => $date_from,'date_to' => $date_to]);
 				$headArray[] = 'User';
 				$headArray[] = 'Negative Reviews';
 				$headArray[] = 'Removed';
