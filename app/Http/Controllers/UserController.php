@@ -350,7 +350,7 @@ class UserController extends Controller
 			
 			
 			if(array_get($_REQUEST,'ExportType')=='Performance'){
-				if(!Auth::user()->can(['data-statistics-preformance'])) die('Permission denied -- data-statistics-preformance');
+				if(!Auth::user()->can(['data-statistics-performance'])) die('Permission denied -- data-statistics-performance');
 				$problemList = DB::select("select a.*,b.out_count,b.out_date,c.purchasedate,d.brand_line,d.item_no from (select count(*) as in_count,from_address,to_address,min(date) as in_date,max(amazon_order_id) as  amazon_order_id
 ,max(sku) as  sku
 ,max(asin) as  asin
