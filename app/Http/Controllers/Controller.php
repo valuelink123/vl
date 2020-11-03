@@ -301,7 +301,7 @@ class Controller extends BaseController
 		//如果选的时间类型是后台当地时间，时间要做转化
 		$dateconfig = array('A1PA6795UKMFR9','A1RKKUPIHCS9HS','A13V1IB3VIYZZH','APJ6JRA9NG5V4');//utc+2:00
 		$time = time();//北京时间当前时间戳
-		// $time = strtotime('2020-11-2 23:01:00');//测试日期
+		// $time = strtotime('2020-10-2 23:01:00');//测试日期
 		if($timeType==1){//选的是后台当地时间
 			if($site=='A1VC38T7YXB528'){//时间范围+1小时,日本站点,-8+9
 				$time = strtotime(date('Y-m-d H:i:s', strtotime ("+1 hour", $time)));//日本站后台当前时间;
@@ -311,9 +311,57 @@ class Controller extends BaseController
 				$time = strtotime(date('Y-m-d H:i:s', strtotime ("-6 hour", $time)));//几个特殊的站点
 			}else{//时间范围-15小时,-8-7
 				$time =  strtotime(date('Y-m-d H:i:s', strtotime ("-15 hour", $time)));//美国站后台当前时间;
+				$res = $this->isWinterTime($time);//判断美国是否冬令制时间
+				//美国Amazon时间冬令制时间和北京时间相差16个小时。夏令制相差15个小时
+				if($res==1){//冬令制时间
+					$time =  strtotime(date('Y-m-d H:i:s', strtotime ("-1 hour", $time)));
+				}
 			}
 		}
 		return $time;
+	}
+
+	//判断是否进入冬令制时间,   夏令时（3月第二个星期天至11月第一个星期天），冬令时（11月8日至次年3月11日(包含)）
+	function isWinterTime($time){
+		$WinterMonth = array(12,1,2);//冬令时月份
+		$SummberMonth = array(4,5,6,7,8,9,10);//夏令时月份
+		$oneDay = date('Y-m-01', $time);//本月第一天
+		$toDay = date('d', $time);//今天是多少号，是本月的第几天
+		#$tolDay = date('d', strtotime("$oneDay +1 month -1 day"));//本月天数
+		$week = date('w',strtotime($oneDay));//本月第一天是星期几
+		$month = date('m',$time);//今天的月份
+
+		if(in_array($month,$WinterMonth)){//冬令时
+			return 1;
+		}
+		if(in_array($month,$SummberMonth)){//夏令时
+			return 0;
+		}
+
+		if($month==11){
+			if($week==0){//本月第一天是星期天
+				if($toDay > 1){
+					return 1;
+				}
+			}else{
+				if((8-$week) < $toDay){
+					return 1;
+				}
+			}
+		}
+
+		if($month==3){
+			if($week==0){
+				if((8-$week) >= $toDay){
+					return 1;
+				}
+			}else{
+				if((15-$week) >= $toDay){
+					return 1;
+				}
+			}
+		}
+		return 0;
 	}
 
 }
