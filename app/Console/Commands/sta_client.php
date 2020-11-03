@@ -191,14 +191,14 @@ class StaClient extends Command
 		DB::select($sql);
 
 		//5,留评率低于90%的客户标记红色,已留评(RSG)/总订单数(RSG),具体为ReviewID OR LINK /Order ID的总数
-		$sql = "update client as t1, (
-					select client_id as id,if(count(amazon_order_id)>0,count(review_url)/count(amazon_order_id),1) as review_rate 
-					from client_info as a 
-					left join rsg_requests as b on b.customer_email = a.email 
-					group by client_id 
-				) as t2 
-				SET rsg_status = 1,rsg_status_explain = 5 WHERE t1.id = t2.id and review_rate < 0.9";
-		DB::select($sql);
+		// $sql = "update client as t1, (
+		// 			select client_id as id,if(count(amazon_order_id)>0,count(review_url)/count(amazon_order_id),1) as review_rate
+		// 			from client_info as a
+		// 			left join rsg_requests as b on b.customer_email = a.email
+		// 			group by client_id
+		// 		) as t2
+		// 		SET rsg_status = 1,rsg_status_explain = 5 WHERE t1.id = t2.id and review_rate < 0.9";
+		// DB::select($sql);
 
 		//4,最近30天有参与4次RSG的客户标记红色
 		$daysago30 = date('Y-m-d',time()-86400*30);
