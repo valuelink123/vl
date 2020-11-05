@@ -113,23 +113,10 @@ class SendEmails extends Command
 						}
 					}
 				});
-
-				if (count(Mail::failures()) > 0) {
-					//print_r(Mail::failures());
-					$result = false ;
-				}else{
-					$result = true ;
-				}
-
-				if ($result){
-					$task->send_date = date("Y-m-d H:i:s");
-					$task->status = 'Send';
-				}else{
-					$task->error = 'Failed to send to '.trim($task->to_address);
-					$task->error_count = $task->error_count + 1;
-                    $task->plan_date = isset($configTime[$task->error_count]) ? time() + $configTime[$task->error_count] : $task->plan_date;
-				}
-				print_r($result);
+				
+				$task->send_date = date("Y-m-d H:i:s");
+				$task->status = 'Send';
+				
 			} catch (\Exception $e) {
 				//\Log::error('Send Mail '.$task->id.' Error' . $e->getMessage());
 				$task->error = $this->filterEmoji($e->getMessage());
