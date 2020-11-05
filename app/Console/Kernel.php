@@ -79,11 +79,14 @@ class Kernel extends ConsoleKernel
 			$schedule->command('get:email '.$account->id.' --time=1day')->cron($x.' 6 * * *')->name($account->id.'_get_emails_6')->withoutOverlapping();
 			$i++;
 
-			if($x>19) $x=0;
+			if($x>9) $x=0;//每十分钟发送一次,$x>9就置0
 			$num_x = sprintf("%02d",$x);
-			$schedule->command('scan:send '.$account->id)->cron($num_x.' * * * *')->name($account->id.'sendmails_19')->withoutOverlapping();
-			$schedule->command('scan:send '.$account->id)->cron(($num_x+20).' * * * *')->name($account->id.'sendmails_39')->withoutOverlapping();
-			$schedule->command('scan:send '.$account->id)->cron(($num_x+40).' * * * *')->name($account->id.'sendmails_59')->withoutOverlapping();
+			$schedule->command('scan:send '.$account->id)->cron($num_x.' * * * *')->name($account->id.'sendmails_9')->withoutOverlapping();
+			$schedule->command('scan:send '.$account->id)->cron(($num_x+10).' * * * *')->name($account->id.'sendmails_19')->withoutOverlapping();
+			$schedule->command('scan:send '.$account->id)->cron(($num_x+20).' * * * *')->name($account->id.'sendmails_29')->withoutOverlapping();
+			$schedule->command('scan:send '.$account->id)->cron(($num_x+30).' * * * *')->name($account->id.'sendmails_39')->withoutOverlapping();
+			$schedule->command('scan:send '.$account->id)->cron(($num_x+40).' * * * *')->name($account->id.'sendmails_49')->withoutOverlapping();
+			$schedule->command('scan:send '.$account->id)->cron(($num_x+50).' * * * *')->name($account->id.'sendmails_59')->withoutOverlapping();
 			$x++;
 
 
