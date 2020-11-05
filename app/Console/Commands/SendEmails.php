@@ -104,7 +104,7 @@ class SendEmails extends Command
 				$html = new \Html2Text\Html2Text($content);
 				Mail::send(['emails.common','emails.common-text'],['content'=>$content,'contentText'=>$html->getText()], function($m) use($subject,$to,$from,$attachs)
 				{
-					$m->to(trim($to));
+					$m->to(preg_replace("/(\s|\&nbsp\;|　|\xc2\xa0)/","",trim($to)));
 					$m->subject($subject);
 					$m->from(trim($from));
 					if ($attachs && count($attachs)>0){
@@ -113,10 +113,23 @@ class SendEmails extends Command
 						}
 					}
 				});
-				
-				$task->send_date = date("Y-m-d H:i:s");
-				$task->status = 'Send';
-				
+
+				if (count(Mail::failures()) > 0) {
+					//print_r(Mail::failures());
+					$result = false ;
+				}else{
+					$result = true ;
+				}
+
+				if ($result){
+					$task->send_date = date("Y-m-d H:i:s");
+					$task->status = 'Send';
+				}else{
+					$task->error = 'Failed to send to '.trim($task->to_address);
+					$task->error_count = $task->error_count + 1;
+                    $task->plan_date = isset($configTime[$task->error_count]) ? time() + $configTime[$task->error_count] : $task->plan_date;
+				}
+				print_r($result);
 			} catch (\Exception $e) {
 				//\Log::error('Send Mail '.$task->id.' Error' . $e->getMessage());
 				$task->error = $this->filterEmoji($e->getMessage());
@@ -153,7 +166,7 @@ class SendEmails extends Command
         $html = new \Html2Text\Html2Text($content);
         Mail::send(['emails.common','emails.common-text'],['content'=>$content,'contentText'=>$html->getText()], function($m) use($subject,$to,$from,$attachs)
         {
-            $m->to(trim($to));
+			$m->to(preg_replace("/(\s|\&nbsp\;|　|\xc2\xa0)/","",trim($to)));
             $m->subject($subject);
             $m->from(trim($from));
             if ($attachs && count($attachs)>0){
