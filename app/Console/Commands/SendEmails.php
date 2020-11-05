@@ -66,7 +66,7 @@ class SendEmails extends Command
 		
 		
 		
-        $tasks = Sendbox::where('status','Waiting')->where('from_address',$select_mail)->where('plan_date','<',strtotime(date('Y-m-d H:i:s')))->where('error_count','<',6)->orderBy('from_address','asc')->take(120)->get();
+        $tasks = Sendbox::where('status','Waiting')->where('from_address',$select_mail)->whereNotNull('error')->where('plan_date','<',strtotime(date('Y-m-d H:i:s')))->where('error_count','<',6)->orderBy('from_address','asc')->take(120)->get();
 		$this->run_email = '';
 		$configTime = array(1=>5*60,2=>15*60,3=>30*60,4=>60*60,5=>240*60);
 		foreach ($tasks as $task) {
