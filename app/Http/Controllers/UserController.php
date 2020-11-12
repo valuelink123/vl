@@ -350,7 +350,7 @@ class UserController extends Controller
 			
 			
 			if(array_get($_REQUEST,'ExportType')=='Performance'){
-				if(!Auth::user()->can(['data-statistics-preformance'])) die('Permission denied -- data-statistics-preformance');
+				if(!Auth::user()->can(['data-statistics-performance'])) die('Permission denied -- data-statistics-performance');
 				$problemList = DB::select("select a.*,b.out_count,b.out_date,c.purchasedate,d.brand_line,d.item_no from (select count(*) as in_count,from_address,to_address,min(date) as in_date,max(amazon_order_id) as  amazon_order_id
 ,max(sku) as  sku
 ,max(asin) as  asin
@@ -446,8 +446,8 @@ where a.date>=:sdate_from and a.date<=:sdate_to
 			
 			if(array_get($_REQUEST,'ExportType')=='Review'){
 				if(!Auth::user()->can(['data-statistics-review'])) die('Permission denied -- data-statistics-review');
-				$getList = DB::select("select count(*) as getcount ,review_user_id as user_id from review a left join asin b on a.site=b.site and a.sellersku=b.sellersku and a.asin=b.asin where date>=:date_from and date<=:date_to group by review_user_id",['date_from' => $date_from,'date_to' => $date_to]);
-				$finishList = DB::select("select count(*) as finishcount ,a.status,review_user_id as user_id from review a left join asin b on a.site=b.site and a.sellersku=b.sellersku and a.asin=b.asin where edate>=:date_from and edate<=:date_to and a.status in (3,4,5) group by status,review_user_id",['date_from' => $date_from,'date_to' => $date_to]);
+				$getList = DB::select("select count(*) as getcount ,review_user_id as user_id from review a left join asin b on a.site=b.site  and a.asin=b.asin where date>=:date_from and date<=:date_to group by review_user_id",['date_from' => $date_from,'date_to' => $date_to]);
+				$finishList = DB::select("select count(*) as finishcount ,a.status,review_user_id as user_id from review a left join asin b on a.site=b.site and a.asin=b.asin where edate>=:date_from and edate<=:date_to and a.status in (3,4,5) group by status,review_user_id",['date_from' => $date_from,'date_to' => $date_to]);
 				$headArray[] = 'User';
 				$headArray[] = 'Negative Reviews';
 				$headArray[] = 'Removed';

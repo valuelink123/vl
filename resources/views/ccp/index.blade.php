@@ -57,9 +57,9 @@
                     <div class="col-md-2">
                         <div class="input-group">
                             <span class="input-group-addon">Site</span>
-                            <select  style="width:100%;height:35px;" id="site" onchange="getAccountBySite()" name="site">
+                            <select  style="width:100%;height:35px;" data-recent="" data-recent-date="" id="site" onchange="getAccountBySite()" name="site">
                                 @foreach($site as $value)
-                                    <option value="{{ $value->marketplaceid }}">{{ $value->domain }}</option>
+                                    <option data-date="{!! $siteDate[$value->marketplaceid] !!}" value="{{ $value->marketplaceid }}">{{ $value->domain }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -86,10 +86,16 @@
                     <div class="col-md-2">
                         <div class="input-group">
                             <span class="input-group-addon">Time Type</span>
-                            <select  style="width:100%;height:35px;" id="timeType" name="timeType">
+                            <select  style="width:100%;height:35px;" id="timeType" name="timeType" >
                                 <option value="1">Local Time</option>
                                 <option value="0">BeiJing Time</option>
                             </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="input-group">
+                            <span class="input-group-addon">Date</span>
+                            <input  class="form-control"  value="{!! $date !!}" data-change="0" data-date-format="yyyy-mm-dd" data-options="format:'yyyy-mm-dd'" id="date" name="date"/>
                         </div>
                     </div>
                     <div class="col-md-2">
@@ -174,6 +180,12 @@
     </div>
 
     <script>
+        //日期控件初始化
+        $('#date').datepicker({
+            rtl: App.isRTL(),
+            autoclose: true
+        });
+
             $('#datatable').dataTable({
                 searching: false,//关闭搜索
                 serverSide: true,//启用服务端分页（这是使用Ajax服务端的必须配置）
@@ -250,6 +262,7 @@
         times = 1;
         function getAccountBySite(){
             var marketplaceid = $('#site option:selected').val();
+            getDateBySite();
             $.ajax({
                 type: 'post',
                 url: '/showAccountBySite',
@@ -275,6 +288,23 @@
             });
 
         }
+		//通过选择的站点和时间类型和时间得到对应的正确的时间
+        function getDateBySite()
+		{
+		    var dataRecent = $('#site').attr('data-recent');//最近一次的站点
+            var recentDate = $('#site').attr('data-recent-date');//最近一次站点的默认日期
+            var marketplaceid = $('#site option:selected').val();
+            var timeType = $('#timeType option:selected').val();
+            var date = $('#date').val();
+            var dataDate = $('#site option:selected').attr('data-date');//选中站点的默认日期
+
+            if(timeType==1 && recentDate == date){
+                $('#date').val(dataDate);
+            }
+
+            $('#site').attr('data-recent',marketplaceid);
+            $('#site').attr('data-recent-date',dataDate);
+		}
 
         $(function(){
             getAccountBySite()//触发当前选的站点得到该站点所有的账号

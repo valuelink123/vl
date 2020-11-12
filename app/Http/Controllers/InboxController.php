@@ -757,6 +757,7 @@ class InboxController extends Controller
         $rules = $this->getRules();
         $status_list[2] = "<span class=\"label label-sm label-success\">Replied</span>";
         $status_list[1] = "<span class=\"label label-sm label-warning\">Do not need to reply</span>";
+		$status_list[99] = "<span class=\"label label-sm label-warning\">Do not need to reply</span>";
         $status_list[0] = "<span class=\"label label-sm label-danger\">Need reply</span>";
         $rsgStatusArr = getCrmRsgStatusArr();
 

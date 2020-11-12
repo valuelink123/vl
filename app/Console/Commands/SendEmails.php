@@ -63,16 +63,16 @@ class SendEmails extends Command
 		foreach($signature_config as $signature_value){
 			$signature_arrays[strtolower(trim($signature_value->account_email))] = $signature_value->signature;  
 		}
-		
-		
-		
-        $tasks = Sendbox::where('status','Waiting')->where('from_address',$select_mail)->where('plan_date','<',strtotime(date('Y-m-d H:i:s')))->where('error_count','<',1)->orderBy('from_address','asc')->take(120)->get();
+
+        $tasks = Sendbox::where('status','Waiting')->where('from_address',$select_mail)->where('plan_date','<',strtotime(date('Y-m-d H:i:s')))->where('error_count','<',6)->orderBy('from_address','asc')->take(120)->get();
 		$this->run_email = '';
+		$configTime = array(1=>5*60,2=>15*60,3=>30*60,4=>60*60,5=>240*60);
 		foreach ($tasks as $task) {
 
 			try {
 				if($task->attachs){
 					$attachs = unserialize($task->attachs);
+
 				}else{
 					$attachs = array();
 				}
@@ -107,7 +107,7 @@ class SendEmails extends Command
 				$html = new \Html2Text\Html2Text($content);
 				Mail::send(['emails.common','emails.common-text'],['content'=>$content,'contentText'=>$html->getText()], function($m) use($subject,$to,$from,$attachs)
 				{
-					$m->to(trim($to));
+					$m->to(preg_replace("/(\s|\&nbsp\;|　|\xc2\xa0)/","",trim($to)));
 					$m->subject($subject);
 					$m->from(trim($from));
 					if ($attachs && count($attachs)>0){
@@ -130,12 +130,14 @@ class SendEmails extends Command
 				}else{
 					$task->error = 'Failed to send to '.trim($task->to_address);
 					$task->error_count = $task->error_count + 1;
+                    $task->plan_date = isset($configTime[$task->error_count]) ? time() + $configTime[$task->error_count] : $task->plan_date;
 				}
 				print_r($result);
 			} catch (\Exception $e) {
 				//\Log::error('Send Mail '.$task->id.' Error' . $e->getMessage());
 				$task->error = $this->filterEmoji($e->getMessage());
 				$task->error_count = $task->error_count + 1;
+                $task->plan_date = isset($configTime[$task->error_count]) ? time() + $configTime[$task->error_count] : $task->plan_date;
 			}
 			sleep(1);
 			$task->save();
@@ -167,7 +169,7 @@ class SendEmails extends Command
         $html = new \Html2Text\Html2Text($content);
         Mail::send(['emails.common','emails.common-text'],['content'=>$content,'contentText'=>$html->getText()], function($m) use($subject,$to,$from,$attachs)
         {
-            $m->to(trim($to));
+			$m->to(preg_replace("/(\s|\&nbsp\;|　|\xc2\xa0)/","",trim($to)));
             $m->subject($subject);
             $m->from(trim($from));
             if ($attachs && count($attachs)>0){

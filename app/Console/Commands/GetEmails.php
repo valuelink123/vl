@@ -82,44 +82,55 @@ class GetEmails extends Command
 
     public function saveEmails($lastMailDate){
 		$update_data = [];
+		$has_save_message = 0;//接收到邮件的总条数
 		try{
 			$last_date = $lastMailDate;
 			$date = new DateTimeImmutable($lastMailDate);
 			$sinceTime = $date->sub(new DateInterval('PT1H'));
 			$server = new Server($this->runAccount['imap_host']);
+			//登录邮箱
 			$connection = $server->authenticate($this->runAccount['email'], $this->runAccount['password']);
+			//获得邮箱邮件箱
 			$mailboxes = $connection->getMailboxes();
 			$search = new SearchExpression();
-			$search->addCondition(new Since($sinceTime));	
-			$has_save_message=false;
+			//这是邮件查询条件，从指定时间日期（$sinceTime）开始，读取所有邮件
+			$search->addCondition(new Since($sinceTime));
+			//遍历邮件箱
 			foreach ($mailboxes as $mailbox) {
 				if ($mailbox->getAttributes() & \LATT_NOSELECT) {
 					continue;
 				}
+				//忽略[已发送邮件，已删除邮件、草稿箱邮件]
 				if($mailbox->getName()=='Sent Messages' || $mailbox->getName()=='Deleted Messages' || $mailbox->getName()=='Drafts'){
 					continue;
 				}
+				//忽略[发件箱,?????]
 				if($mailbox->getName()=='Outbox' || $mailbox->getName()=='Sent' || $mailbox->getName()=='Deleted' || $mailbox->getName()=='Drafts'){
 					continue;
 				}
+				//根据条件，获得邮件箱邮件
 				$messages = $mailbox->getMessages($search,\SORTDATE,false);
+				//遍历邮件，并保存
 				foreach($messages as $message){
+					//保存邮件
 					$result = self::saveMessage($message);	
-					if($result==1){
-						$has_save_message=true;
+					if($result==1){//保存成功
+						$has_save_message++;
+						//设置邮件接收时间
 						if($last_date<date('Y-m-d H:i:s',strtotime($message->getDate()->format('c')))) $last_date = date('Y-m-d H:i:s',strtotime($message->getDate()->format('c')));
 					}
 				}
-				
+				//判断获取邮件的数量，如果读到邮件为空
 				if(!count($messages)){
 					$auto_exit_num=0;
+					//获得所有邮件
 					$messages = $mailbox->getMessages(NULL);
 					$mcc=count($messages);
 					for($mc=$mcc-1;$mc>=0;$mc--){
 						$message = $mailbox->getMessage($messages[$mc]);
 						$result = self::saveMessage($message);
 						if($result==1){
-							$has_save_message=true;
+							$has_save_message++;
 							if($last_date<date('Y-m-d H:i:s',strtotime($message->getDate()->format('c')))) $last_date = date('Y-m-d H:i:s',strtotime($message->getDate()->format('c')));
 						}
 						if($result==2) $auto_exit_num++;
@@ -127,14 +138,14 @@ class GetEmails extends Command
 					}
 				}
 			}
-			
-			if($has_save_message){
-				$update_data['last_mail_date'] = $last_date;
-				$update_data['last_logs'] = $last_date.' Get Emails Success';
-			}
+
 		}catch (\Exception $e){
 			$update_data['last_logs'] = $e->getMessage();
 			
+		}
+		if(!isset($update_data['last_logs'])){
+			$update_data['last_mail_date'] = $last_date;
+			$update_data['last_logs'] = $last_date.' Get Emails Success(Number:'.$has_save_message.')';
 		}
 		if($update_data) DB::table('accounts')->where('id',$this->runAccount['id'])->update($update_data);
     }
