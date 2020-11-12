@@ -422,7 +422,13 @@
                 var email = '';
                 //通过选中的ID得到选中的email
                 $(ctgRows).each(function (index,val){
-					email = email + val +';';
+					val = val.toString();
+					var position = val.indexOf("<div");
+					var eval = val;
+					if(position != '-1'){
+						eval = val.substring(0,position);
+					}
+					email = email + eval +';';
                 });
                 window.open('/send/create?to_address='+email,'_blank');
                 // location.href='/send/create?to_address='+email;

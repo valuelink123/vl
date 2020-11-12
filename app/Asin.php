@@ -75,6 +75,8 @@ class Asin extends Model
         "zouyuanxun@valuelinkcorp.com",
         "sunhanshan@valuelinkcorp.com",
         "chenguancan@valuelinkcorp.com",
-		"lizhuojun@valuelinkcorp.com"
+		"lizhuojun@valuelinkcorp.com",
+		"zhoulinlin@valuelinkcorp.com",
+		"wangxiaohua@valuelinkltd.com"
     );
 }
