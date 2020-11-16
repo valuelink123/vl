@@ -72,10 +72,15 @@ date from asin_daily_info where date>:date_from group by asin,site,date',['date_
  
 		$lists = DB::connection('review_new')->select('select * from tbl_star_system_product
 where last_updated>:date_from',['date_from' => $date_from]);
-		$patterns = '/\d+[\.,]?\d+(%)?/is';
+//		$patterns = '/\d+[\.,]?\d+(%)?/is';
+        //修正正则表达式，以匹配百分比为个位数(如5%)以及数字大于999（如1,000.95或者10,100.95）的匹配,
+        $patterns='/((\d+[\.|\,]?)+\d+(%)?)|(\d+(\.\d+)?%)/';
 		foreach($lists as $list){
-			$coupon_n=$coupon_p=0;
-			$price = $status = 0;
+            //[coupon_p:折扣率百分比，coupon_n:折扣金额具体数值]
+			$coupon_n = 0.00;
+            $coupon_p = 0.00;
+			$price = 0.00;
+            $status = 0;
 			if($list->product_status=='available') $status = 2;
 			if($list->product_status=='unavailable') $status = 1;
 			if($list->price){
@@ -88,14 +93,24 @@ where last_updated>:date_from',['date_from' => $date_from]);
 			if($list->coupon){
 				preg_match($patterns, $list->coupon,$arr);
 				if($arr){
-					$arr_val = str_replace([',','%'],['.',''],$arr[0]);
-					if(array_get($arr,'1')=='%'){
-						$coupon_p=round($arr_val,2);
-						$coupon_n=round($price*$coupon_p/100);
-					}else{
-						$coupon_n=round($arr_val,2);
-						$coupon_p=($price)?round($coupon_n/$price,2)*100:0;
-					}
+					$arr_val = str_replace([',','%'],['',''],$arr[0]);
+					//判断coupon是百分比还是具体数值
+                    if(strpos($arr[0],'%')){
+                        //百分比
+                        $coupon_p=round($arr_val,2);
+                        $coupon_n=round($price*$coupon_p/100,2);
+                    }else{
+                        //具体数值
+                        $coupon_n=round($arr_val,2);
+                        $coupon_p=($price)?round($coupon_n/$price,4)*100:0.00;
+                    }
+//					if(array_get($arr,'0')=='%'){
+//						$coupon_p=round($arr_val,2);
+//						$coupon_n=round($price*$coupon_p/100);
+//					}else{
+//						$coupon_n=round($arr_val,2);
+//						$coupon_p=($price)?round($coupon_n/$price,2)*100:0;
+//					}
 				}
 			}
 			
