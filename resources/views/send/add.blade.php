@@ -108,6 +108,25 @@
 	  }
 	  return true;		  
 	});
+
+      $("#search_from").keyup(function(){
+          var search_value = $(this).val().toUpperCase();
+          var fault = 1;
+          $('#from_address option').each(function (index,element){
+              var content = $(element).text().toUpperCase();
+              if(content.indexOf(search_value) >= 0 ) {
+                  //包含搜索的内容
+                  $(this).show();
+                  if(fault ==1 ){
+                      $(this).attr("selected",true);
+                      fault++;
+                  }
+
+              }else{
+                  $(this).hide();
+              }
+          });
+      });
   });
   </script>
     <h1 class="page-title font-red-intense"> Compose
@@ -149,6 +168,11 @@
                                         <option value="{{$account_email}}" <?php if($request->get('from_address')==$account_email) echo 'selected';?>>{{$account_email}}</option>
                                     @endforeach
                                 </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group ">
+                            <input id="search_from" type="text" class="form-control" value="" placeholder="search From">
                             </div>
                         </div>
 
