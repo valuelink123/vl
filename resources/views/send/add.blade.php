@@ -157,7 +157,7 @@
                         <input type="hidden" name="inbox_id" id="inbox_id" value="0">
                         <input type="hidden" name="user_id" id="user_id" value="{{Auth::user()->id}}">
 
-                        <div class="form-group">
+                        <div class="form-group" style="float:left;width:350px;">
                             <label>From</label>
                             <div class="input-group ">
                                 <span class="input-group-addon">
@@ -171,8 +171,9 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <div class="input-group ">
-                            <input id="search_from" type="text" class="form-control" value="" placeholder="search From">
+                            <label></label>
+                            <div class="input-group" style="height:36px;margin-top:6px;">
+                                <input id="search_from" type="text" class="form-control" value="" placeholder="search From">
                             </div>
                         </div>
 
