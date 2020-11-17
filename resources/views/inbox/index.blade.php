@@ -71,7 +71,7 @@
                                         <option value="">Select Status</option>
                                         <option value="2">Replied</option>
                                         <option value="1">Do not need to reply</option>
-                                        <option value="0" @if($fromService) selected @endif>Need reply</option>
+                                        <option value="0"  selected >Need reply</option>
                                     </select>
 									</div>
                                 </td>

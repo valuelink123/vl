@@ -385,3 +385,6 @@ Route::match(['post','get'],'/transfer/plan/createPlan', 'TransferPlanController
 //调拨任务
 Route::resource('transferTask', 'TransferTaskController');
 Route::Post('/transferTask/get', 'TransferTaskController@get')->name('getTransferTask');
+
+//系统模块下的菜单路由
+Route::get('/system/itRequirement', 'SystemController@itRequirement');//跳转进入到禅道系统
