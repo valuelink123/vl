@@ -190,13 +190,12 @@ class StarController extends Controller
 				if($_REQUEST['order'][0]['column']==$ok) $orderby = $ov;
 			}
 
-			if($_REQUEST['order'][0]['column']==8) $orderby = DB::raw("(star.total_star_number -( case when pre_star.total_star_number>0 then pre_star.total_star_number else 0 end))");
-			if($_REQUEST['order'][0]['column']==9) $orderby = DB::raw("(star.average_score -( case when pre_star.average_score>0 then pre_star.average_score else 0 end))");
-			if($_REQUEST['order'][0]['column']==10) $orderby = DB::raw("((star.five_star_number+star.four_star_number) -( case when (pre_star.five_star_number+pre_star.four_star_number)>0 then (pre_star.five_star_number+pre_star.four_star_number) else 0 end))");
-			if($_REQUEST['order'][0]['column']==11) $orderby = DB::raw("((star.one_star_number+star.two_star_number+star.three_star_number) -( case when (pre_star.one_star_number+pre_star.two_star_number+pre_star.three_star_number)>0 then (pre_star.one_star_number+pre_star.two_star_number+pre_star.three_star_number) else 0 end))");
+			if($_REQUEST['order'][0]['column']==7) $orderby = DB::raw("(CASE WHEN star.total_star_number > 0 THEN star.total_star_number ELSE 0 END) - (CASE WHEN pre_star.total_star_number > 0 THEN	pre_star.total_star_number	ELSE	0	END	)");
+			if($_REQUEST['order'][0]['column']==8) $orderby = DB::raw("(CASE WHEN star.average_score > 0 THEN star.average_score ELSE 0 END) - (CASE WHEN pre_star.average_score > 0 THEN pre_star.average_score	ELSE	0	END	)");
+			if($_REQUEST['order'][0]['column']==9) $orderby = DB::raw("(( case when (star.five_star_number+star.four_star_number)>0 then (star.five_star_number+star.four_star_number) else 0 end) -( case when (pre_star.five_star_number+pre_star.four_star_number)>0 then (pre_star.five_star_number+pre_star.four_star_number) else 0 end))");
+			if($_REQUEST['order'][0]['column']==10) $orderby = DB::raw("(( case when (star.one_star_number+star.two_star_number+star.three_star_number)>0 then (star.one_star_number+star.two_star_number+star.three_star_number) else 0 end) -( case when (pre_star.one_star_number+pre_star.two_star_number+pre_star.three_star_number)>0 then (pre_star.one_star_number+pre_star.two_star_number+pre_star.three_star_number) else 0 end))");
 
             $sort = $_REQUEST['order'][0]['dir'];//排序的类别
-			
         }
 		
         $ordersList =  $customers->orderBy($orderby,$sort)->get()->toArray();
@@ -225,6 +224,7 @@ class StarController extends Controller
 			if( $result >0 ) $diff_total_star_number =  "<span class=\"label label-sm label-success\">".$result."</span>";
 			if( $result <0 ) $diff_total_star_number =  "<span class=\"label label-sm label-danger\">".$result."</span>";
 			if( $result ==0 ) $diff_total_star_number =  "--";
+
 
 			//$diff_average_score为两个日期的平均星级分数的差值
 			$result = $ordersList[$i]['average_score']-$ordersList[$i]['pre_average_score'];
