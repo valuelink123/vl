@@ -42,21 +42,20 @@ class InsertAsininfo extends Command
      */
     public function handle()
     {
-
 		$ratingAsins=DB::table('rating_asin')->where('flag',0)->get()->toArray();
 		if($ratingAsins){
 			foreach ($ratingAsins as $ratingAsin){
-				$exists = DB::connection('review_new')->table('tbl_star_system_product')->where('asin', $ratingAsin['asin'])->where('domain', $ratingAsin['domain'])->get()->toArray();
+				$exists = DB::connection('review_new')->table('tbl_star_system_product')->where('asin', $ratingAsin->asin)->where('domain', $ratingAsin->domain)->get()->toArray();
 				if(!$exists){
 					DB::connection('review_new')->table('tbl_star_system_product')->insert(
 						array(
-							'asin'=>$ratingAsin['asin'],
-							'domain'=>$ratingAsin['domain']
+							'asin'=>$ratingAsin->asin,
+							'domain'=>$ratingAsin->domain
 						)
 					);
 
 				}
-				DB::table('rating_asin')->where('id', $ratingAsin['id'])->update(['flag' => 1]);
+				DB::table('rating_asin')->where('id', $ratingAsin->id)->update(['flag' => 1]);
 			}
 		}
     }
