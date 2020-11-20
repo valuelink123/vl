@@ -259,6 +259,12 @@ class StarController extends Controller
 			foreach($configdata as $dv){
 				$_data[$dv] = ($ordersList[$i][$dv] === NULL ? '-' : $ordersList[$i][$dv]).'<br>'.($ordersList[$i]['pre_'.$dv] === NULL ? '-' : $ordersList[$i]['pre_'.$dv]);
 			}
+
+			//$price,$coupon_p,$coupon_n这三个内容的数据展示
+			$price = ($ordersList[$i]['price']>$ordersList[$i]['pre_price'])?'<span class="btn btn-danger btn-xs">'.round($ordersList[$i]['price'],2).'</span>':( ($ordersList[$i]['price']<$ordersList[$i]['pre_price'])?'<span class="btn btn-success btn-xs">'.round($ordersList[$i]['price'],2).'</span>':round($ordersList[$i]['price'],2));
+			$coupon_p = ($ordersList[$i]['coupon_p']>$ordersList[$i]['pre_coupon_p'])?'<span class="btn btn-danger btn-xs">'.round($ordersList[$i]['coupon_p'],2).'</span>':( ($ordersList[$i]['coupon_p']<$ordersList[$i]['pre_coupon_p'])?'<span class="btn btn-success btn-xs">'.round($ordersList[$i]['coupon_p'],2).'</span>':round($ordersList[$i]['coupon_p'],2));
+			$coupon_n = ($ordersList[$i]['coupon_n']>$ordersList[$i]['pre_coupon_n'])?'<span class="btn btn-danger btn-xs">'.round($ordersList[$i]['coupon_n'],2).'</span>':( ($ordersList[$i]['coupon_n']<$ordersList[$i]['pre_coupon_n'])?'<span class="btn btn-success btn-xs">'.round($ordersList[$i]['coupon_n'],2).'</span>':round($ordersList[$i]['coupon_n'],2));
+
 			//需要展示的数据拼接成需要的数据格式
 			$records["data"][] = array(
 				'<a data-target="#ajax" data-toggle="modal" href="'.url('star/show/'.$ordersList[$i]['asin'].'/'.$ordersList[$i]['domain']).'">'.$ordersList[$i]['asin'].'</a>',
@@ -276,9 +282,9 @@ class StarController extends Controller
 				$diff_star,
 				$ordersList[$i]['create_at'].'<br>'.$ordersList[$i]['pre_create_at'],
 				$rating_status.'<br>'.$pre_rating_status,
-				($ordersList[$i]['price'] === NULL ? '-' : round($ordersList[$i]['price'],2)).'<br>'.($ordersList[$i]['pre_price'] === NULL ? '-' : round($ordersList[$i]['pre_price'],2)),
-				round($ordersList[$i]['coupon_p'],2).'<br>'.round($ordersList[$i]['pre_coupon_p'],2),
-				round($ordersList[$i]['coupon_n'],2).'<br>'.round($ordersList[$i]['pre_coupon_n'],2),
+				$price.'<br>'.round($ordersList[$i]['pre_price'],2),
+				$coupon_p.'<br>'.round($ordersList[$i]['pre_coupon_p'],2),
+				$coupon_n.'<br>'.round($ordersList[$i]['pre_coupon_n'],2),
 				$_data['total_star_number'],
 				round($ordersList[$i]['average_score'],2).'<br>'.round($ordersList[$i]['pre_average_score'],2),
 				$_data['one_star_number'],
