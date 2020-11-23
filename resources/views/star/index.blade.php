@@ -93,7 +93,7 @@ th,td,td>span {
                                         <option value="">All Listing Status</option>
                                         <option value="1" <?php if(1==array_get($_REQUEST,'listing_status')) echo 'selected';?>>Listing Down</option>
 										<option value="2" <?php if(2==array_get($_REQUEST,'listing_status')) echo 'selected';?>>Listing UnAvailable</option>
-										<option value="3" <?php if(3==array_get($_REQUEST,'listing_status')) echo 'selected';?>>Listing Available</option>
+										<option value="3" <?php if(3==array_get($_REQUEST,'listing_status') || !isset($_REQUEST['listing_status'])) echo 'selected';?>>Listing Available</option>
                                     </select>
                                        
 						</div>
@@ -188,35 +188,23 @@ th,td,td>span {
 							
                             <tr role="row" class="heading">
 								<th style="min-width:60px;"> Asin </th><!-- 0 -->
-								<th style="min-width:50px;"> Type </th><!-- 1 -->
-								<th style="min-width:50px;"> Status </th><!-- 2 -->
+                                <th style="min-width:50px;"> Item No. </th><!-- 1 -->
+								<th style="min-width:50px;"> Detail</th><!-- 2 -->
+								<th style="min-width:50px;"> Status </th>	<!-- 3 -->
+                                <th style="min-width:50px;"> Rating Status </th><!-- 4 -->
+                                <th style="min-width:50px;"> Listing </th><!-- 5 -->
+                                <th style="min-width:50px;"> Price </th><!-- 6 -->
+                                <th style="min-width:50px;"> Coupon</th><!-- 7 -->
+                                <th style="min-width:50px;">Ratings </th><!-- 8 -->
 
-								<th style="min-width:40px;"> Level </th><!-- 3 -->
-                                <th style="min-width:50px;"> Item No. </th><!-- 4 -->
-								<th style="min-width:50px;"> Status </th>	<!-- 5 -->
-								<th style="min-width:100px;"> Site </th><!-- 6 -->
-
-                                <th style="min-width:50px;"> Quantity Changes </th><!-- 7 -->
-                                <th style="min-width:50px;"> Rating Changes </th><!-- 8 -->
-								<th style="min-width:50px;"> Positive Changes </th><!-- 9 -->
-								<th style="min-width:50px;"> Negative Changes </th><!-- 10 -->
-								<th style="min-width:50px;"> Rating Limit </th><!-- 11 -->
-								<th style="min-width:50px;"> Rating Status </th><!-- 12 -->
+                                <th style="min-width:50px;"> Quantity Changes </th><!-- 9 -->
+                                <th style="min-width:50px;"> Rating Changes </th><!-- 10 -->
+								<th style="min-width:50px;"> Positive Changes </th><!-- 11 -->
+								<th style="min-width:50px;"> Negative Changes </th><!-- 12 -->
 
 								<th style="min-width:50px;"> Last Update</th><!-- 13 -->
-								<th style="min-width:50px;"> Listing </th><!-- 14 -->
-                                <th style="min-width:50px;"> Price </th><!-- 15 -->
-                                <th style="min-width:50px;"> Coupon % </th><!-- 16 -->
-								<th style="min-width:50px;"> Coupon $ </th><!-- 17 -->
-								<th style="min-width:50px;"> Quantity </th><!-- 18 -->
-                                <th style="min-width:50px;"> Rating </th><!-- 19 -->
-                                <th style="min-width:50px;"> 1 Star </th><!-- 20 -->
-								<th style="min-width:50px;"> 2 Stars </th><!-- 21 -->
-                                <th style="min-width:50px;"> 3 Stars </th><!-- 22 -->
-								<th style="min-width:50px;"> 4 Stars </th><!-- 23 -->
-                                <th style="min-width:50px;"> 5 Stars </th><!-- 24 -->
-                                <th style="min-width:50px;"> Seller </th><!-- 25 -->
-								<th style="min-width:50px;"> Action </th><!-- 26 -->
+                                <th style="min-width:50px;"> Seller </th><!-- 19 -->
+								<th style="min-width:50px;"> Action </th><!-- 20 -->
                             </tr>
 							
                             
@@ -331,19 +319,19 @@ th,td,td>span {
 					buttons: [],
 					
 					<?php } ?>
-					"aoColumnDefs": [ { "bSortable": false, "aTargets": [12,13,26 ] }],
+					"aoColumnDefs": [ { "bSortable": false, "aTargets": [0,1,2,4,13,14,15 ] }],
 					 "order": [
-                        [0, "asc"]
+                        [8, "asc"]
                     ],
                     // scroller extension: http://datatables.net/extensions/scroller/
-                    scrollY:        500,
-                    scrollX:        true,
+                    // scrollY:        500,
+                    // scrollX:        true,
 					
 
-					fixedColumns:   {
-						leftColumns:6,
-						rightColumns: 1
-					},
+					// fixedColumns:   {
+					// 	leftColumns:6,
+					// 	rightColumns: 1
+					// },
                     "ajax": {
                         "url": "{{ url('star/get')}}", // ajax source
                     },
