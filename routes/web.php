@@ -52,6 +52,8 @@ Route::Post('/inbox/getRsgTaskData', 'InboxController@getRsgTaskData')->name('ge
 Route::resource('send', 'SendController');
 Route::Post('/send/get', 'SendController@get')->name('getSendbox');
 Route::get('/send/deletefile/{filename}', 'SendController@deletefile')->name('deleteFile');
+Route::Post('/send/batchUpdate', 'SendController@batchUpdate')->name('sendBatchUpdate');
+
 Route::resource('review', 'ReviewController');
 Route::post('/reviewUpdateContentCN', 'ReviewController@updateContentCN');
 Route::resource('star', 'StarController');

@@ -8,6 +8,22 @@
         <div class="col-md-12">
             <!-- BEGIN EXAMPLE TABLE PORTLET-->
             <div class="portlet light bordered">
+                <div class="portlet-title">
+					<div class="btn-group " style="float:left;">
+                        <div class="table-actions-wrapper" id="table-actions-wrapper">
+							@permission('skuforuser-batch-update')
+                            <select id="confirmStatus" class="table-group-action-input form-control input-inline input-small input-sm">
+                                <option value="">Select Status</option>
+                                <option value="Draft">WithDraw (Errors and Waitings)</option>
+                                <option value="Waiting">ReSend (Errors and Drafts)</option>
+                            </select>
+                            <button class="btn  green table-status-action-submit">
+                                <i class="fa fa-check"></i> Update
+                            </button>
+                        	@endpermission	
+                        </div>
+                    </div>
+                </div>
                 <div class="portlet-body">
 
                     <div class="table-container">
@@ -75,6 +91,7 @@
                                         <option value="Send">Send</option>
                                         <option value="Waiting">Waiting</option>
 										<option value="Draft">Draft</option>
+                                        <option value="Error">Error</option>
                                     </select>
                                 </td>
                                 <td>
@@ -116,22 +133,23 @@
             });
             var grid = new Datatable();
 
+            grid.setAjaxParam("from_address", $("input[name='from_address']").val());
+            grid.setAjaxParam("to_address", $("input[name='to_address']").val());
+            grid.setAjaxParam("date_from", $("input[name='date_from']").val());
+            grid.setAjaxParam("date_to", $("input[name='date_to']").val());
+            grid.setAjaxParam("subject", $("input[name='subject']").val());
+            grid.setAjaxParam("status", $("select[name='status']").val());
+
             grid.init({
                 src: $("#datatable_ajax_customer"),
                 onSuccess: function (grid, response) {
-                    // grid:        grid object
-                    // response:    json object of server side ajax response
-                    // execute some code after table records loaded
+                    grid.setAjaxParam("customActionType", '');
                 },
                 onError: function (grid) {
                     // execute some code on network or other general error
                 },
                 onDataLoad: function(grid) {
                     // execute some code on ajax data load
-                    //alert('123');
-                    //alert($("#subject").val());
-                    //grid.setAjaxParam("subject", $("#subject").val());
-
                 },
                 loadingMessage: 'Loading...',
                 dataTable: { // here you can define a typical datatable settings from http://datatables.net/usage/options
@@ -161,43 +179,38 @@
             });
 
             // handle group actionsubmit button click
-            grid.getTableWrapper().on('click', '.table-group-action-submit', function (e) {
+
+            $(".btn-group").unbind("click").on('click', '.table-status-action-submit', function (e) {
                 e.preventDefault();
-                var action = $(".table-group-action-input", grid.getTableWrapper());
-                if (action.val() != "" && grid.getSelectedRowsCount() > 0) {
-                    grid.setAjaxParam("customActionType", "group_action");
-                    grid.setAjaxParam("customActionName", action.val());
-                    grid.setAjaxParam("id", grid.getSelectedRows());
-                    grid.getDataTable().draw(false);
-                    //grid.clearAjaxParams();
-                } else if (action.val() == "") {
-                    App.alert({
-                        type: 'danger',
-                        icon: 'warning',
-                        message: 'Please select an action',
-                        container: grid.getTableWrapper(),
-                        place: 'prepend'
+                var confirmStatus = $("#confirmStatus", $("#table-actions-wrapper"));
+
+                if (confirmStatus.val() != "" && grid.getSelectedRowsCount() > 0) {
+                    $.ajaxSetup({
+                        headers: { 'X-CSRF-TOKEN' : '{{ csrf_token() }}' }
                     });
+                    $.ajax({
+                        type: "POST",
+                        dataType: "json",
+                        url: "{{ url('send/batchUpdate') }}",
+                        data: {confirmStatus:confirmStatus.val(),id:grid.getSelectedRows()},
+                        success: function (data) {
+                            if(data.customActionStatus=='OK'){
+                                grid.getDataTable().draw(false);
+                                toastr.success(data.customActionMessage);
+                            }else{
+                                toastr.error(data.customActionMessage);
+                            }
+                        },
+                        error: function(data) {
+                            toastr.error(data.responseText);
+                        }
+                    });
+                } else if ( confirmStatus.val() == "" ) {
+                    toastr.error('Please select an action');
                 } else if (grid.getSelectedRowsCount() === 0) {
-                    App.alert({
-                        type: 'danger',
-                        icon: 'warning',
-                        message: 'No record selected',
-                        container: grid.getTableWrapper(),
-                        place: 'prepend'
-                    });
+                    toastr.error('No record selected');
                 }
             });
-            //alert($("select[name='status']").val());
-            //grid.setAjaxParam("customActionType", "group_action");
-            grid.setAjaxParam("from_address", $("input[name='from_address']").val());
-            grid.setAjaxParam("to_address", $("input[name='to_address']").val());
-            grid.setAjaxParam("date_from", $("input[name='date_from']").val());
-            grid.setAjaxParam("date_to", $("input[name='date_to']").val());
-            grid.setAjaxParam("subject", $("input[name='subject']").val());
-            grid.setAjaxParam("status", $("select[name='status']").val());
-            grid.getDataTable().ajax.reload(null,false);
-            //grid.clearAjaxParams();
         }
 
 
@@ -216,8 +229,6 @@
 $(function() {
     TableDatatablesAjax.init();
 });
-
-
 </script>
 
 
