@@ -1193,7 +1193,7 @@ function getGoodStoreHouse()
  */
 function getSiteShort()
 {
-	$arr = array('www.amazon.co.jp'=>'jp','www.amazon.com'=>'us','www.amazon.ca'=>'ca','www.amazon.co.uk'=>'uk','www.amazon.de'=>'de','www.amazon.it'=>'it','www.amazon.es'=>'es','www.amazon.fr'=>'fr');
+	$arr = array('www.amazon.co.jp'=>'jp','www.amazon.com'=>'us','www.amazon.ca'=>'ca','www.amazon.co.uk'=>'uk','www.amazon.de'=>'de','www.amazon.it'=>'it','www.amazon.es'=>'es','www.amazon.fr'=>'fr','www.amazon.mx'=>'mx');
 	return $arr;
 }
 
