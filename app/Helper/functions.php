@@ -742,6 +742,9 @@ function getActiveUserConfig()
 		array('db'=>'website','dbname'=>'vip-support_jp','name'=>'vip-support.jp','formid'=>array(1),'fields'=>array('name'=>'2.3','email'=>3,'orderid'=>4)),
 		array('db'=>'website','dbname'=>'workizeshop_com','name'=>'workizeshop.com','formid'=>array(2),'fields'=>array('name'=>7,'email'=>2,'orderid'=>4)),
 
+		array('db'=>'website','dbname'=>'lacetteshop','name'=>'lacetteshop','formid'=>array(1),'fields'=>array('name'=>1.3,'email'=>3,'orderid'=>4)),
+		array('db'=>'website','dbname'=>'tecbeanshop','name'=>'tecbeanshop','formid'=>array(1),'fields'=>array('name'=>1.3,'email'=>2,'orderid'=>3)),
+
     );
 
     return $config;
