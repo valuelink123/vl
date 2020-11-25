@@ -743,9 +743,9 @@ class InboxController extends Controller
         $iDisplayLength = $iDisplayLength < 0 ? $iTotalRecords : $iDisplayLength;
         $iDisplayStart = intval($_REQUEST['start']);
         $sEcho = intval($_REQUEST['draw']);
-        $customers = $customers->leftJoin(DB::raw('(select email, rsg_status, rsg_status_explain from client_info left join client on client_info.client_id = client.id) as t1'),function($q){
-            $q->on('inbox.from_address', '=', 't1.email');
-        });
+//        $customers = $customers->leftJoin(DB::raw('(select email, rsg_status, rsg_status_explain from client_info left join client on client_info.client_id = client.id) as t1'),function($q){
+//            $q->on('inbox.from_address', '=', 't1.email');
+//        });
 
 		$customersLists =  $customers->orderBy($orderby,$sort)->skip($iDisplayStart)->take($iDisplayLength)->get()->toArray();
         $records = array();
@@ -769,23 +769,23 @@ class InboxController extends Controller
                     $warnText = $this->time_diff(strtotime(date('Y-m-d H:i:s')), strtotime('+ '.array_get($rules,$customersList['rule_id']),strtotime($customersList['date'])));
                 }
             }
-            $explain = isset($rsgStatusArr[$customersList['rsg_status_explain']]) ? $rsgStatusArr[$customersList['rsg_status_explain']]['vop'] : $customersList['rsg_status_explain'];
-            //亚马逊客户是不能邀请做RSG的，不显示红色或绿色圆圈。
-            if($customersList['type'] != 'Site'){
-                $rsgStatus = '';
-            }else{
-                if($customersList['rsg_status']==1) {
-                    //邮箱后面显示红色圆圈
-                    $rsgStatus = '<div class="unavailable" title="'.$explain.'"></div>';
-                }else{
-                    //邮箱后面显示绿色圆圈
-                    $rsgStatus = '<div class="available"></div>';
-                }
-            }
+//            $explain = isset($rsgStatusArr[$customersList['rsg_status_explain']]) ? $rsgStatusArr[$customersList['rsg_status_explain']]['vop'] : $customersList['rsg_status_explain'];
+//            //亚马逊客户是不能邀请做RSG的，不显示红色或绿色圆圈。
+//            if($customersList['type'] != 'Site'){
+//                $rsgStatus = '';
+//            }else{
+//                if($customersList['rsg_status']==1) {
+//                    //邮箱后面显示红色圆圈
+//                    $rsgStatus = '<div class="unavailable" title="'.$explain.'"></div>';
+//                }else{
+//                    //邮箱后面显示绿色圆圈
+//                    $rsgStatus = '<div class="available"></div>';
+//                }
+//            }
             $records["data"][] = array(
                 '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input name="id[]" type="checkbox" class="checkboxes" value="'.$customersList['id'].'"/><span></span></label>',
                 
-				$customersList['from_address'].$rsgStatus.'</BR>'.(array_get($customersList,'from_name')?'<span class="label label-sm label-primary">'.array_get($customersList,'from_name').'</span> ':' ').$status_list[$customersList['reply']],
+				$customersList['from_address'].'</BR>'.(array_get($customersList,'from_name')?'<span class="label label-sm label-primary">'.array_get($customersList,'from_name').'</span> ':' ').$status_list[$customersList['reply']],
                 $customersList['to_address'].'</BR>'.'<span class="label label-sm label-primary">'.array_get($groups,$customersList['group_id'].'.group_name').' - '.array_get($users,$customersList['user_id']).'</span> ',
                 (($customersList['mark'])?'<span class="label label-sm label-danger">'.$customersList['mark'].'</span> ':'').(($customersList['sku'])?'<span class="label label-sm label-primary">'.$customersList['sku'].'</span> ':'').(($customersList['etype'])?'<span class="label label-sm label-danger">'.$customersList['etype'].'</span> ':'').'<a href="/inbox/'.$customersList['id'].'" target="_blank" style="color:#333;">'.(($customersList['read'])?'':'<strong>').$customersList['subject'].(($customersList['read'])?'':'</strong>').'</a>'.(($warnText)?'<span class="label label-sm label-danger">'.$warnText.'</span> ':'').(($customersList['remark'])?'<BR/><span class="label label-sm label-info">'.$customersList['remark'].'</span> ':''),
                 $customersList['date'],
@@ -793,27 +793,6 @@ class InboxController extends Controller
                 '<a href="/inbox/'.$customersList['id'].'" class="btn btn-sm btn-outline grey-salsa" target="_blank"><i class="fa fa-search"></i> View </a>',
             );
 		}
-        /*for($i = $iDisplayStart; $i < $end; $i++) {
-            $warnText = '';
-            if($customersList[$i]['reply']==0){
-                if(array_get($rules,$customersList[$i]['rule_id'],'')){
-                    $warnText = $this->time_diff(strtotime(date('Y-m-d H:i:s')), strtotime('+ '.array_get($rules,$customersList[$i]['rule_id']),strtotime($customersList[$i]['date'])));
-                }
-            }
-
-            $records["data"][] = array(
-                '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input name="id[]" type="checkbox" class="checkboxes" value="'.$customersList[$i]['id'].'"/><span></span></label>',
-                $customersList[$i]['from_address'],
-                $customersList[$i]['to_address'],
-                (($customersList[$i]['mark'])?'<span class="label label-sm label-danger">'.$customersList[$i]['mark'].'</span> ':'').(($customersList[$i]['sku'])?'<span class="label label-sm label-primary">'.$customersList[$i]['sku'].'</span> ':'').(($customersList[$i]['etype'])?'<span class="label label-sm label-danger">'.$customersList[$i]['etype'].'</span> ':'').'<a href="/inbox/'.$customersList[$i]['id'].'" target="_blank" style="color:#333;">'.(($customersList[$i]['read'])?'':'<strong>').$customersList[$i]['subject'].(($customersList[$i]['read'])?'':'</strong>').'</a>'.(($warnText)?'<span class="label label-sm label-danger">'.$warnText.'</span> ':'').(($customersList[$i]['remark'])?'<BR/><span class="label label-sm label-info">'.$customersList[$i]['remark'].'</span> ':''),
-                $customersList[$i]['date'],
-                $status_list[$customersList[$i]['reply']],
-                $users[$customersList[$i]['user_id']],
-                '<a href="/inbox/'.$customersList[$i]['id'].'" class="btn btn-sm btn-outline grey-salsa" target="_blank"><i class="fa fa-search"></i> View </a>',
-            );
-        }
-		*/
-
 
         $records["draw"] = $sEcho;
         $records["recordsTotal"] = $iTotalRecords;
