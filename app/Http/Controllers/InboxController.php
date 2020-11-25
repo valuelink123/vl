@@ -735,8 +735,9 @@ class InboxController extends Controller
         }
 
 		//if(!Auth::user()->can(['inbox-show-all'])) {
-        	 $customers = $customers->orderByRaw('case when user_id='.Auth::user()->id.' and reply=0 then 0 else 1 end asc');
+//        	 $customers = $customers->orderByRaw('case when user_id='.Auth::user()->id.' and reply=0 then 0 else 1 end asc');
 		//}
+		$customers = $customers->orderBy('user_id','asc');
 		$iTotalRecords = $customers->count();
         $iDisplayLength = intval($_REQUEST['length']);
         $iDisplayLength = $iDisplayLength < 0 ? $iTotalRecords : $iDisplayLength;

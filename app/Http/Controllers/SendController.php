@@ -125,6 +125,44 @@ class SendController extends Controller
 		}
         return redirect()->back()->withInput();
     }
+
+
+    public function batchUpdate()
+    {
+        set_time_limit(0);
+        DB::beginTransaction();
+        try{
+            $submitCount = count($_REQUEST["id"]);
+            $emails = Sendbox::whereIn('id',$_REQUEST["id"]); 
+            if(array_get($_REQUEST,"confirmStatus") == 'Waiting'){
+                $successCount = $emails->whereRaw("((status='Waiting' and error_count>0) or status='Draft') ")->update(
+                    [
+                        'status'=>'Waiting',
+                        'error'=>NULL,
+                        'error_count'=>0,
+                    ]
+                );
+            }
+            if(array_get($_REQUEST,"confirmStatus") == 'Draft'){
+                $successCount = $emails->where('status','Waiting')->update(
+                    [
+                        'status'=>'Draft',
+                        'error'=>NULL,
+                        'error_count'=>0,
+                    ]
+                );
+            }
+            DB::commit();
+            $records["customActionStatus"] = 'OK';
+            $records["customActionMessage"] = $successCount.'条记录更新成功!<BR>'; 
+            if($submitCount - $successCount>0) $records["customActionMessage"] .= ($submitCount - $successCount).'条记录更新失败: 非自有记录或状态已改变!';     
+        }catch (\Exception $e) { 
+            DB::rollBack();
+            $records["customActionStatus"] = '';
+            $records["customActionMessage"] = $e->getMessage();
+        }    
+        echo json_encode($records);  
+    }
 	
     public function store(Request $request)
     {
@@ -354,7 +392,15 @@ class SendController extends Controller
 
 
         if(array_get($_REQUEST,'status')){
-            $customers = $customers->where('status',$_REQUEST['status']);
+            if(array_get($_REQUEST,'status')=='Waiting'){
+                $customers = $customers->where('status',$_REQUEST['status'])->where('error_count',0);
+            }
+            if(array_get($_REQUEST,'status')=='Error'){
+                $customers = $customers->where('status','Waiting')->where('error_count','>',0);
+            }
+            if(array_get($_REQUEST,'status')=='Send' || array_get($_REQUEST,'status')=='Draft'){
+                $customers = $customers->where('status',$_REQUEST['status']);
+            }
         }
 		
 		if(array_get($_REQUEST,'user_id')){
@@ -392,6 +438,13 @@ class SendController extends Controller
 		$users = $this->getUsers();
 
         foreach ( $customersLists as $customersList){
+            if($customersList['send_date']){
+                $status = '<span class="label label-sm label-success">'.$customersList['send_date'].'</span> ';
+            }elseif($customersList['status']=='Waiting' && $customersList['error_count']>0){
+                $status = '<span class="label label-sm label-danger">Error</span> ';
+            }else{
+                $status = '<span class="label label-sm label-warning">'.$customersList['status'].'</span> ';
+            }
             $records["data"][] = array(
                 '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input name="id[]" type="checkbox" class="checkboxes" value="'.$customersList['id'].'"/><span></span></label>',
                 $customersList['from_address'],
@@ -399,7 +452,7 @@ class SendController extends Controller
                 '<a href="/send/'.$customersList['id'].'" style="color:#333;" target="_blank">'.$customersList['subject'].'</a>',
                 $customersList['date'],
 				array_get($users,$customersList['user_id']),
-                $customersList['send_date']?'<span class="label label-sm label-success">'.$customersList['send_date'].'</span> ':'<span class="label label-sm label-danger">'.$customersList['status'].'</span> ',
+                $status,
 
 				'<a href="/send/'.$customersList['id'].'" target="_blank">
                                         <button type="submit" class="btn btn-success btn-xs">View</button>

@@ -903,6 +903,23 @@
 												@endpermission
 											</ul>
 										</li>
+
+                                        <li class="menu-dropdown classic-menu-dropdown ">
+                                            <a href="javascript:;"> System
+                                                <span class="arrow"></span>
+                                            </a>
+                                            <ul class="dropdown-menu pull-left">
+
+                                                @permission('It-requirement-show')
+                                                <li class="">
+                                                    <a href="/system/itRequirement" class="nav-link nav-toggle" target="_blank">
+                                                        IT Requirement
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
+                                                @endpermission
+                                            </ul>
+                                        </li>
                                     </ul>
                                 </div>
             <div class="top-menu">

@@ -497,6 +497,7 @@ class MarketingPlanController extends Controller
                 any_value(from_time) as from_time,
                 any_value(to_time) as to_time,
                 any_value(marketing_plan.asin) as asin,
+                any_value(marketing_plan.created_at) as created_at,
                 any_value(marketing_plan.updated_at) as updated_at,
                 any_value(plan_status) as plan_status,
                 any_value(marketing_plan.marketplaceid) as marketplaceid,
@@ -547,7 +548,8 @@ class MarketingPlanController extends Controller
         if (!empty($rsgList) && !empty($sapSellerIdList)) {
             foreach ($rsgList as $k => $v) {
                 $rsgList[$k]['Seller'] = $sapSellerIdList[$v['sap_seller_id']];
-                $rsgList[$k]['updated_at'] = date('Y-m-d', $v['updated_at']);
+                $rsgList[$k]['created_at'] = date('Y-m-d', $v['created_at']);
+				$rsgList[$k]['updated_at'] = date('Y-m-d', $v['updated_at']);
                 $rsgList[$k]['plan_status'] = $planStatus[$v['plan_status']];
                 $rsgList[$k]['current_60romi'] = ($v['current_60romi'] * 100) . '%';
                 $rsgList[$k]['actual_60romi'] = ($v['actual_60romi'] * 100) . '%';

@@ -39,7 +39,7 @@ class StarController extends Controller
     {
 		if(!Auth::user()->can(['asin-rating-show'])) die('Permission denied -- asin-rating-show');
 		$date_from=date('Y-m-d',strtotime('-1 days'));	
-		$date_to=date('Y-m-d',strtotime('-2 days'));		
+		$date_to=date('Y-m-d',strtotime('-2 days'));
 		$teams= DB::select('select bg,bu from asin group by bg,bu ORDER BY BG ASC,BU ASC');
         return view('star/index',['date_from'=>$date_from ,'date_to'=>$date_to,  'users'=>$this->getUsers(),'teams'=>$teams]);
 
@@ -88,13 +88,11 @@ class StarController extends Controller
 				if (array_get($rules, 0) != '*') $customers = $customers->where('asin.bg', array_get($rules, 0));
 				if (array_get($rules, 1) != '*') $customers = $customers->where('asin.bu', array_get($rules, 1));
 			} elseif (Auth::user()->sap_seller_id) {
-				$datas = $datas->where('asin.sap_seller_id', Auth::user()->sap_seller_id);
+				$customers = $customers->where('asin.sap_seller_id', Auth::user()->sap_seller_id);
 			} else {
-				$datas = $datas->where('asin.review_user_id', Auth::user()->id);
+				$customers = $customers->where('asin.review_user_id', Auth::user()->id);
 			}
 		}
-		
-
 
         if(array_get($_REQUEST,'keywords')){
             //$customers = $customers->where('subject', 'like', '%'.$_REQUEST['subject'].'%');
@@ -105,10 +103,8 @@ class StarController extends Controller
                         ->orwhere('asin.seller', 'like', '%'.$keywords.'%')
 						 ->orwhere('star.asin', 'like', '%'.$keywords.'%')
 						  ->orwhere('star.domain', 'like', '%'.$keywords.'%');
-
             });
         }
-		
 		
 		if(array_get($_REQUEST,'bgbu')){
 			   $bgbu = array_get($_REQUEST,'bgbu');
@@ -162,61 +158,33 @@ class StarController extends Controller
 		if(array_get($_REQUEST,'star_from')) $customers = $customers->where('star.average_score','>=',round(array_get($_REQUEST,'star_from'),1));
 		if(array_get($_REQUEST,'star_to')) $customers = $customers->where('star.average_score','<=',round(array_get($_REQUEST,'star_to'),1));
 
-		$orderby = 'asin.asin';
+		$orderby = 'star.average_score';
         $sort = 'asc';
 
-				
         if(isset($_REQUEST['order'][0])){
-            if($_REQUEST['order'][0]['column']==0) $orderby = 'star.asin';
-            if($_REQUEST['order'][0]['column']==1) $orderby = 'asin.post_type';
-			if($_REQUEST['order'][0]['column']==2) $orderby = 'asin.post_status';
-			if($_REQUEST['order'][0]['column']==3) $orderby = 'asin.asin_status';
-            if($_REQUEST['order'][0]['column']==4) $orderby = 'asin.item_no';
-			if($_REQUEST['order'][0]['column']==5) $orderby = 'asin.item_status';
-            if($_REQUEST['order'][0]['column']==6) $orderby = 'asin.seller';
-			if($_REQUEST['order'][0]['column']==7) $orderby = 'star.domain';
-			
-			if($_REQUEST['order'][0]['column']==8) $orderby = DB::raw("(star.total_star_number -( case when pre_star.total_star_number>0 then pre_star.total_star_number else 0 end))");
-			if($_REQUEST['order'][0]['column']==9) $orderby = DB::raw("(star.average_score -( case when pre_star.average_score>0 then pre_star.average_score else 0 end))");
-			if($_REQUEST['order'][0]['column']==10) $orderby = DB::raw("((star.five_star_number+star.four_star_number) -( case when (pre_star.five_star_number+pre_star.four_star_number)>0 then (pre_star.five_star_number+pre_star.four_star_number) else 0 end))");
-			if($_REQUEST['order'][0]['column']==11) $orderby = DB::raw("((star.one_star_number+star.two_star_number+star.three_star_number) -( case when (pre_star.one_star_number+pre_star.two_star_number+pre_star.three_star_number)>0 then (pre_star.one_star_number+pre_star.two_star_number+pre_star.three_star_number) else 0 end))");
-			if($_REQUEST['order'][0]['column']==12) $orderby = 'asin.star';
-			
-			if($_REQUEST['order'][0]['column']==15) $orderby = 'star.status';
-			if($_REQUEST['order'][0]['column']==16) $orderby = 'star.price';
-			if($_REQUEST['order'][0]['column']==17) $orderby = 'star.coupon_p';
-			if($_REQUEST['order'][0]['column']==18) $orderby = 'star.coupon_n';
-			
-			
-			if($_REQUEST['order'][0]['column']==19) $orderby = 'star.total_star_number';
-			if($_REQUEST['order'][0]['column']==20) $orderby = 'star.average_score';
-			if($_REQUEST['order'][0]['column']==21) $orderby = 'star.one_star_number';
-			if($_REQUEST['order'][0]['column']==22) $orderby = 'star.two_star_number';
-			if($_REQUEST['order'][0]['column']==23) $orderby = 'star.three_star_number';
-			if($_REQUEST['order'][0]['column']==24) $orderby = 'star.four_star_number';
-			if($_REQUEST['order'][0]['column']==25) $orderby = 'star.five_star_number';
-			
-			if($_REQUEST['order'][0]['column']==27) $orderby = 'pre_star.status';
-			if($_REQUEST['order'][0]['column']==28) $orderby = 'pre_star.price';
-			if($_REQUEST['order'][0]['column']==29) $orderby = 'pre_star.coupon_p';
-			if($_REQUEST['order'][0]['column']==30) $orderby = 'pre_star.coupon_n';
-			
-			if($_REQUEST['order'][0]['column']==31) $orderby = 'pre_star.total_star_number';
-			if($_REQUEST['order'][0]['column']==32) $orderby = 'pre_star.average_score';
-			if($_REQUEST['order'][0]['column']==33) $orderby = 'pre_star.one_star_number';
-			if($_REQUEST['order'][0]['column']==34) $orderby = 'pre_star.two_star_number';
-			if($_REQUEST['order'][0]['column']==35) $orderby = 'pre_star.three_star_number';
-			if($_REQUEST['order'][0]['column']==36) $orderby = 'pre_star.four_star_number';
-			if($_REQUEST['order'][0]['column']==37) $orderby = 'pre_star.five_star_number';
-            $sort = $_REQUEST['order'][0]['dir'];
-			
-			
+        	//配置排序的字段，点击表格表头某一列对应的要排序的字段
+        	$configOrder = array(
+				3 => 'asin.item_status',
+				5 => 'star.status',
+				6 => 'star.price',
+				7=>'star.coupon_p',
+				8=>'star.average_score',
+			);
+        	foreach($configOrder as $ok=>$ov){
+				if($_REQUEST['order'][0]['column']==$ok) $orderby = $ov;
+			}
+
+			if($_REQUEST['order'][0]['column']==9) $orderby = DB::raw("(CASE WHEN star.total_star_number > 0 THEN star.total_star_number ELSE 0 END) - (CASE WHEN pre_star.total_star_number > 0 THEN	pre_star.total_star_number	ELSE	0	END	)");
+			if($_REQUEST['order'][0]['column']==10) $orderby = DB::raw("(CASE WHEN star.average_score > 0 THEN star.average_score ELSE 0 END) - (CASE WHEN pre_star.average_score > 0 THEN pre_star.average_score	ELSE	0	END	)");
+			if($_REQUEST['order'][0]['column']==11) $orderby = DB::raw("(( case when (star.five_star_number+star.four_star_number)>0 then (star.five_star_number+star.four_star_number) else 0 end) -( case when (pre_star.five_star_number+pre_star.four_star_number)>0 then (pre_star.five_star_number+pre_star.four_star_number) else 0 end))");
+			if($_REQUEST['order'][0]['column']==12) $orderby = DB::raw("(( case when (star.one_star_number+star.two_star_number+star.three_star_number)>0 then (star.one_star_number+star.two_star_number+star.three_star_number) else 0 end) -( case when (pre_star.one_star_number+pre_star.two_star_number+pre_star.three_star_number)>0 then (pre_star.one_star_number+pre_star.two_star_number+pre_star.three_star_number) else 0 end))");
+
+            $sort = $_REQUEST['order'][0]['dir'];//排序的类别
         }
 		
         $ordersList =  $customers->orderBy($orderby,$sort)->get()->toArray();
 		$ordersList =json_decode(json_encode($ordersList), true);
-		
-	
+
         $iTotalRecords = count($ordersList);
         $iDisplayLength = intval($_REQUEST['length']);
         $iDisplayLength = $iDisplayLength < 0 ? $iTotalRecords : $iDisplayLength;
@@ -231,90 +199,94 @@ class StarController extends Controller
 
 		$postStatus = getPostStatus();//帖子状态状态对应值
 		$postType = getPostType();//帖子类型状态对应值
+		$siteShort = getSiteShort();//得到站点与站点简写的键值对
 		
 		$users_array = $this->getUsers();
         for($i = $iDisplayStart; $i < $end; $i++) {
-		
-			$result = $ordersList[$i]['total_star_number']-$ordersList[$i]['pre_total_star_number'];
+
+        	//$diff_total_star_number为两个日期的总星级数量的差值
+			$result = $ordersList[$i]['total_star_number']-$ordersList[$i]['pre_total_star_number'];//第一个日期的总数-第二个日期的总数
 			if( $result >0 ) $diff_total_star_number =  "<span class=\"label label-sm label-success\">".$result."</span>";
 			if( $result <0 ) $diff_total_star_number =  "<span class=\"label label-sm label-danger\">".$result."</span>";
 			if( $result ==0 ) $diff_total_star_number =  "--";
-								
+
+
+			//$diff_average_score为两个日期的平均星级分数的差值
 			$result = $ordersList[$i]['average_score']-$ordersList[$i]['pre_average_score'];
 			if( $result >0 ) $diff_average_score =  "<span class=\"label label-sm label-success\">".$result."</span>";
 			if( $result <0 ) $diff_average_score = "<span class=\"label label-sm label-danger\">".$result."</span>";
 			if( $result ==0 ) $diff_average_score = "--";
-			
+
+			//$diff_positive为好评的变化数量，其中4星5星为好评
 			$result = $ordersList[$i]['five_star_number']-$ordersList[$i]['pre_five_star_number']+$ordersList[$i]['four_star_number']-$ordersList[$i]['pre_four_star_number'];
 			if( $result >0 ) $diff_positive =  "<span class=\"label label-sm label-success\">".$result."</span>";
 			if( $result <0 ) $diff_positive = "<span class=\"label label-sm label-danger\">".$result."</span>";
 			if( $result ==0 ) $diff_positive = "--";
-			
+
+			//$diff_negative为差评的变化数量，其中1星2星3星为差评
 			$result = $ordersList[$i]['three_star_number']-$ordersList[$i]['pre_three_star_number']+$ordersList[$i]['two_star_number']-$ordersList[$i]['pre_two_star_number']+$ordersList[$i]['one_star_number']-$ordersList[$i]['pre_one_star_number'];
 			if( $result >0 ) $diff_negative = "<span class=\"label label-sm label-success\">".$result."</span>";
 			if( $result <0 ) $diff_negative = "<span class=\"label label-sm label-danger\">".$result."</span>";
 			if( $result ==0 ) $diff_negative = "--";
-								
-			
-					
+
+			//$diff_star为星级变化的提示词，平均星级大于star的时候显示Normal；平均星级小于star的时候显示Danger；平均星级等于star的时候显示Warning
 			if( $ordersList[$i]['average_score'] >$ordersList[$i]['star'] ) $diff_star =  "<span class=\"label label-sm label-success\">Normal</span>";
 			if( $ordersList[$i]['average_score'] <$ordersList[$i]['star'] ) $diff_star = "<span class=\"label label-sm label-danger\">Danger</span>";
-			if( $ordersList[$i]['average_score'] ==$ordersList[$i]['star'] ) $diff_star = "<span class=\"label label-sm label-warning\">Warning</span>";		
+			if( $ordersList[$i]['average_score'] ==$ordersList[$i]['star'] ) $diff_star = "<span class=\"label label-sm label-warning\">Warning</span>";
+
+			//listing状态展示的内容，状态为2的时候显示Available，状态为1的时候显示UnAvailable，状态为0的时候显示Down
+			$rating_status = ($ordersList[$i]['status']==2)?'<span class="btn btn-success btn-xs">Available</span>':(($ordersList[$i]['status']==1)?'<span class="btn btn-warning btn-xs">UnAvailable</span>':'<span class="btn btn-danger btn-xs">Down</span>');
+			$pre_rating_status = ($ordersList[$i]['pre_status']==2)?'<span class="btn btn-success btn-xs">Available</span>':(($ordersList[$i]['pre_status']==1)?'<span class="btn btn-warning btn-xs">UnAvailable</span>':'<span class="btn btn-danger btn-xs">Down</span>');
+
+			//配置相同处理方式的数据
+			$_data['total_star_number'] = ($ordersList[$i]['total_star_number'] === NULL ? '-' : $ordersList[$i]['total_star_number']);
+			$_data['pre_total_star_number'] = ($ordersList[$i]['pre_total_star_number'] === NULL ? '-' : $ordersList[$i]['pre_total_star_number']);
+			$configdata = array('one_star_number','two_star_number','three_star_number','four_star_number','five_star_number',);
+			foreach($configdata as $dv){
+				$_data[$dv] = ($ordersList[$i][$dv] === NULL ? '-' : $ordersList[$i][$dv]).'/'.($ordersList[$i]['pre_'.$dv] === NULL ? '-' : $ordersList[$i]['pre_'.$dv]);
+			}
+
+			//$price,$coupon_p,$coupon_n这三个内容的数据展示
+			$price = sprintf("%.2f",$ordersList[$i]['price']).'<br/>'.sprintf("%.2f",$ordersList[$i]['pre_price']);
+//			$price = ($ordersList[$i]['price']>$ordersList[$i]['pre_price'])?'<span class="btn btn-danger btn-xs">'.$_price.'</span>':( ($ordersList[$i]['price']<$ordersList[$i]['pre_price'])?'<span class="btn btn-success btn-xs">'.$_price.'</span>':$_price);
+
+			$_coupon_p = ' ('.round($ordersList[$i]['coupon_p'],2).'%)';
+			$_coupon_n = sprintf("%.2f",$ordersList[$i]['coupon_n']);
+			$coupon_class = ($ordersList[$i]['coupon_p']>$ordersList[$i]['pre_coupon_p'])?'btn-danger':( ($ordersList[$i]['coupon_p']<$ordersList[$i]['pre_coupon_p'])?' btn-success ':'');
+
+			$post_type = isset($postType[$ordersList[$i]['post_type']]['name']) ? $postType[$ordersList[$i]['post_type']]['name'] : $ordersList[$i]['post_type'];//帖子类型
+			$post_status = isset($postStatus[$ordersList[$i]['post_status']]['name']) ? $postStatus[$ordersList[$i]['post_status']]['name'] : $ordersList[$i]['post_status'];//帖子状态
+			$asin_status = $ordersList[$i]['asin_status']?$ordersList[$i]['asin_status']:'S';//asin等级
+
+			$_site = isset($siteShort[$ordersList[$i]['domain']]) ? $siteShort[$ordersList[$i]['domain']] : $ordersList[$i]['domain'];
+			//需要展示的数据拼接成需要的数据格式
 			$records["data"][] = array(
-				'<a data-target="#ajax" data-toggle="modal" href="'.url('star/show/'.$ordersList[$i]['asin'].'/'.$ordersList[$i]['domain']).'">'.$ordersList[$i]['asin'].'</a>',
-
-				isset($postType[$ordersList[$i]['post_type']]['name']) ? $postType[$ordersList[$i]['post_type']]['name'] : $ordersList[$i]['post_type'],//帖子类型
-				isset($postStatus[$ordersList[$i]['post_status']]['name']) ? $postStatus[$ordersList[$i]['post_status']]['name'] : $ordersList[$i]['post_status'],//帖子状态
-
-				$ordersList[$i]['asin_status']?$ordersList[$i]['asin_status']:'S',
-				$ordersList[$i]['item_no'],
+				'<a data-target="#ajax" data-toggle="modal" href="'.url('star/show/'.$ordersList[$i]['asin'].'/'.$ordersList[$i]['domain']).'">'.$ordersList[$i]['asin'].'</a>'.'<br/>'.$_site,//asin
+				$ordersList[$i]['item_no'],//item_no
+				'<span style="text-align: left;float: left;"> <Strong>Type:</Strong>'.$post_type.'<br><strong>Status:</strong>'.$post_status.'<br/><strong>Level:</strong>'.$asin_status.'</span>',
 				($ordersList[$i]['item_status'])?'<span class="btn btn-success btn-xs">Reserved</span>':'<span class="btn btn-danger btn-xs">Eliminate</span>',
-				$ordersList[$i]['seller'],
-				$ordersList[$i]['domain'],
+				$diff_star,
+				$rating_status.'<br>'.$pre_rating_status,
+				$price,
+//				$coupon_n.$coupon_p.'<br>'.round($ordersList[$i]['pre_coupon_n'],2).'('.round($ordersList[$i]['coupon_p'],2).'%)',
+				'<span class="btn btn-xs">'.$_coupon_n.$_coupon_p.'<br/>'.sprintf("%.2f",$ordersList[$i]['pre_coupon_n']).' ('.round($ordersList[$i]['coupon_p'],2).'%)</span>',
+				round($ordersList[$i]['average_score'],2).' ('.$_data['total_star_number'].')'.'<br>'.round($ordersList[$i]['pre_average_score'],2).' ('.$_data['pre_total_star_number'].')',
+
 				$diff_total_star_number,
 				$diff_average_score,
 				$diff_positive,
 				$diff_negative,
-				$ordersList[$i]['star'],
-				$diff_star,
 
-				$ordersList[$i]['create_at'],
-				($ordersList[$i]['status']==2)?'<span class="btn btn-success btn-xs">Available</span>':(($ordersList[$i]['status']==1)?'<span class="btn btn-warning btn-xs">UnAvailable</span>':'<span class="btn btn-danger btn-xs">Down</span>'),
-				($ordersList[$i]['price']>$ordersList[$i]['pre_price'])?'<span class="btn btn-danger btn-xs">'.round($ordersList[$i]['price'],2).'</span>':( ($ordersList[$i]['price']<$ordersList[$i]['pre_price'])?'<span class="btn btn-success btn-xs">'.round($ordersList[$i]['price'],2).'</span>':round($ordersList[$i]['price'],2)),
-				($ordersList[$i]['coupon_p']>$ordersList[$i]['pre_coupon_p'])?'<span class="btn btn-danger btn-xs">'.round($ordersList[$i]['coupon_p'],2).'</span>':( ($ordersList[$i]['coupon_p']<$ordersList[$i]['pre_coupon_p'])?'<span class="btn btn-success btn-xs">'.round($ordersList[$i]['coupon_p'],2).'</span>':round($ordersList[$i]['coupon_p'],2)),
-				($ordersList[$i]['coupon_n']>$ordersList[$i]['pre_coupon_n'])?'<span class="btn btn-danger btn-xs">'.round($ordersList[$i]['coupon_n'],2).'</span>':( ($ordersList[$i]['coupon_n']<$ordersList[$i]['pre_coupon_n'])?'<span class="btn btn-success btn-xs">'.round($ordersList[$i]['coupon_n'],2).'</span>':round($ordersList[$i]['coupon_n'],2)),
-				$ordersList[$i]['total_star_number'],
-				round($ordersList[$i]['average_score'],2),
-				$ordersList[$i]['one_star_number'],
-				$ordersList[$i]['two_star_number'],
-				$ordersList[$i]['three_star_number'],
-				$ordersList[$i]['four_star_number'],
-				$ordersList[$i]['five_star_number'],
-				$ordersList[$i]['pre_create_at'],
-				($ordersList[$i]['pre_status']==2)?'<span class="btn btn-success btn-xs">Available</span>':(($ordersList[$i]['pre_status']==1)?'<span class="btn btn-warning btn-xs">UnAvailable</span>':'<span class="btn btn-danger btn-xs">Down</span>'),
-				round($ordersList[$i]['pre_price'],2),
-				round($ordersList[$i]['pre_coupon_p'],2),
-				round($ordersList[$i]['pre_coupon_n'],2),
-				$ordersList[$i]['pre_total_star_number'],
-				round($ordersList[$i]['pre_average_score'],2),
-				$ordersList[$i]['pre_one_star_number'],
-				$ordersList[$i]['pre_two_star_number'],
-				$ordersList[$i]['pre_three_star_number'],
-				$ordersList[$i]['pre_four_star_number'],
-				$ordersList[$i]['pre_five_star_number'],
-
-				'<a class="btn btn-success editAction" data-asin="'.$ordersList[$i]['asin'].'" data-domain="'.$ordersList[$i]['domain'].'" data-postStatus="'.$ordersList[$i]['post_status'].'" data-postType="'.$ordersList[$i]['post_type'].'" href="javascript:void(0)">Edit</a>'//添加编辑操作
-
+				$ordersList[$i]['create_at'].'<br>'.$ordersList[$i]['pre_create_at'],
+				$ordersList[$i]['seller'],
+				'<a class="btn btn-success editAction" data-asin="'.$ordersList[$i]['asin'].'" data-domain="'.$ordersList[$i]['domain'].'" data-postStatus="'.$ordersList[$i]['post_status'].'" data-postType="'.$ordersList[$i]['post_type'].'" href="javascript:void(0)">Edit</a>',//添加编辑操作
 			);
         }
-
-
 
         $records["draw"] = $sEcho;
         $records["recordsTotal"] = $iTotalRecords;
         $records["recordsFiltered"] = $iTotalRecords;
         echo json_encode($records);
-
     }
 	
 	public function getUsers(){
@@ -349,6 +321,7 @@ class StarController extends Controller
 		$asin= array_get($_REQUEST,'asin');
 		$domain= array_get($_REQUEST,'domain');
 		$datas = Starhistory::where('asin',$asin)->where('domain',$domain)->where('create_at','<=',$asin_to)->where('create_at','>=',$asin_from)->get()->toArray();
+		$returnData = array();
 		foreach($datas as $data){
 			$returnData[$data['create_at']]['review']= round($data['total_star_number'],2);
 			$returnData[$data['create_at']]['rating']= round($data['average_score'],2);

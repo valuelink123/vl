@@ -122,7 +122,7 @@ trait DataTables {
 
         $start = (int)$req->input('start', 0);
         $length = (int)$req->input('length', 10);
-
+        if($length == -1) $length = '18446744073709551615';
         return "{$start},{$length}";
     }
 

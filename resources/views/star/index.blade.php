@@ -93,7 +93,7 @@ th,td,td>span {
                                         <option value="">All Listing Status</option>
                                         <option value="1" <?php if(1==array_get($_REQUEST,'listing_status')) echo 'selected';?>>Listing Down</option>
 										<option value="2" <?php if(2==array_get($_REQUEST,'listing_status')) echo 'selected';?>>Listing UnAvailable</option>
-										<option value="3" <?php if(3==array_get($_REQUEST,'listing_status')) echo 'selected';?>>Listing Available</option>
+										<option value="3" <?php if(3==array_get($_REQUEST,'listing_status') || !isset($_REQUEST['listing_status'])) echo 'selected';?>>Listing Available</option>
                                     </select>
                                        
 						</div>
@@ -187,49 +187,24 @@ th,td,td>span {
                         <thead>
 							
                             <tr role="row" class="heading">
-								<th style="min-width:60px;"> Asin </th>
-								<th style="min-width:50px;"> Type </th>
-								<th style="min-width:50px;"> Status </th>
+								<th style="min-width:60px;"> Asin </th><!-- 0 -->
+                                <th style="min-width:50px;"> Item No. </th><!-- 1 -->
+								<th style="min-width:50px;"> Detail</th><!-- 2 -->
+								<th style="min-width:50px;"> Status </th>	<!-- 3 -->
+                                <th style="min-width:50px;"> Rating Status </th><!-- 4 -->
+                                <th style="min-width:50px;"> Listing </th><!-- 5 -->
+                                <th style="min-width:50px;"> Price </th><!-- 6 -->
+                                <th style="min-width:50px;"> Coupon</th><!-- 7 -->
+                                <th style="min-width:50px;">Ratings </th><!-- 8 -->
 
-								<th style="min-width:40px;"> Level </th>
-                                <th style="min-width:50px;"> Item No. </th>
-								<th style="min-width:50px;"> Status </th>	
-                                <th style="min-width:50px;"> Seller </th>
-								<th style="min-width:100px;"> Site </th>
+                                <th style="min-width:50px;"> Quantity Changes </th><!-- 9 -->
+                                <th style="min-width:50px;"> Rating Changes </th><!-- 10 -->
+								<th style="min-width:50px;"> Positive Changes </th><!-- 11 -->
+								<th style="min-width:50px;"> Negative Changes </th><!-- 12 -->
 
-								
-                                <th style="min-width:50px;"> Quantity Changes </th>
-                                <th style="min-width:50px;"> Rating Changes </th>
-								<th style="min-width:50px;"> Positive Changes </th>
-								<th style="min-width:50px;"> Negative Changes </th>
-								<th style="min-width:50px;"> Rating Limit </th>
-								<th style="min-width:50px;"> Rating Status </th>
-
-								<th style="min-width:50px;"> Last Update</th>
-								<th style="min-width:50px;"> Listing </th>
-                                <th style="min-width:50px;"> Price </th>
-                                <th style="min-width:50px;"> Coupon % </th>
-								<th style="min-width:50px;"> Coupon $ </th>
-								<th style="min-width:50px;"> Quantity </th>
-                                <th style="min-width:50px;"> Rating </th>
-                                <th style="min-width:50px;"> 1 Star </th>
-								<th style="min-width:50px;"> 2 Stars </th>
-                                <th style="min-width:50px;"> 3 Stars </th>
-								<th style="min-width:50px;"> 4 Stars </th>
-                                <th style="min-width:50px;"> 5 Stars </th>
-								<th style="min-width:50px;"> Pre Update</th>
-								<th style="min-width:50px;"> Listing </th>
-                                <th style="min-width:50px;"> Price </th>
-                                <th style="min-width:50px;"> Coupon % </th>
-								<th style="min-width:50px;"> Coupon $ </th>
-								<th style="min-width:50px;"> Quantity </th>
-                                <th style="min-width:50px;"> Rating </th>
-                                <th style="min-width:50px;"> 1 Star </th>
-								<th style="min-width:50px;"> 2 Stars </th>
-                                <th style="min-width:50px;"> 3 Stars </th>
-								<th style="min-width:50px;"> 4 Stars </th>
-                                <th style="min-width:50px;"> 5 Stars </th>
-								<th style="min-width:50px;"> Action </th>
+								<th style="min-width:50px;"> Last Update</th><!-- 13 -->
+                                <th style="min-width:50px;"> Seller </th><!-- 19 -->
+								<th style="min-width:50px;"> Action </th><!-- 20 -->
                             </tr>
 							
                             
@@ -344,52 +319,30 @@ th,td,td>span {
 					buttons: [],
 					
 					<?php } ?>
-					"aoColumnDefs": [ { "bSortable": false, "aTargets": [13,14,26,38 ] }],
+					"aoColumnDefs": [ { "bSortable": false, "aTargets": [0,1,2,4,13,14,15 ] }],
 					 "order": [
-                        [0, "asc"]
+                        [8, "asc"]
                     ],
                     // scroller extension: http://datatables.net/extensions/scroller/
-                    scrollY:        500,
-                    scrollX:        true,
+                    // scrollY:        500,
+                    // scrollX:        true,
 					
 
-					fixedColumns:   {
-						leftColumns:6,
-						rightColumns: 1
-					},
+					// fixedColumns:   {
+					// 	leftColumns:6,
+					// 	rightColumns: 1
+					// },
                     "ajax": {
                         "url": "{{ url('star/get')}}", // ajax source
                     },
-
-                    
 					//"dom": "<'row' <'col-md-12'B>><'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'>r><'table-scrollable't><'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>",
 					"dom": "<'row' <'col-md-12'B>><'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'>r><'table-scrollable't><'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>",
                 }
 
 
             });
-
-            //grid.setAjaxParam("customActionType", "group_action");
-            //grid.setAjaxParam("date_from", $("input[name='date_from']").val());
-            //grid.setAjaxParam("date_to", $("input[name='date_to']").val());
-			//grid.setAjaxParam("star_from", $("input[name='star_from']").val());
-            //grid.setAjaxParam("star_to", $("input[name='star_to']").val());
-            //grid.setAjaxParam("user_id", $("select[name='user_id[]']").val());
-			//grid.setAjaxParam("asin_status", $("select[name='asin_status']").val());
-
-			//grid.setAjaxParam("keywords", $("input[name='keywords']").val());
-            //grid.getDataTable().ajax.reload(null,false);
-            //grid.clearAjaxParams();
-
         }
-
-
-
-
-
-
         return {
-
             //main function to initiate the module
             init: function () {
                 initPickers();
@@ -432,6 +385,7 @@ $(function() {
             title: 'edit_'+asin+'_'+domain,
             content: document.getElementById('edit-content'),
             okVal: 'Submit',
+            lock:true,
             ok: function () {
                 this.title('In the submission…');
                 var data = $("#edit-form").serialize();

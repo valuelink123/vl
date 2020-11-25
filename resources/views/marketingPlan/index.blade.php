@@ -472,6 +472,7 @@
 						<th>实际</th>
 						<th>ROMI</th>
 						<th>状态</th>
+						<th>提交时间</th>
 						<th>操作</th>
 					</tr>
 				</thead>
@@ -880,9 +881,12 @@
 				{
 					data: null,
 					render: function(data, type, row, meta){
-						var content = '<div style="text-align:left"><div>'+row.plan_status+'</div><div><span>提交:</span>'+row.updated_at+'</div></div>';
+						var content = '<div style="text-align:left"><div>'+row.plan_status+'</div><div><span>更新:</span>'+row.updated_at+'</div></div>';
 						return content;
 					}
+				},
+				{
+					data: 'created_at',
 				},
 				{
 					data: "id",

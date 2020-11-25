@@ -264,7 +264,11 @@
             ajax: {
                 type: 'POST',
                 url: "/nonctg/get"
-            }
+            },
+            lengthMenu: [
+                [10, 50, 100, -1],
+                [10, 50, 100, 'All']
+            ],
         })
 
         let users = @json($users) ;
