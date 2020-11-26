@@ -322,7 +322,11 @@ class SendController extends Controller
         $email_history[strtotime($email['date'])] = $email;
 		
 		$account = Accounts::where('account_email',$email['from_address'])->first();
-		$account_type = $account->type;
+		$account_type = '';
+		if($account){
+			$account_type = $account->type;
+		}
+
 		
 		$amazon_order_id='';
 		$i=0;
