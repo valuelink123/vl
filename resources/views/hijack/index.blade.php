@@ -447,7 +447,7 @@
 				dataSrc:function(res){
 					if(res.status == -1){
 						alert(res.message)
-						// window.location.href="/service"
+						window.location.href="/service"
 					}
 					return res.data
 				},
