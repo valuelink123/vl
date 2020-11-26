@@ -1,5 +1,5 @@
 @extends('layouts.layout')
-@section('label', 'Hijack Alerts')
+@section('label', 'Asin Reselling')
 @section('content')
  <style>
 		#tableObj thead th{
@@ -250,12 +250,7 @@
 		.group-checkable{
 			z-index: 9999;
 		}
-		.clear{
-			position: absolute;
-			right: 15px;
-			top: 11px;
-			display: none;
-		}
+
 		.success_mask{
 			width: 400px;
 			height: 50px;
@@ -299,76 +294,69 @@
  
  <body class="dt-tableObj">
  	<div class="content">
+		<form id="search-form">
  		<div class="search_main">
 			<span style="position: relative;height: 38px;display: inline-block; width: 700px; float: left;">
-				<input type="text" class="search_input">
-				<span class="clear">
-					<svg t="1585806919744" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1488" width="18" height="18"><path d="M512 1024C229.216 1024 0 794.784 0 512S229.216 0 512 0s512 229.216 512 512-229.216 512-512 512z m0-564.576L319.488 266.88a37.12 37.12 0 0 0-52.512 52.512L459.424 512 266.88 704.48a37.12 37.12 0 1 0 52.512 52.512L512 564.512l192.512 192.576a37.12 37.12 0 1 0 52.512-52.544L564.576 512l192.544-192.512a37.12 37.12 0 1 0-52.512-52.544L512 459.392v0.032z" fill="#dbdbdb" p-id="1489"></path></svg>
-				</span>
+				<input type="text" name="asin" placeholder="Asin" class="search_input">
 			</span>
- 			
- 			<button class="search_btn" onclick="keyword_filter()">Search</button>
+
+ 			<button class="search_btn" id="search">Search</button>
  		</div>
  		<div class="form_main">
- 			<select name="" class="bgList" onchange="status_filter(this.value,0)">
-				<option value="">All BG</option>
-				<option value="BG1">BG1</option>
-				<option value="BG3">BG3</option>
-				<option value="BG4">BG4</option>
+ 			<select name="bg" class="bgList" >
+				<option value="" >All BG</option>
+				@foreach($bgs as $key=>$val)
+					<option value="{!! $val !!}">{!! $val !!}</option>
+				@endforeach
 			</select>
-			<select name="" onchange="status_filter(this.value,1)">
+			<select name="bu" >
 				<option value="">All BU</option>
-				<option value="BG">BG</option>
-				<option value="BU1">BU1</option>
-				<option value="BU2">BU2</option>
-				<option value="BU3">BU3</option>
-				<option value="BU4">BU4</option>
-				<option value="BU5">BU5</option>
+				@foreach($bus as $key=>$val)
+					<option value="{!! $val !!}">{!! $val !!}</option>
+				@endforeach
 			</select>
- 			<select name="" class="sellerList" onchange="status_filter(this.value,6)">
+ 			<select name="sap_seller_id" class="sellerList" >
 				<option value="">All Seller</option>
+				@foreach($users as $key=>$val)
+					<option value="{!! $key !!}">{!! $val !!}</option>
+				@endforeach
 			</select>
- 			<select name="" onchange="status_filter(this.value,5)">
-				<option value="">All Status</option>
-				<option value="淘汰">淘汰</option>
-				<option value="保留">保留</option>
-				<option value="新品">新品</option>
-				<option value="配件">配件</option>
-				<option value="替换">替换</option>
-				<option value="待定">待定</option>
-				<option value="停售">停售</option>
-			</select>
- 			<select name="" onchange="status_filter(this.value,2)">
-				<option value="">All Marketplace</option>
-				<option value="US">www.amazon.com</option>
-				<option value="CA">www.amazon.ca</option>
-				<option value="MX">www.amazon.mx</option>
-				<option value="GB">www.amazon.co.uk</option>
-				<option value="FR">www.amazon.fr</option>
-				<option value="DE">www.amazon.de</option>
-				<option value="IT">www.amazon.it</option>
-				<option value="ES">www.amazon.es</option>
-				<option value="JP">www.amazon.co.jp</option>
-			</select>
+{{-- 			<select name="status" >--}}
+{{--				<option value="">All Status</option>--}}
+{{--				<option value="淘汰">淘汰</option>--}}
+{{--				<option value="保留">保留</option>--}}
+{{--				<option value="新品">新品</option>--}}
+{{--				<option value="配件">配件</option>--}}
+{{--				<option value="替换">替换</option>--}}
+{{--				<option value="待定">待定</option>--}}
+{{--				<option value="停售">停售</option>--}}
+{{--			</select>--}}
+{{-- 			<select name="marketplace" >--}}
+{{--				<option value="">All Site</option>--}}
+{{--				@foreach($site as $key=>$val)--}}
+{{--					<option value="{!! $key !!}">{!! $val !!}</option>--}}
+{{--				@endforeach--}}
+{{--			</select>--}}
 			
  			<select name="switchSelect" id="switchSelect">
 				<option value="1">On</option>
  				<option value="2">All</option>
  				<option value="3">Off</option>
  			</select>
-			
+
  			<button class="start_btn status_btn isHide">Turn On</button>
  			<button class="close_btn status_btn isHide">Turn Off</button>
-			<button class="export_btn">Export</button>
+{{--			<button class="export_btn">Export</button>--}}
  		</div>
+		</form>
  		<div>
  		
  			<table id="tableObj" class="display table-striped table-bordered table-hover" style="width:100%">
  				<thead>
  					<tr style="text-align: center;">
-						<th>BG</th>
-						<th>BU</th>
-						<th>Marketplace</th>
+{{--						<th>BG</th>--}}
+{{--						<th>BU</th>--}}
+{{--						<th>Marketplace</th>--}}
  						<th><input type="checkbox" id="selectAll" /></th>
  						<th>Product</th>
  						<th class="w8">SKU Status</th>
@@ -431,32 +419,11 @@
  </html>
  
  <script>
-	//筛选
-	function status_filter(value,column) {
-	    if (value == '') {
-	        editTableObj.column(column).search('').draw();
-	    }
-	    else editTableObj.column(column).search(value).draw();
-	}
-	function keyword_filter() {
-		let val = $('.search_input').val();
-		editTableObj.search(val).draw();
-	}
-
  	$(document).ready(function () {
 		let isOpen=1;
 		$('#switchSelect').on("change",function(){
 			isOpen = $(this).val()
 			editTableObj.ajax.reload();
-		})
-		$('.search_input').keyup(function(){
-			 $(this).val() != ''? $('.clear').show(): $('.clear').hide()
-		})
-		//清除输入框的值并搜索
-		$('.clear').click(function(){
-			$('.search_input').val(' ');
-			$(this).hide();
-			keyword_filter()
 		})
 		
 		//禁止警告弹窗弹出
@@ -466,51 +433,31 @@
 			"searching": true,  //去掉搜索框
 			"bLengthChange": false, //去掉每页多少条框体
 			"paging": true,  // 是否显示分页
-			"pagingType": 'numbers',
-			"info": false,// 是否表格左下角显示的文字
+			pagingType: 'bootstrap_extended',
+			"info": true,// 是否表格左下角显示的文字
 			pageLength: 20,
 			lengthMenu: [50,100,200],
+			order: [[5, 'desc']],
 			"ordering": true,
-			"serverSide": false,//是否所有的请求都请求服务器
-			"ajax": {
-				url: "/hijack/index1",
-				data : function(){
-					reqList = {
-						"isOpen" : isOpen,
-					};
-					return reqList;
-				},
+			"serverSide": true,//是否所有的请求都请求服务器
+			ajax: {
+				type: 'POST',
+				url: '/hijack/index1',
+				data:  {search: $("#search-form").serialize()},
 				dataSrc:function(res){
 					if(res.status == -1){
 						alert(res.message)
-						window.location.href="/service"
+						// window.location.href="/service"
 					}
-					$.each(res.userList, function (index, value) {
-						$(".sellerList").append("<option value='" + value.name + "'>" + value.name + "</option>");
-					})
-					return res.productList
-					
-					
+					return res.data
 				},
 				error:function(err){
 					console.log(err)
 				}
+
 			},
-			"pagingType": 'full_numbers',
 			data: [],
 			columns: [
-				{
-					data: "BG" ,
-					visible: false,
-				},
-				{
-					data: "BU" ,
-					visible: false,
-				},
-				{
-					data: 'domin_sx',
-					visible: false,
-				},
 				{
 					data: 'id',
 					orderable: false,
@@ -526,8 +473,8 @@
 				},
 				{
 					data: null,
-					orderable: true,
-					bSortable: true,
+					orderable: false,
+					bSortable: false,
 					render: function (data, type, row) {
 						let img,dot,str;
 						if(row.images != null){
@@ -535,26 +482,30 @@
 							dot = str.split(',');
 							dot.length > 1 ? img = 'https://images-na.ssl-images-amazon.com/images/I/' + dot[0] : img = ''
 						}
-						return '<a target="_blank" href="detail?id='+row.id+'?name='+row.userName+'"><div class="product_main"><div class="product_img"><img src="'+img+'" alt=""></div><div class="product_text"><p class="product_title" title="'+row.title+'">'+row.title+'</p><div class="product_span"><span class="country_img">'+row.domin_sx+'</span><span>'+row.asin+'</span> / <span>'+row.sku+'</span></div></div></div></a>';
+						return '<a target="_blank" href="detail?id='+row.rla_id+'?name='+row.userName+'"><div class="product_main"><div class="product_img"><img src="'+img+'" alt=""></div><div class="product_text"><p class="product_title" title="'+row.title+'">'+row.title+'</p><div class="product_span"><span class="country_img">'+row.siteShort+'</span><span>'+row.asin+'</span> / <span>'+row.sku+'</span></div></div></div></a>';
 					},
 				},
 				{ 
-					data: "sku_status",	
+					data: "sku_status",
+					orderable: false,
+					bSortable: false,
 				},
 				{
 					data: "userName",
+					orderable: false,
+					bSortable: false,
 				},
 				
 				{ 
 					data: "reselling_time",
 				},
 				{ 
-					data: "reselling_num",
+					data: "hijachers",
 				},
 				{
 					data:'reselling_switch',
-					orderable: true,
-					bSortable: true,
+					orderable: false,
+					bSortable: false,
 					render: function (data, type, row, meta) {
 						let title = row.reselling_switch == 0 ? "Hijacker monitoring turned off.":"Hijacker monitoring turned on."
 						var html = '<label class="switch" title="'+ title + '"> <input type="checkbox" class="switch_input" checked value=""><span>'+row.reselling_switch+'</span></label>';
@@ -592,7 +543,7 @@
 					orderable: false,
 					bSortable: false,
 					render: function (data, type, row, meta) {
-						var html = '<a href="https://'+row.toUrl+'/dp/'+ row.asin +'" target="_blank">'
+						var html = '<a href="https://'+row.domain+'/dp/'+ row.asin +'" target="_blank">'
 							+ '<svg t="1585549427364" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5258" width="26" height="26"><path d="M836.096 192H640a32 32 0 0 1 0-64h272a32 32 0 0 1 32 32v281.92a32 32 0 1 1-64 0V238.592L534.912 592.256a32 32 0 1 1-45.824-44.672L836.096 192zM768 826.368V570.176a32 32 0 1 1 64 0v288.192a32 32 0 0 1-32 32h-640a32 32 0 0 1-32-32V281.92a32 32 0 0 1 32-32h384a32 32 0 0 1 0 64H192v512.448h576z" p-id="5259" fill="#bfbfbf"></path></svg>'
 						'</a>';
 						return html;
@@ -601,7 +552,13 @@
 			], 
 			
 		});
-		
+
+		$('#search').click(function () {
+			editTableObj.settings()[0].ajax.data = {search: $("#search-form").serialize()};
+			editTableObj.ajax.reload();
+			return false;
+		});
+
 		//全选
 		$("#selectAll").on('change',function() {  
 		    $("input[name='checkedInput']").prop("checked", this.checked);
@@ -615,8 +572,7 @@
 			let checkedBox = $subs.filter(":checked");
 			checkedBox.length > 0 ? $('.status_btn').show(): $('.status_btn').hide()
 		});
-		
-		
+
 		//开启追踪
 		$('.start_btn').click(function(){
 			let chk_value = '';
@@ -650,6 +606,7 @@
 					$('#selectAll').removeAttr('checked');
 					$('.start_btn').hide();
 					$('.close_btn').hide();
+					return false;
 					
 				},
 				error:function(err){
@@ -692,7 +649,8 @@
 					editTableObj.ajax.reload();
 					$('#selectAll').removeAttr('checked');
 					$('.start_btn').hide();
-					$('.close_btn').hide();			
+					$('.close_btn').hide();
+					return false;
 				},
 				error:function(err){
 					$('.error_mask').fadeIn(1000);
@@ -701,99 +659,6 @@
 					},2000)
 				},
 			});
-		})
-		//导出功能
-		$('.export_btn').click(function(){
-			let checkedBox = $("input[name='checkedInput']:checked");
-			$('.dialogMain').show();
-			let oDate = new Date();
-			let year = oDate.getFullYear();
-			let month = oDate.getMonth()+1; 
-			let day = oDate.getDate();
-			month < 10 ? month = '0'+ month : month = month
-			day < 10 ? day = '0'+ day : day = day
-			let date = year + '-' + month + '-' + day;
-			$('.date1').val(date);
-			$('.date2').val(date)
-		})
-		
-		//取消导出
-		 $('.handlerCancel').click(function(){
-		 	$('.dialogMain').hide();
-		 })
-		 //时间戳转换
-		 function dateStr(str){
-		 	str = str.replace(/-/g,'/'); // 将-替换成/，因为下面这个构造函数只支持/分隔的日期字符串
-		 	return  Math.round(new Date(str).getTime()/1000); // 构造一个日期型数据，值为传入的字符串
-		 }
-		 
-		 //时间选择器
-		 function initPickers() {
-		     $('.date-picker').datepicker({
-		         rtl: App.isRTL(),
-		         autoclose: true
-		     });
-		 }
-		 initPickers();
-		
-		//导出
-		$('.handlerExport').click(function(){
-			 let chk_value = '';
-			 $("input[name='checkedInput']:checked").each(function () {
-				 if(chk_value != ''){
-					 chk_value = chk_value + ',' + $(this).val()	
-				 }else{
-					 chk_value = chk_value + $(this).val()
-				 }				 		 			
-			 });
-			 chk_value == ""? chk_value = -1 : chk_value;
-			 ///hijack/hijackExport
-			 $.ajax({
-				 url: "/shipment/allotProgress",
-				 method: 'POST',
-				 cache: false,
-				 data: {
-					 startTime: dateStr($('.date1').val()),
-					 endTime: dateStr($('.date2').val()),
-					 idList: chk_value
-				 },
-							
-				 success: function (data) {
-					$('.dialogMain').hide();
-					 if(data != ""){
-						var fileName = "VOP Hijack";
-						 function msieversion() {
-							 var ua = window.navigator.userAgent;
-							 var msie = ua.indexOf("MSIE ");
-							 if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./)) {
-								 return true;
-							 } else {
-								 return false;
-							 }
-							 return false;
-						 }
-			 
-						 if (msieversion()) {
-							 var IEwindow = window.open();
-							 IEwindow.document.write('sep=,\r\n' + data);
-							 IEwindow.document.close();
-							 IEwindow.document.execCommand('SaveAs', true, fileName + ".csv");
-							 IEwindow.close();
-						 } else {
-							 var uri = "data:text/csv;charset=utf-8,\ufeff" + data;
-							 var uri = 'data:application/csv;charset=utf-8,\ufeff' + encodeURI(data);
-							 var link = document.createElement("a");
-							 link.href = uri;
-							 link.style = "visibility:hidden";
-							 link.download = fileName + ".csv";
-							 document.body.appendChild(link);
-							 link.click();
-							 document.body.removeChild(link);
-						 }
-					 }
-				 }
-			 });
-				 
 		})
  	})
  </script>

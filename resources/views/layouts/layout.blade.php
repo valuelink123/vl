@@ -227,12 +227,14 @@
 												    </a>
 												</li>
 												@endpermission
+                                                @permission('reselling-show')
 												<li class="">
 												    <a href="/hijack/index" class="nav-link nav-toggle ">
-														Hijacker Alerts
+                                                        Asin Reselling
 														<span class="arrow"></span>
 												    </a>
 												</li>
+                                                @endpermission
 												@permission('asin-table-show')
 												<li class="">
 												    <a href="/asin" class="nav-link nav-toggle ">

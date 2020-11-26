@@ -1,6 +1,6 @@
 @extends('layouts.layout')
 @section('crumb')
-    <a href="/hijack/index">Hijack Alerts</a>
+    <a href="/hijack/index">Asin Reselling</a>
 @endsection
 @section('content')
 <style>
@@ -28,6 +28,7 @@
 		#tabsObj.dataTable tbody tr{
 			cursor: pointer !important;
 		}
+		#tabsObj td,#listObj td,#listObj th{padding:11px;}
 		.content {
 			padding-top: 20px;
 			overflow: hidden;
@@ -116,67 +117,45 @@
 		.bgC{
 			background: #eef1f5 !important;
 		}
+		.switchSelect-table{
+			width:60%;
+			margin-bottom: 20px;
+
+		}
+		.switchSelect-table td{
+			border:1px solid #676464;
+			padding: 7px 12px;
+			margin: 11px 20px 0px 0px;
+			text-align:center;
+		}
+		.switchSelect-table .active{
+			background-color:#CD4D00;
+			color:#ffffff;
+			border:1px solid #CD4D00;
+		}
 	</style>
 	<div class="content">
-		<div style="overflow: hidden;">
-			<div class="detail_label">
-				<img src="" class="product_img" alt="">
-			</div>
-			<div class="detail_span">
-				<p class="product_title"></p>
-				<p class="product_span">
+		<div style="border-top: 1px solid #eee;">
+			<div class="tabs">
+				<table class="switchSelect switchSelect-table">
+					<tr>
+						<td class="switch_type active" data-value="1">ACTIVE</td>
+						<td class="switch_type" data-value="2">ALL</td>
+					</tr>
+				</table>
+				<div style="overflow-y:auto;width:100%;height:700px;">
+				<table id="tabsObj" class="display table-striped table-bordered table-hover" >
+					<thead>
 
-					<span class="country" id="country"></span>
+					</thead>
+					<tbody>
 
-					<a href="" target="_blank" class="asin_link"><span class="span1"></span></a>
-					/
-					<span class="span2"></span>
-				</p>
-				<div class="product_data">
-					<p><label for="">Last Updated:</label><span class="times"></span></p>
-					<p><label for="">Hijackers:</label><span class="number"></span></p>
-					<p><label for="">SKU Status:</label><span class="status"></span></p>
-					<p><label for="">Seller:</label><span class="prople"></span></p>
+					</tbody>
+				</table>
 				</div>
 			</div>
-		</div>
-		<div style="overflow: hidden; margin-top: 20px;">
-			<div class="col-md-2">
-			    <div class="input-group date date-picker margin-bottom-5" data-date-format="yyyy-mm-dd">
-			        <input type="text" class="form-control form-filter input-sm date1" readonly name="date_from" placeholder="From" value="">
-			        <span class="input-group-btn">
-						<button class="btn btn-sm default" type="button">
-							<i class="fa fa-calendar"></i>
-						</button>
-					</span>
-			    </div>
-			</div>
-			<div class="col-md-2">
-			    <div class="input-group date date-picker" data-date-format="yyyy-mm-dd">
-			        <input type="text" class="form-control form-filter input-sm date2" readonly name="date_to" placeholder="To" value="">
-			        <span class="input-group-btn">
-						<button class="btn btn-sm default" type="button">
-							<i class="fa fa-calendar"></i>
-						</button>
-					</span>
-			    </div>
-			</div>
-			<div class="col-md-2">
-				<button class="handlerSearch">Search</button>
-			</div>
-		</div>
-		<div style="border-top: 1px solid #eee;margin-top: 30px; overflow: hidden;">
-			<div class="tabs">
-				<table id="tabsObj" class="display table-striped table-bordered table-hover" style="width:100%">
-					<thead>
-						<tr>
-							<th>Time Checked</th>
-							<th>Hijackers</th>
-						</tr>
-					</thead>
-				</table>
-			</div>
-			<div class="tabs_list">
+			<div class="tabs_list" id="tabs_list" data-asin="{!! $asinInfo['asin'] !!}" data-domain="{!! $asinInfo['domain'] !!}">
+				<div style="padding: 12px;"><a target="_blank" style="font-size:18px;" href="https://{!! $asinInfo['domain'] !!}/gp/offer-listing/{!! $asinInfo['asin'] !!}">https://{!! $asinInfo['domain'] !!}/gp/offer-listing/{!! $asinInfo['asin'] !!}</a></div>
 				<table id="listObj" class="display table-striped table-bordered table-hover" style="width:100%">
 					<thead>
 						<tr>
@@ -184,11 +163,12 @@
 							<th class="w6">Seller ID</th>
 							<th class="w6">Price</th>
 							<th class="w8">Delivery</th>
-							<th class="w6">Duration of Hijacking(h)</th>
-							<th class="w200">Notes</th>
-							<th>Action</th>
 						</tr>
 					</thead>
+
+					<tbody>
+
+					</tbody>
 				</table>
 			</div>
 
@@ -204,183 +184,83 @@
 			let name = decodeURIComponent(url.substr(url.lastIndexOf('=') + 1));
 			let str = url.substr(url.lastIndexOf('=', url.lastIndexOf('=') - 1) + 1);
 			let ind1 = str.lastIndexOf('?');
-			let ids = str.substring(0,ind1)	;
+			let id = str.substring(0,ind1)	;
 
-			//禁止警告弹窗弹出
-			$.fn.dataTable.ext.errMode = 'none';
-
-			//左边table
-			tableObj = $('#tabsObj').DataTable({
-				"searching": false,  //去掉搜索框
-				"bLengthChange": false, //去掉每页多少条框体
-				"paging": true,  // 是否显示分页
-				"info": false,// 是否表格左下角显示的文字
-				"pageLength": 10,
-				"order": [ 0, "desc" ],
-				"pagingType": 'numbers',
-				columns: [
-					{ data: "reselling_time",},
-					{ data: "reselling_num" },
-				],
-				"serverSide": false,
-				ajax: {
-					url: "/hijack/resellingList",
-					type: "post",
-					data : function(){
-						reqList = {
-							"id" : ids,
-							"startTime": time1,
-							"endTime":time2,
-							"name": name,
-						};
-						return reqList;
-					},
-					dataSrc:function(res){
-						let dataList
-						let product = res[0][0]
-						if(product.images != null){
-							str = product.images;
-							dot = str.split(',');
-							dot.length > 1 ? img = 'https://images-na.ssl-images-amazon.com/images/I/' + dot[0] : img = ''
-						}
-						domin_url = product.domin_url
-						$('.product_title').text(product.title);
-						$('.span1').text(product.asin);
-						
-						let asin_href = 'https://'+product.domin_url+'/dp/'+ product.asin;
-						$('.asin_link').attr('href',asin_href);
-						$('.span2').text(product.sku);
-						$('.product_img').attr("src",img);
-						if(product.domin_sx != undefined){
-							$('#country').text(product.domin_sx).show()
-						}else{
-							$('#country').text(product.domin_sx).hide()
-						}
-						$('.times').text(product.asin_reselling_time);
-						$('.number').text(product.asin_reselling_num);
-						$('.status').text(product.sku_status);
-						$('.prople').text(product.user_name);
-						res[1][0] != undefined ? detailId = res[1][0].id : detailId = ''
-						listObj.ajax.reload()
-						return dataList = res[1];
-					},
-				},
-				data: [],
-				"fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {  //行回调函数
-					$(nRow).on( 'click', function () {
-						detailId = aData.id
-						var rowdata = {"taskId" : detailId,};
-						listObj.ajax.reload()
-						$(this).addClass('bgC').siblings().removeClass('bgC');
-					});
-				},
-			});
-
-
-			//右边table
-			listObj = $('#listObj').DataTable({
-				"searching": false,  //去掉搜索框
-				"bLengthChange": false, //去掉每页多少条框体
-				"paging": false,  // 是否显示分页
-				"info": false,// 是否表格左下角显示的文字
-				"serverSide": true,
-				"ordering": false, // 禁止排序
-				"ajax": {
-					url: "/hijack/resellingDetail",
-					type: "post",
-					data : function(){
-						rowdata = {"taskId" : detailId};
-						return rowdata;
-					},
-					dataSrc:function(res){
-						return res
-					},
-				},
-				"columns": [
-					{ "data": "account"},
-					{ "data": "sellerid"},
-					{ "data": "price"},
-					{ "data": "shipping_fee"},
-					{ "data": "timecount"},
-					{ "data": "reselling_remark"},
-					{ "data": null},
-				],
-				data: [],
-				columnDefs: [
-					{
-						"targets": [5],
-						render: function (data, type, row) {
-							return '<div><span>'+data+'</span><img src="../assets/global/img/editor.png" alt="" style="float:right" class="country_img"></div>';
-						},
-
-						createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
-							$(cell).click(function (e) {
-								$(this).html('<input type="text" size="16" style="width: 100%"/>');
-								var aInput = $(this).find(":input");
-								aInput.focus().val(cellData);
-							});
-							$(cell).on("blur", ":input", function (e) {
-								var text = $(this).val();
-								if($(this).val() != cellData){
-									$(cell).html(text);
-									listObj.cell(cell).data(text);
-									$.ajax({
-										type:"post",
-										url:'/hijack/upResellingDetail',
-										data:{
-											id: rowData.id,
-											remark: rowData.reselling_remark
-										},
-										error:function(err){
-										    alert(err);
-										},
-										success:function(res){
-											listObj.ajax.reload()
-										}
-									});
-								}else{
-									$(cell).html(text);
-									listObj.cell(cell).data(text);
-								}
-
-
+			//点击左边表格的td显示出对应右边表格的数据
+			$('#tabsObj').on('click', '.show-detail-account', function(e) {
+				var task_id = $(this).attr('task_id');
+				var product_id = $(this).attr('product_id');
+				var asin = $('#tabs_list').attr('data-asin');
+				var domain = $('#tabs_list').attr('data-domain');
+				$.ajax({
+					type: 'post',
+					url: '/hijack/resellingDetail',
+					data: {taskId:task_id,product_id:product_id},
+					dataType:'json',
+					success: function(res) {
+						if(res.status==1){
+							var data = res.data;
+							var html = '';
+							var href = '';
+							$.each(data,function(i,item) {
+								href = 'https://'+domain+'/sp?asin='+asin+'&seller='+item.sellerid;
+								html += '<tr>';
+								html += '<td><a target="_blank" href="'+href+'">'+item.account+'</a></td>';//每一条数据是一行
+								html += '<td>'+item.sellerid+'</td>';
+								html += '<td>'+item.price+'</td>';
+								html += '<td>'+item.shipping_fee+'</td>';
+								html += '</tr>';
 							})
+							$('#listObj tbody').html(html);
+
+						}else{
+							alert(res.msg);
 						}
-					},
-					{
-						"targets": [6],
-						render: function (data, type, row) {
-							var html = '<a href="https://'+domin_url+'/sp?seller='+ row.sellerid +'" target="_blank">'
-								+ '<svg t="1585549427364" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5258" width="26" height="26"><path d="M836.096 192H640a32 32 0 0 1 0-64h272a32 32 0 0 1 32 32v281.92a32 32 0 1 1-64 0V238.592L534.912 592.256a32 32 0 1 1-45.824-44.672L836.096 192zM768 826.368V570.176a32 32 0 1 1 64 0v288.192a32 32 0 0 1-32 32h-640a32 32 0 0 1-32-32V281.92a32 32 0 0 1 32-32h384a32 32 0 0 1 0 64H192v512.448h576z" p-id="5259" fill="#bfbfbf"></path></svg>'
-							'</a>';
-							return html;
-						},
 					}
-				],
+				});
 			});
 
-			//时间选择器
-			function initPickers() {
-			    $('.date-picker').datepicker({
-			        rtl: App.isRTL(),
-			        autoclose: true
-			    });
-			}
-			initPickers();
-			//时间戳转换
-			function dateStr(str){
-				str = str.replace(/-/g,'/'); // 将-替换成/，因为下面这个构造函数只支持/分隔的日期字符串
-				return  Math.round(new Date(str).getTime()/1000); // 构造一个日期型数据，值为传入的字符串
-			}
-			//搜索
-			$('.handlerSearch').click(function(){
-				time1 = dateStr($('.date1').val());
-				time2 = dateStr($('.date2').val());
-				tableObj.ajax.reload();
-
+			//点击Active或者all显示相应类别的数据
+			$('.switchSelect .switch_type').click(function(){
+				$('.switchSelect .switch_type').removeClass('active');
+				$(this).addClass('active');
+				var switch_type = $(this).attr('data-value');
+				$.ajax({
+					type: 'post',
+					url: '/hijack/resellingList',
+					data: {switch_type:switch_type,id:id},
+					dataType:'json',
+					success: function(res) {
+						if(res.status==1){
+							var data = res.data;
+							var html = '';
+							var num = 0;//默认第0个开始
+							var first_class = '';//此类名用于标记第一个td，触发点击左边表格的第一个td显示右边表格的数据
+							$.each(data,function(i,item) {
+								if(i==0){
+									first_class = 'first-class';
+								}else{
+									first_class = '';
+								}
+								num++;
+								if(num==1){//数量为第一个的时候加上<tr>标签，用于新的一行的开始
+									html += '<tr>';
+								}
+								html += '<td><a href="javascript:void(0);" class="show-detail-account  '+first_class+' " task_id="'+item.task_id+'" product_id="'+item.product_id+'">'+item.date+'('+item.reselling_num+')</a></td>';//每一个数据是一个td
+								if(num==3){//数量为第6个的时候加上</tr>标签，用于这一行的结束
+									html += '</tr>';
+									num = 0;
+								}
+							})
+							$('#tabsObj tbody').html(html);
+							$("#tabsObj .first-class").trigger("click");//触发点击展示右边表格的数据
+						}else{
+							alert(res.msg);
+						}
+					}
+				});
 			})
-
-
+			$(".switchSelect .active").trigger("click");
 		})
 	</script>
 
