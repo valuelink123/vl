@@ -133,7 +133,7 @@ class HijackController extends Controller
         $DOMIN_MARKETPLACEID_SX = Asin::DOMIN_MARKETPLACEID_SX;
         $DOMIN_MARKETPLACEID_RUL = Asin::DOMIN_MARKETPLACEID_URL;
         $ago_time = time() - 3600 * 24;//当前时间 前3小时 todo
-		$ago_time = 1597642928;//测试时间
+//		$ago_time = 1597642928;//测试时间
         $sql_s = 'SELECT SQL_CALC_FOUND_ROWS a.id,a.asin,a.images,a.marketplaceid,a.title,a.listed_at,a.mpn,a.seller_count,a.updated_at,rl_asin.reselling as reselling_switch,rl_asin.id AS rla_id,rl_asin.reselling_num,rl_task.reselling_time,rl_asin.domain as `domain`  
             from tbl_reselling_asin AS rl_asin 
             LEFT JOIN (
