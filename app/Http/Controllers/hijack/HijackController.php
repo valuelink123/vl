@@ -56,8 +56,9 @@ class HijackController extends Controller
 		}
 		$bgs = $this->getBgs();
 		$bus = $this->getBus();
-		$site = getSiteUrl();
-        return view('hijack.index',compact('bgs','bus','users','site'));
+		$site = getSiteShort();
+		$sku_status = Asin::SKU_STATUS_KV;
+        return view('hijack.index',compact('bgs','bus','users','site','sku_status'));
     }
 
     public function detail(Request $request)
@@ -114,10 +115,13 @@ class HijackController extends Controller
 		if(isset($search['asin']) && $search['asin']!=''){
 			$userWhere .= " and asin = '".$search['asin']."'";
 		}
-		$user_sql = " select DISTINCT sap_asin_match_sku.asin from sap_asin_match_sku  {$userWhere}";
+		if(isset($search['sku_status']) && $search['sku_status']!=''){
+			$userWhere .= " and sku_status = '".$search['sku_status']."'";
+		}
+		$asin_sql = " select DISTINCT sap_asin_match_sku.asin from sap_asin_match_sku  {$userWhere}";
 
 		$userasin = array();
-		$_userasin = DB::connection('vlz')->select($user_sql);
+		$_userasin = DB::connection('vlz')->select($asin_sql);
 		foreach($_userasin as $uk=>$uv){
 			if(strlen($uv->asin)==10){//限制只查询有效的asin
 				$userasin[$uv->asin] = $uv->asin;
@@ -148,6 +152,9 @@ class HijackController extends Controller
         } else if (isset($search['switchSelect']) && $search['switchSelect']==3) {
 			$where .= ' AND rl_asin.reselling=0 ';
         }
+		if (isset($search['site']) && $search['site']!='') {
+			$where .= " AND `domain` = '".$search['site']."'";
+		}
         $where .= ' AND a.asin in ("' . implode($userasin, '","') . '")';
 
 		if($request['length'] != '-1'){//等于-1时为查看全部的数据

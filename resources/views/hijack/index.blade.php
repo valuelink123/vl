@@ -321,22 +321,18 @@
 					<option value="{!! $key !!}">{!! $val !!}</option>
 				@endforeach
 			</select>
-{{-- 			<select name="status" >--}}
-{{--				<option value="">All Status</option>--}}
-{{--				<option value="淘汰">淘汰</option>--}}
-{{--				<option value="保留">保留</option>--}}
-{{--				<option value="新品">新品</option>--}}
-{{--				<option value="配件">配件</option>--}}
-{{--				<option value="替换">替换</option>--}}
-{{--				<option value="待定">待定</option>--}}
-{{--				<option value="停售">停售</option>--}}
-{{--			</select>--}}
-{{-- 			<select name="marketplace" >--}}
-{{--				<option value="">All Site</option>--}}
-{{--				@foreach($site as $key=>$val)--}}
-{{--					<option value="{!! $key !!}">{!! $val !!}</option>--}}
-{{--				@endforeach--}}
-{{--			</select>--}}
+ 			<select name="sku_status" >
+				<option value="">All Status</option>
+				@foreach($sku_status as $key=>$val)
+					<option value="{!! $key !!}">{!! $val !!}</option>
+				@endforeach
+			</select>
+ 			<select name="site" >
+				<option value="">All Site</option>
+				@foreach($site as $key=>$val)
+					<option value="{!! $key !!}">{!! $val !!}</option>
+				@endforeach
+			</select>
 			
  			<select name="switchSelect" id="switchSelect">
 				<option value="1">On</option>
