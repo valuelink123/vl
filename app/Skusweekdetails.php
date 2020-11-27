@@ -8,7 +8,6 @@ class Skusweekdetails extends Model
     //
 	protected $connection = 'amazon';
     protected $table = 'asin_daily_report';
-	
 	protected $guarded = [];
     public $timestamps = false;
 }

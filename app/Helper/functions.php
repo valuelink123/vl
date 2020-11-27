@@ -1407,3 +1407,26 @@ function transferRequestStatus()
 function getAccountIdName(){
 	return DB::connection('amazon')->table("seller_accounts")->whereNull('deleted_at')->groupby(['id','label'])->pluck('label','id');
 }
+
+function array_merge_deep(...$arrs)
+{
+	$merged = [];
+	while ($arrs) {
+		$array = array_shift($arrs);
+		if (!$array) {continue;}
+		foreach ($array as $key => $value) {
+			if (is_string($key)) {
+				if (is_array($value) && array_key_exists($key, $merged)
+					&& is_array($merged[$key])) {
+					$merged[$key] = array_merge_deep(...[$merged[$key], $value]);
+				} else {
+					$merged[$key] = $value;
+				}
+			} else {
+				$merged[] = $value;
+			}
+		}
+	}
+
+	return $merged;
+}
