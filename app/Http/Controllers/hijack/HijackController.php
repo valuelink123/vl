@@ -134,17 +134,38 @@ class HijackController extends Controller
 		}
 
         //查询所有 asin 信息
-        $DOMIN_MARKETPLACEID_SX = Asin::DOMIN_MARKETPLACEID_SX;
-        $DOMIN_MARKETPLACEID_RUL = Asin::DOMIN_MARKETPLACEID_URL;
         $ago_time = time() - 3600 * 24;//当前时间 前3小时 todo
-//		$ago_time = 1597642928;//测试时间
-        $sql_s = 'SELECT SQL_CALC_FOUND_ROWS a.id,a.asin,a.images,a.marketplaceid,a.title,a.listed_at,a.mpn,a.seller_count,a.updated_at,rl_asin.reselling as reselling_switch,rl_asin.id AS rla_id,rl_asin.reselling_num,rl_task.reselling_time,rl_asin.domain as `domain`  
-            from tbl_reselling_asin AS rl_asin 
-            LEFT JOIN (
-					select max(reselling_time) as reselling_time,reselling_asin_id from tbl_reselling_task where reselling_time >='.$ago_time.'  group by reselling_asin_id
-					) as rl_task ON rl_asin.id = rl_task.reselling_asin_id 
-			left join asins as a ON a.id = rl_asin.product_id
-            where a.title !="" ';
+        $sql_s = 'SELECT SQL_CALC_FOUND_ROWS 
+				  a.id,
+					rl_asin.asin,
+					a.images,
+					a.marketplaceid,
+					rl_asin.marketplaceid as mid,
+					a.title,
+					a.listed_at,
+					a.mpn,
+					a.seller_count,
+					a.updated_at,
+					rl_asin.reselling AS reselling_switch,
+					rl_asin.id AS rla_id,
+					rl_asin.reselling_num,
+					rl_task.reselling_time,
+					rl_asin.domain AS `domain` 
+				FROM
+				(
+				SELECT
+					tbl_reselling_asin.*,
+					marketplaces.marketplaceid
+				FROM
+					tbl_reselling_asin LEFT JOIN marketplaces ON tbl_reselling_asin.domain=marketplaces.domain	
+				)	 as rl_asin
+				
+				LEFT JOIN asins as a ON rl_asin.asin=a.asin AND rl_asin.marketplaceid=a.marketplaceid
+				
+				LEFT JOIN ( 
+			SELECT max( reselling_time ) AS reselling_time, reselling_asin_id FROM tbl_reselling_task WHERE reselling_time >= '.$ago_time.' GROUP BY reselling_asin_id 
+			) AS rl_task ON rl_asin.id = rl_task.reselling_asin_id 
+			 where a.title !="" ';
         //默认1开启跟卖，2.全部; 3. 关闭跟卖
 		$where = '';
         if(isset($search['switchSelect']) && $search['switchSelect']==1){
@@ -155,7 +176,7 @@ class HijackController extends Controller
 		if (isset($search['site']) && $search['site']!='') {
 			$where .= " AND `domain` = '".$search['site']."'";
 		}
-        $where .= ' AND a.asin in ("' . implode($userasin, '","') . '")';
+        $where .= ' AND rl_asin.asin in ("' . implode($userasin, '","') . '")';
 
 		if($request['length'] != '-1'){//等于-1时为查看全部的数据
 			$limit = $this->dtLimit($request);
