@@ -126,17 +126,15 @@ class Kernel extends ConsoleKernel
 		$schedule->command('add:sales_remind')->dailyAt('07:15')->name('addSalesRemind')->withoutOverlapping();//22周销售计划中，还没有填写销售计划的时候，插件提醒销售去添加计划
 		$schedule->command('add:asin_data')->dailyAt('07:30')->name('addAsinData')->withoutOverlapping();//添加asin数据，每日更新，每周库存跟在途等数据
 
-		$schedule->command('push:dailyReport --marketplace_id=ATVPDKIKX0DER --with_stock=1')->dailyAt('07:30')->name('addAsinData')->withoutOverlapping();
-		$schedule->command('push:dailyReport --marketplace_id=A2EUQ1WTGCTBG2 --with_stock=1')->dailyAt('07:30')->name('addAsinData')->withoutOverlapping();
-		$schedule->command('push:dailyReport --marketplace_id=A1AM78C64UM0Y8 --with_stock=1')->dailyAt('07:30')->name('addAsinData')->withoutOverlapping();
-		$schedule->command('push:dailyReport --marketplace_id=A1F83G8C2ARO7P --with_stock=1')->dailyAt('07:30')->name('addAsinData')->withoutOverlapping();
-		$schedule->command('push:dailyReport --marketplace_id=APJ6JRA9NG5V4 --with_stock=1')->dailyAt('07:30')->name('addAsinData')->withoutOverlapping();
-		$schedule->command('push:dailyReport --marketplace_id=A13V1IB3VIYZZH --with_stock=1')->dailyAt('07:30')->name('addAsinData')->withoutOverlapping();
-		$schedule->command('push:dailyReport --marketplace_id=A1PA6795UKMFR9 --with_stock=1')->dailyAt('07:30')->name('addAsinData')->withoutOverlapping();
-		$schedule->command('push:dailyReport --marketplace_id=A1RKKUPIHCS9HS --with_stock=1')->dailyAt('07:30')->name('addAsinData')->withoutOverlapping();
-		$schedule->command('push:dailyReport --marketplace_id=A1VC38T7YXB528 --with_stock=1')->dailyAt('07:30')->name('addAsinData')->withoutOverlapping();
-
-		
+		$schedule->command('push:dailyReport --marketplace_id=ATVPDKIKX0DER --with_stock=1')->dailyAt('08:00')->name('dailyReport')->withoutOverlapping();
+		$schedule->command('push:dailyReport --marketplace_id=A2EUQ1WTGCTBG2 --with_stock=1')->dailyAt('08:01')->name('dailyReport')->withoutOverlapping();
+		$schedule->command('push:dailyReport --marketplace_id=A1AM78C64UM0Y8 --with_stock=1')->dailyAt('08:02')->name('dailyReport')->withoutOverlapping();
+		$schedule->command('push:dailyReport --marketplace_id=A1F83G8C2ARO7P --with_stock=1')->dailyAt('00:30')->name('dailyReport')->withoutOverlapping();
+		$schedule->command('push:dailyReport --marketplace_id=APJ6JRA9NG5V4 --with_stock=1')->dailyAt('00:31')->name('dailyReport')->withoutOverlapping();
+		$schedule->command('push:dailyReport --marketplace_id=A13V1IB3VIYZZH --with_stock=1')->dailyAt('00:32')->name('dailyReport')->withoutOverlapping();
+		$schedule->command('push:dailyReport --marketplace_id=A1PA6795UKMFR9 --with_stock=1')->dailyAt('00:33')->name('dailyReport')->withoutOverlapping();
+		$schedule->command('push:dailyReport --marketplace_id=A1RKKUPIHCS9HS --with_stock=1')->dailyAt('00:34')->name('dailyReport')->withoutOverlapping();
+		$schedule->command('push:dailyReport --marketplace_id=A1VC38T7YXB528 --with_stock=1')->dailyAt('00:35')->name('dailyReport')->withoutOverlapping();
     }
 
     /**

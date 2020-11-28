@@ -86,7 +86,7 @@ font-weight:bold;
 
                         <div class="col-md-2">
                             <div class="input-group date date-picker margin-bottom-5" data-date-format="yyyy-mm-dd">
-                                <input type="text" class="form-control form-filter input-sm" readonly name="date_start" placeholder="Date" value="{{$date_start}}">
+                                <input type="text" class="form-control " readonly name="date_start" placeholder="Date" value="{{$date_start}}">
                                 <span class="input-group-btn">
 									<button class="btn btn-sm default" type="button">
 										<i class="fa fa-calendar"></i>
@@ -97,7 +97,7 @@ font-weight:bold;
 						
 						<div class="col-md-2">
                             <div class="input-group date date-picker margin-bottom-5" data-date-format="yyyy-mm-dd">
-                                <input type="text" class="form-control form-filter input-sm" readonly name="date_end" placeholder="Date" value="{{$date_end}}">
+                                <input type="text" class="form-control" readonly name="date_end" placeholder="Date" value="{{$date_end}}">
                                 <span class="input-group-btn">
 									<button class="btn btn-sm default" type="button">
 										<i class="fa fa-calendar"></i>
@@ -115,7 +115,7 @@ font-weight:bold;
 						</div>
 						
 						<div class="col-md-1">
-						<select class="form-control form-filter input-sm" name="bgbu">
+						<select class="form-control " name="bgbu">
                                         <option value="">Select BGBU</option>
 										<?php 
 										$bg='';
@@ -134,7 +134,7 @@ font-weight:bold;
 						
 
 						 <div class="col-md-1">
-						<select class="form-control form-filter input-sm" name="site" id="site">
+						<select class="form-control " name="site" id="site">
 									<option value="">Select Site</option>
                                         @foreach (getSiteCode() as $k=>$v)
                                             <option value="{{$v}}" <?php if($v==$s_site) echo 'selected'; ?>>{{$k}}</option>
@@ -143,7 +143,7 @@ font-weight:bold;
 						</div>
 						
 						 <div class="col-md-1">
-						<select class="form-control form-filter input-sm" name="level" id="level">
+						<select class="form-control " name="level" id="level">
 									<option value="">Level</option>
 										<option value="S" <?php if('S'==$s_level) echo 'selected'; ?>>S</option>
                                         <option value="A" <?php if('A'==$s_level) echo 'selected'; ?>>A</option>
@@ -154,7 +154,7 @@ font-weight:bold;
 						</div>
 						
 						<div class="col-md-1">
-						<input type="text" class="form-control form-filter input-sm" name="sku" placeholder="SKU OR ASIN" value ="{{array_get($_REQUEST,'sku')}}">
+						<input type="text" class="form-control " name="sku" placeholder="SKU OR ASIN" value ="{{array_get($_REQUEST,'sku')}}">
                                        
 						</div>
 						<div class="col-md-1">
@@ -181,23 +181,23 @@ font-weight:bold;
 					
 
 					
-						
-						<div class="col-md-3">
+						<div class="row">
+						<div class="col-md-12">
 							<input id="importFile" name="importFile" type="file" style="display:none">
 							{{ csrf_field() }}
-							<a id="importButton" class="btn red pull-left" >Browse</a>
+							<input id="importFileTxt" name="importFileTxt" type="text" class="form-control input-inline">
+							<a id="importButton" class="btn red input-inline" >Browse</a>
 
-							<button id="importSubmit" class="btn blue pull-left">Upload</button>
+							<button id="importSubmit" class="btn blue input-inline">Upload</button>
+		
+							<a href="{{ url('/uploads/dailyReport/dailyReport.xls')}}" class="help-inline" style="margin-top:8px;margin-left:10px;">Template </a>
 
-							<a href="{{ url('/uploads/dailyReport/dailyReport.xlsx')}}" class="pull-left" style="margin-top:8px;margin-left:10px;">Template </a>
+							@permission('sales-report-export')
+							<button id="vl_list_export" class="btn blue input-inline"> Export
+								<i class="fa fa-download"></i>
+							</button>
+							@endpermission
 						</div>
-						
-						<div class="col-md-2 pull-left">
-						@permission('sales-report-export')
-						<button id="vl_list_export" class="btn sbold blue"> Export
-							<i class="fa fa-download"></i>
-						</button>
-						@endpermission
 						</div>
 						
                 </div>
@@ -507,9 +507,14 @@ var FormEditable = function() {
 }();
 
 jQuery(document).ready(function() {
-	$("#importButton").click(function(){
+	$("#importButton,#importFileTxt").click(function(){
 		$("#importFile").trigger("click");
 	});
+
+	$('input[id=importFile]').change(function() {
+		$('#importFileTxt').val($(this).val());
+	});
+
 	$("#importSubmit").click(function () {
 		var fileObj = document.getElementById("importFile").files[0];
 		if (typeof (fileObj) == "undefined" || fileObj.size <= 0) {
