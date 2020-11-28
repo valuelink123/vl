@@ -1300,12 +1300,10 @@ class InboxController extends Controller
 			}else{
 				$message = 'Get Amazon Order ID Success';
 			}
-			
 		}
 		
 		if($inboxid){
-			die(json_encode(array('result'=>$re , 'message'=>$message)));
-		
+			echo (json_encode(array('result'=>$re , 'message'=>$message)));
 		}else{
 			$return_arr['result']=1;
 			$return_arr['message']=$message;
@@ -1407,7 +1405,7 @@ class InboxController extends Controller
                     </div>';
 				}
 			}
-			die(json_encode($return_arr));
+			echo (json_encode($return_arr));
 		}
 	}
 

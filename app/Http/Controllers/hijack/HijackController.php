@@ -165,7 +165,7 @@ class HijackController extends Controller
 				LEFT JOIN ( 
 			SELECT max( reselling_time ) AS reselling_time, reselling_asin_id FROM tbl_reselling_task WHERE reselling_time >= '.$ago_time.' GROUP BY reselling_asin_id 
 			) AS rl_task ON rl_asin.id = rl_task.reselling_asin_id 
-			 where a.title !="" ';
+			 where 1 = 1 ';
         //默认1开启跟卖，2.全部; 3. 关闭跟卖
 		$where = '';
         if(isset($search['switchSelect']) && $search['switchSelect']==1){
@@ -227,6 +227,7 @@ class HijackController extends Controller
         $rla_ids = [];//全部的rla_id，用于查总共有过多少的跟卖账号
 		foreach ($productList as $pk => $pv) {
 			$rla_ids[] = $pv['rla_id'];
+			$productList[$pk]['title'] = $productList[$pk]['title']==NULL ? 'N/A' : $productList[$pk]['title'];
 			$productList[$pk]['siteShort'] =  isset($siteShort[$pv['domain']]) ? $siteShort[$pv['domain']] : $pv['domain'];
 
 			$productList[$pk]['reselling_time'] = date('Y-m-d H:i:s',$productList[$pk]['reselling_time']);
@@ -343,10 +344,17 @@ class HijackController extends Controller
 				->where('task_id', $taskId)
 				->where('white', 0)
 				->get()->toArray();
+			$account = DB::table('accounts')->select('account_sellerid','account_name')->get()->keyBy('account_sellerid')->toArray();
+
 
 			$taskDetail = array();
 			foreach ($_taskDetail as $k => $v) {
 				$taskDetail[$k]['account'] = $v->account;
+				if(isset($account[$v->sellerid])){
+					$taskDetail[$k]['remark'] = '(是公司账号)';
+				}else{
+					$taskDetail[$k]['remark'] = '(非公司账号)';
+				}
 				$taskDetail[$k]['sellerid'] = $v->sellerid;
 				$taskDetail[$k]['price'] = $v->price / 100;
 				$taskDetail[$k]['shipping_fee'] = $v->shipping_fee / 100;

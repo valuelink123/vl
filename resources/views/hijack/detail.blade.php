@@ -162,7 +162,7 @@
 							<th class="w6">Seller</th>
 							<th class="w6">Seller ID</th>
 							<th class="w6">Price</th>
-							<th class="w8">Delivery</th>
+							<th class="w8">Shipping Fee</th>
 						</tr>
 					</thead>
 
@@ -205,7 +205,7 @@
 							$.each(data,function(i,item) {
 								href = 'https://'+domain+'/sp?asin='+asin+'&seller='+item.sellerid;
 								html += '<tr>';
-								html += '<td><a target="_blank" href="'+href+'">'+item.account+'</a></td>';//每一条数据是一行
+								html += '<td><a target="_blank" href="'+href+'">'+item.account+'</a>'+item.remark+'</td>';//每一条数据是一行
 								html += '<td>'+item.sellerid+'</td>';
 								html += '<td>'+item.price+'</td>';
 								html += '<td>'+item.shipping_fee+'</td>';
