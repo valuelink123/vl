@@ -405,7 +405,7 @@ any_value(sap_seller_bg) as bg,any_value(sap_seller_bu) as bu,any_value(sap_sell
 			DB::commit();
 			$lastKeywords = Skusweekdetails::where('asin',$asin)->where('marketplace_id',$marketplace_id)
 			->whereNotNull('keywords')->orderBy('date','desc')->first();
-			if(!empty(json_decode($lastKeywords->keywords,true))){
+			if(!empty($lastKeywords) && !empty(json_decode($lastKeywords->keywords,true))){
 				$keywordHtml='';
 				foreach(json_decode($lastKeywords->keywords,true) as $key=>$val){
 					$keywordHtml .=$key.', ';

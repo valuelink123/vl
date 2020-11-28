@@ -20,7 +20,7 @@
 								        </div>
                                         <div class="col-md-4">
                                             <label class="control-label">Rank</label>
-											<input type="text" class="form-control rank-format rankFormat" name="rank" required>
+											<input type="text" class="form-control rankFormat" name="rank" required>
                                         </div>
 											
 				
@@ -43,7 +43,7 @@
 								        </div>
                                         <div class="col-md-4">
                                             <label class="control-label">Rank</label>
-											<input type="text" value="{{$rank}}" class="form-control rank-format rankFormat" name="rank" required>
+											<input type="text" value="{{$rank}}" class="form-control rankFormat" name="rank" required>
                                         </div>
                                         <div class="col-md-3">
                                             <a href="javascript:;" data-repeater-delete class="btn btn-danger mt-repeater-delete">
@@ -95,7 +95,7 @@ $(function() {
             
     FormRepeater.init();
     $('#update_form').submit(function() {
-        $("#update_form").validate();
+        if(!($("#update_form").valid())) return false;
 		$.ajaxSetup({
 			headers: { 'X-CSRF-TOKEN' : '{{ csrf_token() }}' }
 		});
