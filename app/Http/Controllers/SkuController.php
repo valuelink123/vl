@@ -205,7 +205,7 @@ any_value(sap_seller_bg) as bg,any_value(sap_seller_bu) as bu,any_value(sap_sell
 		}
 		if($user_id){
 			$where.= " and sap_seller_id in (".$user_id.")";
-			$exportFileName .= '_'.array_get($users_array,$user_id,$user_id);
+			$exportFileName .= '_'.implode(',',$user_id);
 		}
 		if($level){
 			$where.= " and sku_tmp_cc.pro_status = '".(($level=='S')?0:$level)."'";
@@ -216,7 +216,7 @@ any_value(sap_seller_bg) as bg,any_value(sap_seller_bu) as bu,any_value(sap_sell
 			$where.= " and (asin='".$sku."' or sku_tmp_cc.sku  like '%".$sku."%' or sku_tmp_cc.description like '%".$sku."%')";
 			$exportFileName .= '_'.$sku;
 		}
-		$exportFileName.=date('YmdHis').'.xls';
+		$exportFileName.='_'.date('YmdHis').'.xls';
 			
 		$month = date('Ym',strtotime($date_start));
         $datas=Skusweekdetails::whereRaw($where)
@@ -467,6 +467,7 @@ any_value(sap_seller_bg) as bg,any_value(sap_seller_bu) as bu,any_value(sap_sell
 				if(!$asin || !$marketplace_id || !$date) continue;
 				unset($data['asin']);unset($data['site']);unset($data['date']);
 				if(isset($data['keywords'])) $data['keywords'] = json_encode($data['keywords']);
+				if(isset($data['keywords'])) $data['conversion'] = round($data['conversion']/100,4);
 				Skusweekdetails::updateOrCreate(
 					[
 						'asin'=>$asin,
