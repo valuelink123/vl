@@ -205,7 +205,7 @@ any_value(sap_seller_bg) as bg,any_value(sap_seller_bu) as bu,any_value(sap_sell
 		}
 		if($user_id){
 			$where.= " and sap_seller_id in (".$user_id.")";
-			$exportFileName .= '_'.implode(',',$user_id);
+			$exportFileName .= '_'.$user_id;
 		}
 		if($level){
 			$where.= " and sku_tmp_cc.pro_status = '".(($level=='S')?0:$level)."'";
