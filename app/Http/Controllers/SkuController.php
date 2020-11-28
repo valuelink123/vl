@@ -216,7 +216,7 @@ any_value(sap_seller_bg) as bg,any_value(sap_seller_bu) as bu,any_value(sap_sell
 			$where.= " and (asin='".$sku."' or sku_tmp_cc.sku  like '%".$sku."%' or sku_tmp_cc.description like '%".$sku."%')";
 			$exportFileName .= '_'.$sku;
 		}
-		
+		$exportFileName.=date('YmdHis').'.xls';
 			
 		$month = date('Ym',strtotime($date_start));
         $datas=Skusweekdetails::whereRaw($where)
@@ -245,6 +245,7 @@ any_value(sap_seller_bg) as bg,any_value(sap_seller_bu) as bu,any_value(sap_sell
 		$headArray[] = 'Conversion%';
 		$headArray[] = 'Strategy';
 		$headArray[] = 'Main Keywords';
+		$headArray[] = 'Keywords Ranking';
 		$headArray[] = 'Rating';
 		$headArray[] = 'Review';
 		$headArray[] = 'Sales';
@@ -264,83 +265,78 @@ any_value(sap_seller_bg) as bg,any_value(sap_seller_bu) as bu,any_value(sap_sell
 		$headArray[] = 'Description';
 		$arrayData[] = $headArray;
 		
-		
 		foreach($datas as $data){
 			$keywords = json_decode($data['keywords'],true);
-			$i=0;
-			foreach($keywords as $keyword=>$rank){
-				if($i){
+			if(empty($keywords) || !is_array($keywords)){
+				$arrayData[] = array(
+					$data['asin'],
+					array_get(getSiteUrl(),$data['marketplace_id']),
+					$data['date'],
+					$data['ranking'],
+					$data['flow'],
+					$data['conversion']*100,
+					$data['strategy'],
+					'',
+					'',
+					$data['rating'],
+					$data['review'],
+					$data['sales'],
+					$data['price'],	
+					$data['fba_stock'],
+					$data['fba_transfer'],
+					$data['fbm_stock'],
+					intval($data['fba_stock']+$data['fba_transfer']+$data['fbm_stock']),
+					($data['sales'])?round(intval($data['fba_stock'])/$data['sales'],2):'∞',
+					($data['sales'])?round((intval($data['fba_stock'])+intval($data['fba_transfer'])+intval($data['fbm_stock']))/$data['sales'],2):'∞',
+					$data['sku'],
+					array_get($users_array,intval(array_get($data,'sap_seller_id')),intval(array_get($data,'sap_seller_id'))),
+					$data['bg'],
+					$data['bu'],
+					array_get(getSkuStatuses(),$data['status']),
+					($data['pro_status']==='0')?'S':$data['pro_status'],
+					$data['description'],
+				);
+			}else{
+				$i=0;
+				foreach($keywords as $keyword=>$rank){
 					$arrayData[] = array(
-						$data['asin'],
-						array_get(getSiteUrl(),$data['marketplace_id']),
-						$data['date'],
-						$data['ranking'],
-						$data['flow'],
-						$data['conversion']*100,
-						$data['strategy'],
+						((!$i)?$data['asin']:''),
+						(!$i)?array_get(getSiteUrl(),$data['marketplace_id']):'',
+						(!$i)?$data['date']:'',
+						(!$i)?$data['ranking']:'',
+						(!$i)?$data['flow']:'',
+						(!$i)?($data['conversion']*100):'',
+						(!$i)?$data['strategy']:'',
 						$keyword,
 						$rank,
-						$data['rating'],
-						$data['review'],
-						$data['sales'],
-						$data['price'],	
-						$data['fba_stock'],
-						$data['fba_transfer'],
-						$data['fbm_stock'],
-						intval($data['fba_stock']+$data['fba_transfer']+$data['fbm_stock']),
-						($data['sales'])?round(intval($data['fba_stock'])/$data['sales'],2):'∞',
-						($data['sales'])?round((intval($data['fba_stock'])+intval($data['fba_transfer'])+intval($data['fbm_stock']))/$data['sales'],2):'∞',
-						$data['sku'],
-						array_get($users_array,intval(array_get($data,'sap_seller_id')),intval(array_get($data,'sap_seller_id'))),
-						$data['bg'],
-						$data['bu'],
-						array_get(getSkuStatuses(),$data['status']),
-						($data['pro_status']==='0')?'S':$data['pro_status'],
-						$data['description']
-						
+						(!$i)?$data['rating']:'',
+						(!$i)?$data['review']:'',
+						(!$i)?$data['sales']:'',
+						(!$i)?$data['price']:'',	
+						(!$i)?$data['fba_stock']:'',
+						(!$i)?$data['fba_transfer']:'',
+						(!$i)?$data['fbm_stock']:'',
+						(!$i)?intval($data['fba_stock']+$data['fba_transfer']+$data['fbm_stock']):'',
+						(!$i)?(($data['sales'])?round(intval($data['fba_stock'])/$data['sales'],2):'∞'):'',
+						(!$i)?(($data['sales'])?round((intval($data['fba_stock'])+intval($data['fba_transfer'])+intval($data['fbm_stock']))/$data['sales'],2):'∞'):'',
+						(!$i)?$data['sku']:'',
+						(!$i)?array_get($users_array,intval(array_get($data,'sap_seller_id')),intval(array_get($data,'sap_seller_id'))):'',
+						(!$i)?$data['bg']:'',
+						(!$i)?$data['bu']:'',
+						(!$i)?array_get(getSkuStatuses(),$data['status']):'',
+						(!$i)?(($data['pro_status']==='0')?'S':$data['pro_status']):'',
+						(!$i)?$data['description']:'',
 					);
-				}else{
-					$arrayData[] = array(
-						'',
-						'',
-						'',
-						'',
-						'',
-						'',
-						'',
-						$keyword,
-						$rank,
-						'',
-						'',
-						'',
-						'',	
-						'',
-						'',
-						'',
-						'',
-						'',
-						'',
-						'',
-						'',
-						'',
-						'',
-						'',
-						'',
-						''
-						
-					);
+					$i++;
 				}
-				$i++;
-			}
-            
+			}   
 		}
 
 		if($arrayData){
 			$spreadsheet = new Spreadsheet();
-
 			$spreadsheet->getActiveSheet()->fromArray($arrayData,NULL, 'A1' );
 			header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-			header('Content-Disposition: attachment;filename="Export_d_report.xlsx"');
+			header('Content-Disposition: attachment;filename="'.$exportFileName.'.xlsx"');
 			$writer = new Xlsx($spreadsheet);
 			$writer->save('php://output');
 		}
