@@ -82,8 +82,9 @@ class PushDailyReport extends Command
         $reviewData = json_decode(json_encode($reviewData),true);
 
         if($this->option('with_stock')){
+            
             $fbaData = DB::connection('amazon')->table('seller_skus')
-            ->where('marketplaceid',$marketplace_id)->where('afn_total','>',0)
+            ->where('marketplaceid',(in_array($marketplace_id,['A2EUQ1WTGCTBG2','A1AM78C64UM0Y8'])?'ATVPDKIKX0DER':$marketplace_id))->where('afn_total','>',0)
             ->selectRaw('asin,sum(afn_sellable) as fba_stock,sum(afn_reserved+afn_transfer) as fba_transfer')
             ->groupBy(['asin'])->get()->keyBy('asin');
             /*
