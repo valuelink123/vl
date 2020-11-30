@@ -220,15 +220,33 @@ class InboxController extends Controller
         $order=array();
 		$account = Accounts::where('account_email',$email['to_address'])->first();
         $account_type = $account ? $account->type : null;
+
         if($email['amazon_order_id']){
 			$amazon_seller_id = $email['amazon_seller_id'];
-			
+
 			if(!$amazon_seller_id){
                 $amazon_seller_id = $account ? $account->account_sellerid : null;
 			}
             $order = DB::table('amazon_orders')->where('SellerId', $amazon_seller_id)->where('AmazonOrderId', $email['amazon_order_id'])->first();
             if($order) $order->item = DB::table('amazon_orders_item')->where('SellerId', $amazon_seller_id)->where('AmazonOrderId', $email['amazon_order_id'])->get();
         }
+
+		//获取该客户与此邮箱的来往邮件中所有绑定的订单号信息,展示出所有绑定订单的订单详情
+		$email_order = Inbox::whereNotNull('amazon_order_id')->whereNotNull('amazon_seller_id')->where('from_address',$email['from_address'])->where('to_address',$email['to_address'])->orderBy('date','desc')->get()->toArray();
+		$sap = new SapRfcRequest();
+		$orderArr = array();
+		foreach($email_order as $key=>$val){
+			//获取sap订单信息
+			$orderid = $val['amazon_order_id'];
+			try{
+				$orderArr[$key] = SapRfcRequest::sapOrderDataTranslate($sap->getOrder(['orderId' => $orderid]));
+				$orderArr[$key]['SellerName'] = Accounts::where('account_sellerid', $orderArr[$key]['SellerId'])->first()->account_name ?? 'No Match';
+			} catch (\Exception $e) {
+
+			}
+
+		}
+
 		$i=0;
         foreach($email_to as $mail){
 			$i++;
@@ -276,7 +294,7 @@ class InboxController extends Controller
 		$lists =  Category::orderBy($order_by,$sort)->get()->toArray();
 		$tree = $this->getTree($lists,28);
 
-        return view('inbox/view',['email_history'=>$email_history,'unread_history'=>$email_unread_history,'order'=>$order,'email'=>$email,'users'=>$this->getUsers(),'groups'=>$this->getGroups(),'sellerids'=>$this->getSellerIds(),'accounts'=>$this->getAccounts(),'account_type'=>$account_type,'tree'=>$tree,'email_change_log'=>$email_change_log,'client_email'=>$client_email,'latestConversationList'=>$latestConversationList,'recentEventsList'=>$recentEventsList,'recentEventsNumbers'=>$recentEventsNumbers,'rsgTaskData'=>$rsgTaskData,'rsg_link'=> 'https://rsg.claimgiftsnow.com?user=V'.Auth::user()->id ]);
+        return view('inbox/view',['email_history'=>$email_history,'unread_history'=>$email_unread_history,'order'=>$order,'orderArr'=>$orderArr,'email'=>$email,'users'=>$this->getUsers(),'groups'=>$this->getGroups(),'sellerids'=>$this->getSellerIds(),'accounts'=>$this->getAccounts(),'account_type'=>$account_type,'tree'=>$tree,'email_change_log'=>$email_change_log,'client_email'=>$client_email,'latestConversationList'=>$latestConversationList,'recentEventsList'=>$recentEventsList,'recentEventsNumbers'=>$recentEventsNumbers,'rsgTaskData'=>$rsgTaskData,'rsg_link'=> 'https://rsg.claimgiftsnow.com?user=V'.Auth::user()->id ]);
     }
 
     public function getRsgStatusAttr($emailDetails, $email, $rsgStatusArr, $fromOrTo){
@@ -1140,6 +1158,22 @@ class InboxController extends Controller
 			}
 			return $group_arr;
         }
+	}
+
+	//收件箱里面解绑订单号操作
+	public function unbindInboxOrder(Request $request)
+	{
+		$inboxid = $request->get('inboxid');
+		$rerurn['status'] = 0;
+		$update = array('amazon_order_id'=>'','amazon_seller_id'=>'','sku'=>'','asin'=>'');
+		$re = Inbox::where('id',$inboxid)->update($update);
+		if($re){
+			$rerurn['status'] = 1;
+			$rerurn['msg'] = 'Unbind Success,Auto refresh after 3 seconds';
+		}else{
+			$rerurn['msg'] = 'Unbind Fail';
+		}
+		return $rerurn;
 	}
 	
 	public function getrfcorder(Request $request){

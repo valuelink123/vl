@@ -59,6 +59,24 @@
 
 	  });
 	});
+	//解绑操作，解绑此封邮件绑定的订单号
+      $("#unbindorder").click(function() {
+          $.ajax({
+              type: 'post',
+              url: '/inbox/unbindInboxOrder',
+              data: {inboxid: $("#rebindorderinboxid").val()},
+              dataType: 'json',
+              success: function (res) {
+                  var msg = res.msg;
+                  if(res.status==1){
+                      toastr.success(msg);
+                      setTimeout(function(){location.reload();},3000);
+                  }else{
+                      toastr.error(msg);
+                  }
+              }
+          });
+      });
 
 	$("#fileupload").submit(function(e){
 	  if($('#account_type').val()!='Amazon') return true;
@@ -627,126 +645,24 @@
 						</div>
 
                         <div class="col-md-4">
-						<div class="input-group">
-                                                            <input id="rebindorderinboxid" class="form-control" type="hidden" name="rebindorderinboxid" value="{{$email['id']}}"> 
-													
-															
-                                                                <input id="rebindorderid" class="form-control" type="text" name="rebindorderid" placeholder="Amazon Order ID"> 
-                                                            <span class="input-group-btn">
-                                                                <button id="rebindorder" class="btn btn-success" type="button">
-                                                                    Rebind Order</button>
-                                                            </span>
-                                                        </div>
-                            
+                            <div class="input-group">
+                                <input id="rebindorderinboxid" class="form-control" type="hidden" name="rebindorderinboxid" value="{{$email['id']}}">
+                                <input id="rebindorderid" class="form-control" type="text" name="rebindorderid" placeholder="Amazon Order ID" style="width:300px;">
+                                <span class="input-group-btn" style="padding-left: 10px;">
+                                    <button id="rebindorder" class="btn btn-success" type="button">Rebind Order</button>
+                                </span>
+                                <span class="input-group-btn" style="padding-left: 20px;">
+                                    <button id="unbindorder" class="btn btn-success" type="button">Unbind Order</button>
+                                </span>
+                            </div>
                         </div>
-                        
-                        
+                        <div class="col-md-2">
+                            @if(isset($order->AmazonOrderId))<span>此封邮件订单号:{!! $order->AmazonOrderId !!}</span>@endif
+                        </div>
                     </div>
                     </form>
-                    <?php
-                    if(isset($order->AmazonOrderId)){?>
-                    <div class="invoice-content-2 bordered">
-                        <div class="row invoice-head">
-                            <div class="col-md-7 col-xs-6">
-                                <div class="invoice-logo">
-                                    <h1 class="uppercase">{{$order->AmazonOrderId}}  ( {{array_get($sellerids,$order->SellerId)}} )</h1>
-                                    Buyer Email : {{$order->BuyerEmail}}<BR>
-                                    Buyer Name : {{$order->BuyerName}}<BR>
-                                    PurchaseDate : {{$order->PurchaseDate}}
-                                </div>
-                            </div>
-                            <div class="col-md-5 col-xs-6">
-                                <div class="company-address">
-                                    <span class="bold ">{{$order->Name}}</span>
-                                    <br> {{$order->AddressLine1}}
-                                    <br> {{$order->AddressLine2}}
-                                    <br> {{$order->AddressLine3}}
-                                    <br> {{$order->City}} {{$order->StateOrRegion}} {{$order->CountryCode}}
-                                    <br> {{$order->PostalCode}}
-                                </div>
-                            </div>
-                        </div>
-                            <BR><BR>
-                        <div class="row invoice-cust-add">
-                            <div class="col-xs-3">
-                                <h4 class="invoice-title ">Seller ID</h4>
-                                <p class="invoice-desc">{{$order->SellerId}}   </p>
-                            </div>
-                            <div class="col-xs-3">
-                                <h4 class="invoice-title ">Site</h4>
-                                <p class="invoice-desc">{{$order->SalesChannel}}</p>
-                            </div>
-                            <div class="col-xs-2">
-                                <h4 class="invoice-title ">Fulfillment Channel</h4>
-                                <p class="invoice-desc">{{$order->FulfillmentChannel}}</p>
-                            </div>
-                            <div class="col-xs-2">
-                                <h4 class="invoice-title ">Ship Service Level</h4>
-                                <p class="invoice-desc">{{$order->ShipServiceLevel}}</p>
-                            </div>
-
-                            <div class="col-xs-2">
-                                <h4 class="invoice-title ">Status</h4>
-                                <p class="invoice-desc">{{$order->OrderStatus}}</p>
-                            </div>
-
-
-                        </div>
-                        <BR><BR>
-                        <div class="row invoice-body">
-                            <div class="col-xs-12 table-responsive">
-                                <table class="table table-hover">
-                                    <thead>
-                                    <tr>
-                                        <th class="invoice-title uppercase">Description</th>
-                                        <th class="invoice-title uppercase text-center">Qty</th>
-                                        <th class="invoice-title uppercase text-center">Price</th>
-                                        <th class="invoice-title uppercase text-center">Shipping</th>
-                                        <th class="invoice-title uppercase text-center">Promotion</th>
-										<th class="invoice-title uppercase text-center">Tax</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <?php
-                                    foreach($order->item as $item){ ?>
-                                    <tr>
-                                        <td>
-                                            <h4><a href="https://www.{{$order->SalesChannel}}/dp/{{$item->ASIN}}" target="_blank" rel="noreferrer">{{$item->ASIN}}</a> ( {{$item->SellerSKU}} )</h4>
-                                            <p> {{$item->Title}} </p>
-                                        </td>
-                                        <td class="text-center sbold">{{$item->QuantityOrdered}}</td>
-                                        <td class="text-center sbold">{{$item->QuantityOrdered?round($item->ItemPriceAmount/$item->QuantityOrdered,2):round($item->ItemPriceAmount,2)}}</td>
-                                        <td class="text-center sbold">{{round($item->ShippingPriceAmount,2)}} {{($item->ShippingDiscountAmount)?'( -'.round($item->ShippingDiscountAmount,2).' )':''}}</td>
-                                        <td class="text-center sbold">{{($item->PromotionDiscountAmount)?'( -'.round($item->PromotionDiscountAmount,2).' )':''}}</td>
-										<td class="text-center sbold">{{round($item->ItemTaxAmount,2)}}</td>
-                                    </tr>
-                                    <?php } ?>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        <div class="row invoice-subtotal">
-                            <div class="col-xs-6">
-                                <h4 class="invoice-title uppercase">Total</h4>
-                                <p class="invoice-desc grand-total">{{round($order->Amount,2)}} {{$order->CurrencyCode}}</p>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-xs-12">
-                                <a class="btn btn-lg green-haze hidden-print uppercase print-btn" href="{{ url('invoice/get/'.$email['id'])}}" target="_blank">Print PDF Invoice</a>
-								
-								 <a class="btn btn-lg red-haze hidden-print uppercase print-btn" href="{{ url('exception/create?request_sellerid='.$order->SellerId.'&request_orderid='.$order->AmazonOrderId.'&request_groupid='.$email['group_id'])}}" target="_blank">Create Refund and Replacement</a>
-
-                            </div>
-                        </div>
-                    </div>
-                       <?php }else{
-                            echo "Can not match or find order";
-
-                        } ?>
+                    @include('nonctg.orderInfo')
                 </div>
-
-
 
                 <div class="tab-pane" id="tab_4">
                     <form role="form" action="{{ url('inbox/change') }}" method="POST">

@@ -67,6 +67,7 @@ Route::Post('/review/get', 'ReviewController@get')->name('getReview');
 Route::Post('/review/upload', 'ReviewController@upload')->name('uploadReview');
 Route::get('/template/ajax/get', 'TemplateController@get')->name('getTemplate');
 Route::Post('/saporder/get', 'InboxController@getrfcorder')->name('getRfcOrder');
+Route::Post('/inbox/unbindInboxOrder', 'InboxController@unbindInboxOrder');//收件箱里面解绑订单号操作
 Route::get('/invoice/get/{id}', 'InboxController@getpdfinvoice')->name('getPdfInvoice');
 Route::resource('qa', 'QaiController');
 Route::Post('/qa/get', 'QaiController@get')->name('getQa');
