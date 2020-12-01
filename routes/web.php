@@ -395,3 +395,10 @@ Route::Post('/transferTask/get', 'TransferTaskController@get')->name('getTransfe
 
 //系统模块下的菜单路由
 Route::get('/system/itRequirement', 'SystemController@itRequirement');//跳转进入到禅道系统
+/*
+ * 弹窗插件模块
+ */
+Route::match(['post','get'],'/api/getCode', 'ApiController@getCode');//得到验证码方法，
+Route::match(['post','get'],'/api/alertRemind', 'ApiController@alertRemind');//弹出验证框
+Route::match(['post','get'],'/api/verifyCode', 'ApiController@verifyCode');//验证填写的验证码是否正确
+
