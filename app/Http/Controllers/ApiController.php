@@ -55,6 +55,7 @@ class ApiController extends Controller
 	 */
 	public function getCode()
 	{
+		header('Access-Control-Allow-Origin:*');
 		$userId = Auth::user()->id;
 		//获取验证码
 		session_start();//开启session记录验证码数据
@@ -121,6 +122,7 @@ class ApiController extends Controller
 	 */
 	public function alertRemind()
 	{
+		header('Access-Control-Allow-Origin:*');
 		$result['status'] = 0;
 		if(Auth::user()){
 			saveOperationLog('verifyCode', 0, array());//操作插入日志表中
@@ -135,12 +137,12 @@ class ApiController extends Controller
 	 */
 	public function verifyCode()
 	{
+		header('Access-Control-Allow-Origin:*');
 		session_start();//开启session获取验证码数据
 		$userId = Auth::user()->id;
 		$code = isset($_REQUEST['code']) && $_REQUEST['code'] ? trim($_REQUEST['code']) : '';
 		$trueCode = $_SESSION["VerifyCode_".$userId];
 		$result['status'] = 0;
-		$result['msg'] = '';
 		if($code == $trueCode){
 			$result['status'] = 1;
 		}
