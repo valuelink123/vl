@@ -395,6 +395,7 @@ Route::Post('/transferTask/get', 'TransferTaskController@get')->name('getTransfe
 
 //系统模块下的菜单路由
 Route::get('/system/itRequirement', 'SystemController@itRequirement');//跳转进入到禅道系统
+Route::get('/plugin/download', 'SystemController@pluginDownload');//下载插件包
 /*
  * 弹窗插件模块
  */

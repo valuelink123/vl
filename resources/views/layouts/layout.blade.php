@@ -911,6 +911,12 @@
                                                 <span class="arrow"></span>
                                             </a>
                                             <ul class="dropdown-menu pull-left">
+                                                <li class="">
+                                                    <a href="/plugin/download" class="nav-link nav-toggle">
+                                                        Plugin Download
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
 
                                                 @permission('It-requirement-show')
                                                 <li class="">
@@ -920,6 +926,7 @@
                                                     </a>
                                                 </li>
                                                 @endpermission
+
                                             </ul>
                                         </li>
                                     </ul>
