@@ -76,7 +76,6 @@ class ApiController extends Controller
 		for ($i = 0; $i < $num; $i++) {
 			$code .= $str[mt_rand(0, strlen($str)-1)];
 		}
-		return $code;
 
 		//创建验证码画布
 		$im = imagecreatetruecolor($width, $height);
@@ -106,14 +105,15 @@ class ApiController extends Controller
 		$array=array(5,4,3,2,1,0,-1,-2,-3,-4,-5);
 
 		// 输出验证码
-		// imagefttext(image, size, angle, x, y, color, fontfile, text)
-		@imagefttext($im, $size , array_rand($array), 12, $size + 6, $text_color, 'c:\WINDOWS\Fonts\simsun.ttc', $code);
+//		 imagefttext(image, size, angle, x, y, color, fontfile, text);
+		imagestring($im, 5, 25, 8, $code, $text_color);
+//		@imagefttext($im, $size , array_rand($array), 12, $size + 6, $text_color, 'c:\WINDOWS\Fonts\simsun.ttc', $code);
 		$_SESSION["VerifyCode_".$userId]=$code;
 		//no-cache在每次请求时都会访问服务器
 		//max-age在请求1s后再次请求会再次访问服务器，must-revalidate则第一发送请求会访问服务器，之后不会再访问服务器
 		// header("Cache-Control: max-age=1, s-maxage=1, no-cache, must-revalidate");
 //		header("Cache-Control: no-cache");
-//		header("Content-type: image/png;charset=gb2312");
+		header("Content-type: image/png;charset=gb2312");
 		//将图片转化为png格式
 		imagepng($im);
 		imagedestroy($im);
