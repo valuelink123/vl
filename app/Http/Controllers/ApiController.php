@@ -76,6 +76,7 @@ class ApiController extends Controller
 		for ($i = 0; $i < $num; $i++) {
 			$code .= $str[mt_rand(0, strlen($str)-1)];
 		}
+		return $code;
 
 		//创建验证码画布
 		$im = imagecreatetruecolor($width, $height);
