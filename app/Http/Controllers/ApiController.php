@@ -56,7 +56,7 @@ class ApiController extends Controller
 	public function getCode()
 	{
 		header('Access-Control-Allow-Origin:*');
-		$userId = Auth::user()->id;
+		$userId = isset($_COOKIE['userId']) && $_COOKIE['userId'] ? $_COOKIE['userId'] : 0;
 		//获取验证码
 		session_start();//开启session记录验证码数据
 		$num = 4;
@@ -124,8 +124,9 @@ class ApiController extends Controller
 	public function alertRemind()
 	{
 		header('Access-Control-Allow-Origin:*');
+		$userId = isset($_COOKIE['userId']) && $_COOKIE['userId'] ? $_COOKIE['userId'] : 0;
 		$result['status'] = 0;
-		if(Auth::user()){
+		if($userId){
 			saveOperationLog('verifyCode', 0, array());//操作插入日志表中
 			$result['status'] = 1;
 		}
@@ -140,7 +141,7 @@ class ApiController extends Controller
 	{
 		header('Access-Control-Allow-Origin:*');
 		session_start();//开启session获取验证码数据
-		$userId = Auth::user()->id;
+		$userId = isset($_COOKIE['userId']) && $_COOKIE['userId'] ? $_COOKIE['userId'] : 0;
 		$code = isset($_REQUEST['code']) && $_REQUEST['code'] ? trim($_REQUEST['code']) : '';
 		$trueCode = $_SESSION["VerifyCode_".$userId];
 		$result['status'] = 0;
