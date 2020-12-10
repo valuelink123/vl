@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Auth;
 use App\Classes\CurlRequest;
 use DB;
+use App\User;
 
 class ApiController extends Controller
 {
@@ -126,10 +127,12 @@ class ApiController extends Controller
 		header('Access-Control-Allow-Origin:*');
 		$userId = isset($_COOKIE['userId']) && $_COOKIE['userId'] ? $_COOKIE['userId'] : 0;
 		$result['status'] = 0;
-		if($userId){
+		$userRole = User::find($userId)->roles->pluck('id')->toArray();
+		if($userId && (in_array(12,$userRole) || in_array(13,$userRole))){
 			saveOperationLog('verifyCode', 0, array());//操作插入日志表中
 			$result['status'] = 1;
 		}
+		$result['userId']=$userId;
 		echo json_encode($result);
 	}
 
@@ -148,6 +151,7 @@ class ApiController extends Controller
 		if($code == $trueCode){
 			$result['status'] = 1;
 		}
+		$result['userId'] = $userId;
 		saveOperationLog('verifyCode', 0, array('code'=>$code));//操作插入日志表中
 		echo json_encode($result);
 	}
