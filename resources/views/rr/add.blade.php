@@ -67,6 +67,7 @@
                                 <select class="form-control" name="type" id="type" required>
 								<option value="">Please Select...</option>
 								<option value="_GET_AFN_INVENTORY_DATA_">_GET_AFN_INVENTORY_DATA_</option>
+								<option value="_GET_FBA_MYI_ALL_INVENTORY_DATA_">_GET_FBA_MYI_ALL_INVENTORY_DATA_</option>
 								<option value="_GET_FBA_FULFILLMENT_INVENTORY_ADJUSTMENTS_DATA_">_GET_FBA_FULFILLMENT_INVENTORY_ADJUSTMENTS_DATA_</option>
 								<option value="_GET_FBA_FULFILLMENT_REMOVAL_SHIPMENT_DETAIL_DATA_">_GET_FBA_FULFILLMENT_REMOVAL_SHIPMENT_DETAIL_DATA_</option>
 								<option value="_GET_FBA_INVENTORY_AGED_DATA_">_GET_FBA_INVENTORY_AGED_DATA_</option>
