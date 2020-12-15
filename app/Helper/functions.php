@@ -1376,7 +1376,7 @@ function getWeekDate($yearWeekNum){
 
 //存日志
 function saveOperationLog(string $table = NULL, int $primary_id = 0 , array $inputData = array()){
-	$userId = isset($_COOKIE['userId']) && $_COOKIE['userId'] ? $_COOKIE['userId'] : 0;
+	$userId = isset($inputData['userId']) && $inputData['userId'] ? $inputData['userId'] : 0;
 	DB::table('operation_log')->insert(
 		array(
 			'user_id'=> Auth::user() ? Auth::user()->id : $userId,

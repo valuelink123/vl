@@ -38,7 +38,6 @@ class HomeController extends Controller
      */
     public function index(Request $request)
     {
-		setcookie("userId", Auth::user()->id);
 		$limit_bg = $limit_bu = $limit_sap_seller_id = $limit_review_user_id='';
 
 		$sumwhere = '1=1';
