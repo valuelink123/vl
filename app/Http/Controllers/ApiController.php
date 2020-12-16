@@ -84,28 +84,4 @@ class ApiController extends Controller
 		}
 		echo json_encode($result);
 	}
-
-	/*
-	 * 验证填写的验证码是否正确
-	 * 验证验证码是否输入正确
-	 */
-	public function verifyCode()
-	{
-		header('Access-Control-Allow-Origin:*');
-		session_start();//开启session获取验证码数据
-		$userId = isset($_COOKIE['userId']) && $_COOKIE['userId'] ? $_COOKIE['userId'] : 0;
-		$code = isset($_REQUEST['code']) && $_REQUEST['code'] ? trim($_REQUEST['code']) : '';
-//		$pid = isset($_REQUEST['pid']) && $_REQUEST['pid'] ? trim($_REQUEST['pid']) : '';
-//		$trueCode = isset($_SESSION["VerifyCode_".$userId.'_'.$pid]) ? $_SESSION["VerifyCode_".$userId.'_'.$pid] : '';
-		$trueCode = isset($_SESSION["VerifyCode_".$userId]) ? $_SESSION["VerifyCode_".$userId] : '';
-		$result['status'] = 0;
-		$result['code'] = $code;
-		$result['truecode'] = $trueCode;
-		if($code == $trueCode){
-			$result['status'] = 1;
-		}
-		$result['userId'] = $userId;
-		saveOperationLog('verifyCode', 0, array('userId'=>$userId,'code'=>$code,'truecode'=>$trueCode,'sessionkey'=>"VerifyCode_".$userId,'sessionid'=>session_id()));//操作插入日志表中
-		echo json_encode($result);
-	}
 }

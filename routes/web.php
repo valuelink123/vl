@@ -399,7 +399,6 @@ Route::get('/plugin/download', 'SystemController@pluginDownload');//下载插件
 /*
  * 弹窗插件模块
  */
-Route::match(['post','get'],'/api/getCode', 'ApiController@getCode');//得到验证码方法，
 Route::match(['post','get'],'/api/alertRemind', 'ApiController@alertRemind');//弹出验证框
-Route::match(['post','get'],'/api/verifyCode', 'ApiController@verifyCode');//验证填写的验证码是否正确
+
 
