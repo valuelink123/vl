@@ -101,11 +101,11 @@ class ReportsController extends Controller
         }
         if(array_get($_REQUEST,'reason')){
             $datas = $datas->whereIn('reason',array_get(FbaInventoryAdjustmentsReport::REASONMATCH,array_get($_REQUEST,'reason'),array_get($_REQUEST,'reason')));
-            $exportFileName.=array_get($_REQUEST,'reason').'_';
+            $exportFileName.=implode(',',array_get($_REQUEST,'reason')).'_';
         }
         if(array_get($_REQUEST,'disposition')){
             $datas = $datas->whereIn('disposition',array_get($_REQUEST,'disposition'));
-            $exportFileName.=array_get($_REQUEST,'disposition').'_';
+            $exportFileName.=implode(',',array_get($_REQUEST,'disposition')).'_';
         }
         if(array_get($_REQUEST,'id')){
             $datas = $datas->whereIn('id',explode(',',array_get($_REQUEST,'id')));
