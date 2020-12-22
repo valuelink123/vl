@@ -401,4 +401,7 @@ Route::get('/plugin/download', 'SystemController@pluginDownload');//下载插件
  */
 Route::match(['post','get'],'/api/alertRemind', 'ApiController@alertRemind');//弹出验证框
 
+Route::get('/reports', 'ReportsController@index');
+Route::any('/reports/get', 'ReportsController@get')->name('getReport');
+
 
