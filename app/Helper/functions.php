@@ -149,7 +149,7 @@ function getUserGroupDetails(){
 }
 function getAsinSites(){
     return array(
-        'www.amazon.com','www.amazon.ca','www.amazon.mx','www.amazon.co.uk','www.amazon.fr','www.amazon.de','www.amazon.it','www.amazon.es','www.amazon.co.jp'
+        'www.amazon.com','www.amazon.ca','www.amazon.com.mx','www.amazon.co.uk','www.amazon.fr','www.amazon.de','www.amazon.it','www.amazon.es','www.amazon.co.jp'
     );
 }
 function getMarks(){
@@ -1175,7 +1175,7 @@ function getSiteArr()
 {
 	$arr['site'] = [
 		'JP' => array('www.amazon.co.jp'),
-		'US' => array('www.amazon.com','www.amazon.ca'),
+		'US' => array('www.amazon.com','www.amazon.ca','www.amazon.com.mx'),
 		'EU' => array('www.amazon.co.uk','www.amazon.de','www.amazon.it','www.amazon.es','www.amazon.fr'),
 	];
 	$arr['fbmfba_days'] = array('JP'=>10,'US'=>20,'EU'=>12);
@@ -1196,7 +1196,7 @@ function getGoodStoreHouse()
  */
 function getSiteShort()
 {
-	$arr = array('www.amazon.co.jp'=>'jp','www.amazon.com'=>'us','www.amazon.ca'=>'ca','www.amazon.co.uk'=>'uk','www.amazon.de'=>'de','www.amazon.it'=>'it','www.amazon.es'=>'es','www.amazon.fr'=>'fr','www.amazon.mx'=>'mx');
+	$arr = array('www.amazon.co.jp'=>'jp','www.amazon.com'=>'us','www.amazon.ca'=>'ca','www.amazon.co.uk'=>'uk','www.amazon.de'=>'de','www.amazon.it'=>'it','www.amazon.es'=>'es','www.amazon.fr'=>'fr','www.amazon.com.mx'=>'mx');
 	return $arr;
 }
 
