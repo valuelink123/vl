@@ -1236,7 +1236,8 @@ function getShipRate()
 		'CS0548'=>'2534',
 		'CS0656'=>'2534'
 	],
-	'CA'=>['default'=>'1900']
+	'CA'=>['default'=>'1900'],
+	'MX'=>['default'=>'1200']
 	];
 	return $arr;
 }
