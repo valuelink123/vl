@@ -1,5 +1,5 @@
 @extends('layouts.layout')
-@section('label', 'Fba Daily Inventory History Report')
+@section('label', 'Fba Inventory Adjustments Report')
 @section('content')
 <style type="text/css">
 th,td,td>span {
@@ -23,7 +23,7 @@ th,td,td>span {
                         <div class="row">
                             <div class="col-md-2">
                                 <div class="input-group date date-picker margin-bottom-5" data-date-format="yyyy-mm-dd">
-                                    <input type="text" class="form-control" readonly name="snapshot_date_from" placeholder="DateFrom" value="">
+                                    <input type="text" class="form-control" readonly name="adjusted_date_from" placeholder="DateFrom" value="">
                                     <span class="input-group-btn">
                                         <button class="btn  default" type="button">
                                             <i class="fa fa-calendar"></i>
@@ -33,7 +33,7 @@ th,td,td>span {
                             </div>
                             <div class="col-md-2">
                                 <div class="input-group date date-picker margin-bottom-5" data-date-format="yyyy-mm-dd">
-                                    <input type="text" class="form-control" readonly name="snapshot_date_to" placeholder="DateTo" value="">
+                                    <input type="text" class="form-control" readonly name="adjusted_date_to" placeholder="DateTo" value="">
                                     <span class="input-group-btn">
                                         <button class="btn default" type="button">
                                             <i class="fa fa-calendar"></i>
@@ -48,7 +48,9 @@ th,td,td>span {
                                 @endforeach
                             </select>
                             </div>
-                            
+                            <div class="col-md-2">
+                                <input type="text" class="form-control" name="transaction_item_id" placeholder="Transaction Item Id">  
+                            </div>
                             <div class="col-md-2">
                                 <input type="text" class="form-control" name="seller_sku" placeholder="Seller skus">  
                             </div>
@@ -62,8 +64,15 @@ th,td,td>span {
                         </div>
                         <div class="row">
                             <div class="col-md-2">
+                                <select class="mt-multiselect btn btn-default " multiple="multiple" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" data-none-selected-text="Select Reason" name="reason[]" id="reason[]">
+                                    @foreach (App\Models\FbaInventoryAdjustmentsReport::RESONSEARCH as $k=>$v)
+                                        <option value="{{$k}}">{{$v}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-2">
                                 <select class="mt-multiselect btn btn-default " multiple="multiple" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" data-none-selected-text="Select Disposition" name="disposition[]" id="disposition[]">
-                                    @foreach (App\Models\FbaDailyInventoryHistoryReport::DISPOSITION as $k=>$v)
+                                    @foreach (App\Models\FbaInventoryAdjustmentsReport::DISPOSITION as $k=>$v)
                                         <option value="{{$k}}">{{$v}}</option>
                                     @endforeach
                                 </select>
@@ -99,13 +108,16 @@ th,td,td>span {
                                         </label>
                                     </th>
                                     <th>Account</th>
-                                    <th>Snapshot Date</th>
+                                    <th>Adjusted Date</th>
+                                    <th>Transaction Item Id</th>
                                     <th>SellerSku</th>
                                     <th>Fnsku</th>
-                                    <th>Country</th>
                                     <th>Fulfillment Center Id</th>
-                                    <th>Disposition</th>
                                     <th>Quantity</th>
+                                    <th>Reson</th>
+                                    <th>Disposition</th>
+                                    <th>Reconciled</th>
+                                    <th>Unreconciled</th>
                                     <th>Updated At</th>
                                 </tr>
                             </thead>
@@ -136,7 +148,7 @@ th,td,td>span {
                 headers: { 'X-CSRF-TOKEN' : '{{ csrf_token() }}' }
             });
             var grid = new Datatable();
-        grid.setAjaxParam("type", 'fba_daily_inventory_history_report');
+        grid.setAjaxParam("type", 'fba_inventory_adjustments_report');
         grid.init({
             src: $("#datatable_ajax_report"),
             onSuccess: function (grid, response) {
@@ -163,25 +175,27 @@ th,td,td>span {
 
         $('#data_search').on('click',function(e){
             e.preventDefault();
-            grid.setAjaxParam("type", 'fba_daily_inventory_history_report');
-            grid.setAjaxParam("snapshot_date_from", $("input[name='snapshot_date_from']").val());
-            grid.setAjaxParam("snapshot_date_to", $("input[name='snapshot_date_to']").val());
+            grid.setAjaxParam("type", 'fba_inventory_adjustments_report');
+            grid.setAjaxParam("adjusted_date_from", $("input[name='adjusted_date_from']").val());
+            grid.setAjaxParam("adjusted_date_to", $("input[name='adjusted_date_to']").val());
             grid.setAjaxParam("fulfillment_center_id", $("input[name='fulfillment_center_id']").val());
             grid.setAjaxParam("seller_sku", $("input[name='seller_sku']").val());
             grid.setAjaxParam("seller_account_id", $("select[name='seller_account_id[]']").val());
             grid.setAjaxParam("fnsku", $("input[name='fnsku']").val());
+            grid.setAjaxParam("transaction_item_id", $("input[name='transaction_item_id']").val());
             grid.setAjaxParam("disposition", $("select[name='disposition[]']").val());
+            grid.setAjaxParam("reson", $("select[name='reson[]']").val());
             grid.getDataTable().draw(false);
         });
 
         $("#select_export").click(function(){
             if (grid.getSelectedRowsCount() <= 0) return false;
-            var baseUrl ='/reports/get?type=fba_daily_inventory_history_report&action=export&id='+grid.getSelectedRows();
+            var baseUrl ='/reports/get?type=fba_inventory_adjustments_report&action=export&id='+grid.getSelectedRows();
             location.href =  baseUrl;
         });
 
         $("#current_export").click(function(){
-            var baseUrl ='/reports/get?type=fba_daily_inventory_history_report&action=export&'+ $('#update_form').serialize();
+            var baseUrl ='/reports/get?type=fba_inventory_adjustments_report&action=export&'+ $('#update_form').serialize();
             var dttable = $('#datatable_ajax_report').dataTable();
             var oSettings = dttable.fnSettings();
             baseUrl = baseUrl+'&offset='+oSettings._iDisplayStart;
@@ -190,7 +204,7 @@ th,td,td>span {
         });
 
         $("#all_export").click(function(){
-            var baseUrl ='/reports/get?type=fba_daily_inventory_history_report&action=export&'+ $('#update_form').serialize();
+            var baseUrl ='/reports/get?type=fba_inventory_adjustments_report&action=export&'+ $('#update_form').serialize();
             location.href =  baseUrl;
         });
 

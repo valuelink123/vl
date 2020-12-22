@@ -725,6 +725,32 @@
                                                     </a>
                                                 </li>
 												@endpermission
+                                                @permission('reports-show')
+												<li class="">
+                                                    <a href="/reports" class="nav-link nav-toggle ">
+                                                        Fba Amazon Fulfilled Inventory Report
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
+                                                <li class="">
+                                                    <a href="/reports?type=fba_daily_inventory_history_report" class="nav-link nav-toggle ">
+                                                        Fba Daily Inventory History Report
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
+                                                <li class="">
+                                                    <a href="/reports?type=fba_inventory_adjustments_report" class="nav-link nav-toggle ">
+                                                        Fba Inventory Adjustments Report
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
+                                                <li class="">
+                                                    <a href="/reports?type=fba_monthly_inventory_history_report" class="nav-link nav-toggle ">
+                                                        Fba Monthly Inventory History Report
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
+												@endpermission
                                             </ul>
                                         </li>
 

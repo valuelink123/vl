@@ -31,6 +31,7 @@ class ReportsController extends Controller
 
     public function index(Request $request)
     {
+        if(!Auth::user()->can(['reports-show'])) die('Permission denied -- reports-show');
         $accounts_data = DB::connection('amazon')->table('seller_accounts')->where('primary',1)->whereNull('deleted_at')->pluck('label','id');
         $type = $request->input('type');
         if(!$type) $type = 'fba_amazon_fulfilled_inventory_report';
@@ -39,6 +40,7 @@ class ReportsController extends Controller
 
     public function get(Request $request)
     {
+        if(!Auth::user()->can(['reports-show'])) die('Permission denied -- reports-show');
         set_time_limit(0);
         $accounts_data = DB::connection('amazon')->table('seller_accounts')->where('primary',1)->whereNull('deleted_at')->pluck('label','id');
         $type = $request->input('type');
@@ -47,51 +49,67 @@ class ReportsController extends Controller
         $datas = DB::connection('amazon')->table($type);
         if(array_get($_REQUEST,'seller_account_id')){
             $datas = $datas->whereIn('seller_account_id',array_get($_REQUEST,'seller_account_id'));
+            $exportFileName.='Account'.implode(',',array_get($_REQUEST,'seller_account_id')).'_';
         }
         if(array_get($_REQUEST,'asin')){
             $datas = $datas->whereIn('asin',explode(',',str_replace([' ','	'],'',array_get($_REQUEST,'asin'))));
+            $exportFileName.=str_replace([' ','	'],'',array_get($_REQUEST,'asin')).'_';
         } 
         if(array_get($_REQUEST,'seller_sku')){
             $datas = $datas->whereIn('seller_sku',explode(',',str_replace([' ','	'],'',array_get($_REQUEST,'seller_sku'))));
+            $exportFileName.=str_replace([' ','	'],'',array_get($_REQUEST,'seller_sku')).'_';
         } 
         if(array_get($_REQUEST,'fnsku')){
-            $datas = $datas->whereIn('seller_sku',explode(',',str_replace([' ','	'],'',array_get($_REQUEST,'seller_sku'))));
+            $datas = $datas->whereIn('fnsku',explode(',',str_replace([' ','	'],'',array_get($_REQUEST,'fnsku'))));
+            $exportFileName.=str_replace([' ','	'],'',array_get($_REQUEST,'fnsku')).'_';
         }  
         if(array_get($_REQUEST,'fulfillment_center_id')){
             $datas = $datas->whereIn('fulfillment_center_id',explode(',',str_replace([' ','	'],'',array_get($_REQUEST,'fulfillment_center_id'))));
+            $exportFileName.=str_replace([' ','	'],'',array_get($_REQUEST,'fulfillment_center_id')).'_';
         } 
         if(array_get($_REQUEST,'adjusted_date_from')){
             $datas = $datas->where('adjusted_date','>=',array_get($_REQUEST,'adjusted_date_from'));
+            $exportFileName.=array_get($_REQUEST,'adjusted_date_from').'_';
         }
         if(array_get($_REQUEST,'adjusted_date_to')){
             $datas = $datas->where('adjusted_date','<=',array_get($_REQUEST,'adjusted_date_to'));
+            $exportFileName.=array_get($_REQUEST,'adjusted_date_to').'_';
         }
         if(array_get($_REQUEST,'snapshot_date_from')){
             $datas = $datas->where('snapshot_date','>=',array_get($_REQUEST,'snapshot_date_from'));
+            $exportFileName.=array_get($_REQUEST,'snapshot_date_from').'_';
         }
         if(array_get($_REQUEST,'snapshot_date_to')){
             $datas = $datas->where('snapshot_date','<=',array_get($_REQUEST,'snapshot_date_to'));
+            $exportFileName.=array_get($_REQUEST,'snapshot_date_to').'_';
         }
         if(array_get($_REQUEST,'month_from')){
             $datas = $datas->where('month','>=',array_get($_REQUEST,'month_from'));
+            $exportFileName.=array_get($_REQUEST,'month_from').'_';
         }
         if(array_get($_REQUEST,'month_to')){
             $datas = $datas->where('month','<=',array_get($_REQUEST,'month_to'));
+            $exportFileName.=array_get($_REQUEST,'month_to').'_';
         }
         if(array_get($_REQUEST,'transaction_item_id')){
             $datas = $datas->where('transaction_item_id',array_get($_REQUEST,'transaction_item_id'));
+            $exportFileName.=array_get($_REQUEST,'transaction_item_id').'_';
         }
         if(array_get($_REQUEST,'warehouse_condition_code')){
             $datas = $datas->where('warehouse_condition_code',array_get($_REQUEST,'warehouse_condition_code'));
+            $exportFileName.=array_get($_REQUEST,'warehouse_condition_code').'_';
         }
         if(array_get($_REQUEST,'reason')){
             $datas = $datas->whereIn('reason',array_get(FbaInventoryAdjustmentsReport::RESONMATCH,array_get($_REQUEST,'reason'),array_get($_REQUEST,'reason')));
+            $exportFileName.=array_get($_REQUEST,'reason').'_';
         }
         if(array_get($_REQUEST,'disposition')){
             $datas = $datas->whereIn('disposition',array_get($_REQUEST,'disposition'));
+            $exportFileName.=array_get($_REQUEST,'disposition').'_';
         }
         if(array_get($_REQUEST,'id')){
             $datas = $datas->whereIn('id',explode(',',array_get($_REQUEST,'id')));
+            $exportFileName.=array_get($_REQUEST,'id').'_';
         }
         $action = $request->input('action');
         $records = array();
@@ -146,7 +164,7 @@ class ReportsController extends Controller
                     $list['country'],
                     $list['fulfillment_center_id'],
                     array_get(FbaDailyInventoryHistoryReport::DISPOSITION,$list['disposition']),
-                    $list['quantity'],
+                    (string)$list['quantity'],
                     $list['updated_at'],
                 );
             }elseif($type  == 'fba_monthly_inventory_history_report'){
@@ -158,8 +176,8 @@ class ReportsController extends Controller
                     $list['country'],
                     $list['fulfillment_center_id'],
                     array_get(FbaMonthlyInventoryHistoryReport::DISPOSITION,$list['disposition']),
-                    $list['average_quantity'],
-                    $list['end_quantity'],
+                    (string)$list['average_quantity'],
+                    (string)$list['end_quantity'],
                     $list['updated_at'],
                 );
             }elseif($type  == 'fba_inventory_adjustments_report'){
@@ -170,11 +188,11 @@ class ReportsController extends Controller
                     $list['seller_sku'],
                     $list['fnsku'],
                     $list['fulfillment_center_id'],
-                    $list['quantity'],
+                    (string)$list['quantity'],
                     array_get(FbaInventoryAdjustmentsReport::RESON,$list['reson']),
                     array_get(FbaInventoryAdjustmentsReport::DISPOSITION,$list['disposition']),
-                    $list['reconciled'],
-                    $list['unreconciled'],
+                    (string)$list['reconciled'],
+                    (string)$list['unreconciled'],
                     $list['updated_at'],
                 );
             }else{
@@ -185,7 +203,7 @@ class ReportsController extends Controller
                     $list['fnsku'],
                     $list['condition_type'],
                     array_get(FbaAmazonFulfilledInventoryReport::STATUS,$list['warehouse_condition_code']),
-                    $list['quantity_available'],
+                    (string)$list['quantity_available'],
                     $list['updated_at'],
                 );
             } 
