@@ -100,8 +100,12 @@ class ReportsController extends Controller
             $exportFileName.=array_get($_REQUEST,'warehouse_condition_code').'_';
         }
         if(array_get($_REQUEST,'reason')){
-            $datas = $datas->whereIn('reason',array_get(FbaInventoryAdjustmentsReport::REASONMATCH,array_get($_REQUEST,'reason'),array_get($_REQUEST,'reason')));
-            $exportFileName.=implode(',',array_get($_REQUEST,'reason')).'_';
+            $reason = [];
+            foreach(array_get($_REQUEST,'reason') as $val){
+                $reason = array_merge($reason,array_get(FbaInventoryAdjustmentsReport::REASONMATCH,$val,[]));
+            }
+            $datas = $datas->whereIn('reason',$reason);
+            $exportFileName.=implode(',',$reason).'_';
         }
         if(array_get($_REQUEST,'disposition')){
             $datas = $datas->whereIn('disposition',array_get($_REQUEST,'disposition'));
