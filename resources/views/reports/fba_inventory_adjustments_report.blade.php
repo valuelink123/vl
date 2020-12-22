@@ -57,15 +57,16 @@ th,td,td>span {
                             <div class="col-md-2">
                                 <input type="text" class="form-control" name="fnsku" placeholder="Fnskus">  
                             </div>
+                        </div>
+                        <div class="row">
                             <div class="col-md-2">
                                 <input type="text" class="form-control" name="fulfillment_center_id" placeholder="Fulfillment Center Id">  
                             </div>
 
-                        </div>
-                        <div class="row">
+                        
                             <div class="col-md-2">
                                 <select class="mt-multiselect btn btn-default " multiple="multiple" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" data-none-selected-text="Select Reason" name="reason[]" id="reason[]">
-                                    @foreach (App\Models\FbaInventoryAdjustmentsReport::RESONSEARCH as $k=>$v)
+                                    @foreach (App\Models\FbaInventoryAdjustmentsReport::REASONSEARCH as $k=>$v)
                                         <option value="{{$k}}">{{$v}}</option>
                                     @endforeach
                                 </select>
@@ -114,7 +115,7 @@ th,td,td>span {
                                     <th>Fnsku</th>
                                     <th>Fulfillment Center Id</th>
                                     <th>Quantity</th>
-                                    <th>Reson</th>
+                                    <th>Reason</th>
                                     <th>Disposition</th>
                                     <th>Reconciled</th>
                                     <th>Unreconciled</th>
@@ -184,7 +185,7 @@ th,td,td>span {
             grid.setAjaxParam("fnsku", $("input[name='fnsku']").val());
             grid.setAjaxParam("transaction_item_id", $("input[name='transaction_item_id']").val());
             grid.setAjaxParam("disposition", $("select[name='disposition[]']").val());
-            grid.setAjaxParam("reson", $("select[name='reson[]']").val());
+            grid.setAjaxParam("reason", $("select[name='reason[]']").val());
             grid.getDataTable().draw(false);
         });
 

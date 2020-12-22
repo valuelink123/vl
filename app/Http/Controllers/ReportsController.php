@@ -100,7 +100,7 @@ class ReportsController extends Controller
             $exportFileName.=array_get($_REQUEST,'warehouse_condition_code').'_';
         }
         if(array_get($_REQUEST,'reason')){
-            $datas = $datas->whereIn('reason',array_get(FbaInventoryAdjustmentsReport::RESONMATCH,array_get($_REQUEST,'reason'),array_get($_REQUEST,'reason')));
+            $datas = $datas->whereIn('reason',array_get(FbaInventoryAdjustmentsReport::REASONMATCH,array_get($_REQUEST,'reason'),array_get($_REQUEST,'reason')));
             $exportFileName.=array_get($_REQUEST,'reason').'_';
         }
         if(array_get($_REQUEST,'disposition')){
@@ -135,7 +135,7 @@ class ReportsController extends Controller
                 ];
             }elseif($type  == 'fba_inventory_adjustments_report'){
                 $records["data"][] = [
-                    'Account','Adjusted Date','Transaction Item Id','SellerSku','Fnsku','Fulfillment Center Id','Quantity','Reson','Disposition','Reconciled','Unreconciled','Updated At'
+                    'Account','Adjusted Date','Transaction Item Id','SellerSku','Fnsku','Fulfillment Center Id','Quantity','Reason','Disposition','Reconciled','Unreconciled','Updated At'
                 ];
             }else{
                 $records["data"][] = [
@@ -189,7 +189,7 @@ class ReportsController extends Controller
                     $list['fnsku'],
                     $list['fulfillment_center_id'],
                     (string)$list['quantity'],
-                    array_get(FbaInventoryAdjustmentsReport::RESON,$list['reson']),
+                    array_get(FbaInventoryAdjustmentsReport::REASON,$list['reason']),
                     array_get(FbaInventoryAdjustmentsReport::DISPOSITION,$list['disposition']),
                     (string)$list['reconciled'],
                     (string)$list['unreconciled'],

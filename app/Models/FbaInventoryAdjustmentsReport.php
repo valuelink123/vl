@@ -15,7 +15,7 @@ class FbaInventoryAdjustmentsReport extends Model
         'CARRIER_DAMAGED'=>'产品破损（物流原因）',
         'EXPIRED'=>'产品过期',
     ];
-    const RESON = [
+    const REASON = [
         '6' => '物流原因',
         '7' => '产品过期',
         'E' => '其它',
@@ -34,7 +34,7 @@ class FbaInventoryAdjustmentsReport extends Model
         'Q' => '盘亏',
     ];
 
-    const RESONSEARCH = [
+    const REASONSEARCH = [
         '6' => '物流原因',
         '7' => '产品过期',
         'E' => '其它',
@@ -50,7 +50,7 @@ class FbaInventoryAdjustmentsReport extends Model
         'Q' => '盘亏',
     ];
 
-    const RESONSMATCH = [
+    const REASONMATCH = [
         '6' => ['6'],
         '7' => ['7'],
         'E' => ['E'],
