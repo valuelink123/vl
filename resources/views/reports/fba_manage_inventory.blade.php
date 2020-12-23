@@ -89,6 +89,11 @@ th,td,td>span {
                                     <th>SellerSku</th>
                                     <th>Fnsku</th>
                                     <th>Condition</th>
+                                    <th>Unit Value</th>
+                                    <th>AFN Fulfillable Value</th>
+                                    <th>AFN Warehouse Value</th>
+                                    <th>AFN Reserved Value</th>
+                                    <th>AFN Total Value</th>
                                     <th>MFN</th>
                                     <th>MFN Fulfillable</th>
                                     <th>AFN</th>
