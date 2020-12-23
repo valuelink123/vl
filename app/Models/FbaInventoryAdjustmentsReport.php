@@ -39,7 +39,6 @@ class FbaInventoryAdjustmentsReport extends Model
         '7' => '产品过期',
         'E' => '其它',
         'H' => '买家原因',
-        'K' => '其它',
         'U' => '卖家原因',
         'D' => '丢弃',
         'F' => '找到库存',
@@ -53,9 +52,8 @@ class FbaInventoryAdjustmentsReport extends Model
     const REASONMATCH = [
         '6' => ['6'],
         '7' => ['7'],
-        'E' => ['E'],
+        'E' => ['E','K'],
         'H' => ['H'],
-        'K' => ['K'],
         'U' => ['U'],
         'D' => ['D'],
         'F' => ['F','N'],
@@ -65,6 +63,13 @@ class FbaInventoryAdjustmentsReport extends Model
         'P' => ['P'],
         'Q' => ['Q'],
     ];
+
+    const STATE = [
+        'SELLABLE' => '可售',
+        'UNSELLABLE' => '不可售',
+    ];
+
+
 
     
 }

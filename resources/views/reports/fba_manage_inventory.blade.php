@@ -1,7 +1,8 @@
 @extends('layouts.layout')
-@section('label', 'Fba Inventory Adjustments Report')
+@section('label', 'Fba Manage Inventory')
 @section('content')
 <style type="text/css">
+
 th,td,td>span {
     font-size:12px !important;
     text-align:center;
@@ -18,29 +19,9 @@ th,td,td>span {
             <!-- BEGIN EXAMPLE TABLE PORTLET-->
             <div class="portlet light bordered">
                 <div class="table-toolbar">
-                    <form role="form" action="{{url('reports')}}" method="POST">
+                    <form id="update_form" action="{{url('reports')}}" method="POST">
                         {{ csrf_field() }}
                         <div class="row">
-                            <div class="col-md-2">
-                                <div class="input-group date date-picker margin-bottom-5" data-date-format="yyyy-mm-dd">
-                                    <input type="text" class="form-control" readonly name="adjusted_date_from" placeholder="DateFrom" value="">
-                                    <span class="input-group-btn">
-                                        <button class="btn  default" type="button">
-                                            <i class="fa fa-calendar"></i>
-                                        </button>
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="col-md-2">
-                                <div class="input-group date date-picker margin-bottom-5" data-date-format="yyyy-mm-dd">
-                                    <input type="text" class="form-control" readonly name="adjusted_date_to" placeholder="DateTo" value="">
-                                    <span class="input-group-btn">
-                                        <button class="btn default" type="button">
-                                            <i class="fa fa-calendar"></i>
-                                        </button>
-                                    </span>
-                                </div>
-                            </div>
                             <div class="col-md-2">
                             <select class="mt-multiselect btn btn-default " multiple="multiple" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" data-none-selected-text="Select Accounts" name="seller_account_id[]" id="seller_account_id[]">
                                 @foreach ($accounts_data as $id=>$name)
@@ -49,7 +30,7 @@ th,td,td>span {
                             </select>
                             </div>
                             <div class="col-md-2">
-                                <input type="text" class="form-control" name="transaction_item_id" placeholder="Transaction Item Id">  
+                                <input type="text" class="form-control" name="asin" placeholder="Asins">  
                             </div>
                             <div class="col-md-2">
                                 <input type="text" class="form-control" name="seller_sku" placeholder="Seller skus">  
@@ -57,30 +38,18 @@ th,td,td>span {
                             <div class="col-md-2">
                                 <input type="text" class="form-control" name="fnsku" placeholder="Fnskus">  
                             </div>
-                        </div>
-                        <div class="row">
                             <div class="col-md-2">
-                                <input type="text" class="form-control" name="fulfillment_center_id" placeholder="Fulfillment Center Id">  
-                            </div>
-                            <div class="col-md-2">
-                                <select class="form-control " name="fba_inventory_adjustments_report_state" id="fba_inventory_adjustments_report_state">
-                                    <option value="">Select State</option>
-                                    @foreach (App\Models\FbaInventoryAdjustmentsReport::STATE as $k=>$v)
-                                        <option value="{{$k}}">{{$v}}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        
-                            <div class="col-md-2">
-                                <select class="mt-multiselect btn btn-default " multiple="multiple" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" data-none-selected-text="Select Reason" name="reason[]" id="reason[]">
-                                    @foreach (App\Models\FbaInventoryAdjustmentsReport::REASONSEARCH as $k=>$v)
+                                <select class="form-control " name="mfn_listing_exists" id="mfn_listing_exists">
+                                    <option value="">MFN</option>
+                                    @foreach (App\Models\FbaManageInventory::LISTINGEXISTS as $k=>$v)
                                         <option value="{{$k}}">{{$v}}</option>
                                     @endforeach
                                 </select>
                             </div>
                             <div class="col-md-2">
-                                <select class="mt-multiselect btn btn-default " multiple="multiple" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" data-none-selected-text="Select Disposition" name="disposition[]" id="disposition[]">
-                                    @foreach (App\Models\FbaInventoryAdjustmentsReport::DISPOSITION as $k=>$v)
+                                <select class="form-control " name="afn_listing_exists" id="afn_listing_exists">
+                                    <option value="">AFN</option>
+                                    @foreach (App\Models\FbaManageInventory::LISTINGEXISTS as $k=>$v)
                                         <option value="{{$k}}">{{$v}}</option>
                                     @endforeach
                                 </select>
@@ -116,17 +85,25 @@ th,td,td>span {
                                         </label>
                                     </th>
                                     <th>Account</th>
-                                    <th>Adjusted Date</th>
-                                    <th>Transaction Item Id</th>
+                                    <th>Asin</th>
                                     <th>SellerSku</th>
                                     <th>Fnsku</th>
-                                    <th>Fulfillment Center Id</th>
-                                    <th>Quantity</th>
-                                    <th>Reason</th>
-                                    <th>State</th>
-                                    <th>Disposition</th>
-                                    <th>Reconciled</th>
-                                    <th>Unreconciled</th>
+                                    <th>Condition</th>
+                                    <th>MFN</th>
+                                    <th>MFN Fulfillable</th>
+                                    <th>AFN</th>
+                                    <th>AFN Warehouse</th>
+                                    <th>AFN Fulfillable</th>
+                                    <th>AFN Reserved</th>
+                                    <th>AFN Unsellable</th>
+                                    <th>Per Unit Volume</th>
+                                    <th>AFN Total</th>
+                                    <th>AFN Inbound Working</th>
+                                    <th>AFN Inbound Shipped</th>
+                                    <th>AFN Inbound Receiving</th>
+                                    <th>AFN Researching</th>
+                                    <th>AFN Reserved Future</th>
+                                    <th>AFN Future Buyable</th>
                                     <th>Updated At</th>
                                 </tr>
                             </thead>
@@ -144,20 +121,20 @@ th,td,td>span {
 <script>
     var TableDatatablesAjax = function () {
 
-        var initPickers = function () {
-            //init date pickers
-            $('.date-picker').datepicker({
-                rtl: App.isRTL(),
-                autoclose: true
-            });
-        }
+    var initPickers = function () {
+        //init date pickers
+        $('.date-picker').datepicker({
+            rtl: App.isRTL(),
+            autoclose: true
+        });
+    }
 
-        var initTable = function () {
-            $.ajaxSetup({
-                headers: { 'X-CSRF-TOKEN' : '{{ csrf_token() }}' }
-            });
-            var grid = new Datatable();
-        grid.setAjaxParam("type", 'fba_inventory_adjustments_report');
+    var initTable = function () {
+        $.ajaxSetup({
+            headers: { 'X-CSRF-TOKEN' : '{{ csrf_token() }}' }
+        });
+        var grid = new Datatable();
+        grid.setAjaxParam("type", 'fba_manage_inventory');
         grid.init({
             src: $("#datatable_ajax_report"),
             onSuccess: function (grid, response) {
@@ -184,28 +161,24 @@ th,td,td>span {
 
         $('#data_search').on('click',function(e){
             e.preventDefault();
-            grid.setAjaxParam("type", 'fba_inventory_adjustments_report');
-            grid.setAjaxParam("adjusted_date_from", $("input[name='adjusted_date_from']").val());
-            grid.setAjaxParam("adjusted_date_to", $("input[name='adjusted_date_to']").val());
-            grid.setAjaxParam("fulfillment_center_id", $("input[name='fulfillment_center_id']").val());
+            grid.setAjaxParam("type", 'fba_manage_inventory');
+            grid.setAjaxParam("asin", $("input[name='asin']").val());
             grid.setAjaxParam("seller_sku", $("input[name='seller_sku']").val());
             grid.setAjaxParam("seller_account_id", $("select[name='seller_account_id[]']").val());
             grid.setAjaxParam("fnsku", $("input[name='fnsku']").val());
-            grid.setAjaxParam("transaction_item_id", $("input[name='transaction_item_id']").val());
-            grid.setAjaxParam("disposition", $("select[name='disposition[]']").val());
-            grid.setAjaxParam("reason", $("select[name='reason[]']").val());
-            grid.setAjaxParam("state", $("select[name='state']").val());
+            grid.setAjaxParam("mfn_listing_exists", $("select[name='mfn_listing_exists']").val()); 
+            grid.setAjaxParam("afn_listing_exists", $("select[name='afn_listing_exists']").val());    
             grid.getDataTable().draw(false);
         });
 
         $("#select_export").click(function(){
             if (grid.getSelectedRowsCount() <= 0) return false;
-            var baseUrl ='/reports/get?type=fba_inventory_adjustments_report&action=export&id='+grid.getSelectedRows();
+            var baseUrl ='/reports/get?type=fba_manage_inventory&action=export&id='+grid.getSelectedRows();
             location.href =  baseUrl;
         });
 
         $("#current_export").click(function(){
-            var baseUrl ='/reports/get?type=fba_inventory_adjustments_report&action=export&'+ $('#update_form').serialize();
+            var baseUrl ='/reports/get?type=fba_manage_inventory&action=export&'+ $('#update_form').serialize();
             var dttable = $('#datatable_ajax_report').dataTable();
             var oSettings = dttable.fnSettings();
             baseUrl = baseUrl+'&offset='+oSettings._iDisplayStart;
@@ -214,32 +187,21 @@ th,td,td>span {
         });
 
         $("#all_export").click(function(){
-            var baseUrl ='/reports/get?type=fba_inventory_adjustments_report&action=export&'+ $('#update_form').serialize();
+            var baseUrl ='/reports/get?type=fba_manage_inventory&action=export&'+ $('#update_form').serialize();
             location.href =  baseUrl;
         });
 
     }
-
-
     return {
-
-        //main function to initiate the module
         init: function () {
             initPickers();
             initTable();
         }
-
     };
-
 }();
-
 $(function() {
     TableDatatablesAjax.init();
 });
-
-
 </script>
-
-
 @endsection
 

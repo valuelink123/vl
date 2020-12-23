@@ -750,6 +750,12 @@
                                                         <span class="arrow"></span>
                                                     </a>
                                                 </li>
+                                                <li class="">
+                                                    <a href="/reports?type=fba_manage_inventory" class="nav-link nav-toggle ">
+                                                        Fba Manage Inventory
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
 												@endpermission
                                             </ul>
                                         </li>

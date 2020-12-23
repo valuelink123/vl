@@ -99,6 +99,27 @@ class ReportsController extends Controller
             $datas = $datas->where('warehouse_condition_code',array_get($_REQUEST,'warehouse_condition_code'));
             $exportFileName.=array_get($_REQUEST,'warehouse_condition_code').'_';
         }
+        if(array_get($_REQUEST,'mfn_listing_exists')!==NULL && array_get($_REQUEST,'mfn_listing_exists')!==''){
+            $datas = $datas->where('mfn_listing_exists',array_get($_REQUEST,'mfn_listing_exists'));
+            $exportFileName.='MFN'.array_get($_REQUEST,'mfn_listing_exists').'_';
+        }
+        if(array_get($_REQUEST,'afn_listing_exists')!==NULL && array_get($_REQUEST,'afn_listing_exists')!==''){
+            $datas = $datas->where('afn_listing_exists',array_get($_REQUEST,'afn_listing_exists'));
+            $exportFileName.='AFN'.array_get($_REQUEST,'afn_listing_exists').'_';
+        }
+        if(array_get($_REQUEST,'fba_inventory_adjustments_report_state')){
+            $datas = $datas->where('warehouse_condition_code',array_get($_REQUEST,'warehouse_condition_code'));
+            $exportFileName.=array_get($_REQUEST,'warehouse_condition_code').'_';
+        }
+        if(array_get($_REQUEST,'fba_inventory_adjustments_report_state')!==NULL && array_get($_REQUEST,'fba_inventory_adjustments_report_state')!==''){
+            if(array_get($_REQUEST,'fba_inventory_adjustments_report_state')=='SELLABLE'){
+                $datas = $datas->where('disposition','SELLABLE');
+            }else{
+                $datas = $datas->where('disposition','<>','SELLABLE');
+            }
+            $exportFileName.=array_get($_REQUEST,'fba_inventory_adjustments_report_state').'_';
+        }
+
         if(array_get($_REQUEST,'reason')){
             $reason = [];
             foreach(array_get($_REQUEST,'reason') as $val){
@@ -139,7 +160,12 @@ class ReportsController extends Controller
                 ];
             }elseif($type  == 'fba_inventory_adjustments_report'){
                 $records["data"][] = [
-                    'Account','Adjusted Date','Transaction Item Id','SellerSku','Fnsku','Fulfillment Center Id','Quantity','Reason','Disposition','Reconciled','Unreconciled','Updated At'
+                    'Account','Adjusted Date','Transaction Item Id','SellerSku','Fnsku','Fulfillment Center Id','Quantity','Reason','State','Disposition','Reconciled','Unreconciled','Updated At'
+                ];
+            }elseif($type  == 'fba_manage_inventory'){
+                $records["data"][] = [
+                    'Account','Asin','SellerSku','Fnsku','Condition','MFN','MFN Fulfillable','AFN','AFN Warehouse','AFN Fulfillable','AFN Reserved','AFN Unsellable',
+                    'Per Unit Volume','AFN Total','AFN Inbound Working','AFN Inbound Shipped','AFN Inbound Receiving','AFN Researching','AFN Reserved Future','AFN Future Buyable','Updated At'
                 ];
             }else{
                 $records["data"][] = [
@@ -194,9 +220,34 @@ class ReportsController extends Controller
                     $list['fulfillment_center_id'],
                     (string)$list['quantity'],
                     array_get(FbaInventoryAdjustmentsReport::REASON,$list['reason']),
+                    array_get(FbaInventoryAdjustmentsReport::STATE,$list['disposition'],'不可售'),
                     array_get(FbaInventoryAdjustmentsReport::DISPOSITION,$list['disposition']),
                     (string)$list['reconciled'],
                     (string)$list['unreconciled'],
+                    $list['updated_at'],
+                );
+            }elseif($type  == 'fba_manage_inventory'){
+                $line = array(
+                    array_get($accounts_data,$list['seller_account_id']),
+                    $list['asin'],
+                    $list['seller_sku'],
+                    $list['fnsku'],
+                    $list['condition'],
+                    array_get(FbaManageInventory::LISTINGEXISTS,$list['mfn_listing_exists']),
+                    (string)$list['mfn_fulfillable_quantity'],
+                    array_get(FbaManageInventory::LISTINGEXISTS,$list['afn_listing_exists']),
+                    (string)$list['afn_warehouse_quantity'],
+                    (string)$list['afn_fulfillable_quantity'],
+                    (string)$list['afn_reserved_quantity'],
+                    (string)$list['afn_unsellable_quantity'],
+                    (string)$list['per_unit_volume'],
+                    (string)$list['afn_total_quantity'],
+                    (string)$list['afn_inbound_working_quantity'],
+                    (string)$list['afn_inbound_shipped_quantity'],
+                    (string)$list['afn_inbound_receiving_quantity'],
+                    (string)$list['afn_researching_quantity'],
+                    (string)$list['afn_reserved_future_supply'],
+                    (string)$list['afn_future_supply_buyable'],
                     $list['updated_at'],
                 );
             }else{
