@@ -8,6 +8,7 @@ use App\Models\FbaAmazonFulfilledInventoryReport;
 use App\Models\FbaDailyInventoryHistoryReport;
 use App\Models\FbaInventoryAdjustmentsReport;
 use App\Models\FbaMonthlyInventoryHistoryReport;
+use App\Models\FbaManageInventory;
 use Illuminate\Support\Facades\Auth;
 use PDO;
 use DB;
@@ -107,11 +108,8 @@ class ReportsController extends Controller
             $datas = $datas->where('afn_listing_exists',array_get($_REQUEST,'afn_listing_exists'));
             $exportFileName.='AFN'.array_get($_REQUEST,'afn_listing_exists').'_';
         }
+
         if(array_get($_REQUEST,'fba_inventory_adjustments_report_state')){
-            $datas = $datas->where('warehouse_condition_code',array_get($_REQUEST,'warehouse_condition_code'));
-            $exportFileName.=array_get($_REQUEST,'warehouse_condition_code').'_';
-        }
-        if(array_get($_REQUEST,'fba_inventory_adjustments_report_state')!==NULL && array_get($_REQUEST,'fba_inventory_adjustments_report_state')!==''){
             if(array_get($_REQUEST,'fba_inventory_adjustments_report_state')=='SELLABLE'){
                 $datas = $datas->where('disposition','SELLABLE');
             }else{
