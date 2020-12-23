@@ -47,7 +47,7 @@ class ReportsController extends Controller
         $type = $request->input('type');
         if(!$type) $type = 'fba_amazon_fulfilled_inventory_report';
         $exportFileName = '';
-        $table = $tpye;
+        $table = $type;
         if($table =='fba_manage_inventory'){
             $table='view_fba_manage_inventory';
         }
