@@ -194,7 +194,7 @@ th,td,td>span {
             grid.setAjaxParam("transaction_item_id", $("input[name='transaction_item_id']").val());
             grid.setAjaxParam("disposition", $("select[name='disposition[]']").val());
             grid.setAjaxParam("reason", $("select[name='reason[]']").val());
-            grid.setAjaxParam("state", $("select[name='state']").val());
+            grid.setAjaxParam("fba_inventory_adjustments_report_state", $("select[name='fba_inventory_adjustments_report_state']").val());
             grid.getDataTable().draw(false);
         });
 
