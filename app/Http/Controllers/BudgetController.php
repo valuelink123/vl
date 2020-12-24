@@ -480,7 +480,7 @@ right join budget_skus as c on b.sku=c.sku and b.site=c.site where ((a.month>='"
 		}
 		$data['showtype'] = $showtype;
 		$data['base_data']= $budget->toArray();
-		$data['rate']= array_get(DB::table('cur_rate')->pluck('rate','cur'),$cur,0);
+		$data['rate']= array_get(DB::connection('amazon')->table('currency_rates')->pluck('rate','currency'),$cur,0);
 		
 		$data['site_code'] = strtoupper(substr($site,-2));
 		if($data['site_code']=='OM') $data['site_code']='US';
