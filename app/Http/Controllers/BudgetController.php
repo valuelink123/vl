@@ -122,11 +122,11 @@ class BudgetController extends Controller
 		}
 		if($sku){
 			$search_skus = explode(',', $sku);
-			$where.= " and ( sku='".$sku."' ";
+			$add_sku_where = [];
 			foreach($search_skus as $search_sku){
-				$where.= " or sku='".$search_sku."'";
+				$add_sku_where[]= "sku='".$search_sku."'";
 			}
-			$where.= ")";
+			$where.= " and ( " .implode(' or ',$add_sku_where)." ) ";
 		}
 		
 		$table_from = "select a.sku,a.site,a.id,a.status,a.remark,b.* from budgets as a left join (select budget_id,sum(qty+promote_qty) as qty,sum(income) as income,sum(cost) as cost,sum(common_fee) as common_fee,sum(pick_fee) as pick_fee,sum(promotion_fee) as promotion_fee,sum(amount_fee) as amount_fee,sum(storage_fee) as storage_fee from budget_details
