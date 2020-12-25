@@ -60,12 +60,12 @@ class BudgetController extends Controller
 	    $default_year_to = ($now_quarter==1)?($nowYear-1).'Ver4':$nowYear.'Ver'.($now_quarter-1);
 
 	    $year_from = $request->get('year_from')?$request->get('year_from'):$default_year_from;
-	    $year_to = $request->get('year_to')?$request->get('year_to'):$default_year_to;
+		$year_to = $request->get('year_to')?$request->get('year_to'):$default_year_to;
+		$year_current = $request->get('year_current')?$request->get('year_current'):date('Y');
 	    $year_from_arr = explode('Ver', $year_from);
 	    $year_to_arr = explode('Ver', $year_to);
-	    $quarter_from = $request->get('quarter_from');
-	    if(!$quarter_from) $quarter_from = [$now_quarter];
-	    if($quarter_from){
+	    $quarter_from = $request->get('quarter_from')??[1,2,3,4];
+	    if(count($quarter_from)<4){
 	    	$date_add_from = '( 1=2';
 	    	foreach($quarter_from as $k=>$v){
 	    		$date_add_from.=" or (date between '".$year_from_arr[0]."-".sprintf("%02d",(($v-1)*3+1))."-01' and '".$year_from_arr[0]."-".sprintf("%02d",($v*3))."-31')";	
@@ -75,16 +75,27 @@ class BudgetController extends Controller
 			$date_add_from = " date between '".$year_from_arr[0]."-01-01' and '".$year_from_arr[0]."-12-31' ";
 		}
 		
-		$quarter_to = $request->get('quarter_to');
-		if(!$quarter_to) $quarter_to = [$now_quarter];
-		if($quarter_to){
+		$quarter_to = $request->get('quarter_to')??[1,2,3,4];
+		if(count($quarter_to)<4){
 	    	$date_add_to = ' (1=2';
-	    	foreach($quarter_from as $k=>$v){
+	    	foreach($quarter_to as $k=>$v){
 	    		$date_add_to.=" or (date between '".$year_to_arr[0]."-".sprintf("%02d",(($v-1)*3+1))."-01' and '".$year_to_arr[0]."-".sprintf("%02d",($v*3))."-31') ";	
 	    	}
 	    	$date_add_to.=')';
 		}else{
 			$date_add_to = " date between '".$year_to_arr[0]."-01-01' and '".$year_to_arr[0]."-12-31' ";
+		}
+
+
+		$quarter_current = $request->get('quarter_current')??[1,2,3,4];
+		if(count($quarter_current)<4){
+	    	$date_add_current = ' (1=2';
+	    	foreach($quarter_current as $k=>$v){
+	    		$date_add_current.=" or (date between '".$year_current."-".sprintf("%02d",(($v-1)*3+1))."-01' and '".$year_current."-".sprintf("%02d",($v*3))."-31') ";	
+	    	}
+	    	$date_add_current.=')';
+		}else{
+			$date_add_current = " date between '".$year_current."-01-01' and '".$year_current."-12-31' ";
 		}
 
 		$user_id = $request->get('user_id');
@@ -136,7 +147,7 @@ where ".$date_add_from." group by budget_id) as b on a.id=b.budget_id where a.ye
 where ".$date_add_to." group by budget_id) as b on a.id=b.budget_id where a.year=".$year_to_arr[0]." and a.quarter=".$year_to_arr[1]." and a.status>0";
 
 		$table_current = "select sku,site,sum(sales) as qty,sum(amount) as income,sum((cost+tax+headshipfee)*sales) as cost,-1*sum(commission) as common_fee,-1*sum(fulfillmentfee) as pick_fee,sum(deal+cpc+coupon) as promotion_fee,
-sum(amount_used) as amount_fee, sum(fba_storage+fbm_storage) as storage_fee from skus_daily_info where ".$date_add_from." group by  sku,site";
+sum(amount_used) as amount_fee, sum(fba_storage+fbm_storage) as storage_fee from skus_daily_info where ".$date_add_current." group by  sku,site";
 		
 		
 		$sql = "(
@@ -174,10 +185,11 @@ sum(amount_used) as amount_fee, sum(fba_storage+fbm_storage) as storage_fee from
 		$data['quarter']=$year_from_arr[1];
 		$data['year_from']=$year_from;
 		$data['year_to']=$year_to;
+		$data['year_current']=$year_current;
 
 		$data['quarter_from']=$quarter_from;
 		$data['quarter_to']=$quarter_to;
-
+		$data['quarter_current']=$quarter_current;
 		$data['datas']= $datas;
 		$data['finish']= $finish;
 		$data['sum']= $sum;

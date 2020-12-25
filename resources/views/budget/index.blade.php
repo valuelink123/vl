@@ -191,9 +191,24 @@ white-space: nowrap;
 						
 						
 						 <div class="row" style="margin-top:20px;">
-						
-						
-						
+						 	<div class="col-md-2">
+                                <div class="input-group date date-picker margin-bottom-5" data-date-format="yyyy">
+                                    <input type="text" class="form-control" readonly name="year_current"  value="{{array_get($_REQUEST,'year_current')??date('Y')}}">
+                                    <span class="input-group-btn">
+                                        <button class="btn  default" type="button">
+                                            <i class="fa fa-calendar"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                            </div>
+
+							<div class="col-md-2">
+								<select class="mt-multiselect btn btn-default " multiple="multiple" data-label="left" data-width="100%" data-action-onchange="true"  name="quarter_current[]" id="quarter_current[]">
+								@foreach ($quarters_arr as $v)
+									<option value="{{$v}}" <?php if(in_array($v,$quarter_current)) echo 'selected'; ?>>Quarter{{$v}}</option>
+								@endforeach
+								</select>
+							</div>
 						
 						
 						
@@ -292,13 +307,15 @@ white-space: nowrap;
 						<td rowspan="2" width="3%">等级</td>
 						<td rowspan="2" width="5%">期初库存</td>
 						<td colspan="4" width="20%">{{$year_from}}预算   
-							<span class="badge badge-danger" id="ToggleCompare" style="cursor: pointer;">切换环比 预算/实际</span>
+							<span class="badge badge-danger" id="ToggleCompare" style="cursor: pointer;">切换环比 实际/预算</span>
 						</td>
-						<td colspan="4" width="20%" class="showCompare">{{$year_to.'预算'}}</td>
-						<td colspan="4" width="20%" class="showCompare">环比</td>
+						<td colspan="4" width="20%" class="showCurrent">实际完成</td>
+						<td colspan="4" width="20%" class="showCurrent">环比</td>
 
-						<td colspan="4" width="20%" class="showCurrent" style="display: none;">实际完成</td>
-						<td colspan="4" width="20%" class="showCurrent" style="display: none;">环比</td>
+						<td colspan="4" width="20%" class="showCompare" style="display: none;">{{$year_to.'预算'}}</td>
+						<td colspan="4" width="20%" class="showCompare" style="display: none;">环比</td>
+
+						
 						<td rowspan="2" width="6%">状态</td>
 					  </tr>
 					  <tr class="head" >
@@ -307,25 +324,27 @@ white-space: nowrap;
 						<td width="5%">利润率</td>
 						<td width="5%">经济效益</td>
 
-						<td width="5%" class="showCompare">销量</td>
-						<td width="5%" class="showCompare">销售额</td>
-						<td width="5%" class="showCompare">利润率</td>
-						<td width="5%" class="showCompare">经济效益</td>
+						<td width="5%" class="showCurrent">销量</td>
+						<td width="5%" class="showCurrent">销售额</td>
+						<td width="5%" class="showCurrent">利润率</td>
+						<td width="5%" class="showCurrent">经济效益</td>
 
-						<td width="5%" class="showCompare">销量</td>
-						<td width="5%" class="showCompare">销售额</td>
-						<td width="5%" class="showCompare">利润率</td>
-						<td width="5%" class="showCompare">经济效益</td>
+						<td width="5%" class="showCurrent">销量</td>
+						<td width="5%" class="showCurrent">销售额</td>
+						<td width="5%" class="showCurrent">利润率</td>
+						<td width="5%" class="showCurrent">经济效益</td>
 
-						<td width="5%" class="showCurrent" style="display: none;">销量</td>
-						<td width="5%" class="showCurrent" style="display: none;">销售额</td>
-						<td width="5%" class="showCurrent" style="display: none;">利润率</td>
-						<td width="5%" class="showCurrent" style="display: none;">经济效益</td>
+						<td width="5%" class="showCompare" style="display: none;">销量</td>
+						<td width="5%" class="showCompare" style="display: none;">销售额</td>
+						<td width="5%" class="showCompare" style="display: none;">利润率</td>
+						<td width="5%" class="showCompare" style="display: none;">经济效益</td>
 
-						<td width="5%" class="showCurrent" style="display: none;">销量</td>
-						<td width="5%" class="showCurrent" style="display: none;">销售额</td>
-						<td width="5%" class="showCurrent" style="display: none;">利润率</td>
-						<td width="5%" class="showCurrent" style="display: none;">经济效益</td>
+						<td width="5%" class="showCompare" style="display: none;">销量</td>
+						<td width="5%" class="showCompare" style="display: none;">销售额</td>
+						<td width="5%" class="showCompare" style="display: none;">利润率</td>
+						<td width="5%" class="showCompare" style="display: none;">经济效益</td>
+
+						
 
 					  </tr>
 					  </thead>
@@ -360,23 +379,27 @@ white-space: nowrap;
 						<td>{{$data->amount1}}</td>
 						<td>{{($data->amount1==0)?0:round($data->economic1/$data->amount1,4)*100}}%</td>
 						<td>{{$data->economic1}}</td>
-						<td class="showCompare">{{$data->qty2}}</td>
-						<td class="showCompare">{{$data->amount2}}</td>
-						<td class="showCompare">{{($data->amount2==0)?0:round($data->economic2/$data->amount2,4)*100}}%</td>
-						<td class="showCompare">{{$data->economic2}}</td>
-						<td class="showCompare"><span class="{{($qty_z>0)?'red':'green'}}">{{$qty_z}}</span></td>
-						<td class="showCompare"><span class="{{($amount_z>0)?'red':'green'}}">{{round($amount_z,2)}}</span></td>
-						<td class="showCompare"><span class="{{($profit_z>0)?'red':'green'}}">{{round($profit_z,2)}}%</span></td>
-						<td class="showCompare"><span class="{{($economic_z>0)?'red':'green'}}">{{round($economic_z,2)}}</span></td>
 
-						<td class="showCurrent" style="display: none;">{{$data->qty3}}</td>
-						<td class="showCurrent" style="display: none;">{{$data->amount3}}</td>
-						<td class="showCurrent" style="display: none;">{{($data->amount3==0)?0:round($data->economic3/$data->amount3,4)*100}}%</td>
-						<td class="showCurrent" style="display: none;">{{$data->economic3}}</td>
-						<td class="showCurrent" style="display: none;"><span class="{{($qty_c>0)?'red':'green'}}">{{$qty_c}}</span></td>
-						<td class="showCurrent" style="display: none;"><span class="{{($amount_c>0)?'red':'green'}}">{{round($amount_c,2)}}</span></td>
-						<td class="showCurrent" style="display: none;"><span class="{{($profit_c>0)?'red':'green'}}">{{round($profit_c,2)}}%</span></td>
-						<td class="showCurrent" style="display: none;"><span class="{{($economic_c>0)?'red':'green'}}">{{round($economic_c,2)}}</span></td>
+						<td class="showCurrent">{{$data->qty3}}</td>
+						<td class="showCurrent">{{$data->amount3}}</td>
+						<td class="showCurrent">{{($data->amount3==0)?0:round($data->economic3/$data->amount3,4)*100}}%</td>
+						<td class="showCurrent">{{$data->economic3}}</td>
+						<td class="showCurrent"><span class="{{($qty_c>0)?'red':'green'}}">{{$qty_c}}</span></td>
+						<td class="showCurrent"><span class="{{($amount_c>0)?'red':'green'}}">{{round($amount_c,2)}}</span></td>
+						<td class="showCurrent"><span class="{{($profit_c>0)?'red':'green'}}">{{round($profit_c,2)}}%</span></td>
+						<td class="showCurrent"><span class="{{($economic_c>0)?'red':'green'}}">{{round($economic_c,2)}}</span></td>
+
+
+						<td class="showCompare" style="display: none;">{{$data->qty2}}</td>
+						<td class="showCompare" style="display: none;">{{$data->amount2}}</td>
+						<td class="showCompare" style="display: none;">{{($data->amount2==0)?0:round($data->economic2/$data->amount2,4)*100}}%</td>
+						<td class="showCompare" style="display: none;">{{$data->economic2}}</td>
+						<td class="showCompare" style="display: none;"><span class="{{($qty_z>0)?'red':'green'}}">{{$qty_z}}</span></td>
+						<td class="showCompare" style="display: none;"><span class="{{($amount_z>0)?'red':'green'}}">{{round($amount_z,2)}}</span></td>
+						<td class="showCompare" style="display: none;"><span class="{{($profit_z>0)?'red':'green'}}">{{round($profit_z,2)}}%</span></td>
+						<td class="showCompare" style="display: none;"><span class="{{($economic_z>0)?'red':'green'}}">{{round($economic_z,2)}}</span></td>
+
+						
 	
 						<td><a href="{{url('/budgets/edit?sku='.$data->sku.'&site='.$data->site.'&year='.$year.'&quarter='.$quarter)}}">{{array_get(getBudgetStageArr(),($data->budget_status)??0)}}</a></td>
 					  </tr>
@@ -389,23 +412,27 @@ white-space: nowrap;
 						<td>{{$sum->amount1}}</td>
 						<td>{{($sum->amount1==0)?0:round($sum->economic1/$sum->amount1,4)*100}}%</td>
 						<td>{{$sum->economic1}}</td>
-						<td class="showCompare">{{$sum->qty2}}</td>
-						<td class="showCompare">{{$sum->amount2}}</td>
-						<td class="showCompare">{{($sum->amount2==0)?0:round($sum->economic2/$sum->amount2,4)*100}}%</td>
-						<td class="showCompare">{{$sum->economic2}}</td>
-						<td class="showCompare"><span class="{{($sum->qty1-$sum->qty2>0)?'red':'green'}}">{{$sum->qty1-$sum->qty2}}</span></td>
-						<td class="showCompare"><span class="{{($sum->amount1-$sum->amount2>0)?'red':'green'}}">{{round($sum->amount1-$sum->amount2,2)}}</span></td>
-						<td class="showCompare"><span class="{{((($sum->amount1==0)?0:round($sum->economic1/$sum->amount1,4)*100)-(($sum->amount2==0)?0:round($sum->economic2/$sum->amount2,4)*100)>0)?'red':'green'}}">{{(($sum->amount1==0)?0:round($sum->economic1/$sum->amount1,4)*100)-(($sum->amount2==0)?0:round($sum->economic2/$sum->amount2,4)*100)}}%</span></td>
-						<td class="showCompare"><span class="{{($sum->economic1-$sum->economic2>0)?'red':'green'}}">{{round($sum->economic1-$sum->economic2,2)}}</span></td>
 
-						<td class="showCurrent" style="display: none;">{{$sum->qty3}}</td>
-						<td class="showCurrent" style="display: none;">{{$sum->amount3}}</td>
-						<td class="showCurrent" style="display: none;">{{($sum->amount3==0)?0:round($sum->economic3/$sum->amount3,4)*100}}%</td>
-						<td class="showCurrent" style="display: none;">{{$sum->economic3}}</td>
-						<td class="showCurrent" style="display: none;"><span class="{{($sum->qty1-$sum->qty3>0)?'red':'green'}}">{{$sum->qty1-$sum->qty3}}</span></td>
-						<td class="showCurrent" style="display: none;"><span class="{{($sum->amount1-$sum->amount3>0)?'red':'green'}}">{{round($sum->amount1-$sum->amount3,2)}}</span></td>
-						<td class="showCurrent" style="display: none;"><span class="{{((($sum->amount1==0)?0:round($sum->economic1/$sum->amount1,4)*100)-(($sum->amount3==0)?0:round($sum->economic3/$sum->amount3,4)*100)>0)?'red':'green'}}">{{(($sum->amount1==0)?0:round($sum->economic1/$sum->amount1,4)*100)-(($sum->amount3==0)?0:round($sum->economic3/$sum->amount3,4)*100)}}%</span></td>
-						<td class="showCurrent" style="display: none;"><span class="{{($sum->economic1-$sum->economic3>0)?'red':'green'}}">{{round($sum->economic1-$sum->economic3,2)}}</span></td>
+						<td class="showCurrent">{{$sum->qty3}}</td>
+						<td class="showCurrent">{{$sum->amount3}}</td>
+						<td class="showCurrent">{{($sum->amount3==0)?0:round($sum->economic3/$sum->amount3,4)*100}}%</td>
+						<td class="showCurrent">{{$sum->economic3}}</td>
+						<td class="showCurrent"><span class="{{($sum->qty1-$sum->qty3>0)?'red':'green'}}">{{$sum->qty1-$sum->qty3}}</span></td>
+						<td class="showCurrent"><span class="{{($sum->amount1-$sum->amount3>0)?'red':'green'}}">{{round($sum->amount1-$sum->amount3,2)}}</span></td>
+						<td class="showCurrent"><span class="{{((($sum->amount1==0)?0:round($sum->economic1/$sum->amount1,4)*100)-(($sum->amount3==0)?0:round($sum->economic3/$sum->amount3,4)*100)>0)?'red':'green'}}">{{(($sum->amount1==0)?0:round($sum->economic1/$sum->amount1,4)*100)-(($sum->amount3==0)?0:round($sum->economic3/$sum->amount3,4)*100)}}%</span></td>
+						<td class="showCurrent"><span class="{{($sum->economic1-$sum->economic3>0)?'red':'green'}}">{{round($sum->economic1-$sum->economic3,2)}}</span></td>
+
+
+						<td class="showCompare" style="display: none;">{{$sum->qty2}}</td>
+						<td class="showCompare" style="display: none;">{{$sum->amount2}}</td>
+						<td class="showCompare" style="display: none;">{{($sum->amount2==0)?0:round($sum->economic2/$sum->amount2,4)*100}}%</td>
+						<td class="showCompare" style="display: none;">{{$sum->economic2}}</td>
+						<td class="showCompare" style="display: none;"><span class="{{($sum->qty1-$sum->qty2>0)?'red':'green'}}">{{$sum->qty1-$sum->qty2}}</span></td>
+						<td class="showCompare" style="display: none;"><span class="{{($sum->amount1-$sum->amount2>0)?'red':'green'}}">{{round($sum->amount1-$sum->amount2,2)}}</span></td>
+						<td class="showCompare" style="display: none;"><span class="{{((($sum->amount1==0)?0:round($sum->economic1/$sum->amount1,4)*100)-(($sum->amount2==0)?0:round($sum->economic2/$sum->amount2,4)*100)>0)?'red':'green'}}">{{(($sum->amount1==0)?0:round($sum->economic1/$sum->amount1,4)*100)-(($sum->amount2==0)?0:round($sum->economic2/$sum->amount2,4)*100)}}%</span></td>
+						<td class="showCompare" style="display: none;"><span class="{{($sum->economic1-$sum->economic2>0)?'red':'green'}}">{{round($sum->economic1-$sum->economic2,2)}}</span></td>
+
+						
 	
 						<td></td>
 					  </tr>
@@ -442,7 +469,10 @@ white-space: nowrap;
 jQuery(document).ready(function() {
 	$('.date-picker').datepicker({
 		rtl: App.isRTL(),
-		orientation: 'bottom',
+		format: 'yyyy',         
+		startView:2,    
+		maxViewMode: 2,
+		minViewMode:2,    
 		autoclose: true
 	});
 	$('#ToggleCompare').click(function(){
