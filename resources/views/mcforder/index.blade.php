@@ -9,18 +9,35 @@
             <!-- BEGIN EXAMPLE TABLE PORTLET-->
             <div class="portlet light bordered">
                 <div class="portlet-body">
+                    @permission('mcforders-report')
+                    <div class="table-toolbar" id="thetabletoolbar">
+                        <div class="row">
+                            <div class="col-md-1" style="float:right;">
+                                <div class="btn-group ">
+                                    <button id="vl_list_export" class="btn sbold blue"> Export
+                                        <i class="fa fa-download"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @endpermission
 
                     <div class="table-container">
-
                         <table class="table table-striped table-bordered table-hover" id="datatable_ajax_customer">
                             <thead>
                             <tr role="row" class="heading">
                                 <th width="15%"> Order Date </th>
                                 <th width="10%"> Account </th>
+                                <th width="10%"> Asin </th>
+                                <th width="10%"> Sku </th>
                                 <th width="15%"> Order Id </th>
                                 <th width="15%"> Name </th>
 								<th width="10%"> Country </th>
                                 <th width="10%"> Status </th>
+                                <th width="10%"> BG </th>
+                                <th width="10%"> BU </th>
+                                <th width="10%"> Seller </th>
 								<th width="15%"> Last Update </th>
                                 <th width="10%"> Action </th>
                             </tr>
@@ -46,19 +63,21 @@
                                 <td>
                                     <select name="sellerid" class="form-control form-filter input-sm">
 											<option value="">Select Account</option>
-										   <?php 
-											foreach($accounts as $k=>$v){ 	
+										   <?php
+											foreach($accounts as $k=>$v){
 												echo '<option value="'.$k.'">'.$v.'</option>';
 											}?>
 										</select>
                                 </td>
+                                <td></td>
+                                <td></td>
                                 <td>
                                     <input type="text" class="form-control form-filter input-sm" name="order_id">
                                 </td>
                                 <td>
                                     <input type="text" class="form-control form-filter input-sm" name="name">
                                 </td>
-                                
+
 								<td>
                                     <select name="country" class="form-control form-filter input-sm">
                                         <option value="">Select Country</option>
@@ -71,12 +90,15 @@
                                 <td>
          							<select name="status" class="form-control form-filter input-sm">
 											<option value="">Select Status</option>
-										   <?php 
-											foreach(getMcfOrderStatus() as $k){ 	
+										   <?php
+											foreach(getMcfOrderStatus() as $k){
 												echo '<option value="'.$k.'">'.$k.'</option>';
 											}?>
-										</select>	
+										</select>
                                 </td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
 								<td></td>
                                 <td>
                                     <div class="margin-bottom-5">
@@ -158,7 +180,7 @@
                 }
             });
 
-            
+
             //alert($("select[name='status']").val());
             //grid.setAjaxParam("customActionType", "group_action");
             grid.setAjaxParam("order_id", $("input[name='order_id']").val());
@@ -187,6 +209,17 @@
 $(function() {
     TableDatatablesAjax.init();
 });
+    $("#vl_list_export").click(function(){
+        var order_id = $("input[name='order_id']").val();
+        var name = $("input[name='name']").val();
+        var date_from = $("input[name='date_from']").val();
+        var date_to = $("input[name='date_to']").val();
+        var sellerid = $("select[name='sellerid']").val();
+        var country = $("select[name='country']").val();
+        var status = $("select[name='status']").val();
+
+        location.href='/mcforderExport?order_id='+order_id+'&name='+name+'&date_from='+date_from+'&date_to='+date_to+'&sellerid='+sellerid+'&country='+country+'&status='+status;
+    });
 
 
 </script>
