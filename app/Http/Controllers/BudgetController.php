@@ -254,11 +254,11 @@ sum(amount_used) as amount_fee, sum(fba_storage+fbm_storage) as storage_fee from
 		}
 		if($sku){
 			$search_skus = explode(',', $sku);
-			$where.= " and ( sku='".$sku."' ";
+			$add_sku_where = [];
 			foreach($search_skus as $search_sku){
-				$where.= " or sku='".trim($search_sku)."'";
+				$add_sku_where[]= "c.sku='".$search_sku."'";
 			}
-			$where.= ")";
+			$where.= " and ( " .implode(' or ',$add_sku_where)." ) ";
 		}
  		$datas = DB::select("select c.id,b.remark,a.month,c.bg,c.bu,c.sku,c.description,c.sap_seller_id,c.status,c.level,c.site,c.stock,c.cost as sku_cost,c.exception,(a.qty+a.promote_qty) as qty,a.income,a.cost,
 a.common_fee,a.pick_fee,a.promotion_fee,a.storage_fee,a.amount_fee,b.status as budget_status from (select budget_id,date_format(date,'%Y%m') as month,
