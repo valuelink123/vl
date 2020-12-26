@@ -149,15 +149,15 @@ class McforderController extends Controller
             $records["data"][] = array(
                 $list['displayable_order_date_time'],
 				array_get($accounts,$list['seller_account_id']),
-                $asin ? $asin : '-',
-                $sku ? $sku : '-',
+                // $asin ? $asin : '-',
+                // $sku ? $sku : '-',
 				$list['seller_fulfillment_order_id'],
 				$list['name'],
 				$list['country_code'],
 				$list['fulfillment_order_status'],
-                $bg ? $bg : '-',
-                $bu ? $bu : '-',
-                $seller ? $seller : '-',
+                // $bg ? $bg : '-',
+                // $bu ? $bu : '-',
+                // $seller ? $seller : '-',
 				$list['status_updated_date_time'],
 				'<a href="/mcforder/'.$list['id'].'" target="_blank">
 					<button type="submit" class="btn btn-success btn-xs">View</button>
@@ -222,15 +222,15 @@ class McforderController extends Controller
         //表头
         $headArray[] = 'Order Date';
         $headArray[] = 'Account';
-        $headArray[] = 'Asin';
-        $headArray[] = 'Sku';
+        // $headArray[] = 'Asin';
+        // $headArray[] = 'Sku';
         $headArray[] = 'Order Id';
         $headArray[] = 'Name';
         $headArray[] = 'Country';
         $headArray[] = 'Status';
-        $headArray[] = 'BG';
-        $headArray[] = 'BU';
-        $headArray[] = 'Seller';
+        // $headArray[] = 'BG';
+        // $headArray[] = 'BU';
+        // $headArray[] = 'Seller';
         $headArray[] = 'Last Update';
 
         $arrayData[] = $headArray;
@@ -254,15 +254,15 @@ class McforderController extends Controller
             $arrayData[] = array(
                 $list['displayable_order_date_time'],
                 array_get($accounts,$list['seller_account_id']),
-                $asin ? $asin : '-',
-                $sku ? $sku : '-',
+                // $asin ? $asin : '-',
+                // $sku ? $sku : '-',
                 $list['seller_fulfillment_order_id'],
                 $list['name'],
                 $list['country_code'],
                 $list['fulfillment_order_status'],
-                $bg ? $bg : '-',
-                $bu ? $bu : '-',
-                $seller ? $seller : '-',
+                // $bg ? $bg : '-',
+                // $bu ? $bu : '-',
+                // $seller ? $seller : '-',
                 $list['status_updated_date_time'],
             );
         }

@@ -29,15 +29,15 @@
                             <tr role="row" class="heading">
                                 <th width="15%"> Order Date </th>
                                 <th width="10%"> Account </th>
-                                <th width="10%"> Asin </th>
-                                <th width="10%"> Sku </th>
+                                <!-- <th width="10%"> Asin </th> -->
+                                <!-- <th width="10%"> Sku </th> -->
                                 <th width="15%"> Order Id </th>
                                 <th width="15%"> Name </th>
 								<th width="10%"> Country </th>
                                 <th width="10%"> Status </th>
-                                <th width="10%"> BG </th>
-                                <th width="10%"> BU </th>
-                                <th width="10%"> Seller </th>
+                                <!-- <th width="10%"> BG </th> -->
+                                <!-- <th width="10%"> BU </th> -->
+                                <!-- <th width="10%"> Seller </th> -->
 								<th width="15%"> Last Update </th>
                                 <th width="10%"> Action </th>
                             </tr>
@@ -69,8 +69,8 @@
 											}?>
 										</select>
                                 </td>
-                                <td></td>
-                                <td></td>
+                                <!-- <td></td>
+                                <td></td> -->
                                 <td>
                                     <input type="text" class="form-control form-filter input-sm" name="order_id">
                                 </td>
@@ -97,9 +97,9 @@
 										</select>
                                 </td>
                                 <td></td>
+                               <!--  <td></td>
                                 <td></td>
-                                <td></td>
-								<td></td>
+								<td></td> -->
                                 <td>
                                     <div class="margin-bottom-5">
                                         <button class="btn btn-sm green btn-outline filter-submit margin-bottom">
