@@ -256,7 +256,7 @@ sum(amount_used) as amount_fee, sum(fba_storage+fbm_storage) as storage_fee from
 			$search_skus = explode(',', $sku);
 			$add_sku_where = [];
 			foreach($search_skus as $search_sku){
-				$add_sku_where[]= "c.sku='".$search_sku."'";
+				$add_sku_where[]= "b.sku='".$search_sku."'";
 			}
 			$where.= " and ( " .implode(' or ',$add_sku_where)." ) ";
 		}
@@ -300,7 +300,7 @@ right join budget_skus as c on b.sku=c.sku and b.site=c.site where ((a.month>='"
 				$arrayData[$data->id][1] = $data->sku;
 				$arrayData[$data->id][2] = $data->description;
 				$arrayData[$data->id][3] = array_get($sap_sellers,$data->sap_seller_id,$data->sap_seller_id);
-				$arrayData[$data->id][4] = $data->status;
+				$arrayData[$data->id][4] = array_get(getSkuStatuses(),$data->status,$data->status);
 				$arrayData[$data->id][5] = $data->site;
 				$arrayData[$data->id][6] = $data->stock;
 				$arrayData[$data->id][7] = $data->sku_cost;
