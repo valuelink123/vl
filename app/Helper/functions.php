@@ -28,7 +28,7 @@ function getSkuStatuses(){
         '5'=>'待定',
         '6'=>'停售',
         '99'=>'新品规划'
-    );    
+    );
 }
 
 function getStockStatus(){
@@ -55,10 +55,10 @@ function getBudgetQuarter(){
         if($i<$nowYear){
             $quarter = 4;
         }else{
-            $quarter = $now_quarter;     
+            $quarter = $now_quarter;
         }
         for($m=1;$m<=$quarter;$m++){
-           $budget_quarter[]=$i.'Ver'.$m;     
+           $budget_quarter[]=$i.'Ver'.$m;
         }
     }
     return $budget_quarter;
@@ -144,7 +144,7 @@ function getUserGroupDetails(){
 		$groups[$k]['users'] = $group_users;
 		$users+=$group_users;
 	}
-	
+
 	return ['groups'=>$groups,'users'=>$users];
 }
 function getAsinSites(){
@@ -394,12 +394,12 @@ function html2text($str){
 }
 
 function textimage($content){
-	$pattern="/<[img|IMG].*?src=[\'|\"](.*?(?:[\.gif|\.jpg|\.png]))[\'|\"].*?[\/]?>/";  
-	preg_match_all($pattern,$content,$matchContent);  
-	if(isset($matchContent[1][0])){  
-		$temp=$matchContent[1][0];  
-	}else{  
-		$temp="./assets/layouts/layout/img/01.jpg";//在相应位置放置一张命名为no-image的jpg图片  
+	$pattern="/<[img|IMG].*?src=[\'|\"](.*?(?:[\.gif|\.jpg|\.png]))[\'|\"].*?[\/]?>/";
+	preg_match_all($pattern,$content,$matchContent);
+	if(isset($matchContent[1][0])){
+		$temp=$matchContent[1][0];
+	}else{
+		$temp="./assets/layouts/layout/img/01.jpg";//在相应位置放置一张命名为no-image的jpg图片
 	}
 	return $temp;
 }
@@ -419,7 +419,7 @@ function getSapNumber($str,$decimal=2){
 			return round($str,$decimal);
 		}
 	}
-	
+
 }
 
 function getComparisonSymbol(){
@@ -553,7 +553,7 @@ function getMarketplaceCode(){
 			'country_code'=>'CA',
 			'currency_code'=>'CAD'
 		),
-		
+
 		'A1PA6795UKMFR9'=>array(
 			'fba_factory_warehouse'=>array(
 				'0'=>array('sap_factory_code'=>'GR01','sap_warehouse_code'=>'AG2')
@@ -566,7 +566,7 @@ function getMarketplaceCode(){
 			'country_code'=>'DE',
 			'currency_code'=>'EUR'
 		),
-		
+
 		'A1RKKUPIHCS9HS'=>array(
 			'fba_factory_warehouse'=>array(
 				'0'=>array('sap_factory_code'=>'ES01','sap_warehouse_code'=>'AS2')
@@ -578,7 +578,7 @@ function getMarketplaceCode(){
 			'country_code'=>'ES',
 			'currency_code'=>'EUR'
 		),
-		
+
 		'A13V1IB3VIYZZH'=>array(
 			'fba_factory_warehouse'=>array(
 				'0'=>array('sap_factory_code'=>'FR01','sap_warehouse_code'=>'AF2')
@@ -590,7 +590,7 @@ function getMarketplaceCode(){
 			'country_code'=>'FR',
 			'currency_code'=>'EUR'
 		),
-		
+
 		'APJ6JRA9NG5V4'=>array(
 			'fba_factory_warehouse'=>array(
 				'0'=>array('sap_factory_code'=>'IT01','sap_warehouse_code'=>'AI2')
@@ -602,7 +602,7 @@ function getMarketplaceCode(){
 			'country_code'=>'IT',
 			'currency_code'=>'EUR'
 		),
-		
+
 		'A1VC38T7YXB528'=>array(
 			'fba_factory_warehouse'=>array(
 				'0'=>array('sap_factory_code'=>'JP01','sap_warehouse_code'=>'AJ2')
@@ -614,7 +614,7 @@ function getMarketplaceCode(){
 			'country_code'=>'JP',
 			'currency_code'=>'JPY'
 		),
-		
+
 		'A1F83G8C2ARO7P'=>array(
 			'fba_factory_warehouse'=>array(
 				'0'=>array('sap_factory_code'=>'UK01','sap_warehouse_code'=>'AE3')
@@ -627,7 +627,7 @@ function getMarketplaceCode(){
 			'country_code'=>'GB',
 			'currency_code'=>'GBP'
 		),
-		
+
 		'ATVPDKIKX0DER'=>array(
 			'fba_factory_warehouse'=>array(
 				'0'=>array('sap_factory_code'=>'US01','sap_warehouse_code'=>'AA1')
@@ -737,7 +737,7 @@ function getActiveUserConfig()
 		array('db'=>'website','dbname'=>'tenkershop','name'=>'tenkershop.com','formid'=>array(2),'fields'=>array('name'=>'1.3','email'=>2,'orderid'=>3)),
 		array('db'=>'website','dbname'=>'miropureshop','name'=>'miropureshop.com','formid'=>array(2),'fields'=>array('name'=>'1.3','email'=>2,'orderid'=>3)),
 		array('db'=>'website','dbname'=>'mookashop','name'=>'mookashop.com','formid'=>array(2),'fields'=>array('name'=>'1.3','email'=>2,'orderid'=>3)),
-		array('db'=>'drocon','dbname'=>'droconshop_com','name'=>'droconshop.com','formid'=>array(2),'fields'=>array('name'=>'1.3','email'=>2,'orderid'=>3)),
+		array('db'=>'drocon','dbname'=>'droconshop_com','name'=>'droconshop.com','formid'=>array(12),'fields'=>array('name'=>'1','email'=>2,'orderid'=>3)),
 		array('db'=>'natrogix','dbname'=>'natrogixshop_com','name'=>'natrogixshop.com','formid'=>array(17),'fields'=>array('name'=>4,'email'=>1,'orderid'=>3)),
 		array('db'=>'website','dbname'=>'vip-support_jp','name'=>'vip-support.jp','formid'=>array(1),'fields'=>array('name'=>'2.3','email'=>3,'orderid'=>4)),
 		array('db'=>'website','dbname'=>'workizeshop_com','name'=>'workizeshop.com','formid'=>array(2),'fields'=>array('name'=>7,'email'=>2,'orderid'=>4)),
