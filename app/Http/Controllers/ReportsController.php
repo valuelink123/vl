@@ -49,7 +49,7 @@ class ReportsController extends Controller
         $exportFileName = '';
         $table = $type;
         if($table =='fba_manage_inventory'){
-            $table='view_fba_manage_inventory';
+            //$table='view_fba_manage_inventory';
         }
         $datas = DB::connection('amazon')->table($table);
         if(array_get($_REQUEST,'seller_account_id')){
@@ -166,7 +166,7 @@ class ReportsController extends Controller
                 ];
             }elseif($type  == 'fba_manage_inventory'){
                 $records["data"][] = [
-                    'Account','Asin','SellerSku','Fnsku','Condition','Unit Value','AFN Fulfillable Value','AFN Warehouse Value','AFN Reserved Value','AFN Total Value','MFN','MFN Fulfillable','AFN','AFN Warehouse','AFN Fulfillable','AFN Reserved','AFN Unsellable',
+                    'Account','Asin','SellerSku','Fnsku','Condition','MFN','MFN Fulfillable','AFN','AFN Warehouse','AFN Fulfillable','AFN Reserved','AFN Unsellable',
                     'Per Unit Volume','AFN Total','AFN Inbound Working','AFN Inbound Shipped','AFN Inbound Receiving','AFN Researching','AFN Reserved Future','AFN Future Buyable','Updated At'
                 ];
             }else{
@@ -235,11 +235,6 @@ class ReportsController extends Controller
                     $list['seller_sku'],
                     $list['fnsku'],
                     $list['condition'],
-                    (string)round($list['avg_price'],2),
-                    (string)round($list['avg_price']*$list['afn_fulfillable_quantity'],2),
-                    (string)round($list['avg_price']*$list['afn_warehouse_quantity'],2),
-                    (string)round($list['avg_price']*$list['afn_reserved_quantity'],2),
-                    (string)round($list['avg_price']*$list['afn_total_quantity'],2),
                     array_get(FbaManageInventory::LISTINGEXISTS,$list['mfn_listing_exists']),
                     (string)$list['mfn_fulfillable_quantity'],
                     array_get(FbaManageInventory::LISTINGEXISTS,$list['afn_listing_exists']),

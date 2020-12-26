@@ -89,26 +89,21 @@ th,td,td>span {
                                     <th>SellerSku</th>
                                     <th>Fnsku</th>
                                     <th>Condition</th>
-                                    <th>Unit Value</th>
-                                    <th>AFN Fulfillable Value</th>
-                                    <th>AFN Warehouse Value</th>
-                                    <th>AFN Reserved Value</th>
-                                    <th>AFN Total Value</th>
-                                    <th>MFN</th>
-                                    <th>MFN Fulfillable</th>
-                                    <th>AFN</th>
-                                    <th>AFN Warehouse</th>
-                                    <th>AFN Fulfillable</th>
-                                    <th>AFN Reserved</th>
-                                    <th>AFN Unsellable</th>
-                                    <th>Per Unit Volume</th>
-                                    <th>AFN Total</th>
-                                    <th>AFN Inbound Working</th>
-                                    <th>AFN Inbound Shipped</th>
-                                    <th>AFN Inbound Receiving</th>
-                                    <th>AFN Researching</th>
-                                    <th>AFN Reserved Future</th>
-                                    <th>AFN Future Buyable</th>
+                                    <th>MFN<i class="fa fa-info-circle popovers" data-container="body" onclick=" " data-trigger="hover" data-placement="top" data-html="true" data-content="自配送商品"></i></font></th>
+                                    <th>MFN Fulfillable<i class="fa fa-info-circle popovers" data-container="body" onclick=" " data-trigger="hover" data-placement="top" data-html="true" data-content="自配送可售数量"></i></font></th>
+                                    <th>AFN<i class="fa fa-info-circle popovers" data-container="body" onclick=" " data-trigger="hover" data-placement="top" data-html="true" data-content="亚马逊物流商品"></i></font></th>
+                                    <th>AFN Warehouse<i class="fa fa-info-circle popovers" data-container="body" onclick=" " data-trigger="hover" data-placement="top" data-html="true" data-content="亚马逊库存数量"></i></font></th>
+                                    <th>AFN Fulfillable<i class="fa fa-info-circle popovers" data-container="body" onclick=" " data-trigger="hover" data-placement="top" data-html="true" data-content="亚马逊物流可售数量"></i></font></th>
+                                    <th>AFN Reserved<i class="fa fa-info-circle popovers" data-container="body" onclick=" " data-trigger="hover" data-placement="top" data-html="true" data-content="亚马逊物流预留数量"></i></font></th>
+                                    <th>AFN Unsellable<i class="fa fa-info-circle popovers" data-container="body" onclick=" " data-trigger="hover" data-placement="top" data-html="true" data-content="亚马逊物流不可售数量"></i></font></th>
+                                    <th>Per Unit Volume<i class="fa fa-info-circle popovers" data-container="body" onclick=" " data-trigger="hover" data-placement="top" data-html="true" data-content="单位商品体积"></i></font></th>
+                                    <th>AFN Total<i class="fa fa-info-circle popovers" data-container="body" onclick=" " data-trigger="hover" data-placement="top" data-html="true" data-content="亚马逊物流总数量"></i></font></th>
+                                    <th>AFN Inbound Working<i class="fa fa-info-circle popovers" data-container="body" onclick=" " data-trigger="hover" data-placement="top" data-html="true" data-content="亚马逊物流入库处理数量"></i></font></th>
+                                    <th>AFN Inbound Shipped<i class="fa fa-info-circle popovers" data-container="body" onclick=" " data-trigger="hover" data-placement="top" data-html="true" data-content="亚马逊物流入库发货数量"></i></font></th>
+                                    <th>AFN Inbound Receiving<i class="fa fa-info-circle popovers" data-container="body" onclick=" " data-trigger="hover" data-placement="top" data-html="true" data-content="亚马逊物流入库接收数量"></i></font></th>
+                                    <th>AFN Researching<i class="fa fa-info-circle popovers" data-container="body" onclick=" " data-trigger="hover" data-placement="top" data-html="true" data-content="亚马逊物流需重新确认库存数量"></i></font></th>
+                                    <th>AFN Reserved Future<i class="fa fa-info-circle popovers" data-container="body" onclick=" " data-trigger="hover" data-placement="top" data-html="true" data-content="亚马逊物流网络未来可购买供货"></i></font></th>
+                                    <th>AFN Future Buyable<i class="fa fa-info-circle popovers" data-container="body" onclick=" " data-trigger="hover" data-placement="top" data-html="true" data-content="亚马逊物流网络预留未来供货"></i></font></th>
                                     <th>Updated At</th>
                                 </tr>
                             </thead>
