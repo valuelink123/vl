@@ -109,6 +109,7 @@ Route::resource('couponkunnr', 'CouponkunnrController');
 Route::Post('/couponkunnr/get', 'CouponkunnrController@get')->name('getkunnrs');
 Route::Post('/couponkunnr/upload', 'CouponkunnrController@upload')->name('uploadkunnr');
 Route::Post('/mcforder/get', 'McforderController@get')->name('getMcforder');
+Route::get('/mcforderExport', 'McforderController@mcforderExport');//mcforder功能的导出
 // Route::resource('rsgproducts', 'RsgproductsController');
 Route::match(['post','get'],'/rsgproducts', 'RsgproductsController@list');//产品列表
 Route::get('/rsgproducts/edit', 'RsgproductsController@edit');//编辑产品
