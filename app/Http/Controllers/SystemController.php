@@ -33,6 +33,19 @@ class SystemController extends Controller
 		header("location:$url");
 
 	}
+	//下载浏览器插件包
+	public function pluginDownload(Request $req)
+	{
+		$filepath = 'plugin.crx';
+		$file=fopen($filepath,"r");
+		header("Content-type:text/html;charset=utf-8");
+		header("Content-Type: application/octet-stream");
+		header("Accept-Ranges: bytes");
+		header("Accept-Length: ".filesize($filepath));
+		header("Content-Disposition: attachment; filename=".$filepath);
+		echo fread($file,filesize($filepath));
+		fclose($file);
+	}
 
 
 

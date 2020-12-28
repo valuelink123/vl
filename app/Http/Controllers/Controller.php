@@ -57,11 +57,12 @@ class Controller extends BaseController
 	* BG领导只能看该BG下的所有asin的相关数据信息
 	* BU领导只能看该BU下的所有asin的相关数据信息
 	* 只是销售员的话，只能看自己所属的asin相关数据信息
+	 * $permission为ctg-show-all，non-ctg-show-all权限,有查看所有数据权限的人就不做限制，
 	*/
 	public function getAsinWhere($bg = 'asin.bg',$bu = 'asin.bu',$userid = 'processor',$permission='')
 	{
 		$asinWhere = '';
-		if(!Auth::user()->can($permission)){
+		if(!Auth::user()->can($permission) || $permission==''){
 			if (Auth::user()->seller_rules) {
 				$rules = explode("-",Auth::user()->seller_rules);
 				if(array_get($rules,0)!='*') $asinWhere .= ' AND '.$bg.' = "'.array_get($rules,0).'"';
@@ -301,7 +302,7 @@ class Controller extends BaseController
 		//如果选的时间类型是后台当地时间，时间要做转化
 		$dateconfig = array('A1PA6795UKMFR9','A1RKKUPIHCS9HS','A13V1IB3VIYZZH','APJ6JRA9NG5V4');//utc+2:00
 		$time = time();//北京时间当前时间戳
-		// $time = strtotime('2020-10-2 23:01:00');//测试日期
+//		 $time = strtotime('2020-10-2 23:01:00');//测试日期
 		if($timeType==1){//选的是后台当地时间
 			if($site=='A1VC38T7YXB528'){//时间范围+1小时,日本站点,-8+9
 				$time = strtotime(date('Y-m-d H:i:s', strtotime ("+1 hour", $time)));//日本站后台当前时间;

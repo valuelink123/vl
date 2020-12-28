@@ -20,9 +20,9 @@
 		
 		   var title = ui.item.title;
 		   var desc = ui.item.desc;
-		   rename = new RegExp("{CUSTOMER_NAME}","g"); 
-		   remail = new RegExp("{CUSTOMER_EMAIL}","g"); 
-		   retitle = new RegExp("{EMAIL_TITLE}","g"); 
+		   rename = new RegExp("{CUSTOMER_NAME}","g");
+		   remail = new RegExp("{CUSTOMER_EMAIL}","g");
+		   retitle = new RegExp("{EMAIL_TITLE}","g");
 		   title = title.replace(rename, "{{array_get($email,'from_name')}}");
 		   title = title.replace(remail, "{{array_get($email,'to_address')}}");
 		   title = title.replace(retitle, "{{array_get($email,'subject')}}");
@@ -34,8 +34,8 @@
 		   ue.ready(function() {
 				ue.setContent(desc);
 		   });
-		   
-		}	
+
+		}
       }
     });
 	$("#fileupload").submit(function(e){
@@ -238,11 +238,14 @@
                                         echo $s_email['status'].' ';
 										
 										if($s_email['send_date']) echo ' at '.$s_email['send_date'];
-										
-                                        if($s_email['error']){ 
+
+										if($s_email['error']){
 											echo ' Error :'.$s_email['error'];
 										}elseif($s_email['plan_date']){
 											echo ' Plan at :'.date('Y-m-d H:i:s',$s_email['plan_date']);
+										}
+										if($s_email['error_count']){//增加输出错误次数
+											echo '<br/>Error times :'.$s_email['error_count'];
 										}
                                         ?>
                                     </span>

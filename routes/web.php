@@ -67,6 +67,7 @@ Route::Post('/review/get', 'ReviewController@get')->name('getReview');
 Route::Post('/review/upload', 'ReviewController@upload')->name('uploadReview');
 Route::get('/template/ajax/get', 'TemplateController@get')->name('getTemplate');
 Route::Post('/saporder/get', 'InboxController@getrfcorder')->name('getRfcOrder');
+Route::Post('/inbox/unbindInboxOrder', 'InboxController@unbindInboxOrder');//收件箱里面解绑订单号操作
 Route::get('/invoice/get/{id}', 'InboxController@getpdfinvoice')->name('getPdfInvoice');
 Route::resource('qa', 'QaiController');
 Route::Post('/qa/get', 'QaiController@get')->name('getQa');
@@ -108,6 +109,7 @@ Route::resource('couponkunnr', 'CouponkunnrController');
 Route::Post('/couponkunnr/get', 'CouponkunnrController@get')->name('getkunnrs');
 Route::Post('/couponkunnr/upload', 'CouponkunnrController@upload')->name('uploadkunnr');
 Route::Post('/mcforder/get', 'McforderController@get')->name('getMcforder');
+Route::get('/mcforderExport', 'McforderController@mcforderExport');//mcforder功能的导出
 // Route::resource('rsgproducts', 'RsgproductsController');
 Route::match(['post','get'],'/rsgproducts', 'RsgproductsController@list');//产品列表
 Route::get('/rsgproducts/edit', 'RsgproductsController@edit');//编辑产品
@@ -132,7 +134,11 @@ Route::Post('/salesp/get', 'SalespController@get')->name('getSalesp');
 Route::resource('proline', 'ProlineController');
 Route::Post('/proline/get', 'ProlineController@get')->name('getproline');
 Route::get('/skus', 'SkuController@index');
+Route::get('/skus/keywords', 'SkuController@keywords');
+Route::Post('/skus/keywords', 'SkuController@updatekeywords');
 Route::Post('/skus', 'SkuController@update');
+Route::Post('/skus/upload', 'SkuController@upload');
+Route::Post('/skus/batchUpdate', 'SkuController@batchUpdate');
 Route::get('/budgets', 'BudgetController@index');
 Route::Post('/budgets', 'BudgetController@index');
 Route::get('/reqrev', 'ReqrevController@index');
@@ -195,7 +201,7 @@ Route::post('/star/updatePost', 'StarController@updatePost');//更新帖子状�
 
 //跟卖追踪
 
-Route::get('/hijack/index1/', 'hijack\\HijackController@index1')->name('index1');
+Route::match(['post','get'],'/hijack/index1/', 'hijack\\HijackController@index1')->name('index1');
 Route::get('/hijack/index2/', 'hijack\\HijackController@index2')->name('index2');
 Route::get('/hijack/index/', 'hijack\\HijackController@index')->name('index');
 Route::get('/hijack/detail/', 'hijack\\HijackController@detail')->name('detail');
@@ -390,3 +396,13 @@ Route::Post('/transferTask/get', 'TransferTaskController@get')->name('getTransfe
 
 //系统模块下的菜单路由
 Route::get('/system/itRequirement', 'SystemController@itRequirement');//跳转进入到禅道系统
+Route::get('/plugin/download', 'SystemController@pluginDownload');//下载插件包
+/*
+ * 弹窗插件模块
+ */
+Route::match(['post','get'],'/api/alertRemind', 'ApiController@alertRemind');//弹出验证框
+
+Route::get('/reports', 'ReportsController@index');
+Route::any('/reports/get', 'ReportsController@get')->name('getReport');
+
+

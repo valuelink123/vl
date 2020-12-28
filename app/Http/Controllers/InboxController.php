@@ -220,15 +220,33 @@ class InboxController extends Controller
         $order=array();
 		$account = Accounts::where('account_email',$email['to_address'])->first();
         $account_type = $account ? $account->type : null;
+
         if($email['amazon_order_id']){
 			$amazon_seller_id = $email['amazon_seller_id'];
-			
+
 			if(!$amazon_seller_id){
                 $amazon_seller_id = $account ? $account->account_sellerid : null;
 			}
             $order = DB::table('amazon_orders')->where('SellerId', $amazon_seller_id)->where('AmazonOrderId', $email['amazon_order_id'])->first();
             if($order) $order->item = DB::table('amazon_orders_item')->where('SellerId', $amazon_seller_id)->where('AmazonOrderId', $email['amazon_order_id'])->get();
         }
+
+		//获取该客户与此邮箱的来往邮件中所有绑定的订单号信息,展示出所有绑定订单的订单详情
+		$email_order = Inbox::whereNotNull('amazon_order_id')->whereNotNull('amazon_seller_id')->where('from_address',$email['from_address'])->where('to_address',$email['to_address'])->orderBy('date','desc')->get()->toArray();
+		$sap = new SapRfcRequest();
+		$orderArr = array();
+		foreach($email_order as $key=>$val){
+			//获取sap订单信息
+			$orderid = $val['amazon_order_id'];
+			try{
+				$orderArr[$key] = SapRfcRequest::sapOrderDataTranslate($sap->getOrder(['orderId' => $orderid]));
+				$orderArr[$key]['SellerName'] = Accounts::where('account_sellerid', $orderArr[$key]['SellerId'])->first()->account_name ?? 'No Match';
+			} catch (\Exception $e) {
+
+			}
+
+		}
+
 		$i=0;
         foreach($email_to as $mail){
 			$i++;
@@ -276,7 +294,7 @@ class InboxController extends Controller
 		$lists =  Category::orderBy($order_by,$sort)->get()->toArray();
 		$tree = $this->getTree($lists,28);
 
-        return view('inbox/view',['email_history'=>$email_history,'unread_history'=>$email_unread_history,'order'=>$order,'email'=>$email,'users'=>$this->getUsers(),'groups'=>$this->getGroups(),'sellerids'=>$this->getSellerIds(),'accounts'=>$this->getAccounts(),'account_type'=>$account_type,'tree'=>$tree,'email_change_log'=>$email_change_log,'client_email'=>$client_email,'latestConversationList'=>$latestConversationList,'recentEventsList'=>$recentEventsList,'recentEventsNumbers'=>$recentEventsNumbers,'rsgTaskData'=>$rsgTaskData,'rsg_link'=> 'https://rsg.claimgiftsnow.com?user=V'.Auth::user()->id ]);
+        return view('inbox/view',['email_history'=>$email_history,'unread_history'=>$email_unread_history,'order'=>$order,'orderArr'=>$orderArr,'email'=>$email,'users'=>$this->getUsers(),'groups'=>$this->getGroups(),'sellerids'=>$this->getSellerIds(),'accounts'=>$this->getAccounts(),'account_type'=>$account_type,'tree'=>$tree,'email_change_log'=>$email_change_log,'client_email'=>$client_email,'latestConversationList'=>$latestConversationList,'recentEventsList'=>$recentEventsList,'recentEventsNumbers'=>$recentEventsNumbers,'rsgTaskData'=>$rsgTaskData,'rsg_link'=> 'https://rsg.claimgiftsnow.com?user=V'.Auth::user()->id ]);
     }
 
     public function getRsgStatusAttr($emailDetails, $email, $rsgStatusArr, $fromOrTo){
@@ -743,9 +761,9 @@ class InboxController extends Controller
         $iDisplayLength = $iDisplayLength < 0 ? $iTotalRecords : $iDisplayLength;
         $iDisplayStart = intval($_REQUEST['start']);
         $sEcho = intval($_REQUEST['draw']);
-        $customers = $customers->leftJoin(DB::raw('(select email, rsg_status, rsg_status_explain from client_info left join client on client_info.client_id = client.id) as t1'),function($q){
-            $q->on('inbox.from_address', '=', 't1.email');
-        });
+//        $customers = $customers->leftJoin(DB::raw('(select email, rsg_status, rsg_status_explain from client_info left join client on client_info.client_id = client.id) as t1'),function($q){
+//            $q->on('inbox.from_address', '=', 't1.email');
+//        });
 
 		$customersLists =  $customers->orderBy($orderby,$sort)->skip($iDisplayStart)->take($iDisplayLength)->get()->toArray();
         $records = array();
@@ -769,23 +787,23 @@ class InboxController extends Controller
                     $warnText = $this->time_diff(strtotime(date('Y-m-d H:i:s')), strtotime('+ '.array_get($rules,$customersList['rule_id']),strtotime($customersList['date'])));
                 }
             }
-            $explain = isset($rsgStatusArr[$customersList['rsg_status_explain']]) ? $rsgStatusArr[$customersList['rsg_status_explain']]['vop'] : $customersList['rsg_status_explain'];
-            //亚马逊客户是不能邀请做RSG的，不显示红色或绿色圆圈。
-            if($customersList['type'] != 'Site'){
-                $rsgStatus = '';
-            }else{
-                if($customersList['rsg_status']==1) {
-                    //邮箱后面显示红色圆圈
-                    $rsgStatus = '<div class="unavailable" title="'.$explain.'"></div>';
-                }else{
-                    //邮箱后面显示绿色圆圈
-                    $rsgStatus = '<div class="available"></div>';
-                }
-            }
+//            $explain = isset($rsgStatusArr[$customersList['rsg_status_explain']]) ? $rsgStatusArr[$customersList['rsg_status_explain']]['vop'] : $customersList['rsg_status_explain'];
+//            //亚马逊客户是不能邀请做RSG的，不显示红色或绿色圆圈。
+//            if($customersList['type'] != 'Site'){
+//                $rsgStatus = '';
+//            }else{
+//                if($customersList['rsg_status']==1) {
+//                    //邮箱后面显示红色圆圈
+//                    $rsgStatus = '<div class="unavailable" title="'.$explain.'"></div>';
+//                }else{
+//                    //邮箱后面显示绿色圆圈
+//                    $rsgStatus = '<div class="available"></div>';
+//                }
+//            }
             $records["data"][] = array(
                 '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input name="id[]" type="checkbox" class="checkboxes" value="'.$customersList['id'].'"/><span></span></label>',
                 
-				$customersList['from_address'].$rsgStatus.'</BR>'.(array_get($customersList,'from_name')?'<span class="label label-sm label-primary">'.array_get($customersList,'from_name').'</span> ':' ').$status_list[$customersList['reply']],
+				$customersList['from_address'].'</BR>'.(array_get($customersList,'from_name')?'<span class="label label-sm label-primary">'.array_get($customersList,'from_name').'</span> ':' ').$status_list[$customersList['reply']],
                 $customersList['to_address'].'</BR>'.'<span class="label label-sm label-primary">'.array_get($groups,$customersList['group_id'].'.group_name').' - '.array_get($users,$customersList['user_id']).'</span> ',
                 (($customersList['mark'])?'<span class="label label-sm label-danger">'.$customersList['mark'].'</span> ':'').(($customersList['sku'])?'<span class="label label-sm label-primary">'.$customersList['sku'].'</span> ':'').(($customersList['etype'])?'<span class="label label-sm label-danger">'.$customersList['etype'].'</span> ':'').'<a href="/inbox/'.$customersList['id'].'" target="_blank" style="color:#333;">'.(($customersList['read'])?'':'<strong>').$customersList['subject'].(($customersList['read'])?'':'</strong>').'</a>'.(($warnText)?'<span class="label label-sm label-danger">'.$warnText.'</span> ':'').(($customersList['remark'])?'<BR/><span class="label label-sm label-info">'.$customersList['remark'].'</span> ':''),
                 $customersList['date'],
@@ -793,27 +811,6 @@ class InboxController extends Controller
                 '<a href="/inbox/'.$customersList['id'].'" class="btn btn-sm btn-outline grey-salsa" target="_blank"><i class="fa fa-search"></i> View </a>',
             );
 		}
-        /*for($i = $iDisplayStart; $i < $end; $i++) {
-            $warnText = '';
-            if($customersList[$i]['reply']==0){
-                if(array_get($rules,$customersList[$i]['rule_id'],'')){
-                    $warnText = $this->time_diff(strtotime(date('Y-m-d H:i:s')), strtotime('+ '.array_get($rules,$customersList[$i]['rule_id']),strtotime($customersList[$i]['date'])));
-                }
-            }
-
-            $records["data"][] = array(
-                '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input name="id[]" type="checkbox" class="checkboxes" value="'.$customersList[$i]['id'].'"/><span></span></label>',
-                $customersList[$i]['from_address'],
-                $customersList[$i]['to_address'],
-                (($customersList[$i]['mark'])?'<span class="label label-sm label-danger">'.$customersList[$i]['mark'].'</span> ':'').(($customersList[$i]['sku'])?'<span class="label label-sm label-primary">'.$customersList[$i]['sku'].'</span> ':'').(($customersList[$i]['etype'])?'<span class="label label-sm label-danger">'.$customersList[$i]['etype'].'</span> ':'').'<a href="/inbox/'.$customersList[$i]['id'].'" target="_blank" style="color:#333;">'.(($customersList[$i]['read'])?'':'<strong>').$customersList[$i]['subject'].(($customersList[$i]['read'])?'':'</strong>').'</a>'.(($warnText)?'<span class="label label-sm label-danger">'.$warnText.'</span> ':'').(($customersList[$i]['remark'])?'<BR/><span class="label label-sm label-info">'.$customersList[$i]['remark'].'</span> ':''),
-                $customersList[$i]['date'],
-                $status_list[$customersList[$i]['reply']],
-                $users[$customersList[$i]['user_id']],
-                '<a href="/inbox/'.$customersList[$i]['id'].'" class="btn btn-sm btn-outline grey-salsa" target="_blank"><i class="fa fa-search"></i> View </a>',
-            );
-        }
-		*/
-
 
         $records["draw"] = $sEcho;
         $records["recordsTotal"] = $iTotalRecords;
@@ -1162,6 +1159,22 @@ class InboxController extends Controller
 			return $group_arr;
         }
 	}
+
+	//收件箱里面解绑订单号操作
+	public function unbindInboxOrder(Request $request)
+	{
+		$inboxid = $request->get('inboxid');
+		$rerurn['status'] = 0;
+		$update = array('amazon_order_id'=>'','amazon_seller_id'=>'','sku'=>'','asin'=>'');
+		$re = Inbox::where('id',$inboxid)->update($update);
+		if($re){
+			$rerurn['status'] = 1;
+			$rerurn['msg'] = 'Unbind Success,Auto refresh after 3 seconds';
+		}else{
+			$rerurn['msg'] = 'Unbind Fail';
+		}
+		return $rerurn;
+	}
 	
 	public function getrfcorder(Request $request){
 		$orderid = $request->get('orderid');
@@ -1321,12 +1334,10 @@ class InboxController extends Controller
 			}else{
 				$message = 'Get Amazon Order ID Success';
 			}
-			
 		}
 		
 		if($inboxid){
-			die(json_encode(array('result'=>$re , 'message'=>$message)));
-		
+			echo (json_encode(array('result'=>$re , 'message'=>$message)));
 		}else{
 			$return_arr['result']=1;
 			$return_arr['message']=$message;
@@ -1428,7 +1439,7 @@ class InboxController extends Controller
                     </div>';
 				}
 			}
-			die(json_encode($return_arr));
+			echo (json_encode($return_arr));
 		}
 	}
 

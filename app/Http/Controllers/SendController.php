@@ -276,12 +276,12 @@ class SendController extends Controller
 
 				$sendbox->text_html = $content;
 				$sendbox->date = date('Y-m-d H:i:s');
-				if($request->get('plan_date')) $sendbox->plan_date = strtotime($request->get('plan_date'));
+				$sendbox->plan_date = ($request->get('plan_date'))?strtotime($request->get('plan_date')):0;
 				$sendbox->status = $request->get('asDraft')?'Draft':'Waiting';
 				$sendbox->inbox_id = $request->get('inbox_id')?intval($request->get('inbox_id')):0;
 				$sendbox->warn = $request->get('warn')?intval($request->get('warn')):0;
 				$sendbox->ip = $_SERVER["REMOTE_ADDR"];
-				if($request->get('fileid')) $sendbox->attachs = $attachs;
+				$sendbox->attachs = ($request->get('fileid'))?$attachs:Null;
 				$sendbox->error = NULL;
 				$sendbox->error_count = 0;
 				$sendbox->save();
@@ -322,7 +322,11 @@ class SendController extends Controller
         $email_history[strtotime($email['date'])] = $email;
 		
 		$account = Accounts::where('account_email',$email['from_address'])->first();
-		$account_type = $account->type;
+		$account_type = '';
+		if($account){
+			$account_type = $account->type;
+		}
+
 		
 		$amazon_order_id='';
 		$i=0;

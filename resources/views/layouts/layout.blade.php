@@ -227,12 +227,14 @@
 												    </a>
 												</li>
 												@endpermission
+                                                @permission('reselling-show')
 												<li class="">
 												    <a href="/hijack/index" class="nav-link nav-toggle ">
-														Hijacker Alerts
+                                                        Asin Reselling
 														<span class="arrow"></span>
 												    </a>
 												</li>
+                                                @endpermission
 												@permission('asin-table-show')
 												<li class="">
 												    <a href="/asin" class="nav-link nav-toggle ">
@@ -723,6 +725,38 @@
                                                     </a>
                                                 </li>
 												@endpermission
+                                                @permission('reports-show')
+												<li class="">
+                                                    <a href="/reports" class="nav-link nav-toggle ">
+                                                        Fba Amazon Fulfilled Inventory Report
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
+                                                <li class="">
+                                                    <a href="/reports?type=fba_daily_inventory_history_report" class="nav-link nav-toggle ">
+                                                        Fba Daily Inventory History Report
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
+                                                <li class="">
+                                                    <a href="/reports?type=fba_inventory_adjustments_report" class="nav-link nav-toggle ">
+                                                        Fba Inventory Adjustments Report
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
+                                                <li class="">
+                                                    <a href="/reports?type=fba_monthly_inventory_history_report" class="nav-link nav-toggle ">
+                                                        Fba Monthly Inventory History Report
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
+                                                <li class="">
+                                                    <a href="/reports?type=fba_manage_inventory" class="nav-link nav-toggle ">
+                                                        Fba Manage Inventory
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
+												@endpermission
                                             </ul>
                                         </li>
 
@@ -909,6 +943,12 @@
                                                 <span class="arrow"></span>
                                             </a>
                                             <ul class="dropdown-menu pull-left">
+                                                <li class="">
+                                                    <a href="/plugin/download" class="nav-link nav-toggle">
+                                                        Plugin Download
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
 
                                                 @permission('It-requirement-show')
                                                 <li class="">
@@ -918,6 +958,7 @@
                                                     </a>
                                                 </li>
                                                 @endpermission
+
                                             </ul>
                                         </li>
                                     </ul>

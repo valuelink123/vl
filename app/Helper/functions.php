@@ -28,7 +28,7 @@ function getSkuStatuses(){
         '5'=>'待定',
         '6'=>'停售',
         '99'=>'新品规划'
-    );    
+    );
 }
 
 function getStockStatus(){
@@ -55,10 +55,10 @@ function getBudgetQuarter(){
         if($i<$nowYear){
             $quarter = 4;
         }else{
-            $quarter = $now_quarter;     
+            $quarter = $now_quarter;
         }
         for($m=1;$m<=$quarter;$m++){
-           $budget_quarter[]=$i.'Ver'.$m;     
+           $budget_quarter[]=$i.'Ver'.$m;
         }
     }
     return $budget_quarter;
@@ -144,12 +144,12 @@ function getUserGroupDetails(){
 		$groups[$k]['users'] = $group_users;
 		$users+=$group_users;
 	}
-	
+
 	return ['groups'=>$groups,'users'=>$users];
 }
 function getAsinSites(){
     return array(
-        'www.amazon.com','www.amazon.ca','www.amazon.mx','www.amazon.co.uk','www.amazon.fr','www.amazon.de','www.amazon.it','www.amazon.es','www.amazon.co.jp'
+        'www.amazon.com','www.amazon.ca','www.amazon.com.mx','www.amazon.co.uk','www.amazon.fr','www.amazon.de','www.amazon.it','www.amazon.es','www.amazon.co.jp'
     );
 }
 function getMarks(){
@@ -394,12 +394,12 @@ function html2text($str){
 }
 
 function textimage($content){
-	$pattern="/<[img|IMG].*?src=[\'|\"](.*?(?:[\.gif|\.jpg|\.png]))[\'|\"].*?[\/]?>/";  
-	preg_match_all($pattern,$content,$matchContent);  
-	if(isset($matchContent[1][0])){  
-		$temp=$matchContent[1][0];  
-	}else{  
-		$temp="./assets/layouts/layout/img/01.jpg";//在相应位置放置一张命名为no-image的jpg图片  
+	$pattern="/<[img|IMG].*?src=[\'|\"](.*?(?:[\.gif|\.jpg|\.png]))[\'|\"].*?[\/]?>/";
+	preg_match_all($pattern,$content,$matchContent);
+	if(isset($matchContent[1][0])){
+		$temp=$matchContent[1][0];
+	}else{
+		$temp="./assets/layouts/layout/img/01.jpg";//在相应位置放置一张命名为no-image的jpg图片
 	}
 	return $temp;
 }
@@ -419,7 +419,7 @@ function getSapNumber($str,$decimal=2){
 			return round($str,$decimal);
 		}
 	}
-	
+
 }
 
 function getComparisonSymbol(){
@@ -553,7 +553,7 @@ function getMarketplaceCode(){
 			'country_code'=>'CA',
 			'currency_code'=>'CAD'
 		),
-		
+
 		'A1PA6795UKMFR9'=>array(
 			'fba_factory_warehouse'=>array(
 				'0'=>array('sap_factory_code'=>'GR01','sap_warehouse_code'=>'AG2')
@@ -566,7 +566,7 @@ function getMarketplaceCode(){
 			'country_code'=>'DE',
 			'currency_code'=>'EUR'
 		),
-		
+
 		'A1RKKUPIHCS9HS'=>array(
 			'fba_factory_warehouse'=>array(
 				'0'=>array('sap_factory_code'=>'ES01','sap_warehouse_code'=>'AS2')
@@ -578,7 +578,7 @@ function getMarketplaceCode(){
 			'country_code'=>'ES',
 			'currency_code'=>'EUR'
 		),
-		
+
 		'A13V1IB3VIYZZH'=>array(
 			'fba_factory_warehouse'=>array(
 				'0'=>array('sap_factory_code'=>'FR01','sap_warehouse_code'=>'AF2')
@@ -590,7 +590,7 @@ function getMarketplaceCode(){
 			'country_code'=>'FR',
 			'currency_code'=>'EUR'
 		),
-		
+
 		'APJ6JRA9NG5V4'=>array(
 			'fba_factory_warehouse'=>array(
 				'0'=>array('sap_factory_code'=>'IT01','sap_warehouse_code'=>'AI2')
@@ -602,7 +602,7 @@ function getMarketplaceCode(){
 			'country_code'=>'IT',
 			'currency_code'=>'EUR'
 		),
-		
+
 		'A1VC38T7YXB528'=>array(
 			'fba_factory_warehouse'=>array(
 				'0'=>array('sap_factory_code'=>'JP01','sap_warehouse_code'=>'AJ2')
@@ -614,7 +614,7 @@ function getMarketplaceCode(){
 			'country_code'=>'JP',
 			'currency_code'=>'JPY'
 		),
-		
+
 		'A1F83G8C2ARO7P'=>array(
 			'fba_factory_warehouse'=>array(
 				'0'=>array('sap_factory_code'=>'UK01','sap_warehouse_code'=>'AE3')
@@ -627,7 +627,7 @@ function getMarketplaceCode(){
 			'country_code'=>'GB',
 			'currency_code'=>'GBP'
 		),
-		
+
 		'ATVPDKIKX0DER'=>array(
 			'fba_factory_warehouse'=>array(
 				'0'=>array('sap_factory_code'=>'US01','sap_warehouse_code'=>'AA1')
@@ -737,7 +737,7 @@ function getActiveUserConfig()
 		array('db'=>'website','dbname'=>'tenkershop','name'=>'tenkershop.com','formid'=>array(2),'fields'=>array('name'=>'1.3','email'=>2,'orderid'=>3)),
 		array('db'=>'website','dbname'=>'miropureshop','name'=>'miropureshop.com','formid'=>array(2),'fields'=>array('name'=>'1.3','email'=>2,'orderid'=>3)),
 		array('db'=>'website','dbname'=>'mookashop','name'=>'mookashop.com','formid'=>array(2),'fields'=>array('name'=>'1.3','email'=>2,'orderid'=>3)),
-		array('db'=>'drocon','dbname'=>'droconshop_com','name'=>'droconshop.com','formid'=>array(2),'fields'=>array('name'=>'1.3','email'=>2,'orderid'=>3)),
+		array('db'=>'drocon','dbname'=>'droconshop_com','name'=>'droconshop.com','formid'=>array(12),'fields'=>array('name'=>'1','email'=>2,'orderid'=>3)),
 		array('db'=>'natrogix','dbname'=>'natrogixshop_com','name'=>'natrogixshop.com','formid'=>array(17),'fields'=>array('name'=>4,'email'=>1,'orderid'=>3)),
 		array('db'=>'website','dbname'=>'vip-support_jp','name'=>'vip-support.jp','formid'=>array(1),'fields'=>array('name'=>'2.3','email'=>3,'orderid'=>4)),
 		array('db'=>'website','dbname'=>'workizeshop_com','name'=>'workizeshop.com','formid'=>array(2),'fields'=>array('name'=>7,'email'=>2,'orderid'=>4)),
@@ -1175,7 +1175,7 @@ function getSiteArr()
 {
 	$arr['site'] = [
 		'JP' => array('www.amazon.co.jp'),
-		'US' => array('www.amazon.com','www.amazon.ca'),
+		'US' => array('www.amazon.com','www.amazon.ca','www.amazon.com.mx'),
 		'EU' => array('www.amazon.co.uk','www.amazon.de','www.amazon.it','www.amazon.es','www.amazon.fr'),
 	];
 	$arr['fbmfba_days'] = array('JP'=>10,'US'=>20,'EU'=>12);
@@ -1196,7 +1196,7 @@ function getGoodStoreHouse()
  */
 function getSiteShort()
 {
-	$arr = array('www.amazon.co.jp'=>'jp','www.amazon.com'=>'us','www.amazon.ca'=>'ca','www.amazon.co.uk'=>'uk','www.amazon.de'=>'de','www.amazon.it'=>'it','www.amazon.es'=>'es','www.amazon.fr'=>'fr','www.amazon.mx'=>'mx');
+	$arr = array('www.amazon.co.jp'=>'jp','www.amazon.com'=>'us','www.amazon.ca'=>'ca','www.amazon.co.uk'=>'uk','www.amazon.de'=>'de','www.amazon.it'=>'it','www.amazon.es'=>'es','www.amazon.fr'=>'fr','www.amazon.com.mx'=>'mx');
 	return $arr;
 }
 
@@ -1236,7 +1236,8 @@ function getShipRate()
 		'CS0548'=>'2534',
 		'CS0656'=>'2534'
 	],
-	'CA'=>['default'=>'1900']
+	'CA'=>['default'=>'1900'],
+	'MX'=>['default'=>'1200']
 	];
 	return $arr;
 }
@@ -1376,9 +1377,10 @@ function getWeekDate($yearWeekNum){
 
 //存日志
 function saveOperationLog(string $table = NULL, int $primary_id = 0 , array $inputData = array()){
+	$userId = isset($inputData['userId']) && $inputData['userId'] ? $inputData['userId'] : 0;
 	DB::table('operation_log')->insert(
 		array(
-			'user_id'=>Auth::user()->id,
+			'user_id'=> Auth::user() ? Auth::user()->id : $userId,
 			'path'=>$_SERVER["REQUEST_URI"],
 			'method'=>$_SERVER['REQUEST_METHOD'],
 			'ip'=>$_SERVER["REMOTE_ADDR"],
@@ -1406,4 +1408,27 @@ function transferRequestStatus()
 //得到账号的IDName
 function getAccountIdName(){
 	return DB::connection('amazon')->table("seller_accounts")->whereNull('deleted_at')->groupby(['id','label'])->pluck('label','id');
+}
+
+function array_merge_deep(...$arrs)
+{
+	$merged = [];
+	while ($arrs) {
+		$array = array_shift($arrs);
+		if (!$array) {continue;}
+		foreach ($array as $key => $value) {
+			if (is_string($key)) {
+				if (is_array($value) && array_key_exists($key, $merged)
+					&& is_array($merged[$key])) {
+					$merged[$key] = array_merge_deep(...[$merged[$key], $value]);
+				} else {
+					$merged[$key] = $value;
+				}
+			} else {
+				$merged[] = $value;
+			}
+		}
+	}
+
+	return $merged;
 }

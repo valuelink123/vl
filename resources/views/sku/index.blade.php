@@ -53,6 +53,19 @@ font-weight:bold;
 .dashboard-stat2 .display .number h3 > small {
     font-size: 14px;
 }
+
+.editable-empty, .editable-empty:hover, .editable-empty:focus {
+    font-style:normal;
+    color: #337ab7;
+}
+
+.table-container a {
+    text-decoration: none;
+    border-bottom: dashed 1px #0088cc;
+}
+.modal-dialog{
+	width:1000px;
+}
     </style>
     <h1 class="page-title font-red-intense"> Daily Sales Report
         
@@ -73,7 +86,7 @@ font-weight:bold;
 
                         <div class="col-md-2">
                             <div class="input-group date date-picker margin-bottom-5" data-date-format="yyyy-mm-dd">
-                                <input type="text" class="form-control form-filter input-sm" readonly name="date_start" placeholder="Date" value="{{$date_start}}">
+                                <input type="text" class="form-control " readonly name="date_start" placeholder="Date" value="{{$date_start}}">
                                 <span class="input-group-btn">
 									<button class="btn btn-sm default" type="button">
 										<i class="fa fa-calendar"></i>
@@ -84,7 +97,7 @@ font-weight:bold;
 						
 						<div class="col-md-2">
                             <div class="input-group date date-picker margin-bottom-5" data-date-format="yyyy-mm-dd">
-                                <input type="text" class="form-control form-filter input-sm" readonly name="date_end" placeholder="Date" value="{{$date_end}}">
+                                <input type="text" class="form-control" readonly name="date_end" placeholder="Date" value="{{$date_end}}">
                                 <span class="input-group-btn">
 									<button class="btn btn-sm default" type="button">
 										<i class="fa fa-calendar"></i>
@@ -102,7 +115,7 @@ font-weight:bold;
 						</div>
 						
 						<div class="col-md-1">
-						<select class="form-control form-filter input-sm" name="bgbu">
+						<select class="form-control " name="bgbu">
                                         <option value="">Select BGBU</option>
 										<?php 
 										$bg='';
@@ -121,7 +134,7 @@ font-weight:bold;
 						
 
 						 <div class="col-md-1">
-						<select class="form-control form-filter input-sm" name="site" id="site">
+						<select class="form-control " name="site" id="site">
 									<option value="">Select Site</option>
                                         @foreach (getSiteCode() as $k=>$v)
                                             <option value="{{$v}}" <?php if($v==$s_site) echo 'selected'; ?>>{{$k}}</option>
@@ -130,7 +143,7 @@ font-weight:bold;
 						</div>
 						
 						 <div class="col-md-1">
-						<select class="form-control form-filter input-sm" name="level" id="level">
+						<select class="form-control " name="level" id="level">
 									<option value="">Level</option>
 										<option value="S" <?php if('S'==$s_level) echo 'selected'; ?>>S</option>
                                         <option value="A" <?php if('A'==$s_level) echo 'selected'; ?>>A</option>
@@ -141,7 +154,7 @@ font-weight:bold;
 						</div>
 						
 						<div class="col-md-1">
-						<input type="text" class="form-control form-filter input-sm" name="sku" placeholder="SKU OR ASIN" value ="{{array_get($_REQUEST,'sku')}}">
+						<input type="text" class="form-control " name="sku" placeholder="SKU OR ASIN" value ="{{array_get($_REQUEST,'sku')}}">
                                        
 						</div>
 						<div class="col-md-1">
@@ -165,12 +178,31 @@ font-weight:bold;
 					</div>
 
                     </form>
-					@permission('sales-report-export')
-					<button id="vl_list_export" class="btn sbold blue"> Export
-                                    <i class="fa fa-download"></i>
-                          </button>
-						  @endpermission
+					
+
+					
+						<div class="row">
+						<div class="col-md-12">
+							<input id="importFile" name="importFile" type="file" style="display:none">
+							{{ csrf_field() }}
+							<input id="importFileTxt" name="importFileTxt" type="text" class="form-control input-inline">
+							<a id="importButton" class="btn red input-inline" >Browse</a>
+
+							<button id="importSubmit" class="btn blue input-inline">Upload</button>
+		
+							<a href="{{ url('/uploads/dailyReport/dailyReport.xls')}}" class="help-inline" style="margin-top:8px;margin-left:10px;">Template </a>
+
+							@permission('sales-report-export')
+							<button id="vl_list_export" class="btn blue input-inline"> Export
+								<i class="fa fa-download"></i>
+							</button>
+							@endpermission
+						</div>
+						</div>
+						
                 </div>
+
+				
                     <div class="table-container">
 					{{ $datas->appends(['date_start' => $date_start,'date_end' => $date_end,'site' => $s_site,'user_id' => $s_user_id,'level' => $s_level,'bgbu' => $bgbu,'sku' => $sku])->links() }} 
 					
@@ -180,51 +212,24 @@ font-weight:bold;
 						<table class="table table-bordered ">
  
 						 <colgroup>
-			<col width="9%"></col>
+			<col width="8%"></col>
+			<col width="10%"></col>
+			<col width="8%"></col>
+			<col width="5%"></col>
+			<col width="5%"></col>
+			<col width="5%"></col>
+			<col width="5%"></col>
+			<col width="5%"></col>
 			<col width="7%"></col>
-			<col width="6%"></col>
-			<col width="6%"></col>
-			<col width="6%"></col>
-			<col width="6%"></col>
-			<col width="6%"></col>
-			<col width="6%"></col>
-			<col width="6%"></col>
-			<col width="6%"></col>
-			<col width="6%"></col>
-			<col width="6%"></col>
-			<col width="7%"></col>
+			<col width="5%"></col>
+			<col width="5%"></col>
+			<col width="5%"></col>
+			<col width="5%"></col>
+			<col width="5%"></col>
 			<col width="7%"></col>
 			<col width="10%"></col>
 			</colgroup>	
 																	
-						<?php 
-						$curr_date = date('Y-m-d',strtotime($date_end));
-						/*
-						if($data->target_sales>0){
-							$complete_sales = round($data->sales/$data->target_sales*100,2);
-						}elseif($data->target_sales<0){
-							$complete_sales = round((2-$data->sales/$data->target_sales)*100,2);
-						}else{
-							$complete_sales =0;
-						}
-						
-						if($data->target_amount>0){
-							$complete_amount = round($data->amount/$data->target_amount*100,2);
-						}elseif($data->target_amount<0){
-							$complete_amount = round((2-$data->amount/$data->target_amount)*100,2);
-						}else{
-							$complete_amount =0;
-						}
-						
-						if($data->target_profit>0){
-							$complete_profit = round($data->profit/$data->target_profit*100,2);
-						}elseif($data->target_profit<0){
-							$complete_profit = round((2-$data->profit/$data->target_profit)*100,2);
-						}else{
-							$complete_profit =0;
-						}
-						*/
-						?>
 						  <tr class="head">
 							<td style="font-weight: bold;">ASIN</td>
 							<td style="font-weight: bold;">Site</td>
@@ -234,7 +239,7 @@ font-weight:bold;
 							<td style="font-weight: bold;">BG</td>
 							<td style="font-weight: bold;">BU</td>
 							<td style="font-weight: bold;">Seller</td>
-							<td colspan="3" style="font-weight: bold;"> Main Keywords </td>
+							<td colspan="4" style="font-weight: bold;"> Last Main Keywords </td>
 							<td colspan="4" style="font-weight: bold;">Description</td>
 						  </tr>
 						  <tr>
@@ -247,7 +252,15 @@ font-weight:bold;
 							<td >{{$data->bg}}</td>
 							<td >{{$data->bu}}</td>
 							<td > {{array_get($users,$data->sap_seller_id,$data->sap_seller_id)}} </td>
-							<td colspan="3" class="keyword_s"><a class="sku_keywords" href="javascript:;" id="{{$data->marketplace_id.':'.$data->asin.':'.$curr_date}}:keywords" data-pk="{{$data->marketplace_id.':'.$data->asin.':'.$curr_date}}:keywords" data-type="text"> {{$data->last_keywords}} </a></td>
+							<td colspan="4" class="keyword_s"><a data-target="#ajax" data-toggle="modal" id ="{{$data->asin.$data->marketplace_id.'keywords'}}" href="{{url('skus/keywords/?asin='.$data->asin.'&marketplace_id='.$data->marketplace_id.'&date='.$curr_date)}}"> 
+							@if(empty(json_decode($data->last_keywords,true)))
+								N/A		
+							@else
+								@foreach(json_decode($data->last_keywords,true) as $k => $v)						
+								{{$k}},&nbsp;&nbsp;
+								@endforeach
+							@endif
+							</a></td>
 							
 							
 							<td colspan="4">{!!str_replace(',','<br />',$data->description)!!}</td>
@@ -261,25 +274,27 @@ font-weight:bold;
 						  <div class="table-head">
 						  <table class="table table-bordered">
 						  <colgroup>
-			<col width="9%"></col>
+						  <col width="8%"></col>
+			<col width="10%"></col>
+			<col width="8%"></col>
+			<col width="5%"></col>
+			<col width="5%"></col>
+			<col width="5%"></col>
+			<col width="5%"></col>
+			<col width="5%"></col>
 			<col width="7%"></col>
-			<col width="6%"></col>
-			<col width="6%"></col>
-			<col width="6%"></col>
-			<col width="6%"></col>
-			<col width="6%"></col>
-			<col width="6%"></col>
-			<col width="6%"></col>
-			<col width="6%"></col>
-			<col width="6%"></col>
-			<col width="6%"></col>
-			<col width="7%"></col>
+			<col width="5%"></col>
+			<col width="5%"></col>
+			<col width="5%"></col>
+			<col width="5%"></col>
+			<col width="5%"></col>
 			<col width="7%"></col>
 			<col width="10%"></col>
 			</colgroup>	
 			<tr class="head">
 							<td style="font-weight: bold;">Date</td>
 							<td style="font-weight: bold;">Rank</td>
+							<td style="font-weight: bold;">CategoryRank</td>
 							<td style="font-weight: bold;">Rating</td>
 							<td style="font-weight: bold;">Reviews</td>
 							<td style="font-weight: bold;">Sales</td>
@@ -299,19 +314,20 @@ font-weight:bold;
 						  <div class="table-body">
 						  <table class="table table-bordered">
 						  <colgroup>
-			<col width="9%"></col>
+						  <col width="8%"></col>
+			<col width="10%"></col>
+			<col width="8%"></col>
+			<col width="5%"></col>
+			<col width="5%"></col>
+			<col width="5%"></col>
+			<col width="5%"></col>
+			<col width="5%"></col>
 			<col width="7%"></col>
-			<col width="6%"></col>
-			<col width="6%"></col>
-			<col width="6%"></col>
-			<col width="6%"></col>
-			<col width="6%"></col>
-			<col width="6%"></col>
-			<col width="6%"></col>
-			<col width="6%"></col>
-			<col width="6%"></col>
-			<col width="6%"></col>
-			<col width="7%"></col>
+			<col width="5%"></col>
+			<col width="5%"></col>
+			<col width="5%"></col>
+			<col width="5%"></col>
+			<col width="5%"></col>
 			<col width="7%"></col>
 			<col width="10%"></col>
 			</colgroup>	
@@ -332,38 +348,50 @@ font-weight:bold;
 							$price_data[]  = round($details[$week]['price'],2);
 							$price_sum+=round($details[$week]['price'],2);
 						}
+						$key = $data->marketplace_id.':'.$data->asin.':'.$week;
 						?>
 						  <tr <?php echo ($lineNum%2==0)?'style="background:#ccc;"':''?>>
 						  	<td>{{$week}}</td>
-							<td class="ranking_s"><a class="sku_ranking" href="javascript:;" id="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:ranking" data-pk="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:ranking" data-type="text" title="排名 P数字-数字 格式">{{array_get($data->details,$week.'.ranking')}} </a></td>
+							<td>
+							<a data-target="#ajax" data-toggle="modal" id ="{{$data->asin.$data->marketplace_id.$week.'ranks'}}" href="{{url('skus/keywords/?asin='.$data->asin.'&marketplace_id='.$data->marketplace_id.'&date='.$week)}}">
+							@if(empty(json_decode(array_get($data->details,$week.'.keywords'),true)))
+								N/A		
+							@else
+								@foreach(json_decode(array_get($data->details,$week.'.keywords'),true) as $k => $v)						
+								{{$v}} in {{$k}}<BR>
+								@endforeach
+							@endif
+							</a>
+							</td>
+							<td class="ranking_s"><a class="sku_ranking" href="javascript:;" id="{{$key}}:ranking" data-pk="{{$key}}:ranking" data-type="text" title="排名 P数字-数字 格式">{{array_get($data->details,$week.'.ranking')}} </a></td>
 							
-							<td><a class="sku_rating" href="javascript:;" id="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:rating" data-pk="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:rating" data-type="text" title="星级"> {{array_get($data->details,$week.'.rating')}} </a></td>
+							<td>{{round(array_get($data->details,$week.'.rating'),1)}}</td>
 							
 					
-							<td><a class="sku_review" href="javascript:;" id="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:review" data-pk="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:review" data-type="text" title="review数量"> {{array_get($data->details,$week.'.review')}}</a></td>
+							<td>{{intval(array_get($data->details,$week.'.review'))}}</td>
 							
 						 
-							<td><a class="sku_sales" href="javascript:;" id="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:sales" data-pk="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:sales" data-type="text" title="销量"> {{array_get($data->details,$week.'.sales')}}</a></td>
+							<td>{{intval(array_get($data->details,$week.'.sales'))}}</td>
 							
-							<td><a class="sku_price" href="javascript:;" id="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:price" data-pk="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:price" data-type="text" title="价格 数字 或 数字-数字 格式"> {{array_get($data->details,$week.'.price')}}</a></td>
+							<td>{{round(array_get($data->details,$week.'.price'),2)}}</td>
 							
-							<td><a class="sku_flow" href="javascript:;" id="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:flow" data-pk="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:flow" data-type="text"> {{array_get($data->details,$week.'.flow')}} </a></td>
+							<td><a class="sku_flow" href="javascript:;" id="{{$key}}:flow" data-pk="{{$key}}:flow" data-type="text"> {{array_get($data->details,$week.'.flow')}} </td>
 						
-							<td><a class="sku_conversion" href="javascript:;" id="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:conversion" data-pk="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:conversion" data-type="text" title="转化率%" > {{round(array_get($data->details,$week.'.conversion')*100,2)}} </a></td>
+							<td><a class="sku_conversion" href="javascript:;" id="{{$key}}:conversion" data-pk="{{$key}}:conversion" data-type="text" title="转化率%" > {{round(array_get($data->details,$week.'.conversion')*100,2)}} </td>
 							
-							<td><a class="sku_fba_stock" href="javascript:;" id="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:fba_stock" data-pk="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:fba_stock" data-type="text" title="FBA库存"> {{array_get($data->details,$week.'.fba_stock')}} </a></td>
+							<td>{{intval(array_get($data->details,$week.'.fba_stock'))}} </td>
 							
-							<td><a class="sku_fba_transfer" href="javascript:;" id="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:fba_transfer" data-pk="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:fba_transfer" data-type="text" title="FBA在途"> {{array_get($data->details,$week.'.fba_transfer')}} </a></td>
+							<td>{{intval(array_get($data->details,$week.'.fba_transfer'))}} </td>
 							
-							<td><a class="sku_fbm_stock" href="javascript:;" id="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:fbm_stock" data-pk="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:fbm_stock" data-type="text" title="FBM库存"> {{array_get($data->details,$week.'.fbm_stock')}} </a></td>
+							<td>{{intval(array_get($data->details,$week.'.fbm_stock'))}}</td>
 							
-							<td><span id="{{str_replace('.','',$data->marketplace_id).':'.$data->asin.':'.$week}}:total_stock"> {!!intval(array_get($data->details,$week.'.fba_stock',0)+array_get($data->details,$week.'.fbm_stock',0)+array_get($data->details,$week.'.fba_transfer',0))!!} </span></td>
+							<td>{!!intval(array_get($data->details,$week.'.fba_stock',0)+array_get($data->details,$week.'.fbm_stock',0)+array_get($data->details,$week.'.fba_transfer',0))!!} </td>
 							
-							<td><span id="{{str_replace('.','',$data->marketplace_id).':'.$data->asin.':'.$week}}:fba_keep"> {!!(array_get($data->details,$week.'.sales',0)!=0)?round(intval(array_get($data->details,$week.'.fba_stock',0))/(array_get($data->details,$week.'.sales',0)),2):'∞'!!} </span></td>
+							<td>{!!(array_get($data->details,$week.'.sales',0)!=0)?round(intval(array_get($data->details,$week.'.fba_stock',0))/(array_get($data->details,$week.'.sales',0)),2):'∞'!!} </td>
 							
-							<td><span id="{{str_replace('.','',$data->marketplace_id).':'.$data->asin.':'.$week}}:total_keep"> {!!(array_get($data->details,$week.'.sales',0)!=0)?round((intval(array_get($data->details,$week.'.fba_stock',0))+intval(array_get($data->details,$week.'.fbm_stock',0))+intval(array_get($data->details,$week.'.fba_transfer',0)))/(array_get($data->details,$week.'.sales',0)),2):'∞'!!} </span></td>
+							<td>{!!(array_get($data->details,$week.'.sales',0)!=0)?round((intval(array_get($data->details,$week.'.fba_stock',0))+intval(array_get($data->details,$week.'.fbm_stock',0))+intval(array_get($data->details,$week.'.fba_transfer',0)))/(array_get($data->details,$week.'.sales',0)),2):'∞'!!}</td>
 							
-							<td class="strategy_s"><a class="sku_strategy" title="{{array_get($data->details,str_replace('.','',$data->marketplace_id).':'.$data->asin.':'.$week.'.strategy')}}" href="javascript:;" id="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:strategy" data-placement="left"  data-pk="{{$data->marketplace_id.':'.$data->asin.':'.$week}}:strategy" data-type="text"> {{array_get($data->details,$week.'.strategy')}} </a></td>
+							<td class="strategy_s"><a class="sku_strategy" title="{{array_get($data->details,$key.'.strategy')}}" href="javascript:;" id="{{$key}}:strategy" data-placement="left"  data-pk="{{$key}}:strategy" data-type="text"> {{array_get($data->details,$week.'.strategy')}} </a></td>
 							
 						  </tr>
 						  <?php
@@ -385,7 +413,7 @@ font-weight:bold;
             <!-- END EXAMPLE TABLE PORTLET-->
         </div>
     </div>
-	
+
 	
 <script src="/assets/global/plugins/moment.min.js" type="text/javascript"></script>
 <script src="/assets/global/plugins/jquery.mockjax.js" type="text/javascript"></script>    
@@ -423,7 +451,7 @@ var FormEditable = function() {
         $.fn.editable.defaults.inputclass = 'form-control';
         $.fn.editable.defaults.url = '/skus';
 		
-		$('.sku_keywords,.sku_strategy').editable({
+		$('.sku_strategy').editable({
 			emptytext:'N/A'
 		});
 		$('.sku_ranking').editable({
@@ -444,30 +472,8 @@ var FormEditable = function() {
 				return 'remote error'; 
 			} 
 		});
-		
-		
-		$('.sku_price').editable({
-			emptytext:'N/A',
-			validate: function (value) {
-				var  objRegExp= /^\d+(\.\d+)?(\-?\d+(\.\d+)?)?$/i;
-                if (!objRegExp.test(value)) {
-                    return 'Must be a number or number-number format';
-                }
-            },
-			success: function (response) { 
-				var obj = JSON.parse(response);
-				for(var jitem in obj){
-					$('#'+jitem).text(obj[jitem]);
-				}
-			}, 
-			error: function (response) { 
-				return 'remote error'; 
-			} 
-		});
-		
-		
-		
-		$('.sku_rating,.sku_review,.sku_flow,.sku_conversion,.sku_sales,.sku_fba_stock,.sku_fbm_stock,.sku_fba_transfer').editable({
+
+		$('.sku_flow,.sku_conversion').editable({
 			emptytext:'N/A',
 			validate: function (value) {
                 if (isNaN(value)) {
@@ -501,13 +507,125 @@ var FormEditable = function() {
 }();
 
 jQuery(document).ready(function() {
+	$("#importButton,#importFileTxt").click(function(){
+		$("#importFile").trigger("click");
+	});
+
+	$('input[id=importFile]').change(function() {
+		$('#importFileTxt').val($(this).val());
+	});
+
+	$("#importSubmit").click(function () {
+		var fileObj = document.getElementById("importFile").files[0];
+		if (typeof (fileObj) == "undefined" || fileObj.size <= 0) {
+			alert("Please Select File!");
+			return false;
+		}
+		var formFile = new FormData();
+		formFile.append("file", fileObj);
+		var data = formFile;
+		$.ajaxSetup({
+			headers: { 'X-CSRF-TOKEN' : '{{ csrf_token() }}' }
+		});
+		$.ajax({
+			url: "/skus/upload",
+			data: data,
+			type: "Post",
+			dataType: "json",
+			cache: false,
+			processData: false,
+			contentType: false,
+			success: function (result) {
+				var html = '<table class="table table-bordered"><tr><td>Asin</td><td>Site</td><td>Date</td><td>Rank</td><td>Sessions</td><td>Conversion%</td><td>Strategy</td><td>Keywords</td></tr>';
+				for(var item in result.updateData){
+					var row = result.updateData[item];
+					var keywords = '';
+					if(typeof(row['keywords'])!="undefined"){
+						for(var key in row['keywords']){
+							keywords += row['keywords'][key]+' in '+key+'<BR>';
+						}
+					}
+					
+					html += '<tr><td width="10%">'+((typeof(row['asin'])=="undefined")?'':row['asin'])+
+						'</td><td width="10%">'+((typeof(row['site'])=="undefined")?'':row['site'])+
+						'</td><td width="10%">'+((typeof(row['date'])=="undefined")?'':row['date'])+
+						'</td><td width="10%">'+((typeof(row['ranking'])=="undefined")?'':row['ranking'])+
+						'</td><td width="10%">'+((typeof(row['flow'])=="undefined")?'':row['flow'])+
+						'</td><td width="10%">'+((typeof(row['conversion'])=="undefined")?'':row['conversion'])+
+						'</td><td width="20%">'+((typeof(row['strategy'])=="undefined")?'':row['strategy'])+
+						'</td><td width="20%">'+keywords+'</td></tr>';
+				}
+				html += '</table>';
+				if(result.customActionStatus=='OK'){  
+					bootbox.dialog({
+						message: html,
+						title: "Confirm Update Data",
+						buttons: {
+							Cancel: {
+								label: "Cancel",
+								className: "btn-default",
+								callback: function () {
+									
+								}
+							}
+							, OK: {
+								label: "OK",
+								className: "btn-primary",
+								callback: function () {
+									toastr.success('Processing...');
+									$.ajaxSetup({
+										headers: { 'X-CSRF-TOKEN' : '{{ csrf_token() }}' }
+									});
+									$.ajax({
+										type: "POST",
+										dataType: "json",
+										url: "{{ url('skus/batchUpdate') }}",
+										data: result.updateData,
+										success: function (updateResult) {
+											if(updateResult.customActionStatus=='OK'){  
+												toastr.success(updateResult.customActionMessage);
+												location.reload();
+											}else{
+												toastr.error(updateResult.customActionMessage);
+											}
+										},
+										error: function(updateResult) {
+											toastr.error(updateResult.responseText);
+										}
+									});
+								}
+							}
+						}
+					});
+				}else{
+					toastr.error(data.customActionMessage);
+				}
+			},
+			error: function(result) {
+                toastr.error(result.responseText);
+			}
+		});
+	});
+
     FormEditable.init();
 	
 	$("#vl_list_export").click(function(){
 		location.href='/dreportexport?sku='+$("input[name='sku']").val()+'&date_start='+$("input[name='date_start']").val()+'&date_end='+$("input[name='date_end']").val()+'&user_id='+(($("select[name='user_id[]']").val())?$("select[name='user_id[]']").val():'')+'&bgbu='+$("select[name='bgbu']").val()+'&site='+$('select[name="site"]').val()+'&level='+$('select[name="level"]').val();
 	});
+
+	$('#ajax').on('hidden.bs.modal', function (e) {
+        $('#ajax .modal-content').html('<div class="modal-body" >Loading...</div>');
+    });
 });
 </script>
 
-
+<div class="modal fade" id="ajax" role="basic" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content" >
+			<div class="modal-body" >
+				Loading...
+			</div>
+		</div>
+	</div>
+</div>
 @endsection

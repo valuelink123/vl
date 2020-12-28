@@ -39,7 +39,7 @@ class HomeController extends Controller
     public function index(Request $request)
     {
 		$limit_bg = $limit_bu = $limit_sap_seller_id = $limit_review_user_id='';
-		
+
 		$sumwhere = '1=1';
 		$bonus_point = 0;
 		$date_from = $request->get('date_from')?$request->get('date_from'):(date('Y-m',strtotime('-2days')).'-01');

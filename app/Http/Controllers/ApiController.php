@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Auth;
 use App\Classes\CurlRequest;
 use DB;
+use App\User;
+use App\Http\Controllers\Auth\LoginController;
+use Illuminate\Http\Request;
 
 class ApiController extends Controller
 {
@@ -47,5 +50,38 @@ class ApiController extends Controller
 		} catch (\Exception $e) {
 			throw new \Exception($e->getMessage());
 		}
+	}
+
+	/*
+	 * 弹出验证框
+	 */
+	public function alertRemind(Request $request)
+	{
+		header('Access-Control-Allow-Origin:*');
+		session_start();//开启session获取验证码数据
+		$result['status'] = 0;
+		$result['userId'] = 0;
+		$email = isset($_REQUEST['email']) && $_REQUEST['email'] ? $_REQUEST['email'] : '';
+		$password = isset($_REQUEST['password']) && $_REQUEST['password'] ? $_REQUEST['password'] : '';
+
+		$auth = new LoginController();
+		$res = $auth->attemptLogin($request, $request);
+		$result['session_id'] = session_id();
+		if($res){
+			$userId = User::where('email',$email)->pluck('id')->first();
+			$result['userId']=$userId;
+			setcookie("userId", $result['userId']);
+			$userRole = User::find($userId)->roles->pluck('id')->toArray();
+			if(in_array(12,$userRole) || in_array(13,$userRole)){//用户角色是客服角色才可以,客服角色id为12和13
+				saveOperationLog('alertRemind', 0, array('userId'=>$userId));//操作插入日志表中
+				$result['status'] = 1;
+				$result['msg'] = '登录成功';
+			}else{
+				$result['msg'] = '用户没有权限';
+			}
+		}else{
+			$result['msg'] = '账号密码错误';
+		}
+		echo json_encode($result);
 	}
 }
