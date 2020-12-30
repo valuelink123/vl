@@ -756,6 +756,18 @@
                                                         <span class="arrow"></span>
                                                     </a>
                                                 </li>
+                                                <li class="">
+                                                    <a href="/reports?type=amazon_settlements" class="nav-link nav-toggle ">
+                                                        Settlements Report
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
+                                                <li class="">
+                                                    <a href="/reports?type=amazon_settlement_details" class="nav-link nav-toggle ">
+                                                        Settlements Details Report
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
 												@endpermission
                                             </ul>
                                         </li>

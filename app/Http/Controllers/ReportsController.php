@@ -88,6 +88,22 @@ class ReportsController extends Controller
             $datas = $datas->where('snapshot_date','<=',array_get($_REQUEST,'snapshot_date_to'));
             $exportFileName.=array_get($_REQUEST,'snapshot_date_to').'_';
         }
+        if(array_get($_REQUEST,'posted_date_from')){
+            $datas = $datas->where('posted_date','>=',array_get($_REQUEST,'posted_date_from'));
+            $exportFileName.=array_get($_REQUEST,'posted_date_from').'_';
+        }
+        if(array_get($_REQUEST,'posted_date_to')){
+            $datas = $datas->where('posted_date','<=',array_get($_REQUEST,'posted_date_to'));
+            $exportFileName.=array_get($_REQUEST,'posted_date_to').'_';
+        }
+        if(array_get($_REQUEST,'deposit_date_from')){
+            $datas = $datas->where('deposit_date','>=',array_get($_REQUEST,'deposit_date_from'));
+            $exportFileName.=array_get($_REQUEST,'deposit_date_from').'_';
+        }
+        if(array_get($_REQUEST,'deposit_date_to')){
+            $datas = $datas->where('deposit_date','<=',array_get($_REQUEST,'deposit_date_to'));
+            $exportFileName.=array_get($_REQUEST,'deposit_date_to').'_';
+        }
         if(array_get($_REQUEST,'month_from')){
             $datas = $datas->where('month','>=',array_get($_REQUEST,'month_from'));
             $exportFileName.=array_get($_REQUEST,'month_from').'_';
@@ -168,6 +184,15 @@ class ReportsController extends Controller
                 $records["data"][] = [
                     'Account','Asin','SellerSku','Fnsku','Condition','MFN','MFN Fulfillable','AFN','AFN Warehouse','AFN Fulfillable','AFN Reserved','AFN Unsellable',
                     'Per Unit Volume','AFN Total','AFN Inbound Working','AFN Inbound Shipped','AFN Inbound Receiving','AFN Researching','AFN Reserved Future','AFN Future Buyable','Updated At'
+                ];
+            }elseif($type  == 'amazon_settlements'){
+                $records["data"][] = [
+                    'Account','Settlement Id','Start Date','End Date','Deposit Date','Total Amount','Currency','Updated At'
+                ];
+            }elseif($type  == 'amazon_settlement_details'){
+                $records["data"][] = [
+                    'Account','Settlement Id','Transaction Type','Order Id','Merchant Order Id','Adjustment Id','Shipment Id','Marketplace Name','Shipment Fee Type',
+                    'Shipment Fee Amount','Order Fee Type','Order Fee Amount','Fulfillment Id','Posted Date','Order Item Code','Merchant Order Item Id','Merchant Adjustment Item Id','Sku','Quantity Purchased','Price Type','Price Amount','Item Related Fee Type','Item Related Fee Amount','Misc Fee Amount','Other Fee Amount','Other Fee Reason Description','Promotion Id','Promotion Type','Promotion Amount','Direct Payment Type','Direct Payment Amount','Other Amount','Currency','Updated At'
                 ];
             }else{
                 $records["data"][] = [
@@ -250,6 +275,54 @@ class ReportsController extends Controller
                     (string)$list['afn_researching_quantity'],
                     (string)$list['afn_reserved_future_supply'],
                     (string)$list['afn_future_supply_buyable'],
+                    $list['updated_at'],
+                );
+            }elseif($type  == 'amazon_settlements'){
+                $line = array(
+                    array_get($accounts_data,$list['seller_account_id']),
+                    $list['settlement_id'],
+                    $list['settlement_start_date'],
+                    $list['settlement_end_date'],
+                    $list['deposit_date'],
+                    (string)$list['total_amount'],
+                    $list['currency'],
+                    $list['updated_at']
+                );
+            }elseif($type  == 'amazon_settlement_details'){
+                $line = array(
+                    array_get($accounts_data,$list['seller_account_id']),
+                    $list['settlement_id'],
+                    $list['transaction_type'],
+                    $list['order_id'],
+                    $list['merchant_order_id'],
+                    $list['adjustment_id'],
+                    $list['shipment_id'],
+                    $list['marketplace_name'],
+                    $list['shipment_fee_type'],
+                    (string)$list['shipment_fee_amount'],
+                    $list['order_fee_type'],
+                    (string)$list['order_fee_amount'],
+                    $list['fulfillment_id'],
+                    $list['posted_date'],
+                    $list['order_item_code'],
+                    $list['merchant_order_item_id'],
+                    $list['merchant_adjustment_item_id'],
+                    $list['sku'],
+                    (string)$list['quantity_purchased'],
+                    $list['price_type'],
+                    (string)$list['price_amount'],
+                    $list['item_related_fee_type'],
+                    (string)$list['item_related_fee_amount'],
+                    (string)$list['misc_fee_amount'],
+                    (string)$list['other_fee_amount'],
+                    $list['other_fee_reason_description'],
+                    $list['promotion_id'],
+                    $list['promotion_type'],
+                    (string)$list['promotion_amount'],
+                    $list['direct_payment_type'],
+                    (string)$list['direct_payment_amount'],
+                    (string)$list['other_amount'],
+                    $list['currency'],
                     $list['updated_at'],
                 );
             }else{
