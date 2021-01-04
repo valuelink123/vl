@@ -44,6 +44,7 @@ function getBudgetQuarter(){
     $nowYear = date('Y');
     $nowMonth =  date('m');
     $budget_quarter = [];
+	$now_quarter = 1;
     if($nowMonth>=3) $now_quarter = 2;
     if($nowMonth>=6) $now_quarter = 3;
     if($nowMonth>=9) $now_quarter = 4;
