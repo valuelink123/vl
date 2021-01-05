@@ -78,6 +78,17 @@
                         </div>
                     </div>
                     <div class="col-md-2">
+                        <div class="input-group">
+                            <span class="input-group-addon">Site</span>
+                            <select style="width:100%;height:29px;" id="site" data-init-by-query="ins.site">
+                                <option value="" >Select</option>
+                                @foreach(getSiteUrl() as $k=>$v)
+                                    <option value="{!! $v !!}" >{!! $v !!}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
                         @permission('non-ctg-export')
                         <div class="btn-group">
                             <button id="export" class="btn sbold blue"> Export
@@ -177,6 +188,7 @@
                     to: date_to.value
                 },
                 ands: {
+                    site:$('#site').val(),
                     // item_group: item_group.value,
                     // brand: brand.value,
                     // item_model: item_model.value

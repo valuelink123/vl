@@ -79,7 +79,8 @@ class CtgController extends Controller {
             ],
             [
                 'phone' => 't1.phone',
-				'email' => 't1.email'
+				'email' => 't1.email',
+				'site' => 't3.SalesChannel',
             ],
             [
                 // WHERE IN
