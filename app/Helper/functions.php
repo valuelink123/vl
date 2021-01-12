@@ -1439,3 +1439,42 @@ function array_merge_deep(...$arrs)
 
 	return $merged;
 }
+
+/*
+ * 同时更新多个记录，参数，连接的数据库，表名，数组
+ * $database 需要更新数据的宏
+ * $tableName 表名
+ * $multipleData  更改的数组
+ * $multipleData[] = array(
+ *   'id' => $mv->id,
+ *   'amazon_order_id' => $replacementOrderID[$mv->seller_fulfillment_order_id]
+ * )
+ */
+function updateBatch($database="",$tableName = "", $multipleData = array()){
+
+	if( $tableName && !empty($multipleData) ) {
+		$updateColumn = array_keys($multipleData[0]);//$updateColumn为传过来的所有字段
+		$referenceColumn = $updateColumn[0]; //为参考列，例如id
+		unset($updateColumn[0]);//更改的字段不包括第一列
+		$whereIn = "";
+
+		$q = "UPDATE ".$tableName." SET ";
+		foreach ( $updateColumn as $uColumn ) {
+			$q .=  $uColumn." = CASE ";
+
+			foreach( $multipleData as $data ) {
+				$q .= "WHEN ".$referenceColumn." = '".$data[$referenceColumn]."' THEN '".$data[$uColumn]."' ";
+			}
+			$q .= "ELSE ".$uColumn." END, ";
+		}
+		foreach( $multipleData as $data ) {
+			$whereIn .= "'".$data[$referenceColumn]."', ";
+		}
+		$q = rtrim($q, ", ")." WHERE ".$referenceColumn." IN (".  rtrim($whereIn, ', ').")";
+		// Update
+		return DB::connection($database)->update(DB::raw($q));
+	} else {
+		return false;
+	}
+
+}

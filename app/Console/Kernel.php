@@ -48,6 +48,9 @@ class Kernel extends ConsoleKernel
 		'App\Console\Commands\AddSalesRemind',
 		'App\Console\Commands\AddAsinData',
 		'App\Console\Commands\PushDailyReport',
+//		'App\Console\Commands\PullMailchimpData',
+		'App\Console\Commands\McfOrderUpdateAmazonOrderId',
+//		'App\Console\Commands\McfOrderUpdateSapStatus',
     ];
 
     /**
@@ -135,6 +138,7 @@ class Kernel extends ConsoleKernel
 		$schedule->command('push:dailyReport --marketplace_id=A1PA6795UKMFR9 --with_stock=1')->dailyAt('08:33')->name('dailyReport')->withoutOverlapping();
 		$schedule->command('push:dailyReport --marketplace_id=A1RKKUPIHCS9HS --with_stock=1')->dailyAt('08:34')->name('dailyReport')->withoutOverlapping();
 		$schedule->command('push:dailyReport --marketplace_id=A1VC38T7YXB528 --with_stock=1')->dailyAt('08:35')->name('dailyReport')->withoutOverlapping();
+		$schedule->command('update:mcf_order_amazonorderid')->monthly()->name('mcf_order_amazonorderid');
     }
 
     /**

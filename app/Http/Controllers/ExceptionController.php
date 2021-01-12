@@ -604,6 +604,7 @@ class ExceptionController extends Controller
 			$exception->process_status = $request->get('process_status');
 			$exception->process_date = date('Y-m-d H:i:s');
 			$exception->process_user_id = intval(Auth::user()->id);
+			$updateMcfOrder = array();
 			if($exception->type==2 || $exception->type==3){
 				$replacements = unserialize($exception->replacement);
 				$products=[];
@@ -611,9 +612,17 @@ class ExceptionController extends Controller
 				if(is_array($products_arr)){
 					$id_add=0;
 					foreach( $products_arr as $product_arr){
+						$updateMcfOrder[$product_arr['replacement_order_id']] = array(///修改数据前的重发单号，amazon_mcf_orders表重发单对应的原始订单号置空
+							'seller_fulfillment_order_id' => $product_arr['replacement_order_id'],
+							'amazon_order_id' => ''
+						);
 						$product_arr['replacement_order_id']=$request->input('replacement_order_id.'.$id_add);
 						$products[]=$product_arr;
 						$id_add++;
+						$updateMcfOrder[$product_arr['replacement_order_id']] = array(///修改数据后的重发单号，amazon_mcf_orders表重发单对应的原始订单号设置
+							'seller_fulfillment_order_id' => $product_arr['replacement_order_id'],
+							'amazon_order_id' => $exception->amazon_order_id
+						);
 					}
 				}
 				$replacements['products']=$products;
@@ -634,6 +643,11 @@ class ExceptionController extends Controller
 				}
 			}
 			if ($exception->save()) {
+				//$product_arr['replacement_order_id']为重发单,匹配amazon_mcf_orders表中对应的原始订单号
+				if($updateMcfOrder){
+					$updateMcfOrder = array_values($updateMcfOrder);
+					updateBatch('amazon','amazon_mcf_orders',$updateMcfOrder);
+				}
 				return redirect('exception/'.$id.'/edit');
 			} else {
 				$request->session()->flash('error_message','Set Failed');
@@ -673,7 +687,7 @@ class ExceptionController extends Controller
 			}else{
 				$exception->gift_card_amount = 0;
 			}
-
+			$updateMcfOrder = array();
 			if( $exception->type == 2 || $exception->type == 3){
 				$replacements = unserialize($exception->replacement);
 				$products=[];
@@ -681,9 +695,17 @@ class ExceptionController extends Controller
 				if(is_array($products_arr)){
 					$id_add=0;
 					foreach( $products_arr as $product_arr){
+						$updateMcfOrder[$product_arr['replacement_order_id']] = array(///修改数据前的重发单号，amazon_mcf_orders表重发单对应的原始订单号置空
+							'seller_fulfillment_order_id' => $product_arr['replacement_order_id'],
+							'amazon_order_id' => ''
+						);
 						$product_arr['replacement_order_id']=$request->input('replacement_order_id.'.$id_add);
 						$products[]=$product_arr;
 						$id_add++;
+						$updateMcfOrder[$product_arr['replacement_order_id']] = array(///修改数据后的重发单号，amazon_mcf_orders表重发单对应的原始订单号设置
+							'seller_fulfillment_order_id' => $product_arr['replacement_order_id'],
+							'amazon_order_id' => $exception->amazon_order_id
+						);
 					}
 				}
 				$replacements['products']=$products;
@@ -719,6 +741,11 @@ class ExceptionController extends Controller
 			}
 
 			if ($exception->save()) {
+				//$product_arr['replacement_order_id']为重发单,匹配amazon_mcf_orders表中对应的原始订单号
+				if($updateMcfOrder){
+					$updateMcfOrder = array_values($updateMcfOrder);
+					updateBatch('amazon','amazon_mcf_orders',$updateMcfOrder);
+				}
 				return redirect('exception/'.$id.'/edit');
 			} else {
 				$request->session()->flash('error_message','Set Failed');
@@ -1106,7 +1133,7 @@ class ExceptionController extends Controller
         }else{
             $exception->gift_card_amount = 0;
         }
-
+		$updateMcfOrder = array();
 		if( $exception->type == 2 || $exception->type == 3){
 			$products=[];
 			$products_arr = $request->get('group-products');
@@ -1120,6 +1147,10 @@ class ExceptionController extends Controller
 				}
 				if($product_arr['seller_id']=='FBM') $product_arr['replacement_order_id']=$request->get('rebindorderid');
 				$products[]=$product_arr;
+				$updateMcfOrder[] = array(
+					'seller_fulfillment_order_id' => $product_arr['replacement_order_id'],
+					'amazon_order_id' => $exception->amazon_order_id
+				);
 			}
 			//当countrycode为US和CA的时候，StateOrRegion填的值必须强制为两个大写字母
 			$specialCountry = array('US','CA');
@@ -1152,6 +1183,10 @@ class ExceptionController extends Controller
 		}
 
         if ($exception->save()) {
+			//$product_arr['replacement_order_id']为重发单,匹配amazon_mcf_orders表中对应的原始订单号
+			if($updateMcfOrder){
+				updateBatch('amazon','amazon_mcf_orders',$updateMcfOrder);
+			}
             return redirect('exception');
         } else {
             $request->session()->flash('error_message','Set Failed');
