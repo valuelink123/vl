@@ -69,7 +69,9 @@ class NonctgController extends Controller
                 'from' => 't1.from',
                 'sales' => 't3.seller',
             ],
-            [],
+            [
+				'site' => 't1.SalesChannel',
+			],
             [
                 // WHERE IN
                 'processor' => 't1.processor',

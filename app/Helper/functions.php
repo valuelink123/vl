@@ -723,10 +723,10 @@ function getActiveUserConfig()
         array('db'=>'website','dbname'=>'mooka_co','name'=>'mooka','formid'=>array(2),'fields'=>array('name'=>'1.3','email'=>2,'orderid'=>3)),
         array('db'=>'website','dbname'=>'irunme_net','name'=>'irunme','formid'=>array(1),'fields'=>array('name'=>'5.3','email'=>6,'orderid'=>7)),
         array('db'=>'website','dbname'=>'spacekeybrands_com','name'=>'spacekeybrands','formid'=>array(2),'fields'=>array('name'=>'2.3','email'=>3,'orderid'=>4)),
-		array('db'=>'natrogix','dbname'=>'natrogix_com','name'=>'natrogix','formid'=>array(17),'fields'=>array('name'=>'4','email'=>1,'orderid'=>3)),
+//		array('db'=>'natrogix','dbname'=>'natrogix_com','name'=>'natrogix','formid'=>array(17),'fields'=>array('name'=>'4','email'=>1,'orderid'=>3)),
 
 		array('db'=>'drocon','dbname'=>'drocon_co','name'=>'drocon','formid'=>array(2),'fields'=>array('name'=>'1.3','email'=>2,'orderid'=>3)),
-		array('db'=>'natrogix','dbname'=>'lypsonline_com','name'=>'lypsonline','formid'=>array(2),'fields'=>array('name'=>'1.3','email'=>2,'orderid'=>3)),
+//		array('db'=>'natrogix','dbname'=>'lypsonline_com','name'=>'lypsonline','formid'=>array(2),'fields'=>array('name'=>'1.3','email'=>2,'orderid'=>3)),
 		array('db'=>'website','dbname'=>'vipsupport_jp','name'=>'vipsupport','formid'=>array(1),'fields'=>array('name'=>'2.3','email'=>3,'orderid'=>4)),
 
 		array('db'=>'website','dbname'=>'wordpress','name'=>'azeus','entry_table'=>'wp_53_gf_entry','meta_table'=>'wp_53_gf_entry_meta','formid'=>array(3),'fields'=>array('name'=>1,'email'=>3,'orderid'=>2)),//新添加的azeus官网数据
@@ -739,7 +739,7 @@ function getActiveUserConfig()
 		array('db'=>'website','dbname'=>'miropureshop','name'=>'miropureshop.com','formid'=>array(2),'fields'=>array('name'=>'1.3','email'=>2,'orderid'=>3)),
 		array('db'=>'website','dbname'=>'mookashop','name'=>'mookashop.com','formid'=>array(2),'fields'=>array('name'=>'1.3','email'=>2,'orderid'=>3)),
 		array('db'=>'drocon','dbname'=>'droconshop_com','name'=>'droconshop.com','formid'=>array(12),'fields'=>array('name'=>'1','email'=>2,'orderid'=>3)),
-		array('db'=>'natrogix','dbname'=>'natrogixshop_com','name'=>'natrogixshop.com','formid'=>array(17),'fields'=>array('name'=>4,'email'=>1,'orderid'=>3)),
+		array('db'=>'website','dbname'=>'natrogix_com','name'=>'natrogixshop.com','formid'=>array(1),'fields'=>array('name'=>1,'email'=>2,'orderid'=>3)),
 		array('db'=>'website','dbname'=>'vip-support_jp','name'=>'vip-support.jp','formid'=>array(1),'fields'=>array('name'=>'2.3','email'=>3,'orderid'=>4)),
 		array('db'=>'website','dbname'=>'workizeshop_com','name'=>'workizeshop.com','formid'=>array(2),'fields'=>array('name'=>7,'email'=>2,'orderid'=>4)),
 
@@ -1102,56 +1102,62 @@ function getRsgRequestChannel()
 function getFacebookGroup()
 {
 	$arr = array(
-		1=>'CTG Premium Product Review Club | Alpha',
-		2=>'CTG Premium Product Review Club | Bravo',
-		3=>'CTG Premium Product Review Club | Charlie',
-		4=>'CTG Premium Product Review Club | Delta',
-		5=>'CTG Premium Product Review Club | Echo',
-		6=>'CTG Premium Product Review Club | Foxtrot',
-		7=>'CTG Premium Product Review Club | Golf',
-		8=>'CTG Premium Product Review Club | Hotel',
-		9=>'CTG Premium Product Review Club | India',
-		10=>'CTG Premium Product Review Club | Juliet',
-		11=>'CTG Premium Product Review Club | Kilo',
-		12=>'CTG Premium Product Review Club | Lima',
-		13=>'CTG Premium Product Review Club | Mike',
-		14=>'CTG Premium Product Review Club | November',
-		15=>'CTG Premium Product Review Club | Oscar',
-		16=>'CTG Premium Product Review Club | Papa',
-		17=>'CTG Premium Product Review Club | Quebec',
-		18=>'CTG Premium Product Review Club | Romeo',
-		19=>'CTG Premium Product Review Club | Sierra',
-		20=>'CTG Premium Product Review Club | Tango',
-		21=>'CTG Premium Product Review Club | Uniform',
-		22=>'CTG Premium Product Review Club | Victor',
-		23=>'CTG Premium Product Review Club | Whiskey',
-		24=>'CTG Premium Product Review Club | X-ray',
-		25=>'CTG Premium Product Review Club | Yankee',
-		26=>'CTG Premium Product Review Club | Zulu',
-		27=>'CTG Premium Product Review Club | Apple',
-		28=>'CTG Premium Product Review Club | Banana',
-		29=>'CTG Premium Product Review Club | Cherry',
-		30=>'CTG Premium Product Review Club | Date',
-		31=>'CTG Premium Product Review Club | Eggplant',
-		32=>'CTG Premium Product Review Club | Fig',
-		33=>'CTG Premium Product Review Club | Grape',
-		34=>'CTG Premium Product Review Club | Honeydew',
-		35=>'CTG Premium Product Review Club | Iceberg Lettuce',
-		36=>'CTG Premium Product Review Club | Jackfruit',
-		37=>'CTG Premium Product Review Club | Kiwi',
-		38=>'CTG Premium Product Review Club | Lemon',
-		39=>'CTG Premium Product Review Club | Mango',
-		40=>'CTG Premium Product Review Club | Nut',
-		41=>'CTG Premium Product Review Club | Olive',
-		42=>'CTG Premium Product Review Club | Peach',
-		43=>'CTG Premium Product Review Club | Quince',
-		44=>'CTG Premium Product Review Club | Radish',
-		45=>'CTG Premium Product Review Club | Strawberry',
-		46=>'CTG Premium Product Review Club | Tomato',
-		47=>'CTG Premium Product Review Club | Vanilla',
-		48=>'CTG Premium Product Review Club | Watermelon',
-		49=>'CTG Premium Product Review Club | Yam',
-		50=>'CTG Premium Product Review Club | Zucchini',
+//		1=>'CTG Premium Product Review Club | Alpha',
+//		2=>'CTG Premium Product Review Club | Bravo',
+//		3=>'CTG Premium Product Review Club | Charlie',
+//		4=>'CTG Premium Product Review Club | Delta',
+//		5=>'CTG Premium Product Review Club | Echo',
+//		6=>'CTG Premium Product Review Club | Foxtrot',
+//		7=>'CTG Premium Product Review Club | Golf',
+//		8=>'CTG Premium Product Review Club | Hotel',
+//		9=>'CTG Premium Product Review Club | India',
+//		10=>'CTG Premium Product Review Club | Juliet',
+//		11=>'CTG Premium Product Review Club | Kilo',
+//		12=>'CTG Premium Product Review Club | Lima',
+//		13=>'CTG Premium Product Review Club | Mike',
+//		14=>'CTG Premium Product Review Club | November',
+//		15=>'CTG Premium Product Review Club | Oscar',
+//		16=>'CTG Premium Product Review Club | Papa',
+//		17=>'CTG Premium Product Review Club | Quebec',
+//		18=>'CTG Premium Product Review Club | Romeo',
+//		19=>'CTG Premium Product Review Club | Sierra',
+//		20=>'CTG Premium Product Review Club | Tango',
+//		21=>'CTG Premium Product Review Club | Uniform',
+//		22=>'CTG Premium Product Review Club | Victor',
+//		23=>'CTG Premium Product Review Club | Whiskey',
+//		24=>'CTG Premium Product Review Club | X-ray',
+//		25=>'CTG Premium Product Review Club | Yankee',
+//		26=>'CTG Premium Product Review Club | Zulu',
+//		27=>'CTG Premium Product Review Club | Apple',
+//		28=>'CTG Premium Product Review Club | Banana',
+//		29=>'CTG Premium Product Review Club | Cherry',
+//		30=>'CTG Premium Product Review Club | Date',
+//		31=>'CTG Premium Product Review Club | Eggplant',
+//		32=>'CTG Premium Product Review Club | Fig',
+//		33=>'CTG Premium Product Review Club | Grape',
+//		34=>'CTG Premium Product Review Club | Honeydew',
+//		35=>'CTG Premium Product Review Club | Iceberg Lettuce',
+//		36=>'CTG Premium Product Review Club | Jackfruit',
+//		37=>'CTG Premium Product Review Club | Kiwi',
+//		38=>'CTG Premium Product Review Club | Lemon',
+//		39=>'CTG Premium Product Review Club | Mango',
+//		40=>'CTG Premium Product Review Club | Nut',
+//		41=>'CTG Premium Product Review Club | Olive',
+//		42=>'CTG Premium Product Review Club | Peach',
+//		43=>'CTG Premium Product Review Club | Quince',
+//		44=>'CTG Premium Product Review Club | Radish',
+//		45=>'CTG Premium Product Review Club | Strawberry',
+//		46=>'CTG Premium Product Review Club | Tomato',
+//		47=>'CTG Premium Product Review Club | Vanilla',
+//		48=>'CTG Premium Product Review Club | Watermelon',
+//		49=>'CTG Premium Product Review Club | Yam',
+//		50=>'CTG Premium Product Review Club | Zucchini',
+		51=>'Amethyst Premium',
+		52=>'Scarlet Rewards',
+		53=>'Turquoise Gifts',
+		54=>'Shamrock Tokens',
+		55=>'Magenta Giveaway',
+
 	);
 	return $arr;
 }
@@ -1432,4 +1438,43 @@ function array_merge_deep(...$arrs)
 	}
 
 	return $merged;
+}
+
+/*
+ * 同时更新多个记录，参数，连接的数据库，表名，数组
+ * $database 需要更新数据的宏
+ * $tableName 表名
+ * $multipleData  更改的数组
+ * $multipleData[] = array(
+ *   'id' => $mv->id,
+ *   'amazon_order_id' => $replacementOrderID[$mv->seller_fulfillment_order_id]
+ * )
+ */
+function updateBatch($database="",$tableName = "", $multipleData = array()){
+
+	if( $tableName && !empty($multipleData) ) {
+		$updateColumn = array_keys($multipleData[0]);//$updateColumn为传过来的所有字段
+		$referenceColumn = $updateColumn[0]; //为参考列，例如id
+		unset($updateColumn[0]);//更改的字段不包括第一列
+		$whereIn = "";
+
+		$q = "UPDATE ".$tableName." SET ";
+		foreach ( $updateColumn as $uColumn ) {
+			$q .=  $uColumn." = CASE ";
+
+			foreach( $multipleData as $data ) {
+				$q .= "WHEN ".$referenceColumn." = '".$data[$referenceColumn]."' THEN '".$data[$uColumn]."' ";
+			}
+			$q .= "ELSE ".$uColumn." END, ";
+		}
+		foreach( $multipleData as $data ) {
+			$whereIn .= "'".$data[$referenceColumn]."', ";
+		}
+		$q = rtrim($q, ", ")." WHERE ".$referenceColumn." IN (".  rtrim($whereIn, ', ').")";
+		// Update
+		return DB::connection($database)->update(DB::raw($q));
+	} else {
+		return false;
+	}
+
 }

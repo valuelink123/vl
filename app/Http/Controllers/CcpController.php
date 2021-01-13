@@ -54,7 +54,8 @@ class CcpController extends Controller
 				$where .= " and bg = '" . $userdata->ubg . "' and bu = '" . $userdata->ubu . "'";
 			}
 		}
-		$bgbu= DB::select('select bg,bu from asin '.$where.' group by bg,bu ORDER BY BG ASC,BU ASC');//获取bgbu选项
+		$bgs = $this->queryFields('SELECT DISTINCT bg FROM asin order By bg asc');
+		$bus = $this->queryFields('SELECT DISTINCT bu FROM asin order By bu asc');
 		$site = getMarketDomain();//获取站点选项
 		$date = $this->date = date('Y-m-d');
 		$siteDate = array();
@@ -62,7 +63,7 @@ class CcpController extends Controller
 			$siteDate[$vv->marketplaceid] = date('Y-m-d',$this->getCurrentTime($vv->marketplaceid,1));
 		}
 		$date = $siteDate[current($site)->marketplaceid];
-		return view('ccp/index',['bgbu'=>$bgbu,'site'=>$site,'date'=>$date,'siteDate'=>$siteDate]);
+		return view('ccp/index',['bgs'=>$bgs,'bus'=>$bus,'site'=>$site,'date'=>$date,'siteDate'=>$siteDate]);
 	}
 	/*
 	*获取mws后台总统计数据的方法
@@ -86,7 +87,8 @@ class CcpController extends Controller
         $date_type = isset($search['date_type']) ? $search['date_type'] : '';//选的时间类型
         $site = isset($search['site']) ? $search['site'] : '';//站点，为marketplaceid
         $account = isset($search['account']) ? $search['account'] : '';//账号id,例如115,137
-        $bgbu = isset($search['bgbu']) ? $search['bgbu'] : '';//bgbu,例如BG1_BU4
+		$bg = isset($search['bg']) ? $search['bg'] : '';
+		$bu = isset($search['bu']) ? $search['bu'] : '';
 		$timeType = isset($search['timeType']) ? $search['timeType'] : '';//时间类型，默认是0为北京时间，1为亚马逊后台当地时间
 		$this->date = isset($search['date']) ? $search['date'] : '';//date搜索框的值
 		$domain = substr(getDomainBySite($site), 4);//orders.sales_channel
@@ -100,7 +102,7 @@ class CcpController extends Controller
 		}
 		$orderwhere .= " and sales_channel = '".ucfirst($domain)."'";
 		//用户权限sap_asin_match_sku
-		$userwhere = $this->getUserWhere($site,$bgbu);
+		$userwhere = $this->getUserWhere($site,$bg,$bu);
 		//保证asin_price此站点今天有数据
 		$this->insertTheAsinPrice($site);
 
@@ -147,7 +149,8 @@ class CcpController extends Controller
         $date_type = isset($search['date_type']) ? $search['date_type'] : '';//选的时间类型
         $site = isset($search['site']) ? $search['site'] : '';//站点，为marketplaceid
         $account = isset($search['account']) ? $search['account'] : '';//账号id,例如115,137
-        $bgbu = isset($search['bgbu']) ? $search['bgbu'] : '';//bgbu,例如BG1_BU4
+		$bg = isset($search['bg']) ? $search['bg'] : '';
+		$bu = isset($search['bu']) ? $search['bu'] : '';
         $asin = isset($search['asin']) ? trim($search['asin'],'+') : '';//asin输入框的值
 		$timeType = isset($search['timeType']) ? $search['timeType'] : '';//时间类型，默认是0为北京时间，1为亚马逊后台当地时间
 		$this->date = isset($search['date']) ? $search['date'] : '';//date搜索框的值
@@ -159,7 +162,7 @@ class CcpController extends Controller
 		$domain = substr(getDomainBySite($site), 4);//orders.sales_channel
 		$orderwhere .= " and sales_channel = '".ucfirst($domain)."'";
 		//用户权限sap_asin_match_sku
-		$userwhere = $this->getUserWhere($site,$bgbu);
+		$userwhere = $this->getUserWhere($site,$bg,$bu);
 		if($asin){
 			$where .= " and order_items.asin = '".$asin."'";
 		}
@@ -245,7 +248,6 @@ class CcpController extends Controller
 		$date_type = isset($search['date_type']) ? $search['date_type'] : '';//选的时间类型
 		$site = isset($search['site']) ? $search['site'] : '';//站点，为marketplaceid
 		$account = isset($search['account']) ? $search['account'] : '';//账号id,例如115,137
-		$bgbu = isset($search['bgbu']) ? $search['bgbu'] : '';//bgbu,例如BG1_BU4
 		$asin = isset($search['asin']) ? current(explode(',',$search['asin'])) : '';//asin输入框的值
 
 	}
@@ -315,7 +317,7 @@ class CcpController extends Controller
 	}
 
 	//得到用户的权限数据查询语句，根据sap_asin_match_sku去查数据
-	public function getUserWhere($site,$bgbu)
+	public function getUserWhere($site,$bg,$bu)
 	{
 		$userdata = Auth::user();
 		$userWhere = " where marketplace_id  = '".$site."'";
@@ -329,8 +331,11 @@ class CcpController extends Controller
 			}
 		}
 
-		if($bgbu){
-			$userWhere .= " and CONCAT(sap_seller_bg,'_',sap_seller_bu) = '".$bgbu."'";
+		if($bg){
+			$userWhere .= " and sap_seller_bg = '".$bg."'";
+		}
+		if($bu){
+			$userWhere .= " and sap_seller_bu = '".$bu."'";
 		}
 		$userWhere = " select DISTINCT sap_asin_match_sku.asin from sap_asin_match_sku  {$userWhere}";
 		return $userWhere;

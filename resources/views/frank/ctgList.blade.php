@@ -42,18 +42,7 @@ th,td,td>span {
                             <input class="form-control" data-options="format:'yyyy-mm-dd'" value="{!! date('Y-m-d') !!}" data-init-by-query="daterange.to" id="date_to" autocomplete="off"/>
                         </div>
                     </div>
-                    <div class="col-md-2">
-                        <div class="input-group">
-                            <span class="input-group-addon">Expect Rating</span>
-                            <select multiple style="width:100%;" id="rating" data-init-by-query="ins.rating">
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                            </select>
-                        </div>
-                        <br/>
+                    <div class="col-md-1">
                         <div class="input-group">
                             <span class="input-group-addon">BG</span>
                             <select multiple style="width:100%;" id="bg" data-init-by-query="ins.bg">
@@ -62,8 +51,17 @@ th,td,td>span {
                                 @endforeach
                             </select>
                         </div>
+                        <br>
+                        <div class="input-group">
+                            <span class="input-group-addon">BU</span>
+                            <select multiple style="width:100%;" id="bu" data-init-by-query="ins.bu">
+                                @foreach($bus as $bu)
+                                    <option value="{!! $bu !!}">{!! $bu !!}</option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <div class="input-group">
                             <span class="input-group-addon">Processor</span>
                             <select multiple style="width:100%;" id="processor" data-init-by-query="ins.processor">
@@ -74,11 +72,13 @@ th,td,td>span {
                         </div>
                         <br/>
                         <div class="input-group">
-                            <span class="input-group-addon">BU</span>
-                            <select multiple style="width:100%;" id="bu" data-init-by-query="ins.bu">
-                                @foreach($bus as $bu)
-                                    <option value="{!! $bu !!}">{!! $bu !!}</option>
-                                @endforeach
+                            <span class="input-group-addon">Expect Rating</span>
+                            <select multiple style="width:100%;" id="rating" data-init-by-query="ins.rating">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
                             </select>
                         </div>
                     </div>
@@ -114,6 +114,17 @@ th,td,td>span {
                             <select style="width:100%;height:29px;" id="channel" data-init-by-query="ins.channel">
                                 @foreach($channel as $k=>$v)
                                     <option value="{!! $k !!}" @if($selchannel==$k) selected @endif>{!! $v !!}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="input-group">
+                            <span class="input-group-addon">Site</span>
+                            <select style="width:100%;height:29px;" id="site" data-init-by-query="ins.site">
+                                <option value="" >Select</option>
+                                @foreach(getSiteUrl() as $k=>$v)
+                                    <option value="{!! $v !!}" >{!! $v !!}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -249,6 +260,7 @@ th,td,td>span {
                 },
                 ands: {
                     email: $('#email').val(),
+                    site:$('#site').val(),
                     // brand: brand.value,
                     // item_model: item_model.value
                 },

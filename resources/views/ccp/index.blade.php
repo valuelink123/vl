@@ -72,13 +72,24 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-1">
                         <div class="input-group">
-                            <span class="input-group-addon">BGBU</span>
-                            <select  style="width:100%;height:35px;" id="bgbu" name="bgbu">
+                            <span class="input-group-addon">BG</span>
+                            <select  style="width:100%;height:35px;" id="bg" name="bg">
                                 <option value="">Select</option>
-                                @foreach($bgbu as $value)
-                                    <option value="{{ $value->bg }}_{{$value->bu}}">{{ $value->bg }}_{{$value->bu}}</option>
+                                @foreach($bgs as $value)
+                                    <option value="{{ $value }}">{{ $value }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-1">
+                        <div class="input-group">
+                            <span class="input-group-addon">BU</span>
+                            <select  style="width:100%;height:35px;" id="bu" name="bu">
+                                <option value="">Select</option>
+                                @foreach($bus as $value)
+                                    <option value="{{$value}}">{{$value}}</option>
                                 @endforeach
                             </select>
                         </div>
