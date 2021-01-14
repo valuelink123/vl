@@ -305,7 +305,7 @@ class CcpController extends Controller
 	 */
 	public function getdays()
 	{
-		$day = (strtotime($this->end_date)-strtotime($this->start_date))/86400;
+		$day = ((strtotime($this->end_date)-strtotime($this->start_date))/86400)+1;
 		return $day;
 	}
 
