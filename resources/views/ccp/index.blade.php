@@ -162,6 +162,13 @@
                         <input  class="form-control"  value="{!! $date !!}" data-change="0" data-date-format="yyyy-mm-dd" data-options="format:'yyyy-mm-dd'" id="to_date" name="to_date" disabled="disabled"/>
                     </div>
                 </div>
+                <div class="col-md-1 confirm" style="display:none;">
+                    <div class="input-group">
+                        <div class="btn-group pull-right" >
+                            <button id="confirm" class="btn sbold green">Confirm</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -248,7 +255,18 @@
             value = $(this).attr('data-value');
             getDateBySite();//通过选择的站点和时间类型和得到对应的正确的时间范围
             $('input[name="date_type"]').val(value);
+            $('.confirm').css('display','none');
+            //date_type的值不为7的时候，隐藏确认键，直接触发搜索，让其显示结果，
+            // 为7的时候显示确认键，需要点击右侧的确认键，让其确认时间才触发搜索，让其显示结果
+            if(value==7){
+                $('.confirm').css('display','block');
+            }else{
+                $("#search_top").trigger("click");
+            }
             return true;
+        })
+        $('.confirm').click(function(){
+            $("#search_top").trigger("click");
         })
         //点击上面的搜索
         $('#search_top').click(function(){
