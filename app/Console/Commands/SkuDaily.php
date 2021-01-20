@@ -1,4 +1,11 @@
 <?php
+/*
+ * 接口文档地址：http://docs.developer.amazonservices.com/en_US/finances/Finances_Datatypes.html
+ * 不同的费用类型分别计入不同的费用字段中
+ * ChargeComponent  计收入
+ * Fee Types--Selling on Amazon Fees 计营销费用
+ * Fee Types--Fulfillment By Amazon Fees 计仓库操作费
+ */
 
 namespace App\Console\Commands;
 
@@ -48,9 +55,12 @@ class SkuDaily extends Command
 		$time =  $this->option('time');
         if(!$time) $time='2day';
 		$date=date('Y-m-d',strtotime('-'.$time));
+//		$date = '2020-06-07';//测试时间2020-10-01
 		print_r($date.'start...');
 		$skus_info=[];
 		$sku=$departments=[];
+		//计入收入的类型 ChargeComponent  计收入
+		$amount_type = ['Principal','Tax','MarketplaceFacilitatorTax-Principal','MarketplaceFacilitatorTax-Shipping','MarketplaceFacilitatorTax-Giftwrap','MarketplaceFacilitatorTax-Other','Discount','TaxDiscount','CODItemCharge','CODItemTaxCharge','CODOrderCharge','CODOrderTaxCharge','CODShippingCharge','CODShippingTaxCharge','ShippingCharge','ShippingTax','Goodwill','Giftwrap','GiftwrapTax','RestockingFee','ReturnShipping','PointsFee','GenericDeduction','FreeReplacementReturnShipping','PaymentMethodFee','ExportCharge','SAFE-TReimbursement','TCS-CGST','TCS-SGST','TCS-IGST','TCS-UTGST'];
 		//取汇率
 		$rates = DB::table('cur_rate')->pluck('rate','cur');
 		//去销售员部门
@@ -94,7 +104,7 @@ class SkuDaily extends Command
 			if(!isset($skus_info[$key]['status'])) $skus_info[$key]['status']=$sku['item_status'];
 			if(!isset($skus_info[$key]['level'])) $skus_info[$key]['level']=$sku['status'];
 			if(!isset($skus_info[$key]['review_user_id'])) $skus_info[$key]['review_user_id']=$sku['review_user_id'];
-			if(in_array($sale->type,['Principal','CostOfPointsGranted','GiftWrap','GiftWrapTax','PaymentMethodFee','ShippingCharge','ShippingTax','Tax','LowValueGoodsTax-Principal','LowValueGoodsTax-Shipping','MarketplaceFacilitatorTax-Other','MarketplaceFacilitatorTax-Principal','MarketplaceFacilitatorTax-Shipping','PromotionMetaDataDefinitionValue'])){
+			if(in_array($sale->type,$amount_type)){
 				if($sale->type == 'Principal') $skus_info[$key]['sales']+=$sale->sales;
 				$skus_info[$key]['amount']+=round($sale->amount*array_get($rates,$sale->currency),2);
 			}elseif(in_array($sale->type,['FBAPerUnitFulfillmentFee','CODChargeback','GiftwrapChargeback','ShippingChargeback'])){
@@ -464,7 +474,7 @@ class SkuDaily extends Command
 			if(!isset($skus_info[$key]['status'])) $skus_info[$key]['status']=$sku['item_status'];
 			if(!isset($skus_info[$key]['level'])) $skus_info[$key]['level']=$sku['status'];
 			if(!isset($skus_info[$key]['review_user_id'])) $skus_info[$key]['review_user_id']=$sku['review_user_id'];
-			if(in_array($sale->type,['Principal','CostOfPointsGranted','GiftWrap','GiftWrapTax','PaymentMethodFee','ShippingCharge','ShippingTax','Tax','LowValueGoodsTax-Principal','LowValueGoodsTax-Shipping','MarketplaceFacilitatorTax-Other','MarketplaceFacilitatorTax-Principal','MarketplaceFacilitatorTax-Shipping','PromotionMetaDataDefinitionValue'])){
+			if(in_array($sale->type,$amount_type)){
 				if($sale->type == 'Principal') $skus_info[$key]['sales']+=$sale->sales;
 				$skus_info[$key]['amount']+=round($sale->amount*array_get($rates,$sale->currency),2);
 			}elseif(in_array($sale->type,['FBAPerUnitFulfillmentFee','CODChargeback','GiftwrapChargeback','ShippingChargeback'])){
