@@ -20,7 +20,7 @@
         font-size: 18px;
     }
     .date-search-table{
-        width:60%;
+        width:100%;
         margin-bottom: 20px;
 
     }
@@ -52,6 +52,8 @@
         <div class="top portlet light" style="margin-left:-25px;">
             <form id="search-form" >
                 <input type="hidden" name="date_type" value="">
+                <input type="hidden" name="start_date" value="">
+                <input type="hidden" name="end_date" value="">
                 <input type="hidden" class="search_asin" name="asin" value="">
                 <div class="search portlet light">
                     <div class="col-md-2">
@@ -97,16 +99,10 @@
                     <div class="col-md-2">
                         <div class="input-group">
                             <span class="input-group-addon">Time Type</span>
-                            <select  style="width:100%;height:35px;" id="timeType" name="timeType" >
+                            <select  style="width:100%;height:35px;" id="timeType" name="timeType" onchange="getDateBySite()">
                                 <option value="1">Local Time</option>
                                 <option value="0">BeiJing Time</option>
                             </select>
-                        </div>
-                    </div>
-                    <div class="col-md-2">
-                        <div class="input-group">
-                            <span class="input-group-addon">Date</span>
-                            <input  class="form-control"  value="{!! $date !!}" data-change="0" data-date-format="yyyy-mm-dd" data-options="format:'yyyy-mm-dd'" id="date" name="date"/>
                         </div>
                     </div>
                     <div class="col-md-2">
@@ -140,17 +136,40 @@
                     <td></td>
                 </tr>
             </table>
-
-            <table class="date-search date-search-table">
-                <tr>
-                    <td class="date_type active" data-value="1">TODAY</td>
-                    <td class="date_type" data-value="2">YESTERDAY</td>
-                    <td class="date_type" data-value="3">LAST 3 DAYS</td>
-                    <td class="date_type" data-value="4">LAST 7 DAYS</td>
-                    <td class="date_type" data-value="5">LAST 15 DAYS</td>
-                    <td class="date_type" data-value="6">LAST 30 DAYS</td>
-                </tr>
-            </table>
+            <div class="search-date light portlet">
+                <div class="col-md-6" style="margin-left: -28px;">
+                <table class="date-search date-search-table">
+                    <tr>
+                        <td class="date_type active" data-value="1">TODAY</td>
+                        <td class="date_type" data-value="2">YESTERDAY</td>
+                        <td class="date_type" data-value="3">LAST 3 DAYS</td>
+                        <td class="date_type" data-value="4">LAST 7 DAYS</td>
+                        <td class="date_type" data-value="5">LAST 15 DAYS</td>
+                        <td class="date_type" data-value="6">LAST 30 DAYS</td>
+                        <td class="date_type" data-value="7">Other</td>
+                    </tr>
+                </table>
+                </div>
+                <div class="col-md-2">
+                    <div class="input-group">
+                        <span class="input-group-addon">From Date</span>
+                        <input  class="form-control"  value="{!! $date !!}" data-date-format="yyyy-mm-dd" data-options="format:'yyyy-mm-dd'" id="from_date" name="from_date" disabled="disabled"/>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="input-group">
+                        <span class="input-group-addon">Date</span>
+                        <input  class="form-control"  value="{!! $date !!}" data-change="0" data-date-format="yyyy-mm-dd" data-options="format:'yyyy-mm-dd'" id="to_date" name="to_date" disabled="disabled"/>
+                    </div>
+                </div>
+                <div class="col-md-1 confirm" style="display:none;">
+                    <div class="input-group">
+                        <div class="btn-group pull-right" >
+                            <button id="confirm" class="btn sbold green">Confirm</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -192,7 +211,12 @@
 
     <script>
         //日期控件初始化
-        $('#date').datepicker({
+        $('#to_date').datepicker({
+            rtl: App.isRTL(),
+            autoclose: true
+        });
+
+        $('#from_date').datepicker({
             rtl: App.isRTL(),
             autoclose: true
         });
@@ -228,8 +252,26 @@
         $('.date-search .date_type').click(function(){
             $('.date-search .date_type').removeClass('active');
             $(this).addClass('active');
-            var value = $(this).attr('data-value');
+            value = $(this).attr('data-value');
+            getDateBySite();//通过选择的站点和时间类型和得到对应的正确的时间范围
             $('input[name="date_type"]').val(value);
+            $('.confirm').css('display','none');
+            //date_type的值不为7的时候，隐藏确认键，直接触发搜索，让其显示结果，
+            // 为7的时候显示确认键，需要点击右侧的确认键，让其确认时间才触发搜索，让其显示结果
+            if(value==7){
+                $('.confirm').css('display','block');
+            }else{
+                $("#search_top").trigger("click");
+            }
+            return true;
+        })
+        $('.confirm').click(function(){
+            $("#search_top").trigger("click");
+        })
+        //点击上面的搜索
+        $('#search_top').click(function(){
+            $('input[name="start_date"]').val($('input[name="from_date"]').val());
+            $('input[name="end_date"]').val($('input[name="to_date"]').val());
             $.ajax({
                 type: 'post',
                 url: '/ccp/showTotal',
@@ -254,11 +296,6 @@
                 dtapi.settings()[0].ajax.data = {search: $("#search-form").serialize()};
                 dtapi.ajax.reload();
             },500)
-
-        })
-        //点击上面的搜索
-        $('#search_top').click(function(){
-            $(".date-search .active").trigger("click");
             return false;
         })
         //点击下面的搜索只改变下面表格的数据
@@ -299,28 +336,57 @@
             });
 
         }
-		//通过选择的站点和时间类型和时间得到对应的正确的时间
+		//通过选择的站点和时间类型和得到对应的正确的时间范围
         function getDateBySite()
 		{
-		    var dataRecent = $('#site').attr('data-recent');//最近一次的站点
-            var recentDate = $('#site').attr('data-recent-date');//最近一次站点的默认日期
-            var marketplaceid = $('#site option:selected').val();
-            var timeType = $('#timeType option:selected').val();
-            var date = $('#date').val();
-            var dataDate = $('#site option:selected').attr('data-date');//选中站点的默认日期
-
-            if(timeType==1 && recentDate == date){
-                $('#date').val(dataDate);
+		    var value = $('.date-search .active').attr('data-value');//选中时间区间的菜单
+            var timeType = $('#timeType option:selected').val();//选择的时间类型，是当地站点时间还是北京时间，timeType
+            var today = new Date();
+            if(timeType==1){//站点本地时间的时候，取出当前选中站点今天的日期
+                var date = $('#site option:selected').attr('data-date');
+                today = new Date(date);
             }
-
-            $('#site').attr('data-recent',marketplaceid);
-            $('#site').attr('data-recent-date',dataDate);
+            var oneday = 1000*60*60*24;//一天时间的秒数
+            var from_time = today;
+            var to_time = today;
+            $('input[name="from_date"]').attr("disabled", "disabled");
+            $('input[name="to_date"]').attr("disabled", "disabled");
+            if(value==2){//选的是昨天,开始和结束都是昨天
+                from_time = to_time = new Date(today- oneday);
+            }else if(value==3){//最近3天，开始是前天，结束是今天
+                from_time = new Date(today- oneday*2);
+            }else if(value==4){//最近7天
+                from_time = new Date(today- oneday*6);
+            }else if(value==5){//最近15天
+                from_time = new Date(today- oneday*14);
+            }else if(value==6){//最近30天
+                from_time = new Date(today- oneday*29);
+            }if(value==7){
+                $('input[name="from_date"]').removeAttr("disabled");
+                $('input[name="to_date"]').removeAttr("disabled");
+                return true;//选中的是其他的时候,不更改开始时间和结束时间
+            }
+            var from_month = from_time.getMonth() + 1;
+            var to_month = to_time.getMonth() + 1;
+            from_month = from_month<10 ? '0'+from_month : from_month;
+            to_month = to_month<10 ? '0'+to_month : to_month;
+            var from_day = from_time.getDate();
+            var to_day = to_time.getDate();
+            from_day = from_day<10 ? '0'+from_day : from_day;
+            to_day = to_day<10 ? '0'+to_day : to_day;
+            var from_date = from_time.getFullYear() + '-'+ from_month + '-'+ from_day;
+            var to_date = to_time.getFullYear() + '-'+ to_month+ '-'+ to_day;
+            $('input[name="from_date"]').val(from_date);
+            $('input[name="to_date"]').val(to_date);
+            $('input[name="start_date"]').val(from_date);
+            $('input[name="end_date"]').val(to_date);
+            return true;
 		}
 
         $(function(){
             getAccountBySite()//触发当前选的站点得到该站点所有的账号
             // 根据搜索时间区域，调用点击事件，展示上部分的统计数据
-            $(".date-search .active").trigger("click");
+            $("#search_top").trigger("click");
         })
     </script>
 

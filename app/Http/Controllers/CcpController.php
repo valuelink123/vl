@@ -27,7 +27,8 @@ class CcpController extends Controller
 	use \App\Traits\Mysqli;
 
 	public $ccpAdmin = array("xumeiling@valuelinkcorp.com");
-	public $date = '';
+	public $start_date = '';//搜索时间范围的开始时间
+	public $end_date = '';//搜索时间范围的结束时间
 
 	public function __construct()
 	{
@@ -57,7 +58,7 @@ class CcpController extends Controller
 		$bgs = $this->queryFields('SELECT DISTINCT bg FROM asin order By bg asc');
 		$bus = $this->queryFields('SELECT DISTINCT bu FROM asin order By bu asc');
 		$site = getMarketDomain();//获取站点选项
-		$date = $this->date = date('Y-m-d');
+//		$date = $this->date = date('Y-m-d');
 		$siteDate = array();
 		foreach($site as $kk=>$vv){
 			$siteDate[$vv->marketplaceid] = date('Y-m-d',$this->getCurrentTime($vv->marketplaceid,1));
@@ -84,18 +85,19 @@ class CcpController extends Controller
 	    //搜索条件，统计数据不受下面的asin搜索的影响
         $search = isset($_REQUEST['search_data']) ? $_REQUEST['search_data'] : '';
         $search = $this->getSearchData(explode('&',$search));
-        $date_type = isset($search['date_type']) ? $search['date_type'] : '';//选的时间类型
+//        $date_type = isset($search['date_type']) ? $search['date_type'] : '';//选的时间类型
         $site = isset($search['site']) ? $search['site'] : '';//站点，为marketplaceid
         $account = isset($search['account']) ? $search['account'] : '';//账号id,例如115,137
 		$bg = isset($search['bg']) ? $search['bg'] : '';
 		$bu = isset($search['bu']) ? $search['bu'] : '';
 		$timeType = isset($search['timeType']) ? $search['timeType'] : '';//时间类型，默认是0为北京时间，1为亚马逊后台当地时间
-		$this->date = isset($search['date']) ? $search['date'] : '';//date搜索框的值
+		$this->start_date = isset($search['start_date']) ? $search['start_date'] : '';
+		$this->end_date = isset($search['end_date']) ? $search['end_date'] : '';
 		$domain = substr(getDomainBySite($site), 4);//orders.sales_channel
 		$siteCur = getSiteCur();
 		$currency_code = isset($siteCur[$domain]) ? $siteCur[$domain] : '';
 
-		$where = $orderwhere = $this->getDateWhere($date_type,$site,$timeType);
+		$where = $orderwhere = $this->getDateWhere($site,$timeType);
 		//$account搜索两个表的字段都为seller_account_id
 		if($account){
 			$where = $orderwhere .= ' and order_items.seller_account_id in('.$account.')';
@@ -146,15 +148,16 @@ class CcpController extends Controller
 	{
 		$search = isset($_REQUEST['search']) ? $_REQUEST['search'] : '';
 		$search = $this->getSearchData(explode('&',$search));
-        $date_type = isset($search['date_type']) ? $search['date_type'] : '';//选的时间类型
+//        $date_type = isset($search['date_type']) ? $search['date_type'] : '';//选的时间类型
         $site = isset($search['site']) ? $search['site'] : '';//站点，为marketplaceid
         $account = isset($search['account']) ? $search['account'] : '';//账号id,例如115,137
 		$bg = isset($search['bg']) ? $search['bg'] : '';
 		$bu = isset($search['bu']) ? $search['bu'] : '';
         $asin = isset($search['asin']) ? trim($search['asin'],'+') : '';//asin输入框的值
 		$timeType = isset($search['timeType']) ? $search['timeType'] : '';//时间类型，默认是0为北京时间，1为亚马逊后台当地时间
-		$this->date = isset($search['date']) ? $search['date'] : '';//date搜索框的值
-		$where = $orderwhere = $this->getDateWhere($date_type,$site,$timeType);
+		$this->start_date = isset($search['start_date']) ? $search['start_date'] : '';
+		$this->end_date = isset($search['end_date']) ? $search['end_date'] : '';
+		$where = $orderwhere = $this->getDateWhere($site,$timeType);
 		//$account搜索两个表的字段都为seller_account_id
 		if($account){
 			$where = $orderwhere .= ' and order_items.seller_account_id in('.$account.')';
@@ -195,7 +198,7 @@ class CcpController extends Controller
 		$recordsTotal = $recordsFiltered = $recordsTotal[0]->total;
 		$data = array();
 		$asins = array();
-        $day = $this->getdays($date_type,$site,$timeType);//获取查询的时间范围有几天
+        $day = $this->getdays();//获取查询的时间范围有几天
 
 		$showOrder = Auth::user()->can(['ccp-showOrderList']) ? 1 : 0;//是否有查看详情权限
 		foreach($itemData as $key=>$val){
@@ -245,7 +248,7 @@ class CcpController extends Controller
 	{
 		if(!Auth::user()->can(['ccp-show'])) die('Permission denied -- ccp show');
 		$search = $this->getSearchData(explode('&',$_SERVER["QUERY_STRING"]));
-		$date_type = isset($search['date_type']) ? $search['date_type'] : '';//选的时间类型
+//		$date_type = isset($search['date_type']) ? $search['date_type'] : '';//选的时间类型
 		$site = isset($search['site']) ? $search['site'] : '';//站点，为marketplaceid
 		$account = isset($search['account']) ? $search['account'] : '';//账号id,例如115,137
 		$asin = isset($search['asin']) ? current(explode(',',$search['asin'])) : '';//asin输入框的值
@@ -253,9 +256,9 @@ class CcpController extends Controller
 	}
 
 	//得到搜索时间的sql
-	public function getDateWhere($date_type,$site,$timeType)
+	public function getDateWhere($site,$timeType)
 	{
-		$dateRange = $this->getDateRange($date_type,$site,$timeType);
+		$dateRange = $this->getDateRange();
 		$startDate = $dateRange['startDate'];
 		$endDate = $dateRange['endDate'];
 		$date_field = 'purchase_date';
@@ -287,20 +290,11 @@ class CcpController extends Controller
 	 * $date_type变量的键值对应关系如下
 	 * 1=>TODAY,2=>YESTERDAY,3=>LAST 3 DAYS,4=>LAST 7 DAYS,5=>LAST 15 DAYS,6=>LAST 30 DAYS
 	 */
-	public function getDateRange($date_type,$site,$timeType)
+	public function getDateRange()
 	{
-		//如果选的时间类型是后台当地时间，时间要做转化
-		$configDays = array(1=>1,2=>1,3=>3,4=>7,5=>15,6=>30);
-		$time = strtotime($this->date);
-		$startDate = date('Y-m-d 00:00:00',$time);//默认的开始时间
-		$endDate = date('Y-m-d 23:59:59',$time);//默认的结束时间
-		if($date_type == 2){//昨天日期
-			$startDate = date("Y-m-d 00:00:00",strtotime("-1 day",$time));
-			$endDate = date('Y-m-d 23:59:59',strtotime("-1 day",$time));
-		}elseif($date_type > 2){
-			$lastday = isset($configDays[$date_type]) ? $configDays[$date_type] : 1;
-			$startDate = date("Y-m-d 00:00:00",strtotime("-".($lastday-1)." day",$time));
-		}
+		//加了搜索的时间范围，$date_type此参数就失效了
+		$startDate = date('Y-m-d 00:00:00',strtotime($this->start_date));//开始时间
+		$endDate = date('Y-m-d 23:59:59',strtotime($this->end_date));//结束时间
 		return array('startDate'=>$startDate,'endDate'=>$endDate);
 	}
 
@@ -309,10 +303,9 @@ class CcpController extends Controller
 	 * $date_type变量的键值对应关系如下
 	 * 1=>TODAY,2=>YESTERDAY,3=>LAST 3 DAYS,4=>LAST 7 DAYS,5=>LAST 15 DAYS,6=>LAST 30 DAYS
 	 */
-	public function getdays($date_type,$site,$timeType)
+	public function getdays()
 	{
-		$configDays = array(1=>1,2=>1,3=>3,4=>7,5=>15,6=>30);
-		$day = isset($configDays[$date_type]) ? $configDays[$date_type] : 1;
+		$day = ((strtotime($this->end_date)-strtotime($this->start_date))/86400)+1;
 		return $day;
 	}
 

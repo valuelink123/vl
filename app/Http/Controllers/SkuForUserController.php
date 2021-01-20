@@ -1,4 +1,12 @@
 <?php
+/*
+ * 产品部对照关系如下：
+ * 产品一部：宁波(484)
+ * 			何文江(383),杨园胜(389)
+ * 产品二部：张均(382)
+ * 			魏丹(380),黄宗深(442),赖青(457),张圣卓(266)
+ * 产品三部：席芳(491)
+ */
 
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
@@ -181,8 +189,11 @@ class SkuForUserController extends Controller
         if(!Auth::user()->can(['skuforuser-show-all'])){
             $user_ids = [];
             $user_ids[] = $userid = Auth::user()->id;
-			if($userid==382){
+			if($userid==382){//产品经理张均
 				$user_ids = [382,380,442,266,457];
+			}
+			if($userid==484){//产品经理宁波
+				$user_ids = [484,383,389];
 			}
             $datas = $datas->where(function ($query) use ($user_ids) {
                 $query->whereIn('producter', $user_ids)
@@ -274,8 +285,11 @@ class SkuForUserController extends Controller
         if(!Auth::user()->can(['skuforuser-show-all'])){
             $user_ids = [];
             $user_ids[] = $userid = Auth::user()->id;
-            if($userid==382){
+            if($userid==382){//产品经理张均
 				$user_ids = [382,380,442,266,457];
+			}
+			if($userid==484){//产品经理宁波
+				$user_ids = [484,383,389];
 			}
             $datas = $datas->where(function ($query) use ($user_ids) {
                 $query->whereIn('producter', $user_ids)
