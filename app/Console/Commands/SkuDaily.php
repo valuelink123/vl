@@ -66,7 +66,7 @@ class SkuDaily extends Command
 		print_r('order...');
 		$sales =  DB::connection('amazon')->select("select seller_sku as sellersku,marketplace_name as MarketplaceName,type,currency,sum(quantity_shipped) as sales,
         sum(amount) as amount from finances_shipment_events where date(posted_date)='$date' 
-		group by sellersku,MarketplaceName,type,currency");
+		group by seller_sku,marketplace_name,type,currency");
 		foreach($sales as $sale){
 			$match_site = $sale->MarketplaceName;
 			if($match_site=='Non-Amazon'){
@@ -109,9 +109,11 @@ class SkuDaily extends Command
 
 		}
 		print_r('refund...');
+
 		//退款明细
-		$refunds =  DB::connection('order')->select("select MarketplaceName,sellersku,type,currency,sum(Amount) as amount from finances_refund_event
-		where date='$date' group by MarketplaceName,SellerSKU,type,Currency");
+		$refunds =  DB::connection('amazon')->select("select marketplace_name as MarketplaceName,seller_sku as sellersku,type,currency,sum(amount) as amount from finances_refund_events
+		where left(posted_date,10)='$date' group by marketplace_name,seller_sku,type,currency");
+
 		foreach($refunds as $refund){
 			$sku = Asin::where('site',strtolower('www.'.$refund->MarketplaceName))->where('sellersku',$refund->sellersku)->first();
 			if(!$sku) continue;
@@ -139,8 +141,8 @@ class SkuDaily extends Command
 		
 		print_r('return...');
 		//退货明细
-		$returns =  DB::connection('order')->select("select asin,sellersku,sum(quantity) as quantity from amazon_returns
-		where left(ReturnDate,10)='$date' and status<>'Reimbursed' group by asin,sellersku");
+		$returns =  DB::connection('amazon')->select("select asin,seller_sku as sellersku,sum(quantity) as quantity from amazon_returns
+		where left(return_date,10)='$date' and status<>'Reimbursed' group by asin,seller_sku");
 		foreach($returns as $return){
 			$sku = Asin::where('asin',trim($return->asin))->where('sellersku',trim($return->sellersku))->first();
 			if(!$sku) continue;
@@ -157,9 +159,11 @@ class SkuDaily extends Command
 			$skus_info[$key]['sales']=$skus_info[$key]['sales']-intval($return->quantity);
 		}
 		print_r('Deal...');
-		//deal
-		$coupons =  DB::connection('order')->select("select totalamount,currency,sku,site_code from finances_deal_event
-		where left(PostedDate,10)='$date'");
+		/*
+		 * deal和coupon和CPC暂时先不取，这三个选项暂时没有数据
+		//deal==处理
+		$coupons =  DB::connection('amazon')->select("select total_amount as totalamount,currency,sku,site_code from finances_deal_events
+		where left(posted_date,10)='$date'");
 		
 		foreach($coupons as $coupon){
 			if(!$coupon->sku) continue;
@@ -189,9 +193,9 @@ class SkuDaily extends Command
 		}
 		
 		print_r('Coupon...');
-		//coupon
-		$coupons =  DB::connection('order')->select("select totalamount,currency,sku,site_code from finances_coupon_event
-		where left(PostedDate,10)='$date'");
+		//coupon==处理
+		$coupons =  DB::connection('amazon')->select("select total_amount as totalamount,currency,sku,site_code from finances_coupon_events
+		where left(posted_date,10)='$date'");
 		foreach($coupons as $coupon){
 			if(!$coupon->sku) continue;
 			if(!$coupon->site_code) continue;
@@ -249,9 +253,10 @@ class SkuDaily extends Command
 				$skus_info[$key]['cpc']+=round($sku_amount*array_get($rates,array_get(getSiteCur(),array_get(getSiteUrl(),$coupon->marketplace_id))),2);
 			}
 		}
+		*/
 		print_r('FBA...');
-		//FBA库存对应
-		$sellerskus =  DB::connection('order')->select("select sellersku,asin,instock from amazon_inventory_supply where instock>0");
+		//FBA库存对应 ==处理
+		$sellerskus =  DB::connection('amazon')->select("select seller_sku as sellersku,asin,in_stock as instock from seller_inventory_supply where in_stock>0");
 		foreach($sellerskus as $sellersku_s){
 			$sku = Asin::where('sellersku',$sellersku_s->sellersku)->where('asin',$sellersku_s->asin)->first();
 			if(!$sku['item_no']) continue;
@@ -429,7 +434,7 @@ class SkuDaily extends Command
 		$skus_info=[];
 		$sales =  DB::connection('amazon')->select("select seller_sku as sellersku,marketplace_name as MarketplaceName,type,currency,sum(quantity_shipped) as sales,
         sum(amount) as amount from finances_shipment_events where date(posted_date)='$date' 
-		group by sellersku,MarketplaceName,type,currency");
+		group by seller_sku,marketplace_name,type,currency");
 		
 		foreach($sales as $sale){
 			$match_site = $sale->MarketplaceName;
