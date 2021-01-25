@@ -10,7 +10,7 @@ use DB;
 use Log;
 
 class CalDailySales extends Command
-{
+{cal:dailySales --afterDate=2020-10-01 --beforeDate=
     /**
      * The name and signature of the console command.
      *
@@ -174,7 +174,8 @@ class CalDailySales extends Command
 
                     //关税
                     $tax_rate=DB::table('tax_rate')->where('site',$site)->whereIn('sku',array('OTHERSKU',$sku))->pluck('tax','sku');
-                    $tax = round(((array_get($tax_rate,$sku)??array_get($tax_rate,'OTHERSKU'))??0),4);
+                    $tax = round(isset($tax_rate[$sku])?$tax_rate[$sku]:array_get($tax_rate,'OTHERSKU',0),4);
+
                     $tax = round($cost*$tax,2);
 
                     //头程运费
