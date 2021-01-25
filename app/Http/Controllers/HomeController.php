@@ -3,18 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Groupdetail;
-use App\User;
-use App\Task;
-use App\Asin;
-use App\SkusDailyInfo;
-use App\AsinDailyInfo;
+use App\Models\SaleDailyInfo;
+use App\SapAsinMatchSku;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use App\Services\MultipleQueue;
-use PDO;
-use DB;
-use log;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 class HomeController extends Controller
@@ -38,511 +30,149 @@ class HomeController extends Controller
      */
     public function index(Request $request)
     {
-		$limit_bg = $limit_bu = $limit_sap_seller_id = $limit_review_user_id='';
-
-		$sumwhere = '1=1';
-		$bonus_point = 0;
 		$date_from = $request->get('date_from')?$request->get('date_from'):(date('Y-m',strtotime('-2days')).'-01');
 		$date_to = $request->get('date_to')?$request->get('date_to'):date('Y-m-d',strtotime('-2days'));
-		
 		if($date_to>date('Y-m-d',strtotime('-2days'))) $date_to=date('Y-m-d',strtotime('-2days'));
 		if($date_from>$date_to) $date_from=$date_to;
 		
+		$datas  = new SaleDailyInfo;
+		$user_teams = new SapAsinMatchSku;
 		if (Auth::user()->seller_rules) {
 			$rules = explode("-", Auth::user()->seller_rules);
 			if (array_get($rules, 0) != '*'){
-				$limit_bg = array_get($rules, 0);
-				$bonus_point = 0.1;
-			}else{
-				$bonus_point = 1;
+				$datas = $datas->where('sap_seller_bg',array_get($rules, 0));
+				$user_teams =$user_teams->where('sap_seller_bg',array_get($rules, 0));
 			}
 			if (array_get($rules, 1) != '*'){
-				$limit_bu = array_get($rules, 1);
-				$bonus_point = 0.3;
+				$datas =$datas->where('sap_seller_bu',array_get($rules, 1));
+				$user_teams =$user_teams->where('sap_seller_bu',array_get($rules, 1));
 			}
-		} elseif (Auth::user()->sap_seller_id) {
-			$limit_sap_seller_id = Auth::user()->sap_seller_id;
-			$bonus_point = 0.6;
 		} else {
-			$limit_review_user_id = Auth::user()->id;
-			$bonus_point = 0.04;
-		}
+			$datas =$datas->where('sap_seller_id',Auth::user()->sap_seller_id); 
+			$user_teams =$user_teams->where('sap_seller_id',Auth::user()->sap_seller_id);
+		} 
+
+		$user_teams = $user_teams->selectRaw('sap_seller_bg as bg , sap_seller_bu as bu')
+		->groupBy(['bg','bu'])->orderBy('bg','asc')->orderBy('bu','asc')->get();
 		
-		
-		$asins = DB::table( DB::raw("(select max(sku_ranking) as sku_ranking,max(rating) as rating,max(review_count) as review_count,max(item_no) as item_no,sum(fba_stock) as fba_stock,sum(fba_transfer) as fba_transfer,max(fbm_stock) as fbm_stock,sum(sales_07_01) as sales_07_01,sum(sales_14_08) as sales_14_08,sum(sales_21_15) as sales_21_15,sum(sales_28_22) as sales_28_22,max(bg) as bg,max(bu) as bu,max(sap_seller_id) as sap_seller_id,max(review_user_id) as review_user_id, min(case when status = 'S' Then '0' else status end) as status,asin,site from asin where length(asin)=10 group by asin,site) as asin") )
-		->leftJoin( DB::raw("(select sum(bonus)*".$bonus_point." as bonus,sum(economic) as economic,sku,site from skus_daily_info where date>='".$date_from."' and date<='".$date_to."' group by sku,site) as sku_info") ,function($q){
-			$q->on('asin.item_no', '=', 'sku_info.sku')->on('asin.site', '=', 'sku_info.site');
-		})->leftJoin( DB::raw("(select sum(amount) as amount,sum(sales) as sales,asin,site from asin_daily_info where date>='".$date_from."' and date<='".$date_to."' group by asin,site) as asin_info") ,function($q){
-			$q->on('asin.asin', '=', 'asin_info.asin')->on('asin.site', '=', 'asin_info.site');
-		})->leftJoin( DB::raw("(select asin as asin_b,domain,avg(sessions) as sessions,avg(unit_session_percentage) as unit_session_percentage,avg(bsr) as bsr from star_history where create_at >= '".date('Y-m-d',strtotime('-10day'))."' group by asin,domain) as asin_star") ,function($q){
-			$q->on('asin.asin', '=', 'asin_star.asin_b')->on('asin.site', '=', 'asin_star.domain');
-		})->leftJoin("skus_status" ,function($q){
-			$q->on('asin.item_no', '=', 'skus_status.sku')->on('asin.site', '=', 'skus_status.site');
-		})->orderByRaw("amount desc")->selectRaw("asin.*,asin_star.*,skus_status.status as sku_status,skus_status.level as sku_level,sku_info.bonus,sku_info.economic,asin_info.amount,asin_info.sales");
-		if($limit_bg){
-			$asins = $asins->where('asin.bg',$limit_bg);
-			$sumwhere.=" and bg='$limit_bg'";
-		}
-		if($limit_bu){
-			$asins = $asins->where('asin.bu',$limit_bu);
-			$sumwhere.=" and bu='$limit_bu'";
-		}
-		if($limit_sap_seller_id){
-			$asins = $asins->where('asin.sap_seller_id',$limit_sap_seller_id);
-			$sumwhere.=" and sap_seller_id='$limit_sap_seller_id'";
-		}
-		if($limit_review_user_id){
-			$asins = $asins->where('asin.review_user_id',$limit_review_user_id);
-			$sumwhere.=" and review_user_id='$limit_review_user_id'";
-		}
-		
-		$user_teams = DB::select("select bg,bu from asin where $sumwhere group by bg,bu ORDER BY BG ASC,BU ASC");
-		$sku_statuses = DB::select("select status from skus_status group by status");
-		
-		if(array_get($_REQUEST,'user_id')){
-			$user_info = User::where('id',array_get($_REQUEST,'user_id'))->first();
-			
-			if ($user_info->seller_rules) {
-				$rules = explode("-", $user_info->seller_rules);
-				if (array_get($rules, 0) != '*'){
-					$limit_bg = array_get($rules, 0);
-					$bonus_point = 0.1;
-				}else{
-					$bonus_point = 1;
-				}
-				if (array_get($rules, 1) != '*'){
-					$limit_bu = array_get($rules, 1);
-					$bonus_point = 0.3;
-				}
-			} elseif ($user_info->sap_seller_id) {
-				$limit_sap_seller_id = $user_info->sap_seller_id;
-				$bonus_point = 0.6;
-			} else {
-				$limit_review_user_id = $user_info->id;
-				$bonus_point = 0.04;
-			}
-		}
-		if($limit_bg){
-			$asins = $asins->where('asin.bg',$limit_bg);
-			$sumwhere.=" and bg='$limit_bg'";
-		}
-		if($limit_bu){
-			$asins = $asins->where('asin.bu',$limit_bu);
-			$sumwhere.=" and bu='$limit_bu'";
-		}
-		if($limit_sap_seller_id){
-			$asins = $asins->where('asin.sap_seller_id',$limit_sap_seller_id);
-			$sumwhere.=" and sap_seller_id='$limit_sap_seller_id'";
-		}
-		if($limit_review_user_id){
-			$asins = $asins->where('asin.review_user_id',$limit_review_user_id);
-			$sumwhere.=" and review_user_id='$limit_review_user_id'";
+		if(array_get($_REQUEST,'sap_seller_id')){
+			$datas =$datas->where('sap_seller_id',array_get($_REQUEST,'sap_seller_id')); 
 		}
 
 		if(array_get($_REQUEST,'bgbu')){
 			$bgbu = array_get($_REQUEST,'bgbu');
 			$bgbu_arr = explode('_',$bgbu);
 			if(array_get($bgbu_arr,0)) {
-				$asins = $asins->where('asin.bg',array_get($bgbu_arr,0));
-				$sumwhere.=" and bg='".array_get($bgbu_arr,0)."'";
+				$datas =$datas->where('sap_seller_bg',array_get($bgbu_arr, 0));
 			}
 			if(array_get($bgbu_arr,1)){
-				$asins = $asins->where('asin.bu',array_get($bgbu_arr,1));
-				$sumwhere.=" and bu='".array_get($bgbu_arr,1)."'";
+				$datas =$datas->where('sap_seller_bu',array_get($bgbu_arr, 1));
 			}
 		}
-		$sku_daily_info_where=$asin_where="";
 		if(array_get($_REQUEST,'keywords')){
 			$keywords = array_get($_REQUEST,'keywords');
 			if($keywords){
 				$search_keys = explode(',', $keywords);
-				$asin_where.= " and ( asin.item_no ='".$keywords."'";
-				$sku_daily_info_where=" and ( skus_daily_info.sku ='".$keywords."'";
-				foreach($search_keys as $search_key){
-					$asin_where.= " or asin.item_no ='".$search_key."'";
-					$sku_daily_info_where.= " or skus_daily_info.sku ='".$search_key."'";
-				}
-				$asin_where.= ")";
-				$sku_daily_info_where.=")";
+				$datas = $datas->where(function ($query) use ($search_keys) {
+					foreach($search_keys as $search_key){
+						$query->where('sku', 'like', '%'.$search_key.'%')
+						->orWhere('asin', 'like', '%'.$search_key.'%');
+					}
+				});	
 			}
-		
-			$asins = $asins->whereRaw(substr($asin_where,5));
 		}
 		
-		if(array_get($_REQUEST,'sku_status')){
-			$asins = $asins->where('skus_status.status',array_get($_REQUEST,'sku_status'));
-			$sumwhere.=" and skus_status.status =  '".array_get($_REQUEST,'sku_status')."'";
+		if(array_get($_REQUEST,'sku_status')!==NULL && array_get($_REQUEST,'sku_status')!==''){
+			$datas =$datas->where('sku_status',array_get($_REQUEST,'sku_status'));
 		}
 		
+		$total_info = clone $datas;
+		$hb_total_info = clone $datas;
+
+		$datas =$datas->where('date','>=',$date_from)->where('date','<=',$date_to)->selectRaw('
+			asin,
+			marketplace_id,
+			any_value(sku) as sku,
+			any_value(sku_status) as sku_status,
+			sum(amount) as amount,
+			sum(resvered) as resvered,
+			sum(sale) as sale,
+			sum(income) as income,
+			sum(shipped) as shipped,
+			sum(`replace`) as `replace`,
+			sum(profit) as profit,
+			sum(refund) as refund,
+			sum(`return`) as `return`,
+			sum(cost) as cost,
+			sum(economic) as economic
+			')
+		->groupBy(['asin','marketplace_id'])->orderBy("economic","desc")->get()->toArray();
 		
 		
-		
-		
-		
-		$fba_stock_info = DB::select("select sum(fba_stock*fba_cost) as fba_total_amount,sum(fba_stock) as fba_total_stock from (select avg(fba_stock+fba_transfer) as fba_stock,avg(fba_cost) as fba_cost from asin left join skus_status on asin.item_no=skus_status.sku and asin.site=skus_status.site where $sumwhere $asin_where group by asin,sellersku ) as fba_total");
-		
-		$fbm_stock_info = DB::select("select sum(fbm_stock*fbm_cost) as fbm_total_amount,sum(fbm_stock) as fbm_total_stock from (select avg(fbm_stock) as fbm_stock,avg(fbm_cost) as fbm_cost from asin left join skus_status on asin.item_no=skus_status.sku and asin.site=skus_status.site where $sumwhere $asin_where group by item_no) as fbm_total");
-		
-		
-		$asins = $asins->take(5)->get();
-		$asins = json_decode(json_encode($asins), true);
+
+		$sku_statuses = getSkuStatuses();
 		
 		$hb_date_to = date('Y-m-d',strtotime($date_from)-86400);
 		$hb_date_from = date('Y-m-d',2*strtotime($date_from)-strtotime($date_to)-86400);
 		
-		$total_info = SkusDailyInfo::select(DB::raw('sum(bonus)*'.$bonus_point.' as bonus,sum(economic) as economic,sum(amount) as amount,sum(sales) as sales'))->leftJoin("skus_status" ,function($q){
-			$q->on('skus_daily_info.sku', '=', 'skus_status.sku')->on('skus_daily_info.site', '=', 'skus_status.site');
-		})->whereRaw($sumwhere.$sku_daily_info_where." and date>='$date_from' and date<='$date_to'")->first()->toArray();
+		$total_info = $total_info->where('date','>=',$date_from)->where('date','<=',$date_to)
+		->selectRaw('
+			sum(amount) as amount,
+			sum(resvered) as resvered,
+			sum(sale) as sale,
+			sum(income) as income,
+			sum(shipped) as shipped,
+			sum(`replace`) as `replace`,
+			sum(profit) as profit,
+			sum(refund) as refund,
+			sum(`return`) as `return`,
+			sum(cost) as cost,
+			sum(economic) as economic
+			')
+		->first()->toArray();
 		
-		$hb_total_info = SkusDailyInfo::select(DB::raw('sum(bonus)*'.$bonus_point.' as bonus,sum(economic) as economic,sum(amount) as amount,sum(sales) as sales'))->leftJoin("skus_status" ,function($q){
-			$q->on('skus_daily_info.sku', '=', 'skus_status.sku')->on('skus_daily_info.site', '=', 'skus_status.site');
-		})->whereRaw($sumwhere.$sku_daily_info_where." and date>='$hb_date_from' and date<='$hb_date_to'")->first()->toArray();
-		
-		$daily_info = SkusDailyInfo::select(DB::raw('sum(bonus)*'.$bonus_point.' as sumbonus,date'))->leftJoin("skus_status" ,function($q){
-			$q->on('skus_daily_info.sku', '=', 'skus_status.sku')->on('skus_daily_info.site', '=', 'skus_status.site');
-		})->whereRaw($sumwhere.$sku_daily_info_where." and date>='$date_from' and date<='$date_to'")->groupBy(['date'])->pluck('sumbonus','date');
-		
-		$curr_month = date('Y-m',strtotime('-2days'));
-		$month_budget = SkusDailyInfo::select(DB::raw('sum(economic) as economic,sum(amount) as amount,sum(sales) as sales,sum(returnqty) as returns,sum(profit_target) as economic_target,sum(sales_target) as sales_target,sum(amount_target) as amount_target,skus_daily_info.sku as sku,skus_daily_info.site as site,any_value(skus_status.status) as sku_status'))->leftJoin("skus_status" ,function($q){
-			$q->on('skus_daily_info.sku', '=', 'skus_status.sku')->on('skus_daily_info.site', '=', 'skus_status.site');
-		})->whereRaw($sumwhere.$sku_daily_info_where." and left(date,7)='$curr_month'")->groupBy(['sku','site'])->orderBy('sales','desc')->get()->toArray();
-
-		
-		
-		$returnDate['month_budget']= $month_budget;
-		$returnDate['bonus_point']= $bonus_point;
+		$hb_total_info = $hb_total_info->where('date','>=',$hb_date_from)->where('date','<=',$hb_date_to)
+		->selectRaw('
+			sum(amount) as amount,
+			sum(resvered) as resvered,
+			sum(sale) as sale,
+			sum(income) as income,
+			sum(shipped) as shipped,
+			sum(`replace`) as `replace`,
+			sum(profit) as profit,
+			sum(refund) as refund,
+			sum(`return`) as `return`,
+			sum(cost) as cost,
+			sum(economic) as economic
+			')
+		->first()->toArray();
+	
 		$returnDate['total_info']= $total_info;
 		$returnDate['hb_total_info']= $hb_total_info;
-		$returnDate['daily_info']= $daily_info;
+		$returnDate['datas']= $datas;
 		$returnDate['teams']= $user_teams;
 		$returnDate['sku_statuses']= $sku_statuses;
-		$returnDate['s_sku_status']= $request->get('sku_status');
-		$returnDate['s_keywords']= $request->get('keywords');
-		$returnDate['users']= $this->getUsers();
+		$returnDate['selected_sku_status']= $request->get('sku_status');
+		$returnDate['selected_keywords']= $request->get('keywords');
+		$returnDate['users']= getUsers('sap_seller');
 		$returnDate['date_from']= $date_from;
 		$returnDate['date_to']= $date_to;
-		$returnDate['s_user_id']= $request->get('user_id');
+		$returnDate['selected_sap_seller_id']= $request->get('sap_seller_id');
 		$returnDate['bgbu']= $request->get('bgbu');
-		
-		$returnDate['fba_stock_info']= $fba_stock_info;
-		$returnDate['fbm_stock_info']= $fbm_stock_info;
-		$returnDate['asins']= $asins;
-		$returnDate['tasks']= Task::where('response_user_id',Auth::user()->id)->where('stage','<',3)->take(10)->orderBy('priority','desc')->get()->toArray();
         return view('home',$returnDate);
 
     }
 	
-	public function getUsers(){
-        //目前在职的（locked=0）销售人员（sap_seller_id>0）
-        $users = User::where('sap_seller_id', '>', 0)->where('locked', '=',0)->get();
-        if (Auth::user()->seller_rules) {
-			$rules = explode("-", Auth::user()->seller_rules);
-			if (array_get($rules, 0) != '*'){
-				$users = $users->where('ubg',array_get($rules, 0));
-			}else{
-			}
-			if (array_get($rules, 1) != '*'){
-				$users = $users->where('ubu',array_get($rules, 1));
-			}
-		} elseif (Auth::user()->sap_seller_id) {
-			$users = $users->where('sap_seller_id',Auth::user()->sap_seller_id);
-		} else {
-			$users = $users->where('id',Auth::user()->id);
-		}
-		$users = $users->toArray();
-        $users_array = array();
-        foreach($users as $user){
-            $users_array[$user['id']] = $user['name'];
-        }
-        return $users_array;
-    }
-	
-	
-	public function getSellers(){
-        $users = User::where('sap_seller_id','>',0)->get()->toArray();
-        $users_array = array();
-        foreach($users as $user){
-            $users_array[$user['sap_seller_id']] = $user['name'];
-        }
-        return $users_array;
-    }
-	
-	public function asins(Request $request){
-		$limit_bg = $limit_bu = $limit_sap_seller_id = $limit_review_user_id='';
-		$sumwhere = '1=1';
-		if (Auth::user()->seller_rules) {
-			$rules = explode("-", Auth::user()->seller_rules);
-			if (array_get($rules, 0) != '*'){
-				$limit_bg = array_get($rules, 0);
-			}else{
-			}
-			if (array_get($rules, 1) != '*'){
-				$limit_bu = array_get($rules, 1);
-			}
-		} elseif (Auth::user()->sap_seller_id) {
-			$limit_sap_seller_id = Auth::user()->sap_seller_id;
-		} else {
-			$limit_review_user_id = Auth::user()->id;
-		}
-		if($limit_bg){
-			$sumwhere.=" and bg='$limit_bg'";
-		}
-		if($limit_bu){
-			$sumwhere.=" and bu='$limit_bu'";
-		}
-		if($limit_sap_seller_id){
-			$sumwhere.=" and sap_seller_id='$limit_sap_seller_id'";
-		}
-		if($limit_review_user_id){
-			$sumwhere.=" and review_user_id='$limit_review_user_id'";
-		}
-        $date_from = $request->get('date_from')?$request->get('date_from'):(date('Y-m',strtotime('-2days')).'-01');
-		$date_to = $request->get('date_to')?$request->get('date_to'):date('Y-m-d',strtotime('-2days'));
-		$teams = DB::select("select bg,bu from asin where $sumwhere group by bg,bu ORDER BY BG ASC,BU ASC");
-		$sku_statuses = DB::select("select status from skus_status group by status");
-		$users = $this->getUsers();
-		if($date_to>date('Y-m-d',strtotime('-2days'))) $date_to=date('Y-m-d',strtotime('-2days'));
-		if($date_from>$date_to) $date_from=$date_to;
-		$s_user_id = $request->get('user_id');
-		$bgbu = $request->get('bgbu');
-		return view('asin',compact('date_from','date_to','s_user_id','bgbu','teams','users','sku_statuses'));	
-    }
-	
-	public function getasins(Request $request){
-        $limit_bg = $limit_bu = $limit_sap_seller_id = $limit_review_user_id='';
-		$date_from = $request->get('date_from')?$request->get('date_from'):(date('Y-m',strtotime('-2days')).'-01');
-		$date_to = $request->get('date_to')?$request->get('date_to'):date('Y-m-d',strtotime('-2days'));
-		$sumwhere = '1=1';
-		$bonus_point = 0;
-		if (Auth::user()->seller_rules) {
-			$rules = explode("-", Auth::user()->seller_rules);
-			if (array_get($rules, 0) != '*'){
-				$limit_bg = array_get($rules, 0);
-				$bonus_point = 0.1;
-			}else{
-				$bonus_point = 1;
-			}
-			if (array_get($rules, 1) != '*'){
-				$limit_bu = array_get($rules, 1);
-				$bonus_point = 0.3;
-			}
-		} elseif (Auth::user()->sap_seller_id) {
-			$limit_sap_seller_id = Auth::user()->sap_seller_id;
-			$bonus_point = 0.6;
-		} else {
-			$limit_review_user_id = Auth::user()->id;
-			$bonus_point = 0.04;
-		}
-		
-		
-		
-		$asins = DB::table( DB::raw("(select max(sku_ranking) as sku_ranking,max(rating) as rating,max(review_count) as review_count,max(item_no) as item_no,sum(fba_stock) as fba_stock,sum(fba_transfer) as fba_transfer,max(fbm_stock) as fbm_stock,sum(sales_07_01) as sales_07_01,sum(sales_14_08) as sales_14_08,sum(sales_21_15) as sales_21_15,sum(sales_28_22) as sales_28_22,max(bg) as bg,max(bu) as bu,max(sap_seller_id) as sap_seller_id,max(review_user_id) as review_user_id, min(case when status = 'S' Then '0' else status end) as status,asin,site from asin where length(asin)=10 group by asin,site) as asin") )
-		->leftJoin( DB::raw("(select asin as asin_b,domain,avg(sessions) as sessions,avg(unit_session_percentage) as unit_session_percentage,avg(bsr) as bsr from star_history where create_at >= '".date('Y-m-d',strtotime('-10day'))."' group by asin,domain) as asin_star") ,function($q){
-			$q->on('asin.asin', '=', 'asin_star.asin_b')->on('asin.site', '=', 'asin_star.domain');
-		})->leftJoin( DB::raw("(select sum(amount) as amount,sum(sales) as sales,asin as asin_a,site as site_a from asin_daily_info where date>='$date_from' and date<='$date_to' group by asin,site) as asin_d") ,function($q){
-			$q->on('asin.asin', '=', 'asin_d.asin_a')->on('asin.site', '=', 'asin_d.site_a');
-		})->leftJoin( DB::raw("(select sum(bonus) as bonus,sum(economic) as economic,sku as sku_s,site  as site_s from skus_daily_info where date>='$date_from' and date<='$date_to' group by sku,site) as sku_d") ,function($q){
-			$q->on('asin.item_no', '=', 'sku_d.sku_s')->on('asin.site', '=', 'sku_d.site_s');
-		})->leftJoin("skus_status" ,function($q){
-			$q->on('asin.item_no', '=', 'skus_status.sku')->on('asin.site', '=', 'skus_status.site');
-		})->selectRaw("asin.*,asin_star.*,asin_d.*,sku_d.*,skus_status.status as sku_status,skus_status.level as sku_level");;
-		
-		
-		
-		if(array_get($_REQUEST,'user_id')){
-			$user_info = User::where('id',array_get($_REQUEST,'user_id'))->first();
-			
-			if ($user_info->seller_rules) {
-				$rules = explode("-", $user_info->seller_rules);
-				if (array_get($rules, 0) != '*'){
-					$limit_bg = array_get($rules, 0);
-					$bonus_point = 0.1;
-				}else{
-					$bonus_point = 1;
-				}
-				if (array_get($rules, 1) != '*'){
-					$limit_bu = array_get($rules, 1);
-					$bonus_point = 0.3;
-				}
-			} elseif ($user_info->sap_seller_id) {
-				$limit_sap_seller_id = $user_info->sap_seller_id;
-				$bonus_point = 0.6;
-			} else {
-				$limit_review_user_id = $user_info->id;
-				$bonus_point = 0.04;
-			}
-		}
-		if(array_get($_REQUEST,'bgbu')){
-			$bgbu = array_get($_REQUEST,'bgbu');
-			$bgbu_arr = explode('_',$bgbu);
-			if(array_get($bgbu_arr,0)) {
-				$asins = $asins->where('asin.bg',array_get($bgbu_arr,0));
-				$sumwhere.=" and bg='".array_get($bgbu_arr,0)."'";
-			}
-			if(array_get($bgbu_arr,1)){
-				$asins = $asins->where('asin.bu',array_get($bgbu_arr,1));
-				$sumwhere.=" and bu='".array_get($bgbu_arr,1)."'";
-			}
-		}
-		if(array_get($_REQUEST,'site')){
-			$asins = $asins->whereIn('asin.site',$_REQUEST['site']);
-		}
-		if(array_get($_REQUEST,'sku_status')){
-			$asins = $asins->where('skus_status.status',$_REQUEST['sku_status']);
-		}
-		if(array_get($_REQUEST,'keywords')){
-            $keywords = array_get($_REQUEST,'keywords');
-            $asins = $asins->where(function ($query) use ($keywords) {
-                $query->where('asin.item_no',$keywords)
-					  ->orwhere('asin.asin',$keywords);
-
-            });
-        }
-		
-		if($limit_bg){
-			$asins = $asins->where('asin.bg',$limit_bg);
-			$sumwhere.=" and bg='$limit_bg'";
-		}
-		if($limit_bu){
-			$asins = $asins->where('asin.bu',$limit_bu);
-			$sumwhere.=" and bu='$limit_bu'";
-		}
-		if($limit_sap_seller_id){
-			$asins = $asins->where('asin.sap_seller_id',$limit_sap_seller_id);
-			$sumwhere.=" and sap_seller_id='$limit_sap_seller_id'";
-		}
-		if($limit_review_user_id){
-			$asins = $asins->where('asin.review_user_id',$limit_review_user_id);
-			$sumwhere.=" and review_user_id='$limit_review_user_id'";
-		}
-		
-		$orderby = 'sales';
-        $sort = 'desc';
-		
-        if(isset($_REQUEST['order'][0])){
-           
-			if($_REQUEST['order'][0]['column']==3) $orderby = 'asin_d.amount';
-            if($_REQUEST['order'][0]['column']==4) $orderby = 'asin_d.sales';
-			if($_REQUEST['order'][0]['column']==5) $orderby = 'asin_d.sales';
-           
-			if($_REQUEST['order'][0]['column']==6) $orderby = '(case when asin_d.sales = 0 Then 0 else asin_d.amount/asin_d.sales end)';
-			
-			if($_REQUEST['order'][0]['column']==7) $orderby = 'asin.fba_stock';
-			if($_REQUEST['order'][0]['column']==8) $orderby = 'asin.fba_transfer';
-			if($_REQUEST['order'][0]['column']==10) $orderby = 'asin.fbm_stock';
-			if($_REQUEST['order'][0]['column']==11) $orderby = 'asin.rating';
-			if($_REQUEST['order'][0]['column']==12) $orderby = 'asin.review_count';
-			if($_REQUEST['order'][0]['column']==13) $orderby = 'asin_star.sessions';
-			if($_REQUEST['order'][0]['column']==14) $orderby = 'asin_star.unit_session_percentage';
-			if($_REQUEST['order'][0]['column']==15) $orderby = 'asin.sku_ranking';
-			if($_REQUEST['order'][0]['column']==16) $orderby = 'asin_star.bsr';
-			if($_REQUEST['order'][0]['column']==17) $orderby = 'sku_d.economic';
-			if($_REQUEST['order'][0]['column']==18) $orderby = 'sku_d.bonus';
-			
-            $sort = $_REQUEST['order'][0]['dir'];
-        }
-
-		$iTotalRecords = $asins->count();
-        $iDisplayLength = intval($_REQUEST['length']);
-        $iDisplayLength = $iDisplayLength < 0 ? $iTotalRecords : $iDisplayLength;
-        $iDisplayStart = intval($_REQUEST['start']);
-        $sEcho = intval($_REQUEST['draw']);
-		$datas =  $asins->orderByRaw($orderby.' '.$sort)->skip($iDisplayStart)->take($iDisplayLength)->get()->toArray();
-		$datas = json_decode(json_encode($datas),true);
-        $records = array();
-        $records["data"] = array();
-
-        $end = $iDisplayStart + $iDisplayLength;
-        $end = $end > $iTotalRecords ? $iTotalRecords : $end;
-		
-
-		
-		$users_array = $this->getUsers();
-		$sellers_array = $this->getSellers();
-		$total_amount = $total_sales = $total_fba_stock = $total_fba_transfer = $total_fbm_stock = $total_review_count = $total_economic = $total_bonus =0;
-		$exists_sku=[];
-        foreach ( $datas as $asin){
-			$sales = ((((array_get($asin,'sales_07_01')??array_get($asin,'sales_14_08'))??array_get($asin,'sales_21_15'))??array_get($asin,'sales_28_22'))??0)/7 ;
-			$records["data"][] = array(
-				'<a href="https://'.array_get($asin,'site').'/dp/'.array_get($asin,'asin').'" class="primary-link" target="_blank">'.array_get($asin,'asin').'</a>',
-				array_get($asin,'item_no'),
-				array_get($asin,'sku_status'),
-				round(array_get($asin,'amount'),2),
-				round(array_get($asin,'sales'),2),
-				intval(array_get($asin,'sales')/((strtotime($date_to)-strtotime($date_from))/86400+1)),
-				(array_get($asin,'sales')>0)?round(array_get($asin,'amount')/array_get($asin,'sales'),2):0,
-				array_get($asin,'fba_stock',0),
-				array_get($asin,'fba_transfer'),
-				($sales>0)?date('Y-m-d',strtotime('+'.intval((array_get($asin,'fba_stock',0)+array_get($asin,'fba_transfer',0))/$sales).' days')):'∞',
-				array_get($asin,'fbm_stock',0),
-				array_get($asin,'rating',0),
-				array_get($asin,'review_count',0),
-				intval(array_get($asin,'sessions')),
-				round(array_get($asin,'unit_session_percentage'),2),
-				substr(array_get($asin,'sku_ranking'),0,20),
-				intval(array_get($asin,'bsr')),
-				intval(array_get($asin,'economic',0)),
-				intval(array_get($asin,'bonus')*$bonus_point)
-			);
-			$total_amount+=round(array_get($asin,'amount'),2);
-			$total_sales+=round(array_get($asin,'sales'),2);
-			$total_fba_stock+=round(array_get($asin,'fba_stock'),2);
-			$total_fba_transfer+=round(array_get($asin,'fba_transfer'),2);
-			$total_fbm_stock+=round(array_get($asin,'fbm_stock'),2);
-			$total_review_count+=round(array_get($asin,'review_count'),2);
-			
-			if(!array_key_exists(array_get($asin,'item_no').'_'.array_get($asin,'site'),$exists_sku)){
-				$total_economic+=intval(array_get($asin,'economic',0));
-				$total_bonus+=intval(array_get($asin,'bonus')*$bonus_point);
-				$exists_sku[array_get($asin,'item_no').'_'.array_get($asin,'site')]=1;
-			}
-        }
-
-		$records["data"][] = array(
-			'Total:',
-			'',
-			'',
-			round($total_amount,2),
-			$total_sales,
-			intval($total_sales/((strtotime($date_to)-strtotime($date_from))/86400+1)),
-			'',
-			$total_fba_stock,
-			$total_fba_transfer,
-			'',
-			$total_fbm_stock,
-			'',
-			$total_review_count,
-			'',
-			'',
-			'',
-			'',
-			$total_economic,
-			$total_bonus
-		);
-
-        $records["draw"] = $sEcho;
-        $records["recordsTotal"] = $iTotalRecords;
-        $records["recordsFiltered"] = $iTotalRecords;
-        echo json_encode($records);
-		
-    }
 	
 	public function Export(Request $request){
-		$limit_bg = $limit_bu = $limit_sap_seller_id = $limit_review_user_id='';
-		
-		$sumwhere = '1=1';
-		$bonus_point = 0;
+		$limit_bg = $limit_bu = $limit_sap_seller_id='';
 		if (Auth::user()->seller_rules) {
 			$rules = explode("-", Auth::user()->seller_rules);
 			if (array_get($rules, 0) != '*'){
 				$limit_bg = array_get($rules, 0);
-				$bonus_point = 0.1;
-			}else{
-				$bonus_point = 1;
 			}
 			if (array_get($rules, 1) != '*'){
 				$limit_bu = array_get($rules, 1);
-				$bonus_point = 0.3;
 			}
 			if(array_get($_REQUEST,'bgbu')){
 				$bgbu = array_get($_REQUEST,'bgbu');
@@ -581,10 +211,8 @@ class HomeController extends Controller
 			}
 		} elseif (Auth::user()->sap_seller_id) {
 			$limit_sap_seller_id = Auth::user()->sap_seller_id;
-			$bonus_point = 0.6;
 		} else {
-			$limit_review_user_id = Auth::user()->id;
-			$bonus_point = 0.04;
+			$limit_sap_seller_id = Auth::user()->id;
 		}
 		
 		if($limit_bg){

@@ -198,15 +198,21 @@
                                             </ul>
                                         </li>
 
-										@permission('task-show')
-										<li class="menu-dropdown classic-menu-dropdown ">
-                                            <a href="/task"> Task
-												<span class="badge badge-danger" >{{intval($untasks)}}</span>
+                                        <li class="menu-dropdown classic-menu-dropdown ">
+                                            <a href="javascript:;"> Sales
                                                 <span class="arrow"></span>
                                             </a>
-
+                                            <ul class="dropdown-menu pull-left">
+                                                @permission('order-list-show')
+                                                <li class="">
+                                                    <a href="/orderList" class="nav-link nav-toggle ">
+                                                        Order List
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
+                                                @endpermission
+                                            </ul>
                                         </li>
-										@endpermission
 
 										<li class="menu-dropdown classic-menu-dropdown ">
                                             <a href="javascript:;"> Listing
