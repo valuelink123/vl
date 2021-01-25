@@ -422,7 +422,7 @@ a.editable-click:hover {
 			</tr>
 			</thead>
 			<tbody>
-			<?php $i=0;?>
+			<?php $i=1;?>
 			@foreach ($datas as $data)
 				<tr class="odd gradeX">
 					<td>
