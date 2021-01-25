@@ -365,4 +365,113 @@ class Controller extends BaseController
 		return 0;
 	}
 
+	/*
+	 * 通过订单号得到mcf的订单信息，sap接口需要的参数为$order和$orderitems两个数组
+	 * 参数：$mcfOrderId   amazon_mcf_orders表中的seller_fulfillment_order_id字段
+	 */
+	function getMcfOrderByMcfOrderId($mcfOrderId){
+		$marketplaceCode =	getMarketplaceCode();
+		$MarketplaceSiteCode = matchMarketplaceSiteCode();//marketplace_id跟亚马逊平台id的对应关系
+		//得到asin,sku,bg,bu,seller信息的数据处理
+		$detail_sql = "select CONCAT(seller_accounts.id,'_',sap_asin_match_sku.seller_sku) as sai_ss,sap_asin_match_sku.asin as asin, sap_asin_match_sku.sku as sku,marketplace_id,sap_seller_id,sap_warehouse_code,sap_factory_code,sap_shipment_code,asins.title as title,sap_asin_match_sku.seller_id 
+                FROM sap_asin_match_sku 
+                left join asins on asins.asin = sap_asin_match_sku.asin and asins.marketplaceid = sap_asin_match_sku.marketplace_id
+                left join seller_accounts on seller_accounts.mws_seller_id = sap_asin_match_sku.seller_id and seller_accounts.mws_marketplaceid=sap_asin_match_sku.marketplace_id";
+		$_detailData = DB::connection('amazon')->select($detail_sql);
+		$_detailData=json_decode(json_encode($_detailData), true);
+		$detailData = array();
+		foreach($_detailData as $dk=>$dv){
+			$detailData[$dv['sai_ss']] = $dv;
+		}
+		$order = $orderitems = array();
+		$_orderData = DB::connection('amazon')->table('amazon_mcf_orders')->where('seller_fulfillment_order_id',$mcfOrderId)->first();
+		$_orderitemsData = DB::connection('amazon')->table('amazon_mcf_orders_item')->where('seller_fulfillment_order_id',$mcfOrderId)->get();
+		$data['status'] = 0;
+		$data['message'] = '';
+		if($_orderData && $_orderitemsData) {
+			$data['status'] = 1;
+			//获取sap_seller_id
+			$sap_seller_id = $sku = $sap_factory_code = $sap_warehouse_code = $title = $currency = $sap_shipment_code = $site = $seller_id = '';
+			$i = 0;
+			foreach ($_orderitemsData as $_orderitem) {
+				$sai_ss = $_orderitem->seller_account_id.'_'.$_orderitem->seller_sku;
+				if(isset($detailData[$sai_ss])){
+					$sap_seller_id = $detailData[$sai_ss]['sap_seller_id'];
+					$sku = $detailData[$sai_ss]['sku'];
+					$sap_factory_code = $detailData[$sai_ss]['sap_factory_code'];
+
+					$sap_warehouse_code = $detailData[$sai_ss]['sap_warehouse_code'];
+					$title = $detailData[$sai_ss]['title'];
+					$currency = isset($marketplaceCode[$detailData[$sai_ss]['marketplace_id']]['currency_code']) ? $marketplaceCode[$detailData[$sai_ss]['marketplace_id']]['currency_code'] : '';
+					$sap_shipment_code = $detailData[$sai_ss]['sap_shipment_code'];
+					$site = isset($MarketplaceSiteCode[$detailData[$sai_ss]['marketplace_id']]) ? $MarketplaceSiteCode[$detailData[$sai_ss]['marketplace_id']] : '';//交易站点
+					$seller_id = $detailData[$sai_ss]['seller_id'];
+				}
+				$i++;
+				$orderitems[] = array(
+					'BSTKD' => $_orderData->amazon_order_id,//平台订单号
+					'PARVW_SE' => $sap_seller_id,//人员编号，sap_seller_id
+					'POSNR' => $i,//项目
+					'ORDERLINEITEMID' => 'VOP',//平台行项目号
+					'MATNR' => $sku,//物料号
+					'KWMENG' => $_orderitem->quantity,////订单数量
+					'WERKS' => $sap_factory_code,////工厂
+					'LGORT' => $sap_warehouse_code,//库存地点
+					'ZPR1' => '0.00',//产品单价
+					'ZKF2' => '0.00',//二程运费
+					'ZKF1' => '0.00',//项目运费
+					'ZJY1' => '0.00',//佣金
+					'ZPJ1' => '0.00',//成交费
+					'ZMWI' => '0.00',//平台税款
+					'ZCZ3' => '0.00',//操作费
+					'SELLER_SKU' => $_orderitem->seller_sku,//平台sku
+					'TITLE' => $title,//帖子标题
+					'WAERK' => $currency,//凭证货币
+					'WAERSF' => $currency,//货币
+				);
+			}
+			$order[] = array(
+				'BSTKD' => $_orderData->amazon_order_id,//平台订单号
+				'PARVW_SE' => $sap_seller_id,//sap_seller_id人员编号
+				'BSTDK' => date('Ymd',strtotime($_orderData->displayable_order_date_time)),//平台订单创建日期
+				'AUART' => 'ZRR1',//销售凭证类型
+				'VKORG' => '2000',//销售组织
+				'VTWEG' => '11',//分销渠道
+				'SPART' => '00',//产品组
+				'VKBUR' => $site,//交易站点
+				'KUNNR' => $seller_id,//售达方
+				'KUNWE' => 'AAAAAA',//客户
+				'ZCJRQ' => date('Ymd'),//创建日期
+				'SDABW' => $sap_shipment_code,//实际运输方式
+				'UNAME' => 'VOP',//用户名
+				'ORDERID' => $_orderData->seller_fulfillment_order_id,//平台订单号（重发单）
+				'PAYMENTID' => $_orderData->seller_fulfillment_order_id,//付款交易ID
+				'NAME1' => $_orderData->name,//客户姓名
+				'LAND1' => $_orderData->country_code,//国家
+				'LAND2' => $_orderData->country_code,//国家
+				'CITY1' => $_orderData->city,//城市
+				'STATEORPROVINCE' => $_orderData->state_or_region,//州/省
+				'STREET' => $_orderData->address_line_1,//地址
+				'STREET2' => $_orderData->address_line_2 . ' ' . $_orderData->address_line_3,//地址2
+				'POSTALCODE' => $_orderData->postal_code,//邮编
+				'PHONE1' => $_orderData->phone//电话
+			);
+
+			$data['data'] = array('order' => json_encode($order), 'orderitems' => json_encode($orderitems));
+		}else{
+			$data['message'] = 'Data Empty';
+		}
+		return $data;
+	}
+
+	function getAccountInfo()
+	{
+		$account = array();
+		$_account= DB::connection('vlz')->select("select id,label from seller_accounts where deleted_at is NULL order by label asc");
+		foreach($_account as $key=>$val){
+			$account[$val->id] = (array)$val;
+		}
+		return $account;
+	}
+
 }

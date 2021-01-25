@@ -110,6 +110,9 @@ Route::Post('/couponkunnr/get', 'CouponkunnrController@get')->name('getkunnrs');
 Route::Post('/couponkunnr/upload', 'CouponkunnrController@upload')->name('uploadkunnr');
 Route::Post('/mcforder/get', 'McforderController@get')->name('getMcforder');
 Route::get('/mcforderExport', 'McforderController@mcforderExport');//mcforder功能的导出
+Route::Post('/mcforder/toSap', 'McforderController@toSap');//mcforder功能中,把重发单插入到sap系统中
+Route::Post('/mcforder/getBindOrder', 'McforderController@getBindOrder');//mcforder功能中,得到可以让用户绑定的原始订单
+Route::Post('/mcforder/bindOrder', 'McforderController@bindOrder');//mcforder功能中,绑定原始订单操作
 // Route::resource('rsgproducts', 'RsgproductsController');
 Route::match(['post','get'],'/rsgproducts', 'RsgproductsController@list');//产品列表
 Route::get('/rsgproducts/edit', 'RsgproductsController@edit');//编辑产品
@@ -404,5 +407,10 @@ Route::match(['post','get'],'/api/alertRemind', 'ApiController@alertRemind');//�
 
 Route::get('/reports', 'ReportsController@index');
 Route::any('/reports/get', 'ReportsController@get')->name('getReport');
+
+//订单列表模块
+Route::get('/orderList', 'OrderListController@index');//订单列表
+Route::post('/orderList/list', 'OrderListController@list');//获取订单列表数据
+Route::match(['post','get'],'/orderList/export', 'OrderListController@export');//订单列表数据的下载
 
 

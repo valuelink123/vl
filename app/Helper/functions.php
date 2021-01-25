@@ -1476,5 +1476,11 @@ function updateBatch($database="",$tableName = "", $multipleData = array()){
 	} else {
 		return false;
 	}
-
+}
+/*
+ * 亚马逊订单状态的枚举
+ */
+function amazonOrderStatus()
+{
+	return array('PendingAvailability', 'Pending', 'Unshipped', 'PartiallyShipped', 'Shipped', 'InvoiceUnconfirmed', 'Unfulfillab','Canceled');
 }
