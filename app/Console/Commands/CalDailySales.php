@@ -10,7 +10,7 @@ use DB;
 use Log;
 
 class CalDailySales extends Command
-{cal:dailySales --afterDate=2020-10-01 --beforeDate=
+{
     /**
      * The name and signature of the console command.
      *
