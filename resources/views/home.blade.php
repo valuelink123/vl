@@ -464,19 +464,19 @@ a.editable-click:hover {
 					</td>
 					
 					<td>
-						0
+					{{round($data['coupon'],2)}}
 					</td>
 					<td>
-						0
+					{{round($data['deal'],2)}}
 					</td>
 					<td>
-						0
+					{{round($data['cpc'],2)}}
 					</td>
 					<td>
 						{{round($data['economic'],2)}}
 					</td>
 					<td>
-						0
+					{{round($data['bonus'],2)}}
 					</td>
 				</tr>
 			@endforeach
@@ -553,7 +553,7 @@ $(function() {
 		autoclose: true,
 	});
 	$("#data_export").click(function(){
-		location.href='/homeexport?date_from='+$("input[name='date_from']").val()+'&date_to='+$("input[name='date_to']").val()+'&sap_seller_id='+$("select[name='sap_seller_id']").val()+'&bgbu='+$("select[name='bgbu']").val();
+		location.href='/home?date_from='+$("input[name='date_from']").val()+'&date_to='+$("input[name='date_to']").val()+'&sap_seller_id='+$("select[name='sap_seller_id']").val()+'&bgbu='+$("select[name='bgbu']").val()+'&sku_status='+$("select[name='sku_status']").val()+'&keywords='+$("input[name='keywords']").val()+'&action=Export';
 	});
 });
 </script>
