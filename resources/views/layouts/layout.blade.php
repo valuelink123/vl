@@ -211,6 +211,14 @@
                                                     </a>
                                                 </li>
                                                 @endpermission
+                                                @permission('refund-show')
+                                                <li class="">
+                                                    <a href="/refund" class="nav-link nav-toggle ">
+                                                        Refund List
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
+                                                @endpermission
                                             </ul>
                                         </li>
 

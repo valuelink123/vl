@@ -108,7 +108,7 @@
                     <div class="col-md-2">
                         <a  data-toggle="modal" href="/orderList/export" target="_blank">
                             <button id="export" class="btn sbold blue"> Export
-                                <i class="fa fa-plus"></i>
+                                <i class="fa"></i>
                             </button>
                         </a>
                     </div>
