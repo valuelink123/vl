@@ -102,7 +102,7 @@
                     </div>
                 </form>
             </div>
-            @permission('order-list-export')
+{{--            @permission('order-list-export')--}}
             <div class="btn-group " style="float:right;margin-top:20px;">
                 <div class="col-md-12">
                     <div class="col-md-2">
@@ -114,7 +114,7 @@
                     </div>
                 </div>
             </div>
-            @endpermission
+{{--            @endpermission--}}
 
             <div>
                 <table class="table table-striped table-bordered" id="datatable">
