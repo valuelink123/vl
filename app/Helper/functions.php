@@ -1489,7 +1489,7 @@ function amazonOrderStatus()
  */
 function amazonReturnStatus()
 {
-	return array('Reimbursed', 'Repackaged Successfully', 'Unit returned to inventory');
+	return array('Reimbursed', 'Pending Repackaging','Repackaged Successfully', 'Unit returned to inventory');
 }
 /*
  * 退货原因的枚举
