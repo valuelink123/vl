@@ -219,6 +219,12 @@
                                                     </a>
                                                 </li>
 {{--                                                @endpermission--}}
+                                                <li class="">
+                                                    <a href="/return" class="nav-link nav-toggle ">
+                                                        Return List
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
                                             </ul>
                                         </li>
 

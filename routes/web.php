@@ -418,4 +418,9 @@ Route::get('/refund', 'RefundController@index');//订单列表
 Route::post('/refund/list', 'RefundController@list');//获取订单列表数据
 Route::match(['post','get'],'/refund/export', 'RefundController@export');//订单列表数据的下载
 
+//退货列表模块
+Route::get('/return', 'ReturnController@index');//订单列表
+Route::post('/return/list', 'ReturnController@list');//获取订单列表数据
+Route::match(['post','get'],'/return/export', 'ReturnController@export');//订单列表数据的下载
+
 
