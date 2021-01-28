@@ -1484,3 +1484,24 @@ function amazonOrderStatus()
 {
 	return array('PendingAvailability', 'Pending', 'Unshipped', 'PartiallyShipped', 'Shipped', 'InvoiceUnconfirmed', 'Unfulfillab','Canceled');
 }
+/*
+ * 退货状态的枚举
+ */
+function amazonReturnStatus()
+{
+	return array('Reimbursed', 'Pending Repackaging','Repackaged Successfully', 'Unit returned to inventory');
+}
+/*
+ * 退货原因的枚举
+ */
+function amazonReturnReason()
+{
+	return array('APPAREL_STYLE', 'APPAREL_TOO_LARGE', 'APPAREL_TOO_SMALL', 'DAMAGED_BY_CARRIER', 'DAMAGED_BY_FC', 'DEFECTIVE', 'DID_NOT_LIKE_FABRIC','EXCESSIVE_INSTALLATION','EXTRA_ITEM','FOUND_BETTER_PRICE','MISORDERED','MISSED_ESTIMATED_DELIVERY','MISSING_PARTS','NEVER_ARRIVED','NOT_AS_DESCRIBED','NOT_COMPATIBLE','NO_REASON_GIVEN','ORDERED_WRONG_ITEM','PART_NOT_COMPATIBLE','PRODUCT_NOT_ITALIAN','QUALITY_UNACCEPTABLE','SWITCHEROO','UNAUTHORIZED_PURCHASE','UNDELIVERABLE_CARRIER_MISS_SORTED','UNDELIVERABLE_FAILED_DELIVERY_ATTEMPTS','UNDELIVERABLE_INSUFFICIENT_ADDRESS','UNDELIVERABLE_MISSING_LABEL','UNDELIVERABLE_REFUSED','UNDELIVERABLE_UNCLAIMED','UNDELIVERABLE_UNKNOWN','UNWANTED_ITEM');
+}
+/*
+ * 退货condition的枚举
+ */
+function amazonReturnCondition()
+{
+	return array('CARRIER_DAMAGED', 'CUSTOMER_DAMAGED', 'DAMAGED', 'DEFECTIVE', 'SELLABLE');
+}
