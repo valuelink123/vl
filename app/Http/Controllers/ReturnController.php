@@ -32,7 +32,7 @@ class ReturnController extends Controller
 		$data['account'] = $this->getAccountInfo();//得到账号机的信息
 		$data['fromDate'] = date('Y-m-d',time()-2*86400);//开始日期,默认查最近三天的数据
 		$data['toDate'] = date('Y-m-d');//结束日期
-		$data['fromDate'] = '2021-01-15';//测试日期
+//		$data['fromDate'] = '2021-01-15';//测试日期
 		return view('sales/returnIndex',['data'=>$data]);
 	}
 
