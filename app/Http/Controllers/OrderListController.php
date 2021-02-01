@@ -93,6 +93,7 @@ class OrderListController extends Controller
 		$headArray[] = 'Status';
 		$headArray[] = 'Date';
 		$headArray[] = 'Asin';
+		$headArray[] = 'Seller Skus';
 		$headArray[] = 'Amounts';
 		$headArray[] = 'Currency';
 		$headArray[] = 'Tracking No';
@@ -125,6 +126,7 @@ class OrderListController extends Controller
 				$val['order_status'],
 				$val['date'],
 				$val['asins'],
+				$val['seller_skus'],
 				$val['amount'],
 				$val['currency_code'],
 				'/NA',//Tracking No
@@ -184,7 +186,7 @@ class OrderListController extends Controller
 			$where.= " and fulfillment_channel = '".$search['fulfillment_channel']."'";
 		}
 
-		$sql = "select SQL_CALC_FOUND_ROWS orders.id,orders.seller_account_id,orders.amazon_order_id,order_status,purchase_date,asins,currency_code,amount,fulfillment_channel,CONCAT(orders.seller_account_id,'_',orders.amazon_order_id) as accountid_orderid,settlement_id,settlement_date,last_update_date,posted_date  
+		$sql = "select SQL_CALC_FOUND_ROWS orders.id,orders.seller_account_id,orders.amazon_order_id,order_status,purchase_date,asins,currency_code,amount,fulfillment_channel,CONCAT(orders.seller_account_id,'_',orders.amazon_order_id) as accountid_orderid,settlement_id,settlement_date,last_update_date,posted_date,orders.seller_skus as seller_skus   
 				from orders 
 				left join (
 					select amazon_settlement_details.seller_account_id as seller_account_id,amazon_settlement_details.order_id as order_id,any_value(amazon_settlements.settlement_id) as settlement_id,any_value(amazon_settlements.deposit_date) as settlement_date 

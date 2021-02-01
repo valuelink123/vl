@@ -1,6 +1,6 @@
 @extends('layouts.layout')
 @section('crumb')
-    @include('layouts.crumb', ['crumbs'=>['order List']])
+    @include('layouts.crumb', ['crumbs'=>['Mcf Order List']])
 @endsection
 @section('content')
     @include('frank.common')
@@ -29,70 +29,40 @@
                             <span class="input-group-addon">Account</span>
                             <select class="mt-multiselect btn btn-default" id="account" multiple="multiple" data-width="100%" data-action-onchange="true" name="account" id="account[]">
                                 @foreach($data['account'] as $value)
-                                <option value="{{$value['id']}}">{{$value['label']}}</option>
+                                    <option value="{{$value['id']}}">{{$value['label']}}</option>
                                 @endforeach
                             </select>
                         </div>
                         <br>
-                        <div class="input-group">
-                            <span class="input-group-addon">Status</span>
-                            <select class="btn btn-default" name="status" id="status">
-                                <option value="">select</option>
-                                @foreach(amazonOrderStatus() as $status)
-                                    <option value="{{$status}}">{{$status}}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-md-2">
                         <div class="input-group">
                             <span class="input-group-addon">Order ID</span>
                             <input  class="form-control"  value="" id="amazon_order_id" name="amazon_order_id"/>
                         </div>
-                        <br>
-                        <div class="input-group">
-                            <span class="input-group-addon">Asin</span>
-                            <input  class="form-control"  value="" id="asin" name="asin"/>
-                        </div>
                     </div>
-
-
-{{--                    <div class="col-md-2">--}}
-{{--                        <div class="input-group">--}}
-{{--                            <span class="input-group-addon">Tracking No</span>--}}
-{{--                            <input  class="form-control"  value="" id="tracking_no" name="tracking_no"/>--}}
-{{--                        </div>--}}
-{{--                        <br>--}}
-{{--                        <div class="input-group">--}}
-{{--                            <span class="input-group-addon">Carryier Code</span>--}}
-{{--                            <input  class="form-control"  value="" id="carry_code" name="carry_code"/>--}}
-{{--                        </div>--}}
-{{--                    </div>--}}
-
                     <div class="col-md-2">
                         <div class="input-group">
-                            <span class="input-group-addon">Settlement ID</span>
-                            <input  class="form-control"  value="" id="settlement_id" name="settlement_id"/>
-                        </div>
-                        <br>
-                        <div class="input-group">
-                            <span class="input-group-addon">Settlement Date</span>
-                            <input  class="form-control"  value="" data-date-format="yyyy-mm-dd" data-options="format:'yyyy-mm-dd'" id="settlement_date" name="settlement_date"/>
-                        </div>
-                    </div>
-
-                    <div class="col-md-2">
-                        <div class="input-group">
-                            <span class="input-group-addon">Fulfillment Channel</span>
-                            <select class="btn btn-default" name="fulfillment_channel" id="fulfillment_channel">
-                                <option value="">select</option>
-                                <option value="AFN">FBA</option>
-                                <option value="MFN">FBM</option>
+                            <span class="input-group-addon">Status</span>
+                            <select class="form-control btn btn-default" name="status" id="status">
+                                <option value="">SELECT</option>
+                                @foreach(getMcfOrderStatus() as $key=>$val)
+                                    <option value="{{$val}}">{{$val}}</option>
+                                @endforeach
                             </select>
                         </div>
                         <br>
+                        <div class="input-group">
+                            <span class="input-group-addon">Seller SKU</span>
+                            <input  class="form-control"  value="" id="seller_sku" name="seller_sku"/>
+                        </div>
                     </div>
+                    <div class="col-md-2">
+                        <div class="input-group">
+                            <span class="input-group-addon">Customer Name</span>
+                            <input  class="form-control"  value="" id="customer_name" name="customer_name"/>
+                        </div>
+                        <br>
 
+                    </div>
                     <div class="col-md-2">
                         <div class="input-group">
                             <div class="btn-group pull-right" >
@@ -102,19 +72,19 @@
                     </div>
                 </form>
             </div>
-{{--            @permission('order-list-export')--}}
+            {{--            @permission('refund-export')--}}
             <div class="btn-group " style="float:right;margin-top:20px;">
                 <div class="col-md-12">
                     <div class="col-md-2">
-                        <a  data-toggle="modal" href="/orderList/export" target="_blank">
+                        <a  data-toggle="modal" href="/refund/export" target="_blank">
                             <button id="export" class="btn sbold blue"> Export
-                                <i class="fa"></i>
+                                <i class="fa "></i>
                             </button>
                         </a>
                     </div>
                 </div>
             </div>
-{{--            @endpermission--}}
+            {{--            @endpermission--}}
 
             <div>
                 <table class="table table-striped table-bordered" id="datatable">
@@ -123,18 +93,16 @@
                         <th>ID</th>
                         <th>Account</th>
                         <th>Amazon Order ID</th>
-                        <th>Status</th>
                         <th>Date</th>
-                        <th>Asin</th>
-                        <th>Seller Skus</th>
-                        <th>Amounts</th>
-                        <th>Currency</th>
-                        <th>Tracking No</th>
+                        <th>Seller SKU</th>
+                        <th>Order Status</th>
+                        <th>Customer Name</th>
+                        <th>Country</th>
+                        <th>Shipping Speed</th>
+                        <th>Tracking No.</th>
                         <th>Carrier Code</th>
                         <th>Settlement ID</th>
                         <th>Settlement Date</th>
-                        <th>Fulfillment Channel</th>
-                        <th>Posted Date</th>
                     </tr>
                     </thead>
                     <tbody></tbody>
@@ -155,10 +123,10 @@
             autoclose: true
         });
 
-        $('#settlement_date').datepicker({
-            rtl: App.isRTL(),
-            autoclose: true
-        });
+        // $('#settlement_date').datepicker({
+        //     rtl: App.isRTL(),
+        //     autoclose: true
+        // });
 
         $('#datatable').dataTable({
             searching: false,//关闭搜索
@@ -174,22 +142,20 @@
                 {data: 'id',name:'id'},
                 {data: 'account',name:'account'},
                 {data: 'amazon_order_id',name:'amazon_order_id'},
-                {data: 'status',name:'status'},
                 {data: 'date',name:'date'},
-                {data: 'asins',name:'asins'},
-                {data:'seller_skus',name:'seller_skus'},
-                {data: 'amount',name:'amount'},
-                {data: 'currency',name:'currency'},
+                {data: 'seller_sku',name:'seller_sku'},
+                {data: 'order_status',name:'order_status'},
+                {data: 'customer_name',name:'customer_name'},
+                {data: 'country',name:'country'},
+                {data: 'shipping_speed',name:'shipping_speed'},
                 {data: 'tracking_no',name:'tracking_no'},
-                {data: 'carry_code',name:'carry_code'},
+                {data: 'carrier_code',name:'carrier_code'},
                 {data: 'settlement_id',name:'settlement_id'},
                 {data: 'settlement_date',name:'settlement_date'},
-                {data: 'fulfillment_channel',name:'fulfillment_channel'},
-                {data: 'posted_date',name:'posted_date'},
             ],
             ajax: {
                 type: 'POST',
-                url: '/orderList/list',
+                url: '/McfOrderList/list',
                 data:  {search: $("#search-form").serialize()}
             }
         })
@@ -213,7 +179,7 @@
                     accountid = accountid + vv
                 }
             });
-            location.href='/orderList/export?'+search+'&account='+accountid;
+            location.href='/McfOrderList/export?'+search+'&account='+accountid;
         });
 
         $(function(){
