@@ -1222,7 +1222,7 @@ class InboxController extends Controller
 							'MarketPlaceId'=>$data['ZMPLACEID'],
 							'AmazonOrderId'=>$data['ZAOID'],
 							'SellerOrderId'=>$data['ZSOID'],
-							'ApiDownloadDate'=>date('Y-m-d H:i:s',strtotime($data['ALOADDATE'].$data['ALOADTIME'])),
+//							'ApiDownloadDate'=>date('Y-m-d H:i:s',strtotime($data['ALOADDATE'].$data['ALOADTIME'])),
 							'PurchaseDate'=>date('Y-m-d H:i:s',strtotime($data['PCHASEDATE'].$data['PCHASETIME'])),
 							'LastUpdateDate'=>date('Y-m-d H:i:s',strtotime($data['LUPDATEDATE'].$data['LUPDATETIME'])),
 							'OrderStatus'=>$data['ORSTATUS'],
