@@ -44,13 +44,14 @@
                                 <input type="text" class="form-control" name="priority" id="priority" value="{{$rule['priority']}}" required>
                             </div>
                         </div>
+
                         <div class="form-group">
-                            <label>Subject</label>
+                            <label>Email From</label>
                             <div class="input-group ">
                                 <span class="input-group-addon">
-                                    <i class="fa fa-heart"></i>
+                                    <i class="fa fa-envelope"></i>
                                 </span>
-                                <input type="text" class="form-control" name="subject" id="subject" value="{{$rule['subject']}}">
+                                <input type="text" class="form-control" name="from_email" id="from_email" value="{{$rule['from_email']}}" >
                             </div>
                         </div>
 
@@ -69,12 +70,12 @@
                         </div>
 
                         <div class="form-group">
-                            <label>Email From</label>
+                            <label>Subject</label>
                             <div class="input-group ">
                                 <span class="input-group-addon">
-                                    <i class="fa fa-envelope"></i>
+                                    <i class="fa fa-heart"></i>
                                 </span>
-                                <input type="text" class="form-control" name="from_email" id="from_email" value="{{$rule['from_email']}}" >
+                                <input type="text" class="form-control" name="subject" id="subject" value="{{$rule['subject']}}">
                             </div>
                         </div>
 

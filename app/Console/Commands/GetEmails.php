@@ -286,24 +286,39 @@ class GetEmails extends Command
 		return $group_id;
 	}
 	
-	
+	/*
+	 * 各个账号收到的邮件分配给用户的规则整理如下：
+		1，查出该账号发送给该客户的最近一条邮件信息，user_id和group_id等于查出的这个记录的对应user_id和group_id，rule_id=888888
+
+		2，查出该账号收到的该客户的最近一条邮件信息，user_id，rule_id和group_id等于查出的这个记录的对应user_id，rule_id和group_id
+
+		3，从邮件的subject中匹配出订单号或者订单信息，如果有订单信息，则从asin表中根据sellersku，asin，site查出一条符合条件的记录，再根据记录里的内容赋值给user_id，rule_id和group_id，item_no，其中rule_id=900000+记录里的id
+
+		查询出rules的所有数据，根据rules表的数据进行匹配，循环rules数据
+		 4.1根据发件人匹配，查询出的from_email字段与邮件的from_address地址进行匹配
+		 4.2根据收件人匹配，查询出的to_email字段与此账号的邮箱地址进行匹配
+		 4.3 根据主题匹配，查询出的subject字段与邮件的subject，text_plain，text_html内容进行匹配
+		 4.4根据asin匹配，查询出的asin字段与订单信息的asin进行匹配
+		 4.5根据sku匹配，查询出的sku字段与订单信息的sku进行匹配
+	 */
 
 	
     public function matchUser($mailData,$orderData){
 		$return_data= array();
         $orderId = array_get($mailData,'amazon_order_id','');
+        //查出该账号最近收到的该客户的邮件信息
         $lastUser = DB::table('inbox')->where('from_address',array_get($mailData,'from_address',''))
             ->where('to_address',$this->runAccount['account_email'])->orderBy('date','desc')->first();
         if($lastUser){
             $return_data = array('etype'=>$lastUser->etype,'remark'=>$lastUser->remark,'sku'=>$lastUser->sku,'asin'=>$lastUser->asin,'item_no'=>$lastUser->item_no,'mark'=>$lastUser->mark,'epoint'=>$lastUser->epoint);
 			 
         }
-		//
+		//查出该账号最近发送给该客户的邮件信息
 		$lastSend = DB::table('sendbox')->where('to_address',array_get($mailData,'from_address',''))
             ->where('from_address',$this->runAccount['account_email'])->orderBy('date','desc')->first();
         if($lastSend){
-			if($lastSend->inbox_id==0){
-			
+			if($lastSend->inbox_id==0){//inbox_id==0表示不是对某封邮件进行回复
+				//根据user_id得到此用户的一条组别信息
 				 $exists = DB::table('group_detail')->where('user_id',$lastSend->user_id)->first();
 				 if($exists){
 					 $return_data['user_id'] = $lastSend->user_id;
@@ -326,7 +341,7 @@ class GetEmails extends Command
 		}
 		
         
-		
+		//从邮件的subject中匹配出订单号或者订单信息，如果有订单信息，则从asin表中根据sellersku，asin，site查出一条符合条件的记录，再根据记录里的内容赋值给user_id，rule_id和group_id，item_no
 		$orderItems = array_get($orderData,'OrderItems',array());
 		
 		if($orderItems){			 
@@ -353,25 +368,6 @@ class GetEmails extends Command
             $orderAsins[]=$item['ASIN'];
         }
         foreach($rules as $rule){
-            //标题匹配
-            if($rule->subject){
-                $matched = false;
-                $subject_match_array = explode(';',$rule->subject);
-                foreach($subject_match_array as $subject_match_string){
-                    if($subject_match_string && stripos(array_get($mailData,'subject',''),$subject_match_string) !== false){
-                        $matched = true;
-                    }
-					if($subject_match_string && stripos(array_get($mailData,'text_plain',''),$subject_match_string) !== false){
-                        $matched = true;
-                    }
-					if($subject_match_string && stripos(strip_tags(array_get($mailData,'text_html','')),$subject_match_string) !== false){
-                        $matched = true;
-                    }
-					
-                }
-                if(!$matched) continue;
-            }
-
             //发件人匹配
             if($rule->from_email){
                 $matched = false;
@@ -395,6 +391,25 @@ class GetEmails extends Command
                 }
                 if(!$matched) continue;
             }
+
+			//标题匹配
+			if($rule->subject){
+				$matched = false;
+				$subject_match_array = explode(';',$rule->subject);
+				foreach($subject_match_array as $subject_match_string){
+					if($subject_match_string && stripos(array_get($mailData,'subject',''),$subject_match_string) !== false){
+						$matched = true;
+					}
+					if($subject_match_string && stripos(array_get($mailData,'text_plain',''),$subject_match_string) !== false){
+						$matched = true;
+					}
+					if($subject_match_string && stripos(strip_tags(array_get($mailData,'text_html','')),$subject_match_string) !== false){
+						$matched = true;
+					}
+
+				}
+				if(!$matched) continue;
+			}
 
             //站点匹配
             /*
