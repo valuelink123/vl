@@ -1,6 +1,6 @@
 @extends('layouts.layout')
 @section('crumb')
-    @include('layouts.crumb', ['crumbs'=>['Mcf Order List']])
+    @include('layouts.crumb', ['crumbs'=>['Amazon Settlement List']])
 @endsection
 @section('content')
     @include('frank.common')
@@ -18,7 +18,8 @@
                             <span class="input-group-addon">From Date</span>
                             <input  class="form-control"  value="{!! $data['fromDate'] !!}" data-date-format="yyyy-mm-dd" data-options="format:'yyyy-mm-dd'" id="from_date" name="from_date"/>
                         </div>
-                        <br>
+                    </div>
+                    <div class="col-md-2">
                         <div class="input-group">
                             <span class="input-group-addon">To Date</span>
                             <input  class="form-control"  value="{!! $data['toDate'] !!}" data-change="0" data-date-format="yyyy-mm-dd" data-options="format:'yyyy-mm-dd'" id="to_date" name="to_date"/>
@@ -33,36 +34,26 @@
                                 @endforeach
                             </select>
                         </div>
-                        <br>
+                    </div>
+                    <div class="col-md-2">
                         <div class="input-group">
-                            <span class="input-group-addon">Order ID</span>
-                            <input  class="form-control"  value="" id="amazon_order_id" name="amazon_order_id"/>
+                            <span class="input-group-addon">Settlement ID</span>
+                            <input  class="form-control"  value="" id="settlement_id" name="settlement_id"/>
                         </div>
                     </div>
                     <div class="col-md-2">
                         <div class="input-group">
-                            <span class="input-group-addon">Status</span>
-                            <select class="form-control btn btn-default" name="status" id="status">
-                                <option value="">SELECT</option>
-                                @foreach(getMcfOrderStatus() as $key=>$val)
+                            <span class="input-group-addon">Currency</span>
+                            <select class="form-control btn btn-default" name="currency" id="currency">
+                                <option value="">select</option>
+                                @foreach(getCurrency() as $key=>$val)
                                     <option value="{{$val}}">{{$val}}</option>
                                 @endforeach
                             </select>
                         </div>
                         <br>
-                        <div class="input-group">
-                            <span class="input-group-addon">Seller SKU</span>
-                            <input  class="form-control"  value="" id="seller_sku" name="seller_sku"/>
-                        </div>
                     </div>
-                    <div class="col-md-2">
-                        <div class="input-group">
-                            <span class="input-group-addon">Customer Name</span>
-                            <input  class="form-control"  value="" id="customer_name" name="customer_name"/>
-                        </div>
-                        <br>
 
-                    </div>
                     <div class="col-md-2">
                         <div class="input-group">
                             <div class="btn-group pull-right" >
@@ -72,11 +63,11 @@
                     </div>
                 </form>
             </div>
-            {{--            @permission('refund-export')--}}
+
             <div class="btn-group " style="float:right;margin-top:20px;">
                 <div class="col-md-12">
                     <div class="col-md-2">
-                        <a  data-toggle="modal" href="/McfOrderList/export" target="_blank">
+                        <a  data-toggle="modal" href="/settlement/export" target="_blank">
                             <button id="export" class="btn sbold blue"> Export
                                 <i class="fa "></i>
                             </button>
@@ -84,7 +75,7 @@
                     </div>
                 </div>
             </div>
-            {{--            @endpermission--}}
+
 
             <div>
                 <table class="table table-striped table-bordered" id="datatable">
@@ -92,17 +83,13 @@
                     <tr>
                         <th>ID</th>
                         <th>Account</th>
-                        <th>Amazon Order ID</th>
-                        <th>Date</th>
-                        <th>Seller SKU</th>
-                        <th>Order Status</th>
-                        <th>Customer Name</th>
-                        <th>Country</th>
-                        <th>Shipping Speed</th>
-                        <th>Tracking No.</th>
-                        <th>Carrier Code</th>
                         <th>Settlement ID</th>
-                        <th>Settlement Date</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Deposit Date</th>
+                        <th>Amount</th>
+                        <th>Currency</th>
+                        <th>Detail</th>
                     </tr>
                     </thead>
                     <tbody></tbody>
@@ -123,11 +110,6 @@
             autoclose: true
         });
 
-        // $('#settlement_date').datepicker({
-        //     rtl: App.isRTL(),
-        //     autoclose: true
-        // });
-
         $('#datatable').dataTable({
             searching: false,//关闭搜索
             serverSide: true,//启用服务端分页（这是使用Ajax服务端的必须配置）
@@ -141,21 +123,17 @@
             columns: [
                 {data: 'id',name:'id'},
                 {data: 'account',name:'account'},
-                {data: 'amazon_order_id',name:'amazon_order_id'},
-                {data: 'date',name:'date'},
-                {data: 'seller_sku',name:'seller_sku'},
-                {data: 'order_status',name:'order_status'},
-                {data: 'customer_name',name:'customer_name'},
-                {data: 'country',name:'country'},
-                {data: 'shipping_speed',name:'shipping_speed'},
-                {data: 'tracking_no',name:'tracking_no'},
-                {data: 'carrier_code',name:'carrier_code'},
                 {data: 'settlement_id',name:'settlement_id'},
-                {data: 'settlement_date',name:'settlement_date'},
+                {data: 'settlement_start_date',name:'settlement_start_date'},
+                {data: 'settlement_end_date',name:'settlement_end_date'},
+                {data: 'deposit_date',name:'deposit_date'},
+                {data: 'total_amount',name:'total_amount'},
+                {data: 'currency',name:'currency'},
+                {data: 'detail',name:'detail'},
             ],
             ajax: {
                 type: 'POST',
-                url: '/McfOrderList/list',
+                url: '/settlement/list',
                 data:  {search: $("#search-form").serialize()}
             }
         })
@@ -179,7 +157,7 @@
                     accountid = accountid + vv
                 }
             });
-            location.href='/McfOrderList/export?'+search+'&account='+accountid;
+            location.href='/settlement/export?'+search+'&account='+accountid;
         });
 
         $(function(){

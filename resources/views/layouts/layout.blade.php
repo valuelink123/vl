@@ -239,12 +239,12 @@
                                                 <span class="arrow"></span>
                                             </a>
                                             <ul class="dropdown-menu pull-left">
-												<li class="">
-                                                    <a href="/home/asins" class="nav-link nav-toggle ">
-                                                        My Listing
-                                                        <span class="arrow"></span>
-                                                    </a>
-                                                </li>
+{{--												<li class="">--}}
+{{--                                                    <a href="/home/asins" class="nav-link nav-toggle ">--}}
+{{--                                                        My Listing--}}
+{{--                                                        <span class="arrow"></span>--}}
+{{--                                                    </a>--}}
+{{--                                                </li>--}}
 												@permission('asin-rating-show')
 												<li class="">
 												    <a href="/star" class="nav-link nav-toggle ">
@@ -278,11 +278,19 @@
 												    </a>
 												</li>
 												 @endpermission
-												
-												 
-												
-												
-												
+                                            </ul>
+                                        </li>
+                                        <li class="menu-dropdown classic-menu-dropdown ">
+                                            <a href="javascript:;"> Financy
+                                                <span class="arrow"></span>
+                                            </a>
+                                            <ul class="dropdown-menu pull-left">
+                                                <li class="">
+                                                    <a href="/settlement" class="nav-link nav-toggle ">
+                                                        Amazon Settlement
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
                                             </ul>
                                         </li>
 
