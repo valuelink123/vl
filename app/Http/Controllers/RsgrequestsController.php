@@ -546,9 +546,11 @@ class RsgrequestsController extends Controller
         }
 		if(array_get($rule,'customer_paypal_email')) $rule['trans']=self::getTrans(array_get($rule,'customer_paypal_email'));
 		$product= RsgProduct::where('id',$rule['product_id'])->first();
-		$product = json_decode(json_encode($product));
 		if($product){
+			$product = $product->toArray();
 			$product['product_name'] = $product['asin'].'——'.$product['product_name'];
+		}else{
+			$product = array();
 		}
 
 		//查询该邮箱是否存在于client_info中，查出需要显示的facebook_name和facebook_group
