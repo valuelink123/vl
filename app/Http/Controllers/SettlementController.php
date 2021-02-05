@@ -295,21 +295,37 @@ class SettlementController extends Controller
 			$where.= " and settlement_id = '".$search['settlement_id']."'";
 		}
 		if(isset($search['seller_sku']) && $search['seller_sku']){
-			$where.= " and seller_sku = '".$search['seller_sku']."'";
+			$where.= " and amazon_settlement_details.seller_sku = '".$search['seller_sku']."'";
 		}
 		if(isset($search['amazon_order_id']) && $search['amazon_order_id']){
 			$where.= " and order_id = '".$search['amazon_order_id']."'";
 		}
 
-		$sql = "select SQL_CALC_FOUND_ROWS id,seller_account_id,settlement_id,currency,transaction_type,order_id,merchant_order_id,fulfillment_id,amazon_settlement_details.sku as seller_sku,shipment_fee_amount,other_fee_amount,price_amount,item_related_fee_amount,misc_fee_amount,promotion_amount,sap_seller_id,bg,bu,asin,price_type,item_related_fee_type
-			from amazon_settlement_details 
-			left join (
-						select seller_sku,any_value(sku) as sku,any_value(asin) as asin,seller_id,any_value(seller_accounts.id) as account_id,any_value(sap_seller_id) as sap_seller_id,any_value(sap_seller_bg) as bg,any_value(sap_seller_bu) as bu 
-						from sap_asin_match_sku
-						left join seller_accounts on mws_seller_id = seller_id 
-						group by seller_sku,seller_id
-				) as t1 on amazon_settlement_details.seller_account_id = t1.account_id and amazon_settlement_details.sku = t1.seller_sku 
-			 {$where}
+		$sql="SELECT SQL_CALC_FOUND_ROWS amazon_settlement_details.*,asin,seller_id,sap_seller_id,sap_seller_bg as bg,sap_seller_bu as bu  
+				FROM (
+					SELECT
+					  seller_accounts.label AS account,seller_accounts.mws_seller_id, 
+					  CASE amazon_settlement_details.marketplace_name
+					  WHEN 'Amazon.com' THEN 'ATVPDKIKX0DER'
+					  WHEN 'Amazon.com.mx' THEN 'A1AM78C64UM0Y8'
+					  WHEN 'Amazon.ca' THEN 'A2EUQ1WTGCTBG2'
+					  WHEN 'Amazon.co.jp' THEN 'A1VC38T7YXB528'
+					  WHEN 'Amazon.co.uk' THEN 'A1F83G8C2ARO7P'
+					  WHEN 'SI UK Prod Marketplace' THEN 'A1F83G8C2ARO7P'
+					  WHEN 'Amazon.de' THEN 'A1PA6795UKMFR9'
+					  WHEN 'Amazon.fr' THEN 'A13V1IB3VIYZZH'
+					  WHEN 'Amazon.es' THEN 'A1RKKUPIHCS9HS'
+					  WHEN 'Amazon.nl' THEN 'A1805IZSGTT6HS'
+					  WHEN 'SI Prod IT Marketplace' THEN 'APJ6JRA9NG5V4'
+					  ELSE
+						seller_accounts.mws_marketplaceid
+					END AS marketplace,
+						amazon_settlement_details.id as id,seller_account_id,settlement_id,currency,transaction_type,order_id,merchant_order_id,fulfillment_id,amazon_settlement_details.sku as seller_sku,shipment_fee_amount,other_fee_amount,price_amount,item_related_fee_amount,misc_fee_amount,promotion_amount,price_type,item_related_fee_type,posted_date 
+					FROM amazon_settlement_details
+					LEFT JOIN  seller_accounts ON (amazon_settlement_details.seller_account_id = seller_accounts.id AND seller_accounts.`primary` = 1 )
+				) AS amazon_settlement_details 
+				left join sap_asin_match_sku on seller_id=mws_seller_id and marketplace_id = marketplace and sap_asin_match_sku.seller_sku=amazon_settlement_details.seller_sku
+			  {$where}
 			order by posted_date desc";
 		return $sql;
 	}
