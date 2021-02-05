@@ -545,7 +545,8 @@ class RsgrequestsController extends Controller
             return redirect('rsgrequests');
         }
 		if(array_get($rule,'customer_paypal_email')) $rule['trans']=self::getTrans(array_get($rule,'customer_paypal_email'));
-		$product= RsgProduct::where('id',$rule['product_id'])->first()->toArray();
+		$product= RsgProduct::where('id',$rule['product_id'])->first();
+		$product = json_decode(json_encode($product));
 		if($product){
 			$product['product_name'] = $product['asin'].'——'.$product['product_name'];
 		}
