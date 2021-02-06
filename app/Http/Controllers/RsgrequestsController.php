@@ -545,9 +545,12 @@ class RsgrequestsController extends Controller
             return redirect('rsgrequests');
         }
 		if(array_get($rule,'customer_paypal_email')) $rule['trans']=self::getTrans(array_get($rule,'customer_paypal_email'));
-		$product= RsgProduct::where('id',$rule['product_id'])->first()->toArray();
+		$product= RsgProduct::where('id',$rule['product_id'])->first();
 		if($product){
+			$product = $product->toArray();
 			$product['product_name'] = $product['asin'].'——'.$product['product_name'];
+		}else{
+			$product = array('site'=>'','asin'=>'','seller_id'=>'','product_name'=>'','price'=>'','currency'=>'','keyword'=>'','page'=>'','position'=>'','id'=>'','product_img'=>'');
 		}
 
 		//查询该邮箱是否存在于client_info中，查出需要显示的facebook_name和facebook_group

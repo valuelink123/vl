@@ -428,4 +428,10 @@ Route::get('/McfOrderList', 'McfOrderListController@index');//重发单列表
 Route::post('/McfOrderList/list', 'McfOrderListController@list');//获取重发单列表数据
 Route::match(['post','get'],'/McfOrderList/export', 'McfOrderListController@export');//重发单列表数据的下载
 
-
+//Amazon Settlement模块
+Route::get('/settlement', 'SettlementController@index');//Settlement列表
+Route::post('/settlement/list', 'SettlementController@list');//获取Settlement列表数据
+Route::match(['post','get'],'/settlement/export', 'SettlementController@export');//Settlement列表数据的下载
+Route::get('/settlement/detail', 'SettlementController@detail');//
+Route::post('/settlement/detailList', 'SettlementController@detailList');//获取Settlement列表数据
+Route::match(['post','get'],'/settlement/detailExport', 'SettlementController@detailExport');//Settlement列表数据的下载
