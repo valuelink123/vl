@@ -746,6 +746,9 @@ function getActiveUserConfig()
 		array('db'=>'website','dbname'=>'lacetteshop','name'=>'lacetteshop','formid'=>array(1),'fields'=>array('name'=>1.3,'email'=>3,'orderid'=>4)),
 		array('db'=>'website','dbname'=>'tecbeanshop','name'=>'tecbeanshop','formid'=>array(1),'fields'=>array('name'=>1.3,'email'=>2,'orderid'=>3)),
 
+		array('db'=>'website','dbname'=>'cocohopshop','name'=>'cocohopshop','formid'=>array(1),'fields'=>array('name'=>1,'email'=>2,'orderid'=>3)),
+		array('db'=>'website','dbname'=>'spacekeyshop','name'=>'spacekeyshop','formid'=>array(1),'fields'=>array('name'=>2,'email'=>3,'orderid'=>4)),
+
     );
 
     return $config;
