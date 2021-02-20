@@ -311,7 +311,7 @@ class RsgproductsController extends Controller
         if($site == 'US'){//特殊处理： US里面不用展示CA站点的产品
             $siteArr = array('www.amazon.com');
         }
-        $where_product .= " and rsg_products.site in('".join($siteArr,"','")."')";
+        $where_product .= " and rsg_products.site in('".join("','",$siteArr)."')";
         if($site=='JP'){
             $where_product .= " and rsg_products.order_status = 1 ";
         }
