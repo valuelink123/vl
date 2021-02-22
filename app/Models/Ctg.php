@@ -44,6 +44,7 @@ class Ctg extends Model {
             if (empty($order['orderItems'])) {
                 throw new \Exception('Order Info Error.');
             }
+            $order['ApiDownloadDate'] = $order['PurchaseDate'];
 
         } catch (\Exception $e) {
             throw new HypocriteException($e->getMessage() . ' For help, please mail to support@claimgiftsnow.com');
