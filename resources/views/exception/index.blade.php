@@ -103,6 +103,7 @@ th,td,td>span {
 								<th width="15%">Creator</th>
                                 <th width="8%"> BGBU </th>
                                 <th width="8%"> Sales </th>
+                                <th width="8%"> Description </th>
                                 <th width="5%"> Action </th>
                             </tr>
                             <tr role="row" class="filter">
@@ -226,6 +227,7 @@ th,td,td>span {
                                         @endforeach
                                     </select>
 								</td>
+                                <td></td>
                                 <td>
                                     <div class="margin-bottom-5">
                                         <button class="btn btn-sm green btn-outline filter-submit margin-bottom">
@@ -290,7 +292,7 @@ th,td,td>span {
                     "dom": "<'row'<'col-md-6 col-sm-12'pli><'col-md-6 col-sm-12'<'table-group-actions pull-right'>>r>t<'row'<'col-md-6 col-sm-12'pli><'col-md-6 col-sm-12'>>",
 
                     "bStateSave": true, // save datatable state(pagination, sort, etc) in cookie.
-                    "aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0 ,4,7,8,9,10,11,12] }],
+                    "aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0 ,4,7,8,9,10,11,12,13] }],
                     "lengthMenu": [
                         [10, 20, 50],
                         [10, 20, 50] // change per page values here
