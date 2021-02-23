@@ -432,13 +432,6 @@ class GetEmails extends Command
 				if($subject_match_string && stripos(array_get($mailData,'subject',''),$subject_match_string) !== false){
 					return true;
 				}
-				if($subject_match_string && stripos(array_get($mailData,'text_plain',''),$subject_match_string) !== false){
-					return true;
-				}
-				if($subject_match_string && stripos(strip_tags(array_get($mailData,'text_html','')),$subject_match_string) !== false){
-					return true;
-				}
-
 			}
 		}
 
@@ -450,6 +443,19 @@ class GetEmails extends Command
 					return true;
 				}
 			}
+			//规则里面填写的asin，加上匹配邮件的主题和内容
+			foreach($asin_match_array as $match_asin){
+				if($match_asin && stripos(array_get($mailData,'subject',''),$match_asin) !== false) {
+					return true;
+				}
+				if($match_asin && stripos(array_get($mailData,'text_plain',''),$match_asin) !== false){
+					return true;
+				}
+				if($match_asin && stripos(strip_tags(array_get($mailData,'text_html','')),$match_asin) !== false){
+					return true;
+				}
+			}
+
 		}
 
 
