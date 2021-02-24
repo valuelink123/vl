@@ -27,6 +27,12 @@
                     </div>
                     <div class="col-md-2">
                         <div class="input-group">
+                            <span class="input-group-addon">Sku</span>
+                            <input  class="form-control"  value="" id="sku" name="sku"/>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="input-group">
                             <div class="btn-group pull-right" >
                                 <button id="search_table" class="btn sbold blue">Search</button>
                             </div>
@@ -39,22 +45,10 @@
                 <table class="table table-striped table-bordered" id="datatable">
                     <thead>
                     <tr>
-                        <th>sku</th>
-                        <th>产品缺陷</th>
-                        <th>品质问题</th>
-                        <th>产品损坏</th>
-                        <th>缺少配件</th>
-                        <th>不想要了</th>
-                        <th>和描述不相符</th>
-                        <th>下错订单</th>
-                        <th>未收到货</th>
-                        <th>有更好的价格</th>
-                        <th>交期超时</th>
-                        <th>未经授权购买</th>
-                        <th>不适合</th>
-                        <th>未知原因</th>
-                        <th>发错货</th>
-                        <th>买多了</th>
+                        <th>SKU</th>
+                        @foreach($data['reasonType'] as $key=>$val)
+                            <th>{{$val['name']}}</th>
+                        @endforeach
                         <th>小计</th>
                     </tr>
                     </thead>
@@ -79,6 +73,7 @@
             searching: false,//关闭搜索
             serverSide: true,//启用服务端分页（这是使用Ajax服务端的必须配置）
             ordering:false,
+            paging:false,
             "pageLength": 20, // default record count per page
             "lengthMenu": [
                 [10, 20,50,],
@@ -86,19 +81,26 @@
             ],
             processing: true,
             columns: [
-                {data: 'id',name:'id'},
-                {data: 'account',name:'account'},
-                {data: 'amazon_order_id',name:'amazon_order_id'},
-                {data: 'date',name:'date'},
-                {data: 'asin',name:'asin'},
-                {data: 'seller_sku',name:'seller_sku'},
-                {data: 'quantity',name:'quantity'},
-                {data: 'status',name:'status'},
-                {data: 'reason',name:'reason'},
-                {data: 'condition',name:'condition'},
-                {data: 'customer_comments',name:'customer_comments'},
-                {data: 'settlement_id',name:'settlement_id'},
-                {data: 'settlement_date',name:'settlement_date'},
+                {data: 'sku',name:'sku'},
+                {data: 'type_1',name:'type_1'},
+                {data: 'type_2',name:'type_2'},
+                {data: 'type_3',name:'type_3'},
+                {data: 'type_4',name:'type_4'},
+                {data: 'type_5',name:'type_5'},
+                {data: 'type_6',name:'type_6'},
+                {data: 'type_7',name:'type_7'},
+                {data: 'type_8',name:'type_8'},
+                {data: 'type_9',name:'type_9'},
+                {data: 'type_10',name:'type_10'},
+                {data: 'type_11',name:'type_11'},
+                {data: 'type_12',name:'type_12'},
+                {data: 'type_13',name:'type_13'},
+                {data: 'type_14',name:'type_14'},
+                {data: 'type_15',name:'type_15'},
+                {data: 'type_16',name:'type_16'},
+                {data: 'type_17',name:'type_17'},
+                {data: 'type_18',name:'type_18'},
+                {data: 'total',name:'total'},
             ],
             ajax: {
                 type: 'POST',
