@@ -231,6 +231,24 @@
                                                         <span class="arrow"></span>
                                                     </a>
                                                 </li>
+{{--                                                <li class="">--}}
+{{--                                                    <a href="/returnAnalysis/returnAnalysis" class="nav-link nav-toggle ">--}}
+{{--                                                        Return analysis--}}
+{{--                                                        <span class="arrow"></span>--}}
+{{--                                                    </a>--}}
+{{--                                                </li>--}}
+                                                <li class="">
+                                                    <a href="/returnAnalysis/asinAnalysis" class="nav-link nav-toggle ">
+                                                        Asin Return analysis
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
+                                                <li class="">
+                                                    <a href="/returnAnalysis/skuAnalysis" class="nav-link nav-toggle ">
+                                                        SKU Return analysis
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
                                             </ul>
                                         </li>
 

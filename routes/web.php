@@ -435,3 +435,9 @@ Route::match(['post','get'],'/settlement/export', 'SettlementController@export')
 Route::get('/settlement/detail', 'SettlementController@detail');//
 Route::post('/settlement/detailList', 'SettlementController@detailList');//获取Settlement列表数据
 Route::match(['post','get'],'/settlement/detailExport', 'SettlementController@detailExport');//Settlement列表数据的下载
+
+//统计分析模块
+Route::match(['post','get'],'/returnAnalysis/returnAnalysis', 'ReturnAnalysisController@returnAnalysis');//退货原因分析
+Route::match(['post','get'],'/returnAnalysis/asinAnalysis', 'ReturnAnalysisController@asinAnalysis');//asin退货分析，维度：asin+币种+account
+Route::match(['post','get'],'/returnAnalysis/skuAnalysis', 'ReturnAnalysisController@skuAnalysis');//sku退货分析，维度：sku+币种
+
