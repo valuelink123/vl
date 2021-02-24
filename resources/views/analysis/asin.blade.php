@@ -56,6 +56,7 @@
                     <thead>
                     <tr>
                         <th>Asin</th>
+                        <th>Title</th>
                         <th>Account</th>
                         <th>REFUND QUANTITY</th>
                         <th>RETURN QUANTITY</th>
@@ -90,6 +91,7 @@
             processing: true,
             columns: [
                 {data: 'asin',name:'asin'},
+                {data: 'title',name:'title'},
                 {data: 'account',name:'account'},
                 {data: 'refund_quantity',name:'refund_quantity'},
                 {data: 'return_quantity',name:'return_quantity'},

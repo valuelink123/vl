@@ -46,6 +46,7 @@
                     <thead>
                     <tr>
                         <th>sku</th>
+                        <th>Title</th>
                         <th>REFUND QUANTITY</th>
                         <th>RETURN QUANTITY</th>
                     </tr>
@@ -79,6 +80,7 @@
             processing: true,
             columns: [
                 {data: 'sku',name:'sku'},
+                {data: 'title',name:'title'},
                 {data: 'refund_quantity',name:'refund_quantity'},
                 {data: 'return_quantity',name:'return_quantity'},
             ],

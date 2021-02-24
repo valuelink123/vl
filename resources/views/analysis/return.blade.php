@@ -46,6 +46,7 @@
                     <thead>
                     <tr>
                         <th>SKU</th>
+                        <th>Title</th>
                         @foreach($data['reasonType'] as $key=>$val)
                             <th>{{$val['name']}}</th>
                         @endforeach
@@ -82,6 +83,7 @@
             processing: true,
             columns: [
                 {data: 'sku',name:'sku'},
+                {data: 'title',name:'title'},
                 {data: 'type_1',name:'type_1'},
                 {data: 'type_2',name:'type_2'},
                 {data: 'type_3',name:'type_3'},

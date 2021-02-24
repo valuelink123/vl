@@ -64,7 +64,7 @@ class ReturnAnalysisController extends Controller
 			if(isset($search['sku']) && $search['sku']){
 				$where_sku.= " and tb.sku = '".$search['sku']."'";
 			}
-			$sql = "select SQL_CALC_FOUND_ROWS type,tb.sku,sum(quantity) as quantity 
+			$sql = "select SQL_CALC_FOUND_ROWS type,tb.sku,sum(quantity) as quantity,any_value(sap_skus.description) as title 
 				from(
 					select t1.seller_sku,t1.asin,reason,`status`,detailed_disposition as `condition`,mws_seller_id,mws_marketplaceid,quantity,$case
 					from amazon_returns as t1
@@ -72,12 +72,15 @@ class ReturnAnalysisController extends Controller
 				    {$where}
 				) as ta
 				left join sap_asin_match_sku as tb on (ta.asin=tb.asin and ta.seller_sku=tb.seller_sku and ta.mws_seller_id=tb.seller_id and ta.mws_marketplaceid=tb.marketplace_id) 
+				left join sap_skus on tb.sku=sap_skus.sku 
 				{$where_sku}
 				group by type,tb.sku order by tb.sku desc";
 
 			$_data = DB::connection('amazon')->select($sql);
 			$_data = json_decode(json_encode($_data),true);
 //			$recordsTotal = $recordsFiltered = (DB::connection('amazon')->select('SELECT FOUND_ROWS() as count'))[0]->count;
+
+
 			$datas = array();
 			foreach($_data as $key=>$val) {
 				if(isset($datas[$val['sku']]['total'])){
@@ -86,6 +89,7 @@ class ReturnAnalysisController extends Controller
 				}else{
 					//数据初始化
 					$datas[$val['sku']]['sku'] = $val['sku'];
+					$datas[$val['sku']]['title'] = $val['title'];
 					$datas[$val['sku']]['total'] = $val['quantity'];
 					foreach($reasonType as $key=>$typeArr){
 						if($val['type']=='type_'.$key){
@@ -127,7 +131,7 @@ class ReturnAnalysisController extends Controller
 				$where.= " and tb.asin = '".$search['asin']."'";
 			}
 
-			$sql="select SQL_CALC_FOUND_ROWS tb.asin,ta.seller_account_id,sum(quantity_shipped) as refund_quantity,sum(tc.quantity) as return_quantity
+			$sql="select SQL_CALC_FOUND_ROWS tb.asin,ta.seller_account_id,sum(quantity_shipped) as refund_quantity,sum(tc.quantity) as return_quantity,any_value(sap_skus.description) as title 
 				from (
 						select amazon_order_id,current_seller_account_id as seller_account_id,current_marketplace_id as marketplace_id,seller_sku,
 						any_value(quantity_shipped) as quantity_shipped,any_value(mws_seller_id) as mws_seller_id
@@ -137,7 +141,8 @@ class ReturnAnalysisController extends Controller
 						group by amazon_order_id,seller_sku,current_seller_account_id,current_marketplace_id
 				) as ta 
 				left join sap_asin_match_sku as tb on (ta.seller_sku=tb.seller_sku and ta.mws_seller_id=tb.seller_id and ta.marketplace_id=tb.marketplace_id)
-				left join amazon_returns as tc on {$where_return} and  tb.asin=tc.asin and ta.seller_account_id=tc.seller_account_id 
+				left join amazon_returns as tc on  tb.asin=tc.asin and ta.seller_account_id=tc.seller_account_id and ta.amazon_order_id = tc.amazon_order_id 
+				left join sap_skus on tb.sku=sap_skus.sku 
 				{$where}
 				group by tb.asin,ta.seller_account_id order by return_quantity desc";
 
@@ -151,6 +156,7 @@ class ReturnAnalysisController extends Controller
 			$recordsTotal = $recordsFiltered = (DB::connection('amazon')->select('SELECT FOUND_ROWS() as count'))[0]->count;
 			$accounts = $this->getAccountInfo();//得到账号机的信息
 			foreach($data as $key=>$val) {
+				$data[$key]['title'] = $data[$key]['title'] ? $data[$key]['title']: '/NA';
 				$data[$key]['refund_quantity'] = $val['refund_quantity']>0 ? $val['refund_quantity'] : 0;
 				$data[$key]['return_quantity'] = $val['return_quantity']>0 ? $val['return_quantity'] : 0;
 				$data[$key]['account'] = isset($accounts[$val['seller_account_id']]) ? $accounts[$val['seller_account_id']]['label'] : $val['seller_account_id'];
@@ -182,7 +188,7 @@ class ReturnAnalysisController extends Controller
 				$where.= " and tb.sku = '".$search['sku']."'";
 			}
 
-			$sql="select SQL_CALC_FOUND_ROWS tb.sku,sum(quantity_shipped) as refund_quantity,any_value(tc.quantity) as return_quantity 
+			$sql="select SQL_CALC_FOUND_ROWS tb.sku,sum(quantity_shipped) as refund_quantity,sum(tc.quantity) as return_quantity,any_value(sap_skus.description) as title  
 				from (
 						select amazon_order_id,current_seller_account_id as seller_account_id,current_marketplace_id as marketplace_id,seller_sku,
 						any_value(quantity_shipped) as quantity_shipped,any_value(mws_seller_id) as mws_seller_id
@@ -192,17 +198,8 @@ class ReturnAnalysisController extends Controller
 						group by amazon_order_id,seller_sku,current_seller_account_id,current_marketplace_id
 				) as ta 
 				left join sap_asin_match_sku as tb on (ta.seller_sku=tb.seller_sku and ta.mws_seller_id=tb.seller_id and ta.marketplace_id=tb.marketplace_id)
-				left join (
-						select tb.sku,sum(quantity) as quantity 
-						from(
-							select t1.seller_sku,t1.asin,reason,`status`,detailed_disposition as `condition`,mws_seller_id,mws_marketplaceid,quantity
-							from amazon_returns as t1
-							left join seller_accounts as t2 on t1.seller_account_id=t2.id
-							{$where_return}
-						) as ta
-						left join sap_asin_match_sku as tb on (ta.asin=tb.asin and ta.seller_sku=tb.seller_sku and ta.mws_seller_id=tb.seller_id and ta.mws_marketplaceid=tb.marketplace_id)
-						group by tb.sku
-				) as tc on tc.sku=tb.sku 
+				left join amazon_returns as tc on  tb.asin=tc.asin and ta.seller_account_id=tc.seller_account_id and ta.amazon_order_id = tc.amazon_order_id 
+				left join sap_skus on tb.sku=sap_skus.sku 
 				{$where}
 				group by tb.sku order by return_quantity desc";
 
@@ -226,4 +223,15 @@ class ReturnAnalysisController extends Controller
 		$data['toDate'] = date('Y-m-d');//结束日期
 		return view('analysis/sku', ['data' => $data]);
 	}
+
+	//通过sku得到sku的标题
+//	public function getSkuInfoBySku($skus)
+//	{
+//		$_skuData = DB::connection('amazon')->table('sap_skus')->select("sku","description")->whereIn('sku',$skus)->get();
+//		$skuData = array();
+//		foreach($_skuData as $sk=>$sv){
+//			$skuData[$sv->sku] = $sv->description;
+//		}
+//		return $skuData;
+//	}
 }
