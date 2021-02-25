@@ -8,6 +8,17 @@
         table th{
             text-align:center;
         }
+        .table tr .title{
+            width: 380px !important
+        }
+        .table{
+            table-layout:fixed;
+        }
+        .table tr .title{
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+        }
     </style>
     <div class="row">
         <div class="top portlet light">
@@ -80,7 +91,7 @@
             processing: true,
             columns: [
                 {data: 'sku',name:'sku'},
-                {data: 'title',name:'title'},
+                {data: 'title',name:'title',class:'title'},
                 {data: 'refund_quantity',name:'refund_quantity'},
                 {data: 'return_quantity',name:'return_quantity'},
             ],

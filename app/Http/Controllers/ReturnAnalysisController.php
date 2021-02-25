@@ -28,7 +28,9 @@ class ReturnAnalysisController extends Controller
 	 */
 	public function returnAnalysis(Request $req)
 	{
+		//配置这些原因应该归属到哪个中文类型下
 		$reasonType = [
+			0=>['name'=>'其他','reason'=>['DID_NOT_LIKE_FABRIC','PRODUCT_NOT_ITALIAN']],
 			1=>['name'=>'产品缺陷','reason'=>['DEFECTIVE']],
 			2=>['name'=>'品质问题','reason'=>['QUALITY_UNACCEPTABLE','APPAREL_STYLE']],
 			3=>['name'=>'产品损坏','reason'=>['DAMAGED_BY_CARRIER','DAMAGED_BY_FC','CUSTOMER_DAMAGED']],
@@ -48,13 +50,17 @@ class ReturnAnalysisController extends Controller
 			17=>['name'=>'损坏','reason'=>['DAMAGED']],
 			18=>['name'=>'可再售','reason'=>['SELLABLE']],
 		];
-		$case = " CASE reason ";
+		$case = " ";
+		$typestr = '';
 		foreach($reasonType as $key=>$typeArr){
+			$case .= " CASE amazon_returns.reason ";
 			foreach($typeArr['reason'] as $type){
-				$case.= " WHEN '".$type."' THEN 'type_".$key."' ";
+				$case.= " WHEN '".$type."' THEN amazon_returns.quantity ";
 			}
+			$typestr .= "sum(type_{$key}) as type_{$key}";
+			$case.= " ELSE 0 END AS type_{$key},";
 		}
-		$case .= " ELSE 'type_0' END AS type";
+
 		if($_POST){
 			$search = isset($_REQUEST['search']) ? $_REQUEST['search'] : '';
 			$search = $this->getSearchData(explode('&',$search));
@@ -64,51 +70,39 @@ class ReturnAnalysisController extends Controller
 			if(isset($search['sku']) && $search['sku']){
 				$where_sku.= " and tb.sku = '".$search['sku']."'";
 			}
-			$sql = "select SQL_CALC_FOUND_ROWS type,tb.sku,sum(quantity) as quantity,any_value(sap_skus.description) as title 
-				from(
-					select t1.seller_sku,t1.asin,reason,`status`,detailed_disposition as `condition`,mws_seller_id,mws_marketplaceid,quantity,$case
-					from amazon_returns as t1
-					left join seller_accounts as t2 on t1.seller_account_id=t2.id
-				    {$where}
-				) as ta
+			$sql = "select SQL_CALC_FOUND_ROWS tb.sku,sum(type_0) as type_0,sum(type_1) as type_1,sum(type_2) as type_2,sum(type_3) as type_3,sum(type_4) as type_4,sum(type_5) as type_5,sum(type_6) as type_6,sum(type_7) as type_7,sum(type_8) as type_8,sum(type_9) as type_9,sum(type_10) as type_10,sum(type_11) as type_11,sum(type_12) as type_12,sum(type_13) as type_13,sum(type_14) as type_14,sum(type_15) as type_15,sum(type_16) as type_16,sum(type_17) as type_17,sum(type_18) as type_18,any_value (sap_skus.description) AS title
+					from (
+					    SELECT seller_accounts.mws_seller_id as mws_seller_id,amazon_returns.seller_account_id,amazon_returns.seller_sku as seller_sku,amazon_returns.asin,{$case} mws_marketplaceid AS mws_marketplaceid
+						FROM amazon_returns 
+						LEFT JOIN seller_accounts ON amazon_returns.seller_account_id = seller_accounts.id 
+						{$where}
+					) as ta 
 				left join sap_asin_match_sku as tb on (ta.asin=tb.asin and ta.seller_sku=tb.seller_sku and ta.mws_seller_id=tb.seller_id and ta.mws_marketplaceid=tb.marketplace_id) 
 				left join sap_skus on tb.sku=sap_skus.sku 
 				{$where_sku}
-				group by type,tb.sku order by tb.sku desc";
+				GROUP BY tb.sku ORDER BY tb.sku DESC";
+
+			if($req['length'] != '-1'){//等于-1时为查看全部的数据
+				$limit = $this->dtLimit($req);
+				$sql .= " LIMIT {$limit} ";
+			}
 
 			$_data = DB::connection('amazon')->select($sql);
-			$_data = json_decode(json_encode($_data),true);
-//			$recordsTotal = $recordsFiltered = (DB::connection('amazon')->select('SELECT FOUND_ROWS() as count'))[0]->count;
+			$data = json_decode(json_encode($_data),true);
+			$recordsTotal = $recordsFiltered = (DB::connection('amazon')->select('SELECT FOUND_ROWS() as count'))[0]->count;
 
-
-			$datas = array();
-			foreach($_data as $key=>$val) {
-				if(isset($datas[$val['sku']]['total'])){
-					$datas[$val['sku']]['total'] = $datas[$val['sku']]['total']+$val['quantity'];
-					$datas[$val['sku']][$val['type']] = $val['quantity'];
-				}else{
-					//数据初始化
-					$datas[$val['sku']]['sku'] = $val['sku'];
-					$datas[$val['sku']]['title'] = $val['title'];
-					$datas[$val['sku']]['total'] = $val['quantity'];
-					foreach($reasonType as $key=>$typeArr){
-						if($val['type']=='type_'.$key){
-							$datas[$val['sku']]['type_'.$key] = $val['quantity'];
-						}else{
-							$datas[$val['sku']]['type_'.$key] = 0;
-						}
-					}
+			foreach($data as $key=>$val){
+				$data[$key]['title'] = '<span title="'.$val['title'].'">'.$val['title'].'</span>';
+				$data[$key]['total'] = 0;
+				foreach($reasonType as $tk=>$typeArr){
+					$data[$key]['total']  = $data[$key]['total'] + $val['type_'.$tk];
 				}
 			}
-			$data = array();
-			foreach($datas as $key=>$val){
-				$data[] = $val;
-			}
-			$recordsTotal = $recordsFiltered = count($data);
 			return compact('data', 'recordsTotal', 'recordsFiltered');
 		}
 		$data['fromDate'] = date('Y-m-d', time() - 2 * 86400);//开始日期,默认查最近三天的数据
 		$data['toDate'] = date('Y-m-d');//结束日期
+//		$data['fromDate'] = '2021-01-15';//测试日期
 		$data['reasonType'] = $reasonType;
 		return view('analysis/return', ['data' => $data]);
 	}
@@ -156,7 +150,7 @@ class ReturnAnalysisController extends Controller
 			$recordsTotal = $recordsFiltered = (DB::connection('amazon')->select('SELECT FOUND_ROWS() as count'))[0]->count;
 			$accounts = $this->getAccountInfo();//得到账号机的信息
 			foreach($data as $key=>$val) {
-				$data[$key]['title'] = $data[$key]['title'] ? $data[$key]['title']: '/NA';
+				$data[$key]['title'] = '<span title="'.$val['title'].'">'.$val['title'].'</span>';
 				$data[$key]['refund_quantity'] = $val['refund_quantity']>0 ? $val['refund_quantity'] : 0;
 				$data[$key]['return_quantity'] = $val['return_quantity']>0 ? $val['return_quantity'] : 0;
 				$data[$key]['account'] = isset($accounts[$val['seller_account_id']]) ? $accounts[$val['seller_account_id']]['label'] : $val['seller_account_id'];
@@ -212,6 +206,7 @@ class ReturnAnalysisController extends Controller
 			$data = json_decode(json_encode($datas),true);
 			$recordsTotal = $recordsFiltered = (DB::connection('amazon')->select('SELECT FOUND_ROWS() as count'))[0]->count;
 			foreach($data as $key=>$val) {
+				$data[$key]['title'] = '<span title="'.$val['title'].'">'.$val['title'].'</span>';
 				$data[$key]['return_quantity'] = $val['return_quantity']>0 ? $val['return_quantity'] : 0;
 				$data[$key]['refund_quantity'] = $val['refund_quantity']>0 ? $val['refund_quantity'] : 0;
 

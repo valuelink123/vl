@@ -8,6 +8,30 @@
         table th{
             text-align:center;
         }
+        table.dataTable thead th, table.dataTable thead td {
+            padding: 10px 0px !important;
+        }
+        .table thead tr th {
+            font-size: 12px !important;
+            font-weight: 600;
+        }
+        .table td, .table th {
+            font-size: 12px;
+        }
+        .table tr .title{
+            width: 280px !important
+        }
+        .table tr .sku{
+            width: 110px !important
+        }
+        .table{
+            table-layout:fixed;
+        }
+        .table tr .title{
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+        }
     </style>
     <div class="row">
         <div class="top portlet light">
@@ -74,7 +98,6 @@
             searching: false,//关闭搜索
             serverSide: true,//启用服务端分页（这是使用Ajax服务端的必须配置）
             ordering:false,
-            paging:false,
             "pageLength": 20, // default record count per page
             "lengthMenu": [
                 [10, 20,50,],
@@ -82,8 +105,9 @@
             ],
             processing: true,
             columns: [
-                {data: 'sku',name:'sku'},
-                {data: 'title',name:'title'},
+                {data: 'sku',name:'sku',class:'sku'},
+                {data: 'title',name:'title',class:'title'},
+                {data: 'type_0',name:'type_0'},
                 {data: 'type_1',name:'type_1'},
                 {data: 'type_2',name:'type_2'},
                 {data: 'type_3',name:'type_3'},
