@@ -32,7 +32,7 @@ class OrderListController extends Controller
 		$data['account'] = $this->getAccountInfo();//得到账号机的信息
 		$data['fromDate'] = date('Y-m-d',time()-2*86400);//开始日期,默认查最近三天的数据
 		$data['toDate'] = date('Y-m-d');//结束日期
-//		$data['fromDate'] = '2021-01-15';//测试日期
+//		$data['fromDate'] = '2021-01-17';//测试日期
 		return view('sales/orderIndex',['data'=>$data]);
 	}
 
@@ -63,6 +63,8 @@ class OrderListController extends Controller
 			$data[$key]['currency'] = $val['currency_code'];
 			$data[$key]['tracking_no'] = '/NA';
 			$data[$key]['carry_code'] = '/NA';
+			$data[$key]['seller_skus'] = '<span title="'.$val['seller_skus'].'">'.$val['seller_skus'].'</span>';
+			$data[$key]['asins'] = '<span title="'.$val['asins'].'">'.$val['asins'].'</span>';
 			$fulfillmentChannel = '';
 			//当为AFN的时候为FBA发货，当为MFN的时候为FBM发货
 			if($val['fulfillment_channel']=='AFN'){

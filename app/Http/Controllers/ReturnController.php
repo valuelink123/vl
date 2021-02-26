@@ -54,6 +54,7 @@ class ReturnController extends Controller
 		$recordsTotal = $recordsFiltered = (DB::connection('amazon')->select('SELECT FOUND_ROWS() as count'))[0]->count;
 		$accounts = $this->getAccountInfo();//得到账号机的信息
 		foreach($data as $key=>$val) {
+			$data[$key]['customer_comments'] = '<span title="'.$val['customer_comments'].'">'.$val['customer_comments'].'</span>';
 			$data[$key]['account'] = isset($accounts[$val['seller_account_id']]) ? $accounts[$val['seller_account_id']]['label'] : $val['seller_account_id'];
 			$data[$key]['date'] = 'Return:'.$val['return_date'];
 		}

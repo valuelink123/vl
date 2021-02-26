@@ -83,10 +83,10 @@
             searching: false,//关闭搜索
             serverSide: true,//启用服务端分页（这是使用Ajax服务端的必须配置）
             ordering:false,
-            "pageLength": 20, // default record count per page
+            "pageLength": 15, // default record count per page
             "lengthMenu": [
-                [10, 20,50,],
-                [10, 20,50,] // change per page values here
+                [15, 30,50,],
+                [15, 30,50,] // change per page values here
             ],
             processing: true,
             columns: [
