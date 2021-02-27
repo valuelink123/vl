@@ -73,7 +73,7 @@ class Kernel extends ConsoleKernel
         })->dailyAt('14:00');
 		$schedule->call(function (){
 			DB::update("update rsg_products set status = 3 where status>-1 and end_date<'".date('Y-m-d')."';");
-        })->dailyAt('08:00');
+        })->dailyAt('02:00');
         $accountList = DB::table('accounts')->get(array('id'));
         $i=$x=0;
         foreach($accountList as $account){
@@ -143,7 +143,7 @@ class Kernel extends ConsoleKernel
 		$schedule->command('update:mcf_order_amazonorderid')->monthly()->name('mcf_order_amazonorderid');
 
 		$schedule->command('cal:dailySales')->dailyAt('08:30')->name('dailySales')->withoutOverlapping();
-		$schedule->command('update:emails')->monthly()->name('updateEmails')->withoutOverlapping();
+//		$schedule->command('update:emails')->monthly()->name('updateEmails')->withoutOverlapping();
     }
 
     /**
