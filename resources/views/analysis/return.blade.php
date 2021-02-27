@@ -9,7 +9,7 @@
             text-align:center;
         }
         table.dataTable thead th, table.dataTable thead td {
-            padding: 10px 0px !important;
+            padding: 10px 5px !important;
         }
         .table thead tr th {
             font-size: 12px !important;

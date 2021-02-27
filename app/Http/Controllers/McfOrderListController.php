@@ -136,6 +136,17 @@ class McfOrderListController extends Controller
 		$where = " where displayable_order_date_time >= '".$search['from_date']." 00:00:00' and displayable_order_date_time <= '".$search['to_date']." 23:59:59'";
 		if(isset($search['account']) && $search['account']){
 			$where.= " and t1.seller_account_id in (".$search['account'].")";
+		}else{
+			//站点权限
+			$data= DB::connection('vlz')->select("select id,label from seller_accounts where deleted_at is NULL and mws_marketplaceid = '{$search['site']}' order by label asc");
+			if($data){
+				$accountStr = '';
+				foreach($data as $key=>$val){
+					$accountStr .= $val->id.',';
+				}
+				$accountStr = rtrim($accountStr,',');
+				$where.= " and t1.seller_account_id in (".$accountStr.")";
+			}
 		}
 		if(isset($search['amazon_order_id']) && $search['amazon_order_id']){
 			$where.= " and t1.seller_fulfillment_order_id = '".$search['amazon_order_id']."'";
