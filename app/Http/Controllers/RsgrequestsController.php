@@ -820,12 +820,31 @@ where payer='$customer_paypal_email' order by timestamp asc");
 				//更新processor
 				$res = RsgRequest::whereIn('id', $ids)->update(array('processor' => $_POST['data']));
 			} elseif ($type == 2) {
-				//更新状态
-				$res = RsgRequest::whereIn('id', $ids)->update(array('step' => $_POST['data']));
-				foreach ($ids as $r_id) {
-					$rule = RsgRequest::findOrFail($r_id);
-					$step_to_tags = getStepIdToTags();
-					self::mailchimp($rule->customer_email, array_get($step_to_tags, $_POST['data']), []);
+				foreach($ids as $id){
+					$rule = RsgRequest::findOrFail($id);
+					$rsgRequestLog = DB::connection('amazon')->table('rsg_requests_log')->where('request_id', '=',$id)->get();
+					//对已有数据，如果第一次更新，当前rsgRequestLog表中没有记录，需要将相应的rsg_requests的记录写入rsgRequestLog表中。
+					if(count($rsgRequestLog) == 0){
+						$ruleClone = clone $rule;
+						$clientInfo = DB::table('client_info')->where('email',$rule->customer_email)->get()->first();
+						if($clientInfo){
+							$ruleClone->facebook_name = $clientInfo->facebook_name;
+							$ruleClone->facebook_group = $clientInfo->facebook_group;
+							$this->insertRsgRequestsLogFirstRecord($ruleClone);
+						}
+					}
+					//更新状态
+					$res = RsgRequest::where('id', $id)->update(array('step' => $_POST['data']));
+
+					if($res){
+						$rule = RsgRequest::findOrFail($id);
+						$step_to_tags = getStepIdToTags();
+						if($rule->auto_send_status==0) {
+							self::mailchimp($rule->customer_email, array_get($step_to_tags, $_POST['data']), []);
+						}
+						$this->insertRsgRequestsLog($rule);
+					}
+
 				}
 			}
 		}

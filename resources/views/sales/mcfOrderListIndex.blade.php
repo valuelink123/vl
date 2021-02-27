@@ -8,6 +8,33 @@
         table th{
             text-align:center;
         }
+        .table td, .table th {
+            font-size: 12px !important;
+        }
+        table.dataTable thead th, table.dataTable thead td {
+            padding: 10px 0px !important;
+        }
+        table.dataTable tbody td {
+            padding: 8px 0px !important;
+        }
+        .table td, .table th {
+            font-size: 12px !important;
+        }
+        .table{
+            table-layout:fixed;
+        }
+        .table tr .data_seller_sku{
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .table tr .data_seller_sku{
+            width: 230px !important
+        }
+        .table tr .data_country{
+            width: 77px !important
+        }
     </style>
     <div class="row">
         <div class="top portlet light">
@@ -99,8 +126,8 @@
                         <th>Customer Name</th>
                         <th>Country</th>
                         <th>Shipping Speed</th>
-                        <th>Tracking No.</th>
-                        <th>Carrier Code</th>
+{{--                        <th>Tracking No.</th>--}}
+{{--                        <th>Carrier Code</th>--}}
                         <th>Settlement ID</th>
                         <th>Settlement Date</th>
                     </tr>
@@ -132,10 +159,10 @@
             searching: false,//关闭搜索
             serverSide: true,//启用服务端分页（这是使用Ajax服务端的必须配置）
             ordering:false,
-            "pageLength": 20, // default record count per page
+            "pageLength": 15, // default record count per page
             "lengthMenu": [
-                [10, 20,50,],
-                [10, 20,50,] // change per page values here
+                [15, 30,50,],
+                [15, 30,50,] // change per page values here
             ],
             processing: true,
             columns: [
@@ -143,13 +170,13 @@
                 {data: 'account',name:'account'},
                 {data: 'amazon_order_id',name:'amazon_order_id'},
                 {data: 'date',name:'date'},
-                {data: 'seller_sku',name:'seller_sku'},
+                {data: 'seller_sku',name:'seller_sku',class:'data_seller_sku'},
                 {data: 'order_status',name:'order_status'},
                 {data: 'customer_name',name:'customer_name'},
-                {data: 'country',name:'country'},
+                {data: 'country',name:'country',class:'data_country'},
                 {data: 'shipping_speed',name:'shipping_speed'},
-                {data: 'tracking_no',name:'tracking_no'},
-                {data: 'carrier_code',name:'carrier_code'},
+                // {data: 'tracking_no',name:'tracking_no'},
+                // {data: 'carrier_code',name:'carrier_code'},
                 {data: 'settlement_id',name:'settlement_id'},
                 {data: 'settlement_date',name:'settlement_date'},
             ],

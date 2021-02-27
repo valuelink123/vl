@@ -8,6 +8,26 @@
         table th{
             text-align:center;
         }
+        table.dataTable thead th, table.dataTable thead td {
+            padding: 10px 0px !important;
+        }
+        table.dataTable tbody td {
+            padding: 8px 0px !important;
+        }
+        .table td, .table th {
+            font-size: 12px !important;
+        }
+        .table{
+            table-layout:fixed;
+        }
+        .table tr .asins{
+            width: 120px !important
+        }
+        .table tr .asins{
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+        }
     </style>
     <div class="row">
         <div class="top portlet light">
@@ -132,10 +152,10 @@
             searching: false,//关闭搜索
             serverSide: true,//启用服务端分页（这是使用Ajax服务端的必须配置）
             ordering:false,
-            "pageLength": 20, // default record count per page
+            "pageLength": 15, // default record count per page
             "lengthMenu": [
-                [10, 20,50,],
-                [10, 20,50,] // change per page values here
+                [15, 30,50,],
+                [15, 30,50,] // change per page values here
             ],
             processing: true,
             columns: [
@@ -143,7 +163,7 @@
                 {data: 'account',name:'account'},
                 {data: 'amazon_order_id',name:'amazon_order_id'},
                 {data: 'date',name:'date'},
-                {data: 'asins',name:'asins'},
+                {data: 'asins',name:'asins',class:'asins'},
                 {data: 'refund_amount',name:'refund_amount'},
                 {data: 'refund_commission',name:'refund_commission'},
                 {data: 'currency',name:'currency'},

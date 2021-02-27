@@ -300,12 +300,37 @@ class GetEmails extends Command
 		 4.3 根据主题匹配，查询出的subject字段与邮件的subject，text_plain，text_html内容进行匹配
 		 4.4根据asin匹配，查询出的asin字段与订单信息的asin进行匹配
 		 4.5根据sku匹配，查询出的sku字段与订单信息的sku进行匹配
+
+		修改规则后：
+			先执行规则排序小于0
+	        再执行规则排序等于0
+			最后执行规则排序大于0的
 	 */
 
 	
     public function matchUser($mailData,$orderData){
 		$return_data= array();
         $orderId = array_get($mailData,'amazon_order_id','');
+		$orderItems = array_get($orderData,'OrderItems',array());
+		$orderSkus = ''; $orderAsins = array();
+		foreach($orderItems as $item){
+			$orderSkus.= $item['SellerSKU'].';';
+			$orderAsins[]=$item['ASIN'];
+		}
+
+		$rules = $this->rules;
+		foreach($rules as $rule){
+			if($rule->priority<0){
+				if($this->checkRule($rule,$mailData,$orderSkus,$orderAsins)) {
+					$return_data['user_id'] = $this->assignGroupUser($rule->group_id, $mailData);
+					$return_data['group_id'] = $rule->group_id;
+					$return_data['reply_status'] = $rule->reply_status;
+					$return_data['rule_id'] = $rule->id;
+					return $return_data;
+				}
+			}
+		}
+
         //查出该账号最近收到的该客户的邮件信息
         $lastUser = DB::table('inbox')->where('from_address',array_get($mailData,'from_address',''))
             ->where('to_address',$this->runAccount['account_email'])->orderBy('date','desc')->first();
@@ -358,101 +383,16 @@ class GetEmails extends Command
 				 }
 			 }		 
 		}
-		
-		
-        $rules = $this->rules;
-        $orderItems = array_get($orderData,'OrderItems',array());
-        $orderSkus = ''; $orderAsins = array();
-        foreach($orderItems as $item){
-            $orderSkus.= $item['SellerSKU'].';';
-            $orderAsins[]=$item['ASIN'];
-        }
         foreach($rules as $rule){
-            //发件人匹配
-            if($rule->from_email){
-                $matched = false;
-                $from_match_array = explode(';',$rule->from_email);
-                foreach($from_match_array as $from_match_string){
-                    if($from_match_string && stripos(array_get($mailData,'from_address',''),$from_match_string) !== false){
-                        $matched = true;
-                    }
-                }
-                if(!$matched) continue;
-            }
-
-            //收件人匹配
-            if($rule->to_email){
-                $matched = false;
-                $to_match_array = explode(';',$rule->to_email);
-                foreach($to_match_array as $to_address){
-                    if($to_address == $this->runAccount['account_email'] ){
-                        $matched = true;
-                    }
-                }
-                if(!$matched) continue;
-            }
-
-			//标题匹配
-			if($rule->subject){
-				$matched = false;
-				$subject_match_array = explode(';',$rule->subject);
-				foreach($subject_match_array as $subject_match_string){
-					if($subject_match_string && stripos(array_get($mailData,'subject',''),$subject_match_string) !== false){
-						$matched = true;
-					}
-					if($subject_match_string && stripos(array_get($mailData,'text_plain',''),$subject_match_string) !== false){
-						$matched = true;
-					}
-					if($subject_match_string && stripos(strip_tags(array_get($mailData,'text_html','')),$subject_match_string) !== false){
-						$matched = true;
-					}
-
+			if($rule->priority>0) {
+				if ($this->checkRule($rule, $mailData, $orderSkus, $orderAsins)) {
+					$return_data['user_id'] = $this->assignGroupUser($rule->group_id, $mailData);
+					$return_data['group_id'] = $rule->group_id;
+					$return_data['reply_status'] = $rule->reply_status;
+					$return_data['rule_id'] = $rule->id;
+					return $return_data;
 				}
-				if(!$matched) continue;
 			}
-
-            //站点匹配
-            /*
-            if($rule->site){
-                $matched = false;
-                $site_match_array = explode(';',$rule->site);
-                if(in_array($data->site,$site_match_array) ){
-                    $matched = true;
-                }
-                if(!$matched) continue;
-            }
-            */
-            //Asin匹配
-            if($rule->asin){
-                $matched = false;
-                $asin_match_array = explode(';',$rule->asin);
-                foreach($orderAsins as $asin){
-                    if($asin   && in_array($asin,$asin_match_array)){
-                        $matched = true;
-                    }
-                }
-                if(!$matched) continue;
-            }
-
-
-            //Sku匹配
-            if($rule->sku){
-                $matched = false;
-                $sku_match_array = explode(';',$rule->sku);
-                foreach($sku_match_array as $sku){
-                    $str=array();
-                    preg_match('/'.$sku.'(\d{4})/i', $orderSkus,$str);
-                    if($sku && $str){
-                        $matched = true;
-                    }
-                }
-                if(!$matched) continue;
-            }
-			$return_data['user_id'] = $this->assignGroupUser($rule->group_id,$mailData);
-			$return_data['group_id'] = $rule->group_id;
-			$return_data['reply_status'] =$rule->reply_status;
-			$return_data['rule_id'] = $rule->id;
-			return $return_data;
         }
 		
 		$return_data['user_id'] = env('SYSTEM_AUTO_REPLY_USER_ID',1);
@@ -462,6 +402,78 @@ class GetEmails extends Command
 		return $return_data;
 
     }
+
+
+    public function checkRule($rule,$mailData,$orderSkus,$orderAsins){
+		//发件人匹配
+		if($rule->from_email){
+			$from_match_array = explode(';',$rule->from_email);
+			foreach($from_match_array as $from_match_string){
+				if($from_match_string && stripos(array_get($mailData,'from_address',''),$from_match_string) !== false){
+					return true;
+				}
+			}
+		}
+
+		//收件人匹配
+		if($rule->to_email){
+			$to_match_array = explode(';',$rule->to_email);
+			foreach($to_match_array as $to_address){
+				if($to_address == $this->runAccount['account_email'] ){
+					return true;
+				}
+			}
+		}
+
+		//标题匹配
+		if($rule->subject){
+			$subject_match_array = explode(';',$rule->subject);
+			foreach($subject_match_array as $subject_match_string){
+				if($subject_match_string && stripos(array_get($mailData,'subject',''),$subject_match_string) !== false){
+					return true;
+				}
+			}
+		}
+
+		//Asin匹配
+		if($rule->asin){
+			$asin_match_array = explode(';',$rule->asin);
+			foreach($orderAsins as $asin){
+				if($asin   && in_array($asin,$asin_match_array)){
+					return true;
+				}
+			}
+			//规则里面填写的asin，加上匹配邮件的主题和内容
+			foreach($asin_match_array as $match_asin){
+				if($match_asin && stripos(array_get($mailData,'subject',''),$match_asin) !== false) {
+					return true;
+				}
+				if($match_asin && stripos(array_get($mailData,'text_plain',''),$match_asin) !== false){
+					return true;
+				}
+				if($match_asin && stripos(strip_tags(array_get($mailData,'text_html','')),$match_asin) !== false){
+					return true;
+				}
+			}
+
+		}
+
+
+		//Sku匹配
+		if($rule->sku){
+			$sku_match_array = explode(';',$rule->sku);
+			foreach($sku_match_array as $sku){
+				$str=array();
+				preg_match('/'.$sku.'(\d{4})/i', $orderSkus,$str);
+				if($sku && $str){
+					return true;
+				}
+			}
+		}
+
+		return false;
+
+	}
 
     public function getOrderByEmail($email){
         $order = DB::connection('order')->table('amazon_orders')->where('SellerId',$this->runAccount['account_sellerid'])->where('BuyerEmail',$email)->orderBy('LastUpdateDate','Desc')->first();

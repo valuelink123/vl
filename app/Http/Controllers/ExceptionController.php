@@ -1043,6 +1043,7 @@ class ExceptionController extends Controller
 				//得到修改为confirmed状态时间
 				$customersList['bg'].$customersList['bu'],
 				array_get($sap_sellers,$customersList['sap_seller_id'],$customersList['sap_seller_id']),
+				$customersList['descrip'],
                 ((Auth::user()->admin || in_array($customersList['group_id'],array_get($this->getUserGroup(),'manage_groups',array()))) && ($customersList['process_status']=='submit' || $customersList['process_status']=='confirmed')) ?'<a href="/exception/'.$customersList['id'].'/edit" class="btn btn-sm red btn-outline " target="_blank"><i class="fa fa-search"></i> Process </a>':'<a href="/exception/'.$customersList['id'].'/edit" class="btn blue btn-sm btn-outline green" target="_blank"><i class="fa fa-search"></i> View </a>',
             );
 		}
@@ -1302,7 +1303,7 @@ class ExceptionController extends Controller
 							'MarketPlaceId'=>$data['ZMPLACEID'],
 							'AmazonOrderId'=>$data['ZAOID'],
 							'SellerOrderId'=>$data['ZSOID'],
-//							'ApiDownloadDate'=>date('Y-m-d H:i:s',strtotime($data['ALOADDATE'].$data['ALOADTIME'])),
+							'ApiDownloadDate'=>date('Y-m-d H:i:s',strtotime($data['PCHASEDATE'].$data['PCHASETIME'])),
 							'PurchaseDate'=>date('Y-m-d H:i:s',strtotime($data['PCHASEDATE'].$data['PCHASETIME'])),
 							'LastUpdateDate'=>date('Y-m-d H:i:s',strtotime($data['LUPDATEDATE'].$data['LUPDATETIME'])),
 							'OrderStatus'=>$data['ORSTATUS'],

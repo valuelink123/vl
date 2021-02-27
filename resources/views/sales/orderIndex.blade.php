@@ -8,6 +8,40 @@
         table th{
             text-align:center;
         }
+        table.dataTable thead th, table.dataTable thead td {
+            padding: 10px 0px !important;
+        }
+        table.dataTable tbody td {
+            padding: 8px 0px !important;
+        }
+        .table td, .table th {
+            font-size: 12px !important;
+        }
+        .table{
+            table-layout:fixed;
+        }
+        .table tr .data-date{
+            width: 200px !important
+        }
+        .table tr .data-currency{
+            width: 70px !important
+        }
+        .table tr .asins{
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+        .table tr .data-asins{
+            width: 120px !important
+        }
+        .table tr .seller_skus{
+            width: 120px !important
+        }
+        .table tr .seller_skus{
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+        }
     </style>
     <div class="row">
         <div class="top portlet light">
@@ -83,7 +117,7 @@
 
                     <div class="col-md-2">
                         <div class="input-group">
-                            <span class="input-group-addon">Fulfillment Channel</span>
+                            <span class="input-group-addon">Fulfillment</span>
                             <select class="btn btn-default" name="fulfillment_channel" id="fulfillment_channel">
                                 <option value="">select</option>
                                 <option value="AFN">FBA</option>
@@ -129,11 +163,11 @@
                         <th>Seller Skus</th>
                         <th>Amounts</th>
                         <th>Currency</th>
-                        <th>Tracking No</th>
-                        <th>Carrier Code</th>
+{{--                        <th>Tracking No</th>--}}
+{{--                        <th>Carrier Code</th>--}}
                         <th>Settlement ID</th>
                         <th>Settlement Date</th>
-                        <th>Fulfillment Channel</th>
+                        <th>Fulfillment</th>
                         <th>Posted Date</th>
                     </tr>
                     </thead>
@@ -164,10 +198,10 @@
             searching: false,//关闭搜索
             serverSide: true,//启用服务端分页（这是使用Ajax服务端的必须配置）
             ordering:false,
-            "pageLength": 20, // default record count per page
+            "pageLength": 15, // default record count per page
             "lengthMenu": [
-                [10, 20,50,],
-                [10, 20,50,] // change per page values here
+                [15, 30,50,],
+                [15, 30,50,] // change per page values here
             ],
             processing: true,
             columns: [
@@ -175,13 +209,13 @@
                 {data: 'account',name:'account'},
                 {data: 'amazon_order_id',name:'amazon_order_id'},
                 {data: 'status',name:'status'},
-                {data: 'date',name:'date'},
-                {data: 'asins',name:'asins'},
-                {data:'seller_skus',name:'seller_skus'},
+                {data: 'date',name:'date',class:'data-date'},
+                {data: 'asins',name:'asins',class:'asins'},
+                {data:'seller_skus',name:'seller_skus',class:'seller_skus'},
                 {data: 'amount',name:'amount'},
-                {data: 'currency',name:'currency'},
-                {data: 'tracking_no',name:'tracking_no'},
-                {data: 'carry_code',name:'carry_code'},
+                {data: 'currency',name:'currency',class:'data-currency'},
+                // {data: 'tracking_no',name:'tracking_no'},
+                // {data: 'carry_code',name:'carry_code'},
                 {data: 'settlement_id',name:'settlement_id'},
                 {data: 'settlement_date',name:'settlement_date'},
                 {data: 'fulfillment_channel',name:'fulfillment_channel'},
