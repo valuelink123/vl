@@ -19,6 +19,16 @@
             white-space: nowrap;
             overflow: hidden;
         }
+        table.dataTable thead th, table.dataTable thead td {
+            padding: 10px 5px !important;
+        }
+        .table thead tr th {
+            font-size: 12px !important;
+            font-weight: 600;
+        }
+        .table td, .table th {
+            font-size: 12px;
+        }
     </style>
     <div class="row">
         <div class="top portlet light">
