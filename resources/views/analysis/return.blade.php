@@ -9,7 +9,7 @@
             text-align:center;
         }
         table.dataTable thead th, table.dataTable thead td {
-            padding: 10px 0px !important;
+            padding: 10px 5px !important;
         }
         .table thead tr th {
             font-size: 12px !important;
@@ -98,6 +98,7 @@
             searching: false,//关闭搜索
             serverSide: true,//启用服务端分页（这是使用Ajax服务端的必须配置）
             ordering:true,
+            aoColumnDefs: [ { "bSortable": false, "aTargets": [21] }],
             "pageLength": 15, // default record count per page
             "lengthMenu": [
                 [15, 30,50,],

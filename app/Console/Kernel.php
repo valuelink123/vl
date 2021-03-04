@@ -73,7 +73,7 @@ class Kernel extends ConsoleKernel
         })->dailyAt('14:00');
 		$schedule->call(function (){
 			DB::update("update rsg_products set status = 3 where status>-1 and end_date<'".date('Y-m-d')."';");
-        })->dailyAt('08:00');
+        })->dailyAt('03:00');
         $accountList = DB::table('accounts')->get(array('id'));
         $i=$x=0;
         foreach($accountList as $account){
@@ -125,7 +125,7 @@ class Kernel extends ConsoleKernel
 		$schedule->command('get:skubaseinfo')->dailyAt('16:00')->name('skubaseinfo')->withoutOverlapping();
 		$schedule->command('add:transfer_warn')->dailyAt('6:00')->name('transferWarn')->withoutOverlapping();//添加调拨预警，每天跑一次
 		$schedule->command('scan:skudaily')->dailyAt('08:00')->name('skudaily')->withoutOverlapping();
-		$schedule->command('add:rsgProduct')->dailyAt('07:00')->name('addProduct')->withoutOverlapping();
+		$schedule->command('add:rsgProduct')->dailyAt('02:00')->name('addProduct')->withoutOverlapping();
 
 		$schedule->command('send:mailchimp')->hourly()->name('sendMailchimp')->withoutOverlapping();//添加edmcampaign的时候，设置了发送时间，批处理发送edm邮件
 		$schedule->command('add:sales_remind')->dailyAt('07:15')->name('addSalesRemind')->withoutOverlapping();//22周销售计划中，还没有填写销售计划的时候，插件提醒销售去添加计划
@@ -143,7 +143,7 @@ class Kernel extends ConsoleKernel
 		$schedule->command('update:mcf_order_amazonorderid')->monthly()->name('mcf_order_amazonorderid');
 
 		$schedule->command('cal:dailySales')->dailyAt('08:30')->name('dailySales')->withoutOverlapping();
-		$schedule->command('update:emails')->monthly()->name('updateEmails')->withoutOverlapping();
+//		$schedule->command('update:emails')->monthly()->name('updateEmails')->withoutOverlapping();
     }
 
     /**

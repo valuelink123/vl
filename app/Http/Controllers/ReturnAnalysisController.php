@@ -36,10 +36,10 @@ class ReturnAnalysisController extends Controller
 			3=>['name'=>'产品损坏','reason'=>['DAMAGED_BY_CARRIER','DAMAGED_BY_FC','CUSTOMER_DAMAGED']],
 			4=>['name'=>'缺少配件','reason'=>['MISSING_PARTS']],
 			5=>['name'=>'不想要了','reason'=>['SWITCHEROO','UNWANTED_ITEM']],
-			6=>['name'=>'和描述不相符','reason'=>['NOT_AS_DESCRIBED']],
+			6=>['name'=>'和描述不符','reason'=>['NOT_AS_DESCRIBED']],
 			7=>['name'=>'下错订单','reason'=>['ORDERED_WRONG_ITEM','MISORDERED']],
 			8=>['name'=>'未收到货','reason'=>['UNDELIVERABLE_UNCLAIMED','UNDELIVERABLE_UNKNOWN','NEVER_ARRIVED','UNDELIVERABLE_CARRIER_MISS_SORTED','UNDELIVERABLE_INSUFFICIENT_ADDRESS','UNDELIVERABLE_MISSING_LABEL','UNDELIVERABLE_FAILED_DELIVERY_ATTEMPTS','UNDELIVERABLE_REFUSED']],
-			9=>['name'=>'有更好的价格','reason'=>['FOUND_BETTER_PRICE']],
+			9=>['name'=>'有更好价格','reason'=>['FOUND_BETTER_PRICE']],
 			10=>['name'=>'交期超时','reason'=>['MISSED_ESTIMATED_DELIVERY']],
 			11=>['name'=>'未经授权购买','reason'=>['UNAUTHORIZED_PURCHASE']],
 			12=>['name'=>'不适合','reason'=>['NOT_COMPATIBLE','APPAREL_TOO_LARGE','APPAREL_TOO_SMALL','PART_NOT_COMPATIBLE']],
@@ -64,6 +64,32 @@ class ReturnAnalysisController extends Controller
 		if($_POST){
 			$search = isset($_REQUEST['search']) ? $_REQUEST['search'] : '';
 			$search = $this->getSearchData(explode('&',$search));
+			$orderby = 'tb.sku';
+			$sort = 'desc';
+			if(isset($_REQUEST['order'][0])){
+				if($_REQUEST['order'][0]['column']==0) $orderby = 'tb.sku';
+				if($_REQUEST['order'][0]['column']==1) $orderby = 'title';
+				if($_REQUEST['order'][0]['column']==2) $orderby = 'type_0';
+				if($_REQUEST['order'][0]['column']==3) $orderby = 'type_1';
+				if($_REQUEST['order'][0]['column']==4) $orderby = 'type_2';
+				if($_REQUEST['order'][0]['column']==5) $orderby = 'type_3';
+				if($_REQUEST['order'][0]['column']==6) $orderby = 'type_4';
+				if($_REQUEST['order'][0]['column']==7) $orderby = 'type_5';
+				if($_REQUEST['order'][0]['column']==8) $orderby = 'type_6';
+				if($_REQUEST['order'][0]['column']==9) $orderby = 'type_7';
+				if($_REQUEST['order'][0]['column']==10) $orderby = 'type_8';
+				if($_REQUEST['order'][0]['column']==11) $orderby = 'type_9';
+				if($_REQUEST['order'][0]['column']==12) $orderby = 'type_10';
+				if($_REQUEST['order'][0]['column']==13) $orderby = 'type_11';
+				if($_REQUEST['order'][0]['column']==14) $orderby = 'type_12';
+				if($_REQUEST['order'][0]['column']==15) $orderby = 'type_13';
+				if($_REQUEST['order'][0]['column']==16) $orderby = 'type_14';
+				if($_REQUEST['order'][0]['column']==17) $orderby = 'type_15';
+				if($_REQUEST['order'][0]['column']==18) $orderby = 'type_16';
+				if($_REQUEST['order'][0]['column']==19) $orderby = 'type_17';
+				if($_REQUEST['order'][0]['column']==20) $orderby = 'type_18';
+				$sort = $_REQUEST['order'][0]['dir'];
+			}
 			//搜索条件如下：from_date,to_date
 			$where = " where return_date >= '".$search['from_date']." 00:00:00' and return_date <= '".$search['to_date']." 23:59:59'";
 			$where_sku = ' where 1 = 1 ';
@@ -80,7 +106,7 @@ class ReturnAnalysisController extends Controller
 				left join sap_asin_match_sku as tb on (ta.asin=tb.asin and ta.seller_sku=tb.seller_sku and ta.mws_seller_id=tb.seller_id and ta.mws_marketplaceid=tb.marketplace_id) 
 				left join sap_skus on tb.sku=sap_skus.sku 
 				{$where_sku}
-				GROUP BY tb.sku ORDER BY tb.sku DESC";
+				GROUP BY tb.sku ORDER BY {$orderby} {$sort}";
 
 			if($req['length'] != '-1'){//等于-1时为查看全部的数据
 				$limit = $this->dtLimit($req);
@@ -120,9 +146,22 @@ class ReturnAnalysisController extends Controller
 			if(isset($search['account']) && $search['account']){
 				$where_refund.= " and t1.current_seller_account_id in (".$search['account'].")";
 			}
+			//站点权限
+			$where_refund .= " and current_marketplace_id = '".ucfirst($search['site'])."'";
+
 			$where = ' where 1 = 1 ';
 			if(isset($search['asin']) && $search['asin']){
 				$where.= " and tb.asin = '".$search['asin']."'";
+			}
+			$orderby = ' return_quantity ';
+			$sort = ' desc ';
+			if(isset($_REQUEST['order'][0])){
+				if($_REQUEST['order'][0]['column']==0) $orderby = 'tb.asin';
+				if($_REQUEST['order'][0]['column']==1) $orderby = 'title';
+				if($_REQUEST['order'][0]['column']==2) $orderby = 'ta.seller_account_id';
+				if($_REQUEST['order'][0]['column']==3) $orderby = 'refund_quantity';
+				if($_REQUEST['order'][0]['column']==4) $orderby = 'return_quantity';
+				$sort = $_REQUEST['order'][0]['dir'];
 			}
 
 			$sql="select SQL_CALC_FOUND_ROWS tb.asin,ta.seller_account_id,sum(quantity_shipped) as refund_quantity,sum(tc.quantity) as return_quantity,any_value(sap_skus.description) as title 
@@ -138,7 +177,7 @@ class ReturnAnalysisController extends Controller
 				left join amazon_returns as tc on  tb.asin=tc.asin and ta.seller_account_id=tc.seller_account_id and ta.amazon_order_id = tc.amazon_order_id 
 				left join sap_skus on tb.sku=sap_skus.sku 
 				{$where}
-				group by tb.asin,ta.seller_account_id order by return_quantity desc";
+				group by tb.asin,ta.seller_account_id order by {$orderby} {$sort}";
 
 			if($req['length'] != '-1'){//等于-1时为查看全部的数据
 				$limit = $this->dtLimit($req);
@@ -182,6 +221,16 @@ class ReturnAnalysisController extends Controller
 				$where.= " and tb.sku = '".$search['sku']."'";
 			}
 
+			$orderby = ' return_quantity ';
+			$sort = ' desc ';
+			if(isset($_REQUEST['order'][0])){
+				if($_REQUEST['order'][0]['column']==0) $orderby = 'tb.sku';
+				if($_REQUEST['order'][0]['column']==1) $orderby = 'title';
+				if($_REQUEST['order'][0]['column']==2) $orderby = 'refund_quantity';
+				if($_REQUEST['order'][0]['column']==3) $orderby = 'return_quantity';
+				$sort = $_REQUEST['order'][0]['dir'];
+			}
+
 			$sql="select SQL_CALC_FOUND_ROWS tb.sku,sum(quantity_shipped) as refund_quantity,sum(tc.quantity) as return_quantity,any_value(sap_skus.description) as title  
 				from (
 						select amazon_order_id,current_seller_account_id as seller_account_id,current_marketplace_id as marketplace_id,seller_sku,
@@ -195,7 +244,7 @@ class ReturnAnalysisController extends Controller
 				left join amazon_returns as tc on  tb.asin=tc.asin and ta.seller_account_id=tc.seller_account_id and ta.amazon_order_id = tc.amazon_order_id 
 				left join sap_skus on tb.sku=sap_skus.sku 
 				{$where}
-				group by tb.sku order by return_quantity desc";
+				group by tb.sku order by {$orderby} {$sort}";
 
 			if($req['length'] != '-1'){//等于-1时为查看全部的数据
 				$limit = $this->dtLimit($req);

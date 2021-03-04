@@ -143,6 +143,10 @@ class RefundController extends Controller
 		if(isset($search['settlement_date']) && $search['settlement_date']){
 			$where.= " and settlement_date >= '".$search['settlement_date']." 00:00:00 ' and settlement_date<= '".$search['settlement_date']." 23:59:59'";
 		}
+		//站点权限
+		$domain = substr(getDomainBySite($search['site']), 4);//orders.sales_channel
+		$where .= " and finances_refund_events.marketplace_name = '".ucfirst($domain)."'";
+
 		$sql = "select SQL_CALC_FOUND_ROWS any_value(orders.id) as id,finances_refund_events.current_seller_account_id as seller_account_id,finances_refund_events.amazon_order_id,any_value(posted_date) as posted_date,any_value(currency) as currency,any_value(settlement_id) as settlement_id,any_value(settlement_date) as settlement_date,any_value(orders.asins) as asins,sum(CASE `type` WHEN 'RefundCommission' THEN finances_refund_events.amount ELSE 0 END) as refund_commission,sum(CASE `type` WHEN 'RefundCommission' THEN 0 ELSE finances_refund_events.amount END) as refund_amount    
 				from finances_refund_events 
 				left join orders on orders.seller_account_id = finances_refund_events.current_seller_account_id and orders.amazon_order_id = finances_refund_events.amazon_order_id 

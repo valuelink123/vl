@@ -19,6 +19,16 @@
             white-space: nowrap;
             overflow: hidden;
         }
+        table.dataTable thead th, table.dataTable thead td {
+            padding: 10px 5px !important;
+        }
+        .table thead tr th {
+            font-size: 12px !important;
+            font-weight: 600;
+        }
+        .table td, .table th {
+            font-size: 12px;
+        }
     </style>
     <div class="row">
         <div class="top portlet light">
@@ -82,7 +92,7 @@
         $('#datatable').dataTable({
             searching: false,//关闭搜索
             serverSide: true,//启用服务端分页（这是使用Ajax服务端的必须配置）
-            ordering:false,
+            ordering:true,
             "pageLength": 15, // default record count per page
             "lengthMenu": [
                 [15, 30,50,],
