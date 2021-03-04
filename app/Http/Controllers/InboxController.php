@@ -606,7 +606,7 @@ class InboxController extends Controller
     }
 
     public function getDefaultDate($todayDate){
-        if(time()-strtotime($todayDate.' 07:30:00') < 0){
+        if(time()-strtotime($todayDate.' 02:30:00') < 0){
             //凌晨到七点半之间要显示的是昨天的数据
             $todayDate = date('Y-m-d',strtotime($todayDate)-86400);
         }
