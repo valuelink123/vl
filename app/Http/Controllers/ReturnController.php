@@ -54,6 +54,7 @@ class ReturnController extends Controller
 		$recordsTotal = $recordsFiltered = (DB::connection('amazon')->select('SELECT FOUND_ROWS() as count'))[0]->count;
 		$accounts = $this->getAccountInfo();//得到账号机的信息
 		foreach($data as $key=>$val) {
+			$data[$key]['customer_comments'] = '<span title="'.$val['customer_comments'].'">'.$val['customer_comments'].'</span>';
 			$data[$key]['account'] = isset($accounts[$val['seller_account_id']]) ? $accounts[$val['seller_account_id']]['label'] : $val['seller_account_id'];
 			$data[$key]['date'] = 'Return:'.$val['return_date'];
 		}
@@ -132,6 +133,17 @@ class ReturnController extends Controller
 		$where = " where return_date >= '".$search['from_date']." 00:00:00' and return_date <= '".$search['to_date']." 23:59:59'";
 		if(isset($search['account']) && $search['account']){
 			$where.= " and amazon_returns.seller_account_id in (".$search['account'].")";
+		}else{
+			//站点权限
+			$data= DB::connection('vlz')->select("select id,label from seller_accounts where deleted_at is NULL and mws_marketplaceid = '{$search['site']}' order by label asc");
+			if($data){
+				$accountStr = '';
+				foreach($data as $key=>$val){
+					$accountStr .= $val->id.',';
+				}
+				$accountStr = rtrim($accountStr,',');
+				$where.= " and amazon_returns.seller_account_id in (".$accountStr.")";
+			}
 		}
 		if(isset($search['amazon_order_id']) && $search['amazon_order_id']){
 			$where.= " and amazon_returns.amazon_order_id = '".$search['amazon_order_id']."'";

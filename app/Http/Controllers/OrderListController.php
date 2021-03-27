@@ -32,7 +32,7 @@ class OrderListController extends Controller
 		$data['account'] = $this->getAccountInfo();//得到账号机的信息
 		$data['fromDate'] = date('Y-m-d',time()-2*86400);//开始日期,默认查最近三天的数据
 		$data['toDate'] = date('Y-m-d');//结束日期
-//		$data['fromDate'] = '2021-01-15';//测试日期
+//		$data['fromDate'] = '2021-01-17';//测试日期
 		return view('sales/orderIndex',['data'=>$data]);
 	}
 
@@ -63,6 +63,8 @@ class OrderListController extends Controller
 			$data[$key]['currency'] = $val['currency_code'];
 			$data[$key]['tracking_no'] = '/NA';
 			$data[$key]['carry_code'] = '/NA';
+			$data[$key]['seller_skus'] = $val['seller_skus'];
+			$data[$key]['asins'] = $val['asins'];
 			$fulfillmentChannel = '';
 			//当为AFN的时候为FBA发货，当为MFN的时候为FBM发货
 			if($val['fulfillment_channel']=='AFN'){
@@ -185,6 +187,10 @@ class OrderListController extends Controller
 		if(isset($search['fulfillment_channel']) && $search['fulfillment_channel']){
 			$where.= " and fulfillment_channel = '".$search['fulfillment_channel']."'";
 		}
+
+		//站点权限
+		$domain = substr(getDomainBySite($search['site']), 4);//orders.sales_channel
+		$where .= " and orders.sales_channel = '".ucfirst($domain)."'";
 
 		$sql = "select SQL_CALC_FOUND_ROWS orders.id,orders.seller_account_id,orders.amazon_order_id,order_status,purchase_date,asins,currency_code,amount,fulfillment_channel,CONCAT(orders.seller_account_id,'_',orders.amazon_order_id) as accountid_orderid,settlement_id,settlement_date,last_update_date,posted_date,orders.seller_skus as seller_skus   
 				from orders 

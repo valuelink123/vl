@@ -8,6 +8,27 @@
         table th{
             text-align:center;
         }
+        .table tr .title{
+            width: 380px !important
+        }
+        .table{
+            table-layout:fixed;
+        }
+        .table tr .title{
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+        table.dataTable thead th, table.dataTable thead td {
+            padding: 10px 5px !important;
+        }
+        .table thead tr th {
+            font-size: 12px !important;
+            font-weight: 600;
+        }
+        .table td, .table th {
+            font-size: 12px;
+        }
     </style>
     <div class="row">
         <div class="top portlet light">
@@ -71,16 +92,16 @@
         $('#datatable').dataTable({
             searching: false,//关闭搜索
             serverSide: true,//启用服务端分页（这是使用Ajax服务端的必须配置）
-            ordering:false,
-            "pageLength": 20, // default record count per page
+            ordering:true,
+            "pageLength": 15, // default record count per page
             "lengthMenu": [
-                [10, 20,50,],
-                [10, 20,50,] // change per page values here
+                [15, 30,50,],
+                [15, 30,50,] // change per page values here
             ],
             processing: true,
             columns: [
                 {data: 'sku',name:'sku'},
-                {data: 'title',name:'title'},
+                {data: 'title',name:'title',class:'title'},
                 {data: 'refund_quantity',name:'refund_quantity'},
                 {data: 'return_quantity',name:'return_quantity'},
             ],

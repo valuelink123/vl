@@ -152,150 +152,180 @@ class ReviewController extends Controller
         $date_from=date('Y-m-d',strtotime('-90 days'));
         $date_to=date('Y-m-d');
 
-        $customers = DB::table('review')
-            ->select('review.*','asin.status as asin_status','asin.bg as bg','asin.bu as bu','customers.email as email','customers.phone as phone','customers.other as other','review_customers.email as email_add','review_customers.phone as phone_add','review_customers.other as other_add','star.average_score as average_score','star.total_star_number as total_star_number')
-            ->leftJoin(DB::raw('(select max(status) as status,max(item_no) as item_no,asin,site,max(bg) as bg,max(bu) as bu from asin group by asin,site) as asin'),function($q){
-                $q->on('review.asin', '=', 'asin.asin')
-                    ->on('review.site', '=', 'asin.site');
-            })->leftJoin('star',function($q){
-                $q->on('review.asin', '=', 'star.asin')
-                    ->on('review.site', '=', 'star.domain');
-            })->leftJoin('customers',function($q){
-                $q->on('review.customer_id', '=', 'customers.customer_id')
-                    ->on('review.site', '=', 'customers.site');
-            })->leftJoin('review_customers',function($q){
-                $q->on('review.review', '=', 'review_customers.review')
-                    ->on('review.site', '=', 'review_customers.site');
-            });
-        if(!Auth::user()->can(['review-show-all'])){
-            $customers = $customers->where('review.user_id',$this->getUserId());
-        }
+		//定义订单物料对照关系
+		$_asinsMapping=array();
+		//定义销售的asin
+		$_asins=array();
 
-        if(array_get($_REQUEST,'bgbu')){
-            $bgbu = array_get($_REQUEST,'bgbu');
-            $bgbu_arr = explode('_',$bgbu);
-            if(array_get($bgbu_arr,0)) $customers = $customers->where('asin.bg',array_get($bgbu_arr,0));
-            if(array_get($bgbu_arr,1)) $customers = $customers->where('asin.bu',array_get($bgbu_arr,1));
-        }
+		//获得当前登陆用户
+		$_curr_user=Auth::User();
 
-        if(array_get($_REQUEST,'vp')){
-            $customers = $customers->where('review.vp',array_get($_REQUEST,'vp')-1);
-        }
+		//从Amazon库获得物料对照关系
+		$_asinsMappingSelect=DB::connection('amazon')->table('sap_asin_match_sku')
+			->select('sap_asin_match_sku.asin','sap_asin_match_sku.seller_sku','sap_asin_match_sku.sku','asins.title','asins.images')
+			->leftJoin('asins',function($q){
+				$q->on('sap_asin_match_sku.asin', '=', 'asins.asin')
+					->on('sap_asin_match_sku.marketplace_id', '=', 'asins.marketplaceid');
+			});
 
-        if(array_get($_REQUEST,'del')){
-            $customers = $customers->where('review.is_delete',array_get($_REQUEST,'del')-1);
-        }
-
-        if(array_get($_REQUEST,'rc')){
-            if(array_get($_REQUEST,'rc')==1) $customers = $customers->whereRaw('review.rating=review.updated_rating');
-            if(array_get($_REQUEST,'rc')==2) $customers = $customers->whereRaw('review.rating<>review.updated_rating');
-        }
+		$_asinsMappingSelect=$_asinsMappingSelect->whereRaw('length(sap_asin_match_sku.asin)=10') ;
 
 
-        if(array_get($_REQUEST,'np')){
-            $nev_rating=4;
-            if(array_get($_REQUEST,'np')==1) {
-                $customers = $customers->Where(function ($query) use ($nev_rating) {
-                    $query->where('rating', '<', $nev_rating)
-                        ->orWhere(function($query) use ($nev_rating){
-                            $query->where('updated_rating','<', $nev_rating)->whereNotNull('updated_rating')->where('updated_rating','>', 0);
-                        });
-                });
-            }
-            if(array_get($_REQUEST,'np')==2) {
-                $customers = $customers->where('rating', '>=', $nev_rating)->where(function ($query) use ($nev_rating) {
-                    $query->where('updated_rating', '>=', $nev_rating)->orWhere('updated_rating', 0)->orWhereNull('updated_rating');
-                });
-            }
-        }
+		//是否属于营销员（销售人员）
+		$_isSales=false;
+		$_toSelect=false;
+		if($_curr_user->seller_rules) {
+			$rules = explode("-", trim($_curr_user->seller_rules));
+			if (array_get($rules, 0) != '*') {
+				$_asinsMappingSelect=$_asinsMappingSelect->where('sap_asin_match_sku.sap_seller_bg',array_get($rules, 0)) ;
+				$_isSales=true;
+			}
+			if (array_get($rules, 1) != '*') {
+				$_asinsMappingSelect=$_asinsMappingSelect->where('sap_asin_match_sku.sap_seller_bu',array_get($rules, 1)) ;
+				$_isSales=true;
+			}
+		}else {
+			if($_curr_user->sap_seller_id>0) {
+				$_isSales=true;
+				$_asinsMappingSelect=$_asinsMappingSelect->where('sap_asin_match_sku.sap_seller_id', $_curr_user->sap_seller_id);
+			}
+		}
+
+		if(array_get($_REQUEST,'bgbu')) {
+			$bgbu = explode("_", trim(array_get($_REQUEST,'bgbu')));
+			if(array_get($bgbu, 0)){
+				$_toSelect=true;
+				$_asinsMappingSelect=$_asinsMappingSelect->where('sap_asin_match_sku.sap_seller_bg',array_get($bgbu, 0)) ;
+			}
+			if(array_get($bgbu, 1)){
+				$_toSelect=true;
+				$_asinsMappingSelect=$_asinsMappingSelect->where('sap_asin_match_sku.sap_seller_bu',array_get($bgbu, 1)) ;
+			}
 
 
-        if(array_get($_REQUEST,'asin_status')){
-            $customers = $customers->whereIn('asin.status',explode(',',array_get($_REQUEST,'asin_status')));
-        }
-        if(Auth::user()->admin){
-            if(array_get($_REQUEST,'user_id')){
-                $customers = $customers->whereIn('review.user_id',explode(',',array_get($_REQUEST,'user_id')));
-            }
-        }
+		}
 
 
-        if(array_get($_REQUEST,'date_from')) $date_from= array_get($_REQUEST,'date_from');
-        if(array_get($_REQUEST,'date_to')) $date_to= array_get($_REQUEST,'date_to');
-        $customers = $customers->where('date','>=',$date_from);
-        $customers = $customers->where('date','<=',$date_to);
+		//TODO: 这里需要把获得的user_id转化为SAP的sap_seller_id,才能获得正确的值
+		if(array_get($_REQUEST,'user_id')){
+			$_sapUserIds=DB::table('users')->select('sap_seller_id')->whereIn('id',explode(',',array_get($_REQUEST,'user_id')))->where('locked',0)->get()->toArray();
+			$_toSelect=true;
+			if($_sapUserIds) {
+				$sapUserIds = array();
+				foreach($_sapUserIds as $key=>$val){
+					$sapUserIds[] = $val->sap_seller_id;
+				}
+				$_asinsMappingSelect = $_asinsMappingSelect->whereIn('sap_asin_match_sku.sap_seller_id',$sapUserIds);
+			}
+		}
+
+		if(array_get($_REQUEST,'asin_status')){
+			$_toSelect=true;
+			$_asinsMappingSelect = $_asinsMappingSelect->whereIn('sap_asin_match_sku.status',explode(',',array_get($_REQUEST,'asin_status')));
+		}
+
+		//关键字查询，只模糊查询asin\seller_sku\sku(item_no)
+		if(array_get($_REQUEST,'keywords')){
+			$_toSelect=true;
+			$keywords=trim(array_get($_REQUEST,'keywords'));
+			$_asinsMappingSelect = $_asinsMappingSelect->where(function ($query) use ($keywords) {
+				$query->where('sap_asin_match_sku.asin', 'like', '%'.$keywords.'%')
+					->orwhere('sap_asin_match_sku.seller_sku', 'like', '%'.$keywords.'%')
+					->orwhere('sap_asin_match_sku.sku', 'like', '%'.$keywords.'%');
+			});
+		}
 
 
-        if(array_get($_REQUEST,'follow_status')){
-            $customers = $customers->whereIn('review.status',explode(',',array_get($_REQUEST,'follow_status')));
-        }
-
-        if(array_get($_REQUEST,'site')){
-            $customers = $customers->whereIn('review.site',explode(',',array_get($_REQUEST,'site')));
-        }
-
-        if(array_get($_REQUEST,'rating')){
-            $customers = $customers->where('review.rating',$_REQUEST['rating']);
-        }
-
-        if(array_get($_REQUEST,'keywords')){
-            //$customers = $customers->where('subject', 'like', '%'.$_REQUEST['subject'].'%');
-            $keywords = array_get($_REQUEST,'keywords');
-            $customers = $customers->where(function ($query) use ($keywords) {
-
-                $query->where('reviewer_name', 'like', '%'.$keywords.'%')
-                    ->orwhere('review.asin', 'like', '%'.$keywords.'%')
-                    ->orwhere('asin.item_no', 'like', '%'.$keywords.'%')
-                    ->orwhere('review.review', 'like', '%'.$keywords.'%')
-                    ->orwhere('amazon_order_id', 'like', '%'.$keywords.'%')
-                    ->orwhere('buyer_email', 'like', '%'.$keywords.'%')
-                    ->orwhere('review.customer_id', 'like', '%'.$keywords.'%')
-                    ->orwhere('etype', 'like', '%'.$keywords.'%');
-
-            });
-        }
+		//判断是销售人员，则查询自己组织以及下级的物料对照关系
+		$asinMatchSkuData = array();
+		$_asinsMapping = $_asinsMappingSelect->get();
+		if($_asinsMapping){
+			foreach ($_asinsMapping as $_asin){
+				if($_asin){
+					$_asins[$_asin->asin]=$_asin->asin;
+					$asinMatchSkuData[$_asin->asin]['item_no'] = $_asin->sku;
+					$asinMatchSkuData[$_asin->asin]['title'] = $_asin->title;
+					$_images = explode(',',$_asin->images);
+					$asinMatchSkuData[$_asin->asin]['img'] = current($_images);
+				}
+			}
+		}
 
 
+		//查询评价表
+		$_reviewsSelect=DB::table('review');
+		if($_asins) {
+			$_reviewsSelect = $_reviewsSelect->whereIn('asin', $_asins);
+		}
 
-        $orderby = 'date';
-        $sort = 'desc';
+
+		if(array_get($_REQUEST,'site')) {
+			$_reviewsSelect = $_reviewsSelect->whereIn('site',explode(',',array_get($_REQUEST,'site')));
+		}
 
 
+		if(array_get($_REQUEST,'follow_status')) {
+			$_reviewsSelect = $_reviewsSelect->whereIn('follow_status',explode(',',array_get($_REQUEST,'follow_status')));
+		}
+
+		if(array_get($_REQUEST,'date_from')) {
+			$_reviewsSelect = $_reviewsSelect->where('date', '>=', array_get($_REQUEST,'date_from'));
+		}
+
+		if(array_get($_REQUEST,'date_to')){
+			$_reviewsSelect = $_reviewsSelect->where('date', '<=', array_get($_REQUEST,'date_to'));
+		}
+
+		if(array_get($_REQUEST,'rating')){
+			$_reviewsSelect = $_reviewsSelect->where('rating', array_get($_REQUEST,'rating'));
+		}
+
+		if(array_get($_REQUEST,'vp')){
+			$_reviewsSelect = $_reviewsSelect->where('vp', array_get($_REQUEST,'vp'));
+		}
+
+		if(array_get($_REQUEST,'del')){
+			$_reviewsSelect = $_reviewsSelect->where('is_delete', array_get($_REQUEST,'del'));
+		}
 
 
-        $reviews =  $customers->orderBy($orderby,$sort)->get();
+		if(array_get($_REQUEST,'rc')){
+			if(array_get($_REQUEST,'rc')==1){
+				$_reviewsSelect = $_reviewsSelect->whereRaw('review.rating=review.updated_rating');
+			}
+			if(array_get($_REQUEST,'rc')==2){
+				$_reviewsSelect = $_reviewsSelect->whereRaw('review.rating<>review.updated_rating');
+			}
+		}
 
-        $reviewsLists =json_decode(json_encode($reviews), true);
+
+		//当np=1是为差评，星级=[1,2,3],当np=2是好评，星级=[4,5]
+		if(array_get($_REQUEST,'np')){
+			switch (array_get($_REQUEST,'np')) {
+				case 1:
+					$_reviewsSelect = $_reviewsSelect->whereIn('rating', [1,2,3]);
+					break;
+				case 2:
+					$_reviewsSelect = $_reviewsSelect->whereIn('rating', [4,5]);
+					break;
+			}
+		}
+		$reviews=$_reviewsSelect->orderBy('date','desc')->get()->toArray();
+		$reviewsLists =json_decode(json_encode($reviews), true);
+
         $arrayData = array();
         $headArray[] = 'Review Date';
-        $headArray[] = 'Asin';
-        $headArray[] = 'Review';
-        $headArray[] = 'ReviewCount';
-        $headArray[] = 'Customer ID';
         $headArray[] = 'Site';
-        $headArray[] = 'ReviewID';
-        $headArray[] = 'Reviewer Name';
+        $headArray[] = 'Asin';
+        $headArray[] = 'Sku';
+        $headArray[] = 'Image';
+        $headArray[] = 'Title';
         $headArray[] = 'Rating';
-        $headArray[] = 'Updated Rating';
         $headArray[] = 'Review Content';
-        $headArray[] = 'Buyer Email';
-        $headArray[] = 'Amazon OrderId';
-        $headArray[] = 'Review Status';
-        $headArray[] = 'Follow Content';
+        $headArray[] = 'Review Content CN';
+        $headArray[] = 'Status';
         $headArray[] = 'Question Type';
-        $headArray[] = 'Follow up Date';
-        $headArray[] = 'Customer Feedback';
-        $headArray[] = 'Asin Status';
-        $headArray[] = 'User';
-        $headArray[] = 'SellerID';
-        $headArray[] = 'Customer Email';
-        $headArray[] = 'Customer Phone';
-        $headArray[] = 'Customer Other';
-        $headArray[] = 'Review Email';
-        $headArray[] = 'Review Phone';
-        $headArray[] = 'Review Other';
-        $headArray[] = 'BG';
-        $headArray[] = 'BU';
+        $headArray[] = 'Comment';
 
         $arrayData[] = $headArray;
         $users_array = $this->getUsers();
@@ -305,45 +335,59 @@ class ReviewController extends Controller
         foreach($steps as $step){
             $follow_status_array[$step->id]=$step->title;
         }
+
         foreach ( $reviewsLists as $review){
             $fol_arr= unserialize($review['follow_content'])?unserialize($review['follow_content']):array();
-            $arrayData[] = array(
-                $review['date'],
-                $review['asin'],
-                round($review['average_score'],1),
-                $review['total_star_number'],
-                $review['customer_id'],
-                $review['site'],
-                $review['review'],
-                $review['reviewer_name'],
-                $review['rating'],
-                $review['updated_rating']?$review['updated_rating']:' ',
-                strip_tags($review['review_content']),
-                $review['buyer_email'],
-                $review['amazon_order_id'],
-                array_get($follow_status_array,empty(array_get($review,'status'))?0:array_get($review,'status'),''),
-                strip_tags(array_get($fol_arr,array_get($review,'status').'.do_content')),
-                $review['etype'],
-                $review['edate'],
-                array_get(getCustomerFb(),$review['customer_feedback']),
-                array_get($asin_status_array,empty(array_get($review,'asin_status'))?0:array_get($review,'asin_status')),
-                array_get($users_array,intval(array_get($review,'user_id')),''),
-                $review['seller_id'],
-                $review['email'],
-                $review['phone'],
-                $review['other'],
-                $review['email_add'],
-                $review['phone_add'],
-                $review['other_add'],
-                $review['bg'],
-                $review['bu']
+			$rating_chstr =$date_chstr = '';
+			if($review['updated_rating']>0 && $review['updated_rating']!=$review['rating']){
+				if($review['updated_rating']>$review['rating']){
+					$rating_chstr = $review['updated_rating'];
+					if($review['updated_date']) $date_chstr = $review['updated_date'];
+				}else{
+					$rating_chstr = $review['updated_rating'];
+					if($review['updated_date']) $date_chstr = $review['updated_date'];
+				}
+			}
+			//求item_no
+			$item = '';
+			if(isset($asinMatchSkuData[$review['asin']]['item_no'])){
+				$item = $asinMatchSkuData[$review['asin']]['item_no'];
+			}
+			//求image
+			$img = '';
+			if(isset($asinMatchSkuData[$review['asin']]['img'])){
+				$img = 'https://images-na.ssl-images-amazon.com/images/I/'.$asinMatchSkuData[$review['asin']]['img'];
+			}
+			$title = '';
+			if(isset($asinMatchSkuData[$review['asin']]['title'])){
+				$title = $asinMatchSkuData[$review['asin']]['title'];
+			}
+			//有些记录的site字段为空
+			$site = '';
+			$siteUrl = 'www.amazon.com';
+			if($review['site']){
+				$site = array_get(array_flip($this->getSitePairs()), $review['site'],'US');
+				$siteUrl = $review['site'];
+			}
 
+            $arrayData[] = array(
+                $review['date'].' '.$date_chstr,
+				$site,
+                $review['asin'],
+				$item,
+				$img,
+				$title,
+				$review['rating'].' '.$rating_chstr,
+				strip_tags($review['review_content']),
+				strip_tags($review['review_content_cn']),
+				strip_tags(array_get($fol_arr,$review['status'].'.do_content')),
+				$review['etype'],
+				$review['remark'],
             );
         }
 
         if($arrayData){
             $spreadsheet = new Spreadsheet();
-
             $spreadsheet->getActiveSheet()
                 ->fromArray(
                     $arrayData,  // The data to set
@@ -382,8 +426,6 @@ class ReviewController extends Controller
 
     public function get()
     {
-        $date_from=date('Y-m-d',strtotime('-90 days'));
-        $date_to=date('Y-m-d');
         if (isset($_REQUEST["customActionType"])) {
             if(!Auth::user()->can(['review-batch-update'])) die('Permission denied -- review-batch-update');
             $updateDate=array();
@@ -418,149 +460,167 @@ class ReviewController extends Controller
 
         }
 
-        $customers = DB::table('review')
-            ->select('review.*','asin.status as asin_status','asin.item_no as item_no','customers.email as email','review_customers.email as email_add','star.average_score as average_score','star.total_star_number as total_star_number', 'fbm_stock.item_name as item_name')
-            ->leftJoin(DB::raw('(select max(status) as status,asin,site,max(bg) as bg,max(bu) as bu,max(item_no) as item_no from asin group by asin,site) as asin'),function($q){
-                $q->on('review.asin', '=', 'asin.asin')
-                    ->on('review.site', '=', 'asin.site');
-            })->leftJoin('star',function($q){
-                $q->on('review.asin', '=', 'star.asin')
-                    ->on('review.site', '=', 'star.domain');
-            })->leftJoin('customers',function($q){
-                $q->on('review.customer_id', '=', 'customers.customer_id')
-                    ->on('review.site', '=', 'customers.site');
-            })->leftJoin('review_customers',function($q){
-                $q->on('review.review', '=', 'review_customers.review')
-                    ->on('review.site', '=', 'review_customers.site');
-            })->leftJoin('fbm_stock',function($q){
-                $q->on('asin.item_no', '=', 'fbm_stock.item_code');
+
+        //定义订单物料对照关系
+        $_asinsMapping=array();
+        //定义销售的asin
+        $_asins=array();
+
+        //获得当前登陆用户
+        $_curr_user=Auth::User();
+
+        //从Amazon库获得物料对照关系
+        $_asinsMappingSelect=DB::connection('amazon')->table('sap_asin_match_sku')
+            ->select('sap_asin_match_sku.asin','sap_asin_match_sku.seller_sku','sap_asin_match_sku.sku','asins.title','asins.images')
+            ->leftJoin('asins',function($q){
+                $q->on('sap_asin_match_sku.asin', '=', 'asins.asin')
+                    ->on('sap_asin_match_sku.marketplace_id', '=', 'asins.marketplaceid');
             });
 
-        if(!Auth::user()->can(['review-show-all'])){
-            $customers = $customers->where('review.user_id',$this->getUserId());
-        }
+        $_asinsMappingSelect=$_asinsMappingSelect->whereRaw('length(sap_asin_match_sku.asin)=10') ;
 
-        if(array_get($_REQUEST,'bgbu')){
-            $bgbu = array_get($_REQUEST,'bgbu');
-            $bgbu_arr = explode('_',$bgbu);
-            if(array_get($bgbu_arr,0)) $customers = $customers->where('asin.bg',array_get($bgbu_arr,0));
-            if(array_get($bgbu_arr,1)) $customers = $customers->where('asin.bu',array_get($bgbu_arr,1));
-        }
 
-        if(array_get($_REQUEST,'vp')){
-            $customers = $customers->where('review.vp',array_get($_REQUEST,'vp')-1);
-        }
-
-        if(array_get($_REQUEST,'del')){
-            $customers = $customers->where('review.is_delete',array_get($_REQUEST,'del')-1);
-        }
-
-        if(array_get($_REQUEST,'rc')){
-            if(array_get($_REQUEST,'rc')==1) $customers = $customers->whereRaw('review.rating=review.updated_rating');
-            if(array_get($_REQUEST,'rc')==2) $customers = $customers->whereRaw('review.rating<>review.updated_rating');
-        }
-
-        if(array_get($_REQUEST,'np')){
-            $nev_rating=4;
-            if(array_get($_REQUEST,'np')==1) {
-                $customers = $customers->Where(function ($query) use ($nev_rating) {
-                    $query->where('rating', '<', $nev_rating)
-                        ->orWhere(function($query) use ($nev_rating){
-                            $query->where('updated_rating','<', $nev_rating)->whereNotNull('updated_rating')->where('updated_rating','>', 0);
-                        });
-                });
+        //是否属于营销员（销售人员）
+        $_isSales=false;
+        $_toSelect=false;
+        if($_curr_user->seller_rules) {
+            $rules = explode("-", trim($_curr_user->seller_rules));
+            if (array_get($rules, 0) != '*') {
+                $_asinsMappingSelect=$_asinsMappingSelect->where('sap_asin_match_sku.sap_seller_bg',array_get($rules, 0)) ;
+                $_isSales=true;
             }
-            if(array_get($_REQUEST,'np')==2) {
-                $customers = $customers->where('rating', '>=', $nev_rating)->where(function ($query) use ($nev_rating) {
-                    $query->where('updated_rating', '>=', $nev_rating)->orWhere('updated_rating', 0)->orWhereNull('updated_rating');
-                });
+            if (array_get($rules, 1) != '*') {
+                $_asinsMappingSelect=$_asinsMappingSelect->where('sap_asin_match_sku.sap_seller_bu',array_get($rules, 1)) ;
+                $_isSales=true;
+            }
+        }else {
+            if($_curr_user->sap_seller_id>0) {
+                $_isSales=true;
+                $_asinsMappingSelect=$_asinsMappingSelect->where('sap_asin_match_sku.sap_seller_id', $_curr_user->sap_seller_id);
+            }
+        }
+
+        if(array_get($_REQUEST,'bgbu')) {
+            $bgbu = explode("_", trim(array_get($_REQUEST,'bgbu')));
+            if(array_get($bgbu, 0)){
+                $_toSelect=true;
+                $_asinsMappingSelect=$_asinsMappingSelect->where('sap_asin_match_sku.sap_seller_bg',array_get($bgbu, 0)) ;
+            }
+            if(array_get($bgbu, 1)){
+                $_toSelect=true;
+                $_asinsMappingSelect=$_asinsMappingSelect->where('sap_asin_match_sku.sap_seller_bu',array_get($bgbu, 1)) ;
+            }
+
+
+        }
+
+
+        //TODO: 这里需要把获得的user_id转化为SAP的sap_seller_id,才能获得正确的值
+        if(array_get($_REQUEST,'user_id')){
+            $_sapUserIds=DB::table('users')->select('sap_seller_id')->whereIn('id',array_get($_REQUEST,'user_id'))->where('locked',0)->get()->toArray();
+            $_toSelect=true;
+            if($_sapUserIds) {
+                $sapUserIds = array();
+                foreach($_sapUserIds as $key=>$val){
+                    $sapUserIds[] = $val->sap_seller_id;
+                }
+                $_asinsMappingSelect = $_asinsMappingSelect->whereIn('sap_asin_match_sku.sap_seller_id',$sapUserIds);
             }
         }
 
         if(array_get($_REQUEST,'asin_status')){
-            $customers = $customers->whereIn('asin.status',array_get($_REQUEST,'asin_status'));
-        }
-        if(Auth::user()->can(['review-show-all'])){
-            if(array_get($_REQUEST,'user_id')){
-                $customers = $customers->whereIn('review.user_id',array_get($_REQUEST,'user_id'));
-            }
+            $_toSelect=true;
+            $_asinsMappingSelect = $_asinsMappingSelect->whereIn('sap_asin_match_sku.status',array_get($_REQUEST,'asin_status'));
         }
 
-
-        if(array_get($_REQUEST,'date_from')) $date_from= array_get($_REQUEST,'date_from');
-        if(array_get($_REQUEST,'date_to')) $date_to= array_get($_REQUEST,'date_to');
-        $customers = $customers->where('date','>=',$date_from);
-        $customers = $customers->where('date','<=',$date_to);
-
-        if(array_get($_REQUEST,'nextdate')) $customers = $customers->where('nextdate',array_get($_REQUEST,'nextdate'));
-
-        if(array_get($_REQUEST,'follow_status')){
-            $customers = $customers->whereIn('review.status',array_get($_REQUEST,'follow_status'));
-        }
-
-        if(array_get($_REQUEST,'site')){
-            $customers = $customers->whereIn('review.site',array_get($_REQUEST,'site'));
-        }
-
-        if(array_get($_REQUEST,'rating')){
-            $customers = $customers->where('review.rating',$_REQUEST['rating']);
-        }
-
+        //关键字查询，只模糊查询asin\seller_sku\sku(item_no)
         if(array_get($_REQUEST,'keywords')){
-            //$customers = $customers->where('subject', 'like', '%'.$_REQUEST['subject'].'%');
-            $keywords = array_get($_REQUEST,'keywords');
-            $customers = $customers->where(function ($query) use ($keywords) {
-
-                $query->where('reviewer_name', 'like', '%'.$keywords.'%')
-                    ->orwhere('review.asin', 'like', '%'.$keywords.'%')
-                    ->orwhere('asin.item_no', 'like', '%'.$keywords.'%')
-                    ->orwhere('review.review', 'like', '%'.$keywords.'%')
-                    ->orwhere('amazon_order_id', 'like', '%'.$keywords.'%')
-                    ->orwhere('buyer_email', 'like', '%'.$keywords.'%')
-                    ->orwhere('review.customer_id', 'like', '%'.$keywords.'%')
-                    ->orwhere('etype', 'like', '%'.$keywords.'%');
-
+            $_toSelect=true;
+            $keywords=trim(array_get($_REQUEST,'keywords'));
+            $_asinsMappingSelect = $_asinsMappingSelect->where(function ($query) use ($keywords) {
+                $query->where('sap_asin_match_sku.asin', 'like', '%'.$keywords.'%')
+                    ->orwhere('sap_asin_match_sku.seller_sku', 'like', '%'.$keywords.'%')
+                    ->orwhere('sap_asin_match_sku.sku', 'like', '%'.$keywords.'%');
             });
         }
 
 
-
-        $orderby = 'date';
-        $sort = 'desc';
-        if(isset($_REQUEST['order'][0])){
-            if($_REQUEST['order'][0]['column']==1) $orderby = 'date';
-            if($_REQUEST['order'][0]['column']==2) $orderby = 'site';
-            if($_REQUEST['order'][0]['column']==3) $orderby = 'asin';
-            if($_REQUEST['order'][0]['column']==4) $orderby = 'item_name';
-            if($_REQUEST['order'][0]['column']==5) $orderby = 'rating';
-            if($_REQUEST['order'][0]['column']==6) $orderby = 'review_content';
-            if($_REQUEST['order'][0]['column']==7) $orderby = 'review_content_cn';
-            if($_REQUEST['order'][0]['column']==8) $orderby = 'status';
-            if($_REQUEST['order'][0]['column']==9) $orderby = 'etype';
-            if($_REQUEST['order'][0]['column']==10) $orderby = 'remark';
-
-//            if($_REQUEST['order'][0]['column']==1) $orderby = 'negative_value';
-//            if($_REQUEST['order'][0]['column']==2) $orderby = 'asin';
-//			if($_REQUEST['order'][0]['column']==3) $orderby = 'date';
-//            if($_REQUEST['order'][0]['column']==4) $orderby = 'rating';
-//			if($_REQUEST['order'][0]['column']==5) $orderby = 'average_score';
-//			if($_REQUEST['order'][0]['column']==6) $orderby = 'total_star_number';
-//            if($_REQUEST['order'][0]['column']==7) $orderby = 'reviewer_name';
-//			if($_REQUEST['order'][0]['column']==8) $orderby = 'vp';
-//            if($_REQUEST['order'][0]['column']==9) $orderby = 'status';
-//            if($_REQUEST['order'][0]['column']==10) $orderby = 'buyer_email';
-//			if($_REQUEST['order'][0]['column']==11) $orderby = 'customer_feedback';
-//            if($_REQUEST['order'][0]['column']==12) $orderby = 'nextdate';
-//			if($_REQUEST['order'][0]['column']==15) $orderby = 'user_id';
-
-            $sort = $_REQUEST['order'][0]['dir'];
-
-
+        //判断是销售人员，则查询自己组织以及下级的物料对照关系
+        $asinMatchSkuData = array();
+        $_asinsMapping = $_asinsMappingSelect->get();
+        if($_asinsMapping){
+            foreach ($_asinsMapping as $_asin){
+                if($_asin){
+                    $_asins[$_asin->asin]=$_asin->asin;
+                    $asinMatchSkuData[$_asin->asin]['item_no'] = $_asin->sku;
+                    $asinMatchSkuData[$_asin->asin]['title'] = $_asin->title;
+                    $_images = explode(',',$_asin->images);
+                    $asinMatchSkuData[$_asin->asin]['img'] = current($_images);
+                }
+            }
         }
 
-        $reviews =  $customers->orderBy($orderby,$sort)->get()->toArray();
-        $ordersList =json_decode(json_encode($reviews), true);
 
+        //查询评价表
+        $_reviewsSelect=DB::table('review');
+        if($_asins) {
+            $_reviewsSelect = $_reviewsSelect->whereIn('asin', $_asins);
+        }
+
+
+        if(array_get($_REQUEST,'site')) {
+            $_reviewsSelect = $_reviewsSelect->whereIn('site',array_get($_REQUEST,'site'));
+        }
+
+
+        if(array_get($_REQUEST,'follow_status')) {
+            $_reviewsSelect = $_reviewsSelect->whereIn('follow_status',array_get($_REQUEST,'follow_status'));
+        }
+
+        if(array_get($_REQUEST,'date_from')) {
+            $_reviewsSelect = $_reviewsSelect->where('date', '>=', array_get($_REQUEST,'date_from'));
+        }
+
+        if(array_get($_REQUEST,'date_to')){
+            $_reviewsSelect = $_reviewsSelect->where('date', '<=', array_get($_REQUEST,'date_to'));
+        }
+
+        if(array_get($_REQUEST,'rating')){
+            $_reviewsSelect = $_reviewsSelect->where('rating', array_get($_REQUEST,'rating'));
+        }
+
+        if(array_get($_REQUEST,'vp')){
+            $_reviewsSelect = $_reviewsSelect->where('vp', array_get($_REQUEST,'vp'));
+        }
+
+        if(array_get($_REQUEST,'del')){
+            $_reviewsSelect = $_reviewsSelect->where('is_delete', array_get($_REQUEST,'del'));
+        }
+
+
+        if(array_get($_REQUEST,'rc')){
+            if(array_get($_REQUEST,'rc')==1){
+                $_reviewsSelect = $_reviewsSelect->whereRaw('review.rating=review.updated_rating');
+            }
+            if(array_get($_REQUEST,'rc')==2){
+                $_reviewsSelect = $_reviewsSelect->whereRaw('review.rating<>review.updated_rating');
+            }
+        }
+
+
+        //当np=1是为差评，星级=[1,2,3],当np=2是好评，星级=[4,5]
+        if(array_get($_REQUEST,'np')){
+            switch (array_get($_REQUEST,'np')) {
+                case 1:
+                    $_reviewsSelect = $_reviewsSelect->whereIn('rating', [1,2,3]);
+                    break;
+                case 2:
+                    $_reviewsSelect = $_reviewsSelect->whereIn('rating', [4,5]);
+                    break;
+            }
+        }
+        $reviews=$_reviewsSelect->orderBy('date','desc')->get()->toArray();
+        $ordersList =json_decode(json_encode($reviews), true);
 
         $iTotalRecords = count($ordersList);
         $iDisplayLength = intval($_REQUEST['length']);
@@ -607,13 +667,24 @@ class ReviewController extends Controller
             $viewItem = '<li><a href="' . $reviewUrl . '" target="_blank"> View </a></li>';
             $resolveItem = '<li><a href="/review/'.$ordersList[$i]['id'].'/edit" target="_blank"><i class="fa fa-search"></i> Resolve </a></li>';
 
+            //求item_no
+            $item = '';
+            if(isset($asinMatchSkuData[$ordersList[$i]['asin']]['item_no'])){
+                $item = $asinMatchSkuData[$ordersList[$i]['asin']]['item_no'];
+            }
+            //求item_name
+            $item_name = '';
+            if(isset($asinMatchSkuData[$ordersList[$i]['asin']]['title'])){
+                $item_name = '<img style="width:100px;height:100px;" src="https://images-na.ssl-images-amazon.com/images/I/'.$asinMatchSkuData[$ordersList[$i]['asin']]['img'].'" title="'.$asinMatchSkuData[$ordersList[$i]['asin']]['title'].'">';
+            }
+
             $fol_arr= unserialize($ordersList[$i]['follow_content'])?unserialize($ordersList[$i]['follow_content']):array();
             $records["data"][] = array(
                 '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input name="id[]" type="checkbox" class="checkboxes" value="'.$ordersList[$i]['id'].'"/><span></span></label>',
                 $ordersList[$i]['date'].' '.$date_chstr,
                 $site,
-                '<a href="https://'.$siteUrl.'/dp/'.$ordersList[$i]['asin'].'" target="_blank">'.$ordersList[$i]['asin'].'</a><br>'.$ordersList[$i]['item_no'],
-                $ordersList[$i]['item_name'],
+                '<a href="https://'.$siteUrl.'/dp/'.$ordersList[$i]['asin'].'" target="_blank">'.$ordersList[$i]['asin'].'</a><br>'.$item,
+                $item_name,
                 $ordersList[$i]['rating'].' '.$rating_chstr,
                 '<div class="text"><a href="'.$reviewUrl.'" target="_blank"><i class="fa fa-external-link"></i></a><span title="'.strip_tags($ordersList[$i]['review_content']).'">'.strip_tags($ordersList[$i]['review_content']).'</span></div>',
                 '<div class="text"><span title="'.strip_tags($ordersList[$i]['review_content_cn']).'">'.strip_tags($ordersList[$i]['review_content_cn']).'</span></div>',
@@ -622,26 +693,8 @@ class ReviewController extends Controller
                 $ordersList[$i]['remark'],
                 (($ordersList[$i]['warn']>0)?'<i class="fa fa-warning" title="Contains dangerous words"></i>&nbsp;&nbsp;&nbsp;':'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;').'<ul class="nav navbar-nav"><li><a href="#" class="dropdown-toggle" style="height:10px; vertical-align:middle; padding-top:0px;" data-toggle="dropdown" role="button">...</a><ul class="dropdown-menu" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(-50px, 20px, 0px); min-width: 88px;" role="menu" style="color: #62c0cc8a">' . $viewItem . $resolveItem . '</ul></li></ul>',
                 $ordersList[$i]['id']
-//				$ordersList[$i]['negative_value'],
-//				'<a href="https://'.$ordersList[$i]['site'].'/dp/'.$ordersList[$i]['asin'].'" target="_blank">'.$ordersList[$i]['asin'].'</a> <span class="label label-sm label-default">'.strtoupper(substr(strrchr($ordersList[$i]['site'], '.'), 1)).'</span>',
-//				$ordersList[$i]['date'].' '.$date_chstr,
-//				$ordersList[$i]['rating'].' '.$rating_chstr,
-//				$ordersList[$i]['average_score'],
-//				$ordersList[$i]['total_star_number'],
-//				$ordersList[$i]['reviewer_name'],
-//				($ordersList[$i]['vp'])?'<span class="badge badge-danger">VP</span>':'',
-//				array_get($follow_status_array,$ordersList[$i]['status'],'').' '.(($ordersList[$i]['is_delete'])?'<span class="badge badge-danger">Del</span>':''),
-//				(($ordersList[$i]['email'])?'<span class="badge badge-danger">C</span>':' ').(($ordersList[$i]['email_add'])?'<span class="badge badge-danger">R</span>':' ').$ordersList[$i]['buyer_email'],
-//				array_get(getCustomerFb(),$ordersList[$i]['customer_feedback']),
-//				$ordersList[$i]['nextdate'],
-//				$ordersList[$i]['item_no'],
-//				strip_tags(array_get($fol_arr,$ordersList[$i]['status'].'.do_content')),
-//				array_get($users_array,intval(array_get($ordersList[$i],'user_id')),''),
-//				$ordersList[$i]['last_updated_date'],
-//				(($ordersList[$i]['warn']>0)?'<i class="fa fa-warning" title="Contains dangerous words"></i>&nbsp;&nbsp;&nbsp;':'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;').'<a href="https://'.$ordersList[$i]['site'].'/gp/customer-reviews/'.$ordersList[$i]['review'].'" target="_blank" class="btn btn-success btn-xs"> View </a>'.'<a href="/review/'.$ordersList[$i]['id'].'/edit" target="_blank" class="btn btn-danger btn-xs"><i class="fa fa-search"></i> Resolve </a>'
             );
         }
-
 
         $records["draw"] = $sEcho;
         $records["recordsTotal"] = $iTotalRecords;

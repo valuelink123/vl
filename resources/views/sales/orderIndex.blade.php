@@ -8,6 +8,20 @@
         table th{
             text-align:center;
         }
+        table.dataTable thead th, table.dataTable thead td {
+            padding: 10px 0px !important;
+        }
+        table.dataTable tbody td {
+            padding: 8px 5px !important;
+        }
+        .table td, .table th {
+            font-size: 12px !important;
+        }
+        .table tr td{
+            word-wrap:break-word !important;
+            /*word-break:break-all !important;*/
+            white-space:nowrap !important;
+        }
     </style>
     <div class="row">
         <div class="top portlet light">
@@ -25,12 +39,30 @@
                         </div>
                     </div>
                     <div class="col-md-2">
+                        <div class="input-group">
+                            <span class="input-group-addon">Site</span>
+                            <select  style="width:100%;height:35px;" data-recent="" data-recent-date="" id="site" onchange="getAccountBySite()" name="site">
+                                @foreach(getMarketDomain() as $value)
+                                    <option value="{{ $value->marketplaceid }}">{{ $value->domain }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <br>
                         <div class="input-group" id="account-div">
                             <span class="input-group-addon">Account</span>
-                            <select class="mt-multiselect btn btn-default" id="account" multiple="multiple" data-width="100%" data-action-onchange="true" name="account" id="account[]">
-                                @foreach($data['account'] as $value)
-                                <option value="{{$value['id']}}">{{$value['label']}}</option>
-                                @endforeach
+                            <select class="btn btn-default" id="account" multiple="multiple" data-width="100%" data-action-onchange="true" name="account" id="account[]">
+
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-2">
+                        <div class="input-group">
+                            <span class="input-group-addon">Fulfillment</span>
+                            <select class="btn btn-default" name="fulfillment_channel" id="fulfillment_channel">
+                                <option value="">select</option>
+                                <option value="AFN">FBA</option>
+                                <option value="MFN">FBM</option>
                             </select>
                         </div>
                         <br>
@@ -83,18 +115,6 @@
 
                     <div class="col-md-2">
                         <div class="input-group">
-                            <span class="input-group-addon">Fulfillment Channel</span>
-                            <select class="btn btn-default" name="fulfillment_channel" id="fulfillment_channel">
-                                <option value="">select</option>
-                                <option value="AFN">FBA</option>
-                                <option value="MFN">FBM</option>
-                            </select>
-                        </div>
-                        <br>
-                    </div>
-
-                    <div class="col-md-2">
-                        <div class="input-group">
                             <div class="btn-group pull-right" >
                                 <button id="search_table" class="btn sbold blue">Search</button>
                             </div>
@@ -129,11 +149,11 @@
                         <th>Seller Skus</th>
                         <th>Amounts</th>
                         <th>Currency</th>
-                        <th>Tracking No</th>
-                        <th>Carrier Code</th>
+{{--                        <th>Tracking No</th>--}}
+{{--                        <th>Carrier Code</th>--}}
                         <th>Settlement ID</th>
                         <th>Settlement Date</th>
-                        <th>Fulfillment Channel</th>
+                        <th>Fulfillment</th>
                         <th>Posted Date</th>
                     </tr>
                     </thead>
@@ -164,10 +184,10 @@
             searching: false,//关闭搜索
             serverSide: true,//启用服务端分页（这是使用Ajax服务端的必须配置）
             ordering:false,
-            "pageLength": 20, // default record count per page
+            "pageLength": 15, // default record count per page
             "lengthMenu": [
-                [10, 20,50,],
-                [10, 20,50,] // change per page values here
+                [15, 30,50,],
+                [15, 30,50,] // change per page values here
             ],
             processing: true,
             columns: [
@@ -175,13 +195,13 @@
                 {data: 'account',name:'account'},
                 {data: 'amazon_order_id',name:'amazon_order_id'},
                 {data: 'status',name:'status'},
-                {data: 'date',name:'date'},
-                {data: 'asins',name:'asins'},
-                {data:'seller_skus',name:'seller_skus'},
+                {data: 'date',name:'date',class:'data-date'},
+                {data: 'asins',name:'asins',class:'asins'},
+                {data:'seller_skus',name:'seller_skus',class:'seller_skus'},
                 {data: 'amount',name:'amount'},
-                {data: 'currency',name:'currency'},
-                {data: 'tracking_no',name:'tracking_no'},
-                {data: 'carry_code',name:'carry_code'},
+                {data: 'currency',name:'currency',class:'data-currency'},
+                // {data: 'tracking_no',name:'tracking_no'},
+                // {data: 'carry_code',name:'carry_code'},
                 {data: 'settlement_id',name:'settlement_id'},
                 {data: 'settlement_date',name:'settlement_date'},
                 {data: 'fulfillment_channel',name:'fulfillment_channel'},
@@ -215,8 +235,35 @@
             });
             location.href='/orderList/export?'+search+'&account='+accountid;
         });
+        function getAccountBySite(){
+            var marketplaceid = $('#site option:selected').val();
+            $.ajax({
+                type: 'post',
+                url: '/showAccountBySite',
+                data: {marketplaceid:marketplaceid},
+                dataType:'json',
+                success: function(res) {
+                    if(res.status==1){
+                        var html = '';
+                        $.each(res.data,function(i,item) {
+                            html += '<option value="'+item.id+'">'+item.label+'</option>';
+                        })
+                        var str = '<span class="input-group-addon">Account</span>\n' +
+                            '\t\t\t\t\t\t\t<select class="mt-multiselect btn btn-default" id="account" multiple="multiple" data-width="100%" data-action-onchange="true" name="account" id="account[]">\n' +
+                            '\n' +html+
+                            '\t\t\t\t\t\t\t</select>';
+                        $('#account-div').html(str);
+                        ComponentsBootstrapMultiselect.init();//处理account的多选显示样式
+                    }else{
+                        alert('请先选择站点');
+                    }
+                }
+            });
+
+        }
 
         $(function(){
+            getAccountBySite()//触发当前选的站点得到该站点所有的账号
             $("#search_table").trigger("click");
         })
     </script>

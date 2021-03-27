@@ -568,8 +568,8 @@ class RsgrequestsController extends Controller
 	
 	public function getproducts(){
 		$date=date('Y-m-d');
-		if(time()-strtotime($date.' 07:30:00') < 0){
-			//凌晨到七点半之间要显示的是昨天的数据
+		if(time()-strtotime($date.' 02:00:00') < 0){
+			//凌晨到2点之前要显示的是昨天的数据
 			$date = date('Y-m-d',strtotime($date)-86400);
 		}
 		$_products = DB::select("select * from `rsg_products` where `created_at` = '".$date."' and `sales_target_reviews` > `requested_review` and `order_status` != -1  order by `order_status` desc");
