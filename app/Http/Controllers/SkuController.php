@@ -467,7 +467,7 @@ any_value(sap_seller_bg) as bg,any_value(sap_seller_bu) as bu,any_value(sap_sell
 				if(!$asin || !$marketplace_id || !$date) continue;
 				unset($data['asin']);unset($data['site']);unset($data['date']);
 				if(isset($data['keywords'])) $data['keywords'] = json_encode($data['keywords']);
-				if(isset($data['keywords'])) $data['conversion'] = round($data['conversion']/100,4);
+				if(isset($data['conversion'])) $data['conversion'] = round($data['conversion']/100,4);
 				Skusweekdetails::updateOrCreate(
 					[
 						'asin'=>$asin,
