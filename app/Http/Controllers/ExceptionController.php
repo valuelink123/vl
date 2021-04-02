@@ -537,9 +537,9 @@ class ExceptionController extends Controller
 			if($file->isValid()){
 				$ext = $file->getClientOriginalExtension();
 				$newname = date('Y-m-d-H-i-s').'-'.uniqid().'.'.$ext;
-				$newpath = '/uploads/exception/'.date('Ymd').'/';
+				$newpath = '/uploads/exceptionUpload/'.date('Ymd').'/';
 				$inputFileName = public_path().$newpath.$newname;
-				$bool = $file->move($inputFileName);
+				$bool = $file->move(public_path().$newpath,$newname);
 				if(!$bool){
 					$request->session()->flash('error_message','Import Data Failed,The file is error');
 					return redirect()->back()->withInput();
@@ -1131,9 +1131,9 @@ class ExceptionController extends Controller
 			if($file->isValid()){
 				$ext = $file->getClientOriginalExtension();
 				$newname = date('Y-m-d-H-i-s').'-'.uniqid().'.'.$ext;
-				$newpath = '/uploads/exception/'.date('Ymd').'/';
+				$newpath = '/uploads/exceptionUpload/'.date('Ymd').'/';
 				$inputFileName = public_path().$newpath.$newname;
-				$bool = $file->move($inputFileName);
+				$bool = $file->move(public_path().$newpath,$newname);
 				if(!$bool){
 					$request->session()->flash('error_message','Import Data Failed,The file is error');
 					return redirect()->back()->withInput();
