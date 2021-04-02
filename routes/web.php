@@ -80,6 +80,7 @@ Route::resource('rs', 'RsController');
 Route::resource('seller', 'SellerController');
 Route::get('/seller/{asin}/{marketplaceid}', 'SellerController@show')->name('viewAsin');
 Route::Post('/ratingdetails', 'SellerController@getrating')->name('getRating');
+Route::get('/exception/download', 'ExceptionController@download');
 Route::resource('exception', 'ExceptionController');
 Route::Post('/exception/fromService', 'ExceptionController@fromService')->name('exceptionFromService');
 Route::Post('/exception/get', 'ExceptionController@get')->name('getException');

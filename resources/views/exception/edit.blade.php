@@ -238,7 +238,22 @@ if($exception['user_id'] == Auth::user()->id && ($exception['process_status'] ==
 				<option value="4" <?php if(4 ==$exception['type']) echo 'selected' ?>>Gift Card
 				</select>
 			</div>
-		</div>				
+		</div>
+
+			<div class="form-group">
+				<div class="col-md-3"  >
+					<label>File</label>
+					<div class="input-group ">
+						<input type="file" name="file_url"  style="width: 90%;"/>
+					</div>
+				</div>
+				@if($exception['file_url'])
+				<div class="col-md-4"  style="margin-top:26px;">
+					<a href="/exception/download?url={{$exception['file_url']}}" >download file
+					</a>
+				</div>
+				@endif
+			</div>
 		</div>
 		<div style="clear:both"></div>
         <div class="tabbable-line">
