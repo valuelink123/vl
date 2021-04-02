@@ -253,6 +253,12 @@
 			</div>
 		</div>
 
+			<div class="form-group">
+				<label>Attach</label>
+				<div class="input-group ">
+					<input type="file" name="file_url"  style="width: 90%;"/>
+				</div>
+			</div>
 
 		<div class="form-group">
 			<label>Type</label>
@@ -267,12 +273,7 @@
 				</select>
 			</div>
 		</div>
-			<div class="form-group">
-				<label>File</label>
-				<div class="input-group ">
-					<input type="file" name="file_url"  style="width: 90%;"/>
-				</div>
-			</div>
+
 		</div>
 		<div style="clear:both"></div>
         <div class="tabbable-line">

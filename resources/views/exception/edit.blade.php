@@ -223,7 +223,22 @@ if($exception['user_id'] == Auth::user()->id && ($exception['process_status'] ==
 					<input type="text" class="form-control" name="descrip" id="descrip" value="{{$exception['descrip']}}" required {{$disable}}>
 				</div>
 			</div>
-		
+
+			<div class="form-group col-md-12">
+				<div class="col-md-3"  >
+					<label>File</label>
+					<div class="input-group ">
+						<input type="file" name="file_url"  style="width: 90%;"/>
+					</div>
+				</div>
+				@if($exception['file_url'])
+					<div class="col-md-9"  style="margin-top:26px;">
+						<a href="{{array_get($exception,'file_url')}}" target="_blank">{{basename(array_get($exception,'file_url'))}}</a>
+						{{--					<a href="/exception/download?url={{$exception['file_url']}}" >download file--}}
+						</a>
+					</div>
+				@endif
+			</div>
 		
 		<div class="form-group">
 			<label>Type</label>
@@ -240,21 +255,7 @@ if($exception['user_id'] == Auth::user()->id && ($exception['process_status'] ==
 			</div>
 		</div>
 
-			<div class="form-group">
-				<div class="col-md-3"  >
-					<label>File</label>
-					<div class="input-group ">
-						<input type="file" name="file_url"  style="width: 90%;"/>
-					</div>
-				</div>
-				@if($exception['file_url'])
-				<div class="col-md-4"  style="margin-top:26px;">
-					<a href="{{array_get($exception,'file_url')}}" target="_blank">{{basename(array_get($exception,'file_url'))}}</a>
-{{--					<a href="/exception/download?url={{$exception['file_url']}}" >download file--}}
-					</a>
-				</div>
-				@endif
-			</div>
+
 		</div>
 		<div style="clear:both"></div>
         <div class="tabbable-line">
