@@ -529,6 +529,30 @@ class ExceptionController extends Controller
     {
 		if(!Auth::user()->can(['exception-update'])) die('Permission denied -- exception-update');
 		$exception = Exception::findOrFail($id);
+
+		//添加上传附件
+		$file = $request->file('file_url');
+		$file_url = '';
+		if($file){
+			if($file->isValid()){
+				$ext = $file->getClientOriginalExtension();
+				$newname = date('Y-m-d-H-i-s').'-'.uniqid().'.'.$ext;
+				$newpath = '/uploads/exceptionUpload/'.date('Ymd').'/';
+				$inputFileName = public_path().$newpath.$newname;
+				$bool = $file->move(public_path().$newpath,$newname);
+				if(!$bool){
+					$request->session()->flash('error_message','Import Data Failed,The file is error');
+					return redirect()->back()->withInput();
+				}else{
+					$file_url = $newpath.$newname;
+					$exception->file_url = $file_url;
+				}
+			}else{
+				$request->session()->flash('error_message','Import Data Failed,The file is too large');
+				return redirect()->back()->withInput();
+			}
+		}
+
 		$acf = $request->get('acf');
 		if(isset($acf) && $exception->process_status=='auto done' && $exception->auto_create_mcf_result!=1){
 			if(!Auth::user()->can(['exception-check'])) die('Permission denied -- exception-check');
@@ -1100,6 +1124,28 @@ class ExceptionController extends Controller
 	public function store(Request $request)
     {
 		if(!Auth::user()->can(['exception-create'])) die('Permission denied -- exception-create');
+		//添加上传附件
+		$file = $request->file('file_url');
+		$file_url = '';
+		if($file){
+			if($file->isValid()){
+				$ext = $file->getClientOriginalExtension();
+				$newname = date('Y-m-d-H-i-s').'-'.uniqid().'.'.$ext;
+				$newpath = '/uploads/exceptionUpload/'.date('Ymd').'/';
+				$inputFileName = public_path().$newpath.$newname;
+				$bool = $file->move(public_path().$newpath,$newname);
+				if(!$bool){
+					$request->session()->flash('error_message','Import Data Failed,The file is error');
+					return redirect()->back()->withInput();
+				}
+				$file_url = $newpath.$newname;
+			}else{
+				$request->session()->flash('error_message','Import Data Failed,The file is too large');
+				 return redirect()->back()->withInput();
+			}
+		}
+
+
         $this->validate($request, [
 			'group_id' => 'required|string',
             'name' => 'required|string',
@@ -1109,7 +1155,8 @@ class ExceptionController extends Controller
             'descrip' => 'required|string',
         ]);
         $exception = new Exception;
-		
+
+		$exception->file_url = $file_url;
         $exception->type = $request->get('type');
 		$exception->name = $request->get('name');
 		$exception->order_sku = $request->get('order_sku');
@@ -1426,6 +1473,25 @@ class ExceptionController extends Controller
 			}
 		}
 		return $operaDate;
+	}
+
+	/*
+	 * 下载上传的附件
+	 */
+	public function download()
+	{
+//		$filepath = 'clients import template.xls';
+		$filepath = isset($_GET['url']) ? $_GET['url'] : '';
+		$arr = explode('/',$filepath);
+		$name = end($arr);
+		$file=fopen($filepath,"r");
+		header("Content-type:text/html;charset=utf-8");
+		header("Content-Type: application/octet-stream");
+		header("Accept-Ranges: bytes");
+		header("Accept-Length: ".filesize($filepath));
+		header("Content-Disposition: attachment; filename=".$filepath);
+		echo fread($file,filesize($filepath));
+		fclose($file);
 	}
 
 }

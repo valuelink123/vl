@@ -5,93 +5,95 @@
 <div>
     <div class="col-md-12">
         <div class="portlet light bordered">
-        @if(!empty($order['orderItems']))
-            <div class="invoice-content-2 bordered">
-                <div class="invoice-head">
-                    <div class="col-md-7 col-xs-6">
-                        <div class="invoice-logo">
-                            <h1 class="uppercase">{!! $order['AmazonOrderId'] !!} ( {!! $order['SellerName'] !!} )</h1>
-                            Buyer Email : {!! $order['BuyerEmail'] !!}<BR>
-                            Buyer Name : {!! $order['BuyerName'] !!}<BR>
-                            PurchaseDate : {!! $order['PurchaseDate'] !!}
+        @if(!empty($orders))
+            @foreach($orders as $order)
+                <div class="invoice-content-2 bordered">
+                    <div class="invoice-head">
+                        <div class="col-md-7 col-xs-6">
+                            <div class="invoice-logo">
+                                <h1 class="uppercase">{!! $order['amazon_order_id'] !!} ( {!! $order['sellerName'] !!} )</h1>
+                                Buyer Email : {!! $order['buyer_email'] !!}<BR>
+                                Buyer Name : {!! $order['buyer_name'] !!}<BR>
+                                PurchaseDate : {!! $order['purchase_date'] !!}
+                            </div>
+                        </div>
+                        <div class="col-md-5 col-xs-6">
+                            <div class="company-address">
+                                <span class="bold ">{!! $order['name'] !!}</span>
+                                <br> {!! $order['address_line1'] !!}
+                                <br> {!! $order['address_line2'] !!}
+                                <br> {!! $order['address_line3'] !!}
+                                <br> {!! $order['city'] !!} {!! $order['state_or_region'] !!} {!! $order['country_code'] !!}
+                                <br> {!! $order['postal_code'] !!}
+                            </div>
                         </div>
                     </div>
-                    <div class="col-md-5 col-xs-6">
-                        <div class="company-address">
-                            <span class="bold ">{!! $order['Name'] !!}</span>
-                            <br> {!! $order['AddressLine1'] !!}
-                            <br> {!! $order['AddressLine2'] !!}
-                            <br> {!! $order['AddressLine3'] !!}
-                            <br> {!! $order['City'] !!} {!! $order['StateOrRegion'] !!} {!! $order['CountryCode'] !!}
-                            <br> {!! $order['PostalCode'] !!}
+                    <div style="clear: both"></div>
+                    <BR><BR>
+                    <div class="invoice-cust-add">
+                        <div class="col-xs-3">
+                            <h4 class="invoice-title ">Seller ID</h4>
+                            <p class="invoice-desc">{!! $order['sellerId'] !!}   </p>
                         </div>
-                    </div>
-                </div>
-                <div style="clear: both"></div>
-                <BR><BR>
-                <div class="invoice-cust-add">
-                    <div class="col-xs-3">
-                        <h4 class="invoice-title ">Seller ID</h4>
-                        <p class="invoice-desc">{!! $order['SellerId'] !!}   </p>
-                    </div>
-                    <div class="col-xs-3">
-                        <h4 class="invoice-title ">Site</h4>
-                        <p class="invoice-desc">{!! $order['SalesChannel'] !!}</p>
-                    </div>
-                    <div class="col-xs-2">
-                        <h4 class="invoice-title ">Fulfillment Channel</h4>
-                        <p class="invoice-desc">{!! $order['FulfillmentChannel'] !!}</p>
-                    </div>
-                    <div class="col-xs-2">
-                        <h4 class="invoice-title ">Ship Service Level</h4>
-                        <p class="invoice-desc">{!! $order['ShipServiceLevel'] !!}</p>
-                    </div>
+                        <div class="col-xs-3">
+                            <h4 class="invoice-title ">Site</h4>
+                            <p class="invoice-desc">{!! $order['sales_channel'] !!}</p>
+                        </div>
+                        <div class="col-xs-2">
+                            <h4 class="invoice-title ">Fulfillment Channel</h4>
+                            <p class="invoice-desc">{!! $order['fulfillment_channel'] !!}</p>
+                        </div>
+                        <div class="col-xs-2">
+                            <h4 class="invoice-title ">Ship Service Level</h4>
+                            <p class="invoice-desc">{!! $order['ship_service_level'] !!}</p>
+                        </div>
 
-                    <div class="col-xs-2">
-                        <h4 class="invoice-title ">Status</h4>
-                        <p class="invoice-desc">{!! $order['OrderStatus'] !!}</p>
+                        <div class="col-xs-2">
+                            <h4 class="invoice-title ">Status</h4>
+                            <p class="invoice-desc">{!! $order['order_status'] !!}</p>
+                        </div>
                     </div>
-                </div>
-                <BR><BR>
-                <div class="invoice-body">
-                    <div class="col-xs-12 table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                            <tr>
-                                <th class="invoice-title uppercase">Description</th>
-                                <th class="invoice-title uppercase text-center">Qty</th>
-                                <th class="invoice-title uppercase text-center">Price</th>
-                                <th class="invoice-title uppercase text-center">Shipping</th>
-                                <th class="invoice-title uppercase text-center">Promotion</th>
-                                <th class="invoice-title uppercase text-center">Tax</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            @foreach($order['orderItems'] as $item)
+                    <BR><BR>
+                    <div class="invoice-body">
+                        <div class="col-xs-12 table-responsive">
+                            <table class="table table-hover">
+                                <thead>
                                 <tr>
-                                    <td>
-                                        <h4>{!! $item['ASIN'] !!} ( {!! $item['SellerSKU'] !!} )</h4>
-                                        <p> {!! $item['Title'] !!} </p>
-                                    </td>
-                                    <td class="text-center sbold">{!! $item['QuantityOrdered'] !!}</td>
-                                    <td class="text-center sbold">{{($item['QuantityOrdered'])?round($item['ItemPriceAmount']/$item['QuantityOrdered'],2):round($item['ItemPriceAmount'],2)}}</td>
-                                    <td class="text-center sbold">{{round($item['ShippingPriceAmount'],2)}} {{($item['ShippingDiscountAmount'])?'( -'.round($item['ShippingDiscountAmount'],2).' )':''}}</td>
-                                    <td class="text-center sbold">{{($item['PromotionDiscountAmount'])?'( -'.round($item['PromotionDiscountAmount'],2).' )':''}}</td>
-                                    <td class="text-center sbold">{{round($item['ItemTaxAmount'],2)}}</td>
+                                    <th class="invoice-title uppercase">Description</th>
+                                    <th class="invoice-title uppercase text-center">Qty</th>
+                                    <th class="invoice-title uppercase text-center">Price</th>
+                                    <th class="invoice-title uppercase text-center">Shipping</th>
+                                    <th class="invoice-title uppercase text-center">Promotion</th>
+                                    <th class="invoice-title uppercase text-center">Tax</th>
                                 </tr>
-                            @endforeach
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                @foreach($order['orderItems'] as $item)
+                                    <tr>
+                                        <td>
+                                            <h4>{!! $item['asin'] !!} ( {!! $item['seller_sku'] !!} )</h4>
+                                            <p> {!! $item['title'] !!} </p>
+                                        </td>
+                                        <td class="text-center sbold">{!! $item['quantity_ordered'] !!}</td>
+                                        <td class="text-center sbold">{{($item['quantity_ordered'])?round($item['item_price_amount']/$item['quantity_ordered'],2):round($item['item_price_amount'],2)}}</td>
+                                        <td class="text-center sbold">{{round($item['shipping_price_amount'],2)}} {{($item['shipping_discount_amount'])?'( -'.round($item['shipping_discount_amount'],2).' )':''}}</td>
+                                        <td class="text-center sbold">{{($item['promotion_discount_amount'])?'( -'.round($item['promotion_discount_amount'],2).' )':''}}</td>
+                                        <td class="text-center sbold">{{round($item['item_tax_amount'],2)}}</td>
+                                    </tr>
+                                @endforeach
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                </div>
-                <div class="invoice-subtotal">
-                    <div class="col-xs-6">
-                        <h4 class="invoice-title uppercase">Total</h4>
-                        <p class="invoice-desc grand-total">{{round($order['Amount'],2)}} {{$order['CurrencyCode']}}</p>
+                    <div class="invoice-subtotal">
+                        <div class="col-xs-6">
+                            <h4 class="invoice-title uppercase">Total</h4>
+                            <p class="invoice-desc grand-total">{{round($order['amount'],2)}} {{$order['currency_code']}}</p>
+                        </div>
                     </div>
-                </div>
 
-            </div>
+                </div>
+            @endforeach
         @else
             <b>Can not match or find order</b>
         @endif

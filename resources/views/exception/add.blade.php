@@ -135,7 +135,7 @@
 	
   });
   </script>
-<form  action="{{ url('exception') }}" id="exception_form" novalidate method="POST">
+<form  action="{{ url('exception') }}" id="exception_form" novalidate method="POST" enctype="multipart/form-data">
  {{ csrf_field() }}<input type="hidden" name="warn" id="warn" value="0">
     <div class="col-lg-9">
         <div class="col-md-12">
@@ -253,13 +253,19 @@
 			</div>
 		</div>
 
+			<div class="form-group">
+				<label>Attach</label>
+				<div class="input-group ">
+					<input type="file" name="file_url"  style="width: 90%;"/>
+				</div>
+			</div>
 
 		<div class="form-group">
 			<label>Type</label>
 			<div class="input-group ">
-			<span class="input-group-addon">
-				<i class="fa fa-bookmark"></i>
-			</span>
+				<span class="input-group-addon">
+					<i class="fa fa-bookmark"></i>
+				</span>
 				<select name="type" id="type" class="form-control" >
 				<option value="2">Replacement
 				<option value="1">Refund
@@ -267,6 +273,7 @@
 				</select>
 			</div>
 		</div>
+
 		</div>
 		<div style="clear:both"></div>
         <div class="tabbable-line">

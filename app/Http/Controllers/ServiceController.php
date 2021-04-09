@@ -133,14 +133,32 @@ class ServiceController extends Controller
         if($searchTerm != '') {
             //Order ID
             if ($searchType == 0) {
-                $sap = new SapRfcRequest();
-                try{
-                    $order = SapRfcRequest::sapOrderDataTranslate($sap->getOrder(['orderId' => $searchTerm]));
-                    $order['SellerName'] = Accounts::where('account_sellerid', $order['SellerId'])->first()->account_name ?? 'No Match';
-                }catch(\Exception $e){
-                    return 'No matching order...';
-                }
-                return view('service.orderinfo', ['order' => $order]);
+//            	订单信息从亚马逊数据的那个库读取订单信息和订单明细的信息
+				$account = $order = $orderItems = array();
+				$_account = DB::connection('amazon')->table('seller_accounts')->get();//卖家账号信息
+				$_order = DB::connection('amazon')->table('orders')->where('amazon_order_id',$searchTerm)->get();//订单信息
+				$_orderItems = DB::connection('amazon')->table('order_items')->where('amazon_order_id',$searchTerm)->get();//订单详情
+				foreach($_account as $ak=>$av){
+					$account[$av->id] = (array)$av;
+				}
+				foreach($_orderItems as $oik=>$oiv){
+					$orderItems[$oiv->seller_account_id.'_'.$oiv->amazon_order_id][] = (array)$oiv;
+				}
+				foreach($_order as $ok=>$ov){
+					$_key = $ov->seller_account_id.'_'.$ov->amazon_order_id;
+					$order[$_key] = (array)$ov;
+					if(isset($orderItems[$_key]) && $orderItems[$_key]){
+						$order[$_key]['orderItems']= $orderItems[$_key];
+					}
+					if(isset($account[$ov->seller_account_id]) && $account[$ov->seller_account_id]){
+						$order[$_key]['sellerName']= $account[$ov->seller_account_id]['label'];
+						$order[$_key]['sellerId']= $account[$ov->seller_account_id]['mws_seller_id'];
+					}
+				}
+				if(!$order){
+					return 'No matching order...';
+				}
+				return view('service.orderinfo', ['orders' => $order]);
 
             }
             //Customer Info, 可按邮箱，电话，［facebook帐号］，paypal帐号查找。

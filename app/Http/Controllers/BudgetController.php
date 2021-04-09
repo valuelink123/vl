@@ -236,7 +236,7 @@ sum(amount_used) as amount_fee, sum(fba_storage+fbm_storage) as storage_fee from
 			$where.= " and c.site='".$site."'";
 		}
 		if($user_id){
-			$where.= " and c.sap_seller_id in (".implode(',',$user_id).")";
+			$where.= " and c.sap_seller_id in (".$user_id.")";
 		}
 		
 		if($level){
