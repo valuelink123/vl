@@ -1509,3 +1509,9 @@ function amazonReturnCondition()
 {
 	return array('CARRIER_DAMAGED', 'CUSTOMER_DAMAGED', 'DAMAGED', 'DEFECTIVE', 'SELLABLE');
 }
+
+
+function checkRsgOrder($amazonOrderId)
+{
+	return (App\RsgRequest::where('amazon_order_Id', $amazonOrderId)->count()>0)?true:false;
+}

@@ -229,6 +229,8 @@ class InboxController extends Controller
 			}
             $order = DB::table('amazon_orders')->where('SellerId', $amazon_seller_id)->where('AmazonOrderId', $email['amazon_order_id'])->first();
             if($order) $order->item = DB::table('amazon_orders_item')->where('SellerId', $amazon_seller_id)->where('AmazonOrderId', $email['amazon_order_id'])->get();
+
+            $existsRsg = (App\RsgRequest::where('amazon_order_Id', $orderid)->count()>0)?'<span class="label label-lg label-danger">RSG ORDER</span>':'';
         }
 
 		//获取该客户与此邮箱的来往邮件中所有绑定的订单号信息,展示出所有绑定订单的订单详情
@@ -1366,7 +1368,7 @@ class InboxController extends Controller
                         <div class="row invoice-head">
                             <div class="col-md-7 col-xs-6">
                                 <div class="invoice-logo">
-                                    <h1 class="uppercase">'.$order->AmazonOrderId.'  ( '.array_get($this->getSellerIds(),$order->SellerId).' )</h1>
+                                    <h1 class="uppercase">'.$order->AmazonOrderId.'  ( '.array_get($this->getSellerIds(),$order->SellerId).' ) '.(checkRsgOrder($orderid)?'<span class="label label-lg label-danger">RSG ORDER</span>':'').'</h1>
                                     Buyer Email : '.$order->BuyerEmail.'<BR>
                                     Buyer Name : '.$order->BuyerName.'<BR>
                                     PurchaseDate : '.$order->PurchaseDate.'
