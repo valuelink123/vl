@@ -57,6 +57,12 @@
 			if(redata.result!=''){
 				toastr.success(redata.message);
 				var data = redata.result;
+				if(data.rsgOrder){   
+					bootbox.dialog({
+						message: "RSG order, please confirm before submit!",
+						title: "Warning",
+					});
+				}
 				$("#name", $("#exception_form")).val(data.BuyerName);
 				$("#refund", $("#exception_form")).val((Math.floor(data.Amount * 1000000) / 1000000).toFixed(2));
 				$("#shipname", $("#exception_form")).val(data.Name);
@@ -77,6 +83,7 @@
                         $(this).prop('selected',false);
                     }
                 });
+				
                 $("#countrycode").trigger("change");//触发countrycode改变事件
 
 				$("#phone", $("#exception_form")).val(data.Phone);

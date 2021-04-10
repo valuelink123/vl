@@ -11,7 +11,7 @@
                     <div class="invoice-head">
                         <div class="col-md-7 col-xs-6">
                             <div class="invoice-logo">
-                                <h1 class="uppercase">{!! $order['amazon_order_id'] !!} ( {!! $order['sellerName'] !!} )</h1>
+                                <h1 class="uppercase">{!! $order['amazon_order_id'] !!} ( {!! $order['sellerName'] !!} ) {!!(checkRsgOrder($order['amazon_order_id'])?'<span class="label label-lg label-danger">RSG ORDER</span>':'')!!}</h1>
                                 Buyer Email : {!! $order['buyer_email'] !!}<BR>
                                 Buyer Name : {!! $order['buyer_name'] !!}<BR>
                                 PurchaseDate : {!! $order['purchase_date'] !!}
