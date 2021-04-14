@@ -44,6 +44,9 @@
 			margin-top: 80px;
 			margin-bottom:0px !important;
 		}
+		.popover.left {
+			min-width: 500px !important;
+		}
 	</style>
 	<div class="row">
 		<div class="col-md-12">
@@ -319,6 +322,9 @@
 					// blurable: true, // unselect on blur
 					selector: 'td:first-child', // 指定第一列可以点击选中
 				},
+				"fnDrawCallback": function (oSettings) {
+					$('.popovers').popover();
+				},
                 columns: [
 					{
                         width: "1px",
@@ -365,7 +371,7 @@
                             $('.check-customer-data').text(staticStatus.check_customer);
                             $('.reject-data').text(staticStatus.reject);
 						}
-
+						
                         return json.data;
                     },
                 }

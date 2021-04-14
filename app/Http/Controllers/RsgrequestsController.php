@@ -85,7 +85,7 @@ class RsgrequestsController extends Controller
 				$q->on('rsg_products.asin', '=', 'asin.asin')
 				  ->on('rsg_products.site', '=', 'asin.site');
 			})
-			->where('rsg_requests.created_at','>=',$submit_date_from.' 00:00:00')->where('rsg_requests.created_at','<=',$submit_date_to.' 23:59:59');
+			->where('rsg_requests.created_at','>=',$submit_date_from.' 00:00:00')->where('rsg_requests.created_at','<=',$submit_date_to.' 23:59:59')->with('logs');
 
 		if(!Auth::user()->can('rsgrequests-show-all')) {
 			if (Auth::user()->seller_rules) {
@@ -232,6 +232,71 @@ class RsgrequestsController extends Controller
 			$lists[$key]['group'] = isset($fbgroupConfig[$list['facebook_group']]) ? $fbgroupConfig[ $list['facebook_group']] : '';
 			$lists[$key]['processor'] = array_get($users,$list['processor']);
 			$lists[$key]['action'] = '<a data-target="#ajax" data-toggle="modal" href="'.url('rsgrequests/'.$list['id'].'/edit').'" class="badge badge-success"> View </a> <a class="btn btn-danger btn-xs" href="'.url('rsgrequests/process?email='.$list['customer_email']).'" target="_blank">Process</a>';
+			$updateHistory = [];
+			$count = count($list['logs']);
+			for($i=0; $i<$count-1; $i++){
+				$rsgRequestsLog = $list['logs'][$i];
+				$rsgRequestsLogNext = $list['logs'][$i+1];
+				$updated_by = array_get($users, $rsgRequestsLog['updated_by']);
+				$updated_at = $rsgRequestsLog['updated_at'];
+				$step = array_get(getStepStatus(),$rsgRequestsLog['step']);
+				$channel = array_get(getRsgRequestChannel(),$rsgRequestsLog['channel']);
+				$facebook_group = array_get(getFacebookGroup(),$rsgRequestsLog['facebook_group']);
+				$updateHistory[$i]['updated_by'] = $updated_by;
+				$updateHistory[$i]['updated_at'] = $updated_at;
+
+				if($rsgRequestsLog['product_id'] != $rsgRequestsLogNext['product_id']){
+					$updateHistory[$i]['product'] = $rsgRequestsLog['product_id'];
+
+				}
+				if($rsgRequestsLog['step'] != $rsgRequestsLogNext['step']){
+					$updateHistory[$i]['current step'] = $step;
+				}
+				if($rsgRequestsLog['customer_paypal_email'] != $rsgRequestsLogNext['customer_paypal_email']){
+					$updateHistory[$i]['paypal email'] = $rsgRequestsLog['customer_paypal_email'];
+				}
+				if($rsgRequestsLog['transfer_amount'] != $rsgRequestsLogNext['transfer_amount']){
+					$updateHistory[$i]['transfer amount'] = $rsgRequestsLog['transfer_amount'];
+				}
+				if($rsgRequestsLog['transfer_currency'] != $rsgRequestsLogNext['transfer_currency']){
+					$updateHistory[$i]['transfer currency'] = $rsgRequestsLog['transfer_currency'];
+				}
+				if($rsgRequestsLog['amazon_order_id'] != $rsgRequestsLogNext['amazon_order_id']){
+					$updateHistory[$i]['amazon order id'] = $rsgRequestsLog['amazon_order_id'];
+				}
+				if($rsgRequestsLog['review_url'] != $rsgRequestsLogNext['review_url']){
+					$updateHistory[$i]['review ID'] = $rsgRequestsLog['review_url'];
+				}
+				if($rsgRequestsLog['transaction_id'] != $rsgRequestsLogNext['transaction_id']){
+					$updateHistory[$i]['remark'] = $rsgRequestsLog['transaction_id'];
+				}
+				if($rsgRequestsLog['star_rating'] != $rsgRequestsLogNext['star_rating']){
+					$updateHistory[$i]['star rating'] = $rsgRequestsLog['star_rating'];
+				}
+				if($rsgRequestsLog['channel'] != $rsgRequestsLogNext['channel']){
+					$updateHistory[$i]['channel'] = $channel;
+				}
+				if($rsgRequestsLog['facebook_name'] != $rsgRequestsLogNext['facebook_name']){
+					$updateHistory[$i]['facebook name'] = $rsgRequestsLog['facebook_name'];
+				}
+				if($rsgRequestsLog['facebook_group'] != $rsgRequestsLogNext['facebook_group']){
+					$updateHistory[$i]['facebook group'] = $facebook_group;
+				}
+			}
+			
+			$logStr = '';
+			if(count($updateHistory) == 0){
+				$logStr = 'No update history';
+			}else{
+				foreach($updateHistory as $k => $v){
+					foreach($v as $k2 => $v2){
+						if($k2 == 'updated_by' || $k2 == 'updated_at') continue;
+						$logStr.='<div><span>'.array_get($v,'updated_by').' updated the '.$k2.' to '.$v2.'</span><span>'.array_get($v,'updated_at').'</span></div>';
+					}
+				}
+			}
+
+			$lists[$key]['updated_at'] ='<i  class="fa fa-info-circle popovers" data-container="body" onclick="" data-trigger="hover" data-placement="left" data-html="true" data-content="'.$logStr.'"></i>'.$lists[$key]['updated_at'];
 		}
 
         $recordsTotal = $iTotalRecords;
