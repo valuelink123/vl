@@ -223,7 +223,12 @@ class SendController extends Controller
 		}
 		$to_address_array = explode(';',str_replace("；",";",$request->get('to_address')));
 
+		$blackEmail = blackEmail();//发邮件的时候，黑名单客户的邮箱
 		foreach($to_address_array as $to_address){
+			if(in_array(trim($to_address),$blackEmail)){
+				$request->session()->flash('error_message','有黑名单客户的邮箱');
+				return redirect()->back()->withInput();
+			}
 			if(trim($to_address)){
 				if($request->get('sendbox_id')){
 					$sendbox = Sendbox::findOrFail($request->get('sendbox_id'));
