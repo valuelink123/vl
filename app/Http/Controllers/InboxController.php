@@ -128,7 +128,7 @@ class InboxController extends Controller
            $inbox->reply = intval($request->get('reply'));
            if($request->get('etype')) $inbox->etype = $request->get('etype');
            if(isset($_REQUEST['remark'])) $inbox->remark = $request->get('remark');
-		   if($request->get('mark')) $inbox->mark = $request->get('mark');
+		   $inbox->mark = $request->get('mark');
            if($request->get('sku')) $inbox->sku = strtoupper($request->get('sku'));
 		   if($request->get('asin')) $inbox->asin = strtoupper($request->get('asin'));
 		   if($request->get('epoint')) $inbox->epoint = $request->get('epoint');
