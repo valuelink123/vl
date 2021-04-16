@@ -1509,3 +1509,36 @@ function amazonReturnCondition()
 {
 	return array('CARRIER_DAMAGED', 'CUSTOMER_DAMAGED', 'DAMAGED', 'DEFECTIVE', 'SELLABLE');
 }
+
+
+function checkRsgOrder($amazonOrderId)
+{
+	return (App\RsgRequest::where('amazon_order_Id', $amazonOrderId)->count()>0)?true:false;
+}
+
+/*
+ * 黑名单邮箱配置
+ */
+function blackEmail()
+{
+	return array(
+		'jazzbaena@yahoo.com',
+		'adriana.hawkes@comcast.net',
+		'rapidrem@comcast.net',
+		'shirley.whitescarver@kctcs.edu',
+		'carlielatourell@gmail.com',
+		'rrconslt@aol.com',
+		'yeie.uaw87.8223z@gmail.com',
+		'l.lynne7@icloud.com',
+		'Tammy@ilashperfection.com',
+		'shivaness@orange.fr',
+		'swampthing@mac.com',
+		'mariarivera1993@icloud.com',
+		'topflier.mobile@apexeagle.net',
+		'stephan.e.walton@comcast.net',
+		'crazycutecloset@mail.com',
+		'alejandroz@protonmail.com',
+		'ashekhani10@stuy.edu',
+		'testireba5@gmail.com'
+	);
+}

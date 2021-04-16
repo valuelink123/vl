@@ -128,7 +128,7 @@ class InboxController extends Controller
            $inbox->reply = intval($request->get('reply'));
            if($request->get('etype')) $inbox->etype = $request->get('etype');
            if(isset($_REQUEST['remark'])) $inbox->remark = $request->get('remark');
-		   if($request->get('mark')) $inbox->mark = $request->get('mark');
+		   $inbox->mark = $request->get('mark');
            if($request->get('sku')) $inbox->sku = strtoupper($request->get('sku'));
 		   if($request->get('asin')) $inbox->asin = strtoupper($request->get('asin'));
 		   if($request->get('epoint')) $inbox->epoint = $request->get('epoint');
@@ -229,7 +229,8 @@ class InboxController extends Controller
 			}
             $order = DB::table('amazon_orders')->where('SellerId', $amazon_seller_id)->where('AmazonOrderId', $email['amazon_order_id'])->first();
             if($order) $order->item = DB::table('amazon_orders_item')->where('SellerId', $amazon_seller_id)->where('AmazonOrderId', $email['amazon_order_id'])->get();
-        }
+
+            }
 
 		//获取该客户与此邮箱的来往邮件中所有绑定的订单号信息,展示出所有绑定订单的订单详情
 		$email_order = Inbox::whereNotNull('amazon_order_id')->whereNotNull('amazon_seller_id')->where('from_address',$email['from_address'])->where('to_address',$email['to_address'])->orderBy('date','desc')->get()->toArray();
@@ -1366,7 +1367,7 @@ class InboxController extends Controller
                         <div class="row invoice-head">
                             <div class="col-md-7 col-xs-6">
                                 <div class="invoice-logo">
-                                    <h1 class="uppercase">'.$order->AmazonOrderId.'  ( '.array_get($this->getSellerIds(),$order->SellerId).' )</h1>
+                                    <h1 class="uppercase">'.$order->AmazonOrderId.'  ( '.array_get($this->getSellerIds(),$order->SellerId).' ) '.(checkRsgOrder($orderid)?'<span class="label label-lg label-danger">RSG ORDER</span>':'').'</h1>
                                     Buyer Email : '.$order->BuyerEmail.'<BR>
                                     Buyer Name : '.$order->BuyerName.'<BR>
                                     PurchaseDate : '.$order->PurchaseDate.'

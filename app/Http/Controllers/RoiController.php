@@ -221,8 +221,9 @@ class RoiController extends Controller
         $billingPeriods = $this->getBillingPeriods();
         $transportModes = $this->getTransportModes();
         $currency_rates = $this->getCurrencyRates();
+		$inventory_turnover_days = array(90,120);
 
-        return view('roi/add',compact('sites', 'availableUsers', 'billingPeriods','transportModes','currency_rates'));
+        return view('roi/add',compact('sites', 'availableUsers', 'billingPeriods','transportModes','currency_rates','inventory_turnover_days'));
     }
 
     public function export(Request $request)
@@ -673,6 +674,7 @@ class RoiController extends Controller
     public function edit(Request $request, $id)
     {
         //name current user's id as $currentUserId
+		$inventory_turnover_days = array(90,120);
         $currentUserId = Auth::user()->id;
         $isUserAdmin = $this->isAdmin($currentUserId);
         $isUserProductDirector = $this->isProductDirector($currentUserId);
@@ -775,7 +777,7 @@ class RoiController extends Controller
             $edit_history_array[] = array('user_name'=>array_get($users, $pair[0]), 'updated_at'=>$pair[1]);
         }
 
-        return view('roi/edit',compact('sites', 'availableUsers', 'billingPeriods','transportModes', 'roi', 'edit_history_array', 'currency_rates'));
+        return view('roi/edit',compact('sites', 'availableUsers', 'billingPeriods','transportModes', 'roi', 'edit_history_array', 'currency_rates','inventory_turnover_days'));
     }
 
     public function copy(Request $request){
@@ -1031,403 +1033,249 @@ class RoiController extends Controller
 
 
     public function analyse(Request $request){
-        $updateAjaxData = $this->getUpdateAjaxData($request);
+		//点击"分析"按钮时，返回的数组，用于ajax异步更新页面数据
+		$configField = array('total_sales_volume','total_sales_amount','year_purchase_amount','year_exception_amount','year_promo','year_platform_commission','year_platform_operate','year_platform_storage','year_import_tax','year_transport','inventory_turnover_days','capital_turnover','put_cost','capital_occupy_cost','change_cost','contribute_cost_total','marginal_profit_per_pcs','total_fixed_cost','estimated_labor_cost','profit_loss_point','estimated_payback_period','return_amount','roi','project_profitability');
+
+		$data = $this->getCalculateData($request);
+		//新版本内容
+		$updateAjaxData = array();
+		foreach($configField as $field){
+			if(in_array($field,array('roi','project_profitability')) && is_numeric($data[$field])){
+				$updateAjaxData[$field] = $this->toPercentage($data[$field]);
+			}elseif($field=='estimated_payback_period'){
+				$updateAjaxData['estimated_payback_period'] = $data[$field] != 0 ? $data[$field] : '12个月以后';;
+			}elseif($field=='total_sales_volume'){
+				$updateAjaxData['year_sales_volume'] = $data[$field];
+			}elseif($field=='total_sales_amount'){
+				$updateAjaxData['year_sales_amount'] = $data[$field];
+			}else{
+				$updateAjaxData[$field] = $data[$field];
+			}
+
+		}
         return json_encode(array('updateAjaxData' => $updateAjaxData));
     }
 
+    public function getCalculateData($request)
+	{
+		//测试用数据： site选择JP; $currency_rate = 0.065767; $early_investment = 3000;
+		$currency_rates = $this->getCurrencyRates();
+		$site = $request->input('site','US');
+		$currency_rate = $currency_rates[$site];
+
+		$update_data = $request->all();
+		$update_data['product_name'] = $this->getString($update_data['product_name']);
+		$update_data['project_code'] = $this->getString($update_data['project_code']);
+
+		$price_rmb_month_array = $sales_amount_month_array = array();
+		$total_sales_volume = $total_sales_amount = 0;
+		$total_promo_amount = $total_exception_amount = 0;
+
+		for($i=1; $i<=12; $i++){
+			//单个月销量
+			$update_data['volume_month_'.$i] = $this->getNumber($update_data['volume_month_'.$i]);
+			//单个月售价外币
+			$update_data['price_fc_month_'.$i] = $this->getNumber($update_data['price_fc_month_'.$i]);
+			//单个月售价RMB
+			$price_rmb_month_array[$i] = $update_data['price_fc_month_'.$i] * $currency_rate;
+			$sales_amount_month_precise = $update_data['price_fc_month_'.$i] * $currency_rate * $update_data['volume_month_'.$i];
+			//单个月销售金额(取整)
+			$sales_amount_month_array[$i] = round($sales_amount_month_precise);
+			//总销量
+			$total_sales_volume += $update_data['volume_month_'.$i];
+			//总销售金额(销售收入)
+			$total_sales_amount += $sales_amount_month_precise;
+			//单个月推广费(百分数转成小数)
+			$update_data['promo_rate_month_'.$i] = $this->getNumber($update_data['promo_rate_month_'.$i])/100;
+			$promo_amount_month_array[$i] = $update_data['promo_rate_month_'.$i] * $sales_amount_month_array[$i];
+			//总推广费(营销费用)
+			$total_promo_amount += $promo_amount_month_array[$i];
+			//单个月异常费(百分数转成小数)
+			$update_data['exception_rate_month_'.$i] = $this->getNumber($update_data['exception_rate_month_'.$i])/100;
+			$exception_amount_month_array[$i] = $update_data['exception_rate_month_'.$i] * $sales_amount_month_array[$i];
+			//总异常费(退款金额)
+			$total_exception_amount += $exception_amount_month_array[$i];
+		}
+
+		//平均售价RMB
+		$average_price_rmb = $total_sales_amount / $total_sales_volume;
+		//平均售价外币
+		$average_price_fc = $average_price_rmb / $currency_rate;
+		//平均推广率
+		$average_promo_rate = $total_promo_amount / $total_sales_amount;
+		//平均异常率
+		$average_exception_rate = $total_exception_amount / $total_sales_amount;
+
+		/*
+		 计算得出结果
+		*/
+		//净收入
+		$net_income =  $total_sales_amount - $total_exception_amount;
+		//采购成本
+		$update_data['purchase_price'] = $this->getNumber($update_data['purchase_price']);
+		$purchase_cost = $update_data['purchase_price'] * $total_sales_volume;
+
+		//--物流费用相关--
+		//产品实重
+		$update_data['weight_per_pcs'] = $this->getNumber($update_data['weight_per_pcs']);
+		$product_weight = $update_data['weight_per_pcs'] * $total_sales_volume;
+		//单pcs体积
+		$update_data['volume_per_pcs'] = $this->getNumber($update_data['volume_per_pcs']);
+		//体积
+		$product_volume = $update_data['volume_per_pcs'] * $total_sales_volume/1000000;
+		//运输单价
+		$update_data['transport_unit_price'] = $this->getNumber($update_data['transport_unit_price']);
+		//运输方式, 0-海运，1-空运，2-快递
+		$transport_mode = $update_data['transport_mode'];
+		//物流费用
+		$transport_cost = 0;
+		if($transport_mode == 0){
+			$transport_cost = $update_data['transport_unit_price'] * $product_volume * 1.2;
+		}else if($transport_mode == 1){
+			$transport_cost = max($product_volume * 1000/6 * 1.2, $product_weight) * $update_data['transport_unit_price'];
+		}else if($transport_mode == 2){
+			$transport_cost = max($product_volume * 1000/5 * 1.2, $product_weight) * $update_data['transport_unit_price'];
+		}
+
+		//--相关税费--
+		//关税税率(百分数转成小数)
+		$update_data['tariff_rate'] = $this->getNumber($update_data['tariff_rate'])/100;
+		if($site == 'JP'){
+			$tariff_amount = $total_sales_amount * 0.35 * $update_data['tariff_rate'];
+		}else{
+			$tariff_amount = $purchase_cost * 0.4 * $update_data['tariff_rate'];
+		}
+		//VAT率
+		$vat_rate = ((float)$this->getVatRates()[$site])/100;
+		//VAT
+		$vat_amount = $net_income / (1+$vat_rate) * $vat_rate;
+
+		//--平台费用--
+		//平台佣金率(百分数转成小数)
+		$update_data['commission_rate'] = $this->getNumber($update_data['commission_rate'])/100;
+		//平台佣金
+		$commission_amount = $update_data['commission_rate'] * $total_sales_amount - $total_exception_amount * $update_data['commission_rate'] * 0.8;
+		//操作费
+		$update_data['unit_operating_fee'] = $this->getNumber($update_data['unit_operating_fee']);
+		$operating_fee = $update_data['unit_operating_fee'] * $currency_rate * $total_sales_volume;
+		//--仓储费相关--
+		//moq
+		$update_data['moq'] = $this->getNumber($update_data['moq']);
+		//运输天数
+		$update_data['transport_days'] = $this->getNumber($update_data['transport_days']);
+		$unit_strorage_fee = $this->getUnitStorageFee()[$site];
+		//仓储费
+		$storage_fee = (($update_data['moq']/2+(7+$update_data['transport_days'])*$total_sales_volume/365)*$update_data['volume_per_pcs']/1000000*($unit_strorage_fee[0]*9+$unit_strorage_fee[1]*3))*$currency_rate;
+
+		//库存周转天数
+		$inventory_turnover_days = $update_data['inventory_turnover_days'];//1.0版本的计算 方式$update_data['transport_days']+7+$update_data['moq']/(2*$total_sales_volume/365);
+		//供应商账期类型
+		$billing_period_type = $update_data['billing_period_type'];
+		//供应商账期
+		$billing_days = $this->getBillingPeriods()[$billing_period_type]['days'];
+		//资金周转次数
+		$capital_turnover = $inventory_turnover_days!=0 ? 360/$inventory_turnover_days : 0; ///1.0本本的计算方式 365/($inventory_turnover_days-$billing_days+14);
+		//投入资金
+		$invest_capital = ((($inventory_turnover_days-$billing_days+14)*$total_sales_volume/365)*($purchase_cost+$transport_cost+$tariff_amount)/$total_sales_volume);
+		//资金占用成本
+		$capital_cost = $invest_capital * 0.18;
+		//变动成本费用小计
+		$variable_cost =  $purchase_cost + $transport_cost + ($tariff_amount + $vat_amount) + ($commission_amount + $operating_fee) + $total_promo_amount + $storage_fee + $capital_cost;
+		//边际贡献总额
+		$total_marginal_contribution = $net_income - $variable_cost;
+		//单位边际贡献(单PCS边际利润)
+		$marginal_profit_per_pcs = $total_marginal_contribution / $total_sales_volume;
+		//边际贡献率
+		//$marginal_profit_rate = $total_marginal_contribution / $total_sales_amount;
+
+		//--固定成本--
+		//固定费用小计
+		$update_data['id_fee'] = $this->getNumber($update_data['id_fee']);
+		$update_data['mold_fee'] = $this->getNumber($update_data['mold_fee']);
+		$update_data['prototype_fee'] = $this->getNumber($update_data['prototype_fee']);
+		$update_data['other_fixed_cost'] = $this->getNumber($update_data['other_fixed_cost']);
+		$update_data['royalty_fee'] = $this->getNumber($update_data['royalty_fee']);
+		$update_data['certification_fee'] = $this->getNumber($update_data['certification_fee']);
+		$total_fixed_cost = $update_data['id_fee'] + $update_data['mold_fee'] + $update_data['prototype_fee'] + $update_data['other_fixed_cost'] + $update_data['royalty_fee'] + $update_data['certification_fee'];
+		//盈亏临界点（销售数量）
+		$breakeven_point_sales_volume = $marginal_profit_per_pcs==0 ? 0 :  $total_fixed_cost / $marginal_profit_per_pcs;//固定成本 / 单位平均边际贡献
+		//预计投资回收期(月)
+		$estimated_payback_period = 0;
+		$cumulate_volume = 0;
+		if($breakeven_point_sales_volume <= $total_sales_volume){
+			for($i=1; $i<=12;$i++){
+				$cumulate_volume += $update_data['volume_month_'.$i];
+				if($cumulate_volume >= $breakeven_point_sales_volume){
+					$estimated_payback_period = $i;
+					break;
+				}
+			}
+		}
+
+		//前期开发投入
+		$update_data['estimated_labor_cost'] = $this->getNumber($update_data['estimated_labor_cost']);
+		$update_data['business_trip_expenses'] = $this->getNumber($update_data['business_trip_expenses']);
+		$update_data['other_project_cost'] = $this->getNumber($update_data['other_project_cost']);
+		$early_investment = $update_data['estimated_labor_cost'] + $update_data['business_trip_expenses'] + $update_data['other_project_cost'];
+		//投资回报额
+		$return_amount = $total_marginal_contribution - $total_fixed_cost/2 - $early_investment/2;
+		//投资回报率
+		$roi = $invest_capital!=0 ? $return_amount / $invest_capital : 0;
+		//项目利润率
+		$project_profitability = $total_sales_amount!=0 ? $return_amount / $total_sales_amount : 0;
+		//底限价格
+		$numerator = ($total_fixed_cost/(2*$total_sales_volume)+($storage_fee+$tariff_amount+$transport_cost+$operating_fee+$purchase_cost+$capital_cost)/$total_sales_volume)*(1+$vat_rate)/$currency_rate;
+		$denominator = (1-$commission_amount/$total_sales_amount-$total_promo_amount/$total_sales_amount-$total_exception_amount/$total_sales_amount)*(1+$vat_rate)-(1-$total_exception_amount/$total_sales_amount)*$vat_rate;
+		$price_floor = $numerator / $denominator;
+
+		//点击"分析"按钮时，返回的数组，用于ajax异步更新页面数据
+		$returnData = array();
+
+		//新版本内容
+		$update_data['total_sales_volume'] = $total_sales_volume;//年销售量===
+		$update_data['total_sales_amount'] = round($total_sales_amount);//年销售金额===
+		$update_data['year_purchase_amount'] = $this->twoDecimal($purchase_cost);//年采购金额===
+		$update_data['year_exception_amount'] = $this->twoDecimal($total_exception_amount);//年异常金额===
+		$update_data['year_promo'] = $this->twoDecimal($total_promo_amount);//年推广费
+		$update_data['year_platform_commission'] = $this->twoDecimal($commission_amount);//年平台佣金===
+		$update_data['year_platform_operate'] = $this->twoDecimal($operating_fee);//年平台操作费===
+		$update_data['year_platform_storage'] = $this->twoDecimal($storage_fee);//年平台仓储费===
+		$update_data['year_import_tax'] = $this->twoDecimal($tariff_amount);//年进口税===
+		$update_data['year_transport'] = $this->twoDecimal($transport_cost);//年物流费===
+		$update_data['inventory_turnover_days'] = $inventory_turnover_days;//库存周转天数===原来有的
+		$update_data['capital_turnover'] = $capital_turnover;//资金周转次数===原来有的
+		$update_data['put_cost'] = $this->twoDecimal($invest_capital);//投入资金===
+		$update_data['capital_occupy_cost'] = $this->twoDecimal($capital_cost);//资金占用成本===
+		$update_data['change_cost'] = $this->twoDecimal($variable_cost);//变动成本费用小计===
+		$update_data['contribute_cost_total'] = $this->twoDecimal($total_marginal_contribution);//边际贡献总额===
+		$update_data['marginal_profit_per_pcs'] = $this->twoDecimal($marginal_profit_per_pcs);//单位平均边际贡献===原来有的
+		$update_data['total_fixed_cost'] = $this->twoDecimal($total_fixed_cost);//固定成本===
+//		$update_data['estimated_labor_cost'] = $update_data['estimated_labor_cost'];//人力成本===原来有的
+		$update_data['profit_loss_point'] = $breakeven_point_sales_volume;//盈亏临界点(销量)===
+		$update_data['estimated_payback_period'] = $estimated_payback_period;//投资回收期(月)===原来有的
+		$update_data['return_amount'] = $this->twoDecimal($return_amount/10000);//投资回报额===原来有的
+		$update_data['roi'] = $roi < 0 ? '∞' : $roi;//投资回报率===原来有的
+		$update_data['project_profitability'] = $project_profitability;//利润率===原来有的
+
+		$update_data['currency_rate'] = $currency_rate;
+		$update_data['average_price_rmb'] = $average_price_rmb;
+		$update_data['average_price_fc'] = $average_price_fc;
+		$update_data['average_promo_rate'] = $average_promo_rate;
+		$update_data['average_exception_rate'] = $average_exception_rate;
+		$update_data['early_investment'] = $early_investment;//前期开发投入
+		$update_data['price_floor'] = $price_floor;
+
+		return $update_data;
+
+	}
+
     public function getUpdateDBData(Request $request){
-        //测试用数据： site选择JP; $currency_rate = 0.065767; $early_investment = 3000;
-        $currency_rates = $this->getCurrencyRates();
-        $site = $request->input('site','US');
-        $currency_rate = $currency_rates[$site];
 
-        $update_data = $request->all();
-        $update_data['product_name'] = $this->getString($update_data['product_name']);
-        $update_data['project_code'] = $this->getString($update_data['project_code']);
-
-        $price_rmb_month_array = $sales_amount_month_array = array();
-        $total_sales_volume = $total_sales_amount = 0;
-        $total_promo_amount = $total_exception_amount = 0;
-
-        for($i=1; $i<=12; $i++){
-            //单个月销量
-            $update_data['volume_month_'.$i] = $this->getNumber($update_data['volume_month_'.$i]);
-            //单个月售价外币
-            $update_data['price_fc_month_'.$i] = $this->getNumber($update_data['price_fc_month_'.$i]);
-            //单个月售价RMB
-            $price_rmb_month_array[$i] = $update_data['price_fc_month_'.$i] * $currency_rate;
-            $sales_amount_month_precise = $update_data['price_fc_month_'.$i] * $currency_rate * $update_data['volume_month_'.$i];
-            //单个月销售金额(取整)
-            $sales_amount_month_array[$i] = round($sales_amount_month_precise);
-            //总销量
-            $total_sales_volume += $update_data['volume_month_'.$i];
-            //总销售金额(销售收入)
-            $total_sales_amount += $sales_amount_month_precise;
-            //单个月推广费(百分数转成小数)
-            $update_data['promo_rate_month_'.$i] = $this->getNumber($update_data['promo_rate_month_'.$i])/100;
-            $promo_amount_month_array[$i] = $update_data['promo_rate_month_'.$i] * $sales_amount_month_array[$i];
-            //总推广费(营销费用)
-            $total_promo_amount += $promo_amount_month_array[$i];
-            //单个月异常费(百分数转成小数)
-            $update_data['exception_rate_month_'.$i] = $this->getNumber($update_data['exception_rate_month_'.$i])/100;
-            $exception_amount_month_array[$i] = $update_data['exception_rate_month_'.$i] * $sales_amount_month_array[$i];
-            //总异常费(退款金额)
-            $total_exception_amount += $exception_amount_month_array[$i];
-        }
-
-        //平均售价RMB
-        $average_price_rmb = $total_sales_amount / $total_sales_volume;
-        //平均售价外币
-        $average_price_fc = $average_price_rmb / $currency_rate;
-        //平均推广率
-        $average_promo_rate = $total_promo_amount / $total_sales_amount;
-        //平均异常率
-        $average_exception_rate = $total_exception_amount / $total_sales_amount;
-
-        /*
-         计算得出结果
-        */
-        //净收入
-        $net_income =  $total_sales_amount - $total_exception_amount;
-        //采购成本
-        $update_data['purchase_price'] = $this->getNumber($update_data['purchase_price']);
-        $purchase_cost = $update_data['purchase_price'] * $total_sales_volume;
-
-        //--物流费用相关--
-        //产品实重
-        $update_data['weight_per_pcs'] = $this->getNumber($update_data['weight_per_pcs']);
-        $product_weight = $update_data['weight_per_pcs'] * $total_sales_volume;
-        //单pcs体积
-        $update_data['volume_per_pcs'] = $this->getNumber($update_data['volume_per_pcs']);
-        //体积
-        $product_volume = $update_data['volume_per_pcs'] * $total_sales_volume/1000000;
-        //运输单价
-        $update_data['transport_unit_price'] = $this->getNumber($update_data['transport_unit_price']);
-        //运输方式, 0-海运，1-空运，2-快递
-        $transport_mode = $update_data['transport_mode'];
-        //物流费用
-        $transport_cost = 0;
-        if($transport_mode == 0){
-            $transport_cost = $update_data['transport_unit_price'] * $product_volume * 1.2;
-        }else if($transport_mode == 1){
-            $transport_cost = max($product_volume * 1000/6 * 1.2, $product_weight) * $update_data['transport_unit_price'];
-        }else if($transport_mode == 2){
-            $transport_cost = max($product_volume * 1000/5 * 1.2, $product_weight) * $update_data['transport_unit_price'];
-        }
-
-        //--相关税费--
-        //关税税率(百分数转成小数)
-        $update_data['tariff_rate'] = $this->getNumber($update_data['tariff_rate'])/100;
-        if($site == 'JP'){
-            $tariff_amount = $total_sales_amount * 0.35 * $update_data['tariff_rate'];
-        }else{
-            $tariff_amount = $purchase_cost * 0.4 * $update_data['tariff_rate'];
-        }
-        //VAT率
-        $vat_rate = ((float)$this->getVatRates()[$site])/100;
-        //VAT
-        $vat_amount = $net_income / (1+$vat_rate) * $vat_rate;
-
-        //--平台费用--
-        //平台佣金率(百分数转成小数)
-        $update_data['commission_rate'] = $this->getNumber($update_data['commission_rate'])/100;
-        //平台佣金
-        $commission_amount = $update_data['commission_rate'] * $total_sales_amount - $total_exception_amount * $update_data['commission_rate'] * 0.8;
-        //操作费
-        $update_data['unit_operating_fee'] = $this->getNumber($update_data['unit_operating_fee']);
-        $operating_fee = $update_data['unit_operating_fee'] * $currency_rate * $total_sales_volume;
-        //--仓储费相关--
-        //moq
-        $update_data['moq'] = $this->getNumber($update_data['moq']);
-        //运输天数
-        $update_data['transport_days'] = $this->getNumber($update_data['transport_days']);
-        $unit_strorage_fee = $this->getUnitStorageFee()[$site];
-        //仓储费
-        $storage_fee = (($update_data['moq']/2+(7+$update_data['transport_days'])*$total_sales_volume/365)*$update_data['volume_per_pcs']/1000000*($unit_strorage_fee[0]*9+$unit_strorage_fee[1]*3))*$currency_rate;
-
-        //库存周转天数
-        $inventory_turnover_days = $update_data['transport_days']+7+$update_data['moq']/(2*$total_sales_volume/365);
-        //供应商账期类型
-        $billing_period_type = $update_data['billing_period_type'];
-        //供应商账期
-        $billing_days = $this->getBillingPeriods()[$billing_period_type]['days'];
-        //资金周转次数
-        $capital_turnover = 365/($inventory_turnover_days-$billing_days+14);
-        //投入资金
-        $invest_capital = ((($inventory_turnover_days-$billing_days+14)*$total_sales_volume/365)*($purchase_cost+$transport_cost+$tariff_amount)/$total_sales_volume);
-        //资金占用成本
-        $capital_cost = $invest_capital * 0.18;
-        //变动成本费用小计
-        $variable_cost =  $purchase_cost + $transport_cost + ($tariff_amount + $vat_amount) + ($commission_amount + $operating_fee) + $total_promo_amount + $storage_fee + $capital_cost;
-        //边际贡献总额
-        $total_marginal_contribution = $net_income - $variable_cost;
-        //单位边际贡献(单PCS边际利润)
-        $marginal_profit_per_pcs = $total_marginal_contribution / $total_sales_volume;
-        //边际贡献率
-        //$marginal_profit_rate = $total_marginal_contribution / $total_sales_amount;
-
-        //--固定成本--
-        //固定费用小计
-        $update_data['id_fee'] = $this->getNumber($update_data['id_fee']);
-        $update_data['mold_fee'] = $this->getNumber($update_data['mold_fee']);
-        $update_data['prototype_fee'] = $this->getNumber($update_data['prototype_fee']);
-        $update_data['other_fixed_cost'] = $this->getNumber($update_data['other_fixed_cost']);
-        $update_data['royalty_fee'] = $this->getNumber($update_data['royalty_fee']);
-        $update_data['certification_fee'] = $this->getNumber($update_data['certification_fee']);
-        $total_fixed_cost = $update_data['id_fee'] + $update_data['mold_fee'] + $update_data['prototype_fee'] + $update_data['other_fixed_cost'] + $update_data['royalty_fee'] + $update_data['certification_fee'];
-        //盈亏临界点（销售数量）
-        $breakeven_point_sales_volume = $total_fixed_cost / $marginal_profit_per_pcs;
-        //预计投资回收期(月)
-        $estimated_payback_period = 0;
-        $cumulate_volume = 0;
-        if($breakeven_point_sales_volume <= $total_sales_volume){
-            for($i=1; $i<=12;$i++){
-                $cumulate_volume += $update_data['volume_month_'.$i];
-                if($cumulate_volume >= $breakeven_point_sales_volume){
-                    $estimated_payback_period = $i;
-                    break;
-                }
-            }
-        }
-
-        //前期开发投入
-        $update_data['estimated_labor_cost'] = $this->getNumber($update_data['estimated_labor_cost']);
-        $update_data['business_trip_expenses'] = $this->getNumber($update_data['business_trip_expenses']);
-        $update_data['other_project_cost'] = $this->getNumber($update_data['other_project_cost']);
-        $early_investment = $update_data['estimated_labor_cost'] + $update_data['business_trip_expenses'] + $update_data['other_project_cost'];
-        //投资回报额
-        $return_amount = $total_marginal_contribution - $total_fixed_cost/2 - $early_investment/2;
-        //投资回报率
-        $roi = $return_amount / $invest_capital;
-        //项目利润率
-        $project_profitability = $return_amount / $total_sales_amount;
-        //底限价格
-        $numerator = ($total_fixed_cost/(2*$total_sales_volume)+($storage_fee+$tariff_amount+$transport_cost+$operating_fee+$purchase_cost+$capital_cost)/$total_sales_volume)*(1+$vat_rate)/$currency_rate;
-        $denominator = (1-$commission_amount/$total_sales_amount-$total_promo_amount/$total_sales_amount-$total_exception_amount/$total_sales_amount)*(1+$vat_rate)-(1-$total_exception_amount/$total_sales_amount)*$vat_rate;
-        $price_floor = $numerator / $denominator;
-
+    	$data = $this->getCalculateData($request);
+    	unset($data['_token']);
         //点保存按钮时，插入或者更新数据到数据库
         //以下百分数要转换成小数保存：单个月推广率，单个月异常率，平均推广率，平均异常率，平台佣金率，关税税率，项目利润率，投资回报率
-        //$request->all();获取的参数还包含 _token, _method
-        unset($update_data['_token']);
-        unset($update_data['_method']);
-
-        $update_data['currency_rate'] = $currency_rate;
-        $update_data['total_sales_volume'] = $total_sales_volume;
-        $update_data['total_sales_amount'] = $total_sales_amount;
-        $update_data['average_price_rmb'] = $average_price_rmb;
-        $update_data['average_price_fc'] = $average_price_fc;
-        $update_data['average_promo_rate'] = $average_promo_rate;
-        $update_data['average_exception_rate'] = $average_exception_rate;
-        $update_data['total_fixed_cost'] = $total_fixed_cost;
-        $update_data['early_investment'] = $early_investment;
-        $update_data['price_floor'] = $price_floor;
-        $update_data['inventory_turnover_days'] = $inventory_turnover_days;
-        $update_data['project_profitability'] = $project_profitability;
-        $update_data['marginal_profit_per_pcs'] = $marginal_profit_per_pcs;
-        $update_data['estimated_payback_period'] = $estimated_payback_period;
-        $update_data['capital_turnover'] = $capital_turnover;
-        $update_data['roi'] = $roi;
-        $update_data['return_amount'] = $return_amount;
-
-        return $update_data;
-    }
-
-    public function getUpdateAjaxData(Request $request){
-        //测试用数据： site选择JP; $currency_rate = 0.065767; $early_investment = 3000;
-        $currency_rates = $this->getCurrencyRates();
-        $site = $request->input('site','US');
-        $currency_rate = $currency_rates[$site];
-
-        $update_data = $request->all();
-        $update_data['product_name'] = $this->getString($update_data['product_name']);
-        $update_data['project_code'] = $this->getString($update_data['project_code']);
-
-        $price_rmb_month_array = $sales_amount_month_array = array();
-        $total_sales_volume = $total_sales_amount = 0;
-        $total_promo_amount = $total_exception_amount = 0;
-
-        for($i=1; $i<=12; $i++){
-            //单个月销量
-            $update_data['volume_month_'.$i] = $this->getNumber($update_data['volume_month_'.$i]);
-            //单个月售价外币
-            $update_data['price_fc_month_'.$i] = $this->getNumber($update_data['price_fc_month_'.$i]);
-            //单个月售价RMB
-            $price_rmb_month_array[$i] = $update_data['price_fc_month_'.$i] * $currency_rate;
-            $sales_amount_month_precise = $update_data['price_fc_month_'.$i] * $currency_rate * $update_data['volume_month_'.$i];
-            //单个月销售金额(取整)
-            $sales_amount_month_array[$i] = round($sales_amount_month_precise);
-            //总销量
-            $total_sales_volume += $update_data['volume_month_'.$i];
-            //总销售金额(销售收入)
-            $total_sales_amount += $sales_amount_month_precise;
-            //单个月推广费(百分数转成小数)
-            $update_data['promo_rate_month_'.$i] = $this->getNumber($update_data['promo_rate_month_'.$i])/100;
-            $promo_amount_month_array[$i] = $update_data['promo_rate_month_'.$i] * $sales_amount_month_array[$i];
-            //总推广费(营销费用)
-            $total_promo_amount += $promo_amount_month_array[$i];
-            //单个月异常费(百分数转成小数)
-            $update_data['exception_rate_month_'.$i] = $this->getNumber($update_data['exception_rate_month_'.$i])/100;
-            $exception_amount_month_array[$i] = $update_data['exception_rate_month_'.$i] * $sales_amount_month_array[$i];
-            //总异常费(退款金额)
-            $total_exception_amount += $exception_amount_month_array[$i];
-        }
-
-        //平均售价RMB
-        $average_price_rmb = $total_sales_amount / $total_sales_volume;
-        //平均售价外币
-        $average_price_fc = $average_price_rmb / $currency_rate;
-        //平均推广率
-        $average_promo_rate = $total_promo_amount / $total_sales_amount;
-        //平均异常率
-        $average_exception_rate = $total_exception_amount / $total_sales_amount;
-
-        /*
-         计算得出结果
-        */
-        //净收入
-        $net_income =  $total_sales_amount - $total_exception_amount;
-        //采购成本
-        $update_data['purchase_price'] = $this->getNumber($update_data['purchase_price']);
-        $purchase_cost = $update_data['purchase_price'] * $total_sales_volume;
-
-        //--物流费用相关--
-        //产品实重
-        $update_data['weight_per_pcs'] = $this->getNumber($update_data['weight_per_pcs']);
-        $product_weight = $update_data['weight_per_pcs'] * $total_sales_volume;
-        //单pcs体积
-        $update_data['volume_per_pcs'] = $this->getNumber($update_data['volume_per_pcs']);
-        //体积
-        $product_volume = $update_data['volume_per_pcs'] * $total_sales_volume/1000000;
-        //运输单价
-        $update_data['transport_unit_price'] = $this->getNumber($update_data['transport_unit_price']);
-        //运输方式, 0-海运，1-空运，2-快递
-        $transport_mode = $update_data['transport_mode'];
-        //物流费用
-        $transport_cost = 0;
-        if($transport_mode == 0){
-            $transport_cost = $update_data['transport_unit_price'] * $product_volume * 1.2;
-        }else if($transport_mode == 1){
-            $transport_cost = max($product_volume * 1000/6 * 1.2, $product_weight) * $update_data['transport_unit_price'];
-        }else if($transport_mode == 2){
-            $transport_cost = max($product_volume * 1000/5 * 1.2, $product_weight) * $update_data['transport_unit_price'];
-        }
-
-        //--相关税费--
-        //关税税率(百分数转成小数)
-        $update_data['tariff_rate'] = $this->getNumber($update_data['tariff_rate'])/100;
-        if($site == 'JP'){
-            $tariff_amount = $total_sales_amount * 0.35 * $update_data['tariff_rate'];
-        }else{
-            $tariff_amount = $purchase_cost * 0.4 * $update_data['tariff_rate'];
-        }
-        //VAT率
-        $vat_rate = ((float)$this->getVatRates()[$site])/100;
-        //VAT
-        $vat_amount = $net_income / (1+$vat_rate) * $vat_rate;
-
-        //--平台费用--
-        //平台佣金率(百分数转成小数)
-        $update_data['commission_rate'] = $this->getNumber($update_data['commission_rate'])/100;
-        //平台佣金
-        $commission_amount = $update_data['commission_rate'] * $total_sales_amount - $total_exception_amount * $update_data['commission_rate'] * 0.8;
-        //操作费
-        $update_data['unit_operating_fee'] = $this->getNumber($update_data['unit_operating_fee']);
-        $operating_fee = $update_data['unit_operating_fee'] * $currency_rate * $total_sales_volume;
-        //--仓储费相关--
-        //moq
-        $update_data['moq'] = $this->getNumber($update_data['moq']);
-        //运输天数
-        $update_data['transport_days'] = $this->getNumber($update_data['transport_days']);
-        $unit_strorage_fee = $this->getUnitStorageFee()[$site];
-        //仓储费
-        $storage_fee = (($update_data['moq']/2+(7+$update_data['transport_days'])*$total_sales_volume/365)*$update_data['volume_per_pcs']/1000000*($unit_strorage_fee[0]*9+$unit_strorage_fee[1]*3))*$currency_rate;
-
-        //库存周转天数
-        $inventory_turnover_days = $update_data['transport_days']+7+$update_data['moq']/(2*$total_sales_volume/365);
-        //供应商账期类型
-        $billing_period_type = $update_data['billing_period_type'];
-        //供应商账期
-        $billing_days = $this->getBillingPeriods()[$billing_period_type]['days'];
-        //资金周转次数
-        $capital_turnover = 365/($inventory_turnover_days-$billing_days+14);
-        //投入资金
-        $invest_capital = ((($inventory_turnover_days-$billing_days+14)*$total_sales_volume/365)*($purchase_cost+$transport_cost+$tariff_amount)/$total_sales_volume);
-        //资金占用成本
-        $capital_cost = $invest_capital * 0.18;
-        //变动成本费用小计
-        $variable_cost =  $purchase_cost + $transport_cost + ($tariff_amount + $vat_amount) + ($commission_amount + $operating_fee) + $total_promo_amount + $storage_fee + $capital_cost;
-        //边际贡献总额
-        $total_marginal_contribution = $net_income - $variable_cost;
-        //单位边际贡献(单PCS边际利润)
-        $marginal_profit_per_pcs = $total_marginal_contribution / $total_sales_volume;
-        //边际贡献率
-        //$marginal_profit_rate = $total_marginal_contribution / $total_sales_amount;
-
-        //--固定成本--
-        //固定费用小计
-        $update_data['id_fee'] = $this->getNumber($update_data['id_fee']);
-        $update_data['mold_fee'] = $this->getNumber($update_data['mold_fee']);
-        $update_data['prototype_fee'] = $this->getNumber($update_data['prototype_fee']);
-        $update_data['other_fixed_cost'] = $this->getNumber($update_data['other_fixed_cost']);
-        $update_data['royalty_fee'] = $this->getNumber($update_data['royalty_fee']);
-        $update_data['certification_fee'] = $this->getNumber($update_data['certification_fee']);
-        $total_fixed_cost = $update_data['id_fee'] + $update_data['mold_fee'] + $update_data['prototype_fee'] + $update_data['other_fixed_cost'] + $update_data['royalty_fee'] + $update_data['certification_fee'];
-        //盈亏临界点（销售数量）
-        $breakeven_point_sales_volume = $total_fixed_cost / $marginal_profit_per_pcs;
-        //预计投资回收期(月)
-        $estimated_payback_period = 0;
-        $cumulate_volume = 0;
-        if($breakeven_point_sales_volume <= $total_sales_volume){
-            for($i=1; $i<=12;$i++){
-                $cumulate_volume += $update_data['volume_month_'.$i];
-                if($cumulate_volume >= $breakeven_point_sales_volume){
-                    $estimated_payback_period = $i;
-                    break;
-                }
-            }
-        }
-
-        //前期开发投入
-        $update_data['estimated_labor_cost'] = $this->getNumber($update_data['estimated_labor_cost']);
-        $update_data['business_trip_expenses'] = $this->getNumber($update_data['business_trip_expenses']);
-        $update_data['other_project_cost'] = $this->getNumber($update_data['other_project_cost']);
-        $early_investment = $update_data['estimated_labor_cost'] + $update_data['business_trip_expenses'] + $update_data['other_project_cost'];
-        //投资回报额
-        $return_amount = $total_marginal_contribution - $total_fixed_cost/2 - $early_investment/2;
-        //投资回报率
-        $roi = $return_amount / $invest_capital;
-        //项目利润率
-        $project_profitability = $return_amount / $total_sales_amount;
-        //底限价格
-        $numerator = ($total_fixed_cost/(2*$total_sales_volume)+($storage_fee+$tariff_amount+$transport_cost+$operating_fee+$purchase_cost+$capital_cost)/$total_sales_volume)*(1+$vat_rate)/$currency_rate;
-        $denominator = (1-$commission_amount/$total_sales_amount-$total_promo_amount/$total_sales_amount-$total_exception_amount/$total_sales_amount)*(1+$vat_rate)-(1-$total_exception_amount/$total_sales_amount)*$vat_rate;
-        $price_floor = $numerator / $denominator;
-
-        //点击"分析"按钮时，返回的数组，用于ajax异步更新页面数据
-        $updateAjaxData = array();
-        //以下注释部分，前端已经自动计算
-    //    $updateAjaxData['total_sales_volume'] = $total_sales_volume;
-    //    $updateAjaxData['average_price_fc'] = $this->twoDecimal($average_price_fc);
-    //    $updateAjaxData['average_price_rmb'] = $this->twoDecimal($average_price_rmb);
-    //    $updateAjaxData['total_sales_amount'] = round($total_sales_amount);
-    //    $updateAjaxData['average_promo_rate'] = $this->toPercentage($average_promo_rate);
-    //    $updateAjaxData['average_exception_rate'] = $this->toPercentage($average_exception_rate);
-    //    for($i=1; $i<=12; $i++) {
-    //        $updateAjaxData['price_rmb_month_' . $i] = $this->twoDecimal($price_rmb_month_array[$i]);
-    //        $updateAjaxData['sales_amount_month_' . $i] = $sales_amount_month_array[$i];
-    //    }
-        $updateAjaxData['price_floor'] = $this->twoDecimal($price_floor);
-        $updateAjaxData['inventory_turnover_days'] = $this->twoDecimal($inventory_turnover_days);
-        $updateAjaxData['project_profitability'] = $this->toPercentage($project_profitability);
-        $updateAjaxData['marginal_profit_per_pcs'] = $this->twoDecimal($marginal_profit_per_pcs);
-        $updateAjaxData['estimated_payback_period'] = $estimated_payback_period > 0 ? $estimated_payback_period : '12个月以后';
-        $updateAjaxData['capital_turnover'] = $capital_turnover < 0 ? '∞' : $this->twoDecimal($capital_turnover);
-        $updateAjaxData['roi'] = $roi < 0 ? '∞' : $this->toPercentage($roi);
-        $updateAjaxData['return_amount'] = $this->twoDecimal($return_amount/10000);
-
-        return $updateAjaxData;
-
+        return $data;
     }
 
     //站点

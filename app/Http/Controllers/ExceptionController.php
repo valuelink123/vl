@@ -1444,7 +1444,7 @@ class ExceptionController extends Controller
 		}
 		if(!$message){
 			$order['orderItemData'] = $orderItemData;
-			
+			$order['rsgOrder'] = checkRsgOrder($orderid);
 			$re = $order;
 			if($re){
 				$message = 'Get Amazon Order ID Success';
