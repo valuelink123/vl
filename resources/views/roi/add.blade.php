@@ -144,6 +144,16 @@
                     @endforeach
                 </select>
             </div>
+
+            <div class="param_cost">
+                <div>库存周转天数</div>
+                <select name="inventory_turnover_days">
+                    @foreach ($inventory_turnover_days as $day)
+                        <option value="{{$day}}">{{$day}}</option>
+                    @endforeach
+                </select>
+            </div>
+
         </div>
         <div style="clear:both"></div>
         <div style="height: 15px;"></div>
@@ -513,7 +523,7 @@
                     </div>
                     <div class="param_cost">
                         <div>预计开发人力成本</div>
-                        <input class="int_or_two_digits_input" type="text" name="estimated_labor_cost" id="estimated_labor_cost" value="0"/>
+                        <input class="int_or_two_digits_input" type="text" name="estimated_labor_cost" value="0"/>
                     </div>
                     <div class="param_cost">
                         <div>差旅费用</div>
@@ -540,16 +550,47 @@
             <div style="height: 15px;"></div>
             <div style="width:1501px">
                 <table id="result_table" border="0" cellspacing="0" cellpadding="0">
+
                     <tr>
-                        <td><span class="grey_color">投资回报额(万元) :</span> <span class="bold" id="return_amount"></span></td>
-                        <td><span class="grey_color">投资回报率ROI(%) :</span> <span class="bold" id="roi"></span></td>
-                        <td width="25%"><span class="grey_color">项目利润率(%) :</span> <span class="bold" id="project_profitability"></span></td>
+                        <td><span class="grey_color">年销售量 :</span> <span class="bold" id="year_sales_volume"></span></td>
+                        <td><span class="grey_color">年销售金额 :</span> <span class="bold" id="year_sales_amount"></span></td>
+                        <td><span class="grey_color">年采购金额 :</span> <span class="bold" id="year_purchase_amount"></span></td>
+                        <td><span class="grey_color">年异常金额 :</span> <span class="bold" id="year_exception_amount"></span></td>
                     </tr>
+
                     <tr>
-                        <td width="25%"><span class="grey_color">底线价格(外币/元) :</span> <span class="bold" id="price_floor"></span></td>
-                        <td width="25%"><span class="grey_color">资金周转次数(次) :</span> <span class="bold" id="capital_turnover"></span></td>
-                        <td><span class="grey_color">库存周转天数(天) :</span> <span class="bold" id="inventory_turnover_days"></span></td>
-                        <td width="25%"><span class="grey_color">单PCS边际利润(元) :</span> <span class="bold" id="marginal_profit_per_pcs"></span></td>
+                        <td><span class="grey_color">年推广费 :</span> <span class="bold" id="year_promo"></span></td>
+                        <td><span class="grey_color">年平台佣金 :</span> <span class="bold" id="year_platform_commission"></span></td>
+                        <td><span class="grey_color">年平台操作费 :</span> <span class="bold" id="year_platform_operate"></span></td>
+                        <td><span class="grey_color">年平台仓储费 :</span> <span class="bold" id="year_platform_storage"></span></td>
+                    </tr>
+
+                    <tr>
+                        <td><span class="grey_color">年进口税 :</span> <span class="bold" id="year_import_tax"></span></td>
+                        <td><span class="grey_color">年物流费 :</span> <span class="bold" id="year_transport"></span></td>
+                        <td><span class="grey_color">库存周转天数 :</span> <span class="bold" id="inventory_turnover_days"></span></td>
+                        <td><span class="grey_color">资金周转次数 :</span> <span class="bold" id="capital_turnover"></span></td>
+                    </tr>
+
+                    <tr>
+                        <td><span class="grey_color">投入资金 :</span> <span class="bold" id="put_cost"></span></td>
+                        <td><span class="grey_color">资金占用成本 :</span> <span class="bold" id="capital_occupy_cost"></span></td>
+                        <td><span class="grey_color">变动成本费用小计 :</span> <span class="bold" id="change_cost"></span></td>
+                        <td><span class="grey_color">边际贡献总额 :</span> <span class="bold" id="contribute_cost_total"></span></td>
+                    </tr>
+
+                    <tr>
+                        <td><span class="grey_color">单位平均边际贡献 :</span> <span class="bold" id="marginal_profit_per_pcs"></span></td>
+                        <td><span class="grey_color">固定成本 :</span> <span class="bold" id="total_fixed_cost"></span></td>
+                        <td><span class="grey_color">人力成本 :</span> <span class="bold" id="estimated_labor_cost"></span></td>
+                        <td><span class="grey_color">盈亏临界点(销量) :</span> <span class="bold" id="profit_loss_point"></span></td>
+                    </tr>
+
+                    <tr>
+                        <td><span class="grey_color">投资回收期(月) :</span> <span class="bold" id="estimated_payback_period"></span></td>
+                        <td><span class="grey_color">投资回报额 :</span> <span class="bold" id="return_amount"></span></td>
+                        <td><span class="grey_color">投资回报率 :</span> <span class="bold" id="roi"></span></td>
+                        <td><span class="grey_color">利润率 :</span> <span class="bold" id="project_profitability"></span></td>
                     </tr>
                 </table>
             </div>
