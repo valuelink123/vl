@@ -33,6 +33,11 @@ class RsgproductsController extends Controller
 		parent::__construct();
     }
 
+    public function __destruct()
+	{
+
+	}
+
    	public function list(Request $req)
     {
 		if(!Auth::user()->can(['rsgproducts-show'])) die('Permission denied -- rsgproducts-show');
