@@ -645,16 +645,46 @@ class RoiController extends Controller
                     <div style="height: 20px;"></div>
                     <div style="width:1501px">
                         <table id="result_table" border="0" cellspacing="0" cellpadding="0">
-                            <tr>
-                                <td><span class="grey_color">投资回报额(万元) :</span> <span class="bold">' . $roi['return_amount'] . '</span></td>
-                                <td><span class="grey_color">投资回报率ROI(%) :</span> <span class="bold">' . $roi['roi'] . '</span></td>
-                                <td width="25%"><span class="grey_color">项目利润率(%) :</span> <span class="bold">' . $roi['project_profitability'] . '</span></td>
+                        	<tr>
+                                <td><span class="grey_color">年销售量 :</span> <span class="bold" id="total_sales_volume">'.$roi['total_sales_volume'].'</span></td>
+                                <td><span class="grey_color">年销售金额 :</span> <span class="bold" id="total_sales_amount">'.$roi['total_sales_amount'].'</span></td>
+                                <td><span class="grey_color">年采购金额 :</span> <span class="bold" id="year_purchase_amount">'.$roi['year_purchase_amount'].'</span></td>
+                                <td><span class="grey_color">年异常金额 :</span> <span class="bold" id="year_exception_amount">'.$roi['year_exception_amount'].'</span></td>
                             </tr>
+
                             <tr>
-                                <td width="25%"><span class="grey_color">底线价格(外币/元) :</span> <span class="bold">' . $roi['price_floor'] . '</span></td>
-                                <td width="25%"><span class="grey_color">资金周转次数(次) :</span> <span class="bold">' . $roi['capital_turnover'] . '</span></td>
-                                <td><span class="grey_color">库存周转天数(天) :</span> <span class="bold">' . $roi['inventory_turnover_days'] . '</span></td>
-                                <td width="25%"><span class="grey_color">单PCS边际利润(元) :</span> <span class="bold">' . $roi['marginal_profit_per_pcs'] . '</span></td>
+                                <td><span class="grey_color">年推广费 :</span> <span class="bold" id="year_promo">'.$roi['year_promo'].'</span></td>
+                                <td><span class="grey_color">年平台佣金 :</span> <span class="bold" id="year_platform_commission">'.$roi['year_platform_commission'].'</span></td>
+                                <td><span class="grey_color">年平台操作费 :</span> <span class="bold" id="year_platform_operate">'.$roi['year_platform_operate'].'</span></td>
+                                <td><span class="grey_color">年平台仓储费 :</span> <span class="bold" id="year_platform_storage">'.$roi['year_platform_storage'].'</span></td>
+                            </tr>
+
+                            <tr>
+                                <td><span class="grey_color">年进口税 :</span> <span class="bold" id="year_import_tax">'.$roi['year_import_tax'].'</span></td>
+                                <td><span class="grey_color">年物流费 :</span> <span class="bold" id="year_transport">'.$roi['year_transport'].'</span></td>
+                                <td><span class="grey_color">库存周转天数 :</span> <span class="bold" id="inventory_turnover_days">'.$roi['inventory_turnover_days'].'</span></td>
+                                <td><span class="grey_color">资金周转次数 :</span> <span class="bold" id="capital_turnover">'.$roi['capital_turnover'].'</span></td>
+                            </tr>
+
+                            <tr>
+                                <td><span class="grey_color">投入资金 :</span> <span class="bold" id="put_cost">'.$roi['put_cost'].'</span></td>
+                                <td><span class="grey_color">资金占用成本 :</span> <span class="bold" id="capital_occupy_cost">'.$roi['capital_occupy_cost'].'</span></td>
+                                <td><span class="grey_color">变动成本费用小计 :</span> <span class="bold" id="change_cost">'.$roi['change_cost'].'</span></td>
+                                <td><span class="grey_color">边际贡献总额 :</span> <span class="bold" id="contribute_cost_total">'.$roi['contribute_cost_total'].'</span></td>
+                            </tr>
+
+                            <tr>
+                                <td><span class="grey_color">单位平均边际贡献 :</span> <span class="bold" id="marginal_profit_per_pcs">'.$roi['marginal_profit_per_pcs'].'</span></td>
+                                <td><span class="grey_color">固定成本 :</span> <span class="bold" id="total_fixed_cost">'.$roi['total_fixed_cost'].'</span></td>
+                                <td><span class="grey_color">人力成本 :</span> <span class="bold" id="estimated_labor_cost">'.$roi['estimated_labor_cost'].'</span></td>
+                                <td><span class="grey_color">盈亏临界点(销量) :</span> <span class="bold" id="profit_loss_point">'.$roi['profit_loss_point'].'</span></td>
+                            </tr>
+
+                            <tr>
+                                <td><span class="grey_color">投资回收期(月) :</span> <span class="bold" id="estimated_payback_period">'.$roi['estimated_payback_period'].'</span></td>
+                                <td><span class="grey_color">投资回报额 :</span> <span class="bold" id="return_amount">'.$roi['return_amount'].'</span></td>
+                                <td><span class="grey_color">投资回报率 :</span> <span class="bold" id="roi">'.$roi['roi'].'</span></td>
+                                <td><span class="grey_color">利润率 :</span> <span class="bold" id="project_profitability">'.$roi['project_profitability'].'</span></td>
                             </tr>
                         </table>
                     </div>
