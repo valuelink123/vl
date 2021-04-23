@@ -646,6 +646,13 @@ class RoiController extends Controller
                     <div style="width:1501px">
                         <table id="result_table" border="0" cellspacing="0" cellpadding="0">
                         	<tr>
+                                <td><span class="grey_color">投资回收期(月) :</span> <span class="bold" id="estimated_payback_period">'.$roi['estimated_payback_period'].'</span></td>
+                                <td><span class="grey_color">投资回报额 :</span> <span class="bold" id="return_amount">'.$roi['return_amount'].'</span></td>
+                                <td><span class="grey_color">投资回报率 :</span> <span class="bold" id="roi">'.$roi['roi'].'</span></td>
+                                <td><span class="grey_color">利润率 :</span> <span class="bold" id="project_profitability">'.$roi['project_profitability'].'</span></td>
+                            </tr>
+                            
+                        	<tr>
                                 <td><span class="grey_color">年销售量 :</span> <span class="bold" id="total_sales_volume">'.$roi['total_sales_volume'].'</span></td>
                                 <td><span class="grey_color">年销售金额 :</span> <span class="bold" id="total_sales_amount">'.$roi['total_sales_amount'].'</span></td>
                                 <td><span class="grey_color">年采购金额 :</span> <span class="bold" id="year_purchase_amount">'.$roi['year_purchase_amount'].'</span></td>
@@ -679,13 +686,11 @@ class RoiController extends Controller
                                 <td><span class="grey_color">人力成本 :</span> <span class="bold" id="estimated_labor_cost">'.$roi['estimated_labor_cost'].'</span></td>
                                 <td><span class="grey_color">盈亏临界点(销量) :</span> <span class="bold" id="profit_loss_point">'.$roi['profit_loss_point'].'</span></td>
                             </tr>
-
+                            
                             <tr>
-                                <td><span class="grey_color">投资回收期(月) :</span> <span class="bold" id="estimated_payback_period">'.$roi['estimated_payback_period'].'</span></td>
-                                <td><span class="grey_color">投资回报额 :</span> <span class="bold" id="return_amount">'.$roi['return_amount'].'</span></td>
-                                <td><span class="grey_color">投资回报率 :</span> <span class="bold" id="roi">'.$roi['roi'].'</span></td>
-                                <td><span class="grey_color">利润率 :</span> <span class="bold" id="project_profitability">'.$roi['project_profitability'].'</span></td>
+                                <td><span class="grey_color">底限价格 :</span> <span class="bold" id="price_floor">'.$roi['price_floor'].'</span></td>
                             </tr>
+                            
                         </table>
                     </div>
                 </div>
@@ -952,7 +957,7 @@ class RoiController extends Controller
             }
         }
 
-        if(!$visible) die('Permission denied');
+        if(!$visible) die('Permission denied');//测试时关闭
 
         $canArchive = false;
         if($isUserAdmin || $isUserProductDirector){
@@ -974,6 +979,14 @@ class RoiController extends Controller
     }
 
     public function showPageDataFormat($roi){
+		//配置需要转换为万为单位的金额数据
+		$amount_field = array('return_amount','total_sales_amount','year_purchase_amount','year_exception_amount','year_promo','year_platform_commission','year_platform_operate','year_platform_storage','year_import_tax','year_transport','put_cost','capital_occupy_cost','change_cost','contribute_cost_total','marginal_profit_per_pcs','total_fixed_cost','estimated_labor_cost');
+		foreach($amount_field as $field){
+			if($roi[$field]>=10000){
+				$roi[$field] = $this->twoDecimal($roi[$field]/10000).'万';
+			}
+		}
+
         $billingPeriods = $this->getBillingPeriods();
         $transportModes = $this->getTransportModes();
         $transport_mode_int = $roi['transport_mode'];
@@ -1064,7 +1077,7 @@ class RoiController extends Controller
 
     public function analyse(Request $request){
 		//点击"分析"按钮时，返回的数组，用于ajax异步更新页面数据
-		$configField = array('total_sales_volume','total_sales_amount','year_purchase_amount','year_exception_amount','year_promo','year_platform_commission','year_platform_operate','year_platform_storage','year_import_tax','year_transport','inventory_turnover_days','capital_turnover','put_cost','capital_occupy_cost','change_cost','contribute_cost_total','marginal_profit_per_pcs','total_fixed_cost','estimated_labor_cost','profit_loss_point','estimated_payback_period','return_amount','roi','project_profitability');
+		$configField = array('total_sales_volume','total_sales_amount','year_purchase_amount','year_exception_amount','year_promo','year_platform_commission','year_platform_operate','year_platform_storage','year_import_tax','year_transport','inventory_turnover_days','capital_turnover','put_cost','capital_occupy_cost','change_cost','contribute_cost_total','marginal_profit_per_pcs','total_fixed_cost','estimated_labor_cost','profit_loss_point','estimated_payback_period','return_amount','roi','project_profitability','price_floor');
 
 		$data = $this->getCalculateData($request);
 		//新版本内容
@@ -1080,6 +1093,14 @@ class RoiController extends Controller
 				$updateAjaxData['year_sales_amount'] = $data[$field];
 			}else{
 				$updateAjaxData[$field] = $data[$field];
+			}
+			//配置需要转换为万为单位的金额数据
+			$amount_field = array('return_amount','year_purchase_amount','year_exception_amount','year_promo','year_platform_commission','year_platform_operate','year_platform_storage','year_import_tax','year_transport','put_cost','capital_occupy_cost','change_cost','contribute_cost_total','marginal_profit_per_pcs','total_fixed_cost','estimated_labor_cost');
+			if(in_array($field,$amount_field) && $updateAjaxData[$field]>=10000){
+				$updateAjaxData[$field] = $this->twoDecimal($updateAjaxData[$field]/10000).'万';
+			}
+			if($field=='total_sales_amount' && $updateAjaxData['year_sales_amount']>=10000){
+				$updateAjaxData['year_sales_amount'] = $this->twoDecimal($updateAjaxData['year_sales_amount']/10000).'万';
 			}
 
 		}
@@ -1263,7 +1284,7 @@ class RoiController extends Controller
 
 		//新版本内容
 		$update_data['total_sales_volume'] = $total_sales_volume;//年销售量===
-		$update_data['total_sales_amount'] = round($total_sales_amount);//年销售金额===
+		$update_data['total_sales_amount'] = $this->twoDecimal($total_sales_amount);//年销售金额===
 		$update_data['year_purchase_amount'] = $this->twoDecimal($purchase_cost);//年采购金额===
 		$update_data['year_exception_amount'] = $this->twoDecimal($total_exception_amount);//年异常金额===
 		$update_data['year_promo'] = $this->twoDecimal($total_promo_amount);//年推广费
@@ -1281,7 +1302,7 @@ class RoiController extends Controller
 		$update_data['marginal_profit_per_pcs'] = $this->twoDecimal($marginal_profit_per_pcs);//单位平均边际贡献===原来有的
 		$update_data['total_fixed_cost'] = $this->twoDecimal($total_fixed_cost);//固定成本===
 //		$update_data['estimated_labor_cost'] = $update_data['estimated_labor_cost'];//人力成本===原来有的
-		$update_data['profit_loss_point'] = $breakeven_point_sales_volume;//盈亏临界点(销量)===
+		$update_data['profit_loss_point'] = round($breakeven_point_sales_volume);//盈亏临界点(销量)===
 		$update_data['estimated_payback_period'] = $estimated_payback_period;//投资回收期(月)===原来有的
 		$update_data['return_amount'] = $this->twoDecimal($return_amount/10000);//投资回报额===原来有的
 		$update_data['roi'] = $roi < 0 ? '∞' : $roi;//投资回报率===原来有的
@@ -1293,7 +1314,7 @@ class RoiController extends Controller
 		$update_data['average_promo_rate'] = $average_promo_rate;
 		$update_data['average_exception_rate'] = $average_exception_rate;
 		$update_data['early_investment'] = $early_investment;//前期开发投入
-		$update_data['price_floor'] = $price_floor;
+		$update_data['price_floor'] = $this->twoDecimal($price_floor);
 
 		return $update_data;
 

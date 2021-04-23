@@ -166,7 +166,7 @@
                 <div style="height: 5px;"></div>
                 <div>
                     <table id="sales_table" border="1" cellspacing="0" cellpadding="0">
-                        <tr>
+                        <tr id="sales_table_th">
                             <th colspan="2" width="200px" style="text-align: center">项目/时间</th>
                             <th width="100px">{{$roi['month_1']}}</th>
                             <th width="100px">{{$roi['month_2']}}</th>
@@ -353,6 +353,13 @@
                     <div style="width:1501px">
                         <table id="result_table" border="0" cellspacing="0" cellpadding="0">
                             <tr>
+                                <td><span class="grey_color">投资回收期(月) :</span> <span class="bold" id="estimated_payback_period">{{$roi['estimated_payback_period']}}</span></td>
+                                <td><span class="grey_color">投资回报额 :</span> <span class="bold" id="return_amount">{{$roi['return_amount']}}</span></td>
+                                <td><span class="grey_color">投资回报率 :</span> <span class="bold" id="roi">{{$roi['roi']}}</span></td>
+                                <td><span class="grey_color">利润率 :</span> <span class="bold" id="project_profitability">{{$roi['project_profitability']}}</span></td>
+                            </tr>
+
+                            <tr>
                                 <td><span class="grey_color">年销售量 :</span> <span class="bold" id="total_sales_volume">{{$roi['total_sales_volume']}}</span></td>
                                 <td><span class="grey_color">年销售金额 :</span> <span class="bold" id="total_sales_amount">{{$roi['total_sales_amount']}}</span></td>
                                 <td><span class="grey_color">年采购金额 :</span> <span class="bold" id="year_purchase_amount">{{$roi['year_purchase_amount']}}</span></td>
@@ -388,11 +395,10 @@
                             </tr>
 
                             <tr>
-                                <td><span class="grey_color">投资回收期(月) :</span> <span class="bold" id="estimated_payback_period">{{$roi['estimated_payback_period']}}</span></td>
-                                <td><span class="grey_color">投资回报额 :</span> <span class="bold" id="return_amount">{{$roi['return_amount']}}</span></td>
-                                <td><span class="grey_color">投资回报率 :</span> <span class="bold" id="roi">{{$roi['roi']}}</span></td>
-                                <td><span class="grey_color">利润率 :</span> <span class="bold" id="project_profitability">{{$roi['project_profitability']}}</span></td>
+                                <td><span class="grey_color">底限价格 :</span> <span class="bold" id="price_floor">{{$roi['price_floor']}}</span></td>
                             </tr>
+
+
                         </table>
                     </div>
                 </div>

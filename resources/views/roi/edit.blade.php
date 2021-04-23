@@ -159,7 +159,7 @@
                                 <span style="color: #999999;" title="预计新品可正式上线销售的时间"><i class="fa fa-info-circle"></i></span>
                             </div>
                             <div class="input-group date date-picker" data-date-format="yyyy-mm-dd">
-                                <input type="text" style="width:125px" class="form-control form-filter input-sm" readonly name="estimated_launch_time" placeholder="Date" value="{{$roi['estimated_launch_time']}}" />
+                                <input id="estimated_launch_time" type="text" style="width:125px" class="form-control form-filter input-sm" readonly name="estimated_launch_time" placeholder="Date" value="{{$roi['estimated_launch_time']}}" />
                                 <span style="width:20px; height:26px" class="input-group-btn">
                                     <button class="btn btn-sm default time-btn" type="button">
                                         <i class="fa fa-calendar"></i>
@@ -199,7 +199,7 @@
                     <div style="height: 5px;"></div>
                     <div>
                         <table id="sales_table" border="1" cellspacing="0" cellpadding="0">
-                            <tr>
+                            <tr id="sales_table_th">
                                 <th colspan="2" width="200px" style="text-align: center">项目/时间</th>
                                 <th width="100px">第1月</th>
                                 <th width="100px">第2月</th>
@@ -590,6 +590,13 @@
                         <div style="width:1501px">
                             <table id="result_table" border="0" cellspacing="0" cellpadding="0">
                                 <tr>
+                                    <td><span class="grey_color">投资回收期(月) :</span> <span class="bold" id="estimated_payback_period"></span></td>
+                                    <td><span class="grey_color">投资回报额 :</span> <span class="bold" id="return_amount"></span></td>
+                                    <td><span class="grey_color">投资回报率 :</span> <span class="bold" id="roi"></span></td>
+                                    <td><span class="grey_color">利润率 :</span> <span class="bold" id="project_profitability"></span></td>
+                                </tr>
+
+                                <tr>
                                     <td><span class="grey_color">年销售量 :</span> <span class="bold" id="year_sales_volume"></span></td>
                                     <td><span class="grey_color">年销售金额 :</span> <span class="bold" id="year_sales_amount"></span></td>
                                     <td><span class="grey_color">年采购金额 :</span> <span class="bold" id="year_purchase_amount"></span></td>
@@ -625,11 +632,10 @@
                                 </tr>
 
                                 <tr>
-                                    <td><span class="grey_color">投资回收期(月) :</span> <span class="bold" id="estimated_payback_period"></span></td>
-                                    <td><span class="grey_color">投资回报额 :</span> <span class="bold" id="return_amount"></span></td>
-                                    <td><span class="grey_color">投资回报率 :</span> <span class="bold" id="roi"></span></td>
-                                    <td><span class="grey_color">利润率 :</span> <span class="bold" id="project_profitability"></span></td>
+                                    <td><span class="grey_color">底限价格 :</span> <span class="bold" id="price_floor"></span></td>
                                 </tr>
+
+
                             </table>
                         </div>
                     </div>
@@ -688,6 +694,42 @@
             }
         });
     }
+    //预计上线时间改动的时候，项目/时间显示第n个月的年月，
+    $("#estimated_launch_time").change(function(){
+        var date = $('#estimated_launch_time').val();
+        var data = new Date(date);
+        var year = data.getFullYear();
+        data.setMonth(data.getMonth()+1, 1)//获取到当前月份,设置月份
+
+        var html = '<th colspan="2" width="200px" style="text-align: center">项目/时间</th>';
+        var m = data.getMonth();
+        m = m < 10 ? "0" + m : m;
+        var y = data.getFullYear();
+        if(m==0){
+            m = 12;
+            y = y-1;
+        }
+        html += '<th width="100px">'+y+"-"+(m)+'</th>';
+        var year_month = '';
+
+        for (var i = 0; i < 11; i++) {
+            data.setMonth(data.getMonth() + 1);//每次循环一次 月份值减1
+            var m = data.getMonth();
+            m = m < 10 ? "0" + m : m;
+            var y = data.getFullYear();
+            if(m==0){
+                m = 12;
+                y = y-1;
+            }
+
+            year_month = y + "-" + (m);
+            html += '<th width="100px">'+year_month+'</th>';
+        }
+        html += '<th width="100px">合计</th>';
+        $('#sales_table_th').html(html);
+    })
+
+
 
     $('#collaboratorsSelect').on('changed.bs.select', function(e) {
         var selected_values = $(this).val();
@@ -707,6 +749,8 @@
             $("#collaboratorsSelect").val(collaborators.split(','));
             $('#collaborators').val(collaborators);
         }
+
+        $("#estimated_launch_time").trigger("change");
 
         refresh_time();
     });
