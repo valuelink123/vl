@@ -921,7 +921,7 @@ class RoiController extends Controller
         $roi['marginal_profit_per_pcs'] = $this->twoDecimal($roi['marginal_profit_per_pcs']);
         $roi['capital_turnover'] = $this->twoDecimal($roi['capital_turnover']);
         $roi['roi'] = $this->toPercentage($roi['roi']);
-        $roi['return_amount'] = $this->twoDecimal($roi['return_amount']/10000);
+        $roi['return_amount'] = $this->twoDecimal($roi['return_amount']);
 
         return $roi;
     }
@@ -986,6 +986,7 @@ class RoiController extends Controller
 				$roi[$field] = $this->twoDecimal($roi[$field]/10000).'万';
 			}
 		}
+
 
         $billingPeriods = $this->getBillingPeriods();
         $transportModes = $this->getTransportModes();
@@ -1304,7 +1305,7 @@ class RoiController extends Controller
 //		$update_data['estimated_labor_cost'] = $update_data['estimated_labor_cost'];//人力成本===原来有的
 		$update_data['profit_loss_point'] = round($breakeven_point_sales_volume);//盈亏临界点(销量)===
 		$update_data['estimated_payback_period'] = $estimated_payback_period;//投资回收期(月)===原来有的
-		$update_data['return_amount'] = $this->twoDecimal($return_amount/10000);//投资回报额===原来有的
+		$update_data['return_amount'] = $this->twoDecimal($return_amount);//投资回报额===原来有的
 		$update_data['roi'] = $roi < 0 ? '∞' : $roi;//投资回报率===原来有的
 		$update_data['project_profitability'] = $project_profitability;//利润率===原来有的
 
