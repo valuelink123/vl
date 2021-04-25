@@ -1229,8 +1229,8 @@ class RoiController extends Controller
 		$capital_turnover = $inventory_turnover_days!=0 ? 360/$inventory_turnover_days : 0; ///1.0本本的计算方式 365/($inventory_turnover_days-$billing_days+14);
 		//投入资金
 		$invest_capital = ((($inventory_turnover_days-$billing_days+14)*$total_sales_volume/365)*($purchase_cost+$transport_cost+$tariff_amount)/$total_sales_volume);
-		//资金占用成本
-		$capital_cost = $invest_capital * 0.18;
+		//资金占用成本,资金占用成本，原来是乘以18%，现在改为乘以10%
+		$capital_cost = $invest_capital * 0.1;
 		//变动成本费用小计
 		$variable_cost =  $purchase_cost + $transport_cost + ($tariff_amount + $vat_amount) + ($commission_amount + $operating_fee) + $total_promo_amount + $storage_fee + $capital_cost;
 		//边际贡献总额
