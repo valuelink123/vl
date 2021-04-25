@@ -608,6 +608,8 @@
 
         let item_code = $item_code.val().trim()
 
+	$item_code.val(item_code.toUpperCase())
+
         let $sellerSkuSelector = $item_code.closest('.mt-repeater-row').find('.seller-sku-selector')
 
         if ($sellerSkuSelector.attr('list') === `list-${item_code}-stocks`) return

@@ -118,7 +118,7 @@ class PushDailyReport extends Command
 		$amazonCategories = DB::connection('amazon')->table('amazon_categories')->pluck('product_category_name','product_category_id');
 		
 		foreach($ranks as $rank){
-			$rankData[$rank->asin]['keywords'][array_get($amazonCategories,$rank->product_category_id,str_replace(array('_display_on_website','_'),array('',' '),$rank->product_category_id))]=>$rank->rank;
+			$rankData[$rank->asin]['keywords'][array_get($amazonCategories,$rank->product_category_id,str_replace(array('_display_on_website','_'),array('',' '),$rank->product_category_id))]=$rank->rank;
 		}
 			
 
