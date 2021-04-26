@@ -457,9 +457,8 @@ var FormEditable = function() {
 		$('.sku_ranking').editable({
 			emptytext:'N/A',
 			validate: function (value) {
-				var  objRegExp= /^P\d+\-\d+$/i;
-                if (!objRegExp.test(value)) {
-                    return 'Must be P?-? format';
+				if (isNaN(value)) {
+                    return 'Must be a number';
                 }
             },
 			success: function (response) { 
