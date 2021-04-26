@@ -88,7 +88,7 @@
 
 $(function() {
     $.validator.addMethod("rankFormat",function(value,element){
-                var objRegExp= /^\d+$/i;
+                var  objRegExp= /^P\d+\-\d+$/i;
                 return objRegExp.test(value);
             },"Must be Number format");
             
