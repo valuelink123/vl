@@ -118,7 +118,7 @@ class PushDailyReport extends Command
 		$amazonCategories = DB::connection('amazon')->table('amazon_categories')->pluck('product_category_name','product_category_id');
 		
 		foreach($ranks as $rank){
-			$rankData[$rank->asin]['keywords'][array_get($amazonCategories,$rank->product_category_id,str_replace(array('_display_on_website','_'),array('',' '),$rank->product_category_id))]=$rank->rank;
+			$rankData[$rank->asin]['ranking'][array_get($amazonCategories,$rank->product_category_id,str_replace(array('_display_on_website','_'),array('',' '),$rank->product_category_id))]=$rank->rank;
 		}
 			
 
@@ -126,7 +126,7 @@ class PushDailyReport extends Command
         $updateData = array_merge_deep($orderData,$reviewData,$fbaData,$fbmData,$rankData);
         foreach($updateData as $key=>$data){
             unset($data['asin']);
-			if(isset($data['keywords'])) $data['keywords'] = json_encode($data['keywords']);
+			if(isset($data['ranking'])) $data['ranking'] = json_encode($data['ranking']);
             Skusweekdetails::updateOrCreate(
                 [
                     'asin'=>$key,
