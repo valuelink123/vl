@@ -112,8 +112,8 @@ class PushDailyReport extends Command
 			->leftJoin('seller_accounts',function($key){
 				$key->on('seller_asins.seller_account_id', '=', 'seller_accounts.id');
 			})
-            ->where('seller_accounts.mws_marketplaceid',$marketplace_id)
-            ->selectRaw('seller_asins.asin,seller_accounts.mws_marketplaceid,min(seller_asin_rankings.rank) as rank,seller_asin_rankings.product_category_id')->where('seller_asin_rankings.date',$date)
+            ->where('seller_accounts.mws_marketplaceid',$marketplace_id)->where('seller_asin_rankings.date',$date)
+            ->selectRaw('seller_asins.asin,seller_accounts.mws_marketplaceid,min(seller_asin_rankings.rank) as rank,seller_asin_rankings.product_category_id')
             ->groupBy(['seller_asins.asin','seller_accounts.mws_marketplaceid','seller_asin_rankings.product_category_id'])->get();
 		$amazonCategories = DB::connection('amazon')->table('amazon_categories')->pluck('product_category_name','product_category_id');
 		
