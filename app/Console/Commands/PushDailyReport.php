@@ -104,10 +104,29 @@ class PushDailyReport extends Command
         }else{
             $fbaData = $fbmData = [];
         }
+		$rankData = [];
+		$ranks = DB::connection('amazon')->table('seller_asin_rankings')
+			->leftJoin('seller_asins',function($key){
+				$key->on('seller_asin_rankings.seller_asin_id', '=', 'seller_asins.id');
+			})
+			->leftJoin('seller_accounts',function($key){
+				$key->on('seller_asins.seller_account_id', '=', 'seller_accounts.id');
+			})
+            ->where('seller_accounts.mws_marketplaceid',$marketplace_id)->where('seller_asin_rankings.date',$date)
+            ->selectRaw('seller_asins.asin,seller_accounts.mws_marketplaceid,min(seller_asin_rankings.rank) as rank,seller_asin_rankings.product_category_id')
+            ->groupBy(['seller_asins.asin','seller_accounts.mws_marketplaceid','seller_asin_rankings.product_category_id'])->get();
+		$amazonCategories = DB::connection('amazon')->table('amazon_categories')->pluck('product_category_name','product_category_id');
+		
+		foreach($ranks as $rank){
+			$rankData[$rank->asin]['ranking'][array_get($amazonCategories,$rank->product_category_id,str_replace(array('_display_on_website','_'),array('',' '),$rank->product_category_id))]=$rank->rank;
+		}
+			
 
-        $updateData = array_merge_deep($orderData,$reviewData,$fbaData,$fbmData);
+
+        $updateData = array_merge_deep($orderData,$reviewData,$fbaData,$fbmData,$rankData);
         foreach($updateData as $key=>$data){
             unset($data['asin']);
+			if(isset($data['ranking'])) $data['ranking'] = json_encode($data['ranking']);
             Skusweekdetails::updateOrCreate(
                 [
                     'asin'=>$key,

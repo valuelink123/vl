@@ -87,11 +87,10 @@
 <script type="text/javascript">
 
 $(function() {
-    
     $.validator.addMethod("rankFormat",function(value,element){
-                var objRegExp= /^P\d+\-\d+$/i;
+                var  objRegExp= /^P\d+\-\d+$/i;
                 return objRegExp.test(value);
-            },"Must be P?-? format");
+            },"Must be Number format");
             
     FormRepeater.init();
     $('#update_form').submit(function() {

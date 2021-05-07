@@ -552,6 +552,13 @@
                 <table id="result_table" border="0" cellspacing="0" cellpadding="0">
 
                     <tr>
+                        <td><span class="grey_color">投资回收期(月) :</span> <span class="bold" id="estimated_payback_period"></span></td>
+                        <td><span class="grey_color">投资回报额 :</span> <span class="bold" id="return_amount"></span></td>
+                        <td><span class="grey_color">投资回报率 :</span> <span class="bold" id="roi"></span></td>
+                        <td><span class="grey_color">利润率 :</span> <span class="bold" id="project_profitability"></span></td>
+                    </tr>
+
+                    <tr>
                         <td><span class="grey_color">年销售量 :</span> <span class="bold" id="year_sales_volume"></span></td>
                         <td><span class="grey_color">年销售金额 :</span> <span class="bold" id="year_sales_amount"></span></td>
                         <td><span class="grey_color">年采购金额 :</span> <span class="bold" id="year_purchase_amount"></span></td>
@@ -587,11 +594,9 @@
                     </tr>
 
                     <tr>
-                        <td><span class="grey_color">投资回收期(月) :</span> <span class="bold" id="estimated_payback_period"></span></td>
-                        <td><span class="grey_color">投资回报额 :</span> <span class="bold" id="return_amount"></span></td>
-                        <td><span class="grey_color">投资回报率 :</span> <span class="bold" id="roi"></span></td>
-                        <td><span class="grey_color">利润率 :</span> <span class="bold" id="project_profitability"></span></td>
+                        <td><span class="grey_color">底限价格 :</span> <span class="bold" id="price_floor"></span></td>
                     </tr>
+
                 </table>
             </div>
         </div>

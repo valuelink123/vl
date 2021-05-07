@@ -363,7 +363,15 @@ font-weight:bold;
 							@endif
 							</a>
 							</td>
-							<td class="ranking_s"><a class="sku_ranking" href="javascript:;" id="{{$key}}:ranking" data-pk="{{$key}}:ranking" data-type="text" title="排名 P数字-数字 格式">{{array_get($data->details,$week.'.ranking')}} </a></td>
+							<td>
+							@if(empty(json_decode(array_get($data->details,$week.'.ranking'),true)))
+								N/A		
+							@else
+								@foreach(json_decode(array_get($data->details,$week.'.ranking'),true) as $k => $v)						
+								{{$v}} in {{$k}}<BR>
+								@endforeach
+							@endif
+							</td>
 							
 							<td>{{round(array_get($data->details,$week.'.rating'),1)}}</td>
 							
@@ -453,24 +461,6 @@ var FormEditable = function() {
 		
 		$('.sku_strategy').editable({
 			emptytext:'N/A'
-		});
-		$('.sku_ranking').editable({
-			emptytext:'N/A',
-			validate: function (value) {
-				var  objRegExp= /^P\d+\-\d+$/i;
-                if (!objRegExp.test(value)) {
-                    return 'Must be P?-? format';
-                }
-            },
-			success: function (response) { 
-				var obj = JSON.parse(response);
-				for(var jitem in obj){
-					$('#'+jitem).text(obj[jitem]);
-				}
-			}, 
-			error: function (response) { 
-				return 'remote error'; 
-			} 
 		});
 
 		$('.sku_flow,.sku_conversion').editable({

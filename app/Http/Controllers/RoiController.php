@@ -645,17 +645,52 @@ class RoiController extends Controller
                     <div style="height: 20px;"></div>
                     <div style="width:1501px">
                         <table id="result_table" border="0" cellspacing="0" cellpadding="0">
-                            <tr>
-                                <td><span class="grey_color">投资回报额(万元) :</span> <span class="bold">' . $roi['return_amount'] . '</span></td>
-                                <td><span class="grey_color">投资回报率ROI(%) :</span> <span class="bold">' . $roi['roi'] . '</span></td>
-                                <td width="25%"><span class="grey_color">项目利润率(%) :</span> <span class="bold">' . $roi['project_profitability'] . '</span></td>
+                        	<tr>
+                                <td><span class="grey_color">投资回收期(月) :</span> <span class="bold" id="estimated_payback_period">'.$roi['estimated_payback_period'].'</span></td>
+                                <td><span class="grey_color">投资回报额 :</span> <span class="bold" id="return_amount">'.$roi['return_amount'].'</span></td>
+                                <td><span class="grey_color">投资回报率 :</span> <span class="bold" id="roi">'.$roi['roi'].'</span></td>
+                                <td><span class="grey_color">利润率 :</span> <span class="bold" id="project_profitability">'.$roi['project_profitability'].'</span></td>
                             </tr>
-                            <tr>
-                                <td width="25%"><span class="grey_color">底线价格(外币/元) :</span> <span class="bold">' . $roi['price_floor'] . '</span></td>
-                                <td width="25%"><span class="grey_color">资金周转次数(次) :</span> <span class="bold">' . $roi['capital_turnover'] . '</span></td>
-                                <td><span class="grey_color">库存周转天数(天) :</span> <span class="bold">' . $roi['inventory_turnover_days'] . '</span></td>
-                                <td width="25%"><span class="grey_color">单PCS边际利润(元) :</span> <span class="bold">' . $roi['marginal_profit_per_pcs'] . '</span></td>
+                            
+                        	<tr>
+                                <td><span class="grey_color">年销售量 :</span> <span class="bold" id="total_sales_volume">'.$roi['total_sales_volume'].'</span></td>
+                                <td><span class="grey_color">年销售金额 :</span> <span class="bold" id="total_sales_amount">'.$roi['total_sales_amount'].'</span></td>
+                                <td><span class="grey_color">年采购金额 :</span> <span class="bold" id="year_purchase_amount">'.$roi['year_purchase_amount'].'</span></td>
+                                <td><span class="grey_color">年异常金额 :</span> <span class="bold" id="year_exception_amount">'.$roi['year_exception_amount'].'</span></td>
                             </tr>
+
+                            <tr>
+                                <td><span class="grey_color">年推广费 :</span> <span class="bold" id="year_promo">'.$roi['year_promo'].'</span></td>
+                                <td><span class="grey_color">年平台佣金 :</span> <span class="bold" id="year_platform_commission">'.$roi['year_platform_commission'].'</span></td>
+                                <td><span class="grey_color">年平台操作费 :</span> <span class="bold" id="year_platform_operate">'.$roi['year_platform_operate'].'</span></td>
+                                <td><span class="grey_color">年平台仓储费 :</span> <span class="bold" id="year_platform_storage">'.$roi['year_platform_storage'].'</span></td>
+                            </tr>
+
+                            <tr>
+                                <td><span class="grey_color">年进口税 :</span> <span class="bold" id="year_import_tax">'.$roi['year_import_tax'].'</span></td>
+                                <td><span class="grey_color">年物流费 :</span> <span class="bold" id="year_transport">'.$roi['year_transport'].'</span></td>
+                                <td><span class="grey_color">库存周转天数 :</span> <span class="bold" id="inventory_turnover_days">'.$roi['inventory_turnover_days'].'</span></td>
+                                <td><span class="grey_color">资金周转次数 :</span> <span class="bold" id="capital_turnover">'.$roi['capital_turnover'].'</span></td>
+                            </tr>
+
+                            <tr>
+                                <td><span class="grey_color">投入资金 :</span> <span class="bold" id="put_cost">'.$roi['put_cost'].'</span></td>
+                                <td><span class="grey_color">资金占用成本 :</span> <span class="bold" id="capital_occupy_cost">'.$roi['capital_occupy_cost'].'</span></td>
+                                <td><span class="grey_color">变动成本费用小计 :</span> <span class="bold" id="change_cost">'.$roi['change_cost'].'</span></td>
+                                <td><span class="grey_color">边际贡献总额 :</span> <span class="bold" id="contribute_cost_total">'.$roi['contribute_cost_total'].'</span></td>
+                            </tr>
+
+                            <tr>
+                                <td><span class="grey_color">单位平均边际贡献 :</span> <span class="bold" id="marginal_profit_per_pcs">'.$roi['marginal_profit_per_pcs'].'</span></td>
+                                <td><span class="grey_color">固定成本 :</span> <span class="bold" id="total_fixed_cost">'.$roi['total_fixed_cost'].'</span></td>
+                                <td><span class="grey_color">人力成本 :</span> <span class="bold" id="estimated_labor_cost">'.$roi['estimated_labor_cost'].'</span></td>
+                                <td><span class="grey_color">盈亏临界点(销量) :</span> <span class="bold" id="profit_loss_point">'.$roi['profit_loss_point'].'</span></td>
+                            </tr>
+                            
+                            <tr>
+                                <td><span class="grey_color">底限价格 :</span> <span class="bold" id="price_floor">'.$roi['price_floor'].'</span></td>
+                            </tr>
+                            
                         </table>
                     </div>
                 </div>
@@ -886,7 +921,7 @@ class RoiController extends Controller
         $roi['marginal_profit_per_pcs'] = $this->twoDecimal($roi['marginal_profit_per_pcs']);
         $roi['capital_turnover'] = $this->twoDecimal($roi['capital_turnover']);
         $roi['roi'] = $this->toPercentage($roi['roi']);
-        $roi['return_amount'] = $this->twoDecimal($roi['return_amount']/10000);
+        $roi['return_amount'] = $this->twoDecimal($roi['return_amount']);
 
         return $roi;
     }
@@ -922,7 +957,7 @@ class RoiController extends Controller
             }
         }
 
-        if(!$visible) die('Permission denied');
+        if(!$visible) die('Permission denied');//测试时关闭
 
         $canArchive = false;
         if($isUserAdmin || $isUserProductDirector){
@@ -944,6 +979,15 @@ class RoiController extends Controller
     }
 
     public function showPageDataFormat($roi){
+		//配置需要转换为万为单位的金额数据
+		$amount_field = array('return_amount','total_sales_amount','year_purchase_amount','year_exception_amount','year_promo','year_platform_commission','year_platform_operate','year_platform_storage','year_import_tax','year_transport','put_cost','capital_occupy_cost','change_cost','contribute_cost_total','marginal_profit_per_pcs','total_fixed_cost','estimated_labor_cost');
+		foreach($amount_field as $field){
+			if($roi[$field]>=10000){
+				$roi[$field] = $this->twoDecimal($roi[$field]/10000).'万';
+			}
+		}
+
+
         $billingPeriods = $this->getBillingPeriods();
         $transportModes = $this->getTransportModes();
         $transport_mode_int = $roi['transport_mode'];
@@ -1034,7 +1078,7 @@ class RoiController extends Controller
 
     public function analyse(Request $request){
 		//点击"分析"按钮时，返回的数组，用于ajax异步更新页面数据
-		$configField = array('total_sales_volume','total_sales_amount','year_purchase_amount','year_exception_amount','year_promo','year_platform_commission','year_platform_operate','year_platform_storage','year_import_tax','year_transport','inventory_turnover_days','capital_turnover','put_cost','capital_occupy_cost','change_cost','contribute_cost_total','marginal_profit_per_pcs','total_fixed_cost','estimated_labor_cost','profit_loss_point','estimated_payback_period','return_amount','roi','project_profitability');
+		$configField = array('total_sales_volume','total_sales_amount','year_purchase_amount','year_exception_amount','year_promo','year_platform_commission','year_platform_operate','year_platform_storage','year_import_tax','year_transport','inventory_turnover_days','capital_turnover','put_cost','capital_occupy_cost','change_cost','contribute_cost_total','marginal_profit_per_pcs','total_fixed_cost','estimated_labor_cost','profit_loss_point','estimated_payback_period','return_amount','roi','project_profitability','price_floor');
 
 		$data = $this->getCalculateData($request);
 		//新版本内容
@@ -1050,6 +1094,14 @@ class RoiController extends Controller
 				$updateAjaxData['year_sales_amount'] = $data[$field];
 			}else{
 				$updateAjaxData[$field] = $data[$field];
+			}
+			//配置需要转换为万为单位的金额数据
+			$amount_field = array('return_amount','year_purchase_amount','year_exception_amount','year_promo','year_platform_commission','year_platform_operate','year_platform_storage','year_import_tax','year_transport','put_cost','capital_occupy_cost','change_cost','contribute_cost_total','marginal_profit_per_pcs','total_fixed_cost','estimated_labor_cost');
+			if(in_array($field,$amount_field) && $updateAjaxData[$field]>=10000){
+				$updateAjaxData[$field] = $this->twoDecimal($updateAjaxData[$field]/10000).'万';
+			}
+			if($field=='total_sales_amount' && $updateAjaxData['year_sales_amount']>=10000){
+				$updateAjaxData['year_sales_amount'] = $this->twoDecimal($updateAjaxData['year_sales_amount']/10000).'万';
 			}
 
 		}
@@ -1177,8 +1229,8 @@ class RoiController extends Controller
 		$capital_turnover = $inventory_turnover_days!=0 ? 360/$inventory_turnover_days : 0; ///1.0本本的计算方式 365/($inventory_turnover_days-$billing_days+14);
 		//投入资金
 		$invest_capital = ((($inventory_turnover_days-$billing_days+14)*$total_sales_volume/365)*($purchase_cost+$transport_cost+$tariff_amount)/$total_sales_volume);
-		//资金占用成本
-		$capital_cost = $invest_capital * 0.18;
+		//资金占用成本,资金占用成本，原来是乘以18%，现在改为乘以10%
+		$capital_cost = $invest_capital * 0.1;
 		//变动成本费用小计
 		$variable_cost =  $purchase_cost + $transport_cost + ($tariff_amount + $vat_amount) + ($commission_amount + $operating_fee) + $total_promo_amount + $storage_fee + $capital_cost;
 		//边际贡献总额
@@ -1233,7 +1285,7 @@ class RoiController extends Controller
 
 		//新版本内容
 		$update_data['total_sales_volume'] = $total_sales_volume;//年销售量===
-		$update_data['total_sales_amount'] = round($total_sales_amount);//年销售金额===
+		$update_data['total_sales_amount'] = $this->twoDecimal($total_sales_amount);//年销售金额===
 		$update_data['year_purchase_amount'] = $this->twoDecimal($purchase_cost);//年采购金额===
 		$update_data['year_exception_amount'] = $this->twoDecimal($total_exception_amount);//年异常金额===
 		$update_data['year_promo'] = $this->twoDecimal($total_promo_amount);//年推广费
@@ -1251,9 +1303,9 @@ class RoiController extends Controller
 		$update_data['marginal_profit_per_pcs'] = $this->twoDecimal($marginal_profit_per_pcs);//单位平均边际贡献===原来有的
 		$update_data['total_fixed_cost'] = $this->twoDecimal($total_fixed_cost);//固定成本===
 //		$update_data['estimated_labor_cost'] = $update_data['estimated_labor_cost'];//人力成本===原来有的
-		$update_data['profit_loss_point'] = $breakeven_point_sales_volume;//盈亏临界点(销量)===
+		$update_data['profit_loss_point'] = round($breakeven_point_sales_volume);//盈亏临界点(销量)===
 		$update_data['estimated_payback_period'] = $estimated_payback_period;//投资回收期(月)===原来有的
-		$update_data['return_amount'] = $this->twoDecimal($return_amount/10000);//投资回报额===原来有的
+		$update_data['return_amount'] = $this->twoDecimal($return_amount);//投资回报额===原来有的
 		$update_data['roi'] = $roi < 0 ? '∞' : $roi;//投资回报率===原来有的
 		$update_data['project_profitability'] = $project_profitability;//利润率===原来有的
 
@@ -1263,7 +1315,7 @@ class RoiController extends Controller
 		$update_data['average_promo_rate'] = $average_promo_rate;
 		$update_data['average_exception_rate'] = $average_exception_rate;
 		$update_data['early_investment'] = $early_investment;//前期开发投入
-		$update_data['price_floor'] = $price_floor;
+		$update_data['price_floor'] = $this->twoDecimal($price_floor);
 
 		return $update_data;
 

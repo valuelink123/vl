@@ -490,7 +490,7 @@ function curl_request($url,$post='',$cookie='', $returnCookie=0){
         curl_setopt($curl, CURLOPT_AUTOREFERER, 1);
         if($post) {
             curl_setopt($curl, CURLOPT_POST, 1);
-            curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($post));
+            curl_setopt($curl, CURLOPT_POSTFIELDS, is_array($post)?http_build_query($post):$post);
         }
         if($cookie) {
             curl_setopt($curl, CURLOPT_COOKIE, $cookie);
