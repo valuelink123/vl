@@ -442,3 +442,6 @@ Route::match(['post','get'],'/returnAnalysis/returnAnalysis', 'ReturnAnalysisCon
 Route::match(['post','get'],'/returnAnalysis/asinAnalysis', 'ReturnAnalysisController@asinAnalysis');//asin退货分析，维度：asin+币种+account
 Route::match(['post','get'],'/returnAnalysis/skuAnalysis', 'ReturnAnalysisController@skuAnalysis');//sku退货分析，维度：sku+币种
 
+Route::get('/finance','FinanceDashBoardController@index');//财务看板
+
+

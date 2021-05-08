@@ -169,6 +169,11 @@
                                                         <li class=" ">
                                                             <a href="{{url('service')}}" class="nav-link "> CS Dashboard </a>
                                                         </li>
+                                                        <li class="">
+                                                            <a href="/finance" class="nav-link nav-toggle ">
+                                                                Finance Dashboard
+                                                            </a>
+                                                        </li>
                                                     </ul>
                                                 </li>
 												@permission('sales-report-show')
