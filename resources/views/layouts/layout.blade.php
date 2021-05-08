@@ -169,6 +169,11 @@
                                                         <li class=" ">
                                                             <a href="{{url('service')}}" class="nav-link "> CS Dashboard </a>
                                                         </li>
+                                                        <li class="">
+                                                            <a href="/finance" class="nav-link nav-toggle ">
+                                                                Finance Dashboard
+                                                            </a>
+                                                        </li>
                                                     </ul>
                                                 </li>
 												@permission('sales-report-show')
@@ -246,12 +251,6 @@
                                                 <li class="">
                                                     <a href="/returnAnalysis/skuAnalysis" class="nav-link nav-toggle ">
                                                         SKU Return analysis
-                                                        <span class="arrow"></span>
-                                                    </a>
-                                                </li>
-                                                <li class="">
-                                                    <a href="/finance" class="nav-link nav-toggle ">
-                                                        Finance
                                                         <span class="arrow"></span>
                                                     </a>
                                                 </li>
