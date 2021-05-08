@@ -23,8 +23,9 @@
                         <div class="input-group" id="account-div">
                             <span class="input-group-addon">Account</span>
                             <select style="width:100%;" class="btn btn-default" id="account" data-width="100%" name="account">
+                                <option value="">Select</option>
                             @foreach($account as $ka=>$va)
-                                    <option value="{{$ka}}" @if($ka==$seller_account_id) selected  @endif>{{$va}}</option>
+                                <option value="{{$ka}}" @if($ka==$seller_account_id) selected  @endif>{{$va}}</option>
                             @endforeach
                             </select>
 {{--                            <select class="btn btn-default" id="account" multiple="multiple" data-width="100%" data-action-onchange="true" name="account" id="account[]">--}}
