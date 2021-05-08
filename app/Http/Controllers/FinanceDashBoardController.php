@@ -59,12 +59,12 @@ class FinanceDashBoardController extends Controller
 
 	public function index(Request $request)
 	{
-		$account = DB::connection('vlz')->table('seller_accounts')->where('primary',1)->pluck('label', 'id')->toArray();
+		$account = DB::connection('vlz')->table('seller_accounts')->where('primary',1)->whereNotNull('deleted_at')->orderBy('label','asc')->pluck('label', 'id')->toArray();
 		$site = getMarketDomain();//获取站点选项
 
 		$date_from = $request->get('date_from');
 		$date_to = $request->get('date_to');
-		$seller_account_id = $request->get('account',current(array_keys($account)));
+		$seller_account_id = $request->get('account','');
 
 		if (is_null($date_from) || empty(trim($date_from))) {
 			$date_from = $this->default_date_from;
@@ -77,12 +77,16 @@ class FinanceDashBoardController extends Controller
 		if ($date_from > $date_to) {
 			$date_from = $date_to;
 		}
-//		echo $seller_account_id;exit;
+		if($seller_account_id){
+			$account_sel = array($seller_account_id);
+		}else{
+			$account_sel = array_keys($account);
+		}
 		$rates = DB::connection('amazon')->table('currency_rates')->pluck('rate', 'currency');
 
-		$shipped_fees = $this->shippedOrderFinanceCalc($rates, $date_from, $date_to,$seller_account_id);
+		$shipped_fees = $this->shippedOrderFinanceCalc($rates, $date_from, $date_to,$account_sel);
 
-		$settlement_fees = $this->settlementFinanceCalc($rates, $date_from, $date_to,$seller_account_id);
+		$settlement_fees = $this->settlementFinanceCalc($rates, $date_from, $date_to,$account_sel);
 
 		$table_th = array('shipment_fee_amount'=>'Shipment Fee Amount', 'order_fee_amount'=>'Order Fee Amount', 'price_amount'=>'Price Amount','item_related_fee_amount'=>'Item Related Fee Amount','misc_fee_amount'=>'misc Fee Amount','other_fee_amount'=>'other Fee Amount','promotion_amount'=>'promotion Amount','direct_payment_amount'=>'direct Payment Amount','other_amount'=>'Other Amount');
 
@@ -99,16 +103,15 @@ class FinanceDashBoardController extends Controller
 	 * @param string $date_to 查询结束时间
 	 * @return array
 	 */
-	protected function shippedOrderFinanceCalc($rates, string $date_from, string $date_to,$seller_account_id): array
+	protected function shippedOrderFinanceCalc($rates, string $date_from, string $date_to,$account_sel): array
 	{
 		$shipped_orders_data = $this->shippedOrderModel
 			->where('posted_date', '>=', $date_from)
 			->where('posted_date', '<=', $date_to)
-			->where('seller_account_id',$seller_account_id)
+			->whereIn('seller_account_id',$account_sel)
 			->selectRaw('seller_account_id,item_type,type_id,sum( amount ) AS amount,currency')
 			->groupBy(['seller_account_id', 'item_type', 'type_id', 'currency'])
 			->get();
-
 
 		$INCOME = 'income';
 		$PROMOTION = 'promotion';
@@ -163,12 +166,12 @@ class FinanceDashBoardController extends Controller
 	 * @param string $date_to 查询结束时间
 	 * @return array
 	 */
-	protected function settlementFinanceCalc($rates, string $date_from, string $date_to,$seller_account_id): array
+	protected function settlementFinanceCalc($rates, string $date_from, string $date_to,$account_sel): array
 	{
 		$settlement_data = $this->settlementDetailModel
 			->where('posted_date', '>=', $date_from)
 			->where('posted_date', '<=', $date_to)
-			->where('seller_account_id',$seller_account_id)
+			->whereIn('seller_account_id',$account_sel)
 			->selectRaw('
                 seller_account_id,
                 transaction_type,
