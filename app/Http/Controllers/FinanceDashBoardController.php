@@ -59,7 +59,7 @@ class FinanceDashBoardController extends Controller
 
 	public function index(Request $request)
 	{
-		$account = DB::connection('vlz')->table('seller_accounts')->where('primary',1)->orderBy('label','asc')->pluck('label', 'id')->toArray();
+		$account = DB::connection('vlz')->table('seller_accounts')->where('primary',1)->whereNotNull('deleted_at')->orderBy('label','asc')->pluck('label', 'id')->toArray();
 		$site = getMarketDomain();//获取站点选项
 
 		$date_from = $request->get('date_from');
