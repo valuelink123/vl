@@ -249,6 +249,12 @@
                                                         <span class="arrow"></span>
                                                     </a>
                                                 </li>
+                                                <li class="">
+                                                    <a href="/finance" class="nav-link nav-toggle ">
+                                                        Finance
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
                                             </ul>
                                         </li>
 
