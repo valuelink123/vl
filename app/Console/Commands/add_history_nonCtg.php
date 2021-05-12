@@ -47,7 +47,9 @@ class Nonctg extends Command
         $today = date('Y-m-d');
         echo 'Execution add_history_nonctg.php script start time:'.$today."\n";
         DB::connection()->enableQueryLog(); // 开启查询日志
-        $config = getActiveUserConfig();//得到配置信息
+		$config = array(
+			array('db'=>'website','dbname'=>'`vip-support_jp`','name'=>'vip-support.jp','formid'=>array(1),'fields'=>array('name'=>'2.3','email'=>3,'orderid'=>4)),
+		);
         $sap = new SapRfcRequest();
         $date = '2020-07-01 00:00:00';//需要跑的历史记录时间
 
