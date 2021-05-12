@@ -444,4 +444,14 @@ Route::match(['post','get'],'/returnAnalysis/skuAnalysis', 'ReturnAnalysisContro
 
 Route::get('/finance','FinanceDashBoardController@index');//财务看板
 
+Route::resource('platformsku', 'Platform\PlatFormSkuController');
+Route::Post('/platformsku/get', 'Platform\PlatFormSkuController@get');
+Route::Post('/platformsku/batchUpdate', 'Platform\PlatFormSkuController@batchUpdate');
+Route::resource('platformship', 'Platform\PlatFormShipController');
+Route::Post('/platformship/get', 'Platform\PlatFormShipController@get');
+Route::Post('/platformship/batchUpdate', 'Platform\PlatFormShipController@batchUpdate');
+Route::resource('platformorder', 'Platform\PlatFormOrderController');
+Route::Post('/platformorder/get', 'Platform\PlatFormOrderController@get');
+Route::Post('/platformorder/batchUpdate', 'Platform\PlatFormOrderController@batchUpdate');
+
 
