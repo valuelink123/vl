@@ -48,9 +48,19 @@ th,td,td>span {
                                 </a>
                             </div>
 							@endpermission
+                            
                         </div>
 						<div class="col-md-8 " >
+                        
 							@permission('exception-export')
+                            <input id="importFile" name="importFile" type="file" style="display:none">
+							{{ csrf_field() }}
+							<input id="importFileTxt" name="importFileTxt" type="text" class="form-control input-inline">
+							<a id="importButton" class="btn red input-inline" >Browse</a>
+
+							<button id="importSubmit" class="btn blue input-inline">Upload</button>
+		
+							<a href="{{ url('/uploads/exception/exception.xls')}}" class="help-inline" style="margin-top:8px;margin-left:10px;">Template </a>
                             <div class="btn-group " style="float:right;">
                                 <button id="vl_list_export" class="btn sbold blue"> Export
                                     <i class="fa fa-download"></i>
@@ -398,6 +408,50 @@ $(function() {
 
 	$("#vl_list_export").click(function(){
 		location.href='/exceptionexport?sellerid='+$("select[name='sellerid']").val()+'&amazon_order_id='+$("input[name='amazon_order_id']").val()+'&date_from='+$("input[name='date_from']").val()+'&date_to='+$("input[name='date_to']").val()+'&type='+$("select[name='type']").val()+'&order_sku='+$("input[name='order_sku']").val()+'&status='+$("select[name='status']").val()+'&user_id='+$("input[name='user_id']").val()+'&group_id='+$("select[name='group_id']").val()+'&operator_id='+$("input[name='operator_id']").val()+'&resellerid='+$("select[name='resellerid']").val()+'&resku='+$("input[name='resku']").val()+'&bgbu='+$("select[name='bgbu']").val()+'&sap_seller_id='+$("select[name='sap_seller_id']").val();
+	});
+
+
+    $("#importButton,#importFileTxt").click(function(){
+		$("#importFile").trigger("click");
+	});
+
+	$('input[id=importFile]').change(function() {
+		$('#importFileTxt').val($(this).val());
+	});
+
+	$("#importSubmit").click(function () {
+		var fileObj = document.getElementById("importFile").files[0];
+		if (typeof (fileObj) == "undefined" || fileObj.size <= 0) {
+			alert("Please Select File!");
+			return false;
+		}
+		var formFile = new FormData();
+		formFile.append("file", fileObj);
+		var data = formFile;
+		$.ajaxSetup({
+			headers: { 'X-CSRF-TOKEN' : '{{ csrf_token() }}' }
+		});
+		$.ajax({
+			url: "/exception/upload",
+			data: data,
+			type: "Post",
+			dataType: "json",
+			cache: false,
+			processData: false,
+			contentType: false,
+			success: function (result) {
+				if(result.customActionStatus=='OK'){  
+					toastr.success(result.customActionMessage);
+                    var dttable = $('#datatable_ajax').dataTable();
+					dttable.api().ajax.reload(null, false);
+				}else{
+					toastr.error(result.customActionMessage);
+				}
+			},
+			error: function(result) {
+                toastr.error(result.responseText);
+			}
+		});
 	});
 });
 

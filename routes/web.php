@@ -88,6 +88,7 @@ Route::get('/exception/111/111', 'ExceptionController@get')->name('getException'
 Route::Post('/exception/getorder', 'ExceptionController@getrfcorder')->name('getExceptionOrder');
 Route::Post('/exception/getrepeatorder', 'ExceptionController@getRepeatOrder')->name('getRepeatOrder');
 Route::get('/exceptionexport', 'ExceptionController@export')->name('exportException');
+Route::Post('/exception/upload', 'ExceptionController@upload');
 Route::get('/reviewexport', 'ReviewController@export')->name('exportReview');
 Route::get('/dreportexport', 'SkuController@export')->name('exportDreport');
 Route::get('/config_option', 'ConfigOptionController@index')->name('config_option');
