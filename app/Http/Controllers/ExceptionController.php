@@ -1526,9 +1526,9 @@ class ExceptionController extends Controller
 					$i++;
 					$row=['amazon_order_id'=>$amazon_order_id,'sellerid'=>$sellerid,'name'=>$name,
 					'request_content'=>$request_content,'descrip'=>$descrip,'type'=>$type,'date'=>date('Y-m-d H:i:s'),
-					'user_id'=>$user_id,'group_id'=>$group_id];
-					if(trim(array_get($data,'G'))) $row['refund'] = round(trim(array_get($data,'G')),2);
-					if(trim(array_get($data,'H'))) $row['gift_card_amount'] = round(trim(array_get($data,'H')),2);
+					'user_id'=>$user_id,'group_id'=>$group_id,'process_status'=>'submit'];
+					$row['refund'] = round(trim(array_get($data,'G')),2);
+					$row['gift_card_amount'] = round(trim(array_get($data,'H')),2);
 					$row['replacement']['shipname'] = trim(array_get($data,'I'));
 					$row['replacement']['countrycode'] = trim(array_get($data,'J'));
 					$row['replacement']['state'] = trim(array_get($data,'K'));
