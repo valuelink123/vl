@@ -15,6 +15,7 @@ use App\Models\PlatformOrderItem;
 use App\Models\GuCangOrderItem;
 use App\Models\GuCangOrderBox;
 use App\Models\GuCangOrderFee;
+use App\User;
 
 class SyncGuCang extends Command
 {
@@ -280,9 +281,13 @@ class SyncGuCang extends Command
             'platform_orders.is_change_label',
             'platform_orders.age_detection',
             'platform_orders.LiftGate',
+			'platform_orders.user_id','platform_orders.order_code',
             ])->toArray();
         foreach($orders as $order){
             $orderId = $order['id'];
+			$user_id = $order['user_id'];
+			$user = User::find($user_id);
+			if(empty($user)) continue;
             $items = PlatformOrderItem::where('platform_order_id',$orderId)
             ->leftJoin('platform_skus',function($key){
                 $key->on('platform_order_items.product_sku', '=', 'platform_skus.platform_sku');
@@ -292,13 +297,32 @@ class SyncGuCang extends Command
             ->get(['platform_skus.product_sku','platform_order_items.fba_product_code','platform_order_items.quantity','platform_order_items.transaction_id','platform_order_items.item_id'])
             ->toArray();
             $order['items'] = $items;
-            unset($order['id']);
+            unset($order['id']);unset($order['user_id']);
+			$order['verify']=1;
             $returnData = $this->request->createOrder($order);
             $updateData = [];
             $updateData['sync_status'] = array_get($returnData,'ask')=='Success'?1:-1;
             $updateData['sync_message'] = array_get($returnData,'message');
-            if(array_get($returnData,'ask')=='Success') $updateData['order_code'] = array_get($returnData,'order_code');
+            if(array_get($returnData,'ask')=='Success'){
+				$updateData['order_code'] = array_get($returnData,'order_code');
+				$order['order_code']=array_get($returnData,'order_code');
+			}
+			$order['user_id'] = $user_id;
+			if(array_get($order,'order_code')){
+				$user = User::find($user_id);
+				$arguments['data'] = [$order];
+				$arguments['user_id'] = $user_id;
+				$arguments['timestamp'] = time();
+				$arguments['sign'] = strtoupper(sha1($arguments['user_id'].$arguments['timestamp'].$user->password));
+				$result = curl_request(env('REQUEST_WMS_URL',''),$arguments);
+				$result = json_decode($result,true);
+				if(array_get($result,'ask')=='Success'){
+					$updateData['wms_order_id'] = array_get($result,'data.0.wms_order_id');
+					$updateData['wms_deliver_order_id'] = array_get($result,'data.0.wms_deliver_order_id');
+				}
+			}
             PlatformOrder::where('id',$orderId)->update($updateData);
+			
         }
 	}
 
@@ -340,6 +364,7 @@ class SyncGuCang extends Command
             'platform_orders.is_change_label',
             'platform_orders.age_detection',
             'platform_orders.LiftGate',
+			'platform_orders.user_id',
             ])->toArray();
         foreach($orders as $order){
             $orderId = $order['id'];
@@ -352,6 +377,7 @@ class SyncGuCang extends Command
             ->get(['platform_skus.product_sku','platform_order_items.fba_product_code','platform_order_items.quantity','platform_order_items.transaction_id','platform_order_items.item_id'])
             ->toArray();
             $order['items'] = $items;
+			unset($order['id']);
             $returnData = $this->request->modifyOrder($order);
             $updateData = [];
             $updateData['sync_status'] = array_get($returnData,'ask')=='Success'?1:-1;
