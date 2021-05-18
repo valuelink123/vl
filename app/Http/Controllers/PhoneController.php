@@ -92,13 +92,13 @@ class PhoneController extends Controller
         $end = $iDisplayStart + $iDisplayLength;
         $end = $end > $iTotalRecords ? $iTotalRecords : $end;
 
-		
+		$emailToEncryptedEmail = getEmailToEncryptedEmail();
 		foreach ( $customersLists as $customersList){
 
             $records["data"][] = array(
                 $customersList['id'],
                 $customersList['phone'],
-				$customersList['buyer_email'],
+				isset($emailToEncryptedEmail[$customersList['buyer_email']]) ? $emailToEncryptedEmail[$customersList['buyer_email']] : $customersList['buyer_email'],
 				$customersList['amazon_order_id'],
 				$customersList['content'],
                 isset($users[$customersList['user_id']]) ? $users[$customersList['user_id']] : '未知',
@@ -164,10 +164,11 @@ class PhoneController extends Controller
 
         // 导出表格的数据为$arrayData
         $arrayData[] = $headArray;
+		$emailToEncryptedEmail = getEmailToEncryptedEmail();
         foreach ($customersLists as $key=>$val){
             $arrayData[] = array(
                 $val['phone'],
-                $val['buyer_email'],
+				isset($emailToEncryptedEmail[$val['buyer_email']]) ? $emailToEncryptedEmail[$val['buyer_email']] : $val['buyer_email'],
                 $val['amazon_order_id'],
                 $val['content'],
                 isset($users[$val['user_id']]) ? $users[$val['user_id']] : '未知',
@@ -263,6 +264,7 @@ class PhoneController extends Controller
             $order = DB::table('amazon_orders')->where('SellerId', array_get($phone,'seller_id'))->where('AmazonOrderId', array_get($phone,'amazon_order_id'))->first();
             if($order) $order->item = DB::table('amazon_orders_item')->where('SellerId', array_get($phone,'seller_id'))->where('AmazonOrderId', array_get($phone,'amazon_order_id'))->get();
         }
+		$emailToEncryptedEmail = getEmailToEncryptedEmail();
 		
         return view('phone/edit',['phone'=>$phone,'users'=>$this->getUsers(),'accounts'=>$this->getAccounts(),'groups'=>$this->getGroups(),'sellerids'=>$this->getSellerIds(),'order'=>($order)?$order:array()]);
     }

@@ -1542,3 +1542,15 @@ function blackEmail()
 		'testireba5@gmail.com'
 	);
 }
+
+function getEmailToEncryptedEmail()
+{
+	$emailData = array();
+	if (Cache::has('email')) {
+		$emailData = Cache::get('email');
+ 	}else{
+		$emailData = DB::table('client_info')->pluck('encrypted_email', 'email')->toArray();
+		Cache::forever('email', $emailData);
+	}
+	return $emailData;
+}

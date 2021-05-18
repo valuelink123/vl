@@ -6,9 +6,10 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use DB;
+use Illuminate\Support\Facades\DB;
 use Log;
 use App\Classes\SapRfcRequest;
+use Cache;
 
 class AddClient extends Command
 {
@@ -52,13 +53,22 @@ class AddClient extends Command
 		// $this->date = '2019-06-01';//测试日期
 		$this->sap = new SapRfcRequest();
 		DB::connection()->enableQueryLog(); // 开启查询日志
-		Log::Info('Add History Client Start...');
+		Log::Info('Add Client Start...');
+//		Log::info(Cache::get('email_test'));
 		$this->getCtgCrm();
 		$this->getNonCtg();
 		$this->getEmailCrm();
 		$this->getCallCrm();
 		$this->getRsgCrm();
 		$this->getReviewCrm();
+		//查询出邮箱对应关系
+		$sql = 'select encrypted_email,email from client_info';
+		$_data = $this->queryRows($sql);
+		foreach($_data as $key=>$val){
+			$emailData[$val['email']] = $val['encrypted_email'];
+		}
+		Cache::forever('email', $emailData);
+//		Log::info(Cache::get('email_test'));
 	}
 
 	/*
