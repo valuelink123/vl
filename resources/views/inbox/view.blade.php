@@ -167,7 +167,7 @@
                                                     <img class="avatar" alt="" src="/assets/layouts/layout/img/avatar.png">
                                                     <div class="message">
                                                         <span class="arrow"> </span>
-                                                        <a href="javascript:;" class="name"> {{$unread_email->from_name}}  < {{$unread_email->from_address}} >  </a>
+                                                        <a href="javascript:;" class="name"> {{$unread_email->from_name}}  < @if(isset($emailToEncryptedEmail[$unread_email->from_address])) {{$emailToEncryptedEmail[$unread_email->from_address]}}  @else {{$unread_email->from_address}}  @endif >  </a>
                                                         <span class="datetime"> at {{$unread_email->date}} </span>
                                                         <span class="body" style="font-size:14px;"><a href="{{url('inbox/'.$unread_email->id)}}"> {{$unread_email->subject}} </a> </span>
                                                     </div>
@@ -495,7 +495,7 @@
                                             </div>
                                             <div class="mt-author" style="float:right;text-align:right">
                                                 <div class="mt-author-name" style="text-align:right">
-                                                    <span class="font-red-madison" >From : {{$s_email['from_name']}}  < {{$s_email['from_address']}} ></span>{!! $s_email['fromAddressRsgStatusHtml'] !!}
+                                                    <span class="font-red-madison" >From : {{$s_email['from_name']}}  < @if(isset($emailToEncryptedEmail[$s_email['from_address']])) {{$emailToEncryptedEmail[$s_email['from_address']]}}  @else {{$s_email['from_address']}}  @endif></span>{!! $s_email['fromAddressRsgStatusHtml'] !!}
                                                 </div>
                                                 <div class="mt-author-name" style="text-align:right">
                                                     <span class="font-blue-madison" >To : @if(isset($accounts[strtolower($s_email['to_address'])])) {{$accounts[strtolower($s_email['to_address'])]}} @endif < {{$s_email['to_address']}} ></span>{!! $s_email['toAddressRsgStatusHtml'] !!}
@@ -556,7 +556,7 @@
                                                 </div>
                                                 <div style="clear: both"></div>
                                                 <div class="mt-author-name" style="text-align:left; float:left">
-                                                    <span href="javascript:;" class="font-blue-madison" >To : {{$s_email['to_address']}}</span>{!! $s_email['toAddressRsgStatusHtml'] !!}
+                                                    <span href="javascript:;" class="font-blue-madison" >To : @if(isset($emailToEncryptedEmail[$s_email['to_address']])) {{$emailToEncryptedEmail[$s_email['to_address']]}}  @else {{$s_email['to_address']}}  @endif</span>{!! $s_email['toAddressRsgStatusHtml'] !!}
                                                 </div>
                                                 <div style="clear: both"></div>
                                                 <div class="mt-author-notes font-grey-mint" style="text-align:left">{{$s_email['date']}} <span class="label label-sm label-danger">{{array_get($users,$s_email['user_id'])}}</span></div>

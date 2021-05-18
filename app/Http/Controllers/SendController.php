@@ -224,7 +224,13 @@ class SendController extends Controller
 		$to_address_array = explode(';',str_replace("；",";",$request->get('to_address')));
 
 		$blackEmail = blackEmail();//发邮件的时候，黑名单客户的邮箱
+		$emailToEncryptedEmail = getEmailToEncryptedEmail();
 		foreach($to_address_array as $to_address){
+			$_address = array_search($to_address,$emailToEncryptedEmail);
+			if($_address){
+				$to_address = $_address;
+			}
+
 			if(in_array(trim($to_address),$blackEmail)){
 				$request->session()->flash('error_message','有黑名单客户的邮箱');
 				return redirect()->back()->withInput();
@@ -317,6 +323,7 @@ class SendController extends Controller
     {
 		if(!Auth::user()->can(['sendbox-show'])) die('Permission denied -- sendbox-show');
         $email = Sendbox::where('id',$id)->first();
+		$emailToEncryptedEmail = getEmailToEncryptedEmail();
 
         $email->toArray();
 		$email_from_history = Inbox::where('date','<',$email['date'])->where('from_address',$email['to_address'])->where('to_address',$email['from_address'])
@@ -370,7 +377,7 @@ class SendController extends Controller
             $order = DB::table('amazon_orders')->where('SellerId', $amazon_seller_id)->where('AmazonOrderId', $amazon_order_id)->first();
             if($order) $order->item = DB::table('amazon_orders_item')->where('SellerId', $amazon_seller_id)->where('AmazonOrderId', $amazon_order_id)->get();
         }
-		return view('send/view',['email_history'=>$email_history,'order'=>$order,'email'=>$email,'users'=>$this->getUsers(),'accounts'=>$this->gAccounts(),'account_type'=>$account_type]);
+		return view('send/view',['email_history'=>$email_history,'order'=>$order,'email'=>$email,'users'=>$this->getUsers(),'accounts'=>$this->gAccounts(),'account_type'=>$account_type,'emailToEncryptedEmail'=>$emailToEncryptedEmail]);
     }
     public function get()
     {
@@ -446,6 +453,7 @@ class SendController extends Controller
         $end = $end > $iTotalRecords ? $iTotalRecords : $end;
 		$users = $this->getUsers();
 
+		$emailToEncryptedEmail = getEmailToEncryptedEmail();
         foreach ( $customersLists as $customersList){
             if($customersList['send_date']){
                 $status = '<span class="label label-sm label-success">'.$customersList['send_date'].'</span> ';
@@ -457,7 +465,7 @@ class SendController extends Controller
             $records["data"][] = array(
                 '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input name="id[]" type="checkbox" class="checkboxes" value="'.$customersList['id'].'"/><span></span></label>',
                 $customersList['from_address'],
-                $customersList['to_address'],
+				isset($emailToEncryptedEmail[$customersList['to_address']]) ? $emailToEncryptedEmail[$customersList['to_address']] : $customersList['to_address'],
                 '<a href="/send/'.$customersList['id'].'" style="color:#333;" target="_blank">'.$customersList['subject'].'</a>',
                 $customersList['date'],
 				array_get($users,$customersList['user_id']),

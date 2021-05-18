@@ -171,7 +171,7 @@
                                         </div>
                                         <div class="mt-author" style="float:right;text-align:right">
                                             <div class="mt-author-name" style="text-align:right">
-                                                <span class="font-red-madison" >From : {{$s_email['from_name']}}  < {{$s_email['from_address']}} ></span>
+                                                <span class="font-red-madison" >From : {{$s_email['from_name']}}  < @if(isset($emailToEncryptedEmail[$s_email['from_address']])) {{$emailToEncryptedEmail[$s_email['from_address']]}}  @else {{$s_email['from_address']}}  @endif ></span>
                                             </div>
                                             <div class="mt-author-name" style="text-align:right">
                                                 <span class="font-blue-madison" >To : {{$accounts[strtolower($s_email['to_address'])]}} < {{$s_email['to_address']}} ></span>
@@ -226,7 +226,7 @@
                                                 <span class="font-red-madison" >From : {{$accounts[strtolower($s_email['from_address'])]}} < {{$s_email['from_address']}} ></span>
                                             </div>
                                             <div class="mt-author-name" style="text-align:left">
-                                                <span href="javascript:;" class="font-blue-madison" >To : {{$s_email['to_address']}}</span>
+                                                <span href="javascript:;" class="font-blue-madison" >To : @if(isset($emailToEncryptedEmail[$s_email['to_address']])) {{$emailToEncryptedEmail[$s_email['to_address']]}}  @else {{$s_email['to_address']}}  @endif</span>
                                             </div>
                                             <div class="mt-author-notes font-grey-mint" style="text-align:left">{{$s_email['date']}} <span class="label label-sm label-danger">{{array_get($users,$s_email['user_id'])}}</span></div>
                                         </div>
