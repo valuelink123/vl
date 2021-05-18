@@ -180,7 +180,7 @@ class RsgrequestsController extends Controller
         $iDisplayLength = intval($_REQUEST['length']);
         $iDisplayLength = $iDisplayLength < 0 ? $iTotalRecords : $iDisplayLength;
         $iDisplayStart = intval($_REQUEST['start']);
-		$lists =  $datas->orderBy($orderby,$sort)->offset($iDisplayStart)->limit($iDisplayLength)->get(['rsg_requests.*','rsg_products.asin','rsg_products.site','rsg_products.seller_id','rsg_products.user_id','client_info.facebook_name','client_info.facebook_group','client.rsg_status','client.rsg_status_explain'])->toArray();
+		$lists =  $datas->orderBy($orderby,$sort)->offset($iDisplayStart)->limit($iDisplayLength)->get(['rsg_requests.*','rsg_products.asin','rsg_products.site','rsg_products.seller_id','rsg_products.user_id','client_info.facebook_name','client_info.encrypted_email','client_info.facebook_group','client.rsg_status','client.rsg_status_explain'])->toArray();
 
 		$fbgroupConfig = getFacebookGroup();
 		$users= $this->getUsers();
@@ -197,7 +197,7 @@ class RsgrequestsController extends Controller
 				$explain_step = $explain;
 				if($list['rsg_status']==1){
 					//邮箱后面显示红色圆圈
-					$lists[$key]['customer_email'] = $list['customer_email'].'<div class="unavailable" title="'.$explain.'"></div>';
+					$lists[$key]['customer_email'] = ($list['encrypted_email']??$list['customer_email']).'<div class="unavailable" title="'.$explain.'"></div>';
 					//下面是关于step后面显示的红色打叉和绿色打钩的处理（rsg申请自动审核状态）
 					//当rsg_status_explain=6的时候，还要看rsg request的状态
 					if($list['rsg_status_explain']==6){
@@ -219,11 +219,14 @@ class RsgrequestsController extends Controller
 					}
 				}else{
 					//邮箱后面显示绿色圆圈,step后面显示绿色打钩
-					$lists[$key]['customer_email'] = $list['customer_email'].'<div class="available"></div>';
+					$lists[$key]['customer_email'] = ($list['encrypted_email']??$list['customer_email']).'<div class="available"></div>';
 					$lists[$key]['step'] .= '<div class="fa green fa-check pull-right"></div>';
 				}
 
+			}else{
+				$lists[$key]['customer_email'] =($list['encrypted_email']??$list['customer_email']);
 			}
+			
 			$lists[$key]['channel'] = isset($channelKeyVal[$list['channel']]) ? $channelKeyVal[$list['channel']] : '';
 			$lists[$key]['asin_link'] = '<a href="https://'.array_get($list,'site').'/dp/'.array_get($list,'asin').'" target="_blank">'.$list['asin'].'</a>';
 			$lists[$key]['funded'] = sprintf("%.2f",(isset($starData[$list['asin'].'_'.$list['site']]) ? $starData[$list['asin'].'_'.$list['site']] : $list['transfer_amount'])).' '.$list['transfer_currency'];
@@ -231,7 +234,7 @@ class RsgrequestsController extends Controller
 			$lists[$key]['sales'] = isset($users[$list['user_id']]) ? $users[$list['user_id']] : $list['user_id'];
 			$lists[$key]['group'] = isset($fbgroupConfig[$list['facebook_group']]) ? $fbgroupConfig[ $list['facebook_group']] : '';
 			$lists[$key]['processor'] = array_get($users,$list['processor']);
-			$lists[$key]['action'] = '<a data-target="#ajax" data-toggle="modal" href="'.url('rsgrequests/'.$list['id'].'/edit').'" class="badge badge-success"> View </a> <a class="btn btn-danger btn-xs" href="'.url('rsgrequests/process?email='.$list['customer_email']).'" target="_blank">Process</a>';
+			$lists[$key]['action'] = '<a data-target="#ajax" data-toggle="modal" href="'.url('rsgrequests/'.$list['id'].'/edit').'" class="badge badge-success"> View </a> <a class="btn btn-danger btn-xs" href="'.url('rsgrequests/process?email='.($list['encrypted_email']??$list['customer_email'])).'" target="_blank">Process</a>';
 			$updateHistory = [];
 			$count = count($list['logs']);
 			for($i=0; $i<$count-1; $i++){
@@ -437,10 +440,9 @@ class RsgrequestsController extends Controller
 	public function process(Request $req){
 
 		if ($req->isMethod('GET')) {
-
-			$emails = DB::table('sendbox')->where('to_address', $req->input('email'))->orderBy('date', 'desc')->get();
+			$email = (DB::table('client_info')->where('encrypted_email',$req->input('email'))->value('email'))??$req->input('email');
+			$emails = DB::table('sendbox')->where('to_address', $email)->orderBy('date', 'desc')->get(['*',DB::RAW('\''.$req->input('email').'\' as to_address')]);
 			$emails = json_decode(json_encode($emails), true); // todo
-
 			$users= $this->getUsers();
 		}
 		return view('rsgrequests/process',['emails'=>$emails,'users'=>$users]);
@@ -621,13 +623,13 @@ class RsgrequestsController extends Controller
 		//查询该邮箱是否存在于client_info中，查出需要显示的facebook_name和facebook_group
 		$rule['facebook_name'] = '';
 		$rule['facebook_group'] = '';
-		$clientInfo = DB::table('client_info')->where('email',$rule['customer_email'])->get(array('facebook_name','facebook_group'))->first();
+		$clientInfo = DB::table('client_info')->where('email',$rule['customer_email'])->get(array('facebook_name','facebook_group','encrypted_email'))->first();
 		if($clientInfo){
 			$fbgroupConfig = getFacebookGroup();
 			$rule['facebook_name'] = $clientInfo->facebook_name;
 			$rule['facebook_group'] = isset($fbgroupConfig[ $clientInfo->facebook_group]) ? $clientInfo->facebook_group.' | '.$fbgroupConfig[ $clientInfo->facebook_group] : $clientInfo->facebook_group;
-
 		}
+		$rule['customer_email'] = empty($clientInfo)?$rule['customer_email']:$clientInfo->encrypted_email;
         return view('rsgrequests/edit',['rule'=>$rule,'product'=>$product,'products'=>self::getproducts()]);
     }
 	
@@ -814,7 +816,7 @@ where payer='$customer_paypal_email' order by timestamp asc");
 		})->leftjoin('client_info', 'rsg_requests.customer_email', '=', 'client_info.email');
 
 		//$datas->count();
-		$lists =  $datas->orderBy($orderby,$sort)->get(['rsg_requests.*','rsg_products.asin','rsg_products.site','rsg_products.seller_id','rsg_products.user_id','client_info.facebook_name','client_info.facebook_group'])->toArray();
+		$lists =  $datas->orderBy($orderby,$sort)->get(['rsg_requests.*','rsg_products.asin','rsg_products.site','rsg_products.seller_id','rsg_products.user_id','client_info.facebook_name','client_info.facebook_group','client_info.encrypted_email'])->toArray();
 
 		$users = $this->getUsers();
 		$channelKeyVal = getRsgRequestChannel();
@@ -825,7 +827,7 @@ where payer='$customer_paypal_email' order by timestamp asc");
 			$arrayData[] = array(
 				$val['created_at'],
 				isset($channelKeyVal[$val['channel']]) ? $channelKeyVal[$val['channel']] : '',
-				$val['customer_email'],
+				$val['encrypted_email']??$val['customer_email'],
 				$val['asin'],
 				array_get(getStepStatus(),$val['step']),
 				$val['customer_paypal_email'],
