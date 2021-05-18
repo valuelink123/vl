@@ -88,7 +88,7 @@ class CrmController extends Controller
                 $action = '<a href="'.url('crm/trackLogAdd?id='.$val['id']).'" target="_blank" class="badge badge-success"> Add Activity </a>';
 			}
 			//点击Batch Send群发邮件时，提取收件人email。
-			$data[$key]['email_hidden'] = $val['email'];
+			$data[$key]['email_hidden'] = $val['encrypted_email']??$val['email'];
 
 			if($val['amazon_profile_page']){
 				$amazonPage = str_replace("http://","",$val['amazon_profile_page']);
