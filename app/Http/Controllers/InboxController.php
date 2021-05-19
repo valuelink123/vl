@@ -714,8 +714,13 @@ class InboxController extends Controller
             //$customers = $customers->where('from_address', 'like', '%'.$_REQUEST['from_address'].'%');
 			
 			$keywords = array_get($_REQUEST,'from_address');
-            $customers = $customers->where(function ($query) use ($keywords) {
+            $customers = $customers->where(function ($query) use ($keywords,$emailToEncryptedEmail) {
+				$_address = array_search($keywords,$emailToEncryptedEmail);
+				if(empty($_address)){
+					$_address = $keywords;
+				}
                 $query->where('from_address'  , 'like', '%'.$keywords.'%')
+						->orwhere('from_address', 'like', '%'.$_address.'%')
                         ->orwhere('from_name', 'like', '%'.$keywords.'%');
 
             });

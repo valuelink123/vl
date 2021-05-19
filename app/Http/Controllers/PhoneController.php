@@ -58,12 +58,25 @@ class PhoneController extends Controller
         $customers = new Phone;
 
         //新添加的搜索选项（创建人姓名，buyer_email，amazon_order_id，content）
-        $searchField = array('phone','buyer_email','amazon_order_id','content');
+        $searchField = array('phone','amazon_order_id','content');
         foreach($searchField as $field){
-            if(array_get($_REQUEST,$field)){
-                $customers = $customers->where($field, 'like', '%'.$_REQUEST[$field].'%');
-            }
+			if(array_get($_REQUEST,$field)){
+				$customers = $customers->where($field, 'like', '%'.$_REQUEST[$field].'%');
+			}
         }
+		$emailToEncryptedEmail = getEmailToEncryptedEmail();
+		if(array_get($_REQUEST,'buyer_email')){
+			$keywords =$_REQUEST['buyer_email'];
+			$customers = $customers->where(function ($query) use ($keywords,$emailToEncryptedEmail) {
+				$_address = array_search($keywords,$emailToEncryptedEmail);
+				if(empty($_address)) {
+					$_address = $keywords;
+				}
+				$query->where('buyer_email'  , 'like', '%'.$keywords.'%')
+					->orwhere('buyer_email', 'like', '%'.$_address.'%');
+
+			});
+		}
 
         if(array_get($_REQUEST,'user_name')){
             $username = trim($_REQUEST['user_name']);
@@ -92,12 +105,11 @@ class PhoneController extends Controller
         $end = $iDisplayStart + $iDisplayLength;
         $end = $end > $iTotalRecords ? $iTotalRecords : $end;
 
-		$emailToEncryptedEmail = getEmailToEncryptedEmail();
 		foreach ( $customersLists as $customersList){
-
             $records["data"][] = array(
                 $customersList['id'],
                 $customersList['phone'],
+//				$customersList['buyer_email'],
 				isset($emailToEncryptedEmail[$customersList['buyer_email']]) ? $emailToEncryptedEmail[$customersList['buyer_email']] : $customersList['buyer_email'],
 				$customersList['amazon_order_id'],
 				$customersList['content'],
@@ -133,12 +145,25 @@ class PhoneController extends Controller
         //取出所有用户的id=>name的映射数组
         $users=$this->getUsers();
 
-        $searchField = array('phone','buyer_email','amazon_order_id','content');
+        $searchField = array('phone','amazon_order_id','content');
         foreach($searchField as $field){
             if(array_get($_REQUEST,$field)){
                 $customers = $customers->where($field, 'like', '%'.$_REQUEST[$field].'%');
             }
         }
+		$emailToEncryptedEmail = getEmailToEncryptedEmail();
+		if(array_get($_REQUEST,'buyer_email')){
+			$keywords =$_REQUEST['buyer_email'];
+			$customers = $customers->where(function ($query) use ($keywords,$emailToEncryptedEmail) {
+				$_address = array_search($keywords,$emailToEncryptedEmail);
+				if(empty($_address)){
+					$_address = $keywords;
+				}
+				$query->where('buyer_email'  , 'like', '%'.$keywords.'%')
+					->orwhere('buyer_email', 'like', '%'.$_address.'%');
+
+			});
+		}
 
         if(array_get($_REQUEST,'user_name')){
             $username = trim($_REQUEST['user_name']);
@@ -164,7 +189,6 @@ class PhoneController extends Controller
 
         // 导出表格的数据为$arrayData
         $arrayData[] = $headArray;
-		$emailToEncryptedEmail = getEmailToEncryptedEmail();
         foreach ($customersLists as $key=>$val){
             $arrayData[] = array(
                 $val['phone'],

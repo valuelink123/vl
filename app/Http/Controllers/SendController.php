@@ -405,7 +405,7 @@ class SendController extends Controller
 
             $customers = new Sendbox;
 
-
+		$emailToEncryptedEmail = getEmailToEncryptedEmail();
 
         if(array_get($_REQUEST,'status')){
             if(array_get($_REQUEST,'status')=='Waiting'){
@@ -426,7 +426,16 @@ class SendController extends Controller
             $customers = $customers->where('from_address', 'like', '%'.$_REQUEST['from_address'].'%');
         }
         if(array_get($_REQUEST,'to_address')){
-            $customers = $customers->where('to_address', 'like', '%'.$_REQUEST['to_address'].'%');
+			$keywords = $_REQUEST['to_address'];
+			$customers = $customers->where(function ($query) use ($keywords,$emailToEncryptedEmail) {
+				$_address = array_search($keywords,$emailToEncryptedEmail);
+				if(empty($_address)){
+					$_address = $keywords;
+				}
+				$query->where('to_address'  , 'like', '%'.$keywords.'%')
+					->orwhere('to_address', 'like', '%'.$_address.'%');
+
+			});
         }
 
         if(array_get($_REQUEST,'subject')){
@@ -453,7 +462,6 @@ class SendController extends Controller
         $end = $end > $iTotalRecords ? $iTotalRecords : $end;
 		$users = $this->getUsers();
 
-		$emailToEncryptedEmail = getEmailToEncryptedEmail();
         foreach ( $customersLists as $customersList){
             if($customersList['send_date']){
                 $status = '<span class="label label-sm label-success">'.$customersList['send_date'].'</span> ';
