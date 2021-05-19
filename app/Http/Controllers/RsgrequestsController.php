@@ -127,6 +127,7 @@ class RsgrequestsController extends Controller
 			$datas = $datas->where(function($query)use($keyword){
 				$query->where('facebook_name','like','%'.$keyword.'%')
 					->orWhere('customer_email', 'like', '%'.$keyword.'%')
+					->orWhere('client_info.encrypted_email', 'like', '%'.$keyword.'%')
 					->orWhere('customer_paypal_email', 'like', '%'.$keyword.'%')
 					->orWhere('review_url', 'like', '%'.$keyword.'%')
 					->orWhere('rsg_products.asin', 'like', '%'.$keyword.'%');
@@ -440,7 +441,7 @@ class RsgrequestsController extends Controller
 	public function process(Request $req){
 
 		if ($req->isMethod('GET')) {
-			$email = (DB::table('client_info')->where('encrypted_email',$req->input('email'))->value('email'))??$req->input('email');
+			$email = array_search($req->input('email'),getEmailToEncryptedEmail())??$req->input('email');
 			$emails = DB::table('sendbox')->where('to_address', $email)->orderBy('date', 'desc')->get(['*',DB::RAW('\''.$req->input('email').'\' as to_address')]);
 			$emails = json_decode(json_encode($emails), true); // todo
 			$users= $this->getUsers();

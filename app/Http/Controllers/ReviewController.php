@@ -755,7 +755,7 @@ class ReviewController extends Controller
         $return['remark'] = array_get($review,'remark');
         $return['sellerids'] = $this->getSellerIds();
         $return['accounts'] = $this->getAccounts();
-        $encrypted_email = (DB::table('client_info')->where('email',$review['buyer_email'])->value('encrypted_email'))??$review['buyer_email'];
+        $encrypted_email = array_get(getEmailToEncryptedEmail(),$review['buyer_email'],$review['buyer_email']);
         $return['emails'] = DB::table('sendbox')->where('to_address', array_get($review,'buyer_email'))->orderBy('date','desc')->get(['*',DB::RAW('\''.$encrypted_email.'\' as to_address')]);
         $return['emails'] =json_decode(json_encode($return['emails']), true);
         $review['buyer_email'] = $encrypted_email;
@@ -779,7 +779,7 @@ class ReviewController extends Controller
 
         $seller_account->seller_id = $request->get('rebindordersellerid');
         $seller_account->amazon_order_id = $request->get('rebindorderid');
-        $seller_account->buyer_email = (DB::table('client_info')->where('encrypted_email',$request->get('buyer_email'))->value('email'))??$request->get('buyer_email');
+        $seller_account->buyer_email = array_search($request->get('buyer_email'),getEmailToEncryptedEmail())??$request->get('buyer_email');
         $seller_account->buyer_phone = $request->get('buyer_phone');
         $seller_account->etype = $request->get('etype');
         $seller_account->remark = $request->get('remark');

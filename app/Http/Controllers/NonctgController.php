@@ -68,6 +68,7 @@ class NonctgController extends Controller
                 'item_no'=>'t3.item_no',
                 'from' => 't1.from',
                 'sales' => 't3.seller',
+                'encrypted_email' => 'encrypted_email'
             ],
             [
 				'site' => 't1.SalesChannel',
@@ -194,10 +195,10 @@ class NonctgController extends Controller
             foreach($trackLogData as $k=>$v){
                 $trackLogData[$k]['note'] = nl2br($v['note']);
             }
-            $encrypted_email = DB::table('client_info')->where('email',$dataRow['email'])->value('encrypted_email');
+            $encrypted_email = array_search(getEmailToEncryptedEmail(),$dataRow['email'],$dataRow['email']);
             $emails = DB::table('sendbox')->where('to_address', $dataRow['email'])->orderBy('date', 'desc')->get(['*',DB::RAW('\''.$encrypted_email.'\' as to_address')]);
             $emails = json_decode(json_encode($emails), true); // todo
-            $dataRow['email'] = $encrypted_email??$dataRow['email'];
+            $dataRow['email'] = $encrypted_email;
             return view('nonctg.process', ['ctgRow' => $dataRow, 'trackLogData'=>$trackLogData,'users' => $users, 'order' => $order, 'emails' => $emails,'status'=>getNonCtgStatusKeyVal()]);
 
         }

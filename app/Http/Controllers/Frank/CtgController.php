@@ -75,7 +75,8 @@ class CtgController extends Controller {
                 'brands' => 't4.brands',
                 'bgs' => 't4.bgs',
                 'bus' => 't4.bus',
-                'phone' => 't1.phone'
+                'phone' => 't1.phone',
+                'encrypted_email' => 'encrypted_email'
             ],
             [
                 'phone' => 't1.phone',
@@ -104,7 +105,6 @@ class CtgController extends Controller {
 			$str = '%"review_id":"'.$ins['review_id'].'"%';
 			$where .= " AND t1.steps like '".$str."'";
 		}
-
 		//选择的渠道不同，查不同的表，限制不同的条件
 		$channel = 0;
 		$table = 'ctg';
@@ -587,7 +587,7 @@ class CtgController extends Controller {
         $emails = [];
         $id = isset($_REQUEST['id']) ? $_REQUEST['id'] : '';
         if($id != ''){
-            $emails = DB::table('client_info')->where('client_id', $id)->pluck('email');
+            $emails = DB::table('client_info')->where('client_id', $id)->pluck('encrypted_email');
         }
 
 		return view('frank/ctgAdd', compact(['channel','emails']));
@@ -600,7 +600,7 @@ class CtgController extends Controller {
 
 		if(!Auth::user()->can(['ctg-add'])) die('Permission denied -- ctg-add');
 		$data['name'] = isset($_REQUEST['name']) ? $_REQUEST['name'] : '';
-		$data['email'] = (DB::table('client_info')->where('encrypted_email',$req->get('email'))->value('email'))??$req->get('email');;
+		$data['email'] = array_search($req->get('email'),getEmailToEncryptedEmail())??$req->get('email');
 		$data['note'] = isset($_REQUEST['note']) ? $_REQUEST['note'] : '';
 		$channel= isset($_REQUEST['channel']) ? $_REQUEST['channel'] : '';
 		$data['order_id'] = isset($_REQUEST['order_id']) ? $_REQUEST['order_id'] : '';
