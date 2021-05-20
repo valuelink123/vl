@@ -16,7 +16,7 @@
                                             {{array_get($data,'from_address')}}
                                         </td>
                                         <td>
-                                            {{array_get($data,'to_address')}}
+                                            {{array_get(getEmailToEncryptedEmail(),array_get($data,'to_address'),array_get($data,'to_address'))}}
                                         </td>
                                         <td>
                                             <a href="/send/{{array_get($data,'id')}}" target="_blank"> {{array_get($data,'subject')}}</a>

@@ -67,6 +67,7 @@ class RsgUserController extends Controller
 			if($val['status']==1){
 				$data[$key]['status'] = 'Activated';
 			}
+			$data[$key]['email'] = array_get(getEmailToEncryptedEmail(),$val['email'],$val['email']);
 		}
 		$recordsTotal = $recordsFiltered = $this->queryOne('SELECT FOUND_ROWS()');
 		return compact('data', 'recordsTotal', 'recordsFiltered');
