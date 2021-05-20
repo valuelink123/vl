@@ -470,11 +470,11 @@ class RsgrequestsController extends Controller
         $contactBasic = [];
         $id = isset($_GET['id']) ? $_GET['id'] : '';
         if($id != ''){
-            $results = DB::select('select email,facebook_name,facebook_group from client_info where client_id='.$id);
+            $results = DB::select('select email,encrypted_email,facebook_name,facebook_group from client_info where client_id='.$id);
             $results = array_map('get_object_vars', $results);
             $fbgroupConfig = getFacebookGroup();
             foreach($results as $key=>$val){
-                $emails[] = $val['email'];
+                $emails[] = $val['encrypted_email'];
                 $contactBasic['facebook_name'] = $val['facebook_name'];
                 $contactBasic['facebook_group'] = isset($fbgroupConfig[$val['facebook_group']]) ? $val['facebook_group'].' | '.$fbgroupConfig[$val['facebook_group']] : $val['facebook_group'];
             }
