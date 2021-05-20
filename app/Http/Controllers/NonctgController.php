@@ -195,7 +195,7 @@ class NonctgController extends Controller
             foreach($trackLogData as $k=>$v){
                 $trackLogData[$k]['note'] = nl2br($v['note']);
             }
-            $encrypted_email = array_search(getEmailToEncryptedEmail(),$dataRow['email'],$dataRow['email']);
+            $encrypted_email = array_get(getEmailToEncryptedEmail(),$dataRow['email'],$dataRow['email']);
             $emails = DB::table('sendbox')->where('to_address', $dataRow['email'])->orderBy('date', 'desc')->get(['*',DB::RAW('\''.$encrypted_email.'\' as to_address')]);
             $emails = json_decode(json_encode($emails), true); // todo
             $dataRow['email'] = $encrypted_email;
