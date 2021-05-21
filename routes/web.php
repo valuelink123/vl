@@ -134,6 +134,7 @@ Route::resource('rsgrequests', 'RsgrequestsController');
 Route::Post('/rsgrequests/get', 'RsgrequestsController@get')->name('getrsgrequests');
 Route::get('/rsgrequestsUpdateHistory', 'RsgrequestsController@updateHistory');
 Route::resource('salesp', 'SalespController');
+Route::Post('/salesp/upload', 'SalespController@upload');
 Route::resource('rr', 'RrController');
 Route::Post('/salesp/get', 'SalespController@get')->name('getSalesp');
 Route::resource('proline', 'ProlineController');
