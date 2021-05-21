@@ -1539,7 +1539,23 @@ function blackEmail()
 		'crazycutecloset@mail.com',
 		'alejandroz@protonmail.com',
 		'ashekhani10@stuy.edu',
-		'testireba5@gmail.com'
+		'testireba5@gmail.com',
+		'cababy@comcast.net',
+		'lsprimont@yahoo.com',
+		'zohar@loshitzer.com',
+		'wendyjonesper@yahoo.com',
+		'casielong4@yahoo.com',
+		'jdahl@pipeline.com',
+		'mrjunderwood@gmail.com',
+		'paracouple@comcast.net',
+		'jimhamlett2@gmail.com',
+		'shea.stimac@outlook.com',
+		'kacampbelljd@gmail.com',
+		'villegas13@gmail.com',
+		'yonilivni47@gmail.com',
+		'robert.tow@aol.com',
+		'954fb78b26091ef830a080f14808f22a6585@valuelinkltd.com',
+
 	);
 }
 
