@@ -221,7 +221,11 @@ class SendController extends Controller
 			}
 			$attachs = serialize($request->get('fileid'));
 		}
+
+
 		$to_address_array = explode(';',str_replace("；",";",$request->get('to_address')));
+
+        $to_address_array=array_unique($to_address_array);
 
 		$blackEmail = blackEmail();//发邮件的时候，黑名单客户的邮箱
 		$emailToEncryptedEmail = getEmailToEncryptedEmail();
@@ -232,8 +236,8 @@ class SendController extends Controller
 			}
 
 			if(in_array(trim($to_address),$blackEmail)){
-				$request->session()->flash('error_message','有黑名单客户的邮箱');
-				return redirect()->back()->withInput();
+//				$request->session()->flash('error_message','有黑名单客户的邮箱');
+				continue;
 			}
 			if(trim($to_address)){
 				if($request->get('sendbox_id')){
