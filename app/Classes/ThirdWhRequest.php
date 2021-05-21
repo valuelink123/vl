@@ -1,6 +1,6 @@
 <?php
 namespace App\Classes;
-
+use App\Models\GuCangRequest;
 class ThirdWhRequest {
 
     private $webServiceUrl;
@@ -29,7 +29,7 @@ class ThirdWhRequest {
                 </SOAP-ENV:Body>
             </SOAP-ENV:Envelope>';
             $returnData = curl_request($this->webServiceUrl,$postFields);
-            $returnData = simplexml_load_string($returnData);
+            $returnData = simplexml_load_string(html_entity_decode($returnData));
             $returnData = $returnData->xpath('//response')[0];
             $returnData = json_decode($returnData, true);
         } catch (\Exception $ex) {
@@ -37,7 +37,14 @@ class ThirdWhRequest {
                 'ask'=>'Failure',
                 'message'=>$ex->getMessage(),
             ];
-        } 
+        }
+        GuCangRequest::Create(
+            [
+                'method'=>$method,
+                'request'=>$paramsJson,
+                'response'=>json_encode($returnData),
+            ]
+        );
         return $returnData;
     }
 

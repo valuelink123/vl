@@ -66,7 +66,7 @@ class CrmController extends Controller
 		foreach($data as $key=>$val){
 			$action = '';
             $explain = isset($rsgStatusArr[$val['rsg_status_explain']]) ? $rsgStatusArr[$val['rsg_status_explain']]['vop'] : $val['rsg_status_explain'];
-            $emailHtml = '<a href="'.url('crm/show?id='.$val['id']).'" target="_blank">'.$val['email'].'</a>';
+            $emailHtml = '<a href="'.url('crm/show?id='.$val['id']).'" target="_blank">'.$val['encrypted_email']??$val['email'].'</a>';
             //亚马逊客户是不能邀请做RSG的，不显示红色或绿色圆圈。@amazon.com, @amazon.co, @marketplace.amazon.com
             if($val['email'] && preg_match("/.+@.*amazon.+/", $val['email'])){
                 $rsgStatusHtml = '';
@@ -88,7 +88,7 @@ class CrmController extends Controller
                 $action = '<a href="'.url('crm/trackLogAdd?id='.$val['id']).'" target="_blank" class="badge badge-success"> Add Activity </a>';
 			}
 			//点击Batch Send群发邮件时，提取收件人email。
-			$data[$key]['email_hidden'] = $val['email'];
+			$data[$key]['email_hidden'] = $val['encrypted_email']??$val['email'];
 
 			if($val['amazon_profile_page']){
 				$amazonPage = str_replace("http://","",$val['amazon_profile_page']);
@@ -106,11 +106,11 @@ class CrmController extends Controller
                     $types_array_text[] = array_get(getCrmClientType(), $value);
                 }
                 $type_text = implode(',', $types_array_text);
-                $data[$key]['email'] = $data[$key]['email'].'<br/><font color="red">'.$type_text.'</font>';
+                $data[$key]['email'] = $val['encrypted_email']??$data[$key]['email'].'<br/><font color="red">'.$type_text.'</font>';
             }
 
 			//当点击ctg,rsg,Negative Review所属的数字时，可以链接到相对应的客户列表页面，times_ctg，times_rsg，times_negative_review
-			$email = $val['email'];
+			$email = $val['encrypted_email']??$val['email'];
 			if($val['times_ctg']>0){
 				$data[$key]['times_ctg'] = '<a href="/ctg/list?email='.$email.'" target="_blank">'.$val['times_ctg'].'</a>';
 			}
@@ -195,13 +195,15 @@ class CrmController extends Controller
 				}
 			}elseif($field=='facebook_group'){
 				$where .= " and c.facebook_group = ".intval($value);
+			}elseif($field=='email'){
+				$where .= " and (c.email = '".trim($value)."' or c.encrypted_email = '".trim($value)."')";
 			}else{
 				$whereInfo .= " and {$field}='{$value}'";
 			}
 
 		}
 
-		$sql = "select SQL_CALC_FOUND_ROWS t1.id as id,t1.date as date,c.name as name,c.email as email,c.phone as phone,c.remark as remark,c.country as country,c.`from` as `from`,c.brand as brand,
+		$sql = "select SQL_CALC_FOUND_ROWS t1.id as id,t1.date as date,c.name as name,c.email as email,encrypted_email,c.phone as phone,c.remark as remark,c.country as country,c.`from` as `from`,c.brand as brand,
 t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_sg as times_sg,t1.times_negative_review as times_negative_review,t1.times_positive_review as times_positive_review,t1.type as 'type', t1.rsg_status as rsg_status,t1.rsg_status_explain as rsg_status_explain,if(num>0,num,0) as order_num,b.name as processor,b.bg as bg,b.bu as bu,c.facebook_name as facebook_name,c.facebook_group as facebook_group,c.amazon_profile_page as amazon_profile_page   
 			FROM client as t1 
 		  	left join(
@@ -212,7 +214,7 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_sg as times_sg,t1.t
 				order by users.id desc 
 			) as b on b.processor = t1.processor 
 			join (
-					select count(*) as num,client_id,max(t1.name) as name,max(t1.email) as email,max(t1.phone) as phone,max(t1.remark) as remark,max(t1.country) as country,max(t1.`from`) as `from`,max(t1.brand) as brand,any_value(facebook_name) as facebook_name,any_value(facebook_group) as facebook_group,max(amazon_profile_page) as amazon_profile_page  
+					select count(*) as num,client_id,max(t1.name) as name,max(t1.email) as email,max(t1.encrypted_email) as encrypted_email,max(t1.phone) as phone,max(t1.remark) as remark,max(t1.country) as country,max(t1.`from`) as `from`,max(t1.brand) as brand,any_value(facebook_name) as facebook_name,any_value(facebook_group) as facebook_group,max(amazon_profile_page) as amazon_profile_page  
 					from client_info t1 
 					left join client_order_info as t2 on t1.id = t2.ci_id
 			  		{$whereInfo}
@@ -232,7 +234,7 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_sg as times_sg,t1.t
 		$date_to = $_GET['date_to'];
 
 		$where = " and t1.date >= '".$date_from." 00:00:00' and t1.date <= '".$date_to." 23:59:59'";
-		$sql = $sql = "select t1.id as id,t1.date as date,c.name as name,c.email as email,c.phone as phone,c.remark as remark,c.country as country,c.`from` as `from`,c.brand as brand,
+		$sql = $sql = "select t1.id as id,t1.date as date,c.name as name,c.email as email,encrypted_email,c.phone as phone,c.remark as remark,c.country as country,c.`from` as `from`,c.brand as brand,
 t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as times_negative_review,t1.times_positive_review as times_positive_review,if(num>0,num,0) as order_num,b.name as processor,b.bg as bg,b.bu as bu,c.facebook_name as facebook_name,c.facebook_group as facebook_group,c.amazon_profile_page as amazon_profile_page   
 			FROM client as t1 
 		  	left join(
@@ -243,7 +245,7 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 				order by users.id desc 
 			) as b on b.processor = t1.processor 
 			join (
-					select count(*) as num,client_id,max(t1.name) as name,max(t1.email) as email,max(t1.phone) as phone,max(t1.remark) as remark,max(t1.country) as country,max(t1.`from`) as `from`,max(t1.brand) as brand,any_value(facebook_name) as facebook_name,any_value(facebook_group) as facebook_group,max(amazon_profile_page) as amazon_profile_page  
+					select count(*) as num,client_id,max(t1.name) as name,max(t1.email) as email,max(t1.encrypted_email) as encrypted_email,max(t1.phone) as phone,max(t1.remark) as remark,max(t1.country) as country,max(t1.`from`) as `from`,max(t1.brand) as brand,any_value(facebook_name) as facebook_name,any_value(facebook_group) as facebook_group,max(amazon_profile_page) as amazon_profile_page  
 					from client_info t1 
 					left join client_order_info as t2 on t1.id = t2.ci_id 
 			  		group by client_id 
@@ -259,7 +261,7 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
             $arrayData[] = array(
                 $val['id'],
                 $val['date'],
-                $val['email'],
+                $val['encrypted_email']??$val['email'],
 				$val['name'],
                 $val['phone'],
                 $val['country'],
@@ -303,7 +305,7 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 		$contactInfo = array();
 		$contactBasic['id'] = $id;
 		if($id){
-			$sql = "select b.client_id as id,b.id as info_id,c.id as cid,b.name as name,b.email as email,b.phone as phone,b.remark as remark,b.type as client_info_type, b.country as country,b.`from` as `from`,b.brand as brand,b.facebook_group as facebook_group,b.facebook_name as facebook_name,c.amazon_order_id as amazon_order_id,c.order_type as order_type,c.amazon_profile_page as amazon_profile_page,d.type as type,d.subscribe as subscribe,d.block as block
+			$sql = "select b.client_id as id,b.id as info_id,c.id as cid,b.name as name,b.email as email,encrypted_email,b.phone as phone,b.remark as remark,b.type as client_info_type, b.country as country,b.`from` as `from`,b.brand as brand,b.facebook_group as facebook_group,b.facebook_name as facebook_name,c.amazon_order_id as amazon_order_id,c.order_type as order_type,c.amazon_profile_page as amazon_profile_page,d.type as type,d.subscribe as subscribe,d.block as block
 			FROM client_info as b
 			left join client_order_info as c on b.id = c.ci_id
 			left join client as d on b.client_id = d.id
@@ -312,6 +314,7 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 			$_data = $this->queryRows($sql);
 			$fbgroupConfig = getFacebookGroup();
 			foreach($_data as $key=>$val){
+				$val['email']=$val['encrypted_email']??$val['email'];
             	//联系人基本信息
 				$contactInfo[$val['email']]['info_id'] = $val['info_id'];
 				$contactInfo[$val['email']]['email'] = $val['email'];
@@ -407,22 +410,24 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 		$insertInfo = array('client_id'=>$data['id'],'name'=>$data['name'],'country'=>$data['country'],'from'=>$data['from'],'brand'=>$data['brand'],'facebook_name'=>$data['facebook_name'],'facebook_group'=>intval($data['facebook_group']));
 		//查出client_info表的id,把之前的该客户的client_info数据删掉
 		$_ciids = DB::table('client_info')->select('id')->where('client_id',$old_id)->get()->toArray();
-		$ciids = array();
+		$ciids = $en_email = array();
 		foreach($_ciids as $key=>$val){
 			$ciids[] = $val->id;
+			$en_email[$val['encrypted_email']??$val['email']]=$val['email'];
 		}
 		DB::table('client_info')->whereIn('id',$ciids)->delete();//删除掉client_info表里的该条数据
 		DB::table('client_order_info')->whereIn('ci_id',$ciids)->delete();//订单信息，删除之前的
 
 		foreach($_POST['group-data'] as $key=>$val){
 			//检查是否有相同的邮箱,email要保持唯一性
-			$_email = DB::table('client_info')->where('email',$val['email'])->get()->toArray();
+			$_email = DB::table('client_info')->where('email',$val['email'])->orWhere('encrypted_email',$val['email'])->get()->toArray();
 			if($_email){
 				DB::rollBack();
 				$request->session()->flash('error_message','Save Failed,Same Email By '.$val['email']);
 				return redirect()->back()->withInput();
 			}
-			$insertInfo['email'] = $val['email'];
+			$insertInfo['email'] = array_get($en_email,$val['email'],$val['email']);
+			$insertInfo['encrypted_email'] = md5($insertInfo['email']).rand(1000,9999).'@valuelinkltd.com';
 			$insertInfo['phone'] = $val['phone'];
             $insertInfo['remark'] = $val['remark'];
 
@@ -481,7 +486,7 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 		$id = $request->input('id',0);
 		if($id){
 			$sap = new SapRfcRequest();
-			$sql = "select b.name as name,b.email as email,b.phone as phone,b.remark as remark,b.country as country,b.`from` as `from`,c.amazon_order_id as order_id
+			$sql = "select b.name as name,b.email as email,encrypted_email,b.phone as phone,b.remark as remark,b.country as country,b.`from` as `from`,c.amazon_order_id as order_id
 			FROM client_info as b
 			left join client_order_info as c on b.id = c.ci_id
 			where b.client_id = $id
@@ -489,7 +494,7 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 			$_data = $this->queryRows($sql);
 			$orderArr = array();
 			$contactInfo = array();
-			$emailArr = $emails = array();
+			$emailArr = $emails = $en_emails = array();
 			foreach($_data as $key=>$val){
 				//获取sap订单信息
 				$orderid = $val['order_id'];
@@ -501,8 +506,9 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
                 }
 
             	//联系人基本信息
-				$contactInfo[$val['email']] = array('name'=>$val['name'],'email'=>$val['email'],'phone'=>$val['phone'],'remark'=>$val['remark'],'country'=>$val['country']);
+				$contactInfo[$val['email']] = array('name'=>$val['name'],'email'=>$val['encrypted_email']??$val['email'],'phone'=>$val['phone'],'remark'=>$val['remark'],'country'=>$val['country']);
 				$emails[] = $val['email'];
+				$en_emails[$val['email']] = $val['encrypted_email'];
 			}
 
 			$userRows = DB::table('users')->select('id', 'name')->get();
@@ -520,7 +526,7 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 
 		}
 //		return view('crm/show',['orderArr'=>$orderArr, 'contactInfo'=> $contactInfo, 'emails' => $emails,'users'=>$users,'track_log_array'=>$track_log_array,'subject_type'=>$subject_type, 'record_id'=>$id]);
-		return view('crm/show',['orderArr'=>$orderArr, 'contactInfo'=> $contactInfo, 'emails' => $emails,'users'=>$users,'track_log_array'=>$track_log_array,'record_id'=>$id]);
+		return view('crm/show',['orderArr'=>$orderArr, 'contactInfo'=> $contactInfo, 'emails' => $emails, 'en_emails'=>$en_emails,'users'=>$users,'track_log_array'=>$track_log_array,'record_id'=>$id]);
 	}
 
     public function getRsgRequestList(){
@@ -531,7 +537,7 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
             $q->on('rsg_products.asin', '=', 'asin.asin')
                 ->on('rsg_products.site', '=', 'asin.site');
         })
-        ->orderBy('rsg_requests.customer_email', 'asc')->where('client.id', '=',$client_id)->get()->toArray();
+        ->orderBy('rsg_requests.customer_email', 'asc')->where('client.id', '=',$client_id)->get(['*',DB::RAW('encrypted_email as customer_email')])->toArray();
 
         foreach ($data as $key=>$list){
             $data[$key]['step'] = '<span class="badge badge-success">'.array_get(getStepStatus(),$list['step']).'</span>';
@@ -678,6 +684,7 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 								$insertInfo = array(
 									'name'=>$data['A'],
 									'email'=>$data['B'],
+									'encrypted_email'=>md5($data['B']).rand(1000,9999).'@valuelinkltd.com',
 									'phone'=>$data['C'],
 									'country'=>$data['E'],
 									'brand'=>$data['F'],

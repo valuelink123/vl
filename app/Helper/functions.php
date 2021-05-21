@@ -496,7 +496,7 @@ function curl_request($url,$post='',$cookie='', $returnCookie=0){
             curl_setopt($curl, CURLOPT_COOKIE, $cookie);
         }
         curl_setopt($curl, CURLOPT_HEADER, $returnCookie);
-        curl_setopt($curl, CURLOPT_TIMEOUT, 10);
+        curl_setopt($curl, CURLOPT_TIMEOUT, 30);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         $data = curl_exec($curl);
         if (curl_errno($curl)) {
@@ -740,7 +740,7 @@ function getActiveUserConfig()
 		array('db'=>'website','dbname'=>'mookashop','name'=>'mookashop.com','formid'=>array(2),'fields'=>array('name'=>'1.3','email'=>2,'orderid'=>3)),
 		array('db'=>'drocon','dbname'=>'droconshop_com','name'=>'droconshop.com','formid'=>array(12),'fields'=>array('name'=>'1','email'=>2,'orderid'=>3)),
 		array('db'=>'website','dbname'=>'natrogix_com','name'=>'natrogixshop.com','formid'=>array(1),'fields'=>array('name'=>1,'email'=>2,'orderid'=>3)),
-		array('db'=>'website','dbname'=>'vip-support_jp','name'=>'vip-support.jp','formid'=>array(1),'fields'=>array('name'=>'2.3','email'=>3,'orderid'=>4)),
+		array('db'=>'website','dbname'=>'`vip-support_jp`','name'=>'vip-support.jp','formid'=>array(1),'fields'=>array('name'=>'2.3','email'=>3,'orderid'=>4)),
 		array('db'=>'website','dbname'=>'workizeshop_com','name'=>'workizeshop.com','formid'=>array(2),'fields'=>array('name'=>7,'email'=>2,'orderid'=>4)),
 
 		array('db'=>'website','dbname'=>'lacetteshop','name'=>'lacetteshop','formid'=>array(1),'fields'=>array('name'=>1.3,'email'=>3,'orderid'=>4)),
@@ -1541,4 +1541,16 @@ function blackEmail()
 		'ashekhani10@stuy.edu',
 		'testireba5@gmail.com'
 	);
+}
+
+function getEmailToEncryptedEmail()
+{
+	$emailData = array();
+	if (Cache::has('email')) {
+		$emailData = Cache::get('email');
+ 	}else{
+		$emailData = DB::table('client_info')->pluck('encrypted_email', 'email')->toArray();
+		Cache::forever('email', $emailData);
+	}
+	return $emailData;
 }

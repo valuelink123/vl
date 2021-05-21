@@ -17,6 +17,7 @@ use App\Services\MultipleQueue;
 use DB;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use App\Category;
 
 
 class UserController extends Controller
@@ -187,8 +188,8 @@ class UserController extends Controller
 
     public function total(Request $request)
     {
-       
-		
+
+		$emailToEncryptedEmail = getEmailToEncryptedEmail();
 		$date_from = array_get($_REQUEST,'date_from')?array_get($_REQUEST,'date_from'):date('Y-m-d',strtotime('-7day'));
         $date_to = array_get($_REQUEST,'date_to')?array_get($_REQUEST,'date_to'):date('Y-m-d');
 		$arrayData= array();
@@ -363,6 +364,7 @@ where status<>'draft' and date>=:date_from_s and date<=:date_to_s group by from_
 
 left join amazon_orders as c on a.amazon_order_id = c.amazonorderid
 left join asin as d on a.sku=d.sellersku and a.asin=d.asin and CONCAT('www.',c.SalesChannel) =  d.site",['date_from' => $date_from,'date_to' => $date_to,'date_from_s' => $date_from,'date_to_s' => $date_to]);
+
 				$headArray[] = 'From Address';
 				$headArray[] = 'To Address';
 				$headArray[] = 'Amazon Order ID';
@@ -381,7 +383,7 @@ left join asin as d on a.sku=d.sellersku and a.asin=d.asin and CONCAT('www.',c.S
 				$users=$this->getUsers();
 				foreach($problemList as $problem){
 					$arrayData[] = [
-						$problem->from_address,
+						isset($emailToEncryptedEmail[$problem->from_address]) ? $emailToEncryptedEmail[$problem->from_address]  : $problem->from_address,
 						$problem->to_address,
 						$problem->amazon_order_id,
 						$problem->purchasedate,
@@ -425,7 +427,7 @@ where a.date>=:sdate_from and a.date<=:sdate_to
 				$users=$this->getUsers();
 				foreach($problemList as $problem){
 					$arrayData[] = [
-						$problem->from_address,
+						isset($emailToEncryptedEmail[$problem->from_address]) ? $emailToEncryptedEmail[$problem->from_address]  : $problem->from_address,
 						$problem->to_address,
 						$problem->amazon_order_id,
 						$problem->purchasedate,
@@ -842,12 +844,7 @@ where a.date>=:sdate_from and a.date<=:sdate_to
         //print_r($date_from);print_r($date_to);
         $user_received_total=array();
         $user_key=array();
-		
-
 		$user_total_r = new Inbox;
-
-			
-        
 		
         if($date_from){
             $user_total_r = $user_total_r->where('date','>=',$date_from.' 00:00:00');
@@ -855,12 +852,21 @@ where a.date>=:sdate_from and a.date<=:sdate_to
         if($date_to){
             $user_total_r = $user_total_r->where('date','<=',$date_to.' 23:59:59');
         }
-		
-        $user_total_r = $user_total_r->whereNotNull('etype')->where('etype','<>','')->select(DB::raw('from_address,to_address,min(date) as date, remark,etype,sku,asin,item_no,epoint,user_id'))->groupBy('from_address','to_address', 'remark','etype','sku','asin','item_no','epoint','user_id')->orderBy('to_address','asc')->orderBy('date','asc')->get();
-		//print_r($user_total_r->toSql());
-        
 
-        return view('user/etotal',['date_from'=>$date_from,'date_to'=>$date_to,'user_total_r'=>$user_total_r,'users'=>$this->getUsers(),'accounts'=>$this->getAccounts()]);
+		$emailToEncryptedEmail = getEmailToEncryptedEmail();
+		$categoryList = Category::pluck('category_name', 'id')->toArray();
+
+        $user_total_r = $user_total_r->whereNotNull('linkage1')->where('linkage1','<>','')->where('linkage1','<>',999999999)->select(DB::raw('from_address,to_address,min(date) as date, remark,linkage1,linkage2,sku,asin,item_no,epoint,user_id'))->groupBy('from_address','to_address', 'remark','linkage1','linkage2','sku','asin','item_no','epoint','user_id')->orderBy('to_address','asc')->orderBy('date','asc')->get();
+        foreach($user_total_r as $key=>$val){
+			$user_total_r[$key]->from_address = isset($emailToEncryptedEmail[$val->from_address]) ? $emailToEncryptedEmail[$val->from_address] : $val->from_address;
+			$user_total_r[$key]->linkage1 = isset($categoryList[$val->linkage1]) ? $categoryList[$val->linkage1] : $val->linkage1;
+			$user_total_r[$key]->linkage2 = isset($categoryList[$val->linkage2]) ? $categoryList[$val->linkage2] : $val->linkage2;
+			if($user_total_r[$key]->linkage2==999999999){
+				$user_total_r[$key]->linkage2 = 'None';
+			}
+		}
+
+		return view('user/etotal',['date_from'=>$date_from,'date_to'=>$date_to,'user_total_r'=>$user_total_r,'users'=>$this->getUsers(),'accounts'=>$this->getAccounts()]);
     }
 
     public function update(Request $request,$id)

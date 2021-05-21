@@ -68,6 +68,7 @@ class NonctgController extends Controller
                 'item_no'=>'t3.item_no',
                 'from' => 't1.from',
                 'sales' => 't3.seller',
+                'encrypted_email' => 'encrypted_email'
             ],
             [
 				'site' => 't1.SalesChannel',
@@ -88,7 +89,7 @@ class NonctgController extends Controller
         $orderby = $this->dtOrderBy($request);
         $limit = $this->dtLimit($request);
 
-        $sql = "SELECT SQL_CALC_FOUND_ROWS t1.id,t1.date,t1.email,t1.email,t1.name,t1.amazon_order_id as order_id,t1.asin,t3.item_group,t3.item_no,t1.from,t1.status,t2.name AS processor,t3.seller,t3.bg,t3.bu,t1.saleschannel as saleschannel,t3.site as site,t1.sellersku as sellersku,rsg_requests.amazon_order_id as rsg_orderid,client.rsg_status as rsg_status,client.rsg_status_explain as rsg_status_explain    
+        $sql = "SELECT SQL_CALC_FOUND_ROWS t1.id,t1.date,t1.email,encrypted_email,t1.email,t1.name,t1.amazon_order_id as order_id,t1.asin,t3.item_group,t3.item_no,t1.from,t1.status,t2.name AS processor,t3.seller,t3.bg,t3.bu,t1.saleschannel as saleschannel,t3.site as site,t1.sellersku as sellersku,rsg_requests.amazon_order_id as rsg_orderid,client.rsg_status as rsg_status,client.rsg_status_explain as rsg_status_explain    
         FROM non_ctg t1 
 	  	Left JOIN rsg_requests on rsg_requests.amazon_order_id = t1.amazon_order_id 
 	  	LEFT JOIN client_info ON client_info.email = t1.email
@@ -111,14 +112,14 @@ class NonctgController extends Controller
             $explain = isset($rsgStatusArr[$val['rsg_status_explain']]) ? $rsgStatusArr[$val['rsg_status_explain']]['vop'] : $val['rsg_status_explain'];
             if($val['rsg_status']==1) {
                 //邮箱后面显示红色圆圈
-                $data[$key]['email'] = $val['email'].'<div class="unavailable" title="'.$explain.'"></div>';
+                $data[$key]['email'] = ($val['encrypted_email']??$val['email']).'<div class="unavailable" title="'.$explain.'"></div>';
             }else{
                 //邮箱后面显示绿色圆圈
-                $data[$key]['email'] = $val['email'].'<div class="available"></div>';
+                $data[$key]['email'] = ($val['encrypted_email']??$val['email']).'<div class="available"></div>';
             }
 
             //点击Batch Send群发邮件时，提取收件人email。
-            $data[$key]['email_hidden'] = $val['email'];
+            $data[$key]['email_hidden'] =  ($val['encrypted_email']??$val['email']);
         }
         return compact('data', 'recordsTotal', 'recordsFiltered');
     }
@@ -179,8 +180,7 @@ class NonctgController extends Controller
             $order['SellerName'] = Accounts::where('account_sellerid', $order['SellerId'])->first()->account_name ?? 'No Match';
 
 
-            $emails = DB::table('sendbox')->where('to_address', $dataRow['email'])->orderBy('date', 'desc')->get();
-            $emails = json_decode(json_encode($emails), true); // todo
+            
 
 
             $userRows = DB::table('users')->select('id', 'name')->get();
@@ -195,7 +195,10 @@ class NonctgController extends Controller
             foreach($trackLogData as $k=>$v){
                 $trackLogData[$k]['note'] = nl2br($v['note']);
             }
-
+            $encrypted_email = array_get(getEmailToEncryptedEmail(),$dataRow['email'],$dataRow['email']);
+            $emails = DB::table('sendbox')->where('to_address', $dataRow['email'])->orderBy('date', 'desc')->get(['*',DB::RAW('\''.$encrypted_email.'\' as to_address')]);
+            $emails = json_decode(json_encode($emails), true); // todo
+            $dataRow['email'] = $encrypted_email;
             return view('nonctg.process', ['ctgRow' => $dataRow, 'trackLogData'=>$trackLogData,'users' => $users, 'order' => $order, 'emails' => $emails,'status'=>getNonCtgStatusKeyVal()]);
 
         }
@@ -278,9 +281,10 @@ class NonctgController extends Controller
 		$date_to = $_GET['date_to'];
 		$where .= " and t1.date >= '".$date_from." 00:00:00' and t1.date <= '".$date_to." 23:59:59'";
 
-		$sql = "SELECT SQL_CALC_FOUND_ROWS t1.id,t1.date,t1.email,t1.email,t1.name,t1.amazon_order_id as order_id,t1.asin,t3.item_group,t3.item_no,t1.from,t1.status,t2.name AS processor,t3.seller,t3.bg,t3.bu,t1.saleschannel as saleschannel,t3.site as site,t1.sellersku as sellersku 
+		$sql = "SELECT SQL_CALC_FOUND_ROWS t1.id,t1.date,t1.email,encrypted_email,t1.email,t1.name,t1.amazon_order_id as order_id,t1.asin,t3.item_group,t3.item_no,t1.from,t1.status,t2.name AS processor,t3.seller,t3.bg,t3.bu,t1.saleschannel as saleschannel,t3.site as site,t1.sellersku as sellersku 
         FROM non_ctg t1
         LEFT JOIN users t2 ON t2.id = t1.processor
+        LEFT JOIN client_info ON client_info.email = t1.email
         LEFT JOIN asin t3 ON t1.asin = t3.asin and t3.site = CONCAT('www.',t1.saleschannel) and t1.sellersku = t3.sellersku  
         {$where} ";
 
@@ -288,7 +292,7 @@ class NonctgController extends Controller
 		foreach ($data as $key=>$val){
 			$arrayData[] = array(
 				$val['date'],
-				$val['email'],
+				$val['encrypted_email']??$val['email'],
 				$val['name'],
 				$val['order_id'],
 				$val['asin'],

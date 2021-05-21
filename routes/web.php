@@ -88,6 +88,7 @@ Route::get('/exception/111/111', 'ExceptionController@get')->name('getException'
 Route::Post('/exception/getorder', 'ExceptionController@getrfcorder')->name('getExceptionOrder');
 Route::Post('/exception/getrepeatorder', 'ExceptionController@getRepeatOrder')->name('getRepeatOrder');
 Route::get('/exceptionexport', 'ExceptionController@export')->name('exportException');
+Route::Post('/exception/upload', 'ExceptionController@upload');
 Route::get('/reviewexport', 'ReviewController@export')->name('exportReview');
 Route::get('/dreportexport', 'SkuController@export')->name('exportDreport');
 Route::get('/config_option', 'ConfigOptionController@index')->name('config_option');
@@ -133,6 +134,7 @@ Route::resource('rsgrequests', 'RsgrequestsController');
 Route::Post('/rsgrequests/get', 'RsgrequestsController@get')->name('getrsgrequests');
 Route::get('/rsgrequestsUpdateHistory', 'RsgrequestsController@updateHistory');
 Route::resource('salesp', 'SalespController');
+Route::Post('/salesp/upload', 'SalespController@upload');
 Route::resource('rr', 'RrController');
 Route::Post('/salesp/get', 'SalespController@get')->name('getSalesp');
 Route::resource('proline', 'ProlineController');
@@ -443,5 +445,15 @@ Route::match(['post','get'],'/returnAnalysis/asinAnalysis', 'ReturnAnalysisContr
 Route::match(['post','get'],'/returnAnalysis/skuAnalysis', 'ReturnAnalysisController@skuAnalysis');//sku退货分析，维度：sku+币种
 
 Route::get('/finance','FinanceDashBoardController@index');//财务看板
+
+Route::resource('platformsku', 'Platform\PlatFormSkuController');
+Route::Post('/platformsku/get', 'Platform\PlatFormSkuController@get');
+Route::Post('/platformsku/batchUpdate', 'Platform\PlatFormSkuController@batchUpdate');
+Route::resource('platformship', 'Platform\PlatFormShipController');
+Route::Post('/platformship/get', 'Platform\PlatFormShipController@get');
+Route::Post('/platformship/batchUpdate', 'Platform\PlatFormShipController@batchUpdate');
+Route::resource('platformorder', 'Platform\PlatFormOrderController');
+Route::Post('/platformorder/get', 'Platform\PlatFormOrderController@get');
+Route::Post('/platformorder/batchUpdate', 'Platform\PlatFormOrderController@batchUpdate');
 
 

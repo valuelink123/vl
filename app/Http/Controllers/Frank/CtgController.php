@@ -75,7 +75,8 @@ class CtgController extends Controller {
                 'brands' => 't4.brands',
                 'bgs' => 't4.bgs',
                 'bus' => 't4.bus',
-                'phone' => 't1.phone'
+                'phone' => 't1.phone',
+                'encrypted_email' => 'encrypted_email'
             ],
             [
                 'phone' => 't1.phone',
@@ -104,7 +105,6 @@ class CtgController extends Controller {
 			$str = '%"review_id":"'.$ins['review_id'].'"%';
 			$where .= " AND t1.steps like '".$str."'";
 		}
-
 		//选择的渠道不同，查不同的表，限制不同的条件
 		$channel = 0;
 		$table = 'ctg';
@@ -145,6 +145,7 @@ class CtgController extends Controller {
             t4.brands,
 		    facebook_name,
 		    facebook_group,
+            encrypted_email,
 		    t1.review_type,
 		    rsg_requests.amazon_order_id as rsg_orderid,
 		    '{$channelName}' as channel,
@@ -207,15 +208,15 @@ class CtgController extends Controller {
 			}
 			$data[$key]['join_rsg'] = $val['rsg_orderid'] ? 'YES' : 'NO';//是否有参加RSG活动
             //点击Batch Send群发邮件时，提取收件人email。
-            $data[$key]['email_hidden'] = $val['email'];
+            $data[$key]['email_hidden'] =  ($val['encrypted_email']??$val['email']);
 
             $explain = isset($rsgStatusArr[$val['rsg_status_explain']]) ? $rsgStatusArr[$val['rsg_status_explain']]['vop'] : $val['rsg_status_explain'];
             if($val['rsg_status']==1) {
                 //邮箱后面显示红色圆圈
-                $data[$key]['email'] = $val['email'].'<div class="unavailable" title="'.$explain.'"></div>';
+                $data[$key]['email'] = ($val['encrypted_email']??$val['email']).'<div class="unavailable" title="'.$explain.'"></div>';
             }else{
                 //邮箱后面显示绿色圆圈
-                $data[$key]['email'] = $val['email'].'<div class="available"></div>';
+                $data[$key]['email'] = ($val['encrypted_email']??$val['email']).'<div class="available"></div>';
             }
 		}
         $recordsTotal = $recordsFiltered = $this->queryOne('SELECT FOUND_ROWS()');
@@ -295,8 +296,10 @@ class CtgController extends Controller {
             t4.bgs,
             t4.bus,
             t4.brands,
+            encrypted_email,
 		   '{$channelName}' as channel 
         FROM {$table} t1 
+        LEFT JOIN client_info ON client_info.email = t1.email 
         LEFT JOIN users t2
           ON t2.id = t1.processor
         LEFT JOIN (
@@ -358,7 +361,7 @@ class CtgController extends Controller {
             }
             $arrayData[] = array(
                 $val['created_at'],
-                $val['email'],
+                ($val['encrypted_email']??$val['email']),
                 $val['name'],
 				$val['order_id'],
                 $val['itemCodes'],
@@ -500,8 +503,7 @@ class CtgController extends Controller {
             $order['SellerName'] = Accounts::where('account_sellerid', $order['SellerId'])->first()->account_name ?? 'No Match';
 
 
-            $emails = DB::table('sendbox')->where('to_address', $ctgRow['email'])->orderBy('date', 'desc')->get();
-            $emails = json_decode(json_encode($emails), true); // todo
+            
 
 
             //目前在职的，而且sap_seller_id不为0
@@ -519,7 +521,7 @@ class CtgController extends Controller {
 				}
 			}
 			//查询该邮箱是否存在于client_info中，查出需要显示的facebook_name和facebook_group
-			$clientInfo = DB::table('client_info')->where('email',$ctgRow['email'])->get(array('facebook_name','facebook_group'))->first();
+			$clientInfo = DB::table('client_info')->where('email',$ctgRow['email'])->get(array('facebook_name','facebook_group','encrypted_email'))->first();
 			if($clientInfo){
 				$fbgroupConfig = getFacebookGroup();
 				$steps = json_decode($ctgRow['steps'],true);
@@ -527,6 +529,9 @@ class CtgController extends Controller {
 				$steps['facebook_group'] = isset($fbgroupConfig[ $clientInfo->facebook_group]) ? $fbgroupConfig[ $clientInfo->facebook_group] : '';
 				$ctgRow['steps'] = json_encode($steps);
 			}
+            $emails = DB::table('sendbox')->where('to_address', $ctgRow['email'])->orderBy('date', 'desc')->get(['*',DB::RAW('\''.$clientInfo->encrypted_email.'\' as to_address')]);
+            $emails = json_decode(json_encode($emails), true); // todo
+            $ctgRow['email'] = empty($clientInfo)?$ctgRow['email']:$clientInfo->encrypted_email;
 
             return view('frank.ctgProcess', compact('ctgRow', 'users', 'trackLogData','order', 'emails'));
 
@@ -582,7 +587,7 @@ class CtgController extends Controller {
         $emails = [];
         $id = isset($_REQUEST['id']) ? $_REQUEST['id'] : '';
         if($id != ''){
-            $emails = DB::table('client_info')->where('client_id', $id)->pluck('email');
+            $emails = DB::table('client_info')->where('client_id', $id)->pluck('encrypted_email');
         }
 
 		return view('frank/ctgAdd', compact(['channel','emails']));
@@ -595,7 +600,7 @@ class CtgController extends Controller {
 
 		if(!Auth::user()->can(['ctg-add'])) die('Permission denied -- ctg-add');
 		$data['name'] = isset($_REQUEST['name']) ? $_REQUEST['name'] : '';
-		$data['email'] = isset($_REQUEST['email']) ? $_REQUEST['email'] : '';
+		$data['email'] = array_search($req->get('email'),getEmailToEncryptedEmail())??$req->get('email');
 		$data['note'] = isset($_REQUEST['note']) ? $_REQUEST['note'] : '';
 		$channel= isset($_REQUEST['channel']) ? $_REQUEST['channel'] : '';
 		$data['order_id'] = isset($_REQUEST['order_id']) ? $_REQUEST['order_id'] : '';

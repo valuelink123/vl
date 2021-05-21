@@ -1494,4 +1494,89 @@ class ExceptionController extends Controller
 		fclose($file);
 	}
 
+
+	public function upload( Request $request )
+    {
+		$updateData=[];
+		try{
+			DB::beginTransaction();
+			$file = $request->file('file');
+			$originalName = $file->getClientOriginalName();
+			$ext = $file->getClientOriginalExtension();
+			$type = $file->getClientMimeType();
+			$realPath = $file->getRealPath();
+			$newname = date('His').uniqid().'.'.$ext;
+			$newpath = '/uploads/exception/'.date('Ymd').'/';
+			$inputFileName = public_path().$newpath.$newname;
+			$bool = $file->move(public_path().$newpath,$newname);
+			$spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($inputFileName);
+			$importData = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
+			$user_id = intval(Auth::user()->id);
+			$group_id = intval(Groupdetail::where('user_id',$user_id)->max('group_id'));
+			$i=0;
+			foreach($importData as $key => $data){
+				if($key==1) continue;
+				$amazon_order_id = trim(array_get($data,'A'));
+				$sellerid = trim(array_get($data,'B'));
+				$name = trim(array_get($data,'C'));
+				$request_content = trim(array_get($data,'D'));
+				$descrip = trim(array_get($data,'E'));
+				$type = array_get(['replacement'=>2,'refund'=>1,'gift cart'=>4,'giftcart'=>4],strtolower(trim(array_get($data,'F'))));
+				if($amazon_order_id && $sellerid && $name && $type){
+					$i++;
+					$row=['amazon_order_id'=>$amazon_order_id,'sellerid'=>$sellerid,'name'=>$name,
+					'request_content'=>$request_content,'descrip'=>$descrip,'type'=>$type,'date'=>date('Y-m-d H:i:s'),
+					'user_id'=>$user_id,'group_id'=>$group_id,'process_status'=>'auto done','process_date'=>date('Y-m-d H:i:s'),
+					'process_user_id'=>$user_id,'auto_create_mcf'=>1,'last_auto_create_mcf_date'=>date('Y-m-d H:i:s')];
+					$row['refund'] = round(trim(array_get($data,'G')),2);
+					$row['gift_card_amount'] = round(trim(array_get($data,'H')),2);
+					$row['replacement']['shipname'] = trim(array_get($data,'I'));
+					$row['replacement']['countrycode'] = trim(array_get($data,'J'));
+					$row['replacement']['state'] = trim(array_get($data,'K'));
+					$row['replacement']['city'] = trim(array_get($data,'L'));
+					$row['replacement']['address1'] = trim(array_get($data,'M'));
+					$row['replacement']['address2'] = trim(array_get($data,'N'));
+					$row['replacement']['address3'] = trim(array_get($data,'O'));
+					$row['replacement']['postalcode'] = trim(array_get($data,'P'));
+					$row['replacement']['phone'] = trim(array_get($data,'Q'));
+					$row['replacement']['shippingspeed'] = trim(array_get($data,'R'));
+					if(trim(array_get($data,'S')) && trim(array_get($data,'T')) && trim(array_get($data,'U')) && trim(array_get($data,'W'))){
+						$row['replacement']['products'][] = [
+							'replacement_order_id'=>trim(array_get($data,'S')),
+							'seller_id'=>trim(array_get($data,'T')),
+							'seller_sku'=>trim(array_get($data,'U')),
+							'item_code'=>trim(array_get($data,'V')),
+							'qty'=>trim(array_get($data,'W')),
+							'shipfrom'=>trim(array_get($data,'X')),
+						];
+					}
+					$updateData[$i] = $row ;
+				}else{
+					if(trim(array_get($data,'S')) && trim(array_get($data,'T')) && trim(array_get($data,'U')) && trim(array_get($data,'W'))){
+						$updateData[$i]['replacement']['products'][] = [
+							'replacement_order_id'=>trim(array_get($data,'S')),
+							'seller_id'=>trim(array_get($data,'T')),
+							'seller_sku'=>trim(array_get($data,'U')),
+							'item_code'=>trim(array_get($data,'V')),
+							'qty'=>trim(array_get($data,'W')),
+							'shipfrom'=>trim(array_get($data,'X')),
+						];
+					}
+				}
+			}
+			foreach($updateData as $k=>$v){
+				$v['replacement'] = serialize($v['replacement']);
+				Exception::create($v);
+			}
+			$records["customActionStatus"] = 'OK';
+			$records["customActionMessage"] = 'Upload Successed!'; 
+			DB::commit();
+        }catch (\Exception $e) { 
+            $records["customActionStatus"] = '';
+            $records["customActionMessage"] = $e->getMessage();
+			DB::rollBack();
+		}    
+        echo json_encode($records);  
+	}
+
 }

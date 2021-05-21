@@ -21,9 +21,8 @@ th,td,td>span {
             <!-- BEGIN EXAMPLE TABLE PORTLET-->
             <div class="portlet light bordered">
                 <div class="portlet-body">
-							
-							
 					<div class="table-toolbar">
+                    <div class="col-md-8 " >
                     <form role="form" action="{{url('salesp')}}" method="GET">
                         {{ csrf_field() }}
                         <div class="row">
@@ -84,7 +83,18 @@ th,td,td>span {
 						</div>
 
                     </form>
-					
+                    </div>
+					<div class="col-md-4 " >
+                        <form action="{{url('salesp/upload')}}" method="post" enctype="multipart/form-data">
+                        <a href="{{ url('/uploads/salep/example.xlsx')}}">Example</a>
+                            <input id="importFile" name="importFile" type="file" style="display:none">
+							{{ csrf_field() }}
+							<input id="importFileTxt" name="importFileTxt" type="text" class="form-control input-inline">
+							<a id="importButton" class="btn red input-inline" >Browse</a>
+							<button type="submit" id="importSubmit" class="btn blue input-inline">ËΩ¨Êç¢Ê†ºÂºè</button>
+                            
+                        </form>
+                    </div>
                 </div>
                     <div class="table-container">
 
@@ -232,9 +242,25 @@ $(function() {
     TableDatatablesAjax.init();
 	$('#data_search').on('click',function(){
 		var dttable = $('#datatable_ajax_sp').dataTable();
-	    dttable.fnClearTable(); //«Âø’“ªœ¬table
-	    dttable.fnDestroy(); //ªπ‘≠≥ı ºªØ¡Àµƒdatatable
+	    dttable.fnClearTable(); //ÔøΩÔøΩÔøΩ“ªÔøΩÔøΩtable
+	    dttable.fnDestroy(); //ÔøΩÔøΩ‘≠ÔøΩÔøΩ ºÔøΩÔøΩÔøΩÀµÔøΩdatatable
 		TableDatatablesAjax.init();
+	});
+    $("#importButton,#importFileTxt").click(function(){
+		$("#importFile").trigger("click");
+	});
+
+	$('input[id=importFile]').change(function() {
+		$('#importFileTxt').val($(this).val());
+	});
+
+	$("#importSubmit").click(function () {
+		var fileObj = document.getElementById("importFile").files[0];
+		if (typeof (fileObj) == "undefined" || fileObj.size <= 0) {
+			alert("Please Select File!");
+			return false;
+		}
+		return true;
 	});
 });
 

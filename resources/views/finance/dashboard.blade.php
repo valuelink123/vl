@@ -177,7 +177,7 @@
                                 <small>promotion</small>
                                 <h4 class="font-green-sharp">
 									<span data-counter="counterup">
-									{{$shipped_fees['shipping']}}</span>
+									{{$shipped_fees['promotion']}}</span>
                                     <small class="font-purple-soft"></small>
                                 </h4>
 

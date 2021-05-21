@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Services\MultipleQueue;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PDO;
 use DB;
 class SalespController extends Controller
@@ -143,5 +145,55 @@ class SalespController extends Controller
         echo json_encode($records);
     }
 	
+
+	public function upload( Request $request )
+    {
+		$file = $request->file('importFile');
+		$originalName = $file->getClientOriginalName();
+		$ext = $file->getClientOriginalExtension();
+		$type = $file->getClientMimeType();
+		$realPath = $file->getRealPath();
+		$newname = date('His').uniqid().'.'.$ext;
+		$newpath = '/uploads/salesp/'.date('Ymd').'/';
+		$inputFileName = public_path().$newpath.$newname;
+		$bool = $file->move(public_path().$newpath,$newname);
+		$spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($inputFileName);
+		$importData = $spreadsheet->getActiveSheet()->toArray(null, true, true);
+		$i=0;
+		$outData[$i] = array('物料','工厂','周数','正常计划数量','促销计划数量','合计计划数量');
+		$weekData = [];
+		foreach($importData as $key => $data){
+			if($key==0) {
+				$column = 9;
+				while(array_get($data,$column)){
+					preg_match('/(?<!\d)\d{6}(?!\d)/i', array_get($data,$column), $weekMatch);
+					$weekData[$column] = array_get($weekMatch,0,array_get($data,$column));
+					$column = $column+3;
+				}	
+			}else{
+				foreach($weekData as $col=>$val){
+					if(array_get($data,1) && array_get($data,4)){
+						$i++;
+						$outData[$i][0] = array_get($data,1);
+						$outData[$i][1] = array_get($data,4);
+						$outData[$i][2] = $val;
+						$outData[$i][3] = (string)intval(array_get($data,$col-2));
+						$outData[$i][4] = (string)intval(array_get($data,$col-1));
+						$outData[$i][5] = (string)intval(array_get($data,$col));
+					}
+				}
+			}	
+		}
+		if($outData){
+            $spreadsheet = new Spreadsheet();
+            $spreadsheet->getActiveSheet()->fromArray($outData,NULL,'A1');
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment;filename="Conversion.xlsx"');
+            header('Cache-Control: max-age=0');
+            $writer = new Xlsx($spreadsheet);
+            $writer->save('php://output');
+        }
+        die();
+	}
 	
 }

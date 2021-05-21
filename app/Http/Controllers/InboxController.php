@@ -180,6 +180,7 @@ class InboxController extends Controller
     public function show($id)
     {
 		if(!Auth::user()->can(['inbox-show'])) die('Permission denied -- inbox-show');
+		$emailToEncryptedEmail = getEmailToEncryptedEmail();
         $email = Inbox::where('id',$id)->first();
 
         //$email->toArray();
@@ -295,7 +296,7 @@ class InboxController extends Controller
 		$lists =  Category::orderBy($order_by,$sort)->get()->toArray();
 		$tree = $this->getTree($lists,28);
 
-        return view('inbox/view',['email_history'=>$email_history,'unread_history'=>$email_unread_history,'order'=>$order,'orderArr'=>$orderArr,'email'=>$email,'users'=>$this->getUsers(),'groups'=>$this->getGroups(),'sellerids'=>$this->getSellerIds(),'accounts'=>$this->getAccounts(),'account_type'=>$account_type,'tree'=>$tree,'email_change_log'=>$email_change_log,'client_email'=>$client_email,'latestConversationList'=>$latestConversationList,'recentEventsList'=>$recentEventsList,'recentEventsNumbers'=>$recentEventsNumbers,'rsgTaskData'=>$rsgTaskData,'rsg_link'=> 'https://rsg.claimgiftsnow.com?user=V'.Auth::user()->id ]);
+        return view('inbox/view',['emailToEncryptedEmail'=>$emailToEncryptedEmail,'email_history'=>$email_history,'unread_history'=>$email_unread_history,'order'=>$order,'orderArr'=>$orderArr,'email'=>$email,'users'=>$this->getUsers(),'groups'=>$this->getGroups(),'sellerids'=>$this->getSellerIds(),'accounts'=>$this->getAccounts(),'account_type'=>$account_type,'tree'=>$tree,'email_change_log'=>$email_change_log,'client_email'=>$client_email,'latestConversationList'=>$latestConversationList,'recentEventsList'=>$recentEventsList,'recentEventsNumbers'=>$recentEventsNumbers,'rsgTaskData'=>$rsgTaskData,'rsg_link'=> 'https://rsg.claimgiftsnow.com?user=V'.Auth::user()->id ]);
     }
 
     public function getRsgStatusAttr($emailDetails, $email, $rsgStatusArr, $fromOrTo){
@@ -630,6 +631,7 @@ class InboxController extends Controller
    * Paging
    */
 		if(!Auth::user()->can(['inbox-show'])) die('Permission denied -- inbox-show');
+		$emailToEncryptedEmail = getEmailToEncryptedEmail();
         $orderby = 'date';
         $sort = 'desc';
         if(isset($_REQUEST['order'][0])){
@@ -712,8 +714,13 @@ class InboxController extends Controller
             //$customers = $customers->where('from_address', 'like', '%'.$_REQUEST['from_address'].'%');
 			
 			$keywords = array_get($_REQUEST,'from_address');
-            $customers = $customers->where(function ($query) use ($keywords) {
+            $customers = $customers->where(function ($query) use ($keywords,$emailToEncryptedEmail) {
+				$_address = array_search($keywords,$emailToEncryptedEmail);
+				if(empty($_address)){
+					$_address = $keywords;
+				}
                 $query->where('from_address'  , 'like', '%'.$keywords.'%')
+						->orwhere('from_address', 'like', '%'.$_address.'%')
                         ->orwhere('from_name', 'like', '%'.$keywords.'%');
 
             });
@@ -801,6 +808,7 @@ class InboxController extends Controller
 //                    $rsgStatus = '<div class="available"></div>';
 //                }
 //            }
+			$customersList['from_address'] = isset($emailToEncryptedEmail[$customersList['from_address']]) ? $emailToEncryptedEmail[$customersList['from_address']]  : $customersList['from_address'];
             $records["data"][] = array(
                 '<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input name="id[]" type="checkbox" class="checkboxes" value="'.$customersList['id'].'"/><span></span></label>',
                 
