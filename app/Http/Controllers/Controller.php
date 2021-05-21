@@ -467,7 +467,7 @@ class Controller extends BaseController
 	function getAccountInfo()
 	{
 		$account = array();
-		$_account= DB::connection('vlz')->select("select id,label from seller_accounts where deleted_at is NULL order by label asc");
+		$_account= DB::connection('vlz')->select("select id,label from seller_accounts where deleted_at is NULL and `primary`=1 order by label asc");
 		foreach($_account as $key=>$val){
 			$account[$val->id] = (array)$val;
 		}
