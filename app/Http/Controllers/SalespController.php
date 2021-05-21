@@ -177,9 +177,9 @@ class SalespController extends Controller
 						$outData[$i][0] = array_get($data,1);
 						$outData[$i][1] = array_get($data,4);
 						$outData[$i][2] = $val;
-						$outData[$i][3] = intval(array_get($data,$col-2));
-						$outData[$i][4] = intval(array_get($data,$col-1));
-						$outData[$i][5] = intval(array_get($data,$col));
+						$outData[$i][3] = (string)intval(array_get($data,$col-2));
+						$outData[$i][4] = (string)intval(array_get($data,$col-1));
+						$outData[$i][5] = (string)intval(array_get($data,$col));
 					}
 				}
 			}	
