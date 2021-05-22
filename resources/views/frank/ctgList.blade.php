@@ -391,8 +391,8 @@ th,td,td>span {
                 url: location.href
             },
             lengthMenu: [
-                [10, 50, 100, -1],
-                [10, 50, 100, 'All']
+                [10, 50, 100],
+                [10, 50, 100]
             ],
         })
 
