@@ -87,6 +87,15 @@
                                 @endforeach
                             </select>
                         </div>
+                        <br/>
+                        <div class="input-group">
+                            <span class="input-group-addon">Type</span>
+                            <select multiple style="width:100%;" id="crmType" data-init-by-query="ins.crmType">
+                                @foreach(getCrmClientType() as $key=>$val)
+                                    <option value="{!! $key !!}">{!! $val !!}</option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
                     <div class="col-md-2">
                         @permission('non-ctg-export')
@@ -198,6 +207,7 @@
                     status: $('#status').val(),
                     bg: $('#bg').val(),
                     bu: $('#bu').val(),
+                    crmType: $('#crmType').val(),
                     from: $('#from').val(),
                 }
             })

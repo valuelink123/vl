@@ -78,6 +78,7 @@ class NonctgController extends Controller
                 'processor' => 't1.processor',
                 'status' => 't1.status',
                 // WHERE FIND_IN_SET
+                'crmType' => 's:client.type',
                 'bg' => 's:t3.bg',
                 'bu' => 's:t3.bu',
             ],

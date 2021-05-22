@@ -147,6 +147,7 @@ class CrmController extends Controller
 				// 'brand' => 'c.brand',
 				// 'country' => 'c.country',
 				// WHERE FIND_IN_SET
+				'type' => 's:t1.type',
 				'bg' => 's:b.bg',
 				'bu' => 's:b.bu',
 			],
@@ -472,6 +473,7 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 			DB::table('client')->where('id',$old_id)->delete();
 		}
 		DB::commit();
+		getBlacklistEmail(true);
 		if(empty($old_id)){
 			//添加界面之后，跳转到列表页
 			return redirect('/crm');

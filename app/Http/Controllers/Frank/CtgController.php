@@ -89,6 +89,7 @@ class CtgController extends Controller {
                 'processor' => 't1.processor',
                 'status' => 't1.status',
                 // WHERE FIND_IN_SET
+                'crmType' => 's:client.type',
                 'bg' => 's:t4.bgs',
                 'bu' => 's:t4.bus',
                 'brand' => 's:t4.brands',
@@ -228,7 +229,6 @@ class CtgController extends Controller {
     public function export(){
 		if(!Auth::user()->can(['ctg-export'])) die('Permission denied -- ctg-export');
         set_time_limit(0);
-
         $arrayData = array();
         $headArray[] = 'Date';
         $headArray[] = 'Email';
@@ -599,6 +599,7 @@ class CtgController extends Controller {
 	{
 
 		if(!Auth::user()->can(['ctg-add'])) die('Permission denied -- ctg-add');
+        if(isBlacklistEmail($req->get('email'))) throw new \Exception('Blacklist email');
 		$data['name'] = isset($_REQUEST['name']) ? $_REQUEST['name'] : '';
 		$data['email'] = array_search($req->get('email'),getEmailToEncryptedEmail())?array_search($req->get('email'),getEmailToEncryptedEmail()):$req->get('email');
 		$data['note'] = isset($_REQUEST['note']) ? $_REQUEST['note'] : '';

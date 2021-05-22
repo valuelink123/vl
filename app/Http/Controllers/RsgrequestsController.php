@@ -119,6 +119,9 @@ class RsgrequestsController extends Controller
 		if(isset($search['user_id']) && $search['user_id']){
 			$datas = $datas->where('rsg_products.user_id', $search['user_id']);
 		}
+		if(isset($search['crmType']) && $search['crmType']){
+			$datas = $datas->where('client.type', $search['crmType']);
+		}
 		if(isset($search['site']) && $search['site']){
 			$datas = $datas->where('rsg_products.site','like', '%'.$search['site'].'%');
 		}
@@ -492,8 +495,10 @@ class RsgrequestsController extends Controller
 			'product_id' => 'required|int',
 			'customer_email' => 'required|email'
         ]);
+		
         $rule = new RsgRequest();
 		$rule->customer_email = array_search($request->get('customer_email'),getEmailToEncryptedEmail())?array_search($request->get('customer_email'),getEmailToEncryptedEmail()):$request->get('customer_email');
+		if(isBlacklistEmail($rule->customer_email)) throw new \Exception('Blacklist email');
 		$rule->customer_paypal_email = $request->get('customer_paypal_email');
 		$rule->transfer_paypal_account = $request->get('transfer_paypal_account');
 		$rule->transaction_id = $request->get('transaction_id');

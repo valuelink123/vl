@@ -128,6 +128,15 @@ th,td,td>span {
                                 @endforeach
                             </select>
                         </div>
+                        <br>
+                        <div class="input-group">
+                            <span class="input-group-addon">Type</span>
+                            <select multiple style="width:100%;" id="crmType" data-init-by-query="ins.crmType">
+                                @foreach(getCrmClientType() as $key=>$val)
+                                    <option value="{!! $key !!}">{!! $val !!}</option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
 					@permission('ctg-export')
                     <div class="col-md-1">
@@ -273,6 +282,7 @@ th,td,td>span {
                     brand: $('#brand').val(),
                     review_id:$('#review_id').val(),
                     channel:$('#channel').val(),
+                    crmType:$('#crmType').val(),
                 }
             })
 

@@ -1570,3 +1570,30 @@ function getEmailToEncryptedEmail()
 	}
 	return $emailData;
 }
+
+function getBlacklistEmail($rebuild = false)
+{
+	$emailData = array();
+	if (Cache::has('blacklistEmail') && !$rebuild) {
+		$emailData = Cache::get('blacklistEmail');
+ 	}else{
+		$emailData = DB::table('client_info')->leftJoin('client',
+			function($q){
+				$q->on('client_info.client_id', '=', 'client.id');
+			}
+		)->whereRaw("FIND_IN_SET('1',client.type)")->pluck(DB::RAW('LOWER(encrypted_email) as encrypted_email'),DB::RAW('LOWER(email) as email'))->toArray();
+		Cache::forever('blacklistEmail', $emailData);
+	}
+	return $emailData;
+}
+
+
+function isBlacklistEmail($email='')
+{
+	$email = strtolower($email);
+	$emailData = getBlacklistEmail();
+	if(!$email || array_search($email,$emailData) || array_key_exists($email,$emailData)){
+		return true;
+	}
+	return false;
+}
