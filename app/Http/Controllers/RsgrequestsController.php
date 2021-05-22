@@ -441,7 +441,7 @@ class RsgrequestsController extends Controller
 	public function process(Request $req){
 
 		if ($req->isMethod('GET')) {
-			$email = array_search($req->input('email'),getEmailToEncryptedEmail())??$req->input('email');
+			$email = array_search($req->input('email'),getEmailToEncryptedEmail())?array_search($req->input('email'),getEmailToEncryptedEmail()):$req->input('email');
 			$emails = DB::table('sendbox')->where('to_address', $email)->orderBy('date', 'desc')->get(['*',DB::RAW('\''.$req->input('email').'\' as to_address')]);
 			$emails = json_decode(json_encode($emails), true); // todo
 			$users= $this->getUsers();
@@ -493,7 +493,7 @@ class RsgrequestsController extends Controller
 			'customer_email' => 'required|email'
         ]);
         $rule = new RsgRequest();
-		$rule->customer_email = array_search($request->get('customer_email'),getEmailToEncryptedEmail())??$request->get('customer_email');
+		$rule->customer_email = array_search($request->get('customer_email'),getEmailToEncryptedEmail())?array_search($request->get('customer_email'),getEmailToEncryptedEmail()):$request->get('customer_email');
 		$rule->customer_paypal_email = $request->get('customer_paypal_email');
 		$rule->transfer_paypal_account = $request->get('transfer_paypal_account');
 		$rule->transaction_id = $request->get('transaction_id');
@@ -535,14 +535,12 @@ class RsgrequestsController extends Controller
 
 		//一个客户对一个产品只能申请一次，可以申请多个不同的产品，但是必须是上个产品complete后才能申请
 		$ruleData = $rule->where('customer_email',$rule->customer_email)->where('product_id',$rule->product_id)->take(1)->get()->toArray();
-
 		if($ruleData){
 			//该客户已经申请过该产品
 			$request->session()->flash('error_message','Rsg Request Failed,One customer cannot test two identical products');
 
 			return redirect()->back()->withInput();
 		}
-
 		//检查该客户最近一次申请产品是什么时候，要在上次申请完成后才能再申请
 		$customerData = $rule->where('customer_email',$rule->customer_email)->orderBy('updated_at', 'desc')->take(1)->get()->toArray();
 		if($customerData){

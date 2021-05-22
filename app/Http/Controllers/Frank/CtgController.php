@@ -600,7 +600,7 @@ class CtgController extends Controller {
 
 		if(!Auth::user()->can(['ctg-add'])) die('Permission denied -- ctg-add');
 		$data['name'] = isset($_REQUEST['name']) ? $_REQUEST['name'] : '';
-		$data['email'] = array_search($req->get('email'),getEmailToEncryptedEmail())??$req->get('email');
+		$data['email'] = array_search($req->get('email'),getEmailToEncryptedEmail())?array_search($req->get('email'),getEmailToEncryptedEmail()):$req->get('email');
 		$data['note'] = isset($_REQUEST['note']) ? $_REQUEST['note'] : '';
 		$channel= isset($_REQUEST['channel']) ? $_REQUEST['channel'] : '';
 		$data['order_id'] = isset($_REQUEST['order_id']) ? $_REQUEST['order_id'] : '';
