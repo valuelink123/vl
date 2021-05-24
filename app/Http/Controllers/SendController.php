@@ -237,6 +237,15 @@ class SendController extends Controller
 //				return redirect()->back()->withInput();
 				continue;
 			}
+
+            if(isBlacklistEmail(trim($to_address))) continue;
+            $hasWaiting = Sendbox::where('user_id',intval(Auth::user()->id))
+            ->where('from_address',trim($request->get('from_address')))
+            ->where('to_address',substr(trim($to_address),0,99))
+            ->where('status','Waiting')->whereNull('error')
+            ->value('id');
+            if($hasWaiting) continue;
+            
 			if(trim($to_address)){
 				if($request->get('sendbox_id')){
 					$sendbox = Sendbox::findOrFail($request->get('sendbox_id'));
