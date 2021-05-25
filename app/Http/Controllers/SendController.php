@@ -226,6 +226,14 @@ class SendController extends Controller
 
 		$blackEmail = blackEmail();//发邮件的时候，黑名单客户的邮箱
 		$emailToEncryptedEmail = getEmailToEncryptedEmail();
+		
+		$hasWaiting = Sendbox::where('status','Waiting')
+			->where('from_address',trim($request->get('from_address')))
+			->where('error_count',0)
+            ->whereIn('to_address',$to_address_array)
+            ->where('user_id',intval(Auth::user()->id))
+            ->groupBy('to_address')->pluck('to_address')->toArray();
+			
 		foreach($to_address_array as $to_address){
 			$_address = array_search($to_address,$emailToEncryptedEmail);
 			if($_address){
@@ -239,12 +247,7 @@ class SendController extends Controller
 			}
 
             if(isBlacklistEmail(trim($to_address))) continue;
-            $hasWaiting = Sendbox::where('user_id',intval(Auth::user()->id))
-            ->where('from_address',trim($request->get('from_address')))
-            ->where('to_address',substr(trim($to_address),0,99))
-            ->where('status','Waiting')->whereNull('error')
-            ->value('id');
-            if($hasWaiting) continue;
+            if(in_array(trim($to_address),$hasWaiting)) continue;
             
 			if(trim($to_address)){
 				if($request->get('sendbox_id')){
@@ -313,7 +316,7 @@ class SendController extends Controller
 		}
         
         
-        if ($sendbox->id) {
+        if (!empty($sendbox)) {
             $request->session()->flash('success_message','Save Email Success');
             if($request->get('inbox_id')){
 				if(!$request->get('asDraft')){
@@ -325,7 +328,7 @@ class SendController extends Controller
             }
             //return redirect('inbox/'.$request->get('inbox_id'));
         } else {
-            $request->session()->flash('error_message','Set Email Failed');
+            $request->session()->flash('error_message','Set Email Failed, the recipient has been blacklisted, or there is an email waiting to be sent');
             return redirect()->back()->withInput();
         }
     }
