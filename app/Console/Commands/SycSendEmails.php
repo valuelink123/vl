@@ -73,10 +73,11 @@ class SycSendEmails extends Command
             DB::rollBack();
             echo $e->getMessage();
         }
+        die(); //取消回写
         DB::beginTransaction();
         try{
             //whereRaw("(status='Send' or (status='Waiting' and error_count>5))")->
-            $editArr = SendboxOut::where('synced',0)->pluck('id')->toArray();
+            $editArr = SendboxOut::whereRaw("(status='Send' or (status='Waiting' and error_count>0))")->where('synced',0)->pluck('id')->toArray();
             $editArr =  array_chunk($editArr,1000);
             foreach($editArr as $editIds){
                 if($editIds){
