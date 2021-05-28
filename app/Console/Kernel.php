@@ -143,6 +143,7 @@ class Kernel extends ConsoleKernel
 		$schedule->command('update:mcf_order_amazonorderid')->monthly()->name('mcf_order_amazonorderid');
 
 		$schedule->command('cal:dailySales')->dailyAt('08:30')->name('dailySales')->withoutOverlapping();
+		$schedule->command('sync:sendmail')->everyTenMinutes()->name('syncSendMail')->withoutOverlapping();
 //		$schedule->command('update:emails')->monthly()->name('updateEmails')->withoutOverlapping();
     }
 

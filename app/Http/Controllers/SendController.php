@@ -135,7 +135,7 @@ class SendController extends Controller
             $submitCount = count($_REQUEST["id"]);
             $emails = Sendbox::whereIn('id',$_REQUEST["id"]); 
             if(array_get($_REQUEST,"confirmStatus") == 'Waiting'){
-                $successCount = $emails->whereRaw("((status='Waiting' and error_count>0) or status='Draft') ")->update(
+                $successCount = $emails->whereRaw("((status='Waiting' and error_count>0) or status='Draft') and synced=0 ")->update(
                     [
                         'status'=>'Waiting',
                         'error'=>NULL,
@@ -144,7 +144,7 @@ class SendController extends Controller
                 );
             }
             if(array_get($_REQUEST,"confirmStatus") == 'Draft'){
-                $successCount = $emails->where('status','Waiting')->update(
+                $successCount = $emails->where('status','Waiting')->where('synced',0)->update(
                     [
                         'status'=>'Draft',
                         'error'=>NULL,
