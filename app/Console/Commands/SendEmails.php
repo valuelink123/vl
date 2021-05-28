@@ -130,7 +130,7 @@ class SendEmails extends Command
 					$task->error_count = $task->error_count + 1;
                     $task->plan_date = isset($configTime[$task->error_count]) ? time() + $configTime[$task->error_count] : $task->plan_date;
 				}
-				print_r($result);
+				$task->synced = 0;
 			} catch (\Exception $e) {
 				//\Log::error('Send Mail '.$task->id.' Error' . $e->getMessage());
 				$task->error = $this->filterEmoji($e->getMessage());

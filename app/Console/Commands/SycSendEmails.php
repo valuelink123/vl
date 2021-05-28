@@ -43,27 +43,54 @@ class SycSendEmails extends Command
     {
         DB::beginTransaction();
         try{
-            $blackEmail = blackEmail();
-            $waitSend = Sendbox::where('status','Waiting')->whereNotIn('to_address',$blackEmail)->where('plan_date','<',strtotime(date('Y-m-d H:i:s')))->where('error_count','<',6)->where('updated_at','<=',date('Y-m-d H:i:s',strtotime('-10 min')))->where('synced',0)->get()->keyBy('id')->toArray();
-            if(!empty($waitSend)){
-                SendboxOut::insertOnDuplicateWithDeadlockCatching(array_values($waitSend),array_keys(array_get(array_values($waitSend),0)));
+            $maxId = SendboxOut::max('id');
+            $maxId = intval($maxId)?intval($maxId):0;
+            $newSend = DB::statement("insert into sendbox_out select * from sendbox where sendbox.id>$maxId");
+            Sendbox::where('id','>=',$maxId)->update(['synced'=>1]);
+            $editArr = Sendbox::where('id','<=',$maxId)->where('synced',0)->pluck('id')->toArray();
+            $editArr =  array_chunk($editArr,1000);
+            foreach($editArr as $editIds){
+                if($editIds){
+                    $editIdsStr = implode(',',$editIds);
+                    DB::statement("update sendbox_out,sendbox set 
+                    sendbox_out.from_address=sendbox.from_address,
+                    sendbox_out.to_address=sendbox.to_address,
+                    sendbox_out.subject=sendbox.subject,
+                    sendbox_out.text_html=sendbox.text_html,
+                    sendbox_out.date=sendbox.date,
+                    sendbox_out.attachs=sendbox.attachs,
+                    sendbox_out.user_id=sendbox.user_id,
+                    sendbox_out.updated_at=sendbox.updated_at,
+                    sendbox_out.status=sendbox.status,
+                    sendbox_out.plan_date=sendbox.plan_date,
+                    sendbox_out.ip=sendbox.ip
+                    where sendbox_out.id=sendbox.id and sendbox.id in ($editIdsStr)");
+                    Sendbox::whereIn('id',$editIds)->update(['synced'=>1]);
+                }
             }
-            $ids = array_keys($waitSend);
-            if($ids) Sendbox::whereIn('id',$ids)->update(['synced'=>1]);
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
             echo $e->getMessage();
         }
-
         DB::beginTransaction();
         try{
-            $hasSend = SendboxOut::whereRaw("(status='Send' or (status='Waiting' and error_count>5))")->where('synced',0)->get(['id','updated_at','send_date','error','status','error_count','synced'])->keyBy('id')->toArray();
-            foreach($hasSend as $k=>$v){
-                Sendbox::where('id',$k)->update($v);
+            //whereRaw("(status='Send' or (status='Waiting' and error_count>5))")->
+            $editArr = SendboxOut::where('synced',0)->pluck('id')->toArray();
+            $editArr =  array_chunk($editArr,1000);
+            foreach($editArr as $editIds){
+                if($editIds){
+                    $editIdsStr = implode(',',$editIds);
+                    DB::statement("update sendbox,sendbox_out set 
+                    sendbox.updated_at=sendbox_out.updated_at,
+                    sendbox.send_date=sendbox_out.send_date,
+                    sendbox.error=sendbox_out.error,
+                    sendbox.status=sendbox_out.status,
+                    sendbox.error_count=sendbox_out.error_count
+                    where sendbox.id=sendbox_out.id and sendbox_out.id in ($editIdsStr)");
+                    SendboxOut::whereIn('id',$editIds)->update(['synced'=>1]);    
+                }
             }
-            $ids = array_keys($hasSend);
-            if($ids) SendboxOut::whereIn('id',$ids)->update(['synced'=>1]);
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
