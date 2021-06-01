@@ -749,6 +749,7 @@ function getActiveUserConfig()
 		array('db'=>'website','dbname'=>'cocohopshop','name'=>'cocohopshop','formid'=>array(1),'fields'=>array('name'=>1,'email'=>2,'orderid'=>3)),
 		array('db'=>'website','dbname'=>'spacekeyshop','name'=>'spacekeyshop','formid'=>array(1),'fields'=>array('name'=>2,'email'=>3,'orderid'=>4)),
 		array('db'=>'website','dbname'=>'thefunavo','name'=>'thefunavo','formid'=>array(1),'fields'=>array('name'=>1,'email'=>2,'orderid'=>3)),
+		array('db'=>'website','dbname'=>'myvidoka_com','name'=>'myvidoka','formid'=>array(1),'fields'=>array('name'=>1.3,'email'=>2,'orderid'=>3)),
 
     );
 
