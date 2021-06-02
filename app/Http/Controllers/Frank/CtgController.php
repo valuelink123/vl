@@ -522,14 +522,18 @@ class CtgController extends Controller {
 			}
 			//查询该邮箱是否存在于client_info中，查出需要显示的facebook_name和facebook_group
 			$clientInfo = DB::table('client_info')->where('email',$ctgRow['email'])->get(array('facebook_name','facebook_group','encrypted_email'))->first();
+
 			if($clientInfo){
 				$fbgroupConfig = getFacebookGroup();
 				$steps = json_decode($ctgRow['steps'],true);
 				$steps['facebook_name'] = $clientInfo->facebook_name;
 				$steps['facebook_group'] = isset($fbgroupConfig[ $clientInfo->facebook_group]) ? $fbgroupConfig[ $clientInfo->facebook_group] : '';
 				$ctgRow['steps'] = json_encode($steps);
+				$emails = DB::table('sendbox')->where('to_address', $ctgRow['email'])->orderBy('date', 'desc')->get(['*',DB::RAW('\''.$clientInfo->encrypted_email.'\' as to_address')]);
+			}else{
+				$emails = DB::table('sendbox')->where('to_address', $ctgRow['email'])->orderBy('date', 'desc')->get(['*']);
 			}
-            $emails = DB::table('sendbox')->where('to_address', $ctgRow['email'])->orderBy('date', 'desc')->get(['*',DB::RAW('\''.$clientInfo->encrypted_email.'\' as to_address')]);
+
             $emails = json_decode(json_encode($emails), true); // todo
             $ctgRow['email'] = empty($clientInfo)?$ctgRow['email']:$clientInfo->encrypted_email;
 
