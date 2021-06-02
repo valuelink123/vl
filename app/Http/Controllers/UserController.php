@@ -188,12 +188,11 @@ class UserController extends Controller
 
     public function total(Request $request)
     {
-
-		$emailToEncryptedEmail = getEmailToEncryptedEmail();
 		$date_from = array_get($_REQUEST,'date_from')?array_get($_REQUEST,'date_from'):date('Y-m-d',strtotime('-7day'));
         $date_to = array_get($_REQUEST,'date_to')?array_get($_REQUEST,'date_to'):date('Y-m-d');
 		$arrayData= array();
 		if (array_get($_REQUEST,'ExportType')) {
+			$emailToEncryptedEmail = getEmailToEncryptedEmail();
             if(array_get($_REQUEST,'ExportType')=='Users'){
 				if(!Auth::user()->can(['data-statistics-users'])) die('Permission denied -- data-statistics-users');
 				$users=$this->getUsers();

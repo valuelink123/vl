@@ -119,6 +119,15 @@
                                 @endforeach
                             </select>
                         </div>
+                        <br/>
+                        <div class="input-group">
+                            <span class="input-group-addon">Type</span>
+                            <select multiple style="width:100%;" id="type" data-init-by-query="ins.type">
+                                @foreach(getCrmClientType() as $key=>$val)
+                                    <option value="{!! $key !!}">{!! $val !!}</option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
                     <div class="col-md-2">
                         <div class="input-group">
@@ -283,6 +292,7 @@
                     processor: $('#processor').val(),
                     bg: $('#bg').val(),
                     bu: $('#bu').val(),
+                    type: $('#type').val(),
                     from: $('#from').val(),
                     country: $('#country').val(),
                     brand: $('#brand').val(),

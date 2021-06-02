@@ -59,7 +59,7 @@
                                 </td>
                                 <td>
                                     <div class="input-group date date-picker margin-bottom-5" data-date-format="yyyy-mm-dd">
-                                        <input type="text" class="form-control form-filter input-sm" readonly name="date_from" placeholder="From">
+                                        <input type="text" class="form-control form-filter input-sm" readonly name="date_from" placeholder="From" value="{{date('Y-m-d',strtotime('-7 days'))}}">
                                         <span class="input-group-btn">
                                                                     <button class="btn btn-sm default" type="button">
                                                                         <i class="fa fa-calendar"></i>
@@ -67,7 +67,7 @@
                                                                 </span>
                                     </div>
                                     <div class="input-group date date-picker" data-date-format="yyyy-mm-dd">
-                                        <input type="text" class="form-control form-filter input-sm" readonly name="date_to" placeholder="To">
+                                        <input type="text" class="form-control form-filter input-sm" readonly name="date_to" placeholder="To" value="{{date('Y-m-d')}}">
                                         <span class="input-group-btn">
                                                                     <button class="btn btn-sm default" type="button">
                                                                         <i class="fa fa-calendar"></i>

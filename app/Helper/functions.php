@@ -749,6 +749,7 @@ function getActiveUserConfig()
 		array('db'=>'website','dbname'=>'cocohopshop','name'=>'cocohopshop','formid'=>array(1),'fields'=>array('name'=>1,'email'=>2,'orderid'=>3)),
 		array('db'=>'website','dbname'=>'spacekeyshop','name'=>'spacekeyshop','formid'=>array(1),'fields'=>array('name'=>2,'email'=>3,'orderid'=>4)),
 		array('db'=>'website','dbname'=>'thefunavo','name'=>'thefunavo','formid'=>array(1),'fields'=>array('name'=>1,'email'=>2,'orderid'=>3)),
+		array('db'=>'website','dbname'=>'myvidoka_com','name'=>'myvidoka','formid'=>array(1),'fields'=>array('name'=>1.3,'email'=>2,'orderid'=>3)),
 
     );
 
@@ -1539,7 +1540,23 @@ function blackEmail()
 		'crazycutecloset@mail.com',
 		'alejandroz@protonmail.com',
 		'ashekhani10@stuy.edu',
-		'testireba5@gmail.com'
+		'testireba5@gmail.com',
+		'cababy@comcast.net',
+		'lsprimont@yahoo.com',
+		'zohar@loshitzer.com',
+		'wendyjonesper@yahoo.com',
+		'casielong4@yahoo.com',
+		'jdahl@pipeline.com',
+		'mrjunderwood@gmail.com',
+		'paracouple@comcast.net',
+		'jimhamlett2@gmail.com',
+		'shea.stimac@outlook.com',
+		'kacampbelljd@gmail.com',
+		'villegas13@gmail.com',
+		'yonilivni47@gmail.com',
+		'robert.tow@aol.com',
+		'954fb78b26091ef830a080f14808f22a6585@valuelinkltd.com',
+
 	);
 }
 
@@ -1553,4 +1570,31 @@ function getEmailToEncryptedEmail()
 		Cache::forever('email', $emailData);
 	}
 	return $emailData;
+}
+
+function getBlacklistEmail($rebuild = false)
+{
+	$emailData = array();
+	if (Cache::has('blacklistEmail') && !$rebuild) {
+		$emailData = Cache::get('blacklistEmail');
+ 	}else{
+		$emailData = DB::table('client_info')->leftJoin('client',
+			function($q){
+				$q->on('client_info.client_id', '=', 'client.id');
+			}
+		)->whereRaw("FIND_IN_SET('1',client.type)")->pluck(DB::RAW('LOWER(encrypted_email) as encrypted_email'),DB::RAW('LOWER(email) as email'))->toArray();
+		Cache::forever('blacklistEmail', $emailData);
+	}
+	return $emailData;
+}
+
+
+function isBlacklistEmail($email='')
+{
+	$email = strtolower($email);
+	$emailData = getBlacklistEmail();
+	if(!$email || array_search($email,$emailData) || array_key_exists($email,$emailData)){
+		return true;
+	}
+	return false;
 }

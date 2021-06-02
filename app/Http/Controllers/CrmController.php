@@ -147,6 +147,7 @@ class CrmController extends Controller
 				// 'brand' => 'c.brand',
 				// 'country' => 'c.country',
 				// WHERE FIND_IN_SET
+				'type' => 's:t1.type',
 				'bg' => 's:b.bg',
 				'bu' => 's:b.bu',
 			],
@@ -409,11 +410,11 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 
 		$insertInfo = array('client_id'=>$data['id'],'name'=>$data['name'],'country'=>$data['country'],'from'=>$data['from'],'brand'=>$data['brand'],'facebook_name'=>$data['facebook_name'],'facebook_group'=>intval($data['facebook_group']));
 		//查出client_info表的id,把之前的该客户的client_info数据删掉
-		$_ciids = DB::table('client_info')->select('id')->where('client_id',$old_id)->get()->toArray();
+		$_ciids = DB::table('client_info')->select(['id','encrypted_email','email'])->where('client_id',$old_id)->get()->toArray();
 		$ciids = $en_email = array();
 		foreach($_ciids as $key=>$val){
 			$ciids[] = $val->id;
-			$en_email[$val['encrypted_email']??$val['email']]=$val['email'];
+			$en_email[($val->encrypted_email??$val->email)]=$val->email;
 		}
 		DB::table('client_info')->whereIn('id',$ciids)->delete();//删除掉client_info表里的该条数据
 		DB::table('client_order_info')->whereIn('ci_id',$ciids)->delete();//订单信息，删除之前的
@@ -472,6 +473,7 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 			DB::table('client')->where('id',$old_id)->delete();
 		}
 		DB::commit();
+		getBlacklistEmail(true);
 		if(empty($old_id)){
 			//添加界面之后，跳转到列表页
 			return redirect('/crm');

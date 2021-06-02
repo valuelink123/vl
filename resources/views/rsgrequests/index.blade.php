@@ -161,6 +161,19 @@
 									</div>
 									<br>
 								</div>
+
+								<div class="col-md-2">
+									<div class="input-group">
+										<span class="input-group-addon">Type</span>
+										<select name="crmType" class="form-control form-filter input-sm">
+											<option value="">All</option>
+											@foreach(getCrmClientType() as $key=>$val)
+												<option value="{!! $key !!}">{!! $val !!}</option>
+											@endforeach
+										</select>
+									</div>
+									<br>
+								</div>
 							</div>
 							<div class="row">
 								<div class="col-md-4">
@@ -307,8 +320,8 @@
                 searching: false,//关闭搜索
                 serverSide: true,//启用服务端分页（这是使用Ajax服务端的必须配置）
                 "lengthMenu": [
-                    [10, 50, 100, -1],
-                    [10, 50, 100, 'All'] // change per page values here
+                    [10, 50, 100],
+                    [10, 50, 100] // change per page values here
                 ],
                 "pageLength": 10, // default record count per page
                 pagingType: 'bootstrap_extended',
@@ -478,6 +491,7 @@
 			$('select[name="processor"]').val('');
             $('input[name="keyword"]').val('');//
             $('select[name="user_id"]').val('');
+			$('select[name="crmType"]').val('');
             $("#search").trigger("click");
 		});
 
@@ -501,6 +515,9 @@
             $("#search").trigger("click");
         });
         $('select[name="user_id"]').change(function(){
+            $("#search").trigger("click");
+        });
+		$('select[name="crmType"]').change(function(){
             $("#search").trigger("click");
         });
 

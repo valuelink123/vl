@@ -53,6 +53,7 @@ class Kernel extends ConsoleKernel
 		'App\Console\Commands\McfOrderUpdateAmazonOrderId',
 //		'App\Console\Commands\McfOrderUpdateSapStatus',
 		'App\Console\Commands\UpdateEmails',
+		'App\Console\Commands\UpdateEmailStatus',
     ];
 
     /**
@@ -143,7 +144,11 @@ class Kernel extends ConsoleKernel
 		$schedule->command('update:mcf_order_amazonorderid')->monthly()->name('mcf_order_amazonorderid');
 
 		$schedule->command('cal:dailySales')->dailyAt('08:30')->name('dailySales')->withoutOverlapping();
+		$schedule->command('sync:sendmail')->everyTenMinutes()->name('syncSendMail')->withoutOverlapping();
 //		$schedule->command('update:emails')->monthly()->name('updateEmails')->withoutOverlapping();
+
+		//cron('*/10 * * * *')
+		$schedule->command('update:email_status')->cron('*/10 * * * *')->name('update_email_status')->withoutOverlapping();//更新邮箱状态，每10分钟一次
     }
 
     /**

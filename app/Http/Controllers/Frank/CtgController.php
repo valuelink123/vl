@@ -89,6 +89,7 @@ class CtgController extends Controller {
                 'processor' => 't1.processor',
                 'status' => 't1.status',
                 // WHERE FIND_IN_SET
+                'crmType' => 's:client.type',
                 'bg' => 's:t4.bgs',
                 'bu' => 's:t4.bus',
                 'brand' => 's:t4.brands',
@@ -228,7 +229,6 @@ class CtgController extends Controller {
     public function export(){
 		if(!Auth::user()->can(['ctg-export'])) die('Permission denied -- ctg-export');
         set_time_limit(0);
-
         $arrayData = array();
         $headArray[] = 'Date';
         $headArray[] = 'Email';
@@ -522,14 +522,18 @@ class CtgController extends Controller {
 			}
 			//查询该邮箱是否存在于client_info中，查出需要显示的facebook_name和facebook_group
 			$clientInfo = DB::table('client_info')->where('email',$ctgRow['email'])->get(array('facebook_name','facebook_group','encrypted_email'))->first();
+
 			if($clientInfo){
 				$fbgroupConfig = getFacebookGroup();
 				$steps = json_decode($ctgRow['steps'],true);
 				$steps['facebook_name'] = $clientInfo->facebook_name;
 				$steps['facebook_group'] = isset($fbgroupConfig[ $clientInfo->facebook_group]) ? $fbgroupConfig[ $clientInfo->facebook_group] : '';
 				$ctgRow['steps'] = json_encode($steps);
+				$emails = DB::table('sendbox')->where('to_address', $ctgRow['email'])->orderBy('date', 'desc')->get(['*',DB::RAW('\''.$clientInfo->encrypted_email.'\' as to_address')]);
+			}else{
+				$emails = DB::table('sendbox')->where('to_address', $ctgRow['email'])->orderBy('date', 'desc')->get(['*']);
 			}
-            $emails = DB::table('sendbox')->where('to_address', $ctgRow['email'])->orderBy('date', 'desc')->get(['*',DB::RAW('\''.$clientInfo->encrypted_email.'\' as to_address')]);
+
             $emails = json_decode(json_encode($emails), true); // todo
             $ctgRow['email'] = empty($clientInfo)?$ctgRow['email']:$clientInfo->encrypted_email;
 
@@ -599,8 +603,9 @@ class CtgController extends Controller {
 	{
 
 		if(!Auth::user()->can(['ctg-add'])) die('Permission denied -- ctg-add');
+        if(isBlacklistEmail($req->get('email'))) throw new \Exception('Blacklist email');
 		$data['name'] = isset($_REQUEST['name']) ? $_REQUEST['name'] : '';
-		$data['email'] = array_search($req->get('email'),getEmailToEncryptedEmail())??$req->get('email');
+		$data['email'] = array_search($req->get('email'),getEmailToEncryptedEmail())?array_search($req->get('email'),getEmailToEncryptedEmail()):$req->get('email');
 		$data['note'] = isset($_REQUEST['note']) ? $_REQUEST['note'] : '';
 		$channel= isset($_REQUEST['channel']) ? $_REQUEST['channel'] : '';
 		$data['order_id'] = isset($_REQUEST['order_id']) ? $_REQUEST['order_id'] : '';

@@ -5,7 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use PhpImap;
 use Illuminate\Support\Facades\Input;
-use App\Sendbox;
+use App\SendboxOut;
 use App\Accounts;
 use Swift_Mailer;
 use Swift_SendmailTransport;
@@ -65,7 +65,7 @@ class SendEmails extends Command
 		}
 
 		$blackEmail = blackEmail();
-        $tasks = Sendbox::where('status','Waiting')->where('from_address',$select_mail)->whereNotIn('to_address',$blackEmail)->where('plan_date','<',strtotime(date('Y-m-d H:i:s')))->where('error_count','<',6)->orderBy('error_count','asc')->take(120)->get();
+        $tasks = SendboxOut::where('status','Waiting')->where('from_address',$select_mail)->whereNotIn('to_address',$blackEmail)->where('plan_date','<',strtotime(date('Y-m-d H:i:s')))->where('error_count','<',6)->orderBy('error_count','asc')->take(120)->get();
 		$this->run_email = '';
 		$configTime = array(1=>5*60,2=>15*60,3=>30*60,4=>60*60,5=>240*60);
 		foreach ($tasks as $task) {
@@ -77,9 +77,6 @@ class SendEmails extends Command
 				}else{
 					$attachs = array();
 				}
-
-
-
 				$from=trim($task->from_address);
 				$to = trim($task->to_address);
 				$subject=$task->subject;
@@ -133,7 +130,7 @@ class SendEmails extends Command
 					$task->error_count = $task->error_count + 1;
                     $task->plan_date = isset($configTime[$task->error_count]) ? time() + $configTime[$task->error_count] : $task->plan_date;
 				}
-				print_r($result);
+				$task->synced = 0;
 			} catch (\Exception $e) {
 				//\Log::error('Send Mail '.$task->id.' Error' . $e->getMessage());
 				$task->error = $this->filterEmoji($e->getMessage());

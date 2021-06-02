@@ -479,9 +479,10 @@
 					<option value ="">全部</option>
 					<option value ="BG">BG</option>
 					<option value ="BG1">BG1</option>
-					<option value ="BG1">BG2</option>
-					<option value ="BG2">BG3</option>
-					<option value ="BG3">BG4</option>
+					<option value ="BG2">BG2</option>
+					<option value ="BG3">BG3</option>
+					<option value ="BG4">BG4</option>
+					<option value ="BG5">BG5</option>
 				</select>
 			</div>
 			<div class="filter_option">
