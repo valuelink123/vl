@@ -751,6 +751,8 @@ function getActiveUserConfig()
 		array('db'=>'website','dbname'=>'thefunavo','name'=>'thefunavo','formid'=>array(1),'fields'=>array('name'=>1,'email'=>2,'orderid'=>3)),
 		array('db'=>'website','dbname'=>'myvidoka_com','name'=>'myvidoka','formid'=>array(1),'fields'=>array('name'=>1.3,'email'=>2,'orderid'=>3)),
 
+		array('db'=>'website','dbname'=>'wordpress','name'=>'dbpowershop_jp','entry_table'=>'wp_54_gf_entry','meta_table'=>'wp_54_gf_entry_meta','formid'=>array(1),'fields'=>array('name'=>1,'email'=>2,'orderid'=>3)),
+
     );
 
     return $config;
