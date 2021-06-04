@@ -87,13 +87,13 @@ class McforderController extends Controller
         }
 
 		if($request->input('order_id')){
-            $datas = $datas->where('seller_fulfillment_order_id', $request->input('order_id'));
+            $datas = $datas->where('seller_fulfillment_order_id','like', '%'.$request->input('order_id').'%');
         }
 		if($request->input('status')){
             $datas = $datas->where('fulfillment_order_status', $request->input('status'));
         }
 		if($request->input('name')){
-            $datas = $datas->where('name', $request->input('name'));
+            $datas = $datas->where('name', 'like', '%'.$request->input('name').'%');
         }
 		//country下拉选择框
 		if($request->input('country')){
@@ -182,39 +182,47 @@ class McforderController extends Controller
         $country = isset($_GET['country']) ? $_GET['country'] : '';
         $status = isset($_GET['status']) ? $_GET['status'] : '';
 
-        $datas= DB::connection('amazon')->table('amazon_mcf_orders')->where('displayable_order_date_time','>=',$date_from.' 00:00:00')->where('displayable_order_date_time','<=',$date_to.' 23:59:59');
+		$datas= DB::connection('amazon')->table('amazon_mcf_orders as t1')
+			->select('t1.*','t2.tracking_number as tracking_number')
+			->leftjoin('amazon_mcf_shipment_package as t2',function($join){
+				$join->on('t1.seller_fulfillment_order_id','=','t2.seller_fulfillment_order_id')
+					->on('t1.seller_account_id','=','t2.seller_account_id');
+			})
+			->where('displayable_order_date_time','>=',$date_from.' 00:00:00')
+			->where('displayable_order_date_time','<=',$date_to.' 23:59:59');
+
         if($sellerid!==''){
-            $datas = $datas->where('seller_account_id', $sellerid);
+            $datas = $datas->where('t1.seller_account_id', $sellerid);
         }
         if($order_id!==''){
-            $datas = $datas->where('seller_fulfillment_order_id', $order_id);
+            $datas = $datas->where('t1.seller_fulfillment_order_id','like', '%'.$order_id.'%');
         }
         if($status!==''){
-            $datas = $datas->where('fulfillment_order_status', $status);
+            $datas = $datas->where('t1.fulfillment_order_status', $status);
         }
         if($name!==''){
-            $datas = $datas->where('name', $name);
+            $datas = $datas->where('t1.name', 'like', '%'.$name.'%');
         }
         if($country!==''){
-            $datas = $datas->where('country_code', $country);
+            $datas = $datas->where('t1.country_code', $country);
         }
 
         $lists =  $datas->get()->toArray();
+
         $accounts = $this->getSellerId();//账号id跟账号名称之间的对应关系
         $lists=json_decode(json_encode($lists), true);
-        $queries = DB::connection('amazon')->getQueryLog(); // 获取查询日志
 
-        //得到asin,sku,bg,bu,seller信息的数据处理
-        $detail_sql = "select CONCAT(seller_accounts.id,'_',sap_asin_match_sku.seller_sku) as sai_ss,sap_asin_match_sku.asin as asin, sap_asin_match_sku.sku as sku,sap_seller_id,sap_seller_bg,sap_seller_bu
-                FROM sap_asin_match_sku
-                left join seller_accounts on seller_accounts.mws_seller_id = sap_asin_match_sku.seller_id
-                and seller_accounts.mws_marketplaceid=sap_asin_match_sku.marketplace_id";
-        $_detailData = DB::connection('amazon')->select($detail_sql);
-        $_detailData=json_decode(json_encode($_detailData), true);
-        $detailData = array();
-        foreach($_detailData as $dk=>$dv){
-            $detailData[$dv['sai_ss']] = $dv;
-        }
+        //得到asin,sku,bg,bu,seller信息的数据处理，暂时不需要，所以注释这部分代码
+//        $detail_sql = "select CONCAT(seller_accounts.id,'_',sap_asin_match_sku.seller_sku) as sai_ss,sap_asin_match_sku.asin as asin, sap_asin_match_sku.sku as sku,sap_seller_id,sap_seller_bg,sap_seller_bu
+//                FROM sap_asin_match_sku
+//                left join seller_accounts on seller_accounts.mws_seller_id = sap_asin_match_sku.seller_id
+//                and seller_accounts.mws_marketplaceid=sap_asin_match_sku.marketplace_id";
+//        $_detailData = DB::connection('amazon')->select($detail_sql);
+//        $_detailData=json_decode(json_encode($_detailData), true);
+//        $detailData = array();
+//        foreach($_detailData as $dk=>$dv){
+//            $detailData[$dv['sai_ss']] = $dv;
+//        }
         //得到sap_sell_id跟用户名称的对照关系
         $sapSeller = getUsers('sap_seller');
         $sapSeller=json_decode(json_encode($sapSeller), true);
@@ -228,6 +236,7 @@ class McforderController extends Controller
         $headArray[] = 'Name';
         $headArray[] = 'Country';
         $headArray[] = 'Status';
+		$headArray[] = 'Tracking Number';
         // $headArray[] = 'BG';
         // $headArray[] = 'BU';
         // $headArray[] = 'Seller';
@@ -238,19 +247,19 @@ class McforderController extends Controller
         foreach ( $lists as $list){
             $asin = $sku = $bg = $bu = $seller = '';
             //通过seller_skus和seller_account_id转换得到asin,sku,bg,bu,seller
-            $_sellerskus = array_filter(explode(';',$list['seller_skus']));//L5HPC0102FBA*1;NUHPC0095US*1;L5HPC0030FBA*1;L5HPC0037FBA*2;
-            foreach($_sellerskus as $sk=>$sv){
-                $sellersku = array_filter(explode('*',$sv));
-                $sellersku = current($sellersku);
-                $sai_ss = $list['seller_account_id'].'_'.$sellersku;
-                if(isset($detailData[$sai_ss])){
-                    $asin .= $detailData[$sai_ss]['asin'].';';
-                    $sku .= $detailData[$sai_ss]['sku'].';';
-                    $bg .= $detailData[$sai_ss]['sap_seller_bg'].';';
-                    $bu .= $detailData[$sai_ss]['sap_seller_bu'].';';
-                    $seller .= isset($sapSeller[$detailData[$sai_ss]['sap_seller_id']]) ? $sapSeller[$detailData[$sai_ss]['sap_seller_id']] : $detailData[$sai_ss]['sap_seller_id'].';';
-                }
-            }
+//            $_sellerskus = array_filter(explode(';',$list['seller_skus']));//L5HPC0102FBA*1;NUHPC0095US*1;L5HPC0030FBA*1;L5HPC0037FBA*2;
+//            foreach($_sellerskus as $sk=>$sv){
+//                $sellersku = array_filter(explode('*',$sv));
+//                $sellersku = current($sellersku);
+//                $sai_ss = $list['seller_account_id'].'_'.$sellersku;
+//                if(isset($detailData[$sai_ss])){
+//                    $asin .= $detailData[$sai_ss]['asin'].';';
+//                    $sku .= $detailData[$sai_ss]['sku'].';';
+//                    $bg .= $detailData[$sai_ss]['sap_seller_bg'].';';
+//                    $bu .= $detailData[$sai_ss]['sap_seller_bu'].';';
+//                    $seller .= isset($sapSeller[$detailData[$sai_ss]['sap_seller_id']]) ? $sapSeller[$detailData[$sai_ss]['sap_seller_id']] : $detailData[$sai_ss]['sap_seller_id'].';';
+//                }
+//            }
             $arrayData[] = array(
                 $list['displayable_order_date_time'],
                 array_get($accounts,$list['seller_account_id']),
@@ -260,6 +269,7 @@ class McforderController extends Controller
                 $list['name'],
                 $list['country_code'],
                 $list['fulfillment_order_status'],
+				$list['tracking_number'],
                 // $bg ? $bg : '-',
                 // $bu ? $bu : '-',
                 // $seller ? $seller : '-',
