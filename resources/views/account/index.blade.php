@@ -52,6 +52,7 @@
 							<th> Account Name </th>
                             <th> Seller Account </th>
 							<th> Level </th>
+                            <th> Status </th>
                             <th> Receive Email </th>
                             <th> Logs</th>
                             <th> Actions </th>
@@ -71,6 +72,9 @@
                                 </td>
 								<td>
                                     {{array_get(getAccountLevel(),$seller_account['level'],$seller_account['level'])}}
+                                </td>
+                                <td>
+                                    {{array_get(\App\Accounts::STATUS,$seller_account['status'])}}
                                 </td>
                                 <td>
                                     {{$seller_account['email']}}

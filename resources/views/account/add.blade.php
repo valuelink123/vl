@@ -111,6 +111,20 @@
                                 <input type="text" class="form-control" name="account_sellerid" id="account_name" value="{{old('account_name')}}" required>
                             </div>
                         </div>
+
+                        <div class="form-group">
+                            <label>Status</label>
+                            <div class="input-group col-md-6">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-user"></i>
+                                </span>
+                                <select class="form-control form-filter input-sm" name="status">
+									@foreach (\App\Accounts::STATUS as $k=>$v)
+										<option value="{{$k}}" <?php if($k==old('status')) echo 'selected';?>>{{$v}}</option>
+									@endforeach
+								</select>
+                            </div>
+                        </div>
 						
 						<div class="form-group">
                             <label>Account Signature</label>

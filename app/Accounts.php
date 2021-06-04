@@ -8,4 +8,9 @@ class Accounts extends Model
     //
     protected $table = 'accounts';
     public $timestamps = false;
+
+    Const STATUS = [
+        '1'=>'Enabled',
+        '0'=>'Disabled',
+    ];
 }

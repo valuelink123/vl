@@ -101,7 +101,21 @@
                                 <input type="text" class="form-control" name="account_sellerid" id="account_sellerid" value="{{$seller_account['account_sellerid']}}" required>
                             </div>
                         </div>
-						
+
+						<div class="form-group">
+                            <label>Status</label>
+                            <div class="input-group col-md-6">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-user"></i>
+                                </span>
+                                <select class="form-control form-filter input-sm" name="status">
+									@foreach (\App\Accounts::STATUS as $k=>$v)
+										<option value="{{$k}}" <?php if($k==$seller_account['status']) echo 'selected';?>>{{$v}}</option>
+									@endforeach
+								</select>
+                            </div>
+                        </div>
+
 						<div class="form-group">
                             <label>Account Signature</label>
                             <div class="input-group">
