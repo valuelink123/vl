@@ -351,23 +351,58 @@ class UserController extends Controller
 			
 			if(array_get($_REQUEST,'ExportType')=='Performance'){
 				if(!Auth::user()->can(['data-statistics-performance'])) die('Permission denied -- data-statistics-performance');
-				$problemList = DB::select("select a.*,b.out_count,b.out_date,c.purchasedate,d.brand_line,d.item_no from (select count(*) as in_count,from_address,to_address,min(date) as in_date,max(amazon_order_id) as  amazon_order_id
-,max(sku) as  sku
-,max(asin) as  asin
-,user_id
-from inbox 
-where date>=:date_from and date<=:date_to group by from_address,to_address,user_id) as a left join 
-(select count(*) as out_count,from_address,to_address,max(date) as out_date  
-from sendbox 
-where status<>'draft' and date>=:date_from_s and date<=:date_to_s group by from_address,to_address) as b on a.from_address=b.to_address and a.to_address=b.from_address
-
-left join amazon_orders as c on a.amazon_order_id = c.amazonorderid
-left join asin as d on a.sku=d.sellersku and a.asin=d.asin and CONCAT('www.',c.SalesChannel) =  d.site",['date_from' => $date_from,'date_to' => $date_to,'date_from_s' => $date_from,'date_to_s' => $date_to]);
+				$user_ids = DB::table('role_user')->where('role_id',4)->pluck('user_id')->toArray();
+				$user_ids = implode(',',$user_ids);
+				$problemList = DB::select("
+				SELECT
+					a.*, b.out_count,
+					b.out_date
+				FROM
+					(
+						SELECT
+							from_address,
+							to_address,
+							count(*) AS in_count,
+							min(date) AS in_date,
+							max(amazon_order_id) AS amazon_order_id,
+							max(sku) AS sku,
+							max(asin) AS asin,
+							max(item_no) AS item_no,
+							user_id
+						FROM
+							inbox_report
+						WHERE
+							date >= '$date_from'
+						AND date <= '$date_to'
+						and user_id in ($user_ids)
+						GROUP BY
+							from_address,
+							to_address,
+							user_id
+					) AS a
+				LEFT JOIN (
+					SELECT
+						count(*) AS out_count,
+						from_address,
+						to_address,
+						max(date) AS out_date
+					FROM
+						sendbox_report
+					WHERE
+						date >= '$date_from'
+					AND date <= '$date_to'
+					and user_id in ($user_ids)
+					And STATUS = 'Send'
+					GROUP BY
+						from_address,
+						to_address
+				) AS b ON a.from_address = b.to_address
+				AND a.to_address = b.from_address");
 
 				$headArray[] = 'From Address';
 				$headArray[] = 'To Address';
 				$headArray[] = 'Amazon Order ID';
-				$headArray[] = 'Purchase Date';
+				//$headArray[] = 'Purchase Date';
 				
 				$headArray[] = 'Received Total';
 				$headArray[] = 'Earliest Received Date';
@@ -376,7 +411,7 @@ left join asin as d on a.sku=d.sellersku and a.asin=d.asin and CONCAT('www.',c.S
 				$headArray[] = 'Sku';
 				$headArray[] = 'Asin';
 				$headArray[] = 'Item No.';
-				$headArray[] = 'Brand Line';
+				//$headArray[] = 'Brand Line';
 				$headArray[] = 'User';
 				$arrayData[] = $headArray;
 				$users=$this->getUsers();
@@ -385,7 +420,7 @@ left join asin as d on a.sku=d.sellersku and a.asin=d.asin and CONCAT('www.',c.S
 						isset($emailToEncryptedEmail[$problem->from_address]) ? $emailToEncryptedEmail[$problem->from_address]  : $problem->from_address,
 						$problem->to_address,
 						$problem->amazon_order_id,
-						$problem->purchasedate,
+						//$problem->purchasedate,
 						$problem->in_count,
 						$problem->in_date,
 						$problem->out_count,
@@ -393,7 +428,7 @@ left join asin as d on a.sku=d.sellersku and a.asin=d.asin and CONCAT('www.',c.S
 						$problem->sku,
 						$problem->asin,
 						$problem->item_no,
-						$problem->brand_line,
+						//$problem->brand_line,
 						array_get($users,$problem->user_id,$problem->user_id),
 					];
 				}
@@ -402,25 +437,44 @@ left join asin as d on a.sku=d.sellersku and a.asin=d.asin and CONCAT('www.',c.S
 			
 			if(array_get($_REQUEST,'ExportType')=='Reply'){
 				if(!Auth::user()->can(['data-statistics-reply'])) die('Permission denied -- data-statistics-reply');
-				$problemList = DB::select("select b.from_address,b.to_address,b.amazon_order_id,b.sku,b.asin,b.date as f_date,a.date as s_date,a.user_id,c.purchasedate,d.brand_line,d.item_no
- from (select min(date) as date ,user_id,inbox_id from sendbox where inbox_id in (select inbox_id from sendbox where inbox_id<>0 and status='Send' and date>=:date_from and date<=:date_to group by inbox_id) group by user_id,inbox_id) as a 
-left join inbox as b on a.inbox_id = b.id
-left join amazon_orders as c on b.amazon_order_id = c.amazonorderid
-left join asin as d on b.sku=d.sellersku and b.asin=d.asin and CONCAT('www.',c.SalesChannel) =  d.site
-where a.date>=:sdate_from and a.date<=:sdate_to
- order by a.date asc",['date_from' => $date_from,'date_to' => $date_to,'sdate_from' => $date_from,'sdate_to' => $date_to]);
+				$user_ids = DB::table('role_user')->where('role_id',4)->pluck('user_id')->toArray();
+				$user_ids = implode(',',$user_ids);
+				$problemList = DB::select("
+				SELECT
+					b.from_address,
+					b.to_address,
+					b.amazon_order_id,
+					b.sku,
+					b.asin,
+					b.date AS f_date,
+					min(a.date) AS s_date,
+					a.user_id,
+					b.item_no
+				FROM
+					inbox_report b
+				LEFT JOIN sendbox_report a  ON b.id = a.inbox_id 
+				WHERE
+					b.date >= '$date_from'
+				AND b.date <= '$date_to'
+				AND a.inbox_id >0
+				and a.date >= '$date_from'
+				AND a.user_id IN ($user_ids)
+				AND a.STATUS = 'Send'
+				GROUP BY
+					user_id,
+					inbox_id
+				");
 				
 				$headArray[] = 'From Address';
 				$headArray[] = 'To Address';
 				$headArray[] = 'Amazon Order ID';
-				$headArray[] = 'Purchase Date';
+				//$headArray[] = 'Purchase Date';
 				$headArray[] = 'Received Date';
 				$headArray[] = 'Send Date';
 				$headArray[] = 'Processing Time ( Hour )';
 				$headArray[] = 'Sku';
 				$headArray[] = 'Asin';
 				$headArray[] = 'Item No.';
-				$headArray[] = 'Brand Line';
 				$headArray[] = 'User';
 				$arrayData[] = $headArray;
 				$users=$this->getUsers();
@@ -429,14 +483,13 @@ where a.date>=:sdate_from and a.date<=:sdate_to
 						isset($emailToEncryptedEmail[$problem->from_address]) ? $emailToEncryptedEmail[$problem->from_address]  : $problem->from_address,
 						$problem->to_address,
 						$problem->amazon_order_id,
-						$problem->purchasedate,
+						//$problem->purchasedate,
 						$problem->f_date,
 						$problem->s_date,
 						round((strtotime($problem->s_date) - strtotime($problem->f_date))/3600,1),
 						$problem->sku,
 						$problem->asin,
 						$problem->item_no,
-						$problem->brand_line,
 						array_get($users,$problem->user_id,$problem->user_id),
 					];
 				}

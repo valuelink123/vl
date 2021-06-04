@@ -54,6 +54,8 @@ class Kernel extends ConsoleKernel
 //		'App\Console\Commands\McfOrderUpdateSapStatus',
 		'App\Console\Commands\UpdateEmails',
 		'App\Console\Commands\UpdateEmailStatus',
+		'App\Console\Commands\UpdateReportData',
+		'App\Console\Commands\SycSendEmails',
     ];
 
     /**
@@ -145,6 +147,7 @@ class Kernel extends ConsoleKernel
 
 		$schedule->command('cal:dailySales')->dailyAt('08:30')->name('dailySales')->withoutOverlapping();
 		$schedule->command('sync:sendmail')->everyTenMinutes()->name('syncSendMail')->withoutOverlapping();
+		$schedule->command('update:reportData')->dailyAt('07:30')->name('reportData')->withoutOverlapping();
 //		$schedule->command('update:emails')->monthly()->name('updateEmails')->withoutOverlapping();
 
 		//cron('*/10 * * * *')
