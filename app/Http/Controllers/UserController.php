@@ -389,9 +389,9 @@ class UserController extends Controller
 					FROM
 						sendbox_report
 					WHERE
-						date >= '$date_from'
+					user_id in ($user_ids)
+					and	date >= '$date_from'
 					AND date <= '$date_to'
-					and user_id in ($user_ids)
 					And STATUS = 'Send'
 					GROUP BY
 						from_address,
@@ -457,8 +457,8 @@ class UserController extends Controller
 					b.date >= '$date_from'
 				AND b.date <= '$date_to'
 				AND a.inbox_id >0
-				and a.date >= '$date_from'
 				AND a.user_id IN ($user_ids)
+				and a.date >= '$date_from'
 				AND a.STATUS = 'Send'
 				GROUP BY
 					user_id,
