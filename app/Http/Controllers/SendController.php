@@ -49,7 +49,7 @@ class SendController extends Controller
     {
 		if(!Auth::user()->can(['compose'])) die('Permission denied -- compose');
 		$accounts = Accounts::where('bg',((Auth::user()->ubg)?Auth::user()->ubg:NULL))
-        ->where('bu',((Auth::user()->ubu)?Auth::user()->ubu:NULL))->get()->toArray();
+        ->whereRaw("(bu is null or bu = '".Auth::user()->ubu."')")->get()->toArray();
         $accounts_array = $type_array =  array();
         foreach($accounts as $account){
             $accounts_array[$account['id']] = $account['account_email'];

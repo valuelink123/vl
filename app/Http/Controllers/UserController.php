@@ -351,7 +351,7 @@ class UserController extends Controller
 			
 			if(array_get($_REQUEST,'ExportType')=='Performance'){
 				if(!Auth::user()->can(['data-statistics-performance'])) die('Permission denied -- data-statistics-performance');
-				$user_ids = DB::table('role_user')->where('role_id',4)->pluck('user_id')->toArray();
+				$user_ids = DB::table('role_user')->whereIn('role_id',['4','12','13','38','39'])->pluck('user_id')->toArray();
 				$user_ids = implode(',',$user_ids);
 				$problemList = DB::select("
 				SELECT
@@ -437,7 +437,7 @@ class UserController extends Controller
 			
 			if(array_get($_REQUEST,'ExportType')=='Reply'){
 				if(!Auth::user()->can(['data-statistics-reply'])) die('Permission denied -- data-statistics-reply');
-				$user_ids = DB::table('role_user')->where('role_id',4)->pluck('user_id')->toArray();
+				$user_ids = DB::table('role_user')->whereIn('role_id',['4','12','13','38','39'])->pluck('user_id')->toArray();
 				$user_ids = implode(',',$user_ids);
 				$problemList = DB::select("
 				SELECT
