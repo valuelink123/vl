@@ -72,6 +72,8 @@ class AccountController extends Controller
         $seller_account->account_email = $request->get('account_email');
         $seller_account->account_name = $request->get('account_name');
         $seller_account->account_sellerid = $request->get('account_sellerid');
+        $seller_account->bg = $request->get('bg');
+        $seller_account->bu = $request->get('bu');
         $seller_account->email = $request->get('email');
         $seller_account->password = $request->get('password');
         $seller_account->imap_host = $request->get('imap_host');
@@ -141,6 +143,8 @@ class AccountController extends Controller
         $seller_account->account_email = $request->get('account_email');
         $seller_account->account_sellerid = $request->get('account_sellerid');
         $seller_account->account_name = $request->get('account_name');
+        $seller_account->bg = $request->get('bg');
+        $seller_account->bu = $request->get('bu');
         $seller_account->email = $request->get('email');
         $seller_account->password = $request->get('password');
         $seller_account->imap_host = $request->get('imap_host');
