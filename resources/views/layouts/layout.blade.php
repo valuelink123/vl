@@ -128,7 +128,7 @@
 	<link href="/assets/pages/css/daterangepicker.css" rel="stylesheet" type="text/css"/>
 	<script src="/assets/pages/scripts/moment.min.js" type="text/javascript"></script>
 	<script src="/assets/pages/scripts/daterangepicker.js" type="text/javascript"></script>
-	
+
 </head>
 <!-- END HEAD -->
 
@@ -673,6 +673,15 @@
 
 											@endpermission
 
+                                            @permission('barcode')
+                                            <li class="">
+                                                <a href="/barcode" class="nav-link nav-toggle">
+                                                    Barcode
+                                                    <span class="arrow"></span>
+                                                </a>
+                                            </li>
+                                            @endpermission
+
 											</ul>
                                         </li>
 
@@ -729,7 +738,7 @@
                                                     </a>
                                                 </li>
 												@endpermission
-												
+
 												@permission('learn-center')
 												<li class="">
                                                     <a href="/kms/learn" class="nav-link nav-toggle ">
