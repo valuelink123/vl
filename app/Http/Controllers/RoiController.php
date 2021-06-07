@@ -28,8 +28,8 @@ class RoiController extends Controller
 
     public function index()
     {
-        $submit_date_from=date('Y-m-d',strtotime('-90 days'));
-        $submit_date_to=date('Y-m-d');
+		$submit_date_from = date("Y-m-d",strtotime("-1 years"));
+        $submit_date_to = date('Y-m-d');
         $users = $this->getUsers();
         $sites = $this->getSites();
 
@@ -81,7 +81,7 @@ class RoiController extends Controller
         $search = isset($_POST['search']) ? $_POST['search'] : '';
         $search = $this->getSearchData(explode('&',$search));
         //搜索时间范围
-        $submit_date_from = isset($search['submit_date_from']) && $search['submit_date_from'] ? $search['submit_date_from'] : date('Y-m-d',strtotime('- 90 days'));
+        $submit_date_from = isset($search['submit_date_from']) && $search['submit_date_from'] ? $search['submit_date_from'] : date("Y-m-d",strtotime("-1 years"));
         $submit_date_to = isset($search['submit_date_to']) && $search['submit_date_to'] ? $search['submit_date_to'] : date('Y-m-d');
 
         //如果连接了asin表，where的字段要加上表名。例如site：where('roi.site', $search['site'])
@@ -254,7 +254,7 @@ class RoiController extends Controller
         $data = DB::connection('amazon')->table('roi')->whereIn('id', $visibleRoiIds);
 
         //搜索时间范围
-        $submit_date_from = isset($_GET['date_from']) && $_GET['date_from'] ? $_GET['date_from'] : date('Y-m-d',strtotime('- 90 days'));
+        $submit_date_from = isset($_GET['date_from']) && $_GET['date_from'] ? $_GET['date_from'] : date("Y-m-d",strtotime("-1 years"));
         $submit_date_to = isset($_GET['date_to']) && $_GET['date_to'] ? $_GET['date_to'] : date('Y-m-d');
         $data = $data->where('roi.created_at','>=',$submit_date_from.' 00:00:00')->where('roi.created_at','<=',$submit_date_to.' 23:59:59')->orderBy('updated_at', 'desc')->get()->toArray();
         $data = json_decode(json_encode($data),true);
