@@ -49,18 +49,24 @@ class AddClient extends Command
 	function handle()
 	{
 		set_time_limit(0);
-		$this->date = date('Y-m-d',time()-3600*24);
-		// $this->date = '2019-06-01';//测试日期
-		$this->sap = new SapRfcRequest();
-		DB::connection()->enableQueryLog(); // 开启查询日志
-		Log::Info('Add Client Start...');
-//		Log::info(Cache::get('email_test'));
-		$this->getCtgCrm();
-		$this->getNonCtg();
-		$this->getEmailCrm();
-		$this->getCallCrm();
-		$this->getRsgCrm();
-		$this->getReviewCrm();
+		DB::beginTransaction();
+		try{
+			$this->date = date('Y-m-d',time()-3600*24);
+			// $this->date = '2019-06-01';//测试日期
+			$this->sap = new SapRfcRequest();
+			DB::connection()->enableQueryLog(); // 开启查询日志
+			Log::Info('Add Client Start...');
+	//		Log::info(Cache::get('email_test'));
+			$this->getCtgCrm();
+			$this->getNonCtg();
+			$this->getEmailCrm();
+			$this->getCallCrm();
+			$this->getRsgCrm();
+			$this->getReviewCrm();
+			DB::commit();
+		}catch (\Exception $e) { 
+			DB::rollBack();
+        } 
 		//查询出邮箱对应关系
 		$sql = 'select encrypted_email,email from client_info';
 		$_data = $this->queryRows($sql);
@@ -270,7 +276,7 @@ class AddClient extends Command
 	 */
 	function addData($_data,$from,$sap=false,$info=false)
 	{
-		DB::beginTransaction();
+		//DB::beginTransaction();
 		$insertOrder = array();
 		$data = array();
 		//处理数据，一个email下可能有好几个订单
@@ -315,7 +321,7 @@ class AddClient extends Command
 				$ci_id = DB::table('client_info')->insertGetId($insertInfo);
 			}
 			if(empty($res) || empty($ci_id)){
-				DB::rollBack();
+				//DB::rollBack();
 				continue;
 			}
 			foreach($val['amazon_order_id'] as $v){
@@ -338,7 +344,7 @@ class AddClient extends Command
 		if($insertOrder){
 			batchInsert('client_order_info',$insertOrder);
 		}
-		DB::commit();
+		//DB::commit();
 	}
 
 	/*
