@@ -483,4 +483,9 @@ Route::get('/barcode/makeToken', 'BarcodeController@makeToken');
 Route::get('/barcodePoListExport', 'BarcodeController@exportPoList');
 Route::get('/barcodePoDetailsExport', 'BarcodeController@exportPoDetails');
 
+Route::resource('giftcard', 'GiftCardController');
+Route::Post('/giftcard/get', 'GiftCardController@get');
+Route::Post('/giftcard/upload', 'GiftCardController@upload');
+Route::get('/giftcardexport', 'GiftCardController@export');
+
 

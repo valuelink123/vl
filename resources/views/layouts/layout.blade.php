@@ -642,6 +642,15 @@
 												</a>
 											</li>
 											@endpermission
+                                            @permission('gift-card-show')
+											<li class="">
+												<a href="/giftcard" class="nav-link nav-toggle ">
+													Gift Card
+													<span class="arrow"></span>
+												</a>
+											</li>
+											@endpermission
+
 											@permission('mcforders')
 											<li class="">
 												<a href="/mcforder" class="nav-link nav-toggle ">
