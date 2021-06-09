@@ -440,7 +440,7 @@ class SendController extends Controller
             $customers = $customers->where('user_id',$_REQUEST['user_id']);
         }
         if(array_get($_REQUEST,'from_address')){
-            $customers = $customers->where('from_address', 'like', '%'.$_REQUEST['from_address'].'%');
+            $customers = $customers->where('from_address',$_REQUEST['from_address']);
         }
         if(array_get($_REQUEST,'to_address')){
 			$keywords = $_REQUEST['to_address'];
@@ -449,8 +449,8 @@ class SendController extends Controller
 				if(empty($_address)){
 					$_address = $keywords;
 				}
-				$query->where('to_address'  , 'like', '%'.$keywords.'%')
-					->orwhere('to_address', 'like', '%'.$_address.'%');
+				$query->where('to_address',$keywords)
+					->orwhere('to_address',$_address);
 
 			});
         }
