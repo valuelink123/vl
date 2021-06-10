@@ -65,7 +65,7 @@ class SendEmails extends Command
 		}
 
 		$blackEmail = blackEmail();
-        $tasks = SendboxOut::where('id',9)->where('status','Waiting')->where('from_address',$select_mail)->whereNotIn('to_address',$blackEmail)->where('plan_date','<',strtotime(date('Y-m-d H:i:s')))->where('error_count','<',6)->orderBy('error_count','asc')->take(120)->get();
+        $tasks = SendboxOut::where('status','Waiting')->where('from_address',$select_mail)->whereNotIn('to_address',$blackEmail)->where('plan_date','<',strtotime(date('Y-m-d H:i:s')))->where('error_count','<',6)->orderBy('error_count','asc')->take(120)->get();
 		$this->run_email = '';
 		$configTime = array(1=>5*60,2=>15*60,3=>30*60,4=>60*60,5=>240*60);
 		foreach ($tasks as $task) {
@@ -116,7 +116,12 @@ class SendEmails extends Command
 				});
 
 				if (count(Mail::failures()) > 0) {
-					$result = $this->sendEmail($from,$to,$subject,$content,$attachs) ;
+					$result = $this->sendEmail($from,$to,$subject,$content,[
+						'smtp_host'=>'smtp.bestthankyou.com',
+						'smtp_port'=>25,
+						'username'=>'',
+						'password'=>'',
+					]);
 				}else{
 					$result = true ;
 				}
@@ -132,8 +137,6 @@ class SendEmails extends Command
 				$task->synced = 0;
 			} catch (\Exception $e) {
 				//\Log::error('Send Mail '.$task->id.' Error' . $e->getMessage());
-				print_r($e->getMessage());
-				die();
 				$task->error = $this->filterEmoji($e->getMessage());
 				$task->error_count = $task->error_count + 1;
                 $task->plan_date = isset($configTime[$task->error_count]) ? time() + $configTime[$task->error_count] : $task->plan_date;
@@ -143,25 +146,28 @@ class SendEmails extends Command
 		}
     }
 
-    public function sendEmail($from,$to,$subject,$content,$attachs=array())
+    public function sendEmail($from,$to,$subject,$content,$attachs=array(),$smtp_array=array())
     {
 		Mail::clearResolvedInstances();
 		$https['ssl']['verify_peer'] = FALSE;
 		$https['ssl']['verify_peer_name'] = FALSE;
-		$transport = (new Swift_SmtpTransport('smtp.bestthankyou.com'))->setStreamOptions($https);
+		$transport = (new Swift_SmtpTransport(array_get($smtp_array,'smtp_host'), array_get($smtp_array,'smtp_port'),array_get($smtp_array,'smtp_ssl')))
+			->setUsername(array_get($smtp_array,'username'))
+			->setPassword(array_get($smtp_array,'password'))
+			->setStreamOptions($https)
+		;
 		Mail::setSwiftMailer(new Swift_Mailer($transport));
         $html = new \Html2Text\Html2Text($content);
         Mail::send(['emails.common','emails.common-text'],['content'=>$content,'contentText'=>$html->getText()], function($m) use($subject,$to,$from,$attachs)
 		{
 			$m->to(preg_replace("/(\s|\&nbsp\;|　|\xc2\xa0)/","",trim($to)));
 			$m->subject($subject);
-			//$m->from(trim($from));
+			$m->from(trim($from));
 			if ($attachs && count($attachs)>0){
 				foreach($attachs as $attachment) {
 					$m->attach(public_path().$attachment);
 				}
 			}
-			
 		});
         if (count(Mail::failures()) > 0) {
             $result = false;
