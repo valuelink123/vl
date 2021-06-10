@@ -677,7 +677,8 @@ class ExceptionController extends Controller
 					$gift_card->exception_id = $exception->id;
 					$gift_card->status = 1;
 					$gift_card->save();
-					if(env('AUTO_GIFT_CARD_MAIL') && env('AUTO_GIFT_CARD_MAIL_TEMPLATE_ID') && env('AUTO_GIFT_CARD_MAIL_SENDER') && $exception->contact_email){
+					if(env('AUTO_GIFT_CARD_MAIL') && env('AUTO_GIFT_CARD_MAIL_TEMPLATE_ID') && env('AUTO_GIFT_CARD_MAIL_SENDER') && $request->get('to_address')){
+						$customer_email = 
 						$gf_template = Templates::find(env('AUTO_GIFT_CARD_MAIL_TEMPLATE_ID'));
 						if(!empty($gf_template)){
 							$content = str_replace("{GIFT_CARD}",$gift_card->code,$gf_template->content);
@@ -685,7 +686,7 @@ class ExceptionController extends Controller
 							Sendbox::create(
 								[
 									'from_address'=>env('AUTO_GIFT_CARD_MAIL_SENDER'),
-									'to_address'=>$exception->contact_email,
+									'to_address'=>$request->get('to_address'),
 									'subject'=>$subject,
 									'text_html'=>$content,
 									'date' => date('Y-m-d H:i:s'),	
