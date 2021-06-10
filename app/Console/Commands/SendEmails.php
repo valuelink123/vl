@@ -69,7 +69,6 @@ class SendEmails extends Command
 		$this->run_email = '';
 		$configTime = array(1=>5*60,2=>15*60,3=>30*60,4=>60*60,5=>240*60);
 		foreach ($tasks as $task) {
-
 			try {
 				if($task->attachs){
 					$attachs = unserialize($task->attachs);
@@ -103,6 +102,7 @@ class SendEmails extends Command
 				}
 		 
 				$html = new \Html2Text\Html2Text($content);
+				
 				Mail::send(['emails.common','emails.common-text'],['content'=>$content,'contentText'=>$html->getText()], function($m) use($subject,$to,$from,$attachs)
 				{
 					$m->to(preg_replace("/(\s|\&nbsp\;|　|\xc2\xa0)/","",trim($to)));
@@ -116,8 +116,12 @@ class SendEmails extends Command
 				});
 
 				if (count(Mail::failures()) > 0) {
-					//print_r(Mail::failures());
-					$result = false ;
+					$result = $this->sendEmail($from,$to,$subject,$content,$attachs,[
+						'smtp_host'=>'smtp.bestthankyou.com',
+						'smtp_port'=>25,
+						'username'=>'',
+						'password'=>'',
+					]);
 				}else{
 					$result = true ;
 				}
@@ -137,50 +141,38 @@ class SendEmails extends Command
 				$task->error_count = $task->error_count + 1;
                 $task->plan_date = isset($configTime[$task->error_count]) ? time() + $configTime[$task->error_count] : $task->plan_date;
 			}
-			sleep(1);
+			sleep(5);
 			$task->save();
 		}
     }
 
-    public function sendEmail($from,$to,$subject = null,$content,$attachs=array(),$smtp_array=array())
+    public function sendEmail($from,$to,$subject,$content,$attachs=array(),$smtp_array=array())
     {
-		if($this->run_email!=$from){
-			unset($transport);
-        	Mail::clearResolvedInstances();
-			$this->run_email=$from;
-			if(array_get($smtp_array,'smtp_host') && array_get($smtp_array,'smtp_port') && array_get($smtp_array,'smtp_ssl') && array_get($smtp_array,'password')){
-				$https['ssl']['verify_peer'] = FALSE;
-				$https['ssl']['verify_peer_name'] = FALSE;
-				$transport = (new Swift_SmtpTransport(array_get($smtp_array,'smtp_host'), array_get($smtp_array,'smtp_port'),array_get($smtp_array,'smtp_ssl')))
-					->setUsername($from)
-					->setPassword(array_get($smtp_array,'password'))
-					->setStreamOptions($https)
-				;
-			}else{
-	
-				$transport = new Swift_SendmailTransport('/usr/sbin/sendmail -bs');
-	
-			}
-			Mail::setSwiftMailer(new Swift_Mailer($transport));
-		}
- 
+		Mail::clearResolvedInstances();
+		$https['ssl']['verify_peer'] = FALSE;
+		$https['ssl']['verify_peer_name'] = FALSE;
+		$transport = (new Swift_SmtpTransport(array_get($smtp_array,'smtp_host'), array_get($smtp_array,'smtp_port'),array_get($smtp_array,'smtp_ssl')))
+			->setUsername(array_get($smtp_array,'username'))
+			->setPassword(array_get($smtp_array,'password'))
+			->setStreamOptions($https)
+		;
+		Mail::setSwiftMailer(new Swift_Mailer($transport));
         $html = new \Html2Text\Html2Text($content);
         Mail::send(['emails.common','emails.common-text'],['content'=>$content,'contentText'=>$html->getText()], function($m) use($subject,$to,$from,$attachs)
-        {
+		{
 			$m->to(preg_replace("/(\s|\&nbsp\;|　|\xc2\xa0)/","",trim($to)));
-            $m->subject($subject);
-            $m->from(trim($from));
-            if ($attachs && count($attachs)>0){
-                foreach($attachs as $attachment) {
-                    $m->attach(public_path().$attachment);
-                }
-            }
-        });
+			$m->subject($subject);
+			$m->from(trim($from));
+			if ($attachs && count($attachs)>0){
+				foreach($attachs as $attachment) {
+					$m->attach(public_path().$attachment);
+				}
+			}
+		});
         if (count(Mail::failures()) > 0) {
-			//print_r(Mail::failures());
-            $result = false ;
+            $result = false;
         }else{
-            $result = true ;
+            $result = true;
         }
         
         return $result;

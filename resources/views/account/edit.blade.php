@@ -45,6 +45,26 @@
                                 <input type="text" class="form-control" name="account_name" id="account_name" value="{{$seller_account['account_name']}}" required>
                             </div>
                         </div>
+
+                        <div class="form-group">
+                            <label>BG</label>
+                            <div class="input-group col-md-6">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-user"></i>
+                                </span>
+                                <input type="text" class="form-control" name="bg"  value="{{$seller_account['bg']}}">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>BU</label>
+                            <div class="input-group col-md-6">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-user"></i>
+                                </span>
+                                <input type="text" class="form-control" name="bu"  value="{{$seller_account['bu']}}">
+                            </div>
+                        </div>
 						
 						<div class="form-group">
                             <label>Account Level</label>
@@ -81,17 +101,31 @@
                                 <input type="text" class="form-control" name="account_sellerid" id="account_sellerid" value="{{$seller_account['account_sellerid']}}" required>
                             </div>
                         </div>
-						
+
+						<div class="form-group">
+                            <label>Status</label>
+                            <div class="input-group col-md-6">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-user"></i>
+                                </span>
+                                <select class="form-control form-filter input-sm" name="status">
+									@foreach (\App\Accounts::STATUS as $k=>$v)
+										<option value="{{$k}}" <?php if($k==$seller_account['status']) echo 'selected';?>>{{$v}}</option>
+									@endforeach
+								</select>
+                            </div>
+                        </div>
+
 						<div class="form-group">
                             <label>Account Signature</label>
                             <div class="input-group">
                                 @include('UEditor::head')
 
-                                    <!-- ¼ÓÔØ±à¼­Æ÷µÄÈÝÆ÷ -->
+                                    <!-- ï¿½ï¿½ï¿½Ø±à¼­ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ -->
                                     <script id="signature_content" name="signature" type="text/plain">
 									<?php echo $seller_account['signature']; ?>
 									</script>
-                                    <!-- ÊµÀý»¯±à¼­Æ÷ -->
+                                    <!-- Êµï¿½ï¿½ï¿½ï¿½ï¿½à¼­ï¿½ï¿½ -->
                                     <script type="text/javascript">
                                         var ue = UE.getEditor('signature_content',{toolbars: [[
             'undo', 'redo', '|',
@@ -103,7 +137,7 @@
             'inserttable', 'deletetable', 'insertparagraphbeforetable', 'insertrow', 'deleterow', 'insertcol', 'deletecol', 'mergecells', 'mergeright', 'mergedown', 'splittocells', 'splittorows', 'splittocols', 'charts', '|',
         ]]});
                                         ue.ready(function() {
-                                            ue.execCommand('serverparam', '_token', '{{ csrf_token() }}');//´Ë´¦ÎªÖ§³Ölaravel5 csrf ,¸ù¾ÝÊµ¼ÊÇé¿öÐÞ¸Ä,Ä¿µÄ¾ÍÊÇÉèÖÃ _token Öµ.
+                                            ue.execCommand('serverparam', '_token', '{{ csrf_token() }}');//ï¿½Ë´ï¿½ÎªÖ§ï¿½ï¿½laravel5 csrf ,ï¿½ï¿½ï¿½ï¿½Êµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Þ¸ï¿½,Ä¿ï¿½Ä¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ _token Öµ.
                                         });
                                		 </script>
                             </div>

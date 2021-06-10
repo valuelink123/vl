@@ -72,6 +72,8 @@ class AccountController extends Controller
         $seller_account->account_email = $request->get('account_email');
         $seller_account->account_name = $request->get('account_name');
         $seller_account->account_sellerid = $request->get('account_sellerid');
+        $seller_account->bg = $request->get('bg');
+        $seller_account->bu = $request->get('bu');
         $seller_account->email = $request->get('email');
         $seller_account->password = $request->get('password');
         $seller_account->imap_host = $request->get('imap_host');
@@ -81,6 +83,7 @@ class AccountController extends Controller
         $seller_account->smtp_ssl = $request->get('smtp_ssl');
         $seller_account->smtp_port = $request->get('smtp_port');
 		$seller_account->type = $request->get('type');
+        $seller_account->status = $request->get('status');
 		$seller_account->level = $request->get('level');
 		$seller_account->signature = $request->get('signature');
 
@@ -141,6 +144,8 @@ class AccountController extends Controller
         $seller_account->account_email = $request->get('account_email');
         $seller_account->account_sellerid = $request->get('account_sellerid');
         $seller_account->account_name = $request->get('account_name');
+        $seller_account->bg = $request->get('bg');
+        $seller_account->bu = $request->get('bu');
         $seller_account->email = $request->get('email');
         $seller_account->password = $request->get('password');
         $seller_account->imap_host = $request->get('imap_host');
@@ -151,6 +156,7 @@ class AccountController extends Controller
         $seller_account->smtp_port = $request->get('smtp_port');
 		$seller_account->type = $request->get('type');
 		$seller_account->level = $request->get('level');
+        $seller_account->status = $request->get('status');
 		$seller_account->signature = $request->get('signature');
         if ($seller_account->save()) {
             $request->session()->flash('success_message','Set Seller Account Success');

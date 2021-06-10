@@ -719,22 +719,21 @@ class InboxController extends Controller
 				if(empty($_address)){
 					$_address = $keywords;
 				}
-                $query->where('from_address'  , 'like', '%'.$keywords.'%')
-						->orwhere('from_address', 'like', '%'.$_address.'%')
-                        ->orwhere('from_name', 'like', '%'.$keywords.'%');
+                $query->where('from_address'  , $keywords)
+						->orwhere('from_address',$_address)
+                        ->orwhere('from_name',$keywords);
 
             });
 			
         }
         if(array_get($_REQUEST,'to_address')){
-            $customers = $customers->where('to_address', 'like', '%'.$_REQUEST['to_address'].'%');
+            $customers = $customers->where('to_address',$_REQUEST['to_address']);
         }
 		
 		if(array_get($_REQUEST,'mark')){
             $customers = $customers->where('mark', $_REQUEST['mark']);
         }
         if(array_get($_REQUEST,'subject')){
-            //$customers = $customers->where('subject', 'like', '%'.$_REQUEST['subject'].'%');
             $keywords = array_get($_REQUEST,'subject');
             $customers = $customers->where(function ($query) use ($keywords) {
 

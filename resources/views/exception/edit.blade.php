@@ -636,6 +636,22 @@ if((Auth::user()->can(['exception-check']) || in_array($exception['group_id'],ar
 						<input type="text" class="form-control" name="amount" onkeyup="this.value=this.value.replace(/[^\d.]/g,'')"  id="amount" value="{{$exception['amount']}}"  {{$disable}}>
 					</div>
 				</div>
+
+
+				<div class="col-md-12">
+					<label class="control-label">Gift Card</label>
+					<div class="input-group ">
+						<span class="input-group-addon">
+							<i class="fa fa-bookmark"></i>
+						</span>
+						<select name="gift_card_id" class="form-control" {{$disable}}>
+						@foreach ($gift_cards as $gift_card)
+						<option value="{{$gift_card['id']}}" <?php if($gift_card['exception_id']==$exception['id']) echo 'selected';?>>{{$gift_card['code'].' - '.$gift_card['amount'].$gift_card['currency']}}
+						@endforeach
+						</select>
+					</div>
+				</div>
+
 				@endif
 			</div>
 		</div>

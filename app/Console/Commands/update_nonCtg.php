@@ -60,6 +60,7 @@ class UpdateNonctg extends Command
 				//遍历循环，一个一个官网进行处理
 				$entry_table = isset($val['entry_table']) && $val['entry_table'] ? $val['entry_table'] : 'wp_gf_entry';
 				$meta_table = isset($val['meta_table']) && $val['meta_table'] ? $val['meta_table'] : 'wp_gf_entry_meta';
+
 				$insertData = $data = $orderidArr = array();
 				$sql = "select entry_id, meta_key,meta_value,date_created 
 				from {$val['dbname']}.{$entry_table} as a

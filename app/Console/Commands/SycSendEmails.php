@@ -45,8 +45,8 @@ class SycSendEmails extends Command
         try{
             $maxId = SendboxOut::max('id');
             $maxId = intval($maxId)?intval($maxId):0;
-            $newSend = DB::statement("insert into sendbox_out select * from sendbox where sendbox.id>$maxId");
-            Sendbox::where('id','>=',$maxId)->update(['synced'=>1]);
+            DB::statement("insert into sendbox_out select * from sendbox where sendbox.id>$maxId");
+            Sendbox::where('id','>',$maxId)->update(['synced'=>1]);
             $editArr = Sendbox::where('id','<=',$maxId)->where('synced',0)->pluck('id')->toArray();
             $editArr =  array_chunk($editArr,1000);
             foreach($editArr as $editIds){
@@ -64,7 +64,7 @@ class SycSendEmails extends Command
                     sendbox_out.status=sendbox.status,
                     sendbox_out.plan_date=sendbox.plan_date,
                     sendbox_out.ip=sendbox.ip
-                    where sendbox_out.id=sendbox.id and sendbox.id in ($editIdsStr)");
+                    where sendbox_out.id=sendbox.id and sendbox.id in ($editIdsStr) and sendbox_out.status<>'Send'");
                     Sendbox::whereIn('id',$editIds)->update(['synced'=>1]);
                 }
             }

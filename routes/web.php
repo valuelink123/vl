@@ -456,4 +456,36 @@ Route::resource('platformorder', 'Platform\PlatFormOrderController');
 Route::Post('/platformorder/get', 'Platform\PlatFormOrderController@get');
 Route::Post('/platformorder/batchUpdate', 'Platform\PlatFormOrderController@batchUpdate');
 
+//...条码系统
+Route::get('/barcode', 'BarcodeController@index');
+Route::post('/barcode/getVendorList', 'BarcodeController@getVendorList');
+Route::get('/barcode/purchaseOrderList', 'BarcodeController@purchaseOrderList');
+Route::post('/barcode/getPurchaseOrderList', 'BarcodeController@getPurchaseOrderList');
+Route::get('/barcode/purchaseOrderDetails', 'BarcodeController@purchaseOrderDetails');
+Route::post('/barcode/getPurchaseOrderDetails', 'BarcodeController@getPurchaseOrderDetails');
+Route::get('/barcode/generateBarcode', 'BarcodeController@generateBarcode');
+Route::post('/barcode/saveBarcode', 'BarcodeController@saveBarcode');
+Route::get('/barcode/printBarcode', 'BarcodeController@printBarcode');
+Route::match(['post','get'], '/barcode/outputBarcode', 'BarcodeController@outputBarcode');
+//Route::match(['post','get'], '/barcode/downloadPDF', 'BarcodeController@downloadPDF');
+//Route::post('/barcode/downloadPDF', 'BarcodeController@downloadPDF');
+//激活条码
+Route::get('/barcode/scanBarcode', 'BarcodeScanController@scanBarcode');
+Route::post('/barcode/checkToken', 'BarcodeScanController@checkToken');
+Route::match(['post','get'], '/barcode/activateBarcode', 'BarcodeScanController@activateBarcode');
+//解绑条码
+Route::get('/barcode/detachBarcode', 'BarcodeScanController@detachBarcode');
+Route::post('/barcode/verifyToken', 'BarcodeScanController@verifyToken');
+Route::match(['post','get'], '/barcode/deactivateBarcode', 'BarcodeScanController@deactivateBarcode');
+//生成供应商token的条码
+Route::get('/barcode/makeToken', 'BarcodeController@makeToken');
+//导出
+Route::get('/barcodePoListExport', 'BarcodeController@exportPoList');
+Route::get('/barcodePoDetailsExport', 'BarcodeController@exportPoDetails');
+
+Route::resource('giftcard', 'GiftCardController');
+Route::Post('/giftcard/get', 'GiftCardController@get');
+Route::Post('/giftcard/upload', 'GiftCardController@upload');
+Route::get('/giftcardexport', 'GiftCardController@export');
+
 

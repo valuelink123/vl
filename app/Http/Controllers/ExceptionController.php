@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Inbox;
 use App\Sendbox;
 use App\Accounts;
+use App\Templates;
+use App\Models\GiftCard;
 use Illuminate\Support\Facades\Session;
 use App\Asin;
 use App\User;
@@ -502,6 +504,18 @@ class ExceptionController extends Controller
 				}
 			}
 		}
+
+		if($rule['type']==4){
+			$gift_cards = GiftCard::where('exception_id',$rule['id'])->take(1)->get()->toArray();
+
+			if(!$gift_cards){
+				$gift_cards = GiftCard::where('status',0)->where('amount',$rule['gift_card_amount'])
+				->where('bg',Auth::user()->ubg)
+				->where('bu',Auth::user()->ubu)->take(10)->get()->toArray();
+				shuffle($gift_cards);
+			}
+			
+		}
 		 //得到列表记录的所有亚马逊id
 		$mcf_orders = DB::connection('order')->table('amazon_mcf_shipment_package')->whereIn('SellerFulfillmentOrderId',$replacement_order_ids)->get();
 
@@ -522,14 +536,13 @@ class ExceptionController extends Controller
 			 'B2B'
 		 );
 
-        return view('exception/edit',['exception'=>$rule,'groups'=>$this->getGroups(),'mygroups'=>$this->getUserGroup(),'sellerids'=>$this->getAccounts(),'last_inboxid'=>$last_inboxid,'mcf_orders'=>$mcf_orders,'auto_create_mcf_logs'=>$auto_create_mcf_logs,'users'=>$this->getUsers(),'requestContentHistoryValues'=>$requestContentHistoryValues]);
+        return view('exception/edit',['exception'=>$rule,'gift_cards'=>$gift_cards,'groups'=>$this->getGroups(),'mygroups'=>$this->getUserGroup(),'sellerids'=>$this->getAccounts(),'last_inboxid'=>$last_inboxid,'mcf_orders'=>$mcf_orders,'auto_create_mcf_logs'=>$auto_create_mcf_logs,'users'=>$this->getUsers(),'requestContentHistoryValues'=>$requestContentHistoryValues]);
     }
 
     public function update(Request $request,$id)
     {
 		if(!Auth::user()->can(['exception-update'])) die('Permission denied -- exception-update');
 		$exception = Exception::findOrFail($id);
-
 		//添加上传附件
 		$file = $request->file('file_url');
 		$file_url = '';
@@ -651,6 +664,40 @@ class ExceptionController extends Controller
 				}
 				$replacements['products']=$products;
 				$exception->replacement =  serialize($replacements);
+			}
+			if($exception->type==4){
+				DB::beginTransaction();
+				$gift_card_id = $request->get('gift_card_id');
+				$gift_card = GiftCard::where('id',intval($gift_card_id))->where('status',0)->lockForUpdate()->first();
+				if(empty($gift_card)){
+					$request->session()->flash('error_message','Set Failed, Gift Card has Used or not exists!');
+					DB::rollBack();
+					return redirect()->back()->withInput();
+				}else{
+					$gift_card->exception_id = $exception->id;
+					$gift_card->status = 1;
+					$gift_card->save();
+					if(env('AUTO_GIFT_CARD_MAIL') && env('AUTO_GIFT_CARD_MAIL_TEMPLATE_ID') && env('AUTO_GIFT_CARD_MAIL_SENDER') && $request->get('to_address')){
+						$customer_email = 
+						$gf_template = Templates::find(env('AUTO_GIFT_CARD_MAIL_TEMPLATE_ID'));
+						if(!empty($gf_template)){
+							$content = str_replace("{GIFT_CARD}",$gift_card->code,$gf_template->content);
+							$subject = str_replace("{GIFT_CARD}",$gift_card->code,$gf_template->title);
+							Sendbox::create(
+								[
+									'from_address'=>env('AUTO_GIFT_CARD_MAIL_SENDER'),
+									'to_address'=>$request->get('to_address'),
+									'subject'=>$subject,
+									'text_html'=>$content,
+									'date' => date('Y-m-d H:i:s'),	
+									'status'=>'Waiting',
+									'ip' => $_SERVER["REMOTE_ADDR"],
+								]
+							);
+						}
+					}
+					DB::commit();
+				}
 			}
 			$file = $request->file('importFile');
   			if($file){
@@ -843,7 +890,7 @@ class ExceptionController extends Controller
 		$customers= Exception::leftJoin(DB::raw("(SELECT asin as asin_a,substring(site,5) as site ,any_value(bg) as bg,any_value(bu) as bu,any_value(sap_seller_id) as sap_seller_id FROM  `asin` group by asin_a,site) as order_info"),function($q){
 			$q->on('order_info.asin_a', '=', 'exception.asin')
 			  ->on('order_info.site', '=', 'exception.saleschannel');
-		});
+		})->with('giftcard');
 
 		if(array_get($_REQUEST,'type')){
             $customers = $customers->where('type', array_get($_REQUEST,'type'));
@@ -979,20 +1026,7 @@ class ExceptionController extends Controller
 
         //得到列表记录的所有亚马逊id(重发单号)
 		$orderid_sellerid = $_mcfStatus = $mcfStatus = array();
-        foreach ( $customersLists as $customersList){
-            $_replacement = unserialize($customersList['replacement']);
-			if(is_array($_replacement['products'])){
-				foreach( $_replacement['products'] as $product){
-					//重发单与sellerid组合为唯一性
-					if(isset($product['replacement_order_id']) && $product['replacement_order_id']){
-						$orderid_sellerid[] = " ( SellerFulfillmentOrderId = '".$product['replacement_order_id']."' and SellerId = '".$product['seller_id']."') ";
-					}
-
-				}
-			}
-
-
-        }
+        
         //根据亚马逊id得到该订单的mcf物流状态
         //exception表的 的 replacement 字段中的 replacement_order_id 是对应的order库的amazon_mcf_orders表的SellerFulfillmentOrderId字段,amazon_mcf_orders表里的FulfillmentOrderStatus表示订单状态
         if($orderid_sellerid){
@@ -1046,7 +1080,10 @@ class ExceptionController extends Controller
 					
 				}
 			}
-            if($customersList['type']==4) $operate.= 'Gift Card : '.$customersList['gift_card_amount'].PHP_EOL;
+            if($customersList['type']==4){
+				$operate.= 'Gift Card : '.$customersList['gift_card_amount'].PHP_EOL;
+				if($customersList['giftcard']) $operate.= 'Card Code: '.$customersList['giftcard']['code'].' - '.$customersList['giftcard']['amount'].$customersList['giftcard']['currency'].PHP_EOL;
+			}
             //得到列表的状态值（在状态值下面显示score值）
             $statusScore = array_get($status_list,$customersList['process_status']).'<br/><br/>'.$customersList['score'];
 

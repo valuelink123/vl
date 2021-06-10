@@ -48,7 +48,8 @@ class SendController extends Controller
     public function create(Request $request)
     {
 		if(!Auth::user()->can(['compose'])) die('Permission denied -- compose');
-		$accounts = Accounts::get()->toArray();
+		$accounts = Accounts::where('status',1)->where('type','<>','Amazon')->where('bg',((Auth::user()->ubg)?Auth::user()->ubg:NULL))
+        ->whereRaw("(bu is null or bu = '".Auth::user()->ubu."')")->get()->toArray();
         $accounts_array = $type_array =  array();
         foreach($accounts as $account){
             $accounts_array[$account['id']] = $account['account_email'];
@@ -223,7 +224,7 @@ class SendController extends Controller
 			}
 			$attachs = serialize($request->get('fileid'));
 		}
-		$to_address_array = explode(';',str_replace("；",";",$request->get('to_address')));
+		$to_address_array = explode(';',str_replace(array("；",' '),array(";",''),$request->get('to_address')));
 		$to_address_array = array_unique($to_address_array);
 
 		$blackEmail = blackEmail();//发邮件的时候，黑名单客户的邮箱
@@ -439,7 +440,7 @@ class SendController extends Controller
             $customers = $customers->where('user_id',$_REQUEST['user_id']);
         }
         if(array_get($_REQUEST,'from_address')){
-            $customers = $customers->where('from_address', 'like', '%'.$_REQUEST['from_address'].'%');
+            $customers = $customers->where('from_address',$_REQUEST['from_address']);
         }
         if(array_get($_REQUEST,'to_address')){
 			$keywords = $_REQUEST['to_address'];
@@ -448,8 +449,8 @@ class SendController extends Controller
 				if(empty($_address)){
 					$_address = $keywords;
 				}
-				$query->where('to_address'  , 'like', '%'.$keywords.'%')
-					->orwhere('to_address', 'like', '%'.$_address.'%');
+				$query->where('to_address',$keywords)
+					->orwhere('to_address',$_address);
 
 			});
         }

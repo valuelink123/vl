@@ -47,7 +47,8 @@ class UpdateEmailStatus extends Command
 			SET sendbox.send_date = sendbox_out.send_date,sendbox.updated_at = sendbox_out.updated_at,sendbox.error = sendbox_out.error,sendbox.error_count = sendbox_out.error_count,sendbox.`status` = sendbox_out.`status`,sendbox.plan_date = sendbox_out.plan_date 
 			WHERE sendbox.id = sendbox_out.id 
   			AND sendbox.`status` = 'Waiting' 
-  			AND sendbox.error_count < 6";
+  			AND sendbox.error_count < 6
+			and (sendbox_out.status='Send' or (sendbox_out.status='Waiting' and sendbox_out.error_count>0))";
 		DB::select($sql);
 
 		Log::info('end update email status');
