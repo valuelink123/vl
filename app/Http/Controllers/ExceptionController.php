@@ -671,16 +671,12 @@ class ExceptionController extends Controller
 				DB::beginTransaction();
 				$gift_card_id = $request->get('gift_card_id');
 				$gift_card = GiftCard::where('id',intval($gift_card_id))->where('status',0)->lockForUpdate()->first();
-				if(empty($gift_card)){
-					$request->session()->flash('error_message','Set Failed, Gift Card has Used or not exists!');
-					DB::rollBack();
-					return redirect()->back()->withInput();
-				}else{
+				if(!empty($gift_card)){
 					$gift_card->exception_id = $exception->id;
 					$gift_card->status = 1;
 					$gift_card->save();
 					if(env('AUTO_GIFT_CARD_MAIL') && env('AUTO_GIFT_CARD_MAIL_TEMPLATE_ID') && env('AUTO_GIFT_CARD_MAIL_SENDER') && $request->get('to_address')){
-						$customer_email = 
+					
 						$gf_template = Templates::find(env('AUTO_GIFT_CARD_MAIL_TEMPLATE_ID'));
 						if(!empty($gf_template)){
 							$content = str_replace("{GIFT_CARD}",$gift_card->code,$gf_template->content);
