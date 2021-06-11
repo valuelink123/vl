@@ -460,6 +460,7 @@ Route::Post('/platformorder/batchUpdate', 'Platform\PlatFormOrderController@batc
 Route::get('/roiPerformance', 'RoiPerformanceController@index');//订单列表
 Route::post('/roiPerformance/list', 'RoiPerformanceController@list');//获取订单列表数据
 Route::match(['post','get'],'/roiPerformance/export', 'RoiPerformanceController@export');//订单列表数据的下载
+Route::match(['post','get'],'/roiPerformance/calculate', 'RoiPerformanceController@calculate');//计算绩效结果
 
 //...条码系统
 Route::get('/barcode', 'BarcodeController@index');

@@ -1600,3 +1600,19 @@ function isBlacklistEmail($email='')
 	}
 	return false;
 }
+
+//从currency_rates表中获取各站点汇率
+function getCurrencyRates(){
+	$data = DB::connection('amazon')->table('currency_rates')->pluck('rate','currency');
+	$currency_rates = array();
+	$currency_rates['US'] = $data['USD'];
+	$currency_rates['CA'] = $data['CAD'];
+	$currency_rates['UK'] = $data['GBP'];
+	$currency_rates['DE'] = $data['EUR'];
+	$currency_rates['JP'] = $data['JPY'];
+	$currency_rates['FR'] = $data['EUR'];
+	$currency_rates['ES'] = $data['EUR'];
+	$currency_rates['IT'] = $data['EUR'];
+
+	return $currency_rates;
+}

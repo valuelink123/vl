@@ -56,6 +56,7 @@ class Kernel extends ConsoleKernel
 		'App\Console\Commands\UpdateEmailStatus',
 		'App\Console\Commands\UpdateReportData',
 		'App\Console\Commands\SycSendEmails',
+		'App\Console\Commands\AddRoiPerformance',
     ];
 
     /**
@@ -152,6 +153,8 @@ class Kernel extends ConsoleKernel
 
 		//cron('*/10 * * * *')
 		$schedule->command('update:email_status')->cron('*/10 * * * *')->name('update_email_status')->withoutOverlapping();//更新邮箱状态，每10分钟一次
+
+		$schedule->command('add:roi_performance')->dailyAt('06:30')->name('add_roi_performance')->withoutOverlapping();//每天早上6点半执行
     }
 
     /**

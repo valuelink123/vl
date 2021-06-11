@@ -32,20 +32,30 @@
                             <span class="input-group-addon">From Date</span>
                             <input  class="form-control"  value="{!! $data['fromDate'] !!}" data-date-format="yyyy-mm-dd" data-options="format:'yyyy-mm-dd'" id="from_date" name="from_date"/>
                         </div>
-                    </div>
-                    <div class="col-md-2">
+                        <br>
                         <div class="input-group">
                             <span class="input-group-addon">To Date</span>
                             <input  class="form-control"  value="{!! $data['toDate'] !!}" data-change="0" data-date-format="yyyy-mm-dd" data-options="format:'yyyy-mm-dd'" id="to_date" name="to_date"/>
                         </div>
                     </div>
+
                     <div class="col-md-2">
                         <div class="input-group">
                             <span class="input-group-addon">Site</span>
-                            <select name="site" id="site" style="width:205px; height:30px">
+                            <select name="site" id="site" style="width:205px; height:34px">
                                 <option value="">select</option>
                                 @foreach ($sites as $site)
                                     <option value="{{$site}}">{{$site}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <br>
+                        <div class="input-group">
+                            <span class="input-group-addon">type</span>
+                            <select name="type" id="type" style="width:205px; height:34px">
+                                <option value="">select</option>
+                                @foreach ($type as $kt=>$kv)
+                                    <option value="{{$kt}}">{{$kv}}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -54,6 +64,11 @@
                         <div class="input-group">
                             <span class="input-group-addon">Sku</span>
                             <input  class="form-control"  value="" id="sku" name="sku"/>
+                        </div>
+                        <br>
+                        <div class="input-group">
+                            <span class="input-group-addon">ROI ID</span>
+                            <input  class="form-control"  value="" id="roi_id" name="roi_id"/>
                         </div>
                     </div>
 
@@ -79,11 +94,18 @@
                 </div>
             </div>
             @endpermission
+            <div class="btn-group" style="margin-top:10px;margin-left:15px;">
+                <button id="batch-calculate" class="btn btn-success btn-sm sbold green-meadow">批量计算
+                </button>
+            </div>
 
             <div>
                 <table class="table table-striped table-bordered" id="datatable">
                     <thead>
                     <tr>
+                        <th onclick="this===arguments[0].target && this.firstElementChild.click()">
+                            <input type="checkbox" onchange="this.checked?dtApi.rows().select():dtApi.rows().deselect()" id="selectAll"/>
+                        </th>
                         <th>ROIID</th>
                         <th>上线时间</th>
                         <th>SKU</th>
@@ -105,12 +127,14 @@
                         <th>总数</th>
                         <th>创建时间</th>
                         <th>更新时间</th>
+                        <th>操作</th>
                     </tr>
                     </thead>
                     <tbody></tbody>
                 </table>
             </div>
         </div>
+        <div style="display:none;" id="hidden-roiid" data-id=""></div>
     </div>
 
     <script>
@@ -135,7 +159,19 @@
                 [20, 30,50,] // change per page values here
             ],
             processing: true,
+            select: {
+                style: 'os',
+                info: true, // info N rows selected
+                // blurable: true, // unselect on blur
+                selector: 'td:first-child', // 指定第一列可以点击选中
+            },
             columns: [
+                {
+                    width: "1px",
+                    orderable: false,
+                    defaultContent: '',
+                    className: 'select-checkbox', // 该类根据 tr:selected 改变自己的背景
+                },
                 {data: 'roi_id',name:'roi_id'},
                 {data: 'estimated_launch_time',name:'estimated_launch_time'},
                 {data: 'sku',name:'sku'},
@@ -157,6 +193,7 @@
                 {data:'value_total',name:'value_total'},
                 {data:'created_at',name:'created_at'},
                 {data:'updated_at',name:'updated_at'},
+                {data:'action',name:'action'},
             ],
             ajax: {
                 type: 'POST',
@@ -176,6 +213,50 @@
             var search = $("#search-form").serialize();
             location.href='/roiPerformance/export?'+search;
         });
+        //点击计算按钮，获取roiid,并触发计算函数
+        $("#datatable").delegate(".calculate","click",function(){
+            //计算
+            console.log(123);
+            var roi_id = $(this).attr('data-id');
+            $('#hidden-roiid').attr('data-id',roi_id);
+            calculateAjax();
+        })
+        //ajax计算结果，计算结果，并把结果存到数据库中
+        function calculateAjax(){
+            roi_id = $('#hidden-roiid').attr('data-id');
+            $.ajax({
+                type: 'post',
+                url: '/roiPerformance/calculate',
+                data: {roi_id:roi_id},
+                dataType:'json',
+                success: function(res) {
+                    alert(res.msg);
+                    if(res.status==1){
+                        //重新加载列表
+                        dtApi.settings()[0].ajax.data = {search: $("#search-form").serialize()};
+                        dtApi.ajax.reload();
+                    }
+
+                }
+            });
+
+
+            return false;
+        }
+
+        //批量计算
+        $('#batch-calculate').click(function(){
+            let selectedRows = dtApi.rows({selected: true})
+            let ctgRows = selectedRows.data().toArray().map(obj => [obj.roi_id])
+            if (!ctgRows.length) {
+                toastr.error('Please select some rows first !')
+                return
+            }
+            var roi_id = ctgRows.join(';');
+            $('#hidden-roiid').attr('data-id',roi_id);
+            calculateAjax();
+
+        })
 
         $(function(){
             $("#search_table").trigger("click");
