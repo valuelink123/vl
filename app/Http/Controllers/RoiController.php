@@ -222,8 +222,9 @@ class RoiController extends Controller
         $transportModes = $this->getTransportModes();
         $currency_rates = $this->getCurrencyRates();
 		$inventory_turnover_days = array(90,120);
+		$month = array(1,2,3,4,5,6,7,8,9,10,11,12);
 
-        return view('roi/add',compact('sites', 'availableUsers', 'billingPeriods','transportModes','currency_rates','inventory_turnover_days'));
+        return view('roi/add',compact('sites', 'availableUsers', 'billingPeriods','transportModes','currency_rates','inventory_turnover_days','month'));
     }
 
     public function export(Request $request)
@@ -408,7 +409,7 @@ class RoiController extends Controller
                     border-radius: 5px !important;
                     border: 1px solid #62c0cc8a;
                 }
-        
+
                 #archived-modal{
                     left: 50%;
                     top: 50%;
@@ -436,7 +437,7 @@ class RoiController extends Controller
                 input{
                     border: 1px solid #dddddd;
                 }
-        
+
             </style>
                 <div style="height: 25px;"></div>
                 <div>
@@ -651,7 +652,7 @@ class RoiController extends Controller
                                 <td><span class="grey_color">投资回报率 :</span> <span class="bold" id="roi">'.$roi['roi'].'</span></td>
                                 <td><span class="grey_color">利润率 :</span> <span class="bold" id="project_profitability">'.$roi['project_profitability'].'</span></td>
                             </tr>
-                            
+
                         	<tr>
                                 <td><span class="grey_color">年销售量 :</span> <span class="bold" id="total_sales_volume">'.$roi['total_sales_volume'].'</span></td>
                                 <td><span class="grey_color">年销售金额 :</span> <span class="bold" id="total_sales_amount">'.$roi['total_sales_amount'].'</span></td>
@@ -686,11 +687,11 @@ class RoiController extends Controller
                                 <td><span class="grey_color">人力成本 :</span> <span class="bold" id="estimated_labor_cost">'.$roi['estimated_labor_cost'].'</span></td>
                                 <td><span class="grey_color">盈亏临界点(销量) :</span> <span class="bold" id="profit_loss_point">'.$roi['profit_loss_point'].'</span></td>
                             </tr>
-                            
+
                             <tr>
                                 <td><span class="grey_color">底限价格 :</span> <span class="bold" id="price_floor">'.$roi['price_floor'].'</span></td>
                             </tr>
-                            
+
                         </table>
                     </div>
                 </div>
@@ -1025,21 +1026,84 @@ class RoiController extends Controller
     public function store(Request $request){
         $updateDBData = $this->getUpdateDBData($request);
         $user_id = Auth::user()->id;
+		$updateDBData['roi'] = $updateDBData['roi']>0 ? $updateDBData['roi'] : '0.00';
         $updateDBData['creator'] = $user_id;
         $updateDBData['created_at'] = date('Y-m-d H:i:s');
         $updateDBData['updated_by'] = $user_id;
         $updateDBData['updated_at'] = $updateDBData['created_at'];
         $updateDBData['edit_history'] = $user_id.','.$updateDBData['created_at'];
 
+        //企管算绩效的数据
+		$roi_performance = $updateDBData['roi_performance'];
+		unset($updateDBData['roi_performance']);
+
         DB::beginTransaction();
-        if(!DB::connection('amazon')->table('roi')->insert($updateDBData)){
+		$id = DB::connection('amazon')->table('roi')->insertGetId($updateDBData);
+        if(!$id){
             $request->session()->flash('error_message','Save Failed.');
             return redirect()->back()->withInput();
         }else{
+			$this->insertRoiPerformance($roi_performance,$id);
             return redirect('roi');
         }
         DB::commit();
     }
+
+    public function insertRoiPerformance($data,$id)
+	{
+		unset($data['inventory_start']);
+		unset($data['inventory_end']);
+		unset($data['inventory_average']);
+		$_data = DB::connection('amazon')->table('roi_performance')->where('roi_id',$id)->get()->toArray();
+		if($_data){
+			$performanceData = array();
+			foreach($data as $key=>$val){
+				$performanceData[$id.'_'.$key] = array(
+					'value_month_1' => $val['value_month_1'],
+					'value_month_2' => $val['value_month_2'],
+					'value_month_3' => $val['value_month_3'],
+					'value_month_4' => $val['value_month_4'],
+					'value_month_5' => $val['value_month_5'],
+					'value_month_6' => $val['value_month_6'],
+					'value_month_7' => $val['value_month_7'],
+					'value_month_8' => $val['value_month_8'],
+					'value_month_9' => $val['value_month_9'],
+					'value_month_10' => $val['value_month_10'],
+					'value_month_11' => $val['value_month_11'],
+					'value_month_12' => $val['value_month_12'],
+					'value_total' => $val['value_total'],
+					'updated_at' => date('Y-m-d H:i:s'),
+				);
+				DB::connection('amazon')->table('roi_performance')->where('roi_id',$id)->where('type',$key)->update($performanceData[$id.'_'.$key]);
+			}
+
+		}else{
+			$performanceData = array();
+			foreach($data as $key=>$val){
+				$performanceData[$id.'_'.$key] = array(
+					'roi_id' => $id,
+					'type' => $key,
+					'value_month_1' => $val['value_month_1'],
+					'value_month_2' => $val['value_month_2'],
+					'value_month_3' => $val['value_month_3'],
+					'value_month_4' => $val['value_month_4'],
+					'value_month_5' => $val['value_month_5'],
+					'value_month_6' => $val['value_month_6'],
+					'value_month_7' => $val['value_month_7'],
+					'value_month_8' => $val['value_month_8'],
+					'value_month_9' => $val['value_month_9'],
+					'value_month_10' => $val['value_month_10'],
+					'value_month_11' => $val['value_month_11'],
+					'value_month_12' => $val['value_month_12'],
+					'value_total' => $val['value_total'],
+					'created_at' => date('Y-m-d H:i:s'),
+					'updated_at' => date('Y-m-d H:i:s'),
+				);
+			}
+			DB::connection('amazon')->table('roi_performance')->insert(array_values($performanceData));
+
+		}
+	}
 
     public function update(Request $request, $id){
 
@@ -1048,6 +1112,7 @@ class RoiController extends Controller
     public function updateRecord(Request $request){
         $updateDBData = $this->getUpdateDBData($request);
         $currentUserId = Auth::user()->id;
+		$updateDBData['roi'] = $updateDBData['roi']>0 ? $updateDBData['roi'] : '0.00';
         $updateDBData['updated_by'] = $currentUserId;
         $updateDBData['updated_at'] = date('Y-m-d H:i:s');
         //edit页面表单有隐藏元素roi_id, add页面没有
@@ -1057,6 +1122,10 @@ class RoiController extends Controller
         $edit_history_array = DB::connection('amazon')->table('roi')->where('id', '=', $roi_id)->pluck('edit_history');
         $edit_history = $edit_history_array[0];
         $updateDBData['edit_history'] = $edit_history.';'.$currentUserId.','.$updateDBData['updated_at'];
+
+		//企管算绩效的数据
+		$roi_performance = $updateDBData['roi_performance'];
+		unset($updateDBData['roi_performance']);
 
         DB::beginTransaction();
         if(!DB::connection('amazon')->table('roi')->where('id', '=', $roi_id)->update($updateDBData)){
@@ -1069,6 +1138,7 @@ class RoiController extends Controller
                     array('editing_user'=> '0')
                 );
             }
+			$this->insertRoiPerformance($roi_performance,$roi_id);
 
             return redirect('roi');
         }
@@ -1283,6 +1353,7 @@ class RoiController extends Controller
 		//点击"分析"按钮时，返回的数组，用于ajax异步更新页面数据
 		$returnData = array();
 
+
 		//新版本内容
 		$update_data['total_sales_volume'] = $total_sales_volume;//年销售量===
 		$update_data['total_sales_amount'] = $this->twoDecimal($total_sales_amount);//年销售金额===
@@ -1316,6 +1387,88 @@ class RoiController extends Controller
 		$update_data['average_exception_rate'] = $average_exception_rate;
 		$update_data['early_investment'] = $early_investment;//前期开发投入
 		$update_data['price_floor'] = $this->twoDecimal($price_floor);
+
+
+
+		//roi绩效表，type的枚举如下：1收入income，2成本cost，3佣金commission，4操作费operate_fee，5仓储费storage_fee，6资金占用成本capital_occupy_cost，7经济效益economic_benefit，8期初库存数量inventory_start，9期末库存数量inventory_end，10平均库存数量inventory_average
+		$update_data['roi_performance']['income']['value_total'] = 0.00;
+		$update_data['roi_performance']['cost']['value_total'] = 0.00;
+		$update_data['roi_performance']['commission']['value_total'] = 0.00;
+		$update_data['roi_performance']['operate_fee']['value_total'] = 0.00;
+		$update_data['roi_performance']['storage_fee']['value_total'] = 0.00;
+		$update_data['roi_performance']['capital_occupy_cost']['value_total'] = 0.00;
+		$update_data['roi_performance']['economic_benefit']['value_total'] = 0.00;
+
+        $update_data['roi_performance']['inventory_start']['value_total'] = 0.00;
+        $update_data['roi_performance']['inventory_end']['value_total'] = 0.00;
+        $update_data['roi_performance']['inventory_average']['value_total'] = 0.00;
+		$update_data['roi_performance']['promo']['value_total'] = $total_promo_amount;//总推广费
+
+		//round()
+		for($i=1; $i<=12;$i++){
+			//每个月的收入,收入=当月销售金额-当月异常费用
+			$update_data['roi_performance']['income']['value_month_'.$i] = sprintf("%.2f",$sales_amount_month_array[$i]-$exception_amount_month_array[$i]);
+			$update_data['roi_performance']['income']['value_total'] += $update_data['roi_performance']['income']['value_month_'.$i];
+
+			//每个月的成本,当月预计销量*（不含税采购单价成本+（总物流费用+总关税）/全年预计销量)
+			$update_data['roi_performance']['cost']['value_month_'.$i] = '0.00';
+			if($total_sales_volume>0){
+				$update_data['roi_performance']['cost']['value_month_'.$i] = sprintf("%.2f",$update_data['volume_month_'.$i]*($update_data['purchase_price']+($tariff_amount+$transport_cost)/$total_sales_volume));
+			}
+			$update_data['roi_performance']['cost']['value_total'] += $update_data['roi_performance']['cost']['value_month_'.$i];
+
+			//每个月的佣金,当月销售金额*平台佣金比例-当月销售金额*当月异常率*平台佣金比例*0.8
+			$update_data['roi_performance']['commission']['value_month_'.$i] = sprintf("%.2f",$sales_amount_month_array[$i]*$update_data['commission_rate']-$sales_amount_month_array[$i]*$update_data['exception_rate_month_'.$i]*$update_data['commission_rate']*0.8);
+			$update_data['roi_performance']['commission']['value_total'] += $update_data['roi_performance']['commission']['value_month_'.$i];
+
+			//每个月的操作费，当月预计销量*平台操作费*汇率
+			$update_data['roi_performance']['operate_fee']['value_month_'.$i] = sprintf("%.2f",$update_data['volume_month_'.$i]*$update_data['unit_operating_fee']*$currency_rate);
+			$update_data['roi_performance']['operate_fee']['value_total'] += $update_data['roi_performance']['operate_fee']['value_month_'.$i];
+
+			//每个月的仓储费,(年平台仓储费/销售预测总数量)*当月销售预测数量
+			$update_data['roi_performance']['storage_fee']['value_month_'.$i] = '0.00';
+			if($total_sales_volume>0){
+				$update_data['roi_performance']['storage_fee']['value_month_'.$i] = sprintf("%.2f",($storage_fee/$total_sales_volume)*$update_data['volume_month_'.$i]);
+			}
+			$update_data['roi_performance']['storage_fee']['value_total'] += $update_data['roi_performance']['storage_fee']['value_month_'.$i];
+
+			//每个月的推广费
+			$update_data['roi_performance']['promo']['value_month_'.$i] = $promo_amount_month_array[$i];
+
+			//每个月的期末库存数量,剔除当月后三个月预计销量的滚动合计
+			if($i<10){
+				$update_data['roi_performance']['inventory_end']['value_month_'.$i] = round($update_data['volume_month_'.($i+1)]+$update_data['volume_month_'.($i+2)]+$update_data['volume_month_'.($i+3)]);
+			}elseif($i==10){
+				$update_data['roi_performance']['inventory_end']['value_month_'.$i] = round($update_data['volume_month_11']+$update_data['volume_month_12']+$update_data['volume_month_1']);
+			}elseif($i==11){
+				$update_data['roi_performance']['inventory_end']['value_month_'.$i] = round($update_data['volume_month_12']+$update_data['volume_month_1']+$update_data['volume_month_2']);
+			}elseif($i==12){
+				$update_data['roi_performance']['inventory_end']['value_month_'.$i] = round($update_data['volume_month_1']+$update_data['volume_month_2']+$update_data['volume_month_3']);
+			}
+
+			//每个月的期初库存数量,第一个月是上线前三个月预计销量合计，从第二个月开始就是上月期末库存数量
+			if($i==1){
+				$update_data['roi_performance']['inventory_start']['value_month_'.$i] = round($update_data['volume_month_1']+$update_data['volume_month_2']+$update_data['volume_month_3']);
+			}else{
+				$update_data['roi_performance']['inventory_start']['value_month_'.$i] = round($update_data['roi_performance']['inventory_end']['value_month_'.($i-1)]);
+			}
+
+			//每个月的平均库存数量,（期初库存数量+期末库存数量）/2
+			$update_data['roi_performance']['inventory_average']['value_month_'.$i] = round(($update_data['roi_performance']['inventory_start']['value_month_'.$i]+$update_data['roi_performance']['inventory_end']['value_month_'.$i])/2);
+
+			//每个月的资金占用成本,当月平均库存数量*（不含税采购单价成本+（总物流费用+总关税）/全年预计销量）*0.18/12
+			$update_data['roi_performance']['capital_occupy_cost']['value_month_'.$i] = 0.00;
+			if($total_sales_volume>0){
+				$update_data['roi_performance']['capital_occupy_cost']['value_month_'.$i] = sprintf("%.2f",$update_data['roi_performance']['inventory_average']['value_month_'.$i]*($update_data['purchase_price']+($tariff_amount+$transport_cost)/$total_sales_volume)*0.18/12);
+			}
+			$update_data['roi_performance']['capital_occupy_cost']['value_total'] += $update_data['roi_performance']['capital_occupy_cost']['value_month_'.$i];
+
+
+			//每个月的经济效益,收入-成本-佣金-操作费-仓储费-推广费-资金占用成本
+			$update_data['roi_performance']['economic_benefit']['value_month_'.$i] = sprintf("%.2f",$update_data['roi_performance']['cost']['value_month_'.$i]-$update_data['roi_performance']['cost']['value_month_'.$i]-$update_data['roi_performance']['commission']['value_month_'.$i]-$update_data['roi_performance']['operate_fee']['value_month_'.$i]-$update_data['roi_performance']['storage_fee']['value_month_'.$i]-$promo_amount_month_array[$i]-$update_data['roi_performance']['capital_occupy_cost']['value_month_'.$i]);
+			$update_data['roi_performance']['economic_benefit']['value_total'] += $update_data['roi_performance']['economic_benefit']['value_month_'.$i];
+
+		}
 
 		return $update_data;
 
