@@ -116,12 +116,15 @@ class SendEmails extends Command
 				});
 
 				if (count(Mail::failures()) > 0) {
+					$result = false ;
+					/*
 					$result = $this->sendEmail($from,$to,$subject,$content,$attachs,[
 						'smtp_host'=>'smtp.bestthankyou.com',
 						'smtp_port'=>25,
 						'username'=>'',
 						'password'=>'',
 					]);
+					*/
 				}else{
 					$result = true ;
 				}
