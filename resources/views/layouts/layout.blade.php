@@ -553,6 +553,16 @@
                                                     </a>
                                                 </li>
                                                 @endpermission
+
+                                                @permission('roi-performance-show')
+                                                <li class="">
+                                                    <a href="/roiPerformance" class="nav-link nav-toggle ">
+                                                        Roi Performance Analysis
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
+                                                @endpermission
+                                                
                                             </ul>
                                         </li>
 
