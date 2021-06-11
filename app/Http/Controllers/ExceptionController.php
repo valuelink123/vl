@@ -515,6 +515,8 @@ class ExceptionController extends Controller
 				shuffle($gift_cards);
 			}
 			
+		}else{
+			$gift_cards = [];
 		}
 		 //得到列表记录的所有亚马逊id
 		$mcf_orders = DB::connection('order')->table('amazon_mcf_shipment_package')->whereIn('SellerFulfillmentOrderId',$replacement_order_ids)->get();
