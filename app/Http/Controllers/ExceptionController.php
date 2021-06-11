@@ -668,10 +668,15 @@ class ExceptionController extends Controller
 				$exception->replacement =  serialize($replacements);
 			}
 			if($exception->type==4){
-				DB::beginTransaction();
 				$gift_card_id = $request->get('gift_card_id');
+				if($gift_card_id){
+				DB::beginTransaction();
 				$gift_card = GiftCard::where('id',intval($gift_card_id))->where('status',0)->lockForUpdate()->first();
-				if(!empty($gift_card)){
+				if(empty($gift_card)){
+					$request->session()->flash('error_message','Set Failed, Gift Card has Used or not exists!');
+					DB::rollBack();
+					return redirect()->back()->withInput();
+				}else{
 					$gift_card->exception_id = $exception->id;
 					$gift_card->status = 1;
 					$gift_card->save();
@@ -695,6 +700,8 @@ class ExceptionController extends Controller
 						}
 					}
 					DB::commit();
+				}
+				
 				}
 			}
 			$file = $request->file('importFile');
