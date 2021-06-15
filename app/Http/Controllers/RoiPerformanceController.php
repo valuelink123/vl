@@ -168,7 +168,7 @@ class RoiPerformanceController extends Controller
 
 
 					//每个月的经济效益,收入-成本-佣金-操作费-仓储费-推广费-资金占用成本
-					$update_data['economic_benefit']['value_month_' . $i] = sprintf("%.2f", $update_data['cost']['value_month_' . $i] - $update_data['cost']['value_month_' . $i] - $update_data['commission']['value_month_' . $i] - $update_data['operate_fee']['value_month_' . $i] - $update_data['storage_fee']['value_month_' . $i] - $update_data['promo']['value_month_' . $i] - $update_data['capital_occupy_cost']['value_month_' . $i]);
+					$update_data['economic_benefit']['value_month_' . $i] = sprintf("%.2f", $update_data['income']['value_month_' . $i] - $update_data['cost']['value_month_' . $i] - $update_data['commission']['value_month_' . $i] - $update_data['operate_fee']['value_month_' . $i] - $update_data['storage_fee']['value_month_' . $i] - $update_data['promo']['value_month_' . $i] - $update_data['capital_occupy_cost']['value_month_' . $i]);
 					$update_data['economic_benefit']['value_total'] += $update_data['economic_benefit']['value_month_' . $i];
 
 				}
