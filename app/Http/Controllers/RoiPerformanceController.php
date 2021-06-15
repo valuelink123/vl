@@ -142,7 +142,7 @@ class RoiPerformanceController extends Controller
 
 					//每个月的平均库存数量,（期初库存数量+期末库存数量）/2
 					$update_data['inventory_average']['value_month_' . $i] = round(($update_data['inventory_start']['value_month_' . $i] + $update_data['inventory_end']['value_month_' . $i]) / 2);
-					
+
 					//每个月的仓储费,如果月份为1月、11月、12月，则等于当月平均库存数量*旺季仓储费*汇率*单PCS体积/1000000，否则就是当月平均库存数量*淡季仓储费*汇率*单PCS体积/1000000
 					//$unit_peak_storage_fee旺季仓储费，$unit_low_storage_fee淡季仓储费
 					$update_data['storage_fee']['value_month_' . $i] = '0.00';
@@ -390,6 +390,11 @@ class RoiPerformanceController extends Controller
 			if(isset($search['type']) && $search['type']){
 				$where.= " and type = '".trim($search['type'])."'";
 			}
+		}
+
+		//上线时间的搜索
+		if(isset($search['estimated_launch_time']) && $search['estimated_launch_time']){
+			$where.= " and estimated_launch_time = '".trim($search['estimated_launch_time'])."'";
 		}
 
 		$sql = "select SQL_CALC_FOUND_ROWS roi_performance.*,roi.*
