@@ -49,8 +49,8 @@ class AddRoiPerformance extends Command
 
 		$sql = "SELECT roi.sku,roi.id as roi_id
 				from roi 
-				left join roi_performance on roi_performance.roi_id=roi.id
-				where sku is not null and roi_id is null";
+				left join roi_performance on roi_performance.roi_id=roi.id 
+				where sku is not null and roi_id is null and archived_status = 1";
 
 		$_data = DB::connection('amazon')->select($sql);
 		$typeConfig = array('income', 'cost', 'commission', 'operate_fee', 'storage_fee', 'capital_occupy_cost', 'economic_benefit', 'promo');
