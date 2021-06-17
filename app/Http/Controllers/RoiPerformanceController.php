@@ -88,6 +88,43 @@ class RoiPerformanceController extends Controller
 				$update_data['promo']['value_total'] = 0.00;//总推广费
 
 				$roiData = (array)$roiData;
+				$unit_strorage_fee = getUnitStorageFee()[$roiData['site']];
+				$unit_peak_storage_fee = $unit_strorage_fee[1];//旺季仓储费
+				$unit_low_storage_fee = $unit_strorage_fee[0];//淡季仓储费
+
+				/*
+				 * year_import_tax_fee,年度进口税   year_transport_fee年物流费
+				 */
+
+				$transport_mode = $roiData['transport_mode'];//运输方式, 0-海运，1-空运，2-快递
+				//总的体积
+				$product_volume = $roiData['volume_per_pcs'] * $roiData['total_sales_volume']/1000000;
+				//产品总的重量
+				$product_weight = $roiData['weight_per_pcs'] * $roiData['total_sales_volume'];
+
+				//一年的物流费
+				$transport_cost = 0;
+				if($transport_mode == 0){
+					$transport_cost = $roiData['transport_unit_price'] * $product_volume * 1.2;
+				}else if($transport_mode == 1){
+					$transport_cost = max($product_volume * 1000/6 * 1.2, $product_weight) * $roiData['transport_unit_price'];
+				}else if($transport_mode == 2){
+					$transport_cost = max($product_volume * 1000/5 * 1.2, $product_weight) * $roiData['transport_unit_price'];
+				}
+				//--相关税费--
+				//关税税率(百分数转成小数)
+				//采购成本
+				$purchase_cost = $roiData['purchase_price'] * $roiData['total_sales_volume'];
+
+				if($roiData['site'] == 'JP'){
+					$tariff_amount = $roiData['total_sales_amount'] * 0.35 * $roiData['tariff_rate'];
+				}else{
+					$tariff_amount = $purchase_cost * 0.4 * $roiData['tariff_rate'];
+				}
+
+				DB::connection('amazon')->table('roi_performance_extra')->where('roi_id',$roiData['id'])->delete();
+				DB::connection('amazon')->table('roi_performance_extra')->insert(array('roi_id'=>$roiData['id'],'year_import_tax_fee'=>$tariff_amount,'year_transport_fee'=>$transport_cost));
+
 				for ($i = 1; $i <= 12; $i++) {
 					//当月销售金额
 					$currency_rate = $currency_rates[$roiData['site']];//当前站点的汇率
@@ -102,7 +139,7 @@ class RoiPerformanceController extends Controller
 					$update_data['cost']['value_month_' . $i] = '0.00';
 					$total_sales_volume = $roiData['total_sales_volume'];//年销售量
 					if ($total_sales_volume > 0) {
-						$update_data['cost']['value_month_' . $i] = sprintf("%.2f", $roiData['volume_month_' . $i] * ($roiData['purchase_price'] + ($roiData['year_import_tax'] + $roiData['year_transport']) / $total_sales_volume));
+						$update_data['cost']['value_month_' . $i] = sprintf("%.2f", $roiData['volume_month_' . $i] * ($roiData['purchase_price'] + ($transport_cost + $tariff_amount) / $total_sales_volume));
 					}
 					$update_data['cost']['value_total'] += $update_data['cost']['value_month_' . $i];
 
@@ -113,13 +150,6 @@ class RoiPerformanceController extends Controller
 					//每个月的操作费，当月预计销量*平台操作费*汇率
 					$update_data['operate_fee']['value_month_' . $i] = sprintf("%.2f", $roiData['volume_month_' . $i] * $roiData['unit_operating_fee'] * $currency_rate);
 					$update_data['operate_fee']['value_total'] += $update_data['operate_fee']['value_month_' . $i];
-
-					//每个月的仓储费,(年平台仓储费/销售预测总数量)*当月销售预测数量
-					$update_data['storage_fee']['value_month_' . $i] = '0.00';
-					if ($total_sales_volume > 0) {
-						$update_data['storage_fee']['value_month_' . $i] = sprintf("%.2f", ($roiData['year_platform_storage'] / $total_sales_volume) * $roiData['volume_month_' . $i]);
-					}
-					$update_data['storage_fee']['value_total'] += $update_data['storage_fee']['value_month_' . $i];
 
 					//每个月的推广费
 					$update_data['promo']['value_month_' . $i] = $roiData['promo_rate_month_' . $i] * $sales_amount_month_array[$i];
@@ -146,16 +176,32 @@ class RoiPerformanceController extends Controller
 					//每个月的平均库存数量,（期初库存数量+期末库存数量）/2
 					$update_data['inventory_average']['value_month_' . $i] = round(($update_data['inventory_start']['value_month_' . $i] + $update_data['inventory_end']['value_month_' . $i]) / 2);
 
+					//每个月的仓储费,如果月份为1月、11月、12月，则等于当月平均库存数量*旺季仓储费*汇率*单PCS体积/1000000，否则就是当月平均库存数量*淡季仓储费*汇率*单PCS体积/1000000
+					//$unit_peak_storage_fee旺季仓储费，$unit_low_storage_fee淡季仓储费
+					$update_data['storage_fee']['value_month_' . $i] = '0.00';
+					if($roiData['estimated_launch_time']){
+						$month = date("m", strtotime("+".($i-1)." months", strtotime($roiData['estimated_launch_time'])));
+						if (in_array($month,array(11,12,01))) {
+							//旺季仓储费
+							$update_data['storage_fee']['value_month_' . $i] = sprintf("%.2f", $update_data['inventory_average']['value_month_' . $i]*$unit_peak_storage_fee*$currency_rate*$roiData['volume_per_pcs']/1000000);
+						}else{
+							//淡季仓储费
+							$update_data['storage_fee']['value_month_' . $i] = sprintf("%.2f", $update_data['inventory_average']['value_month_' . $i]*$unit_low_storage_fee*$currency_rate*$roiData['volume_per_pcs']/1000000);
+						}
+					}
+
+					$update_data['storage_fee']['value_total'] += $update_data['storage_fee']['value_month_' . $i];
+
 					//每个月的资金占用成本,当月平均库存数量*（不含税采购单价成本+（总物流费用+总关税）/全年预计销量）*0.18/12
 					$update_data['capital_occupy_cost']['value_month_' . $i] = 0.00;
 					if ($total_sales_volume > 0) {
-						$update_data['capital_occupy_cost']['value_month_' . $i] = sprintf("%.2f", $update_data['inventory_average']['value_month_' . $i] * ($roiData['purchase_price'] + ($roiData['year_import_tax'] + $roiData['year_transport']) / $total_sales_volume) * 0.18 / 12);
+						$update_data['capital_occupy_cost']['value_month_' . $i] = sprintf("%.2f", $update_data['inventory_average']['value_month_' . $i] * ($roiData['purchase_price'] + ($transport_cost + $tariff_amount) / $total_sales_volume) * 0.18 / 12);
 					}
 					$update_data['capital_occupy_cost']['value_total'] += $update_data['capital_occupy_cost']['value_month_' . $i];
 
 
 					//每个月的经济效益,收入-成本-佣金-操作费-仓储费-推广费-资金占用成本
-					$update_data['economic_benefit']['value_month_' . $i] = sprintf("%.2f", $update_data['cost']['value_month_' . $i] - $update_data['cost']['value_month_' . $i] - $update_data['commission']['value_month_' . $i] - $update_data['operate_fee']['value_month_' . $i] - $update_data['storage_fee']['value_month_' . $i] - $update_data['promo']['value_month_' . $i] - $update_data['capital_occupy_cost']['value_month_' . $i]);
+					$update_data['economic_benefit']['value_month_' . $i] = sprintf("%.2f", $update_data['income']['value_month_' . $i] - $update_data['cost']['value_month_' . $i] - $update_data['commission']['value_month_' . $i] - $update_data['operate_fee']['value_month_' . $i] - $update_data['storage_fee']['value_month_' . $i] - $update_data['promo']['value_month_' . $i] - $update_data['capital_occupy_cost']['value_month_' . $i]);
 					$update_data['economic_benefit']['value_total'] += $update_data['economic_benefit']['value_month_' . $i];
 
 				}
@@ -377,6 +423,11 @@ class RoiPerformanceController extends Controller
 			if(isset($search['type']) && $search['type']){
 				$where.= " and type = '".trim($search['type'])."'";
 			}
+		}
+
+		//上线时间的搜索
+		if(isset($search['estimated_launch_time']) && $search['estimated_launch_time']){
+			$where.= " and estimated_launch_time = '".trim($search['estimated_launch_time'])."'";
 		}
 
 		$sql = "select SQL_CALC_FOUND_ROWS roi_performance.*,roi.*

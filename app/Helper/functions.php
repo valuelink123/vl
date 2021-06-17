@@ -1616,3 +1616,25 @@ function getCurrencyRates(){
 
 	return $currency_rates;
 }
+
+/*
+ * 仓储费
+ * 得到各个国家的淡季旺季仓储费
+ * 0: 淡季仓储费unit_low_storage_fee;
+ * 1: 旺季仓储费unit_peak_storage_fee
+ */
+function getUnitStorageFee(){
+	$data = array(
+		//array(0,1). 0: 淡季仓储费unit_low_season_storage_fee; 1: 旺季仓储费unit_peak_season_storage_fee
+		'US' => array(24.37, 84.76),
+		'CA' => array(20.00, 28.00),
+		'UK' => array(22.95, 32.14),
+		'DE' => array(26.00, 36.00),
+		'JP' => array(5070.00, 9000.00),
+		'FR' => array(26.00, 36.00),
+		'ES' => array(26.00, 36.00),
+		'IT' => array(26.00, 36.00)
+	);
+
+	return $data;
+}

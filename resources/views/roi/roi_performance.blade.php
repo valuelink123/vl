@@ -71,6 +71,12 @@
                             <input  class="form-control"  value="" id="roi_id" name="roi_id"/>
                         </div>
                     </div>
+                    <div class="col-md-2">
+                        <div class="input-group">
+                            <span class="input-group-addon">上线时间</span>
+                            <input  class="form-control"  value="" data-change="0" data-date-format="yyyy-mm-dd" data-options="format:'yyyy-mm-dd'" id="estimated_launch_time" name="estimated_launch_time"/>
+                        </div>
+                    </div>
 
                     <div class="col-md-2">
                         <div class="input-group">
@@ -125,8 +131,8 @@
                         <th>第11月</th>
                         <th>第12月</th>
                         <th>总数</th>
-                        <th>创建时间</th>
-                        <th>更新时间</th>
+{{--                        <th>创建时间</th>--}}
+{{--                        <th>更新时间</th>--}}
                         <th>操作</th>
                     </tr>
                     </thead>
@@ -145,6 +151,10 @@
         });
 
         $('#from_date').datepicker({
+            rtl: App.isRTL(),
+            autoclose: true
+        });
+        $('#estimated_launch_time').datepicker({
             rtl: App.isRTL(),
             autoclose: true
         });
@@ -191,8 +201,8 @@
                 {data:'value_month_11',name:'value_month_11'},
                 {data:'value_month_12',name:'value_month_12'},
                 {data:'value_total',name:'value_total'},
-                {data:'created_at',name:'created_at'},
-                {data:'updated_at',name:'updated_at'},
+                // {data:'created_at',name:'created_at'},
+                // {data:'updated_at',name:'updated_at'},
                 {data:'action',name:'action'},
             ],
             ajax: {
@@ -216,7 +226,6 @@
         //点击计算按钮，获取roiid,并触发计算函数
         $("#datatable").delegate(".calculate","click",function(){
             //计算
-            console.log(123);
             var roi_id = $(this).attr('data-id');
             $('#hidden-roiid').attr('data-id',roi_id);
             calculateAjax();
