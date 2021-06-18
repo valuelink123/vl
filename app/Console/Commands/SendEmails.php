@@ -65,11 +65,8 @@ class SendEmails extends Command
 		}
 
 		$blackEmail = blackEmail();
-		$role_users = DB::table('role_user')->whereIn('role_id',['4','12','13','38','39'])->pluck('user_id')->toArray();
-		$users = DB::table('users')->where('ubg','BG0')->pluck('id')->toArray();
-		$user_ids = array_merge($role_users,$users);
-		
-        $tasks = SendboxOut::where('status','Waiting')->where('from_address',$select_mail)->whereNotIn('user_id',$user_ids)->whereNotIn('to_address',$blackEmail)->where('plan_date','<',strtotime(date('Y-m-d H:i:s')))->where('error_count','<',6)->orderBy('error_count','asc')->take(120)->get();
+
+        $tasks = SendboxOut::where('status','Waiting')->where('from_address',$select_mail)->whereNotIn('to_address',$blackEmail)->where('plan_date','<',strtotime(date('Y-m-d H:i:s')))->where('error_count','<',6)->orderBy('error_count','asc')->take(120)->get();
 		$this->run_email = '';
 		$configTime = array(1=>5*60,2=>15*60,3=>30*60,4=>60*60,5=>240*60);
 		foreach ($tasks as $task) {

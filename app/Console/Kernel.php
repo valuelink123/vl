@@ -79,7 +79,7 @@ class Kernel extends ConsoleKernel
 			DB::update("update rsg_products set status = 3 where status>-1 and end_date<'".date('Y-m-d')."';");
         })->dailyAt('03:00');
         $accountList = DB::table('accounts')->get(array('id'));
-        $i=$x=0;
+        $i=0;
         foreach($accountList as $account){
             if($i>59) $i=0;
 			$num_i = sprintf("%02d",$i);
@@ -88,7 +88,10 @@ class Kernel extends ConsoleKernel
 			$schedule->command('get:email '.$account->id.' --time=1day')->cron($x.' 18 * * *')->name($account->id.'_get_emails_18')->withoutOverlapping();
 			$schedule->command('get:email '.$account->id.' --time=1day')->cron($x.' 6 * * *')->name($account->id.'_get_emails_6')->withoutOverlapping();
 			$i++;
-
+        }
+		$accountList = DB::table('accounts')->whereRaw("type='Amazon' or (bg is not null and bg<>'BG0')")->get(array('id'));
+        $x=0;
+		foreach($accountList as $account){
 			if($x>9) $x=0;//每十分钟发送一次,$x>9就置0
 			$num_x = sprintf("%02d",$x);
 			$schedule->command('scan:send '.$account->id)->cron($num_x.' * * * *')->name($account->id.'sendmails_9')->withoutOverlapping();
@@ -98,10 +101,8 @@ class Kernel extends ConsoleKernel
 			$schedule->command('scan:send '.$account->id)->cron(($num_x+40).' * * * *')->name($account->id.'sendmails_49')->withoutOverlapping();
 			$schedule->command('scan:send '.$account->id)->cron(($num_x+50).' * * * *')->name($account->id.'sendmails_59')->withoutOverlapping();
 			$x++;
-
-
         }
-
+		
 
 		$schedule->command('get:order')->cron('*/30 * * * *')->name('getOrder')->withoutOverlapping();
 		$schedule->command('get:review 1days')->cron('0 */1 * * *')->name('getreviews')->withoutOverlapping();
