@@ -79,7 +79,7 @@ class Kernel extends ConsoleKernel
 			DB::update("update rsg_products set status = 3 where status>-1 and end_date<'".date('Y-m-d')."';");
         })->dailyAt('03:00');
         $accountList = DB::table('accounts')->get(array('id'));
-        $i=0;
+        $i=$x=0;
         foreach($accountList as $account){
             if($i>59) $i=0;
 			$num_i = sprintf("%02d",$i);
@@ -88,6 +88,8 @@ class Kernel extends ConsoleKernel
 			$schedule->command('get:email '.$account->id.' --time=1day')->cron($x.' 18 * * *')->name($account->id.'_get_emails_18')->withoutOverlapping();
 			$schedule->command('get:email '.$account->id.' --time=1day')->cron($x.' 6 * * *')->name($account->id.'_get_emails_6')->withoutOverlapping();
 			$i++;
+		if($x>9) $x=0;
+		$x++;
         }
 		$accountList = DB::table('accounts')->whereRaw("type='Amazon' or (bg is not null and bg<>'BG0')")->get(array('id'));
         $x=0;
