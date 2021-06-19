@@ -65,6 +65,7 @@ class SendEmails extends Command
 		}
 
 		$blackEmail = blackEmail();
+
         $tasks = SendboxOut::where('status','Waiting')->where('from_address',$select_mail)->whereNotIn('to_address',$blackEmail)->where('plan_date','<',strtotime(date('Y-m-d H:i:s')))->where('error_count','<',6)->orderBy('error_count','asc')->take(120)->get();
 		$this->run_email = '';
 		$configTime = array(1=>5*60,2=>15*60,3=>30*60,4=>60*60,5=>240*60);
@@ -116,12 +117,15 @@ class SendEmails extends Command
 				});
 
 				if (count(Mail::failures()) > 0) {
+					$result = false ;
+					/*
 					$result = $this->sendEmail($from,$to,$subject,$content,$attachs,[
 						'smtp_host'=>'smtp.bestthankyou.com',
 						'smtp_port'=>25,
 						'username'=>'',
 						'password'=>'',
 					]);
+					*/
 				}else{
 					$result = true ;
 				}

@@ -636,26 +636,82 @@ if((Auth::user()->can(['exception-check']) || in_array($exception['group_id'],ar
 						<input type="text" class="form-control" name="amount" onkeyup="this.value=this.value.replace(/[^\d.]/g,'')"  id="amount" value="{{$exception['amount']}}"  {{$disable}}>
 					</div>
 				</div>
-
-
-				<div class="col-md-12">
-					<label class="control-label">Gift Card</label>
-					<div class="input-group ">
-						<span class="input-group-addon">
-							<i class="fa fa-bookmark"></i>
-						</span>
-						<select name="gift_card_id" class="form-control" {{$disable}}>
-						@foreach ($gift_cards as $gift_card)
-						<option value="{{$gift_card['id']}}" <?php if($gift_card['exception_id']==$exception['id']) echo 'selected';?>>{{$gift_card['code'].' - '.$gift_card['amount'].$gift_card['currency']}}
-						@endforeach
-						</select>
-					</div>
-				</div>
-
 				@endif
 			</div>
+			
+
+			
+			
 		</div>
-		
+
+		@if($exception['type']==4)
+		<div class="form-group" id="gift-card-div">
+			<div class="row">
+				<div class="col-md-12">
+				<label class="control-label">Gift Card</label>
+				<div class="input-group ">
+					<span class="input-group-addon">
+						<i class="fa fa-bookmark"></i>
+					</span>
+					<select name="gift_card_id" class="form-control" {{$disable}}>
+					@foreach ($gift_cards as $gift_card)
+					<option value="{{$gift_card['id']}}" <?php if($gift_card['exception_id']==$exception['id']) echo 'selected';?>>{{$gift_card['code'].' - '.$gift_card['amount'].$gift_card['currency']}}
+					@endforeach
+					</select>
+				</div>
+				</div>
+
+
+				<div class="col-md-6">
+				<label class="control-label">Brand</label>
+				<div class="input-group ">
+					<span class="input-group-addon">
+						<i class="fa fa-bookmark"></i>
+					</span>
+					<input type="text" class="form-control" name="mail_brand" id="mail_brand" value="{{array_get($gift_card_mail,'brand')}}" {{$disable}}>
+				</div>
+				</div>
+
+				<div class="col-md-6">
+				<label class="control-label">To Address</label>
+				<div class="input-group ">
+					<span class="input-group-addon">
+						<i class="fa fa-bookmark"></i>
+					</span>
+					<input type="text" class="form-control" name="mail_to_address" id="mail_to_address" value="{{array_get($gift_card_mail,'to_address')}}" {{$disable}}>
+				</div>
+				</div>
+
+				<div class="col-md-12">
+				<label class="control-label">From Address</label>
+				<div class="input-group ">
+					<span class="input-group-addon">
+						<i class="fa fa-bookmark"></i>
+					</span>
+					<select name="mail_from_address" id="mail_from_address" class="mt-multiselect form-control " data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" {{$disable}}>
+					@foreach ($mail_accounts as $sender)
+					<option value="{{$sender}}" <?php if(array_get($gift_card_mail,'from_address')==$sender) echo 'selected';?>>{{$sender}}
+					@endforeach
+					</select>
+				</div>
+				</div>
+
+				<div class="col-md-12">
+				<label class="control-label">Template</label>
+				<div class="input-group ">
+					<span class="input-group-addon">
+						<i class="fa fa-bookmark"></i>
+					</span>
+					<select name="mail_template_id" class="form-control" {{$disable}}>
+					@foreach ($mail_templates as $template_id => $tag)
+					<option value="{{$template_id}}" <?php if(array_get($gift_card_mail,'template_id')==$template_id) echo 'selected';?>>{{$tag}}
+					@endforeach
+					</select>
+				</div>
+				</div>
+			</div>
+		</div>
+		@endif
 		<div class="form-group mt-repeater">
 			<div class="row mt-repeater-row">
 				<div class="col-md-6">
@@ -764,6 +820,21 @@ if((Auth::user()->can(['exception-check']) || in_array($exception['group_id'],ar
 </form>
 <script>
     $(function() {
+		if($('#process_status').val() == 'done' && $('#type').val() == 4){
+			$('#gift-card-div').show();
+		}else{
+			$('#gift-card-div').hide();
+		}
+
+		$("#process_status").change(function(){
+            var type = $('#type').val();
+            if(type==4 && $(this).val()=='done'){
+                $('#gift-card-div').show();
+            }else{
+                $('#gift-card-div').hide();
+            }
+        });
+
         //当countrycode为US的时候，StateOrRegion为固定下拉选项
         $("#countrycode").change(function(){
             var country = $('#countrycode').val();

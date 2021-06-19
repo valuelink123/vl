@@ -507,14 +507,18 @@ class ExceptionController extends Controller
 
 		if($rule['type']==4){
 			$gift_cards = GiftCard::where('exception_id',$rule['id'])->take(1)->get()->toArray();
-
 			if(!$gift_cards){
 				$gift_cards = GiftCard::where('status',0)->where('amount',$rule['gift_card_amount'])
 				->where('bg',Auth::user()->ubg)
 				->where('bu',Auth::user()->ubu)->take(10)->get()->toArray();
 				shuffle($gift_cards);
 			}
-			
+			$gift_card_mail = DB::table('exception_gift_cards')->where('exception_id',$rule['id'])->orderBy('id','desc')->first();
+			$gift_card_mail = empty($gift_card_mail)?[]:json_decode(json_encode($gift_card_mail),true);
+			$mail_accounts = Accounts::where('status',1)->pluck('account_email')->toArray();
+			$mail_templates = Templates::whereIn('id',explode(',',env('GIFT_CARD_TEMPLATE_IDS')))->pluck('tag','id')->toArray();
+		}else{
+			$gift_cards = $gift_card_mail = $mail_accounts = $mail_templates = [];
 		}
 		 //得到列表记录的所有亚马逊id
 		$mcf_orders = DB::connection('order')->table('amazon_mcf_shipment_package')->whereIn('SellerFulfillmentOrderId',$replacement_order_ids)->get();
@@ -536,7 +540,7 @@ class ExceptionController extends Controller
 			 'B2B'
 		 );
 
-        return view('exception/edit',['exception'=>$rule,'gift_cards'=>$gift_cards,'groups'=>$this->getGroups(),'mygroups'=>$this->getUserGroup(),'sellerids'=>$this->getAccounts(),'last_inboxid'=>$last_inboxid,'mcf_orders'=>$mcf_orders,'auto_create_mcf_logs'=>$auto_create_mcf_logs,'users'=>$this->getUsers(),'requestContentHistoryValues'=>$requestContentHistoryValues]);
+        return view('exception/edit',['exception'=>$rule,'gift_cards'=>$gift_cards,'mail_accounts'=>$mail_accounts,'mail_templates'=>$mail_templates,'gift_card_mail'=>$gift_card_mail,'groups'=>$this->getGroups(),'mygroups'=>$this->getUserGroup(),'sellerids'=>$this->getAccounts(),'last_inboxid'=>$last_inboxid,'mcf_orders'=>$mcf_orders,'auto_create_mcf_logs'=>$auto_create_mcf_logs,'users'=>$this->getUsers(),'requestContentHistoryValues'=>$requestContentHistoryValues]);
     }
 
     public function update(Request $request,$id)
@@ -665,38 +669,60 @@ class ExceptionController extends Controller
 				$replacements['products']=$products;
 				$exception->replacement =  serialize($replacements);
 			}
-			if($exception->type==4){
-				DB::beginTransaction();
+			if($exception->type==4 && $exception->process_status=='done'){
 				$gift_card_id = $request->get('gift_card_id');
-				$gift_card = GiftCard::where('id',intval($gift_card_id))->where('status',0)->lockForUpdate()->first();
-				if(empty($gift_card)){
-					$request->session()->flash('error_message','Set Failed, Gift Card has Used or not exists!');
-					DB::rollBack();
-					return redirect()->back()->withInput();
-				}else{
-					$gift_card->exception_id = $exception->id;
-					$gift_card->status = 1;
-					$gift_card->save();
-					if(env('AUTO_GIFT_CARD_MAIL') && env('AUTO_GIFT_CARD_MAIL_TEMPLATE_ID') && env('AUTO_GIFT_CARD_MAIL_SENDER') && $request->get('to_address')){
-						$customer_email = 
-						$gf_template = Templates::find(env('AUTO_GIFT_CARD_MAIL_TEMPLATE_ID'));
-						if(!empty($gf_template)){
+				if($gift_card_id){
+					DB::beginTransaction();
+					try {
+						$gift_card = GiftCard::where('id',intval($gift_card_id))->lockForUpdate()->first();
+						if(empty($gift_card)) throw new \Exception('Set Failed, Gift Card has Used or not exists!');
+						if($gift_card->exception_id!=$exception->id && $gift_card->status == 1) throw new \Exception('Set Failed, Gift Card has Used or not exists!');
+						$gift_card->exception_id = $exception->id;
+						$gift_card->status = 1;
+						$gift_card->save();
+						if($request->get('mail_brand') && $request->get('mail_template_id') && $request->get('mail_from_address') && $request->get('mail_to_address')){
+							$gf_template = Templates::find(intval($request->get('mail_template_id')));
+							if(empty($gf_template)) throw new \Exception('Set Failed, Template not exists!');
 							$content = str_replace("{GIFT_CARD}",$gift_card->code,$gf_template->content);
 							$subject = str_replace("{GIFT_CARD}",$gift_card->code,$gf_template->title);
-							Sendbox::create(
-								[
-									'from_address'=>env('AUTO_GIFT_CARD_MAIL_SENDER'),
-									'to_address'=>$request->get('to_address'),
-									'subject'=>$subject,
-									'text_html'=>$content,
-									'date' => date('Y-m-d H:i:s'),	
-									'status'=>'Waiting',
-									'ip' => $_SERVER["REMOTE_ADDR"],
-								]
-							);
+							$content = str_replace("{BRAND}",strtoupper($request->get('mail_brand')),$content);
+							$subject = str_replace("{BRAND}",strtoupper($request->get('mail_brand')),$subject);
+
+							$sendbox = new Sendbox;
+							$sendbox->user_id = intval(Auth::user()->id);
+							$sendbox->from_address = $request->get('mail_from_address');
+							$sendbox->to_address = $request->get('mail_to_address');
+							$sendbox->subject = $subject;
+							$sendbox->text_html = $content;
+							$sendbox->date = date('Y-m-d H:i:s');
+							$sendbox->plan_date = 0;
+							$sendbox->status = 'Waiting';
+							$sendbox->inbox_id = 0;
+							$sendbox->warn = 0;
+							$sendbox->ip = $_SERVER["REMOTE_ADDR"];
+							$sendbox->attachs = Null;
+							$sendbox->error = NULL;
+							$sendbox->error_count = 0;
+							$sendbox->save();
+														
+							DB::table('exception_gift_cards')->insert(
+							array(
+								'exception_id'=>$exception->id,
+								'gift_card_id'=>$gift_card_id,
+								'from_address'=>$request->get('mail_from_address'),
+								'to_address'=>$request->get('mail_to_address'),
+								'brand'=>strtoupper($request->get('mail_brand')),
+								'template_id'=>intval($request->get('mail_template_id')),
+								'sendbox_id'=>$sendbox->id,
+							));
 						}
+						DB::commit();
+					} catch (\Exception $e) {
+						DB::rollBack();
+						print_r($e->getMessage());die();
+						$request->session()->flash('error_message',$e->getMessage());
+						return redirect()->back()->withInput();
 					}
-					DB::commit();
 				}
 			}
 			$file = $request->file('importFile');

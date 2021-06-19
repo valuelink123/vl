@@ -135,15 +135,14 @@ class GiftCardController extends Controller
             $bool = $file->move(public_path().$newpath,$newname);
             $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($inputFileName);
             $importData = $spreadsheet->getActiveSheet()->toArray(null, true, true);
-
-            foreach($importData as $key => $data){
+            foreach($importData as $key => $value){
                 if($key>0) {
-                    $data['bg'] = array_get($data,0);
-                    $data['bu'] = array_get($data,1);
-                    $data['code'] = array_get($data,2);
-                    $data['amount'] = round(array_get($data,3),2);
-                    $data['currency'] = array_get($data,4);
-                    
+                    $data['bg'] = array_get($value,0);
+                    $data['bu'] = array_get($value,1);
+                    $data['code'] = array_get($value,2);
+                    $data['amount'] = round(array_get($value,3),2);
+                    $data['currency'] = array_get($value,4);
+                    $data['user_id'] = Auth::user()->id;
                     if($data['bg'] && $data['bu'] && $data['code'] && $data['amount'] && $data['currency']){
                         GiftCard::firstOrCreate(
                             ['code'=>$data['code']]

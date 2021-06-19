@@ -283,6 +283,8 @@ $(function() {
 			success: function (result) {
 				if(result.customActionStatus=='OK'){  
 					toastr.success(result.customActionMessage);
+					var dttable = $('#datatable_ajax').dataTable();
+					dttable.api().ajax.reload(null, false);
 				}else{
 					toastr.error(result.customActionMessage);
 				}
