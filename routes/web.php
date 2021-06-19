@@ -494,4 +494,6 @@ Route::Post('/giftcard/get', 'GiftCardController@get');
 Route::Post('/giftcard/upload', 'GiftCardController@upload');
 Route::get('/giftcardexport', 'GiftCardController@export');
 
+Route::Post('/amazon/auth', 'AmazonAuthController@index');
+
 
