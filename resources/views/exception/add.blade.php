@@ -538,6 +538,22 @@
 								<input type="text" class="form-control" name="gift_card_amount" id="gift_card_amount" value="{{old('gift_card_amount')}}" autocomplete="off" required />
 							</div>
 						</div>
+
+						<div class="form-group">
+							<label>Currency</label>
+							<div class="input-group ">
+							<span class="input-group-addon">
+								<i class="fa fa-bookmark"></i>
+							</span>
+							<select class="form-control " name="currency" id="currency">
+							<?php 
+							foreach(getCurrency() as $v){ 	
+								echo '<option value="'.$v.'" '.(($v==old('currency'))?'selected':'').'>'.$v.'</option>';
+							}?>
+							</select>
+							</div>
+						</div>
+
 						<div style="clear:both;"></div>
 					</div>
 

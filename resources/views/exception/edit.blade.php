@@ -523,8 +523,26 @@ if($exception['user_id'] == Auth::user()->id && ($exception['process_status'] ==
 								<input type="text" class="form-control" name="gift_card_amount" id="gift_card_amount" value="{{array_get($exception,'gift_card_amount',0)}}" {{$disable}} />
 							</div>
 						</div>
+
+						<div class="form-group">
+							<label>Currency</label>
+							<div class="input-group ">
+							<span class="input-group-addon">
+								<i class="fa fa-bookmark"></i>
+							</span>
+							<select class="form-control " name="currency" id="currency" {{$disable}}>
+							<?php 
+							foreach(getCurrency() as $v){ 	
+								echo '<option value="'.$v.'" '.(($v==array_get($exception,'currency'))?'selected':'').'>'.$v.'</option>';
+							}?>
+							</select>
+							</div>
+						</div>
+
 						<div style="clear:both;"></div>
 					</div>
+					
+					
 
 					<div style="clear:both;"></div>
 				</div>
@@ -668,7 +686,11 @@ if((Auth::user()->can(['exception-check']) || in_array($exception['group_id'],ar
 					<span class="input-group-addon">
 						<i class="fa fa-bookmark"></i>
 					</span>
-					<input type="text" class="form-control" name="mail_brand" id="mail_brand" value="{{array_get($gift_card_mail,'brand')}}" {{$disable}}>
+					<select name="mail_brand" id="mail_brand" class="mt-multiselect form-control " data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" {{$disable}}>
+					@foreach (getBrands() as $k=>$v)
+					<option value="{{$k}}" <?php if(array_get($gift_card_mail,'brand')==$k) echo 'selected';?>>{{$k}}
+					@endforeach
+					</select>
 				</div>
 				</div>
 
@@ -691,20 +713,6 @@ if((Auth::user()->can(['exception-check']) || in_array($exception['group_id'],ar
 					<select name="mail_from_address" id="mail_from_address" class="mt-multiselect form-control " data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" {{$disable}}>
 					@foreach ($mail_accounts as $sender)
 					<option value="{{$sender}}" <?php if(array_get($gift_card_mail,'from_address')==$sender) echo 'selected';?>>{{$sender}}
-					@endforeach
-					</select>
-				</div>
-				</div>
-
-				<div class="col-md-12">
-				<label class="control-label">Template</label>
-				<div class="input-group ">
-					<span class="input-group-addon">
-						<i class="fa fa-bookmark"></i>
-					</span>
-					<select name="mail_template_id" class="form-control" {{$disable}}>
-					@foreach ($mail_templates as $template_id => $tag)
-					<option value="{{$template_id}}" <?php if(array_get($gift_card_mail,'template_id')==$template_id) echo 'selected';?>>{{$tag}}
 					@endforeach
 					</select>
 				</div>

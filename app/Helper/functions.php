@@ -1638,3 +1638,27 @@ function getUnitStorageFee(){
 
 	return $data;
 }
+
+function getBrands(){
+	return array(
+		'DBPOWER'=>'dbpowershop.com',
+		'KOIOS'=>'koiosshop.com',
+		'Miropure'=>'miropureshop.com',
+		'Mooka'=>'mookashops.com',
+		'Nursal'=>'nursalshop.com',
+		'Tenker'=>'tenkershop.com',
+		'DROCON'=>'droconshop.com',
+		'Natrogix'=>'natrogixshop.com',
+		'Spacekey'=>'Spacekeyshop.com',
+		'cocohop'=>'cocohopshop.com',
+		'Funavo'=>'thefunavo.com',
+		'Lacette'=>'Lacetteshop.com',
+		'Petlucky'=>'petluckyshop.com',
+		'WORKIZE'=>'workizeshop.com',
+		'VIDOKA'=>'myvidoka.com',
+		'DBPowerJP'=>'dbpowershop.jp',
+		'VipsupportJP'=>'vip-support.jp',
+		'Cozy Buy'=>'cozybuyonline.com',
+		'Runme'=>'runmesport.com',
+	);
+}
