@@ -28,7 +28,7 @@ class ReturnController extends Controller
 	 */
 	public function index()
 	{
-//		if(!Auth::user()->can(['refund-show'])) die('Permission denied -- refund-show');
+		if(!Auth::user()->can(['return-show'])) die('Permission denied -- return-show');
 		$data['account'] = $this->getAccountInfo();//得到账号机的信息
 		$data['fromDate'] = date('Y-m-d',time()-2*86400);//开始日期,默认查最近三天的数据
 		$data['toDate'] = date('Y-m-d');//结束日期
@@ -66,7 +66,7 @@ class ReturnController extends Controller
 	 */
 	public function export()
 	{
-//		if(!Auth::user()->can(['refund-export'])) die('Permission denied -- refund-export');
+		if(!Auth::user()->can(['return-export'])) die('Permission denied -- return-export');
 		$sql = $this->getSql($_GET);
 		$data = DB::connection('amazon')->select($sql);
 		$data = json_decode(json_encode($data),true);

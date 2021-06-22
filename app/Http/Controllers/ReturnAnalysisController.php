@@ -28,7 +28,7 @@ class ReturnAnalysisController extends Controller
 	 */
 	public function returnAnalysis(Request $req)
 	{
-		//配置这些原因应该归属到哪个中文类型下
+		if(!Auth::user()->can(['return-analysis'])) die('Permission denied -- return-analysis');
 		$reasonType = [
 			0=>['name'=>'其他','reason'=>['DID_NOT_LIKE_FABRIC','PRODUCT_NOT_ITALIAN']],
 			1=>['name'=>'产品缺陷','reason'=>['DEFECTIVE']],
@@ -136,6 +136,8 @@ class ReturnAnalysisController extends Controller
 	//asin维度分析
 	public function asinAnalysis(Request $req)
 	{
+
+		if(!Auth::user()->can(['asin-analysis'])) die('Permission denied -- asin-analysis');
 		if($_POST){
 			$search = isset($_REQUEST['search']) ? $_REQUEST['search'] : '';
 			$search = $this->getSearchData(explode('&',$search));
@@ -205,6 +207,7 @@ class ReturnAnalysisController extends Controller
 	//sku维度分析
 	public function skuAnalysis(Request $req)
 	{
+		if(!Auth::user()->can(['sku-analysis'])) die('Permission denied -- sku-analysis');
 		if($_POST){
 			$search = isset($_REQUEST['search']) ? $_REQUEST['search'] : '';
 			$search = $this->getSearchData(explode('&',$search));
