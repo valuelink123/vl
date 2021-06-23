@@ -77,7 +77,7 @@
                             <input  class="form-control"  value="" id="asin" name="asin"/>
                         </div>
                     </div>
-                    <div class="col-md-2">
+                    {{--                   <div class="col-md-2">
                         <div class="input-group">
                             <span class="input-group-addon">Settlement ID</span>
                             <input  class="form-control"  value="" id="settlement_id" name="settlement_id"/>
@@ -87,7 +87,7 @@
                             <span class="input-group-addon">Settlement Date</span>
                             <input  class="form-control"  value="" data-date-format="yyyy-mm-dd" data-options="format:'yyyy-mm-dd'" id="settlement_date" name="settlement_date"/>
                         </div>
-                    </div>
+                    </div>--}}
                     <div class="col-md-2">
                         <div class="input-group">
                             <span class="input-group-addon">Order ID</span>
@@ -103,7 +103,7 @@
                     </div>
                 </form>
             </div>
-{{--            @permission('refund-export')--}}
+            @permission('refund-export')
             <div class="btn-group " style="float:right;margin-top:20px;">
                 <div class="col-md-12">
                     <div class="col-md-2">
@@ -115,7 +115,7 @@
                     </div>
                 </div>
             </div>
-{{--            @endpermission--}}
+            @endpermission
 
             <div>
                 <table class="table table-striped table-bordered" id="datatable">
@@ -129,8 +129,8 @@
                         <th>Refund Amounts</th>
                         <th>Refund Commission</th>
                         <th>Currency</th>
-                        <th>Settlement ID</th>
-                        <th>Settlement Date</th>
+                        {{--<th>Settlement ID</th>
+                        <th>Settlement Date</th>--}}
                     </tr>
                     </thead>
                     <tbody></tbody>
@@ -175,8 +175,8 @@
                 {data: 'refund_amount',name:'refund_amount'},
                 {data: 'refund_commission',name:'refund_commission'},
                 {data: 'currency',name:'currency'},
-                {data: 'settlement_id',name:'settlement_id'},
-                {data: 'settlement_date',name:'settlement_date'},
+                //{data: 'settlement_id',name:'settlement_id'},
+                //{data: 'settlement_date',name:'settlement_date'},
             ],
             ajax: {
                 type: 'POST',

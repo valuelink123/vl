@@ -101,7 +101,7 @@
 {{--                        </div>--}}
 {{--                    </div>--}}
 
-                    <div class="col-md-2">
+{{--  <div class="col-md-2">
                         <div class="input-group">
                             <span class="input-group-addon">Settlement ID</span>
                             <input  class="form-control"  value="" id="settlement_id" name="settlement_id"/>
@@ -111,7 +111,7 @@
                             <span class="input-group-addon">Settlement Date</span>
                             <input  class="form-control"  value="" data-date-format="yyyy-mm-dd" data-options="format:'yyyy-mm-dd'" id="settlement_date" name="settlement_date"/>
                         </div>
-                    </div>
+                    </div>--}}
 
                     <div class="col-md-2">
                         <div class="input-group">
@@ -122,7 +122,7 @@
                     </div>
                 </form>
             </div>
-{{--            @permission('order-list-export')--}}
+            @permission('order-list-export')
             <div class="btn-group " style="float:right;margin-top:20px;">
                 <div class="col-md-12">
                     <div class="col-md-2">
@@ -134,7 +134,7 @@
                     </div>
                 </div>
             </div>
-{{--            @endpermission--}}
+            @endpermission
 
             <div>
                 <table class="table table-striped table-bordered" id="datatable">
@@ -151,10 +151,10 @@
                         <th>Currency</th>
 {{--                        <th>Tracking No</th>--}}
 {{--                        <th>Carrier Code</th>--}}
-                        <th>Settlement ID</th>
-                        <th>Settlement Date</th>
+{{--  <th>Settlement ID</th>
+                        <th>Settlement Date</th>--}}
                         <th>Fulfillment</th>
-                        <th>Posted Date</th>
+                        {{--   <th>Posted Date</th>--}}
                     </tr>
                     </thead>
                     <tbody></tbody>
@@ -202,10 +202,10 @@
                 {data: 'currency',name:'currency',class:'data-currency'},
                 // {data: 'tracking_no',name:'tracking_no'},
                 // {data: 'carry_code',name:'carry_code'},
-                {data: 'settlement_id',name:'settlement_id'},
-                {data: 'settlement_date',name:'settlement_date'},
+                //{data: 'settlement_id',name:'settlement_id'},
+                //{data: 'settlement_date',name:'settlement_date'},
                 {data: 'fulfillment_channel',name:'fulfillment_channel'},
-                {data: 'posted_date',name:'posted_date'},
+                //{data: 'posted_date',name:'posted_date'},
             ],
             ajax: {
                 type: 'POST',

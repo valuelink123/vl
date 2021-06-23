@@ -83,8 +83,8 @@ class ReturnController extends Controller
 		$headArray[] = 'Reason';
 		$headArray[] = 'Condition';
 		$headArray[] = 'Customer Comments';
-		$headArray[] = 'Settlement ID';
-		$headArray[] = 'Settlement Date';
+		//$headArray[] = 'Settlement ID';
+		//$headArray[] = 'Settlement Date';
 		$arrayData[] = $headArray;
 
 		$accounts = $this->getAccountInfo();//得到账号机的信息
@@ -103,8 +103,8 @@ class ReturnController extends Controller
 				$val['reason'],
 				$val['condition'],
 				$val['customer_comments'],
-				$val['settlement_id'],
-				$val['settlement_date'],
+				//$val['settlement_id'],
+				//$val['settlement_date'],
 			);
 		}
 
@@ -165,19 +165,23 @@ class ReturnController extends Controller
 			$where.= " and seller_sku = '".$search['seller_sku']."'";
 		}
 		if(isset($search['settlement_id']) && $search['settlement_id']){
-			$where.= " and settlement_id = '".$search['settlement_id']."'";
+			//$where.= " and settlement_id = '".$search['settlement_id']."'";
 		}
 
-		$sql = "select SQL_CALC_FOUND_ROWS amazon_returns.id as id,amazon_returns.seller_account_id as seller_account_id,amazon_returns.amazon_order_id as amazon_order_id,amazon_returns.return_date as return_date,amazon_returns.asin as asin,amazon_returns.seller_sku as seller_sku,amazon_returns.quantity as quantity,amazon_returns.status as status,amazon_returns.reason as reason,amazon_returns.customer_comments as customer_comments,amazon_returns.detailed_disposition as `condition`,settlement_id,settlement_date  
+		if (Auth::user()->seller_rules) {
+			$rules = explode("-",Auth::user()->seller_rules);
+			if(array_get($rules,0)!='*') $where.= " and tb.sap_seller_bg='".array_get($rules,0)."'";
+			if(array_get($rules,1)!='*') $where.= " and tb.sap_seller_bu='".array_get($rules,1)."'";
+		} elseif (Auth::user()->sap_seller_id) {
+			$where.= " and tb.sap_seller_id=".Auth::user()->sap_seller_id;
+		}
+
+		$sql = "select SQL_CALC_FOUND_ROWS amazon_returns.id as id,amazon_returns.seller_account_id as seller_account_id,amazon_returns.amazon_order_id as amazon_order_id,amazon_returns.return_date as return_date,amazon_returns.asin as asin,amazon_returns.seller_sku as seller_sku,amazon_returns.quantity as quantity,amazon_returns.status as status,amazon_returns.reason as reason,amazon_returns.customer_comments as customer_comments,amazon_returns.detailed_disposition as `condition`  
 			from amazon_returns 
-			left join (
-					select any_value(amazon_settlement_details.seller_account_id) as seller_account_id,amazon_settlement_details.order_id as order_id,
-any_value(amazon_settlements.settlement_id) as settlement_id,any_value(amazon_settlements.deposit_date) as settlement_date 
-					from amazon_settlement_details 
-					left join amazon_settlements on amazon_settlement_details.settlement_id = amazon_settlements.settlement_id 
-					where transaction_type = 'Refund' and amazon_settlements.deposit_date >= '{$search['from_date']} 00:00:00'
-					group by amazon_settlement_details.order_id,amazon_settlement_details.seller_account_id 
-				) as settlement on amazon_returns.amazon_order_id=settlement.order_id and amazon_returns.seller_account_id = settlement.seller_account_id
+			left join seller_accounts 
+			on `amazon_returns`.`seller_account_id` = seller_accounts.id
+			left join sap_asin_match_sku as tb 
+			on amazon_returns.seller_sku=tb.seller_sku and seller_accounts.mws_seller_id=tb.seller_id and seller_accounts.mws_marketplaceid=tb.marketplace_id
 				{$where}";
 		return $sql;
 	}

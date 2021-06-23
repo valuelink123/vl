@@ -93,6 +93,15 @@ class ReturnAnalysisController extends Controller
 			//搜索条件如下：from_date,to_date
 			$where = " where return_date >= '".$search['from_date']." 00:00:00' and return_date <= '".$search['to_date']." 23:59:59'";
 			$where_sku = ' where 1 = 1 ';
+
+			if (Auth::user()->seller_rules) {
+				$rules = explode("-",Auth::user()->seller_rules);
+				if(array_get($rules,0)!='*') $where_sku.= " and tb.sap_seller_bg='".array_get($rules,0)."'";
+				if(array_get($rules,1)!='*') $where_sku.= " and tb.sap_seller_bu='".array_get($rules,1)."'";
+			} elseif (Auth::user()->sap_seller_id) {
+				$where_sku.= " and tb.sap_seller_id=".Auth::user()->sap_seller_id;
+			}
+
 			if(isset($search['sku']) && $search['sku']){
 				$where_sku.= " and tb.sku = '".$search['sku']."'";
 			}
@@ -155,6 +164,16 @@ class ReturnAnalysisController extends Controller
 			if(isset($search['asin']) && $search['asin']){
 				$where.= " and tb.asin = '".$search['asin']."'";
 			}
+
+			if (Auth::user()->seller_rules) {
+				$rules = explode("-",Auth::user()->seller_rules);
+				if(array_get($rules,0)!='*') $where.= " and tb.sap_seller_bg='".array_get($rules,0)."'";
+				if(array_get($rules,1)!='*') $where.= " and tb.sap_seller_bu='".array_get($rules,1)."'";
+			} elseif (Auth::user()->sap_seller_id) {
+				$where.= " and tb.sap_seller_id=".Auth::user()->sap_seller_id;
+			}
+
+
 			$orderby = ' return_quantity ';
 			$sort = ' desc ';
 			if(isset($_REQUEST['order'][0])){
@@ -224,6 +243,14 @@ class ReturnAnalysisController extends Controller
 				$where.= " and tb.sku = '".$search['sku']."'";
 			}
 
+			if (Auth::user()->seller_rules) {
+				$rules = explode("-",Auth::user()->seller_rules);
+				if(array_get($rules,0)!='*') $where.= " and tb.sap_seller_bg='".array_get($rules,0)."'";
+				if(array_get($rules,1)!='*') $where.= " and tb.sap_seller_bu='".array_get($rules,1)."'";
+			} elseif (Auth::user()->sap_seller_id) {
+				$where.= " and tb.sap_seller_id=".Auth::user()->sap_seller_id;
+			}
+			
 			$orderby = ' return_quantity ';
 			$sort = ' desc ';
 			if(isset($_REQUEST['order'][0])){

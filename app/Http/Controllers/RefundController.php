@@ -80,8 +80,8 @@ class RefundController extends Controller
 		$headArray[] = 'Refund Amounts';
 		$headArray[] = 'Refund Commission';
 		$headArray[] = 'Currency';
-		$headArray[] = 'Settlement ID';
-		$headArray[] = 'Settlement Date';
+		//$headArray[] = 'Settlement ID';
+		//$headArray[] = 'Settlement Date';
 		$arrayData[] = $headArray;
 
 		$accounts = $this->getAccountInfo();//得到账号机的信息
@@ -97,8 +97,8 @@ class RefundController extends Controller
 				$val['refund_amount'],
 				$val['refund_commission'],
 				$val['currency'],
-				$val['settlement_id'],
-				$val['settlement_date'],
+				//$val['settlement_id'],
+				//$val['settlement_date'],
 			);
 		}
 
@@ -138,25 +138,30 @@ class RefundController extends Controller
 			$where.= " and orders.asins like '%".$search['asin']."%'";
 		}
 		if(isset($search['settlement_id']) && $search['settlement_id']){
-			$where.= " and settlement_id = '".$search['settlement_id']."'";
+			//$where.= " and settlement_id = '".$search['settlement_id']."'";
 		}
 		if(isset($search['settlement_date']) && $search['settlement_date']){
-			$where.= " and settlement_date >= '".$search['settlement_date']." 00:00:00 ' and settlement_date<= '".$search['settlement_date']." 23:59:59'";
+			//$where.= " and settlement_date >= '".$search['settlement_date']." 00:00:00 ' and settlement_date<= '".$search['settlement_date']." 23:59:59'";
 		}
 		//站点权限
 		$domain = substr(getDomainBySite($search['site']), 4);//orders.sales_channel
 		$where .= " and finances_refund_events.marketplace_name = '".ucfirst($domain)."'";
 
-		$sql = "select SQL_CALC_FOUND_ROWS any_value(orders.id) as id,finances_refund_events.current_seller_account_id as seller_account_id,finances_refund_events.amazon_order_id,any_value(posted_date) as posted_date,any_value(currency) as currency,any_value(settlement_id) as settlement_id,any_value(settlement_date) as settlement_date,any_value(orders.asins) as asins,sum(CASE `type` WHEN 'RefundCommission' THEN finances_refund_events.amount ELSE 0 END) as refund_commission,sum(CASE `type` WHEN 'RefundCommission' THEN 0 ELSE finances_refund_events.amount END) as refund_amount    
-				from finances_refund_events 
+		if (Auth::user()->seller_rules) {
+			$rules = explode("-",Auth::user()->seller_rules);
+			if(array_get($rules,0)!='*') $where.= " and tb.sap_seller_bg='".array_get($rules,0)."'";
+			if(array_get($rules,1)!='*') $where.= " and tb.sap_seller_bu='".array_get($rules,1)."'";
+		} elseif (Auth::user()->sap_seller_id) {
+			$where.= " and tb.sap_seller_id=".Auth::user()->sap_seller_id;
+		}
+		
+		$sql = "select SQL_CALC_FOUND_ROWS any_value(orders.id) as id,finances_refund_events.current_seller_account_id as seller_account_id,finances_refund_events.amazon_order_id,any_value(posted_date) as posted_date,any_value(currency) as currency,any_value(orders.asins) as asins,sum(CASE `type` WHEN 'RefundCommission' THEN finances_refund_events.amount ELSE 0 END) as refund_commission,sum(CASE `type` WHEN 'RefundCommission' THEN 0 ELSE finances_refund_events.amount END) as refund_amount    
+				from finances_refund_events
+				left join seller_accounts 
+			on `finances_refund_events`.`current_seller_account_id` = seller_accounts.id
+			left join sap_asin_match_sku as tb 
+			on finances_refund_events.seller_sku=tb.seller_sku and seller_accounts.mws_seller_id=tb.seller_id and seller_accounts.mws_marketplaceid=tb.marketplace_id
 				left join orders on orders.seller_account_id = finances_refund_events.current_seller_account_id and orders.amazon_order_id = finances_refund_events.amazon_order_id 
-				left join (
-					select any_value(amazon_settlement_details.seller_account_id) as seller_account_id,amazon_settlement_details.order_id as order_id,any_value(amazon_settlements.settlement_id) as settlement_id,any_value(amazon_settlements.deposit_date) as settlement_date 
-					from amazon_settlement_details 
-					left join amazon_settlements on amazon_settlement_details.settlement_id = amazon_settlements.settlement_id 
-					where transaction_type = 'Refund' and amazon_settlements.deposit_date >= '{$search['from_date']} 00:00:00'
-					group by amazon_settlement_details.order_id,amazon_settlement_details.seller_account_id 
-				) as settlement on finances_refund_events.amazon_order_id=settlement.order_id and finances_refund_events.current_seller_account_id = settlement.seller_account_id
 				 {$where}
 				group by finances_refund_events.current_seller_account_id,finances_refund_events.amazon_order_id,finances_refund_events.seller_sku 
 				order by posted_date desc";

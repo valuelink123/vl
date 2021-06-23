@@ -135,10 +135,10 @@
                             </select>
                         </div>
                         <br>
-                        <div class="input-group">
+                        {{--<div class="input-group">
                             <span class="input-group-addon">Settlement ID</span>
                             <input  class="form-control"  value="" id="settlement_id" name="settlement_id"/>
-                        </div>
+                        </div>--}}
                     </div>
                     <div class="col-md-2">
                         <div class="input-group">
@@ -155,7 +155,7 @@
                     </div>
                 </form>
             </div>
-            {{--            @permission('refund-export')--}}
+            @permission('return-export')
             <div class="btn-group " style="float:right;margin-top:20px;">
                 <div class="col-md-12">
                     <div class="col-md-2">
@@ -167,7 +167,7 @@
                     </div>
                 </div>
             </div>
-            {{--            @endpermission--}}
+            @endpermission
 
             <div>
                 <table class="table table-striped table-bordered" id="datatable">
@@ -184,8 +184,8 @@
                         <th>Reason</th>
                         <th>Condition</th>
                         <th>Customer Comments</th>
-                        <th>Settlement ID</th>
-                        <th>Settlement Date</th>
+                        {{--<th>Settlement ID</th>
+                        <th>Settlement Date</th>--}}
                     </tr>
                     </thead>
                     <tbody></tbody>
@@ -233,8 +233,8 @@
                 {data: 'reason',name:'reason',class:'data_reason'},
                 {data: 'condition',name:'condition',class:'data_condition'},
                 {data: 'customer_comments',name:'customer_comments',class:'data-comments'},
-                {data: 'settlement_id',name:'settlement_id',class:'data_settlement_id'},
-                {data: 'settlement_date',name:'settlement_date',class:'data-settlement-date'},
+                //{data: 'settlement_id',name:'settlement_id',class:'data_settlement_id'},
+                //{data: 'settlement_date',name:'settlement_date',class:'data-settlement-date'},
             ],
             ajax: {
                 type: 'POST',

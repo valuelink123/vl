@@ -96,7 +96,7 @@
                     </div>
                 </form>
             </div>
-            {{--            @permission('refund-export')--}}
+            @permission('mcf-list-export')
             <div class="btn-group " style="float:right;margin-top:20px;">
                 <div class="col-md-12">
                     <div class="col-md-2">
@@ -108,7 +108,7 @@
                     </div>
                 </div>
             </div>
-            {{--            @endpermission--}}
+            @endpermission
 
             <div>
                 <table class="table table-striped table-bordered" id="datatable">
@@ -125,8 +125,8 @@
                         <th>Shipping Speed</th>
 {{--                        <th>Tracking No.</th>--}}
 {{--                        <th>Carrier Code</th>--}}
-                        <th>Settlement ID</th>
-                        <th>Settlement Date</th>
+{{--<th>Settlement ID</th>
+                        <th>Settlement Date</th>--}}
                     </tr>
                     </thead>
                     <tbody></tbody>
@@ -174,8 +174,8 @@
                 {data: 'shipping_speed',name:'shipping_speed'},
                 // {data: 'tracking_no',name:'tracking_no'},
                 // {data: 'carrier_code',name:'carrier_code'},
-                {data: 'settlement_id',name:'settlement_id'},
-                {data: 'settlement_date',name:'settlement_date'},
+                //{data: 'settlement_id',name:'settlement_id'},
+                //{data: 'settlement_date',name:'settlement_date'},
             ],
             ajax: {
                 type: 'POST',
