@@ -153,7 +153,7 @@ class ReturnController extends Controller
 			$where.= " and amazon_returns.asin like '%".$search['asin']."%'";
 		}
 		if(isset($search['status']) && $search['status']){
-			$where.= " and status = '".$search['status']."'";
+			$where.= " and amazon_returns.status = '".$search['status']."'";
 		}
 		if(isset($search['reason']) && $search['reason']){
 			$where.= " and reason = '".$search['reason']."'";
@@ -162,7 +162,7 @@ class ReturnController extends Controller
 			$where.= " and detailed_disposition = '".$search['condition']."'";
 		}
 		if(isset($search['seller_sku']) && $search['seller_sku']){
-			$where.= " and seller_sku = '".$search['seller_sku']."'";
+			$where.= " and amazon_returns.seller_sku = '".$search['seller_sku']."'";
 		}
 		if(isset($search['settlement_id']) && $search['settlement_id']){
 			//$where.= " and settlement_id = '".$search['settlement_id']."'";
