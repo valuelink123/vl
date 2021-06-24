@@ -53,7 +53,7 @@
                         <div class="col-md-2">
                             <div class="input-group">
                                 <span class="input-group-addon">Sales</span>
-                                <select style="width:100%;height:35px;" id="sales" name="sales">
+                                <select class="mt-multiselect btn btn-default form-control" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" id="sales" name="sales">
                                     <option value="">Select</option>
                                     @foreach($users as $id=>$name)
                                         <option value="{!! $id !!}">{!! $name !!}</option>

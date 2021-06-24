@@ -32,15 +32,14 @@
 							@permission('fee-split-update')
 							<div class="table-actions-wrapper">
 								<input type="text" placeholder="SAPSKU" id="sku" class="table-group-action-input form-control input-inline input-small input-sm" />
-								<select  id="sapuid" class="table-group-action-input form-control input-inline input-small input-sm">
-										<option value="">Select Seller</option>
-										@foreach ($users as $user_id=>$user_name)
-												<option value="{{$user_id}}">{{$user_name}}</option>
-											@endforeach
-									</select>
+								<select  id="sapuid" class="table-group-action-input mt-multiselect btn btn-default form-control input-inline input-small input-sm " data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" >
+								@foreach ($users as $user_id=>$user_name)
+									<option value="{{$user_id}}">{{$user_name}}</option>
+								@endforeach
+								</select>
 																	
 								<button class="btn btn-sm green table-group-action-submit">
-									<i class="fa fa-check"></i> Change</button>
+								<i class="fa fa-check"></i> Change</button>
 							</div>
 							@endpermission
 							<table class="table table-striped table-bordered table-hover table-checkable" id="datatable_ajax_ads">
@@ -81,7 +80,7 @@
 									</td>
 									<td>
 										
-										<select name="sellerid" class="form-control form-filter input-sm">
+										<select name="sellerid" class="mt-multiselect btn btn-default form-control form-filter input-sm " data-label="left" data-width="100%" data-filter="true" data-action-onchange="true">
 											<option value="">Select Account</option>
 										   <?php 
 											foreach($accounts as $k=>$v){ 	
@@ -100,7 +99,7 @@
 
 									 <td>
 									
-										<select name="user_id" class="form-control form-filter input-sm">
+										<select name="user_id" class="mt-multiselect btn btn-default form-control form-filter input-sm " data-label="left" data-width="100%" data-filter="true" data-action-onchange="true">
 										<option value="">All Users</option>
 										<option value="-">[Empty]</option>
 										@foreach ($users as $user_id=>$user_name)
@@ -252,8 +251,7 @@
 							@permission('fee-split-update')
 							<div class="table-actions-wrapper">
 								<input type="text" placeholder="SAPSKU" id="sku" class="table-group-action-input form-control input-inline input-small input-sm" />
-								<select  id="sapuid" class="table-group-action-input form-control input-inline input-small input-sm">
-										<option value="">Select Seller</option>
+								<select  id="sapuid" class="table-group-action-input mt-multiselect btn btn-default form-control input-inline input-small input-sm " data-label="left" data-width="100%" data-filter="true" data-action-onchange="true">
 										@foreach ($users as $user_id=>$user_name)
 												<option value="{{$user_id}}">{{$user_name}}</option>
 											@endforeach
@@ -301,7 +299,7 @@
 									</td>
 									<td>
 										
-										<select name="sellerid" class="form-control form-filter input-sm">
+										<select name="sellerid" class="mt-multiselect btn btn-default form-control form-filter input-sm " data-label="left" data-width="100%" data-filter="true" data-action-onchange="true">
 											<option value="">Select Account</option>
 										   <?php 
 											foreach($accounts as $k=>$v){ 	
@@ -320,7 +318,7 @@
 
 									 <td>
 									
-										<select name="user_id" class="form-control form-filter input-sm">
+										<select name="user_id" class="mt-multiselect btn btn-default form-control form-filter input-sm " data-label="left" data-width="100%" data-filter="true" data-action-onchange="true">
 										<option value="">All Users</option>
 										<option value="-">[Empty]</option>
 										@foreach ($users as $user_id=>$user_name)
@@ -486,8 +484,8 @@
 							<div class="table-actions-wrapper">
 								
 								<input type="text" placeholder="SAPSKU" id="sku" class="table-group-action-input form-control input-inline input-small input-sm" />
-								<select  id="sapuid" class="table-group-action-input form-control input-inline input-small input-sm">
-										<option value="">Select Seller</option>
+								<select  id="sapuid" class="table-group-action-input mt-multiselect btn btn-default form-control input-inline input-small input-sm " data-label="left" data-width="100%" data-filter="true" data-action-onchange="true">
+										
 										@foreach ($users as $user_id=>$user_name)
 												<option value="{{$user_id}}">{{$user_name}}</option>
 											@endforeach
@@ -536,7 +534,7 @@
 									</td>
 									<td>
 										
-										<select name="sellerid" class="form-control form-filter input-sm">
+										<select name="sellerid" class="mt-multiselect btn btn-default form-control form-filter input-sm " data-label="left" data-width="100%" data-filter="true" data-action-onchange="true">
 											<option value="">Select Account</option>
 										   <?php 
 											foreach($accounts as $k=>$v){ 	
@@ -555,7 +553,7 @@
 									
 									 <td>
 									
-										<select name="user_id" class="form-control form-filter input-sm">
+										<select name="user_id" class="mt-multiselect btn btn-default form-control form-filter input-sm " data-label="left" data-width="100%" data-filter="true" data-action-onchange="true">
 										<option value="">All Users</option>
 										<option value="-">[Empty]</option>
 										@foreach ($users as $user_id=>$user_name)
@@ -710,8 +708,8 @@
 							<div class="table-actions-wrapper">
 								
 								<input type="text" placeholder="SAPSKU" id="sku" class="table-group-action-input form-control input-inline input-small input-sm" />
-								<select  id="sapuid" class="table-group-action-input form-control input-inline input-small input-sm">
-										<option value="">Select Seller</option>
+								<select  id="sapuid" class="table-group-action-input mt-multiselect btn btn-default form-control input-inline input-small input-sm " data-label="left" data-width="100%" data-filter="true" data-action-onchange="true">
+										
 										@foreach ($users as $user_id=>$user_name)
 												<option value="{{$user_id}}">{{$user_name}}</option>
 											@endforeach
@@ -760,7 +758,7 @@
 									</td>
 									<td>
 										
-										<select name="sellerid" class="form-control form-filter input-sm">
+										<select name="sellerid" class="mt-multiselect btn btn-default form-control form-filter input-sm " data-label="left" data-width="100%" data-filter="true" data-action-onchange="true">
 											<option value="">Select Account</option>
 										   <?php 
 											foreach($accounts as $k=>$v){ 	
@@ -779,7 +777,7 @@
 									
 									 <td>
 									
-										<select name="user_id" class="form-control form-filter input-sm">
+										<select name="user_id" class="mt-multiselect btn btn-default form-control form-filter input-sm " data-label="left" data-width="100%" data-filter="true" data-action-onchange="true">
 										<option value="">All Users</option>
 										<option value="-">[Empty]</option>
 										@foreach ($users as $user_id=>$user_name)
@@ -934,9 +932,11 @@
 							@permission('fee-split-update')
 							<div class="table-actions-wrapper">
 								
+									
+								
 								<input type="text" placeholder="SAPSKU" id="sku" class="table-group-action-input form-control input-inline input-small input-sm" />
-								<select  id="sapuid" class="table-group-action-input form-control input-inline input-small input-sm">
-										<option value="">Select Seller</option>
+								<select  id="sapuid" class="table-group-action-input mt-multiselect btn btn-default form-control input-inline input-small input-sm " data-label="left" data-width="100%" data-filter="true" data-action-onchange="true">
+										
 										@foreach ($users as $user_id=>$user_name)
 												<option value="{{$user_id}}">{{$user_name}}</option>
 											@endforeach
@@ -991,7 +991,7 @@
 									</td>
 									<td>
 										
-										<select name="sellerid" class="form-control form-filter input-sm">
+										<select name="sellerid" class="mt-multiselect btn btn-default form-control form-filter input-sm " data-label="left" data-width="100%" data-filter="true" data-action-onchange="true">
 											<option value="">Select Account</option>
 										   <?php 
 											foreach($accounts as $k=>$v){ 	
@@ -1026,7 +1026,7 @@
 									
 									 <td>
 									
-										<select name="user_id" class="form-control form-filter input-sm">
+										<select name="user_id" class="mt-multiselect btn btn-default form-control form-filter input-sm " data-label="left" data-width="100%" data-filter="true" data-action-onchange="true">
 										<option value="">All Users</option>
 										<option value="-">[Empty]</option>
 										@foreach ($users as $user_id=>$user_name)

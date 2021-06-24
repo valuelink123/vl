@@ -77,7 +77,7 @@
                                 </td>
 								<td>
                                     <?php //if(Auth::user()->admin){ ?>
-                                    <select class="form-control form-filter input-sm" name="user_id">
+                                    <select class="mt-multiselect btn btn-default form-control form-filter input-sm" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" name="user_id">
                                         <option value="">Select...</option>
                                         @foreach ($users as $user_id=>$user_name)
                                             <option value="{{$user_id}}">{{$user_name}}</option>
