@@ -494,4 +494,7 @@ Route::Post('/giftcard/get', 'GiftCardController@get');
 Route::Post('/giftcard/upload', 'GiftCardController@upload');
 Route::get('/giftcardexport', 'GiftCardController@export');
 
+//客诉品线问题细分
+Route::Post('/category/import', 'CategoryController@import');
+
 
