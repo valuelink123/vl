@@ -62,7 +62,7 @@
 							<div class="btn-group " style="float:right;">
 								<form action="{{url('/category/import')}}" method="post" enctype="multipart/form-data">
 									<div class="col-md-12">
-										@permission('category-create')
+										@permission('qa-category-create')
 										<div class="col-md-6">
 											{{ csrf_field() }}
 											<input type="file" name="importFile"  style="width: 90%;"/>
