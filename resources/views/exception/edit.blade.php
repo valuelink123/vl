@@ -231,6 +231,17 @@ if($exception['user_id'] == Auth::user()->id && ($exception['process_status'] ==
 				</div>
 			</div>
 
+
+			<div class="form-group">
+				<label>Customer Email</label>
+				<div class="input-group ">
+			<span class="input-group-addon">
+				<i class="fa fa-bookmark"></i>
+			</span>
+					<input type="text" class="form-control" name="customer_email" id="customer_email" value="{{$exception['customer_email']}}" {{$disable}}>
+				</div>
+			</div>
+
 			<div class="form-group col-md-12">
 				<div class="col-md-3"  >
 					<label>File</label>
@@ -694,15 +705,6 @@ if((Auth::user()->can(['exception-check']) || in_array($exception['group_id'],ar
 				</div>
 				</div>
 
-				<div class="col-md-6">
-				<label class="control-label">To Address</label>
-				<div class="input-group ">
-					<span class="input-group-addon">
-						<i class="fa fa-bookmark"></i>
-					</span>
-					<input type="text" class="form-control" name="mail_to_address" id="mail_to_address" value="{{array_get($gift_card_mail,'to_address')}}" {{$disable}}>
-				</div>
-				</div>
 
 				<div class="col-md-12">
 				<label class="control-label">From Address</label>

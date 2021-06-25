@@ -261,6 +261,16 @@
 			</div>
 		</div>
 
+		<div class="form-group">
+			<label>Customer Email</label>
+			<div class="input-group ">
+			<span class="input-group-addon">
+				<i class="fa fa-bookmark"></i>
+			</span>
+				<input type="text" class="form-control" name="customer_email" id="customer_email" value="{{old('customer_email')}}" >
+			</div>
+		</div>
+
 			<div class="form-group">
 				<label>Attach</label>
 				<div class="input-group ">
@@ -553,6 +563,8 @@
 							</select>
 							</div>
 						</div>
+
+						
 
 						<div style="clear:both;"></div>
 					</div>

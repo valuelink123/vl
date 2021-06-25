@@ -680,7 +680,8 @@ class ExceptionController extends Controller
 						$gift_card->exception_id = $exception->id;
 						$gift_card->status = 1;
 						$gift_card->save();
-						if($request->get('mail_brand') && $request->get('mail_from_address') && $request->get('mail_to_address')){
+						if($request->get('mail_brand') && $request->get('mail_from_address') && $exception->customer_email){
+							$customer_email = array_search($exception->customer_email,getEmailToEncryptedEmail())?array_search($exception->customer_email,getEmailToEncryptedEmail()):$exception->customer_email;
 							if($exception->process_status =='SG gift' || $exception->process_status=='CTG-gift'){
 								$mail_template_id = 4170;
 							}else{
@@ -697,7 +698,7 @@ class ExceptionController extends Controller
 							$sendbox = new Sendbox;
 							$sendbox->user_id = intval(Auth::user()->id);
 							$sendbox->from_address = $request->get('mail_from_address');
-							$sendbox->to_address = $request->get('mail_to_address');
+							$sendbox->to_address = $customer_email;
 							$sendbox->subject = $subject;
 							$sendbox->text_html = $content;
 							$sendbox->date = date('Y-m-d H:i:s');
@@ -716,7 +717,7 @@ class ExceptionController extends Controller
 								'exception_id'=>$exception->id,
 								'gift_card_id'=>$gift_card_id,
 								'from_address'=>$request->get('mail_from_address'),
-								'to_address'=>$request->get('mail_to_address'),
+								'to_address'=>$customer_email,
 								'brand'=>$request->get('mail_brand'),
 								'template_id'=>$mail_template_id,
 								'sendbox_id'=>$sendbox->id,
@@ -777,6 +778,7 @@ class ExceptionController extends Controller
 			$exception->user_id = intval(Auth::user()->id);
 			$exception->request_content = $request->get('request_content');
 			$exception->process_status = 'submit';
+			$exception->customer_email = $request->get('customer_email');
 			$exception->descrip = $request->get('descrip');
 			if( $exception->type == 1 || $exception->type == 3){
 				$exception->refund = round($request->get('refund'),2);
@@ -786,9 +788,11 @@ class ExceptionController extends Controller
 
 			if( $exception->type == 4){
 				$exception->gift_card_amount = round($request->get('gift_card_amount'),2)??0;
+				$exception->currency = $request->get('currency');
 			}else{
 				$exception->gift_card_amount = 0;
 			}
+			
 			$updateMcfOrder = array();
 			if( $exception->type == 2 || $exception->type == 3){
 				$replacements = unserialize($exception->replacement);
@@ -1238,6 +1242,7 @@ class ExceptionController extends Controller
         $exception->descrip = $request->get('descrip');
         $exception->saleschannel = $request->get('saleschannel');
         $exception->asin = $request->get('asin');
+		$exception->customer_email = $request->get('customer_email');
 		if( $exception->type == 1 || $exception->type == 3){
 			$exception->refund = round($request->get('refund'),2);
 		}else{
@@ -1246,6 +1251,7 @@ class ExceptionController extends Controller
 
         if( $exception->type == 4){
             $exception->gift_card_amount = round($request->get('gift_card_amount'),2)??0;
+			$exception->currency = $request->get('currency');
         }else{
             $exception->gift_card_amount = 0;
         }
