@@ -864,6 +864,15 @@
                                                     </a>
                                                 </li>
 												@endpermission
+
+                                                @permission('amazon-fulfilled-shipments-report')
+                                                <li class="">
+                                                    <a href="/amazonFulfiledShipments" class="nav-link nav-toggle ">
+                                                        Amazon fulfilled Shipments Report
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
+                                                @endpermission
                                             </ul>
                                         </li>
 
