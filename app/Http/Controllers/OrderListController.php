@@ -28,7 +28,7 @@ class OrderListController extends Controller
 	 */
 	public function index()
 	{
-//		if(!Auth::user()->can(['order-list-show'])) die('Permission denied -- order-list-show');
+		if(!Auth::user()->can(['order-list-show'])) die('Permission denied -- order-list-show');
 		$data['account'] = $this->getAccountInfo();//得到账号机的信息
 		$data['fromDate'] = date('Y-m-d',time()-2*86400);//开始日期,默认查最近三天的数据
 		$data['toDate'] = date('Y-m-d');//结束日期
@@ -83,7 +83,7 @@ class OrderListController extends Controller
 	 */
 	public function export()
 	{
-//		if(!Auth::user()->can(['order-list-export'])) die('Permission denied -- order-list-export');
+		if(!Auth::user()->can(['order-list-export'])) die('Permission denied -- order-list-export');
 		$sql = $this->getSql($_GET);
 		$data = DB::connection('amazon')->select($sql);
 		$data = json_decode(json_encode($data),true);
@@ -100,10 +100,10 @@ class OrderListController extends Controller
 		$headArray[] = 'Currency';
 		$headArray[] = 'Tracking No';
 		$headArray[] = 'Carrier Code';
-		$headArray[] = 'Settlement ID';
-		$headArray[] = 'Settlement Date';
+		//$headArray[] = 'Settlement ID';
+		//$headArray[] = 'Settlement Date';
 		$headArray[] = 'Fulfillment Channel';
-		$headArray[] = 'Posted Date';
+		//$headArray[] = 'Posted Date';
 		$arrayData[] = $headArray;
 
 		$accounts = $this->getAccountInfo();//得到账号机的信息
@@ -133,10 +133,10 @@ class OrderListController extends Controller
 				$val['currency_code'],
 				'/NA',//Tracking No
 				'/NA',//Carrier Code
-				$val['settlement_id'],
-				$val['settlement_date'],
+				//$val['settlement_id'],
+				//$val['settlement_date'],
 				$val['fulfillment_channel'],
-				$val['posted_date'],//发货时间
+				//$val['posted_date'],//发货时间
 			);
 		}
 
@@ -179,36 +179,57 @@ class OrderListController extends Controller
 			$where.= " and orders.currency_code = '".$search['carry_code']."'";
 		}
 		if(isset($search['settlement_id']) && $search['settlement_id']){
-			$where.= " and settlement_id = '".$search['settlement_id']."'";
+			//$where.= " and settlement_id = '".$search['settlement_id']."'";
 		}
 		if(isset($search['settlement_date']) && $search['settlement_date']){
-			$where.= " and settlement_date >= '".$search['settlement_date']." 00:00:00 ' and settlement_date<= '".$search['settlement_date']." 23:59:59'";
+			//$where.= " and settlement_date >= '".$search['settlement_date']." 00:00:00 ' and settlement_date<= '".$search['settlement_date']." 23:59:59'";
 		}
 		if(isset($search['fulfillment_channel']) && $search['fulfillment_channel']){
 			$where.= " and fulfillment_channel = '".$search['fulfillment_channel']."'";
 		}
 
+		$where_items = '';
+		if (Auth::user()->seller_rules) {
+			$rules = explode("-",Auth::user()->seller_rules);
+			if(array_get($rules,0)!='*') $where_items.= " and tb.sap_seller_bg='".array_get($rules,0)."'";
+			if(array_get($rules,1)!='*') $where_items.= " and tb.sap_seller_bu='".array_get($rules,1)."'";
+		} elseif (Auth::user()->sap_seller_id) {
+			$where_items.= " and tb.sap_seller_id=".Auth::user()->sap_seller_id;
+		}
+		if($where_items){
+			$where.=" and exists (select order_items.id from `order_items` 
+			left join seller_accounts 
+			on `order_items`.`seller_account_id` = seller_accounts.id
+			left join sap_asin_match_sku as tb 
+			on order_items.seller_sku=tb.seller_sku and order_items.asin=tb.asin and seller_accounts.mws_seller_id=tb.seller_id and seller_accounts.mws_marketplaceid=tb.marketplace_id
+			where `orders`.`seller_account_id` = `order_items`.`seller_account_id` and `orders`.`amazon_order_id` = `order_items`.`amazon_order_id` 
+			$where_items)";
+		}	
+
 		//站点权限
 		$domain = substr(getDomainBySite($search['site']), 4);//orders.sales_channel
 		$where .= " and orders.sales_channel = '".ucfirst($domain)."'";
 
-		$sql = "select SQL_CALC_FOUND_ROWS orders.id,orders.seller_account_id,orders.amazon_order_id,order_status,purchase_date,asins,currency_code,amount,fulfillment_channel,CONCAT(orders.seller_account_id,'_',orders.amazon_order_id) as accountid_orderid,settlement_id,settlement_date,last_update_date,posted_date,orders.seller_skus as seller_skus   
+		$sql = "select SQL_CALC_FOUND_ROWS orders.id,orders.seller_account_id,orders.amazon_order_id,order_status,purchase_date,asins,currency_code,amount,fulfillment_channel,CONCAT(orders.seller_account_id,'_',orders.amazon_order_id) as accountid_orderid,last_update_date,orders.seller_skus as seller_skus   
 				from orders 
-				left join (
-					select amazon_settlement_details.seller_account_id as seller_account_id,amazon_settlement_details.order_id as order_id,any_value(amazon_settlements.settlement_id) as settlement_id,any_value(amazon_settlements.deposit_date) as settlement_date 
-					from amazon_settlement_details 
-					left join amazon_settlements on amazon_settlement_details.settlement_id = amazon_settlements.settlement_id 
-					where transaction_type = 'Order' and amazon_settlements.deposit_date >= '{$search['from_date']} 00:00:00'
-					group by amazon_settlement_details.seller_account_id,amazon_settlement_details.order_id 
-				) as settlement on orders.seller_account_id=settlement.seller_account_id and  orders.amazon_order_id=settlement.order_id 
-				left join (
-		            select seller_account_id,amazon_order_id,any_value(posted_date) as posted_date 
-		            from finances_shipment_events 
-		            where posted_date >= '{$search['from_date']} 00:00:00'
-		            group by seller_account_id,amazon_order_id 
-				) as shipment on orders.seller_account_id=shipment.seller_account_id and  orders.amazon_order_id=shipment.amazon_order_id  
-				 {$where} 
+				{$where}
 				order by purchase_date desc";
+
+		/*
+		left join (
+			select amazon_settlement_details.seller_account_id as seller_account_id,amazon_settlement_details.order_id as order_id,any_value(amazon_settlements.settlement_id) as settlement_id,any_value(amazon_settlements.deposit_date) as settlement_date 
+			from amazon_settlement_details 
+			left join amazon_settlements on amazon_settlement_details.settlement_id = amazon_settlements.settlement_id 
+			where transaction_type = 'Order' and amazon_settlements.deposit_date >= '{$search['from_date']} 00:00:00'
+			group by amazon_settlement_details.seller_account_id,amazon_settlement_details.order_id 
+		) as settlement on orders.seller_account_id=settlement.seller_account_id and  orders.amazon_order_id=settlement.order_id 
+		left join (
+			select seller_account_id,amazon_order_id,any_value(posted_date) as posted_date 
+			from finances_shipment_events 
+			where posted_date >= '{$search['from_date']} 00:00:00'
+			group by seller_account_id,amazon_order_id 
+		) as shipment on orders.seller_account_id=shipment.seller_account_id and  orders.amazon_order_id=shipment.amazon_order_id  
+		*/
 		return $sql;
 	}
 

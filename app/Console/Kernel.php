@@ -57,6 +57,7 @@ class Kernel extends ConsoleKernel
 		'App\Console\Commands\UpdateReportData',
 		'App\Console\Commands\SycSendEmails',
 		'App\Console\Commands\AddRoiPerformance',
+		'App\Console\Commands\MakeReport',
     ];
 
     /**
@@ -104,7 +105,7 @@ class Kernel extends ConsoleKernel
 			$schedule->command('scan:send '.$account->id)->cron(($num_x+50).' * * * *')->name($account->id.'sendmails_59')->withoutOverlapping();
 			$x++;
         }
-		
+
 
 		$schedule->command('get:order')->cron('*/30 * * * *')->name('getOrder')->withoutOverlapping();
 		$schedule->command('get:review 1days')->cron('0 */1 * * *')->name('getreviews')->withoutOverlapping();

@@ -508,7 +508,7 @@ class ExceptionController extends Controller
 		if($rule['type']==4){
 			$gift_cards = GiftCard::where('exception_id',$rule['id'])->take(1)->get()->toArray();
 			if(!$gift_cards){
-				$gift_cards = GiftCard::where('status',0)->where('amount',$rule['gift_card_amount'])
+				$gift_cards = GiftCard::where('status',0)->where('amount',$rule['gift_card_amount'])->where('currency',$rule['currency'])
 				->where('bg',Auth::user()->ubg)
 				->where('bu',Auth::user()->ubu)->take(10)->get()->toArray();
 				shuffle($gift_cards);
@@ -516,7 +516,7 @@ class ExceptionController extends Controller
 			$gift_card_mail = DB::table('exception_gift_cards')->where('exception_id',$rule['id'])->orderBy('id','desc')->first();
 			$gift_card_mail = empty($gift_card_mail)?[]:json_decode(json_encode($gift_card_mail),true);
 			$mail_accounts = Accounts::where('status',1)->pluck('account_email')->toArray();
-			$mail_templates = Templates::whereIn('id',explode(',',env('GIFT_CARD_TEMPLATE_IDS')))->pluck('tag','id')->toArray();
+			$mail_templates = []; //Templates::whereIn('id',explode(',',env('GIFT_CARD_TEMPLATE_IDS')))->pluck('tag','id')->toArray();
 		}else{
 			$gift_cards = $gift_card_mail = $mail_accounts = $mail_templates = [];
 		}
@@ -680,18 +680,25 @@ class ExceptionController extends Controller
 						$gift_card->exception_id = $exception->id;
 						$gift_card->status = 1;
 						$gift_card->save();
-						if($request->get('mail_brand') && $request->get('mail_template_id') && $request->get('mail_from_address') && $request->get('mail_to_address')){
-							$gf_template = Templates::find(intval($request->get('mail_template_id')));
+						if($request->get('mail_brand') && $request->get('mail_from_address') && $exception->customer_email){
+							$customer_email = array_search($exception->customer_email,getEmailToEncryptedEmail())?array_search($exception->customer_email,getEmailToEncryptedEmail()):$exception->customer_email;
+							if($exception->process_status =='SG gift' || $exception->process_status=='CTG-gift'){
+								$mail_template_id = 4170;
+							}else{
+								$mail_template_id = 4169;
+							}
+							$gf_template = Templates::find($mail_template_id);
 							if(empty($gf_template)) throw new \Exception('Set Failed, Template not exists!');
 							$content = str_replace("{GIFT_CARD}",$gift_card->code,$gf_template->content);
 							$subject = str_replace("{GIFT_CARD}",$gift_card->code,$gf_template->title);
-							$content = str_replace("{BRAND}",strtoupper($request->get('mail_brand')),$content);
-							$subject = str_replace("{BRAND}",strtoupper($request->get('mail_brand')),$subject);
-
+							$content = str_replace("{BRAND}",$request->get('mail_brand'),$content);
+							$subject = str_replace("{BRAND}",$request->get('mail_brand'),$subject);
+							$content = str_replace("{BRAND_LINK}",array_get(getBrands(),$request->get('mail_brand')),$content);
+							$subject = str_replace("{BRAND_LINK}",array_get(getBrands(),$request->get('mail_brand')),$subject);
 							$sendbox = new Sendbox;
 							$sendbox->user_id = intval(Auth::user()->id);
 							$sendbox->from_address = $request->get('mail_from_address');
-							$sendbox->to_address = $request->get('mail_to_address');
+							$sendbox->to_address = $customer_email;
 							$sendbox->subject = $subject;
 							$sendbox->text_html = $content;
 							$sendbox->date = date('Y-m-d H:i:s');
@@ -710,16 +717,15 @@ class ExceptionController extends Controller
 								'exception_id'=>$exception->id,
 								'gift_card_id'=>$gift_card_id,
 								'from_address'=>$request->get('mail_from_address'),
-								'to_address'=>$request->get('mail_to_address'),
-								'brand'=>strtoupper($request->get('mail_brand')),
-								'template_id'=>intval($request->get('mail_template_id')),
+								'to_address'=>$customer_email,
+								'brand'=>$request->get('mail_brand'),
+								'template_id'=>$mail_template_id,
 								'sendbox_id'=>$sendbox->id,
 							));
 						}
 						DB::commit();
 					} catch (\Exception $e) {
 						DB::rollBack();
-						print_r($e->getMessage());die();
 						$request->session()->flash('error_message',$e->getMessage());
 						return redirect()->back()->withInput();
 					}
@@ -772,6 +778,7 @@ class ExceptionController extends Controller
 			$exception->user_id = intval(Auth::user()->id);
 			$exception->request_content = $request->get('request_content');
 			$exception->process_status = 'submit';
+			$exception->customer_email = $request->get('customer_email');
 			$exception->descrip = $request->get('descrip');
 			if( $exception->type == 1 || $exception->type == 3){
 				$exception->refund = round($request->get('refund'),2);
@@ -781,9 +788,11 @@ class ExceptionController extends Controller
 
 			if( $exception->type == 4){
 				$exception->gift_card_amount = round($request->get('gift_card_amount'),2)??0;
+				$exception->currency = $request->get('currency');
 			}else{
 				$exception->gift_card_amount = 0;
 			}
+			
 			$updateMcfOrder = array();
 			if( $exception->type == 2 || $exception->type == 3){
 				$replacements = unserialize($exception->replacement);
@@ -1233,6 +1242,7 @@ class ExceptionController extends Controller
         $exception->descrip = $request->get('descrip');
         $exception->saleschannel = $request->get('saleschannel');
         $exception->asin = $request->get('asin');
+		$exception->customer_email = $request->get('customer_email');
 		if( $exception->type == 1 || $exception->type == 3){
 			$exception->refund = round($request->get('refund'),2);
 		}else{
@@ -1241,6 +1251,7 @@ class ExceptionController extends Controller
 
         if( $exception->type == 4){
             $exception->gift_card_amount = round($request->get('gift_card_amount'),2)??0;
+			$exception->currency = $request->get('currency');
         }else{
             $exception->gift_card_amount = 0;
         }

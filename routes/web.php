@@ -494,6 +494,16 @@ Route::Post('/giftcard/get', 'GiftCardController@get');
 Route::Post('/giftcard/upload', 'GiftCardController@upload');
 Route::get('/giftcardexport', 'GiftCardController@export');
 
+//客诉品线问题细分
+Route::Post('/category/import', 'CategoryController@import');
+
+
+//Amazon fulfilled Shipments模块
+Route::get('/amazonFulfiledShipments', 'AmazonFulfiledShipmentsController@index');//
+Route::post('/amazonFulfiledShipments/list', 'AmazonFulfiledShipmentsController@list');//
+Route::match(['post','get'],'/amazonFulfiledShipments/export', 'AmazonFulfiledShipmentsController@export');//
+Route::match(['post','get'],'/amazonFulfiledShipments/download', 'AmazonFulfiledShipmentsController@download');//
+
 Route::Post('/amazon/auth', 'AmazonAuthController@index');
 
 

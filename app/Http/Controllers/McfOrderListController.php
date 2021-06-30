@@ -28,7 +28,7 @@ class McfOrderListController extends Controller
 	 */
 	public function index()
 	{
-//		if(!Auth::user()->can(['refund-show'])) die('Permission denied -- refund-show');
+		if(!Auth::user()->can(['mcf-list-show'])) die('Permission denied -- mcf-list-show');
 		$data['account'] = $this->getAccountInfo();//得到账号机的信息
 		$data['fromDate'] = date('Y-m-d',time()-2*86400);//开始日期,默认查最近三天的数据
 		$data['toDate'] = date('Y-m-d');//结束日期
@@ -67,7 +67,7 @@ class McfOrderListController extends Controller
 	 */
 	public function export()
 	{
-//		if(!Auth::user()->can(['refund-export'])) die('Permission denied -- refund-export');
+		if(!Auth::user()->can(['mcf-list-export'])) die('Permission denied -- mcf-list-export');
 		$sql = $this->getSql($_GET);
 		$data = DB::connection('amazon')->select($sql);
 		$data = json_decode(json_encode($data),true);
@@ -84,8 +84,8 @@ class McfOrderListController extends Controller
 		$headArray[] = 'Shipping Speed';
 		$headArray[] = 'Tracking No.';
 		$headArray[] = 'Carrier Code';
-		$headArray[] = 'Settlement ID';
-		$headArray[] = 'Settlement Date';
+		//$headArray[] = 'Settlement ID';
+		//$headArray[] = 'Settlement Date';
 		$arrayData[] = $headArray;
 
 		$accounts = $this->getAccountInfo();//得到账号机的信息
@@ -106,8 +106,8 @@ class McfOrderListController extends Controller
 				$val['shipping_speed'],
 				$val['tracking_no'],
 				$val['carrier_code'],
-				$val['settlement_id'],
-				$val['settlement_date'],
+				//$val['settlement_id'],
+				//$val['settlement_date'],
 			);
 		}
 
@@ -162,20 +162,29 @@ class McfOrderListController extends Controller
 			$where.= " and t1.name like '%".$search['customer_name']."%'";
 		}
 
+		$where_items = '';
+		if (Auth::user()->seller_rules) {
+			$rules = explode("-",Auth::user()->seller_rules);
+			if(array_get($rules,0)!='*') $where_items.= " and tb.sap_seller_bg='".array_get($rules,0)."'";
+			if(array_get($rules,1)!='*') $where_items.= " and tb.sap_seller_bu='".array_get($rules,1)."'";
+		} elseif (Auth::user()->sap_seller_id) {
+			$where_items.= " and tb.sap_seller_id=".Auth::user()->sap_seller_id;
+		}
+		if($where_items){
+			$where.=" and exists (select amazon_mcf_orders_item.id from `amazon_mcf_orders_item` 
+			left join seller_accounts 
+			on `amazon_mcf_orders_item`.`seller_account_id` = seller_accounts.id
+			left join sap_asin_match_sku as tb 
+			on amazon_mcf_orders_item.seller_sku=tb.seller_sku and seller_accounts.mws_seller_id=tb.seller_id and seller_accounts.mws_marketplaceid=tb.marketplace_id
+			where `t1`.`seller_account_id` = `amazon_mcf_orders_item`.`seller_account_id` and `t1`.`seller_fulfillment_order_id` = `amazon_mcf_orders_item`.`seller_fulfillment_order_id` 
+			$where_items)";
+		}	
+
 		$sql = "select SQL_CALC_FOUND_ROWS t1.id as id,t1.seller_account_id as seller_account_id,t1.seller_fulfillment_order_id as amazon_order_id,
 t1.displayable_order_date_time as mcforder_date,t1.shipping_speed_category as shipping_speed,t1.name as customer_name,
-t1.country_code as country,t1.seller_skus as seller_sku,t1.fulfillment_order_status as order_status,
-settlement_id,settlement_date  
+t1.country_code as country,t1.seller_skus as seller_sku,t1.fulfillment_order_status as order_status
 			from amazon_mcf_orders as t1 
-			left join (
-					select any_value(amazon_settlement_details.seller_account_id) as seller_account_id,amazon_settlement_details.order_id as order_id,
-any_value(amazon_settlements.settlement_id) as settlement_id,any_value(amazon_settlements.deposit_date) as settlement_date 
-					from amazon_settlement_details 
-					left join amazon_settlements on amazon_settlement_details.settlement_id = amazon_settlements.settlement_id 
-					where amazon_settlements.deposit_date >= '".$search['from_date']." 00:00:00' 
-					group by amazon_settlement_details.order_id,amazon_settlement_details.seller_account_id 
-				) as settlement on t1.seller_fulfillment_order_id=settlement.order_id and t1.seller_account_id = settlement.seller_account_id
-				{$where}
+			{$where}
 			order by displayable_order_date_time desc ";
 		return $sql;
 	}

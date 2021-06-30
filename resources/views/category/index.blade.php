@@ -58,6 +58,24 @@
                                 </button>
                                 </a>
                             </div>
+
+							<div class="btn-group " style="float:right;">
+								<form action="{{url('/category/import')}}" method="post" enctype="multipart/form-data">
+									<div class="col-md-12">
+										@permission('qa-category-create')
+										<div class="col-md-6">
+											{{ csrf_field() }}
+											<input type="file" name="importFile"  style="width: 90%;"/>
+										</div>
+										<div class="col-md-2">
+											<button type="submit" class="btn blue" id="data_search">Import</button>
+										</div>
+										@endpermission
+									</div>
+								</form>
+							</div>
+
+
                         </div>
                     </div>
                 </div>

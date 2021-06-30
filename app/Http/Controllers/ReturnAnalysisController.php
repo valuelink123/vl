@@ -28,7 +28,7 @@ class ReturnAnalysisController extends Controller
 	 */
 	public function returnAnalysis(Request $req)
 	{
-		//配置这些原因应该归属到哪个中文类型下
+		if(!Auth::user()->can(['return-analysis'])) die('Permission denied -- return-analysis');
 		$reasonType = [
 			0=>['name'=>'其他','reason'=>['DID_NOT_LIKE_FABRIC','PRODUCT_NOT_ITALIAN']],
 			1=>['name'=>'产品缺陷','reason'=>['DEFECTIVE']],
@@ -93,6 +93,15 @@ class ReturnAnalysisController extends Controller
 			//搜索条件如下：from_date,to_date
 			$where = " where return_date >= '".$search['from_date']." 00:00:00' and return_date <= '".$search['to_date']." 23:59:59'";
 			$where_sku = ' where 1 = 1 ';
+
+			if (Auth::user()->seller_rules) {
+				$rules = explode("-",Auth::user()->seller_rules);
+				if(array_get($rules,0)!='*') $where_sku.= " and tb.sap_seller_bg='".array_get($rules,0)."'";
+				if(array_get($rules,1)!='*') $where_sku.= " and tb.sap_seller_bu='".array_get($rules,1)."'";
+			} elseif (Auth::user()->sap_seller_id) {
+				$where_sku.= " and tb.sap_seller_id=".Auth::user()->sap_seller_id;
+			}
+
 			if(isset($search['sku']) && $search['sku']){
 				$where_sku.= " and tb.sku = '".$search['sku']."'";
 			}
@@ -136,6 +145,8 @@ class ReturnAnalysisController extends Controller
 	//asin维度分析
 	public function asinAnalysis(Request $req)
 	{
+
+		if(!Auth::user()->can(['asin-analysis'])) die('Permission denied -- asin-analysis');
 		if($_POST){
 			$search = isset($_REQUEST['search']) ? $_REQUEST['search'] : '';
 			$search = $this->getSearchData(explode('&',$search));
@@ -153,6 +164,16 @@ class ReturnAnalysisController extends Controller
 			if(isset($search['asin']) && $search['asin']){
 				$where.= " and tb.asin = '".$search['asin']."'";
 			}
+
+			if (Auth::user()->seller_rules) {
+				$rules = explode("-",Auth::user()->seller_rules);
+				if(array_get($rules,0)!='*') $where.= " and tb.sap_seller_bg='".array_get($rules,0)."'";
+				if(array_get($rules,1)!='*') $where.= " and tb.sap_seller_bu='".array_get($rules,1)."'";
+			} elseif (Auth::user()->sap_seller_id) {
+				$where.= " and tb.sap_seller_id=".Auth::user()->sap_seller_id;
+			}
+
+
 			$orderby = ' return_quantity ';
 			$sort = ' desc ';
 			if(isset($_REQUEST['order'][0])){
@@ -205,6 +226,7 @@ class ReturnAnalysisController extends Controller
 	//sku维度分析
 	public function skuAnalysis(Request $req)
 	{
+		if(!Auth::user()->can(['sku-analysis'])) die('Permission denied -- sku-analysis');
 		if($_POST){
 			$search = isset($_REQUEST['search']) ? $_REQUEST['search'] : '';
 			$search = $this->getSearchData(explode('&',$search));
@@ -221,6 +243,14 @@ class ReturnAnalysisController extends Controller
 				$where.= " and tb.sku = '".$search['sku']."'";
 			}
 
+			if (Auth::user()->seller_rules) {
+				$rules = explode("-",Auth::user()->seller_rules);
+				if(array_get($rules,0)!='*') $where.= " and tb.sap_seller_bg='".array_get($rules,0)."'";
+				if(array_get($rules,1)!='*') $where.= " and tb.sap_seller_bu='".array_get($rules,1)."'";
+			} elseif (Auth::user()->sap_seller_id) {
+				$where.= " and tb.sap_seller_id=".Auth::user()->sap_seller_id;
+			}
+			
 			$orderby = ' return_quantity ';
 			$sort = ' desc ';
 			if(isset($_REQUEST['order'][0])){

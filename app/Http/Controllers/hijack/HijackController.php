@@ -110,7 +110,7 @@ class HijackController extends Controller
 			$userWhere .= " and sap_seller_bu = '".$search['bu']."'";
 		}
 		if(isset($search['sap_seller_id']) && $search['sap_seller_id']!=''){
-			$userWhere .= " and sap_seller_id = '".$search['sap_seller_id']."'";
+			$userWhere .= " and sap_seller_id in (".$search['sap_seller_id'].")";
 		}
 		if(isset($search['asin']) && $search['asin']!=''){
 			$userWhere .= " and asin = '".$search['asin']."'";
@@ -176,7 +176,7 @@ class HijackController extends Controller
 		if (isset($search['site']) && $search['site']!='') {
 			$where .= " AND `domain` = '".$search['site']."'";
 		}
-        $where .= ' AND rl_asin.asin in ("' . implode($userasin, '","') . '")';
+        $where .= ' AND rl_asin.asin in ("' . implode( '","',$userasin) . '")';
 
 		if($request['length'] != '-1'){//等于-1时为查看全部的数据
 			$limit = $this->dtLimit($request);
@@ -248,7 +248,7 @@ class HijackController extends Controller
 		$sql_t = 'select reselling_asin_id,count(distinct account) as total_num 
 				from tbl_reselling_task as task 
 				left JOIN tbl_reselling_detail as detail on task.id=detail.task_id 
-				where task.reselling_asin_id in("' . implode($rla_ids, '","') . '") and white=0 
+				where task.reselling_asin_id in("' . implode('","',$rla_ids) . '") and white=0 
 				group by reselling_asin_id ';
 		$_totnum = DB::connection('vlz')->select($sql_t);
 		$totnum = array();

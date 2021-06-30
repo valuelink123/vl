@@ -99,7 +99,7 @@ table.dataTable thead th, table.dataTable thead td {
                         <br>
                         <div class="input-group">
                             <span class="input-group-addon">销售员</span>
-                            <select  class="form-control"  id="sap_seller_id" name="sap_seller_id">
+                            <select  class="mt-multiselect btn btn-default form-control" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true"  id="sap_seller_id" name="sap_seller_id">
                                 <option value="">Select</option>
                                 @foreach(getUsers('sap_seller') as $key=>$val)
                                     <option value="{!! $key !!}">{!! $val !!}</option>

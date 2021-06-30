@@ -4,6 +4,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Log;
 
 class AmazonAuthController extends Controller
 {
@@ -16,8 +17,11 @@ class AmazonAuthController extends Controller
     public function index()
     {
 
-       $profiles = $_REQUEST['params'];
-       return 'ok';
+
+
+        $profiles = $_REQUEST['profiles'];
+        Log::info($profiles);
+        return 'ok';
 
     }
 }

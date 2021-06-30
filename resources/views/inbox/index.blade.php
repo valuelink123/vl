@@ -81,7 +81,7 @@
 
 									</div>
 									<div class="input-group col-md-6 pull-left">
-									<select class="form-control form-filter input-sm  " name="group_id">
+									<select class="mt-multiselect btn btn-default form-control form-filter input-sm" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" name="group_id">
                                         <option value="">Group</option>
 										@foreach (array_get($mygroups,'groups',array()) as $group_id=>$group)
 
@@ -91,7 +91,7 @@
                                     </select>
 									</div>
 									<div class="input-group col-md-6 pull-left">
-									<select class="form-control form-filter input-sm " name="user_id">
+									<select class="mt-multiselect btn btn-default form-control form-filter input-sm" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" name="user_id">
                                         <option value="">User</option>
 										@foreach (array_get($mygroups,'users',array()) as $user_id=>$user)
                                             @if(array_get($users,$user_id))

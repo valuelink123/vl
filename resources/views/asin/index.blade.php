@@ -30,27 +30,29 @@ th,td,td>span {
                         <div class="col-md-8">
 							@permission('asin-table-batch-update')
                             <div class="table-actions-wrapper" id="table-actions-wrapper">
-                            <span> </span>
 
-
-                            <select id="giveUser" class="table-group-action-input form-control input-inline input-small input-sm">
-                                <option value="">Change Group</option>
+                            <div class="col-md-3" >
+                            <select id="giveUser" class="table-group-action-input mt-multiselect btn btn-default form-control input-inline input-small input-sm " data-label="left" data-width="100%" data-filter="true" data-action-onchange="true">
+                            
                                 @foreach ($groups as $user_id=>$user_name)
                                     <option value="{{$user_id}}">{{$user_name}}</option>
                                 @endforeach
                             </select>
-							
-							<select id="giveReviewUser" class="table-group-action-input form-control input-inline input-small input-sm">
-                                <option value="">Change Review User</option>
+							</div>
+                            <div class="col-md-3" >
+							<select id="giveReviewUser" class="table-group-action-input mt-multiselect btn btn-default form-control input-inline input-small input-sm " data-label="left" data-width="100%" data-filter="true" data-action-onchange="true">
+                                
                                 @foreach ($users as $user_id=>$user_name)
                                     <option value="{{$user_id}}">{{$user_name}}</option>
                                 @endforeach
                             </select>
-
+                            </div>
+                            <div class="col-md-3" >
 							
 							<input id='giveStar' placeholder='Limit Star' class="table-group-action-input form-control input-inline input-small input-sm">
-                            <button class="btn btn-sm green table-group-action-submit">
-                                <i class="fa fa-check"></i> Change</button>
+                            </div>
+                            <div class="col-md-3" ><button class="btn btn-sm green table-group-action-submit">
+                                <i class="fa fa-check"></i> Change</button></div>
                         </div>
 						@endpermission
 						
@@ -153,8 +155,8 @@ th,td,td>span {
                                 </td>
 								
                                 <td>
-   
-                                    <select class="form-control form-filter input-sm" name="group_id">
+    
+                                    <select class="mt-multiselect btn btn-default form-control form-filter input-sm " data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" name="group_id">
                                         <option value="">Select...</option>
 										<option value="empty">[Empty]</option>
                                         @foreach ($groups as $user_id=>$user_name)
@@ -164,7 +166,7 @@ th,td,td>span {
                                 </td>
 								<td>
    
-                                    <select class="form-control form-filter input-sm" name="review_user_id">
+                                    <select class="mt-multiselect btn btn-default form-control form-filter input-sm " data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" name="review_user_id">
                                         <option value="">Select...</option>
 										<option value="empty">[Empty]</option>
                                         @foreach ($users as $user_id=>$user_name)

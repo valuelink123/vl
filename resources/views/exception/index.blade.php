@@ -177,7 +177,7 @@ th,td,td>span {
 
                                
 								 <td>
-                                <select id="resellerid" class="form-control form-filter input-sm" name="resellerid">
+                                <select id="resellerid" class="mt-multiselect btn btn-default form-control form-filter input-sm" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" name="resellerid">
 								<option value ="">Replace Account
 									<option value ="FBM">FBM	
 								@foreach ($sellerids as $id=>$name)
@@ -196,7 +196,7 @@ th,td,td>span {
                                 </td>
                                 <td>
                                     
-                                    <select class="form-control form-filter input-sm" name="group_id">
+                                    <select class="mt-multiselect btn btn-default form-control form-filter input-sm" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" name="group_id">
                                         <option value="">Group</option>
 										@foreach ($groups as $group_id=>$group)
 										
@@ -230,7 +230,7 @@ th,td,td>span {
 									
 									</td>
                                 <td>
-								<select class="form-control form-filter input-sm" name="sap_seller_id" id="sap_seller_id">
+								<select class="mt-multiselect btn btn-default form-control form-filter input-sm" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" name="sap_seller_id" id="sap_seller_id">
 										<option value="">Sellers</option>
                                         @foreach ($sap_sellers as $user_id=>$user_name)
                                             <option value="{{$user_id}}" >{{$user_name}}</option>

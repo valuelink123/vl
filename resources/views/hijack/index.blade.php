@@ -302,7 +302,8 @@
 
  			<button class="search_btn" id="search">Search</button>
  		</div>
- 		<div class="form_main">
+ 		<div class="form_main" style="float:left;">
+		 	
  			<select name="bg" class="bgList" >
 				<option value="" >All BG</option>
 				@foreach($bgs as $key=>$val)
@@ -315,12 +316,9 @@
 					<option value="{!! $val !!}">{!! $val !!}</option>
 				@endforeach
 			</select>
- 			<select name="sap_seller_id" class="sellerList" >
-				<option value="">All Seller</option>
-				@foreach($users as $key=>$val)
-					<option value="{!! $key !!}">{!! $val !!}</option>
-				@endforeach
-			</select>
+
+			
+ 			
  			<select name="sku_status" >
 				<option value="">All Status</option>
 				@foreach($sku_status as $key=>$val)
@@ -344,6 +342,14 @@
  			<button class="close_btn status_btn isHide">Turn Off</button>
 {{--			<button class="export_btn">Export</button>--}}
  		</div>
+
+		 <div class="col-md-2" style="margin-top:15px;">
+			<select class="mt-multiselect btn btn-default" multiple="multiple" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" data-none-selected-text="All Sellers" name="sap_seller_id" id="sap_seller_id">
+			@foreach($users as $key=>$val)
+				<option value="{!! $key !!}">{!! $val !!}</option>
+			@endforeach
+			</select>
+		</div>
 		</form>
  		<div>
  		
