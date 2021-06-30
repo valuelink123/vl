@@ -195,6 +195,7 @@ class ExceptionController extends Controller
 		$headArray[] = 'S-Amazon Order ID';
 		$headArray[] = 'Type';
 		$headArray[] = 'Customer Name';
+		$headArray[] = 'Customer Email';
 		$headArray[] = 'Order Skus';
 		$headArray[] = 'Create Date';
 		$headArray[] = 'Status';
@@ -370,6 +371,7 @@ class ExceptionController extends Controller
 				$customersList['S-Amazon Order ID'],
                 array_get($type_list,$customersList['type']),
 				$customersList['name'],
+				$customersList['customer_email'],
                 $customersList['order_sku'],
 				$customersList['date'],
                 array_get($status_list,$customersList['process_status']),
