@@ -95,10 +95,6 @@ class AmazonFulfiledShipmentsController extends Controller
 
 		$search = isset($_REQUEST['search']) ? $_REQUEST['search'] : '';
 		$search = $this->getSearchData(explode('&',$search));
-//		echo '<pre>';
-//		var_dump($search,$_REQUEST['account']);
-//		exit;
-
 
 		$insertData = array(
 			'from_date'=> $search['from_date'],
@@ -112,9 +108,7 @@ class AmazonFulfiledShipmentsController extends Controller
 		$id = DB::table('report')->insertGetId($insertData);
 
 		if($id){
-//			Artisan::call("make:report", ['id' => $id]);
-			Artisan::call("make:report");
-
+			Artisan::call("make:report",['--id' => $id]);
 			return array('status'=>1,'msg'=>'操作成功');
 		}else{
 			return array('status'=>0,'msg'=>'操作失败');
