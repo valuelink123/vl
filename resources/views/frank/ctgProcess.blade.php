@@ -58,7 +58,7 @@
                                     <label>
                                         Task Assign to
                                         <input required autocomplete="off" class="xform-autotrim form-control" placeholder="Processor" name="processor"
-                                               value="{!! $ctgRow['processor']>0?"{$ctgRow['processor']} | {$users[$ctgRow['processor']]}":'' !!}" style="width:27em" list="list-users"/>
+                                               value="{!! $ctgRow['processor']>0?array_get($users,$ctgRow['processor'],$ctgRow['processor']):'' !!}" style="width:27em" list="list-users"/>
                                         <datalist id="list-users">
                                             @foreach($users as $id=>$name)
                                                 <option value="{!! $id !!} | {!! $name !!}">

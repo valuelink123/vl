@@ -213,9 +213,10 @@ class Controller extends BaseController
 	public function showTheAccountBySite()
 	{
 		$marketplaceid = isset($_REQUEST['marketplaceid']) ? $_REQUEST['marketplaceid'] : '';
+		$field = isset($_REQUEST['field']) ? $_REQUEST['field'] : 'id';
 		$return = array('status'=>1,'data'=>array()) ;
 		if($marketplaceid){
-			$data= DB::connection('vlz')->select("select id,label from seller_accounts where deleted_at is NULL and mws_marketplaceid = '{$marketplaceid}' order by label asc");
+			$data= DB::connection('vlz')->select("select {$field} as id,label from seller_accounts where deleted_at is NULL and mws_marketplaceid = '{$marketplaceid}' order by label asc");
 			foreach($data as $key=>$val){
 				$return['data'][$key] = (array)$val;
 			}

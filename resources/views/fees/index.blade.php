@@ -30,13 +30,14 @@
 						<div class="tab-pane active" id="tab_ads">
 						<div class="table-container">
 							@permission('fee-split-update')
-							<div class="table-actions-wrapper">
+							<div class="pull-right">
 								<input type="text" placeholder="SAPSKU" id="sku" class="table-group-action-input form-control input-inline input-small input-sm" />
-								<select  id="sapuid" class="table-group-action-input mt-multiselect btn btn-default form-control input-inline input-small input-sm " data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" >
-								@foreach ($users as $user_id=>$user_name)
-									<option value="{{$user_id}}">{{$user_name}}</option>
-								@endforeach
-								</select>
+								<select  id="sapuid" class="table-group-action-input mt-multiselect btn btn-default form-control input-inline input-small input-sm " data-label="left" data-width="100%" data-filter="true" data-action-onchange="true">
+										
+										@foreach ($users as $user_id=>$user_name)
+												<option value="{{$user_id}}">{{$user_name}}</option>
+											@endforeach
+									</select>
 																	
 								<button class="btn btn-sm green table-group-action-submit">
 								<i class="fa fa-check"></i> Change</button>
@@ -184,10 +185,10 @@
 									});
 						
 									// handle group actionsubmit button click
-									grid.getTableWrapper().on('click', '.table-group-action-submit', function (e) {
+									grid.gettableContainer().on('click', '.table-group-action-submit', function (e) {
 										e.preventDefault();
-										var sku = $("#sku", grid.getTableWrapper());
-										var uid = $("#sapuid", grid.getTableWrapper());
+										var sku = $("#sku", grid.gettableContainer());
+										var uid = $("#sapuid", grid.gettableContainer());
 										if ((sku.val() != "") && (uid.val() != "") && grid.getSelectedRowsCount() > 0) {
 											grid.setAjaxParam("customActionType", "group_action");
 											grid.setAjaxParam("customuserid", uid.val());
@@ -200,7 +201,7 @@
 												type: 'danger',
 												icon: 'warning',
 												message: 'Please select an action',
-												container: grid.getTableWrapper(),
+												container: grid.gettableContainer(),
 												place: 'prepend'
 											});
 										} else if (grid.getSelectedRowsCount() === 0) {
@@ -208,7 +209,7 @@
 												type: 'danger',
 												icon: 'warning',
 												message: 'No record selected',
-												container: grid.getTableWrapper(),
+												container: grid.gettableContainer(),
 												place: 'prepend'
 											});
 										}
@@ -249,7 +250,7 @@
 						<div class="tab-pane" id="tab_deal">
 						<div class="table-container">
 							@permission('fee-split-update')
-							<div class="table-actions-wrapper">
+							<div class="pull-right">
 								<input type="text" placeholder="SAPSKU" id="sku" class="table-group-action-input form-control input-inline input-small input-sm" />
 								<select  id="sapuid" class="table-group-action-input mt-multiselect btn btn-default form-control input-inline input-small input-sm " data-label="left" data-width="100%" data-filter="true" data-action-onchange="true">
 										@foreach ($users as $user_id=>$user_name)
@@ -402,11 +403,11 @@
 									});
 						
 									// handle group actionsubmit button click
-									grid.getTableWrapper().on('click', '.table-group-action-submit', function (e) {
+									grid.gettableContainer().on('click', '.table-group-action-submit', function (e) {
 										e.preventDefault();
 									
-										var sku = $("#sku", grid.getTableWrapper());
-										var uid = $("#sapuid", grid.getTableWrapper());
+										var sku = $("#sku", grid.gettableContainer());
+										var uid = $("#sapuid", grid.gettableContainer());
 										if ((sku.val() != "") && (uid.val() != "") && grid.getSelectedRowsCount() > 0) {
 											grid.setAjaxParam("customActionType", "group_action");
 											grid.setAjaxParam("customuserid", uid.val());
@@ -419,7 +420,7 @@
 												type: 'danger',
 												icon: 'warning',
 												message: 'Please select an action',
-												container: grid.getTableWrapper(),
+												container: grid.gettableContainer(),
 												place: 'prepend'
 											});
 										} else if (grid.getSelectedRowsCount() === 0) {
@@ -427,7 +428,7 @@
 												type: 'danger',
 												icon: 'warning',
 												message: 'No record selected',
-												container: grid.getTableWrapper(),
+												container: grid.gettableContainer(),
 												place: 'prepend'
 											});
 										}
@@ -481,7 +482,7 @@
 						</div>
 						<div class="table-container">
 							@permission('fee-split-update')
-							<div class="table-actions-wrapper">
+							<div class="pull-right">
 								
 								<input type="text" placeholder="SAPSKU" id="sku" class="table-group-action-input form-control input-inline input-small input-sm" />
 								<select  id="sapuid" class="table-group-action-input mt-multiselect btn btn-default form-control input-inline input-small input-sm " data-label="left" data-width="100%" data-filter="true" data-action-onchange="true">
@@ -638,11 +639,11 @@
 									});
 						
 									// handle group actionsubmit button click
-									grid.getTableWrapper().on('click', '.table-group-action-submit', function (e) {
+									grid.gettableContainer().on('click', '.table-group-action-submit', function (e) {
 										e.preventDefault();
 										
-										var sku = $("#sku", grid.getTableWrapper());
-										var uid = $("#sapuid", grid.getTableWrapper());
+										var sku = $("#sku", grid.gettableContainer());
+										var uid = $("#sapuid", grid.gettableContainer());
 										if ((sku.val() != "") && (uid.val() != "") && grid.getSelectedRowsCount() > 0) {
 											grid.setAjaxParam("customActionType", "group_action");
 											grid.setAjaxParam("customuserid", uid.val());
@@ -655,7 +656,7 @@
 												type: 'danger',
 												icon: 'warning',
 												message: 'Please select an action',
-												container: grid.getTableWrapper(),
+												container: grid.gettableContainer(),
 												place: 'prepend'
 											});
 										} else if (grid.getSelectedRowsCount() === 0) {
@@ -663,7 +664,7 @@
 												type: 'danger',
 												icon: 'warning',
 												message: 'No record selected',
-												container: grid.getTableWrapper(),
+												container: grid.gettableContainer(),
 												place: 'prepend'
 											});
 										}
@@ -705,7 +706,7 @@
 						<div class="tab-pane" id="tab_servicefee">
 						<div class="table-container">
 							@permission('fee-split-update')
-							<div class="table-actions-wrapper">
+							<div class="pull-right">
 								
 								<input type="text" placeholder="SAPSKU" id="sku" class="table-group-action-input form-control input-inline input-small input-sm" />
 								<select  id="sapuid" class="table-group-action-input mt-multiselect btn btn-default form-control input-inline input-small input-sm " data-label="left" data-width="100%" data-filter="true" data-action-onchange="true">
@@ -862,11 +863,11 @@
 									});
 						
 									// handle group actionsubmit button click
-									grid.getTableWrapper().on('click', '.table-group-action-submit', function (e) {
+									grid.gettableContainer().on('click', '.table-group-action-submit', function (e) {
 										e.preventDefault();
 									
-										var sku = $("#sku", grid.getTableWrapper());
-										var uid = $("#sapuid", grid.getTableWrapper());
+										var sku = $("#sku", grid.gettableContainer());
+										var uid = $("#sapuid", grid.gettableContainer());
 										if ((sku.val() != "") && (uid.val() != "") && grid.getSelectedRowsCount() > 0) {
 											grid.setAjaxParam("customActionType", "group_action");
 											grid.setAjaxParam("customuserid", uid.val());
@@ -879,7 +880,7 @@
 												type: 'danger',
 												icon: 'warning',
 												message: 'Please select an action',
-												container: grid.getTableWrapper(),
+												container: grid.gettableContainer(),
 												place: 'prepend'
 											});
 										} else if (grid.getSelectedRowsCount() === 0) {
@@ -887,7 +888,7 @@
 												type: 'danger',
 												icon: 'warning',
 												message: 'No record selected',
-												container: grid.getTableWrapper(),
+												container: grid.gettableContainer(),
 												place: 'prepend'
 											});
 										}
@@ -930,7 +931,7 @@
 						<div class="tab-pane" id="tab_cpcfee">
 						<div class="table-container">
 							@permission('fee-split-update')
-							<div class="table-actions-wrapper">
+							<div class="pull-right">
 								
 									
 								
@@ -1121,11 +1122,11 @@
 									});
 						
 									// handle group actionsubmit button click
-									grid.getTableWrapper().on('click', '.table-group-action-submit', function (e) {
+									grid.gettableContainer().on('click', '.table-group-action-submit', function (e) {
 										e.preventDefault();
 										
-										var sku = $("#sku", grid.getTableWrapper());
-										var uid = $("#sapuid", grid.getTableWrapper());
+										var sku = $("#sku", grid.gettableContainer());
+										var uid = $("#sapuid", grid.gettableContainer());
 										if ((sku.val() != "") && (uid.val() != "") && grid.getSelectedRowsCount() > 0) {
 											grid.setAjaxParam("customActionType", "group_action");
 											grid.setAjaxParam("customuserid", uid.val());
@@ -1138,7 +1139,7 @@
 												type: 'danger',
 												icon: 'warning',
 												message: 'Please select an action',
-												container: grid.getTableWrapper(),
+												container: grid.gettableContainer(),
 												place: 'prepend'
 											});
 										} else if (grid.getSelectedRowsCount() === 0) {
@@ -1146,7 +1147,7 @@
 												type: 'danger',
 												icon: 'warning',
 												message: 'No record selected',
-												container: grid.getTableWrapper(),
+												container: grid.gettableContainer(),
 												place: 'prepend'
 											});
 										}

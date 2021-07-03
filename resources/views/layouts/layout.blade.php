@@ -976,6 +976,14 @@
 													</a>
 												</li>
 												@endpermission
+                                                @permission('ccp-ad-show')
+                                                <li class="">
+                                                    <a href="/ccp/ad" class="nav-link nav-toggle ">
+                                                        AD
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
+                                                @endpermission
 											</ul>
 										</li>
 
