@@ -193,10 +193,10 @@ class CcpAdController extends Controller
 		$data = array();
 		foreach($_data as $key=>$val){
 			$val = (array)$val;
-			$val['acos'] = $val['sales'] > 0 ? sprintf("%.2f",$val['cost']/$val['sales']) : '-';
-			$val['ctr'] = $val['impressions'] > 0 ? sprintf("%.2f",$val['clicks']/$val['impressions']) : '-';
-			$val['cpc'] = $val['clicks'] > 0 ? sprintf("%.2f",$val['cost']/$val['clicks']) : '-';
-			$val['cr'] = $val['clicks'] > 0 ? sprintf("%.2f",$val['orders']/$val['clicks']) : '-';
+			$val['acos'] = $val['sales'] > 0 ? sprintf("%.2f",$val['cost']*100/$val['sales']).'%' : '-';
+			$val['ctr'] = $val['impressions'] > 0 ? sprintf("%.2f",$val['clicks']*100/$val['impressions']).'%' : '-';
+			$val['cpc'] = $val['clicks'] > 0 ? sprintf("%.2f",$val['cost']*100/$val['clicks']).'%' : '-';
+			$val['cr'] = $val['clicks'] > 0 ? sprintf("%.2f",$val['orders']*100/$val['clicks']).'%' : '-';
 			$data[] = $val;
 		}
 
