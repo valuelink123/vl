@@ -269,6 +269,20 @@ return [
             'engine' => null,
         ],
 
+		'ad' => [
+			'driver' => 'mysql',
+			'host' => env('DB_AD_HOST', '127.0.0.1'),
+			'port' => env('DB_AD_PORT', '3306'),
+			'database' => env('DB_AD_DATABASE', 'forge'),
+			'username' => env('DB_AD_USERNAME', 'forge'),
+			'password' => env('DB_AD_PASSWORD', ''),
+			'charset' => 'utf8mb4',
+			'collation' => 'utf8mb4_unicode_ci',
+			'prefix' => '',
+			'strict' => false,
+			'engine' => null,
+		],
+
 
     ],
 

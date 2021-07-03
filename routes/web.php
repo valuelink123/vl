@@ -328,6 +328,11 @@ Route::post('/ccp/list', 'CcpController@list')->name('ccpList');//ccp功能的�
 Route::post('/showAccountBySite', 'Controller@showTheAccountBySite')->name('showTheAccountBySite');//ccp功能的列表展示
 Route::get('ccp/showOrderList', 'CcpController@showOrderList')->name('showOrderList');//ccp功能的列表中点击订单数查看订单列表的功能
 
+//ccp-ad模块
+Route::get('/ccp/ad', 'CcpAdController@index'); //
+Route::post('/ccp/ad/showTotal', 'CcpAdController@showTotal'); //ccp功能展示顶部统计数据
+Route::post('/ccp/ad/list', 'CcpAdController@list');//ccp功能的列表展示
+
 Route::get('/ccp/salesboard', 'CcpSalesboardController@index');
 Route::post('/ccp/salesboard/showTotal', 'CcpSalesboardController@showTotal');
 Route::post('/ccp/salesboard/list', 'CcpSalesboardController@list');
