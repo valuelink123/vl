@@ -2,16 +2,7 @@
 
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Session;
-use App\Asin;
-use App\User;
-use App\Review;
-use App\Accounts;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use App\Services\MultipleQueue;
-use PDO;
-use App\Classes\CurlRequest;
 use DB;
 
 
@@ -49,7 +40,13 @@ class CcpAdController extends Controller
 		$site = getMarketDomain();//获取站点选项
 		$date = $this->date = date('Y-m-d');
 
-		return view('ccp/ad',['bgs'=>$bgs,'bus'=>$bus,'site'=>$site,'date'=>$date]);
+		$siteDate = array();
+		foreach($site as $kk=>$vv){
+			$siteDate[$vv->marketplaceid] = date('Y-m-d',$this->getCurrentTime($vv->marketplaceid,1));
+		}
+		$date = $siteDate[current($site)->marketplaceid];
+
+		return view('ccp/ad',['bgs'=>$bgs,'bus'=>$bus,'site'=>$site,'date'=>$date,'siteDate'=>$siteDate]);
 	}
 	/*
 	* 获得统计总数据
@@ -70,7 +67,7 @@ class CcpAdController extends Controller
 		$currency_code = isset($siteCur[$domain]) ? $siteCur[$domain] : '';
 
 		//时间搜索范围
-		$where =" and ppc_reports.created_at >= '".$this->start_date." 00:00:00' and ppc_reports.created_at <= '".$this->end_date." 23:59:59' ";
+		$where = $this->getDateWhere($site);
 		$where_profile = " and marketplaces.marketplace = '".$site."'";
 
 		if($account){
@@ -132,7 +129,7 @@ class CcpAdController extends Controller
 		$this->start_date = isset($search['start_date']) ? $search['start_date'] : '';
 		$this->end_date = isset($search['end_date']) ? $search['end_date'] : '';
 		//时间搜索范围
-		$where =" and ppc_reports.created_at >= '".$this->start_date." 00:00:00' and ppc_reports.created_at <= '".$this->end_date." 23:59:59' ";
+		$where = $this->getDateWhere($site);
 		$where_profile = " and marketplaces.marketplace = '".$site."'";
 		if($account){
 			$account_str = implode("','", explode(',',$account));
@@ -233,4 +230,24 @@ class CcpAdController extends Controller
 		}
 		return $data;
 	}
+
+	//得到搜索时间的sql
+	public function getDateWhere($site)
+	{
+		$startDate = date('Y-m-d 00:00:00',strtotime($this->start_date));//开始时间
+		$endDate = date('Y-m-d 23:59:59',strtotime($this->end_date));//结束时间
+		$dateconfig = array('A1PA6795UKMFR9','A1RKKUPIHCS9HS','A13V1IB3VIYZZH','APJ6JRA9NG5V4');//utc+2:00
+		if($site=='A1VC38T7YXB528'){//日本站点，date字段+9hour
+			$date_field = 'date_add(ppc_reports.created_at,INTERVAL 9 hour) ';
+		}elseif($site=='A1F83G8C2ARO7P'){//英国站点+1小时，uTc+1:00
+			$date_field = 'date_add(ppc_reports.created_at,INTERVAL 1 hour) ';
+		}elseif(in_array($site,$dateconfig)){//站点+2小时，utc+2:00
+			$date_field = 'date_add(ppc_reports.created_at,INTERVAL 2 hour) ';
+		}else{//其他站点，date字段-7hour
+			$date_field = 'date_sub(ppc_reports.created_at,INTERVAL 7 hour) ';
+		}
+		$where = " and {$date_field} BETWEEN STR_TO_DATE( '".$startDate."', '%Y-%m-%d %H:%i:%s' ) AND STR_TO_DATE('".$endDate."', '%Y-%m-%d %H:%i:%s' )";
+		return $where;
+	}
+
 }

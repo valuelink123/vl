@@ -61,7 +61,7 @@
                             <span class="input-group-addon">Site</span>
                             <select  style="width:100%;height:35px;" data-recent="" data-recent-date="" id="site" onchange="getAccountBySite()" name="site">
                                 @foreach($site as $value)
-                                    <option value="{{ $value->marketplaceid }}">{{ $value->domain }}</option>
+                                    <option data-date="{!! $siteDate[$value->marketplaceid] !!}" value="{{ $value->marketplaceid }}">{{ $value->domain }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -321,8 +321,8 @@
             // var timeType = $('#timeType option:selected').val();//选择的时间类型，是当地站点时间还是北京时间，timeType
             var today = new Date();
             // if(timeType==1){//站点本地时间的时候，取出当前选中站点今天的日期
-            //     var date = $('#site option:selected').attr('data-date');
-            //     today = new Date(date);
+                var date = $('#site option:selected').attr('data-date');
+                today = new Date(date);
             // }
             var oneday = 1000*60*60*24;//一天时间的秒数
             var from_time = today;
