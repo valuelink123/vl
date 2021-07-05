@@ -83,8 +83,8 @@ class CcpAdController extends Controller
 
 		//sales数据，orders数据
 		$sql ="SELECT  
-					round(sum(ppc_reports.cost*ppc_reports.clicks),2) as cost,
-					round(sum(ppc_reports.attributed_conversions1d_same_sku*ppc_reports.attributed_sales1d),2) as sales
+					round(sum(ppc_reports.cost),2) as cost,
+					round(sum(ppc_reports.attributed_sales1d),2) as sales
 				FROM
 					ppc_product_ads
 				LEFT JOIN ppc_reports ON (
@@ -150,9 +150,9 @@ class CcpAdController extends Controller
 		}
 		$sql = "SELECT SQL_CALC_FOUND_ROWS 
 					ppc_product_ads.asin,
-					round(sum(ppc_reports.cost*ppc_reports.clicks),2) as cost,
+					round(sum(ppc_reports.cost),2) as cost,
 					sum(ppc_reports.clicks) as clicks,
-					round(sum(ppc_reports.attributed_conversions1d_same_sku*ppc_reports.attributed_sales1d),2) as sales,
+					round(sum(ppc_reports.attributed_sales1d),2) as sales,
 					sum(ppc_reports.attributed_conversions1d_same_sku) as orders,
 					sum(ppc_reports.impressions) as impressions
 				FROM
@@ -192,7 +192,7 @@ class CcpAdController extends Controller
 			$val = (array)$val;
 			$val['acos'] = $val['sales'] > 0 ? sprintf("%.2f",$val['cost']*100/$val['sales']).'%' : '-';
 			$val['ctr'] = $val['impressions'] > 0 ? sprintf("%.2f",$val['clicks']*100/$val['impressions']).'%' : '-';
-			$val['cpc'] = $val['clicks'] > 0 ? sprintf("%.2f",$val['cost']*100/$val['clicks']).'%' : '-';
+			$val['cpc'] = $val['clicks'] > 0 ? sprintf("%.2f",$val['cost']/$val['clicks']) : '-';
 			$val['cr'] = $val['clicks'] > 0 ? sprintf("%.2f",$val['orders']*100/$val['clicks']).'%' : '-';
 			$data[] = $val;
 		}
