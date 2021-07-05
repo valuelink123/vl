@@ -234,19 +234,9 @@ class CcpAdController extends Controller
 	//得到搜索时间的sql
 	public function getDateWhere($site)
 	{
-		$startDate = date('Y-m-d 00:00:00',strtotime($this->start_date));//开始时间
-		$endDate = date('Y-m-d 23:59:59',strtotime($this->end_date));//结束时间
-		$dateconfig = array('A1PA6795UKMFR9','A1RKKUPIHCS9HS','A13V1IB3VIYZZH','APJ6JRA9NG5V4');//utc+2:00
-		if($site=='A1VC38T7YXB528'){//日本站点，date字段+9hour
-			$date_field = 'date_add(ppc_reports.created_at,INTERVAL 9 hour) ';
-		}elseif($site=='A1F83G8C2ARO7P'){//英国站点+1小时，uTc+1:00
-			$date_field = 'date_add(ppc_reports.created_at,INTERVAL 1 hour) ';
-		}elseif(in_array($site,$dateconfig)){//站点+2小时，utc+2:00
-			$date_field = 'date_add(ppc_reports.created_at,INTERVAL 2 hour) ';
-		}else{//其他站点，date字段-7hour
-			$date_field = 'date_sub(ppc_reports.created_at,INTERVAL 7 hour) ';
-		}
-		$where = " and {$date_field} BETWEEN STR_TO_DATE( '".$startDate."', '%Y-%m-%d %H:%i:%s' ) AND STR_TO_DATE('".$endDate."', '%Y-%m-%d %H:%i:%s' )";
+		$startDate = date('Y-m-d',strtotime($this->start_date));//开始时间
+		$endDate = date('Y-m-d',strtotime($this->end_date));//结束时间
+		$where = " and ppc_reports.date >= '".$startDate."' and ppc_reports.date <= '".$endDate."'";
 		return $where;
 	}
 
