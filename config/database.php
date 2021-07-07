@@ -282,6 +282,20 @@ return [
 			'strict' => false,
 			'engine' => null,
 		],
+        'ccp' => [
+            'driver' => 'mysql',
+            'host' => env('DB_CCP_HOST', '127.0.0.1'),
+            'port' => env('DB_CCP_PORT', '3306'),
+            'database' => env('DB_CCP_DATABASE', 'forge'),
+            'username' => env('DB_CCP_USERNAME', 'forge'),
+            'password' => env('DB_CCP_PASSWORD', ''),
+            'unix_socket' => env('DB_SOCKET', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'strict' => false,
+            'engine' => null,
+        ],
 
 
     ],

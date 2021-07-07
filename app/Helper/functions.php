@@ -1664,3 +1664,20 @@ function getBrands(){
 		'Runme'=>'runmesport.com',
 	);
 }
+
+function unCamelize($str)
+{
+	return strtolower(preg_replace('/([a-z])([A-Z])/', "$1_$2", $str));
+}
+
+function unCamelizeArr($arr)
+{
+	$tmp = [];
+    if (is_array($arr)) {
+        foreach ($arr as $k => $v) {
+			if(is_array($v)) $v = unCamelizeArr($v);
+            $tmp[unCamelize($k)] = $v;
+        }
+    }
+    return $tmp;
+}
