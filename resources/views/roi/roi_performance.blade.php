@@ -73,8 +73,13 @@
                     </div>
                     <div class="col-md-2">
                         <div class="input-group">
-                            <span class="input-group-addon">上线时间</span>
-                            <input  class="form-control"  value="" data-change="0" data-date-format="yyyy-mm-dd" data-options="format:'yyyy-mm-dd'" id="estimated_launch_time" name="estimated_launch_time"/>
+                            <span class="input-group-addon">上线时间开始</span>
+                            <input  class="form-control"  value="" data-change="0" data-date-format="yyyy-mm-dd" data-options="format:'yyyy-mm-dd'" id="estimated_launch_time_from" name="estimated_launch_time_from"/>
+                        </div>
+                        <br>
+                        <div class="input-group">
+                            <span class="input-group-addon">上线时间结束</span>
+                            <input  class="form-control"  value="" data-change="0" data-date-format="yyyy-mm-dd" data-options="format:'yyyy-mm-dd'" id="estimated_launch_time_to" name="estimated_launch_time_to"/>
                         </div>
                     </div>
 
@@ -154,7 +159,11 @@
             rtl: App.isRTL(),
             autoclose: true
         });
-        $('#estimated_launch_time').datepicker({
+        $('#estimated_launch_time_from').datepicker({
+            rtl: App.isRTL(),
+            autoclose: true
+        });
+        $('#estimated_launch_time_to').datepicker({
             rtl: App.isRTL(),
             autoclose: true
         });

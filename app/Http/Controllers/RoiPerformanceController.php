@@ -426,8 +426,11 @@ class RoiPerformanceController extends Controller
 		}
 
 		//上线时间的搜索
-		if(isset($search['estimated_launch_time']) && $search['estimated_launch_time']){
-			$where.= " and estimated_launch_time = '".trim($search['estimated_launch_time'])."'";
+		if(isset($search['estimated_launch_time_from']) && $search['estimated_launch_time_from']){
+			$where.= " and estimated_launch_time >= '".trim($search['estimated_launch_time_from'])."'";
+		}
+		if(isset($search['estimated_launch_time_to']) && $search['estimated_launch_time_to']){
+			$where.= " and estimated_launch_time <= '".trim($search['estimated_launch_time_to'])."'";
 		}
 
 		$sql = "select SQL_CALC_FOUND_ROWS roi_performance.*,roi.*
