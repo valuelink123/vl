@@ -149,6 +149,7 @@ class CtgController extends Controller {
             encrypted_email,
 		    t1.review_type,
 		    rsg_requests.amazon_order_id as rsg_orderid,
+            exception.amazon_order_id as rr_orderid,
 		    '{$channelName}' as channel,
 		    client.rsg_status as rsg_status,
 		    client.rsg_status_explain as rsg_status_explain
@@ -156,6 +157,9 @@ class CtgController extends Controller {
         Left join ( 
 					select amazon_order_id from rsg_requests group by amazon_order_id 
 				) as rsg_requests on rsg_requests.amazon_order_id = t1.order_id 
+		LEFT JOIN (
+			SELECT amazon_order_id FROM exception GROUP BY amazon_order_id
+			) AS exception ON exception.amazon_order_id = t1.order_id
         LEFT JOIN client_info ON client_info.email = t1.email 
         LEFT JOIN client ON client_info.client_id = client.id  
         LEFT JOIN users t2
@@ -208,6 +212,8 @@ class CtgController extends Controller {
 				$data[$key]['rating'] = '<span class="btn btn-danger btn-xs">'.$val['rating'].'</span>';
 			}
 			$data[$key]['join_rsg'] = $val['rsg_orderid'] ? 'YES' : 'NO';//是否有参加RSG活动
+
+			$data[$key]['join_rr'] = $val['rr_orderid'] ? 'YES' : 'NO';//是否有创建RR订单
             //点击Batch Send群发邮件时，提取收件人email。
             $data[$key]['email_hidden'] =  ($val['encrypted_email']??$val['email']);
 
