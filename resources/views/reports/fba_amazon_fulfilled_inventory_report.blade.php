@@ -23,26 +23,45 @@ th,td,td>span {
                         {{ csrf_field() }}
                         <div class="row">
                             <div class="col-md-2">
-                            <select class="mt-multiselect btn btn-default " multiple="multiple" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" data-none-selected-text="Select Accounts" name="seller_account_id[]" id="seller_account_id[]">
-                                @foreach ($accounts_data as $id=>$name)
-                                    <option value="{{$id}}">{{$name}}</option>
-                                @endforeach
-                            </select>
+                                <div class="input-group date date-picker margin-bottom-5" data-date-format="yyyy-mm-dd">
+                                    <input type="text" class="form-control" readonly name="date_from" placeholder="DateFrom" value="">
+                                    <span class="input-group-btn">
+                                        <button class="btn  default" type="button">
+                                            <i class="fa fa-calendar"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                <br/>
+                                <div class="input-group date date-picker margin-bottom-5" data-date-format="yyyy-mm-dd">
+                                    <input type="text" class="form-control" readonly name="date_to" placeholder="DateTo" value="">
+                                    <span class="input-group-btn">
+                                        <button class="btn default" type="button">
+                                            <i class="fa fa-calendar"></i>
+                                        </button>
+                                    </span>
+                                </div>
                             </div>
                             <div class="col-md-2">
-                                <input type="text" class="form-control" name="asin" placeholder="Asins">  
+                                <input type="text" class="form-control" name="seller_sku" placeholder="Seller skus">
+                                <br/>
+                                <input type="text" class="form-control" name="fnsku" placeholder="Fnskus">
                             </div>
-                            <div class="col-md-2">
-                                <input type="text" class="form-control" name="seller_sku" placeholder="Seller skus">  
-                            </div>
-                            <div class="col-md-2">
-                                <input type="text" class="form-control" name="fnsku" placeholder="Fnskus">  
-                            </div>
+
                             <div class="col-md-2">
                                 <select class="form-control " name="warehouse_condition_code" id="warehouse_condition_code">
                                     <option value="">Select Warehouse Condition</option>
                                     @foreach (App\Models\FbaAmazonFulfilledInventoryReport::STATUS as $k=>$v)
                                         <option value="{{$k}}">{{$v}}</option>
+                                    @endforeach
+                                </select>
+                                <br/>
+                                <input type="text" class="form-control" name="asin" placeholder="Asins">
+                            </div>
+
+                            <div class="col-md-2">
+                                <select class="mt-multiselect btn btn-default " multiple="multiple" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" data-none-selected-text="Select Accounts" name="seller_account_id[]" id="seller_account_id[]">
+                                    @foreach ($accounts_data as $id=>$name)
+                                        <option value="{{$id}}">{{$name}}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -141,6 +160,8 @@ th,td,td>span {
         $('#data_search').on('click',function(e){
             e.preventDefault();
             grid.setAjaxParam("type", 'fba_amazon_fulfilled_inventory_report');
+            grid.setAjaxParam("date_from", $("input[name='date_from']").val());
+            grid.setAjaxParam("date_to", $("input[name='date_to']").val());
             grid.setAjaxParam("asin", $("input[name='asin']").val());
             grid.setAjaxParam("seller_sku", $("input[name='seller_sku']").val());
             grid.setAjaxParam("seller_account_id", $("select[name='seller_account_id[]']").val());
