@@ -184,6 +184,7 @@ th,td,td>span {
 						<th>Order No</th>
                         <th>Item No</th>
                         <th>Item Name</th>
+                        <th>Site</th>
                         <th>Asin</th>
                         <th>Seller SKU</th>
                         <th>Brand</th>
@@ -199,6 +200,7 @@ th,td,td>span {
                         <th>Facebook Name</th>
                         <th>Group</th>
                         <th>Processor</th>
+                        <th>Join RR</th>
                         <th>Join RSg</th>
                         <th>Action</th>
                         <th>Email-Hidden</th>
@@ -296,7 +298,7 @@ th,td,td>span {
             scrollX: 2000,
             fixedColumns:   {
 						leftColumns:3,
-						rightColumns: 3
+						rightColumns: 4
 					},
             pagingType: 'bootstrap_extended',
             processing: true,
@@ -308,7 +310,7 @@ th,td,td>span {
                 selector: 'td:first-child', // 指定第一列可以点击选中
             },
             "aoColumnDefs": [
-                { "bVisible": false, "aTargets": [24] }
+                { "bVisible": false, "aTargets": [26] }
             ],
             columns: [
                 {
@@ -330,6 +332,7 @@ th,td,td>span {
 				{data: 'order_id', name: 'order_id'},
                 {data: 'itemCodes', name: 'itemCodes'},
                 {data: 'itemNames', name: 'itemNames', width: "200px"},
+                {data: 'SalesChannel', name: 'SalesChannel'},
                 {
                     data: 'asins',
                     name: 'asins',
@@ -383,6 +386,7 @@ th,td,td>span {
                 {data:'facebook_name',name:'facebook_name'},
                 {data:'facebook_group',name:'facebook_group'},
                 {data: 'processor', name: 'processor', width: "120px"},
+                {data: 'join_rr', name: 'join_rr',orderable: false,},
                 {data: 'join_rsg', name: 'join_rsg',orderable: false,},
                 {
                     width: "20px",
