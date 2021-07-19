@@ -43,7 +43,7 @@ class GetPpcReport extends Command
      */
     public function handle()
     {
-        $profileId = $this->option('profileId');
+        $profileId = 2418689521697830; //$this->option('profileId');
         $tasks = PpcReport::where('status','IN_PROGRESS');
         if($profileId) $tasks = $tasks->where('profile_id',$profileId);
         $tasks = $tasks->get();
@@ -81,7 +81,7 @@ class GetPpcReport extends Command
                         [
                             'profile_id'=>$profileId,
                             'ad_type'=>$task->ad_type,
-                            'record_type'=>$task->record_type,
+                            'record_type'=>$recordType,
                             'record_type_id'=>$recordTypeId,
                             'date'=>$task->report_date,
                         ],

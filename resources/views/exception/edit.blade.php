@@ -704,21 +704,6 @@ if((Auth::user()->can(['exception-check']) || in_array($exception['group_id'],ar
 					</select>
 				</div>
 				</div>
-
-
-				<div class="col-md-12">
-				<label class="control-label">From Address</label>
-				<div class="input-group ">
-					<span class="input-group-addon">
-						<i class="fa fa-bookmark"></i>
-					</span>
-					<select name="mail_from_address" id="mail_from_address" class="mt-multiselect form-control " data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" {{$disable}}>
-					@foreach ($mail_accounts as $sender)
-					<option value="{{$sender}}" <?php if(array_get($gift_card_mail,'from_address')==$sender) echo 'selected';?>>{{$sender}}
-					@endforeach
-					</select>
-				</div>
-				</div>
 			</div>
 		</div>
 		@endif

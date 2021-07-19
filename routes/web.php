@@ -499,6 +499,28 @@ Route::Post('/giftcard/get', 'GiftCardController@get');
 Route::Post('/giftcard/upload', 'GiftCardController@upload');
 Route::get('/giftcardexport', 'GiftCardController@export');
 
+
+Route::resource('adv', 'AdvController');
+Route::Post('/adv/listCampaigns', 'AdvController@listCampaigns');
+Route::Post('/adv/campaignBatchUpdate', 'AdvController@campaignBatchUpdate');
+Route::Post('/adv/updateCampaign', 'AdvController@updateCampaign');
+Route::get('/adv/campaign/{profile_id}/{ad_type}/{campaign_id}/{tab}', 'AdvController@editCampaign');
+Route::Post('/adv/listAdGroups', 'AdvController@listAdGroups');
+Route::get('/adv/adgroup/{profile_id}/{ad_type}/{adgroup_id}/{tab}', 'AdvController@editAdGroup');
+Route::Post('/adv/listAds', 'AdvController@listAds');
+Route::Post('/adv/listKeywords', 'AdvController@listKeywords');
+Route::Post('/adv/listProducts', 'AdvController@listProducts');
+Route::Post('/adv/updateAdGroup', 'AdvController@updateAdGroup');
+Route::Post('/adv/batchUpdate', 'AdvController@batchUpdate');
+Route::Post('/adv/listNegkeywords', 'AdvController@listNegkeywords');
+Route::Post('/adv/storeNegkeywords', 'AdvController@storeNegkeywords');
+Route::Post('/adv/listNegproducts', 'AdvController@listNegproducts');
+Route::Post('/adv/storeNegproducts', 'AdvController@storeNegproducts');
+Route::Post('/adv/listGNegkeywords', 'AdvController@listGNegkeywords');
+Route::Post('/adv/storeGNegkeywords', 'AdvController@storeGNegkeywords');
+Route::Post('/adv/listGNegproducts', 'AdvController@listGNegproducts');
+Route::Post('/adv/storeGNegproducts', 'AdvController@storeGNegproducts');
+
 //客诉品线问题细分
 Route::Post('/category/import', 'CategoryController@import');
 

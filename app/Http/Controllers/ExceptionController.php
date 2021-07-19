@@ -682,7 +682,7 @@ class ExceptionController extends Controller
 						$gift_card->exception_id = $exception->id;
 						$gift_card->status = 1;
 						$gift_card->save();
-						if($request->get('mail_brand') && $request->get('mail_from_address') && $exception->customer_email){
+						if($request->get('mail_brand') && $exception->customer_email){
 							$customer_email = array_search($exception->customer_email,getEmailToEncryptedEmail())?array_search($exception->customer_email,getEmailToEncryptedEmail()):$exception->customer_email;
 							if($exception->process_status =='SG gift' || $exception->process_status=='CTG-gift'){
 								$mail_template_id = 4170;
@@ -695,11 +695,11 @@ class ExceptionController extends Controller
 							$subject = str_replace("{GIFT_CARD}",$gift_card->code,$gf_template->title);
 							$content = str_replace("{BRAND}",$request->get('mail_brand'),$content);
 							$subject = str_replace("{BRAND}",$request->get('mail_brand'),$subject);
-							$content = str_replace("{BRAND_LINK}",array_get(getBrands(),$request->get('mail_brand')),$content);
-							$subject = str_replace("{BRAND_LINK}",array_get(getBrands(),$request->get('mail_brand')),$subject);
+							$content = str_replace("{BRAND_LINK}",array_get(getBrands(),$request->get('mail_brand').'.url'),$content);
+							$subject = str_replace("{BRAND_LINK}",array_get(getBrands(),$request->get('mail_brand').'.url'),$subject);
 							$sendbox = new Sendbox;
 							$sendbox->user_id = intval(Auth::user()->id);
-							$sendbox->from_address = $request->get('mail_from_address');
+							$sendbox->from_address = array_get(getBrands(),$request->get('mail_brand').'.email');
 							$sendbox->to_address = $customer_email;
 							$sendbox->subject = $subject;
 							$sendbox->text_html = $content;
@@ -718,7 +718,7 @@ class ExceptionController extends Controller
 							array(
 								'exception_id'=>$exception->id,
 								'gift_card_id'=>$gift_card_id,
-								'from_address'=>$request->get('mail_from_address'),
+								'from_address'=>array_get(getBrands(),$request->get('mail_brand').'.email'),
 								'to_address'=>$customer_email,
 								'brand'=>$request->get('mail_brand'),
 								'template_id'=>$mail_template_id,

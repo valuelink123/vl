@@ -42,8 +42,8 @@ class RequestPpcReport extends Command
      */
     public function handle()
     {
-        $profileId = $this->option('profileId');
-        $date = $this->option('date');
+        $profileId = 2418689521697830; //$this->option('profileId');
+        $date = '2021-07-03'; //$this->option('date');
         if(!$date) $date = date('Y-m-d',strtotime('-20 hours'));
         $client = new PpcRequest($profileId);
         $client->refreshToken();
