@@ -715,7 +715,7 @@
                                             @permission('adv-show')
                                             <li class="">
                                                 <a href="/adv" class="nav-link nav-toggle">
-                                                    Barcode
+                                                    Adv manage
                                                     <span class="arrow"></span>
                                                 </a>
                                             </li>

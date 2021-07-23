@@ -69,7 +69,7 @@
 
                             <div class="form-group">
                                 <label>Suggested Bid:</label>
-                                {{array_get($adgroup,'suggestedBid.response.suggestedBid.suggested')?array_get($adgroup,'suggestedBid.response.suggestedBid.suggested').' '.array_get($adgroup,'suggestedBid.response.suggestedBid.rangeStart').' - '.array_get($adgroup,'suggestedBid.response.suggestedBid.rangeEnd'):'-',}}
+                                {{array_get($adgroup,'suggestedBid.response.suggestedBid.suggested')?array_get($adgroup,'suggestedBid.response.suggestedBid.suggested').' '.array_get($adgroup,'suggestedBid.response.suggestedBid.rangeStart').' - '.array_get($adgroup,'suggestedBid.response.suggestedBid.rangeEnd'):'-'}}
                             </div>
 
 
