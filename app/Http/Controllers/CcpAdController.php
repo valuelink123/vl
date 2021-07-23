@@ -186,16 +186,47 @@ class CcpAdController extends Controller
 		$recordsTotal = $recordsFiltered = DB::connection('ad')->select('SELECT FOUND_ROWS() as total');
 		$recordsTotal = $recordsFiltered = $recordsTotal[0]->total;
 
+		$domain = substr(getDomainBySite($site), 4);
 		//AD CONVERSION RATE = orders/click  CTR = click/impressions  cpc = sum(cost*clicks)/sum(clicks)  acos=cost/sales
 		$data = array();
+		$asins = array();
 		foreach($_data as $key=>$val){
 			$val = (array)$val;
+			$asins[] = $val['asin'];
+			$val['title'] = $val['item_no'] = $val['image'] = '/NA';
 			$val['acos'] = $val['sales'] > 0 ? sprintf("%.2f",$val['cost']*100/$val['sales']).'%' : '-';
 			$val['ctr'] = $val['impressions'] > 0 ? sprintf("%.2f",$val['clicks']*100/$val['impressions']).'%' : '-';
 			$val['cpc'] = $val['clicks'] > 0 ? sprintf("%.2f",$val['cost']/$val['clicks']) : '-';
 			$val['cr'] = $val['clicks'] > 0 ? sprintf("%.2f",$val['orders']*100/$val['clicks']).'%' : '-';
-			$data[] = $val;
+			$data[$val['asin']] = $val;
+			$data[$val['asin']]['asin'] = '<a href="https://www.' .$domain. '/dp/' . $val['asin'] .'" target="_blank" rel="noreferrer">'.$val['asin'].'</a>';
 		}
+
+		if($asins){
+			$asins = "'".implode("','",$asins)."'";
+			$product_sql = "select max(title) as title,max(images) as images,asin,max(sku) as item_no
+						from asins
+						where asin in({$asins})
+						and marketplaceid = '{$site}'
+						group by asin ";
+
+			$productData = DB::connection('vlz')->select($product_sql);
+			foreach($productData as $pkey=>$pval){
+				if(isset($data[$pval->asin])){
+					$title = mb_substr($pval->title,0,50);
+					$data[$pval->asin]['title'] = '<span title="'.$pval->title.'">'.$title.'</span>';
+					$data[$pval->asin]['item_no'] = $pval->item_no ? $pval->item_no : $data[$pval['asin']]['item_no'];
+					if($pval->images){
+						$imageArr = explode(',',$pval->images);
+						if($imageArr){
+							$image = 'https://images-na.ssl-images-amazon.com/images/I/'.$imageArr[0];
+							$data[$pval->asin]['image'] = '<a href="https://www.' .$domain. '/dp/' . $pval->asin .'" target="_blank" rel="noreferrer"><image style="width:50px;height:50px;" src="'.$image.'"></a>';
+						}
+					}
+				}
+			}
+		}
+		$data = array_values($data);
 
 		return compact('data', 'recordsTotal', 'recordsFiltered');
 	}

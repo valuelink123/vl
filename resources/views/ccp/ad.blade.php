@@ -176,7 +176,10 @@
             <table class="table table-striped table-bordered" id="datatable">
                 <thead>
                     <tr>
-                        <th>Asin</th>
+                        <th>IMAGE</th>
+                        <th>PRODUCT</th>
+                        <th>ASIN</th>
+                        <th>Item No.</th>
                         <th>AD COST</th>
                         <th>SALES</th>
                         <th>ORDERS</th>
@@ -217,7 +220,10 @@
                 // pagingType: 'bootstrap_extended',
                 processing: true,
                 columns: [
+                    {data: 'image',name:'image'},
+                    {data: 'title',name:'title'},
                     {data: 'asin',name:'asin'},
+                    {data: 'item_no',name:'item_no'},
                     {data: 'cost',name:'cost'},
                     {data: 'sales',name:'sales'},
                     {data: 'orders',name:'orders'},
