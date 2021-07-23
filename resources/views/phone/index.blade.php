@@ -49,7 +49,7 @@
                                 <th width="5%"> Action </th>
                             </tr>
                             <tr role="row" class="filter">
-                                <td> </td>
+                                <td><input type="text" class="form-control form-filter input-sm" name="id"></td>
                                 <td>
 								<input type="text" class="form-control form-filter input-sm" name="phone">
                                 </td>
@@ -176,6 +176,7 @@
             grid.setAjaxParam("amazon_order_id", $("input[name='amazon_order_id']").val());
 			grid.setAjaxParam("content", $("input[name='content']").val());
             grid.setAjaxParam("user_name", $("input[name='user_name']").val());
+            grid.setAjaxParam("id", $("input[name='id']").val());
             grid.getDataTable().ajax.reload(null,false);
             //grid.clearAjaxParams();
         }
@@ -196,7 +197,7 @@
 $(function() {
     TableDatatablesAjax.init();
     $("#vl_list_export").click(function(){
-        location.href='/phoneExport?user_name='+$("input[name='user_name']").val()+'&amazon_order_id='+$("input[name='amazon_order_id']").val()+'&date_from='+$("input[name='date_from']").val()+'&date_to='+$("input[name='date_to']").val()+'&buyer_email='+$("input[name='buyer_email']").val()+'&content='+$("input[name='content']").val()+'&phone='+$("input[name='phone']").val();
+        location.href='/phoneExport?user_name='+$("input[name='user_name']").val()+'&amazon_order_id='+$("input[name='amazon_order_id']").val()+'&date_from='+$("input[name='date_from']").val()+'&date_to='+$("input[name='date_to']").val()+'&buyer_email='+$("input[name='buyer_email']").val()+'&content='+$("input[name='content']").val()+'&phone='+$("input[name='phone']").val()+'&id='+$("input[name='id']").val();
     });
 });
 
