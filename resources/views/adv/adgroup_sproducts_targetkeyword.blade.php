@@ -58,7 +58,7 @@
                         <input type="hidden" name="profile_id" value="{{$profile_id}}">
                         <input type="hidden" name="ad_type" value="{{$ad_type}}">
                         <input type="hidden" name="campaign_id" value="{{array_get($adgroup,'campaignId')}}">
-                        <input type="hidden" name="group_id" value="{{array_get($adgroup,'adGroupId')}}">
+                        <input type="hidden" name="adgroup_id" value="{{array_get($adgroup,'adGroupId')}}">
                         <div class="col-md-2">
                         <select class="form-control" name="stateFilter" id="stateFilter" >
                             <option value="" >All Status</option>
@@ -166,9 +166,11 @@
                                     <th>
                                         <input type="checkbox" class="group-checkable" data-set="#datatable_ajax .checkboxes" />
                                     </th>
+                                    <th>Status</th>
 									<th>Keywords</th>
                                     <th>Match Type</th>
-									<th>Status</th>
+									<th>Serving Status</th>
+                                    <th>Suggested Bid</th>
                                     <th>Bid</th>
 									<th>Impressions</th>
 									<th>Clicks</th>
@@ -191,6 +193,7 @@
         </div>
     </div>
 </div>
+<script src="/assets/global/plugins/bootstrap-editable/bootstrap-editable/js/bootstrap-editable.js" type="text/javascript"></script>
 
 <script>
         var TableDatatablesAjax = function () {
@@ -210,7 +213,7 @@
             grid.setAjaxParam("stateFilter", $("select[name='stateFilter']").val());
             grid.setAjaxParam("ad_type", $("input[name='ad_type']").val());
             grid.setAjaxParam("campaign_id", $("input[name='campaign_id']").val());
-            grid.setAjaxParam("group_id", $("input[name='group_id']").val());
+            grid.setAjaxParam("adgroup_id", $("input[name='adgroup_id']").val());
             grid.setAjaxParam("name", $("input[name='name']").val());
             grid.setAjaxParam("start_date", $("input[name='start_date']").val());
             grid.setAjaxParam("end_date", $("input[name='end_date']").val());
@@ -236,8 +239,7 @@
                     "ajax": {
                         "url": "{{ url('adv/listKeywords')}}",
                     },
-                    scrollY:        380,
-                    scrollX:        true,
+
 					
                     //"scrollX": true,
                     //"autoWidth":true
@@ -358,6 +360,31 @@
                             series : chartY
                         };
                         lineChart.setOption(option);
+                        $('.ajax_bid').editable({
+                            type: 'text',
+                            url: '/adv/updateBid',
+                            params:{
+                                'action':'keywords',
+                                'method':'updateKeywords',
+                                'pk_type':'keywordId',
+                                'profile_id':$("input[name='profile_id']").val(),
+                                'ad_type':$("input[name='ad_type']").val(),
+                            },
+                            validate: function (value) {
+                                if (isNaN(value)) {
+                                    return 'Must be a number';
+                                }
+                            },
+                            success: function (response) { 
+                                var obj = JSON.parse(response);
+                                $.each(obj.response,function(index,value){
+                                    toastr.success(value.code);
+                                });
+                            }, 
+                            error: function (response) { 
+                                return 'remote error'; 
+                            }
+                        });
                     },
                  }
             });

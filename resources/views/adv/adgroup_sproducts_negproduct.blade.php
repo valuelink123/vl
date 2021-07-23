@@ -193,8 +193,7 @@
                     "ajax": {
                         "url": "{{ url('adv/listNegproducts')}}",
                     },
-                    scrollY:        380,
-                    scrollX:        true,
+
 					
                     //"scrollX": true,
                     //"autoWidth":true

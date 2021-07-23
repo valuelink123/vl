@@ -4,7 +4,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 class PpcProfile extends Model
 {
-    protected $connection = 'ppc';
+    protected $guarded = [];
 
     const STATUS = [
         'enabled'=>'enabled',
@@ -24,4 +24,11 @@ class PpcProfile extends Model
         'autoForSales'=>'Dynamic bids - up and down',
         'manual'=>'Fixed bid',
     ];
+
+    const BIDOPTIMIZATION = [
+        'clicks'=>'Optimize for page visits',
+        'conversions'=>'Optimize for conversion',
+        'reach'=>'Optimize for viewable impressions',
+    ];
+    
 }

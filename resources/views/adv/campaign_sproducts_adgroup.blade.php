@@ -198,6 +198,7 @@
         </div>
     </div>
 </div>
+<script src="/assets/global/plugins/bootstrap-editable/bootstrap-editable/js/bootstrap-editable.js" type="text/javascript"></script>
 
 <script>
         var TableDatatablesAjax = function () {
@@ -242,8 +243,7 @@
                     "ajax": {
                         "url": "{{ url('adv/listAdGroups')}}",
                     },
-                    scrollY:        380,
-                    scrollX:        true,
+
 					
                     //"scrollX": true,
                     //"autoWidth":true
@@ -364,6 +364,31 @@
                             series : chartY
                         };
                         lineChart.setOption(option);
+                        $('.ajax_bid').editable({
+                            type: 'text',
+                            url: '/adv/updateBid',
+                            params:{
+                                'action':'groups',
+                                'method':'updateAdGroups',
+                                'pk_type':'adGroupId',
+                                'profile_id':$("input[name='profile_id']").val(),
+                                'ad_type':$("input[name='ad_type']").val(),
+                            },
+                            validate: function (value) {
+                                if (isNaN(value)) {
+                                    return 'Must be a number';
+                                }
+                            },
+                            success: function (response) { 
+                                var obj = JSON.parse(response);
+                                $.each(obj.response,function(index,value){
+                                    toastr.success(value.code);
+                                });
+                            }, 
+                            error: function (response) { 
+                                return 'remote error'; 
+                            }
+                        });
                     },
                  }
             });

@@ -201,8 +201,6 @@
                     "ajax": {
                         "url": "{{ url('adv/listNegkeywords')}}",
                     },
-                    scrollY:        380,
-                    scrollX:        true,
 					
                     //"scrollX": true,
                     //"autoWidth":true

@@ -1,7 +1,7 @@
 @extends('layouts.layout')
-@section('label', 'Campaigns')
+@section('label', 'Ad Group')
 @section('content')
-<h1 class="page-title font-red-intense"> Campaign - {{array_get($campaign,'name')}}
+<h1 class="page-title font-red-intense"> Ad Group - {{array_get($adgroup,'name')}}
 </h1>
 <div class="row">
     <div class="col-md-12">
@@ -11,10 +11,18 @@
                 <div class="tabbable-line">
                 <ul class="nav nav-tabs ">
                     <li class="active">
-                        <a href="/adv/campaign/{{$profile_id}}/{{$ad_type}}/{{array_get($campaign,'campaignId')}}/setting" data-toggle="tab" aria-expanded="true" >Setting</a>
+                        <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/setting" data-toggle="tab" aria-expanded="true" > Setting</a>
                     </li>
                     <li >
-                        <a href="/adv/campaign/{{$profile_id}}/{{$ad_type}}/{{array_get($campaign,'campaignId')}}/adgroup">Ad Groups</a>
+                        <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/ad" >Ads</a>
+                    </li>
+
+                    <li>
+                        <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/targetproduct" >Targeting</a>
+                    </li>
+
+                    <li >
+                        <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/negproduct" >Negative Targeting</a>
                     </li>
                 </ul>
                 <div class="tab-content">
@@ -24,66 +32,47 @@
                         <div class="form-body col-md-6">
                             <input type="hidden" name="profile_id" value="{{$profile_id}}">
                             <input type="hidden" name="ad_type" value="{{$ad_type}}">
-                            <input type="hidden" name="campaign_id" value="{{array_get($campaign,'campaignId')}}">
+                            <input type="hidden" name="campaign_id" value="{{array_get($adgroup,'campaignId')}}">
+                            <input type="hidden" name="adgroup_id" value="{{array_get($adgroup,'adGroupId')}}">
 
 
                             <div class="form-group">
-                                <label>Campaign Name:</label>
-                                <input type="text" class="form-control input-inline" name="name" id="name" value="{{array_get($campaign,'name')}}" >
+                                <label>Ad Group Name:</label>
+                                <input type="text" class="form-control input-inline" name="name" id="name" value="{{array_get($adgroup,'name')}}" >
                             </div>
 
                             <div class="form-group">
-                                <label>Campaign ID:</label>
-                                {{array_get($campaign,'campaignId')}}
+                                <label>Ad Group ID:</label>
+                                {{array_get($adgroup,'adGroupId')}}
                             </div>
 
                             <div class="form-group">
                                 <label>Serving Status:</label>
-                                {{array_get($campaign,'servingStatus')}}
-                            </div>
-
-                            <div class="form-group">
-                                <label>Type:</label>
-                                Sponsored Display
+                                {{array_get($adgroup,'servingStatus')}}
                             </div>
                             
                             <div class="form-group">
                                 <label>Status:</label>
                                 <select class="form-control input-inline" name="state" id="state">
                                 @foreach (\App\Models\PpcProfile::STATUS as $k=>$v)
-                                <option value="{{$k}}" {{($k==array_get($campaign,'state'))?'selected':''}} >{{$v}}</option>
+                                <option value="{{$k}}" {{($k==array_get($adgroup,'state'))?'selected':''}} >{{$v}}</option>
                                 @endforeach 
                                 </select>
                             </div>
 
 
-                            <div class="form-group date date-picker" data-date-format="yyyy-mm-dd" >
-                                <label>Date Range:</label>
-
-                                <div class="input-group date date-picker col-md-4" data-date-format="yyyy-mm-dd">
-                                    <input type="text" class="form-control " readonly name="startDate" id="startDate" value="{{date('Y-m-d',strtotime(array_get($campaign,'startDate')))}}">
-                                    <span class="input-group-btn">
-                                        <button class="btn default" type="button">
-                                            <i class="fa fa-calendar"></i>
-                                        </button>
-                                    </span>
-                                </div>
-                                <div class="input-group date date-picker col-md-4" data-date-format="yyyy-mm-dd">
-                                    <input type="text" class="form-control" readonly name="endDate" id="endDate" value="{{array_get($campaign,'endDate')?date('Y-m-d',strtotime(array_get($campaign,'endDate'))):''}}">
-                                    <span class="input-group-btn">
-                                        <button class="btn default" type="button">
-                                            <i class="fa fa-calendar"></i>
-                                        </button>
-                                    </span>
-                                </div>
-
+                            <div class="form-group">
+                                <label>Bid Optimization:</label>
+                                {{array_get(\App\Models\PpcProfile::BIDOPTIMIZATION,array_get($adgroup,'bidOptimization'))}}
                             </div>
+
 
                             <div class="form-group">
-                                <label>Daily Budget:</label>
-                                <input type="text" class="form-control input-inline" name="budget" id="budget" value="{{array_get($campaign,'budget')}}" >  
+                                <label>Default Bid:</label>
+                                <input type="text" class="form-control input-inline" name="defaultBid" id="defaultBid" value="{{array_get($adgroup,'defaultBid')}}" >  
                             </div>
 
+                            
                             <div style="clear:both;"></div>
                         </div>
                         <div style="clear:both;"></div>
@@ -120,7 +109,7 @@ $(function() {
 		$.ajax({
 			type: "POST",
 			dataType: "json",
-			url: "{{ url('/adv/updateCampaign') }}",
+			url: "{{ url('/adv/updateAdGroup') }}",
 			data: $('#update_form').serialize(),
 			success: function (data) {
 				if(data.code=='SUCCESS'){

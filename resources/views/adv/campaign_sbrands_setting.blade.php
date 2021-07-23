@@ -14,14 +14,23 @@
                         <a href="/adv/campaign/{{$profile_id}}/{{$ad_type}}/{{array_get($campaign,'campaignId')}}/setting"> Setting</a>
                     </li>
                     <li >
-                        <a href="/adv/campaign/{{$profile_id}}/{{$ad_type}}/{{array_get($campaign,'campaignId')}}/targeting" >Targeting</a>
-                    </li>
-                    <li >
-                        <a href="/adv/campaign/{{$profile_id}}/{{$ad_type}}/{{array_get($campaign,'campaignId')}}/negtargeting" >Negative targeting</a>
-                    </li>
-                    <li >
                         <a href="/adv/campaign/{{$profile_id}}/{{$ad_type}}/{{array_get($campaign,'campaignId')}}/creative" >Creative</a>
                     </li>
+                    <li >
+                        <a href="/adv/campaign/{{$profile_id}}/{{$ad_type}}/{{array_get($campaign,'campaignId')}}/targetkeyword" >Targeting keywords</a>
+                    </li>
+                    <li >
+                        <a href="/adv/campaign/{{$profile_id}}/{{$ad_type}}/{{array_get($campaign,'campaignId')}}/negkeyword" >Negative keywords</a>
+                    </li>
+
+                    <li>
+                        <a href="/adv/campaign/{{$profile_id}}/{{$ad_type}}/{{array_get($campaign,'campaignId')}}/targetproduct" >Targeting products</a>
+                    </li>
+
+                    <li>
+                        <a href="/adv/campaign/{{$profile_id}}/{{$ad_type}}/{{array_get($campaign,'campaignId')}}/negproduct" >Negative products</a>
+                    </li>
+                    
                 </ul>
                 <div class="tab-content">
                     <div class="tab-pane active" id="tab_setting">
@@ -151,10 +160,10 @@ $(function() {
 			url: "{{ url('/adv/updateCampaign') }}",
 			data: $('#update_form').serialize(),
 			success: function (data) {
-				if(data.code=='207'){
-                    toastr.success('Update Success');
+				if(data.code=='SUCCESS'){
+                    toastr.success(data.code);
 				}else{
-					toastr.error('Update Failed');
+					toastr.error(data.description);
 				}
 			},
 			error: function(data) {

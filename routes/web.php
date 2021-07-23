@@ -512,6 +512,7 @@ Route::Post('/adv/listKeywords', 'AdvController@listKeywords');
 Route::Post('/adv/listProducts', 'AdvController@listProducts');
 Route::Post('/adv/updateAdGroup', 'AdvController@updateAdGroup');
 Route::Post('/adv/batchUpdate', 'AdvController@batchUpdate');
+Route::Post('/adv/updateBid', 'AdvController@updateBid');
 Route::Post('/adv/listNegkeywords', 'AdvController@listNegkeywords');
 Route::Post('/adv/storeNegkeywords', 'AdvController@storeNegkeywords');
 Route::Post('/adv/listNegproducts', 'AdvController@listNegproducts');

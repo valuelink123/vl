@@ -1,5 +1,5 @@
 @extends('layouts.layout')
-@section('label', 'AdGroups')
+@section('label', 'Campaigns')
 @section('content')
 <style type="text/css">
 	th, td { white-space: nowrap;word-break:break-all; }
@@ -20,7 +20,7 @@
         padding: 10px 0;
     }
 </style>
-<h1 class="page-title font-red-intense"> Ad Group - {{array_get($adgroup,'name')}}
+<h1 class="page-title font-red-intense"> Campaigns - {{array_get($campaign,'name')}}
 </h1>
 <div class="row">
     <div class="col-md-12">
@@ -29,26 +29,26 @@
             
             <div class="tabbable-line">
             <ul class="nav nav-tabs ">
-                <li >
-                    <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/setting"> Setting</a>
-                </li>
-                <li>
-                    <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/ad" >Ads</a>
-                </li>
-                <li >
-                    <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/targetkeyword" >Targeting keywords</a>
-                </li>
-                <li>
-                    <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/negkeyword" >Negative keywords</a>
-                </li>
+                    <li >
+                        <a href="/adv/campaign/{{$profile_id}}/{{$ad_type}}/{{array_get($campaign,'campaignId')}}/setting"> Setting</a>
+                    </li>
+                    <li >
+                        <a href="/adv/campaign/{{$profile_id}}/{{$ad_type}}/{{array_get($campaign,'campaignId')}}/creative" >Creative</a>
+                    </li>
+                    <li class="active">
+                        <a href="/adv/campaign/{{$profile_id}}/{{$ad_type}}/{{array_get($campaign,'campaignId')}}/targetkeyword" >Targeting keywords</a>
+                    </li>
+                    <li >
+                        <a href="/adv/campaign/{{$profile_id}}/{{$ad_type}}/{{array_get($campaign,'campaignId')}}/negkeyword" >Negative keywords</a>
+                    </li>
 
-                <li class="active">
-                    <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/targetproduct" >Targeting products</a>
-                </li>
+                    <li>
+                        <a href="/adv/campaign/{{$profile_id}}/{{$ad_type}}/{{array_get($campaign,'campaignId')}}/targetproduct" >Targeting products</a>
+                    </li>
 
-                <li >
-                    <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/negproduct" >Negative products</a>
-                </li>
+                    <li>
+                        <a href="/adv/campaign/{{$profile_id}}/{{$ad_type}}/{{array_get($campaign,'campaignId')}}/negproduct" >Negative products</a>
+                    </li>
             </ul>
             <div class="tab-content">
                 <div class="table-toolbar">
@@ -57,8 +57,10 @@
                         <div class="row">
                         <input type="hidden" name="profile_id" value="{{$profile_id}}">
                         <input type="hidden" name="ad_type" value="{{$ad_type}}">
-                        <input type="hidden" name="campaign_id" value="{{array_get($adgroup,'campaignId')}}">
-                        <input type="hidden" name="adgroup_id" value="{{array_get($adgroup,'adGroupId')}}">
+                        <input type="hidden" name="campaign_id" value="{{array_get($campaign,'campaignId')}}">
+                        <input type="hidden" name="adgroup_id" value="{{array_get($campaign,'adGroupId')}}">
+                        <input type="hidden" name="adFormat" value="{{array_get($campaign,'adFormat')}}">
+                        
                         <div class="col-md-2">
                         <select class="form-control" name="stateFilter" id="stateFilter" >
                             <option value="" >All Status</option>
@@ -167,9 +169,8 @@
                                         <input type="checkbox" class="group-checkable" data-set="#datatable_ajax .checkboxes" />
                                     </th>
                                     <th>Status</th>
-									<th>Value</th>
+									<th>Keywords</th>
                                     <th>Match Type</th>
-                                    <th>Type</th>
 									<th>Serving Status</th>
                                     <th>Suggested Bid</th>
                                     <th>Bid</th>
@@ -218,6 +219,7 @@
             grid.setAjaxParam("name", $("input[name='name']").val());
             grid.setAjaxParam("start_date", $("input[name='start_date']").val());
             grid.setAjaxParam("end_date", $("input[name='end_date']").val());
+            grid.setAjaxParam("adFormat", $("input[name='adFormat']").val());
             grid.init({
                 src: $("#datatable_ajax"),
                 onSuccess: function (grid, response) {
@@ -238,8 +240,10 @@
                     ],
                     "pageLength": 300,
                     "ajax": {
-                        "url": "{{ url('adv/listProducts')}}",
+                        "url": "{{ url('adv/listKeywords')}}",
                     },
+
+					
                     //"scrollX": true,
                     //"autoWidth":true
                     /*
@@ -363,9 +367,9 @@
                             type: 'text',
                             url: '/adv/updateBid',
                             params:{
-                                'action':'product_targeting',
-                                'method':'updateTargetingClauses',
-                                'pk_type':'targetId',
+                                'action':'keywords',
+                                'method':'updateKeywords',
+                                'pk_type':'keywordId',
                                 'profile_id':$("input[name='profile_id']").val(),
                                 'ad_type':$("input[name='ad_type']").val(),
                             },
@@ -376,9 +380,13 @@
                             },
                             success: function (response) { 
                                 var obj = JSON.parse(response);
-                                $.each(obj.response,function(index,value){
-                                    toastr.success(value.code);
-                                });
+                                if(obj.success==1){
+                                    $.each(obj.response,function(index,value){
+                                        toastr.success(value.code);
+                                    });
+                                }else{
+                                    toastr.error(obj.response);
+                                }
                             }, 
                             error: function (response) { 
                                 return 'remote error'; 
@@ -395,9 +403,11 @@
                 var confirmStatus = $("#confirmStatus", $("#table-actions-wrapper"));
                 var profile_id = $("input[name='profile_id']").val();
                 var ad_type = $("input[name='ad_type']").val();
-                var id_type = 'targetId';
-                var action = 'product_targeting';
-                var method = 'updateTargetingClauses';
+                var campaign_id = $("input[name='campaign_id']").val();
+                var adgroup_id = $("input[name='adgroup_id']").val();
+                var id_type = 'keywordId';
+                var action = 'keywords';
+                var method = 'updateKeywords';
                 if (confirmStatus.val() != "" && grid.getSelectedRowsCount() > 0) {
                     $.ajaxSetup({
                         headers: { 'X-CSRF-TOKEN' : '{{ csrf_token() }}' }
@@ -406,7 +416,7 @@
                         type: "POST",
                         dataType: "json",
                         url: "{{ url('adv/batchUpdate') }}",
-                        data: {confirmStatus:confirmStatus.val(),id:grid.getSelectedRows(),profile_id:profile_id,ad_type:ad_type,id_type:id_type,action:action,method:method},
+                        data: {confirmStatus:confirmStatus.val(),id:grid.getSelectedRows(),profile_id:profile_id,ad_type:ad_type,id_type:id_type,action:action,method:method,campaign_id:campaign_id,adgroup_id:adgroup_id},
                         success: function (data) {
                             if(data.customActionStatus=='OK'){
                                 toastr.success(data.customActionMessage);

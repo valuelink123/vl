@@ -1,5 +1,5 @@
 @extends('layouts.layout')
-@section('label', 'AdGroups')
+@section('label', 'Campaigns')
 @section('content')
 <style type="text/css">
 	th, td { white-space: nowrap;word-break:break-all; }
@@ -20,7 +20,7 @@
         padding: 10px 0;
     }
 </style>
-<h1 class="page-title font-red-intense"> Ad Group - {{array_get($adgroup,'name')}}
+<h1 class="page-title font-red-intense"> Campaigns - {{array_get($campaign,'name')}}
 </h1>
 <div class="row">
     <div class="col-md-12">
@@ -30,24 +30,24 @@
             <div class="tabbable-line">
             <ul class="nav nav-tabs ">
                 <li >
-                    <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/setting"> Setting</a>
-                </li>
-                <li>
-                    <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/ad" >Ads</a>
+                    <a href="/adv/campaign/{{$profile_id}}/{{$ad_type}}/{{array_get($campaign,'campaignId')}}/setting"> Setting</a>
                 </li>
                 <li >
-                    <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/targetkeyword" >Targeting keywords</a>
+                    <a href="/adv/campaign/{{$profile_id}}/{{$ad_type}}/{{array_get($campaign,'campaignId')}}/creative" >Creative</a>
                 </li>
-                <li>
-                    <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/negkeyword" >Negative keywords</a>
+                <li >
+                    <a href="/adv/campaign/{{$profile_id}}/{{$ad_type}}/{{array_get($campaign,'campaignId')}}/targetkeyword" >Targeting keywords</a>
+                </li>
+                <li >
+                    <a href="/adv/campaign/{{$profile_id}}/{{$ad_type}}/{{array_get($campaign,'campaignId')}}/negkeyword" >Negative keywords</a>
                 </li>
 
                 <li class="active">
-                    <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/targetproduct" >Targeting products</a>
+                    <a href="/adv/campaign/{{$profile_id}}/{{$ad_type}}/{{array_get($campaign,'campaignId')}}/targetproduct" >Targeting products</a>
                 </li>
 
                 <li >
-                    <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/negproduct" >Negative products</a>
+                    <a href="/adv/campaign/{{$profile_id}}/{{$ad_type}}/{{array_get($campaign,'campaignId')}}/negproduct" >Negative products</a>
                 </li>
             </ul>
             <div class="tab-content">
@@ -57,8 +57,8 @@
                         <div class="row">
                         <input type="hidden" name="profile_id" value="{{$profile_id}}">
                         <input type="hidden" name="ad_type" value="{{$ad_type}}">
-                        <input type="hidden" name="campaign_id" value="{{array_get($adgroup,'campaignId')}}">
-                        <input type="hidden" name="adgroup_id" value="{{array_get($adgroup,'adGroupId')}}">
+                        <input type="hidden" name="campaign_id" value="{{array_get($campaign,'campaignId')}}">
+                        <input type="hidden" name="adgroup_id" value="{{array_get($campaign,'adGroupId')}}">
                         <div class="col-md-2">
                         <select class="form-control" name="stateFilter" id="stateFilter" >
                             <option value="" >All Status</option>
@@ -134,7 +134,7 @@
                     <div class="caption font-dark col-md-12">
 
                         <div class="btn-group" style="float:right;">
-                            <button class="btn green dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="true"> Create Keywords
+                            <button class="btn green dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="true"> Create
                             </button>
                         </div>
 
@@ -376,9 +376,13 @@
                             },
                             success: function (response) { 
                                 var obj = JSON.parse(response);
-                                $.each(obj.response,function(index,value){
-                                    toastr.success(value.code);
-                                });
+                                if(obj.success==1){
+                                    $.each(obj.response,function(index,value){
+                                        toastr.success(value.code);
+                                    });
+                                }else{
+                                    toastr.error(obj.response);
+                                }
                             }, 
                             error: function (response) { 
                                 return 'remote error'; 

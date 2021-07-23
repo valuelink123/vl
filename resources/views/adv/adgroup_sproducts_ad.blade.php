@@ -58,7 +58,7 @@
                         <input type="hidden" name="profile_id" value="{{$profile_id}}">
                         <input type="hidden" name="ad_type" value="{{$ad_type}}">
                         <input type="hidden" name="campaign_id" value="{{array_get($adgroup,'campaignId')}}">
-                        <input type="hidden" name="group_id" value="{{array_get($adgroup,'adGroupId')}}">
+                        <input type="hidden" name="adgroup_id" value="{{array_get($adgroup,'adGroupId')}}">
                         <div class="col-md-2">
                         <select class="form-control" name="stateFilter" id="stateFilter" >
                             <option value="" >All Status</option>
@@ -209,7 +209,7 @@
             grid.setAjaxParam("stateFilter", $("select[name='stateFilter']").val());
             grid.setAjaxParam("ad_type", $("input[name='ad_type']").val());
             grid.setAjaxParam("campaign_id", $("input[name='campaign_id']").val());
-            grid.setAjaxParam("group_id", $("input[name='group_id']").val());
+            grid.setAjaxParam("adgroup_id", $("input[name='adgroup_id']").val());
             grid.setAjaxParam("name", $("input[name='name']").val());
             grid.setAjaxParam("start_date", $("input[name='start_date']").val());
             grid.setAjaxParam("end_date", $("input[name='end_date']").val());
@@ -235,8 +235,7 @@
                     "ajax": {
                         "url": "{{ url('adv/listAds')}}",
                     },
-                    scrollY:        380,
-                    scrollX:        true,
+
 					
                     //"scrollX": true,
                     //"autoWidth":true

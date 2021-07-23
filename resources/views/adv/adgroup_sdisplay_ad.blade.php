@@ -32,22 +32,15 @@
                 <li >
                     <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/setting"> Setting</a>
                 </li>
-                <li>
+                <li class="active">
                     <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/ad" >Ads</a>
                 </li>
-                <li >
-                    <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/targetkeyword" >Targeting keywords</a>
-                </li>
                 <li>
-                    <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/negkeyword" >Negative keywords</a>
-                </li>
-
-                <li class="active">
-                    <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/targetproduct" >Targeting products</a>
+                    <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/targetproduct" >Targeting</a>
                 </li>
 
                 <li >
-                    <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/negproduct" >Negative products</a>
+                    <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/negproduct" >Negative Targeting</a>
                 </li>
             </ul>
             <div class="tab-content">
@@ -134,7 +127,7 @@
                     <div class="caption font-dark col-md-12">
 
                         <div class="btn-group" style="float:right;">
-                            <button class="btn green dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="true"> Create Keywords
+                            <button class="btn green dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="true"> Create Products
                             </button>
                         </div>
 
@@ -166,13 +159,9 @@
                                     <th>
                                         <input type="checkbox" class="group-checkable" data-set="#datatable_ajax .checkboxes" />
                                     </th>
-                                    <th>Status</th>
-									<th>Value</th>
-                                    <th>Match Type</th>
-                                    <th>Type</th>
-									<th>Serving Status</th>
-                                    <th>Suggested Bid</th>
-                                    <th>Bid</th>
+									<th>Asin</th>
+                                    <th>Seller Sku</th>
+									<th>Status</th>
 									<th>Impressions</th>
 									<th>Clicks</th>
 									<th>CTR</th>
@@ -194,7 +183,6 @@
         </div>
     </div>
 </div>
-<script src="/assets/global/plugins/bootstrap-editable/bootstrap-editable/js/bootstrap-editable.js" type="text/javascript"></script>
 
 <script>
         var TableDatatablesAjax = function () {
@@ -238,8 +226,10 @@
                     ],
                     "pageLength": 300,
                     "ajax": {
-                        "url": "{{ url('adv/listProducts')}}",
+                        "url": "{{ url('adv/listAds')}}",
                     },
+
+					
                     //"scrollX": true,
                     //"autoWidth":true
                     /*
@@ -359,31 +349,6 @@
                             series : chartY
                         };
                         lineChart.setOption(option);
-                        $('.ajax_bid').editable({
-                            type: 'text',
-                            url: '/adv/updateBid',
-                            params:{
-                                'action':'product_targeting',
-                                'method':'updateTargetingClauses',
-                                'pk_type':'targetId',
-                                'profile_id':$("input[name='profile_id']").val(),
-                                'ad_type':$("input[name='ad_type']").val(),
-                            },
-                            validate: function (value) {
-                                if (isNaN(value)) {
-                                    return 'Must be a number';
-                                }
-                            },
-                            success: function (response) { 
-                                var obj = JSON.parse(response);
-                                $.each(obj.response,function(index,value){
-                                    toastr.success(value.code);
-                                });
-                            }, 
-                            error: function (response) { 
-                                return 'remote error'; 
-                            }
-                        });
                     },
                  }
             });
@@ -395,9 +360,9 @@
                 var confirmStatus = $("#confirmStatus", $("#table-actions-wrapper"));
                 var profile_id = $("input[name='profile_id']").val();
                 var ad_type = $("input[name='ad_type']").val();
-                var id_type = 'targetId';
-                var action = 'product_targeting';
-                var method = 'updateTargetingClauses';
+                var id_type = 'adId';
+                var action = 'product_ads';
+                var method = 'updateProductAds';
                 if (confirmStatus.val() != "" && grid.getSelectedRowsCount() > 0) {
                     $.ajaxSetup({
                         headers: { 'X-CSRF-TOKEN' : '{{ csrf_token() }}' }

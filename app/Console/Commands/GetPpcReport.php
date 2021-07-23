@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Models\PpcReport;
+use App\Models\PpcProfile;
 use App\Models\PpcReportData;
 use App\Classes\PpcRequest;
 use DB;
@@ -43,7 +44,7 @@ class GetPpcReport extends Command
      */
     public function handle()
     {
-        $profileId = 2418689521697830; //$this->option('profileId');
+        $profileId = $this->option('profileId');
         $tasks = PpcReport::where('status','IN_PROGRESS');
         if($profileId) $tasks = $tasks->where('profile_id',$profileId);
         $tasks = $tasks->get();
@@ -51,7 +52,6 @@ class GetPpcReport extends Command
             DB::beginTransaction();
 		    try{
                 $client = new PpcRequest($task->profile_id);
-                $client->refreshToken();
                 $app = $client->request($task->ad_type); 
                 $result = $app->report->getReport($task->report_id);
                 if(array_get($result,'success')!=1) continue;
@@ -79,7 +79,7 @@ class GetPpcReport extends Command
                     unset($data[unCamelize($recordType.'Id')]);
                     PpcReportData::updateOrCreate(
                         [
-                            'profile_id'=>$profileId,
+                            'profile_id'=>$task->profile_id,
                             'ad_type'=>$task->ad_type,
                             'record_type'=>$recordType,
                             'record_type_id'=>$recordTypeId,
@@ -91,6 +91,7 @@ class GetPpcReport extends Command
                 $task->save();
                 DB::commit();
             }catch (\Exception $e) { 
+                print_r($e->getMessage());
                 DB::rollBack();
             } 
         }

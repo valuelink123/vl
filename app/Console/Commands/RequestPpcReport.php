@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use App\Classes\PpcRequest;
 use App\Models\PpcReport;
+use App\Models\PpcProfile;
 use DB;
 use Log;
 
@@ -42,12 +43,10 @@ class RequestPpcReport extends Command
      */
     public function handle()
     {
-        $profileId = 2418689521697830; //$this->option('profileId');
-        $date = '2021-07-03'; //$this->option('date');
+        $profileId = $this->option('profileId');
+        $date = $this->option('date');
         if(!$date) $date = date('Y-m-d',strtotime('-20 hours'));
-        $client = new PpcRequest($profileId);
-        $client->refreshToken();
-        $metrics = 'impressions,clicks,cost,attributedConversions1d,attributedConversions1dSameSKU,attributedUnitsOrdered1d,attributedSales1d,attributedSales1dSameSKU,attributedUnitsOrdered1dSameSKU';
+        $metrics = 'attributedUnitsOrdered1dSameSKU';
         $adTypes = [
             'SProducts'=>[
                 'campaigns'=>[
@@ -161,28 +160,35 @@ class RequestPpcReport extends Command
                 ],
             ]
         ];
-        foreach($adTypes as $adType=>$recordTypes){
-            $app = $client->request($adType); 
-            foreach($recordTypes as $recordType => $datas){
-                foreach($datas as $data){
-                    $result = $app->report->requestReport(
-                        $recordType,
-                        array_merge($data,['reportDate'=>date('Ymd',strtotime($date))])
-                    );
-                    if(array_get($result,'success')==1){
-                        PpcReport::create(
-                            [
-                                'profile_id'=>$profileId,
-                                'report_id'=>array_get($result,'response.reportId'),
-                                'report_date'=>$date,
-                                'record_type'=>array_get($result,'response.recordType'),
-                                'ad_type'=>$adType,
-                                'status'=>array_get($result,'response.status'),
-                            ]
+        $profiles = PpcProfile::whereNotNull('refresh_token');
+        if($profileId) $profiles = $profiles->where('profile_id',$profileId);
+        $profiles = $profiles->get();
+        foreach($profiles as $profile){
+            $profileId = $profile->profile_id;
+            $client = new PpcRequest($profileId);
+            foreach($adTypes as $adType=>$recordTypes){
+                $app = $client->request($adType); 
+                foreach($recordTypes as $recordType => $datas){
+                    foreach($datas as $data){
+                        $result = $app->report->requestReport(
+                            $recordType,
+                            array_merge($data,['reportDate'=>date('Ymd',strtotime($date))])
                         );
+                        if(array_get($result,'success')==1){
+                            PpcReport::create(
+                                [
+                                    'profile_id'=>$profileId,
+                                    'report_id'=>array_get($result,'response.reportId'),
+                                    'report_date'=>$date,
+                                    'record_type'=>array_get($result,'response.recordType'),
+                                    'ad_type'=>$adType,
+                                    'status'=>array_get($result,'response.status'),
+                                ]
+                            );
+                        }
                     }
+                    
                 }
-                
             }
         }
 	}

@@ -35,19 +35,12 @@
                 <li>
                     <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/ad" >Ads</a>
                 </li>
-                <li >
-                    <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/targetkeyword" >Targeting keywords</a>
-                </li>
-                <li>
-                    <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/negkeyword" >Negative keywords</a>
-                </li>
-
                 <li class="active">
-                    <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/targetproduct" >Targeting products</a>
+                    <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/targetproduct" >Targeting</a>
                 </li>
 
                 <li >
-                    <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/negproduct" >Negative products</a>
+                    <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/negproduct" >Negative Targeting</a>
                 </li>
             </ul>
             <div class="tab-content">
@@ -363,7 +356,7 @@
                             type: 'text',
                             url: '/adv/updateBid',
                             params:{
-                                'action':'product_targeting',
+                                'action':'targeting',
                                 'method':'updateTargetingClauses',
                                 'pk_type':'targetId',
                                 'profile_id':$("input[name='profile_id']").val(),
@@ -396,7 +389,7 @@
                 var profile_id = $("input[name='profile_id']").val();
                 var ad_type = $("input[name='ad_type']").val();
                 var id_type = 'targetId';
-                var action = 'product_targeting';
+                var action = 'targeting';
                 var method = 'updateTargetingClauses';
                 if (confirmStatus.val() != "" && grid.getSelectedRowsCount() > 0) {
                     $.ajaxSetup({

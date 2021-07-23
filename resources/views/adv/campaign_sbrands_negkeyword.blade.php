@@ -20,7 +20,7 @@
         padding: 10px 0;
     }
 </style>
-<h1 class="page-title font-red-intense"> Campaign - {{array_get($campaign,'name')}}
+<h1 class="page-title font-red-intense"> Campaigns - {{array_get($campaign,'name')}}
 </h1>
 <div class="row">
     <div class="col-md-12">
@@ -33,11 +33,19 @@
                     <a href="/adv/campaign/{{$profile_id}}/{{$ad_type}}/{{array_get($campaign,'campaignId')}}/setting"> Setting</a>
                 </li>
                 <li >
-                    <a href="/adv/campaign/{{$profile_id}}/{{$ad_type}}/{{array_get($campaign,'campaignId')}}/adgroup" >Ad Groups</a>
+                    <a href="/adv/campaign/{{$profile_id}}/{{$ad_type}}/{{array_get($campaign,'campaignId')}}/creative" >Creative</a>
+                </li>
+                <li >
+                    <a href="/adv/campaign/{{$profile_id}}/{{$ad_type}}/{{array_get($campaign,'campaignId')}}/targetkeyword" >Targeting keywords</a>
                 </li>
                 <li class="active">
                     <a href="/adv/campaign/{{$profile_id}}/{{$ad_type}}/{{array_get($campaign,'campaignId')}}/negkeyword" >Negative keywords</a>
                 </li>
+
+                <li>
+                    <a href="/adv/campaign/{{$profile_id}}/{{$ad_type}}/{{array_get($campaign,'campaignId')}}/targetproduct" >Targeting products</a>
+                </li>
+
                 <li >
                     <a href="/adv/campaign/{{$profile_id}}/{{$ad_type}}/{{array_get($campaign,'campaignId')}}/negproduct" >Negative products</a>
                 </li>
@@ -50,6 +58,7 @@
                         <input type="hidden" name="profile_id" value="{{$profile_id}}">
                         <input type="hidden" name="ad_type" value="{{$ad_type}}">
                         <input type="hidden" name="campaign_id" value="{{array_get($campaign,'campaignId')}}">
+                        <input type="hidden" name="adgroup_id" value="{{array_get($campaign,'adGroupId')}}">
                         <div class="col-md-2">
                         <input type="text" class="form-control" name="name" placeholder="keyword">
                         </div>
@@ -64,7 +73,7 @@
                 <div class="portlet-title">
                     <div class="caption font-dark col-md-12">
                         <div class="btn-group" style="float:right;">
-                            <button class="btn green dropdown-toggle" type="button" data-toggle="modal" href="#negkeywordform"> Create
+                            <button class="btn green dropdown-toggle" type="button" data-toggle="modal" href="#negkeywordform"> Create Negative keywords
                             </button>
                             
                         </div>
@@ -74,7 +83,7 @@
                             <div class="table-actions-wrapper" id="table-actions-wrapper">
                                 <select id="confirmStatus" class="table-group-action-input form-control input-inline">
                                     <option value="">Select Status</option>
-                                    <option value="deleted" >Deleted</option>
+                                    <option value="archived" >archived</option>
                                 </select>
                                 <button class="btn  green table-status-action-submit">
                                     <i class="fa fa-check"></i> Batch Update
@@ -139,8 +148,9 @@
                 <input type="hidden" name="profile_id" value="{{$profile_id}}">
                 <input type="hidden" name="ad_type" value="{{$ad_type}}">
                 <input type="hidden" name="campaignId" value="{{array_get($campaign,'campaignId')}}">
+                <input type="hidden" name="adGroupId" value="{{array_get($campaign,'adGroupId')}}">
                 <input type="hidden" name="action" value="keywords">
-                <input type="hidden" name="method" value="createCampaignNegativeKeywords">
+                <input type="hidden" name="method" value="createNegativeKeywords">
             </div>
         </div>
         <!-- /.modal-content -->
@@ -165,9 +175,10 @@
             grid.setAjaxParam("profile_id", $("input[name='profile_id']").val());
             grid.setAjaxParam("ad_type", $("input[name='ad_type']").val());
             grid.setAjaxParam("campaign_id", $("input[name='campaign_id']").val());
+            grid.setAjaxParam("adgroup_id", $("input[name='adgroup_id']").val());
             grid.setAjaxParam("name", $("input[name='name']").val());
             grid.setAjaxParam("action", "keywords");
-            grid.setAjaxParam("method", "listCampaignNegativeKeywords");
+            grid.setAjaxParam("method", "listNegativeKeywords");
             grid.init({
                 src: $("#datatable_ajax"),
                 onSuccess: function (grid, response) {
@@ -190,7 +201,7 @@
                     "ajax": {
                         "url": "{{ url('adv/listNegkeywords')}}",
                     },
-
+					
                     //"scrollX": true,
                     //"autoWidth":true
                     /*
@@ -219,7 +230,7 @@
                 var ad_type = $("input[name='ad_type']").val();
                 var id_type = 'keywordId';
                 var action = 'keywords';
-                var method = 'updateCampaignNegativeKeywords';
+                var method = 'updateNegativeKeywords';
                 if (confirmStatus.val() != "" && grid.getSelectedRowsCount() > 0) {
                     $.ajaxSetup({
                         headers: { 'X-CSRF-TOKEN' : '{{ csrf_token() }}' }

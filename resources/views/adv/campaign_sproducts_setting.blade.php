@@ -164,10 +164,10 @@ $(function() {
 			url: "{{ url('/adv/updateCampaign') }}",
 			data: $('#update_form').serialize(),
 			success: function (data) {
-				if(data.code=='207'){
-                    toastr.success('Update Success');
+				if(data.code=='SUCCESS'){
+                    toastr.success(data.code);
 				}else{
-					toastr.error('Update Failed');
+					toastr.error(data.description);
 				}
 			},
 			error: function(data) {

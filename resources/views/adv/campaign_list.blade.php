@@ -27,7 +27,7 @@
 						<div class="col-md-2">
 						<select class="form-control" name="profile_id" id="profile_id" >
                             @foreach ($profiles as $k=>$v)
-                                <option value="{{$v->profile_id}}" >{{$v->account_id}}</option>
+                                <option value="{{$v->profile_id}}" >{{$v->account_name}}</option>
                             @endforeach
                         </select>
 						</div>
@@ -106,7 +106,7 @@
                     <div class="caption font-dark col-md-12">
 
                         <div class="btn-group" style="float:right;">
-                            <button class="btn green dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="true"> Create Campaign
+                            <button class="btn green dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="true"> Create
                                 <i class="fa fa-angle-down"></i>
                             </button>
                             <ul class="dropdown-menu" role="menu">
@@ -115,11 +115,11 @@
                                 </li>
                                 <li class="divider"> </li>
                                 <li>
-                                    <a href="/adv/displayCreate"> Sponsored Display </a>
+                                    <a href="#"> Sponsored Display </a>
                                 </li>
                                 <li class="divider"> </li>
                                 <li>
-                                    <a href="/adv/brandsCreate"> Sponsored Brands </a>
+                                    <a href="#"> Sponsored Brands </a>
                                 </li>
                                 
                             </ul>
@@ -157,7 +157,6 @@
 									<th>Campaign</th>
                                     <th>Serving Status</th>
 									<th>Type</th>
-									<th>Portfolio</th>
                                     <th>Bidding Strategy</th>
                                     <th>Start Date</th>
 									<th>End Date</th>
@@ -183,6 +182,7 @@
         </div>
     </div>
 
+    <script src="/assets/global/plugins/bootstrap-editable/bootstrap-editable/js/bootstrap-editable.js" type="text/javascript"></script>
 
     <script>
         var TableDatatablesAjax = function () {
@@ -226,8 +226,7 @@
                     "ajax": {
                         "url": "{{ url('adv/listCampaigns')}}",
                     },
-                    scrollY:        380,
-                    scrollX:        true,
+
 					
                     //"scrollX": true,
                     //"autoWidth":true
@@ -348,6 +347,35 @@
                             series : chartY
                         };
                         lineChart.setOption(option);
+                        $('.ajax_bid').editable({
+                            type: 'text',
+                            url: '/adv/updateBid',
+                            params:{
+                                'action':'campaigns',
+                                'method':'updateCampaigns',
+                                'pk_type':'campaignId',
+                                'profile_id':$("select[name='profile_id']").val(),
+                                'ad_type':$("input[name='ad_type']").val(),
+                            },
+                            validate: function (value) {
+                                if (isNaN(value)) {
+                                    return 'Must be a number';
+                                }
+                            },
+                            success: function (response) { 
+                                var obj = JSON.parse(response);
+                                if(obj.success==1){
+                                    $.each(obj.response,function(index,value){
+                                        toastr.success(value.code);
+                                    });
+                                }else{
+                                    toastr.error(obj.response);
+                                }
+                            }, 
+                            error: function (response) { 
+                                return 'remote error'; 
+                            }
+                        });
                     },
                  }
             });

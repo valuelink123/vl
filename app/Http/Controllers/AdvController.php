@@ -26,7 +26,8 @@ class AdvController extends Controller
 
     public function index()
     {
-        $profiles = PpcProfile::whereIn('account_id',[15373,14765])->get();
+        if(!Auth::user()->can(['adv-show'])) die('Permission denied -- adv-show');
+        $profiles = PpcProfile::get();
         return view('adv/campaign_list',['profiles'=>$profiles]);
     }
 
@@ -58,7 +59,6 @@ class AdvController extends Controller
         $end_date = $request->get('end_date');
         $name = $request->get('name');            
         $client = new PpcRequest($profile_id);
-        $client->refreshToken();
         foreach(PpcProfile::AD_TYPE as $k=>$v){
             $params = [];
             if($request->get('stateFilter')) $params['stateFilter'] = $request->get('stateFilter');
@@ -115,11 +115,10 @@ class AdvController extends Controller
                 '<a href="/adv/campaign/'.$profile_id.'/'.(array_get($datas,$i.'.campaignType')?'SProducts':(array_get($datas,$i.'.adFormat')?'SBrands':'SDisplay')).'/'.array_get($datas,$i.'.campaignId').'/setting">'.array_get($datas,$i.'.name').'</a>',
                 array_get($datas,$i.'.servingStatus'),
                 (array_get($datas,$i.'.campaignType')??(array_get($datas,$i.'.adFormat')?'Sponsored Brands':'Sponsored Display')).' - '.(array_get($datas,$i.'.targetingType')??'manual'),
-                '-',
                 array_get(PpcProfile::BIDDING,array_get($datas,$i.'.bidding.strategy','legacyForSales')),
                 date('Y-m-d',strtotime(array_get($datas,$i.'.startDate'))),
                 array_get($datas,$i.'.endDate')?date('Y-m-d',strtotime(array_get($datas,$i.'.endDate'))):'',
-                (array_get($datas,$i.'.dailyBudget')??array_get($datas,$i.'.budget')).' - '.(array_get($datas,$i.'.budgetType')??'daily'),
+                '<button type="button" class="ajax_bid btn default" data-pk="'.(array_get($datas,$i.'.dailyBudget')?'dailyBudget':'budget').'" id="'.(array_get($datas,$i.'.campaignType')?'SProducts':(array_get($datas,$i.'.adFormat')?'SBrands':'SDisplay')).'-'.array_get($datas,$i.'.campaignId').'">'.((array_get($datas,$i.'.dailyBudget')??array_get($datas,$i.'.budget'))).'</button>'.(array_get($datas,$i.'.budgetType')??'daily'),
                 (array_get($reportData,array_get($datas,$i.'.campaignId').'.impressions')>0)?array_get($reportData,array_get($datas,$i.'.campaignId').'.impressions'):'-',
                 (array_get($reportData,array_get($datas,$i.'.campaignId').'.clicks')>0)?array_get($reportData,array_get($datas,$i.'.campaignId').'.clicks'):'-',
                 (array_get($reportData,array_get($datas,$i.'.campaignId').'.ctr')>0)?((array_get($reportData,array_get($datas,$i.'.campaignId').'.ctr')*100).'%'):'-',
@@ -154,12 +153,15 @@ class AdvController extends Controller
                 ];
             }
             $client = new PpcRequest($profile_id);
-            $client->refreshToken();
             foreach($datas as $k=>$data){
                 $app = $client->request($k);
                 $results = $app->campaigns->updateCampaigns($data);
-                foreach(array_get($results,'response') as $result){
-                    $customActionMessage.=$result['campaignId'].' - '.$result['code'].'<BR>';
+                if(array_get($results,'success') == 1){
+                    foreach(array_get($results,'response') as $result){
+                        $customActionMessage.=array_get($result,'campaignId').' - '.array_get($result,'code').'<BR>';
+                    }
+                }else{
+                    throw new \Exception(array_get($results,'response'));
                 }
             }
             $records["customActionStatus"] = 'OK';
@@ -175,11 +177,15 @@ class AdvController extends Controller
     public function editCampaign(Request $request,$profile_id,$ad_type,$campaign_id,$tab)
     {
         $client = new PpcRequest($profile_id);
-        $client->refreshToken();
         $app = $client->request($ad_type);
         $result = $app->campaigns->getCampaignEx($campaign_id);
+        $campaign = [];
         if(array_get($result,'success')==1){
             $campaign =array_get($result,'response');
+            if($ad_type=='SBrands'){
+                $result = $app->groups->listAdGroups(['campaignIdFilter'=>$campaign_id]);
+                $campaign['adGroupId'] = array_get($result,'response.0.adGroupId');
+            }
         }
         return view('adv/campaign_'.strtolower($ad_type).'_'.$tab,['profile_id'=>$profile_id,'ad_type'=>$ad_type,'campaign'=>$campaign]); 
     }
@@ -190,7 +196,6 @@ class AdvController extends Controller
         $ad_type = $request->get('ad_type');
         $campaign_id = $request->get('campaign_id');
         $client = new PpcRequest($profile_id);
-        $client->refreshToken();
         $app = $client->request($ad_type);
         
         $data = [
@@ -201,7 +206,7 @@ class AdvController extends Controller
             'endDate' => ($request->get('endDate')?date('Ymd',strtotime($request->get('endDate'))):NULL),
         ];
         if($request->has('dailyBudget')) $data['dailyBudget'] = $request->get('dailyBudget');
-        if($request->has('budget')) $data['budget'] = $request->get('budget');
+        if($request->has('budget')) $data['budget'] = round($request->get('budget'),2);
         if($request->has('bidOptimization')) $data['bidOptimization'] = $request->get('bidOptimization');
         if($request->has('bidMultiplier')) $data['bidMultiplier'] = intval($request->get('budget'));
         if($request->has('strategy')){
@@ -219,14 +224,43 @@ class AdvController extends Controller
                 ],
             ];
         }
-
         $result = $app->campaigns->updateCampaigns([$data]);
-        echo json_encode($result);
+        if(array_get($result,'success')==1){
+            echo json_encode(array_get($result,'response.0'));
+        }else{
+            echo json_encode([
+                'code'=>array_get($result,'code'),
+                'description'=>array_get($result,'response')
+            ]);
+        }
 
     }
 
 
     
+    public function updateBid(Request $request){
+        $profile_id = $request->get('profile_id');
+        $action = $request->get('action');
+        $method = $request->get('method');
+        $pk_type = $request->get('pk_type');
+        $pk = $request->get('pk');
+        $name = $request->get('name');
+        $value = $request->get('value');
+        $ad_type = $request->get('ad_type');
+        if(!$ad_type){
+            $tmp = explode('-',$name);
+            $ad_type = array_get($tmp,'0');
+            $name = array_get($tmp,'1');
+        }
+        $datas[]=[
+            $pk_type=>$name,
+            $pk=>$value,
+        ];
+        $client = new PpcRequest($profile_id);
+        $app = $client->request($ad_type);
+        $result = $app->$action->$method($datas);
+        echo json_encode($result);   
+    }
 
     public function batchUpdate(Request $request){
         $status = $request->get('confirmStatus');
@@ -240,19 +274,25 @@ class AdvController extends Controller
             $customActionMessage="";
             $datas=[];
             foreach($ids as $id){
-                $datas[]=[
+                $data = [
                     $id_type=>$id,
                     'state'=>$status,
                 ];
+                if($request->get('campaign_id')) $data['campaignId']=$request->get('campaign_id');
+                if($request->get('adgroup_id')) $data['adGroupId']=$request->get('adgroup_id');
+                $datas[]=$data;
             }
             $client = new PpcRequest($profile_id);
-            $client->refreshToken();
             $app = $client->request($ad_type);
             $results = $app->$action->$method($datas);
-            foreach(array_get($results,'response') as $result){
-                $customActionMessage.=$id_type.'-'.$result[$id_type].' '.$result['code'].'<BR>';
+            if(array_get($results,'success') == 1){
+                foreach(array_get($results,'response') as $result){
+                    $customActionMessage.=$id_type.'-'.$result[$id_type].' '.$result['code'].'<BR>';
+                }
+            }else{
+                throw new \Exception(array_get($results,'response'));
             }
-            
+
             $records["customActionStatus"] = 'OK';
             $records["customActionMessage"] = $customActionMessage;     
         }catch (\Exception $e) { 
@@ -270,7 +310,6 @@ class AdvController extends Controller
         $action = $request->get('action');
         $method = $request->get('method');        
         $client = new PpcRequest($profile_id);
-        $client->refreshToken();
         $params['stateFilter'] = 'enabled';
         if($request->get('campaign_id')) $params['campaignIdFilter'] = $request->get('campaign_id');
         if($request->get('adgroup_id')) $params['adGroupIdFilter'] = $request->get('adgroup_id');
@@ -323,23 +362,26 @@ class AdvController extends Controller
             $customActionMessage="";
             $datas=[];
             $keywords = explode(PHP_EOL, $keyword_text);
+            if($campaignId) $data['campaignId'] = $campaignId;
+            if($adGroupId) $data['adGroupId'] = $adGroupId;
             foreach($keywords as $keyword){
-                $data = [
-                    'campaignId'=>$campaignId,
-                    'state'=>'enabled',
-                    'keywordText'=>$keyword,
-                    'matchType'=>$match_type
-                ];
-                if($adGroupId) $data['adGroupId'] = $adGroupId;
+                $data['state'] = 'enabled';
+                $data['keywordText'] = $keyword;
+                $data['matchType'] = $match_type;
                 $datas[]=$data;
             }
             $client = new PpcRequest($profile_id);
-            $client->refreshToken();
             $app = $client->request($ad_type);
             $results = $app->$action->$method($datas);
-            foreach(array_get($results,'response') as $result){
-                $customActionMessage.=$result['keywordId'].' - '.$result['code'].'<BR>';
+
+            if(array_get($results,'success') == 1){
+                foreach(array_get($results,'response') as $result){
+                    $customActionMessage.=$result['keywordId'].' - '.$result['code'].'<BR>';
+                }
+            }else{
+                throw new \Exception(array_get($results,'response'));
             }
+
             $records["customActionStatus"] = 'OK';
             $records["customActionMessage"] = $customActionMessage;     
         }catch (\Exception $e) { 
@@ -358,15 +400,39 @@ class AdvController extends Controller
         $action = $request->get('action');
         $method = $request->get('method');      
         $client = new PpcRequest($profile_id);
-        $client->refreshToken();
         $params['stateFilter'] = 'enabled';
         if($request->get('campaign_id')) $params['campaignIdFilter'] = $request->get('campaign_id');
         if($request->get('adgroup_id')) $params['adGroupIdFilter'] = $request->get('adgroup_id');
         //if($name) $params['name'] = $name;
+        
         $app = $client->request($request->get('ad_type'));
+
+        if($request->get('ad_type') == 'SBrands'){
+            $params = [];
+            $params = [
+                'nextToken'=>'',
+                'maxResults'=>5000,
+                'filters'=>[
+                    [
+                        'filterType'=>'TARGETING_STATE',
+                        'values'=>['enabled'],
+                    ],
+                    [
+                        'filterType'=>'CAMPAIGN_ID',
+                        'values'=>[$request->get('campaign_id')],
+                    ],
+                    [
+                        'filterType'=>'AD_GROUP_ID',
+                        'values'=>[$request->get('adgroup_id')],
+                    ]
+                ]
+             ];
+        }
+
         $result = $app->$action->$method($params);
         if(array_get($result,'success')==1){
             $datas = array_get($result,'response');
+            if($request->get('ad_type') == 'SBrands') $datas = array_get($result,'response.negativeTargets');
         }
         $tmp=[];
         if($name){
@@ -425,7 +491,6 @@ class AdvController extends Controller
             $keywords = explode(PHP_EOL, $keyword_text);
             foreach($keywords as $keyword){
                 $data = [
-                    'campaignId'=>$campaignId,
                     'state'=>'enabled',
                     'expression'=>[
                         [
@@ -435,16 +500,30 @@ class AdvController extends Controller
                     ],
                     'expressionType'=>'manual',
                 ];
+                if($campaignId) $data['campaignId'] = $campaignId;
                 if($adGroupId) $data['adGroupId'] = $adGroupId;
-                $datas[]=$data;
+
+                if($request->get('ad_type') == 'SBrands'){
+                    unset($data['state']);
+                    unset($data['expressionType']);
+                    $datas['negativeTargets'][]=$data;
+                }else{
+                    $datas[]=$data;
+                }   
             }
             $client = new PpcRequest($profile_id);
-            $client->refreshToken();
             $app = $client->request($ad_type);
             $results = $app->$action->$method($datas);
-            foreach(array_get($results,'response') as $result){
-                $customActionMessage.=$result['targetId'].' - '.$result['code'].'<BR>';
+
+
+            if(array_get($results,'success') == 1){
+                foreach(array_get($results,'response') as $result){
+                    $customActionMessage.=array_get($result,'code').' '.array_get($result,'description').'<BR>';
+                }
+            }else{
+                throw new \Exception(array_get($results,'response'));
             }
+        
             $records["customActionStatus"] = 'OK';
             $records["customActionMessage"] = $customActionMessage;     
         }catch (\Exception $e) { 
@@ -462,7 +541,6 @@ class AdvController extends Controller
         $end_date = $request->get('end_date');
         $name = $request->get('name');            
         $client = new PpcRequest($profile_id);
-        $client->refreshToken();
         $params = [];
         if($request->get('stateFilter')) $params['stateFilter'] = $request->get('stateFilter');
         if($request->get('campaign_id')) $params['campaignIdFilter'] = $request->get('campaign_id');
@@ -525,7 +603,7 @@ class AdvController extends Controller
                 '<a href="/adv/adgroup/'.$profile_id.'/'.$request->get('ad_type').'/'.array_get($datas,$i.'.adGroupId').'/setting">'.array_get($datas,$i.'.name').'</a>',
                 array_get($datas,$i.'.servingStatus'),
                 array_get($suggestedBid,'response.suggestedBid.suggested')?array_get($suggestedBid,'response.suggestedBid.suggested').'<BR>'.array_get($suggestedBid,'response.suggestedBid.rangeStart').' - '.array_get($suggestedBid,'response.suggestedBid.rangeEnd'):'-',
-                (array_get($datas,$i.'.defaultBid')??array_get($datas,$i.'.defaultBid')),
+                '<button type="button" class="ajax_bid btn default" data-pk="defaultBid" id="'.array_get($datas,$i.'.adGroupId').'">'.array_get($datas,$i.'.defaultBid').'</button>',
                 (array_get($reportData,array_get($datas,$i.'.adGroupId').'.impressions')>0)?array_get($reportData,array_get($datas,$i.'.adGroupId').'.impressions'):'-',
                 (array_get($reportData,array_get($datas,$i.'.adGroupId').'.clicks')>0)?array_get($reportData,array_get($datas,$i.'.adGroupId').'.clicks'):'-',
                 (array_get($reportData,array_get($datas,$i.'.adGroupId').'.ctr')>0)?((array_get($reportData,array_get($datas,$i.'.adGroupId').'.ctr')*100).'%'):'-',
@@ -549,9 +627,9 @@ class AdvController extends Controller
     public function editAdGroup(Request $request,$profile_id,$ad_type,$adgroup_id,$tab)
     {
         $client = new PpcRequest($profile_id);
-        $client->refreshToken();
         $app = $client->request($ad_type);
         $result = $app->groups->getAdGroupEx($adgroup_id);
+        $adgroup = [];
         if(array_get($result,'success')==1){
             $adgroup =array_get($result,'response');
             if($ad_type=='SProducts') $adgroup['suggestedBid'] = $app->bidding->getAdGroupBidRecommendations($adgroup_id);
@@ -567,7 +645,6 @@ class AdvController extends Controller
         $campaign_id = $request->get('campaign_id');
         $adgroup_id = $request->get('adgroup_id');
         $client = new PpcRequest($profile_id);
-        $client->refreshToken();
         $app = $client->request($ad_type);
         $data = [
             'adGroupId' => $adgroup_id,
@@ -575,10 +652,16 @@ class AdvController extends Controller
             'state' => $request->get('state'),
             'defaultBid' => $request->get('defaultBid'),
         ];
-
         $result = $app->groups->updateAdGroup([$data]);
-        echo json_encode($result);
-
+        if(array_get($result,'success')==1){
+            echo json_encode(array_get($result,'response.0'));
+        }else{
+            echo json_encode([
+                'code'=>array_get($result,'code'),
+                'description'=>array_get($result,'response')
+            ]);
+        }
+        
     }
 
 
@@ -590,7 +673,6 @@ class AdvController extends Controller
         $end_date = $request->get('end_date');
         $name = $request->get('name');            
         $client = new PpcRequest($profile_id);
-        $client->refreshToken();
         $params = [];
         if($request->get('stateFilter')) $params['stateFilter'] = $request->get('stateFilter');
         if($request->get('campaign_id')) $params['campaignIdFilter'] = $request->get('campaign_id');
@@ -621,7 +703,7 @@ class AdvController extends Controller
             $reportData = $this->getReportData(
                 [
                     'profile_id'=>$profile_id,
-                    'record_type'=>'productAd',
+                    'record_type'=>'ad',
                     'start_date'=>$start_date,
                     'end_date'=>$end_date,
                     'group_by'=>'record_type_id',
@@ -632,7 +714,7 @@ class AdvController extends Controller
             $chartData = $this->getReportData(
                 [
                     'profile_id'=>$profile_id,
-                    'record_type'=>'productAd',
+                    'record_type'=>'ad',
                     'start_date'=>$start_date,
                     'end_date'=>$end_date,
                     'group_by'=>'date',
@@ -679,34 +761,72 @@ class AdvController extends Controller
         $end_date = $request->get('end_date');
         $name = $request->get('name');            
         $client = new PpcRequest($profile_id);
-        $client->refreshToken();
-        $params = [];
+        $params = $tmpExpression = [];
         if($request->get('stateFilter')) $params['stateFilter'] = $request->get('stateFilter');
         if($request->get('campaign_id')) $params['campaignIdFilter'] = $request->get('campaign_id');
         if($request->get('adgroup_id')) $params['adGroupIdFilter'] = $request->get('adgroup_id');
         //if($name) $params['name'] = $name;
         $app = $client->request($request->get('ad_type'));
-        $result = $app->keywords->listBiddableKeywords($params);
+        $result = $app->keywords->listBiddableKeywordsEx($params);
+        
         if(array_get($result,'success')==1){
             $datas = array_get($result,'response');
         }
 
+
+        $field = ($request->get('ad_type')=='SProducts')?'keyword':'keywordText';
         if($name){
             $tmp=[];
             foreach($datas as $data){
                 if(strpos($data['keywordText'],$name) !== false){ 
                     $tmp[] = $data;
                     $ids[] = $data['keywordId'];
+                    $tmpExpression[]=[
+                        $field=>array_get($data,'keywordText'),
+                        'matchType'=>array_get($data,'matchType'),
+                    ];
                 }
             }
             $datas = $tmp;
         }else{
             foreach($datas as $data){
-                $ids[] = $data['keywordId']; 
+                $ids[] = $data['keywordId'];
+                $tmpExpression[]=[
+                    $field=>array_get($data,'keywordText'),
+                    'matchType'=>array_get($data,'matchType'),
+                ];
             }
         }
         $iTotalRecords = count($datas);
         if($iTotalRecords>0) {
+            $suggestedBid = [];
+
+            if($request->get('ad_type')=='SProducts'){
+                
+                $re['adGroupId'] =  $request->get('adgroup_id');
+                $re['keywords'] =  $tmpExpression;
+                $results = $app->bidding->getKeywordsBidRecommendations($re);
+                if(!empty(array_get($results,'response.recommendations'))){
+                    foreach(array_get($results,'response.recommendations') as $k=>$v){
+                        $suggestedBid[array_get($v,'keyword').array_get($v,'matchType')] = array_get($v,'suggestedBid');
+                    }
+                }
+                
+            }
+
+            if($request->get('ad_type')=='SBrands'){
+                $re['campaignId'] =  $request->get('campaign_id');
+                $re['adFormat'] =  $request->get('adFormat');
+                $re['keywords'] =  $tmpExpression;
+                $results = [];
+                //$results = $app->bid->bidRecommendations($re);
+                if(!empty(array_get($results,'response.keywordsBidsRecommendationSuccessResults'))){
+                    foreach(array_get($results,'response.keywordsBidsRecommendationSuccessResults') as $k=>$v){
+                        $suggestedBid[array_get($v,'keyword.keywordText').array_get($v,'keyword.matchType')] = array_get($v,'recommendedBid');
+                        $suggestedBid[array_get($v,'keyword.keywordText').array_get($v,'keyword.matchType')]['suggested'] = array_get($v,'recommendedBid.recommended');
+                    }
+                }
+            }
             $reportData = $this->getReportData(
                 [
                     'profile_id'=>$profile_id,
@@ -735,13 +855,15 @@ class AdvController extends Controller
         $sEcho = intval($_REQUEST['draw']);        
         $records["data"] = array();
 		for($i=$iDisplayStart;$i<=($iTotalRecords-1);$i++){
+            $suggested = array_get($suggestedBid,array_get($datas,$i.'.keywordText').array_get($datas,$i.'.matchType'));
             $records["data"][] = array(
                 '<input name="id[]" type="checkbox" class="checkboxes" value="'.array_get($datas,$i.'.keywordId').'"  />',
-                '<a href="https://www.amazon.com/dp/'.array_get($datas,$i.'.asin').'">'.array_get($datas,$i.'.asin').'</a>',
+                array_get($datas,$i.'.state'),
                 array_get($datas,$i.'.keywordText'),
                 array_get($datas,$i.'.matchType'),
-                array_get($datas,$i.'.state'),
-                array_get($datas,$i.'.bid'),
+                array_get($datas,$i.'.servingStatus'),
+                array_get($suggested,'suggested')?array_get($suggested,'suggested').'<BR>'.array_get($suggested,'rangeStart').' - '.array_get($suggested,'rangeEnd'):'-',
+                '<button type="button" class="ajax_bid btn default" data-pk="bid" id="'.array_get($datas,$i.'.keywordId').'">'.round(array_get($datas,$i.'.bid'),2).'</button>',
                 (array_get($reportData,array_get($datas,$i.'.keywordId').'.impressions')>0)?array_get($reportData,array_get($datas,$i.'.keywordId').'.impressions'):'-',
                 (array_get($reportData,array_get($datas,$i.'.keywordId').'.clicks')>0)?array_get($reportData,array_get($datas,$i.'.keywordId').'.clicks'):'-',
                 (array_get($reportData,array_get($datas,$i.'.keywordId').'.ctr')>0)?((array_get($reportData,array_get($datas,$i.'.keywordId').'.ctr')*100).'%'):'-',
@@ -770,51 +892,132 @@ class AdvController extends Controller
         $end_date = $request->get('end_date');
         $name = $request->get('name');            
         $client = new PpcRequest($profile_id);
-        $client->refreshToken();
         $params = [];
         if($request->get('stateFilter')) $params['stateFilter'] = $request->get('stateFilter');
         if($request->get('campaign_id')) $params['campaignIdFilter'] = $request->get('campaign_id');
         if($request->get('adgroup_id')) $params['adGroupIdFilter'] = $request->get('adgroup_id');
         //if($name) $params['name'] = $name;
         $app = $client->request($request->get('ad_type'));
-        $result = $app->product_targeting->listTargetingClauses($params);
-
+        if($request->get('ad_type')=='SProducts') $result = $app->product_targeting->listTargetingClausesEx($params);
+        if($request->get('ad_type')=='SDisplay') $result = $app->targeting->listTargetingClausesEx($params);
+        if($request->get('ad_type')=='SBrands'){
+            $params = [];
+            $params['nextToken'] ='';
+            $params['maxResults'] = 5000;
+            if($request->get('stateFilter')) $params['filters'][] = ['filterType'=>'TARGETING_STATE','values'=>[$request->get('stateFilter')]];
+            if($request->get('campaign_id')) $params['filters'][] = ['filterType'=>'CAMPAIGN_ID','values'=>[$request->get('campaign_id')]];
+            if($request->get('adgroup_id')) $params['filters'][] = ['filterType'=>'AD_GROUP_ID','values'=>[$request->get('adgroup_id')]];
+            $result = $app->product_targeting->listTargetingClauses($params);
+        }
+        $defaultBid = 0;
         if(array_get($result,'success')==1){
             $datas = array_get($result,'response');
+            if($request->get('ad_type')=='SBrands') $datas = array_get($datas,'targets');
         }
-        $tmp=[];
+        $tmp = $tmpExpression = [];
+        if($request->get('ad_type')!='SBrands'){
+            $adgroup = $app->groups->getAdGroupEx($request->get('adgroup_id'));
+            $defaultBid = round(array_get($adgroup,'response.defaultBid'),2);
+        }
+        
+
         if($name){
             foreach($datas as $data){
                 if(strpos($data['expression'][0]['value'],$name) !== false){ 
                     $tmp[]=[
                         'targetId'=>$data['targetId'],
                         'state'=>$data['state'],
-                        'bid'=>$data['bid'],
+                        'bid'=>round(array_get($data,'bid'),2),
                         'type'=>array_get($data,'expression.0.type'),
                         'value'=>array_get($data,'expression.0.value'),
                         'expressionType'=>array_get($data,'expressionType'),
+                        'servingStatus'=>array_get($data,'servingStatus'),
                     ];
+                    if($request->get('ad_type')=='SProducts') $tmpExpression[]=array_get($data,'expression');
+                    if($request->get('ad_type')=='SDisplay'){
+                        $tmpExpression['targetingClauses'][]['targetingClause']=[
+                            'expressionType'=>array_get($data,'expressionType'),
+                            'expression'=>array_get($data,'expression')
+                        ];
+                    }
+                    if($request->get('ad_type')=='SBrands'){
+                        $tmpExpression['targets'][][]=[
+                            'type'=>array_get($data,'expression.0.type'),
+                            'value'=>array_get($data,'expression.0.value')
+                        ];
+                    }
                     $ids[] = $data['targetId']; 
                 }
             }
-            $datas = $tmp;
         }else{
             foreach($datas as $data){
                 $tmp[]=[
                     'targetId'=>$data['targetId'],
                     'state'=>$data['state'],
-                    'bid'=>$data['bid'],
+                    'bid'=>round(array_get($data,'bid'),2),
                     'type'=>array_get($data,'expression.0.type'),
                     'value'=>array_get($data,'expression.0.value'),
                     'expressionType'=>array_get($data,'expressionType'),
-                    
+                    'servingStatus'=>array_get($data,'servingStatus'),
                 ];
+                if($request->get('ad_type')=='SProducts') $tmpExpression[]=array_get($data,'expression');
+                if($request->get('ad_type')=='SDisplay'){
+                    $tmpExpression['targetingClauses'][]['targetingClause']=[
+                        'expressionType'=>array_get($data,'expressionType'),
+                        'expression'=>array_get($data,'expression')
+                    ];
+                }
+                if($request->get('ad_type')=='SBrands'){
+                    $tmpExpression['targets'][][]=[
+                        'type'=>array_get($data,'expression.0.type'),
+                        'value'=>array_get($data,'expression.0.value')
+                    ];
+                }
                 $ids[] = $data['targetId']; 
             }
-            $datas = $tmp;
         }
+        $datas = $tmp;
         $iTotalRecords = count($datas);
         if($iTotalRecords>0) {
+            $suggestedBid = [];
+            if($request->get('ad_type')=='SProducts'){
+                $chunk_result = array_chunk($tmpExpression, 10);
+                foreach($chunk_result as $chunk_value){
+                    $re['adGroupId'] =  $request->get('adgroup_id');
+                    $re['expressions'] =  $chunk_value;
+                    $results = $app->bidding->getBidRecommendations($re);
+                    if(!empty(array_get($results,'response.recommendations'))){
+                        foreach(array_get($results,'response.recommendations') as $k=>$v){
+                            $suggestedBid[array_get($v,'expression.0.type').array_get($v,'expression.0.value')] = array_get($v,'suggestedBid');
+                        }
+                    }
+                }   
+            }
+            if($request->get('ad_type')=='SDisplay'){
+                $result = $app->product_ads->listProductAds([
+                    'campaignIdFilter'=>$request->get('campaign_id'),
+                    'adGroupIdFilter'=>$request->get('adgroup_id'),
+                ]);
+                if(array_get($result,'success')==1){
+                    foreach(array_get($result,'response') as $product){
+                        $tmpExpression['products'][]=['asin'=>$product['asin']];
+                    }
+                }
+                //$results = $app->bid->getBidRecommendations($tmpExpression);
+            }
+
+            if($request->get('ad_type')=='SBrands'){
+                $tmpExpression['adFormat'] =  $request->get('adFormat');
+                $tmpExpression['campaignId'] =  $request->get('campaign_id');
+                $results = $app->bid->bidRecommendations($tmpExpression);
+                if(!empty(array_get($results,'response.targetsBidsRecommendationSuccessResults'))){
+                    foreach(array_get($results,'response.targetsBidsRecommendationSuccessResults') as $k=>$v){
+                        $suggestedBid[array_get($v,'targets.0.type').array_get($v,'targets.0.value')] = array_get($v,'recommendedBid');
+                        $suggestedBid[array_get($v,'targets.0.type').array_get($v,'targets.0.value')]['suggested'] = array_get($v,'recommendedBid.recommended');
+                    }
+                }
+            }
+            
             $reportData = $this->getReportData(
                 [
                     'profile_id'=>$profile_id,
@@ -843,13 +1046,16 @@ class AdvController extends Controller
         $sEcho = intval($_REQUEST['draw']);        
         $records["data"] = array();
 		for($i=$iDisplayStart;$i<=($iTotalRecords-1);$i++){
+            $suggested = array_get($suggestedBid,array_get($datas,$i.'.type').array_get($datas,$i.'.value'));
             $records["data"][] = array(
                 '<input name="id[]" type="checkbox" class="checkboxes" value="'.array_get($datas,$i.'.targetId').'"  />',
+                array_get($datas,$i.'.state'),
                 array_get($datas,$i.'.value'),
                 array_get($datas,$i.'.type'),
                 array_get($datas,$i.'.expressionType'),
-                array_get($datas,$i.'.state'),
-                array_get($datas,$i.'.bid'),
+                array_get($datas,$i.'.servingStatus'),
+                array_get($suggested,'suggested')?array_get($suggested,'suggested').'<BR>'.array_get($suggested,'rangeStart').' - '.array_get($suggested,'rangeEnd'):'-',
+                '<button type="button" class="ajax_bid btn default" data-pk="bid" id="'.array_get($datas,$i.'.targetId').'">'.(array_get($datas,$i.'.bid')>0?array_get($datas,$i.'.bid'):$defaultBid).'</button>',
                 (array_get($reportData,array_get($datas,$i.'.targetId').'.impressions')>0)?array_get($reportData,array_get($datas,$i.'.targetId').'.impressions'):'-',
                 (array_get($reportData,array_get($datas,$i.'.targetId').'.clicks')>0)?array_get($reportData,array_get($datas,$i.'.targetId').'.clicks'):'-',
                 (array_get($reportData,array_get($datas,$i.'.targetId').'.ctr')>0)?((array_get($reportData,array_get($datas,$i.'.targetId').'.ctr')*100).'%'):'-',
@@ -871,27 +1077,13 @@ class AdvController extends Controller
 
     public function createCampaign(Request $request)
     {
-        $profile_id = $request->get('profile_id');
- 
-        $client = new PpcRequest($profile_id);
-        $client->refreshToken();
-        $app = $client->request($request->get('adType'));
-        $params = [];
-        if($request->get('stateFilter')) $params['stateFilter'] = $request->get('stateFilter');
-        if($request->get('name')) $params['name'] = $request->get('name');
-        $result = $app->campaigns->listCampaigns($params);
-        $records = [];
-        if(array_get($result,'success')==1){
-            $records = array_get($result,'response');
-        }
-        echo json_encode($records);
+
     }
 
     public function listPortfolios(Request $request)
     {
         $profile_id = $request->get('profile_id');
         $client = new PpcRequest($profile_id);
-        $client->refreshToken();
         $app = $client->request('BaseService'); 
         $result = $app->portfolios->listPortfoliosEx();
         $records = [];
@@ -900,59 +1092,4 @@ class AdvController extends Controller
         }
         echo json_encode($records);
     }
-
-
-    public function edit(Request $request,$id)
-    {
-        $form =  GiftCard::with('exception')->where('id',$id)->first()->toArray();
-        if(empty($form)) die('不存在!');    
-        return view('giftcard/edit',['form'=>$form]);
-    }
-
-    public function create()
-    {  
-        return view('giftcard/edit',['form'=>[]]);
-    }
-	
-    public function store(Request $request)
-    {
-        DB::beginTransaction();
-        try{ 
-            $id = intval($request->get('id'));
-            $data = $id?(GiftCard::where('status',0)->findOrFail($id)):(new GiftCard);
-            $fileds = array(
-                'bg','bu','code','amount','currency'
-            );
-            foreach($fileds as $filed){
-                $data->{$filed} = $request->get($filed);
-            }
-            $data->user_id = Auth::user()->id;
-            $data->save();
-            DB::commit();
-            $records["customActionStatus"] = 'OK';
-            $records["customActionMessage"] = "更新成功!";
-        }catch (\Exception $e) { 
-            DB::rollBack();
-            $records["customActionStatus"] = '';
-            $records["customActionMessage"] = $e->getMessage();
-        }
-        echo json_encode($records);
-    }
-
-    public function export(Request $request){
-		$arrayData = array();
-		foreach($datas as $data){
-            $arrayData[] = array(
-            );
-		}
-		if($arrayData){
-			$spreadsheet = new Spreadsheet();
-			$spreadsheet->getActiveSheet()->fromArray($arrayData,NULL, 'A1' );
-			header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-			header('Content-Disposition: attachment;filename="campaign.xlsx"');
-			$writer = new Xlsx($spreadsheet);
-			$writer->save('php://output');
-		}
-		die();
-	}
 }
