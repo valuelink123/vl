@@ -73,7 +73,7 @@
                 <div class="portlet-title">
                     <div class="caption font-dark col-md-12">
                         <div class="btn-group" style="float:right;">
-                            <button class="btn green dropdown-toggle" type="button" data-toggle="modal" href="#negkeywordform"> Create Negative products
+                            <button class="btn green dropdown-toggle" type="button" data-toggle="modal" href="#negkeywordform"> Create
                             </button>
                             
                         </div>

@@ -30,5 +30,19 @@ class PpcProfile extends Model
         'conversions'=>'Optimize for conversion',
         'reach'=>'Optimize for viewable impressions',
     ];
+
+    const PREMIUMBIDADJUSTMENT = [
+        '0'=>'No',
+        '1'=>'Yes',
+    ];
+
+
+    const TACTIC = [
+        'T00020'=>'Product',
+        'T00030'=>'Audiences',
+    ];
+
+
+    
     
 }

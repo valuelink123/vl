@@ -119,23 +119,8 @@
                     <div class="caption font-dark col-md-12">
 
                         <div class="btn-group" style="float:right;">
-                            <button class="btn green dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="true"> Create Ad Group
-                                <i class="fa fa-angle-down"></i>
+                            <button class="btn green dropdown-toggle" type="button" data-toggle="modal" href="#updateForm"> Create
                             </button>
-                            <ul class="dropdown-menu" role="menu">
-                                <li>
-                                    <a href="/adv/productsCreate"> SponsoredProducts </a>
-                                </li>
-                                <li class="divider"> </li>
-                                <li>
-                                    <a href="/adv/displayCreate"> Sponsored Display </a>
-                                </li>
-                                <li class="divider"> </li>
-                                <li>
-                                    <a href="/adv/brandsCreate"> Sponsored Brands </a>
-                                </li>
-                                
-                            </ul>
                         </div>
 
 
@@ -192,6 +177,69 @@
         </div>
     </div>
 </div>
+<form id="update_form"  name="update_form" >
+{{ csrf_field() }}
+<div class="modal fade" id="updateForm" tabindex="-1" role="updateForm" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                <h4 class="modal-title">Ad Group</h4>
+            </div>
+            
+            <div class="modal-body"> 
+                    <div class="form-group">
+                        <label>Name:</label>
+                        <input type="text" class="form-control input-inline" name="name" id="name" >
+                    </div>
+
+                    <div class="form-group">
+                        <label>Status:</label>
+                        <select class="form-control input-inline" name="state" id="state">
+                        @foreach (\App\Models\PpcProfile::STATUS as $k=>$v)
+                        <option value="{{$k}}">{{$v}}</option>
+                        @endforeach 
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Default Bid:</label>
+                        <input type="text" class="form-control input-inline" name="defaultBid" id="defaultBid" value="0" >
+                    </div>
+
+                    <div class="form-group">
+                        <label>Bid Optimization:</label>
+                        <select class="form-control input-inline" name="bidOptimization" id="bidOptimization">
+                        @foreach (\App\Models\PpcProfile::BIDOPTIMIZATION as $k=>$v)
+                        <option value="{{$k}}">{{$v}}</option>
+                        @endforeach 
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tactic:</label>
+                        <select class="form-control input-inline" name="tactic" id="tactic">
+                        @foreach (\App\Models\PpcProfile::TACTIC as $k=>$v)
+                        <option value="{{$k}}">{{$v}}</option>
+                        @endforeach 
+                        </select>
+                    </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn dark btn-outline" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn green">Save changes</button>
+                <input type="hidden" name="profile_id" value="{{$profile_id}}">
+                <input type="hidden" name="ad_type" value="{{$ad_type}}">
+                <input type="hidden" name="campaignId" value="{{array_get($campaign,'campaignId')}}">
+                <input type="hidden" name="action" value="groups">
+                <input type="hidden" name="method" value="createAdGroups">
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+</form>
 <script src="/assets/global/plugins/bootstrap-editable/bootstrap-editable/js/bootstrap-editable.js" type="text/javascript"></script>
 
 <script>
@@ -481,6 +529,33 @@
                 $('#reportrange input[name="end_date"]').val(end.format('YYYY-MM-DD'));
             }
         );
+
+        $('#update_form').submit(function() {
+            $.ajaxSetup({
+                headers: { 'X-CSRF-TOKEN' : '{{ csrf_token() }}' }
+            });
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                url: "{{ url('adv/createAdGroup') }}",
+                data: $('#update_form').serialize(),
+                success: function (data) {
+                    if(data.customActionStatus=='OK'){
+                        $('#updateForm').modal('hide');
+                        $('.modal-backdrop').remove();
+                        toastr.success(data.customActionMessage);
+                        var dttable = $('#datatable_ajax').dataTable();
+                        dttable.api().ajax.reload(null, false);
+                    }else{
+                        toastr.error(data.customActionMessage);
+                    }
+                },
+                error: function(data) {
+                    toastr.error(data.responseText);
+                }
+            });
+            return false;
+        });
     });
 
 

@@ -127,7 +127,7 @@
                     <div class="caption font-dark col-md-12">
 
                         <div class="btn-group" style="float:right;">
-                            <button class="btn green dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="true"> Create Products
+                            <button class="btn green dropdown-toggle" type="button" data-toggle="modal" href="#updateForm"> Create
                             </button>
                         </div>
 
@@ -183,7 +183,39 @@
         </div>
     </div>
 </div>
-
+<form id="update_form"  name="update_form" >
+{{ csrf_field() }}
+<div class="modal fade" id="updateForm" tabindex="-1" role="updateForm" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                <h4 class="modal-title">Seller Sku</h4>
+            </div>
+            
+            <div class="modal-body"> 
+                <div class="form-group col-md-12">
+                    <label>Seller Sku *</label>
+                    <textarea class="form-control" rows="10" name="asins" id="asins"
+                    placeholder="Enter your list and separate each item whith a new line."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn dark btn-outline" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn green">Save changes</button>
+                <input type="hidden" name="profile_id" value="{{$profile_id}}">
+                <input type="hidden" name="ad_type" value="{{$ad_type}}">
+                <input type="hidden" name="campaignId" value="{{array_get($adgroup,'campaignId')}}">
+                <input type="hidden" name="adGroupId" value="{{array_get($adgroup,'adGroupId')}}">
+                <input type="hidden" name="action" value="product_ads">
+                <input type="hidden" name="method" value="createProductAds">
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+</form>
 <script>
         var TableDatatablesAjax = function () {
         var initPickers = function () {
@@ -448,6 +480,33 @@
                 $('#reportrange input[name="end_date"]').val(end.format('YYYY-MM-DD'));
             }
         );
+
+        $('#update_form').submit(function() {
+            $.ajaxSetup({
+                headers: { 'X-CSRF-TOKEN' : '{{ csrf_token() }}' }
+            });
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                url: "{{ url('adv/createAds') }}",
+                data: $('#update_form').serialize(),
+                success: function (data) {
+                    if(data.customActionStatus=='OK'){
+                        $('#updateForm').modal('hide');
+                        $('.modal-backdrop').remove();
+                        toastr.success(data.customActionMessage);
+                        var dttable = $('#datatable_ajax').dataTable();
+                        dttable.api().ajax.reload(null, false);
+                    }else{
+                        toastr.error(data.customActionMessage);
+                    }
+                },
+                error: function(data) {
+                    toastr.error(data.responseText);
+                }
+            });
+            return false;
+        });
     });
 
 

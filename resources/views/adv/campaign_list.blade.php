@@ -106,23 +106,8 @@
                     <div class="caption font-dark col-md-12">
 
                         <div class="btn-group" style="float:right;">
-                            <button class="btn green dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="true"> Create
-                                <i class="fa fa-angle-down"></i>
+                            <button class="btn green dropdown-toggle" type="button" data-toggle="modal" href="#updateForm"> Create
                             </button>
-                            <ul class="dropdown-menu" role="menu">
-                                <li>
-                                    <a href="/adv/productsCreate"> SponsoredProducts </a>
-                                </li>
-                                <li class="divider"> </li>
-                                <li>
-                                    <a href="#"> Sponsored Display </a>
-                                </li>
-                                <li class="divider"> </li>
-                                <li>
-                                    <a href="#"> Sponsored Brands </a>
-                                </li>
-                                
-                            </ul>
                         </div>
 
 
@@ -181,6 +166,137 @@
             <!-- END EXAMPLE TABLE PORTLET-->
         </div>
     </div>
+
+    <form id="update_form"  name="update_form" >
+    {{ csrf_field() }}
+    <div class="modal fade" id="updateForm" tabindex="-1" role="updateForm" aria-hidden="true" style="display: none;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                    <h4 class="modal-title">Campaign</h4>
+                </div>
+                
+                <div class="modal-body"> 
+                    <div class="form-group">
+                        <label>Type:</label>
+                        <select class="form-control input-inline" name="ad_type" id="ad_type">
+                        @foreach (\App\Models\PpcProfile::AD_TYPE as $k=>$v)
+                        <option value="{{$k}}">{{$v}}</option>
+                        @endforeach 
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Campaign Name:</label>
+                        <input type="text" class="form-control input-inline" name="name" id="name" >
+                    </div>
+
+                    <div class="form-group">
+                        <label>Status:</label>
+                        <select class="form-control input-inline" name="state" id="state">
+                        @foreach (\App\Models\PpcProfile::STATUS as $k=>$v)
+                        <option value="{{$k}}">{{$v}}</option>
+                        @endforeach 
+                        </select>
+                    </div>
+
+                    <div class="form-group date date-picker" data-date-format="yyyy-mm-dd" >
+                        <label>Date Range:</label>
+
+                        <div class="input-group date date-picker col-md-4" data-date-format="yyyy-mm-dd">
+                            <input type="text" class="form-control" readonly name="startDate" id="startDate" value="{{date('Y-m-d')}}">
+                            <span class="input-group-btn">
+                                <button class="btn default" type="button">
+                                    <i class="fa fa-calendar"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <div class="input-group date date-picker col-md-4" data-date-format="yyyy-mm-dd">
+                            <input type="text" class="form-control" readonly name="endDate" id="endDate" value="">
+                            <span class="input-group-btn">
+                                <button class="btn default" type="button">
+                                    <i class="fa fa-calendar"></i>
+                                </button>
+                            </span>
+                        </div>
+
+                    </div>
+
+                    <div id="additional_attributes">
+                    <div id = "SBrands" style="display:none;">
+                    </div>
+
+                    <div id = "SDisplay" style="display:none;">
+                        <div class="form-group">
+                            <label>Budget:</label>
+                            <input type="text" class="form-control input-inline" name="budget" id="budget" value="0">
+                            <input type="hidden" name="budgetType" value="daily">
+                            <input type="hidden" name="costType" value="cpc">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Tactic:</label>
+                            <select class="form-control input-inline" name="tactic" id="tactic">
+                            <?php 
+                            foreach(\App\Models\PpcProfile::TACTIC as $k=>$v){ 	
+                                echo '<option value="'.$k.'">'.$v.'</option>';
+                            }?>
+                            </select>
+                        </div>
+                    </div>
+
+
+                    <div id = "SProducts">            
+                        <div class="form-group">
+                            <label>Targeting Type:</label>
+                            <select class="form-control input-inline" name="targetingType" id="targetingType">
+                                <option value="auto">Auto</option>
+                                <option value="manual">Manual</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Budget:</label>
+                            <input type="hidden" name="campaignType" value="sponsoredProducts">
+                            <input type="text" class="form-control input-inline" name="dailyBudget" id="dailyBudget" value="0">  
+                        </div>
+
+                        <div class="form-group">
+                            <label>Bidding Strategy:</label>
+                            <select class="form-control input-inline" name="strategy" id="strategy">
+                            <?php 
+                            foreach(\App\Models\PpcProfile::BIDDING as $k=>$v){ 	
+                                echo '<option value="'.$k.'">'.$v.'</option>';
+                            }?>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Adjust bids by placement</label>
+                        </div>
+                        <div class="form-group">
+                            <label class="">Top of search (first page):</label>
+                            <input type="text" class="form-control input-inline" name="placementTop" id="placementTop" value="0">%
+                        </div>
+                        <div class="form-group">   
+                            <label class="">Product pages:</label>
+                            <input type="text" class="form-control input-inline" name="placementProductPage" id="placementProductPage" value="0">%
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn dark btn-outline" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn green">Save changes</button>
+                    <input type="hidden" name="action" value="campaigns">
+                    <input type="hidden" name="method" value="createCampaigns">
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    </form>
 
     <script src="/assets/global/plugins/bootstrap-editable/bootstrap-editable/js/bootstrap-editable.js" type="text/javascript"></script>
 
@@ -355,7 +471,6 @@
                                 'method':'updateCampaigns',
                                 'pk_type':'campaignId',
                                 'profile_id':$("select[name='profile_id']").val(),
-                                'ad_type':$("input[name='ad_type']").val(),
                             },
                             validate: function (value) {
                                 if (isNaN(value)) {
@@ -471,6 +586,38 @@
                 $('#reportrange input[name="end_date"]').val(end.format('YYYY-MM-DD'));
             }
         );
+
+        $('#update_form').submit(function() {
+            $.ajaxSetup({
+                headers: { 'X-CSRF-TOKEN' : '{{ csrf_token() }}' }
+            });
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                url: "{{ url('adv/createCampaign') }}",
+                data: $('#update_form').serialize()+'&profile_id='+$("select[name='profile_id']").val(),
+                success: function (data) {
+                    if(data.customActionStatus=='OK'){
+                        $('#updateForm').modal('hide');
+                        $('.modal-backdrop').remove();
+                        toastr.success(data.customActionMessage);
+                        var dttable = $('#datatable_ajax').dataTable();
+                        dttable.api().ajax.reload(null, false);
+                    }else{
+                        toastr.error(data.customActionMessage);
+                    }
+                },
+                error: function(data) {
+                    toastr.error(data.responseText);
+                }
+            });
+            return false;
+        });
+    });
+
+    $('#ad_type').on('change',function(){
+        $('#'+$(this).val()).show();
+        $('#'+$(this).val()).siblings('div').hide();
     });
 
 

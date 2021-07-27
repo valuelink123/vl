@@ -199,7 +199,7 @@ class AdvController extends Controller
         $app = $client->request($ad_type);
         
         $data = [
-            'campaignId' => $request->get('campaign_id'),
+            'campaignId' => $campaign_id,
             'name' => $request->get('name'),
             'state' => $request->get('state'),
             'startDate' => date('Ymd',strtotime($request->get('startDate'))),
@@ -208,6 +208,7 @@ class AdvController extends Controller
         if($request->has('dailyBudget')) $data['dailyBudget'] = $request->get('dailyBudget');
         if($request->has('budget')) $data['budget'] = round($request->get('budget'),2);
         if($request->has('bidOptimization')) $data['bidOptimization'] = $request->get('bidOptimization');
+        //if($request->has('premiumBidAdjustment')) $data['premiumBidAdjustment'] = $request->get('premiumBidAdjustment');
         if($request->has('bidMultiplier')) $data['bidMultiplier'] = intval($request->get('budget'));
         if($request->has('strategy')){
             $data['bidding'] = [
@@ -225,6 +226,8 @@ class AdvController extends Controller
             ];
         }
         $result = $app->campaigns->updateCampaigns([$data]);
+        print_r($data);
+        print_r($result);
         if(array_get($result,'success')==1){
             echo json_encode(array_get($result,'response.0'));
         }else{
@@ -516,6 +519,87 @@ class AdvController extends Controller
             $results = $app->$action->$method($datas);
 
 
+            if(array_get($results,'success') == 1){
+                foreach(array_get($results,'response') as $result){
+                    $customActionMessage.=array_get($result,'code').' '.array_get($result,'description').'<BR>';
+                }
+            }else{
+                throw new \Exception(array_get($results,'response'));
+            }
+        
+            $records["customActionStatus"] = 'OK';
+            $records["customActionMessage"] = $customActionMessage;     
+        }catch (\Exception $e) { 
+            $records["customActionStatus"] = '';
+            $records["customActionMessage"] = $e->getMessage();
+        }    
+        echo json_encode($records);
+    }
+
+
+
+    public function createAds(Request $request){
+        $keyword_text = $request->get('asins');
+        $campaignId = $request->get('campaignId');
+        $adGroupId = $request->get('adGroupId');
+        $profile_id = $request->get('profile_id');
+        $ad_type = $request->get('ad_type');
+        $action = $request->get('action');
+        $method = $request->get('method'); 
+        try{
+            $customActionMessage="";
+            $datas=[];
+            $keywords = explode(PHP_EOL, $keyword_text);
+            foreach($keywords as $keyword){
+                $data = [
+                    'state'=>'enabled',
+                    'sku'=>$keyword,
+                ];
+                if($campaignId) $data['campaignId'] = $campaignId;
+                if($adGroupId) $data['adGroupId'] = $adGroupId;
+
+                $datas[]=$data; 
+            }
+            $client = new PpcRequest($profile_id);
+            $app = $client->request($ad_type);
+            $results = $app->$action->$method($datas);
+            if(array_get($results,'success') == 1){
+                foreach(array_get($results,'response') as $result){
+                    $customActionMessage.=array_get($result,'code').' '.array_get($result,'description').'<BR>';
+                }
+            }else{
+                throw new \Exception(array_get($results,'response'));
+            }
+        
+            $records["customActionStatus"] = 'OK';
+            $records["customActionMessage"] = $customActionMessage;     
+        }catch (\Exception $e) { 
+            $records["customActionStatus"] = '';
+            $records["customActionMessage"] = $e->getMessage();
+        }    
+        echo json_encode($records);
+    }
+
+
+    public function createAdGroup(Request $request){
+        $campaignId = $request->get('campaignId');
+        $profile_id = $request->get('profile_id');
+        $ad_type = $request->get('ad_type');
+        $action = $request->get('action');
+        $method = $request->get('method'); 
+        try{
+            $customActionMessage="";
+            $data = [
+                'state'=>$request->get('state'),
+                'name'=>$request->get('name'),
+            ];
+            if($campaignId) $data['campaignId'] = $campaignId;
+            if($request->get('defaultBid')) $data['defaultBid'] = round($request->get('defaultBid'),2);
+            if($request->get('bidOptimization')) $data['bidOptimization'] = $request->get('bidOptimization');
+            if($request->get('tactic')) $data['tactic'] = $request->get('tactic');
+            $client = new PpcRequest($profile_id);
+            $app = $client->request($ad_type);
+            $results = $app->$action->$method([$data]);
             if(array_get($results,'success') == 1){
                 foreach(array_get($results,'response') as $result){
                     $customActionMessage.=array_get($result,'code').' '.array_get($result,'description').'<BR>';
@@ -1077,7 +1161,64 @@ class AdvController extends Controller
 
     public function createCampaign(Request $request)
     {
+        $profile_id = $request->get('profile_id');
+        $ad_type = $request->get('ad_type');
+        try{
+            $client = new PpcRequest($profile_id);
+            $app = $client->request($ad_type);
+            $data = [
+                'name' => $request->get('name'),
+                'state' => $request->get('state'),
+                'startDate' => date('Ymd',strtotime($request->get('startDate'))),
+                'endDate' => ($request->get('endDate')?date('Ymd',strtotime($request->get('endDate'))):NULL),
+            ];
+            if($ad_type=="SDisplay"){
+                $data['budget'] = round($request->get('budget'),2);
+                $data['budgetType'] = $request->get('budgetType');
+                $data['costType'] = $request->get('costType');
+                $data['tactic'] = $request->get('tactic');
+            }
+            
+            if($ad_type=="SBrands"){
+                $data['budget'] = round($request->get('budget'),2);
+            }
 
+            if($ad_type=="SProducts"){
+                $data['campaignType'] = 'sponsoredProducts';
+                $data['targetingType'] = $request->get('targetingType');
+                $data['dailyBudget'] = round($request->get('dailyBudget'),2);
+                //$data['premiumBidAdjustment'] = $request->get('premiumBidAdjustment');
+                $data['bidding'] = [
+                    'strategy'=>$request->get('strategy'),
+                    'adjustments'=>[
+                        [
+                            'predicate'=>'placementTop',
+                            'percentage'=>$request->get('placementTop'),
+                        ],  
+                        [
+                            'predicate'=>'placementProductPage',
+                            'percentage'=>$request->get('placementProductPage'),
+                        ]
+                    ],
+                ];
+            }
+            $results = $app->campaigns->CreateCampaigns([$data]);
+            $customActionMessage="";
+            if(array_get($results,'success') == 1){
+                foreach(array_get($results,'response') as $result){
+                    $customActionMessage.=array_get($result,'code').' '.array_get($result,'description').'<BR>';
+                }
+            }else{
+                throw new \Exception(array_get($results,'response'));
+            }
+        
+            $records["customActionStatus"] = 'OK';
+            $records["customActionMessage"] = $customActionMessage;     
+        }catch (\Exception $e) { 
+            $records["customActionStatus"] = '';
+            $records["customActionMessage"] = $e->getMessage();
+        }    
+        echo json_encode($records);
     }
 
     public function listPortfolios(Request $request)

@@ -521,7 +521,9 @@ Route::Post('/adv/listGNegkeywords', 'AdvController@listGNegkeywords');
 Route::Post('/adv/storeGNegkeywords', 'AdvController@storeGNegkeywords');
 Route::Post('/adv/listGNegproducts', 'AdvController@listGNegproducts');
 Route::Post('/adv/storeGNegproducts', 'AdvController@storeGNegproducts');
-
+Route::Post('/adv/createAds', 'AdvController@createAds');
+Route::Post('/adv/createCampaign', 'AdvController@createCampaign');
+Route::Post('/adv/createAdGroup', 'AdvController@createAdGroup');
 //客诉品线问题细分
 Route::Post('/category/import', 'CategoryController@import');
 
