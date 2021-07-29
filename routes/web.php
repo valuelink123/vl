@@ -524,6 +524,8 @@ Route::Post('/adv/storeGNegproducts', 'AdvController@storeGNegproducts');
 Route::Post('/adv/createAds', 'AdvController@createAds');
 Route::Post('/adv/createCampaign', 'AdvController@createCampaign');
 Route::Post('/adv/createAdGroup', 'AdvController@createAdGroup');
+Route::Post('/adv/createKeyword', 'AdvController@createKeyword');
+Route::Post('/adv/createTarget', 'AdvController@createTarget');
 //客诉品线问题细分
 Route::Post('/category/import', 'CategoryController@import');
 

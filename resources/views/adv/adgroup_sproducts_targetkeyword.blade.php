@@ -19,6 +19,9 @@
         color: #666;
         padding: 10px 0;
     }
+    .modal-body{
+        padding:0px;
+    }
 </style>
 <h1 class="page-title font-red-intense"> Ad Group - {{array_get($adgroup,'name')}}
 </h1>
@@ -134,8 +137,8 @@
                     <div class="caption font-dark col-md-12">
 
                         <div class="btn-group" style="float:right;">
-                            <button class="btn green dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="true"> Create Keywords
-                            </button>
+                            <button class="btn green dropdown-toggle" type="button" data-toggle="modal" href="#updateForm"> Create
+                             </button>
                         </div>
 
 
@@ -193,6 +196,103 @@
         </div>
     </div>
 </div>
+
+
+<form id="update_form"  name="update_form" >
+{{ csrf_field() }}
+<div class="modal fade bs-modal-lg" id="updateForm" tabindex="-1" role="updateForm" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                <h4 class="modal-title">Keywords</h4>
+            </div>
+            
+            <div class="modal-body" style="font-size:12px;overflow-y:auto;height:500px;"> 
+                <div class="form-group col-md-4" style="margin-top: 10px;">
+                    <div class="row" style="font-weight:bold;">
+                    <div class="col-md-6">
+                        Keyword Text
+                    </div>
+                    <div class="col-md-3">
+                        Match
+                    </div>
+                    <div class="col-md-3">
+                        Bid
+                    </div>
+                    </div>
+                    @foreach ($suggestedKeywords as $key=>$keyword)
+                    <div class="row">
+                        <div class="col-md-6">
+                        {{array_get($keyword,'keywordText')}}
+                        </div>
+                        <div class="col-md-3">
+                        {{array_get($keyword,'matchType')}}
+                        </div>
+                        <div class="col-md-3">
+                        {{array_get($keyword,'bid')}}
+                        </div>
+                        <div class="clearFix"></div>
+                    </div>
+                    @endforeach
+                </div>
+                <div class="form-group col-md-8" style="margin-top: 10px;">
+                        <div class="form-group mt-repeater">
+							<div data-repeater-list="keywords">
+								<div data-repeater-item class="mt-repeater-item">
+									<div class="row mt-repeater-row">
+										<div class="col-md-3">
+											<label class="control-label">Keyword Text</label>
+											<input type="text" class="form-control input-sm"  name="keywordText" required>
+								
+								        </div>
+										<div class="col-md-3">
+											<label class="control-label">Match Type</label>
+											<select class="form-control input-sm" name="matchType" required>
+                                            @foreach (\App\Models\PpcProfile::MATCHTYPE as $k=>$v)
+                                                <option value="{{$k}}" >{{$v}}</option>
+                                            @endforeach
+											</select>
+                                        </div>
+											
+										<div class="col-md-3">
+											<label class="control-label">Bid</label>
+											<div class="input-group">
+                                            <input type="text" class="form-control input-sm"  name="bid" value="0" required>
+                                            </div>
+                                        </div>
+				
+										<div class="col-md-2">
+											<a href="javascript:;" data-repeater-delete class="btn btn-danger mt-repeater-delete btn-sm">
+												<i class="fa fa-close"></i>
+											</a>
+										</div>
+									</div>
+								</div>
+							</div>
+							<a href="javascript:;" data-repeater-create class="btn btn-sm btn-info mt-repeater-add">
+								<i class="fa fa-plus"></i> Add Keyword</a>
+						</div>
+						<div style="clear:both;height:30px;"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn dark btn-outline" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn green">Save changes</button>
+                <input type="hidden" name="profile_id" value="{{$profile_id}}">
+                <input type="hidden" name="ad_type" value="{{$ad_type}}">
+                <input type="hidden" name="campaignId" value="{{array_get($adgroup,'campaignId')}}">
+                <input type="hidden" name="adGroupId" value="{{array_get($adgroup,'adGroupId')}}">
+                <input type="hidden" name="action" value="keywords">
+                <input type="hidden" name="method" value="createKeywords">
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+</form>
+
 <script src="/assets/global/plugins/bootstrap-editable/bootstrap-editable/js/bootstrap-editable.js" type="text/javascript"></script>
 
 <script>
@@ -484,6 +584,34 @@
                 $('#reportrange input[name="end_date"]').val(end.format('YYYY-MM-DD'));
             }
         );
+
+
+        $('#update_form').submit(function() {
+            $.ajaxSetup({
+                headers: { 'X-CSRF-TOKEN' : '{{ csrf_token() }}' }
+            });
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                url: "{{ url('adv/createKeyword') }}",
+                data: $('#update_form').serialize(),
+                success: function (data) {
+                    if(data.customActionStatus=='OK'){
+                        $('#updateForm').modal('hide');
+                        $('.modal-backdrop').remove();
+                        toastr.success(data.customActionMessage);
+                        var dttable = $('#datatable_ajax').dataTable();
+                        dttable.api().ajax.reload(null, false);
+                    }else{
+                        toastr.error(data.customActionMessage);
+                    }
+                },
+                error: function(data) {
+                    toastr.error(data.responseText);
+                }
+            });
+            return false;
+        });
     });
 
 

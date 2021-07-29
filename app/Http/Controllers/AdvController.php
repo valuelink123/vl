@@ -226,8 +226,6 @@ class AdvController extends Controller
             ];
         }
         $result = $app->campaigns->updateCampaigns([$data]);
-        print_r($data);
-        print_r($result);
         if(array_get($result,'success')==1){
             echo json_encode(array_get($result,'response.0'));
         }else{
@@ -581,6 +579,85 @@ class AdvController extends Controller
     }
 
 
+    public function createKeyword(Request $request){
+        $campaignId = $request->get('campaignId');
+        $adGroupId = $request->get('adGroupId');
+        $profile_id = $request->get('profile_id');
+        $ad_type = $request->get('ad_type');
+        $action = $request->get('action');
+        $method = $request->get('method'); 
+        try{
+            $customActionMessage="";
+            $datas=[];
+            $keywords = $request->get('keywords');
+            foreach($keywords as $keyword){
+                $keyword['state'] = 'enabled';
+                if($campaignId) $keyword['campaignId'] = $campaignId;
+                if($adGroupId) $keyword['adGroupId'] = $adGroupId;
+
+                $datas[]=$keyword; 
+            }
+            $client = new PpcRequest($profile_id);
+            $app = $client->request($ad_type);
+            $results = $app->$action->$method($datas);
+            if(array_get($results,'success') == 1){
+                foreach(array_get($results,'response') as $result){
+                    $customActionMessage.=array_get($result,'code').' '.array_get($result,'description').'<BR>';
+                }
+            }else{
+                throw new \Exception(array_get($results,'response'));
+            }
+            $records["customActionStatus"] = 'OK';
+            $records["customActionMessage"] = $customActionMessage;     
+        }catch (\Exception $e) { 
+            $records["customActionStatus"] = '';
+            $records["customActionMessage"] = $e->getMessage();
+        }    
+        echo json_encode($records);
+    }
+
+
+    public function createTarget(Request $request){
+        $campaignId = $request->get('campaignId');
+        $adGroupId = $request->get('adGroupId');
+        $profile_id = $request->get('profile_id');
+        $ad_type = $request->get('ad_type');
+        $action = $request->get('action');
+        $method = $request->get('method'); 
+        try{
+            $customActionMessage="";
+            $datas=[];
+            $expressions = $request->get('expressions');
+            foreach($expressions as $expression){
+                $target['state'] = 'enabled';
+                $target['expressionType'] = 'manual';
+                $target['bid'] = round(array_get($expression,'bid'),2);
+                unset($expression['bid']);
+                $target['expression'] = $target['resolvedExpression'] = [$expression];
+                if($campaignId) $target['campaignId'] = $campaignId;
+                if($adGroupId) $target['adGroupId'] = $adGroupId;
+                $datas[]=$target; 
+            }
+            $client = new PpcRequest($profile_id);
+            $app = $client->request($ad_type);
+            $results = $app->$action->$method($datas);
+            if(array_get($results,'success') == 1){
+                foreach(array_get($results,'response') as $result){
+                    $customActionMessage.=array_get($result,'code').' '.array_get($result,'description').'<BR>';
+                }
+            }else{
+                throw new \Exception(array_get($results,'response'));
+            }
+            $records["customActionStatus"] = 'OK';
+            $records["customActionMessage"] = $customActionMessage;     
+        }catch (\Exception $e) { 
+            $records["customActionStatus"] = '';
+            $records["customActionMessage"] = $e->getMessage();
+        }    
+        echo json_encode($records);
+    }
+
+
     public function createAdGroup(Request $request){
         $campaignId = $request->get('campaignId');
         $profile_id = $request->get('profile_id');
@@ -713,12 +790,46 @@ class AdvController extends Controller
         $client = new PpcRequest($profile_id);
         $app = $client->request($ad_type);
         $result = $app->groups->getAdGroupEx($adgroup_id);
-        $adgroup = [];
+        $adgroup = $suggestedKeywords = $suggestedProducts = $suggestedCategories = [];
         if(array_get($result,'success')==1){
             $adgroup =array_get($result,'response');
-            if($ad_type=='SProducts') $adgroup['suggestedBid'] = $app->bidding->getAdGroupBidRecommendations($adgroup_id);
+            if($ad_type=='SProducts'){
+                $adgroup['suggestedBid'] = $app->bidding->getAdGroupBidRecommendations($adgroup_id);
+                if($tab=="targetkeyword"){
+                    $result = $app->keywords->getAdGroupSuggestedKeywordsEx($adgroup_id,['suggestBids'=>'yes','maxNumSuggestions'=>100]);
+                    if(array_get($result,'success')==1){
+                        $suggestedKeywords = array_get($result,'response');
+                    }
+                }
+                if($tab=="targetproduct"){
+                    $result = $app->product_ads->listProductAds([
+                        'stateFilter'=>'enabled',
+                        'campaignIdFilter'=>array_get($adgroup,'campaignId'),
+                        'adGroupIdFilter'=>array_get($adgroup,'adGroupId'),
+                    ]);
+                    if(array_get($result,'success')==1){
+                        $asins = [];
+                        $ads = array_get($result,'response');
+                        if(is_array($ads)){
+                            foreach($ads as $ad){
+                                $asins[] = array_get($ad,'asin');
+                            }
+                        }
+                        $datas = array_get($result,'response');
+                    }
+                    $result = $app->product_targeting->createTargetRecommendations($asins,1,50);
+                    if(array_get($result,'success')==1){
+                        $suggestedProducts = array_get($result,'response.recommendedProducts');
+                    }
+
+                    $result = $app->product_targeting->getTargetingCategories($asins);
+                    if(array_get($result,'success')==1){
+                        $suggestedCategories = array_get($result,'response');
+                    }
+                }
+            }
         }
-        return view('adv/adgroup_'.strtolower($ad_type).'_'.$tab,['profile_id'=>$profile_id,'ad_type'=>$ad_type,'adgroup'=>$adgroup]); 
+        return view('adv/adgroup_'.strtolower($ad_type).'_'.$tab,['profile_id'=>$profile_id,'ad_type'=>$ad_type,'adgroup'=>$adgroup,'suggestedKeywords'=>$suggestedKeywords,'suggestedProducts'=>$suggestedProducts,'suggestedCategories'=>$suggestedCategories]); 
     }
 
     public function updateAdGroup(Request $request)

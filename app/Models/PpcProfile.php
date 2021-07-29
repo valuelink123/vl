@@ -42,6 +42,37 @@ class PpcProfile extends Model
         'T00030'=>'Audiences',
     ];
 
+    const MATCHTYPE = [
+        'exact'=>'Exact',
+        'phrase'=>'Phrase',
+        'broad'=>'Broad',
+    ];
+
+    const EXPRESSION = [
+        'queryBroadMatches'=>'queryBroadMatches',
+        'queryPhraseMatches'=>'queryPhraseMatches',
+        'queryExactMatches'=>'queryExactMatches',
+        'asinCategorySameAs'=>'asinCategorySameAs',
+        'asinBrandSameAs'=>'asinBrandSameAs',
+        'asinPriceLessThan'=>'asinPriceLessThan',
+        'asinPriceBetween'=>'asinPriceBetween',
+        'asinPriceGreaterThan'=>'asinPriceGreaterThan',
+        'asinReviewRatingLessThan'=>'asinReviewRatingLessThan',
+        'asinReviewRatingBetween'=>'asinReviewRatingBetween',
+        'asinReviewRatingGreaterThan'=>'asinReviewRatingGreaterThan',
+        'asinSameAs'=>'asinSameAs',
+        'queryBroadRelMatches'=>'queryBroadRelMatches',
+        'queryHighRelMatches'=>'queryHighRelMatches',
+        'asinSubstituteRelated'=>'asinSubstituteRelated',
+        'asinAccessoryRelated'=>'asinAccessoryRelated',
+        'asinAgeRangeSameAs'=>'asinAgeRangeSameAs',
+        'asinGenreSameAs'=>'asinGenreSameAs',
+        'asinIsPrimeShippingEligible'=>'asinIsPrimeShippingEligible',
+    ];
+
+
+
+    
 
     
     
