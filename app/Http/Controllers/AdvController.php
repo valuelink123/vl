@@ -179,15 +179,37 @@ class AdvController extends Controller
         $client = new PpcRequest($profile_id);
         $app = $client->request($ad_type);
         $result = $app->campaigns->getCampaignEx($campaign_id);
-        $campaign = [];
+        $campaign = $suggestedKeywords = $suggestedProducts = $suggestedCategories = [];
         if(array_get($result,'success')==1){
             $campaign =array_get($result,'response');
             if($ad_type=='SBrands'){
                 $result = $app->groups->listAdGroups(['campaignIdFilter'=>$campaign_id]);
                 $campaign['adGroupId'] = array_get($result,'response.0.adGroupId');
+                if($tab == 'targetproduct'){
+                    $asins=array_get($campaign,'creative.asins',[]);
+                    $result = $app->product_targeting->listProductTargetRecommendations([
+                        'nextToken'=>'',
+                        'maxResults'=>100,
+                        'filters'=>[
+                            [
+                                'filterType'=>'ASINS',
+                                'values'=>$asins,
+                            ]
+                        ],
+                    ]);
+                    if(array_get($result,'success')==1){
+                        $suggestedProducts = array_get($result,'response.recommendedProducts');
+                    }
+                    $result = $app->product_targeting->listCategoryTargetRecommendations([
+                        'asins'=>$asins,
+                    ]);
+                    if(array_get($result,'success')==1){
+                        $suggestedCategories = array_get($result,'response.categoryRecommendationResults');
+                    }
+                }
             }
         }
-        return view('adv/campaign_'.strtolower($ad_type).'_'.$tab,['profile_id'=>$profile_id,'ad_type'=>$ad_type,'campaign'=>$campaign]); 
+        return view('adv/campaign_'.strtolower($ad_type).'_'.$tab,['profile_id'=>$profile_id,'ad_type'=>$ad_type,'campaign'=>$campaign,'suggestedKeywords'=>$suggestedKeywords,'suggestedProducts'=>$suggestedProducts,'suggestedCategories'=>$suggestedCategories]); 
     }
 
     public function updateCampaign(Request $request)
@@ -365,8 +387,8 @@ class AdvController extends Controller
             $keywords = explode(PHP_EOL, $keyword_text);
             if($campaignId) $data['campaignId'] = $campaignId;
             if($adGroupId) $data['adGroupId'] = $adGroupId;
+            if($ad_type!='SBrands') $data['state'] = 'enabled';
             foreach($keywords as $keyword){
-                $data['state'] = 'enabled';
                 $data['keywordText'] = $keyword;
                 $data['matchType'] = $match_type;
                 $datas[]=$data;
@@ -374,7 +396,6 @@ class AdvController extends Controller
             $client = new PpcRequest($profile_id);
             $app = $client->request($ad_type);
             $results = $app->$action->$method($datas);
-
             if(array_get($results,'success') == 1){
                 foreach(array_get($results,'response') as $result){
                     $customActionMessage.=$result['keywordId'].' - '.$result['code'].'<BR>';
@@ -629,20 +650,33 @@ class AdvController extends Controller
             $datas=[];
             $expressions = $request->get('expressions');
             foreach($expressions as $expression){
-                $target['state'] = 'enabled';
-                $target['expressionType'] = 'manual';
                 $target['bid'] = round(array_get($expression,'bid'),2);
                 unset($expression['bid']);
-                $target['expression'] =  [$expression];
+                if($ad_type=='SBrands'){
+                    $target['expressions'] =  [$expression];
+                    $target['campaignId'] = $campaignId;
+                }else{
+                    $target['state'] = 'enabled';
+                    $target['expressionType'] = 'manual';
+                    $target['expression'] =  [$expression];
+                }
+
                 if($campaignId && $ad_type =='SProducts'){
                     $target['campaignId'] = $campaignId;
                     $target['resolvedExpression'] = $target['expression'];
                 }
                 if($adGroupId) $target['adGroupId'] = $adGroupId;
-                $datas[]=$target; 
+                
+
+                if($ad_type=='SBrands'){
+                    $datas['targets'][]=$target; 
+                }else{
+                    $datas[]=$target; 
+                }
             }
             $client = new PpcRequest($profile_id);
             $app = $client->request($ad_type);
+            
             $results = $app->$action->$method($datas);
             if(array_get($results,'success') == 1){
                 foreach(array_get($results,'response') as $result){
@@ -1058,6 +1092,7 @@ class AdvController extends Controller
             if($request->get('ad_type')=='SBrands'){
                 $re['campaignId'] =  $request->get('campaign_id');
                 $re['adFormat'] =  $request->get('adFormat');
+                $re['targets'] =  [];
                 $re['keywords'] =  $tmpExpression;
                 $results = [];
                 //$results = $app->bid->bidRecommendations($re);
