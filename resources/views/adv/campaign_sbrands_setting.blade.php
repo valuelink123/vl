@@ -13,9 +13,11 @@
                     <li class="active">
                         <a href="/adv/campaign/{{$profile_id}}/{{$ad_type}}/{{array_get($campaign,'campaignId')}}/setting"> Setting</a>
                     </li>
+                    <!--
                     <li >
                         <a href="/adv/campaign/{{$profile_id}}/{{$ad_type}}/{{array_get($campaign,'campaignId')}}/creative" >Creative</a>
                     </li>
+                    -->
                     <li >
                         <a href="/adv/campaign/{{$profile_id}}/{{$ad_type}}/{{array_get($campaign,'campaignId')}}/targetkeyword" >Targeting keywords</a>
                     </li>
@@ -61,7 +63,42 @@
                                 <label>Type:</label>
                                 Sponsored Brands
                             </div>
+
+                            <div class="form-group">
+                                <label>Ad Format:</label>
+                                {{array_get($campaign,'adFormat')}}
+                            </div>
+
+                            <div class="form-group">
+                                <label>Asins:</label>
+                                {{implode(', ',array_get($campaign,'creative.asins'))}}
+                            </div>
+
+                            <div class="form-group">
+                                <label>Landing Page:</label>
+                                {{array_get($campaign,'landingPage.pageType'). ' - '.array_get($campaign,'landingPage.url')}}
+                            </div>
+                            @if(array_get($campaign,'adFormat')=='video')
+                            <div class="form-group">
+                                <label>Video Media Ids:</label>
+                                {{implode(', ',array_get($campaign,'creative.videoMediaIds'))}}
+                            </div>
+                            @else
+                            <div class="form-group">
+                                <label>Brand Name:</label>
+                                {{array_get($campaign,'creative.brandName')}}
+                            </div>
                             
+                            <div class="form-group">
+                                <label>Brand Logo Url:</label>
+                                {{array_get($campaign,'creative.brandLogoUrl')}}
+                            </div>
+
+                            <div class="form-group">
+                                <label>Head Line:</label>
+                                {{array_get($campaign,'creative.headline')}}
+                            </div>
+                            @endif
                             <div class="form-group">
                                 <label>Status:</label>
                                 <select class="form-control input-inline" name="state" id="state">
