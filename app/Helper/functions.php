@@ -1738,3 +1738,13 @@ function unCamelizeArr($arr)
     }
     return $tmp;
 }
+
+function getSellerAccout(){
+	$sql_account = "select CONCAT(mws_seller_id,'_',mws_marketplaceid) as sellerid_marketplaceid,any_value(label) as label from seller_accounts group by sellerid_marketplaceid";
+	$_data_account = DB::connection('amazon')->select($sql_account);
+	$data_account = array();
+	foreach($_data_account as $val){
+		$data_account[$val->sellerid_marketplaceid] = $val->label;
+	}
+	return $data_account;
+}

@@ -1,6 +1,6 @@
 @extends('layouts.layout')
 @section('crumb')
-    @include('layouts.crumb', ['crumbs'=>['ccp ad dashboard']])
+    @include('layouts.crumb', ['crumbs'=>['ccp ad product dashboard']])
 @endsection
 <style>
     .total-data-table{
@@ -236,7 +236,7 @@
                 ],
                 ajax: {
                     type: 'POST',
-                    url: '/ccp/ad/list',
+                    url: '/ccp/adProduct/list',
                     data:  {search: $("#search-form").serialize()}
                 }
             })
@@ -266,7 +266,7 @@
             $('input[name="end_date"]').val($('input[name="to_date"]').val());
             $.ajax({
                 type: 'post',
-                url: '/ccp/ad/showTotal',
+                url: '/ccp/adProduct/showTotal',
                 data: {search_data:$("#search-form").serialize()},
                 dataType:'json',
                 success: function(res) {
