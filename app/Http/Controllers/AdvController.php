@@ -633,8 +633,11 @@ class AdvController extends Controller
                 $target['expressionType'] = 'manual';
                 $target['bid'] = round(array_get($expression,'bid'),2);
                 unset($expression['bid']);
-                $target['expression'] = $target['resolvedExpression'] = [$expression];
-                if($campaignId) $target['campaignId'] = $campaignId;
+                $target['expression'] =  [$expression];
+                if($campaignId && $ad_type =='SProducts'){
+                    $target['campaignId'] = $campaignId;
+                    $target['resolvedExpression'] = $target['expression'];
+                }
                 if($adGroupId) $target['adGroupId'] = $adGroupId;
                 $datas[]=$target; 
             }
@@ -793,6 +796,50 @@ class AdvController extends Controller
         $adgroup = $suggestedKeywords = $suggestedProducts = $suggestedCategories = [];
         if(array_get($result,'success')==1){
             $adgroup =array_get($result,'response');
+
+            if($ad_type=='SDisplay'){
+                if($tab=="creatives"){
+                    $result = $app->groups->listCreatives(['adGroupIdFilter'=>$adgroup_id]);
+                    if(array_get($result,'success')==1){
+                        $creatives = array_get($result,'response');
+                    }
+                }
+                if($tab=="targetproduct"){
+                    /*
+                    $result = $app->product_ads->listProductAds([
+                        'stateFilter'=>'enabled',
+                        'campaignIdFilter'=>array_get($adgroup,'campaignId'),
+                        'adGroupIdFilter'=>array_get($adgroup,'adGroupId'),
+                    ]);
+                    $asins = [];
+                    if(array_get($result,'success')==1){
+                        $ads = array_get($result,'response');
+                        if(is_array($ads)){
+                            foreach($ads as $ad){
+                                $asins[] = array_get($ad,'asin');
+                            }
+                        }
+                    }
+                    $result = $app->targeting->getTargetingRecommendations([
+                        'tactic'=>array_get($adgroup,'tactic'),
+                        'products'=>$asins,
+                        'typeFilter'=>'PRODUCT',
+                    ]);
+                    if(array_get($result,'success')==1){
+                        $suggestedProducts = array_get($result,'response.recommendedProducts');
+                    }
+
+                    $result = $app->targeting->getTargetingRecommendations([
+                        'tactic'=>array_get($adgroup,'tactic'),
+                        'products'=>$asins,
+                        'typeFilter'=>'CATEGORY',
+                    ]);
+                    if(array_get($result,'success')==1){
+                        $suggestedCategoryies = array_get($result,'response.recommendedProducts');
+                    }
+                    */
+                }
+            }
             if($ad_type=='SProducts'){
                 $adgroup['suggestedBid'] = $app->bidding->getAdGroupBidRecommendations($adgroup_id);
                 if($tab=="targetkeyword"){
@@ -807,15 +854,14 @@ class AdvController extends Controller
                         'campaignIdFilter'=>array_get($adgroup,'campaignId'),
                         'adGroupIdFilter'=>array_get($adgroup,'adGroupId'),
                     ]);
+                    $asins = [];
                     if(array_get($result,'success')==1){
-                        $asins = [];
                         $ads = array_get($result,'response');
                         if(is_array($ads)){
                             foreach($ads as $ad){
                                 $asins[] = array_get($ad,'asin');
                             }
                         }
-                        $datas = array_get($result,'response');
                     }
                     $result = $app->product_targeting->createTargetRecommendations($asins,1,50);
                     if(array_get($result,'success')==1){

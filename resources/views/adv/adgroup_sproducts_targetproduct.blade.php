@@ -281,7 +281,7 @@
 								</div>
 							</div>
 							<a href="javascript:;" data-repeater-create class="btn btn-sm btn-info mt-repeater-add">
-								<i class="fa fa-plus"></i> Add Keyword</a>
+								<i class="fa fa-plus"></i> Add target</a>
 						</div>
 						<div style="clear:both;height:30px;"></div>
                 </div>

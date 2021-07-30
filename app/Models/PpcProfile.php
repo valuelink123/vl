@@ -71,9 +71,20 @@ class PpcProfile extends Model
     ];
 
 
-
     
-
-    
+    const SDISPLAYEXPRESSION = [
+        'asinCategorySameAs'=>'asinCategorySameAs',
+        'asinBrandSameAs'=>'asinBrandSameAs',
+        'asinPriceLessThan'=>'asinPriceLessThan',
+        'asinPriceBetween'=>'asinPriceBetween',
+        'asinPriceGreaterThan'=>'asinPriceGreaterThan',
+        'asinReviewRatingLessThan'=>'asinReviewRatingLessThan',
+        'asinReviewRatingBetween'=>'asinReviewRatingBetween',
+        'asinReviewRatingGreaterThan'=>'asinReviewRatingGreaterThan',
+        'asinSameAs'=>'asinSameAs',
+        'asinAgeRangeSameAs'=>'asinAgeRangeSameAs',
+        'asinGenreSameAs'=>'asinGenreSameAs',
+        'asinIsPrimeShippingEligible'=>'asinIsPrimeShippingEligible',
+    ];
     
 }
