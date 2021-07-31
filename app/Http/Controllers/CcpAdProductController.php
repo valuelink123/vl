@@ -17,7 +17,7 @@ class CcpAdProductController extends Controller
         use \App\Traits\DataTables;
         use \App\Traits\Mysqli;
 
-        public $ccpAdmin = array("xumeiling@valuelinkcorp.com","lidan@valuelinkcorp.com","liuling@dtas.com","wuweiye@valuelinkcorp.com","luodenglin@valuelinkcorp.com","zhouzhiwen@valuelinkltd.com","zhangjianqun@valuelinkcorp.com","sunhanshan@valuelinkcorp.com","wangxiaohua@valuelinkltd.com","zhoulinlin@valuelinkcorp.com","wangshuang@valuelinkltd.com");
+        public $ccpAdmin = array("xumeiling@valuelinkcorp.com","lidan@valuelinkcorp.com","liuling@dtas.com","wuweiye@valuelinkcorp.com","luodenglin@valuelinkcorp.com","zhouzhiwen@valuelinkltd.com","zhangjianqun@valuelinkcorp.com","sunhanshan@valuelinkcorp.com","wangxiaohua@valuelinkltd.com","zhoulinlin@valuelinkcorp.com","wangshuang@valuelinkltd.com","lixiaojian@valuelinkltd.com");
         public $start_date = '';//搜索时间范围的开始时间
         public $end_date = '';//搜索时间范围的结束时间
 
