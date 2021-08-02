@@ -1,6 +1,6 @@
 @extends('layouts.layout')
 @section('crumb')
-    @include('layouts.crumb', ['crumbs'=>['ccp ad dashboard']])
+    @include('layouts.crumb', ['crumbs'=>['ccp ad product dashboard']])
 @endsection
 <style>
     .total-data-table{
@@ -176,7 +176,10 @@
             <table class="table table-striped table-bordered" id="datatable">
                 <thead>
                     <tr>
-                        <th>Asin</th>
+                        <th>IMAGE</th>
+                        <th>PRODUCT</th>
+                        <th>ASIN</th>
+                        <th>Item No.</th>
                         <th>AD COST</th>
                         <th>SALES</th>
                         <th>ORDERS</th>
@@ -217,7 +220,10 @@
                 // pagingType: 'bootstrap_extended',
                 processing: true,
                 columns: [
+                    {data: 'image',name:'image'},
+                    {data: 'title',name:'title'},
                     {data: 'asin',name:'asin'},
+                    {data: 'item_no',name:'item_no'},
                     {data: 'cost',name:'cost'},
                     {data: 'sales',name:'sales'},
                     {data: 'orders',name:'orders'},
@@ -230,7 +236,7 @@
                 ],
                 ajax: {
                     type: 'POST',
-                    url: '/ccp/ad/list',
+                    url: '/ccp/adProduct/list',
                     data:  {search: $("#search-form").serialize()}
                 }
             })
@@ -260,7 +266,7 @@
             $('input[name="end_date"]').val($('input[name="to_date"]').val());
             $.ajax({
                 type: 'post',
-                url: '/ccp/ad/showTotal',
+                url: '/ccp/adProduct/showTotal',
                 data: {search_data:$("#search-form").serialize()},
                 dataType:'json',
                 success: function(res) {

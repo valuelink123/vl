@@ -377,7 +377,7 @@ class RoiPerformanceController extends Controller
 				$val['storage_fee_value_month_1'],$val['storage_fee_value_month_2'],$val['storage_fee_value_month_3'],$val['storage_fee_value_month_4'],$val['storage_fee_value_month_5'],$val['storage_fee_value_month_6'],$val['storage_fee_value_month_7'],$val['storage_fee_value_month_8'],$val['storage_fee_value_month_9'],$val['storage_fee_value_month_10'],$val['storage_fee_value_month_11'],$val['storage_fee_value_month_12'],$val['storage_fee_value_total'],
 
 				//资金占用成本
-				$val['capital_occupy_cost_value_month_1'],$val['capital_occupy_cost_value_month_2'],$val['capital_occupy_cost_value_month_3'],$val['capital_occupy_cost_value_month_4'],$val['capital_occupy_cost_value_month_5'],$val['capital_occupy_cost_value_month_6'],$val['capital_occupy_cost_value_month_7'],$val['capital_occupy_cost_value_month_8'],$val['capital_occupy_cost_value_month_9'],$val['capital_occupy_cost_value_month_10'],$val['capital_occupy_cost_value_month_11'],$val['capital_occupy_cost_value_month_12'],$val['storage_fee_value_total'],
+				$val['capital_occupy_cost_value_month_1'],$val['capital_occupy_cost_value_month_2'],$val['capital_occupy_cost_value_month_3'],$val['capital_occupy_cost_value_month_4'],$val['capital_occupy_cost_value_month_5'],$val['capital_occupy_cost_value_month_6'],$val['capital_occupy_cost_value_month_7'],$val['capital_occupy_cost_value_month_8'],$val['capital_occupy_cost_value_month_9'],$val['capital_occupy_cost_value_month_10'],$val['capital_occupy_cost_value_month_11'],$val['capital_occupy_cost_value_month_12'],$val['capital_occupy_cost_value_total'],
 
 				//经济效益
 				$val['economic_benefit_value_month_1'],$val['economic_benefit_value_month_2'],$val['economic_benefit_value_month_3'],$val['economic_benefit_value_month_4'],$val['economic_benefit_value_month_5'],$val['economic_benefit_value_month_6'],$val['economic_benefit_value_month_7'],$val['economic_benefit_value_month_8'],$val['economic_benefit_value_month_9'],$val['economic_benefit_value_month_10'],$val['economic_benefit_value_month_11'],$val['economic_benefit_value_month_12'],$val['economic_benefit_value_total'],
@@ -426,8 +426,11 @@ class RoiPerformanceController extends Controller
 		}
 
 		//上线时间的搜索
-		if(isset($search['estimated_launch_time']) && $search['estimated_launch_time']){
-			$where.= " and estimated_launch_time = '".trim($search['estimated_launch_time'])."'";
+		if(isset($search['estimated_launch_time_from']) && $search['estimated_launch_time_from']){
+			$where.= " and estimated_launch_time >= '".trim($search['estimated_launch_time_from'])."'";
+		}
+		if(isset($search['estimated_launch_time_to']) && $search['estimated_launch_time_to']){
+			$where.= " and estimated_launch_time <= '".trim($search['estimated_launch_time_to'])."'";
 		}
 
 		$sql = "select SQL_CALC_FOUND_ROWS roi_performance.*,roi.*

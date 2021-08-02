@@ -58,6 +58,9 @@ class Kernel extends ConsoleKernel
 		'App\Console\Commands\SycSendEmails',
 		'App\Console\Commands\AddRoiPerformance',
 		'App\Console\Commands\MakeReport',
+		'App\Console\Commands\UpdateSendboxStatus',
+		'App\Console\Commands\RequestPpcReport',
+		'App\Console\Commands\GetPpcReport',
     ];
 
     /**
@@ -115,6 +118,8 @@ class Kernel extends ConsoleKernel
 		$schedule->command('get:kunnr 3 0')->hourly()->name('getkunnrs')->withoutOverlapping();
 		//$schedule->command('get:sellers')->cron('*/1 * * * *')->name('sendmails')->withoutOverlapping();
 		$schedule->command('get:asininfo')->cron('0 */2 * * *')->name('getasininfo')->withoutOverlapping();
+		$schedule->command('request:ppcReport')->cron('0 */4 * * *')->name('requestppc')->withoutOverlapping();
+		$schedule->command('get:ppcReport')->cron('30 */1 * * *')->name('getppc')->withoutOverlapping();
 		$schedule->command('get:ads 10 1')->cron('5 0 * * *')->name('getads')->withoutOverlapping();
 		$schedule->command('get:profits 10 1 ')->cron('10 0 * * *')->name('getprotit')->withoutOverlapping();
         //$schedule->command('scan:warn')->hourly()->name('warningcheck')->withoutOverlapping();
@@ -159,6 +164,8 @@ class Kernel extends ConsoleKernel
 		$schedule->command('update:email_status')->cron('*/10 * * * *')->name('update_email_status')->withoutOverlapping();//更新邮箱状态，每10分钟一次
 
 		$schedule->command('add:roi_performance')->dailyAt('06:30')->name('add_roi_performance')->withoutOverlapping();//每天早上6点半执行
+
+		$schedule->command('update:sendboxStatus')->cron('0 */2 * * *')->name('updateSendboxStatus')->withoutOverlapping();//2小时执行一次
     }
 
     /**

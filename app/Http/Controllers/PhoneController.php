@@ -87,6 +87,9 @@ class PhoneController extends Controller
         if(array_get($_REQUEST,'date_from')){
             $customers = $customers->where('date','>=',$_REQUEST['date_from'].' 00:00:00');
         }
+        if(array_get($_REQUEST,'id')){
+            $customers = $customers->where('id',array_get($_REQUEST,'id'));
+        }
         if(array_get($_REQUEST,'date_to')){
             $customers = $customers->where('date','<=',$_REQUEST['date_to'].' 23:59:59');
         }
@@ -174,6 +177,10 @@ class PhoneController extends Controller
         if(array_get($_REQUEST,'date_from')){
             $customers = $customers->where('date','>=',$_REQUEST['date_from'].' 00:00:00');
         }
+        if(array_get($_REQUEST,'id')){
+            $customers = $customers->where('id',array_get($_REQUEST,'id'));
+        }
+        
         if(array_get($_REQUEST,'date_to')){
             $customers = $customers->where('date','<=',$_REQUEST['date_to'].' 23:59:59');
         }

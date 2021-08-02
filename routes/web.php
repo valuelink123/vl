@@ -329,9 +329,22 @@ Route::post('/showAccountBySite', 'Controller@showTheAccountBySite')->name('show
 Route::get('ccp/showOrderList', 'CcpController@showOrderList')->name('showOrderList');//ccp功能的列表中点击订单数查看订单列表的功能
 
 //ccp-ad模块
-Route::get('/ccp/ad', 'CcpAdController@index'); //
-Route::post('/ccp/ad/showTotal', 'CcpAdController@showTotal'); //ccp功能展示顶部统计数据
-Route::post('/ccp/ad/list', 'CcpAdController@list');//ccp功能的列表展示
+Route::get('/ccp/adProduct', 'CcpAdProductController@index'); //
+Route::post('/ccp/adProduct/showTotal', 'CcpAdProductController@showTotal'); //ccp功能展示顶部统计数据
+Route::post('/ccp/adProduct/list', 'CcpAdProductController@list');//ccp功能的列表展示
+
+Route::get('/ccp/adKeyword', 'CcpAdKeywordController@index'); //功能入口
+Route::post('/ccp/adKeyword/showTotal', 'CcpAdKeywordController@showTotal'); //ccp功能展示顶部统计数据
+Route::post('/ccp/adKeyword/list', 'CcpAdKeywordController@list');//ccp功能的列表展示
+
+Route::get('/ccp/adCampaign', 'CcpAdCampaignController@index'); //功能入口
+Route::post('/ccp/adCampaign/showTotal', 'CcpAdCampaignController@showTotal'); //ccp功能展示顶部统计数据
+Route::post('/ccp/adCampaign/list', 'CcpAdCampaignController@list');//ccp功能的列表展示
+
+Route::get('/ccp/adGroup', 'CcpAdGroupController@index'); //功能入口
+Route::post('/ccp/adGroup/showTotal', 'CcpAdGroupController@showTotal'); //ccp功能展示顶部统计数据
+Route::post('/ccp/adGroup/list', 'CcpAdGroupController@list');//ccp功能的列表展示
+//ccp-ad模块结束
 
 Route::get('/ccp/salesboard', 'CcpSalesboardController@index');
 Route::post('/ccp/salesboard/showTotal', 'CcpSalesboardController@showTotal');
@@ -499,6 +512,33 @@ Route::Post('/giftcard/get', 'GiftCardController@get');
 Route::Post('/giftcard/upload', 'GiftCardController@upload');
 Route::get('/giftcardexport', 'GiftCardController@export');
 
+
+Route::resource('adv', 'AdvController');
+Route::Post('/adv/listCampaigns', 'AdvController@listCampaigns');
+Route::Post('/adv/campaignBatchUpdate', 'AdvController@campaignBatchUpdate');
+Route::Post('/adv/updateCampaign', 'AdvController@updateCampaign');
+Route::get('/adv/campaign/{profile_id}/{ad_type}/{campaign_id}/{tab}', 'AdvController@editCampaign');
+Route::Post('/adv/listAdGroups', 'AdvController@listAdGroups');
+Route::get('/adv/adgroup/{profile_id}/{ad_type}/{adgroup_id}/{tab}', 'AdvController@editAdGroup');
+Route::Post('/adv/listAds', 'AdvController@listAds');
+Route::Post('/adv/listKeywords', 'AdvController@listKeywords');
+Route::Post('/adv/listProducts', 'AdvController@listProducts');
+Route::Post('/adv/updateAdGroup', 'AdvController@updateAdGroup');
+Route::Post('/adv/batchUpdate', 'AdvController@batchUpdate');
+Route::Post('/adv/updateBid', 'AdvController@updateBid');
+Route::Post('/adv/listNegkeywords', 'AdvController@listNegkeywords');
+Route::Post('/adv/storeNegkeywords', 'AdvController@storeNegkeywords');
+Route::Post('/adv/listNegproducts', 'AdvController@listNegproducts');
+Route::Post('/adv/storeNegproducts', 'AdvController@storeNegproducts');
+Route::Post('/adv/listGNegkeywords', 'AdvController@listGNegkeywords');
+Route::Post('/adv/storeGNegkeywords', 'AdvController@storeGNegkeywords');
+Route::Post('/adv/listGNegproducts', 'AdvController@listGNegproducts');
+Route::Post('/adv/storeGNegproducts', 'AdvController@storeGNegproducts');
+Route::Post('/adv/createAds', 'AdvController@createAds');
+Route::Post('/adv/createCampaign', 'AdvController@createCampaign');
+Route::Post('/adv/createAdGroup', 'AdvController@createAdGroup');
+Route::Post('/adv/createKeyword', 'AdvController@createKeyword');
+Route::Post('/adv/createTarget', 'AdvController@createTarget');
 //客诉品线问题细分
 Route::Post('/category/import', 'CategoryController@import');
 

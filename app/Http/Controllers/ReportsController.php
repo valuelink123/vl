@@ -51,6 +51,7 @@ class ReportsController extends Controller
         if($table =='fba_manage_inventory'){
             //$table='view_fba_manage_inventory';
         }
+
         $datas = DB::connection('amazon')->table($table);
         if(array_get($_REQUEST,'seller_account_id')){
             $datas = $datas->whereIn('seller_account_id',array_get($_REQUEST,'seller_account_id'));
@@ -88,6 +89,15 @@ class ReportsController extends Controller
             $datas = $datas->where('snapshot_date','<=',array_get($_REQUEST,'snapshot_date_to'));
             $exportFileName.=array_get($_REQUEST,'snapshot_date_to').'_';
         }
+        //FBA Smazon Fulfilled Inventory Report功能的搜索时间
+		if(array_get($_REQUEST,'date_from')){
+			$datas = $datas->where('updated_at','>=',array_get($_REQUEST,'date_from').' 00:00:00');
+			$exportFileName.=array_get($_REQUEST,'date_from').'_';
+		}
+		if(array_get($_REQUEST,'date_to')){
+			$datas = $datas->where('updated_at','<=',array_get($_REQUEST,'date_to').' 23:59:59');
+			$exportFileName.=array_get($_REQUEST,'date_to').'_';
+		}
         if(array_get($_REQUEST,'posted_date_from')){
             $datas = $datas->where('posted_date','>=',array_get($_REQUEST,'posted_date_from'));
             $exportFileName.=array_get($_REQUEST,'posted_date_from').'_';

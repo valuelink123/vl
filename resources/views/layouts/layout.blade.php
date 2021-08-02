@@ -711,6 +711,16 @@
                                             </li>
                                             @endpermission
 
+
+                                            @permission('adv-show')
+                                            <li class="">
+                                                <a href="/adv" class="nav-link nav-toggle">
+                                                    Adv manage
+                                                    <span class="arrow"></span>
+                                                </a>
+                                            </li>
+                                            @endpermission
+
 											</ul>
                                         </li>
 
@@ -976,10 +986,34 @@
 													</a>
 												</li>
 												@endpermission
-                                                @permission('ccp-ad-show')
+                                                @permission('ccp-ad-campaign-show')
                                                 <li class="">
-                                                    <a href="/ccp/ad" class="nav-link nav-toggle ">
-                                                        AD
+                                                    <a href="/ccp/adCampaign" class="nav-link nav-toggle ">
+                                                        AD Campaign
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
+                                                @endpermission
+                                                @permission('ccp-ad-group-show')
+                                                <li class="">
+                                                    <a href="/ccp/adGroup" class="nav-link nav-toggle ">
+                                                        AD Group
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
+                                                @endpermission
+                                                @permission('ccp-ad-keyword-show')
+                                                <li class="">
+                                                    <a href="/ccp/adKeyword" class="nav-link nav-toggle ">
+                                                        AD Keyword
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
+                                                @endpermission
+                                                @permission('ccp-ad-product-show')
+                                                <li class="">
+                                                    <a href="/ccp/adProduct" class="nav-link nav-toggle ">
+                                                        AD Product
                                                         <span class="arrow"></span>
                                                     </a>
                                                 </li>
