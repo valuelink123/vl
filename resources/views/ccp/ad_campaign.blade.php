@@ -141,6 +141,7 @@
                     <th>ACCOUNT NAME</th>
                     <th>NAME</th>
                     <th>STATE</th>
+                    <th>DAILY BUDGET</th>
                     <th>AD COST</th>
                     <th>SALES</th>
                     <th>ORDERS</th>
@@ -184,6 +185,7 @@
                 {data: 'account_name',name:'account_name'},
                 {data: 'name',name:'name'},
                 {data: 'state',name:'state'},
+                {data: 'daily_budget',name:'daily_budget'},
                 {data: 'cost',name:'cost'},
                 {data: 'sales',name:'sales'},
                 {data: 'orders',name:'orders'},

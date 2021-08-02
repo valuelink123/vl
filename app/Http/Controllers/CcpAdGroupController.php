@@ -127,7 +127,8 @@ class CcpAdGroupController extends Controller
 
 		$sql = "SELECT SQL_CALC_FOUND_ROWS 
 					any_value(accounts.seller_id) as seller_id,
-					ppc_ad_groups.name as name,
+					ppc_ad_groups.name as group_name,
+       				any_value(ppc_campaigns.name) as campaign_name, 
 					any_value(ppc_ad_groups.state) as state,
 					round(sum(ppc_reports.cost),2) as cost,
 					sum(ppc_reports.clicks) as clicks,
@@ -179,7 +180,7 @@ class CcpAdGroupController extends Controller
 			$val['cr'] = $val['clicks'] > 0 ? sprintf("%.2f",$val['orders']*100/$val['clicks']).'%' : '-';
 			$sellerid_marketplaceid = $val['seller_id'].'_'.$site;
 			$val['account_name'] = isset($data_account[$sellerid_marketplaceid]) ? $data_account[$sellerid_marketplaceid] : $val['seller_id'];
-			$data[$val['name']] = $val;
+			$data[$val['group_name']] = $val;
 		}
 		$data = array_values($data);
 		return compact('data', 'recordsTotal', 'recordsFiltered');
