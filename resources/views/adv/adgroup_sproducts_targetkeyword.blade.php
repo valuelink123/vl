@@ -237,43 +237,87 @@
                     @endforeach
                 </div>
                 <div class="form-group col-md-8" style="margin-top: 10px;">
-                        <div class="form-group mt-repeater">
-							<div data-repeater-list="keywords">
-								<div data-repeater-item class="mt-repeater-item">
-									<div class="row mt-repeater-row">
-										<div class="col-md-3">
-											<label class="control-label">Keyword Text</label>
-											<input type="text" class="form-control input-sm"  name="keywordText" required>
-								
-								        </div>
-										<div class="col-md-3">
-											<label class="control-label">Match Type</label>
-											<select class="form-control input-sm" name="matchType" required>
-                                            @foreach (\App\Models\PpcProfile::MATCHTYPE as $k=>$v)
-                                                <option value="{{$k}}" >{{$v}}</option>
-                                            @endforeach
-											</select>
-                                        </div>
-											
-										<div class="col-md-3">
-											<label class="control-label">Bid</label>
-											<div class="input-group">
-                                            <input type="text" class="form-control input-sm"  name="bid" value="0" required>
+
+                    <ul class="nav nav-tabs" id="addType">
+						<li class="active">
+							<a href="#customize" data-toggle="tab" aria-expanded="true">Customize</a>
+						</li>
+						<li >
+							<a href="#enter_list" data-toggle="tab" aria-expanded="true">Enter List</a>
+						</li>
+					</ul>
+                    <div class="tab-content">
+						<div class="tab-pane active" id="customize">
+                            <div class="form-group mt-repeater">
+                                <div data-repeater-list="keywords">
+                                    <div data-repeater-item class="mt-repeater-item">
+                                        <div class="row mt-repeater-row">
+                                            <div class="col-md-3">
+                                                <label class="control-label">Keyword Text</label>
+                                                <input type="text" class="form-control input-sm"  name="keywordText" required>
+                                    
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label class="control-label">Match Type</label>
+                                                <select class="form-control input-sm" name="matchType" required>
+                                                @foreach (\App\Models\PpcProfile::MATCHTYPE as $k=>$v)
+                                                    <option value="{{$k}}" >{{$v}}</option>
+                                                @endforeach
+                                                </select>
+                                            </div>
+                                                
+                                            <div class="col-md-3">
+                                                <label class="control-label">Bid</label>
+                                                <div class="input-group">
+                                                <input type="text" class="form-control input-sm"  name="bid" value="0" required>
+                                                </div>
+                                            </div>
+                    
+                                            <div class="col-md-2">
+                                                <a href="javascript:;" data-repeater-delete class="btn btn-danger mt-repeater-delete btn-sm">
+                                                    <i class="fa fa-close"></i>
+                                                </a>
                                             </div>
                                         </div>
-				
-										<div class="col-md-2">
-											<a href="javascript:;" data-repeater-delete class="btn btn-danger mt-repeater-delete btn-sm">
-												<i class="fa fa-close"></i>
-											</a>
-										</div>
-									</div>
-								</div>
-							</div>
-							<a href="javascript:;" data-repeater-create class="btn btn-sm btn-info mt-repeater-add">
-								<i class="fa fa-plus"></i> Add Keyword</a>
-						</div>
-						<div style="clear:both;height:30px;"></div>
+                                    </div>
+                                </div>
+                                <a href="javascript:;" data-repeater-create class="btn btn-sm btn-info mt-repeater-add">
+                                    <i class="fa fa-plus"></i> Add Keyword</a>
+                            </div>
+                        </div>
+
+
+                        <div class="tab-pane" id="enter_list">
+                            <div class="form-group col-md-12">
+                                <label>Match Type *</label>
+                                <select class="form-control" name="match_type" id="match_type">
+                                @foreach (\App\Models\PpcProfile::MATCHTYPE as $k=>$v)
+                                    <option value="{{$k}}" >{{$v}}</option>
+                                @endforeach
+                                </select>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label>Bid Option:</label>
+                                <select class="form-control" name="bidOption" id="bidOption">
+                                <option value="suggested" >Suggested Bid</option>
+                                <option value="customize" >Customize Bid</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group col-md-12">
+                                <label>Bid:</label>
+                                <input class="form-control"  name="bid" id="bid" value="{{array_get($adgroup,'defaultBid')}}">
+                            </div>
+
+
+                            <div class="form-group col-md-12">
+                                <label>Keywords *</label>
+                                <textarea class="form-control" rows="10" name="keyword_text" id="keyword_text"
+                                placeholder="Enter your list and separate each item whith a new line."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="clear:both;height:30px;"></div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -281,6 +325,7 @@
                 <button type="submit" class="btn green">Save changes</button>
                 <input type="hidden" name="profile_id" value="{{$profile_id}}">
                 <input type="hidden" name="ad_type" value="{{$ad_type}}">
+                <input type="hidden" name="defaultBid" value="{{array_get($adgroup,'defaultBid')}}">
                 <input type="hidden" name="campaignId" value="{{array_get($adgroup,'campaignId')}}">
                 <input type="hidden" name="adGroupId" value="{{array_get($adgroup,'adGroupId')}}">
                 <input type="hidden" name="action" value="keywords">
@@ -612,6 +657,12 @@
             });
             return false;
         });
+
+        $('#addType>li>a').on('click',function(){
+            $($(this).attr('href')+' input,select,textarea').attr('disabled',false);
+            $($(this).attr('href')).siblings().find('select,input,textarea').attr('disabled',true);
+        });
+
     });
 
 

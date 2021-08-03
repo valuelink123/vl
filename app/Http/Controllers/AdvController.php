@@ -610,16 +610,47 @@ class AdvController extends Controller
         try{
             $customActionMessage="";
             $datas=[];
-            $keywords = $request->get('keywords');
-            foreach($keywords as $keyword){
-                $keyword['state'] = 'enabled';
-                if($campaignId) $keyword['campaignId'] = $campaignId;
-                if($adGroupId) $keyword['adGroupId'] = $adGroupId;
-
-                $datas[]=$keyword; 
-            }
             $client = new PpcRequest($profile_id);
             $app = $client->request($ad_type);
+            $keyword['state'] = 'enabled';
+            if($campaignId) $keyword['campaignId'] = $campaignId;
+            if($adGroupId) $keyword['adGroupId'] = $adGroupId;
+            $keywords = $request->get('keywords');
+            if(!empty($keywords)){
+                foreach($keywords as $data){
+                    $datas[]=array_merge($keyword,$data); 
+                }
+            }else{
+                $keywords = explode(PHP_EOL, $request->get('keyword_text'));
+                if(!empty($keywords)){
+                    $keyword['matchType'] = $request->get('match_type');
+                    if($request->get('bidOption')=='customize'){
+                        $keyword['bid'] = round($request->get('bid'),2);
+                    }
+                    if(array_get($keyword,'bid')<=0)  $keyword['bid'] = round($request->get('defaultBid'),2);
+                    $suggestedBid = [];
+                    if($request->get('bidOption')=='suggested'){
+                        foreach($keywords as $data){
+                            $re['keywords'][] = [
+                                'keyword'=>$data,
+                                'matchType'=>$request->get('match_type'),
+                            ];
+                        }
+                        $re['adGroupId'] =  $adGroupId;
+                        $results = $app->bidding->getKeywordsBidRecommendations($re);
+                        if(!empty(array_get($results,'response.recommendations'))){
+                            foreach(array_get($results,'response.recommendations') as $k=>$v){
+                                $suggestedBid[array_get($v,'keyword')] = array_get($v,'suggestedBid.suggested');
+                            }
+                        }
+                    }
+                    foreach($keywords as $data){
+                        $keyword['keywordText']=$data;
+                        if(array_get($suggestedBid,$data)>0 && $request->get('bidOption')=='suggested') $keyword['bid'] = array_get($suggestedBid,$data);
+                        $datas[]=$keyword; 
+                    }
+                }
+            }
             $results = $app->$action->$method($datas);
             if(array_get($results,'success') == 1){
                 foreach(array_get($results,'response') as $result){
