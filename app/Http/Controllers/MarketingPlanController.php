@@ -115,7 +115,8 @@ class MarketingPlanController extends Controller
                 ->orderBy('date', 'desc')
                 ->first();
             $sql = "SELECT asins.fulfillment,asins.commission,sams.asin,asins.marketplaceid,sams.sku_status,sams.sku,asins.reviews,asins.rating,sams.seller_sku  
-                    from sap_asin_match_sku as sams LEFT JOIN asins on asins.asin= sams.asin 
+                    from sap_asin_match_sku as sams 
+					LEFT JOIN asins on asins.asin= sams.asin and sams.asin = asins.asin and sams.marketplace_id = asins.marketplaceid 
                     WHERE asins.asin ='" . $request['asin'] . "' 
                     AND asins.marketplaceid = '" . $request['marketplace_id'] . "' GROUP BY asins.marketplaceid,sams.asin";
             $user_asin_list_obj = DB::connection('vlz')->select($sql);
