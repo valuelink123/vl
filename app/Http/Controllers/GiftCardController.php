@@ -70,6 +70,7 @@ class GiftCardController extends Controller
                 $list['code'],
                 $list['amount'],
                 $list['currency'],
+				$list['cny'],
                 array_get($list,'user.name'),
                 array_get(GiftCard::STATUS,$list['status']),
                 array_get($list,'exception.amazon_order_id'),
@@ -142,6 +143,7 @@ class GiftCardController extends Controller
                     $data['code'] = array_get($value,2);
                     $data['amount'] = round(array_get($value,3),2);
                     $data['currency'] = array_get($value,4);
+					$data['cny'] = array_get($value,5);
                     $data['user_id'] = Auth::user()->id;
                     if($data['bg'] && $data['bu'] && $data['code'] && $data['amount'] && $data['currency']){
                         GiftCard::firstOrCreate(
