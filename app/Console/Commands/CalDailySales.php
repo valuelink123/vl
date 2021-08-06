@@ -104,9 +104,33 @@ class CalDailySales extends Command
                     if(!isset($skus_info[$key]['shipped'])) $skus_info[$key]['shipped']=0;
                     if(!isset($skus_info[$key]['replace'])) $skus_info[$key]['replace']=0;
                     if(!isset($skus_info[$key]['profit'])) $skus_info[$key]['profit']=0;
-                    if($sale->item_type == 'ItemCharge') $skus_info[$key]['income']+=round($sale->amount*array_get($rates,$sale->currency),2);
-                    if($sale->type == 'Principal') $skus_info[$key]['shipped']+=$sale->shipped;
-                    if(!$sale->current_marketplace_id && $sale->type=='FBAPerUnitFulfillmentFee') $skus_info[$key]['replace']+=$sale->shipped;
+                    if($sale->item_type == 'ItemCharge') {
+                        $skus_info[$key]['income'] += round($sale->amount * array_get($rates, $sale->currency), 2);
+                        if($sale->type=='Tax' || $sale->type='ShippingTax'){
+                            $skus_info[$key]['tax'] += round($sale->amount * array_get($rates, $sale->currency), 2);
+                        }
+                    }
+                    if($sale->type == 'Principal') {
+                        //发货数量
+                        $skus_info[$key]['shipped'] += $sale->shipped;
+                    }
+                    if(!$sale->current_marketplace_id && $sale->type=='FBAPerUnitFulfillmentFee') {
+                        //重发数量
+                        $skus_info[$key]['replace'] += $sale->shipped;
+                    }
+
+                    if($sale->item_type == 'ItemFee') {
+                        if($sale->type=='Commission'){
+                            $skus_info[$key]['commission'] += round($sale->amount * array_get($rates, $sale->currency), 2);
+                        }
+                        $skus_info[$key]['shippingfee'] += round($sale->amount * array_get($rates, $sale->currency), 2);
+                    }
+
+                    if($sale->item_type=='Promotion'){
+                        //折扣金额
+                        $skus_info[$key]['commission']+=round($sale->amount*array_get($rates,$sale->currency),2);
+                    }
+
                     $skus_info[$key]['profit']+=round($sale->amount*array_get($rates,$sale->currency),2);
                 }
 
