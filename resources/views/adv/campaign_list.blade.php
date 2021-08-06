@@ -166,7 +166,15 @@
             <!-- END EXAMPLE TABLE PORTLET-->
         </div>
     </div>
-
+    <div class="modal fade bs-modal-lg" id="ajax" role="basic" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content" >
+                <div class="modal-body" >
+                    Loading...
+                </div>
+            </div>
+        </div>
+    </div>
     <form id="update_form"  name="update_form" >
     {{ csrf_field() }}
     <div class="modal fade" id="updateForm" tabindex="-1" role="updateForm" aria-hidden="true" style="display: none;">
@@ -613,12 +621,19 @@
             });
             return false;
         });
+
+        $('#ajax').on('hidden.bs.modal', function (e) {
+            $('#ajax .modal-content').html('<div class="modal-body" >Loading...</div>');
+        });
+
+        $('#ad_type').on('change',function(){
+            $('#'+$(this).val()).show();
+            $('#'+$(this).val()).siblings('div').hide();
+        });
     });
 
-    $('#ad_type').on('change',function(){
-        $('#'+$(this).val()).show();
-        $('#'+$(this).val()).siblings('div').hide();
-    });
+    
+    
 
 
 </script>

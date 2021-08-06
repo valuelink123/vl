@@ -517,6 +517,7 @@ Route::resource('adv', 'AdvController');
 Route::Post('/adv/listCampaigns', 'AdvController@listCampaigns');
 Route::Post('/adv/campaignBatchUpdate', 'AdvController@campaignBatchUpdate');
 Route::Post('/adv/updateCampaign', 'AdvController@updateCampaign');
+Route::Post('/adv/copyCampaign', 'AdvController@copyCampaign');
 Route::get('/adv/campaign/{profile_id}/{ad_type}/{campaign_id}/{tab}', 'AdvController@editCampaign');
 Route::Post('/adv/listAdGroups', 'AdvController@listAdGroups');
 Route::get('/adv/adgroup/{profile_id}/{ad_type}/{adgroup_id}/{tab}', 'AdvController@editAdGroup');

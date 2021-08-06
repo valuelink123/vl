@@ -112,7 +112,7 @@ class AdvController extends Controller
             $records["data"][] = array(
                 '<input name="id[]" type="checkbox" class="checkboxes" value="'.(array_get($datas,$i.'.campaignType')?'SProducts':(array_get($datas,$i.'.adFormat')?'SBrands':'SDisplay')).'-'.array_get($datas,$i.'.campaignId').'"  />',
                 array_get($datas,$i.'.state'),
-                '<a href="/adv/campaign/'.$profile_id.'/'.(array_get($datas,$i.'.campaignType')?'SProducts':(array_get($datas,$i.'.adFormat')?'SBrands':'SDisplay')).'/'.array_get($datas,$i.'.campaignId').'/setting">'.array_get($datas,$i.'.name').'</a>',
+                '<a href="/adv/campaign/'.$profile_id.'/'.(array_get($datas,$i.'.campaignType')?'SProducts':(array_get($datas,$i.'.adFormat')?'SBrands':'SDisplay')).'/'.array_get($datas,$i.'.campaignId').'/setting">'.array_get($datas,$i.'.name').'</a> '.(array_get($datas,$i.'.campaignType')?'<a data-target="#ajax" data-toggle="modal" href="/adv/campaign/'.$profile_id.'/'.(array_get($datas,$i.'.campaignType')?'SProducts':(array_get($datas,$i.'.adFormat')?'SBrands':'SDisplay')).'/'.array_get($datas,$i.'.campaignId').'/copy" class="badge badge-success"> Copy </a>':''),
                 array_get($datas,$i.'.servingStatus'),
                 (array_get($datas,$i.'.campaignType')??(array_get($datas,$i.'.adFormat')?'Sponsored Brands':'Sponsored Display')).' - '.(array_get($datas,$i.'.targetingType')??'manual'),
                 array_get(PpcProfile::BIDDING,array_get($datas,$i.'.bidding.strategy','legacyForSales')),
@@ -181,7 +181,7 @@ class AdvController extends Controller
         $result = $app->campaigns->getCampaignEx($campaign_id);
         $campaign = $suggestedKeywords = $suggestedProducts = $suggestedCategories = [];
         if(array_get($result,'success')==1){
-            $campaign =array_get($result,'response');
+            $campaign = array_get($result,'response');
             if($ad_type=='SBrands'){
                 $result = $app->groups->listAdGroups(['campaignIdFilter'=>$campaign_id]);
                 $campaign['adGroupId'] = array_get($result,'response.0.adGroupId');
@@ -209,7 +209,144 @@ class AdvController extends Controller
                 }
             }
         }
-        return view('adv/campaign_'.strtolower($ad_type).'_'.$tab,['profile_id'=>$profile_id,'ad_type'=>$ad_type,'campaign'=>$campaign,'suggestedKeywords'=>$suggestedKeywords,'suggestedProducts'=>$suggestedProducts,'suggestedCategories'=>$suggestedCategories]); 
+        $profiles = [];
+        if($tab=='copy') $profiles = PpcProfile::get();
+        return view('adv/campaign_'.strtolower($ad_type).'_'.$tab,['profile_id'=>$profile_id,'ad_type'=>$ad_type,'campaign'=>$campaign,'suggestedKeywords'=>$suggestedKeywords,'suggestedProducts'=>$suggestedProducts,'suggestedCategories'=>$suggestedCategories,'profiles'=>$profiles]); 
+    }
+
+
+    public function copyCampaign(Request $request)
+    {
+        $profile_id = $request->get('profile_id');
+        $ad_type = $request->get('ad_type');
+        $campaign_id = $request->get('campaign_id');
+        $to_profile_id = $request->get('to_profile_id');
+        try{
+            $client = new PpcRequest($profile_id);
+            $app = $client->request($ad_type);
+            $new_client = new PpcRequest($to_profile_id);
+            $new_app = $new_client->request($ad_type);
+            $campaign = $adgroups = $ads = $keywords = $targets = [];
+            $result = $app->campaigns->getCampaignEx($campaign_id);
+            if(array_get($result,'success')==1) $campaign = array_get($result,'response');
+            $params['campaignIdFilter'] = $campaign_id;
+            $campaign['name'] = $request->get('to_name');
+            $campaign['startDate'] = date('Ymd',strtotime($request->get('startDate')));
+            $campaign['endDate'] = ($request->get('endDate')?date('Ymd',strtotime($request->get('endDate'))):NULL);
+            unset($campaign['campaignId']);
+            unset($campaign['premiumBidAdjustment']);
+            unset($campaign['servingStatus']);
+            unset($campaign['creationDate']);
+            unset($campaign['lastUpdatedDate']);
+            $customActionMessage="";
+            $copy = [];
+            $results = $new_app->campaigns->CreateCampaigns([$campaign]);
+            if(array_get($results,'success') != 1) throw new \Exception(array_get($results,'response'));
+
+            foreach(array_get($results,'response') as $result){
+                if(array_get($result,'campaignId')){
+                    $customActionMessage.='campaign '.array_get($result,'campaignId').' '.array_get($result,'code').' '.array_get($result,'description').'<BR>';
+                    $copy['campaignId'] = array_get($result,'campaignId');
+                }else{
+                    throw new \Exception(array_get($result,'code').' '.array_get($result,'description'));
+                }
+            }
+
+            $result = $app->groups->listAdGroupsEx($params);
+            if(array_get($result,'success')==1) $adgroups = array_get($result,'response');
+            foreach($adgroups as $adgroup){
+                $params['adGroupIdFilter'] = array_get($adgroup,'adGroupId');
+                $results = $new_app->groups->createAdGroups([[
+                    'campaignId'=>array_get($copy,'campaignId'),
+                    'name'=>array_get($adgroup,'name'),
+                    'defaultBid'=>array_get($adgroup,'defaultBid'),
+                    'state'=>array_get($adgroup,'state'),
+                ]]);
+                if(array_get($results,'success') != 1) throw new \Exception(array_get($results,'response'));
+
+                foreach(array_get($results,'response') as $result){
+                    if(array_get($result,'adGroupId')){
+                        $customActionMessage.='adGroup '.array_get($result,'adGroupId').' '.array_get($result,'code').' '.array_get($result,'description').'<BR>';
+                        $copy['adGroupId'] = array_get($result,'adGroupId');
+                    }else{
+                        throw new \Exception(array_get($result,'code').' '.array_get($result,'description'));
+                    }
+                }
+
+                $copyAds=$ads=[];
+                $result = $app->product_ads->listProductAds($params);
+                if(array_get($result,'success')==1) $ads = array_get($result,'response');
+                foreach($ads as $ad){
+                    $copyAds[] = array_merge($copy,[
+                        'sku'=>array_get($ad,'sku'),
+                        'state'=>array_get($ad,'state')
+                    ]);
+                }
+                if($copyAds){
+                    $results = $new_app->product_ads->createProductAds($copyAds);
+                    if(array_get($results,'success') == 1){
+                        foreach(array_get($results,'response') as $result){
+                            $customActionMessage.='productAd '.array_get($result,'adId').' '.array_get($result,'code').' '.array_get($result,'description').'<BR>';
+                        }
+                    }else{
+                        throw new \Exception(array_get($results,'response'));
+                    }
+                }
+
+                if($campaign['targetingType']=='auto') continue;
+                $copyKeywords = $keywords = [];
+                $result = $app->keywords->listBiddableKeywordsEx($params);
+                if(array_get($result,'success')==1) $keywords = array_get($result,'response');
+                foreach($keywords as $keyword){
+                    $copyKeywords[] = array_merge($copy,[
+                        'keywordText'=>array_get($keyword,'keywordText'),
+                        'bid'=>array_get($keyword,'bid'),
+                        'state'=>array_get($keyword,'state'),
+                        'matchType'=>array_get($keyword,'matchType'),
+                    ]);
+                }
+                if($copyKeywords){
+                    $results = $new_app->keywords->createKeywords($copyKeywords);
+                    if(array_get($results,'success') == 1){
+                        foreach(array_get($results,'response') as $result){
+                            $customActionMessage.='keyword '.array_get($result,'keywordId').' '.array_get($result,'code').' '.array_get($result,'description').'<BR>';
+                        }
+                    }else{
+                        throw new \Exception(array_get($results,'response'));
+                    }
+                }
+
+                $result = $app->product_targeting->listTargetingClausesEx($params);
+                $copyTargets = $targets = [];
+                if(array_get($result,'success')==1) $targets = array_get($result,'response');
+                foreach($targets as $target){
+                    $copyTargets[] = array_merge($copy,[
+                        'expressionType'=>array_get($target,'expressionType'),
+                        'bid'=>array_get($target,'bid'),
+                        'state'=>array_get($target,'state'),
+                        'expression'=>array_get($target,'expression'),
+                        'state'=>array_get($target,'state'),
+                        'resolvedExpression'=>array_get($target,'resolvedExpression'),
+                    ]);
+                }
+                if($copyTargets){
+                    $results = $new_app->product_targeting->createTargetingClauses($copyTargets);
+                    if(array_get($results,'success') == 1){
+                        foreach(array_get($results,'response') as $result){
+                            $customActionMessage.='target '.array_get($result,'targetId').' '.array_get($result,'code').' '.array_get($result,'description').'<BR>';
+                        }
+                    }else{
+                        throw new \Exception(array_get($results,'response'));
+                    }
+                }
+            }
+            $records["code"] = 'SUCCESS';
+            $records["description"] = $customActionMessage;
+        }catch (\Exception $e) { 
+            $records["code"] = '';
+            $records["description"] = $e->getMessage();
+        }    
+        echo json_encode($records);
     }
 
     public function updateCampaign(Request $request)
@@ -1416,11 +1553,11 @@ class AdvController extends Controller
                     'adjustments'=>[
                         [
                             'predicate'=>'placementTop',
-                            'percentage'=>$request->get('placementTop'),
+                            'percentage'=>round($request->get('placementTop'),2),
                         ],  
                         [
                             'predicate'=>'placementProductPage',
-                            'percentage'=>$request->get('placementProductPage'),
+                            'percentage'=>round($request->get('placementProductPage'),2),
                         ]
                     ],
                 ];
