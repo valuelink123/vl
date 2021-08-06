@@ -110,7 +110,7 @@ class CalDailySales extends Command
                     if(!isset($skus_info[$key]['shippingfee'])) $skus_info[$key]['shippingfee']=0;
                     if($sale->item_type == 'ItemCharge') {
                         $skus_info[$key]['income'] += round($sale->amount * array_get($rates, $sale->currency,1), 2);
-                        if($sale->type=='Tax' || $sale->type='ShippingTax'){
+                        if($sale->type=='Tax' || $sale->type=='ShippingTax'){
                             $skus_info[$key]['tax'] += round($sale->amount * array_get($rates, $sale->currency,1), 2);
                         }
                     }

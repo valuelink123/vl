@@ -294,6 +294,7 @@ a.editable-click:hover {
 
 {{--                新增加的参数--}}
 				<br>
+				<div class="col-md-10">
 				<?php
 				$class=$sign="";
 				$ap = array_get($total_info,'promotion',0);
@@ -359,7 +360,7 @@ a.editable-click:hover {
 						</div>
 						<div class="progress-info">
 							<div class="progress">
-								<span style="width: 100%;" class="progress-bar progress-bar-success green-sharp">
+								<span style="width: 100%;" class="progress-bar progress-bar-success red-haze">
 
 								</span>
 							</div>
@@ -397,7 +398,7 @@ a.editable-click:hover {
 						</div>
 						<div class="progress-info">
 							<div class="progress">
-								<span style="width: 100%;" class="progress-bar progress-bar-success green-sharp">
+								<span style="width: 100%;" class="progress-bar progress-bar-success purple-soft">
 
 								</span>
 							</div>
@@ -426,7 +427,7 @@ a.editable-click:hover {
 							<div class="number">
 								<small>TAX</small>
 								<h3 class="font-green-sharp">
-									<span data-counter="counterup">{{round($ap/10000,2)}} 万</span>
+									<span data-counter="counterup">-{{round($ap/10000,2)}} 万</span>
 									<small class="font-green-sharp">¥</small>
 								</h3>
 
@@ -435,7 +436,7 @@ a.editable-click:hover {
 						</div>
 						<div class="progress-info">
 							<div class="progress">
-								<span style="width: 100%;" class="progress-bar progress-bar-success green-sharp">
+								<span style="width: 100%;" class="progress-bar progress-bar-success blue-sharp">
 
 								</span>
 							</div>
@@ -446,9 +447,9 @@ a.editable-click:hover {
 						</div>
 					</div>
 				</div>
+				</div>
 			</div>
-
-			</div>
+	
 			
             <div class="col-md-3" style="    padding-top: 10px !important;">
 				
