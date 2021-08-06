@@ -291,6 +291,163 @@ a.editable-click:hover {
 					</div>
 				</div>
 				</div>
+
+{{--                新增加的参数--}}
+				<br>
+				<?php
+				$class=$sign="";
+				$ap = array_get($total_info,'promotion',0);
+				$hb_ap = array_get($hb_total_info,'promotion',0);
+				$ap_hb_ap = ($hb_ap!=0)?round(($ap-$hb_ap)/$hb_ap*100,2):'0';
+				if($ap_hb_ap>=0){
+					$class="font-red-haze";
+					$sign='+';
+				}else{
+					$class="font-green-sharp";
+				}
+				?>
+				<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12" style="width:20%;">
+					<div class="dashboard-stat2 ">
+						<div class="display">
+							<div class="number">
+								<small>PROMOTION</small>
+								<h3 class="font-green-sharp">
+									<span data-counter="counterup">{{round($ap/10000,2)}} 万</span>
+									<small class="font-green-sharp">¥</small>
+								</h3>
+
+							</div>
+
+						</div>
+						<div class="progress-info">
+							<div class="progress">
+								<span style="width: 100%;" class="progress-bar progress-bar-success green-sharp">
+
+								</span>
+							</div>
+							<div class="status">
+								<div class="status-title {{$class}}"> {{$sign.$ap_hb_ap}}%</div>
+								<div class="status-number">{{round($hb_ap/10000,2)}} 万</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<?php
+				$class=$sign="";
+				$ap = array_get($total_info,'shippingfee',0);
+				$hb_ap = array_get($hb_total_info,'shippingfee',0);
+				$ap_hb_ap = ($hb_ap!=0)?round(($ap-$hb_ap)/$hb_ap*100,2):'0';
+				if($ap_hb_ap>=0){
+					$class="font-red-haze";
+					$sign='+';
+				}else{
+					$class="font-green-sharp";
+				}
+				?>
+				<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12" style="width:20%;">
+					<div class="dashboard-stat2 ">
+						<div class="display">
+							<div class="number">
+								<small>SHIPPINGFEE</small>
+								<h3 class="font-green-sharp">
+									<span data-counter="counterup">{{round($ap/10000,2)}} 万</span>
+									<small class="font-green-sharp">¥</small>
+								</h3>
+
+							</div>
+
+						</div>
+						<div class="progress-info">
+							<div class="progress">
+								<span style="width: 100%;" class="progress-bar progress-bar-success green-sharp">
+
+								</span>
+							</div>
+							<div class="status">
+								<div class="status-title {{$class}}"> {{$sign.$ap_hb_ap}}%</div>
+								<div class="status-number">{{round($hb_ap/10000,2)}} 万</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<?php
+				$class=$sign="";
+				$ap = array_get($total_info,'commission',0);
+				$hb_ap = array_get($hb_total_info,'commission',0);
+				$ap_hb_ap = ($hb_ap!=0)?round(($ap-$hb_ap)/$hb_ap*100,2):'0';
+				if($ap_hb_ap>=0){
+					$class="font-red-haze";
+					$sign='+';
+				}else{
+					$class="font-green-sharp";
+				}
+				?>
+				<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12" style="width:20%;">
+					<div class="dashboard-stat2 ">
+						<div class="display">
+							<div class="number">
+								<small>COMMISSION</small>
+								<h3 class="font-green-sharp">
+									<span data-counter="counterup">{{round($ap/10000,2)}} 万</span>
+									<small class="font-green-sharp">¥</small>
+								</h3>
+
+							</div>
+
+						</div>
+						<div class="progress-info">
+							<div class="progress">
+								<span style="width: 100%;" class="progress-bar progress-bar-success green-sharp">
+
+								</span>
+							</div>
+							<div class="status">
+								<div class="status-title {{$class}}"> {{$sign.$ap_hb_ap}}%</div>
+								<div class="status-number">{{round($hb_ap/10000,2)}} 万</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<?php
+				$class=$sign="";
+				$ap = array_get($total_info,'tax',0);
+				$hb_ap = array_get($hb_total_info,'tax',0);
+				$ap_hb_ap = ($hb_ap!=0)?round(($ap-$hb_ap)/$hb_ap*100,2):'0';
+				if($ap_hb_ap>=0){
+					$class="font-red-haze";
+					$sign='+';
+				}else{
+					$class="font-green-sharp";
+				}
+				?>
+				<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12" style="width:20%;">
+					<div class="dashboard-stat2 ">
+						<div class="display">
+							<div class="number">
+								<small>TAX</small>
+								<h3 class="font-green-sharp">
+									<span data-counter="counterup">{{round($ap/10000,2)}} 万</span>
+									<small class="font-green-sharp">¥</small>
+								</h3>
+
+							</div>
+
+						</div>
+						<div class="progress-info">
+							<div class="progress">
+								<span style="width: 100%;" class="progress-bar progress-bar-success green-sharp">
+
+								</span>
+							</div>
+							<div class="status">
+								<div class="status-title {{$class}}"> {{$sign.$ap_hb_ap}}%</div>
+								<div class="status-number">{{round($hb_ap/10000,2)}} 万</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
 			</div>
 			
             <div class="col-md-3" style="    padding-top: 10px !important;">

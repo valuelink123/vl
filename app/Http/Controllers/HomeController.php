@@ -103,6 +103,10 @@ class HomeController extends Controller
 			marketplace_id,
 			any_value(sku) as sku,
 			any_value(sku_status) as sku_status,
+			sum(promotion) as promotion,
+			sum(shippingfee) as shippingfee,
+			sum(commission) as commission,
+			sum(tax) as tax,
 			sum(amount) as amount,
 			sum(resvered) as resvered,
 			sum(sale) as sale,
@@ -175,6 +179,10 @@ class HomeController extends Controller
 		$total_info = $total_info->where('date','>=',$date_from)->where('date','<=',$date_to)
 		->selectRaw('
 			sum(amount) as amount,
+			sum(promotion) as promotion,
+			sum(shippingfee) as shippingfee,
+			sum(commission) as commission,
+			sum(tax) as tax,
 			sum(resvered) as resvered,
 			sum(sale) as sale,
 			sum(income) as income,
@@ -195,6 +203,10 @@ class HomeController extends Controller
 		$hb_total_info = $hb_total_info->where('date','>=',$hb_date_from)->where('date','<=',$hb_date_to)
 		->selectRaw('
 			sum(amount) as amount,
+			sum(promotion) as promotion,
+			sum(shippingfee) as shippingfee,
+			sum(commission) as commission,
+			sum(tax) as tax,
 			sum(resvered) as resvered,
 			sum(sale) as sale,
 			sum(income) as income,
