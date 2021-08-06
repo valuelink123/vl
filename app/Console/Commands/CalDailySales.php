@@ -104,6 +104,10 @@ class CalDailySales extends Command
                     if(!isset($skus_info[$key]['shipped'])) $skus_info[$key]['shipped']=0;
                     if(!isset($skus_info[$key]['replace'])) $skus_info[$key]['replace']=0;
                     if(!isset($skus_info[$key]['profit'])) $skus_info[$key]['profit']=0;
+                    if(!isset($skus_info[$key]['commission'])) $skus_info[$key]['commission']=0;
+                    if(!isset($skus_info[$key]['promotion'])) $skus_info[$key]['promotion']=0;
+                    if(!isset($skus_info[$key]['tax'])) $skus_info[$key]['tax']=0;
+                    if(!isset($skus_info[$key]['shippingfee'])) $skus_info[$key]['shippingfee']=0;
                     if($sale->item_type == 'ItemCharge') {
                         $skus_info[$key]['income'] += round($sale->amount * array_get($rates, $sale->currency), 2);
                         if($sale->type=='Tax' || $sale->type='ShippingTax'){
@@ -128,7 +132,7 @@ class CalDailySales extends Command
 
                     if($sale->item_type=='Promotion'){
                         //折扣金额
-                        $skus_info[$key]['commission']+=round($sale->amount*array_get($rates,$sale->currency),2);
+                        $skus_info[$key]['promotion']+=round($sale->amount*array_get($rates,$sale->currency),2);
                     }
 
                     $skus_info[$key]['profit']+=round($sale->amount*array_get($rates,$sale->currency),2);
