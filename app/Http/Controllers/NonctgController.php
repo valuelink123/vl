@@ -90,13 +90,16 @@ class NonctgController extends Controller
         $orderby = $this->dtOrderBy($request);
         $limit = $this->dtLimit($request);
 
-        $sql = "SELECT SQL_CALC_FOUND_ROWS t1.id,t1.date,t1.email,encrypted_email,t1.email,t1.name,t1.amazon_order_id as order_id,t1.asin,t3.item_group,t3.item_no,t1.from,t1.status,t2.name AS processor,t3.seller,t3.bg,t3.bu,t1.saleschannel as saleschannel,t3.site as site,t1.sellersku as sellersku,rsg_requests.amazon_order_id as rsg_orderid,client.rsg_status as rsg_status,client.rsg_status_explain as rsg_status_explain    
+        $sql = "SELECT SQL_CALC_FOUND_ROWS t1.id,t1.date,t1.email,encrypted_email,t1.email,t1.name,t1.amazon_order_id as order_id,t1.asin,t3.item_group,t3.item_no,t1.from,t1.status,t2.name AS processor,t3.seller,t3.bg,t3.bu,t1.saleschannel as saleschannel,t3.site as site,t1.sellersku as sellersku,rsg_requests.amazon_order_id as rsg_orderid,client.rsg_status as rsg_status,client.rsg_status_explain as rsg_status_explain,note_log.note as track_note   
         FROM non_ctg t1 
 	  	Left JOIN rsg_requests on rsg_requests.amazon_order_id = t1.amazon_order_id 
 	  	LEFT JOIN client_info ON client_info.email = t1.email
         LEFT JOIN client ON client_info.client_id = client.id  
         LEFT JOIN users t2 ON t2.id = t1.processor
         LEFT JOIN asin t3 ON t1.asin = t3.asin and t3.site = CONCAT('www.',t1.saleschannel) and t1.sellersku = t3.sellersku  
+		left join (
+		    select any_value(note) as note,record_id  from track_log where track_log.type = 0 group by record_id
+		    ) as note_log on note_log.record_id = t1.id 
         where $where
         ORDER BY $orderby
         LIMIT $limit";
