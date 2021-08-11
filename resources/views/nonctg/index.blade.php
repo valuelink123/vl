@@ -140,6 +140,7 @@
                         <th>BU</th>
                         <th>Sales</th>
                         <th>Processor</th>
+                        <th>Track Note</th>
                         <th>Join RSg</th>
                         <th> Action </th>
                         <th>Email-Hidden</th>
@@ -229,7 +230,7 @@
                 selector: 'td:first-child', // 指定第一列可以点击选中
             },
             "aoColumnDefs": [
-                { "bVisible": false, "aTargets": [18] }
+                { "bVisible": false, "aTargets": [19] }
             ],
             columns: [
                 {
@@ -271,6 +272,7 @@
                 {data: 'bu', name: 'bu'},
                 {data: 'seller', name: 'seller'},
                 {data: 'processor', name: 'processor', width: "120px"},
+                {data: 'track_note', name: 'track_note'},
                 {data: 'join_rsg', name: 'join_rsg',orderable: false,},
                 {
                     width: "20px",
