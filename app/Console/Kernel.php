@@ -158,16 +158,16 @@ class Kernel extends ConsoleKernel
 		$schedule->command('update:mcf_order_amazonorderid')->monthly()->name('mcf_order_amazonorderid');
 
 		$schedule->command('cal:dailySales')->dailyAt('08:30')->name('dailySales')->withoutOverlapping();
-		$schedule->command('sync:sendmail')->everyTenMinutes()->name('syncSendMail')->withoutOverlapping();
-		$schedule->command('update:reportData')->dailyAt('07:30')->name('reportData')->withoutOverlapping();
+		//$schedule->command('sync:sendmail')->everyTenMinutes()->name('syncSendMail')->withoutOverlapping();
+		//$schedule->command('update:reportData')->dailyAt('07:30')->name('reportData')->withoutOverlapping();
 //		$schedule->command('update:emails')->monthly()->name('updateEmails')->withoutOverlapping();
 
 		//cron('*/10 * * * *')
-		$schedule->command('update:email_status')->cron('*/10 * * * *')->name('update_email_status')->withoutOverlapping();//更新邮箱状态，每10分钟一次
+		//$schedule->command('update:email_status')->cron('*/10 * * * *')->name('update_email_status')->withoutOverlapping();//更新邮箱状态，每10分钟一次
 
 		$schedule->command('add:roi_performance')->dailyAt('06:30')->name('add_roi_performance')->withoutOverlapping();//每天早上6点半执行
 
-		$schedule->command('update:sendboxStatus')->cron('0 */2 * * *')->name('updateSendboxStatus')->withoutOverlapping();//2小时执行一次
+		//$schedule->command('update:sendboxStatus')->cron('0 */2 * * *')->name('updateSendboxStatus')->withoutOverlapping();//2小时执行一次
     }
 
     /**
