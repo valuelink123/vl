@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\PpcProfile;
 use App\Models\PpcReportData;
+use App\Models\PpcSchedule;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
@@ -49,6 +50,108 @@ class AdvController extends Controller
         }
         $data = $data->where('date','>=',$params['start_date'])->where('date','<=',$params['end_date'])->groupBy($params['group_by'])->get()->keyBy($params['group_by'])->toArray();
         return $data;
+    }
+
+    public function listSchedules(Request $request)
+    {
+        $datas = PpcSchedule::with('user');
+        if($request->get('profile_id')) $datas = $datas->where('profile_id',$request->get('profile_id'));
+        if($request->get('ad_type')) $datas = $datas->where('ad_type',$request->get('ad_type'));
+        if($request->get('campaign_id')) $datas = $datas->where('campaign_id',$request->get('campaign_id'));
+        if(array_get($_REQUEST,'record_name')){
+            $datas = $datas->where('record_name','like','%'.array_get($_REQUEST,'record_name').'%');
+        }
+        if(array_get($_REQUEST,'status')!==NULL && array_get($_REQUEST,'status')!==''){
+            $datas = $datas->where('status',array_get($_REQUEST,'status'));
+        }
+        if(array_get($_REQUEST,'record_type')){
+            $datas = $datas->where('record_type',array_get($_REQUEST,'record_type'));
+        }
+        
+        
+        $iTotalRecords = $datas->count();
+        $iDisplayLength = intval($_REQUEST['length']);
+        $iDisplayLength = $iDisplayLength < 0 ? $iTotalRecords : $iDisplayLength;
+        $iDisplayStart = intval($_REQUEST['start']);
+        $sEcho = intval($_REQUEST['draw']);
+        $lists =  $datas->offset($iDisplayStart)->limit($iDisplayLength)->get()->toArray();
+        
+        $records["data"] = array();
+		foreach ( $lists as $list){
+            $records["data"][] = array(
+                '<input name="id[]" type="checkbox" class="checkboxes" value="'.$list['id'].'"  />',
+                $list['record_type'],
+                $list['record_name'],
+                array_get(\App\Models\PpcSchedule::STATUS,$list['status']),
+                $list['date_from'],
+                $list['date_to'],
+                $list['time'],
+                'State : '.$list['state'].'<BR>Bid : '.$list['bid'],
+                $list['done_at'].' '.$list['message'],
+                $list['updated_at'],
+                array_get($list,'user.name'),
+            );
+		}
+        $records["draw"] = $sEcho;
+        $records["recordsTotal"] = $iTotalRecords;
+        $records["recordsFiltered"] = $iTotalRecords;
+        echo json_encode($records);
+    }
+
+    public function editSchedule(Request $request)
+    {
+        $form=[
+            'profile_id'=>$request->get('profile_id'),
+            'ad_type'=>$request->get('ad_type'),
+            'campaign_id'=>$request->get('campaign_id'),
+            'record_type'=>$request->get('record_type'),
+            'record_type_id'=>$request->get('record_type_id'),
+            'record_name'=>$request->get('record_name'),
+            'status'=>1,
+            'date_from'=>date('Y-m-d'),
+            'date_to'=>date('Y-m-d'),
+            'time'=>'00:00',
+            'state'=>'enabled',
+            'bid'=>$request->get('bid'),
+        ];
+        if($request->get('id')) $form =  PpcSchedule::where('id',$request->get('id'))->first()->toArray();
+        return view('adv/schedule_edit',['form'=>$form]);
+    }
+	
+    public function saveSchedule(Request $request)
+    {
+        DB::beginTransaction();
+        try{ 
+            $id = intval($request->get('id'));
+            $data = $id?(PpcSchedule::findOrFail($id)):(new PpcSchedule);
+            $fileds = array(
+                'profile_id',
+                'ad_type',
+                'campaign_id',
+                'record_type',
+                'record_name',
+                'record_type_id',
+                'status',
+                'date_from',
+                'date_to',
+                'time',
+                'state',
+                'bid'
+            );
+            foreach($fileds as $filed){
+                $data->{$filed} = $request->get($filed);
+            }
+            $data->user_id = Auth::user()->id;
+            $data->save();
+            DB::commit();
+            $records["code"] = 'SUCCESS';
+            $records["description"] = "更新成功!";
+        }catch (\Exception $e) { 
+            DB::rollBack();
+            $records["code"] = 'FAILED';
+            $records["description"] = $e->getMessage();
+        }
+        echo json_encode($records);
     }
 
     public function listCampaigns(Request $request)
@@ -112,7 +215,9 @@ class AdvController extends Controller
             $records["data"][] = array(
                 '<input name="id[]" type="checkbox" class="checkboxes" value="'.(array_get($datas,$i.'.campaignType')?'SProducts':(array_get($datas,$i.'.adFormat')?'SBrands':'SDisplay')).'-'.array_get($datas,$i.'.campaignId').'"  />',
                 array_get($datas,$i.'.state'),
-                '<a href="/adv/campaign/'.$profile_id.'/'.(array_get($datas,$i.'.campaignType')?'SProducts':(array_get($datas,$i.'.adFormat')?'SBrands':'SDisplay')).'/'.array_get($datas,$i.'.campaignId').'/setting">'.array_get($datas,$i.'.name').'</a> '.(array_get($datas,$i.'.campaignType')?'<a data-target="#ajax" data-toggle="modal" href="/adv/campaign/'.$profile_id.'/'.(array_get($datas,$i.'.campaignType')?'SProducts':(array_get($datas,$i.'.adFormat')?'SBrands':'SDisplay')).'/'.array_get($datas,$i.'.campaignId').'/copy" class="badge badge-success"> Copy </a>':''),
+                '<a href="/adv/campaign/'.$profile_id.'/'.(array_get($datas,$i.'.campaignType')?'SProducts':(array_get($datas,$i.'.adFormat')?'SBrands':'SDisplay')).'/'.array_get($datas,$i.'.campaignId').'/setting">'.array_get($datas,$i.'.name').'</a> '
+                .(array_get($datas,$i.'.campaignType')?'<a data-target="#ajax" data-toggle="modal" href="/adv/campaign/'.$profile_id.'/'.(array_get($datas,$i.'.campaignType')?'SProducts':(array_get($datas,$i.'.adFormat')?'SBrands':'SDisplay')).'/'.array_get($datas,$i.'.campaignId').'/copy" class="badge badge-success"> Copy </a> ':'')
+                .(array_get($datas,$i.'.campaignType')?'<a data-target="#ajax" data-toggle="modal" href="/adv/scheduleEdit?profile_id='.$profile_id.'&ad_type='.(array_get($datas,$i.'.campaignType')?'SProducts':(array_get($datas,$i.'.adFormat')?'SBrands':'SDisplay')).'&campaign_id='.array_get($datas,$i.'.campaignId').'&record_type=campaign&record_type_id='.array_get($datas,$i.'.campaignId').'&record_name='.urlencode(array_get($datas,$i.'.name')).'&bid='.(array_get($datas,$i.'.dailyBudget')??array_get($datas,$i.'.budget')).'" class="badge badge-success"> Scheduled </a>':''),
                 array_get($datas,$i.'.servingStatus'),
                 (array_get($datas,$i.'.campaignType')??(array_get($datas,$i.'.adFormat')?'Sponsored Brands':'Sponsored Display')).' - '.(array_get($datas,$i.'.targetingType')??'manual'),
                 array_get(PpcProfile::BIDDING,array_get($datas,$i.'.bidding.strategy','legacyForSales')),
@@ -166,6 +271,21 @@ class AdvController extends Controller
             }
             $records["customActionStatus"] = 'OK';
             $records["customActionMessage"] = $customActionMessage;     
+        }catch (\Exception $e) { 
+            $records["customActionStatus"] = '';
+            $records["customActionMessage"] = $e->getMessage();
+        }    
+        echo json_encode($records);   
+
+    }
+
+    public function scheduleBatchUpdate(Request $request){
+        $status = $request->get('confirmStatus');
+        $ids = $request->get('id');
+        try{
+            PpcSchedule::whereIn('id',$ids)->update(['status'=>$status]);
+            $records["customActionStatus"] = 'OK';
+            $records["customActionMessage"] = 'Success';     
         }catch (\Exception $e) { 
             $records["customActionStatus"] = '';
             $records["customActionMessage"] = $e->getMessage();
@@ -907,6 +1027,7 @@ class AdvController extends Controller
         $end_date = $request->get('end_date');
         $name = $request->get('name');            
         $client = new PpcRequest($profile_id);
+        $ad_type=$request->get('ad_type');
         $params = [];
         if($request->get('stateFilter')) $params['stateFilter'] = $request->get('stateFilter');
         if($request->get('campaign_id')) $params['campaignIdFilter'] = $request->get('campaign_id');
@@ -966,7 +1087,8 @@ class AdvController extends Controller
             $records["data"][] = array(
                 '<input name="id[]" type="checkbox" class="checkboxes" value="'.array_get($datas,$i.'.adGroupId').'"  />',
                 array_get($datas,$i.'.state'),
-                '<a href="/adv/adgroup/'.$profile_id.'/'.$request->get('ad_type').'/'.array_get($datas,$i.'.adGroupId').'/setting">'.array_get($datas,$i.'.name').'</a>',
+                '<a href="/adv/adgroup/'.$profile_id.'/'.$request->get('ad_type').'/'.array_get($datas,$i.'.adGroupId').'/setting">'.array_get($datas,$i.'.name').'</a>'
+                .' <a data-target="#ajax" data-toggle="modal" href="/adv/scheduleEdit?profile_id='.$profile_id.'&ad_type='.$request->get('ad_type').'&campaign_id='.array_get($datas,$i.'.campaignId').'&record_type=adGroup&record_type_id='.array_get($datas,$i.'.adGroupId').'&record_name='.urlencode(array_get($datas,$i.'.name')).'&bid='.array_get($datas,$i.'.defaultBid').'" class="badge badge-success"> Scheduled </a>',
                 array_get($datas,$i.'.servingStatus'),
                 array_get($suggestedBid,'response.suggestedBid.suggested')?array_get($suggestedBid,'response.suggestedBid.suggested').'<BR>'.array_get($suggestedBid,'response.suggestedBid.rangeStart').' - '.array_get($suggestedBid,'response.suggestedBid.rangeEnd'):'-',
                 '<button type="button" class="ajax_bid btn default" data-pk="defaultBid" id="'.array_get($datas,$i.'.adGroupId').'">'.array_get($datas,$i.'.defaultBid').'</button>',
@@ -1303,7 +1425,8 @@ class AdvController extends Controller
             $records["data"][] = array(
                 '<input name="id[]" type="checkbox" class="checkboxes" value="'.array_get($datas,$i.'.keywordId').'"  />',
                 array_get($datas,$i.'.state'),
-                array_get($datas,$i.'.keywordText'),
+                array_get($datas,$i.'.keywordText')
+                .' <a data-target="#ajax" data-toggle="modal" href="/adv/scheduleEdit?profile_id='.$profile_id.'&ad_type='.$request->get('ad_type').'&campaign_id='.array_get($datas,$i.'.campaignId').'&record_type=keyword&record_type_id='.array_get($datas,$i.'.keywordId').'&record_name='.urlencode(array_get($datas,$i.'.keywordText').' - '.array_get($datas,$i.'.matchType')).'&bid='.array_get($datas,$i.'.bid').'" class="badge badge-success"> Scheduled </a>',
                 array_get($datas,$i.'.matchType'),
                 array_get($datas,$i.'.servingStatus'),
                 array_get($suggested,'suggested')?array_get($suggested,'suggested').'<BR>'.array_get($suggested,'rangeStart').' - '.array_get($suggested,'rangeEnd'):'-',
@@ -1369,6 +1492,7 @@ class AdvController extends Controller
             foreach($datas as $data){
                 if(strpos($data['expression'][0]['value'],$name) !== false){ 
                     $tmp[]=[
+                        'campaignId'=>$data['campaignId'],
                         'targetId'=>$data['targetId'],
                         'state'=>$data['state'],
                         'bid'=>round(array_get($data,'bid'),2),
@@ -1396,6 +1520,7 @@ class AdvController extends Controller
         }else{
             foreach($datas as $data){
                 $tmp[]=[
+                    'campaignId'=>$data['campaignId'],
                     'targetId'=>$data['targetId'],
                     'state'=>$data['state'],
                     'bid'=>round(array_get($data,'bid'),2),
@@ -1494,7 +1619,8 @@ class AdvController extends Controller
             $records["data"][] = array(
                 '<input name="id[]" type="checkbox" class="checkboxes" value="'.array_get($datas,$i.'.targetId').'"  />',
                 array_get($datas,$i.'.state'),
-                array_get($datas,$i.'.value'),
+                array_get($datas,$i.'.value')
+                .' <a data-target="#ajax" data-toggle="modal" href="/adv/scheduleEdit?profile_id='.$profile_id.'&ad_type='.$request->get('ad_type').'&campaign_id='.array_get($datas,$i.'.campaignId').'&record_type=target&record_type_id='.array_get($datas,$i.'.targetId').'&record_name='.urlencode(array_get($datas,$i.'.value').' - '.array_get($datas,$i.'.type')).'&bid='.array_get($datas,$i.'.bid').'" class="badge badge-success"> Scheduled </a>',
                 array_get($datas,$i.'.type'),
                 array_get($datas,$i.'.expressionType'),
                 array_get($datas,$i.'.servingStatus'),

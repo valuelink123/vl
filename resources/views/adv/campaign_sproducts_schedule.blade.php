@@ -35,13 +35,13 @@
                 <li >
                     <a href="/adv/campaign/{{$profile_id}}/{{$ad_type}}/{{array_get($campaign,'campaignId')}}/adgroup" >Ad Groups</a>
                 </li>
-                <li class="active">
+                <li >
                     <a href="/adv/campaign/{{$profile_id}}/{{$ad_type}}/{{array_get($campaign,'campaignId')}}/negkeyword" >Negative keywords</a>
                 </li>
-                <li >
+                <li>
                     <a href="/adv/campaign/{{$profile_id}}/{{$ad_type}}/{{array_get($campaign,'campaignId')}}/negproduct" >Negative products</a>
                 </li>
-                <li>
+                <li class="active">
                     <a href="/adv/campaign/{{$profile_id}}/{{$ad_type}}/{{array_get($campaign,'campaignId')}}/schedule" >Schedules</a>
                 </li>
             </ul>
@@ -54,7 +54,23 @@
                         <input type="hidden" name="ad_type" value="{{$ad_type}}">
                         <input type="hidden" name="campaign_id" value="{{array_get($campaign,'campaignId')}}">
                         <div class="col-md-2">
-                        <input type="text" class="form-control" name="name" placeholder="keyword">
+                        <select class="form-control" name="status" id="status" >
+                            <option value="" >All Status</option>
+                            @foreach (\App\Models\PpcSchedule::STATUS as $k=>$v)
+                                <option value="{{$k}}" >{{$v}}</option>
+                            @endforeach
+                        </select>
+                        </div>
+                        <div class="col-md-2">
+                        <select class="form-control" name="record_type" id="record_type" >
+                            <option value="" >All Type</option>
+                            @foreach (\App\Models\PpcSchedule::TYPE as $k=>$v)
+                                <option value="{{$k}}" >{{$v}}</option>
+                            @endforeach
+                        </select>
+                        </div>
+                        <div class="col-md-2">
+                        <input type="text" class="form-control" name="record_name" placeholder="keyword">
                         </div>
                             <div class="col-md-2">
                             <button type="button" class="btn blue" id="data_search">Search</button>		
@@ -66,18 +82,13 @@
 
                 <div class="portlet-title">
                     <div class="caption font-dark col-md-12">
-                        <div class="btn-group" style="float:right;">
-                            <button class="btn green dropdown-toggle" type="button" data-toggle="modal" href="#negkeywordform"> Create
-                            </button>
-                            
-                        </div>
-
-
                         <div class="btn-group batch-update">
                             <div class="table-actions-wrapper" id="table-actions-wrapper">
                                 <select id="confirmStatus" class="table-group-action-input form-control input-inline">
                                     <option value="">Select Status</option>
-                                    <option value="deleted" >Deleted</option>
+                                    @foreach (\App\Models\PpcSchedule::STATUS as $k=>$v)
+                                        <option value="{{$k}}" >{{$v}}</option>
+                                    @endforeach
                                 </select>
                                 <button class="btn  green table-status-action-submit">
                                     <i class="fa fa-check"></i> Batch Update
@@ -97,8 +108,16 @@
                                     <th>
                                         <input type="checkbox" class="group-checkable" data-set="#datatable_ajax .checkboxes" />
                                     </th>
-									<th>Keywords</th>
-									<th>Match Type</th>                 
+									<th>Type</th>
+                                    <th>Name</th>    
+                                    <th>Status</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
+                                    <th>Time</th>
+                                    <th>Content</th>
+                                    <th>Last Exec</th>
+                                    <th>Last Update</th>
+                                    <th>User</th>        
                                 </tr>
                             </thead>
                             <tbody>	
@@ -111,46 +130,15 @@
         </div>
     </div>
 </div>
-<form id="update_form"  name="update_form" >
-{{ csrf_field() }}
-<div class="modal fade" id="negkeywordform" tabindex="-1" role="negkeywordform" aria-hidden="true" style="display: none;">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
-                <h4 class="modal-title">Negative keywords</h4>
-            </div>
-            
-            <div class="modal-body"> 
-                        <div class="form-group col-md-12">
-                            <label>Match Type *</label>
-                            <select class="form-control" name="match_type" id="match_type">
-							<option value="negativeExact">negativeExact
-                            <option value="negativePhrase">negativePhrase
-							</select>
-                        </div>
-
-                        <div class="form-group col-md-12">
-                            <label>Keywords *</label>
-                            <textarea class="form-control" rows="10" name="keyword_text" id="keyword_text"
-                            placeholder="Enter your list and separate each item whith a new line."></textarea>
-                        </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn dark btn-outline" data-dismiss="modal">Close</button>
-                <button type="submit" class="btn green">Save changes</button>
-                <input type="hidden" name="profile_id" value="{{$profile_id}}">
-                <input type="hidden" name="ad_type" value="{{$ad_type}}">
-                <input type="hidden" name="campaignId" value="{{array_get($campaign,'campaignId')}}">
-                <input type="hidden" name="action" value="keywords">
-                <input type="hidden" name="method" value="createCampaignNegativeKeywords">
-            </div>
-        </div>
-        <!-- /.modal-content -->
-    </div>
-    <!-- /.modal-dialog -->
+<div class="modal fade bs-modal-lg" id="ajax" role="basic" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content" >
+			<div class="modal-body" >
+				Loading...
+			</div>
+		</div>
+	</div>
 </div>
-</form>
 <script>
         var TableDatatablesAjax = function () {
         var initPickers = function () {
@@ -168,9 +156,9 @@
             grid.setAjaxParam("profile_id", $("input[name='profile_id']").val());
             grid.setAjaxParam("ad_type", $("input[name='ad_type']").val());
             grid.setAjaxParam("campaign_id", $("input[name='campaign_id']").val());
-            grid.setAjaxParam("name", $("input[name='name']").val());
-            grid.setAjaxParam("action", "keywords");
-            grid.setAjaxParam("method", "listCampaignNegativeKeywords");
+            grid.setAjaxParam("record_name", $("input[name='record_name']").val());
+            grid.setAjaxParam("status", $("select[name='status']").val());
+            grid.setAjaxParam("record_type", $("select[name='record_type']").val());
             grid.init({
                 src: $("#datatable_ajax"),
                 onSuccess: function (grid, response) {
@@ -191,9 +179,10 @@
                     ],
                     "pageLength": 300,
                     "ajax": {
-                        "url": "{{ url('adv/listNegkeywords')}}",
+                        "url": "{{ url('adv/listSchedules')}}",
                     },
 
+					
                     //"scrollX": true,
                     //"autoWidth":true
                     /*
@@ -218,11 +207,6 @@
             $(".batch-update").unbind("click").on('click', '.table-status-action-submit', function (e) {
                 e.preventDefault();
                 var confirmStatus = $("#confirmStatus", $("#table-actions-wrapper"));
-                var profile_id = $("input[name='profile_id']").val();
-                var ad_type = $("input[name='ad_type']").val();
-                var id_type = 'keywordId';
-                var action = 'keywords';
-                var method = 'updateCampaignNegativeKeywords';
                 if (confirmStatus.val() != "" && grid.getSelectedRowsCount() > 0) {
                     $.ajaxSetup({
                         headers: { 'X-CSRF-TOKEN' : '{{ csrf_token() }}' }
@@ -230,8 +214,8 @@
                     $.ajax({
                         type: "POST",
                         dataType: "json",
-                        url: "{{ url('adv/batchUpdate') }}",
-                        data: {confirmStatus:confirmStatus.val(),id:grid.getSelectedRows(),profile_id:profile_id,ad_type:ad_type,id_type:id_type,action:action,method:method},
+                        url: "{{ url('adv/scheduleBatchUpdate') }}",
+                        data: {confirmStatus:confirmStatus.val(),id:grid.getSelectedRows()},
                         success: function (data) {
                             if(data.customActionStatus=='OK'){
                                 toastr.success(data.customActionMessage);
@@ -266,32 +250,15 @@
             dttable.fnDestroy(); 
             TableDatatablesAjax.init();
         });
-
-        $('#update_form').submit(function() {
-            $.ajaxSetup({
-                headers: { 'X-CSRF-TOKEN' : '{{ csrf_token() }}' }
+        $('#datatable_ajax').on('click', 'td:not(:has(input))', function (e) {
+            e.preventDefault();
+            var recordId = $(this).closest('tr').find('.checkboxes').prop('value');
+            $('#ajax').modal({
+                remote: '/adv/scheduleEdit?id='+recordId
             });
-            $.ajax({
-                type: "POST",
-                dataType: "json",
-                url: "{{ url('adv/storeNegkeywords') }}",
-                data: $('#update_form').serialize(),
-                success: function (data) {
-                    if(data.customActionStatus=='OK'){
-                        $('#negkeywordform').modal('hide');
-                        $('.modal-backdrop').remove();
-                        toastr.success(data.customActionMessage);
-                        var dttable = $('#datatable_ajax').dataTable();
-                        dttable.api().ajax.reload(null, false);
-                    }else{
-                        toastr.error(data.customActionMessage);
-                    }
-                },
-                error: function(data) {
-                    toastr.error(data.responseText);
-                }
-            });
-            return false;
+        } );
+        $('#ajax').on('hidden.bs.modal', function (e) {
+            $('#ajax .modal-content').html('<div class="modal-body" >Loading...</div>');
         });
     });
 

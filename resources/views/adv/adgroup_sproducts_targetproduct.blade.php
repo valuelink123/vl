@@ -302,7 +302,15 @@
     <!-- /.modal-dialog -->
 </div>
 </form>
-
+<div class="modal fade bs-modal-lg" id="ajax" role="basic" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" >
+            <div class="modal-body" >
+                Loading...
+            </div>
+        </div>
+    </div>
+</div>
 <script src="/assets/global/plugins/bootstrap-editable/bootstrap-editable/js/bootstrap-editable.js" type="text/javascript"></script>
 
 <script>
@@ -618,6 +626,11 @@
                 }
             });
             return false;
+        });
+
+
+        $('#ajax').on('hidden.bs.modal', function (e) {
+            $('#ajax .modal-content').html('<div class="modal-body" >Loading...</div>');
         });
     });
 

@@ -513,7 +513,7 @@ Route::Post('/giftcard/upload', 'GiftCardController@upload');
 Route::get('/giftcardexport', 'GiftCardController@export');
 
 
-Route::resource('adv', 'AdvController');
+Route::any('adv', 'AdvController@index');
 Route::Post('/adv/listCampaigns', 'AdvController@listCampaigns');
 Route::Post('/adv/campaignBatchUpdate', 'AdvController@campaignBatchUpdate');
 Route::Post('/adv/updateCampaign', 'AdvController@updateCampaign');
@@ -526,6 +526,7 @@ Route::Post('/adv/listKeywords', 'AdvController@listKeywords');
 Route::Post('/adv/listProducts', 'AdvController@listProducts');
 Route::Post('/adv/updateAdGroup', 'AdvController@updateAdGroup');
 Route::Post('/adv/batchUpdate', 'AdvController@batchUpdate');
+Route::Post('/adv/scheduleBatchUpdate', 'AdvController@scheduleBatchUpdate');
 Route::Post('/adv/updateBid', 'AdvController@updateBid');
 Route::Post('/adv/listNegkeywords', 'AdvController@listNegkeywords');
 Route::Post('/adv/storeNegkeywords', 'AdvController@storeNegkeywords');
@@ -540,6 +541,9 @@ Route::Post('/adv/createCampaign', 'AdvController@createCampaign');
 Route::Post('/adv/createAdGroup', 'AdvController@createAdGroup');
 Route::Post('/adv/createKeyword', 'AdvController@createKeyword');
 Route::Post('/adv/createTarget', 'AdvController@createTarget');
+Route::get('/adv/scheduleEdit', 'AdvController@editSchedule');
+Route::Post('/adv/saveSchedule', 'AdvController@saveSchedule');
+Route::Post('/adv/listSchedules', 'AdvController@listSchedules');
 //客诉品线问题细分
 Route::Post('/category/import', 'CategoryController@import');
 

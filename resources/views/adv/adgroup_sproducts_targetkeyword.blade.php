@@ -197,7 +197,15 @@
     </div>
 </div>
 
-
+<div class="modal fade bs-modal-lg" id="ajax" role="basic" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" >
+            <div class="modal-body" >
+                Loading...
+            </div>
+        </div>
+    </div>
+</div>
 <form id="update_form"  name="update_form" >
 {{ csrf_field() }}
 <div class="modal fade bs-modal-lg" id="updateForm" tabindex="-1" role="updateForm" aria-hidden="true" style="display: none;">
@@ -661,6 +669,10 @@
         $('#addType>li>a').on('click',function(){
             $($(this).attr('href')+' input,select,textarea').attr('disabled',false);
             $($(this).attr('href')).siblings().find('select,input,textarea').attr('disabled',true);
+        });
+
+        $('#ajax').on('hidden.bs.modal', function (e) {
+            $('#ajax .modal-content').html('<div class="modal-body" >Loading...</div>');
         });
 
     });

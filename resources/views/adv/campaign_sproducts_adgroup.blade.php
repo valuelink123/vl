@@ -41,6 +41,9 @@
                 <li >
                     <a href="/adv/campaign/{{$profile_id}}/{{$ad_type}}/{{array_get($campaign,'campaignId')}}/negproduct" >Negative products</a>
                 </li>
+                <li>
+                    <a href="/adv/campaign/{{$profile_id}}/{{$ad_type}}/{{array_get($campaign,'campaignId')}}/schedule" >Schedules</a>
+                </li>
             </ul>
             <div class="tab-content">
                 <div class="table-toolbar">
@@ -162,7 +165,7 @@
 									<th>Ad Group</th>
 									<th>Serving Status</th>
                                     <th>Suggested Bid</th>
-                                    <th>Butget</th>
+                                    <th>Bid</th>
 									<th>Impressions</th>
 									<th>Clicks</th>
 									<th>CTR</th>
@@ -184,7 +187,15 @@
         </div>
     </div>
 </div>
-
+<div class="modal fade bs-modal-lg" id="ajax" role="basic" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" >
+            <div class="modal-body" >
+                Loading...
+            </div>
+        </div>
+    </div>
+</div>
 <form id="update_form"  name="update_form" >
 {{ csrf_field() }}
 <div class="modal fade" id="updateForm" tabindex="-1" role="updateForm" aria-hidden="true" style="display: none;">
@@ -546,6 +557,10 @@
                 }
             });
             return false;
+        });
+
+        $('#ajax').on('hidden.bs.modal', function (e) {
+            $('#ajax .modal-content').html('<div class="modal-body" >Loading...</div>');
         });
     });
 

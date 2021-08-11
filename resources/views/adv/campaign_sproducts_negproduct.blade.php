@@ -41,6 +41,9 @@
                 <li class="active">
                     <a href="/adv/campaign/{{$profile_id}}/{{$ad_type}}/{{array_get($campaign,'campaignId')}}/negproduct" >Negative products</a>
                 </li>
+                <li>
+                    <a href="/adv/campaign/{{$profile_id}}/{{$ad_type}}/{{array_get($campaign,'campaignId')}}/schedule" >Schedules</a>
+                </li>
             </ul>
             <div class="tab-content">
                 <div class="table-toolbar">
