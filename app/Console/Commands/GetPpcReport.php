@@ -49,10 +49,10 @@ class GetPpcReport extends Command
         if($profileId) $tasks = $tasks->where('profile_id',$profileId);
         $tasks = $tasks->get();
         foreach($tasks as $task){
+            $client = new PpcRequest($task->profile_id);
+            $app = $client->request($task->ad_type); 
             DB::beginTransaction();
 		    try{
-                $client = new PpcRequest($task->profile_id);
-                $app = $client->request($task->ad_type); 
                 $result = $app->report->getReport($task->report_id);
                 if(array_get($result,'success')!=1) continue;
                 if(array_get($result,'response.status')!='SUCCESS') continue;
