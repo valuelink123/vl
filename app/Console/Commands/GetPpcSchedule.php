@@ -53,11 +53,11 @@ class GetPpcSchedule extends Command
         if($profileId) $tasks = $tasks->where('profile_id',$profileId);
         $tasks = $tasks->get();
         foreach($tasks as $task){
+            $client = new PpcRequest($task->profile_id);
+            $app = $client->request($task->ad_type); 
             DB::beginTransaction();
-            $customActionMessage = '';
 		    try{
-                $client = new PpcRequest($task->profile_id);
-                $app = $client->request($task->ad_type); 
+                
                 if($task->record_type=='campaign'){
                     $action = 'campaigns';
                     $method = 'updateCampaigns';

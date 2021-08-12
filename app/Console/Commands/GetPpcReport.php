@@ -50,21 +50,22 @@ class GetPpcReport extends Command
         $tasks = $tasks->get();
         foreach($tasks as $task){
             $client = new PpcRequest($task->profile_id);
-            $app = $client->request($task->ad_type); 
-            DB::beginTransaction();
+            $app = $client->request($task->ad_type);
+            $result = $app->report->getReport($task->report_id);
+            if(array_get($result,'success')!=1) continue;
+            if(array_get($result,'response.status')!='SUCCESS') continue;
+            $task->status = array_get($result,'response.status');
+            $task->location = array_get($result,'response.location');
+            $result = $app->report->downloadReportData($task->report_id,
+                [
+                    'path'=>storage_path(),
+                    'reportId'=>$task->report_id,
+                ]
+            );
+            if(array_get($result,'success')!=1) continue;
+            
 		    try{
-                $result = $app->report->getReport($task->report_id);
-                if(array_get($result,'success')!=1) continue;
-                if(array_get($result,'response.status')!='SUCCESS') continue;
-                $task->status = array_get($result,'response.status');
-                $task->location = array_get($result,'response.location');
-                $result = $app->report->downloadReportData($task->report_id,
-                    [
-                        'path'=>storage_path(),
-                        'reportId'=>$task->report_id,
-                    ]
-                );
-                if(array_get($result,'success')!=1) continue;
+                DB::beginTransaction();
                 $datas = array_get($result,'response');
                 foreach($datas as $data){
                     $data = unCamelizeArr($data);
