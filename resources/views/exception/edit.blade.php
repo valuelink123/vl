@@ -166,34 +166,31 @@ if($exception['user_id'] == Auth::user()->id && ($exception['process_status'] ==
 			<label>Seller Account and Order ID</label>
 		<div class="row" >
 	
-						<div class="col-md-5">
-						
-													<select id="rebindordersellerid" class="form-control" name="rebindordersellerid" required {{$disable}}>
-													<?php foreach ($sellerids as $id=>$name){?>
-														<option value="{{$id}}" <?php if($id ==$exception['sellerid']) echo 'selected' ?>>{{$name}}</option>
-													<?php }?>
-													</select> 		
-													
-						</div>
+			<div class="col-md-4">
+				<select id="rebindordersellerid" class="form-control" name="rebindordersellerid" required {{$disable}}>
+				<?php foreach ($sellerids as $id=>$name){?>
+					<option value="{{$id}}" <?php if($id ==$exception['sellerid']) echo 'selected' ?>>{{$name}}</option>
+				<?php }?>
+				</select>
+			</div>
 
-                        <div class="col-md-7">
-						<div class="input-group">
-                                                 
-													
-															
-                                                                <input id="rebindorderid" class="form-control" type="text" name="rebindorderid" placeholder="Amazon Order ID" value="{{$exception['amazon_order_id']}}" required disabled >
-                                                            <span class="input-group-btn">
-                                                                <button id="rebindorder" class="btn btn-success" type="button"  {{$disable}}>
-                                                                    Get Order Info</button>
-                                                            </span>
-                                                        </div>
-                            
-                        </div>
+			<div class="col-md-5">
+				<div class="input-group">
+					<input id="rebindorderid" class="form-control" type="text" name="rebindorderid" placeholder="Amazon Order ID" value="{{$exception['amazon_order_id']}}" required disabled >
+					<span class="input-group-btn">
+						<button id="rebindorder" class="btn btn-success" type="button"  {{$disable}}>
+							Get Order Info</button>
+					</span>
+				</div>
+			</div>
+			<div class="col-md-3">
+				<input type="text" class="form-control" name="asin" id="asin" value="{{$exception['asin']}}" placeholder="Order Asin" disabled>
+			</div>
                         
                         
-                    </div>	
-					</div>
-					 <div class="form-group">
+			</div>
+			</div>
+			 <div class="form-group">
 			<label>Customer Name</label>
 			<div class="input-group ">
 			<span class="input-group-addon">
