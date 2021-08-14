@@ -300,8 +300,8 @@ right join budget_skus as c on b.sku=c.sku and b.site=c.site where ((a.month>='"
 				$arrayData[$data->id][0] = $data->bg.$data->bu;
 				$arrayData[$data->id][1] = $data->sku;
 				$arrayData[$data->id][2] = $data->description;
-				$arrayData[$data->id][3] = array_get($sap_sellers,$data->sap_seller_id,$data->sap_seller_id);
-				$arrayData[$data->id][4] = array_get(getSkuStatuses(),$data->status,$data->status);
+				$arrayData[$data->id][3] = ($data->sap_seller_id)?array_get($sap_sellers,$data->sap_seller_id,$data->sap_seller_id):$data->sap_seller_id;
+				$arrayData[$data->id][4] = ($data->status)?array_get(getSkuStatuses(),$data->status,$data->status):$data->status;
 				$arrayData[$data->id][5] = $data->site;
 				$arrayData[$data->id][6] = $data->stock;
 				$arrayData[$data->id][7] = $data->sku_cost;
@@ -317,7 +317,7 @@ right join budget_skus as c on b.sku=c.sku and b.site=c.site where ((a.month>='"
 				$arrayData[$data->id][112] = 0;
 				$arrayData[$data->id][125] = 0;
 				$arrayData[$data->id][126] = $data->remark;
-				$arrayData[$data->id][127] = array_get(getBudgetStageArr(),intval($data->budget_status));
+				$arrayData[$data->id][127] = ($data->budget_status)?array_get(getBudgetStageArr(),intval($data->budget_status)):$data->budget_status;
 			}
 			$arrayData[$data->id][$month+8] = $data->qty;
 			$arrayData[$data->id][$month+21] = $data->income;

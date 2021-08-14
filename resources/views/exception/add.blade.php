@@ -109,7 +109,12 @@
 			　　}
 				$("#order_sku", $("#exception_form")).val(order_sku);
                 $("#saleschannel", $("#exception_form")).val(data.SalesChannel);
-                $("#asin", $("#exception_form")).val(data.orderItemData['0']['ASIN']);
+                console.log(data.orderItemData.length);
+                if(data.orderItemData.length==1){
+					$("#asin", $("#exception_form")).val(data.orderItemData['0']['ASIN']);
+				}else{
+					$("#asin", $("#exception_form")).val('');
+				}
 
                 rebindordersellerid.value = data.SellerId
                 let site = `www.${data.SalesChannel}`.toLowerCase()
@@ -193,34 +198,30 @@
 			<label>Seller Account and Order ID</label>
 		<div class="row" >
 
-						<div class="col-md-5">
+				<div class="col-md-4">
+					<input id="rebindordersellerid" class="form-control xform-autotrim" name="rebindordersellerid" list="list-rebindordersellerid" placeholder="Seller Account" autocomplete="off" />
+					<datalist id="list-rebindordersellerid">
+						@foreach ($sellerids as $id=>$name)
+							<option value="{{$id}}" label="{{$name}}" >
+						@endforeach
+					</datalist>
+				</div>
 
-													<input id="rebindordersellerid" class="form-control xform-autotrim" name="rebindordersellerid" list="list-rebindordersellerid" placeholder="Seller Account" autocomplete="off" />
-													<datalist id="list-rebindordersellerid">
-														@foreach ($sellerids as $id=>$name)
-															<option value="{{$id}}" label="{{$name}}" >
-														@endforeach
-													</datalist>
-
-						</div>
-
-                        <div class="col-md-7">
-						<div class="input-group">
-
-
-
-                                                                <input id="rebindorderid" class="form-control xform-autotrim" type="text" name="rebindorderid" placeholder="Amazon Order ID" autocomplete="off" required pattern="\d{3}-\d{7}-\d{7}" value="{{array_get($_REQUEST,'request_orderid')}}" />
-                                                            <span class="input-group-btn">
-                                                                <button id="rebindorder" class="btn btn-success" type="button">
-                                                                    Get Order Info</button>
-                                                            </span>
-                                                        </div>
-
-                        </div>
-
-
-                    </div>
+				<div class="col-md-5">
+					<div class="input-group">
+						<input id="rebindorderid" class="form-control xform-autotrim" type="text" name="rebindorderid" placeholder="Amazon Order ID" autocomplete="off" required pattern="\d{3}-\d{7}-\d{7}" value="{{array_get($_REQUEST,'request_orderid')}}" />
+						<span class="input-group-btn">
+							<button id="rebindorder" class="btn btn-success" type="button">
+								Get Order Info</button>
+						</span>
 					</div>
+				</div>
+
+				<div class="col-md-3">
+					<input type="text" class="form-control" name="asin" id="asin" value="" placeholder="Order Asin">
+				</div>
+			</div>
+			</div>
 					 <div class="form-group">
 			<label>Customer Name</label>
 			<div class="input-group ">
@@ -230,7 +231,6 @@
 				<input type="text" class="form-control" name="name" id="name" value="{{old('name')}}" required >
 				<input type="hidden" class="form-control" name="order_sku" id="order_sku" value="{{old('order_sku')}}" >
 				<input type="hidden" class="form-control" name="saleschannel" id="saleschannel" value="{{old('SalesChannel')}}" >
-				<input type="hidden" class="form-control" name="asin" id="asin" value="" >
 			</div>
 		</div>
 					<div class="form-group">
