@@ -12,7 +12,7 @@
                             <input type="hidden" name="record_type_id" value="{{array_get($form,'record_type_id')}}">
                             <input type="hidden" name="campaign_id" value="{{array_get($form,'campaign_id')}}">
                             <input type="hidden" name="id" value="{{array_get($form,'id')}}">
-
+                            
                             <div class="form-group">
                                 <label>Name:</label>
                                 <input type="text" readonly class="form-control" name="record_name" id="record_name" value="{{array_get($form,'record_name')}}" >

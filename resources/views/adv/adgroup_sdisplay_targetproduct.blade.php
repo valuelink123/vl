@@ -1,5 +1,8 @@
 @extends('layouts.layout')
-@section('label', 'AdGroups')
+@section('label')
+<a href="/adv">Advertising</a>  - Campaigns <a href="/adv/campaign/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'campaignId')}}/setting">{{array_get($adgroup,'campaignName')}}</a>
+ - AdGroup <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/setting">{{array_get($adgroup,'name')}}</a>
+@endsection
 @section('content')
 <style type="text/css">
 	th, td { white-space: nowrap;word-break:break-all; }
@@ -63,9 +66,9 @@
                         <div class="col-md-2">
                         <div id="reportrange" class="btn default">
                             <i class="fa fa-calendar"></i> &nbsp;
-                            <span>{{ date('Y-m-d').' - '.date('Y-m-d')}}</span>
+                            <span>{{ date('Y-m-d',strtotime('-29 days')).' - '.date('Y-m-d')}}</span>
                             <b class="fa fa-angle-down"></b>
-                            <input type="hidden" name="start_date" id="start_date" value="{{date('Y-m-d')}}">
+                            <input type="hidden" name="start_date" id="start_date" value="{{date('Y-m-d',strtotime('-29 days'))}}">
                             <input type="hidden" name="end_date" id="end_date" value="{{date('Y-m-d')}}">
                         </div>
                         </div>
@@ -85,37 +88,37 @@
                         <div class="col-lg-2 col-md-4 col-xs-12">
                             <div class="mt-element-ribbon bg-grey-steel">
                                 <div class="ribbon ribbon-color-default uppercase">Spend</div>
-                                <p class="ribbon-content"><span class="text-primary" id = 'total_spend'>0</span><span class="text-success"> TOTAL</span></p>
+                                <p class="ribbon-content"><span class="text-primary total_spend">0</span><span class="text-success"> TOTAL</span></p>
                             </div>
                         </div>
                         <div class="col-lg-2 col-md-4 col-xs-12">
                             <div class="mt-element-ribbon bg-grey-steel">
                                 <div class="ribbon ribbon-color-primary uppercase">Clicks</div>
-                                <p class="ribbon-content"><span class="text-primary" id = 'total_clicks'>0</span><span class="text-success"> TOTAL</span></p>
+                                <p class="ribbon-content"><span class="text-primary total_clicks">0</span><span class="text-success"> TOTAL</span></p>
                             </div>
                         </div>
                         <div class="col-lg-2 col-md-4 col-xs-12">
                             <div class="mt-element-ribbon bg-grey-steel">
                                 <div class="ribbon ribbon-color-info uppercase">CTR</div>
-                                <p class="ribbon-content"><span class="text-primary" id = 'avg_ctr'>0</span><span class="text-success"> AVERAGE</span></p>
+                                <p class="ribbon-content"><span class="text-primary avg_ctr">0</span><span class="text-success"> AVERAGE</span></p>
                             </div>
                         </div>
                         <div class="col-lg-2 col-md-4 col-xs-12">
                             <div class="mt-element-ribbon bg-grey-steel">
                                 <div class="ribbon ribbon-color-success uppercase">Orders</div>
-                                <p class="ribbon-content"><span class="text-primary" id = 'total_orders'>0</span><span class="text-success"> TOTAL</span></p>
+                                <p class="ribbon-content"><span class="text-primary total_orders">0</span><span class="text-success"> TOTAL</span></p>
                             </div>
                         </div>
                         <div class="col-lg-2 col-md-4 col-xs-12">
                             <div class="mt-element-ribbon bg-grey-steel">
                                 <div class="ribbon ribbon-color-danger uppercase ">ACOS</div>
-                                <p class="ribbon-content"><span class="text-primary" id = 'avg_acos'>0</span><span class="text-success"> AVERAGE</span></p>
+                                <p class="ribbon-content"><span class="text-primary avg_acos">0</span><span class="text-success"> AVERAGE</span></p>
                             </div>
                         </div>
                         <div class="col-lg-2 col-md-4 col-xs-12">
                             <div class="mt-element-ribbon bg-grey-steel">
                                 <div class="ribbon ribbon-color-warning uppercase ">ROAS</div>
-                                <p class="ribbon-content"><span class="text-primary" id = 'avg_raos'>0</span><span class="text-success"> AVERAGE</span></p>
+                                <p class="ribbon-content"><span class="text-primary avg_raos">0</span><span class="text-success"> AVERAGE</span></p>
                             </div>
                         </div>
                     </div>
@@ -175,6 +178,18 @@
                                     <th>Sales</th>
                                     <th>ACOS</th>
                                     <th>ROAS</th>                     
+                                </tr>
+                                <tr>
+                                    <th colspan=8></th>
+                                    <th><span class="text-primary total_impressions">0</span></th>
+									<th><span class="text-primary total_clicks">0</span></th>
+									<th><span class="text-primary avg_ctr">0</span></th>
+									<th><span class="text-primary total_spend">0</span></th> 
+									<th><span class="text-primary avg_cpc">0</span></th>
+									<th><span class="text-primary total_orders">0</span></th>
+                                    <th><span class="text-primary total_sales">0</span></th>
+                                    <th><span class="text-primary avg_acos">0</span></th>
+                                    <th><span class="text-primary avg_raos">0</span></th>
                                 </tr>
                             </thead>
                             <tbody>	
@@ -329,7 +344,10 @@
                 dataTable: {
                    //"serverSide":false,
                    "autoWidth":false,
-                   "ordering": false,
+                   "aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0,1,2,3,4,5,6,7] }],
+                   "order": [
+                        [8, "desc"]
+                    ],
                     "lengthMenu": [
                         [50, 100, 300, -1],
                         [50, 100, 300, 'All'] 
@@ -408,13 +426,15 @@
                             attributed_sales1d+=Number(child_value.attributed_sales1d);
                             attributed_units_ordered1d+=Number(child_value.attributed_sales1d);
                         }
-                        $("#total_spend").html(spend.toFixed(2));
-                        $("#total_clicks").html(clicks);
-                        $("#total_orders").html(orders);
-                        $("#avg_ctr").html(((impressions<=0)?0:clicks/impressions).toFixed(4));
-                        $("#avg_acos").html(((attributed_sales1d<=0)?0:spend/attributed_sales1d).toFixed(4));
-                        $("#avg_raos").html(((spend<=0)?0:attributed_sales1d/spend).toFixed(4));
-                        console.log(chartY);
+                        $(".total_spend").html(spend.toFixed(2));
+                        $(".total_clicks").html(clicks);
+                        $(".total_orders").html(orders);
+                        $(".total_impressions").html(impressions);
+                        $(".total_sales").html(attributed_sales1d.toFixed(2));
+                        $(".avg_cpc").html(((clicks<=0)?0:spend/clicks).toFixed(2));
+                        $(".avg_ctr").html(((impressions<=0)?0:clicks/impressions*100).toFixed(2)+'%');
+                        $(".avg_acos").html(((attributed_sales1d<=0)?0:spend/attributed_sales1d*100).toFixed(2)+'%');
+                        $(".avg_raos").html(((spend<=0)?0:attributed_sales1d/spend*100).toFixed(2)+'%');
 
                         var lineChart = echarts.init(document.getElementById('lineChart'));
 
@@ -542,7 +562,7 @@
 
         $('#reportrange').daterangepicker({
                 opens: (App.isRTL() ? 'left' : 'right'),
-                startDate: moment(),
+                startDate: moment().subtract('days', 29),
                 endDate: moment(),
                 dateLimit: {
                     days: 60

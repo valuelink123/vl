@@ -172,16 +172,21 @@ class AdvController extends Controller
                 $datas = array_merge(array_get($result,'response'),$datas);
             }
         }
-        if($name){
-            $tmp=[];
-            foreach($datas as $data){
+        
+        $tmp=[];
+        foreach($datas as $data){
+            if($name){
                 if(strpos($data['name'],$name) !== false){ 
-                    $tmp[] = $data;
+                    $tmp[$data['campaignId']] = $data;
                     $campaignIds[] = $data['campaignId'];
                 }
+            }else{
+                $tmp[$data['campaignId']] = $data;
+                $campaignIds[] = $data['campaignId'];
             }
-            $datas = $tmp;
         }
+        $datas = $tmp;
+        
         $iTotalRecords = count($datas);
         if($iTotalRecords>0) {
             $reportData = $this->getReportData(
@@ -206,6 +211,36 @@ class AdvController extends Controller
                 ]
             );
         }
+        foreach($datas as $key=>$val){
+            $datas[$key]= array_merge($datas[$key],array_get($reportData,$key,[
+                'impressions'=>0,
+                'clicks'=>0,
+                'ctr'=>0,
+                'cost'=>0,
+                'cpc'=>0,
+                'attributed_units_ordered1d'=>0,
+                'attributed_sales1d'=>0,
+                'acos'=>0,
+                'raos'=>0,
+            ]));
+        }
+        $sortFields = [
+            '9'=>'impressions',
+            '10'=>'clicks',
+            '11'=>'ctr',
+            '12'=>'cost',
+            '13'=>'cpc',
+            '14'=>'attributed_units_ordered1d',
+            '15'=>'attributed_sales1d',
+            '16'=>'acos',
+            '17'=>'raos',
+        ];
+        $sortTypes = [
+            'asc'=>SORT_ASC,
+            'desc'=>SORT_DESC,
+        ];
+        $field = array_column($datas,array_get($sortFields,array_get($request->get('order'),'0.column')));
+        array_multisort($field,array_get($sortTypes,array_get($request->get('order'),'0.dir')),$datas);
         $iDisplayLength = intval($_REQUEST['length']);
         $iDisplayLength = $iDisplayLength < 0 ? $iTotalRecords : $iDisplayLength;
         $iDisplayStart = intval($_REQUEST['start']);
@@ -1038,21 +1073,20 @@ class AdvController extends Controller
             $datas = array_get($result,'response');
         }
 
-        if($name){
-            $tmp=[];
-            foreach($datas as $data){
+        $tmp=[];
+        foreach($datas as $data){
+            if($name){
                 if(strpos($data['name'],$name) !== false){ 
-                    $tmp[] = $data;
+                    $tmp[$data['adGroupId']] = $data;
                     $adgroupIds[] = $data['adGroupId'];
                 }
+            }else{
+                $tmp[$data['adGroupId']] = $data;
+                $adgroupIds[] = $data['adGroupId'];
             }
-            $datas = $tmp;
-        }else{
-            foreach($datas as $data){
-                $adgroupIds[] = $data['adGroupId']; 
-            }
-
         }
+        $datas = $tmp;
+
         $iTotalRecords = count($datas);
         if($iTotalRecords>0) {
             $reportData = $this->getReportData(
@@ -1077,6 +1111,36 @@ class AdvController extends Controller
                 ]
             );
         }
+        foreach($datas as $key=>$val){
+            $datas[$key]= array_merge($datas[$key],array_get($reportData,$key,[
+                'impressions'=>0,
+                'clicks'=>0,
+                'ctr'=>0,
+                'cost'=>0,
+                'cpc'=>0,
+                'attributed_units_ordered1d'=>0,
+                'attributed_sales1d'=>0,
+                'acos'=>0,
+                'raos'=>0,
+            ]));
+        }
+        $sortFields = [
+            '7'=>'impressions',
+            '8'=>'clicks',
+            '9'=>'ctr',
+            '10'=>'cost',
+            '11'=>'cpc',
+            '12'=>'attributed_units_ordered1d',
+            '13'=>'attributed_sales1d',
+            '14'=>'acos',
+            '15'=>'raos',
+        ];
+        $sortTypes = [
+            'asc'=>SORT_ASC,
+            'desc'=>SORT_DESC,
+        ];
+        $field = array_column($datas,array_get($sortFields,array_get($request->get('order'),'0.column')));
+        array_multisort($field,array_get($sortTypes,array_get($request->get('order'),'0.dir')),$datas);
         $iDisplayLength = intval($_REQUEST['length']);
         $iDisplayLength = $iDisplayLength < 0 ? $iTotalRecords : $iDisplayLength;
         $iDisplayStart = intval($_REQUEST['start']);
@@ -1120,7 +1184,10 @@ class AdvController extends Controller
         $adgroup = $suggestedKeywords = $suggestedProducts = $suggestedCategories = [];
         if(array_get($result,'success')==1){
             $adgroup =array_get($result,'response');
-
+            $result = $app->campaigns->getCampaignEx(array_get($adgroup,'campaignId'));
+            if(array_get($result,'success')==1){
+                $adgroup['campaignName'] = array_get($result,'response.name');
+            }
             if($ad_type=='SDisplay'){
                 if($tab=="creatives"){
                     $result = $app->groups->listCreatives(['adGroupIdFilter'=>$adgroup_id]);
@@ -1287,6 +1354,36 @@ class AdvController extends Controller
                 ]
             );
         }
+        foreach($datas as $key=>$val){
+            $datas[$key]= array_merge($datas[$key],array_get($reportData,$key,[
+                'impressions'=>0,
+                'clicks'=>0,
+                'ctr'=>0,
+                'cost'=>0,
+                'cpc'=>0,
+                'attributed_units_ordered1d'=>0,
+                'attributed_sales1d'=>0,
+                'acos'=>0,
+                'raos'=>0,
+            ]));
+        }
+        $sortFields = [
+            '4'=>'impressions',
+            '5'=>'clicks',
+            '6'=>'ctr',
+            '7'=>'cost',
+            '8'=>'cpc',
+            '9'=>'attributed_units_ordered1d',
+            '10'=>'attributed_sales1d',
+            '11'=>'acos',
+            '12'=>'raos',
+        ];
+        $sortTypes = [
+            'asc'=>SORT_ASC,
+            'desc'=>SORT_DESC,
+        ];
+        $field = array_column($datas,array_get($sortFields,array_get($request->get('order'),'0.column')));
+        array_multisort($field,array_get($sortTypes,array_get($request->get('order'),'0.dir')),$datas);
         $iDisplayLength = intval($_REQUEST['length']);
         $iDisplayLength = $iDisplayLength < 0 ? $iTotalRecords : $iDisplayLength;
         $iDisplayStart = intval($_REQUEST['start']);
@@ -1340,28 +1437,17 @@ class AdvController extends Controller
 
 
         $field = ($request->get('ad_type')=='SProducts')?'keyword':'keywordText';
-        if($name){
-            $tmp=[];
-            foreach($datas as $data){
-                if(strpos($data['keywordText'],$name) !== false){ 
-                    $tmp[] = $data;
-                    $ids[] = $data['keywordId'];
-                    $tmpExpression[]=[
-                        $field=>array_get($data,'keywordText'),
-                        'matchType'=>array_get($data,'matchType'),
-                    ];
-                }
-            }
-            $datas = $tmp;
-        }else{
-            foreach($datas as $data){
-                $ids[] = $data['keywordId'];
-                $tmpExpression[]=[
-                    $field=>array_get($data,'keywordText'),
-                    'matchType'=>array_get($data,'matchType'),
-                ];
-            }
+        $tmp=[];
+        foreach($datas as $data){
+            if($name && (strpos($data['keywordText'],$name) === false)) continue; 
+            $tmp[$data['keywordId']] = $data;
+            $ids[] = $data['keywordId'];
+            $tmpExpression[]=[
+                $field=>array_get($data,'keywordText'),
+                'matchType'=>array_get($data,'matchType'),
+            ];
         }
+        $datas = $tmp;
         $iTotalRecords = count($datas);
         if($iTotalRecords>0) {
             $suggestedBid = [];
@@ -1415,6 +1501,36 @@ class AdvController extends Controller
                 ]
             );
         }
+        foreach($datas as $key=>$val){
+            $datas[$key]= array_merge($datas[$key],array_get($reportData,$key,[
+                'impressions'=>0,
+                'clicks'=>0,
+                'ctr'=>0,
+                'cost'=>0,
+                'cpc'=>0,
+                'attributed_units_ordered1d'=>0,
+                'attributed_sales1d'=>0,
+                'acos'=>0,
+                'raos'=>0,
+            ]));
+        }
+        $sortFields = [
+            '8'=>'impressions',
+            '9'=>'clicks',
+            '10'=>'ctr',
+            '11'=>'cost',
+            '12'=>'cpc',
+            '13'=>'attributed_units_ordered1d',
+            '14'=>'attributed_sales1d',
+            '15'=>'acos',
+            '16'=>'raos',
+        ];
+        $sortTypes = [
+            'asc'=>SORT_ASC,
+            'desc'=>SORT_DESC,
+        ];
+        $field = array_column($datas,array_get($sortFields,array_get($request->get('order'),'0.column')));
+        array_multisort($field,array_get($sortTypes,array_get($request->get('order'),'0.dir')),$datas);
         $iDisplayLength = intval($_REQUEST['length']);
         $iDisplayLength = $iDisplayLength < 0 ? $iTotalRecords : $iDisplayLength;
         $iDisplayStart = intval($_REQUEST['start']);
@@ -1487,64 +1603,34 @@ class AdvController extends Controller
             $defaultBid = round(array_get($adgroup,'response.defaultBid'),2);
         }
         
-
-        if($name){
-            foreach($datas as $data){
-                if(strpos($data['expression'][0]['value'],$name) !== false){ 
-                    $tmp[]=[
-                        'campaignId'=>$data['campaignId'],
-                        'targetId'=>$data['targetId'],
-                        'state'=>$data['state'],
-                        'bid'=>round(array_get($data,'bid'),2),
-                        'type'=>array_get($data,'expression.0.type'),
-                        'value'=>array_get($data,'expression.0.value'),
-                        'expressionType'=>array_get($data,'expressionType'),
-                        'servingStatus'=>array_get($data,'servingStatus'),
-                    ];
-                    if($request->get('ad_type')=='SProducts') $tmpExpression[]=array_get($data,'expression');
-                    if($request->get('ad_type')=='SDisplay'){
-                        $tmpExpression['targetingClauses'][]['targetingClause']=[
-                            'expressionType'=>array_get($data,'expressionType'),
-                            'expression'=>array_get($data,'expression')
-                        ];
-                    }
-                    if($request->get('ad_type')=='SBrands'){
-                        $tmpExpression['targets'][][]=[
-                            'type'=>array_get($data,'expression.0.type'),
-                            'value'=>array_get($data,'expression.0.value')
-                        ];
-                    }
-                    $ids[] = $data['targetId']; 
-                }
-            }
-        }else{
-            foreach($datas as $data){
-                $tmp[]=[
-                    'campaignId'=>$data['campaignId'],
-                    'targetId'=>$data['targetId'],
-                    'state'=>$data['state'],
-                    'bid'=>round(array_get($data,'bid'),2),
-                    'type'=>array_get($data,'expression.0.type'),
-                    'value'=>array_get($data,'expression.0.value'),
+        foreach($datas as $data){
+            if($name && (strpos($data['expression'][0]['value'],$name) === false)) continue;
+            $tmp[$data['targetId']]=[
+                'campaignId'=>array_get($data,'campaignId'),
+                'targetId'=>$data['targetId'],
+                'state'=>$data['state'],
+                'bid'=>round(array_get($data,'bid'),2),
+                'type'=>array_get($data,'expression.0.type'),
+                'value'=>array_get($data,'expression.0.value'),
+                'expressionType'=>array_get($data,'expressionType'),
+                'servingStatus'=>array_get($data,'servingStatus'),
+            ];
+            if($request->get('ad_type')=='SProducts') $tmpExpression[]=array_get($data,'expression');
+            if($request->get('ad_type')=='SDisplay'){
+                $tmpExpression['targetingClauses'][]['targetingClause']=[
                     'expressionType'=>array_get($data,'expressionType'),
-                    'servingStatus'=>array_get($data,'servingStatus'),
+                    'expression'=>array_get($data,'expression')
                 ];
-                if($request->get('ad_type')=='SProducts') $tmpExpression[]=array_get($data,'expression');
-                if($request->get('ad_type')=='SDisplay'){
-                    $tmpExpression['targetingClauses'][]['targetingClause']=[
-                        'expressionType'=>array_get($data,'expressionType'),
-                        'expression'=>array_get($data,'expression')
-                    ];
-                }
-                if($request->get('ad_type')=='SBrands'){
-                    $tmpExpression['targets'][][]=[
-                        'type'=>array_get($data,'expression.0.type'),
-                        'value'=>array_get($data,'expression.0.value')
-                    ];
-                }
-                $ids[] = $data['targetId']; 
             }
+            if($request->get('ad_type')=='SBrands'){
+                $tmpExpression['targets'][][]=[
+                    'type'=>array_get($data,'expression.0.type'),
+                    'value'=>array_get($data,'expression.0.value')
+                ];
+            }
+            $ids[] = $data['targetId']; 
         }
+        
         $datas = $tmp;
         $iTotalRecords = count($datas);
         if($iTotalRecords>0) {
@@ -1609,6 +1695,36 @@ class AdvController extends Controller
                 ]
             );
         }
+        foreach($datas as $key=>$val){
+            $datas[$key]= array_merge($datas[$key],array_get($reportData,$key,[
+                'impressions'=>0,
+                'clicks'=>0,
+                'ctr'=>0,
+                'cost'=>0,
+                'cpc'=>0,
+                'attributed_units_ordered1d'=>0,
+                'attributed_sales1d'=>0,
+                'acos'=>0,
+                'raos'=>0,
+            ]));
+        }
+        $sortFields = [
+            '8'=>'impressions',
+            '9'=>'clicks',
+            '10'=>'ctr',
+            '11'=>'cost',
+            '12'=>'cpc',
+            '13'=>'attributed_units_ordered1d',
+            '14'=>'attributed_sales1d',
+            '15'=>'acos',
+            '16'=>'raos',
+        ];
+        $sortTypes = [
+            'asc'=>SORT_ASC,
+            'desc'=>SORT_DESC,
+        ];
+        $field = array_column($datas,array_get($sortFields,array_get($request->get('order'),'0.column')));
+        array_multisort($field,array_get($sortTypes,array_get($request->get('order'),'0.dir')),$datas);
         $iDisplayLength = intval($_REQUEST['length']);
         $iDisplayLength = $iDisplayLength < 0 ? $iTotalRecords : $iDisplayLength;
         $iDisplayStart = intval($_REQUEST['start']);
