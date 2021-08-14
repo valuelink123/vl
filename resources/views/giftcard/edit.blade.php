@@ -43,8 +43,12 @@
                         @if (array_get($form,'id')>0)
                         <div class="form-group col-md-12">
                             <label>Status</label>
-                            <input type="text" class="form-control" disabled value="{{array_get(\App\Models\GiftCard::STATUS,array_get($form,'status'))}}" >
-                            
+                            <select class="form-control " name="status" id="status">
+							<?php 
+							foreach(\App\Models\GiftCard::STATUS as $k=>$v){ 	
+								echo '<option value="'.$k.'" '.(($k==array_get($form,'status'))?'selected':'').'>'.$v.'</option>';
+							}?>
+							</select>
                         </div>
 
                         <div class="form-group col-md-12">

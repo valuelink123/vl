@@ -101,13 +101,14 @@ class GiftCardController extends Controller
         DB::beginTransaction();
         try{ 
             $id = intval($request->get('id'));
-            $data = $id?(GiftCard::where('status',0)->findOrFail($id)):(new GiftCard);
+            $data = $id?(GiftCard::findOrFail($id)):(new GiftCard);
             $fileds = array(
                 'bg','bu','code','amount','currency'
             );
             foreach($fileds as $filed){
                 $data->{$filed} = $request->get($filed);
             }
+            $data->status = intval($request->get('status'));
             $data->user_id = Auth::user()->id;
             $data->save();
             DB::commit();
