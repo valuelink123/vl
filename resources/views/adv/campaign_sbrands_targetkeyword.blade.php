@@ -21,6 +21,12 @@
         color: #666;
         padding: 10px 0;
     }
+    .DTFC_LeftBodyLiner{
+        overflow-x: hidden;
+    }
+    table.dataTable tbody tr {
+        height: 60px !important;
+    }
 </style>
 <h1 class="page-title font-red-intense"> Campaigns - {{array_get($campaign,'name')}}
 </h1>
@@ -170,7 +176,6 @@
                             <thead>
                                 <tr role="row" class="heading">
                                     <th>
-                                        <input type="checkbox" class="group-checkable" data-set="#datatable_ajax .checkboxes" />
                                     </th>
                                     <th>Status</th>
 									<th>Keywords</th>
@@ -344,7 +349,7 @@
                 loadingMessage: 'Loading...',
                 dataTable: {
                    //"serverSide":false,
-                   "autoWidth":false,
+                   "autoWidth":true,
                    "aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0,1,2,3,4,5,6] }],
                    "order": [
                         [7, "desc"]
@@ -357,6 +362,13 @@
                     "ajax": {
                         "url": "{{ url('adv/listKeywords')}}",
                     },
+                    scrollY:500,
+                    scrollX:true,
+					
+
+					fixedColumns:   {
+						leftColumns:4
+					},
 
 					
                     //"scrollX": true,
@@ -525,7 +537,7 @@
                 var id_type = 'keywordId';
                 var action = 'keywords';
                 var method = 'updateKeywords';
-                if (confirmStatus.val() != "" && grid.getSelectedRowsCount() > 0) {
+                if (confirmStatus.val() != "" && grid.getClonedSelectedRowsCount() > 0) {
                     $.ajaxSetup({
                         headers: { 'X-CSRF-TOKEN' : '{{ csrf_token() }}' }
                     });
@@ -533,7 +545,7 @@
                         type: "POST",
                         dataType: "json",
                         url: "{{ url('adv/batchUpdate') }}",
-                        data: {confirmStatus:confirmStatus.val(),id:grid.getSelectedRows(),profile_id:profile_id,ad_type:ad_type,id_type:id_type,action:action,method:method,campaign_id:campaign_id,adgroup_id:adgroup_id},
+                        data: {confirmStatus:confirmStatus.val(),id:grid.getClonedSelectedRows(),profile_id:profile_id,ad_type:ad_type,id_type:id_type,action:action,method:method,campaign_id:campaign_id,adgroup_id:adgroup_id},
                         success: function (data) {
                             if(data.customActionStatus=='OK'){
                                 toastr.success(data.customActionMessage);
@@ -548,7 +560,7 @@
                     });
                 } else if ( confirmStatus.val() == "" ) {
                     toastr.error('Please select an action');
-                } else if (grid.getSelectedRowsCount() === 0) {
+                } else if (grid.getClonedSelectedRowsCount() === 0) {
                     toastr.error('No record selected');
                 }
             });
