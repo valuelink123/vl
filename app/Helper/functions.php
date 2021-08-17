@@ -1563,6 +1563,7 @@ function blackEmail()
 		'nmaa7@yahoo.com',
 		'marsha@thenaturalmixologist.com',
 		'sulaimanhack@gmail.com',
+		'hadeeb712@gmail.com',
 
 	);
 }
