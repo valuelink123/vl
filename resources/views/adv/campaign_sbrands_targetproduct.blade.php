@@ -27,6 +27,13 @@
     table.dataTable tbody tr {
         height: 60px !important;
     }
+    .editable-input .input-medium {
+        width: 100% !important;
+        PADDING: 5PX !important;
+    }
+    .table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th{
+        vertical-align: middle !important;
+    }
 </style>
 <h1 class="page-title font-red-intense"> Campaigns - {{array_get($campaign,'name')}}
 </h1>
@@ -499,6 +506,8 @@
                         $('.ajax_bid').editable({
                             type: 'text',
                             url: '/adv/updateBid',
+							showbuttons:false,
+                            mode:'inline',
                             params:{
                                 'action':'product_targeting',
                                 'method':'updateTargetingClauses',

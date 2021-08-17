@@ -23,6 +23,13 @@
     table.dataTable tbody tr {
         height:60px !important;
     }
+    .editable-input .input-medium {
+        width: 100% !important;
+        PADDING: 5PX !important;
+    }
+    .table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th{
+        vertical-align: middle !important;
+    }
 </style>
     <div class="row">
         <div class="col-md-12">
@@ -506,6 +513,8 @@
                         $('.ajax_bid').editable({
                             type: 'text',
                             url: '/adv/updateBid',
+                            showbuttons:false,
+                            mode:'inline',
                             params:{
                                 'action':'campaigns',
                                 'method':'updateCampaigns',

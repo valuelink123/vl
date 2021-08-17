@@ -258,7 +258,7 @@ class AdvController extends Controller
                 array_get(PpcProfile::BIDDING,array_get($datas,$i.'.bidding.strategy','legacyForSales')),
                 date('Y-m-d',strtotime(array_get($datas,$i.'.startDate'))),
                 array_get($datas,$i.'.endDate')?date('Y-m-d',strtotime(array_get($datas,$i.'.endDate'))):'',
-                '<button type="button" class="ajax_bid btn default" data-pk="'.(array_get($datas,$i.'.dailyBudget')?'dailyBudget':'budget').'" id="'.(array_get($datas,$i.'.campaignType')?'SProducts':(array_get($datas,$i.'.adFormat')?'SBrands':'SDisplay')).'-'.array_get($datas,$i.'.campaignId').'">'.((array_get($datas,$i.'.dailyBudget')??array_get($datas,$i.'.budget'))).'</button>'.(array_get($datas,$i.'.budgetType')??'daily'),
+                '<button type="button" class="ajax_bid btn default" data-mode="inline" data-showbuttons="false" data-pk="'.(array_get($datas,$i.'.dailyBudget')?'dailyBudget':'budget').'" id="'.(array_get($datas,$i.'.campaignType')?'SProducts':(array_get($datas,$i.'.adFormat')?'SBrands':'SDisplay')).'-'.array_get($datas,$i.'.campaignId').'">'.((array_get($datas,$i.'.dailyBudget')??array_get($datas,$i.'.budget'))).'</button>',
                 (array_get($reportData,array_get($datas,$i.'.campaignId').'.impressions')>0)?array_get($reportData,array_get($datas,$i.'.campaignId').'.impressions'):'-',
                 (array_get($reportData,array_get($datas,$i.'.campaignId').'.clicks')>0)?array_get($reportData,array_get($datas,$i.'.campaignId').'.clicks'):'-',
                 (array_get($reportData,array_get($datas,$i.'.campaignId').'.ctr')>0)?((array_get($reportData,array_get($datas,$i.'.campaignId').'.ctr')*100).'%'):'-',
@@ -386,6 +386,7 @@ class AdvController extends Controller
             if(array_get($result,'success')==1) $campaign = array_get($result,'response');
             $params['campaignIdFilter'] = $campaign_id;
             $campaign['name'] = $request->get('to_name');
+            $campaign['state'] = 'enabled';
             $campaign['startDate'] = date('Ymd',strtotime($request->get('startDate')));
             $campaign['endDate'] = ($request->get('endDate')?date('Ymd',strtotime($request->get('endDate'))):NULL);
             unset($campaign['campaignId']);
