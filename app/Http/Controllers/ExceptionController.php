@@ -541,6 +541,9 @@ class ExceptionController extends Controller
 			 'Website order',
 			 'B2B'
 		 );
+		foreach($gift_cards as $key=>$val){
+			$gift_cards[$key]['code'] = func_substr_replace($val['code'],"*", 3, 10);
+		}
 
         return view('exception/edit',['exception'=>$rule,'gift_cards'=>$gift_cards,'mail_accounts'=>$mail_accounts,'mail_templates'=>$mail_templates,'gift_card_mail'=>$gift_card_mail,'groups'=>$this->getGroups(),'mygroups'=>$this->getUserGroup(),'sellerids'=>$this->getAccounts(),'last_inboxid'=>$last_inboxid,'mcf_orders'=>$mcf_orders,'auto_create_mcf_logs'=>$auto_create_mcf_logs,'users'=>$this->getUsers(),'requestContentHistoryValues'=>$requestContentHistoryValues]);
     }
