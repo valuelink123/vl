@@ -121,6 +121,11 @@
                     <div class="caption font-dark col-md-12">
 
                         <div class="btn-group" style="float:right;">
+                            
+                            <button class="btn create_whole" type="button" data-type='SProducts'> Create SP Campagin
+                            </button>
+                            
+
                             <button class="btn green dropdown-toggle" type="button" data-toggle="modal" href="#updateForm"> Create
                             </button>
                         </div>
@@ -593,6 +598,14 @@
             dttable.fnDestroy(); 
             TableDatatablesAjax.init();
         });
+
+        $('.create_whole').on('click',function () {
+            var ad_type = $(this).data('type');
+            var profile_id = $("select[name='profile_id']").val();
+            $('#ajax').modal({
+                remote: '/adv/createWhole?profile_id='+profile_id+'&ad_type='+ad_type
+            });
+        } );
 
         $('#reportrange').daterangepicker({
                 opens: (App.isRTL() ? 'left' : 'right'),

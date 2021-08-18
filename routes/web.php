@@ -544,6 +544,8 @@ Route::Post('/adv/createTarget', 'AdvController@createTarget');
 Route::get('/adv/scheduleEdit', 'AdvController@editSchedule');
 Route::Post('/adv/saveSchedule', 'AdvController@saveSchedule');
 Route::Post('/adv/listSchedules', 'AdvController@listSchedules');
+Route::get('/adv/createWhole', 'AdvController@createWhole');
+Route::Post('/adv/saveWhole', 'AdvController@saveWhole');
 //客诉品线问题细分
 Route::Post('/category/import', 'CategoryController@import');
 

@@ -2,6 +2,7 @@
     <div class="col-md-12">
         <!-- BEGIN EXAMPLE TABLE PORTLET-->
         <div class="portlet light bordered">
+            <div class="portlet-title"><h1>Copy Campaign</h1></div>
             <div class="portlet-body">
                     <form id="update_form"  name="update_form" >
                         {{ csrf_field() }}

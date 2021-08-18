@@ -2,6 +2,7 @@
     <div class="col-md-12">
         <!-- BEGIN EXAMPLE TABLE PORTLET-->
         <div class="portlet light bordered">
+            <div class="portlet-title"><h1>Add a scheduled task</h1></div>
             <div class="portlet-body">
                     <form id="schedule_form"  name="schedule_form" >
                         {{ csrf_field() }}
