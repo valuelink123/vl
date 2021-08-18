@@ -584,7 +584,7 @@
 			$.ajax({
 				type:"post",
 				url:"/marketingPlan/index1",
-				async: true,
+				async: false,
 				data:{
 					"sap_seller_id": sap_seller_id,
 				},
@@ -595,10 +595,11 @@
 					$.each(res[1], function (index, value) {
 						$('.rateSelect').append("<option value='"+value.id + "' rate='"+value.rate+"'>" + value.currency + "</option>");
 					})
-					$('.rateSelect').val('1')
+					// $('.rateSelect').val('1')
 				},
 				error:function(err){
 					$('.error_mask_text').text(err)
+
 					$('.error_mask').fadeIn(1000);
 					setTimeout(function(){
 						$('.error_mask').fadeOut(1000);
