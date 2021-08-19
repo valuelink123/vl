@@ -158,8 +158,10 @@ class AdvController extends Controller
     {
         $profile_id = $request->get('profile_id');
         $ad_type = $request->get('ad_type');
-        $account_id = PpcProfile::where('profile_id',$profile_id)->value('account_id');
-        $products = DB::connection('ppc')->table('products')->where('account_id',intval($account_id))->get();
+        $seller_id = PpcProfile::where('profile_id',$profile_id)->value('seller_id');
+        $products = DB::connection('amazon')->select("select asin,seller_sku from seller_skus 
+        left join seller_accounts on seller_skus.seller_account_id=seller_accounts.id where mws_seller_id ='".$seller_id."'
+        group by asin,seller_sku");
         return view('adv/create_whole',['profile_id'=>$profile_id,'ad_type'=>$ad_type,'products'=>$products]);
     }
 	

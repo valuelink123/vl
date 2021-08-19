@@ -118,7 +118,7 @@
                                 <select class="mt-multiselect form-control " multiple="multiple" name="ads[]" id="ads" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true">
 							<?php 
 							foreach($products as $v){ 	
-								echo '<option value="'.$v->sku.'">'.$v->sku.' - '.$v->asin.'</option>';
+								echo '<option value="'.$v->seller_sku.'">'.$v->seller_sku.' - '.$v->asin.'</option>';
 							}?>
 							</select>
                             </div>
