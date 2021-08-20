@@ -49,18 +49,18 @@ class PpcProfile extends Model
     ];
 
     const EXPRESSION = [
+        'asinSameAs'=>'asinSameAs',
+        'asinCategorySameAs'=>'asinCategorySameAs',
+        'asinBrandSameAs'=>'asinBrandSameAs',
         'queryBroadMatches'=>'queryBroadMatches',
         'queryPhraseMatches'=>'queryPhraseMatches',
         'queryExactMatches'=>'queryExactMatches',
-        'asinCategorySameAs'=>'asinCategorySameAs',
-        'asinBrandSameAs'=>'asinBrandSameAs',
         'asinPriceLessThan'=>'asinPriceLessThan',
         'asinPriceBetween'=>'asinPriceBetween',
         'asinPriceGreaterThan'=>'asinPriceGreaterThan',
         'asinReviewRatingLessThan'=>'asinReviewRatingLessThan',
         'asinReviewRatingBetween'=>'asinReviewRatingBetween',
         'asinReviewRatingGreaterThan'=>'asinReviewRatingGreaterThan',
-        'asinSameAs'=>'asinSameAs',
         'queryBroadRelMatches'=>'queryBroadRelMatches',
         'queryHighRelMatches'=>'queryHighRelMatches',
         'asinSubstituteRelated'=>'asinSubstituteRelated',
@@ -73,6 +73,7 @@ class PpcProfile extends Model
 
     
     const SDISPLAYEXPRESSION = [
+        'asinSameAs'=>'asinSameAs',
         'asinCategorySameAs'=>'asinCategorySameAs',
         'asinBrandSameAs'=>'asinBrandSameAs',
         'asinPriceLessThan'=>'asinPriceLessThan',
@@ -81,7 +82,6 @@ class PpcProfile extends Model
         'asinReviewRatingLessThan'=>'asinReviewRatingLessThan',
         'asinReviewRatingBetween'=>'asinReviewRatingBetween',
         'asinReviewRatingGreaterThan'=>'asinReviewRatingGreaterThan',
-        'asinSameAs'=>'asinSameAs',
         'asinAgeRangeSameAs'=>'asinAgeRangeSameAs',
         'asinGenreSameAs'=>'asinGenreSameAs',
         'asinIsPrimeShippingEligible'=>'asinIsPrimeShippingEligible',
@@ -89,6 +89,7 @@ class PpcProfile extends Model
 
 
     const SBRANDSEXPRESSION = [
+        'asinSameAs'=>'asinSameAs',
         'asinCategorySameAs'=>'asinCategorySameAs',
         'asinBrandSameAs'=>'asinBrandSameAs',
         'asinPriceLessThan'=>'asinPriceLessThan',
@@ -97,7 +98,6 @@ class PpcProfile extends Model
         'asinReviewRatingLessThan'=>'asinReviewRatingLessThan',
         'asinReviewRatingBetween'=>'asinReviewRatingBetween',
         'asinReviewRatingGreaterThan'=>'asinReviewRatingGreaterThan',
-        'asinSameAs'=>'asinSameAs',
     ];
 
     

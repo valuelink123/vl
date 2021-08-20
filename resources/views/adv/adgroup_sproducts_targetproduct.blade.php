@@ -275,6 +275,16 @@
                 </div>
 
                 <div class="form-group col-md-6" style="margin-top: 10px;">
+                    <ul class="nav nav-tabs" id="addType">
+						<li class="active">
+							<a href="#customize" data-toggle="tab" aria-expanded="true">Customize</a>
+						</li>
+						<li >
+							<a href="#enter_list" data-toggle="tab" aria-expanded="true">Enter List</a>
+						</li>
+					</ul>
+                    <div class="tab-content">
+						<div class="tab-pane active" id="customize">
                         <div class="form-group mt-repeater">
 							<div data-repeater-list="expressions">
 								<div data-repeater-item class="mt-repeater-item">
@@ -305,10 +315,42 @@
 										</div>
 									</div>
 								</div>
-							</div>
+                            </div>
 							<a href="javascript:;" data-repeater-create class="btn btn-sm btn-info mt-repeater-add">
 								<i class="fa fa-plus"></i> Add target</a>
 						</div>
+                        </div>
+
+                        <div class="tab-pane" id="enter_list">
+                            <div class="form-group col-md-12">
+                                <label>Match Type *</label>
+                                <select class="form-control" name="match_type" id="match_type">
+                                @foreach (\App\Models\PpcProfile::EXPRESSION as $k=>$v)
+                                    <option value="{{$k}}" >{{$v}}</option>
+                                @endforeach
+                                </select>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label>Bid Option:</label>
+                                <select class="form-control" name="bidOption" id="bidOption">
+                                <option value="suggested" >Suggested Bid</option>
+                                <option value="customize" >Customize Bid</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group col-md-12">
+                                <label>Bid:</label>
+                                <input class="form-control"  name="bid" id="bid" value="{{array_get($adgroup,'defaultBid')}}">
+                            </div>
+
+
+                            <div class="form-group col-md-12">
+                                <label>Keywords *</label>
+                                <textarea class="form-control" rows="10" name="keyword_text" id="keyword_text"
+                                placeholder="Enter your list and separate each item whith a new line."></textarea>
+                            </div>
+                        </div>
+                        </div>
 						<div style="clear:both;height:30px;"></div>
                 </div>
             </div>
@@ -317,6 +359,7 @@
                 <button type="submit" class="btn green">Save changes</button>
                 <input type="hidden" name="profile_id" value="{{$profile_id}}">
                 <input type="hidden" name="ad_type" value="{{$ad_type}}">
+                <input type="hidden" name="defaultBid" value="{{array_get($adgroup,'defaultBid')}}">
                 <input type="hidden" name="campaignId" value="{{array_get($adgroup,'campaignId')}}">
                 <input type="hidden" name="adGroupId" value="{{array_get($adgroup,'adGroupId')}}">
                 <input type="hidden" name="action" value="product_targeting">
@@ -668,6 +711,10 @@
             return false;
         });
 
+        $('#addType>li>a').on('click',function(){
+            $($(this).attr('href')+' input,select,textarea').attr('disabled',false);
+            $($(this).attr('href')).siblings().find('select,input,textarea').attr('disabled',true);
+        });
 
         $('#ajax').on('hidden.bs.modal', function (e) {
             $('#ajax .modal-content').html('<div class="modal-body" >Loading...</div>');
