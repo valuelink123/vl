@@ -9,22 +9,22 @@ class PpcSbrandsTarget extends Model
     protected $guarded = [];
     
 
-    public function setExpressionAttribute($value)
+    public function setExpressionsAttribute($value)
 	{
         $this->attributes['expression'] = json_encode($value);
 	}
 	
-	public function getExpressionAttribute($value)
+	public function getExpressionsAttribute($value)
 	{
 		return json_decode($value, true);
 	}
 
-    public function setResolvedExpressionAttribute($value)
+    public function setResolvedExpressionsAttribute($value)
 	{
         $this->attributes['resolved_expression'] = json_encode($value);
 	}
 	
-	public function getResolvedExpressionAttribute($value)
+	public function getResolvedExpressionsAttribute($value)
 	{
 		return json_decode($value, true);
 	}
