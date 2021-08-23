@@ -46,14 +46,14 @@ class RrController extends Controller
         }
         return $users_array;
     }
-	
-	
+
+
 
 
      public function getAccounts(){
-		
+
 		$seller=[];
-		$sellerids = DB::connection('order')->select("select sellerid,(case MarketPlaceId
+		$sellerids = DB::connection('vlz')->select("select mws_seller_id,(case mws_marketplaceid
 		when 'ATVPDKIKX0DER' then 'US'
 		when 'A2EUQ1WTGCTBG2' then 'US'
 		when 'A1AM78C64UM0Y8' then 'US'
@@ -63,13 +63,13 @@ class RrController extends Controller
 		when 'A1RKKUPIHCS9HS' then 'EU'
 		when 'A13V1IB3VIYZZH' then 'EU'
 		when 'A1VC38T7YXB528' then 'JP'
-		else 'US' End) as area,sellername from accounts where status=1 GROUP BY sellerid,area,sellername");
+		else 'US' End) as area,label from seller_accounts where deleted_at is NULL GROUP BY mws_seller_id,area,label");
 		foreach($sellerids as $sellerid){
-			$seller[$sellerid->sellerid]['name']=$sellerid->sellername;
-			$seller[$sellerid->sellerid]['area']=$sellerid->area;
+			$seller[$sellerid->mws_seller_id]['name']=$sellerid->label;
+			$seller[$sellerid->mws_seller_id]['area']=$sellerid->area;
 		}
 		return $seller;
-		
+
     }
 
     public function create()
