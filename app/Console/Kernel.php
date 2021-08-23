@@ -121,7 +121,7 @@ class Kernel extends ConsoleKernel
 		$schedule->command('get:asininfo')->cron('0 */2 * * *')->name('getasininfo')->withoutOverlapping();
 		$schedule->command('request:ppcReport')->cron('0 */4 * * *')->name('requestppc')->withoutOverlapping();
 		$schedule->command('get:ppcReport')->cron('30 */1 * * *')->name('getppc')->withoutOverlapping();
-		$schedule->command('get:ppcSchedule')->cron('*/5 * * * *')->name('scheduleppc')->withoutOverlapping();
+		$schedule->command('get:ppcSchedule')->cron('*/4 * * * *')->name('scheduleppc')->withoutOverlapping();
 		$schedule->command('get:ads 10 1')->cron('5 0 * * *')->name('getads')->withoutOverlapping();
 		$schedule->command('get:profits 10 1 ')->cron('10 0 * * *')->name('getprotit')->withoutOverlapping();
         //$schedule->command('scan:warn')->hourly()->name('warningcheck')->withoutOverlapping();
