@@ -40,7 +40,7 @@
                         {{ csrf_field() }}
                         <div class="row">
 						<div class="col-md-2">
-						<select class="form-control" name="profile_id" id="profile_id" >
+						<select class="form-control mt-multiselect btn btn-default" name="profile_id" id="profile_id" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" >
                             @foreach ($profiles as $k=>$v)
                                 <option value="{{$v->profile_id}}" >{{$v->account_name}}</option>
                             @endforeach
@@ -352,6 +352,10 @@
             $.ajaxSetup({
                 headers: { 'X-CSRF-TOKEN' : '{{ csrf_token() }}' }
             });
+            var lineChart = echarts.init(document.getElementById('lineChart'));
+            lineChart.showLoading({
+                text : 'Loading...'
+            });
             var grid = new Datatable();
             grid.setAjaxParam("profile_id", $("select[name='profile_id']").val());
             grid.setAjaxParam("stateFilter", $("select[name='stateFilter']").val());
@@ -471,10 +475,7 @@
                         $(".avg_cpc").html(((clicks<=0)?0:spend/clicks).toFixed(2));
                         $(".avg_ctr").html(((impressions<=0)?0:clicks/impressions*100).toFixed(2)+'%');
                         $(".avg_acos").html(((attributed_sales1d<=0)?0:spend/attributed_sales1d*100).toFixed(2)+'%');
-                        $(".avg_raos").html(((spend<=0)?0:attributed_sales1d/spend*100).toFixed(2)+'%');
-                        
-
-                        var lineChart = echarts.init(document.getElementById('lineChart'));
+                        $(".avg_raos").html(((spend<=0)?0:attributed_sales1d/spend).toFixed(4));
 
                         var option = {
                             tooltip : {
@@ -514,6 +515,7 @@
                             ],
                             series : chartY
                         };
+                        lineChart.hideLoading();
                         lineChart.setOption(option);
                         $('.ajax_bid').editable({
                             type: 'text',

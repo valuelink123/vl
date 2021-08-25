@@ -395,6 +395,10 @@
             $.ajaxSetup({
                 headers: { 'X-CSRF-TOKEN' : '{{ csrf_token() }}' }
             });
+            var lineChart = echarts.init(document.getElementById('lineChart'));
+            lineChart.showLoading({
+                text : 'Loading...'
+            });
             var grid = new Datatable();
             grid.setAjaxParam("profile_id", $("input[name='profile_id']").val());
             grid.setAjaxParam("stateFilter", $("select[name='stateFilter']").val());
@@ -514,9 +518,7 @@
                         $(".avg_cpc").html(((clicks<=0)?0:spend/clicks).toFixed(2));
                         $(".avg_ctr").html(((impressions<=0)?0:clicks/impressions*100).toFixed(2)+'%');
                         $(".avg_acos").html(((attributed_sales1d<=0)?0:spend/attributed_sales1d*100).toFixed(2)+'%');
-                        $(".avg_raos").html(((spend<=0)?0:attributed_sales1d/spend*100).toFixed(2)+'%');
-
-                        var lineChart = echarts.init(document.getElementById('lineChart'));
+                        $(".avg_raos").html(((spend<=0)?0:attributed_sales1d/spend).toFixed(4));
 
                         var option = {
                             tooltip : {
@@ -556,6 +558,7 @@
                             ],
                             series : chartY
                         };
+                        lineChart.hideLoading();
                         lineChart.setOption(option);
                         $('.ajax_bid').editable({
                             type: 'text',
