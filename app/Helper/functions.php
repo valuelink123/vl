@@ -1564,6 +1564,7 @@ function blackEmail()
 		'marsha@thenaturalmixologist.com',
 		'sulaimanhack@gmail.com',
 		'hadeeb712@gmail.com',
+		'lawhite0317@gmail.com',
 
 	);
 }
