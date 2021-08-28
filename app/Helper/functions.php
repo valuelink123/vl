@@ -1565,6 +1565,7 @@ function blackEmail()
 		'sulaimanhack@gmail.com',
 		'hadeeb712@gmail.com',
 		'lawhite0317@gmail.com',
+		'palazzo@bluerocpremier.com',
 
 	);
 }
