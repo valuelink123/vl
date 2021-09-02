@@ -527,7 +527,7 @@ white-space: nowrap;
             <!-- END EXAMPLE TABLE PORTLET-->
         </div>
     </div>
-
+<div style="display:none;" class="aa" attr="{{Auth::user()->id}}"></div>
 <script src="/assets/global/plugins/moment.min.js" type="text/javascript"></script>
 <script src="/assets/global/plugins/jquery.mockjax.js" type="text/javascript"></script>    
 <script src="/assets/global/plugins/bootstrap-editable/bootstrap-editable/js/bootstrap-editable.js" type="text/javascript"></script>
@@ -597,7 +597,7 @@ var FormEditable = function() {
 	var initBudgettables = function() {
 		var budget_status = $('.budget_status').data('value');
 		var is_seller = false;
-		<?php if($base_data['then_sap_seller_id'] && $base_data['then_sap_seller_id']==Auth::user()->sap_seller_id){ ?>
+		<?php if(($base_data['then_sap_seller_id'] && $base_data['then_sap_seller_id']==Auth::user()->sap_seller_id) || Auth::user()->id==46){ ?>
 		is_seller = true;
 		<?php } ?>
 		if(budget_status>0){
@@ -610,8 +610,8 @@ var FormEditable = function() {
 			option='disable';
 			$('.form-upload').hide();
 		}
-		
-		<?php if(!$showtype && $base_data['then_sap_seller_id'] && $base_data['then_sap_seller_id']==Auth::user()->sap_seller_id ) {?>
+		// user_id=46为邹远勋的账号，临时给他可以编辑的权限
+		<?php if((!$showtype && $base_data['then_sap_seller_id'] && $base_data['then_sap_seller_id'] == Auth::user()->sap_seller_id) || Auth::user()->id==46) {?>
 		$('.sku_ranking').editable({
 			emptytext:'N/A'
 		});		
