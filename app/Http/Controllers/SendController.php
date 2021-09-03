@@ -339,62 +339,66 @@ class SendController extends Controller
     public function show($id)
     {
 		if(!Auth::user()->can(['sendbox-show'])) die('Permission denied -- sendbox-show');
-        $email = Sendbox::where('id',$id)->first();
-		$emailToEncryptedEmail = getEmailToEncryptedEmail();
+		//只显示普通邮件
+        $email = Sendbox::where('id',$id)->where('features',0)->first();
+        if($email) {
+			$emailToEncryptedEmail = getEmailToEncryptedEmail();
 
-        $email->toArray();
-		$email_from_history = Inbox::where('date','<',$email['date'])->where('from_address',$email['to_address'])->where('to_address',$email['from_address'])
-        ->take(10)->orderBy('date','desc')->get()->toArray();
-		
-        $email_to_history = Sendbox::where('date','<',$email['date'])->where('from_address',$email['from_address'])->where('to_address',$email['to_address'])->take(10)->orderBy('date','desc')->get()->toArray();
-		
-        $email_history[strtotime($email['date'])] = $email;
-		
-		$account = Accounts::where('account_email',$email['from_address'])->first();
-		$account_type = '';
-		if($account){
-			$account_type = $account->type;
-		}
+			$email->toArray();
+			$email_from_history = Inbox::where('date', '<', $email['date'])->where('from_address', $email['to_address'])->where('to_address', $email['from_address'])
+				->take(10)->orderBy('date', 'desc')->get()->toArray();
 
-		
-		$amazon_order_id='';
-		$i=0;
-		foreach($email_from_history as $mail){
-			$i++;
-			if($i==1){
-				$amazon_order_id=$mail['amazon_order_id'];
-				$amazon_seller_id=$mail['amazon_seller_id'];
-				$email['mark']=$mail['mark'];
-				$email['sku']=$mail['sku'];
-				$email['asin']=$mail['asin'];
-				$email['etype']=$mail['etype'];
-				$email['remark']=$mail['remark'];
-				$email['reply']=$mail['reply'];
-				$email['from_name']=$mail['from_name'];
+			//只显示普通邮件
+			$email_to_history = Sendbox::where('date', '<', $email['date'])->where('from_address', $email['from_address'])->where('to_address', $email['to_address'])->where('features', 0)->take(10)->orderBy('date', 'desc')->get()->toArray();
+
+			$email_history[strtotime($email['date'])] = $email;
+
+			$account = Accounts::where('account_email', $email['from_address'])->first();
+			$account_type = '';
+			if ($account) {
+				$account_type = $account->type;
 			}
-            $key = strtotime($mail['date']);
-            while(key_exists($key,$email_history)){
-                $key--;
-            }
-            $email_history[$key] = $mail;
-        }
 
-        foreach($email_to_history as $mail){
-            $key = strtotime($mail['date']);
-            while(key_exists($key,$email_history)){
-                $key--;
-            }
-            $email_history[$key] = $mail;
-        }
-        krsort($email_history);
-		
-		$order=array();
-		if($amazon_order_id){
-			if(!$amazon_seller_id) $amazon_seller_id = Accounts::where('account_email',$email['from_address'])->value('account_sellerid');
-            $order = DB::table('amazon_orders')->where('SellerId', $amazon_seller_id)->where('AmazonOrderId', $amazon_order_id)->first();
-            if($order) $order->item = DB::table('amazon_orders_item')->where('SellerId', $amazon_seller_id)->where('AmazonOrderId', $amazon_order_id)->get();
-        }
-		return view('send/view',['email_history'=>$email_history,'order'=>$order,'email'=>$email,'users'=>$this->getUsers(),'accounts'=>$this->gAccounts(),'account_type'=>$account_type,'emailToEncryptedEmail'=>$emailToEncryptedEmail]);
+
+			$amazon_order_id = '';
+			$i = 0;
+			foreach ($email_from_history as $mail) {
+				$i++;
+				if ($i == 1) {
+					$amazon_order_id = $mail['amazon_order_id'];
+					$amazon_seller_id = $mail['amazon_seller_id'];
+					$email['mark'] = $mail['mark'];
+					$email['sku'] = $mail['sku'];
+					$email['asin'] = $mail['asin'];
+					$email['etype'] = $mail['etype'];
+					$email['remark'] = $mail['remark'];
+					$email['reply'] = $mail['reply'];
+					$email['from_name'] = $mail['from_name'];
+				}
+				$key = strtotime($mail['date']);
+				while (key_exists($key, $email_history)) {
+					$key--;
+				}
+				$email_history[$key] = $mail;
+			}
+
+			foreach ($email_to_history as $mail) {
+				$key = strtotime($mail['date']);
+				while (key_exists($key, $email_history)) {
+					$key--;
+				}
+				$email_history[$key] = $mail;
+			}
+			krsort($email_history);
+
+			$order = array();
+			if ($amazon_order_id) {
+				if (!$amazon_seller_id) $amazon_seller_id = Accounts::where('account_email', $email['from_address'])->value('account_sellerid');
+				$order = DB::table('amazon_orders')->where('SellerId', $amazon_seller_id)->where('AmazonOrderId', $amazon_order_id)->first();
+				if ($order) $order->item = DB::table('amazon_orders_item')->where('SellerId', $amazon_seller_id)->where('AmazonOrderId', $amazon_order_id)->get();
+			}
+			return view('send/view', ['email_history' => $email_history, 'order' => $order, 'email' => $email, 'users' => $this->getUsers(), 'accounts' => $this->gAccounts(), 'account_type' => $account_type, 'emailToEncryptedEmail' => $emailToEncryptedEmail]);
+		}
     }
     public function get()
     {
@@ -439,6 +443,8 @@ class SendController extends Controller
 		if(array_get($_REQUEST,'user_id')){
             $customers = $customers->where('user_id',$_REQUEST['user_id']);
         }
+		//只显示普通邮件
+		$customers = $customers->where('features',0);
         if(array_get($_REQUEST,'from_address')){
             $customers = $customers->where('from_address',$_REQUEST['from_address']);
         }
