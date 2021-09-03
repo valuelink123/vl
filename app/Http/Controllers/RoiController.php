@@ -1192,10 +1192,10 @@ class RoiController extends Controller
 		//--相关税费--
 		//关税税率(百分数转成小数)
 		$update_data['tariff_rate'] = $this->getNumber($update_data['tariff_rate'])/100;
-		if($site == 'JP'){
-			$tariff_amount = $total_sales_amount * 0.35 * $update_data['tariff_rate'];
+		if($site == 'US'){
+			$tariff_amount = $purchase_cost * 0.3 * $update_data['tariff_rate'];
 		}else{
-			$tariff_amount = $purchase_cost * 0.4 * $update_data['tariff_rate'];
+			$tariff_amount = $purchase_cost * 0.35 * $update_data['tariff_rate'];
 		}
 		//VAT率
 		$vat_rate = ((float)$this->getVatRates()[$site])/100;

@@ -116,10 +116,10 @@ class RoiPerformanceController extends Controller
 				//采购成本
 				$purchase_cost = $roiData['purchase_price'] * $roiData['total_sales_volume'];
 
-				if($roiData['site'] == 'JP'){
-					$tariff_amount = $roiData['total_sales_amount'] * 0.35 * $roiData['tariff_rate'];
+				if($roiData['site'] == 'US'){
+					$tariff_amount = $purchase_cost * 0.3 * $roiData['tariff_rate'];
 				}else{
-					$tariff_amount = $purchase_cost * 0.4 * $roiData['tariff_rate'];
+					$tariff_amount = $purchase_cost * 0.35 * $roiData['tariff_rate'];
 				}
 
 				DB::connection('amazon')->table('roi_performance_extra')->where('roi_id',$roiData['id'])->delete();

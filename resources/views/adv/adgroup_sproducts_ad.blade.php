@@ -1,5 +1,8 @@
 @extends('layouts.layout')
-@section('label', 'AdGroups')
+@section('label')
+<a href="/adv">Advertising</a>  - Campaigns <a href="/adv/campaign/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'campaignId')}}/setting">{{array_get($adgroup,'campaignName')}}</a>
+ - AdGroup <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/setting">{{array_get($adgroup,'name')}}</a>
+@endsection
 @section('content')
 <style type="text/css">
 	th, td { white-space: nowrap;word-break:break-all; }
@@ -18,6 +21,12 @@
     .portlet.light   .portlet-title   .caption {
         color: #666;
         padding: 10px 0;
+    }
+    .DTFC_LeftBodyLiner{
+        overflow-x: hidden;
+    }
+    table.dataTable tbody tr {
+        height: 60px !important;
     }
 </style>
 <h1 class="page-title font-red-intense"> Ad Group - {{array_get($adgroup,'name')}}
@@ -70,9 +79,9 @@
                         <div class="col-md-2">
                         <div id="reportrange" class="btn default">
                             <i class="fa fa-calendar"></i> &nbsp;
-                            <span>{{ date('Y-m-d').' - '.date('Y-m-d')}}</span>
+                            <span>{{ date('Y-m-d',strtotime('-29 days')).' - '.date('Y-m-d')}}</span>
                             <b class="fa fa-angle-down"></b>
-                            <input type="hidden" name="start_date" id="start_date" value="{{date('Y-m-d')}}">
+                            <input type="hidden" name="start_date" id="start_date" value="{{date('Y-m-d',strtotime('-29 days'))}}">
                             <input type="hidden" name="end_date" id="end_date" value="{{date('Y-m-d')}}">
                         </div>
                         </div>
@@ -92,37 +101,37 @@
                         <div class="col-lg-2 col-md-4 col-xs-12">
                             <div class="mt-element-ribbon bg-grey-steel">
                                 <div class="ribbon ribbon-color-default uppercase">Spend</div>
-                                <p class="ribbon-content"><span class="text-primary" id = 'total_spend'>0</span><span class="text-success"> TOTAL</span></p>
+                                <p class="ribbon-content"><span class="text-primary total_spend">0</span><span class="text-success"> TOTAL</span></p>
                             </div>
                         </div>
                         <div class="col-lg-2 col-md-4 col-xs-12">
                             <div class="mt-element-ribbon bg-grey-steel">
                                 <div class="ribbon ribbon-color-primary uppercase">Clicks</div>
-                                <p class="ribbon-content"><span class="text-primary" id = 'total_clicks'>0</span><span class="text-success"> TOTAL</span></p>
+                                <p class="ribbon-content"><span class="text-primary total_clicks">0</span><span class="text-success"> TOTAL</span></p>
                             </div>
                         </div>
                         <div class="col-lg-2 col-md-4 col-xs-12">
                             <div class="mt-element-ribbon bg-grey-steel">
                                 <div class="ribbon ribbon-color-info uppercase">CTR</div>
-                                <p class="ribbon-content"><span class="text-primary" id = 'avg_ctr'>0</span><span class="text-success"> AVERAGE</span></p>
+                                <p class="ribbon-content"><span class="text-primary avg_ctr">0</span><span class="text-success"> AVERAGE</span></p>
                             </div>
                         </div>
                         <div class="col-lg-2 col-md-4 col-xs-12">
                             <div class="mt-element-ribbon bg-grey-steel">
                                 <div class="ribbon ribbon-color-success uppercase">Orders</div>
-                                <p class="ribbon-content"><span class="text-primary" id = 'total_orders'>0</span><span class="text-success"> TOTAL</span></p>
+                                <p class="ribbon-content"><span class="text-primary total_orders">0</span><span class="text-success"> TOTAL</span></p>
                             </div>
                         </div>
                         <div class="col-lg-2 col-md-4 col-xs-12">
                             <div class="mt-element-ribbon bg-grey-steel">
                                 <div class="ribbon ribbon-color-danger uppercase ">ACOS</div>
-                                <p class="ribbon-content"><span class="text-primary" id = 'avg_acos'>0</span><span class="text-success"> AVERAGE</span></p>
+                                <p class="ribbon-content"><span class="text-primary avg_acos">0</span><span class="text-success"> AVERAGE</span></p>
                             </div>
                         </div>
                         <div class="col-lg-2 col-md-4 col-xs-12">
                             <div class="mt-element-ribbon bg-grey-steel">
                                 <div class="ribbon ribbon-color-warning uppercase ">ROAS</div>
-                                <p class="ribbon-content"><span class="text-primary" id = 'avg_raos'>0</span><span class="text-success"> AVERAGE</span></p>
+                                <p class="ribbon-content"><span class="text-primary avg_raos">0</span><span class="text-success"> AVERAGE</span></p>
                             </div>
                         </div>
                     </div>
@@ -164,7 +173,6 @@
                             <thead>
                                 <tr role="row" class="heading">
                                     <th>
-                                        <input type="checkbox" class="group-checkable" data-set="#datatable_ajax .checkboxes" />
                                     </th>
 									<th>Asin</th>
                                     <th>Seller Sku</th>
@@ -178,6 +186,18 @@
                                     <th>Sales</th>
                                     <th>ACOS</th>
                                     <th>ROAS</th>                     
+                                </tr>
+                                <tr>
+                                    <th colspan=4></th>
+                                    <th><span class="text-primary total_impressions">0</span></th>
+									<th><span class="text-primary total_clicks">0</span></th>
+									<th><span class="text-primary avg_ctr">0</span></th>
+									<th><span class="text-primary total_spend">0</span></th> 
+									<th><span class="text-primary avg_cpc">0</span></th>
+									<th><span class="text-primary total_orders">0</span></th>
+                                    <th><span class="text-primary total_sales">0</span></th>
+                                    <th><span class="text-primary avg_acos">0</span></th>
+                                    <th><span class="text-primary avg_raos">0</span></th>
                                 </tr>
                             </thead>
                             <tbody>	
@@ -203,8 +223,12 @@
             <div class="modal-body"> 
                 <div class="form-group col-md-12">
                     <label>Seller Sku *</label>
-                    <textarea class="form-control" rows="10" name="asins" id="asins"
-                    placeholder="Enter your list and separate each item whith a new line."></textarea>
+                    <select class="mt-multiselect form-control " multiple="multiple" name="ads[]" id="ads" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true">
+                    <?php 
+                    foreach($products as $v){ 	
+                        echo '<option value="'.$v->seller_sku.'">'.$v->seller_sku.' - '.$v->asin.'</option>';
+                    }?>
+                    </select>
                 </div>
             </div>
             <div class="modal-footer">
@@ -236,6 +260,10 @@
             $.ajaxSetup({
                 headers: { 'X-CSRF-TOKEN' : '{{ csrf_token() }}' }
             });
+            var lineChart = echarts.init(document.getElementById('lineChart'));
+            lineChart.showLoading({
+                text : 'Loading...'
+            });
             var grid = new Datatable();
             grid.setAjaxParam("profile_id", $("input[name='profile_id']").val());
             grid.setAjaxParam("stateFilter", $("select[name='stateFilter']").val());
@@ -258,7 +286,10 @@
                 dataTable: {
                    //"serverSide":false,
                    "autoWidth":false,
-                   "ordering": false,
+                   "aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0,1,2,3] }],
+                   "order": [
+                        [4, "desc"]
+                    ],
                     "lengthMenu": [
                         [50, 100, 300, -1],
                         [50, 100, 300, 'All'] 
@@ -268,7 +299,13 @@
                         "url": "{{ url('adv/listAds')}}",
                     },
 
+					scrollY:500,
+                    scrollX:true,
 					
+
+					fixedColumns:   {
+						leftColumns:4
+					},
                     //"scrollX": true,
                     //"autoWidth":true
                     /*
@@ -339,15 +376,15 @@
                             attributed_sales1d+=Number(child_value.attributed_sales1d);
                             attributed_units_ordered1d+=Number(child_value.attributed_sales1d);
                         }
-                        $("#total_spend").html(spend.toFixed(2));
-                        $("#total_clicks").html(clicks);
-                        $("#total_orders").html(orders);
-                        $("#avg_ctr").html(((impressions<=0)?0:clicks/impressions).toFixed(4));
-                        $("#avg_acos").html(((attributed_sales1d<=0)?0:spend/attributed_sales1d).toFixed(4));
-                        $("#avg_raos").html(((spend<=0)?0:attributed_sales1d/spend).toFixed(4));
-                        console.log(chartY);
-
-                        var lineChart = echarts.init(document.getElementById('lineChart'));
+                        $(".total_spend").html(spend.toFixed(2));
+                        $(".total_clicks").html(clicks);
+                        $(".total_orders").html(orders);
+                        $(".total_impressions").html(impressions);
+                        $(".total_sales").html(attributed_sales1d.toFixed(2));
+                        $(".avg_cpc").html(((clicks<=0)?0:spend/clicks).toFixed(2));
+                        $(".avg_ctr").html(((impressions<=0)?0:clicks/impressions*100).toFixed(2)+'%');
+                        $(".avg_acos").html(((attributed_sales1d<=0)?0:spend/attributed_sales1d*100).toFixed(2)+'%');
+                        $(".avg_raos").html(((spend<=0)?0:attributed_sales1d/spend).toFixed(4));
 
                         var option = {
                             tooltip : {
@@ -387,6 +424,7 @@
                             ],
                             series : chartY
                         };
+                        lineChart.hideLoading();
                         lineChart.setOption(option);
                     },
                  }
@@ -402,7 +440,7 @@
                 var id_type = 'adId';
                 var action = 'product_ads';
                 var method = 'updateProductAds';
-                if (confirmStatus.val() != "" && grid.getSelectedRowsCount() > 0) {
+                if (confirmStatus.val() != "" && grid.getClonedSelectedRowsCount() > 0) {
                     $.ajaxSetup({
                         headers: { 'X-CSRF-TOKEN' : '{{ csrf_token() }}' }
                     });
@@ -410,7 +448,7 @@
                         type: "POST",
                         dataType: "json",
                         url: "{{ url('adv/batchUpdate') }}",
-                        data: {confirmStatus:confirmStatus.val(),id:grid.getSelectedRows(),profile_id:profile_id,ad_type:ad_type,id_type:id_type,action:action,method:method},
+                        data: {confirmStatus:confirmStatus.val(),id:grid.getClonedSelectedRows(),profile_id:profile_id,ad_type:ad_type,id_type:id_type,action:action,method:method},
                         success: function (data) {
                             if(data.customActionStatus=='OK'){
                                 toastr.success(data.customActionMessage);
@@ -425,7 +463,7 @@
                     });
                 } else if ( confirmStatus.val() == "" ) {
                     toastr.error('Please select an action');
-                } else if (grid.getSelectedRowsCount() === 0) {
+                } else if (grid.getClonedSelectedRowsCount() === 0) {
                     toastr.error('No record selected');
                 }
             });
@@ -448,7 +486,7 @@
 
         $('#reportrange').daterangepicker({
                 opens: (App.isRTL() ? 'left' : 'right'),
-                startDate: moment(),
+                startDate: moment().subtract('days', 29),
                 endDate: moment(),
                 dateLimit: {
                     days: 60

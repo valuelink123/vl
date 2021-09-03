@@ -254,6 +254,19 @@ var Datatable = function() {
 
             return rows;
         },
+		
+		getClonedSelectedRowsCount: function() {
+            return $('tbody > tr > td:nth-child(1) input[type="checkbox"]:checked', $('.DTFC_Cloned')).size();
+        },
+
+        getClonedSelectedRows: function() {
+            var rows = [];
+            $('tbody > tr > td:nth-child(1) input[type="checkbox"]:checked', $('.DTFC_Cloned')).each(function() {
+                rows.push($(this).val());
+            });
+
+            return rows;
+        },
 
         setAjaxParam: function(name, value) {
             ajaxParams[name] = value;

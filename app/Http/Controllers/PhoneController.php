@@ -201,7 +201,7 @@ class PhoneController extends Controller
                 $val['phone'],
 				isset($emailToEncryptedEmail[$val['buyer_email']]) ? $emailToEncryptedEmail[$val['buyer_email']] : $val['buyer_email'],
                 $val['amazon_order_id'],
-                $val['content'],
+                ' '.$val['content'],
                 isset($users[$val['user_id']]) ? $users[$val['user_id']] : '未知',
                 $val['date'],
             );

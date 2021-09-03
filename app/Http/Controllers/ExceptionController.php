@@ -541,6 +541,9 @@ class ExceptionController extends Controller
 			 'Website order',
 			 'B2B'
 		 );
+		foreach($gift_cards as $key=>$val){
+			$gift_cards[$key]['code'] = func_substr_replace($val['code'],"*", 3, 10);
+		}
 
         return view('exception/edit',['exception'=>$rule,'gift_cards'=>$gift_cards,'mail_accounts'=>$mail_accounts,'mail_templates'=>$mail_templates,'gift_card_mail'=>$gift_card_mail,'groups'=>$this->getGroups(),'mygroups'=>$this->getUserGroup(),'sellerids'=>$this->getAccounts(),'last_inboxid'=>$last_inboxid,'mcf_orders'=>$mcf_orders,'auto_create_mcf_logs'=>$auto_create_mcf_logs,'users'=>$this->getUsers(),'requestContentHistoryValues'=>$requestContentHistoryValues]);
     }
@@ -1260,13 +1263,21 @@ class ExceptionController extends Controller
 		$updateMcfOrder = array();
 		if( $exception->type == 2 || $exception->type == 3){
 			$products=[];
+			/**
+             * products_arr的数据结构如下：
+             * products_arr=[{seller_id=>'店铺seller_id',seller_sku=>"",item_code=>"物料号",note=>'备注或者详情',title=>"商品名称",qty=>库存数量,shipfrom=>"发货仓库",addattr=>"Returned|Urgent"}]
+             *
+             **/
 			$products_arr = $request->get('group-products');
 			$id_add=0;
 			foreach($products_arr as $product_arr){
 				$id_add++;
+				//原销售店铺发货，则在原订单后增加“_0X”,X表示物料号数量,如发一个物料号的产品，X=1,发2个物料号的产品，则X=2;以此类推
 				if(array_get($product_arr,'seller_id')==$request->get('rebindordersellerid')){
 					$product_arr['replacement_order_id']=$request->get('rebindorderid').'-0'.$id_add;
 				}else{
+				    //非原销售店铺发货，这种情况发生在一个物料多个帖子或者一个物料多个店铺跟卖的情况，这种情况则忽略掉原订单号的第一段“xxx-”;
+                    //这样处理的原因是因为订单号，在不同店铺是可以重复的。
 					$product_arr['replacement_order_id']=substr($request->get('rebindorderid'),4).'-0'.$id_add;	
 				}
 				if($product_arr['seller_id']=='FBM') $product_arr['replacement_order_id']=$request->get('rebindorderid');

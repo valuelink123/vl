@@ -130,6 +130,7 @@ class CcpAdCampaignController extends Controller
 					any_value(accounts.seller_id) as seller_id,
 					ppc_campaigns.name as name,
 					any_value(ppc_campaigns.state) as state,
+       				any_value(ppc_campaigns.daily_budget) as daily_budget,
 					round(sum(ppc_reports.cost),2) as cost,
 					sum(ppc_reports.clicks) as clicks,
 					round(sum(ppc_reports.attributed_sales1d),2) as sales,

@@ -1,5 +1,8 @@
 @extends('layouts.layout')
-@section('label', 'Ad Group')
+@section('label')
+<a href="/adv">Advertising</a>  - Campaigns <a href="/adv/campaign/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'campaignId')}}/setting">{{array_get($adgroup,'campaignName')}}</a>
+ - AdGroup <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/setting">{{array_get($adgroup,'name')}}</a>
+@endsection
 @section('content')
 <h1 class="page-title font-red-intense"> Ad Group - {{array_get($adgroup,'name')}}
 </h1>

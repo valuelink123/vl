@@ -370,7 +370,7 @@ class UserController extends Controller
 							max(item_no) AS item_no,
 							user_id
 						FROM
-							inbox_report
+							inbox
 						WHERE
 							date >= '$date_from'
 						AND date <= '$date_to'
@@ -387,7 +387,7 @@ class UserController extends Controller
 						to_address,
 						max(date) AS out_date
 					FROM
-						sendbox_report
+						sendbox
 					WHERE
 					user_id in ($user_ids)
 					and	date >= '$date_from'
@@ -451,8 +451,8 @@ class UserController extends Controller
 					a.user_id,
 					b.item_no
 				FROM
-					inbox_report b
-				LEFT JOIN sendbox_report a  ON b.id = a.inbox_id 
+					inbox b
+				LEFT JOIN sendbox a  ON b.id = a.inbox_id 
 				WHERE
 					b.date >= '$date_from'
 				AND b.date <= '$date_to'

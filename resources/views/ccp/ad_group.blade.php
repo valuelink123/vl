@@ -139,7 +139,8 @@
                 <thead>
                 <tr>
                     <th>ACCOUNT NAME</th>
-                    <th>NAME</th>
+                    <th>CAMPAIGN NAME</th>
+                    <th>GROUP NAME</th>
                     <th>STATE</th>
                     <th>AD COST</th>
                     <th>SALES</th>
@@ -182,7 +183,8 @@
             processing: true,
             columns: [
                 {data: 'account_name',name:'account_name'},
-                {data: 'name',name:'name'},
+                {data: 'campaign_name',name:'campaign_name'},
+                {data: 'group_name',name:'group_name'},
                 {data: 'state',name:'state'},
                 {data: 'cost',name:'cost'},
                 {data: 'sales',name:'sales'},
