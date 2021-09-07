@@ -231,18 +231,45 @@ class SendController extends Controller
 		$emailToEncryptedEmail = getEmailToEncryptedEmail();
 		
 		$hasWaiting = Sendbox::where('status','Waiting')
-			->where('from_address',trim($request->get('from_address')))
-			->where('error_count',0)
-            ->whereIn('to_address',$to_address_array)
-            ->where('user_id',intval(Auth::user()->id))
-            ->groupBy('to_address')->pluck('to_address')->toArray();
-			
+		->where('from_address',trim($request->get('from_address')))
+		->where('error_count',0)
+		->whereIn('to_address',$to_address_array)
+		->where('user_id',intval(Auth::user()->id))
+		->groupBy('to_address')->pluck('to_address')->toArray();
+
+		$to_address_str = implode("','",$to_address_array);
+		$to_address_str = "'".$to_address_str."'";
+		$sql = "select email,encrypted_email,subscribe,block from client left join client_info on client.id = client_info.client_id where (email in($to_address_str) or encrypted_email in($to_address_str))";
+		$_emailData = DB::select($sql);
+		$emailData = $encryptedEmailData = array();
+		foreach($_emailData as $_val){
+			$emailData[$_val->email] = array('subscribe'=>$_val->subscribe,'block'=>$_val->block);
+			$encryptedEmailData[$_val->encrypted_email] = array('subscribe'=>$_val->subscribe,'block'=>$_val->block);
+		}
+
+		$inbox_id = $request->get('inbox_id')?intval($request->get('inbox_id')):0;//有值表示是回复客户的邮件
 		foreach($to_address_array as $to_address){
 			$_address = array_search($to_address,$emailToEncryptedEmail);
 			if($_address){
 				$to_address = $_address;
 			}
-
+			//已订阅才可以主动发邮件(subscribe=1)，默认未订阅只能回复邮件，是block黑名单的话不能给他发邮件(block=1)
+			if(isset($emailData[$to_address]) && $emailData[$to_address]){
+				if($emailData[$to_address]['block']==1){//黑名单不可以发邮件
+					continue;
+				}
+				if($emailData[$to_address]['subscribe']==0 && $inbox_id==0){//未订阅主动发邮件不可以
+					continue;
+				}
+			}
+			if(isset($encryptedEmailData[$to_address]) && $encryptedEmailData[$to_address]){
+				if($encryptedEmailData[$to_address]['block']==1){//黑名单不可以发邮件
+					continue;
+				}
+				if($encryptedEmailData[$to_address]['subscribe']==0 && $inbox_id==0){//未订阅主动发邮件不可以
+					continue;
+				}
+			}
 			if(in_array(trim($to_address),$blackEmail)){
 //				$request->session()->flash('error_message','有黑名单客户的邮箱');
 //				return redirect()->back()->withInput();
