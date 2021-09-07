@@ -287,6 +287,9 @@ class ReviewController extends Controller
 		if(array_get($_REQUEST,'del')){
 			$_reviewsSelect = $_reviewsSelect->where('is_delete', array_get($_REQUEST,'del'));
 		}
+        if(array_get($_REQUEST,'review_id')){
+            $_reviewsSelect = $_reviewsSelect->where('review', array_get($_REQUEST,'review_id'));
+        }
 
 
 		if(array_get($_REQUEST,'rc')){
@@ -595,6 +598,9 @@ class ReviewController extends Controller
 
         if(array_get($_REQUEST,'del')){
             $_reviewsSelect = $_reviewsSelect->where('is_delete', array_get($_REQUEST,'del'));
+        }
+        if(array_get($_REQUEST,'review_id')){
+            $_reviewsSelect = $_reviewsSelect->where('review', array_get($_REQUEST,'review_id'));
         }
 
 
