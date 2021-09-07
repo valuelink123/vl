@@ -776,9 +776,14 @@ class ReviewController extends Controller
 
         $seller_account = Review::findOrFail($id);;
 
+		$buyer_email = $request->get('buyer_email');
+		$_email = array_search($buyer_email,getEmailToEncryptedEmail());
+		if($_email){
+			$buyer_email = $_email;
+		}
         $seller_account->seller_id = $request->get('rebindordersellerid');
         $seller_account->amazon_order_id = $request->get('rebindorderid');
-        $seller_account->buyer_email = array_search($request->get('buyer_email'),getEmailToEncryptedEmail())??$request->get('buyer_email');
+        $seller_account->buyer_email = $buyer_email;
         $seller_account->buyer_phone = $request->get('buyer_phone');
         $seller_account->etype = $request->get('etype');
         $seller_account->remark = $request->get('remark');
