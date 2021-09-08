@@ -753,6 +753,7 @@ class ExceptionController extends Controller
 								$subject = str_replace("{GIFT_CARD}", $gift_card->code, $gf_template->title);
 								$content = str_replace("{BRAND}", $request->get('mail_brand'), $content);
 								$subject = str_replace("{BRAND}", $request->get('mail_brand'), $subject);
+								$subject = str_replace("{AON:}","Order No.: ".$exception->amazon_order_id , $subject);
 								$content = str_replace("{BRAND_LINK}", array_get(getBrands(), $request->get('mail_brand') . '.url'), $content);
 								$subject = str_replace("{BRAND_LINK}", array_get(getBrands(), $request->get('mail_brand') . '.url'), $subject);
 								$sendbox = new Sendbox;
