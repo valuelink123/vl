@@ -259,13 +259,13 @@
                     @foreach ($suggestedKeywords as $key=>$keyword)
                     <div class="row">
                         <div class="col-md-6">
-                        {{array_get($keyword,'keywordText')}}
+                        {{array_get($keyword,'keywordText')}} <a href="javascript:;" class="data-repeater-create" data-k="{{array_get($keyword,'keywordText')}}" data-m="{{array_get($keyword,'matchType')}}" data-b="{{array_get($keyword,'bid')}}">Add</a>
                         </div>
                         <div class="col-md-3">
                         {{array_get($keyword,'matchType')}}
                         </div>
                         <div class="col-md-3">
-                        {{array_get($keyword,'bid')}}
+                        {{array_get($keyword,'bid')}} 
                         </div>
                         <div class="clearFix"></div>
                     </div>
@@ -278,7 +278,7 @@
 							<a href="#customize" data-toggle="tab" aria-expanded="true">Customize</a>
 						</li>
 						<li >
-							<a href="#enter_list" data-toggle="tab" aria-expanded="true">Enter List</a>
+							<a href="#enter_list" data-toggle="tab" aria-expanded="false">Enter List</a>
 						</li>
 					</ul>
                     <div class="tab-content">
@@ -304,7 +304,7 @@
                                             <div class="col-md-3">
                                                 <label class="control-label">Bid</label>
                                                 <div class="input-group">
-                                                <input type="text" class="form-control input-sm"  name="bid" value="0" required>
+                                                <input type="text" class="form-control input-sm"  name="bid" value="{{array_get($adgroup,'defaultBid')}}" required>
                                                 </div>
                                             </div>
                     

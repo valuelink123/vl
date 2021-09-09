@@ -998,6 +998,16 @@ $.fn.repeater = function (fig) {
         $filterNested($self.find('[data-repeater-create]'), fig.repeaters).click(function () {
             addItem();
         });
+		
+		$('.data-repeater-create').click(function (){
+			if($('#customize').hasClass('active')){
+				var d = {keywordText:$(this).data('k'),value:$(this).data('k'), matchType:$(this).data('m'),type:$(this).data('m'), bid:$(this).data('b')};
+            	addItem(d);
+			}
+			if($('#enter_list').hasClass('active')){
+            	$("#keyword_text").append($(this).data('k')+"\r\n");
+			}
+        });
 
         $list.on('click', '[data-repeater-delete]', function () {
             var self = $(this).closest('[data-repeater-item]').get(0);

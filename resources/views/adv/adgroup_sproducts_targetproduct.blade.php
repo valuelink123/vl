@@ -245,7 +245,7 @@
                     @foreach ($suggestedProducts as $k=>$v)
                     <div class="row">
                     <div class="col-md-12">
-                    {{array_get($v,'recommendedTargetAsin')}}
+                    {{array_get($v,'recommendedTargetAsin')}} <a href="javascript:;" class="data-repeater-create" data-k="{{array_get($v,'recommendedTargetAsin')}}" data-m="asinSameAs" data-b="{{array_get($adgroup,'defaultBid')}}">Add</a>
                     </div>
                     </div>
                     @endforeach
@@ -264,7 +264,7 @@
                     @foreach ($suggestedCategories as $k=>$v)
                     <div class="row">
                     <div class="col-md-6">
-                    {{array_get($v,'name')}}
+                    {{array_get($v,'name')}} <a href="javascript:;" class="data-repeater-create" data-k="{{array_get($v,'id')}}" data-m="asinCategorySameAs" data-b="{{array_get($adgroup,'defaultBid')}}">Add</a>
                     </div>
                     <div class="col-md-6">
                     {{array_get($v,'id')}}
@@ -305,7 +305,7 @@
                                         <div class="col-md-3">
 											<label class="control-label">Bid</label>
 											<div class="input-group">
-                                            <input type="text" class="form-control input-sm"  name="bid" value="0" required>
+                                            <input type="text" class="form-control input-sm"  name="bid" value="{{array_get($adgroup,'defaultBid')}}" required>
                                             </div>
                                         </div>
 										<div class="col-md-2">
