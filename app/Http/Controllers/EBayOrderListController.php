@@ -33,8 +33,8 @@ class EBayOrderListController extends Controller
         $sql = "SELECT max(t.sku) as sku, max(t.ebay_sku) as ebay_sku
                 FROM
                 ( SELECT e.sku, f.ebay_sku
-                  FROM ebay_order a
-                  LEFT JOIN ebay_order_line_item e ON a.order_id = e.order_id
+                  FROM 
+                      ebay_order_line_item e
                   LEFT JOIN ebay_sku_sap_sku f ON e.sku = f.ebay_sku and f.active_status = 1
                 ) AS t
                 GROUP BY t.sku";
@@ -182,8 +182,7 @@ class EBayOrderListController extends Controller
             $data[$key]['ebay_sku'] = $val['sku'];
             $data[$key]['ebay_sku_qty'] = $val['quantity'];
             $data[$key]['sap_sku'] = $val['sap_sku'];
-            $sapSkuQty = intval(($val['t_qty'] / $val['s_qty']) * $val['quantity']);
-            $data[$key]['sap_sku_qty'] = $sapSkuQty;
+            $data[$key]['sap_sku_qty'] = empty($val['quantity']) ? null : $sapSkuQty = intval(($val['t_qty'] / $val['s_qty']) * $val['quantity']);
             $data[$key]['factory'] = $val['factory'];
             $data[$key]['warehouse'] = $val['warehouse'];
             $data[$key]['line_item_id'] = '';
@@ -249,7 +248,7 @@ class EBayOrderListController extends Controller
                 $val['site'],
                 $currentLineNumber,
                 $val['sap_sku'],
-                intval(($val['t_qty'] / $val['s_qty']) * $val['quantity']),
+                empty($val['quantity']) ? null : $sapSkuQty = intval(($val['t_qty'] / $val['s_qty']) * $val['quantity']),
                 $val['factory'],
                 $val['warehouse'],
                 '',
@@ -331,7 +330,7 @@ class EBayOrderListController extends Controller
                     ORDER BY
                         a.order_id DESC
                 ) AS t
-                GROUP BY t.sku, t.sap_sku
+                GROUP BY t.order_id, t.sku, t.sap_sku 
                 ORDER BY order_id desc";
 
         return $sql;
