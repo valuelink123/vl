@@ -33,8 +33,7 @@ class NeweggOrderListController extends Controller
         $sql = "SELECT max(t.sku) AS sku, max(t.newegg_sku) AS newegg_sku
                 FROM
                 ( SELECT b.newegg_item_number as sku, c.newegg_sku
-                  FROM newegg_order a
-                  JOIN newegg_item_info b ON a.order_number = b.order_number
+                  FROM newegg_item_info b
                   LEFT JOIN newegg_sku_sap_sku c ON b.newegg_item_number = c.newegg_sku and c.active_status = 1
                 ) AS t
                 GROUP BY t.sku";
@@ -180,7 +179,7 @@ class NeweggOrderListController extends Controller
             $data[$key]['newegg_sku'] = $val['newegg_item_number'];
             $data[$key]['newegg_sku_qty'] = $val['ordered_qty'];
             $data[$key]['sap_sku'] = $val['sap_sku'];
-            $sapSkuQty = intval(($val['t_qty'] / $val['s_qty']) * $val['ordered_qty']);
+            $sapSkuQty = empty($val['ordered_qty']) ? null : intval(($val['t_qty'] / $val['s_qty']) * $val['ordered_qty']);
             $data[$key]['sap_sku_qty'] = $sapSkuQty;
             $data[$key]['factory'] = $val['factory'];
             $data[$key]['warehouse'] = $val['warehouse'];
@@ -245,7 +244,7 @@ class NeweggOrderListController extends Controller
                 $val['site'],
                 $currentLineNumber,
                 $val['sap_sku'],
-                intval(($val['t_qty'] / $val['s_qty']) * $val['ordered_qty']),
+                empty($val['ordered_qty']) ? null : intval(($val['t_qty'] / $val['s_qty']) * $val['ordered_qty']),
                 $val['factory'],
                 $val['warehouse'],
                 '',

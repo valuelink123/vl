@@ -33,9 +33,8 @@ class JoybuyOrderListController extends Controller
         $sql = "SELECT max(t.sku) AS sku, max(t.joybuy_sku) AS joybuy_sku
                 FROM
                 ( SELECT b.sku_id as sku, d.joybuy_sku
-                  FROM joybuy_order a
-                  LEFT JOIN joybuy_sku b ON a.order_id = b.order_id
-                  LEFT JOIN joybuy_order_sku c ON b.id = c.joybuy_sku_id AND a.order_id = c.order_id 
+                  FROM 
+                      joybuy_sku b
                   LEFT JOIN joybuy_sku_sap_sku d ON b.sku_id = d.joybuy_sku and d.active_status = 1
                 ) AS t
                 GROUP BY t.sku";
@@ -184,7 +183,7 @@ class JoybuyOrderListController extends Controller
             $data[$key]['joybuy_sku'] = $val['sku_id'];
             $data[$key]['joybuy_sku_qty'] = $val['quantity'];
             $data[$key]['sap_sku'] = $val['sap_sku'];
-            $sapSkuQty = intval(($val['t_qty'] / $val['s_qty']) * $val['quantity']);
+            $sapSkuQty = empty($val['quantity']) ? null : intval(($val['t_qty'] / $val['s_qty']) * $val['quantity']);
             $data[$key]['sap_sku_qty'] = $sapSkuQty;
             $data[$key]['factory'] = $val['factory'];
             $data[$key]['warehouse'] = $val['warehouse'];
@@ -251,7 +250,7 @@ class JoybuyOrderListController extends Controller
                 $val['site'],
                 $currentLineNumber,
                 $val['sap_sku'],
-                intval(($val['t_qty'] / $val['s_qty']) * $val['quantity']),
+                empty($val['quantity']) ? null : intval(($val['t_qty'] / $val['s_qty']) * $val['quantity']),
                 $val['factory'],
                 $val['warehouse'],
                 '',
