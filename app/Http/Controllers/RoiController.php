@@ -1194,6 +1194,8 @@ class RoiController extends Controller
 		$update_data['tariff_rate'] = $this->getNumber($update_data['tariff_rate'])/100;
 		if($site == 'US'){
 			$tariff_amount = $purchase_cost * 0.3 * $update_data['tariff_rate'];
+		}elseif($site == 'JP'){
+			$tariff_amount = $purchase_cost * 1.1 * 1.05 * $update_data['tariff_rate'];
 		}else{
 			$tariff_amount = $purchase_cost * 0.35 * $update_data['tariff_rate'];
 		}
