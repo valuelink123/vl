@@ -589,13 +589,13 @@ on a.asin=c.asin and a.marketplace_id=c.marketplace_id ";
 		$sql = "
         SELECT SQL_CALC_FOUND_ROWS
         	a.*,(sales_4_weeks/28*0.5+sales_2_weeks/14*0.3+sales_1_weeks/7*0.2) as daily_sales,buybox_sellerid,
-afn_sellable,afn_reserved,mfn_sellable,sz_sellable ".$add_field." from (select asin,marketplace_id,any_value(sku) as sku,any_value(status) as status,
+afn_sellable,afn_reserved,mfn_sellable,IFNULL(sz_sellable,0) as sz_sellable ".$add_field." from (select asin,marketplace_id,any_value(sku) as sku,any_value(status) as status,
 any_value(sku_status) as sku_status,any_value(sap_seller_id) as sap_seller_id, 
 any_value(sap_seller_bg) as bg,any_value(sap_seller_bu) as bu from sap_asin_match_sku where sku_status<6 group by asin,marketplace_id) as a
 left join asins as b on a.asin=b.asin and a.marketplace_id=b.marketplaceid
 left join (select sku,sum(quantity) as sz_sellable from sap_sku_sites where left(sap_factory_code,2)='HK' group by sku) as d on a.sku=d.sku
 ".$add_join."
-			where (sku_status>0 or (afn_sellable+afn_reserved+mfn_sellable+sz_sellable)>0) {$where} 
+			where (sku_status>0 or (afn_sellable+afn_reserved+mfn_sellable+IFNULL(sz_sellable,0))>0) {$where} 
 			{$orderby} ";
 		return $sql;
 	}
