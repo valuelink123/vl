@@ -118,6 +118,8 @@ class RoiPerformanceController extends Controller
 
 				if($roiData['site'] == 'US'){
 					$tariff_amount = $purchase_cost * 0.3 * $roiData['tariff_rate'];
+				}elseif($roiData['site'] == 'JP'){
+					$tariff_amount = $purchase_cost * 1.1 * 1.05 * $roiData['tariff_rate'];
 				}else{
 					$tariff_amount = $purchase_cost * 0.35 * $roiData['tariff_rate'];
 				}

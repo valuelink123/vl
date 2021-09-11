@@ -1181,7 +1181,13 @@ class ExceptionController extends Controller
 			}
             if($customersList['type']==4){
 				$operate.= 'Gift Card : '.$customersList['gift_card_amount'].PHP_EOL;
-				if($customersList['giftcard']) $operate.= 'Card Code: '.$customersList['giftcard']['code'].' - '.$customersList['giftcard']['amount'].$customersList['giftcard']['currency'].PHP_EOL;
+				$user_id = Auth::user()->id;
+				//异常单的gift card，陈金秀和李卓君显示出全部的code,Bruce 李卓君的user_id=392,Grace-陈金秀的user_id=404
+				$_code = $customersList['giftcard']['code'];
+				if(!($user_id == 392 || $user_id == 404)){
+					$_code = func_substr_replace($customersList['giftcard']['code'],"*", 3, 10);
+				}
+				if($customersList['giftcard']) $operate.= 'Card Code: '.$_code.' - '.$customersList['giftcard']['amount'].$customersList['giftcard']['currency'].PHP_EOL;
 			}
             //得到列表的状态值（在状态值下面显示score值）
             $statusScore = array_get($status_list,$customersList['process_status']).'<br/><br/>'.$customersList['score'];
