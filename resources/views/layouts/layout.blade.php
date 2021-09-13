@@ -282,8 +282,14 @@
                                                     </a>
                                                     <ul class="dropdown-menu">
                                                         <li class="">
-                                                            <a href="/eBayOrderList" class="nav-link nav-toggle ">
+                                                            <a href="/ebayOrderList" class="nav-link nav-toggle ">
                                                                 Order List
+                                                                <span class="arrow"></span>
+                                                            </a>
+                                                        </li>
+                                                        <li class="">
+                                                            <a href="/ebayOrderList/skuMatchList" class="nav-link nav-toggle ">
+                                                                SKU Match List
                                                                 <span class="arrow"></span>
                                                             </a>
                                                         </li>
@@ -1156,7 +1162,31 @@
 												@endpermission
 											</ul>
 										</li>
-
+                                        <li class="menu-dropdown classic-menu-dropdown ">
+                                            <a href="javascript:;"> RSG
+                                                <span class="arrow"></span>
+                                            </a>
+                                            <ul class="dropdown-menu pull-left">
+                                                <li class="">
+                                                    <a href="/shopsaver" class="nav-link nav-toggle">
+                                                        ShopSaver Products
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
+                                                <li class="">
+                                                    <a href="/shopsaver/users" class="nav-link nav-toggle">
+                                                        ShopSaver Clients
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
+                                                <li class="">
+                                                    <a href="/shopsaver/orderList" class="nav-link nav-toggle">
+                                                        ShopSaver Order List
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </li>
                                         <li class="menu-dropdown classic-menu-dropdown ">
                                             <a href="javascript:;"> System
                                                 <span class="arrow"></span>

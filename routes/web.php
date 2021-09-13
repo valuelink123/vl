@@ -561,13 +561,16 @@ Route::match(['post','get'],'/amazonFulfiledShipments/download', 'AmazonFulfiled
 Route::Post('/amazon/auth', 'AmazonAuthController@index');
 
 
-//eBay订单列表模块
-Route::get('/eBayOrderList', 'EBayOrderListController@index');//订单列表
-Route::post('/eBayOrderList/list', 'EBayOrderListController@list');//获取订单列表数据
-Route::match(['post','get'],'/eBayOrderList/export', 'EBayOrderListController@export');//订单列表数据的下载
-Route::post('/eBayOrderList/refreshSkuMatchTable', 'EBayOrderListController@refreshSkuMatchTable');
-Route::get('/eBayOrderList/verifySkuTable', 'EBayOrderListController@verifySkuTable');
-Route::post('/eBayOrderList/updateSkuTable', 'EBayOrderListController@updateSkuTable');
+//ebay订单列表模块
+Route::get('/ebayOrderList', 'EBayOrderListController@index');//订单列表
+Route::post('/ebayOrderList/list', 'EBayOrderListController@list');//获取订单列表数据
+Route::match(['post','get'],'/ebayOrderList/export', 'EBayOrderListController@export');//订单列表数据的下载
+Route::post('/ebayOrderList/refreshSkuMatchTable', 'EBayOrderListController@refreshSkuMatchTable');
+Route::get('/ebayOrderList/addSkuMatch', 'EBayOrderListController@addSkuMatch');
+Route::match(['post','get'],'/ebayOrderList/skuMatchList', 'EBayOrderListController@skuMatchList');
+Route::get('/ebayOrderList/skuMatchEdit', 'EBayOrderListController@skuMatchEdit');
+Route::post('/ebayOrderList/skuMatchUpdate', 'EBayOrderListController@skuMatchUpdate');
+Route::get('/ebayOrderList/exportSkuMatchList', 'EBayOrderListController@exportSkuMatchList');//订单列表数据的下载
 
 //joybuy订单列表模块
 Route::get('/joybuyOrderList', 'JoybuyOrderListController@index');//订单列表

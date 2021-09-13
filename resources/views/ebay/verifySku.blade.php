@@ -26,7 +26,7 @@
 <script src="/assets/global/plugins/jquery.min.js" type="text/javascript"></script>
 
 <div style="height: 40px;"></div>
-<form id="skuForm" method="post" action="/eBayOrderList/updateSkuTable">
+<form id="skuForm" method="post" action="/ebayOrderList/updateSkuTable">
     {{ csrf_field() }}
     <input type="hidden" id="skuId" name="skuId" value="">
     <input type="hidden" id="updateMethod" name="updateMethod" value="">
