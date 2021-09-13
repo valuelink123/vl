@@ -760,7 +760,7 @@ class ReviewController extends Controller
         $return['remark'] = array_get($review,'remark');
         $return['sellerids'] = $this->getSellerIds();
         $return['accounts'] = $this->getAccounts();
-        $encrypted_email = array_key_exists($review['buyer_email'],getEmailToEncryptedEmail())?array_get(getEmailToEncryptedEmail(),$review['buyer_email']):'';
+        $encrypted_email = array_key_exists($review['buyer_email'],getEmailToEncryptedEmail())?array_get(getEmailToEncryptedEmail(),$review['buyer_email']):$review['buyer_email'];
         $return['emails'] = DB::table('sendbox')->where('to_address', array_get($review,'buyer_email'))->orderBy('date','desc')->get(['*',DB::RAW('\''.$encrypted_email.'\' as to_address')]);
         $return['emails'] =json_decode(json_encode($return['emails']), true);
         $review['buyer_email'] = $encrypted_email;
