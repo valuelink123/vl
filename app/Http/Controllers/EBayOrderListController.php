@@ -36,177 +36,6 @@ class EBayOrderListController extends Controller
         return view('ebay/orderIndex', ['data' => $data, 'ebaySKuString' => $ebaySKuString]);
     }
 
-    public function addSkuMatch(Request $req)
-    {
-        $ebaySKuString = $this->getNotMatchedSkuString();
-        if ($ebaySKuString) {
-            return view('ebay/addSkuMatch', ['ebaySKuString' => $ebaySKuString]);
-        } else {
-            echo '平台SKU和SAP SKU已全部匹配';
-        }
-    }
-
-    public function skuMatchList(Request $req)
-    {
-        $search = isset($_POST['search']) ? $_POST['search'] : '';
-        $search = $this->getSearchData(explode('&', $search));
-        $sku = array_get($search, 'sku') ?? '';
-        //去除tab,空格,换行. 本身的+转成了%2B：  AP3127_B + BHG1136
-        $sku = str_replace('%09', '', $sku);
-        $sku = str_replace('+', ' ', $sku);
-        $sku = str_replace('%2B', '+', $sku);
-        $sku = trim($sku);
-
-        if ($req->isMethod('GET')) {
-            return view('ebay/skuMatchList', compact('sku'));
-        }
-        $where = '';
-        if ($sku) {
-            $where = " where ebay_sku = '{$sku}' or sap_sku = '{$sku}'";
-        }
-        $sql = "select * from ebay_sku_sap_sku {$where} order by id desc";
-        $recordsTotal = $recordsFiltered = count(DB::connection('ebay')->select($sql));
-        if ($req['length'] != '-1') {
-            $limit = $this->dtLimit($req);
-            $sql .= " LIMIT {$limit} ";
-        }
-
-        $data = DB::connection('ebay')->select($sql);
-        $data = json_decode(json_encode($data), true);
-        foreach ($data as $key => $val) {
-            $data[$key]['action'] = '<a href="/ebayOrderList/skuMatchEdit?sku_id=' . $val['id'] . '" target="_blank">编辑</a>';
-        }
-        return compact('data', 'recordsTotal', 'recordsFiltered');
-    }
-
-    public function skuMatchEdit(Request $req)
-    {
-        $skuId = $req->input('sku_id');
-        $data = DB::connection('ebay')->table('ebay_sku_sap_sku')->where('id', $skuId)->first();
-        $data = json_decode(json_encode($data), true);
-        return view('ebay/skuMatchEdit', compact('data'));
-    }
-
-    public function skuMatchUpdate(Request $req)
-    {
-        $skuId = $req->input('sku_id');
-        $ebaySku = $req->input('ebay_sku');
-        $sQty = $req->input('s_qty');
-        $sapSku = $req->input('sap_sku');
-        $tQty = $req->input('t_qty');
-        $warehouse = $req->input('warehouse');
-        $factory = $req->input('factory');
-        $shipmentCode = $req->input('shipment_code');
-        $updateArray = array('ebay_sku' => $ebaySku, 's_qty' => $sQty, 'sap_sku' => $sapSku, 't_qty' => $tQty, 'warehouse' => $warehouse, 'factory' => $factory, 'shipment_code' => $shipmentCode);
-
-        DB::beginTransaction();
-        try {
-            DB::connection('ebay')->table('ebay_sku_sap_sku')->where('id', $skuId)->update($updateArray);
-            DB::commit();
-            $req->session()->flash('success_message', 'Update SKU match successfully');
-            return redirect('ebayOrderList/skuMatchList');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            $req->session()->flash('error_message', 'Failed to update SKU match');
-            return redirect()->back()->withInput();
-        }
-    }
-
-
-    public function getNotMatchedSkuString()
-    {
-        $sql = "SELECT max(t.sku) as sku, max(t.ebay_sku) as ebay_sku
-                FROM
-                ( SELECT e.sku, f.ebay_sku
-                  FROM 
-                      ebay_order_line_item e
-                  LEFT JOIN ebay_sku_sap_sku f ON e.sku = f.ebay_sku
-                ) AS t
-                GROUP BY t.sku";
-        $data = DB::connection('ebay')->select($sql);
-        $data = json_decode(json_encode($data), true);
-        $ebaySkuArray = array();
-        foreach ($data as $v) {
-            if ($v['ebay_sku'] == null) {
-                $ebaySkuArray[] = $v['sku'];
-            }
-        }
-        $ebaySKuString = "";
-        if (count($ebaySkuArray) > 0) {
-            $ebaySKuString = implode(',', $ebaySkuArray);
-        }
-        return $ebaySKuString;
-    }
-
-    public function refreshSkuMatchTable(Request $req)
-    {
-        $ebay_sku = $req->input('ebay_sku');
-        $s_qty = $req->input('s_qty');
-        $sap_sku = $req->input('sap_sku');
-        $t_qty = $req->input('t_qty');
-        $warehouse = $req->input('warehouse');
-        $factory = $req->input('factory');
-        $shipment_code = $req->input('shipment_code');
-
-        $sku = DB::connection('ebay')->table('ebay_sku_sap_sku')->where('ebay_sku', $ebay_sku)->first();
-        if ($sku) {
-            echo json_encode(array('flag' => 0, 'msg' => '平台SKU已经存在'));
-        }
-        try {
-            DB::connection('ebay')->table('ebay_sku_sap_sku')->insert(compact('ebay_sku', 's_qty', 'sap_sku', 't_qty', 'warehouse', 'factory', 'shipment_code'));
-            $insertTableRow = "<tr><td>{$ebay_sku}</td><td>{$s_qty}</td><td>{$sap_sku}</td><td>{$t_qty}</td><td>{$warehouse}</td><td>{$factory}</td><td>{$shipment_code}</td></tr>";
-            $ebaySKuString = $this->getNotMatchedSkuString();
-            if ($ebaySKuString) {
-                echo json_encode(array('flag' => 1, 'msg' => $insertTableRow));
-            } else {
-                echo json_encode(array('flag' => 2, 'msg' => $insertTableRow));
-            }
-
-        } catch (\Exception $e) {
-            echo json_encode(array('flag' => 0, 'msg' => '插入数据失败'));
-        }
-    }
-
-    public function exportSkuMatchList(Request $req)
-    {
-        $data = DB::connection('ebay')->table('ebay_sku_sap_sku')->get()->toArray();
-        $data = json_decode(json_encode($data), true);
-
-        $arrayData = array();
-        $headArray = array('ID', '平台SKU', '平台SKU的单位数量', 'SAP SKU', 'SAP SKU的数量', '仓库', '工厂', '实际运输方式');
-        $arrayData[] = $headArray;
-        foreach ($data as $key => $val) {
-            $arrayData[] = array(
-                $val['id'],
-                $val['ebay_sku'],
-                $val['s_qty'],
-                $val['sap_sku'],
-                $val['t_qty'],
-                $val['warehouse'],
-                $val['factory'],
-                $val['shipment_code'],
-            );
-        }
-
-        if ($arrayData) {
-            $spreadsheet = new Spreadsheet();
-            $spreadsheet->getActiveSheet()
-                ->fromArray(
-                    $arrayData,  // The data to set
-                    NULL,        // Array values with this value will not be set
-                    'A1'         // Top left coordinate of the worksheet range where
-                //    we want to set these values (default is A1)
-                );
-            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');//告诉浏览器输出07Excel文件
-            header('Content-Disposition: attachment;filename="Export_ebay_Order_List.xlsx"');//告诉浏览器输出浏览器名称
-            header('Cache-Control: max-age=0');//禁止缓存
-            $writer = new Xlsx($spreadsheet);
-            $writer->save('php://output');
-        }
-        die();
-
-    }
-
     /*
      * ajax展示订单列表
      */
@@ -419,6 +248,178 @@ class EBayOrderListController extends Controller
                 ORDER BY order_id desc";
 
         return $sql;
+    }
+
+    public function addSkuMatch(Request $req)
+    {
+        $ebaySKuString = $this->getNotMatchedSkuString();
+        if ($ebaySKuString) {
+            return view('ebay/addSkuMatch', ['ebaySKuString' => $ebaySKuString]);
+        } else {
+            echo '平台SKU和SAP SKU已全部匹配';
+        }
+    }
+
+    public function skuMatchList(Request $req)
+    {
+        $search = isset($_POST['search']) ? $_POST['search'] : '';
+        $search = $this->getSearchData(explode('&', $search));
+        $sku = array_get($search, 'sku') ?? '';
+        //去除tab,空格,换行. 本身的+转成了%2B：  AP3127_B + BHG1136
+        $sku = str_replace('%09', '', $sku);
+        $sku = str_replace('+', ' ', $sku);
+        $sku = str_replace('%2B', '+', $sku);
+        $sku = trim($sku);
+
+        if ($req->isMethod('GET')) {
+            echo 1; exit;
+            return view('ebay/skuMatchList', compact('sku'));
+        }
+        $where = '';
+        if ($sku) {
+            $where = " where ebay_sku = '{$sku}' or sap_sku = '{$sku}'";
+        }
+        $sql = "select * from ebay_sku_sap_sku {$where} order by id desc";
+        $recordsTotal = $recordsFiltered = count(DB::connection('ebay')->select($sql));
+        if ($req['length'] != '-1') {
+            $limit = $this->dtLimit($req);
+            $sql .= " LIMIT {$limit} ";
+        }
+
+        $data = DB::connection('ebay')->select($sql);
+        $data = json_decode(json_encode($data), true);
+        foreach ($data as $key => $val) {
+            $data[$key]['action'] = '<a href="/ebayOrderList/skuMatchEdit?sku_id=' . $val['id'] . '" target="_blank">编辑</a>';
+        }
+        return compact('data', 'recordsTotal', 'recordsFiltered');
+    }
+
+    public function skuMatchEdit(Request $req)
+    {
+        $skuId = $req->input('sku_id');
+        $data = DB::connection('ebay')->table('ebay_sku_sap_sku')->where('id', $skuId)->first();
+        $data = json_decode(json_encode($data), true);
+        return view('ebay/skuMatchEdit', compact('data'));
+    }
+
+    public function skuMatchUpdate(Request $req)
+    {
+        $skuId = $req->input('sku_id');
+        $ebaySku = $req->input('ebay_sku');
+        $sQty = $req->input('s_qty');
+        $sapSku = $req->input('sap_sku');
+        $tQty = $req->input('t_qty');
+        $warehouse = $req->input('warehouse');
+        $factory = $req->input('factory');
+        $shipmentCode = $req->input('shipment_code');
+        $updateArray = array('ebay_sku' => $ebaySku, 's_qty' => $sQty, 'sap_sku' => $sapSku, 't_qty' => $tQty, 'warehouse' => $warehouse, 'factory' => $factory, 'shipment_code' => $shipmentCode);
+
+        DB::beginTransaction();
+        try {
+            DB::connection('ebay')->table('ebay_sku_sap_sku')->where('id', $skuId)->update($updateArray);
+            DB::commit();
+            $req->session()->flash('success_message', 'Update SKU match successfully');
+            return redirect('ebayOrderList/skuMatchList');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $req->session()->flash('error_message', 'Failed to update SKU match');
+            return redirect()->back()->withInput();
+        }
+    }
+
+
+    public function getNotMatchedSkuString()
+    {
+        $sql = "SELECT max(t.sku) as sku, max(t.ebay_sku) as ebay_sku
+                FROM
+                ( SELECT e.sku, f.ebay_sku
+                  FROM 
+                      ebay_order_line_item e
+                  LEFT JOIN ebay_sku_sap_sku f ON e.sku = f.ebay_sku
+                ) AS t
+                GROUP BY t.sku";
+        $data = DB::connection('ebay')->select($sql);
+        $data = json_decode(json_encode($data), true);
+        $ebaySkuArray = array();
+        foreach ($data as $v) {
+            if ($v['ebay_sku'] == null) {
+                $ebaySkuArray[] = $v['sku'];
+            }
+        }
+        $ebaySKuString = "";
+        if (count($ebaySkuArray) > 0) {
+            $ebaySKuString = implode(',', $ebaySkuArray);
+        }
+        return $ebaySKuString;
+    }
+
+    public function refreshSkuMatchTable(Request $req)
+    {
+        $ebay_sku = $req->input('ebay_sku');
+        $s_qty = $req->input('s_qty');
+        $sap_sku = $req->input('sap_sku');
+        $t_qty = $req->input('t_qty');
+        $warehouse = $req->input('warehouse');
+        $factory = $req->input('factory');
+        $shipment_code = $req->input('shipment_code');
+
+        $sku = DB::connection('ebay')->table('ebay_sku_sap_sku')->where('ebay_sku', $ebay_sku)->first();
+        if ($sku) {
+            echo json_encode(array('flag' => 0, 'msg' => '平台SKU已经存在'));
+        }
+        try {
+            DB::connection('ebay')->table('ebay_sku_sap_sku')->insert(compact('ebay_sku', 's_qty', 'sap_sku', 't_qty', 'warehouse', 'factory', 'shipment_code'));
+            $insertTableRow = "<tr><td>{$ebay_sku}</td><td>{$s_qty}</td><td>{$sap_sku}</td><td>{$t_qty}</td><td>{$warehouse}</td><td>{$factory}</td><td>{$shipment_code}</td></tr>";
+            $ebaySKuString = $this->getNotMatchedSkuString();
+            if ($ebaySKuString) {
+                echo json_encode(array('flag' => 1, 'msg' => $insertTableRow));
+            } else {
+                echo json_encode(array('flag' => 2, 'msg' => $insertTableRow));
+            }
+
+        } catch (\Exception $e) {
+            echo json_encode(array('flag' => 0, 'msg' => '插入数据失败'));
+        }
+    }
+
+    public function exportSkuMatchList(Request $req)
+    {
+        $data = DB::connection('ebay')->table('ebay_sku_sap_sku')->get()->toArray();
+        $data = json_decode(json_encode($data), true);
+
+        $arrayData = array();
+        $headArray = array('ID', '平台SKU', '平台SKU的单位数量', 'SAP SKU', 'SAP SKU的数量', '仓库', '工厂', '实际运输方式');
+        $arrayData[] = $headArray;
+        foreach ($data as $key => $val) {
+            $arrayData[] = array(
+                $val['id'],
+                $val['ebay_sku'],
+                $val['s_qty'],
+                $val['sap_sku'],
+                $val['t_qty'],
+                $val['warehouse'],
+                $val['factory'],
+                $val['shipment_code'],
+            );
+        }
+
+        if ($arrayData) {
+            $spreadsheet = new Spreadsheet();
+            $spreadsheet->getActiveSheet()
+                ->fromArray(
+                    $arrayData,  // The data to set
+                    NULL,        // Array values with this value will not be set
+                    'A1'         // Top left coordinate of the worksheet range where
+                //    we want to set these values (default is A1)
+                );
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');//告诉浏览器输出07Excel文件
+            header('Content-Disposition: attachment;filename="Export_ebay_Order_List.xlsx"');//告诉浏览器输出浏览器名称
+            header('Cache-Control: max-age=0');//禁止缓存
+            $writer = new Xlsx($spreadsheet);
+            $writer->save('php://output');
+        }
+        die();
+
     }
 
     //获取所有用户的sap_seller_id和名字的对应关系
