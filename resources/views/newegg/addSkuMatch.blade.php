@@ -30,8 +30,15 @@
 <script src="/assets/global/plugins/jquery.min.js" type="text/javascript"></script>
 
 <div style="height: 20px;"></div>
-<div align="center">没有建立有效匹配的平台SKU如下：</div>
-<div align="center">{{$neweggSKuString}}</div>
+            <div>
+                @if(!empty($neweggSKuString))
+                <div align="left">没有建立有效匹配的平台SKU如下：<span style="color:#ff0000;font-weight: bold">（请添加平台SKU和SAP_SKU对照，否则有的订单会缺失SKU）</span></div>
+                <div align="left">{{$neweggSKuString}}</div>
+                @else
+                @endif
+            </div>
+            <div style="height:10px"></div>
+
 <div style="height: 20px;"></div>
 <div style="font-size: x-small; color: #ff0000">如果是捆绑销售，则分为多行显示，比如AP3126_B + AP3128:
     <table align="center" style="width:400px">
@@ -66,45 +73,27 @@
     <button id="btn-submit" class="btn-common">提交</button>
 </div>
 <div style="height: 5px;"></div>
-<div style="font-size: x-small; color: #ff0000">（提交后，新增的记录将会出现在下表中：未审核的SKU对照关系表）</div>
+<div style="font-size: x-small; color: #ff0000">（提交后，新增的记录将会出现在下表中：）</div>
 <div style="height: 20px;"></div>
-<div align="center">
-    <button id="btn-verify-sku" class="btn-common" style="width: 130px">审核SKU对照表</button>
-</div>
-<div style="height: 10px;"></div>
-<div align="center">未审核的SKU对照关系表：</div>
+<div align="center">新增的SKU对照：</div>
 <div style="height: 5px;"></div>
 
-@if(count($inactiveSkuMatch) > 0)
 <table align="center" id="inactiveSKuMatchTable">
     <tr>
-        <th>平台SKU</th>
-        <th>平台SKU的单位数量</th>
-        <th>SAP SKU</th>
-        <th>SAP SKU的数量</th>
-        <th>仓库</th>
-        <th>工厂</th>
-        <th>实际运输方式</th>
+        <th width="15%">平台SKU</th>
+        <th width="14%">平台SKU的单位数量</th>
+        <th width="14%">SAP SKU</th>
+        <th width="14%">SAP SKU的数量</th>
+        <th width="14%">仓库</th>
+        <th width="14%">工厂</th>
+        <th width="15%">实际运输方式</th>
     </tr>
-    @foreach($inactiveSkuMatch as $val)
-    <tr>
-        <td>{{$val['newegg_sku']}}</td>
-        <td>{{$val['s_qty']}}</td>
-        <td>{{$val['sap_sku']}}</td>
-        <td>{{$val['t_qty']}}</td>
-        <td>{{$val['warehouse']}}</td>
-        <td>{{$val['factory']}}</td>
-        <td>{{$val['shipment_code']}}</td>
-    </tr>
-    @endforeach
 </table>
-@endif
 
 <script type="text/javascript">
     $('#btn-submit').click(function () {
         $newegg_sku = $('#newegg_sku').val().trim();
         $s_qty = $('#s_qty').val().trim();
-        ;
         $sap_sku = $('#sap_sku').val().trim();
         $t_qty = $('#t_qty').val().trim();
         $warehouse = $('#warehouse').val().trim();
@@ -118,6 +107,7 @@
             alert('平台SKU的单位数量 和 SAP SKU的数量 都必须大于0');
             return false;
         }
+        $('#btn-submit').attr("disabled", true);
         $.ajax({
             type: 'post',
             url: '/neweggOrderList/refreshSkuMatchTable',
@@ -131,12 +121,19 @@
                 shipment_code: $shipment_code,
                 _token: '{{csrf_token()}}',
             },
-            dataType: 'text',
+            dataType: 'json',
             success: function (res) {
-                console.log(res)
+                $('#btn-submit').attr("disabled", false);
                 if (res) {
-                    $('.formElement').val('');
-                    $('#inactiveSKuMatchTable').html(res);
+                    if (res.flag == 1 || res.flag == 2) {
+                        $('.formElement').val('');
+                        $('#inactiveSKuMatchTable').append(res.msg);
+                        if (res.flag == 2) {
+                            location.href = '/neweggOrderList/skuMatchList';
+                        }
+                    } else {
+                        alert(res.msg);
+                    }
                 } else {
 
                 }
@@ -144,8 +141,4 @@
         });
     });
 
-
-    $('#btn-verify-sku').click(function () {
-        location.href = '/neweggOrderList/verifySkuTable';
-    });
 </script>

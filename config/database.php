@@ -342,6 +342,21 @@ return [
             'engine' => null,
         ],
 
+        'letian' => [
+            'driver' => 'mysql',
+            'host' => env('DB_LETIAN_HOST', '127.0.0.1'),
+            'port' => env('DB_LETIAN_PORT', '3306'),
+            'database' => env('DB_LETIAN_DATABASE', 'forge'),
+            'username' => env('DB_LETIAN_USERNAME', 'forge'),
+            'password' => env('DB_LETIAN_PASSWORD', ''),
+            'unix_socket' => env('DB_SOCKET', ''),
+            'charset' => 'utf8',
+            'collation' => 'utf8_general_ci',
+            'prefix' => '',
+            'strict' => false,
+            'engine' => null,
+        ],
+
         'theshopsaver' => [
             'driver' => 'mysql',
             'host' => env('DB_THESHOPSAVER_HOST', '127.0.0.1'),

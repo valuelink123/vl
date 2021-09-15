@@ -27,10 +27,10 @@
         <div class="top portlet light">
             <div style="margin-left: -15px;">
                 <div class="col-md-11">
-                    @if(!empty($joybuySKuString))
+                    @if(!empty($letianSKuString))
                     <div align="left">没有建立有效匹配的平台SKU如下：<span style="color:#ff0000;font-weight: bold">（请添加平台SKU和SAP_SKU对照，否则有的订单会缺失SKU）</span>
                     </div>
-                    <div align="left">{{$joybuySKuString}}</div>
+                    <div align="left">{{$letianSKuString}}</div>
                     @else
                     @endif
                 </div>
@@ -165,9 +165,9 @@
             ],
             processing: true,
             columns: [
-                // {data: 'joybuy_sap_id', name: 'joybuy_sap_id'},
+                // {data: 'letian_sap_id', name: 'letian_sap_id'},
                 // {data: 'site', name: 'site'},
-                {data: 'joybuy_order_id', name: 'joybuy_order_id'},
+                {data: 'letian_order_id', name: 'letian_order_id'},
                 // {data: 'sold_to_party', name: 'sold_to_party'},
                 // {data: 'order_type', name: 'order_type'},
                 // {data: 'order_transaction_id', name: 'order_transaction_id'},
@@ -191,11 +191,11 @@
                 {data: 'order_total_amount', name: 'order_total_amount'},
                 {data: 'order_total_amount_currency', name: 'order_total_amount_currency'},
                 // {data: 'shipment_code', name: 'shipment_code'},
-                // {data: 'joybuy_order_id', name: 'joybuy_order_id'},
+                // {data: 'letian_order_id', name: 'letian_order_id'},
                 // {data: 'site', name: 'site'},
                 // {data: 'line_number', name: 'line_number'},
-                {data: 'joybuy_sku', name: 'joybuy_sku'},
-                {data: 'joybuy_sku_qty', name: 'joybuy_sku_qty'},
+                {data: 'letian_sku', name: 'letian_sku'},
+                {data: 'letian_sku_qty', name: 'letian_sku_qty'},
                 {data: 'sap_sku', name: 'sap_sku'},
                 {data: 'sap_sku_qty', name: 'sap_sku_qty'},
                 // {data: 'factory', name: 'factory'},
@@ -209,7 +209,7 @@
             ],
             ajax: {
                 type: 'POST',
-                url: '/joybuyOrderList/list',
+                url: '/letianOrderList/list',
                 data:  {search: $("#search-form").serialize()}
             }
         })
@@ -224,7 +224,7 @@
 
         $("#export").click(function(){
             var search = $("#search-form").serialize();
-            location.href='/joybuyOrderList/export?'+search;
+            location.href='/letianOrderList/export?'+search;
         });
 
         $(function(){
@@ -232,7 +232,7 @@
         });
 
         $('#skuMatchList').click(function(){
-            window.open('/joybuyOrderList/skuMatchList');
+            window.open('/letianOrderList/skuMatchList');
         });
 
     </script>

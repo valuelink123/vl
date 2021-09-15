@@ -54,7 +54,6 @@ class EBayOrderListController extends Controller
         $recordsTotal = $recordsFiltered = (DB::connection('ebay')->select('SELECT FOUND_ROWS() as count'))[0]->count;
         $currentOrderId = '';
         $currentLineNumber = 10;
-        $sapSellerIdNames = $this->getSAPSellerIdNames();
         foreach ($data as $key => $val) {
             $data[$key]['ebay_sap_id'] = $val['sap_code'];
             $data[$key]['site'] = $val['site'];
@@ -96,13 +95,13 @@ class EBayOrderListController extends Controller
             $data[$key]['ebay_sku'] = $val['sku'];
             $data[$key]['ebay_sku_qty'] = $val['quantity'];
             $data[$key]['sap_sku'] = $val['sap_sku'];
-            $data[$key]['sap_sku_qty'] = empty($val['s_qty']) ? null : $sapSkuQty = intval(($val['t_qty'] / $val['s_qty']) * $val['quantity']);
+            $data[$key]['sap_sku_qty'] = empty($val['s_qty']) ? null : intval(($val['t_qty'] / $val['s_qty']) * $val['quantity']);
             $data[$key]['factory'] = $val['factory'];
             $data[$key]['warehouse'] = $val['warehouse'];
             $data[$key]['line_item_id'] = '';
             $data[$key]['post_id'] = '';
             $data[$key]['post_title'] = '';
-            $data[$key]['seller_id'] = $val['sap_seller_id'] ? array_get($sapSellerIdNames, $val['sap_seller_id']) : "";
+            $data[$key]['seller_id'] = $val['sap_seller_name'];
             $data[$key]['line_transaction_id'] = '';
             $data[$key]['mark_complete'] = '';
         }
@@ -162,7 +161,7 @@ class EBayOrderListController extends Controller
                 $val['site'],
                 $currentLineNumber,
                 $val['sap_sku'],
-                empty($val['s_qty']) ? null : $sapSkuQty = intval(($val['t_qty'] / $val['s_qty']) * $val['quantity']),
+                empty($val['s_qty']) ? null : intval(($val['t_qty'] / $val['s_qty']) * $val['quantity']),
                 $val['factory'],
                 $val['warehouse'],
                 '',
@@ -225,10 +224,11 @@ class EBayOrderListController extends Controller
                     max(t.sap_code) AS sap_code,
                     max(t.site) AS site,
                     max(t.sold_to_party) AS sold_to_party,
-                    max(t.sap_seller_id) AS sap_seller_id
+                    max(t.sap_seller_id) AS sap_seller_id,
+                    max(t.sap_seller_name) AS sap_seller_name
                 FROM
                 ( SELECT
-                        a.order_id, a.creation_date, a.seller_id, b.email AS user_email, b.username, c.payment_date, d.city, d.country_code, d.postal_code, d.state_or_province, e.quantity, e.sku, f.s_qty, f.sap_sku, f.t_qty, f.warehouse, f.factory, f.shipment_code, h.sap_code, h.site, h.sold_to_party, h.sap_seller_id,
+                        a.order_id, a.creation_date, a.seller_id, b.email AS user_email, b.username, c.payment_date, d.city, d.country_code, d.postal_code, d.state_or_province, e.quantity, e.sku, f.s_qty, f.sap_sku, f.t_qty, f.warehouse, f.factory, f.shipment_code, h.sap_code, h.site, h.sold_to_party, h.sap_seller_id, h.sap_seller_name,
                         ( CASE WHEN g.line_item_id IS NULL AND g.amount_type = 'total' THEN g.`value` ELSE 0 END ) AS order_total_amount,
                         ( CASE WHEN g.line_item_id IS NULL AND g.amount_type = 'totalMarketplaceFee' THEN g.`value` ELSE 0 END ) AS order_commission
                     FROM
@@ -272,7 +272,6 @@ class EBayOrderListController extends Controller
         $sku = trim($sku);
 
         if ($req->isMethod('GET')) {
-            echo 1; exit;
             return view('ebay/skuMatchList', compact('sku'));
         }
         $where = '';
@@ -413,27 +412,13 @@ class EBayOrderListController extends Controller
                 //    we want to set these values (default is A1)
                 );
             header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');//告诉浏览器输出07Excel文件
-            header('Content-Disposition: attachment;filename="Export_ebay_Order_List.xlsx"');//告诉浏览器输出浏览器名称
+            header('Content-Disposition: attachment;filename="Export_ebay_SKU_List.xlsx"');//告诉浏览器输出浏览器名称
             header('Cache-Control: max-age=0');//禁止缓存
             $writer = new Xlsx($spreadsheet);
             $writer->save('php://output');
         }
         die();
 
-    }
-
-    //获取所有用户的sap_seller_id和名字的对应关系
-    public function getSAPSellerIdNames()
-    {
-        $data = DB::table('users')->pluck('name', 'sap_seller_id');
-        $data = json_decode(json_encode($data), true);
-        foreach ($data as $key => $v) {
-            //移除sap_seller_id is为空值(0, null, "")的项
-            if (!$key) {
-                unset($data[$key]);
-            }
-        }
-        return $data;
     }
 
 }

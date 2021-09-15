@@ -307,6 +307,12 @@
                                                                 <span class="arrow"></span>
                                                             </a>
                                                         </li>
+                                                        <li class="">
+                                                            <a href="/joybuyOrderList/skuMatchList" class="nav-link nav-toggle ">
+                                                                SKU Match List
+                                                                <span class="arrow"></span>
+                                                            </a>
+                                                        </li>
                                                     </ul>
                                                 </li>
                                                 <li class="dropdown-submenu">
@@ -318,6 +324,32 @@
                                                         <li class="">
                                                             <a href="/neweggOrderList" class="nav-link nav-toggle ">
                                                                 Order List
+                                                                <span class="arrow"></span>
+                                                            </a>
+                                                        </li>
+                                                        <li class="">
+                                                            <a href="/neweggOrderList/skuMatchList" class="nav-link nav-toggle ">
+                                                                SKU Match List
+                                                                <span class="arrow"></span>
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </li>
+                                                <li class="dropdown-submenu">
+                                                    <a href="javascript:;" class="nav-link nav-toggle ">
+                                                        Rakuten
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                    <ul class="dropdown-menu">
+                                                        <li class="">
+                                                            <a href="/letianOrderList" class="nav-link nav-toggle ">
+                                                                Order List
+                                                                <span class="arrow"></span>
+                                                            </a>
+                                                        </li>
+                                                        <li class="">
+                                                            <a href="/letianOrderList/skuMatchList" class="nav-link nav-toggle ">
+                                                                SKU Match List
                                                                 <span class="arrow"></span>
                                                             </a>
                                                         </li>

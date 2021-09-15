@@ -31,9 +31,9 @@
 
 <div style="height: 20px;"></div>
             <div>
-                @if(!empty($joybuySKuString))
+                @if(!empty($letianSKuString))
                 <div align="left">没有建立有效匹配的平台SKU如下：<span style="color:#ff0000;font-weight: bold">（请添加平台SKU和SAP_SKU对照，否则有的订单会缺失SKU）</span></div>
-                <div align="left">{{$joybuySKuString}}</div>
+                <div align="left">{{$letianSKuString}}</div>
                 @else
                 @endif
             </div>
@@ -59,7 +59,7 @@
         <th>实际运输方式</th>
     </tr>
     <tr>
-        <td><input type="text" class="formElement" name="joybuy_sku" id="joybuy_sku"/></td>
+        <td><input type="text" class="formElement" name="letian_sku" id="letian_sku"/></td>
         <td><input type="number" class="formElement" name="s_qty" id="s_qty" value="1"/></td>
         <td><input type="text" class="formElement" name="sap_sku" id="sap_sku"/></td>
         <td><input type="number" class="formElement" name="t_qty" id="t_qty"/></td>
@@ -92,14 +92,14 @@
 
 <script type="text/javascript">
     $('#btn-submit').click(function () {
-        $joybuy_sku = $('#joybuy_sku').val().trim();
+        $letian_sku = $('#letian_sku').val().trim();
         $s_qty = $('#s_qty').val().trim();
         $sap_sku = $('#sap_sku').val().trim();
         $t_qty = $('#t_qty').val().trim();
         $warehouse = $('#warehouse').val().trim();
         $factory = $('#factory').val().trim();
         $shipment_code = $('#shipment_code').val().trim();
-        if ($joybuy_sku == '' || $s_qty == '' || $sap_sku == '' || $t_qty == '' || $warehouse == '' || $factory == '' || $shipment_code == '') {
+        if ($letian_sku == '' || $s_qty == '' || $sap_sku == '' || $t_qty == '' || $warehouse == '' || $factory == '' || $shipment_code == '') {
             alert('请填写所有内容');
             return false;
         }
@@ -110,9 +110,9 @@
         $('#btn-submit').attr("disabled", true);
         $.ajax({
             type: 'post',
-            url: '/joybuyOrderList/refreshSkuMatchTable',
+            url: '/letianOrderList/refreshSkuMatchTable',
             data: {
-                joybuy_sku: $joybuy_sku,
+                letian_sku: $letian_sku,
                 s_qty: $s_qty,
                 sap_sku: $sap_sku,
                 t_qty: $t_qty,
@@ -129,7 +129,7 @@
                         $('.formElement').val('');
                         $('#inactiveSKuMatchTable').append(res.msg);
                         if (res.flag == 2) {
-                            location.href = '/joybuyOrderList/skuMatchList';
+                            location.href = '/letianOrderList/skuMatchList';
                         }
                     } else {
                         alert(res.msg);
