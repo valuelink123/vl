@@ -546,6 +546,8 @@ Route::Post('/adv/saveSchedule', 'AdvController@saveSchedule');
 Route::Post('/adv/listSchedules', 'AdvController@listSchedules');
 Route::get('/adv/createWhole', 'AdvController@createWhole');
 Route::Post('/adv/saveWhole', 'AdvController@saveWhole');
+Route::get('/adv/batchScheduled', 'AdvController@batchScheduled');
+Route::Post('/adv/batchSaveScheduled', 'AdvController@batchSaveScheduled');
 //客诉品线问题细分
 Route::Post('/category/import', 'CategoryController@import');
 
@@ -559,3 +561,39 @@ Route::match(['post','get'],'/amazonFulfiledShipments/download', 'AmazonFulfiled
 Route::Post('/amazon/auth', 'AmazonAuthController@index');
 
 
+//ebay订单列表模块
+Route::get('/ebayOrderList', 'EBayOrderListController@index');//订单列表
+Route::post('/ebayOrderList/list', 'EBayOrderListController@list');//获取订单列表数据
+Route::match(['post','get'],'/ebayOrderList/export', 'EBayOrderListController@export');//订单列表数据的下载
+Route::post('/ebayOrderList/refreshSkuMatchTable', 'EBayOrderListController@refreshSkuMatchTable');
+Route::get('/ebayOrderList/addSkuMatch', 'EBayOrderListController@addSkuMatch');
+Route::match(['post','get'],'/ebayOrderList/skuMatchList', 'EBayOrderListController@skuMatchList');
+Route::get('/ebayOrderList/skuMatchEdit', 'EBayOrderListController@skuMatchEdit');
+Route::post('/ebayOrderList/skuMatchUpdate', 'EBayOrderListController@skuMatchUpdate');
+Route::get('/ebayOrderList/exportSkuMatchList', 'EBayOrderListController@exportSkuMatchList');//订单列表数据的下载
+
+//joybuy订单列表模块
+Route::get('/joybuyOrderList', 'JoybuyOrderListController@index');//订单列表
+Route::post('/joybuyOrderList/list', 'JoybuyOrderListController@list');//获取订单列表数据
+Route::match(['post','get'],'/joybuyOrderList/export', 'JoybuyOrderListController@export');//订单列表数据的下载
+Route::post('/joybuyOrderList/refreshSkuMatchTable', 'JoybuyOrderListController@refreshSkuMatchTable');
+Route::get('/joybuyOrderList/verifySkuTable', 'JoybuyOrderListController@verifySkuTable');
+Route::post('/joybuyOrderList/updateSkuTable', 'JoybuyOrderListController@updateSkuTable');
+
+//newegg订单列表模块
+Route::get('/neweggOrderList', 'NeweggOrderListController@index');//订单列表
+Route::post('/neweggOrderList/list', 'NeweggOrderListController@list');//获取订单列表数据
+Route::match(['post','get'],'/neweggOrderList/export', 'NeweggOrderListController@export');//订单列表数据的下载
+Route::post('/neweggOrderList/refreshSkuMatchTable', 'NeweggOrderListController@refreshSkuMatchTable');
+Route::get('/neweggOrderList/verifySkuTable', 'NeweggOrderListController@verifySkuTable');
+Route::post('/neweggOrderList/updateSkuTable', 'NeweggOrderListController@updateSkuTable');
+
+
+Route::get('/shopsaver', 'ShopSaverController@index');
+Route::post('/shopsaver/list', 'ShopSaverController@list');
+Route::get('/shopsaver/edit', 'ShopSaverController@edit');
+Route::post('/shopsaver/update', 'ShopSaverController@update');
+Route::match(['post','get'],'/shopsaver/users', 'ShopSaverController@users');
+Route::match(['post','get'],'/shopsaver/orderList', 'ShopSaverController@orderList');
+Route::get('/shopsaver/userEdit', 'ShopSaverController@userEdit');
+Route::post('/shopsaver/userUpdate', 'ShopSaverController@userUpdate');

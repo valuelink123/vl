@@ -287,6 +287,9 @@ class ReviewController extends Controller
 		if(array_get($_REQUEST,'del')){
 			$_reviewsSelect = $_reviewsSelect->where('is_delete', array_get($_REQUEST,'del'));
 		}
+        if(array_get($_REQUEST,'review_id')){
+            $_reviewsSelect = $_reviewsSelect->where('review', array_get($_REQUEST,'review_id'));
+        }
 
 
 		if(array_get($_REQUEST,'rc')){
@@ -596,6 +599,9 @@ class ReviewController extends Controller
         if(array_get($_REQUEST,'del')){
             $_reviewsSelect = $_reviewsSelect->where('is_delete', array_get($_REQUEST,'del'));
         }
+        if(array_get($_REQUEST,'review_id')){
+            $_reviewsSelect = $_reviewsSelect->where('review', array_get($_REQUEST,'review_id'));
+        }
 
 
         if(array_get($_REQUEST,'rc')){
@@ -754,7 +760,7 @@ class ReviewController extends Controller
         $return['remark'] = array_get($review,'remark');
         $return['sellerids'] = $this->getSellerIds();
         $return['accounts'] = $this->getAccounts();
-        $encrypted_email = array_key_exists($review['buyer_email'],getEmailToEncryptedEmail())?array_get(getEmailToEncryptedEmail(),$review['buyer_email']):'';
+        $encrypted_email = array_key_exists($review['buyer_email'],getEmailToEncryptedEmail())?array_get(getEmailToEncryptedEmail(),$review['buyer_email']):$review['buyer_email'];
         $return['emails'] = DB::table('sendbox')->where('to_address', array_get($review,'buyer_email'))->orderBy('date','desc')->get(['*',DB::RAW('\''.$encrypted_email.'\' as to_address')]);
         $return['emails'] =json_decode(json_encode($return['emails']), true);
         $review['buyer_email'] = $encrypted_email;
@@ -776,9 +782,14 @@ class ReviewController extends Controller
 
         $seller_account = Review::findOrFail($id);;
 
+		$buyer_email = $request->get('buyer_email');
+		$_email = array_search($buyer_email,getEmailToEncryptedEmail());
+		if($_email){
+			$buyer_email = $_email;
+		}
         $seller_account->seller_id = $request->get('rebindordersellerid');
         $seller_account->amazon_order_id = $request->get('rebindorderid');
-        $seller_account->buyer_email = array_search($request->get('buyer_email'),getEmailToEncryptedEmail())??$request->get('buyer_email');
+        $seller_account->buyer_email = $buyer_email;
         $seller_account->buyer_phone = $request->get('buyer_phone');
         $seller_account->etype = $request->get('etype');
         $seller_account->remark = $request->get('remark');

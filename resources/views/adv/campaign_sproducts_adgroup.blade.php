@@ -142,7 +142,7 @@
                     </div>
                     <div class="caption font-dark col-md-12">
 
-                        <div class="btn-group" style="float:right;">
+                        <div class="btn-group" style="float:right; margin-right:100px;">
                             <button class="btn green dropdown-toggle" type="button" data-toggle="modal" href="#updateForm"> Create
                             </button>
 
@@ -159,7 +159,11 @@
                                     @endforeach
                                 </select>
                                 <button class="btn  green table-status-action-submit">
-                                    <i class="fa fa-check"></i> Batch Update
+                                    Batch Update
+                                </button>
+
+                                <button class="btn  red table-status-action-submit">
+                                    Batch Scheduled
                                 </button>
                                     
                             </div>
@@ -329,19 +333,26 @@
 					
                     //"scrollX": true,
                     //"autoWidth":true
-                    /*
                     dom: 'Bfrtip',
+                    "bFilter": false, 
                     buttons: [ 
                         {
                             extend: 'excelHtml5',
-                            text: '导出当前页',
+                            text: 'Export',
                             title: 'Data export',
                             exportOptions: {
-                                columns: [ 3,2,6,7,8,9,4,5 ]
+                                columns: [ 1,2,3,4,5,6,7,8,9,10,11,12,13,14 ]
+                            },
+                            customize: function( xlsx ) {
+                                var sheet = xlsx.xl.worksheets['sheet1.xml'];
+                                $('row c[r^="B"] t', sheet).each(
+                                    function(){
+                                        $(this).text($(this).text().replace(" Copy ","").replace(" Scheduled",""));
+                                    }
+                                );
                             }
                         },
                      ],
-                     */
                     "drawCallback": function( oSettings ) {
                         var ChatsData=jQuery.parseJSON(oSettings.jqXHR.responseText).recordsForChart;
                         var spend = 0;var clicks =0;var impressions =0;var orders =0;var attributed_sales1d =0;var attributed_units_ordered1d =0;
@@ -482,37 +493,48 @@
             //批量更改状态操作
             $(".batch-update").unbind("click").on('click', '.table-status-action-submit', function (e) {
                 e.preventDefault();
-                var confirmStatus = $("#confirmStatus", $("#table-actions-wrapper"));
                 var profile_id = $("input[name='profile_id']").val();
                 var ad_type = $("input[name='ad_type']").val();
-                var id_type = 'adGroupId';
-                var action = 'groups';
-                var method = 'updateAdGroups';
-                if (confirmStatus.val() != "" && grid.getClonedSelectedRowsCount() > 0) {
-                    $.ajaxSetup({
-                        headers: { 'X-CSRF-TOKEN' : '{{ csrf_token() }}' }
-                    });
-                    $.ajax({
-                        type: "POST",
-                        dataType: "json",
-                        url: "{{ url('adv/batchUpdate') }}",
-                        data: {confirmStatus:confirmStatus.val(),id:grid.getClonedSelectedRows(),profile_id:profile_id,ad_type:ad_type,id_type:id_type,action:action,method:method},
-                        success: function (data) {
-                            if(data.customActionStatus=='OK'){
-                                toastr.success(data.customActionMessage);
-                                grid.getDataTable().draw(false);
-                            }else{
-                                toastr.error(data.customActionMessage);
+                var campaign_id = $("input[name='campaign_id']").val();
+                if($(this).hasClass('red')){
+                    if (grid.getClonedSelectedRowsCount() > 0) {
+                        $('#ajax').modal({
+                            remote: '/adv/batchScheduled?profile_id='+profile_id+'&ad_type='+ad_type+'&campaign_id='+campaign_id+'&record_type=adGroup&ids='+grid.getClonedSelectedRows()
+                        });
+                    }else{
+                        toastr.error('No record selected');
+                    }
+                }else{
+                    var confirmStatus = $("#confirmStatus", $("#table-actions-wrapper"));
+                    var id_type = 'adGroupId';
+                    var action = 'groups';
+                    var method = 'updateAdGroups';
+                    if (confirmStatus.val() != "" && grid.getClonedSelectedRowsCount() > 0) {
+                        $.ajaxSetup({
+                            headers: { 'X-CSRF-TOKEN' : '{{ csrf_token() }}' }
+                        });
+                        $.ajax({
+                            type: "POST",
+                            dataType: "json",
+                            url: "{{ url('adv/batchUpdate') }}",
+                            data: {confirmStatus:confirmStatus.val(),id:grid.getClonedSelectedRows(),profile_id:profile_id,ad_type:ad_type,id_type:id_type,action:action,method:method},
+                            success: function (data) {
+                                if(data.customActionStatus=='OK'){
+                                    toastr.success(data.customActionMessage);
+                                    grid.getDataTable().draw(false);
+                                }else{
+                                    toastr.error(data.customActionMessage);
+                                }
+                            },
+                            error: function(data) {
+                                toastr.error(data.responseText);
                             }
-                        },
-                        error: function(data) {
-                            toastr.error(data.responseText);
-                        }
-                    });
-                } else if ( confirmStatus.val() == "" ) {
-                    toastr.error('Please select an action');
-                } else if (grid.getClonedSelectedRowsCount() === 0) {
-                    toastr.error('No record selected');
+                        });
+                    } else if ( confirmStatus.val() == "" ) {
+                        toastr.error('Please select an action');
+                    } else if (grid.getClonedSelectedRowsCount() === 0) {
+                        toastr.error('No record selected');
+                    }
                 }
             });
         }

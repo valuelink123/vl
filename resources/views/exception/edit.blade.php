@@ -674,33 +674,40 @@ if((Auth::user()->can(['exception-check']) || in_array($exception['group_id'],ar
 		<div class="form-group" id="gift-card-div">
 			<div class="row">
 				<div class="col-md-12">
-				<label class="control-label">Gift Card</label>
-				<div class="input-group ">
-					<span class="input-group-addon">
-						<i class="fa fa-bookmark"></i>
-					</span>
-					<select name="gift_card_id" class="form-control" {{$disable}}>
-					@foreach ($gift_cards as $gift_card)
-					<option value="{{$gift_card['id']}}" <?php if($gift_card['exception_id']==$exception['id']) echo 'selected';?>>{{$gift_card['code'].' - '.$gift_card['amount'].$gift_card['currency']}}
-					@endforeach
-					</select>
-				</div>
+					<label class="control-label">Gift Card</label>
+					<div class="input-group ">
+						<span class="input-group-addon">
+							<i class="fa fa-bookmark"></i>
+						</span>
+						<select name="gift_card_id" class="form-control" {{$disable}}>
+						@foreach ($gift_cards as $gift_card)
+						<option value="{{$gift_card['id']}}" <?php if($gift_card['exception_id']==$exception['id']) echo 'selected';?>>{{$gift_card['code'].' - '.$gift_card['amount'].$gift_card['currency']}}
+						@endforeach
+						</select>
+					</div>
 				</div>
 
 
 				<div class="col-md-6">
-				<label class="control-label">Brand</label>
-				<div class="input-group ">
-					<span class="input-group-addon">
-						<i class="fa fa-bookmark"></i>
-					</span>
-					<select name="mail_brand" id="mail_brand" class="mt-multiselect form-control " data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" {{$disable}}>
-					@foreach (getBrands() as $k=>$v)
-					<option value="{{$k}}" <?php if(array_get($gift_card_mail,'brand')==$k) echo 'selected';?>>{{$k}}
-					@endforeach
-					</select>
+					<label class="control-label">Brand</label>
+					<div class="input-group ">
+						<span class="input-group-addon">
+							<i class="fa fa-bookmark"></i>
+						</span>
+						<select name="mail_brand" id="mail_brand" class="mt-multiselect form-control " data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" {{$disable}}>
+						@foreach (getBrands() as $k=>$v)
+						<option value="{{$k}}" <?php if(array_get($gift_card_mail,'brand')==$k) echo 'selected';?>>{{$k}}
+						@endforeach
+						</select>
+					</div>
 				</div>
-				</div>
+
+{{--				重新发送礼品卡邮件的按钮--}}
+				@if($exception['process_status'] == 'done')
+					<div class="col-md-6">
+						<button style="margin-top: 25px;" type="submit" name="again_send_email" value="1" class="btn blue again_send_email">Again Send Email</button>
+					</div>
+				@endif
 			</div>
 		</div>
 		@endif
@@ -916,6 +923,7 @@ if((Auth::user()->can(['exception-check']) || in_array($exception['group_id'],ar
             }
 
         })
+
 
     });
 </script>

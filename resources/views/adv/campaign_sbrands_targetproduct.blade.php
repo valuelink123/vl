@@ -150,7 +150,7 @@
                     </div>
                     <div class="caption font-dark col-md-12">
 
-                        <div class="btn-group" style="float:right;">
+                        <div class="btn-group" style="float:right;margin-right:100px;">
                             <button class="btn green dropdown-toggle" type="button" data-toggle="modal" href="#updateForm"> Create
                             </button>
                         </div>
@@ -388,19 +388,26 @@
 					},
                     //"scrollX": true,
                     //"autoWidth":true
-                    /*
                     dom: 'Bfrtip',
+                    "bFilter": false, 
                     buttons: [ 
                         {
                             extend: 'excelHtml5',
-                            text: '导出当前页',
+                            text: 'Export',
                             title: 'Data export',
                             exportOptions: {
-                                columns: [ 3,2,6,7,8,9,4,5 ]
+                                columns: [ 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16 ]
+                            },
+                            customize: function( xlsx ) {
+                                var sheet = xlsx.xl.worksheets['sheet1.xml'];
+                                $('row c[r^="B"] t', sheet).each(
+                                    function(){
+                                        $(this).text($(this).text().replace(" Copy ","").replace(" Scheduled",""));
+                                    }
+                                );
                             }
                         },
                      ],
-                     */
                     "drawCallback": function( oSettings ) {
                         var ChatsData=jQuery.parseJSON(oSettings.jqXHR.responseText).recordsForChart;
                         var spend = 0;var clicks =0;var impressions =0;var orders =0;var attributed_sales1d =0;var attributed_units_ordered1d =0;

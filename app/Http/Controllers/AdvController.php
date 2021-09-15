@@ -78,10 +78,25 @@ class AdvController extends Controller
         
         $records["data"] = array();
 		foreach ( $lists as $list){
+            $record_name = "";
+            $record_data = DB::table('ppc_'.strtolower($request->get('ad_type')).'_'.unCamelize($list['record_type']).'s')->where(unCamelize($list['record_type']).'_id',$list['record_type_id'])->get()->toArray();
+            if(!empty($record_data)){
+                $record_data = $record_data[0];
+                if($list['record_type']=='target'){
+                    $data = json_decode($record_data->resolved_expression,true);
+                    $record_name = $data[0]['type'].' - '.$data[0]['value'];
+                }elseif($list['record_type']=='keyword'){
+                    $record_name = $record_data->match_type.' - '.$record_data->keyword_text;
+                }elseif($list['record_type']=='ad'){
+                    $record_name = $record_data->asin.' - '.$record_data->sku;
+                }else{
+                    $record_name = $record_data->name;
+                }
+            }
             $records["data"][] = array(
                 '<input name="id[]" type="checkbox" class="checkboxes" value="'.$list['id'].'"  />',
                 $list['record_type'],
-                $list['record_name'],
+                $record_name??$list['record_name'],
                 array_get(\App\Models\PpcSchedule::STATUS,$list['status']),
                 $list['date_from'],
                 $list['date_to'],
@@ -2077,5 +2092,65 @@ class AdvController extends Controller
             $records = array_get($result,'response');
         }
         echo json_encode($records);
+    }
+
+
+    public function batchScheduled(Request $request)
+    {
+        $profile_id = $request->get('profile_id');
+        $ad_type = $request->get('ad_type');
+        $campaign_id = $request->get('campaign_id');
+        $record_type = $request->get('record_type');
+        $ids = $request->get('ids');
+        return view('adv/schedule_batch',['profile_id'=>$profile_id,'ad_type'=>$ad_type,'campaign_id'=>$campaign_id,'record_type'=>$record_type,'ids'=>$ids]);
+    }
+	
+    public function batchSaveScheduled(Request $request)
+    {
+        DB::beginTransaction();
+        try{ 
+            $ids = $request->get('ids');
+            if($ids){
+                $ids = explode(',',$ids);
+                foreach($ids as $id){
+                    $data = new PpcSchedule;
+                    $_id = explode('-',$id);
+                    if(count($_id)>1){
+                        $data->ad_type = $_id[0];
+                        $data->campaign_id = $id = $_id[1];
+                    }else{
+                        $data->ad_type = $request->get('ad_type');
+                        $data->campaign_id = $request->get('campaign_id');
+                    }
+                    if($data->ad_type!='SProducts') continue;
+                    $fileds = array(
+                        'profile_id',
+                        'record_type',
+                        'date_from',
+                        'date_to',
+                        'time',
+                        'state',
+                        'bid'
+                    );
+                    foreach($fileds as $filed){
+                        $data->{$filed} = $request->get($filed);
+                    }
+                    $data->record_type_id = $id;
+                    $data->status = 1;
+                    $data->user_id = Auth::user()->id;
+                    if($data->bid<=0) continue;
+                    $data->save();
+                }
+            }
+            DB::commit();
+            $records["code"] = 'SUCCESS';
+            $records["description"] = "更新成功!";
+        }catch (\Exception $e) { 
+            DB::rollBack();
+            $records["code"] = 'FAILED';
+            $records["description"] = $e->getMessage();
+        }
+        echo json_encode($records);
+
     }
 }

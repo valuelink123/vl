@@ -33,7 +33,7 @@
 							<div class="pull-right">
 								<input type="text" placeholder="SAPSKU" id="sku" class="table-group-action-input form-control input-inline input-small input-sm" />
 								<select  id="sapuid" class="table-group-action-input mt-multiselect btn btn-default form-control input-inline input-small input-sm " data-label="left" data-width="100%" data-filter="true" data-action-onchange="true">
-										
+									<option value="">Select User</option>
 										@foreach ($users as $user_id=>$user_name)
 												<option value="{{$user_id}}">{{$user_name}}</option>
 											@endforeach
@@ -253,6 +253,7 @@
 							<div class="pull-right">
 								<input type="text" placeholder="SAPSKU" id="sku" class="table-group-action-input form-control input-inline input-small input-sm" />
 								<select  id="sapuid" class="table-group-action-input mt-multiselect btn btn-default form-control input-inline input-small input-sm " data-label="left" data-width="100%" data-filter="true" data-action-onchange="true">
+									<option value="">Select User</option>
 										@foreach ($users as $user_id=>$user_name)
 												<option value="{{$user_id}}">{{$user_name}}</option>
 											@endforeach
@@ -486,7 +487,7 @@
 								
 								<input type="text" placeholder="SAPSKU" id="sku" class="table-group-action-input form-control input-inline input-small input-sm" />
 								<select  id="sapuid" class="table-group-action-input mt-multiselect btn btn-default form-control input-inline input-small input-sm " data-label="left" data-width="100%" data-filter="true" data-action-onchange="true">
-										
+									<option value="">Select User</option>
 										@foreach ($users as $user_id=>$user_name)
 												<option value="{{$user_id}}">{{$user_name}}</option>
 											@endforeach
@@ -710,7 +711,7 @@
 								
 								<input type="text" placeholder="SAPSKU" id="sku" class="table-group-action-input form-control input-inline input-small input-sm" />
 								<select  id="sapuid" class="table-group-action-input mt-multiselect btn btn-default form-control input-inline input-small input-sm " data-label="left" data-width="100%" data-filter="true" data-action-onchange="true">
-										
+									<option value="">Select User</option>
 										@foreach ($users as $user_id=>$user_name)
 												<option value="{{$user_id}}">{{$user_name}}</option>
 											@endforeach
@@ -937,7 +938,7 @@
 								
 								<input type="text" placeholder="SAPSKU" id="sku" class="table-group-action-input form-control input-inline input-small input-sm" />
 								<select  id="sapuid" class="table-group-action-input mt-multiselect btn btn-default form-control input-inline input-small input-sm " data-label="left" data-width="100%" data-filter="true" data-action-onchange="true">
-										
+									<option value="">Select User</option>
 										@foreach ($users as $user_id=>$user_name)
 												<option value="{{$user_id}}">{{$user_name}}</option>
 											@endforeach

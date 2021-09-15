@@ -38,17 +38,24 @@
 							<div data-repeater-list="group-users">
 								<div data-repeater-item class="mt-repeater-item">
 									<div class="row mt-repeater-row">
-										<div class="col-md-3">
+										<div class="col-md-2">
 											<label class="control-label">User</label>
-											<select class="form-control" name="user_id" required>
+											<select class="form-control user_id" name="user_id" required>
 
-                                    @foreach ($users as $user_id=>$user_name)
-                                        <option value="{{$user_id}}">{{$user_name}}</option>
-                                    @endforeach
-                                </select>
-								
-								 </div>
-										<div class="col-md-3">
+                                                @foreach ($users as $user_id=>$user_name)
+                                                    <option value="{{$user_id}}">{{$user_name}}</option>
+                                                @endforeach
+                                            </select>
+								        </div>
+                                        <div class="col-md-2">
+                                            <div class="form-group">
+                                                <label></label>
+                                                <div class="input-group" style="height:36px;margin-top:6px;">
+                                                    <input class="search_user form-control" type="text" value="" placeholder="search User">
+                                                </div>
+                                            </div>
+                                        </div>
+										<div class="col-md-2">
 											<label class="control-label">Time From</label>
 											 <div class="input-group">
                                         <input type="text" class="form-control timepicker timepicker-24"  value="0:00"  name="time_from" placeholder="From" >
@@ -59,7 +66,7 @@
                                                             </span>
                                     </div> </div>
 											
-										<div class="col-md-3">
+										<div class="col-md-2">
 											<label class="control-label">Time To</label>
 											<div class="input-group">
                                         <input type="text" value="23:59" class="form-control timepicker timepicker-24"  name="time_to" placeholder="To">
@@ -134,6 +141,26 @@ No time period is set to 0:00 to 23:59
                 minuteStep: 1,
                 showSeconds: false,
                 showMeridian: false
+            });
+
+            $(".mt-repeater").on('keyup','.search_user',function(){
+                var search_value = $(this).val().toUpperCase();
+                var fault = 1;
+                var Obj = $(this).parent().parent().parent().parent();
+                Obj.find('.user_id option').each(function (index,element){
+                    var content = $(element).text().toUpperCase();
+                    if(content.indexOf(search_value) >= 0 ) {
+                        //包含搜索的内容
+                        $(this).show();
+                        if(fault ==1 ){
+                            $(this).attr("selected",true);
+                            fault++;
+                        }
+                    }else{
+                        $(this).hide();
+                    }
+                });
+
             });
 
         });

@@ -597,7 +597,7 @@ var FormEditable = function() {
 	var initBudgettables = function() {
 		var budget_status = $('.budget_status').data('value');
 		var is_seller = false;
-		<?php if(($base_data['then_sap_seller_id'] && $base_data['then_sap_seller_id']==Auth::user()->sap_seller_id) || Auth::user()->id==46){ ?>
+		<?php if(($base_data['then_sap_seller_id'] && $base_data['then_sap_seller_id']==Auth::user()->sap_seller_id) || Auth::user()->id==46 || Auth::user()->id==486){ ?>
 		is_seller = true;
 		<?php } ?>
 		if(budget_status>0){
@@ -610,8 +610,8 @@ var FormEditable = function() {
 			option='disable';
 			$('.form-upload').hide();
 		}
-		// user_id=46为邹远勋的账号，临时给他可以编辑的权限
-		<?php if((!$showtype && $base_data['then_sap_seller_id'] && $base_data['then_sap_seller_id'] == Auth::user()->sap_seller_id) || Auth::user()->id==46) {?>
+		// user_id=46为邹远勋的账号，临时给他可以编辑的权限，486为刘圳波
+		<?php if((!$showtype && $base_data['then_sap_seller_id'] && $base_data['then_sap_seller_id'] == Auth::user()->sap_seller_id) || Auth::user()->id==46 || Auth::user()->id==486) {?>
 		$('.sku_ranking').editable({
 			emptytext:'N/A'
 		});		

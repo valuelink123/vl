@@ -541,330 +541,389 @@ class ExceptionController extends Controller
 			 'Website order',
 			 'B2B'
 		 );
-		foreach($gift_cards as $key=>$val){
-			$gift_cards[$key]['code'] = func_substr_replace($val['code'],"*", 3, 10);
-		}
+		 $user_id = Auth::user()->id;
+		 //异常单的gift card，陈金秀和李卓君显示出全部的code,Bruce 李卓君的user_id=392,Grace-陈金秀的user_id=404
+		 if(!($user_id == 392 || $user_id == 404)){
+			 foreach($gift_cards as $key=>$val){
+				 $gift_cards[$key]['code'] = func_substr_replace($val['code'],"*", 3, 10);
+			 }
+		 }
 
         return view('exception/edit',['exception'=>$rule,'gift_cards'=>$gift_cards,'mail_accounts'=>$mail_accounts,'mail_templates'=>$mail_templates,'gift_card_mail'=>$gift_card_mail,'groups'=>$this->getGroups(),'mygroups'=>$this->getUserGroup(),'sellerids'=>$this->getAccounts(),'last_inboxid'=>$last_inboxid,'mcf_orders'=>$mcf_orders,'auto_create_mcf_logs'=>$auto_create_mcf_logs,'users'=>$this->getUsers(),'requestContentHistoryValues'=>$requestContentHistoryValues]);
     }
 
     public function update(Request $request,$id)
     {
-		if(!Auth::user()->can(['exception-update'])) die('Permission denied -- exception-update');
-		$exception = Exception::findOrFail($id);
-		//添加上传附件
-		$file = $request->file('file_url');
-		$file_url = '';
-		if($file){
-			if($file->isValid()){
-				$ext = $file->getClientOriginalExtension();
-				$newname = date('Y-m-d-H-i-s').'-'.uniqid().'.'.$ext;
-				$newpath = '/uploads/exceptionUpload/'.date('Ymd').'/';
-				$inputFileName = public_path().$newpath.$newname;
-				$bool = $file->move(public_path().$newpath,$newname);
-				if(!$bool){
-					$request->session()->flash('error_message','Import Data Failed,The file is error');
+		$again_send_email = $request->get('again_send_email');
+		if($again_send_email==1){
+			//重新发送礼品卡邮件给客户,点击Again Send Email按钮的时候，会重新再发送一封礼品卡邮件给客户
+			$exception = Exception::findOrFail($id);
+			$exception_gift_cards = DB::table('exception_gift_cards')->where('exception_id',$exception->id)->first();
+			if($exception_gift_cards){
+				$sendbox_id = $exception_gift_cards->sendbox_id;
+				$sendbox_info = current(Sendbox::where('id',$sendbox_id)->take(1)->get()->toArray());
+				if($sendbox_info){
+					$sendbox = new Sendbox;
+					$sendbox->user_id = $exception->user_id;
+					$sendbox->from_address = $sendbox_info['from_address'];
+					$sendbox->to_address = $sendbox_info['to_address'];
+					$sendbox->subject = $sendbox_info['subject'];
+					$sendbox->text_html = $sendbox_info['text_html'];
+					$sendbox->date = date('Y-m-d H:i:s');
+					$sendbox->plan_date = 0;
+					$sendbox->status = 'Waiting';
+					$sendbox->inbox_id = 0;
+					$sendbox->warn = 0;
+					$sendbox->ip = $_SERVER["REMOTE_ADDR"];
+					$sendbox->attachs = Null;
+					$sendbox->error = NULL;
+					$sendbox->error_count = 0;
+					$sendbox->features = 1;//1为礼品卡邮件
+					$sendbox->save();
+
+					DB::table('exception_gift_cards')->insert(
+						array(
+							'exception_id'=>$exception->id,
+							'gift_card_id'=>$exception_gift_cards->gift_card_id,
+							'from_address'=>$exception_gift_cards->from_address,
+							'to_address'=>$exception_gift_cards->to_address,
+							'brand'=>$exception_gift_cards->brand,
+							'template_id'=>$exception_gift_cards->template_id,
+							'sendbox_id'=>$sendbox->id,
+						));
+					$request->session()->flash('success_message','Resending success');
 					return redirect()->back()->withInput();
 				}else{
-					$file_url = $newpath.$newname;
-					$exception->file_url = $file_url;
+					$request->session()->flash('error_message','Resending failed. No mail was sent before');
+					return redirect()->back()->withInput();
 				}
 			}else{
-				$request->session()->flash('error_message','Import Data Failed,The file is too large');
+				$request->session()->flash('error_message','Resending failed. No mail was sent before');
 				return redirect()->back()->withInput();
 			}
-		}
-
-		$acf = $request->get('acf');
-		if(isset($acf) && $exception->process_status=='auto done' && $exception->auto_create_mcf_result!=1){
-			if(!Auth::user()->can(['exception-check'])) die('Permission denied -- exception-check');
-			$exception->auto_create_mcf = $acf;
-			$exception->auto_create_mcf_result = 0;
-			if($acf){
-				
-				$exception->last_auto_create_mcf_date = date('Y-m-d H:i:s');
-			}else{
-				$exception->last_auto_create_mcf_date = NULL;
-			}
-			$exception->save();
-			DB::table('mcf_auto_create_log')->insert(
-			array(
-				'user_id'=>intval(Auth::user()->id),
-				'exception_id'=>$id,
-				'type'=>'MCF',
-				'date'=>date('Y-m-d H:i:s'),
-				'status'=>$acf,
-			));
-			return redirect('exception/'.$id.'/edit');
-		}
-		$acp = $request->get('acp');
-		if(isset($acp) && ($exception->process_status=='auto done' || $exception->process_status=='done' ) && $exception->auto_create_sap_result!=1){
-			if(!Auth::user()->can(['exception-check'])) die('Permission denied -- exception-check');
-			$exception->auto_create_sap = $acp;
-			$exception->auto_create_sap_result = 0;
-			if($acp){
-				$exception->last_auto_create_sap_date = date('Y-m-d H:i:s');
-			}else{
-				$exception->last_auto_create_sap_date = NULL;
-			}
-			$exception->save();
-			DB::table('mcf_auto_create_log')->insert(
-			array(
-				'user_id'=>intval(Auth::user()->id),
-				'exception_id'=>$id,
-				'type'=>'SAP',
-				'date'=>date('Y-m-d H:i:s'),
-				'status'=>$acp,
-			));
-			return redirect('exception/'.$id.'/edit');
-		}
-
-        $exception->score = $request->get('score');
-        $exception->comment = $request->get('comment');
-		$exception->amount = $request->get('amount');
-        $exception->process_content = $request->get('process_content');
-        //需要保存更改信息记录的状态，当由别的状态改为'done','auto done'时或者由'done','auto done'状态改为其他的状态的时候，才要保存更新状态记录，并且别的改为'done','auto done'，然后'done','auto done'改为其他状态，这种情况下才要显示更改状态记录信息
-        $status = $request->get('process_status');
-        $saveLogArray = array('done','auto done');
-        // if(in_array($exception->process_status,$saveLogArray) || in_array($status,$saveLogArray)){
-        //     $exception->update_status_log = $exception->update_status_log.'Status changed to '.$status.' at  '.date('H:i:s,Y-m-d').'<br>';
-        // }
-		//由原先的逻辑现改为任何状态都保存记录日志，并显示
-		if($exception->process_status != $status){
-			if(($exception->process_status!='cancel' && $request->get('process_status')!='submit') || $exception->process_status=='cancel') {
-				if($exception->process_status=='cancel'){
-					$exception->update_status_log = $exception->update_status_log . 'Status changed to submit at  ' . date('H:i:s,Y-m-d') . '<br>';
-				}else{
-					$exception->update_status_log = $exception->update_status_log . 'Status changed to ' . $status . ' at  ' . date('H:i:s,Y-m-d') . '<br>';
-				}
-
-			}
-		}
-		$exception->save();
-		//当状态为cancel的时候，才能修改状态为submit,否则不能
-		if(($exception->process_status!='cancel') && $request->get('process_status')!='submit'){
-			if(!Auth::user()->can(['exception-check'])) die('Permission denied -- exception-check');
-			$this->validate($request, [
-				'process_status' => 'required|string',
-			]);
-			$exception->process_status = $request->get('process_status');
-			$exception->process_date = date('Y-m-d H:i:s');
-			$exception->process_user_id = intval(Auth::user()->id);
-			$updateMcfOrder = array();
-			if($exception->type==2 || $exception->type==3){
-				$replacements = unserialize($exception->replacement);
-				$products=[];
-				$products_arr = array_get($replacements,'products',array());
-				if(is_array($products_arr)){
-					$id_add=0;
-					foreach( $products_arr as $product_arr){
-						$updateMcfOrder[$product_arr['replacement_order_id']] = array(///修改数据前的重发单号，amazon_mcf_orders表重发单对应的原始订单号置空
-							'seller_fulfillment_order_id' => $product_arr['replacement_order_id'],
-							'amazon_order_id' => ''
-						);
-						$product_arr['replacement_order_id']=$request->input('replacement_order_id.'.$id_add);
-						$products[]=$product_arr;
-						$id_add++;
-						$updateMcfOrder[$product_arr['replacement_order_id']] = array(///修改数据后的重发单号，amazon_mcf_orders表重发单对应的原始订单号设置
-							'seller_fulfillment_order_id' => $product_arr['replacement_order_id'],
-							'amazon_order_id' => $exception->amazon_order_id
-						);
-					}
-				}
-				$replacements['products']=$products;
-				$exception->replacement =  serialize($replacements);
-			}
-			if($exception->type==4 && $exception->process_status=='done'){
-				$gift_card_id = $request->get('gift_card_id');
-				if($gift_card_id){
-					DB::beginTransaction();
-					try {
-						$gift_card = GiftCard::where('id',intval($gift_card_id))->lockForUpdate()->first();
-						if(empty($gift_card)) throw new \Exception('Set Failed, Gift Card has Used or not exists!');
-						if($gift_card->exception_id!=$exception->id && $gift_card->status == 1) throw new \Exception('Set Failed, Gift Card has Used or not exists!');
-						$gift_card->exception_id = $exception->id;
-						$gift_card->status = 1;
-						$gift_card->save();
-						if($request->get('mail_brand') && $exception->customer_email){
-							$customer_email = array_search($exception->customer_email,getEmailToEncryptedEmail())?array_search($exception->customer_email,getEmailToEncryptedEmail()):$exception->customer_email;
-							if($exception->process_status =='SG gift' || $exception->process_status=='CTG-gift'){
-								$mail_template_id = 4170;
-							}else{
-								$mail_template_id = 4169;
-							}
-							$gf_template = Templates::find($mail_template_id);
-							if(empty($gf_template)) throw new \Exception('Set Failed, Template not exists!');
-							$content = str_replace("{GIFT_CARD}",$gift_card->code,$gf_template->content);
-							$subject = str_replace("{GIFT_CARD}",$gift_card->code,$gf_template->title);
-							$content = str_replace("{BRAND}",$request->get('mail_brand'),$content);
-							$subject = str_replace("{BRAND}",$request->get('mail_brand'),$subject);
-							$content = str_replace("{BRAND_LINK}",array_get(getBrands(),$request->get('mail_brand').'.url'),$content);
-							$subject = str_replace("{BRAND_LINK}",array_get(getBrands(),$request->get('mail_brand').'.url'),$subject);
-							$sendbox = new Sendbox;
-							$sendbox->user_id = intval(Auth::user()->id);
-							$sendbox->from_address = array_get(getBrands(),$request->get('mail_brand').'.email');
-							$sendbox->to_address = $customer_email;
-							$sendbox->subject = $subject;
-							$sendbox->text_html = $content;
-							$sendbox->date = date('Y-m-d H:i:s');
-							$sendbox->plan_date = 0;
-							$sendbox->status = 'Waiting';
-							$sendbox->inbox_id = 0;
-							$sendbox->warn = 0;
-							$sendbox->ip = $_SERVER["REMOTE_ADDR"];
-							$sendbox->attachs = Null;
-							$sendbox->error = NULL;
-							$sendbox->error_count = 0;
-							$sendbox->save();
-														
-							DB::table('exception_gift_cards')->insert(
-							array(
-								'exception_id'=>$exception->id,
-								'gift_card_id'=>$gift_card_id,
-								'from_address'=>array_get(getBrands(),$request->get('mail_brand').'.email'),
-								'to_address'=>$customer_email,
-								'brand'=>$request->get('mail_brand'),
-								'template_id'=>$mail_template_id,
-								'sendbox_id'=>$sendbox->id,
-							));
-						}
-						DB::commit();
-					} catch (\Exception $e) {
-						DB::rollBack();
-						$request->session()->flash('error_message',$e->getMessage());
-						return redirect()->back()->withInput();
-					}
-				}
-			}
-			$file = $request->file('importFile');
-  			if($file){
-				if($file->isValid()){
-					$originalName = $file->getClientOriginalName();
+		}else {
+			if (!Auth::user()->can(['exception-update'])) die('Permission denied -- exception-update');
+			$exception = Exception::findOrFail($id);
+			//添加上传附件
+			$file = $request->file('file_url');
+			$file_url = '';
+			if ($file) {
+				if ($file->isValid()) {
 					$ext = $file->getClientOriginalExtension();
-					$type = $file->getClientMimeType();
-					$realPath = $file->getRealPath();
-					$newname = date('Y-m-d-H-i-S').'-'.uniqid().'.'.$ext;
-					$newpath = '/uploads/exceptionUpload/'.date('Ymd').'/';
-					$inputFileName = public_path().$newpath.$newname;
-					$bool = $file->move(public_path().$newpath,$newname);
-					if($bool) $exception->process_attach = $newpath.$newname;
-				}
-			}
-			if ($exception->save()) {
-				//$product_arr['replacement_order_id']为重发单,匹配amazon_mcf_orders表中对应的原始订单号
-				if($updateMcfOrder){
-					$updateMcfOrder = array_values($updateMcfOrder);
-					updateBatch('amazon','amazon_mcf_orders',$updateMcfOrder);
-				}
-				return redirect('exception/'.$id.'/edit');
-			} else {
-				$request->session()->flash('error_message','Set Failed');
-				return redirect()->back()->withInput();
-			}
-		}
-		//当状态为cancel或者submit的时候，可以编辑左边页面数据
-		if(($exception->process_status=='cancel' || $exception->process_status=='submit') && Auth::user()->id==$exception->user_id){
-			 if(!Auth::user()->can(['exception-update'])) die('Permission denied -- exception-update');
-			 $this->validate($request, [
-				'group_id' => 'required|string',
-				'name' => 'required|string',
-				'rebindordersellerid' => 'required|string',
-				// 'rebindorderid' => 'required|string',
-				'type' => 'required|string',
-				 'descrip' => 'required|string',
-			]);
-			$exception->type = $request->get('type');
-			$exception->name = $request->get('name');
-			$exception->order_sku = $request->get('order_sku');
-			$exception->date = date('Y-m-d H:i:s');
-			$exception->sellerid = $request->get('rebindordersellerid');
-			// $exception->amazon_order_id = $request->get('rebindorderid');
-			$exception->group_id = $request->get('group_id');
-			$exception->user_id = intval(Auth::user()->id);
-			$exception->request_content = $request->get('request_content');
-			$exception->process_status = 'submit';
-			$exception->customer_email = $request->get('customer_email');
-			$exception->descrip = $request->get('descrip');
-			if( $exception->type == 1 || $exception->type == 3){
-				$exception->refund = round($request->get('refund'),2);
-			}else{
-				$exception->refund = 0;
-			}
-
-			if( $exception->type == 4){
-				$exception->gift_card_amount = round($request->get('gift_card_amount'),2)??0;
-				$exception->currency = $request->get('currency');
-			}else{
-				$exception->gift_card_amount = 0;
-			}
-			
-			$updateMcfOrder = array();
-			if( $exception->type == 2 || $exception->type == 3){
-				$replacements = unserialize($exception->replacement);
-				$products=[];
-				$products_arr = array_get($replacements,'products',array());
-				if(is_array($products_arr)){
-					$id_add=0;
-					foreach( $products_arr as $product_arr){
-						$updateMcfOrder[$product_arr['replacement_order_id']] = array(///修改数据前的重发单号，amazon_mcf_orders表重发单对应的原始订单号置空
-							'seller_fulfillment_order_id' => $product_arr['replacement_order_id'],
-							'amazon_order_id' => ''
-						);
-						$product_arr['replacement_order_id']=$request->input('replacement_order_id.'.$id_add);
-						$products[]=$product_arr;
-						$id_add++;
-						$updateMcfOrder[$product_arr['replacement_order_id']] = array(///修改数据后的重发单号，amazon_mcf_orders表重发单对应的原始订单号设置
-							'seller_fulfillment_order_id' => $product_arr['replacement_order_id'],
-							'amazon_order_id' => $exception->amazon_order_id
-						);
-					}
-				}
-				$replacements['products']=$products;
-
-				//当countrycode为US和CA的时候，StateOrRegion填的值必须强制为两个大写字母
-				$specialCountry = array('US','CA');
-				if(in_array($request->get('countrycode'),$specialCountry)){
-					$state = $request->get('state');
-					if(strtoupper($state)!= $state || strlen($state)!=2){
-						$request->session()->flash('error_message','StateOrRegion has to be an abbreviation');
+					$newname = date('Y-m-d-H-i-s') . '-' . uniqid() . '.' . $ext;
+					$newpath = '/uploads/exceptionUpload/' . date('Ymd') . '/';
+					$inputFileName = public_path() . $newpath . $newname;
+					$bool = $file->move(public_path() . $newpath, $newname);
+					if (!$bool) {
+						$request->session()->flash('error_message', 'Import Data Failed,The file is error');
 						return redirect()->back()->withInput();
+					} else {
+						$file_url = $newpath . $newname;
+						$exception->file_url = $file_url;
 					}
+				} else {
+					$request->session()->flash('error_message', 'Import Data Failed,The file is too large');
+					return redirect()->back()->withInput();
 				}
-
-				$exception->replacement = serialize(
-				array(
-					'shipname'=>$request->get('shipname'),
-					'address1'=>$request->get('address1'),
-					'address2'=>$request->get('address2'),
-					'address3'=>$request->get('address3'),
-					'city'=>$request->get('city'),
-					'county'=>$request->get('county'),
-					'state'=>$request->get('state'),
-					'district'=>$request->get('district'),
-					'postalcode'=>$request->get('postalcode'),
-					'countrycode'=>$request->get('countrycode'),
-					'phone'=>$request->get('phone'),
-					'shippingspeed'=>$request->get('shippingspeed'),
-					'products'=>$products,
-				));
-			}else{
-				$exception->replacement = '';
 			}
 
-			if ($exception->save()) {
-				//$product_arr['replacement_order_id']为重发单,匹配amazon_mcf_orders表中对应的原始订单号
-				if($updateMcfOrder){
-					$updateMcfOrder = array_values($updateMcfOrder);
-					updateBatch('amazon','amazon_mcf_orders',$updateMcfOrder);
+			$acf = $request->get('acf');
+			if (isset($acf) && $exception->process_status == 'auto done' && $exception->auto_create_mcf_result != 1) {
+				if (!Auth::user()->can(['exception-check'])) die('Permission denied -- exception-check');
+				$exception->auto_create_mcf = $acf;
+				$exception->auto_create_mcf_result = 0;
+				if ($acf) {
+
+					$exception->last_auto_create_mcf_date = date('Y-m-d H:i:s');
+				} else {
+					$exception->last_auto_create_mcf_date = NULL;
 				}
-				return redirect('exception/'.$id.'/edit');
-			} else {
-				$request->session()->flash('error_message','Set Failed');
-				return redirect()->back()->withInput();
+				$exception->save();
+				DB::table('mcf_auto_create_log')->insert(
+					array(
+						'user_id' => intval(Auth::user()->id),
+						'exception_id' => $id,
+						'type' => 'MCF',
+						'date' => date('Y-m-d H:i:s'),
+						'status' => $acf,
+					));
+				return redirect('exception/' . $id . '/edit');
+			}
+			$acp = $request->get('acp');
+			if (isset($acp) && ($exception->process_status == 'auto done' || $exception->process_status == 'done') && $exception->auto_create_sap_result != 1) {
+				if (!Auth::user()->can(['exception-check'])) die('Permission denied -- exception-check');
+				$exception->auto_create_sap = $acp;
+				$exception->auto_create_sap_result = 0;
+				if ($acp) {
+					$exception->last_auto_create_sap_date = date('Y-m-d H:i:s');
+				} else {
+					$exception->last_auto_create_sap_date = NULL;
+				}
+				$exception->save();
+				DB::table('mcf_auto_create_log')->insert(
+					array(
+						'user_id' => intval(Auth::user()->id),
+						'exception_id' => $id,
+						'type' => 'SAP',
+						'date' => date('Y-m-d H:i:s'),
+						'status' => $acp,
+					));
+				return redirect('exception/' . $id . '/edit');
+			}
+
+			$exception->score = $request->get('score');
+			$exception->comment = $request->get('comment');
+			$exception->amount = $request->get('amount');
+			$exception->process_content = $request->get('process_content');
+			//需要保存更改信息记录的状态，当由别的状态改为'done','auto done'时或者由'done','auto done'状态改为其他的状态的时候，才要保存更新状态记录，并且别的改为'done','auto done'，然后'done','auto done'改为其他状态，这种情况下才要显示更改状态记录信息
+			$status = $request->get('process_status');
+			$saveLogArray = array('done', 'auto done');
+			// if(in_array($exception->process_status,$saveLogArray) || in_array($status,$saveLogArray)){
+			//     $exception->update_status_log = $exception->update_status_log.'Status changed to '.$status.' at  '.date('H:i:s,Y-m-d').'<br>';
+			// }
+			//由原先的逻辑现改为任何状态都保存记录日志，并显示
+			if ($exception->process_status != $status) {
+				if (($exception->process_status != 'cancel' && $request->get('process_status') != 'submit') || $exception->process_status == 'cancel') {
+					if ($exception->process_status == 'cancel') {
+						$exception->update_status_log = $exception->update_status_log . 'Status changed to submit at  ' . date('H:i:s,Y-m-d') . '<br>';
+					} else {
+						$exception->update_status_log = $exception->update_status_log . 'Status changed to ' . $status . ' at  ' . date('H:i:s,Y-m-d') . '<br>';
+					}
+
+				}
+			}
+			$exception->save();
+			//点击重新发送邮件按钮,就再发送一次礼品卡邮件给客户
+
+			//当状态为cancel的时候，才能修改状态为submit,否则不能
+			if (($exception->process_status != 'cancel') && $request->get('process_status') != 'submit') {
+				if (!Auth::user()->can(['exception-check'])) die('Permission denied -- exception-check');
+				$this->validate($request, [
+					'process_status' => 'required|string',
+				]);
+				$exception->process_status = $request->get('process_status');
+				$exception->process_date = date('Y-m-d H:i:s');
+				$exception->process_user_id = intval(Auth::user()->id);
+				$updateMcfOrder = array();
+				if ($exception->type == 2 || $exception->type == 3) {
+					$replacements = unserialize($exception->replacement);
+					$products = [];
+					$products_arr = array_get($replacements, 'products', array());
+					if (is_array($products_arr)) {
+						$id_add = 0;
+						foreach ($products_arr as $product_arr) {
+							$updateMcfOrder[$product_arr['replacement_order_id']] = array(///修改数据前的重发单号，amazon_mcf_orders表重发单对应的原始订单号置空
+								'seller_fulfillment_order_id' => $product_arr['replacement_order_id'],
+								'amazon_order_id' => ''
+							);
+							$product_arr['replacement_order_id'] = $request->input('replacement_order_id.' . $id_add);
+							$products[] = $product_arr;
+							$id_add++;
+							$updateMcfOrder[$product_arr['replacement_order_id']] = array(///修改数据后的重发单号，amazon_mcf_orders表重发单对应的原始订单号设置
+								'seller_fulfillment_order_id' => $product_arr['replacement_order_id'],
+								'amazon_order_id' => $exception->amazon_order_id
+							);
+						}
+					}
+					$replacements['products'] = $products;
+					$exception->replacement = serialize($replacements);
+				}
+				if ($exception->type == 4 && $exception->process_status == 'done') {
+					$gift_card_id = $request->get('gift_card_id');
+					if ($gift_card_id) {
+						DB::beginTransaction();
+						try {
+							$gift_card = GiftCard::where('id', intval($gift_card_id))->lockForUpdate()->first();
+							if (empty($gift_card)) throw new \Exception('Set Failed, Gift Card has Used or not exists!');
+							if ($gift_card->exception_id != $exception->id && $gift_card->status == 1) throw new \Exception('Set Failed, Gift Card has Used or not exists!');
+							$gift_card->exception_id = $exception->id;
+							$gift_card->status = 1;
+							$gift_card->save();
+							if ($request->get('mail_brand') && $exception->customer_email) {
+								$customer_email = array_search($exception->customer_email, getEmailToEncryptedEmail()) ? array_search($exception->customer_email, getEmailToEncryptedEmail()) : $exception->customer_email;
+
+								if ($exception->process_status == 'SG gift' || $exception->process_status == 'CTG-gift') {
+									$mail_template_id = 4170;
+								} else {
+									$mail_template_id = 4169;
+								}
+								$gf_template = Templates::find($mail_template_id);
+								if (empty($gf_template)) throw new \Exception('Set Failed, Template not exists!');
+								$content = str_replace("{GIFT_CARD}", $gift_card->code, $gf_template->content);
+								$subject = str_replace("{GIFT_CARD}", $gift_card->code, $gf_template->title);
+								$content = str_replace("{BRAND}", $request->get('mail_brand'), $content);
+								$subject = str_replace("{BRAND}", $request->get('mail_brand'), $subject);
+								$subject = str_replace("{AON:}","Order No.: ".$exception->amazon_order_id , $subject);
+								$content = str_replace("{BRAND_LINK}", array_get(getBrands(), $request->get('mail_brand') . '.url'), $content);
+								$subject = str_replace("{BRAND_LINK}", array_get(getBrands(), $request->get('mail_brand') . '.url'), $subject);
+								$sendbox = new Sendbox;
+								$sendbox->user_id = $exception->user_id;
+								$sendbox->from_address = array_get(getBrands(), $request->get('mail_brand') . '.email');
+								$sendbox->to_address = $customer_email;
+								$sendbox->subject = $subject;
+								$sendbox->text_html = $content;
+								$sendbox->date = date('Y-m-d H:i:s');
+								$sendbox->plan_date = 0;
+								$sendbox->status = 'Waiting';
+								$sendbox->inbox_id = 0;
+								$sendbox->warn = 0;
+								$sendbox->ip = $_SERVER["REMOTE_ADDR"];
+								$sendbox->attachs = Null;
+								$sendbox->error = NULL;
+								$sendbox->error_count = 0;
+								$sendbox->features = 1;//1为礼品卡邮件
+								$sendbox->save();
+
+								DB::table('exception_gift_cards')->insert(
+									array(
+										'exception_id' => $exception->id,
+										'gift_card_id' => $gift_card_id,
+										'from_address' => array_get(getBrands(), $request->get('mail_brand') . '.email'),
+										'to_address' => $customer_email,
+										'brand' => $request->get('mail_brand'),
+										'template_id' => $mail_template_id,
+										'sendbox_id' => $sendbox->id,
+									));
+							}
+							DB::commit();
+						} catch (\Exception $e) {
+							DB::rollBack();
+							$request->session()->flash('error_message', $e->getMessage());
+							return redirect()->back()->withInput();
+						}
+					}
+				}
+				$file = $request->file('importFile');
+				if ($file) {
+					if ($file->isValid()) {
+						$originalName = $file->getClientOriginalName();
+						$ext = $file->getClientOriginalExtension();
+						$type = $file->getClientMimeType();
+						$realPath = $file->getRealPath();
+						$newname = date('Y-m-d-H-i-S') . '-' . uniqid() . '.' . $ext;
+						$newpath = '/uploads/exceptionUpload/' . date('Ymd') . '/';
+						$inputFileName = public_path() . $newpath . $newname;
+						$bool = $file->move(public_path() . $newpath, $newname);
+						if ($bool) $exception->process_attach = $newpath . $newname;
+					}
+				}
+				if ($exception->save()) {
+					//$product_arr['replacement_order_id']为重发单,匹配amazon_mcf_orders表中对应的原始订单号
+					if ($updateMcfOrder) {
+						$updateMcfOrder = array_values($updateMcfOrder);
+						updateBatch('amazon', 'amazon_mcf_orders', $updateMcfOrder);
+					}
+					return redirect('exception/' . $id . '/edit');
+				} else {
+					$request->session()->flash('error_message', 'Set Failed');
+					return redirect()->back()->withInput();
+				}
+			}
+
+			//当状态为cancel或者submit的时候，可以编辑左边页面数据
+			if (($exception->process_status == 'cancel' || $exception->process_status == 'submit') && Auth::user()->id == $exception->user_id) {
+				if (!Auth::user()->can(['exception-update'])) die('Permission denied -- exception-update');
+				$this->validate($request, [
+					'group_id' => 'required|string',
+					'name' => 'required|string',
+					'rebindordersellerid' => 'required|string',
+					// 'rebindorderid' => 'required|string',
+					'type' => 'required|string',
+					'descrip' => 'required|string',
+				]);
+				$exception->type = $request->get('type');
+				$exception->name = $request->get('name');
+				$exception->order_sku = $request->get('order_sku');
+				$exception->date = date('Y-m-d H:i:s');
+				$exception->sellerid = $request->get('rebindordersellerid');
+				// $exception->amazon_order_id = $request->get('rebindorderid');
+				$exception->group_id = $request->get('group_id');
+				$exception->user_id = intval(Auth::user()->id);
+				$exception->request_content = $request->get('request_content');
+				$exception->process_status = 'submit';
+				$exception->customer_email = $request->get('customer_email');
+				$exception->descrip = $request->get('descrip');
+				if ($exception->type == 1 || $exception->type == 3) {
+					$exception->refund = round($request->get('refund'), 2);
+				} else {
+					$exception->refund = 0;
+				}
+
+				if ($exception->type == 4) {
+					$exception->gift_card_amount = round($request->get('gift_card_amount'), 2) ?? 0;
+					$exception->currency = $request->get('currency');
+				} else {
+					$exception->gift_card_amount = 0;
+				}
+
+				$updateMcfOrder = array();
+				if ($exception->type == 2 || $exception->type == 3) {
+					$replacements = unserialize($exception->replacement);
+					$products = [];
+					$products_arr = array_get($replacements, 'products', array());
+					if (is_array($products_arr)) {
+						$id_add = 0;
+						foreach ($products_arr as $product_arr) {
+							$updateMcfOrder[$product_arr['replacement_order_id']] = array(///修改数据前的重发单号，amazon_mcf_orders表重发单对应的原始订单号置空
+								'seller_fulfillment_order_id' => $product_arr['replacement_order_id'],
+								'amazon_order_id' => ''
+							);
+							$product_arr['replacement_order_id'] = $request->input('replacement_order_id.' . $id_add);
+							$products[] = $product_arr;
+							$id_add++;
+							$updateMcfOrder[$product_arr['replacement_order_id']] = array(///修改数据后的重发单号，amazon_mcf_orders表重发单对应的原始订单号设置
+								'seller_fulfillment_order_id' => $product_arr['replacement_order_id'],
+								'amazon_order_id' => $exception->amazon_order_id
+							);
+						}
+					}
+					$replacements['products'] = $products;
+
+					//当countrycode为US和CA的时候，StateOrRegion填的值必须强制为两个大写字母
+					$specialCountry = array('US', 'CA');
+					if (in_array($request->get('countrycode'), $specialCountry)) {
+						$state = $request->get('state');
+						if (strtoupper($state) != $state || strlen($state) != 2) {
+							$request->session()->flash('error_message', 'StateOrRegion has to be an abbreviation');
+							return redirect()->back()->withInput();
+						}
+					}
+
+					$exception->replacement = serialize(
+						array(
+							'shipname' => $request->get('shipname'),
+							'address1' => $request->get('address1'),
+							'address2' => $request->get('address2'),
+							'address3' => $request->get('address3'),
+							'city' => $request->get('city'),
+							'county' => $request->get('county'),
+							'state' => $request->get('state'),
+							'district' => $request->get('district'),
+							'postalcode' => $request->get('postalcode'),
+							'countrycode' => $request->get('countrycode'),
+							'phone' => $request->get('phone'),
+							'shippingspeed' => $request->get('shippingspeed'),
+							'products' => $products,
+						));
+				} else {
+					$exception->replacement = '';
+				}
+
+				if ($exception->save()) {
+					//$product_arr['replacement_order_id']为重发单,匹配amazon_mcf_orders表中对应的原始订单号
+					if ($updateMcfOrder) {
+						$updateMcfOrder = array_values($updateMcfOrder);
+						updateBatch('amazon', 'amazon_mcf_orders', $updateMcfOrder);
+					}
+					return redirect('exception/' . $id . '/edit');
+				} else {
+					$request->session()->flash('error_message', 'Set Failed');
+					return redirect()->back()->withInput();
+				}
+
 			}
 
 		}
-
        return redirect('exception/'.$id.'/edit');
     }
     public function get(Request $request)
@@ -1122,7 +1181,13 @@ class ExceptionController extends Controller
 			}
             if($customersList['type']==4){
 				$operate.= 'Gift Card : '.$customersList['gift_card_amount'].PHP_EOL;
-				if($customersList['giftcard']) $operate.= 'Card Code: '.$customersList['giftcard']['code'].' - '.$customersList['giftcard']['amount'].$customersList['giftcard']['currency'].PHP_EOL;
+				$user_id = Auth::user()->id;
+				//异常单的gift card，陈金秀和李卓君显示出全部的code,Bruce 李卓君的user_id=392,Grace-陈金秀的user_id=404
+				$_code = $customersList['giftcard']['code'];
+				if(!($user_id == 392 || $user_id == 404)){
+					$_code = func_substr_replace($customersList['giftcard']['code'],"*", 3, 10);
+				}
+				if($customersList['giftcard']) $operate.= 'Card Code: '.$_code.' - '.$customersList['giftcard']['amount'].$customersList['giftcard']['currency'].PHP_EOL;
 			}
             //得到列表的状态值（在状态值下面显示score值）
             $statusScore = array_get($status_list,$customersList['process_status']).'<br/><br/>'.$customersList['score'];

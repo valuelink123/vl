@@ -208,62 +208,121 @@
                                                 <span class="arrow"></span>
                                             </a>
                                             <ul class="dropdown-menu pull-left">
-                                                @permission('order-list-show')
-                                                <li class="">
-                                                    <a href="/orderList" class="nav-link nav-toggle ">
-                                                        Order List
+                                                <li class="dropdown-submenu">
+                                                    <a href="javascript:;" class="nav-link nav-toggle ">
+                                                        Amazon
                                                         <span class="arrow"></span>
                                                     </a>
+                                                    <ul class="dropdown-menu">
+                                                        @permission('order-list-show')
+                                                        <li class="">
+                                                            <a href="/orderList" class="nav-link nav-toggle ">
+                                                                Order List
+                                                                <span class="arrow"></span>
+                                                            </a>
+                                                        </li>
+                                                        @endpermission
+                                                        @permission('refund-show')
+                                                        <li class="">
+                                                            <a href="/refund" class="nav-link nav-toggle ">
+                                                                Refund List
+                                                                <span class="arrow"></span>
+                                                            </a>
+                                                        </li>
+                                                        @endpermission
+                                                        @permission('return-show')
+                                                        <li class="">
+                                                            <a href="/return" class="nav-link nav-toggle ">
+                                                                Return List
+                                                                <span class="arrow"></span>
+                                                            </a>
+                                                        </li>
+                                                        @endpermission
+                                                        @permission('mcf-list-show')
+                                                        <li class="">
+                                                            <a href="/McfOrderList" class="nav-link nav-toggle ">
+                                                                McfOrder List
+                                                                <span class="arrow"></span>
+                                                            </a>
+                                                        </li>
+                                                        @endpermission
+                                                        @permission('return-analysis')
+                                                        <li class="">
+                                                            <a href="/returnAnalysis/returnAnalysis"
+                                                               class="nav-link nav-toggle ">
+                                                                Return analysis
+                                                                <span class="arrow"></span>
+                                                            </a>
+                                                        </li>
+                                                        @endpermission
+                                                        @permission('asin-analysis')
+                                                        <li class="">s
+                                                            <a href="/returnAnalysis/asinAnalysis"
+                                                               class="nav-link nav-toggle ">
+                                                                Asin Return analysis
+                                                                <span class="arrow"></span>
+                                                            </a>
+                                                        </li>
+                                                        @endpermission
+                                                        @permission('sku-analysis')
+                                                        <li class="">
+                                                            <a href="/returnAnalysis/skuAnalysis"
+                                                               class="nav-link nav-toggle ">
+                                                                SKU Return analysis
+                                                                <span class="arrow"></span>
+                                                            </a>
+                                                        </li>
+                                                        @endpermission
+                                                    </ul>
                                                 </li>
-                                                @endpermission
-                                                @permission('refund-show')
-                                                <li class="">
-                                                    <a href="/refund" class="nav-link nav-toggle ">
-                                                        Refund List
+                                                <li class="dropdown-submenu">
+                                                    <a href="javascript:;" class="nav-link nav-toggle ">
+                                                        eBay
                                                         <span class="arrow"></span>
                                                     </a>
+                                                    <ul class="dropdown-menu">
+                                                        <li class="">
+                                                            <a href="/ebayOrderList" class="nav-link nav-toggle ">
+                                                                Order List
+                                                                <span class="arrow"></span>
+                                                            </a>
+                                                        </li>
+                                                        <li class="">
+                                                            <a href="/ebayOrderList/skuMatchList" class="nav-link nav-toggle ">
+                                                                SKU Match List
+                                                                <span class="arrow"></span>
+                                                            </a>
+                                                        </li>
+                                                    </ul>
                                                 </li>
-                                                @endpermission
-                                                @permission('return-show')
-                                                <li class="">
-                                                    <a href="/return" class="nav-link nav-toggle ">
-                                                        Return List
+                                                <li class="dropdown-submenu">
+                                                    <a href="javascript:;" class="nav-link nav-toggle ">
+                                                        Joybuy
                                                         <span class="arrow"></span>
                                                     </a>
+                                                    <ul class="dropdown-menu">
+                                                        <li class="">
+                                                            <a href="/joybuyOrderList" class="nav-link nav-toggle ">
+                                                                Order List
+                                                                <span class="arrow"></span>
+                                                            </a>
+                                                        </li>
+                                                    </ul>
                                                 </li>
-                                                @endpermission
-                                                @permission('mcf-list-show')
-                                                <li class="">
-                                                    <a href="/McfOrderList" class="nav-link nav-toggle ">
-                                                        McfOrder List
+                                                <li class="dropdown-submenu">
+                                                    <a href="javascript:;" class="nav-link nav-toggle ">
+                                                        Newegg
                                                         <span class="arrow"></span>
                                                     </a>
+                                                    <ul class="dropdown-menu">
+                                                        <li class="">
+                                                            <a href="/neweggOrderList" class="nav-link nav-toggle ">
+                                                                Order List
+                                                                <span class="arrow"></span>
+                                                            </a>
+                                                        </li>
+                                                    </ul>
                                                 </li>
-                                                @endpermission
-                                                @permission('return-analysis')
-                                                <li class="">
-                                                    <a href="/returnAnalysis/returnAnalysis" class="nav-link nav-toggle ">
-                                                        Return analysis
-                                                        <span class="arrow"></span>
-                                                    </a>
-                                                </li>
-                                                @endpermission
-                                                @permission('asin-analysis')
-                                                <li class="">
-                                                    <a href="/returnAnalysis/asinAnalysis" class="nav-link nav-toggle ">
-                                                        Asin Return analysis
-                                                        <span class="arrow"></span>
-                                                    </a>
-                                                </li>
-                                                @endpermission
-                                                @permission('sku-analysis')
-                                                <li class="">
-                                                    <a href="/returnAnalysis/skuAnalysis" class="nav-link nav-toggle ">
-                                                        SKU Return analysis
-                                                        <span class="arrow"></span>
-                                                    </a>
-                                                </li>
-                                                @endpermission
                                             </ul>
                                         </li>
 
@@ -702,7 +761,7 @@
 
 											@endpermission
 
-                                            @permission('barcode')
+                                            @permission('barcode-show')
                                             <li class="">
                                                 <a href="/barcode" class="nav-link nav-toggle">
                                                     Barcode
@@ -711,6 +770,14 @@
                                             </li>
                                             @endpermission
 
+                                            @permission('barcode-qc')
+                                            <li class="">
+                                                <a href="/barcode/qc?p=ec93a64741" class="nav-link nav-toggle">
+                                                    Barcode-QC
+                                                    <span class="arrow"></span>
+                                                </a>
+                                            </li>
+                                            @endpermission
 
                                             @permission('adv-show')
                                             <li class="">
@@ -1095,7 +1162,31 @@
 												@endpermission
 											</ul>
 										</li>
-
+                                        <li class="menu-dropdown classic-menu-dropdown ">
+                                            <a href="javascript:;"> RSG
+                                                <span class="arrow"></span>
+                                            </a>
+                                            <ul class="dropdown-menu pull-left">
+                                                <li class="">
+                                                    <a href="/shopsaver" class="nav-link nav-toggle">
+                                                        ShopSaver Products
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
+                                                <li class="">
+                                                    <a href="/shopsaver/users" class="nav-link nav-toggle">
+                                                        ShopSaver Clients
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
+                                                <li class="">
+                                                    <a href="/shopsaver/orderList" class="nav-link nav-toggle">
+                                                        ShopSaver Order List
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </li>
                                         <li class="menu-dropdown classic-menu-dropdown ">
                                             <a href="javascript:;"> System
                                                 <span class="arrow"></span>
