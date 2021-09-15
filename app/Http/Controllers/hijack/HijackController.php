@@ -64,7 +64,7 @@ class HijackController extends Controller
     public function detail(Request $request)
     {
 		$id = isset($request['id']) && $request['id'] ? $request['id'] : '';
-		$_asinInfo = DB::connection('vlz')->table('tbl_reselling_asin')
+		$_asinInfo = DB::connection('amazon')->table('tbl_reselling_asin')
 			->select('domain','asin')
 			->where('id', $id)
 			->first();
@@ -121,7 +121,7 @@ class HijackController extends Controller
 		$asin_sql = " select DISTINCT sap_asin_match_sku.asin from sap_asin_match_sku  {$userWhere}";
 
 		$userasin = array();
-		$_userasin = DB::connection('vlz')->select($asin_sql);
+		$_userasin = DB::connection('amazon')->select($asin_sql);
 		foreach($_userasin as $uk=>$uv){
 			if(strlen($uv->asin)==10){//限制只查询有效的asin
 				$userasin[$uv->asin] = $uv->asin;
@@ -201,13 +201,13 @@ class HijackController extends Controller
 
 		$sql =  $sql_s.$where.$order.$limit;
 
-        $productList_obj = DB::connection('vlz')->select($sql);
+        $productList_obj = DB::connection('amazon')->select($sql);
         $productList = (json_decode(json_encode($productList_obj), true));
-		$recordsTotal = $recordsFiltered = (DB::connection('vlz')->select('SELECT FOUND_ROWS() as total'))[0]->total;
+		$recordsTotal = $recordsFiltered = (DB::connection('amazon')->select('SELECT FOUND_ROWS() as total'))[0]->total;
 
         //asin相关的对应关系数据,//marketplace_id,sap_seller_id,asin,sap_seller_bg,sap_seller_bu
 		$sap_asin_match_sku = array();
-        $_sap_asin_match_sku = DB::connection('vlz')->table('sap_asin_match_sku')
+        $_sap_asin_match_sku = DB::connection('amazon')->table('sap_asin_match_sku')
             ->select('marketplace_id', 'sap_seller_id', 'asin', 'sap_seller_bg', 'sap_seller_bu', 'id', 'status', 'updated_at', 'sku_status', 'sku')
              ->whereIn('asin', $userasin)
             ->groupBy('asin')
@@ -250,7 +250,7 @@ class HijackController extends Controller
 				left JOIN tbl_reselling_detail as detail on task.id=detail.task_id 
 				where task.reselling_asin_id in("' . implode('","',$rla_ids) . '") and white=0 
 				group by reselling_asin_id ';
-		$_totnum = DB::connection('vlz')->select($sql_t);
+		$_totnum = DB::connection('amazon')->select($sql_t);
 		$totnum = array();
 		foreach($_totnum as $tk=>$tv){
 			$totnum[$tv->reselling_asin_id] = $tv->total_num;
@@ -279,7 +279,7 @@ class HijackController extends Controller
             }
             $arr_id = explode(',', $_POST['id']);
             $update = array('reselling'=>$toup);//更新状态值
-			$result = DB::connection('vlz')->table('tbl_reselling_asin')->whereIn('product_id', $arr_id)->update($update);//删除1条
+			$result = DB::connection('amazon')->table('tbl_reselling_asin')->whereIn('product_id', $arr_id)->update($update);//删除1条
             if ($result > 0) {
                 $r_message = ['status' => 1, 'msg' => '更新成功'];
             } else {
@@ -310,7 +310,7 @@ class HijackController extends Controller
 					left join tbl_reselling_asin on reselling_asin_id = tbl_reselling_asin.id 
 					where reselling_asin_id = '.$id.$where.' 
 					order by reselling_time desc';
-        	$_data = DB::connection('vlz')->select($sql);
+        	$_data = DB::connection('amazon')->select($sql);
 			$taskList = array();
 			foreach($_data as $key=>$val) {
 				$taskList[] = array(
@@ -339,7 +339,7 @@ class HijackController extends Controller
 		$result['status'] = 1;
         if ($taskId > 0) {
 			//每个任务的具体账号信息
-			$_taskDetail = DB::connection('vlz')->table('tbl_reselling_detail')
+			$_taskDetail = DB::connection('amazon')->table('tbl_reselling_detail')
 				->select('id', 'price', 'task_id', 'shipping_fee', 'account', 'white', 'sellerid', 'created_at', 'reselling_remark')
 				->where('task_id', $taskId)
 				->where('white', 0)

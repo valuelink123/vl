@@ -1352,7 +1352,7 @@ function getCrmRsgStatusArr()
 //获取数据库里面的marketplaceid与domain之间的关系
 function getMarketDomain()
 {
-	$data= DB::connection('vlz')->select('select marketplaceid,domain from marketplaces');
+	$data= DB::connection('amazon')->select('select marketplaceid,domain from marketplaces');
 	return $data;
 }
 

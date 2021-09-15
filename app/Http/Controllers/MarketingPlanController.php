@@ -76,7 +76,7 @@ class MarketingPlanController extends Controller
             }
         }
         if (!empty($sql)) {
-            $user_asin_list_obj = DB::connection('vlz')->select($sql);
+            $user_asin_list_obj = DB::connection('amazon')->select($sql);
             $user_asin_list = (json_decode(json_encode($user_asin_list_obj), true));            //asin 站点 suk suk状态
             if (!empty($user_asin_list)) {
                 foreach ($user_asin_list as $k => $v) {
@@ -88,7 +88,7 @@ class MarketingPlanController extends Controller
             }
         }
         //查询所有汇率信息
-        $currency_rates = DB::connection('vlz')->table('currency_rates')
+        $currency_rates = DB::connection('amazon')->table('currency_rates')
             ->select('currency', 'rate', 'id', 'updated_at')
             ->get()->map(function ($value) {
                 return (array)$value;
@@ -108,7 +108,7 @@ class MarketingPlanController extends Controller
         $seller_sku = '';
         $single_economic = $avg_day_sales = $cost = 0;
         if (!empty($request['asin']) && !empty($request['marketplace_id'])) {
-            $asin_daily_report = DB::connection('vlz')->table('asin_daily_report')
+            $asin_daily_report = DB::connection('amazon')->table('asin_daily_report')
                 ->select('date', 'ranking', 'id', 'conversion', 'fba_stock')
                 ->where('asin', $request['asin'])
                 ->where('marketplace_id', $request['marketplace_id'])
@@ -119,7 +119,7 @@ class MarketingPlanController extends Controller
 					LEFT JOIN asins on asins.asin= sams.asin and sams.asin = asins.asin and sams.marketplace_id = asins.marketplaceid 
                     WHERE asins.asin ='" . $request['asin'] . "' 
                     AND asins.marketplaceid = '" . $request['marketplace_id'] . "' GROUP BY asins.marketplaceid,sams.asin";
-            $user_asin_list_obj = DB::connection('vlz')->select($sql);
+            $user_asin_list_obj = DB::connection('amazon')->select($sql);
             $user_asin_list = (json_decode(json_encode($user_asin_list_obj), true));
             if (!empty($user_asin_list)) {
                 $user_asin_list = $user_asin_list[0];
@@ -128,14 +128,14 @@ class MarketingPlanController extends Controller
                 $marketplaceid = $user_asin_list['marketplaceid'];
                 $country = $DOMIN_MARKETPLACEID_SX[$marketplaceid];
                 if (!empty($seller_sku)) {
-                    $daily_statistics = DB::connection('vlz')->table('daily_statistics')
+                    $daily_statistics = DB::connection('amazon')->table('daily_statistics')
                         ->select('afn_sellable', 'id', 'afn_reserved')
                         ->where('seller_sku', $seller_sku)
                         ->orderBy('date', 'desc')
                         ->first();
                 }
                 if (!empty($marketplaceid) && !empty($sku)) {
-                    $view_cost_of_skus = DB::connection('vlz')->table('view_cost_of_skus')
+                    $view_cost_of_skus = DB::connection('amazon')->table('view_cost_of_skus')
                         ->select('cost', 'id')
                         ->where('sku', $sku)
                         ->where('marketplace_id', $marketplaceid)
@@ -172,7 +172,7 @@ class MarketingPlanController extends Controller
                     AND marketplace_id='" . $request['marketplace_id'] . "'
                     AND asin = '" . $request['asin'] . "'
                     ";
-            $statistics_o = DB::connection('vlz')->select($sql1);
+            $statistics_o = DB::connection('amazon')->select($sql1);
             $statistics = (json_decode(json_encode($statistics_o), true));
             if (!empty($statistics)) {
                 $statistics = $statistics[0];
@@ -250,7 +250,7 @@ class MarketingPlanController extends Controller
 
         if ($request['id'] > 0) {
             $sql = "SELECT * FROM marketing_plan WHERE id =" . $request['id'];
-            $marketing_plan = json_decode(json_encode(DB::connection('vlz')->select($sql)), true);
+            $marketing_plan = json_decode(json_encode(DB::connection('amazon')->select($sql)), true);
             $marketing_plan = $marketing_plan[0];
             $marketing_plan['from_time'] = date('Y-m-d', $marketing_plan['from_time']);
             $marketing_plan['to_time'] = date('Y-m-d', $marketing_plan['to_time']);
@@ -290,7 +290,7 @@ class MarketingPlanController extends Controller
             $plan_status = $request['plan_status'];
             $r_message = $resProductIds = [];//更新返回
             //查询当前 plan_status 状态
-            $old_m_plan = DB::connection('vlz')->table('marketing_plan')
+            $old_m_plan = DB::connection('amazon')->table('marketing_plan')
                 ->select('rsg_d_target', 'from_time', 'to_time', 'plan_status', 'goal', 'id', 'updated_at', 'asin', 'marketplaceid')
                 ->where('id', $id)
                 ->first();
@@ -326,7 +326,7 @@ class MarketingPlanController extends Controller
                      */
                     $up_data = array_merge($up_data, ['reality_end' => $old_m_plan['to_time']]);
                 }
-                $result = DB::connection('vlz')->table('marketing_plan')
+                $result = DB::connection('amazon')->table('marketing_plan')
                     ->where('id', $id)
                     ->update($up_data);
                 if ($result == 1) {
@@ -374,7 +374,7 @@ class MarketingPlanController extends Controller
     public function delfiles(Request $request)
     {
         if (!empty($request['files_url']) && !empty($request['id'])) {
-            $marketing_plan = DB::connection('vlz')->table('marketing_plan')
+            $marketing_plan = DB::connection('amazon')->table('marketing_plan')
                 ->select('files', 'id')
                 ->where('id', $request['id'])
                 ->first();
@@ -384,7 +384,7 @@ class MarketingPlanController extends Controller
                 $key = array_search($request['files_url'], $files);
                 if ($key > 0) {
                     unset($files[$key]);
-                    $result = DB::connection('vlz')->table('marketing_plan')
+                    $result = DB::connection('amazon')->table('marketing_plan')
                         ->where('id', $request['id'])
                         ->update(['files' => implode($files, ',')]);
                     if ($result > 0) {
@@ -394,7 +394,7 @@ class MarketingPlanController extends Controller
                     }
 
                 } elseif ($marketing_plan['files'] == $request['files_url']) {
-                    $result = DB::connection('vlz')->table('marketing_plan')
+                    $result = DB::connection('amazon')->table('marketing_plan')
                         ->where('id', $request['id'])
                         ->update(['files' => '']);
                     if ($result > 0) {
@@ -542,7 +542,7 @@ class MarketingPlanController extends Controller
 			$sql = $sql.' ORDER BY updated_at desc';
 		}
 
-        $rsgList = DB::connection('vlz')->select($sql);
+        $rsgList = DB::connection('amazon')->select($sql);
         $rsgList = (json_decode(json_encode($rsgList), true));
         // $planStatus=['0','Pending','Ongoing','Completed','Paused','Rejected'];
         $planStatus = ['0', '待审批', '进行中', '已完结', '已中止', '已拒绝'];
@@ -597,7 +597,7 @@ class MarketingPlanController extends Controller
                 'updated_at' => time(),
                 'files' => $fileUrl
             ];
-            $result = DB::connection('vlz')->table('marketing_plan')
+            $result = DB::connection('amazon')->table('marketing_plan')
                 ->where('id', $request['id'])
                 ->update($update_data);
             if ($result > 0) {
@@ -609,7 +609,7 @@ class MarketingPlanController extends Controller
             $tomorrow_t = strtotime(date('Y-m-d')) + 3600 * 24;
             if ($request['from_time'] >= $tomorrow_t && $request['to_time'] >= $tomorrow_t) {
                 if (!empty($request['asin']) && !empty($request['marketplaceid']) && !empty($request['sku'])) {
-                    $asins = DB::connection('vlz')->table('asins')
+                    $asins = DB::connection('amazon')->table('asins')
                         ->select('id', 'images')
                         ->where('asin', $request['asin'])
                         ->where('marketplaceid', $request['marketplaceid'])
@@ -652,9 +652,9 @@ class MarketingPlanController extends Controller
                         'files' => $fileUrl, 'notes' => @$request['notes'] ? @$request['notes'] : '',
                         'images' => $images,
                     ];
-                    $result = DB::connection('vlz')->table('marketing_plan')->insert($data);
+                    $result = DB::connection('amazon')->table('marketing_plan')->insert($data);
                     if ($result > 0) {
-                        $new_mp = DB::connection('vlz')->table('marketing_plan')
+                        $new_mp = DB::connection('amazon')->table('marketing_plan')
                             ->select('id')
                             ->orderBy('id', 'desc')
                             ->first();
@@ -687,7 +687,7 @@ class MarketingPlanController extends Controller
     public function achieveGoals()
     {
         /** 查询所有未完成的 信息 状态 非 已拒绝*/
-        $m_p = DB::connection('vlz')->table('marketing_plan')
+        $m_p = DB::connection('amazon')->table('marketing_plan')
             ->select('plan_status', 'id', 'to_time', 'marketplaceid', 'asin', 'target_rating', 'target_reviews')
             ->where('plan_status', '!=', 5)
             ->where('complete_at', 0)
@@ -703,7 +703,7 @@ class MarketingPlanController extends Controller
                 $target_reviews = $mv['target_reviews'];
                 $target_rating = $mv['target_rating'];
                 if (isset($asin) && isset($marketplaceid) && $target_reviews > 0 && $target_rating > 0 && $id > 0) {
-                    $asin = DB::connection('vlz')->table('asins')
+                    $asin = DB::connection('amazon')->table('asins')
                         ->select('id')
                         ->where('asin', $asin)
                         ->where('marketplaceid', $marketplaceid)
@@ -714,7 +714,7 @@ class MarketingPlanController extends Controller
                         })->toArray();
                     if (!empty($asin) && count($asin) > 0) {
                         //更新 达成时间
-                        $result = DB::connection('vlz')->table('marketing_plan')
+                        $result = DB::connection('amazon')->table('marketing_plan')
                             ->where('id', $id)
                             ->update(['complete_at' => time(), 'updated_at' => time()]);
                         if ($result > 0) {
@@ -726,7 +726,7 @@ class MarketingPlanController extends Controller
             print_r($r_message);
         }
         /**  查询已完结但是没有更新数据的--------达成目标后1周 更新数据 */
-        $m_p_6 = DB::connection('vlz')->table('marketing_plan')
+        $m_p_6 = DB::connection('amazon')->table('marketing_plan')
             ->select('complete_at', 'id', 'marketplaceid', 'asin')
             ->where('plan_status', '!=', 5)
             ->where('plan_status', '!=', 6)
@@ -767,10 +767,10 @@ class MarketingPlanController extends Controller
                     AND marketplace_id='" . $request['marketplace_id'] . "'
                     AND asin = '" . $request['asin'] . "'
                     ";
-                    $statistics_o = DB::connection('vlz')->select($sql1);
+                    $statistics_o = DB::connection('amazon')->select($sql1);
                     $statistics = (json_decode(json_encode($statistics_o), true));
                     //查询排名 和 转化率
-                    $asin_daily_report = DB::connection('vlz')->table('asin_daily_report')
+                    $asin_daily_report = DB::connection('amazon')->table('asin_daily_report')
                         ->select('date', 'ranking', 'id', 'conversion', 'fba_stock')
                         ->where('asin', $asin)
                         ->where('marketplace_id', $marketplaceid)
@@ -790,7 +790,7 @@ class MarketingPlanController extends Controller
                             'actual_e_val' => @$statistics[0]['single_economic'],
                             'updated_at' => time(), 'plan_status' => 6
                         ];
-                        $result = DB::connection('vlz')->table('marketing_plan')
+                        $result = DB::connection('amazon')->table('marketing_plan')
                             ->where('id', $id)
                             ->update($data);
                         if ($result > 0) {
@@ -817,7 +817,7 @@ class MarketingPlanController extends Controller
         $DOMIN_MARKETPLACEID_RUL = Asin::DOMIN_MARKETPLACEID_URL;
         $end_time = strtotime(date('Y-m-d', time()));
         $idList = $resProductIds = $r_message = [];
-        $m_p = DB::connection('vlz')->table('marketing_plan')
+        $m_p = DB::connection('amazon')->table('marketing_plan')
             ->select('plan_status', 'id', 'to_time', 'marketplaceid', 'asin')
             ->where('plan_status', 2)
             ->where('to_time', '<', $end_time)
@@ -844,7 +844,7 @@ class MarketingPlanController extends Controller
             }
             if (!empty($idList)) {
                 /**  修改更新时间为、实际完结时间 为当前时间 */
-                $result = DB::connection('vlz')->table('marketing_plan')
+                $result = DB::connection('amazon')->table('marketing_plan')
                     ->whereIn('id', $idList)
                     ->update(['plan_status' => 3, 'updated_at' => time(), 'reality_end' => time() - 3600 * 24]);
                 if ($result > 0 && !empty($resProductIds)) {

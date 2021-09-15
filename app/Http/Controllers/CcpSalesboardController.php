@@ -95,7 +95,7 @@ class CcpSalesBoardController extends Controller
 			) AS kk 
 			GROUP BY period";
 
-		$orderData = DB::connection('vlz')->select($sql);
+		$orderData = DB::connection('amazon')->select($sql);
         $result = array();
         $periods = array('period_1','period_2');
         $items = array('sales','units','orders');
@@ -217,8 +217,8 @@ class CcpSalesBoardController extends Controller
             order by sales_1 desc {$limit}
 			";
 
-		$itemData = DB::connection('vlz')->select($sql);
-		$recordsTotal = $recordsFiltered = DB::connection('vlz')->select('SELECT FOUND_ROWS() as total');
+		$itemData = DB::connection('amazon')->select($sql);
+		$recordsTotal = $recordsFiltered = DB::connection('amazon')->select('SELECT FOUND_ROWS() as total');
 		$recordsTotal = $recordsFiltered = $recordsTotal[0]->total;
 		$data = array();
 		$asins = array();
@@ -282,7 +282,7 @@ class CcpSalesBoardController extends Controller
 						and asins.marketplaceid = '{$site}'
 						{$product_where}
 						group by asins.asin ";
-			$productData = DB::connection('vlz')->select($product_sql);
+			$productData = DB::connection('amazon')->select($product_sql);
 			foreach($productData as $key=>$val){
 				if(isset($data[$val->asin])){
 					$title = mb_substr($val->title,0,50);

@@ -53,7 +53,7 @@ class RrController extends Controller
      public function getAccounts(){
 
 		$seller=[];
-		$sellerids = DB::connection('vlz')->select("select mws_seller_id,(case mws_marketplaceid
+		$sellerids = DB::connection('amazon')->select("select mws_seller_id,(case mws_marketplaceid
 		when 'ATVPDKIKX0DER' then 'US'
 		when 'A2EUQ1WTGCTBG2' then 'US'
 		when 'A1AM78C64UM0Y8' then 'US'
