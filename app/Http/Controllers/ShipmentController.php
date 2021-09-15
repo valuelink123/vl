@@ -700,7 +700,7 @@ class ShipmentController extends Controller
                                 'shipment_requests_id' => $id,
                                 'created_at' => date('Y-m-d H:i:s', time())
                             ];
-                            DB::connection('vlz')->table('allot_progress')->insert($data);
+                            DB::connection('amazon')->table('allot_progress')->insert($data);
                         }
                         $r_message = ['status' => 1, 'msg' => '更新成功'];
                     } else {
@@ -820,7 +820,7 @@ class ShipmentController extends Controller
                         foreach ($idList as $k => $v) {
                             $data1 [] = ['shipment_requests_id' => $v, 'created_at' => date('Y-m-d H:i:s', time())];
                         }
-                        DB::connection('vlz')->table('allot_progress')->insert($data1);
+                        DB::connection('amazon')->table('allot_progress')->insert($data1);
                     }
                     $r_message = ['status' => 1, 'msg' => '全部更新成功'];
                 } else {

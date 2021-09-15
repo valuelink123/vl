@@ -247,7 +247,7 @@ class Controller extends BaseController
 			$insertData = DB::connection('vlz')->select($insert_sql);
 			$insertData = array_map('get_object_vars', $insertData);//需要插入的数据
 			if ($insertData) {
-				DB::connection('vlz')->table('asin_price')->insert($insertData);
+				DB::connection('amazon')->table('asin_price')->insert($insertData);
 			}
 		}
 		return true;

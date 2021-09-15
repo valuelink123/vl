@@ -652,7 +652,7 @@ class MarketingPlanController extends Controller
                         'files' => $fileUrl, 'notes' => @$request['notes'] ? @$request['notes'] : '',
                         'images' => $images,
                     ];
-                    $result = DB::connection('vlz')->table('marketing_plan')->insert($data);
+                    $result = DB::connection('amazon')->table('marketing_plan')->insert($data);
                     if ($result > 0) {
                         $new_mp = DB::connection('vlz')->table('marketing_plan')
                             ->select('id')
