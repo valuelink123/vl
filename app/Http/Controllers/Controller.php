@@ -232,7 +232,7 @@ class Controller extends BaseController
 		//查询该站点的最近一条item_price_amount>0的item_price_amount金额,为了替换掉状态为pending并且item_price_amount=0的金额数据\
 		$date = date('Y-m-d');//当前日期
 		//查询当前站点今天是否有价格的数据
-		$priceData = DB::connection('amazon')->select("select seller_account_id,asin,price from asin_price where marketplace_id = '".$site."' and created_at = '".$date."' group by seller_account_id,asin");
+		$priceData = DB::connection('amazon')->select("select seller_account_id,asin,max(price) AS price from asin_price where marketplace_id = '".$site."' and created_at = '".$date."' group by seller_account_id,asin");
 		//当前站点今天还没有数据的话，查询到要插入的数据，更新asin_price表
 		if(empty($priceData)) {
 			DB::connection('amazon')->table('asin_price')->where('marketplace_id',$site)->delete();//没有此站点今天的数据就把此站点以前的数据删除掉
