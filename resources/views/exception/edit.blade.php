@@ -705,7 +705,7 @@ if((Auth::user()->can(['exception-check']) || in_array($exception['group_id'],ar
 {{--				重新发送礼品卡邮件的按钮--}}
 				@if($exception['process_status'] == 'done')
 					<div class="col-md-6">
-						<button style="margin-top: 25px;" type="submit" name="again_send_email" value="1" class="btn blue again_send_email">Again Send Email</button>
+						<button style="margin-top: 25px;" type="submit" name="again_send_email" value="1" class="btn blue again_send_email">RESEND Email</button>
 					</div>
 				@endif
 			</div>

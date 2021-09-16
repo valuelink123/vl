@@ -48,7 +48,7 @@ class MarketingPlanController extends Controller
         /** 超级权限*/
         $ADMIN_EMAIL = Asin::ADMIN_EMAIL;
         if ($sap_seller_id > 0) {
-            $sql = "SELECT sams.asin,asins.marketplaceid,sams.sku_status,sams.sku,asins.reviews,asins.rating 
+            $sql = "SELECT sams.asin,asins.marketplaceid,any_value(sams.sku_status) as sku_status,any_value(sams.sku) as sku,any_value(asins.reviews) as reviews,any_value(asins.rating) as  rating 
                     from sap_asin_match_sku as sams LEFT JOIN asins on asins.asin= sams.asin 
                     WHERE sap_seller_id =" . $sap_seller_id . " AND marketplaceid!=''
                     GROUP BY asins.marketplaceid,sams.asin";
@@ -69,7 +69,7 @@ class MarketingPlanController extends Controller
                 }
             }
             if (in_array($user['email'], $ADMIN_EMAIL)) {
-                $sql = "SELECT sams.asin,asins.marketplaceid,sams.sku_status,sams.sku,asins.reviews,asins.rating 
+                $sql = "SELECT sams.asin,asins.marketplaceid,any_value(sams.sku_status) as sku_status,any_value(sams.sku) as sku,any_value(asins.reviews) as reviews,any_value(asins.rating) as  rating 
                     from sap_asin_match_sku as sams LEFT JOIN asins on asins.asin= sams.asin 
                     WHERE sap_seller_id in (" . implode($sapSellerIdList, ',') . ") and marketplaceid!=''
                     GROUP BY asins.marketplaceid,sams.asin";
