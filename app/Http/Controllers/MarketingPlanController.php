@@ -121,6 +121,7 @@ class MarketingPlanController extends Controller
                     AND asins.marketplaceid = '" . $request['marketplace_id'] . "' GROUP BY asins.marketplaceid,sams.asin";
             $user_asin_list_obj = DB::connection('amazon')->select($sql);
             $user_asin_list = (json_decode(json_encode($user_asin_list_obj), true));
+			$daily_statistics = array();
             if (!empty($user_asin_list)) {
                 $user_asin_list = $user_asin_list[0];
                 $seller_sku = $user_asin_list['seller_sku'];
@@ -154,14 +155,14 @@ class MarketingPlanController extends Controller
                         seller_sku,
                         asin,
                         IFNULL(
-                            sum(
+                            (
                               	amount_income +  amount_refund - cost
-                            ) / sum(
+                            ) / (
                                 quantity_shipped - quantity_returned
                             ),
                             0
                         ) AS single_economic,
-                        sum(
+                        (
                             quantity_shipped - quantity_returned
                         ) / 7 AS avg_day_sales
                     FROM
@@ -172,6 +173,7 @@ class MarketingPlanController extends Controller
                     AND marketplace_id='" . $request['marketplace_id'] . "'
                     AND asin = '" . $request['asin'] . "'
                     ";
+
             $statistics_o = DB::connection('amazon')->select($sql1);
             $statistics = (json_decode(json_encode($statistics_o), true));
             if (!empty($statistics)) {
