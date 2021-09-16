@@ -195,7 +195,7 @@ class ShipmentController extends Controller
             $shipmentList[$key]['toUrl'] = @$DOMIN_MARKETPLACEID_URL[$value['marketplace_id']];
         }
 
-        $sql_group = 'SELECT status,COUNT(id) as count_num from shipment_requests GROUP BY status=0,status=1,status=2,status=3,status=4,status=5';
+        $sql_group = 'SELECT any_value(status) as status,COUNT(id) as count_num from shipment_requests GROUP BY status=0,status=1,status=2,status=3,status=4,status=5';
         $status_group = DB::connection('vlz')->select($sql_group);
         $status_group = (json_decode(json_encode($status_group), true));
         if (!empty($status_group)) {
@@ -887,7 +887,7 @@ class ShipmentController extends Controller
         $DOMIN_MARKETPLACEID_SX = Asin::DOMIN_MARKETPLACEID_SX;
 
         if (!empty($request['asin']) && !empty($request['marketplace_id'])) {
-            $sql = "SELECT sku,seller_sku from sap_asin_match_sku WHERE asin='" . $request['asin'] . "' AND marketplace_id='" . $request['marketplace_id'] . "' GROUP BY seller_sku;";
+            $sql = "SELECT any_value(sku) as sku,seller_sku from sap_asin_match_sku WHERE asin='" . $request['asin'] . "' AND marketplace_id='" . $request['marketplace_id'] . "' GROUP BY seller_sku;";
             $sellersku = DB::connection('vlz')->select($sql);
             $data = (json_decode(json_encode($sellersku), true));
             if (!empty($data)) {
