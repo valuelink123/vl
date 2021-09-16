@@ -114,7 +114,7 @@ class MarketingPlanController extends Controller
                 ->where('marketplace_id', $request['marketplace_id'])
                 ->orderBy('date', 'desc')
                 ->first();
-            $sql = "SELECT asins.fulfillment,asins.commission,sams.asin,asins.marketplaceid,sams.sku_status,sams.sku,asins.reviews,asins.rating,sams.seller_sku  
+            $sql = "SELECT any_value(asins.fulfillment) as fulfillment,any_value(asins.commission) as commission,sams.asin,asins.marketplaceid,any_value(sams.sku_status) as sku_status,any_value(sams.sku) as sku,any_value(asins.reviews) as reviews,any_value(asins.rating) as rating,any_value(sams.seller_sku) as seller_sku  
                     from sap_asin_match_sku as sams 
 					LEFT JOIN asins on asins.asin= sams.asin and sams.asin = asins.asin and sams.marketplace_id = asins.marketplaceid 
                     WHERE asins.asin ='" . $request['asin'] . "' 
