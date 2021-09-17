@@ -48,7 +48,7 @@ class GetPpcSchedule extends Command
         $profileId = $this->option('profileId');
         $date = date('Y-m-d');
         $time = date('Gi');
-        $tasks = PpcSchedule::where('status',1)->where('date_from','<=',$date)
+        $tasks = PpcSchedule::where('status',1)->where('date_from','>=',$date)
         ->where('date_to','<=',$date)->whereRaw("replace(`time`,':','')<=$time and (done_at<='$date' or done_at is null)");
         if($profileId) $tasks = $tasks->where('profile_id',$profileId);
         $tasks = $tasks->get();
