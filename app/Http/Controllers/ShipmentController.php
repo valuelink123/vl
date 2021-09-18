@@ -319,8 +319,8 @@ class ShipmentController extends Controller
         /** 超级权限*/
         $DOMIN_MARKETPLACEID_SX = Asin::DOMIN_MARKETPLACEID_SX;
         $r_message = $seller_skus = $seller_accounts = $asins = [];
-        $label = $batch_num = $stock_day_num = $transfer_num = $planning_name = $seller_name = $sap_seller_id = $planer = '';
-        $FBA_keepday_num = $FBA_Stock = 0;
+        $label = $batch_num = $planning_name = $seller_name = $planer = '';
+        $FBA_keepday_num = $FBA_Stock = $transfer_num = $stock_day_num = $sap_seller_id = 0;
         if (!empty($request['asin'])) {
             if (!empty($request['asin']) && !empty($request['sku']) && !empty($request['seller_sku']) && !empty($request['warehouse']) && !empty($request['quantity']) && !empty($request['received_date'])) {
                 //查询亚马逊 label
