@@ -731,7 +731,7 @@ class ShipmentController extends Controller
         $old_status = $old_sap_seller_id = $new_status = $role_id = '';
         if (!empty($idList)) {
             $old_shipment = DB::connection('vlz')->table('shipment_requests')
-                ->distinct('status', 'sap_seller_id')
+				->distinct('status')
                 ->whereIn('id', $idList)
                 ->get()->map(function ($value) {
                     return (array)$value;
@@ -741,7 +741,6 @@ class ShipmentController extends Controller
                     return ['status' => 0, 'msg' => '更新失败,被修改信息状态不一致'];
                 } else {
                     $old_status = $old_shipment[0]['status'];
-                    $old_sap_seller_id = $old_shipment[0]['sap_seller_id'];
                     $new_status = @$request['status'];
                 }
             }
