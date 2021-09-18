@@ -189,7 +189,7 @@ class MarketingPlanController extends Controller
             $user_asin_list['single_economic'] = $single_economic == 0 ? 0 : $single_economic;
             $user_asin_list['avg_day_sales'] = $avg_day_sales == 0 ? 0 : $avg_day_sales;
             $user_asin_list['cost'] = $cost;
-            $user_asin_list['sku_status'] = $SKU_STATUS_KV[$user_asin_list['sku_status']];
+//            $user_asin_list['sku_status'] = $SKU_STATUS_KV[$user_asin_list['sku_status']];
 
             if (!empty($user_asin_list)) {
                 return $user_asin_list;
@@ -619,6 +619,22 @@ class MarketingPlanController extends Controller
                     if (!empty($asins)) {
                         $images = $asins->images;
                     }
+                    if(@$request['actual_cr']=='NaN'){
+						@$request['actual_cr'] = 0;
+					}
+					if(@$request['actual_60romi']=='NaN'){
+						@$request['actual_60romi'] = 0;
+					}
+					if(@$request['cr_complete']=='NaN'){
+						@$request['cr_complete'] = 0;
+					}
+					if(@$request['units_d_complete']=='NaN'){
+						@$request['units_d_complete'] = 0;
+					}
+					if(@$request['e_val_complete']=='NaN'){
+						@$request['e_val_complete'] = 0;
+					}
+
                     $data = [
                         'sap_seller_id' => $request['sap_seller_id'],
                         'goal' => @$request['goal'],
@@ -638,7 +654,7 @@ class MarketingPlanController extends Controller
                         'to_time' => @$request['to_time'],
                         'rsg_price' => @$request['rsg_price'], 'rsg_d_target' => @$request['rsg_d_target'],
                         'rsg_total' => @$request['rsg_total'], 'est_spend' => @$request['est_spend'],
-                        'current_rank' => @$request['current_rank'], 'current_cr' => @$request['current_cr'],
+                        'current_rank' => @$request['current_rank'], 'current_cr' => str_replace('%','',@$request['current_cr']),
                         'current_units_day' => @$request['current_units_day'], 'current_e_val' => @$request['current_e_val'], 'sap_seller_id' => @$request['sap_seller_id'],
                         'current_60romi' => @$request['current_60romi'], 'actual_rank' => @$request['actual_rank'],
                         'actual_cr' => @$request['actual_cr'], 'actual_units_day' => @$request['actual_units_day'] ? @$request['actual_units_day'] : 0,
