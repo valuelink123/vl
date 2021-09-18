@@ -93,7 +93,7 @@ th,td,td>span {
                                         <option value="">All Listing Status</option>
                                         <option value="1" <?php if(1==array_get($_REQUEST,'listing_status')) echo 'selected';?>>Listing Down</option>
 										<option value="2" <?php if(2==array_get($_REQUEST,'listing_status')) echo 'selected';?>>Listing UnAvailable</option>
-										<option value="3" <?php if(3==array_get($_REQUEST,'listing_status') || !isset($_REQUEST['listing_status'])) echo 'selected';?>>Listing Available</option>
+										<option value="3" <?php if(3==array_get($_REQUEST,'listing_status')) echo 'selected';?>>Listing Available</option>
                                     </select>
                                        
 						</div>
