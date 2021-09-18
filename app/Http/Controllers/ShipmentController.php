@@ -731,9 +731,8 @@ class ShipmentController extends Controller
         $old_status = $old_sap_seller_id = $new_status = $role_id = '';
         if (!empty($idList)) {
             $old_shipment = DB::connection('vlz')->table('shipment_requests')
-                ->select('status', 'sap_seller_id')
+                ->distinct('status', 'sap_seller_id')
                 ->whereIn('id', $idList)
-                ->groupBy('status')
                 ->get()->map(function ($value) {
                     return (array)$value;
                 })->toArray();
