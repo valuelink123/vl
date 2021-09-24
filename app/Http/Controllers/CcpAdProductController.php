@@ -52,7 +52,7 @@ class CcpAdProductController extends Controller
 					$siteDate[$vv->marketplaceid] = date('Y-m-d',$this->getCurrentTime($vv->marketplaceid,1));
 			}
 			$date = $siteDate[current($site)->marketplaceid];
-			$type = array('SProducts','SDisplay');
+			$type = array('SProducts'=>'Sponsored Products','SDisplay'=>'Sponsored Display');
 			return view('ccp/ad_product',['bgs'=>$bgs,'bus'=>$bus,'site'=>$site,'date'=>$date,'siteDate'=>$siteDate,'type'=>$type]);
         }
         /*

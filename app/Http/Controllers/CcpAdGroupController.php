@@ -42,7 +42,7 @@ class CcpAdGroupController extends Controller
 		$site = getMarketDomain();//获取站点选项
 		$this->date = date('Y-m-d');
 		$siteDate = array();
-		$type = array('SProducts','SDisplay','SBrands');
+		$type = array('SProducts'=>'Sponsored Products','SDisplay'=>'Sponsored Display','SBrands'=>'Sponsored Brands');
 		foreach($site as $kk=>$vv){
 			$siteDate[$vv->marketplaceid] = date('Y-m-d',$this->getCurrentTime($vv->marketplaceid,1));
 		}

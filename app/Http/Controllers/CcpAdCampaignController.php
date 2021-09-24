@@ -45,7 +45,7 @@ class CcpAdCampaignController extends Controller
 		foreach($site as $kk=>$vv){
 			$siteDate[$vv->marketplaceid] = date('Y-m-d',$this->getCurrentTime($vv->marketplaceid,1));
 		}
-		$type = array('SProducts','SDisplay','SBrands');
+		$type = array('SProducts'=>'Sponsored Products','SDisplay'=>'Sponsored Display','SBrands'=>'Sponsored Brands');
 		$date = $siteDate[current($site)->marketplaceid];
 		return view('ccp/ad_campaign',['site'=>$site,'date'=>$date,'siteDate'=>$siteDate,'type'=>$type]);
 	}

@@ -47,7 +47,7 @@ class CcpAdKeywordController extends Controller
 			$siteDate[$vv->marketplaceid] = date('Y-m-d',$this->getCurrentTime($vv->marketplaceid,1));
 		}
 		$date = $siteDate[current($site)->marketplaceid];
-		$type = array('SProducts','SBrands');
+		$type = array('SProducts'=>'Sponsored Products','SBrands'=>'Sponsored Brands');
 		return view('ccp/ad_keyword',['site'=>$site,'date'=>$date,'siteDate'=>$siteDate,'type'=>$type]);
 	}
 	/*
