@@ -1117,6 +1117,14 @@
                                                     </a>
                                                 </li>
                                                 @endpermission
+                                                @permission('ccp-ad-target-show')
+                                                <li class="">
+                                                    <a href="/ccp/adTarget" class="nav-link nav-toggle ">
+                                                        AD Target
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
+                                                @endpermission
 											</ul>
 										</li>
 

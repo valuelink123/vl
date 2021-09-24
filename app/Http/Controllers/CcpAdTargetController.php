@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Auth;
 use DB;
 
 
-class CcpAdKeywordController extends Controller
+class CcpAdTargetController extends Controller
 {
 	/**
 	 * Create a new controller instance.
@@ -23,6 +23,8 @@ class CcpAdKeywordController extends Controller
 		'table_group' => array('SProducts'=>'ppc_sproducts_ad_groups','SDisplay'=>'ppc_sdisplay_ad_groups','SBrands'=>'ppc_sbrands_ad_groups'),
 		'table_campaign' => array('SProducts'=>'ppc_sproducts_campaigns','SDisplay'=>'ppc_sdisplay_campaigns','SBrands'=>'ppc_sbrands_campaigns'),
 		'table_keyword' => array('SProducts'=>'ppc_sproducts_keywords','SBrands'=>'ppc_sbrands_keywords'),
+		'table_product' => array('SProducts'=>'ppc_sproducts_ads','SDisplay'=>'ppc_sdisplay_ads'),
+		'table_target' => array('SProducts'=>'ppc_sproducts_targets','SDisplay'=>'ppc_sdisplay_targets','SBrands'=>'ppc_sbrands_targets'),
 		'budget_field' => array('SProducts'=>'daily_budget','SDisplay'=>'budget','SBrands'=>'budget'),
 	);
 
@@ -39,16 +41,17 @@ class CcpAdKeywordController extends Controller
 	 */
 	public function index()
 	{
-		if(!Auth::user()->can(['ccp-ad-keyword-show'])) die('Permission denied -- ccp ad keyword show');
+		if(!Auth::user()->can(['ccp-ad-target-show'])) die('Permission denied -- ccp ad target show');
 		$site = getMarketDomain();//获取站点选项
 		$this->date = date('Y-m-d');
+
 		$siteDate = array();
 		foreach($site as $kk=>$vv){
 			$siteDate[$vv->marketplaceid] = date('Y-m-d',$this->getCurrentTime($vv->marketplaceid,1));
 		}
+		$type = array('SProducts','SDisplay','SBrands');
 		$date = $siteDate[current($site)->marketplaceid];
-		$type = array('SProducts','SBrands');
-		return view('ccp/ad_keyword',['site'=>$site,'date'=>$date,'siteDate'=>$siteDate,'type'=>$type]);
+		return view('ccp/ad_target',['site'=>$site,'date'=>$date,'siteDate'=>$siteDate,'type'=>$type]);
 	}
 	/*
 	* 获得统计总数据
@@ -60,41 +63,46 @@ class CcpAdKeywordController extends Controller
 		$search = $this->getSearchData(explode('&',$search));
 		$site = isset($search['site']) ? $search['site'] : '';//站点，为marketplaceid
 		$account = isset($search['account']) ? $search['account'] : '';//账号id,seller_id
+		$type = isset($search['type']) ? $search['type'] : '';
 		$this->start_date = isset($search['start_date']) ? $search['start_date'] : '';
 		$this->end_date = isset($search['end_date']) ? $search['end_date'] : '';
 		$domain = substr(getDomainBySite($site), 4);//orders.sales_channel
 		$siteCur = getSiteCur();
 		$currency_code = isset($siteCur[$domain]) ? $siteCur[$domain] : '';
-		$type = isset($search['type']) ? $search['type'] : '';
 
-		//时间搜索范围
-		$where = $this->getPpcDateWhere();
 		$account_data = $this->getPpcAccountByMarketplace($site);
 		$account_id = array_keys($account_data);
+		//时间搜索范围
+		$where = $this->getPpcDateWhere();
 		$where .= " and ppc_profiles.account_id in(".implode(",",$account_id).")";
 		if($account){
 			$account_str = implode("','", explode(',',$account));
 			$where .= " and ppc_profiles.seller_id in('".$account_str."')";
 		}
 
-		$table_keyword = isset($this->typeConfig['table_keyword'][$type]) ? $this->typeConfig['table_keyword'][$type] : '';
+		$table_target = isset($this->typeConfig['table_target'][$type]) ? $this->typeConfig['table_target'][$type] : '';
 		$table_campaign = isset($this->typeConfig['table_campaign'][$type]) ? $this->typeConfig['table_campaign'][$type] : '';
+		$table_group = isset($this->typeConfig['table_group'][$type]) ? $this->typeConfig['table_group'][$type] : '';
 
+		$left = " left join {$table_campaign} as campaigns on targets.campaign_id = campaigns.campaign_id ";
+		if($type=='SDisplay'){
+			$left = " left join {$table_group} as groups on targets.ad_group_id = groups.ad_group_id
+			 left join {$table_campaign} as campaigns on campaigns.campaign_id = groups.campaign_id ";
+		}
 		$sql = "SELECT  
 					round(sum(ppc_report_datas.cost),2) as cost,
 					round(sum(ppc_report_datas.attributed_sales1d),2) as sales
 			FROM
-					{$table_keyword} as keywords
-			left join {$table_campaign} as campaigns on keywords.campaign_id = campaigns.campaign_id 
+					{$table_target} as targets
+			{$left}
 			LEFT JOIN ppc_report_datas ON (
-					ppc_report_datas.record_type = 'keyword'
-					AND keywords.keyword_id = ppc_report_datas.record_type_id 
+					ppc_report_datas.record_type = 'target'
+					AND targets.target_id = ppc_report_datas.record_type_id 
 			)
  			left join ppc_profiles on campaigns.profile_id = ppc_profiles.profile_id
 			where ad_type = '".$type."' 
 			{$where}";
 
-		//sales数据，orders数据
 		$orderData = DB::select($sql);
 		$array = array(
 			'sales' => round($orderData[0]->sales,2),
@@ -111,14 +119,14 @@ class CcpAdKeywordController extends Controller
 		$search = $this->getSearchData(explode('&',$search));
 		$site = isset($search['site']) ? $search['site'] : '';//站点，为marketplaceid
 		$account = isset($search['account']) ? $search['account'] : '';//账号id,例如115,137
+		$type = isset($search['type']) ? $search['type'] : '';
 		$this->start_date = isset($search['start_date']) ? $search['start_date'] : '';
 		$this->end_date = isset($search['end_date']) ? $search['end_date'] : '';
-		$type = isset($search['type']) ? $search['type'] : '';
 
-		//时间搜索范围
-		$where = $this->getPpcDateWhere();
 		$account_data = $this->getPpcAccountByMarketplace($site);
 		$account_id = array_keys($account_data);
+		//时间搜索范围
+		$where = $this->getPpcDateWhere();
 		$where .= " and ppc_profiles.account_id in(".implode(",",$account_id).")";
 		if($account){
 			$account_str = implode("','", explode(',',$account));
@@ -130,35 +138,43 @@ class CcpAdKeywordController extends Controller
 			$limit = " LIMIT {$limit} ";
 		}
 
-		$table_keyword = isset($this->typeConfig['table_keyword'][$type]) ? $this->typeConfig['table_keyword'][$type] : '';
+		$table_target = isset($this->typeConfig['table_target'][$type]) ? $this->typeConfig['table_target'][$type] : '';
 		$table_campaign = isset($this->typeConfig['table_campaign'][$type]) ? $this->typeConfig['table_campaign'][$type] : '';
+		$table_group = isset($this->typeConfig['table_group'][$type]) ? $this->typeConfig['table_group'][$type] : '';
+
+		$left = " left join {$table_campaign} as campaigns on targets.campaign_id = campaigns.campaign_id ";
+		if($type=='SDisplay'){
+			$left = " left join {$table_group} as groups on targets.ad_group_id = groups.ad_group_id
+			 left join {$table_campaign} as campaigns on campaigns.campaign_id = groups.campaign_id ";
+		}
 
 		$sql = "SELECT  SQL_CALC_FOUND_ROWS 
-					keywords.keyword_text as keyword_text,
-					any_value(keywords.match_type) as match_type,
-					any_value(keywords.state) as state,
+					any_value(targets.target_id) as target_id,
+					any_value(targets.bid) as bid,
+					any_value(targets.state) as state,
 					round(sum(ppc_report_datas.cost),2) as cost,
 					sum(ppc_report_datas.clicks) as clicks,
 					round(sum(ppc_report_datas.attributed_sales1d),2) as sales,
 					sum(ppc_report_datas.attributed_conversions1d_same_sku) as orders,
 					sum(ppc_report_datas.impressions) as impressions
 			FROM
-					{$table_keyword} as keywords
-			left join {$table_campaign} as campaigns on keywords.campaign_id = campaigns.campaign_id 
+					{$table_target} as targets
+			{$left}
 			LEFT JOIN ppc_report_datas ON (
-					ppc_report_datas.record_type = 'keyword'
-					AND keywords.keyword_id = ppc_report_datas.record_type_id 
+					ppc_report_datas.record_type = 'target'
+					AND targets.target_id = ppc_report_datas.record_type_id 
 			)
  			left join ppc_profiles on campaigns.profile_id = ppc_profiles.profile_id
 			where ad_type = '".$type."' 
 			{$where} 
-			GROUP BY keywords.keyword_text 
+			GROUP BY targets.target_id 
 			 order by sales desc {$limit}";
 
 		$_data = DB::select($sql);
 		$recordsTotal = $recordsFiltered = DB::select('SELECT FOUND_ROWS() as total');
 		$recordsTotal = $recordsFiltered = $recordsTotal[0]->total;
 
+		$data_account = getSellerAccout();
 		//AD CONVERSION RATE = orders/click  CTR = click/impressions  cpc = sum(cost*clicks)/sum(clicks)  acos=cost/sales
 		$data = array();
 		foreach($_data as $key=>$val){
@@ -167,7 +183,8 @@ class CcpAdKeywordController extends Controller
 			$val['ctr'] = $val['impressions'] > 0 ? sprintf("%.2f",$val['clicks']*100/$val['impressions']).'%' : '-';
 			$val['cpc'] = $val['clicks'] > 0 ? sprintf("%.2f",$val['cost']/$val['clicks']) : '-';
 			$val['cr'] = $val['clicks'] > 0 ? sprintf("%.2f",$val['orders']*100/$val['clicks']).'%' : '-';
-			$data[$val['keyword_text']] = $val;
+			$val['bid'] = sprintf("%.2f",$val['bid']);
+			$data[$val['target_id']] = $val;
 		}
 		$data = array_values($data);
 		return compact('data', 'recordsTotal', 'recordsFiltered');

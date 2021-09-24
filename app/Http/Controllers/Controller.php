@@ -475,4 +475,29 @@ class Controller extends BaseController
 		return $account;
 	}
 
+	//得到ppc模块搜索时间的sql
+	public function getPpcDateWhere()
+	{
+		$startDate = date('Y-m-d',strtotime($this->start_date));//开始时间
+		$endDate = date('Y-m-d',strtotime($this->end_date));//结束时间
+		$where = " and ppc_report_datas.date >= '".$startDate."' and ppc_report_datas.date <= '".$endDate."'";
+		return $where;
+	}
+	/*
+	 * 通过选择的站点得到该站点下的所有账号信息
+	 */
+	public function getPpcAccountByMarketplace($marketplace)
+	{
+		$sql = "select accounts.id,accounts.seller_id 
+				from accounts
+				left join marketplaces on accounts.marketplace_id = marketplaces.id 
+    			where user_id = 8566 and marketplaces.marketplace = '".$marketplace."'";
+		$_account = DB::connection('ad')->select($sql);
+		$account = array();
+		foreach($_account as $key=>$val){
+			$account[$val->id] = $val->seller_id;
+		}
+		return $account;
+	}
+
 }

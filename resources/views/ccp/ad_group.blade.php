@@ -74,6 +74,18 @@
                             </select>
                         </div>
                     </div>
+
+                    <div class="col-md-2">
+                        <div class="input-group">
+                            <span class="input-group-addon">Type</span>
+                            <select  style="width:100%;height:35px;" data-recent="" data-recent-date="" id="type" name="type">
+                                @foreach($type as $value)
+                                    <option value="{{ $value }}">{{ $value }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+
                     <div class="col-md-2">
                         <div class="input-group">
                             <div class="btn-group pull-right" >

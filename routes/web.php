@@ -344,6 +344,10 @@ Route::post('/ccp/adCampaign/list', 'CcpAdCampaignController@list');//ccp功能�
 Route::get('/ccp/adGroup', 'CcpAdGroupController@index'); //功能入口
 Route::post('/ccp/adGroup/showTotal', 'CcpAdGroupController@showTotal'); //ccp功能展示顶部统计数据
 Route::post('/ccp/adGroup/list', 'CcpAdGroupController@list');//ccp功能的列表展示
+
+Route::get('/ccp/adTarget', 'CcpAdTargetController@index'); //功能入口
+Route::post('/ccp/adTarget/showTotal', 'CcpAdTargetController@showTotal'); //ccp功能展示顶部统计数据
+Route::post('/ccp/adTarget/list', 'CcpAdTargetController@list');//ccp功能的列表展示
 //ccp-ad模块结束
 
 Route::get('/ccp/salesboard', 'CcpSalesboardController@index');

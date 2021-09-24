@@ -19,6 +19,11 @@ class CcpAdGroupController extends Controller
 
 	public $start_date = '';//搜索时间范围的开始时间
 	public $end_date = '';//搜索时间范围的结束时间
+	public $typeConfig = array(
+		'table_group' => array('SProducts'=>'ppc_sproducts_ad_groups','SDisplay'=>'ppc_sdisplay_ad_groups','SBrands'=>'ppc_sbrands_ad_groups'),
+		'table_campaign' => array('SProducts'=>'ppc_sproducts_campaigns','SDisplay'=>'ppc_sdisplay_campaigns','SBrands'=>'ppc_sbrands_campaigns'),
+		'budget_field' => array('SProducts'=>'daily_budget','SDisplay'=>'budget','SBrands'=>'budget'),
+	);
 
 	public function __construct()
 	{
@@ -37,11 +42,12 @@ class CcpAdGroupController extends Controller
 		$site = getMarketDomain();//获取站点选项
 		$this->date = date('Y-m-d');
 		$siteDate = array();
+		$type = array('SProducts','SDisplay','SBrands');
 		foreach($site as $kk=>$vv){
 			$siteDate[$vv->marketplaceid] = date('Y-m-d',$this->getCurrentTime($vv->marketplaceid,1));
 		}
 		$date = $siteDate[current($site)->marketplaceid];
-		return view('ccp/ad_group',['site'=>$site,'date'=>$date,'siteDate'=>$siteDate]);
+		return view('ccp/ad_group',['site'=>$site,'date'=>$date,'siteDate'=>$siteDate,'type'=>$type]);
 	}
 	/*
 	* 获得统计总数据
@@ -58,43 +64,36 @@ class CcpAdGroupController extends Controller
 		$domain = substr(getDomainBySite($site), 4);//orders.sales_channel
 		$siteCur = getSiteCur();
 		$currency_code = isset($siteCur[$domain]) ? $siteCur[$domain] : '';
+		$type = isset($search['type']) ? $search['type'] : '';
 
 		//时间搜索范围
-		$where = $this->getDateWhere();
-		$where_profile = " and marketplaces.marketplace = '".$site."'";
-
+		$where = $this->getPpcDateWhere();
+		$account_data = $this->getPpcAccountByMarketplace($site);
+		$account_id = array_keys($account_data);
+		$where .= " and ppc_profiles.account_id in(".implode(",",$account_id).")";
 		if($account){
 			$account_str = implode("','", explode(',',$account));
-			$where_profile .= " and accounts.seller_id in('".$account_str."')";
+			$where .= " and ppc_profiles.seller_id in('".$account_str."')";
 		}
 
-		//sales数据，orders数据
-		$sql ="SELECT  
-					round(sum(ppc_reports.cost),2) as cost,
-					round(sum(ppc_reports.attributed_sales1d),2) as sales
+		$table_group = isset($this->typeConfig['table_group'][$type]) ? $this->typeConfig['table_group'][$type] : '';
+		$table_campaign = isset($this->typeConfig['table_campaign'][$type]) ? $this->typeConfig['table_campaign'][$type] : '';
+
+		$sql = "SELECT  
+					round(sum(ppc_report_datas.cost),2) as cost,
+					round(sum(ppc_report_datas.attributed_sales1d),2) as sales
 			FROM
-					ppc_ad_groups
-			LEFT JOIN ppc_reports ON (
-					ppc_reports.record_type = 'Ppc::AdGroup'
-					AND ppc_ad_groups.ad_group_id = ppc_reports.record_type_id
+					{$table_group} as groups
+			left join {$table_campaign} as campaigns on groups.campaign_id = campaigns.campaign_id
+			LEFT JOIN ppc_report_datas ON (
+					ppc_report_datas.record_type = 'adGroup'
+					AND groups.ad_group_id = ppc_report_datas.record_type_id 
 			)
-			WHERE
-					ppc_reports.profile_id IN (
-							SELECT
-									ppc_profiles.profile_id
-							FROM
-									accounts,
-									ppc_profiles,
-									marketplaces
-							WHERE
-									accounts.user_id = 8566
-							AND ppc_profiles.account_id = accounts.id
-							AND accounts.marketplace_id = marketplaces.id 
-						{$where_profile}
-					)
+ 			left join ppc_profiles on campaigns.profile_id = ppc_profiles.profile_id
+			where ad_type = '".$type."' 
 			{$where}";
 
-		$orderData = DB::connection('ad')->select($sql);
+		$orderData = DB::select($sql);
 		$array = array(
 			'sales' => round($orderData[0]->sales,2),
 			'cost' => round($orderData[0]->cost,2),
@@ -112,61 +111,56 @@ class CcpAdGroupController extends Controller
 		$account = isset($search['account']) ? $search['account'] : '';//账号id,例如115,137
 		$this->start_date = isset($search['start_date']) ? $search['start_date'] : '';
 		$this->end_date = isset($search['end_date']) ? $search['end_date'] : '';
+		$type = isset($search['type']) ? $search['type'] : '';
+
 		//时间搜索范围
-		$where = $this->getDateWhere();
-		$where_profile = " and marketplaces.marketplace = '".$site."'";
+		$where = $this->getPpcDateWhere();
+		$account_data = $this->getPpcAccountByMarketplace($site);
+		$account_id = array_keys($account_data);
+		$where .= " and ppc_profiles.account_id in(".implode(",",$account_id).")";
 		if($account){
 			$account_str = implode("','", explode(',',$account));
-			$where_profile .= " and accounts.seller_id in('".$account_str."')";
+			$where .= " and ppc_profiles.seller_id in('".$account_str."')";
 		}
+
+		$table_group = isset($this->typeConfig['table_group'][$type]) ? $this->typeConfig['table_group'][$type] : '';
+		$table_campaign = isset($this->typeConfig['table_campaign'][$type]) ? $this->typeConfig['table_campaign'][$type] : '';
 
 		if($_REQUEST['length']){
 			$limit = $this->dtLimit($req);
 			$limit = " LIMIT {$limit} ";
 		}
+		$state = " any_value(groups.state) as state,";
+		if($type=='SBrands'){
+			$state = " '-' as state,";
+		}
 
 		$sql = "SELECT SQL_CALC_FOUND_ROWS 
-					any_value(accounts.seller_id) as seller_id,
-					ppc_ad_groups.name as group_name,
-       				any_value(ppc_campaigns.name) as campaign_name, 
-					any_value(ppc_ad_groups.state) as state,
-					round(sum(ppc_reports.cost),2) as cost,
-					sum(ppc_reports.clicks) as clicks,
-					round(sum(ppc_reports.attributed_sales1d),2) as sales,
-					sum(ppc_reports.attributed_conversions1d_same_sku) as orders,
-					sum(ppc_reports.impressions) as impressions
+					any_value(ppc_profiles.account_name) as account_name,
+       				any_value(ppc_profiles.seller_id) as seller_id,
+					groups.name as group_name,
+       				any_value(campaigns.name) as campaign_name, 
+					{$state}
+					round(sum(ppc_report_datas.cost),2) as cost,
+					sum(ppc_report_datas.clicks) as clicks,
+					round(sum(ppc_report_datas.attributed_sales1d),2) as sales,
+					sum(ppc_report_datas.attributed_conversions1d_same_sku) as orders,
+					sum(ppc_report_datas.impressions) as impressions
 			FROM
-					ppc_ad_groups
-			LEFT JOIN ppc_reports ON (
-					ppc_reports.record_type = 'Ppc::AdGroup'
-					AND ppc_ad_groups.ad_group_id = ppc_reports.record_type_id
+					{$table_group} as groups
+			left join {$table_campaign} as campaigns on groups.campaign_id = campaigns.campaign_id
+			LEFT JOIN ppc_report_datas ON (
+					ppc_report_datas.record_type = 'adGroup'
+					AND groups.ad_group_id = ppc_report_datas.record_type_id 
 			)
-			left join ppc_campaigns on ppc_ad_groups.campaign_id = ppc_campaigns.campaign_id 
-			left join ppc_profiles on ppc_campaigns.profile_id = ppc_profiles.profile_id
-			left join accounts on ppc_profiles.account_id = accounts.id 
-			WHERE
-					ppc_reports.profile_id IN (
-							SELECT
-									ppc_profiles.profile_id
-							FROM
-									accounts,
-									ppc_profiles,
-									marketplaces
-							WHERE
-									accounts.user_id = 8566
-							AND ppc_profiles.account_id = accounts.id
-							AND accounts.marketplace_id = marketplaces.id 
-						{$where_profile}
-			
-					)
-			{$where}
-			
-			GROUP BY ppc_ad_groups.name 
+ 			left join ppc_profiles on campaigns.profile_id = ppc_profiles.profile_id
+			where ad_type = '".$type."' 
+			{$where} 
+			GROUP BY groups.name 
 			 order by sales desc {$limit}";
 
-
-		$_data = DB::connection('ad')->select($sql);
-		$recordsTotal = $recordsFiltered = DB::connection('ad')->select('SELECT FOUND_ROWS() as total');
+		$_data = DB::select($sql);
+		$recordsTotal = $recordsFiltered = DB::select('SELECT FOUND_ROWS() as total');
 		$recordsTotal = $recordsFiltered = $recordsTotal[0]->total;
 
 		$data_account = getSellerAccout();
@@ -184,16 +178,6 @@ class CcpAdGroupController extends Controller
 		}
 		$data = array_values($data);
 		return compact('data', 'recordsTotal', 'recordsFiltered');
-	}
-
-
-	//得到搜索时间的sql
-	public function getDateWhere()
-	{
-		$startDate = date('Y-m-d',strtotime($this->start_date));//开始时间
-		$endDate = date('Y-m-d',strtotime($this->end_date));//结束时间
-		$where = " and ppc_reports.date >= '".$startDate."' and ppc_reports.date <= '".$endDate."'";
-		return $where;
 	}
 
 }
