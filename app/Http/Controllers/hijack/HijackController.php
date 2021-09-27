@@ -340,7 +340,7 @@ class HijackController extends Controller
         if ($taskId > 0) {
 			//每个任务的具体账号信息
 			$_taskDetail = DB::connection('amazon')->table('tbl_reselling_detail')
-				->select('id', 'price', 'task_id', 'shipping_fee', 'account', 'white', 'sellerid', 'created_at', 'reselling_remark')
+				->select('id', 'price', 'task_id', 'shipping_fee', 'account', 'white', 'sellerid','ismain', 'created_at', 'reselling_remark')
 				->where('task_id', $taskId)
 				->where('white', 0)
 				->get()->toArray();
@@ -355,6 +355,7 @@ class HijackController extends Controller
 				}else{
 					$taskDetail[$k]['remark'] = '(非公司账号)';
 				}
+				$taskDetail[$k]['main'] = $v->ismain==0 ? '非购物车店铺' : '购物车店铺' ;
 				$taskDetail[$k]['sellerid'] = $v->sellerid;
 				$taskDetail[$k]['price'] = $v->price / 100;
 				$taskDetail[$k]['shipping_fee'] = $v->shipping_fee / 100;
