@@ -178,7 +178,7 @@ class HijackController extends Controller
 		}
 //        $where .= ' AND rl_asin.asin in ("' . implode( '","',$userasin) . '")';
 
-		$where .= ' AND rl_asin.asin in ("' .$asin_sql. '")';
+		$where .= ' AND rl_asin.asin in (' .$asin_sql. ')';
 		if($request['length'] != '-1'){//等于-1时为查看全部的数据
 			$limit = $this->dtLimit($request);
 			$limit = " LIMIT {$limit} ";
@@ -201,7 +201,7 @@ class HijackController extends Controller
 		$order = '  ORDER BY '.$field .' '.$sort;
 
 		$sql =  $sql_s.$where.$order.$limit;
-
+		
         $productList_obj = DB::connection('amazon')->select($sql);
         $productList = (json_decode(json_encode($productList_obj), true));
 		$recordsTotal = $recordsFiltered = (DB::connection('amazon')->select('SELECT FOUND_ROWS() as total'))[0]->total;
