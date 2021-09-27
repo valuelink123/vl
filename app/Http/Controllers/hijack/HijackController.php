@@ -93,7 +93,7 @@ class HijackController extends Controller
 		$search = $this->getSearchData(explode('&',$search));
 
         $user = Auth::user(); //todo  打开
-		$userWhere = ' where 1 = 1';//$userWhere是用于限制可查的asin
+		$userWhere = ' where length(sap_asin_match_sku.asin)=10 ';//$userWhere是用于限制可查的asin
 		if(!in_array($user->email, $ADMIN_EMAIL)){//不是超级管理员数组
 			if ($user->seller_rules) {
 				$rules = explode("-", $user->seller_rules);
@@ -176,8 +176,9 @@ class HijackController extends Controller
 		if (isset($search['site']) && $search['site']!='') {
 			$where .= " AND `domain` = '".$search['site']."'";
 		}
-        $where .= ' AND rl_asin.asin in ("' . implode( '","',$userasin) . '")';
+//        $where .= ' AND rl_asin.asin in ("' . implode( '","',$userasin) . '")';
 
+		$where .= ' AND rl_asin.asin in ("' .$asin_sql. '")';
 		if($request['length'] != '-1'){//等于-1时为查看全部的数据
 			$limit = $this->dtLimit($request);
 			$limit = " LIMIT {$limit} ";
@@ -207,11 +208,13 @@ class HijackController extends Controller
 
         //asin相关的对应关系数据,//marketplace_id,sap_seller_id,asin,sap_seller_bg,sap_seller_bu
 		$sap_asin_match_sku = array();
-        $_sap_asin_match_sku = DB::connection('amazon')->table('sap_asin_match_sku')
-            ->select('marketplace_id', 'sap_seller_id', 'asin', 'sap_seller_bg', 'sap_seller_bu', 'id', 'status', 'updated_at', 'sku_status', 'sku')
-             ->whereIn('asin', $userasin)
-            ->groupBy('asin')
-            ->get()->toArray();
+		$sap_asin_match_sku_sql="select marketplace_id, sap_seller_id, asin, sap_seller_bg, sap_seller_bu, id, status, updated_at,sku_status,sku from sap_asin_match_sku {$userWhere}";
+//        $_sap_asin_match_sku = DB::connection('amazon')->table('sap_asin_match_sku')
+//            ->select('marketplace_id', 'sap_seller_id', 'asin', 'sap_seller_bg', 'sap_seller_bu', 'id', 'status', 'updated_at', 'sku_status', 'sku')
+//             ->whereIn('asin', $userasin)
+//            ->get()->toArray();
+		$_sap_asin_match_sku = DB::connection('amazon')->select($sap_asin_match_sku_sql);
+
         foreach($_sap_asin_match_sku as $sk=>$sv){
 			$sap_asin_match_sku[$sv->asin] = (array)$sv;
 		}
