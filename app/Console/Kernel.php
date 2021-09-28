@@ -96,7 +96,7 @@ class Kernel extends ConsoleKernel
 		if($x>9) $x=0;
 		$x++;
         }
-		$accountList = DB::table('accounts')->whereRaw("type='Amazon' or (bg is not null and bg<>'BG0')")->get(array('id'));
+		$accountList = DB::table('accounts')->whereRaw("type='Amazon' or (bg is not null and bg<>'BG1')")->get(array('id'));
         $x=0;
 		foreach($accountList as $account){
 			if($x>9) $x=0;//每十分钟发送一次,$x>9就置0
