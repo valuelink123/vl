@@ -279,6 +279,7 @@ class HistoryClient extends Command
 				$insertInfo = array(
 					'name'=>$val['name'],
 					'email'=>$val['email'],
+					'encrypted_email'=>md5($val['email']).mt_rand(1000,9999).'@valuelinkltd.com',
 					'phone'=>$val['phone'],
 					'country'=>$val['country'],
 					'brand'=>$val['brand'],
