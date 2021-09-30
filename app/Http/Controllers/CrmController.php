@@ -429,7 +429,10 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 				return redirect()->back()->withInput();
 			}
 			$insertInfo['email'] = array_get($en_email,$val['email'],$val['email']);
-			$insertInfo['encrypted_email'] = array_search($insertInfo['email'],$en_email) ??md5($insertInfo['email']).rand(1000,9999).'@valuelinkltd.com';
+			$insertInfo['encrypted_email'] = array_search($insertInfo['email'],$en_email);
+			if(empty($insertInfo['encrypted_email'])){
+				$insertInfo['encrypted_email'] = md5($insertInfo['email']).rand(1000,9999).'@valuelinkltd.com';
+			}
 			$insertInfo['phone'] = $val['phone'];
             $insertInfo['remark'] = $val['remark'];
 
