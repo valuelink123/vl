@@ -55,13 +55,22 @@
                             <input  class="form-control"  value="" id="sku" name="sku"/>
                         </div>
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-1">
                         <div class="input-group">
                             <div class="btn-group pull-right" >
                                 <button id="search_table" class="btn sbold blue">Search</button>
                             </div>
                         </div>
                     </div>
+                    @permission('return-analysis-export')
+                    <div class="col-md-1">
+                        <div class="input-group">
+                            <div class="btn-group pull-right" >
+                                <button id="export_table" class="btn sbold blue">Export</button>
+                            </div>
+                        </div>
+                    </div>
+                    @endpermission
                 </form>
             </div>
 
@@ -140,6 +149,12 @@
         $('#search_table').click(function(){
             dtApi.settings()[0].ajax.data = {search: $("#search-form").serialize()};
             dtApi.ajax.reload();
+            return false;
+        })
+        //点击导出
+        $('#export_table').click(function(){
+            dtApi.settings()[0].ajax.data = {search: $("#search-form").serialize()};
+            location.href='/returnAnalysis/export?'+$("#search-form").serialize();
             return false;
         })
 

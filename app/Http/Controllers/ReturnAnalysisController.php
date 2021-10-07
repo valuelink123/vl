@@ -17,6 +17,28 @@ class ReturnAnalysisController extends Controller
 	 */
 	use \App\Traits\DataTables;
 	use \App\Traits\Mysqli;
+
+	public $reasonType = [
+		0=>['name'=>'其他','reason'=>['DID_NOT_LIKE_FABRIC','PRODUCT_NOT_ITALIAN']],
+		1=>['name'=>'产品缺陷','reason'=>['DEFECTIVE']],
+		2=>['name'=>'品质问题','reason'=>['QUALITY_UNACCEPTABLE','APPAREL_STYLE']],
+		3=>['name'=>'产品损坏','reason'=>['DAMAGED_BY_CARRIER','DAMAGED_BY_FC','CUSTOMER_DAMAGED']],
+		4=>['name'=>'缺少配件','reason'=>['MISSING_PARTS']],
+		5=>['name'=>'不想要了','reason'=>['SWITCHEROO','UNWANTED_ITEM']],
+		6=>['name'=>'和描述不符','reason'=>['NOT_AS_DESCRIBED']],
+		7=>['name'=>'下错订单','reason'=>['ORDERED_WRONG_ITEM','MISORDERED']],
+		8=>['name'=>'未收到货','reason'=>['UNDELIVERABLE_UNCLAIMED','UNDELIVERABLE_UNKNOWN','NEVER_ARRIVED','UNDELIVERABLE_CARRIER_MISS_SORTED','UNDELIVERABLE_INSUFFICIENT_ADDRESS','UNDELIVERABLE_MISSING_LABEL','UNDELIVERABLE_FAILED_DELIVERY_ATTEMPTS','UNDELIVERABLE_REFUSED']],
+		9=>['name'=>'有更好价格','reason'=>['FOUND_BETTER_PRICE']],
+		10=>['name'=>'交期超时','reason'=>['MISSED_ESTIMATED_DELIVERY']],
+		11=>['name'=>'未经授权购买','reason'=>['UNAUTHORIZED_PURCHASE']],
+		12=>['name'=>'不适合','reason'=>['NOT_COMPATIBLE','APPAREL_TOO_LARGE','APPAREL_TOO_SMALL','PART_NOT_COMPATIBLE']],
+		13=>['name'=>'未知原因','reason'=>['NO_REASON_GIVEN']],
+		14=>['name'=>'发错货','reason'=>['EXTRA_ITEM']],
+		15=>['name'=>'买多了','reason'=>['EXCESSIVE_INSTALLATION']],
+		16=>['name'=>'物流损坏','reason'=>['CARRIER_DAMAGED']],
+		17=>['name'=>'损坏','reason'=>['DAMAGED']],
+		18=>['name'=>'可再售','reason'=>['SELLABLE']],
+	];
 	public function __construct()
 	{
 		$this->middleware('auth');
@@ -29,27 +51,7 @@ class ReturnAnalysisController extends Controller
 	public function returnAnalysis(Request $req)
 	{
 		if(!Auth::user()->can(['return-analysis'])) die('Permission denied -- return-analysis');
-		$reasonType = [
-			0=>['name'=>'其他','reason'=>['DID_NOT_LIKE_FABRIC','PRODUCT_NOT_ITALIAN']],
-			1=>['name'=>'产品缺陷','reason'=>['DEFECTIVE']],
-			2=>['name'=>'品质问题','reason'=>['QUALITY_UNACCEPTABLE','APPAREL_STYLE']],
-			3=>['name'=>'产品损坏','reason'=>['DAMAGED_BY_CARRIER','DAMAGED_BY_FC','CUSTOMER_DAMAGED']],
-			4=>['name'=>'缺少配件','reason'=>['MISSING_PARTS']],
-			5=>['name'=>'不想要了','reason'=>['SWITCHEROO','UNWANTED_ITEM']],
-			6=>['name'=>'和描述不符','reason'=>['NOT_AS_DESCRIBED']],
-			7=>['name'=>'下错订单','reason'=>['ORDERED_WRONG_ITEM','MISORDERED']],
-			8=>['name'=>'未收到货','reason'=>['UNDELIVERABLE_UNCLAIMED','UNDELIVERABLE_UNKNOWN','NEVER_ARRIVED','UNDELIVERABLE_CARRIER_MISS_SORTED','UNDELIVERABLE_INSUFFICIENT_ADDRESS','UNDELIVERABLE_MISSING_LABEL','UNDELIVERABLE_FAILED_DELIVERY_ATTEMPTS','UNDELIVERABLE_REFUSED']],
-			9=>['name'=>'有更好价格','reason'=>['FOUND_BETTER_PRICE']],
-			10=>['name'=>'交期超时','reason'=>['MISSED_ESTIMATED_DELIVERY']],
-			11=>['name'=>'未经授权购买','reason'=>['UNAUTHORIZED_PURCHASE']],
-			12=>['name'=>'不适合','reason'=>['NOT_COMPATIBLE','APPAREL_TOO_LARGE','APPAREL_TOO_SMALL','PART_NOT_COMPATIBLE']],
-			13=>['name'=>'未知原因','reason'=>['NO_REASON_GIVEN']],
-			14=>['name'=>'发错货','reason'=>['EXTRA_ITEM']],
-			15=>['name'=>'买多了','reason'=>['EXCESSIVE_INSTALLATION']],
-			16=>['name'=>'物流损坏','reason'=>['CARRIER_DAMAGED']],
-			17=>['name'=>'损坏','reason'=>['DAMAGED']],
-			18=>['name'=>'可再售','reason'=>['SELLABLE']],
-		];
+		$reasonType = $this->reasonType;
 		$case = " ";
 		$typestr = '';
 		foreach($reasonType as $key=>$typeArr){
@@ -140,6 +142,95 @@ class ReturnAnalysisController extends Controller
 //		$data['fromDate'] = '2021-01-15';//测试日期
 		$data['reasonType'] = $reasonType;
 		return view('analysis/return', ['data' => $data]);
+	}
+	/*
+	 * 导出退货原因分析
+	 */
+	public function export(Request $req)
+	{
+		if(!Auth::user()->can(['return-analysis-export'])) die('Permission denied -- return-analysis-export');
+		$reasonType = $this->reasonType;
+		$case = " ";
+		$typestr = '';
+		foreach($reasonType as $key=>$typeArr){
+			$case .= " CASE amazon_returns.reason ";
+			foreach($typeArr['reason'] as $type){
+				$case.= " WHEN '".$type."' THEN amazon_returns.quantity ";
+			}
+			$typestr .= "sum(type_{$key}) as type_{$key}";
+			$case.= " ELSE 0 END AS type_{$key},";
+		}
+
+		$orderby = 'tb.sku';
+		$sort = 'desc';
+
+		//搜索条件如下：from_date,to_date
+		$where = " where return_date >= '".$req['from_date']." 00:00:00' and return_date <= '".$req['to_date']." 23:59:59'";
+		$where_sku = ' where 1 = 1 ';
+
+		if (Auth::user()->seller_rules) {
+			$rules = explode("-",Auth::user()->seller_rules);
+			if(array_get($rules,0)!='*') $where_sku.= " and tb.sap_seller_bg='".array_get($rules,0)."'";
+			if(array_get($rules,1)!='*') $where_sku.= " and tb.sap_seller_bu='".array_get($rules,1)."'";
+		} elseif (Auth::user()->sap_seller_id) {
+			$where_sku.= " and tb.sap_seller_id=".Auth::user()->sap_seller_id;
+		}
+
+		if(isset($req['sku']) && $req['sku']){
+			$where_sku.= " and tb.sku = '".$req['sku']."'";
+		}
+		$sql = "select SQL_CALC_FOUND_ROWS tb.sku,sum(type_0) as type_0,sum(type_1) as type_1,sum(type_2) as type_2,sum(type_3) as type_3,sum(type_4) as type_4,sum(type_5) as type_5,sum(type_6) as type_6,sum(type_7) as type_7,sum(type_8) as type_8,sum(type_9) as type_9,sum(type_10) as type_10,sum(type_11) as type_11,sum(type_12) as type_12,sum(type_13) as type_13,sum(type_14) as type_14,sum(type_15) as type_15,sum(type_16) as type_16,sum(type_17) as type_17,sum(type_18) as type_18,any_value (sap_skus.description) AS title
+				from (
+					SELECT seller_accounts.mws_seller_id as mws_seller_id,amazon_returns.seller_account_id,amazon_returns.seller_sku as seller_sku,amazon_returns.asin,{$case} mws_marketplaceid AS mws_marketplaceid
+					FROM amazon_returns 
+					LEFT JOIN seller_accounts ON amazon_returns.seller_account_id = seller_accounts.id 
+					{$where}
+				) as ta 
+			left join sap_asin_match_sku as tb on (ta.asin=tb.asin and ta.seller_sku=tb.seller_sku and ta.mws_seller_id=tb.seller_id and ta.mws_marketplaceid=tb.marketplace_id) 
+			left join sap_skus on tb.sku=sap_skus.sku 
+			{$where_sku}
+			GROUP BY tb.sku ORDER BY {$orderby} {$sort}";
+
+		$_data = DB::connection('amazon')->select($sql);
+		$data = json_decode(json_encode($_data),true);
+		//表头
+		$headArray = array('SKU','Title');
+		foreach($reasonType as $tk=>$typeArr){
+			$headArray[] = $typeArr['name'];
+		}
+		$headArray[] = '小计';
+		$arrayData[] = $headArray;
+
+		foreach($data as $key=>$val){
+			$_data = array($val['sku'],'<span title="'.$val['title'].'">'.$val['title'].'</span>');
+			for($i=0;$i<=18;$i++){
+				$_data[] = $val['type_'.$i];
+			}
+			$data[$key]['total'] = 0;
+			foreach($reasonType as $tk=>$typeArr){
+				$data[$key]['total'] = $data[$key]['total'] + $val['type_'.$tk];
+			}
+			$_data[] = $data[$key]['total'];
+			$arrayData[] = $_data;
+		}
+
+		if($arrayData){
+			$spreadsheet = new Spreadsheet();
+
+			$spreadsheet->getActiveSheet()
+				->fromArray(
+					$arrayData,  // The data to set
+					NULL,        // Array values with this value will not be set
+					'A1'         // Top left coordinate of the worksheet range where
+				//    we want to set these values (default is A1)
+				);
+			header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');//告诉浏览器输出07Excel文件
+			header('Content-Disposition: attachment;filename="return_analysis.xlsx"');//告诉浏览器输出浏览器名称
+			header('Cache-Control: max-age=0');//禁止缓存
+			$writer = new Xlsx($spreadsheet);
+			$writer->save('php://output');
+		}
+		die();
 	}
 
 	//asin维度分析
