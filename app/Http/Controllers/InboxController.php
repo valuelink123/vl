@@ -688,7 +688,11 @@ class InboxController extends Controller
         if(Auth::user()->can(['inbox-show-all'])){
             $customers = new Inbox;
         }else{
-            $customers = Inbox::whereIn('group_id',array_get($this->getUserGroup(),'groups',array()));
+            //$customers = Inbox::whereIn('group_id',array_get($this->getUserGroup(),'groups',array()));
+			$userData = $this->getUserGroup();
+            $customers = Inbox::where(function ($query) use ($userData) {
+                $query->whereIn('group_id',array_get($userData,'groups',array()))->orWhereIn('user_id',array_get($userData,'user_id',array()));
+            });
         }
 		//if(array_get($_REQUEST,'show_all')=='show_all') $customers = new Inbox;
 		
@@ -1135,10 +1139,10 @@ class InboxController extends Controller
 	}
 	
 	public function getUserGroup(){
-
+		$group_arr =array();
+		$group_arr['users'][Auth::user()->id] = Auth::user()->id;
 		if(Auth::user()->can(['inbox-show-all'])){
             $groups = Groupdetail::get(['group_id']);
-			$group_arr =array();
 			foreach($groups as $group){
 				$group_arr['groups'][$group->group_id] = $group->group_id;
 			}
@@ -1156,7 +1160,6 @@ class InboxController extends Controller
         }else{
 			$user_id = Auth::user()->id;
             $groups = Groupdetail::where('user_id',$user_id)->get(['group_id']);
-			$group_arr =array();
 			foreach($groups as $group){
 				$group_arr['groups'][$group->group_id] = $group->group_id;
 			}
