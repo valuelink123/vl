@@ -611,7 +611,6 @@
 														    <a href="{{url('manageDistributeTime/internationalTransportTime')}}" class="nav-link "> International transport Time </a>
 														</li>
 												    </ul>
-
 												</li>
 
 												<li class="">
@@ -620,6 +619,14 @@
 												        <span class="arrow"></span>
 												    </a>
 												</li>
+                                                @permission('inventory-cycle-count-show')
+                                                <li class="">
+                                                    <a href="/inventoryCycleCount" class="nav-link nav-toggle ">
+                                                        库存盘点
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
+                                                @endpermission
                                             </ul>
                                         </li>
 

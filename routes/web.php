@@ -627,6 +627,11 @@ Route::get('/inventoryCycleCount/downloadSku', 'InventoryCycleCountController@do
 Route::post('/inventoryCycleCount/importSku', 'InventoryCycleCountController@importSku');//导入sku数据
 Route::get('/inventoryCycleCount/downloadActualNumber', 'InventoryCycleCountController@downloadActualNumber');//下载物流部需要的添加真实数量模板
 Route::post('/inventoryCycleCount/importActualNumber', 'InventoryCycleCountController@importActualNumber');//导入真实数量数据
-Route::get('/inventoryCycleCount/downloadReason', 'InventoryCycleCountController@downloadReason');//下载导入差异原因的模板
-Route::post('/inventoryCycleCount/importReason', 'InventoryCycleCountController@importReason');//导入差异原因数据
-Route::get('/inventoryCycleCount/edit', 'InventoryCycleCountController@edit');//导入差异原因数据
+//Route::get('/inventoryCycleCount/downloadReason', 'InventoryCycleCountController@downloadReason');//下载导入差异原因的模板
+//Route::post('/inventoryCycleCount/importReason', 'InventoryCycleCountController@importReason');//导入差异原因数据
+Route::get('/inventoryCycleCount/show', 'InventoryCycleCountController@show');//导入差异原因数据
+Route::post('/inventoryCycleCount/edit', 'InventoryCycleCountController@edit');//编辑操作
+Route::post('/inventoryCycleCount/deleteReason', 'InventoryCycleCountController@deleteReason');//删除原因操作
+Route::post('/inventoryCycleCount/addReason', 'InventoryCycleCountController@addReason');//添加原因操作
+Route::post('/inventoryCycleCount/editReason', 'InventoryCycleCountController@editReason');//编辑原因操作
+Route::get('/inventoryCycleCount/export', 'InventoryCycleCountController@export');//导出操作
