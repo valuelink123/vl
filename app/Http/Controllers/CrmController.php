@@ -106,7 +106,7 @@ class CrmController extends Controller
                     $types_array_text[] = array_get(getCrmClientType(), $value);
                 }
                 $type_text = implode(',', $types_array_text);
-                $data[$key]['email'] = $val['encrypted_email']??$data[$key]['email'].'<br/><font color="red">'.$type_text.'</font>';
+                $data[$key]['email'] = $data[$key]['email'].'<br/><font color="red">'.$type_text.'</font>';
             }
 
 			//当点击ctg,rsg,Negative Review所属的数字时，可以链接到相对应的客户列表页面，times_ctg，times_rsg，times_negative_review
