@@ -97,7 +97,7 @@
                                 <td>{{$data['dispose_after_number']}}</td>
                                 <td>{{$data['difference_after_number']}}</td>
                                 <td>{{$data['difference_after_rate']}}</td>
-                                <td>{{$data['status']}}</td>
+                                <td>{{$data['status_name']}}</td>
                             </tr>
                             </tbody>
                         </table>
@@ -106,7 +106,9 @@
                             <div class="" style="margin-right: 18px;margin-bottom: 10px;float: right;">
                                 <div class="input-group">
                                     <div class="btn-group pull-right" >
-                                        <button id="add_reason" class="btn sbold blue">+</button>
+                                        @if($data['status']<4)
+                                            <button id="add_reason" class="btn sbold blue">+</button>
+                                        @endif
                                     </div>
                                 </div>
                             </div>

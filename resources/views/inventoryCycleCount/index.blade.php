@@ -89,20 +89,6 @@
                     </div>
                 </div>
                 @endpermission
-
-{{--                @permission('inventory-cycle-count-addReason')--}}
-{{--                <div class="col-md-2">--}}
-{{--                    <div class="btn-group ">--}}
-{{--                        <div class="col-md-6"  >--}}
-{{--                            <button type="submit" class="btn blue" id="download_reason">下载原因模板</button>--}}
-{{--                        </div>--}}
-{{--                        <div class="col-md-2">--}}
-{{--                            <button type="submit" class="btn blue" id="data_reason">导入原因</button>--}}
-{{--                        </div>--}}
-{{--                    </div>--}}
-{{--                </div>--}}
-{{--                @endpermission--}}
-
             </div>
             <form id="search-form" >
                 <div class="search portlet light">
@@ -179,25 +165,6 @@
             </table>
         </div>
 
-{{--        <div id="download-add-data" style="display:none;">--}}
-{{--            <form id="download-form">--}}
-{{--                <div class="col-md-12">--}}
-{{--                    <div class="input-group">--}}
-{{--                        <span class="input-group-addon">From Date</span>--}}
-{{--                        <input  class="form-control"  value="{!! $start_date !!}" data-date-format="yyyy-mm-dd" data-options="format:'yyyy-mm-dd'" id="from_date_download" name="from_date_download"/>--}}
-{{--                    </div>--}}
-{{--                </div>--}}
-{{--                <br/>--}}
-{{--                <br/>--}}
-{{--                <div class="col-md-12">--}}
-{{--                    <div class="input-group">--}}
-{{--                        <span class="input-group-addon">To Date</span>--}}
-{{--                        <input  class="form-control"  value="{!! $end_date !!}" data-change="0" data-date-format="yyyy-mm-dd" data-options="format:'yyyy-mm-dd'" id="to_date_download" name="to_date_download"/>--}}
-{{--                    </div>--}}
-{{--                </div>--}}
-{{--            </form>--}}
-{{--        </div>--}}
-
         <div id="import-add-data" style="display:none;">
             <form id="import-form" method="post" action="" enctype="multipart/form-data">
                     <div class="col-md-10">
@@ -238,7 +205,7 @@
                 searching: false,//关闭搜索
                 serverSide: true,//启用服务端分页（这是使用Ajax服务端的必须配置）
                 ordering:false,
-                "pageLength": 50, // default record count per page
+                "pageLength": 20, // default record count per page
                 "lengthMenu": [
                     [10, 20,50,],
                     [10, 20,50,] // change per page values here
@@ -269,22 +236,7 @@
                     data:  {search: decodeURIComponent($("#search-form").serialize().replace(/\+/g," "),true)}
                 }
             })
-        //点击下载真实数量模板
-        // $('#download_actual_number').click(function(){
-        //     art.dialog({
-        //         id: 'art_add_actual_number',
-        //         title: '物流下载模板',
-        //         content: document.getElementById('download-add-data'),
-        //         okVal: 'Submit',
-        //         ok: function () {
-        //             this.title('In the submission…');
-        //             $("#download-form").attr("action","/inventoryCycleCount/downloadActualNumber");//改变表单的提交地址为下载的地址
-        //             $("#download-form").submit();//提交表单
-        //         },
-        //         cancel: true,
-        //         cancelVal:'Cancel'
-        //     });
-        // })
+
         //企管部点击导入sku
         $('#data_sku').click(function(){
             $("#import-form").attr("action","inventoryCycleCount/importSku");
@@ -331,36 +283,6 @@
                 }
             });
         })
-
-        // //点击下载差异原因模板
-        // $('#download_reason').click(function(){
-        //     art.dialog({
-        //         id: 'art_add_reason',
-        //         title: '下载差异原因模板',
-        //         content: document.getElementById('download-add-data'),
-        //         okVal: 'Submit',
-        //         ok: function () {
-        //             this.title('In the submission…');
-        //             $("#download-form").attr("action","/inventoryCycleCount/downloadReason");//改变表单的提交地址为下载的地址
-        //             $("#download-form").submit();//提交表单
-        //         },
-        //         cancel: true,
-        //         cancelVal:'Cancel'
-        //     });
-        // })
-        //
-        // //点击导入差异原因
-        // $('#data_reason').click(function(){
-        //     $("#import-form").attr("action","inventoryCycleCount/importReason");
-        //     art.dialog({
-        //         id: 'art_add_reason',
-        //         title: '导入差异原因',
-        //         content: document.getElementById('import-form'),
-        //         okVal: false,
-        //         cancel: true,
-        //         cancelVal:'Cancel'
-        //     });
-        // })
 
         //点击上面的搜索
         $('#search_top').click(function(){

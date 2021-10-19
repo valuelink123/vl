@@ -500,4 +500,25 @@ class Controller extends BaseController
 		return $account;
 	}
 
+	/*
+	 * 通过sku和日期，从sap接口处获得这些sku的库存数据
+	 */
+	public function getSkuInventoryBySapApi($skus,$start_date,$end_date)
+	{
+		//获取sap接口
+		$skus_str = json_encode($skus);
+		$array_detail['appid'] = env("SAP_KEY");
+		$array_detail['method'] = 'getSkusStock';
+		$array_detail['gt_table'] = $skus_str;
+
+		$sign = $this->getSapApiSign($array_detail);
+		$_sap_data = file_get_contents('http://' . env("SAP_RFC") . '/rfc_sap_api.php?appid=' . env("SAP_KEY") . '&method='.$array_detail['method'].'&skus='.$array_detail['gt_table'].'&start_date='.$start_date.'&end_date='.$end_date.'&sign=' . $sign);
+		$_sap_data = json_decode($_sap_data,true);
+		$sap_inventory_data = array();
+		foreach($_sap_data['RESULT_TABLE'] as $key=>$val){
+			$sap_inventory_data[$val['MATNR']][$val['WERKS'].'_'.$val['LGORT']] = $val;
+		}
+		return $sap_inventory_data;
+	}
+
 }
