@@ -65,6 +65,9 @@
                                     @permission('data-statistics-estimatedSales')
                                 	<button type="submit" class="btn blue" name ="ExportType" value ="EstimatedSales">Export Estimated Sales Report</button>
                                     @endpermission
+                                    @permission('data-statistics-dailySales')
+                                	<button type="submit" class="btn blue" name ="ExportType" value ="DailySales">Export Daily Sales Report</button>
+                                    @endpermission
                             </div>
                         </div>
                         </div>

@@ -860,8 +860,88 @@ class UserController extends Controller
 			
 		
         }
-		
-		
+
+        if (array_get($_REQUEST, 'ExportType') == 'DailySales') {
+            if (!Auth::user()->can(['data-statistics-dailySales'])) die('Permission denied -- data-statistics-dailySales');
+            $sql = "SELECT
+                        tmp.sku,tmp.site,tmp.date,tmp.sales
+                    FROM
+                        (
+                        SELECT
+                            sku,
+                            
+                            CASE marketplace_id 
+                                WHEN 'A2Q3Y263D00KWC' THEN
+                                'Brazil' 
+                                WHEN 'A2EUQ1WTGCTBG2' THEN
+                                'www.amazon.ca' 
+                                WHEN 'A1AM78C64UM0Y8' THEN
+                                'www.amazon.mx' 
+                                WHEN 'ATVPDKIKX0DER' THEN
+                                'www.amazon.com' 
+                                WHEN 'A2VIGQ35RCS4UG' THEN
+                                'United Arab Emirates (U.A.E.)' 
+                                WHEN 'A1PA6795UKMFR9' THEN
+                                'www.amazon.de' 
+                                WHEN 'ARBP9OOSHTCHU' THEN
+                                'Egypt' 
+                                WHEN 'A1RKKUPIHCS9HS' THEN
+                                'www.amazon.es' 
+                                WHEN 'A13V1IB3VIYZZH' THEN
+                                'www.amazon.fr' 
+                                WHEN 'A1F83G8C2ARO7P' THEN
+                                'www.amazon.co.uk' 
+                                WHEN 'A21TJRUUN4KGV' THEN
+                                'India' 
+                                WHEN 'APJ6JRA9NG5V4' THEN
+                                'www.amazon.it' 
+                                WHEN 'A1805IZSGTT6HS' THEN
+                                'Netherlands' 
+                                WHEN 'A17E79C6D8DWNP' THEN
+                                'Saudi Arabia' 
+                                WHEN 'A2NODRKZP88ZB9' THEN
+                                'Sweden' 
+                                WHEN 'A33AVAJ2PDY3EV' THEN
+                                'Turkey' 
+                                WHEN 'A19VAU5U5O7RUS' THEN
+                                'Singapore' 
+                                WHEN 'A39IBJ37TRP1C6' THEN
+                                'Australia' 
+                                WHEN 'A1VC38T7YXB528' THEN
+                                'www.amazon.co.jp' ELSE 'Other' 
+                            END AS site,
+                            date ,
+                        sum( sale ) AS sales
+                        FROM
+                            sale_daily_info 
+                        WHERE
+                            date >= '$date_from'
+						    AND date <= '$date_to'
+                            AND sku IS NOT NULL 
+                        GROUP BY
+                            sku,
+                            marketplace_id,
+                            date 
+                        ) AS tmp 
+                    ORDER BY
+                      tmp.site,
+                        tmp.sku,	
+                        tmp.date ASC 
+                    ";
+            $arrayData[] = ['Sku', 'Site', 'Date', 'Sales'];
+            $data = DB::select($sql);
+            $data = json_decode(json_encode($data), true);
+            foreach ($data as $key => $val) {
+                $arrayData[] = [
+                    array_get($val, 'sku'),
+                    array_get($val, 'site'),
+                    array_get($val, 'date'),
+                    array_get($val, 'sales'),
+                ];
+            }
+
+        }
+
 			
 				
 			if($arrayData){
