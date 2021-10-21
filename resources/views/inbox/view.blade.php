@@ -141,9 +141,29 @@
 	  }
 	  return true;
 	});
+
+      $("#search_user").keyup(function(){
+          // $('#user_id optgroup').attr('data-show',0);
+          $('#user_id optgroup').hide();
+          var search_value = $(this).val().toUpperCase();
+          console.log(111);
+          console.log(search_value);
+          $('#user_id option').each(function (index,element){
+              var content = $(element).text().toUpperCase();
+              if(content.indexOf(search_value) >= 0 ) {
+                  //包含搜索的内容
+                  $(this).show();
+                  $(this).parent().show();
+                  // $(this).parent().attr('data-show',1);
+              }else{
+                  $(this).hide();
+              }
+          });
+      });
+
   });
   </script>
-  
+
   <?php if(count($unread_history)>0){?>
 <div class="col-md-12">
                                 <!-- BEGIN Portlet PORTLET-->
@@ -847,6 +867,7 @@
                             <div style="clear:both;"></div>
                         </div>
                         <div class="col-xs-6">
+                            <div class="col-md-8">
                                 <div class="form-group">
                                     <label>Assign to</label>
                                     <div class="input-group ">
@@ -855,18 +876,21 @@
                                     </span>
                                         <select class="form-control" name="user_id" id="user_id">
                                             @foreach ($groups as $group_id=>$group)
-                                                <optgroup label="{{array_get($group,'group_name')}}">
+                                                <optgroup label="{{array_get($group,'group_name')}}" data-show="0">
                                                     @foreach (array_get($group,'user_ids') as $user_id)
                                                         <option value="{{$group_id.'_'.$user_id}}" <?php if($group_id.'_'.$user_id==$email['group_id'].'_'.$email['user_id']) echo 'selected';?>>{{array_get($users,$user_id)}}</option>
                                                     @endforeach
                                                 </optgroup>
                                             @endforeach
-
-
                                         </select>
 										<input type="text" class="form-control" name="text" id="text" value="" placeholder="Remark for Assign">
                                     </div>
                                 </div>
+                            </div>
+                            <div class="col-md-4" style="height:107px;">
+                                <label></label>
+                                <input id="search_user" type="text" class="form-control" value="" placeholder="search user" >
+                            </div>
 
                                 <div class="form-group">
                                     <label>ASIN</label>
