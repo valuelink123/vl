@@ -220,7 +220,9 @@ class NonctgController extends Controller
         if ($req->has('gift_sku')) {
             $updates['gift_sku'] = $dataRow['gift_sku'] = $req->input('gift_sku');
         }
-        $dataRow->where($wheres)->update($updates);//更新non-ctg表数据内容
+        if($updates){
+			$dataRow->where($wheres)->update($updates);//更新non-ctg表数据内容
+		}
         $trackNote = isset($_REQUEST['track_note']) ? $_REQUEST['track_note'] : '';
         $way = $req->has('way') ? $req->has('way') : '0';//$way=1为页面普通提交，0为ajax提交
         //状态为有意向的时候，把此条non-ctg数据转移到ctg表中

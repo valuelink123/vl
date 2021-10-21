@@ -62,6 +62,7 @@ class Kernel extends ConsoleKernel
 		'App\Console\Commands\RequestPpcReport',
 		'App\Console\Commands\GetPpcReport',
 		'App\Console\Commands\GetPpcSchedule',
+		'App\Console\Commands\AddSapInventory',
     ];
 
     /**
@@ -96,7 +97,7 @@ class Kernel extends ConsoleKernel
 		if($x>9) $x=0;
 		$x++;
         }
-		$accountList = DB::table('accounts')->whereRaw("type='Amazon' or (bg is not null and bg<>'BG0')")->get(array('id'));
+		$accountList = DB::table('accounts')->whereRaw("type='Amazon' or (bg is not null and bg<>'BG1')")->get(array('id'));
         $x=0;
 		foreach($accountList as $account){
 			if($x>9) $x=0;//每十分钟发送一次,$x>9就置0
@@ -168,6 +169,8 @@ class Kernel extends ConsoleKernel
 		$schedule->command('add:roi_performance')->dailyAt('06:30')->name('add_roi_performance')->withoutOverlapping();//每天早上6点半执行
 
 		//$schedule->command('update:sendboxStatus')->cron('0 */2 * * *')->name('updateSendboxStatus')->withoutOverlapping();//2小时执行一次
+
+		$schedule->command('add:sap_inventory')->hourly()->name('add_sap_inventory')->withoutOverlapping();//每小时更新一次，用于获取sap库存数据，主要用于库存盘点模块
     }
 
     /**

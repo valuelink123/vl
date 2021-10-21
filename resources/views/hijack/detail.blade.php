@@ -161,6 +161,7 @@
 						<tr>
 							<th class="w6">Seller</th>
 							<th class="w6">Seller ID</th>
+							<th class="w6">Main</th>
 							<th class="w6">Price</th>
 							<th class="w8">Shipping Fee</th>
 						</tr>
@@ -207,6 +208,7 @@
 								html += '<tr>';
 								html += '<td><a target="_blank" href="'+href+'">'+item.account+'</a>'+item.remark+'</td>';//每一条数据是一行
 								html += '<td>'+item.sellerid+'</td>';
+								html += '<td>'+item.main+'</td>';
 								html += '<td>'+item.price+'</td>';
 								html += '<td>'+item.shipping_fee+'</td>';
 								html += '</tr>';

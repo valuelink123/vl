@@ -106,7 +106,7 @@ class CrmController extends Controller
                     $types_array_text[] = array_get(getCrmClientType(), $value);
                 }
                 $type_text = implode(',', $types_array_text);
-                $data[$key]['email'] = $val['encrypted_email']??$data[$key]['email'].'<br/><font color="red">'.$type_text.'</font>';
+                $data[$key]['email'] = $data[$key]['email'].'<br/><font color="red">'.$type_text.'</font>';
             }
 
 			//当点击ctg,rsg,Negative Review所属的数字时，可以链接到相对应的客户列表页面，times_ctg，times_rsg，times_negative_review
@@ -415,6 +415,7 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 		foreach($_ciids as $key=>$val){
 			$ciids[] = $val->id;
 			$en_email[($val->encrypted_email??$val->email)]=$val->email;
+
 		}
 		DB::table('client_info')->whereIn('id',$ciids)->delete();//删除掉client_info表里的该条数据
 		DB::table('client_order_info')->whereIn('ci_id',$ciids)->delete();//订单信息，删除之前的
@@ -428,7 +429,10 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_negative_review as 
 				return redirect()->back()->withInput();
 			}
 			$insertInfo['email'] = array_get($en_email,$val['email'],$val['email']);
-			$insertInfo['encrypted_email'] = md5($insertInfo['email']).rand(1000,9999).'@valuelinkltd.com';
+			$insertInfo['encrypted_email'] = array_search($insertInfo['email'],$en_email);
+			if(empty($insertInfo['encrypted_email'])){
+				$insertInfo['encrypted_email'] = md5($insertInfo['email']).rand(1000,9999).'@valuelinkltd.com';
+			}
 			$insertInfo['phone'] = $val['phone'];
             $insertInfo['remark'] = $val['remark'];
 

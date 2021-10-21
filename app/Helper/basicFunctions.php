@@ -10,9 +10,9 @@ use Illuminate\Support\Facades\DB;
  * 查client_info表中是否有此客户的数据，如若有就更新facebook_name和facebook_group字段数据，如若没有就插入客户信息数据到client和client_info表
  */
 function updateCrm($data,$updateClient){
-	$clientInfo = DB::table('client_info')->where('email',$data['email'])->get(array('id'))->first();
-	if($clientInfo){
-		$res = DB::table('client_info')->where('email',$data['email'])->update($updateClient);
+	$clientInfo = DB::table('client_info')->where('email',$data['email'])->orWhere('encrypted_email',$data['email'])->get(array('id'))->first();
+	if(!empty($clientInfo)){
+		$res = DB::table('client_info')->where('email',$data['email'])->orWhere('encrypted_email',$data['email'])->update($updateClient);
 	}else{
 		//通过sap获取订单信息
 		try {
@@ -46,6 +46,7 @@ function updateCrm($data,$updateClient){
 		$insertInfo = array(
 			'name'=>isset($data['name']) ? $data['name'] : '',
 			'email'=>$data['email'],
+			'encrypted_email' => md5($insertInfo['email']).rand(1000,9999).'@valuelinkltd.com',
 			'phone'=>isset($data['phone']) ? $data['phone'] : '',
 			'country'=>isset($data['country']) ? $data['country'] : '',
 			'brand'=>isset($data['brand']) ? $data['brand'] : '',

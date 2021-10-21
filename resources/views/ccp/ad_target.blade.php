@@ -1,6 +1,6 @@
 @extends('layouts.layout')
 @section('crumb')
-    @include('layouts.crumb', ['crumbs'=>['ccp ad keyword dashboard']])
+    @include('layouts.crumb', ['crumbs'=>['ccp ad target dashboard']])
 @endsection
 <style>
     .total-data-table{
@@ -110,17 +110,17 @@
             </table>
             <div class="search-date light portlet">
                 <div class="col-md-6" style="margin-left: -28px;">
-                <table class="date-search date-search-table">
-                    <tr>
-                        <td class="date_type active" data-value="1">TODAY</td>
-                        <td class="date_type" data-value="2">YESTERDAY</td>
-                        <td class="date_type" data-value="3">LAST 3 DAYS</td>
-                        <td class="date_type" data-value="4">LAST 7 DAYS</td>
-                        <td class="date_type" data-value="5">LAST 15 DAYS</td>
-                        <td class="date_type" data-value="6">LAST 30 DAYS</td>
-                        <td class="date_type" data-value="7">Other</td>
-                    </tr>
-                </table>
+                    <table class="date-search date-search-table">
+                        <tr>
+                            <td class="date_type active" data-value="1">TODAY</td>
+                            <td class="date_type" data-value="2">YESTERDAY</td>
+                            <td class="date_type" data-value="3">LAST 3 DAYS</td>
+                            <td class="date_type" data-value="4">LAST 7 DAYS</td>
+                            <td class="date_type" data-value="5">LAST 15 DAYS</td>
+                            <td class="date_type" data-value="6">LAST 30 DAYS</td>
+                            <td class="date_type" data-value="7">Other</td>
+                        </tr>
+                    </table>
                 </div>
                 <div class="col-md-2">
                     <div class="input-group">
@@ -149,20 +149,20 @@
         <div class="top portlet light">
             <table class="table table-striped table-bordered" id="datatable">
                 <thead>
-                    <tr>
-                        <th>KEYWORD TEXT</th>
-                        <th>MATCH TYPE</th>
-                        <th>STATE</th>
-                        <th>AD COST</th>
-                        <th>SALES</th>
-                        <th>ORDERS</th>
-                        <th>ACOS</th>
-                        <th>IMPRESSIONS</th>
-                        <th>CLICKS</th>
-                        <th>CTR</th>
-                        <th>CPC</th>
-                        <th>CR</th>
-                    </tr>
+                <tr>
+                    <th>TARGET ID</th>
+                    <th>BID</th>
+                    <th>STATE</th>
+                    <th>AD COST</th>
+                    <th>SALES</th>
+                    <th>ORDERS</th>
+                    <th>ACOS</th>
+                    <th>IMPRESSIONS</th>
+                    <th>CLICKS</th>
+                    <th>CTR</th>
+                    <th>CPC</th>
+                    <th>CR</th>
+                </tr>
                 </thead>
                 <tbody></tbody>
             </table>
@@ -181,37 +181,37 @@
             autoclose: true
         });
 
-            $('#datatable').dataTable({
-                searching: false,//关闭搜索
-                serverSide: true,//启用服务端分页（这是使用Ajax服务端的必须配置）
-                ordering:false,
-                "pageLength": 50, // default record count per page
-                "lengthMenu": [
-                    [10, 20,50,],
-                    [10, 20,50,] // change per page values here
-                ],
-                // pagingType: 'bootstrap_extended',
-                processing: true,
-                columns: [
-                    {data: 'keyword_text',name:'keyword_text'},
-                    {data: 'match_type',name:'match_type'},
-                    {data: 'state',name:'state'},
-                    {data: 'cost',name:'cost'},
-                    {data: 'sales',name:'sales'},
-                    {data: 'orders',name:'orders'},
-                    {data: 'acos',name:'acos'},
-                    {data: 'impressions',name:'impressions'},
-                    {data: 'clicks',name:'clicks'},
-                    {data: 'ctr',name:'ctr'},
-                    {data: 'cpc',name:'cpc'},
-                    {data: 'cr',name:'cr'},
-                ],
-                ajax: {
-                    type: 'POST',
-                    url: '/ccp/adKeyword/list',
-                    data:  {search: $("#search-form").serialize()}
-                }
-            })
+        $('#datatable').dataTable({
+            searching: false,//关闭搜索
+            serverSide: true,//启用服务端分页（这是使用Ajax服务端的必须配置）
+            ordering:false,
+            "pageLength": 50, // default record count per page
+            "lengthMenu": [
+                [10, 20,50,],
+                [10, 20,50,] // change per page values here
+            ],
+            // pagingType: 'bootstrap_extended',
+            processing: true,
+            columns: [
+                {data: 'target_id',name:'target_id'},
+                {data: 'bid',name:'bid'},
+                {data: 'state',name:'state'},
+                {data: 'cost',name:'cost'},
+                {data: 'sales',name:'sales'},
+                {data: 'orders',name:'orders'},
+                {data: 'acos',name:'acos'},
+                {data: 'impressions',name:'impressions'},
+                {data: 'clicks',name:'clicks'},
+                {data: 'ctr',name:'ctr'},
+                {data: 'cpc',name:'cpc'},
+                {data: 'cr',name:'cr'},
+            ],
+            ajax: {
+                type: 'POST',
+                url: '/ccp/adTarget/list',
+                data:  {search: $("#search-form").serialize()}
+            }
+        })
 
         $('.date-search .date_type').click(function(){
             $('.date-search .date_type').removeClass('active');
@@ -238,7 +238,7 @@
             $('input[name="end_date"]').val($('input[name="to_date"]').val());
             $.ajax({
                 type: 'post',
-                url: '/ccp/adKeyword/showTotal',
+                url: '/ccp/adTarget/showTotal',
                 data: {search_data:$("#search-form").serialize()},
                 dataType:'json',
                 success: function(res) {
@@ -271,9 +271,9 @@
                             html += '<option value="'+item.id+'">'+item.label+'</option>';
                         })
                         var str = '<span class="input-group-addon">Account</span>\n' +
-                                '\t\t\t\t\t\t\t<select class="mt-multiselect btn btn-default" id="account" multiple="multiple" data-width="100%" data-action-onchange="true" name="account" id="account[]">\n' +
-                                '\n' +html+
-                                '\t\t\t\t\t\t\t</select>';
+                            '\t\t\t\t\t\t\t<select class="mt-multiselect btn btn-default" id="account" multiple="multiple" data-width="100%" data-action-onchange="true" name="account" id="account[]">\n' +
+                            '\n' +html+
+                            '\t\t\t\t\t\t\t</select>';
                         $('#account-div').html(str);
                         ComponentsBootstrapMultiselect.init();//处理account的多选显示样式
                     }else{
@@ -283,15 +283,15 @@
             });
 
         }
-		//通过选择的站点和时间类型和得到对应的正确的时间范围
+        //通过选择的站点和时间类型和得到对应的正确的时间范围
         function getDateBySite()
-		{
-		    var value = $('.date-search .active').attr('data-value');//选中时间区间的菜单
+        {
+            var value = $('.date-search .active').attr('data-value');//选中时间区间的菜单
             // var timeType = $('#timeType option:selected').val();//选择的时间类型，是当地站点时间还是北京时间，timeType
             var today = new Date();
             // if(timeType==1){//站点本地时间的时候，取出当前选中站点今天的日期
-                var date = $('#site option:selected').attr('data-date');
-                today = new Date(date);
+            var date = $('#site option:selected').attr('data-date');
+            today = new Date(date);
             // }
             var oneday = 1000*60*60*24;//一天时间的秒数
             var from_time = today;
@@ -309,10 +309,10 @@
             }else if(value==6){//最近30天
                 from_time = new Date(today- oneday*29);
             }if(value==7){
-                $('input[name="from_date"]').removeAttr("disabled");
-                $('input[name="to_date"]').removeAttr("disabled");
-                return true;//选中的是其他的时候,不更改开始时间和结束时间
-            }
+            $('input[name="from_date"]').removeAttr("disabled");
+            $('input[name="to_date"]').removeAttr("disabled");
+            return true;//选中的是其他的时候,不更改开始时间和结束时间
+        }
             var from_month = from_time.getMonth() + 1;
             var to_month = to_time.getMonth() + 1;
             from_month = from_month<10 ? '0'+from_month : from_month;
@@ -328,7 +328,7 @@
             $('input[name="start_date"]').val(from_date);
             $('input[name="end_date"]').val(to_date);
             return true;
-		}
+        }
 
         $(function(){
             getAccountBySite()//触发当前选的站点得到该站点所有的账号

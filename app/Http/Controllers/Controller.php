@@ -216,7 +216,7 @@ class Controller extends BaseController
 		$field = isset($_REQUEST['field']) ? $_REQUEST['field'] : 'id';
 		$return = array('status'=>1,'data'=>array()) ;
 		if($marketplaceid){
-			$data= DB::connection('vlz')->select("select {$field} as id,label from seller_accounts where deleted_at is NULL and mws_marketplaceid = '{$marketplaceid}' order by label asc");
+			$data= DB::connection('amazon')->select("select {$field} as id,label from seller_accounts where deleted_at is NULL and mws_marketplaceid = '{$marketplaceid}' order by label asc");
 			foreach($data as $key=>$val){
 				$return['data'][$key] = (array)$val;
 			}
@@ -232,10 +232,10 @@ class Controller extends BaseController
 		//查询该站点的最近一条item_price_amount>0的item_price_amount金额,为了替换掉状态为pending并且item_price_amount=0的金额数据\
 		$date = date('Y-m-d');//当前日期
 		//查询当前站点今天是否有价格的数据
-		$priceData = DB::connection('vlz')->select("select seller_account_id,asin,price from asin_price where marketplace_id = '".$site."' and created_at = '".$date."' group by seller_account_id,asin");
+		$priceData = DB::connection('amazon')->select("select seller_account_id,asin,max(price) AS price from asin_price where marketplace_id = '".$site."' and created_at = '".$date."' group by seller_account_id,asin");
 		//当前站点今天还没有数据的话，查询到要插入的数据，更新asin_price表
 		if(empty($priceData)) {
-			DB::connection('vlz')->table('asin_price')->where('marketplace_id',$site)->delete();//没有此站点今天的数据就把此站点以前的数据删除掉
+			DB::connection('amazon')->table('asin_price')->where('marketplace_id',$site)->delete();//没有此站点今天的数据就把此站点以前的数据删除掉
 			$insert_sql = "select a.asin as asin,ROUND((b.item_price_amount/b.quantity_ordered),2) as price,a.seller_account_id as seller_account_id,'" . $site . "' as marketplace_id,'" . $date . "' as created_at  
     from(select asin,max(id) as id,seller_account_id 
                     from order_items
@@ -244,10 +244,10 @@ class Controller extends BaseController
                     group by asin,seller_account_id 
                 ) as a,order_items as b
         where a.id = b.id";
-			$insertData = DB::connection('vlz')->select($insert_sql);
+			$insertData = DB::connection('amazon')->select($insert_sql);
 			$insertData = array_map('get_object_vars', $insertData);//需要插入的数据
 			if ($insertData) {
-				DB::connection('vlz')->table('asin_price')->insert($insertData);
+				DB::connection('amazon')->table('asin_price')->insert($insertData);
 			}
 		}
 		return true;
@@ -468,11 +468,57 @@ class Controller extends BaseController
 	function getAccountInfo()
 	{
 		$account = array();
-		$_account= DB::connection('vlz')->select("select id,label from seller_accounts where deleted_at is NULL order by label asc");
+		$_account= DB::connection('amazon')->select("select id,label from seller_accounts where deleted_at is NULL order by label asc");
 		foreach($_account as $key=>$val){
 			$account[$val->id] = (array)$val;
 		}
 		return $account;
+	}
+
+	//得到ppc模块搜索时间的sql
+	public function getPpcDateWhere()
+	{
+		$startDate = date('Y-m-d',strtotime($this->start_date));//开始时间
+		$endDate = date('Y-m-d',strtotime($this->end_date));//结束时间
+		$where = " and ppc_report_datas.date >= '".$startDate."' and ppc_report_datas.date <= '".$endDate."'";
+		return $where;
+	}
+	/*
+	 * 通过选择的站点得到该站点下的所有账号信息
+	 */
+	public function getPpcAccountByMarketplace($marketplace)
+	{
+		$sql = "select accounts.id,accounts.seller_id 
+				from accounts
+				left join marketplaces on accounts.marketplace_id = marketplaces.id 
+    			where user_id = 8566 and marketplaces.marketplace = '".$marketplace."'";
+		$_account = DB::connection('ad')->select($sql);
+		$account = array();
+		foreach($_account as $key=>$val){
+			$account[$val->id] = $val->seller_id;
+		}
+		return $account;
+	}
+
+	/*
+	 * 通过sku和日期，从sap接口处获得这些sku的库存数据
+	 */
+	public function getSkuInventoryBySapApi($skus,$start_date,$end_date)
+	{
+		//获取sap接口
+		$skus_str = json_encode($skus);
+		$array_detail['appid'] = env("SAP_KEY");
+		$array_detail['method'] = 'getSkusStock';
+		$array_detail['gt_table'] = $skus_str;
+
+		$sign = $this->getSapApiSign($array_detail);
+		$_sap_data = file_get_contents('http://' . env("SAP_RFC") . '/rfc_sap_api.php?appid=' . env("SAP_KEY") . '&method='.$array_detail['method'].'&skus='.$array_detail['gt_table'].'&start_date='.$start_date.'&end_date='.$end_date.'&sign=' . $sign);
+		$_sap_data = json_decode($_sap_data,true);
+		$sap_inventory_data = array();
+		foreach($_sap_data['RESULT_TABLE'] as $key=>$val){
+			$sap_inventory_data[$val['MATNR']][$val['WERKS'].'_'.$val['LGORT']] = $val;
+		}
+		return $sap_inventory_data;
 	}
 
 }

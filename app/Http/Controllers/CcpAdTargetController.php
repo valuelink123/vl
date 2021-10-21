@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Auth;
 use DB;
 
 
-class CcpAdCampaignController extends Controller
+class CcpAdTargetController extends Controller
 {
 	/**
 	 * Create a new controller instance.
@@ -20,9 +20,13 @@ class CcpAdCampaignController extends Controller
 	public $start_date = '';//搜索时间范围的开始时间
 	public $end_date = '';//搜索时间范围的结束时间
 	public $typeConfig = array(
-							'table' => array('SProducts'=>'ppc_sproducts_campaigns','SDisplay'=>'ppc_sdisplay_campaigns','SBrands'=>'ppc_sbrands_campaigns'),
-							'budget_field' => array('SProducts'=>'daily_budget','SDisplay'=>'budget','SBrands'=>'budget'),
-						);
+		'table_group' => array('SProducts'=>'ppc_sproducts_ad_groups','SDisplay'=>'ppc_sdisplay_ad_groups','SBrands'=>'ppc_sbrands_ad_groups'),
+		'table_campaign' => array('SProducts'=>'ppc_sproducts_campaigns','SDisplay'=>'ppc_sdisplay_campaigns','SBrands'=>'ppc_sbrands_campaigns'),
+		'table_keyword' => array('SProducts'=>'ppc_sproducts_keywords','SBrands'=>'ppc_sbrands_keywords'),
+		'table_product' => array('SProducts'=>'ppc_sproducts_ads','SDisplay'=>'ppc_sdisplay_ads'),
+		'table_target' => array('SProducts'=>'ppc_sproducts_targets','SDisplay'=>'ppc_sdisplay_targets','SBrands'=>'ppc_sbrands_targets'),
+		'budget_field' => array('SProducts'=>'daily_budget','SDisplay'=>'budget','SBrands'=>'budget'),
+	);
 
 	public function __construct()
 	{
@@ -37,7 +41,7 @@ class CcpAdCampaignController extends Controller
 	 */
 	public function index()
 	{
-		if(!Auth::user()->can(['ccp-ad-campaign-show'])) die('Permission denied -- ccp ad campaign show');
+		if(!Auth::user()->can(['ccp-ad-target-show'])) die('Permission denied -- ccp ad target show');
 		$site = getMarketDomain();//获取站点选项
 		$this->date = date('Y-m-d');
 
@@ -47,7 +51,7 @@ class CcpAdCampaignController extends Controller
 		}
 		$type = array('SProducts'=>'Sponsored Products','SDisplay'=>'Sponsored Display','SBrands'=>'Sponsored Brands');
 		$date = $siteDate[current($site)->marketplaceid];
-		return view('ccp/ad_campaign',['site'=>$site,'date'=>$date,'siteDate'=>$siteDate,'type'=>$type]);
+		return view('ccp/ad_target',['site'=>$site,'date'=>$date,'siteDate'=>$siteDate,'type'=>$type]);
 	}
 	/*
 	* 获得统计总数据
@@ -76,16 +80,24 @@ class CcpAdCampaignController extends Controller
 			$where .= " and ppc_profiles.seller_id in('".$account_str."')";
 		}
 
-		$table = isset($this->typeConfig['table'][$type]) ? $this->typeConfig['table'][$type] : 'ppc_sproducts_campaigns';
+		$table_target = isset($this->typeConfig['table_target'][$type]) ? $this->typeConfig['table_target'][$type] : '';
+		$table_campaign = isset($this->typeConfig['table_campaign'][$type]) ? $this->typeConfig['table_campaign'][$type] : '';
+		$table_group = isset($this->typeConfig['table_group'][$type]) ? $this->typeConfig['table_group'][$type] : '';
 
+		$left = " left join {$table_campaign} as campaigns on targets.campaign_id = campaigns.campaign_id ";
+		if($type=='SDisplay'){
+			$left = " left join {$table_group} as groups on targets.ad_group_id = groups.ad_group_id
+			 left join {$table_campaign} as campaigns on campaigns.campaign_id = groups.campaign_id ";
+		}
 		$sql = "SELECT  
 					round(sum(ppc_report_datas.cost),2) as cost,
 					round(sum(ppc_report_datas.attributed_sales1d),2) as sales
 			FROM
-					{$table} as campaigns
+					{$table_target} as targets
+			{$left}
 			LEFT JOIN ppc_report_datas ON (
-					ppc_report_datas.record_type = 'campaign'
-					AND campaigns.campaign_id = ppc_report_datas.record_type_id
+					ppc_report_datas.record_type = 'target'
+					AND targets.target_id = ppc_report_datas.record_type_id 
 			)
  			left join ppc_profiles on campaigns.profile_id = ppc_profiles.profile_id
 			where ad_type = '".$type."' 
@@ -120,37 +132,43 @@ class CcpAdCampaignController extends Controller
 			$account_str = implode("','", explode(',',$account));
 			$where .= " and ppc_profiles.seller_id in('".$account_str."')";
 		}
-		$table = isset($this->typeConfig['table'][$type]) ? $this->typeConfig['table'][$type] : 'ppc_sproducts_campaigns';
-		$budget_field = isset($this->typeConfig['budget_field'][$type]) ? $this->typeConfig['budget_field'][$type] : 'budget';
 
 		if($_REQUEST['length']){
 			$limit = $this->dtLimit($req);
 			$limit = " LIMIT {$limit} ";
 		}
 
-		$sql = "SELECT SQL_CALC_FOUND_ROWS 
-					any_value(ppc_profiles.account_name) as account_name,
-       				any_value(ppc_profiles.seller_id) as seller_id,
-					campaigns.name as name,
-					any_value(campaigns.state) as state,
-       				any_value(campaigns.{$budget_field}) as daily_budget,
+		$table_target = isset($this->typeConfig['table_target'][$type]) ? $this->typeConfig['table_target'][$type] : '';
+		$table_campaign = isset($this->typeConfig['table_campaign'][$type]) ? $this->typeConfig['table_campaign'][$type] : '';
+		$table_group = isset($this->typeConfig['table_group'][$type]) ? $this->typeConfig['table_group'][$type] : '';
+
+		$left = " left join {$table_campaign} as campaigns on targets.campaign_id = campaigns.campaign_id ";
+		if($type=='SDisplay'){
+			$left = " left join {$table_group} as groups on targets.ad_group_id = groups.ad_group_id
+			 left join {$table_campaign} as campaigns on campaigns.campaign_id = groups.campaign_id ";
+		}
+
+		$sql = "SELECT  SQL_CALC_FOUND_ROWS 
+					any_value(targets.target_id) as target_id,
+					any_value(targets.bid) as bid,
+					any_value(targets.state) as state,
 					round(sum(ppc_report_datas.cost),2) as cost,
 					sum(ppc_report_datas.clicks) as clicks,
 					round(sum(ppc_report_datas.attributed_sales1d),2) as sales,
 					sum(ppc_report_datas.attributed_conversions1d_same_sku) as orders,
 					sum(ppc_report_datas.impressions) as impressions
 			FROM
-					{$table} as campaigns
+					{$table_target} as targets
+			{$left}
 			LEFT JOIN ppc_report_datas ON (
-					ppc_report_datas.record_type = 'campaign'
-					AND campaigns.campaign_id = ppc_report_datas.record_type_id
+					ppc_report_datas.record_type = 'target'
+					AND targets.target_id = ppc_report_datas.record_type_id 
 			)
  			left join ppc_profiles on campaigns.profile_id = ppc_profiles.profile_id
 			where ad_type = '".$type."' 
-			{$where}
-			GROUP BY campaigns.name 
-			 order by sales desc  {$limit} ";
-//		echo $sql;exit;
+			{$where} 
+			GROUP BY targets.target_id 
+			 order by sales desc {$limit}";
 
 		$_data = DB::select($sql);
 		$recordsTotal = $recordsFiltered = DB::select('SELECT FOUND_ROWS() as total');
@@ -165,9 +183,8 @@ class CcpAdCampaignController extends Controller
 			$val['ctr'] = $val['impressions'] > 0 ? sprintf("%.2f",$val['clicks']*100/$val['impressions']).'%' : '-';
 			$val['cpc'] = $val['clicks'] > 0 ? sprintf("%.2f",$val['cost']/$val['clicks']) : '-';
 			$val['cr'] = $val['clicks'] > 0 ? sprintf("%.2f",$val['orders']*100/$val['clicks']).'%' : '-';
-			$sellerid_marketplaceid = $val['seller_id'].'_'.$site;
-			$val['account_name'] = isset($data_account[$sellerid_marketplaceid]) ? $data_account[$sellerid_marketplaceid] : $val['seller_id'];
-			$data[$val['name']] = $val;
+			$val['bid'] = sprintf("%.2f",$val['bid']);
+			$data[$val['target_id']] = $val;
 		}
 		$data = array_values($data);
 		return compact('data', 'recordsTotal', 'recordsFiltered');

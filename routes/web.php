@@ -344,6 +344,10 @@ Route::post('/ccp/adCampaign/list', 'CcpAdCampaignController@list');//ccp功能�
 Route::get('/ccp/adGroup', 'CcpAdGroupController@index'); //功能入口
 Route::post('/ccp/adGroup/showTotal', 'CcpAdGroupController@showTotal'); //ccp功能展示顶部统计数据
 Route::post('/ccp/adGroup/list', 'CcpAdGroupController@list');//ccp功能的列表展示
+
+Route::get('/ccp/adTarget', 'CcpAdTargetController@index'); //功能入口
+Route::post('/ccp/adTarget/showTotal', 'CcpAdTargetController@showTotal'); //ccp功能展示顶部统计数据
+Route::post('/ccp/adTarget/list', 'CcpAdTargetController@list');//ccp功能的列表展示
 //ccp-ad模块结束
 
 Route::get('/ccp/salesboard', 'CcpSalesboardController@index');
@@ -459,6 +463,7 @@ Route::match(['post','get'],'/settlement/detailExport', 'SettlementController@de
 
 //统计分析模块
 Route::match(['post','get'],'/returnAnalysis/returnAnalysis', 'ReturnAnalysisController@returnAnalysis');//退货原因分析
+Route::match(['post','get'],'/returnAnalysis/export', 'ReturnAnalysisController@export');//导出退货原因分析
 Route::match(['post','get'],'/returnAnalysis/asinAnalysis', 'ReturnAnalysisController@asinAnalysis');//asin退货分析，维度：asin+币种+account
 Route::match(['post','get'],'/returnAnalysis/skuAnalysis', 'ReturnAnalysisController@skuAnalysis');//sku退货分析，维度：sku+币种
 
@@ -614,3 +619,19 @@ Route::match(['post','get'],'/shopsaver/users', 'ShopSaverController@users');
 Route::match(['post','get'],'/shopsaver/orderList', 'ShopSaverController@orderList');
 Route::get('/shopsaver/userEdit', 'ShopSaverController@userEdit');
 Route::post('/shopsaver/userUpdate', 'ShopSaverController@userUpdate');
+
+//库存盘点
+Route::get('/inventoryCycleCount', 'InventoryCycleCountController@index');//展示index页面
+Route::post('/inventoryCycleCount/list', 'InventoryCycleCountController@list');//获取列表数据
+Route::get('/inventoryCycleCount/downloadSku', 'InventoryCycleCountController@downloadSku');//下载企管部需要的添加sku模板
+Route::post('/inventoryCycleCount/importSku', 'InventoryCycleCountController@importSku');//导入sku数据
+Route::get('/inventoryCycleCount/downloadActualNumber', 'InventoryCycleCountController@downloadActualNumber');//下载物流部需要的添加真实数量模板
+Route::post('/inventoryCycleCount/importActualNumber', 'InventoryCycleCountController@importActualNumber');//导入真实数量数据
+//Route::get('/inventoryCycleCount/downloadReason', 'InventoryCycleCountController@downloadReason');//下载导入差异原因的模板
+//Route::post('/inventoryCycleCount/importReason', 'InventoryCycleCountController@importReason');//导入差异原因数据
+Route::get('/inventoryCycleCount/show', 'InventoryCycleCountController@show');//导入差异原因数据
+Route::post('/inventoryCycleCount/edit', 'InventoryCycleCountController@edit');//编辑操作
+Route::post('/inventoryCycleCount/deleteReason', 'InventoryCycleCountController@deleteReason');//删除原因操作
+Route::post('/inventoryCycleCount/addReason', 'InventoryCycleCountController@addReason');//添加原因操作
+Route::post('/inventoryCycleCount/editReason', 'InventoryCycleCountController@editReason');//编辑原因操作
+Route::get('/inventoryCycleCount/export', 'InventoryCycleCountController@export');//导出操作

@@ -135,7 +135,7 @@ class ReturnController extends Controller
 			$where.= " and amazon_returns.seller_account_id in (".$search['account'].")";
 		}else{
 			//站点权限
-			$data= DB::connection('vlz')->select("select id,label from seller_accounts where deleted_at is NULL and mws_marketplaceid = '{$search['site']}' order by label asc");
+			$data= DB::connection('amazon')->select("select id,label from seller_accounts where deleted_at is NULL and mws_marketplaceid = '{$search['site']}' order by label asc");
 			if($data){
 				$accountStr = '';
 				foreach($data as $key=>$val){

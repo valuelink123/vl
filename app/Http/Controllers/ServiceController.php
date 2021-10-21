@@ -58,41 +58,53 @@ class ServiceController extends Controller
 		$total_score = 0;
 		$channel_score = ['0'=>2,'1'=>3,'2'=>3,'3'=>1,'sg'=>5,'rsg'=>20];
 		$emails = Sendbox::select(DB::Raw('count(*) as count,date(send_date) as sdate'))->whereIn('user_id',$user_ids)->where('send_date','>=',$date_from.' 00:00:00')->where('send_date','<=',$date_to.' 23:59:59')->groupBy('sdate')->pluck('count','sdate')->toArray();
+		$sendbox_emails_count=0;
 		foreach($emails as $k=>$v){
 			$details[$k][3] = $v*array_get($channel_score,'3',0);
 			$total_score+=$details[$k][3];
+            $sendbox_emails_count+=$v;
 		}
 		
 		unset($emails);
 		
 		$others = TrackLog::select(DB::Raw('count(*) as count,date(created_at) as sdate,channel'))->whereIn('processor',$user_ids)->whereIn('channel',['0','1','2'])->where('type',2)->where('created_at','>=',$date_from.' 00:00:00')->where('created_at','<=',$date_to.' 23:59:59')->groupBy(['sdate','channel'])->get()->toArray();
 		$score = 0;
+		$tracklog_count=0;
 		foreach($others as $val){
 			$details[$val['sdate']][$val['channel']] = $val['count']*array_get($channel_score,$val['channel'],0);
 			$total_score+=$details[$val['sdate']][$val['channel']];
+            $tracklog_count+=$val['count'];
 		}
 		unset($others);
 
 		$sg = Ctg::select(DB::Raw('date(created_at) as sdate,count(*) as count'))->whereIn('processor',$user_ids)->where('commented',1)->where('created_at','>=',$date_from.' 00:00:00')->where('created_at','<=',$date_to.' 23:59:59')->groupBy(['sdate'])->pluck('count','sdate')->toArray();
+        $ctg_count=0;
 		foreach($sg as $k=>$v){
 			$details[$k]['sg'] = $v*array_get($channel_score,'sg',0);
 			$total_score+=$details[$k]['sg'];
+			$ctg_count+=$v;
 		}
 		unset($sg);
 		
 		$rsg = RsgRequest::select(DB::Raw('date(updated_at) as sdate,count(*) as count'))->whereIn('processor',$user_ids)->where('step',9)->where('updated_at','>=',$date_from.' 00:00:00')->where('updated_at','<=',$date_to.' 23:59:59')->groupBy(['sdate'])->pluck('count','sdate')->toArray();
+        $rsg_request_count=0;
 		foreach($rsg as $k=>$v){
 			$details[$k]['rsg'] = $v*array_get($channel_score,'rsg',0);
 			$total_score+=$details[$k]['rsg'];
+            $rsg_request_count+=$v;
 		}
 		unset($rsg);
 		
 		
 		//if(!array_key_exists($today,$details)){
-			$dash[0][0]= intval(Sendbox::select(DB::Raw('count(*) as count'))->whereIn('user_id',$user_ids)->where('send_date','>=',$date_from.' 00:00:00')->where('send_date','<=',$date_to.' 23:59:59')->value('count'))+intval(TrackLog::select(DB::Raw('count(*) as count'))->whereIn('processor',$user_ids)->whereIn('channel',['0','1','2'])->where('type',2)->where('created_at','>=',$date_from.' 00:00:00')->where('created_at','<=',$date_to.' 23:59:59')->value('count'));
-			
-			$dash[2][0]= intval(Ctg::select(DB::Raw('count(*) as count'))->whereIn('processor',$user_ids)->where('commented',1)->where('created_at','>=',$date_from.' 00:00:00')->where('created_at','<=',$date_to.' 23:59:59')->value('count'));
-			$dash[3][0]= intval(RsgRequest::select(DB::Raw('count(*) as count'))->whereIn('processor',$user_ids)->where('step',9)->where('updated_at','>=',$date_from.' 00:00:00')->where('updated_at','<=',$date_to.' 23:59:59')->value('count'));	
+//			$dash[0][0]= intval(Sendbox::select(DB::Raw('count(*) as count'))->whereIn('user_id',$user_ids)->where('send_date','>=',$date_from.' 00:00:00')->where('send_date','<=',$date_to.' 23:59:59')->value('count'))+intval(TrackLog::select(DB::Raw('count(*) as count'))->whereIn('processor',$user_ids)->whereIn('channel',['0','1','2'])->where('type',2)->where('created_at','>=',$date_from.' 00:00:00')->where('created_at','<=',$date_to.' 23:59:59')->value('count'));
+//
+//			$dash[2][0]= intval(Ctg::select(DB::Raw('count(*) as count'))->whereIn('processor',$user_ids)->where('commented',1)->where('created_at','>=',$date_from.' 00:00:00')->where('created_at','<=',$date_to.' 23:59:59')->value('count'));
+//			$dash[3][0]= intval(RsgRequest::select(DB::Raw('count(*) as count'))->whereIn('processor',$user_ids)->where('step',9)->where('updated_at','>=',$date_from.' 00:00:00')->where('updated_at','<=',$date_to.' 23:59:59')->value('count'));
+
+		$dash[0][0]=$sendbox_emails_count+$tracklog_count;
+		$dash[2][0]=$ctg_count;
+		$dash[3][0]=$rsg_request_count;
 		//}else{
 			//$dash[0][0]=$dash[2][0]=$dash[3][0]=0;
 			//foreach(array_get($details,$today) as $k=>$v){
@@ -103,10 +115,13 @@ class ServiceController extends Controller
 			
 		//}
 		//if(!array_key_exists($yesterday,$details)){
-			$dash[0][1]= intval(Sendbox::select(DB::Raw('count(*) as count'))->whereIn('user_id',$user_ids)->where('send_date','>=',$hb_date_from.' 00:00:00')->where('send_date','<=',$hb_date_to.' 23:59:59')->value('count'))+intval(TrackLog::select(DB::Raw('count(*) as count'))->whereIn('processor',$user_ids)->whereIn('channel',['0','1','2'])->where('type',2)->where('created_at','>=',$hb_date_from.' 00:00:00')->where('created_at','<=',$hb_date_to.' 23:59:59')->value('count'));
-			
-			$dash[2][1]= intval(Ctg::select(DB::Raw('count(*) as count'))->whereIn('processor',$user_ids)->where('commented',1)->where('created_at','>=',$hb_date_from.' 00:00:00')->where('created_at','<=',$hb_date_to.' 23:59:59')->value('count'));
-			$dash[3][1]= intval(RsgRequest::select(DB::Raw('count(*) as count'))->whereIn('processor',$user_ids)->where('step',9)->where('updated_at','>=',$hb_date_from.' 00:00:00')->where('updated_at','<=',$hb_date_to.' 23:59:59')->value('count'));	
+//			$dash[0][1]= intval(Sendbox::select(DB::Raw('count(*) as count'))->whereIn('user_id',$user_ids)->where('send_date','>=',$hb_date_from.' 00:00:00')->where('send_date','<=',$hb_date_to.' 23:59:59')->value('count'))+intval(TrackLog::select(DB::Raw('count(*) as count'))->whereIn('processor',$user_ids)->whereIn('channel',['0','1','2'])->where('type',2)->where('created_at','>=',$hb_date_from.' 00:00:00')->where('created_at','<=',$hb_date_to.' 23:59:59')->value('count'));
+//
+//			$dash[2][1]= intval(Ctg::select(DB::Raw('count(*) as count'))->whereIn('processor',$user_ids)->where('commented',1)->where('created_at','>=',$hb_date_from.' 00:00:00')->where('created_at','<=',$hb_date_to.' 23:59:59')->value('count'));
+//			$dash[3][1]= intval(RsgRequest::select(DB::Raw('count(*) as count'))->whereIn('processor',$user_ids)->where('step',9)->where('updated_at','>=',$hb_date_from.' 00:00:00')->where('updated_at','<=',$hb_date_to.' 23:59:59')->value('count'));
+		$dash[0][1]=0;
+		$dash[2][1]=0;
+		$dash[3][1]=0;
 		/*}else{
 			$dash[0][1]=$dash[2][1]=$dash[3][1]=0;
 			foreach(array_get($details,$yesterday) as $k=>$v){

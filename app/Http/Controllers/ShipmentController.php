@@ -195,7 +195,7 @@ class ShipmentController extends Controller
             $shipmentList[$key]['toUrl'] = @$DOMIN_MARKETPLACEID_URL[$value['marketplace_id']];
         }
 
-        $sql_group = 'SELECT status,COUNT(id) as count_num from shipment_requests GROUP BY status=0,status=1,status=2,status=3,status=4,status=5';
+        $sql_group = 'SELECT any_value(status) as status,COUNT(id) as count_num from shipment_requests GROUP BY status=0,status=1,status=2,status=3,status=4,status=5';
         $status_group = DB::connection('vlz')->select($sql_group);
         $status_group = (json_decode(json_encode($status_group), true));
         if (!empty($status_group)) {
@@ -319,8 +319,8 @@ class ShipmentController extends Controller
         /** 超级权限*/
         $DOMIN_MARKETPLACEID_SX = Asin::DOMIN_MARKETPLACEID_SX;
         $r_message = $seller_skus = $seller_accounts = $asins = [];
-        $label = $batch_num = $stock_day_num = $transfer_num = $planning_name = $seller_name = $sap_seller_id = $planer = '';
-        $FBA_keepday_num = $FBA_Stock = 0;
+        $label = $batch_num = $planning_name = $seller_name = $planer = '';
+        $FBA_keepday_num = $FBA_Stock = $transfer_num = $stock_day_num = $sap_seller_id = 0;
         if (!empty($request['asin'])) {
             if (!empty($request['asin']) && !empty($request['sku']) && !empty($request['seller_sku']) && !empty($request['warehouse']) && !empty($request['quantity']) && !empty($request['received_date'])) {
                 //查询亚马逊 label
@@ -731,9 +731,8 @@ class ShipmentController extends Controller
         $old_status = $old_sap_seller_id = $new_status = $role_id = '';
         if (!empty($idList)) {
             $old_shipment = DB::connection('vlz')->table('shipment_requests')
-                ->select('status', 'sap_seller_id')
+				->distinct('status')
                 ->whereIn('id', $idList)
-                ->groupBy('status')
                 ->get()->map(function ($value) {
                     return (array)$value;
                 })->toArray();
@@ -742,7 +741,6 @@ class ShipmentController extends Controller
                     return ['status' => 0, 'msg' => '更新失败,被修改信息状态不一致'];
                 } else {
                     $old_status = $old_shipment[0]['status'];
-                    $old_sap_seller_id = $old_shipment[0]['sap_seller_id'];
                     $new_status = @$request['status'];
                 }
             }
@@ -887,7 +885,7 @@ class ShipmentController extends Controller
         $DOMIN_MARKETPLACEID_SX = Asin::DOMIN_MARKETPLACEID_SX;
 
         if (!empty($request['asin']) && !empty($request['marketplace_id'])) {
-            $sql = "SELECT sku,seller_sku from sap_asin_match_sku WHERE asin='" . $request['asin'] . "' AND marketplace_id='" . $request['marketplace_id'] . "' GROUP BY seller_sku;";
+            $sql = "SELECT any_value(sku) as sku,seller_sku from sap_asin_match_sku WHERE asin='" . $request['asin'] . "' AND marketplace_id='" . $request['marketplace_id'] . "' GROUP BY seller_sku;";
             $sellersku = DB::connection('vlz')->select($sql);
             $data = (json_decode(json_encode($sellersku), true));
             if (!empty($data)) {

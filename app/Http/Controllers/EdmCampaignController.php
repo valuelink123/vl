@@ -97,7 +97,7 @@ class EdmCampaignController extends Controller
 			$tmpdata = EdmTemplate::where('id',$template_id)->first()->toArray();
 			$content = $tmpdata['content'];
 			//获取asin相关产品数据，替换模板里的内容
-			$productData = DB::connection('vlz')->select("select * from asins where marketplaceid='".$marketplaceid."' and asin = '".$asin."' limit 1");
+			$productData = DB::connection('amazon')->select("select * from asins where marketplaceid='".$marketplaceid."' and asin = '".$asin."' limit 1");
 			if($productData){
 				$productImages = $productData[0]->images;
 				$imagehtml = '';//产品图片
