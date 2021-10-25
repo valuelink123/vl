@@ -837,7 +837,7 @@
 						if(row.images != null){
 							str = row.images;
 							dot = str.split(',');
-							dot.length > 1 ? img = 'https://images-na.ssl-images-amazon.com/images/I/' + dot[0] : img = ''
+							dot.length >= 1 ? img = 'https://images-na.ssl-images-amazon.com/images/I/' + dot[0] : img = ''
 						}
 						var content = '<img src="'+img+'" alt="" style="display:block; width:50px; height:60px;">';
 						return content;
