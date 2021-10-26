@@ -955,22 +955,20 @@ GROUP BY
 ) AS ASIN_TMP LEFT JOIN asin_daily_report ON (ASIN_TMP.asin=asin_daily_report.asin AND ASIN_TMP.marketplace_id=asin_daily_report.marketplace_id)
 
 WHERE asin_daily_report.date>='$date_from' AND asin_daily_report.date<='$date_to'";
-            $arrayData[] = ['Sku', 'Site','Status', 'Date', 'Sales'];
+            $arrayData[] = ['Sku', 'Title','Site','Status', 'Date', 'Sales'];
             $data = DB::connection('amazon')->select($sql);
             $data = json_decode(json_encode($data), true);
             foreach ($data as $key => $val) {
                 $arrayData[] = [
                     array_get($val, 'sku'),
+					array_get($val, 'description'),
                     array_get($val, 'site'),
 					array_get($val, 'status'),
                     array_get($val, 'date'),
                     array_get($val, 'sales'),
                 ];
             }
-
         }
-
-			
 				
 			if($arrayData){
 				$spreadsheet = new Spreadsheet();
