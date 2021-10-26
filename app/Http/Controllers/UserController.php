@@ -863,78 +863,106 @@ class UserController extends Controller
 
         if (array_get($_REQUEST, 'ExportType') == 'DailySales') {
             if (!Auth::user()->can(['data-statistics-dailySales'])) die('Permission denied -- data-statistics-dailySales');
-            $sql = "SELECT
-                        tmp.sku,tmp.site,tmp.date,tmp.sales
-                    FROM
-                        (
-                        SELECT
-                            sku,
-                            
-                            CASE marketplace_id 
-                                WHEN 'A2Q3Y263D00KWC' THEN
-                                'Brazil' 
-                                WHEN 'A2EUQ1WTGCTBG2' THEN
-                                'www.amazon.ca' 
-                                WHEN 'A1AM78C64UM0Y8' THEN
-                                'www.amazon.mx' 
-                                WHEN 'ATVPDKIKX0DER' THEN
-                                'www.amazon.com' 
-                                WHEN 'A2VIGQ35RCS4UG' THEN
-                                'United Arab Emirates (U.A.E.)' 
-                                WHEN 'A1PA6795UKMFR9' THEN
-                                'www.amazon.de' 
-                                WHEN 'ARBP9OOSHTCHU' THEN
-                                'Egypt' 
-                                WHEN 'A1RKKUPIHCS9HS' THEN
-                                'www.amazon.es' 
-                                WHEN 'A13V1IB3VIYZZH' THEN
-                                'www.amazon.fr' 
-                                WHEN 'A1F83G8C2ARO7P' THEN
-                                'www.amazon.co.uk' 
-                                WHEN 'A21TJRUUN4KGV' THEN
-                                'India' 
-                                WHEN 'APJ6JRA9NG5V4' THEN
-                                'www.amazon.it' 
-                                WHEN 'A1805IZSGTT6HS' THEN
-                                'Netherlands' 
-                                WHEN 'A17E79C6D8DWNP' THEN
-                                'Saudi Arabia' 
-                                WHEN 'A2NODRKZP88ZB9' THEN
-                                'Sweden' 
-                                WHEN 'A33AVAJ2PDY3EV' THEN
-                                'Turkey' 
-                                WHEN 'A19VAU5U5O7RUS' THEN
-                                'Singapore' 
-                                WHEN 'A39IBJ37TRP1C6' THEN
-                                'Australia' 
-                                WHEN 'A1VC38T7YXB528' THEN
-                                'www.amazon.co.jp' ELSE 'Other' 
-                            END AS site,
-                            date ,
-                        sum( sale ) AS sales
-                        FROM
-                            sale_daily_info 
-                        WHERE
-                            date >= '$date_from'
-						    AND date <= '$date_to'
-                            AND sku IS NOT NULL 
-                        GROUP BY
-                            sku,
-                            marketplace_id,
-                            date 
-                        ) AS tmp 
-                    ORDER BY
-                      tmp.site,
-                        tmp.sku,	
-                        tmp.date ASC 
-                    ";
-            $arrayData[] = ['Sku', 'Site', 'Date', 'Sales'];
-            $data = DB::select($sql);
+            $sql = "SELECT ASIN_TMP.sku,ASIN_TMP.description , 
+	CASE ASIN_TMP.marketplace_id 
+      WHEN 'A2Q3Y263D00KWC' THEN
+      'Brazil' 
+      WHEN 'A2EUQ1WTGCTBG2' THEN
+      'www.amazon.ca' 
+      WHEN 'A1AM78C64UM0Y8' THEN
+      'www.amazon.mx' 
+      WHEN 'ATVPDKIKX0DER' THEN
+      'www.amazon.com' 
+      WHEN 'A2VIGQ35RCS4UG' THEN
+      'United Arab Emirates (U.A.E.)' 
+      WHEN 'A1PA6795UKMFR9' THEN
+      'www.amazon.de' 
+      WHEN 'ARBP9OOSHTCHU' THEN
+      'Egypt' 
+      WHEN 'A1RKKUPIHCS9HS' THEN
+      'www.amazon.es' 
+      WHEN 'A13V1IB3VIYZZH' THEN
+      'www.amazon.fr' 
+      WHEN 'A1F83G8C2ARO7P' THEN
+      'www.amazon.co.uk' 
+      WHEN 'A21TJRUUN4KGV' THEN
+      'India' 
+      WHEN 'APJ6JRA9NG5V4' THEN
+      'www.amazon.it' 
+      WHEN 'A1805IZSGTT6HS' THEN
+      'Netherlands' 
+      WHEN 'A17E79C6D8DWNP' THEN
+      'Saudi Arabia' 
+      WHEN 'A2NODRKZP88ZB9' THEN
+      'Sweden' 
+      WHEN 'A33AVAJ2PDY3EV' THEN
+      'Turkey' 
+      WHEN 'A19VAU5U5O7RUS' THEN
+      'Singapore' 
+      WHEN 'A39IBJ37TRP1C6' THEN
+      'Australia' 
+      WHEN 'A1VC38T7YXB528' THEN
+      'www.amazon.co.jp' ELSE 'Other' 
+    END AS site, CASE ASIN_TMP.`STATUS`
+	WHEN 0 THEN '淘汰'
+	WHEN 1 THEN '保留'
+	WHEN 2 THEN '新品'
+	WHEN 3 THEN '配件'
+	WHEN 4 THEN '替换'
+	WHEN 5 THEN '待定'
+  WHEN 6 THEN	'停售'
+	ELSE
+		'新品规划'
+END AS `status`
+, asin_daily_report.date,asin_daily_report.sales FROM (
+SELECT
+	asin,
+	marketplace_id,
+	group_concat( a.sku ) AS sku,
+	group_concat( b.description ) AS description,
+	any_value ( sku_status ) AS `STATUS`,
+	any_value ( STATUS ) AS pro_status,
+	any_value ( bg ) AS bg,
+	any_value ( bu ) AS bu,
+	any_value ( sap_seller_id ) AS sap_seller_id 
+FROM
+	(
+	SELECT
+		asin,
+		marketplace_id,
+		sku,
+		any_value ( sku_status ) AS sku_status,
+		any_value ( CASE WHEN STATUS = 'S' THEN '0' ELSE STATUS END ) AS STATUS,
+		any_value ( sap_seller_bg ) AS bg,
+		any_value ( sap_seller_bu ) AS bu,
+		any_value ( sap_seller_id ) AS sap_seller_id 
+	FROM
+		sap_asin_match_sku 
+	WHERE
+		length(
+		trim( asin )) = 10 
+		AND actived = 1 
+	GROUP BY
+		asin,
+		marketplace_id,
+		sku 
+	) AS a
+	LEFT JOIN sap_skus AS b ON a.sku = b.sku 
+GROUP BY
+	asin,
+	marketplace_id
+	
+) AS ASIN_TMP LEFT JOIN asin_daily_report ON (ASIN_TMP.asin=asin_daily_report.asin AND ASIN_TMP.marketplace_id=asin_daily_report.marketplace_id)
+
+WHERE asin_daily_report.date>='$date_from' AND asin_daily_report.date<='$date_to'";
+            $arrayData[] = ['Sku', 'Site','Status', 'Date', 'Sales'];
+            $data = DB::connection('amazon')->select($sql);
             $data = json_decode(json_encode($data), true);
             foreach ($data as $key => $val) {
                 $arrayData[] = [
                     array_get($val, 'sku'),
                     array_get($val, 'site'),
+					array_get($val, 'status'),
                     array_get($val, 'date'),
                     array_get($val, 'sales'),
                 ];
