@@ -164,21 +164,23 @@ class SalespController extends Controller
 		$weekData = [];
 		foreach($importData as $key => $data){
 			if($key==0) {
-				$column = 9;
+				$column = 20;
 				while(array_get($data,$column)){
 					preg_match('/(?<!\d)\d{6}(?!\d)/i', array_get($data,$column), $weekMatch);
-					$weekData[$column] = array_get($weekMatch,0,array_get($data,$column));
-					$column = $column+3;
+					if(!empty($weekMatch)){
+						$weekData[$column] = array_get($weekMatch,0,array_get($data,$column));
+					}
+					$column = $column+1;
 				}	
 			}else{
 				foreach($weekData as $col=>$val){
-					if(array_get($data,1) && array_get($data,4)){
+					if(array_get($data,5) && array_get($data,9)){
 						$i++;
-						$outData[$i][0] = array_get($data,1);
-						$outData[$i][1] = array_get($data,4);
+						$outData[$i][0] = array_get($data,5);
+						$outData[$i][1] = array_get($data,9);
 						$outData[$i][2] = $val;
-						$outData[$i][3] = (string)intval(array_get($data,$col-2));
-						$outData[$i][4] = (string)intval(array_get($data,$col-1));
+						$outData[$i][3] = '0';
+						$outData[$i][4] = '0';
 						$outData[$i][5] = (string)intval(array_get($data,$col));
 					}
 				}
