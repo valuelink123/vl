@@ -1402,38 +1402,7 @@ class ShipmentController extends Controller
         $sr_id_list = $request['shipment_id_list'] ? $request['shipment_id_list'] : '';
         $statusList = ['资料提供中', '换标中', '待出库', '已发货', '取消发货'];
         $downLoad = $request['downLoad'] ? $request['downLoad'] : 0;//是否下载
-        $sql = "SELECT
-                a.id,
-                a.`status`,
-                a.barcode,
-                a.shipping_method,
-                a.cargo_data,
-                a.shippment_id,
-                a.receipts_num,
-                a.updated_at,
-                a.created_at,
-                s.sap_seller_id,
-                s.batch_num,
-                s.out_warehouse,
-                s.sap_factory_code,
-                s.label,
-                s.sku,
-                s.quantity,
-                s.rms_sku,
-                s.asin,
-                s.cargo_data,
-                s.marketplace_id,
-                a.shipment_requests_id,
-               	a.width,
-                a.height,
-                a.transportation,
-                a.pallets,
-                a.pallets_size,
-                a.length,
-                a.box_num,
-                a.pcs_box,
-                a.pcs,
-                a.weight_box
+        $sql = "SELECT any_value(a.id) as id,any_value(a.status) as status,any_value(a.barcode) as barcode,any_value(a.shippment_id) as shippment_id,any_value(a.receipts_num) as receipts_num,any_value(a.shipping_method) as shipping_method,any_value(a.cargo_data) as cargo_data,any_value(a.width) as width,any_value(a.height) as height,any_value(a.pallets) as pallets,any_value(a.transportation) as transportation,any_value(a.pallets_size) as pallets_size,any_value(a.updated_at) as updated_at,any_value(a.created_at) as created_at,any_value(a.length) as length,any_value(a.box_num) as box_num,any_value(a.pcs_box) as pcs_box,any_value(a.pcs) as pcs,any_value(a.weight_box) as weight_box,any_value(a.shipment_requests_id) as shipment_requests_id,any_value(s.sap_seller_id) as sap_seller_id,any_value(s.batch_num) as batch_num,any_value(s.out_warehouse) as out_warehouse,any_value(s.sap_factory_code) as sap_factory_code,any_value(s.label) as label,any_value(s.sku) as sku,any_value(s.quantity) as quantity,any_value(s.rms_sku) as rms_sku,any_value(s.asin) as asin,any_value(s.cargo_data) as cargo_data,any_value(s.marketplace_id) as marketplace_id 
             FROM
                 allot_progress AS a
             LEFT JOIN shipment_requests AS s ON s.id = a.shipment_requests_id where 1=1 ";
@@ -1517,7 +1486,11 @@ class ShipmentController extends Controller
         $factoryList = DB::connection('vlz')->select($sql_f);
         $factoryList = (json_decode(json_encode($factoryList), true));
         //状态分组 统计
-        $sql_group = 'SELECT status,COUNT(id) as count_num from ( SELECT * FROM allot_progress GROUP BY shipment_requests_id) as a  GROUP BY status=0,status=1,status=2,status=3,status=4';
+        $sql_group = 'SELECT status,COUNT(id) as count_num from ( SELECT any_value(id) as id,any_value(status) as status,any_value(barcode) as barcode,any_value(shippment_id) as shippment_id,any_value(receipts_num) as receipts_num,any_value(shipping_method) as shipping_method,any_value(cargo_data) as cargo_data,any_value(width) as width,any_value(height) as height,any_value(pallets) as pallets,any_value(transportation) as transportation,any_value(pallets_size) as pallets_size,any_value(updated_at) as updated_at,any_value(created_at) as created_at,any_value(length) as length,any_value(box_num) as box_num,any_value(pcs_box) as pcs_box,any_value(pcs) as pcs,any_value(weight_box) as weight_box 
+		FROM
+			allot_progress
+		GROUP BY
+			shipment_requests_id) as a  GROUP BY status';
         $status_group = DB::connection('vlz')->select($sql_group);
         $status_group = (json_decode(json_encode($status_group), true));
         if (!empty($status_group)) {
