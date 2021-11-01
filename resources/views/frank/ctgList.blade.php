@@ -33,8 +33,7 @@ th,td,td>span {
                     <div class="col-md-2">
                         <div class="input-group">
                             <span class="input-group-addon">From</span>
-                            <input class="form-control" data-options="format:'yyyy-mm-dd'" value="{!! date('Y-m-d', strtotime('-7 day')) !!}" data-init-by-query="daterange.from" id="date_from"
-                                   autocomplete="off"/>
+                            <input class="form-control" data-options="format:'yyyy-mm-dd'" value="{!! date('Y-m-d', strtotime('-7 day')) !!}" data-init-by-query="daterange.from" id="date_from" autocomplete="off"/>
                         </div>
                         <br/>
                         <div class="input-group">
@@ -112,6 +111,7 @@ th,td,td>span {
                         <div class="input-group">
                             <span class="input-group-addon">Channel</span>
                             <select style="width:100%;height:29px;" id="channel" data-init-by-query="ins.channel">
+                                <option value="-1" >Select ...</option>
                                 @foreach($channel as $k=>$v)
                                     <option value="{!! $k !!}" @if($selchannel==$k) selected @endif>{!! $v !!}</option>
                                 @endforeach
@@ -122,7 +122,7 @@ th,td,td>span {
                         <div class="input-group">
                             <span class="input-group-addon">Site</span>
                             <select style="width:100%;height:29px;" id="site" data-init-by-query="ins.site">
-                                <option value="" >Select</option>
+                                <option value="" >Select ...</option>
                                 @foreach(getSiteUrl() as $k=>$v)
                                     <option value="{!! $v !!}" >{!! $v !!}</option>
                                 @endforeach
@@ -138,17 +138,7 @@ th,td,td>span {
                             </select>
                         </div>
                     </div>
-					@permission('ctg-export')
-                    <div class="col-md-1">
-                        <div class="btn-group " style="float:right;">
 
-                            <button id="ctg-export" class="btn sbold blue"> Export
-                                <i class="fa fa-download"></i>
-                            </button>
-
-                        </div>
-                    </div>
-					@endpermission
                     @permission('ctg-add')
                     <div class="btn-group" style="float:right;margin-top:10px;">
                         <a data-target="#ajax" data-toggle="modal" href="{{ url('ctg/create')}}">
@@ -158,6 +148,11 @@ th,td,td>span {
                         </a>
                     </div>
                     @endpermission
+                    <div style="clear:both"></div>
+                    <div class="btn-group" style="margin-top:10px;margin-left:15px;">
+                        <button id="search-btn" class="btn sbold blue"> Search
+                        </button>
+                    </div>
 
                     @permission('compose')
                     <div class="btn-group" style="margin-top:10px;margin-left:15px;">
@@ -165,7 +160,16 @@ th,td,td>span {
                         </button>
                     </div>
                     @endpermission
-
+                    @permission('ctg-export')
+                    <div class="btn-group" style="margin-top:10px;margin-left:15px;">
+                        <select style="width: 196px; height: 34px;" id="exportType">
+                            <option value="0">请选择导出类型...</option>
+                            <option value="1">导出选中记录</option>
+                            <option value="2">导出当前展示的记录</option>
+                            <option value="3">导出当前查询结果所有记录</option>
+                        </select>
+                    </div>
+                    @endpermission
                 </div>
             </div>
             <div style="clear:both;height:50px; text-align: right;">
@@ -238,6 +242,20 @@ th,td,td>span {
         </div>
     </div>
 
+<input type="hidden" id="hidden_date_from" value="" />
+<input type="hidden" id="hidden_date_to" value="" />
+<input type="hidden" id="hidden_email" value="" />
+<input type="hidden" id="hidden_site" value="" />
+<input type="hidden" id="hidden_rating" value="" />
+<input type="hidden" id="hidden_processor" value="" />
+<input type="hidden" id="hidden_status" value="" />
+<input type="hidden" id="hidden_bg" value="" />
+<input type="hidden" id="hidden_bu" value="" />
+<input type="hidden" id="hidden_brand" value="" />
+<input type="hidden" id="hidden_review_id" value="" />
+<input type="hidden" id="hidden_channel" value="" />
+<input type="hidden" id="hidden_crmType" value="" />
+
     <script>
 
         XFormHelper.initByQuery('[data-init-by-query]')
@@ -255,14 +273,42 @@ th,td,td>span {
 
         $("#thetabletoolbar select[multiple]").chosen()
 
-        $(thetabletoolbar).change(e => {
-            dtApi.ajax.reload()
-        })
+        // $(thetabletoolbar).change(e => {
+        //     dtApi.ajax.reload()
+        // })
+
+        $('#search-btn').click(function () {
+            if($('#channel').val() == -1){
+                alert("请选择一个Channel");
+                return false;
+            }
+            dtApi.ajax.reload();
+            $('#hidden_date_from').val($('#date_from').val());
+            $('#hidden_date_to').val($('#date_to').val());
+            $('#hidden_email').val($('#email').val());
+            $('#hidden_site').val($('#site').val());
+            $('#hidden_rating').val($('#rating').val());
+            $('#hidden_processor').val($('#processor').val());
+            $('#hidden_status').val($('#status').val());
+            $('#hidden_bg').val($('#bg').val());
+            $('#hidden_bu').val($('#bu').val());
+            $('#hidden_brand').val($('#brand').val());
+            $('#hidden_review_id').val($('#review_id').val());
+            $('#hidden_channel').val($('#channel').val());
+            $('#hidden_crmType').val($('#crmType').val());
+        });
+
+        function jointStringToArray(jointString){
+            if(!jointString){
+                return null;
+            }
+            return String(jointString).split(',');
+        }
+
 
         let $theTable = $(thetable)
 
         $theTable.on('preXhr.dt', (e, settings, data) => {
-
             Object.assign(data.search, {
                 // value: fuzzysearch.value,
                 daterange: {
@@ -287,7 +333,6 @@ th,td,td>span {
                     crmType:$('#crmType').val(),
                 }
             })
-
             history.replaceState(null, null, '?' + objectToQueryString(data.search))
         })
 
@@ -304,7 +349,8 @@ th,td,td>span {
             processing: true,
             order: [[1, 'desc']],
             select: {
-                style: 'os',
+                style: 'multi',
+                //style: 'os', //要按住ctrl键，才可以多选
                 info: true, // info N rows selected
                 // blurable: true, // unselect on blur
                 selector: 'td:first-child', // 指定第一列可以点击选中
@@ -368,9 +414,8 @@ th,td,td>span {
                     render(data, type, row) {
                         if (!data) return ''
                         let steps = eval('(' + data.replace(/<[^>]+>/g,"") + ')');//JSON.parse(data.replace(/<[^>]+>/g,""))
-						
+
                         let html = steps.track_notes[row.status]
-						//alert(html);
                         if (!html) return ''
                         return html.trim().substr(0, 67)
                     }
@@ -422,7 +467,6 @@ th,td,td>span {
             let selectedRows = dtApi.rows({selected: true})
 
             let ctgRows = selectedRows.data().toArray().map(obj => [obj.created_at, obj.order_id, obj.email])
-
             if (!ctgRows.length) {
                 $this.val('')
                 toastr.error('Please select some rows first !')
@@ -432,7 +476,6 @@ th,td,td>span {
             var channel = $('#channel').val();
             postByJson('/ctg/batchassigntask?channel='+channel, {processor, ctgRows}).then(arr => {
                 for (let rowIndex of selectedRows[0]) {
-                    // console.log(dtApi.cell(rowIndex, 9).data())
                     dtApi.cell(rowIndex, 19).data(arr[1]).draw()
                     // draw 之后，dt 自作主张，向服务器请求数据然后又更新一遍
                 }
@@ -448,13 +491,77 @@ th,td,td>span {
 
         let dtApi = $theTable.api();
 
-//        $("#ctg-export").click(function(){
-//            location.href='/ctg/export?asin_status='+(($("select[name='asin_status[]']").val())?$("select[name='asin_status[]']").val():'')+'&keywords='+$("input[name='keywords']").val()+'&date_from='+$("input[name='date_from']").val()+'&date_to='+$("input[name='date_to']").val()+'&nextdate='+$("input[name='nextdate']").val()+'&follow_status='+(($("select[name='follow_status[]']").val())?$("select[name='follow_status[]']").val():'')+'&user_id='+(($("select[name='user_id[]']").val())?$("select[name='user_id[]']").val():'')+'&site='+(($("select[name='site[]']").val())?$("select[name='site[]']").val():'')+'&rating='+$("select[name='rating']").val()+'&bgbu='+$("select[name='bgbu']").val()+'&vp='+$('select[name="vp"]').val()+'&rc='+$('select[name="rc"]').val()+'&del='+$('select[name="del"]').val();
-//        });
+        // $("#ctg-export").click(function(){
+        //     // var channel = $('#channel').val();
+        //     // location.href='/ctg/export?channel='+channel+'&date_from='+$("#date_from").val()+'&date_to='+$("#date_to").val();
+        // });
 
-        $("#ctg-export").click(function(){
-            var channel = $('#channel').val();
-            location.href='/ctg/export?channel='+channel+'&date_from='+$("#date_from").val()+'&date_to='+$("#date_to").val();
+        $('#exportType').change(function(){
+
+            $exportTypeValue = $(this).val();
+            if ($exportTypeValue == 0) {
+                return false;
+            }
+            var selectRowJson = {};
+            if ($exportTypeValue == 1) {
+                let selectedRows = dtApi.rows({selected: true})
+                let ctgRows = selectedRows.data().toArray().map(obj => [obj.created_at, obj.order_id])
+                if (!ctgRows.length) {
+                    $(this).val('0');
+                    alert('Please select some rows first !')
+                    return false;
+                }
+                for (var i = 0; i < ctgRows.length; i++) {
+                    selectRowJson[i] = {};
+                    selectRowJson[i]['created_at'] = ctgRows[i][0];
+                    selectRowJson[i]['order_id'] = ctgRows[i][1];
+                }
+            } else if ($exportTypeValue == 2) {
+                let selectedRows = dtApi.rows()
+                let ctgRows = selectedRows.data().toArray().map(obj => [obj.created_at, obj.order_id])
+                for (var i = 0; i < ctgRows.length; i++) {
+                    selectRowJson[i] = {};
+                    selectRowJson[i]['created_at'] = ctgRows[i][0];
+                    selectRowJson[i]['order_id'] = ctgRows[i][1];
+                }
+            }
+
+            $.ajax({
+                type: 'POST',
+                url: "/ctg/export",
+                data:{search: {
+                    daterange: {
+                        from: $('#hidden_date_from').val(),
+                        to: $('#hidden_date_to').val()
+                    },
+                    ands: {
+                        email: $('#hidden_email').val(),
+                        site: $('#hidden_site').val(),
+                    },
+                    ins: {
+                        rating: jointStringToArray($('#hidden_rating').val()),
+                        processor: jointStringToArray($('#hidden_processor').val()),
+                        status: jointStringToArray($('#hidden_status').val()),
+                        bg: jointStringToArray($('#hidden_bg').val()),
+                        bu: jointStringToArray($('#hidden_bu').val()),
+                        brand: jointStringToArray($('#hidden_brand').val()),
+                        review_id: $('#hidden_review_id').val(),
+                        channel: $('#hidden_channel').val(),
+                        crmType: jointStringToArray($('#hidden_crmType').val()),
+                    },
+                    selectRowJson: selectRowJson,
+                    exportType: $exportTypeValue,
+                }},
+                dataType: 'json'
+            }).done(function (data) {
+                var $a = $("<a>");
+                $a.attr("href", data.file);
+                $("body").append($a);
+                $a.attr("download", "Export_CTG.xlsx");
+                $a[0].click();
+                $a.remove();
+            });
+
         });
 
         //批量发邮件
@@ -470,7 +577,7 @@ th,td,td>span {
             var email = ctgRows.join(';');
             window.open('/send/create?to_address='+email,'_blank');
         })
-        
+
     </script>
 
 @endsection
