@@ -39,7 +39,7 @@ class CtgController extends Controller {
 			
             //目前在职的，而且sap_seller_id不为0
             $userRows = DB::table('users')->where('sap_seller_id', '>', 0)->where('locked', '=',0)->select('id', 'name')->get();
-            $selchannel = isset($_REQUEST['channel']) ? $_REQUEST['channel'] : '';
+            $selchannel = isset($_REQUEST['channel']) ? $_REQUEST['channel'] : '-1';
 
             foreach ($userRows as $row) {
                 $users[$row->id] = $row->name;
@@ -114,6 +114,12 @@ class CtgController extends Controller {
 		if(isset($ins['channel']) && $ins['channel']){
 			$channel = $ins['channel'];
 		}
+		//页面首次加载时，不做内容查询
+        if ($channel == -1) {
+            $data = [];
+            $recordsTotal = $recordsFiltered = 0;
+            return compact('data', 'recordsTotal', 'recordsFiltered');
+        }
 		$channelName = isset($channelKeyVal[$channel]) ? $channelKeyVal[$channel] : 'CTG';
 		if($channel==1){
 			$table = 'cashback';
@@ -232,6 +238,246 @@ class CtgController extends Controller {
 
     }
 
+    public function export(Request $req){
+		if(!Auth::user()->can(['ctg-export'])) die('Permission denied -- ctg-export');
+        set_time_limit(0);
+        $arrayData = array();
+        $headArray[] = 'Date';
+        $headArray[] = 'Email';
+        $headArray[] = 'Customer';
+		$headArray[] = 'Order No';
+        $headArray[] = 'Item No';
+        $headArray[] = 'Item Name';
+        $headArray[] = 'Site';
+        $headArray[] = 'Asin';
+        $headArray[] = 'Seller SKU';
+        $headArray[] = 'Brand';
+        $headArray[] = 'Item Group';
+        $headArray[] = 'Status';
+        $headArray[] = 'BG';
+        $headArray[] = 'BU';
+		$headArray[] = 'Channel';
+        $headArray[] = 'Processor';
+
+        $arrayData[] = $headArray;
+
+                // 分区条件
+        $timeRange = $this->dtTimeRange($req);
+        $where = $this->dtWhere(
+            $req,
+            [
+                'processor' => 't2.name',
+                'email' => 't1.email',
+                'name' => 't1.name',
+                'order_id' => 't1.order_id',
+                'asins' => 't4.asins',
+                'itemCodes' => 't4.itemCodes',
+                'itemNames' => 't4.itemNames',
+                'sellerskus' => 't4.sellerskus',
+                'itemGroups' => 't4.itemGroups',
+                'brands' => 't4.brands',
+                'bgs' => 't4.bgs',
+                'bus' => 't4.bus',
+                'phone' => 't1.phone',
+                'encrypted_email' => 'encrypted_email'
+            ],
+            [
+                'phone' => 't1.phone',
+				'email' => 't1.email',
+				'site' => 't3.SalesChannel',
+            ],
+            [
+                // WHERE IN
+                'rating' => 't1.rating',
+                'processor' => 't1.processor',
+                'status' => 't1.status',
+                // WHERE FIND_IN_SET
+                'crmType' => 's:client.type',
+                'bg' => 's:t4.bgs',
+                'bu' => 's:t4.bus',
+                'brand' => 's:t4.brands',
+            ]
+        );
+        $where .= $this->getAsinWhere('t4.bgs','t4.bus','t1.processor','ctg-show-all');
+
+        $selectRowJson = $req->input('search.selectRowJson', []);
+        $lenSelectedRow = count($selectRowJson);
+        $exportType = $req->input('search.exportType', []);
+        $whereSelectRow = "";
+
+        if($exportType == 1 || $exportType == 2){
+            $whereSelectRow = " AND (";
+            for($i = 0; $i < count($selectRowJson); $i++){
+                $temp = " (t1.created_at = '{$selectRowJson[$i]['created_at']}' AND t1.order_id = '{$selectRowJson[$i]['order_id']}') ";
+                if($i < $lenSelectedRow-1){
+                    $temp .= " OR ";
+                }
+                $whereSelectRow .= $temp;
+            }
+            $whereSelectRow .= ")";
+        }
+
+        $where .= $whereSelectRow;
+
+        //搜索Review Id的搜索条件   '%"review_id":"12"%'
+		$ins = $req->input('search.ins', []);
+		if(isset($ins['review_id']) && $ins['review_id']){
+			$str = '%"review_id":"'.$ins['review_id'].'"%';
+			$where .= " AND t1.steps like '".$str."'";
+		}
+		//选择的渠道不同，查不同的表，限制不同的条件
+		$channel = 0;
+		$table = 'ctg';
+		$channelKeyVal = getCtgChannel();
+		//0=>'CTG',1=>'Cashback',2=>'BOGO',3=>'Non-CTG',4=>'CS-Email',5=>'CS-Chat',6=>'CS-Call'
+		if(isset($ins['channel']) && $ins['channel']){
+			$channel = $ins['channel'];
+		}
+		//页面首次加载时，不做内容查询
+        if ($channel == -1) {
+            $data = [];
+            $recordsTotal = $recordsFiltered = 0;
+            return compact('data', 'recordsTotal', 'recordsFiltered');
+        }
+		$channelName = isset($channelKeyVal[$channel]) ? $channelKeyVal[$channel] : 'CTG';
+		if($channel==1){
+			$table = 'cashback';
+		}elseif($channel==2){
+			$table = 'b1g1';
+		}else{
+			$where .= ' and t1.channel = '.$channel;
+		}
+
+        $sql = "
+        SELECT
+            t1.created_at,
+            t1.name,
+            t1.email,
+            t1.phone,
+            t1.rating,
+            t1.commented,
+            t1.steps,
+            t1.status,
+            t1.order_id,
+            t2.name AS processor,
+            t3.SalesChannel,
+            t4.asins,
+            t4.itemCodes,
+            t4.itemNames,
+            t4.sellerskus,
+            t4.itemGroups,
+            t4.bgs,
+            t4.bus,
+            t4.brands,
+		    facebook_name,
+		    facebook_group,
+            encrypted_email,
+		    t1.review_type,
+		    rsg_requests.amazon_order_id as rsg_orderid,
+            exception.amazon_order_id as rr_orderid,
+		    '{$channelName}' as channel,
+		    client.rsg_status as rsg_status,
+		    client.rsg_status_explain as rsg_status_explain
+        FROM {$table} t1 
+        Left join ( 
+					select amazon_order_id from rsg_requests group by amazon_order_id 
+				) as rsg_requests on rsg_requests.amazon_order_id = t1.order_id 
+		LEFT JOIN (
+			SELECT amazon_order_id FROM exception GROUP BY amazon_order_id
+			) AS exception ON exception.amazon_order_id = t1.order_id
+        LEFT JOIN client_info ON client_info.email = t1.email 
+        LEFT JOIN client ON client_info.client_id = client.id  
+        LEFT JOIN users t2
+          ON t2.id = t1.processor
+        LEFT JOIN (
+          SELECT
+            ANY_VALUE(SalesChannel) as SalesChannel,
+			ANY_VALUE(MarketPlaceId) as MarketPlaceId,
+			ANY_VALUE(SellerId) as SellerId,
+			ANY_VALUE(AmazonOrderId) as AmazonOrderId
+          FROM ctg_order
+            WHERE $timeRange 
+            group by AmazonOrderId 
+          ) t3
+          ON t3.AmazonOrderId = t1.order_id
+        LEFT JOIN (
+            SELECT
+              ANY_VALUE(SellerId) AS SellerId,
+		   	  ANY_VALUE(sap_seller_id) as  sap_seller_id,	
+              ANY_VALUE(MarketPlaceId) AS MarketPlaceId,
+              ANY_VALUE(AmazonOrderId) AS AmazonOrderId,
+              GROUP_CONCAT(DISTINCT t4_1.ASIN) AS asins,
+              GROUP_CONCAT(DISTINCT t4_1.SellerSKU) AS sellerskus,
+              GROUP_CONCAT(DISTINCT fbm_stock.item_name) AS itemNames,
+              GROUP_CONCAT(DISTINCT asin.item_no) AS itemCodes,
+              GROUP_CONCAT(DISTINCT asin.item_group) AS itemGroups,
+              GROUP_CONCAT(DISTINCT asin.bg) AS bgs,
+              GROUP_CONCAT(DISTINCT asin.bu) AS bus,
+              GROUP_CONCAT(DISTINCT asin.brand) AS brands
+            FROM ctg_order_item t4_1
+            LEFT JOIN asin
+              ON asin.site = t4_1.MarketPlaceSite AND asin.sellersku = t4_1.SellerSKU 
+            LEFT JOIN fbm_stock
+              ON fbm_stock.item_code = asin.item_no
+            WHERE $timeRange
+            GROUP BY MarketPlaceId,AmazonOrderId,SellerId
+          ) t4
+          ON t4.AmazonOrderId = t1.order_id AND t4.MarketPlaceId = t3.MarketPlaceId AND t4.SellerId = t3.SellerId
+        WHERE $where
+        ORDER BY created_at desc;
+        ";
+
+        $data = $this->queryRows($sql);
+        foreach ($data as $key=>$val){
+            $arrayData[] = array(
+                substr($val['created_at'], 0, 10),
+                ($val['encrypted_email']??$val['email']),
+                $val['name'],
+				$val['order_id'],
+                $val['itemCodes'],
+                $val['itemNames'],
+                $val['SalesChannel'],
+                $val['asins'],
+                $val['sellerskus'],
+                $val['brands'],
+                $val['itemGroups'],
+                $val['status'],
+                $val['bgs'],
+                $val['bus'],
+				$val['channel'],
+                $val['processor'],
+            );
+        }
+
+        if($arrayData){
+            $spreadsheet = new Spreadsheet();
+
+            $spreadsheet->getActiveSheet()
+                ->fromArray(
+                    $arrayData,  // The data to set
+                    NULL,        // Array values with this value will not be set
+                    'A1'         // Top left coordinate of the worksheet range where
+                //    we want to set these values (default is A1)
+                );
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');//告诉浏览器输出07Excel文件
+            header('Content-Disposition: attachment;filename="Export_CTG_'.$channelName.'.xlsx"');//告诉浏览器输出浏览器名称
+            header('Cache-Control: max-age=0');//禁止缓存
+            ob_start();
+            $writer = new Xlsx($spreadsheet);
+            $writer->save('php://output');
+            $xlsData = ob_get_contents();
+            ob_end_clean();
+
+            $response = array(
+                'op' => 'ok',
+                'file' => "data:application/vnd.ms-excel;base64," . base64_encode($xlsData)
+            );
+
+            die(json_encode($response));
+        }
+    }
+
+    /*
     public function export(){
 		if(!Auth::user()->can(['ctg-export'])) die('Permission denied -- ctg-export');
         set_time_limit(0);
@@ -303,9 +549,9 @@ class CtgController extends Controller {
             t4.bus,
             t4.brands,
             encrypted_email,
-		   '{$channelName}' as channel 
-        FROM {$table} t1 
-        LEFT JOIN client_info ON client_info.email = t1.email 
+		   '{$channelName}' as channel
+        FROM {$table} t1
+        LEFT JOIN client_info ON client_info.email = t1.email
         LEFT JOIN users t2
           ON t2.id = t1.processor
         LEFT JOIN (
@@ -313,9 +559,9 @@ class CtgController extends Controller {
             ANY_VALUE(SalesChannel) as SalesChannel,
 			ANY_VALUE(MarketPlaceId) as MarketPlaceId,
 			ANY_VALUE(SellerId) as SellerId,
-			ANY_VALUE(AmazonOrderId) as AmazonOrderId 
-          FROM ctg_order 
-          group by AmazonOrderId 
+			ANY_VALUE(AmazonOrderId) as AmazonOrderId
+          FROM ctg_order
+          group by AmazonOrderId
           ) t3
           ON t3.AmazonOrderId = t1.order_id
         LEFT JOIN (
@@ -339,9 +585,9 @@ class CtgController extends Controller {
               ON fbm_stock.item_code = asin.item_no
             GROUP BY MarketPlaceId,AmazonOrderId,SellerId
           ) t4
-          ON t4.AmazonOrderId = t1.order_id AND t4.MarketPlaceId = t3.MarketPlaceId AND t4.SellerId = t3.SellerId 
-        {$where} 
-        ORDER BY created_at DESC 
+          ON t4.AmazonOrderId = t1.order_id AND t4.MarketPlaceId = t3.MarketPlaceId AND t4.SellerId = t3.SellerId
+        {$where}
+        ORDER BY created_at DESC
         ";
 
         $data = $this->queryRows($sql);
@@ -469,6 +715,8 @@ class CtgController extends Controller {
 
         return [true, $user->name];
     }
+
+    */
 
     /**
      * @throws DataInputException
