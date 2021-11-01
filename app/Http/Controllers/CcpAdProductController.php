@@ -178,7 +178,7 @@ class CcpAdProductController extends Controller
 
 
 			$_data = DB::select($sql);
-			$recordsTotal = $recordsFiltered = DB::connection('ad')->select('SELECT FOUND_ROWS() as total');
+			$recordsTotal = $recordsFiltered = DB::select('SELECT FOUND_ROWS() as total');
 			$recordsTotal = $recordsFiltered = $recordsTotal[0]->total;
 
 			$domain = substr(getDomainBySite($site), 4);
