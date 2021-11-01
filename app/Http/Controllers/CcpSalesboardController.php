@@ -270,7 +270,7 @@ class CcpSalesBoardController extends Controller
             //    $sellerSkusWhere .= " and marketplaceid='".$site."'";
             //}
 
-			$product_sql = "select max(asins.title) as title,max(asins.images) as images,asins.asin,max(asins.sku) as item_no, c_seller_skus.afn_sellable as afn_sellable, c_seller_skus.afn_reserved as afn_reserved, c_seller_skus.afn_transfer as afn_transfer
+			$product_sql = "select max(asins.title) as title,max(asins.images) as images,asins.asin,max(asins.sku) as item_no, max(c_seller_skus.afn_sellable) as afn_sellable, max(c_seller_skus.afn_reserved) as afn_reserved, max(c_seller_skus.afn_transfer) as afn_transfer
 						from asins
 						LEFT JOIN
                         (SELECT max(asin) as asin, sum(afn_sellable) as afn_sellable, sum(afn_reserved) as afn_reserved, sum(afn_transfer) as afn_transfer
