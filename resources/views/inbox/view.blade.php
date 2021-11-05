@@ -1022,7 +1022,7 @@
                         <div class="form-actions col-xs-12">
                             <div class="row">
                                 <div class="col-md-12" style="text-align: center;">
-                                    <button type="submit" class="btn blue">Submit</button>
+                                    <button type="submit" id="other_submit" class="btn blue">Submit</button>
                                     <button type="reset" class="btn grey-salsa btn-outline">Cancel</button>
                                 </div>
                             </div>
@@ -1059,4 +1059,28 @@ function procHtml($tree,$level = 0,$category_name)
 }
 ?>
 <script src="/assets/global/plugins/bootstrap-confirmation/bootstrap-confirmation.min.js" type="text/javascript"></script>
+    <script>
+        $('#other_submit').click(function(){
+            var linkage1 = $('#linkage1').val();
+            var linkage2 = $('#linkage2').val();
+            var linkage3 = $('#linkage3').val();
+            console.log(linkage1+'__'+linkage2+'__'+linkage3);
+            if(linkage1!='999999999'){
+                //当Question Type选的是质量问题的时候，问题类型的2级和3级都要选才可以提交
+                if(linkage1==14){
+                    if(linkage2==999999999){
+                        alert('Please select a secondary category');
+                        return false;
+                    }
+                    if(linkage3==999999999){
+                        alert('Please select a tertiary category');
+                        return false;
+                    }
+                }
+            }else{
+                alert('Please select question type');
+                return false;
+            }
+        })
+    </script>
 @endsection
