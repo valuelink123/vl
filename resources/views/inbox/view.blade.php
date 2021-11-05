@@ -1072,10 +1072,6 @@ function procHtml($tree,$level = 0,$category_name)
                         alert('Please select a secondary category');
                         return false;
                     }
-                    if(linkage3==999999999){
-                        alert('Please select a tertiary category');
-                        return false;
-                    }
                 }
             }else{
                 alert('Please select question type');
