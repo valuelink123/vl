@@ -445,9 +445,26 @@ class RsgrequestsController extends Controller
 
 		if ($req->isMethod('GET')) {
 			$email = array_search($req->input('email'),getEmailToEncryptedEmail())?array_search($req->input('email'),getEmailToEncryptedEmail()):$req->input('email');
-			$emails = DB::table('sendbox')->where('to_address', $email)->orderBy('date', 'desc')->get(['*',DB::RAW('\''.$req->input('email').'\' as to_address')]);
-			$emails = json_decode(json_encode($emails), true); // todo
+			$sendbox_emails = DB::table('sendbox')->where('to_address', $email)->orderBy('date', 'desc')->get(['*',DB::RAW('\''.$req->input('email').'\' as to_address')]);
+			$inbox_emails = DB::table('inbox')->where('from_address', $email)->orderBy('date', 'desc')->get(['*',DB::RAW('\''.$req->input('email').'\' as from_address')]);
 			$users= $this->getUsers();
+			$sendbox_emails = json_decode(json_encode($sendbox_emails), true); // todo
+			$inbox_emails = json_decode(json_encode($inbox_emails), true); // todo
+			$_emails_array = array();
+			foreach($sendbox_emails as $key=>$val){
+				$val['subject_link'] = ' <a href="/send/'.$val['id'].'" target="_blank">'.$val['subject'].' </a>';
+				$val['user_name'] = array_get($users,array_get($val,'user_id'));
+				$val['email_send_date'] = array_get($val,'send_date') ? '<span class="label label-sm label-success">'.array_get($val,'send_date').'</span> ':'<span class="label label-sm label-danger">'.array_get($val,'status').'</span>';
+				$_emails_array[] = $val;
+			}
+			foreach($inbox_emails as $key=>$val){
+				$val['subject_link'] = ' <a href="/inbox/'.$val['id'].'" target="_blank">'.$val['subject'].' </a>';
+				$val['user_name'] = '客户';
+				$val['email_send_date'] = '<span class="label label-sm label-success">'.array_get($val,'date').'</span> ';
+				$_emails_array[] = $val;
+			}
+			//按时间由近至远排序
+			$emails = array_sort($_emails_array,'date',$type='desc');
 		}
 		return view('rsgrequests/process',['emails'=>$emails,'users'=>$users]);
 	}

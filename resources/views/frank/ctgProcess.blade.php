@@ -347,22 +347,20 @@
                                             {{array_get($data,'to_address')}}
                                         </td>
                                         <td>
-                                            <a href="/send/{{array_get($data,'id')}}" target="_blank"> {{array_get($data,'subject')}}</a>
+                                            {!! array_get($data,'subject_link') !!}
                                         </td>
                                         <td>
                                             {{array_get($data,'date')}}
                                         </td>
                                         <td>
-                                            {{array_get($users,array_get($data,'user_id'))}}
+                                            {{array_get($data,'user_name')}}
                                         </td>
                                         <td>
-                                            {!!array_get($data,'send_date')?'<span class="label label-sm label-success">'.array_get($data,'send_date').'</span> ':'<span class="label label-sm label-danger">'.array_get($data,'status').'</span>'!!}
+                                            {!! array_get($data,'email_send_date') !!}
                                         </td>
 
                                     </tr>
                                 @endforeach
-
-
                                 </tbody>
                             </table>
                             <script>

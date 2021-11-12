@@ -578,16 +578,15 @@ class CtgController extends Controller {
 
             $order['SellerName'] = Accounts::where('account_sellerid', $order['SellerId'])->first()->account_name ?? 'No Match';
 
-
-            
-
-
             //目前在职的，而且sap_seller_id不为0
-            $userRows = DB::table('users')->where('sap_seller_id', '>', 0)->where('locked', '=',0)->select('id', 'name')->get();
+            $userRows = DB::table('users')->where('locked', '=',0)->select('id', 'name','sap_seller_id')->get();
+			$users = $allUser = array();
             foreach ($userRows as $row) {
-                $users[$row->id] = $row->name;
+				$allUser[$row->id] = $row->name;
+            	if($row->sap_seller_id>0){//此时为销售人员
+					$users[$row->id] = $row->name;
+				}
             }
-
             //得到跟进记录(toArray转换成数组)
 			$trackLogData = array();
 			if(isset($ctgRow['nonctg_id'])){
@@ -605,14 +604,32 @@ class CtgController extends Controller {
 				$steps['facebook_name'] = $clientInfo->facebook_name;
 				$steps['facebook_group'] = isset($fbgroupConfig[ $clientInfo->facebook_group]) ? $fbgroupConfig[ $clientInfo->facebook_group] : '';
 				$ctgRow['steps'] = json_encode($steps);
-				$emails = DB::table('sendbox')->where('to_address', $ctgRow['email'])->orderBy('date', 'desc')->get(['*',DB::RAW('\''.$clientInfo->encrypted_email.'\' as to_address')]);
+				$sendbox_emails = DB::table('sendbox')->where('to_address', $ctgRow['email'])->orderBy('date', 'desc')->get(['*',DB::RAW('\''.$clientInfo->encrypted_email.'\' as to_address')]);
+				$inbox_emails = DB::table('inbox')->where('from_address', $ctgRow['email'])->orderBy('date', 'desc')->get(['*',DB::RAW('\''.$clientInfo->encrypted_email.'\' as from_address')]);
 			}else{
-				$emails = DB::table('sendbox')->where('to_address', $ctgRow['email'])->orderBy('date', 'desc')->get(['*']);
+				$sendbox_emails = DB::table('sendbox')->where('to_address', $ctgRow['email'])->orderBy('date', 'desc')->get(['*']);
+				$inbox_emails = DB::table('inbox')->where('from_address', $ctgRow['email'])->orderBy('date', 'desc')->get(['*']);
 			}
 
-            $emails = json_decode(json_encode($emails), true); // todo
-            $ctgRow['email'] = empty($clientInfo)?$ctgRow['email']:$clientInfo->encrypted_email;
+			$sendbox_emails = json_decode(json_encode($sendbox_emails), true); // todo
+			$inbox_emails = json_decode(json_encode($inbox_emails), true); // todo
+			$_emails_array = array();
+			foreach($sendbox_emails as $key=>$val){
+				$val['subject_link'] = ' <a href="/send/'.$val['id'].'" target="_blank">'.$val['subject'].' </a>';
+				$val['user_name'] = array_get($allUser,array_get($val,'user_id'));
+				$val['email_send_date'] = array_get($val,'send_date') ? '<span class="label label-sm label-success">'.array_get($val,'send_date').'</span> ':'<span class="label label-sm label-danger">'.array_get($val,'status').'</span>';
+				$_emails_array[] = $val;
+			}
+			foreach($inbox_emails as $key=>$val){
+				$val['subject_link'] = ' <a href="/inbox/'.$val['id'].'" target="_blank">'.$val['subject'].' </a>';
+				$val['user_name'] = '客户';
+				$val['email_send_date'] = '<span class="label label-sm label-success">'.array_get($val,'date').'</span> ';
+				$_emails_array[] = $val;
+			}
+			//按时间由近至远排序
+			$emails = array_sort($_emails_array,'date',$type='desc');
 
+            $ctgRow['email'] = empty($clientInfo)?$ctgRow['email']:$clientInfo->encrypted_email;
             return view('frank.ctgProcess', compact('ctgRow', 'users', 'trackLogData','order', 'emails'));
 
         }
