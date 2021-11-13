@@ -453,6 +453,8 @@ class RoiController extends Controller
                     <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
                     <span style="padding-right: 20px">SKU: <span class="highlight_text">' . $roi['sku'] . '</span></span>
                     <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                    <span style="padding-right: 20px">售价(外币)： <span class="highlight_text">'.$roi['sell_price'].'</span></span>
+                    <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
                     <span style="padding-right: 20px">项目编号: <span class="highlight_text">' . $roi['project_code'] . '</span></span>
                     <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
                     <span style="padding-right: 20px"><a href="' . $roi['new_product_planning_process'] . '" target="_blank">新品规划流程</a></span>
@@ -497,7 +499,7 @@ class RoiController extends Controller
                             <td><span>' . $roi['total_sales_volume'] . '</span></td>
                         </tr>
                         <tr>
-                            <td>售价（外币）</td>
+                            <td>成交价（外币）</td>
                             <td><span>' . $roi['price_fc_month_1'] .'</span></td>
                             <td><span>' . $roi['price_fc_month_2'] .'</span></td>
                             <td><span>' . $roi['price_fc_month_3'] .'</span></td>
@@ -513,7 +515,7 @@ class RoiController extends Controller
                             <td><span>' . $roi['average_price_fc'] .'</span></td>
                         </tr>
                         <tr>
-                            <td>售价RMB</td>
+                            <td>成交价RMB</td>
                             <td><span>' . $roi['price_rmb_month_1'] .'</span></td>
                             <td><span>' . $roi['price_rmb_month_2'] .'</span></td>
                             <td><span>' . $roi['price_rmb_month_3'] .'</span></td>
@@ -1383,37 +1385,6 @@ class RoiController extends Controller
 		}
 
 		return $data;
-
-//        $data = array(
-//            '0' => array('name'=>'预付20%订金，尾款开3个月银行承兑汇票（见票发货）','days'=>78),
-//            '1' => array('name'=>'预付50%订金，50%尾款货到付款','days'=>-15),
-//            '2' => array('name'=>'货到开票（3个月银行承兑）','days'=>105),
-//            '3' => array('name'=>'预付20%订金，余款月结45天','days'=>42),
-//            '4' => array('name'=>'当月结15天，开三个月银行承兑','days'=>120),
-//            '5' => array('name'=>'预付30%订金，尾款款到发货','days'=>-9), //新账期表中没有了
-//            '6' => array('name'=>'预付30%订金，尾款货到付款','days'=>-9),
-//            '7' => array('name'=>'质检合格后货到三个工作日内付款','days'=>3),
-//            '8' => array('name'=>'预付30%订金，尾款质检合格收到发票后3个工作日内支付','days'=>3.6),
-//            '9' => array('name'=>'预付30%订金，尾款当月结15天并开三个月银行承兑','days'=>75),
-//            '10' => array('name'=>'月结30天','days'=>45),
-//            '11' => array('name'=>'预付20%订金，尾款货到付款','days'=>-6),
-//            '12' => array('name'=>'预付20%订金，余款月结30天','days'=>30),
-//            '13' => array('name'=>'预付10%订金，余款月结45天','days'=>51),
-//            '14' => array('name'=>'月结60天+3个月银行承兑','days'=>165),
-//            '15' => array('name'=>'月结45天+3个月银行承兑','days'=>150),
-//            '16' => array('name'=>'预付50%订金，50%尾款款到发货','days'=>-15),
-//            '17' => array('name'=>'月结30天+保理80天','days'=>125),
-//            '18' => array('name'=>'预付20%订金，尾款款到发货','days'=>-6),
-//            '19' => array('name'=>'月结90天','days'=>105),
-//            '20' => array('name'=>'月结15天','days'=>30),
-//            '21' => array('name'=>'月结30天+3个月银行承兑','days'=>135),
-//            '22' => array('name'=>'预付40%订金，60%尾款款到发货','days'=>-12),
-//            '23' => array('name'=>'月结45天','days'=>60),
-//            '24' => array('name'=>'款到发货','days'=>0),
-//            '25' => array('name'=>'月结60天','days'=>75),
-//            '26' => array('name'=>'预付20%订金，尾款货到后7个工作日内支付（3个月银行承兑）','days'=>78)
-//        );
-//        return $data;
 	}
 
 	//从currency_rates表中获取各站点汇率

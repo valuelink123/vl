@@ -146,9 +146,9 @@
                             </div>
                             <input type="text" name="product_name" id="product_name" style="width:300px;" value="{{$roi['product_name']}}" />
                         </div>
-                        <div class="param_cost">
+                        <div class="param_cost" style="width:120px;">
                             <div>站点</div>
-                            <select name="site" id="site" style="border: 1px solid #dddddd;">
+                            <select name="site" id="site" style="width:100px;">
                                 @foreach ($sites as $site)
                                     <option value="{{$site}}" @if($roi['site'] == $site) selected @endif>{{$site}}</option>
                                 @endforeach
@@ -184,13 +184,18 @@
                             </select>
                         </div>
 
-                        <div class="param_cost">
+                        <div class="param_cost" style="width:170px;">
                             <div>库存周转天数</div>
-                            <select name="inventory_turnover_days">
+                            <select name="inventory_turnover_days" style="width:150px;">
                             @foreach ($inventory_turnover_days as $day)
                                 <option value="{{$day}}" @if($roi['inventory_turnover_days'] == $day) selected @endif>{{$day}}</option>
                             @endforeach
                             </select>
+                        </div>
+
+                        <div class="param_cost">
+                            <div>售价(外币)</div>
+                            <input type="text" name="sell_price" id="sell_price" style="width:100px;" value="{{$roi['sell_price']}}"/>
                         </div>
                     </div>
                     <div style="clear:both"></div>
@@ -235,7 +240,7 @@
                                 <td class="span_td"><span id="total_sales_volume" class="highlight_text">{{$roi['total_sales_volume']}}</span></td>
                             </tr>
                             <tr>
-                                <td style="padding-left: 10px; text-align: left">售价（外币）</td>
+                                <td style="padding-left: 10px; text-align: left">成交价(外币)</td>
                                 <!-- fc： foregin currency -->
                                 <td><input type="text" class="price_fc_input" name="price_fc_month_1" id="price_fc_month_1" value="{{$roi['price_fc_month_1']}}" /></td>
                                 <td><input type="text" class="price_fc_input" name="price_fc_month_2" id="price_fc_month_2" value="{{$roi['price_fc_month_2']}}" /></td>
@@ -253,7 +258,7 @@
 
                             </tr>
                             <tr>
-                                <td style="padding-left: 10px; text-align: left">售价RMB</td>
+                                <td style="padding-left: 10px; text-align: left">成交价RMB</td>
                                 <td class="span_td"><span id="price_rmb_month_1">{{$roi['price_rmb_month_1']}}</span></td>
                                 <td class="span_td"><span id="price_rmb_month_2">{{$roi['price_rmb_month_2']}}</span></td>
                                 <td class="span_td"><span id="price_rmb_month_3">{{$roi['price_rmb_month_3']}}</span></td>
@@ -798,6 +803,11 @@
         var total_sales_amount = $('#total_sales_amount').text();
         if(total_sales_amount == '' || total_sales_amount == '0.00'){
             alert("Total sales amount cannot be 0.");
+            return false;
+        }
+        var sell_price = $('#sell_price').val().trim();
+        if(sell_price == ''){
+            $('#sell_price').focus();
             return false;
         }
     }

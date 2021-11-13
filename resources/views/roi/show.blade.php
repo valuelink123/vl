@@ -157,8 +157,10 @@
                     <span style="padding-right: 20px">站点: <span class="highlight_text">{{$roi['site']}}</span></span>
                     <span style="padding-right: 20px">预计上线时间<span style="color: #999999;" title="预计新品可正式上线销售的时间"><i class="fa fa-info-circle"></i></span>: <span class="highlight_text">{{$roi['estimated_launch_time']}}</span></span>
                     <span style="padding-right: 20px">SKU<span style="color: #999999;" title="在SAP中新建的产品物料号"><i class="fa fa-info-circle"></i></span>: <span class="highlight_text">{{$roi['sku']}}</span></span>
+                    <span style="padding-right: 20px">售价(外币)： <span class="highlight_text">{{$roi['sell_price']}}</span></span>
                     <span style="padding-right: 20px">项目编号<span style="color: #999999;" title="新品开发项目定义好的项目编号"><i class="fa fa-info-circle"></i></span>: <span class="highlight_text">{{$roi['project_code']}}</span></span>
                     <span style="padding-right: 20px"><a href="{{$roi['new_product_planning_process']}}" target="_blank">查看新品规划流程</a><span style="color: #999999;" title="OA中新品规划流程的页面链接"><i class="fa fa-info-circle"></i></span></span>
+
                 </div>
                 <div style="clear:both"></div>
                 <div style="height: 15px;"></div>
@@ -200,7 +202,7 @@
                             <td><span class="highlight_text">{{$roi['total_sales_volume']}}</span></td>
                         </tr>
                         <tr>
-                            <td>售价（外币）</td>
+                            <td>成交价(外币)</td>
                             <td><span>{{$roi['price_fc_month_1']}}</span></td>
                             <td><span>{{$roi['price_fc_month_2']}}</span></td>
                             <td><span>{{$roi['price_fc_month_3']}}</span></td>
@@ -216,7 +218,7 @@
                             <td><span class="highlight_text">{{$roi['average_price_fc']}}</span></td>
                         </tr>
                         <tr>
-                            <td>售价RMB</td>
+                            <td>成交价RMB</td>
                             <td><span>{{$roi['price_rmb_month_1']}}</span></td>
                             <td><span>{{$roi['price_rmb_month_2']}}</span></td>
                             <td><span>{{$roi['price_rmb_month_3']}}</span></td>
