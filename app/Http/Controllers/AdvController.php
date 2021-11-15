@@ -156,6 +156,9 @@ class AdvController extends Controller
             foreach($fileds as $filed){
                 $data->{$filed} = $request->get($filed);
             }
+			if($id && (date('Gi')<intval(str_replace(':','',$request->get('time')))) && ($request->get('status')==1)){
+				$data->done_at = $data->message = NULL;
+			}
             $data->user_id = Auth::user()->id;
             $data->save();
             DB::commit();
