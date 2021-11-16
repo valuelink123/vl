@@ -248,7 +248,11 @@ class StarController extends Controller
 
 			//$price,$coupon_p,$coupon_n这三个内容的数据展示
 			$price = sprintf("%.2f",$ordersList[$i]['price']).'<br/>'.sprintf("%.2f",$ordersList[$i]['pre_price']);
-//			$price = ($ordersList[$i]['price']>$ordersList[$i]['pre_price'])?'<span class="btn btn-danger btn-xs">'.$_price.'</span>':( ($ordersList[$i]['price']<$ordersList[$i]['pre_price'])?'<span class="btn btn-success btn-xs">'.$_price.'</span>':$_price);
+			$one_star_number = sprintf("%.0f",$ordersList[$i]['one_star_number']).'<br/>'.sprintf("%.0f",$ordersList[$i]['pre_one_star_number']);
+			$two_star_number = sprintf("%.0f",$ordersList[$i]['two_star_number']).'<br/>'.sprintf("%.0f",$ordersList[$i]['pre_two_star_number']);
+			$three_star_number = sprintf("%.0f",$ordersList[$i]['three_star_number']).'<br/>'.sprintf("%.0f",$ordersList[$i]['pre_three_star_number']);
+			$four_star_number = sprintf("%.0f",$ordersList[$i]['four_star_number']).'<br/>'.sprintf("%.0f",$ordersList[$i]['pre_four_star_number']);
+			$five_star_number = sprintf("%.0f",$ordersList[$i]['five_star_number']).'<br/>'.sprintf("%.0f",$ordersList[$i]['pre_five_star_number']);
 
 			$_coupon_p = ' ('.round($ordersList[$i]['coupon_p'],2).'%)';
 			$_coupon_n = sprintf("%.2f",$ordersList[$i]['coupon_n']);
@@ -276,6 +280,12 @@ class StarController extends Controller
 				$diff_average_score,
 				$diff_positive,
 				$diff_negative,
+
+				$one_star_number,//新增加的5列
+				$two_star_number,
+				$three_star_number,
+				$four_star_number,
+				$five_star_number,
 
 				$ordersList[$i]['create_at'].'<br>'.$ordersList[$i]['pre_create_at'],
 				$ordersList[$i]['seller'],

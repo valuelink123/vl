@@ -202,6 +202,13 @@ th,td,td>span {
 								<th style="min-width:50px;"> Positive Changes </th><!-- 11 -->
 								<th style="min-width:50px;"> Negative Changes </th><!-- 12 -->
 
+                                <th style="min-width:50px;"> One Star</th><!-- 13 -->
+                                <th style="min-width:50px;"> Two Star</th><!-- 14 -->
+                                <th style="min-width:50px;"> Three Star</th><!-- 15 -->
+                                <th style="min-width:50px;"> Four Star</th><!-- 16 -->
+                                <th style="min-width:50px;"> Five Star</th><!-- 17 -->
+
+
 								<th style="min-width:50px;"> Last Update</th><!-- 13 -->
                                 <th style="min-width:50px;"> Seller </th><!-- 19 -->
 								<th style="min-width:50px;"> Action </th><!-- 20 -->
@@ -319,7 +326,7 @@ th,td,td>span {
 					buttons: [],
 					
 					<?php } ?>
-					"aoColumnDefs": [ { "bSortable": false, "aTargets": [0,1,2,4,13,14,15 ] }],
+					"aoColumnDefs": [ { "bSortable": false, "aTargets": [0,1,2,4,13,14,15,16,17,18,19,20 ] }],
 					 "order": [
                         [8, "asc"]
                     ],
