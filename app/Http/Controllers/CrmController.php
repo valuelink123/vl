@@ -197,7 +197,7 @@ class CrmController extends Controller
 			}elseif($field=='facebook_group'){
 				$where .= " and c.facebook_group = ".intval($value);
 			}elseif($field=='email'){
-				$where .= " and (c.email = '".trim($value)."' or c.encrypted_email = '".trim($value)."')";
+				$where .= " and (c.email like '%".trim($value)."%' or c.encrypted_email like '%".trim($value)."%')";
 			}else{
 				$whereInfo .= " and {$field}='{$value}'";
 			}
