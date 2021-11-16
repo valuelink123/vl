@@ -155,10 +155,10 @@ th,td,td>span {
                     </div>
 
                     @permission('compose')
-                    <div class="btn-group" style="margin-top:10px;margin-left:15px;">
-                        <button id="batch-send" class="btn sbold blue"> Batch Send
-                        </button>
-                    </div>
+{{--                    <div class="btn-group" style="margin-top:10px;margin-left:15px;">--}}
+{{--                        <button id="batch-send" class="btn sbold blue"> Batch Send--}}
+{{--                        </button>--}}
+{{--                    </div>--}}
                     @endpermission
                     @permission('ctg-export')
                     <div class="btn-group" style="margin-top:10px;margin-left:15px;">
