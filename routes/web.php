@@ -635,3 +635,12 @@ Route::post('/inventoryCycleCount/deleteReason', 'InventoryCycleCountController@
 Route::post('/inventoryCycleCount/addReason', 'InventoryCycleCountController@addReason');//添加原因操作
 Route::post('/inventoryCycleCount/editReason', 'InventoryCycleCountController@editReason');//编辑原因操作
 Route::get('/inventoryCycleCount/export', 'InventoryCycleCountController@export');//导出操作
+
+/*
+ * 物料对照关系维护
+ */
+Route::get('/asinMatchRelation', 'AsinMatchRelationController@index');//列表
+Route::post('/asinMatchRelationList', 'AsinMatchRelationController@list');//列表获取数据
+Route::match(['post','get'],'/asinMatchRelation/add', 'AsinMatchRelationController@add');//添加
+Route::match(['post','get'],'/asinMatchRelation/update', 'AsinMatchRelationController@update');//更新
+Route::match(['post','get'],'/asinMatchRelation/delete', 'AsinMatchRelationController@delete');//更新

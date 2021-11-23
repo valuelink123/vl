@@ -402,6 +402,14 @@
 												    </a>
 												</li>
 												 @endpermission
+                                                @permission('asin-match-relation-show')
+                                                <li class="">
+                                                    <a href="/asinMatchRelation" class="nav-link nav-toggle ">
+                                                        Asin Match Relation
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
+                                                @endpermission
                                             </ul>
                                         </li>
                                         <li class="menu-dropdown classic-menu-dropdown ">
