@@ -15,6 +15,34 @@
 				<form id="search-form">
 					<div class="col-md-2">
 						<div class="input-group">
+							<span class="input-group-addon">Site</span>
+							<select  style="width:100%;height:35px;" data-recent="" data-recent-date="" id="site" onchange="getAccountBySite()" name="site">
+								@foreach($site as $value)
+									<option value="{{ $value->marketplaceid }}">{{ $value->domain }}</option>
+								@endforeach
+							</select>
+						</div>
+					</div>
+					<div class="col-md-2">
+						<div class="input-group" id="account-div">
+							<span class="input-group-addon">Account</span>
+							<select class="btn btn-default" id="account" multiple="multiple" data-width="100%" data-action-onchange="true" name="account" id="account[]">
+
+							</select>
+						</div>
+					</div>
+					<div class="col-md-1">
+						<div class="input-group">
+							<span class="input-group-addon">Source</span>
+							<select  style="width:100%;height:35px;" data-recent="" data-recent-date="" id="source" name="source">
+								@foreach($source as $value)
+									<option value="{{$value}}">{{$value}}</option>
+								@endforeach
+							</select>
+						</div>
+					</div>
+					<div class="col-md-2">
+						<div class="input-group">
 							<span class="input-group-addon">Asin</span>
 							<input class="form-control" value="" id="asin" placeholder="Asin" name="asin"/>
 						</div>
@@ -31,7 +59,7 @@
 							<input class="form-control" value="" id="item_no" placeholder="Item No" name="item_no"/>
 						</div>
 					</div>
-					<div class="col-md-2">
+					<div class="col-md-1">
 						<div class="input-group">
 							<div class="btn-group pull-right" >
 								<button id="search_table" class="btn sbold blue">Search</button>
@@ -141,7 +169,36 @@
 			}
 		})
 
+		function getAccountBySite(){
+			var marketplaceid = $('#site option:selected').val();
+			$.ajax({
+				type: 'post',
+				url: '/showAccountBySite',
+				data: {marketplaceid:marketplaceid,field:'mws_seller_id'},
+				dataType:'json',
+				success: function(res) {
+					if(res.status==1){
+
+						var html = '';
+						$.each(res.data,function(i,item) {
+							html += '<option value="'+item.id+'">'+item.label+'</option>';
+						})
+						var str = '<span class="input-group-addon">Account</span>\n' +
+								'\t\t\t\t\t\t\t<select class="mt-multiselect btn btn-default" id="account" multiple="multiple" data-width="100%" data-action-onchange="true" name="account" id="account[]">\n' +
+								'\n' +html+
+								'\t\t\t\t\t\t\t</select>';
+						$('#account-div').html(str);
+						ComponentsBootstrapMultiselect.init();//处理account的多选显示样式
+					}else{
+						alert('请先选择站点');
+					}
+				}
+			});
+
+		}
+
         $(function(){
+			getAccountBySite()//触发当前选的站点得到该站点所有的账号
             $("#search_table").trigger("click");
         })
 	</script>

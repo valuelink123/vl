@@ -28,7 +28,9 @@ class AsinMatchRelationController extends Controller
 	public function index()
 	{
 		if(!Auth::user()->can(['asin-match-relation-show'])) die('Permission denied -- asin-match-relation-show');
-		return view('asinMatchRelation/index');
+		$site = getMarketDomain();//获取站点选项
+		$source = array('SAP','VOP');
+		return view('asinMatchRelation/index',['site'=>$site,'source'=>$source]);
 	}
 
 	/*
@@ -40,9 +42,17 @@ class AsinMatchRelationController extends Controller
 		$search = $this->getSearchData(explode('&',$search));
 		$asin= isset($search['asin']) ? urldecode($search['asin']) : '';
 		$seller_sku= isset($search['seller_sku']) ? urldecode($search['seller_sku']) : '';
+		$marketplace_id= isset($search['site']) ? urldecode($search['site']) : '';
 		$item_no= isset($search['item_no']) ? urldecode($search['item_no']) : '';
+		$account= isset($search['account']) ? urldecode($search['account']) : '';
+		$source= isset($search['source']) ? urldecode($search['source']) : '';
 
-		$query = new Model();
+		if($source=='VOP'){
+			$query = DB::table('asin_match_relation');
+		}else{
+			$query = DB::connection('amazon')->table('sap_asin_match_sku');
+		}
+
 		if($asin){
 			$query = $query->where('asin',$asin);
 		}
@@ -50,35 +60,59 @@ class AsinMatchRelationController extends Controller
 			$query = $query->where('seller_sku',$seller_sku);
 		}
 		if($item_no){
-			$query = $query->where('item_no',$item_no);
+			if($source=='VOP'){
+				$query = $query->where('item_no',$item_no);
+			}else{
+				$query = $query->where('sku',$item_no);
+			}
+
+		}
+		$query = $query->where('marketplace_id',$marketplace_id);
+		if($account){
+			$query = $query->whereIn('seller_id',explode(',',$account));
 		}
 		$recordsFiltered = $recordsTotal = $query->count();//计算出总数
 		$iDisplayLength = intval($_REQUEST['length']);
 		$iDisplayLength = $iDisplayLength < 0 ? $recordsTotal : $iDisplayLength;
 		$iDisplayStart = intval($_REQUEST['start']);
 		$data =  $query->orderBy('id','desc')->offset($iDisplayStart)->limit($iDisplayLength)->get()->toArray();//查询数据
+		$data = json_decode(json_encode($data),true);
+
 		$site = getMarketDomain();//获取站点选项
 		$siteDomain = array();
 		foreach($site as $key=>$val){
 			$siteDomain[$val->marketplaceid] = $val->domain;
 		}
 		$seller_user = getUsers('sap_seller');
+		$sellerIdName= DB::connection('amazon')->table('seller_accounts')->where('mws_marketplaceid',$marketplace_id)->pluck('label','mws_seller_id');
+		$sellerIdName = json_decode(json_encode($sellerIdName),true);
 
 		foreach($data as $key=>$val){
 			$data[$key]['site'] = isset($siteDomain[$val['marketplace_id']]) ? $siteDomain[$val['marketplace_id']] : $val['marketplace_id'];
 			$data[$key]['user_name'] = isset($seller_user[$val['sap_seller_id']]) ? $seller_user[$val['sap_seller_id']] : $val['sap_seller_id'];
+			$data[$key]['source'] = $source;
 
-			$action = '';
-			if(Auth::user()->can(['asin-match-relation-edit'])){
-				$action .= '<a href="/asinMatchRelation/update?id='.$val['id'].'" class="btn btn-success btn-xs" >Edit</a>';
+			if($source=='VOP'){
+				$action = '';
+				if(Auth::user()->can(['asin-match-relation-edit'])){
+					$action .= '<a href="/asinMatchRelation/update?id='.$val['id'].'" class="btn btn-success btn-xs" >Edit</a>';
+				}
+				if(Auth::user()->can(['asin-match-relation-delete'])){
+					$action .= '<a href="javascript:void(0)" data-id="'.$val['id'].'" class="btn btn-success btn-xs delete-action" >Delete</a>';
+				}
+				if(empty($action)){
+					$action = '-';
+				}
+				$data[$key]['action'] = $action;
+			}else{
+				//SAP相关数据处理，seller_name，item_no，warehouse，created_at
+				$data[$key]['action'] = '-';
+				$data[$key]['seller_name'] = isset($sellerIdName[$val['seller_id']]) ? $sellerIdName[$val['seller_id']] : $val['seller_id'];
+				$data[$key]['item_no'] = $val['sku'];
+				$data[$key]['warehouse'] = $val['sap_warehouse_code'];
+				$data[$key]['created_at'] = $val['updated_at'];
+
 			}
-			if(Auth::user()->can(['asin-match-relation-delete'])){
-				$action .= '<a href="javascript:void(0)" data-id="'.$val['id'].'" class="btn btn-success btn-xs delete-action" >Delete</a>';
-			}
-			if(empty($action)){
-				$action = '-';
-			}
-			$data[$key]['action'] = $action;
 		}
 		return compact('data', 'recordsTotal', 'recordsFiltered');
 	}
@@ -90,7 +124,7 @@ class AsinMatchRelationController extends Controller
 	{
 		if(!Auth::user()->can(['asin-match-relation-add'])) die('Permission denied -- asin-match-relation-add');
 		$site = getMarketDomain();//获取站点选项
-		$source = array('VOP','SAP');
+		$source = array('VOP');
 		$seller_user = getUsers('sap_seller');
 		if($request->isMethod('get')){
 			return view('asinMatchRelation/add',['site'=>$site,'source'=>$source,'seller_user'=>$seller_user]);
@@ -121,7 +155,7 @@ class AsinMatchRelationController extends Controller
 		if(!Auth::user()->can(['asin-match-relation-edit'])) die('Permission denied -- asin-match-relation-edit');
 		if($request->isMethod('get')){
 			$site = getMarketDomain();//获取站点选项
-			$source = array('VOP','SAP');
+			$source = array('VOP');
 			$seller_user = getUsers('sap_seller');
 			$id = isset($_GET['id']) && $_GET['id'] ? $_GET['id'] : '';
 			$data = Model::where('id',$id)->first();
