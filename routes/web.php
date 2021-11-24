@@ -644,3 +644,14 @@ Route::post('/asinMatchRelationList', 'AsinMatchRelationController@list');//列�
 Route::match(['post','get'],'/asinMatchRelation/add', 'AsinMatchRelationController@add');//添加
 Route::match(['post','get'],'/asinMatchRelation/update', 'AsinMatchRelationController@update');//更新
 Route::match(['post','get'],'/asinMatchRelation/delete', 'AsinMatchRelationController@delete');//更新
+
+/*
+ * 账号状态设置
+ */
+Route::get('/sellerAccountsStatus', 'SellerAccountsStatusController@index');//列表
+Route::post('/sellerAccountsStatusList', 'SellerAccountsStatusController@list');//列表获取数据
+Route::match(['post','get'],'/sellerAccountsStatus/add', 'SellerAccountsStatusController@add');//添加
+Route::match(['post','get'],'/sellerAccountsStatus/view', 'SellerAccountsStatusController@view');//查看明细
+
+Route::Post('/cuckoo/gather', 'CuckooController@index');
+Route::get('/cuckoo/feedback', 'CuckooController@feedback');
