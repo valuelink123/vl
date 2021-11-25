@@ -480,32 +480,14 @@
                                             <input type="hidden" class="seller_sku" name="seller_sku" />
                                             <input type="hidden" class="find_item_by" name="find_item_by" />
                                         </div>
-                                        <div class="col-lg-4 col-md-4">
-                                            <label class="control-label">Search by Item No and select</label>
-                                            <input type="hidden" class="item_name" name="title" />
-                                            <input type="text" class="form-control seller-sku-selector" name="note" placeholder="Seller Account and SKU" autocomplete="off" required />
-                                        </div>
+{{--                                        <div class="col-lg-4 col-md-4">--}}
+{{--                                            <label class="control-label">Search by Item No and select</label>--}}
+{{--                                            <input type="hidden" class="item_name" name="title" />--}}
+{{--                                            <input type="text" class="form-control seller-sku-selector" name="note" placeholder="Seller Account and SKU" autocomplete="off" required />--}}
+{{--                                        </div>--}}
                                         <div class="col-lg-2 col-md-2">
                                             <label class="control-label">Quantity</label>
                                             <input type="text" class="form-control quantity-input"  name="qty" value="1" placeholder="Quantity" required />
-                                        </div>
-										 <div class="col-lg-2 col-md-2">
-                                            <label class="control-label">ShipFrom</label>
-                                            <select class="form-control shipfrom-input"  name="shipfrom" required />
-											<option value='HK01'>HK01</option>
-											<option value='HK03'>HK03</option>
-											<option value='UK02'>UK02</option>
-											<option value='US02'>US02</option>
-											<option value='US04'>US04</option>
-											<option value='US06'>US06</option>
-											<option value='US'>US</option>
-											<option value='GB'>GB</option>
-											<option value='DE'>DE</option>
-											<option value='FR'>FR</option>
-											<option value='IT'>IT</option>
-											<option value='ES'>ES</option>
-											<option value='JP'>JP</option>
-											</select>
                                         </div>
                                         <div class="col-lg-1 col-md-1">
                                             <label class="control-label"><input type="checkbox" name="addattr" value="Returned">Returned</label>

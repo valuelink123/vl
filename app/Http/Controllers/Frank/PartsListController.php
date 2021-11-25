@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use App\Models\SellerAccountsStatusRecord;
 class PartsListController extends Controller {
 
     use \App\Traits\Mysqli;
@@ -299,9 +300,9 @@ class PartsListController extends Controller {
 
         $item_code = $req->input('item_code');
 		$countryCode = $req->input('countryCode');
+//		$item_code = 'MP0601';//测试数据
 
         if (empty($item_code)) {
-
             // 查 fba
             $result = DB::table('fba_stock')
                 ->select('item_code')
@@ -310,7 +311,6 @@ class PartsListController extends Controller {
 				->where('account_status',0)
                 ->whereNotNull('item_code')
                 ->get();
-
             // fba 查不到，再查 fbm
             if ($result->isEmpty()) {
 
@@ -328,14 +328,16 @@ class PartsListController extends Controller {
             } else {
                 $item_code = $result[0]->item_code;
             }
-
-
         }
-
 
         if (empty($item_code) || !preg_match('#^[A-z0-9_-]+$#', $item_code)) {
             throw new DataInputException("Wrong Item No: {$item_code}");
         }
+        $accountStatusModel = new SellerAccountsStatusRecord();
+		$accountInfo = $accountStatusModel->getEnableAccountInfo();
+		$accountInfo = array_keys($accountInfo);
+		$accountInfo = implode("','",$accountInfo);
+		$accountInfo = "'".$accountInfo."'";
 
         $rows = $this->queryRows(
             "SELECT
@@ -349,10 +351,10 @@ class PartsListController extends Controller {
                 fba_stock
             LEFT JOIN fbm_stock USING (item_code)
             WHERE
-                item_code = '{$item_code}' and account_status = 0 
-
+                item_code = '{$item_code}' 
+			AND account_status = 0
+			and CONCAT(site,'_',seller_id) in({$accountInfo})
             UNION
-
             SELECT
                 item_code,
                 'FBM' AS seller_id,

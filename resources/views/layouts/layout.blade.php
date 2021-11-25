@@ -1076,6 +1076,14 @@
                                                     </a>
                                                 </li>
                                                 @endpermission
+                                                @permission('seller-accounts-status-show')
+                                                <li class="">
+                                                    <a href="/sellerAccountsStatus" class="nav-link nav-toggle ">
+                                                        Seller Accounts Status
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
+                                                @endpermission
 
                                             </ul>
                                         </li>
