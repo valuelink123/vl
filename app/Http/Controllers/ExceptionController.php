@@ -1197,6 +1197,12 @@ class ExceptionController extends Controller
             //得到列表的状态值（在状态值下面显示score值）
             $statusScore = array_get($status_list,$customersList['process_status']).'<br/><br/>'.$customersList['score'];
 
+            //remark的显示
+			$remark = $customersList['process_content'];
+            if($customersList['process_status']=='cancel'){
+				$remark = '<div style="color:red;width:200px;">'.$customersList['process_content'].'</div>';
+			}
+
 			$operDate = $this->getOperaDate($customersList['update_status_log']);////得到操作各个状态的时间
             $records["data"][] = array(
                 ((Auth::user()->admin || in_array($customersList['group_id'],array_get($this->getUserGroup(),'manage_groups',array()))))?'<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline"><input name="id[]" type="checkbox" class="checkboxes" value="'.$customersList['id'].'"/><span></span></label>':'',
@@ -1214,7 +1220,7 @@ class ExceptionController extends Controller
 				//得到修改为confirmed状态时间
 				$customersList['bg'].$customersList['bu'],
 				array_get($sap_sellers,$customersList['sap_seller_id'],$customersList['sap_seller_id']),
-				$customersList['descrip'],
+				$remark,
                 ((Auth::user()->admin || in_array($customersList['group_id'],array_get($this->getUserGroup(),'manage_groups',array()))) && ($customersList['process_status']=='submit' || $customersList['process_status']=='confirmed')) ?'<a href="/exception/'.$customersList['id'].'/edit" class="btn btn-sm red btn-outline " target="_blank"><i class="fa fa-search"></i> Process </a>':'<a href="/exception/'.$customersList['id'].'/edit" class="btn blue btn-sm btn-outline green" target="_blank"><i class="fa fa-search"></i> View </a>',
             );
 		}

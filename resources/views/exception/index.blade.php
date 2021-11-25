@@ -113,7 +113,7 @@ th,td,td>span {
 								<th width="15%">Creator</th>
                                 <th width="8%"> BGBU </th>
                                 <th width="8%"> Sales </th>
-                                <th width="8%"> Description </th>
+                                <th width="8%"> Process Remark </th>
                                 <th width="5%"> Action </th>
                             </tr>
                             <tr role="row" class="filter">
