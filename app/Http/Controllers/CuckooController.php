@@ -18,10 +18,11 @@ class CuckooController extends Controller
 
 
     public function index(){
-        $type = $_REQUEST['type'];
-        $data = $_REQUEST['data'];
-        Log::info('type:',$type);
-        Log::info('data:',$data);
+
+        $input = file_get_contents("php://input");
+        $input_data=json_decode($input);
+        Log::info('cuckoo-type:',isset($input_data["type"])?$input_data["type"]:"");
+        Log::info('cuckoo-data:',isset($input_data["data"])?$input_data["data"]:"");
         return 'ok';
     }
 
