@@ -564,20 +564,19 @@ if((Auth::user()->can(['exception-check']) || in_array($exception['group_id'],ar
 			</div>
 		</div>
 
+			<?php
+			$products_details = array_get($replace,'products',array());
+			$replacement_order_ids=[];
+			if(is_array($products_details)){
 
+			foreach($products_details as $detail) {
+			$replacement_order_ids[]=array_get($detail,'replacement_order_id');
+			$addattr=array_get($detail,'addattr',[]);
+			?>
 			@if($exception['process_status']=='done' || $exception['process_status']=='auto done')
 				{{--当状态为done或者auto done的时候就显示选的产品的信息--}}
 			<div class="form-group mt-repeater">
 				<div data-repeater-list="group-products" id="replacement-product-list">
-					<?php
-					$products_details = array_get($replace,'products',array());
-					$replacement_order_ids=[];
-					if(is_array($products_details)){
-
-					foreach($products_details as $detail) {
-					$replacement_order_ids[]=array_get($detail,'replacement_order_id');
-					$addattr=array_get($detail,'addattr',[]);
-					?>
 					<div data-repeater-item class="mt-repeater-item">
 						<div class="row mt-repeater-row">
 							<div class="col-md-2">
@@ -606,73 +605,12 @@ if((Auth::user()->can(['exception-check']) || in_array($exception['group_id'],ar
 							</div>
 						</div>
 					</div>
-					<?php }} ?>
 				</div>
 			</div>
 			@else
 				{{--			把选择的产品相关数据移动到此处--}}
-				<div id="mt-repeater-product-contnet" class="form-group mt-repeater" style="display:none;">
-					<div data-repeater-list="group-products" id="replacement-product-list">
-						<?php
-						$products_details = array_get($replace,'products',array());
-						$replacement_order_ids=[];
-						if(is_array($products_details)){
+				<div id="mt-repeater-product-contnet">
 
-						foreach($products_details as $detail) {
-						$replacement_order_ids[]=array_get($detail,'replacement_order_id');
-						$addattr=array_get($detail,'addattr',[]);
-						?>
-						<div data-repeater-item class="mt-repeater-item">
-							<div class="row mt-repeater-row">
-								<div class="col-md-3">
-									<label class="control-label">Item No.</label>
-									<input type="text" class="form-control item_code"  name="item_code"  value="{{array_get($detail,'item_code')}}" disabled>
-									<input type="hidden" class="seller_id" name="seller_id" />
-									<input type="hidden" class="seller_sku" name="seller_sku" />
-									<input type="hidden" class="find_item_by" name="find_item_by" />
-
-								</div>
-								<div class="col-lg-3 col-md-3">
-									<label class="control-label">select</label>
-									<input type="hidden" class="item_name" name="title" />
-									<input type="text" class="form-control seller-sku-selector" name="note" placeholder="Seller Account and SKU" autocomplete="off" required />
-								</div>
-								<div class="col-lg-2 col-md-2">
-									<label class="control-label">ShipFrom</label>
-									<select class="form-control shipfrom-input"  name="shipfrom"/>
-									<option value='HK01'>HK01</option>
-									<option value='HK03'>HK03</option>
-									<option value='UK02'>UK02</option>
-									<option value='US02'>US02</option>
-									<option value='US04'>US04</option>
-									<option value='US06'>US06</option>
-									<option value='US'>US</option>
-									<option value='GB'>GB</option>
-									<option value='DE'>DE</option>
-									<option value='FR'>FR</option>
-									<option value='IT'>IT</option>
-									<option value='ES'>ES</option>
-									<option value='JP'>JP</option>
-									</select>
-								</div>
-								{{--							<div class="col-md-4">--}}
-								{{--								<label class="control-label">{{array_get($detail,'title')}}</label>--}}
-								{{--								<input type="text" class="form-control"  name="title" value="{{array_get($detail,'note')??array_get($detail,'seller_sku')??array_get($detail,'sku')}}">--}}
-
-								{{--							</div>--}}
-								<div class="col-md-2">
-									<label class="control-label">Quantity</label>
-									<input type="text" class="form-control quantity-input"  name="qty" value="{{array_get($detail,'qty')}}" disabled>
-
-								</div>
-								<div class="col-md-2">
-									<label class="control-label"><input type="checkbox" name="addattr" disabled value="Returned" <?php if(in_array('Returned',$addattr)) echo "checked";?> >Returned</label>
-									<label class="control-label"><input type="checkbox" name="addattr" disabled value="Urgent" <?php if(in_array('Urgent',$addattr)) echo "checked";?>>Urgent</label>
-								</div>
-							</div>
-						</div>
-						<?php }} ?>
-					</div>
 				</div>
 			@endif
 
@@ -873,6 +811,62 @@ if((Auth::user()->can(['exception-check']) || in_array($exception['group_id'],ar
 
 		</div></div></div>					
 </form>
+<div id="mt-repeater-product-div" style="display:none;">
+	<div class="form-group mt-repeater" >
+		<div data-repeater-list="group-products" id="replacement-product-list">
+			<div data-repeater-item class="mt-repeater-item">
+				<div class="row mt-repeater-row">
+					<div class="col-md-3">
+						<label class="control-label">Item No.</label>
+						<input type="text" class="form-control item_code"  name="item_code"  value="{{array_get($detail,'item_code')}}" disabled>
+						<input type="hidden" class="seller_id" name="seller_id" />
+						<input type="hidden" class="seller_sku" name="seller_sku" />
+						<input type="hidden" class="find_item_by" name="find_item_by" />
+
+					</div>
+					<div class="col-lg-3 col-md-3">
+						<label class="control-label">select</label>
+						<input type="hidden" class="item_name" name="title" />
+						<input type="text" class="form-control seller-sku-selector" name="note" placeholder="Seller Account and SKU" autocomplete="off" required />
+					</div>
+					<div class="col-lg-2 col-md-2">
+						<label class="control-label">ShipFrom</label>
+						<select class="form-control shipfrom-input"  name="shipfrom"/>
+						<option value='HK01'>HK01</option>
+						<option value='HK03'>HK03</option>
+						<option value='UK02'>UK02</option>
+						<option value='US02'>US02</option>
+						<option value='US04'>US04</option>
+						<option value='US06'>US06</option>
+						<option value='US'>US</option>
+						<option value='GB'>GB</option>
+						<option value='DE'>DE</option>
+						<option value='FR'>FR</option>
+						<option value='IT'>IT</option>
+						<option value='ES'>ES</option>
+						<option value='JP'>JP</option>
+						</select>
+					</div>
+					{{--							<div class="col-md-4">--}}
+					{{--								<label class="control-label">{{array_get($detail,'title')}}</label>--}}
+					{{--								<input type="text" class="form-control"  name="title" value="{{array_get($detail,'note')??array_get($detail,'seller_sku')??array_get($detail,'sku')}}">--}}
+
+					{{--							</div>--}}
+					<div class="col-md-2">
+						<label class="control-label">Quantity</label>
+						<input type="text" class="form-control quantity-input"  name="qty" value="{{array_get($detail,'qty')}}" disabled>
+
+					</div>
+					<div class="col-md-2">
+						<label class="control-label"><input type="checkbox" name="addattr" disabled value="Returned" <?php if(in_array('Returned',$addattr)) echo "checked";?> >Returned</label>
+						<label class="control-label"><input type="checkbox" name="addattr" disabled value="Urgent" <?php if(in_array('Urgent',$addattr)) echo "checked";?>>Urgent</label>
+					</div>
+				</div>
+			</div>
+			<?php }} ?>
+		</div>
+	</div>
+</div>
 @include('frank.common')
 <script>
     $(function() {
@@ -880,111 +874,118 @@ if((Auth::user()->can(['exception-check']) || in_array($exception['group_id'],ar
 		$('#process_status').change(function(){
 			var value = $('#process_status').val();
 			if(value=='done' || value=='auto done'){
-				$('#mt-repeater-product-contnet').show();
+				$('#mt-repeater-product-contnet').html($('#mt-repeater-product-div').html());
+				handleItemCodeSearch();
 			}else{
-				$('#mt-repeater-product-contnet').hide();
+				$('#mt-repeater-product-contnet').html('');
 			}
 		})
-		$('.item_code').each(function(){
+		/**
+		 * 通过 item_code (手动输入)
+		 * 或者 seller_id + seller_sku (FBA发货)
+		 * 或者 site + seller_sku + asin (FBM发货)
+		 * 把物料的库存列表带出来(包括fba、fbm)以供选择重发
+		 */
+		function handleItemCodeSearch() {
+			$('.item_code').each(function () {
+				// let $findBy = $(ele).siblings('.find_item_by')
+				// let eventData = JSON.parse($findBy.val())
+				// $findBy.remove()
+				// eventData.currentTarget = ele
+				// handleItemCodeSearch.call(ele, eventData)
 
+				let $item_code = $(this);
 
-			// let $findBy = $(ele).siblings('.find_item_by')
-			// let eventData = JSON.parse($findBy.val())
-			// $findBy.remove()
-			// eventData.currentTarget = ele
-			// handleItemCodeSearch.call(ele, eventData)
+				let item_code = $item_code.val().trim()
 
-			let $item_code = $(this);
+				$item_code.val(item_code.toUpperCase())
 
-			let item_code = $item_code.val().trim()
+				let $sellerSkuSelector = $item_code.closest('.mt-repeater-row').find('.seller-sku-selector')
 
-			$item_code.val(item_code.toUpperCase())
+				if ($sellerSkuSelector.attr('list') === `list-${item_code}-stocks`) return
 
-			let $sellerSkuSelector = $item_code.closest('.mt-repeater-row').find('.seller-sku-selector')
+				$sellerSkuSelector.val('').change().removeAttr('list').data('skusInfo', null).next('datalist').remove()
 
-			if ($sellerSkuSelector.attr('list') === `list-${item_code}-stocks`) return
+				if (!item_code) {
 
-			$sellerSkuSelector.val('').change().removeAttr('list').data('skusInfo', null).next('datalist').remove()
+					var {seller_id, seller_sku, site, asin} = e
 
-			if (!item_code) {
-
-				var {seller_id, seller_sku, site, asin} = e
-
-				if (asin) {
-					var postData = {seller_id, seller_sku, site, asin,'_token':'{{csrf_token()}}'}
-				} else {
-					return $sellerSkuSelector.attr('placeholder', 'Seller Account and SKU')
-				}
-
-			} else {
-				var postData = {item_code,'_token':'{{csrf_token()}}'}
-			}
-			console.log(postData);
-			console.log($sellerSkuSelector);
-
-			countryCode = $('#countrycode').val();
-			$.ajax({
-				method: 'POST',
-				url: '/kms/stocklist?countryCode='+countryCode,
-				data: postData,
-				dataType: 'json',
-				success(stocks) {
-
-					if (!stocks.length) {
-						if(seller_id && seller_sku){
-							$item_code.val('no match')
-							$sellerSkuSelector.val(`${seller_id} | ${seller_sku}`)
-						} else {
-							$sellerSkuSelector.attr('placeholder', 'no match')
-						}
-						return
-					}
-
-					if (false === stocks[0]) {
-						let errmsg = stocks[1]
-						$sellerSkuSelector.attr('placeholder', errmsg)
-						return
-					}
-
-					// console.log(stocks)
-					if(!item_code){
-						item_code = stocks[0].item_code
-						$item_code.val(item_code)
-					}
-
-					stocks.sort((a, b) => {
-						return a.stock < b.stock ? 1 : (a.stock > b.stock ? -1 : 0)
-					})
-
-					$sellerSkuSelector
-							.after(tplRender(tplStockDatalist, {stocks, item_code}))
-							.attr('list', `list-${item_code}-stocks`)
-							.attr('placeholder', 'please select ...')
-
-
-					let skusInfo = rows2object(stocks, ['seller_name', 'seller_sku', ' | '])
-
-					$sellerSkuSelector.data('skusInfo', skusInfo)
-
-					let selected = null
-
-					if (1 === stocks.length && stocks[0].stock > 0) {
-						selected = stocks[0]
+					if (asin) {
+						var postData = {seller_id, seller_sku, site, asin, '_token': '{{csrf_token()}}'}
 					} else {
-						let theSellerId = rebindordersellerid.value.trim()
-						for(let stock of stocks){
-							if(stock.seller_id === theSellerId && stock.stock) {
-								selected = stock
-								break
+						return $sellerSkuSelector.attr('placeholder', 'Seller Account and SKU')
+					}
+
+				} else {
+					var postData = {item_code, '_token': '{{csrf_token()}}'}
+				}
+				console.log(postData);
+				console.log($sellerSkuSelector);
+
+				countryCode = $('#countrycode').val();
+				$.ajax({
+					method: 'POST',
+					url: '/kms/stocklist?countryCode=' + countryCode,
+					data: postData,
+					dataType: 'json',
+					success(stocks) {
+
+						if (!stocks.length) {
+							if (seller_id && seller_sku) {
+								$item_code.val('no match')
+								$sellerSkuSelector.val(`${seller_id} | ${seller_sku}`)
+							} else {
+								$sellerSkuSelector.attr('placeholder', 'no match')
+							}
+							return
+						}
+
+						if (false === stocks[0]) {
+							let errmsg = stocks[1]
+							$sellerSkuSelector.attr('placeholder', errmsg)
+							return
+						}
+
+						// console.log(stocks)
+						if (!item_code) {
+							item_code = stocks[0].item_code
+							$item_code.val(item_code)
+						}
+
+						stocks.sort((a, b) => {
+							return a.stock < b.stock ? 1 : (a.stock > b.stock ? -1 : 0)
+						})
+
+						$sellerSkuSelector
+								.after(tplRender(tplStockDatalist, {stocks, item_code}))
+								.attr('list', `list-${item_code}-stocks`)
+								.attr('placeholder', 'please select ...')
+
+
+						let skusInfo = rows2object(stocks, ['seller_name', 'seller_sku', ' | '])
+
+						$sellerSkuSelector.data('skusInfo', skusInfo)
+
+						let selected = null
+
+						if (1 === stocks.length && stocks[0].stock > 0) {
+							selected = stocks[0]
+						} else {
+							let theSellerId = rebindordersellerid.value.trim()
+							for (let stock of stocks) {
+								if (stock.seller_id === theSellerId && stock.stock) {
+									selected = stock
+									break
+								}
 							}
 						}
+
+						if (selected) $sellerSkuSelector.val(`${selected.seller_name} | ${selected.seller_sku}`).change()
+
 					}
-
-					if(selected) $sellerSkuSelector.val(`${selected.seller_name} | ${selected.seller_sku}`).change()
-
-				}
+				})
 			})
-		})
+		}
 
 		if($('#process_status').val() == 'done' && $('#type').val() == 4){
 			$('#gift-card-div').show();
@@ -1090,104 +1091,6 @@ if((Auth::user()->can(['exception-check']) || in_array($exception['group_id'],ar
             }
 
         })
-
-		/**
-		 * 通过 item_code (手动输入)
-		 * 或者 seller_id + seller_sku (FBA发货)
-		 * 或者 site + seller_sku + asin (FBM发货)
-		 * 把物料的库存列表带出来(包括fba、fbm)以供选择重发
-		 */
-		function handleItemCodeSearch(e) {
-			let $item_code = $(e.currentTarget)
-
-			let item_code = $item_code.val().trim()
-
-			$item_code.val(item_code.toUpperCase())
-
-			let $sellerSkuSelector = $item_code.closest('.mt-repeater-row').find('.seller-sku-selector')
-
-			if ($sellerSkuSelector.attr('list') === `list-${item_code}-stocks`) return
-
-			$sellerSkuSelector.val('').change().removeAttr('list').data('skusInfo', null).next('datalist').remove()
-
-			if (!item_code) {
-
-				var {seller_id, seller_sku, site, asin} = e
-
-				if (asin) {
-					var postData = {seller_id, seller_sku, site, asin}
-				} else {
-					return $sellerSkuSelector.attr('placeholder', 'Seller Account and SKU')
-				}
-
-			} else {
-				var postData = {item_code}
-			}
-
-			countryCode = $('#countrycode').val();
-			$.ajax({
-				method: 'POST',
-				url: '/kms/stocklist?countryCode='+countryCode,
-				data: postData,
-				dataType: 'json',
-				success(stocks) {
-
-					if (!stocks.length) {
-						if(seller_id && seller_sku){
-							$item_code.val('no match')
-							$sellerSkuSelector.val(`${seller_id} | ${seller_sku}`)
-						} else {
-							$sellerSkuSelector.attr('placeholder', 'no match')
-						}
-						return
-					}
-
-					if (false === stocks[0]) {
-						let errmsg = stocks[1]
-						$sellerSkuSelector.attr('placeholder', errmsg)
-						return
-					}
-
-					// console.log(stocks)
-					if(!item_code){
-						item_code = stocks[0].item_code
-						$item_code.val(item_code)
-					}
-
-					stocks.sort((a, b) => {
-						return a.stock < b.stock ? 1 : (a.stock > b.stock ? -1 : 0)
-					})
-
-					$sellerSkuSelector
-							.after(tplRender(tplStockDatalist, {stocks, item_code}))
-							.attr('list', `list-${item_code}-stocks`)
-							.attr('placeholder', 'please select ...')
-
-
-					let skusInfo = rows2object(stocks, ['seller_name', 'seller_sku', ' | '])
-
-					$sellerSkuSelector.data('skusInfo', skusInfo)
-
-					let selected = null
-
-					if (1 === stocks.length && stocks[0].stock > 0) {
-						selected = stocks[0]
-					} else {
-						let theSellerId = rebindordersellerid.value.trim()
-						for(let stock of stocks){
-							if(stock.seller_id === theSellerId && stock.stock) {
-								selected = stock
-								break
-							}
-						}
-					}
-
-					if(selected) $sellerSkuSelector.val(`${selected.seller_name} | ${selected.seller_sku}`).change()
-
-				}
-			})
-		}
-
 
     });
 </script>
