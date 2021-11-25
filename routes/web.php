@@ -655,3 +655,6 @@ Route::match(['post','get'],'/sellerAccountsStatus/view', 'SellerAccountsStatusC
 
 Route::Post('/cuckoo/gather', 'CuckooController@index');
 Route::get('/cuckoo/feedback', 'CuckooController@feedback');
+
+Route::get('/accountStocklist', 'AccountStocklistController@index');//列表
+//Route::post('/sellerAccountsStatusList', 'SellerAccountsStatusController@list');//列表获取数据

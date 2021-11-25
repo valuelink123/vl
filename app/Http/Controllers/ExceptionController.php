@@ -717,6 +717,9 @@ class ExceptionController extends Controller
 						foreach ($products_arr as $key=>$product_arr) {
 							$product_arr['shipfrom'] = $input_products_arr[$key]['shipfrom'];
 							$product_arr['note'] = $input_products_arr[$key]['note'];
+							$product_arr['seller_id'] = $input_products_arr[$key]['seller_id'];
+							$product_arr['seller_sku'] = $input_products_arr[$key]['seller_sku'];
+							$product_arr['find_item_by'] = $input_products_arr[$key]['find_item_by'];
 							$updateMcfOrder[$product_arr['replacement_order_id']] = array(///修改数据前的重发单号，amazon_mcf_orders表重发单对应的原始订单号置空
 								'seller_fulfillment_order_id' => $product_arr['replacement_order_id'],
 								'amazon_order_id' => ''

@@ -505,6 +505,13 @@
                                                     </a>
                                                 </li>
 												 @endpermission
+
+                                                <li class="">
+                                                    <a href="/accountStocklist" class="nav-link nav-toggle ">
+                                                        Account Stocklist
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
                                             </ul>
                                         </li>
 

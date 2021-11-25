@@ -107,6 +107,74 @@
 	});
   });
   </script>
+<?php
+	$replace = unserialize(array_get($exception,'replacement',''));
+?>
+<div id="mt-repeater-product-div" style="display:none;">
+	<div class="form-group mt-repeater" >
+		<div data-repeater-list="group-products" id="replacement-product-list">
+			<?php
+			$products_details = array_get($replace,'products',array());
+			$replacement_order_ids=[];
+			if(is_array($products_details)){
+
+			foreach($products_details as $detail) {
+			$replacement_order_ids[]=array_get($detail,'replacement_order_id');
+			$addattr=array_get($detail,'addattr',[]);
+			?>
+			<div data-repeater-item class="mt-repeater-item">
+				<div class="row mt-repeater-row">
+					<div class="col-md-3">
+						<label class="control-label">Item No.</label>
+						<input type="text" class="form-control item_code"  name="item_code"  value="{{array_get($detail,'item_code')}}" disabled>
+						<input type="hidden" class="seller_id" name="seller_id" />
+						<input type="hidden" class="seller_sku" name="seller_sku" />
+						<input type="hidden" class="find_item_by" name="find_item_by" />
+
+					</div>
+					<div class="col-lg-3 col-md-3">
+						<label class="control-label">select</label>
+						<input type="hidden" class="item_name" name="title" />
+						<input type="text" class="form-control seller-sku-selector" name="note" placeholder="Seller Account and SKU" autocomplete="off" required onchange="getAccountSeller($(this))"/>
+					</div>
+					<div class="col-lg-2 col-md-2">
+						<label class="control-label">ShipFrom</label>
+						<select class="form-control shipfrom-input"  name="shipfrom"/>
+						<option value='HK01'>HK01</option>
+						<option value='HK03'>HK03</option>
+						<option value='UK02'>UK02</option>
+						<option value='US02'>US02</option>
+						<option value='US04'>US04</option>
+						<option value='US06'>US06</option>
+						<option value='US'>US</option>
+						<option value='GB'>GB</option>
+						<option value='DE'>DE</option>
+						<option value='FR'>FR</option>
+						<option value='IT'>IT</option>
+						<option value='ES'>ES</option>
+						<option value='JP'>JP</option>
+						</select>
+					</div>
+					{{--							<div class="col-md-4">--}}
+					{{--								<label class="control-label">{{array_get($detail,'title')}}</label>--}}
+					{{--								<input type="text" class="form-control"  name="title" value="{{array_get($detail,'note')??array_get($detail,'seller_sku')??array_get($detail,'sku')}}">--}}
+
+					{{--							</div>--}}
+					<div class="col-md-2">
+						<label class="control-label">Quantity</label>
+						<input type="text" class="form-control quantity-input"  name="qty" value="{{array_get($detail,'qty')}}" disabled>
+
+					</div>
+					<div class="col-md-2">
+						<label class="control-label"><input type="checkbox" name="addattr" disabled value="Returned" <?php if(in_array('Returned',$addattr)) echo "checked";?> >Returned</label>
+						<label class="control-label"><input type="checkbox" name="addattr" disabled value="Urgent" <?php if(in_array('Urgent',$addattr)) echo "checked";?>>Urgent</label>
+					</div>
+				</div>
+			</div>
+			<?php }} ?>
+		</div>
+	</div>
+</div>
 <form  action="{{ url('exception/'.$exception['id']) }}" id="exception_form" method="POST" enctype="multipart/form-data">
 <?php 
 $mcf_order_str='';
@@ -563,20 +631,19 @@ if((Auth::user()->can(['exception-check']) || in_array($exception['group_id'],ar
 				</select>
 			</div>
 		</div>
-
-			<?php
-			$products_details = array_get($replace,'products',array());
-			$replacement_order_ids=[];
-			if(is_array($products_details)){
-
-			foreach($products_details as $detail) {
-			$replacement_order_ids[]=array_get($detail,'replacement_order_id');
-			$addattr=array_get($detail,'addattr',[]);
-			?>
 			@if($exception['process_status']=='done' || $exception['process_status']=='auto done')
 				{{--当状态为done或者auto done的时候就显示选的产品的信息--}}
 			<div class="form-group mt-repeater">
-				<div data-repeater-list="group-products" id="replacement-product-list">
+				<div data-repeater-list="group-products">
+					<?php
+					$products_details = array_get($replace,'products',array());
+					$replacement_order_ids=[];
+					if(is_array($products_details)){
+
+					foreach($products_details as $detail) {
+					$replacement_order_ids[]=array_get($detail,'replacement_order_id');
+					$addattr=array_get($detail,'addattr',[]);
+					?>
 					<div data-repeater-item class="mt-repeater-item">
 						<div class="row mt-repeater-row">
 							<div class="col-md-2">
@@ -605,6 +672,7 @@ if((Auth::user()->can(['exception-check']) || in_array($exception['group_id'],ar
 							</div>
 						</div>
 					</div>
+						<?php }} ?>
 				</div>
 			</div>
 			@else
@@ -811,75 +879,50 @@ if((Auth::user()->can(['exception-check']) || in_array($exception['group_id'],ar
 
 		</div></div></div>					
 </form>
-<div id="mt-repeater-product-div" style="display:none;">
-	<div class="form-group mt-repeater" >
-		<div data-repeater-list="group-products" id="replacement-product-list">
-			<div data-repeater-item class="mt-repeater-item">
-				<div class="row mt-repeater-row">
-					<div class="col-md-3">
-						<label class="control-label">Item No.</label>
-						<input type="text" class="form-control item_code"  name="item_code"  value="{{array_get($detail,'item_code')}}" disabled>
-						<input type="hidden" class="seller_id" name="seller_id" />
-						<input type="hidden" class="seller_sku" name="seller_sku" />
-						<input type="hidden" class="find_item_by" name="find_item_by" />
-
-					</div>
-					<div class="col-lg-3 col-md-3">
-						<label class="control-label">select</label>
-						<input type="hidden" class="item_name" name="title" />
-						<input type="text" class="form-control seller-sku-selector" name="note" placeholder="Seller Account and SKU" autocomplete="off" required />
-					</div>
-					<div class="col-lg-2 col-md-2">
-						<label class="control-label">ShipFrom</label>
-						<select class="form-control shipfrom-input"  name="shipfrom"/>
-						<option value='HK01'>HK01</option>
-						<option value='HK03'>HK03</option>
-						<option value='UK02'>UK02</option>
-						<option value='US02'>US02</option>
-						<option value='US04'>US04</option>
-						<option value='US06'>US06</option>
-						<option value='US'>US</option>
-						<option value='GB'>GB</option>
-						<option value='DE'>DE</option>
-						<option value='FR'>FR</option>
-						<option value='IT'>IT</option>
-						<option value='ES'>ES</option>
-						<option value='JP'>JP</option>
-						</select>
-					</div>
-					{{--							<div class="col-md-4">--}}
-					{{--								<label class="control-label">{{array_get($detail,'title')}}</label>--}}
-					{{--								<input type="text" class="form-control"  name="title" value="{{array_get($detail,'note')??array_get($detail,'seller_sku')??array_get($detail,'sku')}}">--}}
-
-					{{--							</div>--}}
-					<div class="col-md-2">
-						<label class="control-label">Quantity</label>
-						<input type="text" class="form-control quantity-input"  name="qty" value="{{array_get($detail,'qty')}}" disabled>
-
-					</div>
-					<div class="col-md-2">
-						<label class="control-label"><input type="checkbox" name="addattr" disabled value="Returned" <?php if(in_array('Returned',$addattr)) echo "checked";?> >Returned</label>
-						<label class="control-label"><input type="checkbox" name="addattr" disabled value="Urgent" <?php if(in_array('Urgent',$addattr)) echo "checked";?>>Urgent</label>
-					</div>
-				</div>
-			</div>
-			<?php }} ?>
-		</div>
-	</div>
-</div>
 @include('frank.common')
 <script>
+
+	function getAccountSeller(obj){
+		// $(".seller-sku-selector").each(function () {
+		let skusInfo = obj.data('skusInfo') || {}
+		let info = skusInfo[obj.val()]
+		let $repeatRow = obj.closest('.mt-repeater-row')
+		if (info) {
+			$repeatRow.find('.seller_id').val(info.seller_id)
+			$repeatRow.find('.seller_sku').val(info.seller_sku)
+			if (info.seller_id == 'FBM') {
+				let stock = info.stock
+				$repeatRow.find('.shipfrom-input').val(stock.substring(0, stock.indexOf('-')))
+			} else {
+				$repeatRow.find('.shipfrom-input').val($('#countrycode').val())
+			}
+			if (info.stock <= 0) {
+				alert('The stock of this item is Zero.');
+			}
+		} else {
+			this.value = ''
+			$repeatRow.find('.seller_id').val('')
+			$repeatRow.find('.seller_sku').val('')
+			$repeatRow.find('.shipfrom-input').val($('#countrycode').val())
+		}
+
+		let item_name = info ? info.item_name : ''
+
+		$repeatRow.find('.item_name').val(item_name).prev().html(item_name || 'Search by Item No and select')
+	}
+
     $(function() {
 		//选择标签状态的时候，如果选了no隐藏标签类型，选择的是yes就显示标签类型
-		$('#process_status').change(function(){
+		$('#process_status').change(function () {
 			var value = $('#process_status').val();
-			if(value=='done' || value=='auto done'){
+			if (value == 'done' || value == 'auto done') {
 				$('#mt-repeater-product-contnet').html($('#mt-repeater-product-div').html());
 				handleItemCodeSearch();
-			}else{
+			} else {
 				$('#mt-repeater-product-contnet').html('');
 			}
 		})
+
 		/**
 		 * 通过 item_code (手动输入)
 		 * 或者 seller_id + seller_sku (FBA发货)
@@ -919,8 +962,6 @@ if((Auth::user()->can(['exception-check']) || in_array($exception['group_id'],ar
 				} else {
 					var postData = {item_code, '_token': '{{csrf_token()}}'}
 				}
-				console.log(postData);
-				console.log($sellerSkuSelector);
 
 				countryCode = $('#countrycode').val();
 				$.ajax({
@@ -946,7 +987,6 @@ if((Auth::user()->can(['exception-check']) || in_array($exception['group_id'],ar
 							return
 						}
 
-						// console.log(stocks)
 						if (!item_code) {
 							item_code = stocks[0].item_code
 							$item_code.val(item_code)
