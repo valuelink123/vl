@@ -514,6 +514,39 @@ if($exception['user_id'] == Auth::user()->id && ($exception['process_status'] ==
 								</select>
 							</div>
 						</div>
+{{--						左侧显示客服添加的item no和数量--}}
+						<div class="form-group">
+							<div class="form-group">
+								<div>
+									<?php
+									$products_details = array_get($replace,'products',array());
+									$replacement_order_ids=[];
+									if(is_array($products_details)){
+
+									foreach($products_details as $detail) {
+									$replacement_order_ids[]=array_get($detail,'replacement_order_id');
+									$addattr=array_get($detail,'addattr',[]);
+									?>
+									<div data-repeater-item class="mt-repeater-item">
+										<div class="row mt-repeater-row">
+											<div class="col-md-3">
+												<label class="control-label">Item No.</label>
+												<input type="text" class="form-control" value="{{array_get($detail,'item_code')}}" disabled>
+											</div>
+											<div class="col-md-2">
+												<label class="control-label">Quantity</label>
+												<input type="text" class="form-control"  value="{{array_get($detail,'qty')}}" disabled>
+											</div>
+											<div class="col-md-2">
+												<label class="control-label"><input type="checkbox" disabled value="Returned" <?php if(in_array('Returned',$addattr)) echo "checked";?> >Returned</label>
+												<label class="control-label"><input type="checkbox" disabled value="Urgent" <?php if(in_array('Urgent',$addattr)) echo "checked";?>>Urgent</label>
+											</div>
+										</div>
+									</div>
+									<?php }} ?>
+								</div>
+							</div>
+						</div>
 
 						<script id="tplStockDatalist" type="text/template">
 							<datalist id="list-${item_code}-stocks">

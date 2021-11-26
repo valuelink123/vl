@@ -1174,17 +1174,23 @@ class ExceptionController extends Controller
 						$operate.= '<span class="label label-sm label-danger">Not Set Auto Mcf</span><BR>';
 					}
 					if($customersList['auto_create_mcf']){
-						$operate.= 'Auto Mcf : '.array_get($mcf_result,$customersList['auto_create_mcf_result']).'</BR>'.$customersList['last_auto_create_mcf_log'].'</BR>';
+						if($customersList['auto_create_mcf_result']=='-1'){
+							$operate.= '<span class="label label-sm label-danger">'.'Auto Mcf : '.array_get($mcf_result,$customersList['auto_create_mcf_result']).'</BR>'.$customersList['last_auto_create_mcf_log'].'</span></BR>';
+						}else{
+							$operate.= 'Auto Mcf : '.array_get($mcf_result,$customersList['auto_create_mcf_result']).'</BR>'.$customersList['last_auto_create_mcf_log'].'</BR>';
+						}
 					}
 					
 					if(!$customersList['auto_create_sap'] && ($customersList['type']==2 || $customersList['type']==3) && ($customersList['process_status']=='auto done' || $customersList['process_status']=='done')){
 						$operate.= '<span class="label label-sm label-danger">Not Set Auto SAP</span><BR>';
 					}
 					if($customersList['auto_create_sap']){
-						$operate.= 'Auto Sap : '.array_get($mcf_result,$customersList['auto_create_sap_result']).'</BR>'.$customersList['last_auto_create_sap_log'].'</BR>';
+						if($customersList['auto_create_sap_result']=='-1'){
+							$operate.= '<span class="label label-sm label-danger">'.'Auto Sap : '.array_get($mcf_result,$customersList['auto_create_sap_result']).'</BR>'.$customersList['last_auto_create_sap_log'].'</span></BR>';
+						}else{
+							$operate.= 'Auto Sap : '.array_get($mcf_result,$customersList['auto_create_sap_result']).'</BR>'.$customersList['last_auto_create_sap_log'].'</BR>';
+						}
 					}
-	
-					
 				}
 			}
             if($customersList['type']==4){

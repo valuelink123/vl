@@ -480,11 +480,6 @@
                                             <input type="hidden" class="seller_sku" name="seller_sku" />
                                             <input type="hidden" class="find_item_by" name="find_item_by" />
                                         </div>
-{{--                                        <div class="col-lg-4 col-md-4">--}}
-{{--                                            <label class="control-label">Search by Item No and select</label>--}}
-{{--                                            <input type="hidden" class="item_name" name="title" />--}}
-{{--                                            <input type="text" class="form-control seller-sku-selector" name="note" placeholder="Seller Account and SKU" autocomplete="off" required />--}}
-{{--                                        </div>--}}
                                         <div class="col-lg-2 col-md-2">
                                             <label class="control-label">Quantity</label>
                                             <input type="text" class="form-control quantity-input"  name="qty" value="1" placeholder="Quantity" required />
