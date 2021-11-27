@@ -1066,7 +1066,7 @@ WHERE asin_daily_report.date>='$date_from' AND asin_daily_report.date<='$date_to
         if ($request->getMethod()=='POST')
         {
             $this->validate($request, [
-                'name' => 'required|string',
+//                'name' => 'required|string',
                 'current_password' => 'required_with:password,password_confirmation|string',
                 'password' => 'required_with:password_confirmation|confirmed',
                 //'password_confirmation' => 'required_with:password|string|min:6',
@@ -1075,10 +1075,10 @@ WHERE asin_daily_report.date>='$date_from' AND asin_daily_report.date<='$date_to
 
             $result = Hash::check($request->get('current_password'), $user->password);//Auth::validate(['password'=>$request->get('current_password')]);
             if($result){
-                $user->name = $request->get('name');
-				$user->sap_seller_id = intval($request->get('sap_seller_id'));
-				$user->ubg = trim($request->get('bg'));
-				$user->ubu = trim($request->get('bu'));
+//                $user->name = $request->get('name');
+//				$user->sap_seller_id = intval($request->get('sap_seller_id'));
+//				$user->ubg = trim($request->get('bg'));
+//				$user->ubu = trim($request->get('bu'));
                 if($request->get('password')) $user->password = Hash::make(($request->get('password')));
                 $user->save();
                 $request->session()->flash('success_message', 'Set Profile Success');

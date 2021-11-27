@@ -41,36 +41,36 @@
                                 <span class="input-group-addon">
                                     <i class="fa fa-user"></i>
                                 </span>
-                                <input type="text" class="form-control" name="name" id="name" value="{{$profile->name}}" required>
+                                <input type="text" class="form-control" name="name" id="name" value="{{$profile->name}}" disabled>
                             </div>
                         </div>
-						<div class="form-group">
-                            <label>Sap Seller Id</label>
-                            <div class="input-group col-md-6">
-                                <span class="input-group-addon">
-                                    <i class="fa fa-user"></i>
-                                </span>
-                                <input type="text" class="form-control" name="sap_seller_id" id="sap_seller_id" value="{{$profile->sap_seller_id}}">
-                            </div>
-                        </div>
-						<div class="form-group">
-                            <label>BG</label>
-                            <div class="input-group col-md-6">
-                                <span class="input-group-addon">
-                                    <i class="fa fa-user"></i>
-                                </span>
-                                <input type="text" class="form-control" name="bg" id="bg" value="{{$profile->ubg}}">
-                            </div>
-                        </div>
-						<div class="form-group">
-                            <label>BU</label>
-                            <div class="input-group col-md-6">
-                                <span class="input-group-addon">
-                                    <i class="fa fa-user"></i>
-                                </span>
-                                <input type="text" class="form-control" name="bu" id="bu" value="{{$profile->ubu}}">
-                            </div>
-                        </div>
+{{--						<div class="form-group">--}}
+{{--                            <label>Sap Seller Id</label>--}}
+{{--                            <div class="input-group col-md-6">--}}
+{{--                                <span class="input-group-addon">--}}
+{{--                                    <i class="fa fa-user"></i>--}}
+{{--                                </span>--}}
+{{--                                <input type="text" class="form-control" name="sap_seller_id" id="sap_seller_id" value="{{$profile->sap_seller_id}}">--}}
+{{--                            </div>--}}
+{{--                        </div>--}}
+{{--						<div class="form-group">--}}
+{{--                            <label>BG</label>--}}
+{{--                            <div class="input-group col-md-6">--}}
+{{--                                <span class="input-group-addon">--}}
+{{--                                    <i class="fa fa-user"></i>--}}
+{{--                                </span>--}}
+{{--                                <input type="text" class="form-control" name="bg" id="bg" value="{{$profile->ubg}}">--}}
+{{--                            </div>--}}
+{{--                        </div>--}}
+{{--						<div class="form-group">--}}
+{{--                            <label>BU</label>--}}
+{{--                            <div class="input-group col-md-6">--}}
+{{--                                <span class="input-group-addon">--}}
+{{--                                    <i class="fa fa-user"></i>--}}
+{{--                                </span>--}}
+{{--                                <input type="text" class="form-control" name="bu" id="bu" value="{{$profile->ubu}}">--}}
+{{--                            </div>--}}
+{{--                        </div>--}}
                         <div class="form-group">
                             <label>Current Password</label>
                             <div class="input-group col-md-6">
