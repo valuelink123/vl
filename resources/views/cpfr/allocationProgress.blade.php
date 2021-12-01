@@ -200,7 +200,7 @@
 		line-height: 45px;
 		color: #67c23a;
 	}
-	
+
 	.error_mask{
 		width: 400px;
 		height: 50px;
@@ -259,7 +259,7 @@
 		margin-top: -110px;
 		margin-left: -250px;
 	}
-	
+
 	.upload_file_from,.editor_box{
 		height: 500px;
 		margin-top: -250px;
@@ -309,7 +309,7 @@
 	}
 	.form_btn button:first-child{
 		background-color: #909399;
-		border: 1px solid #909399;	
+		border: 1px solid #909399;
 	}
 	.form_btn button:last-child{
 		margin-left: 10px;
@@ -399,8 +399,8 @@
 		text-overflow: ellipsis;
 	}
 	.editor_div{
-		width: 100%; 
-		height: 100%; 
+		width: 100%;
+		height: 100%;
 		overflow: hidden;
 		border-bottom: 1px solid #ccc;
 		padding: 10px 0;
@@ -432,20 +432,20 @@
 		<button id="downloadTemplate" style="float:right" class="btn sbold green-meadow"> 下载导入模板
 			<i class="fa fa-download"></i>
 		</button>
-		
+
 		<button id="export" style="float:right;margin:0 10px" class="btn sbold blue"> 导出
 			<i class="fa fa-download"></i>
 		</button>
 		<div style="float: right;">
 			<form action="/shipment/importExecl" style="display: inline-block;" method="POST" class="pull-right " enctype="multipart/form-data">
 				{{ csrf_field() }}
-				<input style="display: inline-block;" type="file" name="files" id="input" multiple=""> 
+				<input style="display: inline-block;" type="file" name="files" id="input" multiple="">
 				<button type="submit" class="btn blue start">
 				    <i class="fa fa-upload"></i>
 				    <span>上传</span>
 				</button>
 			</form>
-		</div>   
+		</div>
 	</div>
 	<div class="content">
 		<div class="filter_box">
@@ -457,9 +457,9 @@
 							<i class="fa fa-calendar"></i>
 						</button>
 					</span>
-					<input type="text" class="form-control createTimeInput" value="-" id="createTimeInput">  
+					<input type="text" class="form-control createTimeInput" value="-" id="createTimeInput">
 				</div>
-			</div>	
+			</div>
 			<div class="filter_option">
 				<label for="account_number">账号</label>
 				<select id="account_number" onchange="status_filter(this.value,10)">
@@ -531,7 +531,7 @@
 					<option value ="BU5">BU5</option>
 				</select>
 			</div>
-			
+
 			<div class="filter_option">
 				<label for="seller_select">销售员</label>
 				<select id="seller_select" onchange="status_filter(this.value,6)">
@@ -544,7 +544,7 @@
 				<button class="search">
 					<svg t="1588043111114" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3742" width="18" height="18"><path d="M400.696889 801.393778A400.668444 400.668444 0 1 1 400.696889 0a400.668444 400.668444 0 0 1 0 801.393778z m0-89.031111a311.637333 311.637333 0 1 0 0-623.331556 311.637333 311.637333 0 0 0 0 623.331556z" fill="#ffffff" p-id="3743"></path><path d="M667.904 601.998222l314.766222 314.823111-62.919111 62.976-314.823111-314.823111z" fill="#ffffff" p-id="3744"></path></svg>
 					搜索
-				</button>	
+				</button>
 				<button class="clear" onclick="handleClear()">清空筛选</button>
 			</div>
 		</div>
@@ -632,7 +632,7 @@
 					</table>
 					<div style="position: absolute; bottom: 15px;left: 50%;">合计: <span class="transferredQuantity"></span></div>
 				</div>
-	            
+
 	        </div>
 	    </div>
 	</div>
@@ -648,13 +648,13 @@
 		</span>
 		<span class="mask_text error_mask_text"></span>
 	</div>
-</div>	
+</div>
 
 	<div class="mask_box">
 		<div class="mask-dialog">
 			<svg t="1588919283810" class="icon cancel_mask cancel_btn" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4128" width="15" height="15"><path d="M1001.952 22.144c21.44 21.44 22.048 55.488 1.44 76.096L98.272 1003.36c-20.608 20.576-54.592 20-76.096-1.504-21.536-21.44-22.048-55.488-1.504-76.096L925.824 20.672c20.608-20.64 54.624-20 76.128 1.472" p-id="4129" fill="#707070"></path><path d="M22.176 22.112C43.616 0.672 77.6 0.064 98.24 20.672L1003.392 925.76c20.576 20.608 20 54.592-1.504 76.064-21.44 21.568-55.488 22.08-76.128 1.536L20.672 98.272C0 77.6 0.672 43.584 22.176 22.112" p-id="4130" fill="#707070"></path></svg>
 			<h4 style="text-align: center; line-height: 38px;">调拨进度</h4>
-			
+
 			<div>
 				<label for="audit_status_select" style="display: block;">审核</label>
 				<select name="audit_status_select" disabled="disabled" id="audit_status_select" style="width:100%;height: 28px;margin-bottom: 20px;border: 1px solid rgba(220, 223, 230, 1); background: rgba(239, 239, 239, 0.3);">
@@ -666,7 +666,7 @@
 					<option value="5">取消调拨请求</option>
 				</select>
 			</div>
-			
+
 			<form  method="post" onsubmit="return false" action="##" id="formtest">
 				<div class="mask-form">
 					<div>
@@ -691,7 +691,7 @@
 							</label>
 							<input type="text" id="maskDate" disabled="disabled" class="maskDate">
 						</div>
-						
+
 					</div>
 					<div>
 						<label for="site_select">站点</label>
@@ -714,8 +714,8 @@
 							<label for="warehouse_select">调入工厂</label>
 							<input type="text" id="warehouse_select" disabled="disabled" class="warehouse_select">
 						</div>
-						
-						
+
+
 						<label for="rms_input">
 							是否贴RMS标签
 							<span title="是否需要贴RMS标贴，若是，则需要输入标贴物料号" class="mask_hover_svg">
@@ -760,7 +760,7 @@
 								</button>
 							</span>
 						</div>
-						
+
 					</div>
 				</div>
 			</form>
@@ -769,9 +769,9 @@
 				<input type="hidden" class="formId">
 				<button class="updateConfirm">确认</button>
 			</div>
-			
+
 		</div>
-		
+
 	</div>
 <div class="mask_file_upload">
 			<div class="upload_file_from">
@@ -784,7 +784,7 @@
 						<input type="hidden" name="warn" id="warn" value="0">
 					    <input type="hidden" name="inbox_id" id="inbox_id" value="0">
 					   <input type="hidden" name="user_id" id="user_id" value="{{Auth::user()->id}}">
-										
+
 					    <div style="margin-top: 20px;">
 					        <!-- The fileupload-buttonbar contains buttons to add/delete files and start/cancel the upload -->
 					        <div class="fileupload-buttonbar">
@@ -793,7 +793,7 @@
 					                <span class="btn green fileinput-button">
 										<i class="fa fa-plus"></i>
 										<span>添加文件</span>
-										<input type="file" name="files[]" multiple=""> 
+										<input type="file" name="files[]" multiple="">
 									</span>
 					                <button type="submit" class="btn blue start">
 					                    <i class="fa fa-upload"></i>
@@ -803,7 +803,7 @@
 					                    <i class="fa fa-ban-circle"></i>
 					                    <span>取消上传 </span>
 					                </button>
-					
+
 					                <button type="button" class="btn red delete">
 					                    <i class="fa fa-trash"></i>
 					                    <span>删除</span>
@@ -868,7 +868,7 @@
 					                    {% if (file.name) { %}
 					                        <input type="hidden" name="fileid[]" class="filesUrl" value="{%=file.url%}">
 					                    {% } %}
-					
+
 					                    </p> {% if (file.error) { %}
 					                <div>
 					                    <span class="label label-danger">Error</span> {%=file.error%}</div> {% } %} </td>
@@ -888,8 +888,8 @@
 					        </tr> {% } %} </script>
 					        <div style="clear:both;"></div>
 					    </div>
-					</form>	
-					
+					</form>
+
 				</div>
 				<div style="text-align: center;">
 					<input type="hidden" class="fileId">
@@ -926,7 +926,7 @@
                 <th>高<div>(IN)</div></div></th>
 				<th>卡板号<div>pallets</div></th>
 				<th>打板尺寸<div>(in)</div><div>pallets size</div></th>
-                <th>运输方式<div>transportation</div></div></th>	
+                <th>运输方式<div>transportation</div></div></th>
             </tr>
             </thead>
             <tbody>
@@ -949,11 +949,11 @@
     </script>
 <script>
 	let msg = <?php echo @$msg?$msg:0?>;
-	
+
 	function tplCompile(tpl) {
-	
+
 	    tpl = tpl.replace(/<%([^]+?)%>/g, "`);$1;_push(`")
-	
+
 	    return new Function(
 	        'vars',
 	        `let _output = []
@@ -963,18 +963,18 @@
 	         return _output.join("")`
 	    )
 	}
-	
+
 	function tplRender(selector, vars) {
-	
+
 	    if (!(selector instanceof Element)) {
 	        selector = document.querySelector(selector)
 	        if (!selector) return ''
 	    }
-	
+
 	    if (!selector._compile) {
 	        selector._compile = tplCompile(selector.innerHTML)
 	    }
-	
+
 	    return selector._compile(vars)
 	}
 	//清空筛选
@@ -1011,7 +1011,7 @@
 		let chk_value = '';
 		$("input[name='checkedInput']:checked").each(function (index,value) {
 			if(chk_value != ''){
-				chk_value = chk_value + ',' + $(this).val()	
+				chk_value = chk_value + ',' + $(this).val()
 			}else{
 				chk_value = chk_value + $(this).val()
 			}
@@ -1038,7 +1038,7 @@
 						$('.success_mask_text').text(res.msg);
 						setTimeout(function(){
 							$('.success_mask').fadeOut(1000);
-						},2000)	
+						},2000)
 						tableObj.ajax.reload();
 						$('#selectAll').removeAttr('checked');
 					}
@@ -1047,7 +1047,7 @@
 					console.log(err)
 				}
 			});
-			
+
 		}
 	}
 	//筛选
@@ -1140,7 +1140,7 @@
 		$('.cancelSave').on('click',function(){
 			$('.editor_mask').hide();
 		})
-	
+
 		//上传大货资料
 		$('#fileUpload').on('click',function(){
 			let fileList1 = '';
@@ -1236,16 +1236,16 @@
 		$('.editor_cancel').on('click',function(){
 			$('.editor_mask').hide();
 		})
-		
-		
+
+
 		//下载导入模板
 		$('#downloadTemplate').on('click',function(){
 			let chk_value = '';
 			$("input[name='checkedInput']:checked").each(function (index,value) {
 				if(chk_value != ''){
-					chk_value = chk_value + ',' + $(this).attr('shipment_requests_id')	
+					chk_value = chk_value + ',' + $(this).attr('shipment_requests_id')
 				}else{
-					chk_value = chk_value + $(this).attr('shipment_requests_id')	
+					chk_value = chk_value + $(this).attr('shipment_requests_id')
 				}
 			});
 			$.ajax({
@@ -1278,7 +1278,7 @@
 							 }
 							 return false;
 						 }
-			 
+
 						 if (msieversion()) {
 							 var IEwindow = window.open();
 							 IEwindow.document.write('sep=,\r\n' + data);
@@ -1304,7 +1304,7 @@
 					console.log(err)
 				}
 			});
-			
+
 		})
 		$('.batch_operation').click(function(e){
 			$('.batch_list').slideToggle();
@@ -1320,7 +1320,7 @@
 				url: "/shipment/upShipment2",
 				data: {
 					id: $('.formId').val(),
-					out_warehouse: $('#out_warehouse_input').val(),  
+					out_warehouse: $('#out_warehouse_input').val(),
 					adjustreceived_date: $('.arrivalMaskDate').val(),
 					adjustment_quantity: $('#adjustment_quantity_input').val(),
 				},
@@ -1337,7 +1337,7 @@
 						$('.success_mask_text').text(res.msg);
 						setTimeout(function(){
 							$('.success_mask').fadeOut(1000);
-						},2000)	
+						},2000)
 						tableObj.ajax.reload();
 						clearVal();
 					}
@@ -1352,10 +1352,10 @@
 			let chk_value = '';
 			$("input[name='checkedInput']:checked").each(function () {
 				if(chk_value != ''){
-					chk_value = chk_value + ',' + $(this).val()	
+					chk_value = chk_value + ',' + $(this).val()
 				}else{
 					chk_value = chk_value + $(this).val()
-				}				 		 			
+				}
 			});
 			chk_value == ""? chk_value = -1 : chk_value;
 			tableObj.ajax.reload();
@@ -1365,9 +1365,9 @@
 			 let chk_value = '';
 			 $("input[name='checkedInput']:checked").each(function (index,value) {
 			 	if(chk_value != ''){
-			 		chk_value = chk_value + ',' + $(this).attr('shipment_requests_id')	
+			 		chk_value = chk_value + ',' + $(this).attr('shipment_requests_id')
 			 	}else{
-			 		chk_value = chk_value + $(this).attr('shipment_requests_id')	
+			 		chk_value = chk_value + $(this).attr('shipment_requests_id')
 			 	}
 			 });
 			 $.ajax({
@@ -1387,7 +1387,7 @@
 					sap_factory_code: $('#callin_factory').val(),
 					shipment_id_list: chk_value,
 				 },
-							
+
 				 success: function (data) {
 					 if(data != ""){
 						var fileName = "调拨进度";
@@ -1401,7 +1401,7 @@
 							 }
 							 return false;
 						}
-									 
+
 						if (msieversion()) {
 							 var IEwindow = window.open();
 							 IEwindow.document.write('sep=,\r\n' + data);
@@ -1422,9 +1422,9 @@
 						$('#selectAll').removeAttr('checked');
 						$("input[name='checkedInput']:checked").removeAttr('checked');
 					 }
-				 } 
+				 }
 			 });
-				 
+
 		})
 		//全选
 		$("#selectAll").on('change',function(e) {  
@@ -1434,7 +1434,7 @@
 		//单条选中
 		$("body").on('change','.checkbox-item',function(e){
 			var $subs = $("input[name='checkedInput']");
-		    $("#selectAll").prop("checked" , $subs.length == $subs.filter(":checked").length ? true :false); 
+		    $("#selectAll").prop("checked" , $subs.length == $subs.filter(":checked").length ? true :false);
 			e.cancelBubble=true;
 		});
 		//搜索
@@ -1500,7 +1500,7 @@
 			serverSide: false,
 			processing: false,
 			lengthMenu: [
-			     [10, 25, 50, -1], [10, 25, 50, "All"] 
+			     [10, 25, 50, -1], [10, 25, 50, "All"]
 			],
 			scrollX: "100%",
 			scrollCollapse: false,
@@ -1587,11 +1587,11 @@
 						return content;
 					},
 					createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
-						
+
 					}
 				},
 				{
-					data: 'created_at', 
+					data: 'created_at',
 					name: 'created_at',
 					render: function(data, type, row, meta) {
 						var content = '<div class="data_bg">'+data+'<span><svg t="1589536384161" class="icon warn_icon" viewBox="0 0 1107 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2119" width="20" height="20"><path d="M581.34438559 757.66109686c0-12.54264615-6.68255768-24.16001577-17.58026623-30.43133844-10.89770938-6.27132349-24.26282473-6.27132349-35.05772516 0-10.89770938 6.27132349-17.58026707 17.88869229-17.58026707 30.43133844 0 19.32801279 15.72971238 35.05772516 35.05772516 35.05772517 19.53362989 0 35.1605333-15.72971238 35.1605333-35.05772517M511.22893527 655.57217947V368.53062949c0-17.68307519 15.72971238-31.97346789 35.05772516-31.97346789s35.05772516 14.2903927 35.05772516 31.97346789V655.57217947c0 17.68307519-15.72971238 31.97346789-35.05772516 31.97346789-19.32801279-0.10280896-35.05772516-14.2903927-35.05772515-31.97346789" fill="#d81e06" p-id="2120"></path><path d="M983.83996915 771.74587246L637.88910346 154.17474392C615.37402527 113.97658972 581.85842874 90.94746838 546.08104333 90.94746838s-69.29298193 23.13193029-91.70525115 63.3300845L108.73335254 771.6430635c-22.41227004 39.99253711-24.67405893 80.8075426-6.16851452 112.16415921 18.40273545 31.3566166 55.20820633 49.34811786 101.266449 49.34811704H888.94765176c45.85262558 0 82.86371357-17.88869229 101.26644901-49.2453089 18.40273545-31.3566166 16.03813843-72.1716221-6.37413162-112.16415839z m-55.00258924 73.40532468c-6.37413162 11.41175254-22.61788714 17.78588416-44.618923 17.78588416H208.35486478c-21.8982269 0-38.14198242-6.47694058-44.51611405-17.78588416-6.37413162-11.41175254-3.90672564-29.40325296 6.78536582-49.45092599L511.64017029 192.21391821c10.38366623-19.53362989 23.23473843-31.15099951 34.44087304-31.15099951 11.20613462 0 24.05720764 11.61736963 34.54368284 31.04819055l341.42728711 603.5891619c10.69209229 20.04767303 13.15949827 38.03917429 6.78536663 49.45092599z" fill="#d81e06" p-id="2121"></path></svg></span></div>';
@@ -1606,7 +1606,7 @@
 					}
 				},
 				{
-					data: 'status', 
+					data: 'status',
 					name: 'status',
 					render: function(data, type, row, meta) {
 					 	if(data == 0){ data = '资料提供中' }
@@ -1632,7 +1632,7 @@
 									+'<option value="签收完毕" status="6">签收完毕</option>'
 									+'<option value="取消发货" status="4">取消发货</option>'
 									+'</select>'
-								
+
 								);
 							var aInput = $(this).find(":input");
 							aInput.focus().val("");
@@ -1663,19 +1663,19 @@
 										$('.success_mask_text').text(res.msg);
 										setTimeout(function(){
 											$('.success_mask').fadeOut(1000);
-										},2000)	
+										},2000)
 										$(cell).html($("#editorStatusSelect").val()+'<img src="../assets/global/img/editor.png" alt="" style="float:right" class="country_img">');
 									}
 								}
 							});
-							
+
 						});
 					}
 				},
 				{data: 'name', name: 'name',},
 				{data: 'batch_num', name: 'batch_num',},
 				{
-					data: 'out_warehouse', 
+					data: 'out_warehouse',
 					name: 'out_warehouse',
 					render: function(data, type, row, meta) {
 						var content = '<div style="color:blue;cursor:pointer">'+data +'</div>';
@@ -1690,81 +1690,81 @@
 					}
 				},
 				/* {data: 'amz_account', name: 'amz_account'}, */
-				
+
 				{
-					data: 'sap_factory_code', 
-					name: 'sap_factory_code', 
+					data: 'sap_factory_code',
+					name: 'sap_factory_code',
 					render: function(data, type, row, meta) {
-						var content = '<div style="color:blue;cursor:pointer">'+data +'</div>';
+						var content = '<div>'+data +'</div>';
 						return content;
 					},
-					createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
-						$(cell).on( 'click', function () {
-							$('.mask_box').show();
-							$('.formId').val(rowData.shipment_requests_id);
-							editTableData(rowData.shipment_requests_id);
-						});
-					}
+					// createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
+					// 	$(cell).on( 'click', function () {
+					// 		$('.mask_box').show();
+					// 		$('.formId').val(rowData.shipment_requests_id);
+					// 		editTableData(rowData.shipment_requests_id);
+					// 	});
+					// }
 				},
 				{
-					data: 'label', 
+					data: 'label',
 					name: 'label',
 					render: function(data, type, row, meta) {
-						var content = '<div style="color:blue;cursor:pointer">'+data +'</div>';
+						var content = '<div>'+data +'</div>';
 						return content;
 					},
-					createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
-						$(cell).on( 'click', function () {
-							$('.mask_box').show();
-							$('.formId').val(rowData.shipment_requests_id);
-							editTableData(rowData.shipment_requests_id);
-						});
-					}
+					// createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
+					// 	$(cell).on( 'click', function () {
+					// 		$('.mask_box').show();
+					// 		$('.formId').val(rowData.shipment_requests_id);
+					// 		editTableData(rowData.shipment_requests_id);
+					// 	});
+					// }
 				},
 				{
-					data: 'sku', 
+					data: 'sku',
 					name: 'sku',
 					render: function(data, type, row, meta) {
-						var content = '<div style="color:blue;cursor:pointer">'+data +'</div>';
+						var content = '<div>'+data +'</div>';
 						return content;
 					},
-					createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
-						$(cell).on( 'click', function () {
-							$('.mask_box').show();
-							$('.formId').val(rowData.shipment_requests_id);
-							editTableData(rowData.shipment_requests_id);
-						});
-					}
+					// createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
+					// 	$(cell).on( 'click', function () {
+					// 		$('.mask_box').show();
+					// 		$('.formId').val(rowData.shipment_requests_id);
+					// 		editTableData(rowData.shipment_requests_id);
+					// 	});
+					// }
 				},
 				{
-					data: 'quantity', 
+					data: 'quantity',
 					name: 'quantity',
 					render: function(data, type, row, meta) {
-						var content = '<div style="color:blue;cursor:pointer" class="quantityText">'+data +'</div>';
+						var content = '<div class="quantityText">'+data +'</div>';
 						return content;
 					},
-					createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
-						$(cell).on( 'click', function () {
-							$('.mask_box').show();
-							$('.formId').val(rowData.shipment_requests_id);
-							editTableData(rowData.shipment_requests_id);
-						});
-					}
+					// createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
+					// 	$(cell).on( 'click', function () {
+					// 		$('.mask_box').show();
+					// 		$('.formId').val(rowData.shipment_requests_id);
+					// 		editTableData(rowData.shipment_requests_id);
+					// 	});
+					// }
 				},
 				{
 					data: 'rms_sku',
 					name: 'rms_sku',
 					render: function(data, type, row, meta) {
-						var content = '<div style="color:blue;cursor:pointer">'+data +'</div>';
+						var content = '<div>'+data +'</div>';
 						return content;
 					},
-					createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
-						$(cell).on( 'click', function () {
-							$('.mask_box').show();
-							$('.formId').val(rowData.shipment_requests_id);
-							editTableData(rowData.shipment_requests_id);
-						});
-					}
+					// createdCell: function (cell, cellData, rowData, rowIndex, colIndex) {
+					// 	$(cell).on( 'click', function () {
+					// 		$('.mask_box').show();
+					// 		$('.formId').val(rowData.shipment_requests_id);
+					// 		editTableData(rowData.shipment_requests_id);
+					// 	});
+					// }
 				},
 				{
 					data: 'barcode',
@@ -1779,7 +1779,7 @@
 					name: 'shipping_method',
 				},
 				{
-					data: 'cargo_data', 
+					data: 'cargo_data',
 					name: 'cargo_data',
 					render: function(data, type, row, meta) {
 						let btnText = '';
@@ -1823,7 +1823,7 @@
 					}
 				},
 				{
-					data: 'shippment_id', 
+					data: 'shippment_id',
 					name: 'shippment_id',
 					render: function(data, type, row, meta) {
 						var content = '<div style="color:blue">'+data+'<img src="../assets/global/img/editor.png" alt="" style="float:right" class="country_img"></div>';
@@ -1852,7 +1852,7 @@
 																+'<input type="text" value="'+data[i].shippmentID+'" />'
 																+'<button class="btn btn-sm red-sunglo deleteShippment">删除</button>'
 															+'</div>';
-											
+
 											for(var j=0;j<data[i].receipts_num.length;j++){
 												orderStr += '<div class="orderItem">'
 																+'<input type="text" value="'+data[i].receipts_num[j]+'" />'
@@ -1860,7 +1860,7 @@
 															+'</div>'
 											}
 											$('.shippmenid_box').append('<div class="editor_div">'
-																			+shippmentStr 
+																			+shippmentStr
 																			+ '<div class="order_txt">'
 																				+'<div>'
 																					+'<button style="margin: 5px 10px" class="btn btn-sm btn-info handleAddOrder">新增跟踪单号</button>'
@@ -1868,7 +1868,7 @@
 																				+'<div class="orderList">'
 																					+orderStr
 																				+'</div>'
-																				
+
 																			+'</div>'
 																		+'</div>')
 										}
@@ -1881,14 +1881,14 @@
 											shippmentStr = '<div class="shippment_txt">'
 																+'<span>'+data[i].shippmentID+'</span>'
 															+'</div>';
-											
+
 											for(var j=0;j<data[i].receipts_num.length;j++){
 												orderStr += '<div class="orderItem">'
 																+'<span>'+data[i].receipts_num[j]+'</span>'
 															+'</div>'
 											}
 											$('.shippmenid_box').append('<div class="editor_div">'
-																			+shippmentStr 
+																			+shippmentStr
 																			+ '<div class="order_txt">'
 																				+'<div class="orderList">'
 																					+orderStr
@@ -1906,7 +1906,7 @@
 					}
 				},
 				{
-					data: 'receipts_num', 
+					data: 'receipts_num',
 					name: 'receipts_num',
 					render: function(data, type, row, meta) {
 						var content = '<div style="color:blue">'+data+'<img src="../assets/global/img/editor.png" alt="" style="float:right" class="country_img"></div>';
@@ -1935,7 +1935,7 @@
 																+'<input type="text" value="'+data[i].shippmentID+'" />'
 																+'<button class="btn btn-sm red-sunglo deleteShippment">删除</button>'
 															+'</div>';
-											
+
 											for(var j=0;j<data[i].receipts_num.length;j++){
 												orderStr += '<div class="orderItem">'
 																+'<input type="text" value="'+data[i].receipts_num[j]+'" />'
@@ -1943,7 +1943,7 @@
 															+'</div>'
 											}
 											$('.shippmenid_box').append('<div class="editor_div">'
-																			+shippmentStr 
+																			+shippmentStr
 																			+ '<div class="order_txt">'
 																				+'<div>'
 																					+'<button style="margin: 5px 10px" class="btn btn-sm btn-info handleAddOrder">新增跟踪单号</button>'
@@ -1951,7 +1951,7 @@
 																				+'<div class="orderList">'
 																					+orderStr
 																				+'</div>'
-																				
+
 																			+'</div>'
 																		+'</div>')
 										}
@@ -1964,14 +1964,14 @@
 											shippmentStr = '<div class="shippment_txt">'
 																+'<span>'+data[i].shippmentID+'</span>'
 															+'</div>';
-											
+
 											for(var j=0;j<data[i].receipts_num.length;j++){
 												orderStr += '<div class="orderItem">'
 																+'<span>'+data[i].receipts_num[j]+'</span>'
 															+'</div>'
 											}
 											$('.shippmenid_box').append('<div class="editor_div">'
-																			+shippmentStr 
+																			+shippmentStr
 																			+ '<div class="order_txt">'
 																				+'<div class="orderList">'
 																					+orderStr
@@ -1999,7 +1999,7 @@
 				}
 			],
 			data:[],
-			
+
 			columnDefs: [
 				{ "bSortable": false, "aTargets": [ 0,1,2,3,5,6,7,8,9,10,11,12,13,14,15]},
 				{
@@ -2018,7 +2018,7 @@
 									+'<option value="卡派-仓库直发">卡派-仓库直发</option>'
 									+'<option value="快递-仓库直发">快递-仓库直发</option>'
 									+'</select>'
-								
+
 								);
 							var aInput = $(this).find(":input");
 							aInput.focus().val("");
@@ -2049,48 +2049,48 @@
 										$('.success_mask_text').text(res.msg);
 										setTimeout(function(){
 											$('.success_mask').fadeOut(1000);
-										},2000)	
+										},2000)
 										$(cell).html($("#shippingMethodSelect").val()+'<img src="../assets/global/img/editor.png" alt="" style="float:right" class="country_img">');
 									}
 								}
 							});
-							
+
 						});
 					}
 				}
 			],
-			
+
 		})
 		async function buildSubItemTable(shipment_requests_id) {
-		
+
 		    let rows = await new Promise((resolve, reject) => {
 		        $.post('/shipment/getBoxDetail', {shipment_requests_id})
 		            .success(rows => resolve(rows))
 		            .error((xhr, status, errmsg) => reject(new Error(errmsg)))
 		    })
-		
+
 		    if (!rows.length) return ''
-		
+
 		    if (false === rows[0]) return Promise.reject(new Error(rows[1]))
-		
+
 		    return tplRender('#sub-table-tpl', {rows})
 		}
-		
+
 		tableObj.on('click', 'td.details-control', function () {
-		
+
 		    let $td = $(this)
-		
+
 		    let row = tableObj.row($td.closest('tr'));
-		
+
 		    if (row.child.isShown()) {
 		        row.child.remove();
 		        $td.removeClass('closed');
 		    } else {
 		        let {shipment_requests_id} = row.data()
 		        let id = `sub-item-loading-${shipment_requests_id}`
-		
+
 		        row.child(`<div id="${id}" style="padding:3em;">Data is Loading...</div>`, 'sub-item-row').show()
-		
+
 		        buildSubItemTable(shipment_requests_id).then(html => {
 		            if (html) {
 		                $td.removeClass('disabled')
@@ -2101,11 +2101,11 @@
 		        }).catch(err => {
 		            $(`#${id}`).html(`<span style="color:red">Server Error: ${err.message}</span>`)
 		        })
-		
+
 		        $td.addClass('closed');
 		    }
 		});
-		
+
 		//截取字符前面的
 		function cusstr(str, findStr, num){
 			if(str.length > 0){
@@ -2114,7 +2114,7 @@
 				while(idx >= 0 && count < num){
 				    idx = str.indexOf(findStr, idx+1);
 				    count++;
-				}    
+				}
 				if(idx < 0){
 				    return '';
 				}
@@ -2131,7 +2131,7 @@
 				while(idx >= 0 && count < num){
 					idx = str.indexOf(findStr, idx+1);
 					count++;
-				}    
+				}
 				if(idx < 0){
 					return '';
 				}
@@ -2171,7 +2171,7 @@
 			    daysOfWeek: ['日', '一', '二', '三', '四', '五', '六'],
 			    monthNames: ['一月', '二月', '三月', '四月', '五月', '六月','七月', '八月', '九月', '十月', '十一月', '十二月'],
 			    firstDay: 1,
-						
+
 			},
 			onChangeDateTime:function(dp,$input){
 			}
@@ -2202,7 +2202,7 @@
 			format: 'yyyy-mm-dd',
 		    autoclose: true,
 			//datesDisabled : new Date(),
-			
+
 		});
 	})
 </script>
