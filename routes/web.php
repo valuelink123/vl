@@ -658,3 +658,15 @@ Route::get('/cuckoo/feedback', 'CuckooController@feedback');
 
 Route::get('/accountStocklist', 'AccountStocklistController@index');//列表
 //Route::post('/sellerAccountsStatusList', 'SellerAccountsStatusController@list');//列表获取数据
+
+//cuckoo相关模块
+Route::get('/cuckoo/show', 'CuckooController@show');
+Route::post('/cuckoo/showList', 'CuckooController@showList');
+
+Route::get('/cuckoo/deals', 'CuckooController@deals');
+Route::post('/cuckoo/dealsList', 'CuckooController@dealsList');
+Route::get('/cuckoo/view', 'CuckooController@view');
+Route::get('/cuckoo/coupons', 'CuckooController@coupons');
+Route::post('/cuckoo/couponsList', 'CuckooController@couponsList');
+Route::get('/cuckoo/promotions', 'CuckooController@promotions');
+Route::post('/cuckoo/promotionsList', 'CuckooController@promotionsList');

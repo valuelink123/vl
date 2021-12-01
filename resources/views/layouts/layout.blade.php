@@ -536,6 +536,14 @@
 												    </a>
 												</li>
 												@endpermission
+                                                @permission('cuckoo-show')
+                                                <li class="">
+                                                    <a href="/cuckoo/show" class="nav-link nav-toggle" target="_blank">
+                                                        Cuckoo
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
+                                                @endpermission
 
                                             </ul>
                                         </li>
@@ -1280,6 +1288,7 @@
 
                                             </ul>
                                         </li>
+
                                     </ul>
                                 </div>
             <div class="top-menu">

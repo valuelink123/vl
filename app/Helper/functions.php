@@ -1355,6 +1355,16 @@ function getMarketDomain()
 	$data= DB::connection('amazon')->select('select marketplaceid,domain from marketplaces');
 	return $data;
 }
+//得到站点跟域名的键值对
+function getSiteDomain()
+{
+	$site = getMarketDomain();//获取站点选项
+	$siteDomain = array();
+	foreach($site as $key=>$val){
+		$siteDomain[$val->marketplaceid] = $val->domain;
+	}
+	return $siteDomain;
+}
 
 //通过亚马逊站点得到域名
 function getDomainBySite($site)
