@@ -670,3 +670,6 @@ Route::get('/cuckoo/coupons', 'CuckooController@coupons');
 Route::post('/cuckoo/couponsList', 'CuckooController@couponsList');
 Route::get('/cuckoo/promotions', 'CuckooController@promotions');
 Route::post('/cuckoo/promotionsList', 'CuckooController@promotionsList');
+
+Route::resource('budgetSku', 'BudgetskuController');
+Route::Post('/budgetSku/get', 'BudgetskuController@get');

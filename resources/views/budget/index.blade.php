@@ -55,6 +55,13 @@ white-space: nowrap;
 <?php 
 	$bg='';
 	$quarters_arr=['1','2','3','4'];
+	$sort_order = \Request::get('sort_order');
+	$sortUrl = \Request::getRequestUri();
+	if($sort_order){
+		$sortUrl = str_replace(['&sort_order=asc','sort_order=asc'],'',$sortUrl);
+	}else{
+		$sortUrl = $sortUrl.(\Request::getQueryString()?'&':'?').'sort_order=asc';
+	}
 ?>
 	<div class="row">
         <div class="col-md-12">
@@ -65,6 +72,7 @@ white-space: nowrap;
 							
 					<div class="table-toolbar">
                     <form role="form" action="{{url('budgets')}}" method="GET">
+						<input type="hidden"
                         <div class="row">
 
                         <div class="col-md-2">
@@ -273,7 +281,7 @@ white-space: nowrap;
 						<div class="col-md-5 pull-right" >{{ $datas->appends($_REQUEST)->links() }} </div>
 					</div>
 
-					<table class="table table-striped table-bordered table-hover">
+					<table class="table table-striped table-bordered table-hover dataTable">
 					 <colgroup>
 						<col width="2%"></col>
 						<col width="6%"></col>
@@ -305,7 +313,8 @@ white-space: nowrap;
 						<td rowspan="2" width="3%">站点</td>
 						<td rowspan="2" width="5%">状态</td>
 						<td rowspan="2" width="3%">等级</td>
-						<td rowspan="2" width="5%">期初库存</td>
+						
+						<td rowspan="2" width="6%" class='{{$sort_order?'sorting_asc':'sorting_desc'}}' onclick="location.href='{{$sortUrl}}';">期初库存</td>
 						<td colspan="4" width="20%">{{$year_from}}预算   
 							<span class="badge badge-danger" id="ToggleCompare" style="cursor: pointer;">切换环比 实际/预算</span>
 						</td>

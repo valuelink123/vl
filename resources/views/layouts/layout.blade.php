@@ -199,6 +199,13 @@
                                                         <span class="arrow"></span>
                                                     </a>
                                                 </li>
+
+                                                <li class="">
+                                                    <a href="/budgetSku" class="nav-link nav-toggle ">
+                                                        Budget Skus
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
 												@endpermission
                                             </ul>
                                         </li>

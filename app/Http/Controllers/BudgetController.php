@@ -46,7 +46,8 @@ class BudgetController extends Controller
 		$sap_seller_id = $request->get('sap_seller_id');
 		$level = $request->get('level');
 		$sku = $request->get('sku');
-
+		$sort_field = $request->get('sort_field','stock');
+		$sort_order = $request->get('sort_order','desc');
 		$nowYear = date('Y');
 	    $nowMonth =  date('m');
 		$now_quarter = 1;
@@ -177,7 +178,7 @@ sum(amount_used) as amount_fee, sum(fba_storage+fbm_storage) as storage_fee from
 	
 		
 		
- 		$datas = DB::table(DB::raw($sql))->whereRaw($where)->orderByRaw("case when level = 'S' Then '0' else level end asc")->paginate(20);
+ 		$datas = DB::table(DB::raw($sql))->whereRaw($where)->orderByRaw("$sort_field $sort_order,case when level = 'S' Then '0' else level end asc")->paginate(20);
 		
         $data['teams']= getUsers('sap_bgbu');
 		$data['users']= getUsers('sap_seller');
@@ -194,6 +195,7 @@ sum(amount_used) as amount_fee, sum(fba_storage+fbm_storage) as storage_fee from
 		$data['datas']= $datas;
 		$data['finish']= $finish;
 		$data['sum']= $sum;
+
 		session()->put('remember_list_url',\Request::getRequestUri());
         return view('budget/index',$data);
 

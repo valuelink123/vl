@@ -1795,3 +1795,10 @@ function func_substr_replace($str, $replacement = "*", $start = 3, $length = 6)
 	return $new_str;
 
 }
+
+function getSkuSize(){
+    return array(
+        '0'=>'标准',
+		'1'=>'特大',
+    );
+}
