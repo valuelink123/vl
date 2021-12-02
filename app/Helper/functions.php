@@ -95,7 +95,7 @@ function getUseridSapid(){
 
 function getBudgetStageArr()
 {
-	return array(0=>'待提交',1=>'BU经理审核',2=>'BG总监审核',3=>'计划审核',3=>'企管审核',4=>'VP审核',5=>'已确认');
+	return array(0=>'待提交',1=>'BU经理审核',2=>'BG总监审核',6=>'计划审核',3=>'企管审核',4=>'VP审核',5=>'已确认');
 }
 function getBudgetRuleForRole()
 {
