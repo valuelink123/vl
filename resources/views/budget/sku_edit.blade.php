@@ -39,7 +39,7 @@
                             <label>Sku状态 *</label>
                             <select class="form-control " name="status" id="status">
 							@foreach(getSkuStatuses() as $k=>$v)
-								<option value="{!! $k !!}" {{($k==array_get($form,'level'))?'selected':''}}>{!! $v !!}</option>
+								<option value="{!! $k !!}" {{($k==array_get($form,'status'))?'selected':''}}>{!! $v !!}</option>
 							@endforeach
 							</select>
                         </div>
