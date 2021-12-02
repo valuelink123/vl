@@ -95,12 +95,13 @@ function getUseridSapid(){
 
 function getBudgetStageArr()
 {
-	return array(0=>'待提交',1=>'BU经理审核',2=>'BG总监审核',3=>'企管审核',4=>'VP审核',5=>'已确认');
+	return array(0=>'待提交',1=>'BU经理审核',2=>'BG总监审核',3=>'计划审核',3=>'企管审核',4=>'VP审核',5=>'已确认');
 }
 function getBudgetRuleForRole()
 {
 	if(Auth::user()->can(['budgets-vp-check'])) return getBudgetStageArr();
-	if(Auth::user()->can(['budgets-business-check']))  return array_slice(getBudgetStageArr(),0,5);
+	if(Auth::user()->can(['budgets-business-check']))  return array_slice(getBudgetStageArr(),0,6);
+	if(Auth::user()->can(['budgets-plan-check']))  return array_slice(getBudgetStageArr(),0,5);
 	if(Auth::user()->can(['budgets-bg-check']))  return array_slice(getBudgetStageArr(),0,4);
 	if(Auth::user()->can(['budgets-bu-check']))  return array_slice(getBudgetStageArr(),0,3);
 	if(Auth::user()->can(['budgets-show']))  return array_slice(getBudgetStageArr(),0,2);
