@@ -46,6 +46,7 @@ class BudgetskuController extends Controller
         $sEcho = intval($_REQUEST['draw']);
         $lists =  $datas->orderBy('id','desc')->offset($iDisplayStart)->limit($iDisplayLength)->get()->toArray();
         $users = User::where('sap_seller_id','>',0)->pluck('name','sap_seller_id');
+        $planers = User::pluck('name','id');
         $records["data"] = array();
 		foreach ( $lists as $list){
             $records["data"][] = array(
@@ -62,6 +63,7 @@ class BudgetskuController extends Controller
                 round($list['pick_fee'],4),
                 ($list['exception']*100).'%',
                 array_get($users,$list['sap_seller_id'],$list['sap_seller_id']),
+                array_get($planers,$list['planer_id'],$list['planer_id']),
             );
 		}
         $records["draw"] = $sEcho;
@@ -114,6 +116,7 @@ class BudgetskuController extends Controller
 			$data->exception = explode('%',$request->get('exception'))[0]/100;
 			$data->common_fee = explode('%',$request->get('common_fee'))[0]/100;
             $data->sap_seller_id = $request->get('sap_seller_id');
+            $data->planer_id = $request->get('planer_id');
             $tax = explode('%',$request->get('tax'))[0]/100;
             $siteShort = getSiteShort();
             TaxRate::updateOrCreate(

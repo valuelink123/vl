@@ -58,6 +58,7 @@
                                     <th>拣配费金额（外币）</th>
                                     <th>退货率</th>
                                     <th>销售员</th>
+                                    <th>计划员</th>
                                 </tr>
                             </thead>
                             <tbody>	

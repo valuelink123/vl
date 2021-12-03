@@ -156,11 +156,11 @@ white-space: nowrap;
 
                         
 						<div class="col-md-2">
-						<select class="mt-multiselect btn btn-default " multiple="multiple" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" name="user_id[]" id="user_id[]">
-                            @foreach ($users as $user_id=>$user_name)
-                                <option value="{{$user_id}}" <?php if(in_array($user_id,array_get($_REQUEST,'user_id',[]))) echo 'selected'; ?>>{{$user_name}}</option>
-                            @endforeach
-                        </select>
+							<select class="mt-multiselect btn btn-default " multiple="multiple" data-label="left" data-width="100%" data-action-onchange="true" name="abc[]" id="abc[]">
+								@foreach ($users as $user_id=>$user_name)
+									<option value="{{$user_id}}">{{$user_name}}</option>
+								@endforeach
+							</select>
 						</div>
 						
 
@@ -255,7 +255,7 @@ white-space: nowrap;
 									<?php 
 									$color_arr=['0'=>'red-sunglo','1'=>'yellow-crusta','2'=>'purple-plum','3'=>'blue-hoki','4'=>'blue-madison','5'=>'green-meadow'];
 									foreach (getBudgetRuleForRole() as $k=>$v){
-									if(count(getBudgetRuleForRole())==2 && $k==1) break; //不允许销售批量提交，因为需要单个计算
+									//if(count(getBudgetRuleForRole())==2 && $k==1) break; //不允许销售批量提交，因为需要单个计算
 									?>
 									<li>
 									
@@ -374,7 +374,7 @@ white-space: nowrap;
 					   ?>
 					  <tr>
 					    <td>
-						@if(in_array($data->budget_status,array_keys(getBudgetRuleForRole())) && $data->budget_status>=1)
+						@if(in_array($data->budget_status,array_keys(getBudgetRuleForRole())))
 						<input type="checkbox" name="budget_id[]" value="{{$data->budget_id}}" />
 						@endif
 						</td>

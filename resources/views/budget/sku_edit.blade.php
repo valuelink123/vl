@@ -111,6 +111,15 @@
 							</select>
 						</div>
 
+						<div class="form-group col-md-6">
+							<label>计划员</label>
+							<select class="mt-multiselect btn btn-default form-control" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" name="planer_id" id="planer_id">
+								@foreach (getUsers() as $sap_seller_id=>$user_name)
+									<option value="{{$sap_seller_id}}" {{($sap_seller_id==array_get($form,'planer'))?'selected':''}}>{{$user_name}}</option>
+								@endforeach
+							</select>
+						</div>
+
                         <div style="clear:both;"></div>
                     </div>
 					

@@ -37,7 +37,12 @@ class BudgetController extends Controller
 		if(!Auth::user()->can(['budgets-show'])) die('Permission denied -- budgets-show');
 		
 		if($request->isMethod('POST') && $request->get('budget_id')){ 
-			Budgets::whereIn('id',$request->get('budget_id'))->update(['status'=>$request->get('BatchUpdate')]);
+			$updateBudgets = Budgets::whereIn('id',$request->get('budget_id'))->get();
+			foreach($updateBudgets as $updateBudget){
+				if($updateBudget->status==0 && $request->get('BatchUpdate')>0) $this->calBudget($updateBudget);
+				$updateBudget->status=$request->get('BatchUpdate');
+				$updateBudget->save();
+			}
 			$request->session()->flash('success_message','Update Success!'); 
 		}
 		
@@ -126,7 +131,7 @@ class BudgetController extends Controller
 		if($user_id){
 			$where.= " and sap_seller_id in (".implode(',',$user_id).")";
 		}
-		
+
 		if($level){
 			$where.= " and level = '".$level."'";
 		}
@@ -143,17 +148,17 @@ class BudgetController extends Controller
 		}
 		
 		$table_from = "select a.sku,a.site,a.id,a.status,a.remark,b.* from budgets as a left join (select budget_id,sum(qty+promote_qty) as qty,sum(income) as income,sum(cost) as cost,sum(common_fee) as common_fee,sum(pick_fee) as pick_fee,sum(promotion_fee) as promotion_fee,sum(amount_fee) as amount_fee,sum(storage_fee) as storage_fee from budget_details
-where ".$date_add_from." group by budget_id) as b on a.id=b.budget_id where a.year=".$year_from_arr[0]." and a.quarter=".$year_from_arr[1]." and a.status>0";
+where ".$date_add_from." group by budget_id) as b on a.id=b.budget_id where a.year=".$year_from_arr[0]." and a.quarter=".$year_from_arr[1]."";
 		
 		$table_to = "select a.sku,a.site,b.* from budgets as a left join (select budget_id,sum(qty+promote_qty) as qty,sum(income) as income,sum(cost) as cost,sum(common_fee) as common_fee,sum(pick_fee) as pick_fee,sum(promotion_fee) as promotion_fee,sum(amount_fee) as amount_fee,sum(storage_fee) as storage_fee from budget_details
-where ".$date_add_to." group by budget_id) as b on a.id=b.budget_id where a.year=".$year_to_arr[0]." and a.quarter=".$year_to_arr[1]." and a.status>0";
+where ".$date_add_to." group by budget_id) as b on a.id=b.budget_id where a.year=".$year_to_arr[0]." and a.quarter=".$year_to_arr[1]."";
 
 		$table_current = "select sku,site,sum(sales) as qty,sum(amount) as income,sum((cost+tax+headshipfee)*sales) as cost,-1*sum(commission) as common_fee,-1*sum(fulfillmentfee) as pick_fee,sum(deal+cpc+coupon) as promotion_fee,
 sum(amount_used) as amount_fee, sum(fba_storage+fbm_storage) as storage_fee from skus_daily_info where ".$date_add_current." group by  sku,site";
 		
 		
 		$sql = "(
-		select budget_skus.*,budgets_1.qty as qty1,budgets_1.income as amount1,(budgets_1.income-budgets_1.cost) as profit1,(budgets_1.income-budgets_1.cost-budgets_1.common_fee-budgets_1.pick_fee-budgets_1.promotion_fee-budgets_1.amount_fee-budgets_1.storage_fee) as economic1,IFNULL(budgets_1.id,0) as budget_id,IFNULL(budgets_1.status,0) as budget_status,budgets_1.remark
+		select budget_skus.*, budgets_1.qty as qty1,budgets_1.income as amount1,(budgets_1.income-budgets_1.cost) as profit1,(budgets_1.income-budgets_1.cost-budgets_1.common_fee-budgets_1.pick_fee-budgets_1.promotion_fee-budgets_1.amount_fee-budgets_1.storage_fee) as economic1,IFNULL(budgets_1.id,0) as budget_id,IFNULL(budgets_1.status,0) as budget_status,budgets_1.remark
 ,budgets_2.qty as qty2,budgets_2.income as amount2,(budgets_2.income-budgets_2.cost) as profit2,(budgets_2.income-budgets_2.cost-budgets_2.common_fee-budgets_2.pick_fee-budgets_2.promotion_fee-budgets_2.amount_fee-budgets_2.storage_fee) as economic2, budgets_3.qty as qty3,budgets_3.income as amount3,(budgets_3.income-budgets_3.cost) as profit3,(budgets_3.income-budgets_3.cost-budgets_3.common_fee-budgets_3.pick_fee-budgets_3.promotion_fee-budgets_3.amount_fee-budgets_3.storage_fee) as economic3 from budget_skus 
 		left join (".$table_from." ) as budgets_1 
 		on budget_skus.sku = budgets_1.sku and budget_skus.site = budgets_1.site
@@ -771,5 +776,214 @@ right join budget_skus as c on b.sku=c.sku and b.site=c.site where ((a.month>='"
 			return view('budget/addNew',array('itemGroup'=>$itemGroup));
 		}
 	}
+
+
+
+	public function calBudget($budget)
+    {
+		DB::beginTransaction();
+        try{
+			$budget_id = $budget->id;
+			if(empty($budget)) die('没有该预算基础信息，请联系管理员新增！');
+			$sku_base_data = Budgetskus::where('sku',$budget->sku)->where('site',$budget->site)->first();
+			if(empty($sku_base_data)) die('没有该SKU对应预算基础信息，请联系管理员新增！');
+			$cur = 'EUR';
+			if($budget->site=='www.amazon.com') $cur = 'USD';
+			if($budget->site=='www.amazon.ca') $cur = 'CAD';
+			if($budget->site=='www.amazon.com.mx') $cur = 'MXN';
+			if($budget->site=='www.amazon.co.uk') $cur = 'GBP';
+			if($budget->site=='www.amazon.co.jp') $cur = 'JPY';
+			$budget->then_status = $sku_base_data->status;
+			$budget->then_level = $sku_base_data->level;
+			$budget->then_stock = $sku_base_data->stock;
+			$budget->then_volume = $sku_base_data->volume;
+			$budget->then_size = $sku_base_data->size;
+			$budget->then_cost = $sku_base_data->cost;
+			$budget->then_common_fee = $sku_base_data->common_fee;
+			$budget->then_pick_fee = $sku_base_data->pick_fee;
+			$budget->then_exception = $sku_base_data->exception;
+			$budget->then_bg = $sku_base_data->bg;
+			$budget->then_bu = $sku_base_data->bu;
+			$budget->then_description = $sku_base_data->description;
+			$budget->then_sap_seller_id = $sku_base_data->sap_seller_id;
+			$undate = '0000-00-00';	
+			if($budget->quarter==2) $undate = $budget->year.'-03-31';
+			if($budget->quarter==3) $undate = $budget->year.'-06-30';
+			if($budget->quarter==4) $undate = $budget->year.'-09-30';
+			$week_per = $this->week_per;
+			$weeks = date("W", mktime(0, 0, 0, 12, 28, $budget->year));
+			$start_week = 1;	
+			for($i=1;$i<=$weeks;$i++){
+				if(date("Ymd", strtotime($budget->year . 'W' . sprintf("%02d",$i))+86400*6)>$budget->year.sprintf("%02d",($budget->quarter-1)*3).'31'){
+					$start_week = $i; 
+					break;	
+				}	
+			}
+			$base_data= $budget->toArray();
+			$sku = $base_data['sku'];
+			$rate= array_get(DB::connection('amazon')->table('currency_rates')->pluck('rate','currency'),$cur,0);
+			$common_fee = $base_data['then_common_fee'];
+			$pick_fee = $base_data['then_pick_fee'];
+			$site_code= strtoupper(substr($budget->site,-2));
+			if($site_code=='OM') $site_code='US';
+			
+			$storage_fee = json_decode(json_encode(DB::table('storage_fee')->where('type','FBA')->where('site',$site_code)->where('size',$base_data['then_size'])->first()),true);
+			$tax_rate=DB::table('tax_rate')->where('site',$site_code)->whereIn('sku',array('OTHERSKU',$sku))->pluck('tax','sku');
+			$tax= round(((array_get($tax_rate,$sku)??array_get($tax_rate,'OTHERSKU'))??0),4);
+			$shipfee = (array_get(getShipRate(),$site_code.'.'.$sku)??array_get(getShipRate(),$site_code.'.default'))??0;
+			$headshipfee = round($base_data['then_volume']/1000000*1.2*round($shipfee,4),2);
+			$cold_storagefee=round(array_get($storage_fee,'2_10_fee',0)*$base_data['then_volume']/1000000/4,4);
+			$hot_storagefee=round(array_get($storage_fee,'11_1_fee',0)*$base_data['then_volume']/1000000/4,4);
+			$cost = round($base_data['then_cost']*(1+$tax)+$headshipfee,2);
+			$datas =  Budgetdetails::selectRaw('
+			weeks,
+			any_value(ranking) as ranking,
+			any_value(price) as price,
+			sum(qty) as qty,
+			any_value(promote_price) as promote_price,
+			sum(promote_qty) as promote_qty,
+			any_value(promotion) as promotion,
+			any_value(exception) as exception,
+			sum(income) as income,
+			sum(cost) as cost,
+			sum(common_fee) as common_fee,
+			sum(pick_fee) as pick_fee,
+			sum(promotion_fee) as promotion_fee,
+			sum(amount_fee) as amount_fee,
+			sum(storage_fee) as storage_fee')->where('budget_id',$budget_id)->groupBy('weeks')->get()->keyBy('weeks')->toArray();
+			$stock = $base_data['then_stock'];
+			$first4WeeksQty = $stock;
+			for ($i = 1;$i <= 4;$i++){
+				$first4WeeksQty+=array_get($datas,$i.'.qty',0)+array_get($datas,$i.'.promote_qty',0);
+			}
+			$endStock = 0;
+			$startStock = $stock;
+			$total_qty = $total_income = $total_cost = $total_commonfee = $total_pickfee = $total_storagefee = $total_profee= $total_amountfee =0;
+			$updateData = [];
+			foreach($datas as $i =>$v){
+				$qty = intval(array_get($datas,$i.'.qty',0));
+				$promote_qty = intval(array_get($datas,$i.'.promote_qty',0));
+				$price = array_get($datas,$i.'.price',0);
+				$promote_price = array_get($datas,$i.'.promote_price',0);
+				$promotion = array_get($datas,$i.'.promotion',0);
+				$exception = array_get($datas,$i.'.exception',0);
+				$datas[$i]['week_line_qty'] =$qty+$promote_qty;
+				$datas[$i]['week_line_income']= ($exception==1)?0:round(($qty*$price+$promote_qty*$promote_price)*(1-$exception)*$rate,2);
+				$datas[$i]['week_line_cost']= round(($qty+$promote_qty)*$cost,2);
+				$datas[$i]['week_line_profit']= round($datas[$i]['week_line_income']-$datas[$i]['week_line_cost'],2);
+				$datas[$i]['week_line_commonfee']= ($exception==1)?0:($datas[$i]['week_line_income']*$common_fee+(0.2*$datas[$i]['week_line_income']/(1-$exception)*$common_fee*$exception));
+				$datas[$i]['week_line_pickfee']= $datas[$i]['week_line_qty']*$pick_fee;
+				$datas[$i]['week_line_fee']= round($datas[$i]['week_line_commonfee']+$datas[$i]['week_line_pickfee'],2);
+				$datas[$i]['week_line_profee']= round($datas[$i]['week_line_income']*$promotion,2);
+			}
+
+			for($i=1;$i<=$weeks;$i++){
+				if($i>=$start_week){
+					$stock = ($stock-array_get($datas,$i.'.week_line_qty',0)>0)?$stock-array_get($datas,$i.'.week_line_qty',0):0;
+					$n_stock = 0;
+					if($i<=$weeks-7){
+						for ($ix = 1;$ix <= 7;$ix++){
+								$n_stock+=intval(array_get($datas,($i+$ix).'.week_line_qty',0));
+						}
+					}elseif($i==$weeks){
+						$n_stock=intval(array_get($datas,($i).'.week_line_qty',0)*5.688);  
+					}else{
+						for ($ix = $i+1;$ix <= $weeks;$ix++){
+							$n_stock+=intval(array_get($datas,($ix).'.week_line_qty',0));
+						}
+						if($i==$weeks-1) $n_stock=intval($n_stock*5.919);
+						if($i==$weeks-2) $n_stock=intval($n_stock*3.019);
+						if($i==$weeks-3) $n_stock=intval($n_stock*2.038);
+						if($i==$weeks-4) $n_stock=intval($n_stock*1.579);
+						if($i==$weeks-5) $n_stock=intval($n_stock*1.306);
+						if($i==$weeks-6) $n_stock=intval($n_stock*1.127);
+					}
+					if($base_data['then_status']==1 || $base_data['then_status']==2 || $base_data['then_status']==99){
+						$endStock = $stock>$n_stock?$stock:$n_stock;
+					}else{
+						$endStock = $stock;
+					}
+					
+					$endStock = $endStock>0?$endStock:0;
+					$datas[$i]['stock_end'] = $endStock;
+					
+					$avgStock[$i] = intval(($startStock+$endStock)/2);
+					$startStock = $endStock;
+					$week_line_amountfee = round($cost*$avgStock[$i]*0.00375,2);
+					$datas[$i]['week_line_amountfee'] = $week_line_amountfee;
+
+					if($i<=4){
+						$week_line_storagefee = round($first4WeeksQty*0.656*$hot_storagefee,2);
+					}else{
+						if($i>=($start_week+4)){
+							$week_line_storagefee = round($avgStock[$i-4]*($i>43?$hot_storagefee:$cold_storagefee),2);	
+						}else{
+							$week_line_storagefee = round($avgStock[$i]*($i>43?$hot_storagefee:$cold_storagefee),2);	
+						}
+					}
+					$datas[$i]['week_line_storagefee'] = $week_line_storagefee; 
+					
+					$week_line_economic = round(array_get($datas,$i.'.week_line_profit',0)-array_get($datas,$i.'.week_line_fee',0)-array_get($datas,$i.'.week_line_profee',0)-$week_line_amountfee-$week_line_storagefee,2);
+					$datas[$i]['week_line_economic'] = $week_line_economic; 
+					
+					$dataArr = [
+						'income'=>'week_line_income',
+						'cost'=>'week_line_cost',
+						'common_fee'=>'week_line_commonfee',
+						'pick_fee'=>'week_line_pickfee',
+						'promotion_fee'=>'week_line_profee',
+						'amount_fee'=>'week_line_amountfee',
+						'storage_fee'=>'week_line_storagefee',
+					];
+					foreach($dataArr as $field=>$val){
+						$max_value=0;
+						$week_value = array_get($datas,$i.'.'.$val,0);
+						for($k=0;$k<=6;$k++){
+							$date = date("Y-m-d", strtotime($base_data['year'] . 'W' . sprintf("%02d",$i))+86400*$k);
+							$value = round($week_value*array_get($week_per,$k),2);
+							if($max_value+$value>$week_value) $value = $week_value-$max_value;
+							if($max_value<=$week_value && $k==6) $value = $week_value-$max_value;
+							$max_value+=$value;
+							if($date>$undate){
+								$updateData[$date]['budget_id']=$budget_id;
+								$updateData[$date]['weeks']=$i;
+								$updateData[$date]['date']=$date;
+								$updateData[$date][$field]=$value;
+								$updateData[$date]['created_at']=$updateData[$date]['updated_at']=date('Y-m-d H:i:s');
+							}
+						}
+					}
+				}else{
+					$week_line_amountfee = round(array_get($datas,$i.'.amount_fee'),2);
+					$week_line_storagefee = round(array_get($datas,$i.'.storage_fee'),2);	
+					$week_line_economic = round(array_get($datas,$i.'.income')-array_get($datas,$i.'.cost')-array_get($datas,$i.'.common_fee')-array_get($datas,$i.'.pick_fee')-array_get($datas,$i.'.storage_fee')-array_get($datas,$i.'.promotion_fee')-array_get($datas,$i.'.amount_fee'),2);
+				}
+				
+				$total_qty+=array_get($datas,$i.'.week_line_qty',0);
+				$total_income+=array_get($datas,$i.'.week_line_income',0);
+				$total_cost+=array_get($datas,$i.'.week_line_cost',0);
+				$total_commonfee+=array_get($datas,$i.'.week_line_commonfee',0);
+				$total_pickfee+=array_get($datas,$i.'.week_line_pickfee',0);
+				$total_storagefee+=$week_line_storagefee;
+				$total_profee+=array_get($datas,$i.'.week_line_profee',0);
+				$total_amountfee+=$week_line_amountfee;
+			}
+
+			if($updateData) Budgetdetails::insertOnDuplicateWithDeadlockCatching(array_values($updateData), ['income','cost', 'common_fee', 'pick_fee', 'promotion_fee', 'amount_fee', 'storage_fee','created_at','updated_at']);
+			$budget->qty = $total_qty;
+			$budget->income = $total_income;
+			$budget->cost = $total_cost;
+			$budget->common_fee = $total_commonfee;
+			$budget->pick_fee = $total_pickfee;
+			$budget->promotion_fee = $total_profee;
+			$budget->amount_fee = $total_amountfee;
+			$budget->storage_fee = $total_storagefee;
+			$budget->save();
+			DB::commit();
+		}catch (\Exception $e) { 
+            DB::rollBack();
+			throw $e;
+        }	
+    }
 
 }

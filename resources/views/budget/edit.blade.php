@@ -1,5 +1,5 @@
 @extends('layouts.layout')
-@section('label', 'Budgets')
+@section('label', 'Budget Sku')
 @section('content')
 <link href="/assets/global/plugins/bootstrap-editable/bootstrap-editable/css/bootstrap-editable.css" rel="stylesheet" type="text/css" />
 <style>
