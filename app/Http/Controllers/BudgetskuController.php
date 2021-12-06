@@ -142,4 +142,135 @@ class BudgetskuController extends Controller
         }
         echo json_encode($records);
     }
+
+
+    public function upload( Request $request )
+    {
+        DB::beginTransaction();
+        try{ 
+            $file = $request->file('file');
+            $originalName = $file->getClientOriginalName();
+            $ext = $file->getClientOriginalExtension();
+            $type = $file->getClientMimeType();
+            $realPath = $file->getRealPath();
+            $newname = date('His').uniqid().'.'.$ext;
+            $newpath = '/uploads/budgetSku/'.date('Ymd').'/';
+            $inputFileName = public_path().$newpath.$newname;
+            $bool = $file->move(public_path().$newpath,$newname);
+            $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($inputFileName);
+            $importData = $spreadsheet->getActiveSheet()->toArray(null, true, true);
+            $users = User::where('sap_seller_id','>',0)->pluck('sap_seller_id','name');
+            $planers = User::pluck('id','name');
+            foreach($importData as $key => $value){
+                if($key>0) {
+                    $sku = array_get($value,0);
+                    $site = array_get($value,1);
+                    $data['description'] = array_get($value,2);
+                    $data['status'] = array_get($value,3);
+                    $data['level'] = array_get($value,4);
+                    $data['stock'] = array_get($value,5);
+                    $data['volume'] = array_get($value,6);
+					$data['size'] = array_get($value,7);
+                    $data['cost'] = array_get($value,8);
+                    $tax = array_get($value,9);
+                    $data['pick_fee'] = array_get($value,10);
+                    $data['exception'] = array_get($value,11);
+                    $data['common_fee'] = array_get($value,12);
+                    $sap_seller_id = array_get($value,13);
+                    $planer_id = array_get($value,14);
+                    $data['sap_seller_id'] = array_get($users,$sap_seller_id,0);
+					$data['planer_id'] = array_get($planers,$planer_id,0);
+                    $data['bg'] = array_get($value,15);
+                    $data['bu'] = array_get($value,16);
+
+                    $siteShort = getSiteShort();
+                    TaxRate::updateOrCreate(
+                        ['sku' => $sku,'site' => isset($siteShort[$site]) ? strtoupper($siteShort[$site]) : $site],
+                        [
+                            'tax' => $tax,
+                        ]
+                    );
+                    if($sku && $site){
+                        Budgetskus::updateOrCreate(
+                            ['sku'=>$sku,'site'=>$site]
+                            ,
+                            $data
+                        );
+                    }
+                }	
+            }
+            DB::commit();
+            $records["customActionStatus"] = 'OK';
+            $records["customActionMessage"] = '更新成功!';     
+        }catch (\Exception $e) { 
+            DB::rollBack();
+            $records["customActionStatus"] = '';
+            $records["customActionMessage"] = $e->getMessage();
+        }    
+        echo json_encode($records);  
+	}
+
+
+    public function export(Request $request){
+		set_time_limit(0);        
+	    $datas = new Budgetskus;
+        if(array_get($_REQUEST,'keyword')){
+            $datas = $datas->where('sku','like','%'.array_get($_REQUEST,'keyword').'%')->orWhere('description','like','%'.array_get($_REQUEST,'keyword').'%');
+        }
+        $datas =  $datas->get()->toArray();
+		$arrayData = array();
+		$headArray[] = '物料号';
+		$headArray[] = '站点';
+		$headArray[] = '产品名称';
+		$headArray[] = '状态';
+		$headArray[] = '等级';
+		$headArray[] = '期初库存';
+		$headArray[] = '体积';
+		$headArray[] = '体积标准';
+		$headArray[] = '成本';
+		$headArray[] = '关税';
+        $headArray[] = '拣配费';
+        $headArray[] = '异常率';
+        $headArray[] = '佣金比率';
+        $headArray[] = '销售员';
+        $headArray[] = '计划员';
+        $headArray[] = 'BG';
+        $headArray[] = 'BU';
+		$arrayData[] = $headArray;
+        $users = User::where('sap_seller_id','>',0)->pluck('name','sap_seller_id');
+        $planers = User::pluck('name','id');
+		foreach($datas as $data){
+            $siteShort = getSiteShort();
+            $tax = TaxRate::where('sku',$data['sku'])->where('site',isset($siteShort[$data['site']]) ? strtoupper($siteShort[$data['site']]) : $data['site'])->value('tax');
+            $arrayData[] = array(
+                $data['sku'],
+                $data['site'],
+                $data['description'],
+                $data['status'],
+                $data['level'],
+                $data['stock'],
+                $data['volume'],
+                $data['size'],
+                $data['cost'],
+                $tax,
+                $data['pick_fee'],
+                $data['exception'],
+                $data['common_fee'],
+                array_get($users,$data['sap_seller_id'],$data['sap_seller_id']),
+                array_get($planers,$data['planer_id'],$data['planer_id']),
+                $data['bg'],
+                $data['bu']
+            );
+		}
+
+		if($arrayData){
+			$spreadsheet = new Spreadsheet();
+			$spreadsheet->getActiveSheet()->fromArray($arrayData,NULL, 'A1' );
+			header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+			header('Content-Disposition: attachment;filename="gift_cards.xlsx"');
+			$writer = new Xlsx($spreadsheet);
+			$writer->save('php://output');
+		}
+		die();
+	}
 }

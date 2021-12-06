@@ -1,5 +1,5 @@
 @extends('layouts.layout')
-@section('label', 'User Accounts Manage')
+@section('label', 'Budget Sku Manage')
 @section('content')
 <style type="text/css">
 	th, td { white-space: nowrap;word-break:break-all; }
@@ -9,20 +9,38 @@
             <!-- BEGIN EXAMPLE TABLE PORTLET-->
             <div class="portlet light bordered">
                 <div class="table-toolbar">
-                    <form role="form" action="" method="GET">
-                        {{ csrf_field() }}
-                        <div class="row">
-						<div class="col-md-2">
-						<input type="text" class="form-control" name="keyword" placeholder="Keyword">
-						</div>
-                        <div class="col-md-2">
-                        
-                            <button type="button" class="btn blue" id="data_search">搜索</button>
-                                
-                        </div>
-					    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                        <form role="form" action="" method="GET">
+                            {{ csrf_field() }}
+                            <div class="row">
+                            <div class="col-md-2">
+                            <input type="text" class="form-control" name="keyword" placeholder="Keyword">
+                            </div>
+                            <div class="col-md-2">
+                            
+                                <button type="button" class="btn blue" id="data_search">搜索</button>
+                                    
+                            </div>
+                            </div>
 
-                    </form>
+                        </form>
+                        </div>
+                        <div class="col-md-6">
+                            <input id="importFile" name="importFile" type="file" style="display:none">
+                            {{ csrf_field() }}
+                            <input id="importFileTxt" name="importFileTxt" type="text" class="form-control input-inline">
+                            <a id="importButton" class="btn red input-inline" >Browse</a>
+
+                            <button id="importSubmit" class="btn blue input-inline">Upload</button>
+
+                        
+                            <button id="vl_list_export" class="btn blue input-inline"> Export
+                                <i class="fa fa-download"></i>
+                            </button>
+                            
+                        </div>
+                    </div>
 
                 </div>
 				
@@ -139,6 +157,55 @@ $(function() {
 	$('#ajax').on('hidden.bs.modal', function (e) {
         $('#ajax .modal-content').html('<div class="modal-body" >Loading...</div>');
     });
+
+
+    $("#importButton,#importFileTxt").click(function(){
+		$("#importFile").trigger("click");
+	});
+
+	$('input[id=importFile]').change(function() {
+		$('#importFileTxt').val($(this).val());
+	});
+
+	$("#importSubmit").click(function () {
+		var fileObj = document.getElementById("importFile").files[0];
+		if (typeof (fileObj) == "undefined" || fileObj.size <= 0) {
+			alert("Please Select File!");
+			return false;
+		}
+		var formFile = new FormData();
+		formFile.append("file", fileObj);
+		var data = formFile;
+		$.ajaxSetup({
+			headers: { 'X-CSRF-TOKEN' : '{{ csrf_token() }}' }
+		});
+		$.ajax({
+			url: "/budgetSku/upload",
+			data: data,
+			type: "Post",
+			dataType: "json",
+			cache: false,
+			processData: false,
+			contentType: false,
+			success: function (result) {
+				if(result.customActionStatus=='OK'){  
+					toastr.success(result.customActionMessage);
+					var dttable = $('#datatable_ajax').dataTable();
+					dttable.api().ajax.reload(null, false);
+				}else{
+					toastr.error(result.customActionMessage);
+				}
+			},
+			error: function(result) {
+                toastr.error(result.responseText);
+			}
+		});
+	});
+
+
+    $("#vl_list_export").click(function(){
+		location.href='/budgetSkuExport?keyword='+$("input[name='keyword']").val();
+	});
 });
 
 

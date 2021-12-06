@@ -673,3 +673,5 @@ Route::post('/cuckoo/promotionsList', 'CuckooController@promotionsList');
 
 Route::resource('budgetSku', 'BudgetskuController');
 Route::Post('/budgetSku/get', 'BudgetskuController@get');
+Route::Post('/budgetSku/upload', 'BudgetskuController@upload');
+Route::get('/budgetSkuExport', 'BudgetskuController@export');

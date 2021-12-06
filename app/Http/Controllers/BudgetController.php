@@ -115,6 +115,8 @@ class BudgetController extends Controller
 			if(array_get($rules,1)!='*') $where.= " and bu='".array_get($rules,1)."'";
 		} elseif (Auth::user()->sap_seller_id) {
 			$where.= " and sap_seller_id=".Auth::user()->sap_seller_id;
+		} elseif(Auth::user()->hasRole('计划员')){
+			$where.= " and planer_id=".Auth::user()->id;
 		}
 		if($bgbu){
 		   $bgbu_arr = explode('_',$bgbu);
