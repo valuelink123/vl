@@ -166,16 +166,16 @@ class BudgetskuController extends Controller
                     $sku = array_get($value,0);
                     $site = array_get($value,1);
                     $data['description'] = array_get($value,2);
-                    $data['status'] = array_get($value,3);
+                    $data['status'] = intval(array_get(array_flip(getSkuStatuses()),array_get($value,3)));
                     $data['level'] = array_get($value,4);
-                    $data['stock'] = array_get($value,5);
-                    $data['volume'] = array_get($value,6);
-					$data['size'] = array_get($value,7);
-                    $data['cost'] = array_get($value,8);
+                    $data['stock'] = intval(array_get($value,5));
+                    $data['volume'] = round(array_get($value,6),4);
+					$data['size'] = intval(array_get(array_flip(getSkuSize()),array_get($value,7)));
+                    $data['cost'] = round(array_get($value,8),2);
                     $tax = array_get($value,9);
-                    $data['pick_fee'] = array_get($value,10);
-                    $data['exception'] = array_get($value,11);
-                    $data['common_fee'] = array_get($value,12);
+                    $data['pick_fee'] = round(array_get($value,10),2);
+                    $data['exception'] = round(array_get($value,11),4);
+                    $data['common_fee'] = round(array_get($value,12),4);
                     $sap_seller_id = array_get($value,13);
                     $planer_id = array_get($value,14);
                     $data['sap_seller_id'] = array_get($users,$sap_seller_id,0);
@@ -246,11 +246,11 @@ class BudgetskuController extends Controller
                 $data['sku'],
                 $data['site'],
                 $data['description'],
-                $data['status'],
+                array_get(getSkuStatuses(),$data['status']??0),
                 $data['level'],
                 $data['stock'],
                 $data['volume'],
-                $data['size'],
+                array_get(getSkuSize(),$data['size']??0),
                 $data['cost'],
                 $tax,
                 $data['pick_fee'],
@@ -265,7 +265,7 @@ class BudgetskuController extends Controller
 
 		if($arrayData){
 			$spreadsheet = new Spreadsheet();
-			$spreadsheet->getActiveSheet()->fromArray($arrayData,NULL, 'A1' );
+			$spreadsheet->getActiveSheet()->fromArray($arrayData,NULL,'A1');
 			header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 			header('Content-Disposition: attachment;filename="gift_cards.xlsx"');
 			$writer = new Xlsx($spreadsheet);
