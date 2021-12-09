@@ -548,7 +548,7 @@ class RsgrequestsController extends Controller
 			->where('client_info.email',$rule->customer_email)->get(['client.rsg_status','client.rsg_status_explain','client.subscribe','client.block'])->first();
 
 		if($clientData && ($clientData->subscribe==0 ||$clientData->block==1)){
-			$request->session()->flash('error_message',"Rsg Request Failed! Use ehe email<".$rule->customer_email."> to do rsg is strictly forbidden.");
+			$request->session()->flash('error_message',"Rsg Request Failed! Use the email<".$rule->customer_email."> to do rsg is strictly forbidden.");
 			return redirect()->back()->withInput();
 		}
 
@@ -571,10 +571,15 @@ class RsgrequestsController extends Controller
 		//检查该客户最近一次申请产品是什么时候，要在上次申请完成后才能再申请
 		$customerData = $rule->where('customer_email',$rule->customer_email)->orderBy('updated_at', 'desc')->take(1)->get()->toArray();
 		if($customerData){
-			// $day = (time()-strtotime($customerData[0]['updated_at']))/86400;
+			 $day = (time()-strtotime($customerData[0]['updated_at']))/86400;
 			if(!($customerData[0]['step']==9)){
 				$request->session()->flash('error_message',"Rsg Request Failed,Don't complete previous test yet");
 				return redirect()->back()->withInput();
+			}else{
+				if($day<10){
+					$request->session()->flash('error_message',"Rsg Request Failed,RSG can only be done once in 10 days");
+					return redirect()->back()->withInput();
+				}
 			}
 		}
 

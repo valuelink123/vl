@@ -181,14 +181,14 @@ class StaClient extends Command
 	function updateRsgStatus()
 	{
 		//6,有活动不是Completed状态（包含9,10,2）的客户标记红色
-		$sql = "update client as t1, (
-					select client_id as id 
-					from client_info as a
-					left join rsg_requests as b on b.customer_email = a.email 
-					where step not in (2,9,10)  
-				) as t2 
-				SET rsg_status = 1,rsg_status_explain = 6 WHERE t1.id = t2.id ";
-		DB::select($sql);
+//		$sql = "update client as t1, (
+//					select client_id as id
+//					from client_info as a
+//					left join rsg_requests as b on b.customer_email = a.email
+//					where step not in (2,9,10)
+//				) as t2
+//				SET rsg_status = 1,rsg_status_explain = 6 WHERE t1.id = t2.id ";
+//		DB::select($sql);
 
 		//5,留评率低于90%的客户标记红色,已留评(RSG)/总订单数(RSG),具体为ReviewID OR LINK /Order ID的总数
 		// $sql = "update client as t1, (
@@ -200,17 +200,17 @@ class StaClient extends Command
 		// 		SET rsg_status = 1,rsg_status_explain = 5 WHERE t1.id = t2.id and review_rate < 0.9";
 		// DB::select($sql);
 
-		//4,最近30天有参与4次RSG的客户标记红色
-		$daysago30 = date('Y-m-d',time()-86400*30);
-		$sql = "update client as t1, (
-					select client_id as id,count(*) as rsg_num 
-					from client_info as a 
-					left join rsg_requests as b on b.customer_email = a.email 
-					where created_at >= '".$daysago30."' 
-					group by client_id order by rsg_num desc
-				) as t2 
-				SET rsg_status = 1,rsg_status_explain = 4 WHERE t1.id = t2.id and rsg_num >= 4";
-		DB::select($sql);
+		//4,最近30天有参与3次RSG的客户标记红色
+//		$daysago30 = date('Y-m-d',time()-86400*30);
+//		$sql = "update client as t1, (
+//					select client_id as id,count(*) as rsg_num
+//					from client_info as a
+//					left join rsg_requests as b on b.customer_email = a.email
+//					where created_at >= '".$daysago30."'
+//					group by client_id order by rsg_num desc
+//				) as t2
+//				SET rsg_status = 1,rsg_status_explain = 4 WHERE t1.id = t2.id and rsg_num >= 3";
+//		DB::select($sql);
 
 		//3,留差评的客户标记红色
 		$sql = "update client SET rsg_status = 1,rsg_status_explain = 3 WHERE times_negative_review > 0";
