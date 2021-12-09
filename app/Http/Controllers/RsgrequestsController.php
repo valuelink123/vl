@@ -545,7 +545,12 @@ class RsgrequestsController extends Controller
 		$clientData = DB::table('client')->leftJoin('client_info',function($q){
 			$q->on('client.id', '=', 'client_info.client_id');
 		})
-			->where('client_info.email',$rule->customer_email)->get(['client.rsg_status','client.rsg_status_explain'])->first();
+			->where('client_info.email',$rule->customer_email)->get(['client.rsg_status','client.rsg_status_explain','client.subscribe','client.block'])->first();
+
+		if($clientData && ($clientData->subscribe==0 ||$clientData->block==1)){
+			$request->session()->flash('error_message',"Rsg Request Failed! Use ehe email<".$rule->customer_email."> to do rsg is strictly forbidden.");
+			return redirect()->back()->withInput();
+		}
 
 		if($clientData && $clientData->rsg_status==1){
 			//rsg_status=1表示该客户不能申请rsg产品，
