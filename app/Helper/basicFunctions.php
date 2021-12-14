@@ -46,7 +46,7 @@ function updateCrm($data,$updateClient){
 		$insertInfo = array(
 			'name'=>isset($data['name']) ? $data['name'] : '',
 			'email'=>$data['email'],
-			'encrypted_email' => md5($insertInfo['email']).rand(1000,9999).'@valuelinkltd.com',
+			'encrypted_email' => md5($data['email']).rand(1000,9999).'@valuelinkltd.com',
 			'phone'=>isset($data['phone']) ? $data['phone'] : '',
 			'country'=>isset($data['country']) ? $data['country'] : '',
 			'brand'=>isset($data['brand']) ? $data['brand'] : '',

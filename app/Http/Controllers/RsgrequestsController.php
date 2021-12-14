@@ -515,7 +515,10 @@ class RsgrequestsController extends Controller
 		
         $rule = new RsgRequest();
 		$rule->customer_email = array_search($request->get('customer_email'),getEmailToEncryptedEmail())?array_search($request->get('customer_email'),getEmailToEncryptedEmail()):$request->get('customer_email');
-		if(isBlacklistEmail($rule->customer_email)) throw new \Exception('Blacklist email');
+		if(isBlacklistEmail($rule->customer_email)){
+			$request->session()->flash('error_message','BlackList Email');
+			return redirect()->back()->withInput();
+		}
 		$rule->customer_paypal_email = $request->get('customer_paypal_email');
 		$rule->transfer_paypal_account = $request->get('transfer_paypal_account');
 		$rule->transaction_id = $request->get('transaction_id');

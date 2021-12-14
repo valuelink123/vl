@@ -160,7 +160,7 @@ class BudgetskuController extends Controller
             $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($inputFileName);
             $importData = $spreadsheet->getActiveSheet()->toArray(null, true, true);
             $users = User::where('sap_seller_id','>',0)->pluck('sap_seller_id','name');
-            $planers = User::pluck('id','name');
+            $planers = User::pluck('id','name')->toArray();
             foreach($importData as $key => $value){
                 if($key>0) {
                     $sku = array_get($value,0);
@@ -178,8 +178,8 @@ class BudgetskuController extends Controller
                     $data['common_fee'] = round(array_get($value,12),4);
                     $sap_seller_id = array_get($value,13);
                     $planer_id = array_get($value,14);
-                    $data['sap_seller_id'] = array_get($users,$sap_seller_id,0);
-					$data['planer_id'] = array_get($planers,$planer_id,0);
+                    $data['sap_seller_id'] = intval(array_get($users,$sap_seller_id,0));
+			$data['planer_id'] = intval(array_get($planers,$planer_id,0));
                     $data['bg'] = array_get($value,15);
                     $data['bu'] = array_get($value,16);
 
