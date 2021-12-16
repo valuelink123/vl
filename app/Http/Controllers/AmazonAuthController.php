@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\PpcProfile;
 use Log;
+use DB;
 
 
 class AmazonAuthController extends Controller
