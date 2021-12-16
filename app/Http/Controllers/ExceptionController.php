@@ -697,6 +697,10 @@ class ExceptionController extends Controller
 
 			//当状态为cancel的时候，才能修改状态为submit,否则不能
 			if (($exception->process_status != 'cancel') && $request->get('process_status') != 'submit') {
+				$updateProduct = 0;
+				if (($exception->process_status != 'done' && $exception->process_status != 'auto done')) {
+					$updateProduct  = 1;
+				}
 				if (!Auth::user()->can(['exception-check'])) die('Permission denied -- exception-check');
 				$this->validate($request, [
 					'process_status' => 'required|string',
@@ -711,15 +715,17 @@ class ExceptionController extends Controller
 					$input_products_arr = $request->get('group-products');
 					$products = [];
 					$products_arr = array_get($replacements, 'products', array());
-
 					if (is_array($products_arr)) {
 						$id_add = 0;
 						foreach ($products_arr as $key=>$product_arr) {
-							$product_arr['shipfrom'] = $input_products_arr[$key]['shipfrom'];
-							$product_arr['note'] = $input_products_arr[$key]['note'];
-							$product_arr['seller_id'] = $input_products_arr[$key]['seller_id'];
-							$product_arr['seller_sku'] = $input_products_arr[$key]['seller_sku'];
-							$product_arr['find_item_by'] = $input_products_arr[$key]['find_item_by'];
+							if ($updateProduct==1) {
+								//当修改前的状态不为done和auto done的时候才保存shipfrom，note，seller_id，seller_sku，find_item_by这几个参数的值，不然会被覆盖为空
+								$product_arr['shipfrom'] = $input_products_arr[$key]['shipfrom'];
+								$product_arr['note'] = $input_products_arr[$key]['note'];
+								$product_arr['seller_id'] = $input_products_arr[$key]['seller_id'];
+								$product_arr['seller_sku'] = $input_products_arr[$key]['seller_sku'];
+								$product_arr['find_item_by'] = $input_products_arr[$key]['find_item_by'];
+							}
 							$updateMcfOrder[$product_arr['replacement_order_id']] = array(///修改数据前的重发单号，amazon_mcf_orders表重发单对应的原始订单号置空
 								'seller_fulfillment_order_id' => $product_arr['replacement_order_id'],
 								'amazon_order_id' => ''
