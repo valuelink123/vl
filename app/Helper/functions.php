@@ -1803,3 +1803,27 @@ function getSkuSize(){
 		'1'=>'特大',
     );
 }
+
+function getAdRegions(){
+	return array(
+		'A2Q3Y263D00KWC'=>'NA',
+		'A2EUQ1WTGCTBG2'=>'NA',
+		'A1AM78C64UM0Y8'=>'NA',
+		'ATVPDKIKX0DER'=>'NA',
+		'A2VIGQ35RCS4UG'=>'EU',
+		'A1PA6795UKMFR9'=>'EU',
+		'ARBP9OOSHTCHU '=>'EU',
+		'A1RKKUPIHCS9HS'=>'EU',
+		'A13V1IB3VIYZZH'=>'EU',
+		'A1F83G8C2ARO7P'=>'EU',
+		'A21TJRUUN4KGV'=>'EU',
+		'APJ6JRA9NG5V4'=>'EU',
+		'A1805IZSGTT6HS'=>'EU',
+		'A17E79C6D8DWNP'=>'EU',
+		'A2NODRKZP88ZB9'=>'EU',
+		'A33AVAJ2PDY3EV'=>'EU',
+		'A19VAU5U5O7RUS'=>'FE',
+		'A39IBJ37TRP1C6'=>'FE',
+		'A1VC38T7YXB528'=>'FE'
+	);
+}
