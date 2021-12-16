@@ -54,6 +54,17 @@
                             <input  class="form-control search_date"  value="{!! $endDateTo !!}" data-change="0" data-date-format="yyyy-mm-dd" data-options="format:'yyyy-mm-dd'" id="endDate_to" name="endDate_to"/>
                         </div>
                     </div>
+                    <div class="col-md-2">
+                        <div class="input-group">
+                            <span class="input-group-addon">Type</span>
+                            <select  style="width:100%;height:35px;" data-recent="" data-recent-date="" id="type" name="type">
+                                <option value="">Select</option>
+                                @foreach($type as $value)
+                                    <option value="{{ $value }}">{{ $value }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
                     <div class="col-md-1">
                         <div class="input-group">
                             <div class="btn-group pull-right" >
@@ -72,18 +83,20 @@
                         <th>Type</th>
                         <th>Site</th>
                         <th>Account Name</th>
-                        <th>Min Price</th>
-                        <th>Max Price</th>
+                        <th>Lsting Price</th>
+                        <th>Price</th>
+{{--                        <th>Min Price</th>--}}
+{{--                        <th>Max Price</th>--}}
                         <th>Customers</th>
                         <th>Discount Type</th>
                         <th>Discount</th>
-                        <th>Save</th>
+{{--                        <th>Save</th>--}}
                         <th>Budget</th>
                         <th>Status</th>
                         <th>Start Date</th>
                         <th>End Date</th>
 {{--                        <th>Create Date</th>--}}
-                        <th>Action</th>
+{{--                        <th>Action</th>--}}
                     </tr>
                     </thead>
                     <tbody></tbody>
@@ -114,18 +127,20 @@
                 {data: 'type',name:'type'},
                 {data: 'site',name:'site'},
                 {data: 'account_name',name:'account_name'},
-                {data: 'minPrice',name:'minPrice'},
-                {data: 'maxPrice',name:'maxPrice'},
+                {data: 'listing_price',name:'listing_price'},
+                {data: 'price',name:'price'},
+                // {data: 'minPrice',name:'minPrice'},
+                // {data: 'maxPrice',name:'maxPrice'},
                 {data: 'customers',name:'customers'},
                 {data: 'discountType',name:'discountType'},
                 {data: 'discount',name:'discount'},
-                {data: 'save',name:'save'},
+                // {data: 'save',name:'save'},
                 {data: 'budget',name:'budget'},
                 {data: 'status',name:'status'},
                 {data: 'startDate',name:'startDate'},
                 {data: 'endDate',name:'endDate'},
                 // {data: 'created_at',name:'created_at'},
-                {data: 'action',name:'action'},
+                // {data: 'action',name:'action'},
             ],
             ajax: {
                 type: 'POST',
