@@ -34,7 +34,7 @@ class AmazonAuthController extends Controller
                             'account_id' => 0,
                             'marketplace_id' => trim($profile->marketplace_id),
                             'seller_id' => trim($profile->seller_id),
-                            'account_name' => trim($account->lable),
+                            'account_name' => trim($account->label),
                             'access_token' => trim($profile->access_token),
                             'refresh_token' => trim($profile->refresh_token),
                             'region' => isset($adRegions[trim($profile->marketplace_id)]) ? $adRegions[trim($profile->marketplace_id)] : '',
