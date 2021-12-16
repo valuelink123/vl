@@ -19,7 +19,6 @@ class AmazonAuthController extends Controller
 
     public function index()
     {
-
         $profiles = $_REQUEST['profiles'];
         if($profiles) {
             $adRegions = getAdRegions();
@@ -27,7 +26,7 @@ class AmazonAuthController extends Controller
             $expires_in = time() + 3600;
             if ($profile_arr) {
                 foreach ($profile_arr as $profile) {
-                    $account = DB::connection('vlz')->table('seller_accounts')->select('label')->where('mws_seller_id', $profile->seller_id)->where('mws_marketplaceid', $profile->marketplace_id)->get();
+                    $account = DB::connection('vlz')->table('seller_accounts')->select('label')->where('mws_seller_id', $profile->seller_id)->where('mws_marketplaceid', $profile->marketplace_id)->first();
                     if ($account) {
                         PpcProfile::updateOrCreate([
                             'profile_id' => trim($profile->profile_id),
