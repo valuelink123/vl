@@ -381,6 +381,20 @@ return [
             'strict' => false,
             'engine' => null,
         ],
+		'amzspider' => [
+			'driver' => 'mysql',
+			'host' => env('DB_AMZSPIDER_HOST', '127.0.0.1'),
+			'port' => env('DB_AMZSPIDER_PORT', '3306'),
+			'database' => env('DB_AMZSPIDER_DATABASE', 'forge'),
+			'username' => env('DB_AMZSPIDER_USERNAME', 'forge'),
+			'password' => env('DB_AMZSPIDER_PASSWORD', ''),
+			'unix_socket' => env('DB_AMZSPIDER_SOCKET', ''),
+			'charset' => 'utf8mb4',
+			'collation' => 'utf8mb4_unicode_ci',
+			'prefix' => '',
+			'strict' => false,
+			'engine' => null,
+		],
 
 
     ],

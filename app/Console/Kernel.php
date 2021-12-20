@@ -63,6 +63,7 @@ class Kernel extends ConsoleKernel
 		'App\Console\Commands\GetPpcReport',
 		'App\Console\Commands\GetPpcSchedule',
 		'App\Console\Commands\AddSapInventory',
+		'App\Console\Commands\AddAsins'
     ];
 
     /**
@@ -171,6 +172,7 @@ class Kernel extends ConsoleKernel
 		//$schedule->command('update:sendboxStatus')->cron('0 */2 * * *')->name('updateSendboxStatus')->withoutOverlapping();//2小时执行一次
 
 		$schedule->command('add:sap_inventory')->hourly()->name('add_sap_inventory')->withoutOverlapping();//每小时更新一次，用于获取sap库存数据，主要用于库存盘点模块
+		$schedule->command('add:asins')->dailyAt('03:30')->name('addAsins')->withoutOverlapping();//添加asins数据，每日更新，
     }
 
     /**
