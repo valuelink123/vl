@@ -69,7 +69,7 @@ class PartsListController extends Controller {
         // kms_stock 为 fba_stockk + fbm_stock 的视图
 
 		$rows = DB::table('kms_stock')->leftJoin('asin', function ($join) {
-			$join->on('asin.asin', '=', 'kms_stock.asin')
+			$join->on('asin.asin', '=', 'kms_stock.asin')->on('asin.site','=','kms_stock.site')
 				->ON('asin.sellersku', '=', 'kms_stock.seller_sku');
 				})
             ->select('item_code', 'kms_stock.asin', 'kms_stock.fba_stock', 'kms_stock.fba_transfer', 'kms_stock.fbm_stock', 'item_name', 'seller_name', 'seller_sku','account_status','asin.site','fba_update','fbm_update')
@@ -157,7 +157,7 @@ class PartsListController extends Controller {
             GROUP BY item_no
         ) t3
         USING(item_code) 
-        LEFT JOIN asin on t1.asin = asin.asin and t1.seller_sku = asin.sellersku 
+        LEFT JOIN asin on t1.asin = asin.asin and t1.seller_sku = asin.sellersku and t1.site=asin.site 
         WHERE $where
         ORDER BY $orderby
         LIMIT $limit
