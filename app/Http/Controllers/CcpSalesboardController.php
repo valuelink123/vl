@@ -13,7 +13,7 @@ class CcpSalesBoardController extends Controller
     use \App\Traits\Mysqli;
 	use \App\Traits\DataTables;
 
-    public $ccpAdmin = array("xumeiling@valuelinkcorp.com");
+    public $ccpAdmin = array();
 
     /**
      * Create a new controller instance.
