@@ -244,9 +244,35 @@ class Controller extends BaseController
                     group by asin,seller_account_id 
                 ) as a,order_items as b
         where a.id = b.id";
-			$insertData = DB::connection('amazon')->select($insert_sql);
-			$insertData = array_map('get_object_vars', $insertData);//需要插入的数据
+
+			$_insertData = DB::connection('amazon')->select($insert_sql);
+			$insertData = array();
+			foreach($_insertData as $key=>$val){
+				$insertData[$val->seller_account_id.'_'.$val->asin] = (array)$val;
+			}
+
+			//查询listing的价格
+			$today = date('Y-m-d');
+//			$today = '2021-12-03';//测试数据
+			//$insertData里面可能有缺了asin的价格，所以再查listing价格表，没有的asin价格给他补上
+			$listing_price_sql = "SELECT ASIN as asin,asin_offer_lowest.listing_price as price,asin_offer_summary.marketplace_id AS marketplace_id,'" . $date . "' as created_at,seller_accounts.id AS  seller_account_id
+FROM asin_offer_summary
+LEFT JOIN asin_offer_lowest ON asin_offer_summary.id = asin_offer_lowest.asin_offer_summary_id 
+LEFT JOIN asin_offers ON asin_offer_summary.id = asin_offers.asin_offer_summary_id 
+LEFT JOIN seller_accounts ON seller_accounts.mws_seller_id = asin_offers.seller_id AND mws_marketplaceid = '".$site."' 
+where asin_offer_lowest.fulfillment_channel ='Amazon' AND asin_offer_summary.date = '".$today."' and asin_offer_summary.marketplace_id = '".$site."' 
+AND asin_offers.seller_id IS NOT NULL AND seller_accounts.id IS NOT NULL 
+ORDER BY asin_offer_summary.asin DESC ";
+			$_price_data = DB::connection('amazon')->select($listing_price_sql);
+			$_price_data = json_decode(json_encode($_price_data),true);
+			foreach($_price_data as $key=>$val){
+				if(!isset($insertData[$val['seller_account_id'].'_'.$val['asin']])){
+					$insertData[$val['seller_account_id'].'_'.$val['asin']] = $val;
+				}
+			}
+
 			if ($insertData) {
+				$insertData = array_values($insertData);
 				DB::connection('amazon')->table('asin_price')->insert($insertData);
 			}
 		}
@@ -519,6 +545,37 @@ class Controller extends BaseController
 			$sap_inventory_data[$val['MATNR']][$val['WERKS'].'_'.$val['LGORT']] = $val;
 		}
 		return $sap_inventory_data;
+	}
+
+	/*
+	 * 通过选择的站点账号得到Campaign,ajax联动
+	 */
+	public function getCampaignBySiteAccount()
+	{
+		$marketplaceid = isset($_REQUEST['marketplaceid']) ? $_REQUEST['marketplaceid'] : '';
+		$account = isset($_REQUEST['account']) ? $_REQUEST['account'] : '';
+		$return = array('status'=>1,'data'=>array());
+		if($marketplaceid){
+			$sql_profileId = "SELECT profile_id FROM ppc_profiles WHERE marketplace_id = '".$marketplaceid."'";
+			if($account){
+				$account_str = "'".implode("','", $account)."'";
+				$sql_profileId .= " AND seller_id IN(".$account_str.")";
+			}
+			$sql = "SELECT campaign_id,name FROM (
+						SELECT campaign_id,name,profile_id FROM ppc_sbrands_campaigns 
+						UNION ALL 
+						SELECT campaign_id,name,profile_id FROM ppc_sdisplay_campaigns 
+						UNION ALL 
+						SELECT campaign_id,NAME,profile_id FROM ppc_sproducts_campaigns 
+					) AS campaigns WHERE profile_id IN (".$sql_profileId.") order by name asc";
+			$data= DB::select($sql);
+			foreach($data as $key=>$val){
+				$return['data'][$key] = (array)$val;
+			}
+		}else{
+			$return['status'] = 0;
+		}
+		return $return;
 	}
 
 }
