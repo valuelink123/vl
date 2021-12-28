@@ -230,6 +230,8 @@ sum(amount_used) as amount_fee, sum(fba_storage+fbm_storage) as storage_fee from
 			if(array_get($rules,1)!='*') $where.= " and c.bu='".array_get($rules,1)."'";
 		} elseif (Auth::user()->sap_seller_id) {
 			$where.= " and c.sap_seller_id=".Auth::user()->sap_seller_id;
+		}elseif(Auth::user()->hasRole('计划员')){
+			$where.= " and c.planer_id=".Auth::user()->id;
 		}
 
 		if($bgbu){
@@ -423,6 +425,23 @@ right join budget_skus as c on b.sku=c.sku and b.site=c.site where ((a.month>='"
 			'then_description'=>$sku_base_data->description,
 			'then_sap_seller_id'=>$sku_base_data->sap_seller_id
 		]);
+		
+		if(!$budget->wasRecentlyCreated && $budget->status==0){
+			$budget->then_status = $sku_base_data->status;
+			$budget->then_level = $sku_base_data->level;
+			$budget->then_stock = $sku_base_data->stock;
+			$budget->then_volume = $sku_base_data->volume;
+			$budget->then_size = $sku_base_data->size;
+			$budget->then_cost = $sku_base_data->cost;
+			$budget->then_common_fee = $sku_base_data->common_fee;
+			$budget->then_pick_fee = $sku_base_data->pick_fee;
+			$budget->then_exception = $sku_base_data->exception;
+			$budget->then_bg = $sku_base_data->bg;
+			$budget->then_bu = $sku_base_data->bu;
+			$budget->then_description = $sku_base_data->description;
+			$budget->then_sap_seller_id = $sku_base_data->sap_seller_id;
+			$budget->save();
+		}
 		$budget_id = $budget->id;
 		$data['sku']=$sku;
 		$data['site']=$site;
@@ -546,8 +565,8 @@ right join budget_skus as c on b.sku=c.sku and b.site=c.site where ((a.month>='"
 					$bool = $file->move(public_path().$newpath,$newname);
 					if($bool){
 						$weeks = date("W", mktime(0, 0, 0, 12, 28, $budget->year));
-						$spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($inputFileName);
-						$importData = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
+						$spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::createReaderForFile($inputFileName)->setReadDataOnly(true)->load($inputFileName);
+						$importData = $spreadsheet->getActiveSheet()->toArray(null, true, true,true);
 						$week_per = $this->week_per;		
 						$updateData=[];
 						foreach($importData as $key => $data){
@@ -611,52 +630,10 @@ right join budget_skus as c on b.sku=c.sku and b.site=c.site where ((a.month>='"
 		
 		if(!is_numeric(array_get($data,1))){
 			if(array_get($data,1)=='status' || array_get($data,1)=='remark'){
-				$budget->{array_get($data,1)} = $request->get('value');
-				
-				if(array_get($data,1)=='status' && $request->get('value')==1){
-					$weeks = date("W", mktime(0, 0, 0, 12, 28, $budget->year));
-					$updateData = [];
-					for($i=1;$i<=$weeks;$i++){
-						$data = explode('|',$request->get($i.'-week_line_data'));
-						if(count($data)!=7) continue;
-						
-						for($j=0;$j<=6;$j++){
-							$max_value=0;
-							$week_value = $data[$j];
-							if($j==0) $field = 'income';
-							if($j==1) $field = 'cost';
-							if($j==2) $field = 'common_fee';
-							if($j==3) $field = 'pick_fee';
-							if($j==4) $field = 'promotion_fee';
-							if($j==5) $field = 'amount_fee';
-							if($j==6) $field = 'storage_fee';
-							for($k=0;$k<=6;$k++){
-								$date = date("Y-m-d", strtotime($budget->year . 'W' . sprintf("%02d",$i))+86400*$k);
-								$value = round($week_value*array_get($week_per,$k),2);
-								if($max_value+$value>$week_value) $value = $week_value-$max_value;
-								if($max_value<=$week_value && $k==6) $value = $week_value-$max_value;
-								$max_value+=$value;
-
-								if($date>$undate){
-									$updateData[$date]['budget_id']=$budget_id;
-									$updateData[$date]['weeks']=$i;
-									$updateData[$date]['date']=$date;
-									$updateData[$date][$field]=$value;
-									$updateData[$date]['created_at']=$updateData[$date]['updated_at']=date('Y-m-d H:i:s');
-								}
-							}
-						}
-					}
-					if($updateData) Budgetdetails::insertOnDuplicateWithDeadlockCatching(array_values($updateData), ['income','cost', 'common_fee', 'pick_fee', 'promotion_fee', 'amount_fee', 'storage_fee','created_at','updated_at']);
-					$budget->qty = round($request->get('total_qty'));
-					$budget->income = round($request->get('total_income'),2);
-					$budget->cost = round($request->get('total_cost'),2);
-					$budget->common_fee = round($request->get('total_commonfee'),2);
-					$budget->pick_fee = round($request->get('total_pickfee'),2);
-					$budget->promotion_fee = round($request->get('total_profee'),2);
-					$budget->amount_fee = round($request->get('total_amountfee'),2);
-					$budget->storage_fee = round($request->get('total_storagefee'),2);
+				if(array_get($data,1)=='status' && $request->get('value')>0 && $budget->status==0){
+					$this->calBudget($budget);
 				}
+				$budget->{array_get($data,1)} = $request->get('value');
 				$budget->save();
 				echo $budget->status;
 				die();
@@ -664,6 +641,9 @@ right join budget_skus as c on b.sku=c.sku and b.site=c.site where ((a.month>='"
 				$field_rate = (array_get($data,1)=='exception' || array_get($data,1)=='common_fee')?0.01:1;
 				$budget->{'then_'.array_get($data,1)} = $request->get('value')*$field_rate;	
 				$budget->save();
+				Budgetskus::where('sku',$budget->sku)->where('site',$budget->site)->update([
+					array_get($data,1)=>$request->get('value')*$field_rate
+				]);
 				$return[$request->get('name')]=round($request->get('value'),4);
 				echo json_encode($return);
 				die();
@@ -831,7 +811,7 @@ right join budget_skus as c on b.sku=c.sku and b.site=c.site where ((a.month>='"
 			
 			$storage_fee = json_decode(json_encode(DB::table('storage_fee')->where('type','FBA')->where('site',$site_code)->where('size',$base_data['then_size'])->first()),true);
 			$tax_rate=DB::table('tax_rate')->where('site',$site_code)->whereIn('sku',array('OTHERSKU',$sku))->pluck('tax','sku');
-			$tax= round(((array_get($tax_rate,$sku)??array_get($tax_rate,'OTHERSKU'))??0),4);
+			$tax= round(((array_get($tax_rate,$sku)??array_get($tax_rate,'OTHERSKU'))??0)*0.4,4);
 			$shipfee = (array_get(getShipRate(),$site_code.'.'.$sku)??array_get(getShipRate(),$site_code.'.default'))??0;
 			$headshipfee = round($base_data['then_volume']/1000000*1.2*round($shipfee,4),2);
 			$cold_storagefee=round(array_get($storage_fee,'2_10_fee',0)*$base_data['then_volume']/1000000/4,4);
@@ -874,7 +854,7 @@ right join budget_skus as c on b.sku=c.sku and b.site=c.site where ((a.month>='"
 				$datas[$i]['week_line_cost']= round(($qty+$promote_qty)*$cost,2);
 				$datas[$i]['week_line_profit']= round($datas[$i]['week_line_income']-$datas[$i]['week_line_cost'],2);
 				$datas[$i]['week_line_commonfee']= ($exception==1)?0:($datas[$i]['week_line_income']*$common_fee+(0.2*$datas[$i]['week_line_income']/(1-$exception)*$common_fee*$exception));
-				$datas[$i]['week_line_pickfee']= $datas[$i]['week_line_qty']*$pick_fee;
+				$datas[$i]['week_line_pickfee']= $datas[$i]['week_line_qty']*$pick_fee*$rate;
 				$datas[$i]['week_line_fee']= round($datas[$i]['week_line_commonfee']+$datas[$i]['week_line_pickfee'],2);
 				$datas[$i]['week_line_profee']= round($datas[$i]['week_line_income']*$promotion,2);
 			}

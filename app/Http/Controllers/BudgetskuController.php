@@ -165,24 +165,27 @@ class BudgetskuController extends Controller
                 if($key>0) {
                     $sku = array_get($value,0);
                     $site = array_get($value,1);
-                    $data['description'] = array_get($value,2);
-                    $data['status'] = intval(array_get(array_flip(getSkuStatuses()),array_get($value,3)));
-                    $data['level'] = array_get($value,4);
-                    $data['stock'] = intval(array_get($value,5));
-                    $data['volume'] = round(array_get($value,6),4);
-					$data['size'] = intval(array_get(array_flip(getSkuSize()),array_get($value,7)));
-                    $data['cost'] = round(array_get($value,8),2);
-                    $tax = array_get($value,9);
-                    $data['pick_fee'] = round(array_get($value,10),2);
-                    $data['exception'] = round(array_get($value,11),4);
-                    $data['common_fee'] = round(array_get($value,12),4);
-                    $sap_seller_id = array_get($value,13);
-                    $planer_id = array_get($value,14);
-                    $data['sap_seller_id'] = intval(array_get($users,$sap_seller_id,0));
-			$data['planer_id'] = intval(array_get($planers,$planer_id,0));
-                    $data['bg'] = array_get($value,15);
-                    $data['bu'] = array_get($value,16);
 
+                    
+		    $data['description'] = array_get($value,2);
+                    $data['status'] = intval(array_get(array_flip(getSkuStatuses()),array_get($value,3),0));
+                    $data['level'] = array_get($value,4,'S');
+                    $data['stock'] = intval(array_get($value,5,0));
+                    $data['volume'] = round(array_get($value,6,0),4);
+					$data['size'] = intval(array_get(array_flip(getSkuSize()),array_get($value,7,0)));
+                    $data['cost'] = round(array_get($value,8,0),2);
+                    $tax = round(array_get($value,9,0),4);
+                    $data['pick_fee'] = round(array_get($value,10,0),2);
+                    $data['exception'] = round(array_get($value,11,0),4);
+                    $data['common_fee'] = round(array_get($value,12,0),4);
+                    
+			$sap_seller_id = array_get($value,13,'');
+                    $planer_id = array_get($value,14,'');
+                    $data['sap_seller_id'] = intval(isset($users[$sap_seller_id])?$users[$sap_seller_id]:0);
+			$data['planer_id'] = intval(isset($planers[$planer_id])?$planers[$planer_id]:0);
+                    
+			$data['bg'] = array_get($value,15);
+                    $data['bu'] = array_get($value,16);
                     $siteShort = getSiteShort();
                     TaxRate::updateOrCreate(
                         ['sku' => $sku,'site' => isset($siteShort[$site]) ? strtoupper($siteShort[$site]) : $site],
@@ -197,6 +200,7 @@ class BudgetskuController extends Controller
                             $data
                         );
                     }
+	
                 }	
             }
             DB::commit();

@@ -659,8 +659,9 @@ var FormEditable = function() {
 		var headshipfee = parseFloat($('#headshipfee').text());
 		var cold_storagefee = parseFloat($('#cold_storagefee').val());
 		var hot_storagefee = parseFloat($('#hot_storagefee').val());
-		var cost = parseFloat($('#'+budget_id+'-cost').text());
+		var cost = parseFloat($('#'+budget_id+'-cost').text()).toFixed(2);
 		cost = parseFloat(cost*(1+tax)+headshipfee).toFixed(2);
+		console.log(cost);
 		var avgStock=[];
 		//前4周销量仓储费用
 		for (let i = 1;i <= 4;i++){
