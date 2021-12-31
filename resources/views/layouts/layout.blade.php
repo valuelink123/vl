@@ -1171,6 +1171,48 @@
                                                     </a>
                                                 </li>
                                                 @endpermission
+
+                                                {{--                                                新增加的广告汇总--}}
+                                                <li class="dropdown-submenu">
+                                                    <a href="javascript:;" class="nav-link nav-toggle ">
+                                                        广告汇总
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                    <ul class="dropdown-menu">
+                                                        @permission('ccp-adMatchAsin-show')
+                                                        <li class="">
+                                                            <a href="/ccp/adMatchAsin" class="nav-link nav-toggle ">
+                                                                广告映射关系
+                                                                <span class="arrow"></span>
+                                                            </a>
+                                                        </li>
+                                                        @endpermission
+                                                        @permission('ccp-adTotalBg-show')
+                                                        <li class="">
+                                                            <a href="/ccp/adTotalBg" class="nav-link nav-toggle ">
+                                                                广告汇总(BG维度)
+                                                                <span class="arrow"></span>
+                                                            </a>
+                                                        </li>
+                                                        @endpermission
+                                                        @permission('ccp-adTotalBu-show')
+                                                        <li class="">
+                                                            <a href="/ccp/adTotalBu" class="nav-link nav-toggle ">
+                                                                广告汇总(BU维度)
+                                                                <span class="arrow"></span>
+                                                            </a>
+                                                        </li>
+                                                        @endpermission
+                                                        @permission('ccp-adTotalSeller-show')
+                                                        <li class="">
+                                                            <a href="/ccp/adTotalSeller" class="nav-link nav-toggle ">
+                                                                广告汇总(销售员维度)
+                                                                <span class="arrow"></span>
+                                                            </a>
+                                                        </li>
+                                                        @endpermission
+                                                    </ul>
+                                                </li>
 											</ul>
 										</li>
 

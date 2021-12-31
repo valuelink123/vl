@@ -675,3 +675,18 @@ Route::resource('budgetSku', 'BudgetskuController');
 Route::Post('/budgetSku/get', 'BudgetskuController@get');
 Route::Post('/budgetSku/upload', 'BudgetskuController@upload');
 Route::get('/budgetSkuExport', 'BudgetskuController@export');
+
+//广告汇总相关模块
+Route::get('/ccp/adMatchAsin', 'CcpAdMatchAsinController@index'); //广告映射关系
+Route::post('/ccp/adMatchAsin/list', 'CcpAdMatchAsinController@list');//广告映射关系的列表展示
+Route::post('/getCampaignBySiteAccount', 'Controller@getCampaignBySiteAccount')->name('getCampaignBySiteAccount');//通过选择的站点账号得到Campaign
+Route::match(['post','get'],'/ccp/adMatchAsin/add', 'CcpAdMatchAsinController@add'); //广告映射关系
+Route::post('/ccp/asinMatchSkuDataByAsin', 'Controller@asinMatchSkuDataByAsin');//通过asin得到匹配的asin相关数据
+Route::post('/ccp/adMatchAsin/delete', 'CcpAdMatchAsinController@delete');//删除数据
+//相关统计数据
+Route::get('/ccp/adTotalBg', 'CcpAdTotalController@adTotalBgIndex'); //广告汇总BG维度
+Route::post('/ccp/adTotalBg/list', 'CcpAdTotalController@adTotalBgList'); //广告汇总BG维度
+Route::get('/ccp/adTotalBu', 'CcpAdTotalController@adTotalBuIndex'); //广告汇总BU维度
+Route::post('/ccp/adTotalBu/list', 'CcpAdTotalController@adTotalBuList'); //广告汇总BU维度
+Route::get('/ccp/adTotalSeller', 'CcpAdTotalController@adTotalSellerIndex'); //广告汇总销售员维度
+Route::post('/ccp/adTotalSeller/list', 'CcpAdTotalController@adTotalSellerList'); //广告汇总销售员维度

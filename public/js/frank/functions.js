@@ -241,3 +241,61 @@ function getUrlFileName(url) {
     let file = ms ? ms[1] : url
     return file
 }
+
+function getAccountBySelectedSite(){
+    var marketplaceid = $('#site option:selected').val();
+    $.ajax({
+        type: 'post',
+        url: '/showAccountBySite',
+        data: {marketplaceid:marketplaceid,field:'mws_seller_id'},
+        dataType:'json',
+        success: function(res) {
+            if(res.status==1){
+                var html = '';
+                $.each(res.data,function(i,item) {
+                    html += '<option value="'+item.id+'">'+item.label+'</option>';
+                })
+                var str = '<span class="input-group-addon">Account</span>\n' +
+                    '\t\t\t\t\t\t\t<select class="mt-multiselect btn btn-default" id="account" multiple="multiple" name="account" >\n' +
+                    '\n' +html+
+                    '\t\t\t\t\t\t\t</select>';
+                $('#account-div').html(str);
+                $('#account').multiselect();
+                // ComponentsBootstrapMultiselect.init();//处理account的多选显示样式
+            }else{
+                alert('请先选择站点');
+            }
+        }
+    });
+}
+
+/*
+* 通过选择的站点账号得到Campaign,ajax联动
+ */
+function getCampaignBySelectedAccount(){
+    var marketplaceid = $('#site option:selected').val();
+    var selectedAccount = $('#account').val();
+    console.log(123);
+    $.ajax({
+        type: 'post',
+        url: '/getCampaignBySiteAccount',
+        data: {marketplaceid:marketplaceid,account:selectedAccount},
+        dataType:'json',
+        success: function(res) {
+            if(res.status==1){
+                var html = '';
+                $.each(res.data,function(i,item) {
+                    html += '<option value="'+item.campaign_id+'">'+item.name+'</option>';
+                })
+                var str = '<span class="input-group-addon">Campaign</span>\n' +
+                    '\t\t\t\t\t\t\t<select class="mt-multiselect btn btn-default" id="campaign" multiple="multiple" name="campaign" >\n' +
+                    '\n' +html+
+                    '\t\t\t\t\t\t\t</select>';
+                $('#campaign-div').html(str);
+                $('#campaign').multiselect();
+            }else{
+                alert('请先选择站点');
+            }
+        }
+    });
+}

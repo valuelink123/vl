@@ -577,5 +577,146 @@ ORDER BY asin_offer_summary.asin DESC ";
 		}
 		return $return;
 	}
+	/*
+	 * 通过选中的站点得到某个asin的销售员
+	 */
+	public function getAsinInfoBySite($site)
+	{
+		$asin_sql = "select * from sap_asin_match_sku where marketplace_id = '{$site}'";
+		$_asinData = DB::connection('vlz')->select($asin_sql);
+		foreach($_asinData as $key=>$val){
+			$asinData[$val->seller_id.'_'.$val->asin] = (array)$val;
+		}
+		return $asinData;
+	}
+	/*
+	 * 通过asin得到相对应的asin信息，例如sku，所属的销售员等等
+	 */
+	public function  asinMatchSkuDataByAsin()
+	{
+		$sap_seller = getUsers('sap_seller');
+		$sku = $sellers = array();
+		if ($_POST['marketplace_id'] && $_POST['seller_id'] && $_POST['seller_id']){
+			$asinMatchSkuData = DB::connection('amazon')->table('sap_asin_match_sku')->where('marketplace_id', $_POST['marketplace_id'])->where('seller_id', $_POST['seller_id'])->where('asin', $_POST['asin'])->get();
+			foreach ($asinMatchSkuData as $key => $val) {
+				$sku[$key] = $val->sku;
+				$sellers[$val->sap_seller_id] = isset($sap_seller[$val->sap_seller_id]) && $sap_seller[$val->sap_seller_id] ? $sap_seller[$val->sap_seller_id] : 'N/A';
+			}
+		}
+		return json_encode(array('sku'=>$sku,'sellers'=>$sellers));
+	}
+
+	/*
+	 * 得到物料对照关系表里的信息
+	 */
+	public function getSapAsinMatchSkuInfo($site='',$bg='',$bu='')
+	{
+		$asin_sql = "select marketplace_id,seller_id,asin,sap_seller_bg,sap_seller_bu,sap_seller_id,sku from sap_asin_match_sku where 1=1";
+		if($site){
+			$asin_sql .= " and marketplace_id='".$site."'";
+		}
+		if($bg){
+			$asin_sql .= " and sap_seller_bg='".$bg."'";
+		}
+		if($bu){
+			$asin_sql .= " and sap_seller_bu='".$bu."'";
+		}
+		$_asinData = DB::connection('vlz')->select($asin_sql);
+		foreach($_asinData as $key=>$val){
+			$asinData[$val->marketplace_id.'_'.$val->seller_id.'_'.$val->asin] = (array)$val;
+		}
+		return $asinData;
+	}
+
+	public function getBg($bg='')
+	{
+		if($bg){
+			$sql = "SELECT DISTINCT sap_seller_bg as bg FROM sap_asin_match_sku where sap_seller_bg='".$bg."' order By sap_seller_bg asc";
+		}else{
+			$sql = 'SELECT DISTINCT sap_seller_bg as bg FROM sap_asin_match_sku order By sap_seller_bg asc';
+		}
+		$bgs = DB::connection('vlz')->select($sql);
+		$bgs = json_decode(json_encode($bgs),true);
+		return $bgs;
+	}
+	public function getBu($bg='',$bu = '')
+	{
+		$sql  ="SELECT sap_seller_bg AS bg, sap_seller_bu as bu FROM sap_asin_match_sku where 1=1";
+		if($bg){
+			$sql .= " and sap_seller_bg='".$bg."'";
+		}
+		if($bu){
+			$sql .= " and sap_seller_bu='".$bu."'";
+		}
+		$sql .= " GROUP BY sap_seller_bg,sap_seller_bu order By sap_seller_bu asc";
+		$bus = DB::connection('vlz')->select($sql);
+		$bus = json_decode(json_encode($bus),true);
+		return $bus;
+	}
+
+	//得到搜索时间的sql,ccp相关模块
+	public function getCcpDateWhere($site,$timeType,$start_date,$end_date)
+	{
+//		$dateRange = $this->getDateRange();
+		$startDate = date('Y-m-d 00:00:00',strtotime($start_date));//开始时间
+		$endDate = date('Y-m-d 23:59:59',strtotime($end_date));//结束时间
+//		$startDate = $dateRange['startDate'];
+//		$endDate = $dateRange['endDate'];
+		$date_field = 'purchase_date';
+		$dateconfig = array('A1PA6795UKMFR9','A1RKKUPIHCS9HS','A13V1IB3VIYZZH','APJ6JRA9NG5V4');//utc+2:00
+		if($timeType==1){//选的是后台当地时间
+			if($site=='A1VC38T7YXB528'){//日本站点，date字段+9hour
+				$date_field = 'date_add(purchase_date,INTERVAL 9 hour) ';
+			}elseif($site=='A1F83G8C2ARO7P'){//英国站点+1小时，uTc+1:00
+				$date_field = 'date_add(purchase_date,INTERVAL 1 hour) ';
+			}elseif(in_array($site,$dateconfig)){//站点+2小时，utc+2:00
+				$date_field = 'date_add(purchase_date,INTERVAL 2 hour) ';
+			}else{//其他站点，date字段-7hour
+				$date_field = 'date_sub(purchase_date,INTERVAL 7 hour) ';
+			}
+		}else{//北京时间加上8小时
+			$date_field = 'date_add(purchase_date,INTERVAL 8 hour) ';
+		}
+		$where = " and {$date_field} BETWEEN STR_TO_DATE( '".$startDate."', '%Y-%m-%d %H:%i:%s' ) AND STR_TO_DATE('".$endDate."', '%Y-%m-%d %H:%i:%s' )";
+		return $where;
+	}
+
+	//得到用户的权限数据查询语句，根据sap_asin_match_sku去查数据
+	public function getUserAsin($site,$bg,$bu)
+	{
+		$ccpAdmin = array("zhangjianqun@valuelinkcorp.com","sunhanshan@valuelinkcorp.com","lixiaojian@valuelinkltd.com","wulanfang@valuelinkcorp.com","chenguancan@valuelinkcorp.com");
+		$userdata = Auth::user();
+		$userWhere = " where marketplace_id  = '".$site."'";
+		if (!in_array($userdata->email, $ccpAdmin)) {
+			if ($userdata->seller_rules) {
+				//bg总监或者bu经理
+				$rules = explode("-", $userdata->seller_rules);
+				if (array_get($rules, 0) != '*') $userWhere .= " and sap_seller_bg = '" . array_get($rules, 0) . "'";
+				if (array_get($rules, 1) != '*') $userWhere .= " and sap_seller_bu = '" . array_get($rules, 1) . "'";
+			} elseif ($userdata->sap_seller_id) {//普通销售员
+				$userWhere .= " and sap_seller_id = " . $userdata->sap_seller_id;
+			}
+		}
+
+		if($bg){
+			$userWhere .= " and sap_seller_bg = '".$bg."'";
+		}
+		if($bu){
+			$userWhere .= " and sap_seller_bu = '".$bu."'";
+		}
+		$sql = " select DISTINCT sap_asin_match_sku.asin from sap_asin_match_sku  {$userWhere}";
+		$_asin = DB::connection('vlz')->select($sql);
+		$asin = array();
+		foreach($_asin as $key=>$val){
+			if(strlen($val->asin)==10){
+				$asin[] = $val->asin;
+			}
+
+		}
+		return $asin;
+	}
+
+
+
 
 }
