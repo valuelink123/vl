@@ -121,7 +121,12 @@ class CcpAdTotalController extends Controller
 		$userdata = Auth::user();
 		$rules = explode("-", $userdata->seller_rules);
 		$bg = '';
-		if (array_get($rules, 0) != '*'){$bg = array_get($rules, 0);}
+		$ccpAdmin = $this->getccpAdmin();
+		if (!in_array($userdata->email, $ccpAdmin)) {
+			if (array_get($rules, 0) != '*') {
+				$bg = array_get($rules, 0);
+			}
+		}
 		$bgs = $this->getBg($bg);
 		return view('ccp/ad_total_bu',['start_date'=>$start_date,'end_date'=>$end_date,'site'=>$site,'bgs'=>$bgs]);
 	}
@@ -212,8 +217,15 @@ class CcpAdTotalController extends Controller
 		$userdata = Auth::user();
 		$rules = explode("-", $userdata->seller_rules);
 		$bg = $bu = '';
-		if (array_get($rules, 0) != '*'){$bg = array_get($rules, 0);}
-		if (array_get($rules, 1) != '*'){$bu = array_get($rules, 1);}
+		$ccpAdmin = $this->getccpAdmin();
+		if (!in_array($userdata->email, $ccpAdmin)) {
+			if (array_get($rules, 0) != '*') {
+				$bg = array_get($rules, 0);
+			}
+			if (array_get($rules, 1) != '*') {
+				$bu = array_get($rules, 1);
+			}
+		}
 		$bgs = $this->getBg($bg);
 		$_bus = $this->getBu($bg,$bu);
 		$bus = array();

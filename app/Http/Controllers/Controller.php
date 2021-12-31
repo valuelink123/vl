@@ -684,7 +684,7 @@ ORDER BY asin_offer_summary.asin DESC ";
 	//得到用户的权限数据查询语句，根据sap_asin_match_sku去查数据
 	public function getUserAsin($site,$bg,$bu)
 	{
-		$ccpAdmin = array("zhangjianqun@valuelinkcorp.com","sunhanshan@valuelinkcorp.com","lixiaojian@valuelinkltd.com","wulanfang@valuelinkcorp.com","chenguancan@valuelinkcorp.com");
+		$ccpAdmin = $this->getccpAdmin();
 		$userdata = Auth::user();
 		$userWhere = " where marketplace_id  = '".$site."'";
 		if (!in_array($userdata->email, $ccpAdmin)) {
@@ -714,6 +714,12 @@ ORDER BY asin_offer_summary.asin DESC ";
 
 		}
 		return $asin;
+	}
+
+	public function getccpAdmin()
+	{
+		$ccpAdmin = array("zhangjianqun@valuelinkcorp.com","sunhanshan@valuelinkcorp.com","lixiaojian@valuelinkltd.com","wulanfang@valuelinkcorp.com","chenguancan@valuelinkcorp.com");
+		return $ccpAdmin;
 	}
 
 
