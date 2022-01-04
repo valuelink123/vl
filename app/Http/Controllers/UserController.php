@@ -856,6 +856,45 @@ class UserController extends Controller
 				
 				$arrayData=[];
 			}
+
+			//新增加的查每日库存
+			if(array_get($_REQUEST,'ExportType')=='InventoryDaily'){
+				if(!Auth::user()->can(['data-statistics-inventoryDaily'])) die('Permission denied -- data-statistics-inventoryDaily');
+				$sql = "SELECT report.snapshot_date,report.seller_sku,accounts.mws_seller_id,accounts.mws_marketplaceid,accounts.label AS shop_name,accounts.`primary`,case when accounts.deleted_at IS NULL then '正常店铺' ELSE '异常店铺' END AS shop_status,sap_asin_match_sku.sku as item_no 
+						FROM fba_daily_inventory_history_report AS report
+						LEFT JOIN seller_accounts as accounts ON (report.seller_account_id= accounts.id) 
+						LEFT JOIN sap_asin_match_sku on sap_asin_match_sku.marketplace_id = accounts.mws_marketplaceid and sap_asin_match_sku.seller_id = accounts.mws_seller_id and sap_asin_match_sku.seller_sku = report.seller_sku
+						WHERE report.snapshot_date='".$date_to."'";
+				$data = DB::connection('amazon')->select($sql);
+				$data=json_decode(json_encode($data), true);
+				$arrayData[] = ['snapshot_date','seller_sku','item_no','mws_seller_id','mws_marketplaceid','shop_name','shop_status'];
+				foreach($data as $key=>$val){
+					$arrayData[] = [
+						array_get($val,'snapshot_date'),
+						array_get($val,'seller_sku'),
+						array_get($val,'item_no'),
+						array_get($val,'mws_seller_id'),
+						array_get($val,'mws_marketplaceid'),
+						array_get($val,'shop_name'),
+						array_get($val,'shop_status')
+					];
+				}
+
+				$spreadsheet = new Spreadsheet();
+				$spreadsheet->getActiveSheet()
+					->fromArray(
+						$arrayData,  // The data to set
+						NULL,        // Array values with this value will not be set
+						'A1'         // Top left coordinate of the worksheet range where
+					//    we want to set these values (default is A1)
+					);
+				header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');//告诉浏览器输出07Excel文件
+				header('Content-Disposition: attachment;filename="Export_'.array_get($_REQUEST,'ExportType').'.xlsx"');//告诉浏览器输出浏览器名称
+				header('Cache-Control: max-age=0');//禁止缓存
+				$writer = new Xlsx($spreadsheet);
+				$writer->save('php://output');
+				$arrayData=[];
+			}
 			
 			
 		

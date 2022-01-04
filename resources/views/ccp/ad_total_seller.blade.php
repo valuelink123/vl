@@ -1,6 +1,6 @@
 @extends('layouts.layout')
 @section('crumb')
-    @include('layouts.crumb', ['crumbs'=>['ccp adTotalBu dashboard']])
+    @include('layouts.crumb', ['crumbs'=>['ccp adTotalSeller dashboard']])
 @endsection
 @section('content')
     @include('frank.common')
