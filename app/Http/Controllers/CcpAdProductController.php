@@ -79,6 +79,7 @@ class CcpAdProductController extends Controller
 			$where = $this->getPpcDateWhere();
 			$account_data = $this->getPpcAccountByMarketplace($site);
 			$account_id = array_keys($account_data);
+			$where .= " and ppc_profiles.marketplace_id='".$site."' ";
 			$where .= " and ppc_profiles.account_id in(".implode(",",$account_id).")";
 			if($account){
 				$account_str = implode("','", explode(',',$account));
@@ -135,6 +136,7 @@ class CcpAdProductController extends Controller
 			$where = $this->getPpcDateWhere();
 			$account_data = $this->getPpcAccountByMarketplace($site);
 			$account_id = array_keys($account_data);
+			$where .= " and ppc_profiles.marketplace_id='".$site."' ";
 			$where .= " and ppc_profiles.account_id in(".implode(",",$account_id).")";
 			if($account){
 				$account_str = implode("','", explode(',',$account));
@@ -175,7 +177,6 @@ class CcpAdProductController extends Controller
 			{$where} 
 			GROUP BY products.asin 
 			 order by sales desc {$limit}";
-
 
 			$_data = DB::select($sql);
 			$recordsTotal = $recordsFiltered = DB::select('SELECT FOUND_ROWS() as total');

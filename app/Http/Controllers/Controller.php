@@ -704,12 +704,12 @@ ORDER BY asin_offer_summary.asin DESC ";
 		if($bu){
 			$userWhere .= " and sap_seller_bu = '".$bu."'";
 		}
-		$sql = " select DISTINCT sap_asin_match_sku.asin from sap_asin_match_sku  {$userWhere}";
+		$sql = " select DISTINCT sap_asin_match_sku.asin as asin,CONCAT(sap_asin_match_sku.asin,'_',sap_asin_match_sku.seller_sku) as asin_sku from sap_asin_match_sku  {$userWhere}";
 		$_asin = DB::connection('vlz')->select($sql);
 		$asin = array();
 		foreach($_asin as $key=>$val){
 			if(strlen($val->asin)==10){
-				$asin[] = $val->asin;
+				$asin[] = $val->asin_sku;
 			}
 
 		}

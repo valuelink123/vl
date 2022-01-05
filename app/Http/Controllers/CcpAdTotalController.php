@@ -341,7 +341,7 @@ class CcpAdTotalController extends Controller
 	{
 		$userAsins = $this->getUserAsin($site,$bg,$bu);
 		$userAsins_str = implode("','",$userAsins);
-		$sql="select SQL_CALC_FOUND_ROWS union_table.marketplace_id,union_table.seller_id,union_table.asin,sum(union_table.cost) as ad_cost,sum(union_table.attributed_sales1d) as ad_sales from (SELECT data.`date`,data.impressions,data.clicks,data.cost,data.attributed_sales1d,data.attributed_units_ordered1d,ads.asin,profile.seller_id,profile.marketplace_id,profile.account_name
+		$sql="select SQL_CALC_FOUND_ROWS union_table.marketplace_id,union_table.seller_id,union_table.asin,sum(union_table.cost) as ad_cost,sum(union_table.attributed_sales1d) as ad_sales from (SELECT data.`date`,data.impressions,data.clicks,data.cost,data.attributed_sales1d,data.attributed_units_ordered1d,ads.asin,ads.sku,profile.seller_id,profile.marketplace_id,profile.account_name
 FROM ppc_report_datas as data
 LEFT JOIN ppc_profiles as profile ON (data.profile_id=profile.profile_id)
 LEFT JOIN ppc_sproducts_ads as ads ON (ads.ad_id=data.record_type_id )
@@ -349,7 +349,7 @@ WHERE data.date BETWEEN '".$start_date."' AND '".$end_date."'
 AND data.ad_type='SProducts' AND data.record_type='ad' 
 AND profile.marketplace_id='".$site."' 
 UNION ALL 
-SELECT data.`date`,data.impressions,data.clicks,data.cost,data.attributed_sales1d,data.attributed_units_ordered1d,ads.asin,profile.seller_id,profile.marketplace_id,profile.account_name
+SELECT data.`date`,data.impressions,data.clicks,data.cost,data.attributed_sales1d,data.attributed_units_ordered1d,ads.asin,ads.sku,profile.seller_id,profile.marketplace_id,profile.account_name
 FROM ppc_report_datas as data
 LEFT JOIN ppc_profiles as profile ON (data.profile_id=profile.profile_id)
 LEFT JOIN ppc_sdisplay_ads as ads ON (ads.ad_id=data.record_type_id )
@@ -357,8 +357,9 @@ WHERE data.date BETWEEN '".$start_date."' AND '".$end_date."'
 AND data.ad_type='SDisplay' AND data.record_type='ad' 
 AND profile.marketplace_id='".$site."' 
     ) as union_table 
-    where union_table.asin in('".$userAsins_str."') 
+    where CONCAT(union_table.asin,'_',union_table.sku)  in('".$userAsins_str."') 
     group by union_table.marketplace_id,union_table.seller_id,union_table.asin";
+//		echo $sql;exit;
 		$_data = DB::select($sql);
 		$_data = json_decode(json_encode($_data),true);
 		return $_data;

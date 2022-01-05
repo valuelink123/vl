@@ -74,6 +74,7 @@ class CcpAdTargetController extends Controller
 		$account_id = array_keys($account_data);
 		//时间搜索范围
 		$where = $this->getPpcDateWhere();
+		$where .= " and ppc_profiles.marketplace_id='".$site."' ";
 		$where .= " and ppc_profiles.account_id in(".implode(",",$account_id).")";
 		if($account){
 			$account_str = implode("','", explode(',',$account));
@@ -127,6 +128,7 @@ class CcpAdTargetController extends Controller
 		$account_id = array_keys($account_data);
 		//时间搜索范围
 		$where = $this->getPpcDateWhere();
+		$where .= " and ppc_profiles.marketplace_id='".$site."' ";
 		$where .= " and ppc_profiles.account_id in(".implode(",",$account_id).")";
 		if($account){
 			$account_str = implode("','", explode(',',$account));

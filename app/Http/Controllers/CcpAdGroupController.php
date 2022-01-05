@@ -70,6 +70,7 @@ class CcpAdGroupController extends Controller
 		$where = $this->getPpcDateWhere();
 		$account_data = $this->getPpcAccountByMarketplace($site);
 		$account_id = array_keys($account_data);
+		$where .= " and ppc_profiles.marketplace_id='".$site."' ";
 		$where .= " and ppc_profiles.account_id in(".implode(",",$account_id).")";
 		if($account){
 			$account_str = implode("','", explode(',',$account));
@@ -117,6 +118,7 @@ class CcpAdGroupController extends Controller
 		$where = $this->getPpcDateWhere();
 		$account_data = $this->getPpcAccountByMarketplace($site);
 		$account_id = array_keys($account_data);
+		$where .= " and ppc_profiles.marketplace_id='".$site."' ";
 		$where .= " and ppc_profiles.account_id in(".implode(",",$account_id).")";
 		if($account){
 			$account_str = implode("','", explode(',',$account));
