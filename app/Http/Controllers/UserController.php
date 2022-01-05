@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\FbaDailyInventoryHistoryReport;
 use App\Sendbox;
 use Illuminate\Http\Request;
 use App\Accounts;
@@ -860,14 +861,15 @@ class UserController extends Controller
 			//新增加的查每日库存
 			if(array_get($_REQUEST,'ExportType')=='InventoryDaily'){
 				if(!Auth::user()->can(['data-statistics-inventoryDaily'])) die('Permission denied -- data-statistics-inventoryDaily');
-				$sql = "SELECT report.snapshot_date,report.seller_sku,accounts.mws_seller_id,accounts.mws_marketplaceid,accounts.label AS shop_name,accounts.`primary`,case when accounts.deleted_at IS NULL then '正常店铺' ELSE '异常店铺' END AS shop_status,sap_asin_match_sku.sku as item_no 
+				$sql = "SELECT report.snapshot_date,report.seller_sku,accounts.mws_seller_id,accounts.mws_marketplaceid,any_value(accounts.label) AS shop_name,case when any_value(accounts.deleted_at) IS NULL then '正常店铺' ELSE '异常店铺' END AS shop_status,any_value(sap_asin_match_sku.sku) as item_no,sum(report.quantity) AS quantity,report.disposition 
 						FROM fba_daily_inventory_history_report AS report
 						LEFT JOIN seller_accounts as accounts ON (report.seller_account_id= accounts.id) 
 						LEFT JOIN sap_asin_match_sku on sap_asin_match_sku.marketplace_id = accounts.mws_marketplaceid and sap_asin_match_sku.seller_id = accounts.mws_seller_id and sap_asin_match_sku.seller_sku = report.seller_sku
-						WHERE report.snapshot_date='".$date_to."'";
+						WHERE report.snapshot_date='".$date_to."' 
+						GROUP BY accounts.mws_seller_id,accounts.mws_marketplaceid,report.seller_sku,report.disposition,report.snapshot_date";
 				$data = DB::connection('amazon')->select($sql);
 				$data=json_decode(json_encode($data), true);
-				$arrayData[] = ['snapshot_date','seller_sku','item_no','mws_seller_id','mws_marketplaceid','shop_name','shop_status'];
+				$arrayData[] = ['snapshot_date','seller_sku','item_no','mws_seller_id','mws_marketplaceid','shop_name','shop_status','disposition','quantity'];
 				foreach($data as $key=>$val){
 					$arrayData[] = [
 						array_get($val,'snapshot_date'),
@@ -876,7 +878,9 @@ class UserController extends Controller
 						array_get($val,'mws_seller_id'),
 						array_get($val,'mws_marketplaceid'),
 						array_get($val,'shop_name'),
-						array_get($val,'shop_status')
+						array_get($val,'shop_status'),
+						array_get(FbaDailyInventoryHistoryReport::DISPOSITION,array_get($val,'disposition')),
+						array_get($val,'quantity'),
 					];
 				}
 
