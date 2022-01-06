@@ -682,7 +682,7 @@ ORDER BY asin_offer_summary.asin DESC ";
 	}
 
 	//得到用户的权限数据查询语句，根据sap_asin_match_sku去查数据
-	public function getUserAsin($site,$bg,$bu)
+	public function getUserAsin($site,$bg,$bu,$field='asin_sku')
 	{
 		$ccpAdmin = $this->getccpAdmin();
 		$userdata = Auth::user();
@@ -709,7 +709,7 @@ ORDER BY asin_offer_summary.asin DESC ";
 		$asin = array();
 		foreach($_asin as $key=>$val){
 			if(strlen($val->asin)==10){
-				$asin[] = $val->asin_sku;
+				$asin[] = $val->$field;
 			}
 
 		}

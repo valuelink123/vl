@@ -370,7 +370,7 @@ AND profile.marketplace_id='".$site."'
 	 */
 	public function getCcpData($site,$start_date,$end_date,$bg='',$bu='')
 	{
-		$userAsins = $this->getUserAsin($site,$bg,$bu);
+		$userAsins = $this->getUserAsin($site,$bg,$bu,'asin');
 		$userAsins_str = implode("','",$userAsins);
 		$orderwhere = $where = $this->getCcpDateWhere($site,1,$start_date,$end_date);
 		$domain = substr(getDomainBySite($site), 4);//orders.sales_channel
