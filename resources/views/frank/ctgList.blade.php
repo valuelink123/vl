@@ -255,6 +255,7 @@ th,td,td>span {
 <input type="hidden" id="hidden_review_id" value="" />
 <input type="hidden" id="hidden_channel" value="" />
 <input type="hidden" id="hidden_crmType" value="" />
+<input type="hidden" id="hidden_value" value="" />
 
     <script>
 
@@ -296,6 +297,7 @@ th,td,td>span {
             $('#hidden_review_id').val($('#review_id').val());
             $('#hidden_channel').val($('#channel').val());
             $('#hidden_crmType').val($('#crmType').val());
+			$('#hidden_value').val($('input[type="search"]').val());
         });
 
         function jointStringToArray(jointString){
@@ -497,7 +499,6 @@ th,td,td>span {
         // });
 
         $('#exportType').change(function(){
-
             $exportTypeValue = $(this).val();
             if ($exportTypeValue == 0) {
                 return false;
@@ -530,6 +531,8 @@ th,td,td>span {
                 type: 'POST',
                 url: "/ctg/export",
                 data:{search: {
+					value: $('#hidden_value').val(),
+					regex: false,
                     daterange: {
                         from: $('#hidden_date_from').val(),
                         to: $('#hidden_date_to').val()
