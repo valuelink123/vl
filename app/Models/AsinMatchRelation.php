@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class AsinMatchRelation extends Model
 {
 	use  ExtendedMysqlQueries;
+	protected $connection = 'amazon';
 	protected $table = 'asin_match_relation';
 
 	//得到物料对照关系的所有数据

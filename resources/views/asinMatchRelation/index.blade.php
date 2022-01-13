@@ -55,8 +55,8 @@
 					</div>
 					<div class="col-md-2">
 						<div class="input-group">
-							<span class="input-group-addon">Item No</span>
-							<input class="form-control" value="" id="item_no" placeholder="Item No" name="item_no"/>
+							<span class="input-group-addon">SKU</span>
+							<input class="form-control" value="" id="sku" placeholder="SKU" name="sku"/>
 						</div>
 					</div>
 					<div class="col-md-1">
@@ -125,10 +125,10 @@
                 {data: 'seller_name',name:'seller_name'},
 				{data: 'asin',name:'asin'},
 				{data: 'seller_sku',name:'seller_sku'},
-				{data: 'item_no',name:'item_no'},
+				{data: 'sku',name:'sku'},
 				{data: 'user_name',name:'user_name'},
 				{data: 'source',name:'source'},
-				{data: 'warehouse',name:'warehouse'},
+				{data: 'sap_warehouse_code',name:'sap_warehouse_code'},
 				{data: 'created_at',name:'created_at'},
                 {data: 'updated_at',name:'updated_at'},
                 {data: 'action',name:'action'},

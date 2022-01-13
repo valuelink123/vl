@@ -53,6 +53,7 @@ class CcpAdTotalController extends Controller
 		$_sales = $this->getCcpData($site,$start_date,$end_date);
 		$bgs = $this->getBg();
 		$asinData = $this->getSapAsinMatchSkuInfo();
+
 		$data = array();
 		//各个bg的参数先赋值
 		foreach($bgs as $bgk=>$bgv){
@@ -254,7 +255,7 @@ class CcpAdTotalController extends Controller
 //		$start_date = $end_date = '2021-01-19';//测试时间
 		$_sales = $this->getCcpData($site,$start_date,$end_date,$bg,$bu);
 		$bus = $this->getBu($bg);
-		$asinData = $this->getSapAsinMatchSkuInfo();
+		$asinData = $this->getSapAsinMatchSkuInfo($site,$bg,$bu);
 		$data = array();
 		//各个bg的参数先赋值
 		$sellerData = getUsers('sap_seller');

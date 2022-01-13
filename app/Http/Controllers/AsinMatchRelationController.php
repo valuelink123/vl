@@ -43,12 +43,12 @@ class AsinMatchRelationController extends Controller
 		$asin= isset($search['asin']) ? urldecode($search['asin']) : '';
 		$seller_sku= isset($search['seller_sku']) ? urldecode($search['seller_sku']) : '';
 		$marketplace_id= isset($search['site']) ? urldecode($search['site']) : '';
-		$item_no= isset($search['item_no']) ? urldecode($search['item_no']) : '';
+		$sku= isset($search['sku']) ? urldecode($search['sku']) : '';
 		$account= isset($search['account']) ? urldecode($search['account']) : '';
 		$source= isset($search['source']) ? urldecode($search['source']) : '';
 
 		if($source=='VOP'){
-			$query = DB::table('asin_match_relation');
+			$query = DB::connection('amazon')->table('asin_match_relation');
 		}else{
 			$query = DB::connection('amazon')->table('sap_asin_match_sku');
 		}
@@ -59,13 +59,8 @@ class AsinMatchRelationController extends Controller
 		if($seller_sku){
 			$query = $query->where('seller_sku',$seller_sku);
 		}
-		if($item_no){
-			if($source=='VOP'){
-				$query = $query->where('item_no',$item_no);
-			}else{
-				$query = $query->where('sku',$item_no);
-			}
-
+		if($sku){
+			$query = $query->where('sku',$sku);
 		}
 		$query = $query->where('marketplace_id',$marketplace_id);
 		if($account){
@@ -91,6 +86,8 @@ class AsinMatchRelationController extends Controller
 			$data[$key]['site'] = isset($siteDomain[$val['marketplace_id']]) ? $siteDomain[$val['marketplace_id']] : $val['marketplace_id'];
 			$data[$key]['user_name'] = isset($seller_user[$val['sap_seller_id']]) ? $seller_user[$val['sap_seller_id']] : $val['sap_seller_id'];
 			$data[$key]['source'] = $source;
+			$data[$key]['sku'] = $val['sku'];
+			$data[$key]['sap_warehouse_code'] = $val['sap_warehouse_code'];
 
 			if($source=='VOP'){
 				$action = '';
@@ -105,11 +102,9 @@ class AsinMatchRelationController extends Controller
 				}
 				$data[$key]['action'] = $action;
 			}else{
-				//SAP相关数据处理，seller_name，item_no，warehouse，created_at
+				//SAP相关数据处理，seller_name，created_at
 				$data[$key]['action'] = '-';
 				$data[$key]['seller_name'] = isset($sellerIdName[$val['seller_id']]) ? $sellerIdName[$val['seller_id']] : $val['seller_id'];
-				$data[$key]['item_no'] = $val['sku'];
-				$data[$key]['warehouse'] = $val['sap_warehouse_code'];
 				$data[$key]['created_at'] = $val['updated_at'];
 
 			}
@@ -130,13 +125,17 @@ class AsinMatchRelationController extends Controller
 			return view('asinMatchRelation/add',['site'=>$site,'source'=>$source,'seller_user'=>$seller_user]);
 		}elseif ($request->isMethod('post')){
 			$insertData = array();
-			$configField = array('marketplace_id','seller_id','asin','seller_sku','item_no','sap_seller_id','source','warehouse','seller_name');
+			$configField = array('marketplace_id','seller_id','asin','seller_sku','sku','sap_seller_id','source','sap_warehouse_code','seller_name');
 			foreach($configField as $field){
-				if(isset($_POST[$field]) && $_POST[$field]){
-					$insertData[$field] = $_POST[$field];
-				}
+				$insertData[$field] = isset($_POST[$field]) && $_POST[$field] ? $_POST[$field] : '';
 			}
 			if($insertData){
+				//通过sap_seller_id得到sap_seller_bg,sap_seller_bu
+				$bgbu = DB::table('users')->where('sap_seller_id',$insertData['sap_seller_id'])->first();
+				if($bgbu){
+					$insertData['sap_seller_bg'] = $bgbu->ubg;
+					$insertData['sap_seller_bu'] = $bgbu->ubu;
+				}
 				$res = Model::insert($insertData);//数据插入表中
 				if(empty($res)){
 					$request->session()->flash('error_message','Add Failed');
@@ -170,11 +169,15 @@ class AsinMatchRelationController extends Controller
 			$id = isset($_POST['id']) && $_POST['id'] ? $_POST['id'] : '';
 
 			$update = array();
-			$configField = array('marketplace_id','seller_id','asin','seller_sku','item_no','sap_seller_id','source','warehouse','seller_name');
+			$configField = array('marketplace_id','seller_id','asin','seller_sku','sku','sap_seller_id','source','sap_warehouse_code','seller_name');
 			foreach($configField as $field){
-				if(isset($_POST[$field]) && $_POST[$field]){
-					$update[$field] = $_POST[$field];
-				}
+				$update[$field] = isset($_POST[$field]) && $_POST[$field] ? $_POST[$field] : '';
+			}
+			//通过sap_seller_id得到sap_seller_bg,sap_seller_bu
+			$bgbu = DB::table('users')->where('sap_seller_id',$update['sap_seller_id'])->first();
+			if($bgbu){
+				$insertData['sap_seller_bg'] = $bgbu->ubg;
+				$insertData['sap_seller_bu'] = $bgbu->ubu;
 			}
 			$res = Model::where('id',$id)->update($update);
 			if($res){

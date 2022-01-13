@@ -611,16 +611,19 @@ ORDER BY asin_offer_summary.asin DESC ";
 	 */
 	public function getSapAsinMatchSkuInfo($site='',$bg='',$bu='')
 	{
-		$asin_sql = "select marketplace_id,seller_id,asin,sap_seller_bg,sap_seller_bu,sap_seller_id,sku from sap_asin_match_sku where 1=1";
+		$userWhere = ' where 1=1 ';
 		if($site){
-			$asin_sql .= " and marketplace_id='".$site."'";
+			$userWhere .= " and marketplace_id='".$site."'";
 		}
 		if($bg){
-			$asin_sql .= " and sap_seller_bg='".$bg."'";
+			$userWhere .= " and sap_seller_bg='".$bg."'";
 		}
 		if($bu){
-			$asin_sql .= " and sap_seller_bu='".$bu."'";
+			$userWhere .= " and sap_seller_bu='".$bu."'";
 		}
+		$asin_sql = "select marketplace_id,seller_id,asin,sap_seller_bg,sap_seller_bu,sap_seller_id,sku from sap_asin_match_sku {$userWhere}
+					UNION ALL 
+					select marketplace_id,seller_id,asin,sap_seller_bg,sap_seller_bu,sap_seller_id,sku from asin_match_relation {$userWhere}";
 		$_asinData = DB::connection('vlz')->select($asin_sql);
 		foreach($_asinData as $key=>$val){
 			$asinData[$val->marketplace_id.'_'.$val->seller_id.'_'.$val->asin] = (array)$val;
@@ -704,7 +707,9 @@ ORDER BY asin_offer_summary.asin DESC ";
 		if($bu){
 			$userWhere .= " and sap_seller_bu = '".$bu."'";
 		}
-		$sql = " select DISTINCT sap_asin_match_sku.asin as asin,CONCAT(sap_asin_match_sku.asin,'_',sap_asin_match_sku.seller_sku) as asin_sku from sap_asin_match_sku  {$userWhere}";
+		$sql = "select DISTINCT sap_asin_match_sku.asin as asin,CONCAT(sap_asin_match_sku.asin,'_',sap_asin_match_sku.seller_sku) as asin_sku from sap_asin_match_sku {$userWhere}
+					UNION ALL 
+					select DISTINCT asin_match_relation.asin as asin,CONCAT(asin_match_relation.asin,'_',asin_match_relation.seller_sku) as asin_sku from asin_match_relation {$userWhere}";
 		$_asin = DB::connection('vlz')->select($sql);
 		$asin = array();
 		foreach($_asin as $key=>$val){

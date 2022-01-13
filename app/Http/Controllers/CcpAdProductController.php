@@ -247,7 +247,9 @@ class CcpAdProductController extends Controller
                 if($bu){
                         $userWhere .= " and sap_seller_bu = '".$bu."'";
                 }
-                $sql_user = " select DISTINCT CONCAT(sap_asin_match_sku.asin,'_',sap_asin_match_sku.seller_sku) as asin_sku  from sap_asin_match_sku {$userWhere}";
+				$sql_user = "select DISTINCT CONCAT(sap_asin_match_sku.asin,'_',sap_asin_match_sku.seller_sku) as asin_sku from sap_asin_match_sku {$userWhere}
+					UNION ALL 
+					select DISTINCT CONCAT(asin_match_relation.asin,'_',asin_match_relation.seller_sku) as asin_sku from asin_match_relation {$userWhere}";
                 $_data = DB::connection('vlz')->select($sql_user);
                 $data = array();
                 foreach($_data as $key=>$val){
