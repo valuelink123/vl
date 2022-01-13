@@ -178,7 +178,12 @@ class CalDailySales extends Command
                         ->where('seller_id',array_get($sellerAccounts,$sellerAccountId))
                         ->where('seller_sku',$sellerSku)
                         ->whereRaw("marketplace_id = '".$marketplaceId."' ".(($v['asin'])?" and asin='".$v['asin']."'":""))
-                        ->first();  
+                        ->first();
+					$matchSkuRelation = DB::connection('amazon')->table('asin_match_relation')
+						->where('seller_id',array_get($sellerAccounts,$sellerAccountId))
+						->where('seller_sku',$sellerSku)
+						->whereRaw("marketplace_id = '".$marketplaceId."' ".(($v['asin'])?" and asin='".$v['asin']."'":""))
+						->first();
 
                     if(!empty($matchSku)){
                         $v['asin'] = $v['asin']??$matchSku->asin;
@@ -187,7 +192,16 @@ class CalDailySales extends Command
                         $v['sap_seller_id'] = $matchSku->sap_seller_id;
                         $v['sap_seller_bg'] = $matchSku->sap_seller_bg;
                         $v['sap_seller_bu'] = $matchSku->sap_seller_bu;
-                    }
+                    }else{
+						if(!empty($matchSkuRelation)){
+							$v['asin'] = $v['asin']??$matchSkuRelation->asin;
+							$v['sku'] = $matchSkuRelation->sku;
+							$v['sku_status'] = $matchSkuRelation->sku_status;
+							$v['sap_seller_id'] = $matchSkuRelation->sap_seller_id;
+							$v['sap_seller_bg'] = $matchSkuRelation->sap_seller_bg;
+							$v['sap_seller_bu'] = $matchSkuRelation->sap_seller_bu;
+						}
+					}
 
                     if(!isset($v['asin'])) $v['asin']=NULL;
                     if(!isset($v['sku'])) $v['sku']=NULL;
