@@ -330,7 +330,9 @@ class CcpController extends Controller
 		if($bu){
 			$userWhere .= " and sap_seller_bu = '".$bu."'";
 		}
-		$userWhere = " select DISTINCT sap_asin_match_sku.asin from sap_asin_match_sku  {$userWhere}";
+		$userWhere = "select DISTINCT sap_asin_match_sku.asin from sap_asin_match_sku {$userWhere}
+					UNION ALL 
+					select DISTINCT asin_match_relation.asin from asin_match_relation {$userWhere}";
 		return $userWhere;
 	}
 }

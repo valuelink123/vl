@@ -298,7 +298,6 @@ th,td,td>span {
             $('#hidden_channel').val($('#channel').val());
             $('#hidden_crmType').val($('#crmType').val());
 			$('#hidden_value').val($('input[type="search"]').val());
-			alert($('#hidden_value').val());
         });
 
         function jointStringToArray(jointString){
@@ -500,7 +499,6 @@ th,td,td>span {
         // });
 
         $('#exportType').change(function(){
-			alert($('#hidden_value').val());
             $exportTypeValue = $(this).val();
             if ($exportTypeValue == 0) {
                 return false;

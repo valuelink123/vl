@@ -72,12 +72,12 @@
 										</div>
 									</div>
 									<div class="form-group">
-										<label>Item No</label>
+										<label>SKU</label>
 										<div class="input-group ">
                                             <span class="input-group-addon">
                                                 <i class="fa fa-bookmark"></i>
                                             </span>
-											<input type="text" class="form-control" name="item_no" id="item_no" value=""  >
+											<input type="text" class="form-control" name="sku" id="sku" value=""  >
 										</div>
 									</div>
 									<div class="form-group">
@@ -112,7 +112,7 @@
                                             <span class="input-group-addon">
                                                 <i class="fa fa-bookmark"></i>
                                             </span>
-											<input type="text" class="form-control" name="warehouse" id="warehouse" value=""  >
+											<input type="text" class="form-control" name="sap_warehouse_code" id="sap_warehouse_code" value=""  >
 										</div>
 									</div>
 
@@ -136,7 +136,7 @@
         function validate_form(){
             var asin = $('#asin').val().trim();
             var seller_sku = $('#seller_sku').val().trim();
-			var item_no = $('#item_no').val().trim();
+			var sku = $('#sku').val().trim();
             if(asin == ''){
                 alert("Asin cannot be empty.");
                 return false;
@@ -145,8 +145,8 @@
                 alert("Seller Sku cannot be empty.");
                 return false;
             }
-			if(item_no == ''){
-				alert("Item No cannot be empty.");
+			if(sku == ''){
+				alert("SKU cannot be empty.");
 				return false;
 			}
 			$('#seller_name').val($('#account').find("option:selected").text());
