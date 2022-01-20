@@ -15,6 +15,7 @@ use App\User;
 use App\Inbox;
 use App\Rule;
 use App\Exception;
+use Log;
 
 class Controller extends BaseController
 {
@@ -725,6 +726,49 @@ ORDER BY asin_offer_summary.asin DESC ";
 	{
 		$ccpAdmin = array("zhangjianqun@valuelinkcorp.com","sunhanshan@valuelinkcorp.com","lixiaojian@valuelinkltd.com","wulanfang@valuelinkcorp.com","chenguancan@valuelinkcorp.com");
 		return $ccpAdmin;
+	}
+
+	/*
+     * 客服系统添加异常单同步到VOP系统
+	 * 接口数据
+     */
+	public function interfaceAddException(){
+		$params = isset($_POST['params']) && $_POST['params'] ? $_POST['params'] : '';
+		Log::info('interfaceAddException-data:'.(isset($params)?$params:""));
+		$data = json_decode($params,true);
+		$configField = array('type','name','date','sellerid','process_date','amazon_order_id','refund','gift_card_amount','currency','customer_email','replacement','user_id','group_id','process_user_id','process_status','request_content','process_content','order_sku','process_attach','replacement_order_id','descrip','score','auto_create_mcf','auto_create_mcf_result','last_auto_create_mcf_date','last_auto_create_mcf_log','comment','update_status_log','saleschannel','asin','auto_create_sap','auto_create_sap_result','last_auto_create_sap_date','last_auto_create_sap_log','amount','file_url');
+		//service_system_id
+		$return['status'] = 1;
+		if(!(isset($data['id']) && $data['id'])){
+			$return['status'] = 0;
+			$return['msg'] = '请传必填参数id';
+			return json_encode($return);
+		}
+		if(!(isset($data['type']) && $data['type'])){
+			$return['status'] = 0;
+			$return['msg'] = '请传必填参数type';
+			return json_encode($return);
+		}
+
+		$insertData = array();
+		foreach($configField as $field){
+			if(isset($data[$field]) && $data[$field]){
+				$insertData[$field] = $data[$field];
+			}
+		}
+		if($insertData){
+			$res = DB::table('exception')
+				->updateOrInsert(
+					['service_system_id' => $data['id']],
+					$insertData
+				);
+			if(!$res){
+				$return['status'] = 0;
+				$return['msg'] = '对接数据失败';
+			}
+		}
+
+		return json_encode($return);
 	}
 
 

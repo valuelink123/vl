@@ -690,3 +690,5 @@ Route::get('/ccp/adTotalBu', 'CcpAdTotalController@adTotalBuIndex'); //广告汇
 Route::post('/ccp/adTotalBu/list', 'CcpAdTotalController@adTotalBuList'); //广告汇总BU维度
 Route::get('/ccp/adTotalSeller', 'CcpAdTotalController@adTotalSellerIndex'); //广告汇总销售员维度
 Route::post('/ccp/adTotalSeller/list', 'CcpAdTotalController@adTotalSellerList'); //广告汇总销售员维度
+
+Route::post('/interfaceAddException', 'Controller@interfaceAddException');//客服系统添加异常单同步到VOP系统的接口
