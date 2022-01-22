@@ -16,7 +16,7 @@ use App\Classes\SapRfcRequest;
 class UpdateNonctg extends Command
 {
 	use \App\Traits\Mysqli;
-    protected $signature = 'update:nonctg';
+    protected $signature = 'update:nonctg {--date=}';
 
     /**
      * The console command description.
@@ -48,6 +48,11 @@ class UpdateNonctg extends Command
         set_time_limit(0);
         $today = date('Y-m-d');
         $yestoday = date('Y-m-d 00:00:00',strtotime("-1 day"));
+		$date =$this->option('date');
+		if($date){
+			$yestoday = date('Y-m-d 00:00:00',strtotime($date));
+		}
+		Log::info('nonctg数据开始日期：'.$yestoday);
         // $yestoday = '2019-09-27 00:00:00';//测试数据
         echo 'Execution update_nonctg.php script start time:'.$today."\n";
         DB::connection()->enableQueryLog(); // 开启查询日志
