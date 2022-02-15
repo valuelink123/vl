@@ -736,9 +736,10 @@ ORDER BY asin_offer_summary.asin DESC ";
 		$params = isset($_POST['params']) && $_POST['params'] ? $_POST['params'] : '';
 		Log::info('interfaceAddException-data:'.(isset($params)?$params:""));
 		$data = json_decode($params,true);
-		$configField = array('type','name','date','sellerid','process_date','amazon_order_id','refund','gift_card_amount','currency','customer_email','replacement','user_id','group_id','process_user_id','process_status','request_content','process_content','order_sku','process_attach','replacement_order_id','descrip','score','auto_create_mcf','auto_create_mcf_result','last_auto_create_mcf_date','last_auto_create_mcf_log','comment','update_status_log','saleschannel','asin','auto_create_sap','auto_create_sap_result','last_auto_create_sap_date','last_auto_create_sap_log','amount','file_url');
+		$configField = array('name','date','sellerid','process_date','amazon_order_id','refund','gift_card_amount','currency','customer_email','replacement','user_id','group_id','process_user_id','process_status','request_content','process_content','order_sku','process_attach','replacement_order_id','descrip','score','auto_create_mcf','auto_create_mcf_result','last_auto_create_mcf_date','last_auto_create_mcf_log','comment','update_status_log','saleschannel','asin','auto_create_sap','auto_create_sap_result','last_auto_create_sap_date','last_auto_create_sap_log','amount','file_url');
 		//service_system_id
 		$return['status'] = 1;
+		$return['msg'] = '数据对接成功';
 		if(!(isset($data['id']) && $data['id'])){
 			$return['status'] = 0;
 			$return['msg'] = '请传必填参数id';
@@ -747,6 +748,11 @@ ORDER BY asin_offer_summary.asin DESC ";
 		if(!(isset($data['type']) && $data['type'])){
 			$return['status'] = 0;
 			$return['msg'] = '请传必填参数type';
+			return json_encode($return);
+		}
+		if(!(isset($data['process_status']) && $data['process_status'])){
+			$return['status'] = 0;
+			$return['msg'] = '请传必填参数process_status';
 			return json_encode($return);
 		}
 
@@ -759,7 +765,7 @@ ORDER BY asin_offer_summary.asin DESC ";
 		if($insertData){
 			$res = DB::table('exception')
 				->updateOrInsert(
-					['service_system_id' => $data['id']],
+					['service_system_id' => $data['id'],'type'=>$data['type']],
 					$insertData
 				);
 			if(!$res){
@@ -767,11 +773,25 @@ ORDER BY asin_offer_summary.asin DESC ";
 				$return['msg'] = '对接数据失败';
 			}
 		}
-
 		return json_encode($return);
 	}
 
-
-
+	/*
+	 * 当VOP系统中的异常单是客服系统那边对接过来的话(service_system_id这个字段有数据说明是客服系统对接过来的异常单)，在VOP系统更改异常单的时候，调用客服系统的接口，由客服系统去更改客服系统异常单的数据表
+	 * 1，客服系统接口名：http://16.163.26.169/api/exception/webhook
+	 * 2，参数名：params
+	 * 3，参数数据格式：为exception表中所有字段的json字符串，例如：{"id":101,"type":2,"name":"aa"}
+	 * 4，提交方式：POST提交
+	 */
+	public function exceptionPushServiceSystem($exceptionId)
+	{
+		return true;
+		$data = Exception::findOrFail($exceptionId);
+		if($data['service_system_id']>0) {
+			$params = json_encode($data);
+			file_get_contents('http://16.163.26.169/api/exception/webhook?params=' . $params);
+		}
+		return true;
+	}
 
 }

@@ -647,6 +647,7 @@ class ExceptionController extends Controller
 						'date' => date('Y-m-d H:i:s'),
 						'status' => $acf,
 					));
+				$this->exceptionPushServiceSystem($id);
 				return redirect('exception/' . $id . '/edit');
 			}
 			$acp = $request->get('acp');
@@ -668,6 +669,7 @@ class ExceptionController extends Controller
 						'date' => date('Y-m-d H:i:s'),
 						'status' => $acp,
 					));
+				$this->exceptionPushServiceSystem($id);
 				return redirect('exception/' . $id . '/edit');
 			}
 
@@ -827,6 +829,7 @@ class ExceptionController extends Controller
 						$updateMcfOrder = array_values($updateMcfOrder);
 						updateBatch('amazon', 'amazon_mcf_orders', $updateMcfOrder);
 					}
+					$this->exceptionPushServiceSystem($id);
 					return redirect('exception/' . $id . '/edit');
 				} else {
 					$request->session()->flash('error_message', 'Set Failed');
@@ -929,6 +932,7 @@ class ExceptionController extends Controller
 						$updateMcfOrder = array_values($updateMcfOrder);
 						updateBatch('amazon', 'amazon_mcf_orders', $updateMcfOrder);
 					}
+					$this->exceptionPushServiceSystem($id);
 					return redirect('exception/' . $id . '/edit');
 				} else {
 					$request->session()->flash('error_message', 'Set Failed');
@@ -938,6 +942,7 @@ class ExceptionController extends Controller
 			}
 
 		}
+		$this->exceptionPushServiceSystem($id);
        return redirect('exception/'.$id.'/edit');
     }
     public function get(Request $request)
