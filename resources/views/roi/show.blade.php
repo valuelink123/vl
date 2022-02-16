@@ -336,10 +336,14 @@
                                     <div class="bold">运输参数</div>
                                     <div style="height: 7px;"></div>
                                     <div>
-                                        <div style="margin-right: 20px; float: left;"><span class="grey_color">运输方式 :</span> <span>{{$roi['transport_mode']}}</span></div>
-                                        <div style="margin-right: 20px; float: left;"><span class="grey_color">运输单价 :</span> <span>{!! $roi['transport_unit_price'] !!}</span></div>
-                                        <div style="margin-right: 20px; float: left;"><span class="grey_color">运输天数 :</span> <span>{{$roi['transport_days']}}</span></div>
+                                        <div style="margin-right: 20px; float: left;"><span class="grey_color">头程运输方式 :</span> <span>{{$roi['transport_mode']}}</span></div>
+                                        <div style="margin-right: 20px; float: left;"><span class="grey_color">头程运输单价 :</span> <span>{!! $roi['transport_unit_price'] !!}</span></div>
+                                        <div style="margin-right: 20px; float: left;"><span class="grey_color">头程运输天数 :</span> <span>{{$roi['transport_days']}}</span></div>
                                         <div style="margin-right: 20px; float: left;"><span class="grey_color">关税税率 :</span> <span>{{$roi['tariff_rate']}}</span></div>
+                                    </div>
+                                    <div>
+                                        <div style="margin-right: 20px; float: left;"><span class="grey_color">二程运输单价 :</span> <span>{!! $roi['two_transport_unit_price'] !!}</span></div>
+                                        <div style="margin-right: 20px; float: left;"><span class="grey_color">二程运输天数 :</span> <span>{{$roi['two_transport_days']}}</span></div>
                                     </div>
                                 </td>
                             </tr>

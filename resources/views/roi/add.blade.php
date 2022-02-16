@@ -411,7 +411,7 @@
                 <div class="bold">运输参数</div>
                 <div style="height: 10px;"></div>
                 <div class="param_cost">
-                    <div>运输方式</div>
+                    <div>头程运输方式</div>
                     <select style="width: 205px;height:28px" name="transport_mode" onchange="change_transport_mode(this)" id="transport_mode">
                         @foreach ($transportModes as $k => $v)
                         <option value="{{$k}}">{{$v}}</option>
@@ -419,14 +419,14 @@
                     </select>
                 </div>
                 <div class="param_cost">
-                    <div>运输单价</div>
+                    <div>头程运输单价</div>
                     <div style="width: 205px;" class="input-group">
                         <input class="int_or_two_digits_input" type="text" name="transport_unit_price" style="width: 157px"/>
                         <span id="unit_price_type" style="height:26px; padding: 4px" class="input-group-addon">元/m<sup>3</sup></span>
                     </div>
                 </div>
                 <div class="param_cost">
-                    <div>运输天数</div>
+                    <div>头程运输天数</div>
                     <input class="int_or_two_digits_input" type="text" name="transport_days" id="transport_days" />
                 </div>
                 <div class="param_cost">
@@ -435,6 +435,19 @@
                         <input class="int_or_two_digits_input" type="text" name="tariff_rate" id="tariff_rate" style="float: left;border: none;width: 189px;height: 23px;"><span>%</span>
                     </div>
                 </div>
+                <br/><br/><br/><br/>
+                <div class="param_cost">
+                    <div>二程运输单价</div>
+                    <div style="width: 205px;" class="input-group">
+                        <input class="int_or_two_digits_input" type="text" name="two_transport_unit_price" style="width: 127px"/>
+                        <span style="height:26px; padding: 4px" class="input-group-addon">当地币/pcs</span>
+                    </div>
+                </div>
+                <div class="param_cost">
+                    <div>二程运输天数</div>
+                    <input class="int_or_two_digits_input" type="text" name="two_transport_days" id="two_transport_days" />
+                </div>
+
                 <div style="clear: both"></div>
                 <div style="height: 20px;"></div>
                 <div class="bold">采购参数</div>

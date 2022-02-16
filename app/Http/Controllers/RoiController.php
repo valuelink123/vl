@@ -630,10 +630,14 @@ class RoiController extends Controller
                                     <div class="bold">运输参数</div>
                                     <div style="height: 7px;"></div>
                                     <div>
-                                        <span style="margin-right: 20px; float: left;"><span class="grey_color">运输方式 :</span> <span>' . $roi['transport_mode'] . '</span></span>&nbsp;&nbsp;&nbsp;&nbsp;
-                                        <span style="margin-right: 20px; float: left;"><span class="grey_color">运输单价 :</span> <span>' . $roi['transport_unit_price'] . '</span></span>&nbsp;&nbsp;&nbsp;&nbsp;
-                                        <span style="margin-right: 20px; float: left;"><span class="grey_color">运输天数 :</span> <span>' . $roi['transport_days'] . '</span></span>&nbsp;&nbsp;&nbsp;&nbsp;
+                                        <span style="margin-right: 20px; float: left;"><span class="grey_color">头程运输方式 :</span> <span>' . $roi['transport_mode'] . '</span></span>&nbsp;&nbsp;&nbsp;&nbsp;
+                                        <span style="margin-right: 20px; float: left;"><span class="grey_color">头程运输单价 :</span> <span>' . $roi['transport_unit_price'] . '</span></span>&nbsp;&nbsp;&nbsp;&nbsp;
+                                        <span style="margin-right: 20px; float: left;"><span class="grey_color">头程运输天数 :</span> <span>' . $roi['transport_days'] . '</span></span>&nbsp;&nbsp;&nbsp;&nbsp;
                                         <span style="margin-right: 20px; float: left;"><span class="grey_color">关税税率 :</span> <span>' . $roi['tariff_rate'] . '</span></span>
+                                    </div>
+                                    <div>
+                                        <span style="margin-right: 20px; float: left;"><span class="grey_color">二程运输单价 :</span> <span>' . $roi['two_transport_unit_price'] . '</span></span>&nbsp;&nbsp;&nbsp;&nbsp;
+                                        <span style="margin-right: 20px; float: left;"><span class="grey_color">二程运输天数 :</span> <span>' . $roi['two_transport_days'] . '</span></span>&nbsp;&nbsp;&nbsp;&nbsp;
                                     </div>
                                 </td>
                             </tr>
@@ -901,7 +905,9 @@ class RoiController extends Controller
 		$roi['average_exception_rate'] = $this->toPercentage($roi['average_exception_rate']);
 		$roi['unit_operating_fee'] = $this->twoDecimal($roi['unit_operating_fee']);
 		$roi['transport_unit_price'] = $this->twoDecimal($roi['transport_unit_price']);
-		$roi['transport_days'] = $this->twoDecimal($roi['transport_days']);
+		$roi['transport_days'] = $this->twoDecimal($roi['transport_days']);//头程运输天数
+		$roi['two_transport_unit_price'] = $this->twoDecimal($roi['two_transport_unit_price']);//二程运输单价
+		$roi['two_transport_days'] = $this->twoDecimal($roi['two_transport_days']);//二程运输天数
 		$roi['weight_per_pcs'] = $this->twoDecimal($roi['weight_per_pcs']);
 		$roi['volume_per_pcs'] = $this->twoDecimal($roi['volume_per_pcs']);
 		$roi['purchase_price'] = $this->twoDecimal($roi['purchase_price']);
@@ -982,7 +988,7 @@ class RoiController extends Controller
 
 	public function showPageDataFormat($roi){
 		//配置需要转换为万为单位的金额数据
-		$amount_field = array('return_amount','total_sales_amount','year_purchase_amount','year_exception_amount','year_promo','year_platform_commission','year_platform_operate','year_platform_storage','year_import_tax','year_transport','put_cost','capital_occupy_cost','change_cost','contribute_cost_total','marginal_profit_per_pcs','total_fixed_cost','estimated_labor_cost');
+		$amount_field = array('return_amount','total_sales_amount','year_purchase_amount','year_exception_amount','year_promo','year_platform_commission','year_platform_operate','year_platform_storage','year_import_tax','year_transport','one_year_transport','two_year_transport','put_cost','capital_occupy_cost','change_cost','contribute_cost_total','marginal_profit_per_pcs','total_fixed_cost','estimated_labor_cost');
 		foreach($amount_field as $field){
 			if($roi[$field]>=10000){
 				$roi[$field] = $this->twoDecimal($roi[$field]/10000).'万';
@@ -999,6 +1005,7 @@ class RoiController extends Controller
 			$transport_unit = '<span>元/KG></span>';
 		}
 		$roi['transport_unit_price'] = $roi['transport_unit_price'].$transport_unit;
+		$roi['two_transport_unit_price'] = $roi['two_transport_unit_price'].'<span>当地币/pcs</span>';
 		$roi['billing_period_type'] = $billingPeriods[$roi['billing_period_type']]['name'];
 		$estimated_launch_time = $roi['estimated_launch_time'];
 		if($estimated_launch_time){
@@ -1013,6 +1020,8 @@ class RoiController extends Controller
 		}
 		$roi['commission_rate'] = $this->toPercentage($roi['commission_rate']);
 		$roi['tariff_rate'] = $this->toPercentage($roi['tariff_rate']);
+		//年物流费还要备注头程和二程分别是多少
+		$roi['year_transport'] = $roi['year_transport'].'(头程:'.$roi['one_year_transport'].',二程:'.$roi['two_year_transport'].')';
 
 		if($roi['capital_turnover'] < 0){
 			$roi['capital_turnover'] = '∞';
@@ -1080,7 +1089,7 @@ class RoiController extends Controller
 
 	public function analyse(Request $request){
 		//点击"分析"按钮时，返回的数组，用于ajax异步更新页面数据
-		$configField = array('total_sales_volume','total_sales_amount','year_purchase_amount','year_exception_amount','year_promo','year_platform_commission','year_platform_operate','year_platform_storage','year_import_tax','year_transport','inventory_turnover_days','capital_turnover','put_cost','capital_occupy_cost','change_cost','contribute_cost_total','marginal_profit_per_pcs','total_fixed_cost','estimated_labor_cost','profit_loss_point','estimated_payback_period','return_amount','roi','project_profitability','price_floor');
+		$configField = array('total_sales_volume','total_sales_amount','year_purchase_amount','year_exception_amount','year_promo','year_platform_commission','year_platform_operate','year_platform_storage','year_import_tax','year_transport','one_year_transport','two_year_transport','inventory_turnover_days','capital_turnover','put_cost','capital_occupy_cost','change_cost','contribute_cost_total','marginal_profit_per_pcs','total_fixed_cost','estimated_labor_cost','profit_loss_point','estimated_payback_period','return_amount','roi','project_profitability','price_floor');
 
 		$data = $this->getCalculateData($request);
 		//新版本内容
@@ -1097,16 +1106,18 @@ class RoiController extends Controller
 			}else{
 				$updateAjaxData[$field] = $data[$field];
 			}
+
 			//配置需要转换为万为单位的金额数据
-			$amount_field = array('return_amount','year_purchase_amount','year_exception_amount','year_promo','year_platform_commission','year_platform_operate','year_platform_storage','year_import_tax','year_transport','put_cost','capital_occupy_cost','change_cost','contribute_cost_total','marginal_profit_per_pcs','total_fixed_cost','estimated_labor_cost');
+			$amount_field = array('return_amount','year_purchase_amount','year_exception_amount','year_promo','year_platform_commission','year_platform_operate','year_platform_storage','year_import_tax','year_transport','one_year_transport','two_year_transport','put_cost','capital_occupy_cost','change_cost','contribute_cost_total','marginal_profit_per_pcs','total_fixed_cost','estimated_labor_cost');
 			if(in_array($field,$amount_field) && $updateAjaxData[$field]>=10000){
 				$updateAjaxData[$field] = $this->twoDecimal($updateAjaxData[$field]/10000).'万';
 			}
 			if($field=='total_sales_amount' && $updateAjaxData['year_sales_amount']>=10000){
 				$updateAjaxData['year_sales_amount'] = $this->twoDecimal($updateAjaxData['year_sales_amount']/10000).'万';
 			}
-
 		}
+		//年物流费还要备注头程和二程分别是多少
+		$updateAjaxData['year_transport'] = $updateAjaxData['year_transport'].'(头程:'.$updateAjaxData['one_year_transport'].',二程:'.$updateAjaxData['two_year_transport'].')';
 		return json_encode(array('updateAjaxData' => $updateAjaxData));
 	}
 
@@ -1177,19 +1188,23 @@ class RoiController extends Controller
 		$update_data['volume_per_pcs'] = $this->getNumber($update_data['volume_per_pcs']);
 		//体积
 		$product_volume = $update_data['volume_per_pcs'] * $total_sales_volume/1000000;
-		//运输单价
+		//头程运输单价
 		$update_data['transport_unit_price'] = $this->getNumber($update_data['transport_unit_price']);
+		//二程运输单价
+		$update_data['two_transport_unit_price'] = $this->getNumber($update_data['two_transport_unit_price']);
 		//运输方式, 0-海运，1-空运，2-快递
 		$transport_mode = $update_data['transport_mode'];
-		//物流费用
-		$transport_cost = 0;
+		//年物流费用（$transport_cost），头程年物流费用（$one_transport_cost）,二程年物流费用（$two_transport_cost）
+		$one_transport_cost = 0;
 		if($transport_mode == 0){
-			$transport_cost = $update_data['transport_unit_price'] * $product_volume * 1.2;
+			$one_transport_cost = $update_data['transport_unit_price'] * $product_volume * 1.2;
 		}else if($transport_mode == 1){
-			$transport_cost = max($product_volume * 1000/6 * 1.2, $product_weight) * $update_data['transport_unit_price'];
+			$one_transport_cost = max($product_volume * 1000/6 * 1.2, $product_weight) * $update_data['transport_unit_price'];
 		}else if($transport_mode == 2){
-			$transport_cost = max($product_volume * 1000/5 * 1.2, $product_weight) * $update_data['transport_unit_price'];
+			$one_transport_cost = max($product_volume * 1000/5 * 1.2, $product_weight) * $update_data['transport_unit_price'];
 		}
+		$two_transport_cost = $update_data['two_transport_unit_price'] * $total_sales_volume * $currency_rate;
+		$transport_cost = $one_transport_cost + $two_transport_cost;
 
 		//--相关税费--
 		//关税税率(百分数转成小数)
@@ -1218,10 +1233,11 @@ class RoiController extends Controller
 		//moq
 		$update_data['moq'] = $this->getNumber($update_data['moq']);
 		//运输天数
-		$update_data['transport_days'] = $this->getNumber($update_data['transport_days']);
+		$update_data['transport_days'] = $this->getNumber($update_data['transport_days']);//头程运输天数
+		$update_data['two_transport_days'] = $this->getNumber($update_data['two_transport_days']);//二程运输天数
 		$unit_strorage_fee = $this->getUnitStorageFee()[$site];
-		//仓储费
-		$storage_fee = (($update_data['moq']/2+(7+$update_data['transport_days'])*$total_sales_volume/365)*$update_data['volume_per_pcs']/1000000*($unit_strorage_fee[0]*9+$unit_strorage_fee[1]*3))*$currency_rate;
+		//年仓储费,$total_sales_volume总销量
+		$storage_fee = (($update_data['moq']/2+(7+$update_data['transport_days']+$update_data['two_transport_days'])*$total_sales_volume/365)*$update_data['volume_per_pcs']/1000000*($unit_strorage_fee[0]*9+$unit_strorage_fee[1]*3))*$currency_rate;
 
 		//库存周转天数
 		$inventory_turnover_days = $update_data['inventory_turnover_days'];//1.0版本的计算 方式$update_data['transport_days']+7+$update_data['moq']/(2*$total_sales_volume/365);
@@ -1297,6 +1313,8 @@ class RoiController extends Controller
 		$update_data['year_platform_operate'] = $this->twoDecimal($operating_fee);//年平台操作费===
 		$update_data['year_platform_storage'] = $this->twoDecimal($storage_fee);//年平台仓储费===
 		$update_data['year_import_tax'] = $this->twoDecimal($tariff_amount);//年进口税===
+		$update_data['one_year_transport'] = $this->twoDecimal($one_transport_cost);//头程的年物流费===
+		$update_data['two_year_transport'] = $this->twoDecimal($two_transport_cost);//二程的年物流费===
 		$update_data['year_transport'] = $this->twoDecimal($transport_cost);//年物流费===
 		$update_data['inventory_turnover_days'] = $inventory_turnover_days;//库存周转天数===原来有的
 		$update_data['capital_turnover'] = $capital_turnover;//资金周转次数===原来有的
