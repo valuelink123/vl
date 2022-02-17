@@ -134,7 +134,6 @@ class RoiPerformanceController extends Controller
 					//当月销售金额
 					$currency_rate = $currency_rates[$roiData['site']];//当前站点的汇率
 					$sales_amount_month_array[$i] = round($roiData['price_fc_month_' . $i] * $currency_rate * $roiData['volume_month_' . $i]);
-
 					//每个月的收入,收入=当月销售金额-当月异常费用
 					$exception_amount_month_array[$i] = $roiData['exception_rate_month_' . $i] * $sales_amount_month_array[$i];//当月异常费用
 					$update_data['income']['value_month_' . $i] = sprintf("%.2f", $sales_amount_month_array[$i] - $exception_amount_month_array[$i]);
