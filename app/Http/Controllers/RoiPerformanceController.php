@@ -95,22 +95,25 @@ class RoiPerformanceController extends Controller
 				/*
 				 * year_import_tax_fee,年度进口税   year_transport_fee年物流费
 				 */
-
+				$currency_rate = $currency_rates[$roiData['site']];//当前站点的汇率
 				$transport_mode = $roiData['transport_mode'];//运输方式, 0-海运，1-空运，2-快递
 				//总的体积
 				$product_volume = $roiData['volume_per_pcs'] * $roiData['total_sales_volume']/1000000;
 				//产品总的重量
 				$product_weight = $roiData['weight_per_pcs'] * $roiData['total_sales_volume'];
 
-				//一年的物流费
-				$transport_cost = 0;
+				//年物流费用（$transport_cost），头程年物流费用（$one_transport_cost）,二程年物流费用（$two_transport_cost）
+				$one_transport_cost = 0;
 				if($transport_mode == 0){
-					$transport_cost = $roiData['transport_unit_price'] * $product_volume * 1.2;
+					$one_transport_cost = $roiData['transport_unit_price'] * $product_volume * 1.2;
 				}else if($transport_mode == 1){
-					$transport_cost = max($product_volume * 1000/6 * 1.2, $product_weight) * $roiData['transport_unit_price'];
+					$one_transport_cost = max($product_volume * 1000/6 * 1.2, $product_weight) * $roiData['transport_unit_price'];
 				}else if($transport_mode == 2){
-					$transport_cost = max($product_volume * 1000/5 * 1.2, $product_weight) * $roiData['transport_unit_price'];
+					$one_transport_cost = max($product_volume * 1000/5 * 1.2, $product_weight) * $roiData['transport_unit_price'];
 				}
+				$two_transport_cost = $roiData['two_transport_unit_price'] * $roiData['total_sales_volume'] * $currency_rate;
+				$transport_cost = $one_transport_cost + $two_transport_cost;
+
 				//--相关税费--
 				//关税税率(百分数转成小数)
 				//采购成本
