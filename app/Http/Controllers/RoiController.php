@@ -1236,8 +1236,8 @@ class RoiController extends Controller
 		$update_data['transport_days'] = $this->getNumber($update_data['transport_days']);//头程运输天数
 		$update_data['two_transport_days'] = $this->getNumber($update_data['two_transport_days']);//二程运输天数
 		$unit_strorage_fee = $this->getUnitStorageFee()[$site];
-		//年仓储费,$total_sales_volume总销量
-		$storage_fee = (($update_data['moq']/2+(7+$update_data['transport_days']+$update_data['two_transport_days'])*$total_sales_volume/365)*$update_data['volume_per_pcs']/1000000*($unit_strorage_fee[0]*9+$unit_strorage_fee[1]*3))*$currency_rate;
+		//年仓储费,$total_sales_volume总销量，v2022.2.18:仓储费平均库存天数增加3个月（以前是增加7天）
+		$storage_fee = (($update_data['moq']/2+(90+$update_data['transport_days']+$update_data['two_transport_days'])*$total_sales_volume/365)*$update_data['volume_per_pcs']/1000000*($unit_strorage_fee[0]*9+$unit_strorage_fee[1]*3))*$currency_rate;
 
 		//库存周转天数
 		$inventory_turnover_days = $update_data['inventory_turnover_days'];//1.0版本的计算 方式$update_data['transport_days']+7+$update_data['moq']/(2*$total_sales_volume/365);
@@ -1249,8 +1249,10 @@ class RoiController extends Controller
 		$capital_turnover = $inventory_turnover_days!=0 ? 360/$inventory_turnover_days : 0; ///1.0本本的计算方式 365/($inventory_turnover_days-$billing_days+14);
 		//投入资金
 		$invest_capital = ((($inventory_turnover_days-$billing_days+14)*$total_sales_volume/365)*($purchase_cost+$transport_cost+$tariff_amount)/$total_sales_volume);
-		//资金占用成本,资金占用成本，原来是乘以18%，现在改为乘以10%
-		$capital_cost = $invest_capital * 0.1;
+		//资金占用成本,资金占用成本，原来是乘以18%，现在改为乘以10%，资金占用成本最新版本2022.2.18：改为按照平均库存来计算，而不是投入资金
+//		$capital_cost = $invest_capital * 0.1;
+		//（不含税采购价+物流费用/销量+关税/销量）*0.18，库存单位成本=采购+物流+关税
+		$capital_cost = (($update_data['moq']/2+(90+$update_data['transport_days']+$update_data['two_transport_days'])*$total_sales_volume/365)*($update_data['purchase_price']+$transport_cost/$total_sales_volume+$tariff_amount/$total_sales_volume)*0.18);
 		//变动成本费用小计
 		$variable_cost =  $purchase_cost + $transport_cost + ($tariff_amount + $vat_amount) + ($commission_amount + $operating_fee) + $total_promo_amount + $storage_fee + $capital_cost;
 		//边际贡献总额
