@@ -1364,11 +1364,19 @@ class RoiController extends Controller
 	public function getUnitStorageFee(){
 		$data = array(
 			//array(0,1). 0: 淡季仓储费unit_low_season_storage_fee; 1: 旺季仓储费unit_peak_season_storage_fee
-			'US' => array(24.37, 84.76),
-			'CA' => array(20.00, 28.00),
-			'UK' => array(22.95, 32.14),
+//			'US' => array(24.37, 84.76),
+//			'CA' => array(20.00, 28.00),
+//			'UK' => array(22.95, 32.14),
+//			'DE' => array(26.00, 36.00),
+//			'JP' => array(5070.00, 9000.00),
+//			'FR' => array(26.00, 36.00),
+//			'ES' => array(26.00, 36.00),
+//			'IT' => array(26.00, 36.00)
+			'US' => array(29.31, 84.76),
+			'CA' => array(28.00, 38.00),
+			'UK' => array(23.31, 32.84),
 			'DE' => array(26.00, 36.00),
-			'JP' => array(5070.00, 9000.00),
+			'JP' => array(5160.00, 9170.00),
 			'FR' => array(26.00, 36.00),
 			'ES' => array(26.00, 36.00),
 			'IT' => array(26.00, 36.00)
