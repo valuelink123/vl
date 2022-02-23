@@ -270,7 +270,18 @@
 
         //点击导出
         $('#export_table').click(function(){
-            location.href='/ccp/adCampaign/export?'+$("#search-form").serialize();
+            var search = $("#search-form").serialize();
+            var accountid = '';
+            var vv = '';
+            $("#account-div .active").each(function (index,value) {
+                vv = $(this).find('input').val();
+                if(accountid != ''){
+                    accountid = accountid + ',' + vv
+                }else{
+                    accountid = accountid + vv
+                }
+            });
+            location.href='/ccp/adCampaign/export?'+search+'&account='+accountid;
             return false;
         })
         times = 1;
