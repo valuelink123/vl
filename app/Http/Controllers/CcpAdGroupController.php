@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use DB;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 
 class CcpAdGroupController extends Controller
@@ -109,6 +111,40 @@ class CcpAdGroupController extends Controller
 		$search = isset($_REQUEST['search']) ? $_REQUEST['search'] : '';
 		$search = $this->getSearchData(explode('&',$search));
 		$site = isset($search['site']) ? $search['site'] : '';//站点，为marketplaceid
+		$limit = '';
+		if($_REQUEST['length']){
+			$limit = $this->dtLimit($req);
+			$limit = " LIMIT {$limit} ";
+		}
+		$sql = $this->getSql($search) .$limit;
+
+		$_data = DB::select($sql);
+		$recordsTotal = $recordsFiltered = DB::select('SELECT FOUND_ROWS() as total');
+		$recordsTotal = $recordsFiltered = $recordsTotal[0]->total;
+
+		$data_account = getSellerAccout();
+		//AD CONVERSION RATE = orders/click  CTR = click/impressions  cpc = sum(cost*clicks)/sum(clicks)  acos=cost/sales
+		$data = array();
+		foreach($_data as $key=>$val){
+			$val = (array)$val;
+			$val['acos'] = $val['sales'] > 0 ? sprintf("%.2f",$val['cost']*100/$val['sales']).'%' : '-';
+			$val['ctr'] = $val['impressions'] > 0 ? sprintf("%.2f",$val['clicks']*100/$val['impressions']).'%' : '-';
+			$val['cpc'] = $val['clicks'] > 0 ? sprintf("%.2f",$val['cost']/$val['clicks']) : '-';
+			$val['cr'] = $val['clicks'] > 0 ? sprintf("%.2f",$val['orders']*100/$val['clicks']).'%' : '-';
+			$sellerid_marketplaceid = $val['seller_id'].'_'.$site;
+			$val['account_name'] = isset($data_account[$sellerid_marketplaceid]) ? $data_account[$sellerid_marketplaceid] : $val['seller_id'];
+			$data[$val['group_name']] = $val;
+		}
+		$data = array_values($data);
+		return compact('data', 'recordsTotal', 'recordsFiltered');
+	}
+
+	/*
+	 * 得到列表和导出数据的sql
+	 */
+	public function getSql($search)
+	{
+		$site = isset($search['site']) ? $search['site'] : '';//站点，为marketplaceid
 		$account = isset($search['account']) ? $search['account'] : '';//账号id,例如115,137
 		$this->start_date = isset($search['start_date']) ? $search['start_date'] : '';
 		$this->end_date = isset($search['end_date']) ? $search['end_date'] : '';
@@ -128,10 +164,6 @@ class CcpAdGroupController extends Controller
 		$table_group = isset($this->typeConfig['table_group'][$type]) ? $this->typeConfig['table_group'][$type] : '';
 		$table_campaign = isset($this->typeConfig['table_campaign'][$type]) ? $this->typeConfig['table_campaign'][$type] : '';
 
-		if($_REQUEST['length']){
-			$limit = $this->dtLimit($req);
-			$limit = " LIMIT {$limit} ";
-		}
 		$state = " any_value(groups.state) as state,";
 		if($type=='SBrands'){
 			$state = " '-' as state,";
@@ -159,15 +191,25 @@ class CcpAdGroupController extends Controller
 			where ad_type = '".$type."' 
 			{$where} 
 			GROUP BY groups.name 
-			 order by sales desc {$limit}";
+			 order by sales desc";
+		return $sql;
+	}
 
-		$_data = DB::select($sql);
-		$recordsTotal = $recordsFiltered = DB::select('SELECT FOUND_ROWS() as total');
-		$recordsTotal = $recordsFiltered = $recordsTotal[0]->total;
-
+	/*
+	 * 导出列表
+	 */
+	public function export(Request $req)
+	{
+		if(!Auth::user()->can(['ccp-ad-group-export'])) die('Permission denied -- ccp ad group export');
+		$site = isset($req['site']) ? $req['site'] : '';//站点，为marketplaceid
+		$sql = $this->getSql($req);
 		$data_account = getSellerAccout();
-		//AD CONVERSION RATE = orders/click  CTR = click/impressions  cpc = sum(cost*clicks)/sum(clicks)  acos=cost/sales
-		$data = array();
+		$_data = DB::select($sql);
+
+		//表头
+		$headArray = array('ACCOUNT NAME','CAMPAIGN NAME','GROUP NAME','STATE','AD COST','SALES','ORDERS','ACOS','IMPRESSIONS','CLICKS','CTR','CPC','CR');
+		$arrayData[] = $headArray;
+
 		foreach($_data as $key=>$val){
 			$val = (array)$val;
 			$val['acos'] = $val['sales'] > 0 ? sprintf("%.2f",$val['cost']*100/$val['sales']).'%' : '-';
@@ -177,9 +219,40 @@ class CcpAdGroupController extends Controller
 			$sellerid_marketplaceid = $val['seller_id'].'_'.$site;
 			$val['account_name'] = isset($data_account[$sellerid_marketplaceid]) ? $data_account[$sellerid_marketplaceid] : $val['seller_id'];
 			$data[$val['group_name']] = $val;
+			$arrayData[] = array(
+				$val['account_name'],
+				$val['campaign_name'],
+				$val['group_name'],
+				$val['state'],
+				$val['cost'],
+				$val['sales'],
+				$val['orders'],
+				$val['acos'],
+				$val['impressions'],
+				$val['clicks'],
+				$val['ctr'],
+				$val['cpc'],
+				$val['cr'],
+			);
 		}
-		$data = array_values($data);
-		return compact('data', 'recordsTotal', 'recordsFiltered');
+
+		if($arrayData){
+			$spreadsheet = new Spreadsheet();
+
+			$spreadsheet->getActiveSheet()
+				->fromArray(
+					$arrayData,  // The data to set
+					NULL,        // Array values with this value will not be set
+					'A1'         // Top left coordinate of the worksheet range where
+				//    we want to set these values (default is A1)
+				);
+			header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');//告诉浏览器输出07Excel文件
+			header('Content-Disposition: attachment;filename="CCP_AdGroup.xlsx"');//告诉浏览器输出浏览器名称
+			header('Cache-Control: max-age=0');//禁止缓存
+			$writer = new Xlsx($spreadsheet);
+			$writer->save('php://output');
+		}
+		die();
 	}
 
 }

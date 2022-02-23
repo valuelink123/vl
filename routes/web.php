@@ -332,22 +332,27 @@ Route::get('ccp/showOrderList', 'CcpController@showOrderList')->name('showOrderL
 Route::get('/ccp/adProduct', 'CcpAdProductController@index'); //
 Route::post('/ccp/adProduct/showTotal', 'CcpAdProductController@showTotal'); //ccp功能展示顶部统计数据
 Route::post('/ccp/adProduct/list', 'CcpAdProductController@list');//ccp功能的列表展示
+Route::get('/ccp/adProduct/export', 'CcpAdProductController@export');//ccp功能的导出功能
 
 Route::get('/ccp/adKeyword', 'CcpAdKeywordController@index'); //功能入口
 Route::post('/ccp/adKeyword/showTotal', 'CcpAdKeywordController@showTotal'); //ccp功能展示顶部统计数据
 Route::post('/ccp/adKeyword/list', 'CcpAdKeywordController@list');//ccp功能的列表展示
+Route::get('/ccp/adKeyword/export', 'CcpAdKeywordController@export');//ccp功能的导出功能
 
 Route::get('/ccp/adCampaign', 'CcpAdCampaignController@index'); //功能入口
 Route::post('/ccp/adCampaign/showTotal', 'CcpAdCampaignController@showTotal'); //ccp功能展示顶部统计数据
 Route::post('/ccp/adCampaign/list', 'CcpAdCampaignController@list');//ccp功能的列表展示
+Route::get('/ccp/adCampaign/export', 'CcpAdCampaignController@export');//ccp功能的导出功能
 
 Route::get('/ccp/adGroup', 'CcpAdGroupController@index'); //功能入口
 Route::post('/ccp/adGroup/showTotal', 'CcpAdGroupController@showTotal'); //ccp功能展示顶部统计数据
 Route::post('/ccp/adGroup/list', 'CcpAdGroupController@list');//ccp功能的列表展示
+Route::get('/ccp/adGroup/export', 'CcpAdGroupController@export');//ccp功能的导出功能
 
 Route::get('/ccp/adTarget', 'CcpAdTargetController@index'); //功能入口
 Route::post('/ccp/adTarget/showTotal', 'CcpAdTargetController@showTotal'); //ccp功能展示顶部统计数据
 Route::post('/ccp/adTarget/list', 'CcpAdTargetController@list');//ccp功能的列表展示
+Route::get('/ccp/adTarget/export', 'CcpAdTargetController@export');//ccp功能的导出功能
 //ccp-ad模块结束
 
 Route::get('/ccp/salesboard', 'CcpSalesboardController@index');
@@ -625,6 +630,8 @@ Route::get('/inventoryCycleCount', 'InventoryCycleCountController@index');//展�
 Route::post('/inventoryCycleCount/list', 'InventoryCycleCountController@list');//获取列表数据
 Route::get('/inventoryCycleCount/downloadSku', 'InventoryCycleCountController@downloadSku');//下载企管部需要的添加sku模板
 Route::post('/inventoryCycleCount/importSku', 'InventoryCycleCountController@importSku');//导入sku数据
+Route::get('/inventoryCycleCount/downloadAccountNumber', 'InventoryCycleCountController@downloadAccountNumber');//下载财务部需要的添加账面数量模板
+Route::post('/inventoryCycleCount/importAccountNumber', 'InventoryCycleCountController@importAccountNumber');//财务部导入账面数量数据
 Route::get('/inventoryCycleCount/downloadActualNumber', 'InventoryCycleCountController@downloadActualNumber');//下载物流部需要的添加真实数量模板
 Route::post('/inventoryCycleCount/importActualNumber', 'InventoryCycleCountController@importActualNumber');//导入真实数量数据
 //Route::get('/inventoryCycleCount/downloadReason', 'InventoryCycleCountController@downloadReason');//下载导入差异原因的模板

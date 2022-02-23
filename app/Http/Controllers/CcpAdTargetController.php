@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use DB;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 
 class CcpAdTargetController extends Controller
@@ -118,6 +120,37 @@ class CcpAdTargetController extends Controller
 	{
 		$search = isset($_REQUEST['search']) ? $_REQUEST['search'] : '';
 		$search = $this->getSearchData(explode('&',$search));
+		$limit = "";
+		if($_REQUEST['length']){
+			$limit = $this->dtLimit($req);
+			$limit = " LIMIT {$limit} ";
+		}
+		$sql = $this->getSql($search) .$limit;
+
+		$_data = DB::select($sql);
+		$recordsTotal = $recordsFiltered = DB::select('SELECT FOUND_ROWS() as total');
+		$recordsTotal = $recordsFiltered = $recordsTotal[0]->total;
+
+		//AD CONVERSION RATE = orders/click  CTR = click/impressions  cpc = sum(cost*clicks)/sum(clicks)  acos=cost/sales
+		$data = array();
+		foreach($_data as $key=>$val){
+			$val = (array)$val;
+			$val['acos'] = $val['sales'] > 0 ? sprintf("%.2f",$val['cost']*100/$val['sales']).'%' : '-';
+			$val['ctr'] = $val['impressions'] > 0 ? sprintf("%.2f",$val['clicks']*100/$val['impressions']).'%' : '-';
+			$val['cpc'] = $val['clicks'] > 0 ? sprintf("%.2f",$val['cost']/$val['clicks']) : '-';
+			$val['cr'] = $val['clicks'] > 0 ? sprintf("%.2f",$val['orders']*100/$val['clicks']).'%' : '-';
+			$val['bid'] = sprintf("%.2f",$val['bid']);
+			$data[$val['target_id']] = $val;
+		}
+		$data = array_values($data);
+		return compact('data', 'recordsTotal', 'recordsFiltered');
+	}
+
+	/*
+	 * 得到列表和导出数据的sql
+	 */
+	public function getSql($search)
+	{
 		$site = isset($search['site']) ? $search['site'] : '';//站点，为marketplaceid
 		$account = isset($search['account']) ? $search['account'] : '';//账号id,例如115,137
 		$type = isset($search['type']) ? $search['type'] : '';
@@ -134,12 +167,6 @@ class CcpAdTargetController extends Controller
 			$account_str = implode("','", explode(',',$account));
 			$where .= " and ppc_profiles.seller_id in('".$account_str."')";
 		}
-
-		if($_REQUEST['length']){
-			$limit = $this->dtLimit($req);
-			$limit = " LIMIT {$limit} ";
-		}
-
 		$table_target = isset($this->typeConfig['table_target'][$type]) ? $this->typeConfig['table_target'][$type] : '';
 		$table_campaign = isset($this->typeConfig['table_campaign'][$type]) ? $this->typeConfig['table_campaign'][$type] : '';
 		$table_group = isset($this->typeConfig['table_group'][$type]) ? $this->typeConfig['table_group'][$type] : '';
@@ -170,15 +197,23 @@ class CcpAdTargetController extends Controller
 			where ad_type = '".$type."' 
 			{$where} 
 			GROUP BY targets.target_id 
-			 order by sales desc {$limit}";
+			 order by sales desc ";
+		return $sql;
+	}
 
+	/*
+	 * 导出列表
+	 */
+	public function export(Request $req)
+	{
+		if(!Auth::user()->can(['ccp-ad-target-export'])) die('Permission denied -- ccp ad target export');
+		$sql = $this->getSql($req);
 		$_data = DB::select($sql);
-		$recordsTotal = $recordsFiltered = DB::select('SELECT FOUND_ROWS() as total');
-		$recordsTotal = $recordsFiltered = $recordsTotal[0]->total;
 
-		$data_account = getSellerAccout();
-		//AD CONVERSION RATE = orders/click  CTR = click/impressions  cpc = sum(cost*clicks)/sum(clicks)  acos=cost/sales
-		$data = array();
+		//表头
+		$headArray = array('TARGET ID','BID','STATE','AD COST','SALES','ORDERS','ACOS','IMPRESSIONS','CLICKS','CTR','CPC','CR');
+		$arrayData[] = $headArray;
+
 		foreach($_data as $key=>$val){
 			$val = (array)$val;
 			$val['acos'] = $val['sales'] > 0 ? sprintf("%.2f",$val['cost']*100/$val['sales']).'%' : '-';
@@ -187,9 +222,39 @@ class CcpAdTargetController extends Controller
 			$val['cr'] = $val['clicks'] > 0 ? sprintf("%.2f",$val['orders']*100/$val['clicks']).'%' : '-';
 			$val['bid'] = sprintf("%.2f",$val['bid']);
 			$data[$val['target_id']] = $val;
+			$arrayData[] = array(
+				$val['target_id'].' ',
+				$val['bid'],
+				$val['state'],
+				$val['cost'],
+				$val['sales'],
+				$val['orders'],
+				$val['acos'],
+				$val['impressions'],
+				$val['clicks'],
+				$val['ctr'],
+				$val['cpc'],
+				$val['cr'],
+			);
 		}
-		$data = array_values($data);
-		return compact('data', 'recordsTotal', 'recordsFiltered');
+
+		if($arrayData){
+			$spreadsheet = new Spreadsheet();
+
+			$spreadsheet->getActiveSheet()
+				->fromArray(
+					$arrayData,  // The data to set
+					NULL,        // Array values with this value will not be set
+					'A1'         // Top left coordinate of the worksheet range where
+				//    we want to set these values (default is A1)
+				);
+			header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');//告诉浏览器输出07Excel文件
+			header('Content-Disposition: attachment;filename="CCP_AdTarget.xlsx"');//告诉浏览器输出浏览器名称
+			header('Cache-Control: max-age=0');//禁止缓存
+			$writer = new Xlsx($spreadsheet);
+			$writer->save('php://output');
+		}
+		die();
 	}
 
 }

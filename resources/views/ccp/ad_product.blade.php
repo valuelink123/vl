@@ -106,13 +106,22 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-1">
                         <div class="input-group">
                             <div class="btn-group pull-right" >
                                 <button id="search_top" class="btn sbold blue">Search</button>
                             </div>
                         </div>
                     </div>
+                    @permission('ccp-ad-product-export')
+                    <div class="col-md-1">
+                        <div class="input-group">
+                            <div class="btn-group pull-right" >
+                                <button id="export_table" class="btn sbold blue">Export</button>
+                            </div>
+                        </div>
+                    </div>
+                    @endpermission
                 </div>
             </form>
         </div>
@@ -174,7 +183,7 @@
                         <input class="form-control" value="" id="asin" placeholder="Asin"/>
                     </div>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-1">
                     <div class="input-group">
                         <div class="btn-group pull-right" >
                             <button id="search_table" class="btn sbold blue">Search</button>
@@ -299,6 +308,12 @@
             dtapi = $('#datatable').dataTable().api();
             dtapi.settings()[0].ajax.data = {search: $("#search-form").serialize()};
             dtapi.ajax.reload();
+            return false;
+        })
+
+        //点击导出
+        $('#export_table').click(function(){
+            location.href='/ccp/adProduct/export?'+$("#search-form").serialize();
             return false;
         })
         times = 1;
