@@ -101,15 +101,15 @@
         <div style="font-size: 18px; font-weight: bold;">投入产出表</div>
         <div style="height: 30px;"></div>
         <div class="first_row_params">
-            <div style="width:315px; float:left;">
+            <div style="width:275px; float:left;">
                 <div>产品名称
                     <span style="color: #999999;" title="可自定义产品名称，方便同一项目下方案对比区分。如：“乐观-榨汁机”"><i class="fa fa-info-circle"></i></span>
                 </div>
-                <input type="text" name="product_name" id="product_name" style="width:300px;" />
+                <input type="text" name="product_name" id="product_name" style="width:260px;" />
             </div>
             <div class="param_cost" style="width:120px;">
                 <div>站点</div>
-                <select name="site" id="site" style="width:100px;">
+                <select name="site" id="site" style="width:60px;">
                     @foreach ($sites as $site)
                         <option value="{{$site}}">{{$site}}</option>
                     @endforeach
@@ -145,9 +145,9 @@
                 </select>
             </div>
 
-            <div class="param_cost" style="width:170px;">
+            <div class="param_cost" style="width:130px;">
                 <div>库存周转天数</div>
-                <select name="inventory_turnover_days" style="width:150px;">
+                <select name="inventory_turnover_days" style="width:100px;">
                     @foreach ($inventory_turnover_days as $day)
                         <option value="{{$day}}">{{$day}}</option>
                     @endforeach
@@ -156,6 +156,11 @@
             <div class="param_cost">
                 <div>售价(外币)</div>
                 <input type="text" name="sell_price" id="sell_price" style="width:100px;" />
+            </div>
+
+            <div class="" style="margin-left: -100px;float: left;">
+                <div>在库库存维持天数（FBA+FBM）</div>
+                <input class="int_input" type="text" name="Inventory_days" id="Inventory_days" style="width:160px;" />
             </div>
 
         </div>

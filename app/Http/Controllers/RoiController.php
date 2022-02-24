@@ -457,6 +457,8 @@ class RoiController extends Controller
                     <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
                     <span style="padding-right: 20px">项目编号: <span class="highlight_text">' . $roi['project_code'] . '</span></span>
                     <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                    <span style="padding-right: 20px">在库库存维持天数(FBA+FBM): <span class="highlight_text">' . $roi['Inventory_days'] . '</span></span>
+                    <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
                     <span style="padding-right: 20px"><a href="' . $roi['new_product_planning_process'] . '" target="_blank">新品规划流程</a></span>
                 </div>
                 <div style="clear:both"></div>
@@ -908,6 +910,7 @@ class RoiController extends Controller
 		$roi['transport_days'] = $this->twoDecimal($roi['transport_days']);//头程运输天数
 		$roi['two_transport_unit_price'] = $this->twoDecimal($roi['two_transport_unit_price']);//二程运输单价
 		$roi['two_transport_days'] = $this->twoDecimal($roi['two_transport_days']);//二程运输天数
+		$roi['Inventory_days'] = $this->twoDecimal($roi['Inventory_days']);//在库库存维持天数
 		$roi['weight_per_pcs'] = $this->twoDecimal($roi['weight_per_pcs']);
 		$roi['volume_per_pcs'] = $this->twoDecimal($roi['volume_per_pcs']);
 		$roi['purchase_price'] = $this->twoDecimal($roi['purchase_price']);
@@ -1211,8 +1214,8 @@ class RoiController extends Controller
 		$update_data['tariff_rate'] = $this->getNumber($update_data['tariff_rate'])/100;
 		if($site == 'US'){
 			$tariff_amount = $purchase_cost * 0.3 * $update_data['tariff_rate'];
-		}elseif($site == 'JP'){
-			$tariff_amount = $purchase_cost * 1.1 * 1.05 * $update_data['tariff_rate'];
+		}elseif($site == 'JP'){//日本大部分产品没有关税，但是有10%的消费税,+0.1就是10%的消费税
+			$tariff_amount = $purchase_cost * 1.1 * 1.05 * ($update_data['tariff_rate']+0.1);
 		}else{
 			$tariff_amount = $purchase_cost * 0.35 * $update_data['tariff_rate'];
 		}
@@ -1235,9 +1238,12 @@ class RoiController extends Controller
 		//运输天数
 		$update_data['transport_days'] = $this->getNumber($update_data['transport_days']);//头程运输天数
 		$update_data['two_transport_days'] = $this->getNumber($update_data['two_transport_days']);//二程运输天数
+		$update_data['Inventory_days'] = $this->getNumber($update_data['Inventory_days']);//在库库存维持天数
 		$unit_strorage_fee = $this->getUnitStorageFee()[$site];
 		//年仓储费,$total_sales_volume总销量，v2022.2.18:仓储费平均库存天数增加3个月（以前是增加7天）
-		$storage_fee = (($update_data['moq']/2+(90+$update_data['transport_days']+$update_data['two_transport_days'])*$total_sales_volume/365)*$update_data['volume_per_pcs']/1000000*($unit_strorage_fee[0]*9+$unit_strorage_fee[1]*3))*$currency_rate;
+//		$storage_fee = (($update_data['moq']/2+(90+$update_data['transport_days']+$update_data['two_transport_days'])*$total_sales_volume/365)*$update_data['volume_per_pcs']/1000000*($unit_strorage_fee[0]*9+$unit_strorage_fee[1]*3))*$currency_rate;
+		//2022.2.24仓储费计算版本
+		$storage_fee = (($update_data['Inventory_days']*$total_sales_volume/365)*$update_data['volume_per_pcs']/1000000*($unit_strorage_fee[0]*9+$unit_strorage_fee[1]*3))*$currency_rate;
 
 		//库存周转天数
 		$inventory_turnover_days = $update_data['inventory_turnover_days'];//1.0版本的计算 方式$update_data['transport_days']+7+$update_data['moq']/(2*$total_sales_volume/365);
@@ -1252,7 +1258,9 @@ class RoiController extends Controller
 		//资金占用成本,资金占用成本，原来是乘以18%，现在改为乘以10%，资金占用成本最新版本2022.2.18：改为按照平均库存来计算，而不是投入资金
 //		$capital_cost = $invest_capital * 0.1;
 		//（不含税采购价+物流费用/销量+关税/销量）*0.18，库存单位成本=采购+物流+关税
-		$capital_cost = (($update_data['moq']/2+(90+$update_data['transport_days']+$update_data['two_transport_days'])*$total_sales_volume/365)*($update_data['purchase_price']+$transport_cost/$total_sales_volume+$tariff_amount/$total_sales_volume)*0.18);
+//		$capital_cost = (($update_data['moq']/2+(90+$update_data['transport_days']+$update_data['two_transport_days'])*$total_sales_volume/365)*($update_data['purchase_price']+$transport_cost/$total_sales_volume+$tariff_amount/$total_sales_volume)*0.18);
+		//2022.2.24资金占用成本计算版本，$billing_days为供应商账期
+		$capital_cost = (($update_data['Inventory_days']+$update_data['transport_days']+$update_data['two_transport_days']-$billing_days)*$total_sales_volume/365)*($update_data['purchase_price']+$transport_cost/$total_sales_volume+$tariff_amount/$total_sales_volume)*0.18;
 		//变动成本费用小计
 		$variable_cost =  $purchase_cost + $transport_cost + ($tariff_amount + $vat_amount) + ($commission_amount + $operating_fee) + $total_promo_amount + $storage_fee + $capital_cost;
 		//边际贡献总额

@@ -158,6 +158,7 @@
                     <span style="padding-right: 20px">预计上线时间<span style="color: #999999;" title="预计新品可正式上线销售的时间"><i class="fa fa-info-circle"></i></span>: <span class="highlight_text">{{$roi['estimated_launch_time']}}</span></span>
                     <span style="padding-right: 20px">SKU<span style="color: #999999;" title="在SAP中新建的产品物料号"><i class="fa fa-info-circle"></i></span>: <span class="highlight_text">{{$roi['sku']}}</span></span>
                     <span style="padding-right: 20px">售价(外币)： <span class="highlight_text">{{$roi['sell_price']}}</span></span>
+                    <span style="padding-right: 20px">在库库存维持天数（FBA+FBM）<span class="highlight_text">{{$roi['Inventory_days']}}</span></span>
                     <span style="padding-right: 20px">项目编号<span style="color: #999999;" title="新品开发项目定义好的项目编号"><i class="fa fa-info-circle"></i></span>: <span class="highlight_text">{{$roi['project_code']}}</span></span>
                     <span style="padding-right: 20px"><a href="{{$roi['new_product_planning_process']}}" target="_blank">查看新品规划流程</a><span style="color: #999999;" title="OA中新品规划流程的页面链接"><i class="fa fa-info-circle"></i></span></span>
 
