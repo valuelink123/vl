@@ -691,6 +691,11 @@
             $('#sell_price').focus();
             return false;
         }
+        var Inventory_days = $('#Inventory_days').val().trim();
+        if(Inventory_days == '' || Inventory_days <=0){
+            alert("在库库存维持天数（FBA+FBM）必须大于0");
+            return false;
+        }
     }
 
     $("#analyse-btn").on('click', function() {
