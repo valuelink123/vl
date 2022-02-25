@@ -1259,8 +1259,8 @@ class RoiController extends Controller
 //		$capital_cost = $invest_capital * 0.1;
 		//（不含税采购价+物流费用/销量+关税/销量）*0.18，库存单位成本=采购+物流+关税
 //		$capital_cost = (($update_data['moq']/2+(90+$update_data['transport_days']+$update_data['two_transport_days'])*$total_sales_volume/365)*($update_data['purchase_price']+$transport_cost/$total_sales_volume+$tariff_amount/$total_sales_volume)*0.18);
-		//2022.2.24资金占用成本计算版本，$billing_days为供应商账期
-		$capital_cost = (($update_data['Inventory_days']+$update_data['transport_days']+$update_data['two_transport_days']-$billing_days)*$total_sales_volume/365)*($update_data['purchase_price']+$transport_cost/$total_sales_volume+$tariff_amount/$total_sales_volume)*0.18;
+		//2022.2.24资金占用成本计算版本
+		$capital_cost = (($update_data['Inventory_days']+$update_data['transport_days']+$update_data['two_transport_days'])*$total_sales_volume/365)*($update_data['purchase_price']+$transport_cost/$total_sales_volume+$tariff_amount/$total_sales_volume)*0.18;
 		//变动成本费用小计
 		$variable_cost =  $purchase_cost + $transport_cost + ($tariff_amount + $vat_amount) + ($commission_amount + $operating_fee) + $total_promo_amount + $storage_fee + $capital_cost;
 		//边际贡献总额
