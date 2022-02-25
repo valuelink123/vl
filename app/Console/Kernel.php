@@ -60,6 +60,7 @@ class Kernel extends ConsoleKernel
 		'App\Console\Commands\MakeReport',
 		'App\Console\Commands\UpdateSendboxStatus',
 		'App\Console\Commands\RequestPpcReport',
+		'App\Console\Commands\RequestMonthPpcReport',
 		'App\Console\Commands\GetPpcReport',
 		'App\Console\Commands\GetPpcSchedule',
 		'App\Console\Commands\AddSapInventory',
@@ -115,14 +116,16 @@ class Kernel extends ConsoleKernel
 
 		$schedule->command('get:order')->cron('*/30 * * * *')->name('getOrder')->withoutOverlapping();
 		$schedule->command('get:review 1days')->cron('0 */1 * * *')->name('getreviews')->withoutOverlapping();
-		$schedule->command('get:reviewTranslate')->cron('*/1 * * * *')->name('getreviewTranslate')->withoutOverlapping();
+		//$schedule->command('get:reviewTranslate')->cron('*/1 * * * *')->name('getreviewTranslate')->withoutOverlapping();
 		$schedule->command('get:star 5days')->twiceDaily(11, 23)->name('getstars')->withoutOverlapping();
 		$schedule->command('get:asin 3000 0')->cron('30 */3 * * *')->name('getasins')->withoutOverlapping();
 		$schedule->command('get:kunnr 3 0')->hourly()->name('getkunnrs')->withoutOverlapping();
 		//$schedule->command('get:sellers')->cron('*/1 * * * *')->name('sendmails')->withoutOverlapping();
 		$schedule->command('get:asininfo')->cron('0 */2 * * *')->name('getasininfo')->withoutOverlapping();
 		$schedule->command('request:ppcReport')->cron('0 */4 * * *')->name('requestppc')->withoutOverlapping();
-		$schedule->command('get:ppcReport')->cron('30 */1 * * *')->name('getppc')->withoutOverlapping();
+		$schedule->command('request:monthPpcReport')->dailyAt('01:00')->name('requestppcmonth')->withoutOverlapping();		for($pj=0;$pj<=20;$pj++){
+			$schedule->command('get:ppcReport --skip='.$pj)->cron('*/30 * * * *')->name('getppc'.$pj)->withoutOverlapping();
+		}
 		$schedule->command('get:ppcSchedule')->cron('*/4 * * * *')->name('scheduleppc')->withoutOverlapping();
 		$schedule->command('get:ads 10 1')->cron('5 0 * * *')->name('getads')->withoutOverlapping();
 		$schedule->command('get:profits 10 1 ')->cron('10 0 * * *')->name('getprotit')->withoutOverlapping();

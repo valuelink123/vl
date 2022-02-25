@@ -963,7 +963,7 @@ if((Auth::user()->can(['exception-check']) || in_array($exception['group_id'],ar
 		 * 把物料的库存列表带出来(包括fba、fbm)以供选择重发
 		 */
 		function handleItemCodeSearch() {
-			$('.item_code').each(function () {
+			$('#mt-repeater-product-contnet .item_code').each(function () {
 				// let $findBy = $(ele).siblings('.find_item_by')
 				// let eventData = JSON.parse($findBy.val())
 				// $findBy.remove()
