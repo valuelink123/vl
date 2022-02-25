@@ -160,7 +160,7 @@
 
             <div class="" style="margin-left: -100px;float: left;">
                 <div>在库库存维持天数（FBA+FBM）</div>
-                <input class="int_input" type="text" name="Inventory_days" id="Inventory_days" style="width:160px;" />
+                <input class="int_input" type="text" name="Inventory_days" id="Inventory_days" value="30" style="width:160px;" />
             </div>
 
         </div>
