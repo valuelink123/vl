@@ -1254,7 +1254,7 @@ class RoiController extends Controller
 		//资金周转次数
 //		$capital_turnover = $inventory_turnover_days!=0 ? 360/$inventory_turnover_days : 0; ///1.0本本的计算方式 365/($inventory_turnover_days-$billing_days+14);
 		///2022.2.25新版本的资金周转次数
-		$capital_turnover = 365/($inventory_turnover_days-$billing_days+14);
+		$capital_turnover = $inventory_turnover_days-$billing_days+14 !=0 ? sprintf("%.2f",365/($inventory_turnover_days-$billing_days+14)) : 0;
 		//投入资金
 		$invest_capital = ((($inventory_turnover_days-$billing_days+14)*$total_sales_volume/365)*($purchase_cost+$transport_cost+$tariff_amount)/$total_sales_volume);
 		//资金占用成本,资金占用成本，原来是乘以18%，现在改为乘以10%，资金占用成本最新版本2022.2.18：改为按照平均库存来计算，而不是投入资金
