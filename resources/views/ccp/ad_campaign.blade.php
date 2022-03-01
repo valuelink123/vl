@@ -76,16 +76,15 @@
                     </div>
 
                     <div class="col-md-2">
-                        <div class="input-group">
+                        <div class="input-group" id="type-div">
                             <span class="input-group-addon">Type</span>
-                            <select  style="width:100%;height:35px;" data-recent="" data-recent-date="" id="type" name="type">
-                                @foreach($type as $key=>$value)
-                                    <option value="{{ $key }}">{{ $value }}</option>
+                            <select class="mt-multiselect btn btn-default " multiple="multiple" data-label="left" data-width="100%" data-action-onchange="true"  name="type" id="type[]">
+                                @foreach ($type as $key=>$value)
+                                    <option value="{{$key}}">{{ $value }}</option>
                                 @endforeach
                             </select>
                         </div>
                     </div>
-
 
                     <div class="col-md-1">
                         <div class="input-group">
@@ -192,6 +191,7 @@
             rtl: App.isRTL(),
             autoclose: true
         });
+        $('#type').multiselect();
 
         $('#datatable').dataTable({
             searching: false,//关闭搜索
@@ -281,7 +281,18 @@
                     accountid = accountid + vv
                 }
             });
-            location.href='/ccp/adCampaign/export?'+search+'&account='+accountid;
+            //type的拼接
+            var type = '';
+            var vv = '';
+            $("#type-div .active").each(function (index,value) {
+                vv = $(this).find('input').val();
+                if(type != ''){
+                    type = type + ',' + vv
+                }else{
+                    type = type + vv
+                }
+            });
+            location.href='/ccp/adCampaign/export?'+search+'&account='+accountid+'&type='+type;
             return false;
         })
         times = 1;
@@ -305,7 +316,8 @@
                             '\n' +html+
                             '\t\t\t\t\t\t\t</select>';
                         $('#account-div').html(str);
-                        ComponentsBootstrapMultiselect.init();//处理account的多选显示样式
+                        $('#account').multiselect();
+                        // ComponentsBootstrapMultiselect.init();//处理account的多选显示样式
                     }else{
                         alert('请先选择站点');
                     }

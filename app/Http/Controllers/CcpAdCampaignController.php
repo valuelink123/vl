@@ -78,20 +78,31 @@ class CcpAdCampaignController extends Controller
 			$where .= " and ppc_profiles.seller_id in('".$account_str."')";
 		}
 
-		$table = isset($this->typeConfig['table'][$type]) ? $this->typeConfig['table'][$type] : 'ppc_sproducts_campaigns';
-
-		$sql = "SELECT  
-					round(sum(ppc_report_datas.cost),2) as cost,
-					round(sum(ppc_report_datas.attributed_sales1d),2) as sales
+		if($type){
+			$type_arr = explode(',',$type);
+		}else{
+			$type_arr = array('SProducts','SDisplay','SBrands');
+		}
+		$union_all = "";
+		foreach($type_arr as $type) {
+			$table = isset($this->typeConfig['table'][$type]) ? $this->typeConfig['table'][$type] : 'ppc_sproducts_campaigns';
+			$_sql = "SELECT  
+				round(sum(ppc_report_datas.cost),2) as cost,
+				round(sum(ppc_report_datas.attributed_sales1d),2) as sales
 			FROM
 					{$table} as campaigns
 			LEFT JOIN ppc_report_datas ON (
 					ppc_report_datas.record_type = 'campaign'
 					AND campaigns.campaign_id = ppc_report_datas.record_type_id
 			)
- 			left join ppc_profiles on campaigns.profile_id = ppc_profiles.profile_id
-			where ad_type = '".$type."' 
+			left join ppc_profiles on campaigns.profile_id = ppc_profiles.profile_id
+			where ad_type = '" . $type . "' 
 			{$where}";
+			$union_all = $union_all ? $union_all." union all " .$_sql : $_sql;
+		}
+		$sql = " SELECT 
+					round(sum(cost),2) as cost,
+					round(sum(sales),2) as sales from( ".$union_all . " ) AS UNION_table";
 
 		$orderData = DB::select($sql);
 		$array = array(
@@ -114,6 +125,7 @@ class CcpAdCampaignController extends Controller
 			$limit = " LIMIT {$limit} ";
 		}
 		$sql = $this->getSql($search) .$limit;
+
 		$_data = DB::select($sql);
 		$recordsTotal = $recordsFiltered = DB::select('SELECT FOUND_ROWS() as total');
 		$recordsTotal = $recordsFiltered = $recordsTotal[0]->total;
@@ -143,6 +155,7 @@ class CcpAdCampaignController extends Controller
 		$site = isset($search['site']) ? $search['site'] : '';//站点，为marketplaceid
 		$account = isset($search['account']) ? $search['account'] : '';//账号id,例如115,137
 		$type = isset($search['type']) ? $search['type'] : '';
+
 		$this->start_date = isset($search['start_date']) ? $search['start_date'] : '';
 		$this->end_date = isset($search['end_date']) ? $search['end_date'] : '';
 
@@ -156,10 +169,17 @@ class CcpAdCampaignController extends Controller
 			$account_str = implode("','", explode(',',$account));
 			$where .= " and ppc_profiles.seller_id in('".$account_str."')";
 		}
-		$table = isset($this->typeConfig['table'][$type]) ? $this->typeConfig['table'][$type] : 'ppc_sproducts_campaigns';
-		$budget_field = isset($this->typeConfig['budget_field'][$type]) ? $this->typeConfig['budget_field'][$type] : 'budget';
+		if($type){
+			$type_arr = explode(',',$type);
+		}else{
+			$type_arr = array('SProducts','SDisplay','SBrands');
+		}
+		$union_all = "";
+		foreach($type_arr as $type) {
+			$table = isset($this->typeConfig['table'][$type]) ? $this->typeConfig['table'][$type] : 'ppc_sproducts_campaigns';
+			$budget_field = isset($this->typeConfig['budget_field'][$type]) ? $this->typeConfig['budget_field'][$type] : 'budget';
 
-		$sql = "SELECT SQL_CALC_FOUND_ROWS 
+			$_sql = "SELECT  
 					any_value(ppc_profiles.account_name) as account_name,
        				any_value(ppc_profiles.seller_id) as seller_id,
 					campaigns.name as name,
@@ -177,10 +197,23 @@ class CcpAdCampaignController extends Controller
 					AND campaigns.campaign_id = ppc_report_datas.record_type_id
 			)
  			left join ppc_profiles on campaigns.profile_id = ppc_profiles.profile_id
-			where ad_type = '".$type."' 
+			where ad_type = '" . $type . "' 
 			{$where}
-			GROUP BY campaigns.name 
-			 order by sales desc";
+			GROUP BY campaigns.name ";
+
+			$union_all = $union_all ? $union_all." union all " .$_sql : $_sql;
+		}
+		$sql = " SELECT SQL_CALC_FOUND_ROWS 
+					any_value(account_name) as account_name,
+       				any_value(seller_id) as seller_id,
+					name,
+					any_value(state) as state,
+       				any_value(daily_budget) as daily_budget,
+					round(sum(cost),2) as cost,
+					sum(clicks) as clicks,
+					round(sum(sales),2) as sales,
+					sum(orders) as orders,
+					sum(impressions) as impressions from( ".$union_all . " ) AS UNION_table GROUP BY name  order by sales desc ";
 		return $sql;
 
 	}
