@@ -88,7 +88,7 @@ class CcpAdCampaignController extends Controller
 			$table = isset($this->typeConfig['table'][$type]) ? $this->typeConfig['table'][$type] : 'ppc_sproducts_campaigns';
 			$_sql = "SELECT  
 				round(sum(ppc_report_datas.cost),2) as cost,
-				round(sum(ppc_report_datas.attributed_sales1d),2) as sales
+				round(sum(case ad_type when 'SProducts' then ppc_report_datas.attributed_sales7d else ppc_report_datas.attributed_sales14d end ),2) as sales
 			FROM
 					{$table} as campaigns
 			LEFT JOIN ppc_report_datas ON (
@@ -187,8 +187,8 @@ class CcpAdCampaignController extends Controller
        				any_value(campaigns.{$budget_field}) as daily_budget,
 					round(sum(ppc_report_datas.cost),2) as cost,
 					sum(ppc_report_datas.clicks) as clicks,
-					round(sum(ppc_report_datas.attributed_sales1d),2) as sales,
-					sum(ppc_report_datas.attributed_conversions1d_same_sku) as orders,
+					round(sum(case ad_type when 'SProducts' then ppc_report_datas.attributed_sales7d else ppc_report_datas.attributed_sales14d end ),2) as sales,
+					sum(case ad_type when 'SProducts' then ppc_report_datas.attributed_conversions7d else ppc_report_datas.attributed_conversions14d end ) as orders,
 					sum(ppc_report_datas.impressions) as impressions
 			FROM
 					{$table} as campaigns
