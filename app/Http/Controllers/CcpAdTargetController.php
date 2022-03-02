@@ -94,7 +94,7 @@ class CcpAdTargetController extends Controller
 		}
 		$sql = "SELECT  
 					round(sum(ppc_report_datas.cost),2) as cost,
-					round(sum(ppc_report_datas.attributed_sales1d),2) as sales
+					round(sum(case ad_type when 'SProducts' then ppc_report_datas.attributed_sales7d else ppc_report_datas.attributed_sales14d end ),2) as sales
 			FROM
 					{$table_target} as targets
 			{$left}
@@ -183,8 +183,8 @@ class CcpAdTargetController extends Controller
 					any_value(targets.state) as state,
 					round(sum(ppc_report_datas.cost),2) as cost,
 					sum(ppc_report_datas.clicks) as clicks,
-					round(sum(ppc_report_datas.attributed_sales1d),2) as sales,
-					sum(ppc_report_datas.attributed_conversions1d_same_sku) as orders,
+					round(sum(case ad_type when 'SProducts' then ppc_report_datas.attributed_sales7d else ppc_report_datas.attributed_sales14d end ),2) as sales,
+					sum(case ad_type when 'SProducts' then ppc_report_datas.attributed_conversions7d else ppc_report_datas.attributed_conversions14d end ) as orders,
 					sum(ppc_report_datas.impressions) as impressions
 			FROM
 					{$table_target} as targets
