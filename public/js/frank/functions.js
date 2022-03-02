@@ -268,6 +268,29 @@ function getAccountBySelectedSite(){
         }
     });
 }
+/*
+ * 通过已选择的站点显示可选择的账号，账号为单选
+ */
+function getRadioAccountBySelectedSite(){
+    var marketplaceid = $('#site option:selected').val();
+    $.ajax({
+        type: 'post',
+        url: '/showAccountBySite',
+        data: {marketplaceid:marketplaceid,field:'mws_seller_id'},
+        dataType:'json',
+        success: function(res) {
+            if(res.status==1){
+                var html = '';
+                $.each(res.data,function(i,item) {
+                    html += '<option value="'+item.id+'">'+item.label+'</option>';
+                })
+                $('#account').html(html);
+            }else{
+                alert('请先选择站点');
+            }
+        }
+    });
+}
 
 /*
 * 通过选择的站点账号得到Campaign,ajax联动
@@ -275,7 +298,6 @@ function getAccountBySelectedSite(){
 function getCampaignBySelectedAccount(){
     var marketplaceid = $('#site option:selected').val();
     var selectedAccount = $('#account').val();
-    console.log(123);
     $.ajax({
         type: 'post',
         url: '/getCampaignBySiteAccount',
@@ -298,4 +320,96 @@ function getCampaignBySelectedAccount(){
             }
         }
     });
+}
+
+/*
+* 通过选择的站点账号得到Campaign,ajax联动
+ */
+function getRadioCampaignBySelectedAccount(){
+    var marketplaceid = $('#site option:selected').val();
+    var selectedAccount = $('#account').val();
+    $.ajax({
+        type: 'post',
+        url: '/getCampaignBySiteAccount',
+        data: {marketplaceid:marketplaceid,account:selectedAccount},
+        dataType:'json',
+        async: false,
+        success: function(res) {
+            if(res.status==1){
+                var html = '';
+                $.each(res.data,function(i,item) {
+                    html += '<option value="'+item.campaign_id+'">'+item.name+'</option>';
+                })
+                $('#campaign').html(html);
+            }else{
+                alert('请先选择站点或者账号');
+            }
+        }
+    });
+}
+
+
+/*
+ * 通过选择的campaign得到该campaign已设置的group
+ */
+function getRadioGroupBySelectedCampaign()
+{
+    var marketplaceid = $('#site option:selected').val();
+    var selectedAccount = $('#account').val();
+    var selectedCampaign = $('#campaign').val();
+    if(selectedCampaign) {
+        $.ajax({
+            type: 'post',
+            url: '/getGroupBySiteCampaign',
+            data: {marketplaceid: marketplaceid, account: selectedAccount, campaign: selectedCampaign},
+            dataType: 'json',
+            success: function (res) {
+                if (res.status == 1) {
+                    var html = '';
+                    $.each(res.data, function (i, item) {
+                        html += '<option value="' + item.ad_group_id + '">' + item.name + '</option>';
+                    })
+                    $('#ad_group').html(html);
+                } else {
+                    alert('请先选择campaign');
+                }
+            }
+        });
+    }else{
+        var html = '';
+        $('#ad_group').html(html);
+    }
+}
+/*
+ * 通过选择的campaign得到该campaign所属的类型，在设置campaign的时候就会设置好这是哪一个type的广告
+ */
+function getDataBySelectedCampaign()
+{
+    var selectedCampaign = $('#campaign').val();
+    if(selectedCampaign) {
+        $.ajax({
+            type: 'post',
+            url: '/getDataBySiteCampaign',
+            data: {campaign: selectedCampaign},
+            dataType: 'json',
+            success: function (res) {
+                if (res.status == 1) {
+                    var html = '';
+                    var profile_id = '';
+                    $.each(res.data, function (i, item) {
+                        html += '<option value="' + item.type + '">' + item.name + '</option>';
+                        profile_id = item.profile_id;
+                    })
+                    $('#ad_type').html(html);
+                    $('#profile_id').val(profile_id);
+                } else {
+                    alert('请先选择campaign');
+                }
+            }
+        });
+    }else{
+        var html = '';
+        $('#ad_type').html(html);
+        $('#profile_id').val('');
+    }
 }

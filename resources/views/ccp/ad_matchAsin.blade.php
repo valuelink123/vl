@@ -19,24 +19,34 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <div class="input-group" id="account-div">
                             <span class="input-group-addon">Account</span>
                         </div>
                     </div>
 
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <div class="input-group" id="campaign-div">
                             <span class="input-group-addon">Campaign</span>
                         </div>
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-3">
+                        <div class="input-group">
+                            <span class="input-group-addon">Campaign Name</span>
+                            <input class="form-control" value="" id="campaign_name" placeholder="Campaign Name" name="campaign_name">
+                        </div>
+                    </div>
+
+                    <div class="col-md-1">
                         <div class="input-group">
                             <div class="btn-group pull-right" >
                                 <button id="search_top" class="btn sbold blue">Search</button>
                             </div>
                         </div>
                     </div>
+{{--                    <div class="col-md-1">--}}
+{{--                        <a  href="/ccp/adMatchAsin/add" target="_blank">Add New</a>--}}
+{{--                    </div>--}}
                 </div>
             </form>
         </div>
@@ -89,7 +99,7 @@
             ajax: {
                 type: 'POST',
                 url: '/ccp/adMatchAsin/list',
-                data:  {search: $("#search-form").serialize()}
+                data:  {search: decodeURIComponent($("#search-form").serialize().replace(/\+/g, " "), true)}
             }
         })
 
@@ -97,7 +107,8 @@
         $('#search_top').click(function(){
             // 改变下面表格的数据内容
             dtapi = $('#datatable').dataTable().api();
-            dtapi.settings()[0].ajax.data = {search: $("#search-form").serialize()};
+            //输入框解决中文乱码
+            dtapi.settings()[0].ajax.data = {search: decodeURIComponent($("#search-form").serialize().replace(/\+/g, " "), true)};
             dtapi.ajax.reload();
             return false;
         })
@@ -129,7 +140,6 @@
                     }
                 }
             });
-
         }
 
         $("#account-div").change(function(){

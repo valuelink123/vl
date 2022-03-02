@@ -43,16 +43,20 @@ class CcpAdMatchAsinController extends Controller
 		$site = isset($search['site']) ? $search['site'] : '';//站点，为marketplaceid
 		$account = isset($search['account']) ? $search['account'] : '';//账号
 		$campaign = isset($search['campaign']) ? $search['campaign'] : '';
+		$campaign_name = isset($search['campaign_name']) ? $search['campaign_name'] : '';//campaign_name
 
 		//搜索条件
 		$where = '';
 		$where .= " and profiles.marketplace_id = '".$site."'";
 		if($account){
 			$account_str = "'".implode("','", explode(',',$account))."'";
-			$where .= " and profiles.seller_id in('".$account_str."')";
+			$where .= " and profiles.seller_id in(".$account_str.")";
 		}
 		if($campaign){
-			$where .= " and profiles.seller_id in(".$campaign.")";
+			$where .= " and union_table.campaign_id in(".$campaign.")";
+		}
+		if($campaign_name){
+			$where .= " and union_table.campaign like '%". $campaign_name ."%'";
 		}
 
 		if($_REQUEST['length']){
@@ -71,13 +75,18 @@ class CcpAdMatchAsinController extends Controller
 	LEFT JOIN ppc_sdisplay_ad_groups as groups ON groups.ad_group_id = products.ad_group_id 
 	left join ppc_sdisplay_campaigns as campaigns on products.campaign_id = campaigns.campaign_id 
 	UNION all
+	SELECT 'N/A' AS ASIN,'N/A' AS sku,groups.name AS ad_group,campaigns.name AS campaign,'sbrands' AS ad_type,campaigns.profile_id AS profile_id,campaigns.campaign_id AS campaign_id,0 AS ad_id,groups.ad_group_id AS ad_group_id,'system' AS 'data_type','N/A' AS id
+	from ppc_sbrands_campaigns AS campaigns 
+	LEFT JOIN ppc_sbrands_ad_groups AS groups ON campaigns.campaign_id = groups.campaign_id 
+	LEFT JOIN ppc_ad_match_asin ON ppc_ad_match_asin.campaign_id=campaigns.campaign_id WHERE ppc_ad_match_asin.campaign_id IS null
+	UNION ALL
   SELECT products.asin as asin,products.sku as sku,products.ad_group AS ad_group,products.campaign AS campaign,products.ad_type AS ad_type,products.profile_id AS profile_id,products.campaign_id AS campaign_id,products.ad_id AS ad_id,products.ad_group_id AS ad_group_id,'add' as 'data_type',id
   from ppc_ad_match_asin AS products 
  ) AS union_table 
  left join ppc_profiles AS profiles on union_table.profile_id = profiles.profile_id 
  WHERE profiles.marketplace_id IS NOT NULL AND profiles.seller_id IS NOT NULL AND union_table.campaign_id IS NOT NULL {$where}
 			 {$limit}";
-
+		
 		$_data = DB::select($sql);
 		$recordsTotal = $recordsFiltered = DB::select('SELECT FOUND_ROWS() as total');
 		$recordsTotal = $recordsFiltered = $recordsTotal[0]->total;
@@ -90,7 +99,11 @@ class CcpAdMatchAsinController extends Controller
 		foreach($_data as $key=>$val){
 			$data[$key] = $val = (array)$val;
 			$data[$key]['site'] = $domain;
-			$data[$key]['action'] = '<a href="/ccp/adMatchAsin/add?marketplace_id='.$val['marketplace_id'].'&seller_id='.$val['seller_id'].'&account_name='.$val['account_name'].'&campaign='.$val['campaign'].'&ad_group='.$val['ad_group'].'&ad_type='.$val['ad_type'].'&campaign_id='.$val['campaign_id'].'&ad_group_id='.$val['ad_group_id'].'&ad_id='.$val['ad_id'].'&profile_id='.$val['profile_id'].'" class="btn btn-success btn-xs">增加</a>   ';
+			if($val['ad_type']=='sbrands' && $val['asin']!='N/A'){
+				$data[$key]['action'] = '';
+			}else {
+				$data[$key]['action'] = '<a href="/ccp/adMatchAsin/add?marketplace_id=' . $val['marketplace_id'] . '&seller_id=' . $val['seller_id'] . '&account_name=' . $val['account_name'] . '&campaign=' . $val['campaign'] . '&ad_group=' . $val['ad_group'] . '&ad_type=' . $val['ad_type'] . '&campaign_id=' . $val['campaign_id'] . '&ad_group_id=' . $val['ad_group_id'] . '&ad_id=' . $val['ad_id'] . '&profile_id=' . $val['profile_id'] . '" class="btn btn-success btn-xs">增加</a>   ';
+			}
 			if($val['data_type']=='add'){
 				$data[$key]['action'] .= '<a href="javascript:void(0);" class="btn btn-success btn-xs" onclick="del('.$val['id'].')">删除</a>';
 			}
@@ -110,15 +123,18 @@ class CcpAdMatchAsinController extends Controller
 	public function add(Request $request)
 	{
 		$site = getMarketDomain();//获取站点选项
+		$ad_type = array('sproducts','sdisplay','sbrands');
 		if($request->isMethod('get')){
 			$params = $_GET;
-			$params['domain'] = 'N/A';
-			foreach($site as $key=>$val){
-				if($val->marketplaceid==$params['marketplace_id']){
-					$params['domain'] = $val->domain;
+			if(isset($params['marketplace_id'])) {
+				$params['domain'] = 'N/A';
+				foreach ($site as $key => $val) {
+					if ($val->marketplaceid == $params['marketplace_id']) {
+						$params['domain'] = $val->domain;
+					}
 				}
 			}
-			return view('ccp/ad_matchAsin_add',['params'=>$params]);
+			return view('ccp/ad_matchAsin_add',['params'=>$params,'site'=>$site,'ad_type'=>$ad_type]);
 		}elseif ($request->isMethod('post')){
 			$insertData = array();
 			$configField = array('marketplace_id','seller_id','campaign','ad_group','ad_type','asin','sku','sap_seller_id','campaign_id','ad_group_id','ad_id','profile_id');

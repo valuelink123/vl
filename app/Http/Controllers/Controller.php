@@ -559,7 +559,11 @@ ORDER BY asin_offer_summary.asin DESC ";
 		if($marketplaceid){
 			$sql_profileId = "SELECT profile_id FROM ppc_profiles WHERE marketplace_id = '".$marketplaceid."'";
 			if($account){
-				$account_str = "'".implode("','", $account)."'";
+				if(is_array($account)){
+					$account_str = "'".implode("','", $account)."'";
+				}else{
+					$account_str = "'".$account."'";
+				}
 				$sql_profileId .= " AND seller_id IN(".$account_str.")";
 			}
 			$sql = "SELECT campaign_id,name FROM (
@@ -578,6 +582,58 @@ ORDER BY asin_offer_summary.asin DESC ";
 		}
 		return $return;
 	}
+
+	/*
+	 * 通过选择的campaign得到griup,ajax联动
+	 */
+	public function getGroupBySiteCampaign()
+	{
+		$marketplaceid = isset($_REQUEST['marketplaceid']) ? $_REQUEST['marketplaceid'] : '';
+		$account = isset($_REQUEST['account']) ? $_REQUEST['account'] : '';
+		$campaign = isset($_REQUEST['campaign']) ? $_REQUEST['campaign'] : '';
+		$return = array('status'=>1,'data'=>array());
+		if($campaign){
+			$sql = "SELECT ad_group_id,name FROM (
+						SELECT ad_group_id,name,campaign_id FROM ppc_sbrands_ad_groups 
+						UNION ALL 
+						SELECT ad_group_id,name,campaign_id FROM ppc_sdisplay_ad_groups 
+						UNION ALL 
+						SELECT ad_group_id,NAME,campaign_id FROM ppc_sproducts_ad_groups 
+					) AS ad_group WHERE campaign_id = {$campaign} order by name asc";
+			$data= DB::select($sql);
+			foreach($data as $key=>$val){
+				$return['data'][$key] = (array)$val;
+			}
+		}else{
+			$return['status'] = 0;
+		}
+		return $return;
+	}
+	/*
+	 *
+	 */
+	public function getDataBySiteCampaign()
+	{
+		$campaign = isset($_REQUEST['campaign']) ? $_REQUEST['campaign'] : '';
+		$return = array('status'=>1,'data'=>array());
+		if($campaign){
+			$sql = "SELECT type,name,profile_id FROM (
+						SELECT 'sbrands' as type,'sbrands' as name,campaign_id,profile_id FROM ppc_sbrands_campaigns 
+						UNION ALL 
+						SELECT 'sdisplay' as type,'sdisplay' as name,campaign_id,profile_id FROM ppc_sdisplay_campaigns 
+						UNION ALL 
+						SELECT 'sproducts' as type,'sproducts' as name,campaign_id,profile_id FROM ppc_sproducts_campaigns 
+					) AS ad_type WHERE campaign_id = {$campaign} order by name asc";
+			$data= DB::select($sql);
+			foreach($data as $key=>$val){
+				$return['data'][$key] = (array)$val;
+			}
+		}else{
+			$return['status'] = 0;
+		}
+		return $return;
+	}
+
 	/*
 	 * 通过选中的站点得到某个asin的销售员
 	 */
@@ -597,6 +653,7 @@ ORDER BY asin_offer_summary.asin DESC ";
 	{
 		$sap_seller = getUsers('sap_seller');
 		$sku = $sellers = array();
+
 		if ($_POST['marketplace_id'] && $_POST['seller_id'] && $_POST['seller_id']){
 			$asinMatchSkuData = DB::connection('amazon')->table('sap_asin_match_sku')->where('marketplace_id', $_POST['marketplace_id'])->where('seller_id', $_POST['seller_id'])->where('asin', $_POST['asin'])->get();
 			foreach ($asinMatchSkuData as $key => $val) {

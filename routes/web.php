@@ -632,6 +632,8 @@ Route::get('/inventoryCycleCount/downloadSku', 'InventoryCycleCountController@do
 Route::post('/inventoryCycleCount/importSku', 'InventoryCycleCountController@importSku');//导入sku数据
 Route::get('/inventoryCycleCount/downloadAccountNumber', 'InventoryCycleCountController@downloadAccountNumber');//下载财务部需要的添加账面数量模板
 Route::post('/inventoryCycleCount/importAccountNumber', 'InventoryCycleCountController@importAccountNumber');//财务部导入账面数量数据
+Route::get('/inventoryCycleCount/downloadDisposeAfterAccountNumber', 'InventoryCycleCountController@downloadDisposeAfterAccountNumber');//下载财务部需要添加的处理后账面数量模板
+Route::post('/inventoryCycleCount/importDisposeAfterAccountNumber', 'InventoryCycleCountController@importDisposeAfterAccountNumber');//财务部导入处理后的账面数量数据
 Route::get('/inventoryCycleCount/downloadActualNumber', 'InventoryCycleCountController@downloadActualNumber');//下载物流部需要的添加真实数量模板
 Route::post('/inventoryCycleCount/importActualNumber', 'InventoryCycleCountController@importActualNumber');//导入真实数量数据
 //Route::get('/inventoryCycleCount/downloadReason', 'InventoryCycleCountController@downloadReason');//下载导入差异原因的模板
@@ -687,6 +689,8 @@ Route::get('/budgetSkuExport', 'BudgetskuController@export');
 Route::get('/ccp/adMatchAsin', 'CcpAdMatchAsinController@index'); //广告映射关系
 Route::post('/ccp/adMatchAsin/list', 'CcpAdMatchAsinController@list');//广告映射关系的列表展示
 Route::post('/getCampaignBySiteAccount', 'Controller@getCampaignBySiteAccount')->name('getCampaignBySiteAccount');//通过选择的站点账号得到Campaign
+Route::post('/getGroupBySiteCampaign', 'Controller@getGroupBySiteCampaign')->name('getGroupBySiteCampaign');//通过选择的campaign得到组别
+Route::post('/getDataBySiteCampaign', 'Controller@getDataBySiteCampaign')->name('getDataBySiteCampaign');//通过选择的campaign得到该campaign的type
 Route::match(['post','get'],'/ccp/adMatchAsin/add', 'CcpAdMatchAsinController@add'); //广告映射关系
 Route::post('/ccp/asinMatchSkuDataByAsin', 'Controller@asinMatchSkuDataByAsin');//通过asin得到匹配的asin相关数据
 Route::post('/ccp/adMatchAsin/delete', 'CcpAdMatchAsinController@delete');//删除数据
