@@ -210,6 +210,7 @@ class CcpAdProductController extends Controller
 		}
 		$sql = "SELECT  SQL_CALC_FOUND_ROWS 
     					products.asin as asin,
+       					group_concat(campaigns.name)as campaign_name,
 						round(sum(ppc_report_datas.cost),2) as cost,
 						sum(ppc_report_datas.clicks) as clicks,
        					round(sum(case ad_type when 'SProducts' then ppc_report_datas.attributed_sales7d else ppc_report_datas.attributed_sales14d end ),2) as sales,
@@ -300,6 +301,7 @@ class CcpAdProductController extends Controller
 			$val['cr'] = $val['clicks'] > 0 ? sprintf("%.2f",$val['orders']*100/$val['clicks']).'%' : '-';
 			$data[$val['asin']] = $val;
 			$data[$val['asin']]['asin'] = '<a href="https://www.' .$domain. '/dp/' . $val['asin'] .'" target="_blank" rel="noreferrer">'.$val['asin'].'</a>';
+			$data[$val['asin']]['campaign'] = '<span title="'.$val['campaign_name'].'">'.mb_substr($val['campaign_name'],0,50).'</span>';
 			$data[$val['asin']]['asin_export'] = $val['asin'];
 		}
 		if($asins){

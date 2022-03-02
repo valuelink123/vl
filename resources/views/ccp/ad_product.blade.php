@@ -199,6 +199,7 @@
                         <th>PRODUCT</th>
                         <th>ASIN</th>
                         <th>Item No.</th>
+                        <th>Campaign</th>
                         <th>AD COST</th>
                         <th>SALES</th>
                         <th>ORDERS</th>
@@ -243,6 +244,7 @@
                     {data: 'title',name:'title'},
                     {data: 'asin',name:'asin'},
                     {data: 'item_no',name:'item_no'},
+                    {data: 'campaign',name:'campaign'},
                     {data: 'cost',name:'cost'},
                     {data: 'sales',name:'sales'},
                     {data: 'orders',name:'orders'},
