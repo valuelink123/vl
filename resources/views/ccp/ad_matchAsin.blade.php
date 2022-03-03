@@ -6,7 +6,7 @@
 @section('content')
     @include('frank.common')
     <div class="row">
-        <div class="top portlet light" style="margin-left:-25px;">
+        <div class="top portlet light" style="margin-left:-25px;height: 130px;">
             <form id="search-form" >
                 <div class="search portlet light">
                     <div class="col-md-2">
@@ -18,10 +18,20 @@
                                 @endforeach
                             </select>
                         </div>
+                        <br/>
+                        <div class="input-group">
+                            <span class="input-group-addon">ASIN</span>
+                            <input class="form-control" value="" id="asin" placeholder="Asin" name="asin">
+                        </div>
                     </div>
                     <div class="col-md-2">
                         <div class="input-group" id="account-div">
                             <span class="input-group-addon">Account</span>
+                        </div>
+                        <br/>
+                        <div class="input-group">
+                            <span class="input-group-addon">SKU</span>
+                            <input class="form-control" value="" id="sku" placeholder="sku" name="sku">
                         </div>
                     </div>
 

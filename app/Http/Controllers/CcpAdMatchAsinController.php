@@ -44,6 +44,8 @@ class CcpAdMatchAsinController extends Controller
 		$account = isset($search['account']) ? $search['account'] : '';//账号
 		$campaign = isset($search['campaign']) ? $search['campaign'] : '';
 		$campaign_name = isset($search['campaign_name']) ? $search['campaign_name'] : '';//campaign_name
+		$asin = isset($search['asin']) ? $search['asin'] : '';
+		$sku = isset($search['sku']) ? $search['sku'] : '';
 
 		//搜索条件
 		$where = '';
@@ -57,6 +59,12 @@ class CcpAdMatchAsinController extends Controller
 		}
 		if($campaign_name){
 			$where .= " and union_table.campaign like '%". $campaign_name ."%'";
+		}
+		if($asin){
+			$where .= " and union_table.asin like '%". $asin ."%'";
+		}
+		if($sku){
+			$where .= " and union_table.sku like '%". $sku ."%'";
 		}
 
 		if($_REQUEST['length']){
@@ -75,7 +83,7 @@ class CcpAdMatchAsinController extends Controller
 	LEFT JOIN ppc_sdisplay_ad_groups as groups ON groups.ad_group_id = products.ad_group_id 
 	left join ppc_sdisplay_campaigns as campaigns on products.campaign_id = campaigns.campaign_id 
 	UNION all
-	SELECT 'N/A' AS ASIN,'N/A' AS sku,groups.name AS ad_group,campaigns.name AS campaign,'sbrands' AS ad_type,campaigns.profile_id AS profile_id,campaigns.campaign_id AS campaign_id,0 AS ad_id,groups.ad_group_id AS ad_group_id,'system' AS 'data_type','N/A' AS id
+	SELECT 'N/A' AS asin,'N/A' AS sku,groups.name AS ad_group,campaigns.name AS campaign,'sbrands' AS ad_type,campaigns.profile_id AS profile_id,campaigns.campaign_id AS campaign_id,0 AS ad_id,groups.ad_group_id AS ad_group_id,'system' AS 'data_type','N/A' AS id
 	from ppc_sbrands_campaigns AS campaigns 
 	LEFT JOIN ppc_sbrands_ad_groups AS groups ON campaigns.campaign_id = groups.campaign_id 
 	LEFT JOIN ppc_ad_match_asin ON ppc_ad_match_asin.campaign_id=campaigns.campaign_id WHERE ppc_ad_match_asin.campaign_id IS null
@@ -86,7 +94,7 @@ class CcpAdMatchAsinController extends Controller
  left join ppc_profiles AS profiles on union_table.profile_id = profiles.profile_id 
  WHERE profiles.marketplace_id IS NOT NULL AND profiles.seller_id IS NOT NULL AND union_table.campaign_id IS NOT NULL {$where}
 			 {$limit}";
-		
+
 		$_data = DB::select($sql);
 		$recordsTotal = $recordsFiltered = DB::select('SELECT FOUND_ROWS() as total');
 		$recordsTotal = $recordsFiltered = $recordsTotal[0]->total;
