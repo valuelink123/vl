@@ -16,6 +16,8 @@ use App\Inbox;
 use App\Rule;
 use App\Exception;
 use Log;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class Controller extends BaseController
 {
@@ -849,6 +851,30 @@ ORDER BY asin_offer_summary.asin DESC ";
 			file_get_contents('http://16.163.26.169/api/exception/webhook?params=' . $params);
 		}
 		return true;
+	}
+
+	/*
+	 * 导出excel表格函数
+	 */
+	public function exportExcel($arrayData,$fileName)
+	{
+		if($arrayData){
+			$spreadsheet = new Spreadsheet();
+
+			$spreadsheet->getActiveSheet()
+				->fromArray(
+					$arrayData,  // The data to set
+					NULL,        // Array values with this value will not be set
+					'A1'         // Top left coordinate of the worksheet range where
+				//    we want to set these values (default is A1)
+				);
+			header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');//告诉浏览器输出07Excel文件
+			header('Content-Disposition: attachment;filename="'.$fileName.'"');//告诉浏览器输出浏览器名称
+			header('Cache-Control: max-age=0');//禁止缓存
+			$writer = new Xlsx($spreadsheet);
+			$writer->save('php://output');
+		}
+		die();
 	}
 
 }

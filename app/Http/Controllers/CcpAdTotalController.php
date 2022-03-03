@@ -40,20 +40,41 @@ class CcpAdTotalController extends Controller
 	{
 		$search = isset($_REQUEST['search']) ? $_REQUEST['search'] : '';
 		$search = $this->getSearchData(explode('&',$search));
+		$data = $this->getTotalBgData($search);
+		$data = array_values($data);
+		return compact('data');
+	}
+	//bg维度统计数据的导出
+	public function adTotalBgExport(Request $req)
+	{
+		if(!Auth::user()->can(['ccp-adTotalBg-export'])) die('Permission denied -- ccp adTotalBg export');
+		$data = $this->getTotalBgData($_GET);
+		$headArray = array('部门','站内纯广告费用','站内纯广告销售额','站内纯广告费用/纯广告销售额比例','站内总销售额','总销售额扣除15%（退货10%和VAT的5%)','站内纯广告费用/总销售额');
+		$arrayData[] = $headArray;
+		foreach($data as $key=>$val){
+			$arrayData[] = array(
+				$val['bg'],
+				$val['ad_cost'],
+				$val['ad_sales'],
+				$val['ad_acos'],
+				$val['total_sales'],
+				$val['actual_sales'],
+				$val['acos']
+			);
+		}
+		$this->exportExcel($arrayData,"asTotalBg.xlsx");
+	}
+	//得到bg维度统计数据
+	public function getTotalBgData($search)
+	{
 		$start_date = isset($search['start_date']) ? $search['start_date'] : '';
 		$end_date = isset($search['end_date']) ? $search['end_date'] : '';
 		$site = isset($search['site']) ? $search['site'] : '';
-
-//		$start_date = '2021-08-01';//测试时间
-//		$end_date = '2021-12-01';//测试时间
 		$_data = $this->getAdData($site,$start_date,$end_date);//得到站点广告数据
-
 		//求ccp的站内总销售额
-//		$start_date = $end_date = '2021-01-19';//测试时间
 		$_sales = $this->getCcpData($site,$start_date,$end_date);
 		$bgs = $this->getBg();
 		$asinData = $this->getSapAsinMatchSkuInfo();
-
 		$data = array();
 		//各个bg的参数先赋值
 		foreach($bgs as $bgk=>$bgv){
@@ -104,12 +125,8 @@ class CcpAdTotalController extends Controller
 			$data['total']['actual_sales'] = sprintf("%.2f", $data['total']['total_sales'] * 0.85);
 			$data['total']['acos'] = $data['total']['actual_sales'] > 0 ? sprintf("%.2f", $data['total']['ad_cost'] * 100 / $data['total']['actual_sales']) . '%' : '-';
 		}
-
-
-		$data = array_values($data);
-		return compact('data');
+		return $data;
 	}
-
 	/**
 	 * 展示列表页面
 	 */
@@ -137,17 +154,39 @@ class CcpAdTotalController extends Controller
 	{
 		$search = isset($_REQUEST['search']) ? $_REQUEST['search'] : '';
 		$search = $this->getSearchData(explode('&',$search));
+		$data = $this->getTotalBuData($search);
+		$data = array_values($data);
+		return compact('data');
+	}
+	//BU维度统计数据的导出
+	public function adTotalBuExport()
+	{
+		if(!Auth::user()->can(['ccp-adTotalBu-export'])) die('Permission denied -- ccp adTotalBu export');
+		$data = $this->getTotalBuData($_GET);
+		$headArray = array('部门','站内纯广告费用','站内纯广告销售额','站内纯广告费用/纯广告销售额比例','站内总销售额','总销售额扣除15%（退货10%和VAT的5%)','站内纯广告费用/总销售额');
+		$arrayData[] = $headArray;
+		foreach($data as $key=>$val){
+			$arrayData[] = array(
+				$val['department'],
+				$val['ad_cost'],
+				$val['ad_sales'],
+				$val['ad_acos'],
+				$val['total_sales'],
+				$val['actual_sales'],
+				$val['acos']
+			);
+		}
+		$this->exportExcel($arrayData,"asTotalBu.xlsx");
+	}
+	//得到bu维度统计数据
+	public function getTotalBuData($search)
+	{
 		$start_date = isset($search['start_date']) ? $search['start_date'] : '';
 		$end_date = isset($search['end_date']) ? $search['end_date'] : '';
 		$site = isset($search['site']) ? $search['site'] : '';
 		$bg = isset($search['bg']) ? $search['bg'] : '';
-
-//		$start_date = '2021-08-01';//测试时间
-//		$end_date = '2021-12-01';//测试时间
 		$_data = $this->getAdData($site,$start_date,$end_date,$bg);//得到站点广告数据
-
 		//求ccp的站内总销售额
-//		$start_date = $end_date = '2021-01-19';//测试时间
 		$_sales = $this->getCcpData($site,$start_date,$end_date,$bg);
 		$bus = $this->getBu($bg);
 		$asinData = $this->getSapAsinMatchSkuInfo($site,$bg);
@@ -201,9 +240,7 @@ class CcpAdTotalController extends Controller
 			$data['total']['actual_sales'] = sprintf("%.2f", $data['total']['total_sales'] * 0.85);
 			$data['total']['acos'] = $data['total']['actual_sales'] > 0 ? sprintf("%.2f", $data['total']['ad_cost'] * 100 / $data['total']['actual_sales']) . '%' : '-';
 		}
-
-		$data = array_values($data);
-		return compact('data');
+		return $data;
 	}
 
 	/**
@@ -241,18 +278,42 @@ class CcpAdTotalController extends Controller
 	{
 		$search = isset($_REQUEST['search']) ? $_REQUEST['search'] : '';
 		$search = $this->getSearchData(explode('&',$search));
+		$data = $this->getTotalSellerData($search);
+
+		$data = array_values($data);
+		return compact('data');
+	}
+	//广告汇总销售员维度导出
+	public function adTotalSellerExport()
+	{
+		if(!Auth::user()->can(['ccp-adTotalSeller-export'])) die('Permission denied -- ccp adTotalSeller export');
+		$data = $this->getTotalSellerData($_GET);
+		$headArray = array('人员','SKU','站内纯广告费用','站内纯广告销售额','站内纯广告费用/纯广告销售额比例','站内总销售额','总销售额扣除15%（退货10%和VAT的5%)','站内纯广告费用/总销售额');
+		$arrayData[] = $headArray;
+		foreach($data as $key=>$val){
+			$arrayData[] = array(
+				$val['seller'],
+				$val['sku'],
+				$val['ad_cost'],
+				$val['ad_sales'],
+				$val['ad_acos'],
+				$val['total_sales'],
+				$val['actual_sales'],
+				$val['acos']
+			);
+		}
+		$this->exportExcel($arrayData,"asTotalSeller.xlsx");
+	}
+	//得到销售员维度统计数据
+	public function getTotalSellerData($search)
+	{
 		$start_date = isset($search['start_date']) ? $search['start_date'] : '';
 		$end_date = isset($search['end_date']) ? $search['end_date'] : '';
 		$site = isset($search['site']) ? $search['site'] : '';
 		$bg = isset($search['bg']) ? $search['bg'] : '';
 		$bu = isset($search['bu']) ? $search['bu'] : '';
-
-//		$start_date = '2021-08-01';//测试时间
-//		$end_date = '2021-12-01';//测试时间
 		$_data = $this->getAdData($site,$start_date,$end_date,$bg,$bu);//得到站点广告数据
-
 		//求ccp的站内总销售额
-//		$start_date = $end_date = '2021-01-19';//测试时间
 		$_sales = $this->getCcpData($site,$start_date,$end_date,$bg,$bu);
 		$bus = $this->getBu($bg);
 		$asinData = $this->getSapAsinMatchSkuInfo($site,$bg,$bu);
@@ -329,9 +390,7 @@ class CcpAdTotalController extends Controller
 			$data['total']['actual_sales'] = sprintf("%.2f", $data['total']['total_sales'] * 0.85);
 			$data['total']['acos'] = $data['total']['actual_sales'] > 0 ? sprintf("%.2f", $data['total']['ad_cost'] * 100 / $data['total']['actual_sales']) . '%' : '-';
 		}
-
-		$data = array_values($data);
-		return compact('data');
+		return $data;
 	}
 
 
@@ -340,6 +399,8 @@ class CcpAdTotalController extends Controller
 	 */
 	public function getAdData($site,$start_date,$end_date,$bg='',$bu='')
 	{
+//		$start_date = '2021-08-01';//测试时间
+//		$end_date = '2021-12-01';//测试时间
 		$userAsins = $this->getUserAsin($site,$bg,$bu);
 		$userAsins_str = implode("','",$userAsins);
 		$sql="select SQL_CALC_FOUND_ROWS union_table.marketplace_id,union_table.seller_id,union_table.asin,sum(union_table.cost) as ad_cost,sum(union_table.attributed_sales1d) as ad_sales from (SELECT data.`date`,data.impressions,data.clicks,data.cost,data.attributed_sales1d,data.attributed_units_ordered1d,ads.asin,ads.sku,profile.seller_id,profile.marketplace_id,profile.account_name
@@ -371,6 +432,7 @@ AND profile.marketplace_id='".$site."'
 	 */
 	public function getCcpData($site,$start_date,$end_date,$bg='',$bu='')
 	{
+//		$start_date = $end_date = '2021-01-19';//测试时间
 		$userAsins = $this->getUserAsin($site,$bg,$bu,'asin');
 		$userAsins_str = implode("','",$userAsins);
 		$orderwhere = $where = $this->getCcpDateWhere($site,1,$start_date,$end_date);

@@ -697,9 +697,12 @@ Route::post('/ccp/adMatchAsin/delete', 'CcpAdMatchAsinController@delete');//删�
 //相关统计数据
 Route::get('/ccp/adTotalBg', 'CcpAdTotalController@adTotalBgIndex'); //广告汇总BG维度
 Route::post('/ccp/adTotalBg/list', 'CcpAdTotalController@adTotalBgList'); //广告汇总BG维度
+Route::get('/ccp/adTotalBg/export', 'CcpAdTotalController@adTotalBgExport'); //广告汇总BG维度导出
 Route::get('/ccp/adTotalBu', 'CcpAdTotalController@adTotalBuIndex'); //广告汇总BU维度
 Route::post('/ccp/adTotalBu/list', 'CcpAdTotalController@adTotalBuList'); //广告汇总BU维度
+Route::get('/ccp/adTotalBu/export', 'CcpAdTotalController@adTotalBuExport'); //广告汇总BU维度导出
 Route::get('/ccp/adTotalSeller', 'CcpAdTotalController@adTotalSellerIndex'); //广告汇总销售员维度
 Route::post('/ccp/adTotalSeller/list', 'CcpAdTotalController@adTotalSellerList'); //广告汇总销售员维度
+Route::get('/ccp/adTotalSeller/export', 'CcpAdTotalController@adTotalSellerExport'); //广告汇总销售员维度导出
 
 Route::post('/interfaceAddException', 'Controller@interfaceAddException');//客服系统添加异常单同步到VOP系统的接口
