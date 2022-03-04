@@ -104,9 +104,9 @@
                     <div class="col-md-2">
                         <div class="input-group">
                             <span class="input-group-addon">BG</span>
-                            <select multiple style="width:100%;" id="bg" data-init-by-query="ins.bg">
+                            <select multiple style="width:100%;" id="bg" data-init-by-query="ins.bg" {{(\Auth::user()->sap_seller_id && \Auth::user()->ubg)?'disabled':''}}>
                                 @foreach($bgs as $bg)
-                                    <option value="{!! $bg !!}">{!! $bg !!}</option>
+                                    <option value="{!! $bg !!}" {{(\Auth::user()->sap_seller_id && \Auth::user()->ubg && \Auth::user()->ubg==$bg )?'selected':''}}>{!! $bg !!}</option>
                                 @endforeach
                             </select>
                         </div>

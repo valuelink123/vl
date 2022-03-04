@@ -37,12 +37,12 @@ class AdvController extends Controller
         sum(impressions) as impressions,
         sum(clicks) as clicks,
         sum(cost) as cost,
-        sum(attributed_sales1d) as attributed_sales1d,
-        sum(attributed_units_ordered1d) as attributed_units_ordered1d,
+        sum((case ad_type when \'SProducts\' then attributed_sales7d else attributed_sales14d end)) as attributed_sales1d,
+        sum((case ad_type when \'SProducts\' then attributed_conversions7d else attributed_conversions14d end)) as attributed_units_ordered1d,
         round(sum(clicks)/sum(impressions),4) as ctr,
         round(sum(cost)/sum(clicks),4) as cpc,
-        round(sum(cost)/sum(attributed_sales1d),4) as acos,
-        round(sum(attributed_sales1d)/sum(cost),4) as raos
+        round(sum(cost)/sum((case ad_type when \'SProducts\' then attributed_sales7d else attributed_sales14d end)),4) as acos,
+        round(sum((case ad_type when \'SProducts\' then attributed_sales7d else attributed_sales14d end))/sum(cost),4) as raos
         ')->where('profile_id',$params['profile_id'])->where('record_type',$params['record_type']);
         foreach($params['where'] as $key=>$val){
             $where = is_array($val)?'whereIn':'where';
