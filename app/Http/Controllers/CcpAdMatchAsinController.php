@@ -41,6 +41,50 @@ class CcpAdMatchAsinController extends Controller
 		$search = isset($_REQUEST['search']) ? $_REQUEST['search'] : '';
 		$search = $this->getSearchData(explode('&',$search));
 		$site = isset($search['site']) ? $search['site'] : '';//站点，为marketplaceid
+		$limit = '';
+		if($_REQUEST['length']){
+			$limit = $this->dtLimit($req);
+			$limit = " LIMIT {$limit} ";
+		}
+		$sql = $this->getSql($search). $limit;
+		$_data = DB::select($sql);
+		$recordsTotal = $recordsFiltered = DB::select('SELECT FOUND_ROWS() as total');
+		$recordsTotal = $recordsFiltered = $recordsTotal[0]->total;
+		$data = $this->getDealData($_data,$site);
+		$data = array_values($data);
+		return compact('data', 'recordsTotal', 'recordsFiltered');
+	}
+
+	//导出数据
+	public function export()
+	{
+		if(!Auth::user()->can(['ccp-adMatchAsin-export'])) die('Permission denied -- ccp adMatchAsin export');
+		$site = isset($_GET['site']) ? $_GET['site'] : '';
+		$sql = $this->getSql($_GET);
+		$_data = DB::select($sql);
+		$data = $this->getDealData($_data,$site);
+		$headArray = array('站点','店铺','Campaign','AD Group','AD Type','ASIN','销售员','SKU');
+		$arrayData[] = $headArray;
+		foreach($data as $key=>$val){
+			$arrayData[] = array(
+				$val['site'],
+				$val['account_name'],
+				$val['campaign'],
+				$val['ad_group'],
+				$val['ad_type'],
+				$val['asin'],
+				$val['seller'],
+				$val['sku']
+			);
+		}
+		$this->exportExcel($arrayData,"adMatchAsin.xlsx");
+
+	}
+
+	//得到sql语句
+	public function getSql($search)
+	{
+		$site = isset($search['site']) ? $search['site'] : '';//站点，为marketplaceid
 		$account = isset($search['account']) ? $search['account'] : '';//账号
 		$campaign = isset($search['campaign']) ? $search['campaign'] : '';
 		$campaign_name = isset($search['campaign_name']) ? $search['campaign_name'] : '';//campaign_name
@@ -66,12 +110,6 @@ class CcpAdMatchAsinController extends Controller
 		if($sku){
 			$where .= " and union_table.sku like '%". $sku ."%'";
 		}
-
-		if($_REQUEST['length']){
-			$limit = $this->dtLimit($req);
-			$limit = " LIMIT {$limit} ";
-		}
-
 		$sql = "SELECT SQL_CALC_FOUND_ROWS union_table.*,profiles.account_name AS account_name,profiles.marketplace_id AS marketplace_id,profiles.seller_id AS seller_id FROM (
 	SELECT products.asin as asin,products.sku as sku,groups.name AS ad_group,campaigns.name AS campaign,'sproducts' AS ad_type,campaigns.profile_id AS profile_id,campaigns.campaign_id AS campaign_id,products.ad_id AS ad_id,products.ad_group_id AS ad_group_id,'system' as 'data_type','N/A' as id
 	FROM ppc_sproducts_ads as products 
@@ -92,15 +130,14 @@ class CcpAdMatchAsinController extends Controller
   from ppc_ad_match_asin AS products 
  ) AS union_table 
  left join ppc_profiles AS profiles on union_table.profile_id = profiles.profile_id 
- WHERE profiles.marketplace_id IS NOT NULL AND profiles.seller_id IS NOT NULL AND union_table.campaign_id IS NOT NULL {$where}
-			 {$limit}";
+ WHERE profiles.marketplace_id IS NOT NULL AND profiles.seller_id IS NOT NULL AND union_table.campaign_id IS NOT NULL {$where}";
+		return $sql;
+	}
 
-		$_data = DB::select($sql);
-		$recordsTotal = $recordsFiltered = DB::select('SELECT FOUND_ROWS() as total');
-		$recordsTotal = $recordsFiltered = $recordsTotal[0]->total;
-
+	//得到处理后的数据
+	public function getDealData($_data,$site)
+	{
 		$domain = substr(getDomainBySite($site), 4);
-
 		$data = array();
 		$asinInfo = $this->getAsinInfoBySite($site);
 		$sap_seller = getUsers('sap_seller');
@@ -121,8 +158,7 @@ class CcpAdMatchAsinController extends Controller
 			}
 			$data[$key]['seller'] = isset($sap_seller[$sap_seller_id]) && $sap_seller[$sap_seller_id] ? $sap_seller[$sap_seller_id] : 'N/A';
 		}
-		$data = array_values($data);
-		return compact('data', 'recordsTotal', 'recordsFiltered');
+		return $data;
 	}
 
 	/*
@@ -173,8 +209,4 @@ class CcpAdMatchAsinController extends Controller
 		$res = DB::table('ppc_ad_match_asin')->where('id',$id)->delete();
 		return array('status'=>$res);
 	}
-
-
-
-
 }

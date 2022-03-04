@@ -688,6 +688,7 @@ Route::get('/budgetSkuExport', 'BudgetskuController@export');
 //广告汇总相关模块
 Route::get('/ccp/adMatchAsin', 'CcpAdMatchAsinController@index'); //广告映射关系
 Route::post('/ccp/adMatchAsin/list', 'CcpAdMatchAsinController@list');//广告映射关系的列表展示
+Route::get('/ccp/adMatchAsin/export', 'CcpAdMatchAsinController@export');//广告映射关系的导出
 Route::post('/getCampaignBySiteAccount', 'Controller@getCampaignBySiteAccount')->name('getCampaignBySiteAccount');//通过选择的站点账号得到Campaign
 Route::post('/getGroupBySiteCampaign', 'Controller@getGroupBySiteCampaign')->name('getGroupBySiteCampaign');//通过选择的campaign得到组别
 Route::post('/getDataBySiteCampaign', 'Controller@getDataBySiteCampaign')->name('getDataBySiteCampaign');//通过选择的campaign得到该campaign的type

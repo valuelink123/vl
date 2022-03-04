@@ -57,6 +57,15 @@
 {{--                    <div class="col-md-1">--}}
 {{--                        <a  href="/ccp/adMatchAsin/add" target="_blank">Add New</a>--}}
 {{--                    </div>--}}
+                    @permission('ccp-adMatchAsin-export')
+                    <div class="col-md-1">
+                        <div class="input-group">
+                            <div class="btn-group pull-right" >
+                                <button id="export_table" class="btn sbold blue">Export</button>
+                            </div>
+                        </div>
+                    </div>
+                    @endpermission
                 </div>
             </form>
         </div>
@@ -120,6 +129,34 @@
             //输入框解决中文乱码
             dtapi.settings()[0].ajax.data = {search: decodeURIComponent($("#search-form").serialize().replace(/\+/g, " "), true)};
             dtapi.ajax.reload();
+            return false;
+        })
+
+        //点击导出
+        $('#export_table').click(function(){
+            var search = $("#search-form").serialize();
+            var accountid = '';
+            var vv = '';
+            $("#account-div .active").each(function (index,value) {
+                vv = $(this).find('input').val();
+                if(accountid != ''){
+                    accountid = accountid + ',' + vv
+                }else{
+                    accountid = accountid + vv
+                }
+            });
+            //campaign的拼接
+            var campaign = '';
+            var vv = '';
+            $("#campaign-div .active").each(function (index,value) {
+                vv = $(this).find('input').val();
+                if(campaign != ''){
+                    campaign = campaign + ',' + vv
+                }else{
+                    campaign = campaign + vv
+                }
+            });
+            location.href='/ccp/adMatchAsin/export?'+search+'&account='+accountid+'&campaign='+campaign;
             return false;
         })
 

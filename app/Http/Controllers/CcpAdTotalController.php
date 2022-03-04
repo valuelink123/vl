@@ -62,7 +62,7 @@ class CcpAdTotalController extends Controller
 				$val['acos']
 			);
 		}
-		$this->exportExcel($arrayData,"asTotalBg.xlsx");
+		$this->exportExcel($arrayData,"adTotalBg.xlsx");
 	}
 	//得到bg维度统计数据
 	public function getTotalBgData($search)
@@ -176,7 +176,7 @@ class CcpAdTotalController extends Controller
 				$val['acos']
 			);
 		}
-		$this->exportExcel($arrayData,"asTotalBu.xlsx");
+		$this->exportExcel($arrayData,"adTotalBu.xlsx");
 	}
 	//得到bu维度统计数据
 	public function getTotalBuData($search)
@@ -302,7 +302,7 @@ class CcpAdTotalController extends Controller
 				$val['acos']
 			);
 		}
-		$this->exportExcel($arrayData,"asTotalSeller.xlsx");
+		$this->exportExcel($arrayData,"adTotalSeller.xlsx");
 	}
 	//得到销售员维度统计数据
 	public function getTotalSellerData($search)
