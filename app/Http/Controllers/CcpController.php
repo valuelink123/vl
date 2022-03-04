@@ -148,12 +148,52 @@ class CcpController extends Controller
 	{
 		$search = isset($_REQUEST['search']) ? $_REQUEST['search'] : '';
 		$search = $this->getSearchData(explode('&',$search));
-//        $date_type = isset($search['date_type']) ? $search['date_type'] : '';//选的时间类型
-        $site = isset($search['site']) ? $search['site'] : '';//站点，为marketplaceid
-        $account = isset($search['account']) ? $search['account'] : '';//账号id,例如115,137
+		$site = isset($search['site']) ? $search['site'] : '';
+		$limit = "";
+		if($_REQUEST['length']){
+			$limit = $this->dtLimit($req);
+			$limit = " LIMIT {$limit} ";
+		}
+		$sql = $this->getSql($search).$limit;
+		$itemData = DB::connection('vlz')->select($sql);
+		$recordsTotal = $recordsFiltered = DB::connection('vlz')->select('SELECT FOUND_ROWS() as total');
+		$recordsTotal = $recordsFiltered = $recordsTotal[0]->total;
+		$data = $this->getDealData($itemData,$site);
+		$data = array_values($data);
+		return compact('data', 'recordsTotal', 'recordsFiltered');
+	}
+
+	//ccp的导出功能
+	public function export()
+	{
+		if(!Auth::user()->can(['ccp-export'])) die('Permission denied -- ccp export');
+		$site = isset($_GET['site']) ? $_GET['site'] : '';
+		$sql = $this->getSql($_GET);
+		$itemData = DB::connection('vlz')->select($sql);
+		$data = $this->getDealData($itemData,$site);
+		$headArray = array('PRODUCT','ASIN','Item No.','SALES','UNITS','ORDERS','AVG.UNITS PER DAY');
+		$arrayData[] = $headArray;
+		foreach($data as $key=>$val){
+			$arrayData[] = array(
+				$val['title_all'],
+				$val['asin'],
+				$val['item_no'],
+				$val['sales'],
+				$val['units'],
+				$val['orders_num'],
+				$val['avg_units']
+			);
+		}
+		$this->exportExcel($arrayData,"ccp.xlsx");
+	}
+	//得到sql查询语句
+	public function getSql($search)
+	{
+		$site = isset($search['site']) ? $search['site'] : '';//站点，为marketplaceid
+		$account = isset($search['account']) ? $search['account'] : '';//账号id,例如115,137
 		$bg = isset($search['bg']) ? $search['bg'] : '';
 		$bu = isset($search['bu']) ? $search['bu'] : '';
-        $asin = isset($search['asin']) ? trim($search['asin'],'+') : '';//asin输入框的值
+		$asin = isset($search['asin']) ? trim($search['asin'],'+') : '';//asin输入框的值
 		$timeType = isset($search['timeType']) ? $search['timeType'] : '';//时间类型，默认是0为北京时间，1为亚马逊后台当地时间
 		$this->start_date = isset($search['start_date']) ? $search['start_date'] : '';
 		$this->end_date = isset($search['end_date']) ? $search['end_date'] : '';
@@ -169,12 +209,6 @@ class CcpController extends Controller
 		if($asin){
 			$where .= " and order_items.asin = '".$asin."'";
 		}
-
-		if($_REQUEST['length']){
-			$limit = $this->dtLimit($req);
-			$limit = " LIMIT {$limit} ";
-		}
-
 		$sql ="SELECT SQL_CALC_FOUND_ROWS kk.asin,SUM( item_price_amount ) AS sales,SUM( quantity_ordered ) AS units,SUM( quantity_ordered * PROMO ) AS unitsPromo,COUNT( DISTINCT amazon_order_id ) AS orders,COUNT(DISTINCT PROMO_ORDER_ID) AS ordersPromo,sum(c_promotionAmount) as promotionAmount 
 			FROM
 			  (SELECT order_items.amazon_order_id,order_items.asin,asin_price.price AS default_unit_price,order_items.quantity_ordered,
@@ -191,31 +225,28 @@ class CcpController extends Controller
 				  )
 			  	{$where} 
 			  	and order_items.asin in({$userwhere}) 
-			) AS kk GROUP BY kk.asin order by sales desc {$limit}";
-
-		$itemData = DB::connection('vlz')->select($sql);
-		$recordsTotal = $recordsFiltered = DB::connection('vlz')->select('SELECT FOUND_ROWS() as total');
-		$recordsTotal = $recordsFiltered = $recordsTotal[0]->total;
+			) AS kk GROUP BY kk.asin order by sales desc";
+		return $sql;
+	}
+	//得到处理后的数据
+	public function getDealData($itemData,$site)
+	{
 		$data = array();
 		$asins = array();
-        $day = $this->getdays();//获取查询的时间范围有几天
-
+		$day = $this->getdays();//获取查询的时间范围有几天
+		$domain = substr(getDomainBySite($site), 4);
 		$showOrder = Auth::user()->can(['ccp-showOrderList']) ? 1 : 0;//是否有查看详情权限
 		foreach($itemData as $key=>$val){
 			$data[$val->asin] = (array)$val;
 			$data[$val->asin]['avg_units'] = round($val->units/$day,2);
-			$data[$val->asin]['title'] = $data[$val->asin]['image'] = $data[$val->asin]['item_no'] = 'N/A';
-			if($showOrder==1) {
-				$data[$val->asin]['orders'] = '<a target="_blank" href="/ccp/showOrderList?asin=' . $val->asin . '&' . $_REQUEST['search'] . '">' . $val->orders . '</a>';
-			}
+			$data[$val->asin]['title'] = $data[$val->asin]['title_all'] = $data[$val->asin]['image'] = $data[$val->asin]['item_no'] = 'N/A';
+			$data[$val->asin]['orders'] = $val->orders;
+			$data[$val->asin]['orders_num'] = $val->orders;
 			$asins[] = $val->asin;
 		}
 		if($asins){
 			$asins = "'".implode("','",$asins)."'";
 			$product_where = '';
-			// if($account){
-			// 	$product_where .= ' and seller_account_id in('.$account.')';
-			// }
 			$product_sql = "select max(title) as title,max(images) as images,asin,max(sku) as item_no
 						from asins
 						where asin in({$asins})
@@ -227,6 +258,7 @@ class CcpController extends Controller
 			foreach($productData as $key=>$val){
 				if(isset($data[$val->asin])){
 					$title = mb_substr($val->title,0,50);
+					$data[$val->asin]['title_all'] = $val->title;
 					$data[$val->asin]['title'] = '<span title="'.$val->title.'">'.$title.'</span>';
 					$data[$val->asin]['item_no'] = $val->item_no ? $val->item_no : $data[$val->asin]['item_no'];
 					if($val->images){
@@ -239,9 +271,7 @@ class CcpController extends Controller
 				}
 			}
 		}
-
-		$data = array_values($data);
-		return compact('data', 'recordsTotal', 'recordsFiltered');
+		return $data;
 	}
 	//ccp功能的列表中点击订单数查看改asin在查询条件内所有订单列表
 	public function showOrderList(Request $req)

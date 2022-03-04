@@ -105,13 +105,22 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-1">
                         <div class="input-group">
                             <div class="btn-group pull-right" >
                                 <button id="search_top" class="btn sbold blue">Search</button>
                             </div>
                         </div>
                     </div>
+                    @permission('ccp-export')
+                    <div class="col-md-1">
+                        <div class="input-group">
+                            <div class="btn-group pull-right" >
+                                <button id="export_table" class="btn sbold blue">Export</button>
+                            </div>
+                        </div>
+                    </div>
+                    @endpermission
                 </div>
             </form>
         </div>
@@ -388,6 +397,22 @@
             // 根据搜索时间区域，调用点击事件，展示上部分的统计数据
             $("#search_top").trigger("click");
         })
-    </script>
 
+        //点击导出
+        $('#export_table').click(function(){
+            var search = $("#search-form").serialize();
+            var accountid = '';
+            var vv = '';
+            $("#account-div .active").each(function (index,value) {
+                vv = $(this).find('input').val();
+                if(accountid != ''){
+                    accountid = accountid + ',' + vv
+                }else{
+                    accountid = accountid + vv
+                }
+            });
+            location.href='/ccp/export?'+search+'&account='+accountid;
+            return false;
+        })
+    </script>
 @endsection
