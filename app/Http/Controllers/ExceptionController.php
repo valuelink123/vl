@@ -105,9 +105,9 @@ class ExceptionController extends Controller
         }
 
         //if(Auth::user()->admin) {
-		
+
 			if (array_get($_REQUEST, 'group_id')) {
-				
+
                 $customers = $customers->where('group_id', array_get($_REQUEST, 'group_id'));
 
             }
@@ -149,16 +149,16 @@ class ExceptionController extends Controller
 
         if(array_get($_REQUEST,'sellerid')){
             $customers = $customers->where('sellerid',  array_get($_REQUEST, 'sellerid'));
-			
+
         }
         if(array_get($_REQUEST,'amazon_order_id')){
             $customers = $customers->where('amazon_order_id', array_get($_REQUEST, 'amazon_order_id'));
         }
-		
+
 
         if(array_get($_REQUEST,'order_sku')){
             $customers = $customers->where('order_sku', 'like', '%'.$_REQUEST['order_sku'].'%');
-           
+
         }
         if(array_get($_REQUEST,'date_from')){
             $customers = $customers->where('date','>=',$_REQUEST['date_from'].' 00:00:00');
@@ -166,7 +166,7 @@ class ExceptionController extends Controller
         if(array_get($_REQUEST,'date_to')){
             $customers = $customers->where('date','<=',$_REQUEST['date_to'].' 23:59:59');
         }
-		
+
 		if(array_get($_REQUEST,'resellerid')){
             $customers = $customers->where('replacement', 'like', '%:"'.$_REQUEST['resellerid'].'";%');
         }
@@ -185,7 +185,7 @@ class ExceptionController extends Controller
 		if(array_get($_REQUEST,'sap_seller_id')){
             $customers = $customers->where('sap_seller_id',array_get($_REQUEST,'sap_seller_id'));
         }
-		
+
 		$customersLists =  $customers->orderBy('date','desc')->get()->toArray();
 		$arrayData = $arrayAmazon = $arraySap = array();
 		$headArray[] = 'Account';
@@ -364,7 +364,7 @@ class ExceptionController extends Controller
 
 			$operDate = $this->getOperaDate($customersList['update_status_log']);////得到操作各个状态的时间
             $arrayData[] = array(
-				array_get($accounts,$customersList['sellerid']),
+                isset($accounts[$customersList['sellerid']]) ? $accounts[$customersList['sellerid']] : $customersList['sellerid'],
 				$customersList['site'],
                 $customersList['amazon_order_id'],
 				$customersList['Replacement Order ID'],
@@ -440,7 +440,7 @@ class ExceptionController extends Controller
 
     public function create()
     {
-	
+
 		if(!Auth::user()->can(['exception-create'])) die('Permission denied -- exception-create');
         $vars = ['groups'=>$this->getGroups(),'mygroups'=>$this->getUserGroup(),'sellerids'=>$this->getAccounts()];
 
@@ -947,7 +947,7 @@ class ExceptionController extends Controller
     }
     public function get(Request $request)
     {
-		
+
         $orderby = 'date';
         $sort = 'desc';
         if(isset($_REQUEST['order'][0])){
@@ -964,7 +964,7 @@ class ExceptionController extends Controller
 			if(!Auth::user()->can(['exception-batch-update'])) die('Permission denied -- exception-batch-update');
             $updateDate=array();
             if(isset($_REQUEST['process_status']) && $_REQUEST['process_status']!='' && array_get($_REQUEST,"process_content")){
-			
+
 				if($_REQUEST['process_status']=='auto_sap'){
 					$updateDate['auto_create_sap'] = 1;
 					$updateDate['auto_create_sap_result'] = 0;
@@ -976,7 +976,7 @@ class ExceptionController extends Controller
 					$updateDate['last_auto_create_mcf_date'] = date('Y-m-d H:i:s');
 					$updateDate['last_auto_create_mcf_log'] = NULL;
 				}else{
-					$updateDate['process_status'] = $_REQUEST['process_status'];	
+					$updateDate['process_status'] = $_REQUEST['process_status'];
 				}
                 $updateDate['process_content'] = $_REQUEST['process_content'];
             }
@@ -1140,11 +1140,11 @@ class ExceptionController extends Controller
 		$type_list = array(1=>'Refund',2=>'Replacement',3=>'Refund & Replacement',4=>'Gift Card');
 
 		$mcf_result=array('0'=>'Waiting','1'=>'Success','-1'=>'Failed');
-		
+
 
         //得到列表记录的所有亚马逊id(重发单号)
 		$orderid_sellerid = $_mcfStatus = $mcfStatus = array();
-        
+
         //根据亚马逊id得到该订单的mcf物流状态
         //exception表的 的 replacement 字段中的 replacement_order_id 是对应的order库的amazon_mcf_orders表的SellerFulfillmentOrderId字段,amazon_mcf_orders表里的FulfillmentOrderStatus表示订单状态
         if($orderid_sellerid){
@@ -1191,7 +1191,7 @@ class ExceptionController extends Controller
 							$operate.= 'Auto Mcf : '.array_get($mcf_result,$customersList['auto_create_mcf_result']).'</BR>'.$customersList['last_auto_create_mcf_log'].'</BR>';
 						}
 					}
-					
+
 					if(!$customersList['auto_create_sap'] && ($customersList['type']==2 || $customersList['type']==3) && ($customersList['process_status']=='auto done' || $customersList['process_status']=='done')){
 						$operate.= '<span class="label label-sm label-danger">Not Set Auto SAP</span><BR>';
 					}
@@ -1274,7 +1274,7 @@ class ExceptionController extends Controller
     }
 
     public function getAccounts(){
-		
+
 		$seller=[];
 		$accounts= DB::connection('order')->table('accounts')->where('status',1)->groupBy(['sellername','sellerid'])->get(['sellername','sellerid']);
 		$accounts=json_decode(json_encode($accounts), true);
@@ -1282,9 +1282,9 @@ class ExceptionController extends Controller
 			$seller[$account['sellerid']]=$account['sellername'];
 		}
 		return $seller;
-		
+
     }
-	
+
 	public function getSellerIds(){
         $accounts = Accounts::where('type','Amazon')->get()->toArray();
         $accounts_array = array();
@@ -1374,7 +1374,7 @@ class ExceptionController extends Controller
 				}else{
 				    //非原销售店铺发货，这种情况发生在一个物料多个帖子或者一个物料多个店铺跟卖的情况，这种情况则忽略掉原订单号的第一段“xxx-”;
                     //这样处理的原因是因为订单号，在不同店铺是可以重复的。
-					$product_arr['replacement_order_id']=substr($request->get('rebindorderid'),4).'-0'.$id_add;	
+					$product_arr['replacement_order_id']=substr($request->get('rebindorderid'),4).'-0'.$id_add;
 				}
 				if($product_arr['seller_id']=='FBM') $product_arr['replacement_order_id']=$request->get('rebindorderid');
 				$products[]=$product_arr;
@@ -1392,7 +1392,7 @@ class ExceptionController extends Controller
                     return redirect()->back()->withInput();
                 }
             }
-			
+
 			$exception->replacement = serialize(
 			array(
 				'shipname'=>$request->get('shipname'),
@@ -1432,15 +1432,15 @@ class ExceptionController extends Controller
 		foreach($leaders as $leader){
 			$group_leaders[$leader->group_id] = array_get($group_leaders,$leader->group_id).(array_get($group_leaders,$leader->group_id)?'; ':'').array_get($this->getUsers(),$leader->user_id);
 		}
-		
+
 		return $group_leaders;
-	
+
 	}
-	
-	
-	
+
+
+
 	public function getUserGroup(){
-	
+
 		if(Auth::user()->admin){
 		    $groups = Groupdetail::get(['group_id']);
 
@@ -1469,11 +1469,11 @@ class ExceptionController extends Controller
 			}
 			$group_arr['users'][$user_id] = $user_id;
 			return $group_arr;
-			
+
         }
-		
-		
-		
+
+
+
 	}
 	public function getRepeatOrder(Request $request){
 		$orderid = $request->get('orderid');
@@ -1485,7 +1485,7 @@ class ExceptionController extends Controller
 		die(json_encode($exists));
 	}
 
-	
+
 	public function getrfcorder(Request $request){
 		$orderid = $request->get('orderid');
 		$sellerid = $request->get('sellerid');
@@ -1523,7 +1523,7 @@ class ExceptionController extends Controller
 
 					$res = file_get_contents('http://'.env("SAP_RFC").'/rfc_site.php?appid='.$appkey.'&method=getOrder&orderId='.$orderid.'&sign='.$sign);
 					$result = json_decode($res,true);
-					
+
 					if(array_get($result,'result')){
 						$data  = array_get($result,'data',array());
 						$order = $orderItemData = array();
@@ -1568,7 +1568,7 @@ class ExceptionController extends Controller
 						foreach($data['O_ITEMS'] as $sdata){
 							if(!$sku) $sku = $sdata['ZSSKU'];
 							if(!$asin) $asin = $sdata['ZASIN'];
-							$orderItemData[]= array(			
+							$orderItemData[]= array(
 									'SellerId'=>$sdata['SELLERID'],
 									'MarketPlaceId'=>$sdata['ZMPLACEID'],
 									'AmazonOrderId'=>$sdata['ZAOID'],
@@ -1615,7 +1615,7 @@ class ExceptionController extends Controller
 				}
 			}else{
 				$sellerid =  $exists->SellerId;
-				
+
 				$exists_item = DB::table('amazon_orders_item')->where('AmazonOrderId', $orderid);
 				// if($sellerid){
 				// 	$exists_item = $exists_item->where('SellerId', $sellerid);
@@ -1752,14 +1752,14 @@ class ExceptionController extends Controller
 				Exception::create($v);
 			}
 			$records["customActionStatus"] = 'OK';
-			$records["customActionMessage"] = 'Upload Successed!'; 
+			$records["customActionMessage"] = 'Upload Successed!';
 			DB::commit();
-        }catch (\Exception $e) { 
+        }catch (\Exception $e) {
             $records["customActionStatus"] = '';
             $records["customActionMessage"] = $e->getMessage();
 			DB::rollBack();
-		}    
-        echo json_encode($records);  
+		}
+        echo json_encode($records);
 	}
 
 }
