@@ -138,29 +138,51 @@ class AdvController extends Controller
         DB::beginTransaction();
         try{ 
             $id = intval($request->get('id'));
-            $data = $id?(PpcSchedule::findOrFail($id)):(new PpcSchedule);
-            $fileds = array(
-                'profile_id',
-                'ad_type',
-                'campaign_id',
-                'record_type',
-                'record_name',
-                'record_type_id',
-                'status',
-                'date_from',
-                'date_to',
-                'time',
-                'state',
-                'bid'
-            );
-            foreach($fileds as $filed){
-                $data->{$filed} = $request->get($filed);
-            }
-			if($id && (date('Gi')<intval(str_replace(':','',$request->get('time')))) && ($request->get('status')==1)){
-				$data->done_at = $data->message = NULL;
+			$schedules = $request->input('schedules')??[];
+			if(!empty($schedules)){
+				foreach($schedules as $schedule){
+					PpcSchedule::create(
+					[
+						'profile_id'=>$request->get('profile_id'),
+						'ad_type'=>$request->get('ad_type'),
+						'campaign_id'=>$request->get('campaign_id'),
+						'record_type'=>$request->get('record_type'),
+						'record_name'=>$request->get('record_name'),
+						'record_type_id'=>$request->get('record_type_id'),
+						'status'=>$request->get('status'),
+						'date_from'=>$request->get('date_from'),
+						'date_to'=>$request->get('date_to'),
+						'time'=>array_get($schedule,'time'),
+						'state'=>array_get($schedule,'state'),
+						'bid'=>array_get($schedule,'bid'),
+					]
+					);
+				}
+			}else{
+				$data = $id?(PpcSchedule::findOrFail($id)):(new PpcSchedule);
+				$fileds = array(
+					'profile_id',
+					'ad_type',
+					'campaign_id',
+					'record_type',
+					'record_name',
+					'record_type_id',
+					'status',
+					'date_from',
+					'date_to',
+					'time',
+					'state',
+					'bid'
+				);
+				foreach($fileds as $filed){
+					$data->{$filed} = $request->get($filed);
+				}
+				if($id && (date('Gi')<intval(str_replace(':','',$request->get('time')))) && ($request->get('status')==1)){
+					$data->done_at = $data->message = NULL;
+				}
+				$data->user_id = Auth::user()->id;
+				$data->save();
 			}
-            $data->user_id = Auth::user()->id;
-            $data->save();
             DB::commit();
             $records["code"] = 'SUCCESS';
             $records["description"] = "更新成功!";

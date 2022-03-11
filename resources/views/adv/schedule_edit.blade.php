@@ -49,7 +49,7 @@
                                     </span>
                                 </div>
                             </div>
-
+							@if(!empty(array_get($form,'id')))
                             <div class="form-group">
                                 <label>Time:</label>
                                 <div class="input-group col-md-4">
@@ -75,6 +75,50 @@
                                 <label>Bid:</label>
                                 <input type="text" class="form-control" name="bid" id="bid" value="{{array_get($form,'bid')}}" >
                             </div>
+							@else
+							<div class="form-group mt-repeater">
+								<div data-repeater-list="schedules">
+									<div data-repeater-item class="mt-repeater-item">
+										<div class="row mt-repeater-row">
+											<div class="col-md-3">
+												<label>Time:</label>
+												<div class="input-group">
+													<input type="text" class="form-control timepicker timepicker-24"  name="time" placeholder="time" value="00:00" required>
+													<span class="input-group-btn">
+														<button class="btn default" type="button">
+															<i class="fa fa-clock-o"></i>
+														</button>
+													</span>
+												</div>
+											</div>
+											<div class="col-md-3">
+												<label>State:</label>
+												<select class="form-control " name="state" id="state" required>
+												@foreach (\App\Models\PpcProfile::STATUS as $k=>$v)
+												<option value="{{$k}}" {{($k==array_get($form,'state'))?'selected':''}} >{{$v}}</option>
+												@endforeach 
+												</select>
+											</div>
+											
+											<div class="col-md-3">
+												<label>Bid:</label>
+                                				<input type="text" class="form-control" name="bid" id="bid" value="0" required>
+											</div>
+												
+					
+											<div class="col-md-3">
+												<a href="javascript:;" data-repeater-delete class="btn btn-danger mt-repeater-delete">
+													<i class="fa fa-close"></i>
+												</a>
+											</div>
+										</div>
+									</div>
+									
+								</div>
+								<a href="javascript:;" data-repeater-create class="btn btn-info mt-repeater-add">
+								<i class="fa fa-plus"></i> Add Schedule</a>
+							</div>
+							@endif
 
                             <div style="clear:both;"></div>
                         </div>
@@ -111,6 +155,9 @@ $(function() {
         showMeridian: false
     });
 
+
+	FormRepeater.init();
+	
     $('#schedule_form').submit(function() {
 		$.ajaxSetup({
 			headers: { 'X-CSRF-TOKEN' : '{{ csrf_token() }}' }
