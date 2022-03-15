@@ -125,7 +125,6 @@ class CcpAdCampaignController extends Controller
 			$limit = " LIMIT {$limit} ";
 		}
 		$sql = $this->getSql($search) .$limit;
-
 		$_data = DB::select($sql);
 		$recordsTotal = $recordsFiltered = DB::select('SELECT FOUND_ROWS() as total');
 		$recordsTotal = $recordsFiltered = $recordsTotal[0]->total;
@@ -182,7 +181,8 @@ class CcpAdCampaignController extends Controller
 			$_sql = "SELECT  
 					any_value(ppc_profiles.account_name) as account_name,
        				any_value(ppc_profiles.seller_id) as seller_id,
-					campaigns.name as name,
+					any_value(campaigns.name) as name,
+       				campaigns.campaign_id as campaign_id,
 					any_value(campaigns.state) as state,
        				any_value(campaigns.{$budget_field}) as daily_budget,
 					round(sum(ppc_report_datas.cost),2) as cost,
@@ -199,21 +199,22 @@ class CcpAdCampaignController extends Controller
  			left join ppc_profiles on campaigns.profile_id = ppc_profiles.profile_id
 			where ad_type = '" . $type . "' 
 			{$where}
-			GROUP BY campaigns.name ";
+			GROUP BY campaigns.campaign_id ";
 
 			$union_all = $union_all ? $union_all." union all " .$_sql : $_sql;
 		}
 		$sql = " SELECT SQL_CALC_FOUND_ROWS 
 					any_value(account_name) as account_name,
        				any_value(seller_id) as seller_id,
-					name,
+       				any_value(name) as name,
+       				campaign_id,
 					any_value(state) as state,
        				any_value(daily_budget) as daily_budget,
 					round(sum(cost),2) as cost,
 					sum(clicks) as clicks,
 					round(sum(sales),2) as sales,
 					sum(orders) as orders,
-					sum(impressions) as impressions from( ".$union_all . " ) AS UNION_table GROUP BY name  order by sales desc ";
+					sum(impressions) as impressions from( ".$union_all . " ) AS UNION_table GROUP BY campaign_id  order by sales desc ";
 		return $sql;
 
 	}
