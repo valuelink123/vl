@@ -844,7 +844,7 @@ ORDER BY asin_offer_summary.asin DESC ";
 	 */
 	public function exceptionPushServiceSystem($exceptionId)
 	{
-		return true;
+//		return true;
 		$data = Exception::findOrFail($exceptionId);
 		if($data['service_system_id']>0) {
 			$params = json_encode($data);
