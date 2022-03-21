@@ -846,10 +846,11 @@ ORDER BY asin_offer_summary.asin DESC ";
 	{
 //		return true;
 		$data = Exception::findOrFail($exceptionId);
-		if($data['service_system_id']>0) {
+		//if($data['service_system_id']>0) {
 			$params = json_encode($data);
 			file_get_contents('http://16.163.26.169/api/exception/webhook?params=' . $params);
-		}
+		//}
+		
 		return true;
 	}
 
