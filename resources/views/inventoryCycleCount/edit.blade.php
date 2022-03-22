@@ -75,11 +75,15 @@
                                 <th>SKU</th>
                                 <th>工厂</th>
                                 <th>库位</th>
+                                <th>SAP库存数量</th>
+                                <th>账面数量</th>
+                                <th>未过账数量</th>
                                 <th>实物数量</th>
-                                <th>处理前数量</th>
                                 <th>最初差异数量</th>
                                 <th>最初差异率</th>
-                                <th>处理后数量</th>
+                                <th>处理后SAP数量</th>
+                                <th>处理后账面数量</th>
+                                <th>处理后未过账数量</th>
                                 <th>处理后差异数量</th>
                                 <th>处理后差异率</th>
                                 <th>状态</th>
@@ -90,11 +94,15 @@
                                 <td>{{$data['sku']}}</td>
                                 <td>{{$data['factory']}}</td>
                                 <td>{{$data['location']}}</td>
-                                <td>{{$data['actual_number']}}</td>
                                 <td>{{$data['dispose_before_number']}}</td>
+                                <td>{{$data['account_number']}}</td>
+                                <td>{{$data['notaccount_number']}}</td>
+                                <td>{{$data['actual_number']}}</td>
                                 <td>{{$data['difference_before_number']}}</td>
                                 <td>{{$data['difference_before_rate']}}</td>
                                 <td>{{$data['dispose_after_number']}}</td>
+                                <td>{{$data['dispose_after_account_number']}}</td>
+                                <td>{{$data['dispose_after_notaccount_number']}}</td>
                                 <td>{{$data['difference_after_number']}}</td>
                                 <td>{{$data['difference_after_rate']}}</td>
                                 <td>{{$data['status_name']}}</td>

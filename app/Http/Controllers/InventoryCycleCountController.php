@@ -50,41 +50,13 @@ class InventoryCycleCountController extends Controller
 	{
 		$search = isset($_REQUEST['search']) ? $_REQUEST['search'] : '';
 		$search = $this->getSearchData(explode('&',$search));
-		$where = ' where 1 = 1';
-        $from_date = isset($search['from_date']) ? $search['from_date'] : '';//选的时间类型
-        $to_date = isset($search['to_date']) ? $search['to_date'] : '';//站点，为marketplaceid
-        $sku = isset($search['sku']) ? $search['sku'] : '';//账号id,例如115,137
-		$factory = isset($search['factory']) ? $search['factory'] : '';
-		$status = isset($search['status']) ? $search['status'] : '';
-		if($from_date){
-			$where .= " and inventory_cycle_count.date >= '".$from_date."'";
-		}
-		if($to_date){
-			$where .= " and inventory_cycle_count.date <= '".$to_date."'";
-		}
-		if($sku){
-			$sku_arr = explode(';',$sku);
-			$sku_str = implode("','",$sku_arr);
-			$where .= " and inventory_cycle_count.sku in( '".$sku_str."')";
-		}
-		if($factory){
-			$where .= " and inventory_cycle_count.factory = '".$factory."'";
-		}
-		if($status){
-			$where .= " and inventory_cycle_count.status = {$status}";
-		}
-
-		if($_REQUEST['length']){
+		$limit = '';
+		if($_REQUEST['length'] != '-1'){
 			$limit = $this->dtLimit($req);
 			$limit = " LIMIT {$limit} ";
 		}
-		$sql = "select SQL_CALC_FOUND_ROWS inventory_cycle_count.*,
-before_data.MENGE1 as before_MENGE1,before_data.MENGE2 as before_MENGE2,before_data.MSTOCK1 as before_MSTOCK1,before_data.MSTOCK2 as before_MSTOCK2,before_data.LABST as before_LABST,
-after_data.MENGE1 as after_MENGE1,after_data.MENGE2 as after_MENGE2,after_data.MSTOCK1 as after_MSTOCK1,after_data.MSTOCK2 as after_MSTOCK2,after_data.LABST as after_LABST 
-				from inventory_cycle_count 
-left join (select * from inventory_cycle_count_sapinventory where type = 'BEFORE') as before_data on inventory_cycle_count.id = before_data.inventory_cycle_count_id
-left join (select * from inventory_cycle_count_sapinventory where type = 'AFTER') as after_data on inventory_cycle_count.id = after_data.inventory_cycle_count_id
-{$where} order by id desc {$limit}";
+		$sql = $this->getSql($search) . $limit;
+
 		$itemData = DB::select($sql);
 		$recordsTotal = $recordsFiltered = DB::select('SELECT FOUND_ROWS() as total');
 		$recordsTotal = $recordsFiltered = $recordsTotal[0]->total;
@@ -93,24 +65,35 @@ left join (select * from inventory_cycle_count_sapinventory where type = 'AFTER'
 //		$showOrder = Auth::user()->can(['ccp-showOrderList']) ? 1 : 0;//是否有查看详情权限
 		$statusArr = InventoryCycleCount::STATUS;
 		$total['date'] = '汇总';
+		$total['id'] = 0;
 		$total['sku'] = $total['describe'] = $total['factory'] = $total['location'] = $total['cost'] = $total['dispose_time'] = $total['confirm_time'] = '-';
 		$total['action'] = '-';
-		$total['actual_number'] = 0;//汇总的实物数量
-		$total['dispose_before_number'] = 0;//汇总的处理前账面数量
-		$total['difference_before_number'] = 0;//汇总的处理前差异数量 = 每一列的差异数量的绝对值再求和
-		$total['dispose_after_number'] = 0;//汇总的处理后账面数量
-		$total['difference_after_number'] = 0;//汇总的处理后差异数量 = 每一列的差异数量的绝对值再求和
-		$total['difference_amount'] = 0;//汇总的差异金额 = 每一列的差异金额的绝对值求和
-		$total['cost'] = $total['status'] = '-';
+		//得到原因
+		$reasonData = $this->getReasonData($itemData);
+		//求和字段说明，actual_number汇总的实物数量，dispose_before_number汇总的处理前sap库存数量，difference_before_number汇总的处理前差异数量 = 每一列的差异数量的绝对值再求和，dispose_after_number汇总的处理后sap库存数量，difference_after_number汇总的处理后差异数量 = 每一列的差异数量的绝对值再求和，difference_amount汇总的差异金额 = 每一列的差异金额的绝对值求和,account_number账面数量，notaccount_number未过账数量，dispose_after_account_number处理后的账面数量，dispose_after_notaccount_number处理后的未过账数量，未过账数量=处理前数量-账面数量
+		$total['actual_number'] = $total['dispose_before_number'] = $total['difference_before_number'] = $total['dispose_after_number'] = $total['difference_after_number'] = $total['difference_amount'] = $total['account_number'] = $total['notaccount_number'] = $total['dispose_after_account_number'] = $total['dispose_after_notaccount_number'] = 0;
+
+		$total['cost'] = $total['status'] = $total['reason'] = '-';
 //		$sum_dispose_before_amount = 0;//求和（每一列的账面数量*每一列的产品成本）
 		foreach($itemData as $key=>$val){
 			$data[$key] = $val = (array)$val;
+
+			if(isset($reasonData[$val['id']])){
+				$_reason = mb_substr($reasonData[$val['id']],0,20);
+				$reason = '<span title="'.$reasonData[$val['id']].'">'.$_reason.'</span>';
+			}else{
+				$reason = '-';
+			}
+			$data[$key]['reason'] = $reason;
 //			$data[$key]['cost'] = '1';//测试，产品成本=1
-			$data[$key]['difference_before_number'] = $data[$key]['actual_number'] - $data[$key]['dispose_before_number'];//处理前差异数量=实物-处理前数量
+			$data[$key]['difference_before_number'] = $data[$key]['actual_number'] - $data[$key]['account_number'];//处理前差异数量=实物-处理前账面数量
 //			$data[$key]['difference_amount'] = sprintf("%.2f",$data[$key]['difference_before_number'] * $data[$key]['cost']);//差异金额=差异数量*产品成本
-			$data[$key]['difference_before_rate'] = $data[$key]['dispose_before_number']>0 ? sprintf("%.2f",abs($data[$key]['difference_before_number']/$data[$key]['dispose_before_number'])) : '0.00';//最初差异率 =（处理前差异数量/处理前数量）再取绝对值
-			$data[$key]['difference_after_number'] = $data[$key]['actual_number'] - $data[$key]['dispose_after_number'];//处理后差异数量=实物-处理后数量
-			$data[$key]['difference_after_rate'] = $data[$key]['dispose_after_number']>0 ? sprintf("%.2f",abs($data[$key]['difference_after_number']/$data[$key]['dispose_after_number'])) : '0.00';//处理后差异率 =（处理厚差异数量/处理后数量）再取绝对值
+			$data[$key]['difference_before_rate'] = $data[$key]['account_number']>0 ? abs(sprintf("%.2f",abs($data[$key]['difference_before_number']/$data[$key]['account_number']))) : '0.00';//最初差异率 =（处理前差异数量/处理前账面数量）再取绝对值
+			$data[$key]['difference_after_number'] = $data[$key]['actual_number'] - $data[$key]['dispose_after_account_number'];//处理后差异数量=实物-处理后账面数量
+			$data[$key]['difference_after_rate'] = $data[$key]['dispose_after_account_number']>0 ? abs(sprintf("%.2f",abs($data[$key]['difference_after_number']/$data[$key]['dispose_after_account_number']))) : '0.00';//处理后差异率 =（处理厚差异数量/处理后数量）再取绝对值
+			//notaccount_number,未过账数量=处理前sap数量-处理前账面数量
+			$data[$key]['notaccount_number'] =$data[$key]['dispose_before_number'] - $data[$key]['account_number'];
+			$data[$key]['dispose_after_notaccount_number'] =$data[$key]['dispose_after_number'] - $data[$key]['dispose_after_account_number'];
 
 			$data[$key]['status'] = isset($statusArr[$data[$key]['status']]) ? $statusArr[$data[$key]['status']] : $data[$key]['status'];
 			$action = '';
@@ -126,15 +109,19 @@ left join (select * from inventory_cycle_count_sapinventory where type = 'AFTER'
 
 			//最后一列的汇总数据相关
 			$total['actual_number'] += $data[$key]['actual_number'];//汇总的真实数量
-			$total['dispose_before_number'] += $data[$key]['dispose_before_number'];//汇总的处理前数量
+			$total['dispose_before_number'] += $data[$key]['dispose_before_number'];//汇总的处理前sap库存数量
 			$total['difference_before_number'] += abs($data[$key]['difference_before_number']);//汇总的处理前差异数量
 
-			$total['dispose_after_number'] += $data[$key]['dispose_after_number'];//汇总的处理后数量
+			$total['dispose_after_number'] += $data[$key]['dispose_after_number'];//汇总的处理后sap库存数量
 			$total['difference_after_number'] += abs($data[$key]['difference_after_number']);//汇总的处理后差异数量
 //			$total['difference_amount'] += abs($data[$key]['difference_amount']);
 //			$sum_dispose_before_amount += $data[$key]['dispose_before_number'] * $data[$key]['cost'];
+			$total['notaccount_number'] += abs($data[$key]['notaccount_number']);
+			$total['dispose_after_notaccount_number'] += abs($data[$key]['dispose_after_notaccount_number']);
+			$total['account_number'] += $data[$key]['account_number'];
+			$total['dispose_after_account_number'] += $data[$key]['dispose_after_account_number'];
 
-			//最后把处理前数量和处理后数量，加上批注，鼠标移动到就添加已发货已收货等信息
+			//最后把处理前sap库存数量和处理后sap库存数量，加上批注，鼠标移动到就添加已发货已收货等信息
 			if($data[$key]['dispose_before_number']){
 				$remark = '总已发货数:'.$data[$key]['before_MENGE1'].'；'.'总已收货数:'.$data[$key]['before_MENGE2'].'；'.'期初库存数:'.$data[$key]['before_MSTOCK1'].'；'.'期末库存数:'.$data[$key]['before_MSTOCK2'].'；'.'非限制使用的估价的库存:'.$data[$key]['before_LABST'];
 				$data[$key]['dispose_before_number'] = '<div title="'.$remark.'">'.$data[$key]['dispose_before_number'].'</div>';
@@ -149,6 +136,31 @@ left join (select * from inventory_cycle_count_sapinventory where type = 'AFTER'
 		$data[] = $total;
 		$data = array_values($data);
 		return compact('data', 'recordsTotal', 'recordsFiltered');
+	}
+
+	public function getReasonData($itemData)
+	{
+		$ids_str = '';
+		foreach($itemData as $key=>$val){
+			$ids_str .= $val->id.',';
+		}
+		$reasonData = array();
+		if($ids_str) {
+			$reasonSql = "SELECT inventory_cycle_count_reason.*
+						FROM inventory_cycle_count
+						LEFT JOIN inventory_cycle_count_reason ON inventory_cycle_count.id = inventory_cycle_count_reason.inventory_cycle_count_id 
+						WHERE inventory_cycle_count.id in (" . rtrim($ids_str, ',') . ") 
+						and inventory_cycle_count_reason.id is not null";
+			$_reasonData = DB::select($reasonSql);
+			$_reasonData = json_decode(json_encode($_reasonData), true);
+			$reasonArr = InventoryCycleCountReason::REASON;
+			foreach ($_reasonData as $key => $val) {
+				$_reason = isset($reasonArr[$val['reason']]) ? $reasonArr[$val['reason']] : $val['reason'];
+				$reason = '数量:' . $val['number'] . ',原因:' . $_reason . ',备注具体原因:' . $val['reason_remark'] . ',处理方案:' . $val['solution'] . ';';
+				$reasonData[$val['inventory_cycle_count_id']] = isset($reasonData[$val['inventory_cycle_count_id']]) ? $reasonData[$val['inventory_cycle_count_id']] . $reason : $reason;
+			}
+		}
+		return $reasonData;
 	}
 
 	/*
@@ -292,49 +304,95 @@ left join (select * from inventory_cycle_count_sapinventory where type = 'AFTER'
 		}
 		die();
 	}
+
+	public function getSql($search)
+	{
+		$where = ' where 1 = 1';
+		$from_date = isset($search['from_date']) ? $search['from_date'] : '';//选的时间类型
+		$to_date = isset($search['to_date']) ? $search['to_date'] : '';//站点，为marketplaceid
+		$sku = isset($search['sku']) ? $search['sku'] : '';//账号id,例如115,137
+		$factory = isset($search['factory']) ? $search['factory'] : '';
+		$status = isset($search['status']) ? $search['status'] : '';
+		if($from_date){
+			$where .= " and inventory_cycle_count.date >= '".$from_date."'";
+		}
+		if($to_date){
+			$where .= " and inventory_cycle_count.date <= '".$to_date."'";
+		}
+		if($sku){
+			$sku_arr = explode(';',$sku);
+			$sku_str = implode("','",$sku_arr);
+			$where .= " and inventory_cycle_count.sku in( '".$sku_str."')";
+		}
+		if($factory){
+			$where .= " and inventory_cycle_count.factory = '".$factory."'";
+		}
+		if($status){
+			$where .= " and inventory_cycle_count.status = {$status}";
+		}
+
+		$sql = "select SQL_CALC_FOUND_ROWS inventory_cycle_count.*,
+before_data.MENGE1 as before_MENGE1,before_data.MENGE2 as before_MENGE2,before_data.MSTOCK1 as before_MSTOCK1,before_data.MSTOCK2 as before_MSTOCK2,before_data.LABST as before_LABST,
+after_data.MENGE1 as after_MENGE1,after_data.MENGE2 as after_MENGE2,after_data.MSTOCK1 as after_MSTOCK1,after_data.MSTOCK2 as after_MSTOCK2,after_data.LABST as after_LABST 
+				from inventory_cycle_count 
+left join (select * from inventory_cycle_count_sapinventory where type = 'BEFORE') as before_data on inventory_cycle_count.id = before_data.inventory_cycle_count_id
+left join (select * from inventory_cycle_count_sapinventory where type = 'AFTER') as after_data on inventory_cycle_count.id = after_data.inventory_cycle_count_id
+{$where} order by id desc ";
+		return $sql;
+	}
 	/*
-	 * 主列表数据的额编辑操作
+	 * 主列表数据的编辑操作
 	 */
 	public function edit(Request $request)
 	{
 		$id = isset($_REQUEST['id']) && $_REQUEST['id'] ? $_REQUEST['id'] : 0;
+		$id = explode(",",trim($id,','));
 		$after_status = isset($_REQUEST['status']) && $_REQUEST['status'] ? $_REQUEST['status'] : 0;
 		$update['status'] = $after_status;
-		//$after_status等于2的时候，改为完成盘点状态的时候，改状态字段
-		if($after_status==3){//改为完成差异处理的时候，改状态字段，和dispose_time处理差异时间
-			$update['dispose_time'] = date('Y-m-d H:i:s');
-		}elseif($after_status==4){//改为确认状态的时候，改状态字段，和confirm_time确认时间
-			$update['confirm_time'] = date('Y-m-d H:i:s');
-			//改为确认状态的时候，还要更改一下处理后数量改为最新的数量
-			$_data = InventoryCycleCount::where('id',$id)->get()->toArray();
-			foreach($_data as $key=>$val){
-				$skus = array(array('MATNR'=>$val['sku']));
-				$start_date = $end_date = date('Y-m-d',strtotime($val['date']));
-				$sap_inventory_data = $this->getSkuInventoryBySapApi($skus,$start_date,$end_date);
-				$_sapdata = $sap_inventory_data[$val['sku']][$val['factory'].'_'.$val['location']];
-				$insertSapData = array(
-					'inventory_cycle_count_id' => $val['id'],
-					'date' => $val['date'],
-					'sku' => $val['sku'],
-					'factory' => $val['factory'],
-					'location' => $val['location'],
-					'type' => 'AFTER',
-					'BUKRS' => $_sapdata['BUKRS'],
-					'MENGE1' => intval($_sapdata['MENGE1']),
-					'MENGE2' => $_sapdata['MENGE2'],
-					'MSTOCK1' => $_sapdata['MSTOCK1'],
-					'MSTOCK2' => $_sapdata['MSTOCK2'],
-					'LABST' => $_sapdata['LABST'],
-					'LFGJA' => $_sapdata['LFGJA'],
-					'LFMON' => $_sapdata['LFMON'],
-				);
-				InventoryCycleCountSapInventory::updateOrCreate(['inventory_cycle_count_id' => $val['id'],'type'=>'AFTER'], $insertSapData);
-				$updateData['dispose_after_number'] = $_sapdata['MSTOCK2'];//处理后数量
-				InventoryCycleCount::where('id',$val['id'])->update($updateData);
+		$_data = InventoryCycleCount::whereIn('id',$id)->where('status',$after_status-1)->get()->toArray();
+		$res = 0;
+		$msg = '失败';
+		if(count($_data)==count($id)) {
+			//$after_status等于2的时候，改为完成盘点状态的时候，改状态字段
+			if ($after_status == 3) {//改为完成差异处理的时候，改状态字段，和dispose_time处理差异时间
+				$update['dispose_time'] = date('Y-m-d H:i:s');
+			} elseif ($after_status == 4) {//改为确认状态的时候，改状态字段，和confirm_time确认时间
+				$update['confirm_time'] = date('Y-m-d H:i:s');
+				//改为确认状态的时候，还要更改一下处理后数量改为最新的数量
+				foreach ($_data as $key => $val) {
+					$skus = array(array('MATNR' => $val['sku']));
+					$start_date = $end_date = date('Y-m-d', strtotime($val['date']));
+					$sap_inventory_data = $this->getSkuInventoryBySapApi($skus, $start_date, $end_date);
+					$_sapdata = $sap_inventory_data[$val['sku']][$val['factory'] . '_' . $val['location']];
+					$insertSapData = array(
+						'inventory_cycle_count_id' => $val['id'],
+						'date' => $val['date'],
+						'sku' => $val['sku'],
+						'factory' => $val['factory'],
+						'location' => $val['location'],
+						'type' => 'AFTER',
+						'BUKRS' => $_sapdata['BUKRS'],
+						'MENGE1' => intval($_sapdata['MENGE1']),
+						'MENGE2' => $_sapdata['MENGE2'],
+						'MSTOCK1' => $_sapdata['MSTOCK1'],
+						'MSTOCK2' => $_sapdata['MSTOCK2'],
+						'LABST' => $_sapdata['LABST'],
+						'LFGJA' => $_sapdata['LFGJA'],
+						'LFMON' => $_sapdata['LFMON'],
+					);
+					InventoryCycleCountSapInventory::updateOrCreate(['inventory_cycle_count_id' => $val['id'], 'type' => 'AFTER'], $insertSapData);
+					$updateData['dispose_after_number'] = $_sapdata['MSTOCK2'];//处理后数量
+					InventoryCycleCount::where('id', $val['id'])->update($updateData);
+				}
 			}
+			$res = InventoryCycleCount::whereIn('id', $id)->update($update);
+			if($res){
+				$msg = '成功';
+			}
+		}else{
+			$msg = '所选择的数据不能同时改为此状态';
 		}
-		$res = InventoryCycleCount::where('id',$id)->update($update);
-		return array('status'=>$res);
+		return array('status'=>$res,'msg'=>$msg);
 	}
 	/*
 	 * 查看明细编辑页面
@@ -346,16 +404,22 @@ left join (select * from inventory_cycle_count_sapinventory where type = 'AFTER'
 		if($data){
 			$data = $data->toArray();
 			//处理后的数量是从sap的接口中获取，当状态改为已确认的时候，处理后的数量才是从数据库里面取dispose_after_number这个字段，不然的话是实时的取sap的数据
-			if($data['status'] != 4){
-				$data['dispose_after_number'] = 10;//测试数据
-			}
-
-
+//			if($data['status'] != 4){
+//				$data['dispose_after_number'] = 10;//测试数据
+//			}
 			$data['difference_before_number'] = $data['actual_number'] -$data['dispose_before_number'];//处理前差异数量=实物-处理前数量
 			$data['difference_before_rate'] = $data['dispose_before_number']>0 ? sprintf("%.2f",abs($data['difference_before_number']/$data['dispose_before_number'])) : '0.00';//最初差异率 =（处理前差异数量/处理前数量）再取绝对值
 
 			$data['difference_after_number'] = $data['actual_number'] - $data['dispose_after_number'];//处理后差异数量=实物-处理后数量
 			$data['difference_after_rate'] = $data['dispose_after_number']>0 ? sprintf("%.2f",abs($data['difference_after_number']/$data['dispose_after_number'])) : '0.00';//处理后差异率 =（处理厚差异数量/处理后数量）再取绝对值
+			//notaccount_number,未过账数量=处理前sap数量-处理前账面数量
+			$data['notaccount_number'] =$data['dispose_before_number'] - $data['account_number'];
+			$data['dispose_after_notaccount_number'] =$data['dispose_after_number'] - $data['dispose_after_account_number'];
+
+			$data['difference_before_number'] = $data['actual_number'] - $data['account_number'];//处理前差异数量=实物-处理前账面数量
+			$data['difference_before_rate'] = $data['account_number']>0 ? abs(sprintf("%.2f",abs($data['difference_before_number']/$data['account_number']))) : '0.00';//最初差异率 =（处理前差异数量/处理前账面数量）再取绝对值
+			$data['difference_after_number'] = $data['actual_number'] - $data['dispose_after_account_number'];//处理后差异数量=实物-处理后账面数量
+			$data['difference_after_rate'] = $data['dispose_after_account_number']>0 ? abs(sprintf("%.2f",abs($data['difference_after_number']/$data['dispose_after_account_number']))) : '0.00';//处理后差异率 =（处理厚差异数量/处理后数量）再取绝对值
 
 			$statusArr = InventoryCycleCount::STATUS;
 			$data['status_name'] = isset($statusArr[$data['status']]) ? $statusArr[$data['status']] : $data['status'];
@@ -433,7 +497,6 @@ left join (select * from inventory_cycle_count_sapinventory where type = 'AFTER'
 		$arrayData[] = $headArray;
 		$today = date('Y/m/d');
 		$arrayData[] = array($today, '',);
-
 		if($arrayData){
 			$spreadsheet = new Spreadsheet();
 
@@ -500,7 +563,8 @@ left join (select * from inventory_cycle_count_sapinventory where type = 'AFTER'
 								$date = date('Y-m-d',strtotime($data['A']));
 								if(isset($sap_inventory_data[$data['B']])){
 									foreach($sap_inventory_data[$data['B']] as $skey=>$sval){
-										if($sval['WERKS'] && $sval['LGORT']) {
+										//MSTOCK1和MSTOCK2不含有负号(-)
+										if($sval['WERKS'] && $sval['LGORT'] && $sval['MSTOCK1']>0 && $sval['MSTOCK2']>0 && !(strstr($sval['MSTOCK1'], '-')) && !(strstr($sval['MSTOCK2'], '-'))) {
 											$insertData = array(
 												'date' => $date,
 												'sku' => $data['B'],
@@ -555,45 +619,56 @@ left join (select * from inventory_cycle_count_sapinventory where type = 'AFTER'
 			}
 		}
 		return redirect('/inventoryCycleCount');
-
 	}
-
-	public function getSapApiSign($array)
-	{
-		ksort($array);
-		$authstr = "";
-		foreach ($array as $k => $v) {
-			$authstr = $authstr.$k.$v;
-		}
-		$authstr=$authstr.env("SAP_SECRET");
-		$sign = strtoupper(sha1($authstr));
-		return $sign;
-	}
-
 	/*
 	 * 下载物流部需要的添加真实数量模板
 	 */
 	public function downloadActualNumber(Request $request)
 	{
-		$today = date('Y-m-d');
-		$_data = InventoryCycleCount::where('date','>=',$today)->where('status',1)->get()->toArray();
-
-		$headArray = array('盘点日期','SKU','工厂','库位','实物数量');
-		$arrayData[] = $headArray;
-
-		foreach($_data as $key=>$val){
-			$arrayData[] = array(
-				$val['date'],
-				$val['sku'],
-				$val['factory'],
-				$val['location'],
-				$val['actual_number'],
-			);
+		$_data = InventoryCycleCount::where('status',1)->get()->toArray();
+		$excel_name = "导入实物数量模板.xlsx";
+		$excel_field = array('date'=>'盘点日期','sku'=>'SKU','factory'=>'工厂','location'=>'库位','actual_number'=>'实物数量');
+		$this->downloadExcel($_data,$excel_field,$excel_name);
+	}
+	/*
+	 * 下载财务部需要的添加账面数量模板
+	 */
+	public function downloadAccountNumber(Request $request)
+	{
+		$_data = InventoryCycleCount::where('status',1)->get()->toArray();
+		$excel_name = "导入账面数量模板.xlsx";
+		$excel_field = array('date'=>'盘点日期','sku'=>'SKU','factory'=>'工厂','location'=>'库位','account_number'=>'账面数量');
+		$this->downloadExcel($_data,$excel_field,$excel_name);
+	}
+	/*
+	 * 下载财务部需要添加的处理之后的账面数量模板
+	 */
+	public function downloadDisposeAfterAccountNumber(Request $request)
+	{
+		$_data = InventoryCycleCount::where('status',1)->get()->toArray();
+		$excel_name = "导入处理后账面数量模板.xlsx";
+		$excel_field = array('date'=>'盘点日期','sku'=>'SKU','factory'=>'工厂','location'=>'库位','dispose_after_account_number'=>'账面数量');
+		$this->downloadExcel($_data,$excel_field,$excel_name);
+	}
+	/*
+	 * 下载excel模板的公共方法
+	 */
+	public function downloadExcel($_data,$excel_field,$excel_name)
+	{
+		$headArray = array();
+		foreach($excel_field as $field=>$name){
+			$headArray[] = $name;
 		}
-
+		$arrayData[] = $headArray;
+		foreach($_data as $key=>$val){
+			$downloadData = array();
+			foreach($excel_field as $field=>$name){
+				$downloadData[] = $val[$field];
+			}
+			$arrayData[] = $downloadData;
+		}
 		if($arrayData){
 			$spreadsheet = new Spreadsheet();
-
 			$spreadsheet->getActiveSheet()
 				->fromArray(
 					$arrayData,  // The data to set
@@ -602,7 +677,7 @@ left join (select * from inventory_cycle_count_sapinventory where type = 'AFTER'
 				//    we want to set these values (default is A1)
 				);
 			header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');//告诉浏览器输出07Excel文件
-			header('Content-Disposition: attachment;filename="导入实物数量模板.xlsx"');//告诉浏览器输出浏览器名称
+			header('Content-Disposition: attachment;filename="'.$excel_name.'"');//告诉浏览器输出浏览器名称
 			header('Cache-Control: max-age=0');//禁止缓存
 			$writer = new Xlsx($spreadsheet);
 			$writer->save('php://output');
@@ -615,6 +690,32 @@ left join (select * from inventory_cycle_count_sapinventory where type = 'AFTER'
 	public function importActualNumber(Request $request)
 	{
 		if(!Auth::user()->can(['inventory-cycle-count-addActualNumber'])) die('Permission denied -- inventory-cycle-count-addActualNumber');
+		$this->importNumber($request,'actual_number');
+		return redirect('/inventoryCycleCount');
+	}
+	/*
+	 * 财务部导入账面数量数据
+	 */
+	public function importAccountNumber(Request $request)
+	{
+		if(!Auth::user()->can(['inventory-cycle-count-addAccountNumber'])) die('Permission denied -- inventory-cycle-count-addAccountNumber');
+		$this->importNumber($request,'account_number');
+		return redirect('/inventoryCycleCount');
+	}
+	/*
+	 * 财务部导入处理后的账面数量数据
+	 */
+	public function importDisposeAfterAccountNumber(Request $request)
+	{
+		if(!Auth::user()->can(['inventory-cycle-count-addAccountNumber'])) die('Permission denied -- inventory-cycle-count-addAccountNumber');
+		$this->importNumber($request,'dispose_after_account_number');
+		return redirect('/inventoryCycleCount');
+	}
+	/*
+	 * 导入数量
+	 */
+	public function importNumber($request,$number_type)
+	{
 		if($request->isMethod('POST')){
 			$file = $request->file('import_File');
 			if($file){
@@ -633,22 +734,22 @@ left join (select * from inventory_cycle_count_sapinventory where type = 'AFTER'
 								unset($importData[$key]);
 								continue;
 							}
-							InventoryCycleCount::where('date',date('Y-m-d',strtotime($data['A'])))->where('sku',$data['B'])->where('factory',$data['C'])->where('location',$data['D'])->where('status',1)->update(['actual_number'=>$data['E']]);
+							InventoryCycleCount::where('date',date('Y-m-d',strtotime($data['A'])))->where('sku',$data['B'])->where('factory',$data['C'])->where('location',$data['D'])->where('status',1)->update([$number_type=>$data['E']]);
 							unset($importData[$key]);
 						}
 
-						$request->session()->flash('success_message','Import Data Success!');
+						return $request->session()->flash('success_message','Import Data Success!');
 					}else{
-						$request->session()->flash('error_message','Import Data Failed');
+						return $request->session()->flash('error_message','Import Data Failed');
 					}
 				}else{
-					$request->session()->flash('error_message','Import Data Failed,The file is too large');
+					return $request->session()->flash('error_message','Import Data Failed,The file is too large');
 				}
 			}else{
-				$request->session()->flash('error_message','Please Select Upload File');
+				return $request->session()->flash('error_message','Please Select Upload File');
 			}
 		}
-		return redirect('/inventoryCycleCount');
+		return true;
 	}
 
 	/*
@@ -671,5 +772,17 @@ left join (select * from inventory_cycle_count_sapinventory where type = 'AFTER'
 			}
 		}
 		return ['dispose_after_number'=>$dispose_after_number,'sap_inventory_data'=>$sap_inventory_data];
+	}
+
+	public function getSapApiSign($array)
+	{
+		ksort($array);
+		$authstr = "";
+		foreach ($array as $k => $v) {
+			$authstr = $authstr.$k.$v;
+		}
+		$authstr=$authstr.env("SAP_SECRET");
+		$sign = strtoupper(sha1($authstr));
+		return $sign;
 	}
 }

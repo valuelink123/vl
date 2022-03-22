@@ -50,38 +50,44 @@
                 <div class="col-md-2">
                     <div class="btn-group ">
                         <div class="col-md-6"  >
-                            <button type="submit" class="btn blue" id="download_actual_number"><a href="{{ url('/inventoryCycleCount/downloadSku')}}" >企管下载模板</a></button>
+                            <button type="submit" class="btn blue" id="download_sku_number"><a href="{{ url('/inventoryCycleCount/downloadSku')}}" >企管下载模板</a></button>
                         </div>
                         <div class="col-md-2">
                             <button type="submit" class="btn blue" id="data_sku">导入sku</button>
                         </div>
                     </div>
                 </div>
+                @endpermission
 
-{{--                <div class="col-md-4">--}}
-{{--                    <div class="btn-group ">--}}
-{{--                        <form action="{{url('/inventoryCycleCount/importSku')}}" method="post" enctype="multipart/form-data">--}}
-{{--                            <div class="col-md-3"  >--}}
-{{--                                <a href="{{ url('/inventoryCycleCount/downloadSku')}}" >企管下载模板--}}
-{{--                                </a>--}}
-{{--                            </div>--}}
-{{--                            <div class="col-md-6">--}}
-{{--                                {{ csrf_field() }}--}}
-{{--                                <input type="file" name="importSkuFile"  style="width: 90%;"/>--}}
-{{--                            </div>--}}
-{{--                            <div class="col-md-2">--}}
-{{--                                <button type="submit" class="btn blue" id="data_sku">导入sku</button>--}}
-{{--                            </div>--}}
-{{--                        </form>--}}
-{{--                    </div>--}}
-{{--                </div>--}}
+                @permission('inventory-cycle-count-addAccountNumber')
+                <div class="col-md-2">
+                    <div class="btn-group ">
+                        <div class="col-md-6"  >
+                            <button type="submit" class="btn blue" id="download_account_number"><a href="{{ url('/inventoryCycleCount/downloadAccountNumber')}}">财务下载模板</a></button>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn blue" id="data_account_number">导入账面数量</button>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="col-md-3">
+                    <div class="btn-group ">
+                        <div class="col-md-6">
+                            <button type="submit" class="btn blue" id="download_dispose_after_account_number"><a href="{{ url('/inventoryCycleCount/downloadDisposeAfterAccountNumber')}}">财务下载处理后模板</a></button>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn blue" id="data_dispose_after_account_number">导入处理后数量</button>
+                        </div>
+                    </div>
+                </div>
                 @endpermission
 
                 @permission('inventory-cycle-count-addActualNumber')
                 <div class="col-md-2">
                     <div class="btn-group ">
                         <div class="col-md-6"  >
-                            <button type="submit" class="btn blue" id="download_actual_number"><a href="{{ url('/inventoryCycleCount/downloadActualNumber')}}" >物流下载模板</a></button>
+                            <button type="submit" class="btn blue" id="download_actual_number"><a href="{{ url('/inventoryCycleCount/downloadActualNumber')}}">物流下载模板</a></button>
                         </div>
                         <div class="col-md-2">
                             <button type="submit" class="btn blue" id="data_actual_number">导入真实数量</button>
@@ -140,22 +146,43 @@
         </div>
 
         <div class="row" style="margin-top:50px;">
+            <div class="col-md-2">
+                <div class="btn-group">
+                    <button type="button" class="btn btn-sm green-meadow">批量操作</button>
+                    <button type="button" class="btn btn-sm green-meadow dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                        <i class="fa fa-angle-down"></i>
+                    </button>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><button type="submit" class="btn btn-sm red-sunglo batch-edit-action" value="2">完成盘点</button></li>
+                        <li class="divider"> </li>
+                        <li><button type="submit" class="btn btn-sm yellow-crusta batch-edit-action" value="3">完成差异处理</button></li>
+                        <li class="divider"> </li>
+                        <li><button type="submit" class="btn btn-sm blue-hoki batch-edit-action" value="4">确认</button></li>
+                        <li class="divider"> </li>
+                    </ul>
+                </div>
+            </div>
             <table class="table table-striped table-bordered" id="datatable">
                 <thead>
                     <tr>
+                        <th><input type="checkbox" id="select_all"/></th>
                         <th>盘点日期</th>
                         <th>SKU</th>
-{{--                        <th>产品描述</th>--}}
                         <th>工厂</th>
                         <th>库位</th>
-                        <th>处理前数量</th>
+                        <th>SAP库存数量</th>
+                        <th>账面数量</th>
+                        <th>未过账数量</th>
                         <th>实物数量</th>
                         <th>最初差异数量</th>
                         <th>最初差异率</th>
-                        <th>处理后数量</th>
+                        <th>处理后SAP数量</th>
+                        <th>处理后账面数量</th>
+                        <th>处理后未过账数量</th>
                         <th>处理后差异数量</th>
                         <th>处理后差异率</th>
                         <th>状态</th>
+                        <th>差异原因</th>
                         <th>完成时间</th>
                         <th>确认时间</th>
                         <th>操作</th>
@@ -200,6 +227,7 @@
             rtl: App.isRTL(),
             autoclose: true
         });
+        // var datatableApi = $('#datatable').dataTable().api();
 
         $('#datatable').dataTable({
                 searching: false,//关闭搜索
@@ -207,25 +235,44 @@
                 ordering:false,
                 "pageLength": 20, // default record count per page
                 "lengthMenu": [
-                    [10, 20,50,],
-                    [10, 20,50,] // change per page values here
+                    [10, 20,50,-1],
+                    [10, 20,50,"All"] // change per page values here
                 ],
+                "scrollX": true,
+                // fixedColumns:   {
+                //     leftColumns:4
+                // },
+
                 // pagingType: 'bootstrap_extended',
                 processing: true,
                 columns: [
+                    {
+                        width: "1px",
+                        orderable: false,
+                        defaultContent: '',
+                        // className: 'select-checkbox', // 该类根据 tr:selected 改变自己的背景
+                        render:function(data,type,row,meta){
+                            return '<input type="checkbox" class="select-checkbox" value="'+row.id+'">';
+                        }
+                    },
+                    // {data: 'date',name:'date'},
                     {data: 'date',name:'date'},
                     {data: 'sku',name:'sku'},
-                    // {data: 'describe',name:'describe'},
                     {data: 'factory',name:'factory'},
                     {data: 'location',name:'location'},
-                    {data: 'dispose_before_number',name:'dispose_before_number'},//处理前数量
+                    {data: 'dispose_before_number',name:'dispose_before_number'},//处理前SAP库存数量
+                    {data: 'account_number',name:'account_number'},//账面数量
+                    {data: 'notaccount_number',name:'notaccount_number'},//未过账数量
                     {data: 'actual_number',name:'actual_number'},//实物数量
                     {data: 'difference_before_number',name:'difference_before_number'},//最初差异数量
                     {data: 'difference_before_rate',name:'difference_before_rate'},//最初差异率
-                    {data: 'dispose_after_number',name:'dispose_after_number'},//处理后数量
+                    {data: 'dispose_after_number',name:'dispose_after_number'},//处理后SAP库存数量
+                    {data: 'dispose_after_account_number',name:'dispose_after_account_number'},//处理后的账面数量
+                    {data: 'dispose_after_notaccount_number',name:'dispose_after_notaccount_number'},//处理后未过账数量
                     {data: 'difference_after_number',name:'difference_after_number'},//处理后差异数量
                     {data: 'difference_after_rate',name:'difference_after_rate'},//处理后差异率
                     {data: 'status',name:'status'},
+                    {data: 'reason',name:'reason'},
                     {data: 'dispose_time',name:'dispose_time'},
                     {data: 'confirm_time',name:'confirm_time'},
                     {data: 'action',name:'action'},
@@ -263,6 +310,31 @@
             });
         })
 
+        //点击导入账面数量数据
+        $('#data_account_number').click(function(){
+            $("#import-form").attr("action","inventoryCycleCount/importAccountNumber");
+            art.dialog({
+                id: 'art_add_account_number',
+                title: '导入账面数量',
+                content: document.getElementById('import-form'),
+                okVal: false,
+                cancel: true,
+                cancelVal:'Cancel'
+            });
+        })
+        //点击导入账面数量数据
+        $('#data_dispose_after_account_number').click(function(){
+            $("#import-form").attr("action","inventoryCycleCount/importDisposeAfterAccountNumber");
+            art.dialog({
+                id: 'art_add_dispose_after_account_number',
+                title: '导入处理后的账面数量',
+                content: document.getElementById('import-form'),
+                okVal: false,
+                cancel: true,
+                cancelVal:'Cancel'
+            });
+        })
+
         //点击完成盘点，把状态改为完成盘点状态
         $('table').on('click','.edit-action',function(){
             var id = $(this).parent().attr('data-id');
@@ -279,15 +351,43 @@
                     }else{
                         alert('失败');
                     }
-
                 }
             });
         })
 
+        //批量更新状态，batch-edit-action
+        $('.batch-edit-action').click(function(){
+            var id='';
+            $(".select-checkbox").each(function () {
+                if (this.checked == true) {
+                    if ($(this).val()>0) {
+                        id = id + ',' + $(this).val();
+                    }
+                }
+            });
+            console.log(id);
+            var status = $(this).val();
+            $.ajax({
+                type: 'post',
+                url: '/inventoryCycleCount/edit',
+                data: {status:status,id:id},
+                dataType:'json',
+                success: function(res) {
+                    if(res.status>0){
+                        $("#search_top").trigger("click");
+                        alert(res.msg);
+                    }else{
+                        alert(res.msg);
+                    }
+                }
+            });
+        })
+
+        var dtapi = $('#datatable').dataTable().api();
         //点击上面的搜索
         $('#search_top').click(function(){
             //改变下面表格的数据内容
-            dtapi = $('#datatable').dataTable().api();
+            // dtapi = $('#datatable').dataTable().api();
             dtapi.settings()[0].ajax.data = {search: decodeURIComponent($("#search-form").serialize().replace(/\+/g," "),true)};
             dtapi.ajax.reload();
             return false;
@@ -296,6 +396,38 @@
         $("#export").click(function(){
             location.href='/inventoryCycleCount/export?='+decodeURIComponent($("#search-form").serialize().replace(/\+/g," "),true);
         });
+
+        //点击列表中的单选
+        $("#datatable").on('click', '.select-checkbox',function(){
+            if ($(this).is(":checked") == false) {
+                $("#select_all").prop("checked", false);
+                $(this).parent().parent().removeClass('selected');
+            } else {
+                var flag = true;
+                $(this).parent().parent().addClass('selected');
+                $("#select_all").prop("checked", true);
+                $(".select-checkbox").each(function () {
+                    if (this.checked == false) {
+                        $("#select_all").prop("checked", false);
+                        flag = false;
+                        return;
+                    }
+                });
+            }
+        });
+        //点击表头上的全选
+        $('#select_all').on('click',function(){
+            if ($(this).is(":checked") == false) {
+                //不选中
+                $(".select-checkbox").prop("checked", false);
+                $(".select-checkbox").parent().parent().removeClass('selected');
+
+            }else{
+                //选中
+                $(".select-checkbox").prop("checked", true);
+                $(".select-checkbox").parent().parent().addClass('selected');
+            }
+        })
 
         $(function(){
             // 根据搜索时间区域，调用点击搜索事件
