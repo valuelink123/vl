@@ -856,6 +856,12 @@
                                                     <span class="arrow"></span>
                                                 </a>
                                             </li>
+											<li class="">
+                                                <a href="/ppcschedule" class="nav-link nav-toggle">
+                                                    Adv Schedules
+                                                    <span class="arrow"></span>
+                                                </a>
+                                            </li>
                                             @endpermission
 
 											</ul>

@@ -559,6 +559,12 @@ Route::get('/adv/createWhole', 'AdvController@createWhole');
 Route::Post('/adv/saveWhole', 'AdvController@saveWhole');
 Route::get('/adv/batchScheduled', 'AdvController@batchScheduled');
 Route::Post('/adv/batchSaveScheduled', 'AdvController@batchSaveScheduled');
+
+Route::get('/ppcschedule','PpcscheduleController@index');
+Route::get('/ppcschedule/scheduleEdit', 'PpcscheduleController@editSchedule');
+Route::Post('/ppcschedule/saveSchedule', 'PpcscheduleController@saveSchedule');
+Route::Post('/ppcschedule/listSchedules', 'PpcscheduleController@listSchedules');
+Route::Post('/ppcschedule/scheduleBatchUpdate', 'PpcscheduleController@scheduleBatchUpdate');
 //客诉品线问题细分
 Route::Post('/category/import', 'CategoryController@import');
 

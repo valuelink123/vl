@@ -26,5 +26,15 @@ class PpcSchedule extends Model
     {
         return $this->belongsTo(\App\User::class, 'user_id', 'id');
     }
+	
+	public function campaign():BelongsTo
+    {
+        return $this->belongsTo(\App\Models\PpcSproductsCampaign::class, 'campaign_id', 'campaign_id');
+    }
+	
+	public function profile():BelongsTo
+    {
+        return $this->belongsTo(\App\Models\PpcProfile::class, 'profile_id', 'profile_id');
+    }
 
 }
