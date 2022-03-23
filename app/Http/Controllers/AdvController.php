@@ -138,29 +138,54 @@ class AdvController extends Controller
         DB::beginTransaction();
         try{ 
             $id = intval($request->get('id'));
-            $data = $id?(PpcSchedule::findOrFail($id)):(new PpcSchedule);
-            $fileds = array(
-                'profile_id',
-                'ad_type',
-                'campaign_id',
-                'record_type',
-                'record_name',
-                'record_type_id',
-                'status',
-                'date_from',
-                'date_to',
-                'time',
-                'state',
-                'bid'
-            );
-            foreach($fileds as $filed){
-                $data->{$filed} = $request->get($filed);
-            }
-			if($id && (date('Gi')<intval(str_replace(':','',$request->get('time')))) && ($request->get('status')==1)){
-				$data->done_at = $data->message = NULL;
+			
+			$schedules = $request->input('schedules')??[];
+			if(!empty($schedules)){
+				foreach($schedules as $schedule){
+					PpcSchedule::create(
+					[
+						'profile_id'=>$request->get('profile_id'),
+						'ad_type'=>$request->get('ad_type'),
+						'campaign_id'=>$request->get('campaign_id'),
+						'record_type'=>$request->get('record_type'),
+						'record_name'=>$request->get('record_name'),
+						'record_type_id'=>$request->get('record_type_id'),
+						'status'=>$request->get('status'),
+						'date_from'=>$request->get('date_from'),
+						'date_to'=>$request->get('date_to'),
+						'time'=>array_get($schedule,'time'),
+						'state'=>array_get($schedule,'state'),
+						'bid'=>array_get($schedule,'bid'),
+						'user_id'=>Auth::user()->id,
+					]
+					);
+				}
+			}else{
+			
+				$data = $id?(PpcSchedule::findOrFail($id)):(new PpcSchedule);
+				$fileds = array(
+					'profile_id',
+					'ad_type',
+					'campaign_id',
+					'record_type',
+					'record_name',
+					'record_type_id',
+					'status',
+					'date_from',
+					'date_to',
+					'time',
+					'state',
+					'bid'
+				);
+				foreach($fileds as $filed){
+					$data->{$filed} = $request->get($filed);
+				}
+				if($id && (date('Gi')<intval(str_replace(':','',$request->get('time')))) && ($request->get('status')==1)){
+					$data->done_at = $data->message = NULL;
+				}
+				$data->user_id = Auth::user()->id;
+				$data->save();
 			}
-            $data->user_id = Auth::user()->id;
-            $data->save();
             DB::commit();
             $records["code"] = 'SUCCESS';
             $records["description"] = "更新成功!";
@@ -1776,15 +1801,15 @@ class AdvController extends Controller
             ]));
         }
         $sortFields = [
-            '8'=>'impressions',
-            '9'=>'clicks',
-            '10'=>'ctr',
-            '11'=>'cost',
-            '12'=>'cpc',
-            '13'=>'attributed_units_ordered1d',
-            '14'=>'attributed_sales1d',
-            '15'=>'acos',
-            '16'=>'raos',
+            '7'=>'impressions',
+            '8'=>'clicks',
+            '9'=>'ctr',
+            '10'=>'cost',
+            '11'=>'cpc',
+            '12'=>'attributed_units_ordered1d',
+            '13'=>'attributed_sales1d',
+            '14'=>'acos',
+            '15'=>'raos',
         ];
         $sortTypes = [
             'asc'=>SORT_ASC,
