@@ -14,10 +14,6 @@
                             <input type="hidden" name="campaign_id" value="{{array_get($form,'campaign_id')}}">
                             <input type="hidden" name="id" value="{{array_get($form,'id')}}">
                             
-                            <div class="form-group">
-                                <label>Name:</label>
-                                <input type="text" readonly class="form-control" name="record_name" id="record_name" value="{{array_get($form,'record_name')}}" >
-                            </div>
                             
 
                             <div class="form-group">
@@ -49,7 +45,7 @@
                                     </span>
                                 </div>
                             </div>
-                            @if(!empty(array_get($form,'id')))
+							@if(!empty(array_get($form,'id')))
                             <div class="form-group">
                                 <label>Time:</label>
                                 <div class="input-group col-md-4">
@@ -154,8 +150,6 @@ $(function() {
         showSeconds: false,
         showMeridian: false
     });
-	
-	FormRepeater.init();
 
 
 	FormRepeater.init();
@@ -167,7 +161,7 @@ $(function() {
 		$.ajax({
 			type: "POST",
 			dataType: "json",
-			url: "{{ url('/adv/saveSchedule') }}",
+			url: "{{ url('/ppcschedule/saveSchedule') }}",
 			data: $('#schedule_form').serialize(),
 			success: function (data) {
 				if(data.code=='SUCCESS'){

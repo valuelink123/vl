@@ -138,7 +138,6 @@ class AdvController extends Controller
         DB::beginTransaction();
         try{ 
             $id = intval($request->get('id'));
-			
 			$schedules = $request->input('schedules')??[];
 			if(!empty($schedules)){
 				foreach($schedules as $schedule){
@@ -161,7 +160,6 @@ class AdvController extends Controller
 					);
 				}
 			}else{
-			
 				$data = $id?(PpcSchedule::findOrFail($id)):(new PpcSchedule);
 				$fileds = array(
 					'profile_id',
