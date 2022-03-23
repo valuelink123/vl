@@ -64,7 +64,9 @@ class Kernel extends ConsoleKernel
 		'App\Console\Commands\GetPpcReport',
 		'App\Console\Commands\GetPpcSchedule',
 		'App\Console\Commands\AddSapInventory',
-		'App\Console\Commands\AddAsins'
+		'App\Console\Commands\AddAsins',
+		'App\Console\Commands\AddPpcAdCampaign',
+		'App\Console\Commands\AddPpcAdCampaignHistory'
     ];
 
     /**
@@ -176,6 +178,8 @@ class Kernel extends ConsoleKernel
 
 		$schedule->command('add:sap_inventory')->hourly()->name('add_sap_inventory')->withoutOverlapping();//每小时更新一次，用于获取sap库存数据，主要用于库存盘点模块
 		$schedule->command('add:asins')->dailyAt('03:30')->name('addAsins')->withoutOverlapping();//添加asins数据，每日更新，
+		$schedule->command('add:ppc_ad_campaign')->dailyAt('04:30')->name('addPpcAdCampaign')->withoutOverlapping();//添加广告映射关系数据，每日更新，
+		$schedule->command('add:ppc_ad_campaign_history')->monthly()->name('addPpcAdCampaignHistory')->withoutOverlapping();//把销售之前维护的ppc_ad_match_asin表里面的映射关系，迁移到新的表里面，ppc_ad_campaign和ppc_ad_campaign_match_asin表
     }
 
     /**
