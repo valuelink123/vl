@@ -523,16 +523,13 @@ right join budget_skus as c on b.sku=c.sku and b.site=c.site where ((a.month>='"
 		$data['showtype'] = $showtype;
 		$data['base_data']= $budget->toArray();
 		$data['rate']= array_get(DB::connection('amazon')->table('currency_rates')->pluck('rate','currency'),$cur,0);
+		$data['vat']= array_get(getSiteVat(),$site,0);
 		
 		$data['site_code'] = strtoupper(substr($site,-2));
 		if($data['site_code']=='OM') $data['site_code']='US';
 		
 		$storage_fee = json_decode(json_encode(DB::table('storage_fee')->where('type','FBA')->where('site',$data['site_code'])->where('size',$data['base_data']['then_size'])->first()),true);
 
-		$tax_rate=DB::table('tax_rate')->where('site',$data['site_code'])->whereIn('sku',array('OTHERSKU',$sku))->pluck('tax','sku');
-		$data['base_data']['tax']= round(((array_get($tax_rate,$sku)??array_get($tax_rate,'OTHERSKU'))??0),4);
-		$shipfee = (array_get(getShipRate(),$data['site_code'].'.'.$sku)??array_get(getShipRate(),$data['site_code'].'.default'))??0;
-		$data['base_data']['headshipfee']=round($data['base_data']['then_volume']/1000000*1.2*round($shipfee,4),2);
 		$data['base_data']['cold_storagefee']=round(array_get($storage_fee,'2_10_fee',0)*$data['base_data']['then_volume']/1000000/4,4);
 		$data['base_data']['hot_storagefee']=round(array_get($storage_fee,'11_1_fee',0)*$data['base_data']['then_volume']/1000000/4,4);
 		$data['remember_list_url'] = session()->get('remember_list_url');
@@ -809,11 +806,10 @@ right join budget_skus as c on b.sku=c.sku and b.site=c.site where ((a.month>='"
 			$site_code= strtoupper(substr($budget->site,-2));
 			if($site_code=='OM') $site_code='US';
 			
+			$vat = array_get(getSiteVat(),$budget->site,0);
 			$storage_fee = json_decode(json_encode(DB::table('storage_fee')->where('type','FBA')->where('site',$site_code)->where('size',$base_data['then_size'])->first()),true);
-			$tax_rate=DB::table('tax_rate')->where('site',$site_code)->whereIn('sku',array('OTHERSKU',$sku))->pluck('tax','sku');
-			$tax= round(((array_get($tax_rate,$sku)??array_get($tax_rate,'OTHERSKU'))??0)*0.4,4);
-			$shipfee = (array_get(getShipRate(),$site_code.'.'.$sku)??array_get(getShipRate(),$site_code.'.default'))??0;
-			$headshipfee = round($base_data['then_volume']/1000000*1.2*round($shipfee,4),2);
+			$tax= 0;
+			$headshipfee = 0;
 			$cold_storagefee=round(array_get($storage_fee,'2_10_fee',0)*$base_data['then_volume']/1000000/4,4);
 			$hot_storagefee=round(array_get($storage_fee,'11_1_fee',0)*$base_data['then_volume']/1000000/4,4);
 			$cost = round($base_data['then_cost']*(1+$tax)+$headshipfee,2);
@@ -850,7 +846,7 @@ right join budget_skus as c on b.sku=c.sku and b.site=c.site where ((a.month>='"
 				$promotion = array_get($datas,$i.'.promotion',0);
 				$exception = array_get($datas,$i.'.exception',0);
 				$datas[$i]['week_line_qty'] =$qty+$promote_qty;
-				$datas[$i]['week_line_income']= ($exception==1)?0:round(($qty*$price+$promote_qty*$promote_price)*(1-$exception)*$rate,2);
+				$datas[$i]['week_line_income']= ($exception==1)?0:round(($qty*$price+$promote_qty*$promote_price)*(1-$exception)*$rate/(1+$vat),2);
 				$datas[$i]['week_line_cost']= round(($qty+$promote_qty)*$cost,2);
 				$datas[$i]['week_line_profit']= round($datas[$i]['week_line_income']-$datas[$i]['week_line_cost'],2);
 				$datas[$i]['week_line_commonfee']= ($exception==1)?0:($datas[$i]['week_line_income']*$common_fee+(0.2*$datas[$i]['week_line_income']/(1-$exception)*$common_fee*$exception));
@@ -863,8 +859,8 @@ right join budget_skus as c on b.sku=c.sku and b.site=c.site where ((a.month>='"
 				if($i>=$start_week){
 					$stock = ($stock-array_get($datas,$i.'.week_line_qty',0)>0)?$stock-array_get($datas,$i.'.week_line_qty',0):0;
 					$n_stock = 0;
-					if($i<=$weeks-7){
-						for ($ix = 1;$ix <= 7;$ix++){
+					if($i<=$weeks-13){
+						for ($ix = 1;$ix <= 13;$ix++){
 								$n_stock+=intval(array_get($datas,($i+$ix).'.week_line_qty',0));
 						}
 					}elseif($i==$weeks){
@@ -891,16 +887,16 @@ right join budget_skus as c on b.sku=c.sku and b.site=c.site where ((a.month>='"
 					
 					$avgStock[$i] = intval(($startStock+$endStock)/2);
 					$startStock = $endStock;
-					$week_line_amountfee = round($cost*$avgStock[$i]*0.00375,2);
+					$week_line_amountfee = round($cost*$avgStock[$i]*0.00346,2);
 					$datas[$i]['week_line_amountfee'] = $week_line_amountfee;
 
 					if($i<=4){
-						$week_line_storagefee = round($first4WeeksQty*0.656*$hot_storagefee,2);
+						$week_line_storagefee = round($first4WeeksQty*0.4*0.656*$hot_storagefee,2);
 					}else{
 						if($i>=($start_week+4)){
-							$week_line_storagefee = round($avgStock[$i-4]*($i>43?$hot_storagefee:$cold_storagefee),2);	
+							$week_line_storagefee = round($avgStock[$i-4]*0.4*($i>43?$hot_storagefee:$cold_storagefee),2);	
 						}else{
-							$week_line_storagefee = round($avgStock[$i]*($i>43?$hot_storagefee:$cold_storagefee),2);	
+							$week_line_storagefee = round($avgStock[$i]*0.4*($i>43?$hot_storagefee:$cold_storagefee),2);	
 						}
 					}
 					$datas[$i]['week_line_storagefee'] = $week_line_storagefee; 
