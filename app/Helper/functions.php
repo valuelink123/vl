@@ -305,6 +305,22 @@ function getSiteCur(){
     );
 }
 
+function getSiteVat(){
+    return array(
+        'www.amazon.ca'=>0,
+        'www.amazon.de'=>0.19,
+        'www.amazon.es'=>0.21,
+        'www.amazon.fr'=>0.2,
+        'www.amazon.in'=>0,
+        'www.amazon.it'=>0.22,
+        'www.amazon.co.jp'=>0,
+        'www.amazon.co.uk'=>0.2,
+        'www.amazon.com.mx'=>0,
+        'www.amazon.com'=>0,
+		'www.amazon.mx'=>0,
+    );
+}
+
 
 function getCurrency(){
     return array(

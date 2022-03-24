@@ -125,9 +125,7 @@ white-space: nowrap;
 			<col width="8%"></col>
 			<col width="5%"></col>
 			<col width="5%"></col>
-			<col width="4%"></col>
-			<col width="4%"></col>
-			<col width="4%"></col>
+			<col width="12%"></col>
 			<col width="5%"></col>
 			<col width="4%"></col>
 			<col width="5%"></col>
@@ -144,9 +142,7 @@ white-space: nowrap;
 						<td width="8%">SKU</td>
 						<td width="5%">状态</td>
 						<td width="5%">等级</td>
-						<td width="4%">不含税采购单价(CNY)</td>
-						<td width="4%">关税税率</td>
-						<td width="4%">头程运费(CNY)</td>
+						<td width="4%">物料成本(CNY 含关税头二程)</td>
 						<td width="5%">佣金比率</td>
 						<td width="4%">拣配费(外币)</td>
 						<td width="5%">异常率</td>
@@ -169,12 +165,10 @@ white-space: nowrap;
 						
 						</td>
 						<td><a class="budgetskus_cost editable" title="成本" href="javascript:;" id="{{$budget_id}}-cost" data-pk="{{$budget_id}}-cost" data-type="text" data-placement="bottom">{{round($base_data['then_cost'],2)}}</a></td>
-						<td><span id = "tax">{{$base_data['tax']}}</span></td>
-						<td><span id = "headshipfee">{{$base_data['headshipfee']}}</span></td>
 						<td><a class="budgetskus_common_fee editable" title="佣金比率%" href="javascript:;" id="{{$budget_id}}-common_fee" data-pk="{{$budget_id}}-common_fee" data-type="text" data-placement="bottom">{{$base_data['then_common_fee']*100}}</a>%</td>
 						<td><a class="budgetskus_pick_fee editable" title="拣配费" href="javascript:;" id="{{$budget_id}}-pick_fee" data-pk="{{$budget_id}}-pick_fee" data-type="text" data-placement="bottom">{{$base_data['then_pick_fee']}}</a></td>
 						<td>{{$base_data['then_exception']*100}}%</td>
-						<td><span id = "rate">{{$rate}}</span></td>
+						<td><span id = "rate">{{$rate}}</span><span id = "vat">{{$vat}}</span></td>
 						<td><a class="budgetskus_stock editable" title="期初库存" href="javascript:;" id="{{$budget_id}}-stock" data-pk="{{$budget_id}}-stock" data-type="text" data-placement="bottom">{{$base_data['then_stock']}}</a></td>
 						<td>{{array_get(getUsers('sap_seller'),$base_data['then_sap_seller_id'],$base_data['then_sap_seller_id'])}}</td>
 						<td>{{$base_data['then_description']}}</td>
@@ -655,13 +649,12 @@ var FormEditable = function() {
 		}
 		var stock =  parseInt($('#'+budget_id+'-stock').text());
 		var first4WeeksQty = stock;
-		var tax = parseFloat($('#tax').text())*0.4;
-		var headshipfee = parseFloat($('#headshipfee').text());
+		var tax = 0;
+		var headshipfee = 0;
 		var cold_storagefee = parseFloat($('#cold_storagefee').val());
 		var hot_storagefee = parseFloat($('#hot_storagefee').val());
 		var cost = parseFloat($('#'+budget_id+'-cost').text()).toFixed(2);
 		cost = parseFloat(cost*(1+tax)+headshipfee).toFixed(2);
-		console.log(cost);
 		var avgStock=[];
 		//前4周销量仓储费用
 		for (let i = 1;i <= 4;i++){
@@ -694,8 +687,8 @@ var FormEditable = function() {
 			if(i>=start_week){
 				stock = (stock-week_line_qty>0)?stock-week_line_qty:0;
 				var n_stock = 0;
-				if(i<=weeks-7){
-				   for (let ix = 1;ix <= 7;ix++){
+				if(i<=weeks-13){
+				   for (let ix = 1;ix <= 13;ix++){
 						n_stock+=parseInt($('#'+budget_id+'-'+(i+ix)+'-week_line_qty').text());
 				   }
 				}else if(i==weeks){
@@ -722,16 +715,16 @@ var FormEditable = function() {
 				//平均库存
 				avgStock[i] = parseInt((startStock+endStock)/2);
 				startStock = endStock;
-				var week_line_amountfee = parseFloat(cost*avgStock[i]*0.00375).toFixed(2);
+				var week_line_amountfee = parseFloat(cost*avgStock[i]*0.00346).toFixed(2);
 				$('#'+budget_id+'-'+(i)+'-week_line_amountfee').text(week_line_amountfee);
 				
 				if(i<=4){
-					var week_line_storagefee = parseFloat(first4WeeksQty*0.656*hot_storagefee).toFixed(2);
+					var week_line_storagefee = parseFloat(first4WeeksQty*0.4*0.656*hot_storagefee).toFixed(2);
 				}else{
 					if(i>=(start_week+4)){
-						var week_line_storagefee = parseFloat(avgStock[i-4]*(i>43?hot_storagefee:cold_storagefee)).toFixed(2);	
+						var week_line_storagefee = parseFloat(avgStock[i-4]*0.4*(i>43?hot_storagefee:cold_storagefee)).toFixed(2);	
 					}else{
-						var week_line_storagefee = parseFloat(avgStock[i]*(i>43?hot_storagefee:cold_storagefee)).toFixed(2);	
+						var week_line_storagefee = parseFloat(avgStock[i]*0.4*(i>43?hot_storagefee:cold_storagefee)).toFixed(2);	
 					}
 					
 				}
@@ -778,8 +771,9 @@ var FormEditable = function() {
 	
 	var initLine = function(budget_id,week_id){
 		var rate = parseFloat($('#rate').text());
-		var tax = parseFloat($('#tax').text())*0.4;
-		var headshipfee = parseFloat($('#headshipfee').text());
+		var vat = parseFloat($('#vat').text());
+		var tax = 0;
+		var headshipfee = 0;
 		var cost = parseFloat($('#'+budget_id+'-cost').text());
 		var common_fee = parseFloat($('#'+budget_id+'-common_fee').text())/100;
 		var pick_fee = parseFloat(parseFloat($('#'+budget_id+'-pick_fee').text())*rate).toFixed(2);
@@ -794,7 +788,7 @@ var FormEditable = function() {
 		var promotion = parseFloat($('#'+budget_id+'-'+week_id+'-promotion').text())/100;
 		var exception = parseFloat($('#'+budget_id+'-'+week_id+'-exception').text())/100;
 		var week_line_qty = parseInt(qty+promote_qty);
-		var week_line_income = (exception==1)?0:parseFloat((qty*price+promote_qty*promote_price)*(1-exception)*rate).toFixed(2);
+		var week_line_income = (exception==1)?0:parseFloat((qty*price+promote_qty*promote_price)*(1-exception)*rate/(1+vat)).toFixed(2);
 		var week_line_cost = parseFloat((qty+promote_qty)*cost).toFixed(2);
 		var week_line_commonfee = (exception==1)?0:parseFloat(week_line_income*common_fee+(0.2*week_line_income/(1-exception)*common_fee*exception));
 		var week_line_pickfee = parseFloat(week_line_qty*pick_fee);
