@@ -88,6 +88,11 @@ class Kernel extends ConsoleKernel
 		$schedule->call(function (){
 			DB::update("update rsg_products set status = 3 where status>-1 and end_date<'".date('Y-m-d')."';");
         })->dailyAt('03:00');
+		$schedule->call(function (){
+			DB::update("update budget_skus,asin set budget_skus.sap_seller_id=asin.sap_seller_id,budget_skus.`status`=asin.item_status,
+budget_skus.bg=asin.bg, budget_skus.bu=asin.bu WHERE budget_skus.sku = asin.item_no and budget_skus.site=asin.site;");
+        })->hourly();
+		
         $accountList = DB::table('accounts')->get(array('id'));
         $i=$x=0;
         foreach($accountList as $account){
@@ -125,9 +130,8 @@ class Kernel extends ConsoleKernel
 		//$schedule->command('get:sellers')->cron('*/1 * * * *')->name('sendmails')->withoutOverlapping();
 		$schedule->command('get:asininfo')->cron('0 */2 * * *')->name('getasininfo')->withoutOverlapping();
 		$schedule->command('request:ppcReport')->cron('0 */4 * * *')->name('requestppc')->withoutOverlapping();
-		$schedule->command('request:monthPpcReport')->dailyAt('01:00')->name('requestppcmonth')->withoutOverlapping();		for($pj=0;$pj<=20;$pj++){
-			$schedule->command('get:ppcReport --skip='.$pj)->cron('*/30 * * * *')->name('getppc'.$pj)->withoutOverlapping();
-		}
+		$schedule->command('request:monthPpcReport')->dailyAt('01:00')->name('requestppcmonth')->withoutOverlapping();		
+		$schedule->command('get:ppcReport --skip='.intval(date('i')))->cron(intval(date('i')).' * * * *')->name('getppc'.intval(date('i')))->withoutOverlapping();
 		$schedule->command('get:ppcSchedule')->cron('*/4 * * * *')->name('scheduleppc')->withoutOverlapping();
 		$schedule->command('get:ads 10 1')->cron('5 0 * * *')->name('getads')->withoutOverlapping();
 		$schedule->command('get:profits 10 1 ')->cron('10 0 * * *')->name('getprotit')->withoutOverlapping();
