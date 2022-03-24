@@ -657,7 +657,7 @@ ORDER BY asin_offer_summary.asin DESC ";
 		$sku = $sellers = array();
 
 		if ($_POST['marketplace_id'] && $_POST['seller_id'] && $_POST['seller_id']){
-			$asinMatchSkuData = DB::connection('amazon')->table('sap_asin_match_sku')->where('marketplace_id', $_POST['marketplace_id'])->where('seller_id', $_POST['seller_id'])->where('asin', $_POST['asin'])->get();
+			$asinMatchSkuData = DB::connection('amazon')->table('sap_asin_match_sku')->where('marketplace_id', trim($_POST['marketplace_id']))->where('seller_id', trim($_POST['seller_id']))->where('asin', trim($_POST['asin']))->get();
 			foreach ($asinMatchSkuData as $key => $val) {
 				$sku[$key] = $val->sku;
 				$sellers[$val->sap_seller_id] = isset($sap_seller[$val->sap_seller_id]) && $sap_seller[$val->sap_seller_id] ? $sap_seller[$val->sap_seller_id] : 'N/A';

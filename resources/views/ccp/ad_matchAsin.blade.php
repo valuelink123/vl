@@ -107,8 +107,8 @@
             columns: [
                 {data: 'site',name:'site'},
                 {data: 'account_name',name:'account_name'},
-                {data: 'campaign',name:'campaign'},
-                {data: 'ad_group',name:'ad_group'},
+                {data: 'campaign_name',name:'campaig_name'},
+                {data: 'group_name',name:'group_name'},
                 {data: 'ad_type',name:'ad_type'},
                 {data: 'asin',name:'asin'},
                 {data: 'seller',name:'seller'},
