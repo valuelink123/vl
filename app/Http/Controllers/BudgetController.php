@@ -864,17 +864,24 @@ right join budget_skus as c on b.sku=c.sku and b.site=c.site where ((a.month>='"
 								$n_stock+=intval(array_get($datas,($i+$ix).'.week_line_qty',0));
 						}
 					}elseif($i==$weeks){
-						$n_stock=intval(array_get($datas,($i).'.week_line_qty',0)*5.688);  
+						$n_stock=intval(array_get($datas,($i).'.week_line_qty',0)*10.284);  
 					}else{
 						for ($ix = $i+1;$ix <= $weeks;$ix++){
 							$n_stock+=intval(array_get($datas,($ix).'.week_line_qty',0));
 						}
-						if($i==$weeks-1) $n_stock=intval($n_stock*5.919);
-						if($i==$weeks-2) $n_stock=intval($n_stock*3.019);
-						if($i==$weeks-3) $n_stock=intval($n_stock*2.038);
-						if($i==$weeks-4) $n_stock=intval($n_stock*1.579);
-						if($i==$weeks-5) $n_stock=intval($n_stock*1.306);
-						if($i==$weeks-6) $n_stock=intval($n_stock*1.127);
+						if($i==$weeks-1) $n_stock=intval($n_stock*10.512);
+						if($i==$weeks-2) $n_stock=intval($n_stock*5.24);
+						if($i==$weeks-3) $n_stock=intval($n_stock*3.465);
+						if($i==$weeks-4) $n_stock=intval($n_stock*2.641);
+						if($i==$weeks-5) $n_stock=intval($n_stock*2.153);
+						if($i==$weeks-6) $n_stock=intval($n_stock*1.83);
+						if($i==$weeks-7) $n_stock=intval($n_stock*1.614);
+						if($i==$weeks-8) $n_stock=intval($n_stock*1.465);
+						if($i==$weeks-9) $n_stock=intval($n_stock*1.341);
+						if($i==$weeks-10) $n_stock=intval($n_stock*1.238);
+						if($i==$weeks-11) $n_stock=intval($n_stock*1.148);
+						if($i==$weeks-12) $n_stock=intval($n_stock*1.07);
+				   
 					}
 					if($base_data['then_status']==1 || $base_data['then_status']==2 || $base_data['then_status']==99){
 						$endStock = $stock>$n_stock?$stock:$n_stock;

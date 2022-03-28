@@ -142,7 +142,7 @@ white-space: nowrap;
 						<td width="8%">SKU</td>
 						<td width="5%">状态</td>
 						<td width="5%">等级</td>
-						<td width="4%">物料成本(CNY 含关税头二程)</td>
+						<td width="4%">物料成本<i class="fa fa-exclamation-circle" title="物流成本=不含税采购单价+关税+头程运费+二程运费"></i></td>
 						<td width="5%">佣金比率</td>
 						<td width="4%">拣配费(外币)</td>
 						<td width="5%">异常率</td>
@@ -692,17 +692,23 @@ var FormEditable = function() {
 						n_stock+=parseInt($('#'+budget_id+'-'+(i+ix)+'-week_line_qty').text());
 				   }
 				}else if(i==weeks){
-				   n_stock=parseInt(parseInt($('#'+budget_id+'-'+(i)+'-week_line_qty').text())*5.688);  
+				   n_stock=parseInt(parseInt($('#'+budget_id+'-'+(i)+'-week_line_qty').text())*10.284);  
 				}else{
 				   for (let ix = i+1;ix <= weeks;ix++){
 						n_stock+=parseInt($('#'+budget_id+'-'+(ix)+'-week_line_qty').text());
 				   }
-				   if(i==weeks-1) n_stock=parseInt(n_stock*5.919);
-				   if(i==weeks-2) n_stock=parseInt(n_stock*3.019);
-				   if(i==weeks-3) n_stock=parseInt(n_stock*2.038);
-				   if(i==weeks-4) n_stock=parseInt(n_stock*1.579);
-				   if(i==weeks-5) n_stock=parseInt(n_stock*1.306);
-				   if(i==weeks-6) n_stock=parseInt(n_stock*1.127);
+				   if(i==weeks-1) n_stock=parseInt(n_stock*10.512);
+				   if(i==weeks-2) n_stock=parseInt(n_stock*5.24);
+				   if(i==weeks-3) n_stock=parseInt(n_stock*3.465);
+				   if(i==weeks-4) n_stock=parseInt(n_stock*2.641);
+				   if(i==weeks-5) n_stock=parseInt(n_stock*2.153);
+				   if(i==weeks-6) n_stock=parseInt(n_stock*1.83);
+				   if(i==weeks-7) n_stock=parseInt(n_stock*1.614);
+				   if(i==weeks-8) n_stock=parseInt(n_stock*1.465);
+				   if(i==weeks-9) n_stock=parseInt(n_stock*1.341);
+				   if(i==weeks-10) n_stock=parseInt(n_stock*1.238);
+				   if(i==weeks-11) n_stock=parseInt(n_stock*1.148);
+				   if(i==weeks-12) n_stock=parseInt(n_stock*1.07);
 				}
 				<?php if($base_data['then_status']==1 || $base_data['then_status']==2 || $base_data['then_status']==99){ ?>
 				endStock = stock>n_stock?stock:n_stock;
