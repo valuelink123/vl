@@ -88,6 +88,9 @@ LEFT JOIN ppc_ad_campaign ON union_table.campaign_id = ppc_ad_campaign.campaign_
                     'group_name'=>$val['group_name'],
                     'campaign_name'=>$val['campaign_name'],
 				);
+			}else{
+				$updateData = array('group_name'=>$val['group_name'],'campaign_name'=>$val['campaign_name']);
+				DB::table('ppc_ad_campaign')->where('campaign_id',$val['campaign_id'])->update($updateData);
 			}
 			if(empty($val['vop_asin_campaign_id']) && $val['asin']){
 				$insertAsinData[$val['campaign_id'].'_'.$val['asin']] = array(
