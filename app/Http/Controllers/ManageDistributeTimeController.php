@@ -423,7 +423,7 @@ class ManageDistributeTimeController extends Controller
                                         'eta'=>intval(trim($data['F'])),
                                         'clearance_days'=>intval(trim($data['G'])),
                                         'delivery_days'=>intval(trim($data['H'])),
-                                        'fba_sign_in_days'=>intval(trim($data['I'])),
+                                        'fbm_sign_in_days'=>intval(trim($data['I'])),
                                         'total_days'=>intval(trim($data['E']))+intval(trim($data['F']))+intval(trim($data['G']))+intval(trim($data['H']))+intval(trim($data['I'])),
                                         'maintainer'=>Auth::user()->id,
                                         'maintain_time'=>date('Y-m-d H:i:s')
@@ -443,7 +443,7 @@ class ManageDistributeTimeController extends Controller
                                             'eta'=>intval(trim($data['F'])),
                                             'clearance_days'=>intval(trim($data['G'])),
                                             'delivery_days'=>intval(trim($data['H'])),
-                                            'fba_sign_in_days'=>intval(trim($data['I'])),
+                                            'fbm_sign_in_days'=>intval(trim($data['I'])),
                                             'total_days'=>intval(trim($data['E']))+intval(trim($data['F']))+intval(trim($data['G']))+intval(trim($data['H']))+intval(trim($data['I'])),
                                             'maintainer'=>Auth::user()->id,
                                             'maintain_time'=>date('Y-m-d H:i:s')
@@ -477,8 +477,8 @@ class ManageDistributeTimeController extends Controller
         $eta = intval($row->eta);
         $clearance_days = intval($row->clearance_days);
         $delivery_days = intval($row->delivery_days);
-        $fba_sign_in_days = intval($row->fba_sign_in_days);
-        $total_days = $etd + $eta + $clearance_days + $delivery_days + $fba_sign_in_days;
+        $fbm_sign_in_days = intval($row->fbm_sign_in_days);
+        $total_days = $etd + $eta + $clearance_days + $delivery_days + $fbm_sign_in_days;
 
         $updateData = array();
         if(isset($_POST['etd']) && $_POST['etd']){
@@ -493,9 +493,9 @@ class ManageDistributeTimeController extends Controller
         }else if(isset($_POST['delivery_days']) && $_POST['delivery_days']){
             $updateData['delivery_days'] = intval($_POST['delivery_days']);
             $updateData['total_days'] = $total_days - $delivery_days + intval($_POST['delivery_days']);
-        }else if(isset($_POST['fba_sign_in_days']) && $_POST['fba_sign_in_days']){
-            $updateData['fba_sign_in_days'] = intval($_POST['fba_sign_in_days']);
-            $updateData['total_days'] = $total_days - $fba_sign_in_days + intval($_POST['fba_sign_in_days']);
+        }else if(isset($_POST['fbm_sign_in_days']) && $_POST['fbm_sign_in_days']){
+            $updateData['fbm_sign_in_days'] = intval($_POST['fbm_sign_in_days']);
+            $updateData['total_days'] = $total_days - $fbm_sign_in_days + intval($_POST['fbm_sign_in_days']);
         }else if(isset($_POST['is_default']) && $_POST['is_default']){
             $updateData['is_default'] = $_POST['is_default'];
         }else{
@@ -520,12 +520,12 @@ class ManageDistributeTimeController extends Controller
             $eta = intval($row->eta);
             $clearance_days = intval($row->clearance_days);
             $delivery_days = intval($row->delivery_days);
-            $fba_sign_in_days = intval($row->fba_sign_in_days);
-            $total_days = $etd + $eta + $clearance_days + $delivery_days + $fba_sign_in_days;
+            $fbm_sign_in_days = intval($row->fbm_sign_in_days);
+            $total_days = $etd + $eta + $clearance_days + $delivery_days + $fbm_sign_in_days;
 
             $updateData = array();
             $updateData[$input_id] = $input_value;
-            //$$input_id: $etd, $eta, $clearance_days, $delivery_days, $fba_sign_in_days
+            //$$input_id: $etd, $eta, $clearance_days, $delivery_days, $fbm_sign_in_days
             $updateData['total_days'] = $total_days - $$input_id + $input_value;
             $updateData['maintainer'] = intval(Auth::user()->id);
             $updateData['maintain_time'] = date('Y-m-d H:i:s');
@@ -570,7 +570,7 @@ class ManageDistributeTimeController extends Controller
         $transportModes = $this->getTransportModes();
         $isDefault = $this->getIsDefault();
         $arrayData = array();
-        $headArray = array('工厂','物流商','运输方式代码','运输方式','地区','ETD','ETA','清关日期','派送日期','FBA签收日期','总时效','维护人','维护时间','是否默认');
+        $headArray = array('工厂','物流商','运输方式代码','运输方式','地区','ETD','ETA','清关日期','派送日期','FBM签收日期','总时效','维护人','维护时间','是否默认');
         $arrayData[] = $headArray;
         foreach ($data as $key=>$val){
             $arrayData[] = array(
@@ -583,7 +583,7 @@ class ManageDistributeTimeController extends Controller
                 $val['eta'],
                 $val['clearance_days'],
                 $val['delivery_days'],
-                $val['fba_sign_in_days'],
+                $val['fbm_sign_in_days'],
                 $val['total_days'],
                 array_get($usersIdName,$val['maintainer']),
                 $val['maintain_time'],

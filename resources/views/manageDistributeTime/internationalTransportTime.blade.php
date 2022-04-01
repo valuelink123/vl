@@ -220,7 +220,7 @@
 					<li><span>ETA:</span><input type="text" id="eta" onkeyup="value=value.replace(/^(0+)|[^\d]+/g,'')" class="batch_list_input"><button id="btn_eta" class="batch_list_button change">change</button></li>
 					<li><span>清关日期:</span><input type="text" id="clearance_days" onkeyup="value=value.replace(/^(0+)|[^\d]+/g,'')" class="batch_list_input"><button id="btn_clearance_days" class="batch_list_button change">change</button></li>
 					<li><span>派送日期:</span><input type="text" id="delivery_days" onkeyup="value=value.replace(/^(0+)|[^\d]+/g,'')" class="batch_list_input"><button id="btn_delivery_days" class="batch_list_button change">change</button></li>
-					<li><span>FBA签收日期:</span><input type="text" id="fba_sign_in_days" onkeyup="value=value.replace(/^(0+)|[^\d]+/g,'')" class="batch_list_input"><button id="btn_fba_sign_in_days" class="batch_list_button change">change</button></li>
+					<li><span>FBM签收日期:</span><input type="text" id="fbm_sign_in_days" onkeyup="value=value.replace(/^(0+)|[^\d]+/g,'')" class="batch_list_input"><button id="btn_fbm_sign_in_days" class="batch_list_button change">change</button></li>
 				</ul>
 			</div>
 			<div class="col-md-10" style="float: right;padding-right: 0;">
@@ -260,7 +260,7 @@
 				<th>ETA</th>
 				<th>清关日期</th>
 				<th>派送日期</th>
-				<th>FBA签收日期</th>
+				<th>FBM签收日期</th>
 				<th>总时效</th>
 				<th>维护人</th>
 				<th>维护日期</th>
@@ -489,7 +489,7 @@
 					data: 'delivery_days',
 				},
 				{
-					data: 'fba_sign_in_days',
+					data: 'fbm_sign_in_days',
 				},
 				{
 					data: 'total_days',
@@ -680,7 +680,7 @@
                                     url:'/manageDistributeTime/updateTransportTime',
                                     data:{
                                         id: rowData.id,
-                                        fba_sign_in_days: rowData.fba_sign_in_days
+                                        fbm_sign_in_days: rowData.fbm_sign_in_days
                                     },
                                     error:function(err){
                                         console.log(err);
