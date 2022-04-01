@@ -837,10 +837,11 @@ ORDER BY asin_offer_summary.asin DESC ";
 
 	/*
 	 * 当VOP系统中的异常单是客服系统那边对接过来的话(service_system_id这个字段有数据说明是客服系统对接过来的异常单)，在VOP系统更改异常单的时候，调用客服系统的接口，由客服系统去更改客服系统异常单的数据表
-	 * 1，客服系统接口名：http://16.163.26.169/api/exception/webhook
+	 * 1，客服系统接口名：http://16.163.26.169/api/exception/webhook，此为线上的客服系统地址，本地测试的时候，请关闭此对接
 	 * 2，参数名：params
 	 * 3，参数数据格式：为exception表中所有字段的json字符串，例如：{"id":101,"type":2,"name":"aa"}
 	 * 4，提交方式：POST提交
+	 *
 	 */
 	public function exceptionPushServiceSystem($exceptionId)
 	{
@@ -848,7 +849,7 @@ ORDER BY asin_offer_summary.asin DESC ";
 		$data = Exception::findOrFail($exceptionId);
 		//if($data['service_system_id']>0) {
 			$params = json_encode($data);
-			file_get_contents('http://16.163.26.169/api/exception/webhook?params=' . $params);
+			file_get_contents('http://www.onecustomerme.com/api/exception/webhook?params=' . $params);
 		//}
 		
 		return true;
