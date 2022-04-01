@@ -39,6 +39,14 @@ class ReturnAnalysisController extends Controller
 		17=>['name'=>'损坏','reason'=>['DAMAGED']],
 		18=>['name'=>'可再售','reason'=>['SELLABLE']],
 	];
+
+	public $reasonSummaryType = [
+		0=>['name'=>'品质问题退货数量','reason'=>['DEFECTIVE','QUALITY_UNACCEPTABLE','APPAREL_STYLE','MISSING_PARTS','DAMAGED_BY_CARRIER','DAMAGED_BY_FC','CUSTOMER_DAMAGED']],
+		1=>['name'=>'非品质问题退货数量','reason'=>['DID_NOT_LIKE_FABRIC','PRODUCT_NOT_ITALIAN','SWITCHEROO','UNWANTED_ITEM','NOT_AS_DESCRIBED','ORDERED_WRONG_ITEM','MISORDERED','UNDELIVERABLE_UNCLAIMED','UNDELIVERABLE_UNKNOWN','NEVER_ARRIVED','UNDELIVERABLE_CARRIER_MISS_SORTED','UNDELIVERABLE_INSUFFICIENT_ADDRESS','UNDELIVERABLE_MISSING_LABEL','UNDELIVERABLE_FAILED_DELIVERY_ATTEMPTS','UNDELIVERABLE_REFUSED','FOUND_BETTER_PRICE','MISSED_ESTIMATED_DELIVERY','UNAUTHORIZED_PURCHASE','NOT_COMPATIBLE','APPAREL_TOO_LARGE','APPAREL_TOO_SMALL','PART_NOT_COMPATIBLE','NO_REASON_GIVEN','EXTRA_ITEM','EXCESSIVE_INSTALLATION','CARRIER_DAMAGED','DAMAGED','SELLABLE']],
+	];
+
+	public $ccpAdmin = array("huangshan@valuelinkltd.com","lidan@valuelinkcorp.com","wuweiye@valuelinkcorp.com","luodenglin@valuelinkcorp.com","zhouzhiwen@valuelinkltd.com","zhangjianqun@valuelinkcorp.com","sunhanshan@valuelinkcorp.com","wangxiaohua@valuelinkltd.com","zhoulinlin@valuelinkcorp.com","wangshuang@valuelinkltd.com","lizhuojun@valuelinkcorp.com","lixiaojian@valuelinkltd.com");
+
 	public function __construct()
 	{
 		$this->middleware('auth');
@@ -143,6 +151,286 @@ class ReturnAnalysisController extends Controller
 		$data['reasonType'] = $reasonType;
 		return view('analysis/return', ['data' => $data]);
 	}
+
+	/*
+	 *
+	 * 退货汇总
+	 *
+	 * */
+	public function returnSummaryAnalysis(Request $req)
+	{
+		if(!Auth::user()->can(['return-summary-analysis'])) die('Permission denied -- return-summary-analysis');
+		$reasonSummaryType = $this->reasonSummaryType;
+		$case = " ";
+		$typestr = '';
+		foreach($reasonSummaryType as $key=>$typeArr){
+			$case .= " CASE amazon_returns.reason ";
+			foreach($typeArr['reason'] as $type){
+				$case.= " WHEN '".$type."' THEN amazon_returns.quantity ";
+			}
+			$typestr .= "sum(type_{$key}) as type_{$key}";
+			$case.= " ELSE 0 END AS type_{$key},";
+		}
+
+		if($_POST){
+			$search = isset($_REQUEST['search']) ? $_REQUEST['search'] : '';
+			$search = $this->getSearchData(explode('&',$search));
+			$orderby = 'tb.sku';
+			$sort = 'desc';
+			if(isset($_REQUEST['order'][0])){
+				if($_REQUEST['order'][0]['column']==0) $orderby = 'tb.sku';
+				if($_REQUEST['order'][0]['column']==1) $orderby = 'tb.asin';
+				if($_REQUEST['order'][0]['column']==2) $orderby = 'tb.sellersku';
+				if($_REQUEST['order'][0]['column']==3) $orderby = 'type_0';
+				if($_REQUEST['order'][0]['column']==4) $orderby = 'type_1';
+				$sort = $_REQUEST['order'][0]['dir'];
+			}
+			//搜索条件如下：from_date,to_date
+			$where = " where return_date >= '".$search['from_date']." 00:00:00' and return_date <= '".$search['to_date']." 23:59:59'";
+			//$where = " where return_date >= '2020-04-24 00:00:00' and return_date <= '2020-04-25 23:59:59'";
+			$where_sku = ' where 1 = 1 ';
+
+			if (Auth::user()->seller_rules) {
+				$rules = explode("-",Auth::user()->seller_rules);
+				if(array_get($rules,0)!='*') $where_sku.= " and tb.sap_seller_bg='".array_get($rules,0)."'";
+				if(array_get($rules,1)!='*') $where_sku.= " and tb.sap_seller_bu='".array_get($rules,1)."'";
+			} elseif (Auth::user()->sap_seller_id) {
+				$where_sku.= " and tb.sap_seller_id=".Auth::user()->sap_seller_id;
+			}
+
+			if(isset($search['sku']) && $search['sku']){
+				$where_sku.= " and tb.sku = '".$search['sku']."'";
+			}
+			$sql = "select SQL_CALC_FOUND_ROWS tb.sku,any_value(tb.asin) as asin,any_value(tb.seller_sku) as seller_sku,sum(type_0) as type_0,sum(type_1) as type_1,sum(type_0)/(sum(type_0)+sum(type_1)) as qualityReturnQuantityPercentage
+					from (
+					    SELECT seller_accounts.mws_seller_id as mws_seller_id,amazon_returns.seller_account_id,amazon_returns.seller_sku as seller_sku,amazon_returns.asin,{$case} mws_marketplaceid AS mws_marketplaceid
+						FROM amazon_returns
+						LEFT JOIN seller_accounts ON amazon_returns.seller_account_id = seller_accounts.id
+						{$where}
+					) as ta
+				left join sap_asin_match_sku as tb on (ta.asin=tb.asin and ta.seller_sku=tb.seller_sku and ta.mws_seller_id=tb.seller_id and ta.mws_marketplaceid=tb.marketplace_id)
+				left join sap_skus on tb.sku=sap_skus.sku
+				{$where_sku}
+				GROUP BY tb.sku ORDER BY {$orderby} {$sort}";
+
+			if($req['length'] != '-1'){//等于-1时为查看全部的数据
+				$limit = $this->dtLimit($req);
+				$sql .= " LIMIT {$limit} ";
+			}
+
+			$_data = DB::connection('amazon')->select($sql);
+			$dataA = json_decode(json_encode($_data),true);
+
+			$recordsTotal = $recordsFiltered = (DB::connection('amazon')->select('SELECT FOUND_ROWS() as count'))[0]->count;
+
+			if(!empty($dataA)){
+
+				//$aisnList = "";
+				foreach($dataA as $key=>$val){
+					//$aisnList .= ",'".$val['sku']."'";
+					if($val['sku'] == ''){
+						$data[$key]['sku'] = '';
+						$data[$key]['asin'] = '';
+						$data[$key]['seller_sku'] = '';
+						$data[$key]['type_0'] = $val['type_0'];
+						$data[$key]['type_1'] = $val['type_1'];
+						$data[$key]['qualityReturnQuantityPercentage'] = round($val['qualityReturnQuantityPercentage'], 4)*100 ."%";
+						$data[$key]['units'] = 0;
+						$data[$key]['percentSales'] = 0;
+					}else{
+						$sql_units = $this->getSql($search,$val['sku']);
+						$_itemData = DB::connection('amazon')->select($sql_units);
+						$itemData = json_decode(json_encode($_itemData),true);
+						if(!empty($itemData)){
+							if($val['sku'] == $itemData[0]['sku']){
+								$data[$key]['sku'] = $val['sku'];
+								$data[$key]['asin'] = $val['asin'];
+								$data[$key]['seller_sku'] = $val['seller_sku'];
+								$data[$key]['type_0'] = $val['type_0'];
+								$data[$key]['type_1'] = $val['type_1'];
+								$data[$key]['qualityReturnQuantityPercentage'] = round($val['qualityReturnQuantityPercentage'], 4)*100 ."%";
+								$data[$key]['units'] = $itemData[0]['units'];
+								$data[$key]['percentSales'] = round(($val['type_0']/$itemData[0]['units']) ,4)*100 ."%";
+							}else{
+								$data[$key]['sku'] = $val['sku'];
+								$data[$key]['asin'] = $val['asin'];
+								$data[$key]['seller_sku'] = $val['seller_sku'];
+								$data[$key]['type_0'] = $val['type_0'];
+								$data[$key]['type_1'] = $val['type_1'];
+								$data[$key]['qualityReturnQuantityPercentage'] = round($val['qualityReturnQuantityPercentage'], 4)*100 ."%";
+								$data[$key]['units'] = 0;
+								$data[$key]['percentSales'] = 0;
+							}
+						}else{
+							$data[$key]['sku'] = $val['sku'];
+							$data[$key]['asin'] = $val['asin'];
+							$data[$key]['seller_sku'] = $val['seller_sku'];
+							$data[$key]['type_0'] = $val['type_0'];
+							$data[$key]['type_1'] = $val['type_1'];
+							$data[$key]['qualityReturnQuantityPercentage'] = round($val['qualityReturnQuantityPercentage'], 4)*100 ."%";
+							$data[$key]['units'] = 0;
+							$data[$key]['percentSales'] = 0;
+						}
+					}
+
+				}
+//				$aisnList = substr($aisnList,strpos($aisnList,',')+1);
+//				$sql_units = $this->getSql($search,$aisnList);
+//				$_itemData = DB::connection('amazon')->select($sql_units);
+//				$itemData = json_decode(json_encode($_itemData),true);
+//				foreach($dataA as $key=>$val){
+//					if($val['sku'] == ''){
+//						$data[$key]['sku'] = '';
+//						$data[$key]['asin'] = '';
+//						$data[$key]['seller_sku'] = '';
+//						$data[$key]['type_0'] = $val['type_0'];
+//						$data[$key]['type_1'] = $val['type_1'];
+//						$data[$key]['qualityReturnQuantityPercentage'] = round($val['qualityReturnQuantityPercentage'], 4)*100 ."%";
+//						$data[$key]['units'] = 0;
+//						$data[$key]['percentSales'] = 0;
+//					}else{
+//						foreach($itemData as $k=>$v){
+//							if($v['sku'] == ''){
+//								$data[$key]['sku'] = $val['sku'];
+//								$data[$key]['asin'] = $val['asin'];
+//								$data[$key]['seller_sku'] = $val['seller_sku'];
+//								$data[$key]['type_0'] = $val['type_0'];
+//								$data[$key]['type_1'] = $val['type_1'];
+//								$data[$key]['qualityReturnQuantityPercentage'] = round($val['qualityReturnQuantityPercentage'], 4)*100 ."%";
+//								$data[$key]['units'] = 0;
+//								$data[$key]['percentSales'] = 0;
+//							}else{
+//								if($val['sku'] == $v['sku']){
+//									$data[$key]['sku'] = $val['sku'];
+//									$data[$key]['asin'] = $val['asin'];
+//									$data[$key]['seller_sku'] = $val['seller_sku'];
+//									$data[$key]['type_0'] = $val['type_0'];
+//									$data[$key]['type_1'] = $val['type_1'];
+//									$data[$key]['qualityReturnQuantityPercentage'] = round($val['qualityReturnQuantityPercentage'], 4)*100 ."%";
+//									$data[$key]['units'] = $v['units'];
+//									$data[$key]['percentSales'] = round(($val['type_0']/$v['units']) ,4)*100 ."%";
+//								}
+//							}
+//						}
+//					}
+//
+//				}
+			}else{
+				$data['sku'] = '';
+				$data['asin'] = '';
+				$data['seller_sku'] = '';
+				$data['type_0'] = '';
+				$data['type_1'] = '';
+				$data['qualityReturnQuantityPercentage'] = '';
+				$data['units'] = '';
+				$data['percentSales'] = '';
+			}
+			$arr = array();
+			$data = array_merge($arr,$data);
+			return compact('data', 'recordsTotal', 'recordsFiltered');
+		}
+
+		$data['fromDate'] = date('Y-m-d', time() - 2 * 86400);//开始日期,默认查最近三天的数据
+		$data['toDate'] = date('Y-m-d');//结束日期
+//		$data['fromDate'] = '2021-01-15';//测试日期
+		$data['reasonType'] = $reasonSummaryType;
+
+		return view('analysis/return_summary', ['data' => $data]);
+	}
+
+	//得到sql查询语句
+	public function getSql($search,$sku)
+	{
+//		$site = isset($search['site']) ? $search['site'] : '';//站点，为marketplaceid
+//		$account = isset($search['account']) ? $search['account'] : '';//账号id,例如115,137
+//		$bg = isset($search['bg']) ? $search['bg'] : '';
+//		$bu = isset($search['bu']) ? $search['bu'] : '';
+//		$asin = isset($search['asin']) ? trim($search['asin'],'+') : '';//asin输入框的值
+//		$timeType = isset($search['timeType']) ? $search['timeType'] : '';//时间类型，默认是0为北京时间，1为亚马逊后台当地时间
+//		$this->start_date = isset($search['from_date']) ? $search['from_date'] : '';
+//		$this->end_date = isset($search['end_date']) ? $search['end_date'] : '';
+		$where = $orderwhere = " and purchase_date BETWEEN STR_TO_DATE( '".$search['from_date']." 00:00:00', '%Y-%m-%d %H:%i:%s' ) AND STR_TO_DATE('".$search['to_date']." 23:59:59', '%Y-%m-%d %H:%i:%s' )";
+		//$where = $orderwhere = " and purchase_date BETWEEN STR_TO_DATE( '2020-04-24 00:00:00', '%Y-%m-%d %H:%i:%s' ) AND STR_TO_DATE('2020-04-25 23:59:59', '%Y-%m-%d %H:%i:%s' )";
+		//$account搜索两个表的字段都为seller_account_id
+//		if($account){
+//			$where = $orderwhere .= ' and order_items.seller_account_id in('.$account.')';
+//		}
+//		$domain = substr(getDomainBySite($site), 4);//orders.sales_channel
+//		$orderwhere .= " and sales_channel = '".ucfirst($domain)."'";
+//		//用户权限sap_asin_match_sku
+//		$userwhere = $this->getUserWhere($site,$bg,$bu);
+//		if($asin){
+//			$where .= " and order_items.asin = '".$asin."'";
+//		}
+		$sql ="SELECT SQL_CALC_FOUND_ROWS sku,SUM( quantity_ordered ) AS units
+			FROM
+			  (SELECT order_items.quantity_ordered,order_items.seller_sku,sap_asin_match_sku.sku as sku
+			  	FROM order_items
+			  	LEFT JOIN sap_asin_match_sku ON (order_items.seller_sku=sap_asin_match_sku.seller_sku) WHERE order_items.amazon_order_id IN
+				  (
+					SELECT amazon_order_id
+					FROM orders
+					WHERE order_status IN ( 'PendingAvailability', 'Pending', 'Unshipped', 'PartiallyShipped', 'Shipped', 'InvoiceUnconfirmed', 'Unfulfillab' ) {$orderwhere}
+				  )
+			  	{$where}
+			  	and order_items.asin in( SELECT ASIN FROM sap_asin_match_sku WHERE sku IN ('".$sku."') )
+			) AS kk GROUP BY sku order by units desc";
+		return $sql;
+	}
+	//and order_items.asin in( SELECT ASIN FROM sap_asin_match_sku WHERE sku IN ('".$sku."') )
+	//得到搜索时间的sql
+	public function getDateWhere($site,$timeType)
+	{
+		$dateRange = $this->getDateRange();
+		$startDate = $dateRange['startDate'];
+		$endDate = $dateRange['endDate'];
+		$date_field = 'purchase_date';
+		$dateconfig = array('A1PA6795UKMFR9','A1RKKUPIHCS9HS','A13V1IB3VIYZZH','APJ6JRA9NG5V4');//utc+2:00
+		if($timeType==1){//选的是后台当地时间
+			if($site=='A1VC38T7YXB528'){//日本站点，date字段+9hour
+				$date_field = 'date_add(purchase_date,INTERVAL 9 hour) ';
+			}elseif($site=='A1F83G8C2ARO7P'){//英国站点+1小时，uTc+1:00
+				$date_field = 'date_add(purchase_date,INTERVAL 1 hour) ';
+			}elseif(in_array($site,$dateconfig)){//站点+2小时，utc+2:00
+				$date_field = 'date_add(purchase_date,INTERVAL 2 hour) ';
+			}else{//其他站点，date字段-7hour
+				$date_field = 'date_sub(purchase_date,INTERVAL 7 hour) ';
+			}
+		}else{//北京时间加上8小时
+			$date_field = 'date_add(purchase_date,INTERVAL 8 hour) ';
+		}
+		$where = " and {$date_field} BETWEEN STR_TO_DATE( '".$startDate."', '%Y-%m-%d %H:%i:%s' ) AND STR_TO_DATE('".$endDate."', '%Y-%m-%d %H:%i:%s' )";
+		return $where;
+	}
+
+	//得到用户的权限数据查询语句，根据sap_asin_match_sku去查数据
+	public function getUserWhere()
+	{
+		$userdata = Auth::user();
+//		$userWhere = " where marketplace_id  = '".$site."'";
+		$userWhere = " where 1=1";
+		if (!in_array(Auth::user()->email, $this->ccpAdmin)) {
+			if ($userdata->seller_rules) {
+				$rules = explode("-", $userdata->seller_rules);
+				if (array_get($rules, 0) != '*') $userWhere .= " and sap_seller_bg = '".array_get($rules, 0)."'";
+				if (array_get($rules, 1) != '*') $userWhere .= " and sap_seller_bu = '".array_get($rules, 1)."'";
+			}elseif($userdata->sap_seller_id){
+				$userWhere .= " and sap_seller_id = ".$userdata->sap_seller_id;
+			}
+		}
+
+//		if($bg){
+//			$userWhere .= " and sap_seller_bg = '".$bg."'";
+//		}
+//		if($bu){
+//			$userWhere .= " and sap_seller_bu = '".$bu."'";
+//		}
+		$userWhere = "select DISTINCT sap_asin_match_sku.asin from sap_asin_match_sku {$userWhere}
+					UNION ALL
+					select DISTINCT asin_match_relation.asin from asin_match_relation {$userWhere}";
+		return $userWhere;
+	}
+
 	/*
 	 * 导出退货原因分析
 	 */

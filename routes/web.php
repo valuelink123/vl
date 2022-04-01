@@ -329,6 +329,13 @@ Route::get('/ccp/export', 'CcpController@export')->name('ccpExport');//ccp功能
 Route::post('/showAccountBySite', 'Controller@showTheAccountBySite')->name('showTheAccountBySite');//ccp功能的列表展示
 Route::get('ccp/showOrderList', 'CcpController@showOrderList')->name('showOrderList');//ccp功能的列表中点击订单数查看订单列表的功能
 
+//测试
+Route::get('/test', 'TestController@test'); //mws后台管理
+
+//销售额预警
+Route::match(['post','get'],'/salesAlert/index', 'SalesAlertController@index');
+Route::match(['post','get'],'/salesAlert/create', 'SalesAlertController@create');
+
 //ccp-ad模块
 Route::get('/ccp/adProduct', 'CcpAdProductController@index'); //
 Route::post('/ccp/adProduct/showTotal', 'CcpAdProductController@showTotal'); //ccp功能展示顶部统计数据
@@ -469,6 +476,7 @@ Route::match(['post','get'],'/settlement/detailExport', 'SettlementController@de
 
 //统计分析模块
 Route::match(['post','get'],'/returnAnalysis/returnAnalysis', 'ReturnAnalysisController@returnAnalysis');//退货原因分析
+Route::match(['post','get'],'/returnAnalysis/returnSummaryAnalysis', 'ReturnAnalysisController@returnSummaryAnalysis');//退货原因汇总
 Route::match(['post','get'],'/returnAnalysis/export', 'ReturnAnalysisController@export');//导出退货原因分析
 Route::match(['post','get'],'/returnAnalysis/asinAnalysis', 'ReturnAnalysisController@asinAnalysis');//asin退货分析，维度：asin+币种+account
 Route::match(['post','get'],'/returnAnalysis/skuAnalysis', 'ReturnAnalysisController@skuAnalysis');//sku退货分析，维度：sku+币种

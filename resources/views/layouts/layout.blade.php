@@ -263,8 +263,17 @@
                                                             </a>
                                                         </li>
                                                         @endpermission
+                                                        @permission('return-summary-analysis')
+                                                        <li class="">
+                                                            <a href="/returnAnalysis/returnSummaryAnalysis"
+                                                               class="nav-link nav-toggle ">
+                                                                Return summary analysis
+                                                                <span class="arrow"></span>
+                                                            </a>
+                                                        </li>
+                                                        @endpermission
                                                         @permission('asin-analysis')
-                                                        <li class="">s
+                                                        <li class="">
                                                             <a href="/returnAnalysis/asinAnalysis"
                                                                class="nav-link nav-toggle ">
                                                                 Asin Return analysis
@@ -1321,6 +1330,20 @@
                                                 </li>
                                             </ul>
                                         </li>
+                                        <li class="menu-dropdown classic-menu-dropdown ">
+                                            <a href="javascript:;"> Sales Alert
+                                                <span class="arrow"></span>
+                                            </a>
+                                            <ul class="dropdown-menu pull-left">
+                                                <li class="">
+                                                    <a href="/salesAlert/index" class="nav-link nav-toggle">
+                                                        Alert Settings
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </li>
+
                                         <li class="menu-dropdown classic-menu-dropdown ">
                                             <a href="javascript:;"> System
                                                 <span class="arrow"></span>
