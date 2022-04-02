@@ -292,11 +292,13 @@ class FeesController extends Controller
         $date_to=$request->input('date_to')?$request->input('date_to'):date('Y-m-d');
 		
 		$datas= DB::connection('order')->table('finances_coupon_event')->where('PostedDate','>=',$date_from.'T00:00:00Z')->where('PostedDate','<=',$date_to.'T23:59:59Z');
-               
+
+		$accounts = $this->getSellerId();
         if($request->input('sellerid')){
             $datas = $datas->where('SellerId', $request->input('sellerid'));
-        }
-		
+        }else{
+			$datas = $datas->whereIn('SellerId', array_keys($accounts));
+		}
 
 		if($request->input('user_id')){
 		
@@ -315,12 +317,11 @@ class FeesController extends Controller
         $iDisplayStart = intval($_REQUEST['start']);
         $sEcho = intval($_REQUEST['draw']);
 		$lists =  $datas->orderBy($orderby,$sort)->offset($iDisplayStart)->limit($iDisplayLength)->get()->toArray();
-        $records = array();
+		$records = array();
         $records["data"] = array();
 
         $end = $iDisplayStart + $iDisplayLength;
         $end = $end > $iTotalRecords ? $iTotalRecords : $end;
-		$accounts = $this->getSellerId();
 		
 		$lists=json_decode(json_encode($lists), true);
 		foreach ( $lists as $list){
