@@ -1336,8 +1336,22 @@
                                             </a>
                                             <ul class="dropdown-menu pull-left">
                                                 <li class="">
-                                                    <a href="/salesAlert/index" class="nav-link nav-toggle">
+                                                    <a href="/salesAlert" class="nav-link nav-toggle">
                                                         Alert Settings
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
+
+                                                <li class="">
+                                                    <a href="/getSalesAlertSku" class="nav-link nav-toggle">
+                                                        salesAlertSku(sku维度)
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
+
+                                                <li class="">
+                                                    <a href="/getSalesAlertWeek" class="nav-link nav-toggle">
+                                                        salesAlertWeek(周维度)
                                                         <span class="arrow"></span>
                                                     </a>
                                                 </li>

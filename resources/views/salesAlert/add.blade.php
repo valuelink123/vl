@@ -23,7 +23,11 @@
                                 <span class="input-group-addon">
                                     <i class="fa fa-tag"></i>
                                 </span>
-                                    <input type="text" name="department" class="form-control" value="{{old('department')}}" required />
+                                <select style="width:100%;height:35px;" id="department" name="department" required>
+                                    @foreach($bgs as $val)
+                                        <option value="{{$val['bg']}}">{{$val['bg']}}</option>
+                                    @endforeach
+                                </select>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -34,7 +38,7 @@
                                         <span class="input-group-addon">
                                             <i class="fa fa-tag"></i>
                                         </span>
-                                            <input  class="form-control"  value="{{old('year')}}" id="year" name="year" />
+                                            <input  class="form-control"  value="{{old('year')}}" id="year" name="year" required />
                                         </div>
                                     </div>
                                     <div class="col-md-3">
@@ -43,7 +47,7 @@
                                         <span class="input-group-addon">
                                             <i class="fa fa-tag"></i>
                                         </span>
-                                            <input  class="form-control" value="{{old('month')}}" id="month" name="month" />
+                                            <input  class="form-control" value="{{old('month')}}" id="month" name="month" required />
                                         </div>
                                     </div>
                                     <div class="col-md-3">
@@ -52,7 +56,7 @@
                                         <span class="input-group-addon">
                                             <i class="fa fa-tag"></i>
                                         </span>
-                                            <input  class="form-control"  value="{{old('start_time')}}" id="start_time" name="start_time" />
+                                            <input  class="form-control"  value="{{old('start_time')}}" id="start_time" name="start_time" required />
                                         </div>
                                     </div>
                                     <div class="col-md-3">
@@ -61,7 +65,29 @@
                                         <span class="input-group-addon">
                                             <i class="fa fa-tag"></i>
                                         </span>
-                                            <input  class="form-control"  value="{{old('end_time')}}" id="end_time" name="end_time" />
+                                            <input  class="form-control"  value="{{old('end_time')}}" id="end_time" name="end_time" required />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label>销售额</label>
+                                        <div class="input-group ">
+                                        <span class="input-group-addon">
+                                            <i class="fa fa-tag"></i>
+                                        </span>
+                                            <input  class="form-control"  value="{{old('sales')}}" id="sales" name="sales" required />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label>营销费用</label>
+                                        <div class="input-group ">
+                                        <span class="input-group-addon">
+                                            <i class="fa fa-tag"></i>
+                                        </span>
+                                            <input  class="form-control" value="{{old('marketing_expenses')}}" id="marketing_expenses" name="marketing_expenses" required />
                                         </div>
                                     </div>
                                 </div>

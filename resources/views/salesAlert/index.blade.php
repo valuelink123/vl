@@ -42,53 +42,73 @@
 					<table class="table table-striped table-bordered table-hover table-checkable order-column" id="manage_sales_alert">
 						<thead>
 						<tr>
-							<th > ID </th>
-							<th> Account Name </th>
-							<th> Seller Account </th>
-							<th> Level </th>
-							<th> Status </th>
-							<th> Receive Email </th>
-							<th> Logs</th>
+							<th> ID </th>
+							<th> 部门 </th>
+							<th> 年 </th>
+							<th> 月 </th>
+							<th> 开始时间 </th>
+							<th> 结束时间 </th>
+							<th> 销售额 </th>
+							<th> 营销费用 </th>
+							<th> 占比 </th>
+							<th> 添加时间 </th>
+							<th> 添加人 </th>
 							<th> Actions </th>
 						</tr>
 						</thead>
 						<tbody>
-						{{--@foreach ($seller_accounts as $seller_account)--}}
+						@foreach ($data as $value)
 							<tr class="odd">
 								<td>
-									11
+									{{$value['id']}}
 								</td>
 								<td>
-									22
+									{{$value['department']}}
 								</td>
 								<td>
-									33
+									{{$value['year']}}
 								</td>
 								<td>
-									44
+									{{$value['month']}}
 								</td>
 								<td>
-									55
+									{{$value['start_time']}}
 								</td>
 								<td>
-									66
+									{{$value['end_time']}}
 								</td>
 								<td>
-									77
+									{{$value['sales']}}
+								</td>
+								<td>
+									{{$value['marketing_expenses']}}
+								</td>
+								<td>
+									@if($value['marketing_expenses'] != 0)
+										{{round(($value['marketing_expenses']/$value['sales'])*100,2)}}%
+										@else
+										0%
+									@endif
+								</td>
+								<td>
+									{{$value['created_at']}}
+								</td>
+								<td>
+									{{$value['creatrd_user']}}
 								</td>
 								<td>
 
-									<a href="#">
+									<a href="{{ url('salesAlert/'.$value['id'].'/edit') }}">
 										<button type="submit" class="btn btn-success btn-xs">Edit</button>
 									</a>
-									<form action="#" method="POST" style="display: inline;">
+									<form action="{{ url('salesAlert/'.$value['id']) }}" method="POST" style="display: inline;">
 										{{ method_field('DELETE') }}
 										{{ csrf_field() }}
 										<button type="submit" class="btn btn-danger btn-xs">Delete</button>
 									</form>
 								</td>
 							</tr>
-						{{--@endforeach--}}
+						@endforeach
 
 
 
@@ -150,7 +170,7 @@
 						}
 					],
 					"order": [
-						[3, "desc"]
+						[0, "desc"]
 					] // set first column as a default sort by asc
 				});
 

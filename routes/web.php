@@ -333,8 +333,9 @@ Route::get('ccp/showOrderList', 'CcpController@showOrderList')->name('showOrderL
 Route::get('/test', 'TestController@test'); //mws后台管理
 
 //销售额预警
-Route::match(['post','get'],'/salesAlert/index', 'SalesAlertController@index');
-Route::match(['post','get'],'/salesAlert/create', 'SalesAlertController@create');
+Route::resource('salesAlert', 'SalesAlertController');
+Route::match(['post','get'],'/getSalesAlertSku', 'SalesAlertController@salesAlertSku');
+Route::match(['post','get'],'/getSalesAlertWeek', 'SalesAlertController@SalesAlertWeek');
 
 //ccp-ad模块
 Route::get('/ccp/adProduct', 'CcpAdProductController@index'); //

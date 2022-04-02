@@ -1,89 +1,142 @@
-
-    <div class="row"><div class="col-md-12">
-        <div class="portlet light bordered">
-
-            <div class="portlet-body form">
-                <form role="form" action="{{ url('category/'.$category['id']) }}" method="POST">
-                    {{ csrf_field() }}
-                    {{ method_field('PUT') }}
-                    <input type="hidden" name="category_type" value="<?php echo $category_type;?>" />
-                    <div class="form-body">
-                        <div class="form-group col-md-12" style="margin-top: 40px;">
-                            <label>Superior category</label>
-
-                            <select name="superior_category" class="form-control " required>
-                                <?php
-                                if($category_type == 1){
-                                ?>
-                                <option value="28">Primary category</option>
-                                <?php
-                                }else{
-                                ?>
-                                <option value="29">Primary category</option>
-                                <?php
-                                }
-                                ?>
-                                <?php
-                                echo procHtml($tree,0, $category['category_pid']);
-//                                foreach($lists as $key=>$val){
-//                                    if($t['cate_ParentId'] == ''){
-//                                        echo '<option value="'.$val['category_id'].'">'.$val['category_name'].' </option>';
-//                                        $html .= "<li>{$t['cate_Name']}</li>";
-//                                    }else{
-//                                        $html .= "<li>".$t['cate_Name'];
-//                                        $html .= procHtml($t['cate_ParentId']);
-//                                        $html = $html."</li>";
-//                                    }
-//
-//                                }
-                                ?>
-                            </select>
-
-                        </div>
-
-						<div class="form-group col-md-12">
-                            <label>Category name</label>
-
-
-                                <input type="text" class="form-control" name="category_name" id="category_name" value="{{array_get($category,'category_name')}}" required>
-
-                        </div>
-
-
-
-
+@extends('layouts.layout')
+@section('label', 'Sales Alert Create')
+@section('content')
+    <h1 class="page-title font-red-intense"> Sales Alert
+        <small></small>
+    </h1>
+    <div class="row">
+        <div class="col-md-8">
+            <div class="portlet light bordered">
+                <div class="portlet-title">
+                    <div class="caption">
+                        <i class="icon-settings font-dark"></i>
+                        <span class="caption-subject font-dark sbold uppercase">Create Sales Alert</span>
                     </div>
-                    <div class="form-actions">
-                        <div class="row">
-                            <div class="col-md-offset-4 col-md-8">
-								<button type="button"  class="btn grey-salsa btn-outline pull-right"  data-dismiss="modal" aria-hidden="true">Close</button>
-                                <button type="submit" class="btn blue pull-right">Submit</button>
-
+                </div>
+                <div class="portlet-body form">
+                    <form role="form" action="{{ url('salesAlert/'.$data['id']) }}" method="POST">
+                        {{ csrf_field() }}
+                        {{ method_field('PUT') }}
+                        <div class="form-body">
+                            <div class="form-group">
+                                <label>部门</label>
+                                <div class="input-group ">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-tag"></i>
+                                </span>
+                                    <input type="text" name="department" class="form-control" value="{{$data['department']}}" required />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <label>年</label>
+                                        <div class="input-group ">
+                                        <span class="input-group-addon">
+                                            <i class="fa fa-tag"></i>
+                                        </span>
+                                            <input  class="form-control"  value="{{old('year')}}" id="year" name="year" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label>月</label>
+                                        <div class="input-group ">
+                                        <span class="input-group-addon">
+                                            <i class="fa fa-tag"></i>
+                                        </span>
+                                            <input  class="form-control" value="{{old('month')}}" id="month" name="month" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label>开始时间</label>
+                                        <div class="input-group ">
+                                        <span class="input-group-addon">
+                                            <i class="fa fa-tag"></i>
+                                        </span>
+                                            <input  class="form-control"  value="{{old('start_time')}}" id="start_time" name="start_time" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label>结束时间</label>
+                                        <div class="input-group ">
+                                        <span class="input-group-addon">
+                                            <i class="fa fa-tag"></i>
+                                        </span>
+                                            <input  class="form-control"  value="{{old('end_time')}}" id="end_time" name="end_time" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label>销售额</label>
+                                        <div class="input-group ">
+                                        <span class="input-group-addon">
+                                            <i class="fa fa-tag"></i>
+                                        </span>
+                                            <input  class="form-control"  value="{{old('sales')}}" id="sales" name="sales" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label>营销费用</label>
+                                        <div class="input-group ">
+                                        <span class="input-group-addon">
+                                            <i class="fa fa-tag"></i>
+                                        </span>
+                                            <input  class="form-control" value="{{old('marketing_expenses')}}" id="marketing_expenses" name="marketing_expenses" />
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </form>
+                        <div class="form-actions">
+                            <div class="row">
+                                <div class="col-md-offset-4 col-md-8">
+                                    <button type="button"  class="btn grey-salsa btn-outline"  data-dismiss="modal" aria-hidden="true">Close</button>
+                                    <button type="submit" class="btn blue">Submit</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
+        <div class="col-md-4"></div>
     </div>
+    <script>
+        $('#year').datepicker({
+            format: 'yyyy',
+            //            language: "zh-CN",
+            autoclose:true,
+            startView: 2,
+            minViewMode: 2,
+            maxViewMode: 2
+        });
 
-    </div>
-    <?php
-    function procHtml($tree,$level = 0,$category_pid)
-    {
-        $html = '';
-        foreach($tree as $key=>$val)
-        {
-            if($val['category_pid'] == '') {
-                $html .= '<option value="'.$val['id'].'">'.$val['category_name'].' </option>';
-            }else{
-                $flg = str_repeat('|----',$level);
-                $selected = ($val['id']==$category_pid) ? 'selected' : '';
-                $html .= '<option value="'.$val['id'].'" '.$selected.'>'.$flg.$val['category_name'];
-                $html .= procHtml($val['category_pid'],$level+1,$category_pid);
-                $html = $html."</option>";
-            }
-        }
-        return $html;
-    }
-    ?>
+        $('#month').datepicker({
+            format: 'mm',
+//            language: "zh-CN",
+            autoclose:true,
+            startView: 1,
+            minViewMode: 1,
+            maxViewMode: 1
+        });
+        $('#start_time').datepicker({
+            format: 'yyyy-mm-dd',
+//            language: "zh-CN",
+            autoclose:true,
+            startView: 0,
+            minViewMode: 0,
+            maxViewMode: 0
+        });
+        $('#end_time').datepicker({
+            format: 'yyyy-mm-dd',
+//            language: "zh-CN",
+            autoclose:true,
+            startView: 0,
+            minViewMode: 0,
+            maxViewMode: 0
+        });
+    </script>
+@endsection
