@@ -274,47 +274,7 @@ class ReturnAnalysisController extends Controller
 					}
 
 				}
-//				$aisnList = substr($aisnList,strpos($aisnList,',')+1);
-//				$sql_units = $this->getSql($search,$aisnList);
-//				$_itemData = DB::connection('amazon')->select($sql_units);
-//				$itemData = json_decode(json_encode($_itemData),true);
-//				foreach($dataA as $key=>$val){
-//					if($val['sku'] == ''){
-//						$data[$key]['sku'] = '';
-//						$data[$key]['asin'] = '';
-//						$data[$key]['seller_sku'] = '';
-//						$data[$key]['type_0'] = $val['type_0'];
-//						$data[$key]['type_1'] = $val['type_1'];
-//						$data[$key]['qualityReturnQuantityPercentage'] = round($val['qualityReturnQuantityPercentage'], 4)*100 ."%";
-//						$data[$key]['units'] = 0;
-//						$data[$key]['percentSales'] = 0;
-//					}else{
-//						foreach($itemData as $k=>$v){
-//							if($v['sku'] == ''){
-//								$data[$key]['sku'] = $val['sku'];
-//								$data[$key]['asin'] = $val['asin'];
-//								$data[$key]['seller_sku'] = $val['seller_sku'];
-//								$data[$key]['type_0'] = $val['type_0'];
-//								$data[$key]['type_1'] = $val['type_1'];
-//								$data[$key]['qualityReturnQuantityPercentage'] = round($val['qualityReturnQuantityPercentage'], 4)*100 ."%";
-//								$data[$key]['units'] = 0;
-//								$data[$key]['percentSales'] = 0;
-//							}else{
-//								if($val['sku'] == $v['sku']){
-//									$data[$key]['sku'] = $val['sku'];
-//									$data[$key]['asin'] = $val['asin'];
-//									$data[$key]['seller_sku'] = $val['seller_sku'];
-//									$data[$key]['type_0'] = $val['type_0'];
-//									$data[$key]['type_1'] = $val['type_1'];
-//									$data[$key]['qualityReturnQuantityPercentage'] = round($val['qualityReturnQuantityPercentage'], 4)*100 ."%";
-//									$data[$key]['units'] = $v['units'];
-//									$data[$key]['percentSales'] = round(($val['type_0']/$v['units']) ,4)*100 ."%";
-//								}
-//							}
-//						}
-//					}
-//
-//				}
+				$data = array_values($data);
 			}else{
 				$data['sku'] = '';
 				$data['asin'] = '';
@@ -325,8 +285,7 @@ class ReturnAnalysisController extends Controller
 				$data['units'] = '';
 				$data['percentSales'] = '';
 			}
-			$arr = array();
-			$data = array_merge($arr,$data);
+
 			return compact('data', 'recordsTotal', 'recordsFiltered');
 		}
 
@@ -377,7 +336,7 @@ class ReturnAnalysisController extends Controller
 			) AS kk GROUP BY sku order by units desc";
 		return $sql;
 	}
-	//and order_items.asin in( SELECT ASIN FROM sap_asin_match_sku WHERE sku IN ('".$sku."') )
+
 	//得到搜索时间的sql
 	public function getDateWhere($site,$timeType)
 	{

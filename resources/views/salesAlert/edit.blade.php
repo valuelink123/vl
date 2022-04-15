@@ -24,7 +24,11 @@
                                 <span class="input-group-addon">
                                     <i class="fa fa-tag"></i>
                                 </span>
-                                    <input type="text" name="department" class="form-control" value="{{$data['department']}}" required />
+                                    <select style="width:100%;height:35px;" id="department" name="department" required>
+                                        @foreach($bgs as $val)
+                                            <option value="{{$val['bg']}}" @if($val['bg'] == $data['department']) selected="selected" @endif>{{$val['bg']}}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -35,7 +39,7 @@
                                         <span class="input-group-addon">
                                             <i class="fa fa-tag"></i>
                                         </span>
-                                            <input  class="form-control"  value="{{old('year')}}" id="year" name="year" />
+                                            <input  class="form-control"  value="{{$data['year']}}" id="year" name="year" />
                                         </div>
                                     </div>
                                     <div class="col-md-3">
@@ -44,7 +48,7 @@
                                         <span class="input-group-addon">
                                             <i class="fa fa-tag"></i>
                                         </span>
-                                            <input  class="form-control" value="{{old('month')}}" id="month" name="month" />
+                                            <input  class="form-control" value="{{$data['month']}}" id="month" name="month" />
                                         </div>
                                     </div>
                                     <div class="col-md-3">
@@ -53,7 +57,7 @@
                                         <span class="input-group-addon">
                                             <i class="fa fa-tag"></i>
                                         </span>
-                                            <input  class="form-control"  value="{{old('start_time')}}" id="start_time" name="start_time" />
+                                            <input  class="form-control"  value="{{$data['start_time']}}" id="start_time" name="start_time" />
                                         </div>
                                     </div>
                                     <div class="col-md-3">
@@ -62,7 +66,7 @@
                                         <span class="input-group-addon">
                                             <i class="fa fa-tag"></i>
                                         </span>
-                                            <input  class="form-control"  value="{{old('end_time')}}" id="end_time" name="end_time" />
+                                            <input  class="form-control"  value="{{$data['end_time']}}" id="end_time" name="end_time" />
                                         </div>
                                     </div>
                                 </div>
@@ -75,7 +79,7 @@
                                         <span class="input-group-addon">
                                             <i class="fa fa-tag"></i>
                                         </span>
-                                            <input  class="form-control"  value="{{old('sales')}}" id="sales" name="sales" />
+                                            <input  class="form-control"  value="{{$data['sales']}}" id="sales" name="sales" />
                                         </div>
                                     </div>
                                     <div class="col-md-6">
@@ -84,7 +88,7 @@
                                         <span class="input-group-addon">
                                             <i class="fa fa-tag"></i>
                                         </span>
-                                            <input  class="form-control" value="{{old('marketing_expenses')}}" id="marketing_expenses" name="marketing_expenses" />
+                                            <input  class="form-control" value="{{$data['marketing_expenses']}}" id="marketing_expenses" name="marketing_expenses" />
                                         </div>
                                     </div>
                                 </div>

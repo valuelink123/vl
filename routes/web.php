@@ -334,8 +334,10 @@ Route::get('/test', 'TestController@test'); //mws后台管理
 
 //销售额预警
 Route::resource('salesAlert', 'SalesAlertController');
+
 Route::match(['post','get'],'/getSalesAlertSku', 'SalesAlertController@salesAlertSku');
 Route::match(['post','get'],'/getSalesAlertWeek', 'SalesAlertController@SalesAlertWeek');
+Route::match(['post','get'],'/salesAlert/totalBg/list', 'SalesAlertController@salesAlertTotalBgList'); //广告汇总BU维度
 
 //ccp-ad模块
 Route::get('/ccp/adProduct', 'CcpAdProductController@index'); //

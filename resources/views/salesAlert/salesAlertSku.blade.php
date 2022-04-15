@@ -56,13 +56,10 @@
                 <table class="table table-striped table-bordered" id="datatable">
                     <thead>
                     <tr>
-                        <th>部门</th>
                         <th>SKU</th>
                         <th>销售额</th>
                         <th>营销费用</th>
                         <th>占比</th>
-                        <th></th>
-                        <th></th>
                     </tr>
                     </thead>
                     <tbody></tbody>
@@ -83,25 +80,26 @@
 
         $('#datatable').dataTable({
             searching: false,//关闭搜索
-            paging:false,
-            processing: true,
+            serverSide: true,//启用服务端分页（这是使用Ajax服务端的必须配置）
             ordering: false, // 禁止排序
+            "pageLength": 15, // default record count per page
+            "lengthMenu": [
+                [15, 30,50,],
+                [15, 30,50,] // change per page values here
+            ],
+            processing: true,
             columns: [
-                {data: 'department',name:'department'},
-                {data: 'ad_cost',name:'ad_cost'},
+                {data: 'sku',name:'sku'},
                 {data: 'ad_sales',name:'ad_sales'},
-                {data: 'ad_acos',name:'ad_acos'},
-                {data: 'total_sales',name:'total_sales'},
-                {data: 'actual_sales',name:'actual_sales'},
-                {data: 'acos',name:'acos'},
+                {data: 'ad_cost',name:'ad_cost'},
+                {data: 'proportion',name:'proportion'},
             ],
             ajax: {
                 type: 'POST',
-                url: '/ccp/adTotalBu/list',
+                url: '/salesAlert/totalBg/list',
                 data:  {search: $("#search-form").serialize()}
             }
         })
-
         // 点击上面的搜索
         $('#search_top').click(function(){
             // 改变下面表格的数据内容

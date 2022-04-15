@@ -91,21 +91,6 @@
                     </thead>
                     <tbody></tbody>
                 </table>
-                {{--<table class="table table-striped table-bordered" id="datatable">--}}
-                    {{--<thead>--}}
-                    {{--<tr>--}}
-                        {{--<th>sku</th>--}}
-                        {{--<th>asin</th>--}}
-                        {{--<th>sellersku</th>--}}
-                        {{--<th>品质问题退货数量</th>--}}
-                        {{--<th>非品质问题退货数量</th>--}}
-                        {{--<th>品质问题退货数量/总的退货数量</th>--}}
-                        {{--<th>销量</th>--}}
-                        {{--<th>品质问题退货数量/销量</th>--}}
-                    {{--</tr>--}}
-                    {{--</thead>--}}
-                    {{--<tbody></tbody>--}}
-                {{--</table>--}}
             </div>
         </div>
     </div>
@@ -162,8 +147,8 @@
 //            return false;
 //        })
 //
-//        $(function(){
-//            $("#search_table").trigger("click");
-//        })
+        $(function(){
+            $("#search_table").trigger("click");
+        })
     </script>
 @endsection

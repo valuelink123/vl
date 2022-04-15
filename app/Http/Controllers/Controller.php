@@ -691,6 +691,31 @@ ORDER BY asin_offer_summary.asin DESC ";
 		return $asinData;
 	}
 
+	/*
+	 * 得到物料对照关系表里的信息
+	 */
+	public function getSapAsinMatchSkuInfoTo($site='',$bg='',$bu='')
+	{
+		$userWhere = ' where 1=1 ';
+		if($site){
+			$userWhere .= " and marketplace_id='".$site."'";
+		}
+		if($bg){
+			$userWhere .= " and sap_seller_bg='".$bg."'";
+		}
+		if($bu){
+			$userWhere .= " and sap_seller_bu='".$bu."'";
+		}
+		$sku_sql = "select marketplace_id,seller_id,asin,sap_seller_bg,sap_seller_bu,sap_seller_id,sku from sap_asin_match_sku {$userWhere}
+					UNION ALL
+					select marketplace_id,seller_id,asin,sap_seller_bg,sap_seller_bu,sap_seller_id,sku from asin_match_relation {$userWhere}";
+		$_skuData = DB::connection('vlz')->select($sku_sql);
+		foreach($_skuData as $key=>$val){
+			$skuData[$val->marketplace_id.'_'.$val->seller_id.'_'.$val->sku] = (array)$val;
+		}
+		return $skuData;
+	}
+
 	public function getBg($bg='')
 	{
 		if($bg){
