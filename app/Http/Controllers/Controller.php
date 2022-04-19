@@ -849,7 +849,8 @@ ORDER BY asin_offer_summary.asin DESC ";
 		$data = Exception::findOrFail($exceptionId);
 		//if($data['service_system_id']>0) {
 			$params = json_encode($data);
-			file_get_contents('http://www.onecustomerme.com/api/exception/webhook?params=' . $params);
+			curl_request('http://www.onecustomerme.com/api/exception/webhook',['params'=>$params]);
+			//file_get_contents('http://www.onecustomerme.com/api/exception/webhook?params=' . $params);
 		//}
 		
 		return true;
