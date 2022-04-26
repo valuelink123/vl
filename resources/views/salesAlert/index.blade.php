@@ -46,8 +46,7 @@
 							<th> 部门 </th>
 							<th> 年 </th>
 							<th> 月 </th>
-							<th> 开始时间 </th>
-							<th> 结束时间 </th>
+							<th> 周 </th>
 							<th> 销售额 </th>
 							<th> 营销费用 </th>
 							<th> 占比 </th>
@@ -72,10 +71,7 @@
 									{{$value['month']}}
 								</td>
 								<td>
-									{{$value['start_time']}}
-								</td>
-								<td>
-									{{$value['end_time']}}
+									{{$value['week']}}
 								</td>
 								<td>
 									{{$value['sales']}}

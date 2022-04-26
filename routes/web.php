@@ -337,7 +337,8 @@ Route::resource('salesAlert', 'SalesAlertController');
 
 Route::match(['post','get'],'/getSalesAlertSku', 'SalesAlertController@salesAlertSku');
 Route::match(['post','get'],'/getSalesAlertWeek', 'SalesAlertController@SalesAlertWeek');
-Route::match(['post','get'],'/salesAlert/totalBg/list', 'SalesAlertController@salesAlertTotalBgList'); //广告汇总BU维度
+Route::match(['post','get'],'/salesAlert/totalSku/list', 'SalesAlertController@salesAlertTotalSkuList'); //sku维度
+Route::match(['post','get'],'/salesAlert/totalWeek/list', 'SalesAlertController@salesAlertTotalWeekList'); //sku维度
 
 //ccp-ad模块
 Route::get('/ccp/adProduct', 'CcpAdProductController@index'); //

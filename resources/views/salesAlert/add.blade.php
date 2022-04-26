@@ -32,7 +32,7 @@
                             </div>
                             <div class="form-group">
                                 <div class="row">
-                                    <div class="col-md-3">
+                                    <div class="col-md-4">
                                         <label>年</label>
                                         <div class="input-group ">
                                         <span class="input-group-addon">
@@ -41,7 +41,7 @@
                                             <input  class="form-control"  value="{{old('year')}}" id="year" name="year" required />
                                         </div>
                                     </div>
-                                    <div class="col-md-3">
+                                    <div class="col-md-4">
                                         <label>月</label>
                                         <div class="input-group ">
                                         <span class="input-group-addon">
@@ -50,22 +50,17 @@
                                             <input  class="form-control" value="{{old('month')}}" id="month" name="month" required />
                                         </div>
                                     </div>
-                                    <div class="col-md-3">
-                                        <label>开始时间</label>
+                                    <div class="col-md-4">
+                                        <label>周</label>
                                         <div class="input-group ">
                                         <span class="input-group-addon">
                                             <i class="fa fa-tag"></i>
                                         </span>
-                                            <input  class="form-control"  value="{{old('start_time')}}" id="start_time" name="start_time" required />
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label>结束时间</label>
-                                        <div class="input-group ">
-                                        <span class="input-group-addon">
-                                            <i class="fa fa-tag"></i>
-                                        </span>
-                                            <input  class="form-control"  value="{{old('end_time')}}" id="end_time" name="end_time" required />
+                                            <select style="width:100%;height:35px;" id="week" name="week" required>
+                                                @for($i = 1;$i<=52;$i++)
+                                                <option value="{{$i}}">{{$i}}</option>
+                                                @endfor
+                                            </select>
                                         </div>
                                     </div>
                                 </div>
@@ -125,21 +120,21 @@
             minViewMode: 1,
             maxViewMode: 1
         });
-        $('#start_time').datepicker({
-            format: 'yyyy-mm-dd',
-//            language: "zh-CN",
-            autoclose:true,
-            startView: 0,
-            minViewMode: 0,
-            maxViewMode: 0
-        });
-        $('#end_time').datepicker({
-            format: 'yyyy-mm-dd',
-//            language: "zh-CN",
-            autoclose:true,
-            startView: 0,
-            minViewMode: 0,
-            maxViewMode: 0
-        });
+
+//        $('#week').datepicker({
+//            showWeek: true,
+//            onSelect: function(dateText, inst) {
+//                alert(dateText)
+//            }
+//        });
+
+//        $('#end_time').datepicker({
+//            format: 'yyyy-mm-dd',
+////            language: "zh-CN",
+//            autoclose:true,
+//            startView: 0,
+//            minViewMode: 0,
+//            maxViewMode: 0
+//        });
     </script>
 @endsection

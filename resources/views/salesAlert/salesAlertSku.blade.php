@@ -10,14 +10,14 @@
                 <div class="search portlet light">
                     <div class="col-md-2">
                         <div class="input-group">
-                            <span class="input-group-addon">起始日期</span>
-                            <input  class="form-control"  value="{!! $start_date !!}" data-date-format="yyyy-mm-dd" data-options="format:'yyyy-mm-dd'" id="start_date" name="start_date"/>
+                            <span class="input-group-addon">年</span>
+                            <input  class="form-control"  value="{!! $start_date !!}" id="year" name="year"/>
                         </div>
                     </div>
                     <div class="col-md-2">
                         <div class="input-group">
-                            <span class="input-group-addon">截止日期</span>
-                            <input  class="form-control"  value="{!! $end_date !!}" data-change="0" data-date-format="yyyy-mm-dd" data-options="format:'yyyy-mm-dd'" id="end_date" name="end_date"/>
+                            <span class="input-group-addon">月</span>
+                            <input  class="form-control"  value="{!! $end_date !!}" id="month" name="month"/>
                         </div>
                     </div>
                     <div class="col-md-2">
@@ -69,12 +69,12 @@
     </div>
     <script>
         //日期控件初始化
-        $('#start_date').datepicker({
-            rtl: App.isRTL(),
+        $('#year').datepicker({
+            format: 'yyyy',
             autoclose: true
         });
-        $('#end_date').datepicker({
-            rtl: App.isRTL(),
+        $('#month').datepicker({
+            format: 'mm',
             autoclose: true
         });
 
@@ -96,7 +96,7 @@
             ],
             ajax: {
                 type: 'POST',
-                url: '/salesAlert/totalBg/list',
+                url: '/salesAlert/totalSku/list',
                 data:  {search: $("#search-form").serialize()}
             }
         })

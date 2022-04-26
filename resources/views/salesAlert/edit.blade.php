@@ -33,7 +33,7 @@
                             </div>
                             <div class="form-group">
                                 <div class="row">
-                                    <div class="col-md-3">
+                                    <div class="col-md-4">
                                         <label>年</label>
                                         <div class="input-group ">
                                         <span class="input-group-addon">
@@ -42,7 +42,7 @@
                                             <input  class="form-control"  value="{{$data['year']}}" id="year" name="year" />
                                         </div>
                                     </div>
-                                    <div class="col-md-3">
+                                    <div class="col-md-4">
                                         <label>月</label>
                                         <div class="input-group ">
                                         <span class="input-group-addon">
@@ -51,24 +51,28 @@
                                             <input  class="form-control" value="{{$data['month']}}" id="month" name="month" />
                                         </div>
                                     </div>
-                                    <div class="col-md-3">
-                                        <label>开始时间</label>
+                                    <div class="col-md-4">
+                                        <label>周</label>
                                         <div class="input-group ">
                                         <span class="input-group-addon">
                                             <i class="fa fa-tag"></i>
                                         </span>
-                                            <input  class="form-control"  value="{{$data['start_time']}}" id="start_time" name="start_time" />
+                                            <select style="width:100%;height:35px;" id="week" name="week" required>
+                                                @for($i = 1;$i<=52;$i++)
+                                                    <option value="{{$i}}" @if($i == $data['week']) selected="selected" @endif>{{$i}}</option>
+                                                @endfor
+                                            </select>
                                         </div>
                                     </div>
-                                    <div class="col-md-3">
-                                        <label>结束时间</label>
-                                        <div class="input-group ">
-                                        <span class="input-group-addon">
-                                            <i class="fa fa-tag"></i>
-                                        </span>
-                                            <input  class="form-control"  value="{{$data['end_time']}}" id="end_time" name="end_time" />
-                                        </div>
-                                    </div>
+                                    {{--<div class="col-md-3">--}}
+                                        {{--<label>结束时间</label>--}}
+                                        {{--<div class="input-group ">--}}
+                                        {{--<span class="input-group-addon">--}}
+                                            {{--<i class="fa fa-tag"></i>--}}
+                                        {{--</span>--}}
+                                            {{--<input  class="form-control"  value="{{$data['end_time']}}" id="end_time" name="end_time" />--}}
+                                        {{--</div>--}}
+                                    {{--</div>--}}
                                 </div>
                             </div>
                             <div class="form-group">
