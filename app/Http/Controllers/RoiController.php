@@ -1348,7 +1348,7 @@ class RoiController extends Controller
 		$update_data['profit_loss_point'] = round($breakeven_point_sales_volume);//盈亏临界点(销量)===
 		$update_data['estimated_payback_period'] = $estimated_payback_period;//投资回收期(月)===原来有的
 		$update_data['return_amount'] = $this->twoDecimal($return_amount);//投资回报额===原来有的
-		$update_data['roi'] = $roi < 0 ? '∞' : $roi;//投资回报率===原来有的
+		$update_data['roi'] = $roi;//$roi < 0 ? '∞' : $roi 投资回报率===原来有的
 		$update_data['project_profitability'] = $project_profitability;//利润率===原来有的
 
 		$update_data['currency_rate'] = $currency_rate;
