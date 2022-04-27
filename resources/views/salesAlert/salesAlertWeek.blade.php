@@ -1,6 +1,6 @@
 @extends('layouts.layout')
 @section('crumb')
-    @include('layouts.crumb', ['crumbs'=>['salesAlert SKU']])
+    @include('layouts.crumb', ['crumbs'=>['salesAlert Week']])
 @endsection
 @section('content')
     @include('frank.common')
