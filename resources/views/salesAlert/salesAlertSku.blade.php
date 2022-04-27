@@ -11,13 +11,13 @@
                     <div class="col-md-2">
                         <div class="input-group">
                             <span class="input-group-addon">年</span>
-                            <input  class="form-control"  value="{!! $start_date !!}" id="year" name="year"/>
+                            <input  class="form-control"  value="{!! $year !!}" id="year" name="year"/>
                         </div>
                     </div>
                     <div class="col-md-2">
                         <div class="input-group">
                             <span class="input-group-addon">月</span>
-                            <input  class="form-control"  value="{!! $end_date !!}" id="month" name="month"/>
+                            <input  class="form-control"  value="{!! $month !!}" id="month" name="month"/>
                         </div>
                     </div>
                     <div class="col-md-2">

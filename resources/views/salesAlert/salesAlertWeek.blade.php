@@ -11,7 +11,7 @@
                     <div class="col-md-2">
                         <div class="input-group">
                             <span class="input-group-addon">年</span>
-                            <input  class="form-control"  value="{!! $start_date !!}" id="year" name="year"/>
+                            <input  class="form-control"  value="{!! $year !!}" id="year" name="year"/>
                         </div>
                     </div>
                     <div class="col-md-2">
@@ -60,7 +60,8 @@
                 <table class="table table-striped table-bordered" id="datatable">
                     <thead>
                     <tr>
-                        <th>SKU</th>
+                        <th>年</th>
+                        <th>周</th>
                         <th>销售额</th>
                         <th>营销费用</th>
                         <th>占比</th>
@@ -95,6 +96,7 @@
             columns: [
                 {data: 'sku',name:'sku'},
                 {data: 'ad_sales',name:'ad_sales'},
+                {data: 'ad_cost',name:'ad_cost'},
                 {data: 'ad_cost',name:'ad_cost'},
                 {data: 'proportion',name:'proportion'},
             ],

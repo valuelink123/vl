@@ -131,13 +131,13 @@ class SalesAlertController extends Controller
     */
     public function salesAlertSku(){
 
-        $start_date = date('Y-m-d');
-        $end_date = date('Y-m-d');
+        $year = date('Y');
+        $month = date('m');
         $site = getMarketDomain();//获取站点选项
         $bg = '';
         $bgs = $this->getBg($bg);
 
-        return view('salesAlert/salesAlertSku',['start_date'=>$start_date,'end_date'=>$end_date,'site'=>$site,'bgs'=>$bgs]);
+        return view('salesAlert/salesAlertSku',['year'=>$year,'month'=>$month,'site'=>$site,'bgs'=>$bgs]);
     }
 
     //展示列表数据
@@ -260,13 +260,13 @@ class SalesAlertController extends Controller
      */
     public function salesAlertWeek(){
 
-        $start_date = date('Y-m-d');
-        $end_date = date('Y-m-d');
+        $year = date('Y');
+        //$end_date = date('Y-m-d');
         $site = getMarketDomain();//获取站点选项
         $bg = '';
         $bgs = $this->getBg($bg);
 
-        return view('salesAlert/salesAlertWeek',['start_date'=>$start_date,'end_date'=>$end_date,'site'=>$site,'bgs'=>$bgs]);
+        return view('salesAlert/salesAlertWeek',['year'=>$year,'site'=>$site,'bgs'=>$bgs]);
     }
 
     /**
