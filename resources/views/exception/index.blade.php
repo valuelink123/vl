@@ -51,8 +51,8 @@ th,td,td>span {
                             
                         </div>
 						<div class="col-md-8 " >
+							@permission('exception-import')
 
-                            @permission('exception-import')
                             <input id="importFile" name="importFile" type="file" style="display:none">
 							{{ csrf_field() }}
 							<input id="importFileTxt" name="importFileTxt" type="text" class="form-control input-inline">
@@ -61,8 +61,10 @@ th,td,td>span {
 							<button id="importSubmit" class="btn blue input-inline">Upload</button>
 		
 							<a href="{{ url('/uploads/exception/exception.xls')}}" class="help-inline" style="margin-top:8px;margin-left:10px;">Template </a>
-                            @endpermission
-                            @permission('exception-export')
+
+							@endpermission
+							@permission('exception-export')
+
                             <div class="btn-group " style="float:right;">
                                 <button id="vl_list_export" class="btn sbold blue"> Export
                                     <i class="fa fa-download"></i>
