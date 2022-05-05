@@ -2,15 +2,30 @@
 
 namespace App\Http\Controllers;
 
+use common\libs\RedisHandle;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use DB;
+use Illuminate\Support\Facades\Cache;
+use qrcode\QRcode;
 
 class BarcodeScanController extends Controller
 {
     public function __construct()
     {
 //        $this->middleware('auth');
+    }
+
+    public function businessLogin(Request $request)
+    {
+        $urlParam = $request->input("p");
+        return view('barcode/businessLogin', ['urlParam' => $urlParam]);
+    }
+
+    public function scanDetach(Request $request)
+    {
+        $urlParam = $request->input("p");
+        return view('barcode/scanDetach', ['urlParam' => $urlParam]);
     }
 
     public function scanBarcode(Request $request)
@@ -22,25 +37,61 @@ class BarcodeScanController extends Controller
     public function checkToken(Request $request)
     {
         $token = $request->input("token");
-        $purchaseOrder = $request->input("purchaseOrder");
-        $sku = strtoupper($request->input("sku"));
         $urlParam = $request->input("urlParam");
         $barcodeVendorInfo = DB::table('barcode_vendor_info')->where('token', $token)->where('url_param', $urlParam)->first();
         $barcodeVendorInfo = json_decode(json_encode($barcodeVendorInfo), true);
         if (!$barcodeVendorInfo) {
-            $msg = 'Token和网址参数不匹配';
-            return view('barcode/scanBarcode', compact('token', 'purchaseOrder', 'sku', 'urlParam', 'msg'));
+            $msg = 'FAIL: 秘钥和网址参数不匹配';
+            return view('barcode/scanBarcode', compact('token', 'urlParam', 'msg'));
+        }
+        return view('barcode/scanBarcodeStep1', compact('token', 'urlParam'));
+    }
+
+    public function checkPoSku(Request $request)
+    {
+
+
+        $token = $request->input("token");
+        $purchaseOrder = $request->input("purchaseOrder");
+        $sku = strtoupper($request->input("sku"));
+        $urlParam = $request->input("urlParam");
+        $min = $request->input("min");
+        $max = $request->input("max");
+        $barcodeVendorInfo = DB::table('barcode_vendor_info')->where('token', $token)->where('url_param', $urlParam)->first();
+        $barcodeVendorInfo = json_decode(json_encode($barcodeVendorInfo), true);
+        if (!$barcodeVendorInfo) {
+            $msg = 'FAIL: 秘钥和网址参数不匹配';
+            return view('barcode/scanBarcode', compact('token', 'urlParam', 'msg'));
         }
         $vendorCode = $barcodeVendorInfo['vendor_code'];
+
         $vendorInfo = DB::table('barcode_scan_record')->where('vendor_code', $vendorCode)->where('purchase_order', $purchaseOrder)->first();
         $vendorInfo = json_decode(json_encode($vendorInfo), true);
         if (!$vendorInfo) {
-            $msg = '系统中不存在此采购订单号';
-            return view('barcode/scanBarcode', compact('token', 'purchaseOrder', 'sku', 'urlParam', 'msg'));
+            $msg = 'FAIL: 系统中不存在此采购订单号';
+            return view('barcode/scanBarcodeStep1', compact('token', 'purchaseOrder', 'sku', 'urlParam', 'msg'));
         }
+        $poDetails = DB::table('barcode_po_details')->where('purchase_order', $purchaseOrder)->where('sku', $sku)->get()->toArray();
+        $poDetails = json_decode(json_encode($poDetails), true);
 
-        return view('barcode/scanBarcodeStep2', compact('vendorCode', 'purchaseOrder', 'sku', 'urlParam'));
+        if (!$poDetails) {
+            $msg = 'FAIL: 采购订单号下没有该SKU';
+            return view('barcode/scanBarcodeStep1', compact('token', 'purchaseOrder', 'sku', 'urlParam', 'msg'));
+        }
+        $skuQty = 0;
+        foreach ($poDetails as $poDetail) {
+            $skuQty += intval($poDetail['quantity']);
+        }
+        //$cache = Cache('key', 'value');
+        Cache::store('file')->put($purchaseOrder.'-'.$sku, $min.'-'.$max, 3600);
+        $range = Cache::store('file')->get($purchaseOrder.'-'.$sku);
+//        $cache = Cache::store('file')->get('key');
+//        dd($cache);die;
+//        RedisHandle::hSet($purchaseOrder.'-'.$sku, $min.'-'.$max);
+        $activatedCount = DB::table('barcode_scan_record')->where('vendor_code', $vendorCode)->where('purchase_order', $purchaseOrder)->where('sku', $sku)->count();
+        return view('barcode/scanBarcodeStep2', compact('vendorCode', 'purchaseOrder', 'sku', 'skuQty', 'activatedCount', 'urlParam'));
     }
+
 
     public function activateBarcode(Request $request)
     {
@@ -48,6 +99,26 @@ class BarcodeScanController extends Controller
         $purchaseOrder = strtoupper($request->input("purchaseOrder"));
         $sku = strtoupper($request->input("sku"));
         $barcodeText = $request->input("barcodeText");
+        $weight = $request->input("weight");
+
+        if (strlen($barcodeText) != 12) {
+            $flag = 0;
+            $msg = 'FAIL: 条码号必须为12位';
+            die(json_encode(array('flag' => $flag, 'msg' => $msg)));
+        }
+
+        $skuQty = 0;
+        $poDetails = DB::table('barcode_po_details')->where('purchase_order', $purchaseOrder)->where('sku', $sku)->get()->toArray();
+        $poDetails = json_decode(json_encode($poDetails), true);
+        foreach ($poDetails as $poDetail) {
+            $skuQty += intval($poDetail['quantity']);
+        }
+        $activatedCount = DB::table('barcode_scan_record')->where('vendor_code', $vendorCode)->where('purchase_order', $purchaseOrder)->where('sku', $sku)->count();
+        if ($activatedCount >= $skuQty) {
+            $flag = 0;
+            $msg = 'FAIL: ' . $sku . '已全部激活';
+            die(json_encode(array('flag' => $flag, 'msg' => $msg)));
+       }
         //验证条形码是否符合规则，
         //供应商4位+年月2位+校准1位+流水号4位+校准1位=12位
         $vendorYearMonth = substr($barcodeText, 0, 6);
@@ -56,23 +127,40 @@ class BarcodeScanController extends Controller
         $v0 = substr($barcodeText, -1, 1);
         $validationCode = $this->getValidationCode($vendorYearMonth . $sn);
         if ($validationCode != $v0 . $v1) {
-            $msg = '条码号不符合规则';
-            return view('barcode/scanBarcodeStep2', compact('vendorCode', 'purchaseOrder', 'sku', 'msg'));
+            $flag = 0;
+            $msg = 'FAIL: 条码号不符合规则';
+            die(json_encode(array('flag' => $flag, 'msg' => $msg)));
         }
         $barcodeScanRecord = DB::table('barcode_scan_record')->where('vendor_code', $vendorCode)->where('purchase_order', $purchaseOrder)->where('barcode_text', $barcodeText)->first();
         $barcodeScanRecord = json_decode(json_encode($barcodeScanRecord), true);
         if (!$barcodeScanRecord) {
-            $msg = '该采购订单号下面没有此条码';
-            return view('barcode/scanBarcodeStep2', compact('vendorCode', 'purchaseOrder', 'sku', 'msg'));
+            $flag = 0;
+            $msg = 'FAIL: 该采购订单号下面没有此条码';
+            die(json_encode(array('flag' => $flag, 'msg' => $msg)));
         }
 
         if ($barcodeScanRecord['current_status'] == 1) {
-            $msg = '条码已经被激活';
-            return view('barcode/scanBarcodeStep2', compact('vendorCode', 'purchaseOrder', 'sku', 'msg'));
+            $flag = 0;
+            $msg = 'FAIL: 条码已经被激活';
+            die(json_encode(array('flag' => $flag, 'msg' => $msg)));
         }
+
+        //增加重量区间判断
+        if($weight){
+            $range = Cache::store('file')->get($purchaseOrder.'-'.$sku);
+            $rangeArr = explode('-', $range);
+            if(!isset($rangeArr[0]) || !isset($rangeArr[1]) || $weight < (int)$rangeArr[0] || $weight > (int)$rangeArr[1]){
+                $flag = 0;
+                $msg = 'FAIL: 重量不符合要求';
+                die(json_encode(array('flag' => $flag, 'msg' => $msg)));
+            }
+        }
+
+
         $updateArray = array(
             'sku' => $sku,
             'current_status' => 1,
+            'weight' => $weight,
             'status_updated_at' => date('Y-m-d H:i:s', time())
         );
         //第一次扫描激活时，status_history为空，将其值设置为0
@@ -85,11 +173,12 @@ class BarcodeScanController extends Controller
         $updateArray['status_history'] = $statusHistory . ',1';
         $barcodeScanRecord = DB::table('barcode_scan_record')->where('vendor_code', $vendorCode)->where('purchase_order', $purchaseOrder)->where('barcode_text', $barcodeText);
         $barcodeScanRecord->update($updateArray);
-        $msg = '条码激活成功';
 
-        return view('barcode/scanBarcodeStep2', compact('vendorCode', 'purchaseOrder', 'sku', 'msg'));
+        $activatedCount++;
+        $flag = 1;
+        $msg = 'PASS: 条码激活成功';
+        die(json_encode(array('flag' => $flag, 'msg' => $msg, 'activatedCount' => $activatedCount)));
     }
-
 
     public function detachBarcode(Request $request)
     {
@@ -100,23 +189,37 @@ class BarcodeScanController extends Controller
     public function verifyToken(Request $request)
     {
         $token = $request->input("token");
+        $urlParam = $request->input("urlParam");
+        $barcodeVendorInfo = DB::table('barcode_vendor_info')->where('token', $token)->where('url_param', $urlParam)->first();
+        $barcodeVendorInfo = json_decode(json_encode($barcodeVendorInfo), true);
+        if (!$barcodeVendorInfo) {
+            $msg = 'FAIL: 秘钥和网址参数不匹配';
+            return view('barcode/detachBarcode', compact('token', 'urlParam', 'msg'));
+        }
+
+        return view('barcode/detachBarcodeStep1', compact('token', 'urlParam'));
+    }
+
+    public function verifyPo(Request $request)
+    {
+        $token = $request->input("token");
         $purchaseOrder = $request->input("purchaseOrder");
         $urlParam = $request->input("urlParam");
         $barcodeVendorInfo = DB::table('barcode_vendor_info')->where('token', $token)->where('url_param', $urlParam)->first();
         $barcodeVendorInfo = json_decode(json_encode($barcodeVendorInfo), true);
         if (!$barcodeVendorInfo) {
-            $msg = 'Token和网址参数不匹配';
-            return view('barcode/detachBarcode', compact('token', 'purchaseOrder', 'urlParam', 'msg'));
+            $msg = 'FAIL: 秘钥和网址参数不匹配';
+            return view('barcode/detachBarcode', compact('token', 'urlParam', 'msg'));
         }
         $vendorCode = $barcodeVendorInfo['vendor_code'];
         $vendorInfo = DB::table('barcode_scan_record')->where('vendor_code', $vendorCode)->where('purchase_order', $purchaseOrder)->first();
         $vendorInfo = json_decode(json_encode($vendorInfo), true);
         if (!$vendorInfo) {
-            $msg = '系统中不存在此采购订单号';
-            return view('barcode/detachBarcode', compact('token', 'purchaseOrder', 'urlParam', 'msg'));
+            $msg = 'FAIL: 系统中不存在此采购订单号';
+            return view('barcode/detachBarcodeStep1', compact('token', 'purchaseOrder', 'urlParam', 'msg'));
         }
 
-        return view('barcode/detachBarcodeStep2', compact('vendorCode', 'purchaseOrder', 'urlParam'));
+        return view('barcode/detachBarcodeStep2', compact('vendorCode', 'purchaseOrder'));
     }
 
     public function deactivateBarcode(Request $request)
@@ -124,6 +227,12 @@ class BarcodeScanController extends Controller
         $vendorCode = $request->input("vendorCode");
         $purchaseOrder = $request->input("purchaseOrder");
         $barcodeText = $request->input("barcodeText");
+
+        if(strlen($barcodeText) != 12){
+            $flag = 0;
+            $msg = 'FAIL: 条码号必须为12位';
+            die(json_encode(array('flag' => $flag, 'msg' => $msg)));
+        }
 
         //验证条形码是否符合规则，
         //供应商4位+年月2位+校准1位+流水号4位+校准1位=12位
@@ -134,24 +243,28 @@ class BarcodeScanController extends Controller
         $validationCode = $this->getValidationCode($vendorYearMonth . $sn);
 
         if ($validationCode != $v0 . $v1) {
-            $msg = '条码号不符合规则';
-            return view('barcode/detachBarcodeStep2', compact('vendorCode', 'purchaseOrder', 'msg'));
+            $flag = 0;
+            $msg = 'FAIL: 条码号不符合规则';
+            die(json_encode(array('flag' => $flag, 'msg' => $msg)));
         }
 
         $barcodeScanRecord = DB::table('barcode_scan_record')->where('vendor_code', $vendorCode)->where('purchase_order', $purchaseOrder)->where('barcode_text', $barcodeText)->first();
         $barcodeScanRecord = json_decode(json_encode($barcodeScanRecord), true);
         if (!$barcodeScanRecord) {
-            $msg = '该采购订单号下面没有此条码';
-            return view('barcode/detachBarcodeStep2', compact('vendorCode', 'purchaseOrder', 'msg'));
+            $flag = 0;
+            $msg = 'FAIL: 该采购订单号下面没有此条码';
+            die(json_encode(array('flag' => $flag, 'msg' => $msg)));
         }
 
         if ($barcodeScanRecord['current_status'] == 0) {
-            $msg = '条码尚未被激活';
-            return view('barcode/detachBarcodeStep2', compact('vendorCode', 'purchaseOrder', 'msg'));
+            $flag = 0;
+            $msg = 'FAIL: 条码尚未被激活';
+            die(json_encode(array('flag' => $flag, 'msg' => $msg)));
         }
         if ($barcodeScanRecord['current_status'] == 2) {
-            $msg = '条码已经处于解绑状态';
-            return view('barcode/detachBarcodeStep2', compact('vendorCode', 'purchaseOrder', 'msg'));
+            $flag = 0;
+            $msg = 'FAIL: 条码已经处于解绑状态';
+            die(json_encode(array('flag' => $flag, 'msg' => $msg)));
         }
 
         $updateArray = array(
@@ -160,13 +273,58 @@ class BarcodeScanController extends Controller
             'status_updated_at' => date('Y-m-d H:i:s', time())
         );
 
-        //激活成功，则会在status_history后面添加,1
+        //解绑成功，则会在status_history后面添加,2
         $updateArray['status_history'] = $barcodeScanRecord['status_history'] . ',2';
         $barcodeScanRecord = DB::table('barcode_scan_record')->where('vendor_code', $vendorCode)->where('purchase_order', $purchaseOrder)->where('barcode_text', $barcodeText);
         $barcodeScanRecord->update($updateArray);
-        $msg = '条码解绑成功';
+        $flag = 1;
+        $msg = 'PASS: 条码解绑成功';
+        die(json_encode(array('flag' => $flag, 'msg' => $msg)));
+    }
 
-        return view('barcode/detachBarcodeStep2', compact('vendorCode', 'purchaseOrder', 'msg'));
+    public function updateToken(Request $request)
+    {
+        $urlParam = $request->input("p");
+        $vendor = DB::table('barcode_vendor_info')->where('url_param', $urlParam)->first();
+        if (!$vendor) {
+            die('网址参数不正确');
+        }
+        $token = $vendor->token;
+        return view('barcode/updateToken', compact('urlParam', 'token'));
+    }
+
+    public function generateNewToken(Request $request)
+    {
+        $token = $request->input("token");
+        $urlParam = $request->input("urlParam");
+        $barcodeVendorInfo = DB::table('barcode_vendor_info')->where('token', $token)->where('url_param', $urlParam)->first();
+        $barcodeVendorInfo = json_decode(json_encode($barcodeVendorInfo), true);
+        if (!$barcodeVendorInfo) {
+            $flag = 0;
+            $msg = 'FAIL: 秘钥和网址参数不匹配';
+            $returnData = json_encode(array('flag' => $flag, 'msg' => $msg));
+            die($returnData);
+        }
+
+        $newToken = md5($token);
+        //一维码
+        $generator = new \Picqer\Barcode\BarcodeGeneratorPNG();
+        $tokenBarcode = $generator->getBarcode($newToken, $generator::TYPE_CODE_93, 1, 20);
+        $tokenBarcode = base64_encode($tokenBarcode);
+        $tokenBarcode = '<img src="data:image/png;base64,' . $tokenBarcode . '"/>';
+        //二维码
+        ob_start();
+        QRCode::png($newToken, false, 'L', 5, 2);
+        $imageString = base64_encode(ob_get_contents());
+        ob_end_clean();
+        $tokenQR = '<img src="data:image/png;base64,' . $imageString . '"/>';
+
+        $flag = 1;
+        $msg = 'PASS: 更新成功';
+        $returnData = json_encode(array('flag' => $flag, 'msg' => $msg, 'newToken' => $newToken, 'tokenBarcode' => $tokenBarcode, 'tokenQR' => $tokenQR));
+        echo $returnData;
+        //数据库中更新token
+        DB::table('barcode_vendor_info')->where('token', $token)->update(array('token' => $newToken));
     }
 
     //得到2位验证码
@@ -180,7 +338,7 @@ class BarcodeScanController extends Controller
         return $validationCode;
     }
 
-        //Convert an arbitrarily large number from any base to any base.
+    //Convert an arbitrarily large number from any base to any base.
     public function convBase($numberInput, $fromBaseInput, $toBaseInput)
     {
         if ($fromBaseInput == $toBaseInput) return $numberInput;
@@ -209,6 +367,5 @@ class BarcodeScanController extends Controller
         }
         return $retval;
     }
-
 
 }
