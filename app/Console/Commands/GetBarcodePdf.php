@@ -44,7 +44,7 @@ class GetBarcodePdf extends Command
     {
         $barcodeFilePath = storage_path('app/public/barcode');
         if (!file_exists($barcodeFilePath)) {
-            mkdir($barcodeFilePath, 0755, true);
+            mkdir($barcodeFilePath, 0777, true);
         }
         $poList = [];
         $poArray = DB::table('barcode_po_details')->where('pdf_status', 0)->distinct()->get(['purchase_order']);
