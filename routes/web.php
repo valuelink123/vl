@@ -512,18 +512,41 @@ Route::get('/barcode/purchaseOrderDetails', 'BarcodeController@purchaseOrderDeta
 Route::post('/barcode/getPurchaseOrderDetails', 'BarcodeController@getPurchaseOrderDetails');
 Route::get('/barcode/generateBarcode', 'BarcodeController@generateBarcode');
 Route::post('/barcode/saveBarcode', 'BarcodeController@saveBarcode');
+Route::post('/barcode/saveNewVendor', 'BarcodeController@saveNewVendor');
 Route::get('/barcode/printBarcode', 'BarcodeController@printBarcode');
+Route::get('/barcode/addNewVendor', 'BarcodeController@addNewVendor');
 Route::match(['post','get'], '/barcode/outputBarcode', 'BarcodeController@outputBarcode');
 //Route::match(['post','get'], '/barcode/downloadPDF', 'BarcodeController@downloadPDF');
 //Route::post('/barcode/downloadPDF', 'BarcodeController@downloadPDF');
 //激活条码
 Route::get('/barcode/scanBarcode', 'BarcodeScanController@scanBarcode');
+Route::post('/barcode/checkPoSku', 'BarcodeScanController@checkPoSku');
 Route::post('/barcode/checkToken', 'BarcodeScanController@checkToken');
 Route::match(['post','get'], '/barcode/activateBarcode', 'BarcodeScanController@activateBarcode');
 //解绑条码
 Route::get('/barcode/detachBarcode', 'BarcodeScanController@detachBarcode');
 Route::post('/barcode/verifyToken', 'BarcodeScanController@verifyToken');
 Route::match(['post','get'], '/barcode/deactivateBarcode', 'BarcodeScanController@deactivateBarcode');
+//add
+Route::get('/barcode/qc', 'BarcodeController@qc');
+Route::post('/barcode/getVendorTable', 'BarcodeController@getVendorTable');
+Route::post('/barcode/modifyOperator', 'BarcodeController@modifyOperator');
+Route::get('/barcode/check', 'BarcodeController@check');
+Route::get('/barcode/scanDetach', 'BarcodeScanController@scanDetach');
+Route::get('/barcode/vendorDetails', 'BarcodeController@vendorDetails');
+Route::get('/barcode/businessLogin', 'BarcodeScanController@businessLogin');
+Route::get('/barcode/updateToken', 'BarcodeScanController@updateToken');
+Route::post('/barcode/generateNewToken', 'BarcodeScanController@generateNewToken');
+Route::post('/barcode/verifyPo','BarcodeScanController@verifyPo');
+Route::get('/barcode/changeOperator','BarcodeController@changeOperator');
+Route::post('/barcode/checkQc', 'BarcodeController@checkQc');
+Route::get('/barcode/changeOperator','BarcodeController@changeOperator');
+Route::get('/barcode/editVendor','BarcodeController@editVendor');
+Route::get('/barcode/test','BarcodeController@test');
+Route::get('/barcode/exportBarcodePdf','BarcodeController@exportBarcodePdf');
+Route::post('/barcode/verifyQc','BarcodeController@verifyQc');
+Route::post('/barcode/modifyVendor','BarcodeController@modifyVendor');
+Route::post('/barcode/getVendorOrderDetails', 'BarcodeController@getVendorOrderDetails');
 //生成供应商token的条码
 Route::get('/barcode/makeToken', 'BarcodeController@makeToken');
 //导出
