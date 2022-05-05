@@ -1,73 +1,50 @@
 <!doctype html>
 <html>
 <head>
-    <title>Detach Barcode</title>
-    <link href="/assets/global/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
-    <link href="/assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.css" rel="stylesheet"
-          type="text/css"/>
-
+    <title>解绑条码</title>
     <script src="/assets/global/plugins/jquery.min.js" type="text/javascript"></script>
-    <script src="/assets/global/plugins/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
-    <script src="/assets/global/plugins/datatables/datatables.min.js" type="text/javascript"></script>
-    <script src="/assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.js"
-            type="text/javascript"></script>
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <style type="text/css">
+        .btn-submit {
+            background-color: #63C5D1;
+            color: #ffffff;
+            font-size: 14px;
+            text-align: center;
+            width: 70px;
+            height: 30px;
+            border-radius: 5px 5px 5px 5px !important;
+            margin-top: 15px;
+        }
         input {
-            height: 40px;
+            width: 250px;
+            height: 20px;
         }
     </style>
 
 </head>
 <body>
+<div align="center">
 <form action="{{ url('/barcode/verifyToken') }}" method="POST" id="scanForm" onsubmit="return checkForm()">
     {{ csrf_field() }}
     <input type="hidden" id='urlParam' name='urlParam' value="@if(isset($urlParam)) {{$urlParam}} @else @endif"/>
-    <div class="col-lg-9">
-        <div class="col-md-12">
-            <div>
-                <div>
-                    <div class="">
-                        <div class="col-lg-8">
-                            <div class="form-group">
-                                <label>Token</label>
-                                @if(!isset($token))
-                                    <input type="text" class="form-control" name="token" id="token" value=""
-                                           required>
-                                @else
-                                    <input type="text" class="form-control" name="token" id="token"
-                                           value="{{$token}}" required>
-                                @endif
-                            </div>
-                            <div class="form-group">
-                                <label>采购订单号</label>
-                                @if(!isset($purchaseOrder))
-                                    <input type="text" class="form-control" name="purchaseOrder" id="purchaseOrder"
-                                           value=""
-                                           required>
-                                @else
-                                    <input type="text" class="form-control" name="purchaseOrder" id="purchaseOrder"
-                                           value="{{$purchaseOrder}}" required>
-                                @endif
-                            </div>
-                            <div align="center">
-                                <button type="submit" class="btn-submit" style="background-color:#63C5D1">提交</button>
-                            </div>
-                            <div class="form-group">
-                                <label style="color:#ff0000; font-size: x-small">@if(isset($msg)){{$msg}} @else @endif</label>
-                            </div>
-                        </div>
-                        <div style="clear:both;"></div>
-
-                        <div id="msgDiv"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div align="center">
+        <label align="center" style="font-size: 32px">解绑条码</label>
     </div>
-</form>
+    <div>秘钥</div>
+    <div>
+        <input type="password" class="form-control" name="token" id="token"
+                   @if(isset($token)) value="{{$token}}" @else value="" @endif required>
+    </div>
+    <div align="center">
+        <button type="submit" class="btn-submit">提交</button>
+    </div>
+    <div>
+        <label style="color:#ff0000; font-size:28px; margin-top:15px">@if(isset($msg)){{$msg}} @else @endif</label>
+    </div>
 
+</form>
+</div>
 <script type="text/javascript">
     $(function () {
         $('#token').focus();
@@ -75,16 +52,10 @@
 
     function checkForm() {
         $token = $('#token').val().trim();
-        $purchaseOrder = $('#purchaseOrder').val().trim();
-
         $urlParam = $('#urlParam').val().trim();
 
         if ($token == '') {
             $('#token').focus();
-            return false;
-        }
-        if ($purchaseOrder == '') {
-            $('#purchaseOrder').focus();
             return false;
         }
         if ($urlParam == '') {

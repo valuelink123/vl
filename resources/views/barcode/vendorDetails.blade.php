@@ -51,8 +51,7 @@
 
             <div class="portlet-title">
                 <label>供应商代码：{{$vendorCode}}</label>
-                <div style="height: 5px;"></div>
-                <label>采购订单号：{{$purchaseOrder}}</label>
+                <div style="height: 5px;"></div>b
                 <div style="clear:both;"></div>
                 <div style="float:left; width:180px">
                     <div class="input-group date date-picker pull-left" data-date-format="yyyy-mm-dd">
@@ -71,7 +70,6 @@
                 <form id="search-form">
                     {{--                    {{ csrf_field() }}--}}
                     <input type="hidden" name='vendorCode' id='vendorCode' value="{{$vendorCode}}"/>
-                    <input type="hidden" name='purchaseOrder' id='purchaseOrder' value="{{$purchaseOrder}}"/>
                     <input type="hidden" name='skuHidden' id="skuHidden" value=""/>
                     <div class="table-toolbar" id="thetabletoolbar">
                         <div class="input-group pull-left">
@@ -108,12 +106,9 @@
                                 <th>条码当前状态</th>
                                 <th>条码历史状态</th>
                                 <th>条码最后更新时间</th>
-                                <th>条码生成人</th>
-                                <th>条码生成时间</th>
-                                <th>条码打印人</th>
-                                <th>QC</th>
-                                <th>QC历史记录</th>
-                                <th>QC最后更新时间</th>
+{{--                                <th>条码生成人</th>--}}
+{{--                                <th>条码生成时间</th>--}}
+{{--                                <th>条码打印人</th>--}}
                             </tr>
                             </thead>
                             <tbody></tbody>
@@ -158,7 +153,7 @@
             //processing: true,
             scrollX: false,
             ordering: true,
-            aoColumnDefs: [{"bSortable": false, "aTargets": [3, 5, 7]}],
+            aoColumnDefs: [{"bSortable": false, "aTargets": [3]}],
             order: [],
             columns: [
                 {data: 'sku', name: 'sku'},
@@ -167,16 +162,13 @@
                 {data: 'current_status', name: 'current_status'},
                 {data: 'status_history', name: 'status_history'},
                 {data: 'status_updated_at', name: 'status_updated_at'},
-                {data: 'generated_by', name: 'generated_by'},
-                {data: 'generated_at', name: 'generated_at'},
-                {data: 'printed_by', name: 'printed_by'},
-                {data: 'qc', name: 'qc'},
-                {data: 'qc_history', name: 'qc_history'},
-                {data: 'qc_updated_at', name: 'qc_updated_at'},
+                // {data: 'generated_by', name: 'generated_by'},
+                // {data: 'generated_at', name: 'generated_at'},
+                // {data: 'printed_by', name: 'printed_by'},
             ],
             ajax: {
                 type: 'POST',
-                url: "{{ url('barcode/getPurchaseOrderDetails')}}",
+                url: "{{ url('barcode/getVendorOrderDetails')}}",
                 data: {
                     search: decodeURIComponent($("#search-form").serialize().replace(/\+/g, " "), true),
                     '_token': '{{csrf_token()}}'

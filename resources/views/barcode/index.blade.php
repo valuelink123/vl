@@ -44,7 +44,12 @@
 
 
                             <div class="pull-right">
-                                <button id="makeToken" class="barcode-btn">生成Token
+                                @if($canChangeOperator)
+                                <button id="changeOperator" class="barcode-btn">变更采购员
+                                </button>
+                                @else
+                                @endif
+                                <button id="addNewVendor" class="barcode-btn">新增供应商
                                 </button>
 {{--                                <button id="makeTokenBarcode" class="barcode-btn">条码演示--}}
 {{--                                </button>--}}
@@ -53,8 +58,8 @@
                                 <button id="printBarcode" class="barcode-btn">打印条码
                                 </button>
                                 <input type="text" name="vendorText" id="vendorText"
-                                       style="width: 200px; height: 29px; border: 1px solid #dddddd;"
-                                       placeholder="输入供应商名称或代码"/>
+                                       style="width: 240px; height: 29px; border: 1px solid #dddddd;"
+                                       placeholder="输入供应商名称或代码(VOP,SAP均可)"/>
                                 <button id="search" type="button" class="search-btn">搜索
                                 </button>
                             </div>
@@ -69,10 +74,11 @@
                             <table class="table table-striped table-bordered table-hover table-checkable" id="thetable">
                                 <thead>
                                 <tr role="row" class="heading">
-                                    <th>供应商代码</th>
-                                    <th>Token</th>
-                                    <th>网址参数</th>
+                                    <th>供应商序号</th>
+                                    <th>供应商代码(VOP)</th>
+                                    <th>供应商代码(SAP)</th>
                                     <th>供应商名称</th>
+                                    <th>采购人员</th>
                                     <th></th>
                                 </tr>
                                 </thead>
@@ -112,13 +118,17 @@
                 //processing: true,
                 scrollX: false,
                 ordering: true,
-                aoColumnDefs: [{"bSortable": false, "aTargets": [0, 1, 2, 3, 4]}],
+                aoColumnDefs: [
+                    {"bSortable": false, "aTargets": []},
+                    { "bVisible": false, "aTargets": [] }
+                    ],
                 order: [],
                 columns: [
+                    {data: 'id', name: 'id'},
                     {data: 'vendor_code', name: 'vendor_code'},
-                    {data: 'token', name: 'token'},
-                    {data: 'url_param', name: 'url_param'},
+                    {data: 'vendor_code_from_sap', name: 'vendor_code_from_sap'},
                     {data: 'vendor_name', name: 'vendor_name'},
+                    {data: 'operator', name: 'operator'},
                     {data: 'enter', name: 'enter'},
                 ],
                 ajax: {
@@ -146,8 +156,12 @@
             return false;
         });
 
-        $('#makeToken').click(function () {
-            window.open('/barcode/makeToken');
+
+        $('#changeOperator').click(function () {
+            window.open('/barcode/changeOperator');
+        });
+        $('#addNewVendor').click(function () {
+            window.open('/barcode/addNewVendor');
         });
         $('#makeTokenBarcode').click(function () {
             window.open('/barcode/makeTokenBarcode');
@@ -164,7 +178,5 @@
                 $(this).find('.modal-content').html('<div class="modal-body"><img src="../assets/global/img/loading-spinner-grey.gif" alt="" class="loading"><span>Loading... </span></div>');
             });
         });
-
-
     </script>
 @endsection

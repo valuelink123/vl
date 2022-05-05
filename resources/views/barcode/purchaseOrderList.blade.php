@@ -45,10 +45,16 @@
             <div style="height: 15px;"></div>
 
             <div class="portlet-title">
-                <label>供应商代码：{{$vendorCode}}</label>
+                <div>供应商代码(VOP)：{{$vendorCode}}</div>
+                <div>供应商代码(SAP)：{{$vendorCodeFromSAP}}</div>
+                <div>密钥：{{$token}}</div>
+                <div>扫描&解绑URL：{{$scanDetachUrl}}</div>
+                <div>企业登陆：{{$updateTokenUrl}}</div>
+                <div style="height: 20px"></div>
                 <form id="search-form">
                     <input type="hidden" name='vendorCode' id="vendorCode" value="{{$vendorCode}}"/>
                     <input type="hidden" name='poHidden' id="poHidden" value=""/>
+                    <input type="hidden" name='p' id="p" value="{{$p}}"/>
                     <div class="table-toolbar" id="thetabletoolbar">
                         <div class="input-group">
                             <input type="text" name="po" id="po"
@@ -73,9 +79,11 @@
                         <table class="table table-striped table-bordered table-hover table-checkable" id="thetable">
                             <thead>
                             <tr role="row" class="heading">
-                                <th>供应商代码</th>
+{{--                                <th>供应商代码</th>--}}
                                 <th>采购订单号</th>
+                                <th>订单生成时间</th>
                                 <th>生成的条码总数</th>
+                                <th>实际需要的条码数</th>
                                 <th>已激活的条码数</th>
                                 <th></th>
                             </tr>
@@ -116,12 +124,14 @@
             processing: true,
             scrollX: false,
             ordering: true,
-            aoColumnDefs: [{"bSortable": false, "aTargets": [0, 4]}],
+            aoColumnDefs: [{"bSortable": false, "aTargets": []}],
             order: [],
             columns: [
-                {data: 'vendor_code', name: 'vendor_code'},
+                // {data: 'vendor_code', name: 'vendor_code'},
                 {data: 'purchase_order', name: 'purchase_order'},
+                {data: 'purchase_date', name: 'purchase_date'},
                 {data: 'total_barcodes', name: 'total_barcodes'},
+                {data: 'actual_needed_barcodes', name: 'actual_needed_barcodes'},
                 {data: 'activated_barcodes', name: 'activated_barcodes'},
                 {data: 'details', name: 'details'},
             ],
