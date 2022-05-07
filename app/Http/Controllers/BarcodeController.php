@@ -299,7 +299,8 @@ class BarcodeController extends Controller
         if ($barcodeSizeType == 1) {
             $btChunk = array_chunk($bt, 5); //每行打印的条码个数
             $html = '<html><style type="text/css">.border{float:left;margin-left:9.45px;margin-right:9.45px;margin-top:9.64px;margin-bottom:9.64px;border:1px solid #000;padding-left:7.53px;padding-right:7.53px;padding-top:5.55px;padding-bottom:5.55px;} .bTextDiv{text-align: center;width:102px; height:11px;} div span{font-size:10px;margin-left:-2px;-webkit-transform:scale(0.8);display:block;}</style><body style="margin-top:0px; margin-left:10px;font-family: arial;">';
-            echo $html;
+//            $html .= '<p>po: '.$purchaseOrder.'</p>';
+            $html .= '<div style="page-break-after: always">po: '.$purchaseOrder.'</div>';
             $row = 0;
             foreach ($btChunk as $chunk) {
                 $row++;
@@ -315,8 +316,8 @@ class BarcodeController extends Controller
                                </div>';
                 }
                 $html .= '<div style="clear:both"></div></div>';
-                if ($row % 18 == 0) {
-                    $html .= '<div style="page-break-after: always"></div>';
+                if ($row % 17 == 0) {
+                    $html .= '<div style="page-break-after: always">po: '.$purchaseOrder.'</div>';
                 }
                 echo $html;
             }
