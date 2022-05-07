@@ -983,7 +983,7 @@ class BarcodeController extends Controller
         }
         $operatorIdArray = DB::table('role_user')->where('role_id', $roleIdForOperators)->pluck('user_id');
         //易林腾不出现在采购人员列表中
-        $yltUserIds = DB::table('users')->where('email', 'like', 'yilinteng@valuelink%')->where('locked', 0)->pluck('id');
+        $yltUserIds = DB::table('users')->where('email', 'like', 'yilinteng@valuelink%')->where('email', 'like', 'chenguancan@valuelink%')->where('email', 'like', 'sunhanshan@valuelink%')->where('email', 'like', 'zhangjianqun@valuelink%')->where('locked', 0)->pluck('id');
         $yltUserId = $yltUserIds[0];
         $operators = array();
         $users = $this->getUserIdNames();
