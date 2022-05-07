@@ -1088,7 +1088,7 @@ class BarcodeController extends Controller
     //获取采购总监的id
     public function getPurchasingDirectorIds()
     {
-        $userIds = DB::table('users')->where('email', 'like', 'wangshuang@valuelink%')->orWhere('email', 'like', 'yilinteng@valuelink%')->where('locked', 0)->pluck('id');
+        $userIds = DB::table('users')->where('email', 'like', 'wangshuang@valuelink%')->orWhere('email', 'like', 'yilinteng@valuelink%')->orWhere('email', 'like', 'chenguancan@valuelink%')->orWhere('email', 'like', 'zhangjianqun@valuelink%')->orWhere('email', 'like', 'sunhanshan@valuelink%')->where('locked', 0)->pluck('id');
         $userIds = json_decode(json_encode($userIds),true);
         return $userIds;
     }
