@@ -317,7 +317,7 @@ class BarcodeController extends Controller
                 }
                 $html .= '<div style="clear:both"></div></div>';
                 if ($row % 17 == 0) {
-                    $html .= '<div style="width: 100%;text-align: center;margin:10px 0px;">po: '.$purchaseOrder.'
+                    $html .= '<div style="width: 690px;text-align: center;margin:10px 0px;">po: '.$purchaseOrder.'
 </div><div style="page-break-after: always"></div>';
                 }
                 echo $html;
