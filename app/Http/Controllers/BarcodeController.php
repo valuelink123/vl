@@ -121,7 +121,7 @@ class BarcodeController extends Controller
             $InsertData = array();
             $vendorCodeFromSap = '';
             //----------------------------------------------------
-            $poRow = DB::connection('wms')->table('sap_purchase')->where('EBELN', $purchaseOrder)->first();
+            $poRow = DB::table('sap_purchase')->where('EBELN', $purchaseOrder)->first();
             $poRow = json_decode(json_encode($poRow), true);
             //---------------------------------------------------
             if($poRow) {
