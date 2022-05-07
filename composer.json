@@ -23,11 +23,13 @@
         "laravel/tinker": "~1.0",
         "maatwebsite/excel": "^3.0",
         "mpdf/mpdf": "^7.0",
+        "mystudytime/easy-amazon-advertising": "^1.2",
         "paypal/merchant-sdk-php": "3.12",
         "pda/pheanstalk": "^3.1",
         "php-imap/php-imap": "^3.0",
         "phpoffice/phpexcel": "^1.8",
         "picqer/php-barcode-generator": "^2.0",
+        "predis/predis": "^1.1",
         "stevenyangecho/laravel-u-editor": "1.4.2",
         "yadakhov/insert-on-duplicate-key": "^1.2",
         "zizaco/entrust": "5.2.x-dev"
