@@ -983,13 +983,18 @@ class BarcodeController extends Controller
         }
         $operatorIdArray = DB::table('role_user')->where('role_id', $roleIdForOperators)->pluck('user_id');
         //易林腾不出现在采购人员列表中
-        $yltUserIds = DB::table('users')->where('email', 'like', 'yilinteng@valuelink%')->where('email', 'like', 'chenguancan@valuelink%')->where('email', 'like', 'sunhanshan@valuelink%')->where('email', 'like', 'zhangjianqun@valuelink%')->where('locked', 0)->pluck('id');
-        $yltUserId = $yltUserIds[0];
+        $yltUserIds = DB::table('users')->where('email', 'like', 'yilinteng@valuelink%')->orwhere('email', 'like', 'chenguancan@valuelink%')->orwhere('email', 'like', 'sunhanshan@valuelink%')->orwhere('email', 'like', 'zhangjianqun@valuelink%')->where('locked', 0)->pluck('id');
+        $yltUserIds = json_decode(json_encode($yltUserIds), true);
+
+//        $yltUserId = $yltUserIds[0];
         $operators = array();
         $users = $this->getUserIdNames();
         foreach ($operatorIdArray as $v) {
-            if($v == $yltUserId) continue;
-            $operators[$v] = $users[$v];
+            if(!in_array($v, $yltUserIds)){
+                $operators[$v] = $users[$v];
+            }
+//            if($v == $yltUserId) continue;
+//            $operators[$v] = $users[$v];
         }
 
         return view('barcode/changeOperator', ['operators' => $operators]);
