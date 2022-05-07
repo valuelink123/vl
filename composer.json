@@ -13,8 +13,6 @@
         "ext-openssl": "*",
         "ext-pdo": "*",
         "barryvdh/laravel-debugbar": "^3.1",
-        "clegginabox/pdf-merger": "dev-master",
-        "codedge/laravel-fpdf": "1.5.2",
         "ddeboer/imap": "1.8.0",
         "drewm/mailchimp-api": "^2.5",
         "enkay/mws": "^0.4.0",
