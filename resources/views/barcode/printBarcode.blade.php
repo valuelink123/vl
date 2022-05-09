@@ -48,10 +48,10 @@
     <div align="center">
         <button type="button" id="btn-submit" class="btn-submit">网页浏览
         </button>
-        <button type="button" id="btn-export" class="btn-submit" style="width: 114px">下载条码PDF
-        </button>
-        <div style="font-size: x-small; color: #ff0000">（PDF文件不是实时生成的，如不能下载，请稍后再试）</div>
-        <div style="font-size: x-small; color: #ff0000">（或者网页浏览，页面点击右键，选择: 打印 > 另存为PDF）</div>
+<!--        <button type="button" id="btn-export" class="btn-submit" style="width: 114px">下载条码PDF-->
+<!--        </button>-->
+<!--        <div style="font-size: x-small; color: #ff0000">（PDF文件不是实时生成的，如不能下载，请稍后再试）</div>-->
+        <div style="font-size: x-small; color: #ff0000">（网页浏览，页面点击右键，选择: 打印 > 另存为PDF）</div>
 
     </div>
     <div style="clear:both;"></div>
@@ -71,13 +71,13 @@
     });
 
     $('#btn-export').click(function () {
-        $purchaseOrder = $('#purchaseOrder').val().trim();
-        if ($purchaseOrder == '') {
-            alert('请输入采购订单号');
-            $('#purchaseOrder').focus();
-            return false;
-        }
-        window.open('/barcode/exportBarcodePdf?purchaseOrder=' + $purchaseOrder);
+        // $purchaseOrder = $('#purchaseOrder').val().trim();
+        // if ($purchaseOrder == '') {
+        //     alert('请输入采购订单号');
+        //     $('#purchaseOrder').focus();
+        //     return false;
+        // }
+        // window.open('/barcode/exportBarcodePdf?purchaseOrder=' + $purchaseOrder);
     });
 
 </script>
