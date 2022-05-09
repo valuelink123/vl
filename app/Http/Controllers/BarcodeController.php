@@ -39,7 +39,15 @@ class BarcodeController extends Controller
     {
         $userId = Auth::user()->id;
 
+        $canChangeOperator = false;
+        if (in_array($userId, $this->getPurchasingDirectorIds())) {
+            $canChangeOperator = true;
+        }
+
         $data = DB::table('barcode_vendor_info');
+        if(!$canChangeOperator){
+            $data = DB::table('barcode_vendor_info')->where('operator_id', $userId);
+        }
         $search = isset($_POST['search']) ? $_POST['search'] : '';
         $search = $this->getSearchData(explode('&', $search));
         if (isset($search['vendorText']) && $search['vendorText']) {
