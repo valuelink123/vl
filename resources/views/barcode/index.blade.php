@@ -74,7 +74,7 @@
                             <table class="table table-striped table-bordered table-hover table-checkable" id="thetable">
                                 <thead>
                                 <tr role="row" class="heading">
-<!--                                    <th>供应商序号</th>-->
+                                    <th>供应商序号</th>
                                     <th>供应商代码(VOP)</th>
                                     <th>供应商代码(SAP)</th>
                                     <th>供应商名称</th>
