@@ -887,23 +887,23 @@ class BarcodeController extends Controller
         DB::beginTransaction();
         try {
             //修改了供应商代码(VOP)
-            if ($vendor['vendor_code'] != $vendorCode) {
+//            if ($vendor['vendor_code'] != $vendorCode) {
+//                $updateArray = array(
+//                    'vendor_code' => $vendorCode,
+//                    'vendor_code_from_sap' => $vendorCodeFromSAP,
+//                    'vendor_name' => $vendorName,
+//                    'token' => md5($vendorCode . '176'),
+//                    'url_param' => substr(md5($vendorCode . '199'), 0, 10)
+//                );
+//                DB::table('barcode_vendor_info')->where('id', $vendorId)->update($updateArray);
+//                DB::commit();
+//                $flag = 1;
+//                $msg = '修改供应商信息成功. 修改了供应商代码（VOP），秘钥和网址参数也改变了';
+//                $returnData = json_encode(array('flag' => $flag, 'msg' => $msg));
+//                echo $returnData;
+//            } else {
                 $updateArray = array(
-                    'vendor_code' => $vendorCode,
-                    'vendor_code_from_sap' => $vendorCodeFromSAP,
-                    'vendor_name' => $vendorName,
-                    'token' => md5($vendorCode . '176'),
-                    'url_param' => substr(md5($vendorCode . '199'), 0, 10)
-                );
-                DB::table('barcode_vendor_info')->where('id', $vendorId)->update($updateArray);
-                DB::commit();
-                $flag = 1;
-                $msg = '修改供应商信息成功. 修改了供应商代码（VOP），秘钥和网址参数也改变了';
-                $returnData = json_encode(array('flag' => $flag, 'msg' => $msg));
-                echo $returnData;
-            } else {
-                $updateArray = array(
-                    'vendor_code_from_sap' => $vendorCodeFromSAP,
+//                    'vendor_code_from_sap' => $vendorCodeFromSAP,
                     'vendor_name' => $vendorName,
                 );
                 DB::table('barcode_vendor_info')->where('id', $vendorId)->update($updateArray);
@@ -912,7 +912,7 @@ class BarcodeController extends Controller
                 $msg = '修改供应商信息成功. 未修改供应商代码（VOP）';
                 $returnData = json_encode(array('flag' => $flag, 'msg' => $msg));
                 echo $returnData;
-            }
+//            }
 
         } catch (\Exception $e) {
             DB::rollback();
