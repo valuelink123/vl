@@ -351,6 +351,7 @@ class BarcodeController extends Controller
 
     public function purchaseOrderList(Request $req)
     {
+        $userId = Auth::user()->id;
         $vendorCode = $req->input('vendorCode');
         $p = $req->input('p');
         $vendor = DB::table('barcode_vendor_info')->where('vendor_code', $vendorCode)->first();
@@ -364,10 +365,20 @@ class BarcodeController extends Controller
         $vendor = json_decode(json_encode($vendor), true);
         $vendorCode = $vendor['vendor_code'];
         $vendorCodeFromSAP = $vendor['vendor_code_from_sap'];
-        $token = $vendor['token'];
-        $url_param = $vendor['url_param'];
+
+        $token = '*********************************';
+        $url_param = '************************';
+
+
+        if (in_array($userId, $this->getPurchasingDirectorIds())) {
+            $token = $vendor['token'];
+            $url_param = $vendor['url_param'];
+
+        }
         $scanDetachUrl = url('/barcode/scanDetach?p=' . $url_param);
         $updateTokenUrl = url('/barcode/businessLogin?p=' . $url_param);
+
+
 
         return view('barcode/purchaseOrderList', compact('vendorCode', 'token', 'url_param', 'vendorCodeFromSAP', 'scanDetachUrl', 'updateTokenUrl', 'p'));
     }
