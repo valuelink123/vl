@@ -74,7 +74,7 @@
                             <table class="table table-striped table-bordered table-hover table-checkable" id="thetable">
                                 <thead>
                                 <tr role="row" class="heading">
-                                    <th>供应商序号</th>
+<!--                                    <th>供应商序号</th>-->
                                     <th>供应商代码(VOP)</th>
                                     <th>供应商代码(SAP)</th>
                                     <th>供应商名称</th>
@@ -124,7 +124,7 @@
                     ],
                 order: [],
                 columns: [
-                    {data: 'id', name: 'id'},
+                    // {data: 'id', name: 'id'},
                     {data: 'vendor_code', name: 'vendor_code'},
                     {data: 'vendor_code_from_sap', name: 'vendor_code_from_sap'},
                     {data: 'vendor_name', name: 'vendor_name'},
@@ -137,7 +137,7 @@
                     data: {
                         search: decodeURIComponent($("#search-form").serialize().replace(/\+/g, " "), true),
                         '_token': '{{csrf_token()}}'
-                    },
+                    },WWW
                 }
             });
         }
