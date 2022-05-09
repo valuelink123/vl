@@ -124,7 +124,7 @@
                     ],
                 order: [],
                 columns: [
-                    // {data: 'id', name: 'id'},
+                    {data: 'id', name: 'id'},
                     {data: 'vendor_code', name: 'vendor_code'},
                     {data: 'vendor_code_from_sap', name: 'vendor_code_from_sap'},
                     {data: 'vendor_name', name: 'vendor_name'},
