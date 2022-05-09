@@ -27,11 +27,11 @@
         </div>
         <div>输入供应商代码(VOP)</div>
         <div>
-            <input type="text" name="vendorCode" id="vendorCode" value="{{$vendor['vendor_code']}}" oninput="value=value.replace(/[^A-Z]/g,'')" maxlength="4" />
+            <input type="text" name="vendorCode" id="vendorCode" value="{{$vendor['vendor_code']}}" oninput="value=value.replace(/[^A-Z]/g,'')" maxlength="4" readonly/>
         </div>
         <div>输入供应商代码(SAP)</div>
         <div>
-            <input type="text" name="vendorCodeFromSAP" id="vendorCodeFromSAP" value="{{$vendor['vendor_code_from_sap']}}" oninput="value=value.replace(/[^\d]/g,'')" maxlength="10" />
+            <input type="text" name="vendorCodeFromSAP" id="vendorCodeFromSAP" value="{{$vendor['vendor_code_from_sap']}}" oninput="value=value.replace(/[^\d]/g,'')" maxlength="10" readonly/>
         </div>
         <div>输入供应商名称</div>
         <div style="font-size: x-small; color: #ff0000">（地区+简称，例如：深圳纽尚）</div>
