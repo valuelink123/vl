@@ -313,15 +313,15 @@ class BarcodeScanController extends Controller
         $tokenBarcode = base64_encode($tokenBarcode);
         $tokenBarcode = '<img src="data:image/png;base64,' . $tokenBarcode . '"/>';
         //二维码
-//        ob_start();
-//        QRCode::png($newToken, false, 'L', 5, 2);
-//        $imageString = base64_encode(ob_get_contents());
-//        ob_end_clean();
-//        $tokenQR = '<img src="data:image/png;base64,' . $imageString . '"/>';
+        ob_start();
+        QRCode::png($newToken, false, 'L', 5, 2);
+        $imageString = base64_encode(ob_get_contents());
+        ob_end_clean();
+        $tokenQR = '<img src="data:image/png;base64,' . $imageString . '"/>';
 
         $flag = 1;
         $msg = 'PASS: 更新成功';
-        $returnData = json_encode(array('flag' => $flag, 'msg' => $msg, 'newToken' => $newToken, 'tokenBarcode' => $tokenBarcode, 'tokenQR' => ''));
+        $returnData = json_encode(array('flag' => $flag, 'msg' => $msg, 'newToken' => $newToken, 'tokenBarcode' => $tokenBarcode, 'tokenQR' => $tokenQR));
         echo $returnData;
         //数据库中更新token
         DB::table('barcode_vendor_info')->where('token', $token)->update(array('token' => $newToken));
