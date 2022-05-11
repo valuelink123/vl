@@ -549,6 +549,8 @@ Route::post('/barcode/modifyVendor','BarcodeController@modifyVendor');
 Route::post('/barcode/getVendorOrderDetails', 'BarcodeController@getVendorOrderDetails');
 //生成供应商token的条码
 Route::get('/barcode/makeToken', 'BarcodeController@makeToken');
+Route::post('/barcode/getSkuInfo', 'BarcodeController@getSkuInfo');
+
 //导出
 Route::get('/barcodePoListExport', 'BarcodeController@exportPoList');
 Route::get('/barcodePoDetailsExport', 'BarcodeController@exportPoDetails');
