@@ -702,7 +702,8 @@ class BarcodeController extends Controller
         $search = $this->getSearchData(explode('&', $search));
         $vendorCode = $search['vendorCode'];
         $purchaseOrder = $search['purchaseOrder'];
-        $data = DB::table('barcode_scan_record')->where('vendor_code', $vendorCode)->where('purchase_order', $purchaseOrder);
+        $dateOption = $request->input('dateOption', date('Y-m-d'));
+        $data = DB::table('barcode_scan_record')->where('vendor_code', $vendorCode)->where('purchase_order', $purchaseOrder)->whereRaw("SUBSTR(`status_updated_at`,1,10)='$dateOption'");
 
         if (isset($search['sku'])) {
             $sku = $search['sku'];
@@ -712,7 +713,7 @@ class BarcodeController extends Controller
             foreach ($poDetails as $poDetail) {
                 $totalNum += intval($poDetail['quantity']);
             }
-            $activatedCount = DB::table('barcode_scan_record')->where('vendor_code', $vendorCode)->where('purchase_order', $purchaseOrder)->where('sku', $sku)->count();
+            $activatedCount = DB::table('barcode_scan_record')->where('vendor_code', $vendorCode)->where('purchase_order', $purchaseOrder)->where('sku', $sku)->whereRaw("SUBSTR(`status_updated_at`,1,10)='$dateOption'")->count();
 
             if ($sku) {
                 $data = $data->where(function ($query) use ($sku) {
