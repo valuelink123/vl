@@ -63,7 +63,7 @@
                         <input type="text" style="width:125px" class="form-control form-filter input-sm" readonly placeholder="选择日期" id="dateOption" name="dateOption" value="{{$dateOption}}"/>
                     </div>
                 </div>
-                <div style="height: 30px; padding-top: 6px;">当天激活的数量：<span style="color:#0000ff"
+                <div style="height: 30px; padding-top: 6px;">激活的数量：<span style="color:#0000ff"
                                                                            id="activatedCount">{{$activatedCount}}</span></div>
                 <div style="height: 5px;"></div>
                 <div style="clear:both"></div>
