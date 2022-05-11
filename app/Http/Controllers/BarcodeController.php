@@ -702,7 +702,12 @@ class BarcodeController extends Controller
         $search = $this->getSearchData(explode('&', $search));
         $vendorCode = $search['vendorCode'];
         $purchaseOrder = $search['purchaseOrder'];
-        $dateOption = $request->input('dateOption', date('Y-m-d'));
+        $dateOption = isset($_POST['dateOption']) ? $_POST['dateOption'] : '';
+        if($dateOption==''){
+            $dateOption=date('Y-m-d');
+        }else{
+            $dateOption=date($dateOption,'Y-m-d');
+        }
         $data = DB::table('barcode_scan_record')->where('vendor_code', $vendorCode)->where('purchase_order', $purchaseOrder)->whereRaw("SUBSTR(`status_updated_at`,1,10)='$dateOption'");
 
         if (isset($search['sku'])) {
