@@ -190,7 +190,6 @@
             url: '/barcode/getSkuInfo',
             data: {
                 search: decodeURIComponent($("#search-form").serialize().replace(/\+/g, " "), true),
-                dateOption: $dateOption,
                 '_token': '{{csrf_token()}}'
             },
             dataType: 'json',
