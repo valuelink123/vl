@@ -389,7 +389,7 @@ class BarcodeController extends Controller
 
         $scanDetachUrl = url('https://www.baidu.com/s?wd=' . $url_param);
         $updateTokenUrl = url('https://www.baidu.com/s?wd=' . $url_param);
-        if (in_array($userId, $this->getPurchasingDirectorIds())) {
+        if (Auth::user()->can(['barcode-show-vendor-info'])) {
             $token = $vendor['token'];
             $url_param = $vendor['url_param'];
             $scanDetachUrl = url('/barcode/scanDetach?p=' . $url_param);
