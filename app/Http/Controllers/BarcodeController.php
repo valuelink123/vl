@@ -46,6 +46,7 @@ class BarcodeController extends Controller
 
     public function getVendorList()
     {
+        if (!Auth::user()->can(['barcode-show-vendor'])) die('Permission denied');
         $userId = Auth::user()->id;
 
         $canChangeOperator = false;
@@ -103,12 +104,13 @@ class BarcodeController extends Controller
 
     public function generateBarcode(Request $request)
     {
-        if (!Auth::user()->can(['barcode-show'])) die('Permission denied');
+        if (!Auth::user()->can(['barcode-show-genBarcode'])) die('Permission denied');
         return view('barcode/generateBarcode');
     }
 
     public function saveBarcode(Request $request)
     {
+        if (!Auth::user()->can(['barcode-show-genBarcode'])) die('Permission denied');
         $purchaseOrder = $request->input('purchaseOrder');
         $array_detail['appid'] = env("SAP_KEY");
         $array_detail['method'] = 'getPurchaseOrderDetail';
@@ -295,7 +297,7 @@ class BarcodeController extends Controller
 
     public function printBarcode(Request $request)
     {
-        if (!Auth::user()->can(['barcode-show'])) die('Permission denied');
+        if (!Auth::user()->can(['barcode-show-genBarcode'])) die('Permission denied');
         return view('barcode/printBarcode');
     }
 
@@ -366,6 +368,7 @@ class BarcodeController extends Controller
 
     public function purchaseOrderList(Request $req)
     {
+        if (!Auth::user()->can(['barcode-show-po-list'])) die('Permission denied');
         $userId = Auth::user()->id;
         $vendorCode = $req->input('vendorCode');
         $p = $req->input('p');
@@ -402,6 +405,7 @@ class BarcodeController extends Controller
 
     public function getPurchaseOrderList(Request $request)
     {
+        if (!Auth::user()->can(['barcode-show-po-list'])) die('Permission denied');
         $search = isset($_POST['search']) ? $_POST['search'] : '';
         $search = $this->getSearchData(explode('&', $search));
 
@@ -512,6 +516,7 @@ class BarcodeController extends Controller
 
     public function purchaseOrderDetails(Request $req)
     {
+        if (!Auth::user()->can(['barcode-show-po-detail'])) die('Permission denied');
         $vendorCode = $req->input('vendorCode');
         $purchaseOrder = $req->input('purchaseOrder');
         $p = $req->input('p');
@@ -534,6 +539,7 @@ class BarcodeController extends Controller
 
     public function getPurchaseOrderDetails(Request $request)
     {
+        if (!Auth::user()->can(['barcode-show-po-detail'])) die('Permission denied');
         $search = isset($_POST['search']) ? $_POST['search'] : '';
         $search = $this->getSearchData(explode('&', $search));
         if (!(isset($search['vendorCode']) && $search['vendorCode'])) {
@@ -767,7 +773,7 @@ class BarcodeController extends Controller
 
     public function addNewVendor(Request $request)
     {
-//        if (!Auth::user()->can(['barcode-show'])) die('Permission denied');
+        if (!Auth::user()->can(['barcode-show-add-vendor'])) die('Permission denied');
         $userId = Auth::user()->id;
         $canChangeOperator = false;
         if (in_array($userId, $this->getPurchasingDirectorIds())) {
@@ -795,6 +801,7 @@ class BarcodeController extends Controller
 
     public function saveNewVendor(Request $request)
     {
+        if (!Auth::user()->can(['barcode-show-add-vendor'])) die('Permission denied');
         $userId = Auth::user()->id;
         //如果输入的供应商代码是小写，自动转成大写。
         $vendorCode = strtoupper($request->input('vendorCode'));
@@ -853,6 +860,7 @@ class BarcodeController extends Controller
 
     public function editVendor(Request $request)
     {
+        if (!Auth::user()->can(['barcode-show-add-vendor'])) die('Permission denied');
         $userId = Auth::user()->id;
         //if (!in_array($userId, $this->getPurchasingDirectorIds())) die('Permission denied');
 
@@ -864,6 +872,7 @@ class BarcodeController extends Controller
 
     public function modifyVendor(Request $request)
     {
+        if (!Auth::user()->can(['barcode-show-add-vendor'])) die('Permission denied');
         $vendorId = $request->input('vendorId');
         //如果输入的供应商代码是小写，自动转成大写。
         $vendorCode = strtoupper($request->input('vendorCode'));
@@ -1041,6 +1050,7 @@ class BarcodeController extends Controller
 
     public function getVendorTable(Request $request)
     {
+        if (!Auth::user()->can(['barcode-show'])) die('Permission denied');
         $data = DB::table('barcode_vendor_info');
         $search = isset($_POST['search']) ? $_POST['search'] : '';
         $search = $this->getSearchData(explode('&', $search));
@@ -1079,6 +1089,7 @@ class BarcodeController extends Controller
 
     public function modifyOperator(Request $request)
     {
+        if (!Auth::user()->can(['barcode-show-change-employee'])) die('Permission denied');
         $newOperatorId = intval($request->input('newOperatorId'));
         $vendorIdRows = $request->input('vendorIdRows');
 //        var_dump($vendorIdRows); exit;
