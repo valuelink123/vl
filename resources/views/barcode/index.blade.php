@@ -47,16 +47,17 @@
                                 @if($canChangeOperator)
                                 <button id="changeOperator" class="barcode-btn">变更采购员
                                 </button>
-                                @else
-                                @endif
                                 <button id="addNewVendor" class="barcode-btn">新增供应商
                                 </button>
+                                @endif
 {{--                                <button id="makeTokenBarcode" class="barcode-btn">条码演示--}}
 {{--                                </button>--}}
+                                @if($isPurchaseEmployee || $canChangeOperator)
                                 <button id="generateBarcode" class="barcode-btn">生成条码
                                 </button>
                                 <button id="printBarcode" class="barcode-btn">打印条码
                                 </button>
+                                @endif
                                 <input type="text" name="vendorText" id="vendorText"
                                        style="width: 240px; height: 29px; border: 1px solid #dddddd;"
                                        placeholder="输入供应商名称或代码(VOP,SAP均可)"/>

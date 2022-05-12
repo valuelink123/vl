@@ -32,7 +32,16 @@ class BarcodeController extends Controller
             $canChangeOperator = true;
         }
 
-        return view('barcode/index', compact('canChangeOperator'));
+        $isPurchaseEmployee=false;
+        if(!$canChangeOperator){
+            $userCount = (DB::select("SELECT FOUND_ROWS() as count FROM role_user,roles WHERE role_user.role_id=roles.id AND roles.name='Purchase Employee' AND role_user.user_id=".$userId));
+            if($userCount && $userCount[0]->count>0) {
+                $isPurchaseEmployee = true;
+            }
+        }
+
+
+        return view('barcode/index', compact('canChangeOperator','isPurchaseEmployee'));
     }
 
     public function getVendorList()
@@ -46,7 +55,10 @@ class BarcodeController extends Controller
 
         $data = DB::table('barcode_vendor_info');
         if(!$canChangeOperator){
-            $data = DB::table('barcode_vendor_info')->where('operator_id', $userId);
+            $userCount = (DB::select("SELECT FOUND_ROWS() as count FROM role_user,roles WHERE role_user.role_id=roles.id AND roles.name='Purchase Employee' AND role_user.user_id=".$userId));
+            if($userCount && $userCount[0]->count>0) {
+                $data = DB::table('barcode_vendor_info')->where('operator_id', $userId);
+            }
         }
         $search = isset($_POST['search']) ? $_POST['search'] : '';
         $search = $this->getSearchData(explode('&', $search));
