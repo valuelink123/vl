@@ -297,7 +297,7 @@ class BarcodeController extends Controller
 
     public function printBarcode(Request $request)
     {
-        if (!Auth::user()->can(['barcode-show-genBarcode'])) die('Permission denied');
+        if (!Auth::user()->can(['barcode-show-printBarcode'])) die('Permission denied');
         return view('barcode/printBarcode');
     }
 
