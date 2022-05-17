@@ -371,20 +371,43 @@ class BarcodeController extends Controller
     {
         $p = $req->input('p');
         $token=$req->input('token');
-        if($p && $p!='' &$token &token !='') {
-            if (!Auth::user()->can(['barcode-show-po-list'])) die('Permission denied');
-        }
+//        if($p && $p!='' &$token &token !='') {
+//            if (!Auth::user()->can(['barcode-show-po-list'])) die('Permission denied');
+//        }
+
+        if (!Auth::user()->can(['barcode-show-po-list']) || (!$p & !$token)) die('Permission denied');
+
         $userId = Auth::user()->id;
         $vendorCode = $req->input('vendorCode');
 
-        $vendor = DB::table('barcode_vendor_info')->where('vendor_code', $vendorCode)->first();
-        if (!$vendor) {
-            $vendor = DB::table('barcode_vendor_info')->where('url_param', $p)->where('token',$token)->first();
-            if(!$vendor){
-                die('没有选择供应商或者没有密钥');
-            }
+        $vendor0 = DB::table('barcode_vendor_info')->where('vendor_code', $vendorCode)->first();
+        $vendor1 = DB::table('barcode_vendor_info')->where('url_param', $p)->where('token',$token)->first();
 
+        if(!$vendor0){
+            $vendor = $vendor0;
         }
+
+        if(!$vendor1){
+            $vendor = $vendor1;
+        }
+//        if (!$vendor) {
+//            $vendor = DB::table('barcode_vendor_info')->where('url_param', $p)->where('token',$token)->first();
+//            if(!$vendor){
+//                die('没有选择供应商或者没有密钥');
+//            }
+//
+//        }
+
+        if(!$vendor){
+            if($p && $token) {
+                die('请确认密钥');
+            }else{
+                die('请选择供应商');
+            }
+        }
+
+
+
         $vendor = json_decode(json_encode($vendor), true);
         $vendorCode = $vendor['vendor_code'];
         $vendorCodeFromSAP = $vendor['vendor_code_from_sap'];
@@ -394,7 +417,7 @@ class BarcodeController extends Controller
 
         $scanDetachUrl = url('https://www.baidu.com/s?wd=' . $url_param);
         $updateTokenUrl = url('https://www.baidu.com/s?wd=' . $url_param);
-        if (Auth::user()->can(['barcode-show-vendor-info'])) {
+        if (Auth::user()->can(['barcode-show-vendor-info']) || ($p & $token )) {
             $token = $vendor['token'];
             $url_param = $vendor['url_param'];
             $scanDetachUrl = url('/barcode/scanDetach?p=' . $url_param);
