@@ -375,7 +375,7 @@ class BarcodeController extends Controller
 //            if (!Auth::user()->can(['barcode-show-po-list'])) die('Permission denied');
 //        }
 
-//        if (!Auth::user()->can(['barcode-show-po-list']) || (!$p & !$token)) die('Permission denied');
+        if (!Auth::user()->can(['barcode-show-po-list']) || (!$p )) die('Permission denied');
 
         $userId = Auth::user()->id;
         $vendorCode = $req->input('vendorCode');
