@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Picqer\Barcode\BarcodeGeneratorPNG;
 use DB;
 
 class BarcodeController extends Controller
@@ -317,7 +318,7 @@ class BarcodeController extends Controller
         $vendorCode = $bt['vendor_code'];
         $bt = DB::table('barcode_scan_record')->where('vendor_code', $vendorCode)->where('purchase_order', $purchaseOrder)->orderBy('id', 'asc')->pluck('barcode_text');
         $bt = json_decode(json_encode($bt), true);
-        $generator = new \Picqer\Barcode\BarcodeGeneratorPNG();
+        $generator = new BarcodeGeneratorPNG();
         if ($barcodeSizeType == 1) {
             $btChunk = array_chunk($bt, 5); //每行打印的条码个数
             $html = '<html><style type="text/css">.border{float:left;margin-left:9.45px;margin-right:9.45px;margin-top:9.64px;margin-bottom:9.64px;border:1px solid #000;padding-left:7.53px;padding-right:7.53px;padding-top:5.55px;padding-bottom:5.55px;} .bTextDiv{text-align: center;width:102px; height:11px;} div span{font-size:10px;margin-left:-2px;-webkit-transform:scale(0.8);display:block;}</style><body style="margin-top:0px; margin-left:10px;font-family: arial;">';
@@ -328,7 +329,7 @@ class BarcodeController extends Controller
                 $row++;
                 $html = '<div>';
                 foreach ($chunk as $barcodeText) {
-                    $barcode = $generator->getBarcode($barcodeText, $generator::TYPE_CODE_93, 1, 20, array(0, 0, 0));
+                    $barcode = $generator->getBarcode($barcodeText, $generator::TYPE_CODE_93, 5, 20, array(0, 0, 0));
                     $barcode = base64_encode($barcode);
                     $html .= '<div class="border">
                                   <div>
@@ -368,13 +369,17 @@ class BarcodeController extends Controller
 
     public function purchaseOrderList(Request $req)
     {
-        if (!Auth::user()->can(['barcode-show-po-list'])) die('Permission denied');
+        $p = $req->input('p');
+        $token=$req->input('token');
+        if($p && $p!='' &$token &token !='') {
+            if (!Auth::user()->can(['barcode-show-po-list'])) die('Permission denied');
+        }
         $userId = Auth::user()->id;
         $vendorCode = $req->input('vendorCode');
-        $p = $req->input('p');
+
         $vendor = DB::table('barcode_vendor_info')->where('vendor_code', $vendorCode)->first();
         if (!$vendor) {
-            $vendor = DB::table('barcode_vendor_info')->where('url_param', $p)->first();
+            $vendor = DB::table('barcode_vendor_info')->where('url_param', $p)->where('token',$token)->first();
             if(!$vendor){
                 die('没有选择供应商或者没有密钥');
             }
@@ -396,9 +401,6 @@ class BarcodeController extends Controller
             $updateTokenUrl = url('/barcode/businessLogin?p=' . $url_param);
 
         }
-
-
-
 
         return view('barcode/purchaseOrderList', compact('vendorCode', 'token', 'url_param', 'vendorCodeFromSAP', 'scanDetachUrl', 'updateTokenUrl', 'p'));
     }
