@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use DB;
 use Illuminate\Support\Facades\Cache;
+use Picqer\Barcode\BarcodeGeneratorPNG;
 use qrcode\QRcode;
 
 class BarcodeScanController extends Controller
@@ -308,8 +309,8 @@ class BarcodeScanController extends Controller
 
         $newToken = md5($token);
         //一维码
-        $generator = new \Picqer\Barcode\BarcodeGeneratorPNG();
-        $tokenBarcode = $generator->getBarcode($newToken, $generator::TYPE_CODE_93, 1, 20);
+        $generator = new BarcodeGeneratorPNG();
+        $tokenBarcode = $generator->getBarcode($newToken, $generator::TYPE_CODE_93, 5, 20,array(0, 0, 0));
         $tokenBarcode = base64_encode($tokenBarcode);
         $tokenBarcode = '<img src="data:image/png;base64,' . $tokenBarcode . '"/>';
         //二维码
