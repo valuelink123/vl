@@ -400,7 +400,7 @@ class BarcodeController extends Controller
 //        }
 
         if(!$vendor){
-            if($p) {
+            if($p && !$vendorCode) {
                 die('请确认密钥');
             }else{
                 die('请选择供应商');
