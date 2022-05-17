@@ -371,14 +371,16 @@ class BarcodeController extends Controller
     {
         $p = $req->input('p');
         $token=$req->input('token');
+        $vendorCode = $req->input('vendorCode');
 //        if($p && $p!='' &$token &token !='') {
 //            if (!Auth::user()->can(['barcode-show-po-list'])) die('Permission denied');
 //        }
 
-        if (!Auth::user()->can(['barcode-show-po-list']) || (!$p )) die('Permission denied');
-
+        if(!$p && $vendorCode) {
+            if (!Auth::user()->can(['barcode-show-po-list'])) die('Permission denied');
+        }
         $userId = Auth::user()->id;
-        $vendorCode = $req->input('vendorCode');
+
 
         $vendor0 = DB::table('barcode_vendor_info')->where('vendor_code', $vendorCode)->first();
 //        $vendor1 = DB::table('barcode_vendor_info')->where('url_param', $p)->where('token',$token)->first();
