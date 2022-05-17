@@ -386,11 +386,11 @@ class BarcodeController extends Controller
 //        $vendor1 = DB::table('barcode_vendor_info')->where('url_param', $p)->where('token',$token)->first();
         $vendor1 = DB::table('barcode_vendor_info')->where('url_param', $p)->first();
 
-        if(!$vendor0){
+        if($vendor0){
             $vendor = $vendor0;
         }
 
-        if(!$vendor1){
+        if($vendor1){
             $vendor = $vendor1;
         }
 //        if (!$vendor) {
