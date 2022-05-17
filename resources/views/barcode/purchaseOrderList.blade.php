@@ -49,7 +49,7 @@
                 <div>供应商代码(SAP)：{{$vendorCodeFromSAP}}</div>
                 <div>密钥：{{$token}}</div>
                 <div>扫描&解绑URL：{{$scanDetachUrl}}</div>
-                <div>企业登陆：{{$updateTokenUrl}}</div>
+                <div>企业登录：{{$updateTokenUrl}}</div>
                 <div style="height: 20px"></div>
                 <form id="search-form">
                     <input type="hidden" name='vendorCode' id="vendorCode" value="{{$vendorCode}}"/>

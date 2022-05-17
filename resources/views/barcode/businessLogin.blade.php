@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <head>
-    <title>企业登陆</title>
+    <title>企业登录</title>
     <script src="/assets/global/plugins/jquery.min.js" type="text/javascript"></script>
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
@@ -19,7 +19,7 @@
 </head>
 <body>
 <div align="center">
-    <label align="center" style="font-size: 32px">企业登陆</label>
+    <label align="center" style="font-size: 32px">企业登录</label>
 </div>
 <div style="height: 15px;"></div>
 <div align="center">
