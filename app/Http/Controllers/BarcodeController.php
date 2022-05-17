@@ -392,9 +392,7 @@ class BarcodeController extends Controller
             $vendor1 = json_decode(json_encode($vendor1), true);
         }
 
-        if($vendor0){
-            $vendor = $vendor0;
-        }
+        $vendor=$vendor0;
 
         if($vendor1){
             $vendor = $vendor1;
