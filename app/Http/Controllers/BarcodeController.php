@@ -419,17 +419,24 @@ class BarcodeController extends Controller
         $vendorCode = $vendor['vendor_code'];
         $vendorCodeFromSAP = $vendor['vendor_code_from_sap'];
 
-        $token = '*********************************';
-        $url_param = '************************';
 
+        $url_param = '************************';
         $scanDetachUrl = url('https://www.baidu.com/s?wd=' . $url_param);
         $updateTokenUrl = url('https://www.baidu.com/s?wd=' . $url_param);
-        if (Auth::user()->can(['barcode-show-vendor-info']) || ($p)) {
+        if ($p && $token) {
             $token = $vendor['token'];
             $url_param = $vendor['url_param'];
             $scanDetachUrl = url('/barcode/scanDetach?p=' . $url_param);
             $updateTokenUrl = url('/barcode/businessLogin?p=' . $url_param);
 
+        }else{
+            $token = '*********************************';
+            if(Auth::user()->can(['barcode-show-vendor-info'])){
+                $token = $vendor['token'];
+                $url_param = $vendor['url_param'];
+                $scanDetachUrl = url('/barcode/scanDetach?p=' . $url_param);
+                $updateTokenUrl = url('/barcode/businessLogin?p=' . $url_param);
+            }
         }
 
         return view('barcode/purchaseOrderList', compact('vendorCode', 'token', 'url_param', 'vendorCodeFromSAP', 'scanDetachUrl', 'updateTokenUrl', 'p'));
