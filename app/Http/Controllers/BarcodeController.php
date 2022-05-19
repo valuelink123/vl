@@ -499,7 +499,7 @@ class BarcodeController extends Controller
             $lists[$key]['total_barcodes'] = $list['total_barcodes'];
             $lists[$key]['actual_needed_barcodes'] = $list['total_barcodes'] - intval($list['total_barcodes'] / 11);
             $lists[$key]['activated_barcodes'] = $list['activated_barcodes'];
-            $lists[$key]['details'] = '<a href = "/barcode/purchaseOrderDetails?vendorCode=' . $list['vendor_code'] . '&purchaseOrder=' . $list['purchase_order'] . '&p=' . $search['p'] . '" target = "_blank">详情</a > ';
+            $lists[$key]['details'] = '<a href = "/barcode/purchaseOrderDetails?vendorCode=' . $list['vendor_code'] . '&purchaseOrder=' . $list['purchase_order'] . '&p=' . $search['p'] . '&p=' . $search['token'] .'" target = "_blank">详情</a > ';
         }
         $recordsTotal = $iTotalRecords;
         $recordsFiltered = $iTotalRecords;
@@ -565,10 +565,14 @@ class BarcodeController extends Controller
 
     public function purchaseOrderDetails(Request $req)
     {
-        if (!Auth::user()->can(['barcode-show-po-detail'])) die('Permission denied');
+
         $vendorCode = $req->input('vendorCode');
         $purchaseOrder = $req->input('purchaseOrder');
         $p = $req->input('p');
+        $token = $req->input('token');
+        if(!$p && !$token) {
+            if (!Auth::user()->can(['barcode-show-po-detail'])) die('Permission denied');
+        }
         if (!$vendorCode) {
             die('没有选择供应商');
         }
