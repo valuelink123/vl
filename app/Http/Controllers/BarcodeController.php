@@ -20,7 +20,7 @@ class BarcodeController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth');
+//        $this->middleware('auth');
         parent::__construct();
     }
 
@@ -376,10 +376,10 @@ class BarcodeController extends Controller
 //            if (!Auth::user()->can(['barcode-show-po-list'])) die('Permission denied');
 //        }
 
-        if(!$p && $vendorCode) {
+        if((!$p || !$token ) && $vendorCode) {
             if (!Auth::user()->can(['barcode-show-po-list'])) die('Permission denied');
         }
-        $userId = Auth::user()->id;
+//        $userId = Auth::user()->id;
 
 
         $vendor0 = DB::table('barcode_vendor_info')->where('vendor_code', $vendorCode)->first();
@@ -387,7 +387,7 @@ class BarcodeController extends Controller
             $vendor0 = json_decode(json_encode($vendor0), true);
         }
 //        $vendor1 = DB::table('barcode_vendor_info')->where('url_param', $p)->where('token',$token)->first();
-        $vendor1 = DB::table('barcode_vendor_info')->where('url_param', $p)->first();
+        $vendor1 = DB::table('barcode_vendor_info')->where('url_param', $p)->where('token',$token)->first();
         if($vendor1){
             $vendor1 = json_decode(json_encode($vendor1), true);
         }
@@ -405,7 +405,7 @@ class BarcodeController extends Controller
 //
 //        }
 
-        if($vendor){
+        if(!$vendor){
             if($p && !$vendorCode) {
                 die('请确认密钥');
             }else{
