@@ -21,6 +21,7 @@ class BarcodeScanController extends Controller
     {
         $urlParam = $request->input("p");
         $vendor = DB::table('barcode_vendor_info')->where('url_param', $urlParam)->first();
+        $vendor = json_decode(json_encode($vendor), true);
         $urlParam='';
         $token='';
         if($vendor){

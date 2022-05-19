@@ -23,28 +23,31 @@
 </div>
 <div style="height: 15px;"></div>
 <div align="center">
-<!--    <input type="hidden" id="urlParam" value="{{$urlParam}}"/>-->
+    <input type="hidden" id="urlParam" value="{{$urlParam}}"/>
+    <input type="hidden" id="token" value="{{$token}}"/>
     <button type="button" id="detailBtn" class="common-btn" style="margin-right: 15px">数据库</button>
     <button type="button" id="updateTokenBtn" class="common-btn" style="width: 120px">更改密钥</button>
 </div>
 <script type="text/javascript">
     $('#detailBtn').click(function () {
-        // $urlParam = $('#urlParam').val().trim();
+        let urlParam = $('#urlParam').val().trim();
+        let token = $('#token').val().trim();
         if ($urlParam == '') {
             alert('网址参数为空');
             return false;
         }
         // $p = $('#urlParam').val();
-        window.location.href='/barcode/purchaseOrderList?p=' + $urlParam + '&token='+ $token;
+        window.location.href='/barcode/purchaseOrderList?p=' + urlParam + '&token='+ token;
     });
     $('#updateTokenBtn').click(function () {
-        // $urlParam = $('#urlParam').val().trim();
+        let urlParam = $('#urlParam').val().trim();
+        let token = $('#token').val().trim();
         if ($urlParam == '') {
             alert('网址参数为空');
             return false;
         }
         // $p = $('#urlParam').val();
-        window.location.href='/barcode/updateToken?p=' + $urlParam + '&token='+ $token;
+        window.location.href='/barcode/updateToken?p=' + urlParam + '&token='+ token;
     });
 </script>
 </body>

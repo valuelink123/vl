@@ -387,7 +387,8 @@ class BarcodeController extends Controller
             $vendor0 = json_decode(json_encode($vendor0), true);
         }
 //        $vendor1 = DB::table('barcode_vendor_info')->where('url_param', $p)->where('token',$token)->first();
-        $vendor1 = DB::table('barcode_vendor_info')->where('url_param', $p)->where('token',$token)->first();
+        $vendor1 = DB::table('barcode_vendor_info')->where('url_param',
+        )->where('token',$token)->first();
         if($vendor1){
             $vendor1 = json_decode(json_encode($vendor1), true);
         }
