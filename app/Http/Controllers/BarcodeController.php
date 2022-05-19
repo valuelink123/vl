@@ -444,14 +444,24 @@ class BarcodeController extends Controller
 
     public function getPurchaseOrderList(Request $request)
     {
-        if (!Auth::user()->can(['barcode-show-po-list'])) die('Permission denied');
         $search = isset($_POST['search']) ? $_POST['search'] : '';
         $search = $this->getSearchData(explode('&', $search));
-
-        if (!(isset($search['vendorCode']) && $search['vendorCode'])) {
-            die('没有选择供应商');
-        }
         $vendorCode = $search['vendorCode'];
+        $p = $search['p'];
+        $token = $search['token'];
+        if(!$p && !$token){
+            if (!Auth::user()->can(['barcode-show-po-list'])) die('Permission denied');
+            if (!(isset($search['vendorCode']) && $search['vendorCode'])) {
+                die('没有选择供应商');
+            }
+        }else{
+            $vendor = DB::table('barcode_vendor_info')->where('url_param', $p)->where('token',$token)->first();
+            $vendor = json_decode(json_encode($vendor), true);
+            if($vendor){
+                $vendorCode=$vendor['vendorCode'];
+            }
+        }
+
         $data = DB::table('barcode_scan_record')->where('vendor_code', $vendorCode);
         if (isset($search['po']) && $search['po']) {
             $po = $search['po'];
