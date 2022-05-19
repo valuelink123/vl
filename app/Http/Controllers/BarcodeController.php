@@ -458,7 +458,7 @@ class BarcodeController extends Controller
             $vendor = DB::table('barcode_vendor_info')->where('url_param', $p)->where('token',$token)->first();
             $vendor = json_decode(json_encode($vendor), true);
             if($vendor){
-                $vendorCode=$vendor['vendorCode'];
+                $vendorCode=$vendor['vendor_code'];
             }
         }
 
