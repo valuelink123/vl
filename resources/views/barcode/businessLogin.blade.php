@@ -23,8 +23,6 @@
 </div>
 <div style="height: 15px;"></div>
 <div align="center">
-    <input type="hidden" id="urlParam" value="{{$urlParam}}"/>
-    <input type="hidden" id="token" value="{{$token}}"/>
     <button type="button" id="detailBtn" class="common-btn" style="margin-right: 15px">数据库</button>
     <button type="button" id="updateTokenBtn" class="common-btn" style="width: 120px">更改密钥</button>
 </div>
