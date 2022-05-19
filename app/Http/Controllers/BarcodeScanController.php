@@ -20,7 +20,14 @@ class BarcodeScanController extends Controller
     public function businessLogin(Request $request)
     {
         $urlParam = $request->input("p");
-        return view('barcode/businessLogin', ['urlParam' => $urlParam]);
+        $vendor = DB::table('barcode_vendor_info')->where('url_param', $urlParam)->first();
+        $urlParam='';
+        $token='';
+        if($vendor){
+            $urlParam=$vendor['vendor_code'];
+            $token = $vendor['token'];
+        }
+        return view('barcode/businessLogin', ['urlParam' => $urlParam,'token'=> $token]);
     }
 
     public function scanDetach(Request $request)
