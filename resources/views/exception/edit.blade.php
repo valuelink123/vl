@@ -316,7 +316,7 @@ if($exception['user_id'] == Auth::user()->id && ($exception['process_status'] ==
 				</div>
 				@if($exception['file_url'])
 					<div class="col-md-9"  style="margin-top:26px;">
-						<a href="{{array_get($exception,'file_url')}}" target="_blank">{{basename(array_get($exception,'file_url'))}}</a>
+						<a href="{{((array_get($exception,'service_system_id')>0)?'http://www.onecustomerme.com':'').array_get($exception,'file_url')}}" target="_blank">{{basename(array_get($exception,'file_url'))}}</a>
 						{{--					<a href="/exception/download?url={{$exception['file_url']}}" >download file--}}
 						</a>
 					</div>
