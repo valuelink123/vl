@@ -30,24 +30,10 @@
 </div>
 <script type="text/javascript">
     $('#detailBtn').click(function () {
-        let urlParam = $('#urlParam').val().trim();
-        let token = $('#token').val().trim();
-        if ($urlParam == '') {
-            alert('网址参数为空');
-            return false;
-        }
-        // $p = $('#urlParam').val();
-        window.location.href='/barcode/purchaseOrderList?p=' + urlParam + '&token='+ token;
+        window.location.href="/barcode/purchaseOrderList?p={{$urlParam}}&token={{$token}}";
     });
     $('#updateTokenBtn').click(function () {
-        let urlParam = $('#urlParam').val().trim();
-        let token = $('#token').val().trim();
-        if ($urlParam == '') {
-            alert('网址参数为空');
-            return false;
-        }
-        // $p = $('#urlParam').val();
-        window.location.href='/barcode/updateToken?p=' + urlParam + '&token='+ token;
+        window.location.href="/barcode/updateToken?p={{$urlParam}}";
     });
 </script>
 </body>
