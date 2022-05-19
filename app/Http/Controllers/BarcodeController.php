@@ -592,9 +592,13 @@ class BarcodeController extends Controller
 
     public function getPurchaseOrderDetails(Request $request)
     {
-        if (!Auth::user()->can(['barcode-show-po-detail'])) die('Permission denied');
         $search = isset($_POST['search']) ? $_POST['search'] : '';
         $search = $this->getSearchData(explode('&', $search));
+        $p=$search['p'];
+        $token=$search['token'];
+        if(!$p && !$token) {
+            if (!Auth::user()->can(['barcode-show-po-detail'])) die('Permission denied');
+        }
         if (!(isset($search['vendorCode']) && $search['vendorCode'])) {
             die('没有选择供应商');
         }
