@@ -73,6 +73,8 @@
                     <input type="hidden" name='vendorCode' id='vendorCode' value="{{$vendorCode}}"/>
                     <input type="hidden" name='purchaseOrder' id='purchaseOrder' value="{{$purchaseOrder}}"/>
                     <input type="hidden" name='skuHidden' id="skuHidden" value=""/>
+                    <input type="hidden" name='p' id="skuHidden" value="{{$p}}"/>
+                    <input type="hidden" name='token' id="skuHidden" value="{{$token}}"/>
                     <div class="table-toolbar" id="thetabletoolbar">
                         <div class="input-group pull-left">
                             <input type="text" name="sku" id="sku"
