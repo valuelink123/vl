@@ -27,7 +27,7 @@ class BarcodeScanController extends Controller
             $urlParam=$vendor['vendor_code'];
             $token = $vendor['token'];
         }
-        return view('barcode/businessLogin', ['urlParam' => $urlParam,'token'=> $token]);
+        return view('barcode/businessLogin', compact($urlParam,$token));
     }
 
     public function scanDetach(Request $request)
