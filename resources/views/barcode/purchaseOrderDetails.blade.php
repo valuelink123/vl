@@ -50,8 +50,7 @@
 
             <div class="portlet-title">
                 <label>供应商代码：{{$vendorCode}}</label>
-                <div style="height: 5px;"/>
-                <label>采购订单号：{{$purchaseOrder}}</label>
+                <div style="height: 5px;"/><label>采购订单号：{{$purchaseOrder}}</label>
                 <div style="clear:both;"></div>
                 <div style="float:left; width:180px">
                     <div class="input-group date date-picker pull-left" data-date-format="yyyy-mm-dd">
