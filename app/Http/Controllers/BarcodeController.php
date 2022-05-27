@@ -371,51 +371,46 @@ class BarcodeController extends Controller
     {
         $p = $req->input('p');
         $token=$req->input('token');
-        $vendorCode = $req->input('vendorCode');
-//        if($p && $p!='' &$token &token !='') {
-//            if (!Auth::user()->can(['barcode-show-po-list'])) die('Permission denied');
-//        }
+        $sign = $req->input('sign');
 
-        if((!$p && !$token ) && $vendorCode) {
-            if (!Auth::user()->can(['barcode-show-po-list'])) die('Permission denied');
-        }
-//        $userId = Auth::user()->id;
-
-
-        $vendor0 = DB::table('barcode_vendor_info')->where('vendor_code', $vendorCode)->first();
-        if($vendor0) {
-            $vendor0 = json_decode(json_encode($vendor0), true);
-        }
-//        $vendor1 = DB::table('barcode_vendor_info')->where('url_param', $p)->where('token',$token)->first();
-        $vendor1 = DB::table('barcode_vendor_info')->where('url_param', $p)->where('token',$token)->first();
-        if($vendor1){
-            $vendor1 = json_decode(json_encode($vendor1), true);
-        }
-
-        $vendor=$vendor0;
-
-        if($vendor1){
-            $vendor = $vendor1;
-        }
-//        if (!$vendor) {
-//            $vendor = DB::table('barcode_vendor_info')->where('url_param', $p)->where('token',$token)->first();
-//            if(!$vendor){
-//                die('没有选择供应商或者没有密钥');
-//            }
-//
-//        }
-
-        if(!$vendor){
-            if($p && !$vendorCode) {
+        if($sign){
+            if(!$p || !$token){
                 die('请确认密钥');
-            }else{
-                die('请选择供应商');
+            }
+            $__sign=md5($p.$token.'vlerp');
+            if($sign!=$__sign){
+                die('请确认密钥');
             }
         }
 
 
 
-//        $vendor = json_decode(json_encode($vendor), true);
+        $vendorCode = $req->input('vendorCode');
+//        if($p && $p!='' &$token &token !='') {
+//            if (!Auth::user()->can(['barcode-show-po-list'])) die('Permission denied');
+//        }
+
+        if(!$sign) {
+            if (!Auth::user()->can(['barcode-show-po-list'])) die('Permission denied');
+        }
+//        $userId = Auth::user()->id;
+
+
+        if(!$sign){
+            $vendor = DB::table('barcode_vendor_info')->where('vendor_code', $vendorCode)->first();
+            $vendor = json_decode(json_encode($vendor), true);
+            if(!$vendor){
+                die('请选择供应商');
+            }
+        }else{
+            $vendor = DB::table('barcode_vendor_info')->where('url_param', $p)->where('token',$token)->first();
+            $vendor = json_decode(json_encode($vendor), true);
+            if(!$vendor){
+                die('请确认密钥');
+            }
+        }
+
+
         $vendorCode = $vendor['vendor_code'];
         $vendorCodeFromSAP = $vendor['vendor_code_from_sap'];
 
@@ -423,23 +418,25 @@ class BarcodeController extends Controller
         $url_param = '************************';
         $scanDetachUrl = url('https://www.baidu.com/s?wd=' . $url_param);
         $updateTokenUrl = url('https://www.baidu.com/s?wd=' . $url_param);
-        if ($p && $token) {
+        if ($sign) {
             $token = $vendor['token'];
             $url_param = $vendor['url_param'];
-            $scanDetachUrl = url('/barcode/scanDetach?p=' . $url_param);
-            $updateTokenUrl = url('/barcode/businessLogin?p=' . $url_param);
+            $scanDetachUrl = url('/barcode/scanDetach?p=' . $url_param.'&sign='.$sign);
+            $updateTokenUrl = url('/barcode/businessLogin?p=' . $url_param.'&sign='.$sign);
 
         }else{
             $token = '*********************************';
+            $sign = '********************************';
             if(Auth::user()->can(['barcode-show-vendor-info'])){
                 $token = $vendor['token'];
                 $url_param = $vendor['url_param'];
-                $scanDetachUrl = url('/barcode/scanDetach?p=' . $url_param);
-                $updateTokenUrl = url('/barcode/businessLogin?p=' . $url_param);
+                $sign = md5($url_param.$token.'vlerp');
+                $scanDetachUrl = url('/barcode/scanDetach?p=' . $url_param.'&sign='.$sign);
+                $updateTokenUrl = url('/barcode/businessLogin?p=' . $url_param.'&sign='.$sign);
             }
         }
 
-        return view('barcode/purchaseOrderList', compact('vendorCode', 'token', 'url_param', 'vendorCodeFromSAP', 'scanDetachUrl', 'updateTokenUrl', 'p'));
+        return view('barcode/purchaseOrderList', compact('vendorCode', 'token', 'url_param', 'vendorCodeFromSAP', 'scanDetachUrl', 'updateTokenUrl', 'p','sign'));
     }
 
     public function getPurchaseOrderList(Request $request)
