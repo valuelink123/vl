@@ -20,6 +20,7 @@ class BarcodeScanController extends Controller
     public function businessLogin(Request $request)
     {
         $urlParam = $request->input("p");
+        $sign = $request->input("sign");
         $vendor = DB::table('barcode_vendor_info')->where('url_param', $urlParam)->first();
         $vendor = json_decode(json_encode($vendor), true);
         $urlParam='';
@@ -27,8 +28,12 @@ class BarcodeScanController extends Controller
         if($vendor){
             $urlParam=$vendor['url_param'];
             $token = $vendor['token'];
+            $__sign=md5($urlParam.$token.'vlerp');
+            if($sign!=$__sign){
+                die('请确认密钥');
+            }
         }
-        return view('barcode/businessLogin', compact('urlParam','token'));
+        return view('barcode/businessLogin', compact('urlParam','token','sign'));
     }
 
     public function scanDetach(Request $request)

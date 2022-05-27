@@ -28,10 +28,10 @@
 </div>
 <script type="text/javascript">
     $('#detailBtn').click(function () {
-        window.location.href="/barcode/purchaseOrderList?p={{$urlParam}}&token={{$token}}";
+        window.location.href="/barcode/purchaseOrderList?p={{$urlParam}}&token={{$token}}&sign={{$sign}}";
     });
     $('#updateTokenBtn').click(function () {
-        window.location.href="/barcode/updateToken?p={{$urlParam}}";
+        window.location.href="/barcode/updateToken?p={{$urlParam}}&sign={{$sign}}";
     });
 </script>
 </body>
