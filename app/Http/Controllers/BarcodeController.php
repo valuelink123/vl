@@ -381,20 +381,18 @@ class BarcodeController extends Controller
             if($sign!=$__sign){
                 die('请确认密钥');
             }
+        }else{
+            if (!Auth::user()->can(['barcode-show-po-list'])) die('Permission denied');
         }
 
 
 
         $vendorCode = $req->input('vendorCode');
-//        if($p && $p!='' &$token &token !='') {
-//            if (!Auth::user()->can(['barcode-show-po-list'])) die('Permission denied');
-//        }
+
 
         if(!$sign) {
             if (!Auth::user()->can(['barcode-show-po-list'])) die('Permission denied');
         }
-//        $userId = Auth::user()->id;
-
 
         if(!$sign){
             $vendor = DB::table('barcode_vendor_info')->where('vendor_code', $vendorCode)->first();
