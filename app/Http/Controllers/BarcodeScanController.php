@@ -28,12 +28,15 @@ class BarcodeScanController extends Controller
         if($vendor){
             $urlParam=$vendor['url_param'];
             $token = $vendor['token'];
-            $__sign=md5($urlParam.$token.'vlerp');
+            $__sign = md5($urlParam.$token.'vlerp');
             if($sign!=$__sign){
                 die('请确认密钥');
             }
+            return view('barcode/businessLogin', compact('urlParam','token','sign'));
+        }else{
+            die('请确认密钥');
         }
-        return view('barcode/businessLogin', compact('urlParam','token','sign'));
+
     }
 
     public function scanDetach(Request $request)
