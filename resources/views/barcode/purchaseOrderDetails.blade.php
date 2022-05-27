@@ -16,7 +16,6 @@
     <script src="/assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.js" type="text/javascript"></script>
     <script src="/assets/global/scripts/app.min.js" type="text/javascript"></script>
     <script src="/assets/global/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js" type="text/javascript"></script>
-{{--    <script src="/assets/global/plugins/bootstrap-timepicker/js/bootstrap-timepicker.min.js" type="text/javascript"></script>--}}
     <script src="/assets/global/plugins/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js" type="text/javascript"></script>
 
     <style>
@@ -51,7 +50,7 @@
 
             <div class="portlet-title">
                 <label>供应商代码：{{$vendorCode}}</label>
-                <div style="height: 5px;"></div>
+                <div style="height: 5px;"/>
                 <label>采购订单号：{{$purchaseOrder}}</label>
                 <div style="clear:both;"></div>
                 <div style="float:left; width:180px">
