@@ -565,12 +565,29 @@ class BarcodeController extends Controller
         $purchaseOrder = $req->input('purchaseOrder');
         $p = $req->input('p');
         $token = $req->input('token');
-        if(!$p && !$token) {
+        $sign = $req->input('sign');
+
+        if($sign){
+            if(!$p || !$token){
+                die('请确认密钥');
+            }
+            $__sign=md5($p.$token.'vlerp');
+            if($sign!=$__sign){
+                die('请确认密钥');
+            }
+            $vendor = DB::table('barcode_vendor_info')->where('url_param', $p)->where('token',$token)->first();
+            $vendor = json_decode(json_encode($vendor), true);
+            if(!$vendor){
+                die('请确认密钥');
+            }else{
+                $vendorCode=$vendor['vendor_code'];
+            }
+
+        }else{
             if (!Auth::user()->can(['barcode-show-po-detail'])) die('Permission denied');
         }
-        if (!$vendorCode) {
-            die('没有选择供应商');
-        }
+
+
         if (!$purchaseOrder) {
             die('没有选择采购订单号');
         }
@@ -578,7 +595,7 @@ class BarcodeController extends Controller
         $dateOption = date("Y-m-d");
         $activatedCount = DB::table('barcode_scan_record')->where('vendor_code', $vendorCode)->where('purchase_order', $purchaseOrder)->where('current_status', 1)->whereRaw("SUBSTR(`status_updated_at`,1,10)='$dateOption'")->count();
 
-        if($p){
+        if($sign){
             return view('barcode/vendorDetails', compact('vendorCode', 'dateOption', 'activatedCount'));
         }
         return view('barcode/purchaseOrderDetails', compact('vendorCode', 'dateOption', 'activatedCount', 'purchaseOrder'));
