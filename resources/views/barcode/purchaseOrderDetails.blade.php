@@ -195,12 +195,8 @@
     let dtApi = $theTable.api();
     //点击提交按钮重新绘制表格，并将输入框中的值赋予检索框
     $('#search').click(function () {
-        let sku = $('#sku').val();
-        $('#skuHidden').val(sku.trim());
-        if(sku.trim()==''){
-            $('#msgDiv').text('请输入SKU');
-            return false;
-        }
+        let sku = $('#sku').val().trim();
+        $('#skuHidden').val(sku);
         //显示指定SKU总数和激活的数量
         $.ajax({
             type: 'post',
