@@ -585,6 +585,10 @@ class BarcodeController extends Controller
         $token = $req->input('token');
         $sign = $req->input('sign');
 
+        if (!$purchaseOrder) {
+            die('没有选择采购订单号');
+        }
+
         if($sign){
             if(!$p || !$token){
                 die('请确认密钥');
@@ -606,18 +610,19 @@ class BarcodeController extends Controller
         }
 
 
-        if (!$purchaseOrder) {
-            die('没有选择采购订单号');
-        }
+
 
         $dateOption = date("Y-m-d");
+
+        $activatedCount = 0;
+
         $activatedCount = DB::table('barcode_scan_record')->where('vendor_code', $vendorCode)->where('purchase_order', $purchaseOrder)->where('current_status', 1)->whereRaw("SUBSTR(`status_updated_at`,1,10)='$dateOption'")->count();
 
         if($sign){
             return view('barcode/vendorDetails', compact('vendorCode', 'dateOption', 'activatedCount'));
+        }else {
+            return view('barcode/purchaseOrderDetails', compact('vendorCode', 'dateOption', 'activatedCount', 'purchaseOrder'));
         }
-        return view('barcode/purchaseOrderDetails', compact('vendorCode', 'dateOption', 'activatedCount', 'purchaseOrder'));
-
     }
 
     public function getPurchaseOrderDetails(Request $request)

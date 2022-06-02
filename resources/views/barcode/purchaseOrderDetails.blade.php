@@ -8,15 +8,19 @@
           type="text/css"/>
     <link href="/assets/global/plugins/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
     <link href="/assets/global/css/components.css" rel="stylesheet" id="style_components" type="text/css"/>
-    <link href="/assets/global/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.min.css" rel="stylesheet" type="text/css"/>
+    <link href="/assets/global/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.min.css" rel="stylesheet"
+          type="text/css"/>
 
     <script src="/assets/global/plugins/jquery.min.js" type="text/javascript"></script>
     <script src="/assets/global/plugins/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
     <script src="/assets/global/plugins/datatables/datatables.min.js" type="text/javascript"></script>
-    <script src="/assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.js" type="text/javascript"></script>
+    <script src="/assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.js"
+            type="text/javascript"></script>
     <script src="/assets/global/scripts/app.min.js" type="text/javascript"></script>
-    <script src="/assets/global/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js" type="text/javascript"></script>
-    <script src="/assets/global/plugins/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js" type="text/javascript"></script>
+    <script src="/assets/global/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js"
+            type="text/javascript"></script>
+    <script src="/assets/global/plugins/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"
+            type="text/javascript"></script>
 
     <style>
         .search-btn {
@@ -50,7 +54,8 @@
 
             <div class="portlet-title">
                 <label>供应商代码：{{$vendorCode}}</label>
-                <div style="height: 5px;"/><label>采购订单号：{{$purchaseOrder}}</label>
+                <div style="height: 5px;"/>
+                <label>采购订单号：{{$purchaseOrder}}</label>
                 <div style="clear:both;"></div>
                 <div style="float:left; width:180px">
                     <div class="input-group date date-picker pull-left" data-date-format="yyyy-mm-dd">
@@ -59,21 +64,19 @@
                                 <i class="fa fa-calendar"></i>
                             </button>
                         </span>
-                        <input type="text" style="width:125px" class="form-control form-filter input-sm" readonly placeholder="选择日期" id="dateOption" name="dateOption" value="{{$dateOption}}"/>
+                        <input type="text" style="width:125px" class="form-control form-filter input-sm" readonly
+                               placeholder="选择日期" id="dateOption" name="dateOption" value="{{$dateOption}}"/>
                     </div>
                 </div>
                 <div style="height: 30px; padding-top: 6px;">当天激活的数量：<span style="color:#0000ff"
-                                                                           id="activatedCount">{{$activatedCount}}</span></div>
+                                                                           id="activatedCount">{{$activatedCount}}</span>
+                </div>
                 <div style="height: 5px;"></div>
                 <div style="clear:both"></div>
                 <form id="search-form">
-                    {{--                    {{ csrf_field() }}--}}
                     <input type="hidden" name='vendorCode' id='vendorCode' value="{{$vendorCode}}"/>
                     <input type="hidden" name='purchaseOrder' id='purchaseOrder' value="{{$purchaseOrder}}"/>
                     <input type="hidden" name='skuHidden' id="skuHidden" value=""/>
-<!--                    <input type="hidden" name='p' id="pHidden" value="{{$p}}"/>-->
-<!--                    <input type="hidden" name='token' id="tokenHidden" value="{{$token}}"/>-->
-<!--                    <input type="hidden" name='sign' id="signHidden" value="{{$sign}}"/>-->
                     <div class="table-toolbar" id="thetabletoolbar">
                         <div class="input-group pull-left">
                             <input type="text" name="sku" id="sku"
@@ -235,7 +238,7 @@
         });
     });
 
-    $('#dateOption').change(function(){
+    $('#dateOption').change(function () {
         $dateOption = $(this).val();
         $.ajax({
             type: 'post',
