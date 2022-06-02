@@ -666,7 +666,7 @@ class BarcodeController extends Controller
 
         $data = DB::table('barcode_scan_record')->where('vendor_code', $vendorCode)->where('purchase_order', $purchaseOrder);
 
-        if ($sku ) {
+        if ($sku) {
             $data = $data->where(function ($query) use ($sku) {
                 $query->where('sku', '=', $sku);
             });
@@ -674,18 +674,18 @@ class BarcodeController extends Controller
 
 
 
-        $orderby = 'status_updated_at';
-        $order_column = $request->input('order.0.column', '4');
-        if ($order_column == 0) {
-            $orderby = 'sku';
-        } else if ($order_column == 1) {
-            $orderby = 'sn';
-        } else if ($order_column == 2) {
-            $orderby = 'current_status';
-        } else if ($order_column == 4) {
-            $orderby = 'status_updated_at';
-        }
-        $sort = $request->input('order.0.dir', 'desc');
+//        $orderby = 'status_updated_at';
+//        $order_column = $request->input('order.0.column', '4');
+//        if ($order_column == 0) {
+//            $orderby = 'sku';
+//        } else if ($order_column == 1) {
+//            $orderby = 'sn';
+//        } else if ($order_column == 2) {
+//            $orderby = 'current_status';
+//        } else if ($order_column == 4) {
+//            $orderby = 'status_updated_at';
+//        }
+//        $sort = $request->input('order.0.dir', 'desc');
         $iTotalRecords = $data->get()->count();
 
 
