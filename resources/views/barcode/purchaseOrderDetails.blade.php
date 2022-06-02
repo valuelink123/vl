@@ -141,17 +141,10 @@
 </div>
 
 <script>
-    $("[id^='date']").each(function () {
-        let defaults = {
-            autoclose: true
-        }
-        let options = eval(`({${$(this).data('options')}})`)
-        $(this).datepicker(Object.assign(defaults, options))
-    });
+    let $theTable1 = $(thetable);
 
-    let $theTable = $(thetable);
     var initTable = function () {
-        $theTable.dataTable({
+        $theTable1.dataTable({
             searching: false,//关闭搜索
             serverSide: true,//启用服务端分页（这是使用Ajax服务端的必须配置）
             "lengthMenu": [
@@ -189,10 +182,19 @@
             }
         });
     }
-
-
     initTable();
-    let dtApi = $theTable.api();
+    let dtApi = $theTable1.api();
+
+    $("[id^='date']").each(function () {
+        let defaults = {
+            autoclose: true
+        }
+        let options = eval(`({${$(this).data('options')}})`)
+        $(this).datepicker(Object.assign(defaults, options))
+    });
+
+
+
     //点击提交按钮重新绘制表格，并将输入框中的值赋予检索框
     $('#search').click(function () {
         let sku = $('#sku').val().trim();
