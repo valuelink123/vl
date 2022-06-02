@@ -193,7 +193,7 @@
         });
     }
 
-    initTable();
+    // initTable();
     let dtApi = $theTable.api();
     //点击提交按钮重新绘制表格，并将输入框中的值赋予检索框
     $('#search').click(function () {

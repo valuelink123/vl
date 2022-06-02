@@ -581,6 +581,8 @@ class BarcodeController extends Controller
 
         $vendorCode = $req->input('vendorCode');
         $purchaseOrder = $req->input('purchaseOrder');
+
+
         $p = $req->input('p');
         $token = $req->input('token');
         $sign = $req->input('sign');
@@ -627,6 +629,8 @@ class BarcodeController extends Controller
 
     public function getPurchaseOrderDetails(Request $request)
     {
+
+
         $search = isset($_POST['search']) ? $_POST['search'] : '';
         $search = $this->getSearchData(explode('&', $search));
         $p=$search['p'];
@@ -689,7 +693,11 @@ class BarcodeController extends Controller
         $iDisplayLength = $iDisplayLength < 0 ? $iTotalRecords : $iDisplayLength;
         $iDisplayStart = intval($_REQUEST['start']);
         $lists = $data->orderBy($orderby, $sort)->offset($iDisplayStart)->limit($iDisplayLength)->get()->toArray();
+
+
         $lists = json_decode(json_encode($lists), true);
+
+
         $userIdNames = $this->getUserIdNames();
 
         foreach ($lists as $key => $list) {
