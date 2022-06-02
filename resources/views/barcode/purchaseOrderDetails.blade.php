@@ -196,8 +196,8 @@
     //点击提交按钮重新绘制表格，并将输入框中的值赋予检索框
     $('#search').click(function () {
         let sku = $('#sku').val();
-        $('#skuHidden').val(trim(sku));
-        if(trim(sku)==''){
+        $('#skuHidden').val(sku.trim());
+        if(sku.trim()==''){
             $('#msgDiv').text('请输入SKU');
             return false;
         }
