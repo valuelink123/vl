@@ -48,10 +48,9 @@
         <!-- BEGIN EXAMPLE TABLE PORTLET-->
         <div class="portlet light bordered">
             <div style="height: 15px;"></div>
-
             <div class="portlet-title">
                 <label>供应商代码：{{$vendorCode}}</label>
-                <div style="height: 5px;"></div>b
+                <div style="height: 5px;"></div>
                 <div style="clear:both;"></div>
                 <div style="float:left; width:180px">
                     <div class="input-group date date-picker pull-left" data-date-format="yyyy-mm-dd">
@@ -63,8 +62,7 @@
                         <input type="text" style="width:125px" class="form-control form-filter input-sm" readonly placeholder="选择日期" id="dateOption" name="dateOption" value="{{$dateOption}}"/>
                     </div>
                 </div>
-                <div style="height: 30px; padding-top: 6px;">激活的数量：<span style="color:#0000ff"
-                                                                           id="activatedCount">{{$activatedCount}}</span></div>
+                <div style="height: 30px; padding-top: 6px;">激活的数量：<span style="color:#0000ff" id="activatedCount">{{$activatedCount}}</span></div>
                 <div style="height: 5px;"></div>
                 <div style="clear:both"></div>
                 <form id="search-form">
@@ -75,18 +73,18 @@
                         <div class="input-group pull-left">
                             <input type="text" name="sku" id="sku"
                                    style="width: 300px; height: 29px; border: 1px solid #dddddd;" placeholder="输入SKU"/>
+                            <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
                             <button id="search" type="button" class="search-btn">搜索
+                            </button>
+                            <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                            <button type="button" class="common-btn" id="export-btn" style="width: 80px"><span><i
+                                            class="fa fa-sign-out"></i></span> 导出
                             </button>
                         </div>
                         <div class="pull-left"><span>&nbsp;&nbsp;&nbsp;&nbsp;</span></div>
                         <div id='msgDiv' style="margin-left:15px; padding-top: 6px; color:#0000ff"></div>
                         <div style="clear:both"></div>
                         <div style="height: 5px"></div>
-                        <div>
-                            <button type="button" class="common-btn" id="export-btn" style="width: 80px"><span><i
-                                            class="fa fa-sign-out"></i></span> 导出
-                            </button>
-                        </div>
                     </div>
 
                 </form>
