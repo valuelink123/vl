@@ -634,6 +634,7 @@ class BarcodeController extends Controller
         $sign=$search['sign'];
         $vendorCode=$search['vendorCode'];
         $purchaseOrder=$search['purchaseOrder'];
+        $sku=$search['sku'];
         if (!$purchaseOrder) {
             die('没有选择采购订单号');
         }
@@ -660,8 +661,8 @@ class BarcodeController extends Controller
         }
 
         $data = DB::table('barcode_scan_record')->where('vendor_code', $vendorCode)->where('purchase_order', $purchaseOrder);
-        if (isset($search['sku']) && $search['sku']) {
-            $sku = $search['sku'];
+
+        if ($sku ) {
             $data = $data->where(function ($query) use ($sku) {
                 $query->where('sku', '=', $sku);
             });
@@ -680,6 +681,8 @@ class BarcodeController extends Controller
         }
         $sort = $request->input('order.0.dir', 'desc');
         $iTotalRecords = $data->get()->count();
+
+
         $iDisplayLength = intval($_REQUEST['length']);
         $iDisplayLength = $iDisplayLength < 0 ? $iTotalRecords : $iDisplayLength;
         $iDisplayStart = intval($_REQUEST['start']);
