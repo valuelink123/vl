@@ -56,6 +56,7 @@
                     <input type="hidden" name='poHidden' id="poHidden" value=""/>
                     <input type="hidden" name='p' id="p" value="{{$p}}"/>
                     <input type="hidden" name='token' id="p" value="{{$token}}"/>
+                    <input type="hidden" name='sign' id="p" value="{{$sign}}"/>
                     <div class="table-toolbar" id="thetabletoolbar">
                         <div class="input-group">
                             <input type="text" name="po" id="po"

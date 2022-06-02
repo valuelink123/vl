@@ -431,10 +431,12 @@ class BarcodeController extends Controller
                 $sign = md5($url_param.$token.'vlerp');
                 $scanDetachUrl = url('/barcode/scanDetach?p=' . $url_param.'&sign='.$sign);
                 $updateTokenUrl = url('/barcode/businessLogin?p=' . $url_param.'&sign='.$sign);
+                $sign='';
             }
         }
 
         return view('barcode/purchaseOrderList', compact('vendorCode', 'token', 'url_param', 'vendorCodeFromSAP', 'scanDetachUrl', 'updateTokenUrl', 'p','sign'));
+
     }
 
     public function getPurchaseOrderList(Request $request)
