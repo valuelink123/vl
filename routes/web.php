@@ -752,3 +752,4 @@ Route::post('/ccp/adTotalSeller/list', 'CcpAdTotalController@adTotalSellerList')
 Route::get('/ccp/adTotalSeller/export', 'CcpAdTotalController@adTotalSellerExport'); //广告汇总销售员维度导出
 
 Route::post('/interfaceAddException', 'Controller@interfaceAddException');//客服系统添加异常单同步到VOP系统的接口
+Route::any('/exceptionResendApi', 'ExceptionController@resendApi');

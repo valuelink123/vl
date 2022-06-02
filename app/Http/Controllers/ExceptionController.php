@@ -551,7 +551,51 @@ class ExceptionController extends Controller
 
         return view('exception/edit',['exception'=>$rule,'gift_cards'=>$gift_cards,'mail_accounts'=>$mail_accounts,'mail_templates'=>$mail_templates,'gift_card_mail'=>$gift_card_mail,'groups'=>$this->getGroups(),'mygroups'=>$this->getUserGroup(),'sellerids'=>$this->getAccounts(),'last_inboxid'=>$last_inboxid,'mcf_orders'=>$mcf_orders,'auto_create_mcf_logs'=>$auto_create_mcf_logs,'users'=>$this->getUsers(),'requestContentHistoryValues'=>$requestContentHistoryValues]);
     }
+	
+	public function resendApi(Request $request){
+		$id = $request->get('id');
+		$exception = Exception::findOrFail($id);
+		$exception_gift_cards = DB::table('exception_gift_cards')->where('exception_id',$exception->id)->first();
+		$records['success'] = 0;
+		$records['message'] = 'Resending failed. No mail was sent before';
+		if($exception_gift_cards){
+			$sendbox_id = $exception_gift_cards->sendbox_id;
+			$sendbox_info = current(Sendbox::where('id',$sendbox_id)->take(1)->get()->toArray());
+			if($sendbox_info){
+				$sendbox = new Sendbox;
+				$sendbox->user_id = $exception->user_id;
+				$sendbox->from_address = $sendbox_info['from_address'];
+				$sendbox->to_address = $sendbox_info['to_address'];
+				$sendbox->subject = $sendbox_info['subject'];
+				$sendbox->text_html = $sendbox_info['text_html'];
+				$sendbox->date = date('Y-m-d H:i:s');
+				$sendbox->plan_date = 0;
+				$sendbox->status = 'Waiting';
+				$sendbox->inbox_id = 0;
+				$sendbox->warn = 0;
+				$sendbox->ip = $_SERVER["REMOTE_ADDR"];
+				$sendbox->attachs = Null;
+				$sendbox->error = NULL;
+				$sendbox->error_count = 0;
+				$sendbox->features = 1;//1为礼品卡邮件
+				$sendbox->save();
 
+				DB::table('exception_gift_cards')->insert(
+					array(
+						'exception_id'=>$exception->id,
+						'gift_card_id'=>$exception_gift_cards->gift_card_id,
+						'from_address'=>$exception_gift_cards->from_address,
+						'to_address'=>$exception_gift_cards->to_address,
+						'brand'=>$exception_gift_cards->brand,
+						'template_id'=>$exception_gift_cards->template_id,
+						'sendbox_id'=>$sendbox->id,
+					));
+				$records['success'] = 1;
+				$records['message'] = 'Resending Success';
+			}
+		}
+		echo json_encode($records);
+	}
     public function update(Request $request,$id)
     {
 		$again_send_email = $request->get('again_send_email');
