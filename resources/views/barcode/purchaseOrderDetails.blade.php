@@ -141,7 +141,7 @@
 </div>
 
 <script>
-    let $theTable = $("#thetable");
+    let $theTable = $(thetable);
 
     var initTable = function () {
         $theTable.dataTable({
