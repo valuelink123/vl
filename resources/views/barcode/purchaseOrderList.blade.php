@@ -61,27 +61,23 @@
                         <div class="input-group">
                             <input type="text" name="po" id="po"
                                    style="width: 300px; height: 29px; border: 1px solid #dddddd;"
-                                   placeholder="输入采购订单号"/>
+                                   placeholder="输入采购订单号"/><span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
                             <button id="search" type="button" class="search-btn">搜索
+                            </button><span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                            <button type="button" class="common-btn" id="export-btn" style="width: 80px"><span><i
+                                            class="fa fa-sign-out"></i></span> 导出
                             </button>
                         </div>
                     </div>
                 </form>
-                <div>
-                    <button type="button" class="common-btn" id="export-btn" style="width: 80px"><span><i
-                                    class="fa fa-sign-out"></i></span> 导出
-                    </button>
-                </div>
             </div>
             <div style="height: 20px;"></div>
             <div class="portlet-body">
                 <div class="table-container">
-
                     <div style="overflow:auto;width: 100%;">
                         <table class="table table-striped table-bordered table-hover table-checkable" id="thetable">
                             <thead>
                             <tr role="row" class="heading">
-{{--                                <th>供应商代码</th>--}}
                                 <th>采购订单号</th>
                                 <th>订单生成时间</th>
                                 <th>生成的条码总数</th>
@@ -129,7 +125,6 @@
             aoColumnDefs: [{"bSortable": false, "aTargets": []}],
             order: [],
             columns: [
-                // {data: 'vendor_code', name: 'vendor_code'},
                 {data: 'purchase_order', name: 'purchase_order'},
                 {data: 'purchase_date', name: 'purchase_date'},
                 {data: 'total_barcodes', name: 'total_barcodes'},

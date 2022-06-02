@@ -668,6 +668,8 @@ class BarcodeController extends Controller
             });
         }
 
+
+
         $orderby = 'status_updated_at';
         $order_column = $request->input('order.0.column', '4');
         if ($order_column == 0) {
