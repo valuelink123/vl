@@ -444,18 +444,30 @@ class BarcodeController extends Controller
         $vendorCode = $search['vendorCode'];
         $p = $search['p'];
         $token = $search['token'];
-        if(!$p && !$token){
-            if (!Auth::user()->can(['barcode-show-po-list'])) die('Permission denied');
-            if (!(isset($search['vendorCode']) && $search['vendorCode'])) {
-                die('没有选择供应商');
+        $sign = $search['sign'];
+
+        if($sign){
+            if(!$p || !$token){
+                die('请确认密钥');
             }
-        }else{
+            $__sign=md5($p.$token.'vlerp');
+            if($sign != $__sign){
+                die('请确认密钥');
+            }
+
             $vendor = DB::table('barcode_vendor_info')->where('url_param', $p)->where('token',$token)->first();
             $vendor = json_decode(json_encode($vendor), true);
             if($vendor){
                 $vendorCode=$vendor['vendor_code'];
             }
+
+        }else{
+            if (!Auth::user()->can(['barcode-show-po-list'])) die('Permission denied');
+            if (!(isset($search['vendorCode']) && $search['vendorCode'])) {
+                die('没有选择供应商');
+            }
         }
+
 
         $data = DB::table('barcode_scan_record')->where('vendor_code', $vendorCode);
         if (isset($search['po']) && $search['po']) {
@@ -494,7 +506,11 @@ class BarcodeController extends Controller
             $lists[$key]['total_barcodes'] = $list['total_barcodes'];
             $lists[$key]['actual_needed_barcodes'] = $list['total_barcodes'] - intval($list['total_barcodes'] / 11);
             $lists[$key]['activated_barcodes'] = $list['activated_barcodes'];
-            $lists[$key]['details'] = '<a href = "/barcode/purchaseOrderDetails?vendorCode=' . $list['vendor_code'] . '&purchaseOrder=' . $list['purchase_order'] . '&p=' . $search['p'] . '&p=' . $search['token'] .'" target = "_blank">详情</a > ';
+            if($sign){
+                $lists[$key]['details'] = '<a href = "/barcode/purchaseOrderDetails?purchaseOrder=' . $list['purchase_order'] . '&p=' . $search['p'] . '&token=' . $search['token'] .'&sign='.$search['sign'].'" target = "_blank">详情</a > ';
+            }else {
+                $lists[$key]['details'] = '<a href = "/barcode/purchaseOrderDetails?vendorCode=' . $list['vendor_code'] . '&purchaseOrder=' . $list['purchase_order'] . '" target = "_blank">详情</a > ';
+            }
         }
         $recordsTotal = $iTotalRecords;
         $recordsFiltered = $iTotalRecords;
@@ -572,7 +588,7 @@ class BarcodeController extends Controller
                 die('请确认密钥');
             }
             $__sign=md5($p.$token.'vlerp');
-            if($sign!=$__sign){
+            if($sign != $__sign){
                 die('请确认密钥');
             }
             $vendor = DB::table('barcode_vendor_info')->where('url_param', $p)->where('token',$token)->first();
@@ -580,7 +596,7 @@ class BarcodeController extends Controller
             if(!$vendor){
                 die('请确认密钥');
             }else{
-                $vendorCode=$vendor['vendor_code'];
+                $vendorCode = $vendor['vendor_code'];
             }
 
         }else{
@@ -596,6 +612,7 @@ class BarcodeController extends Controller
         $activatedCount = DB::table('barcode_scan_record')->where('vendor_code', $vendorCode)->where('purchase_order', $purchaseOrder)->where('current_status', 1)->whereRaw("SUBSTR(`status_updated_at`,1,10)='$dateOption'")->count();
 
         if($sign){
+
             return view('barcode/vendorDetails', compact('vendorCode', 'dateOption', 'activatedCount'));
         }
         return view('barcode/purchaseOrderDetails', compact('vendorCode', 'dateOption', 'activatedCount', 'purchaseOrder'));
