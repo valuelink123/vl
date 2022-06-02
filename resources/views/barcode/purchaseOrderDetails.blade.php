@@ -144,132 +144,132 @@
 </div>
 
 <script>
-    $("[id^='date']").each(function () {
-        let defaults = {
-            autoclose: true
-        }
-        let options = eval(`({${$(this).data('options')}})`)
-        $(this).datepicker(Object.assign(defaults, options))
-    });
-
-    let $theTable = $(thetable);
-    var initTable = function () {
-        $theTable.dataTable({
-            searching: false,//关闭搜索
-            serverSide: true,//启用服务端分页（这是使用Ajax服务端的必须配置）
-            "lengthMenu": [
-                [10, 50, 100, -1],
-                [10, 50, 100, 'All'] // change per page values here
-            ],
-            "pageLength": 50, // default record count per page
-            pagingType: 'bootstrap_extended',
-            //processing: true,
-            scrollX: false,
-            ordering: true,
-            aoColumnDefs: [{"bSortable": false, "aTargets": [3, 5, 7]}],
-            order: [],
-            columns: [
-                {data: 'sku', name: 'sku'},
-                {data: 'barcode_text', name: 'barcode_text'},
-                {data: 'weight', name: 'weight'},
-                {data: 'current_status', name: 'current_status'},
-                {data: 'status_history', name: 'status_history'},
-                {data: 'status_updated_at', name: 'status_updated_at'},
-                {data: 'generated_by', name: 'generated_by'},
-                {data: 'generated_at', name: 'generated_at'},
-                {data: 'printed_by', name: 'printed_by'},
-                {data: 'qc', name: 'qc'},
-                {data: 'qc_history', name: 'qc_history'},
-                {data: 'qc_updated_at', name: 'qc_updated_at'},
-            ],
-            ajax: {
-                type: 'POST',
-                url: "{{ url('barcode/getPurchaseOrderDetails')}}",
-                data: {
-                    search: decodeURIComponent($("#search-form").serialize().replace(/\+/g, " "), true),
-                    '_token': '{{csrf_token()}}'
-                },
-            }
-        });
-    }
+    // $("[id^='date']").each(function () {
+    //     let defaults = {
+    //         autoclose: true
+    //     }
+    //     let options = eval(`({${$(this).data('options')}})`)
+    //     $(this).datepicker(Object.assign(defaults, options))
+    // });
+    //
+    // let $theTable = $(thetable);
+    // var initTable = function () {
+    //     $theTable.dataTable({
+    //         searching: false,//关闭搜索
+    //         serverSide: true,//启用服务端分页（这是使用Ajax服务端的必须配置）
+    //         "lengthMenu": [
+    //             [10, 50, 100, -1],
+    //             [10, 50, 100, 'All'] // change per page values here
+    //         ],
+    //         "pageLength": 50, // default record count per page
+    //         pagingType: 'bootstrap_extended',
+    //         //processing: true,
+    //         scrollX: false,
+    //         ordering: true,
+    //         aoColumnDefs: [{"bSortable": false, "aTargets": [3, 5, 7]}],
+    //         order: [],
+    //         columns: [
+    //             {data: 'sku', name: 'sku'},
+    //             {data: 'barcode_text', name: 'barcode_text'},
+    //             {data: 'weight', name: 'weight'},
+    //             {data: 'current_status', name: 'current_status'},
+    //             {data: 'status_history', name: 'status_history'},
+    //             {data: 'status_updated_at', name: 'status_updated_at'},
+    //             {data: 'generated_by', name: 'generated_by'},
+    //             {data: 'generated_at', name: 'generated_at'},
+    //             {data: 'printed_by', name: 'printed_by'},
+    //             {data: 'qc', name: 'qc'},
+    //             {data: 'qc_history', name: 'qc_history'},
+    //             {data: 'qc_updated_at', name: 'qc_updated_at'},
+    //         ],
+    //         ajax: {
+    //             type: 'POST',
+    //             url: "{{ url('barcode/getPurchaseOrderDetails')}}",
+    //             data: {
+    //                 search: decodeURIComponent($("#search-form").serialize().replace(/\+/g, " "), true),
+    //                 '_token': '{{csrf_token()}}'
+    //             },
+    //         }
+    //     });
+    // }
 
 
     // initTable();
-    let dtApi = $theTable.api();
-    //点击提交按钮重新绘制表格，并将输入框中的值赋予检索框
-    $('#search').click(function () {
-        let sku = $('#sku').val();
-        $('#skuHidden').val(sku);
+    // let dtApi = $theTable.api();
+    // //点击提交按钮重新绘制表格，并将输入框中的值赋予检索框
+    // $('#search').click(function () {
+    //     let sku = $('#sku').val();
+    //     $('#skuHidden').val(sku);
+    //
+    //     //显示指定SKU总数和激活的数量
+    //     $.ajax({
+    //         type: 'post',
+    //         url: '/barcode/getSkuInfo',
+    //         data: {
+    //             search: decodeURIComponent($("#search-form").serialize().replace(/\+/g, " "), true),
+    //             '_token': '{{csrf_token()}}'
+    //         },
+    //         dataType: 'json',
+    //         success: function (res) {
+    //             if (res) {
+    //                 $('#msgDiv').text(res.msg);
+    //             } else {
+    //
+    //             }
+    //         }
+    //     });
+    //
+    //     //更新下面的表格
+    //     dtApi.settings()[0].ajax.data = {search: decodeURIComponent($("#search-form").serialize().replace(/\+/g, " "), true)};
+    //     dtApi.ajax.reload();
+    //     return false;
+    // });
 
-        //显示指定SKU总数和激活的数量
-        $.ajax({
-            type: 'post',
-            url: '/barcode/getSkuInfo',
-            data: {
-                search: decodeURIComponent($("#search-form").serialize().replace(/\+/g, " "), true),
-                '_token': '{{csrf_token()}}'
-            },
-            dataType: 'json',
-            success: function (res) {
-                if (res) {
-                    $('#msgDiv').text(res.msg);
-                } else {
+    // $(function () {
+    //     $("#ajax").on("hidden.bs.modal", function () {
+    //         $(this).find('.modal-content').html('<div class="modal-body"><img src="../assets/global/img/loading-spinner-grey.gif" alt="" class="loading"><span>Loading... </span></div>');
+    //     });
+    //
+    //     $('.date-picker').datepicker({
+    //         rtl: App.isRTL(),
+    //         format: 'yyyy-mm-dd',
+    //         orientation: 'bottom',
+    //         autoclose: true,
+    //     });
+    //
+    //     //如果不加以下代码，点击模态框里的date-picker后，模态框里的所有input元素的值都被清空。
+    //     $('.date-picker').on('show', function (event) {
+    //         event.stopPropagation();
+    //     });
+    // });
 
-                }
-            }
-        });
-
-        //更新下面的表格
-        dtApi.settings()[0].ajax.data = {search: decodeURIComponent($("#search-form").serialize().replace(/\+/g, " "), true)};
-        dtApi.ajax.reload();
-        return false;
-    });
-
-    $(function () {
-        $("#ajax").on("hidden.bs.modal", function () {
-            $(this).find('.modal-content').html('<div class="modal-body"><img src="../assets/global/img/loading-spinner-grey.gif" alt="" class="loading"><span>Loading... </span></div>');
-        });
-
-        $('.date-picker').datepicker({
-            rtl: App.isRTL(),
-            format: 'yyyy-mm-dd',
-            orientation: 'bottom',
-            autoclose: true,
-        });
-
-        //如果不加以下代码，点击模态框里的date-picker后，模态框里的所有input元素的值都被清空。
-        $('.date-picker').on('show', function (event) {
-            event.stopPropagation();
-        });
-    });
-
-    $('#dateOption').change(function () {
-        $dateOption = $(this).val();
-        $.ajax({
-            type: 'post',
-            url: '/barcode/getActivatedCountInADay',
-            data: {
-                vendorCode: $('#vendorCode').val(),
-                purchaseOrder: $('#purchaseOrder').val(),
-                dateOption: $dateOption,
-                _token: '{{csrf_token()}}'
-            },
-            dataType: 'json',
-            success: function (res) {
-                if (res) {
-                    $('#activatedCount').text(res.activatedCount);
-                } else {
-                    //编辑失败
-                }
-            }
-        });
-    });
+    // $('#dateOption').change(function () {
+    //     $dateOption = $(this).val();
+    //     $.ajax({
+    //         type: 'post',
+    //         url: '/barcode/getActivatedCountInADay',
+    //         data: {
+    //             vendorCode: $('#vendorCode').val(),
+    //             purchaseOrder: $('#purchaseOrder').val(),
+    //             dateOption: $dateOption,
+    //             _token: '{{csrf_token()}}'
+    //         },
+    //         dataType: 'json',
+    //         success: function (res) {
+    //             if (res) {
+    //                 $('#activatedCount').text(res.activatedCount);
+    //             } else {
+    //                 //编辑失败
+    //             }
+    //         }
+    //     });
+    // });
 
     //下载数据
-    $("#export-btn").click(function () {
-        location.href = '/barcodePoDetailsExport?vendorCode=' + $("#vendorCode").val() + '&purchaseOrder=' + $("#purchaseOrder").val() + '&sku=' + $("#skuHidden").val();
-        return false;
-    });
+    // $("#export-btn").click(function () {
+    //     location.href = '/barcodePoDetailsExport?vendorCode=' + $("#vendorCode").val() + '&purchaseOrder=' + $("#purchaseOrder").val() + '&sku=' + $("#skuHidden").val();
+    //     return false;
+    // });
 
 
 </script>

@@ -616,9 +616,9 @@ class BarcodeController extends Controller
 
         $dateOption = date("Y-m-d");
 
-        $activatedCount = 0;
+//        $activatedCount = 0;
 
-        $activatedCount = DB::table('barcode_scan_record')->where('vendor_code', $vendorCode)->where('purchase_order', $purchaseOrder)->where('current_status', 1)->whereRaw("SUBSTR(`status_updated_at`,1,10)='$dateOption'")->count();
+        $activatedCount = DB::table('barcode_scan_record')->where('vendor_code', $vendorCode)->where('purchase_order', $purchaseOrder)->where('current_status', 1)->whereRAW("SUBSTR(`status_updated_at`,1,10)='".$dateOption."'")->count();
 
         if($sign){
             return view('barcode/vendorDetails', compact('vendorCode', 'dateOption', 'activatedCount'));
