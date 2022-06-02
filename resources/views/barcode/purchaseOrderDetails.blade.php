@@ -152,7 +152,7 @@
         $(this).datepicker(Object.assign(defaults, options))
     });
 
-    let $theTable = $("#thetable")
+    let $theTable = $(thetable);
     var initTable = function () {
         $theTable.dataTable({
             searching: false,//关闭搜索
@@ -192,6 +192,7 @@
             }
         });
     }
+
 
     // initTable();
     let dtApi = $theTable.api();
