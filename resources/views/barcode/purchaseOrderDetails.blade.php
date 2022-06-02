@@ -74,6 +74,7 @@
                 <div style="height: 5px;"></div>
                 <div style="clear:both"></div>
                 <form id="search-form">
+                    {{ csrf_field() }}
                     <input type="hidden" name='vendorCode' id='vendorCode' value="{{$vendorCode}}"/>
                     <input type="hidden" name='purchaseOrder' id='purchaseOrder' value="{{$purchaseOrder}}"/>
                     <input type="hidden" name='skuHidden' id="skuHidden" value=""/>
@@ -193,8 +194,8 @@
     let dtApi = $theTable.api();
     //点击提交按钮重新绘制表格，并将输入框中的值赋予检索框
     $('#search').click(function () {
-        $sku = $('#sku').val();
-        $('#skuHidden').val($sku);
+        let sku = $('#sku').val();
+        $('#skuHidden').val(sku);
 
         //显示指定SKU总数和激活的数量
         $.ajax({
