@@ -629,103 +629,85 @@ class BarcodeController extends Controller
 
     public function getPurchaseOrderDetails(Request $request)
     {
-
-
         $search = isset($_POST['search']) ? $_POST['search'] : '';
         $search = $this->getSearchData(explode('&', $search));
-        $p=$search['p'];
-        $token=$search['token'];
-        $sign=$search['sign'];
         $vendorCode=$search['vendorCode'];
         $purchaseOrder=$search['purchaseOrder'];
-        $sku=$search['sku'];
-        if (!$purchaseOrder) {
-            die('没有选择采购订单号');
-        }
-        if($sign){
-            if(!$p || !$token){
-                die('请确认密钥');
-            }
-            $__sign=md5($p.$token.'vlerp');
-            if($sign != $__sign){
-                die('请确认密钥');
-            }
-
-            $vendor = DB::table('barcode_vendor_info')->where('url_param', $p)->where('token',$token)->first();
-            $vendor = json_decode(json_encode($vendor), true);
-            if($vendor){
-                $vendorCode=$vendor['vendor_code'];
-            }
-        }else{
-            if (!Auth::user()->can(['barcode-show-po-detail'])) die('Permission denied');
-        }
-
-        if (!$vendorCode) {
-            die('没有选择供应商');
-        }
-
-        $data = DB::table('barcode_scan_record')->where('vendor_code', $vendorCode)->where('purchase_order', $purchaseOrder);
-
-        if ($sku) {
-            $data = $data->where(function ($query) use ($sku) {
-                $query->where('sku', '=', $sku);
-            });
-        }
-
-
-
-        $orderby = 'status_updated_at';
-        $order_column = $request->input('order.0.column', '4');
-        if ($order_column == 0) {
-            $orderby = 'sku';
-        } else if ($order_column == 1) {
-            $orderby = 'sn';
-        } else if ($order_column == 2) {
-            $orderby = 'current_status';
-        } else if ($order_column == 4) {
-            $orderby = 'status_updated_at';
-        }
-        $sort = $request->input('order.0.dir', 'desc');
-        $iTotalRecords = $data->get()->count();
-
-
-        $iDisplayLength = intval($_REQUEST['length']);
-        $iDisplayLength = $iDisplayLength < 0 ? $iTotalRecords : $iDisplayLength;
-        $iDisplayStart = intval($_REQUEST['start']);
-        $lists = $data->orderBy($orderby, $sort)->offset($iDisplayStart)->limit($iDisplayLength)->get()->toArray();
-
-
-        $lists = json_decode(json_encode($lists), true);
-
-
-        $userIdNames = $this->getUserIdNames();
-
-        foreach ($lists as $key => $list) {
-            $lists[$key]['sku'] = $list['sku'];
-            $lists[$key]['barcode_text'] = $list['barcode_text'];
-            $lists[$key]['current_status'] = $list['current_status'];
-            $lists[$key]['status_history'] = $list['status_history'];
-            $lists[$key]['status_updated_at'] = $list['status_updated_at'];
-            $lists[$key]['generated_by'] = array_get($userIdNames, $list['generated_by']);
-            $lists[$key]['generated_at'] = $list['generated_at'];
-            $lists[$key]['printed_by'] = array_get($userIdNames, $list['printed_by']);
-            $lists[$key]['qc'] = array_get($userIdNames, $list['qc']);
-            if ($list['qc_history']) {
-                $qcArray = explode(',', $list['qc_history']);
-                $qcNameArray = [];
-                foreach ($qcArray as $k => $v) {
-                    $qcNameArray[$k] = array_get($userIdNames, intval($v));
-                }
-                $qcHistory = implode(',', $qcNameArray);
-                $lists[$key]['qc_history'] = $qcHistory;
-            } else {
-                $lists[$key]['qc_history'] = '';
-            }
-            $lists[$key]['qc_updated_at'] = $list['qc_updated_at'];
-        }
-        $recordsTotal = $iTotalRecords;
-        $recordsFiltered = $iTotalRecords;
-        $data = $lists;
+        $sku = $search['sku'];
+//        if (!$purchaseOrder) {
+//            die('没有选择采购订单号');
+//        }
+//        if (!$vendorCode) {
+//            die('没有选择供应商');
+//        }
+//
+//        if (!Auth::user()->can(['barcode-show-po-detail'])) die('Permission denied');
+//
+//
+//
+//        $data = DB::table('barcode_scan_record')->where('vendor_code', $vendorCode)->where('purchase_order', $purchaseOrder);
+//
+//        if ($sku) {
+//            $data = $data->where(function ($query) use ($sku) {
+//                $query->where('sku', '=', $sku);
+//            });
+//        }
+//
+//
+//
+//        $orderby = 'status_updated_at';
+//        $order_column = $request->input('order.0.column', '4');
+//        if ($order_column == 0) {
+//            $orderby = 'sku';
+//        } else if ($order_column == 1) {
+//            $orderby = 'sn';
+//        } else if ($order_column == 2) {
+//            $orderby = 'current_status';
+//        } else if ($order_column == 4) {
+//            $orderby = 'status_updated_at';
+//        }
+//        $sort = $request->input('order.0.dir', 'desc');
+//        $iTotalRecords = $data->get()->count();
+//
+//
+//        $iDisplayLength = intval($_REQUEST['length']);
+//        $iDisplayLength = $iDisplayLength < 0 ? $iTotalRecords : $iDisplayLength;
+//        $iDisplayStart = intval($_REQUEST['start']);
+//        $lists = $data->orderBy($orderby, $sort)->offset($iDisplayStart)->limit($iDisplayLength)->get()->toArray();
+//        $lists = json_decode(json_encode($lists), true);
+//
+//
+//        $userIdNames = $this->getUserIdNames();
+//
+//        foreach ($lists as $key => $list) {
+//            $lists[$key]['sku'] = $list['sku'];
+//            $lists[$key]['barcode_text'] = $list['barcode_text'];
+//            $lists[$key]['current_status'] = $list['current_status'];
+//            $lists[$key]['status_history'] = $list['status_history'];
+//            $lists[$key]['status_updated_at'] = $list['status_updated_at'];
+//            $lists[$key]['generated_by'] = array_get($userIdNames, $list['generated_by']);
+//            $lists[$key]['generated_at'] = $list['generated_at'];
+//            $lists[$key]['printed_by'] = array_get($userIdNames, $list['printed_by']);
+//            $lists[$key]['qc'] = array_get($userIdNames, $list['qc']);
+//            if ($list['qc_history']) {
+//                $qcArray = explode(',', $list['qc_history']);
+//                $qcNameArray = [];
+//                foreach ($qcArray as $k => $v) {
+//                    $qcNameArray[$k] = array_get($userIdNames, intval($v));
+//                }
+//                $qcHistory = implode(',', $qcNameArray);
+//                $lists[$key]['qc_history'] = $qcHistory;
+//            } else {
+//                $lists[$key]['qc_history'] = '';
+//            }
+//            $lists[$key]['qc_updated_at'] = $list['qc_updated_at'];
+//        }
+//        $recordsTotal = $iTotalRecords;
+//        $recordsFiltered = $iTotalRecords;
+//        $data = $lists;
+        $data=[];
+        $recordsTotal=100;
+        $recordsFiltered=100;
         return compact('data', 'recordsTotal', 'recordsFiltered');
     }
 
