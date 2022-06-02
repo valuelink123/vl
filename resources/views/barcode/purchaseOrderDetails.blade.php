@@ -152,7 +152,7 @@
         $(this).datepicker(Object.assign(defaults, options))
     });
 
-    let $theTable = $(thetable)
+    let $theTable = $("#thetable")
     var initTable = function () {
         $theTable.dataTable({
             searching: false,//关闭搜索
@@ -197,8 +197,8 @@
     let dtApi = $theTable.api();
     //点击提交按钮重新绘制表格，并将输入框中的值赋予检索框
     $('#search').click(function () {
-        $sku = $('#sku').val();
-        $('#skuHidden').val($sku);
+        let sku = $('#sku').val();
+        $('#skuHidden').val(sku);
 
         //显示指定SKU总数和激活的数量
         $.ajax({
