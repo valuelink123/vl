@@ -313,7 +313,7 @@ class TaskController extends Controller
 				'type'=>99,
 				'priority'=>1,
 				'complete_date'=>date('Y-m-d'),
-				'request'=>url('/exception/'.$exception->id.'/edit'),
+				'request'=>url('/exception/'.$exception->id.'/edit').' '.$text,
 				'request_user_id'=>$exception->user_id,
 				'request_date'=>date('Y-m-d H:i:s'),
 				'response_user_id'=>$user_id,
