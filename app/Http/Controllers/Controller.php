@@ -822,24 +822,21 @@ ORDER BY asin_offer_summary.asin DESC ";
 		$data = json_decode($params,true);
 		$configField = array('name','date','sellerid','process_date','amazon_order_id','refund','gift_card_amount','currency','customer_email','replacement','user_id','group_id','process_user_id','process_status','request_content','process_content','order_sku','process_attach','replacement_order_id','descrip','score','auto_create_mcf','auto_create_mcf_result','last_auto_create_mcf_date','last_auto_create_mcf_log','comment','update_status_log','saleschannel','asin','auto_create_sap','auto_create_sap_result','last_auto_create_sap_date','last_auto_create_sap_log','amount','file_url');
 		//service_system_id
-		$return['status'] = 1;
-		$return['msg'] = '数据对接成功';
+		$return['status'] = 0;
+		$return['id'] = 0;
+		$return['msg'] = '';
 		if(!(isset($data['id']) && $data['id'])){
-			$return['status'] = 0;
 			$return['msg'] = '请传必填参数id';
 			return json_encode($return);
 		}
 		if(!(isset($data['type']) && $data['type'])){
-			$return['status'] = 0;
 			$return['msg'] = '请传必填参数type';
 			return json_encode($return);
 		}
 		if(!(isset($data['process_status']) && $data['process_status'])){
-			$return['status'] = 0;
 			$return['msg'] = '请传必填参数process_status';
 			return json_encode($return);
 		}
-
 		$insertData = array();
 		foreach($configField as $field){
 			if(isset($data[$field]) && $data[$field]){
@@ -847,14 +844,14 @@ ORDER BY asin_offer_summary.asin DESC ";
 			}
 		}
 		if($insertData){
-			$res = DB::table('exception')
-				->updateOrInsert(
+			$res = Exception::updateOrCreate(
 					['service_system_id' => $data['id'],'type'=>$data['type']],
 					$insertData
 				);
-			if(!$res){
-				$return['status'] = 0;
-				$return['msg'] = '对接数据失败';
+			if(!empty($res)){
+				$return['status'] = 1;
+				$return['id'] = $res->id;
+				$return['msg'] = '数据对接成功';
 			}
 		}
 		return json_encode($return);
