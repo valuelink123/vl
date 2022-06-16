@@ -621,7 +621,7 @@ class BarcodeController extends Controller
         $activatedCount = DB::table('barcode_scan_record')->where('vendor_code', $vendorCode)->where('purchase_order', $purchaseOrder)->where('current_status', 1)->whereRAW("SUBSTR(`status_updated_at`,1,10)='".$dateOption."'")->count();
 
         if($sign){
-            return view('barcode/vendorDetails', compact('vendorCode', 'dateOption', 'activatedCount', 'p', 'token', 'sign'));
+            return view('barcode/vendorDetails', compact('vendorCode', 'dateOption', 'activatedCount', 'p', 'token', 'sign','purchaseOrder'));
         }else {
             return view('barcode/purchaseOrderDetails', compact('vendorCode', 'dateOption', 'activatedCount', 'purchaseOrder'));
         }
@@ -715,11 +715,15 @@ class BarcodeController extends Controller
             die('没有选择供应商');
         }
         $vendorCode = $search['vendorCode'];
-        $purchaseOrder=$search['purchaseOrder'];
+        $purchaseOrder = $search['purchaseOrder'];
 
         $p = $search['p'];
         $token = $search['token'];
         $sign = $search['sign'];
+
+
+        var_dump($search);
+        die('1111111111');
 
         if($sign){
             if(!$p || !$token){
@@ -742,12 +746,18 @@ class BarcodeController extends Controller
         }
 
 
-
-        $data = DB::table('barcode_scan_record')->where('vendor_code', $vendorCode)->where('purchase_order', $purchaseOrder);;
+        $data = DB::table('barcode_scan_record')->where('vendor_code', $vendorCode);
         if (isset($search['sku']) && $search['sku']) {
             $sku = $search['sku'];
             $data = $data->where(function ($query) use ($sku) {
                 $query->where('sku', '=', $sku);
+            });
+        }
+
+        if (isset($search['purchaseOrder']) && $search['purchaseOrder']) {
+            $purchaseOrder = $search['purchaseOrder'];
+            $data = $data->where(function ($query) use ($purchaseOrder) {
+                $query->where('purchase_order', '=', $purchaseOrder);
             });
         }
 
