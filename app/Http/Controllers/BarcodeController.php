@@ -721,10 +721,6 @@ class BarcodeController extends Controller
         $token = $search['token'];
         $sign = $search['sign'];
 
-
-        var_dump($search);
-        die('1111111111');
-
         if($sign){
             if(!$p || !$token){
                 die('请确认密钥');
