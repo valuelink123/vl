@@ -104,7 +104,7 @@
                 <div class="table-container">
 
                     <div style="overflow:auto;width: 100%;">
-                        <table class="table table-striped table-bordered table-hover table-checkable" id="thetable1">
+                        <table class="table table-striped table-bordered table-hover table-checkable" id="thetable">
                             <thead>
                             <tr role="row" class="heading">
                                 <th>SKU</th>
