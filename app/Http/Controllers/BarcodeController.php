@@ -621,7 +621,7 @@ class BarcodeController extends Controller
         $activatedCount = DB::table('barcode_scan_record')->where('vendor_code', $vendorCode)->where('purchase_order', $purchaseOrder)->where('current_status', 1)->whereRAW("SUBSTR(`status_updated_at`,1,10)='".$dateOption."'")->count();
 
         if($sign){
-            return view('barcode/vendorDetails', compact('vendorCode', 'dateOption', 'activatedCount'));
+            return view('barcode/vendorDetails', compact('vendorCode', 'dateOption', 'activatedCount', 'p', 'token', 'sign'));
         }else {
             return view('barcode/purchaseOrderDetails', compact('vendorCode', 'dateOption', 'activatedCount', 'purchaseOrder'));
         }
@@ -629,11 +629,13 @@ class BarcodeController extends Controller
 
     public function getPurchaseOrderDetails(Request $request)
     {
+
         $search = isset($_POST['search']) ? $_POST['search'] : '';
         $search = $this->getSearchData(explode('&', $search));
         $vendorCode=$search['vendorCode'];
         $purchaseOrder=$search['purchaseOrder'];
         $sku = $search['sku'];
+
         if (!$purchaseOrder) {
             die('没有选择采购订单号');
         }
@@ -713,7 +715,35 @@ class BarcodeController extends Controller
             die('没有选择供应商');
         }
         $vendorCode = $search['vendorCode'];
-        $data = DB::table('barcode_scan_record')->where('vendor_code', $vendorCode);
+        $purchaseOrder=$search['purchaseOrder'];
+
+        $p = $search['p'];
+        $token = $search['token'];
+        $sign = $search['sign'];
+
+        if($sign){
+            if(!$p || !$token){
+                die('请确认密钥');
+            }
+            $__sign=md5($p.$token.'vlerp');
+            if($sign != $__sign){
+                die('请确认密钥');
+            }
+            $vendor = DB::table('barcode_vendor_info')->where('url_param', $p)->where('token',$token)->first();
+            $vendor = json_decode(json_encode($vendor), true);
+            if(!$vendor){
+                die('请确认密钥');
+            }else{
+                $vendorCode = $vendor['vendor_code'];
+            }
+
+        }else{
+            if (!Auth::user()->can(['barcode-show-po-detail'])) die('Permission denied');
+        }
+
+
+
+        $data = DB::table('barcode_scan_record')->where('vendor_code', $vendorCode)->where('purchase_order', $purchaseOrder);;
         if (isset($search['sku']) && $search['sku']) {
             $sku = $search['sku'];
             $data = $data->where(function ($query) use ($sku) {

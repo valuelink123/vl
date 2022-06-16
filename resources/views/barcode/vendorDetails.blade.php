@@ -50,7 +50,8 @@
             <div style="height: 15px;"></div>
             <div class="portlet-title">
                 <label>供应商代码：{{$vendorCode}}</label>
-                <div style="height: 5px;"></div>
+                <div style="height: 5px;"/>
+                <label>采购订单号：{{$purchaseOrder}}</label>
                 <div style="clear:both;"></div>
                 <div style="float:left; width:180px">
                     <div class="input-group date date-picker pull-left" data-date-format="yyyy-mm-dd">
@@ -69,6 +70,10 @@
                     {{--                    {{ csrf_field() }}--}}
                     <input type="hidden" name='vendorCode' id='vendorCode' value="{{$vendorCode}}"/>
                     <input type="hidden" name='skuHidden' id="skuHidden" value=""/>
+                    <input type="hidden" name='purchaseOrder' id='purchaseOrder' value="{{$purchaseOrder}}"/>
+                    <input type="hidden" name='p' id="pHidden" value="{{$p}}"/>
+                    <input type="hidden" name='token' id="token" value="{{$token}}"/>
+                    <input type="hidden" name='sign' id="sign" value="{{$sign}}"/>
                     <div class="table-toolbar" id="thetabletoolbar">
                         <div class="input-group pull-left">
                             <input type="text" name="sku" id="sku"
@@ -104,9 +109,6 @@
                                 <th>条码当前状态</th>
                                 <th>条码历史状态</th>
                                 <th>条码最后更新时间</th>
-{{--                                <th>条码生成人</th>--}}
-{{--                                <th>条码生成时间</th>--}}
-{{--                                <th>条码打印人</th>--}}
                             </tr>
                             </thead>
                             <tbody></tbody>
@@ -137,7 +139,7 @@
         $(this).datepicker(Object.assign(defaults, options))
     });
 
-    let $theTable = $(thetable)
+    let $theTable = $('thetable')
     var initTable = function () {
         $theTable.dataTable({
             searching: false,//关闭搜索
