@@ -753,3 +753,4 @@ Route::get('/ccp/adTotalSeller/export', 'CcpAdTotalController@adTotalSellerExpor
 
 Route::post('/interfaceAddException', 'Controller@interfaceAddException');//客服系统添加异常单同步到VOP系统的接口
 Route::any('/exceptionResendApi', 'ExceptionController@resendApi');
+Route::any('/exceptionTaskApi', 'TaskController@taskApi');

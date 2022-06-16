@@ -5,6 +5,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use App\User;
 use App\Task;
+use App\Asin;
+use App\Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Services\MultipleQueue;
@@ -22,7 +24,7 @@ class TaskController extends Controller
 
     public function __construct()
     {
-        $this->middleware('auth');
+        $this->middleware('auth', ['except' => ['taskApi']]);
 		parent::__construct();
     }
 
@@ -296,6 +298,34 @@ class TaskController extends Controller
 		}else{
 			$return[$name]=$request->get('value');
 			
+		}
+		echo json_encode($return);
+	}
+	
+	public function taskApi(Request $request){
+		try {
+			$id = $request->get('id');
+			$exception = Exception::findOrFail($id);
+			$text = $request->get('text');
+			$sap_seller_id = Asin::where('asin',$exception->asin)->where('site','www.'.$exception->saleschannel)->value('sap_seller_id');
+			$user_id = User::where('sap_seller_id',intval($sap_seller_id))->value('id');
+			Task::create(array(
+				'type'=>99,
+				'priority'=>1,
+				'complete_date'=>date('Y-m-d'),
+				'request'=>url('/exception/'.$exception->id.'/edit').' '.$text,
+				'request_user_id'=>$exception->user_id,
+				'request_date'=>date('Y-m-d H:i:s'),
+				'response_user_id'=>$user_id,
+				'asin'=>$exception->asin,
+				'sku'=>$exception->order_sku,
+				'customer_email'=>$exception->customer_email,
+			));
+			$return['success'] = 1;
+			$return['message'] = '';
+		} catch (\Exception $e) {
+			$return['success'] = 0;
+			$return['message'] = $e->getMessage();
 		}
 		echo json_encode($return);
 	}
