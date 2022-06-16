@@ -176,7 +176,6 @@
                 type: 'POST',
                 url: "{{ url('barcode/getPurchaseOrderDetails')}}",
                 data: {
-                    consoelog
                     search: decodeURIComponent($("#search-form").serialize().replace(/\+/g, " "), true),
                     '_token': '{{csrf_token()}}'
                 },
