@@ -104,7 +104,7 @@
                 <div class="table-container">
 
                     <div style="overflow:auto;width: 100%;">
-                        <table class="table table-striped table-bordered table-hover table-checkable" id="thetable—_data">
+                        <table class="table table-striped table-bordered table-hover table-checkable" id="thetableData">
                             <thead>
                             <tr role="row" class="heading">
                                 <th>SKU</th>
@@ -141,7 +141,7 @@
 </div>
 
 <script>
-    let $theTableData = $('#thetable_data');
+    let $theTableData = $('#thetableData');
 
     var initTable = function () {
         $theTableData.dataTable({
@@ -176,6 +176,7 @@
                 type: 'POST',
                 url: "{{ url('barcode/getPurchaseOrderDetails')}}",
                 data: {
+                    consoelog
                     search: decodeURIComponent($("#search-form").serialize().replace(/\+/g, " "), true),
                     '_token': '{{csrf_token()}}'
                 },
