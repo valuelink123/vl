@@ -104,7 +104,7 @@
                 <div class="table-container">
 
                     <div style="overflow:auto;width: 100%;">
-                        <table class="table table-striped table-bordered table-hover table-checkable" id="thetable">
+                        <table class="table table-striped table-bordered table-hover table-checkable" id="thetable—_data">
                             <thead>
                             <tr role="row" class="heading">
                                 <th>SKU</th>
@@ -141,10 +141,10 @@
 </div>
 
 <script>
-    let $theTable = $(thetable);
+    let $theTableData = $('#thetable_data');
 
     var initTable = function () {
-        $theTable.dataTable({
+        $theTableData.dataTable({
             searching: false,//关闭搜索
             serverSide: true,//启用服务端分页（这是使用Ajax服务端的必须配置）
             "lengthMenu": [
@@ -183,7 +183,7 @@
         });
     }
     initTable();
-    let dtApi = $theTable.api();
+    let dtApi = $theTableData.api();
 
     $("[id^='date']").each(function () {
         let defaults = {
