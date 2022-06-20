@@ -127,7 +127,7 @@ class BarcodeController extends Controller
 
         $sign = $this->getSapApiSign($array_detail);
         try {
-            $res = file_get_contents('http://' . env("SAP_RFC") . '/rfc_sap_api.php?appid=' . env("SAP_KEY") . '&method=' . $array_detail['method'] . '&gt_table=' . $array_detail['gt_table'] . '&sign=' . $sign);
+            $res = file_get_contents('http://' . env("SAP_RFC") . '/rfc_sap_api.php?appid=' . $array_detail['appid']. '&method=' . $array_detail['method'] . '&gt_table=' . $array_detail['gt_table'] . '&sign=' . $sign);
             //$res = file_get_contents('http://' . env("SAP_RFC") . '/rfc_sap_api.php?appid=' . env("SAP_KEY") . '&method=' . $array_detail['method'] . '&sign=' . $sign);   getPurchaseOrderList
             //
             $result = json_decode($res, true);
@@ -959,6 +959,31 @@ class BarcodeController extends Controller
             $returnData = json_encode(array('flag' => $flag, 'msg' => $msg));
             die($returnData);
         }
+
+        $sapAPI['appid'] = env("SAP_KEY");
+        $sapAPI['method'] = 'getSupplier';
+        $sapAPI['sc']= $vendorCodeFromSAP;
+
+        $sign = $this->getSapApiSign($sapAPI);
+        try {
+            $res = file_get_contents('http://' . env("SAP_RFC") . '/rfc_sap_api.php?appid=' . $sapAPI['appid'] . '&method=' . $sapAPI['method'] . '&sc=' . $sapAPI['sc'] . '&sign=' . $sign);
+
+            $result = json_decode($res, true);
+
+            if (!array_get($result, 'RESULT_TABLE') || empty (array_get($result, 'RESULT_TABLE'))) {
+                $flag = 0;
+                $msg = 'FAIL： SAP供应商编码错误';
+                $returnData = json_encode(array('flag' => $flag, 'msg' => $msg));
+                die($returnData);
+            }
+        }catch (\Exception $e) {
+            $flag = 0;
+            $msg = 'FAIL： 从SAP中验证供应商时,网络异常';
+            $returnData = json_encode(array('flag' => $flag, 'msg' => $msg));
+            die($returnData);
+        }
+
+
         $vendor = DB::table('barcode_vendor_info')->where('vendor_name', $vendorName)->first();
         $vendor = json_decode(json_encode($vendor), true);
         if ($vendor) {
