@@ -100,7 +100,7 @@
                 <div class="table-container">
 
                     <div style="overflow:auto;width: 100%;">
-                        <table class="table table-striped table-bordered table-hover table-checkable" id="thetable">
+                        <table class="table table-striped table-bordered table-hover table-checkable" id="the_table">
                             <thead>
                             <tr role="row" class="heading">
                                 <th>SKU</th>
@@ -139,9 +139,9 @@
         $(this).datepicker(Object.assign(defaults, options))
     });
 
-    let $theTable = $('thetable')
+    let $the_Table = $('the_table');
     var initTable = function () {
-        $theTable.dataTable({
+        $the_Table.dataTable({
             searching: false,//关闭搜索
             serverSide: true,//启用服务端分页（这是使用Ajax服务端的必须配置）
             "lengthMenu": [
@@ -162,9 +162,6 @@
                 {data: 'current_status', name: 'current_status'},
                 {data: 'status_history', name: 'status_history'},
                 {data: 'status_updated_at', name: 'status_updated_at'},
-                // {data: 'generated_by', name: 'generated_by'},
-                // {data: 'generated_at', name: 'generated_at'},
-                // {data: 'printed_by', name: 'printed_by'},
             ],
             ajax: {
                 type: 'POST',
@@ -178,7 +175,8 @@
     }
 
     initTable();
-    let dtApi = $theTable.api();
+
+    let dtApi = $the_Table.api();
     //点击提交按钮重新绘制表格，并将输入框中的值赋予检索框
     $('#search').click(function () {
         $sku = $('#sku').val();

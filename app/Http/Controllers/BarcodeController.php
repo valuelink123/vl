@@ -716,10 +716,13 @@ class BarcodeController extends Controller
         }
         $vendorCode = $search['vendorCode'];
         $purchaseOrder = $search['purchaseOrder'];
+        $sku = $search['sku'];
 
         $p = $search['p'];
         $token = $search['token'];
         $sign = $search['sign'];
+
+
 
         if($sign){
             if(!$p || !$token){
@@ -743,15 +746,13 @@ class BarcodeController extends Controller
 
 
         $data = DB::table('barcode_scan_record')->where('vendor_code', $vendorCode);
-        if (isset($search['sku']) && $search['sku']) {
-            $sku = $search['sku'];
+        if (isset($sku) && $sku) {
             $data = $data->where(function ($query) use ($sku) {
                 $query->where('sku', '=', $sku);
             });
         }
 
-        if (isset($search['purchaseOrder']) && $search['purchaseOrder']) {
-            $purchaseOrder = $search['purchaseOrder'];
+        if (isset($purchaseOrder) && $purchaseOrder) {
             $data = $data->where(function ($query) use ($purchaseOrder) {
                 $query->where('purchase_order', '=', $purchaseOrder);
             });
