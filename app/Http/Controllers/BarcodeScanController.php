@@ -324,9 +324,9 @@ class BarcodeScanController extends Controller
         $newToken = md5($token);
         //一维码
         $generator = new BarcodeGeneratorPNG();
-        $tokenBarcode = $generator->getBarcode($newToken, $generator::TYPE_CODE_93, 2, 40);
+        $tokenBarcode = $generator->getBarcode($newToken, $generator::TYPE_CODE_93, 5, 40);
         $tokenBarcode = base64_encode($tokenBarcode);
-        $tokenBarcode = '<img src="data:image/png;base64,' . $tokenBarcode . '"/>';
+        $tokenBarcode = '<img src="data:image/png;base64,' . $tokenBarcode . '" style="width:200px;height:20px;"/>';
         //二维码
 //        ob_start();
 //        QRCode::png($newToken, false, 'M', 5, 2);

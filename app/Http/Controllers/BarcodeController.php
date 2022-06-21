@@ -329,7 +329,7 @@ class BarcodeController extends Controller
                 $row++;
                 $html = '<div>';
                 foreach ($chunk as $barcodeText) {
-                    $barcode = $generator->getBarcode($barcodeText, $generator::TYPE_CODE_93, 5, 20, array(0, 0, 0));
+                    $barcode = $generator->getBarcode($barcodeText, $generator::TYPE_CODE_93, 20, 20, array(0, 0, 0));
                     $barcode = base64_encode($barcode);
                     $html .= '<div class="border">
                                   <div>
