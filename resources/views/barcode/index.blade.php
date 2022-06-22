@@ -47,11 +47,13 @@
                                 @if($canChangeOperator)
                                 <button id="changeOperator" class="barcode-btn">变更采购员
                                 </button>
+                                @endif
+                                @if($canChangeOperator)
                                 <button id="addNewVendor" class="barcode-btn">新增供应商
                                 </button>
                                 @endif
-{{--                                <button id="makeTokenBarcode" class="barcode-btn">条码演示--}}
-{{--                                </button>--}}
+
+
                                 @if($isPurchaseEmployee || $canChangeOperator)
                                 <button id="generateBarcode" class="barcode-btn">生成条码
                                 </button>

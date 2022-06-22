@@ -29,8 +29,14 @@ class BarcodeController extends Controller
         if (!Auth::user()->can(['barcode-show'])) die('Permission denied');
         $userId = Auth::user()->id;
         $canChangeOperator = false;
-        if (in_array($userId, $this->getPurchasingDirectorIds())) {
-            $canChangeOperator = true;
+        $canAddOperator =false;
+
+        if (Auth::user()->can(['barcode-show-add-vendor'])){
+            $canAddOperator = true;
+        }
+
+       if (Auth::user()->can(['barcode-show-change-employee'])){
+           $canChangeOperator = true;
         }
 
         $isPurchaseEmployee=false;
@@ -42,7 +48,7 @@ class BarcodeController extends Controller
         }
 
 
-        return view('barcode/index', compact('canChangeOperator','isPurchaseEmployee'));
+        return view('barcode/index', compact('canAddOperator', 'canChangeOperator','isPurchaseEmployee'));
     }
 
     public function getVendorList()
