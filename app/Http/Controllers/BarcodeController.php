@@ -439,7 +439,7 @@ class BarcodeController extends Controller
             $token='';
         }
 
-        return view('barcode/purchaseOrderList', compact('vendorCode', 'token', 'url_param', 'vendorCodeFromSAP', 'scanDetachUrl', 'updateTokenUrl', 'p','sign'));
+        return view('barcode/purchaseOrderList', compact('vendorCode', 'token', 'vendorCodeFromSAP', 'scanDetachUrl', 'updateTokenUrl', 'p','sign'));
 
     }
 
