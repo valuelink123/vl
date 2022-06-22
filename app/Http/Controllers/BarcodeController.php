@@ -422,7 +422,6 @@ class BarcodeController extends Controller
             $scanDetachUrl = url('/barcode/scanDetach?p=' . $url_param.'&sign='.$sign);
             $updateTokenUrl = url('/barcode/businessLogin?p=' . $url_param.'&sign='.$sign);
             $p='';
-            $token='';
 
         }else{
             $token = '*********************************';
@@ -436,7 +435,9 @@ class BarcodeController extends Controller
             }
             $sign='';
             $p='';
-            $token='';
+
+
+
         }
 
         return view('barcode/purchaseOrderList', compact('vendorCode', 'token', 'vendorCodeFromSAP', 'scanDetachUrl', 'updateTokenUrl', 'p','sign'));
