@@ -373,7 +373,7 @@ class BarcodeController extends Controller
         $token=$req->input('token');
         $sign = $req->input('sign');
 
-        if($sign){
+        if(!empty($sign)){
             if(!$p || !$token){
                 die('请确认密钥');
             }
@@ -421,6 +421,8 @@ class BarcodeController extends Controller
             $url_param = $vendor['url_param'];
             $scanDetachUrl = url('/barcode/scanDetach?p=' . $url_param.'&sign='.$sign);
             $updateTokenUrl = url('/barcode/businessLogin?p=' . $url_param.'&sign='.$sign);
+            $p='';
+            $token='';
 
         }else{
             $token = '*********************************';
@@ -431,8 +433,10 @@ class BarcodeController extends Controller
                 $sign = md5($url_param.$token.'vlerp');
                 $scanDetachUrl = url('/barcode/scanDetach?p=' . $url_param.'&sign='.$sign);
                 $updateTokenUrl = url('/barcode/businessLogin?p=' . $url_param.'&sign='.$sign);
-                $sign='';
             }
+            $sign='';
+            $p='';
+            $token='';
         }
 
         return view('barcode/purchaseOrderList', compact('vendorCode', 'token', 'url_param', 'vendorCodeFromSAP', 'scanDetachUrl', 'updateTokenUrl', 'p','sign'));
@@ -464,7 +468,9 @@ class BarcodeController extends Controller
             }
 
         }else{
-            if (!Auth::user()->can(['barcode-show-po-list'])) die('Permission denied');
+            if (!Auth::user()->can(['barcode-show-po-list'])){
+                die('Permission denied');
+            }
             if (!(isset($search['vendorCode']) && $search['vendorCode'])) {
                 die('没有选择供应商');
             }
