@@ -48,7 +48,7 @@
                                 <button id="changeOperator" class="barcode-btn">变更采购员
                                 </button>
                                 @endif
-                                @if($canChangeOperator)
+                                @if($canAddOperator)
                                 <button id="addNewVendor" class="barcode-btn">新增供应商
                                 </button>
                                 @endif
