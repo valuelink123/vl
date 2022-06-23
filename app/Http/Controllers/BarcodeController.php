@@ -433,8 +433,6 @@ class BarcodeController extends Controller
             $url_param = $vendor['url_param'];
             $scanDetachUrl = url('/barcode/scanDetach?p=' . $url_param.'&sign='.$sign);
             $updateTokenUrl = url('/barcode/businessLogin?p=' . $url_param.'&sign='.$sign);
-            $p='';
-
         }else{
             $token = '*********************************';
             $sign = '********************************';
