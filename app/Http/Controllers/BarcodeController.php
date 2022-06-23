@@ -1324,10 +1324,10 @@ class BarcodeController extends Controller
     public function qc(Request $request)
     {
         if (!Auth::user()->can(['barcode-qc'])) die('Permission denied');
-        $urlParam = $request->input("p");
-        if ($urlParam != 'ec93a64741') {
-            die('网址参数不正确');
-        }
+//        $urlParam = $request->input("p");
+//        if ($urlParam != 'ec93a64741') {
+//            die('网址参数不正确');
+//        }
         return view('barcode/qc');
     }
 
