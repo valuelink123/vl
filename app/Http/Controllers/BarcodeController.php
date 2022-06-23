@@ -57,9 +57,12 @@ class BarcodeController extends Controller
         $userId = Auth::user()->id;
 
         $canChangeOperator = false;
-        if (in_array($userId, $this->getPurchasingDirectorIds())) {
+        if (Auth::user()->can(['barcode-show-change-employee'])){
             $canChangeOperator = true;
         }
+//        if (in_array($userId, $this->getPurchasingDirectorIds())) {
+//            $canChangeOperator = true;
+//        }
 
         $data = DB::table('barcode_vendor_info');
         if(!$canChangeOperator){
@@ -97,7 +100,10 @@ class BarcodeController extends Controller
             $lists[$key]['vendor_name'] = $list['vendor_name'];
             $lists[$key]['operator'] = array_get($userIdNames, intval($list['operator_id'])); //导入的数据，operator_id值为null，所以用intval()
             $enter = '<a href="/barcode/purchaseOrderList?vendorCode=' . $list['vendor_code'] . '" target="_blank">订单列表</a>';
-            if (in_array($userId, $this->getPurchasingDirectorIds())) {
+//            if (in_array($userId, $this->getPurchasingDirectorIds())) {
+//                $enter .= '&nbsp;&nbsp;<button style="background-color: #63C5D1"><a href="/barcode/editVendor?vendorId=' . $list['id'] . '" target="_blank">编辑</a></button>';
+//            }
+            if (Auth::user()->can(['barcode-show-add-vendor'])){
                 $enter .= '&nbsp;&nbsp;<button style="background-color: #63C5D1"><a href="/barcode/editVendor?vendorId=' . $list['id'] . '" target="_blank">编辑</a></button>';
             }
             $lists[$key]['enter'] = $enter;
@@ -923,11 +929,14 @@ class BarcodeController extends Controller
     {
         if (!Auth::user()->can(['barcode-show-add-vendor'])) die('Permission denied');
         $userId = Auth::user()->id;
-        $canChangeOperator = false;
-        if (in_array($userId, $this->getPurchasingDirectorIds())) {
-            $canChangeOperator = true;
-        }
-        if (!$canChangeOperator) die('Permission denied');
+        $canChangeOperator = true;
+//        if (Auth::user()->can(['barcode-show-add-vendor'])){
+//            $canChangeOperator = true;
+//        }
+//        if (in_array($userId, $this->getPurchasingDirectorIds())) {
+//            $canChangeOperator = true;
+//        }
+//        if (!$canChangeOperator) die('Permission denied');
 
         $role = DB::table('roles')->where('name', 'Purchase Employee')->first();
         $roleIdForOperators = 0;
@@ -1189,12 +1198,14 @@ class BarcodeController extends Controller
 
     public function changeOperator(Request $request)
     {
+        if (!Auth::user()->can(['barcode-show-change-employee'])) die('Permission denied');
         $userId = Auth::user()->id;
-        $canChangeOperator = false;
-        if (in_array($userId, $this->getPurchasingDirectorIds())) {
-            $canChangeOperator = true;
-        }
-        if (!$canChangeOperator) die('Permission denied');
+        $canChangeOperator = true;
+//
+//        if (in_array($userId, $this->getPurchasingDirectorIds())) {
+//            $canChangeOperator = true;
+//        }
+//        if (!$canChangeOperator) die('Permission denied');
 
         $role = DB::table('roles')->where('name', 'Purchase Employee')->first();
         $roleIdForOperators = 0;
@@ -1314,12 +1325,12 @@ class BarcodeController extends Controller
     }
 
     //获取采购总监的id
-    public function getPurchasingDirectorIds()
-    {
-        $userIds = DB::table('users')->where('email', 'like', 'wangshuang@valuelink%')->orWhere('email', 'like', 'zhousunyao@valuelink%')->orWhere('email', 'like', 'yilinteng@valuelink%')->orWhere('email', 'like', 'chenguancan@valuelink%')->orWhere('email', 'like', 'zhangjianqun@valuelink%')->orWhere('email', 'like', 'sunhanshan@valuelink%')->where('locked', 0)->pluck('id');
-        $userIds = json_decode(json_encode($userIds),true);
-        return $userIds;
-    }
+//    public function getPurchasingDirectorIds()
+//    {
+//        $userIds = DB::table('users')->where('email', 'like', 'wangshuang@valuelink%')->orWhere('email', 'like', 'zhousunyao@valuelink%')->orWhere('email', 'like', 'yilinteng@valuelink%')->orWhere('email', 'like', 'chenguancan@valuelink%')->orWhere('email', 'like', 'zhangjianqun@valuelink%')->orWhere('email', 'like', 'sunhanshan@valuelink%')->where('locked', 0)->pluck('id');
+//        $userIds = json_decode(json_encode($userIds),true);
+//        return $userIds;
+//    }
 
     public function qc(Request $request)
     {
