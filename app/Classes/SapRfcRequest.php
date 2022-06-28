@@ -177,14 +177,15 @@ class SapRfcRequest {
         try {
 
             $json = CurlRequest::curl_get_contents($url,60);
+            $json = json_decode($json, true);
+            return json;
 
         } catch (\Exception $e) {
 
             throw new SapRfcRequestException('System Network Error.', 100, $e);
         }
 
-        $json = json_decode($json, true);
-        return json;
+
 
         // 返回 json
         // 成功 {"method":"getOrder","orderId":"028-8067324-2327540","result":1,"message":""}
