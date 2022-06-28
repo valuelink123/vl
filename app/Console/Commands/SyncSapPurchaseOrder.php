@@ -31,13 +31,13 @@ class SyncSapPurchaseOrder extends Command
 
 
         $res=$sap->getPurchaseOrderList(['start_date'=>$afterDate,'end_date'=>$beforeDate]);
-        if(array_get($res,'data.O_RETURN')=='S'){
-            $lists = array_get($res,'data.RESULT_TABLE');
+        if(array_get($res,'O_RETURN')=='S'){
+            $lists = array_get($res,'RESULT_TABLE');
             foreach($lists as $list){
 //                $__EBELN=trim(array_get($list,'EBELN',''));
-//                $__BUKRS=trim(array_get($list,'BUKRS',''));
+                $__LIFNR=trim(array_get($list,'LIFNR',''));
                 $__BSART=trim(array_get($list,'BSART',''));
-                if($__BSART=='NB') {
+                if($__BSART=='NB' && $__LIFNR !='CN01') {
                     SapPurchase::updateOrCreate(["EBELN" => trim(array_get($list,'EBELN',''))],
                         [
                             "BUKRS" => trim(array_get($list, 'BUKRS', '')),
