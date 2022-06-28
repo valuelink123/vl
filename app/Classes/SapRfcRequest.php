@@ -178,7 +178,7 @@ class SapRfcRequest {
 
             $json = CurlRequest::curl_get_contents($url,60);
             $json = json_decode($json, true);
-            return json;
+            return $json;
 
         } catch (\Exception $e) {
 
