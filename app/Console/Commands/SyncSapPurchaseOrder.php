@@ -24,12 +24,13 @@ class SyncSapPurchaseOrder extends Command
 
         $sap = new SapRfcRequest();
 
-        $data['postdata']['EXPORT']=array('O_MESSAGE'=>'','O_RETURN'=>'');
-        $data['postdata']['TABLE']=array('RESULT_TABLE'=>array(0));
-        $data['postdata']['IMPORT']=array('I_DATE_S'=>$afterDate,'I_DATE_E'=>$beforeDate);
+//        $data['postdata']['EXPORT']=array('O_MESSAGE'=>'','O_RETURN'=>'');
+//        $data['postdata']['TABLE']=array('RESULT_TABLE'=>array(0));
+//        $data['postdata']['IMPORT']=array('I_DATE_S'=>$afterDate,'I_DATE_E'=>$beforeDate);
 
 
-        $res=$sap->getPurchaseOrderList($data);
+
+        $res=$sap->getPurchaseOrderList(['start_date'=>$afterDate,'end_date'=>$beforeDate]);
         if(array_get($res,'data.O_RETURN')=='S'){
             $lists = array_get($res,'data.RESULT_TABLE');
             foreach($lists as $list){
