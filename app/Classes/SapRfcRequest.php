@@ -184,21 +184,22 @@ class SapRfcRequest {
         }
 
         $json = json_decode($json, true);
+        return json;
 
         // 返回 json
         // 成功 {"method":"getOrder","orderId":"028-8067324-2327540","result":1,"message":""}
         // 失败 {"method":"getOrder","orderId":"028-8067324-23275401","result":0,"message":"Data Auth Failed!"}
 
-        if (!isset($json['result'])) {
-            throw new SapRfcRequestException('System Data Decode Failed.', 101);
-        } else if (1 == $json['result']) {
-            return $json['data'];
-        } else if ('No matching data!' === $json['message']) {
-            // 垃圾设计，把 无结果 和 错误 混在一起了！
-            return [];
-        } else {
-            throw new SapRfcRequestException($json['message'], 102);
-        }
+//        if (!isset($json['result'])) {
+//            throw new SapRfcRequestException('System Data Decode Failed.', 101);
+//        } else if (1 == $json['result']) {
+//            return $json['data'];
+//        } else if ('No matching data!' === $json['message']) {
+//            // 垃圾设计，把 无结果 和 错误 混在一起了！
+//            return [];
+//        } else {
+//            throw new SapRfcRequestException($json['message'], 102);
+//        }
     }
 }
 
