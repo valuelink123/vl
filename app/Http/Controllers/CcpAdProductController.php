@@ -19,9 +19,9 @@ class CcpAdProductController extends Controller
 	use \App\Traits\DataTables;
 	use \App\Traits\Mysqli;
 
-	public $ccpAdmin = array("lidan@valuelinkcorp.com","liuling@dtas.com","wuweiye@valuelinkcorp.com","luodenglin@valuelinkcorp.com","zhouzhiwen@valuelinkltd.com","zhangjianqun@valuelinkcorp.com","sunhanshan@valuelinkcorp.com","wangxiaohua@valuelinkltd.com","zhoulinlin@valuelinkcorp.com","wangshuang@valuelinkltd.com","lixiaojian@valuelinkltd.com");
-	public $start_date = '';//ËÑË÷Ê±¼ä·¶Î§µÄ¿ªÊ¼Ê±¼ä
-	public $end_date = '';//ËÑË÷Ê±¼ä·¶Î§µÄ½áÊøÊ±¼ä
+	public $ccpAdmin = array("lidan@valuelinkcorp.com","liuling@dtas.com","wuweiye@valuelinkcorp.com","luodenglin@valuelinkcorp.com","zhouzhiwen@valuelinkltd.com","zhangjianqun@valuelinkcorp.com","sunhanshan@valuelinkcorp.com","wangxiaohua@valuelinkltd.com","zhoulinlin@valuelinkcorp.com","wangshuang@valuelinkltd.com","lixiaojian@valuelinkltd.com","shiqingbo@valuelinkltd.com");
+	public $start_date = '';//ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ä·¶Î§ï¿½Ä¿ï¿½Ê¼Ê±ï¿½ï¿½
+	public $end_date = '';//ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ä·¶Î§ï¿½Ä½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½
 	public $typeConfig = array(
 		'table_group' => array('SProducts'=>'ppc_sproducts_ad_groups','SDisplay'=>'ppc_sdisplay_ad_groups','SBrands'=>'ppc_sbrands_ad_groups'),
 		'table_campaign' => array('SProducts'=>'ppc_sproducts_campaigns','SDisplay'=>'ppc_sdisplay_campaigns','SBrands'=>'ppc_sbrands_campaigns'),
@@ -46,7 +46,7 @@ class CcpAdProductController extends Controller
 		if(!Auth::user()->can(['ccp-ad-product-show'])) die('Permission denied -- ccp ad product show');
 		$bgs = $this->queryFields('SELECT DISTINCT bg FROM asin order By bg asc');
 		$bus = $this->queryFields('SELECT DISTINCT bu FROM asin order By bu asc');
-		$site = getMarketDomain();//»ñÈ¡Õ¾µãÑ¡Ïî
+		$site = getMarketDomain();//ï¿½ï¿½È¡Õ¾ï¿½ï¿½Ñ¡ï¿½ï¿½
 		$this->date = date('Y-m-d');
 
 		$siteDate = array();
@@ -58,15 +58,15 @@ class CcpAdProductController extends Controller
 		return view('ccp/ad_product',['bgs'=>$bgs,'bus'=>$bus,'site'=>$site,'date'=>$date,'siteDate'=>$siteDate,'type'=>$type]);
 	}
 	/*
-	* »ñµÃÍ³¼Æ×ÜÊý¾Ý
+	* ï¿½ï¿½ï¿½Í³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	 */
 	public function showTotal()
 	{
-		//ËÑË÷Ìõ¼þ£¬Í³¼ÆÊý¾Ý²»ÊÜÏÂÃæµÄasinËÑË÷µÄÓ°Ïì
+		//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í³ï¿½ï¿½ï¿½ï¿½ï¿½Ý²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½asinï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó°ï¿½ï¿½
 		$search = isset($_REQUEST['search_data']) ? $_REQUEST['search_data'] : '';
 		$search = $this->getSearchData(explode('&',$search));
-		$site = isset($search['site']) ? $search['site'] : '';//Õ¾µã£¬Îªmarketplaceid
-		$account = isset($search['account']) ? $search['account'] : '';//ÕËºÅid,seller_id
+		$site = isset($search['site']) ? $search['site'] : '';//Õ¾ï¿½ã£¬Îªmarketplaceid
+		$account = isset($search['account']) ? $search['account'] : '';//ï¿½Ëºï¿½id,seller_id
 		$bg = isset($search['bg']) ? $search['bg'] : '';
 		$bu = isset($search['bu']) ? $search['bu'] : '';
 		$this->start_date = isset($search['start_date']) ? $search['start_date'] : '';
@@ -77,7 +77,7 @@ class CcpAdProductController extends Controller
 
 		$type = isset($search['type']) ? $search['type'] : '';
 
-		//Ê±¼äËÑË÷·¶Î§
+		//Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î§
 		$where = $this->getPpcDateWhere();
 		$account_data = $this->getPpcAccountByMarketplace($site);
 		$account_id = array_keys($account_data);
@@ -92,7 +92,7 @@ class CcpAdProductController extends Controller
 		$table_product = isset($this->typeConfig['table_product'][$type]) ? $this->typeConfig['table_product'][$type] : '';
 
 
-		//ÓÃ»§È¨ÏÞÊý¾Ý£¬Í¨¹ýsap_asin_match_sku±íµÃµ½¿É²é·¶Î§µÄasin_selersku×éºÏÊý¾Ý£¬
+		//ï¿½Ã»ï¿½È¨ï¿½ï¿½ï¿½ï¿½ï¿½Ý£ï¿½Í¨ï¿½ï¿½sap_asin_match_skuï¿½ï¿½Ãµï¿½ï¿½É²é·¶Î§ï¿½ï¿½asin_selerskuï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý£ï¿½
 		$asin_sellersku_arr = $this->getSellerSkuData($site,$bg,$bu);
 		$asin_sellersku_str = implode("','", $asin_sellersku_arr);
 		$where .= " and CONCAT(products.asin,'_',products.sku) in('".$asin_sellersku_str."')";
@@ -120,12 +120,12 @@ class CcpAdProductController extends Controller
 		return $array;
 	}
 
-	//Õ¹Ê¾ÁÐ±íÊý¾Ý
+	//Õ¹Ê¾ï¿½Ð±ï¿½ï¿½ï¿½ï¿½ï¿½
 	public function list(Request $req)
 	{
 		$search = isset($_REQUEST['search']) ? $_REQUEST['search'] : '';
 		$search = $this->getSearchData(explode('&',$search));
-		$site = isset($search['site']) ? $search['site'] : '';//Õ¾µã£¬Îªmarketplaceid
+		$site = isset($search['site']) ? $search['site'] : '';//Õ¾ï¿½ã£¬Îªmarketplaceid
 		$limit = "";
 		if($_REQUEST['length']){
 				$limit = $this->dtLimit($req);
@@ -136,12 +136,12 @@ class CcpAdProductController extends Controller
 		$_data = DB::select($sql);
 		$recordsTotal = $recordsFiltered = DB::select('SELECT FOUND_ROWS() as total');
 		$recordsTotal = $recordsFiltered = $recordsTotal[0]->total;
-		$data = $this->getDealData($_data,$site);//µÃµ½´¦ÀíºóµÄÊý¾Ý
+		$data = $this->getDealData($_data,$site);//ï¿½Ãµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 		return compact('data', 'recordsTotal', 'recordsFiltered');
 	}
 	/*
-	 * ÓÃ»§È¨ÏÞÊý¾Ý£¬Í¨¹ýsap_asin_match_sku±íµÃµ½¿É²é·¶Î§µÄasin_selersku×éºÏÊý¾Ý
+	 * ï¿½Ã»ï¿½È¨ï¿½ï¿½ï¿½ï¿½ï¿½Ý£ï¿½Í¨ï¿½ï¿½sap_asin_match_skuï¿½ï¿½Ãµï¿½ï¿½É²é·¶Î§ï¿½ï¿½asin_selerskuï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	 */
 	public function getSellerSkuData($site,$bg,$bu)
 	{
@@ -175,20 +175,20 @@ class CcpAdProductController extends Controller
 	}
 
 	/*
-	 * µÃµ½ÁÐ±íºÍµ¼³öÊý¾ÝµÄsql
+	 * ï¿½Ãµï¿½ï¿½Ð±ï¿½Íµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ýµï¿½sql
 	 */
 	public function getSql($search)
 	{
-		$site = isset($search['site']) ? $search['site'] : '';//Õ¾µã£¬Îªmarketplaceid
-		$account = isset($search['account']) ? $search['account'] : '';//ÕËºÅid,ÀýÈç115,137
+		$site = isset($search['site']) ? $search['site'] : '';//Õ¾ï¿½ã£¬Îªmarketplaceid
+		$account = isset($search['account']) ? $search['account'] : '';//ï¿½Ëºï¿½id,ï¿½ï¿½ï¿½ï¿½115,137
 		$bg = isset($search['bg']) ? $search['bg'] : '';
 		$bu = isset($search['bu']) ? $search['bu'] : '';
-		$asin = isset($search['asin']) ? trim($search['asin'],'+') : '';//asinÊäÈë¿òµÄÖµ
+		$asin = isset($search['asin']) ? trim($search['asin'],'+') : '';//asinï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµ
 		$this->start_date = isset($search['start_date']) ? $search['start_date'] : '';
 		$this->end_date = isset($search['end_date']) ? $search['end_date'] : '';
 		$type = isset($search['type']) ? $search['type'] : '';
 
-		//Ê±¼äËÑË÷·¶Î§
+		//Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î§
 		$where = $this->getPpcDateWhere();
 		$account_data = $this->getPpcAccountByMarketplace($site);
 		$account_id = array_keys($account_data);
@@ -201,7 +201,7 @@ class CcpAdProductController extends Controller
 		$table_campaign = isset($this->typeConfig['table_campaign'][$type]) ? $this->typeConfig['table_campaign'][$type] : '';
 		$table_product = isset($this->typeConfig['table_product'][$type]) ? $this->typeConfig['table_product'][$type] : '';
 
-		//ÓÃ»§È¨ÏÞÊý¾Ý£¬Í¨¹ýsap_asin_match_sku±íµÃµ½¿É²é·¶Î§µÄasin_selersku×éºÏÊý¾Ý£¬
+		//ï¿½Ã»ï¿½È¨ï¿½ï¿½ï¿½ï¿½ï¿½Ý£ï¿½Í¨ï¿½ï¿½sap_asin_match_skuï¿½ï¿½Ãµï¿½ï¿½É²é·¶Î§ï¿½ï¿½asin_selerskuï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý£ï¿½
 		$asin_sellersku_arr = $this->getSellerSkuData($site,$bg,$bu);
 		$asin_sellersku_str = implode("','", $asin_sellersku_arr);
 		$where .= " and CONCAT(products.asin,'_',products.sku) in('".$asin_sellersku_str."')";
@@ -232,7 +232,7 @@ class CcpAdProductController extends Controller
 	}
 
 	/*
-	 * µ¼³öÁÐ±í
+	 * ï¿½ï¿½ï¿½ï¿½ï¿½Ð±ï¿½
 	 */
 	public function export(Request $req)
 	{
@@ -240,11 +240,11 @@ class CcpAdProductController extends Controller
 		$sql = $this->getSql($req);
 		$_data = DB::select($sql);
 
-		//±íÍ·
+		//ï¿½ï¿½Í·
 		$headArray = array('PRODUCT','ASIN','Item No.','AD COST','SALES','ORDERS','ACOS','IMPRESSIONS','CLICKS','CTR','CPC','CR');
 		$arrayData[] = $headArray;
-		$site = isset($req['site']) ? $req['site'] : '';//Õ¾µã£¬Îªmarketplaceid
-		$data = $this->getDealData($_data,$site);//µÃµ½´¦ÀíºóµÄÊý¾Ý
+		$site = isset($req['site']) ? $req['site'] : '';//Õ¾ï¿½ã£¬Îªmarketplaceid
+		$data = $this->getDealData($_data,$site);//ï¿½Ãµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 		foreach($data as $key=>$val){
 			$arrayData[] = array(
@@ -273,9 +273,9 @@ class CcpAdProductController extends Controller
 					'A1'         // Top left coordinate of the worksheet range where
 				//    we want to set these values (default is A1)
 				);
-			header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');//¸æËßä¯ÀÀÆ÷Êä³ö07ExcelÎÄ¼þ
-			header('Content-Disposition: attachment;filename="CCP_AdProduct.xlsx"');//¸æËßä¯ÀÀÆ÷Êä³öä¯ÀÀÆ÷Ãû³Æ
-			header('Cache-Control: max-age=0');//½ûÖ¹»º´æ
+			header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½07Excelï¿½Ä¼ï¿½
+			header('Content-Disposition: attachment;filename="CCP_AdProduct.xlsx"');//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+			header('Cache-Control: max-age=0');//ï¿½ï¿½Ö¹ï¿½ï¿½ï¿½ï¿½
 			$writer = new Xlsx($spreadsheet);
 			$writer->save('php://output');
 		}
@@ -283,7 +283,7 @@ class CcpAdProductController extends Controller
 	}
 
 	/*
-	 * ´¦Àí·µ»ØµÄÊý¾Ý
+	 * ï¿½ï¿½ï¿½ï¿½ï¿½Øµï¿½ï¿½ï¿½ï¿½ï¿½
 	 */
 	public function getDealData($_data,$site)
 	{

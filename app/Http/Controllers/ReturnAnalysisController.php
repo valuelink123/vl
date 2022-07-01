@@ -45,7 +45,7 @@ class ReturnAnalysisController extends Controller
 		1=>['name'=>'非品质问题退货数量','reason'=>['DID_NOT_LIKE_FABRIC','PRODUCT_NOT_ITALIAN','SWITCHEROO','UNWANTED_ITEM','NOT_AS_DESCRIBED','ORDERED_WRONG_ITEM','MISORDERED','UNDELIVERABLE_UNCLAIMED','UNDELIVERABLE_UNKNOWN','NEVER_ARRIVED','UNDELIVERABLE_CARRIER_MISS_SORTED','UNDELIVERABLE_INSUFFICIENT_ADDRESS','UNDELIVERABLE_MISSING_LABEL','UNDELIVERABLE_FAILED_DELIVERY_ATTEMPTS','UNDELIVERABLE_REFUSED','FOUND_BETTER_PRICE','MISSED_ESTIMATED_DELIVERY','UNAUTHORIZED_PURCHASE','NOT_COMPATIBLE','APPAREL_TOO_LARGE','APPAREL_TOO_SMALL','PART_NOT_COMPATIBLE','NO_REASON_GIVEN','EXTRA_ITEM','EXCESSIVE_INSTALLATION','CARRIER_DAMAGED','DAMAGED','SELLABLE']],
 	];
 
-	public $ccpAdmin = array("huangshan@valuelinkltd.com","lidan@valuelinkcorp.com","wuweiye@valuelinkcorp.com","luodenglin@valuelinkcorp.com","zhouzhiwen@valuelinkltd.com","zhangjianqun@valuelinkcorp.com","sunhanshan@valuelinkcorp.com","wangxiaohua@valuelinkltd.com","zhoulinlin@valuelinkcorp.com","wangshuang@valuelinkltd.com","lizhuojun@valuelinkcorp.com","lixiaojian@valuelinkltd.com");
+	public $ccpAdmin = array("huangshan@valuelinkltd.com","lidan@valuelinkcorp.com","wuweiye@valuelinkcorp.com","luodenglin@valuelinkcorp.com","zhouzhiwen@valuelinkltd.com","zhangjianqun@valuelinkcorp.com","sunhanshan@valuelinkcorp.com","wangxiaohua@valuelinkltd.com","zhoulinlin@valuelinkcorp.com","wangshuang@valuelinkltd.com","lizhuojun@valuelinkcorp.com","lixiaojian@valuelinkltd.com","shiqingbo@valuelinkltd.com");
 
 	public function __construct()
 	{
