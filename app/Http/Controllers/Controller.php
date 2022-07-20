@@ -867,14 +867,21 @@ ORDER BY asin_offer_summary.asin DESC ";
 	 */
 	public function exceptionPushServiceSystem($exceptionId)
 	{
+		try{
 //		return true;
 		$data = Exception::findOrFail($exceptionId);
 		//if($data['service_system_id']>0) {
 			$params = json_encode($data);
-			curl_request('http://www.onecustomerme.com/api/exception/webhook',['params'=>$params]);
-			//file_get_contents('http://www.onecustomerme.com/api/exception/webhook?params=' . $params);
+			$return  = curl_request('http://www.onecustomerme.com/api/exception/webhook',['params'=>$params]);
+			$return = json_decode($return,true);
+			if(array_get($return,'result')!='ok'){
+				throw new \Exception("Data synchronization failed, please try again");
+			}//file_get_contents('http://www.onecustomerme.com/api/exception/webhook?params=' . $params);
 		//}
 		
+		} catch (\Exception $e) {
+			throw $e;
+		}
 		return true;
 	}
 
