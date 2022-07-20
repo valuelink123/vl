@@ -131,27 +131,45 @@ class SapRfcRequest {
      */
     public function __call($method, $arguments) {
 
-        $appid = $this->appid;
 
-        $pairs = $arguments[0];
+        $arguments=$arguments[0];
+        $arguments['appid'] = $this->appid;
+        $arguments['method'] = $method;
 
-        $array = compact('appid', 'method');
-        $array = array_replace($array, $pairs);
+        ksort($arguments);
 
-        ksort($array);
-
-        $authstr = [];
-
-        foreach ($array as $k => $v) {
-            $authstr[] = $k;
-            $authstr[] = $v;
+        $authstr = "";
+        foreach ($arguments as $k => $v) {
+            $authstr.= $k;
         }
 
-        $authstr[] = $this->appsecret;
 
-        $array['sign'] = strtoupper(sha1(implode('', $authstr)));
+        $authstr.= $this->appsecret;
 
-        $queryString = http_build_query($array, '', '&', PHP_QUERY_RFC3986);
+        $arguments['sign'] =  strtoupper(sha1($authstr));
+
+
+//        $appid = $this->appid;
+//
+//        $pairs = $arguments[0];
+//
+//        $array = compact('appid', 'method');
+//        $array = array_replace($array, $pairs);
+//
+//        ksort($array);
+//
+//        $authstr = [];
+//
+//        foreach ($array as $k => $v) {
+//            $authstr[] = $k;
+//            $authstr[] = $v;
+//        }
+//
+//        $authstr[] = $this->appsecret;
+//
+//        $array['sign'] = strtoupper(sha1(implode('', $authstr)));
+
+        $queryString = http_build_query($arguments, '', '&', PHP_QUERY_RFC3986);
 
         $url = "http://{$this->host}/rfc_site.php?{$queryString}";
         //$url = "http://192.168.10.10:18003/rfc_site.php?{$queryString}";

@@ -30,7 +30,7 @@
             <input type="text" name="vendorCodeFromSAP" id="vendorCodeFromSAP" value="" oninput="value=value.replace(/[^\d]/g,'')" maxlength="10" />
         </div>
         <div>输入供应商名称</div>
-        <div style="font-size: x-small; color: #ff0000">（地区+简称，例如：深圳纽尚）</div>
+        <div style="font-size: x-small; color: #ff0000">（地区+简称，例如：深圳价之链）</div>
         <div>
             <input type="text" class="form-control" name="vendorName" id="vendorName" value=""/>
         </div>

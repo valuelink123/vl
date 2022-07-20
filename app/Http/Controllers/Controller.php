@@ -808,7 +808,7 @@ ORDER BY asin_offer_summary.asin DESC ";
 
 	public function getccpAdmin()
 	{
-		$ccpAdmin = array("zhangjianqun@valuelinkcorp.com","sunhanshan@valuelinkcorp.com","lixiaojian@valuelinkltd.com","wulanfang@valuelinkcorp.com","chenguancan@valuelinkcorp.com");
+		$ccpAdmin = array("zhangjianqun@valuelinkcorp.com","sunhanshan@valuelinkcorp.com","lixiaojian@valuelinkltd.com","wulanfang@valuelinkcorp.com","chenguancan@valuelinkcorp.com","shiqingbo@valuelinkltd.com");
 		return $ccpAdmin;
 	}
 

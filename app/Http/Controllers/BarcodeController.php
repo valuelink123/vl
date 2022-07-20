@@ -29,8 +29,14 @@ class BarcodeController extends Controller
         if (!Auth::user()->can(['barcode-show'])) die('Permission denied');
         $userId = Auth::user()->id;
         $canChangeOperator = false;
-        if (in_array($userId, $this->getPurchasingDirectorIds())) {
-            $canChangeOperator = true;
+        $canAddOperator =false;
+
+        if (Auth::user()->can(['barcode-show-add-vendor'])){
+            $canAddOperator = true;
+        }
+
+       if (Auth::user()->can(['barcode-show-change-employee'])){
+           $canChangeOperator = true;
         }
 
         $isPurchaseEmployee=false;
@@ -42,7 +48,7 @@ class BarcodeController extends Controller
         }
 
 
-        return view('barcode/index', compact('canChangeOperator','isPurchaseEmployee'));
+        return view('barcode/index', compact('canAddOperator', 'canChangeOperator','isPurchaseEmployee'));
     }
 
     public function getVendorList()
@@ -51,9 +57,12 @@ class BarcodeController extends Controller
         $userId = Auth::user()->id;
 
         $canChangeOperator = false;
-        if (in_array($userId, $this->getPurchasingDirectorIds())) {
+        if (Auth::user()->can(['barcode-show-change-employee'])){
             $canChangeOperator = true;
         }
+//        if (in_array($userId, $this->getPurchasingDirectorIds())) {
+//            $canChangeOperator = true;
+//        }
 
         $data = DB::table('barcode_vendor_info');
         if(!$canChangeOperator){
@@ -91,7 +100,10 @@ class BarcodeController extends Controller
             $lists[$key]['vendor_name'] = $list['vendor_name'];
             $lists[$key]['operator'] = array_get($userIdNames, intval($list['operator_id'])); //导入的数据，operator_id值为null，所以用intval()
             $enter = '<a href="/barcode/purchaseOrderList?vendorCode=' . $list['vendor_code'] . '" target="_blank">订单列表</a>';
-            if (in_array($userId, $this->getPurchasingDirectorIds())) {
+//            if (in_array($userId, $this->getPurchasingDirectorIds())) {
+//                $enter .= '&nbsp;&nbsp;<button style="background-color: #63C5D1"><a href="/barcode/editVendor?vendorId=' . $list['id'] . '" target="_blank">编辑</a></button>';
+//            }
+            if (Auth::user()->can(['barcode-show-add-vendor'])){
                 $enter .= '&nbsp;&nbsp;<button style="background-color: #63C5D1"><a href="/barcode/editVendor?vendorId=' . $list['id'] . '" target="_blank">编辑</a></button>';
             }
             $lists[$key]['enter'] = $enter;
@@ -127,7 +139,7 @@ class BarcodeController extends Controller
 
         $sign = $this->getSapApiSign($array_detail);
         try {
-            $res = file_get_contents('http://' . env("SAP_RFC") . '/rfc_sap_api.php?appid=' . env("SAP_KEY") . '&method=' . $array_detail['method'] . '&gt_table=' . $array_detail['gt_table'] . '&sign=' . $sign);
+            $res = file_get_contents('http://' . env("SAP_RFC") . '/rfc_sap_api.php?appid=' . $array_detail['appid']. '&method=' . $array_detail['method'] . '&gt_table=' . $array_detail['gt_table'] . '&sign=' . $sign);
             //$res = file_get_contents('http://' . env("SAP_RFC") . '/rfc_sap_api.php?appid=' . env("SAP_KEY") . '&method=' . $array_detail['method'] . '&sign=' . $sign);   getPurchaseOrderList
             //
             $result = json_decode($res, true);
@@ -329,7 +341,7 @@ class BarcodeController extends Controller
                 $row++;
                 $html = '<div>';
                 foreach ($chunk as $barcodeText) {
-                    $barcode = $generator->getBarcode($barcodeText, $generator::TYPE_CODE_93, 5, 20, array(0, 0, 0));
+                    $barcode = $generator->getBarcode($barcodeText, $generator::TYPE_CODE_93, 20, 20, array(0, 0, 0));
                     $barcode = base64_encode($barcode);
                     $html .= '<div class="border">
                                   <div>
@@ -373,7 +385,7 @@ class BarcodeController extends Controller
         $token=$req->input('token');
         $sign = $req->input('sign');
 
-        if($sign){
+        if(!empty($sign)){
             if(!$p || !$token){
                 die('请确认密钥');
             }
@@ -421,7 +433,6 @@ class BarcodeController extends Controller
             $url_param = $vendor['url_param'];
             $scanDetachUrl = url('/barcode/scanDetach?p=' . $url_param.'&sign='.$sign);
             $updateTokenUrl = url('/barcode/businessLogin?p=' . $url_param.'&sign='.$sign);
-
         }else{
             $token = '*********************************';
             $sign = '********************************';
@@ -431,11 +442,15 @@ class BarcodeController extends Controller
                 $sign = md5($url_param.$token.'vlerp');
                 $scanDetachUrl = url('/barcode/scanDetach?p=' . $url_param.'&sign='.$sign);
                 $updateTokenUrl = url('/barcode/businessLogin?p=' . $url_param.'&sign='.$sign);
-                $sign='';
             }
+            $sign='';
+            $p='';
+
+
+
         }
 
-        return view('barcode/purchaseOrderList', compact('vendorCode', 'token', 'url_param', 'vendorCodeFromSAP', 'scanDetachUrl', 'updateTokenUrl', 'p','sign'));
+        return view('barcode/purchaseOrderList', compact('vendorCode', 'token', 'vendorCodeFromSAP', 'scanDetachUrl', 'updateTokenUrl', 'p','sign'));
 
     }
 
@@ -464,7 +479,9 @@ class BarcodeController extends Controller
             }
 
         }else{
-            if (!Auth::user()->can(['barcode-show-po-list'])) die('Permission denied');
+            if (!Auth::user()->can(['barcode-show-po-list'])){
+                die('Permission denied');
+            }
             if (!(isset($search['vendorCode']) && $search['vendorCode'])) {
                 die('没有选择供应商');
             }
@@ -621,7 +638,7 @@ class BarcodeController extends Controller
         $activatedCount = DB::table('barcode_scan_record')->where('vendor_code', $vendorCode)->where('purchase_order', $purchaseOrder)->where('current_status', 1)->whereRAW("SUBSTR(`status_updated_at`,1,10)='".$dateOption."'")->count();
 
         if($sign){
-            return view('barcode/vendorDetails', compact('vendorCode', 'dateOption', 'activatedCount'));
+            return view('barcode/vendorDetails', compact('vendorCode', 'dateOption', 'activatedCount', 'p', 'token', 'sign','purchaseOrder'));
         }else {
             return view('barcode/purchaseOrderDetails', compact('vendorCode', 'dateOption', 'activatedCount', 'purchaseOrder'));
         }
@@ -629,85 +646,81 @@ class BarcodeController extends Controller
 
     public function getPurchaseOrderDetails(Request $request)
     {
+
         $search = isset($_POST['search']) ? $_POST['search'] : '';
         $search = $this->getSearchData(explode('&', $search));
         $vendorCode=$search['vendorCode'];
         $purchaseOrder=$search['purchaseOrder'];
         $sku = $search['sku'];
-//        if (!$purchaseOrder) {
-//            die('没有选择采购订单号');
-//        }
-//        if (!$vendorCode) {
-//            die('没有选择供应商');
-//        }
-//
-//        if (!Auth::user()->can(['barcode-show-po-detail'])) die('Permission denied');
-//
-//
-//
-//        $data = DB::table('barcode_scan_record')->where('vendor_code', $vendorCode)->where('purchase_order', $purchaseOrder);
-//
-//        if ($sku) {
-//            $data = $data->where(function ($query) use ($sku) {
-//                $query->where('sku', '=', $sku);
-//            });
-//        }
-//
-//
-//
-//        $orderby = 'status_updated_at';
-//        $order_column = $request->input('order.0.column', '4');
-//        if ($order_column == 0) {
-//            $orderby = 'sku';
-//        } else if ($order_column == 1) {
-//            $orderby = 'sn';
-//        } else if ($order_column == 2) {
-//            $orderby = 'current_status';
-//        } else if ($order_column == 4) {
-//            $orderby = 'status_updated_at';
-//        }
-//        $sort = $request->input('order.0.dir', 'desc');
-//        $iTotalRecords = $data->get()->count();
-//
-//
-//        $iDisplayLength = intval($_REQUEST['length']);
-//        $iDisplayLength = $iDisplayLength < 0 ? $iTotalRecords : $iDisplayLength;
-//        $iDisplayStart = intval($_REQUEST['start']);
-//        $lists = $data->orderBy($orderby, $sort)->offset($iDisplayStart)->limit($iDisplayLength)->get()->toArray();
-//        $lists = json_decode(json_encode($lists), true);
-//
-//
-//        $userIdNames = $this->getUserIdNames();
-//
-//        foreach ($lists as $key => $list) {
-//            $lists[$key]['sku'] = $list['sku'];
-//            $lists[$key]['barcode_text'] = $list['barcode_text'];
-//            $lists[$key]['current_status'] = $list['current_status'];
-//            $lists[$key]['status_history'] = $list['status_history'];
-//            $lists[$key]['status_updated_at'] = $list['status_updated_at'];
-//            $lists[$key]['generated_by'] = array_get($userIdNames, $list['generated_by']);
-//            $lists[$key]['generated_at'] = $list['generated_at'];
-//            $lists[$key]['printed_by'] = array_get($userIdNames, $list['printed_by']);
-//            $lists[$key]['qc'] = array_get($userIdNames, $list['qc']);
-//            if ($list['qc_history']) {
-//                $qcArray = explode(',', $list['qc_history']);
-//                $qcNameArray = [];
-//                foreach ($qcArray as $k => $v) {
-//                    $qcNameArray[$k] = array_get($userIdNames, intval($v));
-//                }
-//                $qcHistory = implode(',', $qcNameArray);
-//                $lists[$key]['qc_history'] = $qcHistory;
-//            } else {
-//                $lists[$key]['qc_history'] = '';
-//            }
-//            $lists[$key]['qc_updated_at'] = $list['qc_updated_at'];
-//        }
-//        $recordsTotal = $iTotalRecords;
-//        $recordsFiltered = $iTotalRecords;
-//        $data = $lists;
-        $data=[];
-        $recordsTotal=100;
-        $recordsFiltered=100;
+
+        if (!$purchaseOrder) {
+            die('没有选择采购订单号');
+        }
+        if (!$vendorCode) {
+            die('没有选择供应商');
+        }
+
+        if (!Auth::user()->can(['barcode-show-po-detail'])) die('Permission denied');
+
+
+
+        $data = DB::table('barcode_scan_record')->where('vendor_code', $vendorCode)->where('purchase_order', $purchaseOrder);
+
+        if ($sku) {
+            $data = $data->where(function ($query) use ($sku) {
+                $query->where('sku', '=', $sku);
+            });
+        }
+
+        $orderby = 'status_updated_at';
+        $order_column = $request->input('order.0.column', '4');
+        if ($order_column == 0) {
+            $orderby = 'sku';
+        } else if ($order_column == 1) {
+            $orderby = 'sn';
+        } else if ($order_column == 2) {
+            $orderby = 'current_status';
+        } else if ($order_column == 4) {
+            $orderby = 'status_updated_at';
+        }
+        $sort = $request->input('order.0.dir', 'desc');
+        $iTotalRecords = $data->get()->count();
+
+
+        $iDisplayLength = intval($_REQUEST['length']);
+        $iDisplayLength = $iDisplayLength <= 0 ? $iTotalRecords : $iDisplayLength;
+        $iDisplayStart = intval($_REQUEST['start']);
+        $lists = $data->orderBy($orderby, $sort)->offset($iDisplayStart)->limit($iDisplayLength)->get()->toArray();
+        $lists = json_decode(json_encode($lists), true);
+
+        $userIdNames = $this->getUserIdNames();
+
+        foreach ($lists as $key => $list) {
+            $lists[$key]['sku'] = $list['sku'];
+            $lists[$key]['barcode_text'] = $list['barcode_text'];
+            $lists[$key]['current_status'] = $list['current_status'];
+            $lists[$key]['status_history'] = $list['status_history'];
+            $lists[$key]['status_updated_at'] = $list['status_updated_at'];
+            $lists[$key]['generated_by'] = array_get($userIdNames, $list['generated_by']);
+            $lists[$key]['generated_at'] = $list['generated_at'];
+            $lists[$key]['printed_by'] = array_get($userIdNames, $list['printed_by']);
+            $lists[$key]['qc'] = array_get($userIdNames, $list['qc']);
+            if ($list['qc_history']) {
+                $qcArray = explode(',', $list['qc_history']);
+                $qcNameArray = [];
+                foreach ($qcArray as $k => $v) {
+                    $qcNameArray[$k] = array_get($userIdNames, intval($v));
+                }
+                $qcHistory = implode(',', $qcNameArray);
+                $lists[$key]['qc_history'] = $qcHistory;
+            } else {
+                $lists[$key]['qc_history'] = '';
+            }
+            $lists[$key]['qc_updated_at'] = $list['qc_updated_at'];
+        }
+        $recordsTotal = $iTotalRecords;
+        $recordsFiltered = $iTotalRecords;
+        $data = $lists;
         return compact('data', 'recordsTotal', 'recordsFiltered');
     }
 
@@ -719,11 +732,46 @@ class BarcodeController extends Controller
             die('没有选择供应商');
         }
         $vendorCode = $search['vendorCode'];
+        $purchaseOrder = $search['purchaseOrder'];
+        $sku = $search['sku'];
+
+        $p = $search['p'];
+        $token = $search['token'];
+        $sign = $search['sign'];
+
+
+
+        if($sign){
+            if(!$p || !$token){
+                die('请确认密钥');
+            }
+            $__sign=md5($p.$token.'vlerp');
+            if($sign != $__sign){
+                die('请确认密钥');
+            }
+            $vendor = DB::table('barcode_vendor_info')->where('url_param', $p)->where('token',$token)->first();
+            $vendor = json_decode(json_encode($vendor), true);
+            if(!$vendor){
+                die('请确认密钥');
+            }else{
+                $vendorCode = $vendor['vendor_code'];
+            }
+
+        }else{
+            if (!Auth::user()->can(['barcode-show-po-detail'])) die('Permission denied');
+        }
+
+
         $data = DB::table('barcode_scan_record')->where('vendor_code', $vendorCode);
-        if (isset($search['sku']) && $search['sku']) {
-            $sku = $search['sku'];
+        if (isset($sku) && $sku) {
             $data = $data->where(function ($query) use ($sku) {
                 $query->where('sku', '=', $sku);
+            });
+        }
+
+        if (isset($purchaseOrder) && $purchaseOrder) {
+            $data = $data->where(function ($query) use ($purchaseOrder) {
+                $query->where('purchase_order', '=', $purchaseOrder);
             });
         }
 
@@ -879,11 +927,14 @@ class BarcodeController extends Controller
     {
         if (!Auth::user()->can(['barcode-show-add-vendor'])) die('Permission denied');
         $userId = Auth::user()->id;
-        $canChangeOperator = false;
-        if (in_array($userId, $this->getPurchasingDirectorIds())) {
-            $canChangeOperator = true;
-        }
-        if (!$canChangeOperator) die('Permission denied');
+        $canChangeOperator = true;
+//        if (Auth::user()->can(['barcode-show-add-vendor'])){
+//            $canChangeOperator = true;
+//        }
+//        if (in_array($userId, $this->getPurchasingDirectorIds())) {
+//            $canChangeOperator = true;
+//        }
+//        if (!$canChangeOperator) die('Permission denied');
 
         $role = DB::table('roles')->where('name', 'Purchase Employee')->first();
         $roleIdForOperators = 0;
@@ -928,6 +979,31 @@ class BarcodeController extends Controller
             $returnData = json_encode(array('flag' => $flag, 'msg' => $msg));
             die($returnData);
         }
+
+        $sapAPI['appid'] = env("SAP_KEY");
+        $sapAPI['method'] = 'getSupplier';
+        $sapAPI['sc']= $vendorCodeFromSAP;
+
+        $sign = $this->getSapApiSign($sapAPI);
+        try {
+            $res = file_get_contents('http://' . env("SAP_RFC") . '/rfc_sap_api.php?appid=' . $sapAPI['appid'] . '&method=' . $sapAPI['method'] . '&sc=' . $sapAPI['sc'] . '&sign=' . $sign);
+
+            $result = json_decode($res, true);
+
+            if (!array_get($result, 'RESULT_TABLE') || empty (array_get($result, 'RESULT_TABLE'))) {
+                $flag = 0;
+                $msg = 'FAIL： SAP供应商编码错误';
+                $returnData = json_encode(array('flag' => $flag, 'msg' => $msg));
+                die($returnData);
+            }
+        }catch (\Exception $e) {
+            $flag = 0;
+            $msg = 'FAIL： 从SAP中验证供应商时,网络异常';
+            $returnData = json_encode(array('flag' => $flag, 'msg' => $msg));
+            die($returnData);
+        }
+
+
         $vendor = DB::table('barcode_vendor_info')->where('vendor_name', $vendorName)->first();
         $vendor = json_decode(json_encode($vendor), true);
         if ($vendor) {
@@ -1120,12 +1196,14 @@ class BarcodeController extends Controller
 
     public function changeOperator(Request $request)
     {
+        if (!Auth::user()->can(['barcode-show-change-employee'])) die('Permission denied');
         $userId = Auth::user()->id;
-        $canChangeOperator = false;
-        if (in_array($userId, $this->getPurchasingDirectorIds())) {
-            $canChangeOperator = true;
-        }
-        if (!$canChangeOperator) die('Permission denied');
+        $canChangeOperator = true;
+//
+//        if (in_array($userId, $this->getPurchasingDirectorIds())) {
+//            $canChangeOperator = true;
+//        }
+//        if (!$canChangeOperator) die('Permission denied');
 
         $role = DB::table('roles')->where('name', 'Purchase Employee')->first();
         $roleIdForOperators = 0;
@@ -1245,20 +1323,20 @@ class BarcodeController extends Controller
     }
 
     //获取采购总监的id
-    public function getPurchasingDirectorIds()
-    {
-        $userIds = DB::table('users')->where('email', 'like', 'wangshuang@valuelink%')->orWhere('email', 'like', 'yilinteng@valuelink%')->orWhere('email', 'like', 'chenguancan@valuelink%')->orWhere('email', 'like', 'zhangjianqun@valuelink%')->orWhere('email', 'like', 'sunhanshan@valuelink%')->where('locked', 0)->pluck('id');
-        $userIds = json_decode(json_encode($userIds),true);
-        return $userIds;
-    }
+//    public function getPurchasingDirectorIds()
+//    {
+//        $userIds = DB::table('users')->where('email', 'like', 'wangshuang@valuelink%')->orWhere('email', 'like', 'zhousunyao@valuelink%')->orWhere('email', 'like', 'yilinteng@valuelink%')->orWhere('email', 'like', 'chenguancan@valuelink%')->orWhere('email', 'like', 'zhangjianqun@valuelink%')->orWhere('email', 'like', 'sunhanshan@valuelink%')->where('locked', 0)->pluck('id');
+//        $userIds = json_decode(json_encode($userIds),true);
+//        return $userIds;
+//    }
 
     public function qc(Request $request)
     {
         if (!Auth::user()->can(['barcode-qc'])) die('Permission denied');
-        $urlParam = $request->input("p");
-        if ($urlParam != 'ec93a64741') {
-            die('网址参数不正确');
-        }
+//        $urlParam = $request->input("p");
+//        if ($urlParam != 'ec93a64741') {
+//            die('网址参数不正确');
+//        }
         return view('barcode/qc');
     }
 

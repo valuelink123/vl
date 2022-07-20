@@ -50,7 +50,8 @@
             <div style="height: 15px;"></div>
             <div class="portlet-title">
                 <label>供应商代码：{{$vendorCode}}</label>
-                <div style="height: 5px;"></div>
+                <div style="height: 5px;"/>
+                <label>采购订单号：{{$purchaseOrder}}</label>
                 <div style="clear:both;"></div>
                 <div style="float:left; width:180px">
                     <div class="input-group date date-picker pull-left" data-date-format="yyyy-mm-dd">
@@ -69,6 +70,10 @@
                     {{--                    {{ csrf_field() }}--}}
                     <input type="hidden" name='vendorCode' id='vendorCode' value="{{$vendorCode}}"/>
                     <input type="hidden" name='skuHidden' id="skuHidden" value=""/>
+                    <input type="hidden" name='purchaseOrder' id='purchaseOrder' value="{{$purchaseOrder}}"/>
+                    <input type="hidden" name='p' id="pHidden" value="{{$p}}"/>
+                    <input type="hidden" name='token' id="token" value="{{$token}}"/>
+                    <input type="hidden" name='sign' id="sign" value="{{$sign}}"/>
                     <div class="table-toolbar" id="thetabletoolbar">
                         <div class="input-group pull-left">
                             <input type="text" name="sku" id="sku"
@@ -95,7 +100,7 @@
                 <div class="table-container">
 
                     <div style="overflow:auto;width: 100%;">
-                        <table class="table table-striped table-bordered table-hover table-checkable" id="thetable">
+                        <table class="table table-striped table-bordered table-hover table-checkable" id="the_table">
                             <thead>
                             <tr role="row" class="heading">
                                 <th>SKU</th>
@@ -104,9 +109,6 @@
                                 <th>条码当前状态</th>
                                 <th>条码历史状态</th>
                                 <th>条码最后更新时间</th>
-{{--                                <th>条码生成人</th>--}}
-{{--                                <th>条码生成时间</th>--}}
-{{--                                <th>条码打印人</th>--}}
                             </tr>
                             </thead>
                             <tbody></tbody>
@@ -137,9 +139,9 @@
         $(this).datepicker(Object.assign(defaults, options))
     });
 
-    let $theTable = $(thetable)
+    let $the_Table = $('#the_table');
     var initTable = function () {
-        $theTable.dataTable({
+        $the_Table.dataTable({
             searching: false,//关闭搜索
             serverSide: true,//启用服务端分页（这是使用Ajax服务端的必须配置）
             "lengthMenu": [
@@ -160,9 +162,6 @@
                 {data: 'current_status', name: 'current_status'},
                 {data: 'status_history', name: 'status_history'},
                 {data: 'status_updated_at', name: 'status_updated_at'},
-                // {data: 'generated_by', name: 'generated_by'},
-                // {data: 'generated_at', name: 'generated_at'},
-                // {data: 'printed_by', name: 'printed_by'},
             ],
             ajax: {
                 type: 'POST',
@@ -176,7 +175,8 @@
     }
 
     initTable();
-    let dtApi = $theTable.api();
+
+    let dtApi = $the_Table.api();
     //点击提交按钮重新绘制表格，并将输入框中的值赋予检索框
     $('#search').click(function () {
         $sku = $('#sku').val();
