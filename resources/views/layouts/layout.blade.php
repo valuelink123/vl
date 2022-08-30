@@ -505,6 +505,14 @@
                                                     </a>
                                                 </li>
 												@endpermission
+                                                @permission('customer-show')
+                                                <li class="">
+                                                    <a href="/customer" class="nav-link nav-toggle ">
+                                                        Customer
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
+                                                @endpermission
 
 												@permission('rsgUser-show')
 												<li class="">

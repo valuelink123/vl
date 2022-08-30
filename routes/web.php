@@ -182,6 +182,9 @@ Route::post('/crm/trackLogStore','CrmController@trackLogStore')->name('trackLogS
 Route::post('/crm/getTrackLog','CrmController@getTrackLog')->name('getTrackLog');
 Route::post('/crm/getRsgRequestList','CrmController@getRsgRequestList')->name('getRsgRequestList');
 
+Route::get('/customer', 'CustomerController@index');
+Route::post('/customer/get', 'CustomerController@get');
+
 Route::resource('task', 'TaskController');
 Route::Post('/task/get', 'TaskController@get')->name('getTask');
 Route::Post('/taskajaxupdate', 'TaskController@taskAjaxUpdate')->name('taskAjaxUpdate');
