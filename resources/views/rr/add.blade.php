@@ -64,7 +64,7 @@
                                 <span class="input-group-addon">
                                     <i class="fa fa-heart"></i>
                                 </span>
-                                <select class="form-control" name="type" id="type" required>
+                                <select class="form-control" name="report_type" id="report_type" required>
 								<option value="">Please Select...</option>
 								<option value="GET_FBA_FULFILLMENT_CUSTOMER_RETURNS_DATA">GET_FBA_FULFILLMENT_CUSTOMER_RETURNS_DATA</option>
 <option value="GET_FBA_FULFILLMENT_CUSTOMER_SHIPMENT_REPLACEMENT_DATA">GET_FBA_FULFILLMENT_CUSTOMER_SHIPMENT_REPLACEMENT_DATA</option>
@@ -80,7 +80,7 @@
 <option value="GET_FBA_FULFILLMENT_MONTHLY_INVENTORY_DATA">GET_FBA_FULFILLMENT_MONTHLY_INVENTORY_DATA</option>
 <option value="GET_FBA_FULFILLMENT_CURRENT_INVENTORY_DATA">GET_FBA_FULFILLMENT_CURRENT_INVENTORY_DATA</option>
 <option value="GET_V2_SETTLEMENT_REPORT_DATA_FLAT_FILE">GET_V2_SETTLEMENT_REPORT_DATA_FLAT_FILE</option>
-<option value="GET_FBA_INVENTORY_AGED_DATA">FBA Inventory Age Report</option>
+<option value="GET_FBA_INVENTORY_AGED_DATA">GET_FBA_INVENTORY_AGED_DATA</option>
 								</select>
                             </div>
                         </div>
