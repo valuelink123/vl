@@ -33,7 +33,7 @@ class RrController extends Controller
         if(!Auth::user()->can(['requestreport-show'])) die('Permission denied -- requestreport-show');
 		$batch_del = $request->get('batch_del');
 		if($batch_del) DB::connection('amazon')->table('created_reports')->whereIn('id',explode(',',$batch_del))->delete();
-        $datas= DB::connection('amazon')->select("select a.seller_account_id, a.after_date, a.before_date, a.report_type, a.error, a.created_at, b.status, b.report_url from created_reports as a left join reports as b on a.report_id = b.report_id where a.user_id<>1");
+        $datas= DB::connection('amazon')->select("select a.id, a.seller_account_id, a.after_date, a.before_date, a.report_type, a.error, a.created_at, b.status, b.report_url from created_reports as a left join reports as b on a.report_id = b.report_id where a.user_id<>1");
         return view('rr/index',['datas'=>$datas,'users'=>$this->getUsers(),'accounts'=>$this->getAccounts()]);
 
     }
