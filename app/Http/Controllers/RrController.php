@@ -63,7 +63,7 @@ class RrController extends Controller
 		when 'A1RKKUPIHCS9HS' then 'EU'
 		when 'A13V1IB3VIYZZH' then 'EU'
 		when 'A1VC38T7YXB528' then 'JP'
-		else 'US' End) as area,label from seller_accounts where primary = 1 and deleted_at is NULL and refresh_token is not null");
+		else 'US' End) as area,label from seller_accounts where `primary` = 1 and deleted_at is NULL and refresh_token is not null");
 		foreach($sellerids as $sellerid){
 			$seller[$sellerid->id]['name']=$sellerid->label;
 			$seller[$sellerid->id]['area']=$sellerid->area;
