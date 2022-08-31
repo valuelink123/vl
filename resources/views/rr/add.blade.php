@@ -32,7 +32,7 @@
                                     <i class="fa fa-tag"></i>
                                 </span>
 								
-                               <select  name="sellerid[]" id="sellerid[]" class="mt-multiselect btn btn-default" multiple="multiple" data-clickable-groups="true" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" required>
+                               <select  name="seller_account_ids[]" id="seller_account_ids[]" class="mt-multiselect btn btn-default" multiple="multiple" data-clickable-groups="true" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" required>
 									<optgroup label="Select All US" >
 									@foreach($accounts as $k=>$v)
 										@if ($v['area']=='US')
@@ -66,14 +66,21 @@
                                 </span>
                                 <select class="form-control" name="type" id="type" required>
 								<option value="">Please Select...</option>
-								<option value="_GET_AFN_INVENTORY_DATA_">_GET_AFN_INVENTORY_DATA_</option>
-								<option value="_GET_FBA_MYI_ALL_INVENTORY_DATA_">_GET_FBA_MYI_ALL_INVENTORY_DATA_</option>
-								<option value="_GET_FBA_FULFILLMENT_INVENTORY_ADJUSTMENTS_DATA_">_GET_FBA_FULFILLMENT_INVENTORY_ADJUSTMENTS_DATA_</option>
-								<option value="_GET_FBA_FULFILLMENT_REMOVAL_SHIPMENT_DETAIL_DATA_">_GET_FBA_FULFILLMENT_REMOVAL_SHIPMENT_DETAIL_DATA_</option>
-								<option value="_GET_FBA_INVENTORY_AGED_DATA_">_GET_FBA_INVENTORY_AGED_DATA_</option>
-								<option value="_GET_FBA_FULFILLMENT_REMOVAL_ORDER_DETAIL_DATA_">_GET_FBA_FULFILLMENT_REMOVAL_ORDER_DETAIL_DATA_</option>
-								<option value="_GET_FBA_FULFILLMENT_INVENTORY_RECEIPTS_DATA_">_GET_FBA_FULFILLMENT_INVENTORY_RECEIPTS_DATA_</option>
-								<option value="_GET_FLAT_FILE_ALL_ORDERS_DATA_BY_LAST_UPDATE_">_GET_FLAT_FILE_ALL_ORDERS_DATA_BY_LAST_UPDATE_</option>
+								<option value="GET_FBA_FULFILLMENT_CUSTOMER_RETURNS_DATA">GET_FBA_FULFILLMENT_CUSTOMER_RETURNS_DATA</option>
+<option value="GET_FBA_FULFILLMENT_CUSTOMER_SHIPMENT_REPLACEMENT_DATA">GET_FBA_FULFILLMENT_CUSTOMER_SHIPMENT_REPLACEMENT_DATA</option>
+<option value="GET_FBA_FULFILLMENT_REMOVAL_ORDER_DETAIL_DATA">GET_FBA_FULFILLMENT_REMOVAL_ORDER_DETAIL_DATA</option>
+<option value="GET_FBA_FULFILLMENT_REMOVAL_SHIPMENT_DETAIL_DATA">GET_FBA_FULFILLMENT_REMOVAL_SHIPMENT_DETAIL_DATA</option>
+<option value="GET_FBA_MYI_ALL_INVENTORY_DATA">GET_FBA_MYI_ALL_INVENTORY_DATA</option>
+<option value="GET_AFN_INVENTORY_DATA">GET_AFN_INVENTORY_DATA</option>
+<option value="GET_AFN_INVENTORY_DATA_BY_COUNTRY">GET_AFN_INVENTORY_DATA_BY_COUNTRY</option>
+<option value="GET_FBA_FULFILLMENT_INVENTORY_ADJUSTMENTS_DATA">GET_FBA_FULFILLMENT_INVENTORY_ADJUSTMENTS_DATA</option>
+<option value="GET_FBA_REIMBURSEMENTS_DATA">GET_FBA_REIMBURSEMENTS_DATA</option>
+<option value="GET_FBA_FULFILLMENT_INVENTORY_RECEIPTS_DATA">GET_FBA_FULFILLMENT_INVENTORY_RECEIPTS_DATA</option>
+<option value="GET_RESERVED_INVENTORY_DATA">GET_RESERVED_INVENTORY_DATA</option>
+<option value="GET_FBA_FULFILLMENT_MONTHLY_INVENTORY_DATA">GET_FBA_FULFILLMENT_MONTHLY_INVENTORY_DATA</option>
+<option value="GET_FBA_FULFILLMENT_CURRENT_INVENTORY_DATA">GET_FBA_FULFILLMENT_CURRENT_INVENTORY_DATA</option>
+<option value="GET_V2_SETTLEMENT_REPORT_DATA_FLAT_FILE">GET_V2_SETTLEMENT_REPORT_DATA_FLAT_FILE</option>
+<option value="GET_FBA_INVENTORY_AGED_DATA">FBA Inventory Age Report</option>
 								</select>
                             </div>
                         </div>
@@ -83,7 +90,7 @@
                             <div class="input-group ">
                                 
                                 <div class="input-group date date-picker margin-bottom-5" data-date-format="yyyy-mm-dd">
-                                        <input type="text" class="form-control input-sm" readonly name="startdate" placeholder="From" value="{{date('Y-m-d',strtotime('-1day'))}}">
+                                        <input type="text" class="form-control input-sm" readonly name="after_date" placeholder="From" value="{{date('Y-m-d',strtotime('-1day'))}}">
                                         <span class="input-group-btn">
                                                                     <button class="btn btn-sm default" type="button">
                                                                         <i class="fa fa-calendar"></i>
@@ -91,7 +98,7 @@
                                                                 </span>
                                     </div>
                                     <div class="input-group date date-picker" data-date-format="yyyy-mm-dd">
-                                        <input type="text" class="form-control form-filter input-sm" readonly name="enddate" placeholder="To" value="{{date('Y-m-d')}}">
+                                        <input type="text" class="form-control form-filter input-sm" readonly name="before_date" placeholder="To" value="{{date('Y-m-d')}}">
                                         <span class="input-group-btn">
                                                                     <button class="btn btn-sm default" type="button">
                                                                         <i class="fa fa-calendar"></i>

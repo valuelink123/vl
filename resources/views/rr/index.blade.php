@@ -64,7 +64,6 @@
                             <th> Report Type </th>
 							<th> Report Date </th>
                             <th> Request Date </th>
-							<th> Complete Date </th>
 							<th> Status </th>
                             <th> Actions </th>
                         </tr>
@@ -78,26 +77,23 @@
 								</label>
 								</td>
                                 <td>
-                                    {{array_get($accounts,$data->SellerId.'.name').' -- '.array_get($accounts,$data->SellerId.'.area')}}
+                                    {{array_get($accounts,$data->seller_account_id.'.name').' -- '.array_get($accounts,$data->seller_account_id.'.area')}}
                                 </td>
                                 <td>
-                                    {{$data->Type}}
+                                    {{$data->report_type}}
                                 </td>
 								<td>
-                                    {{$data->StartDate}} -- {{$data->EndDate}}
+                                    {{$data->after_date}} -- {{$data->before_date}}
                                 </td>
                                 <td>
-                                    {{$data->RequestDate}}
+                                    {{$data->created_at}}
                                 </td>
                                 <td>
-                                    {{$data->CompleteDate}}
-                                </td>
-								<td>
-                                    {{$data->Message}}
+                                    {{($data->error)?'Access to requested resource is denied':(($data->status)??'PENDING')}}
                                 </td>
                                 <td>
-									@if($data->Path)
-                                    <a href="http://{{env('SAP_RFC')}}/reports/{{$data->Path}}" target="_blank">
+									@if($data->report_url)
+                                    <a href="{{$data->report_url}}" target="_blank">
                                         <button type="submit" class="btn btn-success btn-xs">Download</button>
                                     </a>
 									@endif
