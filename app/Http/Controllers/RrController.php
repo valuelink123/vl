@@ -89,12 +89,15 @@ class RrController extends Controller
 			'before_date' => 'required|string',
         ]);
 		$insertData=[];
+		$date = date('Y-m-d H:i:s');
 		foreach($request->get('seller_account_ids') as $seller_account_id){
 			$insertData[] = array(
 				'seller_account_id'=>$seller_account_id,
 				'report_type'=>$request->get('report_type'),
 				'after_date'=>$request->get('after_date'),
 				'before_date'=>$request->get('before_date'),
+				'created_at'=>$date,
+				'updated_at'=>$date,
 				'user_id'=>Auth::user()->id,
 			);
 		}
