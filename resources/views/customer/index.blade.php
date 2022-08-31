@@ -267,11 +267,12 @@
                 // blurable: true, // unselect on blur
                 selector: 'td:first-child', // 指定第一列可以点击选中
             },
-            "aoColumnDefs": [
-                { "bSortable": false,}
-                // { "bSortable": false, "aTargets": [11] },
-            //     { "bVisible": false, "aTargets": [22] }
-                ],
+            bSort:false,
+            // "aoColumnDefs": [
+            //     { "bSortable": false,}
+            //     // { "bSortable": false, "aTargets": [11] },
+            // //     { "bVisible": false, "aTargets": [22] }
+            //     ],
             columns: [
                 {
                     width: "1px",
