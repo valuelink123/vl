@@ -808,6 +808,14 @@
 												</a>
 											</li>
 											@endpermission
+                                            @permission('exception-reminder')
+                                            <li class="">
+                                                <a href="/exceptionReminder" class="nav-link nav-toggle ">
+                                                    Refund Replacement Reminder
+                                                    <span class="arrow"></span>
+                                                </a>
+                                            </li>
+                                            @endpermission
                                             @permission('gift-card-show')
 											<li class="">
 												<a href="/giftcard" class="nav-link nav-toggle ">

@@ -30,7 +30,8 @@ class ExceptionController extends Controller
      * @return void
      *
      */
-
+	use \App\Traits\Mysqli;
+	use \App\Traits\DataTables;
     public function __construct()
     {
         $this->middleware('auth', ['except' => ['resendApi']]);
@@ -1805,6 +1806,57 @@ class ExceptionController extends Controller
 			DB::rollBack();
 		}
         echo json_encode($records);
+	}
+
+	public function remind()
+	{
+		if(!Auth::user()->can(['exception-reminder'])) die('Permission denied -- exception reminder');
+		$sales = getUsers('sap_seller');//sap_seller_id=>name
+		return view('exception/reminder',array('sales'=>$sales));
+	}
+	public function getRemind(Request $request)
+	{
+		$where = ' where 1=1 ';
+		//筛选销售用户
+		if(array_get($_REQUEST,'sales')){
+			$sales = array_get($_REQUEST,'sales');
+			$where .= " and sap_seller_id in ('".implode("','", $sales)."') ";
+		}
+		$limit = $this->dtLimit($request);
+		$_sql = " select sap_seller_id,any_value(bg) as bg,any_value(bu) as bu,sum(confirmed_num) as confirmed_num,sum(mcf_failed_num) as mcf_failed_num,sum(sap_failed_num) as sap_failed_num from (
+select bg,bu,sap_seller_id,
+CASE WHEN process_status='confirmed' THEN 1 else 0 end as  confirmed_num,
+ CASE WHEN (process_status='auto done' and auto_create_mcf=1 and auto_create_mcf_result='-1') THEN 1 else 0 end as  mcf_failed_num,
+ CASE WHEN ((process_status='auto done' or process_status='done') and auto_create_sap_result='-1') THEN 1 else 0 end as  sap_failed_num
+from 
+(select bg,bu,sap_seller_id,auto_create_mcf,auto_create_mcf_result,auto_create_sap_result,process_status,asin_info.site,asin_info.asin 
+from exception 
+left join (SELECT asin as asin,substring(site,5) as site ,any_value(bg) as bg,any_value(bu) as bu,any_value(sap_seller_id) as sap_seller_id FROM  `asin` group by asin,site) as asin_info
+on exception.asin = asin_info.asin and exception.saleschannel = asin_info.site
+) as data_table 
+) as total_table {$where} group by sap_seller_id order by confirmed_num desc";
+
+		$sql = $_sql.'  LIMIT '.$limit;
+		$_data = DB::select($sql);
+
+		$sales = getUsers('sap_seller');//sap_seller_id=>name
+		foreach ($_data as $key=>$val){
+			$data[$key][] = $val->bg.$val->bu;//bggu
+			$data[$key][] = isset($sales[$val->sap_seller_id]) ? $sales[$val->sap_seller_id] : $val->sap_seller_id;//销售
+			$data[$key][] = $val->confirmed_num;//confirmed_num
+			$data[$key][] = $val->mcf_failed_num;//mcf_failed_num
+			$data[$key][] = $val->sap_failed_num;//sap_failed_num
+		}
+		$sql_total = "select count(*) as total from( {$_sql}) as skutable";
+		$total = DB::select($sql_total);
+		$recordsTotal = $recordsFiltered = $total[0]->total;
+		$sEcho = intval($_REQUEST['draw']);
+
+		$records["data"] = $data;
+		$records["draw"] = $sEcho;
+		$records["recordsTotal"] = $recordsTotal;
+		$records["recordsFiltered"] = $recordsFiltered;
+		echo json_encode($records);
 	}
 
 }
