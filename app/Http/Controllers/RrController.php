@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use App\User;
+use App\Models\CreatedReport;
+use App\Models\ReportGroup;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Services\MultipleQueue;
@@ -32,8 +34,11 @@ class RrController extends Controller
     {
         if(!Auth::user()->can(['requestreport-show'])) die('Permission denied -- requestreport-show');
 		$batch_del = $request->get('batch_del');
-		if($batch_del) DB::connection('amazon')->table('created_reports')->whereIn('id',explode(',',$batch_del))->delete();
-        $datas= DB::connection('amazon')->select("select a.id, a.seller_account_id, a.after_date, a.before_date, a.report_type, a.error, a.created_at, b.status, b.report_url from created_reports as a left join reports as b on a.report_id = b.report_id where a.user_id<>1");
+		if($batch_del){
+			ReportGroup::whereIn('id',explode(',',$batch_del))->delete();
+			CreatedReport::whereIn('group_id',explode(',',$batch_del))->delete();
+		}
+        $datas= ReportGroup::with('reports')->get();
         return view('rr/index',['datas'=>$datas,'users'=>$this->getUsers(),'accounts'=>$this->getAccounts()]);
 
     }
@@ -90,6 +95,7 @@ class RrController extends Controller
         ]);
 		$insertData=[];
 		$date = date('Y-m-d H:i:s');
+		$group = ReportGroup::create([]);
 		foreach($request->get('seller_account_ids') as $seller_account_id){
 			$insertData[] = array(
 				'seller_account_id'=>$seller_account_id,
@@ -97,11 +103,12 @@ class RrController extends Controller
 				'after_date'=>$request->get('after_date'),
 				'before_date'=>$request->get('before_date'),
 				'created_at'=>$date,
-				'updated_at'=>$date,	
+				'updated_at'=>$date,
+				'group_id'=>$group->id,	
 				'user_id'=>Auth::user()->id,
 			);
 		}
-        $result = DB::connection('amazon')->table('created_reports')->insert($insertData);
+        $result = CreatedReport::insert($insertData);
         if ($result) {
             $request->session()->flash('success_message','Set Report Success');
             return redirect('rr');
@@ -115,7 +122,8 @@ class RrController extends Controller
     public function destroy(Request $request,$id)
     {
         if(!Auth::user()->can(['requestreport-delete'])) die('Permission denied -- requestreport-delete');
-        $result = DB::connection('amazon')->table('created_reports')->where('id',$id)->delete();
+        ReportGroup::where('id',$id)->delete();
+		CreatedReport::where('group_id',$id)->delete();
         $request->session()->flash('success_message','Delete Report Success');
         return redirect('rr');
     }

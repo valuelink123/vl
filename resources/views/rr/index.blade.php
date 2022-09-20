@@ -60,11 +60,10 @@
                                     </label>
 									
 							</th>
-                            <th> Account </th>
+                            <th> Account / Status </th>
                             <th> Report Type </th>
 							<th> Report Date </th>
                             <th> Request Date </th>
-							<th> Status </th>
                             <th> Actions </th>
                         </tr>
                         </thead>
@@ -77,19 +76,41 @@
 								</label>
 								</td>
                                 <td>
-                                    {{array_get($accounts,$data->seller_account_id.'.name').' -- '.array_get($accounts,$data->seller_account_id.'.area')}}
+									<div class="btn-group" style="display:block;">
+										<a class="btn dropdown-toggle" href="javascript:;" data-toggle="dropdown" aria-expanded="false"> {{count($data->reports)}} Accounts
+											<i class="fa fa-angle-down"></i>
+										</a>
+										<ul class="dropdown-menu">
+											
+											<?php
+											$reports = $data->reports;
+											foreach($reports as $report){
+												echo '<li><a href="javascript:;">'.array_get($accounts,$report->seller_account_id.'.name',$report->seller_account_id).' : ';
+												if(isset($report->report->status)){
+													echo $report->report->status;
+												}else{
+													if(!empty($report->error)){
+														echo 'ERROR';
+													} else{
+														echo 'PENDING';
+													}
+												}
+												echo '</a></li>';
+											}
+											?>
+											
+										</ul>
+									</div>
+                                    
                                 </td>
                                 <td>
-                                    {{$data->report_type}}
+                                    {{$data->reports[0]->report_type}}
                                 </td>
 								<td>
-                                    {{$data->after_date}} -- {{$data->before_date}}
+                                    {{$data->reports[0]->after_date}} -- {{$data->reports[0]->before_date}}
                                 </td>
                                 <td>
-                                    {{$data->created_at}}
-                                </td>
-                                <td>
-                                    {{($data->error)?'Access to requested resource is denied':(($data->status)??'PENDING')}}
+                                    {{$data->reports[0]->created_at}}
                                 </td>
                                 <td>
 									@if($data->report_url)
