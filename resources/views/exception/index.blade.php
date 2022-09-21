@@ -150,20 +150,20 @@ th,td,td>span {
 								
                                 <td>
                                     <div class="input-group date date-picker margin-bottom-5" data-date-format="yyyy-mm-dd">
-                                        <input type="text" class="form-control form-filter input-sm" readonly name="date_from" placeholder="From">
+                                        <input type="text" class="form-control form-filter input-sm" readonly name="date_from" placeholder="From" value="@if($data['date_from']){{$data['date_from']}}@endif">
                                         <span class="input-group-btn">
-                                                                    <button class="btn btn-sm default" type="button">
-                                                                        <i class="fa fa-calendar"></i>
-                                                                    </button>
-                                                                </span>
+                                            <button class="btn btn-sm default" type="button">
+                                                <i class="fa fa-calendar"></i>
+                                            </button>
+                                        </span>
                                     </div>
                                     <div class="input-group date date-picker" data-date-format="yyyy-mm-dd">
-                                        <input type="text" class="form-control form-filter input-sm" readonly name="date_to" placeholder="To">
+                                        <input type="text" class="form-control form-filter input-sm" readonly name="date_to" placeholder="To" value="@if($data['date_to']){{$data['date_to']}}@endif">
                                         <span class="input-group-btn">
-                                                                    <button class="btn btn-sm default" type="button">
-                                                                        <i class="fa fa-calendar"></i>
-                                                                    </button>
-                                                                </span>
+                                            <button class="btn btn-sm default" type="button">
+                                                <i class="fa fa-calendar"></i>
+                                            </button>
+                                        </span>
                                     </div>
                                 </td>
                                 <td>
@@ -172,10 +172,10 @@ th,td,td>span {
                                         <option value="submit">Pending</option>
                                         <option value="cancel" @if($linkIndex==3) selected @endif>Cancelled</option>
                                         <option value="done">Done</option>
-                                        <option value="confirmed">Confirmed</option>
+                                        <option value="confirmed" @if($data['status']=='confirmed') selected  @endif>Confirmed</option>
                                         <option value="auto done">Auto Done</option>
-										<option value="auto_failed">Auto Failed</option>
-										<option value="sap_failed">Sap Failed</option>
+										<option value="auto_failed" @if($data['status']=='auto_failed') selected  @endif>Auto Failed</option>
+										<option value="sap_failed" @if($data['status']=='sap_failed') selected  @endif>Sap Failed</option>
                                     </select>
                                 </td>
 
@@ -237,7 +237,7 @@ th,td,td>span {
 								<select class="mt-multiselect btn btn-default form-control form-filter input-sm" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" name="sap_seller_id" id="sap_seller_id">
 										<option value="">Sellers</option>
                                         @foreach ($sap_sellers as $user_id=>$user_name)
-                                            <option value="{{$user_id}}" >{{$user_name}}</option>
+                                            <option value="{{$user_id}}" @if($data['sap_seller_id']==$user_id) selected  @endif >{{$user_name}}</option>
                                         @endforeach
                                     </select>
 								</td>

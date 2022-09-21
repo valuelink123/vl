@@ -21,6 +21,20 @@
                             </div>
 
                             <div class="col-md-2">
+                                <div class="input-group">
+                                    <span class="input-group-addon">开始时间</span>
+                                    <input  class="form-control"  value="{!! $date_start !!}" data-change="0" data-date-format="yyyy-mm-dd" data-options="format:'yyyy-mm-dd'" id="date_start" name="date_start" />
+                                </div>
+                            </div>
+
+                            <div class="col-md-2">
+                                <div class="input-group">
+                                    <span class="input-group-addon">结束时间</span>
+                                    <input  class="form-control"  value="{!! $date_end !!}" data-change="0" data-date-format="yyyy-mm-dd" data-options="format:'yyyy-mm-dd'" id="date_end" name="date_end"/>
+                                </div>
+                            </div>
+
+                            <div class="col-md-2">
                                 <button type="button" class="btn blue" id="data_search">Search</button>
                             </div>
                         </div>
@@ -49,6 +63,16 @@
         </div>
     </div>
     <script>
+        $('#date_start').datepicker({
+            rtl: App.isRTL(),
+            autoclose: true
+        });
+
+        $('#from_end').datepicker({
+            rtl: App.isRTL(),
+            autoclose: true
+        });
+
         var TableDatatablesAjax = function () {
             var initPickers = function () {
                 //init date pickers
@@ -64,6 +88,8 @@
                 });
                 var grid = new Datatable();
                 grid.setAjaxParam("sales", $("select[name='sales[]']").val());
+                grid.setAjaxParam("date_start", $("input[name='date_start']").val());
+                grid.setAjaxParam("date_end", $("input[name='date_end']").val());
                 grid.init({
                     src: $("#datatable_ajax"),
                     onSuccess: function (grid, response) {

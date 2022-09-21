@@ -50,8 +50,12 @@ class ExceptionController extends Controller
         $fromService = '';
         $currentUserId = '';
         $linkIndex = '';
+        $data['date_from'] = isset($_GET['date_from']) ? $_GET['date_from'] : '';
+		$data['date_to'] = isset($_GET['date_to']) ? $_GET['date_to'] : '';
+		$data['sap_seller_id'] = isset($_GET['sap_seller_id']) ? $_GET['sap_seller_id'] : '';
+		$data['status'] = isset($_GET['status']) ? $_GET['status'] : '';
 
-        return view('exception/index',['users'=>$this->getUsers(),'groups'=>$this->getGroups(),'mygroups'=>$this->getUserGroup(),'sellerids'=>$this->getAccounts(),'teams'=> getUsers('sap_bgbu'),'sap_sellers'=>getUsers('sap_seller'), 'fromService'=>$fromService, 'currentUserId'=>$currentUserId, 'linkIndex'=>$linkIndex]);
+        return view('exception/index',['users'=>$this->getUsers(),'groups'=>$this->getGroups(),'mygroups'=>$this->getUserGroup(),'sellerids'=>$this->getAccounts(),'teams'=> getUsers('sap_bgbu'),'sap_sellers'=>getUsers('sap_seller'), 'fromService'=>$fromService, 'currentUserId'=>$currentUserId, 'linkIndex'=>$linkIndex,'data'=>$data]);
     }
 
     public function fromService(Request $request)
@@ -1812,7 +1816,9 @@ class ExceptionController extends Controller
 	{
 		if(!Auth::user()->can(['exception-reminder'])) die('Permission denied -- exception reminder');
 		$sales = getUsers('sap_seller');//sap_seller_id=>name
-		return view('exception/reminder',array('sales'=>$sales));
+		$date_start = date('Y-m',time()).'-01';
+		$date_end = date('Y-m-d',time());
+		return view('exception/reminder',array('sales'=>$sales,'date_start'=>$date_start,'date_end'=>$date_end));
 	}
 	public function getRemind(Request $request)
 	{
@@ -1822,30 +1828,33 @@ class ExceptionController extends Controller
 			$sales = array_get($_REQUEST,'sales');
 			$where .= " and sap_seller_id in ('".implode("','", $sales)."') ";
 		}
+
+		if(array_get($_REQUEST,'date_start')){
+			$where .= " and date >= '".$_REQUEST['date_start']." 00:00:00' ";
+		}
+		if(array_get($_REQUEST,'date_end')){
+			$where .= " and date <= '".$_REQUEST['date_end']." 23:59:59' ";
+		}
+
 		$limit = $this->dtLimit($request);
-		$_sql = " select sap_seller_id,any_value(bg) as bg,any_value(bu) as bu,sum(confirmed_num) as confirmed_num,sum(mcf_failed_num) as mcf_failed_num,sum(sap_failed_num) as sap_failed_num from (
-select bg,bu,sap_seller_id,
-CASE WHEN process_status='confirmed' THEN 1 else 0 end as  confirmed_num,
- CASE WHEN (process_status='auto done' and auto_create_mcf=1 and auto_create_mcf_result='-1') THEN 1 else 0 end as  mcf_failed_num,
- CASE WHEN ((process_status='auto done' or process_status='done') and auto_create_sap_result='-1') THEN 1 else 0 end as  sap_failed_num
-from 
-(select bg,bu,sap_seller_id,auto_create_mcf,auto_create_mcf_result,auto_create_sap_result,process_status,asin_info.site,asin_info.asin 
+		$_sql = " select sap_seller_id,any_value(bg) as bg,any_value(bu) as bu,sum(confirmed_num) as confirmed_num,sum(mcf_failed_num) as mcf_failed_num,sum(sap_failed_num) as sap_failed_num 
+ from (
+select bg,bu,sap_seller_id,auto_create_mcf,auto_create_mcf_result,auto_create_sap_result,process_status,asin_info.site,asin_info.asin,CASE WHEN process_status='confirmed' THEN 1 else 0 end as  confirmed_num,CASE WHEN (process_status='auto done' and auto_create_mcf=1 and auto_create_mcf_result='-1') THEN 1 else 0 end as  mcf_failed_num,CASE WHEN ((process_status='auto done' or process_status='done') and auto_create_sap_result='-1') THEN 1 else 0 end as  sap_failed_num
 from exception 
 left join (SELECT asin as asin,substring(site,5) as site ,any_value(bg) as bg,any_value(bu) as bu,any_value(sap_seller_id) as sap_seller_id FROM  `asin` group by asin,site) as asin_info
-on exception.asin = asin_info.asin and exception.saleschannel = asin_info.site
-) as data_table 
-) as total_table {$where} group by sap_seller_id order by confirmed_num desc";
+on exception.asin = asin_info.asin and exception.saleschannel = asin_info.site {$where}
+) as total_table group by sap_seller_id order by confirmed_num desc";
 
 		$sql = $_sql.'  LIMIT '.$limit;
 		$_data = DB::select($sql);
-
+		$data = array();
 		$sales = getUsers('sap_seller');//sap_seller_id=>name
 		foreach ($_data as $key=>$val){
 			$data[$key][] = $val->bg.$val->bu;//bggu
 			$data[$key][] = isset($sales[$val->sap_seller_id]) ? $sales[$val->sap_seller_id] : $val->sap_seller_id;//销售
-			$data[$key][] = $val->confirmed_num;//confirmed_num
-			$data[$key][] = $val->mcf_failed_num;//mcf_failed_num
-			$data[$key][] = $val->sap_failed_num;//sap_failed_num
+			$data[$key][] = '<a target="_blank" href="/exception?date_from='.$_REQUEST['date_start'].'&date_to='.$_REQUEST['date_end'].'&sap_seller_id='.$val->sap_seller_id.'&status=confirmed">'.$val->confirmed_num.'</a>';//confirmed_num
+			$data[$key][] = '<a target="_blank" href="/exception?date_from='.$_REQUEST['date_start'].'&date_to='.$_REQUEST['date_end'].'&sap_seller_id='.$val->sap_seller_id.'&status=auto_failed">'.$val->mcf_failed_num.'</a>';//mcf_failed_num
+			$data[$key][] = '<a target="_blank" href="/exception?date_from='.$_REQUEST['date_start'].'&date_to='.$_REQUEST['date_end'].'&sap_seller_id='.$val->sap_seller_id.'&status=sap_failed">'.$val->sap_failed_num.'</a>';//sap_failed_num
 		}
 		$sql_total = "select count(*) as total from( {$_sql}) as skutable";
 		$total = DB::select($sql_total);
