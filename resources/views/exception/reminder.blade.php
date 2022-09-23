@@ -12,7 +12,25 @@
                     <form role="form" action="" method="GET">
                         {{ csrf_field() }}
                         <div class="row">
-                            <div class="col-md-3">
+                            <div class="col-md-1">
+                                <select class="form-control" name="bg" id="bg">
+                                    <option value="">select</option>
+                                    @foreach ($bgs as $value)
+                                        <option value="{{$value}}">{{$value}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="col-md-1">
+                                <select class="form-control" name="bu" id="bu">
+                                    <option value="">select</option>
+                                    @foreach ($bus as $value)
+                                        <option value="{{$value}}">{{$value}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="col-md-2">
                                 <select class="mt-multiselect btn btn-default " multiple="multiple" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" name="sales[]" id="sales[]">
                                     @foreach ($sales as $id=>$name)
                                         <option value="{{$id}}">{{$name}}</option>
@@ -88,6 +106,8 @@
                 });
                 var grid = new Datatable();
                 grid.setAjaxParam("sales", $("select[name='sales[]']").val());
+                grid.setAjaxParam("bg", $("select[name='bg']").val());
+                grid.setAjaxParam("bu", $("select[name='bu']").val());
                 grid.setAjaxParam("date_start", $("input[name='date_start']").val());
                 grid.setAjaxParam("date_end", $("input[name='date_end']").val());
                 grid.init({

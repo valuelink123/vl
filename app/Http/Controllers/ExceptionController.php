@@ -1532,7 +1532,9 @@ class ExceptionController extends Controller
 		->leftJoin('users',function($q){
 				$q->on('exception.user_id', '=', 'users.id');
 			})->get(['users.name','exception.date','exception.process_status'])->toArray();
-		die(json_encode($exists));
+		return json_encode($exists);
+
+//		die(json_encode($exists));
 	}
 
 
@@ -1685,7 +1687,8 @@ class ExceptionController extends Controller
 				$message = 'Get Amazon Order ID Failed';
 			}
 		}
-		die(json_encode(array('result'=>$re , 'message'=>$message)));
+		return json_encode(array('result'=>$re , 'message'=>$message));
+//		die(json_encode(array('result'=>$re , 'message'=>$message)));
 	}
 
 	/*
@@ -1818,7 +1821,9 @@ class ExceptionController extends Controller
 		$sales = getUsers('sap_seller');//sap_seller_id=>name
 		$date_start = date('Y-m',time()).'-01';
 		$date_end = date('Y-m-d',time());
-		return view('exception/reminder',array('sales'=>$sales,'date_start'=>$date_start,'date_end'=>$date_end));
+		$bgs = $this->queryFields('SELECT DISTINCT bg FROM asin order By bg asc');
+		$bus = $this->queryFields('SELECT DISTINCT bu FROM asin order By bu asc');
+		return view('exception/reminder',array('sales'=>$sales,'bgs'=>$bgs,'bus'=>$bus,'date_start'=>$date_start,'date_end'=>$date_end));
 	}
 	public function getRemind(Request $request)
 	{
@@ -1827,6 +1832,12 @@ class ExceptionController extends Controller
 		if(array_get($_REQUEST,'sales')){
 			$sales = array_get($_REQUEST,'sales');
 			$where .= " and sap_seller_id in ('".implode("','", $sales)."') ";
+		}
+		if(array_get($_REQUEST,'bg')){
+			$where .= " and bg = '".$_REQUEST['bg']."'";
+		}
+		if(array_get($_REQUEST,'bu')){
+			$where .= " and bu = '".$_REQUEST['bu']."'";
 		}
 
 		if(array_get($_REQUEST,'date_start')){
