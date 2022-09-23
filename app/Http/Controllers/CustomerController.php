@@ -41,7 +41,7 @@ class CustomerController extends Controller
 		$froms = $this->queryFields('SELECT DISTINCT `from` FROM client_info');
 		$brands = $this->queryFields('SELECT DISTINCT brand FROM client_info');
 		$date_from=date('Y-m-d',strtotime('-30 days'));
-//		$date_from = "2021-09-01";//测试日期
+//		$date_from = "2021-09-02";//测试日期
 		$date_to=date('Y-m-d');
 		return view('customer/index',['date_from'=>$date_from,'date_to'=>$date_to,'bgs'=>$bgs,'bus'=>$bus,'users'=>$users,'countrys'=>$countrys,'froms'=>$froms,'brands'=>$brands]);
 	}

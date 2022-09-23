@@ -26,6 +26,14 @@
     <div class="portlet light bordered">
         <div class="portlet-body">
             <div class="table-toolbar" id="thetabletoolbar">
+                <div class="col-md-12" style="margin-bottom:20px;">
+                @permission('compose')
+                <div class="btn-group">
+                    <button id="batch-send" class="btn sbold blue"> Batch Send
+                    </button>
+                </div>
+                @endpermission
+                </div>
                 <div class="row">
                     <div class="col-md-3">
                         <div class="input-group">
@@ -165,7 +173,7 @@
 {{--                        <th>Remark</th>--}}
                         <th >Processor</th>
 {{--                        <th >Action</th>--}}
-{{--                        <th>Email-Hidden</th>--}}
+                        <th>Email-Hidden</th>
                     </tr>
                     </thead>
                     <tbody></tbody>
@@ -268,6 +276,9 @@
                 selector: 'td:first-child', // 指定第一列可以点击选中
             },
             bSort:false,
+            "aoColumnDefs": [
+                { "bVisible": false, "aTargets": [11] }
+            ],
             // "aoColumnDefs": [
             //     { "bSortable": false,}
             //     // { "bSortable": false, "aTargets": [11] },
@@ -302,7 +313,7 @@
                 // {data:'remark',name:'remark'},
                 {data: 'processor', name: 'processor'},
                 // {data: 'action', name: 'action'},
-                // {data: 'email_hidden', name: 'email_hidden'},
+                {data: 'email_hidden', name: 'email_hidden'},
             ],
             ajax: {
                 type: 'POST',

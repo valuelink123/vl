@@ -1867,6 +1867,19 @@ on exception.asin = asin_info.asin and exception.saleschannel = asin_info.site {
 			$data[$key][] = '<a target="_blank" href="/exception?date_from='.$_REQUEST['date_start'].'&date_to='.$_REQUEST['date_end'].'&sap_seller_id='.$val->sap_seller_id.'&status=auto_failed">'.$val->mcf_failed_num.'</a>';//mcf_failed_num
 			$data[$key][] = '<a target="_blank" href="/exception?date_from='.$_REQUEST['date_start'].'&date_to='.$_REQUEST['date_end'].'&sap_seller_id='.$val->sap_seller_id.'&status=sap_failed">'.$val->sap_failed_num.'</a>';//sap_failed_num
 		}
+		//最后一列的合计数据
+		$_totalData = DB::select($_sql);
+		$totalData['confirmed_num'] = $totalData['mcf_failed_num'] = $totalData['sap_failed_num'] = 0;
+		if($_totalData){
+			foreach ($_totalData as $tkey=>$tval){
+				//合计数据相加
+				$totalData['confirmed_num'] += $tval->confirmed_num;
+				$totalData['mcf_failed_num'] += $tval->mcf_failed_num;
+				$totalData['sap_failed_num'] += $tval->sap_failed_num;
+			}
+			$data[] = array('合计','-',$totalData['confirmed_num'],$totalData['mcf_failed_num'],$totalData['sap_failed_num']);
+		}
+
 		$sql_total = "select count(*) as total from( {$_sql}) as skutable";
 		$total = DB::select($sql_total);
 		$recordsTotal = $recordsFiltered = $total[0]->total;
