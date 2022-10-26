@@ -55,18 +55,20 @@ class AddPpcAdCampaign extends Command
   campaigns.profile_id AS profile_id,campaigns.campaign_id AS campaign_id,products.ad_group_id AS ad_group_id
   FROM ppc_sproducts_ads as products
   LEFT JOIN ppc_sproducts_ad_groups as groups ON groups.ad_group_id = products.ad_group_id
-  left join ppc_sproducts_campaigns as campaigns on products.campaign_id = campaigns.campaign_id
+  left join ppc_sproducts_campaigns as campaigns on products.campaign_id = campaigns.campaign_id 
+    where products.state = 'enabled' and groups.state = 'enabled'
   UNION all
   SELECT products.asin as asin,products.sku as sku,'sdisplay' AS ad_type,groups.name AS group_name,campaigns.name AS campaign_name,
   campaigns.profile_id AS profile_id,campaigns.campaign_id AS campaign_id,products.ad_group_id AS ad_group_id
   FROM ppc_sdisplay_ads as products
   LEFT JOIN ppc_sdisplay_ad_groups as groups ON groups.ad_group_id = products.ad_group_id
-  left join ppc_sdisplay_campaigns as campaigns on products.campaign_id = campaigns.campaign_id
+  left join ppc_sdisplay_campaigns as campaigns on products.campaign_id = campaigns.campaign_id 
+    where products.state = 'enabled' and groups.state = 'enabled'
   UNION all
   SELECT '' AS asin,'' AS sku,'sbrands' AS ad_type,groups.name AS group_name,campaigns.name AS campaign_name,
   campaigns.profile_id AS profile_id,campaigns.campaign_id AS campaign_id,groups.ad_group_id AS ad_group_id
   from ppc_sbrands_campaigns AS campaigns
-  LEFT JOIN ppc_sbrands_ad_groups AS groups ON campaigns.campaign_id = groups.campaign_id
+  LEFT JOIN ppc_sbrands_ad_groups AS groups ON campaigns.campaign_id = groups.campaign_id where campaigns.state = 'enabled' 
    ) AS union_table
 
  left join ppc_profiles AS profiles on union_table.profile_id = profiles.profile_id
