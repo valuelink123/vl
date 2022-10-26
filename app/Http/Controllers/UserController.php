@@ -577,33 +577,32 @@ class UserController extends Controller
 			if(array_get($_REQUEST,'ExportType')=='Return'){
 				if(!Auth::user()->can(['data-statistics-return'])) die('Permission denied -- data-statistics-return');
 				$seller=[];
-				$accounts= DB::connection('order')->table('accounts')->where('status',1)->groupBy(['sellername','sellerid'])->get(['sellername','sellerid']);
+				$accounts= DB::connection('amazon')->table('seller_accounts')->where('primary',1)->get(['label','id']);
 				$accounts=json_decode(json_encode($accounts), true);
 				foreach($accounts as $account){
-					$seller[$account['sellerid']]=$account['sellername'];
+					$seller[$account['id']]=$account['label'];
 				}
-				$datas= DB::connection('order')->table('amazon_returns')->where('ReturnDate','>=',$date_from.'T00:00:00')->where('ReturnDate','<=',$date_to.'T23:59:59')->orderBy('ReturnDate','asc')->get()->toArray();
-				$arrayData[] = ['ReturnDate','SellerId','SellerName','AmazonOrderId','LineNum','SellerSKU','ASIN','FNSKU','Title','Quantity','FulfillmentCenterId','DetailedDisposition','Reason','Status','LicensePlateNumber','CustomerComments'];
+				$datas= DB::connection('amazon')->table('amazon_returns')->where('return_date','>=',$date_from.' 00:00:00')->where('return_date','<=',$date_to.' 23:59:59')->orderBy('return_date','asc')->get()->toArray();
+				$arrayData[] = ['ReturnDate','SellerName','AmazonOrderId','LineNum','SellerSKU','ASIN','FNSKU','Title','Quantity','FulfillmentCenterId','DetailedDisposition','Reason','Status','LicensePlateNumber','CustomerComments'];
 
 				$datas=json_decode(json_encode($datas), true);
 				foreach($datas as $key=>$val){
 					$arrayData[] = [
-						array_get($val,'ReturnDate'),
-						array_get($val,'SellerId'),
-						array_get($seller,array_get($val,'SellerId'),array_get($val,'SellerId')),
-						array_get($val,'AmazonOrderId'),
-						array_get($val,'LineNum'),
-						array_get($val,'SellerSKU'),
-						array_get($val,'ASIN'),
-						array_get($val,'FNSKU'),
-						array_get($val,'Title'),
-						array_get($val,'Quantity'),
-						array_get($val,'FulfillmentCenterId'),
-						array_get($val,'DetailedDisposition'),
-						array_get($val,'Reason'),
-						array_get($val,'Status'),
-						array_get($val,'LicensePlateNumber'),
-						array_get($val,'CustomerComments')
+						array_get($val,'return_date'),
+						array_get($seller,array_get($val,'seller_account_id'),array_get($val,'seller_account_id')),
+						array_get($val,'amazon_order_id'),
+						array_get($val,'line_num'),
+						array_get($val,'seller_sku'),
+						array_get($val,'asin'),
+						array_get($val,'fnsku'),
+						array_get($val,'title'),
+						array_get($val,'quantity'),
+						array_get($val,'fulfillment_center_id'),
+						array_get($val,'detailed_disposition'),
+						array_get($val,'reason'),
+						array_get($val,'status'),
+						array_get($val,'license_plate_number'),
+						array_get($val,'customer_comments')
 					];
 				}
 				
