@@ -96,7 +96,7 @@ LEFT JOIN ppc_ad_campaign ON union_table.campaign_id = ppc_ad_campaign.campaign_
 			}
 			if($val['ad_type']!='sbrands'){
 				DB::table('ppc_ad_campaign_match_asin')->where('campaign_id',$val['campaign_id'])->delete();
-				if(empty($val['vop_asin_campaign_id']) && $val['asin']){
+				if($val['asin']){
 					$insertAsinData[$val['campaign_id'] . '_' . $val['asin']] = array(
 						'campaign_id' => $val['campaign_id'],
 						'asin' => $val['asin'],
