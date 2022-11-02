@@ -760,3 +760,7 @@ Route::any('/exceptionTaskApi', 'TaskController@taskApi');
 
 Route::get('/exceptionReminder', 'ExceptionController@remind');
 Route::Post('/exceptionReminder/get', 'ExceptionController@getRemind');
+
+Route::resource('reims', 'ReimController');
+Route::Post('/reims/get', 'ReimController@get')->name('getReim');
+Route::Post('/reims/batchUpdate', 'ReimController@batchUpdate')->name('ReimBatchUpdate');

@@ -1051,6 +1051,13 @@
                                                     </a>
                                                 </li>
                                                 @endpermission
+												
+												<li class="">
+                                                    <a href="/reims" class="nav-link nav-toggle ">
+                                                        Reimbursements Report
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
                                             </ul>
                                         </li>
 
