@@ -765,9 +765,10 @@ if((Auth::user()->can(['exception-check']) || in_array($exception['group_id'],ar
 			
 		</div>
 
-		@if($exception['type']==4)
+		@if($exception['type']==4 || $exception['type']==2)
 		<div class="form-group" id="gift-card-div">
 			<div class="row">
+				@if($exception['type']==4)
 				<div class="col-md-12">
 					<label class="control-label">Gift Card</label>
 					<div class="input-group ">
@@ -781,6 +782,7 @@ if((Auth::user()->can(['exception-check']) || in_array($exception['group_id'],ar
 						</select>
 					</div>
 				</div>
+				@endif
 
 
 				<div class="col-md-6">
@@ -791,14 +793,14 @@ if((Auth::user()->can(['exception-check']) || in_array($exception['group_id'],ar
 						</span>
 						<select name="mail_brand" id="mail_brand" class="mt-multiselect form-control " data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" {{$disable}}>
 						@foreach (getBrands() as $k=>$v)
-						<option value="{{$k}}" <?php if(array_get($gift_card_mail,'brand')==$k) echo 'selected';?>>{{$k}}
+						<option value="{{$k}}" <?php if($exception['brand']==$k || array_get($gift_card_mail,'brand')==$k) echo 'selected';?>>{{$k}}
 						@endforeach
 						</select>
 					</div>
 				</div>
 
 {{--				重新发送礼品卡邮件的按钮--}}
-				@if($exception['process_status'] == 'done')
+				@if($exception['process_status'] == 'done' && $exception['type']==4)
 					<div class="col-md-6">
 						<button style="margin-top: 25px;" type="submit" name="again_send_email" value="1" class="btn blue again_send_email">RESEND Email</button>
 					</div>
@@ -826,22 +828,22 @@ if((Auth::user()->can(['exception-check']) || in_array($exception['group_id'],ar
 					@endforeach
 					<BR />
 				</div>
-				
-				
-				<?php 
-				$mcf_result=array('0'=>'Waiting','1'=>'Success','-1'=>'Failed');	
+
+
+				<?php
+				$mcf_result=array('0'=>'Waiting','1'=>'Success','-1'=>'Failed');
 				if(array_get($exception,'auto_create_mcf')){ ?>
 				<div class="col-md-12">
-					<span class="label label-sm label-danger">{{array_get($mcf_result,array_get($exception,'auto_create_mcf_result'))}}</span>	
+					<span class="label label-sm label-danger">{{array_get($mcf_result,array_get($exception,'auto_create_mcf_result'))}}</span>
 					<BR />
 					{{array_get($exception,'last_auto_create_mcf_date')}}
 					<BR />
 					{{array_get($exception,'last_auto_create_mcf_log')}}
-					
+
 				</div>
 				<?php } ?>
-				
-				<?php 
+
+				<?php
 				if($auto_create_mcf_logs){ ?>
 				<div class="col-md-12">
 				 	@foreach ($auto_create_mcf_logs as $auto_create_mcf_log)
@@ -860,10 +862,10 @@ if((Auth::user()->can(['exception-check']) || in_array($exception['group_id'],ar
 			<a href="{{ url('/inbox/'.$last_inboxid)}}" target="_blank" > See Email History</a>
 		</div>
 		</div>
-		<?php 
+		<?php
 		}
 		?>
-		
+
 		<div class="form-actions">
                         <div class="row">
                             <div class="col-md-12">
@@ -872,7 +874,7 @@ if((Auth::user()->can(['exception-check']) || in_array($exception['group_id'],ar
                                 <button type="submit" class="btn blue"  {{$disable}}>Submit</button>
                                 <button type="reset" class="btn grey-salsa btn-outline"  {{$disable}}>Cancel</button>
 								<?php } ?>
-								<?php 
+								<?php
 								if($exception['process_status']=='auto done'){
 									if(array_get($exception,'auto_create_mcf')){
 								?>
@@ -880,9 +882,9 @@ if((Auth::user()->can(['exception-check']) || in_array($exception['group_id'],ar
 								<?php }else{ ?>
 								<button type="submit" class="btn blue" name="acf" value="1">Auto Create MCF</button>
 								<?php }} ?>
-								
-								
-								<?php 
+
+
+								<?php
 								if($exception['process_status']=='auto done' || $exception['process_status']=='done'){
 									if(array_get($exception,'auto_create_sap')){
 								?>
@@ -893,7 +895,7 @@ if((Auth::user()->can(['exception-check']) || in_array($exception['group_id'],ar
                             </div>
                         </div>
                     </div>
-		
+
 		</div>
 	</div><div style="clear:both;"></div>
 
@@ -910,7 +912,7 @@ if((Auth::user()->can(['exception-check']) || in_array($exception['group_id'],ar
 		</div>
 		@endif
 
-		</div></div></div>					
+		</div></div></div>
 </form>
 @include('frank.common')
 <script>
@@ -1060,19 +1062,39 @@ if((Auth::user()->can(['exception-check']) || in_array($exception['group_id'],ar
 			})
 		}
 
-		if($('#process_status').val() == 'done' && $('#type').val() == 4){
-			$('#gift-card-div').show();
-		}else{
-			$('#gift-card-div').hide();
+		if($('#type').val() == 4){
+			if($('#process_status').val() == 'done'){
+				$('#gift-card-div').show();
+			}else{
+				$('#gift-card-div').hide();
+			}
+		}
+		if($('#type').val() == 2){
+			if(($('#process_status').val() == 'done' ||$('#process_status').val() == 'auto done')){
+				$('#gift-card-div').show();
+			}else{
+				$('#gift-card-div').hide();
+			}
 		}
 
 		$("#process_status").change(function(){
             var type = $('#type').val();
-            if(type==4 && $(this).val()=='done'){
-                $('#gift-card-div').show();
-            }else{
-                $('#gift-card-div').hide();
-            }
+            //type类型为gift card并且状态改为done的时候才显示
+			if(type==4){
+				if($(this).val()=='done'){
+					$('#gift-card-div').show();
+				}else{
+					$('#gift-card-div').hide();
+				}
+			}
+			//type类型为2并且状态改为done或者auto done的时候才显示
+			if(type==2){
+				if($(this).val()=='done' || $(this).val()=='auto done'){
+					$('#gift-card-div').show();
+				}else{
+					$('#gift-card-div').hide();
+				}
+			}
         });
 
         //当countrycode为US的时候，StateOrRegion为固定下拉选项

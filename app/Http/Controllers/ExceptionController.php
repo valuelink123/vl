@@ -727,6 +727,9 @@ class ExceptionController extends Controller
 			$exception->comment = $request->get('comment');
 			$exception->amount = $request->get('amount');
 			$exception->process_content = $request->get('process_content');
+			if ($request->get('mail_brand')){
+				$exception->brand = $request->get('mail_brand');
+			}
 			//需要保存更改信息记录的状态，当由别的状态改为'done','auto done'时或者由'done','auto done'状态改为其他的状态的时候，才要保存更新状态记录，并且别的改为'done','auto done'，然后'done','auto done'改为其他状态，这种情况下才要显示更改状态记录信息
 			$status = $request->get('process_status');
 			$saveLogArray = array('done', 'auto done');
