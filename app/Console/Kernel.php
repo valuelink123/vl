@@ -66,6 +66,7 @@ class Kernel extends ConsoleKernel
 		'App\Console\Commands\AddSapInventory',
 		'App\Console\Commands\AddAsins',
 		'App\Console\Commands\AddPpcAdCampaign',
+		'App\Console\Commands\ExceptionMcfInfo',
 		'App\Console\Commands\AddPpcAdCampaignHistory'
     ];
 
@@ -186,6 +187,7 @@ budget_skus.bg=asin.bg, budget_skus.bu=asin.bu WHERE budget_skus.sku = asin.item
 		$schedule->command('add:ppc_ad_campaign_history')->monthly()->name('addPpcAdCampaignHistory')->withoutOverlapping();//把销售之前维护的ppc_ad_match_asin表里面的映射关系，迁移到新的表里面，ppc_ad_campaign和ppc_ad_campaign_match_asin表
 
         $schedule->command('sync:purchase')->dailyAt('08:00')->name('sync_sap_purchase')->withoutOverlapping();//每天早上6点半执行
+		$schedule->command('exception:mcfInfo')->hourly()->name('add_exception_mcfInfo')->withoutOverlapping();
     }
 
     /**
