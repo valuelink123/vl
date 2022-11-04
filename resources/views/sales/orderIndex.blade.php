@@ -145,6 +145,7 @@
                         <th>Amazon Order ID</th>
                         <th>Status</th>
                         <th>Date</th>
+						<th>LastUpdateDate</th>
                         <th>Asin</th>
                         <th>Seller Skus</th>
                         <th>Amounts</th>
@@ -196,6 +197,7 @@
                 {data: 'amazon_order_id',name:'amazon_order_id'},
                 {data: 'status',name:'status'},
                 {data: 'date',name:'date',class:'data-date'},
+				{data: 'update_date',name:'update_date',class:'data-date'},
                 {data: 'asins',name:'asins',class:'asins'},
                 {data:'seller_skus',name:'seller_skus',class:'seller_skus'},
                 {data: 'amount',name:'amount'},

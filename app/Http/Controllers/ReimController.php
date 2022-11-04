@@ -33,7 +33,7 @@ class ReimController extends Controller
 
     public function get(Request $request)
     {
-        $datas = AmazonShipmentItem::selectRaw('amazon_shipment_items.*, seller_accounts.label,asin.bg,asin.bu,asin.sap_seller_id,asin.sku,amazon_reimbursements.case_id as r_case_id,amazon_reimbursements.currency_unit,amazon_reimbursements.amount_total,amazon_reimbursements.quantity_reimbursed_inventory,amazon_shipments.shipment_status')
+        $datas = AmazonShipmentItem::selectRaw('amazon_shipment_items.*, seller_accounts.label,asin.bg,asin.bu,asin.sap_seller_id,asin.sku,amazon_reimbursements.case_id as r_case_id,amazon_reimbursements.currency_unit,amazon_reimbursements.amount_total,amazon_reimbursements.quantity_reimbursed_total,amazon_shipments.shipment_status')
 		->leftJoin('amazon_shipments',function($q){
             $q->on('amazon_shipment_items.seller_id', '=', 'amazon_shipments.seller_id')->on(			'amazon_shipment_items.shipment_id', '=', 'amazon_shipments.shipment_id');
         })
@@ -111,11 +111,11 @@ class ReimController extends Controller
 				$list['quantity_received'],
 				$list['quantity_shipped']-$list['quantity_received'],
 				$list['shipment_status'],
-				'<a href="'.$list['pod'].'" target="_blank">'.basename($list['pod']).'</a>',
+				(!empty($list['pod']) && file_exists(public_path().$list['pod']))?'<a href="'.$list['pod'].'" target="_blank">'.basename($list['pod']).'</a>':$list['pod'],
 				$list['case_id'],
                 $list['amount_total'],
                 $list['currency_unit'],
-                $list['quantity_reimbursed_inventory'],
+                $list['quantity_reimbursed_total'],
                 empty($list['r_case_id'])?(empty($list['case_id'])?'':'Pending'):'Success',
 				array_get(AmazonShipmentItem::STATUS,$list['step'],$list['step']),
 				$list['remark'],
@@ -151,6 +151,8 @@ class ReimController extends Controller
 					$bool = $file->move(public_path() . $newpath, $newname);
 					$updateData['pod']=$newpath . $newname;
 				}
+			}else{
+				$updateData['pod'] = $request->get('isa');
 			}
 			$updateData['step']=intval($request->get('step'));
 			if($request->get('case_id')) $updateData['case_id']=$request->get('case_id');

@@ -8,7 +8,12 @@
                     <div class="form-body">
                         <div class="form-group col-md-12">
                             <label>Pod</label>
-                            <input type="file" name="file" id="file">  
+                            <input type="file" class="form-control" name="file" id="file">  
+                        </div>
+						
+						<div class="form-group col-md-12">
+                            <label>ISA</label>
+                            <input type="text" class="form-control" name="isa" id="isa">  
                         </div>
 
 
@@ -64,6 +69,7 @@ $(function() {
 		formFile.append("step", $("#step").val());
 		formFile.append("remark", $("#remark").val());
 		formFile.append("ids", $("#ids").val());
+		formFile.append("isa", $("#isa").val());
 		$.ajaxSetup({
 			headers: { 'X-CSRF-TOKEN' : '{{ csrf_token() }}' }
 		});

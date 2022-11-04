@@ -60,6 +60,7 @@ class OrderListController extends Controller
 			if($val['order_status']=='Canceled'){
 				$data[$key]['date'] .= '<br> Canceled:'.$val['last_update_date'];
 			}
+			$data[$key]['update_date'] = $val['last_update_date'];
 			$data[$key]['currency'] = $val['currency_code'];
 			$data[$key]['tracking_no'] = '/NA';
 			$data[$key]['carry_code'] = '/NA';
@@ -94,6 +95,7 @@ class OrderListController extends Controller
 		$headArray[] = 'Amazon Order ID';
 		$headArray[] = 'Status';
 		$headArray[] = 'Date';
+		$headArray[] = 'LastUpdateDate';
 		$headArray[] = 'Asin';
 		$headArray[] = 'Seller Skus';
 		$headArray[] = 'Amounts';
@@ -114,6 +116,7 @@ class OrderListController extends Controller
 			if($val['order_status']=='Canceled'){
 				$val['date'] .= '; Canceled:'.$val['last_update_date'];
 			}
+			
 			//当为AFN的时候为FBA发货，当为MFN的时候为FBM发货
 			if($val['fulfillment_channel']=='AFN'){
 				$val['fulfillment_channel'] = 'FBA';
@@ -127,6 +130,7 @@ class OrderListController extends Controller
 				$val['amazon_order_id'],
 				$val['order_status'],
 				$val['date'],
+				$val['last_update_date'],
 				$val['asins'],
 				$val['seller_skus'],
 				$val['amount'],
@@ -210,7 +214,7 @@ class OrderListController extends Controller
 		$domain = substr(getDomainBySite($search['site']), 4);//orders.sales_channel
 		$where .= " and orders.sales_channel = '".ucfirst($domain)."'";
 
-		$sql = "select SQL_CALC_FOUND_ROWS orders.id,orders.seller_account_id,orders.amazon_order_id,order_status,purchase_date,asins,currency_code,amount,fulfillment_channel,CONCAT(orders.seller_account_id,'_',orders.amazon_order_id) as accountid_orderid,last_update_date,orders.seller_skus as seller_skus   
+		$sql = "select SQL_CALC_FOUND_ROWS orders.id,orders.seller_account_id,orders.amazon_order_id,order_status,purchase_date,last_update_date,asins,currency_code,amount,fulfillment_channel,CONCAT(orders.seller_account_id,'_',orders.amazon_order_id) as accountid_orderid,last_update_date,orders.seller_skus as seller_skus   
 				from orders 
 				{$where}
 				order by purchase_date desc";

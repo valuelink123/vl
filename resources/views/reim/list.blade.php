@@ -106,11 +106,8 @@
                 </div>
 				
                 <div class="portlet-title">
-                    <div class="caption font-dark">
-                        <i class="icon-settings font-dark"></i>
-                        <span class="caption-subject bold uppercase">索赔列表</span>
-                    </div>
-					<div class="btn-group " style="float:right;">
+                    
+					<div class="btn-group " style="float:left;">
                         <div class="table-actions-wrapper" id="table-actions-wrapper">
                             <button class="btn  green table-status-action-submit">
                                 <i class="fa fa-check"></i> 执行批量更新
@@ -125,7 +122,7 @@
                             <thead>
                                 <tr role="row" class="heading">
                                     <th>
-                                        <input type="checkbox" class="group-checkable" data-set="#datatable_ajax .checkboxes" />
+                                       
                                     </th>
                                     <th>更新日期</th>
 									<th>Bg - Bu</th>
@@ -138,7 +135,7 @@
 									<th>收货数量</th>
 									<th>差异数量</th>
 									<th>货件状态</th>
-                                    <th>Pod</th>
+                                    <th>POD/ISA</th>
 									<th>CaseID</th>
 									<th>赔偿金额</th>
 									<th>货币</th>
@@ -204,25 +201,26 @@
                         [10, 20, 50, -1],
                         [10, 20, 50, 'All'] 
                     ],
-                    "pageLength": 10,
+                    "pageLength": -1,
                     "ajax": {
                         "url": "{{ url('reims/get')}}",
                     },
-                    //"scrollX": true,
-                    //"autoWidth":true
-                    /*
+                    scrollY:500,
+                    scrollX:true,
+                    
                     dom: 'Bfrtip',
+					"bFilter": false,
                     buttons: [ 
                         {
                             extend: 'excelHtml5',
-                            text: '导出当前页',
+                            text: 'Export',
                             title: 'Data export',
                             exportOptions: {
-                                columns: [ 3,2,6,7,8,9,4,5 ]
-                            }
+                                columns: [ 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19 ]
+                            },
                         },
                      ]
-                     */
+                     
                  }
             });
 
