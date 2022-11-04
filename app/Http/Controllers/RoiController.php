@@ -1270,7 +1270,8 @@ class RoiController extends Controller
 		if($capital_cost_rate > 0.4){
 			$capital_cost_rate = 0.4;
 		}
-		$capital_cost = (($update_data['Inventory_days']+$update_data['transport_days']+$update_data['two_transport_days'])*$total_sales_volume/365)*($update_data['purchase_price']+$transport_cost/$total_sales_volume+$tariff_amount/$total_sales_volume)*$capital_cost_rate;
+//		$capital_cost = (($update_data['Inventory_days']+$update_data['transport_days']+$update_data['two_transport_days'])*$total_sales_volume/365)*($update_data['purchase_price']+$transport_cost/$total_sales_volume+$tariff_amount/$total_sales_volume)*$capital_cost_rate;
+		$capital_cost = 0;//2022.11.4资金占用成本改成0
 		//变动成本费用小计
 		$variable_cost =  $purchase_cost + $transport_cost + ($tariff_amount + $vat_amount) + ($commission_amount + $operating_fee) + $total_promo_amount + $storage_fee + $capital_cost;
 		//边际贡献总额
