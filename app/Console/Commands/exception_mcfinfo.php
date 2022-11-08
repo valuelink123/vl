@@ -107,7 +107,7 @@ class ExceptionMcfInfo extends Command
 							'attachs' => NULL,
 							'error' => NULL,
 							'error_count' => 0,
-							'features' => 1,
+							'features' => 0,
 						);
 						$sendbox_id = DB::table('sendbox')->insertGetId($insertSendbox);
 						DB::table('exception')->where('id', $_exceptionId)->update(['mcf_sendbox_id' => $sendbox_id]);

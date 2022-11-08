@@ -354,7 +354,11 @@
             ajax: {
                 type: 'POST',
                 url: "/crm/get"
-            }
+            },
+            lengthMenu: [
+                [10, 50, 100,1000],
+                [10, 50, 100,1000]
+            ],
         })
 
         let users = @json($users) ;
