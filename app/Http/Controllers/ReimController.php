@@ -151,9 +151,8 @@ class ReimController extends Controller
 					$bool = $file->move(public_path() . $newpath, $newname);
 					$updateData['pod']=$newpath . $newname;
 				}
-			}else{
-				$updateData['pod'] = $request->get('isa');
 			}
+			if($request->get('isa')) $updateData['pod']=$request->get('isa');
 			$updateData['step']=intval($request->get('step'));
 			if($request->get('case_id')) $updateData['case_id']=$request->get('case_id');
 			if($request->get('remark')) $updateData['remark']=$request->get('remark');
