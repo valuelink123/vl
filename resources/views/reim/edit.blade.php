@@ -27,7 +27,8 @@
                             <select class="form-control " name="step" id="step">
 							<?php 
 							foreach(\App\Models\AmazonShipmentItem::STATUS as $k=>$v){ 	
-								echo '<option value="'.$k.'">'.$v.'</option>';
+								$selected = ($k==1)?'selected':'';
+								echo '<option value="'.$k.'" '.$selected.'>'.$v.'</option>';
 							}?>
 							</select>
                         </div>
