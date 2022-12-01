@@ -301,7 +301,14 @@ class CcpController extends Controller
 			}elseif(in_array($site,$dateconfig)){//站点+2小时，utc+2:00
 				$date_field = 'date_add(purchase_date,INTERVAL 2 hour) ';
 			}else{//其他站点，date字段-7hour
-				$date_field = 'date_sub(purchase_date,INTERVAL 7 hour) ';
+				$res = $this->isWinterTime(strtotime($startDate));//判断美国是否冬令制时间
+				//美国Amazon时间冬令制时间和北京时间相差16个小时。夏令制相差15个小时
+				if($res==1){//冬令制时间
+					$date_field = 'date_sub(purchase_date,INTERVAL 8 hour) ';
+				}else{
+					$date_field = 'date_sub(purchase_date,INTERVAL 7 hour) ';
+				}
+
 			}
 		}else{//北京时间加上8小时
 			$date_field = 'date_add(purchase_date,INTERVAL 8 hour) ';
