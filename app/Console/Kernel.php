@@ -67,6 +67,7 @@ class Kernel extends ConsoleKernel
 		'App\Console\Commands\AddAsins',
 		'App\Console\Commands\AddPpcAdCampaign',
 		'App\Console\Commands\ExceptionMcfInfo',
+		'App\Console\Commands\WarrantyUpdateNonctg',
 		'App\Console\Commands\AddPpcAdCampaignHistory'
     ];
 
@@ -143,6 +144,7 @@ budget_skus.bg=asin.bg, budget_skus.bu=asin.bu WHERE budget_skus.sku = asin.item
 		//$schedule->command('get:requestreviewtasks')->dailyAt('18:00')->name('getrr')->withoutOverlapping();
         $filePath = base_path().'/storage/logs/noctg.log';
         // $schedule->command('add:nonctg')->monthly()->appendOutputTo($filePath)->name('add_history_nonctg')->withoutOverlapping();//添加nonctg数据，此脚本只执行一次
+		$schedule->command('update:warranty_nonctg')->dailyAt('06:40')->appendOutputTo($filePath)->name('update_warranty_nonctg')->withoutOverlapping();//添加nonctg数据，此脚本只执行一次
         $schedule->command('update:nonctg')->cron('*/30 * * * *')->appendOutputTo($filePath)->name('update_nonctg')->withoutOverlapping();
         //crm模块的相关批处理
 		$schedule->command('add:historyClient')->monthly()->name('add_history_client')->withoutOverlapping();//添加客户数据，此脚本只执行一次
