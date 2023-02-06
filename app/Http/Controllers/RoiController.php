@@ -1127,9 +1127,9 @@ class RoiController extends Controller
 	public function getCalculateData($request)
 	{
 		//测试用数据： site选择JP; $currency_rate = 0.065767; $early_investment = 3000;
-		$currency_rates = $this->getCurrencyRates();
+		//$currency_rates = $this->getCurrencyRates();
 		$site = $request->input('site','US');
-		$currency_rate = $currency_rates[$site];
+		$currency_rate = round($request->input('custom_rate','1'),4);
 
 		$update_data = $request->all();
 		$update_data['product_name'] = $this->getString($update_data['product_name']);

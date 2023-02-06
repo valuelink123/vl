@@ -101,19 +101,23 @@
         <div style="font-size: 18px; font-weight: bold;">投入产出表</div>
         <div style="height: 30px;"></div>
         <div class="first_row_params">
-            <div style="width:275px; float:left;">
+            <div style="width:200px; float:left;">
                 <div>产品名称
                     <span style="color: #999999;" title="可自定义产品名称，方便同一项目下方案对比区分。如：“乐观-榨汁机”"><i class="fa fa-info-circle"></i></span>
                 </div>
-                <input type="text" name="product_name" id="product_name" style="width:260px;" />
+                <input type="text" name="product_name" id="product_name" style="width:170px;" />
             </div>
-            <div class="param_cost" style="width:120px;">
+            <div style="width:90px;float:left;">
                 <div>站点</div>
                 <select name="site" id="site" style="width:60px;">
                     @foreach ($sites as $site)
                         <option value="{{$site}}">{{$site}}</option>
                     @endforeach
                 </select>
+            </div>
+			<div style="width:90px;float:left;">
+                <div>汇率</div>
+                <input type="text" name="custom_rate" id="custom_rate" style="width:60px;" value="1" >
             </div>
             <div style="width:165px; float:left">
                 <div>预计上线时间
@@ -128,11 +132,11 @@
                     </span>
                 </div>
             </div>
-            <div class="param_cost">
+            <div style="width:120px;float:left;">
                 <div>项目编号
                     <span style="color: #999999;" title="新品开发项目定义好的项目编号"><i class="fa fa-info-circle"></i></span>
                 </div>
-                <input type="text" name="project_code" id="project_code" />
+                <input type="text" name="project_code" id="project_code" style="width:90px;" />
             </div>
             <div class="param_cost">
                 <div>选择合作者</div>
@@ -639,7 +643,12 @@
         var selected_values = $(this).val();
         $('#collaborators').val(selected_values);
     });
-
+	
+	$('#site').on('change', function(){
+        var site = $(this).val();
+        $('#custom_rate').val(myParseFloat(currency_rates[site]));
+    });
+	
     $(function() {
         $('.date-picker').datepicker({
             rtl: App.isRTL(),
@@ -647,6 +656,7 @@
             orientation: 'bottom',
             autoclose: true,
         });
+		$('#custom_rate').val(myParseFloat(currency_rates[$('#site').val()]));
     });
 
     function fold_cost_details(){
@@ -793,7 +803,7 @@
     });
 
     //当切换站点时，自动计算
-    $('#site').on('change', function(){
+    $('#site, #custom_rate').on('change', function(){
         calculate_results();
     });
 
@@ -809,7 +819,7 @@
 
         var sales_amount_month_array=new Array();
         var site = $('#site').val();
-        var currency_rate = myParseFloat(currency_rates[site]);
+        var currency_rate = myParseFloat($('#custom_rate').val());
         for(var i=1; i<=12; i++){
             var price_fc_month_i = myParseFloat($('#price_fc_month_' + i).val().trim());
             var volume_month_i = myParseInt($('#volume_month_' + i).val().trim())

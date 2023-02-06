@@ -140,13 +140,13 @@
                     <div style="font-size: 18px; font-weight: bold">投入产出表</div>
                     <div style="height: 30px;"></div>
                     <div class="first_row_params">
-                        <div style="width:275px; float:left;">
+                        <div style="width:200px; float:left;">
                             <div >产品名称
                                 <span style="color: #999999;" title="可自定义产品名称，方便同一项目下方案对比区分。如：“乐观-榨汁机”"><i class="fa fa-info-circle"></i></span>
                             </div>
-                            <input type="text" name="product_name" id="product_name" style="width:260px;" value="{{$roi['product_name']}}" />
+                            <input type="text" name="product_name" id="product_name" style="width:170px;" value="{{$roi['product_name']}}" />
                         </div>
-                        <div class="param_cost" style="width:120px;">
+                        <div class="param_cost" style="width:90px;">
                             <div>站点</div>
                             <select name="site" id="site" style="width:60px;">
                                 @foreach ($sites as $site)
@@ -154,6 +154,10 @@
                                 @endforeach
                             </select>
                         </div>
+						<div style="width:90px;float:left;">
+							<div>汇率</div>
+							<input type="text" name="custom_rate" id="custom_rate" style="width:60px;" value="{{$roi['currency_rate']}}" >
+						</div>
                         <div style="width:165px; float:left">
                             <div>预计上线时间
                                 <span style="color: #999999;" title="预计新品可正式上线销售的时间"><i class="fa fa-info-circle"></i></span>
@@ -167,11 +171,11 @@
                                 </span>
                             </div>
                         </div>
-                        <div class="param_cost">
+                        <div style="width:120px; float:left">
                             <div>项目编号
                                 <span style="color: #999999;" title="新品开发项目定义好的项目编号"><i class="fa fa-info-circle"></i></span>
                             </div>
-                            <input type="text" name="project_code" id="project_code" value="{{$roi['project_code']}}"/>
+                            <input type="text" name="project_code" id="project_code" value="{{$roi['project_code']}}" style="width:90px;" />
                         </div>
                         <div class="param_cost">
                             <div>选择合作者</div>
@@ -702,6 +706,7 @@
 <script type="text/javascript">
     var currency_rates = eval(<?php echo json_encode($currency_rates);?>);
 
+	
     function refresh_time() {
         setTimeout(refresh_time, 1000 * 60); //这里的1000表示1秒有1000毫秒
         var roi_id = $('#roi_id').val();
@@ -755,6 +760,11 @@
     $('#collaboratorsSelect').on('changed.bs.select', function(e) {
         var selected_values = $(this).val();
         $('#collaborators').val(selected_values);
+    });
+	
+	$('#site').on('change', function(){
+        var site = $(this).val();
+        $('#custom_rate').val(myParseFloat(currency_rates[site]));
     });
 
     $(function() {
@@ -928,7 +938,7 @@
     });
 
     //当切换站点时，自动计算
-    $('#site').on('change', function(){
+    $('#site, #custom_rate').on('change', function(){
         calculate_results();
     });
 
