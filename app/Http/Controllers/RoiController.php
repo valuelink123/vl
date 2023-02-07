@@ -1132,6 +1132,7 @@ class RoiController extends Controller
 		$currency_rate = round($request->input('custom_rate','1'),4);
 
 		$update_data = $request->all();
+		unset($update_data['custom_rate']);
 		$update_data['product_name'] = $this->getString($update_data['product_name']);
 		$update_data['project_code'] = $this->getString($update_data['project_code']);
 
