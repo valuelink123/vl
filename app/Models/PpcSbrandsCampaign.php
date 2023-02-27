@@ -27,4 +27,14 @@ class PpcSbrandsCampaign extends Model
 	{
 		return json_decode($value, true);
 	}
+
+	public function setBidAdjustmentsAttribute($value)
+	{
+        $this->attributes['landing_page'] = json_encode($value);
+	}
+	
+	public function getBidAdjustmentsAttribute($value)
+	{
+		return json_decode($value, true);
+	}
 }
