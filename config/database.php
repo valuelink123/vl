@@ -409,6 +409,20 @@ return [
             'strict' => false,
             'engine' => null,
         ],
+		'cs' => [
+			'driver' => 'mysql',
+			'host' => env('DB_CS_HOST', '127.0.0.1'),
+			'port' => env('DB_CS_PORT', '3306'),
+			'database' => env('DB_CS_DATABASE', 'forge'),
+			'username' => env('DB_CS_R_USERNAME', 'forge'),
+			'password' => env('DB_CS_R_PASSWORD', ''),
+			'unix_socket' => env('DB_CS_SOCKET', ''),
+			'charset' => 'utf8mb4',
+			'collation' => 'utf8mb4_unicode_ci',
+			'prefix' => '',
+			'strict' => false,
+			'engine' => null,
+		],
 
 
     ],

@@ -764,3 +764,8 @@ Route::Post('/exceptionReminder/get', 'ExceptionController@getRemind');
 Route::resource('reims', 'ReimController');
 Route::Post('/reims/get', 'ReimController@get')->name('getReim');
 Route::Post('/reims/batchUpdate', 'ReimController@batchUpdate')->name('ReimBatchUpdate');
+
+
+//cs-crm模块
+Route::get('/cscrm', 'CscrmController@index');
+Route::match(['post','get'],'/cscrm/get', 'CscrmController@get')->name('getCscrm');

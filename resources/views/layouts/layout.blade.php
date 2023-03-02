@@ -505,6 +505,14 @@
                                                     </a>
                                                 </li>
 												@endpermission
+                                                @permission('cs-crm-show')
+                                                <li class="">
+                                                    <a href="/cscrm" class="nav-link nav-toggle ">
+                                                        CRM--CS Team
+                                                        <span class="arrow"></span>
+                                                    </a>
+                                                </li>
+                                                @endpermission
                                                 @permission('customer-show')
                                                 <li class="">
                                                     <a href="/customer" class="nav-link nav-toggle ">

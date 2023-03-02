@@ -908,5 +908,15 @@ ORDER BY asin_offer_summary.asin DESC ";
 		}
 		die();
 	}
+	//得到question type选项
+	function getCategoryType()
+	{
+		$_categoryData = DB::connection('cs')->table('category')->get();
+		$categoryData = array();
+		foreach($_categoryData as $key=>$val){
+			$categoryData[$val->id] = $val->category_name;
+		}
+		return $categoryData;
+	}
 
 }

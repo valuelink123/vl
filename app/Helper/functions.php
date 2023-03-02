@@ -1843,3 +1843,39 @@ function getAdRegions(){
 		'A1VC38T7YXB528'=>'FE'
 	);
 }
+
+//获得性别枚举
+function getGender()
+{
+	return array('Unknown','Male','Female');
+}
+//获得国家枚举
+function getCountry()
+{
+	return array(
+		'Amazon.ca'=>'CA',
+		'Amazon.de'=>'DE',
+		'Amazon.es'=>'ES',
+		'Amazon.fr'=>'FR',
+		'Amazon.in'=>'IN',
+		'Aamazon.it'=>'IT',
+		'Amazon.co.jp'=>'JP',
+		'Amazon.co.uk'=>'UK',
+		'Amazon.com.mx'=>'MX',
+		'Amazon.com'=>'US'
+	);
+}
+function getFrom()
+{
+	return array('Email','Call','Chat');
+}
+function getReview()
+{
+	return array('None','PR customer','NRW customer');
+}
+
+// 获得品牌数据
+function getBrand()
+{
+	return DB::connection('cs')->table('config_option')->where('co_pid',1)->where('co_status',0)->orderBy('co_order','desc')->pluck('co_name','id')->toArray();
+}
