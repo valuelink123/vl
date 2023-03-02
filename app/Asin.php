@@ -78,3 +78,4 @@ class Asin extends Model
             "shiqingbo@valuelinkltd.com",
         );
 }
+

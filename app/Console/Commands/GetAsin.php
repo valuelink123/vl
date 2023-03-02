@@ -95,7 +95,15 @@ class GetAsin extends Command
 			}
 			$sku_price= ($sku_price_num)?round($sku_price/$sku_price_num,2):0;
 			$sku_sales= ($sku_sales_num)?round($sku_sales/$sku_sales_num,2):0;
-
+			$exists = DB::table('rating_asin')->where('asin', trim(array_get($asin,'ASIN')))->where('domain', 'www.'.trim(array_get($asin,'SITE')))->first();
+			if(empty($exists)) {
+				DB::table('rating_asin')->insert(
+						array(
+							'asin'=>trim(array_get($asin,'ASIN')),
+							'domain'=>'www.'.trim(array_get($asin,'SITE'))
+						)
+				);
+			}
 			Asin::updateOrCreate(
 			[
 				'asin' => trim(array_get($asin,'ASIN','')),
