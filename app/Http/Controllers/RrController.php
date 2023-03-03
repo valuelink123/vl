@@ -93,13 +93,19 @@ class RrController extends Controller
 			'after_date' => 'required|string',
 			'before_date' => 'required|string',
         ]);
-		$insertData=[];
+		$insertData = $report_option = [];
 		$date = date('Y-m-d H:i:s');
 		$group = ReportGroup::create([]);
+		
+		$options = $request->get('report_option');
+		foreach($options as $option){
+			if(!empty(array_get($option,'option')) && !empty(array_get($option,'value'))) $report_option[$option['option']] = $option['value'];
+		}
 		foreach($request->get('seller_account_ids') as $seller_account_id){
 			$insertData[] = array(
 				'seller_account_id'=>$seller_account_id,
 				'report_type'=>$request->get('report_type'),
+				'report_option'=>!empty($report_option)?json_encode($report_option):NULL,
 				'after_date'=>$request->get('after_date'),
 				'before_date'=>$request->get('before_date'),
 				'created_at'=>$date,

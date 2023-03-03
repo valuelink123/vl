@@ -62,13 +62,17 @@
 							</th>
                             <th> Account / Status </th>
                             <th> Report Type </th>
+							
 							<th> Report Date </th>
+							<th> Report Option </th>
                             <th> Request Date </th>
+							
                             <th> Actions </th>
                         </tr>
                         </thead>
                         <tbody>
                         @foreach ($datas as $data)
+							<?php if(empty($data->reports)) continue;?>
                             <tr class="odd gradeX">
 								<td>
 								<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline">
@@ -107,7 +111,10 @@
                                     {{$data->reports[0]->report_type}}
                                 </td>
 								<td>
-                                    {{$data->reports[0]->after_date}} -- {{$data->reports[0]->before_date}}
+                                    {{date('Y-m-d',strtotime($data->reports[0]->after_date))}} -- {{date('Y-m-d',strtotime($data->reports[0]->before_date))}}
+                                </td>
+								<td>
+                                    {{$data->reports[0]->report_option}}
                                 </td>
                                 <td>
                                     {{$data->reports[0]->created_at}}

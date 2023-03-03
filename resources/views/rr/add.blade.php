@@ -103,6 +103,37 @@
                                     </div>
                             </div>
                         </div>
+						<div class="form-group mt-repeater">
+							<label>Report Option</label>
+							<div data-repeater-list="report_option">
+								<div data-repeater-item class="mt-repeater-item">
+									<div class="row mt-repeater-row">
+										<div class="col-md-4">
+											<label class="control-label">Option</label>
+											<div class="input-group">
+                                       	 	<input type="text" class="form-control"  name="option">
+            
+                                    		</div>
+										</div>		
+										<div class="col-md-4">
+											<label class="control-label">Value</label>
+											<div class="input-group">
+                                       		<input type="text" class="form-control"  name="value">
+            
+                                    		</div>
+										</div>
+				
+										<div class="col-md-4">
+											<a href="javascript:;" data-repeater-delete class="btn btn-danger mt-repeater-delete">
+												<i class="fa fa-close"></i>
+											</a>
+										</div>
+									</div>
+								</div>
+							</div>
+							<a href="javascript:;" data-repeater-create class="btn btn-info mt-repeater-add">
+								<i class="fa fa-plus"></i> Add Option</a>
+						</div>
 
                       
 
