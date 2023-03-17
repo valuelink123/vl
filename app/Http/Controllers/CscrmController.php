@@ -58,20 +58,9 @@ class CscrmController extends Controller
 		$sql = $this->getCscrmSql($request);
 		$limit = $this->dtLimit($request);
 		$sql .= ' LIMIT '.$limit;
-//		echo '<pre>';
-//		echo $sql;exit;
 		$data = DB::connection('cs')->select($sql);
-//		$data = $this->queryRows($sql);
-//		echo '<pre>';
-//		var_dump($data);
-//		exit;
-
-//		$recordsTotal = $recordsFiltered = $this->queryOne('SELECT FOUND_ROWS()');
 		$totalData = DB::connection('cs')->select('SELECT FOUND_ROWS() as total');
 		$recordsTotal = $recordsFiltered = $totalData[0]->total;
-//		echo '<pre>';
-//		var_dump($totalData);
-//		exit;
 
 		//得到question_type数据的id对应的类型名称
 		//category_name
@@ -79,7 +68,7 @@ class CscrmController extends Controller
 		if($data){
 			$data = json_decode(json_encode($data),true);
 			foreach($data as $key=>$val){
-				$data[$key]['email_hidden'] = $val['email'];
+				$data[$key]['email_hidden'] = $data[$key]['encrypted_email'] = $val['email'];
 				$item = DB::connection('cs')->table('cs_crm_item')->where('cscrm_id',$val['id'])->where('email',$val['email'])->get();
 				$data[$key]['amazon_order_id'] = $data[$key]['brand'] = $data[$key]['review'] = $data[$key]['status'] = $data[$key]['sku'] = $data[$key]['asin'] = $data[$key]['item_no'] = $data[$key]['item_group'] = $data[$key]['question_type'] = $data[$key]['bg'] = $data[$key]['bu'] = '';
 				foreach($item as $item_value){
@@ -95,6 +84,12 @@ class CscrmController extends Controller
 					$linkage2 = isset($categoryData[$item_value->linkage2]) ? $categoryData[$item_value->linkage2] : '';
 					$linkage3 = isset($categoryData[$item_value->linkage3]) ? $categoryData[$item_value->linkage3] : '';
 					$data[$key]['question_type'] .= $linkage1.'/'.$linkage2.'/'.$linkage3.'<br>';
+					//查隐藏邮箱
+					$encrypted_email = DB::table('client_info')->where('email',$val['email'])->first();
+					if($encrypted_email){
+						$encrypted_email = $encrypted_email->encrypted_email;
+						$data[$key]['encrypted_email'] = $encrypted_email;
+					}
 					//查bgbu
 					if($item_value->asin){
 						$asinData = DB::table('asin')->where('asin',$item_value->asin)->first();

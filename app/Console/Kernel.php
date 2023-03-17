@@ -68,7 +68,8 @@ class Kernel extends ConsoleKernel
 		'App\Console\Commands\AddPpcAdCampaign',
 		'App\Console\Commands\ExceptionMcfInfo',
 		'App\Console\Commands\WarrantyUpdateNonctg',
-		'App\Console\Commands\AddPpcAdCampaignHistory'
+		'App\Console\Commands\AddPpcAdCampaignHistory',
+		'App\Console\Commands\CsPhone'
     ];
 
     /**
@@ -82,6 +83,7 @@ class Kernel extends ConsoleKernel
         // 由于 php artisan 命令会触发 schedule 执行；
 
         // if (!Schema::hasTable('accounts')) return;
+		$schedule->command('add:cs_phone')->hourly()->name('add_cs_phone')->withoutOverlapping();//添加客服系统的call message数据
 
         // 防止第一次执行 php artisan migrate 时，报找不到表的错误；
 		$schedule->call(function (){
@@ -94,7 +96,7 @@ class Kernel extends ConsoleKernel
 			DB::update("update budget_skus,asin set budget_skus.sap_seller_id=asin.sap_seller_id,budget_skus.`status`=asin.item_status,
 budget_skus.bg=asin.bg, budget_skus.bu=asin.bu WHERE budget_skus.sku = asin.item_no and budget_skus.site=asin.site;");
         })->hourly();
-		
+
         $accountList = DB::table('accounts')->get(array('id'));
         $i=$x=0;
         foreach($accountList as $account){
@@ -132,7 +134,7 @@ budget_skus.bg=asin.bg, budget_skus.bu=asin.bu WHERE budget_skus.sku = asin.item
 		//$schedule->command('get:sellers')->cron('*/1 * * * *')->name('sendmails')->withoutOverlapping();
 		$schedule->command('get:asininfo')->cron('0 */2 * * *')->name('getasininfo')->withoutOverlapping();
 		$schedule->command('request:ppcReport')->cron('0 */4 * * *')->name('requestppc')->withoutOverlapping();
-		$schedule->command('request:monthPpcReport')->dailyAt('01:00')->name('requestppcmonth')->withoutOverlapping();		
+		$schedule->command('request:monthPpcReport')->dailyAt('01:00')->name('requestppcmonth')->withoutOverlapping();
 		$schedule->command('get:ppcReport --skip='.intval(date('i')))->cron(intval(date('i')).' * * * *')->name('getppc'.intval(date('i')))->withoutOverlapping();
 		$schedule->command('get:ppcSchedule')->cron('*/4 * * * *')->name('scheduleppc')->withoutOverlapping();
 		$schedule->command('get:ads 10 1')->cron('5 0 * * *')->name('getads')->withoutOverlapping();

@@ -27,41 +27,41 @@
     <div class="portlet light bordered">
         <div class="col-md-12" style="padding: 0px;margin-bottom: 30px;">
 
-            @permission('cs-crm-add')
-            <a  data-toggle="modal" href="{{ url('cscrm/create')}}" target="_blank"><button id="sample_editable_1_2_new" class="btn sbold red"> Add New
-                    <i class="fa fa-plus"></i>
-                </button>
-            </a>
-            @endpermission
+{{--            @permission('cs-crm-add')--}}
+{{--            <a  data-toggle="modal" href="{{ url('cscrm/create')}}" target="_blank"><button id="sample_editable_1_2_new" class="btn sbold red"> Add New--}}
+{{--                    <i class="fa fa-plus"></i>--}}
+{{--                </button>--}}
+{{--            </a>--}}
+{{--            @endpermission--}}
 
 
-            @permission('compose')
-            <div class="btn-group">
-                <button id="batch-send" class="btn sbold blue"> Batch Send
-                </button>
-            </div>
-            @endpermission
+{{--            @permission('compose')--}}
+{{--            <div class="btn-group">--}}
+{{--                <button id="batch-send" class="btn sbold blue"> Batch Send--}}
+{{--                </button>--}}
+{{--            </div>--}}
+{{--            @endpermission--}}
 
-            <div class="btn-group " style="float:right;">
-                <form action="{{url('/cscrm/import')}}" method="post" enctype="multipart/form-data">
-                    <div class="col-md-12">
-                        @permission('cs-crm-import')
-                        <div class="col-md-4"  >
-                            <a href="{{ url('/cscrm/download')}}" >Import Template
-                            </a>
-                        </div>
-                        <div class="col-md-6">
-                            {{ csrf_field() }}
-                            <input type="file" name="importFile"  style="width: 90%;"/>
-                        </div>
-                        <div class="col-md-2">
-                            <button type="submit" class="btn blue" id="data_search">Import</button>
+{{--            <div class="btn-group " style="float:right;">--}}
+{{--                <form action="{{url('/cscrm/import')}}" method="post" enctype="multipart/form-data">--}}
+{{--                    <div class="col-md-12">--}}
+{{--                        @permission('cs-crm-import')--}}
+{{--                        <div class="col-md-4"  >--}}
+{{--                            <a href="{{ url('/cscrm/download')}}" >Import Template--}}
+{{--                            </a>--}}
+{{--                        </div>--}}
+{{--                        <div class="col-md-6">--}}
+{{--                            {{ csrf_field() }}--}}
+{{--                            <input type="file" name="importFile"  style="width: 90%;"/>--}}
+{{--                        </div>--}}
+{{--                        <div class="col-md-2">--}}
+{{--                            <button type="submit" class="btn blue" id="data_search">Import</button>--}}
 
-                        </div>
-                        @endpermission
-                    </div>
-                </form>
-            </div>
+{{--                        </div>--}}
+{{--                        @endpermission--}}
+{{--                    </div>--}}
+{{--                </form>--}}
+{{--            </div>--}}
 
         </div>
         <div class="portlet-body">
@@ -292,7 +292,7 @@
                 },
                 {data: 'id', name: 'id'},
                 {data: 'date', name: 'date'},
-                {data: 'email', name: 'email'},
+                {data: 'encrypted_email', name: 'encrypted_email'},
                 {data: 'name', name: 'name'},
                 {data: 'phone', name: 'phone'},
                 {data: 'country', name: 'country'},

@@ -57,6 +57,7 @@ class AddClient extends Command
 			DB::connection()->enableQueryLog(); // 开启查询日志
 			Log::Info('Add Client Start...');
 	//		Log::info(Cache::get('email_test'));
+			$this->getCsCrm();
 			$this->getCtgCrm();
 			$this->getNonCtg();
 			$this->getEmailCrm();
@@ -64,9 +65,9 @@ class AddClient extends Command
 			$this->getRsgCrm();
 			$this->getReviewCrm();
 			DB::commit();
-		}catch (\Exception $e) { 
+		}catch (\Exception $e) {
 			DB::rollBack();
-        } 
+        }
 		//查询出邮箱对应关系
 		$sql = 'select encrypted_email,email from client_info';
 		$_data = $this->queryRows($sql);
@@ -269,6 +270,19 @@ class AddClient extends Command
 		// Log::Info($queries);
 	}
 
+	function getCsCrm()
+	{
+		$where = " t1.date >= '".$this->date."'";
+		$sql = "SELECT *,cs_crm.created_at as date from cs_crm left join cs_crm_item on cs_crm.email=cs_crm_item.email";
+		Log::Info($sql);
+
+		$data = DB::connection('cs')->select($sql);
+		if($data){
+			$data = json_decode(json_encode($data),true);
+			$this->addData($data,'Cs',false,true);
+		}
+	}
+
 	/*
 	 * 插入数据到client,client_info,client_order_info这三个表中
 	 * $sap表示是否要获取sap接口,
@@ -292,13 +306,17 @@ class AddClient extends Command
 
 			$data[$val['email']]['amazon_order_id'][] = $order_id;
 		}
-
 		foreach($data as $key=>$val){
+
+			if(!$val['email']){
+				continue;
+			}
 			//检查是否有相同的邮箱,email要保持唯一性
 			$info = DB::table('client_info')->where('email',$val['email'])->get(array('id'))->toArray();
 			if($info){
 				$res = 1;
 				$ci_id = $info[0]->id;
+
 			}else{
 				$insertInfo = array(
 					'name'=>$val['name'],
@@ -309,8 +327,9 @@ class AddClient extends Command
 					'brand'=>$val['brand'],
 					'from'=>$from,
 				);
+
 				//插入到client表里的数据0
-				$userId = $val['processor'];
+				$userId = isset($val['processor']) ? $val['processor'] : 1;
 				$insertClient = array(
 					'date'=>isset($val['date']) ? $val['date'] : date('Y-m-d H:i:s'),
 					'created_at'=>date('Y-m-d H:i:s'),
@@ -320,24 +339,29 @@ class AddClient extends Command
 
 				$insertInfo['client_id'] = $res = DB::table('client')->insertGetId($insertClient);
 				$ci_id = DB::table('client_info')->insertGetId($insertInfo);
+
 			}
 			if(empty($res) || empty($ci_id)){
 				//DB::rollBack();
 				continue;
 			}
-			foreach($val['amazon_order_id'] as $v){
-				if($v){
-					//RSG的订单要特殊标记
-					$order_type = 0;
-					if($from=='RSG'){
-						$order_type = 1;
-					}
-					$insertOrder[] = array(
-						'amazon_order_id' => $v,
-						'ci_id' => $ci_id,
-						'order_type' => $order_type,
-					);
 
+			if(isset($val['amazon_order_id']) && $val['amazon_order_id']) {
+				foreach ($val['amazon_order_id'] as $v) {
+					if ($v) {
+						//RSG的订单要特殊标记
+						$order_type = 0;
+						if ($from == 'RSG') {
+							$order_type = 1;
+						}
+						$insertOrder[] = array(
+							'amazon_order_id' => $v,
+							'ci_id' => $ci_id,
+							'order_type' => $order_type,
+						);
+
+
+					}
 				}
 			}
 		}
