@@ -163,7 +163,7 @@ class CcpAdCampaignController extends Controller
 		//时间搜索范围
 		$where = $this->getPpcDateWhere();
 		$where .= " and ppc_profiles.marketplace_id='".$site."' ";
-		//$where .= " and ppc_profiles.account_id in(".implode(",",$account_id).")";
+		$where .= " and ppc_profiles.account_id in(".implode(",",$account_id).")";
 		if($account){
 			$account_str = implode("','", explode(',',$account));
 			$where .= " and ppc_profiles.seller_id in('".$account_str."')";
