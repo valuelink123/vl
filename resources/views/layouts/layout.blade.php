@@ -1304,7 +1304,7 @@
 												@endpermission
 											</ul>
 										</li>
-
+										<!--
 										<li class="menu-dropdown classic-menu-dropdown ">
 											<a href="javascript:;"> CPFR协同补货
 												<span class="arrow"></span>
@@ -1362,6 +1362,7 @@
                                                 </li>
                                             </ul>
                                         </li>
+					-->
                                         <li class="menu-dropdown classic-menu-dropdown ">
                                             <a href="javascript:;"> Sales Alert
                                                 <span class="arrow"></span>
