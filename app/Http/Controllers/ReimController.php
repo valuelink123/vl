@@ -35,13 +35,13 @@ class ReimController extends Controller
     {
         $datas = AmazonShipmentItem::selectRaw('amazon_shipment_items.*, seller_accounts.label,asin.bg,asin.bu,asin.sap_seller_id,asin.sku,amazon_reimbursements.case_id as r_case_id,amazon_reimbursements.currency_unit,amazon_reimbursements.amount_total,amazon_reimbursements.quantity_reimbursed_total,amazon_shipments.shipment_status')
 		->leftJoin('amazon_shipments',function($q){
-            $q->on('amazon_shipment_items.seller_id', '=', 'amazon_shipments.seller_id')->on(			'amazon_shipment_items.shipment_id', '=', 'amazon_shipments.shipment_id');
+            $q->on('amazon_shipment_items.seller_id', '=', 'amazon_shipments.seller_id')->on('amazon_shipment_items.shipment_id', '=', 'amazon_shipments.shipment_id');
         })
 		->leftJoin('seller_accounts',function($q){
             $q->on('amazon_shipment_items.seller_id', '=', 'seller_accounts.mws_seller_id');
         })
-        ->leftJoin('amazon_reimbursements',function($q){
-            $q->on('amazon_shipment_items.case_id', '=', 'amazon_reimbursements.case_id');
+        ->leftJoin(DB::raw("(select seller_account_id,case_id,fnsku, currency_unit, sum(amount_total) as amount_total, sum(quantity_reimbursed_total) as quantity_reimbursed_total from amazon_reimbursements group by seller_account_id,case_id,fnsku, currency_unit) as amazon_reimbursements"),function($q){
+            $q->on('amazon_shipment_items.case_id', '=', 'amazon_reimbursements.case_id')->on('amazon_reimbursements.seller_account_id','=','seller_accounts.id')->on('amazon_shipment_items.fnsku','=','amazon_reimbursements.fnsku');
         })
         ->leftJoin(DB::raw("(select seller_sku,any_value(sku) as sku,any_value(sap_seller_id) as sap_seller_id,any_value(sap_seller_bg) as bg,any_value(sap_seller_bu) as bu from sap_asin_match_sku group by seller_sku) as asin"),function($q){
             $q->on('amazon_shipment_items.seller_sku', '=', 'asin.seller_sku');
@@ -67,11 +67,11 @@ class ReimController extends Controller
             $datas = $datas->where('amazon_shipment_items.updated_at','<=',array_get($_REQUEST,'date_to'));
         }
 		if(array_get($_REQUEST,'shipment_id')){
-            $datas = $datas->where('amazon_shipment_items.shipment_id',array_get($_REQUEST,'shipment_id'));
+            $datas = $datas->whereIn('amazon_shipment_items.shipment_id',explode(",",array_get($_REQUEST,'shipment_id')));
         }
 		
 		if(array_get($_REQUEST,'case_id')){
-            $datas = $datas->where('amazon_shipment_items.case_id',array_get($_REQUEST,'case_id'));
+            $datas = $datas->whereIn('amazon_shipment_items.case_id',explode(",",array_get($_REQUEST,'case_id')));
         }
         if(array_get($_REQUEST,'sku')){
             $datas = $datas->whereIn('asin.sku',explode(',',str_replace([' ','	'],'',array_get($_REQUEST,'sku'))));
