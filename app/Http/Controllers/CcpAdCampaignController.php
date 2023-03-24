@@ -72,7 +72,7 @@ class CcpAdCampaignController extends Controller
 		//时间搜索范围
 		$where = $this->getPpcDateWhere();
 		$where .= " and ppc_profiles.marketplace_id='".$site."' ";
-		$where .= " and ppc_profiles.account_id in(".implode(",",$account_id).")";
+//		$where .= " and ppc_profiles.account_id in(".implode(",",$account_id).")";
 		if($account){
 			$account_str = implode("','", explode(',',$account));
 			$where .= " and ppc_profiles.seller_id in('".$account_str."')";
@@ -163,7 +163,7 @@ class CcpAdCampaignController extends Controller
 		//时间搜索范围
 		$where = $this->getPpcDateWhere();
 		$where .= " and ppc_profiles.marketplace_id='".$site."' ";
-		$where .= " and ppc_profiles.account_id in(".implode(",",$account_id).")";
+//		$where .= " and ppc_profiles.account_id in(".implode(",",$account_id).")";
 		if($account){
 			$account_str = implode("','", explode(',',$account));
 			$where .= " and ppc_profiles.seller_id in('".$account_str."')";
@@ -216,6 +216,7 @@ class CcpAdCampaignController extends Controller
 					sum(orders) as orders,
 					sum(impressions) as impressions from( ".$union_all . " ) AS UNION_table GROUP BY campaign_id  order by sales desc ";
 		return $sql;
+
 
 	}
 
