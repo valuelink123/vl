@@ -19,9 +19,9 @@ class CcpAdProductController extends Controller
 	use \App\Traits\DataTables;
 	use \App\Traits\Mysqli;
 
-	public $ccpAdmin = array("lidan@valuelinkcorp.com","liuling@dtas.com","wuweiye@valuelinkcorp.com","luodenglin@valuelinkcorp.com","zhouzhiwen@valuelinkltd.com","zhangjianqun@valuelinkcorp.com","sunhanshan@valuelinkcorp.com","wangxiaohua@valuelinkltd.com","zhoulinlin@valuelinkcorp.com","wangshuang@valuelinkltd.com","lixiaojian@valuelinkltd.com","shiqingbo@valuelinkltd.com");
-	public $start_date = '';//����ʱ�䷶Χ�Ŀ�ʼʱ��
-	public $end_date = '';//����ʱ�䷶Χ�Ľ���ʱ��
+	public $ccpAdmin = array("lidan@valuelinkcorp.com","liuling@dtas.com","wuweiye@valuelinkcorp.com","luodenglin@valuelinkcorp.com","zhouzhiwen@valuelinkltd.com","zhangjianqun@valuelinkcorp.com","sunhanshan@valuelinkcorp.com","wangxiaohua@valuelinkltd.com","zhoulinlin@valuelinkcorp.com","wangshuang@valuelinkltd.com","lixiaojian@valuelinkltd.com","shiqingbo@valuelinkltd.com","wangmengshi@valuelinkcorp.com");
+	public $start_date = '';//
+	public $end_date = '';//
 	public $typeConfig = array(
 		'table_group' => array('SProducts'=>'ppc_sproducts_ad_groups','SDisplay'=>'ppc_sdisplay_ad_groups','SBrands'=>'ppc_sbrands_ad_groups'),
 		'table_campaign' => array('SProducts'=>'ppc_sproducts_campaigns','SDisplay'=>'ppc_sdisplay_campaigns','SBrands'=>'ppc_sbrands_campaigns'),
