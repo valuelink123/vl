@@ -125,6 +125,18 @@ function getDistRuleForRole()
 	return array();
 }
 
+function getTransferForRole()
+{
+	$userRole = User::find(Auth::user()->id)->roles->pluck('id')->toArray();
+	if(in_array(31,$userRole)) return \App\Models\TransferPlan::STATUS;
+	if(in_array(23,$userRole)) return array_slice(\App\Models\TransferPlan::STATUS,0,5);
+	if(in_array(28,$userRole)) return array_slice(\App\Models\TransferPlan::STATUS,0,4);
+	if(in_array(15,$userRole)) return array_slice(\App\Models\TransferPlan::STATUS,0,3);
+	if(in_array(16,$userRole)) return array_slice(\App\Models\TransferPlan::STATUS,0,3);
+	if(in_array(11,$userRole)) return array_slice(\App\Models\TransferPlan::STATUS,0,2);
+	return array();
+}
+
 
 function getSellerAccount(){
 	return DB::connection('amazon')->table("seller_accounts")->whereNull('deleted_at')->groupby(['mws_seller_id','label'])->pluck('label','mws_seller_id');

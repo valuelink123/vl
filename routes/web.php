@@ -283,6 +283,7 @@ Route::post('/get22WeekDate', 'Controller@get22WeekDate');//得到22周日期
 
 //CPFR协同补货
 Route::get('/cpfr/index', 'CpfrController@index')->name('index');
+Route::get('/cpfr/editShipmentRequest', 'CpfrController@editShipmentRequest')->name('editShipmentRequest');
 Route::get('/cpfr/allocationProgress', 'CpfrController@allocationProgress')->name('allocationProgress');
 
 Route::match(['post','get'],'/shipment/index', 'ShipmentController@index');//调拨需求列表
@@ -437,6 +438,23 @@ Route::get('/transfer/request/downloadAttach', 'TransferRequestController@downlo
 Route::resource('transferPlan', 'TransferPlanController');
 Route::Post('/transferPlan/get', 'TransferPlanController@get')->name('getTransferPlan');
 Route::Post('/transferPlan/batchUpdate', 'TransferPlanController@batchUpdate')->name('transferPlanBatchUpdate');
+Route::Post('/transferPlan/getSellerSku', 'TransferPlanController@getSellerSku')->name('getSellerSku');
+Route::Post('/transferPlan/update', 'TransferPlanController@update')->name('update');
+Route::Post('/transferPlan/getUploadData', 'TransferPlanController@getUploadData')->name('getUploadData');
+Route::Post('/transferPlan/updateFiles', 'TransferPlanController@updateFiles')->name('updateFiles');
+
+Route::resource('daPlan', 'DaPlanController');
+Route::Post('/daPlan/get', 'DaPlanController@get')->name('getDaPlan');
+Route::Post('/daPlan/batchUpdate', 'daPlanController@batchUpdate')->name('daPlanBatchUpdate');
+Route::Post('/daPlan/update', 'daPlanController@update')->name('update');
+
+Route::resource('shipPlan', 'shipPlanController');
+Route::Post('/shipPlan/get', 'shipPlanController@get')->name('getDaPlan');
+Route::Post('/shipPlan/batchUpdate', 'shipPlanController@batchUpdate')->name('shipPlanBatchUpdate');
+Route::Post('/shipPlan/update', 'shipPlanController@update')->name('update');
+
+
+
 Route::match(['post','get'],'/transfer/plan/createPlan', 'TransferPlanController@createPlan');//计划确认后的挑货请求，生成计划
 //调拨任务
 Route::resource('transferTask', 'TransferTaskController');

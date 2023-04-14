@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Session;
+use App\SapAsinMatchSku;
 use App\User;
-use App\Models\TransferTask;
 use App\Models\TransferPlan;
-use App\Models\TransferRequest;
 use Illuminate\Support\Facades\Auth;
 use PDO;
 use DB;
+use Exception;
 use Illuminate\Http\Response;
 class TransferPlanController extends Controller
 {
@@ -28,97 +27,107 @@ class TransferPlanController extends Controller
 
     public function index()
     {
-        if(!Auth::user()->can(['transfer-plan-show'])) die('Permission denied -- transfer-plan-show');
-        return view('transfer/planList',['sellers'=>getUsers('sap_seller'), 'users'=>getUsers(), 'status'=>TransferPlan::STATUS, 'siteCode' => (DB::table('marketplaces')->pluck('country_code','marketplace_id'))]);
-
+        $statusList = TransferPlan::selectRaw('status,count(id) as count')->groupBy('status')->pluck('count','status');
+        return view('transfer/planList',['statusList'=>$statusList]);
     }
 
     public function get(Request $request)
     {
-        $datas = TransferPlan::select('transfer_plans.*','transfer_requests.marketplace_id','transfer_requests.bg','transfer_requests.bu','transfer_requests.asin','transfer_requests.sku as request_sku'
-        ,'transfer_requests.quantity as request_quantity','transfer_tasks.transfer_task_key','transfer_tasks.status as task_status','transfer_tasks.carrier_code as task_carrier_code'
-        ,'transfer_tasks.ship_method as task_ship_method','transfer_tasks.tracking_number','transfer_tasks.out_date as task_out_date','transfer_tasks.in_date as task_in_date','asin.fba_stock',
-        'asin.fba_transfer','asin.sales')
-        ->leftJoin('transfer_requests',function($q){
-            $q->on('transfer_plans.transfer_request_id', '=', 'transfer_requests.id');
-        })
-        ->leftjoin('transfer_tasks',function($q){
-            $q->on('transfer_plans.id', '=', 'transfer_tasks.transfer_plan_id');
-        })
-        ->leftjoin('marketplaces',function($q){
-            $q->on('transfer_requests.marketplace_id', '=', 'marketplaces.marketplace_id');
-        })
-        ->leftJoin(DB::raw("(select sum(fba_stock) as fba_stock,sum(fba_transfer) as fba_transfer,sum(sales_07_01*0.1+sales_14_08*0.2+sales_21_15*0.3+sales_28_22*0.5)/7 as sales ,asin,site from asin where length(asin)=10 group by asin,site) as asin"),function($q){
-            $q->on('transfer_requests.asin', '=', 'asin.asin')->on('marketplaces.site', '=', 'asin.site');
-        });
-        
 
-
+        $datas = TransferPlan::orderBy('id','desc');
+        if (Auth::user()->seller_rules) {
+			$rules = explode("-",Auth::user()->seller_rules);
+			if(array_get($rules,0)!='*') $datas = $datas->where('bg',array_get($rules,0));
+			if(array_get($rules,1)!='*') $datas = $datas->where('bu',array_get($rules,1));
+		} elseif (Auth::user()->sap_seller_id) {
+            $datas = $datas->where('sap_seller_id',Auth::user()->sap_seller_id);
+		} 
         if(array_get($_REQUEST,'marketplace_id')){
-            $datas = $datas->whereIn('transfer_requests.marketplace_id',array_get($_REQUEST,'marketplace_id'));
+            $datas = $datas->whereIn('marketplace_id',array_get($_REQUEST,'marketplace_id'));
         }
         if(array_get($_REQUEST,'bg')){
-            $datas = $datas->whereIn('transfer_requests.bg',array_get($_REQUEST,'bg'));
+            $datas = $datas->whereIn('bg',array_get($_REQUEST,'bg'));
         }
         if(array_get($_REQUEST,'bu')){
-            $datas = $datas->whereIn('transfer_requests.bu',array_get($_REQUEST,'bu'));
+            $datas = $datas->whereIn('bu',array_get($_REQUEST,'bu'));
         }
-        if(array_get($_REQUEST,'out_factory')){
-            $datas = $datas->where('out_factory',array_get($_REQUEST,'out_factory'));
-        }
-        if(array_get($_REQUEST,'in_factory')){
-            $datas = $datas->where('in_factory',array_get($_REQUEST,'in_factory'));
-        }
-        if(array_get($_REQUEST,'asin')){
-            $datas = $datas->whereIn('transfer_requests.asin',explode(',',str_replace([' ','	'],'',array_get($_REQUEST,'asin'))));
-        }
-        if(array_get($_REQUEST,'sku')){
-            $datas = $datas->whereIn('transfer_requests.sku',explode(',',str_replace([' ','	'],'',array_get($_REQUEST,'sku'))));
-        } 
         if(array_get($_REQUEST,'status')!==NULL && array_get($_REQUEST,'status')!==''){
-            $datas = $datas->whereIn('transfer_plans.status',array_get($_REQUEST,'status'));
+            $datas = $datas->whereIn('status',array_get($_REQUEST,'status'));
+        }
+        if(array_get($_REQUEST,'tstatus')!==NULL && array_get($_REQUEST,'tstatus')!==''){
+            $datas = $datas->whereIn('tstatus',array_get($_REQUEST,'tstatus'));
+        }
+        if(array_get($_REQUEST,'sap_seller_id')){
+            $datas = $datas->whereIn('sap_seller_id',array_get($_REQUEST,'sap_seller_id'));
+        }
+        if(array_get($_REQUEST,'seller_id')){
+            $datas = $datas->whereIn('seller_id',array_get($_REQUEST,'seller_id'));
+        }
+        if(array_get($_REQUEST,'created_start')){
+            $datas = $datas->where('created_at','>=',array_get($_REQUEST,'created_start'));
+        }
+        if(array_get($_REQUEST,'created_end')){
+            $datas = $datas->where('created_at','<=',array_get($_REQUEST,'created_end'));
+        }
+        if(array_get($_REQUEST,'received_start')){
+            $datas = $datas->where('received_date','>=',array_get($_REQUEST,'received_start'));
+        }
+        if(array_get($_REQUEST,'received_end')){
+            $datas = $datas->where('received_date','<=',array_get($_REQUEST,'received_end'));
+        }
+        if(array_get($_REQUEST,'keyword')){
+            $datas = $datas->where('items','like','%'.array_get($_REQUEST,'keyword').'%');
         }
         
+        $sellers = getUsers('sap_seller');
+        $accounts = getSellerAccount();
         $iTotalRecords = $datas->count();
         $iDisplayLength = intval($_REQUEST['length']);
         $iDisplayLength = $iDisplayLength < 0 ? $iTotalRecords : $iDisplayLength;
         $iDisplayStart = intval($_REQUEST['start']);
         $sEcho = intval($_REQUEST['draw']);
-        $lists =  $datas->offset($iDisplayStart)->limit($iDisplayLength)->orderBy('transfer_plans.id','desc')->get()->toArray();
-        
-        $records["data"] = array();
-        $siteCode = DB::table('marketplaces')->pluck('country_code','marketplace_id');
-		foreach ( $lists as $list){
+        $shipmentList =  $datas->offset($iDisplayStart)->limit($iDisplayLength)->orderBy('id','desc')->get()->toArray();
+        $records["data"] = [];
+
+        foreach ( $shipmentList as $list){
+            $items = $list['items'];
+            $str = '';
+            if(is_array($items)){
+                foreach($items as $item){
+                    $str .= '<div class="row" style="margin-bottom:5px;"><div class="col-md-2"><image src="https://images-na.ssl-images-amazon.com/images/I/'.$item['image'].'" width=50px height=50px></div>
+                    <div class="col-md-10" style="text-align:left;font-size:12px;">
+                        <div class="col-md-6">SKU : '.$item['sku'].'</div>
+                        <div class="col-md-6">FNSKU : '.$item['fnsku'].'</div>
+                        <div class="col-md-6">Asin : '.$item['asin'].'</div>
+                        <div class="col-md-6">SellerSku : '.$item['sellersku'].'</div>
+                        <div class="col-md-12">数量 : '.intval(array_get($item,'quantity')).'</div>
+                        <div class="col-md-6">预计卡板数 : '.$item['broads'].'</div>
+                        <div class="col-md-6">预计箱数 : '.$item['packages'].'</div>
+                        <div class="col-md-6">RMS : '.array_get(\App\Models\TransferPlan::TF,$item['rms']).'</div>
+                        <div class="col-md-6">抽卡 : '.array_get(\App\Models\TransferPlan::TF,$item['rcard']).'</div>
+                        <div class="col-md-12">预计运费:'.$item['ship_fee'].'</div>
+                    </div></div>';
+                }
+            }
+            $str .= '<div class="col-md-12" style="textc -align:left;font-size:12px;"><span class="label label-sm label-primary">'.$list['reson'].'</span> <span class="label label-sm label-danger">'.$list['remark'].'</span></div>';
             $records["data"][] = array(
                 '<input name="id[]" type="checkbox" class="checkboxes" value="'.$list['id'].'"  />',
-                array_get($siteCode,$list['marketplace_id']),
-                $list['bg'],
-                $list['bu'],
-                $list['out_factory'],
-                $list['in_factory'],
-                $list['asin'],
-                $list['request_sku'],
-                $list['request_quantity'],
-                ($list['status']!==NUll)?array_get(TransferPlan::STATUS,$list['status']):'',
-                $list['sku'],
-                $list['quantity'],
-                $list['fba_stock']??0,
-                $list['fba_transfer']??0,
-                ($list['sales']>0)?date('Y-m-d',strtotime('+'.intval((array_get($list,'fba_stock',0)+array_get($list,'fba_transfer',0))/$list['sales']).' days')):'∞',
-                $list['carrier_code'].($list['ship_method']?'</BR>'.$list['ship_method']:''),
-                $list['out_date'],
-                $list['in_date'],
-                $list['require_rms']?'Yes':'No',
-                $list['require_attach']?'Yes':'No',
-                $list['require_purchase']?'Yes':'No',
-                $list['require_rebrand']?'Yes':'No',
-                $list['transfer_task_key'],
-                ($list['task_status']!==NUll)?array_get(TransferTask::STATUS,$list['task_status']):'',
-                ($list['tracking_number']?$list['tracking_number']:'').($list['task_carrier_code']?'</BR>'.$list['task_carrier_code']:'').($list['task_ship_method']?'</BR>'.$list['task_ship_method']:''),
-                $list['task_out_date'],
-				$list['task_in_date'],
+                array_get(array_flip(getSiteCode()),$list['marketplace_id']),
+                $list['bg'].$list['bu'].'-'.array_get($sellers,intval($list['sap_seller_id'])),
+                array_get($accounts,$list['seller_id'],$list['seller_id']),
+                $list['shipment_id'],
+                $list['warehouse_code'],
+                array_get(TransferPlan::SHIPMETHOD,$list['ship_method']).(!empty($list['ship_fee'])?'<BR><span class="label label-sm label-primary">'.$list['ship_fee'].'</span>':''),
+                $str,
+                $list['received_date'].(!empty($list['ship_date'])?'<BR><span class="label label-sm label-primary">'.$list['ship_date'].'</span>':''),
+                array_get(TransferPlan::STATUS,$list['status']),
+                array_get(TransferPlan::SHIPMENTSTATUS,$list['tstatus']),
+                $list['in_factory_code'],
+                $list['out_factory_code'],
+                empty($list['files']) ? '<button class="uploadDataBtn btn red-sunglo" value="'.$list['id'].'">上传大货资料</button>' : '<button class="uploadDataBtn btn  green-meadow" value="'.$list['id'].'">查看大货资料</button>',
             );
 		}
+
         $records["draw"] = $sEcho;
         $records["recordsTotal"] = $iTotalRecords;
         $records["recordsFiltered"] = $iTotalRecords;
@@ -127,43 +136,124 @@ class TransferPlanController extends Controller
 
     public function edit(Request $request,$id)
     {
-        if(!Auth::user()->can(['transfer-plan-show'])) die('Permission denied -- transfer-plan-show');
-        $transferPlan =  TransferPlan::find($id);
-        if(empty($transferPlan)) die('计划不存在!');
-        $transferRequest = TransferRequest::find($transferPlan->transfer_request_id);
-        $transferTask = TransferTask::where('transfer_plan_id',$id)->first();
-
-        $users = getUsers();
-        $siteCode = DB::table('marketplaces')->pluck('country_code','marketplace_id');
-        $accountCode = DB::connection('amazon')->table('seller_accounts')->whereNull('deleted_at')->pluck('label','mws_seller_id');
-        $logArr = [];
-        if(!empty($transferTask)){
-        $logs = getOperationLog(['table'=>'transfer_tasks','primary_id'=>$transferTask->id]);
-            foreach($logs  as $log){
-                $logArr[]= $log->created_at.' '.array_get($users,$log->user_id).' '.array_get(TransferTask::STATUS,array_get(json_decode($log->input,true),'status')); 
-            }
+        $warehouses = DB::connection('amazon')->table('amazon_warehouses')->selectRaw("code,concat(city,' ',address,' ',zip) as address")->pluck('address','code');
+		$factorys = SapAsinMatchSku::where('sap_factory_code','<>','')->whereNotNull('sap_factory_code')->groupBy('sap_factory_code')->select(['sap_factory_code'])->pluck('sap_factory_code')->toArray();
+		$form=$items=[];
+        if($id){
+            $form = TransferPlan::find($id)->toArray();
+            $items = $form['items'];
         }
-        
-        return view('transfer/planEdit',['transferPlan'=>$transferPlan,'transferRequest'=>$transferRequest,'transferTask'=>$transferTask,'sellers'=>getUsers('sap_seller'), 'users'=>$users, 'planStatus'=>TransferPlan::STATUS, 'requestStatus'=>TransferRequest::STATUS, 'taskStatus'=>TransferTask::STATUS,'logArr'=>$logArr,'siteCode'=>$siteCode,'accountCode'=>$accountCode]);
+        return view('transfer/planEdit',['form'=>$form ,'items'=>$items ,'factorys'=>$factorys ,'warehouses'=>$warehouses]);
+    }
+
+    public function getSellerSku(Request $request)
+    {
+        $data = [];
+        $sku = $seller_id = $image = null;
+
+        if (!empty($request['asin']) && !empty($request['marketplace_id'])) {
+            $sql = "SELECT any_value(sku) as sku, seller_id, seller_sku from sap_asin_match_sku WHERE asin='" . $request['asin'] . "' AND marketplace_id='" . $request['marketplace_id'] . "' GROUP BY seller_id,seller_sku;";
+            $sellersku = DB::connection('vlz')->select($sql);
+            $data = (json_decode(json_encode($sellersku), true));
+            $accounts = getSellerAccount();
+            foreach($data as $k=>$v){
+                $data[$k]['seller_id'] = array_get($accounts,$v['seller_id'],$v['seller_id']);
+                $sku = $v['sku'];
+                $seller_id = $v['seller_id'];
+            }
+            $images = DB::connection('vlz')->table('asins')->where('asin',$request['asin'])->where('marketplaceid',$request['marketplace_id'])->value('images');
+            $images = explode(',',$images);
+            $image = array_get($images,0);
+        }
+        return ['seller_sku_list' => $data , 'sku' => $sku, 'seller_id' => $seller_id, 'image' => $image];
     }
 	
-
-    public function update(Request $request,$id)
+    public function getUploadData(Request $request)
     {
-		if(!Auth::user()->can(['transfer-plan-update'])) die('Permission denied -- transfer-plan-update');
-        DB::beginTransaction();
-        try{ 
-            $data = TransferPlan::findOrFail($id);
-            if($data->status == 1 ) throw new \Exception("计划已审核，无法再次更新!");
-            $fileds = array(
-                'out_factory','out_date','in_factory','in_date','sku','quantity','rms','carrier_code','ship_method','require_rms','require_attach','require_purchase','require_rebrand','status'
-            );
-            foreach($fileds as $filed){
-                $data->{$filed} = $request->get($filed);
+        $id = @$request['id'];
+        $cargo_data_arr = $cargo_data_arr_new = [];
+        if ($id > 0) {
+            $files = TransferPlan::where('id',$id)->value('files');
+            if (!empty($files)) {
+                $cargo_data_arr = explode(',', $files);
+                if (!empty($cargo_data_arr)) {
+                    foreach ($cargo_data_arr as $ck => $cv) {
+                        $last = strripos($cv, '/');
+                        $fileName = substr($cv, $last + 1);
+                        $cargo_data_arr_new[$ck]['title'] = $fileName;
+                        $cargo_data_arr_new[$ck]['url'] = $cv;
+                    }
+                }
             }
-            $data->save();
-            if($data->status == 1 ) self::createTransferTask($data);
-            saveOperationLog('transfer_plans', $data->id, $request->all());
+            return $cargo_data_arr_new;
+        } else {
+            return [];
+        }
+
+    }
+
+    public function updateFiles(Request $request)
+    {
+        $id = $request['id'];
+        if (!empty($request['files']) && !empty($id)) {
+            $result = TransferPlan::where('id',$id)->update([
+                'files' => $request['files']
+            ]);
+            if ($result > 0) {
+                $r_message = ['status' => 1, 'msg' => '保存成功'];
+            } else {
+                $r_message = ['status' => 0, 'msg' => '保存失败'];
+            }
+        } else {
+            $r_message = ['status' => 0, 'msg' => '缺少数据'];
+        }
+        return $r_message;
+    }
+
+    public function update(Request $request)
+    {
+		DB::beginTransaction();
+        try{
+            $data = $request->all();
+            $id = $data['id'];
+            unset($data['id']);unset($data['_token']);
+            $transferPlan = TransferPlan::find($id);
+            if((!empty($transferPlan) && $transferPlan->sap_seller_id == \Auth::user()->sap_seller_id && $transferPlan->status<=1) || empty($transferPlan)){
+                $items = $data['items'];
+                $currencyRate = DB::connection('vlz')->table('currency_rates')->where('currency','USD')->value('rate');
+                if(!$currencyRate) throw new \Exception('缺失汇率数据!');
+                $warehouseFee = DB::connection('vlz')->table('amazon_warehouse_fee')->where('code',$data['warehouse_code'])->value('fee');
+                if(!$warehouseFee) throw new \Exception($data['warehouse_code'].'缺失运费数据!');
+                $data['broads'] = $data['ship_fee'] = $data['packages'] = 0;
+                foreach($items as $key=>$item){
+                    $sizeInfo = DB::connection('vlz')->table('sku_size')->where('sku',$item['sku'])->first();
+                    if(empty($sizeInfo)){
+                        throw new \Exception($item['sku'].'缺失基础数据!');
+                    }
+                    $data['items'][$key]['per_package_qty'] = intval($sizeInfo->quantity);
+                    $data['items'][$key]['packages'] = ceil($item['quantity']/$sizeInfo->quantity);
+                    $data['items'][$key]['volume'] = round($sizeInfo->volume,4);
+                    $data['items'][$key]['broads'] = ceil(($sizeInfo->volume)*$item['quantity']/1.5);
+                    $data['items'][$key]['ship_fee'] = round($data['items'][$key]['broads']*$warehouseFee*$currencyRate,2);
+
+                    $data['broads']+= $data['items'][$key]['broads'];
+                    $data['ship_fee']+= $data['items'][$key]['ship_fee'];
+                    $data['packages']+= $data['items'][$key]['packages'];
+                }
+            }
+            if(!empty($transferPlan)){
+                if($transferPlan->sap_seller_id != \Auth::user()->sap_seller_id || $transferPlan->status>1){
+                    $data = [];
+                    $data['status'] = $request->get('status');
+                }
+                if($transferPlan->status==5) throw new \Exception('已审批状态无法修改!');
+                TransferPlan::updateOrCreate(['id'=>$id],$data);
+            }else{
+                $data['sap_seller_id'] = Auth::user()->sap_seller_id;
+                $data['bg'] = Auth::user()->ubg;
+                $data['bu'] = Auth::user()->ubu;
+                TransferPlan::create($data);
+            }
             DB::commit();
             $records["customActionStatus"] = 'OK';
             $records["customActionMessage"] = "更新成功!";     
@@ -176,27 +266,23 @@ class TransferPlanController extends Controller
     }
 
     public function batchUpdate(Request $request){
-        if(!Auth::user()->can(['transfer-plan-update'])) die('Permission denied -- transfer-plan-update');
         $status = intval(array_get($_REQUEST,"confirmStatus"));
         DB::beginTransaction();
         try{ 
             $customActionMessage='';
-            if($status == 1) $transferTaskKey = uniqid('Task');
             foreach($_REQUEST["id"] as $plan_id){
-                $transferPlan = TransferPlan::where('status','<>',1)->find($plan_id);
+                $transferPlan = TransferPlan::find($plan_id);
                 if(empty($transferPlan)){
-                    $customActionMessage.='ID:'.$plan_id.' 已审核或不存在!</BR>';
+                    $customActionMessage.='ID:'.$plan_id.' 不存在!</BR>';
                     continue;
                 }
-                if($transferPlan->status == $status){
-                    $customActionMessage.='ID:'.$plan_id.' 无更新!</BR>';
+                if($transferPlan->status == 5){
+                    $customActionMessage.='ID:'.$plan_id.' 已审批状态无法修改!</BR>';
                     continue;
                 }
                 $transferPlan->status = $status;
                 $transferPlan->save();
                 $customActionMessage.='ID:'.$plan_id.' 更新成功!</BR>';
-                if($status == 1) self::createTransferTask($transferPlan,$transferTaskKey);
-                saveOperationLog('transfer_plans', $transferPlan->id, ['status'=>$status]);
             }
             DB::commit();
             $records["customActionStatus"] = 'OK';
@@ -206,90 +292,6 @@ class TransferPlanController extends Controller
             $records["customActionStatus"] = '';
             $records["customActionMessage"] = $e->getMessage();
         }    
-        echo json_encode($records);   
-
+        echo json_encode($records); 
     }
-    public function createTransferTask(TransferPlan $transferPlan,string $transferTaskKey = ''){
-        if(!$transferTaskKey) $transferTaskKey = uniqid('Task');
-        $status = 3;
-        if($transferPlan->require_rebrand) $status=2;
-        if($transferPlan->require_purchase) $status=1;
-        if($transferPlan->require_attach) $status=0;
-        $result = TransferTask::firstOrCreate(
-            [
-                'transfer_plan_id'=>$transferPlan->id
-            ],
-            [
-                'transfer_task_key'=>$transferTaskKey,
-                'status'=>$status,
-                'user_id'=>Auth::user()->id
-            ]
-        );
-        if($result->wasRecentlyCreated) saveOperationLog('transfer_tasks', $result->id, ['status'=>$status]);
-    }
-
-	//生成计划
-	public function createPlan(Request $request)
-	{
-		$userInfo = Auth::user();//登录用户信息
-		if(!$userInfo->can(['transfer-plan-add'])) die('Permission denied -- transfer-plan-add');
-		if($request->isMethod('get')){
-			//调出生成计划页面
-			$ids = isset($_REQUEST['id']) && $_REQUEST['id'] ? $_REQUEST['id'] : '';
-			$id_array = explode(',',$ids);
-			$data = DB::table('transfer_requests')->where('status',6)->whereIn('id',$id_array)->select('id','asin','sku','quantity','seller_id','marketplace_id')->get()->toArray();//获取此id的数据
-			if(empty($data)){
-				$request->session()->flash('error_message','ID error');
-				return redirect()->back()->withInput();
-			}else{
-				$site_sellerid = array();
-				foreach($data as $key=>$val){
-					$data[$key] = (array)$val;
-					$site_sellerid[$val->marketplace_id.'_'.$val->seller_id] = isset($site_sellerid[$val->marketplace_id.'_'.$val->seller_id]) ? $site_sellerid[$val->marketplace_id.'_'.$val->seller_id] : '';
-				}
-				if(count($site_sellerid)>1){//判断是否可同时添加
-					$request->session()->flash('error_message','同时生成多条计划的时候，只能为同一站点同一账号');
-					return redirect()->back()->withInput();
-				}
-			}
-			return view('transfer/planAdd',['data'=>$data,'ids'=>$ids]);
-		}elseif ($request->isMethod('post')){
-			//post请求生成计划操作
-			$insert['status'] = 0;
-			$insert['planer'] = $userInfo->id;
-			$insert['transfer_plan_key'] = md5(time());
-
-			$configField = array('out_factory','in_factory','carrier_code','ship_method','out_date','in_date');
-			foreach($configField as $field){
-				$insert[$field] = isset($_POST[$field]) && $_POST[$field]!=='' ? $_POST[$field] : '';
-			}
-			$id_array = isset($_POST['id']) ? $_POST['id'] : '';
-			$quantity = isset($_POST['quantity']) ? $_POST['quantity'] : '';
-			$require_rms = isset($_POST['require_rms']) ? $_POST['require_rms'] : '';
-			$require_attach = isset($_POST['require_attach']) ? $_POST['require_attach'] : '';
-			$require_rebrand = isset($_POST['require_rebrand']) ? $_POST['require_rebrand'] : '';
-			$num = 0;
-			foreach($id_array as $key=>$val){
-				$insert['transfer_request_id'] = $val;
-				$insert['created_at'] = $insert['updated_at'] = date('Y-m-d H:i:s');
-				$insert['quantity'] = isset($quantity[$key]) ? $quantity[$key] : 0;
-				$insert['require_rms'] = isset($require_rms[$key]) ? $require_rms[$key] : 0;
-				$insert['require_attach'] = isset($require_attach[$key]) ? $require_attach[$key] : 0;
-				$insert['require_rebrand'] = isset($require_rebrand[$key]) ? $require_rebrand[$key] : 0;
-				//添加表的数据
-				$resId = DB::table('transfer_plans')->insertGetId($insert);
-				if($resId){
-					DB::table('transfer_requests')->where('id',$val)->update(array('status'=>8));
-					SaveOperationLog('transfer_requests', $resId, $insert);//添加操作存日志
-					$num++;
-				}
-			}
-			if($num==0){
-				$request->session()->flash('error_message','Add Failed');
-				return redirect()->back()->withInput();
-			}
-
-			return redirect('/transferPlan');
-		}
-	}
 }
