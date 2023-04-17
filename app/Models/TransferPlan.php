@@ -50,19 +50,11 @@ class TransferPlan extends Model {
         '8'=>'取消发货',
     ];
 
-    const LOGISTICSSHIPMENTSTATUS = [
-        '0'=>'资料提供中',
-        '1'=>'DA已创建出库单',
-        '2'=>'换标中',
-        '3'=>'待出库',
-        '4'=>'已发货',
-        '5'=>'DA系统订单已完成',
-        '8'=>'取消发货',
-    ];
 
     const SHIPSHIPMENTSTATUS = [
         '5'=>'DA系统订单已完成',
         '6'=>'物流确认运费',
+        '7'=>'SAP创建调拨单',
         '8'=>'取消发货',
     ];
 

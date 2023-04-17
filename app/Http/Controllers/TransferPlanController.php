@@ -109,7 +109,7 @@ class TransferPlanController extends Controller
                     </div></div>';
                 }
             }
-            $str .= '<div class="col-md-12" style="textc -align:left;"><span class="label label-sm label-primary">'.$list['reson'].'</span> <span class="label label-sm label-danger">'.$list['remark'].'</span></div>';
+            $str .= '<div class="col-md-12" style="text-align:left;"><span class="label label-primary">'.$list['reson'].'</span> <span class="label label-danger">'.$list['remark'].'</span> <span class="label label-danger">'.$list['api_msg'].'</span></div>';
             $records["data"][] = array(
                 '<input name="id[]" type="checkbox" class="checkboxes" value="'.$list['id'].'"  />',
                 array_get(array_flip(getSiteCode()),$list['marketplace_id']),
@@ -117,9 +117,11 @@ class TransferPlanController extends Controller
                 array_get($accounts,$list['seller_id'],$list['seller_id']),
                 $list['shipment_id'],
                 $list['warehouse_code'],
-                array_get(TransferPlan::SHIPMETHOD,$list['ship_method']).(!empty($list['ship_fee'])?'<BR><span class="label label-sm label-primary">'.$list['ship_fee'].'</span>':''),
+                array_get(TransferPlan::SHIPMETHOD,$list['ship_method']),
+                $list['ship_fee'],
                 $str,
-                $list['received_date'].(!empty($list['ship_date'])?'<BR><span class="label label-sm label-primary">'.$list['ship_date'].'</span>':''),
+                $list['received_date'],
+                $list['ship_date'],
                 array_get(TransferPlan::STATUS,$list['status']),
                 array_get(TransferPlan::SHIPMENTSTATUS,$list['tstatus']),
                 $list['in_factory_code'],

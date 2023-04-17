@@ -114,16 +114,16 @@
                         <table class="table table-striped table-bordered table-hover table-checkable" id="datatable_ajax">
                             <thead>
                                 <tr role="row" class="heading">
-                                    <th width=3%>
+                                    <th>
                                         <input type="checkbox" class="group-checkable" data-set="#datatable_ajax .checkboxes" />
                                     </th>
                                     <th >Submit Date</th>
-                                    <th >DA OrderID</th>
+                                    <th style="width:150px;" >DA OrderID</th>
                                     <th >Ship Status</th>
                                     <th >Actual Ship Date</th>
                                     <th >Reservation Date</th>
-                                    <th style="width:400px;"> Request Details</th>
-                                    <th style="width:400px;">Actual Ship Details</th>
+                                    <th style="width:500px;"> Request Details</th>
+                                    <th style="width:500px;">Actual Ship Details</th>
                                     <th >Shipment ID</th>
                                     <th >Reservation ID</th>
                                     <th >Address</th>
@@ -201,7 +201,7 @@
                             text: 'Export Current Page',
                             title: 'Data export',
                             exportOptions: {
-                                columns: [ 1,2,3,4,5,6,7,8,9,10,11,12,13,14 ]
+                                columns: [ 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 ]
                             }
                         },
                     ],
@@ -285,7 +285,7 @@ $(function() {
 	    dttable.fnDestroy(); 
 		TableDatatablesAjax.init();
 	});
-	$('#datatable_ajax').on('click', 'td:not(:has(input),:has(button))', function (e) {
+	$('#datatable_ajax').on('dblclick', 'td:not(:has(input),:has(button))', function (e) {
         e.preventDefault();
         var planId = $(this).closest('tr').find('.checkboxes').prop('value');
         $('#ajax').modal({

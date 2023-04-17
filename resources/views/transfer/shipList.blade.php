@@ -114,17 +114,17 @@
                         <table class="table table-striped table-bordered table-hover table-checkable" id="datatable_ajax">
                             <thead>
                                 <tr role="row" class="heading">
-                                    <th width=3%>
+                                    <th>
                                         <input type="checkbox" class="group-checkable" data-set="#datatable_ajax .checkboxes" />
                                     </th>
                                     <th >需求日期</th>
-                                    <th >Shipment ID</th>
+                                    <th style="width:150px;">Shipment ID</th>
                                     <th >调拨状态</th>
                                     <th >仓库代码</th>
                                     <th >运输方式</th>
                                     <th >实际发货时间</th>
-                                    <th style="width:400px;"> 调拨详情</th>
-                                    <th style="width:400px;">实际发货详情</th>
+                                    <th style="width:500px;"> 调拨详情</th>
+                                    <th style="width:500px;">实际发货详情</th>
                                     <th >预计总卡板数</th>
                                     <th >预计总箱数</th>
                                     <th >实际总卡板数</th>
@@ -203,7 +203,7 @@
                             text: '导出当前页',
                             title: 'Data export',
                             exportOptions: {
-                                columns: [ 1,2,3,4,5,6,7,8,9,10,11,12,13,14 ]
+                                columns: [ 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17 ]
                             }
                         },
                     ],
@@ -287,7 +287,7 @@ $(function() {
 	    dttable.fnDestroy(); 
 		TableDatatablesAjax.init();
 	});
-	$('#datatable_ajax').on('click', 'td:not(:has(input),:has(button))', function (e) {
+	$('#datatable_ajax').on('dblclick', 'td:not(:has(input),:has(button))', function (e) {
         e.preventDefault();
         var planId = $(this).closest('tr').find('.checkboxes').prop('value');
         $('#ajax').modal({

@@ -14,6 +14,7 @@ if(empty($form)) $disabledForm="";
                         <div class="form-body">
                         <input type="hidden" name="id" value="{{array_get($form,'id',0)}}">
                         <input type="hidden" name="seller_id" id = "seller_id" value="{{array_get($form,'seller_id')}}">
+						<input type="hidden" name="api_msg">
 						<div class="row">
                         @if(getTransferForRole())
 						<div class="col-md-3">

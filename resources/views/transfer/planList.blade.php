@@ -2,7 +2,7 @@
 @section('label', '调拨计划列表')
 @section('content')
 <style type="text/css">
-    table.dataTable thead th, table.dataTable thead td, .table td, .table th {padding:8px; white-space: nowrap;word-break:break-all; }
+    table.dataTable thead th, table.dataTable thead td, .table td, .table th {padding:8px; white-space: nowrap;word-break:break-all;}
     .portlet.light .dataTables_wrapper .dt-buttons {
         margin-top: 
         0px !important;
@@ -279,17 +279,19 @@
                         <table class="table table-striped table-bordered table-hover table-checkable" id="datatable_ajax">
                             <thead>
                                 <tr role="row" class="heading">
-                                    <th width=3%>
+                                    <th>
                                         <input type="checkbox" class="group-checkable" data-set="#datatable_ajax .checkboxes" />
                                     </th>
-                                    <th >站点</th>
-                                    <th >销售员</th>
+                                    <th>站点</th>
+                                    <th style="width:150px;">销售员</th>
                                     <th >账号</th>
                                     <th>Shipment ID</th>
                                     <th >仓库代码</th>
-                                    <th >运输方式<BR>运费</th>
-                                    <th style="width:400px;">调拨详情</th>
-                                    <th >预计到货日期<BR>实际发货日期</th>
+                                    <th >运输方式</th>
+                                    <th >运费</th>
+                                    <th style="width:500px;">调拨详情</th>
+                                    <th>预计到货日期</th>
+                                    <th>实际发货日期</th>
                                     <th>审核状态</th>
                                     <th>调拨状态</th>
                                     <th>调入工厂</th>
@@ -351,7 +353,7 @@
                 loadingMessage: 'Loading...',
                 dataTable: {
                    //"serverSide":false,
-                   "autoWidth":false,
+                   "autoWidth":true,
                    "ordering": false,
                     "lengthMenu": [
                         [10, 50, 100, -1],
@@ -370,7 +372,7 @@
                             text: '导出当前页',
                             title: 'Data export',
                             exportOptions: {
-                                columns: [ 1,2,3,4,5,6,7,8,9,10,11,12 ]
+                                columns: [ 1,2,3,4,5,6,7,8,9,10,11,12,13,14 ]
                             }
                         },
                     ],

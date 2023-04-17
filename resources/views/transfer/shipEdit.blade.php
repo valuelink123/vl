@@ -72,6 +72,7 @@ if(in_array(array_get($form,'tstatus'),[0,1,2,3,4,5,8])) $disabledForm="";
                         {{ csrf_field() }}
                         <div class="form-body">
                         <input type="hidden" name="id" value="{{array_get($form,'id',0)}}">
+                        <input type="hidden" name="api_msg">
 						<div class="row">
 
 						<div class="col-md-6">

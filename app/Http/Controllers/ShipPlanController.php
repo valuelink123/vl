@@ -51,7 +51,7 @@ class ShipPlanController extends Controller
         if(array_get($_REQUEST,'shipment_id')){
             $datas = $datas->where('shipment_id','like','%'.array_get($_REQUEST,'shipment_id').'%');
         }
-        $daSkus = DB::connection('amazon')->table('da_sku_match')->get()->keyBy('sku')->toArray();
+        $daSkus = DB::connection('amazon')->table('da_sku_match')->pluck('da_sku','sku')->toArray();
         $iTotalRecords = $datas->count();
         $iDisplayLength = intval($_REQUEST['length']);
         $iDisplayLength = $iDisplayLength < 0 ? $iTotalRecords : $iDisplayLength;
@@ -68,7 +68,7 @@ class ShipPlanController extends Controller
             if(is_array($items)){
                 foreach($items as $item){
                     $str .= '<div class="row" style="margin-bottom:5px;"><div class="col-md-2"><image src="https://images-na.ssl-images-amazon.com/images/I/'.$item['image'].'" width=50px height=50px></div>
-                    <div class="col-md-10" style="text-align:left;font-size:12px;">
+                    <div class="col-md-10" style="text-align:left;">
                     <div class="col-md-6">SKU : '.$item['sku'].'</div>
                     <div class="col-md-6">FNSKU : '.$item['fnsku'].'</div>
                     <div class="col-md-6">Asin : '.$item['asin'].'</div>
@@ -93,7 +93,7 @@ class ShipPlanController extends Controller
                     $total_packages += $item['packages'];
                 }
             }
-            $str .= '<div class="col-md-12" style="textc -align:left;font-size:12px;"><span class="label label-sm label-primary">'.$list['reson'].'</span> <span class="label label-sm label-danger">'.$list['remark'].'</span></div>';
+            $str .= '<div class="col-md-12" style="text-align:left;"><span class="label label-primary">'.$list['reson'].'</span> <span class="label label-danger">'.$list['remark'].'</span></div>';
             $items = $list['ships'];
             $shipStr = '';
             if(is_array($items)){
@@ -107,7 +107,7 @@ class ShipPlanController extends Controller
                 }
                 foreach($daSkuShips as $key=>$item){
                     $shipStr .= '<div class="row" style="margin-bottom:5px;"><div class="col-md-2"><image src="https://images-na.ssl-images-amazon.com/images/I/'.$item['image'].'" width=50px height=50px></div>
-                    <div class="col-md-10" style="text-align:left;font-size:12px;">
+                    <div class="col-md-10" style="text-align:left;">
                     <div class="col-md-6">DASKU : '.$key.'</div>
                     <div class="col-md-6">数量 : '.intval($item['quantity']).'</div>
                     <div class="col-md-6">实际卡板数 : '.intval($item['broads']).'</div>
@@ -125,7 +125,7 @@ class ShipPlanController extends Controller
                 array_get(TransferPlan::SHIPMETHOD,$list['ship_method']),
                 $list['ship_date'],
                 $str,
-                $shipStr,
+                $shipStr.'<div class="col-md-12" style="text-align:left;"><span class="label label-danger">'.$list['api_msg'].'</span></div>',
                
                 $total_broads,
                 $total_packages,
