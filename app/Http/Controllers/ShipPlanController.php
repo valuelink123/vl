@@ -155,7 +155,7 @@ class ShipPlanController extends Controller
             $items = $form['items'];
             $ships = $form['ships'];
         }
-        return view('transfer/shipEdit',['form'=>$form ,'items'=>$items ,'ships'=>$ships ,'daSkus'=>$daSkus ,'warehouses'=>$warehouses]);
+        return view('transfer/shipEdit',['form'=>$form ,'items'=>$items ,'ships'=>$ships]);
     }
 
 
@@ -191,6 +191,11 @@ class ShipPlanController extends Controller
                     $customActionMessage.='ID:'.$plan_id.' 不存在!</BR>';
                     continue;
                 }
+                if(!in_array($transferPlan->tstatus,[0,1,2,3,4,5,8])){
+                    $customActionMessage.='ID:'.$plan_id.' 状态无法修改!</BR>';
+                    continue;
+                }
+
                 $transferPlan->tstatus = $tstatus;
                 $transferPlan->save();
                 $customActionMessage.='ID:'.$plan_id.' 更新成功!</BR>';

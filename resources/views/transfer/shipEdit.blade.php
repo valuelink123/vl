@@ -1,3 +1,7 @@
+<?php
+$disabledForm = ' disabled ';
+if(in_array(array_get($form,'tstatus'),[0,1,2,3,4,5,8])) $disabledForm="";
+?>
 <div class="row">
     <div class="col-md-12">
         <!-- BEGIN EXAMPLE TABLE PORTLET-->
@@ -7,21 +11,61 @@
             <?php
             $str = '';
             $daSkuSelect = [];
-            foreach($items as $item){
-                $str .= '<div class="row" style="margin-bottom:5px;">
-                <div class="col-md-2"><image src="https://images-na.ssl-images-amazon.com/images/I/'.$item['image'].'" width=100%></div>
-                <div class="col-md-10" style="text-align:left;font-size:14px;">
-                    <div class="col-md-6">DA SKU : '.array_get($daSkus, $item['sku'], $item['sku']).'</div>
+
+            if(is_array($items)){
+                foreach($items as $item){
+                    $str .= '<div class="row" style="margin-bottom:5px;"><div class="col-md-2"><image src="https://images-na.ssl-images-amazon.com/images/I/'.$item['image'].'" width=100% height=100% ></div>
+                    <div class="col-md-10" style="text-align:left;">
+                    <div class="col-md-6">SKU : '.$item['sku'].'</div>
                     <div class="col-md-6">FNSKU : '.$item['fnsku'].'</div>
-                    <div class="col-md-6">Confirm Quantity : '.intval(array_get($item,'confirm_quantity')).'</div>
-                    <div class="col-md-6">Expected Packing : '.$item['packages'].'</div>
+                    <div class="col-md-6">Asin : '.$item['asin'].'</div>
+                    <div class="col-md-6">SellerSku : '.$item['sellersku'].'</div>
+                    <div class="col-md-6">数量 : '.intval(array_get($item,'quantity')).'</div>
+                    <div class="col-md-6">单箱数量 : '.intval(array_get($item,'per_package_qty')).'</div>
+                    <div class="col-md-6">预计卡板数 : '.$item['broads'].'</div>
+                    <div class="col-md-6">预计箱数 : '.$item['packages'].'</div>
                     <div class="col-md-6">RMS : '.array_get(\App\Models\TransferPlan::TF,$item['rms']).'</div>
-                    <div class="col-md-6">Remove Card : '.array_get(\App\Models\TransferPlan::TF,$item['rcard']).'</div>
-                </div></div>';
-                $daSkuSelect[] = array_get($daSkus, $item['sku'], $item['sku']);
+                    <div class="col-md-6">抽卡 : '.array_get(\App\Models\TransferPlan::TF,$item['rcard']).'</div>
+                    <div class="col-md-12">预计运费:'.$item['ship_fee'].'</div>
+                    </div></div>';
+                }
             }
-            $str .= '<div class="col-md-12" style="textc -align:left;font-size:14px; margin-bottom:10px;"><span class="label label-sm label-primary">'.$form['reson'].'</span> <span class="label label-sm label-danger">'.$form['remark'].'</span></div>';
+            $str .= '<div class="col-md-12" style="textc -align:left;"><span class="label label-sm label-primary">'.array_get($form,'reson').'</span> <span class="label label-sm label-danger">'.array_get($form,'remark').'</span></div>';
+            $items = $ships;
+            if(is_array($items)){
+                $str .= '<div style="padding: 10px;
+                clear: both;
+                border-bottom: 1px solid #eee;"><h2>DA实际发货</h2></div>';
+                foreach($items as $item){
+                    if(!isset($daSkuShips[$item['sku']])){     
+                        $daSkuShips[$item['sku']] = 
+                        [
+                            'quantity'=>0,
+                            'broads'=>0,
+                            'packages'=>0,
+                            'locations'=>[]
+                        ];
+                    }
+                    $daSkuShips[$item['sku']]['quantity'] += intval($item['quantity']);
+                    $daSkuShips[$item['sku']]['broads'] += intval($item['broads']);
+                    $daSkuShips[$item['sku']]['packages'] += intval($item['packages']);
+                    $daSkuShips[$item['sku']]['locations'][]= $item['location'];
+                }
+                foreach($daSkuShips as $key=>$item){
+                    $str .= '<div class="row" style="margin:10px;">
+                    <div class="col-md-12" style="text-align:left;">
+                    <div class="col-md-6">DASKU : '.$key.'</div>
+                    <div class="col-md-6">数量 : '.intval($item['quantity']).'</div>
+                    <div class="col-md-6">实际卡板数 : '.intval($item['broads']).'</div>
+                    <div class="col-md-6">实际箱数 : '.intval($item['packages']).'</div>
+                    <div class="col-md-12">Locations : '.implode(', ',$item['locations']).'</div>
+                    </div></div>';
+                }
+            }
+
+            $str .= '<div style="margin: 10px 0; clear: both; border-bottom: 1px solid #eee;"></div>';
             echo $str;
+            
             ?>
 
                     <form id="update_form"  name="update_form" >
@@ -30,132 +74,26 @@
                         <input type="hidden" name="id" value="{{array_get($form,'id',0)}}">
 						<div class="row">
 
-						<div class="col-md-3">
+						<div class="col-md-6">
 						<div class="form-group">
 							<label>Ship Status:</label>
-							<select class="form-control" name="tstatus" id="tstatus" >
-							@foreach (\App\Models\TransferPlan::DASHIPMENTSTATUS as $k=>$v)
+							<select class="form-control" name="tstatus" id="tstatus" {{$disabledForm}}>
+							@foreach (\App\Models\TransferPlan::SHIPSHIPMENTSTATUS as $k=>$v)
 							<option value="{{$k}}" {{($k==array_get($form,'tstatus'))?'selected':''}} >{{$v}}</option>
 							@endforeach 
 							</select>
 						</div>
 						</div>
 
-						<div class="col-md-3">
+						<div class="col-md-6">
 
 						<div class="form-group">
-							<label>Actual Ship Date:</label>
-                            <input type="text" class="form-control date-picker" name="ship_date" id="ship_date" value="{{array_get($form,'ship_date')}}" required>
+							<label>Ship Fee:</label>
+                            <input type="text" class="form-control" name="ship_fee" id="ship_fee" {{$disabledForm}} value="{{array_get($form,'ship_fee')}}" required>
 						</div>
 						</div>
 
-                        <div class="col-md-3">
 
-						<div class="form-group">
-							<label>Reservation Date:</label>
-                            <input type="text" class="form-control date-picker" name="reservation_date" id="reservation_date" value="{{array_get($form,'reservation_date')}}" required>
-						</div>
-						</div>
-
-					
-
-						</div>				
-
-						<div class="form-group mt-repeater">
-							<div data-repeater-list="ships">
-                                @if(empty($ships))
-                                <div data-repeater-item class="mt-repeater-item">
-									<div class="row mt-repeater-row">
-                                    <div class="col-md-2">
-                                            <label class="control-label">Sku</label>
-                                            <select class="form-control" name="sku" id="sku" required>
-                                            @foreach ($daSkuSelect as $k)
-                                            <option value="{{$k}}">{{$k}}</option>
-                                            @endforeach 
-                                            </select>
-                                        </div>
-										
-                                        <div class="col-md-2">
-                                            <label class="control-label">Location</label>
-											<input type="text" class="form-control" name="location" required>
-                                        </div>
-
-										<div class="col-md-2">
-                                            <label class="control-label">Quantity</label>
-											<input type="text" class="form-control" name="quantity"  required>
-                                        </div>
-
-                                        <div class="col-md-2">
-                                            <label class="control-label">Actual Broads</label>
-											<input type="text" class="form-control" name="broads" required>
-                                        </div>
-
-                                        <div class="col-md-2">
-                                            <label class="control-label">Actual Packages</label>
-											<input type="text" class="form-control" name="packages"  required>
-                                        </div>
-
-                                        
-                                        <div class="col-md-2">
-                                            <a href="javascript:;" data-repeater-delete class="btn btn-danger mt-repeater-delete">
-                                                <i class="fa fa-close"></i>
-                                            </a>
-                                        </div>
-                                    
-								    </div>
-									<div style="clear:both;"></div>
-								</div>
-                                @else
-								<?php 
-								foreach($ships as $key=>$value) { ?>
-								<div data-repeater-item class="mt-repeater-item">
-									<div class="row mt-repeater-row ">
-                                        <div class="col-md-2">
-                                            <label class="control-label">Sku</label>
-											<select class="form-control" name="sku" id="sku" required>
-                                            @foreach ($daSkuSelect as $k)
-                                            <option value="{{$k}}" {{($k==array_get($value,'sku'))?'selected':''}} >{{$k}}</option>
-                                            @endforeach 
-                                            </select>
-                                        </div>
-										
-                                        <div class="col-md-2">
-                                            <label class="control-label">Location</label>
-											<input type="text" class="form-control" name="location" value="{{$value['location']}}" required>
-                                        </div>
-
-										<div class="col-md-2">
-                                            <label class="control-label">Quantity</label>
-											<input type="text" class="form-control" name="quantity" value="{{$value['quantity']}}" required>
-                                        </div>
-
-                                        <div class="col-md-2">
-                                            <label class="control-label">Actual Broads</label>
-											<input type="text" class="form-control" name="broads" value="{{$value['broads']}}" required>
-                                        </div>
-
-                                        <div class="col-md-2">
-                                            <label class="control-label">Actual Packages</label>
-											<input type="text" class="form-control" name="packages" value="{{$value['packages']}}" required>
-                                        </div>
-
-                                        <div class="col-md-2">
-                                            <a href="javascript:;" data-repeater-delete class="btn btn-danger mt-repeater-delete">
-                                                <i class="fa fa-close"></i>
-                                            </a>
-                                        </div>
-
-								    </div>
-									<div style="clear:both;"></div>
-								</div>
-								<?php } ?>
-                                @endif
-							</div>
-
-							<a href="javascript:;" data-repeater-create class="btn btn-info mt-repeater-add">
-							<i class="fa fa-plus"></i> Add SKU</a>
-							<div style="clear:both;"></div>
-						</div>
                         </div>
 						
                         <div class="form-actions">
@@ -193,7 +131,7 @@ $(function() {
 		$.ajax({
 			type: "POST",
 			dataType: "json",
-			url: "{{ url('/daPlan/update') }}",
+			url: "{{ url('/shipPlan/update') }}",
 			data: $('#update_form').serialize(),
 			success: function (data) {
 				if(data.customActionStatus=='OK'){

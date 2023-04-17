@@ -2,7 +2,7 @@
 @section('label', '调拨计划列表')
 @section('content')
 <style type="text/css">
-    table.dataTable thead th, table.dataTable thead td, .table td, .table th {padding:8px; white-space: nowrap;word-break:break-all; font-size:12px !important;}
+    table.dataTable thead th, table.dataTable thead td, .table td, .table th {padding:8px; white-space: nowrap;word-break:break-all; }
     .portlet.light .dataTables_wrapper .dt-buttons {
         margin-top: 
         0px !important;

@@ -63,7 +63,6 @@ class TransferPlan extends Model {
     const SHIPSHIPMENTSTATUS = [
         '5'=>'DA系统订单已完成',
         '6'=>'物流确认运费',
-        '7'=>'SAP创建调拨单',
         '8'=>'取消发货',
     ];
 

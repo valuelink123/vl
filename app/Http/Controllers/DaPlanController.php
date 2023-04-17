@@ -89,7 +89,7 @@ class DaPlanController extends Controller
                     ];
                 }
             }
-            $str .= '<div class="col-md-12" style="textc -align:left;font-size:12px;"><span class="label label-sm label-primary">'.$list['reson'].'</span> <span class="label label-sm label-danger">'.$list['remark'].'</span></div>';
+            $str .= '<div class="col-md-12" style="textc -align:left;"><span class="label label-sm label-primary">'.$list['reson'].'</span> <span class="label label-sm label-danger">'.$list['remark'].'</span></div>';
             $items = $list['ships'];
             $shipStr = '';
             if(is_array($items)){
@@ -101,7 +101,7 @@ class DaPlanController extends Controller
                 }
                 foreach($daSkuShips as $key=>$item){
                     $shipStr .= '<div class="row" style="margin-bottom:5px;"><div class="col-md-2"><image src="https://images-na.ssl-images-amazon.com/images/I/'.$item['image'].'" width=50px height=50px></div>
-                    <div class="col-md-10" style="text-align:left;font-size:12px;">
+                    <div class="col-md-10" style="text-align:left;">
                     <div class="col-md-6">DASKU : '.$key.'</div>
                     <div class="col-md-6">Quantity : '.intval($item['quantity']).'</div>
                     <div class="col-md-6">Broads : '.intval($item['broads']).'</div>

@@ -449,7 +449,7 @@ Route::Post('/daPlan/batchUpdate', 'daPlanController@batchUpdate')->name('daPlan
 Route::Post('/daPlan/update', 'daPlanController@update')->name('update');
 
 Route::resource('shipPlan', 'shipPlanController');
-Route::Post('/shipPlan/get', 'shipPlanController@get')->name('getDaPlan');
+Route::Post('/shipPlan/get', 'shipPlanController@get')->name('getShipPlan');
 Route::Post('/shipPlan/batchUpdate', 'shipPlanController@batchUpdate')->name('shipPlanBatchUpdate');
 Route::Post('/shipPlan/update', 'shipPlanController@update')->name('update');
 

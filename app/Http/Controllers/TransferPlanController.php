@@ -95,7 +95,7 @@ class TransferPlanController extends Controller
             if(is_array($items)){
                 foreach($items as $item){
                     $str .= '<div class="row" style="margin-bottom:5px;"><div class="col-md-2"><image src="https://images-na.ssl-images-amazon.com/images/I/'.$item['image'].'" width=50px height=50px></div>
-                    <div class="col-md-10" style="text-align:left;font-size:12px;">
+                    <div class="col-md-10" style="text-align:left;">
                         <div class="col-md-6">SKU : '.$item['sku'].'</div>
                         <div class="col-md-6">FNSKU : '.$item['fnsku'].'</div>
                         <div class="col-md-6">Asin : '.$item['asin'].'</div>
@@ -109,7 +109,7 @@ class TransferPlanController extends Controller
                     </div></div>';
                 }
             }
-            $str .= '<div class="col-md-12" style="textc -align:left;font-size:12px;"><span class="label label-sm label-primary">'.$list['reson'].'</span> <span class="label label-sm label-danger">'.$list['remark'].'</span></div>';
+            $str .= '<div class="col-md-12" style="textc -align:left;"><span class="label label-sm label-primary">'.$list['reson'].'</span> <span class="label label-sm label-danger">'.$list['remark'].'</span></div>';
             $records["data"][] = array(
                 '<input name="id[]" type="checkbox" class="checkboxes" value="'.$list['id'].'"  />',
                 array_get(array_flip(getSiteCode()),$list['marketplace_id']),
