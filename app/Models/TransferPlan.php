@@ -15,7 +15,8 @@ class TransferPlan extends Model {
         '2'=>'BG总经理审核',
         '3'=>'计划员审核',
         '4'=>'计划经理确认',
-        '5'=>'已审批',
+        '5'=>'物流确认',
+        '6'=>'已审批',
     ];
 
     const SHIPMETHOD = [
@@ -41,7 +42,6 @@ class TransferPlan extends Model {
     ];
 
     const DASHIPMENTSTATUS = [
-        '0'=>'资料提供中',
         '1'=>'DA已创建出库单',
         '2'=>'换标中',
         '3'=>'待出库',

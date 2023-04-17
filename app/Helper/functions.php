@@ -128,7 +128,8 @@ function getDistRuleForRole()
 function getTransferForRole()
 {
 	$userRole = User::find(Auth::user()->id)->roles->pluck('id')->toArray();
-	if(in_array(31,$userRole)) return \App\Models\TransferPlan::STATUS;
+	if(in_array(52,$userRole)) return \App\Models\TransferPlan::STATUS;
+	if(in_array(31,$userRole)) return array_slice(\App\Models\TransferPlan::STATUS,0,6);
 	if(in_array(23,$userRole)) return array_slice(\App\Models\TransferPlan::STATUS,0,5);
 	if(in_array(28,$userRole)) return array_slice(\App\Models\TransferPlan::STATUS,0,4);
 	if(in_array(15,$userRole)) return array_slice(\App\Models\TransferPlan::STATUS,0,3);

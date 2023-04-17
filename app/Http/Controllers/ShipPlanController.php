@@ -33,7 +33,7 @@ class ShipPlanController extends Controller
     public function get(Request $request)
     {
 
-        $datas = TransferPlan::where('status',5);
+        $datas = TransferPlan::where('status',5)->where('tstatus','>',4);
 
         if(array_get($_REQUEST,'tstatus')!==NULL && array_get($_REQUEST,'tstatus')!==''){
             $datas = $datas->whereIn('tstatus',array_get($_REQUEST,'tstatus'));

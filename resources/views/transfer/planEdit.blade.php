@@ -123,7 +123,7 @@ if(empty($form)) $disabledForm="";
 
 						<div class="form-group">
 							<label>备注:</label>
-                            <input type="text" class="form-control" name="remark" id="remark" {{$disabledForm}} value="{{array_get($form,'remark')}}" required>
+                            <input type="text" class="form-control" name="remark" id="remark" value="{{array_get($form,'remark')}}" required>
 						</div>
 						</div>
 						</div>

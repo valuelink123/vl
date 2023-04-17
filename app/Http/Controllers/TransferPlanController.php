@@ -248,7 +248,7 @@ class TransferPlanController extends Controller
                     $data = [];
                     $data['status'] = $request->get('status');
                 }
-                if($transferPlan->status==5) throw new \Exception('已审批状态无法修改!');
+                if($transferPlan->status==6) throw new \Exception('已审批状态无法修改!');
                 TransferPlan::updateOrCreate(['id'=>$id],$data);
             }else{
                 $data['sap_seller_id'] = Auth::user()->sap_seller_id;
@@ -278,7 +278,7 @@ class TransferPlanController extends Controller
                     $customActionMessage.='ID:'.$plan_id.' 不存在!</BR>';
                     continue;
                 }
-                if($transferPlan->status == 5){
+                if($transferPlan->status == 6){
                     $customActionMessage.='ID:'.$plan_id.' 已审批状态无法修改!</BR>';
                     continue;
                 }

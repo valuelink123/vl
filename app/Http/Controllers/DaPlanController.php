@@ -35,7 +35,7 @@ class DaPlanController extends Controller
 
         $datas = TransferPlan::leftJoin('amazon_warehouses',function($q){
 			$q->on('transfer_plans.warehouse_code', '=', 'amazon_warehouses.code');
-		})->where('status',5);
+		})->where('status',6)->where('tstatus','>',0);
 
         if(array_get($_REQUEST,'tstatus')!==NULL && array_get($_REQUEST,'tstatus')!==''){
             $datas = $datas->whereIn('tstatus',array_get($_REQUEST,'tstatus'));

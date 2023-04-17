@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Models\TransferPlan;
+use Illuminate\Support\Facades\Mail;
 use DB;
 use Log;
 
@@ -45,9 +46,23 @@ class PostDa extends Command
 		$key = 'up4oY31x';
 		$token = 'PttzVyFJRNp4XMx6FeqW7/aOkGS7+qtD';
 		$customerCode ='VL';
+		$shipEmail = 'wangjianeng@valuelinkltd.com';//'zhanqiziyin@valuelinkltd.com';
+		$daEmail = 'wangjianeng@valuelinkltd.com';
+
+		$checks = TransferPlan::where('status',5)->where('tstatus',0)->get();
+		foreach($checks as $data){
+			$subject = $content = $data->shipment_id.' 调拨请求需要审核!';
+			$to = $shipEmail;
+			Mail::send(['emails.common'],['content'=>$content], function($m) use($subject,$to)
+			{
+				$m->to($to);
+				$m->subject($subject);
+			});
+		}
+
 		$daSkus = DB::connection('amazon')->table('da_sku_match')->pluck('da_sku','sku')->toArray();
 		$amazonWarehouses = DB::connection('amazon')->table('amazon_warehouses')->get()->keyBy('code')->toArray();
-		$creates = TransferPlan::where('status',5)->where('tstatus',0)->get();
+		$creates = TransferPlan::where('status',6)->where('tstatus',0)->get();
 		foreach($creates as $data){
 			try{
 				$items = $data->items;
@@ -94,10 +109,28 @@ class PostDa extends Command
 					$data->da_order_id = array_get($result,'msg');
 					$data->tstatus=1;
 					$data->api_msg = null;
+					$data->save();
+					$subject = $content = 'Ref No. '.implode('/',$fnsku).'-'.$data->shipment_id.' Attachs!';
+					$to = $daEmail;
+					Mail::send(['emails.common'],['content'=>$content], function($m) use($subject,$to,$uploads)
+					{
+						$m->to($to);
+						$m->subject($subject);
+						if ($uploads && count($uploads)>0){
+							foreach($uploads as $attachment) {
+								$m->attach(public_path().$attachment);
+							}
+						}
+					});
+
 				}else{
 					$data->api_msg = json_encode(array_get($result,'data'));
+					$data->save();
 				}
-				$data->save();
+				
+
+				
+
 			}catch (\Exception $e) { 
 				Log::Info($e->getMessage());
 			} 
@@ -105,8 +138,8 @@ class PostDa extends Command
 
 
 
-		$creates = TransferPlan::where('status',5)->where('tstatus',4)->whereNotNull('da_order_id')->get();
-		foreach($creates as $data){
+		$updates = TransferPlan::where('status',6)->where('tstatus',4)->whereNotNull('da_order_id')->get();
+		foreach($update as $data){
 			try{
 				$items = $data->ships;
 				$header=$profile=$details=$files=$sku = $fnsku = $postData= [];
