@@ -117,20 +117,15 @@
                                     <th>
                                         <input type="checkbox" class="group-checkable" data-set="#datatable_ajax .checkboxes" />
                                     </th>
-                                    <th >Submit Date</th>
-                                    <th style="width:150px;" >DA OrderID</th>
+                                    <th ><div style="width:150px;">Submit Date</div></th>
+                                    <th><div style="width:150px;">DA OrderID</div></th>
                                     <th >Ship Status</th>
                                     <th >Actual Ship Date</th>
                                     <th >Reservation Date</th>
-                                    <th style="width:500px;"> Request Details</th>
-                                    <th style="width:500px;">Actual Ship Details</th>
+                                    <th > <div style="width:500px;">Request Details</div></th>
+                                    <th><div style="width:500px;">Actual Ship Details</div></th>
                                     <th >Shipment ID</th>
-                                    <th >Reservation ID</th>
-                                    <th >Address</th>
-                                    <th >State</th>
-                                    <th >City</th>
-                                    <th >Postal Code</th>
-                                    <th >Warehouse Code</th>    
+                                    <th >Reservation ID</th>  
                                     <th >ShipMethod</th>
                                 </tr>
                             </thead>

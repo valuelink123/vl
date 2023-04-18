@@ -17,13 +17,15 @@ if(in_array(array_get($form,'tstatus'),[0,1,2,3,8])) $disabledForm="";
                 <div class="col-md-10" style="text-align:left;font-size:14px;">
                     <div class="col-md-6">DA SKU : '.array_get($daSkus, $item['sku'], $item['sku']).'</div>
                     <div class="col-md-6">FNSKU : '.$item['fnsku'].'</div>
-                    <div class="col-md-12">Quantity : '.intval(array_get($item,'quantity')).'</div>
+                    <div class="col-md-6">Warehouse : '.array_get($item,'warehouse_code').'</div>
+                    <div class="col-md-6">Quantity : '.intval(array_get($item,'quantity')).'</div>
                     <div class="col-md-6">Broads : '.$item['broads'].'</div>
                     <div class="col-md-6">Packages : '.$item['packages'].'</div>
                     <div class="col-md-6">RMS : '.array_get(\App\Models\TransferPlan::TF,$item['rms']).'</div>
                     <div class="col-md-6">Remove Card : '.array_get(\App\Models\TransferPlan::TF,$item['rcard']).'</div>
+                    <div class="col-md-12">Address : '.array_get($warehouses,array_get($item,'warehouse_code').'.address').' '.array_get($warehouses,array_get($item,'warehouse_code').'.state').' '.array_get($warehouses,array_get($item,'warehouse_code').'.city').'  '.array_get($warehouses,array_get($item,'warehouse_code').'.zip').'</div>
                 </div></div>';
-                $daSkuSelect[] = array_get($daSkus, $item['sku'], $item['sku']);
+                $daSkuSelect[array_get($daSkus, $item['sku'], $item['sku'])] = array_get($daSkus, $item['sku'], $item['sku']);
             }
             $str .= '<div class="col-md-12" style="textc -align:left;font-size:14px; margin-bottom:10px;"><span class="label label-sm label-primary">'.$form['reson'].'</span> <span class="label label-sm label-danger">'.$form['remark'].'</span></div>';
             echo $str;

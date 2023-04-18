@@ -4,6 +4,9 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Models\TransferPlan;
+use Swift_Mailer;
+use Swift_SendmailTransport;
+use Swift_SmtpTransport;
 use Illuminate\Support\Facades\Mail;
 use DB;
 use Log;
@@ -42,27 +45,28 @@ class PostDa extends Command
      */
     public function handle()
     {
-		$url = 'http://main1.freightoa.com/webapi_doa/api/';
-		$key = 'up4oY31x';
-		$token = 'PttzVyFJRNp4XMx6FeqW7/aOkGS7+qtD';
-		$customerCode ='VL';
-		$shipEmail = 'wangjianeng@valuelinkltd.com';//'zhanqiziyin@valuelinkltd.com';
-		$daEmail = 'wangjianeng@valuelinkltd.com';
+		$url = env('DAURL');//'http://main1.freightoa.com/webapi_doa/api/';
+		$key = env('DAKEY');//'up4oY31x';
+		$token = env('DATOKEN');//'PttzVyFJRNp4XMx6FeqW7/aOkGS7+qtD';
+		$customerCode =env('DACUSTOMERCODE');//'VL';
+		$shipEmail = env('SHIPMAIL');//'284299346@qq.com';//'zhanqiziyin@valuelinkltd.com';
+		$daEmail = env('DAMAIL');//'284299346@qq.com';
 
 		$checks = TransferPlan::where('status',5)->where('tstatus',0)->get();
 		foreach($checks as $data){
-			$subject = $content = $data->shipment_id.' 调拨请求需要审核!';
-			$to = $shipEmail;
-			Mail::send(['emails.common'],['content'=>$content], function($m) use($subject,$to)
+			$subject = $data->shipment_id.' 调拨请求需要审核!';
+			$html = new \Html2Text\Html2Text($subject);
+			Mail::send(['emails.common','emails.common-text'],['content'=>$subject,'contentText'=>$html->getText()], function($m) use($subject,$shipEmail)
 			{
-				$m->to($to);
+				$m->to($shipEmail);
 				$m->subject($subject);
 			});
+			sleep(2);
 		}
 
 		$daSkus = DB::connection('amazon')->table('da_sku_match')->pluck('da_sku','sku')->toArray();
 		$amazonWarehouses = DB::connection('amazon')->table('amazon_warehouses')->get()->keyBy('code')->toArray();
-		$creates = TransferPlan::where('status',6)->where('tstatus',0)->get();
+		$creates = TransferPlan::where('status',6)->where('tstatus',0)->whereNull('da_order_id')->get();
 		foreach($creates as $data){
 			try{
 				$items = $data->items;
@@ -73,19 +77,21 @@ class PostDa extends Command
 						$fnsku[] =array_get($item,'fnsku');
 						$details[]=[
 							'item_no'=>array_get($daSkus, array_get($item,'sku'), array_get($item,'sku')),
+							'remark'=>array_get($item,'warehouse_code'),
 							'qty'=>intval(array_get($item,'quantity'))
 						];
+						$warehouse = array_get($amazonWarehouses, array_get($item,'warehouse_code'));
 					}
 				}
 				$header[]='content-type: application/json';
 				$header[]='appKey: '.$key;
 				$header[]='appToken: '.$token;
-				$warehouse = array_get($amazonWarehouses, $data->warehouse_code);
+				
 				$profile['customer_code']=$customerCode;
 				$profile['customer_ref_no']=implode('/',$fnsku).'-'.$data->shipment_id;
 				$profile['po_no']=$data->warehouse_code.'-'.implode('/',$sku);
 				$profile['ship_via']=$data->ship_method;
-				$profile['ship_to_name']='AMAZON '.$data->warehouse_code;
+				$profile['ship_to_name']='AMAZON '.$warehouse->code;
 				$profile['ship_to_address']=$warehouse->address;
 				$profile['ship_to_city']=$warehouse->city;
 				$profile['ship_to_state']=$warehouse->state;
@@ -110,11 +116,11 @@ class PostDa extends Command
 					$data->tstatus=1;
 					$data->api_msg = null;
 					$data->save();
-					$subject = $content = 'Ref No. '.implode('/',$fnsku).'-'.$data->shipment_id.' Attachs!';
-					$to = $daEmail;
-					Mail::send(['emails.common'],['content'=>$content], function($m) use($subject,$to,$uploads)
+					$subject = 'Ref No. '.implode('/',$fnsku).'-'.$data->shipment_id.' Attachs!';
+					$html = new \Html2Text\Html2Text($subject);
+					Mail::send(['emails.common','emails.common-text'],['content'=>$subject,'contentText'=>$html->getText()],  function($m) use($subject,$daEmail,$uploads)
 					{
-						$m->to($to);
+						$m->to($daEmail);
 						$m->subject($subject);
 						if ($uploads && count($uploads)>0){
 							foreach($uploads as $attachment) {
@@ -122,9 +128,8 @@ class PostDa extends Command
 							}
 						}
 					});
-
 				}else{
-					$data->api_msg = json_encode(array_get($result,'data'));
+					$data->api_msg = array_get($result,'msg').json_encode(array_get($result,'data'));
 					$data->save();
 				}
 				
@@ -139,7 +144,7 @@ class PostDa extends Command
 
 
 		$updates = TransferPlan::where('status',6)->where('tstatus',4)->whereNotNull('da_order_id')->get();
-		foreach($update as $data){
+		foreach($updates as $data){
 			try{
 				$items = $data->ships;
 				$header=$profile=$details=$files=$sku = $fnsku = $postData= [];
@@ -165,7 +170,7 @@ class PostDa extends Command
 					$data->tstatus=5;
 					$data->api_msg = null;
 				}else{
-					$data->api_msg = json_encode(array_get($result,'data'));
+					$data->api_msg = array_get($result,'msg').json_encode(array_get($result,'data'));
 				}
 				$data->save();
 			}catch (\Exception $e) { 

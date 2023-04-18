@@ -94,18 +94,18 @@ class TransferPlanController extends Controller
             $str = '';
             if(is_array($items)){
                 foreach($items as $item){
-                    $str .= '<div class="row" style="margin-bottom:5px;"><div class="col-md-2"><image src="https://images-na.ssl-images-amazon.com/images/I/'.$item['image'].'" width=50px height=50px></div>
+                    $str .= '<div class="row" style="margin-bottom:10px;"><div class="col-md-2"><image src="https://images-na.ssl-images-amazon.com/images/I/'.$item['image'].'" width=50px height=50px></div>
                     <div class="col-md-10" style="text-align:left;">
                         <div class="col-md-6">SKU : '.$item['sku'].'</div>
                         <div class="col-md-6">FNSKU : '.$item['fnsku'].'</div>
                         <div class="col-md-6">Asin : '.$item['asin'].'</div>
                         <div class="col-md-6">SellerSku : '.$item['sellersku'].'</div>
-                        <div class="col-md-12">数量 : '.intval(array_get($item,'quantity')).'</div>
-                        <div class="col-md-6">预计卡板数 : '.$item['broads'].'</div>
-                        <div class="col-md-6">预计箱数 : '.$item['packages'].'</div>
+                        <div class="col-md-6">数量 : '.intval(array_get($item,'quantity')).'</div>
+                        <div class="col-md-6">仓库 : '.array_get($item,'warehouse_code').'</div>
                         <div class="col-md-6">RMS : '.array_get(\App\Models\TransferPlan::TF,$item['rms']).'</div>
                         <div class="col-md-6">抽卡 : '.array_get(\App\Models\TransferPlan::TF,$item['rcard']).'</div>
-                        <div class="col-md-12">预计运费:'.$item['ship_fee'].'</div>
+                        <div class="col-md-6">预计箱数 : '.$item['packages'].'</div>
+                        <div class="col-md-6">预计运费:'.$item['ship_fee'].'</div>
                     </div></div>';
                 }
             }
@@ -223,24 +223,35 @@ class TransferPlanController extends Controller
             if((!empty($transferPlan) && $transferPlan->sap_seller_id == \Auth::user()->sap_seller_id && $transferPlan->status<=1) || empty($transferPlan)){
                 $items = $data['items'];
                 $currencyRate = DB::connection('vlz')->table('currency_rates')->where('currency','USD')->value('rate');
+                $warehousesFee = DB::connection('vlz')->table('amazon_warehouse_fee')->pluck('fee','code')->toArray();
                 if(!$currencyRate) throw new \Exception('缺失汇率数据!');
-                $warehouseFee = DB::connection('vlz')->table('amazon_warehouse_fee')->where('code',$data['warehouse_code'])->value('fee');
-                if(!$warehouseFee) throw new \Exception($data['warehouse_code'].'缺失运费数据!');
+                
                 $data['broads'] = $data['ship_fee'] = $data['packages'] = 0;
                 foreach($items as $key=>$item){
+                    $data['warehouse_code'] = $item['warehouse_code'];
                     $sizeInfo = DB::connection('vlz')->table('sku_size')->where('sku',$item['sku'])->first();
                     if(empty($sizeInfo)){
                         throw new \Exception($item['sku'].'缺失基础数据!');
                     }
-                    $data['items'][$key]['per_package_qty'] = intval($sizeInfo->quantity);
-                    $data['items'][$key]['packages'] = ceil($item['quantity']/$sizeInfo->quantity);
-                    $data['items'][$key]['volume'] = round($sizeInfo->volume,4);
-                    $data['items'][$key]['broads'] = ceil(($sizeInfo->volume)*$item['quantity']/1.5);
-                    $data['items'][$key]['ship_fee'] = round($data['items'][$key]['broads']*$warehouseFee*$currencyRate,2);
+                    $data['items'][$key]['broads'] = ceil(($sizeInfo->volume)*intval($item['packages'])/1.5);
+                    $data['items'][$key]['ship_fee'] = 0;
+                    if($data['ship_method']=='other'){
+                        $warehouseFee = round(array_get($warehousesFee,$item['warehouse_code']),2);
+                        if(!$warehouseFee) throw new \Exception($data['warehouse_code'].'缺失运费数据!');
+                        $data['items'][$key]['ship_fee'] += round($data['items'][$key]['broads']*$warehouseFee,2);
+                    }
+                    if($item['rcard']=='1'){
+                        $data['items'][$key]['ship_fee'] += 0.5*intval($item['quantity']);
+                    }
+                    $data['items'][$key]['ship_fee'] += 0.35*intval($item['quantity']);
+                    $data['items'][$key]['ship_fee'] += $data['items'][$key]['broads']*15;
+                    $data['items'][$key]['ship_fee'] += (($data['ship_method']=='other')?1.2:1.8)*intval($item['packages']);
+                    $data['items'][$key]['ship_fee'] += (0.5*intval($item['quantity'])<8*intval($item['packages']))?0.5*intval($item['quantity']):8*intval($item['packages']);
+                    $data['items'][$key]['ship_fee'] = round($data['items'][$key]['ship_fee']*$currencyRate,2);
 
-                    $data['broads']+= $data['items'][$key]['broads'];
-                    $data['ship_fee']+= $data['items'][$key]['ship_fee'];
-                    $data['packages']+= $data['items'][$key]['packages'];
+                    $data['broads']+=$data['items'][$key]['broads'];
+                    $data['packages']+=intval($item['packages']);
+                    $data['ship_fee']+=$data['items'][$key]['ship_fee'];
                 }
             }
             if(!empty($transferPlan)){

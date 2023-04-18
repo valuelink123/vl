@@ -282,14 +282,14 @@
                                     <th>
                                         <input type="checkbox" class="group-checkable" data-set="#datatable_ajax .checkboxes" />
                                     </th>
-                                    <th>站点</th>
-                                    <th style="width:150px;">销售员</th>
+                                    <th><div style="width:50px;">站点</div></th>
+                                    <th><div style="width:150px;">销售员</div></th>
                                     <th >账号</th>
                                     <th>Shipment ID</th>
                                     <th >仓库代码</th>
                                     <th >运输方式</th>
                                     <th >运费</th>
-                                    <th style="width:500px;">调拨详情</th>
+                                    <th><div style="width:500px;">调拨详情</div></th>
                                     <th>预计到货日期</th>
                                     <th>实际发货日期</th>
                                     <th>审核状态</th>

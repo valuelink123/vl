@@ -117,14 +117,13 @@
                                     <th>
                                         <input type="checkbox" class="group-checkable" data-set="#datatable_ajax .checkboxes" />
                                     </th>
-                                    <th >需求日期</th>
-                                    <th style="width:150px;">Shipment ID</th>
+                                    <th ><div style="width:150px;">需求日期</div></th>
+                                    <th ><div style="width:150px;">Shipment ID</div></th>
                                     <th >调拨状态</th>
-                                    <th >仓库代码</th>
                                     <th >运输方式</th>
                                     <th >实际发货时间</th>
-                                    <th style="width:500px;"> 调拨详情</th>
-                                    <th style="width:500px;">实际发货详情</th>
+                                    <th ><div style="width:500px;">调拨详情</div></th>
+                                    <th ><div style="width:500px;">实际发货详情</div></th>
                                     <th >预计总卡板数</th>
                                     <th >预计总箱数</th>
                                     <th >实际总卡板数</th>

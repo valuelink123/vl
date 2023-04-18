@@ -33,7 +33,7 @@ class ShipPlanController extends Controller
     public function get(Request $request)
     {
 
-        $datas = TransferPlan::where('status',5)->where('tstatus','>',4);
+        $datas = TransferPlan::where('status',6)->where('tstatus','>',4);
 
         if(array_get($_REQUEST,'tstatus')!==NULL && array_get($_REQUEST,'tstatus')!==''){
             $datas = $datas->whereIn('tstatus',array_get($_REQUEST,'tstatus'));
@@ -67,14 +67,15 @@ class ShipPlanController extends Controller
             $daSkuShips = [];
             if(is_array($items)){
                 foreach($items as $item){
-                    $str .= '<div class="row" style="margin-bottom:5px;"><div class="col-md-2"><image src="https://images-na.ssl-images-amazon.com/images/I/'.$item['image'].'" width=50px height=50px></div>
+                    $str .= '<div class="row" style="margin-bottom:10px;"><div class="col-md-2"><image src="https://images-na.ssl-images-amazon.com/images/I/'.$item['image'].'" width=50px height=50px></div>
                     <div class="col-md-10" style="text-align:left;">
                     <div class="col-md-6">SKU : '.$item['sku'].'</div>
                     <div class="col-md-6">FNSKU : '.$item['fnsku'].'</div>
                     <div class="col-md-6">Asin : '.$item['asin'].'</div>
                     <div class="col-md-6">SellerSku : '.$item['sellersku'].'</div>
+                    <div class="col-md-6">仓库 : '.array_get($item,'warehouse_code').'</div>
                     <div class="col-md-6">数量 : '.intval(array_get($item,'quantity')).'</div>
-                    <div class="col-md-6">单箱数量 : '.intval(array_get($item,'per_package_qty')).'</div>
+
                     <div class="col-md-6">预计卡板数 : '.$item['broads'].'</div>
                     <div class="col-md-6">预计箱数 : '.$item['packages'].'</div>
                     <div class="col-md-6">RMS : '.array_get(\App\Models\TransferPlan::TF,$item['rms']).'</div>
@@ -106,7 +107,7 @@ class ShipPlanController extends Controller
                     $actual_packages += intval($item['packages']);
                 }
                 foreach($daSkuShips as $key=>$item){
-                    $shipStr .= '<div class="row" style="margin-bottom:5px;"><div class="col-md-2"><image src="https://images-na.ssl-images-amazon.com/images/I/'.$item['image'].'" width=50px height=50px></div>
+                    $shipStr .= '<div class="row" style="margin-bottom:10px;"><div class="col-md-2"><image src="https://images-na.ssl-images-amazon.com/images/I/'.$item['image'].'" width=50px height=50px></div>
                     <div class="col-md-10" style="text-align:left;">
                     <div class="col-md-6">DASKU : '.$key.'</div>
                     <div class="col-md-6">数量 : '.intval($item['quantity']).'</div>
@@ -121,12 +122,10 @@ class ShipPlanController extends Controller
                 $list['created_at'],
                 $list['shipment_id'],
                 array_get(TransferPlan::SHIPMENTSTATUS,$list['tstatus']),
-                $list['warehouse_code'],
                 array_get(TransferPlan::SHIPMETHOD,$list['ship_method']),
                 $list['ship_date'],
                 $str,
                 $shipStr.'<div class="col-md-12" style="text-align:left;"><span class="label label-danger">'.$list['api_msg'].'</span></div>',
-               
                 $total_broads,
                 $total_packages,
                 $actual_broads,

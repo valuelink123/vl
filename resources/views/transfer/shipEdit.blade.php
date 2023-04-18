@@ -6,7 +6,9 @@ if(in_array(array_get($form,'tstatus'),[0,1,2,3,4,5,8])) $disabledForm="";
     <div class="col-md-12">
         <!-- BEGIN EXAMPLE TABLE PORTLET-->
         <div class="portlet light bordered">
-            <div class="portlet-title"><h1>调拨计划</h1></div>
+        <div style="padding: 10px;
+                clear: both;
+                border-bottom: 1px solid #eee;"><h2>调拨计划</h2></div>
             <div class="portlet-body">
             <?php
             $str = '';
@@ -20,8 +22,8 @@ if(in_array(array_get($form,'tstatus'),[0,1,2,3,4,5,8])) $disabledForm="";
                     <div class="col-md-6">FNSKU : '.$item['fnsku'].'</div>
                     <div class="col-md-6">Asin : '.$item['asin'].'</div>
                     <div class="col-md-6">SellerSku : '.$item['sellersku'].'</div>
+                    <div class="col-md-6">仓库 : '.array_get($item,'warehouse_code').'</div>
                     <div class="col-md-6">数量 : '.intval(array_get($item,'quantity')).'</div>
-                    <div class="col-md-6">单箱数量 : '.intval(array_get($item,'per_package_qty')).'</div>
                     <div class="col-md-6">预计卡板数 : '.$item['broads'].'</div>
                     <div class="col-md-6">预计箱数 : '.$item['packages'].'</div>
                     <div class="col-md-6">RMS : '.array_get(\App\Models\TransferPlan::TF,$item['rms']).'</div>
@@ -37,29 +39,13 @@ if(in_array(array_get($form,'tstatus'),[0,1,2,3,4,5,8])) $disabledForm="";
                 clear: both;
                 border-bottom: 1px solid #eee;"><h2>DA实际发货</h2></div>';
                 foreach($items as $item){
-                    if(!isset($daSkuShips[$item['sku']])){     
-                        $daSkuShips[$item['sku']] = 
-                        [
-                            'quantity'=>0,
-                            'broads'=>0,
-                            'packages'=>0,
-                            'locations'=>[]
-                        ];
-                    }
-                    $daSkuShips[$item['sku']]['quantity'] += intval($item['quantity']);
-                    $daSkuShips[$item['sku']]['broads'] += intval($item['broads']);
-                    $daSkuShips[$item['sku']]['packages'] += intval($item['packages']);
-                    $daSkuShips[$item['sku']]['locations'][]= $item['location'];
-                }
-                foreach($daSkuShips as $key=>$item){
                     $str .= '<div class="row" style="margin:10px;">
-                    <div class="col-md-12" style="text-align:left;">
-                    <div class="col-md-6">DASKU : '.$key.'</div>
-                    <div class="col-md-6">数量 : '.intval($item['quantity']).'</div>
-                    <div class="col-md-6">实际卡板数 : '.intval($item['broads']).'</div>
-                    <div class="col-md-6">实际箱数 : '.intval($item['packages']).'</div>
-                    <div class="col-md-12">Locations : '.implode(', ',$item['locations']).'</div>
-                    </div></div>';
+                    <div class="col-md-3">DASKU : '.$item['sku'].'</div>
+                    <div class="col-md-2">数量 : '.intval($item['quantity']).'</div>
+                    <div class="col-md-2">实际卡板数 : '.intval($item['broads']).'</div>
+                    <div class="col-md-2">实际箱数 : '.intval($item['packages']).'</div>
+                    <div class="col-md-3">Location : '.$item['location'].'</div>
+                    </div>';
                 }
             }
 
@@ -77,7 +63,7 @@ if(in_array(array_get($form,'tstatus'),[0,1,2,3,4,5,8])) $disabledForm="";
 
 						<div class="col-md-6">
 						<div class="form-group">
-							<label>Ship Status:</label>
+							<label>调拨状态:</label>
 							<select class="form-control" name="tstatus" id="tstatus" {{$disabledForm}}>
 							@foreach (\App\Models\TransferPlan::SHIPSHIPMENTSTATUS as $k=>$v)
 							<option value="{{$k}}" {{($k==array_get($form,'tstatus'))?'selected':''}} >{{$v}}</option>
@@ -89,7 +75,7 @@ if(in_array(array_get($form,'tstatus'),[0,1,2,3,4,5,8])) $disabledForm="";
 						<div class="col-md-6">
 
 						<div class="form-group">
-							<label>Ship Fee:</label>
+							<label>运费:</label>
                             <input type="text" class="form-control" name="ship_fee" id="ship_fee" {{$disabledForm}} value="{{array_get($form,'ship_fee')}}" required>
 						</div>
 						</div>

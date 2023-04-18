@@ -33,9 +33,7 @@ class DaPlanController extends Controller
     public function get(Request $request)
     {
 
-        $datas = TransferPlan::leftJoin('amazon_warehouses',function($q){
-			$q->on('transfer_plans.warehouse_code', '=', 'amazon_warehouses.code');
-		})->where('status',6)->where('tstatus','>',0);
+        $datas = TransferPlan::where('status',6)->where('tstatus','>',0);
 
         if(array_get($_REQUEST,'tstatus')!==NULL && array_get($_REQUEST,'tstatus')!==''){
             $datas = $datas->whereIn('tstatus',array_get($_REQUEST,'tstatus'));
@@ -55,6 +53,7 @@ class DaPlanController extends Controller
         }
         
         $daSkus = DB::connection('amazon')->table('da_sku_match')->pluck('da_sku','sku')->toArray();
+        $warehouses = json_decode(json_encode(DB::connection('amazon')->table('amazon_warehouses')->get()->keyBy('code')),true);
         $iTotalRecords = $datas->count();
         $iDisplayLength = intval($_REQUEST['length']);
         $iDisplayLength = $iDisplayLength < 0 ? $iTotalRecords : $iDisplayLength;
@@ -69,15 +68,17 @@ class DaPlanController extends Controller
             $daSkuShips = [];
             if(is_array($items)){
                 foreach($items as $item){
-                    $str .= '<div class="row" style="margin-bottom:5px;"><div class="col-md-2"><image src="https://images-na.ssl-images-amazon.com/images/I/'.$item['image'].'" width=100% height=100%></div>
+                    $str .= '<div class="row" style="margin-bottom:10px;"><div class="col-md-2"><image src="https://images-na.ssl-images-amazon.com/images/I/'.$item['image'].'" width=100% height=100%></div>
                     <div class="col-md-10" style="text-align:left;">
                     <div class="col-md-6">DASKU : '.array_get($daSkus, $item['sku'], $item['sku']).'</div>
                     <div class="col-md-6">FNSKU : '.$item['fnsku'].'</div>
-                    <div class="col-md-12">Quantity : '.intval(array_get($item,'quantity')).'</div>
+                    <div class="col-md-6">Warehouse : '.array_get($item,'warehouse_code').'</div>
+                    <div class="col-md-6">Quantity : '.intval(array_get($item,'quantity')).'</div>
                     <div class="col-md-6">Pallet Count : '.$item['broads'].'</div>
                     <div class="col-md-6">Boxes Count : '.$item['packages'].'</div>
                     <div class="col-md-6">RMS : '.array_get(\App\Models\TransferPlan::TF,$item['rms']).'</div>
                     <div class="col-md-6">RCard : '.array_get(\App\Models\TransferPlan::TF,$item['rcard']).'</div>
+                    <div class="col-md-12">Address : '.array_get($warehouses,array_get($item,'warehouse_code').'.address').' '.array_get($warehouses,array_get($item,'warehouse_code').'.state').' '.array_get($warehouses,array_get($item,'warehouse_code').'.city').'  '.array_get($warehouses,array_get($item,'warehouse_code').'.zip').'</div>
                     </div></div>';
                     $daSkuShips[array_get($daSkus, $item['sku'], $item['sku'])] = 
                     [
@@ -89,7 +90,7 @@ class DaPlanController extends Controller
                     ];
                 }
             }
-            $str .= '<div class="col-md-12" style="textc -align:left;"><span class="label label-primary">'.$list['reson'].'</span> <span class="label label-danger">'.$list['remark'].'</span></div>';
+            $str .= '<div class="col-md-12" style="text-align:left;"><span class="label label-primary">'.$list['reson'].'</span> <span class="label label-danger">'.$list['remark'].'</span></div>';
             $items = $list['ships'];
             $shipStr = '';
             if(is_array($items)){
@@ -106,7 +107,7 @@ class DaPlanController extends Controller
                     <div class="col-md-6">Quantity : '.intval($item['quantity']).'</div>
                     <div class="col-md-6">Pallet Count : '.intval($item['broads']).'</div>
                     <div class="col-md-6">Boxes Count : '.intval($item['packages']).'</div>
-                    <div class="col-md-12">Locations : '.implode(', ',$item['locations']).'</div>
+                    <div class="col-md-12">Locations : '.implode(' , ',$item['locations']).'</div>
                     </div></div>';
                 }
                 
@@ -122,11 +123,6 @@ class DaPlanController extends Controller
                 $shipStr.'<div class="col-md-12" style="text-align:left;"><span class="label label-danger">'.$list['api_msg'].'</span></div>',
                 $list['shipment_id'],
                 $list['reservation_id'],
-                $list['address'],
-                $list['state'],
-                $list['city'],
-                $list['zip'],
-                $list['warehouse_code'],
                 array_get(TransferPlan::SHIPMETHOD,$list['ship_method']),
             );
 		}
@@ -139,7 +135,7 @@ class DaPlanController extends Controller
 
     public function edit(Request $request,$id)
     {
-        $warehouses = DB::connection('amazon')->table('amazon_warehouses')->get()->keyBy('code')->toArray();
+        $warehouses = json_decode(json_encode(DB::connection('amazon')->table('amazon_warehouses')->get()->keyBy('code')),true);
 		$daSkus = DB::connection('amazon')->table('da_sku_match')->pluck('da_sku','sku')->toArray();
 		$form=$items=[];
         if($id){

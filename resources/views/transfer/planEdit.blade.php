@@ -35,7 +35,7 @@ if(empty($form)) $disabledForm="";
 						</div>
 						</div>
 
-						<div class="col-md-2">
+						<div class="col-md-3">
 						<div class="form-group">
 							<label>站点:</label>
 							<select class="form-control" name="marketplace_id" id="marketplace_id" {{$disabledForm}} required>
@@ -45,7 +45,7 @@ if(empty($form)) $disabledForm="";
 							</select>
 						</div>
 						</div>
-						<div class="col-md-2">
+						<div class="col-md-3">
 						<div class="form-group">
 							<label>运输方式:</label>
                             <select class="form-control" name="ship_method" id="ship_method" {{$disabledForm}} required>
@@ -55,25 +55,17 @@ if(empty($form)) $disabledForm="";
 							</select>
 						</div>
 						</div>
-						<div class="col-md-2">
-						<div class="form-group">
-							<label>预约号:</label>
-                            <input type="text" class="form-control" name="reservation_id" id="reservation_id" {{$disabledForm}} value="{{array_get($form,'reservation_id')}}" required>
-						</div>
-						</div>
 						</div>
 
 						<div class="row">
 						<div class="col-md-3">
 						<div class="form-group">
-							<label>仓库代码:</label>
-                            <select class="form-control" name="warehouse_code" id="warehouse_code" {{$disabledForm}} required>
-							@foreach ($warehouses as $k=>$v)
-							<option value="{{$k}}" {{($k==array_get($form,'warehouse_code'))?'selected':''}} >{{$k.' - '.$v}}</option>
-							@endforeach 
-							</select>
+							<label>预约号:</label>
+                            <input type="text" class="form-control" name="reservation_id" id="reservation_id" {{$disabledForm}} value="{{array_get($form,'reservation_id')}}" required>
 						</div>
 						</div>
+						
+
 
 						<div class="col-md-3">
 
@@ -83,7 +75,7 @@ if(empty($form)) $disabledForm="";
 						</div>
 						</div>
 
-						<div class="col-md-2">
+						<div class="col-md-3">
 						<div class="form-group">
 							<label>调入工厂:</label>
                             <select class="form-control" name="in_factory_code" id="in_factory_code" {{$disabledForm}} required>
@@ -94,7 +86,7 @@ if(empty($form)) $disabledForm="";
 						</div>
 						</div>
 
-						<div class="col-md-2">
+						<div class="col-md-3">
 						<div class="form-group">
 							<label>调出工厂:</label>
 							<select class="form-control" name="out_factory_code" id="out_factory_code" {{$disabledForm}} required>
@@ -143,7 +135,27 @@ if(empty($form)) $disabledForm="";
                                             <label class="control-label">Sku</label>
 											<input type="text" class="form-control sku_input" {{$disabledForm}} name="sku" required>
                                         </div>
-										
+
+										<div class="col-md-3">
+                                            <label class="control-label">Seller Sku</label>
+											<select name="sellersku" id="sellersku" class="form-control sellersku_input" {{$disabledForm}} required></select>
+                                        </div>
+
+										<div class="col-md-3">
+                                            <label class="control-label">条码FNSKU</label>
+											<input type="text" class="form-control" name="fnsku" {{$disabledForm}} required>
+                                        </div>
+
+
+										<div class="col-md-2">
+											<label class="control-label">仓库代码</label>
+											<select class="form-control" name="warehouse_code" id="warehouse_code" {{$disabledForm}} required>
+											@foreach ($warehouses as $k=>$v)
+											<option value="{{$k}}">{{$k.' - '.$v}}</option>
+											@endforeach 
+											</select>
+								        </div>
+
 										<div class="col-md-2">
                                             <label class="control-label">申请数量</label>
 											<input type="text" class="form-control" name="quantity" {{$disabledForm}} required>
@@ -167,23 +179,11 @@ if(empty($form)) $disabledForm="";
 											</select>
                                         </div>
 
-										<div class="col-md-3">
-                                            <label class="control-label">Seller Sku</label>
-											<select name="sellersku" id="sellersku" class="form-control sellersku_input" {{$disabledForm}} required></select>
-                                        </div>
-
-										<div class="col-md-3">
-                                            <label class="control-label">条码FNSKU</label>
-											<input type="text" class="form-control" name="fnsku" {{$disabledForm}} required>
-                                        </div>
-
-										<!--
 										<div class="col-md-2">
                                             <label class="control-label">预计箱数</label>
 											<input type="text" class="form-control" name="packages" {{$disabledForm}} required>
-											
                                         </div>
-										-->
+										
 										<input type="hidden" name="image">
 										<input type="hidden" name="seller_id">
                                         
@@ -210,7 +210,26 @@ if(empty($form)) $disabledForm="";
                                             <label class="control-label">Sku</label>
 											<input type="text" class="form-control sku_input" name="sku" value="{{$value['sku']}}" {{$disabledForm}} required>
                                         </div>
-										
+										<div class="col-md-3">
+                                            <label class="control-label">Seller Sku</label>
+											<select name="sellersku" id="sellersku" class="form-control sellersku_input" {{$disabledForm}} required>
+                                                <option value="{{$value['sellersku']}}">{{$value['sellersku']}}
+                                            </select>
+                                        </div>
+										<div class="col-md-3">
+                                            <label class="control-label">条码FNSKU</label>
+											<input type="text" class="form-control" name="fnsku" value="{{$value['fnsku']}}" {{$disabledForm}} required>
+                                        </div>
+
+										<div class="col-md-2">
+											<label class="control-label">仓库代码</label>
+											<select class="form-control" name="warehouse_code" id="warehouse_code" {{$disabledForm}} required>
+											@foreach ($warehouses as $k=>$v)
+											<option value="{{$k}}" {{($k==array_get($value,'warehouse_code'))?'selected':''}} >{{$k.' - '.$v}}</option>
+											@endforeach 
+											</select>
+								        </div>
+
 										<div class="col-md-2">
                                             <label class="control-label">申请数量</label>
 											<input type="text" class="form-control" name="quantity" value="{{$value['quantity']}}" {{$disabledForm}} required>
@@ -233,18 +252,6 @@ if(empty($form)) $disabledForm="";
 											@endforeach 
 											</select>
                                         </div>
-
-										<div class="col-md-3">
-                                            <label class="control-label">Seller Sku</label>
-											<select name="sellersku" id="sellersku" class="form-control sellersku_input" {{$disabledForm}} required>
-                                                <option value="{{$value['sellersku']}}">{{$value['sellersku']}}
-                                            </select>
-                                        </div>
-										<div class="col-md-3">
-                                            <label class="control-label">条码FNSKU</label>
-											<input type="text" class="form-control" name="fnsku" value="{{$value['fnsku']}}" {{$disabledForm}} required>
-                                        </div>
-										<!--
 										
 										<div class="col-md-2">
                                             <label class="control-label">预计箱数</label>
@@ -252,7 +259,6 @@ if(empty($form)) $disabledForm="";
 											
                                         </div>
 
-										-->
 										<input type="hidden" name="image" value="{{$value['image']}}">
 										<input type="hidden" name="seller_id" value="{{$value['seller_id']}}">
                                         @if(!$disabledForm)
