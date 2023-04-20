@@ -20,9 +20,9 @@ if(empty($form)) $disabledForm="";
 						<div class="col-md-3">
 						<div class="form-group">
 							<label>审核状态:</label>
-							<select class="form-control" name="status" id="status" >
-							@foreach (getTransferForRole() as $k=>$v)
-							<option value="{{$k}}" {{($k==array_get($form,'status') || (empty(array_get($form,'status')) && $k==1))?'selected':''}} >{{$v}}</option>
+							<select class="form-control" name="status" id="status" {{in_array(array_get($form,'status'),array_keys(getTransferForRole()))?'':'disabled'}}>
+							@foreach (\App\Models\TransferPlan::STATUS as $k=>$v)
+							<option value="{{$k}}" {{($k==array_get($form,'status') || (empty(array_get($form,'status')) && $k==1))?'selected':''}} {{in_array($k,array_keys(getTransferForRole()))?'':'disabled'}}>{{$v}}</option>
 							@endforeach 
 							</select>
 						</div>
@@ -150,6 +150,7 @@ if(empty($form)) $disabledForm="";
 										<div class="col-md-2">
 											<label class="control-label">仓库代码</label>
 											<select class="form-control" name="warehouse_code" id="warehouse_code" {{$disabledForm}} required>
+											
 											@foreach ($warehouses as $k=>$v)
 											<option value="{{$k}}">{{$k.' - '.$v}}</option>
 											@endforeach 
@@ -158,12 +159,13 @@ if(empty($form)) $disabledForm="";
 
 										<div class="col-md-2">
                                             <label class="control-label">申请数量</label>
-											<input type="text" class="form-control" name="quantity" {{$disabledForm}} required>
+											<input type="text" class="form-control" name="quantity" value="0" {{$disabledForm}} required>
                                         </div>
 
 										<div class="col-md-2">
 											<label class="control-label">是否贴rms标</label>
 											<select class="form-control" name="rms" id="rms" {{$disabledForm}} required>
+											
 											@foreach (\App\Models\TransferPlan::TF as $k=>$v)
 											<option value="{{$k}}" {{($k==0)?'selected':''}}>{{$v}}</option>
 											@endforeach 
@@ -173,6 +175,7 @@ if(empty($form)) $disabledForm="";
                                         <div class="col-md-2">
                                             <label class="control-label">是否抽卡</label>
 											<select class="form-control" name="rcard" id="rcard" {{$disabledForm}} required>
+											
 											@foreach (\App\Models\TransferPlan::TF as $k=>$v)
 											<option value="{{$k}}" {{($k==0)?'selected':''}} >{{$v}}</option>
 											@endforeach 
@@ -181,11 +184,11 @@ if(empty($form)) $disabledForm="";
 
 										<div class="col-md-2">
                                             <label class="control-label">预计箱数</label>
-											<input type="text" class="form-control" name="packages" {{$disabledForm}} required>
+											<input type="text" class="form-control" name="packages" value="0" {{$disabledForm}} required>
                                         </div>
 										
 										<input type="hidden" name="image">
-										<input type="hidden" name="seller_id">
+										<input type="hidden" class="sku_seller_id" name="seller_id">
                                         
                                         @if(!$disabledForm)
                                         <div class="col-md-2">
@@ -238,6 +241,7 @@ if(empty($form)) $disabledForm="";
 										<div class="col-md-2">
 											<label class="control-label">是否贴rms标</label>
 											<select class="form-control" name="rms" id="rms" {{$disabledForm}} required>
+
 											@foreach (\App\Models\TransferPlan::TF as $k=>$v)
 											<option value="{{$k}}" {{($k==array_get($value,'rms'))?'selected':''}} >{{$v}}</option>
 											@endforeach 
@@ -247,6 +251,7 @@ if(empty($form)) $disabledForm="";
                                         <div class="col-md-2">
                                             <label class="control-label">是否抽卡</label>
 											<select class="form-control" name="rcard" id="rcard" {{$disabledForm}}  required>
+											
 											@foreach (\App\Models\TransferPlan::TF as $k=>$v)
 											<option value="{{$k}}" {{($k==array_get($value,'rcard'))?'selected':''}} >{{$v}}</option>
 											@endforeach 
@@ -260,7 +265,7 @@ if(empty($form)) $disabledForm="";
                                         </div>
 
 										<input type="hidden" name="image" value="{{$value['image']}}">
-										<input type="hidden" name="seller_id" value="{{$value['seller_id']}}">
+										<input type="hidden" name="seller_id" class="sku_seller_id" value="{{$value['seller_id']}}">
                                         @if(!$disabledForm)
                                         <div class="col-md-2">
                                             <a href="javascript:;" data-repeater-delete class="btn btn-danger mt-repeater-delete">
@@ -310,12 +315,25 @@ $(function() {
 	//FormRepeater.init();
 
 	$('.mt-repeater').repeater({
+		defaultValues: {
+			'warehouse_code': 'ABE2',
+			'quantity': '0',
+			'rms': '0',
+			'rcard': '0',
+			'packages': '0',
+		},
 		isFirstItemUndeletable: true,
 		initEmpty: false,
 		ready: function () {
 			$('.asin_input').on('change',function(){
 				var str = $(this).attr('name').slice(0,-6);
 				getAjaxData(str)
+			});
+			$('.sellersku_input').on('change',function(){
+				var seller_id = $(this).find('option:selected').data('seller_id');
+				$('#seller_id').val(seller_id);
+				var str = $(this).attr('name').slice(0,-11);
+				$("input[name='"+str+"[seller_id]']").val(seller_id);
 			})
 		},
 		show: function () {
@@ -323,10 +341,16 @@ $(function() {
 			$('.asin_input').on('change',function(){
 				var str = $(this).attr('name').slice(0,-6);
 				getAjaxData(str)
+			});
+			$('.sellersku_input').on('change',function(){
+				var seller_id = $(this).find('option:selected').data('seller_id');
+				$('#seller_id').val(seller_id);
+				var str = $(this).attr('name').slice(0,-11);
+				$("input[name='"+str+"[seller_id]']").val(seller_id);
 			})
 		},
-		hide: function () {
-			$(this).slideUp();
+		hide: function (deleteElement) {
+			$(this).slideUp(deleteElement);
 		},
 	});
 
@@ -345,13 +369,12 @@ $(function() {
                     asin: $("input[name='"+str+"[asin]']").val()
                 },
                 success: function (res) {
-                    $("#seller_id").val(res.seller_id);
                     $("input[name='"+str+"[sku]']").val(res.sku);
-                    $("input[name='"+str+"[seller_id]']").val(res.seller_id);
                     $("input[name='"+str+"[image]']").val(res.image);
                     $("select[name='"+str+"[sellersku]']").empty();
+					$("select[name='"+str+"[sellersku]']").append("<option value=''>请选择</option>");
                     $.each(res.seller_sku_list, function (index, value) {
-                        $("select[name='"+str+"[sellersku]']").append("<option value='"+value.seller_sku+"'>"+value.seller_sku+" - "+value.seller_id+"</option>");
+                        $("select[name='"+str+"[sellersku]']").append("<option value='"+value.seller_sku+"' data-seller_id = '"+value.seller_id+"'>"+value.seller_sku+" - "+value.label+"</option>");
                     });
                 },
                 error: function(err) {
@@ -368,7 +391,24 @@ $(function() {
 		$('.sellersku_input').empty();
 	})
 	
+
+	
+	
+
+
     $('#update_form').submit(function() {
+
+		var falseSeller = false;
+		$('.sku_seller_id').each(function(){
+			if($('#seller_id').val() != $(this).val()){
+				var str = $(this).attr('name').slice(0,-11);
+				toastr.error($("select[name='"+str+"[sellersku]']").val()+' 和其他SKU不在同一账号');
+				falseSeller = true;
+			}
+		})
+		if(falseSeller) {
+			return false;
+		}
 		$.ajaxSetup({
 			headers: { 'X-CSRF-TOKEN' : '{{ csrf_token() }}' }
 		});

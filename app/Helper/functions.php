@@ -140,7 +140,7 @@ function getTransferForRole()
 
 
 function getSellerAccount(){
-	return DB::connection('amazon')->table("seller_accounts")->whereNull('deleted_at')->groupby(['mws_seller_id','label'])->pluck('label','mws_seller_id');
+	return DB::connection('amazon')->table("seller_accounts")->where('primary',1)->whereNull('deleted_at')->groupby(['mws_seller_id','label'])->pluck('label','mws_seller_id');
 }
 function getUserGroupDetails(){
 	$groups=$users =[];

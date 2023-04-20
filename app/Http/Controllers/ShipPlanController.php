@@ -46,7 +46,20 @@ class ShipPlanController extends Controller
             $datas = $datas->where('created_at','<=',array_get($_REQUEST,'created_end'));
         }
         if(array_get($_REQUEST,'keyword')){
-            $datas = $datas->where('items','like','%'.array_get($_REQUEST,'keyword').'%');
+            $keyword = array_get($_REQUEST,'keyword');
+            $datas = $datas->where(function ($query) use ($keyword) {
+                $query->where('shipment_id', 'like', '%'.$keyword.'%')
+                    ->orwhere('da_order_id', 'like', '%'.$keyword.'%')
+                    ->orwhereHas('items',function($itemQuery)use($keyword){
+                        $itemQuery->where('asin','like','%'.$keyword.'%')
+                            ->orWhere('sku','like','%'.$keyword.'%')
+                            ->orWhere('sellersku','like','%'.$keyword.'%')
+                            ->orWhere('fnsku','like','%'.$keyword.'%')
+                            ->orwhereHas('ships',function($shipQuery)use($keyword){
+                                $shipQuery->where('sku','like','%'.$keyword.'%');
+                            });
+                    });
+            });
         }
         if(array_get($_REQUEST,'shipment_id')){
             $datas = $datas->where('shipment_id','like','%'.array_get($_REQUEST,'shipment_id').'%');
@@ -62,9 +75,8 @@ class ShipPlanController extends Controller
 
         foreach ( $shipmentList as $list){
             $items = $list['items'];
-            $str = '';
+            $str = $strShip = '';
             $total_broads = $total_packages = $actual_broads = $actual_packages = 0;
-            $daSkuShips = [];
             if(is_array($items)){
                 foreach($items as $item){
                     $str .= '<div class="row" style="margin-bottom:10px;"><div class="col-md-2"><image src="https://images-na.ssl-images-amazon.com/images/I/'.$item['image'].'" width=50px height=50px></div>
@@ -82,41 +94,36 @@ class ShipPlanController extends Controller
                     <div class="col-md-6">抽卡 : '.array_get(\App\Models\TransferPlan::TF,$item['rcard']).'</div>
                     <div class="col-md-12">预计运费:'.$item['ship_fee'].'</div>
                     </div></div>';
-                    $daSkuShips[array_get($daSkus, $item['sku'], $item['sku'])] = 
-                    [
-                        'image'=>$item['image'],
-                        'quantity'=>0,
-                        'broads'=>0,
-                        'packages'=>0,
-                        'locations'=>[],
-                    ];
-                    $total_broads += $item['broads'];
-                    $total_packages += $item['packages'];
+                    $ships = $item['ships'];
+                    if(!empty($ships)){
+                        $shipSku = '';
+                        $locations= [];
+                        $quantity = $broads = $packages = 0;
+                        foreach($ships as $ship){
+                            $quantity += intval($ship['quantity']);
+                            $broads += intval($ship['broads']);
+                            $packages += intval($ship['packages']);
+                            $locations[] = $ship['location'];
+                            $shipSku = $ship['sku'];
+                            $actual_broads += intval($ship['broads']);
+                            $actual_packages += intval($ship['packages']);
+                        }
+                        
+                        $strShip.='<div class="row" style="margin-bottom:10px;text-align:left;">
+                        <div class="col-md-12">DASKU : '.$shipSku.'</div>
+                        <div class="col-md-6">Quantity : '.intval($quantity).'</div>
+                        <div class="col-md-6">Warehouse : '.array_get($item,'warehouse_code').'</div>
+                        <div class="col-md-6">Pallet Count : '.intval($broads).'</div>
+                        <div class="col-md-6">Boxes Count : '.intval($packages).'</div>
+                        <div class="col-md-12">Locations : '.implode(' , ',$locations).'</div>
+                        </div>';
+                    }
+                    $total_broads += intval($item['broads']);
+                    $total_packages += intval($item['packages']);
                 }
             }
             $str .= '<div class="col-md-12" style="text-align:left;"><span class="label label-primary">'.$list['reson'].'</span> <span class="label label-danger">'.$list['remark'].'</span></div>';
-            $items = $list['ships'];
-            $shipStr = '';
-            if(is_array($items)){
-                foreach($items as $item){
-                    $daSkuShips[$item['sku']]['quantity'] += intval($item['quantity']);
-                    $daSkuShips[$item['sku']]['broads'] += intval($item['broads']);
-                    $daSkuShips[$item['sku']]['packages'] += intval($item['packages']);
-                    $daSkuShips[$item['sku']]['locations'][]= $item['location'];
-                    $actual_broads += intval($item['broads']);
-                    $actual_packages += intval($item['packages']);
-                }
-                foreach($daSkuShips as $key=>$item){
-                    $shipStr .= '<div class="row" style="margin-bottom:10px;"><div class="col-md-2"><image src="https://images-na.ssl-images-amazon.com/images/I/'.$item['image'].'" width=50px height=50px></div>
-                    <div class="col-md-10" style="text-align:left;">
-                    <div class="col-md-6">DASKU : '.$key.'</div>
-                    <div class="col-md-6">数量 : '.intval($item['quantity']).'</div>
-                    <div class="col-md-6">实际卡板数 : '.intval($item['broads']).'</div>
-                    <div class="col-md-6">实际箱数 : '.intval($item['packages']).'</div>
-                    <div class="col-md-12">Locations : '.implode(', ',$item['locations']).'</div>
-                    </div></div>';
-                }
-            }
+            
             $records["data"][] = array(
                 '<input name="id[]" type="checkbox" class="checkboxes" value="'.$list['id'].'"  />',
                 $list['created_at'],
@@ -125,7 +132,7 @@ class ShipPlanController extends Controller
                 array_get(TransferPlan::SHIPMETHOD,$list['ship_method']),
                 $list['ship_date'],
                 $str,
-                $shipStr.'<div class="col-md-12" style="text-align:left;"><span class="label label-danger">'.$list['api_msg'].'</span></div>',
+                $strShip.'<div class="col-md-12" style="text-align:left;"><span class="label label-danger">'.$list['api_msg'].'</span></div>',
                 $total_broads,
                 $total_packages,
                 $actual_broads,
@@ -146,15 +153,13 @@ class ShipPlanController extends Controller
 
     public function edit(Request $request,$id)
     {
-        $warehouses = DB::connection('amazon')->table('amazon_warehouses')->get()->keyBy('code')->toArray();
-		$daSkus = DB::connection('amazon')->table('da_sku_match')->get()->keyBy('sku')->toArray();
+        $warehouses = json_decode(json_encode(DB::connection('amazon')->table('amazon_warehouses')->get()->keyBy('code')->toArray()),true);
 		$form=$items=[];
         if($id){
             $form = TransferPlan::find($id)->toArray();
             $items = $form['items'];
-            $ships = $form['ships'];
         }
-        return view('transfer/shipEdit',['form'=>$form ,'items'=>$items ,'ships'=>$ships]);
+        return view('transfer/shipEdit',['form'=>$form ,'items'=>$items,'warehouses'=>$warehouses ]);
     }
 
 
@@ -162,12 +167,15 @@ class ShipPlanController extends Controller
     {
 		DB::beginTransaction();
         try{
-            $data = $request->all();
-            $id = $data['id'];
-            unset($data['id']);unset($data['_token']);
+            $id = $request->get('id');
             if($id){
-                TransferPlan::updateOrCreate(['id'=>$id],$data);
+                $transferPlan = TransferPlan::findOrFail($id);
+                if(!in_array($transferPlan->tstatus,[5,6,8])) throw new \Exception('This Status Can Not Update!');
+                $transferPlan->tstatus = $request->get('tstatus');
+                $transferPlan->ship_fee = $request->get('ship_fee');
+                $transferPlan->save();    
             }
+
             DB::commit();
             $records["customActionStatus"] = 'OK';
             $records["customActionMessage"] = "Success!";     
@@ -187,12 +195,10 @@ class ShipPlanController extends Controller
             foreach($_REQUEST["id"] as $plan_id){
                 $transferPlan = TransferPlan::find($plan_id);
                 if(empty($transferPlan)){
-                    $customActionMessage.='ID:'.$plan_id.' 不存在!</BR>';
-                    continue;
+                    throw new \Exception('ID:'.$plan_id.' 不存在!');
                 }
-                if(!in_array($transferPlan->tstatus,[0,1,2,3,4,5,8])){
-                    $customActionMessage.='ID:'.$plan_id.' 状态无法修改!</BR>';
-                    continue;
+                if(!in_array($transferPlan->tstatus,[5,6,8])){
+                    throw new \Exception('ID:'.$plan_id.' 状态无法修改!');
                 }
 
                 $transferPlan->tstatus = $tstatus;

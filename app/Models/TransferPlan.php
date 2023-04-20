@@ -2,6 +2,7 @@
 
 use App\Models\Traits\ExtendedMysqlQueries;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class TransferPlan extends Model {
 
@@ -9,6 +10,11 @@ class TransferPlan extends Model {
     protected $connection = 'amazon';
     public $timestamps = true;
     protected $guarded = [];
+    protected $with = ['items'];
+    protected $fillable = [ 
+        'id','sap_seller_id','seller_id','marketplace_id','in_factory_code','out_factory_code','received_date','shipment_id','reservation_id','ship_method','ship_fee','ship_date','reson','tstatus','status','bg','bu','remark','files','da_order_id','reservation_date','sap_tm','sap_dn','sap_st0','broads','packages','api_msg'
+    ];
+
     const STATUS = [
         '0'=>'取消调拨请求',
         '1'=>'BU经理审核',
@@ -58,27 +64,9 @@ class TransferPlan extends Model {
         '8'=>'取消发货',
     ];
 
-    public function setItemsAttribute($value)
-	{
-        if (is_array($value)) {
-            $this->attributes['items'] = json_encode($value);
-        }
-	}
-	
-	public function getItemsAttribute($value)
-	{
-		return json_decode($value, true);
-	}
+    public function items():hasMany
+    {
+        return $this->hasMany(TransferPlanItem::class, 'transfer_plan_id', 'id');
+    }
 
-    public function setShipsAttribute($value)
-	{
-        if (is_array($value)) {
-            $this->attributes['ships'] = json_encode($value);
-        }
-	}
-	
-	public function getShipsAttribute($value)
-	{
-		return json_decode($value, true);
-	}
 }

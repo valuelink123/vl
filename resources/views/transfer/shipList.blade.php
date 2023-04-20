@@ -38,7 +38,7 @@
                         <div class="col-md-3">
 							<div class="col-md-6">
                             <div class="input-group date date-picker margin-bottom-5" data-date-format="yyyy-mm-dd">
-                                <input type="text" class="form-control " readonly name="ship_start" placeholder="创建日期起" >
+                                <input type="text" class="form-control " readonly name="created_start" placeholder="创建日期起" >
                                 <span class="input-group-btn">
                                     <button class="btn  default" type="button">
                                         <i class="fa fa-calendar"></i>
@@ -48,7 +48,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="input-group date date-picker" data-date-format="yyyy-mm-dd">
-                                <input type="text" class="form-control " readonly name="ship_end" placeholder="创建日期止">
+                                <input type="text" class="form-control " readonly name="created_end" placeholder="创建日期止">
                                 <span class="input-group-btn">
                                     <button class="btn  default" type="button">
                                         <i class="fa fa-calendar"></i>
@@ -168,7 +168,7 @@
             grid.setAjaxParam("created_start", $("input[name='created_start']").val());
 			grid.setAjaxParam("created_end", $("input[name='created_end']").val());
 			grid.setAjaxParam("keyword", $("input[name='keyword']").val());
-            grid.setAjaxParam("ship_order_id", $("input[name='shipment_id']").val());
+            grid.setAjaxParam("shipment_id", $("input[name='shipment_id']").val());
             grid.setAjaxParam("tstatus", $("select[name='tstatus[]']").val());
 
             grid.init({

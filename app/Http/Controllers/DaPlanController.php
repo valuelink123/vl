@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use App\SapAsinMatchSku;
 use App\User;
 use App\Models\TransferPlan;
+use App\Models\TransferPlanItemShip;
 use Illuminate\Support\Facades\Auth;
 use PDO;
 use DB;
@@ -46,7 +47,20 @@ class DaPlanController extends Controller
             $datas = $datas->where('ship_date','<=',array_get($_REQUEST,'ship_end'));
         }
         if(array_get($_REQUEST,'keyword')){
-            $datas = $datas->where('items','like','%'.array_get($_REQUEST,'keyword').'%');
+            $keyword = array_get($_REQUEST,'keyword');
+            $datas = $datas->where(function ($query) use ($keyword) {
+                $query->where('shipment_id', 'like', '%'.$keyword.'%')
+                    ->orwhere('da_order_id', 'like', '%'.$keyword.'%')
+                    ->orwhereHas('items',function($itemQuery)use($keyword){
+                        $itemQuery->where('asin','like','%'.$keyword.'%')
+                            ->orWhere('sku','like','%'.$keyword.'%')
+                            ->orWhere('sellersku','like','%'.$keyword.'%')
+                            ->orWhere('fnsku','like','%'.$keyword.'%')
+                            ->orwhereHas('ships',function($shipQuery)use($keyword){
+                                $shipQuery->where('sku','like','%'.$keyword.'%');
+                            });
+                    });
+            });
         }
         if(array_get($_REQUEST,'da_order_id')){
             $datas = $datas->where('da_order_id','like','%'.array_get($_REQUEST,'da_order_id').'%');
@@ -64,8 +78,7 @@ class DaPlanController extends Controller
 
         foreach ( $shipmentList as $list){
             $items = $list['items'];
-            $str = '';
-            $daSkuShips = [];
+            $str = $strShip = '';
             if(is_array($items)){
                 foreach($items as $item){
                     $str .= '<div class="row" style="margin-bottom:10px;"><div class="col-md-2"><image src="https://images-na.ssl-images-amazon.com/images/I/'.$item['image'].'" width=100% height=100%></div>
@@ -80,38 +93,35 @@ class DaPlanController extends Controller
                     <div class="col-md-6">RCard : '.array_get(\App\Models\TransferPlan::TF,$item['rcard']).'</div>
                     <div class="col-md-12">Address : '.array_get($warehouses,array_get($item,'warehouse_code').'.address').' '.array_get($warehouses,array_get($item,'warehouse_code').'.state').' '.array_get($warehouses,array_get($item,'warehouse_code').'.city').'  '.array_get($warehouses,array_get($item,'warehouse_code').'.zip').'</div>
                     </div></div>';
-                    $daSkuShips[array_get($daSkus, $item['sku'], $item['sku'])] = 
-                    [
-                        'image'=>$item['image'],
-                        'quantity'=>0,
-                        'broads'=>0,
-                        'packages'=>0,
-                        'locations'=>[],
-                    ];
+
+                    $ships = $item['ships'];
+                    if(!empty($ships)){
+                        $shipSku = '';
+                        $locations= [];
+                        $quantity = $broads = $packages = 0;
+                        foreach($ships as $ship){
+                            $quantity += intval($ship['quantity']);
+                            $broads += intval($ship['broads']);
+                            $packages += intval($ship['packages']);
+                            $locations[] = $ship['location'];
+                            $shipSku = $ship['sku'];
+                        }
+                        
+                        $strShip.='<div class="row" style="margin-bottom:10px;text-align:left;">
+                        <div class="col-md-12">DASKU : '.$shipSku.'</div>
+                        <div class="col-md-6">Quantity : '.intval($quantity).'</div>
+                        <div class="col-md-6">Warehouse : '.array_get($item,'warehouse_code').'</div>
+                        <div class="col-md-6">Pallet Count : '.intval($broads).'</div>
+                        <div class="col-md-6">Boxes Count : '.intval($packages).'</div>
+                        <div class="col-md-12">Locations : '.implode(' , ',$locations).'</div>
+                        </div>';
+                    }
+                    
+                    
                 }
             }
             $str .= '<div class="col-md-12" style="text-align:left;"><span class="label label-primary">'.$list['reson'].'</span> <span class="label label-danger">'.$list['remark'].'</span></div>';
-            $items = $list['ships'];
-            $shipStr = '';
-            if(is_array($items)){
-                foreach($items as $item){
-                    $daSkuShips[$item['sku']]['quantity'] += intval($item['quantity']);
-                    $daSkuShips[$item['sku']]['broads'] += intval($item['broads']);
-                    $daSkuShips[$item['sku']]['packages'] += intval($item['packages']);
-                    $daSkuShips[$item['sku']]['locations'][]= $item['location'];
-                }
-                foreach($daSkuShips as $key=>$item){
-                    $shipStr .= '<div class="row" style="margin-bottom:5px;"><div class="col-md-2"><image src="https://images-na.ssl-images-amazon.com/images/I/'.$item['image'].'" width=100% height=100%></div>
-                    <div class="col-md-10" style="text-align:left;">
-                    <div class="col-md-6">DASKU : '.$key.'</div>
-                    <div class="col-md-6">Quantity : '.intval($item['quantity']).'</div>
-                    <div class="col-md-6">Pallet Count : '.intval($item['broads']).'</div>
-                    <div class="col-md-6">Boxes Count : '.intval($item['packages']).'</div>
-                    <div class="col-md-12">Locations : '.implode(' , ',$item['locations']).'</div>
-                    </div></div>';
-                }
-                
-            }
+        
             $records["data"][] = array(
                 '<input name="id[]" type="checkbox" class="checkboxes" value="'.$list['id'].'"  />',
                 $list['created_at'],
@@ -120,7 +130,7 @@ class DaPlanController extends Controller
                 $list['ship_date'],
                 $list['reservation_date'],
                 $str,
-                $shipStr.'<div class="col-md-12" style="text-align:left;"><span class="label label-danger">'.$list['api_msg'].'</span></div>',
+                $strShip.'<div class="col-md-12" style="text-align:left;"><span class="label label-danger">'.$list['api_msg'].'</span></div>',
                 $list['shipment_id'],
                 $list['reservation_id'],
                 array_get(TransferPlan::SHIPMETHOD,$list['ship_method']),
@@ -141,9 +151,8 @@ class DaPlanController extends Controller
         if($id){
             $form = TransferPlan::find($id)->toArray();
             $items = $form['items'];
-            $ships = $form['ships'];
         }
-        return view('transfer/daEdit',['form'=>$form ,'items'=>$items ,'ships'=>$ships ,'daSkus'=>$daSkus ,'warehouses'=>$warehouses]);
+        return view('transfer/daEdit',['form'=>$form ,'items'=>$items ,'daSkus'=>$daSkus ,'warehouses'=>$warehouses]);
     }
 
 
@@ -151,13 +160,31 @@ class DaPlanController extends Controller
     {
 		DB::beginTransaction();
         try{
-            $data = $request->all();
-            $id = $data['id'];
-            unset($data['id']);unset($data['_token']);
+            $id = $request->get('id');
+            
             if($id){
-                $transferPlan = TransferPlan::find($id);
-                if($transferPlan->tstatus==4) throw new \Exception('已发货状态无法修改!');
-                TransferPlan::updateOrCreate(['id'=>$id],$data);
+                $transferPlan = TransferPlan::findOrFail($id);
+                if(!in_array($transferPlan->tstatus,[1,2,3,8])) throw new \Exception('This Status Can Not Update!');
+                $transferPlan->tstatus = $request->get('tstatus');
+                $transferPlan->ship_date = $request->get('ship_date');
+                $transferPlan->reservation_date = $request->get('reservation_date');
+                if($transferPlan->tstatus == 4){
+                    if(!$transferPlan->ship_date) $transferPlan->ship_date=date('Y-m-d');
+                    if(!$transferPlan->reservation_date) $transferPlan->reservation_date=date('Y-m-d');
+                }
+                $transferPlan->save();
+                
+                $items = $transferPlan->items;
+                foreach($items as $item){
+                    $item->ships()->delete();
+                    $shipData = [];
+                    $ships = array_get($request->get('ships'),$item->id);
+                    if(empty($ships)) continue;
+                    foreach ($ships as $ship) {
+                        $shipData[] = new TransferPlanItemShip($ship);
+                    }
+                    $item->ships()->saveMany($shipData);
+                }
             }
             DB::commit();
             $records["customActionStatus"] = 'OK';
@@ -177,14 +204,8 @@ class DaPlanController extends Controller
             $customActionMessage='';
             foreach($_REQUEST["id"] as $plan_id){
                 $transferPlan = TransferPlan::find($plan_id);
-                if(empty($transferPlan)){
-                    $customActionMessage.='ID:'.$plan_id.' Not Exists!</BR>';
-                    continue;
-                }
-
-                if(!in_array($transferPlan->tstatus,[0,1,2,3,8])){
-                    $customActionMessage.='ID:'.$plan_id.' 状态无法修改!</BR>';
-                    continue;
+                if(!in_array($transferPlan->tstatus,[1,2,3,8])){
+                    throw new \Exception('ID:'.$plan_id.' This Status Can Not Update!</BR>');
                 }
 
                 $transferPlan->tstatus = $tstatus;

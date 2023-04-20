@@ -214,7 +214,7 @@
 						</div>
 						
 						<div class="col-md-2">
-						<input type="text" class="form-control" name="keyword" placeholder="keyword">
+						<input type="text" class="form-control" name="keyword" value="{{\Request::get('keyword')}}" placeholder="keyword">
 						</div>
 						
 						
@@ -286,7 +286,6 @@
                                     <th><div style="width:150px;">销售员</div></th>
                                     <th >账号</th>
                                     <th>Shipment ID</th>
-                                    <th >仓库代码</th>
                                     <th >运输方式</th>
                                     <th >运费</th>
                                     <th><div style="width:500px;">调拨详情</div></th>
@@ -372,7 +371,7 @@
                             text: '导出当前页',
                             title: 'Data export',
                             exportOptions: {
-                                columns: [ 1,2,3,4,5,6,7,8,9,10,11,12,13,14 ]
+                                columns: [ 1,2,3,4,5,6,7,8,9,10,11,12,13 ]
                             }
                         },
                     ],

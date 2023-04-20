@@ -24,7 +24,7 @@
                         {{ csrf_field() }}
                         <div class="row">
 						<div class="col-md-2">
-						<input type="text" class="form-control" name="ship_order_id" placeholder="Ship Order ID">
+						<input type="text" class="form-control" name="da_order_id" placeholder="Da Order ID">
 						</div>
                         
                         <div class="col-md-2">
@@ -162,7 +162,7 @@
             grid.setAjaxParam("ship_start", $("input[name='ship_start']").val());
 			grid.setAjaxParam("ship_end", $("input[name='ship_end']").val());
 			grid.setAjaxParam("keyword", $("input[name='keyword']").val());
-            grid.setAjaxParam("ship_order_id", $("input[name='ship_order_id']").val());
+            grid.setAjaxParam("da_order_id", $("input[name='da_order_id']").val());
             grid.setAjaxParam("tstatus", $("select[name='tstatus[]']").val());
 
             grid.init({

@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use App\SapAsinMatchSku;
 use App\User;
 use App\Models\TransferPlan;
+use App\Models\TransferPlanItem;
 use Illuminate\Support\Facades\Auth;
 use PDO;
 use DB;
@@ -76,9 +77,18 @@ class TransferPlanController extends Controller
             $datas = $datas->where('received_date','<=',array_get($_REQUEST,'received_end'));
         }
         if(array_get($_REQUEST,'keyword')){
-            $datas = $datas->where('items','like','%'.array_get($_REQUEST,'keyword').'%');
+            $keyword = array_get($_REQUEST,'keyword');
+            $datas = $datas->where(function ($query) use ($keyword) {
+                $query->where('shipment_id', 'like', '%'.$keyword.'%')
+                    ->orwhere('da_order_id', 'like', '%'.$keyword.'%')
+                    ->orwhereHas('items',function($itemQuery)use($keyword){
+                        $itemQuery->where('asin','like','%'.$keyword.'%')
+                            ->orWhere('sku','like','%'.$keyword.'%')
+                            ->orWhere('sellersku','like','%'.$keyword.'%')
+                            ->orWhere('fnsku','like','%'.$keyword.'%');
+                    });
+            });
         }
-        
         $sellers = getUsers('sap_seller');
         $accounts = getSellerAccount();
         $iTotalRecords = $datas->count();
@@ -116,7 +126,6 @@ class TransferPlanController extends Controller
                 $list['bg'].$list['bu'].'-'.array_get($sellers,intval($list['sap_seller_id'])),
                 array_get($accounts,$list['seller_id'],$list['seller_id']),
                 $list['shipment_id'],
-                $list['warehouse_code'],
                 array_get(TransferPlan::SHIPMETHOD,$list['ship_method']),
                 $list['ship_fee'],
                 $str,
@@ -155,19 +164,18 @@ class TransferPlanController extends Controller
 
         if (!empty($request['asin']) && !empty($request['marketplace_id'])) {
             $sql = "SELECT any_value(sku) as sku, seller_id, seller_sku from sap_asin_match_sku WHERE asin='" . $request['asin'] . "' AND marketplace_id='" . $request['marketplace_id'] . "' GROUP BY seller_id,seller_sku;";
-            $sellersku = DB::connection('vlz')->select($sql);
+            $sellersku = DB::connection('amazon')->select($sql);
             $data = (json_decode(json_encode($sellersku), true));
             $accounts = getSellerAccount();
             foreach($data as $k=>$v){
-                $data[$k]['seller_id'] = array_get($accounts,$v['seller_id'],$v['seller_id']);
+                $data[$k]['label'] = array_get($accounts,$v['seller_id'],$v['seller_id']);
                 $sku = $v['sku'];
-                $seller_id = $v['seller_id'];
             }
-            $images = DB::connection('vlz')->table('asins')->where('asin',$request['asin'])->where('marketplaceid',$request['marketplace_id'])->value('images');
+            $images = DB::connection('amazon')->table('asins')->where('asin',$request['asin'])->where('marketplaceid',$request['marketplace_id'])->value('images');
             $images = explode(',',$images);
             $image = array_get($images,0);
         }
-        return ['seller_sku_list' => $data , 'sku' => $sku, 'seller_id' => $seller_id, 'image' => $image];
+        return ['seller_sku_list' => $data , 'sku' => $sku, 'image' => $image];
     }
 	
     public function getUploadData(Request $request)
@@ -216,56 +224,74 @@ class TransferPlanController extends Controller
     {
 		DB::beginTransaction();
         try{
-            $data = $request->all();
-            $id = $data['id'];
-            unset($data['id']);unset($data['_token']);
-            $transferPlan = TransferPlan::find($id);
-            if((!empty($transferPlan) && $transferPlan->sap_seller_id == \Auth::user()->sap_seller_id && $transferPlan->status<=1) || empty($transferPlan)){
-                $items = $data['items'];
-                $currencyRate = DB::connection('vlz')->table('currency_rates')->where('currency','USD')->value('rate');
-                $warehousesFee = DB::connection('vlz')->table('amazon_warehouse_fee')->pluck('fee','code')->toArray();
+            $id = $request->get('id');
+            $transferPlan = $id?(TransferPlan::findOrFail($id)):(new TransferPlan);
+            if($transferPlan->status==6) throw new \Exception('已审批状态无法修改!');
+            $transferPlan->remark = $request->get('remark');
+            $transferPlan->status = $request->get('status');
+            $transferPlan->api_msg = null;
+
+            $items = [];
+            if(($id && $transferPlan->sap_seller_id == \Auth::user()->sap_seller_id && $transferPlan->status<=1) || !$id){
+                $items = $request->get('items');
+                $currencyRate = DB::connection('amazon')->table('currency_rates')->where('currency','USD')->value('rate');
+                $warehousesFee = DB::connection('amazon')->table('amazon_warehouse_fee')->pluck('fee','code')->toArray();
                 if(!$currencyRate) throw new \Exception('缺失汇率数据!');
-                
-                $data['broads'] = $data['ship_fee'] = $data['packages'] = 0;
+                $broads = $ship_fee = $packages = 0;
                 foreach($items as $key=>$item){
-                    $data['warehouse_code'] = $item['warehouse_code'];
-                    $sizeInfo = DB::connection('vlz')->table('sku_size')->where('sku',$item['sku'])->first();
+                    
+                    $sizeInfo = DB::connection('amazon')->table('sku_size')->where('sku',$item['sku'])->first();
                     if(empty($sizeInfo)){
                         throw new \Exception($item['sku'].'缺失基础数据!');
                     }
-                    $data['items'][$key]['broads'] = ceil(($sizeInfo->volume)*intval($item['packages'])/1.5);
-                    $data['items'][$key]['ship_fee'] = 0;
-                    if($data['ship_method']=='other'){
+                    $items[$key]['broads'] = ceil(($sizeInfo->volume)*intval($item['packages'])/1.5);
+                    $items[$key]['ship_fee'] = 0;
+                    if($request->get('ship_method')=='other'){
                         $warehouseFee = round(array_get($warehousesFee,$item['warehouse_code']),2);
-                        if(!$warehouseFee) throw new \Exception($data['warehouse_code'].'缺失运费数据!');
-                        $data['items'][$key]['ship_fee'] += round($data['items'][$key]['broads']*$warehouseFee,2);
+                        if(!$warehouseFee) throw new \Exception($item['warehouse_code'].'缺失运费数据!');
+                        $items[$key]['ship_fee'] += round($items[$key]['broads']*$warehouseFee,2);
                     }
                     if($item['rcard']=='1'){
-                        $data['items'][$key]['ship_fee'] += 0.5*intval($item['quantity']);
+                        $items[$key]['ship_fee'] += 0.5*intval($item['quantity']);
                     }
-                    $data['items'][$key]['ship_fee'] += 0.35*intval($item['quantity']);
-                    $data['items'][$key]['ship_fee'] += $data['items'][$key]['broads']*15;
-                    $data['items'][$key]['ship_fee'] += (($data['ship_method']=='other')?1.2:1.8)*intval($item['packages']);
-                    $data['items'][$key]['ship_fee'] += (0.5*intval($item['quantity'])<8*intval($item['packages']))?0.5*intval($item['quantity']):8*intval($item['packages']);
-                    $data['items'][$key]['ship_fee'] = round($data['items'][$key]['ship_fee']*$currencyRate,2);
+                    $items[$key]['ship_fee'] += 0.35*intval($item['quantity']);
+                    $items[$key]['ship_fee'] += $items[$key]['broads']*15;
+                    $items[$key]['ship_fee'] += (($request->get('ship_method')=='other')?1.2:1.8)*intval($item['packages']);
+                    $items[$key]['ship_fee'] += (0.5*intval($item['quantity'])<8*intval($item['packages']))?0.5*intval($item['quantity']):8*intval($item['packages']);
+                    $items[$key]['ship_fee'] = round($items[$key]['ship_fee']*$currencyRate,2);
 
-                    $data['broads']+=$data['items'][$key]['broads'];
-                    $data['packages']+=intval($item['packages']);
-                    $data['ship_fee']+=$data['items'][$key]['ship_fee'];
+                    $broads+=$items[$key]['broads'];
+                    $packages+=intval($item['packages']);
+                    $ship_fee+=$items[$key]['ship_fee'];
                 }
-            }
-            if(!empty($transferPlan)){
-                if($transferPlan->sap_seller_id != \Auth::user()->sap_seller_id || $transferPlan->status>1){
-                    $data = [];
-                    $data['status'] = $request->get('status');
-                }
-                if($transferPlan->status==6) throw new \Exception('已审批状态无法修改!');
-                TransferPlan::updateOrCreate(['id'=>$id],$data);
+                $transferPlan->sap_seller_id = Auth::user()->sap_seller_id;
+                $transferPlan->bg = Auth::user()->ubg;
+                $transferPlan->bu = Auth::user()->ubu;
+                $transferPlan->seller_id = $request->get('seller_id');
+                $transferPlan->marketplace_id = $request->get('marketplace_id');
+                $transferPlan->in_factory_code = $request->get('in_factory_code');
+                $transferPlan->out_factory_code = $request->get('out_factory_code');
+                $transferPlan->received_date = $request->get('received_date');
+                $transferPlan->shipment_id = $request->get('shipment_id');
+                $transferPlan->reservation_id = $request->get('reservation_id');
+                $transferPlan->ship_method = $request->get('ship_method');
+                $transferPlan->reson = $request->get('reson');
+                $transferPlan->remark = $request->get('remark');
+                $transferPlan->broads = $broads;
+                $transferPlan->packages = $packages;
+                $transferPlan->ship_fee = $ship_fee;
             }else{
-                $data['sap_seller_id'] = Auth::user()->sap_seller_id;
-                $data['bg'] = Auth::user()->ubg;
-                $data['bu'] = Auth::user()->ubu;
-                TransferPlan::create($data);
+                $items=[];
+            }
+            
+            $transferPlan->save();
+            if($items){
+                $transferPlan->items()->delete();
+                $itemData = [];
+                foreach ($items as $item) {
+                    $itemData[] = new TransferPlanItem($item);
+                }
+                $transferPlan->items()->saveMany($itemData);
             }
             DB::commit();
             $records["customActionStatus"] = 'OK';
@@ -286,12 +312,10 @@ class TransferPlanController extends Controller
             foreach($_REQUEST["id"] as $plan_id){
                 $transferPlan = TransferPlan::find($plan_id);
                 if(empty($transferPlan)){
-                    $customActionMessage.='ID:'.$plan_id.' 不存在!</BR>';
-                    continue;
+                    throw new \Exception('ID:'.$plan_id.' 不存在!');
                 }
                 if($transferPlan->status == 6){
-                    $customActionMessage.='ID:'.$plan_id.' 已审批状态无法修改!</BR>';
-                    continue;
+                    throw new \Exception('ID:'.$plan_id.' 已审批状态无法修改!');
                 }
                 $transferPlan->status = $status;
                 $transferPlan->save();

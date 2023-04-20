@@ -54,7 +54,7 @@ class PostDa extends Command
 
 		$checks = TransferPlan::where('status',5)->where('tstatus',0)->get();
 		foreach($checks as $data){
-			$subject = $data->shipment_id.' 调拨请求需要审核!';
+			$subject = 'ShipmentID '.$data->shipment_id.' 调拨请求需要审核!';
 			$html = new \Html2Text\Html2Text($subject);
 			Mail::send(['emails.common','emails.common-text'],['content'=>$subject,'contentText'=>$html->getText()], function($m) use($subject,$shipEmail)
 			{
@@ -67,20 +67,22 @@ class PostDa extends Command
 		$daSkus = DB::connection('amazon')->table('da_sku_match')->pluck('da_sku','sku')->toArray();
 		$amazonWarehouses = DB::connection('amazon')->table('amazon_warehouses')->get()->keyBy('code')->toArray();
 		$creates = TransferPlan::where('status',6)->where('tstatus',0)->whereNull('da_order_id')->get();
+		
 		foreach($creates as $data){
 			try{
 				$items = $data->items;
+				
 				$header=$profile=$details=$files=$sku = $fnsku = $postData= [];
-				if(is_array($items)){
+				if(!empty($items)){
 					foreach($items as $item){
-						$sku[]=array_get($item,'sku');
-						$fnsku[] =array_get($item,'fnsku');
+
+						$sku[]=$item->sku;
+						$fnsku[] =$item->fnsku;
 						$details[]=[
-							'item_no'=>array_get($daSkus, array_get($item,'sku'), array_get($item,'sku')),
-							'remark'=>array_get($item,'warehouse_code'),
-							'qty'=>intval(array_get($item,'quantity'))
+							'item_no'=>array_get($daSkus, $item->sku, $item->sku),
+							'qty'=>intval($item->quantity)
 						];
-						$warehouse = array_get($amazonWarehouses, array_get($item,'warehouse_code'));
+						$warehouse = array_get($amazonWarehouses, $item->warehouse_code);
 					}
 				}
 				$header[]='content-type: application/json';
@@ -89,7 +91,7 @@ class PostDa extends Command
 				
 				$profile['customer_code']=$customerCode;
 				$profile['customer_ref_no']=implode('/',$fnsku).'-'.$data->shipment_id;
-				$profile['po_no']=$data->warehouse_code.'-'.implode('/',$sku);
+				$profile['po_no']=$warehouse->code.'-'.implode('/',$sku);
 				$profile['ship_via']=$data->ship_method;
 				$profile['ship_to_name']='AMAZON '.$warehouse->code;
 				$profile['ship_to_address']=$warehouse->address;
@@ -102,21 +104,22 @@ class PostDa extends Command
 				$profile['pallet_count']=$data->broads;
 				$profile['remark']=$data->remark;
 				$postData['profile'] = $profile;
-				$postData['items'] = $details;
-				
-				$uploads = explode(',', $data->files);
-				foreach($uploads as $upload){
-					$files[]=['file_name'=>basename(public_path($upload)),'file_content'=>base64_encode(file_get_contents(public_path($upload)))];
+				$postData['items'] = $details;	
+				if(!empty($data->files)){
+					$uploads = explode(',', $data->files);
+					foreach($uploads as $upload){
+						$files[]=['file_name'=>basename(public_path($upload)),'file_content'=>base64_encode(file_get_contents(public_path($upload)))];
+					}
 				}
 				$postData['files'] = $files;
-				$result = json_decode($this->postJson($url.'outbound/postOutbound', $postData, $header),true);
+				$result = json_decode($this->postJson($url.'/outbound/postOutbound', $postData, $header),true);
 				
 				if(array_get($result,'code')=='200'){
 					$data->da_order_id = array_get($result,'msg');
 					$data->tstatus=1;
 					$data->api_msg = null;
 					$data->save();
-					$subject = 'Ref No. '.implode('/',$fnsku).'-'.$data->shipment_id.' Attachs!';
+					$subject = 'Order No. '.$data->da_order_id.' Ref No. '.implode('/',$fnsku).'-'.$data->shipment_id.' Attachs!';
 					$html = new \Html2Text\Html2Text($subject);
 					Mail::send(['emails.common','emails.common-text'],['content'=>$subject,'contentText'=>$html->getText()],  function($m) use($subject,$daEmail,$uploads)
 					{
@@ -132,10 +135,6 @@ class PostDa extends Command
 					$data->api_msg = array_get($result,'msg').json_encode(array_get($result,'data'));
 					$data->save();
 				}
-				
-
-				
-
 			}catch (\Exception $e) { 
 				Log::Info($e->getMessage());
 			} 
@@ -146,15 +145,21 @@ class PostDa extends Command
 		$updates = TransferPlan::where('status',6)->where('tstatus',4)->whereNotNull('da_order_id')->get();
 		foreach($updates as $data){
 			try{
-				$items = $data->ships;
+				$items = $data->items;
 				$header=$profile=$details=$files=$sku = $fnsku = $postData= [];
-				if(is_array($items)){
+				if(!empty($items)){
 					foreach($items as $item){
-						$details[]=[
-							'item_no'=>array_get($item,'sku'),
-							'location_name'=>array_get($item,'location'),
-							'qty'=>intval(array_get($item,'quantity'))
-						];
+						$ships = $item->ships;
+						if(!empty($ships)){
+							foreach($ships as $ship){
+								$details[]=[
+									'item_no'=>$ship->sku,
+									'location_name'=>$ship->location,
+									'remark'=>$item->warehouse_code,
+									'qty'=>intval($ship->quantity)
+								];
+							}
+						}
 					}
 				}
 				$header[]='content-type: application/json';
@@ -165,10 +170,11 @@ class PostDa extends Command
 				$profile['actual_date']=date('Y-m-d\TH:i:s',strtotime($data->ship_date));
 				$postData['profile'] = $profile;
 				$postData['items'] = $details;
-				$result = json_decode($this->postJson($url.'outbound/SetCompleteOutbound', $postData, $header),true);
+				$result = json_decode($this->postJson($url.'/outbound/SetCompleteOutbound', $postData, $header),true);
+				
 				if(array_get($result,'code')=='200'){
 					$data->tstatus=5;
-					$data->api_msg = null;
+					$data->api_msg = null;	
 				}else{
 					$data->api_msg = array_get($result,'msg').json_encode(array_get($result,'data'));
 				}
