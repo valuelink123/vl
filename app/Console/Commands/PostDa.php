@@ -7,6 +7,7 @@ use App\Models\TransferPlan;
 use Swift_Mailer;
 use Swift_SendmailTransport;
 use Swift_SmtpTransport;
+use App\Classes\SapRfc;
 use Illuminate\Support\Facades\Mail;
 use DB;
 use Log;
@@ -184,7 +185,65 @@ class PostDa extends Command
 				Log::Info($e->getMessage());
 			} 
 		}
-		
+
+
+		$createSap = TransferPlan::where('status',6)->where('tstatus',6)->whereNotNull('da_order_id')->get();
+		foreach($createSap as $data){
+			try{
+				$sapData = $ITAB1=$ITAB2=$LINENUM=[];
+				$items = $data->items;
+				if(!empty($items)){
+					foreach($items as $item){
+						$ITAB1[$data->shipment_id.$item->warehouse_code] = 
+						[
+							'ZID'=>$data->shipment_id.$item->warehouse_code,
+							'ZEBELN'=>$data->da_order_id,
+							'BSART'=>'UB',
+							'EKORG'=>'VL02',
+							'EKGRP'=>'G11',
+							'BUKRS'=>'2000',
+							'LIFNR'=>'US04',
+						];
+						$LINENUM[$data->shipment_id.$item->warehouse_code]=0;
+						$ships = $item->ships;
+						if(!empty($ships)){
+							foreach($ships as $ship){
+								$LINENUM[$data->shipment_id.$item->warehouse_code]+=10;
+								$ITAB2[] = 
+								[
+									'ZID'=>$data->shipment_id.$item->warehouse_code,
+									'EBELP'=>$LINENUM[$data->shipment_id.$item->warehouse_code],
+									'PSTYP'=>'U',
+									'EINDT'=>date('Ymd',strtotime($data->ship_date)),
+									'MATNR'=>$item->sku,
+									'MENGE'=>$ship->quantity,
+									'TRAGR'=>'10',
+									'RWERKS'=>'US01',
+									'RLGORT'=>'AAA1',
+									'SLGORT'=>'US1',
+									'WLIFNR'=>'SZ-DA',
+								];
+								
+							}
+						}
+					}
+				}
+				$sap = new SapRfc();
+				$sapData['postdata']['EXPORT']=array('O_MSG'=>'','O_FLAG'=>'');
+				$sapData['postdata']['TABLE']=array('I_TAB1'=>$ITAB1, 'I_TAB2'=>$ITAB2);
+			    $sapData['istest'] = 1;
+				$res = $sap->ZFMPHPRFC034($sapData);
+				if(array_get($res,'ack')==1 && array_get($res,'data.O_FLAG')=='X'){
+					$data->tstatus=7;
+					$data->api_msg = null;	
+				}else{
+					$data->api_msg = array_get($res,'data.O_FLAG').array_get($res,'data.O_MSG');
+				}
+				$data->save();
+			}catch (\Exception $e) { 
+				Log::Info($e->getMessage());
+			} 
+		}
 	}
 
 
