@@ -43,7 +43,7 @@ class TransferPlan extends Model {
         '4'=>'已发货',
         '5'=>'DA系统订单已完成',
         '6'=>'物流确认运费',
-        '7'=>'SAP创建调拨单',
+        '7'=>'SAP已创建调拨单',
         '8'=>'取消发货',
     ];
 
@@ -52,7 +52,6 @@ class TransferPlan extends Model {
         '2'=>'换标中',
         '3'=>'待出库',
         '4'=>'已发货',
-        '5'=>'DA系统订单已完成',
         '8'=>'取消发货',
     ];
 
@@ -60,7 +59,6 @@ class TransferPlan extends Model {
     const SHIPSHIPMENTSTATUS = [
         '5'=>'DA系统订单已完成',
         '6'=>'物流确认运费',
-        '7'=>'SAP创建调拨单',
         '8'=>'取消发货',
     ];
 

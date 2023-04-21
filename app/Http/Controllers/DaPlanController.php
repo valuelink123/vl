@@ -255,9 +255,10 @@ class DaPlanController extends Controller
 				if($daOrderId && $daSku && $sku && $warehouseCode){
                     $transferPlanItemId = 0;
                     $transferPlanItems = TransferPlanItem::with('plan')->whereHas('plan',function($idQuery)use($daOrderId){
-                        $idQuery->where('da_order_id',$daOrderId);
-                    })->where('sku',$sku)->where('warehouse_code',$warehouseCode)->where('status',6)->whereIn('tstatus',[1,2,3])->get();
-                    foreach($transferPlanItems as $transferPlanItem){
+                        $idQuery->where('da_order_id',$daOrderId)->where('status',6)->whereIn('tstatus',[1,2,3]);
+                    })->where('sku',$sku)->where('warehouse_code',$warehouseCode)->get();
+                   
+		    foreach($transferPlanItems as $transferPlanItem){
                         $transferPlanItem->ships()->delete();
                         $transferPlanItemId = $transferPlanItem->id;
                     }
@@ -274,8 +275,9 @@ class DaPlanController extends Controller
                         ];
                     }
 				}
-                if(!empty($updateData)) TransferPlanItem::insert($updateData);
+                
 			}
+	 		if(!empty($updateData)) TransferPlanItemShip::insert($updateData);
             DB::commit();
 			$records["customActionStatus"] = 'OK';
 			$records["customActionMessage"] = 'Upload Successed!';  

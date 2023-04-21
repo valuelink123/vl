@@ -445,9 +445,9 @@ Route::Post('/transferPlan/updateFiles', 'TransferPlanController@updateFiles')->
 
 Route::resource('daPlan', 'DaPlanController');
 Route::Post('/daPlan/get', 'DaPlanController@get')->name('getDaPlan');
-Route::Post('/daPlan/batchUpdate', 'daPlanController@batchUpdate')->name('daPlanBatchUpdate');
-Route::Post('/daPlan/update', 'daPlanController@update')->name('update');
-Route::Post('/daPlan/upload', 'daPlanController@upload');
+Route::Post('/daPlan/batchUpdate', 'DaPlanController@batchUpdate')->name('daPlanBatchUpdate');
+Route::Post('/daPlan/update', 'DaPlanController@update')->name('update');
+Route::Post('/daPlan/upload', 'DaPlanController@upload');
 
 Route::resource('shipPlan', 'ShipPlanController');
 Route::Post('/shipPlan/get', 'ShipPlanController@get')->name('getShipPlan');

@@ -170,7 +170,7 @@ class ShipPlanController extends Controller
             $id = $request->get('id');
             if($id){
                 $transferPlan = TransferPlan::findOrFail($id);
-                if(!in_array($transferPlan->tstatus,[5,6,8])) throw new \Exception('This Status Can Not Update!');
+                if(!in_array($transferPlan->tstatus,[5,8])) throw new \Exception('This Status Can Not Update!');
                 $transferPlan->tstatus = $request->get('tstatus');
                 $transferPlan->ship_fee = $request->get('ship_fee');
                 $transferPlan->save();    
@@ -197,7 +197,7 @@ class ShipPlanController extends Controller
                 if(empty($transferPlan)){
                     throw new \Exception('ID:'.$plan_id.' 不存在!');
                 }
-                if(!in_array($transferPlan->tstatus,[5,6,8])){
+                if(!in_array($transferPlan->tstatus,[5,8])){
                     throw new \Exception('ID:'.$plan_id.' 状态无法修改!');
                 }
 

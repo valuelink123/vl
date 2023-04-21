@@ -110,9 +110,7 @@
                         </div>
                     </div>
 
-                    <div class="col-md-4">
-                    </div>
-                    <div class="col-md-4">
+                    <div class="col-md-8" style="text-align:right;">
                         <input id="importFile" name="importFile" type="file" style="display:none">
                         {{ csrf_field() }}
                         <input id="importFileTxt" name="importFileTxt" type="text" class="form-control input-inline">
@@ -327,9 +325,11 @@ $(function() {
 			success: function (result) {
 
 				if(result.customActionStatus=='OK'){  
-					
+				toastr.success(result.customActionMessage);
+                    var dttable = $('#datatable_ajax').dataTable();
+					dttable.api().ajax.reload(null, false);	
 				}else{
-					toastr.error(data.customActionMessage);
+					toastr.error(result.customActionMessage);
 				}
 			},
 			error: function(result) {

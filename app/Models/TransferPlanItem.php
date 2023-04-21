@@ -31,7 +31,7 @@ class TransferPlanItem extends Model {
 
     public function plan():BelongsTo
     {
-        return $this->belongsTo(TransferPlan::class, 'id', 'transfer_plan_id');
+        return $this->belongsTo(TransferPlan::class,'transfer_plan_id','id');
     }
 
     public function ships():hasMany
