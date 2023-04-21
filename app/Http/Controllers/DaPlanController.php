@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use App\SapAsinMatchSku;
 use App\User;
 use App\Models\TransferPlan;
+use App\Models\TransferPlanItem;
 use App\Models\TransferPlanItemShip;
 use Illuminate\Support\Facades\Auth;
 use PDO;
@@ -207,7 +208,10 @@ class DaPlanController extends Controller
                 if(!in_array($transferPlan->tstatus,[1,2,3,8])){
                     throw new \Exception('ID:'.$plan_id.' This Status Can Not Update!</BR>');
                 }
-
+                if($transferPlan->tstatus == 4){
+                    if(!$transferPlan->ship_date) $transferPlan->ship_date=date('Y-m-d');
+                    if(!$transferPlan->reservation_date) $transferPlan->reservation_date=date('Y-m-d');
+                }
                 $transferPlan->tstatus = $tstatus;
                 $transferPlan->save();
                 $customActionMessage.='ID:'.$plan_id.' Update Success!</BR>';
@@ -222,4 +226,64 @@ class DaPlanController extends Controller
         }    
         echo json_encode($records); 
     }
+
+    public function upload( Request $request )
+    {
+		try{
+            $updateData=[];
+            DB::beginTransaction();
+            $daSkus = DB::connection('amazon')->table('da_sku_match')->pluck('sku','da_sku')->toArray();
+			$file = $request->file('file');
+			$ext = $file->getClientOriginalExtension();
+			$newname = date('His').uniqid().'.'.$ext;
+			$newpath = '/uploads/da/'.date('Ymd').'/';
+			$inputFileName = public_path().$newpath.$newname;
+			$file->move(public_path().$newpath,$newname);
+			$spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($inputFileName);
+			$importData = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
+            $date=date('Y-m-d H:i:s');
+			foreach($importData as $key => $data){
+				if($key==1) continue;
+				$daOrderId = trim(array_get($data,'A'));
+				$daSku = trim(array_get($data,'B'));
+				$warehouseCode = trim(array_get($data,'C'));
+                $qty = intval(array_get($data,'D'));
+				$location = trim(array_get($data,'E'));
+                $broads = intval(array_get($data,'F'));
+				$packages = intval(array_get($data,'G'));
+                $sku = array_get($daSkus, $daSku, $daSku);
+				if($daOrderId && $daSku && $sku && $warehouseCode){
+                    $transferPlanItemId = 0;
+                    $transferPlanItems = TransferPlanItem::with('plan')->whereHas('plan',function($idQuery)use($daOrderId){
+                        $idQuery->where('da_order_id',$daOrderId);
+                    })->where('sku',$sku)->where('warehouse_code',$warehouseCode)->where('status',6)->whereIn('tstatus',[1,2,3])->get();
+                    foreach($transferPlanItems as $transferPlanItem){
+                        $transferPlanItem->ships()->delete();
+                        $transferPlanItemId = $transferPlanItem->id;
+                    }
+                    if($transferPlanItemId){
+                        $updateData[]=[
+                            'transfer_plan_item_id'=>$transferPlanItemId,
+                            'sku'=>$daSku,
+                            'location'=>$location,
+                            'quantity'=>$qty,
+                            'broads'=>$broads,
+                            'packages'=>$packages,
+                            'created_at'=>$date,
+                            'updated_at'=>$date,
+                        ];
+                    }
+				}
+                if(!empty($updateData)) TransferPlanItem::insert($updateData);
+			}
+            DB::commit();
+			$records["customActionStatus"] = 'OK';
+			$records["customActionMessage"] = 'Upload Successed!';  
+        }catch (\Exception $e) { 
+            DB::rollBack();
+            $records["customActionStatus"] = '';
+            $records["customActionMessage"] = $e->getMessage();
+		}    
+        echo json_encode($records);  
+	}
 }

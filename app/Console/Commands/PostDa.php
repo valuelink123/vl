@@ -76,13 +76,14 @@ class PostDa extends Command
 				if(!empty($items)){
 					foreach($items as $item){
 
-						$sku[]=$item->sku;
+						$sku[]=array_get($daSkus, $item->sku, $item->sku);
+						$warehouse[] = $item->warehouse_code;
 						$fnsku[] =$item->fnsku;
 						$details[]=[
 							'item_no'=>array_get($daSkus, $item->sku, $item->sku),
 							'qty'=>intval($item->quantity)
 						];
-						$warehouse = array_get($amazonWarehouses, $item->warehouse_code);
+						$wh = array_get($amazonWarehouses, $item->warehouse_code);
 					}
 				}
 				$header[]='content-type: application/json';
@@ -91,13 +92,13 @@ class PostDa extends Command
 				
 				$profile['customer_code']=$customerCode;
 				$profile['customer_ref_no']=implode('/',$fnsku).'-'.$data->shipment_id;
-				$profile['po_no']=$warehouse->code.'-'.implode('/',$sku);
+				$profile['po_no']=implode('/',$warehouse).'-'.implode('/',$sku);
 				$profile['ship_via']=$data->ship_method;
-				$profile['ship_to_name']='AMAZON '.$warehouse->code;
-				$profile['ship_to_address']=$warehouse->address;
-				$profile['ship_to_city']=$warehouse->city;
-				$profile['ship_to_state']=$warehouse->state;
-				$profile['ship_to_zipcode']=$warehouse->zip;
+				$profile['ship_to_name']='AMAZON '.implode('/',$warehouse);
+				$profile['ship_to_address']=$wh->address;
+				$profile['ship_to_city']=$wh->city;
+				$profile['ship_to_state']=$wh->state;
+				$profile['ship_to_zipcode']=$wh->zip;
 				$profile['ship_to_contact']='';
 				$profile['ship_to_tel']='';
 				$profile['etd']=date('Y-m-d\TH:i:s',strtotime($data->created_at));

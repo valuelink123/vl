@@ -79,8 +79,23 @@
 					
                 </div>
 				
-                <div class="portlet-title">
-					<div class="col-md-4 batchU" style="float:left;padding:0px;">
+                <div class="portlet-title" style="padding-bottom:10px;">
+                    <div class="col-md-4">
+                    </div>
+
+                    <div class="col-md-8" style="text-align:right;">
+                        <?php 
+                        $color_arr=['0'=>'red-sunglo','1'=>'yellow-crusta','2'=>'purple-plum','3'=>'blue-hoki','4'=>'blue-madison','5'=>'green-meadow'];
+                        $i=0;
+                        foreach (\App\Models\TransferPlan::DASHIPMENTSTATUS as $k=>$v){
+                        ?>
+                        <button type="button" class="btn {{array_get($color_arr,(($i>=7)?$i-7:$i))}}">{{$v}} : {{array_get($statusList,$k,0)}}</button>
+                        <?php 
+                        $i++;
+                        } ?>
+                    </div>
+
+                    <div class="col-md-4 batchU" style="float:left;padding:0px;">
                         <div class="table-actions-wrapper" id="table-actions-wrapper">
                             <select id="confirmStatus" class="table-group-action-input form-control input-inline">
                                 <option value="">Select Ship Status</option>
@@ -95,16 +110,17 @@
                         </div>
                     </div>
 
-                    <div class="col-md-8">
-                        <?php 
-                        $color_arr=['0'=>'red-sunglo','1'=>'yellow-crusta','2'=>'purple-plum','3'=>'blue-hoki','4'=>'blue-madison','5'=>'green-meadow'];
-                        $i=0;
-                        foreach (\App\Models\TransferPlan::DASHIPMENTSTATUS as $k=>$v){
-                        ?>
-                        <button type="button" class="btn {{array_get($color_arr,(($i>=7)?$i-7:$i))}}">{{$v}} : {{array_get($statusList,$k,0)}}</button>
-                        <?php 
-                        $i++;
-                        } ?>
+                    <div class="col-md-4">
+                    </div>
+                    <div class="col-md-4">
+                        <input id="importFile" name="importFile" type="file" style="display:none">
+                        {{ csrf_field() }}
+                        <input id="importFileTxt" name="importFileTxt" type="text" class="form-control input-inline">
+                        <a id="importButton" class="btn red input-inline" >Browse</a>
+
+                        <button id="importSubmit" class="btn blue input-inline">Upload</button>
+    
+                        <a href="{{ url('/uploads/da/da.xls')}}" class="help-inline" style="margin-top:8px;margin-left:10px;">Template </a>
                     </div>
 					
                 </div>
@@ -280,6 +296,48 @@ $(function() {
 	    dttable.fnDestroy(); 
 		TableDatatablesAjax.init();
 	});
+    $("#importButton,#importFileTxt").click(function(){
+		$("#importFile").trigger("click");
+	});
+
+	$('input[id=importFile]').change(function() {
+		$('#importFileTxt').val($(this).val());
+	});
+
+	$("#importSubmit").click(function () {
+		var fileObj = document.getElementById("importFile").files[0];
+		if (typeof (fileObj) == "undefined" || fileObj.size <= 0) {
+			alert("Please Select File!");
+			return false;
+		}
+		var formFile = new FormData();
+		formFile.append("file", fileObj);
+		var data = formFile;
+		$.ajaxSetup({
+			headers: { 'X-CSRF-TOKEN' : '{{ csrf_token() }}' }
+		});
+		$.ajax({
+			url: "/daPlan/upload",
+			data: data,
+			type: "Post",
+			dataType: "json",
+			cache: false,
+			processData: false,
+			contentType: false,
+			success: function (result) {
+
+				if(result.customActionStatus=='OK'){  
+					
+				}else{
+					toastr.error(data.customActionMessage);
+				}
+			},
+			error: function(result) {
+                toastr.error(result.responseText);
+			}
+		});
+	});
+
 	$('#datatable_ajax').on('dblclick', 'td:not(:has(input),:has(button))', function (e) {
         e.preventDefault();
         var planId = $(this).closest('tr').find('.checkboxes').prop('value');
