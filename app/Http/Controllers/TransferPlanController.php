@@ -148,7 +148,7 @@ class TransferPlanController extends Controller
     public function edit(Request $request,$id)
     {
         $warehouses = DB::connection('amazon')->table('amazon_warehouses')->selectRaw("code,concat(city,' ',address,' ',zip) as address")->pluck('address','code');
-		$factorys = SapAsinMatchSku::where('sap_factory_code','<>','')->whereNotNull('sap_factory_code')->groupBy('sap_factory_code')->select(['sap_factory_code'])->pluck('sap_factory_code')->toArray();
+	$factorys = SapAsinMatchSku::where('sap_factory_code','<>','')->whereNotNull('sap_factory_code')->groupBy('sap_factory_code')->select(['sap_factory_code'])->pluck('sap_factory_code')->toArray();
 		$form=$items=[];
         if($id){
             $form = TransferPlan::find($id)->toArray();
@@ -222,20 +222,22 @@ class TransferPlanController extends Controller
 
     public function update(Request $request)
     {
-		DB::beginTransaction();
+	DB::beginTransaction();
         try{
             $id = $request->get('id');
+	    $exShipmentId = TransferPlan::where('id','<>',intval($id))->where('shipment_id',$request->get('shipment_id'))->value('shipment_id');
+	    if($exShipmentId) throw new \Exception('ShipmentId 已存在!');	
             $transferPlan = $id?(TransferPlan::findOrFail($id)):(new TransferPlan);
             if($transferPlan->status==6) throw new \Exception('已审批状态无法修改!');
             $transferPlan->remark = $request->get('remark');
             $transferPlan->status = $request->get('status');
             $transferPlan->api_msg = null;
-
+	    
             $items = [];
             if(($id && $transferPlan->sap_seller_id == \Auth::user()->sap_seller_id && $transferPlan->status<=1) || !$id){
                 $items = $request->get('items');
                 $currencyRate = DB::connection('amazon')->table('currency_rates')->where('currency','USD')->value('rate');
-                $warehousesFee = DB::connection('amazon')->table('amazon_warehouse_fee')->pluck('fee','code')->toArray();
+                $warehousesFee = DB::connection('amazon')->table('amazon_warehouses')->pluck('fee','code')->toArray();
                 if(!$currencyRate) throw new \Exception('缺失汇率数据!');
                 $broads = $ship_fee = $packages = 0;
                 foreach($items as $key=>$item){

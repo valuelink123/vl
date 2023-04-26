@@ -162,32 +162,36 @@ class DaPlanController extends Controller
 		DB::beginTransaction();
         try{
             $id = $request->get('id');
+            $shiped =false;
             
-            if($id){
                 $transferPlan = TransferPlan::findOrFail($id);
                 if(!in_array($transferPlan->tstatus,[1,2,3,8])) throw new \Exception('This Status Can Not Update!');
-                $transferPlan->tstatus = $request->get('tstatus');
-                $transferPlan->ship_date = $request->get('ship_date');
-                $transferPlan->reservation_date = $request->get('reservation_date');
-                if($transferPlan->tstatus == 4){
-                    if(!$transferPlan->ship_date) $transferPlan->ship_date=date('Y-m-d');
-                    if(!$transferPlan->reservation_date) $transferPlan->reservation_date=date('Y-m-d');
-                }
-                $transferPlan->save();
-                
                 $items = $transferPlan->items;
                 foreach($items as $item){
                     $item->ships()->delete();
                     $shipData = [];
                     $ships = array_get($request->get('ships'),$item->id);
-                    if(empty($ships)) continue;
+                    if(empty($ships)) {
+			continue;
+		    }else{
+			$shiped = true;
+		    }
                     foreach ($ships as $ship) {
                         $shipData[] = new TransferPlanItemShip($ship);
                     }
                     $item->ships()->saveMany($shipData);
                 }
+            
+	    if(!$shiped && $request->get('tstatus')==4) throw new \Exception('No Items Shiped Can Not Update!');
+            $transferPlan->tstatus = $request->get('tstatus');
+            $transferPlan->ship_date = $request->get('ship_date');
+            $transferPlan->reservation_date = $request->get('reservation_date');
+            if($transferPlan->tstatus == 4){
+                if(!$transferPlan->ship_date) $transferPlan->ship_date=date('Y-m-d');
+                if(!$transferPlan->reservation_date) $transferPlan->reservation_date=date('Y-m-d');
             }
-            DB::commit();
+            $transferPlan->save();
+	    DB::commit();
             $records["customActionStatus"] = 'OK';
             $records["customActionMessage"] = "Success!";     
         }catch (\Exception $e) { 
@@ -208,9 +212,12 @@ class DaPlanController extends Controller
                 if(!in_array($transferPlan->tstatus,[1,2,3,8])){
                     throw new \Exception('ID:'.$plan_id.' This Status Can Not Update!</BR>');
                 }
-                if($transferPlan->tstatus == 4){
+                if($tstatus == 4){
                     if(!$transferPlan->ship_date) $transferPlan->ship_date=date('Y-m-d');
                     if(!$transferPlan->reservation_date) $transferPlan->reservation_date=date('Y-m-d');
+		    $itemIds = TransferPlanItem::where('transfer_plan_id',$plan_id)->pluck('id')->toArray();
+		    $shipId = TransferPlanItemShip::whereIn('transfer_plan_item_id',$itemIds)->value('id');
+		    if(!$shipId) throw new \Exception('ID:'.$plan_id.' No Items Shiped  Can Not Update!</BR>');
                 }
                 $transferPlan->tstatus = $tstatus;
                 $transferPlan->save();

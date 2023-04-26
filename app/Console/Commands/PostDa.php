@@ -244,6 +244,46 @@ class PostDa extends Command
 				Log::Info($e->getMessage());
 			} 
 		}
+
+		$createSap = TransferPlan::where('status',6)->where('tstatus',7)->whereNotNull('da_order_id')->whereNull('sap_st0')->get();
+		foreach($createSap as $data){
+			try{
+				$items = $data->items;
+				if(!empty($items)){
+					$sap = new SapRfc();
+					$sto = $tm = $dn = [];
+					$api_msg = '';
+					foreach($items as $item){
+						$ZID = $data->shipment_id.$item->warehouse_code;
+						$sapData['postdata']['EXPORT']=array('O_MSG'=>'','O_FLAG'=>'');
+						$sapData['postdata']['TABLE']= array('O_TAB'=>array(0));
+						$sapData['postdata']['IMPORT']=array('I_ZID'=>$ZID);
+						$sapData['istest'] = 1;
+						$res = $sap->ZMM_STO_DA($sapData);
+						if(array_get($res,'ack')==1 && array_get($res,'data.O_FLAG')=='X'){
+							$lists = array_get($res,'data.O_TAB');
+							foreach($lists as $list){
+								$sto[$list['VGBEL']]=$list['VGBEL'];
+								$tm[$list['VBELN']]=$list['VBELN'];
+								$dn[$list['TKNUM']]=$list['TKNUM'];
+							}
+						}else{
+							$api_msg.= array_get($res,'data.O_FLAG').array_get($res,'data.O_MSG');
+						}
+					}
+					if(!empty($sto)){
+						$data->sap_st0=implode(';', array_filter($sto));
+						$data->sap_tm=implode(';', array_filter($tm));
+						$data->sap_dn=implode(';', array_filter($dn));
+					}else{
+						$data->api_msg=$api_msg;
+					}
+					$data->save();
+				}
+			}catch (\Exception $e) { 
+				Log::Info($e->getMessage());
+			} 
+		}
 	}
 
 
