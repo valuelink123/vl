@@ -150,6 +150,7 @@
 
             <!-- BEGIN TOP NAVIGATION MENU -->
 			<div class="hor-menu  ">
+				@if(!(Auth::user()->can(['da-show'])))
                                     <ul class="nav navbar-nav">
 
                                         <li class="menu-dropdown classic-menu-dropdown ">
@@ -675,6 +676,23 @@
 												        <span class="arrow"></span>
 												    </a>
 												</li>
+						<li class="">
+                                                                                                    <a href="/transferPlan" class="nav-link nav-toggle ">
+                                                                                                        CPFR补货申请
+                                                                                                        <span class="arrow"></span>
+                                                                                                    </a>
+                                                                                                </li>
+<li class="">
+                                                                                                    <a href="/daPlan" class="nav-link nav-toggle ">
+                                                                                                        CPFR补货DA发货
+                                                                                                        <span class="arrow"></span>
+                                                                                                    </a>
+                                                                                                </li><li class="">
+                                                                                                    <a href="/shipPlan" class="nav-link nav-toggle ">
+                                                                                                        CPFR补货运费确认
+                                                                                                        <span class="arrow"></span>
+                                                                                                    </a>
+                                                                                                </li>
                                                 @permission('inventory-cycle-count-show')
                                                 <li class="">
                                                     <a href="/inventoryCycleCount" class="nav-link nav-toggle ">
@@ -1416,6 +1434,7 @@
                                         </li>
 
                                     </ul>
+				@endif
                                 </div>
             <div class="top-menu">
 

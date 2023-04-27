@@ -47,7 +47,9 @@ class LoginController extends Controller
     }
 	
 	public function authenticated(Request $request, $user){    
-		return ($user->seller_rules || $user->sap_seller_id)?redirect('home'):redirect('service');
+		if($user->can(['da-show'])) return redirect('daPlan');
+		if($user->seller_rules || $user->sap_seller_id) return redirect('home');
+		return redirect('service');
 	}
 	
 	public function redirectTo(){
