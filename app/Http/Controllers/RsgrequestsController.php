@@ -538,6 +538,9 @@ class RsgrequestsController extends Controller
 			}
 		}
 		$rule->star_rating = $request->get('star_rating');
+		$rule->customer_status = $request->get('customer_status');
+		$rule->order_id_status = $request->get('order_id_status');
+		$rule->asin = $request->get('asin');
 		// $rule->follow = $request->get('follow');
 		// $rule->next_follow_date = $request->get('next_follow_date');
 
@@ -711,6 +714,9 @@ class RsgrequestsController extends Controller
 		$rule->transfer_currency = $request->get('transfer_currency');
 		$rule->review_url = $request->get('review_url');
         $rule->step = intval($request->get('step'));
+		$rule->customer_status = $request->get('customer_status');
+		$rule->order_id_status = $request->get('order_id_status');
+		$rule->asin = $request->get('asin');
 		
         //回复变更产品功能
 		$product_id = intval($request->get('product_id'));
@@ -967,5 +973,106 @@ where payer='$customer_paypal_email' order by timestamp asc");
 			$starData[$val['asin'].'_'.$val['domain']] = $val['price'] - $val['coupon_n'];
 		}
 		return $starData;
+	}
+
+	/*
+	 * 下载导入excel表格的模板
+	 */
+	public function download(Request $request)
+	{
+		$filepath = 'rsgrequest_import_template.xls';
+		$file=fopen($filepath,"r");
+		header("Content-type:text/html;charset=utf-8");
+		header("Content-Type: application/octet-stream");
+		header("Accept-Ranges: bytes");
+		header("Accept-Length: ".filesize($filepath));
+		header("Content-Disposition: attachment; filename=".$filepath);
+		echo fread($file,filesize($filepath));
+		fclose($file);
+	}
+
+	/*
+	 * 导入excel表格数据到rsg request
+	 */
+	public function import( Request $request )
+	{
+		$addnum = 0;
+		set_time_limit(0);
+		if($request->isMethod('POST')){
+			$file = $request->file('importFile');
+			if($file){
+				if($file->isValid()){
+					$ext = $file->getClientOriginalExtension();
+					$newname = date('Y-m-d-H-i-s').'-'.uniqid().'.'.$ext;
+					$newpath = '/uploads/rsgrequest/'.date('Ymd').'/';
+					$inputFileName = public_path().$newpath.$newname;
+					$bool = $file->move(public_path().$newpath,$newname);
+
+					if($bool){
+						$spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($inputFileName);
+						$importData = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
+
+						$num = 0;
+						foreach($importData as $key=>$val){
+							if($key==1 || empty($val['C'])){
+								continue;
+							}
+
+							$infoData = array();
+							$infoData['created_at'] = date('Y-m-d H:i:s',strtotime($val['A']));
+							//$infoData['email'] = $val['B'];name
+							$infoData['customer_email'] = $val['C'];
+							$infoData['customer_paypal_email'] = $val['D'];
+							$infoData['asin'] = $val['E'];
+							$infoData['amazon_order_id'] = $val['F'];
+							$infoData['order_id_status'] = $val['G'];
+							$infoData['transfer_amount'] = $val['H'];
+							$infoData['transfer_currency'] = 'USD';
+							$infoData['review_url'] = $val['I'];
+							$infoData['star_rating'] = $val['J'];
+							$infoData['customer_status'] = $val['K'];
+							$infoData['step'] = 9;
+							$infoData['site'] = 'www.amazon.com';
+							$infoData['user_id'] = 0;
+							$infoData['processor'] = Auth::user()->id;
+							//通过asin获得对应的销售
+							$asinData = DB::table('asin')->where('asin',$infoData['asin'])->where('site',$infoData['site'])->first();
+							if($asinData){
+								$userData = DB::table('users')->where('sap_seller_id',$asinData->sap_seller_id)->first();
+								if($userData){
+									$infoData['user_id'] = $userData->id;
+								}
+							}
+
+							if($infoData){
+								DB::table('rsg_requests')->insertGetId($infoData);
+								$num++;
+								if($val['B'] && $infoData['customer_email']){
+									$updateClient['facebook_name'] = $val['B'];
+								}
+								if($updateClient){
+									$data['email'] = $infoData['customer_email'];
+									$data['order_id'] = $infoData['amazon_order_id'];
+									$data['from'] = 'RSG';
+									$data['processor'] = $infoData['user_id'];
+									updateCrm($data,$updateClient);
+								}
+							}
+						}
+						$request->session()->flash('success_message','Import Success('.$num.')!');
+					}else{
+						$request->session()->flash('error_message','Import Data Failed');
+						// return redirect()->back()->withInput();
+					}
+				}else{
+					$request->session()->flash('error_message','Import Data Failed,The file is too large');
+					// return redirect()->back()->withInput();
+				}
+			}else{
+				$request->session()->flash('error_message','Please Select Upload File');
+				// return redirect()->back()->withInput();
+			}
+		}
+		return redirect('rsgrequests');
 	}
 }

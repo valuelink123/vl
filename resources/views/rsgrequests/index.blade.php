@@ -196,6 +196,26 @@
 					<div class="col-md-12" style="padding: 0px;">
 
 						<div class="btn-group " style="float:right;">
+							<form action="{{url('/rsgrequests/import')}}" method="post" enctype="multipart/form-data">
+								<div class="col-md-12">
+									<div class="col-md-4"  >
+										<a href="{{ url('/rsgrequests/download')}}" >Import Template
+										</a>
+									</div>
+									<div class="col-md-6">
+										{{ csrf_field() }}
+										<input type="file" name="importFile"  style="width: 90%;"/>
+									</div>
+									<div class="col-md-2">
+										<button type="submit" class="btn blue" id="data_search">Import</button>
+
+									</div>
+
+								</div>
+							</form>
+						</div>
+
+						<div class="btn-group " style="float:right;">
 							@permission('rsgrequests-export')
 							<button id="export" class="btn sbold blue"> Export
 								<i class="fa fa-download"></i>

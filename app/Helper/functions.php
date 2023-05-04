@@ -1892,3 +1892,13 @@ function getBrand()
 {
 	return DB::connection('cs')->table('config_option')->where('co_pid',1)->where('co_status',0)->orderBy('co_order','desc')->pluck('co_name','id')->toArray();
 }
+//rsg request功能的客户状态
+function getCustomerStatus()
+{
+	return array('Prepay','RAR','RAS','RAO','Half Prepay/RAO','Half Prepay/RAS','Half Prepay/RAR');
+}
+//rsg request功能的客户状态
+function getOrderIdStatus()
+{
+	return array('Pending','Payment Complete','Shipped','Cancelled','Invalid');
+}

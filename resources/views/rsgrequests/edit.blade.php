@@ -198,6 +198,27 @@
 								<option value="1" @if($rule['auto_send_status']==1) selected @endif>No</option>
 							</select>
 						</div>
+
+						<div class="form-group col-md-6">
+							<label>Customer Status</label>
+							<select class="form-control " name="customer_status" id="customer_status" required>
+								@foreach(getCustomerStatus() as $v)
+									<option value="{{$v}}" @if($rule['customer_status']==$v) selected @endif>{{$v}}</option>
+								@endforeach
+							</select>
+						</div>
+						<div class="form-group col-md-6">
+							<label>Order Id Status</label>
+							<select class="form-control " name="order_id_status" id="order_id_status" required>
+								@foreach(getOrderIdStatus() as $v)
+									<option value="{{$v}}" @if($rule['order_id_status']==$v) selected @endif>{{$v}}</option>
+								@endforeach
+							</select>
+						</div>
+						<div class="form-group col-md-6">
+							<label>Asin</label>
+							<input type="text" class="form-control" name="asin" id="asin" value="{{array_get($rule,'asin')}}">
+						</div>
 						
 						@if (array_get($rule,'trans'))
 						<table class="table table-hover col-md-12">
