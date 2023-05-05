@@ -540,7 +540,7 @@ class RsgrequestsController extends Controller
 		$rule->star_rating = $request->get('star_rating');
 		$rule->customer_status = $request->get('customer_status');
 		$rule->order_id_status = $request->get('order_id_status');
-		$rule->asin = $request->get('asin');
+		$rule->order_asin = $request->get('order_asin');
 		// $rule->follow = $request->get('follow');
 		// $rule->next_follow_date = $request->get('next_follow_date');
 
@@ -716,7 +716,7 @@ class RsgrequestsController extends Controller
         $rule->step = intval($request->get('step'));
 		$rule->customer_status = $request->get('customer_status');
 		$rule->order_id_status = $request->get('order_id_status');
-		$rule->asin = $request->get('asin');
+		$rule->order_asin = $request->get('order_asin');
 		
         //回复变更产品功能
 		$product_id = intval($request->get('product_id'));
@@ -1023,7 +1023,7 @@ where payer='$customer_paypal_email' order by timestamp asc");
 							//$infoData['email'] = $val['B'];name
 							$infoData['customer_email'] = $val['C'];
 							$infoData['customer_paypal_email'] = $val['D'];
-							$infoData['asin'] = $val['E'];
+							$infoData['order_asin'] = $val['E'];
 							$infoData['amazon_order_id'] = $val['F'];
 							$infoData['order_id_status'] = $val['G'];
 							$infoData['transfer_amount'] = $val['H'];
@@ -1032,11 +1032,11 @@ where payer='$customer_paypal_email' order by timestamp asc");
 							$infoData['star_rating'] = $val['J'];
 							$infoData['customer_status'] = $val['K'];
 							$infoData['step'] = 9;
-							$infoData['site'] = 'www.amazon.com';
+							$infoData['order_site'] = 'www.amazon.com';
 							$infoData['user_id'] = 0;
 							$infoData['processor'] = Auth::user()->id;
 							//通过asin获得对应的销售
-							$asinData = DB::table('asin')->where('asin',$infoData['asin'])->where('site',$infoData['site'])->first();
+							$asinData = DB::table('asin')->where('asin',$infoData['order_asin'])->where('site',$infoData['order_site'])->first();
 							if($asinData){
 								$userData = DB::table('users')->where('sap_seller_id',$asinData->sap_seller_id)->first();
 								if($userData){

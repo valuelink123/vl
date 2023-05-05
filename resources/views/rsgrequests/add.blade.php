@@ -183,7 +183,7 @@
                         </div>
                         <div class="form-group col-md-6">
                             <label>Asin</label>
-                            <input type="text" class="form-control" name="asin" id="asin" >
+                            <input type="text" class="form-control" name="order_asin" id="order_asin" >
                         </div>
 						
                     </div>
