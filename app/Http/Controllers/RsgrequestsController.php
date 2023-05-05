@@ -1045,6 +1045,7 @@ where payer='$customer_paypal_email' order by timestamp asc");
 							}
 
 							if($infoData){
+								$updateClient = array();
 								DB::table('rsg_requests')->insertGetId($infoData);
 								$num++;
 								if($val['B'] && $infoData['customer_email']){
