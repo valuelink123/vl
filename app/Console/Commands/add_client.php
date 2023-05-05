@@ -272,8 +272,11 @@ class AddClient extends Command
 
 	function getCsCrm()
 	{
-		$where = " t1.date >= '".$this->date."'";
-		$sql = "SELECT *,cs_crm.created_at as date from cs_crm left join cs_crm_item on cs_crm.email=cs_crm_item.email";
+		//限制只能导两个月前的客户数据
+		$date_from = date('Y-m-d',time()-3600*24*61);
+		$date_to = date('Y-m-d',time()-3600*24*60);
+		$where = " cs_crm.created_at >= '".$date_from."' and cs_crm.created_at <= '".$date_to."'";
+		$sql = "SELECT *,cs_crm.created_at as date from cs_crm left join cs_crm_item on cs_crm.email=cs_crm_item.email where ".$where;
 		Log::Info($sql);
 
 		$data = DB::connection('cs')->select($sql);

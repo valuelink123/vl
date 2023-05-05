@@ -46,8 +46,8 @@ class CscrmController extends Controller
 		$countrys = getCountry();
 		$froms = getFrom();
 		$brands = getBrand();
-		$date_from=date('Y-m-d',strtotime('-30 days'));
-		$date_to=date('Y-m-d');
+		$date_from = date('Y-m-d',strtotime('-90 days'));
+		$date_to = date('Y-m-d',strtotime('-60 days'));
 		$categoryData = $this->getCategoryType();
 		return view('cscrm/index',['date_from'=>$date_from,'date_to'=>$date_to,'bgs'=>$bgs,'bus'=>$bus,'countrys'=>$countrys,'froms'=>$froms,'brands'=>$brands,'categoryData'=>$categoryData]);
 	}

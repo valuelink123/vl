@@ -76,7 +76,7 @@
                         <br/>
                         <div class="input-group">
                             <span class="input-group-addon">To</span>
-                            <input class="form-control" data-options="format:'yyyy-mm-dd'" value="{!! $date_to !!}" data-init-by-query="daterange.to" id="date_to" autocomplete="off"/>
+                            <input class="form-control" data-default="{{ $date_to}}" data-options="format:'yyyy-mm-dd'" value="{!! $date_to !!}" data-init-by-query="daterange.to" id="date_to" autocomplete="off"/>
                         </div>
                         <br/>
                         <div class="input-group">
@@ -228,13 +228,19 @@
 
         $("#thetabletoolbar [id^='date_']").each(function () {
 
-            let defaults = {
-                autoclose: true
-            }
+            // let defaults = {
+            //     autoclose: true,
+            //
+            //     maxDate: '2023-04-01'
+            // }
 
             let options = eval(`({${$(this).data('options')}})`)
+            $(this).datepicker({
+                format:'yyyy-mm-dd',
+                autoclose: true,
+            });
 
-            $(this).datepicker(Object.assign(defaults, options))
+            // $(this).datepicker(Object.assign(defaults, options))
         })
 
         $("#thetabletoolbar select[multiple]").chosen()
@@ -242,7 +248,6 @@
         let $theTable = $(thetable)
 
         $theTable.on('preXhr.dt', (e, settings, data) => {
-
             Object.assign(data.search, {
                 daterange: {
                     from: date_from.value,
@@ -323,6 +328,14 @@
 
         });
         $(thetabletoolbar).change(e => {
+            var date_to = $('#date_to').val();
+            var date_to_default = $('#date_to').attr('data-default');
+            if(date_to>date_to_default){
+                alert('只能查两个月前的数据，请重新选择结束日期');
+                return false;
+            }
+            console.log(123);
+            console.log(date_to);
             dtApi.ajax.reload()
         })
 
