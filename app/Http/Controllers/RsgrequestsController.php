@@ -133,6 +133,7 @@ class RsgrequestsController extends Controller
 					->orWhere('client_info.encrypted_email', 'like', '%'.$keyword.'%')
 					->orWhere('customer_paypal_email', 'like', '%'.$keyword.'%')
 					->orWhere('review_url', 'like', '%'.$keyword.'%')
+					->orWhere('order_asin', 'like', '%'.$keyword.'%')
 					->orWhere('rsg_products.asin', 'like', '%'.$keyword.'%');
 			});
 		}
