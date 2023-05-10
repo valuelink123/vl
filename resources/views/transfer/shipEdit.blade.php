@@ -1,6 +1,6 @@
 <?php
 $disabledForm = ' disabled ';
-if(in_array(array_get($form,'tstatus'),[0,1,2,3,4,5,8])) $disabledForm="";
+if(in_array(array_get($form,'tstatus'),[5,6,8])) $disabledForm="";
 ?>
 <div class="row">
     <div class="col-md-12">
@@ -21,9 +21,9 @@ if(in_array(array_get($form,'tstatus'),[0,1,2,3,4,5,8])) $disabledForm="";
             <div class="col-md-6">
             <div class="form-group">
                 <label>调拨状态:</label>
-                <select class="form-control" name="tstatus" id="tstatus" {{in_array(array_get($form,'tstatus'),[5,8])?'':'disabled'}}>
+                <select class="form-control" name="tstatus" id="tstatus" {{in_array(array_get($form,'tstatus'),[5,6,8])?'':'disabled'}}>
                 @foreach (\App\Models\TransferPlan::SHIPMENTSTATUS as $k=>$v)
-                <option value="{{$k}}" {{($k==array_get($form,'tstatus'))?'selected':''}} {{in_array($k,[5,8])?'':'disabled'}}>{{$v}}</option>
+                <option value="{{$k}}" {{($k==array_get($form,'tstatus'))?'selected':''}} {{in_array($k,[5,6,8])?'':'disabled'}}>{{$v}}</option>
                 @endforeach 
                 </select>
             </div>
@@ -37,7 +37,21 @@ if(in_array(array_get($form,'tstatus'),[0,1,2,3,4,5,8])) $disabledForm="";
             </div>
             </div>
 
+		<div class="col-md-6">
 
+            <div class="form-group">
+                <label>材积重:</label>
+                <input type="text" class="form-control" name="weight" id="weight" {{$disabledForm}} value="{{array_get($form,'weight')}}" required>
+            </div>
+            </div>
+
+		<div class="col-md-6">
+
+            <div class="form-group">
+                <label>体积重:</label>
+                <input type="text" class="form-control" name="volume" id="volume" {{$disabledForm}} value="{{array_get($form,'volume')}}" required>
+            </div>
+            </div>
             </div>
             <div class="col-md-12" style="text-align:left;"><span class="label label-sm label-primary">{{array_get($form,'reson')}}</span> <span class="label label-sm label-danger">{{array_get($form,'remark')}}</span></div>
             <div class="form-actions">

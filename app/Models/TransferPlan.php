@@ -12,7 +12,7 @@ class TransferPlan extends Model {
     protected $guarded = [];
     protected $with = ['items'];
     protected $fillable = [ 
-        'id','sap_seller_id','seller_id','marketplace_id','in_factory_code','out_factory_code','received_date','shipment_id','reservation_id','ship_method','ship_fee','ship_date','reson','tstatus','status','bg','bu','remark','files','da_order_id','reservation_date','sap_tm','sap_dn','sap_st0','broads','packages','api_msg'
+        'id','sap_seller_id','seller_id','marketplace_id','in_factory_code','out_factory_code','received_date','shipment_id','reservation_id','ship_method','ship_fee','ship_date','reson','tstatus','status','bg','bu','remark','files','da_order_id','reservation_date','sap_tm','sap_dn','sap_st0','broads','packages','weight','volume','api_msg'
     ];
 
     const STATUS = [
@@ -42,7 +42,7 @@ class TransferPlan extends Model {
         '3'=>'待出库',
         '4'=>'已发货',
         '5'=>'DA系统订单已完成',
-        '6'=>'物流确认运费',
+        '6'=>'物流已确认运费',
         '7'=>'SAP已创建调拨单',
         '8'=>'取消发货',
     ];
@@ -58,7 +58,7 @@ class TransferPlan extends Model {
 
     const SHIPSHIPMENTSTATUS = [
         '5'=>'DA系统订单已完成',
-        '6'=>'物流确认运费',
+        '6'=>'物流已确认运费',
         '8'=>'取消发货',
     ];
 

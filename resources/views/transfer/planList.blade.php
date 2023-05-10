@@ -413,7 +413,7 @@
                                         if(reg.test(res[i].url)){
                                             fileAddress1 += '<div><a class="titleHidden" href="' + res[i].url + '" target="_blank">' + res[i].title + '</a><a style="float:right" href="' + res[i].url + '" class="button" download="' + res[i].title + '">下载</a></div>';
                                         }else{
-                                            fileAddress2 += '<div><span class="titleHidden">' + res[i].title + '</span><a style="float:right" href="' + res[i].url + '" download="' + res[i].title + '" class="button">下载</a></div>';
+                                            fileAddress2 += '<div><span class="titleHidden">' + res[i].title + '</span><a style="float:right" href="' + res[i].url + '" download="' + res[i].title + '" id="' + res[i].url + '" class="button">下载</a></div>';
                                         }
                                     }
                                     $('.file_adress').append(fileAddress1 + fileAddress2 );
@@ -510,9 +510,9 @@ $(function() {
         let str1 = $('.file_adress div').find('.button')
         for(var i=0;i<str1.length;i++){
             if(fileList1 != ''){
-                fileList1 = fileList1 + ',' + str1[i].href;
+                fileList1 = fileList1 + ',' + str1[i].id;
             }else{
-                fileList1 = fileList1 + str1[i].href;
+                fileList1 = fileList1 + str1[i].id;
             }
         }
         let fileList = '';

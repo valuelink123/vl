@@ -1,6 +1,6 @@
 <?php
 $disabledForm = ' disabled ';
-if(in_array(array_get($form,'tstatus'),[0,1,2,3,8])) $disabledForm="";
+if(in_array(array_get($form,'tstatus'),[0,1,2,3,4,8])) $disabledForm="";
 ?>
 <div class="row">
     <div class="col-md-12">
@@ -19,7 +19,7 @@ if(in_array(array_get($form,'tstatus'),[0,1,2,3,8])) $disabledForm="";
                         <div class="col-md-3">
                         <div class="form-group">
                             <label>Ship Status:</label>
-                            <select class="form-control" name="tstatus" id="tstatus" {{in_array(array_get($form,'tstatus'),[1,2,3,8])?'':'disabled'}} >
+                            <select class="form-control" name="tstatus" id="tstatus" {{in_array(array_get($form,'tstatus'),[1,2,3,4,8])?'':'disabled'}} >
                             @foreach (\App\Models\TransferPlan::SHIPMENTSTATUS as $k=>$v)
                             <option value="{{$k}}" {{($k==array_get($form,'tstatus'))?'selected':''}} {{in_array($k,[1,2,3,4,8])?'':'disabled'}} >{{$v}}</option>
                             @endforeach 
@@ -86,7 +86,7 @@ if(in_array(array_get($form,'tstatus'),[0,1,2,3,8])) $disabledForm="";
 
 										<div class="col-md-2">
                                             <label class="control-label">Quantity</label>
-											<input type="text" class="form-control" name="quantity" value="0" {{$disabledForm}}  required>
+											<input type="text" class="form-control" name="quantity" value="1" {{$disabledForm}}  required>
                                         </div>
 
                                         <div class="col-md-2">
@@ -166,7 +166,7 @@ if(in_array(array_get($form,'tstatus'),[0,1,2,3,8])) $disabledForm="";
                             $('.mt-repeater-{{$item["id"]}}').repeater({
                                 defaultValues: {
                                     'sku': '{{array_get($daSkus, $item["sku"], $item["sku"])}}',
-                                    'quantity': '0',
+                                    'quantity': '1',
                                     'broads': '0',
                                     'packages': '0',
                                 },

@@ -3,6 +3,7 @@ $disabledForm = ' disabled ';
 if(array_get($form,'sap_seller_id') == \Auth::user()->sap_seller_id && array_get($form,'status')<=1) $disabledForm="";
 if(empty($form)) $disabledForm="";
 ?>
+<link href="../assets/global/plugins/select2/css/select2-bootstrap.min.css" rel="stylesheet" type="text/css" />
 <div class="row">
     <div class="col-md-12">
         <!-- BEGIN EXAMPLE TABLE PORTLET-->
@@ -147,9 +148,9 @@ if(empty($form)) $disabledForm="";
                                         </div>
 
 
-										<div class="col-md-2">
+										<div class="col-md-3">
 											<label class="control-label">仓库代码</label>
-											<select class="form-control" name="warehouse_code" id="warehouse_code" {{$disabledForm}} required>
+											<select class="warehouse_select form-control" name="warehouse_code" id="warehouse_code" {{$disabledForm}} required>
 											
 											@foreach ($warehouses as $k=>$v)
 											<option value="{{$k}}">{{$k.' - '.$v}}</option>
@@ -159,7 +160,7 @@ if(empty($form)) $disabledForm="";
 
 										<div class="col-md-2">
                                             <label class="control-label">申请数量</label>
-											<input type="text" class="form-control" name="quantity" value="0" {{$disabledForm}} required>
+											<input type="text" class="form-control" name="quantity" value="1" {{$disabledForm}} required>
                                         </div>
 
 										<div class="col-md-2">
@@ -191,7 +192,7 @@ if(empty($form)) $disabledForm="";
 										<input type="hidden" class="sku_seller_id" name="seller_id">
                                         
                                         @if(!$disabledForm)
-                                        <div class="col-md-2">
+                                        <div class="col-md-1">
                                             <a href="javascript:;" data-repeater-delete class="btn btn-danger mt-repeater-delete">
                                                 <i class="fa fa-close"></i>
                                             </a>
@@ -224,9 +225,9 @@ if(empty($form)) $disabledForm="";
 											<input type="text" class="form-control" name="fnsku" value="{{$value['fnsku']}}" {{$disabledForm}} required>
                                         </div>
 
-										<div class="col-md-2">
+										<div class="col-md-3">
 											<label class="control-label">仓库代码</label>
-											<select class="form-control" name="warehouse_code" id="warehouse_code" {{$disabledForm}} required>
+											<select class="warehouse_select form-control" name="warehouse_code" id="warehouse_code" {{$disabledForm}} required>
 											@foreach ($warehouses as $k=>$v)
 											<option value="{{$k}}" {{($k==array_get($value,'warehouse_code'))?'selected':''}} >{{$k.' - '.$v}}</option>
 											@endforeach 
@@ -267,7 +268,7 @@ if(empty($form)) $disabledForm="";
 										<input type="hidden" name="image" value="{{$value['image']}}">
 										<input type="hidden" name="seller_id" class="sku_seller_id" value="{{$value['seller_id']}}">
                                         @if(!$disabledForm)
-                                        <div class="col-md-2">
+                                        <div class="col-md-1">
                                             <a href="javascript:;" data-repeater-delete class="btn btn-danger mt-repeater-delete">
                                                 <i class="fa fa-close"></i>
                                             </a>
@@ -317,7 +318,7 @@ $(function() {
 	$('.mt-repeater').repeater({
 		defaultValues: {
 			'warehouse_code': 'ABE2',
-			'quantity': '0',
+			'quantity': '1',
 			'rms': '0',
 			'rcard': '0',
 			'packages': '0',
@@ -334,7 +335,8 @@ $(function() {
 				$('#seller_id').val(seller_id);
 				var str = $(this).attr('name').slice(0,-11);
 				$("input[name='"+str+"[seller_id]']").val(seller_id);
-			})
+			});
+			$('.warehouse_select').select2();
 		},
 		show: function () {
 			$(this).slideDown();
@@ -347,7 +349,8 @@ $(function() {
 				$('#seller_id').val(seller_id);
 				var str = $(this).attr('name').slice(0,-11);
 				$("input[name='"+str+"[seller_id]']").val(seller_id);
-			})
+			});
+			$('.warehouse_select').select2();
 		},
 		hide: function (deleteElement) {
 			$(this).slideUp(deleteElement);

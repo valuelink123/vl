@@ -26,7 +26,9 @@ class TransferPlanItem extends Model {
         'rms',
         'rcard',
         'broads',
-        'packages'
+        'packages',
+	'weight',
+	'volume'
     ];
 
     public function plan():BelongsTo

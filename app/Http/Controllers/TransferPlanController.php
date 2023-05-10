@@ -239,15 +239,17 @@ class TransferPlanController extends Controller
                 $currencyRate = DB::connection('amazon')->table('currency_rates')->where('currency','USD')->value('rate');
                 $warehousesFee = DB::connection('amazon')->table('amazon_warehouses')->pluck('fee','code')->toArray();
                 if(!$currencyRate) throw new \Exception('缺失汇率数据!');
-                $broads = $ship_fee = $packages = 0;
+                $broads = $ship_fee = $packages = $totalWeight = $totalVolume = 0;
                 foreach($items as $key=>$item){
                     
                     $sizeInfo = DB::connection('amazon')->table('sku_size')->where('sku',$item['sku'])->first();
                     if(empty($sizeInfo)){
                         throw new \Exception($item['sku'].'缺失基础数据!');
                     }
-                    $items[$key]['broads'] = ceil(($sizeInfo->volume)*intval($item['packages'])/1.5);
-                    $items[$key]['ship_fee'] = 0;
+                    $items[$key]['broads'] = ceil(($sizeInfo->volume)/167/1.5);
+		    $items[$key]['weight'] = round(($sizeInfo->weight)*intval($item['packages']),2);
+		    $items[$key]['volume'] = round(($sizeInfo->length)*($sizeInfo->width)*($sizeInfo->height)/6000*intval($item['packages']),2);
+                    $items[$key]['ship_fee'] =  0;
                     if($request->get('ship_method')=='other'){
                         $warehouseFee = round(array_get($warehousesFee,$item['warehouse_code']),2);
                         if(!$warehouseFee) throw new \Exception($item['warehouse_code'].'缺失运费数据!');
@@ -265,6 +267,8 @@ class TransferPlanController extends Controller
                     $broads+=$items[$key]['broads'];
                     $packages+=intval($item['packages']);
                     $ship_fee+=$items[$key]['ship_fee'];
+		    $totalWeight+=$items[$key]['weight'];
+		    $totalVolume+=$items[$key]['volume'];
                 }
                 $transferPlan->sap_seller_id = Auth::user()->sap_seller_id;
                 $transferPlan->bg = Auth::user()->ubg;
@@ -282,6 +286,8 @@ class TransferPlanController extends Controller
                 $transferPlan->broads = $broads;
                 $transferPlan->packages = $packages;
                 $transferPlan->ship_fee = $ship_fee;
+		$transferPlan->weight = $totalWeight;
+		$transferPlan->volume = $totalVolume;
             }else{
                 $items=[];
             }

@@ -165,7 +165,7 @@ class DaPlanController extends Controller
             $shiped =false;
             
                 $transferPlan = TransferPlan::findOrFail($id);
-                if(!in_array($transferPlan->tstatus,[1,2,3,8])) throw new \Exception('This Status Can Not Update!');
+                if(!in_array($transferPlan->tstatus,[1,2,3,4,8])) throw new \Exception('This Status Can Not Update!');
                 $items = $transferPlan->items;
                 foreach($items as $item){
                     $item->ships()->delete();
@@ -209,7 +209,7 @@ class DaPlanController extends Controller
             $customActionMessage='';
             foreach($_REQUEST["id"] as $plan_id){
                 $transferPlan = TransferPlan::find($plan_id);
-                if(!in_array($transferPlan->tstatus,[1,2,3,8])){
+                if(!in_array($transferPlan->tstatus,[1,2,3,4,8])){
                     throw new \Exception('ID:'.$plan_id.' This Status Can Not Update!</BR>');
                 }
                 if($tstatus == 4){
