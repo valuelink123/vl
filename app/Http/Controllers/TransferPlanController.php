@@ -228,7 +228,7 @@ class TransferPlanController extends Controller
 	    $exShipmentId = TransferPlan::where('id','<>',intval($id))->where('shipment_id',$request->get('shipment_id'))->value('shipment_id');
 	    if($exShipmentId) throw new \Exception('ShipmentId 已存在!');	
             $transferPlan = $id?(TransferPlan::findOrFail($id)):(new TransferPlan);
-            if($transferPlan->status==6) throw new \Exception('已审批状态无法修改!');
+            if(!in_array($transferPlan->status,array_keys(getTransferForRole()))) throw new \Exception('无权限修改!');
             $transferPlan->remark = $request->get('remark');
             $transferPlan->status = $request->get('status');
             $transferPlan->api_msg = null;
@@ -322,8 +322,8 @@ class TransferPlanController extends Controller
                 if(empty($transferPlan)){
                     throw new \Exception('ID:'.$plan_id.' 不存在!');
                 }
-                if($transferPlan->status == 6){
-                    throw new \Exception('ID:'.$plan_id.' 已审批状态无法修改!');
+                if(!in_array($transferPlan->status,array_keys(getTransferForRole()))){
+                    throw new \Exception('ID:'.$plan_id.' 无权限修改!');
                 }
                 $transferPlan->status = $status;
                 $transferPlan->save();

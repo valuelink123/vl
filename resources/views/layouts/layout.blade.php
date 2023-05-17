@@ -676,23 +676,30 @@
 												        <span class="arrow"></span>
 												    </a>
 												</li>
+						@permission('transfer-plan-show')
 						<li class="">
                                                                                                     <a href="/transferPlan" class="nav-link nav-toggle ">
                                                                                                         CPFR补货申请
                                                                                                         <span class="arrow"></span>
                                                                                                     </a>
                                                                                                 </li>
+						@endpermission
+						@permission('transfer-plan-da')
 <li class="">
                                                                                                     <a href="/daPlan" class="nav-link nav-toggle ">
                                                                                                         CPFR补货DA发货
                                                                                                         <span class="arrow"></span>
                                                                                                     </a>
-                                                                                                </li><li class="">
+                                                                                                </li>
+						@endpermission
+						@permission('transfer-plan-confirm')
+<li class="">
                                                                                                     <a href="/shipPlan" class="nav-link nav-toggle ">
                                                                                                         CPFR补货运费确认
                                                                                                         <span class="arrow"></span>
                                                                                                     </a>
                                                                                                 </li>
+						@endpermission
                                                 @permission('inventory-cycle-count-show')
                                                 <li class="">
                                                     <a href="/inventoryCycleCount" class="nav-link nav-toggle ">
