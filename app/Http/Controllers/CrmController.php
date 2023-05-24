@@ -44,7 +44,7 @@ class CrmController extends Controller
 		$bus = $this->queryFields('SELECT DISTINCT bu FROM asin');
 		//获取country,from,brand
 		$countrys = $this->queryFields('SELECT DISTINCT country FROM client_info');
-		$froms = $this->queryFields("SELECT DISTINCT `from` FROM client_info where `from` !='cs'");
+		$froms = $this->queryFields("SELECT DISTINCT `from` FROM client_info where `from` !='cs' and `from` !='call'");
 		$brands = $this->queryFields('SELECT DISTINCT brand FROM client_info');
 		$date_from=date('Y-m-d',strtotime('-30 days'));
 		$date_to=date('Y-m-d');
@@ -221,7 +221,7 @@ t1.times_ctg as times_ctg,t1.times_rsg as times_rsg,t1.times_sg as times_sg,t1.t
 			  		{$whereInfo}
 			  		group by client_id 
 			) as c on t1.id = c.client_id 
-			where $where and `from` !='cs' 
+			where $where and `from` !='cs' and `from` !='call' 
 			{$orderby} ";
 		return $sql;
 	}
