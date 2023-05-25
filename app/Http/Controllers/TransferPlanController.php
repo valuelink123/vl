@@ -124,6 +124,7 @@ class TransferPlanController extends Controller
                 '<input name="id[]" type="checkbox" class="checkboxes" value="'.$list['id'].'"  />',
                 array_get(array_flip(getSiteCode()),$list['marketplace_id']),
                 $list['bg'].$list['bu'].'-'.array_get($sellers,intval($list['sap_seller_id'])),
+		date('Y-m-d',strtotime($list['created_at'])),
                 array_get($accounts,$list['seller_id'],$list['seller_id']),
                 $list['shipment_id'],
                 array_get(TransferPlan::SHIPMETHOD,$list['ship_method']),

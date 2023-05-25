@@ -284,7 +284,9 @@
                                     </th>
                                     <th><div style="width:50px;">站点</div></th>
                                     <th><div style="width:150px;">销售员</div></th>
-                                    <th >账号</th>
+                                    <th>需求创建日期</th>
+					<th >账号</th>
+				    
                                     <th>Shipment ID</th>
                                     <th >运输方式</th>
                                     <th >运费</th>
@@ -371,7 +373,7 @@
                             text: '导出当前页',
                             title: 'Data export',
                             exportOptions: {
-                                columns: [ 1,2,3,4,5,6,7,8,9,10,11,12,13 ]
+                                columns: [ 1,2,3,4,5,6,7,8,9,10,11,12,13,14 ]
                             }
                         },
                     ],

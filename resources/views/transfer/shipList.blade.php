@@ -119,6 +119,7 @@
                                     </th>
                                     <th ><div style="width:150px;">需求日期</div></th>
                                     <th ><div style="width:150px;">Shipment ID</div></th>
+					<th>账号</th>
                                     <th >调拨状态</th>
                                     <th >运输方式</th>
                                     <th >实际发货时间</th>
@@ -204,7 +205,7 @@
                             text: '导出当前页',
                             title: 'Data export',
                             exportOptions: {
-                                columns: [ 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18 ]
+                                columns: [ 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19 ]
                             }
                         },
                     ],

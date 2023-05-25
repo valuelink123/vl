@@ -64,6 +64,7 @@ class ShipPlanController extends Controller
         if(array_get($_REQUEST,'shipment_id')){
             $datas = $datas->where('shipment_id','like','%'.array_get($_REQUEST,'shipment_id').'%');
         }
+	$accounts = getSellerAccount();
         $daSkus = DB::connection('amazon')->table('da_sku_match')->pluck('da_sku','sku')->toArray();
         $iTotalRecords = $datas->count();
         $iDisplayLength = intval($_REQUEST['length']);
@@ -128,6 +129,7 @@ class ShipPlanController extends Controller
                 '<input name="id[]" type="checkbox" class="checkboxes" value="'.$list['id'].'"  />',
                 $list['created_at'],
                 $list['shipment_id'],
+		array_get($accounts,$list['seller_id'],$list['seller_id']),
                 array_get(TransferPlan::SHIPMENTSTATUS,$list['tstatus']),
                 array_get(TransferPlan::SHIPMETHOD,$list['ship_method']),
                 $list['ship_date'],
@@ -140,9 +142,9 @@ class ShipPlanController extends Controller
                 $list['ship_fee'],
 		$list['weight'],
 		$list['volume'],
-                $list['sap_tm'],
-                $list['sap_dn'],
-                $list['sap_st0'],
+                str_replace(';','<BR>',$list['sap_tm']),
+                str_replace(';','<BR>',$list['sap_dn']),
+                str_replace(';','<BR>',$list['sap_st0']),
                 $list['da_order_id'],
             );
 		}

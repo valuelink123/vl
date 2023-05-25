@@ -66,7 +66,7 @@ class DaPlanController extends Controller
         if(array_get($_REQUEST,'da_order_id')){
             $datas = $datas->where('da_order_id','like','%'.array_get($_REQUEST,'da_order_id').'%');
         }
-        
+        $accounts = getSellerAccount();
         $daSkus = DB::connection('amazon')->table('da_sku_match')->pluck('da_sku','sku')->toArray();
         $warehouses = json_decode(json_encode(DB::connection('amazon')->table('amazon_warehouses')->get()->keyBy('code')),true);
         $iTotalRecords = $datas->count();
@@ -127,6 +127,7 @@ class DaPlanController extends Controller
                 '<input name="id[]" type="checkbox" class="checkboxes" value="'.$list['id'].'"  />',
                 $list['created_at'],
                 $list['da_order_id'],
+		array_get($accounts,$list['seller_id'],$list['seller_id']),
                 array_get(TransferPlan::SHIPMENTSTATUS,$list['tstatus']),
                 $list['ship_date'],
                 $list['reservation_date'],

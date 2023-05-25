@@ -69,32 +69,36 @@ class PostDa extends Command
 		$amazonWarehouses = DB::connection('amazon')->table('amazon_warehouses')->get()->keyBy('code')->toArray();
 		$creates = TransferPlan::where('status',6)->where('tstatus',0)->whereNull('da_order_id')->get();	
 		foreach($creates as $data){
+			sleep(2);
+			
 			try{
 				$items = $data->items;
 				
-				$header=$profile=$details=$files=$sku = $fnsku = $postData= [];
+				$header=$profile=$details=$files= $postData= [];
+				$sku = $warehouse = $fnsku = null;
 				if(!empty($items)){
 					foreach($items as $item){
-
-						$sku[]=array_get($daSkus, $item->sku, $item->sku);
-						$warehouse[] = $item->warehouse_code;
-						$fnsku[] =$item->fnsku;
+						
+						if(!$sku) $sku=array_get($daSkus, $item->sku, $item->sku);
+						if(!$warehouse) $warehouse = $item->warehouse_code;
+						if(!$fnsku) $fnsku =$item->fnsku;
 						$details[]=[
 							'item_no'=>array_get($daSkus, $item->sku, $item->sku),
 							'qty'=>intval($item->quantity)
 						];
-						$wh = array_get($amazonWarehouses, $item->warehouse_code);
+						$wh = array_get($amazonWarehouses, $warehouse);
 					}
 				}
+			
 				$header[]='content-type: application/json';
 				$header[]='appKey: '.$key;
 				$header[]='appToken: '.$token;
 				
 				$profile['customer_code']=$customerCode;
-				$profile['customer_ref_no']=implode('/',$fnsku).'-'.$data->shipment_id;
-				$profile['po_no']=implode('/',$warehouse).'-'.implode('/',$sku);
+				$profile['customer_ref_no']=$fnsku.'-'.$data->shipment_id;
+				$profile['po_no']=$warehouse.'-'.$sku;
 				$profile['ship_via']=$data->ship_method;
-				$profile['ship_to_name']='AMAZON '.implode('/',$warehouse);
+				$profile['ship_to_name']='AMAZON '.$warehouse;
 				$profile['ship_to_address']=$wh->address;
 				$profile['ship_to_city']=$wh->city;
 				$profile['ship_to_state']=$wh->state;
@@ -113,13 +117,15 @@ class PostDa extends Command
 					}
 				}
 				$postData['files'] = $files;
+			
 				$result = json_decode($this->postJson($url.'/outbound/postOutbound', $postData, $header),true);
 				if(array_get($result,'code')=='200'){
 					$data->da_order_id = array_get($result,'msg');
 					$data->tstatus=1;
 					$data->api_msg = null;
 					$data->save();
-					$subject = 'Order No. '.$data->da_order_id.' Ref No. '.implode('/',$fnsku).'-'.$data->shipment_id.' Attachs!';
+			
+					$subject = 'Order No. '.$data->da_order_id.' Ref No. '.$fnsku.'-'.$data->shipment_id.' Attachs!';
 					$html = new \Html2Text\Html2Text($subject);
 					Mail::send(['emails.common','emails.common-text'],['content'=>$subject,'contentText'=>$html->getText()],  function($m) use($subject,$daEmail,$uploads)
 					{
@@ -131,10 +137,12 @@ class PostDa extends Command
 							}
 						}
 					});
+			
 				}else{
 					$data->api_msg = array_get($result,'msg').json_encode(array_get($result,'data'));
 					$data->save();
 				}
+			
 			}catch (\Exception $e) { 
 				Log::Info($e->getMessage());
 			} 
@@ -144,6 +152,7 @@ class PostDa extends Command
 
 		$updates = TransferPlan::where('status',6)->where('tstatus',4)->whereNotNull('da_order_id')->get();
 		foreach($updates as $data){
+			sleep(2);
 			try{
 				$items = $data->items;
 				$header=$profile=$details=$files=$sku = $fnsku = $postData= [];
@@ -186,12 +195,14 @@ class PostDa extends Command
 
 		$updateSap = TransferPlan::where('status',6)->where('tstatus',7)->whereNotNull('da_order_id')->whereNull('sap_st0')->get();
                 foreach($updateSap as $data){
+			sleep(2);
                         try{
                                 $items = $data->items;
                                 if(!empty($items)){
                                         $sap = new SapRfc();
                                         $sto = $tm = $dn = $sapData = [];
                                         $api_msg = '';
+					$completed = true;
                                         foreach($items as $item){
                                                 $ZID = $data->shipment_id.$item->warehouse_code;
                                                 $sapData['postdata']['EXPORT']=array('O_MSG'=>'','O_FLAG'=>'');
@@ -207,10 +218,11 @@ class PostDa extends Command
                                                                 $dn[$list['TKNUM']]=$list['TKNUM'];
                                                         }
                                                 }else{
-                                                        $api_msg.= array_get($res,'data.O_FLAG').array_get($res,'data.O_MSG');
+							$completed = false;
+                                                        $api_msg= array_get($res,'data.O_FLAG').array_get($res,'data.O_MSG');
                                                 }
                                         }
-                                        if(!empty($sto)){
+                                        if($completed){
                                                 $data->api_msg = null;
                                                 $data->sap_st0=implode(';', array_filter($sto));
                                                 $data->sap_tm=implode(';', array_filter($tm));
@@ -228,6 +240,7 @@ class PostDa extends Command
 
 		$createSap = TransferPlan::where('status',6)->where('tstatus',6)->whereNotNull('da_order_id')->get();
 		foreach($createSap as $data){
+			sleep(2);
 			try{
 				$sapData = $ITAB1=$ITAB2=$LINENUM=[];
 				$items = $data->items;
@@ -243,7 +256,8 @@ class PostDa extends Command
 							'BUKRS'=>'2000',
 							'LIFNR'=>'US04',
 						];
-						$LINENUM[$data->shipment_id.$item->warehouse_code]=0;
+						if(!isset($LINENUM[$data->shipment_id.$item->warehouse_code])) $LINENUM[$data->shipment_id.$item->warehouse_code]=0;
+						//$LINENUM[$data->shipment_id.$item->warehouse_code]=0;
 						$ships = $item->ships;
 						if(!empty($ships)){
 							foreach($ships as $ship){
@@ -270,6 +284,7 @@ class PostDa extends Command
 				$sap = new SapRfc();
 				$sapData['postdata']['EXPORT']=array('O_MSG'=>'','O_FLAG'=>'');
 				$sapData['postdata']['TABLE']=array('I_TAB1'=>$ITAB1, 'I_TAB2'=>$ITAB2);
+				//print_r($sapData);die();
 			   //$sapData['istest'] = 1;
 				$res = $sap->ZFMPHPRFC034($sapData);
 				if(array_get($res,'ack')==1 && array_get($res,'data.O_FLAG')=='X'){

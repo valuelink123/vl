@@ -133,7 +133,8 @@
                                     </th>
                                     <th ><div style="width:150px;">Submit Date</div></th>
                                     <th><div style="width:150px;">DA OrderID</div></th>
-                                    <th >Ship Status</th>
+			    	    <th>Account</th>
+					<th >Ship Status</th>
                                     <th >Actual Ship Date</th>
                                     <th >Reservation Date</th>
                                     <th > <div style="width:500px;">Request Details</div></th>
@@ -210,7 +211,7 @@
                             text: 'Export Current Page',
                             title: 'Data export',
                             exportOptions: {
-                                columns: [ 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 ]
+                                columns: [ 1,2,3,4,5,6,7,8,9,10,11 ]
                             }
                         },
                     ],
