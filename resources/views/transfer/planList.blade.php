@@ -266,7 +266,7 @@
                         $i=0;
                         foreach (\App\Models\TransferPlan::STATUS as $k=>$v){
                         ?>
-                        <button type="button" class="btn {{array_get($color_arr,(($i>=7)?$i-7:$i))}}">{{$v}} : {{array_get($statusList,$k,0)}}</button>
+                        <button type="button" data-statusid="{{$k}}" class="btn status_button {{array_get($color_arr,(($i>=7)?$i-7:$i))}}">{{$v}} : {{array_get($statusList,$k,0)}}</button>
                         <?php 
                         $i++;
                         } ?>
@@ -483,6 +483,14 @@ $(function() {
 
 	TableDatatablesAjax.init();
 	$('#data_search').on('click',function(){
+		var dttable = $('#datatable_ajax').dataTable();
+		dttable.fnClearTable(false);
+	    dttable.fnDestroy(); 
+		TableDatatablesAjax.init();
+	});
+	$('.status_button').on('click',function(){
+        $("select[name='status[]']").val($(this).data('statusid'));
+        $("select[name='status[]']").multiselect("refresh");
 		var dttable = $('#datatable_ajax').dataTable();
 		dttable.fnClearTable(false);
 	    dttable.fnDestroy(); 
