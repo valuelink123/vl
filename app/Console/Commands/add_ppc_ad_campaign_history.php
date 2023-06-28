@@ -85,7 +85,10 @@ WHERE ppc_ad_match_asin.ad_type !='sproducts' order by ppc_ad_match_asin.id asc"
 			DB::table('ppc_ad_campaign')->insert($insertData);
 		}
 		if($insertAsinData){
-			DB::table('ppc_ad_campaign_match_asin')->insert($insertAsinData);
+			$chunk_result = array_chunk($insertAsinData, 100);
+			foreach($chunk_result as $data){
+				DB::table('ppc_ad_campaign_match_asin')->insert($data);
+			}
 		}
 		Log::Info('add:ppc_ad_campaign_history End...');
 	}
