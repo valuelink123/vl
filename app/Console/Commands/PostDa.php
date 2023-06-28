@@ -195,15 +195,16 @@ class PostDa extends Command
 
 		$updateSap = TransferPlan::where('status',6)->where('tstatus',7)->whereNotNull('da_order_id')->whereNull('sap_st0')->get();
                 foreach($updateSap as $data){
-			sleep(2);
+				sleep(2);
                         try{
                                 $items = $data->items;
                                 if(!empty($items)){
                                         $sap = new SapRfc();
                                         $sto = $tm = $dn = $sapData = [];
                                         $api_msg = '';
-					$completed = true;
+										$completed = true;
                                         foreach($items as $item){
+												$tsto = $ttm = $tdn = [];
                                                 $ZID = $data->shipment_id.$item->warehouse_code;
                                                 $sapData['postdata']['EXPORT']=array('O_MSG'=>'','O_FLAG'=>'');
                                                 $sapData['postdata']['TABLE']= array('O_TAB'=>array(0));
@@ -213,12 +214,16 @@ class PostDa extends Command
                                                 if(array_get($res,'ack')==1 && array_get($res,'data.O_FLAG')=='X'){
                                                         $lists = array_get($res,'data.O_TAB');
                                                         foreach($lists as $list){
-                                                                $sto[$list['VGBEL']]=$list['VGBEL'];
-                                                                $tm[$list['VBELN']]=$list['VBELN'];
-                                                                $dn[$list['TKNUM']]=$list['TKNUM'];
+                                                                $sto[$list['VGBEL']]=$tsto[$list['VGBEL']]=$list['VGBEL'];
+                                                                $dn[$list['VBELN']]=$tdn[$list['VBELN']]=$list['VBELN'];
+                                                                $tm[$list['TKNUM']]=$ttm[$list['TKNUM']]=$list['TKNUM'];
                                                         }
+														$item->sap_st0=implode(';', array_filter($tsto));
+                                                		$item->sap_tm=implode(';', array_filter($ttm));
+                                                		$item->sap_dn=implode(';', array_filter($tdn));	
+														$item->save();
                                                 }else{
-							$completed = false;
+														$completed = false;
                                                         $api_msg= array_get($res,'data.O_FLAG').array_get($res,'data.O_MSG');
                                                 }
                                         }

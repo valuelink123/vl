@@ -76,77 +76,89 @@ class ShipPlanController extends Controller
 
         foreach ( $shipmentList as $list){
             $items = $list['items'];
-            $str = $strShip = '';
-            $total_broads = $total_packages = $actual_broads = $actual_packages = 0;
-            if(is_array($items)){
-                foreach($items as $item){
-                    $str .= '<div class="row" style="margin-bottom:10px;"><div class="col-md-2"><image src="https://images-na.ssl-images-amazon.com/images/I/'.$item['image'].'" width=50px height=50px></div>
-                    <div class="col-md-10" style="text-align:left;">
-                    <div class="col-md-6">SKU : '.$item['sku'].'</div>
-                    <div class="col-md-6">FNSKU : '.$item['fnsku'].'</div>
-                    <div class="col-md-6">Asin : '.$item['asin'].'</div>
-                    <div class="col-md-6">SellerSku : '.$item['sellersku'].'</div>
-                    <div class="col-md-6">仓库 : '.array_get($item,'warehouse_code').'</div>
-                    <div class="col-md-6">数量 : '.intval(array_get($item,'quantity')).'</div>
-
-                    <div class="col-md-6">预计卡板数 : '.$item['broads'].'</div>
-                    <div class="col-md-6">预计箱数 : '.$item['packages'].'</div>
-                    <div class="col-md-6">RMS : '.array_get(\App\Models\TransferPlan::TF,$item['rms']).'</div>
-                    <div class="col-md-6">抽卡 : '.array_get(\App\Models\TransferPlan::TF,$item['rcard']).'</div>
-                    <div class="col-md-12">预计运费:'.$item['ship_fee'].'</div>
-                    </div></div>';
-                    $ships = $item['ships'];
-                    if(!empty($ships)){
-                        $shipSku = '';
-                        $locations= [];
-                        $quantity = $broads = $packages = 0;
-                        foreach($ships as $ship){
-                            $quantity += intval($ship['quantity']);
-                            $broads += intval($ship['broads']);
-                            $packages += intval($ship['packages']);
-                            $locations[] = $ship['location'];
-                            $shipSku = $ship['sku'];
-                            $actual_broads += intval($ship['broads']);
-                            $actual_packages += intval($ship['packages']);
-                        }
-                        
-                        $strShip.='<div class="row" style="margin-bottom:10px;text-align:left;">
-                        <div class="col-md-12">DASKU : '.$shipSku.'</div>
-                        <div class="col-md-6">Quantity : '.intval($quantity).'</div>
-                        <div class="col-md-6">Warehouse : '.array_get($item,'warehouse_code').'</div>
-                        <div class="col-md-6">Pallet Count : '.intval($broads).'</div>
-                        <div class="col-md-6">Boxes Count : '.intval($packages).'</div>
-                        <div class="col-md-12">Locations : '.implode(' , ',$locations).'</div>
-                        </div>';
+            $rows = count($items);
+            $i=1;
+            foreach($items as $item){
+                $ships = $item['ships'];
+                $shipSku = [];
+                $quantity = $broads = $packages = 0;
+                if(!empty($ships)){
+                    foreach($ships as $ship){
+                        $quantity += intval($ship['quantity']);
+                        $broads += intval($ship['broads']);
+                        $packages += intval($ship['packages']);
+                        $shipSku[trim($ship['sku'])] = $ship['sku'];
                     }
-                    $total_broads += intval($item['broads']);
-                    $total_packages += intval($item['packages']);
                 }
+                if($i==1){
+                    $records["data"][] = array(
+                        '<input name="id[]" type="checkbox" class="checkboxes" value="'.$list['id'].'"  />',
+                        $list['created_at'],
+                        $list['shipment_id'],
+                        array_get($accounts,$list['seller_id'],$list['seller_id']),
+                        array_get(TransferPlan::SHIPMENTSTATUS,$list['tstatus']),
+                        array_get(TransferPlan::SHIPMETHOD,$list['ship_method']),
+                        $list['ship_date'],
+                        '<image src="https://images-na.ssl-images-amazon.com/images/I/'.$item['image'].'" width=50px height=50px>',
+                        $item['sku'],
+                        $item['fnsku'],
+                        $item['sellersku'],
+                        $item['asin'],
+                        intval(array_get($item,'quantity')),
+                        array_get($item,'warehouse_code'),
+                        array_get(\App\Models\TransferPlan::TF,$item['rcard']),
+                        array_get(\App\Models\TransferPlan::TF,$item['rms']),
+                        $item['packages'],
+                        implode(',',$shipSku),
+                        $quantity,
+                        $broads,
+                        $packages,
+                        array_get($item,'sap_st0'),
+                        array_get($item,'sap_tm'),
+                        array_get($item,'sap_dn'),
+                        $list['ship_fee'],
+                        $list['weight'],
+                        $list['volume'],
+                        $list['da_order_id'],
+                        $list['api_msg'],
+                    );
+                }else{
+                    $records["data"][] = array(
+                        '<input type="hidden" class="checkboxes" value="'.$list['id'].'">',
+                        '',
+                        '',
+                        '',
+                        '',
+                        '',
+                        '',
+                        '<image src="https://images-na.ssl-images-amazon.com/images/I/'.$item['image'].'" width=50px height=50px>',
+                        $item['sku'],
+                        $item['fnsku'],
+                        $item['sellersku'],
+                        $item['asin'],
+                        intval(array_get($item,'quantity')),
+                        array_get($item,'warehouse_code'),
+                        array_get(\App\Models\TransferPlan::TF,$item['rcard']),
+                        array_get(\App\Models\TransferPlan::TF,$item['rms']),
+                        $item['packages'],
+                        implode(',',$shipSku),
+                        $quantity,
+                        $broads,
+                        $packages,
+                        array_get($item,'sap_st0'),
+                        array_get($item,'sap_tm'),
+                        array_get($item,'sap_dn'),
+                        '',
+                        '',
+                        '',
+                        '',
+                        '',
+                    );
+                    
+                }
+                $i++;
             }
-            $str .= '<div class="col-md-12" style="text-align:left;"><span class="label label-primary">'.$list['reson'].'</span> <span class="label label-danger">'.$list['remark'].'</span></div>';
             
-            $records["data"][] = array(
-                '<input name="id[]" type="checkbox" class="checkboxes" value="'.$list['id'].'"  />',
-                $list['created_at'],
-                $list['shipment_id'],
-		array_get($accounts,$list['seller_id'],$list['seller_id']),
-                array_get(TransferPlan::SHIPMENTSTATUS,$list['tstatus']),
-                array_get(TransferPlan::SHIPMETHOD,$list['ship_method']),
-                $list['ship_date'],
-                $str,
-                $strShip.'<div class="col-md-12" style="text-align:left;"><span class="label label-danger">'.$list['api_msg'].'</span></div>',
-                $total_broads,
-                $total_packages,
-                $actual_broads,
-                $actual_packages,
-                $list['ship_fee'],
-		$list['weight'],
-		$list['volume'],
-                str_replace(';','<BR>',$list['sap_dn']),
-                str_replace(';','<BR>',$list['sap_tm']),
-                str_replace(';','<BR>',$list['sap_st0']),
-                $list['da_order_id'],
-            );
 		}
 
         $records["draw"] = $sEcho;

@@ -279,25 +279,40 @@
                         <table class="table table-striped table-bordered table-hover table-checkable" id="datatable_ajax">
                             <thead>
                                 <tr role="row" class="heading">
-                                    <th>
+                                    <th >
                                         <input type="checkbox" class="group-checkable" data-set="#datatable_ajax .checkboxes" />
                                     </th>
-                                    <th><div style="width:50px;">站点</div></th>
-                                    <th><div style="width:150px;">销售员</div></th>
-                                    <th>需求创建日期</th>
-					<th >账号</th>
-				    
-                                    <th>Shipment ID</th>
+                                    <th ><div style="width:50px;">站点</div></th>
+                                    <th ><div style="width:150px;">销售员</div></th>
+                                    <th >需求创建日期</th>
+					                <th >账号</th>
+                                    <th >Shipment ID</th>
                                     <th >运输方式</th>
                                     <th >运费</th>
-                                    <th><div style="width:500px;">调拨详情</div></th>
-                                    <th>预计到货日期</th>
-                                    <th>实际发货日期</th>
-                                    <th>审核状态</th>
-                                    <th>调拨状态</th>
-                                    <th>调入工厂</th>
-                                    <th>调出工厂</th>
-                                    <th>大货资料附件</th>                        
+                                    <th>图片</th>
+                                    <th >SKU</th>
+                                    <th>FNSKU</th> 
+                                    <th>SELLERSKU</th> 
+                                    <th>ASIN</th>
+                                    <th >数量</th>
+                                    <th >仓库</th>
+                                    <th>抽卡</th> 
+                                    <th>换标</th> 
+                                    <th>预计箱数</th>
+                                    <th>DA发货SKU</th>
+                                    <th>DA发货数量</th>
+                                    <th>DA发货卡板数</th>
+                                    <th>DA发货箱数</th> 
+                                    <th >预计到货日期</th>
+                                    <th >实际发货日期</th>
+                                    <th >调拨理由</th>
+                                    <th >备注</th>
+                                    <th >审核状态</th>
+                                    <th >调拨状态</th>
+                                    <th >调入工厂</th>
+                                    <th >调出工厂</th>
+                                    <th >大货资料附件</th>
+                                    <th >异常信息</th>                       
                                 </tr>
                             </thead>
                             <tbody>	
@@ -373,7 +388,7 @@
                             text: '导出当前页',
                             title: 'Data export',
                             exportOptions: {
-                                columns: [ 1,2,3,4,5,6,7,8,9,10,11,12,13,14 ]
+                                columns: [ 1,2,3,4,5,6,7,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29 ]
                             }
                         },
                     ],

@@ -120,23 +120,32 @@
                                     </th>
                                     <th ><div style="width:150px;">需求日期</div></th>
                                     <th ><div style="width:150px;">Shipment ID</div></th>
-					<th>账号</th>
+					                <th>账号</th>
                                     <th >调拨状态</th>
                                     <th >运输方式</th>
                                     <th >实际发货时间</th>
-                                    <th ><div style="width:500px;">调拨详情</div></th>
-                                    <th ><div style="width:500px;">实际发货详情</div></th>
-                                    <th >预计总卡板数</th>
-                                    <th >预计总箱数</th>
-                                    <th >实际总卡板数</th>
-                                    <th >实际总箱数</th>
-                                    <th >运费</th>
-				<th>材积重</th>
-				<th>体积重</th>
-                                    <th >TM</th>
-                                    <th >DN</th>
-                                    <th >ST0</th>
-                                    <th >DA出库单号</th>
+                                    <th>图片</th>
+                                    <th >SKU</th>
+                                    <th>FNSKU</th> 
+                                    <th>SELLERSKU</th> 
+                                    <th>ASIN</th>
+                                    <th >数量</th>
+                                    <th >仓库</th>
+                                    <th>抽卡</th> 
+                                    <th>换标</th> 
+                                    <th>预计箱数</th>
+                                    <th>DA发货SKU</th>
+                                    <th>DA发货数量</th>
+                                    <th>DA发货卡板数</th>
+                                    <th>DA发货箱数</th>
+                                    <th>ST0</th>
+                                    <th>TM</th>
+                                    <th>DN</th>
+                                    <th>运费</th>
+				                    <th>材积重</th>
+				                    <th>体积重</th>
+                                    <th>DA出库单号</th>
+                                    <th>异常信息</th>
                                 </tr>
                             </thead>
                             <tbody>	
@@ -206,7 +215,7 @@
                             text: '导出当前页',
                             title: 'Data export',
                             exportOptions: {
-                                columns: [ 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19 ]
+                                columns: [ 1,2,3,4,5,6,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27 ]
                             }
                         },
                     ],

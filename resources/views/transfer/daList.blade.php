@@ -132,17 +132,30 @@
                                     <th>
                                         <input type="checkbox" class="group-checkable" data-set="#datatable_ajax .checkboxes" />
                                     </th>
-                                    <th ><div style="width:150px;">Submit Date</div></th>
+                                    <th><div style="width:150px;">Submit Date</div></th>
                                     <th><div style="width:150px;">DA OrderID</div></th>
-			    	    <th>Account</th>
-					<th >Ship Status</th>
+			    	                <th>Account</th>
+					                <th >Ship Status</th>
                                     <th >Actual Ship Date</th>
                                     <th >Reservation Date</th>
-                                    <th > <div style="width:500px;">Request Details</div></th>
-                                    <th><div style="width:500px;">Actual Ship Details</div></th>
+                                    <th>Image</th>
+                                    <th>SKU</th>
+                                    <th>FNSKU</th> 
+                                    <th>SELLERSKU</th> 
+                                    <th>ASIN</th>
+                                    <th>Quantity</th>
+                                    <th>Warehouse Code</th>
+                                    <th>RCard</th> 
+                                    <th>RMS</th> 
+                                    <th>Boxes</th>
+                                    <th>DA Actual SKU</th>
+                                    <th>DA Actual Quantity</th>
+                                    <th>DA Actual Pallet</th>
+                                    <th>DA Actual Boxes</th>
                                     <th >Shipment ID</th>
                                     <th >Reservation ID</th>  
                                     <th >ShipMethod</th>
+                                    <th >Error Message</th>
                                 </tr>
                             </thead>
                             <tbody>	
@@ -212,7 +225,7 @@
                             text: 'Export Current Page',
                             title: 'Data export',
                             exportOptions: {
-                                columns: [ 1,2,3,4,5,6,7,8,9,10,11 ]
+                                columns: [ 1,2,3,4,5,6,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23 ]
                             }
                         },
                     ],
