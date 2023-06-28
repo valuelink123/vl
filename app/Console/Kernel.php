@@ -70,6 +70,7 @@ class Kernel extends ConsoleKernel
 		'App\Console\Commands\WarrantyUpdateNonctg',
 		'App\Console\Commands\AddPpcAdCampaignHistory',
 		'App\Console\Commands\CsPhone',
+		'App\Console\Commands\SapAddWalmartShippedOrder',
 		'App\Console\Commands\PostDa'
     ];
 
@@ -81,9 +82,9 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // 由于 php artisan 命令会触发 schedule 执行；
+    	// 由于 php artisan 命令会触发 schedule 执行；
 
-        // if (!Schema::hasTable('accounts')) return;
+         //if (!Schema::hasTable('accounts')) return;
 		$schedule->command('add:cs_phone')->hourly()->name('add_cs_phone')->withoutOverlapping();//添加客服系统的call message数据
 
         // 防止第一次执行 php artisan migrate 时，报找不到表的错误；
@@ -194,6 +195,7 @@ budget_skus.bg=asin.bg, budget_skus.bu=asin.bu WHERE budget_skus.sku = asin.item
         $schedule->command('sync:purchase')->dailyAt('08:00')->name('sync_sap_purchase')->withoutOverlapping();//每天早上6点半执行
 		$schedule->command('post:da')->hourly()->name('postda')->withoutOverlapping();
 		$schedule->command('exception:mcfInfo')->hourly()->name('add_exception_mcfInfo')->withoutOverlapping();
+		$schedule->command('add:walmart_order')->hourly()->name('add_walmart_order')->withoutOverlapping();
     }
 
     /**

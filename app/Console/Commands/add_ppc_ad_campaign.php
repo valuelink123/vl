@@ -118,7 +118,10 @@ LEFT JOIN ppc_ad_campaign ON union_table.campaign_id = ppc_ad_campaign.campaign_
 			DB::table('ppc_ad_campaign')->insert($insertData);
 		}
 		if($insertAsinData){
-			DB::table('ppc_ad_campaign_match_asin')->insert($insertAsinData);
+			$chunk_result = array_chunk($insertAsinData, 100);
+			foreach($chunk_result as $data){
+				DB::table('ppc_ad_campaign_match_asin')->insert($data);
+			}
 		}
 		Log::Info('add:ppc_ad_campaign End...');
 	}
