@@ -101,43 +101,95 @@ class TransferPlanController extends Controller
 
         foreach ( $shipmentList as $list){
             $items = $list['items'];
-            $str = '';
-            if(is_array($items)){
-                foreach($items as $item){
-                    $str .= '<div class="row" style="margin-bottom:10px;"><div class="col-md-2"><image src="https://images-na.ssl-images-amazon.com/images/I/'.$item['image'].'" width=50px height=50px></div>
-                    <div class="col-md-10" style="text-align:left;">
-                        <div class="col-md-6">SKU : '.$item['sku'].'</div>
-                        <div class="col-md-6">FNSKU : '.$item['fnsku'].'</div>
-                        <div class="col-md-6">Asin : '.$item['asin'].'</div>
-                        <div class="col-md-6">SellerSku : '.$item['sellersku'].'</div>
-                        <div class="col-md-6">数量 : '.intval(array_get($item,'quantity')).'</div>
-                        <div class="col-md-6">仓库 : '.array_get($item,'warehouse_code').'</div>
-                        <div class="col-md-6">RMS : '.array_get(\App\Models\TransferPlan::TF,$item['rms']).'</div>
-                        <div class="col-md-6">抽卡 : '.array_get(\App\Models\TransferPlan::TF,$item['rcard']).'</div>
-                        <div class="col-md-6">预计箱数 : '.$item['packages'].'</div>
-                        <div class="col-md-6">预计运费:'.$item['ship_fee'].'</div>
-                    </div></div>';
+            $rows = count($items);
+            $i=1;
+            foreach($items as $item){
+                $ships = $item['ships'];
+                $shipSku = [];
+                $quantity = $broads = $packages = 0;
+                if(!empty($ships)){
+                    foreach($ships as $ship){
+                        $quantity += intval($ship['quantity']);
+                        $broads += intval($ship['broads']);
+                        $packages += intval($ship['packages']);
+                        $shipSku[trim($ship['sku'])] = $ship['sku'];
+                    }
                 }
+                if($i==1){
+                    $records["data"][] = array(
+                        '<input name="id[]" type="checkbox" class="checkboxes" value="'.$list['id'].'"  />',
+                        array_get(array_flip(getSiteCode()),$list['marketplace_id']),
+                        $list['bg'].$list['bu'].'-'.array_get($sellers,intval($list['sap_seller_id'])),
+                        date('Y-m-d',strtotime($list['created_at'])),
+                        array_get($accounts,$list['seller_id'],$list['seller_id']),
+                        $list['shipment_id'],
+                        array_get(TransferPlan::SHIPMETHOD,$list['ship_method']),
+                        $list['ship_fee'],
+                        '<image src="https://images-na.ssl-images-amazon.com/images/I/'.$item['image'].'" width=50px height=50px>',
+                        $item['sku'],
+                        $item['fnsku'],
+                        $item['sellersku'],
+                        $item['asin'],
+                        intval(array_get($item,'quantity')),
+                        array_get($item,'warehouse_code'),
+                        array_get(\App\Models\TransferPlan::TF,$item['rcard']),
+                        array_get(\App\Models\TransferPlan::TF,$item['rms']),
+                        $item['packages'],
+                        implode(',',$shipSku),
+                        $quantity,
+                        $broads,
+                        $packages,
+                        $list['received_date'],
+                        $list['ship_date'],
+                        $list['reson'],
+                        $list['remark'],
+                        array_get(TransferPlan::STATUS,$list['status']),
+                        array_get(TransferPlan::SHIPMENTSTATUS,$list['tstatus']),
+                        $list['in_factory_code'],
+                        $list['out_factory_code'],
+                        empty($list['files']) ? '<button class="uploadDataBtn btn red-sunglo" value="'.$list['id'].'">上传大货资料</button>' : '<button class="uploadDataBtn btn  green-meadow" value="'.$list['id'].'">查看大货资料</button>',
+                        $list['api_msg'],
+                    );
+                }else{
+                    $records["data"][] = array(
+                        '<input type="hidden" class="checkboxes" value="'.$list['id'].'">',
+                        '',
+                        '',
+                        '',
+                        '',
+                        '',
+                        '',
+                        '',
+                        '<image src="https://images-na.ssl-images-amazon.com/images/I/'.$item['image'].'" width=50px height=50px>',
+                        $item['sku'],
+                        $item['fnsku'],
+                        $item['sellersku'],
+                        $item['asin'],
+                        intval(array_get($item,'quantity')),
+                        array_get($item,'warehouse_code'),
+                        array_get(\App\Models\TransferPlan::TF,$item['rcard']),
+                        array_get(\App\Models\TransferPlan::TF,$item['rms']),
+                        $item['packages'],
+                        implode(',',$shipSku),
+                        $quantity,
+                        $broads,
+                        $packages,
+                        '',
+                        '',
+                        '',
+                        '',
+                        '',
+                        '',
+                        '',
+                        '',
+                        '',
+                        '',
+                    );
+                    
+                }
+                $i++;
             }
-            $str .= '<div class="col-md-12" style="text-align:left;"><span class="label label-primary">'.$list['reson'].'</span> <span class="label label-danger">'.$list['remark'].'</span> <span class="label label-danger">'.$list['api_msg'].'</span></div>';
-            $records["data"][] = array(
-                '<input name="id[]" type="checkbox" class="checkboxes" value="'.$list['id'].'"  />',
-                array_get(array_flip(getSiteCode()),$list['marketplace_id']),
-                $list['bg'].$list['bu'].'-'.array_get($sellers,intval($list['sap_seller_id'])),
-		date('Y-m-d',strtotime($list['created_at'])),
-                array_get($accounts,$list['seller_id'],$list['seller_id']),
-                $list['shipment_id'],
-                array_get(TransferPlan::SHIPMETHOD,$list['ship_method']),
-                $list['ship_fee'],
-                $str,
-                $list['received_date'],
-                $list['ship_date'],
-                array_get(TransferPlan::STATUS,$list['status']),
-                array_get(TransferPlan::SHIPMENTSTATUS,$list['tstatus']),
-                $list['in_factory_code'],
-                $list['out_factory_code'],
-                empty($list['files']) ? '<button class="uploadDataBtn btn red-sunglo" value="'.$list['id'].'">上传大货资料</button>' : '<button class="uploadDataBtn btn  green-meadow" value="'.$list['id'].'">查看大货资料</button>',
-            );
+            
 		}
 
         $records["draw"] = $sEcho;
