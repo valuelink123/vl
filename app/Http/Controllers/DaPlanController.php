@@ -82,7 +82,7 @@ class DaPlanController extends Controller
             $str = $strShip = '';
             if(is_array($items)){
                 foreach($items as $item){
-                    $str .= '<div class="row" style="margin-bottom:10px;"><div class="col-md-2"><image src="https://images-na.ssl-images-amazon.com/images/I/'.$item['image'].'" width=100% height=100%></div>
+                    $str .= '<div class="row" style="margin-bottom:10px;"><div class="col-md-2"><image src="https://images-na.ssl-images-amazon.com/images/I/'.$item['image'].'" width=50px ></div>
                     <div class="col-md-10" style="text-align:left;">
                     <div class="col-md-6">DASKU : '.array_get($daSkus, $item['sku'], $item['sku']).'</div>
                     <div class="col-md-6">FNSKU : '.$item['fnsku'].'</div>

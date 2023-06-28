@@ -142,8 +142,8 @@ class ShipPlanController extends Controller
                 $list['ship_fee'],
 		$list['weight'],
 		$list['volume'],
-                str_replace(';','<BR>',$list['sap_tm']),
                 str_replace(';','<BR>',$list['sap_dn']),
+                str_replace(';','<BR>',$list['sap_tm']),
                 str_replace(';','<BR>',$list['sap_st0']),
                 $list['da_order_id'],
             );

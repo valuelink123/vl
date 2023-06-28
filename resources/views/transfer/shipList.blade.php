@@ -99,9 +99,10 @@
                         <?php 
                         $color_arr=['0'=>'red-sunglo','1'=>'yellow-crusta','2'=>'purple-plum','3'=>'blue-hoki','4'=>'blue-madison','5'=>'green-meadow'];
                         $i=0;
-                        foreach (\App\Models\TransferPlan::SHIPSHIPMENTSTATUS as $k=>$v){
+                        foreach (\App\Models\TransferPlan::SHIPMENTSTATUS as $k=>$v){
+			if(!in_array($k,[5,6,7,8])) continue;
                         ?>
-                        <button type="button" class="btn {{array_get($color_arr,(($i>=7)?$i-7:$i))}}">{{$v}} : {{array_get($statusList,$k,0)}}</button>
+                        <button type="button" data-statusid="{{$k}}" class="status_button btn {{array_get($color_arr,(($i>=7)?$i-7:$i))}}">{{$v}} : {{array_get($statusList,$k,0)}}</button>
                         <?php 
                         $i++;
                         } ?>
@@ -284,6 +285,14 @@ $(function() {
 
 	TableDatatablesAjax.init();
 	$('#data_search').on('click',function(){
+		var dttable = $('#datatable_ajax').dataTable();
+		dttable.fnClearTable(false);
+	    dttable.fnDestroy(); 
+		TableDatatablesAjax.init();
+	});
+	$('.status_button').on('click',function(){
+        $("select[name='tstatus[]']").val($(this).data('statusid'));
+        $("select[name='tstatus[]']").multiselect("refresh");
 		var dttable = $('#datatable_ajax').dataTable();
 		dttable.fnClearTable(false);
 	    dttable.fnDestroy(); 

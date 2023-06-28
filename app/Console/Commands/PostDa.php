@@ -237,7 +237,7 @@ class PostDa extends Command
                         }
                 }
 
-
+		$sapSkus = DB::connection('amazon')->table('da_sku_match')->pluck('sku','da_sku')->toArray();
 		$createSap = TransferPlan::where('status',6)->where('tstatus',6)->whereNotNull('da_order_id')->get();
 		foreach($createSap as $data){
 			sleep(2);
@@ -268,7 +268,7 @@ class PostDa extends Command
 									'EBELP'=>$LINENUM[$data->shipment_id.$item->warehouse_code],
 									'PSTYP'=>'U',
 									'EINDT'=>date('Ymd',strtotime($data->ship_date)),
-									'MATNR'=>$item->sku,
+									'MATNR'=>array_get($sapSkus,$ship->sku,$ship->sku),
 									'MENGE'=>$ship->quantity,
 									'TRAGR'=>'10',
 									'RWERKS'=>'US01',

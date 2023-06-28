@@ -28,6 +28,7 @@ class TransferPlan extends Model {
     const SHIPMETHOD = [
         'other'=>'DA卡派',
         'amazon'=>'亚马逊自提',
+	'UPS'=>'DA-UPS',
     ];
 
     const TF = [
