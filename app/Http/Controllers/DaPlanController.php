@@ -125,12 +125,12 @@ class DaPlanController extends Controller
                 }else{
                     $records["data"][] = array(
                         '<input type="hidden" class="checkboxes" value="'.$list['id'].'">',
-                        '',
-                        '',
-                        '',
-                        '',
-                        '',
-                        '',
+                        '<div style="display:none;">'.$list['created_at'].'</div>',
+                        '<div style="display:none;">'.$list['da_order_id'].'</div>',
+                        '<div style="display:none;">'.array_get($accounts,$list['seller_id'],$list['seller_id']).'</div>',
+                        '<div style="display:none;">'.array_get(TransferPlan::SHIPMENTSTATUS,$list['tstatus']).'</div>',
+                        '<div style="display:none;">'.$list['ship_date'].'</div>',
+                        '<div style="display:none;">'.$list['reservation_date'].'</div>',
                         '<image src="https://images-na.ssl-images-amazon.com/images/I/'.$item['image'].'" width=50px height=50px>',
                         $item['sku'],
                         $item['fnsku'],
@@ -145,9 +145,9 @@ class DaPlanController extends Controller
                         $quantity,
                         $broads,
                         $packages,
-                        '',
-                        '',
-                        '',
+                        '<div style="display:none;">'.$list['shipment_id'].'</div>',
+                        '<div style="display:none;">'.$list['reservation_id'].'</div>',
+                        '<div style="display:none;">'.array_get(TransferPlan::SHIPMETHOD,$list['ship_method']).'</div>',
                         '',
                     );
                     
