@@ -50,10 +50,10 @@ class SapAddWalmartShippedOrder extends Command
 		}
 		$walmart = new Walmart();
 		$params['createdStartDate'] = $date;
-		if($params['createdStartDate'] < '2023-06-20'){
-			$params['createdStartDate'] = '2023-06-20 00:00:00';//测试数据
+		if($params['createdStartDate'] < '2023-07-01'){
+			$params['createdStartDate'] = '2023-07-01 00:00:00';//测试数据
 		}
-		$params['createdStartDate'] = "2023-05-01";//测试数据
+//		$params['createdStartDate'] = "2023-05-01";//测试数据
 		$params['limit'] = 1000;
 		$params['status'] = 'Shipped';//Delivered
 		Log::info('params:'.json_encode($params));
