@@ -162,7 +162,7 @@ class SapAddWalmartShippedOrder extends Command
 					$sap_order[0] = $order;
 					$sap = new SapRfcRequest();
 					try {
-//						$res=$sap->ZFMPHPRFC033(['sap_order'=>$sap_order,'sap_order_item'=>$sap_order_item]);
+						$res=$sap->ZFMPHPRFC033(['sap_order'=>$sap_order,'sap_order_item'=>$sap_order_item]);
 					} catch (\Exception $e) {
 
 					}
