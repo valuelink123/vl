@@ -43,15 +43,15 @@ class SapAddWalmartShippedOrder extends Command
 	{
 		Log::info('Execution add:walmart_order script start'.date('Y-m-d H:i:s'));
 		set_time_limit(0);
-		$date = date('Y-m-d 00:00:00',strtotime("-7 day"));
+		$date = date('Y-m-d',strtotime("-7 day"));
 		$date_param =$this->option('date');
 		if($date_param){
-			$date = date('Y-m-d 00:00:00',strtotime($date_param));
+			$date = date('Y-m-d',strtotime($date_param));
 		}
 		$walmart = new Walmart();
 		$params['createdStartDate'] = $date;
 		if($params['createdStartDate'] < '2023-07-01'){
-			$params['createdStartDate'] = '2023-07-01 00:00:00';//测试数据
+			$params['createdStartDate'] = '2023-07-01';//测试数据
 		}
 //		$params['createdStartDate'] = "2023-05-01";//测试数据
 		$params['limit'] = 1000;
@@ -59,6 +59,7 @@ class SapAddWalmartShippedOrder extends Command
 		Log::info('params:'.json_encode($params));
 		$account = DB::table('walmart_accounts')->where('account_status',1)->get();
 		foreach($account as $key=>$val){
+			log::info($params);
 			$this->getWalmartOrderData($walmart,$val,$params);
 		}
 		Log::info('Execution script end');
