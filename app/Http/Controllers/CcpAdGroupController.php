@@ -82,9 +82,13 @@ class CcpAdGroupController extends Controller
 		$table_group = isset($this->typeConfig['table_group'][$type]) ? $this->typeConfig['table_group'][$type] : '';
 		$table_campaign = isset($this->typeConfig['table_campaign'][$type]) ? $this->typeConfig['table_campaign'][$type] : '';
 
+		$str_sales = "round(sum(case ad_type when 'SProducts' then ppc_report_datas.attributed_sales7d else ppc_report_datas.attributed_sales14d end ),2) as sales";
+		if($type==='SDisplay'){
+			$str_sales = "round(sum(case ad_type when 'SProducts' then ppc_report_datas.attributed_sales7d when 'SDisplay' and campaigns.cost_type='VCPM' then ppc_report_datas.view_attributed_sales14d else ppc_report_datas.attributed_sales14d end ),2) as sales";
+		}
 		$sql = "SELECT  
 					round(sum(ppc_report_datas.cost),2) as cost,
-					round(sum(case ad_type when 'SProducts' then ppc_report_datas.attributed_sales7d else ppc_report_datas.attributed_sales14d end ),2) as sales 
+					{$str_sales} 
 			FROM
 					{$table_group} as groups
 			left join {$table_campaign} as campaigns on groups.campaign_id = campaigns.campaign_id
@@ -169,6 +173,15 @@ class CcpAdGroupController extends Controller
 			$state = " '-' as state,";
 		}
 
+		$str_sales = "round(sum(case ad_type when 'SProducts' then ppc_report_datas.attributed_sales7d else ppc_report_datas.attributed_sales14d end ),2) as sales";
+		$str_orders = "sum(case ad_type when 'SProducts' then ppc_report_datas.attributed_conversions7d else ppc_report_datas.attributed_conversions14d end ) as orders";
+		$str_impressions = "sum(ppc_report_datas.impressions) as impressions";
+		if($type==='SDisplay'){
+			$str_sales = "round(sum(case ad_type when 'SProducts' then ppc_report_datas.attributed_sales7d when 'SDisplay' and campaigns.cost_type='VCPM' then ppc_report_datas.view_attributed_sales14d else ppc_report_datas.attributed_sales14d end ),2) as sales";
+			$str_orders = "sum(case ad_type when 'SProducts' then ppc_report_datas.attributed_conversions7d when 'SDisplay' and campaigns.cost_type='VCPM' then ppc_report_datas.view_attributed_conversions14d else ppc_report_datas.attributed_conversions14d end ) as orders";
+			$str_impressions = "sum(case ad_type when 'SDisplay' and campaigns.cost_type='VCPM' then ppc_report_datas.view_impressions else ppc_report_datas.impressions end ) as impressions";
+		}
+
 		$sql = "SELECT SQL_CALC_FOUND_ROWS 
 					any_value(ppc_profiles.account_name) as account_name,
        				any_value(ppc_profiles.seller_id) as seller_id,
@@ -177,9 +190,9 @@ class CcpAdGroupController extends Controller
 					{$state}
 					round(sum(ppc_report_datas.cost),2) as cost,
 					sum(ppc_report_datas.clicks) as clicks,
-       				round(sum(case ad_type when 'SProducts' then ppc_report_datas.attributed_sales7d else ppc_report_datas.attributed_sales14d end ),2) as sales,
-					sum(case ad_type when 'SProducts' then ppc_report_datas.attributed_conversions7d else ppc_report_datas.attributed_conversions14d end ) as orders,
-					sum(ppc_report_datas.impressions) as impressions
+       				{$str_sales},
+					{$str_orders},
+					{$str_impressions}
 			FROM
 					{$table_group} as groups
 			left join {$table_campaign} as campaigns on groups.campaign_id = campaigns.campaign_id
