@@ -86,9 +86,13 @@ class CcpAdCampaignController extends Controller
 		$union_all = "";
 		foreach($type_arr as $type) {
 			$table = isset($this->typeConfig['table'][$type]) ? $this->typeConfig['table'][$type] : 'ppc_sproducts_campaigns';
+			$str_sales = "round(sum(case ad_type when 'SProducts' then ppc_report_datas.attributed_sales7d else ppc_report_datas.attributed_sales14d end ),2) as sales";
+			if($type==='SDisplay'){
+				$str_sales = "round(sum(case ad_type when 'SProducts' then ppc_report_datas.attributed_sales7d when 'SDisplay' and campaigns.cost_type='VCPM' then ppc_report_datas.view_attributed_sales14d else ppc_report_datas.attributed_sales14d end ),2) as sales";
+			}
 			$_sql = "SELECT  
 				round(sum(ppc_report_datas.cost),2) as cost,
-				round(sum(case ad_type when 'SProducts' then ppc_report_datas.attributed_sales7d else ppc_report_datas.attributed_sales14d end ),2) as sales
+				{$str_sales}
 			FROM
 					{$table} as campaigns
 			LEFT JOIN ppc_report_datas ON (
@@ -125,6 +129,9 @@ class CcpAdCampaignController extends Controller
 			$limit = " LIMIT {$limit} ";
 		}
 		$sql = $this->getSql($search) .$limit;
+//		echo '<pre>';
+//		echo $sql;
+//		exit;
 		$_data = DB::select($sql);
 		$recordsTotal = $recordsFiltered = DB::select('SELECT FOUND_ROWS() as total');
 		$recordsTotal = $recordsFiltered = $recordsTotal[0]->total;
@@ -178,6 +185,16 @@ class CcpAdCampaignController extends Controller
 			$table = isset($this->typeConfig['table'][$type]) ? $this->typeConfig['table'][$type] : 'ppc_sproducts_campaigns';
 			$budget_field = isset($this->typeConfig['budget_field'][$type]) ? $this->typeConfig['budget_field'][$type] : 'budget';
 
+			$str_sales = "round(sum(case ad_type when 'SProducts' then ppc_report_datas.attributed_sales7d else ppc_report_datas.attributed_sales14d end ),2) as sales";
+			$str_orders = "sum(case ad_type when 'SProducts' then ppc_report_datas.attributed_conversions7d else ppc_report_datas.attributed_conversions14d end ) as orders";
+			$str_impressions = "sum(ppc_report_datas.impressions) as impressions";
+			if($type==='SDisplay'){
+				$str_sales = "round(sum(case ad_type when 'SProducts' then ppc_report_datas.attributed_sales7d when 'SDisplay' and campaigns.cost_type='VCPM' then ppc_report_datas.view_attributed_sales14d else ppc_report_datas.attributed_sales14d end ),2) as sales";
+				$str_orders = "sum(case ad_type when 'SProducts' then ppc_report_datas.attributed_conversions7d when 'SDisplay' and campaigns.cost_type='VCPM' then ppc_report_datas.view_attributed_conversions14d else ppc_report_datas.attributed_conversions14d end ) as orders";
+				$str_impressions = "sum(case ad_type when 'SDisplay' and campaigns.cost_type='VCPM' then ppc_report_datas.view_impressions else ppc_report_datas.impressions end ) as impressions";
+			}
+
+
 			$_sql = "SELECT  
 					any_value(ppc_profiles.account_name) as account_name,
        				any_value(ppc_profiles.seller_id) as seller_id,
@@ -187,9 +204,9 @@ class CcpAdCampaignController extends Controller
        				any_value(campaigns.{$budget_field}) as daily_budget,
 					round(sum(ppc_report_datas.cost),2) as cost,
 					sum(ppc_report_datas.clicks) as clicks,
-					round(sum(case ad_type when 'SProducts' then ppc_report_datas.attributed_sales7d else ppc_report_datas.attributed_sales14d end ),2) as sales,
-					sum(case ad_type when 'SProducts' then ppc_report_datas.attributed_conversions7d else ppc_report_datas.attributed_conversions14d end ) as orders,
-					sum(ppc_report_datas.impressions) as impressions
+					{$str_sales},
+					{$str_orders},
+       				{$str_impressions}
 			FROM
 					{$table} as campaigns
 			LEFT JOIN ppc_report_datas ON (
@@ -216,8 +233,6 @@ class CcpAdCampaignController extends Controller
 					sum(orders) as orders,
 					sum(impressions) as impressions from( ".$union_all . " ) AS UNION_table GROUP BY campaign_id  order by sales desc ";
 		return $sql;
-
-
 	}
 
 	/*
