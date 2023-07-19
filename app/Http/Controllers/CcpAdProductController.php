@@ -97,9 +97,14 @@ class CcpAdProductController extends Controller
 		$asin_sellersku_str = implode("','", $asin_sellersku_arr);
 		$where .= " and CONCAT(products.asin,'_',products.sku) in('".$asin_sellersku_str."')";
 
+		$str_sales = "round(sum(case ad_type when 'SProducts' then ppc_report_datas.attributed_sales7d else ppc_report_datas.attributed_sales14d end ),2) as sales";
+		if($type==='SDisplay'){
+			$str_sales = "round(sum(case ad_type when 'SProducts' then ppc_report_datas.attributed_sales7d when 'SDisplay' and campaigns.cost_type='VCPM' then ppc_report_datas.view_attributed_sales14d else ppc_report_datas.attributed_sales14d end ),2) as sales";
+		}
+
 		$sql = "SELECT  
 				round(sum(ppc_report_datas.cost),2) as cost,
-				round(sum(case ad_type when 'SProducts' then ppc_report_datas.attributed_sales7d else ppc_report_datas.attributed_sales14d end ),2) as sales
+				{$str_sales}
 		FROM
 				{$table_product} as products
 		left join {$table_campaign} as campaigns on products.campaign_id = campaigns.campaign_id 
@@ -208,14 +213,23 @@ class CcpAdProductController extends Controller
 		if($asin){
 			$where .= " and products.asin = '".$asin."'";
 		}
+		$str_sales = "round(sum(case ad_type when 'SProducts' then ppc_report_datas.attributed_sales7d else ppc_report_datas.attributed_sales14d end ),2) as sales";
+		$str_orders = "sum(case ad_type when 'SProducts' then ppc_report_datas.attributed_conversions7d else ppc_report_datas.attributed_conversions14d end ) as orders";
+		$str_impressions = "sum(ppc_report_datas.impressions) as impressions";
+		if($type==='SDisplay'){
+			$str_sales = "round(sum(case ad_type when 'SProducts' then ppc_report_datas.attributed_sales7d when 'SDisplay' and campaigns.cost_type='VCPM' then ppc_report_datas.view_attributed_sales14d else ppc_report_datas.attributed_sales14d end ),2) as sales";
+			$str_orders = "sum(case ad_type when 'SProducts' then ppc_report_datas.attributed_conversions7d when 'SDisplay' and campaigns.cost_type='VCPM' then ppc_report_datas.view_attributed_conversions14d else ppc_report_datas.attributed_conversions14d end ) as orders";
+			$str_impressions = "sum(case ad_type when 'SDisplay' and campaigns.cost_type='VCPM' then ppc_report_datas.view_impressions else ppc_report_datas.impressions end ) as impressions";
+		}
+
 		$sql = "SELECT  SQL_CALC_FOUND_ROWS 
     					products.asin as asin,
        					group_concat(campaigns.name)as campaign_name,
 						round(sum(ppc_report_datas.cost),2) as cost,
 						sum(ppc_report_datas.clicks) as clicks,
-       					round(sum(case ad_type when 'SProducts' then ppc_report_datas.attributed_sales7d else ppc_report_datas.attributed_sales14d end ),2) as sales,
-						sum(case ad_type when 'SProducts' then ppc_report_datas.attributed_conversions7d else ppc_report_datas.attributed_conversions14d end ) as orders,
-						sum(ppc_report_datas.impressions) as impressions
+       					{$str_sales},
+						{$str_orders},
+						{$str_impressions}
 			FROM
 					{$table_product} as products
 			left join {$table_campaign} as campaigns on products.campaign_id = campaigns.campaign_id 
