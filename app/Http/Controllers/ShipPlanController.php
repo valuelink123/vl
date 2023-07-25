@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use App\SapAsinMatchSku;
 use App\User;
 use App\Models\TransferPlan;
+use App\Models\TransferPlanItem;
 use Illuminate\Support\Facades\Auth;
 use PDO;
 use DB;
@@ -66,6 +67,7 @@ class ShipPlanController extends Controller
         }
 	$accounts = getSellerAccount();
         $daSkus = DB::connection('amazon')->table('da_sku_match')->pluck('da_sku','sku')->toArray();
+	$warehouses = json_decode(json_encode(DB::connection('amazon')->table('amazon_warehouses')->get()->keyBy('code')),true);	
         $iTotalRecords = $datas->count();
         $iDisplayLength = intval($_REQUEST['length']);
         $iDisplayLength = $iDisplayLength < 0 ? $iTotalRecords : $iDisplayLength;
@@ -106,6 +108,7 @@ class ShipPlanController extends Controller
                         $item['asin'],
                         intval(array_get($item,'quantity')),
                         array_get($item,'warehouse_code'),
+			array_get($warehouses,array_get($item,'warehouse_code').'.address').' '.array_get($warehouses,array_get($item,'warehouse_code').'.state').' '.array_get($warehouses,array_get($item,'warehouse_code').'.city').' '.array_get($warehouses,array_get($item,'warehouse_code').'.zip'),
                         array_get(\App\Models\TransferPlan::TF,$item['rcard']),
                         array_get(\App\Models\TransferPlan::TF,$item['rms']),
                         $item['packages'],
@@ -116,14 +119,14 @@ class ShipPlanController extends Controller
                         $quantity,
                         $broads,
                         $packages,
-                        array_get($item,'sap_st0'),
+			array_get($item,'sap_st0'),
                         array_get($item,'sap_tm'),
                         array_get($item,'sap_dn'),
                         $list['ship_fee'],
                         $list['weight'],
                         $list['volume'],
                         $list['da_order_id'],
-                        $list['api_msg'],
+			$list['api_msg'],
                     );
                 }else{
                     $records["data"][] = array(
@@ -141,6 +144,7 @@ class ShipPlanController extends Controller
                         $item['asin'],
                         intval(array_get($item,'quantity')),
                         array_get($item,'warehouse_code'),
+			array_get($warehouses,array_get($item,'warehouse_code').'.address').' '.array_get($warehouses,array_get($item,'warehouse_code').'.state').' '.array_get($warehouses,array_get($item,'warehouse_code').'.city').' '.array_get($warehouses,array_get($item,'warehouse_code').'.zip'),
                         array_get(\App\Models\TransferPlan::TF,$item['rcard']),
                         array_get(\App\Models\TransferPlan::TF,$item['rms']),
                         $item['packages'],
@@ -158,7 +162,7 @@ class ShipPlanController extends Controller
                         '<div style="display:none;">'.$list['weight'].'</div>',
                         '<div style="display:none;">'.$list['volume'].'</div>',
                         '<div style="display:none;">'.$list['da_order_id'].'</div>',
-                        '',
+			'',
                     );
                     
                 }
@@ -191,13 +195,29 @@ class ShipPlanController extends Controller
         try{
             $id = $request->get('id');
             if($id){
-                $transferPlan = TransferPlan::findOrFail($id);
-                if(!in_array($transferPlan->tstatus,[5,6,8])) throw new \Exception('This Status Can Not Update!');
+				$transferPlan = TransferPlan::findOrFail($id);
+                if(!in_array($transferPlan->tstatus,[5,6,7,8])) throw new \Exception('This Status Can Not Update!');
+				if($transferPlan->tstatus == 7 ){
+					$items = $request->get('items');
+					$sap_st0 = $sap_dn = $sap_tm = [];
+					foreach($items as $key=>$val){
+						if(!empty($val['sap_st0']) && !empty($val['sap_dn']) && !empty($val['sap_tm'])){
+							TransferPlanItem::where('id',$key)->update($val);
+							$sap_st0[$val['sap_st0']]=$val['sap_st0'];
+							$sap_dn[$val['sap_dn']]=$val['sap_dn'];
+							$sap_tm[$val['sap_tm']]=$val['sap_tm'];
+						} 
+					}
+					$transferPlan->sap_st0 = implode(';', array_filter($sap_st0));
+					$transferPlan->sap_dn = implode(';', array_filter($sap_dn));
+					$transferPlan->sap_tm = implode(';', array_filter($sap_tm));
+				}
+                
                 $transferPlan->tstatus = $request->get('tstatus');
                 $transferPlan->ship_fee = $request->get('ship_fee');
-		$transferPlan->weight = $request->get('weight');
-		$transferPlan->volume = $request->get('volume');
-                $transferPlan->save();    
+				$transferPlan->weight = $request->get('weight');
+				$transferPlan->volume = $request->get('volume');
+                $transferPlan->save();
             }
 
             DB::commit();
