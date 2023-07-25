@@ -187,8 +187,8 @@
             <div class="search_table" style="margin-bottom:50px;margin-left:-15px;">
                 <div class="col-md-2">
                     <div class="input-group">
-                        <span class="input-group-addon">Asin</span>
-                        <input class="form-control" value="" id="asin" placeholder="Asin"/>
+                        <span class="input-group-addon">Asin/SKU</span>
+                        <input class="form-control" value="" id="asin" placeholder="Asin/SKU"/>
                     </div>
                 </div>
                 <div class="col-md-2">
