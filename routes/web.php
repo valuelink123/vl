@@ -455,6 +455,21 @@ Route::Post('/shipPlan/get', 'ShipPlanController@get')->name('getShipPlan');
 Route::Post('/shipPlan/batchUpdate', 'ShipPlanController@batchUpdate')->name('shipPlanBatchUpdate');
 Route::Post('/shipPlan/update', 'ShipPlanController@update')->name('update');
 
+Route::resource('daSkuMatch', 'DaSkuMatchController');
+Route::Post('/daSkuMatch/get', 'DaSkuMatchController@get')->name('getDaSkuMatch');
+Route::Post('/daSkuMatch/update', 'DaSkuMatchController@update')->name('updateDaSkuMatch');
+Route::Post('/daSkuMatch/upload', 'DaSkuMatchController@upload');
+
+Route::resource('amazonWarehouse', 'AmazonWarehouseController');
+Route::Post('/amazonWarehouse/get', 'AmazonWarehouseController@get')->name('getAmazonWarehouse');
+Route::Post('/amazonWarehouse/update', 'AmazonWarehouseController@update')->name('updateAmazonWarehouse');
+Route::Post('/amazonWarehouse/upload', 'AmazonWarehouseController@upload');
+
+Route::resource('skuSize', 'SkuSizeController');
+Route::Post('/skuSize/get', 'SkuSizeController@get')->name('getSkuSize');
+Route::Post('/skuSize/update', 'SkuSizeController@update')->name('updateSkuSize');
+Route::Post('/skuSize/upload', 'SkuSizeController@upload');
+
 
 
 Route::match(['post','get'],'/transfer/plan/createPlan', 'TransferPlanController@createPlan');//计划确认后的挑货请求，生成计划
