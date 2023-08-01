@@ -230,33 +230,6 @@
             autoclose: true
         });
 
-            $('#datatable').dataTable({
-                searching: false,//关闭搜索
-                serverSide: true,//启用服务端分页（这是使用Ajax服务端的必须配置）
-                ordering:false,
-                "pageLength": 50, // default record count per page
-                "lengthMenu": [
-                    [10, 20,50,],
-                    [10, 20,50,] // change per page values here
-                ],
-                // pagingType: 'bootstrap_extended',
-                processing: true,
-                columns: [
-                    {data: 'image',name:'image'},
-                    {data: 'title',name:'title'},
-                    {data: 'asin',name:'asin'},
-                    {data: 'item_no',name:'item_no'},
-                    {data: 'sales',name:'sales'},
-                    {data: 'units',name:'units'},
-                    {data: 'orders',name:'orders'},
-                    {data: 'avg_units',name:'avg_units'},
-                ],
-                ajax: {
-                    type: 'POST',
-                    url: '/ccp/list',
-                    data:  {search: $("#search-form").serialize()}
-                }
-            })
 
         $('.date-search .date_type').click(function(){
             $('.date-search .date_type').removeClass('active');
@@ -279,6 +252,16 @@
         })
         //点击上面的搜索
         $('#search_top').click(function(){
+            $('.total-data-table .sales').text('-');
+            $('.total-data-table .units').text('-');
+            $('.total-data-table .orders').text('-');
+            $('.total-data-table .avgPrice').text('-');
+            $('.total-data-table .revenue').text('-');
+            $('.total-data-table .unitsFull').text('-');
+            $('.total-data-table .unitsPromo').text('-');
+            $('.total-data-table .ordersFull').text('-');
+            $('.total-data-table .ordersPromo').text('-');
+            $('.total-data-table .danwei').text('-');
             $('input[name="start_date"]').val($('input[name="from_date"]').val());
             $('input[name="end_date"]').val($('input[name="to_date"]').val());
             $.ajax({
@@ -300,11 +283,10 @@
                 }
             });
             //改变下面表格的数据内容,睡眠0.5秒,确保asin_price里面已经插入数据
-            setTimeout(function(){
-                dtapi = $('#datatable').dataTable().api();
-                dtapi.settings()[0].ajax.data = {search: $("#search-form").serialize()};
-                dtapi.ajax.reload();
-            },500)
+            dtapi = $('#datatable').dataTable().api();
+            dtapi.settings()[0].ajax.data = {search: $("#search-form").serialize()};
+            dtapi.ajax.reload();
+            
             return false;
         })
         //点击下面的搜索只改变下面表格的数据
@@ -395,7 +377,57 @@
         $(function(){
             getAccountBySite()//触发当前选的站点得到该站点所有的账号
             // 根据搜索时间区域，调用点击事件，展示上部分的统计数据
-            $("#search_top").trigger("click");
+            $('input[name="start_date"]').val($('input[name="from_date"]').val());
+            $('input[name="end_date"]').val($('input[name="to_date"]').val());
+            $.ajax({
+                type: 'post',
+                url: '/ccp/showTotal',
+                data: {search_data:$("#search-form").serialize()},
+                dataType:'json',
+                success: function(res) {
+                    $('.total-data-table .sales').text(res.sales);
+                    $('.total-data-table .units').text(res.units);
+                    $('.total-data-table .orders').text(res.orders);
+                    $('.total-data-table .avgPrice').text(res.avgPrice);
+                    $('.total-data-table .revenue').text(res.revenue);
+                    $('.total-data-table .unitsFull').text(res.unitsFull);
+                    $('.total-data-table .unitsPromo').text(res.unitsPromo);
+                    $('.total-data-table .ordersFull').text(res.ordersFull);
+                    $('.total-data-table .ordersPromo').text(res.ordersPromo);
+                    $('.total-data-table .danwei').text(res.danwei);
+                }
+            });
+
+            $('#datatable').dataTable({
+                searching: false,//关闭搜索
+                serverSide: true,//启用服务端分页（这是使用Ajax服务端的必须配置）
+                ordering:false,
+                "pageLength": 50, // default record count per page
+                "lengthMenu": [
+                    [10, 20,50,],
+                    [10, 20,50,] // change per page values here
+                ],
+                // pagingType: 'bootstrap_extended',
+                processing: true,
+                columns: [
+                    {data: 'image',name:'image'},
+                    {data: 'title',name:'title'},
+                    {data: 'asin',name:'asin'},
+                    {data: 'item_no',name:'item_no'},
+                    {data: 'sales',name:'sales'},
+                    {data: 'units',name:'units'},
+                    {data: 'orders',name:'orders'},
+                    {data: 'avg_units',name:'avg_units'},
+                ],
+                ajax: {
+                    type: 'POST',
+                    url: '/ccp/list',
+                    data:  {search: $("#search-form").serialize()}
+                }
+            })
+
+            
+            //$("#search_top").trigger("click");
         })
 
         //点击导出
