@@ -1857,7 +1857,7 @@ select bg,bu,sap_seller_id,auto_create_mcf,auto_create_mcf_result,auto_create_sa
 from exception 
 left join (SELECT asin as asin,substring(site,5) as site ,any_value(bg) as bg,any_value(bu) as bu,any_value(sap_seller_id) as sap_seller_id FROM  `asin` group by asin,site) as asin_info
 on exception.asin = asin_info.asin and exception.saleschannel = asin_info.site {$where}
-) as total_table group by sap_seller_id order by confirmed_num desc";
+) as total_table group by sap_seller_id order by bg desc,bu desc";
 
 		$sql = $_sql.'  LIMIT '.$limit;
 		$_data = DB::select($sql);
