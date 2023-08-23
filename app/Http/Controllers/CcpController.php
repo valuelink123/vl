@@ -97,12 +97,17 @@ class CcpController extends Controller
 		$siteCur = getSiteCur();
 		$currency_code = isset($siteCur[$domain]) ? $siteCur[$domain] : '';
 
-		$where = $orderwhere = $this->getDateWhere($site,$timeType);
+		$orderwhere = "WHERE order_status IN ( 'PendingAvailability', 'Pending', 'Unshipped', 'PartiallyShipped', 'Shipped', 'InvoiceUnconfirmed', 'Unfulfillab' )";
+
+		$orderwhere .= " and sales_channel = '".ucfirst($domain)."'";
+		$where = $this->getDateWhere($site,$timeType);
+		$orderwhere .= $this->getDateWhere($site,$timeType);
+
 		//$account搜索两个表的字段都为seller_account_id
 		if($account){
-			$where = $orderwhere .= ' and order_items.seller_account_id in('.$account.')';
+			$where .= ' and order_items.seller_account_id in('.$account.')';
+			$orderwhere .= ' and seller_account_id in('.$account.')';
 		}
-		$orderwhere .= " and sales_channel = '".ucfirst($domain)."'";
 		//用户权限sap_asin_match_sku
 		$userwhere = $this->getUserWhere($site,$bg,$bu);
 		//保证asin_price此站点今天有数据
@@ -121,7 +126,7 @@ class CcpController extends Controller
 				  (
 					SELECT amazon_order_id 
 					FROM orders 
-					WHERE order_status IN ( 'PendingAvailability', 'Pending', 'Unshipped', 'PartiallyShipped', 'Shipped', 'InvoiceUnconfirmed', 'Unfulfillab' ) {$orderwhere}
+					{$orderwhere}
 				  )
 			  	{$where} 
 			  	and order_items.asin in({$userwhere})
@@ -197,14 +202,19 @@ class CcpController extends Controller
 		$timeType = isset($search['timeType']) ? $search['timeType'] : '';//时间类型，默认是0为北京时间，1为亚马逊后台当地时间
 		$this->start_date = isset($search['start_date']) ? $search['start_date'] : '';
 		$this->end_date = isset($search['end_date']) ? $search['end_date'] : '';
-		$where = $orderwhere = $this->getDateWhere($site,$timeType);
-		//$account搜索两个表的字段都为seller_account_id
-		if($account){
-			$where = $orderwhere .= ' and order_items.seller_account_id in('.$account.')';
-		}
+		$orderwhere = "WHERE order_status IN ( 'PendingAvailability', 'Pending', 'Unshipped', 'PartiallyShipped', 'Shipped', 'InvoiceUnconfirmed', 'Unfulfillab' )";
+		
+		
 		$domain = substr(getDomainBySite($site), 4);//orders.sales_channel
 		$orderwhere .= " and sales_channel = '".ucfirst($domain)."'";
+		$where = $this->getDateWhere($site,$timeType);
+		$orderwhere .= $this->getDateWhere($site,$timeType);
 		//用户权限sap_asin_match_sku
+		//$account搜索两个表的字段都为seller_account_id
+		if($account){
+			$where .= ' and order_items.seller_account_id in('.$account.')';
+			$orderwhere .= ' and seller_account_id in('.$account.')';
+		}
 		$userwhere = $this->getUserWhere($site,$bg,$bu);
 		if($asin){
 			//根据输入的asin/sku参数，得到可查询的asin
@@ -231,12 +241,14 @@ class CcpController extends Controller
 				  (
 					SELECT amazon_order_id 
 					FROM orders 
-					WHERE order_status IN ( 'PendingAvailability', 'Pending', 'Unshipped', 'PartiallyShipped', 'Shipped', 'InvoiceUnconfirmed', 'Unfulfillab' ) {$orderwhere}
+					 {$orderwhere}
 				  )
+				and order_items.asin in({$userwhere}) 
 			  	{$where} 
-			  	and order_items.asin in({$userwhere}) 
+			  	
 			) AS kk GROUP BY kk.asin order by sales desc";
 		return $sql;
+		
 	}
 	//得到处理后的数据
 	public function getDealData($itemData,$site)
@@ -301,29 +313,27 @@ class CcpController extends Controller
 		$dateRange = $this->getDateRange();
 		$startDate = $dateRange['startDate'];
 		$endDate = $dateRange['endDate'];
-		$date_field = 'purchase_date';
+		$date_field = -28800;
 		$dateconfig = array('A1PA6795UKMFR9','A1RKKUPIHCS9HS','A13V1IB3VIYZZH','APJ6JRA9NG5V4');//utc+2:00
 		if($timeType==1){//选的是后台当地时间
 			if($site=='A1VC38T7YXB528'){//日本站点，date字段+9hour
-				$date_field = 'date_add(purchase_date,INTERVAL 9 hour) ';
+				$date_field = -32400;
 			}elseif($site=='A1F83G8C2ARO7P'){//英国站点+1小时，uTc+1:00
-				$date_field = 'date_add(purchase_date,INTERVAL 1 hour) ';
+				$date_field = -3600;
 			}elseif(in_array($site,$dateconfig)){//站点+2小时，utc+2:00
-				$date_field = 'date_add(purchase_date,INTERVAL 2 hour) ';
+				$date_field = -7200;
 			}else{//其他站点，date字段-7hour
 				$res = $this->isWinterTime(strtotime($startDate));//判断美国是否冬令制时间
 				//美国Amazon时间冬令制时间和北京时间相差16个小时。夏令制相差15个小时
 				if($res==1){//冬令制时间
-					$date_field = 'date_sub(purchase_date,INTERVAL 8 hour) ';
+					$date_field = 28800;
 				}else{
-					$date_field = 'date_sub(purchase_date,INTERVAL 7 hour) ';
+					$date_field = 25200;
 				}
 
 			}
-		}else{//北京时间加上8小时
-			$date_field = 'date_add(purchase_date,INTERVAL 8 hour) ';
 		}
-		$where = " and {$date_field} BETWEEN STR_TO_DATE( '".$startDate."', '%Y-%m-%d %H:%i:%s' ) AND STR_TO_DATE('".$endDate."', '%Y-%m-%d %H:%i:%s' )";
+		$where = " and purchase_date BETWEEN '".date('Y-m-d H:i:s',strtotime($startDate)+$date_field)."' AND '".date('Y-m-d H:i:s',strtotime($endDate)+$date_field)."'";
 		return $where;
 	}
 	/*

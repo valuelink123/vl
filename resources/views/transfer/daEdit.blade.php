@@ -21,7 +21,7 @@ if(in_array(array_get($form,'tstatus'),[0,1,2,3,4,8])) $disabledForm="";
                             <label>Ship Status:</label>
                             <select class="form-control" name="tstatus" id="tstatus" {{in_array(array_get($form,'tstatus'),[1,2,3,4,8])?'':'disabled'}} >
                             @foreach (\App\Models\TransferPlan::SHIPMENTSTATUS as $k=>$v)
-                            <option value="{{$k}}" {{($k==array_get($form,'tstatus'))?'selected':''}} {{in_array($k,[1,2,3,4,8])?'':'disabled'}} >{{$v}}</option>
+                            <option value="{{$k}}" {{($k==array_get($form,'tstatus'))?'selected':''}} {{in_array($k,[1,2,3,4,5,5,5,5,5,8])?'':'disabled'}} >{{$v}}</option>
                             @endforeach 
                             </select>
                         </div>

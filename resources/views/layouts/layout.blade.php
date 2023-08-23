@@ -700,6 +700,24 @@
                                                                                                     </a>
                                                                                                 </li>
 						@endpermission
+                        <li class="">
+                            <a href="/skuSize" class="nav-link nav-toggle ">
+                                配货SKU尺寸重量信息
+                                <span class="arrow"></span>
+                            </a>
+                        </li>
+                        <li class="">
+                            <a href="/amazonWarehouse" class="nav-link nav-toggle ">
+                                配货亚马逊仓库信息
+                                <span class="arrow"></span>
+                            </a>
+                        </li>
+                        <li class="">
+                            <a href="/daSkuMatch" class="nav-link nav-toggle ">
+                                配货DaSku匹配信息
+                                <span class="arrow"></span>
+                            </a>
+                        </li>
                                                 @permission('inventory-cycle-count-show')
                                                 <li class="">
                                                     <a href="/inventoryCycleCount" class="nav-link nav-toggle ">

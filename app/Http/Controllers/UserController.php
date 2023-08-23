@@ -147,13 +147,20 @@ class UserController extends Controller
             'password' => 'required|string|min:6|confirmed',
 			'roles'=> 'required|array'
         ]);
-
+	$seller_rules = null;
+		if(in_array(15,$request->input('roles')) || in_array(16,$request->input('roles'))){
+			$seller_rules = $request->get('bg').'-'.$request->get('bu').'-*';
+		}
+		if(in_array(28,$request->input('roles'))){
+			$seller_rules = $request->get('bg').'-*-*';
+		}
         $user = User::create([
             'name' => $request->get('name'),
             'email' => $request->get('email'),
             'password' => bcrypt($request->get('password')),
 			'ubg' => $request->get('bg'),
             'ubu' => $request->get('bu'),
+		'seller_rules' => $seller_rules,
 			'sap_seller_id' => intval($request->get('sap_seller_id')),
 			'admin'=> ($request->get('admin'))?1:0
         ]);
@@ -1084,7 +1091,14 @@ WHERE asin_daily_report.date>='$date_from' AND asin_daily_report.date<='$date_to
 		if($request->get('bg')) $update['ubg'] = $request->get('bg');
 		if($request->get('bu')) $update['ubu'] = $request->get('bu');
 		if($request->get('sap_seller_id')) $update['sap_seller_id'] = intval($request->get('sap_seller_id'));
-			
+	$seller_rules = null;
+		if(in_array(15,$request->input('roles')) || in_array(16,$request->input('roles'))){
+			$seller_rules = $request->get('bg').'-'.$request->get('bu').'-*';
+		}
+		if(in_array(28,$request->input('roles'))){
+			$seller_rules = $request->get('bg').'-*-*';
+		}
+	$update['seller_rules'] = $seller_rules;		
         $user = User::find($id);
 		$result = $user->update($update);
 

@@ -1,6 +1,6 @@
 <?php
 $disabledForm = ' disabled ';
-if(in_array(array_get($form,'tstatus'),[5,6,8])) $disabledForm="";
+if(in_array(array_get($form,'tstatus'),[5,6,7,8])) $disabledForm="";
 ?>
 <div class="row">
     <div class="col-md-12">
@@ -21,9 +21,9 @@ if(in_array(array_get($form,'tstatus'),[5,6,8])) $disabledForm="";
             <div class="col-md-6">
             <div class="form-group">
                 <label>调拨状态:</label>
-                <select class="form-control" name="tstatus" id="tstatus" {{in_array(array_get($form,'tstatus'),[5,6,8])?'':'disabled'}}>
+                <select class="form-control" name="tstatus" id="tstatus" {{in_array(array_get($form,'tstatus'),[5,6,7,8])?'':'disabled'}}>
                 @foreach (\App\Models\TransferPlan::SHIPMENTSTATUS as $k=>$v)
-                <option value="{{$k}}" {{($k==array_get($form,'tstatus'))?'selected':''}} {{in_array($k,[5,6,8])?'':'disabled'}}>{{$v}}</option>
+                <option value="{{$k}}" {{($k==array_get($form,'tstatus'))?'selected':''}} {{in_array($k,[5,6,7,8])?'':'disabled'}}>{{$v}}</option>
                 @endforeach 
                 </select>
             </div>
@@ -54,16 +54,7 @@ if(in_array(array_get($form,'tstatus'),[5,6,8])) $disabledForm="";
             </div>
             </div>
             <div class="col-md-12" style="text-align:left;"><span class="label label-sm label-primary">{{array_get($form,'reson')}}</span> <span class="label label-sm label-danger">{{array_get($form,'remark')}}</span></div>
-            <div class="form-actions">
-                            <div class="row">
-                                <div class="col-md-12">
-                                 <button type="button"  class="btn grey-salsa btn-outline pull-right"  data-dismiss="modal" aria-hidden="true">Close</button>
-								 &nbsp;&nbsp;
-                                 <input type="submit" name="update" value="Save" class="btn blue pull-right" >
-                                </div>
-                            </div>
-                        </div>
-                    </form>
+            
             <div style="clear:both;"></div>
             <?php
             foreach($items as $key=>$item){
@@ -84,7 +75,31 @@ if(in_array(array_get($form,'tstatus'),[5,6,8])) $disabledForm="";
                 <div class="col-md-6">RMS : {{array_get(\App\Models\TransferPlan::TF,$item['rms'])}}</div>
                 <div class="col-md-6">抽卡 : {{array_get(\App\Models\TransferPlan::TF,$item['rcard'])}}</div>
                 <div class="col-md-12">地址 : {{array_get($warehouses,array_get($item,'warehouse_code').'.address')}} {{array_get($warehouses,array_get($item,'warehouse_code').'.state')}} {{array_get($warehouses,array_get($item,'warehouse_code').'.city')}}  {{array_get($warehouses,array_get($item,'warehouse_code').'.zip')}}</div>
-            </div></div>
+            </div>
+			<div style="clear:both;"></div>
+	@if(array_get($form,'tstatus')==7)
+	    <div class="row">
+	<div class="col-md-4">
+	<div class="form-group">
+		<label>ST0:</label>
+		<input type="text" class="form-control" name="items[{{array_get($item,'id')}}][sap_st0]" {{$disabledForm}} value="{{array_get($item,'sap_st0')}}" required>
+	</div>
+	</div>
+	<div class="col-md-4">
+	<div class="form-group">
+		<label>DN:</label>
+		<input type="text" class="form-control" name="items[{{array_get($item,'id')}}][sap_dn]" {{$disabledForm}} value="{{array_get($item,'sap_dn')}}" required>
+	</div>
+	</div>
+	<div class="col-md-4">
+	<div class="form-group">
+		<label>TM:</label>
+		<input type="text" class="form-control" name="items[{{array_get($item,'id')}}][sap_tm]" {{$disabledForm}} value="{{array_get($item,'sap_tm')}}" required>
+	</div>
+	</div>
+</div>
+	@endif
+	    </div>
             <div class="row" style="margin:10px;">
             @if(!empty($ships))
             <table class="table table-hover">
@@ -135,6 +150,16 @@ if(in_array(array_get($form,'tstatus'),[5,6,8])) $disabledForm="";
             <?php
             }
             ?>
+			<div class="form-actions">
+					<div class="row">
+						<div class="col-md-12">
+						 <button type="button"  class="btn grey-salsa btn-outline pull-right"  data-dismiss="modal" aria-hidden="true">Close</button>
+						 &nbsp;&nbsp;
+						 <input type="submit" name="update" value="Save" class="btn blue pull-right" >
+						</div>
+					</div>
+				</div>
+			</form>
 
                     
 						
