@@ -85,7 +85,12 @@
                             </select>
                         </div>
                     </div>
-
+                    <div class="col-md-2">
+                        <div class="input-group">
+                            <span class="input-group-addon">Campaig</span>
+                            <input name="campaig_name" value="">
+                        </div>
+                    </div>
                     <div class="col-md-1">
                         <div class="input-group">
                             <div class="btn-group pull-right" >
@@ -222,7 +227,7 @@
             ajax: {
                 type: 'POST',
                 url: '/ccp/adCampaign/list',
-                data:  {search: $("#search-form").serialize()}
+                data:  {search: decodeURIComponent($("#search-form").serialize(),true)}
             }
         })
 
@@ -252,7 +257,7 @@
             $.ajax({
                 type: 'post',
                 url: '/ccp/adCampaign/showTotal',
-                data: {search_data:$("#search-form").serialize()},
+                data: {search_data:decodeURIComponent($("#search-form").serialize(),true)},
                 dataType:'json',
                 success: function(res) {
                     $('.total-data-table .sales').text(res.sales);
@@ -262,7 +267,7 @@
             });
             //改变下面表格的数据内容
             dtapi = $('#datatable').dataTable().api();
-            dtapi.settings()[0].ajax.data = {search: $("#search-form").serialize()};
+            dtapi.settings()[0].ajax.data = {search: decodeURIComponent($("#search-form").serialize(),true)};
             dtapi.ajax.reload();
 
             return false;
@@ -270,7 +275,7 @@
 
         //点击导出
         $('#export_table').click(function(){
-            var search = $("#search-form").serialize();
+            var search = decodeURIComponent($("#search-form").serialize(),true);
             var accountid = '';
             var vv = '';
             $("#account-div .active").each(function (index,value) {

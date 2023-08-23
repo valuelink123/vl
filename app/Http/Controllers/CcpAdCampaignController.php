@@ -161,6 +161,7 @@ class CcpAdCampaignController extends Controller
 		$site = isset($search['site']) ? $search['site'] : '';//站点，为marketplaceid
 		$account = isset($search['account']) ? $search['account'] : '';//账号id,例如115,137
 		$type = isset($search['type']) ? $search['type'] : '';
+		$campaig_name = isset($search['campaig_name']) ? $search['campaig_name'] : '';
 
 		$this->start_date = isset($search['start_date']) ? $search['start_date'] : '';
 		$this->end_date = isset($search['end_date']) ? $search['end_date'] : '';
@@ -175,6 +176,10 @@ class CcpAdCampaignController extends Controller
 			$account_str = implode("','", explode(',',$account));
 			$where .= " and ppc_profiles.seller_id in('".$account_str."')";
 		}
+		if($campaig_name) {
+			$where .= " and campaigns.name like'%".$campaig_name."%' ";
+		}
+		
 		if($type){
 			$type_arr = explode(',',$type);
 		}else{
