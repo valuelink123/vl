@@ -122,7 +122,10 @@
                             <thead>
                                 <tr role="row" class="heading">
                                     <th>
-                                       
+     					<label class="mt-checkbox mt-checkbox-single mt-checkbox-outline">
+                                        <input type="checkbox" class="group-checkable" data-set="#datatable_ajax .checkboxes" />
+                                        <span></span>
+                                    </label>                                  
                                     </th>
                                     <th>更新日期</th>
 									<th>Bg - Bu</th>
@@ -219,7 +222,19 @@
                                 columns: [ 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19 ]
                             },
                         },
-                     ]
+                     ],
+		     
+                        "drawCallback": function(){
+                            $(".dataTables_scroll input[class='group-checkable']").on('change',function(e) {
+                                $(".dataTables_scroll input[class='checkboxes']").prop("checked", this.checked);
+                            });	
+
+                            $(".dataTables_scroll input[class='checkboxes']").on('change',function(e) {
+                                $(".dataTables_scroll input[class='group-checkable']").prop("checked", false);
+                            });	
+                        }
+
+                    
                      
                  }
             });
