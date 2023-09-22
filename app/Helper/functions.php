@@ -1765,6 +1765,34 @@ function getBrands(){
 			'url'=>'runmesport.com',
 			'email'=>'support@runmesport.com',
 		],
+		'Tec.Bean'=>[
+			'url'=>'tecbeanshop.com',
+			'email'=>'support@tecbeanshop.com',
+		],
+		'VACASSO'=>[
+			'url'=>'myvacasso.com',
+			'email'=>'support@myvacasso.com',
+		],
+		'Szevzo'=>[
+			'url'=>'szevzoshop.com',
+			'email'=>'service@szevzoshop.com',
+		],
+		'VIZONY'=>[
+			'url'=>'vizonyshop.com',
+			'email'=>'support@vizonyshop.com',
+		],
+		'TETAL'=>[
+			'url'=>'tetalshop.com',
+			'email'=>'support@tetalshop.com',
+		],
+		'DEVINC'=>[
+			'url'=>'devincshop.com',
+			'email'=>'support@devincshop.com',
+		],
+		'PEKITEN'=>[
+			'url'=>'pekitenshop.com',
+			'email'=>'support@pekitenshop.com',
+		],
 	);
 }
 
