@@ -51,7 +51,7 @@ class PostDa extends Command
 		$token = env('DATOKEN');//'PttzVyFJRNp4XMx6FeqW7/aOkGS7+qtD';
 		$customerCode =env('DACUSTOMERCODE');//'VL';
 		$shipEmail = env('SHIPMAIL');//'284299346@qq.com';//'zhanqiziyin@valuelinkltd.com';
-		$daEmail = env('DAMAIL');//'284299346@qq.com';
+		$daEmails = explode(',',env('DAMAIL'));//'284299346@qq.com';
 
 		$checks = TransferPlan::where('status',5)->where('tstatus',0)->get();
 		foreach($checks as $data){
@@ -127,6 +127,7 @@ class PostDa extends Command
 			
 					$subject = 'Order No. '.$data->da_order_id.' Ref No. '.$fnsku.'-'.$data->shipment_id.' Attachs!';
 					$html = new \Html2Text\Html2Text($subject);
+					foreach($daEmails as $daEmail){
 					Mail::send(['emails.common','emails.common-text'],['content'=>$subject,'contentText'=>$html->getText()],  function($m) use($subject,$daEmail,$uploads)
 					{
 						$m->to($daEmail);
@@ -137,6 +138,7 @@ class PostDa extends Command
 							}
 						}
 					});
+					}
 			
 				}else{
 					$data->api_msg = array_get($result,'msg').json_encode(array_get($result,'data'));
@@ -211,6 +213,7 @@ class PostDa extends Command
                                                 $sapData['postdata']['IMPORT']=array('I_ZID'=>$ZID);
                                                 //$sapData['istest'] = 1;
                                                 $res = $sap->ZMM_STO_DA($sapData);
+						print_r($res);
                                                 if(array_get($res,'ack')==1 && array_get($res,'data.O_FLAG')=='X'){
                                                         $lists = array_get($res,'data.O_TAB');
                                                         foreach($lists as $list){

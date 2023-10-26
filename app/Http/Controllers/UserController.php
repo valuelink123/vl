@@ -619,37 +619,34 @@ class UserController extends Controller
 			if(array_get($_REQUEST,'ExportType')=='Reimbursements'){
 				if(!Auth::user()->can(['data-statistics-reimbursements'])) die('Permission denied -- data-statistics-reimbursements');
 				$seller=[];
-				$accounts= DB::connection('order')->table('accounts')->where('status',1)->groupBy(['sellername','sellerid'])->get(['sellername','sellerid']);
+				$accounts= DB::connection('amazon')->table('seller_accounts')->where('primary',1)->get(['label','id']);
 				$accounts=json_decode(json_encode($accounts), true);
 				foreach($accounts as $account){
-					$seller[$account['sellerid']]=$account['sellername'];
+					$seller[$account['id']]=$account['label'];
 				}
-				$datas= DB::connection('order')->table('amazon_reimbursements')->where('approvalDate','>=',$date_from.'T00:00:00')->where('approvalDate','<=',$date_to.'T23:59:59')->orderBy('approvalDate','asc')->get()->toArray();
-				$arrayData[] = ['approvalDate','SellerId','SellerName','reimbursementId','lineNum','caseId','amazonOrderId','reason','Sku','FnSku','asin','productName','currencyUnit','quantityReimbursedCash','quantityReimbursedInventory','quantityReimbursedTotal','originalReimbursementId','originalReimbursementType','condition','amountPerUnit','amountTotal'];
+				$datas= DB::connection('amazon')->table('amazon_reimbursements')->where('approval_date','>=',$date_from.' 00:00:00')->where('approval_date','<=',$date_to.' 23:59:59')->orderBy('approval_date','asc')->get()->toArray();
+				$arrayData[] = ['approvalDate','SellerName','reimbursementId','lineNum','caseId','amazonOrderId','reason','Sku','FnSku','asin','productName','currencyUnit','quantityReimbursedCash','quantityReimbursedInventory','quantityReimbursedTotal','condition','amountPerUnit','amountTotal'];
 				$datas=json_decode(json_encode($datas), true);
 				foreach($datas as $key=>$val){
 					$arrayData[] = [
-						array_get($val,'approvalDate'),
-						array_get($val,'sellerId'),
-						array_get($seller,array_get($val,'sellerId'),array_get($val,'sellerId')),
-						array_get($val,'reimbursementId'),
-						array_get($val,'lineNum'),
-						array_get($val,'caseId'),
-						array_get($val,'amazonOrderId'),
+						array_get($val,'approval_date'),
+						array_get($seller,array_get($val,'seller_account_id'),array_get($val,'seller_account_id')),
+						array_get($val,'reimbursement_id'),
+						array_get($val,'line_num'),
+						array_get($val,'case_id'),
+						array_get($val,'amazon_order_id'),
 						array_get($val,'reason'),
-						array_get($val,'sku'),
+						array_get($val,'seller_sku'),
 						array_get($val,'fnsku'),
 						array_get($val,'asin'),
-						array_get($val,'productName'),
-						array_get($val,'currencyUnit'),
-						array_get($val,'quantityReimbursedCash'),
-						array_get($val,'quantityReimbursedInventory'),
-						array_get($val,'quantityReimbursedTotal'),
-						array_get($val,'originalReimbursementId'),
-						array_get($val,'originalReimbursementType'),
+						array_get($val,'title'),
+						array_get($val,'currency_unit'),
+						array_get($val,'quantity_reimbursed_cash'),
+						array_get($val,'quantity_reimbursed_inventory'),
+						array_get($val,'quantity_reimbursed_total'),
 						array_get($val,'condition'),
-						array_get($val,'amountPerUnit'),
-						array_get($val,'amountTotal')
+						array_get($val,'amount_per_unit'),
+						array_get($val,'amount_total')
 						
 					];
 				}
