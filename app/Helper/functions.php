@@ -1933,15 +1933,17 @@ function getOrderIdStatus()
 
 function getSellerRules(string $ruleStr, string $bg, string $bu){
 	$ruleStrs = explode(",", $ruleStr);
-	$where = '';
+	if(empty($ruleStrs)) return '';
+	$orWhere = [];
+	$i=0;
 	foreach($ruleStrs as $ruleStr){
+		$str = [];
 		$rule = explode("-",$ruleStr);
-		if(array_get($rule,0)!='*') $where.= " and ($bg='".array_get($rule,0)."'";
-		if(array_get($rule,1)!='*') {
-			$where.= " and $bu='".array_get($rule,1)."')";
-		}else{
-			$where.= ")";
-		}
+		if(array_get($rule,0)!='*') $str[]= "  $bg='".array_get($rule,0)."'";
+		if(array_get($rule,1)!='*') $str[]= "  $bu='".array_get($rule,1)."'";
+		if(empty($str)) continue;
+		$orWhere[] = '('.implode(' and ',$str).')';
 	}
-	return $where;
+	if(empty($orWhere)) return '';
+	return 'and ('.implode(' or ',$orWhere).')';
 }
