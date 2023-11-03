@@ -1933,7 +1933,7 @@ function getOrderIdStatus()
 
 function getSellerRules(string $ruleStr, string $bg, string $bu){
 	$ruleStrs = explode(",", $ruleStr);
-	if(empty($ruleStrs)) return '';
+	if(empty($ruleStrs)) return ' ';
 	$orWhere = [];
 	$i=0;
 	foreach($ruleStrs as $ruleStr){
@@ -1941,9 +1941,9 @@ function getSellerRules(string $ruleStr, string $bg, string $bu){
 		$rule = explode("-",$ruleStr);
 		if(array_get($rule,0)!='*') $str[]= "  $bg='".array_get($rule,0)."'";
 		if(array_get($rule,1)!='*') $str[]= "  $bu='".array_get($rule,1)."'";
-		if(empty($str)) continue;
+		if(empty($str)) return ' ';
 		$orWhere[] = '('.implode(' and ',$str).')';
 	}
-	if(empty($orWhere)) return '';
-	return 'and ('.implode(' or ',$orWhere).')';
+	if(empty($orWhere)) return ' ';
+	return ' and ('.implode(' or ',$orWhere).')';
 }
