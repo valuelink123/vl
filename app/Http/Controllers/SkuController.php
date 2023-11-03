@@ -46,9 +46,7 @@ class SkuController extends Controller
 		$where= "where length(trim(asin))=10";
 		
 		if (Auth::user()->seller_rules) {
-			$rules = explode("-",Auth::user()->seller_rules);
-			if(array_get($rules,0)!='*') $where.= " and bg='".array_get($rules,0)."'";
-			if(array_get($rules,1)!='*') $where.= " and bu='".array_get($rules,1)."'";
+			$where.= getSellerRules(Auth::user()->seller_rules,'bg','bu');
 		} elseif (Auth::user()->sap_seller_id) {
 			$where.= " and sap_seller_id=".Auth::user()->sap_seller_id;
 		} else {
@@ -181,9 +179,7 @@ any_value(sap_seller_bg) as bg,any_value(sap_seller_bu) as bu,any_value(sap_sell
 		$exportFileName = $date_start.'_'.$date_end;
 		$where= " length(trim(asin))=10 and date>='$date_start' and date<='$date_end' ";
 		if (Auth::user()->seller_rules) {
-			$rules = explode("-",Auth::user()->seller_rules);
-			if(array_get($rules,0)!='*') $where.= " and bg='".array_get($rules,0)."'";
-			if(array_get($rules,1)!='*') $where.= " and bu='".array_get($rules,1)."'";
+			$where.= getSellerRules(Auth::user()->seller_rules,'bg','bu');
 		} elseif (Auth::user()->sap_seller_id) {
 			$where.= "sap_seller_id=".Auth::user()->sap_seller_id;
 		} else {

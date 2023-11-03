@@ -66,9 +66,8 @@ class TaskController extends Controller
 		if(!Auth::user()->can(['task-show-all'])){ 
 		
 			if (Auth::user()->seller_rules) {
-				$rules = explode("-", Auth::user()->seller_rules);
-				if (array_get($rules, 0) != '*') $customers = $customers->where('users.ubg', array_get($rules, 0));
-				if (array_get($rules, 1) != '*') $customers = $customers->where('users.ubu', array_get($rules, 1));
+				$where = '1=1 '.getSellerRules(Auth::user()->seller_rules,'users.ubg','users.ubu');
+				$customers = $customers->whereRaw($where);
 			} else {
 				$user_id = $this->getUserId();
 				$customers = $customers->where(function ($query) use ($user_id) {

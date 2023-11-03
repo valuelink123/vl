@@ -42,15 +42,9 @@ class HomeController extends Controller
 
 		$exportFileName = '';
 		if (Auth::user()->seller_rules) {
-			$rules = explode("-", Auth::user()->seller_rules);
-			if (array_get($rules, 0) != '*'){
-				$datas = $datas->where('sap_seller_bg',array_get($rules, 0));
-				$user_teams =$user_teams->where('sap_seller_bg',array_get($rules, 0));
-			}
-			if (array_get($rules, 1) != '*'){
-				$datas =$datas->where('sap_seller_bu',array_get($rules, 1));
-				$user_teams =$user_teams->where('sap_seller_bu',array_get($rules, 1));
-			}
+			$where = '1=1 '.getSellerRules(Auth::user()->seller_rules,'sap_seller_bg','sap_seller_bu');
+			$datas = $datas->whereRaw($where);
+			$user_teams =$user_teams->whereRaw($where);
 		} else {
 			$datas =$datas->where('sap_seller_id',Auth::user()->sap_seller_id); 
 			$user_teams =$user_teams->where('sap_seller_id',Auth::user()->sap_seller_id);

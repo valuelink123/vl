@@ -253,7 +253,8 @@ class CcpAdTotalController extends Controller
 		$end_date = date('Y-m-d');
 		$site = getMarketDomain();//获取站点选项
 		$userdata = Auth::user();
-		$rules = explode("-", $userdata->seller_rules);
+		$rule = explode(",", $userdata->seller_rules);
+		$rules = explode("-", array_get($rule,0));
 		$bg = $bu = '';
 		$ccpAdmin = $this->getccpAdmin();
 		if (!in_array($userdata->email, $ccpAdmin)) {

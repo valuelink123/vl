@@ -84,9 +84,8 @@ class StarController extends Controller
 		
 		if(!Auth::user()->can('asin-rating-show-all')) {
 			if (Auth::user()->seller_rules) {
-				$rules = explode("-", Auth::user()->seller_rules);
-				if (array_get($rules, 0) != '*') $customers = $customers->where('asin.bg', array_get($rules, 0));
-				if (array_get($rules, 1) != '*') $customers = $customers->where('asin.bu', array_get($rules, 1));
+				$where = '1=1 '.getSellerRules(Auth::user()->seller_rules,'asin.bg','asin.bu');
+				$customers = $customers->whereRaw($where);
 			} elseif (Auth::user()->sap_seller_id) {
 				$customers = $customers->where('asin.sap_seller_id', Auth::user()->sap_seller_id);
 			} else {

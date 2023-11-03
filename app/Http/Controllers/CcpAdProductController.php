@@ -154,9 +154,7 @@ class CcpAdProductController extends Controller
 			$userWhere = " where LENGTH(asin)=10 and marketplace_id  = '".$site."'";
 			if (!in_array(Auth::user()->email, $this->ccpAdmin)) {
 					if ($userdata->seller_rules) {
-							$rules = explode("-", $userdata->seller_rules);
-							if (array_get($rules, 0) != '*') $userWhere .= " and sap_seller_bg = '".array_get($rules, 0)."'";
-							if (array_get($rules, 1) != '*') $userWhere .= " and sap_seller_bu = '".array_get($rules, 1)."'";
+							$userWhere.= getSellerRules($userdata->seller_rules,'sap_seller_bg','sap_seller_bu');
 					}elseif($userdata->sap_seller_id){
 							$userWhere .= " and sap_seller_id = ".$userdata->sap_seller_id;
 					}

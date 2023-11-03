@@ -65,9 +65,7 @@ class ReqrevController extends Controller
 		$user_id = $request->get('user_id');
 		$where = "1=1";
 		if (Auth::user()->seller_rules) {
-			$rules = explode("-",Auth::user()->seller_rules);
-			if(array_get($rules,0)!='*') $where.= " and bg='".array_get($rules,0)."'";
-			if(array_get($rules,1)!='*') $where.= " and bu='".array_get($rules,1)."'";
+			$where.= getSellerRules(Auth::user()->seller_rules,'bg','bu');
 		} elseif (Auth::user()->sap_seller_id) {
 			$where.= " and sap_seller_id=".Auth::user()->sap_seller_id;
 		}

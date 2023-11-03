@@ -175,13 +175,15 @@ class ReviewController extends Controller
 		$_isSales=false;
 		$_toSelect=false;
 		if($_curr_user->seller_rules) {
-			$rules = explode("-", trim($_curr_user->seller_rules));
+			$where = '1=1 '.getSellerRules($_curr_user->seller_rules,'sap_asin_match_sku.sap_seller_bg','sap_asin_match_sku.sap_seller_bu');
+			$_asinsMappingSelect = $_asinsMappingSelect->whereRaw($where);
+			
+			$ruleStr = explode(",",$_curr_user->seller_rules);
+			$rules = explode("-",array_get($ruleStr,0));
 			if (array_get($rules, 0) != '*') {
-				$_asinsMappingSelect=$_asinsMappingSelect->where('sap_asin_match_sku.sap_seller_bg',array_get($rules, 0)) ;
 				$_isSales=true;
 			}
 			if (array_get($rules, 1) != '*') {
-				$_asinsMappingSelect=$_asinsMappingSelect->where('sap_asin_match_sku.sap_seller_bu',array_get($rules, 1)) ;
 				$_isSales=true;
 			}
 		}else {
@@ -487,15 +489,17 @@ class ReviewController extends Controller
         $_isSales=false;
         $_toSelect=false;
         if($_curr_user->seller_rules) {
-            $rules = explode("-", trim($_curr_user->seller_rules));
-            if (array_get($rules, 0) != '*') {
-                $_asinsMappingSelect=$_asinsMappingSelect->where('sap_asin_match_sku.sap_seller_bg',array_get($rules, 0)) ;
-                $_isSales=true;
-            }
-            if (array_get($rules, 1) != '*') {
-                $_asinsMappingSelect=$_asinsMappingSelect->where('sap_asin_match_sku.sap_seller_bu',array_get($rules, 1)) ;
-                $_isSales=true;
-            }
+            $where = '1=1 '.getSellerRules($_curr_user->seller_rules,'sap_asin_match_sku.sap_seller_bg','sap_asin_match_sku.sap_seller_bu');
+			$_asinsMappingSelect = $_asinsMappingSelect->whereRaw($where);
+			
+			$ruleStr = explode(",",$_curr_user->seller_rules);
+			$rules = explode("-",array_get($ruleStr,0));
+			if (array_get($rules, 0) != '*') {
+				$_isSales=true;
+			}
+			if (array_get($rules, 1) != '*') {
+				$_isSales=true;
+			}
         }else {
             if($_curr_user->sap_seller_id>0) {
                 $_isSales=true;

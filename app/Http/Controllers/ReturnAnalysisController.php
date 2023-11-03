@@ -105,9 +105,7 @@ class ReturnAnalysisController extends Controller
 			$where_sku = ' where 1 = 1 ';
 
 			if (Auth::user()->seller_rules) {
-				$rules = explode("-",Auth::user()->seller_rules);
-				if(array_get($rules,0)!='*') $where_sku.= " and tb.sap_seller_bg='".array_get($rules,0)."'";
-				if(array_get($rules,1)!='*') $where_sku.= " and tb.sap_seller_bu='".array_get($rules,1)."'";
+				$where_sku.= getSellerRules(Auth::user()->seller_rules,'tb.sap_seller_bg','tb.sap_seller_bu');
 			} elseif (Auth::user()->sap_seller_id) {
 				$where_sku.= " and tb.sap_seller_id=".Auth::user()->sap_seller_id;
 			}
@@ -191,9 +189,7 @@ class ReturnAnalysisController extends Controller
 			$where_sku = ' where 1 = 1 ';
 
 			if (Auth::user()->seller_rules) {
-				$rules = explode("-",Auth::user()->seller_rules);
-				if(array_get($rules,0)!='*') $where_sku.= " and tb.sap_seller_bg='".array_get($rules,0)."'";
-				if(array_get($rules,1)!='*') $where_sku.= " and tb.sap_seller_bu='".array_get($rules,1)."'";
+				$where_sku.= getSellerRules(Auth::user()->seller_rules,'tb.sap_seller_bg','tb.sap_seller_bu');
 			} elseif (Auth::user()->sap_seller_id) {
 				$where_sku.= " and tb.sap_seller_id=".Auth::user()->sap_seller_id;
 			}
@@ -370,9 +366,7 @@ class ReturnAnalysisController extends Controller
 		$userWhere = " where 1=1";
 		if (!in_array(Auth::user()->email, $this->ccpAdmin)) {
 			if ($userdata->seller_rules) {
-				$rules = explode("-", $userdata->seller_rules);
-				if (array_get($rules, 0) != '*') $userWhere .= " and sap_seller_bg = '".array_get($rules, 0)."'";
-				if (array_get($rules, 1) != '*') $userWhere .= " and sap_seller_bu = '".array_get($rules, 1)."'";
+				$userWhere.= getSellerRules($userdata->seller_rules,'sap_seller_bg','sap_seller_bu');
 			}elseif($userdata->sap_seller_id){
 				$userWhere .= " and sap_seller_id = ".$userdata->sap_seller_id;
 			}
@@ -416,9 +410,7 @@ class ReturnAnalysisController extends Controller
 		$where_sku = ' where 1 = 1 ';
 
 		if (Auth::user()->seller_rules) {
-			$rules = explode("-",Auth::user()->seller_rules);
-			if(array_get($rules,0)!='*') $where_sku.= " and tb.sap_seller_bg='".array_get($rules,0)."'";
-			if(array_get($rules,1)!='*') $where_sku.= " and tb.sap_seller_bu='".array_get($rules,1)."'";
+			$where_sku.= getSellerRules(Auth::user()->seller_rules,'tb.sap_seller_bg','tb.sap_seller_bu');
 		} elseif (Auth::user()->sap_seller_id) {
 			$where_sku.= " and tb.sap_seller_id=".Auth::user()->sap_seller_id;
 		}
@@ -504,9 +496,8 @@ class ReturnAnalysisController extends Controller
 			}
 
 			if (Auth::user()->seller_rules) {
-				$rules = explode("-",Auth::user()->seller_rules);
-				if(array_get($rules,0)!='*') $where.= " and tb.sap_seller_bg='".array_get($rules,0)."'";
-				if(array_get($rules,1)!='*') $where.= " and tb.sap_seller_bu='".array_get($rules,1)."'";
+				$where.= getSellerRules(Auth::user()->seller_rules,'tb.sap_seller_bg','tb.sap_seller_bu');
+				
 			} elseif (Auth::user()->sap_seller_id) {
 				$where.= " and tb.sap_seller_id=".Auth::user()->sap_seller_id;
 			}
@@ -582,9 +573,7 @@ class ReturnAnalysisController extends Controller
 			}
 
 			if (Auth::user()->seller_rules) {
-				$rules = explode("-",Auth::user()->seller_rules);
-				if(array_get($rules,0)!='*') $where.= " and tb.sap_seller_bg='".array_get($rules,0)."'";
-				if(array_get($rules,1)!='*') $where.= " and tb.sap_seller_bu='".array_get($rules,1)."'";
+				$where.= getSellerRules(Auth::user()->seller_rules,'tb.sap_seller_bg','tb.sap_seller_bu');
 			} elseif (Auth::user()->sap_seller_id) {
 				$where.= " and tb.sap_seller_id=".Auth::user()->sap_seller_id;
 			}

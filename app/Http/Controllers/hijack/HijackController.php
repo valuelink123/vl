@@ -96,9 +96,7 @@ class HijackController extends Controller
 		$userWhere = ' where length(sap_asin_match_sku.asin)=10 ';//$userWhere是用于限制可查的asin
 		if(!in_array($user->email, $ADMIN_EMAIL)){//不是超级管理员数组
 			if ($user->seller_rules) {
-				$rules = explode("-", $user->seller_rules);
-				if (array_get($rules, 0) != '*') $userWhere .= " and sap_seller_bg = '".array_get($rules, 0)."'";
-				if (array_get($rules, 1) != '*') $userWhere .= " and sap_seller_bu = '".array_get($rules, 1)."'";
+				$userWhere.= getSellerRules($user->seller_rules,'sap_seller_bg','sap_seller_bu');
 			}elseif($user->sap_seller_id){
 				$userWhere .= " and sap_seller_id = ".$user->sap_seller_id;
 			}

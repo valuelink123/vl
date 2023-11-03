@@ -1930,3 +1930,18 @@ function getOrderIdStatus()
 {
 	return array('Pending','Payment Complete','Shipped','Cancelled','Invalid');
 }
+
+function getSellerRules(string $ruleStr, string $bg, string $bu){
+	$ruleStrs = explode(",", $ruleStr);
+	$where = '';
+	foreach($ruleStrs as $ruleStr){
+		$rule = explode("-",$ruleStr);
+		if(array_get($rule,0)!='*') $where.= " and ($bg='".array_get($rule,0)."'";
+		if(array_get($rule,1)!='*') {
+			$where.= " and $bu='".array_get($rule,1)."')";
+		}else{
+			$where.= ")";
+		}
+	}
+	return $where;
+}

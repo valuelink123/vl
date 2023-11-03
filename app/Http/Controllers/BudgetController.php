@@ -110,9 +110,7 @@ class BudgetController extends Controller
 		$b_status = $request->get('b_status');
 		$where = "1=1";
 		if (Auth::user()->seller_rules) {
-			$rules = explode("-",Auth::user()->seller_rules);
-			if(array_get($rules,0)!='*') $where.= " and bg='".array_get($rules,0)."'";
-			if(array_get($rules,1)!='*') $where.= " and bu='".array_get($rules,1)."'";
+			$where.= getSellerRules(Auth::user()->seller_rules,'bg','bu');
 		} elseif (Auth::user()->sap_seller_id) {
 			$where.= " and sap_seller_id=".Auth::user()->sap_seller_id;
 		} elseif(Auth::user()->hasRole('计划员')){
@@ -225,9 +223,7 @@ sum(amount_used) as amount_fee, sum(fba_storage+fbm_storage) as storage_fee from
 		$b_status = $request->get('b_status');
 		$where = "";
 		if (Auth::user()->seller_rules) {
-			$rules = explode("-",Auth::user()->seller_rules);
-			if(array_get($rules,0)!='*') $where.= " and c.bg='".array_get($rules,0)."'";
-			if(array_get($rules,1)!='*') $where.= " and c.bu='".array_get($rules,1)."'";
+			$where.= getSellerRules(Auth::user()->seller_rules,'c.bg','c.bu');
 		} elseif (Auth::user()->sap_seller_id) {
 			$where.= " and c.sap_seller_id=".Auth::user()->sap_seller_id;
 		}elseif(Auth::user()->hasRole('计划员')){

@@ -38,9 +38,7 @@ class TranController extends Controller
 		if(!Auth::user()->can(['distribution-analysis-show'])) die('Permission denied -- distribution-analysis-show');
 		$where= "where seller_asins.site='www.amazon.com' and seller_asins.item_code<>'a:0:{}'";
 		if (Auth::user()->seller_rules) {
-			$rules = explode("-",Auth::user()->seller_rules);
-			if(array_get($rules,0)!='*') $where.= " and b.bg='".array_get($rules,0)."'";
-			if(array_get($rules,1)!='*') $where.= " and b.bu='".array_get($rules,1)."'";
+			$where.= getSellerRules(Auth::user()->seller_rules,'b.bg','b.bu');
 		} elseif (Auth::user()->sap_seller_id) {
 			$where.= " and b.sap_seller_id=".Auth::user()->sap_seller_id;
 		} else {

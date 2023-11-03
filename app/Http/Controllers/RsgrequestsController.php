@@ -89,9 +89,8 @@ class RsgrequestsController extends Controller
 
 		if(!Auth::user()->can('rsgrequests-show-all')) {
 			if (Auth::user()->seller_rules) {
-				$rules = explode("-", Auth::user()->seller_rules);
-				if (array_get($rules, 0) != '*') $datas = $datas->where('bg', array_get($rules, 0));
-				if (array_get($rules, 1) != '*') $datas = $datas->where('bu', array_get($rules, 1));
+				$where = '1=1 '.getSellerRules(Auth::user()->seller_rules,'bg','bu');
+				$datas = $datas->whereRaw($where);
 			} elseif (Auth::user()->sap_seller_id) {
 				$datas = $datas->where('sap_seller_id', Auth::user()->sap_seller_id);
 			} else {

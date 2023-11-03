@@ -148,9 +148,7 @@ class RefundController extends Controller
 		$where .= " and finances_refund_events.marketplace_name = '".ucfirst($domain)."'";
 
 		if (Auth::user()->seller_rules) {
-			$rules = explode("-",Auth::user()->seller_rules);
-			if(array_get($rules,0)!='*') $where.= " and tb.sap_seller_bg='".array_get($rules,0)."'";
-			if(array_get($rules,1)!='*') $where.= " and tb.sap_seller_bu='".array_get($rules,1)."'";
+			$where.= getSellerRules(Auth::user()->seller_rules,'tb.sap_seller_bg','tb.sap_seller_bu');
 		} elseif (Auth::user()->sap_seller_id) {
 			$where.= " and tb.sap_seller_id=".Auth::user()->sap_seller_id;
 		}

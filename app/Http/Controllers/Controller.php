@@ -67,9 +67,7 @@ class Controller extends BaseController
 		$asinWhere = '';
 		if(!Auth::user()->can($permission) || $permission==''){
 			if (Auth::user()->seller_rules) {
-				$rules = explode("-",Auth::user()->seller_rules);
-				if(array_get($rules,0)!='*') $asinWhere .= ' AND '.$bg.' = "'.array_get($rules,0).'"';
-				if(array_get($rules,1)!='*') $asinWhere .=  ' AND '.$bu.' = "'.array_get($rules,1).'"';
+				$asinWhere.= getSellerRules(Auth::user()->seller_rules,$bg,$bu);
 			} else{
 				$asinWhere = ' AND '.$userid.' = '.Auth::user()->id;
 			}
@@ -312,9 +310,7 @@ ORDER BY asin_offer_summary.asin DESC ";
 		$url = isset($siteUrl[$site]) && $siteUrl[$site] ? 'www.'.$siteUrl[$site] : $site;
 		$where = " where asin = '".$asin."' and site = '".$url."'";
 		if ($userdata->seller_rules) {
-			$rules = explode("-", $userdata->seller_rules);
-			if (array_get($rules, 0) != '*') $where .= " and bg = '".array_get($rules, 0)."'";
-			if (array_get($rules, 1) != '*') $where .= " and bu = '".array_get($rules, 1)."'";
+			$where.= getSellerRules($userdata->seller_rules,'bg','bu');
 		}elseif($userdata->sap_seller_id){
 			$where .= " and sap_seller_id = ".$userdata->sap_seller_id;
 		}
@@ -777,10 +773,7 @@ ORDER BY asin_offer_summary.asin DESC ";
 		$userWhere = " where marketplace_id  = '".$site."'";
 		if (!in_array($userdata->email, $ccpAdmin)) {
 			if ($userdata->seller_rules) {
-				//bg总监或者bu经理
-				$rules = explode("-", $userdata->seller_rules);
-				if (array_get($rules, 0) != '*') $userWhere .= " and sap_seller_bg = '" . array_get($rules, 0) . "'";
-				if (array_get($rules, 1) != '*') $userWhere .= " and sap_seller_bu = '" . array_get($rules, 1) . "'";
+				$userWhere.= getSellerRules($userdata->seller_rules,'sap_seller_bg','sap_seller_bu');
 			} elseif ($userdata->sap_seller_id) {//普通销售员
 				$userWhere .= " and sap_seller_id = " . $userdata->sap_seller_id;
 			}

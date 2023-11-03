@@ -61,7 +61,9 @@ class PriceController extends Controller
 		}
 		
 		if (Auth::user()->seller_rules) {
-			$rules = explode("-",Auth::user()->seller_rules);
+			
+			$ruleStr = explode(",",Auth::user()->seller_rules);
+			$rules = explode("-",array_get($ruleStr,0));
 			if(array_get($rules,0)!='*') $bg=array_get($rules,0);
 			if(array_get($rules,1)!='*') $bu=array_get($rules,1);
 		} elseif (Auth::user()->sap_seller_id) {

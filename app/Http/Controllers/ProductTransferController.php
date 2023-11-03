@@ -239,7 +239,8 @@ class ProductTransferController extends Controller
 
 		//看是否是bg,bu的管理者，是管理者的话，BG,BU可进行process操作，且BG的话要限制显示的状态为BU已批准的状态（>0）
 		if (Auth::user()->seller_rules) {
-			$rules = explode("-",Auth::user()->seller_rules);
+			$ruleStr = explode(",",Auth::user()->seller_rules);
+			$rules = explode("-",array_get($ruleStr,0));
 			if(array_get($rules,0)!='*') $this->bgManage = array_get($rules,0);
 			if(array_get($rules,1)!='*') $this->buManage = array_get($rules,1);
 		}
@@ -343,7 +344,8 @@ class ProductTransferController extends Controller
 
 		//看是否是bg,bu的管理者，是管理者的话，BG,BU可进行process操作，且BG的话要限制显示的状态为BU已批准的状态（>0）
 		if (Auth::user()->seller_rules) {
-			$rules = explode("-",Auth::user()->seller_rules);
+			$ruleStr = explode(",",Auth::user()->seller_rules);
+			$rules = explode("-",array_get($ruleStr,0));
 			if(array_get($rules,0)!='*') $this->bgManage = array_get($rules,0);
 			if(array_get($rules,1)!='*') $this->buManage = array_get($rules,1);
 		}
