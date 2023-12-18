@@ -721,16 +721,16 @@ var FormEditable = function() {
 				//平均库存
 				avgStock[i] = parseInt((startStock+endStock)/2);
 				startStock = endStock;
-				var week_line_amountfee = parseFloat(cost*avgStock[i]*0.00346).toFixed(2);
+				var week_line_amountfee = 0; //parseFloat(cost*avgStock[i]*0.00346).toFixed(2);
 				$('#'+budget_id+'-'+(i)+'-week_line_amountfee').text(week_line_amountfee);
 				
 				if(i<=4){
-					var week_line_storagefee = parseFloat(first4WeeksQty*0.4*0.656*hot_storagefee).toFixed(2);
+					var week_line_storagefee = parseFloat(first4WeeksQty*0.7*0.656*hot_storagefee).toFixed(2);
 				}else{
 					if(i>=(start_week+4)){
-						var week_line_storagefee = parseFloat(avgStock[i-4]*0.4*(i>43?hot_storagefee:cold_storagefee)).toFixed(2);	
+						var week_line_storagefee = parseFloat(avgStock[i-4]*0.7*(i>43?hot_storagefee:cold_storagefee)).toFixed(2);	
 					}else{
-						var week_line_storagefee = parseFloat(avgStock[i]*0.4*(i>43?hot_storagefee:cold_storagefee)).toFixed(2);	
+						var week_line_storagefee = parseFloat(avgStock[i]*0.7*(i>43?hot_storagefee:cold_storagefee)).toFixed(2);	
 					}
 					
 				}

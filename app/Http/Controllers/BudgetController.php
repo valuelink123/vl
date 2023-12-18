@@ -894,12 +894,12 @@ right join budget_skus as c on b.sku=c.sku and b.site=c.site where ((a.month>='"
 					$datas[$i]['week_line_amountfee'] = $week_line_amountfee;
 
 					if($i<=4){
-						$week_line_storagefee = round($first4WeeksQty*0.4*0.656*$hot_storagefee,2);
+						$week_line_storagefee = round($first4WeeksQty*0.7*0.656*$hot_storagefee,2);
 					}else{
 						if($i>=($start_week+4)){
-							$week_line_storagefee = round($avgStock[$i-4]*0.4*($i>43?$hot_storagefee:$cold_storagefee),2);	
+							$week_line_storagefee = round($avgStock[$i-4]*0.7*($i>43?$hot_storagefee:$cold_storagefee),2);	
 						}else{
-							$week_line_storagefee = round($avgStock[$i]*0.4*($i>43?$hot_storagefee:$cold_storagefee),2);	
+							$week_line_storagefee = round($avgStock[$i]*0.7*($i>43?$hot_storagefee:$cold_storagefee),2);	
 						}
 					}
 					$datas[$i]['week_line_storagefee'] = $week_line_storagefee; 
