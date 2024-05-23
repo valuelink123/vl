@@ -47,12 +47,10 @@ class CcpAdMatchAsinController extends Controller
 			$limit = " LIMIT {$limit} ";
 		}
 		$sql = $this->getSql($search). $limit;
-
 		$_data = DB::select($sql);
 		$recordsTotal = $recordsFiltered = DB::select('SELECT FOUND_ROWS() as total');
 		$recordsTotal = $recordsFiltered = $recordsTotal[0]->total;
-		$data = $this->getDealData($_data,$site);
-		$data = array_values($data);
+		$data = $_data;
 		return compact('data', 'recordsTotal', 'recordsFiltered');
 	}
 
@@ -62,8 +60,7 @@ class CcpAdMatchAsinController extends Controller
 		if(!Auth::user()->can(['ccp-adMatchAsin-export'])) die('Permission denied -- ccp adMatchAsin export');
 		$site = isset($_GET['site']) ? $_GET['site'] : '';
 		$sql = $this->getSql($_GET);
-		$_data = DB::select($sql);
-		$data = $this->getDealData($_data,$site);
+		$data = json_decode(json_encode(DB::select($sql)),true);
 		$headArray = array('站点','店铺','Campaign','AD Group','AD Type','ASIN','销售员','SKU');
 		$arrayData[] = $headArray;
 		foreach($data as $key=>$val){
@@ -91,10 +88,10 @@ class CcpAdMatchAsinController extends Controller
 		$campaign_name = isset($search['campaign_name']) ? $search['campaign_name'] : '';//campaign_name
 		$asin = isset($search['asin']) ? $search['asin'] : '';
 		$sku = isset($search['sku']) ? $search['sku'] : '';
-
+		$domain = getDomainBySite($site);
 		//搜索条件
-		$where = '';
-		$where .= " and vop_campaign.marketplace_id = '".$site."'";
+		$where = '1=1';
+		//$where .= "vop_campaign.marketplace_id = '".$site."'";
 		if($account){
 			$account_str = "'".implode("','", explode(',',$account))."'";
 			$where .= " and vop_campaign.seller_id in(".$account_str.")";
@@ -121,11 +118,14 @@ class CcpAdMatchAsinController extends Controller
 			}
 		}
 
- 		$sql = "select SQL_CALC_FOUND_ROWS vop_campaign.*,profiles.account_name AS account_name,vop_campaign_asin.asin as asin,vop_campaign_asin.sku as sku,vop_campaign_asin.id as vop_campaign_asin_id 
-				from ppc_ad_campaign as vop_campaign
+ 		$sql = "select SQL_CALC_FOUND_ROWS vop_campaign.*,profiles.account_name AS account_name,vop_campaign_asin.asin as asin,vop_campaign_asin.sku as sku,vop_campaign_asin.id as vop_campaign_asin_id ,vop_asin.seller,'$domain' as site
+				from (select * from ppc_ad_campaign WHERE marketplace_id = '$site' ) as vop_campaign
 				left join ppc_ad_campaign_match_asin as vop_campaign_asin on vop_campaign.campaign_id = vop_campaign_asin.campaign_id
 				left join ppc_profiles AS profiles on vop_campaign.profile_id = profiles.profile_id
-				WHERE profiles.marketplace_id IS NOT NULL AND profiles.seller_id IS NOT NULL {$where}";
+				left join 
+				(select seller_id,asin,any_value(seller) as seller from asin left join sap_kunnr on asin.sap_store_id=sap_kunnr.kunnr where asin.site='$domain' group by seller_id,asin) as vop_asin
+				on `profiles`.seller_id=vop_asin.seller_id and vop_campaign_asin.asin = vop_asin.asin
+				WHERE {$where}";
 
 		return $sql;
 	}
@@ -142,13 +142,13 @@ class CcpAdMatchAsinController extends Controller
 			$data[$key]['site'] = $domain;
 
 			$data[$key]['action'] = '-';
-			if($val['ad_type']=='sbrands'){
+			//if($val['ad_type']=='sbrands'){
 			 	if($val['asin']){
 					$data[$key]['action'] = '<a href="javascript:void(0);" class="btn btn-success btn-xs" onclick="del('.$val['vop_campaign_asin_id'].')">删除</a>';
 				}else{
 					$data[$key]['action'] = '<a href="/ccp/adMatchAsin/add?campaign_id=' . $val['campaign_id'] .'" class="btn btn-success btn-xs">增加</a>   ';
 				}
-			}
+			//}
 			$sap_seller_id = '';
 			if($val['asin'] && isset($asinInfo[$val['seller_id'].'_'.$val['asin']])){
 				$sap_seller_id = $asinInfo[$val['seller_id'].'_'.$val['asin']]['sap_seller_id'];

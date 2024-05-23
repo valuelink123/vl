@@ -99,7 +99,11 @@ th,td,td>span {
                             <tr role="row" class="filter">
                                 <td> </td>
                                 <td>
-                                    <input type="text" class="form-control form-filter input-sm" name="site">
+                                   <select class="mt-multiselect btn btn-default form-control form-filter input-sm " multiple="multiple" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" name="site[]">
+                                        @foreach ($sites as $key=>$val)
+                                            <option value="{{$val['site']}}">{{$val['site']}}</option>
+                                        @endforeach
+                                    </select>
                                 </td>
                                 <td>
                                     <input type="text" class="form-control form-filter input-sm" name="asin">
@@ -294,7 +298,7 @@ th,td,td>span {
             });
 
             //grid.setAjaxParam("customActionType", "group_action");
-            grid.setAjaxParam("site", $("input[name='site']").val());
+            grid.setAjaxParam("site", $("input[name='site[]']").val());
             grid.setAjaxParam("asin", $("input[name='asin']").val());
 			grid.setAjaxParam("sellersku", $("input[name='sellersku']").val());
             grid.setAjaxParam("item_no", $("input[name='item_no']").val());
@@ -327,7 +331,7 @@ th,td,td>span {
 $(function() {
     TableDatatablesAjax.init();
 	$("#vl_list_export").click(function(){
-		location.href='/asinexport?item_model='+$("input[name='item_model']").val()+'&site='+$("input[name='site']").val()+'&asin='+$("input[name='asin']").val()+'&sellersku='+$("input[name='sellersku']").val()+'&item_no='+$("input[name='item_no']").val()+'&item_group='+$("input[name='item_group']").val()+'&bg='+$("input[name='bg']").val()+'&seller='+$("input[name='seller']").val()+'&brand_line='+$("input[name='brand_line']").val()+'&bu='+$("input[name='bu']").val()+'&status='+$("select[name='status']").val()+'&user_id='+$("select[name='review_user_id']").val()+'&group_id='+$("select[name='group_id']").val();
+		location.href='/asinexport?item_model='+$("input[name='item_model']").val()+'&site='+(($("select[name='site[]']").val())?$("select[name='site[]']").val():'')+'&asin='+$("input[name='asin']").val()+'&sellersku='+$("input[name='sellersku']").val()+'&item_no='+$("input[name='item_no']").val()+'&item_group='+$("input[name='item_group']").val()+'&bg='+$("input[name='bg']").val()+'&seller='+$("input[name='seller']").val()+'&brand_line='+$("input[name='brand_line']").val()+'&bu='+$("input[name='bu']").val()+'&status='+$("select[name='status']").val()+'&user_id='+$("select[name='review_user_id']").val()+'&group_id='+$("select[name='group_id']").val();
 	});
 });
 

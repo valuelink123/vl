@@ -48,8 +48,8 @@ class GetPpcSchedule extends Command
         $profileId = $this->option('profileId');
         $date = date('Y-m-d');
         $time = date('Gi');
-        $tasks = PpcSchedule::where('status',1)->where('date_from','>=',$date)
-        ->where('date_to','<=',$date)->whereRaw("replace(`time`,':','')<=$time and (done_at<='$date' or done_at is null)");
+        $tasks = PpcSchedule::where('status',1)->where('date_from','<=',$date)
+        ->where('date_to','>=',$date)->whereRaw("replace(`time`,':','')<=$time and (done_at<='$date' or done_at is null)");
         if($profileId) $tasks = $tasks->where('profile_id',$profileId);
         $tasks = $tasks->get();
         foreach($tasks as $task){
@@ -91,15 +91,16 @@ class GetPpcSchedule extends Command
                     foreach(array_get($results,'response') as $result){
                         $task->message =$result['code'];
                     }
+			$task->done_at = date('Y-m-d H:i:s');
                 }else{
                     $task->message =array_get($results,'response');
                 }
-                $task->done_at = date('Y-m-d H:i:s');
+                //$task->done_at = date('Y-m-d H:i:s');
                 $task->save();
                 DB::commit();
             }catch (\Exception $e) { 
                 Log::Info($e->getMessage());
-                print_r($e->getMessage());
+                
                 DB::rollBack();
             } 
         }

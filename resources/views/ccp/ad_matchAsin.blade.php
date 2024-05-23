@@ -35,11 +35,11 @@
                         </div>
                     </div>
 
-                    <div class="col-md-2">
+                    <!--<div class="col-md-2">
                         <div class="input-group" id="campaign-div">
                             <span class="input-group-addon">Campaign</span>
                         </div>
-                    </div>
+                    </div>-->
                     <div class="col-md-3">
                         <div class="input-group">
                             <span class="input-group-addon">Campaign Name</span>
@@ -97,10 +97,10 @@
             searching: false,//关闭搜索
             serverSide: true,//启用服务端分页（这是使用Ajax服务端的必须配置）
             ordering:false,
-            "pageLength": 30, // default record count per page
+            "pageLength": 20, // default record count per page
             "lengthMenu": [
-                [30,50,],
-                [30,50,] // change per page values here
+                [20,50,],
+                [20,50,] // change per page values here
             ],
             // pagingType: 'bootstrap_extended',
             processing: true,
@@ -113,7 +113,21 @@
                 {data: 'asin',name:'asin'},
                 {data: 'seller',name:'seller'},
                 {data: 'sku',name:'sku'},
-                {data: 'action',name:'action'},
+				{
+                    data: 'campaign_id',
+                    name: 'campaign_id',
+                    render(data, type, row) {
+						//if(row.ad_type=='sbrands'){
+							if(row.asin){
+								return `<a href="javascript:void(0);" class="btn btn-success btn-xs" onclick="del(${row.vop_campaign_asin_id})">删除</a>`;
+							}else{
+								return `<a href="/ccp/adMatchAsin/add?campaign_id=${row.campaign_id}" class="btn btn-success btn-xs">增加</a>`;
+							}
+						//}else{
+						//	return ``;
+						//}
+                    }
+                },
             ],
             ajax: {
                 type: 'POST',
@@ -163,11 +177,11 @@
         $(function(){
             getAccountBySite();
             // 根据搜索时间区域，调用点击事件，展示上部分的统计数据
-            $("#search_top").trigger("click");
+            //$("#search_top").trigger("click");
         })
         function getAccountBySite(){
             getAccountBySelectedSite();
-            $("#account-div").trigger("change");
+            //$("#account-div").trigger("change");
         }
 
         function del(id){
@@ -190,7 +204,7 @@
         }
 
         $("#account-div").change(function(){
-            getCampaignBySelectedAccount();
+            //getCampaignBySelectedAccount();
         });
 
     </script>

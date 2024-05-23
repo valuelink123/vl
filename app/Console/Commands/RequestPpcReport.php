@@ -4,10 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Classes\PpcRequest;
-use App\Models\PpcReport;
 use App\Models\PpcProfile;
-use DB;
-use Log;
 
 class RequestPpcReport extends Command
 {
@@ -16,7 +13,7 @@ class RequestPpcReport extends Command
      *
      * @var string
      */
-    protected $signature = 'request:ppcReport {--profileId=} {--date=}';
+    protected $signature = 'request:ppcReport {--profileId=}';
 
     /**
      * The console command description.
@@ -44,121 +41,8 @@ class RequestPpcReport extends Command
     public function handle()
     {
         $profileId = $this->option('profileId');
-        $date = $this->option('date');
-        if(!$date) $date = date('Y-m-d',strtotime('-20 hours'));
-        $metrics = 'attributedUnitsOrdered1dSameSKU';
         $adTypes = [
-            'SProducts'=>[
-                'campaigns'=>[
-                    ['metrics'=>'campaignId,'.$metrics]
-                ],
-                'adGroups'=>[
-                    ['metrics'=>'adGroupId,'.$metrics]
-                ],
-                'keywords'=>[
-                    ['metrics'=>'keywordId,'.$metrics]
-                ],
-                'productAds'=>[
-                    ['metrics'=>''.$metrics]
-                ],
-                'targets'=>[
-                    ['metrics'=>'targetId,'.$metrics]
-                ],
-            ],
-            
-            'SDisplay'=>[
-                'campaigns'=>[
-                    [
-                        'metrics'=>'campaignId,impressions,clicks,cost,attributedConversions1d,attributedConversions1dSameSKU,attributedUnitsOrdered1d,attributedSales1d,attributedSales1dSameSKU',
-                        'tactic'=>'T00020'
-                    ],
-                    [
-                        'metrics'=>'campaignId,impressions,clicks,cost,attributedConversions1d,attributedConversions1dSameSKU,attributedUnitsOrdered1d,attributedSales1d,attributedSales1dSameSKU',
-                        'tactic'=>'T00030'
-                    ],
-                    [
-                        'metrics'=>'campaignId,impressions,clicks,cost,attributedConversions1d,attributedConversions1dSameSKU,attributedUnitsOrdered1d,attributedSales1d,attributedSales1dSameSKU',
-                        'tactic'=>'remarketing'
-                    ],
-                ],
-                'adGroups'=>[
-                    [
-                        'metrics'=>'adGroupId,impressions,clicks,cost,attributedConversions1d,attributedConversions1dSameSKU,attributedUnitsOrdered1d,attributedSales1d,attributedSales1dSameSKU',
-                        'tactic'=>'T00020'
-                    ],
-                    [
-                        'metrics'=>'adGroupId,impressions,clicks,cost,attributedConversions1d,attributedConversions1dSameSKU,attributedUnitsOrdered1d,attributedSales1d,attributedSales1dSameSKU',
-                        'tactic'=>'T00030'
-                    ],
-                    [
-                        'metrics'=>'adGroupId,impressions,clicks,cost,attributedConversions1d,attributedConversions1dSameSKU,attributedUnitsOrdered1d,attributedSales1d,attributedSales1dSameSKU',
-                        'tactic'=>'remarketing'
-                    ],
-                ],
-                'productAds'=>[
-                    [
-                        'metrics'=>'adId,impressions,clicks,cost,attributedConversions1d,attributedConversions1dSameSKU,attributedUnitsOrdered1d,attributedSales1d,attributedSales1dSameSKU',
-                        'tactic'=>'T00020'
-                    ],
-                    [
-                        'metrics'=>'adId,impressions,clicks,cost,attributedConversions1d,attributedConversions1dSameSKU,attributedUnitsOrdered1d,attributedSales1d,attributedSales1dSameSKU',
-                        'tactic'=>'T00030'
-                    ],
-                    [
-                        'metrics'=>'adId,impressions,clicks,cost,attributedConversions1d,attributedConversions1dSameSKU,attributedUnitsOrdered1d,attributedSales1d,attributedSales1dSameSKU',
-                        'tactic'=>'remarketing'
-                    ],
-                ],
-                'targets'=>[
-                    [
-                        'metrics'=>'targetId,impressions,clicks,cost,attributedConversions1d,attributedConversions1dSameSKU,attributedUnitsOrdered1d,attributedSales1d,attributedSales1dSameSKU',
-                        'tactic'=>'T00020'
-                    ],
-                    [
-                        'metrics'=>'targetId,impressions,clicks,cost,attributedConversions1d,attributedConversions1dSameSKU,attributedUnitsOrdered1d,attributedSales1d,attributedSales1dSameSKU',
-                        'tactic'=>'T00030'
-                    ],
-                ],
-            ],
-            
-            'SBrands'=>[
-                'campaigns'=>[
-                    [
-                        'creativeType'=>'video',
-                        'metrics'=>'campaignId,impressions,clicks,cost'
-                    ],
-                    [
-                        'metrics'=>'campaignId,impressions,clicks,cost'
-                    ]
-                ],
-                'adGroups'=>[
-                    [
-                        'creativeType'=>'video',
-                        'metrics'=>'adGroupId,'.$metrics
-                    ],
-                    [
-                        'metrics'=>'adGroupId,'.$metrics
-                    ]
-                ],
-                'keywords'=>[
-                    [
-                        'creativeType'=>'video',
-                        'metrics'=>'keywordId,'.$metrics
-                    ],
-                    [
-                        'metrics'=>'keywordId,'.$metrics
-                    ]
-                ],
-                'targets'=>[
-                    [
-                        'creativeType'=>'video',
-                        'metrics'=>'targetId,'.$metrics
-                    ],
-                    [
-                        'metrics'=>'targetId,'.$metrics
-                    ]
-                ],
-            ]
+            'SProducts','SDisplay','SBrands'
         ];
         $profiles = PpcProfile::whereNotNull('refresh_token');
         if($profileId) $profiles = $profiles->where('profile_id',$profileId);
@@ -166,31 +50,152 @@ class RequestPpcReport extends Command
         foreach($profiles as $profile){
             $profileId = $profile->profile_id;
             $client = new PpcRequest($profileId);
-            foreach($adTypes as $adType=>$recordTypes){
-                $app = $client->request($adType); 
-                foreach($recordTypes as $recordType => $datas){
-                    foreach($datas as $data){
-                        $result = $app->report->requestReport(
-                            $recordType,
-                            array_merge($data,['reportDate'=>date('Ymd',strtotime($date))])
-                        );
-                        if(array_get($result,'success')==1){
-                            PpcReport::create(
+            foreach($adTypes as $adType){
+                $app = $client->request($adType);
+				if($adType=='SBrands'){
+					$result = $app->campaigns->listCampaignsV4Ex();
+					if(array_get($result,'success')==1){
+						$datas = array_get($result,'response.campaigns');
+						if(is_array($datas)){
+							$model = '\App\Models\Ppc'.ucfirst(strtolower($adType)).'Campaign';
+							foreach($datas as $data){
+								$data = unCamelizeArr($data);
+								$allow_fields = ['campaign_id','profile_id','name','budget','budget_type','start_date','end_date','serving_status','portfolio_id','state','bid_optimization','bid_multiplier','bid_adjustments','brand_entity_id','ad_format','creative','landing_page','supply_source'];
+								foreach($data as $dk=>$dv){
+									if(!in_array($dk,$allow_fields)) unset($data[$dk]);
+								}
+								$model::updateOrCreate(
+									[
+										'profile_id'=>$profileId,
+										'campaign_id'=>$data['campaign_id'],
+									],
+									$data       
+								);
+							}
+						}
+					}
+				}else{
+					$result = $app->campaigns->listCampaignsEx();
+					if(array_get($result,'success')==1){
+						$datas = array_get($result,'response');
+						if(is_array($datas)){
+							$model = '\App\Models\Ppc'.ucfirst(strtolower($adType)).'Campaign';
+							foreach($datas as $data){
+								$data = unCamelizeArr($data);
+								if(isset($data['rule_based_budget'])) unset($data['rule_based_budget']);
+								$model::updateOrCreate(
+									[
+										'profile_id'=>$profileId,
+										'campaign_id'=>$data['campaign_id'],
+									],
+									$data       
+								);
+							}
+						}
+					}
+				
+				}
+                
+				$result = $app->groups->listAdGroupsEx();
+                if(array_get($result,'success')==1){
+                    $datas = array_get($result,'response');
+                    if(is_array($datas)){
+                        $model = '\App\Models\Ppc'.ucfirst(strtolower($adType)).'AdGroup';
+                        foreach($datas as $data){
+                            $data = unCamelizeArr($data);
+                            $model::updateOrCreate(
                                 [
-                                    'profile_id'=>$profileId,
-                                    'report_id'=>array_get($result,'response.reportId'),
-                                    'report_date'=>$date,
-                                    'record_type'=>array_get($result,'response.recordType'),
-                                    'ad_type'=>$adType,
-                                    'status'=>array_get($result,'response.status'),
-                                ]
+                                    'ad_group_id'=>$data['ad_group_id'],
+                                ],
+                                $data       
                             );
                         }
                     }
-                    
                 }
+                if($adType!='SBrands'){
+                    $result = $app->product_ads->listProductAds([]);
+                    if(array_get($result,'success')==1){
+                        $datas = array_get($result,'response');
+                        if(is_array($datas)){
+                            $model = '\App\Models\Ppc'.ucfirst(strtolower($adType)).'Ad';
+                            foreach($datas as $data){
+                                $data = unCamelizeArr($data);
+                                $model::updateOrCreate(
+                                    [
+                                        'ad_id'=>$data['ad_id'],
+                                    ],
+                                    $data      
+                                );
+                            }
+                        }
+                    }  
+                }
+                
+                if($adType!='SDisplay'){
+                    $result = $app->keywords->listBiddableKeywordsEx([]);
+                    if(array_get($result,'success')==1){
+                        $datas = array_get($result,'response');
+                        if(is_array($datas)){
+                            $model = '\App\Models\Ppc'.ucfirst(strtolower($adType)).'Keyword';
+                            foreach($datas as $data){
+                                $data = unCamelizeArr($data);
+                                $model::updateOrCreate(
+                                    [
+                                        'keyword_id'=>$data['keyword_id'],
+                                    ],
+                                    $data       
+                                );
+                            }
+                        }
+                    }
+                    
+                }    
+                
+
+                if($adType=='SBrands'){
+                    $params = [];
+                    $params['nextToken'] ='';
+                    $params['maxResults'] = 5000;
+                    do{
+                        $result = $app->product_targeting->listTargetingClauses($params);
+                        if(array_get($result,'success')==1){
+                            $datas = array_get($result,'response.targets');
+                            if(is_array($datas)){
+                                $params['nextToken'] = array_get($result,'response.nextToken');
+                                $model = '\App\Models\Ppc'.ucfirst(strtolower($adType)).'Target';
+                                foreach($datas as $data){
+                                    $data = unCamelizeArr($data);
+                                    $model::updateOrCreate(
+                                        [
+                                            'target_id'=>$data['target_id'],
+                                        ],
+                                        $data       
+                                    );
+                                } 
+                            }  
+                        }
+                    }while(!empty($params['nextToken']));
+                }else{
+                    if($adType=='SProducts') $result = $app->product_targeting->listTargetingClausesEx([]);
+                    if($adType=='SDisplay') $result = $app->targeting->listTargetingClausesEx([]);
+                    if(array_get($result,'success')==1){
+                        $datas = array_get($result,'response');
+                        if(is_array($datas)){
+                            $model = '\App\Models\Ppc'.ucfirst(strtolower($adType)).'Target';
+                            foreach($datas as $data){
+                                $data = unCamelizeArr($data);
+                                $model::updateOrCreate(
+                                    [
+                                        'target_id'=>$data['target_id'],
+                                    ],
+                                    $data     
+                                );
+                            }
+                        }
+                    }
+                } 
             }
         }
-	}
+     }
 
 }

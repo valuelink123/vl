@@ -201,13 +201,17 @@
         $('#datatable').dataTable({
             searching: false,//关闭搜索
             serverSide: true,//启用服务端分页（这是使用Ajax服务端的必须配置）
-            ordering:false,
+            ordering:true,
             "pageLength": 50, // default record count per page
             "lengthMenu": [
                 [10, 20,50,],
                 [10, 20,50,] // change per page values here
             ],
             // pagingType: 'bootstrap_extended',
+			"aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0,1,2,3] }],
+			"order": [
+				[4, "desc"]
+			],// set first column as a default sort by asc
             processing: true,
             columns: [
                 {data: 'account_name',name:'account_name'},

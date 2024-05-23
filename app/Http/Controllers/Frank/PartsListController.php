@@ -230,7 +230,7 @@ class PartsListController extends Controller {
             GROUP BY item_no
         ) t3
         USING(item_code) 
-        LEFT JOIN asin on t1.asin = asin.asin and t1.seller_sku = asin.sellersku
+        LEFT JOIN asin on t1.asin = asin.asin and t1.seller_sku = asin.sellersku and t1.site=asin.site 
         ";
 
         $rows = $this->queryRows($sql);
@@ -291,6 +291,118 @@ class PartsListController extends Controller {
 		}
 		die();
 	}
+	
+	public function getStockListNew(Request $req) {
+
+        $item_code = $req->input('item_code');
+		$countryCode = $req->input('countryCode');
+		$replacements_skus = [];
+		$replacements_skus[] = $item_code;
+		$replace_skus = DB::table('replace_skus')
+                ->where('skua', $item_code)
+                ->get(['skub']);
+		foreach($replace_skus as $replace_sku){
+			$replacements_skus[] = $replace_sku->skub;
+		}
+		
+        if (empty($item_code)) {
+            // 查 fba
+            $result = DB::table('fba_stock')
+                ->select('item_code')
+                ->where('seller_id', $req->input('seller_id'))
+                ->where('seller_sku', $req->input('seller_sku'))
+				->where('account_status',0)
+                ->whereNotNull('item_code')
+                ->get();
+            // fba 查不到，再查 fbm
+            if ($result->isEmpty()) {
+
+                $asinRow = Asin::select('item_no')
+                    ->where('site', $req->input('site'))
+                    ->where('asin', $req->input('asin'))
+                    ->where('sellersku', $req->input('seller_sku'))->first();
+
+                if (empty($asinRow)) {
+                    return [];
+                } else {
+                    $item_code = $asinRow->item_no;
+                }
+
+            } else {
+                $item_code = $result[0]->item_code;
+            }
+        }
+
+        if (empty($item_code) || !preg_match('#^[A-z0-9_-]+$#', $item_code)) {
+            throw new DataInputException("Wrong Item No: {$item_code}");
+        }
+        $accountStatusModel = new SellerAccountsStatusRecord();
+		$accountInfo = $accountStatusModel->getEnableAccountInfo();
+		$accountInfo = array_keys($accountInfo);
+		$accountInfo = implode("','",$accountInfo);
+		$accountInfo = "'".$accountInfo."'";
+		$replacements_skus = "'".implode("','",$replacements_skus)."'";
+        $rows = $this->queryRows(
+            "SELECT
+                item_code,
+                seller_id,
+                seller_name,
+                seller_sku,
+                item_name,
+                fba_stock AS stock
+            FROM
+                fba_stock
+            LEFT JOIN fbm_stock USING (item_code)
+            WHERE
+                item_code in({$replacements_skus})
+			AND account_status = 0
+			and CONCAT(site,'_',seller_id) in({$accountInfo})
+            UNION
+            SELECT
+                item_code,
+                'FBM' AS seller_id,
+                'FBM' AS seller_name,
+                CONCAT('ITEM CODE - ', item_code) AS seller_sku,
+                item_name,
+                fbm_stock AS stock
+            FROM
+                fbm_stock
+            WHERE
+                item_code in({$replacements_skus})"
+        );
+
+		$validStock = $this->getFbmAccsStock();
+		$storeByCountryCode= getCountryCode();
+        foreach ($rows as $key=>$row) {
+            // 全部转成 INT，避免 JS 数字字符串的陷阱(比较、加法会出麻烦)
+            // 通过配置 PDO、MYSQLI 可以默认返回数字
+            // PDO::ATTR_STRINGIFY_FETCHES
+            // MYSQLI_OPT_INT_AND_FLOAT_NATIVE
+			$rows[$key]['stock'] = (int)$row['stock'];
+			$rows[$key]['item_code_attr'] = '';
+			if($row['item_code']!=$item_code) $rows[$key]['item_code_attr'] = 'REPLACE';
+            if($row['seller_id']=='FBM'){
+				if(isset($validStock[$row['item_code']]) && is_array($validStock[$row['item_code']])){
+					$valid = '';
+					foreach($validStock[$row['item_code']] as $k=>$v){
+						if($countryCode && in_array($k,$storeByCountryCode[$countryCode]['store'])){
+							$valid = $valid.$k.':'.$v.',';
+						}
+					}
+					$rows[$key]['stock'] = $valid;
+					if(empty($valid)){
+						unset($rows[$key]);
+					}
+				}else{
+					unset($rows[$key]);
+				}
+			}
+        }
+
+        return $rows;
+    }
+
+
 
     /**
      * @throws DataInputException

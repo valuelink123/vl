@@ -31,7 +31,7 @@ Route::get('/partslist/export', 'PartsListController@export');
 Route::post('/partslist/subitems', 'PartsListController@getSubItemList');
 Route::post('/partslist/updateStatus', 'PartsListController@updateStatus');//partslist列表页面设置账号机是否有效
 Route::post('/stocklist', 'PartsListController@getStockList');
-
+Route::post('/stocklistnew', 'PartsListController@getStockListNew');
 Route::get('/notice', 'NoticeCenterController@index');
 Route::post('/notice/get', 'NoticeCenterController@get');
 Route::get('/notice/create', 'NoticeCenterController@edit');

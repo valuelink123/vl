@@ -172,8 +172,7 @@ class SapRfcRequest {
         $queryString = http_build_query($arguments, '', '&', PHP_QUERY_RFC3986);
 
         $url = "http://{$this->host}/rfc_site.php?{$queryString}";
-        //$url = "http://192.168.10.10:18003/rfc_site.php?{$queryString}";
-
+        //$url = "http://192.168.10.10:18003/rfc_site.php?{$queryString}"
         try {
 
             $json = CurlRequest::curl_get_contents($url,60);

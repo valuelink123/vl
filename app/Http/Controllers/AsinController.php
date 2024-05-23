@@ -55,7 +55,8 @@ class AsinController extends Controller
     public function index()
     {
         if(!Auth::user()->can(['asin-table-show'])) die('Permission denied -- asin-table-show');
-        return view('asin/index',['users'=>$this->getUsers(),'groups'=>$this->getGroups()]);
+		$sites = Asin::select('site')->groupBy('site')->get()->toArray();
+        return view('asin/index',['users'=>$this->getUsers(),'groups'=>$this->getGroups(),'sites'=>$sites]);
 
     }
 
@@ -102,7 +103,7 @@ class AsinController extends Controller
 		
 		
 		if (array_get($_REQUEST, 'site')) {
-			$customers = $customers->where('site', $_REQUEST['site']);
+			$customers = $customers->whereIn('site', explode(',',$_REQUEST['site']));
 		}
 		
 		if (array_get($_REQUEST, 'status') && array_get($_REQUEST, 'status')!='Unmatched') {
@@ -138,7 +139,7 @@ class AsinController extends Controller
 		if(array_get($_REQUEST,'bu')){
             $customers = $customers->where('bu', 'like', '%'.$_REQUEST['bu'].'%');
         }
-        
+		
         $customersLists =  $customers->orderBy($orderby,$sort)->get()->toArray();
 
 		$arrayData = array();
@@ -280,8 +281,8 @@ class AsinController extends Controller
 			
 		}
 		
-		if (array_get($_REQUEST, 'site')) {
-			$customers = $customers->where('site', $_REQUEST['site']);
+		if (array_get($_REQUEST, 'site.0')) {
+			$customers = $customers->whereIn('site', array_get($_REQUEST, 'site'));
 		}
 		
 		if (array_get($_REQUEST, 'status') && array_get($_REQUEST, 'status')!='Unmatched') {
@@ -317,7 +318,6 @@ class AsinController extends Controller
 		if(array_get($_REQUEST,'bu')){
             $customers = $customers->where('bu', 'like', '%'.$_REQUEST['bu'].'%');
         }
-        
         $customersList =  $customers->orderBy($orderby,$sort)->get()->toArray();
 
         $iTotalRecords = count($customersList);

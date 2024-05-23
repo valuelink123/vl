@@ -550,8 +550,8 @@ if($exception['user_id'] == Auth::user()->id && ($exception['process_status'] ==
 
 						<script id="tplStockDatalist" type="text/template">
 							<datalist id="list-${item_code}-stocks">
-								<% for(let {seller_name,seller_id,seller_sku,stock} of stocks){ %>
-								<option value="${seller_name} | ${seller_sku}" label="Stock: ${stock}">
+								<% for(let {seller_name,seller_id,seller_sku,item_code,item_code_attr,stock} of stocks){ %>
+								<option value="${seller_name} | ${seller_sku} | ${item_code} | ${item_code_attr}" label="Stock: ${stock}">
 									<% } %>
 							</datalist>
 						</script>
@@ -920,7 +920,10 @@ if((Auth::user()->can(['exception-check']) || in_array($exception['group_id'],ar
 	function getAccountSeller(obj){
 		// $(".seller-sku-selector").each(function () {
 		let skusInfo = obj.data('skusInfo') || {}
+		console.log(skusInfo);
 		let info = skusInfo[obj.val()]
+		console.log(obj.val());
+		console.log(info);
 		let $repeatRow = obj.closest('.mt-repeater-row')
 		if (info) {
 			$repeatRow.find('.seller_id').val(info.seller_id)
@@ -1001,7 +1004,7 @@ if((Auth::user()->can(['exception-check']) || in_array($exception['group_id'],ar
 				countryCode = $('#countrycode').val();
 				$.ajax({
 					method: 'POST',
-					url: '/kms/stocklist?countryCode=' + countryCode,
+					url: '/kms/stocklistnew?countryCode=' + countryCode,
 					data: postData,
 					dataType: 'json',
 					success(stocks) {
@@ -1037,7 +1040,7 @@ if((Auth::user()->can(['exception-check']) || in_array($exception['group_id'],ar
 								.attr('placeholder', 'please select ...')
 
 
-						let skusInfo = rows2object(stocks, ['seller_name', 'seller_sku', ' | '])
+						let skusInfo = rows2object(stocks, ['seller_name', 'seller_sku', 'item_code', 'item_code_attr', ' | '])
 
 						$sellerSkuSelector.data('skusInfo', skusInfo)
 
@@ -1055,7 +1058,7 @@ if((Auth::user()->can(['exception-check']) || in_array($exception['group_id'],ar
 							}
 						}
 
-						if (selected) $sellerSkuSelector.val(`${selected.seller_name} | ${selected.seller_sku}`).change()
+						if (selected) $sellerSkuSelector.val(`${selected.seller_name} | ${selected.seller_sku} | ${selected.item_code} | ${selected.item_code_attr}`).change()
 
 					}
 				})

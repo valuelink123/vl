@@ -255,7 +255,7 @@ class SendController extends Controller
 			}
 			//已订阅才可以主动发邮件(subscribe=1)，默认未订阅只能回复邮件，是block黑名单的话不能给他发邮件(block=1)
 			if(isset($emailData[$to_address]) && $emailData[$to_address]){
-				if($emailData[$to_address]['block']==1){//黑名单不可以发邮件
+				if($emailData[$to_address]['block']==1 && $inbox_id==0){//黑名单不可以发邮件
 					continue;
 				}
 				if($emailData[$to_address]['subscribe']==0 && $inbox_id==0){//未订阅主动发邮件不可以
@@ -263,20 +263,20 @@ class SendController extends Controller
 				}
 			}
 			if(isset($encryptedEmailData[$to_address]) && $encryptedEmailData[$to_address]){
-				if($encryptedEmailData[$to_address]['block']==1){//黑名单不可以发邮件
+				if($encryptedEmailData[$to_address]['block']==1 && $inbox_id==0){//黑名单不可以发邮件
 					continue;
 				}
 				if($encryptedEmailData[$to_address]['subscribe']==0 && $inbox_id==0){//未订阅主动发邮件不可以
 					continue;
 				}
 			}
-			if(in_array(trim($to_address),$blackEmail)){
+			if(in_array(trim($to_address),$blackEmail) && $inbox_id==0){
 //				$request->session()->flash('error_message','有黑名单客户的邮箱');
 //				return redirect()->back()->withInput();
 				continue;
 			}
 
-            if(isBlacklistEmail(trim($to_address))) continue;
+            if(isBlacklistEmail(trim($to_address)) && $inbox_id==0) continue;
             if(in_array(trim($to_address),$hasWaiting)) continue;
             
 			if(trim($to_address)){

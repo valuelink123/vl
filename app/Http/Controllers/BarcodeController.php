@@ -162,7 +162,7 @@ class BarcodeController extends Controller
             if($poRow) {
                 foreach ($data as $poDetail) {
                     //从PO单中用EBELN匹配数据查询FRGKE判断Z
-                    if($poRow['FRGKE'] == 'Z'){
+                    if($poRow['FRGKE'] == 'Z' || $poRow['FRGKE'] == 'Y'){
                         $vendorCodeFromSap = $poRow['LIFNR'];
                         $InsertData[$poIndex++] = array(
                             'purchase_order' => $poDetail['EBELN'],

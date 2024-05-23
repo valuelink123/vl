@@ -90,7 +90,7 @@ class CalDailySales extends Command
                     if(!isset($skus_info[$key]['resvered'])) $skus_info[$key]['resvered']=0;
                     if(!isset($skus_info[$key]['asin'])) $skus_info[$key]['asin']=$order->asin;
                     $skus_info[$key]['resvered']+=$order->sales;
-                    $skus_info[$key]['amount']+=round($order->amount*array_get($rates,$order->currency,1),2);
+                    $skus_info[$key]['amount']+=round($order->amount*array_get($rates,$order->currency??'USD',1),2);
                     $skus_info[$key]['sale']+=$order->quantity;
                 }
                 

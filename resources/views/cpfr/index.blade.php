@@ -450,9 +450,11 @@
 		<li><a href="/cpfr/allocationProgress">调拨进度</a></li>
 	</ul>
 	<div class="button_box">
+	<!--
 		<button id="addShipment" class="btn sbold red"> 新建调拨计划
 			<i class="fa fa-plus"></i>
 		</button>
+	-->
 		<button id="export" class="btn sbold blue"> 导出
 			<i class="fa fa-download"></i>
 		</button>

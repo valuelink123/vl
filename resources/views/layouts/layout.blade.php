@@ -858,6 +858,13 @@
 													<span class="arrow"></span>
 												</a>
 											</li>
+											
+											<li class="">
+												<a href="/replaceSku" class="nav-link nav-toggle ">
+													重发单设置替代SKU
+													<span class="arrow"></span>
+												</a>
+											</li>
 											@endpermission
                                             @permission('exception-reminder')
                                             <li class="">

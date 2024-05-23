@@ -170,13 +170,16 @@ class ReportsController extends Controller
 
         if($action == 'export'){
             if(array_get($_REQUEST,'limit')){
-                $datas->offset(intval(array_get($_REQUEST,'offset')))->limit(intval(array_get($_REQUEST,'limit')));
+                $datas = $datas->offset(intval(array_get($_REQUEST,'offset')))->limit(intval(array_get($_REQUEST,'limit')));
                 $exportFileName.='Page'.intval(intval(array_get($_REQUEST,'offset'))/intval(array_get($_REQUEST,'limit'))+1).'_';
             }
+	
             if(!$exportFileName) $exportFileName = 'All_';
             $exportFileName.=date('YmdHis').'.xlsx';
-            $lists =  $datas->orderBy('id','desc')->get()->toArray();
+			
+            $lists =  $datas->get();
             $lists = json_decode(json_encode($lists), true);
+			
             $arrayData = array();
             if($type  == 'fba_daily_inventory_history_report'){
                 $records["data"][] = [

@@ -426,12 +426,13 @@ class CtgController extends Controller {
         WHERE $where
         ORDER BY created_at desc;
         ";
+	
 
         $data = $this->queryRows($sql);
         foreach ($data as $key=>$val){
             $arrayData[] = array(
                 substr($val['created_at'], 0, 10),
-                ($val['encrypted_email']??$val['email']),
+                ($val['email']),
                 $val['name'],
 				$val['order_id'],
                 $val['itemCodes'],

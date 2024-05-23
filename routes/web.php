@@ -460,6 +460,10 @@ Route::Post('/daSkuMatch/get', 'DaSkuMatchController@get')->name('getDaSkuMatch'
 Route::Post('/daSkuMatch/update', 'DaSkuMatchController@update')->name('updateDaSkuMatch');
 Route::Post('/daSkuMatch/upload', 'DaSkuMatchController@upload');
 
+Route::resource('replaceSku', 'ReplaceSkuController');
+Route::Post('/replaceSku/get', 'ReplaceSkuController@get')->name('getReplaceSku');
+Route::Post('/replaceSku/update', 'ReplaceSkuController@update')->name('updateReplaceSku');
+
 Route::resource('amazonWarehouse', 'AmazonWarehouseController');
 Route::Post('/amazonWarehouse/get', 'AmazonWarehouseController@get')->name('getAmazonWarehouse');
 Route::Post('/amazonWarehouse/update', 'AmazonWarehouseController@update')->name('updateAmazonWarehouse');
@@ -804,3 +808,4 @@ Route::Post('/reims/batchUpdate', 'ReimController@batchUpdate')->name('ReimBatch
 //cs-crm模块
 Route::get('/cscrm', 'CscrmController@index');
 Route::match(['post','get'],'/cscrm/get', 'CscrmController@get')->name('getCscrm');
+Route::match(['post','get'],'/cscrm/export', 'CscrmController@export')->name('exportCscrm');

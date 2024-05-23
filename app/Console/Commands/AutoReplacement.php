@@ -45,7 +45,7 @@ class AutoReplacement extends Command
     public function handle()
     {	
 		
-		$autoDatas = Exception::where('type',2)->where('process_status','confirmed')->whereNotNull('service_system_id')->where('process_date','>',date('Y-m-d H:i:s',strtotime('-2 days')))->where('process_date','<',date('Y-m-d H:i:s',strtotime('-1 days')))->get();
+		$autoDatas = Exception::where('id',117871)->where('type',2)->where('process_status','confirmed')->whereNotNull('service_system_id')->where('process_date','>',date('Y-m-d H:i:s',strtotime('-2 days')))->where('process_date','<',date('Y-m-d H:i:s',strtotime('-1 days')))->get();
 		foreach($autoDatas as $autoData){
 			try{
 				$shipData = unserialize($autoData->replacement);

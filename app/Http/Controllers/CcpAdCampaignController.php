@@ -124,11 +124,24 @@ class CcpAdCampaignController extends Controller
 		$search = $this->getSearchData(explode('&',$search));
 		$site = isset($search['site']) ? $search['site'] : '';//站点，为marketplaceid
 		$limit = '';
+		$column = array_get($req->get('order'),'0.column',4);
+		$orderArr = [
+			'4'=>'cost',
+			'5'=>'sales',
+			'6'=>'orders',
+			'7'=>'acos',
+			'8'=>'ctr',
+			'9'=>'clicks',
+			'10'=>'ctr',
+			'11'=>'cpc',
+			'12'=>'cr',
+		];
+		$dir = array_get($req->get('order'),'0.dir','desc');
 		if($_REQUEST['length']){
 			$limit = $this->dtLimit($req);
 			$limit = " LIMIT {$limit} ";
 		}
-		$sql = $this->getSql($search) .$limit;
+		$sql = $this->getSql($search).' order by '.array_get($orderArr,$column,'4').' '.$dir .$limit;
 //		echo '<pre>';
 //		echo $sql;
 //		exit;
@@ -232,11 +245,16 @@ class CcpAdCampaignController extends Controller
        				campaign_id,
 					any_value(state) as state,
        				any_value(daily_budget) as daily_budget,
+					sum(cost)/sum(sales) as acos,
+					sum(clicks)/sum(impressions) as ctr,
+					sum(cost)/sum(clicks) as cpc,
+					sum(orders)/sum(clicks) as cr,
+					
 					round(sum(cost),2) as cost,
 					sum(clicks) as clicks,
 					round(sum(sales),2) as sales,
 					sum(orders) as orders,
-					sum(impressions) as impressions from( ".$union_all . " ) AS UNION_table GROUP BY campaign_id  order by sales desc ";
+					sum(impressions) as impressions from( ".$union_all . " ) AS UNION_table GROUP BY campaign_id";
 		return $sql;
 	}
 

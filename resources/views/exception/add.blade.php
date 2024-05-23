@@ -501,9 +501,9 @@
                         </div>
                         <script id="tplStockDatalist" type="text/template">
                             <datalist id="list-${item_code}-stocks">
-                                <% for(let {seller_name,seller_id,seller_sku,stock} of stocks){ %>
-                                <option value="${seller_name} | ${seller_sku}" label="Stock: ${stock}">
-                                <% } %>
+                                <% for(let {seller_name,seller_id,seller_sku,item_code,item_code_attr,stock} of stocks){ %>
+								<option value="${seller_name} | ${seller_sku} | ${item_code} | ${item_code_attr}" label="Stock: ${stock}">
+									<% } %>
                             </datalist>
                         </script>
                     </div>
@@ -675,7 +675,7 @@
                     .attr('placeholder', 'please select ...')
 
 
-                let skusInfo = rows2object(stocks, ['seller_name', 'seller_sku', ' | '])
+                let skusInfo = rows2object(stocks, ['seller_name', 'seller_sku', 'item_code', 'item_code_attr', ' | '])
 
                 $sellerSkuSelector.data('skusInfo', skusInfo)
 
@@ -693,7 +693,7 @@
                     }
                 }
 
-                if(selected) $sellerSkuSelector.val(`${selected.seller_name} | ${selected.seller_sku}`).change()
+                if(selected) $sellerSkuSelector.val(`${selected.seller_name} | ${selected.seller_sku} | ${selected.item_code} | ${selected.item_code_attr}`).change()
 
             }
         })

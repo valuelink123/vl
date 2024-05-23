@@ -34,7 +34,7 @@
                         {{ csrf_field() }}
                         <div class="row">
                         <div class="col-md-2">
-						<select class="form-control mt-multiselect btn btn-default" name="profile_id" id="profile_id" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" >
+						<select class="form-control mt-multiselect btn btn-default" multiple="multiple" name="profile_id" id="profile_id" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" data-none-selected-text="Select Accounts">
                             @foreach ($profiles as $k=>$v)
                                 <option value="{{$v->profile_id}}" >{{$v->account_name}}</option>
                             @endforeach
@@ -47,6 +47,7 @@
                             @endforeach
                         </select>
 						</div>
+						
 						
                         <div class="col-md-2">
                         <select class="form-control" name="status" id="status" >
@@ -64,6 +65,15 @@
                             @endforeach
                         </select>
                         </div>
+						<div class="col-md-2">
+						<select class="form-control mt-multiselect btn btn-default" multiple="multiple" name="user_id" id="user_id" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true" data-none-selected-text="Select Users">
+                            @foreach (getUsers() as $k=>$v)
+                                <option value="{{$k}}" >{{$v}}</option>
+                            @endforeach
+                        </select>
+						</div>
+						
+						
                         <div class="col-md-2">
                         <input type="text" class="form-control" name="record_name" placeholder="keyword">
                         </div>
@@ -148,6 +158,7 @@
             });
             var grid = new Datatable();
             grid.setAjaxParam("profile_id", $("select[name='profile_id']").val());
+			grid.setAjaxParam("user_id", $("select[name='user_id']").val());
             grid.setAjaxParam("record_name", $("input[name='record_name']").val());
             grid.setAjaxParam("status", $("select[name='status']").val());
 			grid.setAjaxParam("ad_type", $("select[name='ad_type']").val());
@@ -167,10 +178,10 @@
                    "autoWidth":false,
                    "ordering": false,
                     "lengthMenu": [
-                        [50, 100, 300, -1],
-                        [50, 100, 300, 'All'] 
+                        [20, 100, 500, -1],
+                        [20, 100, 500, 'All'] 
                     ],
-                    "pageLength": 300,
+                    "pageLength": 20,
                     "ajax": {
                         "url": "{{ url('ppcschedule/listSchedules')}}",
                     },

@@ -69,37 +69,11 @@ class CscrmController extends Controller
 			$data = json_decode(json_encode($data),true);
 			foreach($data as $key=>$val){
 				$data[$key]['email_hidden'] = $data[$key]['encrypted_email'] = $val['email'];
-				$item = DB::connection('cs')->table('cs_crm_item')->where('cscrm_id',$val['id'])->where('email',$val['email'])->get();
-				$data[$key]['amazon_order_id'] = $data[$key]['brand'] = $data[$key]['review'] = $data[$key]['status'] = $data[$key]['sku'] = $data[$key]['asin'] = $data[$key]['item_no'] = $data[$key]['item_group'] = $data[$key]['question_type'] = $data[$key]['bg'] = $data[$key]['bu'] = '';
-				foreach($item as $item_value){
-					$data[$key]['amazon_order_id'] .= $item_value->amazon_order_id.'<br>';
-					$data[$key]['brand'] .= $item_value->brand.'<br>';
-					$data[$key]['review'] .= $item_value->review.'<br>';
-					$data[$key]['status'] .= $item_value->status.'<br>';
-					$data[$key]['sku'] .= $item_value->sku.'<br>';
-					$data[$key]['asin'] .= $item_value->asin.'<br>';
-					$data[$key]['item_no'] .= $item_value->item_no.'<br>';
-					$data[$key]['item_group'] .= $item_value->item_group.'<br>';
-					$linkage1 = isset($categoryData[$item_value->linkage1]) ? $categoryData[$item_value->linkage1] : '';
-					$linkage2 = isset($categoryData[$item_value->linkage2]) ? $categoryData[$item_value->linkage2] : '';
-					$linkage3 = isset($categoryData[$item_value->linkage3]) ? $categoryData[$item_value->linkage3] : '';
-					$data[$key]['question_type'] .= $linkage1.'/'.$linkage2.'/'.$linkage3.'<br>';
-					//查隐藏邮箱
-					$encrypted_email = DB::table('client_info')->where('email',$val['email'])->first();
-					if($encrypted_email){
-						$encrypted_email = $encrypted_email->encrypted_email;
-						$data[$key]['encrypted_email'] = $encrypted_email;
-					}
-					//查bgbu
-					if($item_value->asin){
-						$asinData = DB::table('asin')->where('asin',$item_value->asin)->first();
-						if($asinData){
-							$data[$key]['bg'] .= $asinData->bg.'<br>';
-							$data[$key]['bu'] .= $asinData->bu.'<br>';
-						}
-					}
 
-				}
+				$linkage1 = isset($categoryData[$val['linkage1']]) ? $categoryData[$val['linkage1']] : '';
+				$linkage2 = isset($categoryData[$val['linkage2']]) ? $categoryData[$val['linkage2']] : '';
+				$linkage3 = isset($categoryData[$val['linkage3']]) ? $categoryData[$val['linkage3']] : '';
+				$data[$key]['question_type'] = $linkage1.'/'.$linkage2.'/'.$linkage3;
 			}
 		}
 		return compact('data', 'recordsTotal', 'recordsFiltered');
@@ -140,7 +114,7 @@ class CscrmController extends Controller
 		);
 
 		$ins = $request->input('search.ins', []);
-		if($ins['bg'] || $ins['bu']){
+		if(array_get($ins,'bg') || array_get($ins,'bu')){
 			$asins = DB::table('asin');
 			if($ins['bg']){
 				$asins = $asins->whereIn('bg',$ins['bg']);
@@ -157,7 +131,7 @@ class CscrmController extends Controller
 			$where .= " and asin in ".$asin_str;
 		}
 		
-		$sql = "select SQL_CALC_FOUND_ROWS t1.id as id,t1.created_at as date,name,t1.email as email,phone,country,`from`,name,gender,facebook_name 
+		$sql = "select SQL_CALC_FOUND_ROWS t1.id as id,t1.created_at as date,name,t1.email as email,phone,country,`from`,name,gender,facebook_name,amazon_order_id,brand,review,linkage1,linkage2,linkage3,sku,asin,item_no,item_group
 			FROM cs_crm as t1 
 		  	left join cs_crm_item on t1.id = cs_crm_item.cscrm_id 
 			where $where 
@@ -165,6 +139,76 @@ class CscrmController extends Controller
 			order by id desc";
 		// echo $sql;exit;
 		return $sql;
+	}
+	
+	
+	//导出数据
+	public function export(Request $request)
+	{
+		set_time_limit(0);
+		$date_from = $_GET['date_from'];
+		$date_to = $_GET['date_to'];
+		$where = " t1.created_at >= '".$date_from." 00:00:00' and t1.created_at <= '".$date_to." 23:59:59'";
+		$sql = "select t1.id as id,t1.created_at as date,name,t1.email as email,phone,country,`from`,name,gender,facebook_name,amazon_order_id,brand,review,linkage1,linkage2,linkage3,sku,asin,item_no,item_group
+			FROM cs_crm as t1 
+		  	left join cs_crm_item on t1.id = cs_crm_item.cscrm_id 
+			where $where 
+			group by t1.id 
+			order by id desc";
+		// echo $sql;exit;
+		$data = DB::connection('cs')->select($sql);
+		$categoryData = $this->getCategoryType();
+		$arrayData = array();
+		$headArray = array('ID','Date','Email','Name','Phone','Country','From','Gender','Facebook','OrderId','Brand','Review','Question','Sku','Asin','ItemNo','ItemGroup');
+		$arrayData[] = $headArray;
+		if($data){
+			$data = json_decode(json_encode($data),true);
+			
+			foreach($data as $key=>$val){
+				$linkage1 = isset($categoryData[$val['linkage1']]) ? $categoryData[$val['linkage1']] : '';
+				$linkage2 = isset($categoryData[$val['linkage2']]) ? $categoryData[$val['linkage2']] : '';
+				$linkage3 = isset($categoryData[$val['linkage3']]) ? $categoryData[$val['linkage3']] : '';
+				$question = $linkage1.'/'.$linkage2.'/'.$linkage3;
+				$arrayData[] = [
+					$val['id'],
+					$val['date'],
+					$val['email'],
+					$val['name'],
+					$val['phone'],
+					$val['country'],
+					$val['from'],
+					$val['gender'],
+					$val['facebook_name'],
+					$val['amazon_order_id'],
+					$val['brand'],
+					$val['review'],
+					$question,
+					$val['sku'],
+					$val['asin'],
+					$val['item_no'],
+					$val['item_group'],
+				];
+		
+			}
+		}
+		
+        if($arrayData){
+            $spreadsheet = new Spreadsheet();
+
+            $spreadsheet->getActiveSheet()
+                ->fromArray(
+                    $arrayData,  // The data to set
+                    NULL,        // Array values with this value will not be set
+                    'A1'         // Top left coordinate of the worksheet range where
+                //    we want to set these values (default is A1)
+                );
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');//告诉浏览器输出07Excel文件
+            header('Content-Disposition: attachment;filename="Export_CSCRM.xlsx"');//告诉浏览器输出浏览器名称
+            header('Cache-Control: max-age=0');//禁止缓存
+            $writer = new Xlsx($spreadsheet);
+            $writer->save('php://output');
+        }
+        die();
 	}
 
 }

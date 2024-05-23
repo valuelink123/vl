@@ -33,7 +33,7 @@ class PpcscheduleController extends Controller
     public function listSchedules(Request $request)
     {
         $datas = PpcSchedule::with('user')->with('campaign')->with('profile');
-        if($request->get('profile_id')) $datas = $datas->where('profile_id',$request->get('profile_id'));
+        if($request->get('profile_id')) $datas = $datas->whereIn('profile_id',$request->get('profile_id'));
         if($request->get('ad_type')) $datas = $datas->where('ad_type',$request->get('ad_type'));	
 		$keyword = array_get($_REQUEST,'record_name');
         if($keyword){
@@ -41,6 +41,9 @@ class PpcscheduleController extends Controller
     			$query->where('name', 'like', '%'.$keyword.'%');
 			});
         }
+		
+		if($request->get('user_id')) $datas = $datas->whereIn('user_id',$request->get('user_id'));
+		
         if(array_get($_REQUEST,'status')!==NULL && array_get($_REQUEST,'status')!==''){
             $datas = $datas->where('status',array_get($_REQUEST,'status'));
         }
@@ -76,7 +79,7 @@ class PpcscheduleController extends Controller
             $records["data"][] = array(
                 '<input name="id[]" type="checkbox" class="checkboxes" value="'.$list['id'].'"  />',
 				array_get($list,'profile.account_name'),
-                array_get($list,'campagin.name'),
+                array_get($list,'campaign.name'),
 				$list['record_type'],
                 $record_name??$list['record_name'],
                 array_get(\App\Models\PpcSchedule::STATUS,$list['status']),

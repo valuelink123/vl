@@ -18,4 +18,14 @@ class PpcSproductsCampaign extends Model
 	{
 		return json_decode($value, true);
 	}
+	
+	public function setNetworksAttribute($value)
+	{
+        $this->attributes['networks'] = json_encode($value);
+	}
+	
+	public function getNetworksAttribute($value)
+	{
+		return json_decode($value, true);
+	}
 }
