@@ -609,6 +609,12 @@
                                                         <span class="arrow"></span>
                                                     </a>
                                                 </li>
+												<li class="">
+													<a href="/otherSku" class="nav-link nav-toggle ">
+														平台库存看板
+														<span class="arrow"></span>
+													</a>
+												</li>
 												@permission('productTransfer-show')
                                                 <li class="">
                                                     <a href="{{ url('productTransfer') }}" class="nav-link nav-toggle ">

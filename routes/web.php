@@ -460,6 +460,11 @@ Route::Post('/daSkuMatch/get', 'DaSkuMatchController@get')->name('getDaSkuMatch'
 Route::Post('/daSkuMatch/update', 'DaSkuMatchController@update')->name('updateDaSkuMatch');
 Route::Post('/daSkuMatch/upload', 'DaSkuMatchController@upload');
 
+Route::resource('otherSku', 'OtherSkuController');
+Route::Post('/otherSku/get', 'OtherSkuController@get')->name('getOtherSku');
+Route::Post('/otherSku/update', 'OtherSkuController@update')->name('updateOtherSku');
+Route::Post('/otherSku/upload', 'OtherSkuController@upload');
+
 Route::resource('replaceSku', 'ReplaceSkuController');
 Route::Post('/replaceSku/get', 'ReplaceSkuController@get')->name('getReplaceSku');
 Route::Post('/replaceSku/update', 'ReplaceSkuController@update')->name('updateReplaceSku');
