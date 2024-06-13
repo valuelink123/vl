@@ -121,12 +121,13 @@ class FinanceShipmentController extends Controller
 				$list['posted_date'],
 				$list['order_item_id'],
 				$list['seller_sku'],
-				$list['quantity_shipped'],
+				$list['quantity_shipped'].' ',
 				$list['type_id'],
-				$list['amount'],
+				round($list['amount'],2).' ',
 				$list['currency']
             );
 		}
+
 		if($data){
             $spreadsheet = new Spreadsheet();
 
