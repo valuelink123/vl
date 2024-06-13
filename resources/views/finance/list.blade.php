@@ -43,7 +43,7 @@ table.dataTable.fixedHeader-floating {
 							<div class="col-md-2">
 								<div class="input-group">
 									<span class="input-group-addon">Accounts</span>
-									<select  class="mt-multiselect btn btn-default " multiple="multiple" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true"  id="accounts" name="accounts">
+									<select  class="mt-multiselect btn btn-default " multiple="multiple" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true"  id="seller_account_id" name="seller_account_id[]">
 										@foreach($accounts as $key=>$val)
 											<option value="{!! $key !!}">{!! $val !!}</option>
 										@endforeach
@@ -120,7 +120,7 @@ table.dataTable.fixedHeader-floating {
             var grid = new Datatable();
 			grid.setAjaxParam("date_from", $("input[name='date_from']").val());
 			grid.setAjaxParam("date_to", $("input[name='date_to']").val());
-			grid.setAjaxParam("seller_account_id", $("select[name='accounts']").val());
+			grid.setAjaxParam("seller_account_id", $("select[name='seller_account_id[]']").val());
 			grid.setAjaxParam("keyword", $("input[name='keyword']").val());
             grid.init({
                 src: $("#datatable_ajax"),
