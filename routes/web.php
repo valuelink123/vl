@@ -817,4 +817,4 @@ Route::match(['post','get'],'/cscrm/export', 'CscrmController@export')->name('ex
 
 Route::resource('financeshipment', 'FinanceShipmentController');
 Route::Post('/financeshipment/get', 'FinanceShipmentController@get');
-Route::get('/financeshipment/export', 'FinanceShipmentController@export');
+Route::get('/financeshipmentExport', 'FinanceShipmentController@export');

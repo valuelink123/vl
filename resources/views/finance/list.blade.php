@@ -166,7 +166,7 @@ $(function() {
 	});
 	
 	$("#export").click(function(){
-		location.href='/financeshipment/export?'+$("#search-form").serialize();
+		location.href='/financeshipmentExport?'+$("#search-form").serialize();
 		return false;
 	});
 	

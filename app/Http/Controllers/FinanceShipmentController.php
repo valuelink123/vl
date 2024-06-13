@@ -7,6 +7,9 @@ use Illuminate\Support\Facades\Auth;
 use PDO;
 use DB;
 use Illuminate\Http\Response;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+
 class FinanceShipmentController extends Controller
 {
     /**
