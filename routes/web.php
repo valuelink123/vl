@@ -814,3 +814,7 @@ Route::Post('/reims/batchUpdate', 'ReimController@batchUpdate')->name('ReimBatch
 Route::get('/cscrm', 'CscrmController@index');
 Route::match(['post','get'],'/cscrm/get', 'CscrmController@get')->name('getCscrm');
 Route::match(['post','get'],'/cscrm/export', 'CscrmController@export')->name('exportCscrm');
+
+Route::resource('financeshipment', 'FinanceShipmentController');
+Route::Post('/financeshipment/get', 'FinanceShipmentController@get');
+Route::get('/financeshipment/export', 'FinanceShipmentController@export');
