@@ -44,7 +44,6 @@ function getBudgetQuarter(){
     $nowYear = date('Y');
     $nowMonth =  date('m');
     $budget_quarter = [];
-	$now_quarter = 1;
     if($nowMonth>=3) $now_quarter = 2;
     if($nowMonth>=6) $now_quarter = 3;
     if($nowMonth>=9) $now_quarter = 4;
@@ -95,16 +94,15 @@ function getUseridSapid(){
 
 function getBudgetStageArr()
 {
-	return array(0=>'待提交',1=>'BU经理审核',2=>'BG总监审核',6=>'计划审核',3=>'企管审核',4=>'VP审核',5=>'已确认');
+	return array(0=>'待提交',1=>'BU经理审核',2=>'BG总监审核',3=>'企管审核',4=>'VP审核',5=>'已确认');
 }
 function getBudgetRuleForRole()
 {
 	if(Auth::user()->can(['budgets-vp-check'])) return getBudgetStageArr();
-	if(Auth::user()->can(['budgets-business-check']))  return array_slice(getBudgetStageArr(),0,6,true);
-	if(Auth::user()->can(['budgets-plan-check']))  return array_slice(getBudgetStageArr(),0,5,true);
-	if(Auth::user()->can(['budgets-bg-check']))  return array_slice(getBudgetStageArr(),0,4,true);
-	if(Auth::user()->can(['budgets-bu-check']))  return array_slice(getBudgetStageArr(),0,3,true);
-	if(Auth::user()->can(['budgets-show']))  return array_slice(getBudgetStageArr(),0,2,true);
+	if(Auth::user()->can(['budgets-business-check']))  return array_slice(getBudgetStageArr(),0,5);
+	if(Auth::user()->can(['budgets-bg-check']))  return array_slice(getBudgetStageArr(),0,4);
+	if(Auth::user()->can(['budgets-bu-check']))  return array_slice(getBudgetStageArr(),0,3);
+	if(Auth::user()->can(['budgets-show']))  return array_slice(getBudgetStageArr(),0,2);
 	return array();
 }
 
@@ -125,22 +123,9 @@ function getDistRuleForRole()
 	return array();
 }
 
-function getTransferForRole()
-{
-	$userRole = User::find(Auth::user()->id)->roles->pluck('id')->toArray();
-	if(in_array(52,$userRole)) return \App\Models\TransferPlan::STATUS;
-	if(in_array(31,$userRole)) return array_slice(\App\Models\TransferPlan::STATUS,0,6);
-	if(in_array(23,$userRole)) return array_slice(\App\Models\TransferPlan::STATUS,0,5);
-	if(in_array(28,$userRole)) return array_slice(\App\Models\TransferPlan::STATUS,0,4);
-	if(in_array(15,$userRole)) return array_slice(\App\Models\TransferPlan::STATUS,0,3);
-	if(in_array(16,$userRole)) return array_slice(\App\Models\TransferPlan::STATUS,0,3);
-	if(in_array(11,$userRole)) return array_slice(\App\Models\TransferPlan::STATUS,0,2);
-	return array();
-}
-
 
 function getSellerAccount(){
-	return DB::connection('amazon')->table("seller_accounts")->where('primary',1)->whereNull('deleted_at')->groupby(['mws_seller_id','label'])->pluck('label','mws_seller_id');
+	return DB::connection('amazon')->table("seller_accounts")->whereNull('deleted_at')->groupby(['mws_seller_id','label'])->pluck('label','mws_seller_id');
 }
 function getUserGroupDetails(){
 	$groups=$users =[];
@@ -315,22 +300,6 @@ function getSiteCur(){
         'amazon.com.mx'=>'MXN',
         'amazon.com'=>'USD',
 		'amazon.mx'=>'MXN',
-    );
-}
-
-function getSiteVat(){
-    return array(
-        'www.amazon.ca'=>0,
-        'www.amazon.de'=>0.19,
-        'www.amazon.es'=>0.21,
-        'www.amazon.fr'=>0.2,
-        'www.amazon.in'=>0,
-        'www.amazon.it'=>0.22,
-        'www.amazon.co.jp'=>0,
-        'www.amazon.co.uk'=>0.2,
-        'www.amazon.com.mx'=>0,
-        'www.amazon.com'=>0,
-		'www.amazon.mx'=>0,
     );
 }
 
@@ -520,13 +489,13 @@ function curl_request($url,$post='',$cookie='', $returnCookie=0){
         curl_setopt($curl, CURLOPT_AUTOREFERER, 1);
         if($post) {
             curl_setopt($curl, CURLOPT_POST, 1);
-            curl_setopt($curl, CURLOPT_POSTFIELDS, is_array($post)?http_build_query($post):$post);
+            curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($post));
         }
         if($cookie) {
             curl_setopt($curl, CURLOPT_COOKIE, $cookie);
         }
         curl_setopt($curl, CURLOPT_HEADER, $returnCookie);
-        curl_setopt($curl, CURLOPT_TIMEOUT, 30);
+        curl_setopt($curl, CURLOPT_TIMEOUT, 10);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         $data = curl_exec($curl);
         if (curl_errno($curl)) {
@@ -753,10 +722,10 @@ function getActiveUserConfig()
         array('db'=>'website','dbname'=>'mooka_co','name'=>'mooka','formid'=>array(2),'fields'=>array('name'=>'1.3','email'=>2,'orderid'=>3)),
         array('db'=>'website','dbname'=>'irunme_net','name'=>'irunme','formid'=>array(1),'fields'=>array('name'=>'5.3','email'=>6,'orderid'=>7)),
         array('db'=>'website','dbname'=>'spacekeybrands_com','name'=>'spacekeybrands','formid'=>array(2),'fields'=>array('name'=>'2.3','email'=>3,'orderid'=>4)),
-//		array('db'=>'natrogix','dbname'=>'natrogix_com','name'=>'natrogix','formid'=>array(17),'fields'=>array('name'=>'4','email'=>1,'orderid'=>3)),
+		array('db'=>'natrogix','dbname'=>'natrogix_com','name'=>'natrogix','formid'=>array(17),'fields'=>array('name'=>'4','email'=>1,'orderid'=>3)),
 
 		array('db'=>'drocon','dbname'=>'drocon_co','name'=>'drocon','formid'=>array(2),'fields'=>array('name'=>'1.3','email'=>2,'orderid'=>3)),
-//		array('db'=>'natrogix','dbname'=>'lypsonline_com','name'=>'lypsonline','formid'=>array(2),'fields'=>array('name'=>'1.3','email'=>2,'orderid'=>3)),
+		array('db'=>'natrogix','dbname'=>'lypsonline_com','name'=>'lypsonline','formid'=>array(2),'fields'=>array('name'=>'1.3','email'=>2,'orderid'=>3)),
 		array('db'=>'website','dbname'=>'vipsupport_jp','name'=>'vipsupport','formid'=>array(1),'fields'=>array('name'=>'2.3','email'=>3,'orderid'=>4)),
 
 		array('db'=>'website','dbname'=>'wordpress','name'=>'azeus','entry_table'=>'wp_53_gf_entry','meta_table'=>'wp_53_gf_entry_meta','formid'=>array(3),'fields'=>array('name'=>1,'email'=>3,'orderid'=>2)),//新添加的azeus官网数据
@@ -769,19 +738,12 @@ function getActiveUserConfig()
 		array('db'=>'website','dbname'=>'miropureshop','name'=>'miropureshop.com','formid'=>array(2),'fields'=>array('name'=>'1.3','email'=>2,'orderid'=>3)),
 		array('db'=>'website','dbname'=>'mookashop','name'=>'mookashop.com','formid'=>array(2),'fields'=>array('name'=>'1.3','email'=>2,'orderid'=>3)),
 		array('db'=>'drocon','dbname'=>'droconshop_com','name'=>'droconshop.com','formid'=>array(12),'fields'=>array('name'=>'1','email'=>2,'orderid'=>3)),
-		array('db'=>'website','dbname'=>'natrogix_com','name'=>'natrogixshop.com','formid'=>array(1),'fields'=>array('name'=>1,'email'=>2,'orderid'=>3)),
-		array('db'=>'website','dbname'=>'`vip-support_jp`','name'=>'vip-support.jp','formid'=>array(1),'fields'=>array('name'=>'2.3','email'=>3,'orderid'=>4)),
+		array('db'=>'natrogix','dbname'=>'natrogixshop_com','name'=>'natrogixshop.com','formid'=>array(17),'fields'=>array('name'=>4,'email'=>1,'orderid'=>3)),
+		array('db'=>'website','dbname'=>'vip-support_jp','name'=>'vip-support.jp','formid'=>array(1),'fields'=>array('name'=>'2.3','email'=>3,'orderid'=>4)),
 		array('db'=>'website','dbname'=>'workizeshop_com','name'=>'workizeshop.com','formid'=>array(2),'fields'=>array('name'=>7,'email'=>2,'orderid'=>4)),
 
 		array('db'=>'website','dbname'=>'lacetteshop','name'=>'lacetteshop','formid'=>array(1),'fields'=>array('name'=>1.3,'email'=>3,'orderid'=>4)),
 		array('db'=>'website','dbname'=>'tecbeanshop','name'=>'tecbeanshop','formid'=>array(1),'fields'=>array('name'=>1.3,'email'=>2,'orderid'=>3)),
-
-		array('db'=>'website','dbname'=>'cocohopshop','name'=>'cocohopshop','formid'=>array(1),'fields'=>array('name'=>1,'email'=>2,'orderid'=>3)),
-		array('db'=>'website','dbname'=>'spacekeyshop','name'=>'spacekeyshop','formid'=>array(1),'fields'=>array('name'=>2,'email'=>3,'orderid'=>4)),
-		array('db'=>'website','dbname'=>'thefunavo','name'=>'thefunavo','formid'=>array(1),'fields'=>array('name'=>1,'email'=>2,'orderid'=>3)),
-		array('db'=>'website','dbname'=>'myvidoka_com','name'=>'myvidoka','formid'=>array(1),'fields'=>array('name'=>1.3,'email'=>2,'orderid'=>3)),
-
-		array('db'=>'website','dbname'=>'wordpress','name'=>'dbpowershop_jp','entry_table'=>'wp_54_gf_entry','meta_table'=>'wp_54_gf_entry_meta','formid'=>array(1),'fields'=>array('name'=>1,'email'=>2,'orderid'=>3)),
 
     );
 
@@ -943,7 +905,7 @@ function getCrmFrom()
 //CRM模块可供下拉选择的brand
 function getCrmBrand()
 {
-	return array('DBPOWER','TENKER','KOIOS','SPACEKEY','Mooka','Natrogix','Miropure','NURSAL','DROCON','Runme','OXA','Lyps','SPACEKEYBRANDS','TECBEAN','Babysteps','VIPSUPPORT','AZEUS','PureMeHome');
+	return array('DBPOWER','TENKER','KOIOS','SPACEKEY','Mooka','Natrogix','Miropure','NURSAL','DROCON','Runme','OXA','Lyps','SPACEKEYBRANDS','TECBEAN','Babysteps','VIPSUPPORT','AZEUS');
 }
 
 //CRM模块可供下拉选择的订单类型
@@ -1139,62 +1101,56 @@ function getRsgRequestChannel()
 function getFacebookGroup()
 {
 	$arr = array(
-//		1=>'CTG Premium Product Review Club | Alpha',
-//		2=>'CTG Premium Product Review Club | Bravo',
-//		3=>'CTG Premium Product Review Club | Charlie',
-//		4=>'CTG Premium Product Review Club | Delta',
-//		5=>'CTG Premium Product Review Club | Echo',
-//		6=>'CTG Premium Product Review Club | Foxtrot',
-//		7=>'CTG Premium Product Review Club | Golf',
-//		8=>'CTG Premium Product Review Club | Hotel',
-//		9=>'CTG Premium Product Review Club | India',
-//		10=>'CTG Premium Product Review Club | Juliet',
-//		11=>'CTG Premium Product Review Club | Kilo',
-//		12=>'CTG Premium Product Review Club | Lima',
-//		13=>'CTG Premium Product Review Club | Mike',
-//		14=>'CTG Premium Product Review Club | November',
-//		15=>'CTG Premium Product Review Club | Oscar',
-//		16=>'CTG Premium Product Review Club | Papa',
-//		17=>'CTG Premium Product Review Club | Quebec',
-//		18=>'CTG Premium Product Review Club | Romeo',
-//		19=>'CTG Premium Product Review Club | Sierra',
-//		20=>'CTG Premium Product Review Club | Tango',
-//		21=>'CTG Premium Product Review Club | Uniform',
-//		22=>'CTG Premium Product Review Club | Victor',
-//		23=>'CTG Premium Product Review Club | Whiskey',
-//		24=>'CTG Premium Product Review Club | X-ray',
-//		25=>'CTG Premium Product Review Club | Yankee',
-//		26=>'CTG Premium Product Review Club | Zulu',
-//		27=>'CTG Premium Product Review Club | Apple',
-//		28=>'CTG Premium Product Review Club | Banana',
-//		29=>'CTG Premium Product Review Club | Cherry',
-//		30=>'CTG Premium Product Review Club | Date',
-//		31=>'CTG Premium Product Review Club | Eggplant',
-//		32=>'CTG Premium Product Review Club | Fig',
-//		33=>'CTG Premium Product Review Club | Grape',
-//		34=>'CTG Premium Product Review Club | Honeydew',
-//		35=>'CTG Premium Product Review Club | Iceberg Lettuce',
-//		36=>'CTG Premium Product Review Club | Jackfruit',
-//		37=>'CTG Premium Product Review Club | Kiwi',
-//		38=>'CTG Premium Product Review Club | Lemon',
-//		39=>'CTG Premium Product Review Club | Mango',
-//		40=>'CTG Premium Product Review Club | Nut',
-//		41=>'CTG Premium Product Review Club | Olive',
-//		42=>'CTG Premium Product Review Club | Peach',
-//		43=>'CTG Premium Product Review Club | Quince',
-//		44=>'CTG Premium Product Review Club | Radish',
-//		45=>'CTG Premium Product Review Club | Strawberry',
-//		46=>'CTG Premium Product Review Club | Tomato',
-//		47=>'CTG Premium Product Review Club | Vanilla',
-//		48=>'CTG Premium Product Review Club | Watermelon',
-//		49=>'CTG Premium Product Review Club | Yam',
-//		50=>'CTG Premium Product Review Club | Zucchini',
-		51=>'Amethyst Premium',
-		52=>'Scarlet Rewards',
-		53=>'Turquoise Gifts',
-		54=>'Shamrock Tokens',
-		55=>'Magenta Giveaway',
-
+		1=>'CTG Premium Product Review Club | Alpha',
+		2=>'CTG Premium Product Review Club | Bravo',
+		3=>'CTG Premium Product Review Club | Charlie',
+		4=>'CTG Premium Product Review Club | Delta',
+		5=>'CTG Premium Product Review Club | Echo',
+		6=>'CTG Premium Product Review Club | Foxtrot',
+		7=>'CTG Premium Product Review Club | Golf',
+		8=>'CTG Premium Product Review Club | Hotel',
+		9=>'CTG Premium Product Review Club | India',
+		10=>'CTG Premium Product Review Club | Juliet',
+		11=>'CTG Premium Product Review Club | Kilo',
+		12=>'CTG Premium Product Review Club | Lima',
+		13=>'CTG Premium Product Review Club | Mike',
+		14=>'CTG Premium Product Review Club | November',
+		15=>'CTG Premium Product Review Club | Oscar',
+		16=>'CTG Premium Product Review Club | Papa',
+		17=>'CTG Premium Product Review Club | Quebec',
+		18=>'CTG Premium Product Review Club | Romeo',
+		19=>'CTG Premium Product Review Club | Sierra',
+		20=>'CTG Premium Product Review Club | Tango',
+		21=>'CTG Premium Product Review Club | Uniform',
+		22=>'CTG Premium Product Review Club | Victor',
+		23=>'CTG Premium Product Review Club | Whiskey',
+		24=>'CTG Premium Product Review Club | X-ray',
+		25=>'CTG Premium Product Review Club | Yankee',
+		26=>'CTG Premium Product Review Club | Zulu',
+		27=>'CTG Premium Product Review Club | Apple',
+		28=>'CTG Premium Product Review Club | Banana',
+		29=>'CTG Premium Product Review Club | Cherry',
+		30=>'CTG Premium Product Review Club | Date',
+		31=>'CTG Premium Product Review Club | Eggplant',
+		32=>'CTG Premium Product Review Club | Fig',
+		33=>'CTG Premium Product Review Club | Grape',
+		34=>'CTG Premium Product Review Club | Honeydew',
+		35=>'CTG Premium Product Review Club | Iceberg Lettuce',
+		36=>'CTG Premium Product Review Club | Jackfruit',
+		37=>'CTG Premium Product Review Club | Kiwi',
+		38=>'CTG Premium Product Review Club | Lemon',
+		39=>'CTG Premium Product Review Club | Mango',
+		40=>'CTG Premium Product Review Club | Nut',
+		41=>'CTG Premium Product Review Club | Olive',
+		42=>'CTG Premium Product Review Club | Peach',
+		43=>'CTG Premium Product Review Club | Quince',
+		44=>'CTG Premium Product Review Club | Radish',
+		45=>'CTG Premium Product Review Club | Strawberry',
+		46=>'CTG Premium Product Review Club | Tomato',
+		47=>'CTG Premium Product Review Club | Vanilla',
+		48=>'CTG Premium Product Review Club | Watermelon',
+		49=>'CTG Premium Product Review Club | Yam',
+		50=>'CTG Premium Product Review Club | Zucchini',
 	);
 	return $arr;
 }
@@ -1265,23 +1221,23 @@ function getReplyAduitStatus()
 function getShipRate()
 {
 	$arr = [
-	'US'=>['default'=>'2750'],
-	'UK'=>['default'=>'2585'],
-	'DE'=>['default'=>'2970'],
-	'FR'=>['default'=>'2970'],
-	'ES'=>['default'=>'2970'],
-	'IT'=>['default'=>'2970'],
+	'US'=>['default'=>'1200'],
+	'UK'=>['default'=>'1050'],
+	'DE'=>['default'=>'1550'],
+	'FR'=>['default'=>'1550'],
+	'ES'=>['default'=>'1650'],
+	'IT'=>['default'=>'1650'],
 	'JP'=>[
-		'default'=>'1760',
-		'HA0618'=>'2788',
-		'HA0697'=>'2788',
-		'CS0517'=>'2788',
-		'CS0510'=>'2788',
-		'CS0548'=>'2788',
-		'CS0656'=>'2788'
+		'default'=>'950',
+		'HA0618'=>'2534',
+		'HA0697'=>'2534',
+		'CS0517'=>'2534',
+		'CS0510'=>'2534',
+		'CS0548'=>'2534',
+		'CS0656'=>'2534'
 	],
-	'CA'=>['default'=>'2750'],
-	'MX'=>['default'=>'2750']
+	'CA'=>['default'=>'1900'],
+	'MX'=>['default'=>'1200']
 	];
 	return $arr;
 }
@@ -1382,18 +1338,8 @@ function getCrmRsgStatusArr()
 //获取数据库里面的marketplaceid与domain之间的关系
 function getMarketDomain()
 {
-	$data= DB::connection('amazon')->select('select marketplaceid,domain from marketplaces');
+	$data= DB::connection('vlz')->select('select marketplaceid,domain from marketplaces');
 	return $data;
-}
-//得到站点跟域名的键值对
-function getSiteDomain()
-{
-	$site = getMarketDomain();//获取站点选项
-	$siteDomain = array();
-	foreach($site as $key=>$val){
-		$siteDomain[$val->marketplaceid] = $val->domain;
-	}
-	return $siteDomain;
 }
 
 //通过亚马逊站点得到域名
@@ -1485,469 +1431,4 @@ function array_merge_deep(...$arrs)
 	}
 
 	return $merged;
-}
-
-/*
- * 同时更新多个记录，参数，连接的数据库，表名，数组
- * $database 需要更新数据的宏
- * $tableName 表名
- * $multipleData  更改的数组
- * $multipleData[] = array(
- *   'id' => $mv->id,
- *   'amazon_order_id' => $replacementOrderID[$mv->seller_fulfillment_order_id]
- * )
- */
-function updateBatch($database="",$tableName = "", $multipleData = array()){
-
-	if( $tableName && !empty($multipleData) ) {
-		$updateColumn = array_keys($multipleData[0]);//$updateColumn为传过来的所有字段
-		$referenceColumn = $updateColumn[0]; //为参考列，例如id
-		unset($updateColumn[0]);//更改的字段不包括第一列
-		$whereIn = "";
-
-		$q = "UPDATE ".$tableName." SET ";
-		foreach ( $updateColumn as $uColumn ) {
-			$q .=  $uColumn." = CASE ";
-
-			foreach( $multipleData as $data ) {
-				$q .= "WHEN ".$referenceColumn." = '".$data[$referenceColumn]."' THEN '".$data[$uColumn]."' ";
-			}
-			$q .= "ELSE ".$uColumn." END, ";
-		}
-		foreach( $multipleData as $data ) {
-			$whereIn .= "'".$data[$referenceColumn]."', ";
-		}
-		$q = rtrim($q, ", ")." WHERE ".$referenceColumn." IN (".  rtrim($whereIn, ', ').")";
-		// Update
-		return DB::connection($database)->update(DB::raw($q));
-	} else {
-		return false;
-	}
-}
-/*
- * 亚马逊订单状态的枚举
- */
-function amazonOrderStatus()
-{
-	return array('PendingAvailability', 'Pending', 'Unshipped', 'PartiallyShipped', 'Shipped', 'InvoiceUnconfirmed', 'Unfulfillab','Canceled');
-}
-/*
- * 退货状态的枚举
- */
-function amazonReturnStatus()
-{
-	return array('Reimbursed', 'Pending Repackaging','Repackaged Successfully', 'Unit returned to inventory');
-}
-/*
- * 退货原因的枚举
- */
-function amazonReturnReason()
-{
-	return array('APPAREL_STYLE', 'APPAREL_TOO_LARGE', 'APPAREL_TOO_SMALL', 'DAMAGED_BY_CARRIER', 'DAMAGED_BY_FC', 'DEFECTIVE', 'DID_NOT_LIKE_FABRIC','EXCESSIVE_INSTALLATION','EXTRA_ITEM','FOUND_BETTER_PRICE','MISORDERED','MISSED_ESTIMATED_DELIVERY','MISSING_PARTS','NEVER_ARRIVED','NOT_AS_DESCRIBED','NOT_COMPATIBLE','NO_REASON_GIVEN','ORDERED_WRONG_ITEM','PART_NOT_COMPATIBLE','PRODUCT_NOT_ITALIAN','QUALITY_UNACCEPTABLE','SWITCHEROO','UNAUTHORIZED_PURCHASE','UNDELIVERABLE_CARRIER_MISS_SORTED','UNDELIVERABLE_FAILED_DELIVERY_ATTEMPTS','UNDELIVERABLE_INSUFFICIENT_ADDRESS','UNDELIVERABLE_MISSING_LABEL','UNDELIVERABLE_REFUSED','UNDELIVERABLE_UNCLAIMED','UNDELIVERABLE_UNKNOWN','UNWANTED_ITEM');
-}
-/*
- * 退货condition的枚举
- */
-function amazonReturnCondition()
-{
-	return array('CARRIER_DAMAGED', 'CUSTOMER_DAMAGED', 'DAMAGED', 'DEFECTIVE', 'SELLABLE');
-}
-
-
-function checkRsgOrder($amazonOrderId)
-{
-	return (App\RsgRequest::where('amazon_order_Id', $amazonOrderId)->count()>0)?true:false;
-}
-
-/*
- * 黑名单邮箱配置
- */
-function blackEmail()
-{
-	return array(
-		'jazzbaena@yahoo.com',
-		'adriana.hawkes@comcast.net',
-		'rapidrem@comcast.net',
-		'shirley.whitescarver@kctcs.edu',
-		'carlielatourell@gmail.com',
-		'rrconslt@aol.com',
-		'yeie.uaw87.8223z@gmail.com',
-		'l.lynne7@icloud.com',
-		'Tammy@ilashperfection.com',
-		'shivaness@orange.fr',
-		'swampthing@mac.com',
-		'mariarivera1993@icloud.com',
-		'topflier.mobile@apexeagle.net',
-		'stephan.e.walton@comcast.net',
-		'crazycutecloset@mail.com',
-		'alejandroz@protonmail.com',
-		'ashekhani10@stuy.edu',
-		'testireba5@gmail.com',
-		'cababy@comcast.net',
-		'lsprimont@yahoo.com',
-		'zohar@loshitzer.com',
-		'wendyjonesper@yahoo.com',
-		'casielong4@yahoo.com',
-		'jdahl@pipeline.com',
-		'mrjunderwood@gmail.com',
-		'paracouple@comcast.net',
-		'jimhamlett2@gmail.com',
-		'shea.stimac@outlook.com',
-		'kacampbelljd@gmail.com',
-		'villegas13@gmail.com',
-		'yonilivni47@gmail.com',
-		'robert.tow@aol.com',
-		'954fb78b26091ef830a080f14808f22a6585@valuelinkltd.com',
-		'jeff@jeffgardner.net',
-		'chappylane@comcast.net',
-		'nmaa7@yahoo.com',
-		'marsha@thenaturalmixologist.com',
-		'sulaimanhack@gmail.com',
-		'hadeeb712@gmail.com',
-		'lawhite0317@gmail.com',
-		'palazzo@bluerocpremier.com',
-
-	);
-}
-
-function getEmailToEncryptedEmail()
-{
-	$emailData = array();
-	if (Cache::has('email')) {
-		$emailData = Cache::get('email');
- 	}else{
-		$emailData = DB::table('client_info')->pluck('encrypted_email', 'email')->toArray();
-		Cache::forever('email', $emailData);
-	}
-	return $emailData;
-}
-
-function getBlacklistEmail($rebuild = false)
-{
-	$emailData = array();
-	if (Cache::has('blacklistEmail') && !$rebuild) {
-		$emailData = Cache::get('blacklistEmail');
- 	}else{
-		$emailData = DB::table('client_info')->leftJoin('client',
-			function($q){
-				$q->on('client_info.client_id', '=', 'client.id');
-			}
-		)->whereRaw("FIND_IN_SET('1',client.type)")->pluck(DB::RAW('LOWER(encrypted_email) as encrypted_email'),DB::RAW('LOWER(email) as email'))->toArray();
-		Cache::forever('blacklistEmail', $emailData);
-	}
-	return $emailData;
-}
-
-
-function isBlacklistEmail($email='')
-{
-	$email = strtolower($email);
-	$emailData = getBlacklistEmail();
-	if(!$email || array_search($email,$emailData) || array_key_exists($email,$emailData)){
-		return true;
-	}
-	return false;
-}
-
-//从currency_rates表中获取各站点汇率
-function getCurrencyRates(){
-	$data = DB::connection('amazon')->table('currency_rates')->pluck('rate','currency');
-	$currency_rates = array();
-	$currency_rates['US'] = $data['USD'];
-	$currency_rates['CA'] = $data['CAD'];
-	$currency_rates['UK'] = $data['GBP'];
-	$currency_rates['DE'] = $data['EUR'];
-	$currency_rates['JP'] = $data['JPY'];
-	$currency_rates['FR'] = $data['EUR'];
-	$currency_rates['ES'] = $data['EUR'];
-	$currency_rates['IT'] = $data['EUR'];
-
-	return $currency_rates;
-}
-
-/*
- * 仓储费
- * 得到各个国家的淡季旺季仓储费
- * 0: 淡季仓储费unit_low_storage_fee;
- * 1: 旺季仓储费unit_peak_storage_fee
- */
-function getUnitStorageFee(){
-	$data = array(
-		//array(0,1). 0: 淡季仓储费unit_low_season_storage_fee; 1: 旺季仓储费unit_peak_season_storage_fee
-		'US' => array(24.37, 84.76),
-		'CA' => array(20.00, 28.00),
-		'UK' => array(22.95, 32.14),
-		'DE' => array(26.00, 36.00),
-		'JP' => array(5070.00, 9000.00),
-		'FR' => array(26.00, 36.00),
-		'ES' => array(26.00, 36.00),
-		'IT' => array(26.00, 36.00)
-	);
-
-	return $data;
-}
-
-function getBrands(){
-	return array(
-		'DBPOWER'=>[
-			'url'=>'dbpowershop.com',
-			'email'=>'support@dbpowershop.com',
-		],
-		'KOIOS'=>[
-			'url'=>'koiosshop.com',
-			'email'=>'support@koiosshop.com',
-		],
-		'Miropure'=>[
-			'url'=>'miropureshop.com',
-			'email'=>'support@miropureshop.com',
-		],
-		'Mooka'=>[
-			'url'=>'mookashops.com',
-			'email'=>'support@mookashops.com',
-		],
-		'Nursal'=>[
-			'url'=>'nursalshop.com',
-			'email'=>'support@nursalshop.com',
-		],
-		'Tenker'=>[
-			'url'=>'tenkershop.com',
-			'email'=>'support@tenkershop.com',
-		],
-		'DROCON'=>[
-			'url'=>'droconshop.com',
-			'email'=>'support@droconshop.com',
-		],
-		'Natrogix'=>[
-			'url'=>'natrogixshop.com',
-			'email'=>'support@natrogixshop.com',
-		],
-		'Spacekey'=>[
-			'url'=>'spacekeyshop.com',
-			'email'=>'support@spacekeyshop.com',
-		],
-		'cocohop'=>[
-			'url'=>'cocohopshop.com',
-			'email'=>'support@cocohopshop.com',
-		],
-		'Funavo'=>[
-			'url'=>'thefunavo.com',
-			'email'=>'support@thefunavo.com',
-		],
-		'Lacette'=>[
-			'url'=>'lacetteshop.com',
-			'email'=>'support@lacetteshop.com',
-		],
-		'Petlucky'=>[
-			'url'=>'petluckyshop.com',
-			'email'=>'support@petluckyshop.com',
-		],
-		'WORKIZE'=>[
-			'url'=>'workizeshop.com',
-			'email'=>'support@workizeshop.com',
-		],
-		'VIDOKA'=>[
-			'url'=>'myvidoka.com',
-			'email'=>'support@myvidoka.com',
-		],
-		'DBPowerJP'=>[
-			'url'=>'dbpowershop.jp',
-			'email'=>'service@dbpowershop.jp',
-		],
-		'VipsupportJP'=>[
-			'url'=>'vip-support.jp',
-			'email'=>'service@vip-support.jp',
-		],
-		'Cozy Buy'=>[
-			'url'=>'cozybuyonline.com',
-			'email'=>'support@cozybuyonline.com',
-		],
-		'Runme'=>[
-			'url'=>'runmesport.com',
-			'email'=>'support@runmesport.com',
-		],
-		'Tec.Bean'=>[
-			'url'=>'tecbeanshop.com',
-			'email'=>'support@tecbeanshop.com',
-		],
-		'VACASSO'=>[
-			'url'=>'myvacasso.com',
-			'email'=>'support@myvacasso.com',
-		],
-		'Szevzo'=>[
-			'url'=>'szevzoshop.com',
-			'email'=>'service@szevzoshop.com',
-		],
-		'VIZONY'=>[
-			'url'=>'vizonyshop.com',
-			'email'=>'support@vizonyshop.com',
-		],
-		'TETAL'=>[
-			'url'=>'tetalshop.com',
-			'email'=>'support@tetalshop.com',
-		],
-		'DEVINC'=>[
-			'url'=>'devincshop.com',
-			'email'=>'support@devincshop.com',
-		],
-		'PEKITEN'=>[
-			'url'=>'pekitenshop.com',
-			'email'=>'support@pekitenshop.com',
-		],
-		'PureMeHome'=>[
-                        'url'=>'puremehome.com',
-                        'email'=>'support@puremehome.com',
-                ],
-	);
-}
-
-function unCamelize($str)
-{
-	return strtolower(preg_replace('/([a-z])([A-Z])/', "$1_$2", $str));
-}
-
-function unCamelizeArr($arr)
-{
-	$tmp = [];
-    if (is_array($arr)) {
-        foreach ($arr as $k => $v) {
-			if(is_array($v)) $v = unCamelizeArr($v);
-            $tmp[unCamelize($k)] = $v;
-        }
-    }
-    return $tmp;
-}
-
-function getSellerAccout(){
-	$sql_account = "select CONCAT(mws_seller_id,'_',mws_marketplaceid) as sellerid_marketplaceid,any_value(label) as label from seller_accounts group by sellerid_marketplaceid";
-	$_data_account = DB::connection('amazon')->select($sql_account);
-	$data_account = array();
-	foreach($_data_account as $val){
-		$data_account[$val->sellerid_marketplaceid] = $val->label;
-	}
-	return $data_account;
-}
-
-function func_substr_replace($str, $replacement = "*", $start = 3, $length = 6)
-{
-	$len = mb_strlen($str,"utf-8");
-
-	if ($len > intval($start+$length)) {
-		$str1 = mb_substr($str,0,$start,"utf-8");
-
-		$str2 = mb_substr($str,intval($start+$length),NULL,"utf-8");
-
-	} else {
-		$str1 = mb_substr($str,0,1,"utf-8");
-
-		$str2 = mb_substr($str,$len-1,1,"utf-8");
-
-		$length = $len - 2;
-
-	}
-
-	$new_str = $str1;
-
-	for ($i = 0; $i < $length; $i++) {
-		$new_str .= $replacement;
-
-	}
-
-	$new_str .= $str2;
-
-	return $new_str;
-
-}
-
-function getSkuSize(){
-    return array(
-        '0'=>'标准',
-		'1'=>'特大',
-    );
-}
-
-function getAdRegions(){
-	return array(
-		'A2Q3Y263D00KWC'=>'NA',
-		'A2EUQ1WTGCTBG2'=>'NA',
-		'A1AM78C64UM0Y8'=>'NA',
-		'ATVPDKIKX0DER'=>'NA',
-		'A2VIGQ35RCS4UG'=>'EU',
-		'A1PA6795UKMFR9'=>'EU',
-		'ARBP9OOSHTCHU '=>'EU',
-		'A1RKKUPIHCS9HS'=>'EU',
-		'A13V1IB3VIYZZH'=>'EU',
-		'A1F83G8C2ARO7P'=>'EU',
-		'A21TJRUUN4KGV'=>'EU',
-		'APJ6JRA9NG5V4'=>'EU',
-		'A1805IZSGTT6HS'=>'EU',
-		'A17E79C6D8DWNP'=>'EU',
-		'A2NODRKZP88ZB9'=>'EU',
-		'A33AVAJ2PDY3EV'=>'EU',
-		'A19VAU5U5O7RUS'=>'FE',
-		'A39IBJ37TRP1C6'=>'FE',
-		'A1VC38T7YXB528'=>'FE'
-	);
-}
-
-//获得性别枚举
-function getGender()
-{
-	return array('Unknown','Male','Female');
-}
-//获得国家枚举
-function getCountry()
-{
-	return array(
-		'Amazon.ca'=>'CA',
-		'Amazon.de'=>'DE',
-		'Amazon.es'=>'ES',
-		'Amazon.fr'=>'FR',
-		'Amazon.in'=>'IN',
-		'Aamazon.it'=>'IT',
-		'Amazon.co.jp'=>'JP',
-		'Amazon.co.uk'=>'UK',
-		'Amazon.com.mx'=>'MX',
-		'Amazon.com'=>'US'
-	);
-}
-function getFrom()
-{
-	return array('Email','Call','Chat');
-}
-function getReview()
-{
-	return array('None','PR customer','NRW customer');
-}
-
-// 获得品牌数据
-function getBrand()
-{
-	return DB::connection('cs')->table('config_option')->where('co_pid',1)->where('co_status',0)->orderBy('co_order','desc')->pluck('co_name','id')->toArray();
-}
-//rsg request功能的客户状态
-function getCustomerStatus()
-{
-	return array('Prepay','RAR','RAS','RAO','Half Prepay/RAO','Half Prepay/RAS','Half Prepay/RAR');
-}
-//rsg request功能的客户状态
-function getOrderIdStatus()
-{
-	return array('Pending','Payment Complete','Shipped','Cancelled','Invalid');
-}
-
-function getSellerRules(string $ruleStr, string $bg, string $bu){
-	$ruleStrs = explode(",", $ruleStr);
-	if(empty($ruleStrs)) return ' ';
-	$orWhere = [];
-	$i=0;
-	foreach($ruleStrs as $ruleStr){
-		$str = [];
-		$rule = explode("-",$ruleStr);
-		if(array_get($rule,0)!='*') $str[]= "  $bg='".array_get($rule,0)."'";
-		if(array_get($rule,1)!='*') $str[]= "  $bu='".array_get($rule,1)."'";
-		if(empty($str)) return ' ';
-		$orWhere[] = '('.implode(' and ',$str).')';
-	}
-	if(empty($orWhere)) return ' ';
-	return ' and ('.implode(' or ',$orWhere).')';
 }

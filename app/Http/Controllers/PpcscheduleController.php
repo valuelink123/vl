@@ -79,9 +79,9 @@ class PpcscheduleController extends Controller
             $records["data"][] = array(
                 '<input name="id[]" type="checkbox" class="checkboxes" value="'.$list['id'].'"  />',
 				array_get($list,'profile.account_name'),
-                array_get($list,'campaign.name'),
+                array_get($list,'campaign.name')?array_get($list,'campaign.name'):$list['record_name'],
 				$list['record_type'],
-                $record_name??$list['record_name'],
+                empty(trim($record_name))?$list['record_name']:trim($record_name),
                 array_get(\App\Models\PpcSchedule::STATUS,$list['status']),
                 $list['date_from'].'<BR>'.$list['date_to'],
                 $list['time'],

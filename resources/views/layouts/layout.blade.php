@@ -255,6 +255,12 @@
                                                             </a>
                                                         </li>
                                                         @endpermission
+						        <li class="">
+                                                            <a href="/financeshipment" class="nav-link nav-toggle ">
+                                                                Finance Shipment Events
+                                                                <span class="arrow"></span>
+                                                            </a>
+                                                        </li>
                                                         @permission('return-analysis')
                                                         <li class="">
                                                             <a href="/returnAnalysis/returnAnalysis"
@@ -611,7 +617,7 @@
                                                 </li>
 												<li class="">
 													<a href="/otherSku" class="nav-link nav-toggle ">
-														平台库存看板
+														OTO Inventory
 														<span class="arrow"></span>
 													</a>
 												</li>

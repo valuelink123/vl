@@ -1,12 +1,22 @@
 @extends('layouts.layout')
-@section('label', '平台SKU库存列表')
+@section('label', 'OTO Inventory')
 @section('content')
-<link href="/assets/global/plugins/bootstrap-editable/bootstrap-editable/css/bootstrap-editable.css" rel="stylesheet" type="text/css" />
 <style type="text/css">
 
     .portlet.light .dataTables_wrapper .dt-buttons {
         margin-top: 0px !important;
     }
+	.table thead tr th,.table thead tr td,.table td, .table th{
+	font-size:11px;
+	white-space: nowrap;
+	text-align:left;
+}
+table.dataTable thead th, table.dataTable thead td {
+    padding: 8px 10px;
+}
+table.dataTable.fixedHeader-floating {
+    margin-top: 50px!important;
+}
 </style>
 
     <div class="row">
@@ -62,6 +72,7 @@
                             <thead>
                                 <tr role="row" class="heading">
                                     <th>SKU</th>
+									<th>产品名称</th>
 									<th>供应商未交</th>
 									<th>预计交期</th>
                                     <th>货好未提</th>
@@ -105,16 +116,21 @@
                 dataTable: {
                    //"serverSide":false,
                    "autoWidth":false,
-                   "ordering": false,
+                   "ordering": true,
                     "lengthMenu": [
                         [20, 50, 100, -1],
                         [20, 50, 100, 'All'] 
                     ],
+		    fixedHeader: true,
                     "bFilter":false,
                     "pageLength": 20,
                     "ajax": {
                         "url": "{{ url('otherSku/get')}}",
                     },
+					"aoColumnDefs": [ { "bSortable": false, "aTargets": [1,3 ] }],
+					 "order": [
+                        [12, "desc"]
+                    ],
                     dom: 'Blrtip',
                     buttons: [ 
                         {
@@ -122,7 +138,7 @@
                             text: '导出当前页',
                             title: 'Data export',
                             exportOptions: {
-                                columns: [ 0,1,2,3,4,5,6,7,8,9,10,11 ]
+                                columns: [ 0,1,2,3,4,5,6,7,8,9,10,11,12 ]
                             }
                         },
                     ],
@@ -198,7 +214,7 @@ $(function() {
 		});
 	});
 
-	$('#datatable_ajax').on('dblclick', 'td:not(:has(input),:has(button))', function (e) {
+	$('#datatable_ajax').on('click', '.editData', function (e) {
         e.preventDefault();
         var planId = $(this).closest('tr').find('.checkboxes').prop('value');
         $('#ajax').modal({

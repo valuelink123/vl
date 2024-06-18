@@ -31,9 +31,11 @@ class OtherSkuController extends Controller
     public function get(Request $request)
     {
 
-        $datas = new OtherSku();
+        $datas = OtherSku::leftJoin('sap_skus',function($q){
+				$q->on('other_skus.sku', '=', 'sap_skus.sku');
+			})->selectRaw('other_skus.*,sap_skus.description,(US09TJIT+US05+US04+US07+US08+US10) as transfer,(purchase-unpicked) as purchase,(purchase+HK01+US09TJIT+US05+US04+US07+US08+US10+US02US7+US05HC1+US10DH1+US09TMU) as total');
         if(array_get($_REQUEST,'keyword')){
-            $datas = $datas->where('sku','like','%'.array_get($_REQUEST,'keyword').'%');
+            $datas = $datas->where('other_skus.sku','like','%'.array_get($_REQUEST,'keyword').'%')->orWhere('description','like','%'.array_get($_REQUEST,'keyword').'%');
         }
         
         $iTotalRecords = $datas->count();
@@ -41,7 +43,20 @@ class OtherSkuController extends Controller
         $iDisplayLength = $iDisplayLength < 0 ? $iTotalRecords : $iDisplayLength;
         $iDisplayStart = intval($_REQUEST['start']);
         $sEcho = intval($_REQUEST['draw']);
-        $Lists =  $datas->offset($iDisplayStart)->limit($iDisplayLength)->orderBy('id','desc')->get()->toArray();
+		$orderByConfig = [
+			'0'=>'sku',
+			'2'=>'purchase',
+			'4'=>'unpicked',
+			'5'=>'HK01',
+			'6'=>'in_transit',
+			'7'=>'transfer',
+			'8'=>'US02US7',
+			'9'=>'US05HC1',
+			'10'=>'US10DH1',
+			'11'=>'US09TMU',
+			'12'=>'total',
+		];
+        $Lists =  $datas->offset($iDisplayStart)->limit($iDisplayLength)->orderBy(array_get($orderByConfig,array_get($_REQUEST,'order.0.column',12)),array_get($_REQUEST,'order.0.dir','desc'))->get()->toArray();
         $records["data"] = [];
 		
         foreach ( $Lists as $list){
@@ -53,18 +68,19 @@ class OtherSkuController extends Controller
 			if($list['US08']>0) $transfer.= '沃尔玛在途 '.$list['US08'].'<BR>';
 			if($list['US10']>0) $transfer.= '敦煌在途 '.$list['US10'].'<BR>';
             $records["data"][] = array(
-                '<input type="hidden" class="checkboxes" value="'.$list['id'].'">'.$list['sku'],
+                '<input type="hidden" class="checkboxes" value="'.$list['id'].'"><a class="editData">'.$list['sku'].'</a>',
+				$list['description'],
 				$list['purchase'],
 				str_replace(';','<BR>',$list['purchase_deails']),
-                $list['unpicked'],
+                '<a class="editData">'.$list['unpicked'].'</a>',
 				$list['HK01'],
-				$list['in_transit'],
+				'<a class="editData">'.$list['in_transit'].'</a>',
 				$transfer,
 				$list['US02US7'],
 				$list['US05HC1'],
 				$list['US10DH1'],
 				$list['US09TMU'],
-				$list['purchase']+$list['unpicked']+$list['HK01']+$list['US09TJIT']+$list['US05']+$list['US04']+$list['US07']+$list['US08']+$list['US10']+$list['US02US7']+$list['US05HC1']+$list['US10DH1']+$list['US09TMU'],
+				$list['total'],
             );
 		}
 
