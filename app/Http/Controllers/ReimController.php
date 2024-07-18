@@ -100,7 +100,7 @@ class ReimController extends Controller
 		foreach ( $lists as $list){
             $records["data"][] = array(
                 '<input name="id[]" type="checkbox" class="checkboxes" value="'.$list['id'].'"  />',
-                $list['updated_at'],
+                $list['created_at'],
                 $list['bg'].'-'.$list['bu'],
                 array_get($users,$list['sap_seller_id'],$list['sap_seller_id']),
                 $list['label'],

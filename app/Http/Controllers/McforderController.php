@@ -113,7 +113,7 @@ class McforderController extends Controller
         $end = $end > $iTotalRecords ? $iTotalRecords : $end;
 		$accounts = $this->getSellerId();
 		$lists=json_decode(json_encode($lists), true);
-
+	/*
         //得到asin,sku,bg,bu,seller信息的数据处理
         $detail_sql = "select CONCAT(seller_accounts.id,'_',sap_asin_match_sku.seller_sku) as sai_ss,sap_asin_match_sku.asin as asin, sap_asin_match_sku.sku as sku,sap_seller_id,sap_seller_bg,sap_seller_bu
                 FROM sap_asin_match_sku
@@ -128,9 +128,10 @@ class McforderController extends Controller
         //得到sap_sell_id跟用户名称的对照关系
         $sapSeller = getUsers('sap_seller');
         $sapSeller=json_decode(json_encode($sapSeller), true);
-
+	*/
 		foreach ( $lists as $list){
-            $asin = $sku = $bg = $bu = $seller = '';
+            /*
+		$asin = $sku = $bg = $bu = $seller = '';
             //通过seller_skus和seller_account_id转换得到asin,sku,bg,bu,seller
             $_sellerskus = array_filter(explode(';',$list['seller_skus']));//L5HPC0102FBA*1;NUHPC0095US*1;L5HPC0030FBA*1;L5HPC0037FBA*2;
             foreach($_sellerskus as $sk=>$sv){
@@ -145,6 +146,7 @@ class McforderController extends Controller
                     $seller .= isset($sapSeller[$detailData[$sai_ss]['sap_seller_id']]) ? $sapSeller[$detailData[$sai_ss]['sap_seller_id']] : $detailData[$sai_ss]['sap_seller_id'].'<br/>';
                 }
             }
+	    */
 
             $records["data"][] = array(
                 $list['displayable_order_date_time'],
@@ -185,8 +187,8 @@ class McforderController extends Controller
 		$datas= DB::connection('amazon')->table('amazon_mcf_orders as t1')
 			->select('t1.*','t2.tracking_number as tracking_number')
 			->leftjoin('amazon_mcf_shipment_package as t2',function($join){
-				$join->on('t1.seller_fulfillment_order_id','=','t2.seller_fulfillment_order_id')
-					->on('t1.seller_account_id','=','t2.seller_account_id');
+				$join->on('t1.seller_account_id','=','t2.seller_account_id')
+					->on('t1.seller_fulfillment_order_id','=','t2.seller_fulfillment_order_id');
 			})
 			->where('displayable_order_date_time','>=',$date_from.' 00:00:00')
 			->where('displayable_order_date_time','<=',$date_to.' 23:59:59');
