@@ -30,6 +30,11 @@
     .table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th{
         vertical-align: middle !important;
     }
+    .table thead tr th,.table thead tr td,.table td, .table th{
+        font-size:11px;
+        white-space: nowrap;
+        text-align:left;
+    }
 </style>
     <div class="row">
         <div class="col-md-12">
@@ -120,17 +125,6 @@
                     </div>
                     <div class="caption font-dark col-md-12">
 
-                        <div class="btn-group" style="float:right;margin-right:100px;">
-                            
-                            <button class="btn create_whole" type="button" data-type='SProducts'> Create SP Campagin
-                            </button>
-                            
-
-                            <button class="btn green dropdown-toggle" type="button" data-toggle="modal" href="#updateForm"> Create
-                            </button>
-
-                        </div>
-
 
                         <div class="btn-group batch-update">
                             <div class="table-actions-wrapper" id="table-actions-wrapper">
@@ -143,10 +137,6 @@
                                 </select>
                                 <button class="btn  green table-status-action-submit">
                                     Batch Update
-                                </button>
-
-                                <button class="btn  red table-status-action-submit">
-                                    Batch Scheduled
                                 </button>
                                     
                             </div>
@@ -164,9 +154,7 @@
                                     </th>
                                     <th>Status</th>
 									<th>Campaign</th>
-                                    <th>Serving Status</th>
 									<th>Type</th>
-                                    <th>Bidding Strategy</th>
                                     <th>Start Date</th>
 									<th>End Date</th>
                                     <th>Butget</th>
@@ -181,7 +169,7 @@
                                     <th>ROAS</th>                     
                                 </tr>
                                 <tr>
-                                    <th colspan=9></th>
+                                    <th colspan=7></th>
                                     <th><span class="text-primary total_impressions">0</span></th>
 									<th><span class="text-primary total_clicks">0</span></th>
 									<th><span class="text-primary avg_ctr">0</span></th>
@@ -381,9 +369,9 @@
                 dataTable: {
                    //"serverSide":false,
                    "autoWidth":true,
-                   "aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0,1,2,3,4,5,6,7,8] }],
+                   "aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0,1,2,3,4,5,6] }],
                    "order": [
-                        [9, "desc"]
+                        [7, "desc"]
                     ],
                     "lengthMenu": [
                         [50, 100, 300, -1],
@@ -413,7 +401,7 @@
                             text: 'Export',
                             title: 'Data export',
                             exportOptions: {
-                                columns: [ 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17 ]
+                                columns: [ 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 ]
                             },
                             customize: function( xlsx ) {
                                 var sheet = xlsx.xl.worksheets['sheet1.xml'];
@@ -551,7 +539,7 @@
                                 var obj = JSON.parse(response);
                                 if(obj.success==1){
                                     $.each(obj.response,function(index,value){
-                                        toastr.success(value.code);
+                                        toastr.success('Success');
                                     });
                                 }else{
                                     toastr.error(obj.response);

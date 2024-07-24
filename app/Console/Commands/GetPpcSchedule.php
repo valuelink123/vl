@@ -52,6 +52,7 @@ class GetPpcSchedule extends Command
         ->where('date_to','>=',$date)->whereRaw("replace(`time`,':','')<=$time and (done_at<='$date' or done_at is null)");
         if($profileId) $tasks = $tasks->where('profile_id',$profileId);
         $tasks = $tasks->get();
+
         foreach($tasks as $task){
             $client = new PpcRequest($task->profile_id);
             $app = $client->request($task->ad_type); 
@@ -83,24 +84,20 @@ class GetPpcSchedule extends Command
                     $bid = 'bid';
                 }
                 $results = $app->$action->$method([[
-                    $typeId=>$task->record_type_id,
-                    'state'=>$task->state,
+                    $typeId=>(string)$task->record_type_id,
+                    'state'=>($task->ad_type=='SBrands')?strtoupper($task->state):$task->state,
                     $bid=>round($task->bid,2),
                 ]]);
                 if(array_get($results,'success') == 1){
-                    foreach(array_get($results,'response') as $result){
-                        $task->message =$result['code'];
-                    }
-			$task->done_at = date('Y-m-d H:i:s');
+                    $task->message = 'SUCCESS';
+			        $task->done_at = date('Y-m-d H:i:s');
                 }else{
                     $task->message =array_get($results,'response');
                 }
-                //$task->done_at = date('Y-m-d H:i:s');
                 $task->save();
                 DB::commit();
-            }catch (\Exception $e) { 
-                Log::Info($e->getMessage());
-                
+            }catch (\Exception $e) {
+                print_r($e);
                 DB::rollBack();
             } 
         }

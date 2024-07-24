@@ -13,7 +13,31 @@
                             <input type="hidden" name="record_type_id" value="{{array_get($form,'record_type_id')}}">
                             <input type="hidden" name="campaign_id" value="{{array_get($form,'campaign_id')}}">
                             <input type="hidden" name="id" value="{{array_get($form,'id')}}">
-                            
+                            @if(!empty($exists))
+                            <table class="table table-bordered">
+                                <tr>
+                                    <td colspan=6>Already existed</td>
+                                </tr>
+                                <tr>
+                                    <td>Start</td>
+                                    <td>End</td>
+                                    <td>Bid</td>
+                                    <td>State</td>
+                                    <td>Status</td>
+                                    <td>User</td>
+                                </tr>
+                                @foreach($exists  as $exist)
+                                <tr>
+                                    <td>{{array_get($exist,'date_from')}}</td>
+                                    <td>{{array_get($exist,'date_to')}}</td>
+                                    <td>{{array_get($exist,'bid')}}</td>
+                                    <td>{{array_get(\App\Models\PpcProfile::STATUS,array_get($exist,'state'))}}</td>
+                                    <td>{{array_get(\App\Models\PpcSchedule::STATUS,array_get($exist,'status'))}}</td>
+                                    <td>{{array_get($users,array_get($exist,'user_id'))}}</td>
+                                </tr>
+                                @endforeach
+                            </table>
+                            @endif
                             <div class="form-group">
                                 <label>Name:</label>
                                 <input type="text" readonly class="form-control" name="record_name" id="record_name" value="{{array_get($form,'record_name')}}" >
@@ -155,9 +179,6 @@ $(function() {
         showMeridian: false
     });
 	
-	FormRepeater.init();
-
-
 	FormRepeater.init();
 	
     $('#schedule_form').submit(function() {
