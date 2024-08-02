@@ -32,14 +32,20 @@ class PpcscheduleController extends Controller
 
     public function listSchedules(Request $request)
     {
-        $datas = PpcSchedule::with('user')->with('campaign')->with('profile');
+        $datas = PpcSchedule::with('user')->with('profile')->leftJoin(
+            DB::RAW("(select campaign_id,name from ppc_sproducts_campaigns UNION all select campaign_id,name from ppc_sdisplay_campaigns
+UNION all select campaign_id,name from ppc_sbrands_campaigns) as campaigns"),function($q){
+    $q->on('ppc_schedules.campaign_id', '=', 'campaigns.campaign_id');
+});
         if($request->get('profile_id')) $datas = $datas->whereIn('profile_id',$request->get('profile_id'));
         if($request->get('ad_type')) $datas = $datas->where('ad_type',$request->get('ad_type'));	
 		$keyword = array_get($_REQUEST,'record_name');
         if($keyword){
-            $datas = $datas->whereHas('campaign', function ($query) use ($keyword) {
-    			$query->where('name', 'like', '%'.$keyword.'%');
-			});
+            $datas = $datas->where(function ($query) use ($keyword) {
+                $query->where('campaigns.name'  , 'like', '%'.$keyword.'%')
+                        ->orwhere('record_name', 'like', '%'.$keyword.'%');
+
+            });
         }
 		
 		if($request->get('user_id')) $datas = $datas->whereIn('user_id',$request->get('user_id'));
@@ -62,6 +68,7 @@ class PpcscheduleController extends Controller
         $records["data"] = array();
 		foreach ( $lists as $list){
             $record_name = "";
+            /*
             $record_data = DB::table('ppc_'.strtolower($request->get('ad_type')).'_'.unCamelize($list['record_type']).'s')->where(unCamelize($list['record_type']).'_id',$list['record_type_id'])->get()->toArray();
             if(!empty($record_data)){
                 $record_data = $record_data[0];
@@ -76,10 +83,11 @@ class PpcscheduleController extends Controller
                     $record_name = $record_data->name;
                 }
             }
+            */
             $records["data"][] = array(
                 '<input name="id[]" type="checkbox" class="checkboxes" value="'.$list['id'].'"  />',
 				array_get($list,'profile.account_name'),
-                array_get($list,'campaign.name')?array_get($list,'campaign.name'):$list['record_name'],
+                array_get($list,'name')?array_get($list,'name'):$list['record_name'],
 				$list['record_type'],
                 empty(trim($record_name))?$list['record_name']:trim($record_name),
                 array_get(\App\Models\PpcSchedule::STATUS,$list['status']),
@@ -103,6 +111,7 @@ class PpcscheduleController extends Controller
             'profile_id'=>$request->get('profile_id'),
             'ad_type'=>$request->get('ad_type'),
             'campaign_id'=>$request->get('campaign_id'),
+            'adgroup_id'=>$request->get('adgroup_id'),
             'record_type'=>$request->get('record_type'),
             'record_type_id'=>$request->get('record_type_id'),
             'record_name'=>$request->get('record_name'),
@@ -130,6 +139,7 @@ class PpcscheduleController extends Controller
 						'profile_id'=>$request->get('profile_id'),
 						'ad_type'=>$request->get('ad_type'),
 						'campaign_id'=>$request->get('campaign_id'),
+                        'adgroup_id'=>$request->get('adgroup_id'),
 						'record_type'=>$request->get('record_type'),
 						//'record_name'=>$request->get('record_name'),
 						'record_type_id'=>$request->get('record_type_id'),
@@ -148,6 +158,7 @@ class PpcscheduleController extends Controller
 					'profile_id',
 					'ad_type',
 					'campaign_id',
+                    'adgroup_id',
 					'record_type',
 					//'record_name',
 					'record_type_id',

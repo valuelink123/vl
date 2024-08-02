@@ -12,6 +12,7 @@
                             <input type="hidden" name="record_type" value="{{array_get($form,'record_type')}}">
                             <input type="hidden" name="record_type_id" value="{{array_get($form,'record_type_id')}}">
                             <input type="hidden" name="campaign_id" value="{{array_get($form,'campaign_id')}}">
+                            <input type="hidden" name="adgroup_id" value="{{array_get($form,'adgroup_id')}}">
                             <input type="hidden" name="id" value="{{array_get($form,'id')}}">
                             
                             

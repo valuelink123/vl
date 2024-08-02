@@ -42,6 +42,7 @@
 						</div>
 						<div class="col-md-2">
 						<select class="form-control" name="ad_type" id="ad_type">
+                            <option value="" >All Ads</option>
                             @foreach (\App\Models\PpcProfile::AD_TYPE as $k=>$v)
                                 <option value="{{$k}}" >{{$v}}</option>
                             @endforeach
