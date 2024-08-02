@@ -61,10 +61,10 @@ class ReimController extends Controller
             $datas = $datas->whereIn('asin.bu',array_get($_REQUEST,'bu'));
         }
         if(array_get($_REQUEST,'date_from')){
-            $datas = $datas->where('amazon_shipment_items.updated_at','>=',array_get($_REQUEST,'date_from'));
+            $datas = $datas->where('amazon_shipment_items.created_at','>=',array_get($_REQUEST,'date_from'));
         }
         if(array_get($_REQUEST,'date_to')){
-            $datas = $datas->where('amazon_shipment_items.updated_at','<=',array_get($_REQUEST,'date_to'));
+            $datas = $datas->where('amazon_shipment_items.created_at','<=',array_get($_REQUEST,'date_to'));
         }
 		if(array_get($_REQUEST,'shipment_id')){
             $datas = $datas->whereIn('amazon_shipment_items.shipment_id',explode(",",array_get($_REQUEST,'shipment_id')));
@@ -94,7 +94,7 @@ class ReimController extends Controller
         $iDisplayLength = $iDisplayLength < 0 ? $iTotalRecords : $iDisplayLength;
         $iDisplayStart = intval($_REQUEST['start']);
         $sEcho = intval($_REQUEST['draw']);
-        $lists =  $datas->offset($iDisplayStart)->limit($iDisplayLength)->orderBy('amazon_shipment_items.id','desc')->get()->toArray();
+        $lists =  $datas->offset($iDisplayStart)->limit($iDisplayLength)->orderBy('created_at','desc')->get()->toArray();
         $users = getUsers('sap_seller');
         $records["data"] = array();
 		foreach ( $lists as $list){

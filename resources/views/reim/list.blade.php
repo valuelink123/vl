@@ -14,7 +14,7 @@
                         <div class="row">
 						<div class="col-md-2">
                             <div class="input-group date date-picker" data-date-format="yyyy-mm-dd">
-                                <input type="text" class="form-control" readonly name="date_from" placeholder="Date From" value="{{date('Y-m-d',strtotime('-30 days'))}}">
+                                <input type="text" class="form-control" readonly name="date_from" placeholder="Date From" value="{{date('Y-m-d',strtotime('-180 days'))}}">
                                 <span class="input-group-btn">
                                                                         <button class="btn btn-sm default" type="button">
                                                                             <i class="fa fa-calendar"></i>
