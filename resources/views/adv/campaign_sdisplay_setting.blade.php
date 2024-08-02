@@ -38,16 +38,6 @@
                                 <label>Campaign ID:</label>
                                 {{array_get($campaign,'campaignId')}}
                             </div>
-
-                            <div class="form-group">
-                                <label>Serving Status:</label>
-                                {{array_get($campaign,'servingStatus')}}
-                            </div>
-
-                            <div class="form-group">
-                                <label>Type:</label>
-                                Sponsored Display
-                            </div>
                             
                             <div class="form-group">
                                 <label>Status:</label>
@@ -59,30 +49,8 @@
                             </div>
 
 
-                            <div class="form-group date date-picker" data-date-format="yyyy-mm-dd" >
-                                <label>Date Range:</label>
-
-                                <div class="input-group date date-picker col-md-4" data-date-format="yyyy-mm-dd">
-                                    <input type="text" class="form-control " readonly name="startDate" id="startDate" value="{{date('Y-m-d',strtotime(array_get($campaign,'startDate')))}}">
-                                    <span class="input-group-btn">
-                                        <button class="btn default" type="button">
-                                            <i class="fa fa-calendar"></i>
-                                        </button>
-                                    </span>
-                                </div>
-                                <div class="input-group date date-picker col-md-4" data-date-format="yyyy-mm-dd">
-                                    <input type="text" class="form-control" readonly name="endDate" id="endDate" value="{{array_get($campaign,'endDate')?date('Y-m-d',strtotime(array_get($campaign,'endDate'))):''}}">
-                                    <span class="input-group-btn">
-                                        <button class="btn default" type="button">
-                                            <i class="fa fa-calendar"></i>
-                                        </button>
-                                    </span>
-                                </div>
-
-                            </div>
-
                             <div class="form-group">
-                                <label>Daily Budget:</label>
+                                <label>Budget:</label>
                                 <input type="text" class="form-control input-inline" name="budget" id="budget" value="{{array_get($campaign,'budget')}}" >  
                             </div>
 

@@ -23,15 +23,7 @@
                         <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/targetkeyword" >Targeting keywords</a>
                     </li>
                     <li>
-                        <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/negkeyword" >Negative keywords</a>
-                    </li>
-
-                    <li>
                         <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/targetproduct" >Targeting products</a>
-                    </li>
-
-                    <li >
-                        <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/negproduct" >Negative products</a>
                     </li>
                 </ul>
                 <div class="tab-content">
@@ -53,11 +45,6 @@
                             <div class="form-group">
                                 <label>Ad Group ID:</label>
                                 {{array_get($adgroup,'adGroupId')}}
-                            </div>
-
-                            <div class="form-group">
-                                <label>Serving Status:</label>
-                                {{array_get($adgroup,'servingStatus')}}
                             </div>
                             
                             <div class="form-group">

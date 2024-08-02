@@ -44,8 +44,14 @@
                 <li class="active">
                     <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/ad" >Ads</a>
                 </li>
+                <li >
+                    <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/targetkeyword" >Targeting keywords</a>
+                </li>
                 <li>
-                    <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/targetproduct" >Targeting</a>
+                    <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/targetproduct" >Targeting products</a>
+                </li>
+                <li >
+                    <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/targettheme" >Targeting Themes</a>
                 </li>
             </ul>
             <div class="tab-content">
@@ -61,7 +67,7 @@
                         <select class="form-control" name="stateFilter" id="stateFilter" >
                             <option value="" >All Status</option>
                             @foreach (\App\Models\PpcProfile::STATUS as $k=>$v)
-                                <option value="{{$k}}" >{{$v}}</option>
+                                <option value="{{strtoupper($k)}}" >{{$v}}</option>
                             @endforeach
                         </select>
                         </div>
@@ -130,7 +136,12 @@
                         <div class="clearfix"></div>
                     </div>
                     <div class="caption font-dark col-md-12">
-
+                        <!--
+                        <div class="btn-group" style="float:right; margin-right:100px;">
+                            <button class="btn green dropdown-toggle" type="button" data-toggle="modal" href="#updateForm"> Create
+                            </button>
+                        </div>
+                        -->
 
 
                         <div class="btn-group batch-update">
@@ -139,11 +150,11 @@
                                 <select id="confirmStatus" class="table-group-action-input form-control input-inline">
                                     <option value="">Select Status</option>
                                     @foreach (\App\Models\PpcProfile::STATUS as $k=>$v)
-                                        <option value="{{$k}}" >{{$v}}</option>
+                                        <option value="{{strtoupper($k)}}" >{{$v}}</option>
                                     @endforeach
                                 </select>
                                 <button class="btn  green table-status-action-submit">
-                                    <i class="fa fa-check"></i> Batch Update
+                                     Batch Update
                                 </button>
                                     
                             </div>
@@ -160,7 +171,7 @@
                                     <th>
                                     </th>
 									<th>Asin</th>
-                                    <th>Seller Sku</th>
+                                    <th>Name</th>
 									<th>Status</th>
 									<th>Impressions</th>
 									<th>Clicks</th>
@@ -283,15 +294,14 @@
                     "ajax": {
                         "url": "{{ url('adv/listAds')}}",
                     },
-                    scrollY:500,
+
+					scrollY:500,
                     scrollX:true,
 					
 
 					fixedColumns:   {
 						leftColumns:4
 					},
-
-					
                     //"scrollX": true,
                     //"autoWidth":true
                     dom: 'Bfrtip',
@@ -427,37 +437,48 @@
             //批量更改状态操作
             $(".batch-update").unbind("click").on('click', '.table-status-action-submit', function (e) {
                 e.preventDefault();
-                var confirmStatus = $("#confirmStatus", $("#table-actions-wrapper"));
                 var profile_id = $("input[name='profile_id']").val();
                 var ad_type = $("input[name='ad_type']").val();
-                var id_type = 'adId';
-                var action = 'product_ads';
-                var method = 'updateProductAds';
-                if (confirmStatus.val() != "" && grid.getClonedSelectedRowsCount() > 0) {
-                    $.ajaxSetup({
-                        headers: { 'X-CSRF-TOKEN' : '{{ csrf_token() }}' }
-                    });
-                    $.ajax({
-                        type: "POST",
-                        dataType: "json",
-                        url: "{{ url('adv/batchUpdate') }}",
-                        data: {confirmStatus:confirmStatus.val(),id:grid.getClonedSelectedRows(),profile_id:profile_id,ad_type:ad_type,id_type:id_type,action:action,method:method},
-                        success: function (data) {
-                            if(data.customActionStatus=='OK'){
-                                toastr.success(data.customActionMessage);
-                                grid.getDataTable().draw(false);
-                            }else{
-                                toastr.error(data.customActionMessage);
+                var campaign_id = $("input[name='campaign_id']").val();
+                if($(this).hasClass('red')){
+                    if (grid.getClonedSelectedRowsCount() > 0) {
+                        $('#ajax').modal({
+                            remote: '/adv/batchScheduled?profile_id='+profile_id+'&ad_type='+ad_type+'&campaign_id='+campaign_id+'&record_type=ad&ids='+grid.getClonedSelectedRows()
+                        });
+                    }else{
+                        toastr.error('No record selected');
+                    }
+                }else{
+                    var confirmStatus = $("#confirmStatus", $("#table-actions-wrapper"));
+                    var id_type = 'adId';
+                    var action = 'product_ads';
+                    var method = 'updateProductAds';
+                    if (confirmStatus.val() != "" && grid.getClonedSelectedRowsCount() > 0) {
+                        $.ajaxSetup({
+                            headers: { 'X-CSRF-TOKEN' : '{{ csrf_token() }}' }
+                        });
+                        $.ajax({
+                            type: "POST",
+                            dataType: "json",
+                            url: "{{ url('adv/batchUpdate') }}",
+                            data: {confirmStatus:confirmStatus.val(),id:grid.getClonedSelectedRows(),profile_id:profile_id,ad_type:ad_type,id_type:id_type,action:action,method:method},
+                            success: function (data) {
+                                if(data.customActionStatus=='OK'){
+                                    toastr.success(data.customActionMessage);
+                                    grid.getDataTable().draw(false);
+                                }else{
+                                    toastr.error(data.customActionMessage);
+                                }
+                            },
+                            error: function(data) {
+                                toastr.error(data.responseText);
                             }
-                        },
-                        error: function(data) {
-                            toastr.error(data.responseText);
-                        }
-                    });
-                } else if ( confirmStatus.val() == "" ) {
-                    toastr.error('Please select an action');
-                } else if (grid.getClonedSelectedRowsCount() === 0) {
-                    toastr.error('No record selected');
+                        });
+                    } else if ( confirmStatus.val() == "" ) {
+                        toastr.error('Please select an action');
+                    } else if (grid.getClonedSelectedRowsCount() === 0) {
+                        toastr.error('No record selected');
+                    }
                 }
             });
         }

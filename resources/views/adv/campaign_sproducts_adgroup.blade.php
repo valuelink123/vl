@@ -50,15 +50,6 @@
                 <li class="active">
                     <a href="/adv/campaign/{{$profile_id}}/{{$ad_type}}/{{array_get($campaign,'campaignId')}}/adgroup" >Ad Groups</a>
                 </li>
-                <li >
-                    <a href="/adv/campaign/{{$profile_id}}/{{$ad_type}}/{{array_get($campaign,'campaignId')}}/negkeyword" >Negative keywords</a>
-                </li>
-                <li >
-                    <a href="/adv/campaign/{{$profile_id}}/{{$ad_type}}/{{array_get($campaign,'campaignId')}}/negproduct" >Negative products</a>
-                </li>
-                <li>
-                    <a href="/adv/campaign/{{$profile_id}}/{{$ad_type}}/{{array_get($campaign,'campaignId')}}/schedule" >Schedules</a>
-                </li>
             </ul>
             <div class="tab-content">
                 <div class="table-toolbar">
@@ -142,11 +133,6 @@
                     </div>
                     <div class="caption font-dark col-md-12">
 
-                        <div class="btn-group" style="float:right; margin-right:100px;">
-                            <button class="btn green dropdown-toggle" type="button" data-toggle="modal" href="#updateForm"> Create
-                            </button>
-
-                        </div>
 
 
                         <div class="btn-group batch-update">
@@ -160,10 +146,6 @@
                                 </select>
                                 <button class="btn  green table-status-action-submit">
                                     Batch Update
-                                </button>
-
-                                <button class="btn  red table-status-action-submit">
-                                    Batch Scheduled
                                 </button>
                                     
                             </div>
@@ -482,7 +464,10 @@
                                 });
                             }, 
                             error: function (response) { 
-                                return 'remote error'; 
+                                var obj = JSON.parse(response.responseText);
+                                $.each(obj.response,function(index,value){
+                                    toastr.error(value.code +' - '+ value.description);
+                                });
                             }
                         });
                     },

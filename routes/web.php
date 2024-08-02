@@ -620,6 +620,7 @@ Route::get('/adv/adgroup/{profile_id}/{ad_type}/{adgroup_id}/{tab}', 'AdvControl
 Route::Post('/adv/listAds', 'AdvController@listAds');
 Route::Post('/adv/listKeywords', 'AdvController@listKeywords');
 Route::Post('/adv/listProducts', 'AdvController@listProducts');
+Route::Post('/adv/listThemes', 'AdvController@listThemes');
 Route::Post('/adv/updateAdGroup', 'AdvController@updateAdGroup');
 Route::Post('/adv/batchUpdate', 'AdvController@batchUpdate');
 Route::Post('/adv/scheduleBatchUpdate', 'AdvController@scheduleBatchUpdate');

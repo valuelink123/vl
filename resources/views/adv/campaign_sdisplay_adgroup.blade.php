@@ -133,12 +133,6 @@
                     </div>
                     <div class="caption font-dark col-md-12">
 
-                        <div class="btn-group" style="float:right;margin-right:100px;">
-                            <button class="btn green dropdown-toggle" type="button" data-toggle="modal" href="#updateForm"> Create
-                            </button>
-                        </div>
-
-
                         <div class="btn-group batch-update">
                             <div class="table-actions-wrapper" id="table-actions-wrapper">
                                 
@@ -200,6 +194,15 @@
                 </div>
             </div>
             
+        </div>
+    </div>
+</div>
+<div class="modal fade bs-modal-lg" id="ajax" role="basic" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" >
+            <div class="modal-body" >
+                Loading...
+            </div>
         </div>
     </div>
 </div>
@@ -475,7 +478,10 @@
                                 });
                             }, 
                             error: function (response) { 
-                                return 'remote error'; 
+                                var obj = JSON.parse(response.responseText);
+                                $.each(obj.response,function(index,value){
+                                    toastr.error(value.code +' - '+ value.description);
+                                });
                             }
                         });
                     },

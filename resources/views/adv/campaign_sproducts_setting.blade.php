@@ -18,15 +18,6 @@
                     <li >
                         <a href="/adv/campaign/{{$profile_id}}/{{$ad_type}}/{{array_get($campaign,'campaignId')}}/adgroup" >Ad Groups</a>
                     </li>
-                    <li >
-                        <a href="/adv/campaign/{{$profile_id}}/{{$ad_type}}/{{array_get($campaign,'campaignId')}}/negkeyword" >Negative keywords</a>
-                    </li>
-                    <li >
-                        <a href="/adv/campaign/{{$profile_id}}/{{$ad_type}}/{{array_get($campaign,'campaignId')}}/negproduct" >Negative products</a>
-                    </li>
-                    <li>
-                        <a href="/adv/campaign/{{$profile_id}}/{{$ad_type}}/{{array_get($campaign,'campaignId')}}/schedule" >Schedules</a>
-                    </li>
                 </ul>
                 <div class="tab-content">
                     <div class="tab-pane active" id="tab_setting">
@@ -47,16 +38,6 @@
                                 <label>Campaign ID:</label>
                                 {{array_get($campaign,'campaignId')}}
                             </div>
-
-                            <div class="form-group">
-                                <label>Serving Status:</label>
-                                {{array_get($campaign,'servingStatus')}}
-                            </div>
-
-                            <div class="form-group">
-                                <label>Type:</label>
-                                Sponsored Products
-                            </div>
                             
                             <div class="form-group">
                                 <label>Status:</label>
@@ -68,68 +49,10 @@
                             </div>
 
                             <div class="form-group">
-                                <label>Targeting Type:</label>
-                                {{array_get($campaign,'targetingType')}}
-                            </div>
-
-                            <div class="form-group date date-picker" data-date-format="yyyy-mm-dd" >
-                                <label>Date Range:</label>
-
-                                <div class="input-group date date-picker col-md-4" data-date-format="yyyy-mm-dd">
-                                    <input type="text" class="form-control " readonly name="startDate" id="startDate" value="{{date('Y-m-d',strtotime(array_get($campaign,'startDate')))}}">
-                                    <span class="input-group-btn">
-                                        <button class="btn default" type="button">
-                                            <i class="fa fa-calendar"></i>
-                                        </button>
-                                    </span>
-                                </div>
-                                <div class="input-group date date-picker col-md-4" data-date-format="yyyy-mm-dd">
-                                    <input type="text" class="form-control" readonly name="endDate" id="endDate" value="{{array_get($campaign,'endDate')?date('Y-m-d',strtotime(array_get($campaign,'endDate'))):''}}">
-                                    <span class="input-group-btn">
-                                        <button class="btn default" type="button">
-                                            <i class="fa fa-calendar"></i>
-                                        </button>
-                                    </span>
-                                </div>
-
-                            </div>
-
-                            <div class="form-group">
-                                <label>Daily Budget:</label>
+                                <label>Budget:</label>
                                 <input type="text" class="form-control input-inline" name="dailyBudget" id="dailyBudget" value="{{array_get($campaign,'dailyBudget')}}" >  
                             </div>
 
-                            <div class="form-group">
-                                <label>Bidding Strategy:</label>
-                                <select class="form-control input-inline" name="strategy" id="strategy">
-                                <?php 
-                                foreach(\App\Models\PpcProfile::BIDDING as $k=>$v){ 	
-                                    echo '<option value="'.$k.'" '.(($k==array_get($campaign,'bidding.strategy'))?'selected':'').'>'.$v.'</option>';
-                                }?>
-                                </select>
-                            </div>
-                            
-                            <?php
-                            $placementTop = $placementProductPage = 0;
-                            $adjustments = array_get($campaign,'bidding.adjustments');
-                            foreach($adjustments as $adjustment){
-                                if($adjustment['predicate'] == 'placementTop') $placementTop = $adjustment['percentage'];
-                                if($adjustment['predicate'] == 'placementProductPage') $placementProductPage = $adjustment['percentage'];
-                            }
-                            
-                            ?>
-                            <div class="form-group">
-                                <label>Adjust bids by placement</label>
-                            </div>
-                            <div class="form-group">
-                                <label class="">Top of search (first page):</label>
-                                <input type="text" class="form-control input-inline" name="placementTop" id="placementTop" value="{{$placementTop}}" >%
-                            </div>
-                            <div class="form-group">   
-                                <label class="">Product pages:</label>
-                                <input type="text" class="form-control input-inline" name="placementProductPage" id="placementProductPage" value="{{$placementProductPage}}" >%
-                                </div>
-                            </div>
                             <div style="clear:both;"></div>
                         </div>
                         <div style="clear:both;"></div>

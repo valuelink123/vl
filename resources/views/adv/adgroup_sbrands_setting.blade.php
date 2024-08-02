@@ -19,10 +19,15 @@
                     <li >
                         <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/ad" >Ads</a>
                     </li>
-
-                    <li>
-                        <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/targetproduct" >Targeting</a>
+                    <li >
+                        <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/targetkeyword" >Targeting keywords</a>
                     </li>
+                    <li>
+                        <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/targetproduct" >Targeting products</a>
+                    </li>
+                    <li >
+                    <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/targettheme" >Targeting Themes</a>
+                </li>
                 </ul>
                 <div class="tab-content">
                     <div class="tab-pane active" id="tab_setting">
@@ -49,15 +54,9 @@
                                 <label>Status:</label>
                                 <select class="form-control input-inline" name="state" id="state">
                                 @foreach (\App\Models\PpcProfile::STATUS as $k=>$v)
-                                <option value="{{$k}}" {{($k==array_get($adgroup,'state'))?'selected':''}} >{{$v}}</option>
+                                <option value="{{strtoupper($k)}}" {{($k==strtolower(array_get($adgroup,'state')))?'selected':''}} >{{$v}}</option>
                                 @endforeach 
                                 </select>
-                            </div>
-
-
-                            <div class="form-group">
-                                <label>Default Bid:</label>
-                                <input type="text" class="form-control input-inline" name="defaultBid" id="defaultBid" value="{{array_get($adgroup,'defaultBid')}}" >  
                             </div>
 
                             

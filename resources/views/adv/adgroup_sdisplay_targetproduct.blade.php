@@ -54,10 +54,6 @@
                 <li class="active">
                     <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/targetproduct" >Targeting</a>
                 </li>
-
-                <li >
-                    <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/negproduct" >Negative Targeting</a>
-                </li>
             </ul>
             <div class="tab-content">
                 <div class="table-toolbar">
@@ -142,10 +138,6 @@
                     </div>
                     <div class="caption font-dark col-md-12">
 
-                        <div class="btn-group" style="float:right;margin-right:100px;">
-                            <button class="btn green dropdown-toggle" type="button" data-toggle="modal" href="#updateForm"> Create
-                            </button>
-                        </div>
 
 
                         <div class="btn-group batch-update">
@@ -214,7 +206,15 @@
         </div>
     </div>
 </div>
-
+<div class="modal fade bs-modal-lg" id="ajax" role="basic" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" >
+            <div class="modal-body" >
+                Loading...
+            </div>
+        </div>
+    </div>
+</div>
 <form id="update_form"  name="update_form" >
 {{ csrf_field() }}
 <div class="modal fade bs-modal-lg" id="updateForm" tabindex="-1" role="updateForm" aria-hidden="true" style="display: none;">
@@ -529,8 +529,11 @@
                                     toastr.success(value.code);
                                 });
                             }, 
-                            error: function (response) { 
-                                return 'remote error'; 
+                            error: function (response) {
+                                var obj = JSON.parse(response.responseText);
+                                $.each(obj.response,function(index,value){
+                                    toastr.error(value.code +' - '+ value.description);
+                                });
                             }
                         });
                     },

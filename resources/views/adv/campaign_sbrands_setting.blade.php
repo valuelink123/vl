@@ -15,11 +15,11 @@
                     <li class="active">
                         <a href="/adv/campaign/{{$profile_id}}/{{$ad_type}}/{{array_get($campaign,'campaignId')}}/setting"> Setting</a>
                     </li>
-                    <!--
+                    
                     <li >
-                        <a href="/adv/campaign/{{$profile_id}}/{{$ad_type}}/{{array_get($campaign,'campaignId')}}/creative" >Creative</a>
+                        <a href="/adv/campaign/{{$profile_id}}/{{$ad_type}}/{{array_get($campaign,'campaignId')}}/adgroup" >Ad Groups</a>
                     </li>
-                    -->
+                    <!--
                     <li >
                         <a href="/adv/campaign/{{$profile_id}}/{{$ad_type}}/{{array_get($campaign,'campaignId')}}/targetkeyword" >Targeting keywords</a>
                     </li>
@@ -34,7 +34,7 @@
                     <li>
                         <a href="/adv/campaign/{{$profile_id}}/{{$ad_type}}/{{array_get($campaign,'campaignId')}}/negproduct" >Negative products</a>
                     </li>
-                    
+                    -->
                 </ul>
                 <div class="tab-content">
                     <div class="tab-pane active" id="tab_setting">
@@ -57,100 +57,25 @@
                             </div>
 
                             <div class="form-group">
-                                <label>Serving Status:</label>
-                                {{array_get($campaign,'servingStatus')}}
-                            </div>
-
-                            <div class="form-group">
                                 <label>Type:</label>
                                 Sponsored Brands
                             </div>
 
                             <div class="form-group">
-                                <label>Ad Format:</label>
-                                {{array_get($campaign,'adFormat')}}
-                            </div>
-
-                            <div class="form-group">
-                                <label>Asins:</label>
-                                {{implode(', ',array_get($campaign,'creative.asins'))}}
-                            </div>
-
-                            <div class="form-group">
-                                <label>Landing Page:</label>
-                                {{array_get($campaign,'landingPage.pageType'). ' - '.array_get($campaign,'landingPage.url')}}
-                            </div>
-                            @if(array_get($campaign,'adFormat')=='video')
-                            <div class="form-group">
-                                <label>Video Media Ids:</label>
-                                {{implode(', ',array_get($campaign,'creative.videoMediaIds'))}}
-                            </div>
-                            @else
-                            <div class="form-group">
-                                <label>Brand Name:</label>
-                                {{array_get($campaign,'creative.brandName')}}
-                            </div>
-                            
-                            <div class="form-group">
-                                <label>Brand Logo Url:</label>
-                                {{array_get($campaign,'creative.brandLogoUrl')}}
-                            </div>
-
-                            <div class="form-group">
-                                <label>Head Line:</label>
-                                {{array_get($campaign,'creative.headline')}}
-                            </div>
-                            @endif
-                            <div class="form-group">
                                 <label>Status:</label>
                                 <select class="form-control input-inline" name="state" id="state">
                                 @foreach (\App\Models\PpcProfile::STATUS as $k=>$v)
-                                <option value="{{$k}}" {{($k==array_get($campaign,'state'))?'selected':''}} >{{$v}}</option>
+                                <option value="{{strtoupper($k)}}" {{($k==strtolower(array_get($campaign,'state')))?'selected':''}} >{{$v}}</option>
                                 @endforeach 
                                 </select>
-                            </div>
-
-                            <div class="form-group date date-picker" data-date-format="yyyy-mm-dd" >
-                                <label>Date Range:</label>
-
-                                <div class="input-group date date-picker col-md-4" data-date-format="yyyy-mm-dd">
-                                    <input type="text" class="form-control " readonly name="startDate" id="startDate" value="{{date('Y-m-d',strtotime(array_get($campaign,'startDate')))}}">
-                                    <span class="input-group-btn">
-                                        <button class="btn default" type="button">
-                                            <i class="fa fa-calendar"></i>
-                                        </button>
-                                    </span>
-                                </div>
-                                <div class="input-group date date-picker col-md-4" data-date-format="yyyy-mm-dd">
-                                    <input type="text" class="form-control" readonly name="endDate" id="endDate" value="{{array_get($campaign,'endDate')?date('Y-m-d',strtotime(array_get($campaign,'endDate'))):''}}">
-                                    <span class="input-group-btn">
-                                        <button class="btn default" type="button">
-                                            <i class="fa fa-calendar"></i>
-                                        </button>
-                                    </span>
-                                </div>
-
                             </div>
 
                             <div class="form-group">
                                 <label>Budget:</label>
                                 <input type="text" class="form-control input-inline" name="budget" id="budget" value="{{array_get($campaign,'budget')}}" >  {{array_get($campaign,'budgetType')}}
                             </div>
-                            @if(array_get($campaign,'adFormat')=='productCollection')
-                            <div class="form-group">
-                                <label>Bid Optimization:</label>
-                                <select class="form-control input-inline" name="bidOptimization" id="bidOptimization">
-                                @foreach (['1'=>'Enabled','0'=>'Disabled'] as $k=>$v)
-                                <option value="{{$k}}" {{($k==array_get($campaign,'bidOptimization'))?'selected':''}} >{{$v}}</option>
-                                @endforeach 
-                                </select>
-                            </div>
 
-                            <div class="form-group">
-                                <label>Bid Multiplier:</label>
-                                <input class="form-control input-inline" {{array_get($campaign,'bidOptimization')?'disabled':''}}  name="bidMultiplier" id="bidMultiplier" value="{{array_get($campaign,'bidMultiplier')}}" >% (-99 to 99)
-                            </div>
-                            @endif
+                            
                             <div style="clear:both;"></div>
                         </div>
                         <div style="clear:both;"></div>

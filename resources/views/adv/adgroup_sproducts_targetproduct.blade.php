@@ -57,16 +57,9 @@
                 <li >
                     <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/targetkeyword" >Targeting keywords</a>
                 </li>
-                <li>
-                    <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/negkeyword" >Negative keywords</a>
-                </li>
 
                 <li class="active">
                     <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/targetproduct" >Targeting products</a>
-                </li>
-
-                <li >
-                    <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/negproduct" >Negative products</a>
                 </li>
             </ul>
             <div class="tab-content">
@@ -151,12 +144,12 @@
                         <div class="clearfix"></div>
                     </div>
                     <div class="caption font-dark col-md-12">
-
+                        <!--
                         <div class="btn-group" style="float:right;margin-right:100px;">
                             <button class="btn green dropdown-toggle" type="button" data-toggle="modal" href="#updateForm"> Create
                             </button>
                         </div>
-
+                        -->
 
                         <div class="btn-group batch-update">
                             <div class="table-actions-wrapper" id="table-actions-wrapper">
@@ -169,10 +162,6 @@
                                 </select>
                                 <button class="btn  green table-status-action-submit">
                                      Batch Update
-                                </button>
-
-                                <button class="btn  red table-status-action-submit">
-                                    Batch Scheduled
                                 </button>
                                     
                             </div>
@@ -595,7 +584,10 @@
                                 });
                             }, 
                             error: function (response) { 
-                                return 'remote error'; 
+                                var obj = JSON.parse(response.responseText);
+                                $.each(obj.response,function(index,value){
+                                    toastr.error(value.code +' - '+ value.description);
+                                });
                             }
                         });
                     },

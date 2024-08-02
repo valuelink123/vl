@@ -9,7 +9,6 @@ class PpcProfile extends Model
     const STATUS = [
         'enabled'=>'enabled',
         'paused'=>'paused',
-        'archived'=>'archived',
     ];
 
     const AD_TYPE = [

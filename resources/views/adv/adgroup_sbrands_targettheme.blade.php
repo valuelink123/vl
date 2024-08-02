@@ -22,11 +22,21 @@
         color: #666;
         padding: 10px 0;
     }
+    .modal-body{
+        padding:0px;
+    }
     .DTFC_LeftBodyLiner{
         overflow-x: hidden;
     }
     table.dataTable tbody tr {
         height: 60px !important;
+    }
+    .editable-input .input-medium {
+        width: 100% !important;
+        PADDING: 5PX !important;
+    }
+    .table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th{
+        vertical-align: middle !important;
     }
 </style>
 <h1 class="page-title font-red-intense"> Ad Group - {{array_get($adgroup,'name')}}
@@ -41,11 +51,20 @@
                 <li >
                     <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/setting"> Setting</a>
                 </li>
-                <li class="active">
+                <li>
                     <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/ad" >Ads</a>
                 </li>
                 <li>
-                    <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/targetproduct" >Targeting</a>
+                    <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/targetkeyword" >Targeting keywords</a>
+                </li>
+
+
+                <li >
+                    <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/targetproduct" >Targeting products</a>
+                </li>
+
+                <li class="active">
+                    <a href="/adv/adgroup/{{$profile_id}}/{{$ad_type}}/{{array_get($adgroup,'adGroupId')}}/targettheme" >Targeting Themes</a>
                 </li>
             </ul>
             <div class="tab-content">
@@ -130,7 +149,13 @@
                         <div class="clearfix"></div>
                     </div>
                     <div class="caption font-dark col-md-12">
+                        <!--
+                        <div class="btn-group" style="float:right;margin-right:100px;">
+                            <button class="btn green dropdown-toggle" type="button" data-toggle="modal" href="#updateForm"> Create
+                             </button>
+                        </div>
 
+                        -->
 
 
                         <div class="btn-group batch-update">
@@ -143,7 +168,7 @@
                                     @endforeach
                                 </select>
                                 <button class="btn  green table-status-action-submit">
-                                    <i class="fa fa-check"></i> Batch Update
+                                    Batch Update
                                 </button>
                                     
                             </div>
@@ -159,9 +184,9 @@
                                 <tr role="row" class="heading">
                                     <th>
                                     </th>
-									<th>Asin</th>
-                                    <th>Seller Sku</th>
-									<th>Status</th>
+                                    <th>Status</th>
+									<th>Theme Type</th>
+                                    <th>Bid</th>
 									<th>Impressions</th>
 									<th>Clicks</th>
 									<th>CTR</th>
@@ -195,25 +220,136 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade bs-modal-lg" id="ajax" role="basic" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" >
+            <div class="modal-body" >
+                Loading...
+            </div>
+        </div>
+    </div>
+</div>
 <form id="update_form"  name="update_form" >
 {{ csrf_field() }}
-<div class="modal fade" id="updateForm" tabindex="-1" role="updateForm" aria-hidden="true" style="display: none;">
-    <div class="modal-dialog">
+<div class="modal fade bs-modal-lg" id="updateForm" tabindex="-1" role="updateForm" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
-                <h4 class="modal-title">Seller Sku</h4>
+                <h4 class="modal-title">Keywords</h4>
             </div>
             
-            <div class="modal-body"> 
-                <div class="form-group col-md-12">
-                    <label>Seller Sku *</label>
-                    <select class="mt-multiselect form-control " multiple="multiple" name="ads[]" id="ads" data-label="left" data-width="100%" data-filter="true" data-action-onchange="true">
-                    <?php 
-                    foreach($products as $v){ 	
-                        echo '<option value="'.$v->seller_sku.'">'.$v->seller_sku.' - '.$v->asin.'</option>';
-                    }?>
-                    </select>
+            <div class="modal-body" style="font-size:12px;overflow-y:auto;height:500px;"> 
+                <div class="form-group col-md-4" style="margin-top: 10px;">
+                    <div class="row" style="font-weight:bold;">
+                    <div class="col-md-6">
+                        Keyword Text
+                    </div>
+                    <div class="col-md-3">
+                        Match
+                    </div>
+                    <div class="col-md-3">
+                        Bid
+                    </div>
+                    </div>
+                    @foreach ($suggestedKeywords as $key=>$keyword)
+                    <div class="row">
+                        <div class="col-md-6">
+                        {{array_get($keyword,'keywordText')}} <a href="javascript:;" class="data-repeater-create" data-k="{{array_get($keyword,'keywordText')}}" data-m="{{array_get($keyword,'matchType')}}" data-b="{{array_get($keyword,'bid')}}">Add</a>
+                        </div>
+                        <div class="col-md-3">
+                        {{array_get($keyword,'matchType')}}
+                        </div>
+                        <div class="col-md-3">
+                        {{array_get($keyword,'bid')}} 
+                        </div>
+                        <div class="clearFix"></div>
+                    </div>
+                    @endforeach
+                </div>
+                <div class="form-group col-md-8" style="margin-top: 10px;">
+
+                    <ul class="nav nav-tabs" id="addType">
+						<li class="active">
+							<a href="#customize" data-toggle="tab" aria-expanded="true">Customize</a>
+						</li>
+						<li >
+							<a href="#enter_list" data-toggle="tab" aria-expanded="false">Enter List</a>
+						</li>
+					</ul>
+                    <div class="tab-content">
+						<div class="tab-pane active" id="customize">
+                            <div class="form-group mt-repeater">
+                                <div data-repeater-list="keywords">
+                                    <div data-repeater-item class="mt-repeater-item">
+                                        <div class="row mt-repeater-row">
+                                            <div class="col-md-3">
+                                                <label class="control-label">Keyword Text</label>
+                                                <input type="text" class="form-control input-sm"  name="keywordText" required>
+                                    
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label class="control-label">Match Type</label>
+                                                <select class="form-control input-sm" name="matchType" required>
+                                                @foreach (\App\Models\PpcProfile::MATCHTYPE as $k=>$v)
+                                                    <option value="{{$k}}" >{{$v}}</option>
+                                                @endforeach
+                                                </select>
+                                            </div>
+                                                
+                                            <div class="col-md-3">
+                                                <label class="control-label">Bid</label>
+                                                <div class="input-group">
+                                                <input type="text" class="form-control input-sm"  name="bid" value="{{array_get($adgroup,'defaultBid')}}" required>
+                                                </div>
+                                            </div>
+                    
+                                            <div class="col-md-2">
+                                                <a href="javascript:;" data-repeater-delete class="btn btn-danger mt-repeater-delete btn-sm">
+                                                    <i class="fa fa-close"></i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a href="javascript:;" data-repeater-create class="btn btn-sm btn-info mt-repeater-add">
+                                    <i class="fa fa-plus"></i> Add Keyword</a>
+                            </div>
+                        </div>
+
+
+                        <div class="tab-pane" id="enter_list">
+                            <div class="form-group col-md-12">
+                                <label>Match Type *</label>
+                                <select class="form-control" name="match_type" id="match_type">
+                                @foreach (\App\Models\PpcProfile::MATCHTYPE as $k=>$v)
+                                    <option value="{{$k}}" >{{$v}}</option>
+                                @endforeach
+                                </select>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label>Bid Option:</label>
+                                <select class="form-control" name="bidOption" id="bidOption">
+                                <option value="suggested" >Suggested Bid</option>
+                                <option value="customize" >Customize Bid</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group col-md-12">
+                                <label>Bid:</label>
+                                <input class="form-control"  name="bid" id="bid" value="{{array_get($adgroup,'defaultBid')}}">
+                            </div>
+
+
+                            <div class="form-group col-md-12">
+                                <label>Keywords *</label>
+                                <textarea class="form-control" rows="10" name="keyword_text" id="keyword_text"
+                                placeholder="Enter your list and separate each item whith a new line."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="clear:both;height:30px;"></div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -221,10 +357,11 @@
                 <button type="submit" class="btn green">Save changes</button>
                 <input type="hidden" name="profile_id" value="{{$profile_id}}">
                 <input type="hidden" name="ad_type" value="{{$ad_type}}">
+                <input type="hidden" name="defaultBid" value="{{array_get($adgroup,'defaultBid')}}">
                 <input type="hidden" name="campaignId" value="{{array_get($adgroup,'campaignId')}}">
                 <input type="hidden" name="adGroupId" value="{{array_get($adgroup,'adGroupId')}}">
-                <input type="hidden" name="action" value="product_ads">
-                <input type="hidden" name="method" value="createProductAds">
+                <input type="hidden" name="action" value="keywords">
+                <input type="hidden" name="method" value="createKeywords">
             </div>
         </div>
         <!-- /.modal-content -->
@@ -232,6 +369,9 @@
     <!-- /.modal-dialog -->
 </div>
 </form>
+
+<script src="/assets/global/plugins/bootstrap-editable/bootstrap-editable/js/bootstrap-editable.js" type="text/javascript"></script>
+
 <script>
         var TableDatatablesAjax = function () {
         var initPickers = function () {
@@ -270,7 +410,7 @@
                 loadingMessage: 'Loading...',
                 dataTable: {
                    //"serverSide":false,
-                   "autoWidth":false,
+                   "autoWidth":true,
                    "aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0,1,2,3] }],
                    "order": [
                         [4, "desc"]
@@ -281,19 +421,17 @@
                     ],
                     "pageLength": 300,
                     "ajax": {
-                        "url": "{{ url('adv/listAds')}}",
+                        "url": "{{ url('adv/listThemes')}}",
                     },
                     scrollY:500,
                     scrollX:true,
 					
 
 					fixedColumns:   {
-						leftColumns:4
+						leftColumns:3
 					},
 
 					
-                    //"scrollX": true,
-                    //"autoWidth":true
                     dom: 'Bfrtip',
                     "bFilter": false, 
                     buttons: [ 
@@ -302,7 +440,7 @@
                             text: 'Export',
                             title: 'Data export',
                             exportOptions: {
-                                columns: [ 1,2,3,4,5,6,7,8,9,10,11,12]
+                                columns: [ 1,2,3,4,5,6,7,8,9,10,11,12 ]
                             },
                             customize: function( xlsx ) {
                                 var sheet = xlsx.xl.worksheets['sheet1.xml'];
@@ -419,6 +557,38 @@
                         };
                         lineChart.hideLoading();
                         lineChart.setOption(option);
+                        $('.ajax_bid').editable({
+                            type: 'text',
+                            url: '/adv/updateBid',
+							showbuttons:false,
+                            mode:'inline',
+                            params:{
+                                'action':'themes',
+                                'method':'updateThemes',
+                                'pk_type':'themeId',
+                                'profile_id':$("input[name='profile_id']").val(),
+                                'ad_type':$("input[name='ad_type']").val(),
+                                'campaign_id':$("input[name='campaign_id']").val(),
+                                'adgroup_id':$("input[name='adgroup_id']").val(),
+                            },
+                            validate: function (value) {
+                                if (isNaN(value)) {
+                                    return 'Must be a number';
+                                }
+                            },
+                            success: function (response) { 
+                                var obj = JSON.parse(response);
+                                $.each(obj.response.success,function(index,value){
+                                    toastr.success(value.themeId+' Success');
+                                });
+                            }, 
+                            error: function (response) { 
+                                var obj = JSON.parse(response.responseText);
+                                $.each(obj.response,function(index,value){
+                                    toastr.error(value.code +' - '+ value.description);
+                                });
+                            }
+                        });
                     },
                  }
             });
@@ -427,37 +597,49 @@
             //批量更改状态操作
             $(".batch-update").unbind("click").on('click', '.table-status-action-submit', function (e) {
                 e.preventDefault();
-                var confirmStatus = $("#confirmStatus", $("#table-actions-wrapper"));
                 var profile_id = $("input[name='profile_id']").val();
                 var ad_type = $("input[name='ad_type']").val();
-                var id_type = 'adId';
-                var action = 'product_ads';
-                var method = 'updateProductAds';
-                if (confirmStatus.val() != "" && grid.getClonedSelectedRowsCount() > 0) {
-                    $.ajaxSetup({
-                        headers: { 'X-CSRF-TOKEN' : '{{ csrf_token() }}' }
-                    });
-                    $.ajax({
-                        type: "POST",
-                        dataType: "json",
-                        url: "{{ url('adv/batchUpdate') }}",
-                        data: {confirmStatus:confirmStatus.val(),id:grid.getClonedSelectedRows(),profile_id:profile_id,ad_type:ad_type,id_type:id_type,action:action,method:method},
-                        success: function (data) {
-                            if(data.customActionStatus=='OK'){
-                                toastr.success(data.customActionMessage);
-                                grid.getDataTable().draw(false);
-                            }else{
-                                toastr.error(data.customActionMessage);
+                var campaign_id = $("input[name='campaign_id']").val();
+                var adgroup_id = $("input[name='adgroup_id']").val();
+                if($(this).hasClass('red')){
+                    if (grid.getClonedSelectedRowsCount() > 0) {
+                        $('#ajax').modal({
+                            remote: '/adv/batchScheduled?profile_id='+profile_id+'&ad_type='+ad_type+'&campaign_id='+campaign_id+'&record_type=keyword&ids='+grid.getClonedSelectedRows()
+                        });
+                    }else{
+                        toastr.error('No record selected');
+                    }
+                }else{
+                    var confirmStatus = $("#confirmStatus", $("#table-actions-wrapper"));
+                    var id_type = 'themeId';
+                    var action = 'themes';
+                    var method = 'updateThemes';
+                    if (confirmStatus.val() != "" && grid.getClonedSelectedRowsCount() > 0) {
+                        $.ajaxSetup({
+                            headers: { 'X-CSRF-TOKEN' : '{{ csrf_token() }}' }
+                        });
+                        $.ajax({
+                            type: "POST",
+                            dataType: "json",
+                            url: "{{ url('adv/batchUpdate') }}",
+                            data: {confirmStatus:confirmStatus.val(),id:grid.getClonedSelectedRows(),profile_id:profile_id,ad_type:ad_type,id_type:id_type,action:action,method:method,campaign_id:campaign_id,adgroup_id:adgroup_id},
+                            success: function (data) {
+                                if(data.customActionStatus=='OK'){
+                                    toastr.success(data.customActionMessage);
+                                    grid.getDataTable().draw(false);
+                                }else{
+                                    toastr.error(data.customActionMessage);
+                                }
+                            },
+                            error: function(data) {
+                                toastr.error(data.responseText);
                             }
-                        },
-                        error: function(data) {
-                            toastr.error(data.responseText);
-                        }
-                    });
-                } else if ( confirmStatus.val() == "" ) {
-                    toastr.error('Please select an action');
-                } else if (grid.getClonedSelectedRowsCount() === 0) {
-                    toastr.error('No record selected');
+                        });
+                    } else if ( confirmStatus.val() == "" ) {
+                        toastr.error('Please select an action');
+                    } else if (grid.getClonedSelectedRowsCount() === 0) {
+                        toastr.error('No record selected');
+                    }
                 }
             });
         }
@@ -519,6 +701,7 @@
             }
         );
 
+
         $('#update_form').submit(function() {
             $.ajaxSetup({
                 headers: { 'X-CSRF-TOKEN' : '{{ csrf_token() }}' }
@@ -526,7 +709,7 @@
             $.ajax({
                 type: "POST",
                 dataType: "json",
-                url: "{{ url('adv/createAds') }}",
+                url: "{{ url('adv/createKeyword') }}",
                 data: $('#update_form').serialize(),
                 success: function (data) {
                     if(data.customActionStatus=='OK'){
@@ -545,6 +728,16 @@
             });
             return false;
         });
+
+        $('#addType>li>a').on('click',function(){
+            $($(this).attr('href')+' input,select,textarea').attr('disabled',false);
+            $($(this).attr('href')).siblings().find('select,input,textarea').attr('disabled',true);
+        });
+
+        $('#ajax').on('hidden.bs.modal', function (e) {
+            $('#ajax .modal-content').html('<div class="modal-body" >Loading...</div>');
+        });
+
     });
 
 
