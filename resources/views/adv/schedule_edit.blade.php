@@ -17,11 +17,12 @@
                             @if(!empty($exists))
                             <table class="table table-bordered">
                                 <tr>
-                                    <td colspan=6>Already existed</td>
+                                    <td colspan=7>Already existed</td>
                                 </tr>
                                 <tr>
                                     <td>Start</td>
                                     <td>End</td>
+                                    <td>Time</td>
                                     <td>Bid</td>
                                     <td>State</td>
                                     <td>Status</td>
@@ -31,6 +32,7 @@
                                 <tr>
                                     <td>{{array_get($exist,'date_from')}}</td>
                                     <td>{{array_get($exist,'date_to')}}</td>
+                                    <td>{{array_get($exist,'time')}}</td>
                                     <td>{{array_get($exist,'bid')}}</td>
                                     <td>{{array_get(\App\Models\PpcProfile::STATUS,array_get($exist,'state'))}}</td>
                                     <td>{{array_get(\App\Models\PpcSchedule::STATUS,array_get($exist,'status'))}}</td>
