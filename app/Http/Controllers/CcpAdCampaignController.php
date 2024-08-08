@@ -67,46 +67,25 @@ class CcpAdCampaignController extends Controller
 		$siteCur = getSiteCur();
 		$currency_code = isset($siteCur[$domain]) ? $siteCur[$domain] : '';
 
-		$account_data = $this->getPpcAccountByMarketplace($site);
-		$account_id = array_keys($account_data);
+		//$account_data = $this->getPpcAccountByMarketplace($site);
+		//$account_id = array_keys($account_data);
 		//时间搜索范围
-		$where = $this->getPpcDateWhere();
-		$where .= " and ppc_profiles.marketplace_id='".$site."' ";
-//		$where .= " and ppc_profiles.account_id in(".implode(",",$account_id).")";
+		$where = "where a.record_type='campaign' and cost>0 and a.date>='".$this->start_date."' and a.date<='".$this->end_date."' ";
+		$where .= " and c.marketplace_id='".$site."' ";
 		if($account){
 			$account_str = implode("','", explode(',',$account));
-			$where .= " and ppc_profiles.seller_id in('".$account_str."')";
+			$where .= " and c.seller_id in('".$account_str."')";
 		}
-
 		if($type){
-			$type_arr = explode(',',$type);
-		}else{
-			$type_arr = array('SProducts','SDisplay','SBrands');
+			$type_str = implode("','", explode(',',$type));
+			$where .= " and a.ad_type in('".$type_str."')";
 		}
-		$union_all = "";
-		foreach($type_arr as $type) {
-			$table = isset($this->typeConfig['table'][$type]) ? $this->typeConfig['table'][$type] : 'ppc_sproducts_campaigns';
-			$str_sales = "round(sum(case ad_type when 'SProducts' then ppc_report_datas.attributed_sales7d else ppc_report_datas.attributed_sales14d end ),2) as sales";
-			if($type==='SDisplay'){
-				$str_sales = "round(sum(case ad_type when 'SProducts' then ppc_report_datas.attributed_sales7d when 'SDisplay' and campaigns.cost_type='VCPM' then ppc_report_datas.view_attributed_sales14d else ppc_report_datas.attributed_sales14d end ),2) as sales";
-			}
-			$_sql = "SELECT  
-				round(sum(ppc_report_datas.cost),2) as cost,
-				{$str_sales}
-			FROM
-					{$table} as campaigns
-			LEFT JOIN ppc_report_datas ON (
-					ppc_report_datas.record_type = 'campaign'
-					AND campaigns.campaign_id = ppc_report_datas.record_type_id
-			)
-			left join ppc_profiles on campaigns.profile_id = ppc_profiles.profile_id
-			where ad_type = '" . $type . "' 
-			{$where}";
-			$union_all = $union_all ? $union_all." union all " .$_sql : $_sql;
-		}
-		$sql = " SELECT 
-					round(sum(cost),2) as cost,
-					round(sum(sales),2) as sales from( ".$union_all . " ) AS UNION_table";
+		$sql = " select  sum(cost) as cost,
+sum(
+CASE cost_type WHEN 'VCPM' THEN view_attributed_sales14d ELSE attributed_sales14d END
+) as sales 
+from ppc_report_datas a 
+left join ppc_profiles as c on a.profile_id=c.profile_id $where";
 
 		$orderData = DB::select($sql);
 		$array = array(
@@ -142,9 +121,6 @@ class CcpAdCampaignController extends Controller
 			$limit = " LIMIT {$limit} ";
 		}
 		$sql = $this->getSql($search).' order by '.array_get($orderArr,$column,'4').' '.$dir .$limit;
-//		echo '<pre>';
-//		echo $sql;
-//		exit;
 		$_data = DB::select($sql);
 		$recordsTotal = $recordsFiltered = DB::select('SELECT FOUND_ROWS() as total');
 		$recordsTotal = $recordsFiltered = $recordsTotal[0]->total;
@@ -179,82 +155,43 @@ class CcpAdCampaignController extends Controller
 		$this->start_date = isset($search['start_date']) ? $search['start_date'] : '';
 		$this->end_date = isset($search['end_date']) ? $search['end_date'] : '';
 
-		$account_data = $this->getPpcAccountByMarketplace($site);
-		$account_id = array_keys($account_data);
-		//时间搜索范围
-		$where = $this->getPpcDateWhere();
-		$where .= " and ppc_profiles.marketplace_id='".$site."' ";
-//		$where .= " and ppc_profiles.account_id in(".implode(",",$account_id).")";
+		$where = "where a.record_type='campaign' and cost>0 and a.date>='".$this->start_date."' and a.date<='".$this->end_date."' ";
+		$where .= " and c.marketplace_id='".$site."' ";
 		if($account){
 			$account_str = implode("','", explode(',',$account));
-			$where .= " and ppc_profiles.seller_id in('".$account_str."')";
+			$where .= " and c.seller_id in('".$account_str."')";
+		}
+		if($type){
+			$type_str = implode("','", explode(',',$type));
+			$where .= " and a.ad_type in('".$type_str."')";
 		}
 		if($campaig_name) {
-			$where .= " and campaigns.name like'%".$campaig_name."%' ";
+			$where .= " and b.name like'%".$campaig_name."%' ";
 		}
-		
-		if($type){
-			$type_arr = explode(',',$type);
-		}else{
-			$type_arr = array('SProducts','SDisplay','SBrands');
-		}
-		$union_all = "";
-		foreach($type_arr as $type) {
-			$table = isset($this->typeConfig['table'][$type]) ? $this->typeConfig['table'][$type] : 'ppc_sproducts_campaigns';
-			$budget_field = isset($this->typeConfig['budget_field'][$type]) ? $this->typeConfig['budget_field'][$type] : 'budget';
+	
+		$sql = " select SQL_CALC_FOUND_ROWS any_value(c.account_name) as account_name,any_value(c.seller_id) as seller_id,any_value(b.name) as name,any_value ( state ) AS state,any_value(b.daily_budget) as daily_budget, a.profile_id, a.record_type_id,sum(cost) as cost, sum(clicks) as clicks,
+sum(
+CASE cost_type WHEN 'VCPM' THEN view_attributed_sales14d ELSE attributed_sales14d END
+) as sales, 
+sum(
+CASE cost_type WHEN 'VCPM' THEN view_attributed_conversions14d ELSE attributed_conversions14d END
+) as orders, 
+sum(
+CASE cost_type WHEN 'VCPM' THEN view_impressions ELSE impressions END
+) as impressions,
+sum( cost )/ sum( CASE cost_type WHEN 'VCPM' THEN view_attributed_sales14d ELSE attributed_sales14d END ) AS acos ,
+sum( clicks )/ sum( CASE cost_type WHEN 'VCPM' THEN view_impressions ELSE impressions END ) AS ctr,
+sum( cost )/ sum( clicks ) AS cpc,
+sum( CASE cost_type WHEN 'VCPM' THEN view_attributed_conversions14d ELSE attributed_conversions14d END )/ sum( clicks ) AS cr
 
-			$str_sales = "round(sum(case ad_type when 'SProducts' then ppc_report_datas.attributed_sales7d else ppc_report_datas.attributed_sales14d end ),2) as sales";
-			$str_orders = "sum(case ad_type when 'SProducts' then ppc_report_datas.attributed_conversions7d else ppc_report_datas.attributed_conversions14d end ) as orders";
-			$str_impressions = "sum(ppc_report_datas.impressions) as impressions";
-			if($type==='SDisplay'){
-				$str_sales = "round(sum(case ad_type when 'SProducts' then ppc_report_datas.attributed_sales7d when 'SDisplay' and campaigns.cost_type='VCPM' then ppc_report_datas.view_attributed_sales14d else ppc_report_datas.attributed_sales14d end ),2) as sales";
-				$str_orders = "sum(case ad_type when 'SProducts' then ppc_report_datas.attributed_conversions7d when 'SDisplay' and campaigns.cost_type='VCPM' then ppc_report_datas.view_attributed_conversions14d else ppc_report_datas.attributed_conversions14d end ) as orders";
-				$str_impressions = "sum(case ad_type when 'SDisplay' and campaigns.cost_type='VCPM' then ppc_report_datas.view_impressions else ppc_report_datas.impressions end ) as impressions";
-			}
+from ppc_report_datas a 
 
+left join (select profile_id,campaign_id,name,state,daily_budget  from ppc_sproducts_campaigns union all
+select profile_id,campaign_id,name,state,budget as daily_budget from ppc_sdisplay_campaigns union all
+select profile_id,campaign_id,name,state,budget as daily_budget from ppc_sbrands_campaigns) as b
 
-			$_sql = "SELECT  
-					any_value(ppc_profiles.account_name) as account_name,
-       				any_value(ppc_profiles.seller_id) as seller_id,
-					any_value(campaigns.name) as name,
-       				campaigns.campaign_id as campaign_id,
-					any_value(campaigns.state) as state,
-       				any_value(campaigns.{$budget_field}) as daily_budget,
-					round(sum(ppc_report_datas.cost),2) as cost,
-					sum(ppc_report_datas.clicks) as clicks,
-					{$str_sales},
-					{$str_orders},
-       				{$str_impressions}
-			FROM
-					{$table} as campaigns
-			LEFT JOIN ppc_report_datas ON (
-					ppc_report_datas.record_type = 'campaign'
-					AND campaigns.campaign_id = ppc_report_datas.record_type_id
-			)
- 			left join ppc_profiles on campaigns.profile_id = ppc_profiles.profile_id
-			where ad_type = '" . $type . "' 
-			{$where}
-			GROUP BY campaigns.campaign_id ";
-
-			$union_all = $union_all ? $union_all." union all " .$_sql : $_sql;
-		}
-		$sql = " SELECT SQL_CALC_FOUND_ROWS 
-					any_value(account_name) as account_name,
-       				any_value(seller_id) as seller_id,
-       				any_value(name) as name,
-       				campaign_id,
-					any_value(state) as state,
-       				any_value(daily_budget) as daily_budget,
-					sum(cost)/sum(sales) as acos,
-					sum(clicks)/sum(impressions) as ctr,
-					sum(cost)/sum(clicks) as cpc,
-					sum(orders)/sum(clicks) as cr,
-					
-					round(sum(cost),2) as cost,
-					sum(clicks) as clicks,
-					round(sum(sales),2) as sales,
-					sum(orders) as orders,
-					sum(impressions) as impressions from( ".$union_all . " ) AS UNION_table GROUP BY campaign_id";
+on a.profile_id=b.profile_id and a.record_type_id=b.campaign_id 
+left join ppc_profiles as c on a.profile_id=c.profile_id $where  group by a.profile_id,a.record_type_id ";
 		return $sql;
 	}
 

@@ -18,7 +18,7 @@ class GetPpcSchedule extends Command
      *
      * @var string
      */
-    protected $signature = 'get:ppcSchedule {--profileId=}';
+    protected $signature = 'get:ppcSchedule {--profileId=} {--id=}';
 
     /**
      * The console command description.
@@ -47,12 +47,13 @@ class GetPpcSchedule extends Command
     {
         
         $profileId = $this->option('profileId');
+	$id = $this->option('id');
         $date = date('Y-m-d');
         $time = date('Gi');
         $tasks = PpcSchedule::where('status',1)->where('date_from','<=',$date)
         ->where('date_to','>=',$date)->whereRaw("replace(`time`,':','')<=$time and (done_at<='$date' or done_at is null)");
         if($profileId) $tasks = $tasks->where('profile_id',$profileId);
-        
+        if($id) $tasks = $tasks->where('id',$id);
         //$tasks = PpcSchedule::where('user_id',1);
         $tasks = $tasks->get();
 
@@ -110,7 +111,8 @@ class GetPpcSchedule extends Command
                 $data['state'] = ($task->ad_type=='SBrands' && $task->record_type=='campaign')?strtoupper($task->state):$task->state;
                 $data[$bid] = round($task->bid,2);
                 $results = $app->$action->$method([$data]);
-                if(array_get($results,'code') == 429){
+		$resultsStr = json_encode($results);
+                if(array_get($results,'code') == 429 || strpos($resultsStr,'SERVER_IS_BUSY')!==false){
                     $task->message = '429 Request Limited';	
                 }else{
                     if(array_get($results,'success') == 1){
@@ -141,7 +143,7 @@ class GetPpcSchedule extends Command
                             }
                         }
                     }else{
-                        $task->message =json_encode(array_get($results,'response'));
+                        $task->message =json_encode($results);
                     }
                 } 
                 $task->save();
