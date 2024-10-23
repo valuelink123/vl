@@ -218,7 +218,7 @@ class CcpController extends Controller
 			//根据输入的asin/sku参数，得到可查询的asin
 			$_sql = "select asin
 						from asins
-						where sku ='{$asin}' and marketplaceid = '".$site."'";
+						where (sku ='{$asin}' or title like '%".str_replace('+',' ',$asin)."%') and marketplaceid = '".$site."'";
 			$_data = DB::connection('vlz')->select($_sql);
 			$asins[] = $asin;
 			foreach($_data as $dk=>$dv){

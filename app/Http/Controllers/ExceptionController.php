@@ -34,6 +34,7 @@ class ExceptionController extends Controller
 	use \App\Traits\DataTables;
     public function __construct()
     {
+
         $this->middleware('auth', ['except' => ['resendApi']]);
 		
 		parent::__construct();

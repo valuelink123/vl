@@ -53,7 +53,7 @@ class RequestPpcReport extends Command
             foreach($adTypes as $adType){
                 $app = $client->request($adType);
 				if($adType=='SBrands'){
-					$result = $app->campaigns->listCampaignsV4Ex();
+					$result = $app->campaigns->listCampaignsV4Ex(['maxResults'=>100]);
 					if(array_get($result,'success')==1){
 						$datas = array_get($result,'response.campaigns');
 						if(is_array($datas)){

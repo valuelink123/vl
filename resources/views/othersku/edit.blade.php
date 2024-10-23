@@ -17,7 +17,7 @@
 
                                 <div class="form-group">
                                     <label>Sku:</label>
-                                    <input type="text" class="form-control"  name="sku" id="sku" value="{{array_get($form,'sku')}}" <?php if(!Auth::user()->sap_seller_id || array_get($form,'id')>0) echo 'readonly'; ?>>
+                                    <input type="text" class="form-control"  name="sku" id="sku" value="{{array_get($form,'sku')}}" <?php if(array_get($form,'id')>0) echo 'readonly'; ?>>
                                 </div>
                             </div>
 

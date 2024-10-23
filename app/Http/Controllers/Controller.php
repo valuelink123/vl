@@ -819,15 +819,15 @@ ORDER BY asin_offer_summary.asin DESC ";
 		$return['id'] = 0;
 		$return['msg'] = '';
 		if(!(isset($data['id']) && $data['id'])){
-			$return['msg'] = '请传必填参数id';
+			$return['msg'] = 'no id';
 			return json_encode($return);
 		}
 		if(!(isset($data['type']) && $data['type'])){
-			$return['msg'] = '请传必填参数type';
+			$return['msg'] = 'no type';
 			return json_encode($return);
 		}
 		if(!(isset($data['process_status']) && $data['process_status'])){
-			$return['msg'] = '请传必填参数process_status';
+			$return['msg'] = 'no process_status';
 			return json_encode($return);
 		}
 		$insertData = array();
@@ -844,7 +844,7 @@ ORDER BY asin_offer_summary.asin DESC ";
 			if(!empty($res)){
 				$return['status'] = 1;
 				$return['id'] = $res->id;
-				$return['msg'] = '数据对接成功';
+				$return['msg'] = 'success';
 			}
 		}
 		return json_encode($return);
@@ -865,8 +865,9 @@ ORDER BY asin_offer_summary.asin DESC ";
 		$data = Exception::findOrFail($exceptionId);
 		//if($data['service_system_id']>0) {
 			$params = json_encode($data);
-			$return  = curl_request('http://www.onecustomerme.com/api/exception/webhook',['params'=>$params]);
+			$return  = curl_request('https://www.onecustomerme.com/api/exception/webhook',['params'=>$params]);
 			$return = json_decode($return,true);
+			//print_r($return);die();
 			if(array_get($return,'result')!='ok'){
 				throw new \Exception("Data synchronization failed, please try again");
 			}//file_get_contents('http://www.onecustomerme.com/api/exception/webhook?params=' . $params);

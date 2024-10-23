@@ -33,7 +33,7 @@ class OtherSkuController extends Controller
 
         $datas = OtherSku::leftJoin('sap_skus',function($q){
 				$q->on('other_skus.sku', '=', 'sap_skus.sku');
-			})->selectRaw('other_skus.*,sap_skus.description,(US09TJIT+US05+US04+US07+US08+US10) as transfer,(purchase-unpicked) as purchase,(purchase+HK01+US09TJIT+US05+US04+US07+US08+US10+US02US7+US05HC1+US10DH1+US09TMU) as total');
+			})->selectRaw('other_skus.*,sap_skus.description,(US09TJIT+US05+US04+US07+US08+US10+US13) as transfer,(purchase-unpicked) as purchase,(purchase+HK01+US09TJIT+US05+US04+US07+US08+US10+US02US7+US05HC1+US10DH1+US09TMU+US13FH1) as total');
         if(array_get($_REQUEST,'keyword')){
             $datas = $datas->where('other_skus.sku','like','%'.array_get($_REQUEST,'keyword').'%')->orWhere('description','like','%'.array_get($_REQUEST,'keyword').'%');
         }
@@ -54,19 +54,21 @@ class OtherSkuController extends Controller
 			'9'=>'US05HC1',
 			'10'=>'US10DH1',
 			'11'=>'US09TMU',
-			'12'=>'total',
+			'12'=>'US13FH1',
+			'13'=>'total',
 		];
-        $Lists =  $datas->offset($iDisplayStart)->limit($iDisplayLength)->orderBy(array_get($orderByConfig,array_get($_REQUEST,'order.0.column',12)),array_get($_REQUEST,'order.0.dir','desc'))->get()->toArray();
+        $Lists =  $datas->offset($iDisplayStart)->limit($iDisplayLength)->orderBy(array_get($orderByConfig,array_get($_REQUEST,'order.0.column',13)),array_get($_REQUEST,'order.0.dir','desc'))->get()->toArray();
         $records["data"] = [];
 		
         foreach ( $Lists as $list){
-			$transfer = '';
-			if($list['US09TJIT']>0) $transfer.= 'TEMU在途 '.$list['US09TJIT'].'<BR>';
-			if($list['US05']>0) $transfer.= '鸿宸在途 '.$list['US05'].'<BR>';
-			if($list['US04']>0) $transfer.= 'DA在途 '.$list['US04'].'<BR>';
-			if($list['US07']>0) $transfer.= 'Tradeful在途 '.$list['US07'].'<BR>';
-			if($list['US08']>0) $transfer.= '沃尔玛在途 '.$list['US08'].'<BR>';
-			if($list['US10']>0) $transfer.= '敦煌在途 '.$list['US10'].'<BR>';
+			$transfer = $list['transfer'];
+			if($list['US09TJIT']>0) $transfer.= '<BR>TEMU在途 '.$list['US09TJIT'];
+			if($list['US05']>0) $transfer.= '<BR>鸿宸在途 '.$list['US05'];
+			if($list['US04']>0) $transfer.= '<BR>DA在途 '.$list['US04'];
+			if($list['US07']>0) $transfer.= '<BR>Tradeful在途 '.$list['US07'];
+			if($list['US08']>0) $transfer.= '<BR>沃尔玛在途 '.$list['US08'];
+			if($list['US10']>0) $transfer.= '<BR>敦煌在途 '.$list['US10'];
+			if($list['US13']>0) $transfer.= '<BR>富皇在途 '.$list['US13'];
             $records["data"][] = array(
                 '<input type="hidden" class="checkboxes" value="'.$list['id'].'"><a class="editData">'.$list['sku'].'</a>',
 				$list['description'],
@@ -80,6 +82,7 @@ class OtherSkuController extends Controller
 				$list['US05HC1'],
 				$list['US10DH1'],
 				$list['US09TMU'],
+				$list['US13FH1'],
 				$list['total'],
             );
 		}
@@ -114,7 +117,10 @@ class OtherSkuController extends Controller
 					]
             	);
 			}else{
-				OtherSku::where('sku',$request->get('sku'))->update(
+				OtherSku::updateOrCreate(
+					[
+						'sku'=>$request->get('sku'),
+					],
 					[
 						'unpicked'=>intval($request->get('unpicked'))
 					]
@@ -161,7 +167,10 @@ class OtherSkuController extends Controller
 							]
 						);
 					}else{
-						OtherSku::where('sku',$sku)->update(
+						OtherSku::updateOrCreate(
+							[
+								'sku'=>$request->get('sku'),
+							],
 							[
 								'unpicked'=>intval($unpicked)
 							]

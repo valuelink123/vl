@@ -83,6 +83,7 @@ table.dataTable.fixedHeader-floating {
                                     <th>HC仓库存</th>
 									<th>DH仓库存</th>
 									<th>TEMU仓库存</th>
+									<th>富皇仓库存</th>
 									<th>合计</th>
                                 </tr>
                             </thead>
@@ -129,7 +130,7 @@ table.dataTable.fixedHeader-floating {
                     },
 					"aoColumnDefs": [ { "bSortable": false, "aTargets": [1,3 ] }],
 					 "order": [
-                        [12, "desc"]
+                        [13, "desc"]
                     ],
                     dom: 'Blrtip',
                     buttons: [ 
@@ -138,7 +139,7 @@ table.dataTable.fixedHeader-floating {
                             text: '导出当前页',
                             title: 'Data export',
                             exportOptions: {
-                                columns: [ 0,1,2,3,4,5,6,7,8,9,10,11,12 ]
+                                columns: [ 0,1,2,3,4,5,6,7,8,9,10,11,12,13 ]
                             }
                         },
                     ],

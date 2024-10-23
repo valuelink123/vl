@@ -192,6 +192,7 @@ select profile_id,campaign_id,name,state,budget as daily_budget from ppc_sbrands
 
 on a.profile_id=b.profile_id and a.record_type_id=b.campaign_id 
 left join ppc_profiles as c on a.profile_id=c.profile_id $where  group by a.profile_id,a.record_type_id ";
+		//die($sql);
 		return $sql;
 	}
 
