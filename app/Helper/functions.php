@@ -318,6 +318,21 @@ function getSiteCur(){
     );
 }
 
+function getMarketplaceIdCur(){
+    return array(
+        'A2EUQ1WTGCTBG2'=>'CAD',
+        'A1PA6795UKMFR9'=>'EUR',
+        'A1RKKUPIHCS9HS'=>'EUR',
+        'A13V1IB3VIYZZH'=>'EUR',
+        'A21TJRUUN4KGV'=>'INR',
+        'APJ6JRA9NG5V4'=>'EUR',
+        'A1VC38T7YXB528'=>'JPY',
+        'A1F83G8C2ARO7P'=>'GBP',
+        'A1AM78C64UM0Y8'=>'MXN',
+        'ATVPDKIKX0DER'=>'USD',
+    );
+}
+
 function getSiteVat(){
     return array(
         'www.amazon.ca'=>0,
@@ -1796,6 +1811,14 @@ function getBrands(){
 		'PureMeHome'=>[
                         'url'=>'puremehome.com',
                         'email'=>'support@puremehome.com',
+                ],
+        'PEKITEN'=>[
+                        'url'=>'PEKITEN.com',
+                        'email'=>'support@PEKITEN.com',
+                ],
+        'DBFIT'=>[
+                        'url'=>'DBFIT.com',
+                        'email'=>'support@DBFIT.com',
                 ],
 	);
 }

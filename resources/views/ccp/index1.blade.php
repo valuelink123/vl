@@ -214,7 +214,6 @@
                         <th>ORDERS</th>
                         <th>AVG.PRICE</th>
                         <th>UNITS/D</th>
-                        <th></th>
                     </tr>
                 </thead>
                 <tbody></tbody>
@@ -405,7 +404,7 @@
                 }
             });
 
-            var cusTable = $('#datatable').dataTable({
+            $('#datatable').dataTable({
                 searching: false,//关闭搜索
                 serverSide: true,//启用服务端分页（这是使用Ajax服务端的必须配置）
                 ordering:false,
@@ -427,46 +426,17 @@
                     {data: 'orders',name:'orders'},
                     {data: 'avg_price',name:'avg_price'},
                     {data: 'avg_units',name:'avg_units'},
-                    {
-                        "class":          'details-control',
-                        "orderable":      false,
-                        "data":           null,
-                        "defaultContent": ''
-                    },
                 ],
                 ajax: {
                     type: 'POST',
                     url: '/ccp/list',
                     data:  {search: $("#search-form").serialize()}
                 }
-            });
+            })
 
-            $('#datatable tbody').on('click', 'td.details-control', function () {
-                var tr = $(this).closest('tr');
-                var cusTable = $('#datatable').dataTable().api();
-                var row = cusTable.row( tr );
-                if ( row.child.isShown() ) {
-                    // This row is already open - close it
-                    row.child.hide();
-                    tr.removeClass('shown');
-                    $(this).removeClass('closed');
-                }
-                else {
-                    var sub_row = '<table class="table table-striped table-bordered" style="text-align:center;width: 65%;float: right;"><tr><td width=28%>Account</td><td width=12%>Sales</td><td width=12%>Income</td><td width=12%>Units</td><td width=12%>Orders</td><td width=12%>Avg.Price</td><td width=12%>Unit/D</td></tr>';
-                    $.each(row.data().details, function(idx,val){
-                        sub_row += '<tr><td>' + val.label + '</td><td>' + val.sales + '</td><td>' + val.income + '</td><td>' + val.units + '</td><td>' + val.orders + '</td><td>' + val.avg_price + '</td><td>' + val.avg_units + '</td></tr>';    
-                    });
-                    sub_row += '</table>';
-                    row.child( sub_row ).show();
-                    tr.addClass('shown');
-                    $(this).addClass('closed');
-                }
-            } );
             
             //$("#search_top").trigger("click");
         })
-
-        
 
         //点击导出
         $('#export_table').click(function(){

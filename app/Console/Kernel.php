@@ -194,7 +194,7 @@ budget_skus.bg=asin.bg, budget_skus.bu=asin.bu WHERE budget_skus.sku = asin.item
 
         $schedule->command('sync:purchase')->dailyAt('08:00')->name('sync_sap_purchase')->withoutOverlapping();//每天早上6点半执行
 		$schedule->command('post:da')->hourly()->name('postda')->withoutOverlapping();
-		$schedule->command('exception:mcfInfo')->hourly()->name('add_exception_mcfInfo')->withoutOverlapping();
+		//$schedule->command('exception:mcfInfo')->hourly()->name('add_exception_mcfInfo')->withoutOverlapping();
 		$schedule->command('add:walmart_order')->hourly()->name('add_walmart_order')->withoutOverlapping();
     }
 

@@ -108,17 +108,17 @@
                                     
                                 </td>
                                 <td>
-                                    {{$data->reports[0]->report_type}}
-                                </td>
-								<td>
-                                    {{date('Y-m-d',strtotime($data->reports[0]->after_date))}} -- {{date('Y-m-d',strtotime($data->reports[0]->before_date))}}
-                                </td>
-								<td>
-                                    {{$data->reports[0]->report_option}}
-                                </td>
-                                <td>
-                                    {{$data->reports[0]->created_at}}
-                                </td>
+	{{$data->reports[0]->report_type}}
+</td>
+<td>
+	{{date('Y-m-d',strtotime($data->reports[0]->after_date))}} -- {{date('Y-m-d',strtotime($data->reports[0]->before_date))}}
+</td>
+<td>
+	{{$data->reports[0]->report_option}}
+</td>
+<td>
+	{{$data->reports[0]->created_at}}
+</td>
                                 <td>
 									@if($data->report_url)
                                     <a href="{{$data->report_url}}" target="_blank">

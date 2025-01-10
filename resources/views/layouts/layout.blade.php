@@ -387,12 +387,14 @@
                                                 <span class="arrow"></span>
                                             </a>
                                             <ul class="dropdown-menu pull-left">
-{{--												<li class="">--}}
-{{--                                                    <a href="/home/asins" class="nav-link nav-toggle ">--}}
-{{--                                                        My Listing--}}
-{{--                                                        <span class="arrow"></span>--}}
-{{--                                                    </a>--}}
-{{--                                                </li>--}}
+                                                @permission('listing-update')
+												<li class="">
+												    <a href="/listing" class="nav-link nav-toggle ">
+												        My Listing
+												        <span class="arrow"></span>
+												    </a>
+												</li>
+												@endpermission
 												@permission('asin-rating-show')
 												<li class="">
 												    <a href="/star" class="nav-link nav-toggle ">

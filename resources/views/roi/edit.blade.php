@@ -453,6 +453,15 @@
                                 <div>平台操作费(外币/pcs)</div>
                                 <input class="int_or_two_digits_input" type="text" name="unit_operating_fee" id="unit_operating_fee" value="{{$roi['unit_operating_fee']}}" />
                             </div>
+
+                            <div class="param_cost">
+                                <div>平台</div>
+                                <select name="platform" id="platform">
+                                    @foreach ($platforms as $k => $v)
+                                    <option value="{{$k}}" @if($roi['platform'] == $k) selected @endif>{{$v}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
                             <div style="clear: both"></div>
                             <div style="height: 20px;"></div>
                             <div class="bold">运输参数</div>

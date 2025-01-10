@@ -221,9 +221,16 @@ class RoiController extends Controller
 		$billingPeriods = $this->getBillingPeriods();
 		$transportModes = $this->getTransportModes();
 		$currency_rates = $this->getCurrencyRates();
+        $platforms = [
+            '0'=>'Amazon',
+            '1'=>'Tiktok',
+            '2'=>'Temu',
+            '3'=>'eBay',
+            '4'=>'Walmart',
+        ];
 		$inventory_turnover_days = array(90,120);
 
-		return view('roi/add',compact('sites', 'availableUsers', 'billingPeriods','transportModes','currency_rates','inventory_turnover_days'));
+		return view('roi/add',compact('sites', 'availableUsers', 'billingPeriods','transportModes','currency_rates','inventory_turnover_days','platforms'));
 	}
 
 	public function export(Request $request)
@@ -797,6 +804,13 @@ class RoiController extends Controller
 		$transportModes = $this->getTransportModes();
 		$currency_rates = $this->getCurrencyRates();
 		$roi = $this->getCurrentRoi($id);
+        $platforms = [
+            '0'=>'Amazon',
+            '1'=>'Tiktok',
+            '2'=>'Temu',
+            '3'=>'eBay',
+            '4'=>'Walmart',
+        ];
 		for($i=1; $i<=12;$i++){
 			$roi['promo_rate_month_'.$i] = $this->twoDecimal($roi['promo_rate_month_'.$i] * 100);
 			$roi['exception_rate_month_'.$i] = $this->twoDecimal($roi['exception_rate_month_'.$i]* 100);
@@ -820,7 +834,7 @@ class RoiController extends Controller
 			$edit_history_array[] = array('user_name'=>array_get($users, $pair[0]), 'updated_at'=>$pair[1]);
 		}
 
-		return view('roi/edit',compact('sites', 'availableUsers', 'billingPeriods','transportModes', 'roi', 'edit_history_array', 'currency_rates','inventory_turnover_days'));
+		return view('roi/edit',compact('sites', 'availableUsers', 'billingPeriods','transportModes', 'roi', 'edit_history_array', 'currency_rates','inventory_turnover_days','platforms'));
 	}
 
 	public function copy(Request $request){

@@ -121,6 +121,7 @@ left join ppc_profiles as c on a.profile_id=c.profile_id $where";
 			$limit = " LIMIT {$limit} ";
 		}
 		$sql = $this->getSql($search).' order by '.array_get($orderArr,$column,'4').' '.$dir .$limit;
+        //die($sql);
 		$_data = DB::select($sql);
 		$recordsTotal = $recordsFiltered = DB::select('SELECT FOUND_ROWS() as total');
 		$recordsTotal = $recordsFiltered = $recordsTotal[0]->total;

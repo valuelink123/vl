@@ -62,6 +62,7 @@ class CcpController extends Controller
 			$siteDate[$vv->marketplaceid] = date('Y-m-d',$this->getCurrentTime($vv->marketplaceid,1));
 		}
 		$date = $siteDate[current($site)->marketplaceid];
+        
 		return view('ccp/index',['bgs'=>$bgs,'bus'=>$bus,'site'=>$site,'date'=>$date,'siteDate'=>$siteDate]);
 	}
 	/*
@@ -95,7 +96,7 @@ class CcpController extends Controller
 		$siteCur = getSiteCur();
 		$currency_code = isset($siteCur[$domain]) ? $siteCur[$domain] : '';
 
-		$orderwhere = "WHERE order_status IN ( 'PendingAvailability', 'Pending', 'Unshipped', 'PartiallyShipped', 'Shipped', 'InvoiceUnconfirmed', 'Unfulfillab' )";
+		$orderwhere = "WHERE order_status <> 'Canceled'";
 
 		$orderwhere .= " and sales_channel = '".ucfirst($domain)."'";
 		$where = $this->getDateWhere($site,$timeType);
@@ -112,10 +113,11 @@ class CcpController extends Controller
 		$this->insertTheAsinPrice($site);
 
 		//sales数据，orders数据
-		$sql ="SELECT SUM( item_price_amount ) AS sales,SUM( quantity_ordered ) AS units,SUM( quantity_ordered * PROMO ) AS unitsPromo,COUNT( DISTINCT amazon_order_id ) AS orders,COUNT(DISTINCT PROMO_ORDER_ID) AS ordersPromo,sum(c_promotionAmount) as promotionAmount 
+		$sql ="SELECT SUM( item_price_amount ) AS sales,SUM( true_item_price_amount-c_promotionAmount ) AS income,SUM( quantity_ordered ) AS units,SUM( quantity_ordered * PROMO ) AS unitsPromo,COUNT( DISTINCT amazon_order_id ) AS orders,COUNT(DISTINCT PROMO_ORDER_ID) AS ordersPromo,sum(c_promotionAmount) as promotionAmount 
 			FROM
 			  (SELECT order_items.amazon_order_id,order_items.asin,asin_price.price AS default_unit_price,order_items.quantity_ordered,
 			  		CASE order_items.item_price_amount WHEN 0.00 THEN asin_price.price * order_items.quantity_ordered ELSE order_items.item_price_amount END AS item_price_amount,
+                    item_price_amount as true_item_price_amount,
 			   		LENGTH( order_items.promotion_ids )> 10 AS PROMO,promotion_discount_amount as c_promotionAmount,
 			  		CASE WHEN LENGTH( order_items.promotion_ids )> 10 THEN amazon_order_id ELSE '' END AS PROMO_ORDER_ID  
 			  	FROM order_items 
@@ -129,11 +131,11 @@ class CcpController extends Controller
 			  	{$where} 
 			  	and order_items.asin in({$userwhere})
 			) AS kk";
-
 		$orderData = DB::connection('vlz')->select($sql);
 		$array = array(
 			'sales' => round($orderData[0]->sales,2),
 			'revenue' => round($orderData[0]->sales - $orderData[0]->promotionAmount,2),
+            'income' => round($orderData[0]->income,2),
 			'units' => round($orderData[0]->units,2),
 			'unitsFull' => round($orderData[0]->units - $orderData[0]->unitsPromo,2),
 			'unitsPromo' => round($orderData[0]->unitsPromo,2),
@@ -174,7 +176,7 @@ class CcpController extends Controller
 		$sql = $this->getSql($_GET);
 		$itemData = DB::connection('vlz')->select($sql);
 		$data = $this->getDealData($itemData,$site);
-		$headArray = array('PRODUCT','ASIN','Item No.','SALES','UNITS','ORDERS','AVG.UNITS PER DAY');
+		$headArray = array('PRODUCT','ASIN','Item No.','SALES','INCOME','UNITS','ORDERS','AVG.PRICE','AVG.UNITS PER DAY');
 		$arrayData[] = $headArray;
 		foreach($data as $key=>$val){
 			$arrayData[] = array(
@@ -182,8 +184,10 @@ class CcpController extends Controller
 				$val['asin'],
 				$val['item_no'],
 				$val['sales'],
+                $val['income'],
 				$val['units'],
-				$val['orders_num'],
+				$val['orders'],
+                $val['avg_price'],
 				$val['avg_units']
 			);
 		}
@@ -200,7 +204,7 @@ class CcpController extends Controller
 		$timeType = isset($search['timeType']) ? $search['timeType'] : '';//时间类型，默认是0为北京时间，1为亚马逊后台当地时间
 		$this->start_date = isset($search['start_date']) ? $search['start_date'] : '';
 		$this->end_date = isset($search['end_date']) ? $search['end_date'] : '';
-		$orderwhere = "WHERE order_status IN ( 'PendingAvailability', 'Pending', 'Unshipped', 'PartiallyShipped', 'Shipped', 'InvoiceUnconfirmed', 'Unfulfillab' )";
+		$orderwhere = "WHERE order_status <>'Canceled'";
 		
 		
 		$domain = substr(getDomainBySite($site), 4);//orders.sales_channel
@@ -227,10 +231,13 @@ class CcpController extends Controller
 			$asins = "'".implode("','",$asins)."'";
 			$where .= " and order_items.asin in ($asins)";
 		}
-		$sql ="SELECT SQL_CALC_FOUND_ROWS kk.asin,SUM( item_price_amount ) AS sales,SUM( quantity_ordered ) AS units,SUM( quantity_ordered * PROMO ) AS unitsPromo,COUNT( DISTINCT amazon_order_id ) AS orders,COUNT(DISTINCT PROMO_ORDER_ID) AS ordersPromo,sum(c_promotionAmount) as promotionAmount 
+		$sql ="SELECT SQL_CALC_FOUND_ROWS seller_accounts.label,
+	kk.seller_account_id,kk.asin,SUM( item_price_amount ) AS sales,
+    SUM( true_item_price_amount-c_promotionAmount ) AS income,SUM( quantity_ordered ) AS units,SUM( quantity_ordered * PROMO ) AS unitsPromo,COUNT( DISTINCT amazon_order_id ) AS orders,COUNT(DISTINCT PROMO_ORDER_ID) AS ordersPromo,sum(c_promotionAmount) as promotionAmount
 			FROM
-			  (SELECT order_items.amazon_order_id,order_items.asin,asin_price.price AS default_unit_price,order_items.quantity_ordered,
+			  (SELECT order_items.seller_account_id,order_items.amazon_order_id,order_items.asin,asin_price.price AS default_unit_price,order_items.quantity_ordered,
 			  		CASE order_items.item_price_amount WHEN 0.00 THEN asin_price.price * order_items.quantity_ordered ELSE order_items.item_price_amount END AS item_price_amount,
+                    item_price_amount as true_item_price_amount,
 			   		LENGTH( order_items.promotion_ids )> 10 AS PROMO,promotion_discount_amount as c_promotionAmount,
 			  		CASE WHEN LENGTH( order_items.promotion_ids )> 10 THEN amazon_order_id ELSE '' END AS PROMO_ORDER_ID  
 			  	FROM order_items 
@@ -244,7 +251,8 @@ class CcpController extends Controller
 				and order_items.asin in({$userwhere}) 
 			  	{$where} 
 			  	
-			) AS kk GROUP BY kk.asin order by sales desc";
+			) AS kk left join seller_accounts on kk.seller_account_id=seller_accounts.id GROUP BY kk.seller_account_id, kk.asin order by sales desc";
+        
 		return $sql;
 		
 	}
@@ -257,11 +265,32 @@ class CcpController extends Controller
 		$domain = substr(getDomainBySite($site), 4);
 		$showOrder = Auth::user()->can(['ccp-showOrderList']) ? 1 : 0;//是否有查看详情权限
 		foreach($itemData as $key=>$val){
-			$data[$val->asin] = (array)$val;
-			$data[$val->asin]['avg_units'] = round($val->units/$day,2);
-			$data[$val->asin]['title'] = $data[$val->asin]['title_all'] = $data[$val->asin]['image'] = $data[$val->asin]['item_no'] = 'N/A';
-			$data[$val->asin]['orders'] = $val->orders;
-			$data[$val->asin]['orders_num'] = $val->orders;
+            if(!isset($data[$val->asin])){
+                $data[$val->asin] = (array)$val;
+            }else{
+                $data[$val->asin]['sales']+=$val->sales;
+                $data[$val->asin]['income']+=$val->income;
+                $data[$val->asin]['units']+=$val->units;
+                $data[$val->asin]['unitsPromo']+=$val->unitsPromo;
+                $data[$val->asin]['orders']+=$val->orders;
+                $data[$val->asin]['ordersPromo']+=$val->ordersPromo;
+                $data[$val->asin]['promotionAmount']+=$val->promotionAmount;
+
+                $data[$val->asin]['sales']=round($data[$val->asin]['sales'],2);
+                $data[$val->asin]['income']=round($data[$val->asin]['income'],2);
+                $data[$val->asin]['units']=round($data[$val->asin]['units'],2);
+                $data[$val->asin]['unitsPromo']=round($data[$val->asin]['unitsPromo'],2);
+                $data[$val->asin]['orders']=round($data[$val->asin]['orders'],2);
+                $data[$val->asin]['ordersPromo']=round($data[$val->asin]['ordersPromo'],2);
+                $data[$val->asin]['promotionAmount']=round($data[$val->asin]['promotionAmount'],2);
+            }
+            $data[$val->asin]['title'] = $data[$val->asin]['title_all'] = $data[$val->asin]['image'] = $data[$val->asin]['item_no'] = 'N/A';
+            $data[$val->asin]['details'][$val->seller_account_id] = (array)$val;
+            $data[$val->asin]['details'][$val->seller_account_id]['avg_units'] = round($val->units/$day,2);
+            $data[$val->asin]['details'][$val->seller_account_id]['avg_price'] = round(($val->sales-$val->promotionAmount)/$val->units,2);
+
+            $data[$val->asin]['avg_units'] = round($data[$val->asin]['units']/$day,2);
+            $data[$val->asin]['avg_price'] = round(($data[$val->asin]['sales']-$data[$val->asin]['promotionAmount'])/$data[$val->asin]['units'],2);
 			$asins[] = $val->asin;
 		}
 		if($asins){
@@ -276,20 +305,25 @@ class CcpController extends Controller
 
 			$productData = DB::connection('vlz')->select($product_sql);
 			foreach($productData as $key=>$val){
-				if(isset($data[$val->asin])){
-					$title = mb_substr($val->title,0,50);
-					$data[$val->asin]['title_all'] = $val->title;
-					$data[$val->asin]['title'] = '<span title="'.$val->title.'">'.$title.'</span>';
-					$data[$val->asin]['item_no'] = $val->item_no ? $val->item_no : $data[$val->asin]['item_no'];
-					if($val->images){
-						$imageArr = explode(',',$val->images);
-						if($imageArr){
-							$image = 'https://images-na.ssl-images-amazon.com/images/I/'.$imageArr[0];
-							$data[$val->asin]['image'] = '<a href="https://www.' .$domain. '/dp/' . $val->asin .'" target="_blank" rel="noreferrer"><image style="width:50px;height:50px;" src="'.$image.'"></a>';
-						}
-					}
-				}
+                $asinInfoData[$val->asin] = $val;
 			}
+            foreach($data as $key=>$val){
+                if(isset($asinInfoData[$val['asin']])){
+                    $tmp = $asinInfoData[$val['asin']];
+                    $title = mb_substr($tmp->title,0,50);
+                    $data[$key]['title_all'] = $tmp->title;
+                    $data[$key]['title'] = '<span title="'.$tmp->title.'">'.$title.'</span>';
+                    $data[$key]['item_no'] = $tmp->item_no ? $tmp->item_no : $data[$key]['item_no'];
+                    if($tmp->images){
+                        $imageArr = explode(',',$tmp->images);
+                        if($imageArr){
+                            $image = 'https://images-na.ssl-images-amazon.com/images/I/'.$imageArr[0];
+                            $data[$key]['image'] = '<a href="https://www.' .$domain. '/dp/' . $tmp->asin .'" target="_blank" rel="noreferrer"><image style="width:50px;height:50px;" src="'.$image.'"></a>';
+                        }
+                    }
+                }
+            }
+            
 		}
 		return $data;
 	}

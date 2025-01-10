@@ -482,7 +482,7 @@ class ReviewController extends Controller
                     ->on('sap_asin_match_sku.marketplace_id', '=', 'asins.marketplaceid');
             });
 
-        $_asinsMappingSelect=$_asinsMappingSelect->whereRaw('length(sap_asin_match_sku.asin)=10') ;
+        
 
 
         //是否属于营销员（销售人员）
@@ -521,6 +521,7 @@ class ReviewController extends Controller
 
         }
 
+        $_asinsMappingSelect=$_asinsMappingSelect->whereRaw('length(sap_asin_match_sku.asin)=10') ;
 
         //TODO: 这里需要把获得的user_id转化为SAP的sap_seller_id,才能获得正确的值
         if(array_get($_REQUEST,'user_id')){
@@ -545,9 +546,9 @@ class ReviewController extends Controller
             $_toSelect=true;
             $keywords=trim(array_get($_REQUEST,'keywords'));
             $_asinsMappingSelect = $_asinsMappingSelect->where(function ($query) use ($keywords) {
-                $query->where('sap_asin_match_sku.asin', 'like', '%'.$keywords.'%')
-                    ->orwhere('sap_asin_match_sku.seller_sku', 'like', '%'.$keywords.'%')
-                    ->orwhere('sap_asin_match_sku.sku', 'like', '%'.$keywords.'%');
+                $query->where('sap_asin_match_sku.asin', $keywords)
+                    ->orwhere('sap_asin_match_sku.seller_sku', $keywords)
+                    ->orwhere('sap_asin_match_sku.sku', $keywords);
             });
         }
 
@@ -558,7 +559,7 @@ class ReviewController extends Controller
         if($_asinsMapping){
             foreach ($_asinsMapping as $_asin){
                 if($_asin){
-                    $_asins[$_asin->asin]=$_asin->asin;
+                    $_asins[]=$_asin->asin;
                     $asinMatchSkuData[$_asin->asin]['item_no'] = $_asin->sku;
                     $asinMatchSkuData[$_asin->asin]['title'] = $_asin->title;
                     $_images = explode(',',$_asin->images);
